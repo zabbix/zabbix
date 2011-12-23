@@ -21,6 +21,7 @@
 #define ZABBIX_DB_H
 
 #include "common.h"
+#include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
 
@@ -586,7 +587,8 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 
 int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
 int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
-int	DBdelete_host(zbx_uint64_t hostid);
+void	DBdelete_items(zbx_vector_uint64_t *itemids);
+void	DBdelete_host(zbx_uint64_t hostid);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 

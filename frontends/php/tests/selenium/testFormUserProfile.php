@@ -21,26 +21,21 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormUserProfile extends CWebTest
-{
+class testFormUserProfile extends CWebTest {
 	public $oldHash;
 
-	public function hashUsersExcept($user)
-	{
+	public function hashUsersExcept($user) {
 		$this->oldHash=DBhash("select * from users where alias<>'$user' order by userid");
 	}
 
-	protected function assertPreConditions()
-	{
+	protected function assertPreConditions() {
 		$this->oldHash=$this->hashUsersExcept('Admin');
 	}
 
-	protected function assertPostConditions()
-	{
+	protected function assertPostConditions() {
 	}
 
-	public function testFormProfile_SimpleUpdate()
-	{
+	public function testFormProfile_SimpleUpdate() {
 		$this->login('profile.php');
 
 		$this->assertTitle('User profile');
@@ -49,11 +44,10 @@ class testFormUserProfile extends CWebTest
 		$this->wait();
 		$this->ok('Copyright');
 
-		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+		$this->assertEquals($this->oldHash, $this->hashUsersExcept('Admin'));
 	}
 
-	public function testFormProfile_Cancel()
-	{
+	public function testFormProfile_Cancel() {
 		$this->login('profile.php');
 
 		$this->button_click('save');
@@ -61,68 +55,64 @@ class testFormUserProfile extends CWebTest
 		$this->ok('Copyright');
 	}
 
-	public function testFormProfile_PasswordChange1()
-	{
+	public function testFormProfile_PasswordChange1() {
 		$pwd="'\'$\"\"!$@$#^%$+-=~`\`\\";
 
 		$this->login('profile.php');
 
 		$this->button_click('change_password');
 		$this->wait();
-		$this->input_type('password1',$pwd);
-		$this->input_type('password2',$pwd);
+		$this->input_type('password1', $pwd);
+		$this->input_type('password2', $pwd);
 
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
 
 		$row=DBfetch(DBselect("select passwd from users where alias='Admin'"));
-		$this->assertEquals(md5($pwd),$row['passwd']);
+		$this->assertEquals(md5($pwd), $row['passwd']);
 
-		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+		$this->assertEquals($this->oldHash, $this->hashUsersExcept('Admin'));
 	}
 
-	public function testFormProfile_PasswordChange2()
-	{
+	public function testFormProfile_PasswordChange2() {
 		$this->login('profile.php');
 
 		$this->button_click('change_password');
 		$this->wait();
-		$this->input_type('password1','zabbix');
-		$this->input_type('password2','zabbix');
+		$this->input_type('password1', 'zabbix');
+		$this->input_type('password2', 'zabbix');
 
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
 
-		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+		$this->assertEquals($this->oldHash, $this->hashUsersExcept('Admin'));
 	}
 
-	public function testFormProfile_EmptyPasswords()
-	{
+	public function testFormProfile_EmptyPasswords() {
 		$this->login('profile.php');
 
 		$this->button_click('change_password');
 		$this->wait();
-		$this->input_type('password1','');
-		$this->input_type('password2','');
+		$this->input_type('password1', '');
+		$this->input_type('password2', '');
 
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('ERROR: Password should not be empty');
 		$this->assertTitle('User profile');
 
-		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+		$this->assertEquals($this->oldHash, $this->hashUsersExcept('Admin'));
 	}
 
-	public function testFormProfile_DifferentPasswords()
-	{
+	public function testFormProfile_DifferentPasswords() {
 		$this->login('profile.php');
 
 		$this->button_click('change_password');
 		$this->wait();
-		$this->input_type('password1','abc');
-		$this->input_type('password2','def');
+		$this->input_type('password1', 'abc');
+		$this->input_type('password2', 'def');
 
 		$this->button_click('save');
 		$this->wait();
@@ -130,24 +120,23 @@ class testFormUserProfile extends CWebTest
 		$this->assertTitle('User profile');
 	}
 
-	public function testFormProfile_ThemeChange()
-	{
+	public function testFormProfile_ThemeChange() {
 		global $DB;
 
 		$this->login('profile.php');
 
-		$this->dropdown_select('theme','Original blue');
+		$this->dropdown_select('theme', 'Original blue');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Copyright');
 
 		$row=DBfetch(DBselect("select theme from users where alias='Admin'"));
-		$this->assertEquals('css_ob.css',$row['theme']);
+		$this->assertEquals('css_ob.css', $row['theme']);
 
-		$this->assertEquals($this->oldHash,$this->hashUsersExcept('Admin'));
+		$this->assertEquals($this->oldHash, $this->hashUsersExcept('Admin'));
 	}
 
-	public function testFormProfile_GlobalMessagingEnable(){
+	public function testFormProfile_GlobalMessagingEnable() {
 // TODO
 		$this->markTestIncomplete();
 /*
@@ -170,6 +159,5 @@ class testFormUserProfile extends CWebTest
 		// and maybe individually toggle priority checkboxes and check in the db...
 */
 	}
-
 }
 ?>

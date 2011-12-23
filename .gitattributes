@@ -6,15 +6,12 @@ bin/win32/zabbix_sender.exe -text
 bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
-/build.xml -text
 build/win32/project/Makefile_agent -text
 build/win32/project/Makefile_agent_x64 -text
 build/win32/project/Makefile_get -text
 build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
-create/bin/export_data.sh -text
-create/bin/gen_data.pl -text
 create/src/data.tmpl -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
@@ -175,15 +172,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/sysmaps/CCanvas.php -text
-frontends/php/include/classes/sysmaps/CMapPainter.php -text
-frontends/php/include/views/configuration.application.edit.php -text
-frontends/php/include/views/configuration.application.list.php -text
-frontends/php/include/views/configuration.services.child.list.php -text
-frontends/php/include/views/configuration.services.edit.php -text
-frontends/php/include/views/configuration.services.list.php -text
-frontends/php/include/views/configuration.services.parent.list.php -text
-frontends/php/include/views/js/configuration.services.edit.js.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
@@ -245,16 +233,7 @@ frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/bootstrap.php.template -text
-include/telnet.h -text
-m4/ax_lib_ibm_db2.m4 -text
-m4/ax_lib_oracle_oci.m4 -text
-m4/iconv.m4 -text
-m4/libiodbc.m4 -text
-m4/libssh2.m4 -text
-m4/libunixodbc.m4 -text
-m4/openipmi.m4 -text
-m4/resolv.m4 -text
-man/Makefile.am -text
+frontends/php/tests/selenium/templates/testPageSample.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -531,24 +510,11 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
-misc/init.d/ubuntu/zabbix-agent.conf -text
-misc/init.d/ubuntu/zabbix-server.conf -text
-misc/snmptrap/zabbix_trap_receiver.pl -text
-src/libs/zbxcomms/telnet.c -text
-src/libs/zbxself/Makefile.am -text
-src/libs/zbxsysinfo/linux/hardware.c -text
-src/libs/zbxsysinfo/linux/hardware.h -text
-src/libs/zbxsysinfo/linux/software.c -text
-src/libs/zbxsysinfo/linux/software.h -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
-src/zabbix_server/selfmon/Makefile.am -text
-src/zabbix_server/snmptrapper/Makefile.am -text
-src/zabbix_server/snmptrapper/snmptrapper.c -text
-src/zabbix_server/snmptrapper/snmptrapper.h -text
 tests/data/README -text
 tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text

@@ -63,6 +63,7 @@ class API_JSON_Item extends CZabbixTest
 				"hostid" => "10017",
 				"type"  => "0",
 				'value_type' => '3',
+				'delay' => '30',
 				"interfaceid"  => "10017",
 				"inventory_link" => $inventoryFieldNr
 			),
