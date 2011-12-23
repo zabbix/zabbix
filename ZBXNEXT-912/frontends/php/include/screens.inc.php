@@ -185,11 +185,12 @@ function add_slideshow($name, $delay, $slides) {
 	}
 
 	// set default delay
-	foreach ($slides as $slide) {
-		if (!isset($slide['delay'])) {
-			$slide['delay'] = 0;
+	for ($i = 0, $size = count($slides); $i < $size; $i++) {
+		if (empty($slides[$i]['delay'])) {
+			$slides[$i]['delay'] = 0;
 		}
 	}
+
 	$slideshowid = get_dbid('slideshows', 'slideshowid');
 	$result = DBexecute(
 		'INSERT INTO slideshows (slideshowid,name,delay)'.
@@ -242,9 +243,9 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	}
 
 	// set default delay
-	foreach ($slides as $slide) {
-		if (!isset($slide['delay'])) {
-			$slide['delay'] = 0;
+	for ($i = 0, $size = count($slides); $i < $size; $i++) {
+		if (empty($slides[$i]['delay'])) {
+			$slides[$i]['delay'] = 0;
 		}
 	}
 

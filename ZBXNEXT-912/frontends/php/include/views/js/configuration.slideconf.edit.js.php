@@ -9,7 +9,7 @@
 	</td>
 	<td>#{name}</td>
 	<td>
-		<input class="input text" type="text" name="slides[#{rowId}][delay]" value="0" size="5" maxlength="5" onchange="validateNumericBox(this, false, false);" style="text-align: right;">
+		<input class="input text" type="text" name="slides[#{rowId}][delay]" placeholder="<#{rowDelay}>" value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
 	</td>
 	<td>
 		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" value="<?php echo _('Remove'); ?>" onclick="removeSlide(this);" />
@@ -93,6 +93,7 @@
 	});
 
 	function addPopupValues(list) {
+		var defaultDelay = jQuery('#delay').val();
 		for (var i = 0; i < list.values.length; i++) {
 			if (empty(list.values[i])) {
 				continue;
@@ -100,6 +101,7 @@
 			var value = list.values[i];
 			value['rowNum'] = jQuery('#slideTable tr.sortable .rowNum').length + 1;
 			value['rowId'] = jQuery('#slideTable tr.sortable .rowNum').length;
+			value['rowDelay'] = defaultDelay;
 
 			if (jQuery('#slides' + value.screenid).length) {
 				continue;

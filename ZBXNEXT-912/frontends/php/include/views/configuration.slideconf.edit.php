@@ -36,7 +36,7 @@ if (!empty($this->data['slideshowid'])) {
 // create slide form list
 $slideFormList = new CFormList('slideFormList');
 $slideFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
-$slideFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5, 'no', false, false));
+$slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, 'no', false, false));
 
 // append slide table
 $slideTable = new CTableInfo(_('No slides defined.'), 'formElementTable');
@@ -46,7 +46,7 @@ $slideTable->setHeader(array(
 	new CCol(SPACE, null, null, '15'),
 	new CCol(SPACE, null, null, '15'),
 	new CCol(_('Screen'), null, null, '140'),
-	new CCol(_('Delay'), null, null, '60'),
+	new CCol(_('Delay'), null, null, '70'),
 	new CCol(_('Action'), null, null, '50')
 ));
 
@@ -63,7 +63,8 @@ foreach ($this->data['slides'] as $step => $slides) {
 	$numSpan = new CSpan($i++.':', 'rowNum');
 	$numSpan->setAttribute('id', 'current_slide_'.$step);
 
-	$delay = !empty($slides['delay']) ? $slides['delay'] : $this->data['delay'];
+	$delay = new CNumericBox('slides['.$step.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, 'no', true, false);
+	$delay->setAttribute('placeholder', '<'.$this->data['delay'].'>');
 
 	$removeButton = new CButton('remove_'.$step, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
 	$removeButton->setAttribute('remove_slide', $step);
@@ -72,7 +73,7 @@ foreach ($this->data['slides'] as $step => $slides) {
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
 		$numSpan,
 		$name,
-		new CNumericBox('slides['.$step.'][delay]', $delay, 5, 'no', false, false),
+		$delay,
 		$removeButton
 	), 'sortable');
 	$row->setAttribute('id', 'slides_'.$step);
