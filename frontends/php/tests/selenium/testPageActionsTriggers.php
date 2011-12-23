@@ -33,7 +33,7 @@ class testPageActionsTriggers extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsTriggers_SimpleTest($action)
+	public function testPageActionsTriggers_CheckLayout($action)
 	{
 		$name=$action['name'];
 

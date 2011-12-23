@@ -28,6 +28,7 @@ class testPageHosts extends CWebTest{
 	}
 
 	/**
+	* Test that all required elements present on the page
 	* @dataProvider allHosts
 	*/
 	public function testPageHosts_CheckLayout($host){
@@ -48,6 +49,7 @@ class testPageHosts extends CWebTest{
 	}
 
 	/**
+	* Test that after update object properties remains exactly the same in the database
 	* @dataProvider allHosts
 	*/
 	public function testPageHosts_SimpleUpdate($host){

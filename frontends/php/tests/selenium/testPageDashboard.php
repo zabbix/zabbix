@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageDashboard extends CWebTest
 {
-	public function testPageDashboard_SimpleTest()
+	public function testPageDashboard_CheckLayout()
 	{
 		$this->login('dashboard.php');
 		$this->assertTitle('Dashboard');
