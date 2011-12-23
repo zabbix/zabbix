@@ -12,6 +12,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+A......... [ZBX-4425] fixed item prototype interface mapping when cloning a discovery rule (pavels)
 ..F....... [ZBX-4459] fixed values are cleared when try to add incorrect value mapping, negative values now allowed (Vedmak)
 ..F....... [ZBX-4458] fixed js error in global macro form, changed layout to be consistant with other places (Vedmak)
 ..F....... [ZBX-4449] fixed IT services SLA graph permission checks (pavels)
