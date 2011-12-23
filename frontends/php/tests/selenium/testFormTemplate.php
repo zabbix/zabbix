@@ -21,16 +21,16 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormTemplate extends CWebTest{
+class testFormTemplate extends CWebTest {
 	public $template = "Test template";
 	public $template_tmp = "Test template 2";
 
 	public function testFormTemplate_Create(){
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','Templates');
+		$this->dropdown_select_wait('groupid', 'Templates');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('template_name',$this->template);
+		$this->input_type('template_name', $this->template);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
@@ -38,14 +38,14 @@ class testFormTemplate extends CWebTest{
 		$this->ok($this->template);
 	}
 
-	public function testFormTemplate_CreateLongTemplateName(){
+	public function testFormTemplate_CreateLongTemplateName() {
 // 64 character long template name
 		$template="000000000011111111112222222222333333333344444444445555555555666";
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','Templates');
+		$this->dropdown_select_wait('groupid', 'Templates');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('template_name',$template);
+		$this->input_type('template_name', $template);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
@@ -53,9 +53,9 @@ class testFormTemplate extends CWebTest{
 		$this->ok($template);
 	}
 
-	public function testFormTemplate_SimpleUpdate(){
+	public function testFormTemplate_SimpleUpdate() {
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','Templates');
+		$this->dropdown_select_wait('groupid', 'Templates');
 		$this->click('link=Template_Linux');
 		$this->wait();
 		$this->button_click('save');
@@ -65,13 +65,13 @@ class testFormTemplate extends CWebTest{
 		$this->ok($this->template);
 	}
 
-	public function testFormTemplate_UpdateTemplateName(){
+	public function testFormTemplate_UpdateTemplateName() {
 		// Update template
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 		$this->click('link='.$this->template);
 		$this->wait();
-		$this->input_type('template_name',$this->template_tmp);
+		$this->input_type('template_name', $this->template_tmp);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
@@ -101,15 +101,15 @@ class testFormTemplate extends CWebTest{
 		// Attempt to create a template with a name that already exists and not add it to any groups
 		// In future should also check these conditions individually
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('template_name','Template_Linux');
+		$this->input_type('template_name', 'Template_Linux');
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
 		$this->ok('No groups for template');
-		$this->assertEquals(1,DBcount("select * from hosts where host='Template_Linux'"));
+		$this->assertEquals(1, DBcount("select * from hosts where host='Template_Linux'"));
 	}
 
 	public function testFormTemplate_Delete() {
@@ -120,7 +120,7 @@ class testFormTemplate extends CWebTest{
 		$this->chooseOkOnNextConfirmation();
 		// Delete template
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 		$this->click('link='.$this->template_tmp);
 		$this->wait();
 		$this->button_click('delete');
@@ -134,27 +134,27 @@ class testFormTemplate extends CWebTest{
 		$this->assertEquals(0, $macrosCount, 'Template macros have not been deleted.');
 	}
 
-	public function testFormTemplate_CloneTemplate(){
+	public function testFormTemplate_CloneTemplate() {
 		// Clone template
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 		$this->click('link=Template_Linux');
 		$this->wait();
 		$this->button_click('clone');
 		$this->wait();
-		$this->input_type('template_name',$this->template_tmp);
+		$this->input_type('template_name', $this->template_tmp);
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
 		$this->ok('New template added');
 	}
 
-	public function testFormTemplate_DeleteClonedTemplate(){
+	public function testFormTemplate_DeleteClonedTemplate() {
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete template
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 		$this->click('link='.$this->template_tmp);
 		$this->wait();
 		$this->button_click('delete');
@@ -164,27 +164,27 @@ class testFormTemplate extends CWebTest{
 		$this->ok('Template deleted');
 	}
 
-	public function testFormTemplate_FullCloneTemplate(){
+	public function testFormTemplate_FullCloneTemplate() {
 		// Full clone template
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 		$this->click('link=Template_Linux');
 		$this->wait();
 		$this->button_click('full_clone');
 		$this->wait();
-		$this->input_type('template_name',$this->template.'_fullclone');
+		$this->input_type('template_name', $this->template.'_fullclone');
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
 		$this->ok('New template added');
 	}
 
-	public function testFormTemplate_DeleteFullClonedTemplate(){
+	public function testFormTemplate_DeleteFullClonedTemplate() {
 		$this->chooseOkOnNextConfirmation();
 
 		// Delete full cloned template
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 		$this->click('link='.$this->template.'_fullclone');
 		$this->wait();
 		$this->button_click('delete');
