@@ -31,8 +31,9 @@ class testPageActionsAutoregistration extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsAutoregistration_SimpleTest($action) {
-		$name = $action['name'];
+	public function testPageActionsAutoregistration_CheckLayout($action)
+	{
+		$name=$action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');

@@ -32,7 +32,7 @@ class testPageDiscovery extends CWebTest
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_SimpleTest($rule)
+	public function testPageDiscovery_CheckLayout($rule)
 	{
 		$this->login('discoveryconf.php');
 		$this->assertTitle('Configuration of discovery');
