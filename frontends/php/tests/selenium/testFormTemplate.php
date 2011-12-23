@@ -25,7 +25,7 @@ class testFormTemplate extends CWebTest {
 	public $template = "Test template";
 	public $template_tmp = "Test template 2";
 
-	public function testFormTemplate_Create(){
+	public function testFormTemplate_Create() {
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid', 'Templates');
 		$this->button_click('form');
@@ -114,7 +114,7 @@ class testFormTemplate extends CWebTest {
 
 	public function testFormTemplate_Delete() {
 
-		// save the id of the host
+		// save the ID of the host
 		$template = DBfetch(DBSelect("select hostid from hosts where host like '".$this->template_tmp."'"));
 
 		$this->chooseOkOnNextConfirmation();
