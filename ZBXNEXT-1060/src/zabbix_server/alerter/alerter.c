@@ -78,12 +78,6 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 		/* SMS uses its own timeouts */
 		res = send_sms(mediatype->gsm_modem, alert->sendto, alert->message, error, max_error_len);
 	}
-	else if (MEDIA_TYPE_EZ_TEXTING == mediatype->type)
-	{
-		/* Ez Texting uses its own timeouts */
-		res = send_ez_texting(mediatype->username, mediatype->passwd,
-				alert->sendto, alert->message, mediatype->exec_path, error, max_error_len);
-	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
 		char	full_path[MAX_STRING_LEN], *send_to, *subject, *message, *output = NULL;
