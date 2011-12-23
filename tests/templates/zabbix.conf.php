@@ -20,7 +20,7 @@
 
 global $DB;
 
-$DB["TYPE"]		= "POSTGRESQL";
+$DB["TYPE"]		= "{DBTYPE}";
 $DB["SERVER"]		= "{DBHOST}";
 $DB["PORT"]		= "0";
 $DB["DATABASE"]		= "{DBNAME}";

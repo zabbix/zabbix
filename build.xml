@@ -3,11 +3,14 @@
 	<property name="basedir" value="${WORKSPACE}"/>
 	<property name="builddir" value="${BUILDDIR}"/>
 	<property name="svn" value="${SVN}"/>
+	<property name="dbenable" value="${DBENABLE}"/>
 	<property name="dbtype" value="${DBTYPE}"/>
 	<property name="dbhost" value="${DBHOST}"/>
 	<property name="dbname" value="${DBNAME}"/>
 	<property name="dbuser" value="${DBUSER}"/>
 	<property name="dbpassword" value="${DBPASSWORD}"/>
+	<property name="agentport" value="${AGENTPORT}"/>
+	<property name="serverport" value="${SERVERPORT}"/>
 	<property name="url" value="${URL}"/>
 
 	<target name="buildagent">
@@ -27,7 +30,7 @@
 		<!-- Build server binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg value="--enable-server"/>
-			<arg value="--with-${dbtype}"/>
+			<arg value="--with-${dbenable}"/>
 			<arg value="--with-net-snmp"/>
 			<arg value="--with-openipmi"/>
 			<arg value="--with-ldap"/>
@@ -46,7 +49,7 @@
 		<!-- Build proxy binaries -->
 		<exec executable="./configure" dir="${builddir}" failonerror="on">
 			<arg value="--enable-proxy"/>
-			<arg value="--with-${dbtype}"/>
+			<arg value="--with-${dbenable}"/>
 			<arg value="--with-net-snmp"/>
 			<arg value="--with-openipmi"/>
 			<arg value="--with-ldap"/>
@@ -118,7 +121,28 @@
 		</exec>
 	</target>
 
-	<target name="init-postgresql" depends="init-common">
+	<target name="create-configs">
+<!--	<target name="create-configs" depends="init-common"> -->
+		<!-- Create PHP config file -->
+		<copy overwrite="true" file="${builddir}/tests/templates/zabbix.conf.php" tofile="${builddir}/frontends/php/conf/zabbix.conf.php"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
+		<!-- Create deamon config files -->
+		<mkdir dir="${builddir}/etc"/>
+		<mkdir dir="${builddir}/tmp"/>
+		<copy overwrite="true" file="${builddir}/tests/templates/zabbix_agentd.conf" tofile="${builddir}/etc/zabbix_agentd.conf"/>
+		<replace file="${builddir}/etc/zabbix_agentd.conf" token="{AGENTPORT}" value="${agentport}"/>
+		<replace file="${builddir}/etc/zabbix_agentd.conf" token="{ROOTDIR}" value="${builddir}"/>
+		<copy overwrite="true" file="${builddir}/tests/templates/zabbix_server.conf" tofile="${builddir}/etc/zabbix_server.conf"/>
+		<replace file="${builddir}/etc/zabbix_server.conf" token="{SERVERPORT}" value="${serverport}"/>
+		<replace file="${builddir}/etc/zabbix_server.conf" token="{ROOTDIR}" value="${builddir}"/>
+	</target>
+
+	<target name="init-postgresql" depends="create-configs">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<arg line="-h ${dbhost}"/>
@@ -168,22 +192,43 @@
 		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
 	</target>
 
-	<target name="runagent" depends="buildagent">
+	<target name="killagent">
 		<!-- Kill previously running agent -->
 		<exec executable="killall" failonerror="off">
-			<arg line="-9 zabbix_agentd"/>
+			<arg line="-9 `cat ${builddir}/tmp/zabbix_agentd.tmp`"/>
 		</exec>
 		<!-- Sleep for 2 seconds -->
 		<exec executable="sleep" failonerror="off">
 			<arg line="2"/>
 		</exec>
-		<!-- Execute Agent with default config file -->
-		<exec executable="${builddir}/sbin/zabbix_agentd" dir="${builddir}/sbin" failonerror="on">
-			<arg line="--config=${builddir}/conf/zabbix_agentd.conf"/>
+	</target>
+
+	<target name="killserver">
+		<!-- Kill previously running server -->
+		<exec executable="killall" failonerror="off">
+			<arg line="-9 `cat ${builddir}/tmp/zabbix_server.tmp`"/>
+		</exec>
+		<!-- Sleep for 2 seconds -->
+		<exec executable="sleep" failonerror="off">
+			<arg line="2"/>
 		</exec>
 	</target>
 
-	<target name="init-mysql" depends="init-common">
+	<target name="runserver" depends="buildserver,killserver">
+		<!-- Execute Server -->
+		<exec executable="${builddir}/sbin/zabbix_server" dir="${builddir}/sbin" failonerror="on">
+			<arg line="--config=${builddir}/etc/zabbix_server.conf"/>
+		</exec>
+	</target>
+
+	<target name="runagent" depends="buildagent,killagent">
+		<!-- Execute Agent -->
+		<exec executable="${builddir}/sbin/zabbix_agentd" dir="${builddir}/sbin" failonerror="on">
+			<arg line="--config=${builddir}/etc/zabbix_agentd.conf"/>
+		</exec>
+	</target>
+
+	<target name="init-mysql" depends="create-configs">
 		<!-- Create MySQL database -->
 		<exec executable="mysql" failonerror="on">
 			<arg line="-h ${dbhost}"/>
@@ -247,7 +292,7 @@
 	</target>
 
 	<target name="build-mysql" depends="clean,init-mysql,buildagent,buildproxy,buildserver,test-frontend" />
-	<target name="build-postgresql" depends="clean,init-postgresql,buildagent,buildproxy,buildserver,test-frontend" />
+	<target name="build-postgresql" depends="clean,init-postgresql,runagent,runserver,buildproxy,test-frontend" />
 	<target name="build-sqlite3" depends="clean,init-sqlite3,buildagent,buildproxy,buildserver,test-frontend" />
 
 	<!-- Default target -->
