@@ -24,49 +24,46 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 class testPageActionsAutoregistration extends CWebTest
 {
 	// Returns all trigger actions
-	public static function allActions()
-	{
+	public static function allActions() {
 		return DBdata("select * from actions where eventsource=".EVENT_SOURCE_AUTO_REGISTRATION." order by actionid");
 	}
 
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsAutoregistration_SimpleTest($action)
-	{
-		$name=$action['name'];
+	public function testPageActionsAutoregistration_SimpleTest($action) {
+		$name = $action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
 
 // eventsource is used for a hidden field, so it does not work. See above: ?eventsource=0 is used instead
-//		$this->dropdown_select('eventsource','Auto registration');
+//		$this->dropdown_select('eventsource', 'Auto registration');
 
 		$this->ok('Event source');
 		$this->ok('Displaying');
 		// Header
-		$this->ok(array('Name','Conditions','Operations','Status'));
+		$this->ok(array('Name', 'Conditions', 'Operations', 'Status'));
 		// Data
 		$this->ok(array($action['name']));
-		$this->dropdown_select('go','Enable selected');
-		$this->dropdown_select('go','Disable selected');
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Enable selected');
+		$this->dropdown_select('go', 'Disable selected');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsAutoregistration_SimpleUpdate($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsAutoregistration_SimpleUpdate($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
-		$sql1="select * from actions where actionid=$actionid order by actionid";
-		$oldHashAction=DBhash($sql1);
-		$sql2="select * from operations where actionid=$actionid order by operationid";
-		$oldHashOperations=DBhash($sql2);
-		$sql3="select * from conditions where actionid=$actionid order by conditionid";
-		$oldHashConditions=DBhash($sql3);
+		$sql1 = "select * from actions where actionid=$actionid order by actionid";
+		$oldHashAction = DBhash($sql1);
+		$sql2 = "select * from operations where actionid=$actionid order by operationid";
+		$oldHashOperations = DBhash($sql2);
+		$sql3 = "select * from conditions where actionid=$actionid order by conditionid";
+		$oldHashConditions = DBhash($sql3);
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
@@ -78,53 +75,50 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->ok('Action updated');
 		$this->ok("$name");
 
-		$this->assertEquals($oldHashAction,DBhash($sql1),"Chuck Norris: Action update changed data in table 'actions'.");
-		$this->assertEquals($oldHashOperations,DBhash($sql2),"Chuck Norris: Action update changed data in table 'operations'");
-		$this->assertEquals($oldHashConditions,DBhash($sql3),"Chuck Norris: Action update changed data in table 'conditions'");
+		$this->assertEquals($oldHashAction, DBhash($sql1),"Chuck Norris: Action update changed data in table 'actions'.");
+		$this->assertEquals($oldHashOperations, DBhash($sql2),"Chuck Norris: Action update changed data in table 'operations'");
+		$this->assertEquals($oldHashConditions, DBhash($sql3),"Chuck Norris: Action update changed data in table 'conditions'");
 	}
 
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsAutoregistration_SingleEnableDisable($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsAutoregistration_SingleEnableDisable($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
-		switch($action['status']){
+		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
 				$this->href_click("actionconf.php?go=disable&g_actionid%5B%5D=$actionid&");
-			break;
+				break;
 			case ACTION_STATUS_DISABLED:
 				$this->href_click("actionconf.php?go=activate&g_actionid%5B%5D=$actionid&");
-			break;
+				break;
 		}
 		$this->wait();
 
 		$this->assertTitle('Configuration of actions');
 		$this->ok('Status updated');
 
-		switch($action['status']){
+		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
 				$sql="select * from actions where actionid=$actionid and status=".ACTION_STATUS_DISABLED;
-			break;
+				break;
 			case ACTION_STATUS_DISABLED:
 				$sql="select * from actions where actionid=$actionid and status=".ACTION_STATUS_ENABLED;
-			break;
+				break;
 		}
-		$this->assertEquals(1,DBcount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsAutoregistration_Create()
-	{
+	public function testPageActionsAutoregistration_Create() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageActionsAutoregistration_MassDisableAll()
-	{
+	public function testPageActionsAutoregistration_MassDisableAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -132,17 +126,16 @@ class testPageActionsAutoregistration extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsAutoregistration_MassDisable($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsAutoregistration_MassDisable($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
 		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go','Disable selected');
+		$this->dropdown_select('go', 'Disable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -153,11 +146,10 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->ok('Disabled');
 
 		$sql="select * from actions where actionid=$actionid and status=1";
-		$this->assertEquals(1,DBcount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsAutoregistration_MassEnableAll()
-	{
+	public function testPageActionsAutoregistration_MassEnableAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -165,17 +157,16 @@ class testPageActionsAutoregistration extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsAutoregistration_MassEnable($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsAutoregistration_MassEnable($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
 		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go','Enable selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -185,12 +176,11 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->ok('Status updated');
 		$this->ok('Enabled');
 
-		$sql="select * from actions where actionid=$actionid and status=0";
-		$this->assertEquals(1,DBcount($sql));
+		$sql = "select * from actions where actionid=$actionid and status=0";
+		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsAutoregistration_MassDeleteAll()
-	{
+	public function testPageActionsAutoregistration_MassDeleteAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -198,10 +188,9 @@ class testPageActionsAutoregistration extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsAutoregistration_MassDelete($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsAutoregistration_MassDelete($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -210,7 +199,7 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
 		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -219,18 +208,17 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->assertTitle('Configuration of actions');
 		$this->ok('Selected actions deleted');
 
-		$sql="select * from actions where actionid=$actionid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from operations where actionid=$actionid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from conditions where actionid=$actionid";
-		$this->assertEquals(0,DBcount($sql));
+		$sql = "select * from actions where actionid=$actionid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from operations where actionid=$actionid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from conditions where actionid=$actionid";
+		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('actions');
 	}
 
-	public function testPageActionsAutoregistration_Sorting()
-	{
+	public function testPageActionsAutoregistration_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}
