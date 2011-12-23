@@ -1652,6 +1652,8 @@ elseif ($srctbl == 'screens') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($screens, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "screens";');
+
 	$form->addItem($table);
 	$form->show();
 }
