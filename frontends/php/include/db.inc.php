@@ -1120,8 +1120,8 @@ class DB {
 
 		if (is_null(self::$nodeId)) {
 			self::$nodeId = get_current_nodeid(false);
-			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-			self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
+			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
+			self::$maxNodeId = bcadd(self::$minNodeId, '99999999999', 0);
 		}
 	}
 
