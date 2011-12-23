@@ -900,12 +900,12 @@ COpt::memoryPick();
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1
+			'selectHosts' => array('name'),
+			'nopermissions' => true
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_CREATED_SMALL);
+			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_CREATED_SMALL);
 		}
 	}
 
@@ -957,12 +957,12 @@ COpt::memoryPick();
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1,
+			'selectHosts' => array('name'),
+			'nopermissions' => true,
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
+			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
 		}
 
 	}
@@ -1012,7 +1012,7 @@ COpt::memoryPick();
 		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
-			'output' => array('hostid', 'host', 'status'),
+			'output' => array('hostid', 'name', 'status'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'nopermissions' => true,
@@ -1061,10 +1061,10 @@ COpt::memoryPick();
 					$exItem = $exItemsKeys[$item['key_']];
 
 					if ($exItem['flags'] != ZBX_FLAG_DISCOVERY) {
-						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
+						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['name']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['name'], $item['key_']));
 					}
 				}
 
@@ -1079,7 +1079,7 @@ COpt::memoryPick();
 					}
 					// no matching interface found, throw an error
 					elseif($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['name'], $item['key_']));
 					}
 				}
 
@@ -1155,7 +1155,7 @@ COpt::memoryPick();
 			}
 			// no matching interface found, throw an error
 			elseif($interface !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $dstDiscovery['key_']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['name'], $dstDiscovery['key_']));
 			}
 		}
 
@@ -1164,7 +1164,7 @@ COpt::memoryPick();
 		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
 
 		// copy prototypes
-		$newPrototypes = $this->copyDiscoveryPrototypes($srcDiscovery, $dstDiscovery);
+		$newPrototypes = $this->copyDiscoveryPrototypes($srcDiscovery, $dstDiscovery, $dstHost);
 
 		// if there were prototypes defined, clone everything else
 		if ($newPrototypes) {
@@ -1195,10 +1195,11 @@ COpt::memoryPick();
 	 *
 	 * @param array $srcDiscovery   The source discovery rule to copy from
 	 * @param array $dstDiscovery   The target discovery rule to copy to
+	 * @param array $dstHost        The target host to copy the deiscovery rule to
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery) {
+	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$prototypes = API::ItemPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -1206,9 +1207,24 @@ COpt::memoryPick();
 
 		$rs = array();
 		if ($prototypes) {
-			foreach ($prototypes as &$prototype) {
+			foreach ($prototypes as $key => $prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
+
+				// map prototype interfaces
+				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
+					// find a matching interface
+					$interface = self::findInterfaceForItem($prototype, $dstHost['interfaces']);
+					if ($interface) {
+						$prototype['interfaceid'] = $interface['interfaceid'];
+					}
+					// no matching interface found, throw an error
+					elseif ($interface !== false) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['name'], $prototype['key_']));
+					}
+				}
+
+				$prototypes[$key] = $prototype;
 			}
 
 			$rs = API::ItemPrototype()->create($prototypes);

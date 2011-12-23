@@ -44,7 +44,7 @@ class testPageNodes extends CWebTest
 	/**
 	* @dataProvider allNodes
 	*/
-	public function testPageNodes_SimpleTest($node)
+	public function testPageNodes_CheckLayout($node)
 	{
 		// TODO
 		$this->markTestIncomplete();

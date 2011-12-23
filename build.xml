@@ -34,9 +34,11 @@
 			<arg value="--with-ssh2"/>
 			<arg value="--with-libcurl"/>
 			<arg value="--with-jabber"/>
+			<arg value="--prefix=${builddir}"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on">
 			<arg value="-j4"/>
+			<arg value="install"/>
 		</exec>
 	</target>
 
@@ -51,9 +53,11 @@
 			<arg value="--with-ssh2"/>
 			<arg value="--with-libcurl"/>
 			<arg value="--with-jabber"/>
+			<arg value="--prefix=${builddir}"/>
 		</exec>
 		<exec executable="make" dir="${builddir}" failonerror="on">
 			<arg value="-j4"/>
+			<arg value="install"/>
 		</exec>
 	</target>
 
