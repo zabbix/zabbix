@@ -1264,10 +1264,9 @@ class zbxXML{
 							}
 						}
 
-						foreach($items as $inum => $item){
+						foreach($items as $item){
 							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 							$item_db['hostid'] = $current_hostid;
-							$item_db['profile_link'] = 0;
 
 							// item needs interfaces
 							if($old_version_input){
