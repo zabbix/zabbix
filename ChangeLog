@@ -12,6 +12,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+..F....... [ZBX-4470] fixed node initialization in DM setup (pavels)
 ..F....... [ZBX-4407] fixed import hosts from 1.8 version (sanja)
 A......... [ZBX-4425] fixed item prototype interface mapping when cloning a discovery rule (pavels)
 ..F....... [ZBX-4459] fixed values are cleared when try to add incorrect value mapping, negative values now allowed (Vedmak)

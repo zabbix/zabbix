@@ -1109,6 +1109,23 @@ class DB {
 		throw new APIException($code, $errors);
 	}
 
+
+	/**
+	 * Initializes nodes.
+	 *
+	 * @static
+	 */
+	public static function init() {
+		global $ZBX_LOCALNODEID;
+
+		if (is_null(self::$nodeId)) {
+			self::$nodeId = get_current_nodeid(false);
+			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000'), bcmul($ZBX_LOCALNODEID, '100000000000'), 0);
+			self::$maxNodeId = bcadd(self::$minNodeId, '99999999999', 0);
+		}
+	}
+
+
 	/**
 	 * Reserve ids for primary key of passed table.
 	 * If record for table does not exist or value is out of range, ids record is recreated
@@ -1124,6 +1141,9 @@ class DB {
 	 */
 	protected static function reserveIds($table, $count) {
 		global $DB;
+
+		self::init();
+
 		$tableSchema = self::getSchema($table);
 		$id_name = $tableSchema['key'];
 
@@ -1175,6 +1195,8 @@ class DB {
 	 * @return string
 	 */
 	private static function refreshIds($table, $count) {
+		self::init();
+
 		$tableSchema = self::getSchema($table);
 		$id_name = $tableSchema['key'];
 
@@ -1209,17 +1231,24 @@ class DB {
 		return $nextid;
 	}
 
-	public static function getSchema($table = null) {
-		global $ZBX_LOCALNODEID;
 
+	/**
+	 * Returns the array describing the database schema.
+	 *
+	 * If the $table parameter is passed, the method will return the schema for the given table,
+	 * otherwise - for the whole database.
+	 *
+	 * @static
+	 *
+	 * @throws APIException if the given table does not exist
+	 *
+	 * @param string $table
+	 *
+	 * @return array
+	 */
+	public static function getSchema($table = null) {
 		if (is_null(self::$schema)) {
 			self::$schema = include(self::SCHEMA_FILE);
-		}
-
-		if (is_null(self::$nodeId)) {
-			self::$nodeId = get_current_nodeid(false);
-			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-			self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 		}
 
 		if (is_null($table)) {
@@ -1232,6 +1261,7 @@ class DB {
 			self::exception(self::SCHEMA_ERROR, _s('Table "%s" does not exist.', $table));
 		}
 	}
+
 
 	public static function getDefaults($table) {
 		$table = self::getSchema($table);
