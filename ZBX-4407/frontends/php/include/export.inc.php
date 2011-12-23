@@ -1168,7 +1168,7 @@ class zbxXML{
 							foreach ($inventoryNodeExt as $field) {
 								$newInventoryName = self::mapProfileName($field->nodeName);
 								if (isset($host_db['inventory'][$newInventoryName]) && $field->nodeValue !== '') {
-									$host_db['inventory'][$newInventoryName] .= "\n";
+									$host_db['inventory'][$newInventoryName] .= "\r\n\r\n";
 									$host_db['inventory'][$newInventoryName] .= $field->nodeValue;
 								}
 								else {
