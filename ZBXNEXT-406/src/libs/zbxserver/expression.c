@@ -2403,7 +2403,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 					replace_to = zbx_strdup(replace_to, 1 == interface.useip ? interface.ip_orig : interface.dns_orig);
 			}
 		}
-		else if (macro_type & MACRO_TYPE_INTERFACE_PORT)
+		else if (macro_type & (MACRO_TYPE_INTERFACE_PORT | MACRO_TYPE_LLD_LIFETIME))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{

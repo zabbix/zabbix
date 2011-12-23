@@ -89,7 +89,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase
 
 	protected function tearDown()
 	{
-		DBclose();
+/*		DBclose();*/
 	}
 
 	public function login($url = NULL)

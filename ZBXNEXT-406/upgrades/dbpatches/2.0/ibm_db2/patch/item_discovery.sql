@@ -3,6 +3,7 @@ CREATE TABLE item_discovery (
 	itemid                   bigint                                    NOT NULL,
 	parent_itemid            bigint                                    NOT NULL,
 	key_                     varchar(255)    WITH DEFAULT ''           NOT NULL,
+	lastcheck                integer         WITH DEFAULT '0'          NOT NULL,
 	PRIMARY KEY (itemdiscoveryid)
 )
 /

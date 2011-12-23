@@ -261,7 +261,7 @@ static void	*__mem_malloc(zbx_mem_info_t *info, uint32_t size)
 	/* try to find an appropriate chunk in special buckets */
 
 	index = mem_bucket_by_size(size);
-	
+
 	while (index < MEM_BUCKET_COUNT - 1 && NULL == info->buckets[index])
 		index++;
 
@@ -476,7 +476,7 @@ static void	__mem_free(zbx_mem_info_t *info, void *ptr)
 		prev_chunk = chunk - MEM_SIZE_FIELD - CHUNK_SIZE(chunk - MEM_SIZE_FIELD) - MEM_SIZE_FIELD;
 
 		chunk_size += 4 * MEM_SIZE_FIELD + CHUNK_SIZE(prev_chunk) + CHUNK_SIZE(next_chunk);
-		
+
 		mem_unlink_chunk(info, prev_chunk);
 		mem_unlink_chunk(info, next_chunk);
 
@@ -581,7 +581,7 @@ void	zbx_mem_create(zbx_mem_info_t **info, key_t shm_key, int lock_name, size_t 
 	(*info)->mem_param = base;
 	size -= strlen(param) + 1;
 	base += strlen(param) + 1;
-	
+
 	/* allocate mutex */
 
 	if (ZBX_NO_MUTEX != lock_name)
@@ -818,7 +818,7 @@ size_t	zbx_mem_required_size(size_t size, int chunks_num, const char *descr, con
 	/* shared memory of what size should we allocate so that there is a guarantee */
 	/* that we will be able to get ourselves 'chunks_num' pieces of memory with a */
 	/* total size of 'size', given that we also have to store 'descr' and 'param'? */
-	
+
 	size += 7;					/* ensure we allocate enough to 8-align zbx_mem_info_t */
 	size += sizeof(zbx_mem_info_t);
 	size += ZBX_PTR_SIZE - 1;			/* ensure we allocate enough to align bucket pointers */
