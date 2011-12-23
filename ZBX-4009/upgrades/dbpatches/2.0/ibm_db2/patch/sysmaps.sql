@@ -98,7 +98,7 @@ ALTER TABLE sysmaps ADD iconmapid bigint NULL
 /
 REORG TABLE sysmaps
 /
-ALTER TABLE sysmaps ADD expand_macros integer DEFAULT '0' NOT NULL
+ALTER TABLE sysmaps ADD expand_macros integer WITH DEFAULT '0' NOT NULL
 /
 REORG TABLE sysmaps
 /
