@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testFormSysmap extends CWebTest {
 
@@ -83,7 +83,7 @@ class testFormSysmap extends CWebTest {
 
 	public function testFormSysmapSimpleUpdate() {
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="' . $this->mapName . '"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
@@ -102,7 +102,7 @@ class testFormSysmap extends CWebTest {
 		DBsave_tables('sysmaps');
 
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="' . $this->mapName . '"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
 
 		$this->input_type('name', $mapName);
@@ -129,7 +129,7 @@ class testFormSysmap extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 		// Delete Map
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="' . $this->mapName . '"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
 		$this->button_click('delete');
 		$this->waitForConfirmation();
@@ -146,7 +146,7 @@ class testFormSysmap extends CWebTest {
 		$mapName = 'Cloned map';
 
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="' . $this->mapName . '"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
 		$this->button_click('clone');
 		$this->input_type('name', $mapName);
@@ -168,7 +168,7 @@ class testFormSysmap extends CWebTest {
 		$this->open('sysmaps.php');
 		$this->chooseOkOnNextConfirmation();
 		$this->login('sysmaps.php');
-		$this->click('//a[text()="' . $mapName . '"]/../../td/a[text()="Edit"]');
+		$this->click('//a[text()="'.$mapName.'"]/../../td/a[text()="Edit"]');
 		$this->wait();
 		$this->button_click('delete');
 		$this->wait();
@@ -178,5 +178,4 @@ class testFormSysmap extends CWebTest {
 	}
 
 }
-
 ?>
