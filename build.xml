@@ -121,8 +121,7 @@
 		</exec>
 	</target>
 
-	<target name="create-configs">
-<!--	<target name="create-configs" depends="init-common"> -->
+	<target name="create-configs" depends="init-common">
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="${builddir}/tests/templates/zabbix.conf.php" tofile="${builddir}/frontends/php/conf/zabbix.conf.php"/>
 		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
@@ -130,16 +129,20 @@
 		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
 		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
 		<!-- Create deamon config files -->
 		<mkdir dir="${builddir}/etc"/>
 		<mkdir dir="${builddir}/tmp"/>
 		<copy overwrite="true" file="${builddir}/tests/templates/zabbix_agentd.conf" tofile="${builddir}/etc/zabbix_agentd.conf"/>
 		<replace file="${builddir}/etc/zabbix_agentd.conf" token="{AGENTPORT}" value="${agentport}"/>
 		<replace file="${builddir}/etc/zabbix_agentd.conf" token="{ROOTDIR}" value="${builddir}"/>
+
 		<copy overwrite="true" file="${builddir}/tests/templates/zabbix_server.conf" tofile="${builddir}/etc/zabbix_server.conf"/>
 		<replace file="${builddir}/etc/zabbix_server.conf" token="{SERVERPORT}" value="${serverport}"/>
 		<replace file="${builddir}/etc/zabbix_server.conf" token="{ROOTDIR}" value="${builddir}"/>
+		<replace file="${builddir}/etc/zabbix_server.conf" token="{DBNAME}" value="${dbname}"/>
+		<replace file="${builddir}/etc/zabbix_server.conf" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="${builddir}/etc/zabbix_server.conf" token="{DBUSER}" value="${dbuser}"/>
+		<replace file="${builddir}/etc/zabbix_server.conf" token="{DBPASSWORD}" value="${dbpassword}"/>
 	</target>
 
 	<target name="init-postgresql" depends="create-configs">
@@ -182,14 +185,6 @@
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname} ${dbuser}"/>
 		</exec>
-
-		<!-- Create PHP config file -->
-		<copy overwrite="true" file="${builddir}/tests/templates/zabbix.conf.php.postgresql" tofile="${builddir}/frontends/php/conf/zabbix.conf.php"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
 	</target>
 
 	<target name="killagent">
@@ -254,14 +249,6 @@
 			<arg line="-h ${dbhost}"/>
 			<arg line="-u${dbuser} ${dbname}"/>
 		</exec>
-
-		<!-- Create PHP config file -->
-		<copy overwrite="true" file="${builddir}/tests/templates/zabbix.conf.php.mysql" tofile="${builddir}/frontends/php/conf/zabbix.conf.php"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
-		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
 	</target>
 
 	<target name="clean">
