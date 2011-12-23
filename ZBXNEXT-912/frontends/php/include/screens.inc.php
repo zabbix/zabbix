@@ -184,13 +184,6 @@ function add_slideshow($name, $delay, $slides) {
 		return false;
 	}
 
-	// set default delay
-	for ($i = 0, $size = count($slides); $i < $size; $i++) {
-		if (empty($slides[$i]['delay'])) {
-			$slides[$i]['delay'] = 0;
-		}
-	}
-
 	$slideshowid = get_dbid('slideshows', 'slideshowid');
 	$result = DBexecute(
 		'INSERT INTO slideshows (slideshowid,name,delay)'.
@@ -201,6 +194,11 @@ function add_slideshow($name, $delay, $slides) {
 	$i = 0;
 	foreach ($slides as $slide) {
 		$slideid = get_dbid('slides', 'slideid');
+
+		// set default delay
+		if (empty($slide['delay'])) {
+			$slide['delay'] = 0;
+		}
 
 		$result = DBexecute(
 			'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
@@ -242,13 +240,6 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 		return false;
 	}
 
-	// set default delay
-	for ($i = 0, $size = count($slides); $i < $size; $i++) {
-		if (empty($slides[$i]['delay'])) {
-			$slides[$i]['delay'] = 0;
-		}
-	}
-
 	if (!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.$delay.' WHERE slideshowid='.$slideshowid)) {
 		return false;
 	}
@@ -277,9 +268,12 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 		$i = 0;
 		foreach ($slides as $slide) {
 			$slideid = get_dbid('slides', 'slideid');
-			if (!isset($slide['delay'])) {
-				$slide['delay'] = $delay;
+
+			// set default delay
+			if (empty($slide['delay'])) {
+				$slide['delay'] = 0;
 			}
+
 			$result = DBexecute(
 				'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
 				' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')'

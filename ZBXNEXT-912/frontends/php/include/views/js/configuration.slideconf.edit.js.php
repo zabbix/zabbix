@@ -2,50 +2,48 @@
 <tr id="slides_#{rowNum}" class="sortable">
 	<td>
 		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-		<input name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
+		<input name="slides[#{rowNum}][screenid]" type="hidden" value="#{screenid}" />
 	</td>
 	<td>
-		<span class="rowNum" id="current_slide_#{rowId}">#{rowNum}</span>
+		<span class="rowNum" id="current_slide_#{rowNum}">#{rowNum}</span>
 	</td>
 	<td>#{name}</td>
 	<td>
-		<input class="input text" type="text" name="slides[#{rowId}][delay]" placeholder="<#{rowDelay}>" value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
+		<input class="input text" type="text" name="slides[#{rowNum}][delay]" placeholder="<#{rowDelay}>" value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
 	</td>
 	<td>
-		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" value="<?php echo _('Remove'); ?>" onclick="removeSlide(this);" />
+		<input type="button" class="input link_menu" id="remove_#{rowNum}" remove_slide="#{rowNum}" value="<?php echo _('Remove'); ?>" onclick="removeSlide(this);" />
 	</td>
 </tr>
 </script>
 
 <script type="text/javascript">
 	function removeSlide(obj) {
-		if (obj != null) {
-			slideId = obj.getAttribute('remove_slide');
+		step = obj.getAttribute('remove_slide');
 
-			removeObjectById('slides_' + slideId);
-			removeObjectById('slides_' + slideId + '_slideid');
-			removeObjectById('slides_' + slideId + '_screenid');
-			removeObjectById('slides_' + slideId + '_delay');
+		removeObjectById('slides_' + step);
+		removeObjectById('slides_' + step + '_slideid');
+		removeObjectById('slides_' + step + '_screenid');
+		removeObjectById('slides_' + step + '_delay');
 
-			if (jQuery('#slideTable tr.sortable').length <= 1) {
-				jQuery('#slideTable').sortable('disable');
-			}
-			recalculateSortOrder();
+		if (jQuery('#slideTable tr.sortable').length <= 1) {
+			jQuery('#slideTable').sortable('disable');
 		}
+		recalculateSortOrder();
 	}
 
 	function recalculateSortOrder() {
 		var i = 0;
 		jQuery('#slideTable tr.sortable .rowNum').each(function() {
-			var slideId = (i == 0) ? '0' : i;
+			var step = (i == 0) ? '0' : i;
 
 			// rewrite ids to temp
-			jQuery('#remove_' + slideId).attr('id', 'tmp_remove_' + slideId);
-			jQuery('#slides_' + slideId).attr('id', 'tmp_slides_' + slideId);
-			jQuery('#slides_' + slideId + '_slideid').attr('id', 'tmp_slides_' + slideId + '_slideid');
-			jQuery('#slides_' + slideId + '_screenid').attr('id', 'tmp_slides_' + slideId + '_screenid');
-			jQuery('#slides_' + slideId + '_delay').attr('id', 'tmp_slides_' + slideId + '_delay');
-			jQuery('#current_slide_' + slideId).attr('id', 'tmp_current_slide_' + slideId);
+			jQuery('#remove_' + step).attr('id', 'tmp_remove_' + step);
+			jQuery('#slides_' + step).attr('id', 'tmp_slides_' + step);
+			jQuery('#slides_' + step + '_slideid').attr('id', 'tmp_slides_' + step + '_slideid');
+			jQuery('#slides_' + step + '_screenid').attr('id', 'tmp_slides_' + step + '_screenid');
+			jQuery('#slides_' + step + '_delay').attr('id', 'tmp_slides_' + step + '_delay');
+			jQuery('#current_slide_' + step).attr('id', 'tmp_current_slide_' + step);
 
 			// set order number
 			jQuery(this).attr('new_slide', i);
@@ -55,21 +53,21 @@
 
 		// rewrite ids in new order
 		for (var n = 0; n < i; n++) {
-			var newSlideId = jQuery('#tmp_current_slide_' + n).attr('new_slide');
+			var newStep = jQuery('#tmp_current_slide_' + n).attr('new_slide');
 
-			jQuery('#tmp_remove_' + n).attr('id', 'remove_' + newSlideId);
-			jQuery('#tmp_slides_' + n).attr('id', 'slides_' + newSlideId);
-			jQuery('#tmp_slides_' + n + '_slideid').attr('id', 'slides_' + newSlideId + '_slideid');
-			jQuery('#tmp_slides_' + n + '_screenid').attr('id', 'slides_' + newSlideId + '_screenid');
-			jQuery('#tmp_slides_' + n + '_delay').attr('id', 'slides_' + newSlideId + '_delay');
+			jQuery('#tmp_remove_' + n).attr('id', 'remove_' + newStep);
+			jQuery('#tmp_slides_' + n).attr('id', 'slides_' + newStep);
+			jQuery('#tmp_slides_' + n + '_slideid').attr('id', 'slides_' + newStep + '_slideid');
+			jQuery('#tmp_slides_' + n + '_screenid').attr('id', 'slides_' + newStep + '_screenid');
+			jQuery('#tmp_slides_' + n + '_delay').attr('id', 'slides_' + newStep + '_delay');
 
-			jQuery('#slides_' + newSlideId + '_slideid').attr('name', 'slides[' + newSlideId + '][slideid]');
-			jQuery('#slides_' + newSlideId + '_screenid').attr('name', 'slides[' + newSlideId + '][screenid]');
-			jQuery('#slides_' + newSlideId + '_delay').attr('name', 'slides[' + newSlideId + '][delay]');
-			jQuery('#remove_' + newSlideId).attr('remove_slide', newSlideId);
+			jQuery('#slides_' + newStep + '_slideid').attr('name', 'slides[' + newStep + '][slideid]');
+			jQuery('#slides_' + newStep + '_screenid').attr('name', 'slides[' + newStep + '][screenid]');
+			jQuery('#slides_' + newStep + '_delay').attr('name', 'slides[' + newStep + '][delay]');
+			jQuery('#remove_' + newStep).attr('remove_slide', newStep);
 
 			// set new slide order position
-			jQuery('#tmp_current_slide_' + n).attr('id', 'current_slide_' + newSlideId);
+			jQuery('#tmp_current_slide_' + n).attr('id', 'current_slide_' + newStep);
 		}
 	}
 
@@ -100,12 +98,7 @@
 			}
 			var value = list.values[i];
 			value['rowNum'] = jQuery('#slideTable tr.sortable .rowNum').length + 1;
-			value['rowId'] = jQuery('#slideTable tr.sortable .rowNum').length;
 			value['rowDelay'] = defaultDelay;
-
-			if (jQuery('#slides' + value.screenid).length) {
-				continue;
-			}
 
 			var tpl = new Template(jQuery('#screenRowTPL').html());
 			jQuery('#screenListFooter').before(tpl.evaluate(value));

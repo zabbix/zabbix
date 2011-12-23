@@ -28,7 +28,7 @@ $slideWidget->addPageHeader(_('CONFIGURATION OF SLIDE SHOWS'));
 $slideForm = new CForm();
 $slideForm->setName('slideForm');
 $slideForm->addVar('form', $this->data['form']);
-$slideForm->addVar('slides', $this->data['slides']);
+$slideForm->addVar('slides', $this->data['slides_without_delay']);
 if (!empty($this->data['slideshowid'])) {
 	$slideForm->addVar('slideshowid', $this->data['slideshowid']);
 }

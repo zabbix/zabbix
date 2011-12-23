@@ -156,6 +156,12 @@ if (isset($_REQUEST['form'])) {
 		}
 	}
 
+	// get slides without delay
+	$data['slides_without_delay'] = $data['slides'];
+	for ($i = 0, $size = count($data['slides_without_delay']); $i < $size; $i++) {
+		unset($data['slides_without_delay'][$i]['delay']);
+	}
+
 	// render view
 	$slideshowView = new CView('configuration.slideconf.edit', $data);
 	$slideshowView->render();
