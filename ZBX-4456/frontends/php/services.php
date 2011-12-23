@@ -194,7 +194,7 @@ if (isset($_REQUEST['form'])) {
 		}
 		// validate time 'from' is bigger than time 'to'
 		elseif ($new_service_time['from'] > $new_service_time['to']) {
-			error(_('Servie time from cannot be bigger than time to.'));
+			error(_('Service time "from" cannot be bigger than time "to".'));
 		}
 		// if this time is not already there, adding it for insertation
 		elseif (!str_in_array($_REQUEST['service_times'], $new_service_time)) {
