@@ -147,7 +147,7 @@ PQserverVersion(conn);
         postgresql_version_number=`expr $postgresql_version_major \* 1000000 \
                                    \+ $postgresql_version_minor \* 1000 \
                                    \+ $postgresql_version_micro`
-	
+
         if test -n "$postgresql_version_req"; then
 
             AC_MSG_CHECKING([if PostgreSQL version is >= $postgresql_version_req])

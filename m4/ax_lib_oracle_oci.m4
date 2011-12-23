@@ -25,7 +25,7 @@
 #
 #   NOTE: These options described above do not take yes|no values. If 'yes'
 #   value is passed, then WARNING message will be displayed, 'no' value, as
-#   well as the --without-oracle-* variations will cause the macro to not 
+#   well as the --without-oracle-* variations will cause the macro to not
 #   check anything.
 #
 #   This macro calls:
@@ -211,14 +211,14 @@ Please, locate Oracle directories using --with-oracle or \
         dnl Check required version of Oracle is available
         dnl
         oracle_version_req=ifelse([$1], [], [], [$1])
- 
+
         if test "$oci_header_found" = "yes"; then
- 
+
             oracle_version_major=`cat $oracle_include_dir/oci.h \
                                  | grep '#define.*OCI_MAJOR_VERSION.*' \
                                  | sed -e 's/#define OCI_MAJOR_VERSION  *//' \
                                  | sed -e 's/  *\/\*.*\*\///'`
- 
+
             oracle_version_minor=`cat $oracle_include_dir/oci.h \
                                  | grep '#define.*OCI_MINOR_VERSION.*' \
                                  | sed -e 's/#define OCI_MINOR_VERSION  *//' \
@@ -227,29 +227,29 @@ Please, locate Oracle directories using --with-oracle or \
             dnl Calculate its number representation
             oracle_version_number=`expr $oracle_version_major \* 1000000 \
                                   \+ $oracle_version_minor \* 1000`
-             
- 
+
+
             if test -n "$oracle_version_req"; then
                 AC_MSG_CHECKING([if Oracle OCI version is >= $oracle_version_req])
-             
+
                 if test -n "$oracle_version_major" -a -n $"oracle_version_minor"; then
-             
+
                     ORACLE_OCI_VERSION="$oracle_version_major.$oracle_version_minor"
-             
+
                     dnl Decompose required version string of Oracle
                     dnl and calculate its number representation
                     oracle_version_req_major=`expr $oracle_version_req : '\([[0-9]]*\)'`
                     oracle_version_req_minor=`expr $oracle_version_req : '[[0-9]]*\.\([[0-9]]*\)'`
-             
+
                     oracle_version_req_number=`expr $oracle_version_req_major \* 1000000 \
                                                \+ $oracle_version_req_minor \* 1000`
-             
+
                     oracle_version_check=`expr $oracle_version_number \>\= $oracle_version_req_number`
                     if test "$oracle_version_check" = "1"; then
-             
+
                         oracle_version_checked="yes"
                         AC_MSG_RESULT([yes])
-             
+
                     else
                         oracle_version_checked="no"
                         AC_MSG_RESULT([no])
