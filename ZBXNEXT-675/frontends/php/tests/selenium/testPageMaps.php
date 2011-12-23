@@ -30,7 +30,7 @@ class testPageMaps extends CWebTest{
 	/**
 	* @dataProvider allMaps
 	*/
-	public function testPageMaps_SimpleTest($map){
+	public function testPageMaps_CheckLayout($map){
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
 

@@ -12,7 +12,7 @@ DIST_SUBDIRS = \
 	osx \
 	simple \
 	solaris \
-	unknown 
+	unknown
 
 SUBDIRS = \
 	common \
