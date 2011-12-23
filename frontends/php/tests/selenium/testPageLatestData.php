@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageLatestData extends CWebTest
 {
-	public function testPageLatestData_SimpleTest()
+	public function testPageLatestData_CheckLayout()
 	{
 		$this->login('latest.php');
 		$this->assertTitle('Latest data \[refreshed every 30 sec\]');

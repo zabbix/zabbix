@@ -32,7 +32,7 @@ class testPageAdministrationDMProxies extends CWebTest
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageAdministrationDMProxies_SimpleTest($proxy)
+	public function testPageAdministrationDMProxies_CheckLayout($proxy)
 	{
 		$this->login('proxies.php');
 		$this->assertTitle('Proxies');

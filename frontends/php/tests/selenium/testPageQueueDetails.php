@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageQueueDetails extends CWebTest
 {
-	public function testPageQueueDetails_SimpleTest()
+	public function testPageQueueDetails_CheckLayout()
 	{
 		$this->login('queue.php?config=2');
 		$this->assertTitle('Queue \[refreshed every 30 sec\]');
