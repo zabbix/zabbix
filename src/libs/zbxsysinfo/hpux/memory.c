@@ -54,6 +54,16 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+static int	VM_MEMORY_ACTIVE(AGENT_RESULT *result)
+{
+	ZBX_PSTAT_GETSTATIC();
+	ZBX_PSTAT_GETDYNAMIC();
+
+	SET_UI64_RESULT(result, (zbx_uint64_t)pdy.psd_arm * pst.page_size);
+
+	return SYSINFO_RET_OK;
+}
+
 static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
 	ZBX_PSTAT_GETSTATIC();
@@ -109,6 +119,7 @@ int	VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	{
 		{"total",	VM_MEMORY_TOTAL},
 		{"free",	VM_MEMORY_FREE},
+		{"active",	VM_MEMORY_ACTIVE},
 		{"used",	VM_MEMORY_USED},
 		{"pused",	VM_MEMORY_PUSED},
 		{"available",	VM_MEMORY_AVAILABLE},
