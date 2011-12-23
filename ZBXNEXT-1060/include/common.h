@@ -423,8 +423,8 @@ typedef enum
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
 	MEDIA_TYPE_SMS,
-	MEDIA_TYPE_JABBER,
-	MEDIA_TYPE_EZ_TEXTING = 100
+	MEDIA_TYPE_JABBER
+/*	MEDIA_TYPE_EZ_TEXTING = 100*/
 } zbx_media_type_t;
 
 /* alert statuses */
