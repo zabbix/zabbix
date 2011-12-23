@@ -425,10 +425,7 @@ define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
 define('MEDIA_TYPE_JABBER',		3);
-define('MEDIA_TYPE_EZ_TEXTING',	100);
-
-define('EZ_TEXTING_LIMIT_USA',		0);
-define('EZ_TEXTING_LIMIT_CANADA',	1);
+/* define('MEDIA_TYPE_EZ_TEXTING',	100); */
 
 define('ACTION_DEFAULT_SUBJ_TRIGGER', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
 define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOST.HOST}');

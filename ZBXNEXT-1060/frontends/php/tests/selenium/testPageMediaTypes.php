@@ -42,7 +42,6 @@ class testPageMediaTypes extends CWebTest{
 		if($mediatype['type'] == MEDIA_TYPE_EMAIL) $this->ok('Email');
 		if($mediatype['type'] == MEDIA_TYPE_JABBER) $this->ok('Jabber');
 		if($mediatype['type'] == MEDIA_TYPE_SMS) $this->ok('SMS');
-		if($mediatype['type'] == MEDIA_TYPE_EZ_TEXTING) $this->ok('Ez Texting');
 		$this->dropdown_select('go', 'Delete selected');
 //		$this->button_click('delete');
 	}

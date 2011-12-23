@@ -66,9 +66,6 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 		case MEDIA_TYPE_JABBER:
 			$details = _('Jabber identifier').': "'.$mediatype['username'].'"';
 			break;
-		case MEDIA_TYPE_EZ_TEXTING:
-			$details = _('Username').': "'.$mediatype['username'].'"';
-			break;
 		default:
 			$details = '';
 	}

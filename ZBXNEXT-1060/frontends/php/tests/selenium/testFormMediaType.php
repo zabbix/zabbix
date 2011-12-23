@@ -96,13 +96,6 @@ class testFormMediaType extends CWebTest{
 				$this->input_type('username',$data['Jabber identifier']);
 				$this->input_type('password',$data['Password']);
 			break;
-			case 'Ez Texting':
-				$this->dropdown_select('type',$type);
-				$this->wait();
-				$this->input_type('description',$data['Description']);
-				$this->input_type('username',$data['Username']);
-				$this->input_type('password',$data['Password']);
-			break;
 		}
 
 		$this->click('save');

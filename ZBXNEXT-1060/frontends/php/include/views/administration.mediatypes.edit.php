@@ -41,14 +41,7 @@ $cmbType->addItems(array(
 	MEDIA_TYPE_SMS => _('SMS'),
 	MEDIA_TYPE_JABBER => _('Jabber'),
 ));
-$cmbType->addItemsInGroup(_('Commercial'), array(MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')));
-$cmbTypeRow = array($cmbType);
-if ($this->data['type'] == MEDIA_TYPE_EZ_TEXTING) {
-	$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
-	$ez_texting_link->setTarget('_blank');
-	$cmbTypeRow[] = $ez_texting_link;
-}
-$mediaTypeFormList->addRow(_('Type'), $cmbTypeRow);
+$mediaTypeFormList->addRow(_('Type'), $cmbType);
 
 // append others fields to form list
 if ($this->data['type'] == MEDIA_TYPE_EMAIL) {
@@ -62,7 +55,7 @@ elseif ($this->data['type'] == MEDIA_TYPE_SMS) {
 elseif ($this->data['type'] == MEDIA_TYPE_EXEC) {
 	$mediaTypeFormList->addRow(_('Script name'), new CTextBox('exec_path', $this->data['exec_path'], ZBX_TEXTBOX_STANDARD_SIZE));
 }
-elseif ($this->data['type'] == MEDIA_TYPE_JABBER || $this->data['type'] == MEDIA_TYPE_EZ_TEXTING) {
+elseif ($this->data['type'] == MEDIA_TYPE_JABBER) {
 	// create password field
 	if (!empty($this->data['password'])) {
 		$passwordButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("password").enable().show().focus();');
@@ -74,21 +67,8 @@ elseif ($this->data['type'] == MEDIA_TYPE_JABBER || $this->data['type'] == MEDIA
 		$passwordField = new CPassBox('password', '', ZBX_TEXTBOX_SMALL_SIZE);
 	}
 
-	// append password field to form list
-	if ($this->data['type'] == MEDIA_TYPE_JABBER) {
-		$mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_STANDARD_SIZE));
-		$mediaTypeFormList->addRow(_('Password'), $passwordField);
-	}
-	else {
-		$mediaTypeFormList->addRow(_('Username'), new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_STANDARD_SIZE));
-		$mediaTypeFormList->addRow(_('Password'), $passwordField);
-		$limitCb = new CComboBox('exec_path', $this->data['exec_path']);
-		$limitCb->addItems(array(
-			EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
-			EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)'),
-		));
-		$mediaTypeFormList->addRow(_('Message text limit'), $limitCb);
-	}
+	$mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$mediaTypeFormList->addRow(_('Password'), $passwordField);
 }
 
 // append form list to tab

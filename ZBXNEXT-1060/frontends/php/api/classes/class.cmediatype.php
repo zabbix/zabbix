@@ -334,8 +334,7 @@ class CMediatype extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
 				}
 
-				if(in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))
-						&& (!isset($mediatype['passwd']) || empty($mediatype['passwd']))){
+				if ($mediatype['type'] == MEDIA_TYPE_JABBER && (!isset($mediatype['passwd']) || empty($mediatype['passwd']))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED);
 				}
 
@@ -404,7 +403,7 @@ class CMediatype extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED);
 				}
 
-				if(!in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))){
+				if ($mediatype['type'] != MEDIA_TYPE_JABBER) {
 					$mediatype['passwd'] = '';
 				}
 

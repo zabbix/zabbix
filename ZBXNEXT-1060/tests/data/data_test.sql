@@ -4,15 +4,11 @@ UPDATE hosts SET status=0,name='ЗАББИКС Сервер',host='Test host' WH
 -- Enabling debug mode
 UPDATE usrgrp SET debug_mode = 1 WHERE usrgrpid = 7;
 
--- New media types
-INSERT INTO media_type (mediatypeid, type, description, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd) VALUES (4,100,'SMS via IP','','','','0','','test','test');
-
 -- More medias for user 'Admin'
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (1,1,1,'test@zabbix.com',0,63,'1-7,00:00-24:00;');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (2,1,1,'test2@zabbix.com',1,60,'1-7,00:00-24:00;');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (3,1,3,'123456789',0,32,'1-7,00:00-24:00;');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (4,1,2,'test@jabber.com',0,16,'1-7,00:00-24:00;');
-INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (5,1,4,'test_account',0,63,'6-7,09:00-18:00;');
 
 -- More user scripts
 INSERT INTO scripts (scriptid, name, command, host_access, usrgrpid, groupid, description, confirmation) VALUES (3,'Reboot','/sbin/shutdown -r',3,7,4,'This command reboots server.','Do you really want to reboot it?');
