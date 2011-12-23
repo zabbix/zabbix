@@ -84,6 +84,10 @@ function get_real_text_width(text, id) {
 }
 
 function show_popup_menu(e, content, width){
+
+	if (A_MENUS[0] !== undefined) {
+		A_MENUS[0].collapse();
+	}
 	var cursor = get_cursor_position(e);
 	var tmp_width = 0;
 	var max_width = 0;
@@ -453,10 +457,12 @@ function menu_item (o_parent, n_order) {
 	// generate item's HMTL
 	var el = document.createElement('a');
 	el.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id + 'o');
-	el.setAttribute('href', this.a_config[1]);
 
-	if(this.a_config[2] && this.a_config[2]['tw'])
-		el.setAttribute('target', this.a_config[2]['tw']);
+	if (this.a_config[1] != null) {
+		el.setAttribute('href', this.a_config[1]);
+		if(this.a_config[2] && this.a_config[2]['tw'])
+			el.setAttribute('target', this.a_config[2]['tw']);
+	}
 
 	el.className = this.getstyle(0, 0);
 	el.style.position = 'absolute';

@@ -1,5 +1,6 @@
 Changes for 1.8.10rc1
 
+..F....... [ZBX-3909] fixed link to null on menu and non-hiding menu in maps (Slava)
 ..F....... [ZBX-2737] fixed various messages at linking templates (sanja)
 A......... [ZBX-4273] fixed getting permission error while creating an action (sanja)
 ....I..... [ZBX-4377] fixed error message when checking if libcurl can be linked statically (dimir)
