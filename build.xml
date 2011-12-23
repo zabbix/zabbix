@@ -189,19 +189,40 @@
 
 	<target name="killagent">
 		<!-- Kill previously running agent -->
-		<exec executable="killall" failonerror="off">
-			<arg line="-9 `cat ${builddir}/tmp/zabbix_agentd.tmp`"/>
+		<exec executable="bash">
+			<arg value="-c"/>
+			<arg value="kill `ps -fu hudson|grep -v grep|grep ${builddir}/etc/zabbix_agentd.conf|head -1|awk '{print $2}'`"/>
 		</exec>
 		<!-- Sleep for 2 seconds -->
 		<exec executable="sleep" failonerror="off">
 			<arg line="2"/>
+		</exec>
+	</target>
+
+	<target name="sleep5m">
+		<!-- Sleep for 5 minutes -->
+		<exec executable="sleep" failonerror="off">
+			<arg line="300"/>
+		</exec>
+	</target>
+
+	<target name="killdaemons">
+		<!-- Kill previously running server -->
+		<exec executable="bash">
+			<arg value="-c"/>
+			<arg value="kill `ps -fu hudson|grep -v grep|grep ${builddir}/etc/zabbix_server.conf|head -1|awk '{print $2}'`"/>
+		</exec>
+		<exec executable="bash">
+			<arg value="-c"/>
+			<arg value="kill `ps -fu hudson|grep -v grep|grep ${builddir}/etc/zabbix_agentd.conf|head -1|awk '{print $2}'`"/>
 		</exec>
 	</target>
 
 	<target name="killserver">
 		<!-- Kill previously running server -->
-		<exec executable="killall" failonerror="off">
-			<arg line="-9 `cat ${builddir}/tmp/zabbix_server.tmp`"/>
+		<exec executable="bash">
+			<arg value="-c"/>
+			<arg value="kill `ps -fu hudson|grep -v grep|grep ${builddir}/etc/zabbix_server.conf|head -1|awk '{print $2}'`"/>
 		</exec>
 		<!-- Sleep for 2 seconds -->
 		<exec executable="sleep" failonerror="off">
@@ -209,14 +230,14 @@
 		</exec>
 	</target>
 
-	<target name="runserver" depends="buildserver,killserver">
+	<target name="runserver" depends="buildserver">
 		<!-- Execute Server -->
 		<exec executable="${builddir}/sbin/zabbix_server" dir="${builddir}/sbin" failonerror="on">
 			<arg line="--config=${builddir}/etc/zabbix_server.conf"/>
 		</exec>
 	</target>
 
-	<target name="runagent" depends="buildagent,killagent">
+	<target name="runagent" depends="buildagent">
 		<!-- Execute Agent -->
 		<exec executable="${builddir}/sbin/zabbix_agentd" dir="${builddir}/sbin" failonerror="on">
 			<arg line="--config=${builddir}/etc/zabbix_agentd.conf"/>
@@ -278,8 +299,8 @@
 		</exec>
 	</target>
 
-	<target name="build-mysql" depends="clean,init-mysql,buildagent,buildproxy,buildserver,test-frontend" />
-	<target name="build-postgresql" depends="clean,init-postgresql,runagent,runserver,buildproxy,test-frontend" />
+	<target name="build-mysql" depends="clean,killserver,init-mysql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
+	<target name="build-postgresql" depends="clean,killserver,init-postgresql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
 	<target name="build-sqlite3" depends="clean,init-sqlite3,buildagent,buildproxy,buildserver,test-frontend" />
 
 	<!-- Default target -->
