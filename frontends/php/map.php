@@ -29,20 +29,20 @@ $page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 require_once('include/page_header.php');
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields=array(
-	'sysmapid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
+$fields = array(
+	'sysmapid' =>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,				null),
 
-	'selements'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,		NULL),
-	'links'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,		NULL),
-	'noselements'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
-	'nolinks'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
-	'nocalculations'=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
+	'selements' =>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,				null),
+	'links' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,				null),
+	'noselements' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
+	'nolinks' =>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
+	'nocalculations' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
+	'expand_macros' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
 
-	'show_triggers'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3"),	NULL),
-	'grid'=>			array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,500),	NULL),
-	'base64image'=>		array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),		NULL),
+	'show_triggers' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		null),
+	'grid' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 500),	null),
+	'base64image' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
 );
-
 check_fields($fields);
 ?>
 <?php
@@ -56,8 +56,7 @@ $options = array(
 );
 $maps = API::Map()->get($options);
 $map = reset($maps);
-
-if(!$map){
+if (!$map) {
 	access_deny();
 }
 
@@ -97,19 +96,19 @@ $y = imagesy($im);
 
 $json = new CJSON();
 
-if(isset($_REQUEST['selements']) || isset($_REQUEST['noselements'])){
+if (isset($_REQUEST['selements']) || isset($_REQUEST['noselements'])) {
 	$map['selements'] = get_request('selements', '[]');
 	$map['selements'] = $json->decode($map['selements'], true);
 }
 
-if(isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])){
+if (isset($_REQUEST['links']) || isset($_REQUEST['nolinks'])) {
 	$map['links'] = get_request('links', '[]');
 	$map['links'] = $json->decode($map['links'], true);
 }
 
 
 $nocalculations = get_request('nocalculations', false);
-if($nocalculations){
+if ($nocalculations) {
 	// get default iconmap id to use for elements that use icon map
 	if ($map['iconmapid']) {
 		$iconMaps = API::IconMap()->get(array(
@@ -123,7 +122,7 @@ if($nocalculations){
 
 	$map_info = array();
 
-	foreach($map['selements'] as $selement){
+	foreach ($map['selements'] as $selement) {
 		// if element use icon map and icon map is set for map, and is host like element, we use default icon map icon
 		if ($map['iconmapid'] && $selement['use_iconmap'] &&
 			(
@@ -141,10 +140,10 @@ if($nocalculations){
 			'iconid' => $iconid,
 			'icon_type' => SYSMAP_ELEMENT_ICON_OFF,
 		);
-		if($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE){
+		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE) {
 			$map_info[$selement['selementid']]['name'] = _('Image');
 		}
-		else{
+		else {
 			$map_info[$selement['selementid']]['name'] = $selement['elementName'];
 		}
 	}
@@ -160,22 +159,23 @@ else{
 // Draw MAP
 drawMapConnectors($im, $map, $map_info, $allLinks);
 
-if(!isset($_REQUEST['noselements'])){
+if (!isset($_REQUEST['noselements'])) {
 	drawMapHighligts($im, $map, $map_info);
 	drawMapSelements($im, $map, $map_info);
 }
 
-drawMapLabels($im, $map, $map_info, !$nocalculations);
-drawMapLinkLabels($im, $map, $map_info, !$nocalculations);
+$expand_macros = get_request('expand_macros', true);
+drawMapLabels($im, $map, $map_info, $expand_macros);
+drawMapLinkLabels($im, $map, $map_info, $expand_macros);
 
-if(!isset($_REQUEST['noselements']) && ($map['markelements'] == 1)){
+if (!isset($_REQUEST['noselements']) && $map['markelements'] == 1) {
 	drawMapSelementsMarks($im, $map, $map_info);
 }
-//--
+
 
 show_messages();
 
-if(get_request('base64image')){
+if (get_request('base64image')) {
 	ob_start();
 	imagepng($im);
 	$imageSource = ob_get_contents();
@@ -184,10 +184,9 @@ if(get_request('base64image')){
 	echo $json->encode(array('result' => base64_encode($imageSource)));
 	imagedestroy($im);
 }
-else{
+else {
 	imageOut($im);
 }
 
 require_once('include/page_footer.php');
-
 ?>
