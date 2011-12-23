@@ -29,10 +29,12 @@ abstract class CItemGeneral extends CZBXAPI{
 
 	abstract public function get($options=array());
 
-	public function __construct(){
-// template - if templated item, value is taken from template item, cannot be changed on host
-// system - values should not be updated
-// host - value should be null for template items
+	public function __construct() {
+		parent::__construct();
+
+		// template - if templated item, value is taken from template item, cannot be changed on host
+		// system - values should not be updated
+		// host - value should be null for template items
 		$this->fieldRules = array(
 			'type'					=> array('template' => 1),
 			'snmp_community'		=> array(),
@@ -80,6 +82,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			'interfaceid'			=> array('host' => 1),
 			'port'					=> array(),
 			'inventory_link'		=> array(),
+			'lifetime'				=> array(),
 		);
 	}
 
@@ -143,6 +146,8 @@ abstract class CItemGeneral extends CZBXAPI{
 		));
 
 		foreach ($items as $inum => &$item) {
+			$item = $this->clearValues($item);
+
 			$fullItem = $items[$inum];
 
 			if (!check_db_fields($item_db_fields, $item)) {
@@ -156,10 +161,6 @@ abstract class CItemGeneral extends CZBXAPI{
 
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
 
-				if ($dbHosts[$fullItem['hostid']]['status'] == HOST_STATUS_TEMPLATE) {
-					unset($item['interfaceid']);
-				}
-
 				// apply rules
 				foreach ($this->fieldRules as $field => $rules) {
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
@@ -170,21 +171,17 @@ abstract class CItemGeneral extends CZBXAPI{
 				if (!isset($item['key_'])) {
 					$item['key_'] = $fullItem['key_'];
 				}
-
 				if (!isset($item['hostid'])) {
 					$item['hostid'] = $fullItem['hostid'];
+				}
+
+				if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
+					$item['error'] = '';
 				}
 			}
 			else {
 				if (!isset($dbHosts[$item['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
-				}
-
-				if (!isset($item['interfaceid'])
-						&& self::itemTypeInterface($item['type'])
-						&& $dbHosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE
-						&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
 				}
 			}
 
@@ -200,21 +197,22 @@ abstract class CItemGeneral extends CZBXAPI{
 				$item['data_type'] = 0;
 			}
 
-			// interface
+			// check if the item requires an interface
 			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
-			if ($itemInterfaceType !== false
-					&& $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE
-					&& $fullItem['flags'] != ZBX_FLAG_DISCOVERY_CHILD
-					&& isset($item['interfaceid']) && $item['interfaceid']) {
-				if (!isset($interfaces[$fullItem['interfaceid']])
+			if ($itemInterfaceType !== false && $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
+				if (!$fullItem['interfaceid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
+				}
+				elseif (!isset($interfaces[$fullItem['interfaceid']])
 						|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
 				}
-				if ($itemInterfaceType !== INTERFACE_TYPE_ANY
+				elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY
 						&& $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
 				}
 			}
+			// no interface required, just set it to NULL
 			else {
 				$item['interfaceid'] = 0;
 			}
@@ -240,7 +238,7 @@ abstract class CItemGeneral extends CZBXAPI{
 						|| !str_in_array($params[2], array('last', 'min', 'max', 'avg', 'sum', 'count'))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
-						' "<last|min|max|avg|sum|count>", "parameter"].', $itemKey->getKeyId()));
+							' "<last|min|max|avg|sum|count>", "parameter"].', $itemKey->getKeyId()));
 				}
 			}
 
@@ -270,13 +268,36 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			// SNMP port
-			if (isset($fullItem['port']) && !validatePortNumber($fullItem['port'], true, true)) {
+			if (isset($fullItem['port']) && !zbx_empty($fullItem['port']) && !validatePortNumberOrMacro($fullItem['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Item "%1$s:%2$s" has invalid port: "%3$s".', $fullItem['name'], $fullItem['key_'], $fullItem['port']));
 			}
 
+			$this->checkSpecificFields($fullItem);
 		}
 		unset($item);
+	}
+
+	protected function checkSpecificFields(array $item) {
+		return true;
+	}
+
+	protected function clearValues(array $item) {
+		if (isset($item['port']) && $item['port'] != '') {
+			$item['port'] = ltrim($item['port'], '0');
+			if ($item['port'] == '') {
+				$item['port'] = 0;
+			}
+		}
+
+		if (isset($item['lifetime']) && $item['lifetime'] != '') {
+			$item['lifetime'] = ltrim($item['lifetime'], '0');
+			if ($item['lifetime'] == '') {
+				$item['lifetime'] = 0;
+			}
+		}
+
+		return $item;
 	}
 
 	protected function errorInheritFlags($flag, $key, $host){
@@ -404,6 +425,90 @@ abstract class CItemGeneral extends CZBXAPI{
 		));
 
 		return (count($ids) == $count);
+	}
+
+
+	/**
+	 * Checks whether the given items are referenced by any graphs and tries to
+	 * unset these references, if they are no longer used.
+	 *
+	 * @throws APIException if at least one of the item can't be deleted
+	 *
+	 * @param array $itemIds   An array of item IDs
+	 */
+	protected function checkGraphReference(array $itemIds) {
+		$this->checkUseInGraphAxis($itemIds, true);
+		$this->checkUseInGraphAxis($itemIds);
+	}
+
+
+	/**
+	 * Checks if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * if there are graphs, that have an y*_itemid column set, but the
+	 * y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, the y*_itemid
+	 * column will be set to NULL.
+	 *
+	 * If the $checkMax parameter is set to true, the items will be checked against
+	 * max Y values, otherwise, they will be checked against min Y values.
+	 *
+	 * @throws APIException if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * @param array $itemIds   An array of items IDs
+	 * @param type $checkMax
+	 */
+	protected function checkUseInGraphAxis(array $itemIds, $checkMax = false) {
+		if ($checkMax) {
+			$filter = array(
+				'ymax_itemid' => $itemIds,
+			);
+			$itemIdColumn = 'ymax_itemid';
+			$typeColumn = 'ymax_type';
+		}
+		else {
+			$filter = array(
+				'ymin_itemid' => $itemIds,
+			);
+			$itemIdColumn = 'ymin_itemid';
+			$typeColumn = 'ymin_type';
+		}
+
+		// make if work for both graphs and graph prototypes
+		$filter['flags'] = array(
+			ZBX_FLAG_DISCOVERY_CHILD,
+			ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_CREATED
+		);
+
+		// check if the items are used in Y axis min/max values in any graphs
+		$graphs = API::Graph()->get(array(
+			'output' => array($itemIdColumn, $typeColumn, 'graphtype'),
+			'filter' => $filter
+		));
+
+		$updateGraphs = array();
+		foreach ($graphs as &$graph) {
+			// check if Y type is actually set to GRAPH_YAXIS_TYPE_ITEM_VALUE
+			if ($graph[$typeColumn] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				if ($checkMax) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Could not delete these items because some of them are used as MAX values for graphs.');
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Could not delete these items because some of them are used as MIN values for graphs.');
+				}
+			}
+			else {
+				$graph[$itemIdColumn] = null;
+				$updateGraphs[] = $graph;
+			}
+		}
+
+		// if there are graphs, that have an y*_itemid column set, but the
+		// y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, set y*_itemid to NULL.
+		// Otherwise we won't be able to delete them.
+		if ($updateGraphs) {
+			API::Graph()->update($updateGraphs);
+		}
 	}
 
 }

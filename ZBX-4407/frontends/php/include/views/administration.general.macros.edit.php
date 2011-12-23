@@ -29,15 +29,11 @@ $macrosForm->addVar('config', get_request('config', 11));
 
 $macrosTable = new CTable(SPACE, 'formElementTable');
 $macrosTable->setAttribute('id', 'tbl_macros');
-$macrosTable->addRow(array(SPACE, _('Macro'), SPACE, _('Value')));
+$macrosTable->addRow(array(_('Macro'), SPACE, _('Value'), SPACE));
 
 // fields
 $macros = array_values($this->data['macros']);
 foreach ($macros as $macroid => $macro) {
-	$checkbox = new CCheckBox();
-	if (empty($macro['macro']) || (!empty($macro['type']) && $macro['type'] == 'new')) {
-		$checkbox->setAttribute('value', 'no');
-	}
 	$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30, 'no', 64);
 	$text1->setAttribute('placeholder', '{$MACRO}');
 	$text1->setAttribute('style', 'text-transform:uppercase;');
@@ -46,31 +42,22 @@ foreach ($macros as $macroid => $macro) {
 	$span = new CSpan(RARR);
 	$span->addStyle('vertical-align:top;');
 
-	$macrosTable->addRow(array($checkbox, $text1, $span, $text2));
+	$deleteButton = new CButton('macros_del', _('Remove'));
+	$deleteButton->addClass('link_menu macroRemove');
+
+	$macrosTable->addRow(array($text1, $span, $text2, $deleteButton), 'form_row');
 }
 
 // buttons
-$addButton = new CButton('macro_add', _('Add'), 'javascript: addMacroRow()');
-$addButton->setAttribute('style', 'margin-top:10px;');
-$deleteButton = new CButton('macros_del', _('Delete selected'), 'jQuery(document).ready(function() {
-																	jQuery(\'#tbl_macros input:checked\').each(function() {
-																		jQuery(this.parentNode.parentNode).remove();
-																		if (jQuery(this).val() == \'yes\') {
-																			if (typeof(deleted_macro_cnt) == \'undefined\') {
-																				deleted_macro_cnt = 1;
-																			}
-																			else {
-																				deleted_macro_cnt++;
-																			}
-																		}
-																	});
-																});');
-$deleteButton->setAttribute('style', 'margin-top:10px;');
-$saveButton = new CSubmit('save', _('Save'), "if (deleted_macro_cnt > 0) return confirm('"._('Are you sure you want to delete')." '+deleted_macro_cnt+' "._('macro(s)')."?');");
+$addButton = new CButton('macro_add', _('Add'));
+$addButton->addClass('link_menu');
+
+$saveButton = new CSubmit('save', _('Save'));
+$saveButton->attr('data-removed-count', 0);
 $saveButton->addClass('main');
 
-$buttonColumn = new CCol(array($addButton, SPACE, $deleteButton));
-$buttonColumn->setAttribute('colspan', 4);
+$buttonColumn = new CCol($addButton);
+$buttonColumn->setAttribute('colspan', 5);
 
 $buttonRow = new CRow();
 $buttonRow->setAttribute('id', 'row_new_macro');

@@ -61,6 +61,7 @@ ALTER TABLE items ADD interfaceid number(20) NULL;
 ALTER TABLE items ADD port nvarchar2(64) DEFAULT '';
 ALTER TABLE items ADD description nvarchar2(2048) DEFAULT '';
 ALTER TABLE items ADD inventory_link number(10) DEFAULT '0' NOT NULL;
+ALTER TABLE items ADD lifetime nvarchar2(64) DEFAULT '0';
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
 UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM items);

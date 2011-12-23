@@ -169,7 +169,6 @@
 	'S_RETRIES_LEFT'=>			_('Retries left'),
 
 //	alarms.php
-	'S_SHOW_ALL'=>				_('Show all'),
 	'S_TIME'=>				_('Time'),
 	'S_STATUS'=>				_('Status'),
 	'S_TRUE_BIG'=>				_('TRUE'),
@@ -187,11 +186,9 @@
 
 // Lines
 	'S_LINE'=>				_('Line'),
-	'S_FILLED_REGION'=>			_('Filled region'),
 	'S_BOLD_LINE'=>				_('Bold line'),
 	'S_DOT'=>				_('Dot'),
 	'S_DASHED_LINE'=>			_('Dashed line'),
-	'S_GRADIENT_LINE'=>			_('Gradient line'),
 
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>			_('Custom graphs'),
@@ -214,13 +211,6 @@
 	'S_DEFAULT_THEME'=>				_('Default theme'),
 	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
 	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
-	'S_CANNNOT_UPDATE_VALUE_MAP'=>			_('Cannot update value map'),
-	'S_VALUE_MAP_ADDED'=>				_('Value map added'),
-	'S_CANNNOT_ADD_VALUE_MAP'=>			_('Cannot add value map'),
-	'S_VALUE_MAP_DELETED'=>				_('Value map deleted'),
-	'S_CANNNOT_DELETE_VALUE_MAP'=>			_('Cannot delete value map'),
-	'S_VALUE_MAP_UPDATED'=>				_('Value map updated'),
-	'S_CONFIGURATION_OF_ZABBIX_BIG'=>		_('CONFIGURATION OF ZABBIX'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
 	'S_DEFAULT'=>					_('Default'),
@@ -249,8 +239,6 @@
 	'S_CANNOT_DELETE_REGULAR_EXPRESSION'=>		_('Cannot delete regular expression'),
 
 	'S_DELETE_REGULAR_EXPRESSION_Q'=>		_('Delete regular expression?'),
-
-	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		_('Value maps are used to create a mapping between numeric values and string representations'),
 
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
@@ -313,8 +301,6 @@
 	'S_DRAW_STYLE'=>			_('Draw style'),
 	'S_SIMPLE'=>				_('Simple'),
 	'S_GRAPH_TYPE'=>			_('Graph type'),
-	'S_AGGREGATED'=>			_('Aggregated'),
-	'S_AGGREGATED_PERIODS_COUNT'=>		_('Aggregated periods count'),
 
 //	graphs.php
 	'S_ADD_GRAPH_ITEMS' => _('add graph items first'),
@@ -398,7 +384,6 @@
 
 //	hosts.php
 	'S_HOST_INTERFACE' =>			_('Host interface'),
-	'S_IPMI'=>			_('IPMI'),
 	'S_MACROS'=>					_('Macros'),
 	'S_MACRO'=>					_('Macro'),
 	'S_WRONG_MACRO'=>				_('Wrong macro'),
@@ -408,13 +393,11 @@
 	'S_IN'=>					_('In'),
 	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
-	'S_APPLICATIONS_BIG'=>				_('APPLICATIONS'),
 	'S_HOSTS'=>					_('Hosts'),
 	'S_ITEMS'=>					_('Items'),
 	'S_ITEMS_BIG'=>					_('ITEMS'),
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
-	'S_HOST_GROUPS_BIG'=>				_('HOST GROUPS'),
 	'S_HOST'=>					_('Host'),
 	'S_CONNECT_TO'=>				_('Connect to'),
 	'S_DNS'=>					_('DNS'),
@@ -459,10 +442,8 @@
 	'S_PROXY_NAME'=>				_('Proxy name'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
 	'S_CLEAR_WHEN_UNLINKING' => _('Clear when unlinking'),
-	'S_SNMP' =>						_('SNMP'),
 	'S_INTERFACES' =>				_('Interfaces'),
 	'S_INTERFACE' =>				_('Interface'),
-	'S_JMX' =>						_('JMX'),
 
 // templates.php
 	'S_TEMPLATE_ADDED'=>			_('New template added'),
@@ -491,7 +472,6 @@
 	'S_WITH_TRIGGERS'=>					_('With triggers'),
 	'S_WITHOUT_TRIGGERS'=>					_('Without triggers'),
 	'S_TYPES'=>						_('Types'),
-	'S_NO_ITEMS_DEFINED'=>					_('No items defined.'),
 	'S_CLEAR_HISTORY'=>					_('Clear history'),
 	'S_CANNOT_CLEAR_HISTORY'=>				_('Cannot clear history'),
 	'S_CONFIGURATION_OF_ITEMS'=>				_('Configuration of items'),
@@ -524,7 +504,6 @@
 	'S_NUMERIC_UNSIGNED'=>					_('Numeric (unsigned)'),
 	'S_NUMERIC_FLOAT'=>					_('Numeric (float)'),
 	'S_CHARACTER'=>						_('Character'),
-	'S_WIZARD'=>						_('Wizard'),
 	'S_LOG'=>						_('Log'),
 	'S_TEXT'=>						_('Text'),
 	'S_AS_IS'=>						_('As is'),
@@ -952,8 +931,6 @@
 	'S_STATUS_OF_TRIGGERS_BIG'=>		_('STATUS OF TRIGGERS'),
 	'S_STATUS_OF_HOSTGROUP_TRIGGERS'=>	_('Status of hostgroup triggers'),
 	'S_STATUS_OF_HOST_TRIGGERS'=>		_('Status of host triggers'),
-	'S_HIDE_ALL'=>				_('Hide all'),
-	'S_SHOW_UNACKNOWLEDGED'=>		_('Show unacknowledged'),
 	'S_SHOW_DETAILS'=>			_('Show details'),
 	'S_FILTER_BY_NAME'=>				_('Filter by name'),
 	'S_TRIGGERS_BIG'=>			_('TRIGGERS'),
@@ -977,7 +954,6 @@
 	'S_CANNOT_DELETE_PROXY'=>	_('Cannot delete proxy'),
 	'S_NAME'=>					_('Name'),
 	'S_DEBUG'=>					_('Debug'),
-	'S_DENY'=>					_('Deny'),
 	'S_HIDE'=>					_('Hide'),
 	'S_ADD_TO'=>				_('Add to'),
 	'S_REMOVE_FROM'=>			_('Remove from'),
@@ -1032,8 +1008,6 @@
 
 //	popup.php
 	'S_CAPTION'=>				_('Caption'),
-	'S_EMPTY'=>					_('Empty'),
-	'S_NO_ITEMS'=>				_('No items'),
 	'S_DISCOVERY_RULES_BIG'=>	_('DISCOVERY RULES'),
 
 //	popup_period.php

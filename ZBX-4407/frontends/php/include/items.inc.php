@@ -235,12 +235,9 @@ function item_type2str($type = null){
 		while ($item = DBfetch($db_items)) {
 			$old_status = $item['status'];
 			if ($status != $old_status) {
-				if ($status == ITEM_STATUS_ACTIVE) {
-					$sql = 'UPDATE items SET status='.$status.',error=\'\' WHERE itemid='.$item['itemid'];
-				}
-				else {
-					$sql = 'UPDATE items SET status='.$status.' WHERE itemid='.$item['itemid'];
-				}
+				$sql = 'UPDATE items SET status='.$status.
+						($status != ITEM_STATUS_NOTSUPPORTED ? ",error=''" : '').
+						' WHERE itemid='.$item['itemid'];
 
 				$result &= DBexecute($sql);
 				if ($result) {
@@ -450,7 +447,7 @@ function item_type2str($type = null){
 	}
 
 	function get_item_by_itemid_limited($itemid){
-		$sql = 'SELECT itemid,interfaceid,name,key_,hostid,delay,history,status,type,'.
+		$sql = 'SELECT itemid,interfaceid,name,key_,hostid,delay,history,status,type,lifetime,'.
 					'snmp_community,snmp_oid,value_type,data_type,trapper_hosts,port,units,multiplier,delta,'.
 					'snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,'.
 					'formula,trends,logtimefmt,valuemapid,delay_flex,params,ipmi_sensor,templateid,'.

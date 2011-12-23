@@ -31,7 +31,7 @@ class testFormHostGroup extends CWebTest
 		$this->login('hostgroups.php');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('gname',$this->hostgroup);
+		$this->input_type('name',$this->hostgroup);
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Group added');
@@ -42,7 +42,7 @@ class testFormHostGroup extends CWebTest
 		$this->login('hostgroups.php');
 		$this->click('link='.$this->hostgroup);
 		$this->wait();
-		$this->input_type('gname',$this->hostgroup.'2');
+		$this->input_type('name',$this->hostgroup.'2');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Group updated');

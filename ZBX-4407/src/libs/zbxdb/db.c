@@ -194,7 +194,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret)
 	{
-		DBexecute("SET NAMES utf8");
+		DBexecute("set names utf8");
 	}
 
 	if (ZBX_DB_FAIL == ret)
@@ -355,8 +355,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		else
 			*path = '\0';
 
-		DBexecute("PRAGMA synchronous = 0"); /* OFF */
-		DBexecute("PRAGMA temp_store = 2"); /* MEMORY */
+		DBexecute("PRAGMA synchronous = 0");	/* OFF */
+		DBexecute("PRAGMA temp_store = 2");	/* MEMORY */
 		DBexecute("PRAGMA temp_store_directory = '%s'", path);
 
 		zbx_free(path);

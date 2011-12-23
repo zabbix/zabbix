@@ -193,7 +193,7 @@ function getActionMapBySysmap($sysmap) {
 
 		if (!empty($db_element['urls'])) {
 			order_result($db_element['urls'], 'name');
-			$menus .= "['".S_URLS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus .= "['"._('URLs')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			foreach ($db_element['urls'] as $url) {
 				$menus .= "[".zbx_jsvalue($url['name']).",".zbx_jsvalue($url['url']).", 'nosid'],";
 			}
@@ -1693,6 +1693,11 @@ function drawMapSelementsMarks(&$im, &$map, &$map_info) {
 
 		$el_info = $map_info[$selementid];
 		if (!$el_info['latelyChanged']) {
+			continue;
+		}
+
+		// skip host group element containers
+		if ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 			continue;
 		}
 
