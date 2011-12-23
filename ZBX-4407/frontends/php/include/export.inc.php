@@ -244,7 +244,7 @@ class zbxXML{
 		'ssh_perf'
 	);
 
-	protected static function mapProfileName($name){
+	protected static function mapInventoryName($name){
 		$map = array(
 			'devicetype' => 'type',
 			'serialno' => 'serialno_a',
@@ -1149,7 +1149,7 @@ class zbxXML{
 								$host_db['inventory'] = array();
 							}
 							foreach ($inventoryNode as $field) {
-								$newInventoryName = self::mapProfileName($field->nodeName);
+								$newInventoryName = self::mapInventoryName($field->nodeName);
 								$host_db['inventory'][$newInventoryName] = $field->nodeValue;
 							}
 						}
@@ -1160,7 +1160,7 @@ class zbxXML{
 								$host_db['inventory'] = array();
 							}
 							foreach ($inventoryNodeExt as $field) {
-								$newInventoryName = self::mapProfileName($field->nodeName);
+								$newInventoryName = self::mapInventoryName($field->nodeName);
 								if (isset($host_db['inventory'][$newInventoryName]) && $field->nodeValue !== '') {
 									$host_db['inventory'][$newInventoryName] .= "\r\n\r\n";
 									$host_db['inventory'][$newInventoryName] .= $field->nodeValue;
