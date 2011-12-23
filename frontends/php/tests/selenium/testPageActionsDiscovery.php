@@ -31,7 +31,8 @@ class testPageActionsDiscovery extends CWebTest {
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsDiscovery_SimpleTest($action) {
+	public function testPageActionsDiscovery_CheckLayout($action)
+	{
 		$name=$action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);

@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageOverview extends CWebTest
 {
-	public function testPageOverview_SimpleTest()
+	public function testPageOverview_CheckLayout()
 	{
 		$this->login('overview.php');
 		$this->assertTitle('Overview \[refreshed every 30 sec\]');
