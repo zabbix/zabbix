@@ -156,11 +156,13 @@ function get_slideshow_by_slideshowid($slideshowid) {
 }
 
 function add_slideshow($name, $delay, $slides) {
+	// validate slides
 	if (empty($slides)) {
 		error(_('Slide show must contain slides.'));
 		return false;
 	}
 
+	// validate screens
 	$screenids = zbx_objectValues($slides, 'screenid');
 	$screens = API::Screen()->get(array(
 		'screenids' => $screenids,
@@ -169,10 +171,20 @@ function add_slideshow($name, $delay, $slides) {
 	$screens = ZBX_toHash($screens, 'screenid');
 	foreach ($screenids as $screenid) {
 		if (!isset($screens[$screenid])) {
+			error(_('Invalid screen found.'));
 			return false;
 		}
 	}
 
+	// validate slide name
+	$sql = 'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($name);
+	$db_slideshow = DBfetch(DBselect($sql, 1));
+	if (!empty($db_slideshow)) {
+		error(_s('Slide show "%s" already exists.', $name));
+		return false;
+	}
+
+	// set default delay
 	foreach ($slides as $slide) {
 		if (!isset($slide['delay'])) {
 			$slide['delay'] = 0;
@@ -184,11 +196,11 @@ function add_slideshow($name, $delay, $slides) {
 		' VALUES ('.$slideshowid.','.zbx_dbstr($name).','.$delay.')'
 	);
 
+	// create slides
 	$i = 0;
 	foreach ($slides as $slide) {
 		$slideid = get_dbid('slides', 'slideid');
 
-		// TODO: resulve conflict about regression of delay per slide
 		$result = DBexecute(
 			'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
 			' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')'
@@ -201,11 +213,13 @@ function add_slideshow($name, $delay, $slides) {
 }
 
 function update_slideshow($slideshowid, $name, $delay, $slides) {
+	// validate slides
 	if (empty($slides)) {
 		error(_('Slide show must contain slides.'));
 		return false;
 	}
 
+	// validate screens
 	$screenids = zbx_objectValues($slides, 'screenid');
 	$screens = API::Screen()->get(array(
 		'screenids' => $screenids,
@@ -214,10 +228,20 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	$screens = ZBX_toHash($screens, 'screenid');
 	foreach ($screenids as $screenid) {
 		if (!isset($screens[$screenid])) {
+			error(_('Invalid screen found.'));
 			return false;
 		}
 	}
 
+	// validate slide name
+	$sql = 'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($name).' AND s.slideshowid<>'.$slideshowid;
+	$db_slideshow = DBfetch(DBselect($sql, 1));
+	if (!empty($db_slideshow)) {
+		error(_s('Slide show "%s" already exists.', $name));
+		return false;
+	}
+
+	// set default delay
 	foreach ($slides as $slide) {
 		if (!isset($slide['delay'])) {
 			$slide['delay'] = 0;
@@ -228,32 +252,27 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 		return false;
 	}
 
-	// fetching all slides that currently are
-	$dbSlidesR = DBSelect('SELECT s.* FROM slides s WHERE s.slideshowid='.$slideshowid.' ORDER BY s.step');
-	$dbSlides = array();
-	while ($dbSlide = DBFetch($dbSlidesR)) {
-		$dbSlides[] = $dbSlide;
-	}
+	// get slides
+	$db_slides = DBfetchArray(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.$slideshowid.' ORDER BY s.step'));
 
 	// checking, if at least one of them has changes
 	$slidesChanged = false;
-	if (count($dbSlides) != count($slides)) {
+	if (count($db_slides) != count($slides)) {
 		$slidesChanged = true;
 	}
 	else {
-		foreach ($dbSlides as $i => $dbSlide) {
-			if (bccomp($dbSlides[$i]['screenid'], $slides[$i]['screenid']) != 0 || $dbSlides[$i]['delay'] != $slides[$i]['delay']) {
+		foreach ($db_slides as $i => $slide) {
+			if (bccomp($db_slides[$i]['screenid'], $slides[$i]['screenid']) != 0 || $db_slides[$i]['delay'] != $slides[$i]['delay']) {
 				$slidesChanged = true;
 				break;
 			}
 		}
 	}
 
-	// if slides have changed
+	// update slides
 	if ($slidesChanged) {
-		// wiping all of them out
 		DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
-		// and inserting new ones
+
 		$i = 0;
 		foreach ($slides as $slide) {
 			$slideid = get_dbid('slides', 'slideid');

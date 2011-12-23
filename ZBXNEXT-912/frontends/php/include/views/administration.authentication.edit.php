@@ -51,18 +51,18 @@ if ($this->data['config'] == ZBX_AUTH_LDAP) {
 		}
 	}
 	else {
-		$userComboBox = new CTextBox('user', $this->data['user'], ZBX_TEXTAREA_STANDARD_SIZE, 'yes');
+		$userComboBox = new CTextBox('user', $this->data['user'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes');
 	}
 
-	$authenticationFormList->addRow(_('LDAP host'), new CTextBox('ldap_host', $this->data['config_data']['ldap_host'], ZBX_TEXTAREA_STANDARD_SIZE));
+	$authenticationFormList->addRow(_('LDAP host'), new CTextBox('ldap_host', $this->data['config_data']['ldap_host'], ZBX_TEXTBOX_STANDARD_SIZE));
 	$authenticationFormList->addRow(_('Port'), new CNumericBox('ldap_port', $this->data['config_data']['ldap_port'], 5));
-	$authenticationFormList->addRow(_('Base DN'), new CTextBox('ldap_base_dn',$this->data['config_data']['ldap_base_dn'], ZBX_TEXTAREA_STANDARD_SIZE));
-	$authenticationFormList->addRow(_('Search attribute'), new CTextBox('ldap_search_attribute', !empty($this->data['config_data']['ldap_search_attribute']) ? $this->data['config_data']['ldap_search_attribute'] : 'uid', ZBX_TEXTAREA_STANDARD_SIZE, 'no', 128));
-	$authenticationFormList->addRow(_('Bind DN'), new CTextBox('ldap_bind_dn', $this->data['config_data']['ldap_bind_dn'], ZBX_TEXTAREA_STANDARD_SIZE));
-	$authenticationFormList->addRow(_('Bind password'), new CPassBox('ldap_bind_password', $this->data['config_data']['ldap_bind_password'], ZBX_TEXTAREA_STANDARD_SIZE));
+	$authenticationFormList->addRow(_('Base DN'), new CTextBox('ldap_base_dn',$this->data['config_data']['ldap_base_dn'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$authenticationFormList->addRow(_('Search attribute'), new CTextBox('ldap_search_attribute', !empty($this->data['config_data']['ldap_search_attribute']) ? $this->data['config_data']['ldap_search_attribute'] : 'uid', ZBX_TEXTBOX_STANDARD_SIZE, 'no', 128));
+	$authenticationFormList->addRow(_('Bind DN'), new CTextBox('ldap_bind_dn', $this->data['config_data']['ldap_bind_dn'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$authenticationFormList->addRow(_('Bind password'), new CPassBox('ldap_bind_password', $this->data['config_data']['ldap_bind_password'], ZBX_TEXTBOX_STANDARD_SIZE));
 	$authenticationFormList->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']');
 	$authenticationFormList->addRow(_('Login'), $userComboBox);
-	$authenticationFormList->addRow(_('User password'), new CPassBox('user_password', $this->data['user_password'], ZBX_TEXTAREA_STANDARD_SIZE));
+	$authenticationFormList->addRow(_('User password'), new CPassBox('user_password', $this->data['user_password'], ZBX_TEXTBOX_STANDARD_SIZE));
 }
 
 // append form list to tab

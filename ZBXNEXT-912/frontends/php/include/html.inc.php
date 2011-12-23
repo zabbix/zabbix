@@ -279,12 +279,12 @@ function get_icon($name, $params = array()) {
 }
 
 /**
-* Create CDiv with host/template information and references to it's elements
-*
-* @param string $hostid
-* @param string $current elements that reference should not be added to
-* @return object
-*/
+ * Create CDiv with host/template information and references to it's elements
+ *
+ * @param string $hostid
+ * @param string $current elements that reference should not be added to
+ * @return object
+ */
 function get_header_host_table($hostid, $current = null) {
 	$elements = array(
 		'items' => 'items',
@@ -396,7 +396,7 @@ function get_header_host_table($hostid, $current = null) {
 			' ('.$header_host['screens'] . ')'));
 	}
 
-	return new CDiv($list, 'objectgroup ui-widget-content ui-corner-all');
+	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
 function makeFormFooter($main, $other = array()) {
