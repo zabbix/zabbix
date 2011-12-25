@@ -159,7 +159,6 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('ERROR: Cannot update macros');
-		$this->ok('[CUserMacro.createGlobal -> CUserMacro.validate]');
 		$this->ok('Cannot add macro');
 
 		$newHashGlobalmacro = DBhash($sql);
