@@ -183,14 +183,14 @@ if (isset($_REQUEST['form'])) {
 			if (!isset($_REQUEST['new_service_time']['from'])) {
 				$_REQUEST['new_service_time']['from'] = $_REQUEST['new_service_time']['from_hour'].':'.$_REQUEST['new_service_time']['from_minute'];
 			}
-			error(_s('Error adding service time "%s". Should be from 00:00 to 24:00.', $_REQUEST['new_service_time']['from']));
+			error(_('Error adding service time. Should be from 00:00 to 24:00.'));
 		}
 		// validate time 'to' has a wrong format
 		elseif ($new_service_time['to'] === false) {
 			if (!isset($_REQUEST['new_service_time']['to'])) {
 				$_REQUEST['new_service_time']['to'] = $_REQUEST['new_service_time']['to_hour'].':'.$_REQUEST['new_service_time']['to_minute'];
 			}
-			error(_s('Error adding service time "%s". Should be from 00:00 to 24:00.', $_REQUEST['new_service_time']['to']));
+			error(_('Error adding service time. Should be from 00:00 to 24:00.'));
 		}
 		// validate time 'from' is bigger than time 'to'
 		elseif ($new_service_time['from'] > $new_service_time['to']) {
@@ -199,10 +199,24 @@ if (isset($_REQUEST['form'])) {
 		// if this time is not already there, adding it for insertation
 		elseif (!str_in_array($_REQUEST['service_times'], $new_service_time)) {
 			array_push($_REQUEST['service_times'], $new_service_time);
+
+			unset($_REQUEST['new_service_time']['from_week']);
+			unset($_REQUEST['new_service_time']['to_week']);
+			unset($_REQUEST['new_service_time']['from_hour']);
+			unset($_REQUEST['new_service_time']['to_hour']);
+			unset($_REQUEST['new_service_time']['from_minute']);
+			unset($_REQUEST['new_service_time']['to_minute']);
 		}
 
 		show_messages();
 	}
+	else {
+		unset($_REQUEST['new_service_time']['from_week']);
+		unset($_REQUEST['new_service_time']['to_week']);
+		unset($_REQUEST['new_service_time']['from_hour']);
+		unset($_REQUEST['new_service_time']['to_hour']);
+		unset($_REQUEST['new_service_time']['from_minute']);
+		unset($_REQUEST['new_service_time']['to_minute']);	}
 }
 
 /*

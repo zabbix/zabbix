@@ -140,7 +140,7 @@ function dowHrMinToStr($value, $display24Hours = false) {
 
 // Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occured
 function dowHrMinToSec($dow, $hr, $min) {
-	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min)) {
+	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min) || !zbx_ctype_digit($dow) || !zbx_ctype_digit($hr) || !zbx_ctype_digit($min)) {
 		return false;
 	}
 
