@@ -2568,8 +2568,8 @@ const char	*zbx_result_string(int result)
 			return "TIMEOUT_ERROR";
 		case AGENT_ERROR:
 			return "AGENT_ERROR";
-		case PROXY_ERROR:
-			return "PROXY_ERROR";
+		case GATEWAY_ERROR:
+			return "GATEWAY_ERROR";
 		default:
 			return "unknown";
 	}

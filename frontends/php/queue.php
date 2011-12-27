@@ -105,7 +105,6 @@ require_once 'include/page_header.php';
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.value_type NOT IN ('.ITEM_VALUE_TYPE_LOG.')'.
-			' AND i.key_ NOT IN ('.zbx_dbstr('status').')'.
 			' AND NOT i.lastclock IS NULL'.
 			' AND ('.
 				' i.type IN ('.implode(',',$norm_item_types).')'.
