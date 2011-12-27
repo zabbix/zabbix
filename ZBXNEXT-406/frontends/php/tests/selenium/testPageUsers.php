@@ -32,7 +32,7 @@ class testPageUsers extends CWebTest
 	/**
 	* @dataProvider allUsers
 	*/
-	public function testPageUsers_SimpleTest($user)
+	public function testPageUsers_CheckLayout($user)
 	{
 		$this->login('users.php');
 		$this->assertTitle('Users');

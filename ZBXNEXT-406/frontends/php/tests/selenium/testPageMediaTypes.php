@@ -30,7 +30,7 @@ class testPageMediaTypes extends CWebTest{
 	/**
 	 * @dataProvider allMediaTypes
 	 */
-	public function testPageMediaTypes_SimpleTest($mediatype){
+	public function testPageMediaTypes_CheckLayout($mediatype){
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 

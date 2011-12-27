@@ -2,7 +2,8 @@
 Changes for 1.9.9
 
 New features:
-..F.I...S. [ZBX-3286] added ability to automatically delete low level discovered resources (Vedmak,Sasha)
+..F.I..... [ZBX-4009] added new option in map configuration which enables macros expanding (Vedmak)
+..F.I...S. [ZBX-3286] added ability to automatically delete low level discovered resources (Sasha, Vedmak)
 ........S. [ZBX-2806] improved processing of escalations (dimir, Sasha)
 ..F....... [ZBX-1357] updated Greek, Latvian, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 A.F....... [ZBX-3527] improved host form to allow selection of default interface (Vedmak)
@@ -12,6 +13,8 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+..F....... [ZBX-4470] fixed node initialization in DM setup (pavels)
+..F....... [ZBX-4407] fixed import hosts from 1.8 version (sanja)
 A......... [ZBX-4425] fixed item prototype interface mapping when cloning a discovery rule (pavels)
 ..F....... [ZBX-4459] fixed values are cleared when try to add incorrect value mapping, negative values now allowed (Vedmak)
 ..F....... [ZBX-4458] fixed js error in global macro form, changed layout to be consistant with other places (Vedmak)
