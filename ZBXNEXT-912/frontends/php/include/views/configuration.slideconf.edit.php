@@ -64,7 +64,7 @@ foreach ($this->data['slides'] as $step => $slides) {
 	$numSpan->setAttribute('id', 'current_slide_'.$step);
 
 	$delay = new CNumericBox('slides['.$step.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, 'no', true, false);
-	$delay->setAttribute('placeholder', '<'.$this->data['delay'].'>');
+	$delay->setAttribute('placeholder', _('default'));
 
 	$removeButton = new CButton('remove_'.$step, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
 	$removeButton->setAttribute('remove_slide', $step);

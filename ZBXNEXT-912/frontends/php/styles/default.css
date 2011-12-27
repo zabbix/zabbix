@@ -47,6 +47,7 @@ form { margin: 0 }
 
 .hidden { display: none; }
 .pre { white-space: pre; }
+.placeholder { color: #aaa; }
 
 /* align */
 .floatleft { float: left; }
