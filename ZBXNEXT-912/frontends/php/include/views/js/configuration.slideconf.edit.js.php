@@ -19,12 +19,12 @@
 
 <script type="text/javascript">
 	function removeSlide(obj) {
-		step = obj.getAttribute('remove_slide');
+		var step = obj.getAttribute('remove_slide');
 
-		removeObjectById('slides_' + step);
-		removeObjectById('slides_' + step + '_slideid');
-		removeObjectById('slides_' + step + '_screenid');
-		removeObjectById('slides_' + step + '_delay');
+		jQuery('#slides_' + step).remove();
+		jQuery('#slides_' + step + '_slideid').remove();
+		jQuery('#slides_' + step + '_screenid').remove();
+		jQuery('#slides_' + step + '_delay').remove();
 
 		if (jQuery('#slideTable tr.sortable').length <= 1) {
 			jQuery('#slideTable').sortable('disable');

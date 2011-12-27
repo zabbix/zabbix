@@ -1,17 +1,17 @@
 <script type="text/javascript">
 	function removeStep(obj) {
-		step = obj.getAttribute('remove_step');
+		var step = obj.getAttribute('remove_step');
 
-		removeObjectById('steps_' + step);
-		removeObjectById('steps_' + step + '_httpstepid');
-		removeObjectById('steps_' + step + '_httptestid');
-		removeObjectById('steps_' + step + '_name');
-		removeObjectById('steps_' + step + '_no');
-		removeObjectById('steps_' + step + '_url');
-		removeObjectById('steps_' + step + '_timeout');
-		removeObjectById('steps_' + step + '_posts');
-		removeObjectById('steps_' + step + '_required');
-		removeObjectById('steps_' + step + '_status_codes');
+		jQuery('#steps_' + step).remove();
+		jQuery('#steps_' + step + '_httpstepid').remove();
+		jQuery('#steps_' + step + '_httptestid').remove();
+		jQuery('#steps_' + step + '_name').remove();
+		jQuery('#steps_' + step + '_no').remove();
+		jQuery('#steps_' + step + '_url').remove();
+		jQuery('#steps_' + step + '_timeout').remove();
+		jQuery('#steps_' + step + '_posts').remove();
+		jQuery('#steps_' + step + '_required').remove();
+		jQuery('#steps_' + step + '_status_codes').remove();
 
 		if (jQuery('#httpStepTable tr.sortable').length <= 1) {
 			jQuery('#httpStepTable').sortable('disable');
