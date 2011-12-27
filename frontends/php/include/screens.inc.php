@@ -1750,7 +1750,7 @@ require_once('include/js.inc.php');
 						));
 					}
 
-					zbx_add_post_js('jqBlink.init();');
+					zbx_add_post_js('jqBlink.blink();');
 
 					$item = array($item);
 					if ($editmode == 1) {
