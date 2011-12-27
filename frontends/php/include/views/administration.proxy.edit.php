@@ -61,7 +61,7 @@
 		$hosts = zbx_objectValues($proxy['hosts'], 'hostid');
 	}
 
-	$proxyList->addRow(S_PROXY_NAME, new CTextBox('host', $name, 30));
+	$proxyList->addRow(S_PROXY_NAME, new CTextBox('host', $name, 30, 'no', 64));
 
 	$statusBox = new CComboBox('status', $status, 'submit()');
 	$statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, S_PROXY_ACTIVE);
