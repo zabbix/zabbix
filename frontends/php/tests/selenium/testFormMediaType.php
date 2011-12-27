@@ -42,7 +42,7 @@ class testFormMediaType extends CWebTest{
 		return $data;
 	}
 
-	public function testFormMediaType_SimpleTest(){
+	public function testFormMediaType_CheckLayout(){
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 
