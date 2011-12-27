@@ -86,6 +86,13 @@ require_once('include/page_header.php');
 						if ($sysmap === false) throw new Exception(_('Access denied!')."\n\r");
 
 						$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
+						foreach ($sysmapUpdate['selements'] as $array_data) {
+							if (isset($array_data['label']) && $array_data['label']!='')
+								$label_array[] = $array_data['label'];
+						}
+						if (count($label_array) != count(array_unique($label_array))) {
+							throw new Exception(_('Dublicated names.')."\n\r");
+						}
 						$sysmapUpdate['sysmapid'] = $sysmapid;
 
 						$result = API::Map()->update($sysmapUpdate);
