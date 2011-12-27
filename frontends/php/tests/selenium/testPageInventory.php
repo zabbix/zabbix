@@ -30,7 +30,7 @@ class testPageInventory extends CWebTest{
 	/**
 	* @dataProvider allInventory
 	*/
-	public function testPageInventory_SimpleTest($inventory){
+	public function testPageInventory_CheckLayout($inventory){
 		$hostid = $inventory['hostid'];
 		$host = DBfetch(DBselect("select name from hosts where hostid=$hostid"));
 		$name = $host['name'];

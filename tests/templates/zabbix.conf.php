@@ -20,12 +20,12 @@
 
 global $DB;
 
-$DB["TYPE"]		= "SQLITE3";
-$DB["SERVER"]		= "localhost";
+$DB["TYPE"]		= "{DBTYPE}";
+$DB["SERVER"]		= "{DBHOST}";
 $DB["PORT"]		= "0";
 $DB["DATABASE"]		= "{DBNAME}";
-$DB["USER"]		= "root";
-$DB["PASSWORD"]		= "";
+$DB["USER"]		= "{DBUSER}";
+$DB["PASSWORD"]		= "{DBPASSWORD}";
 
 $ZBX_SERVER		= "hudson";
 $ZBX_SERVER_PORT	= "10051";

@@ -309,10 +309,10 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 			NULL);
 
 		zbx_free(strings[1]);
-		
+
 #else	/* not _WINDOWS */
-		
-		/* for nice printing into syslog */		
+
+		/* for nice printing into syslog */
 		switch (level)
 		{
 			case LOG_LEVEL_CRIT:
@@ -332,7 +332,7 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 			default:
 				/* LOG_LEVEL_EMPTY - print nothing */
-				break;			
+				break;
 		}
 
 #endif	/* _WINDOWS */

@@ -159,17 +159,13 @@ $cn_rmv = new CIcon(_('Remove link'), 'iconminus');
 $cn_rmv->setAttribute('id', 'linkRemove');
 //------------------------
 
+$expandMacros = new CSpan($sysmap['expand_macros'] == SYSMAP_EXPAND_MACROS_ON ? _('On') : _('Off'), 'whitelink');
+$expandMacros->setAttribute('id', 'expand_macros');
 
-$gridShow = new CSpan(
-	$sysmap['grid_show'] == SYSMAP_GRID_SHOW_ON ? _('Shown') : _('Hidden'),
-	'whitelink'
-);
+$gridShow = new CSpan($sysmap['grid_show'] == SYSMAP_GRID_SHOW_ON ? _('Shown') : _('Hidden'), 'whitelink');
 $gridShow->setAttribute('id', 'gridshow');
 
-$gridAutoAlign = new CSpan(
-	$sysmap['grid_align'] == SYSMAP_GRID_ALIGN_ON ? _('On') : _('Off'),
-	'whitelink'
-);
+$gridAutoAlign = new CSpan($sysmap['grid_align'] == SYSMAP_GRID_ALIGN_ON ? _('On') : _('Off'), 'whitelink');
 $gridAutoAlign->setAttribute('id', 'gridautoalign');
 
 $possibleGridSizes = array(
@@ -197,6 +193,8 @@ $menuRow = array(
 	_('Icon').' [', $el_add, $el_rmv, ']',
 	SPACE.SPACE,
 	_('Link').' [',$cn_add,$cn_rmv,']',
+	SPACE.SPACE,
+	_('Expand macros').' [', $expandMacros, ']',
 	SPACE.SPACE,
 	_('Grid').' [', $gridShow, '|', $gridAutoAlign, ']',
 	SPACE,

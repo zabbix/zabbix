@@ -31,7 +31,7 @@ class testPageHistory extends CWebTest{
 	* @dataProvider allEnabledItems
 	*/
 
-	public function testPageItems_SimpleTest($item){
+	public function testPageItems_CheckLayout($item){
 
 		// should switch to graph for numeric items, should check filter for history & text items
 		// also different header for log items (different for eventlog items ?)
