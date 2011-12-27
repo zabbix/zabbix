@@ -1406,7 +1406,7 @@ class DB {
 			// sql execution
 			$sql = 'UPDATE '.$table.' SET '.$sqlSet.' WHERE '.implode(' AND ', $sqlWhere);
 			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
+				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s".', $sql));
 			}
 		}
 		return true;

@@ -207,7 +207,7 @@ elseif (isset($_REQUEST['save'])) {
 				'hostid' => $_REQUEST['hostid']
 			));
 			if (!$result) {
-				throw new Exception(_('Cannot add new application').' [ '.$application.' ]');
+				throw new Exception(_('Cannot add new application.').' [ '.$application.' ]');
 			}
 			else {
 				$webcheck['applicationid'] = reset($result['applicationids']);
