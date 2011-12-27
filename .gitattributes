@@ -498,6 +498,8 @@ frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/selenium/templates/testPageSample.php -text
+frontends/php/tests/selenium/testFormAdministrationDMProxies.php -text
+frontends/php/tests/selenium/testFormAdministrationGeneralMacro.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -517,9 +519,9 @@ src/zabbix_java/tests/junit-4.8.2.jar -text
 tests/data/README -text
 tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text
-tests/templates/zabbix.conf.php.mysql -text
-tests/templates/zabbix.conf.php.postgresql -text
-tests/templates/zabbix.conf.php.sqlite3 -text
+tests/templates/zabbix.conf.php -text
+tests/templates/zabbix_agentd.conf -text
+tests/templates/zabbix_server.conf -text
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png
