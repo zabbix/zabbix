@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-15 00:57+0200\n"
+"POT-Creation-Date: 2011-12-20 13:05+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -177,7 +177,7 @@ msgstr ""
 
 #: include/actions.inc.php:180 include/blocks.inc.php:292
 #: include/blocks.inc.php:336 include/blocks.inc.php:882
-#: include/events.inc.php:139 include/events.inc.php:209
+#: include/events.inc.php:134 include/events.inc.php:204
 #: include/locales/en_gb.inc.php:947
 #: include/views/configuration.action.edit.php:918
 msgid "Ack"
@@ -204,7 +204,7 @@ msgstr ""
 msgid "Acknowledge status"
 msgstr ""
 
-#: include/events.inc.php:125 tr_status.php:287 tr_status.php:613
+#: include/events.inc.php:120 tr_status.php:287 tr_status.php:613
 msgid "Acknowledged"
 msgstr "Aceptada"
 
@@ -273,7 +273,7 @@ msgid "Action updated"
 msgstr "Acción actualizada"
 
 #: include/blocks.inc.php:293 include/blocks.inc.php:337
-#: include/blocks.inc.php:883 include/events.inc.php:140
+#: include/blocks.inc.php:883 include/events.inc.php:135
 #: include/locales/en_gb.inc.php:155 include/menu.inc.php:197
 msgid "Actions"
 msgstr "Acciones"
@@ -418,8 +418,8 @@ msgid "Advanced labels"
 msgstr ""
 
 #: include/blocks.inc.php:290 include/blocks.inc.php:334
-#: include/blocks.inc.php:880 include/events.inc.php:138
-#: include/events.inc.php:209 include/events.inc.php:212
+#: include/blocks.inc.php:880 include/events.inc.php:133
+#: include/events.inc.php:204 include/events.inc.php:207
 #: include/locales/en_gb.inc.php:672
 msgid "Age"
 msgstr ""
@@ -434,7 +434,7 @@ msgid "Age less than %s"
 msgstr ""
 
 #: include/views/administration.script.list.php:76
-#: include/views/configuration.httpconf.edit.php:108 popup.php:1891
+#: include/views/configuration.httpconf.edit.php:108 popup.php:1889
 msgid "Agent"
 msgstr "Agente"
 
@@ -980,7 +980,7 @@ msgstr ""
 msgid "Canada (136 characters)"
 msgstr ""
 
-#: include/classes/class.cbuttoncancel.php:24 include/config.inc.php:330
+#: include/classes/class.cbuttoncancel.php:24 include/config.inc.php:334
 #: include/forms.inc.php:3247 include/forms.inc.php:3631
 #: include/js.inc.php:213 include/locales/en_gb.inc.php:667
 #: include/views/configuration.action.edit.php:879
@@ -1727,7 +1727,7 @@ msgstr ""
 msgid "Check already exists."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:230
+#: api/classes/class.citemgeneral.php:222
 msgid "Check the key, please. Default example was passed."
 msgstr ""
 
@@ -1848,8 +1848,8 @@ msgstr ""
 #: include/views/administration.script.edit.php:61
 #: include/views/administration.script.list.php:43
 #: include/views/configuration.action.edit.php:697
-#: include/views/configuration.action.edit.php:702 popup.php:1843
-#: popup.php:1850
+#: include/views/configuration.action.edit.php:702 popup.php:1841
+#: popup.php:1848
 msgid "Commands"
 msgstr ""
 
@@ -2786,7 +2786,7 @@ msgstr ""
 msgid "Description"
 msgstr "Nombre descriptivo"
 
-#: include/blocks.inc.php:747 include/config.inc.php:418
+#: include/blocks.inc.php:747 include/config.inc.php:422
 #: include/locales/en_gb.inc.php:989
 #: include/views/administration.mediatypes.list.php:48
 #: include/views/configuration.action.edit.php:333
@@ -3114,8 +3114,8 @@ msgstr ""
 msgid "Duplicate user alias \"%s\"."
 msgstr ""
 
-#: events.php:514 events.php:527 include/events.inc.php:137
-#: include/events.inc.php:209 include/events.inc.php:212 tr_status.php:286
+#: events.php:514 events.php:527 include/events.inc.php:132
+#: include/events.inc.php:204 include/events.inc.php:207 tr_status.php:286
 msgid "Duration"
 msgstr "Duración"
 
@@ -3131,7 +3131,7 @@ msgstr ""
 msgid "E"
 msgstr ""
 
-#: include/config.inc.php:385
+#: include/config.inc.php:389
 msgid "ERROR"
 msgstr ""
 
@@ -3326,7 +3326,7 @@ msgstr ""
 msgid "Error description"
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:235
+#: api/classes/class.citemgeneral.php:227
 #, php-format
 msgid "Error in item key: \"%s\"."
 msgstr ""
@@ -3335,7 +3335,7 @@ msgstr ""
 msgid "Escalation period"
 msgstr ""
 
-#: include/events.inc.php:120
+#: include/events.inc.php:115
 msgid "Event"
 msgstr ""
 
@@ -3408,8 +3408,8 @@ msgstr ""
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:42
 #: include/views/configuration.action.edit.php:676
-#: include/views/js/configuration.action.edit.js.php:112 popup.php:1842
-#: popup.php:1849
+#: include/views/js/configuration.action.edit.js.php:112 popup.php:1840
+#: popup.php:1847
 msgid "Execute on"
 msgstr ""
 
@@ -4565,7 +4565,7 @@ msgstr ""
 msgid "Idle till"
 msgstr "Inactivo hasta"
 
-#: include/config.inc.php:324
+#: include/config.inc.php:328
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr ""
 
@@ -4573,7 +4573,7 @@ msgstr ""
 #: include/views/administration.general.image.edit.php:40
 #: include/views/administration.general.image.edit.php:43
 #: include/views/administration.general.image.edit.php:49
-#: include/views/js/configuration.sysmaps.js.php:20 map.php:370
+#: include/views/js/configuration.sysmaps.js.php:20 map.php:145
 msgid "Image"
 msgstr "Imágen"
 
@@ -5277,7 +5277,7 @@ msgstr ""
 msgid "Item \"%1$s:%2$s\" deleted."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:278
+#: api/classes/class.citemgeneral.php:270
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
@@ -5331,15 +5331,15 @@ msgstr ""
 msgid "Item updated"
 msgstr "Monitor actualizado"
 
-#: api/classes/class.citemgeneral.php:214
+#: api/classes/class.citemgeneral.php:205
 msgid "Item uses host interface from non-parent host."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:218
+#: api/classes/class.citemgeneral.php:209
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:271
+#: api/classes/class.citemgeneral.php:263
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr ""
 
@@ -5347,27 +5347,27 @@ msgstr ""
 msgid "Item will populate host inventory field"
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:291
+#: api/classes/class.citemgeneral.php:283
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as a discovery rule."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:297
+#: api/classes/class.citemgeneral.php:289
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as an item created from item prototype."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:294
+#: api/classes/class.citemgeneral.php:286
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as an item prototype."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:288
+#: api/classes/class.citemgeneral.php:280
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as an item."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:300
+#: api/classes/class.citemgeneral.php:292
 #, php-format
 msgid "Item with key \"%1$s\" already exists on host \"%2$s\" as unknown item element."
 msgstr ""
@@ -5511,7 +5511,7 @@ msgstr "Conservar las tendencias durante (en días)"
 msgid "Key"
 msgstr "Monitor"
 
-#: api/classes/class.citemgeneral.php:245
+#: api/classes/class.citemgeneral.php:237
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr ""
@@ -5776,7 +5776,7 @@ msgstr ""
 msgid "Logged in as"
 msgstr ""
 
-#: auditlogs.php:144 auditlogs.php:232 include/config.inc.php:329
+#: auditlogs.php:144 auditlogs.php:232 include/config.inc.php:333
 #: include/menu.inc.php:278 include/page_header.php:245
 #: include/views/administration.authentication.edit.php:64
 #: include/views/administration.users.list.php:64
@@ -6053,7 +6053,7 @@ msgid "Max count of events per trigger to show"
 msgstr ""
 
 #: include/classes/class.cwidget.php:106 include/classes/class.cwidget.php:109
-#: include/config.inc.php:420
+#: include/config.inc.php:424
 msgid "Maximize"
 msgstr ""
 
@@ -6194,7 +6194,7 @@ msgid "Min severity"
 msgstr ""
 
 #: include/classes/class.cwidget.php:106 include/classes/class.cwidget.php:109
-#: include/config.inc.php:420
+#: include/config.inc.php:424
 msgid "Minimize"
 msgstr ""
 
@@ -6383,8 +6383,8 @@ msgstr ""
 #: popup.php:1085 popup.php:1153 popup.php:1188 popup.php:1217 popup.php:1356
 #: popup.php:1364 popup.php:1427 popup.php:1430 popup.php:1492 popup.php:1554
 #: popup.php:1558 popup.php:1613 popup.php:1617 popup.php:1667 popup.php:1700
-#: popup.php:1733 popup.php:1773 popup.php:1789 popup.php:1812 popup.php:1841
-#: popup.php:1848 queue.php:250 trigger_prototypes.php:45 triggers.php:46
+#: popup.php:1733 popup.php:1773 popup.php:1789 popup.php:1810 popup.php:1839
+#: popup.php:1846 queue.php:250 trigger_prototypes.php:45 triggers.php:46
 #: triggers.php:487
 msgid "Name"
 msgstr "Nombre"
@@ -6498,8 +6498,8 @@ msgstr "Siguiente"
 msgid "Next check"
 msgstr "Próxima comprobación"
 
-#: include/config.inc.php:623 include/events.inc.php:286
-#: include/events.inc.php:300 include/forms.inc.php:3557
+#: include/config.inc.php:627 include/events.inc.php:281
+#: include/events.inc.php:295 include/forms.inc.php:3557
 #: include/locales/en_gb.inc.php:714
 #: include/views/administration.users.list.php:79
 #: include/views/administration.users.list.php:82
@@ -6703,7 +6703,7 @@ msgstr ""
 msgid "No images defined."
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:190
+#: api/classes/class.citemgeneral.php:201
 msgid "No interface for item."
 msgstr ""
 
@@ -6825,7 +6825,7 @@ msgstr ""
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr ""
 
-#: popup.php:1811 proxies.php:202
+#: popup.php:1809 proxies.php:202
 msgid "No proxies defined."
 msgstr ""
 
@@ -6863,7 +6863,7 @@ msgstr ""
 msgid "No script specified for action operation command."
 msgstr ""
 
-#: include/views/administration.script.list.php:37 popup.php:1837
+#: include/views/administration.script.list.php:37 popup.php:1835
 msgid "No scripts defined."
 msgstr ""
 
@@ -8220,7 +8220,7 @@ msgstr ""
 msgid "SNMP trap"
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:253
+#: api/classes/class.citemgeneral.php:245
 msgid "SNMP trap key is invalid"
 msgstr ""
 
@@ -8576,7 +8576,7 @@ msgstr "Segundos"
 #: include/views/js/configuration.sysmaps.js.php:104 popup.php:551
 #: popup.php:622 popup.php:677 popup.php:765 popup.php:826 popup.php:952
 #: popup.php:1056 popup.php:1138 popup.php:1300 popup.php:1408 popup.php:1477
-#: popup.php:1591 popup.php:1652 popup.php:1910
+#: popup.php:1591 popup.php:1652 popup.php:1908
 msgid "Select"
 msgstr "Seleccionar / Examinar..."
 
@@ -8667,7 +8667,7 @@ msgstr ""
 msgid "Serial number B"
 msgstr ""
 
-#: include/views/administration.script.list.php:79 popup.php:1894
+#: include/views/administration.script.list.php:79 popup.php:1892
 #: queue.php:186
 msgid "Server"
 msgstr "Servidor"
@@ -9023,8 +9023,8 @@ msgid "Stats for"
 msgstr ""
 
 #: actionconf.php:465 discoveryconf.php:250 hosts.php:816
-#: include/events.inc.php:136 include/events.inc.php:209
-#: include/events.inc.php:212 include/locales/en_gb.inc.php:173
+#: include/events.inc.php:131 include/events.inc.php:204
+#: include/events.inc.php:207 include/locales/en_gb.inc.php:173
 #: include/views/administration.users.list.php:67
 #: include/views/configuration.discovery.edit.php:98
 #: include/views/configuration.host.edit.php:341
@@ -9435,9 +9435,9 @@ msgstr "Jueves"
 msgid "Till"
 msgstr "Hasta"
 
-#: include/acknow.inc.php:41 include/events.inc.php:121
-#: include/events.inc.php:135 include/events.inc.php:209
-#: include/events.inc.php:212 include/locales/en_gb.inc.php:172
+#: include/acknow.inc.php:41 include/events.inc.php:116
+#: include/events.inc.php:130 include/events.inc.php:204
+#: include/events.inc.php:207 include/locales/en_gb.inc.php:172
 #: include/views/configuration.services.edit.php:226
 #: include/views/configuration.services.edit.php:227
 #: include/views/configuration.services.edit.php:255
@@ -9791,7 +9791,7 @@ msgstr "Tipo de cálculo"
 msgid "Type of information"
 msgstr "Tipo de información"
 
-#: api/classes/class.citemgeneral.php:263
+#: api/classes/class.citemgeneral.php:255
 msgid "Type of information must be Log for log key."
 msgstr ""
 
@@ -9849,7 +9849,7 @@ msgstr ""
 msgid "USER PROFILE"
 msgstr "PERFIL DE USUARIO"
 
-#: include/config.inc.php:783 include/locales/en_gb.inc.php:27
+#: include/config.inc.php:787 include/locales/en_gb.inc.php:27
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -10233,7 +10233,7 @@ msgstr "Asignación de valores"
 msgid "Value maps are used to create a mapping between numeric values and string representations"
 msgstr ""
 
-#: api/classes/class.citemgeneral.php:258
+#: api/classes/class.citemgeneral.php:250
 msgid "Value type must be Float for aggregate items."
 msgstr ""
 
@@ -10580,8 +10580,8 @@ msgstr "Año"
 msgid "Yearly"
 msgstr "Anual"
 
-#: include/blocks.inc.php:755 include/config.inc.php:626
-#: include/events.inc.php:289 include/events.inc.php:303
+#: include/blocks.inc.php:755 include/config.inc.php:630
+#: include/events.inc.php:284 include/events.inc.php:298
 #: include/forms.inc.php:3557 include/locales/en_gb.inc.php:713
 #: include/views/administration.users.list.php:78
 msgid "Yes"
@@ -10600,7 +10600,7 @@ msgstr ""
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
 
-#: include/config.inc.php:323
+#: include/config.inc.php:327
 msgid "You are not logged in."
 msgstr ""
 
@@ -10608,7 +10608,7 @@ msgstr ""
 msgid "You can not switch hosts for current selection"
 msgstr ""
 
-#: include/config.inc.php:324
+#: include/config.inc.php:328
 msgid "You cannot view this URL as a"
 msgstr ""
 
@@ -10687,7 +10687,7 @@ msgstr ""
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
-#: include/config.inc.php:324
+#: include/config.inc.php:328
 msgid "You must login to view this page."
 msgstr ""
 
@@ -10885,8 +10885,8 @@ msgid "d M Y H:i"
 msgstr ""
 
 #: acknow.php:164 include/acknow.inc.php:45 include/blocks.inc.php:988
-#: include/events.inc.php:121 include/events.inc.php:188
-#: include/events.inc.php:250 include/locales/en_gb.inc.php:26
+#: include/events.inc.php:116 include/events.inc.php:183
+#: include/events.inc.php:245 include/locales/en_gb.inc.php:26
 #: include/locales/en_gb.inc.php:69 include/locales/en_gb.inc.php:72
 #: include/locales/en_gb.inc.php:92 include/locales/en_gb.inc.php:93
 #: include/locales/en_gb.inc.php:130 include/locales/en_gb.inc.php:131

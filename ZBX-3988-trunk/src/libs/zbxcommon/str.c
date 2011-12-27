@@ -2568,8 +2568,8 @@ const char	*zbx_result_string(int result)
 			return "TIMEOUT_ERROR";
 		case AGENT_ERROR:
 			return "AGENT_ERROR";
-		case PROXY_ERROR:
-			return "PROXY_ERROR";
+		case GATEWAY_ERROR:
+			return "GATEWAY_ERROR";
 		default:
 			return "unknown";
 	}
@@ -2638,6 +2638,23 @@ const char	*zbx_nodetype_string(unsigned char nodetype)
 		case ZBX_NODE_MASTER: return "MASTER";
 		case ZBX_NODE_SLAVE: return "SLAVE";
 		default: return "unknown";
+	}
+}
+
+const char	*zbx_escalation_status_string(unsigned char status)
+{
+	switch (status)
+	{
+		case ESCALATION_STATUS_ACTIVE:
+			return "active";
+		case ESCALATION_STATUS_RECOVERY:
+			return "recovery";
+		case ESCALATION_STATUS_SLEEP:
+			return "sleep";
+		case ESCALATION_STATUS_COMPLETED:
+			return "completed";
+		default:
+			return "unknown";
 	}
 }
 

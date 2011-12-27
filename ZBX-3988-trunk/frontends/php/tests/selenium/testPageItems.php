@@ -31,7 +31,7 @@ class testPageItems extends CWebTest{
 	* @dataProvider allHosts
 	*/
 
-	public function testPageItems_SimpleTest($host){
+	public function testPageItems_CheckLayout($host){
 		$hostid=$host['hostid'];
 
 		$this->login('hosts.php');

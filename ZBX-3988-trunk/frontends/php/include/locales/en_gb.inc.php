@@ -211,13 +211,6 @@
 	'S_DEFAULT_THEME'=>				_('Default theme'),
 	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
 	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
-	'S_CANNNOT_UPDATE_VALUE_MAP'=>			_('Cannot update value map'),
-	'S_VALUE_MAP_ADDED'=>				_('Value map added'),
-	'S_CANNNOT_ADD_VALUE_MAP'=>			_('Cannot add value map'),
-	'S_VALUE_MAP_DELETED'=>				_('Value map deleted'),
-	'S_CANNNOT_DELETE_VALUE_MAP'=>			_('Cannot delete value map'),
-	'S_VALUE_MAP_UPDATED'=>				_('Value map updated'),
-	'S_CONFIGURATION_OF_ZABBIX_BIG'=>		_('CONFIGURATION OF ZABBIX'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
 	'S_DEFAULT'=>					_('Default'),
@@ -246,8 +239,6 @@
 	'S_CANNOT_DELETE_REGULAR_EXPRESSION'=>		_('Cannot delete regular expression'),
 
 	'S_DELETE_REGULAR_EXPRESSION_Q'=>		_('Delete regular expression?'),
-
-	'S_VALUE_MAPS_CREATE_NUM_STRING'=>		_('Value maps are used to create a mapping between numeric values and string representations'),
 
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),

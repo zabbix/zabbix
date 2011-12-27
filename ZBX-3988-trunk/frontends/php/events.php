@@ -620,10 +620,12 @@ require_once('include/page_header.php');
 											zbx_jsvalue($items, true).");");
 
 					// duration
-					if($nextEvent = get_next_event($event, $events, $_REQUEST['showUnknown']))
+					if ($nextEvent = get_next_event($event, $events, $_REQUEST['showUnknown'])) {
 						$event['duration'] = zbx_date2age($event['clock'], $nextEvent['clock']);
-					else
+					}
+					else {
 						$event['duration'] = zbx_date2age($event['clock']);
+					}
 
 					$statusSpan = new CSpan(trigger_value2str($event['value']));
 					// add colors and blinking to span depending on configuration and trigger parameters
