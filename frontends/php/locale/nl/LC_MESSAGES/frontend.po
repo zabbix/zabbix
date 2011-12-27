@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-28 00:19+0200\n"
-"PO-Revision-Date: 2011-09-13 15:40+0200\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2011-12-28 00:21+0200\n"
+"PO-Revision-Date: 2011-12-27 21:09+0200\n"
+"Last-Translator: kreno <kreno@kreno.be>\n"
 "Language-Team: Dutch Translation Team\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr " op "
 #: maintenance.php:124
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18"
-msgstr ""
+msgstr "\"%s\" moet liggen tussen 1970.01.01 en 2038.01.18"
 
 #: include/profiles.inc.php:269
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -51,8 +51,8 @@ msgstr[1] "%1$d dagen, "
 #, php-format
 msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d scenario"
+msgstr[1] "%1$d scenarios"
 
 #: chart4.php:87 chart5.php:85
 #, php-format
@@ -131,7 +131,7 @@ msgstr "500 laatste waardes"
 
 #: include/views/configuration.sysmap.edit.php:66
 msgid "<manual>"
-msgstr ""
+msgstr "<manueel>"
 
 #: actionconf.php:452 auditacts.php:110
 msgid "ACTIONS"
@@ -162,7 +162,7 @@ msgstr "CONTROLEER LOGBOEK"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "AUTHENTICATION TO ZABBIX"
-msgstr ""
+msgstr "AUTHENTICATIE NAAR ZABBIX"
 
 #: include/locales/en_gb.inc.php:711
 msgid "AVAILABILITY REPORT"
@@ -200,7 +200,7 @@ msgstr "Melding bevestigd door"
 
 #: acknow.php:153 acknow.php:182
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Bevestig en keer terug"
 
 #: include/locales/en_gb.inc.php:939
 msgid "Acknowledge status"
@@ -240,7 +240,7 @@ msgstr "Actie"
 
 #: api/classes/class.caction.php:817
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2%s seconds)."
-msgstr ""
+msgstr "Actie \"%1$s\" heeft foutieve waarden voor \"esc_period\" (minimum %2%s seconden)."
 
 #: api/classes/class.caction.php:820 api/classes/class.caction.php:835
 #: api/classes/class.caction.php:925 api/classes/class.caction.php:945
@@ -289,7 +289,7 @@ msgstr "Selectie activeren"
 
 #: include/views/configuration.httpconf.list.php:129
 msgid "Activate selected WEB scenarios?"
-msgstr ""
+msgstr "Geselecteerde WEB scenario's activeren?"
 
 #: include/views/configuration.application.list.php:84
 msgid "Activate selected applications?"
@@ -385,11 +385,11 @@ msgstr "Toevoegen aan"
 
 #: maps.php:73
 msgid "Add to Favourites"
-msgstr ""
+msgstr "Toevoegen aan Favorieten"
 
 #: include/html.inc.php:255 screens.php:91
 msgid "Add to favourites"
-msgstr ""
+msgstr "Toevoegen aan Favorieten"
 
 #: include/actions.inc.php:479 include/forms.inc.php:1739
 msgid "Add to host group"
@@ -442,7 +442,7 @@ msgstr "Agent"
 
 #: include/views/configuration.host.edit.php:260
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Agent interfaces"
 
 #: include/hosts.inc.php:63 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:58 popup.php:785
@@ -505,27 +505,27 @@ msgstr "Applicatie"
 #: api/classes/class.capplication.php:784
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "Applicatie \"%1$s\" bestaat reeds voor host \"%2$s\"."
 
 #: api/classes/class.capplication.php:482
 #, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Applicatie \"%1$s\" bestaat reeds."
 
 #: api/classes/class.capplication.php:631
 #, php-format
 msgid "Application \"%1$s\" deleted."
-msgstr ""
+msgstr "Applicatie \"%1$s\" verwijderd."
 
 #: api/classes/class.capplication.php:624
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Applicatie \"%1$s\" wordt gebruikt in scenario \"%2$s\" en kan niet verwijderd worden."
 
 #: api/classes/class.capplication.php:541
 #, php-format
 msgid "Application \"%1$s:%2$s\" created."
-msgstr ""
+msgstr "Applicatie \"%1$s:%2$s\" gecreëerd."
 
 #: api/classes/class.capplication.php:564
 #, php-format
@@ -613,7 +613,7 @@ msgstr "Op"
 
 #: include/forms.inc.php:3222
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "Op (hour:minute)"
 
 #: api/classes/class.cmaintenance.php:453
 #: api/classes/class.cmaintenance.php:645
@@ -623,11 +623,11 @@ msgstr "Er moet minstens één host of groep worden geselecteerd"
 #: api/classes/class.cmaintenance.php:523
 #: api/classes/class.cmaintenance.php:636
 msgid "At least one maintenance period must be created"
-msgstr ""
+msgstr "Er moet op zijn minst één onderhoudsperiode gecreëerd worden"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "Op zijn minst MySQL, PostgreSQL, Oracle, SQLite3 of IBM DB2 moet ondersteund zijn"
 
 #: include/locales/en_gb.inc.php:976 include/menu.inc.php:259
 msgid "Audit"
@@ -657,15 +657,15 @@ msgstr "Authenticatie methode"
 
 #: authentication.php:153 authentication.php:154
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Authenticatie methode veranderd naar HTTP"
 
 #: authentication.php:116 authentication.php:117
 msgid "Authentication method changed to LDAP"
-msgstr ""
+msgstr "Authenticatie methode veranderd naar LDAP"
 
 #: authentication.php:76 authentication.php:77
 msgid "Authentication method changed to Zabbix internal"
-msgstr ""
+msgstr "Authenticatie methode veranderd naar Zabbix (intern)"
 
 #: authentication.php:24
 msgid "Authentication to Zabbix"
@@ -677,7 +677,7 @@ msgstr "Automatische registratie"
 
 #: include/views/administration.users.edit.php:124
 msgid "Auto-login"
-msgstr ""
+msgstr "Auto-login"
 
 #: include/views/administration.users.edit.php:125
 msgid "Auto-logout (min 90 seconds)"
@@ -690,12 +690,12 @@ msgstr "Automatisch"
 
 #: include/views/configuration.sysmap.edit.php:77
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Automatisch iconen koppelen"
 
 #: include/views/js/configuration.sysmaps.js.php:116
 #: include/views/js/configuration.sysmaps.js.php:319
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "Automatisch iconen selecteren"
 
 #: hosts.php:817 include/html.inc.php:371 include/locales/en_gb.inc.php:435
 #: popup.php:441
@@ -759,7 +759,7 @@ msgstr "Bind DN"
 
 #: include/views/administration.authentication.edit.php:62
 msgid "Bind password"
-msgstr ""
+msgstr "Bind paswoord"
 
 #: include/views/administration.general.gui.edit.php:25
 #: include/views/administration.users.edit.php:114
@@ -832,7 +832,7 @@ msgstr "CONFIGURATIE VAN HOST GROEPEN"
 #: include/views/configuration.services.edit.php:26
 #: include/views/configuration.services.list.php:23
 msgid "CONFIGURATION OF IT SERVICES"
-msgstr ""
+msgstr "CONFIGURATIE VAN IT SERVICES"
 
 #: include/locales/en_gb.inc.php:561
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
@@ -890,11 +890,11 @@ msgstr "CONFIGURATIE VAN TRIGGERS"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "CONFIGURATIE VAN USER"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "CONFIGURATIE VAN USER GROEPEN"
 
 #: include/views/administration.usergroups.list.php:33
 #: include/views/administration.users.list.php:33
@@ -912,7 +912,7 @@ msgstr "CONFIGURATIE VAN ZABBIX"
 
 #: include/views/configuration.services.edit.php:62
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "Bereken SLA, acceptabele SLA (in %)"
 
 #: include/items.inc.php:93 include/locales/en_gb.inc.php:325
 msgid "Calculated"
@@ -920,7 +920,7 @@ msgstr "Berekend"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "Berekende permissies"
 
 #: include/locales/en_gb.inc.php:424
 msgid "Callback"
@@ -1052,7 +1052,7 @@ msgstr "Kan onderhoud niet toeveoegen"
 
 #: media_types.php:92
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Kan media type niet toevoegen"
 
 #: include/locales/en_gb.inc.php:319
 msgid "Cannot add more than one item with type \"Graph sum\""
@@ -1125,15 +1125,15 @@ msgstr "Kan niet map waarde bijwerken"
 
 #: authentication.php:121
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Kan authenticatiemethode niet veranderen naar LDAP"
 
 #: authentication.php:81
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Kan authenticatiemethode niet veranderen naar Zabbux (intern)"
 
 #: authentication.php:158
 msgid "Cannot changed authentication method to HTTP"
-msgstr ""
+msgstr "Kan authenticatiemethode niet veranderen naar HTTP"
 
 #: include/locales/en_gb.inc.php:476
 msgid "Cannot clear history"
@@ -1141,15 +1141,15 @@ msgstr "Kan geschiedenis niet opschonen"
 
 #: api/classes/class.cdiscoveryrule.php:1332
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "Kan grafiek prototypes niet klonen"
 
 #: api/classes/class.cdiscoveryrule.php:1232
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Kan item prototypes niet klonen"
 
 #: api/classes/class.cdiscoveryrule.php:855
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "Kan trigger prototypes niet klonen"
 
 #: include/locales/en_gb.inc.php:280
 msgid "Cannot copy graphs"
@@ -1162,7 +1162,7 @@ msgstr "Kan de items niet kopieren"
 #: include/triggers.inc.php:640
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Kan trigger \"%1$s:%2$s\" niet kopiëren, omdat er meerde hosts in de expressie zijn."
 
 #: include/db.inc.php:53
 msgid "Cannot create another database connection."
@@ -1174,12 +1174,12 @@ msgstr "Kan discovery regel niet aanmaken"
 
 #: config.php:755
 msgid "Cannot create icon map"
-msgstr ""
+msgstr "Kan icoon map niet aanmaken"
 
 #: api/classes/class.ciconmap.php:261 api/classes/class.ciconmap.php:321
 #, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
-msgstr ""
+msgstr "Kan géén icoon mappen met identieke namen \"%s\" aanmaken."
 
 #: include/export.inc.php:881
 #, php-format
@@ -1188,7 +1188,7 @@ msgstr "Kan de map \"%s\" niet aanmaken."
 
 #: include/js.inc.php:315
 msgid "Cannot create new element"
-msgstr ""
+msgstr "Kan nieuw element niet aanmaken"
 
 #: api/classes/class.cusermedia.php:414 api/classes/class.cuser.php:404
 #, php-format
@@ -1218,7 +1218,7 @@ msgstr "Kan grafiek prototype niet verwijderen"
 
 #: api/classes/class.citem.php:1114
 msgid "Cannot delete graph."
-msgstr ""
+msgstr "Kan grafiek niet verwijderen."
 
 #: include/locales/en_gb.inc.php:317
 msgid "Cannot delete graphs"
