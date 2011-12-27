@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-12-28 00:19+0200\n"
-"PO-Revision-Date: 2011-12-15 00:50+0200\n"
+"PO-Revision-Date: 2011-12-28 00:42+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -3902,7 +3902,7 @@ msgstr "Grafiki izdzēsti"
 
 #: include/locales.inc.php:65
 msgid "Greek (el_GR)"
-msgstr ""
+msgstr "Grieķu (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:61 sysmap.php:199
 msgid "Grid"
