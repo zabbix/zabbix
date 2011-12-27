@@ -62,6 +62,7 @@ function set_zbx_locales() {
 		'nl_NL'=>  _('Dutch (nl_NL)'),
 		'fr_FR'=>  _('French (fr_FR)'),
 		'de_DE'=>  _('German (de_DE)'),
+		'el_GR'=>  _('Greek (el_GR)'),
 		'hu_HU'=>  _('Hungarian (hu_HU)'),
 		'it_IT'=>  _('Italian (it_IT)'),
 		'ko_KR'=>  _('Korean (ko_KR)'),
