@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-28 00:19+0200\n"
-"PO-Revision-Date: 2011-11-18 02:43+0200\n"
+"POT-Creation-Date: 2011-12-28 00:21+0200\n"
+"PO-Revision-Date: 2011-12-26 20:11+0200\n"
 "Last-Translator: vzanchettin <vzanchettin@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -199,7 +199,7 @@ msgstr "Alarme reconhecido por"
 
 #: acknow.php:153 acknow.php:182
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Reconhecer e retornar"
 
 #: include/locales/en_gb.inc.php:939
 msgid "Acknowledge status"
@@ -239,7 +239,7 @@ msgstr "Ação"
 
 #: api/classes/class.caction.php:817
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2%s seconds)."
-msgstr ""
+msgstr "Ação \"%1$s\" tem um valor incorreto para \"esc_period\" (minimo %2%s segundos)."
 
 #: api/classes/class.caction.php:820 api/classes/class.caction.php:835
 #: api/classes/class.caction.php:925 api/classes/class.caction.php:945
@@ -288,7 +288,7 @@ msgstr "Ativar selecionado"
 
 #: include/views/configuration.httpconf.list.php:129
 msgid "Activate selected WEB scenarios?"
-msgstr ""
+msgstr "Ativar cenários da WEB selecionados?"
 
 #: include/views/configuration.application.list.php:84
 msgid "Activate selected applications?"
@@ -510,22 +510,22 @@ msgstr ""
 #: api/classes/class.capplication.php:482
 #, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Aplicação \"%1$s\" já existe."
 
 #: api/classes/class.capplication.php:631
 #, php-format
 msgid "Application \"%1$s\" deleted."
-msgstr ""
+msgstr "Aplicação \"%1$s\" excluída."
 
 #: api/classes/class.capplication.php:624
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Aplicação \"%1$s\" está sendo utilizada pelo cenário \"%2$s\" e não pode ser excluída."
 
 #: api/classes/class.capplication.php:541
 #, php-format
 msgid "Application \"%1$s:%2$s\" created."
-msgstr ""
+msgstr "Aplicação \"%1$s:%2$s\" criada."
 
 #: api/classes/class.capplication.php:564
 #, php-format
@@ -605,7 +605,7 @@ msgstr "Como texto puro"
 
 #: include/hosts.inc.php:98
 msgid "Asset tag"
-msgstr ""
+msgstr "Etiqueta de patrimônio"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
 msgid "At"
@@ -613,7 +613,7 @@ msgstr "Em"
 
 #: include/forms.inc.php:3222
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "às (horas:minutos)"
 
 #: api/classes/class.cmaintenance.php:453
 #: api/classes/class.cmaintenance.php:645
@@ -623,7 +623,7 @@ msgstr "Pelo menos um host ou grupo deve ser selecionado"
 #: api/classes/class.cmaintenance.php:523
 #: api/classes/class.cmaintenance.php:636
 msgid "At least one maintenance period must be created"
-msgstr ""
+msgstr "Pelo menos um período de manutenção deve ser criado"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -677,7 +677,7 @@ msgstr "Auto-registro"
 
 #: include/views/administration.users.edit.php:124
 msgid "Auto-login"
-msgstr ""
+msgstr "Auto-login"
 
 #: include/views/administration.users.edit.php:125
 msgid "Auto-logout (min 90 seconds)"
@@ -690,7 +690,7 @@ msgstr "Automático"
 
 #: include/views/configuration.sysmap.edit.php:77
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Mapeamento automático de icone"
 
 #: include/views/js/configuration.sysmaps.js.php:116
 #: include/views/js/configuration.sysmaps.js.php:319
@@ -890,11 +890,11 @@ msgstr "CONFIGURAÇÃO DE TRIGGERS"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "CONFIGURAÇÃO DO USUÁRIO"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "CONFIGURAÇÃO DO GRUPO DE USUÁRIO"
 
 #: include/views/administration.usergroups.list.php:33
 #: include/views/administration.users.list.php:33
@@ -920,7 +920,7 @@ msgstr "Calculado"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "Permissões calculadas"
 
 #: include/locales/en_gb.inc.php:424
 msgid "Callback"
@@ -1145,11 +1145,11 @@ msgstr ""
 
 #: api/classes/class.cdiscoveryrule.php:1232
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Não foi possível clonar protótipos do item."
 
 #: api/classes/class.cdiscoveryrule.php:855
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "Não foi possível clonar protótipos da trigger."
 
 #: include/locales/en_gb.inc.php:280
 msgid "Cannot copy graphs"
@@ -1162,7 +1162,7 @@ msgstr "Não foi possível copiar itens"
 #: include/triggers.inc.php:640
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Não foi possível copiar a trigger \"%1$s:%2$s\", por que tem vários hosts na expressão."
 
 #: include/db.inc.php:53
 msgid "Cannot create another database connection."
@@ -1188,7 +1188,7 @@ msgstr "Não foi possível criar o mapa \"%s\"."
 
 #: include/js.inc.php:315
 msgid "Cannot create new element"
-msgstr ""
+msgstr "Não foi possivel criar um novo elemento"
 
 #: api/classes/class.cusermedia.php:414 api/classes/class.cuser.php:404
 #, php-format
@@ -1214,11 +1214,11 @@ msgstr "Gráfico não foi removido"
 
 #: api/classes/class.cgraphprototype.php:1007
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Protótipo do gráfico não foi removido"
 
 #: api/classes/class.citem.php:1114
 msgid "Cannot delete graph."
-msgstr ""
+msgstr "Gráfico não foi removido."
 
 #: include/locales/en_gb.inc.php:317
 msgid "Cannot delete graphs"
@@ -1234,11 +1234,11 @@ msgstr "Host não foi removido"
 
 #: api/classes/class.chost.php:1801
 msgid "Cannot delete host group."
-msgstr ""
+msgstr "Grupo de host não foi removido."
 
 #: config.php:768
 msgid "Cannot delete icon map"
-msgstr ""
+msgstr "Não foi possível remover icone do mapa"
 
 #: config.php:229
 msgid "Cannot delete image"
@@ -1246,7 +1246,7 @@ msgstr "Imagem não foi removida"
 
 #: api/classes/class.chost.php:1923
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "Não foi possível remover inventário."
 
 #: include/locales/en_gb.inc.php:482 screenedit.php:184
 msgid "Cannot delete item"
@@ -1262,7 +1262,7 @@ msgstr "Não foi possível remover período de manutenção"
 
 #: media_types.php:108 media_types.php:119
 msgid "Cannot delete media type"
-msgstr ""
+msgstr "Não foi possível remover tipo de mídia"
 
 #: include/locales/en_gb.inc.php:610
 msgid "Cannot delete network map"
@@ -1286,7 +1286,7 @@ msgstr "Cenário não foi removido"
 
 #: include/locales/en_gb.inc.php:778
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "Não foi possível excluir a tela"
 
 #: scripts.php:142 scripts.php:159
 msgid "Cannot delete script"
@@ -1295,16 +1295,16 @@ msgstr "Não foi possível remover script"
 #: api/classes/class.cscript.php:513
 #, php-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível excluir os scripts. Script \"%1$s\" é usado na operação de ação \"%2$s\"."
 
 #: api/classes/class.cscript.php:502
 #, php-format
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
-msgstr ""
+msgstr "Scripts não foram excluídos. Script com scriptid \"%s\" não existe."
 
 #: actionconf.php:336
 msgid "Cannot delete selected actions"
-msgstr ""
+msgstr "Ações selecionadas não foram excluídas"
 
 #: services.php:110
 msgid "Cannot delete service"
@@ -1338,7 +1338,7 @@ msgstr "Trigger não foi removida"
 
 #: api/classes/class.citem.php:1130
 msgid "Cannot delete trigger."
-msgstr ""
+msgstr "Trigger não foi excluída."
 
 #: include/locales/en_gb.inc.php:878
 msgid "Cannot delete triggers"
@@ -1380,7 +1380,7 @@ msgstr "Grupo de host não existe"
 #: include/export.inc.php:749
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível localizar ícone do mapa \"%1$s\" usado no mapa exportado \"%2$s\"."
 
 #: include/locales/en_gb.inc.php:628
 msgid "Cannot find image"
@@ -1396,7 +1396,7 @@ msgstr "Mapa não existe"
 
 #: include/js.inc.php:298
 msgid "Cannot find objects with name"
-msgstr ""
+msgstr "Não foi possível localizar objetos com nome"
 
 #: include/locales/en_gb.inc.php:634
 msgid "Cannot find screen"
@@ -1440,11 +1440,11 @@ msgstr "Falha na associação do template"
 
 #: api/classes/class.cuser.php:886
 msgid "Cannot logout."
-msgstr ""
+msgstr "Não foi possível terminar sessão."
 
 #: api/classes/class.chost.php:1699
 msgid "Cannot mass update host name."
-msgstr ""
+msgstr "Não foi possível atualizar em massa o nome da máquina."
 
 #: api/classes/class.ctemplate.php:1371
 msgid "Cannot mass update template name"
@@ -1504,31 +1504,31 @@ msgstr "Não foi possível desbloquear usuários"
 
 #: api/classes/class.ctemplate.php:2164
 msgid "Cannot unlink and clear applications"
-msgstr ""
+msgstr "Não foi possível desvíncular e limpar aplicações"
 
 #: api/classes/class.ctemplate.php:2027
 msgid "Cannot unlink and clear discovery rules"
-msgstr ""
+msgstr "Não foi possível desvíncular e limpar regras decobertas"
 
 #: api/classes/class.ctemplate.php:2111
 msgid "Cannot unlink and clear graph prototypes"
-msgstr ""
+msgstr "Não foi possível desvíncular e limpar protótipos de gráficos"
 
 #: api/classes/class.ctemplate.php:2129
 msgid "Cannot unlink and clear graphs."
-msgstr ""
+msgstr "Não foi possível desvíncular e limpar os gráficos."
 
 #: api/classes/class.ctemplate.php:2063
 msgid "Cannot unlink and clear item prototypes"
-msgstr ""
+msgstr "Não foi possível desvícular e limpar os protótipos de itens"
 
 #: api/classes/class.ctemplate.php:2045
 msgid "Cannot unlink and clear items"
-msgstr ""
+msgstr "Não foi possível desvíncular e limpar os itens"
 
 #: api/classes/class.ctemplate.php:1966 api/classes/class.ctemplate.php:1983
 msgid "Cannot unlink and clear triggers"
-msgstr ""
+msgstr "Não foi possível desvincular e limpar as triggers"
 
 #: include/locales/en_gb.inc.php:464
 msgid "Cannot unlink template"
@@ -1573,7 +1573,7 @@ msgstr "Grupo não foi atualizado"
 
 #: api/classes/class.cusergroup.php:395
 msgid "Cannot update group."
-msgstr ""
+msgstr "Grupo não foi atualizado."
 
 #: hostgroups.php:206 hosts.php:460
 msgid "Cannot update host"
@@ -1585,11 +1585,11 @@ msgstr "Status do host não foi atualizado"
 
 #: hosts.php:440
 msgid "Cannot update hosts"
-msgstr ""
+msgstr "Hosts não foram atualizados"
 
 #: config.php:750
 msgid "Cannot update icon map"
-msgstr ""
+msgstr "Ícones do mapa não foram atualizados"
 
 #: config.php:157 include/export.inc.php:712
 msgid "Cannot update image"
@@ -1618,11 +1618,11 @@ msgstr "Não foi possível atualizar período de manutenção"
 #: include/export.inc.php:872
 #, php-format
 msgid "Cannot update map \"%s\"."
-msgstr ""
+msgstr "Não foi possível atualizar o mapa \"%s\"."
 
 #: media_types.php:87
 msgid "Cannot update media type"
-msgstr ""
+msgstr "Não foi possível atualizar o tipo de mídia"
 
 #: include/locales/en_gb.inc.php:618
 msgid "Cannot update network map"
@@ -10478,22 +10478,22 @@ msgstr "Escrita"
 
 #: api/classes/class.cmapelement.php:518
 msgid "Wrong fields for element"
-msgstr ""
+msgstr "Campos errado para o elemento"
 
 #: api/classes/class.cgraph.php:1048
 #: api/classes/class.cgraphprototype.php:1040
 msgid "Wrong fields for graph"
-msgstr ""
+msgstr "Campos errado para o gráfico"
 
 #: api/classes/class.chost.php:1299
 #, php-format
 msgid "Wrong fields for host \"%s\"."
-msgstr ""
+msgstr "Campos errado para o host \"%s\"."
 
 #: api/classes/class.cgraph.php:1062
 #: api/classes/class.cgraphprototype.php:1054
 msgid "Wrong fields for items"
-msgstr ""
+msgstr "Campos errado para os itens"
 
 #: api/classes/class.cmapelement.php:795
 msgid "Wrong fields for linktrigger"
@@ -10518,21 +10518,21 @@ msgstr "Campos incorretos para o tipo de mídia"
 #: api/classes/class.cscreen.php:610
 #, php-format
 msgid "Wrong fields for screen [ %s ]"
-msgstr ""
+msgstr "Campos incorretos para a tela [ %s ]"
 
 #: api/classes/class.cscript.php:382
 msgid "Wrong fields for script"
-msgstr ""
+msgstr "Campos incorretos para o script"
 
 #: api/classes/class.ctriggerprototype.php:1090
 #: api/classes/class.ctriggerprototype.php:1161
 msgid "Wrong fields for trigger"
-msgstr ""
+msgstr "Campos incorretos para a trigger"
 
 #: api/classes/class.cuser.php:371
 #, php-format
 msgid "Wrong fields for user \"%s\"."
-msgstr ""
+msgstr "Campos incorretos para o usuário \"%s\"."
 
 #: api/classes/class.cusermedia.php:380
 #, php-format
@@ -10636,11 +10636,11 @@ msgstr "Você não pode ver esta URL como"
 
 #: include/views/js/configuration.action.edit.js.php:280
 msgid "You did not specify host for operation."
-msgstr ""
+msgstr "Você não especificou um host para operação."
 
 #: include/views/js/configuration.action.edit.js.php:267
 msgid "You did not specify host group for operation."
-msgstr ""
+msgstr "Você não especificou um grupo de host para operação."
 
 #: api/classes/class.caction.php:1627
 #, php-format
@@ -10683,15 +10683,15 @@ msgstr ""
 
 #: api/classes/class.cuser.php:377
 msgid "You do not have permissions to create users."
-msgstr ""
+msgstr "Você não tem permissão para criar usuários."
 
 #: api/classes/class.cuser.php:398
 msgid "You do not have permissions to delete user or user does not exist."
-msgstr ""
+msgstr "Você não tem permissão para excluir o usuário ou o usuário não existe."
 
 #: api/classes/class.cuser.php:395
 msgid "You do not have permissions to delete users."
-msgstr ""
+msgstr "Você não tem permissões para excluir estes usuários."
 
 #: api/classes/class.cusermedia.php:398 api/classes/class.cuser.php:387
 msgid "You do not have permissions to update other users."
@@ -10707,7 +10707,7 @@ msgstr ""
 
 #: api/classes/class.cuser.php:383
 msgid "You do not have permissions to update user or user does not exist."
-msgstr ""
+msgstr "Você não tem permissões para atualizar o usuário ou o usuário não existe."
 
 #: include/config.inc.php:328
 msgid "You must login to view this page."
@@ -10849,7 +10849,7 @@ msgstr "afeta somente dados filtrados!"
 
 #: include/hosts.inc.php:411
 msgid "agent"
-msgstr ""
+msgstr "agente"
 
 #: include/classes/class.cpagefilter.php:446 include/graphs.inc.php:86
 #: include/locales/en_gb.inc.php:270
@@ -11236,7 +11236,7 @@ msgstr "enviado"
 
 #: include/views/configuration.services.edit.php:176
 msgid "short description"
-msgstr ""
+msgstr "descrição curta"
 
 #: include/views/configuration.sysmap.edit.php:75
 msgid "show icon mappings"
@@ -11277,7 +11277,7 @@ msgstr "utilizado na tela exportada"
 
 #: include/views/administration.general.macros.edit.php:41
 msgid "value"
-msgstr ""
+msgstr "valor"
 
 #: include/locales/en_gb.inc.php:31
 msgid "w"
