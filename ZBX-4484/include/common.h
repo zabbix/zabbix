@@ -139,7 +139,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	NETWORK_ERROR	-3
 #define	TIMEOUT_ERROR	-4
 #define	AGENT_ERROR	-5
-#define	PROXY_ERROR	-6
+#define	GATEWAY_ERROR	-6
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
@@ -405,8 +405,6 @@ typedef enum
 	AUDIT_RESOURCE_REGEXP
 } zbx_auditlog_resourcetype_t;
 
-/* special item key used for storing server status */
-#define SERVER_STATUS_KEY	"status"
 /* special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
 /* special item key used for ICMP ping latency */

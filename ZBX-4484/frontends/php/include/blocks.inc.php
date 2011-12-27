@@ -1012,7 +1012,7 @@ function make_latest_issues(array $filter = array()) {
 	}
 
 	// initialize blinking
-	zbx_add_post_js('jqBlink.init();');
+	zbx_add_post_js('jqBlink.blink();');
 	$script = new CJSScript(get_js("jQuery('#hat_lastiss_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
 
 	$infoDiv = new CDiv(_n('%2$d of %1$d issue is shown', '%2$d of %1$d issues are shown', $triggersTotalCount, count($triggers)));
