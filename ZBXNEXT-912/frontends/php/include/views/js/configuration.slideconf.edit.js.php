@@ -1,18 +1,18 @@
 <script type="text/x-jquery-tmpl" id="screenRowTPL">
-<tr id="slides_#{rowNum}" class="sortable">
+<tr id="slides_#{rowId}" class="sortable">
 	<td>
 		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-		<input name="slides[#{rowNum}][screenid]" type="hidden" value="#{screenid}" />
+		<input name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
 	</td>
 	<td>
-		<span class="rowNum" id="current_slide_#{rowNum}">#{rowNum}</span>
+		<span class="rowNum" id="current_slide_#{rowId}">#{rowNum}</span>
 	</td>
 	<td>#{name}</td>
 	<td>
-		<input class="input text" type="text" name="slides[#{rowNum}][delay]" placeholder="<#{rowDelay}>" value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
+		<input class="input text" type="text" name="slides[#{rowId}][delay]" placeholder="<#{rowDelay}>" value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
 	</td>
 	<td>
-		<input type="button" class="input link_menu" id="remove_#{rowNum}" remove_slide="#{rowNum}" value="<?php echo _('Remove'); ?>" onclick="removeSlide(this);" />
+		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" value="<?php echo _('Remove'); ?>" onclick="removeSlide(this);" />
 	</td>
 </tr>
 </script>
@@ -71,37 +71,46 @@
 		}
 	}
 
-	jQuery(document).ready(function() {
-		'use strict';
-
-		jQuery('#slideTable').sortable({
-			disabled: (jQuery('#slideTable tr.sortable').length <= 1),
-			items: 'tbody tr.sortable',
-			axis: 'y',
-			cursor: 'move',
-			containment: 'parent',
-			handle: 'span.ui-icon-arrowthick-2-n-s',
-			tolerance: 'pointer',
-			opacity: 0.6,
-			update: recalculateSortOrder,
-			start: function(e, ui) {
-				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
-			}
-		});
-	});
-
 	function addPopupValues(list) {
+		var initSize = jQuery('#slideTable tr.sortable .rowNum').length;
 		var defaultDelay = jQuery('#delay').val();
 		for (var i = 0; i < list.values.length; i++) {
 			if (empty(list.values[i])) {
 				continue;
 			}
 			var value = list.values[i];
-			value['rowNum'] = jQuery('#slideTable tr.sortable .rowNum').length + 1;
+			value['rowId'] = jQuery('#slideTable tr.sortable .rowNum').length;
+			value['rowNum'] = value['rowId'] + 1;
 			value['rowDelay'] = defaultDelay;
 
 			var tpl = new Template(jQuery('#screenRowTPL').html());
 			jQuery('#screenListFooter').before(tpl.evaluate(value));
 		}
+		if (initSize <= 1) {
+			initSortable();
+		}
 	}
+
+	function initSortable() {
+		jQuery(document).ready(function() {
+			'use strict';
+
+			jQuery('#slideTable').sortable({
+				disabled: (jQuery('#slideTable tr.sortable').length <= 1),
+				items: 'tbody tr.sortable',
+				axis: 'y',
+				cursor: 'move',
+				containment: 'parent',
+				handle: 'span.ui-icon-arrowthick-2-n-s',
+				tolerance: 'pointer',
+				opacity: 0.6,
+				update: recalculateSortOrder,
+				start: function(e, ui) {
+					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				}
+			});
+		});
+	}
+
+	initSortable();
 </script>
