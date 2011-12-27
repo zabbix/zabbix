@@ -32,11 +32,23 @@
 		'use strict';
 
 		jQuery('#paramtype').change(function() {
-			if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
-				jQuery('#value').removeAttr('readonly');
+			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last') {
+				if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
+					jQuery('#param_0').removeAttr('readonly');
+				}
+				else {
+					jQuery('#param_0').attr('readonly', 'readonly');
+				}
 			}
-			else {
-				jQuery('#value').attr('readonly', 'readonly');
+		});
+		jQuery(document).ready(function() {
+			if (jQuery('#expr_type option:selected').val().substr(0, 4) == 'last') {
+				if (jQuery('#paramtype option:selected').val() == <?php echo PARAM_TYPE_COUNTS; ?>) {
+					jQuery('#param_0').removeAttr('readonly');
+				}
+				else {
+					jQuery('#param_0').attr('readonly', 'readonly');
+				}
 			}
 		});
 	});

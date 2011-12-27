@@ -66,10 +66,9 @@ foreach ($this->data['functions'] as $id => $f) {
 	}
 }
 $expressionFormList->addRow(_('Function'), $functionComboBox);
-
-$valueIsReadonly = 'no';
 if (isset($this->data['functions'][$this->data['function']]['params'])) {
 	foreach ($this->data['functions'][$this->data['function']]['params'] as $pid => $pf) {
+		$paramIsReadonly = 'no';
 		$paramValue = isset($this->data['param'][$pid]) ? $this->data['param'][$pid] : null;
 
 		if ($pf['T'] == T_ZBX_INT) {
@@ -80,7 +79,9 @@ if (isset($this->data['functions'][$this->data['function']]['params'])) {
 						foreach ($pf['M'] as $mid => $caption) {
 							$paramTypeElement->addItem($mid, $caption);
 						}
-						$valueIsReadonly = 'yes';
+						if (substr($this->data['expr_type'], 0, 4) == 'last') {
+							$paramIsReadonly = 'yes';
+						}
 					}
 					elseif ($pf['M'] == PARAM_TYPE_SECONDS) {
 						$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
@@ -102,7 +103,7 @@ if (isset($this->data['functions'][$this->data['function']]['params'])) {
 			else {
 				$paramTypeElement = null;
 			}
-			$expressionFormList->addRow($pf['C'].' ', array(new CNumericBox('param['.$pid.']', $paramValue, 10), $paramTypeElement));
+			$expressionFormList->addRow($pf['C'].' ', array(new CNumericBox('param['.$pid.']', $paramValue, 10, $paramIsReadonly), $paramTypeElement));
 		}
 		else {
 			$expressionFormList->addRow($pf['C'], new CTextBox('param['.$pid.']', $paramValue, 30));
@@ -114,7 +115,7 @@ else {
 	$expressionForm->addVar('paramtype', PARAM_TYPE_SECONDS);
 	$expressionForm->addVar('param', 0);
 }
-$expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10, $valueIsReadonly));
+$expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10));
 
 // append tabs to form
 $expressionTab = new CTabView();

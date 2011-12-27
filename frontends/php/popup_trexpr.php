@@ -52,7 +52,7 @@ $param1_sec_count = array(
 	),
 	array(
 		'C' => S_TIME_SHIFT.' ', // caption
-		'T' => T_ZBX_INT, // type
+		'T' => T_ZBX_INT // type
 	)
 );
 $param1_sec_count_no_timeshift = array(
