@@ -525,13 +525,11 @@ void	DBupdate_triggers_status_after_restart()
 				" and h.status in (%d)"
 				" and i.status in (%d)"
 				" and i.type not in (%d,%d)"
-				" and i.key_ not in ('%s')"
 				" and t.status in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
-			SERVER_STATUS_KEY,
 			TRIGGER_STATUS_ENABLED,
 			DBnode_local("t.triggerid"));
 
@@ -785,7 +783,6 @@ int	DBget_queue_count(int from, int to)
 				" and h.status=%d"
 				" and i.status=%d"
 				" and i.value_type not in (%d)"
-				" and i.key_ not in ('%s')"
 				" and ("
 					"i.lastclock is not null"
 					" and i.lastclock<%d"
@@ -801,7 +798,6 @@ int	DBget_queue_count(int from, int to)
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
-			SERVER_STATUS_KEY,
 			now - from,
 				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
@@ -888,7 +884,7 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 		ret = SUCCEED;
 	}
 	else
-		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist", hostname);
+		*error = zbx_dsprintf(*error, "proxy \"%s\" does not exist", hostname);
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

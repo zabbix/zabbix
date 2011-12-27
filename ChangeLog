@@ -2,6 +2,7 @@
 Changes for 1.9.9
 
 New features:
+..F.I...S. [ZBXNEXT-406] replaced an older 'status' check to an internal 'zabbix[host,<type>,available]' check (asaveljevs, Sasha)
 ..F.I..... [ZBX-4009] added new option in map configuration which enables macros expanding (Vedmak)
 ..F.I...S. [ZBX-3286] added ability to automatically delete low level discovered resources (Sasha, Vedmak)
 ........S. [ZBX-2806] improved processing of escalations (dimir, Sasha)
