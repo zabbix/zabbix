@@ -32,7 +32,7 @@ class testPageQueueOverviewByProxy extends CWebTest
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageQueueOverviewByProxy_SimpleTest($proxy)
+	public function testPageQueueOverviewByProxy_CheckLayout($proxy)
 	{
 		$this->login('queue.php?config=1');
 		$this->assertTitle('Queue \[refreshed every 30 sec\]');

@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageAvailabilityReport extends CWebTest
 {
-	public function testPageAvailabilityReport_ByHost_SimpleTest()
+	public function testPageAvailabilityReport_ByHost_CheckLayout()
 	{
 		$this->login('report2.php?config=0');
 		$this->assertTitle('Availability report');
@@ -41,7 +41,7 @@ class testPageAvailabilityReport extends CWebTest
 		$this->checkNoRealHostnames();
 	}
 
-	public function testPageAvailabilityReport_ByTriggerTemplate_SimpleTest()
+	public function testPageAvailabilityReport_ByTriggerTemplate_CheckLayout()
 	{
 		$this->login('report2.php?config=1');
 		$this->assertTitle('Availability report');
