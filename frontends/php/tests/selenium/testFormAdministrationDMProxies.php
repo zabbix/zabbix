@@ -293,6 +293,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->ok('Proxy');
 		$this->input_type('host', $newname);
 		$this->button_click('save');
+		$this->wait();
 		$this->ok('Proxy added');
 		$this->assertTitle('Proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
