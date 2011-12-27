@@ -370,26 +370,33 @@ require_once('include/page_header.php');
 		}
 		elseif (isset($_REQUEST['save'])) {
 			$mapping = get_request('valuemap', array());
-			if (isset($_REQUEST['valuemapid'])) {
-				$result = update_valuemap($_REQUEST['valuemapid'],$_REQUEST['mapname'], $mapping);
-				$audit_action = AUDIT_ACTION_UPDATE;
-				$msg_ok = _('Value map updated');
-				$msg_fail = _('Cannot update value map');
-				$valuemapid = $_REQUEST['valuemapid'];
+			$prevMap = get_valuemap($_REQUEST['mapname']);
+			if (!$prevMap) {
+				if (isset($_REQUEST['valuemapid'])) {
+					$result = update_valuemap($_REQUEST['valuemapid'], $_REQUEST['mapname'], $mapping);
+					$audit_action = AUDIT_ACTION_UPDATE;
+					$msg_ok = _('Value map updated');
+					$msg_fail = _('Cannot update value map');
+					$valuemapid = $_REQUEST['valuemapid'];
+				}
+				else {
+					if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+						access_deny();
+					}
+					$result = add_valuemap($_REQUEST['mapname'], $mapping);
+					$audit_action = AUDIT_ACTION_ADD;
+					$msg_ok = _('Value map added');
+					$msg_fail = _('Cannot add value map');
+					$valuemapid = $result;
+				}
 			}
 			else {
-				if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-					access_deny();
-				}
-				$result = add_valuemap($_REQUEST['mapname'], $mapping);
-				$audit_action = AUDIT_ACTION_ADD;
-				$msg_ok = _('Value map added');
-				$msg_fail = _('Cannot add value map');
-				$valuemapid = $result;
+				$msg_ok =  _('Value map added');
+				$msg_fail = _('Cannot add value map. Map with name "' .$_REQUEST['mapname'].'" already exist');
+				$result = 0;
 			}
-
 			if ($result) {
-				add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _('Value map').' ['.$_REQUEST['mapname'].'] ['.$valuemapid.']');
+				add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _('Value map') . ' [' . $_REQUEST['mapname'] . '] [' . $valuemapid . ']');
 				unset($_REQUEST['form']);
 			}
 			show_messages($result, $msg_ok, $msg_fail);
