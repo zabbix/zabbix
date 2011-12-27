@@ -370,7 +370,7 @@ require_once('include/page_header.php');
 		}
 		elseif (isset($_REQUEST['save'])) {
 			$mapping = get_request('valuemap', array());
-			$prevMap = get_valuemap($_REQUEST['mapname']);
+			$prevMap = getValuemapByName($_REQUEST['mapname']);
 			if (!$prevMap) {
 				if (isset($_REQUEST['valuemapid'])) {
 					$result = update_valuemap($_REQUEST['valuemapid'], $_REQUEST['mapname'], $mapping);
@@ -392,7 +392,7 @@ require_once('include/page_header.php');
 			}
 			else {
 				$msg_ok =  _('Value map added');
-				$msg_fail = _('Cannot add value map. Map with name "' .$_REQUEST['mapname'].'" already exist');
+				$msg_fail = sprintf(_('Cannot add value map. Map with name "%s" already exist'), $_REQUEST['mapname']);
 				$result = 0;
 			}
 			if ($result) {

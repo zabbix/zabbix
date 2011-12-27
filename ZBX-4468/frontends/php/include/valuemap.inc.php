@@ -78,12 +78,10 @@
 		return true;
 	}
 
-	function get_valuemap($name = null)	{
+	function getValuemapByName($name)	{
 		$sql = 'SELECT *' .
-				' FROM valuemaps';
-		if ($name) {
-			$sql .= " WHERE name='" . $name . "'";
-		}
+				' FROM valuemaps'.
+				' WHERE name=' .zbx_dbstr($name);
 		$result = DBselect($sql);
 		if ($row = DBfetch($result)) {
 			return $row;
