@@ -2195,9 +2195,11 @@
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
 					$data['templates'][] = new CLink($db_triggers['name'], 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'], 'highlight underline weight_normal');
+					$data['templates'][] = SPACE.RARR.SPACE;
 				}
 				$tmp_triggerid = $db_triggers['templateid'];
 			} while ($tmp_triggerid != 0);
+			array_pop($data['templates']);
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
 		}
