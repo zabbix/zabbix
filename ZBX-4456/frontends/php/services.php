@@ -216,7 +216,8 @@ if (isset($_REQUEST['form'])) {
 		unset($_REQUEST['new_service_time']['from_hour']);
 		unset($_REQUEST['new_service_time']['to_hour']);
 		unset($_REQUEST['new_service_time']['from_minute']);
-		unset($_REQUEST['new_service_time']['to_minute']);	}
+		unset($_REQUEST['new_service_time']['to_minute']);
+	}
 }
 
 /*
