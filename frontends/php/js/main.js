@@ -609,12 +609,12 @@ var AudioList = {
 /**
  * Sets HTML elements to blink.
  * Example of usage:
- *      <span class="blink" data-seconds-to-blink="60">test 1</span>
- *      <span class="blink" data-seconds-to-blink="30">test 2</span>
+ *      <span class="blink" data-time-to-blink="60">test 1</span>
+ *      <span class="blink" data-time-to-blink="30">test 2</span>
  *      <span class="blink">test 3</span>
  *      <script type="text/javascript">
  *          jQuery(document).ready(function(
- *              jqBlink.init();
+ *              jqBlink.blink();
  *          ));
  *      </script>
  * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
@@ -622,30 +622,21 @@ var AudioList = {
  * @author Konstantin Buravcov
  */
 var jqBlink = {
-	objects: [], // those objects will blink
 	shown: false, // are objects currently shown or hidden?
 	blinkInterval: 1000, // how fast will they blink (ms)
 	secondsSinceInit: 0,
 
 	/**
-	 * Initialize blinking
-	 */
-	init: function() {
-		if (this.objects.length === 0) {
-			this.findObjects();
-		}
-		this.blink();
-	},
-
-	/**
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
 	 */
 	blink: function() {
+		var objects = jQuery('.blink');
+
 		// maybe some of the objects should not blink any more?
-		this.filterOutNonBlinking();
+		objects = this.filterOutNonBlinking(objects);
 
 		// changing visibility state
-		this.objects.css('visibility', this.shown ? 'hidden' : 'visible');
+		objects.css('visibility', this.shown ? 'hidden' : 'visible');
 
 		// reversing the value of indicator attribute
 		this.shown = !this.shown;
@@ -658,19 +649,12 @@ var jqBlink = {
 	},
 
 	/**
-	 * Find all elements with class 'blink' and store them in this.objects
-	 */
-	findObjects: function() {
-		this.objects = jQuery('.blink');
-	},
-
-	/**
 	 * Check all currently found objects and exclude ones that should stop blinking by now
 	 */
-	filterOutNonBlinking: function() {
+	filterOutNonBlinking: function(objects) {
 		var that = this;
 
-		this.objects = this.objects.filter(function() {
+		return objects.filter(function() {
 			var obj = jQuery(this);
 			if (typeof obj.data('timeToBlink') !== 'undefined') {
 				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
