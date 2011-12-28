@@ -30,12 +30,12 @@ static u_int	pagesize = 0;
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
-	u_int	totalpages;
-	size_t	len;
+	uint64_t	totalbytes;
+	size_t		len;
 
-	ZBX_SYSCTLBYNAME("vm.stats.vm.v_page_count", totalpages);
+	ZBX_SYSCTLBYNAME("hw.physmem", totalbytes);
 
-	SET_UI64_RESULT(result, (zbx_uint64_t)totalpages * pagesize);
+	SET_UI64_RESULT(result, (zbx_uint64_t)totalbytes);
 
 	return SYSINFO_RET_OK;
 }
