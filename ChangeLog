@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+........S. [ZBX-2802] fixed handling of NodeNoHistory and NodeNoEvents parameters (Sasha)
 ...G...PS. [ZBX-4394] fixed handling of log rotation failure (Andris)
 ..F....... [ZBX-4455] fixed the 'sortorder' field validation in the IT services form (pavels)
 ..F....... [ZBX-4447] fixed object selection in several forms in IE6 and IE7 (pavels)
