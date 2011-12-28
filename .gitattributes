@@ -236,6 +236,7 @@ frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/selenium/templates/testPageSample.php -text
 frontends/php/tests/selenium/testFormAdministrationDMProxies.php -text
 frontends/php/tests/selenium/testFormAdministrationGeneralMacro.php -text
+frontends/php/tests/selenium/testPageAdministrationGeneralRegexp.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
