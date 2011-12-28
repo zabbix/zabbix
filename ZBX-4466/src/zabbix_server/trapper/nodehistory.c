@@ -100,7 +100,7 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	if (NULL == (table = DBget_table(buffer)))
 		goto error;
 
-	if (0 == (table->flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
+	if (0 == (table->flags & ZBX_HISTORY))
 		goto error;
 
 	if (NULL == r)
