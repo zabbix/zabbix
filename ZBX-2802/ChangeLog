@@ -1,3 +1,18 @@
+Changes for 1.8.11rc1
+
+...G...PS. [ZBX-4394] fixed handling of log rotation failure (Andris)
+..F....... [ZBX-4455] fixed the 'sortorder' field validation in the IT services form (pavels)
+..F....... [ZBX-4447] fixed object selection in several forms in IE6 and IE7 (pavels)
+........S. [ZBX-4298] fixed a number of deleted events in a deleted data report (Sasha)
+
+Changes for 1.8.10
+
+1.8.10rc2 was released as 1.8.10 without any changes
+
+Changes for 1.8.10rc2
+
+..F....... [ZBX-2843] fixed log trigger creation menu in items list (Vedmak)
+
 Changes for 1.8.10rc1
 
 .......PS. [ZBX-4424] fixed handling of a long localized content by history syncer (Sasha)

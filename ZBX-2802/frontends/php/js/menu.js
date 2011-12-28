@@ -94,11 +94,13 @@ function show_popup_menu(e, content, width){
 	var menuTextLength = 35;
 
 	for (var i = 0; i < content.length; i++) {
-		content[i][0] = truncateText(content[i][0], menuTextLength);
-		tmp_width = get_real_text_width(content[i][0], i);
+		if (content[i].length) {
+			content[i][0] = truncateText(content[i][0], menuTextLength);
+			tmp_width = get_real_text_width(content[i][0], i);
 
-		if (max_width < tmp_width) {
-			max_width = tmp_width;
+			if (max_width < tmp_width) {
+				max_width = tmp_width;
+			}
 		}
 
 		// truncate sub menu text
@@ -498,7 +500,7 @@ function menu_item (o_parent, n_order) {
 	eldiv.className = this.getstyle(1, 0);
 	eldiv.innerHTML = this.a_config[0];
 	el.appendChild(eldiv);
-	
+
 	document.body.appendChild(el);
 
 	this.e_ielement = document.getElementById('e' + o_root.n_id + '_' + this.n_id + 'i');
