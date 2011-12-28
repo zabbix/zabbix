@@ -66,14 +66,8 @@ if (!empty($this->data['insert'])) {
 	);
 	?>
 	<script language="JavaScript" type="text/javascript">
-		var form = window.opener.document.forms['<?php echo $this->data['dstfrm']; ?>'];
-		if (form) {
-			var el = form.elements['<?php echo $this->data['dstfld1']; ?>'];
-			if (el) {
-				insertText(el, <?php echo zbx_jsvalue($expression); ?>);
-				close_window();
-			}
-		}
+		insertText(jQuery('#<?php echo $this->data['dstfld1']; ?>', window.opener.document), <?php echo zbx_jsvalue($expression); ?>);
+		close_window();
 	</script>
 <?php
 }
