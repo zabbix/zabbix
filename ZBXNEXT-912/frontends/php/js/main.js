@@ -1102,4 +1102,3 @@ function createPlaceholders() {
 		});
 	}
 }
-createPlaceholders();
