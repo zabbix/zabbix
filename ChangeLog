@@ -379,6 +379,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+........S. [ZBX-4466] fixed inserting UNKNOWN events with incorrect 'clock' values (Sasha)
 ........S. [ZBX-2802] fixed handling of NodeNoHistory and NodeNoEvents parameters (Sasha)
 ...G...PS. [ZBX-4394] fixed handling of log rotation failure (Andris)
 ........S. [ZBX-4298] fixed a number of deleted events in a deleted data report (Sasha)
