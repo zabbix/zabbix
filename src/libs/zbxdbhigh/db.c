@@ -521,6 +521,7 @@ void	DBupdate_triggers_status_after_restart()
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
+				" and i.lastclock is not null"
 				" and f.triggerid=t.triggerid"
 				" and h.status in (%d)"
 				" and i.status in (%d)"
