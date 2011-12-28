@@ -109,7 +109,7 @@ switch ($page['type']) {
 	case PAGE_TYPE_HTML:
 	default:
 		if (!isset($page['encoding'])) {
-			header('Content-Type: text/html; charset='._('UTF-8'));
+			header('Content-Type: text/html; charset=UTF-8');
 		}
 		else {
 			header('Content-Type: text/html; charset='.$page['encoding']);

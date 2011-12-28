@@ -31,7 +31,7 @@ class CTextArea extends CTag {
 
 		// set width
 		if ($width == ZBX_TEXTAREA_STANDARD_WIDTH) {
-			$this->addClass('textarea_standart');
+			$this->addClass('textarea_standard');
 		}
 		elseif ($width == ZBX_TEXTAREA_BIG_WIDTH) {
 			$this->addClass('textarea_big');

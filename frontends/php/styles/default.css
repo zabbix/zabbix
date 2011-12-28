@@ -163,7 +163,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height:100%; }
 .formrow .listInfoText { margin-left: 1%; }
 .listInfo { width: 100%; display: table; }
-.textarea_standart { width: 312px; }
+.textarea_standard { width: 312px; }
 .textarea_big { width: 524px; }
 
 /******************* buttons *********************/

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class for standart ajax response generation.
+ * Class for standard ajax response generation.
  */
 class ajaxResponse {
 	private $_result = true;
