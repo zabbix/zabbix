@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4491] updated Japanese translation; thanks to Kodai Terashima (Richlv)
 ..F....... [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (SlaVa)
 ..F....... [ZBX-3219] Translating script error to human language (slava)
 ..F....... [ZBX-4457] updated French translation; thanks to Joseph Bueno (Richlv)

@@ -2140,6 +2140,7 @@
 	'S_HOST_NO_DNS'=>			'DNS名が設定されていません',
 	'S_SECOND_IN_PARENTHESES'=>			'(秒)',
 	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM'=>			'スクリーンのアイテムのリソース設定が正しくありません',
+	'S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM'=>			'スクリーンのアイテムのリソースが設定されていません',
 	'S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION'=>			'実行しますか？',
 	'S_INCORRECT_VALUE_FOR_SETMESSAGE'=>			'setMessage()の値が正しくありません: "%s".',
 	'S_KEY_CANNOT_BE_EMPTY'=>			'キーは必須の設定項目です。',
