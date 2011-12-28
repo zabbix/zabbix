@@ -2145,10 +2145,19 @@
 			'priority' => get_request('priority', 0),
 			'config' => select_config()
 		);
-		asort($data['dependencies']);
-		if (empty($data['visible'])) {
-			$data['visible']['priority'] = 1;
+		$data['dependencies'] = API::Trigger()->get(array(
+			'triggerids' => $data['dependencies'],
+			'output' => array('triggerid', 'description'),
+			'preservekeys' => true,
+			'selectHosts' => array('name')
+		));
+		foreach ($data['dependencies'] as &$dependency) {
+			if (!empty($dependency['hosts'][0]['name'])) {
+				$dependency['host'] = $dependency['hosts'][0]['name'];
+			}
+			unset($dependency['hosts']);
 		}
+		order_result($data['dependencies'], 'description');
 		return $data;
 	}
 
@@ -2158,7 +2167,7 @@
 			'form_refresh' => get_request('form_refresh'),
 			'parent_discoveryid' => get_request('parent_discoveryid'),
 			'dependencies' => get_request('dependencies', array()),
-			'dependence' => array(),
+			'db_dependencies' => array(),
 			'triggerid' => get_request('triggerid'),
 			'expression' => get_request('expression', ''),
 			'expr_temp' => get_request('expr_temp', ''),
@@ -2272,19 +2281,19 @@
 		}
 
 		if (empty($data['parent_discoveryid'])) {
-			$data['dependence'] = API::Trigger()->get(array(
+			$data['db_dependencies'] = API::Trigger()->get(array(
 				'triggerids' => $data['dependencies'],
 				'output' => array('triggerid', 'description'),
 				'preservekeys' => true,
 				'selectHosts' => array('name')
 			));
-			foreach ($data['dependence'] as &$dependence) {
-				if (!empty($dependence['hosts'][0]['name'])) {
-					$dependence['host'] = $dependence['hosts'][0]['name'];
+			foreach ($data['db_dependencies'] as &$dependency) {
+				if (!empty($dependency['hosts'][0]['name'])) {
+					$dependency['host'] = $dependency['hosts'][0]['name'];
 				}
-				unset($dependence['hosts']);
+				unset($dependency['hosts']);
 			}
-			order_result($data['dependence'], 'description');
+			order_result($data['db_dependencies'], 'description');
 		}
 		return $data;
 	}

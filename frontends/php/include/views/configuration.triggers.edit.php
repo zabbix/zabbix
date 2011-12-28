@@ -296,36 +296,36 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
  * Dependencies tab
  */
 if (empty($this->data['parent_discoveryid'])) {
-	$dependencesFormList = new CFormList('dependencesFormList');
-	$dependencesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-	$dependencesTable->setAttribute('style', 'min-width: 500px;');
-	$dependencesTable->setAttribute('id', 'dependenciesTable');
-	$dependencesTable->setHeader(array(
+	$dependenciesFormList = new CFormList('dependenciesFormList');
+	$dependenciesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
+	$dependenciesTable->setAttribute('style', 'min-width: 500px;');
+	$dependenciesTable->setAttribute('id', 'dependenciesTable');
+	$dependenciesTable->setHeader(array(
 		_('Name'),
 		_('Action')
 	));
 
-	foreach ($this->data['dependence'] as $dependence) {
-		$triggersForm->addVar('dependencies[]', $dependence['triggerid'], 'dependencies_'.$dependence['triggerid']);
+	foreach ($this->data['db_dependencies'] as $dependency) {
+		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
 		$row = new CRow(array(
-			$dependence['host'].': '.$dependence['description'],
-			new CButton('remove', _('Remove'), 'javascript: removeDependence(\''.$dependence['triggerid'].'\');', 'link_menu')
+			$dependency['host'].': '.$dependency['description'],
+			new CButton('remove', _('Remove'), 'javascript: removeDependency(\''.$dependency['triggerid'].'\');', 'link_menu')
 		));
-		$row->setAttribute('id', 'dependence_'.$dependence['triggerid']);
-		$dependencesTable->addRow($row);
+		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
+		$dependenciesTable->addRow($row);
 	}
-	$dependencesFormList->addRow(
+	$dependenciesFormList->addRow(
 		_('Dependencies'),
 		new CDiv(
 			array(
-				$dependencesTable,
+				$dependenciesTable,
 				new CButton('bnt1', _('Add'), 'return PopUp(\'popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1\', 1000, 700);', 'link_menu')
 			),
 			'objectgroup inlineblock border_dotted ui-corner-all'
 		)
 	);
-	$triggersTab->addTab('dependencesTab', _('Dependencies'), $dependencesFormList);
+	$triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 }
 
 // append tabs to form

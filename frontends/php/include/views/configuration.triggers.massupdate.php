@@ -92,53 +92,53 @@ $triggersFormList->addRow(
 	array(
 		_('Severity'),
 		SPACE,
-		new CVisibilityBox('visible[priority]', empty($this->data['visible']['priority']) ? 'yes' : 'no', 'priority_div', _('Original')),
+		new CVisibilityBox('visible[priority]', !empty($this->data['visible']['priority']) ? 'yes' : 'no', 'priority_div', _('Original')),
 	),
 	$severityDiv
 );
 
 // append dependencies to form list
 if (empty($this->data['parent_discoveryid'])) {
-	$dependencesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-	$dependencesTable->setAttribute('style', 'min-width: 500px;');
-	$dependencesTable->setAttribute('id', 'dependenciesTable');
-	$dependencesTable->setHeader(array(
+	$dependenciesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
+	$dependenciesTable->setAttribute('style', 'min-width: 500px;');
+	$dependenciesTable->setAttribute('id', 'dependenciesTable');
+	$dependenciesTable->setHeader(array(
 		_('Name'),
 		_('Action')
 	));
 
-	foreach ($this->data['dependencies'] as $dependence_trigger_id) {
-		$triggersForm->addVar('dependencies[]', $dependence_trigger_id, 'dependencies_'.$dependence_trigger_id);
+	foreach ($this->data['dependencies'] as $dependency) {
+		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
 		$row = new CRow(array(
-			expand_trigger_description($dependence_trigger_id),
-			new CButton('remove', _('Remove'), 'javascript: removeDependence(\''.$dependence_trigger_id.'\');', 'link_menu')
+			$dependency['host'].': '.$dependency['description'],
+			new CButton('remove', _('Remove'), 'javascript: removeDependency(\''.$dependency['triggerid'].'\');', 'link_menu')
 		));
-		$row->setAttribute('id', 'dependence_'.$dependence_trigger_id);
-		$dependencesTable->addRow($row);
+		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
+		$dependenciesTable->addRow($row);
 	}
 
-	$dependenceDiv = new CDiv(
+	$dependenciesDiv = new CDiv(
 		array(
-			$dependencesTable,
+			$dependenciesTable,
 			new CButton('btn1', _('Add'),
-				'return PopUp(\'popup.php?dstfrm=massupdate&dstact=add_dependence&reference=deptrigger'.
-				'&dstfld1=new_dependence[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
+				'return PopUp(\'popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
+				'&dstfld1=new_dependency[]&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
 				'\', 1000, 700);',
 				'link_menu'
 			)
 		),
 		'objectgroup inlineblock border_dotted ui-corner-all'
 	);
-	$dependenceDiv->setAttribute('id', 'dependence_div');
+	$dependenciesDiv->setAttribute('id', 'dependencies_div');
 
 	$triggersFormList->addRow(
 		array(
 			_('Dependencies'),
 			SPACE,
-			new CVisibilityBox('visible[dependencies]', !empty($this->data['visible']['dependencies']) ? 'yes' : 'no', 'dependence_div', _('Original'))
+			new CVisibilityBox('visible[dependencies]', !empty($this->data['visible']['dependencies']) ? 'yes' : 'no', 'dependencies_div', _('Original'))
 		),
-		$dependenceDiv
+		$dependenciesDiv
 	);
 }
 
