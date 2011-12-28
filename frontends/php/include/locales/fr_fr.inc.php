@@ -2140,6 +2140,7 @@
 	'S_HOST_NO_DNS'=>			'Pas de nom DNS spécifié',
 	'S_SECOND_IN_PARENTHESES'=>			'(secondes)',
 	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM'=>			'Ressource fournie incorrecte pour l\'élément de l\'écran',
+	'S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM'=>			'Pas de ressource fournie pour l\'élément de l\'écran',
 	'S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION'=>			'Etes-vous sûr de vouloir effectuer cette action ?',
 	'S_INCORRECT_VALUE_FOR_SETMESSAGE'=>			'Valeur incorrecte pour setMessage(): "%s".',
 	'S_KEY_CANNOT_BE_EMPTY'=>			'La clé ne peut pas être vide',
