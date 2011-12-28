@@ -34,7 +34,6 @@ $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
 $triggersForm->addVar('form', $this->data['form']);
 $triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$triggersForm->addVar('expression', $this->data['expression']);
 $triggersForm->addVar('input_method', $this->data['input_method']);
 $triggersForm->addVar('toggle_input_method', '');
 $triggersForm->addVar('remove_expression', '');
@@ -57,6 +56,10 @@ $expressionTextBox = new CTextArea(
 	ZBX_TEXTAREA_STANDARD_WIDTH,
 	$this->data['expression_field_readonly']
 );
+if ($this->data['expression_field_readonly'] == 'yes') {
+	$triggersForm->addVar('expression', $this->data['expression']);
+}
+
 $addExpressionButton = new CButton(
 	'insert',
 	$this->data['input_method'] == IM_TREE ? _('Edit') : _('Add'),
