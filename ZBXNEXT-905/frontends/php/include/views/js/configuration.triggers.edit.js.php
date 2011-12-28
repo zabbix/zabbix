@@ -55,14 +55,14 @@
 		}
 		if (list.object == 'deptrigger') {
 			for (var i = 0; i < list.values.length; i++) {
-				create_var('triggersForm', 'new_dependence[' + i + ']', list.values[i].triggerid, false);
+				create_var('triggersForm', 'new_dependency[' + i + ']', list.values[i].triggerid, false);
 			}
-			create_var('triggersForm', 'add_dependence', 1, true);
+			create_var('triggersForm', 'add_dependency', 1, true);
 		}
 	}
 
-	function removeDependence(triggerid) {
-		jQuery('#dependence_' + triggerid).remove();
+	function removeDependency(triggerid) {
+		jQuery('#dependency_' + triggerid).remove();
 		jQuery('#dependencies_' + triggerid).remove();
 	}
 
