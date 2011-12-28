@@ -165,11 +165,13 @@ include_once('include/page_header.php');
 	$item['host'] = $host['host'];
 
 // resets get params for proper page refresh
-	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
+	if (isset($_REQUEST['period']) || isset($_REQUEST['stime'])) {
 		navigation_bar_calc('web.item.graph', $item['itemid'], true);
-		jsRedirect('history.php?action=' . get_request('action', 'showgraph') . '&itemid=' . $item['itemid']);
-		include_once('include/page_footer.php');
-		exit();
+		if ($_REQUEST['action'] != 'showvalues') {
+			jsRedirect('history.php?action='.get_request('action', 'showgraph').'&itemid='.$item['itemid']);
+			include_once('include/page_footer.php');
+			exit();
+		}
 	}
 //--
 
@@ -194,12 +196,12 @@ include_once('include/page_header.php');
 		'body' => array()
 	);
 
-	if(count($items) == 1){
+	if (count($items) == 1) {
 		$ptData['header'][] = $item['host'].': '.item_description($item);
 
 		$header['left'] = array(new CLink($item['host'],'latest.php?hostid='.$item['hostid']),': ',item_description($item));
 
-		if('showgraph' == $_REQUEST['action']){
+		if ($_REQUEST['action'] == 'showgraph') {
 			$header['right'][] = get_icon('favourite', array(
 				'fav' => 'web.favorite.graphids',
 				'elid' => $item['itemid'],
@@ -548,7 +550,6 @@ include_once('include/page_header.php');
 	}
 ?>
 <script type="text/javascript">
-//<!--<![CDATA[
 function addPopupValues(list){
 	if(!isset('object', list)){
 		throw("Error hash attribute 'list' doesn't contain 'object' index");
