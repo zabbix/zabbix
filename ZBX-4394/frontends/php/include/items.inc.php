@@ -419,7 +419,7 @@
 			DBexecute('INSERT INTO items_applications (itemappid,itemid,applicationid) VALUES('.$itemappid.','.$itemid.','.$appid.')');
 		}
 
-		info(S_ADDED_NEW_ITEM.SPACE.$host['host'].':'.$item['key_']);
+		info(S_ADDED_NEW_ITEM.SPACE.'"'.$host['host'].':'.$item['key_'].'"');
 
 // add items to child hosts
 
@@ -633,7 +633,7 @@
 		update_item_status($itemid, $item['status']);
 
 		if($result){
-			info(S_ITEM.SPACE."'".$host['host'].':'.$item['key_']."'".SPACE.S_UPDATED_SMALL);
+			info(S_ITEM.SPACE.'"'.$host['host'].':'.$item['key_'].'"'.SPACE.S_UPDATED_SMALL);
 		}
 
 	return $result;
@@ -718,22 +718,28 @@
 		zbx_value2array($templateids);
 
 		$db_items = get_items_by_hostid($hostid);
-		while($db_item = DBfetch($db_items)){
-			if($db_item["templateid"] == 0)
-				continue;
 
-			if( !is_null($templateids)){
+		$host = get_host_by_hostid($hostid);
+
+		while ($db_item = DBfetch($db_items)) {
+			if ($db_item["templateid"] == 0) {
+				continue;
+			}
+
+			if (!is_null($templateids)) {
 				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
 
-				if(!uint_in_array($db_tmp_item["hostid"], $templateids)) continue;
-			}
-
-			if($unlink_mode){
-				if(DBexecute('UPDATE items SET templateid=0 WHERE itemid='.$db_item["itemid"])){
-					info(sprintf(S_ITEM_UNLINKED, $db_item["key_"]));
+				if (!uint_in_array($db_tmp_item["hostid"], $templateids)) {
+					continue;
 				}
 			}
-			else{
+
+			if ($unlink_mode) {
+				if (DBexecute('UPDATE items SET templateid=0 WHERE itemid='.$db_item["itemid"])) {
+					info(sprintf(S_ITEM_UNLINKED, $host['host'].':'.$db_item["key_"]));
+				}
+			}
+			else {
 				delete_item($db_item["itemid"]);
 			}
 		}
@@ -1010,7 +1016,7 @@
 /*		$result = DBexecute('DELETE FROM items WHERE '.DBcondition('itemid',$itemids));*/
 		if($result){
 			foreach($items as $itemid => $item){
-				info(S_ITEM.SPACE."'".$hosts[$itemid]['host'].':'.$item['key_']."'".SPACE.S_DELETED_SMALL);
+				info(S_ITEM.SPACE.'"'.$hosts[$itemid]['host'].':'.$item['key_'].'"'.SPACE.S_DELETED_SMALL);
 			}
 		}
 	return $result;
