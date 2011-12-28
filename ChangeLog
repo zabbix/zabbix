@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+..F....... [ZBX-3909] fixed link to null on menu and non-hiding menu in maps (Slava)
 ...G...... [ZBX-4421] added individual CPU statistics on FreeBSD (Andris)
 ........S. [ZBX-4466] fixed inserting UNKNOWN events with incorrect 'clock' values (Sasha)
 ........S. [ZBX-2802] fixed handling of NodeNoHistory and NodeNoEvents parameters (Sasha)
