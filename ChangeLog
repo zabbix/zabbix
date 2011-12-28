@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4455] fixed the 'sortorder' field validation in the IT services form (pavels)
 ..F....... [ZBX-4447] fixed object selection in several forms in IE6 and IE7 (pavels)
 ........S. [ZBX-4298] fixed a number of deleted events in a deleted data report (Sasha)
 
