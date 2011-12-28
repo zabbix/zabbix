@@ -77,7 +77,9 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertAttribute("//input[@id='host']/@maxlength", '64');
 		$this->assertElementPresent('status');
 		$this->assertElementPresent('interfaces_0_ip');
+		$this->assertAttribute("//input[@id='interfaces_0_ip']/@maxlength", '39');
 		$this->assertElementPresent('interfaces_0_dns');
+		$this->assertAttribute("//input[@id='interfaces_0_dns']/@maxlength", '64');
 		$this->assertElementPresent('interfaces_0_port');
 		$this->assertAttribute("//input[@id='interfaces_0_port']/@maxlength", '64');
 		$this->assertElementPresent('hosts_left');

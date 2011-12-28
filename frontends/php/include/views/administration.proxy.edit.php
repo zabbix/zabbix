@@ -91,10 +91,10 @@
 			S_PORT
 		));
 		$ifTab->addRow(array(
-			new CTextBox('interfaces[0][ip]', $interface['ip'], '24'),
-			new CTextBox('interfaces[0][dns]', $interface['dns'], '30'),
+			new CTextBox('interfaces[0][ip]', $interface['ip'], '24', 'no', 39),
+			new CTextBox('interfaces[0][dns]', $interface['dns'], '30', 'no', 64),
 			$cmbConnectBy,
-			new CTextBox('interfaces[0][port]', $interface['port'], 15)
+			new CTextBox('interfaces[0][port]', $interface['port'], 15, 'no', 64)
 		));
 
 		$proxyList->addRow(S_INTERFACE, new CDiv($ifTab, 'objectgroup inlineblock border_dotted ui-corner-all'));
