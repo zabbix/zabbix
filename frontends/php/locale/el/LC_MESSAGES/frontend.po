@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-12-28 00:21+0200\n"
-"PO-Revision-Date: 2011-12-27 10:19+0200\n"
+"PO-Revision-Date: 2011-12-28 09:46+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
 "Language: el\n"
@@ -6590,24 +6590,22 @@ msgid "No applications defined."
 msgstr "Δεν ορίσθηκαν κατηγορίες."
 
 #: api/classes/class.caction.php:1555
-#, fuzzy, php-format
+#, php-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Δεν καθορίστηκε τύπος ταυτοποίησης για εντολή action operation \"%s\"."
+msgstr "Δεν καθορίστηκε τύπος ταυτοποίησης για εντολή εργασίας ενέργειας \"%s\"."
 
 #: api/classes/class.caction.php:1559 api/classes/class.caction.php:1573
-#, fuzzy, php-format
+#, php-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Δεν καθορίστηκε όνομα χρήστη ταυτοποίησης για εντολή action operation \"%s\"."
+msgstr "Δεν καθορίστηκε όνομα χρήστη ταυτοποίησης για εντολή εργασίας ενέργειας \"%s\"."
 
 #: api/classes/class.caction.php:1542
-#, fuzzy
 msgid "No command specified for action operation."
-msgstr "No command specified for action operation."
+msgstr "Δεν καθορίστηκε εντολή για εργασία ενέργειας."
 
 #: api/classes/class.caction.php:1537
-#, fuzzy
 msgid "No command type specified for action operation."
-msgstr "No command type specified for action operation."
+msgstr "Δεν καθορίστηκε τύπος εντολής για εργασία ενέργειας."
 
 #: include/views/configuration.action.edit.php:88
 #: include/views/configuration.action.edit.php:801
@@ -6667,9 +6665,9 @@ msgid "No events to acknowledge"
 msgstr "Δεν υπάρχουν συμβάντα για αποδοχή"
 
 #: api/classes/class.caction.php:1550
-#, fuzzy, php-format
+#, php-format
 msgid "No execution target specified for action operation command \"%s\"."
-msgstr "No execution target specified for action operation command \"%s\"."
+msgstr "Δεν ορίσθηκε στόχος εκτέλεσης για εντολή εργασίας ενέργειας \"%s\"."
 
 #: include/locales/en_gb.inc.php:535
 msgid "No flexible intervals"
