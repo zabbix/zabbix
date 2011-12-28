@@ -379,10 +379,14 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4457] updated French translation; thanks to Joseph Bueno (Richlv)
+..F....... [ZBX-3909] fixed link to null on menu and non-hiding menu in maps (Slava)
 ...G...... [ZBX-4421] added individual CPU statistics on FreeBSD (Andris)
 ........S. [ZBX-4466] fixed inserting UNKNOWN events with incorrect 'clock' values (Sasha)
 ........S. [ZBX-2802] fixed handling of NodeNoHistory and NodeNoEvents parameters (Sasha)
 ...G...PS. [ZBX-4394] fixed handling of log rotation failure (Andris)
+..F....... [ZBX-4455] fixed the 'sortorder' field validation in the IT services form (pavels)
+..F....... [ZBX-4447] fixed object selection in several forms in IE6 and IE7 (pavels)
 ........S. [ZBX-4298] fixed a number of deleted events in a deleted data report (Sasha)
 
 Changes for 1.8.10
