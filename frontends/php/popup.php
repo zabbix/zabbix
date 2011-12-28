@@ -236,6 +236,10 @@ if ($min_user_type > $USER_DETAILS['type']) {
 	access_deny();
 }
 
+$url = new CUrl();
+$path = $url->getPath();
+insert_js('cookie.eraseArray(\''.$path.'\')');
+
 ?>
 <?php
 function get_window_opener($frame, $field, $value) {
@@ -584,7 +588,7 @@ elseif ($srctbl == 'host_group') {
 		'preservekeys' => true
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$hostgroups = API::HostGroup()->get($options);
 	order_result($hostgroups, 'name');
@@ -646,7 +650,7 @@ elseif ($srctbl == 'host_templates') {
 		'preservekeys' => true
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$templates = API::Template()->get($options);
 	order_result($templates, 'name');
@@ -697,7 +701,7 @@ elseif ($srctbl == 'hosts_and_templates') {
 		'sortfield' => 'name'
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$templates = API::Template()->get($options);
 
@@ -735,7 +739,7 @@ elseif ($srctbl == 'usrgrp') {
 		'preservekeys' => true
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$usergroups = API::UserGroup()->get($options);
 	order_result($usergroups, 'name');
@@ -795,7 +799,7 @@ elseif ($srctbl == 'users') {
 		'preservekeys' => true
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$users = API::User()->get($options);
 	order_result($users, 'alias');
@@ -997,7 +1001,7 @@ elseif ($srctbl == 'items') {
 		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 	}
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	if (!is_null($templated) && $templated == 1) {
 		$options['templated'] = $templated;
@@ -1173,7 +1177,7 @@ elseif ($srctbl == 'applications') {
 		$options['groupids'] = $groupid;
 	}
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	if (!is_null($templated)) {
 		$options['templated'] = $templated;
@@ -1247,7 +1251,7 @@ elseif ($srctbl == 'graphs') {
 		);
 
 		if (!is_null($writeonly)) {
-			$options['editable'] = 1;
+			$options['editable'] = true;
 		}
 		if (!is_null($templated)) {
 			$options['templated'] = $templated;
@@ -1350,7 +1354,7 @@ elseif ($srctbl == 'simple_graph') {
 			'preservekeys' => true
 		);
 		if (!is_null($writeonly)) {
-			$options['editable'] = 1;
+			$options['editable'] = true;
 		}
 		if (!is_null($templated)) {
 			$options['templated'] = $templated;
@@ -1525,7 +1529,7 @@ elseif ($srctbl == 'plain_text') {
 		'sortfield' => 'name'
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	if (!is_null($templated)) {
 		$options['templated'] = $templated;
@@ -1721,11 +1725,11 @@ elseif ($srctbl == 'overview') {
 
 	$options = array(
 		'nodeids' => $nodeid,
-		'monitored_hosts' => 1,
+		'monitored_hosts' => true,
 		'output' => API_OUTPUT_EXTEND
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$hostgroups = API::HostGroup()->get($options);
 	order_result($hostgroups, 'name');
@@ -1757,7 +1761,7 @@ elseif ($srctbl == 'host_group_scr') {
 		'output' => API_OUTPUT_EXTEND
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$hostgroups = API::HostGroup()->get($options);
 	order_result($hostgroups, 'name');
