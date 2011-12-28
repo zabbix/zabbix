@@ -77,7 +77,9 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertAttribute("//input[@id='host']/@maxlength", '64');
 		$this->assertElementPresent('status');
 		$this->assertElementPresent('interfaces_0_ip');
+		$this->assertAttribute("//input[@id='interfaces_0_ip']/@maxlength", '39');
 		$this->assertElementPresent('interfaces_0_dns');
+		$this->assertAttribute("//input[@id='interfaces_0_dns']/@maxlength", '64');
 		$this->assertElementPresent('interfaces_0_port');
 		$this->assertAttribute("//input[@id='interfaces_0_port']/@maxlength", '64');
 		$this->assertElementPresent('hosts_left');
@@ -98,6 +100,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 				array(), 0, 0, 0, 0, ''),
 			array(PROXY_GOOD, 'New passive proxy 1', HOST_STATUS_PROXY_PASSIVE,
 				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, 11051, ''),
+			array(PROXY_GOOD, 'New passive proxy with IP macro', HOST_STATUS_PROXY_PASSIVE,
+				array(), '{$PROXY_PORT}', 'proxy123.zabbix.com', 0, 11051, ''),
 			array(PROXY_BAD, 'New passive proxy 2', HOST_STATUS_PROXY_PASSIVE,
 				array(), 'wrong ip', 'proxy123.zabbix.com', 11051, 0, array('Cannot add proxy', 'Incorrect interface IP parameter')),
 			array(PROXY_BAD, '%^&', HOST_STATUS_PROXY_PASSIVE,
@@ -105,7 +109,11 @@ class testFormAdministrationDMProxies extends CWebTest {
 			array(PROXY_BAD, 'Прокси', HOST_STATUS_PROXY_PASSIVE,
 				array(), 'wrong ip', 'proxy123.zabbix.com', 11051, 0, array('Cannot add proxy', 'Incorrect characters used for Proxy name "Прокси".')),
 			array(PROXY_BAD, 'New passive proxy 3', HOST_STATUS_PROXY_PASSIVE,
-				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, 'port', array('Cannot add proxy', 'Incorrect interface port "port" provided'))
+				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, 'port', array('Cannot add proxy', 'Incorrect interface port "port" provided')),
+			array(PROXY_BAD, 'New active proxy 1', HOST_STATUS_PROXY_ACTIVE,
+				array(), 0, 0, 0, 0, array('Cannot add proxy', 'Host "New active proxy 1" already exists.')),
+			array(PROXY_BAD, 'New passive proxy with wrong IP macro', HOST_STATUS_PROXY_PASSIVE,
+				array(), '$PROXY_PORT', 'proxy123.zabbix.com', 0, 11051, array('Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided'))
 		);
 	}
 
