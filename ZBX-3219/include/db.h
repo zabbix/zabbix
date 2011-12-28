@@ -35,7 +35,6 @@ extern int	CONFIG_DBPORT;
 extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
-extern int	CONFIG_NODE_NOHISTORY;
 extern int	CONFIG_REFRESH_UNSUPPORTED;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_LOG_SLOW_QUERIES;
@@ -77,9 +76,9 @@ typedef enum {
 	GRAPH_ITEM_AGGREGATED = 1
 } zbx_graph_item_type;
 
-#define	ZBX_DB_CONNECT_NORMAL	0
-#define	ZBX_DB_CONNECT_EXIT	1
-#define	ZBX_DB_CONNECT_ONCE	2
+#define ZBX_DB_CONNECT_NORMAL	0
+#define ZBX_DB_CONNECT_EXIT	1
+#define ZBX_DB_CONNECT_ONCE	2
 
 /* Trigger related defines */
 #define TRIGGER_DESCRIPTION_LEN		1020
@@ -151,13 +150,14 @@ typedef enum {
 #define FUNCTION_PARAMETER_LEN_MAX	FUNCTION_PARAMETER_LEN+1
 
 #define HISTORY_STR_VALUE_LEN		255
-#define HISTORY_STR_VALUE_LEN_MAX	HISTORY_STR_VALUE_LEN+1
+#ifdef HAVE_IBM_DB2
+#	define HISTORY_TEXT_VALUE_LEN	2048
+#	define HISTORY_LOG_VALUE_LEN	2048
+#else
+#	define HISTORY_TEXT_VALUE_LEN	65535
+#	define HISTORY_LOG_VALUE_LEN	65535
+#endif
 
-#define	HISTORY_TEXT_VALUE_LEN		65535
-#define	HISTORY_TEXT_VALUE_LEN_MAX	HISTORY_TEXT_VALUE_LEN+1
-
-#define	HISTORY_LOG_VALUE_LEN		65535
-#define	HISTORY_LOG_VALUE_LEN_MAX	HISTORY_LOG_VALUE_LEN+1
 #define HISTORY_LOG_SOURCE_LEN		64
 #define HISTORY_LOG_SOURCE_LEN_MAX	HISTORY_LOG_SOURCE_LEN+1
 
@@ -210,17 +210,17 @@ typedef enum {
 #define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
 
 #ifdef HAVE_ORACLE
-#define	ZBX_SQL_STRCMP		"%s%s%s"
-#define	ZBX_SQL_STRVAL_EQ(str)	str[0] != '\0' ? "='"  : "",			\
+#define ZBX_SQL_STRCMP		"%s%s%s"
+#define ZBX_SQL_STRVAL_EQ(str)	str[0] != '\0' ? "='"  : "",			\
 				str[0] != '\0' ? str   : " is null",		\
 				str[0] != '\0' ? "'"   : ""
 #define	ZBX_SQL_STRVAL_NE(str)	str[0] != '\0' ? "<>'" : "",			\
 				str[0] != '\0' ? str   : " is not null",	\
 				str[0] != '\0' ? "'"   : ""
 #else
-#define	ZBX_SQL_STRCMP		"%s'%s'"
-#define	ZBX_SQL_STRVAL_EQ(str)	"=", str
-#define	ZBX_SQL_STRVAL_NE(str)	"<>", str
+#define ZBX_SQL_STRCMP		"%s'%s'"
+#define ZBX_SQL_STRVAL_EQ(str)	"=", str
+#define ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
 
 #define ZBX_MAX_SQL_LEN		65535
@@ -308,22 +308,6 @@ typedef struct
 }
 DB_EVENT;
 
-typedef struct
-{
-	zbx_uint64_t     hostid;
-	char    host[HOST_HOST_LEN_MAX];
-	char    dns[HOST_DNS_LEN_MAX];
-	int     useip;
-	char    ip[HOST_IP_LEN_MAX];
-	int	port;
-	int	status;
-	int	disable_until;
-	int	errors_from;
-	char	error[HOST_ERROR_LEN_MAX];
-	int	available;
-}
-DB_HOST;
-
 typedef union
 {
 	double		dbl;
@@ -375,17 +359,6 @@ typedef struct
 	char			*h_lastseverity;
 }
 DB_ITEM;
-
-typedef struct
-{
-	zbx_uint64_t	mediaid;
-	zbx_uint64_t	mediatypeid;
-	char		*sendto;
-	char		*period;
-	int		active;
-	int		severity;
-}
-DB_MEDIA;
 
 typedef struct
 {
@@ -578,7 +551,7 @@ double	DBget_requiredperformance();
 int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error);
 
 char	*DBdyn_escape_string(const char *src);
-char	*DBdyn_escape_string_len(const char *src, int max_src_len);
+char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char	*DBdyn_escape_like_pattern(const char *src);
@@ -588,7 +561,6 @@ void	DBfree_item_from_db(DB_ITEM *item);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
-int	DBget_host_by_hostid(int hostid,DB_HOST *host);
 int	DBadd_templates_to_host(int hostid,int host_templateid);
 
 int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int graphs);

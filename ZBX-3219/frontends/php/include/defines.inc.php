@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION', '1.8.10rc1');
-	define('ZABBIX_API_VERSION','1.3');
+	define('ZABBIX_VERSION',		'1.8.11rc1');
+	define('ZABBIX_API_VERSION',	'1.3');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -655,7 +655,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
-	define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[KMGTsmhdw]{0,1})');
+	define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[YZEPKMGTsmhdw]{0,1})');
 
 	define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 //--

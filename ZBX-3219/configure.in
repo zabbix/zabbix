@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[1.8.10rc1])
+AM_INIT_AUTOMAKE([zabbix],[1.8.11rc1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1135,6 +1135,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	dnl Checking for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
 			AC_MSG_ERROR([Curl library not found])

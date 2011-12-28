@@ -143,7 +143,7 @@ private $allowed;
 // <number> = <integer> | <integer><suffix>| <integer>.<integer> | <integer>.<integer><suffix>
 // <suffix> = [KMGTsmhdw]
 
-		$expression = preg_replace("/(\d+(\.\d+)?[KMGTsmhdw]?)/u", '{constant}', $expression);
+		$expression = preg_replace("/(\d+(\.\d+)?[YZEPKMGTsmhdw]?)/u", '{constant}', $expression);
 		$simpleExpr = str_replace(' ','',$expression);
 
 // constant => expression
