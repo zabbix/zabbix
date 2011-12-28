@@ -298,7 +298,7 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
 if (empty($this->data['parent_discoveryid'])) {
 	$dependencesFormList = new CFormList('dependencesFormList');
 	$dependencesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
-	$dependencesTable->setAttribute('style', 'min-width:500px;');
+	$dependencesTable->setAttribute('style', 'min-width: 500px;');
 	$dependencesTable->setAttribute('id', 'dependenciesTable');
 	$dependencesTable->setHeader(array(
 		_('Name'),
@@ -309,7 +309,7 @@ if (empty($this->data['parent_discoveryid'])) {
 		$triggersForm->addVar('dependencies[]', $dependence['triggerid'], 'dependencies_'.$dependence['triggerid']);
 
 		$row = new CRow(array(
-			$dependence['description'],
+			$dependence['host'].': '.$dependence['description'],
 			new CButton('remove', _('Remove'), 'javascript: removeDependence(\''.$dependence['triggerid'].'\');', 'link_menu')
 		));
 		$row->setAttribute('id', 'dependence_'.$dependence['triggerid']);

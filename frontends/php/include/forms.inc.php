@@ -2275,8 +2275,16 @@
 			$data['dependence'] = API::Trigger()->get(array(
 				'triggerids' => $data['dependencies'],
 				'output' => array('triggerid', 'description'),
-				'preservekeys' => true
+				'preservekeys' => true,
+				'selectHosts' => array('name')
 			));
+			foreach ($data['dependence'] as &$dependence) {
+				if (!empty($dependence['hosts'][0]['name'])) {
+					$dependence['host'] = $dependence['hosts'][0]['name'];
+				}
+				unset($dependence['hosts']);
+			}
+			order_result($data['dependence'], 'description');
 		}
 		return $data;
 	}
