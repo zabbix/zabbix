@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+..F....... [ZBX-3219] Translating script error to human language (slava)
 ..F....... [ZBX-4457] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-3909] fixed link to null on menu and non-hiding menu in maps (Slava)
 ...G...... [ZBX-4421] added individual CPU statistics on FreeBSD (Andris)
@@ -29,6 +30,8 @@ A......... [ZBX-4273] fixed getting permission error while creating an action (s
 .......PS. [ZBX-4376] fixed escaping of strings with PostgreSQL 9.1 or later (Sasha)
 ..F....... [ZBX-2419] fixed calculation of SLA if uptime/downtime is specified (Sasha)
 ..F....... [ZBX-3074] moved the 'Status' column in the item list to the right (slava)
+A......... [ZBX-3104] implemented the screen item API (pavels)
+A.F....... [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
 A......... [ZBX-3104] implemented the screen item API (pavels)
 A.F....... [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
 ........S. [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)
