@@ -75,7 +75,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		// $newHash2=DBhash($sql_hash2);
 		$this->assertEquals($oldHashRegexp2, DBhash($sql_hash2), "Chuck Norris: no-change regexp update should not update data in table 'expressions'");
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
@@ -91,7 +91,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
 		$this->ok('Regular expressions');
-		$this->ok(array('Name','Expressions'));
+		$this->ok(array('Name', 'Expressions'));
 
 		// detecting "regexpid" values for clicking checkboxes "regexpids[$regexpid]"
 		$sql = "SELECT regexpid FROM regexps WHERE name='$name'";
@@ -136,7 +136,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$sql1 = "SELECT * FROM regexps";
 		$this->assertEquals(0, DBcount($sql1), 'Chuck Norris: Regexp has not been deleted from the DB');
 
-		$sql2 = "SELECT * FROM regexps r, expressions e WHERE r.regexpid =e.regexpid";
+		$sql2 = "SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid";
 		$this->assertEquals(0, DBcount($sql2), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 
 		// DBrestore_tables('regexps');
