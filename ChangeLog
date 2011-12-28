@@ -1,5 +1,7 @@
 Changes for 1.8.11rc1
 
+........S. [ZBX-4298] fixed a number of deleted events in a deleted data report (Sasha)
+
 Changes for 1.8.10
 
 1.8.10rc2 was released as 1.8.10 without any changes
