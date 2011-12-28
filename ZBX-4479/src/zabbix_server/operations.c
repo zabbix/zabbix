@@ -541,13 +541,13 @@ void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid)
  *                                                                            *
  * Purpose: link host with template                                           *
  *                                                                            *
- * Parameters: event      - [IN] event data                                   *
- *             templateid - [IN] host template identificator from database    *
+ * Parameters: event           - [IN] event data                              *
+ *             lnk_templateids - [IN] array of template ids                   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_add(DB_EVENT *event, zbx_uint64_t templateid)
+void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
 {
 	const char	*__function_name = "op_template_add";
 	zbx_uint64_t	hostid;
@@ -563,7 +563,7 @@ void	op_template_add(DB_EVENT *event, zbx_uint64_t templateid)
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
 
-	DBcopy_template_elements(hostid, templateid);
+	DBcopy_template_elements(hostid, lnk_templateids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
