@@ -1,3 +1,25 @@
+Changes for 1.8.11rc1
+
+..F....... [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (SlaVa)
+..F....... [ZBX-3219] Translating script error to human language (slava)
+..F....... [ZBX-4457] updated French translation; thanks to Joseph Bueno (Richlv)
+..F....... [ZBX-3909] fixed link to null on menu and non-hiding menu in maps (Slava)
+...G...... [ZBX-4421] added individual CPU statistics on FreeBSD (Andris)
+........S. [ZBX-4466] fixed inserting UNKNOWN events with incorrect 'clock' values (Sasha)
+........S. [ZBX-2802] fixed handling of NodeNoHistory and NodeNoEvents parameters (Sasha)
+...G...PS. [ZBX-4394] fixed handling of log rotation failure (Andris)
+..F....... [ZBX-4455] fixed the 'sortorder' field validation in the IT services form (pavels)
+..F....... [ZBX-4447] fixed object selection in several forms in IE6 and IE7 (pavels)
+........S. [ZBX-4298] fixed a number of deleted events in a deleted data report (Sasha)
+
+Changes for 1.8.10
+
+1.8.10rc2 was released as 1.8.10 without any changes
+
+Changes for 1.8.10rc2
+
+..F....... [ZBX-2843] fixed log trigger creation menu in items list (Vedmak)
+
 Changes for 1.8.10rc1
 
 ..F....... [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (Slava)
@@ -10,6 +32,8 @@ A......... [ZBX-4273] fixed getting permission error while creating an action (s
 .......PS. [ZBX-4376] fixed escaping of strings with PostgreSQL 9.1 or later (Sasha)
 ..F....... [ZBX-2419] fixed calculation of SLA if uptime/downtime is specified (Sasha)
 ..F....... [ZBX-3074] moved the 'Status' column in the item list to the right (slava)
+A......... [ZBX-3104] implemented the screen item API (pavels)
+A.F....... [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
 A......... [ZBX-3104] implemented the screen item API (pavels)
 A.F....... [ZBX-3104] fixed screen item "Parameter" field validation and some minor screen item bugs (pavels)
 ........S. [ZBX-4298] added deleted data report to a housekeeper on every step (dimir)
