@@ -19,31 +19,34 @@
 **/
 ?>
 <?php
-/*************** VALUE MAPPING ******************/
 	function add_mapping_to_valuemap($valuemapid, $mappings) {
 		DBexecute("delete FROM mappings WHERE valuemapid=$valuemapid");
 
-		foreach($mappings as $map) {
+		foreach ($mappings as $map) {
 			$mappingid = get_dbid("mappings","mappingid");
 
 			$result = DBexecute("insert into mappings (mappingid,valuemapid, value, newvalue)".
 				" values (".$mappingid.",".$valuemapid.",".zbx_dbstr($map["value"]).",".
 				zbx_dbstr($map["newvalue"]).")");
 
-			if (!$result)
+			if (!$result) {
 				return $result;
+			}
 		}
 		return TRUE;
 	}
 
 	function add_valuemap($name, $mappings) {
-		if (!is_array($mappings))	return FALSE;
+		if (!is_array($mappings)) {
+			return FALSE;
+		}
 
 		$valuemapid = get_dbid("valuemaps","valuemapid");
 
 		$result = DBexecute("insert into valuemaps (valuemapid,name) values ($valuemapid,".zbx_dbstr($name).")");
-		if (!$result)
+		if (!$result) {
 			return $result;
+		}
 
 		$result = add_mapping_to_valuemap($valuemapid, $mappings);
 		if (!$result) {
@@ -56,13 +59,16 @@
 	}
 
 	function update_valuemap($valuemapid, $name, $mappings) {
-		if (!is_array($mappings))	return FALSE;
+		if (!is_array($mappings)) {
+			return FALSE;
+		}
 
 		$result = DBexecute('UPDATE valuemaps SET name='.zbx_dbstr($name).
 			' WHERE valuemapid='.$valuemapid);
 
-		if (!$result)
+		if (!$result) {
 			return $result;
+		}
 
 		$result = add_mapping_to_valuemap($valuemapid, $mappings);
 		if (!$result) {
@@ -78,34 +84,39 @@
 		return true;
 	}
 
-	function getValuemapByName($name)	{
-		$sql = 'SELECT *' .
-				' FROM valuemaps'.
-				' WHERE name=' .zbx_dbstr($name);
-		$result = DBselect($sql);
+	function getValuemapByName($name) {
+		$result = DBselect(
+			'SELECT *'.
+			' FROM valuemaps'.
+			' WHERE name='.zbx_dbstr($name)
+		);
 		if ($row = DBfetch($result)) {
 			return $row;
 		}
 		return 0;
 	}
 
-function replace_value_by_map($value, $valuemapid) {
-		if ($valuemapid < 1) return $value;
+	function replace_value_by_map($value, $valuemapid) {
+		if ($valuemapid < 1) {
+			return $value;
+		}
 
 		static $valuemaps = array();
-		if (isset($valuemaps[$valuemapid][$value])) return $valuemaps[$valuemapid][$value];
-
-		$sql = 'SELECT newvalue '.
-				' FROM mappings '.
-				' WHERE valuemapid='.$valuemapid.
-					' AND value='.zbx_dbstr($value);
-		$result = DBselect($sql);
-		if ($row = DBfetch($result)) {
-			$valuemaps[$valuemapid][$value] = $row['newvalue'].' '.'('.$value.')';
+		if (isset($valuemaps[$valuemapid][$value])) {
 			return $valuemaps[$valuemapid][$value];
 		}
 
-	return $value;
+		$result = DBselect(
+			'SELECT newvalue'.
+			' FROM mappings'.
+			' WHERE valuemapid='.$valuemapid.
+				' AND value='.zbx_dbstr($value)
+		);
+		if ($row = DBfetch($result)) {
+			$valuemaps[$valuemapid][$value] = $row['newvalue'].' ('.$value.')';
+			return $valuemaps[$valuemapid][$value];
+		}
+
+		return $value;
 	}
-/*************** END VALUE MAPPING ******************/
 ?>

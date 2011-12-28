@@ -396,7 +396,7 @@ require_once('include/page_header.php');
 				$result = 0;
 			}
 			if ($result) {
-				add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _('Value map') . ' [' . $_REQUEST['mapname'] . '] [' . $valuemapid . ']');
+				add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _('Value map').' ['.$_REQUEST['mapname'].'] ['.$valuemapid.']');
 				unset($_REQUEST['form']);
 			}
 			show_messages($result, $msg_ok, $msg_fail);
