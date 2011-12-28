@@ -89,6 +89,7 @@
 		if (initSize <= 1) {
 			initSortable();
 		}
+		createPlaceholders();
 	}
 
 	function initSortable() {
