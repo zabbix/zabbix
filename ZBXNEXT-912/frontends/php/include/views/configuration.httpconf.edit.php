@@ -156,7 +156,9 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	$numSpan->setAttribute('id', 'current_step_'.$stepid);
 
 	$name = new CSpan($step['name'], 'link');
-	$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'&list_name=steps&stepid='.$stepid.
+	$name->setAttribute('id', 'name_'.$stepid);
+	$name->setAttribute('name_step', $stepid);
+	$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'&list_name=steps&stepid="+jQuery(this).attr("name_step")+"'.
 		url_param($step['name'], false, 'name').
 		url_param($step['timeout'], false, 'timeout').
 		url_param($step['url'], false, 'url').

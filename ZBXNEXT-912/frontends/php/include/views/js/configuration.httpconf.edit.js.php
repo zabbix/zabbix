@@ -26,6 +26,7 @@
 
 			// rewrite ids to temp
 			jQuery('#remove_' + step).attr('id', 'tmp_remove_' + step);
+			jQuery('#name_' + step).attr('id', 'tmp_name_' + step);
 			jQuery('#steps_' + step).attr('id', 'tmp_steps_' + step);
 			jQuery('#steps_' + step + '_httpstepid').attr('id', 'tmp_steps_' + step + '_httpstepid');
 			jQuery('#steps_' + step + '_httptestid').attr('id', 'tmp_steps_' + step + '_httptestid');
@@ -49,6 +50,7 @@
 			var newStep = jQuery('#tmp_current_step_' + n).attr('new_step');
 
 			jQuery('#tmp_remove_' + n).attr('id', 'remove_' + newStep);
+			jQuery('#tmp_name_' + n).attr('id', 'name_' + newStep);
 			jQuery('#tmp_steps_' + n).attr('id', 'steps_' + newStep);
 			jQuery('#tmp_steps_' + n + '_httpstepid').attr('id', 'steps_' + newStep + '_httpstepid');
 			jQuery('#tmp_steps_' + n + '_httptestid').attr('id', 'steps_' + newStep + '_httptestid');
@@ -61,6 +63,7 @@
 			jQuery('#tmp_steps_' + n + '_status_codes').attr('id', 'steps_' + newStep + '_status_codes');
 
 			jQuery('#remove_' + newStep).attr('remove_step', newStep);
+			jQuery('#name_' + newStep).attr('name_step', newStep);
 			jQuery('#steps_' + newStep + '_httpstepid').attr('name', 'steps[' + newStep + '][httpstepid]');
 			jQuery('#steps_' + newStep + '_httptestid').attr('name', 'steps[' + newStep + '][httptestid]');
 			jQuery('#steps_' + newStep + '_name').attr('name', 'steps[' + newStep + '][name]');
