@@ -604,7 +604,7 @@ var AudioList = {
 };
 
 /*
- * Replace standart blink functionality
+ * Replace standard blink functionality
  */
 /**
  * Sets HTML elements to blink.
