@@ -1650,9 +1650,12 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_uint64_t templateid)
+static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
 	const char		*__function_name = "DBdelete_template_graphs";
+
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_uint64_t	graphids;
@@ -1660,16 +1663,20 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_uint64_t templatei
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&graphids);
 
-	result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct gi.graphid"
 			" from graphs_items gi,items i,items ti"
 			" where gi.itemid=i.itemid"
 				" and i.templateid=ti.itemid"
 				" and i.hostid=" ZBX_FS_UI64
-				" and ti.hostid=" ZBX_FS_UI64,
-			hostid, templateid);
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1682,6 +1689,7 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_uint64_t templatei
 	DBdelete_graphs(&graphids);
 
 	zbx_vector_uint64_destroy(&graphids);
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1700,9 +1708,12 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_uint64_t templatei
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templateid)
+static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
 	const char	*__function_name = "DBdelete_template_triggers";
+
+	char		*sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	*triggerids = NULL, triggerid;
@@ -1710,14 +1721,19 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templat
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect(
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct f.triggerid"
 			" from functions f,items i,items ti"
 			" where f.itemid=i.itemid"
 				" and i.templateid=ti.itemid"
 				" and i.hostid=" ZBX_FS_UI64
-				" and ti.hostid=" ZBX_FS_UI64,
-			hostid, templateid);
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1729,6 +1745,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templat
 	DBdelete_triggers(&triggerids, &triggerids_alloc, &triggerids_num);
 
 	zbx_free(triggerids);
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1747,22 +1764,32 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_uint64_t templat
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid)
+static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
+	const char		*__function_name = "DBdelete_template_items";
+
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		itemid;
 	zbx_vector_uint64_t	itemids;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&itemids);
 
-	result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct i.itemid"
 			" from items i,items ti"
 			" where i.templateid=ti.itemid"
 				" and i.hostid=" ZBX_FS_UI64
-				" and ti.hostid=" ZBX_FS_UI64,
-			hostid, templateid);
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1775,6 +1802,9 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid
 	DBdelete_items(&itemids);
 
 	zbx_vector_uint64_destroy(&itemids);
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -1791,21 +1821,31 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_uint64_t templateid
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static void	DBdelete_template_applications(zbx_uint64_t hostid,
-		zbx_uint64_t templateid)
+static void	DBdelete_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
+	const char	*__function_name = "DBdelete_template_applications";
+
+	char		*sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	*applicationids = NULL, applicationid;
 	int		applicationids_alloc = 0, applicationids_num = 0;
 
-	result = DBselect(
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct a.applicationid"
 			" from applications a,applications ta"
 			" where a.templateid=ta.applicationid"
 				" and a.hostid=" ZBX_FS_UI64
-				" and ta.hostid=" ZBX_FS_UI64,
-			hostid, templateid);
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ta.hostid", templateids->values, templateids->values_num);
+
+	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1818,6 +1858,9 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid,
 	DBdelete_applications(applicationids, applicationids_num);
 
 	zbx_free(applicationids);
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2136,32 +2179,61 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid)
+int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	hosttemplateid = 0;
+	const char		*__function_name = "DBdelete_template_elements";
 
-	result = DBselect("select hosttemplateid from hosts_templates"
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		templateid;
+	zbx_vector_uint64_t	templateids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&templateids);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select templateid from hosts_templates"
 			" where hostid=" ZBX_FS_UI64
-				" and templateid=" ZBX_FS_UI64,
-			hostid, templateid);
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid",
+			del_templateids->values, del_templateids->values_num);
+
+	result = DBselect("%s", sql);
 
 	if (NULL != (row = DBfetch(result)))
-		ZBX_STR2UINT64(hosttemplateid, row[0]);
+	{
+		ZBX_STR2UINT64(templateid, row[0]);
+		zbx_vector_uint64_append(&templateids, templateid);
+	}
 	DBfree_result(result);
 
-	if (0 == hosttemplateid)
-		return SUCCEED;
+	if (0 != templateids.values_num)
+	{
+		DBdelete_template_graphs(hostid, &templateids);
+		DBdelete_template_triggers(hostid, &templateids);
+		DBdelete_template_items(hostid, &templateids);
+		DBdelete_template_applications(hostid, &templateids);
 
-	DBdelete_template_graphs(hostid, templateid);
-	DBdelete_template_triggers(hostid, templateid);
-	DBdelete_template_items(hostid, templateid);
-	DBdelete_template_applications(hostid, templateid);
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"delete from hosts_templates"
+				" where hostid=" ZBX_FS_UI64
+					" and",
+				hostid);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid",
+				templateids.values, templateids.values_num);
+		DBexecute("%s", sql);
+	}
 
-	DBexecute("delete from hosts_templates"
-			" where hosttemplateid=" ZBX_FS_UI64,
-			hosttemplateid);
+	zbx_vector_uint64_destroy(&templateids);
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return SUCCEED;
 }

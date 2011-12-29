@@ -1107,11 +1107,12 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 	DB_ROW			row;
 	unsigned char		operationtype;
 	zbx_uint64_t		groupid, templateid;
-	zbx_vector_uint64_t	lnk_templateids;
+	zbx_vector_uint64_t	lnk_templateids, del_templateids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
 
 	zbx_vector_uint64_create(&lnk_templateids);
+	zbx_vector_uint64_create(&del_templateids);
 
 	result = DBselect(
 			"select o.operationtype,g.groupid,t.templateid"
@@ -1155,7 +1156,7 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 				break;
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
 				if (0 != templateid)
-					op_template_del(event, templateid);
+					zbx_vector_uint64_append(&del_templateids, templateid);
 				break;
 			default:
 				;
@@ -1169,6 +1170,13 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 		op_template_add(event, &lnk_templateids);
 	}
 
+	if (0 != del_templateids.values_num)
+	{
+		zbx_vector_uint64_sort(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		op_template_del(event, &del_templateids);
+	}
+
+	zbx_vector_uint64_destroy(&del_templateids);
 	zbx_vector_uint64_destroy(&lnk_templateids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

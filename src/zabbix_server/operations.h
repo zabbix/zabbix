@@ -27,7 +27,7 @@
 extern int	CONFIG_TIMEOUT;
 
 void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids);
-void	op_template_del(DB_EVENT *event, zbx_uint64_t templateid);
+void	op_template_del(DB_EVENT *event, zbx_vector_uint64_t *del_templateids);
 void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid);
 void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid);
 void	op_host_add(DB_EVENT *event);
