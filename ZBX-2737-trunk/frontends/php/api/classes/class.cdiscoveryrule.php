@@ -538,17 +538,6 @@ COpt::memoryPick();
 
 		$this->inherit($items);
 
-// TODO: REMOVE info
-		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
-			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1
-		));
-		foreach($itemHosts as $item){
-			$host = reset($item['hosts']);
-			info(_s('Added new discovery rule "%1$s" to host "%2$s".', $item['key_'], $host['host']));
-		}
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
@@ -921,7 +910,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_CREATED_SMALL);
+			info(_s('Added new discovery rule "%1$s" to host "%2$s".', $item['key_'], $host['host']));
 		}
 	}
 
