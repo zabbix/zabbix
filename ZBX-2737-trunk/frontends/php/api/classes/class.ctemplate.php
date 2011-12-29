@@ -1984,7 +1984,7 @@ COpt::memoryPick();
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
 					$host = get_host_by_triggerid($trigger['triggerid']);
-					info(_s('Trigger "%1$s" unlinked from host "%2$s".', $trigger['description'], $host['host']));
+					info(_s('Unlinked: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['host']));
 				}
 			}
 		}
@@ -2002,7 +2002,7 @@ COpt::memoryPick();
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger){
 					$host = get_host_by_triggerid($trigger['triggerid']);
-					info(_s('Trigger prototype "%1$s" unlinked from host "%2$s".', $trigger['description'], $host['host']));
+					info(_s('Unlinked: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], $host['host']));
 				}
 			}
 		}
@@ -2053,7 +2053,7 @@ COpt::memoryPick();
 						$host_id  = $discoveryRule['hostid'];
 						$host = get_host_by_hostid($host_id);
 					}
-					info(_s('Discovery rule "%1$s" unlinked from host "%2$s".', $discoveryRule['key_'], $host['host']));
+					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['key_'], $host['host']));
 				}
 			}
 		}
@@ -2077,7 +2077,7 @@ COpt::memoryPick();
 						$host_id  = $item['hostid'];
 						$host = get_host_by_hostid($host_id);
 					}
-					info(_s('Item "%1$s" unlinked from host "%2$s".', $item['key_'], $host['host']));
+					info(_s('Unlinked: Item "%1$s" on "%2$s".', $item['key_'], $host['host']));
 				}
 			}
 		}
@@ -2101,7 +2101,7 @@ COpt::memoryPick();
 						$host_id  = $item['hostid'];
 						$host = get_host_by_hostid($host_id);
 					}
-					info(_s('Item prototype "%1$s" unlinked from host "%2$s".', $item['key_'], $host['host']));
+					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['key_'], $host['host']));
 				}
 			}
 		}
@@ -2153,7 +2153,7 @@ COpt::memoryPick();
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_CHILD] as $graph){
 					$host = get_host_by_graphid($graph['graphid']);
-					info(_s('Graph prototype "%1$s" unlinked from host "%2$s".', $graph['name'], $host['host']));
+					info(_s('Unlinked: Graph prototype "%1$s" on "%2$s".', $graph['name'], $host['host']));
 				}
 			}
 		}
@@ -2172,7 +2172,7 @@ COpt::memoryPick();
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_NORMAL] as $graph){
 					$host = get_host_by_graphid($graph['graphid']);
-					info(_s('Graph "%1$s" unlinked from host "%2$s".', $graph['name'], $host['host']));
+					info(_s('Unlinked: Graph "%1$s" on "%2$s".', $graph['name'], $host['host']));
 				}
 			}
 		}
@@ -2216,7 +2216,7 @@ COpt::memoryPick();
 						$host_id  = $application['hostid'];
 						$host = get_host_by_hostid($host_id);
 					}
-					info(_s('Application "%1$s" unlinked from host "%2$s".', $application['name'], $host['host']));
+					info(_s('Unlinked: Application "%1$s" on "%2$s".', $application['name'], $host['host']));
 				}
 			}
 		}

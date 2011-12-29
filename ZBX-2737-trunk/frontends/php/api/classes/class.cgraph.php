@@ -1038,7 +1038,7 @@ class CGraph extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_graphs as $graphid => $graph) {
-			info(_s('Graph "%1$s" deleted from host "%2$s".', $graph['name'], $hosts[$graphid]['host']));
+			info(_s('Deleted: Graph "%1$s" on "%2$s".', $graph['name'], $hosts[$graphid]['host']));
 		}
 
 		return array('graphids' => $graphids);

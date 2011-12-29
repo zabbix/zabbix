@@ -663,7 +663,7 @@ COpt::memoryPick();
 				$host_id  = $item['hostid'];
 				$host = get_host_by_hostid($host_id);
 			}
-			info(_s('Discovery rule "%1$s" deleted from host "%2$s".', $item['key_'], $host['host']));
+			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['key_'], $host['host']));
 		}
 
 		return array('ruleids' => $ruleids);
@@ -910,7 +910,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Added new discovery rule "%1$s" to host "%2$s".', $item['key_'], $host['host']));
+			info(_s('Created: Discovery rule "%1$s" on "%2$s".', $item['key_'], $host['host']));
 		}
 	}
 
@@ -1069,7 +1069,7 @@ COpt::memoryPick();
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists on host "%2$s", inherited from another template.', $item['key_'], $host['host']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.', $item['key_'], $host['host']));
 					}
 				}
 
@@ -1084,7 +1084,7 @@ COpt::memoryPick();
 					}
 					// no matching interface found, throw an error
 					elseif($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
 					}
 				}
 
@@ -1160,7 +1160,7 @@ COpt::memoryPick();
 			}
 			// no matching interface found, throw an error
 			elseif($interface !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $dstDiscovery['key_']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['host'], $dstDiscovery['key_']));
 			}
 		}
 

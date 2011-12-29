@@ -607,7 +607,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Added new item prototype "%1$s" to host "%2$s".', $item['key_'], $host['host']));
+			info(_s('Created: Item prototype "%1$s" on "%2$s".', $item['key_'], $host['host']));
 		}
 	}
 
@@ -663,7 +663,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Item prototype "%1$s" updated on host "%2$s".', $item['key_'], $host['host']));
+			info(_s('Updated: Item prototype "%1$s" on "%2$s".', $item['key_'], $host['host']));
 		}
 	}
 
@@ -811,7 +811,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_itemPrototypes as $item){
-				info(_s('Item prototype "%1$s" deleted from host "%2$s".', $item['key_'], $item['name']));
+				info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['key_'], $item['name']));
 			}
 
 			return array('prototypeids' => $prototypeids);
@@ -917,7 +917,7 @@ COpt::memoryPick();
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					else if(($exItem['templateid'] > 0) && (bccomp($exItem['templateid'], $item['itemid']) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" already exists on host "%2$s", inherited from another template.', $exItem['key_'], $host['host']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" already exists on "%2$s", inherited from another template.', $exItem['key_'], $host['host']));
 					}
 				}
 
@@ -933,7 +933,7 @@ COpt::memoryPick();
 					}
 					// no matching interface found, throw an error
 					elseif($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
 					}
 				}
 // coping item
