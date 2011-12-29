@@ -2,7 +2,8 @@
 <tr id="slides_#{rowId}" class="sortable">
 	<td>
 		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-		<input name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
+		<input id="slides_#{rowId}_screenid" name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
+		<input id="slides_#{rowId}_slideid" name="slides[#{rowId}][slideid]" type="hidden" value="" />
 	</td>
 	<td>
 		<span class="rowNum" id="current_slide_#{rowId}">#{rowNum}</span>
