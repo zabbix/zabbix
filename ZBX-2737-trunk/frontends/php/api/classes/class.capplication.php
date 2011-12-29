@@ -538,7 +538,7 @@ class CApplication extends CZBXAPI {
 		));
 		foreach ($applications_created as $application_created) {
 			$host = reset($application_created['hosts']);
-			info(_s('Added new application "%2$s" to host "%1$s".', $host['host'], $application_created['name']));
+			info(_s('Added new application "%1$s" to host "%2$s".', $application_created['name'], $host['host']));
 		}
 	}
 
@@ -561,7 +561,7 @@ class CApplication extends CZBXAPI {
 		));
 		foreach ($applications_upd as $application_upd) {
 			$host = reset($application_upd['hosts']);
-			info(_s('Application "%2$s" updated on host "%1$s".', $host['host'], $application_upd['name']));
+			info(_s('Application "%1$s" updated on host "%2$s".', $application_upd['name'], $host['host']));
 		}
 	}
 
@@ -634,7 +634,7 @@ class CApplication extends CZBXAPI {
 				$host_id  = $del_application['hostid'];
 				$host = get_host_by_hostid($host_id);
 			}
-			info(_s('Application "%2$s" deleted from host "%1$s".', $host['host'], $del_application['name']));
+			info(_s('Application "%1$s" deleted from host "%2$s".', $del_application['name'], $host['host']));
 		}
 		return array('applicationids' => $applicationids);
 	}

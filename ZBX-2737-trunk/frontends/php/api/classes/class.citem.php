@@ -961,7 +961,7 @@ class CItem extends CItemGeneral {
 		));
 		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
-			info(_s('Added new item "%2$s" to host "%1$s".', $host['host'], $item['key_']));
+			info(_s('Added new item "%1$s" to host "%2$s".', $item['key_'], $host['host']));
 		}
 	}
 
@@ -1025,7 +1025,7 @@ class CItem extends CItemGeneral {
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Item "%2$s" updated on host "%1$s".', $host['host'], $item['key_']));
+			info(_s('Item "%1$s" updated on host "%2$s".', $item['key_'], $host['host']));
 		}
 	}
 
@@ -1171,7 +1171,7 @@ class CItem extends CItemGeneral {
 					$host_id  = $item['hostid'];
 					$host = get_host_by_hostid($host_id);
 				}
-				info(_s('Item "%2$s" deleted from host "%1$s".', $host['host'], $item['key_']));
+				info(_s('Item "%1$s" deleted from host "%2$s".', $item['key_'], $host['host']));
 			}
 
 			return array('itemids' => $itemids);
@@ -1279,7 +1279,7 @@ class CItem extends CItemGeneral {
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%2$s" already exists on host "%1$s", inherited from another template.', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" already exists on host "%2$s", inherited from another template.', $item['key_'], $host['host']));
 					}
 				}
 

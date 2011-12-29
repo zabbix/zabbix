@@ -607,7 +607,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Added new item prototype "%2$s" to host "%1$s".', $host['host'], $item['key_']));
+			info(_s('Added new item prototype "%1$s" to host "%2$s".', $item['key_'], $host['host']));
 		}
 	}
 
@@ -663,7 +663,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Item prototype "%2$s" updated on host "%1$s".', $host['host'], $item['key_']));
+			info(_s('Item prototype "%1$s" updated on host "%2$s".', $item['key_'], $host['host']));
 		}
 	}
 
@@ -811,7 +811,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_itemPrototypes as $item){
-				info(_s('Item prototype "%2$s" deleted from host "%1$s".', $item['name'], $item['key_']));
+				info(_s('Item prototype "%1$s" deleted from host "%2$s".', $item['key_'], $item['name']));
 			}
 
 			return array('prototypeids' => $prototypeids);
@@ -917,7 +917,7 @@ COpt::memoryPick();
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					else if(($exItem['templateid'] > 0) && (bccomp($exItem['templateid'], $item['itemid']) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%2$s" already exists on host "%1$s", inherited from another template.', $host['host'], $exItem['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" already exists on host "%2$s", inherited from another template.', $exItem['key_'], $host['host']));
 					}
 				}
 
