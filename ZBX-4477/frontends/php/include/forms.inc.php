@@ -2443,7 +2443,7 @@
 
 			$frmTrig->addVar('remove_expression', '');
 
-			$btn_test = new CButton('test_expression', S_TEST,
+			$btn_test = new CButton('test_expression', _('Test'),
 									"openWinCentered(".
 									"'tr_testexpr.php?expression=' + encodeURIComponent(this.form.elements['expression'].value)".
 									",'ExpressionTest'".
@@ -3402,7 +3402,7 @@
 		$tblRE = new CTable('','formtable nowrap');
 
 		$tblRE->addRow(array(S_NAME, new CTextBox('rename', $rename, 60)));
-		$tblRE->addRow(array(S_TEST_STRING, new CTextArea('test_string', $test_string, 66, 5)));
+		$tblRE->addRow(array(_('Test string'), new CTextArea('test_string', $test_string, 66, 5)));
 
 		$tabExp = new CTableInfo();
 
@@ -3499,13 +3499,13 @@
 		$td->addStyle('text-align: right;');
 
 		$td->addItem(SPACE);
-		$td->addItem(new CSubmit('test', S_TEST));
+		$td->addItem(new CSubmit('test', _('Test')));
 
 		if (isset($_REQUEST['regexpid'])) {
 			$td->addItem(SPACE);
 			$td->addItem(new CSubmit('clone', S_CLONE));
 			$td->addItem(SPACE);
-			$td->addItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q, url_param('form').url_param('config').url_param('regexpid').url_param('delete', false, 'go')));
+			$td->addItem(new CButtonDelete(_('Delete regular expression?'), url_param('form').url_param('config').url_param('regexpid').url_param('delete', false, 'go')));
 		}
 
 		$td->addItem(SPACE);

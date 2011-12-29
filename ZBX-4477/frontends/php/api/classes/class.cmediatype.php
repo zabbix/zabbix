@@ -320,7 +320,7 @@ class CMediatype extends CZBXAPI {
 
 
 			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types'));
 			}
 
 			$mediatypes = zbx_toArray($mediatypes);
@@ -331,12 +331,12 @@ class CMediatype extends CZBXAPI {
 					'description' => null,
 				);
 				if(!check_db_fields($mediatype_db_fields, $mediatype)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type'));
 				}
 
 				if(in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))
 						&& (!isset($mediatype['passwd']) || empty($mediatype['passwd']))){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type'));
 				}
 
 				$options = array(
@@ -345,7 +345,7 @@ class CMediatype extends CZBXAPI {
 				);
 				$mediatype_exist = $this->get($options);
 				if(!empty($mediatype_exist)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIA_TYPE_ALREADY_EXISTS . ' ' . $mediatype_exist[0]['description']);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type already exists: "%s".', $mediatype_exist[0]['description']));
 				}
 
 			}
@@ -430,29 +430,27 @@ class CMediatype extends CZBXAPI {
  * @param array $mediatypes[0,...]['mediatypeids']
  * @return boolean
  */
-	public function delete($mediatypeids){
-
-
-		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES);
+	public function delete($mediatypeids) {
+		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete media types'));
 		}
 
 		$mediatypeids = zbx_toArray($mediatypeids);
 
-			$options = array(
-				'mediatypeids' => $mediatypeids,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1,
-			);
-			$actions = API::Action()->get($options);
-			if(!empty($actions)){
-				$action = reset($actions);
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIA_TYPES_USED_BY_ACTIONS . ' ' . $action['name']);
-			}
+		$options = array(
+			'mediatypeids' => $mediatypeids,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1,
+		);
+		$actions = API::Action()->get($options);
+		if (!empty($actions)) {
+			$action = reset($actions);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media types used by action: "%s".', $action['name']));
+		}
 
-			DB::delete('media_type', array('mediatypeid'=>$mediatypeids));
+		DB::delete('media_type', array('mediatypeid' => $mediatypeids));
 
-			return array('mediatypeids' => $mediatypeids);
+		return array('mediatypeids' => $mediatypeids);
 	}
 }
 ?>
