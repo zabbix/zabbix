@@ -297,7 +297,7 @@ function item_type2str($type = null){
 					}
 					elseif ($type !== false) {
 						if (!isset($interfaceids[$type])) {
-							error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
+							error(_s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
 							return false;
 						}
 						$srcItem['interfaceid'] = $interfaceids[$type];
@@ -353,7 +353,7 @@ function item_type2str($type = null){
 				}
 				// no matching interface found, throw an error
 				elseif($interface !== false) {
-					error(_s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
+					error(_s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
 				}
 			}
 

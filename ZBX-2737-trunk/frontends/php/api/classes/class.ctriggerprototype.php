@@ -1341,7 +1341,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(sprintf(_('Created: Trigger prototype "%1$s" to host "%2$s".'), $trigger['description'], $host['host']));
+			info(sprintf(_('Created: Trigger prototype "%1$s" on "%2$s".'), $trigger['description'], $host['host']));
 		}
 
 	}
