@@ -55,8 +55,7 @@ function addRegexp(array $regexp, array $expressions) {
 			throw new Exception(_s('Regular expression "%s" already exists.', $regexp['name']));
 		}
 
-
-		$regexpIds = DB::insert('regexps', $regexp);
+		$regexpIds = DB::insert('regexps', array($regexp));
 		$regexpId = reset($regexpIds);
 		addRegexpExpressions($regexpId, $expressions);
 
