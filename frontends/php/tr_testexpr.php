@@ -22,7 +22,7 @@
 require_once('include/config.inc.php');
 require_once('include/triggers.inc.php');
 
-$page['title'] = S_TEST;
+$page['title'] = _('Test');
 $page['file'] = 'tr_testexpr.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
@@ -111,7 +111,7 @@ require_once('include/page_header.php');
 
 //------------------------ <FORM> ---------------------------
 
-	$frm_test = new CFormTable(S_TEST, 'tr_testexpr.php');
+	$frm_test = new CFormTable(_('Test'), 'tr_testexpr.php');
 	$frm_test->setHelp('web.testexpr.service.php');
 	$frm_test->setTableClass('formlongtable formtable');
 	$frm_test->addVar('form_refresh', get_request('form_refresh', 1));
@@ -160,7 +160,7 @@ require_once('include/page_header.php');
 	$frm_test->addRow(S_RESULT, $res_table);
 
 // action buttons
-	$btn_test = new CSubmit('test_expression', S_TEST);
+	$btn_test = new CSubmit('test_expression', _('Test'));
 	if(!$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 	$frm_test->addItemToBottomRow($btn_test);
 	$frm_test->addItemToBottomRow(SPACE);

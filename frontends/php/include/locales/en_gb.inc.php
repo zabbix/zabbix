@@ -219,27 +219,6 @@
 	'S_NOTHING_TO_DO'=>				_('Nothing to do'),
 	'S_EXPRESSION'=>				_('Expression'),
 
-	'S_CHARACTER_STRING_INCLUDED'=>			_('Character string included'),
-	'S_ANY_CHARACTER_STRING_INCLUDED'=>		_('Any character string included'),
-	'S_CHARACTER_STRING_NOT_INCLUDED'=>		_('Character string not included'),
-	'S_RESULT_IS_TRUE'=>				_('Result is TRUE'),
-	'S_RESULT_IS_FALSE'=>				_('Result is FALSE'),
-
-	'S_TEST'=>					_('Test'),
-	'S_TEST_STRING'=>				_('Test string'),
-	'S_INCORRECT_EXPRESSION'=>			_('Incorrect expression'),
-
-	'S_REGULAR_EXPRESSION_ADDED'=>			_('Regular expression added'),
-	'S_CANNOT_ADD_REGULAR_EXPRESSION'=>		_('Cannot add regular expression'),
-
-	'S_REGULAR_EXPRESSION_UPDATED'=>		_('Regular expression updated'),
-	'S_CANNOT_UPDATE_REGULAR_EXPRESSION'=>		_('Cannot update regular expression'),
-
-	'S_REGULAR_EXPRESSION_DELETED'=>		_('Regular expression deleted'),
-	'S_CANNOT_DELETE_REGULAR_EXPRESSION'=>		_('Cannot delete regular expression'),
-
-	'S_DELETE_REGULAR_EXPRESSION_Q'=>		_('Delete regular expression?'),
-
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
 	'S_CONFIGURATION_OF_NODES'=>		_('CONFIGURATION OF NODES'),
@@ -1077,7 +1056,6 @@
 	'S_DELETE_TRIGGER_Q'=>			_('Delete trigger?'),
 
 //	items.inc.php
-	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	_('Incorrect arguments passed to function'),
 	'S_UPDATED_SMALL'=>				_('updated'),
 
 //	httptest.inc.php
@@ -1134,14 +1112,6 @@
 	'S_CUSER_ERROR_INCORRECT_TIME_PERIOD'=>			_('Incorrect time period'),
 	'S_CUSER_ERROR_WRONG_PERIOD_PART1'=>			_('Wrong period ['),
 	'S_CUSER_ERROR_WRONG_PERIOD_PART2'=>			_(']'),
-
-// class.cmediatype.php
-	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE' =>	_('Wrong fields for media type'),
-	'S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED' =>	_('Password required for media type'),
-	'S_MEDIA_TYPE_ALREADY_EXISTS'=>				_('Media type already exists:'),
-	'S_MEDIA_TYPES_USED_BY_ACTIONS'=>	_('Media types used by action:'),
-	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>_('Only Super Admins can create media types'),
-	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>_('Only Super Admins can delete media types'),
 
 //	Menu
 

@@ -90,7 +90,7 @@ require_once('include/page_header.php');
 		'regexpids'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 		'regexpid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==10)&&(isset({form})&&({form}=="update"))'),
 		'rename'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', S_NAME),
-		'test_string'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', S_TEST_STRING),
+		'test_string'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', _('Test string')),
 		'delete_regexp'=>			array(T_ZBX_STR, O_OPT,	null,	null,		null),
 
 		'g_expressionid'=>			array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
@@ -193,9 +193,6 @@ require_once('include/page_header.php');
 					if (is_null($file)) {
 						throw new Exception(_('Select image to download'));
 					}
-					if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-						access_deny();
-					}
 
 					$val = array(
 						'name' => $_REQUEST['name'],
@@ -236,9 +233,6 @@ require_once('include/page_header.php');
 	}
 	// GUI
 	elseif (isset($_REQUEST['save']) && ($_REQUEST['config'] == 8)) {
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-			access_deny();
-
 		$configs = array(
 			'default_theme' => get_request('default_theme'),
 			'event_ack_enable' => (is_null(get_request('event_ack_enable')) ? 0 : 1),
@@ -275,10 +269,6 @@ require_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['save'])&&uint_in_array($_REQUEST['config'],array(0,5,7))){
-
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-			access_deny();
-
 /* OTHER ACTIONS */
 		$configs = array(
 				'event_history' => get_request('event_history'),
@@ -378,9 +368,6 @@ require_once('include/page_header.php');
 				$valuemapid = $_REQUEST['valuemapid'];
 			}
 			else {
-				if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-					access_deny();
-				}
 				$result = add_valuemap($_REQUEST['mapname'], $mapping);
 				$audit_action = AUDIT_ACTION_ADD;
 				$msg_ok = _('Value map added');
@@ -412,9 +399,6 @@ require_once('include/page_header.php');
 		}
 	}
 	else if(isset($_REQUEST['save']) && ($_REQUEST['config']==9)){
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-			access_deny();
-
 /* OTHER ACTIONS */
 		$configs = array(
 				'default_theme' => get_request('default_theme')
@@ -428,71 +412,47 @@ require_once('include/page_header.php');
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,$msg);
 		}
 	}
-	else if($_REQUEST['config'] == 10){
+	elseif ($_REQUEST['config'] == 10) {
 		if (isset($_REQUEST['clone']) && isset($_REQUEST['regexpid'])) {
 			unset($_REQUEST['regexpid']);
 			$_REQUEST['form'] = 'clone';
 		}
-		else if(isset($_REQUEST['cancel_new_expression'])){
+		elseif (isset($_REQUEST['cancel_new_expression'])) {
 			unset($_REQUEST['new_expression']);
 		}
 		elseif (isset($_REQUEST['save'])) {
-			if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-				access_deny();
-			}
-
 			$regexp = array(
 				'name' => $_REQUEST['rename'],
-				'test_string' => $_REQUEST['test_string']
+				'test_string' => $_REQUEST['test_string'],
 			);
+			$expressions = get_request('expressions', array());
 
 			DBstart();
 			if (isset($_REQUEST['regexpid'])) {
-				$regexpid = $_REQUEST['regexpid'];
-				if (!get_regexp_by_regexpid($regexpid)) {
-					$result = false;
-					error(_('Regular expression does not exist.'));
-				}
-				else {
-					delete_expressions_by_regexpid($_REQUEST['regexpid']);
-					$result = update_regexp($regexpid, $regexp);
-				}
+				$regexp['regexpid'] = $_REQUEST['regexpid'];
+				$result = updateRegexp($regexp, $expressions);
 
-				$msg1 = S_REGULAR_EXPRESSION_UPDATED;
-				$msg2 = S_CANNOT_UPDATE_REGULAR_EXPRESSION;
+				$msg1 = _('Regular expression updated');
+				$msg2 = _('Cannot update regular expression');
 			}
 			else {
-				$result = $regexpid = add_regexp($regexp);
+				$result = addRegexp($regexp, $expressions);
 
-				$msg1 = S_REGULAR_EXPRESSION_ADDED;
-				$msg2 = S_CANNOT_ADD_REGULAR_EXPRESSION;
+				$msg1 = _('Regular expression added');
+				$msg2 = _('Cannot add regular expression');
 			}
+			$result = Dbend($result);
+			show_messages($result, $msg1, $msg2);
 
 			if ($result) {
-				$expressions = get_request('expressions', array());
-				foreach ($expressions as $id => $expression) {
-					$expressionid = add_expression($regexpid,$expression);
-				}
-			}
-
-			$result = Dbend($result);
-
-			show_messages($result,$msg1,$msg2);
-
-			if ($result) { // result - OK
 				add_audit(!isset($_REQUEST['regexpid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
-					AUDIT_RESOURCE_REGEXP,
-					S_NAME.': '.$_REQUEST['rename']);
+					AUDIT_RESOURCE_REGEXP, S_NAME.': '.$_REQUEST['rename']);
 
 				unset($_REQUEST['form']);
 			}
 		}
 		elseif (isset($_REQUEST['go'])) {
 			if ($_REQUEST['go'] == 'delete') {
-				if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
-					access_deny();
-				}
-
 				$regexpids = get_request('regexpid', array());
 				if (isset($_REQUEST['regexpids'])) {
 					$regexpids = $_REQUEST['regexpids'];
@@ -501,15 +461,15 @@ require_once('include/page_header.php');
 				zbx_value2array($regexpids);
 
 				$regexps = array();
-				foreach($regexpids as $id => $regexpid){
-					$regexps[$regexpid] = get_regexp_by_regexpid($regexpid);
+				foreach ($regexpids as $id => $regexpid) {
+					$regexps[$regexpid] = getRegexp($regexpid);
 				}
 
 				DBstart();
-				$result = delete_regexp($regexpids);
+				$result = DBexecute('DELETE FROM regexps WHERE '.DBcondition('regexpid', $regexpids));
 				$result = Dbend($result);
 
-				show_messages($result, S_REGULAR_EXPRESSION_DELETED, S_CANNOT_DELETE_REGULAR_EXPRESSION);
+				show_messages($result, _('Regular expression deleted'), _('Cannot delete regular expression'));
 				if ($result) {
 					foreach ($regexps as $regexpid => $regexp) {
 						add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regexpid.'] '.S_NAME.' ['.$regexp['name'].']');
@@ -527,24 +487,21 @@ require_once('include/page_header.php');
 		elseif (isset($_REQUEST['add_expression']) && isset($_REQUEST['new_expression'])) {
 			$new_expression = $_REQUEST['new_expression'];
 
-			if(!isset($new_expression['case_sensitive']))		$new_expression['case_sensitive'] = 0;
-
-			$result = false;
-			if(zbx_empty($new_expression['expression'])) {
-				info(S_INCORRECT_EXPRESSION);
-			}
-			else{
-				$result = true;
-			}
-
-			if($result){
-				if(!isset($new_expression['id'])){
-					if(!isset($_REQUEST['expressions'])) $_REQUEST['expressions'] = array();
-
-					if(!str_in_array($new_expression,$_REQUEST['expressions']))
-						array_push($_REQUEST['expressions'],$new_expression);
+			if (!zbx_empty($new_expression['expression'])) {
+				if (!isset($new_expression['case_sensitive'])) {
+					$new_expression['case_sensitive'] = 0;
 				}
-				else{
+
+				if (!isset($new_expression['id'])) {
+					if (!isset($_REQUEST['expressions'])) {
+						$_REQUEST['expressions'] = array();
+					}
+
+					if (!str_in_array($new_expression, $_REQUEST['expressions'])) {
+						$_REQUEST['expressions'][] = $new_expression;
+					}
+				}
+				else {
 					$id = $new_expression['id'];
 					unset($new_expression['id']);
 					$_REQUEST['expressions'][$id] = $new_expression;
@@ -552,19 +509,22 @@ require_once('include/page_header.php');
 
 				unset($_REQUEST['new_expression']);
 			}
+			else {
+				error(_('Incorrect expression'));
+			}
 		}
 		elseif (isset($_REQUEST['delete_expression']) && isset($_REQUEST['g_expressionid'])) {
-			$_REQUEST['expressions'] = get_request('expressions',array());
+			$_REQUEST['expressions'] = get_request('expressions', array());
 			foreach ($_REQUEST['g_expressionid'] as $val) {
 				unset($_REQUEST['expressions'][$val]);
 			}
 		}
 		elseif (isset($_REQUEST['edit_expressionid'])) {
 			$_REQUEST['edit_expressionid'] = array_keys($_REQUEST['edit_expressionid']);
-			$edit_expressionid = $_REQUEST['edit_expressionid'] = array_pop($_REQUEST['edit_expressionid']);
-			$_REQUEST['expressions'] = get_request('expressions',array());
+			$edit_expressionid = array_pop($_REQUEST['edit_expressionid']);
+			$_REQUEST['expressions'] = get_request('expressions', array());
 
-			if(isset($_REQUEST['expressions'][$edit_expressionid])){
+			if (isset($_REQUEST['expressions'][$edit_expressionid])) {
 				$_REQUEST['new_expression'] = $_REQUEST['expressions'][$edit_expressionid];
 				$_REQUEST['new_expression']['id'] = $edit_expressionid;
 			}
@@ -1021,34 +981,38 @@ require_once('include/page_header.php');
 //////////////////////////////////////////
 //  config = 10 // Regular Expressions  //
 //////////////////////////////////////////
-	elseif($_REQUEST['config'] == 10){
-		$data = array();
+elseif ($_REQUEST['config'] == 10) {
+	$data = array();
 
-		if(isset($_REQUEST['form'])){
-			$data['form'] = get_request('form', 1);
-			$data['form_refresh'] = get_request('form_refresh', 0) + 1;
+	if (isset($_REQUEST['form'])) {
+		$data['form'] = get_request('form', 1);
+		$data['form_refresh'] = get_request('form_refresh', 0) + 1;
 
-			$regExpForm = new CView('administration.general.regularexpressions.edit', $data);
-			$cnf_wdgt->addItem($regExpForm->render());
-		}
-		else{
-			$data['cnf_wdgt'] = &$cnf_wdgt;
-			$data['regexps'] = array();
-			$data['regexpids'] = array();
-
-			$db_regexps = DBselect('SELECT re.* FROM regexps re WHERE '.DBin_node('re.regexpid').' ORDER BY re.name');
-			while($regexp = DBfetch($db_regexps)){
-				$regexp['expressions'] = array();
-				$data['regexps'][$regexp['regexpid']] = $regexp;
-				$data['regexpids'][$regexp['regexpid']] = $regexp['regexpid'];
-			}
-
-			$data['db_exps'] = DBfetchArray(DBselect('SELECT e.* FROM expressions e WHERE '.DBin_node('e.expressionid').' AND '.DBcondition('e.regexpid', $data['regexpids']).' ORDER BY e.expression_type'));
-
-			$regExpForm = new CView('administration.general.regularexpressions.list', $data);
-			$cnf_wdgt->addItem($regExpForm->render());
-		}
+		$regExpForm = new CView('administration.general.regularexpressions.edit', $data);
+		$cnf_wdgt->addItem($regExpForm->render());
 	}
+	else {
+		$data['cnf_wdgt'] = &$cnf_wdgt;
+		$data['regexps'] = array();
+		$data['regexpids'] = array();
+
+		$db_regexps = DBselect('SELECT re.* FROM regexps re WHERE '.DBin_node('re.regexpid'));
+		while ($regexp = DBfetch($db_regexps)) {
+			$regexp['expressions'] = array();
+			$data['regexps'][$regexp['regexpid']] = $regexp;
+			$data['regexpids'][$regexp['regexpid']] = $regexp['regexpid'];
+		}
+		order_result($data['regexps'], 'name');
+
+		$data['db_exps'] = DBfetchArray(DBselect('SELECT e.* FROM expressions e WHERE '.
+				DBin_node('e.expressionid').
+				' AND '.DBcondition('e.regexpid', $data['regexpids']).
+				' ORDER BY e.expression_type'));
+
+		$regExpForm = new CView('administration.general.regularexpressions.list', $data);
+		$cnf_wdgt->addItem($regExpForm->render());
+	}
+}
 /////////////////////////////
 //  config = 11 // Macros  //
 /////////////////////////////
