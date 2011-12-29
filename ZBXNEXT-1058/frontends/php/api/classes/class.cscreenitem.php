@@ -73,6 +73,11 @@ class CScreenItem extends CZBXAPI {
 			'editable'					=> null,
 
 			'selectScreen'				=> null,				// not implemented
+
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'preservekeys'				=> null,
+			'countOutput'				=> null,
 		));
 	}
 
