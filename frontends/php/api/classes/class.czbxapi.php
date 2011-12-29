@@ -86,11 +86,6 @@ class CZBXAPI {
 
 			// output
 			'output'					=> API_OUTPUT_REFER,
-			'countOutput'				=> null,
-			'preservekeys'				=> null,
-
-			'sortfield'					=> '',
-			'sortorder'					=> '',
 			'limit'						=> null
 		);
 	}
@@ -238,6 +233,27 @@ class CZBXAPI {
 
 
 	/**
+	 * Constructs an SQL SELECT query from the given options, executes it and returns the result.
+	 *
+	 * TODO: add global 'preservekeys' support
+	 * TODO: add global 'countOutput' support
+	 *
+	 * @param string $tableName
+	 * @param string $tableAlias
+	 * @param array $options
+	 *
+	 * @return array
+	 */
+	public function select($tableName, $tableAlias, array $options) {
+		$sql = $this->createSelectQuery($tableName, $tableAlias, $options);
+		var_dump($sql);
+		$query = DBSelect($sql, $options['limit']);
+
+		return DBfetchArray($query);
+	}
+
+
+	/**
 	 * Creates an SQL SELECT query from the given options.
 	 *
 	 * @param $tableName
@@ -328,7 +344,7 @@ class CZBXAPI {
 		$pkFieldId = $this->fieldId($this->pk(), $tableAlias);
 
 		// count
-		if ($options['countOutput'] !== null) {
+		if (isset($options['countOutput'])) {
 			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
 		}
 		// custom output
@@ -341,7 +357,7 @@ class CZBXAPI {
 			}
 
 			// make sure the id is included if the 'preservekeys' option is enabled
-			if ($options['preservekeys'] !== null) {
+			if (isset($options['preservekeys'])) {
 				$sqlParts['select'][] = $pkFieldId;
 			}
 		}
@@ -366,22 +382,22 @@ class CZBXAPI {
 	 */
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$pkOption = $this->pkOption($tableName);
-		$pkFieldId = $this->fieldId($this->pk(), $tableAlias);
+		$tableId = $this->tableId($tableName, $tableAlias);
 
-		// screen item ids
-		if ($options[$pkOption] !== null) {
+		// pks
+		if (isset($options[$pkOption])) {
 			zbx_value2array($options[$pkOption]);
-			$sqlParts['where'][] = DBcondition($pkFieldId, $options[$pkOption]);
+			$sqlParts['where'][] = DBcondition($this->fieldId($this->pk($tableName), $tableAlias), $options[$pkOption]);
 		}
 
 		// filters
 		if (is_array($options['filter'])) {
-			zbx_db_filter($this->tableId(), $options, $sqlParts);
+			zbx_db_filter($tableId, $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search($this->tableId(), $options, $sqlParts);
+			zbx_db_search($tableId, $options, $sqlParts);
 		}
 
 		return $sqlParts;
@@ -400,11 +416,12 @@ class CZBXAPI {
 	 */
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$pkOption = $this->pkOption($tableName);
+		$pkFieldId = $this->fieldId($this->pk($tableName), $tableAlias);
 
 		// if no specific ids are given, apply the node filter
-		if ($options[$pkOption] === null) {
-			$nodeids = ($options[$pkOption] !== null) ? $options[$pkOption] : get_current_nodeid();
-			$sqlParts['where'][] = DBin_node($this->fieldId($this->pk(), $tableAlias), $nodeids);
+		if (!isset($options[$pkOption])) {
+			$nodeids = (isset($options['nodeids'])) ? $options[$pkOption] : get_current_nodeid();
+			$sqlParts['where'][] = DBin_node($pkFieldId, $nodeids);
 		}
 
 		return $sqlParts;
@@ -413,6 +430,7 @@ class CZBXAPI {
 
 	/**
 	 * Modifies the SQL parts to implement all of the sorting related options.
+	 * Soring is currently only supported for CZBXAPI::get() methods.
 	 *
 	 * @param $tableName
 	 * @param $tableAlias
