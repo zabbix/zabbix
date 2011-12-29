@@ -105,7 +105,6 @@ class CItem extends CItemGeneral {
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectApplications'		=> null,
-			'selectPrototypes'			=> null,
 			'selectDiscoveryRule'		=> null,
 			'selectItemDiscovery'       => null,
 			'countOutput'				=> null,
@@ -493,9 +492,6 @@ class CItem extends CItemGeneral {
 					if (!is_null($options['selectApplications']) && !isset($result[$item['itemid']]['applications'])) {
 						$result[$item['itemid']]['applications'] = array();
 					}
-					if (!is_null($options['selectPrototypes']) && !isset($result[$item['itemid']]['prototypes'])) {
-						$result[$item['itemid']]['prototypes'] = array();
-					}
 					if (!is_null($options['selectDiscoveryRule']) && !isset($result[$item['itemid']]['discoveryRule'])) {
 						$result[$item['itemid']]['discoveryRule'] = array();
 					}
@@ -705,59 +701,6 @@ class CItem extends CItemGeneral {
 				unset($application['items']);
 				foreach ($aitems as $item) {
 					$result[$item['itemid']]['applications'][] = $application;
-				}
-			}
-		}
-
-		// adding prototypes
-		if (!is_null($options['selectPrototypes'])) {
-			$obj_params = array(
-				'nodeids' => $nodeids,
-				'discoveryids' => $itemids,
-				'filter' => array('flags' => null),
-				'nopermissions' => 1,
-				'preservekeys' => 1
-			);
-
-			if (is_array($options['selectPrototypes']) || str_in_array($options['selectPrototypes'], $subselects_allowed_outputs)) {
-				$obj_params['output'] = $options['selectPrototypes'];
-				$prototypes = $this->get($obj_params);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($prototypes, 'name');
-				}
-				foreach ($prototypes as $itemid => $subrule) {
-					unset($prototypes[$itemid]['discoveries']);
-					$count = array();
-					foreach ($subrule['discoveries'] as $discovery) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$discovery['itemid']])) {
-								$count[$discovery['itemid']] = 0;
-							}
-							$count[$discovery['itemid']]++;
-
-							if ($count[$discovery['itemid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-						$result[$discovery['itemid']]['prototypes'][] = &$prototypes[$itemid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectPrototypes']) {
-				$obj_params['countOutput'] = 1;
-				$obj_params['groupCount'] = 1;
-
-				$prototypes = $this->get($obj_params);
-				$prototypes = zbx_toHash($prototypes, 'parent_itemid');
-
-				foreach ($result as $itemid => $item) {
-					if (isset($prototypes[$itemid])) {
-						$result[$itemid]['prototypes'] = $prototypes[$itemid]['rowscount'];
-					}
-					else {
-						$result[$itemid]['prototypes'] = 0;
-					}
 				}
 			}
 		}
