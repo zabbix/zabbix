@@ -811,6 +811,9 @@ class CItem extends CItemGeneral {
 			}
 		}
 
+		// add other related objects
+		$result = $this->addRelatedObjects($options, $result);
+
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -1509,6 +1512,36 @@ class CItem extends CItemGeneral {
 			}
 		}
 		return true;
+	}
+
+
+	public function addRelatedObjects(array $options, array $result) {
+
+		// TODO: move selectItemHosts to CItemGeneral::addRelatedObjects();
+		// TODO: move selectInterfaces to CItemGeneral::addRelatedObjects();
+		// TODO: move selectTriggers to CItemGeneral::addRelatedObjects();
+		// TODO: move selectGraphs to CItemGeneral::addRelatedObjects();
+		// TODO: move selectApplications to CItemGeneral::addRelatedObjects();
+		$result = parent::addRelatedObjects($options, $result);
+
+		$itemids = zbx_objectValues($result, 'itemid');
+
+		// adding item discovery
+		if ($options['selectItemDiscovery']) {
+			// TODO: remove parent_itemid from the result
+			$itemDiscoveryOutput = $this->extendOutputOption($options['selectItemDiscovery'], 'parent_itemid', 'item_discovery');
+			$itemDiscoveries = $this->select('item_discovery', 'id', array(
+				'output' => $itemDiscoveryOutput,
+				'filter' => array(
+					'parent_itemid' => $itemids
+				)
+			));
+			foreach ($itemDiscoveries as $itemDiscovery) {
+				$result[$itemDiscovery['parent_itemid']]['itemDiscovery'] = $itemDiscovery;
+			}
+		}
+
+		return $result;
 	}
 }
 ?>
