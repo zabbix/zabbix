@@ -345,7 +345,7 @@ $dashboardWidget->addItem($dashboardTable);
 $dashboardWidget->show();
 
 // activating blinking
-zbx_add_post_js('jqBlink.init();');
+zbx_add_post_js('jqBlink.blink();');
 ?>
 <script type="text/javascript">
 	//<!--<![CDATA[

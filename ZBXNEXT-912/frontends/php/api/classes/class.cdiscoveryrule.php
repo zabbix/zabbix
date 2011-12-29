@@ -25,14 +25,17 @@
 
 class CDiscoveryRule extends CItemGeneral {
 
-	protected $tableName = 'items';
+	const MIN_LIFETIME = 0;
+	const MAX_LIFETIME = 3650;
 
+	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 
 
 	public function __construct(){
 		parent::__construct();
 	}
+
 
 /**
  * Get DiscoveryRule data
@@ -490,13 +493,13 @@ COpt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
 		}
 
 		return $result;
 	}
+
 
 	public function exists($object){
 		$options = array(
@@ -520,25 +523,6 @@ COpt::memoryPick();
 	}
 
 
-	/**
-	 * Check item data and set missing default values.
-	 *
-	 * @throws APIException
-	 *
-	 * @param array $items passed by reference
-	 * @param bool  $update
-	 *
-	 * @return void
-	 */
-	protected function checkInput(array &$items, $update = false) {
-		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY;
-			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
-		}
-
-		parent::checkInput($items, $update);
-	}
-
 /**
  * Add DiscoveryRule
  *
@@ -548,121 +532,15 @@ COpt::memoryPick();
 	public function create($items){
 		$items = zbx_toArray($items);
 
-			$this->checkInput($items);
+		$this->checkInput($items);
 
-			$this->createReal($items);
+		$this->createReal($items);
 
-			$this->inherit($items);
+		$this->inherit($items);
 
-			return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
-	protected function createReal(&$items){
-		foreach($items as $key => $item){
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => 1
-			));
-			foreach($itemsExists as $inum => $itemExists){
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item ['.$item['key_'].'] already exists');
-			}
-		}
-
-		$itemids = DB::insert('items', $items);
-
-		$itemApplications = array();
-		foreach($items as $key => $item){
-			$items[$key]['itemid'] = $itemids[$key];
-
-			if(!isset($item['applications'])) continue;
-
-			foreach($item['applications'] as $anum => $appid){
-				if($appid == 0) continue;
-
-				$itemApplications[] = array(
-					'applicationid' => $appid,
-					'itemid' => $items[$key]['itemid']
-				);
-			}
-		}
-
-		if(!empty($itemApplications)){
-			DB::insert('items_applications', $itemApplications);
-		}
-
-// TODO: REMOVE info
-		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
-			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1
-		));
-		foreach($itemHosts as $item){
-			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_CREATED_SMALL);
-		}
-	}
-
-	protected function updateReal($items){
-		$items = zbx_toArray($items);
-
-		$data = array();
-		foreach($items as $inum => $item){
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => 1
-			));
-			foreach($itemsExists as $inum => $itemExists){
-				if(bccomp($itemExists['itemid'], $item['itemid']) != 0){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
-				}
-			}
-
-			$data[] = array('values' => $item, 'where'=> array('itemid'=>$item['itemid']));
-		}
-		$result = DB::update('items', $data);
-		if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-		$itemids = array();
-		$itemApplications = array();
-		foreach($items as $key => $item){
-			$itemids[] = $item['itemid'];
-
-			if(!isset($item['applications'])) continue;
-			foreach($item['applications'] as $anum => $appid){
-				$itemApplications[] = array(
-					'applicationid' => $appid,
-					'itemid' => $item['itemid']
-				);
-			}
-		}
-
-		if(!empty($itemids)){
-			DB::delete('items_applications', array('itemid'=>$itemids));
-			DB::insert('items_applications', $itemApplications);
-		}
-
-// TODO: REMOVE info
-		$itemHosts = $this->get(array(
-			'itemids' => $itemids,
-			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1,
-		));
-		foreach($itemHosts as $item){
-			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
-		}
-
-	}
 
 /**
  * Update DiscoveryRule
@@ -673,14 +551,15 @@ COpt::memoryPick();
 	public function update($items){
 		$items = zbx_toArray($items);
 
-			$this->checkInput($items, true);
+		$this->checkInput($items, true);
 
-			$this->updateReal($items);
+		$this->updateReal($items);
 
-			$this->inherit($items);
+		$this->inherit($items);
 
-			return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
+
 
 	/**
 	 * Delete DiscoveryRules
@@ -785,6 +664,47 @@ COpt::memoryPick();
 		return array('ruleids' => $ruleids);
 	}
 
+
+	/**
+	 * Copies the given discovery rules to the specified hosts.
+	 *
+	 * @throws APIException if no discovery rule IDs or host IDs are given or
+	 * the user doesn't have the necessary permissions.
+	 *
+	 * @param array $data
+	 * @param array $data['discoveryruleids'] An array of item ids to be cloned
+	 * @param array $data['hostids']          An array of host ids were the items should be cloned to
+	 */
+	public function copy(array $data) {
+		// validate data
+		if (!isset($data['discoveryids']) || !$data['discoveryids']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No discovery rule IDs given.'));
+		}
+		if (!isset($data['hostids']) || !$data['hostids']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No host IDs given.'));
+		}
+
+		// check if all hosts exist and are writable
+		if (!API::Host()->isWritable($data['hostids'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
+
+		// check if the given discovery rules exist
+		if (!$this->isReadable($data['discoveryids'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
+
+		// copy
+		foreach ($data['discoveryids'] as $discoveryid) {
+			foreach ($data['hostids'] as $hostid) {
+				$this->copyDiscoveryRule($discoveryid, $hostid);
+			}
+		}
+
+		return true;
+	}
+
+
 	public function syncTemplates($data){
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
@@ -815,6 +735,269 @@ COpt::memoryPick();
 		return true;
 	}
 
+
+	/**
+	 * Returns true if the given discovery rules exists and are available for
+	 * reading.
+	 *
+	 * @param array     $ids  An array if item IDs
+	 * @return boolean
+	 */
+	public function isReadable($ids) {
+		if (!is_array($ids)) {
+			return false;
+		}
+		elseif (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+
+	/**
+	 * Returns true if the given discovery rules exists and are available for
+	 * writing.
+	 *
+	 * @param array     $ids  An array if item IDs
+	 * @return boolean
+	 */
+	public function isWritable($ids) {
+		if (!is_array($ids)) {
+			return false;
+		}
+		elseif (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+
+	/**
+	 * Copies all of the triggers from the source discovery to the target discovery rule.
+	 *
+	 * @throws APIException if trigger saving fails
+	 *
+	 * @param array $srcDiscovery    The source discovery rule to copy from
+	 * @param array $dstDiscovery    The target discovery rule to copy to
+	 * @param array $srcHost         The host the source discovery belongs to
+	 * @param array $dstHost         The host the target discovery belongs to
+	 *
+	 * @return array
+	 */
+	protected function copyDiscoveryTriggers(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
+		$srcTriggers = API::TriggerPrototype()->get(array(
+			'discoveryids' => $srcDiscovery['itemid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'selectItems' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectFunctions' => API_OUTPUT_EXTEND,
+		));
+
+		if (!$srcTriggers) {
+			return array();
+		}
+
+		$itemKeys = array();
+		foreach ($srcTriggers as $trigger) {
+			foreach ($trigger['items'] as $item) {
+				$itemKeys[] = $item['key_'];
+			}
+		}
+		array_unique($itemKeys);
+
+		// fetch newly created items
+		$items = API::Item()->get(array(
+			'hostids' => $dstDiscovery['hostid'],
+			'filter' => array(
+				'key_' => $itemKeys
+			),
+			'output' => API_OUTPUT_EXTEND,
+		));
+		$dstItems = array();
+		foreach ($items as $item) {
+			$dstItems[$item['key_']] = $item;
+		}
+
+		// save new triggers
+		$dstTriggers = $srcTriggers;
+		foreach ($dstTriggers as &$trigger) {
+			unset($trigger['triggerid']);
+
+			// update expression
+			$trigger['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
+
+		}
+
+		$rs = API::TriggerPrototype()->create($dstTriggers);
+		if (!$rs) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone trigger prototypes.'));
+		}
+
+		return $rs;
+	}
+
+
+	protected function createReal(&$items){
+		foreach($items as $key => $item){
+			$itemsExists = API::Item()->get(array(
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(
+					'hostid' => $item['hostid'],
+					'key_' => $item['key_']
+				),
+				'nopermissions' => 1
+			));
+			foreach($itemsExists as $inum => $itemExists){
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item ['.$item['key_'].'] already exists');
+			}
+		}
+
+		$itemids = DB::insert('items', $items);
+
+		$itemApplications = array();
+		foreach($items as $key => $item){
+			$items[$key]['itemid'] = $itemids[$key];
+
+			if(!isset($item['applications'])) continue;
+
+			foreach($item['applications'] as $anum => $appid){
+				if($appid == 0) continue;
+
+				$itemApplications[] = array(
+					'applicationid' => $appid,
+					'itemid' => $items[$key]['itemid']
+				);
+			}
+		}
+
+		if(!empty($itemApplications)){
+			DB::insert('items_applications', $itemApplications);
+		}
+
+		// TODO: REMOVE info
+		$itemHosts = $this->get(array(
+			'itemids' => $itemids,
+			'output' => array('key_'),
+			'selectHosts' => array('name'),
+			'nopermissions' => true
+		));
+		foreach($itemHosts as $item){
+			$host = reset($item['hosts']);
+			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_CREATED_SMALL);
+		}
+	}
+
+
+	protected function updateReal($items){
+		$items = zbx_toArray($items);
+
+		$data = array();
+		foreach($items as $inum => $item){
+			$itemsExists = API::Item()->get(array(
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(
+					'hostid' => $item['hostid'],
+					'key_' => $item['key_']
+				),
+				'nopermissions' => 1
+			));
+			foreach($itemsExists as $inum => $itemExists){
+				if(bccomp($itemExists['itemid'], $item['itemid']) != 0){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
+				}
+			}
+
+			$data[] = array('values' => $item, 'where'=> array('itemid'=>$item['itemid']));
+		}
+		$result = DB::update('items', $data);
+		if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+
+		$itemids = array();
+		$itemApplications = array();
+		foreach($items as $key => $item){
+			$itemids[] = $item['itemid'];
+
+			if(!isset($item['applications'])) continue;
+			foreach($item['applications'] as $anum => $appid){
+				$itemApplications[] = array(
+					'applicationid' => $appid,
+					'itemid' => $item['itemid']
+				);
+			}
+		}
+
+		if(!empty($itemids)){
+			DB::delete('items_applications', array('itemid'=>$itemids));
+			DB::insert('items_applications', $itemApplications);
+		}
+
+		// TODO: REMOVE info
+		$itemHosts = $this->get(array(
+			'itemids' => $itemids,
+			'output' => array('key_'),
+			'selectHosts' => array('name'),
+			'nopermissions' => true,
+		));
+		foreach($itemHosts as $item){
+			$host = reset($item['hosts']);
+			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
+		}
+
+	}
+
+
+	/**
+	 * Check item data and set missing default values.
+	 *
+	 * @throws APIException
+	 *
+	 * @param array $items passed by reference
+	 * @param bool  $update
+	 *
+	 * @return void
+	 */
+	protected function checkInput(array &$items, $update = false) {
+		foreach ($items as &$item) {
+			$item['flags'] = ZBX_FLAG_DISCOVERY;
+			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
+		}
+
+		parent::checkInput($items, $update);
+	}
+
+
+	protected function checkSpecificFields(array $item) {
+		if (isset($item['lifetime']) && !$this->validateLifetime($item['lifetime'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Discovery rule "%1$s:%2$s" has incorrect lifetime: "%3$s". (min: %4$d, max: %5$d, user macro allowed)',
+					$item['name'], $item['key_'], $item['lifetime'], self::MIN_LIFETIME, self::MAX_LIFETIME)
+			);
+		}
+	}
+
+
 	/**
 	 * Inherit discovery rules to child hosts/templates.
 	 * @param array $items
@@ -829,7 +1012,7 @@ COpt::memoryPick();
 		$chdHosts = API::Host()->get(array(
 			'templateids' => zbx_objectValues($items, 'hostid'),
 			'hostids' => $hostids,
-			'output' => array('hostid', 'host', 'status'),
+			'output' => array('hostid', 'name', 'status'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'nopermissions' => true,
@@ -878,10 +1061,10 @@ COpt::memoryPick();
 					$exItem = $exItemsKeys[$item['key_']];
 
 					if ($exItem['flags'] != ZBX_FLAG_DISCOVERY) {
-						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
+						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['name']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['name'], $item['key_']));
 					}
 				}
 
@@ -896,7 +1079,7 @@ COpt::memoryPick();
 					}
 					// no matching interface found, throw an error
 					elseif($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['name'], $item['key_']));
 					}
 				}
 
@@ -929,46 +1112,6 @@ COpt::memoryPick();
 		$this->updateReal($updateItems);
 
 		$this->inherit($inheritedItems);
-	}
-
-
-	/**
-	 * Copies the given discovery rules to the specified hosts.
-	 *
-	 * @throws APIException if no discovery rule IDs or host IDs are given or
-	 * the user doesn't have the necessary permissions.
-	 *
-	 * @param array $data
-	 * @param array $data['discoveryruleids'] An array of item ids to be cloned
-	 * @param array $data['hostids']          An array of host ids were the items should be cloned to
-	 */
-	public function copy(array $data) {
-		// validate data
-		if (!isset($data['discoveryids']) || !$data['discoveryids']) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No discovery rule IDs given.'));
-		}
-		if (!isset($data['hostids']) || !$data['hostids']) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No host IDs given.'));
-		}
-
-		// check if all hosts exist and are writable
-		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-		}
-
-		// check if the given discovery rules exist
-		if (!$this->isReadable($data['discoveryids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-		}
-
-		// copy
-		foreach ($data['discoveryids'] as $discoveryid) {
-			foreach ($data['hostids'] as $hostid) {
-				$this->copyDiscoveryRule($discoveryid, $hostid);
-			}
-		}
-
-		return true;
 	}
 
 
@@ -1012,7 +1155,7 @@ COpt::memoryPick();
 			}
 			// no matching interface found, throw an error
 			elseif($interface !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['host'], $dstDiscovery['key_']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['name'], $dstDiscovery['key_']));
 			}
 		}
 
@@ -1021,7 +1164,7 @@ COpt::memoryPick();
 		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
 
 		// copy prototypes
-		$newPrototypes = $this->copyDiscoveryPrototypes($srcDiscovery, $dstDiscovery);
+		$newPrototypes = $this->copyDiscoveryPrototypes($srcDiscovery, $dstDiscovery, $dstHost);
 
 		// if there were prototypes defined, clone everything else
 		if ($newPrototypes) {
@@ -1052,10 +1195,11 @@ COpt::memoryPick();
 	 *
 	 * @param array $srcDiscovery   The source discovery rule to copy from
 	 * @param array $dstDiscovery   The target discovery rule to copy to
+	 * @param array $dstHost        The target host to copy the deiscovery rule to
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery) {
+	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$prototypes = API::ItemPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -1063,9 +1207,24 @@ COpt::memoryPick();
 
 		$rs = array();
 		if ($prototypes) {
-			foreach ($prototypes as &$prototype) {
+			foreach ($prototypes as $key => $prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
+
+				// map prototype interfaces
+				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
+					// find a matching interface
+					$interface = self::findInterfaceForItem($prototype, $dstHost['interfaces']);
+					if ($interface) {
+						$prototype['interfaceid'] = $interface['interfaceid'];
+					}
+					// no matching interface found, throw an error
+					elseif ($interface !== false) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['name'], $prototype['key_']));
+					}
+				}
+
+				$prototypes[$key] = $prototype;
 			}
 
 			$rs = API::ItemPrototype()->create($prototypes);
@@ -1177,126 +1336,9 @@ COpt::memoryPick();
 	}
 
 
-	/**
-	 * Copies all of the triggers from the source discovery to the target discovery rule.
-	 *
-	 * @throws APIException if trigger saving fails
-	 *
-	 * @param array $srcDiscovery    The source discovery rule to copy from
-	 * @param array $dstDiscovery    The target discovery rule to copy to
-	 * @param array $srcHost         The host the source discovery belongs to
-	 * @param array $dstHost         The host the target discovery belongs to
-	 *
-	 * @return array
-	 */
-	public function copyDiscoveryTriggers(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
-		$srcTriggers = API::TriggerPrototype()->get(array(
-			'discoveryids' => $srcDiscovery['itemid'],
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'selectItems' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectFunctions' => API_OUTPUT_EXTEND,
-		));
-
-		if (!$srcTriggers) {
-			return array();
-		}
-
-		$itemKeys = array();
-		foreach ($srcTriggers as $trigger) {
-			foreach ($trigger['items'] as $item) {
-				$itemKeys[] = $item['key_'];
-			}
-		}
-		array_unique($itemKeys);
-
-		// fetch newly created items
-		$items = API::Item()->get(array(
-			'hostids' => $dstDiscovery['hostid'],
-			'filter' => array(
-				'key_' => $itemKeys
-			),
-			'output' => API_OUTPUT_EXTEND,
-		));
-		$dstItems = array();
-		foreach ($items as $item) {
-			$dstItems[$item['key_']] = $item;
-		}
-
-		// save new triggers
-		$dstTriggers = $srcTriggers;
-		foreach ($dstTriggers as &$trigger) {
-			unset($trigger['triggerid']);
-
-			// update expression
-			$trigger['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
-
-		}
-
-		$rs = API::TriggerPrototype()->create($dstTriggers);
-		if (!$rs) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone trigger prototypes.'));
-		}
-
-		return $rs;
+	private function validateLifetime($lifetime) {
+		return (validateNumber($lifetime, self::MIN_LIFETIME, self::MAX_LIFETIME) || validateUserMacro($lifetime));
 	}
 
-
-	/**
-	 * Returns true if the given discovery rules exists and are available for
-	 * reading.
-	 *
-	 * @param array     $ids  An array if item IDs
-	 * @return boolean
-	 */
-	public function isReadable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		elseif (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'itemids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
-			'countOutput' => true
-		));
-
-		return (count($ids) == $count);
-	}
-
-
-	/**
-	 * Returns true if the given discovery rules exists and are available for
-	 * writing.
-	 *
-	 * @param array     $ids  An array if item IDs
-	 * @return boolean
-	 */
-	public function isWritable($ids) {
-		if (!is_array($ids)) {
-			return false;
-		}
-		elseif (empty($ids)) {
-			return true;
-		}
-
-		$ids = array_unique($ids);
-
-		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'itemids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
-			'editable' => true,
-			'countOutput' => true
-		));
-
-		return (count($ids) == $count);
-	}
 }
 ?>

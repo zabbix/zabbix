@@ -495,6 +495,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 		char	*error = NULL;
 
 		zbx_remove_chars(c, "\r\n");
+		zbx_replace_invalid_utf8(c);
 
 		if (ITEM_VALUE_TYPE_UINT64 == value_type)
 			error = zbx_dsprintf(error,

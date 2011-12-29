@@ -32,7 +32,7 @@ class testPageSlideShows extends CWebTest
 	/**
 	* @dataProvider allSlideShows
 	*/
-	public function testPageSlideShows_SimpleTest($slideshow)
+	public function testPageSlideShows_CheckLayout($slideshow)
 	{
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slideshows');

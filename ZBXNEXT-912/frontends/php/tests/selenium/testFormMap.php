@@ -101,6 +101,7 @@ class testFormMap extends CWebTest
 
 		// selecting new grid size
 		$this->dropdown_select('gridsize', $gridSize);
+		sleep(1);
 
 		// changing other two options if they are not already set as needed
 		if(($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON && $showGrid == 0) || ($db_map['grid_show'] == SYSMAP_GRID_SHOW_OFF && $showGrid == 1)){

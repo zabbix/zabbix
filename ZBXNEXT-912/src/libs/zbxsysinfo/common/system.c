@@ -223,7 +223,7 @@ int	SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 #if defined(_WINDOWS)
 	DWORD	dwSize = 256;
-	TCHAR	computerName[256]; 
+	TCHAR	computerName[256];
 	char	buffer[256];
 	int	netbios, ret;
 	WSADATA sockInfo;

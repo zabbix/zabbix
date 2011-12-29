@@ -620,10 +620,12 @@ require_once('include/page_header.php');
 											zbx_jsvalue($items, true).");");
 
 					// duration
-					if($nextEvent = get_next_event($event, $events, $_REQUEST['showUnknown']))
+					if ($nextEvent = get_next_event($event, $events, $_REQUEST['showUnknown'])) {
 						$event['duration'] = zbx_date2age($event['clock'], $nextEvent['clock']);
-					else
+					}
+					else {
 						$event['duration'] = zbx_date2age($event['clock']);
+					}
 
 					$statusSpan = new CSpan(trigger_value2str($event['value']));
 					// add colors and blinking to span depending on configuration and trigger parameters
@@ -698,7 +700,7 @@ require_once('include/page_header.php');
 		'periodFixed' => CProfile::get('web.events.timelinefixed', 1)
 	);
 
-	zbx_add_post_js('jqBlink.init();');
+	zbx_add_post_js('jqBlink.blink();');
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
 

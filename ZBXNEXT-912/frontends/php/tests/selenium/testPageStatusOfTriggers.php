@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageStatusOfTriggers extends CWebTest
 {
-	public function testPageStatusOfTriggers_SimpleTest()
+	public function testPageStatusOfTriggers_CheckLayout()
 	{
 		$this->login('tr_status.php');
 		$this->assertTitle('Status of triggers \[refreshed every 30 sec\]');
