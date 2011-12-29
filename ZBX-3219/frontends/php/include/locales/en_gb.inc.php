@@ -1914,7 +1914,7 @@
 	'S_NOT_RUN' => 'Connection to Zabbix server "%s" refused. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Security environment (for example, SELinux) is blocking the connection; 3. Zabbix server daemon not running; 4. Firewall is blocking TCP connection.',
 	'S_IP_NOT_AVAILABLE' => 'Zabbix server "%s" can not be reached. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect network configuration.',
 	'S_TIME_OUT' => 'Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.',
-	'S_WRONG_DNS' => 'Connection to Zabbix server "%s" faileds. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.',
+	'S_WRONG_DNS' => 'Connection to Zabbix server "%s" failed. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.',
 	'S_SCRIPT_ERROR'=>			'SCRIPT ERROR',
 	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
 	'S_SCRIPT_SEND_ERROR'=>			'Can\'t send command, check connection',
