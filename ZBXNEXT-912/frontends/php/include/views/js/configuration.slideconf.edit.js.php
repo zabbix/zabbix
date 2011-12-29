@@ -10,7 +10,7 @@
 	</td>
 	<td>#{name}</td>
 	<td>
-		<input class="input text" type="text" name="slides[#{rowId}][delay]" placeholder="<?php echo _('default'); ?>" value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
+		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?php echo _('default'); ?>" value="" size="5" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right;">
 	</td>
 	<td>
 		<input type="button" class="input link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" value="<?php echo _('Remove'); ?>" onclick="removeSlide(this);" />
