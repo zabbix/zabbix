@@ -140,4 +140,22 @@ function imageThumb($source, $thumbWidth = 0, $thumbHeight = 0) {
 }
 
 
+/**
+ * Creates an image from a string preserving PNG transparency.
+ *
+ * @param $imageString
+ *
+ * @return resource
+ */
+function imageFromString($imageString) {
+	$image = imagecreatefromstring($imageString);
+
+	// preserve PNG transparency
+	imagealphablending($image, false);
+	imagesavealpha($image, true);
+
+	return $image;
+}
+
+
 ?>
