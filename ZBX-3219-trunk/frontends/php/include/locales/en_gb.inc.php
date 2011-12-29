@@ -975,7 +975,7 @@
 	'S_NOT_RUN' => 						_('Connection to Zabbix server "%s" refused. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Security environment (for example, SELinux) is blocking the connection; 3. Zabbix server daemon not running; 4. Firewall is blocking TCP connection.'),
 	'S_IP_NOT_AVAILABLE' => 			_('Zabbix server "%s" can not be reached. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect network configuration.'),
 	'S_TIME_OUT' => 					_('Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.'),
-	'S_WRONG_DNS' => 					_('Connection to Zabbix server "%s" faileds. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.'),
+	'S_WRONG_DNS' => 					_('Connection to Zabbix server "%s" failed. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.'),
 
 //	audit.php
 	'S_AUDIT'=>					_('Audit'),
