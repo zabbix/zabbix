@@ -1528,16 +1528,18 @@ class CItem extends CItemGeneral {
 
 		// adding item discovery
 		if ($options['selectItemDiscovery']) {
-			// TODO: remove parent_itemid from the result
-			$itemDiscoveryOutput = $this->extendOutputOption($options['selectItemDiscovery'], 'parent_itemid', 'item_discovery');
+			$itemDiscoveryOutput = $this->extendOutputOption('item_discovery', 'itemid', $options['selectItemDiscovery']);
 			$itemDiscoveries = $this->select('item_discovery', 'id', array(
 				'output' => $itemDiscoveryOutput,
 				'filter' => array(
-					'parent_itemid' => $itemids
+					'itemid' => $itemids
 				)
 			));
 			foreach ($itemDiscoveries as $itemDiscovery) {
-				$result[$itemDiscovery['parent_itemid']]['itemDiscovery'] = $itemDiscovery;
+				$refId = $itemDiscovery['itemid'];
+				$itemDiscovery = $this->unsetExtraFields('item_discovery', $itemDiscovery, $options['selectItemDiscovery']);
+
+				$result[$refId]['itemDiscovery'] = $itemDiscovery;
 			}
 		}
 
