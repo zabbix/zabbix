@@ -2214,6 +2214,8 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 
 	if (0 != templateids.values_num)
 	{
+		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		DBdelete_template_graphs(hostid, &templateids);
 		DBdelete_template_triggers(hostid, &templateids);
 		DBdelete_template_items(hostid, &templateids);
