@@ -87,9 +87,7 @@ require_once('include/page_header.php');
 			$image = get_image_by_imageid($iconid);
 			$image = $image['image'];
 
-			$source = imagecreatefromstring($image);
-			imagealphablending($source, false);
-			imagesavealpha($source, true);
+			$source = imageFromString($image);
 		}
 		else {
 			$source = get_default_image(true);

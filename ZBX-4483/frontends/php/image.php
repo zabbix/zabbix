@@ -52,9 +52,7 @@ require_once('include/page_header.php');
 		require_once('include/page_footer.php');
 	}
 
-	$source = imagecreatefromstring($row['image']);
-	imagealphablending($source, false);
-	imagesavealpha($source, true);
+	$source = imageFromString($row['image']);
 
 	unset($row);
 
