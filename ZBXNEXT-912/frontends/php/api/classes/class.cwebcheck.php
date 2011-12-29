@@ -674,7 +674,7 @@ class CWebCheck extends CZBXAPI {
 		$db_keys = DBfetchArray(DBselect(
 			'SELECT i.key_'.
 			' FROM items i,httpstepitem hi'.
-			' WHERE hi.httpstepid IN ('.implode(',', $webstepids).')'.
+			' WHERE '.DBcondition('hi.httpstepid', $webstepids).
 				' AND hi.itemid=i.itemid'
 		));
 		$db_keys = zbx_toHash($db_keys, 'key_');
