@@ -5533,6 +5533,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'delete_clock' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'profiles' => array(
