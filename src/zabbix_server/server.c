@@ -545,23 +545,6 @@ int	MAIN_ZABBIX_ENTRY()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	{
-		zbx_vector_uint64_t	templateids;
-
-		zbx_vector_uint64_create(&templateids);
-		zabbix_set_log_level(LOG_LEVEL_DEBUG);
-		zbx_vector_uint64_append(&templateids, 10047);
-		zbx_vector_uint64_append(&templateids, 10048);
-		zbx_vector_uint64_append(&templateids, 10050);
-		zbx_vector_uint64_append(&templateids, 10051);
-		zbx_vector_uint64_append(&templateids, 10031);
-		DBcopy_template_elements(10049, &templateids);
-		zabbix_set_log_level(LOG_LEVEL_WARNING);
-		zbx_vector_uint64_destroy(&templateids);
-		DBclose();
-		zbx_on_exit();
-	}
-
 	if (0 != CONFIG_NODEID)
 	{
 		result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);

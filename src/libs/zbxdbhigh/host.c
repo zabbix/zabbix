@@ -26,9 +26,9 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: validate_template                                                *
+ * Function: validate_linked_templates                                        *
  *                                                                            *
- * Description: Check collisions between templates                            *
+ * Description: Check of collisions between linked templates                  *
  *                                                                            *
  * Parameters: templateids - array of templates identificators from database  *
  *                                                                            *
@@ -39,13 +39,20 @@
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	validate_template(zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
+static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
 {
+	const char	*__function_name = "validate_linked_templates";
+
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 256, sql_offset;
 	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == templateids->values_num)
+		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -99,17 +106,53 @@ static int	validate_template(zbx_vector_uint64_t *templateids, char *error, size
 		DBfree_result(result);
 	}
 
+	/* trigger expressions */
+	if (SUCCEED == ret)
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select t1.description,h2.host"
+				" from items i1,functions f1,triggers t1,functions f2,items i2,hosts h2"
+				" where i1.itemid=f1.itemid"
+					" and f1.triggerid=t1.triggerid"
+					" and t1.triggerid=f2.triggerid"
+					" and f2.itemid=i2.itemid"
+					" and i2.hostid=h2.hostid"
+					" and h2.status=%d"
+					" and",
+				HOST_STATUS_TEMPLATE);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.hostid",
+				templateids->values, templateids->values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i2.hostid",
+				templateids->values, templateids->values_num);
+
+		result = DBselectN(sql, 1);
+
+		if (NULL != (row = DBfetch(result)))
+		{
+			ret = FAIL;
+			zbx_snprintf(error, max_error_len,
+					"trigger \"%s\" has items from template \"%s\"",
+					row[0], row[1]);
+		}
+		DBfree_result(result);
+	}
+
 	/* trigger dependencies */
 	if (SUCCEED == ret)
 	{
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select h1.host,h2.host"
-				" from trigger_depends td,functions f1,items i1,hosts h1,functions f2,items i2,hosts h2"
-				" where td.triggerid_down=f1.triggerid"
+				"select t1.description,h1.host,t2.description,h2.host"
+				" from trigger_depends td,triggers t1,functions f1,items i1,hosts h1,"
+					"triggers t2,functions f2,items i2,hosts h2"
+				" where td.triggerid_down=t1.triggerid"
+					" and t1.triggerid=f1.triggerid"
 					" and f1.itemid=i1.itemid"
 					" and i1.hostid=h1.hostid"
-					" and td.triggerid_up=f2.triggerid"
+					" and td.triggerid_up=t2.triggerid"
+					" and t2.triggerid=f2.triggerid"
 					" and f2.itemid=i2.itemid"
 					" and i2.hostid=h2.hostid"
 					" and");
@@ -126,8 +169,9 @@ static int	validate_template(zbx_vector_uint64_t *templateids, char *error, size
 		{
 			ret = FAIL;
 			zbx_snprintf(error, max_error_len,
-					"trigger in template \"%s\" has dependency with trigger in template \"%s\"",
-					row[0], row[1]);
+					"trigger \"%s\" in template \"%s\""
+					" has dependency from trigger \"%s\" in template \"%s\"",
+					row[0], row[1], row[2], row[3]);
 		}
 		DBfree_result(result);
 	}
@@ -190,6 +234,8 @@ static int	validate_template(zbx_vector_uint64_t *templateids, char *error, size
 	}
 
 	zbx_free(sql);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -273,28 +319,27 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	validate_inventory_links(zbx_uint64_t hostid, zbx_uint64_t templateid, char *error, size_t max_error_len)
+static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
+		char *error, size_t max_error_len)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		sql[320];
+	char		*sql = NULL;
+	size_t		sql_alloc = 512, sql_offset;
 	int		ret = SUCCEED;
 
-	zbx_snprintf(sql, sizeof(sql),
-			"select ti.itemid"
-			" from items ti,items i"
-			" where ti.key_<>i.key_"
-				" and ti.inventory_link=i.inventory_link"
-				" and ti.hostid=" ZBX_FS_UI64
-				" and i.hostid=" ZBX_FS_UI64
-				" and ti.inventory_link<>0"
-				" and not exists ("
-					"select *"
-					" from items"
-					" where items.hostid=" ZBX_FS_UI64
-						" and items.key_=i.key_"
-					")",
-			templateid, hostid, templateid);
+	sql = zbx_malloc(sql, sql_alloc);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select inventory_link,count(*)"
+			" from items"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+			templateids->values, templateids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			" group by inventory_link"
+			" having count(*)>1");
 
 	result = DBselectN(sql, 1);
 
@@ -304,6 +349,40 @@ static int	validate_inventory_links(zbx_uint64_t hostid, zbx_uint64_t templateid
 		ret = FAIL;
 	}
 	DBfree_result(result);
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select ti.itemid"
+			" from items ti,items i"
+			" where ti.key_<>i.key_"
+				" and ti.inventory_link=i.inventory_link"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid",
+			templateids->values, templateids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and i.hostid=" ZBX_FS_UI64
+				" and ti.inventory_link<>0"
+				" and not exists ("
+					"select *"
+					" from items",
+				hostid);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "items.hostid",
+			templateids->values, templateids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+						" and items.key_=i.key_"
+					")");
+
+	result = DBselectN(sql, 1);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
+		ret = FAIL;
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
 
 	return ret;
 }
@@ -429,9 +508,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-/*	if (SUCCEED != (res = validate_inventory_links(hostid, lnk_templateids, error, max_error_len)))
+	if (SUCCEED != (res = validate_inventory_links(hostid, templateids, error, max_error_len)))
 		return res;
-*/
+
 	sql = zbx_malloc(sql, sql_alloc);
 
 	sql_offset = 0;
@@ -2080,7 +2159,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 	if (0 == trids_num)
 		return SUCCEED;
 
-	sql = zbx_malloc(sql, sql_alloc * sizeof(char));
+	sql = zbx_malloc(sql, sql_alloc);
 	tpl_triggerids = zbx_malloc(tpl_triggerids, alloc * sizeof(zbx_uint64_t));
 	hst_triggerids = zbx_malloc(hst_triggerids, alloc * sizeof(zbx_uint64_t));
 
@@ -2167,6 +2246,39 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_templates_by_hostid                                          *
+ *                                                                            *
+ * Description: Retrieve already linked templates for specified host          *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	templateid;
+
+	result = DBselect(
+			"select templateid"
+			" from hosts_templates"
+			" where hostid=" ZBX_FS_UI64,
+			hostid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(templateid, row[0]);
+		zbx_vector_uint64_append(templateids, templateid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBdelete_template_elements                                       *
  *                                                                            *
  * Purpose: delete template elements from host                                *
@@ -2184,60 +2296,62 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 	const char		*__function_name = "DBdelete_template_elements";
 
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
-	zbx_uint64_t		templateid;
+	size_t			sql_alloc = 128, sql_offset = 0;
 	zbx_vector_uint64_t	templateids;
+	int			i, index, res = SUCCEED;
+	char			error[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	sql = zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&templateids);
 
+	get_templates_by_hostid(hostid, &templateids);
+
+	for (i = 0; i < del_templateids->values_num; i++)
+	{
+		if (FAIL == (index = zbx_vector_uint64_bsearch(&templateids, del_templateids->values[i],
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			/* template already unlinked */
+			zbx_vector_uint64_remove(del_templateids, i--);
+		}
+		else
+			zbx_vector_uint64_remove(&templateids, index);
+	}
+
+	/* all templates already unlinked */
+	if (0 == del_templateids->values_num)
+		goto clean;
+
+	if (SUCCEED != (res = validate_linked_templates(&templateids, error, sizeof(error))))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot unlink template: %s", error);
+		goto clean;
+	}
+
+	DBdelete_template_graphs(hostid, del_templateids);
+	DBdelete_template_triggers(hostid, del_templateids);
+	DBdelete_template_items(hostid, del_templateids);
+	DBdelete_template_applications(hostid, del_templateids);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select templateid from hosts_templates"
+			"delete from hosts_templates"
 			" where hostid=" ZBX_FS_UI64
 				" and",
 			hostid);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid",
 			del_templateids->values, del_templateids->values_num);
+	DBexecute("%s", sql);
 
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(templateid, row[0]);
-		zbx_vector_uint64_append(&templateids, templateid);
-	}
-	DBfree_result(result);
-
-	if (0 != templateids.values_num)
-	{
-		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		DBdelete_template_graphs(hostid, &templateids);
-		DBdelete_template_triggers(hostid, &templateids);
-		DBdelete_template_items(hostid, &templateids);
-		DBdelete_template_applications(hostid, &templateids);
-
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"delete from hosts_templates"
-				" where hostid=" ZBX_FS_UI64
-					" and",
-				hostid);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "templateid",
-				templateids.values, templateids.values_num);
-		DBexecute("%s", sql);
-	}
-
-	zbx_vector_uint64_destroy(&templateids);
 	zbx_free(sql);
+clean:
+	zbx_vector_uint64_destroy(&templateids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
-	return SUCCEED;
+	return res;
 }
 
 /******************************************************************************
@@ -3342,39 +3456,6 @@ static int	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 
 /******************************************************************************
  *                                                                            *
- * Function: get_templates_by_hostid                                          *
- *                                                                            *
- * Description: Retrieve already linked templates for specified host          *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	templateid;
-
-	result = DBselect(
-			"select templateid"
-			" from hosts_templates"
-			" where hostid=" ZBX_FS_UI64,
-			hostid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(templateid, row[0]);
-		zbx_vector_uint64_append(templateids, templateid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBcopy_template_elements                                         *
  *                                                                            *
  * Purpose: copy elements from specified template                             *
@@ -3421,7 +3502,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (SUCCEED != (res = validate_template(&templateids, error, sizeof(error))))
+	if (SUCCEED != (res = validate_linked_templates(&templateids, error, sizeof(error))))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot link template: %s", error);
 		goto clean;
