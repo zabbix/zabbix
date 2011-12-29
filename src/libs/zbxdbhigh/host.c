@@ -334,7 +334,8 @@ static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select inventory_link,count(*)"
 			" from items"
-			" where");
+			" where inventory_link<>0"
+				" and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			templateids->values, templateids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
