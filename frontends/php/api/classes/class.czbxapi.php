@@ -212,13 +212,13 @@ class CZBXAPI {
 	/**
 	 * Adds the given field to the "output" option if it's not already present.
 	 *
-	 * @param mixed $output
-	 * @param string $field
 	 * @param string $tableName
+	 * @param string $field
+	 * @param string $output
 	 *
 	 * @return mixed
 	 */
-	protected function extendOutputOption($output, $field, $tableName = null) {
+	protected function extendOutputOption($tableName, $field, $output) {
 		if ($output == API_OUTPUT_SHORTEN || $output == API_OUTPUT_REFER) {
 			$output = array(
 				$this->pk($tableName),
@@ -237,19 +237,36 @@ class CZBXAPI {
 	 * Unsets the fields that haven't been explicitly asked for by the user, but
 	 * have been included in the resulting object for whatever reasons.
 	 *
-	 * @param array $object    The object from the database
-	 * @param array $options
-	 * @param array $sqlParts
+	 * If the $option parameter is set to API_OUTPUT_SHORT, return only the private key.
+	 * If the $option parameter is set to API_OUTPUT_EXTEND or to API_OUTPUT_REFER, return the result as is.
+	 * If the $option parameter is an array of fields, return only them.
+	 *
+	 * @param string $tableName      The table that stores the object
+	 * @param array $object          The object from the database
+	 * @param array $output          The original requested output
 	 *
 	 * @return array           The resulting object
 	 */
-	protected function unsetExtraFields(array $object, array $options, array $sqlParts) {
+	protected function unsetExtraFields($tableName, array $object, $output) {
 
-		// unset the pk forced by the 'preservedkeys' option
-		if ($options['preservekeys'] !== null && in_array($this->fieldId($this->pk()), $sqlParts['select'])
-			&& is_array($options['output']) && !in_array($this->pk(), $options['output'])) {
+		// for API_OUTPUT_SHORTEN return only the private key
+		if ($output == API_OUTPUT_SHORTEN) {
+			$pkField = $this->pk($tableName);
 
-			unset($object[$this->pk()]);
+			if (isset($object[$pkField])) {
+				$object = array($pkField => $object[$pkField]);
+			}
+			else {
+				$object = array();
+			}
+		}
+		// if specific fields where requested, return only them
+		elseif (is_array($output)) {
+			foreach ($object as $field => $value) {
+				if (!in_array($field, $output)) {
+					unset($object[$field]);
+				}
+			}
 		}
 
 		return $object;
@@ -467,6 +484,25 @@ class CZBXAPI {
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if ($this->sortColumns) {
 			zbx_db_sorting($sqlParts, $options, $this->sortColumns, $tableAlias);
+		}
+
+		return $sqlParts;
+	}
+
+
+	/**
+	 * Adds the given field to the SELECT part of the $sqlParts array if it's not already present.
+	 *
+	 * @param string $fieldId
+	 * @param array $sqlParts
+	 *
+	 * @return array
+	 */
+	protected function extendQuerySelect($fieldId, array $sqlParts) {
+		list($tableAlias,) = explode('.', $fieldId);
+
+		if (!in_array($fieldId, $sqlParts['select']) && !in_array($this->fieldId('*', $tableAlias), $sqlParts['select'])) {
+			$sqlParts['select'][] = $fieldId;
 		}
 
 		return $sqlParts;

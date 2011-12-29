@@ -99,8 +99,7 @@ class CScreenItem extends CZBXAPI {
 		$options = zbx_array_merge($this->getOptions, $options);
 
 		// build and execute query
-		$sqlParts = $this->createSelectQueryParts($this->tableName(), $this->tableAlias(), $options);
-		$sql = $this->createSelectQueryFromParts($sqlParts);
+		$sql = $this->createSelectQuery($this->tableName(), $this->tableAlias(), $options);
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
@@ -113,10 +112,10 @@ class CScreenItem extends CZBXAPI {
 			// a normal select query
 			else {
 				if ($options['preservekeys'] !== null) {
-					$result[$row['screenitemid']] = $this->unsetExtraFields($row, $options, $sqlParts);
+					$result[$row['screenitemid']] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
 				}
 				else {
-					$result[] = $this->unsetExtraFields($row, $options, $sqlParts);
+					$result[] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
 				}
 			}
 		}
@@ -524,6 +523,7 @@ class CScreenItem extends CZBXAPI {
 		// screen ids
 		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
+			$sqlParts = $this->extendQuerySelect($this->fieldId('screenid'), $sqlParts);
 			$sqlParts['where'][] = DBcondition($this->fieldId('screenid'), $options['screenids']);
 		}
 
