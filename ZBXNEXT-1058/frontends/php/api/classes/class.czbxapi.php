@@ -210,6 +210,30 @@ class CZBXAPI {
 
 
 	/**
+	 * Adds the given field to the "output" option if it's not already present.
+	 *
+	 * @param mixed $output
+	 * @param string $field
+	 * @param string $tableName
+	 *
+	 * @return mixed
+	 */
+	protected function extendOutputOption($output, $field, $tableName = null) {
+		if ($output == API_OUTPUT_SHORTEN || $output == API_OUTPUT_REFER) {
+			$output = array(
+				$this->pk($tableName),
+				$field
+			);
+		}
+		if (is_array($output) && !in_array($field, $output)) {
+			$output[] = $field;
+		}
+
+		return $output;
+	}
+
+
+	/**
 	 * Unsets the fields that haven't been explicitly asked for by the user, but
 	 * have been included in the resulting object for whatever reasons.
 	 *
@@ -245,9 +269,10 @@ class CZBXAPI {
 	 * @return array
 	 */
 	public function select($tableName, $tableAlias, array $options) {
+		$limit = (isset($options['limit'])) ? $options['limit'] : null;
+
 		$sql = $this->createSelectQuery($tableName, $tableAlias, $options);
-		var_dump($sql);
-		$query = DBSelect($sql, $options['limit']);
+		$query = DBSelect($sql, $limit);
 
 		return DBfetchArray($query);
 	}
@@ -445,6 +470,20 @@ class CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+
+	/**
+	 * Adds the related objects requested by "select*" options to the resulting object set.
+	 *
+	 * @param array $options
+	 * @param array $result
+	 * @return array mixed
+	 */
+	protected function addRelatedObjects(array $options, array $result) {
+		// must be implemented in each API separately
+
+		return $result;
 	}
 
 
