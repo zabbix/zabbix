@@ -580,7 +580,7 @@ void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_del(DB_EVENT *event, zbx_uint64_t templateid)
+void	op_template_del(DB_EVENT *event, zbx_vector_uint64_t *del_templateids)
 {
 	const char	*__function_name = "op_template_del";
 	zbx_uint64_t	hostid;
@@ -596,7 +596,7 @@ void	op_template_del(DB_EVENT *event, zbx_uint64_t templateid)
 	if (0 == (hostid = select_discovered_host(event)))
 		return;
 
-	DBdelete_template_elements(hostid, templateid);
+	DBdelete_template_elements(hostid, del_templateids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
