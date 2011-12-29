@@ -1666,7 +1666,7 @@ class CTrigger extends CZBXAPI {
 
 				$expression_changed = true;
 				$expression_full = $trigger['expression'];
-				$trigger['error'] = _('Trigger expression updated. No status update so far.');
+				$trigger['error'] = 'Trigger expression updated. No status update so far.';
 			}
 
 			if ($description_changed || $expression_changed) {
