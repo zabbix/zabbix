@@ -185,7 +185,7 @@ function get_viewed_nodes($options = array()) {
 function get_node_name_by_elid($id_val, $force_with_all_nodes = null, $delimiter = '') {
 	global $ZBX_NODES, $ZBX_VIEWED_NODES;
 
-	if ($force_with_all_nodes === false || (is_null($force_with_all_nodes) && ($ZBX_VIEWED_NODES['selected'] != 0))) {
+	if ($force_with_all_nodes === false || (is_null($force_with_all_nodes) && $ZBX_VIEWED_NODES['selected'] != 0)) {
 		return null;
 	}
 

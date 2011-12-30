@@ -109,7 +109,7 @@ $iconMapTable->addRow($hiddenRowTemplate);
 
 // add row button
 $addCol = new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'));
-$addCol->setColSpan(5);
+$addCol->setColSpan(6);
 $iconMapTable->addRow(array(SPACE, $addCol));
 
 // <default icon row>
