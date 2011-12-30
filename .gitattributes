@@ -172,6 +172,19 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/views/configuration.copy.elements.php -text
+frontends/php/include/views/configuration.hostgroups.edit.php -text
+frontends/php/include/views/configuration.hostgroups.list.php -text
+frontends/php/include/views/configuration.slideconf.edit.php -text
+frontends/php/include/views/configuration.slideconf.list.php -text
+frontends/php/include/views/configuration.triggers.edit.php -text
+frontends/php/include/views/configuration.triggers.expression.php -text
+frontends/php/include/views/configuration.triggers.list.php -text
+frontends/php/include/views/configuration.triggers.massupdate.php -text
+frontends/php/include/views/js/configuration.slideconf.edit.js.php -text
+frontends/php/include/views/js/configuration.triggers.edit.js.php -text
+frontends/php/include/views/js/configuration.triggers.expression.js.php -text
+frontends/php/include/views/monitoring.slides.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
