@@ -1111,7 +1111,7 @@ COpt::memoryPick();
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('host'),
+				'selectHosts' => array('host')
 			));
 
 			foreach($createdTriggers as $createdTrigger){
@@ -1329,7 +1329,6 @@ COpt::memoryPick();
 			'output' => array('host'),
 			'triggerids' => $triggers
 		));
-
 		$host = reset($dbHosts);
 
 		foreach($triggers as $tnum => $trigger){

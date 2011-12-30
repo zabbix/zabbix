@@ -2010,15 +2010,15 @@ COpt::memoryPick();
 
 
 /* ITEMS, DISCOVERY RULES {{{ */
-		$sql_from = 'items i1, items i2';
-		$sql_where = ' i2.itemid=i1.templateid'.
+		$sql_from = 'items i1,items i2';
+		$sql_where = 'i2.itemid=i1.templateid'.
 			' AND '.DBCondition('i2.hostid', $templateids).
 			' AND '.DBCondition('i1.flags', $flags);
 
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid, i1.flags, i1.name, i1.hostid'.
+		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,i1.name,i1.hostid'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_items = DBSelect($sql);

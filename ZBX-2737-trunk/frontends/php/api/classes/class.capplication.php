@@ -580,7 +580,7 @@ class CApplication extends CZBXAPI {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectHosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 		$del_applications = $this->get($options);
 
@@ -611,7 +611,7 @@ class CApplication extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 		$del_application_childs = $this->get($options);
 		$del_applications = zbx_array_merge($del_applications, $del_application_childs);

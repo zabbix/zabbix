@@ -1494,7 +1494,7 @@ class CTrigger extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('host'),
+			'selectHosts' => array('host')
 		);
 		$del_triggers = $this->get($options);
 
@@ -1646,7 +1646,7 @@ class CTrigger extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'nopermissions' => true,
-			'selectHosts' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_EXTEND
 		);
 		$dbTriggers = $this->get($options);
 

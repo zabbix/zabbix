@@ -578,7 +578,7 @@ COpt::memoryPick();
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('host'),
+			'selectHosts' => array('host')
 		);
 		$del_rules = $this->get($options);
 
@@ -611,7 +611,7 @@ COpt::memoryPick();
 			'itemids' => $child_ruleids,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('host'),
+			'selectHosts' => array('host')
 		);
 		$del_rules_childs = $this->get($options);
 

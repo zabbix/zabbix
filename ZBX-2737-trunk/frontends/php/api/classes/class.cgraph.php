@@ -988,10 +988,10 @@ class CGraph extends CZBXAPI {
 		// TODO: remove $nopermissions hack
 		$options = array(
 			'graphids' => $graphids,
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
-			'selectHosts' => array('host'),
+			'preservekeys' => true,
+			'selectHosts' => array('host')
 		);
 		$del_graphs = $this->get($options);
 
@@ -1032,7 +1032,7 @@ class CGraph extends CZBXAPI {
 		));
 
 		// TODO: REMOVE info
-		foreach ($del_graphs as $graphid => $graph) {
+		foreach ($del_graphs as $graph) {
 			$host = reset($graph['hosts']);
 			info(_s('Deleted: Graph "%1$s" on "%2$s".', $graph['name'], $host['host']));
 		}
