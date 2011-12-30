@@ -54,11 +54,11 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralRegexp_SimpleUpdate($regexp) {
 
-		$sql_hash="select * from regexps order by regexpid";
-		$oldHashRegexp=DBhash($sql_hash);
+		$sqlRegexps="select * from regexps order by regexpid";
+		$oldHashRegexps=DBhash($sqlRegexps);
 
-		$sql_hash2="select * from expressions order by expressionid";
-		$oldHashRegexp2=DBhash($sql_hash2);
+		$sqlExpressions="select * from expressions order by expressionid";
+		$oldHashExpressions=DBhash($sqlExpressions);
 
 		$this->login('config.php');
 		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
@@ -70,12 +70,9 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->wait();
 		$this->ok('Regular expression updated');
 
-		// $newHash=DBhash($sql_hash);
-		$this->assertEquals($oldHashRegexp, DBhash($sql_hash), "Chuck Norris: no-change regexp update should not update data in table 'regexps'");
+		$this->assertEquals($oldHashRegexps, DBhash($sqlRegexps), "Chuck Norris: no-change regexp update should not update data in table 'regexps'");
 
-		// $newHash2=DBhash($sql_hash2);
-		$this->assertEquals($oldHashRegexp2, DBhash($sql_hash2), "Chuck Norris: no-change regexp update should not update data in table 'expressions'");
-		$this->dropdown_select('go', 'Delete selected');
+		$this->assertEquals($oldHashExpressions, DBhash($sqlExpressions), "Chuck Norris: no-change regexp update should not update data in table 'expressions'");
 	}
 
 	/**
