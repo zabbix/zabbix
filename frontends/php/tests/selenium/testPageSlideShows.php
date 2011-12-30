@@ -35,7 +35,7 @@ class testPageSlideShows extends CWebTest
 	public function testPageSlideShows_CheckLayout($slideshow)
 	{
 		$this->login('slideconf.php');
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 		$this->ok('SLIDE SHOWS');
@@ -62,12 +62,12 @@ class testPageSlideShows extends CWebTest
 		$oldHashSlide=DBhash($sql2);
 
 		$this->login('slideconf.php');
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 		$this->ok('Slide show updated');
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
@@ -79,7 +79,7 @@ class testPageSlideShows extends CWebTest
 	public function testPageSlideShows_Create()
 	{
 		$this->login('slideconf.php');
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 		$this->button_click('form');
 		$this->wait();
 
@@ -111,7 +111,7 @@ class testPageSlideShows extends CWebTest
 		DBsave_tables('slideshows');
 
 		$this->login('slideconf.php');
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 		$this->checkbox_select("shows[$slideshowid]");
 		$this->dropdown_select('go','Delete selected');
 		$this->button_click('goButton');
@@ -119,7 +119,7 @@ class testPageSlideShows extends CWebTest
 
 		$this->getConfirmation();
 
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 		$this->ok('Slide show deleted');
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
