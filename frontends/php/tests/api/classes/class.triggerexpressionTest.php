@@ -23,6 +23,7 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../../../include/locales/en_gb.inc.php');
 require_once(dirname(__FILE__).'/../../../include/locales.inc.php');
+require_once(dirname(__FILE__).'/../../../include/gettextwrapper.inc.php');
 process_locales();
 require_once(dirname(__FILE__).'/../../../include/defines.inc.php');
 require_once(dirname(__FILE__).'/../../../include/validate.inc.php');
