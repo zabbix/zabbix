@@ -829,62 +829,60 @@ function get_action_cmds_for_event($event){
 return $table;
 }
 
-// Author: Aly
-function get_actions_hint_by_eventid($eventid,$status=NULL){
+function get_actions_hint_by_eventid($eventid, $status = null) {
 	$hostids = array();
-	$sql = 'SELECT DISTINCT i.hostid '.
-			' FROM events e, functions f, items i '.
+	$sql = 'SELECT DISTINCT i.hostid'.
+			' FROM events e,functions f,items i'.
 			' WHERE e.eventid='.$eventid.
 				' AND e.object='.EVENT_SOURCE_TRIGGERS.
 				' AND f.triggerid=e.objectid '.
 				' AND i.itemid=f.itemid';
-	if($host = DBfetch(DBselect($sql,1))){
+	if ($host = DBfetch(DBselect($sql, 1))) {
 		$hostids[$host['hostid']] = $host['hostid'];
 	}
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 
 	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$tab_hint->setAttribute('style', 'width: 300px;');
-	$tab_hint->SetHeader(array(
-			is_show_all_nodes() ? S_NODES : null,
-			S_USER,
-			S_DETAILS,
-			S_STATUS
-			));
+	$tab_hint->setHeader(array(
+		is_show_all_nodes() ? _('Nodes') : null,
+		_('User'),
+		_('Details'),
+		_('Status')
+	));
 
-	$sql = 'SELECT DISTINCT a.alertid,mt.description,u.alias,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype '.
-			' FROM events e,alerts a '.
-				' LEFT JOIN users u ON u.userid=a.userid '.
+	$sql = 'SELECT DISTINCT a.alertid,mt.description,u.alias,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
+			' FROM events e,alerts a'.
+				' LEFT JOIN users u ON u.userid=a.userid'.
 				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
 			' WHERE a.eventid='.$eventid.
 				(is_null($status)?'':' AND a.status='.$status).
-				' AND e.eventid = a.eventid'.
+				' AND e.eventid=a.eventid'.
 				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
 				' AND '.DBcondition('e.objectid',$available_triggers).
 				' AND '.DBin_node('a.alertid').
 			' ORDER BY a.alertid';
-	$result=DBselect($sql,30);
+	$result = DBselect($sql, 30);
 
-	while($row=DBfetch($result)){
-
-		if($row["status"] == ALERT_STATUS_SENT){
-			$status=new CSpan(S_SENT,"green");
+	while ($row = DBfetch($result)) {
+		if ($row['status'] == ALERT_STATUS_SENT) {
+			$status = new CSpan(_('Sent'), 'green');
 		}
-		else if($row["status"] == ALERT_STATUS_NOT_SENT){
-			$status=new CSpan(S_IN_PROGRESS,"orange");
+		elseif ($row['status'] == ALERT_STATUS_NOT_SENT) {
+			$status = new CSpan(_('In progress'), 'orange');
 		}
-		else{
+		else {
 			$status = new CSpan(_('not sent'), 'red');
 		}
 
-		switch($row['alerttype']){
+		switch ($row['alerttype']) {
 			case ALERT_TYPE_MESSAGE:
-				$message = empty($row['description'])?'-':$row['description'];
+				$message = empty($row['description']) ? '-' : $row['description'];
 				break;
 			case ALERT_TYPE_COMMAND:
-				$message = array(bold(S_COMMAND.':'));
-				$msg = explode("\n",$row['message']);
-				foreach($msg as $m){
+				$message = array(bold(_('Command').':'));
+				$msg = explode("\n", $row['message']);
+				foreach ($msg as $m) {
 					array_push($message, BR(), $m);
 				}
 				break;
@@ -894,147 +892,140 @@ function get_actions_hint_by_eventid($eventid,$status=NULL){
 
 		$tab_hint->addRow(array(
 			get_node_name_by_elid($row['alertid']),
-			empty($row['alias'])?' - ':$row['alias'],
+			empty($row['alias']) ? ' - ' : $row['alias'],
 			$message,
 			$status
 		));
 	}
-
-return $tab_hint;
+	return $tab_hint;
 }
 
-function get_event_actions_status($eventid){
-// Actions
-	$actions= new CTable(' - ');
+function get_event_actions_status($eventid) {
+	$actionTable = new CTable(' - ');
 
-	$sql='SELECT COUNT(a.alertid) as cnt_all'.
-			' FROM alerts a '.
-			' WHERE a.eventid='.$eventid.
-				' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')';
+	$alerts = DBfetch(DBselect(
+		'SELECT COUNT(a.alertid) AS cnt_all'.
+		' FROM alerts a'.
+		' WHERE a.eventid='.$eventid.
+			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'
+	));
 
-	$alerts=DBfetch(DBselect($sql));
-
-	if(isset($alerts['cnt_all']) && ($alerts['cnt_all'] > 0)){
+	if (isset($alerts['cnt_all']) && $alerts['cnt_all'] > 0) {
 		$mixed = 0;
-// Sent
-		$sql='SELECT COUNT(a.alertid) as sent '.
-				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
-					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-					' AND a.status='.ALERT_STATUS_SENT;
 
-		$tmp=DBfetch(DBselect($sql));
-		$alerts['sent'] = $tmp['sent'];
-		$mixed+=($alerts['sent'])?ALERT_STATUS_SENT:0;
-// In progress
-		$sql='SELECT COUNT(a.alertid) as inprogress '.
-				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
-					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-					' AND a.status='.ALERT_STATUS_NOT_SENT;
-
-		$tmp=DBfetch(DBselect($sql));
-		$alerts['inprogress'] = $tmp['inprogress'];
-// Failed
-		$sql='SELECT COUNT(a.alertid) as failed '.
-				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
-					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-					' AND a.status='.ALERT_STATUS_FAILED;
-
-		$tmp=DBfetch(DBselect($sql));
-		$alerts['failed'] = $tmp['failed'];
-		$mixed+=($alerts['failed'])?ALERT_STATUS_FAILED:0;
-
-		if($alerts['inprogress']){
-			$status = new CSpan(S_IN_PROGRESS,'orange');
-		}
-		else if(ALERT_STATUS_SENT == $mixed){
-			$status = new CSpan(S_OK,'green');
-		}
-		else if(ALERT_STATUS_FAILED == $mixed){
-			$status = new CSpan(S_FAILED,'red');
-		}
-		else{
-			$tdl = new CCol(($alerts['sent'])?(new CSpan($alerts['sent'],'green')):SPACE);
-			$tdl->setAttribute('width','10');
-
-			$tdr = new CCol(($alerts['failed'])?(new CSpan($alerts['failed'],'red')):SPACE);
-			$tdr->setAttribute('width','10');
-
-			$status = new CRow(array($tdl,$tdr));
-		}
-
-		$actions->addRow($status);
-	}
-
-return $actions;
-}
-
-function get_event_actions_stat_hints($eventid){
-	$actions= new CTable(' - ');
-
-	$sql='SELECT COUNT(a.alertid) as cnt '.
-			' FROM alerts a '.
+		// sent
+		$tmp = DBfetch(DBselect(
+			'SELECT COUNT(a.alertid) AS sent'.
+			' FROM alerts a'.
 			' WHERE a.eventid='.$eventid.
-				' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')';
+				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+				' AND a.status='.ALERT_STATUS_SENT
+		));
+		$alerts['sent'] = $tmp['sent'];
+		$mixed += $alerts['sent'] ? ALERT_STATUS_SENT : 0;
 
+		// in progress
+		$tmp = DBfetch(DBselect(
+			'SELECT COUNT(a.alertid) AS inprogress'.
+			' FROM alerts a'.
+			' WHERE a.eventid='.$eventid.
+				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+				' AND a.status='.ALERT_STATUS_NOT_SENT
+		));
+		$alerts['inprogress'] = $tmp['inprogress'];
 
-	$alerts=DBfetch(DBselect($sql));
+		// failed
+		$tmp = DBfetch(DBselect(
+			'SELECT COUNT(a.alertid) AS failed'.
+			' FROM alerts a'.
+			' WHERE a.eventid='.$eventid.
+				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+				' AND a.status='.ALERT_STATUS_FAILED
+		));
+		$alerts['failed'] = $tmp['failed'];
+		$mixed += $alerts['failed'] ? ALERT_STATUS_FAILED : 0;
 
-	if(isset($alerts['cnt']) && ($alerts['cnt'] > 0)){
-		$sql='SELECT COUNT(a.alertid) as sent '.
-				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
-					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-					' AND a.status='.ALERT_STATUS_SENT;
-
-		$alerts=DBfetch(DBselect($sql));
-
-		$alert_cnt = new CSpan($alerts['sent'],'green');
-		if($alerts['sent']){
-			$hint=get_actions_hint_by_eventid($eventid,ALERT_STATUS_SENT);
-			$alert_cnt->SetHint($hint);
+		if ($alerts['inprogress']) {
+			$status = new CSpan(_('In progress'), 'orange');
 		}
-		$tdl = new CCol(($alerts['sent'])?$alert_cnt:SPACE);
-		$tdl->setAttribute('width','10');
-
-		$sql='SELECT COUNT(a.alertid) as inprogress '.
-				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
-					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-					' AND a.status='.ALERT_STATUS_NOT_SENT;
-
-		$alerts=DBfetch(DBselect($sql));
-
-		$alert_cnt = new CSpan($alerts['inprogress'],'orange');
-		if($alerts['inprogress']){
-			$hint=get_actions_hint_by_eventid($eventid,ALERT_STATUS_NOT_SENT);
-			$alert_cnt->setHint($hint);
+		elseif ($mixed == ALERT_STATUS_SENT) {
+			$status = new CSpan(_('Ok'), 'green');
 		}
-		$tdc = new CCol(($alerts['inprogress'])?$alert_cnt:SPACE);
-		$tdc->setAttribute('width','10');
-
-		$sql='SELECT COUNT(a.alertid) as failed '.
-				' FROM alerts a '.
-				' WHERE a.eventid='.$eventid.
-					' AND a.alerttype in ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-					' AND a.status='.ALERT_STATUS_FAILED;
-
-		$alerts=DBfetch(DBselect($sql));
-
-		$alert_cnt = new CSpan($alerts['failed'],'red');
-		if($alerts['failed']){
-			$hint=get_actions_hint_by_eventid($eventid,ALERT_STATUS_FAILED);
-			$alert_cnt->setHint($hint);
+		elseif ($mixed == ALERT_STATUS_FAILED) {
+			$status = new CSpan(_('Failed'), 'red');
 		}
+		else {
+			$tdl = new CCol($alerts['sent'] ? new CSpan($alerts['sent'], 'green') : SPACE);
+			$tdl->setAttribute('width', '10');
 
-		$tdr = new CCol(($alerts['failed'])?$alert_cnt:SPACE);
-		$tdr->setAttribute('width','10');
+			$tdr = new CCol($alerts['failed'] ? new CSpan($alerts['failed'], 'red') : SPACE);
+			$tdr->setAttribute('width', '10');
 
-		$actions->addRow(array($tdl,$tdc,$tdr));
+			$status = new CRow(array($tdl, $tdr));
+		}
+		$actionTable->addRow($status);
 	}
-return $actions;
+	return $actionTable;
 }
 
+function get_event_actions_stat_hints($eventid) {
+	$actionTable = new CTable(' - ');
+
+	$alerts = DBfetch(DBselect(
+		'SELECT COUNT(a.alertid) AS cnt'.
+		' FROM alerts a'.
+		' WHERE a.eventid='.$eventid.
+			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'
+	));
+
+	if (isset($alerts['cnt']) && $alerts['cnt'] > 0) {
+		// left
+		$alerts = DBfetch(DBselect(
+			'SELECT COUNT(a.alertid) AS sent'.
+			' FROM alerts a'.
+			' WHERE a.eventid='.$eventid.
+				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+				' AND a.status='.ALERT_STATUS_SENT
+		));
+		$alert_cnt = new CSpan($alerts['sent'], 'green');
+		if ($alerts['sent']) {
+			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_SENT));
+		}
+		$columnLeft = new CCol($alerts['sent'] ? $alert_cnt : SPACE);
+		$columnLeft->setAttribute('width', '10');
+
+		// center
+		$alerts = DBfetch(DBselect(
+			'SELECT COUNT(a.alertid) AS inprogress'.
+			' FROM alerts a'.
+			' WHERE a.eventid='.$eventid.
+				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+				' AND a.status='.ALERT_STATUS_NOT_SENT
+		));
+		$alert_cnt = new CSpan($alerts['inprogress'], 'orange');
+		if ($alerts['inprogress']) {
+			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_NOT_SENT));
+		}
+		$columnCenter = new CCol($alerts['inprogress'] ? $alert_cnt : SPACE);
+		$columnCenter->setAttribute('width', '10');
+
+		// right
+		$alerts = DBfetch(DBselect(
+			'SELECT COUNT(a.alertid) AS failed'.
+			' FROM alerts a'.
+			' WHERE a.eventid='.$eventid.
+				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+				' AND a.status='.ALERT_STATUS_FAILED
+		));
+		$alert_cnt = new CSpan($alerts['failed'], 'red');
+		if ($alerts['failed']) {
+			$alert_cnt->setHint(get_actions_hint_by_eventid($eventid, ALERT_STATUS_FAILED));
+		}
+		$columnRight = new CCol($alerts['failed'] ? $alert_cnt : SPACE);
+		$columnRight->setAttribute('width', '10');
+
+		$actionTable->addRow(array($columnLeft, $columnCenter, $columnRight));
+	}
+	return $actionTable;
+}
 ?>

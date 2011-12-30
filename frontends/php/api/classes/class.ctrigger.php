@@ -24,12 +24,8 @@
  *
  * @package API
  */
-
-
 class CTrigger extends CZBXAPI {
-
 	protected $tableName = 'triggers';
-
 	protected $tableAlias = 't';
 
 	/**
@@ -1294,7 +1290,7 @@ class CTrigger extends CZBXAPI {
 			$currentTrigger = $triggers[$tnum];
 
 			if (!check_db_fields($trigger_db_fields, $trigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect fields for trigger'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect fields for trigger.'));
 			}
 
 			if (($update || $delete) && !isset($dbTriggers[$trigger['triggerid']])) {
@@ -1308,7 +1304,8 @@ class CTrigger extends CZBXAPI {
 			elseif ($delete) {
 				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot delete templated trigger [%1$s:%2$s]', $dbTriggers[$trigger['triggerid']]['description'], explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
+						_s('Cannot delete templated trigger "%1$s:%2$s".', $dbTriggers[$trigger['triggerid']]['description'],
+							explode_exp($dbTriggers[$trigger['triggerid']]['expression']))
 					);
 				}
 				continue;
@@ -1409,7 +1406,7 @@ class CTrigger extends CZBXAPI {
 				));
 
 				if ($existTrigger) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger [%1$s:%2$s] already exists.', $trigger['description'], $trigger['expression']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s:%2$s" already exists.', $trigger['description'], $trigger['expression']));
 				}
 			}
 		}
@@ -1464,7 +1461,7 @@ class CTrigger extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function delete(array $triggerids, $nopermissions = false) {
+	public function delete($triggerids, $nopermissions = false) {
 		$triggerids = zbx_toArray($triggerids);
 		$triggers = zbx_toObject($triggerids, 'triggerid');
 
@@ -1591,8 +1588,16 @@ class CTrigger extends CZBXAPI {
 	 */
 	protected function createReal(array &$triggers) {
 		$triggers = zbx_toArray($triggers);
-		$triggerids = DB::insert('triggers', $triggers);
 
+		// insert triggers without expression
+		$triggersCopy = $triggers;
+		for ($i = 0, $size = count($triggersCopy); $i < $size; $i++) {
+			unset($triggersCopy[$i]['expression']);
+		}
+		$triggerids = DB::insert('triggers', $triggersCopy);
+		unset($triggersCopy);
+
+		// update triggers expression
 		foreach ($triggers as $tnum => $trigger) {
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
 
@@ -1648,7 +1653,7 @@ class CTrigger extends CZBXAPI {
 		foreach ($triggers as &$trigger) {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 
-			if (isset($trigger['description']) && (strcmp($dbTrigger['description'], $trigger['description']) != 0)) {
+			if (isset($trigger['description']) && strcmp($dbTrigger['description'], $trigger['description']) != 0) {
 				$description_changed = true;
 			}
 			else {
@@ -1692,7 +1697,7 @@ class CTrigger extends CZBXAPI {
 						break;
 					}
 				}
-				if ($trigger_exist && (bccomp($trigger_exist['triggerid'], $trigger['triggerid']) != 0)) {
+				if ($trigger_exist && bccomp($trigger_exist['triggerid'], $trigger['triggerid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%s" already exists.', $trigger['description']));
 				}
 			}
@@ -1945,7 +1950,6 @@ class CTrigger extends CZBXAPI {
 			$trigger['expression'] = explode_exp($trigger['expression']);
 			$this->inherit($trigger, $data['hostids']);
 		}
-
 
 		// Update dependencies, do it after all triggers that can be dependent were created/updated on all child hosts/templates.
 		// Starting from highest level template triggers select triggers from one level lower, then for each lower trigger
