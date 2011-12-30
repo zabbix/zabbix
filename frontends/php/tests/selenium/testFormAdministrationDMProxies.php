@@ -115,7 +115,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 			array(PROXY_BAD, 'New active proxy 1', HOST_STATUS_PROXY_ACTIVE,
 				array(), 0, 0, 0, 0, array('Cannot add proxy', 'Host "New active proxy 1" already exists.')),
 			array(PROXY_BAD, 'New passive proxy with wrong port macro', HOST_STATUS_PROXY_PASSIVE,
-				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, '$PROXY_PORT', array('Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided.')),
+				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, '$PROXY_PORT', array('Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided')),
 			array(PROXY_BAD, 'New passive proxy with wrong IP macro', HOST_STATUS_PROXY_PASSIVE,
 				array(), '$PROXY_IP', 'proxy123.zabbix.com', 0, 11051, array('Cannot add proxy', 'Incorrect interface IP parameter "$PROXY_IP" provided.'))
 		);
