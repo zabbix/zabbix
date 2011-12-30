@@ -2078,7 +2078,8 @@
 				}
 				$tmp_triggerid = $db_triggers['templateid'];
 			} while ($tmp_triggerid != 0);
-			array_pop($data['templates']);
+			$data['templates'] = array_reverse($data['templates']);
+			array_shift($data['templates']);
 
 			$data['limited'] = $data['trigger']['templateid'] ? 'yes' : null;
 		}
