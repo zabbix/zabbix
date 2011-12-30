@@ -515,50 +515,38 @@ function hostInterfaceTypeNumToName($type) {
 		));
 	}
 
-/*
- * Function: get_viewed_groups
- *
- * Description:
- *     Retrieve groups for dropdown
- *
- * Author:
- *		Artem "Aly" Suharev
- *
- * Comments:
- *
- */
+// retrieve groups for dropdown
 function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = array()) {
-	global $USER_DETAILS;
-	global $page;
+	global $USER_DETAILS, $page;
 
 	$def_sql = array(
-				'select' =>	array('g.groupid','g.name'),
-				'from' =>	array('groups g'),
-				'where' =>	array(),
-				'order' =>	array(),
-			);
+		'select' =>	array('g.groupid', 'g.name'),
+		'from' =>	array('groups g'),
+		'where' =>	array(),
+		'order' =>	array()
+	);
 
 	$def_options = array(
-				'deny_all' =>						0,
-				'allow_all' =>						0,
-				'select_first_group'=>				0,
-				'select_first_group_if_empty'=>		0,
-				'do_not_select' =>					0,
-				'do_not_select_if_empty' =>			0,
-				'monitored_hosts' =>				0,
-				'templated_hosts' =>				0,
-				'real_hosts' =>						0,
-				'not_proxy_hosts' =>				0,
-				'with_items' =>						0,
-				'with_monitored_items' =>			0,
-				'with_historical_items'=>			0,
-				'with_triggers' =>					0,
-				'with_monitored_triggers'=>			0,
-				'with_httptests' =>					0,
-				'with_monitored_httptests'=>		0,
-				'with_graphs'=>						0,
-				'only_current_node' =>				0
-			);
+		'deny_all' =>						0,
+		'allow_all' =>						0,
+		'select_first_group' =>				0,
+		'select_first_group_if_empty' =>	0,
+		'do_not_select' =>					0,
+		'do_not_select_if_empty' =>			0,
+		'monitored_hosts' =>				0,
+		'templated_hosts' =>				0,
+		'real_hosts' =>						0,
+		'not_proxy_hosts' =>				0,
+		'with_items' =>						0,
+		'with_monitored_items' =>			0,
+		'with_historical_items' =>			0,
+		'with_triggers' =>					0,
+		'with_monitored_triggers' =>		0,
+		'with_httptests' =>					0,
+		'with_monitored_httptests' =>		0,
+		'with_graphs' =>					0,
+		'only_current_node' =>				0
+	);
 	$def_options = zbx_array_merge($def_options, $options);
 
 	$config = select_config();
@@ -575,7 +563,7 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	$groups = &$result['groups'];
 	$groupids = &$result['groupids'];
 
-	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) ? S_NOT_SELECTED_SMALL : S_ALL_SMALL;
+	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all');
 	$groups['0'] = $first_entry;
 
 	$_REQUEST['groupid'] = $result['original'] = get_request('groupid', -1);
@@ -600,16 +588,21 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	}
 
 	// hosts
-	if ($def_options['monitored_hosts'])
+	if ($def_options['monitored_hosts']) {
 		$def_sql['where'][] = 'h.status='.HOST_STATUS_MONITORED;
-	elseif ($def_options['real_hosts'])
+	}
+	elseif ($def_options['real_hosts']) {
 		$def_sql['where'][] = 'h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
-	elseif ($def_options['templated_hosts'])
+	}
+	elseif ($def_options['templated_hosts']) {
 		$def_sql['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
-	elseif ($def_options['not_proxy_hosts'])
+	}
+	elseif ($def_options['not_proxy_hosts']) {
 		$def_sql['where'][] = 'h.status<>'.HOST_STATUS_PROXY;
-	else
+	}
+	else {
 		$in_hosts = false;
+	}
 
 	if (!isset($in_hosts)) {
 		$def_sql['from'][] = 'hosts_groups hg';
@@ -633,7 +626,6 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	}
 	elseif ($def_options['with_historical_items']) {
 		$def_sql['from'][] = 'hosts_groups hg';
-
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
 		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
 	}
@@ -641,58 +633,52 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	// triggers
 	if ($def_options['with_triggers']) {
 		$def_sql['from'][] = 'hosts_groups hg';
-
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS( SELECT t.triggerid'.
-									' FROM items i, functions f, triggers t'.
-									' WHERE i.hostid=hg.hostid'.
-										' AND f.itemid=i.itemid'.
-										' AND t.triggerid=f.triggerid)';
+		$def_sql['where'][] = 'EXISTS (SELECT t.triggerid'.
+										' FROM items i,functions f,triggers t'.
+										' WHERE i.hostid=hg.hostid'.
+											' AND f.itemid=i.itemid'.
+											' AND t.triggerid=f.triggerid)';
 	}
 	elseif ($def_options['with_monitored_triggers']) {
 		$def_sql['from'][] = 'hosts_groups hg';
-
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS( SELECT t.triggerid'.
-									' FROM items i, functions f, triggers t'.
-									' WHERE i.hostid=hg.hostid'.
-										' AND i.status='.ITEM_STATUS_ACTIVE.
-										' AND i.itemid=f.itemid'.
-										' AND f.triggerid=t.triggerid'.
-										' AND t.status='.TRIGGER_STATUS_ENABLED.')';
+		$def_sql['where'][] = 'EXISTS (SELECT t.triggerid'.
+										' FROM items i,functions f,triggers t'.
+										' WHERE i.hostid=hg.hostid'.
+											' AND i.status='.ITEM_STATUS_ACTIVE.
+											' AND i.itemid=f.itemid'.
+											' AND f.triggerid=t.triggerid'.
+											' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 	}
 
 	// httptests
 	if ($def_options['with_httptests']) {
 		$def_sql['from'][] = 'hosts_groups hg';
-
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS( SELECT a.applicationid'.
-								' FROM applications a, httptest ht'.
-								' WHERE a.hostid=hg.hostid'.
-									' AND ht.applicationid=a.applicationid)';
+		$def_sql['where'][] = 'EXISTS (SELECT a.applicationid'.
+									' FROM applications a,httptest ht'.
+									' WHERE a.hostid=hg.hostid'.
+										' AND ht.applicationid=a.applicationid)';
 	}
 	elseif ($def_options['with_monitored_httptests']) {
 		$def_sql['from'][] = 'hosts_groups hg';
-
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS('.
-								' SELECT a.applicationid'.
-								' FROM applications a, httptest ht'.
-								' WHERE a.hostid=hg.hostid'.
-									' AND ht.applicationid=a.applicationid'.
-									' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+		$def_sql['where'][] = 'EXISTS (SELECT a.applicationid'.
+										' FROM applications a,httptest ht'.
+										' WHERE a.hostid=hg.hostid'.
+											' AND ht.applicationid=a.applicationid'.
+											' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 	}
 
 	// graphs
 	if ($def_options['with_graphs']) {
 		$def_sql['from'][] = 'hosts_groups hg';
-
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS( SELECT DISTINCT i.itemid'.
-									' FROM items i, graphs_items gi'.
-									' WHERE i.hostid=hg.hostid'.
-										' AND i.itemid=gi.itemid)';
+		$def_sql['where'][] = 'EXISTS (SELECT DISTINCT i.itemid'.
+										' FROM items i,graphs_items gi'.
+										' WHERE i.hostid=hg.hostid'.
+											' AND i.itemid=gi.itemid)';
 	}
 
 	$def_sql['order'][] = 'g.name';
@@ -700,8 +686,12 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	foreach ($sql as $key => $value) {
 		zbx_value2array($value);
 
-		if (isset($def_sql[$key])) $def_sql[$key] = zbx_array_merge($def_sql[$key], $value);
-		else $def_sql[$key] = $value;
+		if (isset($def_sql[$key])) {
+			$def_sql[$key] = zbx_array_merge($def_sql[$key], $value);
+		}
+		else {
+			$def_sql[$key] = $value;
+		}
 	}
 
 	$def_sql['select'] = array_unique($def_sql['select']);
@@ -713,23 +703,31 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	$sql_from = '';
 	$sql_where = '';
 	$sql_order = '';
-	if (!empty($def_sql['select'])) $sql_select .= implode(',', $def_sql['select']);
-	if (!empty($def_sql['from'])) $sql_from .= implode(',', $def_sql['from']);
-	if (!empty($def_sql['where'])) $sql_where .= ' AND '.implode(' AND ', $def_sql['where']);
-	if (!empty($def_sql['order'])) $sql_order .= implode(',', $def_sql['order']);
+	if (!empty($def_sql['select'])) {
+		$sql_select .= implode(',', $def_sql['select']);
+	}
+	if (!empty($def_sql['from'])) {
+		$sql_from .= implode(',', $def_sql['from']);
+	}
+	if (!empty($def_sql['where'])) {
+		$sql_where .= ' AND '.implode(' AND ', $def_sql['where']);
+	}
+	if (!empty($def_sql['order'])) {
+		$sql_order .= implode(',', $def_sql['order']);
+	}
 
-	$sql = 'SELECT DISTINCT '.$sql_select.
-			' FROM '.$sql_from.
-			' WHERE '.DBcondition('g.groupid',$available_groups).
-				$sql_where.
-			' ORDER BY '.$sql_order;
-
-	$res = DBselect($sql);
+	$res = DBselect(
+		'SELECT DISTINCT '.$sql_select.
+		' FROM '.$sql_from.
+		' WHERE '.DBcondition('g.groupid', $available_groups).
+			$sql_where.
+		' ORDER BY '.$sql_order);
 	while ($group = DBfetch($res)) {
 		$groups[$group['groupid']] = $group['name'];
 		$groupids[$group['groupid']] = $group['groupid'];
-
-		if (bccomp($_REQUEST['groupid'],$group['groupid']) == 0) $result['selected'] = $group['groupid'];
+		if (bccomp($_REQUEST['groupid'], $group['groupid']) == 0) {
+			$result['selected'] = $group['groupid'];
+		}
 	}
 
 	$profile_groupid = CProfile::get('web.'.$page['menu'].'.groupid');
@@ -740,20 +738,23 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 	elseif ($def_options['do_not_select_if_empty'] && ($_REQUEST['groupid'] == -1)) {
 		$result['selected'] = $_REQUEST['groupid'] = 0;
 	}
-	elseif (($def_options['select_first_group']) ||
-			($def_options['select_first_group_if_empty'] && ($_REQUEST['groupid'] == -1) && is_null($profile_groupid)))
-	{
+	elseif ($def_options['select_first_group']
+				|| ($def_options['select_first_group_if_empty'] && $_REQUEST['groupid'] == -1 && is_null($profile_groupid))) {
 		$first_groupid = next($groupids);
 		reset($groupids);
 
-		if ($first_groupid !== FALSE)
+		if ($first_groupid !== false) {
 			$_REQUEST['groupid'] = $result['selected'] = $first_groupid;
-		else
+		}
+		else {
 			$_REQUEST['groupid'] = $result['selected'] = 0;
+		}
 	}
 	else {
 		if ($config['dropdown_first_remember']) {
-			if ($_REQUEST['groupid'] == -1) $_REQUEST['groupid'] = is_null($profile_groupid) ? '0' : $profile_groupid;
+			if ($_REQUEST['groupid'] == -1) {
+				$_REQUEST['groupid'] = is_null($profile_groupid) ? '0' : $profile_groupid;
+			}
 			if (isset($groupids[$_REQUEST['groupid']])){
 				$result['selected'] = $_REQUEST['groupid'];
 			}
@@ -765,8 +766,7 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 			$_REQUEST['groupid'] = $result['selected'];
 		}
 	}
-
-return $result;
+	return $result;
 }
 
 /*
@@ -1024,16 +1024,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 	return $result;
 }
 
-/*
- * Function: validate_group_with_host
- *
- * Description:
- *     Check available groups and host by user permission
- *     and check current group an host relations
- *
- * Author:
- *		Aly
- */
+// check available groups and host by user permission and check current group an host relations
 function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host = true) {
 	global $page;
 
@@ -1060,7 +1051,7 @@ function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host = tru
 	else {
 		$_REQUEST['groupid'] = 0;
 
-		if ($reset_host && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE)) {
+		if ($reset_host && $dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) {
 			$_REQUEST['hostid'] = 0;
 		}
 	}
@@ -1068,20 +1059,18 @@ function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host = tru
 	$PAGE_GROUPS['selected'] = $_REQUEST['groupid'];
 	$PAGE_HOSTS['selected'] = $_REQUEST['hostid'];
 
-	if (($PAGE_GROUPS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host) {
+	if ($PAGE_GROUPS['selected'] == 0 && $dd_first_entry == ZBX_DROPDOWN_FIRST_NONE && $reset_host) {
 		$PAGE_GROUPS['groupids'] = array();
 	}
-
-	if (($PAGE_HOSTS['selected'] == 0) && ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) && $reset_host) {
+	if ($PAGE_HOSTS['selected'] == 0 && $dd_first_entry == ZBX_DROPDOWN_FIRST_NONE && $reset_host) {
 		$PAGE_HOSTS['hostids'] = array();
 	}
-
-	if ($PAGE_GROUPS['original'] > -1)
+	if ($PAGE_GROUPS['original'] > -1) {
 		CProfile::update('web.'.$page['menu'].'.groupid', $_REQUEST['groupid'], PROFILE_TYPE_ID);
-
-	if ($PAGE_HOSTS['original'] > -1)
+	}
+	if ($PAGE_HOSTS['original'] > -1) {
 		CProfile::update('web.'.$page['menu'].'.hostid', $_REQUEST['hostid'], PROFILE_TYPE_ID);
-
+	}
 	CProfile::update($group_var, $_REQUEST['groupid'], PROFILE_TYPE_ID);
 	CProfile::update($host_var, $_REQUEST['hostid'], PROFILE_TYPE_ID);
 }

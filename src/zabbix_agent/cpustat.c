@@ -192,8 +192,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 #elif defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)
 
-	long	cp_time[CPUSTATES];
-	size_t	nlen = sizeof(cp_time);
+	long	cp_time[CPUSTATES], *cp_times = NULL;
+	size_t	nlen, nlen_alloc;
 
 #elif defined(HAVE_KSTAT_H)
 
@@ -312,6 +312,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 #elif defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)
 	/* FreeBSD 7.0 */
 
+	nlen = sizeof(cp_time);
 	if (-1 == sysctlbyname("kern.cp_time", &cp_time, &nlen, NULL, 0) || nlen != sizeof(cp_time))
 	{
 		ZBX_SET_CPUS_NOTSUPPORTED();
@@ -327,6 +328,39 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)cp_time[CP_IDLE];
 
 	update_cpu_counters(&pcpus->cpu[0], counter);
+
+	/* get size of result set for CPU statistics */
+	if (-1 == sysctlbyname("kern.cp_times", NULL, &nlen_alloc, NULL, 0)) {
+		for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
+			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+		goto exit;
+	}
+
+	cp_times = zbx_malloc(cp_times, nlen_alloc);
+
+	nlen = nlen_alloc;
+	if (0 == sysctlbyname("kern.cp_times", cp_times, &nlen, NULL, 0) && nlen == nlen_alloc)
+	{
+		for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
+		{
+			memset(counter, 0, sizeof(counter));
+
+			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_USER);
+			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_NICE);
+			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_SYS);
+			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_INTR);
+			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_IDLE);
+
+			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
+		}
+	}
+	else
+	{
+		for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
+			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+	}
+
+	zbx_free(cp_times);
 
 #elif defined(HAVE_KSTAT_H)
 	/* Solaris */
