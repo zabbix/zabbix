@@ -19,155 +19,162 @@
 **/
 ?>
 <?php
-function init_trigger_expression_structures() {
-	global $ZBX_TR_EXPR_SIMPLE_MACROS, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
-	if (defined('TRIGGER_EXPRESSION_STRUCTURES_OK')) {
+function init_trigger_expression_structures($getMacros = true, $getFunctions = true) {
+	if ($getMacros) {
+		$ZBX_TR_EXPR_SIMPLE_MACROS = array(
+			'{TRIGGER.VALUE}' => '{TRIGGER.VALUE}'
+		);
+	}
+
+	if ($getFunctions) {
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS = array();
+
+		$args_ignored = array(array('type' => 'str'));
+
+		$value_types_all = array(
+			ITEM_VALUE_TYPE_FLOAT => true,
+			ITEM_VALUE_TYPE_UINT64 => true,
+			ITEM_VALUE_TYPE_STR => true,
+			ITEM_VALUE_TYPE_TEXT => true,
+			ITEM_VALUE_TYPE_LOG => true
+		);
+		$value_types_num = array(
+			ITEM_VALUE_TYPE_FLOAT => true,
+			ITEM_VALUE_TYPE_UINT64 => true
+		);
+		$value_types_char = array(
+			ITEM_VALUE_TYPE_STR => true,
+			ITEM_VALUE_TYPE_TEXT => true,
+			ITEM_VALUE_TYPE_LOG => true
+		);
+
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['abschange'] = array(
+			'args' => $args_ignored,
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'] = array(
+			'args' => array(
+				array('type' => 'sec_num', 'mandat' => true),
+				array('type' => 'sec')
+			),
+			'value_types' => $value_types_num
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['change'] = array(
+			'args' => $args_ignored,
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count'] = array(
+			'args' => array(
+				array('type' => 'sec_num','mandat' => true),
+				array('type' => 'str'),
+				array('type' => 'str'),
+				array('type' => 'sec')
+			),
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['date'] = array(
+			'args' => $args_ignored,
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['dayofmonth'] = array(
+			'args' => $args_ignored,
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['dayofweek'] = array(
+			'args' => $args_ignored,
+			'value_types' =>	$value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['delta'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['diff'] = array(
+			'args' => $args_ignored,
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['fuzzytime']	= array(
+			'args' => array(
+				array('type' => 'sec', 'mandat' => true)
+			),
+			'value_types' => $value_types_num
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'] = array(
+			'args' => array(
+				array('type' => 'str', 'mandat' => true),
+				array('type' => 'sec_num')
+			),
+			'value_types' => $value_types_char
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last'] = array(
+			'args' => array(
+				array('type' => 'sec_num', 'mandat' => true),
+				array('type' => 'sec')
+			),
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logeventid'] = array(
+			'args' => array(
+				array('type' => 'str', 'mandat' => true)
+			),
+			'value_types' => array(
+				ITEM_VALUE_TYPE_LOG => true
+			)
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logseverity'] = array(
+			'args' => $args_ignored,
+			'value_types' => array(
+				ITEM_VALUE_TYPE_LOG => true,
+			)
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logsource'] = array(
+			'args' => array(
+				array('type' => 'str', 'mandat' => true)
+			),
+			'value_types' => array(
+				ITEM_VALUE_TYPE_LOG => true
+			)
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['max'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['min'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['nodata']= array(
+			'args' => array(
+				array('type' => 'sec', 'mandat' => true)
+			),
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['now'] = array(
+			'args' => $args_ignored,
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['prev'] = array(
+			'args' => $args_ignored,
+			'value_types' => $value_types_all
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['strlen'] = array(
+			'args' => array(
+				array('type' => 'sec_num', 'mandat' => true),
+				array('type' => 'sec')
+			),
+			'value_types' => $value_types_char
+		);
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['sum'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['time'] = array(
+			'args' => $args_ignored,
+			'value_types' => $value_types_all
+		);
+	}
+
+	if ($getMacros && $getFunctions) {
 		return array(
 			'functions' => $ZBX_TR_EXPR_ALLOWED_FUNCTIONS,
 			'macros' => $ZBX_TR_EXPR_SIMPLE_MACROS
 		);
 	}
-	define('TRIGGER_EXPRESSION_STRUCTURES_OK', 1);
-
-	$ZBX_TR_EXPR_SIMPLE_MACROS['{TRIGGER.VALUE}'] = '{TRIGGER.VALUE}';
-
-	$args_ignored = array(array('type' => 'str'));
-
-	$value_types_all = array(
-		ITEM_VALUE_TYPE_FLOAT => true,
-		ITEM_VALUE_TYPE_UINT64 => true,
-		ITEM_VALUE_TYPE_STR => true,
-		ITEM_VALUE_TYPE_TEXT => true,
-		ITEM_VALUE_TYPE_LOG => true
-	);
-	$value_types_num = array(
-		ITEM_VALUE_TYPE_FLOAT => true,
-		ITEM_VALUE_TYPE_UINT64 => true
-	);
-	$value_types_char = array(
-		ITEM_VALUE_TYPE_STR => true,
-		ITEM_VALUE_TYPE_TEXT => true,
-		ITEM_VALUE_TYPE_LOG => true
-	);
-
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['abschange'] = array(
-		'args' => $args_ignored,
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'] = array(
-		'args' => array(
-			array('type' => 'sec_num', 'mandat' => true),
-			array('type' => 'sec')
-		),
-		'value_types' => $value_types_num
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['change'] = array(
-		'args' => $args_ignored,
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count'] = array(
-		'args' => array(
-			array('type' => 'sec_num','mandat' => true),
-			array('type' => 'str'),
-			array('type' => 'str'),
-			array('type' => 'sec')
-		),
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['date'] = array(
-		'args' => $args_ignored,
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['dayofmonth'] = array(
-		'args' => $args_ignored,
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['dayofweek'] = array(
-		'args' => $args_ignored,
-		'value_types' =>	$value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['delta'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['diff'] = array(
-		'args' => $args_ignored,
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['fuzzytime']	= array(
-		'args' => array(
-			array('type' => 'sec', 'mandat' => true)
-		),
-		'value_types' => $value_types_num
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'] = array(
-		'args' => array(
-			array('type' => 'str', 'mandat' => true),
-			array('type' => 'sec_num')
-		),
-		'value_types' => $value_types_char
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['last'] = array(
-		'args' => array(
-			array('type' => 'sec_num', 'mandat' => true),
-			array('type' => 'sec')
-		),
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logeventid'] = array(
-		'args' => array(
-			array('type' => 'str', 'mandat' => true)
-		),
-		'value_types' => array(
-			ITEM_VALUE_TYPE_LOG => true
-		)
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logseverity'] = array(
-		'args' => $args_ignored,
-		'value_types' => array(
-			ITEM_VALUE_TYPE_LOG => true,
-		)
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['logsource'] = array(
-		'args' => array(
-			array('type' => 'str', 'mandat' => true)
-		),
-		'value_types' => array(
-			ITEM_VALUE_TYPE_LOG => true
-		)
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['max'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['min'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['nodata']= array(
-		'args' => array(
-			array('type' => 'sec', 'mandat' => true)
-		),
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['now'] = array(
-		'args' => $args_ignored,
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['prev'] = array(
-		'args' => $args_ignored,
-		'value_types' => $value_types_all
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['regexp'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'];
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['str'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['iregexp'];
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['strlen'] = array(
-		'args' => array(
-			array('type' => 'sec_num', 'mandat' => true),
-			array('type' => 'sec')
-		),
-		'value_types' => $value_types_char
-	);
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['sum'] = $ZBX_TR_EXPR_ALLOWED_FUNCTIONS['avg'];
-	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['time'] = array(
-		'args' => $args_ignored,
-		'value_types' => $value_types_all
-	);
-
-	return array(
-		'functions' => $ZBX_TR_EXPR_ALLOWED_FUNCTIONS,
-		'macros' => $ZBX_TR_EXPR_SIMPLE_MACROS
-	);
+	elseif ($getMacros) {
+		return $ZBX_TR_EXPR_SIMPLE_MACROS;
+	}
+	elseif ($getFunctions) {
+		return $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+	}
 }
 
 // returns string of accessible triggers
@@ -958,8 +965,7 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
 
 // translate localhost:procload.last(0)>10 to {12}>10 and create database representation.
 function implode_exp($expression, $triggerid) {
-	init_trigger_expression_structures();
-	global $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS = init_trigger_expression_structures(false, true);
 
 	$expr = $expression;
 	$trigExpr = new CTriggerExpression(array('expression' => $expression));
@@ -2427,8 +2433,7 @@ function make_expression($node, &$map, $parent_expr = null) {
 }
 
 function get_item_function_info($expr) {
-	init_trigger_expression_structures();
-	global $ZBX_TR_EXPR_SIMPLE_MACROS;
+	$ZBX_TR_EXPR_SIMPLE_MACROS = init_trigger_expression_structures(true, false);
 
 	$value_type = array(
 		ITEM_VALUE_TYPE_UINT64	=> _('Numeric (integer 64bit)'),
