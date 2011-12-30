@@ -3222,10 +3222,18 @@
 		if (isset($new_expression['expressionid'])) {
 			$tblExp->addItem(new CVar('new_expression[expressionid]', $new_expression['expressionid']));
 		}
-		if(!isset($new_expression['expression'])) $new_expression['expression']		= '';
-		if(!isset($new_expression['expression_type'])) $new_expression['expression_type']	= EXPRESSION_TYPE_INCLUDED;
-		if(!isset($new_expression['case_sensitive'])) $new_expression['case_sensitive']	= 0;
-		if(!isset($new_expression['exp_delimiter'])) $new_expression['exp_delimiter']	= ',';
+		if (!isset($new_expression['expression'])) {
+			$new_expression['expression'] = '';
+		}
+		if (!isset($new_expression['expression_type'])) {
+			$new_expression['expression_type'] = EXPRESSION_TYPE_INCLUDED;
+		}
+		if (!isset($new_expression['case_sensitive'])) {
+			$new_expression['case_sensitive'] = 0;
+		}
+		if (!isset($new_expression['exp_delimiter'])) {
+			$new_expression['exp_delimiter'] = ',';
+		}
 
 		$tblExp->addRow(array(_('Expression'), new CTextBox('new_expression[expression]', $new_expression['expression'], 60)));
 

@@ -423,7 +423,7 @@ require_once('include/page_header.php');
 		elseif (isset($_REQUEST['save'])) {
 			$regexp = array(
 				'name' => $_REQUEST['rename'],
-				'test_string' => $_REQUEST['test_string'],
+				'test_string' => $_REQUEST['test_string']
 			);
 			$expressions = get_request('expressions', array());
 
@@ -461,7 +461,7 @@ require_once('include/page_header.php');
 				zbx_value2array($regexpids);
 
 				$regexps = array();
-				foreach ($regexpids as $id => $regexpid) {
+				foreach ($regexpids as $regexpid) {
 					$regexps[$regexpid] = getRegexp($regexpid);
 				}
 
