@@ -16,52 +16,20 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
 /************************************************************/
 /*					ZABBIX MAPS								*/
 /************************************************************/
-.border_dotted_top {
-	border-top: 0;
-}
-
-.dropArea {
-	background-color: #FFB;
-}
-
-.sortableRowPlaceholder{
-	height: 30px;
-}
-
-#sysmap_cnt .sysmap_element{
-	position: absolute;
-	z-index: 10;
-}
-
-#sysmap_cnt .selementArea{
-	background-color: rgb(204, 204, 204);
-	background-color: rgba(204, 204, 204, 0.5);
-}
-
-#sysmap_cnt .selected{
-	border: 3px #FFCC00 solid;
-	margin: -3px;
-}
-#sysmap_cnt .ui-selecting{
-	border: 3px #FFCC00 solid;
-	margin: -3px;
-}
-
-.floatWindow{
-	box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5);
-}
-
-fieldset{
-	margin: 0;
-	padding: 0;
-}
-
-table.gridTable{
-	empty-cells:show;
+.border_dotted_top { border-top: 0; }
+.dropArea { background-color: #FFB; }
+.sortableRowPlaceholder { height: 30px; }
+#sysmap_cnt .sysmap_element { position: absolute; z-index: 10; }
+#sysmap_cnt .selementArea { background-color: rgb(204, 204, 204); background-color: rgba(204, 204, 204, 0.5); }
+#sysmap_cnt .selected { border: 3px #FFCC00 solid; margin: -3px; }
+#sysmap_cnt .ui-selecting { border: 3px #FFCC00 solid; margin: -3px; }
+.floatWindow { box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5); }
+fieldset { margin: 0; padding: 0; }
+table.gridTable {
+	empty-cells: show;
 	padding: 1px 3px;
 	white-space: nowrap;
 	text-align: left;
@@ -69,41 +37,18 @@ table.gridTable{
 	border-collapse: collapse;
 	width: 100%
 }
-table.gridTable thead tr td{
-	font-weight: bold;
-	background-color: #CED7DF;
-}
-table.gridTable tfoot tr td{
-	text-align: right;
-	background-color: #CED7DF;
-}
-table.gridTable tbody tr td{
-	background-color: #F2F7FA;
-}
-table.gridTable tr td{
-	border: 2px solid white;
-}
-
-.colorpickerLabel{
-	border: 1px solid black;
-	display: inline;
-	width: 10px;
-	height: 10px;
-}
-
-fieldset {
-	border: 1px solid gray;
-	margin-bottom: 2px;
-	padding: 2px;
-}
-fieldset legend{
-	margin: 0.2em 0.5em;
-}
+table.gridTable thead tr td { font-weight: bold; background-color: #CED7DF; }
+table.gridTable tfoot tr td { text-align: right; background-color: #CED7DF; }
+table.gridTable tbody tr td { background-color: #F2F7FA; }
+table.gridTable tr td { border: 2px solid white; }
+.colorpickerLabel { border: 1px solid black; display: inline; width: 10px; height: 10px; }
+fieldset { border: 1px solid gray; margin-bottom: 2px; padding: 2px; }
+fieldset legend { margin: 0.2em 0.5em; }
 
 /************************************************************/
 /*					ZABBIX MESSAGING						*/
 /************************************************************/
-div.messagecontainer{
+div.messagecontainer {
 	position: absolute;
 	top: 84px;
 	right: 0;
@@ -111,83 +56,29 @@ div.messagecontainer{
 	border: 2px solid #FFFFFF;
 	z-index: 1000;
 }
-
-div.messagecontainer .header{
-	height: 18px;
-	padding: 2px 80px 2px 2px;
-	margin: 0 2px 0 2px;
-}
-
-div.messagecontainer .header .headertext{
-	font-weight: bold;
-	color: #FFFFFF;
-	font-size: 10pt;
-	margin: 0;
-}
-
-div.messagecontainer .header .controls{
-	position: absolute;
-	right: 1px;
-	top: 2px;
-}
-
-
-div.messagecontainer ul{
-	clear: right;
-	padding: 0;
-	margin: 0 0 2px 1px;
-	list-style: none;
-}
-
-div.messagecontainer ul li.listItem{
-	margin: 1px 2px 1px 2px;
-	border: 1px solid #FFFFFF;
-}
-
-div.messagecontainer ul li.listItem .message{
-	white-space: nowrap;
-}
-
-div.messagecontainer .message .messagebox{
+div.messagecontainer .header { height: 18px; padding: 2px 80px 2px 2px; margin: 0 2px 0 2px; }
+div.messagecontainer .header .headertext { font-weight: bold; color: #FFFFFF; font-size: 10pt; margin: 0; }
+div.messagecontainer .header .controls { position: absolute; right: 1px; top: 2px; }
+div.messagecontainer ul { clear: right; padding: 0; margin: 0 0 2px 1px; list-style: none; }
+div.messagecontainer ul li.listItem { margin: 1px 2px 1px 2px; border: 1px solid #FFFFFF; }
+div.messagecontainer ul li.listItem .message { white-space: nowrap; }
+div.messagecontainer .message .messagebox {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	padding: 0 22px 2px 6px;
 	margin-left: 20px;
 	background-color: #4F4F4F;
 	color: #EAEAEA;
 }
+div.messagecontainer .message .messagebox span.title { line-height: 22px; font-size: 10pt; font-weight: bold; white-space: nowrap; }
+div.messagecontainer .messagebox span.title a { font-size: 10pt; color: #EAEAEA; white-space: nowrap; line-height: 22px; }
+div.messagecontainer .messagebox span.body { line-height: 14px; font-size: 7pt; white-space: nowrap; }
+div.messagecontainer .messagebox span.body a { color: #EAEAEA; line-height: 14px; font-size: 7pt; white-space: nowrap; }
 
-div.messagecontainer .message .messagebox span.title{
-	line-height: 22px;
-	font-size: 10pt;
-	font-weight: bold;
-	white-space: nowrap;
-}
-
-div.messagecontainer .messagebox span.title a{
-	font-size: 10pt;
-	color: #EAEAEA;
-	white-space: nowrap;
-	line-height: 22px;
-}
-
-div.messagecontainer .messagebox span.body{
-	line-height: 14px;
-	font-size: 7pt;
-	white-space: nowrap;
-}
-
-div.messagecontainer .messagebox span.body a{
-	color: #EAEAEA;
-	line-height: 14px;
-	font-size: 7pt;
-	white-space: nowrap;
-}
 /************************************************************/
 /*						SEARCH Suggest						*/
 /************************************************************/
-div input.search{ padding: 1px; width: 16em;}
-
-div.suggest{
+div input.search { padding: 1px; width: 16em; }
+div.suggest {
 	position: absolute;
 	border: 1px #5C7099 solid;
 	width: 162px;
@@ -198,51 +89,37 @@ div.suggest{
 /************************************************************/
 /*					SCROLLBAR III STYLES					*/
 /************************************************************/
-div.scrollbar{
+div.scrollbar {
 	position: relative;
 	border: 1px #4F6FA8 solid;
 	height: 56px;
 	background-color: #DDDDDD;
 	margin: 0 auto;
 	line-height: 1em;
-/*	overflow: hidden; */
 }
-
-div.scrollbar .info{
-	height: 14px;
-	font-size: 10px;
-	vertical-align:bottom;
-}
-
-div.scrollbar .info .zoom{
+div.scrollbar .info { height: 14px; font-size: 10px; vertical-align:bottom; }
+div.scrollbar .info .zoom {
 	float: left;
 	border: 0 #FF00FF solid;
 	white-space:nowrap;
 	height: 14px;
 	line-height: 14px;
 }
-
-div.scrollbar .info .zoom .text{
+div.scrollbar .info .zoom .text {
 	padding-left: 2px;
 	padding-right: 5px;
 	font-weight: bold;
 	font-size: 11px;
 	color: #333333;
 }
-
-div.scrollbar .info .zoom .links{
-	font-size: 10px;
-	white-space: nowrap;
-}
-
-div.scrollbar .info .zoom .links .link{
+div.scrollbar .info .zoom .links { font-size: 10px; white-space: nowrap; }
+div.scrollbar .info .zoom .links .link {
 	padding-left: 3px;
 	padding-right: 3px;
 	line-height: 14px;
 	vertical-align: top;
 }
-
-div.scrollbar .info .timeline{
+div.scrollbar .info .timeline {
 	float: right;
 	border: 0 #FF00FF solid;
 	white-space:nowrap;
@@ -250,64 +127,49 @@ div.scrollbar .info .timeline{
 	font-size: 10px;
 	vertical-align:bottom;
 }
-
-div.scrollbar .info .timeline .info_left{
+div.scrollbar .info .timeline .info_left {
 	border: 0 black solid;
 	padding-right: 5px;
 	line-height: 12px;
 	vertical-align: bottom;
 	text-decoration: none;
 }
-
-div.scrollbar .info .timeline .info_sep1{
+div.scrollbar .info .timeline .info_sep1 {
 	border: 0 black solid;
 	padding-right: 5px;
-
 	line-height: 14px;
 	vertical-align: bottom;
 }
-
-div.scrollbar .info .timeline .info_right{
+div.scrollbar .info .timeline .info_right {
 	border: 0 black solid;
 	padding-right: 2px;
 	line-height: 12px;
 	vertical-align: bottom;
 	text-decoration: none;
 }
-
-div.scrollbar .sublevel{
-}
-
-div.scrollbar .sublevel .bg{
-	height: 27px;
-	background: url(../images/general/bar/bg.png) repeat-x;
-}
-
-div.scrollbar .sublevel .left{
+div.scrollbar .sublevel .bg { height: 27px; background: url(../images/general/bar/bg.png) repeat-x; }
+div.scrollbar .sublevel .left {
 	float: left;
 	width: 17px;
 	height: 27px;
 	background-image: url(../images/general/bar/left.png);
 	cursor: pointer;
 }
-
-div.scrollbar .sublevel .right{
+div.scrollbar .sublevel .right {
 	float: right;
 	width: 17px;
 	height: 27px;
 	background-image: url(../images/general/bar/right.png);
 	cursor: pointer;
 }
-
-div.scrollbar .overlevel{
+div.scrollbar .overlevel {
 	position:absolute;
 	top: 14px;
 	border: 0 green solid;
 	height: 27px;
 	left: 17px;
 }
-
-div.scrollbar .overlevel .bar{
+div.scrollbar .overlevel .bar {
 	position:absolute;
 	left: 74px;
 	width: 140px;
@@ -316,19 +178,16 @@ div.scrollbar .overlevel .bar{
 	z-index: 1;
 	cursor: pointer;
 }
-
-div.scrollbar .overlevel .bar .icon{
+div.scrollbar .overlevel .bar .icon {
 	position: relative;
 	height: 25px;
 	background: url(../images/general/bar/bar_bg.png) repeat-x;
 }
-
-div.scrollbar .overlevel .bar .icon .center{
+div.scrollbar .overlevel .bar .icon .center {
 	background: url(../images/general/bar/bar_middle.png) no-repeat center;
 	height: 25px;
 }
-
-div.scrollbar .overlevel .ghost{
+div.scrollbar .overlevel .ghost {
 	position: absolute;
 	top: 0;
 	left: 74px;
@@ -337,8 +196,7 @@ div.scrollbar .overlevel .ghost{
 	line-height: 25px;
 	border: 1px black solid;
 }
-
-div.scrollbar .overlevel .left_arr{
+div.scrollbar .overlevel .left_arr {
 	position: absolute;
 	top: 8px;
 	left: 70px;
@@ -346,10 +204,9 @@ div.scrollbar .overlevel .left_arr{
 	height: 13px;
 	background-image: url(../images/general/bar/left_arr.png);
 	z-index: 99;
-	cursor:e-resize;
+	cursor: e-resize;
 }
-
-div.scrollbar .overlevel .right_arr{
+div.scrollbar .overlevel .right_arr {
 	position: absolute;
 	top: 8px;
 	left: 211px;
@@ -357,59 +214,28 @@ div.scrollbar .overlevel .right_arr{
 	height: 13px;
 	background-image: url(../images/general/bar/right_arr.png);
 	z-index: 99;
-	cursor:e-resize;
+	cursor: e-resize;
 }
-
-div.scrollbar .subline{
-	height: 14px;
-	border: 0 blue solid;
-}
-
-div.scrollbar .subline .nav_links{
+div.scrollbar .subline { height: 14px; border: 0 blue solid;}
+div.scrollbar .subline .nav_links {
 	float: left;
 	border: 0 black solid;
 	padding-left: 2px;
 	padding-right: 5px;
 	line-height: 12px;
 }
-
-div.scrollbar .subline .nav_links .link{
+div.scrollbar .subline .nav_links .link {
 	padding-left: 3px;
 	padding-right: 3px;
 	line-height: 10px;
 	vertical-align: top;
 }
-
-div.scrollbar .subline .nav_links .text{
-	line-height: 12px;
-	vertical-align: top;
-	color: #333333;
-}
-
-div.scrollbar .subline .period{
-	float: right;
-	width: 60px;
-	text-align: right;
-}
-
-div.scrollbar .subline .period .period_state_begin{
-	padding-left: 2px;
-	line-height: 12px;
-	color: #888888;
-}
-
-div.scrollbar .subline .period .period_state_end{
-	padding-right: 2px;
-	line-height: 12px;
-	color: #888888;
-}
-
-div.scrollbar .subline .period .period_state{
-	line-height: 12px;
-	color: #888888;
-}
-
-div.scrollbar .subline .info_period{
+div.scrollbar .subline .nav_links .text { line-height: 12px; vertical-align: top; color: #333333; }
+div.scrollbar .subline .period { float: right; width: 60px; text-align: right; }
+div.scrollbar .subline .period .period_state_begin { padding-left: 2px; line-height: 12px; color: #888888; }
+div.scrollbar .subline .period .period_state_end { padding-right: 2px; line-height: 12px; color: #888888; }
+div.scrollbar .subline .period .period_state { line-height: 12px; color: #888888; }
+div.scrollbar .subline .info_period {
 	float: right;
 	padding-left: 2px;
 	padding-right: 2px;
@@ -421,43 +247,30 @@ div.scrollbar .subline .info_period{
 /************************************************************/
 /*						SBOX STYLES							*/
 /************************************************************/
-
-div#selection_box{
+div#selection_box {
 	position: absolute;
-	filter:alpha(opacity=40);
-	opacity:.40;
-	background-color:#0000FF;
-	border:1px black solid;
+	filter: alpha(opacity=40);
+	opacity: .40;
+	background-color: #0000FF;
+	border: 1px black solid;
 	width: 1px;
 	height: 1px;
 	z-index: 4;
-	overflow:hidden;
+	overflow: hidden;
 }
-
-div.box_on{
-	position: absolute;
-	z-index:2;
-	border: 0 red solid;
-/*
-	background-color:#FF0000;
-	opacity:.50;
-	filter:alpha(opacity=50);
-/**/
-}
-
-span#period_span{
+div.box_on { position: absolute; z-index: 2; border: 0 red solid; }
+span#period_span {
 	font-weight: bold;
 	font-size: 11px;
 	color: #FFFFFF;
 	position: absolute;
 	top: 2px;
 	right: 4px;
-	text-decoration:none;
+	text-decoration: none;
 }
 
 /* CSS Document */
-
-div.calendar{
+div.calendar {
 	position: absolute;
 	width: 180px;
 	top: 10px;
@@ -465,124 +278,64 @@ div.calendar{
 	border: 1px blue solid;
 	z-index: 100;
 }
-
-div.calendardays{
-	border: 1px orange solid;
-}
-
-div.calendartime{
+div.calendardays { border: 1px orange solid; }
+div.calendartime {
 	background-color: #DDEEFF;
 	text-align: center;
 	padding-top: 2px;
 	padding-bottom: 2px;
 	height: 42px;
 }
-
 div.calendar input[type="button"] {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	border: 1px solid #00888B;
 	background: #AADDEE;
-	cursor:pointer;
+	cursor: pointer;
 }
-
-table.calendarhat{
+table.calendarhat {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	text-align: center;
-	background-color:#DDEEFF;
+	background-color: #DDEEFF;
 	font-weight: bold;
 }
+table.calendarhat tr td { height: 18px; width: 22px; }
+table.calendarhat tr td.long { text-align: center; width: 116px; overflow: hidden; }
 
-table.calendarhat tr td{
-	height: 18px;
-	width: 22px;
-}
-
-table.calendarhat tr td.long{
-	text-align:center;
-	width: 116px;
-	overflow: hidden;
-}
-
-/* CELLS */
-table.calendartab{
-	font-family:Verdana, Arial, Helvetica, sans-serif;
+/* Cells */
+table.calendartab {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	text-align: center;
-	background-color:#EEEEEE;
+	background-color: #EEEEEE;
 	border-spacing: 1px;
 }
+table.calendartab tr.header td:hover { cursor:default; }
+table.calendartab tr td { height: 18px; width: 22px; background-color: #FFFFFF; }
+table.calendartab tr td:hover { cursor: pointer; }
+table.calendartab tr td.holiday { background-color: #AADDEE; }
+table.calendartab tr td.grey { color: #AFAFAF; }
+table.calendartab tr td.selected { background-color: #008888; color: #eeeeee; }
 
-table.calendartab tr.header td:hover{
-	cursor:default;
-}
+/* Span */
+div.calendar span.title { text-align: center; color: #000099; }
+div.calendar span.clndr_left_arrow { padding-left: 5px; }
+div.calendar span.clndr_left_arrow:hover { cursor: pointer; }
+div.calendar span.clndr_right_arrow { padding-right: 5px; }
+div.calendar span.clndr_right_arrow:hover { cursor: pointer; }
 
-table.calendartab tr td{
-	height: 18px;
-	width: 22px;
-	background-color:#FFFFFF;
-}
-
-table.calendartab tr td:hover{
-	cursor: pointer;
-}
-
-table.calendartab tr td.holiday{
-	background-color:#AADDEE;
-}
-
-table.calendartab tr td.grey{
-	color:#AFAFAF;
-}
-
-table.calendartab tr td.selected{
-/*
-	border-left: 1px #333333 groove;
-	border-top: 1px #333333 groove;
-*/
-	background-color: #008888;
-	color: #eeeeee;
-}
-
-/* SPAN */
-
-div.calendar span.title{
-	text-align:center;
-	color:#000099;
-}
-
-div.calendar span.clndr_left_arrow{
-	padding-left: 5px;
-}
-
-div.calendar span.clndr_left_arrow:hover{
-	cursor: pointer;
-}
-
-div.calendar span.clndr_right_arrow{
-	padding-right: 5px;
-}
-
-div.calendar span.clndr_right_arrow:hover{
-	cursor: pointer;
-}
-
-/* INPUT */
-
-div.calendar input.calendar_textbox{
+/* Input */
+div.calendar input.calendar_textbox {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	text-align: center;
 	width: 26px;
 	height: 14px;
-	vertical-align:middle;
+	vertical-align: middle;
 }
 
-/* CSS Document */
-
 /**************** POPUP MENU ***************/
-
 /* default menu item */
 .pum_o_item {
 	font-family: sans-serif;
@@ -593,19 +346,11 @@ div.calendar input.calendar_textbox{
 	margin: 0;
 	overflow: hidden;
 }
-.pum_o_item:hover {
-	cursor:pointer;
-	text-decoration: underline;
-	background-color: #FDFDFF;
-}
-.pum_i_item {
-	margin: 3px 0 0 8px;
-	white-space: nowrap;
-	overflow: hidden;
-}
+.pum_o_item:hover { cursor: pointer; text-decoration: underline; background-color: #FDFDFF; }
+.pum_i_item { margin: 3px 0 0 8px; white-space: nowrap; overflow: hidden; }
 
 /* menu menu item with submenu */
-.pum_b_submenu{
+.pum_b_submenu {
 	font-family: sans-serif;
 	font-size: 12px;
 	text-decoration: none;
@@ -614,13 +359,8 @@ div.calendar input.calendar_textbox{
 	border: black 1px solid;
 	margin: 0;
 }
-.pum_b_submenu:hover {
-	cursor:pointer;
-	text-decoration: none;
-	background-color: #FDFDFF;
-}
-
-.pum_o_submenu{
+.pum_b_submenu:hover { cursor: pointer; text-decoration: none; background-color: #FDFDFF; }
+.pum_o_submenu {
 	font-family: sans-serif;
 	font-size: 12px;
 	text-decoration: none;
@@ -628,15 +368,8 @@ div.calendar input.calendar_textbox{
 	border: black 1px solid;
 	margin: 0;
 }
-.pum_o_submenu:hover {
-	cursor:pointer;
-	text-decoration: none;
-	background-color: #FDFDFF;
-}
-.pum_i_submenu{
-	margin: 3px 0 0 8px;
-
-}
+.pum_o_submenu:hover { cursor:pointer; text-decoration: none; background-color: #FDFDFF; }
+.pum_i_submenu { margin: 3px 0 0 8px; }
 
 /* menu group header */
 .pum_oheader {
@@ -646,20 +379,10 @@ div.calendar input.calendar_textbox{
 	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
 	margin: 0;
 }
-.pum_oheader:hover {
-	cursor:pointer;
-	text-decoration: none;
-}
-.pum_iheader {
-	color: #FFFFFF;
-	font-weight: bold;
-	margin: 3px 0 0 8px;
-}
-
-/************ END OF POPUP MENU ************/
+.pum_oheader:hover { cursor:pointer; text-decoration: none; }
+.pum_iheader { color: #FFFFFF; font-weight: bold; margin: 3px 0 0 8px; }
 
 /**************** HINT BOX *****************/
-
 #hint_box {
 	top: 0;
 	z-index: 100;
@@ -668,14 +391,12 @@ div.calendar input.calendar_textbox{
 	padding: 2px;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 8pt;
-	line-height:15px;
+	line-height: 15px;
 	border: 1px solid black;
 	border-left: none;
 	border-top: none;
 	visibility: hidden;
 }
-
-/************** END OF HINT BOX ************/
 
 /************** COLOR PICKER ***************/
 #color_picker {
@@ -684,23 +405,15 @@ div.calendar input.calendar_textbox{
 	position: absolute;
 	background-color: white;
 	padding: 2px;
-	line-height:15px;
+	line-height: 15px;
 	border: 1px solid black;
 }
-
 #color_picker table tr td { margin: 0; padding: 2px; }
-
 #color_picker a { text-decoration: none; padding: 0; margin: 0; }
-
 /************ END OF COLOR PICKER ***********/
 
-.zbx_search{padding-top: 1px; font-weight:bold; float:right; height: 18px; min-width: 228px;}
-.zbx_search input[type=text] {margin-right: 0; vertical-align:top; padding: 0 2px; height: 16px; width: 160px; border-right: 0; border-color: #9DB2CD;}
+.zbx_search { padding-top: 1px; font-weight:bold; float:right; height: 18px; min-width: 228px; }
+.zbx_search input[type=text] { margin-right: 0; vertical-align:top; padding: 0 2px; height: 16px; width: 160px; border-right: 0; border-color: #9DB2CD; }
 
 /**************** TRIGGER DISPLAYING FORM ***************/
-div.trigger_displaying_form_col {
-	width: 12em;
-	zoom:1;
-	*display: inline;
-}
-/**************** END TRIGGER DISPLAYING FORM ***************/
+div.trigger_displaying_form_col { width: 12em; zoom:1; *display: inline; }

@@ -53,31 +53,6 @@ static int	is_bunch_poller(int poller_type)
 	return ZBX_POLLER_TYPE_JAVA == poller_type ? SUCCEED : FAIL;
 }
 
-static void	update_key_status(zbx_uint64_t hostid, int host_status, zbx_timespec_t *ts)
-{
-	const char	*__function_name = "update_key_status";
-	DC_ITEM		*items = NULL;
-	int		i, num;
-	AGENT_RESULT	agent;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " status:%d",
-			__function_name, hostid, host_status);
-
-	num = DCconfig_get_items(hostid, SERVER_STATUS_KEY, &items);
-	for (i = 0; i < num; i++)
-	{
-		init_result(&agent);
-		SET_UI64_RESULT(&agent, host_status);
-
-		dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, ts,
-				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
-
-		free_result(&agent);
-	}
-
-	zbx_free(items);
-}
-
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
 	const char	*__function_name = "update_triggers_status_to_unknown";
@@ -140,7 +115,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" and f.triggerid=t.triggerid"
 				" and i.hostid=h.hostid"
 				" and i.status=%d"
-				" and not i.key_ like '%s'"
 				" and i.type in (%s)"
 				" and f.function not in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and t.status=%d"
@@ -166,12 +140,10 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 						")"
 					")"
 					" and i2.status=%d"
-					" and not i2.key_ like '%s'"
 					" and h2.status=%d"
 			")"
 			" order by t.triggerid",
 			ITEM_STATUS_ACTIVE,
-			SERVER_STATUS_KEY,
 			failed_type_buf,
 			TRIGGER_STATUS_ENABLED,
 			hostid,
@@ -183,7 +155,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			ITEM_TYPE_IPMI, HOST_AVAILABLE_TRUE,
 			ITEM_TYPE_JMX, HOST_AVAILABLE_TRUE,
 			ITEM_STATUS_ACTIVE,
-			SERVER_STATUS_KEY,
 			HOST_STATUS_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
@@ -332,9 +303,6 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 
 		*available = HOST_AVAILABLE_TRUE;
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,", fld_available, *available);
-
-		if (available == &item->host.available)
-			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, ts);
 	}
 
 	*errors_from = 0;
@@ -454,9 +422,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
 						fld_available, *available);
-
-				if (available == &item->host.available)
-					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, ts);
 
 				update_triggers_status_to_unknown(item->host.hostid, item->type, ts,
 						"Agent is unavailable.");
@@ -745,7 +710,7 @@ static int	get_values(unsigned char poller_type)
 				activate_host(&items[i], &timespecs[i]);
 				break;
 			case NETWORK_ERROR:
-			case PROXY_ERROR:
+			case GATEWAY_ERROR:
 				deactivate_host(&items[i], &timespecs[i], results[i].msg);
 				break;
 			default:
@@ -767,7 +732,7 @@ static int	get_values(unsigned char poller_type)
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, timespecs[i].sec);
 		}
-		else if (NETWORK_ERROR == errcodes[i] || PROXY_ERROR == errcodes[i])
+		else if (NETWORK_ERROR == errcodes[i] || GATEWAY_ERROR == errcodes[i])
 		{
 			DCrequeue_unreachable_item(items[i].itemid);
 		}

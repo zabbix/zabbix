@@ -19,136 +19,6 @@
 **/
 ?>
 <?php
-	function insert_slideshow_form(){
-		$form = new CFormTable(S_SLIDESHOW, null, 'post');
-		$form->setHelp('config_advanced.php');
-
-		if(isset($_REQUEST['slideshowid'])){
-			$form->addVar('slideshowid', $_REQUEST['slideshowid']);
-		}
-
-		$name		= get_request('name', '');
-		$delay		= get_request('delay', 5);
-		$steps		= get_request('steps', array());
-
-		$new_step	= get_request('new_step', null);
-
-		if((isset($_REQUEST['slideshowid']) && !isset($_REQUEST['form_refresh']))){
-			$slideshow_data = DBfetch(DBselect('SELECT * FROM slideshows WHERE slideshowid='.$_REQUEST['slideshowid']));
-
-			$name		= $slideshow_data['name'];
-			$delay		= $slideshow_data['delay'];
-			$steps		= array();
-			$db_steps = DBselect('SELECT * FROM slides WHERE slideshowid='.$_REQUEST['slideshowid'].' order by step');
-
-			while($step_data = DBfetch($db_steps)){
-				$steps[$step_data['step']] = array(
-						'screenid' => $step_data['screenid'],
-						'delay' => $step_data['delay']
-					);
-			}
-		}
-
-		$form->addRow(S_NAME, new CTextBox('name', $name, 40));
-
-		$delayBox = new CComboBox('delay', $delay);
-		$delayBox->addItem(10,'10');
-		$delayBox->addItem(30,'30');
-		$delayBox->addItem(60,'60');
-		$delayBox->addItem(120,'120');
-		$delayBox->addItem(600,'600');
-		$delayBox->addItem(900,'900');
-
-		$form->addRow(_('Update interval (in sec)'), $delayBox);
-
-		$tblSteps = new CTableInfo(_('No slides defined.'));
-		$tblSteps->setHeader(array(S_SCREEN, S_DELAY, S_SORT));
-		if(count($steps) > 0){
-			ksort($steps);
-			$first = min(array_keys($steps));
-			$last = max(array_keys($steps));
-		}
-
-		foreach($steps as $sid => $s){
-			if( !isset($s['screenid']) ) $s['screenid'] = 0;
-
-			if(isset($s['delay']) && $s['delay'] > 0 )
-				$s['delay'] = bold($s['delay']);
-			else
-				$s['delay'] = $delay;
-
-			$up = null;
-			if($sid != $first){
-				$up = new CSpan(S_UP,'link');
-				$up->onClick("return create_var('".$form->getName()."','move_up',".$sid.", true);");
-			}
-
-			$down = null;
-			if($sid != $last){
-				$down = new CSpan(S_DOWN,'link');
-				$down->onClick("return create_var('".$form->getName()."','move_down',".$sid.", true);");
-			}
-
-			$screen_data = get_screen_by_screenid($s['screenid']);
-			$name = new CSpan($screen_data['name'],'link');
-			$name->onClick("return create_var('".$form->getName()."','edit_step',".$sid.", true);");
-
-			$tblSteps->addRow(array(
-				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
-				$s['delay'],
-				array($up, isset($up) && isset($down) ? SPACE : null, $down)
-				));
-		}
-		$form->addVar('steps', $steps);
-
-		$form->addRow(S_SLIDES, array(
-			$tblSteps,
-			!isset($new_step) ? new CSubmit('add_step_bttn',S_ADD,
-				"return create_var('".$form->getName()."','add_step',1, true);") : null,
-			(count($steps) > 0) ? new CSubmit('del_sel_step',S_DELETE_SELECTED) : null
-			));
-
-		if(isset($new_step)){
-			if( !isset($new_step['screenid']) )	$new_step['screenid'] = 0;
-			if( !isset($new_step['delay']) )	$new_step['delay'] = 0;
-
-			if( isset($new_step['sid']) )
-				$form->addVar('new_step[sid]',$new_step['sid']);
-
-			$form->addVar('new_step[screenid]',$new_step['screenid']);
-
-			$screen_data = get_screen_by_screenid($new_step['screenid']);
-
-			$form->addRow(S_NEW_SLIDE, array(
-					S_DELAY,
-					new CNumericBox('new_step[delay]', $new_step['delay'], 5), BR(),
-					new CTextBox('screen_name', $screen_data['name'], 40, 'yes'),
-					new CButton('select_screen',S_SELECT,
-						'return PopUp("popup.php?dstfrm='.$form->getName().'&srctbl=screens'.
-						'&dstfld1=screen_name&srcfld1=name'.
-						'&dstfld2=new_step_screenid&srcfld2=screenid");'),
-					BR(),
-					new CSubmit('add_step', isset($new_step['sid']) ? S_SAVE : S_ADD),
-					new CSubmit('cancel_step', S_CANCEL)
-
-				),
-				isset($new_step['sid']) ? 'edit' : 'new');
-		}
-
-		$form->addItemToBottomRow(new CSubmit("save",S_SAVE));
-		if(isset($_REQUEST['slideshowid'])){
-			$form->addItemToBottomRow(SPACE);
-			$form->addItemToBottomRow(new CSubmit('clone',S_CLONE));
-			$form->addItemToBottomRow(SPACE);
-			$form->addItemToBottomRow(new CButtonDelete(S_DELETE_SLIDESHOW_Q,
-				url_param('form').url_param('slideshowid').url_param('config')));
-		}
-		$form->addItemToBottomRow(SPACE);
-		$form->addItemToBottomRow(new CButtonCancel());
-
-		return $form;
-	}
-
 	function getUserFormData($userid, $isProfile = false) {
 		$config = select_config();
 		$data = array('is_profile' => $isProfile);
@@ -1532,7 +1402,7 @@
 
 		$row = new CRow(array(new CCol(S_NEW_FLEXIBLE_INTERVAL,'form_row_l'), new CCol(
 			array(
-				S_DELAY, SPACE,
+				_('Delay'), SPACE,
 				new CNumericBox('new_delay_flex[delay]','50',5),
 				S_PERIOD, SPACE,
 				new CTextBox('new_delay_flex[period]',ZBX_DEFAULT_INTERVAL,27), BR(),
@@ -1934,7 +1804,7 @@
 						S_FLEXIBLE_INTERVALS), $delay_flex_el);
 
 		$new_delay_flex_el = new CSpan(array(
-										S_DELAY, SPACE,
+										_('Delay'), SPACE,
 										new CNumericBox("new_delay_flex[delay]","50",5),
 										S_PERIOD, SPACE,
 										new CTextBox("new_delay_flex[period]",ZBX_DEFAULT_INTERVAL,27), BR(),

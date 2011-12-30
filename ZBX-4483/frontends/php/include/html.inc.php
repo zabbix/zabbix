@@ -215,7 +215,7 @@ function get_table_header($col1, $col2 = SPACE) {
 			$col2 = array($col2);
 		}
 
-		foreach ($col2 as $num => $r_item) {
+		foreach ($col2 as $r_item) {
 			$right_row[] = new CCol($r_item, 'header_r');
 		}
 	}
@@ -237,7 +237,7 @@ function get_table_header($col1, $col2 = SPACE) {
 
 function show_table_header($col1, $col2 = SPACE){
 	$table = get_table_header($col1, $col2);
-	$table->Show();
+	$table->show();
 }
 
 function get_icon($name, $params = array()) {
@@ -247,14 +247,14 @@ function get_icon($name, $params = array()) {
 				$icon = new CIcon(
 					_('Remove from favourites'),
 					'iconminus',
-					'rm4favorites("'.$params['elname'].'","'.$params['elid'].'", 0);'
+					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'", 0);'
 				);
 			}
 			else{
 				$icon = new CIcon(
 					_('Add to favourites'),
 					'iconplus',
-					'add2favorites("'.$params['elname'].'","'.$params['elid'].'");'
+					'add2favorites("'.$params['elname'].'", "'.$params['elid'].'");'
 				);
 			}
 			$icon->setAttribute('id', 'addrm_fav');
@@ -279,12 +279,12 @@ function get_icon($name, $params = array()) {
 }
 
 /**
-* Create CDiv with host/template information and references to it's elements
-*
-* @param string $hostid
-* @param string $current elements that reference should not be added to
-* @return object
-*/
+ * Create CDiv with host/template information and references to it's elements
+ *
+ * @param string $hostid
+ * @param string $current elements that reference should not be added to
+ * @return object
+ */
 function get_header_host_table($hostid, $current = null) {
 	$elements = array(
 		'items' => 'items',
@@ -301,7 +301,7 @@ function get_header_host_table($hostid, $current = null) {
 	$header_host_opt = array(
 		'hostids' => $hostid,
 		'output' => array('hostid', 'name', 'status', 'proxy_hostid', 'available'),
-		'templated_hosts' => true,
+		'templated_hosts' => true
 	);
 	if (isset($elements['items'])) {
 		$header_host_opt['selectItems'] = API_OUTPUT_COUNT;
@@ -396,9 +396,7 @@ function get_header_host_table($hostid, $current = null) {
 			' ('.$header_host['screens'] . ')'));
 	}
 
-	$tbl_header_host = new CDiv($list, 'objectgroup ui-widget-content ui-corner-all');
-
-	return $tbl_header_host;
+	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
 function makeFormFooter($main, $other = array()) {
@@ -419,6 +417,6 @@ function makeFormFooter($main, $other = array()) {
 	}
 	$buttons = new CDiv(array($otherBttns), 'dd');
 
-	return new CDiv(new CDiv(array($space, $buttons),'formrow'), 'objectgroup footer min-width ui-widget-content ui-corner-all');
+	return new CDiv(new CDiv(array($space, $buttons), 'formrow'), 'objectgroup footer min-width ui-widget-content ui-corner-all');
 }
 ?>

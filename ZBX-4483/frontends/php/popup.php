@@ -1550,9 +1550,7 @@ elseif ($srctbl == 'slides') {
 	$table = new CTableInfo(_('No slides defined.'));
 
 	if ($multiselect) {
-		$header = array(
-			array(new CCheckBox('all_slides', null, "javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"), _('Name')),
-		);
+		$header = array(array(new CCheckBox('all_slides', null, "javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"), _('Name')),);
 	}
 	else {
 		$header = array(_('Name'));
@@ -1627,7 +1625,7 @@ elseif ($srctbl == 'screens') {
 	$screens = API::Screen()->get($options);
 	order_result($screens, 'name');
 
-	foreach ($screens as $snum => $row) {
+	foreach ($screens as $row) {
 		$name = new CSpan($row['name'], 'link');
 
 		if ($multiselect) {
@@ -1654,6 +1652,8 @@ elseif ($srctbl == 'screens') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($screens, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "screens";');
+
 	$form->addItem($table);
 	$form->show();
 }
