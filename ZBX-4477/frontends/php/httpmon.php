@@ -255,7 +255,7 @@ require_once('include/page_header.php');
 				$status['style'] = 'disabled';
 			}
 			else{
-				$status['msg'] = S_OK_BIG;
+				$status['msg'] = _('OK');
 				$status['style'] = 'enabled';
 			}
 		}

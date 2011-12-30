@@ -174,7 +174,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
-	$trigg_wdgt->addHeader(S_TRIGGERS_BIG, $r_form);
+	$trigg_wdgt->addHeader(_('TRIGGERS'), $r_form);
 	$trigg_wdgt->addHeader($numrows);
 
 /************************* FILTER **************************/
@@ -278,8 +278,8 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$table->setHeader(array(
 		$whow_hide_all,
 		$config['event_ack_enable'] ? $header_cb : null,
-		make_sorting_header(S_SEVERITY, 'priority'),
-		S_STATUS,
+		make_sorting_header(_('Severity'), 'priority'),
+		_('Status'),
 		S_INFO,
 		make_sorting_header(_('Last change'), 'lastchange'),
 		S_AGE,
@@ -288,7 +288,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		is_show_all_nodes() ? S_NODE : null,
 		S_HOST,
 		make_sorting_header(S_NAME, 'description'),
-		S_COMMENTS
+		_('Comments')
 	));
 
 
@@ -464,13 +464,13 @@ require_once('include/views/js/general.script.confirm.js.php');
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
 			$str_tmp = zbx_jsvalue('javascript: redirect("triggers.php?form=update&triggerid='.
 					$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid']).'")');
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',". $str_tmp .",
+			$menu_trigger_conf = "['"._('Configuration of triggers')."',". $str_tmp .",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
 		if (!zbx_empty($trigger['url'])) {
 			// double zbx_jsvalue is required to prevent XSS attacks
-			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href=".zbx_jsvalue(zbx_jsvalue(resolveTriggerUrl($trigger), null, false))."\",
+			$menu_trigger_url = "['"._('URL')."',\"javascript: window.location.href=".zbx_jsvalue(zbx_jsvalue(resolveTriggerUrl($trigger), null, false))."\",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$description->addAction('onclick',
@@ -510,7 +510,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$dependency = false;
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(S_DEPENDENT.':'));
+		$dep_table->addRow(bold(_('Dependent').':'));
 
 		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$trigger['triggerid'];
 		$dep_res = DBselect($sql_dep);
@@ -555,7 +555,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$menus = "[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 			}
 
-			$menus.= "[".zbx_jsvalue(S_URLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus.= "[".zbx_jsvalue(_('URLs')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 			$menus = rtrim($menus,',');

@@ -28,6 +28,11 @@ class CTextBox extends CInput {
 		$this->tag_body_start = '';
 		$this->setAttribute('size', $size);
 		$this->setAttribute('maxlength', $maxlength);
+
+		// require for align input field using css width
+		if ($size == ZBX_TEXTBOX_STANDARD_SIZE) {
+			$this->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+		}
 	}
 }
 ?>

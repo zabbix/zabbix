@@ -874,7 +874,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 	$tableSchema = DB::getSchema($table);
 	if (!$tableSchema) {
-		info('Error in search request for table ['.$table.']');
+		info(_s('Error in search request for table "%1$s".', $table));
 	}
 
 	$start = is_null($options['startSearch']) ? '%' : '';
@@ -930,7 +930,7 @@ function zbx_db_filter($table, $options, &$sql_parts) {
 
 	$tableSchema = DB::getSchema($table);
 	if (!$tableSchema) {
-		info('Error in search request for table ['.$table.']');
+		info(_s('Error in search request for table "%1$s".', $table));
 	}
 
 	$filter = array();
@@ -1436,7 +1436,7 @@ class DB {
 			// sql execution
 			$sql = 'UPDATE '.$table.' SET '.$sqlSet.' WHERE '.implode(' AND ', $sqlWhere);
 			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
+				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s".', $sql));
 			}
 		}
 		return true;
