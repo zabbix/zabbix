@@ -2074,7 +2074,6 @@
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			'neplatné parametry pro',
 	'S_NO_HOST_WITH'=>				'Neexistuje hostitel s',
 	'S_ADDED_NEW_APPLICATION'=>			'Přidána nová aplikace',
-	'S_UPDATED_APPLICATION'=>			'Aktualizována aplikace',
 	'S_USED_BY_ITEM_SMALL'=>			'použita položkou',
 	'S_NO_APPLICATION_WITH'=>			'Neexistuje aplikace s',
 	'S_UNLINKED_SMALL'=>				'odpojený',
@@ -2121,10 +2120,8 @@
 	'S_INCORRECT_TRIGGER_EXPRESSION'=>			'Neplatný výraz spouštěče',
 	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		'Nelze použít hostitele ze šablon ve smíšených výrazech.',
 	'S_ADDED_TRIGGER'=>					'Přidán spouštěč',
-	'S_TO_HOST_SMALL'=>					'k hostiteli',
 	'S_MISSING_KEY'=>					'Chybí klíč',
 	'S_INCORRECT_FUNCTION_IS_USED'=>			'Není použita platná funkce',
-	'S_FROM_HOST_SMALL'=>					'od hostitele',
 	'S_0_OR_1'=>						'0 nebo 1',
 	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'Výraz spouštěče musí obsahovat alespoň jednu položku.',
 	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Hostitel neexistuje.',
@@ -2154,8 +2151,6 @@
 	'S_MUST_USE_ITEMS_ONLY_FROM_HOST'=>			'Můžete použít položky pouze z hostitele',
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'pro šablonu grafu',
 	'S_UPDATED_FOR_HOSTS'=>					'aktualizován pro hostitele',
-	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graf "',
-	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" byl smazaný z hostitelů',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Nepodařilo se načíst nastavení',

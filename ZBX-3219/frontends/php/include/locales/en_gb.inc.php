@@ -2170,7 +2170,6 @@
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			'incorrect parameters for',
 	'S_NO_HOST_WITH'=>				'No host with',
 	'S_ADDED_NEW_APPLICATION'=>			'Added new application',
-	'S_UPDATED_APPLICATION'=>			'Updated application',
 	'S_USED_BY_ITEM_SMALL'=>			'used by item',
 	'S_NO_APPLICATION_WITH'=>			'No application with',
 	'S_UNLINKED_SMALL'=>				'unlinked',
@@ -2218,10 +2217,8 @@
 	'S_INCORRECT_TRIGGER_EXPRESSION'=>			'Incorrect trigger expression',
 	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		'You can not use template hosts in mixed expressions.',
 	'S_ADDED_TRIGGER'=>					'Added new trigger',
-	'S_TO_HOST_SMALL'=>					'to host',
 	'S_MISSING_KEY'=>					'Missing key',
 	'S_INCORRECT_FUNCTION_IS_USED'=>			'Incorrect function is used',
-	'S_FROM_HOST_SMALL'=>					'from host',
 	'S_0_OR_1'=>						'0 or 1',
 	'S_TRIGGER_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>	'At least one item must be present in the trigger expression.',
 	'S_EXPRESSION_HOST_DOES_NOT_EXISTS_ERROR'=>		'Host does not exist.',
@@ -2254,8 +2251,6 @@
 	'S_MUST_USE_ITEMS_ONLY_FROM_HOST'=>			'You must use items only from host',
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
-	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graph "',
-	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" deleted from host',
 
 //	profiles.inc.php
 	'S_UNABLE_TO_SELECT_CONFIGURATION'=>	'Unable to select configuration',

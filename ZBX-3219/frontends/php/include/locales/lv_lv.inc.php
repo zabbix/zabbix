@@ -479,7 +479,6 @@
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART1'=>			'Funkcija \'',
 	'S_EXPRESSION_FUNCTION_DOES_NOT_ACCEPTS_PARAMS_ERROR_PART2'=>			'\' nepieņem parametrus',
 	'S_DELETE_IT_Q'=>			'Izdzēst?',
-	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Grafiks "',
 	'S_EVERY_SMALL'=>			'katru',
 	'S_DAY_SMALL'=>			'diena',
 	'S_WEEKS_SMALL'=>			'nedēļas',
