@@ -3526,24 +3526,23 @@
 					' ORDER BY e.expression_type';
 
 			$db_exps = DBselect($sql);
-			while($exp = DBfetch($db_exps)){
+			while ($exp = DBfetch($db_exps)) {
 				$expressions[] = $exp;
 			}
 		}
-		else{
+		else {
 			$expressions = get_request('expressions',array());
 		}
 
 		$tblExp = new CTableInfo();
 		$tblExp->setHeader(array(
-				new CCheckBox('all_expressions', null, 'checkAll("regularExpressionsForm", "all_expressions", "g_expressionid");'),
-				_('Expression'),
-				_('Expected result'),
-				_('Case sensitive'),
-				_('Edit')
-			));
+			new CCheckBox('all_expressions', null, 'checkAll("regularExpressionsForm", "all_expressions", "g_expressionid");'),
+			_('Expression'),
+			_('Expected result'),
+			_('Case sensitive'),
+			_('Edit')
+		));
 
-//		zbx_rksort($timeperiods);
 		foreach($expressions as $id => $expression){
 
 			$exp_result = expression_type2str($expression['expression_type']);
@@ -3558,10 +3557,13 @@
 				new CSubmit('edit_expressionid['.$id.']', _('Edit'))
 			));
 
-			$tblExp->addItem(new CVar('expressions['.$id.'][expression]',		$expression['expression']));
-			$tblExp->addItem(new CVar('expressions['.$id.'][expression_type]',	$expression['expression_type']));
-			$tblExp->addItem(new CVar('expressions['.$id.'][case_sensitive]',	$expression['case_sensitive']));
-			$tblExp->addItem(new CVar('expressions['.$id.'][exp_delimiter]',	$expression['exp_delimiter']));
+			if (isset($expression['expressionid'])) {
+				$tblExp->addItem(new CVar('expressions['.$id.'][expressionid]', $expression['expressionid']));
+			}
+			$tblExp->addItem(new CVar('expressions['.$id.'][expression]', $expression['expression']));
+			$tblExp->addItem(new CVar('expressions['.$id.'][expression_type]', $expression['expression_type']));
+			$tblExp->addItem(new CVar('expressions['.$id.'][case_sensitive]', $expression['case_sensitive']));
+			$tblExp->addItem(new CVar('expressions['.$id.'][exp_delimiter]', $expression['exp_delimiter']));
 		}
 
 		$buttons = array();
@@ -3592,10 +3594,13 @@
 			$new_expression = array();
 		}
 
-		if(!isset($new_expression['expression']))			$new_expression['expression']		= '';
-		if(!isset($new_expression['expression_type']))		$new_expression['expression_type']	= EXPRESSION_TYPE_INCLUDED;
-		if(!isset($new_expression['case_sensitive']))		$new_expression['case_sensitive']	= 0;
-		if(!isset($new_expression['exp_delimiter']))		$new_expression['exp_delimiter']	= ',';
+		if (isset($new_expression['expressionid'])) {
+			$tblExp->addItem(new CVar('new_expression[expressionid]', $new_expression['expressionid']));
+		}
+		if(!isset($new_expression['expression'])) $new_expression['expression']		= '';
+		if(!isset($new_expression['expression_type'])) $new_expression['expression_type']	= EXPRESSION_TYPE_INCLUDED;
+		if(!isset($new_expression['case_sensitive'])) $new_expression['case_sensitive']	= 0;
+		if(!isset($new_expression['exp_delimiter'])) $new_expression['exp_delimiter']	= ',';
 
 		$tblExp->addRow(array(_('Expression'), new CTextBox('new_expression[expression]', $new_expression['expression'], 60)));
 
