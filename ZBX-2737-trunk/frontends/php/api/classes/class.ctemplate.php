@@ -1906,16 +1906,6 @@ COpt::memoryPick();
 			$flags = array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD);
 		}
 
-		$host = array();
-
-		if (!is_null($targetids)) {
-			$host = get_host_by_hostid(reset($targetids));
-		}
-		else {
-			$host = get_host_by_hostid(reset($templateids));
-		}
-
-
 /* TRIGGERS {{{ */
 		// check that all triggers on templates that we unlink, don't have items from another templates
 		$sql = 'SELECT DISTINCT t.description'.
@@ -1939,36 +1929,42 @@ COpt::memoryPick();
 		}
 
 
-		$sql_from = 'triggers t';
-		$sql_where = ' EXISTS ('.
-				' SELECT ff.triggerid'.
-				' FROM functions ff, items ii'.
-				' WHERE ff.triggerid=t.templateid'.
-					' AND ii.itemid=ff.itemid'.
+		$sql_from = 'triggers t ';
+		$sql_where = ' EXISTS ( '.
+				' SELECT ff.triggerid '.
+				' FROM functions ff, items ii '.
+				' WHERE ff.triggerid=t.templateid '.
+					' AND ii.itemid=ff.itemid '.
 					' AND '.DBCondition('ii.hostid', $templateids).')'.
 				' AND '.DBCondition('t.flags', $flags);
 
 
 		if(!is_null($targetids)){
-			$sql_from = 'triggers t, functions f, items i';
+			$sql_from = ' triggers t, functions f, items i, hosts h ';
 			$sql_where .= ' AND '.DBCondition('i.hostid', $targetids).
-				' AND f.itemid=i.itemid'.
-				' AND t.triggerid=f.triggerid';
+				' AND f.itemid=i.itemid '.
+				' AND t.triggerid=f.triggerid '.
+				' AND h.hostid=i.hostid ';
 		}
-		$sql = 'SELECT DISTINCT t.triggerid, t.description, t.flags, t.expression'.
+		$sql = 'SELECT DISTINCT t.triggerid, t.description, t.flags, t.expression, h.host '.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_triggers = DBSelect($sql);
 		$triggers = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array(),
+			ZBX_FLAG_DISCOVERY_CHILD => array()
 		);
+		$triggerids = array();
 		while($trigger = DBfetch($db_triggers)){
 			$triggers[$trigger['flags']][$trigger['triggerid']] = array(
 				'description' => $trigger['description'],
 				'expression' => explode_exp($trigger['expression']),
-				'triggerid' => $trigger['triggerid']
+				'triggerid' => $trigger['triggerid'],
+				'host' => $trigger['host']
 			);
+			if (!in_array($trigger['triggerid'], $triggerids)) {
+				array_push($triggerids, $trigger['triggerid']);
+			}
 		}
 
 		if(!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])){
@@ -1983,8 +1979,7 @@ COpt::memoryPick();
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
-					$host = get_host_by_triggerid($trigger['triggerid']);
-					info(_s('Unlinked: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['host']));
+					info(_s('Unlinked: Trigger "%1$s" on "%2$s".', $trigger['description'], $trigger['host']));
 				}
 			}
 		}
@@ -2001,8 +1996,7 @@ COpt::memoryPick();
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger){
-					$host = get_host_by_triggerid($trigger['triggerid']);
-					info(_s('Unlinked: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], $host['host']));
+					info(_s('Unlinked: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], $trigger['host']));
 				}
 			}
 		}
@@ -2010,15 +2004,16 @@ COpt::memoryPick();
 
 
 /* ITEMS, DISCOVERY RULES {{{ */
-		$sql_from = 'items i1,items i2';
-		$sql_where = 'i2.itemid=i1.templateid'.
+		$sql_from = ' items i1, items i2, hosts h ';
+		$sql_where = ' i2.itemid=i1.templateid '.
 			' AND '.DBCondition('i2.hostid', $templateids).
-			' AND '.DBCondition('i1.flags', $flags);
+			' AND '.DBCondition('i1.flags', $flags).
+			' AND h.hostid=i1.hostid ';
 
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,i1.name,i1.hostid'.
+		$sql = 'SELECT DISTINCT i1.itemid, i1.flags, i1.name, i1.hostid, h.host '.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_items = DBSelect($sql);
@@ -2030,7 +2025,7 @@ COpt::memoryPick();
 		while($item = DBfetch($db_items)){
 			$items[$item['flags']][$item['itemid']] = array(
 				'name' => $item['name'],
-				'hostid' => $item['hostid']
+				'host' => $item['host']
 			);
 		}
 
@@ -2045,14 +2040,8 @@ COpt::memoryPick();
 					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY]))
 				));
 
-				$host_id = "";
-
 				foreach($items[ZBX_FLAG_DISCOVERY] as $discoveryRule){
-					if ($host_id != $discoveryRule['hostid']) {
-						$host_id  = $discoveryRule['hostid'];
-						$host = get_host_by_hostid($host_id);
-					}
-					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['name'], $host['host']));
+					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['name'], $discoveryRule['host']));
 				}
 			}
 		}
@@ -2069,14 +2058,8 @@ COpt::memoryPick();
 					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_NORMAL]))
 				));
 
-				$host_id = "";
-
 				foreach($items[ZBX_FLAG_DISCOVERY_NORMAL] as $item){
-					if ($host_id != $item['hostid']) {
-						$host_id  = $item['hostid'];
-						$host = get_host_by_hostid($host_id);
-					}
-					info(_s('Unlinked: Item "%1$s" on "%2$s".', $item['name'], $host['host']));
+					info(_s('Unlinked: Item "%1$s" on "%2$s".', $item['name'], $item['host']));
 				}
 			}
 		}
@@ -2093,14 +2076,8 @@ COpt::memoryPick();
 					'where' => array('itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_CHILD]))
 				));
 
-				$host_id = "";
-
 				foreach($items[ZBX_FLAG_DISCOVERY_CHILD] as $item){
-					if ($host_id != $item['hostid']) {
-						$host_id  = $item['hostid'];
-						$host = get_host_by_hostid($host_id);
-					}
-					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $host['host']));
+					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
 				}
 			}
 		}
@@ -2108,23 +2085,24 @@ COpt::memoryPick();
 
 
 /* GRAPHS {{{ */
-		$sql_from = 'graphs g';
-		$sql_where = ' EXISTS ('.
-				' SELECT ggi.graphid'.
-				' FROM graphs_items ggi, items ii'.
-				' WHERE ggi.graphid=g.templateid'.
-					' AND ii.itemid=ggi.itemid'.
+		$sql_from = ' graphs g ';
+		$sql_where = ' EXISTS ( '.
+				' SELECT ggi.graphid '.
+				' FROM graphs_items ggi, items ii '.
+				' WHERE ggi.graphid=g.templateid '.
+					' AND ii.itemid=ggi.itemid '.
 					' AND '.DBCondition('ii.hostid', $templateids).')'.
 				' AND '.DBCondition('g.flags', $flags);
 
 
 		if(!is_null($targetids)){
-			$sql_from = 'graphs g, graphs_items gi, items i';
+			$sql_from = ' graphs g, graphs_items gi, items i, hosts h ';
 			$sql_where .= ' AND '.DBCondition('i.hostid', $targetids).
-  				' AND gi.itemid=i.itemid'.
-				' AND g.graphid=gi.graphid';
+				' AND gi.itemid=i.itemid '.
+				' AND g.graphid=gi.graphid '.
+				' AND h.hostid=i.hostid ';
 		}
-		$sql = 'SELECT DISTINCT g.graphid, g.name, g.flags'.
+		$sql = 'SELECT DISTINCT g.graphid, g.name, g.flags, h.host '.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_graphs = DBSelect($sql);
@@ -2135,7 +2113,8 @@ COpt::memoryPick();
 		while($graph = DBfetch($db_graphs)){
 			$graphs[$graph['flags']][$graph['graphid']] = array(
 				'name' => $graph['name'],
-				'graphid' => $graph['graphid']
+				'graphid' => $graph['graphid'],
+				'host' => $graph['host']
 			);
 		}
 
@@ -2151,8 +2130,7 @@ COpt::memoryPick();
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_CHILD] as $graph){
-					$host = get_host_by_graphid($graph['graphid']);
-					info(_s('Unlinked: Graph prototype "%1$s" on "%2$s".', $graph['name'], $host['host']));
+					info(_s('Unlinked: Graph prototype "%1$s" on "%2$s".', $graph['name'], $graph['host']));
 				}
 			}
 		}
@@ -2170,8 +2148,7 @@ COpt::memoryPick();
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_NORMAL] as $graph){
-					$host = get_host_by_graphid($graph['graphid']);
-					info(_s('Unlinked: Graph "%1$s" on "%2$s".', $graph['name'], $host['host']));
+					info(_s('Unlinked: Graph "%1$s" on "%2$s".', $graph['name'], $graph['host']));
 				}
 			}
 		}
@@ -2179,13 +2156,14 @@ COpt::memoryPick();
 
 
 /* APPLICATIONS {{{ */
-		$sql_from = 'applications a1, applications a2';
-		$sql_where = ' a2.applicationid=a1.templateid'.
-			' AND '.DBCondition('a2.hostid', $templateids);
+		$sql_from = 'applications a1, applications a2, hosts h ';
+		$sql_where = ' a2.applicationid=a1.templateid '.
+			' AND '.DBCondition('a2.hostid', $templateids).
+			' AND h.hostid=a1.hostid ';
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('a1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT a1.applicationid, a1.name, a1.hostid'.
+		$sql = 'SELECT DISTINCT a1.applicationid, a1.name, a1.hostid, h.host'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_applications = DBSelect($sql);
@@ -2193,7 +2171,8 @@ COpt::memoryPick();
 		while($application = DBfetch($db_applications)){
 			$applications[$application['applicationid']] = array(
 				'name' => $application['name'],
-				'hostid' => $application['hostid']
+				'hostid' => $application['hostid'],
+				'host' => $application['host']
 			);
 		}
 
@@ -2208,14 +2187,8 @@ COpt::memoryPick();
 					'where' => array('applicationid' => array_keys($applications))
 				));
 
-				$host_id = "";
-
 				foreach($applications as $application){
-					if ($host_id != $application['hostid']) {
-						$host_id  = $application['hostid'];
-						$host = get_host_by_hostid($host_id);
-					}
-					info(_s('Unlinked: Application "%1$s" on "%2$s".', $application['name'], $host['host']));
+					info(_s('Unlinked: Application "%1$s" on "%2$s".', $application['name'], $application['host']));
 				}
 			}
 		}
