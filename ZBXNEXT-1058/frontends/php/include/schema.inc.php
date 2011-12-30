@@ -5533,7 +5533,7 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
-			'ts_clock' => array(
+			'ts_delete' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
