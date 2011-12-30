@@ -2018,7 +2018,7 @@ COpt::memoryPick();
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid, i1.key_, i1.flags, i1.name, i1.hostid'.
+		$sql = 'SELECT DISTINCT i1.itemid, i1.flags, i1.name, i1.hostid'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_items = DBSelect($sql);
@@ -2030,7 +2030,6 @@ COpt::memoryPick();
 		while($item = DBfetch($db_items)){
 			$items[$item['flags']][$item['itemid']] = array(
 				'name' => $item['name'],
-				'key_' => $item['key_'],
 				'hostid' => $item['hostid']
 			);
 		}
@@ -2053,7 +2052,7 @@ COpt::memoryPick();
 						$host_id  = $discoveryRule['hostid'];
 						$host = get_host_by_hostid($host_id);
 					}
-					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['key_'], $host['host']));
+					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['name'], $host['host']));
 				}
 			}
 		}
@@ -2077,7 +2076,7 @@ COpt::memoryPick();
 						$host_id  = $item['hostid'];
 						$host = get_host_by_hostid($host_id);
 					}
-					info(_s('Unlinked: Item "%1$s" on "%2$s".', $item['key_'], $host['host']));
+					info(_s('Unlinked: Item "%1$s" on "%2$s".', $item['name'], $host['host']));
 				}
 			}
 		}
@@ -2101,7 +2100,7 @@ COpt::memoryPick();
 						$host_id  = $item['hostid'];
 						$host = get_host_by_hostid($host_id);
 					}
-					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['key_'], $host['host']));
+					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $host['host']));
 				}
 			}
 		}

@@ -601,13 +601,13 @@ COpt::memoryPick();
 // TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
+			'output' => array('name'),
 			'selectHosts' => array('host'),
 			'nopermissions' => 1
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Created: Item prototype "%1$s" on "%2$s".', $item['key_'], $host['host']));
+			info(_s('Created: Item prototype "%1$s" on "%2$s".', $item['name'], $host['host']));
 		}
 	}
 
@@ -657,13 +657,13 @@ COpt::memoryPick();
 // TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
+			'output' => array('name'),
 			'selectHosts' => array('host'),
 			'nopermissions' => 1,
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Updated: Item prototype "%1$s" on "%2$s".', $item['key_'], $host['host']));
+			info(_s('Updated: Item prototype "%1$s" on "%2$s".', $item['name'], $host['host']));
 		}
 	}
 
@@ -700,6 +700,7 @@ COpt::memoryPick();
 				'editable' => 1,
 				'preservekeys' => 1,
 				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('host'),
 			);
 			$del_itemPrototypes = $this->get($options);
 
@@ -732,6 +733,7 @@ COpt::memoryPick();
 				'itemids' => $child_prototypeids,
 				'nopermissions' => true,
 				'preservekeys' => true,
+				'selectHosts' => array('host'),
 			);
 			$del_itemPrototypes_childs = $this->get($options);
 
@@ -811,7 +813,8 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach($del_itemPrototypes as $item){
-				info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['key_'], $item['name']));
+				$host = reset($item['hosts']);
+				info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['host']));
 			}
 
 			return array('prototypeids' => $prototypeids);

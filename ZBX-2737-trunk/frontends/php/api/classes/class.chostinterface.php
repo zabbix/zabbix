@@ -913,7 +913,7 @@ Copt::memoryPick();
 
 	private function checkIfInterfaceHasItems(array $interfaceIds) {
 		$items = API::Item()->get(array(
-			'output' => array('key_'),
+			'output' => array('name'),
 			'selectHosts' => array('host'),
 			'interfaceids' => $interfaceIds,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -924,7 +924,7 @@ Copt::memoryPick();
 
 		foreach ($items as $item) {
 			$host = reset($item['hosts']);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%1$s" on "%2$s"', $item['key_'], $host['host']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%1$s" on "%2$s"', $item['name'], $host['host']));
 		}
 	}
 }

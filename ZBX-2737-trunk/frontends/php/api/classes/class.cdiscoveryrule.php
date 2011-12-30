@@ -578,6 +578,7 @@ COpt::memoryPick();
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true,
+			'selectHosts' => array('host'),
 		);
 		$del_rules = $this->get($options);
 
@@ -609,7 +610,8 @@ COpt::memoryPick();
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $child_ruleids,
 			'nopermissions' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'selectHosts' => array('host'),
 		);
 		$del_rules_childs = $this->get($options);
 
@@ -656,14 +658,9 @@ COpt::memoryPick();
 		DB::insert('housekeeper', $insert);
 
 		// TODO: remove info from API
-		$host_id = "";
-
 		foreach ($del_rules as $item) {
-			if ($host_id != $item['hostid']) {
-				$host_id  = $item['hostid'];
-				$host = get_host_by_hostid($host_id);
-			}
-			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['key_'], $host['host']));
+			$host = reset($item['hosts']);
+			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['host']));
 		}
 
 		return array('ruleids' => $ruleids);
@@ -910,7 +907,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Created: Discovery rule "%1$s" on "%2$s".', $item['key_'], $host['host']));
+			info(_s('Created: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['host']));
 		}
 	}
 
@@ -967,7 +964,7 @@ COpt::memoryPick();
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['host'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
+			info(_s('Updated: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['host']));
 		}
 
 	}

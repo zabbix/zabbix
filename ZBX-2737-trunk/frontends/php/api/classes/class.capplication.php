@@ -579,7 +579,8 @@ class CApplication extends CZBXAPI {
 			'applicationids' => $applicationids,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'selectHosts' => API_OUTPUT_EXTEND,
 		);
 		$del_applications = $this->get($options);
 
@@ -609,7 +610,8 @@ class CApplication extends CZBXAPI {
 			'applicationids' => $child_applicationids,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'selectHosts' => API_OUTPUT_EXTEND,
 		);
 		$del_application_childs = $this->get($options);
 		$del_applications = zbx_array_merge($del_applications, $del_application_childs);
@@ -626,14 +628,9 @@ class CApplication extends CZBXAPI {
 
 		DB::delete('applications', array('applicationid' => $applicationids));
 
-		$host_id = "";
-
 		// TODO: remove info from API
 		foreach ($del_applications as $del_application) {
-			if ($host_id != $del_application['hostid']) {
-				$host_id  = $del_application['hostid'];
-				$host = get_host_by_hostid($host_id);
-			}
+			$host = reset($del_application['hosts']);
 			info(_s('Deleted: Application "%1$s" on "%2$s".', $del_application['name'], $host['host']));
 		}
 		return array('applicationids' => $applicationids);

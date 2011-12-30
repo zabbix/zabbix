@@ -990,7 +990,8 @@ class CGraph extends CZBXAPI {
 			'graphids' => $graphids,
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
+			'preservekeys' => 1,
+			'selectHosts' => array('host'),
 		);
 		$del_graphs = $this->get($options);
 
@@ -1015,12 +1016,6 @@ class CGraph extends CZBXAPI {
 			}
 		} while (!empty($parent_graphids));
 
-		// Building hosts list
-		$hosts = array();
-		foreach ($del_graphs as $graphid => $graph) {
-				$hosts[$graphid] = get_host_by_graphid($graph['graphid']);
-		}
-
 		DB::delete('screens_items', array(
 			'resourceid' => $graphids,
 			'resourcetype' => SCREEN_RESOURCE_GRAPH
@@ -1038,7 +1033,8 @@ class CGraph extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_graphs as $graphid => $graph) {
-			info(_s('Deleted: Graph "%1$s" on "%2$s".', $graph['name'], $hosts[$graphid]['host']));
+			$host = reset($graph['hosts']);
+			info(_s('Deleted: Graph "%1$s" on "%2$s".', $graph['name'], $host['host']));
 		}
 
 		return array('graphids' => $graphids);

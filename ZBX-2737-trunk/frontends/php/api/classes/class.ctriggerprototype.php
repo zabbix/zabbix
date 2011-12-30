@@ -1110,10 +1110,9 @@ COpt::memoryPick();
 			$createdTriggers = $this->get(array(
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_REFER,
-				'selectItems' => API_OUTPUT_EXTEND
+				'selectItems' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('host'),
 			));
-
-			$host = get_host_by_triggerid($createdTriggers['triggerids']);
 
 			foreach($createdTriggers as $createdTrigger){
 				$has_prototype = false;
@@ -1132,6 +1131,7 @@ COpt::memoryPick();
 
 			foreach($triggers as $trigger) {
 				$this->inherit($trigger);
+				$host = reset($trigger['hosts']);
 				info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['host']));
 			}
 
@@ -1325,7 +1325,12 @@ COpt::memoryPick();
 
 		$triggerids = DB::insert('triggers', $triggers);
 
-		$host = get_host_by_triggerid($triggerids);
+		$dbHosts = API::Host()->get(array(
+			'output' => array('host'),
+			'triggerids' => $triggers
+		));
+
+		$host = reset($dbHosts);
 
 		foreach($triggers as $tnum => $trigger){
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];

@@ -955,13 +955,13 @@ class CItem extends CItemGeneral {
 // TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
+			'output' => array('name'),
 			'selectHosts' => array('host'),
 			'nopermissions' => 1
 		));
 		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
-			info(_s('Created: Item "%1$s" on "%2$s".', $item['key_'], $host['host']));
+			info(_s('Created: Item "%1$s" on "%2$s".', $item['name'], $host['host']));
 		}
 	}
 
@@ -1019,13 +1019,13 @@ class CItem extends CItemGeneral {
 // TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
+			'output' => array('name'),
 			'selectHosts' => array('host'),
 			'nopermissions' => 1,
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(_s('Updated: Item "%1$s" on "%2$s".', $item['key_'], $host['host']));
+			info(_s('Updated: Item "%1$s" on "%2$s".', $item['name'], $host['host']));
 		}
 	}
 
@@ -1065,6 +1065,7 @@ class CItem extends CItemGeneral {
 				'editable' => true,
 				'preservekeys' => true,
 				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('host'),
 			);
 			$del_items = $this->get($options);
 
@@ -1164,14 +1165,9 @@ class CItem extends CItemGeneral {
 			DB::insert('housekeeper', $insert);
 
 			// TODO: remove info from API
-			$host_id = "";
-
 			foreach ($del_items as $item) {
-				if ($host_id != $item['hostid']) {
-					$host_id  = $item['hostid'];
-					$host = get_host_by_hostid($host_id);
-				}
-				info(_s('Deleted: Item "%1$s" on "%2$s".', $item['key_'], $host['host']));
+				$host = reset($item['hosts']);
+				info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['host']));
 			}
 
 			return array('itemids' => $itemids);
