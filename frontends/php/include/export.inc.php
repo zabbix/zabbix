@@ -244,7 +244,7 @@ class zbxXML{
 		'ssh_perf'
 	);
 
-	protected static function mapProfileName($name){
+	protected static function mapInventoryName($name) {
 		$map = array(
 			'devicetype' => 'type',
 			'serialno' => 'serialno_a',
@@ -1149,7 +1149,7 @@ class zbxXML{
 								$host_db['inventory'] = array();
 							}
 							foreach ($inventoryNode as $field) {
-								$newInventoryName = self::mapProfileName($field->nodeName);
+								$newInventoryName = self::mapInventoryName($field->nodeName);
 								$host_db['inventory'][$newInventoryName] = $field->nodeValue;
 							}
 						}
@@ -1160,7 +1160,7 @@ class zbxXML{
 								$host_db['inventory'] = array();
 							}
 							foreach ($inventoryNodeExt as $field) {
-								$newInventoryName = self::mapProfileName($field->nodeName);
+								$newInventoryName = self::mapInventoryName($field->nodeName);
 								if (isset($host_db['inventory'][$newInventoryName]) && $field->nodeValue !== '') {
 									$host_db['inventory'][$newInventoryName] .= "\r\n\r\n";
 									$host_db['inventory'][$newInventoryName] .= $field->nodeValue;
@@ -1220,12 +1220,12 @@ class zbxXML{
 						$items = $xpath->query('items/item', $host);
 
 						// if this is an export from 1.8, we need to make some adjustments to items
-						if($old_version_input){
-							if(!$interfaces_created_with_host){
+						if ($old_version_input) {
+							if (!$interfaces_created_with_host) {
 								// if host had another interfaces, we are not touching them: they remain as is
-								foreach($interfaces as $i => $interface){
+								foreach ($interfaces as $i => $interface) {
 									// interface was not already created
-									if(!isset($interface['interfaceid'])){
+									if (!isset($interface['interfaceid'])) {
 										// creating interface
 										$interface['hostid'] = $current_hostid;
 										$ids = API::HostInterface()->create($interface);
@@ -1234,7 +1234,7 @@ class zbxXML{
 									}
 								}
 							}
-							else{
+							else {
 								$options = array(
 									'hostids' => $current_hostid,
 									'output' => API_OUTPUT_EXTEND
@@ -1249,8 +1249,8 @@ class zbxXML{
 							$ipmi_interface_id = null;
 							$snmp_interfaces = array(); //hash 'port' => 'iterfaceid'
 
-							foreach($interfaces as $interface){
-								switch($interface['type']){
+							foreach ($interfaces as $interface) {
+								switch ($interface['type']) {
 									case INTERFACE_TYPE_AGENT:
 										$agent_interface_id = $interface['interfaceid'];
 									break;
@@ -1264,22 +1264,21 @@ class zbxXML{
 							}
 						}
 
-						foreach($items as $inum => $item){
+						foreach ($items as $item) {
 							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 							$item_db['hostid'] = $current_hostid;
-							$item_db['profile_link'] = 0;
 
 							// item needs interfaces
-							if($old_version_input){
+							if ($old_version_input) {
 								// 'snmp_port' column was renamed to 'port'
-								if($item_db['snmp_port'] != 0){
+								if ($item_db['snmp_port'] != 0) {
 									// zabbix agent items have no ports
 									$item_db['port'] = $item_db['snmp_port'];
 								}
 								unset($item_db['snmp_port']);
 
 								// assigning appropriate interface depending on item type
-								switch($item_db['type']){
+								switch ($item_db['type']) {
 									// zabbix agent interface
 									case ITEM_TYPE_ZABBIX:
 									case ITEM_TYPE_SIMPLE:
