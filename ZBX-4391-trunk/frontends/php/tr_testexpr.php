@@ -22,7 +22,7 @@
 require_once('include/config.inc.php');
 require_once('include/triggers.inc.php');
 
-$page['title'] = S_TEST;
+$page['title'] = _('Test');
 $page['file'] = 'tr_testexpr.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
@@ -30,10 +30,11 @@ define('COMBO_PATTERN', 'str_in_array({},array(');
 define('COMBO_PATTERN_LENGTH', zbx_strlen(COMBO_PATTERN));
 
 $definedErrorPhrases = array(
-			EXPRESSION_VALUE_TYPE_UNKNOWN => S_EXPRESSION_VALUE_TYPE_UNKNOWN,
-			EXPRESSION_HOST_UNKNOWN => S_EXPRESSION_HOST_UNKNOWN,
-			EXPRESSION_HOST_ITEM_UNKNOWN => S_EXPRESSION_HOST_ITEM_UNKNOWN,
-			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
+	EXPRESSION_VALUE_TYPE_UNKNOWN => _('Unknown variable type, testing not available'),
+	EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
+	EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
+	EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro')
+);
 
 require_once('include/page_header.php');
 ?>
@@ -111,7 +112,7 @@ require_once('include/page_header.php');
 
 //------------------------ <FORM> ---------------------------
 
-	$frm_test = new CFormTable(S_TEST, 'tr_testexpr.php');
+	$frm_test = new CFormTable(_('Test'), 'tr_testexpr.php');
 	$frm_test->setHelp('web.testexpr.service.php');
 	$frm_test->setTableClass('formlongtable formtable');
 	$frm_test->addVar('form_refresh', get_request('form_refresh', 1));
@@ -125,7 +126,7 @@ require_once('include/page_header.php');
 	$res_table->setAttribute('id', 'result_list');
 	$res_table->setOddRowClass('even_row');
 	$res_table->setEvenRowClass('even_row');
-	$res_table->setHeader(array(S_EXPRESSION, S_RESULT));
+	$res_table->setHeader(array(_('Expression'), _('Result')));
 
 	ksort($rplcts, SORT_NUMERIC);
 
@@ -160,7 +161,7 @@ require_once('include/page_header.php');
 	$frm_test->addRow(S_RESULT, $res_table);
 
 // action buttons
-	$btn_test = new CSubmit('test_expression', S_TEST);
+	$btn_test = new CSubmit('test_expression', _('Test'));
 	if(!$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 	$frm_test->addItemToBottomRow($btn_test);
 	$frm_test->addItemToBottomRow(SPACE);

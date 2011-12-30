@@ -32,7 +32,7 @@ class testPageScripts extends CWebTest
 	/**
 	* @dataProvider allScripts
 	*/
-	public function testPageScripts_SimpleTest($script)
+	public function testPageScripts_CheckLayout($script)
 	{
 		$this->login('scripts.php');
 		$this->assertTitle('Scripts');

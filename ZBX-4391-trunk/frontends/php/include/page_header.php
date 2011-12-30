@@ -46,50 +46,70 @@ switch ($page['type']) {
 	case PAGE_TYPE_XML:
 		header('Content-Type: text/xml');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_JS:
 		header('Content-Type: application/javascript; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_JSON:
 		header('Content-Type: application/json');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_JSON_RPC:
 		header('Content-Type: application/json-rpc');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_JSON_RPC:
 		header('Content-Type: application/json-rpc');
-		if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if(!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_CSS:
 		header('Content-Type: text/css; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_TEXT:
 		header('Content-Type: text/plain; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_TEXT_FILE:
 		header('Content-Type: text/plain; charset=UTF-8');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_CSV:
 		header('Content-Type: text/csv; charset=UTF-8');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_HTML:
 	default:
 		if (!isset($page['encoding'])) {
-			header('Content-Type: text/html; charset='.S_HTML_CHARSET);
+			header('Content-Type: text/html; charset=UTF-8');
 		}
 		else {
 			header('Content-Type: text/html; charset='.$page['encoding']);
@@ -105,8 +125,8 @@ switch ($page['type']) {
 		}
 		$page_title = defined($page['title']) ? constant($page['title']) : $page['title'];
 		if (ZBX_DISTRIBUTED) {
-			if (isset($ZBX_VIEWED_NODES) && ($ZBX_VIEWED_NODES['selected'] == 0)) { // all selected
-				$page_title .= ' ('.S_ALL_NODES.') ';
+			if (isset($ZBX_VIEWED_NODES) && $ZBX_VIEWED_NODES['selected'] == 0) { // all selected
+				$page_title .= ' ('._('All nodes').') ';
 			}
 			elseif (!empty($ZBX_NODES)) {
 				$page_title .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
@@ -324,7 +344,6 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$div_node_tree = new CDiv();
 			$div_node_tree->addItem($node_tree->getHTML());
 			$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display:'none'});"));
-
 			$div_node_tree->setAttribute('id', 'div_node_tree');
 			$div_node_tree->addStyle('display: none');
 

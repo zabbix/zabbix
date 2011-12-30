@@ -40,12 +40,11 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-	$resize = 0;
-
-	if(isset($_REQUEST['width']) || isset($_REQUEST['height'])){
-		$resize = 1;
-		$th_width = get_request('width',0);
-		$th_height = get_request('height',0);
+	$resize = false;
+	if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
+		$resize = true;
+		$width = get_request('width', 0);
+		$height = get_request('height', 0);
 	}
 
 	if(!($row = get_image_by_imageid($_REQUEST['imageid']))){
@@ -53,53 +52,12 @@ require_once('include/page_header.php');
 		require_once('include/page_footer.php');
 	}
 
-	$source = imagecreatefromstring($row['image']);
+	$source = imageFromString($row['image']);
 
 	unset($row);
 
-	if($resize == 1){
-		$src_width	= imagesx($source);
-		$src_height	= imagesy($source);
-
-		if($src_width > $th_width || $src_height > $th_height){
-			if($th_width == 0){
-				$th_width = $th_height * $src_width/$src_height;
-			}
-			else if($th_height == 0){
-				$th_height = $th_width * $src_height/$src_width;
-			}
-			else {
-				$a = $th_width/$th_height;
-				$b = $src_width/$src_height;
-
-				if($a > $b){
-					$th_width  = $b * $th_height;
-					$th_height = $th_height;
-				}
-				else {
-					$th_height = $th_width/$b;
-					$th_width  = $th_width;
-				}
-			}
-
-			if(function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1)){
-				$thumb = imagecreatetruecolor($th_width,$th_height);
-			}
-			else{
-				$thumb = imagecreate($th_width,$th_height);
-			}
-
-			imagecopyresized(
-				$thumb, $source,
-				0, 0,
-				0, 0,
-				$th_width, $th_height,
-				$src_width, $src_height);
-
-			imagedestroy($source);
-
-			$source = $thumb;
-		}
+	if ($resize) {
+		$source = imageThumb($source, $width, $height);
 	}
 	imageout($source);
 ?>
