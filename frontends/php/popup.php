@@ -236,6 +236,10 @@ if ($min_user_type > $USER_DETAILS['type']) {
 	access_deny();
 }
 
+$url = new CUrl();
+$path = $url->getPath();
+insert_js('cookie.eraseArray(\''.$path.'\')');
+
 ?>
 <?php
 function get_window_opener($frame, $field, $value) {
@@ -418,8 +422,8 @@ else {
 			$value2 = isset($_REQUEST['dstfld2']) && zbx_strpos($_REQUEST['dstfld2'], 'id') !== false ? 0 : '';
 
 			$epmtyScript = get_window_opener($dstfrm, $dstfld1, $value1);
-			$epmtyScript.= get_window_opener($dstfrm, $dstfld2, $value2);
-			$epmtyScript.= ' close_window(); return false;';
+			$epmtyScript .= get_window_opener($dstfrm, $dstfld2, $value2);
+			$epmtyScript .= ' close_window(); return false;';
 
 			$frmTitle->addItem(array(SPACE, new CButton('empty', _('Empty'), $epmtyScript)));
 		}
@@ -498,7 +502,6 @@ if ($srctbl == 'hosts') {
 			$status,
 			$available
 		));
-
 		unset($host);
 	}
 	$table->show();
@@ -544,7 +547,6 @@ elseif ($srctbl == 'templates') {
 	foreach ($template_list as $host) {
 		$chk = new CCheckBox('templates['.$host['hostid'].']', isset($templates[$host['hostid']]), null, $host['name']);
 		$chk->setEnabled(!isset($existed_templates[$host['hostid']]) && !isset($excludeids[$host['hostid']]));
-
 		$table->addRow(array(array($chk, $host['name'])));
 	}
 
@@ -558,7 +560,6 @@ elseif ($srctbl == 'templates') {
 	if ($real_hosts) {
 		$form->addVar('real_hosts', 1);
 	}
-
 	$form->addVar('dstfrm', $dstfrm);
 	$form->addVar('dstfld1', $dstfld1);
 	$form->addVar('srctbl', $srctbl);
@@ -587,7 +588,7 @@ elseif ($srctbl == 'host_group') {
 		'preservekeys' => true
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$hostgroups = API::HostGroup()->get($options);
 	order_result($hostgroups, 'name');
@@ -623,6 +624,8 @@ elseif ($srctbl == 'host_group') {
 		$table->setFooter(new CCol($button, 'right'));
 		insert_js('var popupReference = '.zbx_jsvalue($hostgroups, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "groups";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -647,7 +650,7 @@ elseif ($srctbl == 'host_templates') {
 		'preservekeys' => true
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$templates = API::Template()->get($options);
 	order_result($templates, 'name');
@@ -679,6 +682,8 @@ elseif ($srctbl == 'host_templates') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($templates, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "templates";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -696,7 +701,7 @@ elseif ($srctbl == 'hosts_and_templates') {
 		'sortfield' => 'name'
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$templates = API::Template()->get($options);
 
@@ -709,7 +714,7 @@ elseif ($srctbl == 'hosts_and_templates') {
 	foreach ($objects as $row) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['name'], 'link');
-		$name->setAttribute('onclick', $action." close_window(); return false;");
+		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}
 	$table->show();
@@ -734,7 +739,7 @@ elseif ($srctbl == 'usrgrp') {
 		'preservekeys' => true
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$usergroups = API::UserGroup()->get($options);
 	order_result($usergroups, 'name');
@@ -767,6 +772,7 @@ elseif ($srctbl == 'usrgrp') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($usergroups, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "usrgrps";');
 
 	$form->addItem($table);
 	$form->show();
@@ -793,7 +799,7 @@ elseif ($srctbl == 'users') {
 		'preservekeys' => true
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$users = API::User()->get($options);
 	order_result($users, 'alias');
@@ -828,6 +834,8 @@ elseif ($srctbl == 'users') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($users, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "users";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -850,7 +858,7 @@ elseif ($srctbl == 'help_items') {
 /*
  * Triggers
  */
-elseif ($srctbl == 'triggers'){
+elseif ($srctbl == 'triggers') {
 	$form = new CForm();
 	$form->setName('triggerform');
 	$form->setAttribute('id', 'triggers');
@@ -858,7 +866,7 @@ elseif ($srctbl == 'triggers'){
 	$table = new CTableInfo(_('No triggers defined.'));
 
 	$table->setHeader(array(
-		$multiselect ? new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers','triggers');") : null,
+		$multiselect ? new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');") : null,
 		_('Name'),
 		_('Severity'),
 		_('Status')
@@ -888,7 +896,7 @@ elseif ($srctbl == 'triggers'){
 		$jsTriggers = array();
 	}
 
-	foreach($triggers as $trigger) {
+	foreach ($triggers as $trigger) {
 		$host = reset($trigger['hosts']);
 		$trigger['hostname'] = $host['name'];
 
@@ -896,7 +904,7 @@ elseif ($srctbl == 'triggers'){
 		$trigger['description'] = $trigger['hostname'].':'.$trigger['description'];
 
 		if ($multiselect) {
-			$js_action = "addValue(".zbx_jsvalue($reference).", ".zbx_jsvalue($trigger['triggerid']).");";
+			$js_action = 'addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($trigger['triggerid']).');';
 		}
 		else {
 			$values = array(
@@ -920,7 +928,7 @@ elseif ($srctbl == 'triggers'){
 			}
 		}
 
-		switch($trigger['status']) {
+		switch ($trigger['status']) {
 			case TRIGGER_STATUS_DISABLED:
 				$status = new CSpan(_('Disabled'), 'disabled');
 				break;
@@ -954,6 +962,8 @@ elseif ($srctbl == 'triggers'){
 
 		insert_js('var popupReference = '.zbx_jsValue($jsTriggers, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -991,7 +1001,7 @@ elseif ($srctbl == 'items') {
 		$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 	}
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	if (!is_null($templated) && $templated == 1) {
 		$options['templated'] = $templated;
@@ -1058,6 +1068,8 @@ elseif ($srctbl == 'items') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($jsItems, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "items";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -1073,7 +1085,7 @@ elseif ($srctbl == 'prototypes') {
 
 	if ($multiselect) {
 		$header = array(
-			array(new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items','items');"), _('Name')),
+			array(new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');"), _('Name')),
 			_('Key'),
 			_('Type'),
 			_('Type of information'),
@@ -1140,6 +1152,8 @@ elseif ($srctbl == 'prototypes') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($items, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "items";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -1157,13 +1171,13 @@ elseif ($srctbl == 'applications') {
 		'nodeids' => $nodeid,
 		'hostids' => $hostid,
 		'output' => API_OUTPUT_EXTEND,
-		'expandData' => true,
+		'expandData' => true
 	);
 	if (is_null($hostid)) {
 		$options['groupids'] = $groupid;
 	}
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	if (!is_null($templated)) {
 		$options['templated'] = $templated;
@@ -1237,7 +1251,7 @@ elseif ($srctbl == 'graphs') {
 		);
 
 		if (!is_null($writeonly)) {
-			$options['editable'] = 1;
+			$options['editable'] = true;
 		}
 		if (!is_null($templated)) {
 			$options['templated'] = $templated;
@@ -1302,6 +1316,8 @@ elseif ($srctbl == 'graphs') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($graphs, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "graphs";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -1338,7 +1354,7 @@ elseif ($srctbl == 'simple_graph') {
 			'preservekeys' => true
 		);
 		if (!is_null($writeonly)) {
-			$options['editable'] = 1;
+			$options['editable'] = true;
 		}
 		if (!is_null($templated)) {
 			$options['templated'] = $templated;
@@ -1410,6 +1426,8 @@ elseif ($srctbl == 'simple_graph') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($items, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "items";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -1479,6 +1497,8 @@ elseif ($srctbl == 'sysmaps') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($sysmaps, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "sysmaps";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -1509,7 +1529,7 @@ elseif ($srctbl == 'plain_text') {
 		'sortfield' => 'name'
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	if (!is_null($templated)) {
 		$options['templated'] = $templated;
@@ -1591,6 +1611,8 @@ elseif ($srctbl == 'slides') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($slideshows, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "slides";');
+
 	$form->addItem($table);
 	$form->show();
 }
@@ -1686,7 +1708,7 @@ elseif ($srctbl == 'screens2') {
 
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 
-		$name->setAttribute('onclick', $action." close_window(); return false;");
+		$name->setAttribute('onclick', $action.' close_window(); return false;');
 
 		$table->addRow($name);
 	}
@@ -1701,11 +1723,11 @@ elseif ($srctbl == 'overview') {
 
 	$options = array(
 		'nodeids' => $nodeid,
-		'monitored_hosts' => 1,
+		'monitored_hosts' => true,
 		'output' => API_OUTPUT_EXTEND
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$hostgroups = API::HostGroup()->get($options);
 	order_result($hostgroups, 'name');
@@ -1719,7 +1741,7 @@ elseif ($srctbl == 'overview') {
 
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 
-		$name->setAttribute('onclick', $action." close_window(); return false;");
+		$name->setAttribute('onclick', $action.' close_window(); return false;');
 
 		$table->addRow($name);
 	}
@@ -1737,7 +1759,7 @@ elseif ($srctbl == 'host_group_scr') {
 		'output' => API_OUTPUT_EXTEND
 	);
 	if (!is_null($writeonly)) {
-		$options['editable'] = 1;
+		$options['editable'] = true;
 	}
 	$hostgroups = API::HostGroup()->get($options);
 	order_result($hostgroups, 'name');
@@ -1749,7 +1771,7 @@ elseif ($srctbl == 'host_group_scr') {
 		if (!$all) {
 			$action = get_window_opener($dstfrm, $dstfld1, create_id_by_nodeid(0, $nodeid)).get_window_opener($dstfrm, $dstfld2, $row['node_name']._('- all groups -'));
 			$name = new CLink(bold(_('- all groups -')), '#');
-			$name->setAttribute('onclick',$action." close_window(); return false;");
+			$name->setAttribute('onclick', $action.' close_window(); return false;');
 			$table->addRow($name);
 			$all = true;
 		}
@@ -1797,7 +1819,7 @@ elseif ($srctbl == 'dchecks') {
 		$dRule['name'] = $dRule['name'].':'.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
 		$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dRule[$srcfld2]) : '');
 		$name = new CSpan($dRule['name'], 'link');
-		$name->setAttribute('onclick', $action." close_window(); return false;");
+		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}
 	$table->show();
@@ -1819,7 +1841,7 @@ elseif ($srctbl == 'proxies') {
 	while ($row = DBfetch($result)) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
 		$name = new CSpan($row['host'], 'link');
-		$name->setAttribute('onclick', $action." close_window(); return false;");
+		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}
 	$table->show();
@@ -1870,7 +1892,7 @@ elseif ($srctbl == 'scripts') {
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($script['scriptid']).');';
 		}
-		else{
+		else {
 			$values = array(
 				$dstfld1 => $script[$srcfld1],
 				$dstfld2 => $script[$srcfld2]
@@ -1909,6 +1931,8 @@ elseif ($srctbl == 'scripts') {
 		$table->setFooter(new CCol($button, 'right'));
 		insert_js('var popupReference = '.zbx_jsvalue($scripts, true).';');
 	}
+	zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
+
 	$form->addItem($table);
 	$form->show();
 }

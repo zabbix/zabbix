@@ -124,7 +124,7 @@ if(isset($_REQUEST['save_trigger'])){
 			$triggerid = $_REQUEST['triggerid'];
 			$audit_action = AUDIT_ACTION_UPDATE;
 
-			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
+			show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 		}
 		else{
 			$trigger = array();
@@ -303,20 +303,20 @@ if(isset($_REQUEST['sform'])){
 	$ctb->setAttribute('id','logexpr');
 
 	$cb = new CButton('add_exp',S_ADD,'javascript: add_logexpr();');
-	$cbAdd = new CButton('add_key_and',S_AND_BIG,'javascript: add_keyword_and();');
-	$cbOr = new CButton('add_key_or',S_OR_BIG,'javascript: add_keyword_or();');
+	$cbAdd = new CButton('add_key_and', _('AND'), 'javascript: add_keyword_and();');
+	$cbOr = new CButton('add_key_or', _('OR'), 'javascript: add_keyword_or();');
 	$cbIregexp = new CCheckBox('iregexp', 'no', null,1);
 
 
-	$frmTRLog->addRow(S_EXPRESSION,array($ctb,BR(),$cbIregexp,'iregexp',SPACE,$cbAdd,SPACE,$cbOr,SPACE,$exp_select,SPACE, $cb));
+	$frmTRLog->addRow(_('Expression'), array($ctb,BR(),$cbIregexp,'iregexp',SPACE,$cbAdd,SPACE,$cbOr,SPACE,$exp_select,SPACE, $cb));
 
 	$keyTable = new CTableInfo(null);
 	$keyTable->setAttribute('id','key_list');
-	$keyTable->setHeader(array(S_KEYWORD,S_TYPE, S_ACTION));
+	$keyTable->setHeader(array(S_KEYWORD, S_TYPE, S_ACTION));
 
 	$table = new CTableInfo(null);
 	$table->setAttribute('id','exp_list');
-	$table->setHeader(array(S_EXPRESSION,S_TYPE, S_POSITION, S_ACTION));
+	$table->setHeader(array(_('Expression'), S_TYPE, S_POSITION, S_ACTION));
 
 	$maxid=0;
 
@@ -376,36 +376,23 @@ if(isset($_REQUEST['sform'])){
 	}
 	zbx_add_post_js('key_count='.($maxid+1));
 
-	$frmTRLog->addRow(SPACE,$keyTable);
-	$frmTRLog->addRow(SPACE,$table);
-
-//	$frmTRLog->addRow(S_MULTIPLE_EVENTS,new CCheckBox('type', (($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'), null,1));
+	$frmTRLog->addRow(SPACE, $keyTable);
+	$frmTRLog->addRow(SPACE, $table);
 
 	$sev_select = new CComboBox('priority', $priority);
 	$sev_select->addItems(getSeverityCaption());
-	$frmTRLog->addRow(S_SEVERITY, $sev_select);
-
-	$frmTRLog->addRow(S_COMMENTS, new CTextArea('comments',$comments));
-
-	$frmTRLog->addRow(S_URL,new CTextBox('url',$url,80));
-
-	$frmTRLog->addRow(S_DISABLED,new CCheckBox('status', (($status == TRIGGER_STATUS_DISABLED)?'yes':'no'), null,1));
-
-	$frmTRLog->addItemToBottomRow(new CSubmit('save_trigger',S_SAVE,'javascript: document.forms[0].action += \'?saction=1\';'));
+	$frmTRLog->addRow(_('Severity'), $sev_select);
+	$frmTRLog->addRow(_('Comments'), new CTextArea('comments', $comments));
+	$frmTRLog->addRow(_('URL'), new CTextBox('url', $url, 80));
+	$frmTRLog->addRow(_('Disabled'), new CCheckBox('status', $status == TRIGGER_STATUS_DISABLED ? 'yes' : 'no', null, 1));
+	$frmTRLog->addItemToBottomRow(new CSubmit('save_trigger', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';'));
 	$frmTRLog->addItemToBottomRow(SPACE);
+	$frmTRLog->addItemToBottomRow(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 
-	$cb = new CButton('cancel',S_CANCEL, 'javascript: self.close();');
-
-	$frmTRLog->addItemToBottomRow($cb);
-	if($bExprResult){
+	if ($bExprResult) {
 		$frmTRLog->show();
 	}
 }
-//------------------------ </FORM> ---------------------------
-
-?>
-<?php
 
 require_once('include/page_footer.php');
-
 ?>

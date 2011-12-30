@@ -623,7 +623,7 @@ function insert_js($script) {
 }
 
 function get_js($script) {
-	return('<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>');
+	return '<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>';
 }
 
 function include_js($script) {

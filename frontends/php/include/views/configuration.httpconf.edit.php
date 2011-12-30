@@ -112,7 +112,7 @@ $agentComboBox->addItemsInGroup(_('Others'), array(
 $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 // append status to form list
-$httpFormList->addRow(_('Variables'), new CTextArea('macros', $this->data['macros'], ZBX_TEXTAREA_STANDARD_SIZE, 5));
+$httpFormList->addRow(_('Variables'), new CTextArea('macros', $this->data['macros']));
 $httpFormList->addRow(_('Active'), new CCheckBox('status', $this->data['status'] ? (!isset($_REQUEST['httptestid']) ? 1 : 0) : 1, null, 1)); // invert status 0 - enable, 1 - disable
 
 /*

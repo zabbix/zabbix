@@ -19,55 +19,52 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/forms.inc.php";
+require_once 'include/config.inc.php';
+require_once 'include/hosts.inc.php';
+require_once 'include/forms.inc.php';
 
-	$page['title'] = 'S_SCRIPTS';
-	$page['file'] = 'scripts_exec.php';
+$page['title'] = 'S_SCRIPTS';
+$page['file'] = 'scripts_exec.php';
 
-	define('ZBX_PAGE_NO_MENU', 1);
+define('ZBX_PAGE_NO_MENU', 1);
 
-	require_once ('include/page_header.php');
+require_once ('include/page_header.php');
 
-//		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields=array(
-	'hostid'=>				array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'isset({execute})'),
-	'scriptid'=>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'isset({execute})'),
-	'execute'=>				array(T_ZBX_INT, O_OPT,  P_ACT, 		IN('0,1'),	null),
+//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({execute})'),
+	'scriptid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({execute})'),
+	'execute' =>	array(T_ZBX_INT, O_OPT, P_ACT,	IN('0,1'),	null),
 );
 check_fields($fields);
 
-if(isset($_REQUEST['execute'])){
+if (isset($_REQUEST['execute'])) {
 	$scriptid = $_REQUEST['scriptid'];
 	$hostid = $_REQUEST['hostid'];
 
-	$sql = 'SELECT name '.
-			' FROM scripts '.
-			' WHERE scriptid='.$scriptid;
-	$script_info = DBfetch(DBselect($sql));
+	$script_info = DBfetch(DBselect(
+		'SELECT s.name'.
+		' FROM scripts s'.
+		' WHERE s.scriptid='.$scriptid
+	));
 
 	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
-	if($result === false){
+	if ($result === false) {
 		show_messages(false, '', S_SCRIPT_ERROR);
 	}
-	else{
+	else {
 		$message = $result['value'];
-		if($result['response'] == 'failed'){
+		if ($result['response'] == 'failed') {
 			error($message);
 			show_messages(false, '', S_SCRIPT_ERROR);
 			$message = '';
 		}
-
 		$frmResult = new CFormTable($script_info['name']);
-		$frmResult->addRow(S_RESULT, new CTextArea('message', $message, 100, 25, 'yes'));
+		$frmResult->addRow(S_RESULT, new CTextArea('message', $message, 25, ZBX_TEXTAREA_BIG_WIDTH, 'yes'));
 		$frmResult->addItemToBottomRow(new CButton('close', S_CLOSE, 'window.close();'));
 		$frmResult->show();
 	}
-
 }
 
-?>
-<?php
 require_once "include/page_footer.php";
 ?>

@@ -207,7 +207,7 @@ elseif (isset($_REQUEST['events'])) {
 	}
 }
 
-$frmMsg->addRow(_('Message'), new CTextArea('message', '', 80, 6));
+$frmMsg->addRow(_('Message'), new CTextArea('message', '', ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_BIG_WIDTH));
 $frmMsg->addItemToBottomRow(new CSubmit('saveandreturn', $btn_txt2));
 $bulk ? '' : $frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
 $frmMsg->addItemToBottomRow(new CButtonCancel(url_param('backurl').url_param('eventid').url_param('triggerid').url_param('screenid')));
