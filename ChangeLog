@@ -2,6 +2,7 @@
 Changes for 1.9.9
 
 New features:
+..F....... [ZBX-4483] added transparency support for image resizing (pavels)
 ..F....... [ZBXNEXT-905] redesign Configuration->Triggers (Eduard)
 ..F....... [ZBXNEXT-912] redesign Configuration->Slide shows (Eduard)
 ..F.I...S. [ZBXNEXT-406] replaced an older 'status' check to an internal 'zabbix[host,<type>,available]' check (asaveljevs, Sasha)
@@ -16,6 +17,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+..F....... [ZBX-4483] added proper icon image resizing (pavels)
 ..F....... [ZBX-4456] fixed error position in IT services form (Vedmak)
 ..F....... [ZBX-4470] fixed node initialization in DM setup (pavels)
 ..F....... [ZBX-4407] fixed import hosts from 1.8 version (sanja)
