@@ -722,7 +722,7 @@ define('EXPRESSION_HOST_UNKNOWN',	'#ERROR_HOST#');
 define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
 
-define('AVAILABLE_NOCACHE',	0);	// take available objects not from cache
+define('AVAILABLE_NOCACHE', 0);	// take available objects not from cache
 
 define('SBR',	"<br/>\n");
 define('SPACE',	'&nbsp;');
@@ -730,11 +730,11 @@ define('RARR',	'&rArr;');
 
 // affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
 if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {
-	define('ZBX_MBSTRINGS_OVERLOADED',1);
+	define('ZBX_MBSTRINGS_OVERLOADED', 1);
 }
 
-define('REGEXP_INCLUDE',0);
-define('REGEXP_EXCLUDE',1);
+define('REGEXP_INCLUDE', 0);
+define('REGEXP_EXCLUDE', 1);
 
 // preg
 define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
@@ -757,7 +757,7 @@ define('ZBX_KEY_ID',		1);
 define('ZBX_KEY_NAME_ID',	2);
 define('ZBX_KEY_PARAM_ID',	6);
 
-define('ZBX_HISTORY_COUNT',5);
+define('ZBX_HISTORY_COUNT', 5);
 
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
 define('ZBX_GUEST_USER','guest');
@@ -766,7 +766,7 @@ define('ZBX_DEFAULT_CSS','default.css');
 define('ZBX_FAVORITES_ALL', -1);
 
 // allow for testing
-define('ZBX_ALLOW_UNICODE',1);
+define('ZBX_ALLOW_UNICODE', 1);
 
 // IPMI
 define('IPMI_AUTHTYPE_DEFAULT',		-1);
@@ -817,37 +817,39 @@ define('XML_TAG_DEPENDS',			'depends');
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
 // API errors
-define('ZBX_API_ERROR_INTERNAL', 	111);
-define('ZBX_API_ERROR_PARAMETERS', 	100);
+define('ZBX_API_ERROR_INTERNAL',	111);
+define('ZBX_API_ERROR_PARAMETERS',	100);
 define('ZBX_API_ERROR_PERMISSIONS', 120);
-define('ZBX_API_ERROR_NO_AUTH', 	200);
-define('ZBX_API_ERROR_NO_METHOD', 	300);
+define('ZBX_API_ERROR_NO_AUTH',		200);
+define('ZBX_API_ERROR_NO_METHOD',	300);
 
-define('API_OUTPUT_SHORTEN', 	'shorten');
-define('API_OUTPUT_REFER', 		'refer');
-define('API_OUTPUT_EXTEND', 	'extend');
-define('API_OUTPUT_COUNT', 		'count');
-define('API_OUTPUT_CUSTOM', 	'custom');
+define('API_OUTPUT_SHORTEN',	'shorten');
+define('API_OUTPUT_REFER',		'refer');
+define('API_OUTPUT_EXTEND',		'extend');
+define('API_OUTPUT_COUNT',		'count');
+define('API_OUTPUT_CUSTOM',		'custom');
 
-define('SEC_PER_MIN', 	60);
-define('SEC_PER_HOUR', 	3600);
-define('SEC_PER_DAY', 	86400);
-define('SEC_PER_WEEK', 	604800); // 7 * SEC_PER_DAY
+define('SEC_PER_MIN',	60);
+define('SEC_PER_HOUR',	3600);
+define('SEC_PER_DAY',	86400);
+define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
 define('SEC_PER_MONTH', 2592000); // 30 * SEC_PER_DAY
-define('SEC_PER_YEAR', 	31536000); // 365 * SEC_PER_DAY
+define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
 
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
 // input fields
-define('ZBX_TEXTBOX_STANDARD_SIZE', 50);
-define('ZBX_TEXTBOX_SMALL_SIZE', 25);
-define('ZBX_TEXTAREA_STANDARD_SIZE', 47);
+define('ZBX_TEXTBOX_STANDARD_SIZE',		50);
+define('ZBX_TEXTBOX_SMALL_SIZE',		25);
+define('ZBX_TEXTAREA_STANDARD_WIDTH',	312);
+define('ZBX_TEXTAREA_BIG_WIDTH',		524);
+define('ZBX_TEXTAREA_STANDARD_ROWS',	7);
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
-	$_GET	 = zbx_stripslashes($_GET);
-	$_POST	 = zbx_stripslashes($_POST);
+	$_GET = zbx_stripslashes($_GET);
+	$_POST = zbx_stripslashes($_POST);
 	$_COOKIE = zbx_stripslashes($_COOKIE);
 }
 
