@@ -431,18 +431,17 @@ class CMediatype extends CZBXAPI {
  * @return boolean
  */
 	public function delete($mediatypeids) {
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete media types'));
 		}
 
 		$mediatypeids = zbx_toArray($mediatypeids);
 
-		$options = array(
+		$actions = API::Action()->get(array(
 			'mediatypeids' => $mediatypeids,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
-		);
-		$actions = API::Action()->get($options);
+			'preservekeys' => true
+		));
 		if (!empty($actions)) {
 			$action = reset($actions);
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media types used by action: "%s".', $action['name']));
