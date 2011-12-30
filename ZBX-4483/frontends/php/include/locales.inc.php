@@ -21,33 +21,29 @@
 <?php
 function init_mbstrings() {
 	$res = true;
-
 	$res &= mbstrings_available();
-
 	ini_set('mbstring.internal_encoding', 'UTF-8');
 	$res &= (ini_get('mbstring.internal_encoding') == 'UTF-8');
-
 	ini_set('mbstring.detect_order', 'UTF-8, ISO-8859-1, JIS, SJIS');
 	$res &= (ini_get('mbstring.detect_order') == 'UTF-8, ISO-8859-1, JIS, SJIS');
-
-	if ($res) define('ZBX_MBSTRINGS_ENABLED', true);
+	if ($res) {
+		define('ZBX_MBSTRINGS_ENABLED', true);
+	}
 	return $res;
 }
 
 function mbstrings_available() {
-	return (function_exists('mb_strlen')
-			&& function_exists('mb_strtoupper')
-			&& function_exists('mb_strpos')
-			&& function_exists('mb_substr'));
+	return function_exists('mb_strlen') && function_exists('mb_strtoupper') && function_exists('mb_strpos') && function_exists('mb_substr');
 }
 
-// Translate global array $TRANSLATION into constants
+// translate global array $TRANSLATION into constants
 function process_locales() {
 	global $TRANSLATION;
-//SDI(count($TRANSLATION).' : '.$TRANSLATION['S_HTML_CHARSET']);
 	if (isset($TRANSLATION) && is_array($TRANSLATION)) {
-		foreach ($TRANSLATION as $const=>$label) {
-			if (!defined($const)) define($const, $label);
+		foreach ($TRANSLATION as $const => $label) {
+			if (!defined($const)) {
+				define($const, $label);
+			}
 		}
 	}
 	unset($GLOBALS['TRANSLATION']);
@@ -79,7 +75,6 @@ function set_zbx_locales() {
 	);
 }
 
-
 /**
  * Return an array of locale name variants based of language.
  *
@@ -87,11 +82,12 @@ function set_zbx_locales() {
  * @return array a list of possible locale names
  */
 function zbx_locale_variants($language) {
-	if (stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false)
-		$result = zbx_locale_variants_win($language);
-	else
-		$result = zbx_locale_variants_unix($language);
-	return $result;
+	if (stristr($_SERVER['SERVER_SOFTWARE'], 'win32') !== false) {
+		return zbx_locale_variants_win($language);
+	}
+	else {
+		return zbx_locale_variants_unix($language);
+	}
 }
 
 function zbx_locale_variants_unix($language) {
@@ -99,7 +95,6 @@ function zbx_locale_variants_unix($language) {
 		'',
 		'.utf8',
 		'.UTF-8',
-
 		'.iso885915',
 		'.ISO8859-1',
 		'.ISO8859-2',
@@ -107,12 +102,10 @@ function zbx_locale_variants_unix($language) {
 		'.ISO8859-5',
 		'.ISO8859-15',
 		'.ISO8859-13',
-
 		'.CP1131',
 		'.CP1251',
 		'.CP1251',
 		'.CP949',
-
 		'.KOI8-U',
 		'.US-ASCII',
 		'.eucKR',
@@ -132,9 +125,8 @@ function zbx_locale_variants_unix($language) {
 		'.gb18030',
 		'.gbk',
 		'.koi8r',
-		'.tcvn',
+		'.tcvn'
 	);
-
 	$result = array();
 	foreach ($postfixes as $postfix) {
 		$result[] = $language.$postfix;
@@ -143,33 +135,28 @@ function zbx_locale_variants_unix($language) {
 }
 
 function zbx_locale_variants_win($language) {
-// windows locales are written like language[_country[.charset]]
-// for a list of supported languages see http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
+	// windows locales are written like language[_country[.charset]]
+	// for a list of supported languages see http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
 	$winLanguageName = array(
-		'en_gb'=>  'english',
-		'zh_cn'=>  'chinese',
-		'cs_cz'=>  'czech',
-		'nl_nl'=>  'dutch',
-		'fr_fr'=>  'french',
-		'de_de'=>  'german',
-		'hu_hu'=>  'hungarian',
-		'it_it'=>  'italian',
-		'ko_kr'=>  'korean',
-		'ja_jp'=>  'japanese',
-		'lv_lv'=>  'latvian',
-		'pl_pl'=>  'polish',
-		'pt_br'=>  'portuguese',
-		'ru_ru'=>  'russian',
-		'sk_sk'=>  'slovak',
-		'es_es'=>  'spanish',
-		'sv_se'=>  'swedish',
-		'uk_ua'=>  'ukrainian'
+		'en_gb' => 'english',
+		'zh_cn' => 'chinese',
+		'cs_cz' => 'czech',
+		'nl_nl' => 'dutch',
+		'fr_fr' => 'french',
+		'de_de' => 'german',
+		'hu_hu' => 'hungarian',
+		'it_it' => 'italian',
+		'ko_kr' => 'korean',
+		'ja_jp' => 'japanese',
+		'lv_lv' => 'latvian',
+		'pl_pl' => 'polish',
+		'pt_br' => 'portuguese',
+		'ru_ru' => 'russian',
+		'sk_sk' => 'slovak',
+		'es_es' => 'spanish',
+		'sv_se' => 'swedish',
+		'uk_ua' => 'ukrainian'
 	);
-
-	$winLang = $winLanguageName[strtolower($language)];
-
-	$result = array($winLang);
-
-	return $result;
+	return array($winLanguageName[strtolower($language)]);
 }
 ?>

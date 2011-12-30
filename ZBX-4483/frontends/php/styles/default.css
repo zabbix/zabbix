@@ -109,16 +109,14 @@ a.underline:link { text-decoration: underline; }
 a.underline:visited { text-decoration: underline; }
 a.underline:hover { text-decoration: underline; }
 a.underline:active { text-decoration: underline; }
+a.weight_normal { font-weight: normal; }
 
 /* list */
 ul.itservices { margin: 0 0 0 5px; }
 ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
-ul.formlist li.top-aligned {
-	margin: -1px 0 0 0;
-	padding-top: 0;
-}
+ul.formlist li.top-aligned { margin: -1px 0 0 0; padding-top: 0; }
 
 /* any object list inline */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}
@@ -154,18 +152,19 @@ form .thin .input { height: 14px; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 
 input.formlist { padding-top: 2px; padding-bottom: 2px; }
-input[type="button"] { cursor: pointer; }
+input[type="button"].formlist { cursor: pointer; vertical-align: top; background: #ffffff; }
 
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #FFAA33; }
 div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #DD7711; }
 
 .select { cursor: pointer; margin: 1px 2px 1px 1px; }
 .selectShorten { width: 200px; }
-
 .radio { margin: 2px 2px; vertical-align: top; }
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height:100%; }
 .formrow .listInfoText { margin-left: 1%; }
 .listInfo { width: 100%; display: table; }
+.textarea_standard { width: 312px; }
+.textarea_big { width: 524px; }
 
 /* buttons */
 .button { border: 1px solid #808080; vertical-align: top; margin: 1px 2px 1px 1px; background: #F0F0F0 url('../images/gradients/button.gif') repeat-x top left; }
