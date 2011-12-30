@@ -1066,3 +1066,23 @@ function switch_mute(icon) {
 
 	send_params(params);
 }
+
+function createPlaceholders() {
+	if (IE) {
+		jQuery(document).ready(function() {
+			'use strict';
+
+			jQuery('[placeholder]').focus(function() {
+				if (jQuery(this).val() == jQuery(this).attr('placeholder')) {
+					jQuery(this).val('');
+					jQuery(this).removeClass('placeholder');
+				}
+			}).blur(function() {
+				if (jQuery(this).val() == '' || jQuery(this).val() == jQuery(this).attr('placeholder')) {
+					jQuery(this).addClass('placeholder');
+					jQuery(this).val(jQuery(this).attr('placeholder'));
+				}
+			}).blur();
+		});
+	}
+}

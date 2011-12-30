@@ -113,7 +113,6 @@ class CTag extends CObject {
 		return $this->attributes['class'];
 	}
 
-	// jQuery style alias
 	public function attr($name, $value = null) {
 		if (is_null($value)) {
 			$this->getAttribute($name);
