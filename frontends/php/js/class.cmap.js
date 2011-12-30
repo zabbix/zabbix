@@ -183,7 +183,7 @@ ZABBIX.apps.map = (function() {
 				})
 				.appendTo('body')
 				.draggable({
-					containment: [0,0,3200,3200]
+					containment: [0, 0, 3200, 3200]
 				});
 
 			this.updateImage();
@@ -256,6 +256,7 @@ ZABBIX.apps.map = (function() {
 					data: {
 						output: 'json',
 						sysmapid: this.sysmapid,
+						expand_macros: this.data.expand_macros,
 						noselements: 1,
 						nolinks: 1,
 						nocalculations: 1,
@@ -381,6 +382,13 @@ ZABBIX.apps.map = (function() {
 				var that = this;
 
 				// MAP PANEL EVENTS
+				// toggle expand macros
+				jQuery('#expand_macros').click(function() {
+					that.data.expand_macros = that.data.expand_macros === '1' ? '0' : '1';
+					jQuery(this).html(that.data.expand_macros === '1' ? locale['S_ON'] : locale['S_OFF']);
+					that.updateImage();
+				});
+
 				// change grid size
 				jQuery('#gridsize').change(function() {
 					var value = jQuery(this).val();

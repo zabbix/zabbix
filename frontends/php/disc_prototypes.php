@@ -463,15 +463,15 @@ switch($itemType) {
 
 // GO{
 		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption = new CComboItem('activate', _('Activate selected'));
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption = new CComboItem('disable', _('Disable selected'));
 		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('delete', _('Delete selected'));
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 

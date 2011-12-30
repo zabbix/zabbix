@@ -231,13 +231,9 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		$lclock = $event['clock'];
 
 		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+
 		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle(
-			$eventStatusSpan,
-			$event['value'],
-			$event['clock'],
-			$event['acknowledged']
-		);
+		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
 		$ack = getEventAckState($event, false, false);
 

@@ -37,7 +37,7 @@ $imageFormList->addRow(_('Type'), $imageCb);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
 if (!empty($this->data['imageid'])) {
 	if ($data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
-		$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?iconid='.$this->data['imageid'], 'no image', 200), 'image.php?imageid='.$this->data['imageid']));
+		$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?width=200&height=200&iconid='.$this->data['imageid'], 'no image'), 'image.php?imageid='.$this->data['imageid']));
 	}
 	else {
 		$imageFormList->addRow(_('Image'), new CImg('imgstore.php?iconid='.$this->data['imageid'], 'no image', null));

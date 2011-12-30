@@ -631,8 +631,6 @@ function add_elementNames(&$selements) {
 	}
 }
 
-//------------------------------------
-
 function getTriggersInfo($selement, $i) {
 	global $colors;
 
@@ -647,8 +645,8 @@ function getTriggersInfo($selement, $i) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 		$info['info'] = array();
 		$info['info']['unack'] = array(
-			'msg' => S_PROBLEM_BIG,
-			'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
+			'msg' => _('PROBLEM'),
+			'color' => $i['priority'] > 3 ? $colors['Red'] : $colors['Dark Red']
 		);
 	}
 	elseif ($i['trigger_disabled']) {
@@ -666,7 +664,7 @@ function getTriggersInfo($selement, $i) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['info'] = array(
 			'unknown' => array(
-				'msg' => S_OK_BIG,
+				'msg' => _('OK'),
 				'color' => $colors['Dark Green'],
 			)
 		);
@@ -686,7 +684,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		'latelyChanged' => $i['latelyChanged'],
 		'ack' => $i['ack'],
 		'priority' => $i['priority'],
-		'info' => array(),
+		'info' => array()
 	);
 	$has_problem = false;
 
@@ -708,7 +706,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = array(
 				'msg' => $msg,
-				'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
+				'color' => $i['priority'] > 3 ? $colors['Red'] : $colors['Dark Red']
 			);
 		}
 
@@ -748,7 +746,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['info']['unknown'] = array(
-			'msg' => S_OK_BIG,
+			'msg' => _('OK'),
 			'color' => $colors['Dark Green'],
 		);
 	}
@@ -837,7 +835,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
 		$info['info']['unknown'] = array(
-			'msg' => S_OK_BIG,
+			'msg' => _('OK'),
 			'color' => $colors['Dark Green'],
 		);
 	}
@@ -926,7 +924,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['iconid'] = $selement['iconid_off'];
 		$info['info']['unknown'] = array(
-			'msg' => S_OK_BIG,
+			'msg' => _('OK'),
 			'color' => $colors['Dark Green'],
 		);
 	}

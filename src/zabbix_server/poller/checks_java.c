@@ -31,7 +31,7 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 	const char		*p;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	char			value[MAX_BUFFER_LEN];
-	int			i, ret = PROXY_ERROR;
+	int			i, ret = GATEWAY_ERROR;
 
 	if (SUCCEED == zbx_json_open(response, &jp))
 	{
@@ -140,7 +140,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 
 	if (NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY)
 	{
-		err = PROXY_ERROR;
+		err = GATEWAY_ERROR;
 		strscpy(error, "JavaGateway configuration parameter not set or empty");
 		goto exit;
 	}
@@ -158,7 +158,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 					0 != strcmp(items[0].username, items[i].username) ||
 					0 != strcmp(items[0].password, items[i].password))
 			{
-				err = PROXY_ERROR;
+				err = GATEWAY_ERROR;
 				strscpy(error, "Java poller received items with different connection parameters");
 				goto exit;
 			}
@@ -204,10 +204,10 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 	if (FAIL == err)
 	{
 		strscpy(error, zbx_tcp_strerror());
-		err = PROXY_ERROR;
+		err = GATEWAY_ERROR;
 	}
 exit:
-	if (NETWORK_ERROR == err || PROXY_ERROR == err)
+	if (NETWORK_ERROR == err || GATEWAY_ERROR == err)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Getting Java values failed: %s", error);
 

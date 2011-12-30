@@ -19,18 +19,16 @@
 **/
 ?>
 <?php
-class CFormTable extends CForm{
-
+class CFormTable extends CForm {
 	private $align;
 	private $help;
 	private $title;
 	private $tableclass = 'formtable';
-
 	protected $top_items = array();
 	protected $center_items = array();
 	protected $bottom_items = array();
 
-	public function __construct($title=null, $action=null, $method=null, $enctype=null, $form_variable=null){
+	public function __construct($title = null, $action = null, $method = null, $enctype = null, $form_variable = null) {
 		$method = is_null($method) ? 'post' : $method;
 		parent::__construct($method, $action, $enctype);
 
@@ -40,145 +38,149 @@ class CFormTable extends CForm{
 		$form_variable = is_null($form_variable) ? 'form' : $form_variable;
 		$this->addVar($form_variable, get_request($form_variable, 1));
 
-		$this->bottom_items = new CCol(SPACE,'form_row_last');
+		$this->bottom_items = new CCol(SPACE, 'form_row_last');
 		$this->bottom_items->setColSpan(2);
 	}
 
-	public function setAction($value){
-
-		if(is_string($value))
+	public function setAction($value) {
+		if (is_string($value)) {
 			return parent::setAction($value);
-		elseif(is_null($value))
+		}
+		elseif (is_null($value)) {
 			return parent::setAction($value);
-		else
-			return $this->error('Incorrect value for setAction ['.$value.']');
+		}
+		else {
+			return $this->error('Incorrect value for setAction "'.$value.'".');
+		}
 	}
 
-	public function setName($value){
-		if(!is_string($value)){
-			return $this->error('Incorrect value for setAlign ['.$value.']');
+	public function setName($value) {
+		if (!is_string($value)) {
+			return $this->error('Incorrect value for setAlign "'.$value.'".');
 		}
 		$this->attr('name', $value);
 		$this->attr('id', zbx_formatDomId($value));
-	return true;
+		return true;
 	}
 
-	public function setAlign($value){
-		if(!is_string($value)){
-			return $this->error('Incorrect value for setAlign ['.$value.']');
+	public function setAlign($value) {
+		if (!is_string($value)) {
+			return $this->error('Incorrect value for setAlign "'.$value.'".');
 		}
 		return $this->align = $value;
 	}
 
-	public function setTitle($value=null){
+	public function setTitle($value = null) {
 		$this->title = $value;
 	}
 
-	public function setHelp($value=NULL){
-		if(is_null($value)) {
+	public function setHelp($value = null) {
+		if (is_null($value)) {
 			$this->help = new CHelp();
 		}
-		else if(is_object($value) && zbx_strtolower(get_class($value)) == 'chelp') {
+		elseif (is_object($value) && zbx_strtolower(get_class($value)) == 'chelp') {
 			$this->help = $value;
 		}
-		else if(is_string($value)) {
+		elseif (is_string($value)) {
 			$this->help = new CHelp($value);
-			if($this->getName()==NULL)
+			if ($this->getName() == null) {
 				$this->setName($value);
+			}
 		}
 		else {
-			return $this->error('Incorrect value for setHelp ['.$value.']');
+			return $this->error('Incorrect value for setHelp "'.$value.'".');
 		}
 
-	return 0;
+		return 0;
 	}
 
-	public function addRow($item1, $item2=NULL, $class=NULL, $id=null){
-		if(is_object($item1) && zbx_strtolower(get_class($item1)) == 'crow'){
+	public function addRow($item1, $item2 = null, $class = null, $id = null) {
+		if (is_object($item1) && zbx_strtolower(get_class($item1)) == 'crow') {
 		}
-		else if(is_object($item1) && zbx_strtolower(get_class($item1)) == 'ctable'){
-			$td = new CCol($item1,'form_row_c');
+		elseif (is_object($item1) && zbx_strtolower(get_class($item1)) == 'ctable') {
+			$td = new CCol($item1, 'form_row_c');
 			$td->setColSpan(2);
-
 			$item1 = new CRow($td);
 		}
-		else{
-			if(is_string($item1)){
+		else {
+			if (is_string($item1)) {
 				$item1 = nbsp($item1);
 			}
+			if (empty($item1)) {
+				$item1 = SPACE;
+			}
+			if (empty($item2)) {
+				$item2 = SPACE;
+			}
 
-			if(empty($item1)) $item1 = SPACE;
-			if(empty($item2)) $item2 = SPACE;
-
-			$item1 = new CRow(array(
-				new CCol($item1, 'form_row_l'),
-				new CCol($item2, 'form_row_r')
-			), $class);
+			$item1 = new CRow(
+				array(
+					new CCol($item1, 'form_row_l'),
+					new CCol($item2, 'form_row_r')
+				),
+				$class
+			);
 		}
 
-		if(!is_null($id))
+		if (!is_null($id)) {
 			$item1->attr('id', zbx_formatDomId($id));
-
+		}
 		array_push($this->center_items, $item1);
 
-	return $item1;
+		return $item1;
 	}
 
-	public function addSpanRow($value, $class=NULL){
-		if(is_null($value)) $value = SPACE;
-		if(is_null($class)) $class = 'form_row_c';
-
-		$col = new CCol($value,$class);
+	public function addSpanRow($value, $class = null) {
+		if (is_null($value)) {
+			$value = SPACE;
+		}
+		if (is_null($class)) {
+			$class = 'form_row_c';
+		}
+		$col = new CCol($value, $class);
 		$col->setColSpan(2);
-		array_push($this->center_items,new CRow($col));
+		array_push($this->center_items, new CRow($col));
 	}
 
-	public function addItemToBottomRow($value){
+	public function addItemToBottomRow($value) {
 		$this->bottom_items->addItem($value);
 	}
 
-	public function setTableClass($class){
-		if(is_string($class)){
+	public function setTableClass($class) {
+		if (is_string($class)) {
 			$this->tableclass = $class;
 		}
 	}
 
-	public function bodyToString(){
+	public function bodyToString() {
 		$res = parent::bodyToString();
-
-		$tbl = new CTable(NULL,$this->tableclass);
-
-		//$tbl->setOddRowClass('form_odd_row');
-		//$tbl->setEvenRowClass('form_even_row');
-
+		$tbl = new CTable(null, $this->tableclass);
 		$tbl->setCellSpacing(0);
 		$tbl->setCellPadding(1);
-
 		$tbl->setAlign($this->align);
-// add first row
-		if(!is_null($this->title)){
-			$col = new CCol(NULL,'form_row_first');
+
+		// add first row
+		if (!is_null($this->title)) {
+			$col = new CCol(null, 'form_row_first');
 			$col->setColSpan(2);
 
-			if(isset($this->help)){
+			if (isset($this->help)) {
 				$col->addItem($this->help);
 			}
-
-			if(isset($this->title)){
+			if (isset($this->title)) {
 				$col->addItem($this->title);
 			}
-
 			$tbl->setHeader($col);
 		}
 
-// add last row
+		// add last row
 		$tbl->setFooter($this->bottom_items);
-// add center rows
-		foreach($this->center_items as $item){
+
+		// add center rows
+		foreach ($this->center_items as $item) {
 			$tbl->addRow($item);
 		}
-
-		return $res . $tbl->toString();
+		return $res.$tbl->toString();
 	}
 }
 ?>

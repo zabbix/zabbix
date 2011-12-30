@@ -32,7 +32,7 @@ class testPageSlideShows extends CWebTest
 	/**
 	* @dataProvider allSlideShows
 	*/
-	public function testPageSlideShows_SimpleTest($slideshow)
+	public function testPageSlideShows_CheckLayout($slideshow)
 	{
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slideshows');
@@ -68,7 +68,7 @@ class testPageSlideShows extends CWebTest
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Configuration of slideshows');
-		$this->ok('Slideshow updated');
+		$this->ok('Slide show updated');
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
@@ -120,7 +120,7 @@ class testPageSlideShows extends CWebTest
 		$this->getConfirmation();
 
 		$this->assertTitle('Configuration of slideshows');
-		$this->ok('Slideshow deleted');
+		$this->ok('Slide show deleted');
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
 		$sql="select * from slideshows where slideshowid=$slideshowid";

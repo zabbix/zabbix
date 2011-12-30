@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageWeb extends CWebTest
 {
-	public function testPageWeb_SimpleTest()
+	public function testPageWeb_CheckLayout()
 	{
 		$this->login('httpmon.php');
 		$this->assertTitle('Status of Web monitoring');

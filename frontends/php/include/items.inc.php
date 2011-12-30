@@ -105,23 +105,25 @@ function item_type2str($type = null){
 	}
 }
 
-	function item_value_type2str($type=null){
+	function item_value_type2str($type = null) {
 		$types = array(
 			ITEM_VALUE_TYPE_UINT64 => S_NUMERIC_UNSIGNED,
-			ITEM_VALUE_TYPE_FLOAT => S_NUMERIC_FLOAT,
-			ITEM_VALUE_TYPE_STR => S_CHARACTER,
+			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+			ITEM_VALUE_TYPE_STR => _('Character'),
 			ITEM_VALUE_TYPE_LOG => S_LOG,
-			ITEM_VALUE_TYPE_TEXT => S_TEXT,
+			ITEM_VALUE_TYPE_TEXT => S_TEXT
 		);
 
-		if(is_null($type)){
+		if (is_null($type)) {
 			natsort($types);
 			return $types;
 		}
-		else if(isset($types[$type]))
+		elseif (isset($types[$type])) {
 			return $types[$type];
-		else
+		}
+		else {
 			return S_UNKNOWN;
+		}
 	}
 
 	function item_data_type2str($type=null){
@@ -624,15 +626,15 @@ function item_type2str($type = null){
 	return get_host_by_itemid($itemid);
 	}
 
-// kostilek //
-	function get_realrule_by_itemid_and_hostid($itemid, $hostid){
+	function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
 		$item = get_item_by_itemid($itemid);
-		if(bccomp($hostid,$item['hostid']) == 0)
+		if (bccomp($hostid,$item['hostid']) == 0) {
 			return $item['itemid'];
+		}
 
-		if($item['templateid'] <> 0)
+		if ($item['templateid'] <> 0) {
 			return get_realrule_by_itemid_and_hostid($item['templateid'], $hostid);
-
+		}
 		return $item['itemid'];
 	}
 
