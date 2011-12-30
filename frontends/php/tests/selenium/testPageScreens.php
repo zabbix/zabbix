@@ -33,7 +33,7 @@ class testPageScreens extends CWebTest
 	/**
 	* @dataProvider allScreens
 	*/
-	public function testPageScreens_SimpleTest($screen)
+	public function testPageScreens_CheckLayout($screen)
 	{
 		$this->login('screenconf.php');
 		$this->assertTitle('Configuration of screens');

@@ -83,16 +83,41 @@ function get_real_text_width(text, id) {
 	return tmp_len;
 }
 
+function truncateText(text, len) {
+	return (text.length > len) ? text.substring(0, len) + '...' : text;
+}
+
 function show_popup_menu(e, content, width){
+
+	if (A_MENUS[0] !== undefined) {
+		A_MENUS[0].collapse();
+	}
+
 	var cursor = get_cursor_position(e);
 	var tmp_width = 0;
 	var max_width = 0;
+	var menuTextLength = 35;
 
-	for (i = 0; i < content.length; i++) {
-		tmp_width = get_real_text_width(content[i][0], i);
+	for (var i = 0; i < content.length; i++) {
+		if (content[i].length) {
+			content[i][0] = truncateText(content[i][0], menuTextLength);
+			tmp_width = get_real_text_width(content[i][0], i);
 
-		if (max_width < tmp_width) {
-			max_width = tmp_width;
+			if (max_width < tmp_width) {
+				max_width = tmp_width;
+			}
+		}
+
+		// truncate sub menu text
+		if (content[i].length > 4) {
+			for (var j = 4; j < content[i].length; j++) {
+				content[i][j][0] = truncateText(content[i][j][0], menuTextLength);
+				tmp_width = get_real_text_width(content[i][j][0], i);
+
+				if (max_width < tmp_width) {
+					max_width = tmp_width;
+				}
+			}
 		}
 	}
 
@@ -104,8 +129,8 @@ function show_popup_menu(e, content, width){
 		width = 220;
 
 	var pos = [
-		{'block_top' : -12, 'block_left' : -5, 'width' : width},
-		{'block_top' : 5, 'block_left' : width - 5, 'width' : width}
+		{'block_top': -12, 'block_left': -5, 'width': width},
+		{'block_top': 5, 'block_left': width-5, 'width': width}
 	];
 
 	new popup_menu (content, pos, cursor.x, cursor.y);
@@ -431,6 +456,12 @@ function menu_item (o_parent, n_order) {
 	// generate item's HMTL
 	var el = document.createElement('a');
 	el.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id + 'o');
+
+	if (this.a_config[1] != null) {
+		el.setAttribute('href', this.a_config[1]);
+		if(this.a_config[2] && this.a_config[2]['tw'])
+			el.setAttribute('target', this.a_config[2]['tw']);
+	}
 	el.setAttribute('href', this.a_config[1]);
 
 	if (this.a_config[2] && this.a_config[2]['tw']) {

@@ -3,6 +3,7 @@ CREATE TABLE item_discovery (
 	itemid                   bigint                                    NOT NULL,
 	parent_itemid            bigint                                    NOT NULL,
 	key_                     varchar(255)    DEFAULT ''                NOT NULL,
+	lastcheck                integer         DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (itemdiscoveryid)
 ) with OIDS;
 CREATE UNIQUE INDEX item_discovery_1 on item_discovery (itemid,parent_itemid);
