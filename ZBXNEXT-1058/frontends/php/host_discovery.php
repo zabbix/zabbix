@@ -330,7 +330,7 @@ switch($itemType) {
 
 		$formula = get_request('formula', '1');
 		$logtimefmt = get_request('logtimefmt', '');
-		$lifetime = get_request('lifetime', 0);
+		$lifetime = get_request('lifetime', 30);
 
 		if(isset($_REQUEST['itemid'])){
 			$frmItem->addVar('itemid', $_REQUEST['itemid']);
