@@ -231,6 +231,11 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 span.footer_sign { padding-right: 5px; padding-left: 5px; }
 span.divider { color: #558; font-weight: normal; }
 
+/* icon mapping */
+
+#iconMapTable .sortable { height: 30px; }
+#iconMapTable .sortable .preview { vertical-align: middle; }
+
 /* subfilter buttons */
 span.subfilter_enabled { color: #00AA00; cursor: pointer; text-decoration: none; border-bottom: 1px dashed; }
 span.subfilter_enabled:hover { color:#44CC44; }
