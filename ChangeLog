@@ -383,6 +383,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+....I..... [ZBX-4461] changed binary path from bin to sbin in FreeBSD initscripts (Richlv)
 ..F....... [ZBX-4457] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-3909] fixed link to null on menu and non-hiding menu in maps (Slava)
 ...G...... [ZBX-4421] added individual CPU statistics on FreeBSD (Andris)
