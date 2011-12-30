@@ -30,12 +30,18 @@ function getRegexp($regexpId) {
 }
 
 function getRegexpExpressions($regexpId) {
+	$expressions = array();
+
 	$sql = 'SELECT e.expressionid, e.expression, e.expression_type, e.exp_delimiter, e.case_sensitive'.
 			' FROM expressions e '.
 			' WHERE '.DBin_node('e.expressionid').
 			' AND regexpid='.$regexpId;
+	$dbExpressions = DBselect($sql);
+	while($expression = DBfetch($dbExpressions)) {
+		$expressions[$expression['expressionid']] = $expression;
+	}
 
-	return DBfetchArray(DBselect($sql));
+	return $expressions;
 }
 
 function addRegexp(array $regexp, array $expressions) {
@@ -58,7 +64,6 @@ function addRegexp(array $regexp, array $expressions) {
 		$regexpIds = DB::insert('regexps', array($regexp));
 		$regexpId = reset($regexpIds);
 		addRegexpExpressions($regexpId, $expressions);
-
 	}
 	catch (Exception $e) {
 		error($e->getMessage());
@@ -119,20 +124,30 @@ function updateRegexp(array $regexp, array $expressions) {
 function rewriteRegexpExpressions($regexpId, array $expressions) {
 	$dbExpressions = getRegexpExpressions($regexpId);
 
-	foreach ($dbExpressions as $dbExpId => $dbExpression) {
-		foreach ($expressions as $expId => $expression) {
-			unset($dbExpression['expressionid']);
-			if (array_equal($dbExpression, $expression)) {
-				unset($dbExpressions[$dbExpId]);
-				unset($expressions[$expId]);
-			}
+	$expressionsToAdd = array();
+	$expressionsToUpdate = array();
+	foreach ($expressions as $expression) {
+		if (!isset($expression['expressionid'])) {
+			$expressionsToAdd[] = $expression;
+		}
+		elseif (isset($dbExpressions[$expression['expressionid']])) {
+			$expressionsToUpdate[] = $expression;
+			unset($dbExpressions[$expression['expressionid']]);
 		}
 	}
 
-	$dbExpressionIds = zbx_objectValues($dbExpressions, 'expressionid');
-	deleteRegexpExpressions($dbExpressionIds);
+	if (!empty($dbExpressions)){
+		$dbExpressionIds = zbx_objectValues($dbExpressions, 'expressionid');
+		deleteRegexpExpressions($dbExpressionIds);
+	}
 
-	addRegexpExpressions($regexpId, $expressions);
+	if (!empty($expressionsToAdd)) {
+		addRegexpExpressions($regexpId, $expressionsToAdd);
+	}
+
+	if (!empty($expressionsToUpdate)) {
+		updateRegexpExpressions($expressionsToUpdate);
+	}
 }
 
 function addRegexpExpressions($regexpId, array $expressions) {
@@ -149,6 +164,18 @@ function addRegexpExpressions($regexpId, array $expressions) {
 	unset($expression);
 
 	DB::insert('expressions', $expressions);
+}
+
+function updateRegexpExpressions(array $expressions) {
+	foreach ($expressions as &$expression) {
+		$expressionId = $expression['expressionid'];
+		unset($expression['expressionid']);
+		DB::update('expressions', array(
+			'values' => $expression,
+			'where' => array('expressionid' => $expressionId)
+		));
+	}
+	unset($expression);
 }
 
 function deleteRegexpExpressions(array $expressionIds) {
