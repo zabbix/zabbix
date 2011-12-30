@@ -2,6 +2,11 @@
 Changes for 1.9.9
 
 New features:
+..F.I...S. [ZBXNEXT-406] replaced an older 'status' check to an internal 'zabbix[host,<type>,available]' check (asaveljevs, Sasha)
+..F.I..... [ZBX-4009] added new option in map configuration which enables macros expanding (Vedmak)
+..F.I...S. [ZBX-3286] added ability to automatically delete low level discovered resources (Sasha, Vedmak)
+........S. [ZBX-2806] improved processing of escalations (dimir, Sasha)
+..F....... [ZBX-1357] updated Brazilian Portuguese, Dutch, Greek, Latvian, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 A.F....... [ZBX-3527] improved host form to allow selection of default interface (Vedmak)
 A.F.....S. [ZBX-4262] added support of item prototypes for graph y axis min/max (pavels, Sasha)
 A.F....... [ZBX-4311] fixed graph prototype name validation (pavels)
@@ -9,7 +14,23 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
-..F....... [ZBX-4336] fixed problem with item status clearing when changing  to active in frontend.(SlaVa)
+..F....... [ZBX-4456] fixed error position in IT services form (Vedmak)
+..F....... [ZBX-4470] fixed node initialization in DM setup (pavels)
+..F....... [ZBX-4407] fixed import hosts from 1.8 version (sanja)
+A......... [ZBX-4425] fixed item prototype interface mapping when cloning a discovery rule (pavels)
+..F....... [ZBX-4459] fixed values are cleared when try to add incorrect value mapping, negative values now allowed (Vedmak)
+..F....... [ZBX-4458] fixed js error in global macro form, changed layout to be consistant with other places (Vedmak)
+..F....... [ZBX-4449] fixed IT services SLA graph permission checks (pavels)
+A......... [ZBX-4448] fixed proxy interface validation (pavels)
+..F....... [ZBX-4455] fixed the 'sortorder' field validation in the IT services form (pavels)
+..F....... [ZBX-4427] fixed map element host group highlighting (pavels)
+..F....... [ZBX-4446] fixed event duration calculation (pavels)
+........S. [ZBX-2806] fixed possible double notification messages (dimir,Sasha)
+A......... [ZBX-4425] fixed unsetting interface when performing Item::udpate requests (pavels)
+..F....... [ZBX-4436] fixed wrong sql query in discovery popup (SlaVa)
+....I..... [ZBX-4429] fixed problem with wrong mysql comment tag and warning in mysql function when  update to 1.9.8 (SlaVa)
+........S. [ZBX-4418] fixed possible SQL errors while processing of time functions (Sasha)
+..F....... [ZBX-4336] fixed problem with item status clearing when changing  to active in frontend (SlaVa)
 A.F....... [ZBX-4260] replaced event sorting by 'clock' with 'eventid' (pavels)
 ..F....... [ZBX-4381] fixed permission check in SLA reports (pavels)
 ..F....... [ZBX-4411] remade the zbx_stripos() function whithout the use of mb_stripos() (pavels)
@@ -356,8 +377,33 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.11rc1
+
+..F....... [ZBX-4457] updated French translation; thanks to Joseph Bueno (Richlv)
+..F....... [ZBX-3909] fixed link to null on menu and non-hiding menu in maps (Slava)
+...G...... [ZBX-4421] added individual CPU statistics on FreeBSD (Andris)
+........S. [ZBX-4466] fixed inserting UNKNOWN events with incorrect 'clock' values (Sasha)
+........S. [ZBX-2802] fixed handling of NodeNoHistory and NodeNoEvents parameters (Sasha)
+...G...PS. [ZBX-4394] fixed handling of log rotation failure (Andris)
+..F....... [ZBX-4455] fixed the 'sortorder' field validation in the IT services form (pavels)
+..F....... [ZBX-4447] fixed object selection in several forms in IE6 and IE7 (pavels)
+........S. [ZBX-4298] fixed a number of deleted events in a deleted data report (Sasha)
+
+Changes for 1.8.10
+
+1.8.10rc2 was released as 1.8.10 without any changes
+
+Changes for 1.8.10rc2
+
+..F....... [ZBX-2843] fixed log trigger creation menu in items list (Vedmak)
+
 Changes for 1.8.10rc1
 
+..F....... [ZBX-3219] Translating script error to human language (slava)
+.......PS. [ZBX-4424] fixed handling of a long localized content by history syncer (Sasha)
+.......PS. [ZBX-4424] fixed handling of a localized content with incorrect utf8 characters (Sasha)
+..F....... [ZBX-2737] fixed various messages at linking templates (sanja)
+A......... [ZBX-4273] fixed getting permission error while creating an action (sanja)
 ....I..... [ZBX-4377] fixed error message when checking if libcurl can be linked statically (dimir)
 ..F....... [ZBX-4391] fixed suffix support in trigger testing interface (slava)
 .......PS. [ZBX-4376] fixed escaping of strings with PostgreSQL 9.1 or later (Sasha)
@@ -375,7 +421,7 @@ A.F....... [ZBX-2859] fixed possibility to successfully delete zero regular expr
 ..F....... [ZBX-2843] made dashboard and slideshow popup menus have dynamic width (sanja)
 A.F....... [ZBX-4279] added an error message when trying to delete an item, that's being used as a min/max Y axis value for graphs (pavels)
 ..F....... [ZBX-4375] updated Russian translation; thanks to Alexey Pustovalov (Richlv)
-........S. [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (dimir,asaveljevs)
+........S. [ZBX-4360] fixed trapper compilation error on FreeBSD 7.3 (asaveljevs,dimir)
 A.F....... [ZBX-4249] fixed trigger wizard when inserting macro multiple times (Vedmak)
 ..F....... [ZBX-4351] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-4353] updated Japanese translation; thanks to Kodai Terashima (Richlv)

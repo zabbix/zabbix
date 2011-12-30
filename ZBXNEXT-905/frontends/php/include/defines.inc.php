@@ -301,6 +301,9 @@ define('SYSMAP_MARKELEMENTS_ON',		1);
 define('SYSMAP_GRID_SHOW_ON',		1);
 define('SYSMAP_GRID_SHOW_OFF',		0);
 
+define('SYSMAP_EXPAND_MACROS_OFF',	0);
+define('SYSMAP_EXPAND_MACROS_ON',	1);
+
 define('SYSMAP_GRID_ALIGN_ON',		1);
 define('SYSMAP_GRID_ALIGN_OFF',		0);
 
@@ -788,8 +791,7 @@ define('XML_TAG_MACRO', 			'macro');
 define('XML_TAG_ZABBIX_EXPORT', 	'zabbix_export');
 define('XML_TAG_HOSTS', 			'hosts');
 define('XML_TAG_HOST', 				'host');
-define('XML_TAG_HOSTPROFILE',		'host_profile');
-define('XML_TAG_HOSTPROFILE_EXT',	'host_profiles_ext');
+define('XML_TAG_HOSTINVENTORY',		'host_inventory');
 define('XML_TAG_GROUPS',			'groups');
 define('XML_TAG_GROUP',				'group');
 define('XML_TAG_APPLICATIONS',		'applications');
@@ -833,6 +835,9 @@ define('SEC_PER_DAY',	86400);
 define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
 define('SEC_PER_MONTH', 2592000); // 30 * SEC_PER_DAY
 define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
+
+define('ZBX_MIN_PORT_NUMBER', 0);
+define('ZBX_MAX_PORT_NUMBER', 65535);
 
 // input fields
 define('ZBX_TEXTBOX_STANDARD_SIZE',		50);

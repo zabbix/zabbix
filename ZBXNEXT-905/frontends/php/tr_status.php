@@ -737,7 +737,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$trigg_wdgt->addItem($m_form);
 	$trigg_wdgt->show();
 
-	zbx_add_post_js('jqBlink.init();');
+	zbx_add_post_js('jqBlink.blink();');
 	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
 
 require_once('include/page_footer.php');

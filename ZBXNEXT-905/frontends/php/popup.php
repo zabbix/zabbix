@@ -1570,9 +1570,7 @@ elseif ($srctbl == 'slides') {
 	$table = new CTableInfo(_('No slides defined.'));
 
 	if ($multiselect) {
-		$header = array(
-			array(new CCheckBox('all_slides', null, "javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"), _('Name')),
-		);
+		$header = array(array(new CCheckBox('all_slides', null, "javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"), _('Name')),);
 	}
 	else {
 		$header = array(_('Name'));
@@ -1649,7 +1647,7 @@ elseif ($srctbl == 'screens') {
 	$screens = API::Screen()->get($options);
 	order_result($screens, 'name');
 
-	foreach ($screens as $snum => $row) {
+	foreach ($screens as $row) {
 		$name = new CSpan($row['name'], 'link');
 
 		if ($multiselect) {
@@ -1812,17 +1810,15 @@ elseif ($srctbl == 'dchecks') {
 	$table = new CTableInfo(_('No discovery checks defined.'));
 	$table->setHeader(_('Name'));
 
-	$result = DBselect(
-		'SELECT DISTINCT r.name,c.dcheckid,c.type,c.key_,c.ports.'.
-		' FROM drules r,dchecks c'.
-		' WHERE r.druleid=c.druleid AND '.DBin_node('r.druleid', $nodeid)
-	);
-	while ($row = DBfetch($result)) {
-		$row['name'] = $row['name'].':'.discovery_check2str($row['type'], $row['key_'], $row['ports']);
-
-		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
-
-		$name = new CSpan($row['name'], 'link');
+	$result = API::DRule()->get(array(
+		'selectDChecks' => array('dcheckid','type','key_','ports'),
+		'output' => API_OUTPUT_EXTEND
+	));
+	foreach ($result as $dRule) {
+		$dCheck = reset($dRule['dchecks']);
+		$dRule['name'] = $dRule['name'].':'.discovery_check2str($dCheck['type'], $dCheck['key_'], $dCheck['ports']);
+		$action = get_window_opener($dstfrm, $dstfld1, $dCheck[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $dRule[$srcfld2]) : '');
+		$name = new CSpan($dRule['name'], 'link');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}

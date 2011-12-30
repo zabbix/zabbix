@@ -32,7 +32,7 @@ class testPageMaintenance extends CWebTest
 	/**
 	* @dataProvider allMaintenances
 	*/
-	public function testPageMaintenance_SimpleTest($maintenance)
+	public function testPageMaintenance_CheckLayout($maintenance)
 	{
 		$this->login('maintenance.php');
 		$this->dropdown_select_wait('groupid','all');

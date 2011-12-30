@@ -139,7 +139,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	NETWORK_ERROR	-3
 #define	TIMEOUT_ERROR	-4
 #define	AGENT_ERROR	-5
-#define	PROXY_ERROR	-6
+#define	GATEWAY_ERROR	-6
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
@@ -405,8 +405,6 @@ typedef enum
 	AUDIT_RESOURCE_REGEXP
 } zbx_auditlog_resourcetype_t;
 
-/* special item key used for storing server status */
-#define SERVER_STATUS_KEY	"status"
 /* special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
 /* special item key used for ICMP ping latency */
@@ -439,12 +437,12 @@ typedef enum
 typedef enum
 {
 	ESCALATION_STATUS_ACTIVE = 0,
-	ESCALATION_STATUS_RECOVERY,
+	ESCALATION_STATUS_RECOVERY,	/* only in server code, never in DB */
 	ESCALATION_STATUS_SLEEP,
-	ESCALATION_STATUS_COMPLETED, /* only in server code, never in DB */
-	ESCALATION_STATUS_SUPERSEDED_ACTIVE,
-	ESCALATION_STATUS_SUPERSEDED_RECOVERY
-} zbx_escalation_status_t;
+	ESCALATION_STATUS_COMPLETED	/* only in server code, never in DB */
+}
+zbx_escalation_status_t;
+const char      *zbx_escalation_status_string(unsigned char status);
 
 /* alert types */
 typedef enum
@@ -958,7 +956,8 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
-int	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
 
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
