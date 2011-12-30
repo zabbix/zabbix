@@ -56,6 +56,7 @@ require_once(dirname(__FILE__).'/testPageWeb.php');
 require_once(dirname(__FILE__).'/testFormAction.php');
 require_once(dirname(__FILE__).'/testFormAdministrationDMProxies.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralMacro.php');
+require_once(dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php');
 require_once(dirname(__FILE__).'/testFormConfigTriggerSeverity.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
@@ -110,6 +111,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralMacro');
+		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
 		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
