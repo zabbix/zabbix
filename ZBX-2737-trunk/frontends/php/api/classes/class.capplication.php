@@ -538,7 +538,7 @@ class CApplication extends CZBXAPI {
 		));
 		foreach ($applications_created as $application_created) {
 			$host = reset($application_created['hosts']);
-			info(_s('Created: Application "%1$s" on "%2$s".', $application_created['name'], $host['host']));
+			info(_s('Created: Application "%1$s" on "%2$s".', $application_created['name'], $host['name']));
 		}
 	}
 
@@ -561,7 +561,7 @@ class CApplication extends CZBXAPI {
 		));
 		foreach ($applications_upd as $application_upd) {
 			$host = reset($application_upd['hosts']);
-			info(_s('Updated: Application "%1$s" on "%2$s".', $application_upd['name'], $host['host']));
+			info(_s('Updated: Application "%1$s" on "%2$s".', $application_upd['name'], $host['name']));
 		}
 	}
 
@@ -580,7 +580,7 @@ class CApplication extends CZBXAPI {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectHosts' => array('host')
+			'selectHosts' => array('name')
 		);
 		$del_applications = $this->get($options);
 
@@ -611,7 +611,7 @@ class CApplication extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('host')
+			'selectHosts' => array('name')
 		);
 		$del_application_childs = $this->get($options);
 		$del_applications = zbx_array_merge($del_applications, $del_application_childs);
@@ -631,7 +631,7 @@ class CApplication extends CZBXAPI {
 		// TODO: remove info from API
 		foreach ($del_applications as $del_application) {
 			$host = reset($del_application['hosts']);
-			info(_s('Deleted: Application "%1$s" on "%2$s".', $del_application['name'], $host['host']));
+			info(_s('Deleted: Application "%1$s" on "%2$s".', $del_application['name'], $host['name']));
 		}
 		return array('applicationids' => $applicationids);
 	}
@@ -784,7 +784,7 @@ class CApplication extends CZBXAPI {
 				if (isset($application['name']) && isset($exApplicationsNames[$application['name']])) {
 					$exApplication = $exApplicationsNames[$application['name']];
 					if ($exApplication['templateid'] > 0 && bccomp($exApplication['templateid'], $application['applicationid'] != 0)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['host']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['name']));
 					}
 				}
 

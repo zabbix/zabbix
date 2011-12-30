@@ -956,12 +956,12 @@ class CItem extends CItemGeneral {
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('name'),
-			'selectHosts' => array('host'),
+			'selectHosts' => array('name'),
 			'nopermissions' => true
 		));
 		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
-			info(_s('Created: Item "%1$s" on "%2$s".', $item['name'], $host['host']));
+			info(_s('Created: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
@@ -1020,12 +1020,12 @@ class CItem extends CItemGeneral {
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
 			'output' => array('name'),
-			'selectHosts' => array('host'),
+			'selectHosts' => array('name'),
 			'nopermissions' => true
 		));
 		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
-			info(_s('Updated: Item "%1$s" on "%2$s".', $item['name'], $host['host']));
+			info(_s('Updated: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
@@ -1065,7 +1065,7 @@ class CItem extends CItemGeneral {
 				'editable' => true,
 				'preservekeys' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('host')
+				'selectHosts' => array('name')
 			);
 			$del_items = $this->get($options);
 
@@ -1167,7 +1167,7 @@ class CItem extends CItemGeneral {
 			// TODO: remove info from API
 			foreach ($del_items as $item) {
 				$host = reset($item['hosts']);
-				info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['host']));
+				info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 			}
 
 			return array('itemids' => $itemids);

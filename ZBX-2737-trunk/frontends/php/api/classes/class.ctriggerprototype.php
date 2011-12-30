@@ -1111,7 +1111,7 @@ COpt::memoryPick();
 				'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 				'output' => API_OUTPUT_REFER,
 				'selectItems' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('host')
+				'selectHosts' => array('name')
 			));
 
 			foreach($createdTriggers as $createdTrigger){
@@ -1132,7 +1132,7 @@ COpt::memoryPick();
 			foreach($triggers as $trigger) {
 				$this->inherit($trigger);
 				$host = reset($trigger['hosts']);
-				info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['host']));
+				info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['name']));
 			}
 
 			return array('triggerids' => $triggerids);
@@ -1326,7 +1326,7 @@ COpt::memoryPick();
 		$triggerids = DB::insert('triggers', $triggers);
 
 		$dbHosts = API::Host()->get(array(
-			'output' => array('host'),
+			'output' => array('name'),
 			'triggerids' => $triggers
 		));
 		$host = reset($dbHosts);
@@ -1345,7 +1345,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(sprintf(_('Created: Trigger prototype "%1$s" on "%2$s".'), $trigger['description'], $host['host']));
+			info(sprintf(_('Created: Trigger prototype "%1$s" on "%2$s".'), $trigger['description'], $host['name']));
 		}
 
 	}

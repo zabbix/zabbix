@@ -1494,7 +1494,7 @@ class CTrigger extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('host')
+			'selectHosts' => array('name')
 		);
 		$del_triggers = $this->get($options);
 
@@ -1531,7 +1531,7 @@ class CTrigger extends CZBXAPI {
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
 			$host = reset($trigger['hosts']);
-			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['host']));
+			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['name']));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
@@ -1646,7 +1646,7 @@ class CTrigger extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'nopermissions' => true,
-			'selectHosts' => array('host')
+			'selectHosts' => array('name')
 		);
 		$dbTriggers = $this->get($options);
 
@@ -1738,7 +1738,7 @@ class CTrigger extends CZBXAPI {
 
 			$host = reset($dbTriggers[$trigger['triggerid']]['hosts']);
 
-			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['host']);
+			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['name']);
 		}
 		unset($trigger);
 

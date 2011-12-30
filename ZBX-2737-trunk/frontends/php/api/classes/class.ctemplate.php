@@ -1946,7 +1946,7 @@ COpt::memoryPick();
 				' AND t.triggerid=f.triggerid '.
 				' AND h.hostid=i.hostid ';
 		}
-		$sql = 'SELECT DISTINCT t.triggerid, t.description, t.flags, t.expression, h.host '.
+		$sql = 'SELECT DISTINCT t.triggerid, t.description, t.flags, t.expression, h.name as host '.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_triggers = DBSelect($sql);
@@ -2013,7 +2013,7 @@ COpt::memoryPick();
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid, i1.flags, i1.name, i1.hostid, h.host '.
+		$sql = 'SELECT DISTINCT i1.itemid, i1.flags, i1.name, i1.hostid, h.name as host '.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_items = DBSelect($sql);
@@ -2102,7 +2102,7 @@ COpt::memoryPick();
 				' AND g.graphid=gi.graphid '.
 				' AND h.hostid=i.hostid ';
 		}
-		$sql = 'SELECT DISTINCT g.graphid, g.name, g.flags, h.host '.
+		$sql = 'SELECT DISTINCT g.graphid, g.name, g.flags, h.name as host '.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_graphs = DBSelect($sql);
@@ -2163,7 +2163,7 @@ COpt::memoryPick();
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('a1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT a1.applicationid, a1.name, a1.hostid, h.host'.
+		$sql = 'SELECT DISTINCT a1.applicationid, a1.name, a1.hostid, h.name as host '.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_applications = DBSelect($sql);

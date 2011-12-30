@@ -991,7 +991,7 @@ class CGraph extends CZBXAPI {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectHosts' => array('host')
+			'selectHosts' => array('name')
 		);
 		$del_graphs = $this->get($options);
 
@@ -1034,7 +1034,7 @@ class CGraph extends CZBXAPI {
 		// TODO: REMOVE info
 		foreach ($del_graphs as $graph) {
 			$host = reset($graph['hosts']);
-			info(_s('Deleted: Graph "%1$s" on "%2$s".', $graph['name'], $host['host']));
+			info(_s('Deleted: Graph "%1$s" on "%2$s".', $graph['name'], $host['name']));
 		}
 
 		return array('graphids' => $graphids);
