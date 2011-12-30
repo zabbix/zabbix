@@ -44,7 +44,6 @@
 	'S_DISCOVERY'=>				_('Discovery'),
 	'S_CONFIGURATION_OF_DISCOVERY'=>	_('Configuration of discovery'),
 	'S_CREATE_RULE'=>			_('Create rule'),
-	'S_NO_PROXY'=>				_('(no proxy)'),
 	'S_SSH'=>				_('SSH'),
 	'S_SMTP'=>				_('SMTP'),
 	'S_FTP'=>				_('FTP'),
@@ -155,7 +154,6 @@
 	'S_ACTIONS'=>				_('Actions'),
 	'S_LOGS'=>				_('Logs'),
 	'S_LOGS_BIG'=>				_('LOGS'),
-	'S_DELAY'=>				_('Delay'),
 	'S_ON_BIG'=>				_('ON'),
 	'S_ON'=>					_('On'),
 	'S_OFF'=>					_('Off'),
@@ -281,7 +279,6 @@
 	'S_ITEM_ADDED'=>			_('Item added'),
 	'S_ITEM_UPDATED'=>			_('Item updated'),
 	'S_ITEMS_UPDATED'=>			_('Items updated'),
-	'S_ITEM_DOES_NOT_EXIST'=>	_('Item does not exist'),
 	'S_SORT_BY'=>				_('Sort by'),
 	'S_PARAMETER'=>				_('Parameter'),
 	'S_COLOR'=>					_('Colour'),
@@ -410,25 +407,6 @@
 	'S_ALL_GROUPS'=>				_('All groups'),
 	'S_DNS_NAME'=>					_('DNS name'),
 	'S_IP_ADDRESS'=>				_('IP address'),
-	'S_LINK_ADDITIONAL_TEMPLATES'=>			_('Link additional templates'),
-	'S_RELINK_TEMPLATES'=>			_('Replace linked templates'),
-	'S_IPMI_AUTHTYPE'=>				_('IPMI authentication algorithm'),
-	'S_AUTHTYPE_DEFAULT'=>				_('Default'),
-	'S_AUTHTYPE_NONE'=>				_('None'),
-	'S_AUTHTYPE_MD2'=>				_('MD2'),
-	'S_AUTHTYPE_MD5'=>				_('MD5'),
-	'S_AUTHTYPE_STRAIGHT'=>				_('Straight'),
-	'S_AUTHTYPE_OEM'=>				_('OEM'),
-	'S_AUTHTYPE_RMCP_PLUS'=>			_('RMCP+'),
-	'S_IPMI_PRIVILEGE'=>				_('IPMI privilege level'),
-	'S_PRIVILEGE_CALLBACK'=>			_('Callback'),
-	'S_PRIVILEGE_USER'=>				_('User'),
-	'S_PRIVILEGE_OPERATOR'=>			_('Operator'),
-	'S_PRIVILEGE_ADMIN'=>				_('Admin'),
-	'S_PRIVILEGE_OEM'=>				_('OEM'),
-	'S_IPMI_USERNAME'=>				_('IPMI username'),
-	'S_IPMI_PASSWORD'=>				_('IPMI password'),
-	'S_DELETE_SELECTED_HOST_Q'=>			_('Delete selected host?'),
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_HOST_GROUP'=>				_('Host group'),
 	'S_UPDATE'=>					_('Update'),
@@ -441,7 +419,6 @@
 	'S_CREATE_PROXY'=>				_('Create proxy'),
 	'S_PROXY_NAME'=>				_('Proxy name'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
-	'S_CLEAR_WHEN_UNLINKING' => _('Clear when unlinking'),
 	'S_INTERFACES' =>				_('Interfaces'),
 	'S_INTERFACE' =>				_('Interface'),
 
@@ -464,7 +441,6 @@
 	'S_CANNOT_UNLINK_TEMPLATE'=>	_('Cannot unlink template'),
 	'S_CANNOT_LINK_TEMPLATE'=>	_('Cannot link template'),
 	'S_UNLINK_AND_CLEAR'=>			_('Unlink and clear'),
-	'S_MONITORED_BY_PROXY'=>		_('Monitored by proxy'),
 
 //	items.php
 	'S_TEMPLATED_ITEMS'=>					_('Templated items'),
@@ -779,7 +755,6 @@
 	'S_COLUMNS'=>				_('Columns'),
 	'S_ROWS'=>				_('Rows'),
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
-	'S_SCREEN_CELL_CONFIGURATION'=>		_('Screen cell configuration'),
 	'S_RESOURCE'=>					_('Resource'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
 	'S_SIMPLE_GRAPH'=>				_('Simple graph'),
@@ -789,22 +764,10 @@
 	'S_WIDTH'=>						_('Width'),
 	'S_HEIGHT'=>					_('Height'),
 	'S_CREATE_SCREEN'=>				_('Create screen'),
-	'S_CREATE_SLIDESHOW'=>			_('Create slide show'),
 	'S_EDIT'=>						_('Edit'),
 	'S_DYNAMIC_ITEM'=>				_('Dynamic item'),
 	'S_DIMENSION_COLS_ROWS'=>		_('Dimension (cols x rows)'),
-	'S_DELETE_SELECTED_SLIDESHOWS_Q'=>	_('Delete selected slideshows?'),
-
-	'S_SLIDESHOW_MUST_CONTAIN_SLIDES' => _('Slideshow must contain slides'),
-	'S_SLIDESHOWS'=>				_('Slide shows'),
-	'S_SLIDESHOW'=>					_('Slide show'),
-	'S_CONFIGURATION_OF_SLIDESHOWS_BIG'=>	_('CONFIGURATION OF SLIDE SHOWS'),
-	'S_CONFIGURATION_OF_SLIDESHOWS'=>	_('Configuration of slideshows'),
-	'S_SLIDESHOWS_BIG'=>			_('SLIDE SHOWS'),
-	'S_NO_SLIDESHOWS_DEFINED'=>		_('No slide shows defined.'),
-	'S_COUNT_OF_SLIDES'=>			_('Count of slides'),
 	'S_SLIDES'=>					_('Slides'),
-	'S_NEW_SLIDE'=>					_('New slide'),
 	'S_SHOW_TEXT_AS_HTML'=>			_('Show text as HTML'),
 
 	'S_IMPORT_SCREEN'=>				_('Import screen'),
@@ -848,17 +811,6 @@
 //	screens.php
 	'S_SCREENS_BIG'=>				_('SCREENS'),
 	'S_HOST_SCREENS'=>				_('Host screens'),
-
-	'S_SLIDESHOW_UPDATED'=>			_('Slideshow updated'),
-	'S_CANNOT_UPDATE_SLIDESHOW'=>	_('Cannot update slideshow'),
-	'S_SLIDESHOW_ADDED'=>			_('Slideshow added'),
-	'S_CANNOT_ADD_SLIDESHOW'=>		_('Cannot add slideshow'),
-	'S_SLIDESHOW_DELETED'=>			_('Slideshow deleted'),
-	'S_CANNOT_DELETE_SLIDESHOW'=>	_('Cannot delete slideshow'),
-	'S_DELETE_SLIDESHOW_Q'=>		_('Delete slideshow?'),
-
-// slides.php
-	'S_CUSTOM_SLIDES' =>			_('Custom slides'),
 
 //	services.php
 	'S_NO_IT_SERVICE_DEFINED'=>		_('No IT services defined.'),
@@ -1103,11 +1055,9 @@
 	'S_SUBMAP'=>			_('Submap'),
 
 //	screens.inc.php
-	'S_NO_ROWS_IN_SCREEN'=>				_('No rows in screen'),
 	'S_DELETE_IT_Q'=>				_('Delete it?'),
 	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>			_('This screen-row is not empty'),
 	'S_THIS_SCREEN_COLUMN_NOT_EMPTY'=>		_('This screen-column is not empty'),
-	'S_SCREENS_PLAIN_TEXT_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_SCREENS_TRIGGER_FORM_DATE_FORMAT'=>		_('[H:i:s]'),
 
 //	graphs.inc.php

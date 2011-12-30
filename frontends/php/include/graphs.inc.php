@@ -358,49 +358,43 @@ function copy_graph_to_host($graphid, $hostid) {
 	return $result;
 }
 
-	function navigation_bar_calc($idx=null, $idx2=0, $update=false){
-//SDI($_REQUEST['stime']);
-
-		if(!is_null($idx)){
-			if($update){
-				if(isset($_REQUEST['period']) && ($_REQUEST['period'] >= ZBX_MIN_PERIOD))
-					CProfile::update($idx.'.period',$_REQUEST['period'],PROFILE_TYPE_INT, $idx2);
-
-				if(isset($_REQUEST['stime']))
-					CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
+function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
+	if (!is_null($idx)) {
+		if ($update) {
+			if (isset($_REQUEST['period']) && $_REQUEST['period'] >= ZBX_MIN_PERIOD) {
+				CProfile::update($idx.'.period', $_REQUEST['period'], PROFILE_TYPE_INT, $idx2);
 			}
-
-			$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2));
-			$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime', null, $idx2));
-		}
-
-		$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
-		$_REQUEST['stime'] = get_request('stime', null);
-
-		if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
-			show_message(_s('Warning. Time period min value: %1$s (%2$s h)', ZBX_MIN_PERIOD, (int)(ZBX_MIN_PERIOD / SEC_PER_HOUR)));
-			$_REQUEST['period'] = ZBX_MIN_PERIOD;
-		}
-		else if ($_REQUEST['period'] > ZBX_MAX_PERIOD) {
-			show_message(_s('Warning. Time period max value: %1$s (%2$s d)', ZBX_MAX_PERIOD, (int)(ZBX_MAX_PERIOD / SEC_PER_DAY)));
-			$_REQUEST['period'] = ZBX_MAX_PERIOD;
-		}
-
-		if(isset($_REQUEST['stime'])){
-			$time = zbxDateToTime($_REQUEST['stime']);
-
-			if(($time+$_REQUEST['period']) > time()) {
-				$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
+			if (isset($_REQUEST['stime'])) {
+				CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
 			}
 		}
-		else{
-			$_REQUEST['stime'] = date('YmdHis', time()-$_REQUEST['period']);
-		}
+		$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2));
+		$_REQUEST['stime'] = get_request('stime', CProfile::get($idx.'.stime', null, $idx2));
+	}
+	$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
+	$_REQUEST['stime'] = get_request('stime', null);
 
-	return $_REQUEST['period'];
+	if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
+		show_message(_s('Warning. Time period min value: %1$s (%2$s h).', ZBX_MIN_PERIOD, (int)(ZBX_MIN_PERIOD / SEC_PER_HOUR)));
+		$_REQUEST['period'] = ZBX_MIN_PERIOD;
+	}
+	elseif ($_REQUEST['period'] > ZBX_MAX_PERIOD) {
+		show_message(_s('Warning. Time period max value: %1$s (%2$s d).', ZBX_MAX_PERIOD, (int)(ZBX_MAX_PERIOD / SEC_PER_DAY)));
+		$_REQUEST['period'] = ZBX_MAX_PERIOD;
 	}
 
-//Author:	Aly
+	if (isset($_REQUEST['stime'])) {
+		$time = zbxDateToTime($_REQUEST['stime']);
+		if (($time + $_REQUEST['period']) > time()) {
+			$_REQUEST['stime'] = date('YmdHis', time() - $_REQUEST['period']);
+		}
+	}
+	else {
+		$_REQUEST['stime'] = date('YmdHis', time() - $_REQUEST['period']);
+	}
+	return $_REQUEST['period'];
+}
+
 	function get_next_color($palettetype=0){
 		static $prev_color = array('dark'=>true, 'color'=>0, 'grad'=>0);
 

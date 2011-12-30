@@ -45,7 +45,8 @@ $httpFormList->addRow(_('Application'), array(
 	new CTextBox('application', $this->data['application'], ZBX_TEXTBOX_STANDARD_SIZE),
 	SPACE,
 	new CButton('select_app', _('Select'),
-		'return PopUp("popup.php?dstfrm='.$httpForm->getName().'&dstfld1=application&srctbl=applications&srcfld1=name&only_hostid='.$this->data['hostid'].'", 500, 600, "application");'
+		'return PopUp("popup.php?dstfrm='.$httpForm->getName().'&dstfld1=application&srctbl=applications&srcfld1=name&only_hostid='.$this->data['hostid'].'", 500, 600, "application");',
+		'formlist'
 	)
 ));
 $httpFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
@@ -61,7 +62,7 @@ if (in_array($this->data['authentication'], array(HTTPTEST_AUTH_BASIC, HTTPTEST_
 
 $httpFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5));
 
-// append http agents to form list
+// append http agents to form list - http://www.useragentstring.com
 $agentComboBox = new CEditableComboBox('agent', $this->data['agent'], ZBX_TEXTBOX_STANDARD_SIZE);
 $agentComboBox->addItemsInGroup(_('Internet Explorer'), array(
 	'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)' => 'Internet Explorer 10.0',
@@ -71,6 +72,7 @@ $agentComboBox->addItemsInGroup(_('Internet Explorer'), array(
 	'Mozilla/5.0 (compatible; MSIE 6.0; Windows NT 5.1)' => 'Internet Explorer 6.0'
 ));
 $agentComboBox->addItemsInGroup(_('Mozilla Firefox'), array(
+	'Mozilla/5.0 (X11; Linux i686; rv:8.0) Gecko/20100101 Firefox/8.0' => 'Mozilla Firefox 8.0',
 	'Mozilla/5.0 (X11; Linux i686; rv:7.0) Gecko/20100101 Firefox/7.0' => 'Mozilla Firefox 7.0',
 	'Mozilla/5.0 (X11; Linux i686; rv:6.0) Gecko/20100101 Firefox/6.0' => 'Mozilla Firefox 6.0',
 	'Mozilla/5.0 (X11; U; Linux i586; de; rv:5.0) Gecko/20100101 Firefox/5.0' => 'Mozilla Firefox 5.0',
@@ -91,6 +93,8 @@ $agentComboBox->addItemsInGroup(_('Safari'), array(
 	'Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_1 like Mac OS X; fr-fr) AppleWebKit/525.18.1 (KHTML, like Gecko) Mobile/5F136' => 'Safari on iPhone'
 ));
 $agentComboBox->addItemsInGroup(_('Google Chrome'), array(
+	'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8' => 'Google Chrome 17',
+	'Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.36 Safari/535.7' => 'Google Chrome 16',
 	'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.872.0 Safari/535.2' => 'Google Chrome 15',
 	'Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.1 (KHTML, like Gecko) Ubuntu/11.04 Chromium/14.0.825.0 Chrome/14.0.825.0 Safari/535.1' => 'Google Chrome 14',
 	'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_3) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.32 Safari/535.1' => 'Google Chrome 13',
@@ -116,23 +120,19 @@ $httpFormList->addRow(_('Active'), new CCheckBox('status', $this->data['status']
  */
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = new CTable(_('No steps defined.'), 'formElementTable');
-$stepsTable->setAttribute('style', 'min-width:500px;');
+$stepsTable->setAttribute('style', 'min-width: 500px;');
 $stepsTable->setAttribute('id', 'httpStepTable');
 $stepsTable->setHeader(array(
-	SPACE,
-	SPACE,
-	_('Name'),
-	_('Timeout'),
-	_('URL'),
-	_('Required'),
-	_('Status codes'),
-	_('Action')
+	new CCol(SPACE, null, null, '15'),
+	new CCol(SPACE, null, null, '15'),
+	new CCol(_('Name'), null, null, '150'),
+	new CCol(_('Timeout'), null, null, '50'),
+	new CCol(_('URL'), null, null, '200'),
+	new CCol(_('Required'), null, null, '50'),
+	new CCol(_('Status codes'), null, null, '90'),
+	new CCol(_('Action'), null, null, '50')
 ));
 
-if (count($this->data['steps']) > 0) {
-	$first = min(array_keys($this->data['steps']));
-	$last = max(array_keys($this->data['steps']));
-}
 $i = 1;
 foreach ($this->data['steps'] as $stepid => $step) {
 	if (!isset($step['name'])) {
@@ -151,15 +151,21 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$step['required'] = '';
 	}
 
+	$numSpan = new CSpan($i++.':');
+	$numSpan->addClass('rowNum');
+	$numSpan->setAttribute('id', 'current_step_'.$stepid);
+
 	$name = new CSpan($step['name'], 'link');
-	$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'&list_name=steps&stepid='.$stepid.
+	$name->setAttribute('id', 'name_'.$stepid);
+	$name->setAttribute('name_step', $stepid);
+	$name->onClick('return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'&list_name=steps&stepid="+jQuery(this).attr("name_step")+"'.
 		url_param($step['name'], false, 'name').
 		url_param($step['timeout'], false, 'timeout').
 		url_param($step['url'], false, 'url').
 		url_param($step['posts'], false, 'posts').
 		url_param($step['required'], false, 'required').
 		url_param($step['status_codes'], false, 'status_codes').
-		'", 600, 390);'
+		'", 600, 410);'
 	);
 
 	if (zbx_strlen($step['url']) > 70) {
@@ -170,9 +176,8 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$url = $step['url'];
 	}
 
-	$numSpan = new CSpan($i++.':');
-	$numSpan->addClass('rowNum');
-	$numSpan->setAttribute('id', 'current_step_'.$stepid);
+	$removeButton = new CButton('remove_'.$stepid, _('Remove'), 'javascript: removeStep(this);', 'link_menu');
+	$removeButton->setAttribute('remove_step', $stepid);
 
 	$row = new CRow(array(
 		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
@@ -182,20 +187,17 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$url,
 		htmlspecialchars($step['required']),
 		$step['status_codes'],
-		new CButton('remove', _('Remove'), 'javascript: removeHttpStep(\''.$stepid.'\');', 'link_menu')
+		$removeButton
 	), 'sortable');
 	$row->setAttribute('id', 'steps_'.$stepid);
 	$stepsTable->addRow($row);
 }
 
-$httpStepFormList->addRow(
-	_('Steps'),
-	new CDiv(array(
-		$stepsTable,
-		new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'", 600, 410);', 'link_menu')
-	),
-	'objectgroup inlineblock border_dotted ui-corner-all')
-);
+$tmpColumn = new CCol(new CButton('add_step', _('Add'), 'return PopUp("popup_httpstep.php?dstfrm='.$httpForm->getName().'", 600, 410);', 'link_menu'), null, 8);
+$tmpColumn->setAttribute('style', 'vertical-align: middle;');
+$stepsTable->addRow(new CRow($tmpColumn));
+
+$httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // append tabs to form
 $httpTab = new CTabView(array('remember' => true));
