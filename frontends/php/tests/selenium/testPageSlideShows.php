@@ -83,10 +83,12 @@ class testPageSlideShows extends CWebTest
 		$this->button_click('form');
 		$this->wait();
 
-		$this->ok('Slide show');
+		$this->ok('CONFIGURATION OF SLIDE SHOWS');
+		$this->ok('Slide');
 		$this->ok('Name');
-		$this->ok('Update interval');
+		$this->ok('Default delay (in seconds)');
 		$this->ok('Slides');
+		$this->ok(array('Screen', 'Delay', 'Action'));
 		$this->button_click('cancel');
 		$this->wait();
 		$this->ok('SLIDE SHOWS');
