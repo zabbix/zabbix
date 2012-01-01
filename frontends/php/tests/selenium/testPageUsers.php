@@ -21,40 +21,35 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageUsers extends CWebTest
-{
+class testPageUsers extends CWebTest {
 	// Returns all users
-	public static function allUsers()
-	{
+	public static function allUsers() {
 		return DBdata('select * from users');
 	}
 
 	/**
 	* @dataProvider allUsers
 	*/
-	public function testPageUsers_CheckLayout($user)
-	{
+	public function testPageUsers_CheckLayout($user) {
 		$this->login('users.php');
 		$this->assertTitle('Users');
 
-		$this->dropdown_select_wait('filter_usrgrpid','All');
+		$this->dropdown_select_wait('filter_usrgrpid', 'All');
 
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 		$this->ok('Displaying');
-		$this->ok(array('Alias','Name','Surname','User type','Groups','Is online?','Login','Frontend access','Debug mode','Status'));
-		$this->ok(array($user['alias'],$user['name'],$user['surname']));
-		$this->dropdown_select('go','Unblock selected');
-		$this->dropdown_select('go','Delete selected');
+		$this->ok(array('Alias', 'Name', 'Surname', 'User type', 'Groups', 'Is online?', 'Login', 'Frontend access', 'Debug mode', 'Status'));
+		$this->ok(array($user['alias'], $user['name'], $user['surname']));
+		$this->dropdown_select('go', 'Unblock selected');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
-	public function testPageUsers_FilterByHostGroup()
-	{
+	public function testPageUsers_FilterByHostGroup() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUsers_Sorting()
-	{
+	public function testPageUsers_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -62,8 +57,7 @@ class testPageUsers extends CWebTest
 	/**
 	* @dataProvider allUsers
 	*/
-	public function testPageUsers_SimpleUpdate($user)
-	{
+	public function testPageUsers_SimpleUpdate($user) {
 		$alias=$user['alias'];
 
 		$sql1="select * from users where alias='$alias' order by userid";
@@ -75,7 +69,7 @@ class testPageUsers extends CWebTest
 
 		$this->login('users.php');
 		$this->assertTitle('Users');
-		$this->dropdown_select_wait('filter_usrgrpid','All');
+		$this->dropdown_select_wait('filter_usrgrpid', 'All');
 
 		$this->click("link=$alias");
 		$this->wait();
@@ -86,35 +80,32 @@ class testPageUsers extends CWebTest
 		$this->ok("$alias");
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 
-		$this->assertEquals($oldHashUser,DBhash($sql1));
-		$this->assertEquals($oldHashGroup,DBhash($sql2),"Chuck Norris: User update changed data in table users_groups");
-		$this->assertEquals($oldHashMedia,DBhash($sql3),"Chuck Norris: User update changed data in table medias");
+		$this->assertEquals($oldHashUser, DBhash($sql1));
+		$this->assertEquals($oldHashGroup, DBhash($sql2), "Chuck Norris: User update changed data in table users_groups");
+		$this->assertEquals($oldHashMedia, DBhash($sql3), "Chuck Norris: User update changed data in table medias");
 	}
 
-	public function testPageUsers_MassDeleteAll()
-	{
+	public function testPageUsers_MassDeleteAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUsers_MassDelete()
-	{
+	public function testPageUsers_MassDelete() {
 		DBsave_tables('users');
 
 		$this->chooseOkOnNextConfirmation();
 
 		$result=DBselect("select userid from users where alias not in ('guest','Admin')");
 
-		while($user=DBfetch($result))
-		{
+		while ($user=DBfetch($result)) {
 			$id=$user['userid'];
 
 			$this->login('users.php');
 			$this->assertTitle('Users');
-			$this->dropdown_select_wait('filter_usrgrpid','All');
+			$this->dropdown_select_wait('filter_usrgrpid', 'All');
 
 			$this->checkbox_select("group_userid[$id]");
-			$this->dropdown_select('go','Delete selected');
+			$this->dropdown_select('go', 'Delete selected');
 			$this->button_click('goButton');
 			$this->wait();
 
@@ -123,34 +114,32 @@ class testPageUsers extends CWebTest
 			$this->ok('User deleted');
 
 			$sql="select * from users where userid=$id";
-			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table users");
+			$this->assertEquals(0, DBcount($sql), "Chuck Norris: user $id deleted but still exists in table users");
 			$sql="select * from users_groups where userid=$id";
-			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table users_groups");
+			$this->assertEquals(0, DBcount($sql), "Chuck Norris: user $id deleted but still exists in table users_groups");
 			$sql="select * from media where userid=$id";
-			$this->assertEquals(0,DBcount($sql),"Chuck Norris: user $id deleted but still exists in table media");
+			$this->assertEquals(0, DBcount($sql), "Chuck Norris: user $id deleted but still exists in table media");
 		}
 
 		DBrestore_tables('users');
 	}
 
-	public function testPageUsers_MassDeleteSpecialUsers()
-	{
+	public function testPageUsers_MassDeleteSpecialUsers() {
 		DBsave_tables('users');
 
 		$this->chooseOkOnNextConfirmation();
 
 		$result=DBselect("select userid from users where alias in ('guest','Admin')");
 
-		while($user=DBfetch($result))
-		{
+		while ($user=DBfetch($result)) {
 			$id=$user['userid'];
 
 			$this->login('users.php');
 			$this->assertTitle('Users');
-			$this->dropdown_select_wait('filter_usrgrpid','All');
+			$this->dropdown_select_wait('filter_usrgrpid', 'All');
 
 			$this->checkbox_select("group_userid[$id]");
-			$this->dropdown_select('go','Delete selected');
+			$this->dropdown_select('go', 'Delete selected');
 			$this->button_click('goButton');
 			$this->wait();
 
@@ -159,25 +148,23 @@ class testPageUsers extends CWebTest
 			$this->ok('Cannot delete user');
 
 			$sql="select * from users where userid=$id";
-			$this->assertNotEquals(0,DBcount($sql));
+			$this->assertNotEquals(0, DBcount($sql));
 			$sql="select * from users_groups where userid=$id";
-			$this->assertNotEquals(0,DBcount($sql));
+			$this->assertNotEquals(0, DBcount($sql));
 // No media types by default for guest and Admin
 //			$sql="select * from media where userid=$id";
-//			$this->assertNotEquals(0,DBcount($sql));
+//			$this->assertNotEquals(0, DBcount($sql));
 		}
 
 		DBrestore_tables('users');
 	}
 
-	public function testPageUsers_MassUnblockAll()
-	{
+	public function testPageUsers_MassUnblockAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUsers_MassUnblock()
-	{
+	public function testPageUsers_MassUnblock() {
 // TODO
 		$this->markTestIncomplete();
 	}
