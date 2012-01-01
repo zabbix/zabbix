@@ -435,7 +435,7 @@ table.flicker tr td.flicker_r {text-align: right; height: 16px; padding-right: 4
 table.flicker a { color: #0BF; }
 table.itemfilter { border: 1px solid #777777; width: 100%; background-color: white; }
 
-/* aknowledges */
+/* acknowledgements */
 table.ack_msgs { width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid; }
 table.ack_msgs tr.title { height: 14px; vertical-align: middle; color: #FFFFFF;  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; }
 table.ack_msgs tr td.user { padding-left: 10px; padding-right: 10px; text-align: left; }
