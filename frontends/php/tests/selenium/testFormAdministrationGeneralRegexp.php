@@ -114,7 +114,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->ok('Regular expression added');
 
 		// select * from regexps r, expressions e where r.name='...' and r.regexpid=e.regexpid
-		$sql = 'SELECT * FROM regexps r, expressions e WHERE r.name='.zbx_dbstr($name).' AND r.regexpid=e.regexpid';
+		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($name).' AND r.regexpid=e.regexpid';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Regular expression with such name has not been added');
 	}
 
@@ -281,7 +281,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$sql1 = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($name);
 		$this->assertEquals(0, DBcount($sql1), 'Chuck Norris: Regexp has not been deleted from the DB');
 
-		$sql2 = 'SELECT * FROM regexps r, expressions e WHERE r.regexpid=e.regexpid and r.name='.zbx_dbstr($name);
+		$sql2 = 'SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid and r.name='.zbx_dbstr($name);
 
 		// this check will fail as at this moment expressions are not deleted when deleting related regexp
 		$this->assertEquals(0, DBcount($sql2), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
