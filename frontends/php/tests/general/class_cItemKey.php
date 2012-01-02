@@ -456,121 +456,121 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 			array(
 				'key[a, [b, c], d]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', 'b, c', 'd')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', 'b, c', 'd')
 				)
 			),
 			array(
 				'key["a", "b", "c"]["d"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', 'b', 'c', 'd')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', 'b', 'c', 'd')
 				)
 			),
 			array(
 				'key[a, b, c][d]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', 'b', 'c', 'd')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', 'b', 'c', 'd')
 				)
 			),
 			array(
 				'key["12\"3", "456", 789]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('12"3', '456', '789')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('12"3', '456', '789')
 				)
 			),
 			array(
 				'key',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array()
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array()
 				)
 			),
 			array(
 				'key[]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('')
 				)
 			),
 			array(
 				'key[""]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('')
 				)
 			),
 			array(
 				'key["", "", ""]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('', '', '')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('', '', '')
 				)
 			),
 			array(
 				'key[, abc]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('', 'abc')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('', 'abc')
 				)
 			),
 			array(
 				'key["", abc]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('', 'abc')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('', 'abc')
 				)
 			),
 			array(
 				'key[][abc]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('', 'abc')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('', 'abc')
 				)
 			),
 			array(
 				'key[ab"\"c]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('ab"\"c')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('ab"\"c')
 				)
 			),
 			array(
 				'key[[a, b, c]][a]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a, b, c', 'a')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a, b, c', 'a')
 				)
 			),
 			array(
 				'key[["a", "b", "c"]]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('"a", "b", "c"')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('"a", "b", "c"')
 				)
 			),
 			array(
 				'key[["\"a\"", "\"b\"", "\"c\""]]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('"\"a\"", "\"b\"", "\"c\""')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('"\"a\"", "\"b\"", "\"c\""')
 				)
 			),
 
@@ -610,10 +610,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 			'key_id' => $itemKey->getKeyId(),
 			'parameters' => $itemKey->getParameters()
 		);
-		if($expectedResult === false){
+		if ($expectedResult === false) {
 			$this->assertFalse($result['valid'], "I was expecting key $key to be invalid, but got: \n".print_r($result, true));
 		}
-		else{
+		else {
 			unset($result['error']); // no error descriptions in data providers
 			$this->assertEquals($result, $expectedResult, "I was expecting: \n".print_r($expectedResult, true)."but got: \n".print_r($result, true).' for key '.$key);
 		}
