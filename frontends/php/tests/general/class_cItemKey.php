@@ -36,345 +36,345 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 			array(
 				'key',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array()
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array()
 				)
 			),
 			array(
 				'key[a]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a')
 				)
 			),
 			array(
 				'key[a, b, c]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', 'b', 'c')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', 'b', 'c')
 				)
 			),
 			array(
 				'key[ a, b, c]', // whitespace before 'a' should be ignored
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', 'b', 'c')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', 'b', 'c')
 				)
 			),
 			array(
 				'key[    a,    b,     c]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', 'b', 'c')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', 'b', 'c')
 				)
 			),
 			array(
 				'key[a , b  , c   ]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a ', 'b  ', 'c   ')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a ', 'b  ', 'c   ')
 				)
 			),
 			array(
 				'key[   a ,   b  ,  c   ]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a ', 'b  ', 'c   ')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a ', 'b  ', 'c   ')
 				)
 			),
 			array(
 				'key[echo.one, !@##$%$%^&*(, ryrt"rtyrty]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('echo.one', '!@##$%$%^&*(', 'ryrt"rtyrty')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('echo.one', '!@##$%$%^&*(', 'ryrt"rtyrty')
 				)
 			),
 			array(
 				'key["a","b","c"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', 'b', 'c')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', 'b', 'c')
 				)
 			),
 			array(
 				'key[  "a",  "b", "c"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', 'b', 'c')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', 'b', 'c')
 				)
 			),
 			array(
 				'key[  "a"  ,  "b"  , "c"  ]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', 'b', 'c')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', 'b', 'c')
 				)
 			),
 			array(
 				'key["a ", " b ", " c"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a ', ' b ', ' c')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a ', ' b ', ' c')
 				)
 			),
 			array(
 				'key[  "  a "  , "  b  "  ,  " c "  ]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('  a ', '  b  ', ' c ')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('  a ', '  b  ', ' c ')
 				)
 			),
 			array(
 				'key[123"456, 456"789]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('123"456', '456"789')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('123"456', '456"789')
 				)
 			),
 			array(
 				'key[123\"456, 456"789]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('123\"456', '456"789')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('123\"456', '456"789')
 				)
 			),
 			array(
 				'key["I am \"testing\""]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('I am "testing"')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('I am "testing"')
 				)
 			),
 			array(
 				'key["I am \"testing\"  "]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('I am "testing"  ')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('I am "testing"  ')
 				)
 			),
 			array(
 				'key["123", "456", 789]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('123', '456', '789')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('123', '456', '789')
 				)
 			),
 			array(
 				'key["12\"3", "456", 789]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('12"3', '456', '789')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('12"3', '456', '789')
 				)
 			),
 			array(
 				'key[abc[]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('abc[')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('abc[')
 				)
 			),
 			array(
 				'key["a[][][]]],\"!@$#$^%*&*)"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a[][][]]],"!@$#$^%*&*)')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a[][][]]],"!@$#$^%*&*)')
 				)
 			),
 			array(
 				'key[["a"],b]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('"a"', 'b')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('"a"', 'b')
 				)
 			),
 			array(
 				'complex.key[a, b, c]',
 				array(
-					'valid'=>true,
-					'key_id'=>'complex.key',
-					'parameters'=>array('a', 'b', 'c')
+					'valid' => true,
+					'key_id' => 'complex.key',
+					'parameters' => array('a', 'b', 'c')
 				)
 			),
 			array(
 				'complex.key[[a, b], c]',
 				array(
-					'valid'=>true,
-					'key_id'=>'complex.key',
-					'parameters'=>array('a, b', 'c')
+					'valid' => true,
+					'key_id' => 'complex.key',
+					'parameters' => array('a, b', 'c')
 				)
 			),
 			array(
 				'complex.key[abc"efg"h]',
 				array(
-					'valid'=>true,
-					'key_id'=>'complex.key',
-					'parameters'=>array('abc"efg"h')
+					'valid' => true,
+					'key_id' => 'complex.key',
+					'parameters' => array('abc"efg"h')
 				)
 			),
 			array(
 				'complex.key[a][b]',
 				array(
-					'valid'=>true,
-					'key_id'=>'complex.key',
-					'parameters'=>array('a', 'b')
+					'valid' => true,
+					'key_id' => 'complex.key',
+					'parameters' => array('a', 'b')
 				)
 			),
 			array(
 				'complex.key["a"]["b"]',
 			    array(
-					'valid'=>true,
-					'key_id'=>'complex.key',
-					'parameters'=>array('a', 'b')
+					'valid' => true,
+					'key_id' => 'complex.key',
+					'parameters' => array('a', 'b')
 				)
 			),
 			array(
 				'complex.key["a"][b]',
 				array(
-					'valid'=>true,
-					'key_id'=>'complex.key',
-					'parameters'=>array('a', 'b')
+					'valid' => true,
+					'key_id' => 'complex.key',
+					'parameters' => array('a', 'b')
 				)
 			),
 			array(
 				'complex.key[a, b][c, d]',
 				array(
-					'valid'=>true,
-					'key_id'=>'complex.key',
-					'parameters'=>array('a', 'b', 'c', 'd')
+					'valid' => true,
+					'key_id' => 'complex.key',
+					'parameters' => array('a', 'b', 'c', 'd')
 				)
 			),
 			array(
 				'complex.key["a", "b"]["c", "d"]',
 			    array(
-					'valid'=>true,
-					'key_id'=>'complex.key',
-					'parameters'=>array('a', 'b', 'c', 'd')
+					'valid' => true,
+					'key_id' => 'complex.key',
+					'parameters' => array('a', 'b', 'c', 'd')
 				)
 			),
 			array(
 				'more.complex.key[1, 2, [A, B, [a, b], C], 3]',
 				array(
-					'valid'=>true,
-					'key_id'=>'more.complex.key',
-					'parameters'=>array('1', '2', 'A, B, [a, b], C', '3')
+					'valid' => true,
+					'key_id' => 'more.complex.key',
+					'parameters' => array('1', '2', 'A, B, [a, b], C', '3')
 				)
 			),
 			array(
 				'more.complex.key["1", "2", ["A", "B", ["a", "b"], "C"], "3"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'more.complex.key',
-					'parameters'=>array('1', '2', '"A", "B", ["a", "b"], "C"', '3')
+					'valid' => true,
+					'key_id' => 'more.complex.key',
+					'parameters' => array('1', '2', '"A", "B", ["a", "b"], "C"', '3')
 				)
 			),
 			array(
 				'more.complex.key[["1"]]',
 				array(
-					'valid'=>true,
-					'key_id'=>'more.complex.key',
-					'parameters'=>array('"1"')
+					'valid' => true,
+					'key_id' => 'more.complex.key',
+					'parameters' => array('"1"')
 				)
 			),
 			array(
 				'key[,,]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('', '', '')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('', '', '')
 				)
 			),
 			array(
 				'key[a"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a"')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a"')
 				)
 			),
 			array(
 				'key[a\"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a\"')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a\"')
 				)
 			),
 			array(
 				'key["\""]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('"')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('"')
 				)
 			),
 			array(
 				'key["\\""]', // key["\""]
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('"')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('"')
 				)
 			),
 			array(
 				'key["\\\""]', // key["\\""]
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('\\"')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('\\"')
 				)
 			),
 			array(
 				'key["\\\\""]', // key["\\""]
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('\"')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('\"')
 				)
 			),
 			array(
 				'key["\ "]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('\ ')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('\ ')
 				)
 			),
 			array(
 				'key["\\ "]', // key["\ "]
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('\\ ')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('\\ ')
 				)
 			),
 			array(
 				'key["\\\\ "]',  // key["\\ "]
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('\\\\ ')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('\\\\ ')
 				)
 			),
 			array('key["\"]', false),
@@ -384,73 +384,73 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 			array(
 				'key[a,]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', '')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', '')
 				)
 			),
 			array(
 				'key["a",]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', '')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', '')
 				)
 			),
 			array(
 				'system.run["echo \'a\"b\' | cut -d\'\"\' -f1"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'system.run',
-					'parameters'=>array('echo \'a"b\' | cut -d\'"\' -f1')
+					'valid' => true,
+					'key_id' => 'system.run',
+					'parameters' => array('echo \'a"b\' | cut -d\'"\' -f1')
 				)
 			),
 			array(
 				'012345',
 				array(
-					'valid'=>true,
-					'key_id'=>'012345',
-					'parameters'=>array()
+					'valid' => true,
+					'key_id' => '012345',
+					'parameters' => array()
 				)
 			),
 			array(
 				'key[ГУГЛ]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('ГУГЛ')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('ГУГЛ')
 				)
 			),
 			array(
 				'key["ГУГЛ"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('ГУГЛ')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('ГУГЛ')
 				)
 			),
 			array(
 				'key[["a", "b", "c"], "d"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('"a", "b", "c"', 'd')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('"a", "b", "c"', 'd')
 				)
 			),
 			array(
 				'key["a", ["b", "c"], "d"]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a', '"b", "c"', 'd')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a', '"b", "c"', 'd')
 				)
 			),
 			array(
 				'key[[a, b, c], d]',
 				array(
-					'valid'=>true,
-					'key_id'=>'key',
-					'parameters'=>array('a, b, c', 'd')
+					'valid' => true,
+					'key_id' => 'key',
+					'parameters' => array('a, b, c', 'd')
 				)
 			),
 			array(
