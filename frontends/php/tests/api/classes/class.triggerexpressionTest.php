@@ -33,8 +33,8 @@ require_once(dirname(__FILE__).'/../../../include/triggers.inc.php');
 require_once(dirname(__FILE__).'/../../../api/classes/class.ctriggerexpression.php');
 require_once(dirname(__FILE__).'/../../../api/classes/class.citemkey.php');
 
-class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
-	public static function provider(){
+class class_triggerexpressionTest extends PHPUnit_Framework_TestCase {
+	public static function provider() {
 		return array(
 	// Correct trigger expressions
 			array('',false),
@@ -1357,10 +1357,10 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 	/**
 	* @dataProvider provider
 	*/
-	public function test_parse($a, $b){
+	public function test_parse($a, $b) {
 		$trigger = new CTriggerExpression(array('expression'=>$a));
-		if(empty($trigger->errors)){
-			$this->assertEquals($b,true);
+		if (empty($trigger->errors)) {
+			$this->assertEquals($b, true);
 		}
 		else {
 //			print_r($trigger->errors);
