@@ -32,7 +32,7 @@ class testPageUserGroups extends CWebTest
 	/**
 	* @dataProvider allGroups
 	*/
-	public function testPageUserGroups_SimpleTest($group)
+	public function testPageUserGroups_CheckLayout($group)
 	{
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');

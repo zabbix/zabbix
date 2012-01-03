@@ -22,7 +22,7 @@
 require_once('include/config.inc.php');
 require_once('include/forms.inc.php');
 
-$page["title"] = "S_INSTALLATION";
+$page["title"] = _('Installation');
 $page["file"] = 'instal.php';
 
 require_once('include/page_header.php');

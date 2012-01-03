@@ -63,7 +63,7 @@ $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
 if (isset($_REQUEST['serviceid'])) {
 	if ($service = DBfetch(DBselect('SELECT DISTINCT s.serviceid,s.triggerid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid']))) {
-		if (isset($service['triggerid']) && !isset($available_triggers[$service['triggerid']])) {
+		if ($service['triggerid'] && !isset($available_triggers[$service['triggerid']])) {
 			access_deny();
 		}
 	}

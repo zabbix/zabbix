@@ -32,7 +32,7 @@ class testPageTemplates extends CWebTest
 	/**
 	* @dataProvider allTemplates
 	*/
-	public function testPageTemplates_SimpleTest($template)
+	public function testPageTemplates_CheckLayout($template)
 	{
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid','Templates');

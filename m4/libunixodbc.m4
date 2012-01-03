@@ -33,7 +33,7 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
      ],[want_unixodbc=ifelse([$1],,[no],[$1])])
 
   if test "x$want_unixodbc" != x"no"; then
-	
+
 	if test -z "$_libodbc_config" -o test; then
 		AC_PATH_PROG([_libodbc_config], [odbc_config], [no])
 	fi
