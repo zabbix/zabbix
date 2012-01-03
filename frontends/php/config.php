@@ -53,7 +53,6 @@ require_once('include/page_header.php');
 		// value mapping
 		'valuemapid'=>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==6)&&(isset({form})&&({form}=="update"))'),
 		'mapname'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 		'isset({config})&&({config}==6)&&isset({save})'),
-		'original_mapname'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 		'isset({config})&&({config}==6)&&isset({save})'),
 		'valuemap'=>				array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'rem_value'=>				array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535), null),
 		'add_value'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({add_map})'),
@@ -371,11 +370,8 @@ require_once('include/page_header.php');
 		}
 		elseif (isset($_REQUEST['save'])) {
 			$mapping = get_request('valuemap', array());
-			$prevMap = 0;
-			if ($_REQUEST['mapname'] != $_REQUEST['original_mapname'] || $_REQUEST['original_mapname'] == '') {
-				$prevMap = getValuemapByName($_REQUEST['mapname']);
-			}
-			if (!$prevMap) {
+			$prevMap = getValuemapByName($_REQUEST['mapname']);
+			if (!$prevMap || (isset($prevMap['valuemapid']) && $_REQUEST['valuemapid'] == $prevMap['valuemapid']) ) {
 				if (isset($_REQUEST['valuemapid'])) {
 					$result = update_valuemap($_REQUEST['valuemapid'], $_REQUEST['mapname'], $mapping);
 					$audit_action = AUDIT_ACTION_UPDATE;
