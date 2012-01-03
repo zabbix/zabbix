@@ -1091,8 +1091,6 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			_('Template with item key'),
 	'S_TEMPLATE_WITH_APPLICATION'=>			_('Template with application'),
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
-	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		_('Host'),
-	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		_('has been deleted from the system'),
 
 //	triggers.inc.php
 	'S_NO_TRIGGER_WITH'=>					_('No trigger with'),

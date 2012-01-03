@@ -901,7 +901,7 @@ COpt::memoryPick();
 		// TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
+			'output' => array('key_', 'name'),
 			'selectHosts' => array('name'),
 			'nopermissions' => 1
 		));
@@ -958,7 +958,7 @@ COpt::memoryPick();
 		// TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
+			'output' => array('key_', 'name'),
 			'selectHosts' => array('name'),
 			'nopermissions' => 1,
 		));

@@ -343,7 +343,7 @@ class CApplication extends CZBXAPI {
 
 		// adding objects
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+		if ($options['selectHosts'] !== null && (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs))) {
 			$obj_params = array(
 				'output' => $options['selectHosts'],
 				'applicationids' => $applicationids,
@@ -580,7 +580,7 @@ class CApplication extends CZBXAPI {
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectHosts' => array('name')
+			'selectHosts' => array('name', 'hostid')
 		);
 		$del_applications = $this->get($options);
 
@@ -611,7 +611,7 @@ class CApplication extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('name')
+			'selectHosts' => array('name', 'hostid')
 		);
 		$del_application_childs = $this->get($options);
 		$del_applications = zbx_array_merge($del_applications, $del_application_childs);
