@@ -40,7 +40,7 @@ function DBdata($query) {
 	$objects=array();
 
 	$result=DBselect($query);
-	while($object=DBfetch($result)) {
+	while ($object=DBfetch($result)) {
 		$objects[]=array($object);
 	}
 
