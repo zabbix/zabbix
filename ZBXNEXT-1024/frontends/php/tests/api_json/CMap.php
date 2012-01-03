@@ -23,10 +23,8 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class API_JSON_User extends CZabbixTest
-{
-	public static function map_data()
-	{
+class API_JSON_User extends CZabbixTest {
+	public static function map_data() {
 		return array(
 			array(
 				array(array(
@@ -40,7 +38,7 @@ class API_JSON_User extends CZabbixTest
 					'grid_size' => 100,
 					'grid_show' => 1,
 					'grid_align' => 0,
-					"highlight"  =>0,
+					"highlight" => 0,
 					"expandproblem" => 0,
 					"markelements" => 0,
 					"show_unack" => 0,
@@ -53,8 +51,7 @@ class API_JSON_User extends CZabbixTest
 	/**
 	* @dataProvider map_data
 	*/
-	public function testCMap_Create($maps)
-	{
+	public function testCMap_Create($maps) {
 		$debug = null;
 
 		DBsave_tables('sysmaps');
@@ -69,12 +66,12 @@ class API_JSON_User extends CZabbixTest
 		$this->assertTrue(!array_key_exists('error', $result),"Chuck Norris: Failed to create map through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
 
 		// looking at the DB, was the record created?
-		foreach($maps as $map){
+		foreach ($maps as $map) {
 			// regular query
 			$sql="select * from sysmaps where name='".$map['name']."'";
 			$r = DBSelect($sql);
 			$map_db = DBFetch($r);
-			$this->assertTrue(array_key_exists('sysmapid', $map_db),"Chuck Norris: Map was just inserted but I failed to fetch it's id using DB query. Here is how a result looks like: ".print_r($map_db, true));
+			$this->assertTrue(array_key_exists('sysmapid', $map_db), "Chuck Norris: Map was just inserted but I failed to fetch it's ID using DB query. Here is how a result looks like: ".print_r($map_db, true));
 
 			// api call
 			$result = $this->api_acall(
@@ -85,7 +82,7 @@ class API_JSON_User extends CZabbixTest
 				$debug
 			);
 			$map_api = reset($result['result']);
-			$this->assertTrue(array_key_exists('sysmapid', $map_api),"Chuck Norris: Chuck Norris: Map was just inserted but I failed to fetch it's id using JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
+			$this->assertTrue(array_key_exists('sysmapid', $map_api), "Chuck Norris: Map was just inserted but I failed to fetch it's ID using JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
 
 		}
 

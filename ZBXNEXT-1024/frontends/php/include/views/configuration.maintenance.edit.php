@@ -73,7 +73,7 @@ $maintenanceTillMinute->setAttribute('placeholder', _('mm'));
 $maintenanceFormList->addRow(_('Active till'), array($maintenanceTillDay, '/', $maintenanceTillMonth, '/', $maintenanceTillYear, SPACE, $maintenanceTillHour, ':', $maintenanceTillMinute, $calendarIcon));
 zbx_add_post_js('create_calendar(null, ["mntc_till_day", "mntc_till_month", "mntc_till_year", "mntc_till_hour", "mntc_till_minute"], "mntc_active_till", "active_till");');
 
-$maintenanceFormList->addRow(_('Description'), new CTextArea('description', $this->data['description'], ZBX_TEXTAREA_STANDARD_SIZE, 5));
+$maintenanceFormList->addRow(_('Description'), new CTextArea('description', $this->data['description']));
 
 /*
  * Maintenance period tab

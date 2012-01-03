@@ -24,7 +24,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 class testPageEvents extends CWebTest
 {
 
-	public function testPageEvents_Triggers_SimpleTest()
+	public function testPageEvents_Triggers_CheckLayout()
 	{
 		$this->login('events.php');
 
@@ -48,7 +48,7 @@ class testPageEvents extends CWebTest
 		}
 	}
 
-	public function testPageEvents_Discovery_SimpleTest()
+	public function testPageEvents_Discovery_CheckLayout()
 	{
 		$this->login('events.php');
 

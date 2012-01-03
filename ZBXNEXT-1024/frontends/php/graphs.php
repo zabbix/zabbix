@@ -357,21 +357,19 @@ require_once('include/page_header.php');
 
 	$form = new CForm('get');
 
-// Config
-	if(!isset($_REQUEST['form'])){
-// removes form_refresh variable
+	if (!isset($_REQUEST['form'])) {
 		$form->cleanItems();
 		$form->addItem(new CSubmit('form', S_CREATE_GRAPH));
 	}
 
-	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
+	show_table_header(_('CONFIGURATION OF GRAPHS'), $form);
 
-	if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['group_graphid'])){
-		$graphs_wdgt = new CWidget();
-		$graphs_wdgt->addItem(insert_copy_elements_to_forms('group_graphid'));
-		$graphs_wdgt->show();
+	if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
+		$triggersView = new CView('configuration.copy.elements', getCopyElementsFormData('group_graphid'));
+		$triggersView->render();
+		$triggersView->show();
 	}
-	else if(isset($_REQUEST['form'])){
+	elseif (isset($_REQUEST['form'])) {
 		insert_graph_form();
 		echo SBR;
 		$table = new CTable(NULL,'graph');
@@ -526,9 +524,9 @@ require_once('include/page_header.php');
 
 //----- GO ------
 		$goBox = new CComboBox('go');
-		$goBox->addItem('copy_to',S_COPY_SELECTED_TO);
+		$goBox->addItem('copy_to', _('Copy selected to ...'));
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('delete', _('Delete selected'));
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_GRAPHS);
 		$goBox->addItem($goOption);
 

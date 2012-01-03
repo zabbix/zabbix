@@ -293,7 +293,7 @@ require_once('include/page_header.php');
 		));
 	}
 
-	$wdgt_hgroups = new CUIWidget('search_hostgroup',$table);
+	$wdgt_hgroups = new CUIWidget('search_hostgroup', $table);
 	$wdgt_hgroups->setHeader(_('Host groups'), SPACE);
 	$wdgt_hgroups->setFooter(S_DISPLAYING.SPACE.$viewCount.SPACE.S_OF_SMALL.SPACE.$overalCount.SPACE.S_FOUND_SMALL);
 	$right_col[] = $wdgt_hgroups;

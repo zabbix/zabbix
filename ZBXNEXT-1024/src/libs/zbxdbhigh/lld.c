@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "zbxserver.h"
 
 typedef struct
 {
@@ -1197,7 +1198,7 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 		const char *snmpv3_authpassphrase_esc, const char *snmpv3_privpassphrase_esc, unsigned char authtype,
 		const char *username_esc, const char *password_esc, const char *publickey_esc,
 		const char *privatekey_esc, const char *description_esc, zbx_uint64_t interfaceid,
-		zbx_uint64_t parent_itemid, const char *key_proto_esc)
+		zbx_uint64_t parent_itemid, const char *key_proto_esc, int lastcheck)
 {
 	int		i, j, new_items = 0, new_apps = 0;
 	zbx_lld_item_t	*item;
@@ -1221,7 +1222,7 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 			" values ";
 	const char	*ins_item_discovery_sql =
 			"insert into item_discovery"
-			" (itemdiscoveryid,itemid,parent_itemid,key_)"
+			" (itemdiscoveryid,itemid,parent_itemid,key_,lastcheck)"
 			" values ";
 	const char	*ins_items_applications_sql =
 			"insert into items_applications"
@@ -1307,8 +1308,8 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_item_discovery_sql);
 #endif
 			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')%s",
-					itemdiscoveryid, item->itemid, parent_itemid, key_proto_esc, row_dl);
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',%d)%s",
+					itemdiscoveryid, item->itemid, parent_itemid, key_proto_esc, lastcheck, row_dl);
 
 			itemdiscoveryid++;
 		}
@@ -1362,10 +1363,11 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 
 			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
 					"update item_discovery"
-					" set key_='%s'"
+					" set key_='%s',"
+						"lastcheck=%d"
 					" where itemid=" ZBX_FS_UI64
 						" and parent_itemid=" ZBX_FS_UI64 ";\n",
-					key_proto_esc, item->itemid, parent_itemid);
+					key_proto_esc, lastcheck, item->itemid, parent_itemid);
 
 			if (0 != item->del_appids_num)
 			{
@@ -1443,7 +1445,8 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
  *                                                                            *
  ******************************************************************************/
 static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemid, struct zbx_json_parse *jp_data,
-		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num)
+		char **error, const char *f_macro, const char *f_regexp, ZBX_REGEXP *regexps, int regexps_num,
+		int lastcheck)
 {
 	const char		*__function_name = "DBlld_update_items";
 
@@ -1466,9 +1469,8 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 				"i.description,i.interfaceid"
 			" from items i,item_discovery id"
 			" where i.itemid=id.itemid"
-				" and i.hostid=" ZBX_FS_UI64
 				" and id.parent_itemid=" ZBX_FS_UI64,
-			hostid, discovery_itemid);
+			discovery_itemid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1541,7 +1543,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 				valuemapid, ipmi_sensor_esc, snmp_community_esc, port_esc, snmpv3_securityname_esc,
 				snmpv3_securitylevel, snmpv3_authpassphrase_esc, snmpv3_authpassphrase_esc, authtype,
 				username_esc, password_esc, publickey_esc, privatekey_esc, description_esc,
-				interfaceid, parent_itemid, key_proto_esc);
+				interfaceid, parent_itemid, key_proto_esc, lastcheck);
 
 		zbx_free(description_esc);
 		zbx_free(privatekey_esc);
@@ -2165,6 +2167,42 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static void	DBlld_remove_lost_resources(zbx_uint64_t discovery_itemid, unsigned short lifetime, int now)
+{
+	const char		*__function_name = "DBlld_remove_lost_resources";
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_uint64_t		itemid;
+	zbx_vector_uint64_t	items;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lifetime:%hu", __function_name, lifetime);
+
+	zbx_vector_uint64_create(&items);
+
+	result = DBselect(
+			"select id2.itemid"
+			" from item_discovery id1,item_discovery id2"
+			" where id1.itemid=id2.parent_itemid"
+				" and id1.parent_itemid=" ZBX_FS_UI64
+				" and id2.lastcheck<%d",
+			discovery_itemid, now - lifetime * SEC_PER_DAY);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(itemid, row[0]);
+		zbx_vector_uint64_append(&items, itemid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&items, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBdelete_items(&items);
+
+	zbx_vector_uint64_destroy(&items);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBlld_process_discovery_rule                                     *
@@ -2181,32 +2219,45 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 {
 	const char		*__function_name = "DBlld_process_discovery_rule";
-
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_uint64_t		hostid = 0;
 	struct zbx_json_parse	jp, jp_data;
 	char			*discovery_key = NULL, *filter = NULL, *error = NULL, *db_error = NULL, *error_esc;
 	unsigned char		status = 0;
+	unsigned short		lifetime;
 	char			*f_macro = NULL, *f_regexp = NULL;
 	ZBX_REGEXP		*regexps = NULL;
-	int			regexps_alloc = 0, regexps_num = 0;
+	int			regexps_alloc = 0, regexps_num = 0, now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
 
 	result = DBselect(
-			"select hostid,key_,status,filter,error"
+			"select hostid,key_,status,filter,error,lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			discovery_itemid);
 
 	if (NULL != (row = DBfetch(result)))
 	{
+		char	*lifetime_str;
+
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
 		status = (unsigned char)atoi(row[2]);
 		filter = zbx_strdup(filter, row[3]);
 		db_error = zbx_strdup(db_error, row[4]);
+
+		lifetime_str = zbx_strdup(NULL, row[5]);
+		substitute_simple_macros(NULL, &hostid, NULL, NULL, &lifetime_str, MACRO_TYPE_LLD_LIFETIME, NULL, 0);
+		if (SUCCEED != is_ushort(lifetime_str, &lifetime))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule \"%s:%s\":"
+					" \"%s\" is not a valid value",
+					zbx_host_string(hostid), discovery_key, lifetime_str);
+			lifetime = 0xffff;
+		}
+		zbx_free(lifetime_str);
 	}
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", discovery_itemid);
@@ -2264,9 +2315,12 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 				__function_name, f_macro, f_regexp);
 	}
 
-	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
+	now = time(NULL);
+
+	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, now);
 	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
+	DBlld_remove_lost_resources(discovery_itemid, lifetime, now);
 
 	zbx_free(regexps);
 

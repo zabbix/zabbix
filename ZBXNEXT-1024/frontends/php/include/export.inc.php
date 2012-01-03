@@ -51,7 +51,7 @@ class zbxXML{
 				'macro' 			=> 'name'
 			)
 		),
-		XML_TAG_HOSTPROFILE => array(
+		XML_TAG_HOSTINVENTORY => array(
 			'attributes' => array(),
 			'elements' => array(
 				'devicetype'		=> '',
@@ -64,12 +64,7 @@ class zbxXML{
 				'software'			=> '',
 				'contact'			=> '',
 				'location'			=> '',
-				'notes'				=> ''
-			)
-		),
-		XML_TAG_HOSTPROFILE_EXT => array(
-			'attributes' => array(),
-			'elements' => array(
+				'notes'				=> '',
 				'device_alias'		=> '',
 				'device_type'		=> '',
 				'device_chassis'	=> '',
@@ -224,7 +219,32 @@ class zbxXML{
 		)
 	);
 
-	protected static function mapProfileName($name){
+	private static $oldKeys = array(
+		'tcp',
+		'ftp',
+		'http',
+		'imap',
+		'ldap',
+		'nntp',
+		'ntp',
+		'pop',
+		'smtp',
+		'ssh'
+	);
+	private static $oldKeysPref = array(
+		'tcp_perf',
+		'ftp_perf',
+		'http_perf',
+		'imap_perf',
+		'ldap_perf',
+		'nntp_perf',
+		'ntp_perf',
+		'pop_perf',
+		'smtp_perf',
+		'ssh_perf'
+	);
+
+	protected static function mapInventoryName($name) {
 		$map = array(
 			'devicetype' => 'type',
 			'serialno' => 'serialno_a',
@@ -287,8 +307,31 @@ class zbxXML{
 	}
 
 	protected static function outputXML($doc){
-//		return preg_replace_callback('/^( {2,})/m', array('zbxXML', 'space2tab'), $doc->ownerDocument->saveXML());
 		return $doc->ownerDocument->saveXML();
+	}
+
+	/**
+	 * Converts Simple key from old format to new.
+	 *
+	 *
+	 * @param mixed $oldKey   Simple key in old format
+	 *
+	 * @return mixed
+	 */
+	public static function convertOldSimpleKey($oldKey) {
+		$newKey = $oldKey;
+
+		$explodedKey = explode(',', $oldKey);
+
+		if (in_array($explodedKey[0], self::$oldKeys)) {
+			$newKey = 'net.tcp.service['.$explodedKey[0].',,'.$explodedKey[1].']';
+		}
+		elseif (in_array($explodedKey[0], self::$oldKeysPref)) {
+			$keyWithoutPerf = explode('_', $explodedKey[0]);
+			$newKey = 'net.tcp.service.perf['.$keyWithoutPerf[0].',,'.$explodedKey[1].']';
+		}
+
+		return $newKey;
 	}
 
 	private static function space2tab($matches){
@@ -1098,76 +1141,75 @@ class zbxXML{
 // }}} TEMPLATES
 
 
-// HOST PROFILES {{{
-					if($old_version_input){
-						$profile_node = $xpath->query('host_profile/*', $host);
-						if($profile_node->length > 0){
-							$host_db['profile'] = array();
-							foreach($profile_node as $field){
-								$newProfileName = self::mapProfileName($field->nodeName);
-								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
-									$host_db['profile'][$newProfileName] .= "\n";
-									$host_db['profile'][$newProfileName] .= $field->nodeValue;
+					// host inventory
+					if ($old_version_input) {
+						$inventoryNode = $xpath->query('host_profile/*', $host);
+						if ($inventoryNode->length > 0) {
+							if (!isset($host_db['inventory'])) {
+								$host_db['inventory'] = array();
+							}
+							foreach ($inventoryNode as $field) {
+								$newInventoryName = self::mapInventoryName($field->nodeName);
+								$host_db['inventory'][$newInventoryName] = $field->nodeValue;
+							}
+						}
+
+						$inventoryNodeExt = $xpath->query('host_profiles_ext/*', $host);
+						if ($inventoryNodeExt->length > 0) {
+							if (!isset($host_db['inventory'])) {
+								$host_db['inventory'] = array();
+							}
+							foreach ($inventoryNodeExt as $field) {
+								$newInventoryName = self::mapInventoryName($field->nodeName);
+								if (isset($host_db['inventory'][$newInventoryName]) && $field->nodeValue !== '') {
+									$host_db['inventory'][$newInventoryName] .= "\r\n\r\n";
+									$host_db['inventory'][$newInventoryName] .= $field->nodeValue;
 								}
-								else{
-									$host_db['profile'][$newProfileName] = $field->nodeValue;
+								else {
+									$host_db['inventory'][$newInventoryName] = $field->nodeValue;
 								}
 							}
 						}
 
-						$profile_ext_node = $xpath->query('host_profiles_ext/*', $host);
-						if($profile_ext_node->length > 0){
-							if(!isset($host_db['profile'])){
-								$host_db['profile'] = array();
-							}
-							foreach($profile_ext_node as $field){
-								$newProfileName = self::mapProfileName($field->nodeName);
-								if(isset($host_db['profile'][$newProfileName]) && $field->nodeValue !== ''){
-									$host_db['profile'][$newProfileName] .= "\n";
-									$host_db['profile'][$newProfileName] .= $field->nodeValue;
-								}
-								else{
-									$host_db['profile'][$newProfileName] = $field->nodeValue;
-								}
-							}
-						}
-
-						$host_db['profile_mode'] = isset($host_db['profile']) ? HOST_PROFILE_MANUAL : HOST_PROFILE_DISABLED;
+						$host_db['inventory_mode'] = isset($host_db['inventory']) ? HOST_INVENTORY_MANUAL : HOST_INVENTORY_DISABLED;
 					}
-// }}} HOST PROFILES
 
 // HOSTS
-					if(isset($host_db['proxy_hostid'])){
+					if (isset($host_db['proxy_hostid'])) {
 						$proxy_exists = API::Proxy()->get(array('proxyids' => $host_db['proxy_hostid']));
-						if(empty($proxy_exists))
+						if (empty($proxy_exists)) {
 							$host_db['proxy_hostid'] = 0;
+						}
 					}
 
-					if($current_host && isset($rules['host']['exist'])){
-						if($host_db['status'] == HOST_STATUS_TEMPLATE){
+					if ($current_host && isset($rules['host']['exist'])) {
+						if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 							$host_db['templateid'] = $current_host['hostid'];
 							$result = API::Template()->update($host_db);
 						}
-						else{
+						else {
 							$host_db['hostid'] = $current_host['hostid'];
 							$result = API::Host()->update($host_db);
 						}
-						if(!$result)
+						if (!$result) {
 							throw new Exception();
+						}
 						$current_hostid = $current_host['hostid'];
 					}
 
-					if(!$current_host && isset($rules['host']['missed'])){
-						if($host_db['status'] == HOST_STATUS_TEMPLATE){
+					if (!$current_host && isset($rules['host']['missed'])) {
+						if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 							$result = API::Template()->create($host_db);
-							if(!$result)
+							if (!$result) {
 								throw new Exception();
+							}
 							$current_hostid = reset($result['templateids']);
 						}
-						else{
+						else {
 							$result = API::Host()->create($host_db);
-							if(!$result)
+							if (!$result) {
 								throw new Exception();
+							}
 							$current_hostid = reset($result['hostids']);
 						}
 					}
@@ -1178,12 +1220,12 @@ class zbxXML{
 						$items = $xpath->query('items/item', $host);
 
 						// if this is an export from 1.8, we need to make some adjustments to items
-						if($old_version_input){
-							if(!$interfaces_created_with_host){
+						if ($old_version_input) {
+							if (!$interfaces_created_with_host) {
 								// if host had another interfaces, we are not touching them: they remain as is
-								foreach($interfaces as $i => $interface){
+								foreach ($interfaces as $i => $interface) {
 									// interface was not already created
-									if(!isset($interface['interfaceid'])){
+									if (!isset($interface['interfaceid'])) {
 										// creating interface
 										$interface['hostid'] = $current_hostid;
 										$ids = API::HostInterface()->create($interface);
@@ -1192,7 +1234,7 @@ class zbxXML{
 									}
 								}
 							}
-							else{
+							else {
 								$options = array(
 									'hostids' => $current_hostid,
 									'output' => API_OUTPUT_EXTEND
@@ -1207,8 +1249,8 @@ class zbxXML{
 							$ipmi_interface_id = null;
 							$snmp_interfaces = array(); //hash 'port' => 'iterfaceid'
 
-							foreach($interfaces as $interface){
-								switch($interface['type']){
+							foreach ($interfaces as $interface) {
+								switch ($interface['type']) {
 									case INTERFACE_TYPE_AGENT:
 										$agent_interface_id = $interface['interfaceid'];
 									break;
@@ -1222,22 +1264,21 @@ class zbxXML{
 							}
 						}
 
-						foreach($items as $inum => $item){
+						foreach ($items as $item) {
 							$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 							$item_db['hostid'] = $current_hostid;
-							$item_db['profile_link'] = 0;
 
 							// item needs interfaces
-							if($old_version_input){
+							if ($old_version_input) {
 								// 'snmp_port' column was renamed to 'port'
-								if($item_db['snmp_port'] != 0){
+								if ($item_db['snmp_port'] != 0) {
 									// zabbix agent items have no ports
 									$item_db['port'] = $item_db['snmp_port'];
 								}
 								unset($item_db['snmp_port']);
 
 								// assigning appropriate interface depending on item type
-								switch($item_db['type']){
+								switch ($item_db['type']) {
 									// zabbix agent interface
 									case ITEM_TYPE_ZABBIX:
 									case ITEM_TYPE_SIMPLE:
@@ -1268,6 +1309,7 @@ class zbxXML{
 										break;
 								}
 
+								$item_db['key_'] = self::convertOldSimpleKey($item_db['key_']);
 							}
 
 							$options = array(
@@ -1388,6 +1430,20 @@ class zbxXML{
 						foreach($triggers as $trigger){
 							$trigger_db = self::mapXML2arr($trigger, XML_TAG_TRIGGER);
 
+							if($old_version_input) {
+								$expressionPart = explode(':', $trigger_db['expression']);
+								$keyName = explode(',', $expressionPart[1], 2);
+
+								if (count($keyName) == 2) {
+									$keyValue = explode('.', $keyName[1], 2);
+									$key = $keyName[0].",".$keyValue[0];
+
+									if (in_array($keyName[0], self::$oldKeys) || in_array($keyName[0], self::$oldKeysPref)) {
+										$trigger_db['expression'] = str_replace($key, self::convertOldSimpleKey($key), $trigger_db['expression']);
+									}
+								}
+							}
+
 							// {HOSTNAME} is here for backward compatibility
 							$trigger_db['expression'] = str_replace('{{HOSTNAME}:', '{'.$host_db['host'].':', $trigger_db['expression']);
 							$trigger_db['expression'] = str_replace('{{HOST.HOST}:', '{'.$host_db['host'].':', $trigger_db['expression']);
@@ -1418,11 +1474,11 @@ class zbxXML{
 
 
 							if(!$current_trigger && !isset($rules['trigger']['missed'])){
-								info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+								info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 								continue; // break if not update exist
 							}
 							if($current_trigger && !isset($rules['trigger']['exist'])){
-								info('Trigger ['.$trigger_db['description'].'] skipped - user rule');
+								info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 								continue; // break if not update exist
 							}
 
@@ -1486,6 +1542,9 @@ class zbxXML{
 								// {HOSTNAME} is here for backward compatibility
 								$gitem_db['host'] = ($gitem_host == '{HOSTNAME}') ? $host_db['host'] : $gitem_host;
 								$gitem_db['host'] = ($gitem_host == '{HOST.HOST}') ? $host_db['host'] : $gitem_host;
+								if ($old_version_input) {
+									$data[0] = self::convertOldSimpleKey($data[0]);
+								}
 								$gitem_db['key_'] = implode(':', $data);
 
 								if($current_item = API::Item()->exists($gitem_db)){
@@ -1748,17 +1807,16 @@ class zbxXML{
 		foreach($data['hosts'] as $host){
 // HOST
 			$host_node = self::addChildData($hosts_node, XML_TAG_HOST, $host);
-// HOST PROFILE
-			if(!empty($host['profile']))
-				self::addChildData($host_node, XML_TAG_HOSTPROFILE, $host['profile']);
-			if(!empty($host['profile_ext']))
-				self::addChildData($host_node, XML_TAG_HOSTPROFILE_EXT, $host['profile_ext']);
+// HOST INVENTORY
+			if (!empty($host['inventory'])) {
+				self::addChildData($host_node, XML_TAG_HOSTINVENTORY, $host['inventory']);
+			}
 // GROUPS
-			if(isset($data['hosts_groups'])){
+			if (isset($data['hosts_groups'])) {
 				$groups_node = $host_node->appendChild(new DOMElement(XML_TAG_GROUPS));
-				foreach($data['hosts_groups'] as $gnum => $group){
+				foreach ($data['hosts_groups'] as $gnum => $group) {
 					$group['hosts'] = zbx_toHash($group['hosts'], 'hostid');
-					if(isset($group['hosts'][$host['hostid']])){
+					if (isset($group['hosts'][$host['hostid']])) {
 						$n = $groups_node->appendChild(new DOMElement(XML_TAG_GROUP));
 						$n->appendChild(new DOMText($group['name']));
 					}
@@ -1766,29 +1824,29 @@ class zbxXML{
 			}
 
 // TRIGGERS
-			if(isset($data['triggers'])){
+			if (isset($data['triggers'])) {
 				$triggers_node = $host_node->appendChild(new DOMElement(XML_TAG_TRIGGERS));
-				foreach($data['triggers'] as $tnum => $trigger){
+				foreach ($data['triggers'] as $tnum => $trigger) {
 					$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-					if(isset($trigger['hosts'][$host['hostid']])){
+					if (isset($trigger['hosts'][$host['hostid']])) {
 						self::addChildData($triggers_node, XML_TAG_TRIGGER, $trigger);
 					}
 				}
 			}
 
 // ITEMS
-			if(isset($data['items'])){
+			if (isset($data['items'])) {
 				$items_node = $host_node->appendChild(new DOMElement(XML_TAG_ITEMS));
-				foreach($data['items'] as $item){
+				foreach ($data['items'] as $item) {
 					$item['hosts'] = zbx_toHash($item['hosts'], 'hostid');
-					if(isset($item['hosts'][$host['hostid']])){
+					if (isset($item['hosts'][$host['hostid']])) {
 						$item_node = self::addChildData($items_node, XML_TAG_ITEM, $item);
 //sdi('Item: '. date('H i s u'));
-						if(isset($data['items_applications'])){
+						if (isset($data['items_applications'])) {
 							$applications_node = $item_node->appendChild(new DOMElement(XML_TAG_APPLICATIONS));
-							foreach($data['items_applications'] as $application){
+							foreach ($data['items_applications'] as $application) {
 								$application['items'] = zbx_toHash($application['items'], 'itemid');
-								if(isset($application['items'][$item['itemid']])){
+								if (isset($application['items'][$item['itemid']])) {
 									$n = $applications_node->appendChild(new DOMElement(XML_TAG_APPLICATION));
 									$n->appendChild(new DOMText($application['name']));
 								}
@@ -1799,11 +1857,11 @@ class zbxXML{
 			}
 
 // TEMPLATES
-			if(isset($data['templates'])){
+			if (isset($data['templates'])) {
 				$templates_node = $host_node->appendChild(new DOMElement(XML_TAG_TEMPLATES));
-				foreach($data['templates'] as $template){
+				foreach ($data['templates'] as $template) {
 					$template['hosts'] = zbx_toHash($template['hosts'], 'hostid');
-					if(isset($template['hosts'][$host['hostid']])){
+					if (isset($template['hosts'][$host['hostid']])) {
 						$n = $templates_node->appendChild(new DOMElement(XML_TAG_TEMPLATE));
 						$n->appendChild(new DOMText($template['host']));
 					}
@@ -1811,11 +1869,11 @@ class zbxXML{
 			}
 
 // SCREENS
-			if(isset($data['screens'])){
+			if (isset($data['screens'])) {
 				$screens_node = $host_node->appendChild(new DOMElement(XML_TAG_SCREENS));
 
-				foreach($data['screens'] as $screen){
-					if(bccomp($screen['templateid'],$host['hostid']) == 0){
+				foreach ($data['screens'] as $screen) {
+					if (bccomp($screen['templateid'],$host['hostid']) == 0) {
 						unset($screen['screenid'], $screen['templateid']);
 						self::arrayToDOM($screens_node, $screen, XML_TAG_SCREEN);
 					}
@@ -1823,15 +1881,17 @@ class zbxXML{
 			}
 
 // GRAPHS
-			if(isset($data['graphs'])){
+			if (isset($data['graphs'])) {
 				$graphs_node = $host_node->appendChild(new DOMElement(XML_TAG_GRAPHS));
 				$itemminmaxids = array();
 
-				foreach($data['graphs'] as $num => $graph){
-					if($graph['ymin_itemid'] && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE))
+				foreach ($data['graphs'] as $num => $graph) {
+					if ($graph['ymin_itemid'] && ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)) {
 						$itemminmaxids[$graph['ymin_itemid']] = $graph['ymin_itemid'];
-					if($graph['ymax_itemid'] && ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE))
+					}
+					if ($graph['ymax_itemid'] && ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE)) {
 						$itemminmaxids[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+					}
 				}
 
 				$options = array(

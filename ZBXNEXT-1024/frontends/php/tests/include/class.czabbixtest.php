@@ -24,14 +24,13 @@
 require_once(dirname(__FILE__).'/../../include/defines.inc.php');
 require_once(dirname(__FILE__).'/dbfunc.php');
 
-class CZabbixTest extends PHPUnit_Framework_TestCase
-{
-	public $ID=0;
+class CZabbixTest extends PHPUnit_Framework_TestCase {
+	public $ID = 0;
 
-	function do_post_request($data,&$debug){
+	function do_post_request($data, &$debug){
 		global $URL;
 
-		if(is_array($data)) $data = json_encode($data);
+		if (is_array($data)) $data = json_encode($data);
 
 //print("Request:\n".$data."\n");
 
@@ -51,7 +50,7 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 		$ctx = stream_context_create($params);
 
 		$fp = fopen($URL, 'rb', false, $ctx);
-		if(!$fp) {
+		if (!$fp) {
 			throw new Exception("Problem with $URL, $php_errormsg");
 		}
 
@@ -59,7 +58,7 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 
 		fclose($fp);
 
-		if($response === false) {
+		if ($response === false) {
 			throw new Exception("Problem reading data from $URL, $php_errormsg");
 		}
 
@@ -70,21 +69,21 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 		return $response;
 	}
 
-	function api_call_raw($json, &$debug){
-		$response = $this->do_post_request($json,$debug);
+	function api_call_raw($json, &$debug) {
+		$response = $this->do_post_request($json, $debug);
 		$decoded = json_decode($response, true);
 
 		return $decoded;
 	}
 
-	function api_call($method, $params, &$debug){
+	function api_call($method, $params, &$debug) {
 		global $ID;
 
 		$data = array(
 			'jsonrpc' => '2.0',
 			'method' => $method,
 			'params' => $params,
-			'id'=> $this->ID
+			'id' => $this->ID
 		);
 
 		$response = $this->do_post_request($data,$debug);
@@ -93,17 +92,17 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 		return $decoded;
 	}
 
-	function api_acall($method, $params, &$debug){
+	function api_acall($method, $params, &$debug) {
 		global $ID;
 
 		$data = array(
 			'jsonrpc' => '2.0',
 			'method' => 'user.login',
-			'params' => array('user'=>'Admin', 'password'=>'zabbix'),
-			'id'=> $this->ID
+			'params' => array('user' => 'Admin', 'password' => 'zabbix'),
+			'id' => $this->ID
 		);
 
-		$response = $this->do_post_request($data,$debug);
+		$response = $this->do_post_request($data, $debug);
 		$decoded = json_decode($response, true);
 		$auth=$decoded["result"];
 
@@ -112,32 +111,31 @@ class CZabbixTest extends PHPUnit_Framework_TestCase
 			'method' => $method,
 			'params' => $params,
 			'auth' => $auth,
-			'id'=> $this->ID
+			'id' => $this->ID
 		);
 
-		$response = $this->do_post_request($data,$debug);
+		$response = $this->do_post_request($data, $debug);
 		$decoded = json_decode($response, true);
 
 		return $decoded;
 	}
 
 
-	protected function setUp()
-	{
-		global $DB,$URL;
+	protected function setUp() {
+		global $DB, $URL;
 
-		if(strstr(PHPUNIT_URL,'http://'))
+		if (strstr(PHPUNIT_URL, 'http://'))
 		{
 			$URL=PHPUNIT_URL.'api_jsonrpc.php';
-		} else {
+		}
+		else {
 			$URL='http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/api_jsonrpc.php';
 		}
 
-		if(!isset($DB['DB'])) DBConnect($error);
+		if (!isset($DB['DB'])) DBConnect($error);
 	}
 
-	protected function tearDown()
-	{
+	protected function tearDown() {
 		DBclose();
 	}
 }
