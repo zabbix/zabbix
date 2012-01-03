@@ -371,7 +371,7 @@ require_once('include/page_header.php');
 		elseif (isset($_REQUEST['save'])) {
 			$mapping = get_request('valuemap', array());
 			$prevMap = getValuemapByName($_REQUEST['mapname']);
-			if (!$prevMap || (isset($prevMap['valuemapid']) && bccomp($_REQUEST['valuemapid'], $prevMap['valuemapid']) == 0) ) {
+			if (!$prevMap || (isset($_REQUEST['valuemapid']) && bccomp($_REQUEST['valuemapid'], $prevMap['valuemapid']) == 0) ) {
 				if (isset($_REQUEST['valuemapid'])) {
 					$result = update_valuemap($_REQUEST['valuemapid'], $_REQUEST['mapname'], $mapping);
 					$audit_action = AUDIT_ACTION_UPDATE;
