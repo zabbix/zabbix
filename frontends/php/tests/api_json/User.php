@@ -208,7 +208,7 @@ class API_JSON_User extends CZabbixTest {
 
 		// checking result
 		if ($success_expected) {
-			$this->assertFalse(array_key_exists('error', $result),"Chuck Norris: Failed to create user through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
+			$this->assertFalse(array_key_exists('error', $result), "Chuck Norris: Failed to create user through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
 
 			// checking if record was inserted in the DB
 			$just_created_id = $result['id'];
