@@ -53,6 +53,7 @@ require_once('include/page_header.php');
 		// value mapping
 		'valuemapid'=>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({config})&&({config}==6)&&(isset({form})&&({form}=="update"))'),
 		'mapname'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 		'isset({config})&&({config}==6)&&isset({save})'),
+		'original_mapname'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 		'isset({config})&&({config}==6)&&isset({save})'),
 		'valuemap'=>				array(T_ZBX_STR, O_OPT,	null,	null,	null),
 		'rem_value'=>				array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535), null),
 		'add_value'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({add_map})'),
@@ -370,7 +371,10 @@ require_once('include/page_header.php');
 		}
 		elseif (isset($_REQUEST['save'])) {
 			$mapping = get_request('valuemap', array());
-			$prevMap = getValuemapByName($_REQUEST['mapname']);
+			$prevMap = 0;
+			if ($_REQUEST['mapname'] != $_REQUEST['original_mapname'] || $_REQUEST['original_mapname'] == '') {
+				$prevMap = getValuemapByName($_REQUEST['mapname']);
+			}
 			if (!$prevMap) {
 				if (isset($_REQUEST['valuemapid'])) {
 					$result = update_valuemap($_REQUEST['valuemapid'], $_REQUEST['mapname'], $mapping);
@@ -392,7 +396,7 @@ require_once('include/page_header.php');
 			}
 			else {
 				$msg_ok =  _('Value map added');
-				$msg_fail = sprintf(_('Cannot add or update value map. Map with name "%s" already exists'), $_REQUEST['mapname']);
+				$msg_fail = sprintf(_('Cannot add value map. Map with name "%s" already exists'), $_REQUEST['mapname']);
 				$result = 0;
 			}
 			if ($result) {
