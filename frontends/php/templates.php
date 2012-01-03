@@ -572,7 +572,7 @@ require_once('include/page_header.php');
 // TABLE WITH TEMPLATES
 
 		$frmGroup = new CForm('get');
-		$frmGroup->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
+		$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
 // table header
 		$numrows = new CDiv();

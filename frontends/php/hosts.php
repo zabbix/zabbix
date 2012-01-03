@@ -762,7 +762,7 @@ require_once('include/page_header.php');
 		$frmGroup = new CForm();
 		$frmGroup->setMethod('get');
 
-		$frmGroup->addItem(array(_('Group'), $pageFilter->getGroupsCB()));
+		$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
