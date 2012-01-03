@@ -318,7 +318,6 @@ class CMediatype extends CZBXAPI {
  */
 	public function create($mediatypes){
 
-
 			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types'));
 			}
@@ -345,7 +344,7 @@ class CMediatype extends CZBXAPI {
 				);
 				$mediatype_exist = $this->get($options);
 				if(!empty($mediatype_exist)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type already exists: "%s".', $mediatype_exist[0]['description']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type already exists: "%s"', $mediatype_exist[0]['description']));
 				}
 
 			}
@@ -371,20 +370,19 @@ class CMediatype extends CZBXAPI {
  */
 	public function update($mediatypes){
 
-
 			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types'));
 			}
 			$mediatypes = zbx_toArray($mediatypes);
 
 
 			$update = array();
-			foreach($mediatypes as $mnum => $mediatype){
+			foreach($mediatypes as $mediatype){
 				$mediatype_db_fields = array(
 					'mediatypeid' => null,
 				);
 				if(!check_db_fields($mediatype_db_fields, $mediatype)){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type'));
 				}
 
 				if(isset($mediatype['description'])){
@@ -397,11 +395,11 @@ class CMediatype extends CZBXAPI {
 					$exist_mediatype = reset($exist_mediatypes);
 
 					if($exist_mediatype && (bccomp($exist_mediatype['mediatypeid'],$mediatype['mediatypeid']) != 0))
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_MEDIA_TYPE_ALREADY_EXISTS . ' ' . $mediatype['description']);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type already exists: "%s"', $mediatype['description']));
 				}
 
 				if(array_key_exists('passwd', $mediatype) && empty($mediatype['passwd'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type'));
 				}
 
 				if(!in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))){
