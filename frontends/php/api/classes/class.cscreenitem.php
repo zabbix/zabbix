@@ -99,7 +99,7 @@ class CScreenItem extends CZBXAPI {
 		$options = zbx_array_merge($this->getOptions, $options);
 
 		// build and execute query
-		$sql = $this->createSelectQuery($this->tableName(), $this->tableAlias(), $options);
+		$sql = $this->createSelectQuery($this->tableName(), $options);
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
