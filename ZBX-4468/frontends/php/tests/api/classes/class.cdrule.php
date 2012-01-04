@@ -35,33 +35,33 @@ require_once(dirname(__FILE__).'/../../../include/triggers.inc.php');
 require_once(dirname(__FILE__).'/../../../api/classes/class.apiexception.php');
 
 
-if(!function_exists('error')){
-	function error($error){
+if (!function_exists('error')) {
+	function error($error) {
 		echo "\nError reported: $error\n";
 		return true;
 	}
 }
-if(!function_exists('get_accessible_nodes_by_user')){
-	function get_accessible_nodes_by_user(){
+if (!function_exists('get_accessible_nodes_by_user')) {
+	function get_accessible_nodes_by_user() {
 		return true;
 	}
 }
 
-class CDRuleTest extends PHPUnit_Framework_TestCase{
+class CDRuleTest extends PHPUnit_Framework_TestCase {
 
 	private static $drule;
 	private static $createdRules = array();
 
-	public static function autoloadRegister($name){
-		if(is_file(dirname(__FILE__).'/../../../api/classes/class.'.strtolower($name).'.php'))
+	public static function autoloadRegister($name) {
+		if (is_file(dirname(__FILE__).'/../../../api/classes/class.'.strtolower($name).'.php'))
 			require_once(dirname(__FILE__).'/../../../api/classes/class.'.strtolower($name).'.php');
-		else if(is_file(dirname(__FILE__).'/../../../include/classes/class.'.strtolower($name).'.php'))
+		elseif (is_file(dirname(__FILE__).'/../../../include/classes/class.'.strtolower($name).'.php'))
 			require_once(dirname(__FILE__).'/../../../include/classes/class.'.strtolower($name).'.php');
 		else
 			require_once(dirname(__FILE__).'/../../../api/rpc/class.'.strtolower($name).'.php');
 	}
 
-	public static function setUpBeforeClass(){
+	public static function setUpBeforeClass() {
 		spl_autoload_register('self::autoloadRegister');
 		self::$drule = new CDRule();
 
@@ -76,25 +76,24 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 		CZBXAPI::$userData['type'] = USER_TYPE_SUPER_ADMIN;
 	}
 
-	public static function tearDownAfterClass(){
+	public static function tearDownAfterClass() {
 		spl_autoload_unregister('self::autoloadRegister');
 		API::setReturnRPC();
 	}
 
-	public function setUp(){
+	public function setUp() {
 		DBConnect($error);
 	}
 
-	public function tearDown(){
-		if(!empty(self::$createdRules)){
+	public function tearDown() {
+		if (!empty(self::$createdRules)) {
 			self::$drule->delete(self::$createdRules);
 			self::$createdRules = array();
 		}
 		DBclose();
 	}
 
-
-	public static function providerCreateValidRules(){
+	public static function providerCreateValidRules() {
 		return array(
 			array(
 				// #0 minimal required fields
@@ -150,7 +149,7 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 		);
 	}
 
-	public static function providerCreateInvalidRules(){
+	public static function providerCreateInvalidRules() {
 		return array(
 			array(
 				// #0 empty rule
@@ -323,7 +322,7 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 		);
 	}
 
-	public static function providerUpdateValid(){
+	public static function providerUpdateValid() {
 		return array(
 			array(
 				// #0 minimal required fields
@@ -360,11 +359,10 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 					)
 				)
 			),
-
 		);
 	}
 
-	public static function providerUpdateInvalid(){
+	public static function providerUpdateInvalid() {
 		return array(
 			array(
 				// #0 empty rule
@@ -510,11 +508,11 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 	}
 
 
-	protected function createValidRules(){
+	protected function createValidRules() {
 		// create rules
 		$validRules = self::providerCreateValidRules();
 		$rulesCreate = array();
-		foreach($validRules as $validRule){
+		foreach ($validRules as $validRule) {
 			$rulesCreate[] = reset($validRule);
 		}
 		$druleids = self::$drule->create($rulesCreate);
@@ -526,14 +524,14 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 	/**
 	 * @dataProvider providerCreateValidRules
 	 */
-	public function testCreateValid($rule){
-		try{
+	public function testCreateValid($rule) {
+		try {
 			$result = self::$drule->create($rule);
 			$this->assertArrayHasKey('druleids', $result, 'CDRule->create() result does not contain "druleids"');
 
 			self::$drule->delete($result['druleids']);
 		}
-		catch(APIException $e){
+		catch (APIException $e) {
 			$this->assertTrue(false, $e->getMessage());
 		}
 	}
@@ -542,7 +540,7 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 	 * @dataProvider providerCreateInvalidRules
 	 * @expectedException APIException
 	 */
-	public function testCreateInvalid($rule){
+	public function testCreateInvalid($rule) {
 		$result = self::$drule->create($rule);
 		self::$drule->delete($result['druleids']);
 	}
@@ -550,18 +548,17 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 	/**
 	 * @dataProvider providerUpdateValid
 	 */
-	public function testUpdateValid($rule){
-		try{
+	public function testUpdateValid($rule) {
+		try {
 			$createdRuleids = $this->createValidRules();
-
 			// update each created rule
-			foreach($createdRuleids as $ruleid){
+			foreach ($createdRuleids as $ruleid) {
 				$rule['druleid'] = $ruleid;
 				$result = self::$drule->update($rule);
 				$this->assertArrayHasKey('druleids', $result, 'CDRule->update() result does not contain "druleids"');
 			}
 		}
-		catch(APIException $e){
+		catch (APIException $e) {
 			// any exception should fail
 			$this->assertTrue(false, $e->getMessage());
 		}
@@ -571,16 +568,16 @@ class CDRuleTest extends PHPUnit_Framework_TestCase{
 	 * @dataProvider providerUpdateInvalid
 	 * @expectedException APIException
 	 */
-	public function testUpdateInvalid($rule){
-		try{
+	public function testUpdateInvalid($rule) {
+		try {
 			$createdRuleids = $this->createValidRules();
 		}
-		catch(APIException $e){
+		catch (APIException $e) {
 			$this->assertTrue(false, $e->getMessage());
 		}
 
 		// here exception should be thrown
-		foreach($createdRuleids as $ruleid){
+		foreach ($createdRuleids as $ruleid) {
 			$rule['druleid'] = $ruleid;
 			$result = self::$drule->update($rule);
 			$this->assertArrayHasKey('druleids', $result, 'CDRule->update() result does not contain "druleids"');

@@ -1,5 +1,4 @@
 <script type="text/x-jquery-tmpl" id="hostInterfaceRow">
-
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
 	<td style="width: 2em;">
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
@@ -12,7 +11,7 @@
 	<td style="width: 19em;">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" size="30" value="#{iface.dns}" />
 	</td>
-	<td style="width: 10em;">
+	<td style="width: 10em; white-space: nowrap;">
 		<div class="jqueryinputset">
 			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
 			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label>
@@ -31,7 +30,6 @@
 		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="link_menu remove" #{*attrs.disabled} ><?php echo _('Remove'); ?></button>
 	</td>
 </tr>
-
 </script>
 
 <script type="text/javascript">
@@ -47,12 +45,10 @@ var hostInterfacesManager = (function() {
 		},
 		allHostInterfaces = {};
 
-
 	function renderHostInterfaceRow(hostInterface) {
 		var domAttrs = getDomElementsAttrsForInterface(hostInterface),
 			domId = getDomIdForRowInsert(hostInterface.type),
 			domRow;
-
 
 		jQuery(domId).before(rowTemplate.evaluate({iface: hostInterface, attrs: domAttrs}));
 
@@ -105,7 +101,6 @@ var hostInterfacesManager = (function() {
 		types[getHostInterfaceNumericType('jmx')] = {main: null, all: []};
 		types[getHostInterfaceNumericType('ipmi')] = {main: null, all: []};
 
-
 		for (var hostInterfaceId in allHostInterfaces){
 			hostInterface = allHostInterfaces[hostInterfaceId];
 
@@ -117,10 +112,8 @@ var hostInterfacesManager = (function() {
 				types[hostInterface.type].main = hostInterfaceId;
 			}
 		}
-
 		return types;
 	}
-
 
 	function addDraggableIcon(domElement) {
 		domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>');
@@ -139,13 +132,13 @@ var hostInterfacesManager = (function() {
 	function addNotDraggableIcon(domElement) {
 		domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s state-disabled"></span>');
 		jQuery('.ui-icon', domElement).hover(
-			function(event) {
+			function (event) {
 				jQuery('<div><?php echo _('Interface is used by items that require this type of the interface.'); ?></div>')
-						.css({position: 'absolute', opacity: 1, padding: '2px'})
-						.addClass('ui-state-highlight')
-						.appendTo(event.target.parentNode);
+					.css({position: 'absolute', opacity: 1, padding: '2px'})
+					.addClass('ui-state-highlight')
+					.appendTo(event.target.parentNode);
 			},
-			function(event) {
+			function (event) {
 				jQuery(event.target).next().remove();
 			}
 		)
@@ -162,7 +155,6 @@ var hostInterfacesManager = (function() {
 		if (hostInterface.items) {
 			attrs.disabled = 'disabled="disabled"';
 		}
-
 
 		if (hostInterface.useip == 0) {
 			attrs.checked_dns = 'checked="checked"';
@@ -197,14 +189,13 @@ var hostInterfacesManager = (function() {
 			default:
 				throw new Error('Unknown host interface type.');
 		}
-
 		return footerRowId;
 	}
 
 	function getHostInterfaceNumericType(typeName) {
 		var typeNum;
 
-		switch(typeName) {
+		switch (typeName) {
 			case 'agent':
 				typeNum = '<?php print(INTERFACE_TYPE_AGENT); ?>';
 				break;
@@ -220,7 +211,6 @@ var hostInterfacesManager = (function() {
 			default:
 				throw new Error('Unknown host interface type name.');
 		}
-
 		return typeNum;
 	}
 
@@ -253,7 +243,6 @@ var hostInterfacesManager = (function() {
 		jQuery('#interface_main_'+hostInterfaceId).attr('name', 'mainInterfaces['+newHostInterfaceType+']');
 		jQuery('#interface_main_'+hostInterfaceId).prop('checked', false);
 		jQuery('#interface_type_'+hostInterfaceId).val(newHostInterfaceType);
-
 		jQuery('#hostInterfaceRow_'+hostInterfaceId).insertBefore(newDomId);
 	}
 
@@ -317,9 +306,7 @@ var hostInterfacesManager = (function() {
 			allHostInterfaces[hostInterfaceId].useip = useip;
 		}
 	}
-
 }());
-
 
 jQuery(document).ready(function() {
 	'use strict';
@@ -379,32 +366,27 @@ jQuery(document).ready(function() {
 		hostInterfacesManager.addNew('ipmi');
 	});
 
-
 	// radio button of inventory modes was clicked
-	jQuery("div.jqueryinputset input[name=inventory_mode]").click(function() {
+	jQuery('div.jqueryinputset input[name=inventory_mode]').click(function() {
 		// action depending on which button was clicked
 		var inventoryFields = jQuery("#inventorylist :input:gt(2)");
 
-		switch(jQuery(this).val()) {
+		switch (jQuery(this).val()) {
 			case '<?php echo HOST_INVENTORY_DISABLED ?>':
 				inventoryFields.prop('disabled', true);
 				jQuery('.populating_item').hide();
-			break;
+				break;
 			case '<?php echo HOST_INVENTORY_MANUAL ?>':
 				inventoryFields.prop('disabled', false);
 				jQuery('.populating_item').hide();
-			break;
+				break;
 			case '<?php echo HOST_INVENTORY_AUTOMATIC ?>':
 				inventoryFields.prop('disabled', false);
 				inventoryFields.filter('.linked_to_item').prop('disabled', true);
 				jQuery('.populating_item').show();
-			break;
+				break;
 		}
 	});
-
 	jQuery('#name').focus();
 });
-
-
 </script>
-
