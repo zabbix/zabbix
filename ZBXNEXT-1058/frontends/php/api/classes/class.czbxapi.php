@@ -280,15 +280,14 @@ class CZBXAPI {
 	 * TODO: add global 'countOutput' support
 	 *
 	 * @param string $tableName
-	 * @param string $tableAlias
 	 * @param array $options
 	 *
 	 * @return array
 	 */
-	public function select($tableName, $tableAlias, array $options) {
+	public function select($tableName, array $options) {
 		$limit = (isset($options['limit'])) ? $options['limit'] : null;
 
-		$sql = $this->createSelectQuery($tableName, $tableAlias, $options);
+		$sql = $this->createSelectQuery($tableName, $options);
 		$query = DBSelect($sql, $limit);
 
 		return DBfetchArray($query);
@@ -299,12 +298,12 @@ class CZBXAPI {
 	 * Creates an SQL SELECT query from the given options.
 	 *
 	 * @param $tableName
-	 * @param $tableAlias
 	 * @param array $options
+	 *
 	 * @return array
 	 */
-	protected function createSelectQuery($tableName, $tableAlias, array $options) {
-		$sqlParts = $this->createSelectQueryParts($tableName, $tableAlias, $options);
+	protected function createSelectQuery($tableName, array $options) {
+		$sqlParts = $this->createSelectQueryParts($tableName, 't', $options);
 
 		return $this->createSelectQueryFromParts($sqlParts);
 	}
@@ -324,7 +323,7 @@ class CZBXAPI {
 		$options = zbx_array_merge($this->globalGetOptions, $options);
 
 		$sqlParts = array(
-			'select' => array($this->fieldId($this->pk(), $tableAlias)),
+			'select' => array($this->fieldId($this->pk($tableName), $tableAlias)),
 			'from' => array($this->tableId($tableName, $tableAlias)),
 			'where' => array(),
 			'group' => array(),
@@ -383,7 +382,7 @@ class CZBXAPI {
 	 * @return array         The resulting SQL parts array
 	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$pkFieldId = $this->fieldId($this->pk(), $tableAlias);
+		$pkFieldId = $this->fieldId($this->pk($tableName), $tableAlias);
 
 		// count
 		if (isset($options['countOutput'])) {
