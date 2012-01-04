@@ -30,7 +30,7 @@
  *                                                                            *
  * Description: Check of collisions between linked templates                  *
  *                                                                            *
- * Parameters: templateids - array of templates identificators from database  *
+ * Parameters: templateids - [IN] array of template ids                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
@@ -309,8 +309,8 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
  *                                                                            *
  * Description: Check collisions in item inventory links                      *
  *                                                                            *
- * Parameters: hostid     - [IN] host identificator from database             *
- *             templateid - [IN] template identificator from database         *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template ids                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
@@ -322,11 +322,14 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
 static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 		char *error, size_t max_error_len)
 {
+	const char	*__function_name = "validate_inventory_links";
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 512, sql_offset;
 	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -346,10 +349,13 @@ static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
 		ret = FAIL;
+		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
 	}
 	DBfree_result(result);
+
+	if (FAIL == ret)
+		goto out;
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
@@ -378,12 +384,14 @@ static int	validate_inventory_links(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
 		ret = FAIL;
+		zbx_strlcpy(error, "two items cannot populate one host inventory field", max_error_len);
 	}
 	DBfree_result(result);
-
+out:
 	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -467,8 +475,7 @@ static int	DBcmp_graphitems(ZBX_GRAPH_ITEMS *gitems1, int gitems1_num,
 
 	res = SUCCEED;
 clean:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
 }
@@ -479,8 +486,8 @@ clean:
  *                                                                            *
  * Description: Check collisions between host and linked template             *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             templateid - template identificator from database              *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template ids                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
@@ -503,14 +510,13 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	size_t		gitems_alloc = 0, gitems_num = 0,
 			chd_gitems_alloc = 0, chd_gitems_num = 0;
 	int		res = SUCCEED;
-	zbx_uint64_t	graphid;
+	zbx_uint64_t	graphid, interfaceids[4];
 	unsigned char	t_flags, h_flags, type;
-	zbx_uint64_t	interfaceids[4];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != (res = validate_inventory_links(hostid, templateids, error, max_error_len)))
-		return res;
+		goto out;
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -673,7 +679,7 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 	zbx_free(sql);
 	zbx_free(gitems);
 	zbx_free(chd_gitems);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
@@ -1722,8 +1728,8 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  *                                                                            *
  * Purpose: delete template graphs from host                                  *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             templateid - template identificator from database              *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template ids                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1780,8 +1786,8 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *t
  *                                                                            *
  * Purpose: delete template triggers from host                                *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             templateid - template identificator from database              *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template ids                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1836,8 +1842,8 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
  *                                                                            *
  * Purpose: delete template items from host                                   *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             templateid - template identificator from database              *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template ids                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1893,8 +1899,8 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Purpose: delete application                                                *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             templateid - template identificator from database              *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template ids                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -2251,6 +2257,9 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
  *                                                                            *
  * Description: Retrieve already linked templates for specified host          *
  *                                                                            *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template ids                       *
+ *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
@@ -2284,8 +2293,8 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  *                                                                            *
  * Purpose: delete template elements from host                                *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             templateid - template identificator from database              *
+ * Parameters: hostid          - [IN] host identificator from database        *
+ *             del_templateids - [IN] array of template ids                   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -2364,14 +2373,12 @@ clean:
  * Parameters: hostid      - [IN] host id                                     *
  *             templateids - [IN] array of template ids                       *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
 	typedef struct
 	{
@@ -2388,7 +2395,6 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t
 	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
 	zbx_app_t	*app = NULL;
 	size_t		app_alloc = 0, app_num = 0;
-	int		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2502,9 +2508,7 @@ static int	DBcopy_template_applications(zbx_uint64_t hostid, zbx_vector_uint64_t
 
 	zbx_free(sql);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /* Auxiliary function for DBcopy_template_items() */
@@ -2539,14 +2543,12 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
  * Parameters: hostid      - [IN] host id                                     *
  *             templateids - [IN] array of template ids                       *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
+static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids)
 {
 	typedef struct
 	{
@@ -2610,7 +2612,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templ
 	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i, res = SUCCEED;
+	int		i;
 	zbx_uint64_t	interfaceids[4];
 	zbx_item_t	*item = NULL;
 	size_t		item_alloc = 0, item_num = 0;
@@ -3026,8 +3028,6 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templ
 
 				zbx_free(proto);
 			}
-
-			zbx_free(protoids);
 		}
 
 		zbx_free(protoids);
@@ -3035,9 +3035,7 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templ
 
 	zbx_free(sql);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
-
-	return res;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name);
 }
 
 /******************************************************************************
@@ -3046,8 +3044,8 @@ static int	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *templ
  *                                                                            *
  * Purpose: Copy template triggers to host                                    *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             templateid - host template identificator from database         *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template ids                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -3156,8 +3154,7 @@ static zbx_uint64_t	DBget_same_itemid(zbx_uint64_t hostid, zbx_uint64_t titemid)
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64,
-			__function_name, itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __function_name, itemid);
 
 	return itemid;
 }
@@ -3371,8 +3368,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
 	zbx_free(chd_gitems);
 	zbx_free(sql);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
 }
@@ -3383,8 +3379,8 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
  *                                                                            *
  * Purpose: copy graphs from template to host                                 *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             templateid - template identificator from database              *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template ids                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -3461,8 +3457,8 @@ static int	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  *                                                                            *
  * Purpose: copy elements from specified template                             *
  *                                                                            *
- * Parameters: hostid - host identificator from database                      *
- *             templateid - template identificator from database              *
+ * Parameters: hostid          - [IN] host identificator from database        *
+ *             lnk_templateids - [IN] array of template ids                   *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -3524,10 +3520,10 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 				hosttemplateid++, hostid, lnk_templateids->values[i]);
 	}
 
-	if (SUCCEED == (res = DBcopy_template_applications(hostid, lnk_templateids)))
-		if (SUCCEED == (res = DBcopy_template_items(hostid, lnk_templateids)))
-			if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids)))
-				res = DBcopy_template_graphs(hostid, lnk_templateids);
+	DBcopy_template_applications(hostid, lnk_templateids);
+	DBcopy_template_items(hostid, lnk_templateids);
+	if (SUCCEED == (res = DBcopy_template_triggers(hostid, lnk_templateids)))
+		res = DBcopy_template_graphs(hostid, lnk_templateids);
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 

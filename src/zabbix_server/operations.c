@@ -574,8 +574,8 @@ void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
  *                                                                            *
  * Purpose: unlink and clear host from template                               *
  *                                                                            *
- * Parameters: event      - [IN] event data                                   *
- *             templateid - [IN] host template identificator from database    *
+ * Parameters: event           - [IN] event data                              *
+ *             lnk_templateids - [IN] array of template ids                   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
