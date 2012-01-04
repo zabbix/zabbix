@@ -360,8 +360,6 @@ static zbx_mem_info_t	*config_mem;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
-static const char	*INTERNED_SERVER_STATUS_KEY;
-
 static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 				unsigned char item_type, const char *key,
 				unsigned char flags, unsigned char *poller_type)
@@ -369,12 +367,6 @@ static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
 	if (0 != proxy_hostid && (ITEM_TYPE_INTERNAL != item_type &&
 				ITEM_TYPE_AGGREGATE != item_type &&
 				ITEM_TYPE_CALCULATED != item_type))
-	{
-		*poller_type = ZBX_NO_POLLER;
-		return;
-	}
-
-	if (INTERNED_SERVER_STATUS_KEY == key)
 	{
 		*poller_type = ZBX_NO_POLLER;
 		return;
@@ -2884,8 +2876,6 @@ void	init_configuration_cache()
 
 	zbx_strpool_create(strpool_size);
 
-	INTERNED_SERVER_STATUS_KEY = zbx_strpool_intern(SERVER_STATUS_KEY);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -3706,88 +3696,6 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_items                                               *
- *                                                                            *
- * Purpose: Get array of items with specified key                             *
- *                                                                            *
- * Parameters: hostid - [IN] host ID (0 - keys from all hosts)                *
- *             key - [IN] key name                                            *
- *             items - [OUT] pointer to array of DC_ITEM structures           *
- *                                                                            *
- * Return value: number of items                                              *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments: only used for SERVER_STATUS_KEY items                            *
- *                                                                            *
- ******************************************************************************/
-int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items)
-{
-	const char	*__function_name = "DCconfig_get_items";
-
-	int			items_num = 0, items_alloc = 8, counter = 0;
-	ZBX_DC_ITEM		*dc_item;
-	ZBX_DC_HOST		*dc_host;
-	zbx_hashset_iter_t	dc_iter;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " key:'%s'",
-			__function_name, hostid, key);
-
-	*items = zbx_malloc(*items, items_alloc * sizeof(DC_ITEM));
-
-	LOCK_CACHE;
-
-	if (0 == hostid)
-		zbx_hashset_iter_reset(&config->hosts, &dc_iter);
-
-	while (1)
-	{
-		if (0 == hostid)
-		{
-			if (NULL == (dc_host = zbx_hashset_iter_next(&dc_iter)))
-				break;
-		}
-		else if (1 != ++counter || NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
-		{
-			break;
-		}
-
-		if (0 != dc_host->proxy_hostid)
-			continue;
-
-		if (HOST_MAINTENANCE_STATUS_OFF != dc_host->maintenance_status ||
-				MAINTENANCE_TYPE_NORMAL != dc_host->maintenance_type)
-			continue;
-
-		if (NULL == (dc_item = DCfind_item(dc_host->hostid, key)))
-			continue;
-
-		if (0 != (ZBX_FLAG_DISCOVERY_CHILD & dc_item->flags))
-			continue;
-
-		if (0 == config->config->refresh_unsupported && ITEM_STATUS_NOTSUPPORTED == dc_item->status)
-			continue;
-
-		if (items_num == items_alloc)
-		{
-			items_alloc += 8;
-			*items = zbx_realloc(*items, items_alloc * sizeof(DC_ITEM));
-		}
-
-		DCget_host(&(*items)[items_num].host, dc_host);
-		DCget_item(&(*items)[items_num], dc_item);
-		items_num++;
-	}
-
-	UNLOCK_CACHE;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, items_num);
-
-	return items_num;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCconfig_get_snmp_interfaceids_by_addr                           *
  *                                                                            *
  * Purpose: get array of interface ids for the specified address              *
@@ -3907,7 +3815,7 @@ void	*DCconfig_get_config_data(void *data, int type)
 {
 	LOCK_CACHE;
 
-	switch(type)
+	switch (type)
 	{
 		case CONFIG_ALERT_HISTORY:
 			*(int *)data = config->config->alert_history;
@@ -4136,17 +4044,17 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now)
 			goto unlock;
 	}
 
-	/* First error */
-	if (*errors_from == 0)
+	/* first error */
+	if (0 == *errors_from)
 	{
 		*errors_from = now;
 		*disable_until = now + CONFIG_UNREACHABLE_DELAY;
 	}
 	else
 	{
-		if (now - *errors_from <= CONFIG_UNREACHABLE_PERIOD)
+		if (CONFIG_UNREACHABLE_PERIOD >= now - *errors_from)
 		{
-			/* Still unavailable, but won't change status to UNAVAILABLE yet */
+			/* still unavailable, but won't change status to UNAVAILABLE yet */
 			*disable_until = now + CONFIG_UNREACHABLE_DELAY;
 		}
 		else

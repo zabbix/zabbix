@@ -35,19 +35,14 @@ dist-hook:
 dbschema:
 	create/bin/gen_data.pl ibm_db2 > database/ibm_db2/data.sql
 	create/bin/gen_schema.pl ibm_db2 > database/ibm_db2/schema.sql
-	cp create/data/images_ibm_db2.sql database/ibm_db2/images.sql
 	create/bin/gen_data.pl mysql > database/mysql/data.sql
 	create/bin/gen_schema.pl mysql > database/mysql/schema.sql
-	cp create/data/images_mysql.sql database/mysql/images.sql
 	create/bin/gen_data.pl oracle > database/oracle/data.sql
 	create/bin/gen_schema.pl oracle > database/oracle/schema.sql
-	cp create/data/images_oracle.sql database/oracle/images.sql
 	create/bin/gen_data.pl postgresql > database/postgresql/data.sql
 	create/bin/gen_schema.pl postgresql > database/postgresql/schema.sql
-	cp create/data/images_postgresql.sql database/postgresql/images.sql
 	create/bin/gen_data.pl sqlite3 > database/sqlite3/data.sql
 	create/bin/gen_schema.pl sqlite3 > database/sqlite3/schema.sql
-	cp create/data/images_sqlite3.sql database/sqlite3/images.sql
 	create/bin/gen_schema.pl c > src/libs/zbxdbhigh/dbschema.c
 
 gettext:

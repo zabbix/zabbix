@@ -23,6 +23,7 @@
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "zbxalgo.h"
 
 #include "housekeeper.h"
 
@@ -43,17 +44,16 @@ extern unsigned char	process_type;
  ******************************************************************************/
 static int	housekeeping_cleanup()
 {
-	const char	*__function_name = "housekeeping_cleanup";
-	DB_HOUSEKEEPER	housekeeper;
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		d, deleted = 0;
-	char		*sql = NULL;
-	size_t		sql_alloc = 512, sql_offset = 0;
-	int		ids_alloc = 0, ids_num = 0;
-	zbx_uint64_t	*ids = NULL;
+	const char		*__function_name = "housekeeping_cleanup";
+	DB_HOUSEKEEPER		housekeeper;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			d, deleted = 0;
+	zbx_vector_uint64_t	housekeeperids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&housekeeperids);
 
 	/* order by tablename to effectively use DB cache */
 	result = DBselect(
@@ -133,24 +133,31 @@ static int	housekeeping_cleanup()
 		}
 
 		if (0 == d || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > d)
-			uint64_array_add(&ids, &ids_alloc, &ids_num, housekeeper.housekeeperid, 64);
+			zbx_vector_uint64_append(&housekeeperids, housekeeper.housekeeperid);
 
 		deleted += d;
 	}
 	DBfree_result(result);
 
-	if (NULL != ids)
+	if (0 != housekeeperids.values_num)
 	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 512, sql_offset = 0;
+
 		sql = zbx_malloc(sql, sql_alloc);
 
+		zbx_vector_uint64_sort(&housekeeperids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from housekeeper where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "housekeeperid", ids, ids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "housekeeperid",
+				housekeeperids.values, housekeeperids.values_num);
 
 		DBexecute("%s", sql);
 
 		zbx_free(sql);
-		zbx_free(ids);
 	}
+
+	zbx_vector_uint64_destroy(&housekeeperids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
@@ -204,7 +211,7 @@ static int	housekeeping_events(int now)
 		ZBX_STR2UINT64(eventid, row[0]);
 
 		DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64, eventid);
-		deleted = DBexecute("delete from events where eventid=" ZBX_FS_UI64, eventid);
+		deleted += DBexecute("delete from events where eventid=" ZBX_FS_UI64, eventid);
 	}
 	DBfree_result(result);
 
@@ -275,28 +282,32 @@ static int	delete_history(const char *table, zbx_uint64_t itemid, int keep_histo
 static int	housekeeping_history_and_trends(int now)
 {
 	const char	*__function_name = "housekeeping_history_and_trends";
-	DB_ITEM         item;
+	zbx_uint64_t	itemid;
 	DB_RESULT       result;
 	DB_ROW          row;
-	int             deleted = 0;
+	int             history, trends, deleted = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	result = DBselect("select itemid,history,trends from items");
+	result = DBselect(
+			"select i.itemid,i.history,i.trends from items i,hosts h"
+			" where i.hostid=h.hostid"
+				" and h.status in (%d,%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(item.itemid, row[0]);
-		item.history = atoi(row[1]);
-		item.trends = atoi(row[2]);
+		ZBX_STR2UINT64(itemid, row[0]);
+		history = atoi(row[1]);
+		trends = atoi(row[2]);
 
-		deleted += delete_history("history", item.itemid, item.history, now);
-		deleted += delete_history("history_uint", item.itemid, item.history, now);
-		deleted += delete_history("history_str", item.itemid, item.history, now);
-		deleted += delete_history("history_text", item.itemid, item.history, now);
-		deleted += delete_history("history_log", item.itemid, item.history, now);
-		deleted += delete_history("trends", item.itemid, item.trends, now);
-		deleted += delete_history("trends_uint", item.itemid, item.trends, now);
+		deleted += delete_history("history", itemid, history, now);
+		deleted += delete_history("history_uint", itemid, history, now);
+		deleted += delete_history("history_str", itemid, history, now);
+		deleted += delete_history("history_text", itemid, history, now);
+		deleted += delete_history("history_log", itemid, history, now);
+		deleted += delete_history("trends", itemid, trends, now);
+		deleted += delete_history("trends_uint", itemid, trends, now);
 	}
 	DBfree_result(result);
 

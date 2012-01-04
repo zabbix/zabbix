@@ -35,7 +35,7 @@ class testPageSlideShows extends CWebTest
 	public function testPageSlideShows_CheckLayout($slideshow)
 	{
 		$this->login('slideconf.php');
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 		$this->ok('SLIDE SHOWS');
@@ -62,13 +62,13 @@ class testPageSlideShows extends CWebTest
 		$oldHashSlide=DBhash($sql2);
 
 		$this->login('slideconf.php');
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of slideshows');
-		$this->ok('Slideshow updated');
+		$this->assertTitle('Configuration of slide shows');
+		$this->ok('Slide show updated');
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
@@ -79,14 +79,16 @@ class testPageSlideShows extends CWebTest
 	public function testPageSlideShows_Create()
 	{
 		$this->login('slideconf.php');
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 		$this->button_click('form');
 		$this->wait();
 
-		$this->ok('Slide show');
+		$this->ok('CONFIGURATION OF SLIDE SHOWS');
+		$this->ok('Slide');
 		$this->ok('Name');
-		$this->ok('Update interval');
+		$this->ok('Default delay (in seconds)');
 		$this->ok('Slides');
+		$this->ok(array('Screen', 'Delay', 'Action'));
 		$this->button_click('cancel');
 		$this->wait();
 		$this->ok('SLIDE SHOWS');
@@ -111,7 +113,7 @@ class testPageSlideShows extends CWebTest
 		DBsave_tables('slideshows');
 
 		$this->login('slideconf.php');
-		$this->assertTitle('Configuration of slideshows');
+		$this->assertTitle('Configuration of slide shows');
 		$this->checkbox_select("shows[$slideshowid]");
 		$this->dropdown_select('go','Delete selected');
 		$this->button_click('goButton');
@@ -119,8 +121,8 @@ class testPageSlideShows extends CWebTest
 
 		$this->getConfirmation();
 
-		$this->assertTitle('Configuration of slideshows');
-		$this->ok('Slideshow deleted');
+		$this->assertTitle('Configuration of slide shows');
+		$this->ok('Slide show deleted');
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
 		$sql="select * from slideshows where slideshowid=$slideshowid";

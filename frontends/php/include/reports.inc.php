@@ -315,7 +315,7 @@ function bar_report_form(){
 					$color,
 				));
 		}
-		$delete_button = new CSubmit('delete_item', S_DELETE_SELECTED);
+		$delete_button = new CSubmit('delete_item', _('Delete selected'));
 	}
 	else{
 		$items_table = $delete_button = null;
@@ -409,7 +409,7 @@ function bar_report_form2(){
 					$color,
 				));
 		}
-		$delete_button = new CSubmit('delete_period', S_DELETE_SELECTED);
+		$delete_button = new CSubmit('delete_period', _('Delete selected'));
 	}
 	else{
 		$periods_table = $delete_button = null;
@@ -451,7 +451,7 @@ function bar_report_form2(){
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0)
 				));
 		}
-		$delete_button = new CSubmit('delete_item', S_DELETE_SELECTED);
+		$delete_button = new CSubmit('delete_item', _('Delete selected'));
 	}
 	else{
 		$items_table = $delete_button = null;
