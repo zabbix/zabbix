@@ -760,49 +760,53 @@ class CUserMacro extends CZBXAPI{
  * @param array $data['macros']
  * @return boolean
  */
-	public static function massAdd($data){
+	public static function massAdd($data) {
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
 
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		$templateids = zbx_objectValues($templates, 'templateid');
 
-		try{
+		try {
 			self::BeginTransaction(__METHOD__);
 
-			if(!isset($data['macros']) || empty($data['macros']))
+			if (!isset($data['macros']) || empty($data['macros'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ macros ]');
-			else if(empty($hosts) && empty($templates))
+			}
+			elseif (empty($hosts) && empty($templates)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ hosts ] or [ templates ]');
+			}
 
-			if(!empty($hosts)){
+			if (!empty($hosts)) {
 // Host permission
 				$options = array(
 					'hostids' => $hostids,
-					'editable' => 1,
+					'editable' => true,
 					'output' => array('hostid', 'host'),
-					'preservekeys' => 1
+					'preservekeys' => true
 				);
 				$upd_hosts = CHost::get($options);
-				foreach($hosts as $hnum => $host){
-					if(!isset($upd_hosts[$host['hostid']]))
+				foreach($hosts as $hnum => $host) {
+					if (!isset($upd_hosts[$host['hostid']])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					}
 				}
 //--
 			}
 
-			if(!empty($templates)){
+			if (!empty($templates)) {
 // Template permission
 				$options = array(
 					'templateids' => $templateids,
-					'editable' => 1,
+					'editable' => true,
 					'output' => array('hostid', 'host'),
-					'preservekeys' => 1
+					'preservekeys' => true
 				);
 				$upd_templates = CTemplate::get($options);
-				foreach($templates as $tnum => $template){
-					if(!isset($upd_templates[$template['templateid']]))
+				foreach ($templates as $tnum => $template) {
+					if (!isset($upd_templates[$template['templateid']])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					}
 				}
 //--
 			}
@@ -816,19 +820,21 @@ class CUserMacro extends CZBXAPI{
 				'limit' => 1
 			);
 			$existing_macros = self::get($options);
-			foreach($existing_macros as $emnum => $exst_macro){
-				if(isset($upd_hosts[$exst_macro['hostid']]))
+			foreach ($existing_macros as $emnum => $exst_macro) {
+				if (isset($upd_hosts[$exst_macro['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_hosts[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
-				else if(isset($upd_templates[$exst_macro['hstid']]))
+				}
+				elseif (isset($upd_templates[$exst_macro['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_templates[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
+				}
 			}
 //--
 
 			self::validate($data['macros']);
 
 			$insertData = array();
-			foreach($data['macros'] as $mnum => $macro){
-				foreach($objectids as $onum => $hostid){
+			foreach ($data['macros'] as $mnum => $macro) {
+				foreach ($objectids as $onum => $hostid) {
 					$insertData[] = array(
 						'hostid' => $hostid,
 						'macro' => $macro['macro'],
@@ -843,7 +849,7 @@ class CUserMacro extends CZBXAPI{
 
 			return array('hostmacroids' => $hostmacroids);
 		}
-		catch(APIException $e){
+		catch (APIException $e) {
 			self::EndTransaction(false, __METHOD__);
 			$error = $e->getErrors();
 			$error = reset($error);
@@ -1035,7 +1041,7 @@ class CUserMacro extends CZBXAPI{
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
 		$macros = array_unique($macros);
-		
+
 		$result = array();
 
 		$obj_options = array(
@@ -1047,8 +1053,8 @@ class CUserMacro extends CZBXAPI{
 			'templated_hosts' => true,
 		);
 		$hosts = CHost::get($obj_options);
-		$hostids = array_keys($hosts);	
-		
+		$hostids = array_keys($hosts);
+
 		do{
 			$obj_options = array(
 				'hostids' => $hostids,
