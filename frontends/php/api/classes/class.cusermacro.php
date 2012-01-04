@@ -540,85 +540,100 @@ class CUserMacro extends CZBXAPI {
 			return array('globalmacroids' => $globalmacroids);
 	}
 
-	public function updateGlobal($globalmacros){
 
+	/**
+	 * Updates global macros.
+	 *
+	 * @param array $globalmacros
+	 *
+	 * @return array
+	 */
+	public function updateGlobal(array $globalmacros) {
 
 		$globalmacros = zbx_toArray($globalmacros);
-		$globalmacros = zbx_toHash($globalmacros, 'macro');
 
-		$globalmacroids = array();
+		// permission check
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+		}
 
-// permission check
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+		$this->validate($globalmacros);
+
+		// permissions + existance
+		$ids = zbx_objectValues($dbGmacros, 'globalmacroid');
+		$dbGmacros = $this->get(array(
+			'globalmacroids' => $ids,
+			'globalmacro' => true,
+			'editable' => true,
+			'output'=> API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+		foreach ($globalmacros as $gmacro) {
+			if (!isset($dbGmacros[$gmacro['globalmacroid']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_MACROS.' [ '.$gmacro['macro'].' ] '.S_DOES_NOT_EXIST_SMALL);
+			}
+		}
+
+		// update macros
+		$data = array();
+		foreach($globalmacros as $gmacro){
+			$values = $gmacro;
+			unset($values['globalmacroid']);
+
+			$data[] = array(
+				'values'=> $values,
+				'where'=> array('globalmacroid' => $gmacro['globalmacroid'])
+			);
+		}
+		$result = DB::update('globalmacro', $data);
+		if (!$result) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		}
+
+		return array(
+			'globalmacroids' => $ids
+		);
+	}
+
+
+	/**
+	 * Delete global macros.
+	 *
+	 * @param array $globalmacroIds
+	 *
+	 * @return boolean
+	 */
+	public function deleteGlobal(array $globalmacroIds) {
+
+		if (!$globalmacroIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		// permissions + existance
+		$dbGmacros = $this->get(array(
+			'globalmacroids' => $globalmacroIds,
+			'globalmacro' => true,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+		foreach ($globalmacroIds as $gmacroId) {
+			if (!isset($dbGmacros[$gmacroId])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
-//--
+		}
 
-			$this->validate($globalmacros);
+		// delete macros
+		$rs = DB::delete('globalmacro', array(
+			'globalmacroid' => $globalmacroIds
+		));
+		if (!$rs) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		}
 
-// permissions + existance
-			$options = array(
-				'filter' => array('macro' => zbx_objectValues($globalmacros, 'macro')),
-				'globalmacro' => 1,
-				'editable' => 1,
-				'output'=> API_OUTPUT_EXTEND
-			);
-			$db_gmacros = $this->get($options);
-			$db_gmacros = zbx_toHash($db_gmacros, 'macro');
-
-			foreach($globalmacros as $mnum => $gmacro){
-				if(!isset($db_gmacros[$gmacro['macro']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACROS.' [ '.$gmacro['macro'].' ] '.S_DOES_NOT_EXIST_SMALL);
-			}
-//--------
-			$globalmacroids = zbx_objectValues($db_gmacros, 'globalmacroid');
-
-			$data = array();
-			foreach($globalmacros as $mnum => $gmacro){
-				$data[] = array(
-					'values'=> array('value' => $gmacro['value']),
-					'where'=> array('macro' => $gmacro['macro'])
-				);
-			}
-
-			$result = DB::update('globalmacro', $data);
-			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-			return array('globalmacroids' => $globalmacroids);
-	}
-/**
- * Delete UserMacros
- *
- * @param array $globalmacroids
- * @param array $globalmacroids['globalmacroids']
- * @return boolean
- */
-	public function deleteGlobal($globalmacros){
-		$globalmacros = zbx_toArray($globalmacros);
-
-			if(empty($globalmacros))
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-
-// permissions + existance
-			$options = array(
-				'filter' => array('macro' => $globalmacros),
-				'globalmacro' => 1,
-				'editable' => 1,
-				'output'=> API_OUTPUT_EXTEND
-			);
-			$db_gmacros = $this->get($options);
-			$db_gmacros = zbx_toHash($db_gmacros, 'macro');
-
-			foreach($globalmacros as $mnum => $gmacro){
-				if(!isset($db_gmacros[$gmacro]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
-//--------
-			$sql = 'DELETE FROM globalmacro WHERE '.DBcondition('macro', $globalmacros);
-			if(!DBExecute($sql))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-			return array('globalmacroids' => zbx_objectValues($db_gmacros, 'globalmacroid'));
+		return array(
+			'globalmacroids' => $globalmacroIds
+		);
 	}
 
 /**
