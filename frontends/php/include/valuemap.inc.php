@@ -42,7 +42,7 @@ function add_valuemap($name, $mappings) {
 
 	$valuemapid = get_dbid('valuemaps', 'valuemapid');
 
-	$result = DBexecute('INSERT INTO valuemaps (valuemapid,name) VALUES ($valuemapid,'.zbx_dbstr($name).')');
+	$result = DBexecute("INSERT INTO valuemaps (valuemapid,name) VALUES ($valuemapid,".zbx_dbstr($name).")");
 	if (!$result) {
 		return $result;
 	}
@@ -103,5 +103,17 @@ function replace_value_by_map($value, $valuemapid) {
 		return $valuemaps[$valuemapid][$value];
 	}
 	return $value;
+}
+
+function getValuemapByName($name) 	{
+	$result = DBselect(
+		'SELECT v.valuemapid, v.name' .
+			' FROM valuemaps v' .
+			' WHERE v.name=' . zbx_dbstr($name)
+	);
+	if ($row = DBfetch($result)) {
+		return $row;
+	}
+	return 0;
 }
 ?>
