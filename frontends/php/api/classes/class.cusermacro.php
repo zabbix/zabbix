@@ -478,7 +478,7 @@ class CUserMacro extends CZBXAPI {
 
 			foreach ($hostmacroids as $hmnum => $hostmacroid) {
 				if (!isset($db_hmacros[$hostmacroid]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 //--------
 
@@ -506,7 +506,7 @@ class CUserMacro extends CZBXAPI {
 
 // permission check
 			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 //--
 
@@ -520,7 +520,7 @@ class CUserMacro extends CZBXAPI {
 			);
 			$existing_macros = $this->get($options);
 			foreach($existing_macros as $emnum => $exst_macro){
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" already exists.', $exst_macro['macro']));
 			}
 //--
 			foreach($macros as $mnum => $macro){
@@ -554,7 +554,7 @@ class CUserMacro extends CZBXAPI {
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		$this->validate($globalmacros);
@@ -568,9 +568,9 @@ class CUserMacro extends CZBXAPI {
 			'output'=> API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
-		foreach ($globalmacros as $gmacro) {
+		foreach ($globalmacros as $key => $gmacro) {
 			if (!isset($dbGmacros[$gmacro['globalmacroid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_MACROS.' [ '.$gmacro['macro'].' ] '.S_DOES_NOT_EXIST_SMALL);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" does not exist.', $gmacro['globalmacroid']));
 			}
 		}
 
@@ -619,7 +619,7 @@ class CUserMacro extends CZBXAPI {
 		));
 		foreach ($globalmacroIds as $gmacroId) {
 			if (!isset($dbGmacros[$gmacroId])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
@@ -653,18 +653,18 @@ class CUserMacro extends CZBXAPI {
 
 		foreach($macros as $mnum => $macro){
 			if(zbx_empty($macro['value'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: '.S_EMPTY_MACRO_VALUE);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty value for macro "%1s".', $macro['macro']));
 			}
 			if(zbx_strlen($macro['macro']) > 64){
-				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: '.S_MACRO_TOO_LONG.' > 64');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro name "%1s" is too long, it should not exceed 64 chars.', $macro['macro']));
 			}
 
 			if(zbx_strlen($macro['value']) > 255){
-				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: '.S_MACRO_VALUE_TOO_LONG.' > 255');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" value is too long, it should not exceed 255 chars.', $macro['macro']));
 			}
 
 			if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro['macro'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: '.S_WRONG_MACRO);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong macro "%1s".', $macro['macro']));
 			}
 		}
 
@@ -703,7 +703,7 @@ class CUserMacro extends CZBXAPI {
 				$upd_hosts = API::Host()->get($options);
 				foreach($hosts as $hnum => $host){
 					if(!isset($upd_hosts[$host['hostid']]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
 //--
 			}
@@ -719,7 +719,7 @@ class CUserMacro extends CZBXAPI {
 				$upd_templates = API::Template()->get($options);
 				foreach($templates as $tnum => $template){
 					if(!isset($upd_templates[$template['templateid']]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
 //--
 			}
@@ -735,9 +735,9 @@ class CUserMacro extends CZBXAPI {
 			$existing_macros = $this->get($options);
 			foreach($existing_macros as $emnum => $exst_macro){
 				if(isset($upd_hosts[$exst_macro['hostid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_hosts[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" already exists on "%2s".', $exst_macro['macro'], $upd_hosts[$exst_macro['hostid']]['host']));
 				else if(isset($upd_templates[$exst_macro['hstid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_templates[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" already exists on "%2s".', $exst_macro['macro'], $upd_templates[$exst_macro['hostid']]['host']));
 			}
 //--
 
@@ -787,7 +787,7 @@ class CUserMacro extends CZBXAPI {
 
 			foreach($objectids as $objectid){
 				if(!isset($db_objects[$objectid]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			$options = array(
@@ -837,7 +837,7 @@ class CUserMacro extends CZBXAPI {
 				$upd_hosts = API::Host()->get($options);
 				foreach($hosts as $hnum => $host){
 					if(!isset($upd_hosts[$host['hostid']]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
 //--
 			}
@@ -853,7 +853,7 @@ class CUserMacro extends CZBXAPI {
 				$upd_templates = API::Template()->get($options);
 				foreach($templates as $tnum => $template){
 					if(!isset($upd_templates[$template['templateid']]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
 //--
 			}
