@@ -392,7 +392,7 @@ require_once('include/page_header.php');
 			}
 			else {
 				$msg_ok =  _('Value map added');
-				$msg_fail = _s(_('Cannot add or update value map. Map with name "%s" already exists'), $_REQUEST['mapname']);
+				$msg_fail = _s('Cannot add or update value map. Map with name "%s" already exists', $_REQUEST['mapname']);
 				$result = 0;
 			}
 			if ($result) {

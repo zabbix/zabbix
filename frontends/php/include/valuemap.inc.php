@@ -88,7 +88,7 @@
 		$result = DBselect(
 			'SELECT v.valuemapid, v.name'.
 			' FROM valuemaps v'.
-			' WHERE name='.zbx_dbstr($name)
+			' WHERE v.name='.zbx_dbstr($name)
 		);
 		if ($row = DBfetch($result)) {
 			return $row;
