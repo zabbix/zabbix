@@ -86,8 +86,8 @@
 
 	function getValuemapByName($name) {
 		$result = DBselect(
-			'SELECT *'.
-			' FROM valuemaps'.
+			'SELECT v.valuemapid, v.name'.
+			' FROM valuemaps v'.
 			' WHERE name='.zbx_dbstr($name)
 		);
 		if ($row = DBfetch($result)) {
