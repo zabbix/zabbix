@@ -777,8 +777,8 @@ class CUserMacro extends CZBXAPI{
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ hosts ] or [ templates ]');
 			}
 
+			// Host permission
 			if (!empty($hosts)) {
-// Host permission
 				$options = array(
 					'hostids' => $hostids,
 					'editable' => true,
@@ -786,16 +786,15 @@ class CUserMacro extends CZBXAPI{
 					'preservekeys' => true
 				);
 				$upd_hosts = CHost::get($options);
-				foreach($hosts as $hnum => $host) {
+				foreach($hosts as $host) {
 					if (!isset($upd_hosts[$host['hostid']])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 					}
 				}
-//--
 			}
 
+			// Template permission
 			if (!empty($templates)) {
-// Template permission
 				$options = array(
 					'templateids' => $templateids,
 					'editable' => true,
@@ -803,16 +802,15 @@ class CUserMacro extends CZBXAPI{
 					'preservekeys' => true
 				);
 				$upd_templates = CTemplate::get($options);
-				foreach ($templates as $tnum => $template) {
+				foreach ($templates as $template) {
 					if (!isset($upd_templates[$template['templateid']])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 					}
 				}
-//--
 			}
 
+			// Check on existing
 			$objectids = array_merge($hostids, $templateids);
-// Check on existing
 			$options = array(
 				'hostids' => $objectids,
 				'filter' => array('macro' => zbx_objectValues($data['macros'], 'macro')),
@@ -820,7 +818,7 @@ class CUserMacro extends CZBXAPI{
 				'limit' => 1
 			);
 			$existing_macros = self::get($options);
-			foreach ($existing_macros as $emnum => $exst_macro) {
+			foreach ($existing_macros as $exst_macro) {
 				if (isset($upd_hosts[$exst_macro['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_hosts[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
@@ -828,13 +826,12 @@ class CUserMacro extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_templates[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 			}
-//--
 
 			self::validate($data['macros']);
 
 			$insertData = array();
-			foreach ($data['macros'] as $mnum => $macro) {
-				foreach ($objectids as $onum => $hostid) {
+			foreach ($data['macros'] as $macro) {
+				foreach ($objectids as $hostid) {
 					$insertData[] = array(
 						'hostid' => $hostid,
 						'macro' => $macro['macro'],
