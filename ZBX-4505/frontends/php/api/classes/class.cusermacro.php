@@ -559,7 +559,7 @@ class CUserMacro extends CZBXAPI {
 
 		$this->validate($globalmacros);
 
-		// permissions + existance
+		// permissions + existence
 		$ids = zbx_objectValues($dbGmacros, 'globalmacroid');
 		$dbGmacros = $this->get(array(
 			'globalmacroids' => $ids,
@@ -609,7 +609,7 @@ class CUserMacro extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		// permissions + existance
+		// permissions + existence
 		$dbGmacros = $this->get(array(
 			'globalmacroids' => $globalmacroIds,
 			'globalmacro' => true,
