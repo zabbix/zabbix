@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageAdministrationGeneralValuemap extends CWebTest {
 
-	public static function allValuemaps(){
+	public static function allValuemaps() {
 		return DBdata('select * from valuemaps');
 	}
 
@@ -43,7 +43,7 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 		$this->ok(array($valuemap['name']));
 
 		// checking that in the "Value map" column are correct values
-		// $sql1 = "SELECT m.value, m.newvalue FROM mappings m, valuemaps vm WHERE m.valuemapid=vm.valuemapid";
+		// $sql1 = "SELECT m.value,m.newvalue FROM mappings m,valuemaps vm WHERE m.valuemapid=vm.valuemapid";
 		$sqlMappings = 'SELECT m.value FROM mappings m,valuemaps vm WHERE m.valuemapid='.$valuemap['valuemapid'];
 		$result1 = DBfetch(DBselect($sqlMappings));
 		$value = $result1['value'];
