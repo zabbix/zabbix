@@ -26,6 +26,7 @@ require_once(dirname(__FILE__).'/testPageActionsDiscovery.php');
 require_once(dirname(__FILE__).'/testPageActionsTriggers.php');
 require_once(dirname(__FILE__).'/testPageAdministrationDMProxies.php');
 require_once(dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php');
+require_once(dirname(__FILE__).'/testPageAdministrationGeneralValuemap.php');
 require_once(dirname(__FILE__).'/testPageAvailabilityReport.php');
 require_once(dirname(__FILE__).'/testPageDashboard.php');
 require_once(dirname(__FILE__).'/testPageDiscovery.php');
