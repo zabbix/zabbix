@@ -613,11 +613,19 @@ require_once('include/page_header.php');
 				$macrosToUpdate = array();
 				foreach ($newMacros as $number => $newMacro) {
 					if (isset($newMacro['globalmacroid']) && isset($globalMacros[$newMacro['globalmacroid']])) {
-						$macrosToUpdate[$newMacro['globalmacroid']] = $newMacro;
+
+						$dbGlobalMacro = $globalMacros[$newMacro['globalmacroid']];
 
 						// remove item from new macros array
 						unset($newMacros[$number]);
 						unset($globalMacros[$newMacro['globalmacroid']]);
+
+						// if the macro is unchanged - skip it
+						if ($dbGlobalMacro == $newMacro) {
+							continue;
+						}
+
+						$macrosToUpdate[$newMacro['globalmacroid']] = $newMacro;
 					}
 				}
 				if (!empty($macrosToUpdate)) {
