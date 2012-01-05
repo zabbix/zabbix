@@ -84,24 +84,17 @@
 		$cmbConnectBy->useJQueryStyle();
 
 		$ifTab = new CTable();
-		$free_space = new CCol(SPACE);
-		$free_space->addStyle('width: 2em;');
+		$ifTab->addClass('formElementTable');
 		$ifTab->addRow(array(
 			S_IP_ADDRESS,
-			$free_space,
 			S_DNS_NAME,
-			$free_space,
 			S_CONNECT_TO,
-			$free_space,
 			S_PORT
 		));
 		$ifTab->addRow(array(
 			new CTextBox('interfaces[0][ip]', $interface['ip'], '24', 'no', 39),
-			$free_space,
 			new CTextBox('interfaces[0][dns]', $interface['dns'], '30', 'no', 64),
-			$free_space,
 			$cmbConnectBy,
-			$free_space,
 			new CTextBox('interfaces[0][port]', $interface['port'], 15, 'no', 64)
 		));
 
