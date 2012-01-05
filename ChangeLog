@@ -388,7 +388,7 @@ Changes for 1.8.11rc1
 A......... [ZBX-4337] fixed possible typo in class.cusermacro.php (sanja)
 ....I..... [ZBX-4461] changed binary path from bin to sbin in FreeBSD initscripts (Richlv)
 ..F....... [ZBX-4491] updated Japanese translation; thanks to Kodai Terashima (Richlv)
-..F....... [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (SlaVa)
+..F....... [ZBX-4169] fixed filter reset after timeline change in Monitoring->latest data->History of log item (Slava)
 ..F....... [ZBX-3219] Translating script error to human language (Slava)
 ..F....... [ZBX-4457] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-3909] fixed link to null on menu and non-hiding menu in maps (Slava)
