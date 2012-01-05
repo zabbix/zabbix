@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-function getRegexpByRegexpId($regexpid){
+function getRegexpByRegexpId($regexpid) {
 	$sql = 'SELECT re.* '.
 					' FROM regexps re '.
 					' WHERE '.DBin_node('re.regexpid').
@@ -31,13 +31,13 @@ return $db_regexp;
 
 // Author: Aly
 // function add_regexp($regexp=array()){
-function addRegexp($regexp=array()){
+function addRegexp($regexp = array()) {
 	$db_fields = array('name' => null,
 						'test_string' => '',
 					);
 
 	if(!check_db_fields($db_fields, $regexp)){
-		error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.' [add_regexp]');
+		error(_('Incorrect arguments passed to function').' [add_regexp]');
 		return false;
 	}
 
@@ -72,7 +72,7 @@ function updateRegexp($regexpid, array $regexp = array()) {
 	);
 
 	if (!check_db_fields($db_fields, $regexp)) {
-		error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.' [update_regexp]');
+		error(_('Incorrect arguments passed to function').' [updateRegexp]');
 		return false;
 	}
 
@@ -142,7 +142,7 @@ function updateExpressions($regexpId, array $expressions) {
 				'regexpid' => $regexpId
 			);
 			if(!check_db_fields($def, $expression)){
-				error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.' [add_expression]');
+				error(_('Incorrect arguments passed to function').' [updateExpressions]');
 				return false;
 			}
 
@@ -160,26 +160,26 @@ function updateExpressions($regexpId, array $expressions) {
 
 // Author: Aly
 // function expression_type2str($expression_type)
-function expression_type2str($expression_type){
-	switch($expression_type){
+function expression_type2str($expression_type) {
+	switch ($expression_type) {
 		case EXPRESSION_TYPE_INCLUDED:
-			$str = S_CHARACTER_STRING_INCLUDED;
+			$str = _('Character string included');
 			break;
 		case EXPRESSION_TYPE_ANY_INCLUDED:
-			$str = S_ANY_CHARACTER_STRING_INCLUDED;
+			$str = _('Any character string included');
 			break;
 		case EXPRESSION_TYPE_NOT_INCLUDED:
-			$str = S_CHARACTER_STRING_NOT_INCLUDED;
+			$str = _('Character string not included');
 			break;
 		case EXPRESSION_TYPE_TRUE:
-			$str = S_RESULT_IS_TRUE;
+			$str = _('Result is TRUE');
 			break;
 		case EXPRESSION_TYPE_FALSE:
-			$str = S_RESULT_IS_FALSE;
+			$str = _('Result is FALSE');
 			break;
 		default:
-			$str = S_UNKNOWN;
+			$str = _('Test string');
 	}
-return $str;
+	return $str;
 }
 ?>

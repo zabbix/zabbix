@@ -160,8 +160,6 @@
 //	alarms.php
 	'S_TIME'=>				_('Time'),
 	'S_STATUS'=>				_('Status'),
-	'S_TRUE_BIG'=>				_('TRUE'),
-	'S_FALSE_BIG'=>				_('FALSE'),
 
 //	actions.php
 	'S_TYPE'=>				_('Type'),
@@ -204,25 +202,6 @@
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
-
-	'S_CHARACTER_STRING_INCLUDED'=>			_('Character string included'),
-	'S_ANY_CHARACTER_STRING_INCLUDED'=>		_('Any character string included'),
-	'S_CHARACTER_STRING_NOT_INCLUDED'=>		_('Character string not included'),
-	'S_RESULT_IS_TRUE'=>				_('Result is TRUE'),
-	'S_RESULT_IS_FALSE'=>				_('Result is FALSE'),
-	'S_TEST_STRING'=>				_('Test string'),
-	'S_INCORRECT_EXPRESSION'=>			_('Incorrect expression'),
-
-	'S_REGULAR_EXPRESSION_ADDED'=>			_('Regular expression added'),
-	'S_CANNOT_ADD_REGULAR_EXPRESSION'=>		_('Cannot add regular expression'),
-
-	'S_REGULAR_EXPRESSION_UPDATED'=>		_('Regular expression updated'),
-	'S_CANNOT_UPDATE_REGULAR_EXPRESSION'=>		_('Cannot update regular expression'),
-
-	'S_REGULAR_EXPRESSION_DELETED'=>		_('Regular expression deleted'),
-	'S_CANNOT_DELETE_REGULAR_EXPRESSION'=>		_('Cannot delete regular expression'),
-
-	'S_DELETE_REGULAR_EXPRESSION_Q'=>		_('Delete regular expression?'),
 
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
@@ -844,7 +823,6 @@
 //scripts.php
 	'S_SCRIPTS'=>				_('Scripts'),
 	'S_COMMAND'=>				_('Command'),
-	'S_RESULT'=>				_('Result'),
 	'S_CLOSE'=>					_('Close'),
 
 	'S_SCRIPT_ERROR'=>					_('SCRIPT ERROR'),
@@ -915,7 +893,6 @@
 	'S_TEST_DATA'=>		_('Test data'),
 	'S_EXPRESSION_VARIABLE_ELEMENTS'=>	_('Expression Variable Elements'),
 	'S_RESULT_TYPE'=>	_('Result type'),
-	'S_COMBINED_RESULT'=>	_('Combined result'),
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	_('Incorrect time period'),
@@ -949,7 +926,6 @@
 	'S_DO'=>				_('Do'),
 
 //	items.inc.php
-	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	_('Incorrect arguments passed to function'),
 	'S_UPDATED_SMALL'=>				_('updated'),
 
 //	httptest.inc.php

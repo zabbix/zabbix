@@ -89,8 +89,8 @@ require_once('include/page_header.php');
 		// regexp
 		'regexpids'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 		'regexpid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==10)&&(isset({form})&&({form}=="update"))'),
-		'rename'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', S_NAME),
-		'test_string'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', S_TEST_STRING),
+		'rename'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', _('Name')),
+		'test_string'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', _('Test string')),
 		'delete_regexp'=>			array(T_ZBX_STR, O_OPT,	null,	null,		null),
 
 		'g_expressionid'=>			array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
@@ -468,14 +468,14 @@ require_once('include/page_header.php');
 					$result = updateRegexp($regexpid, $regexp);
 				}
 
-				$msg1 = S_REGULAR_EXPRESSION_UPDATED;
-				$msg2 = S_CANNOT_UPDATE_REGULAR_EXPRESSION;
+				$msg1 = _('Regular expression updated');
+				$msg2 = _('Cannot update regular expression');
 			}
 			else {
 				$result = $regexpid = addRegexp($regexp);
 
-				$msg1 = S_REGULAR_EXPRESSION_ADDED;
-				$msg2 = S_CANNOT_ADD_REGULAR_EXPRESSION;
+				$msg1 = _('Regular expression added');
+				$msg2 = _('Cannot add regular expression');
 			}
 
 			// update expressions
@@ -517,7 +517,7 @@ require_once('include/page_header.php');
 				$result = deleteRegexp($regexpids);
 				$result = Dbend($result);
 
-				show_messages($result, S_REGULAR_EXPRESSION_DELETED, S_CANNOT_DELETE_REGULAR_EXPRESSION);
+				show_messages($result, _('Regular expression deleted'), _('Cannot delete regular expression'));
 				if ($result) {
 					foreach ($regexps as $regexpid => $regexp) {
 						add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regexpid.'] '.S_NAME.' ['.$regexp['name'].']');
@@ -539,7 +539,7 @@ require_once('include/page_header.php');
 
 			$result = false;
 			if(zbx_empty($new_expression['expression'])) {
-				info(S_INCORRECT_EXPRESSION);
+				info(_('Incorrect expression'));
 			}
 			else{
 				$result = true;
