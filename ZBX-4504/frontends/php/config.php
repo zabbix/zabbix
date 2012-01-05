@@ -457,32 +457,27 @@ require_once('include/page_header.php');
 			DBstart();
 			if (isset($_REQUEST['regexpid'])) {
 				$regexpid = $_REQUEST['regexpid'];
-				if (!get_regexp_by_regexpid($regexpid)) {
+				if (!getRegexpByRegexpId($regexpid)) {
 					$result = false;
 					error(_('Regular expression does not exist.'));
 				}
 				else {
-					$result = update_regexp($regexpid, $regexp);
-
-					if ($result) {
-						updateExpressions($regexpid, $expressions);
-					}
+					$result = updateRegexp($regexpid, $regexp);
 				}
 
 				$msg1 = S_REGULAR_EXPRESSION_UPDATED;
 				$msg2 = S_CANNOT_UPDATE_REGULAR_EXPRESSION;
 			}
 			else {
-				$result = $regexpid = add_regexp($regexp);
-
-				if ($result) {
-					foreach ($expressions as $id => $expression) {
-						$expressionid = add_expression($regexpid,$expression);
-					}
-				}
+				$result = $regexpid = addRegexp($regexp);
 
 				$msg1 = S_REGULAR_EXPRESSION_ADDED;
 				$msg2 = S_CANNOT_ADD_REGULAR_EXPRESSION;
+			}
+
+			// update expressions
+			if ($result) {
+				updateExpressions($regexpid, $expressions);
 			}
 
 			$result = Dbend($result);
@@ -512,11 +507,11 @@ require_once('include/page_header.php');
 
 				$regexps = array();
 				foreach($regexpids as $id => $regexpid){
-					$regexps[$regexpid] = get_regexp_by_regexpid($regexpid);
+					$regexps[$regexpid] = getRegexpByRegexpId($regexpid);
 				}
 
 				DBstart();
-				$result = delete_regexp($regexpids);
+				$result = deleteRegexp($regexpids);
 				$result = Dbend($result);
 
 				show_messages($result, S_REGULAR_EXPRESSION_DELETED, S_CANNOT_DELETE_REGULAR_EXPRESSION);

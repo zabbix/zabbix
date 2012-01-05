@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-function get_regexp_by_regexpid($regexpid){
+function getRegexpByRegexpId($regexpid){
 	$sql = 'SELECT re.* '.
 					' FROM regexps re '.
 					' WHERE '.DBin_node('re.regexpid').
@@ -31,7 +31,7 @@ return $db_regexp;
 
 // Author: Aly
 // function add_regexp($regexp=array()){
-function add_regexp($regexp=array()){
+function addRegexp($regexp=array()){
 	$db_fields = array('name' => null,
 						'test_string' => '',
 					);
@@ -57,9 +57,15 @@ function add_regexp($regexp=array()){
 return $result?$regexpid:false;
 }
 
-// Author: Aly
-// function update_regexp($regexpid, $regexp=array())
-function update_regexp($regexpid, $regexp = array()) {
+/**
+ * Updates the given regular expression.
+ *
+ * @param $regexpid
+ * @param array $regexp
+ *
+ * @return bool
+ */
+function updateRegexp($regexpid, array $regexp = array()) {
 	$db_fields = array(
 		'name' => null,
 		'test_string' => '',
@@ -70,9 +76,12 @@ function update_regexp($regexpid, $regexp = array()) {
 		return false;
 	}
 
-	$sql = 'SELECT regexpid FROM regexps WHERE name='.zbx_dbstr($regexp['name']);
-	if ($db_regexp = DBfetch(DBselect($sql))) {
-		if (bccomp($regexpid, $db_regexp['regexpid']) != 0) {
+	$dbRegexp = DB::find('regexps', array(
+		'name' => $regexp['name']
+	));
+	if ($dbRegexp) {
+		$dbRegexp = reset($dbRegexp);
+		if (bccomp($regexpid, $dbRegexp['regexpid']) != 0) {
 			info(_s('Regular expression "%s" already exists.', $regexp['name']));
 
 			return false;
@@ -82,43 +91,17 @@ function update_regexp($regexpid, $regexp = array()) {
 	return DB::updateByPk('regexps', $regexpid, $regexp);
 }
 
-// Author: Aly
-// function delete_regexp($regexpids)
-function delete_regexp($regexpids){
-	zbx_value2array($regexpids);
-
-// delete expressions first
-	delete_expressions_by_regexpid($regexpids);
-	$result = DBexecute('DELETE FROM regexps WHERE '.DBcondition('regexpid',$regexpids));
-
-return $result;
-}
-
-// Author: Aly
-// function add_expression($expression = array())
-function add_expression($regexpid, $expression = array()){
-	$db_fields = array('expression' => null,
-						'expression_type' => null,
-						'case_sensitive' => 0,
-						'exp_delimiter' => ',',
-					);
-
-	if(!check_db_fields($db_fields, $expression)){
-		error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.' [add_expression]');
-		return false;
-	}
-
-	$expressionid = get_dbid('expressions','expressionid');
-
-	$result = DBexecute('INSERT INTO expressions (expressionid,regexpid,expression,expression_type,case_sensitive,exp_delimiter) '.
-				' VALUES ('.$expressionid.','.
-						$regexpid.','.
-						zbx_dbstr($expression['expression']).','.
-						$expression['expression_type'].','.
-						$expression['case_sensitive'].','.
-						zbx_dbstr($expression['exp_delimiter']).')');
-
-return $result?$expressionid:false;
+/**
+ * Deletes the given regular expressions.
+ *
+ * @param $regexpIds
+ *
+ * @return bool
+ */
+function deleteRegexp($regexpIds) {
+	return DB::delete('regexps', array(
+		'regexpid' => $regexpIds
+	));
 }
 
 
@@ -128,6 +111,8 @@ return $result?$expressionid:false;
  *
  * @param $regexpId
  * @param array $expressions
+ *
+ * @return bool
  */
 function updateExpressions($regexpId, array $expressions) {
 
@@ -170,22 +155,7 @@ function updateExpressions($regexpId, array $expressions) {
 		'expressionid' => zbx_objectValues($dbExpressions, 'expressionid')
 	));
 
-}
-
-// Author: Aly
-// function delete_expression_by_regexpid($regexpids)
-function delete_expressions_by_regexpid($regexpids){
-	zbx_value2array($regexpids);
-	$sql = 'DELETE FROM expressions WHERE '.DBcondition('regexpid',$regexpids);
-return DBexecute($sql);
-}
-
-// Author: Aly
-// function delete_expression($expressionids)
-function delete_expression($expressionids){
-	zbx_value2array($expressionids);
-	$sql = 'DELETE FROM expressions WHERE '.DBcondition('expressionid',$expressionids);
-return DBexecute($sql);
+	return true;
 }
 
 // Author: Aly
