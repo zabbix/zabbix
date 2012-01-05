@@ -37,7 +37,7 @@ static size_t	buffer_alloc, tmp_alloc;
  *                                                                            *
  * Function: send_history_last_id                                             *
  *                                                                            *
- * Purpose: send list of last historical tables ids                           *
+ * Purpose: send list of last historical tables IDs                           *
  *                                                                            *
  * Parameters: sock - opened socket of node-node connection                   *
  *             record                                                         *
