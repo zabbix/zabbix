@@ -665,83 +665,86 @@ class CUserMacro extends CZBXAPI {
  * @param array $data['macros']
  * @return boolean
  */
-	public function massAdd($data){
+	public function massAdd($data) {
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
 
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		$templateids = zbx_objectValues($templates, 'templateid');
 
-			if(!isset($data['macros']) || empty($data['macros']))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ macros ]');
-			else if(empty($hosts) && empty($templates))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ hosts ] or [ templates ]');
+		if (!isset($data['macros']) || empty($data['macros'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ macros ]');
+		}
+		elseif (empty($hosts) && empty($templates)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ hosts ] or [ templates ]');
+		}
 
-			if(!empty($hosts)){
-// Host permission
-				$options = array(
-					'hostids' => $hostids,
-					'editable' => 1,
-					'output' => array('hostid', 'host'),
-					'preservekeys' => 1
-				);
-				$upd_hosts = API::Host()->get($options);
-				foreach($hosts as $hnum => $host){
-					if(!isset($upd_hosts[$host['hostid']]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-//--
-			}
-
-			if(!empty($templates)){
-// Template permission
-				$options = array(
-					'templateids' => $templateids,
-					'editable' => 1,
-					'output' => array('hostid', 'host'),
-					'preservekeys' => 1
-				);
-				$upd_templates = API::Template()->get($options);
-				foreach($templates as $tnum => $template){
-					if(!isset($upd_templates[$template['templateid']]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-//--
-			}
-
-			$objectids = array_merge($hostids, $templateids);
-// Check on existing
+		// Host permission
+		if (!empty($hosts)) {
 			$options = array(
-				'hostids' => $objectids,
-				'filter' => array('macro' => zbx_objectValues($data['macros'], 'macro')),
-				'output' => API_OUTPUT_EXTEND,
-				'limit' => 1
+				'hostids' => $hostids,
+				'editable' => true,
+				'output' => array('hostid', 'host'),
+				'preservekeys' => true
 			);
-			$existing_macros = $this->get($options);
-			foreach($existing_macros as $emnum => $exst_macro){
-				if(isset($upd_hosts[$exst_macro['hostid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_hosts[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
-				else if(isset($upd_templates[$exst_macro['hstid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_templates[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
-			}
-//--
-
-			$this->validate($data['macros']);
-
-			$insertData = array();
-			foreach($data['macros'] as $mnum => $macro){
-				foreach($objectids as $onum => $hostid){
-					$insertData[] = array(
-						'hostid' => $hostid,
-						'macro' => $macro['macro'],
-						'value' => $macro['value']
-					);
+			$upd_hosts = API::Host()->get($options);
+			foreach($hosts as $host) {
+				if (!isset($upd_hosts[$host['hostid']])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
+		}
 
-			$hostmacroids = DB::insert('hostmacro', $insertData);
+		// Template permission
+		if (!empty($templates)) {
+			$options = array(
+				'templateids' => $templateids,
+				'editable' => true,
+				'output' => array('hostid', 'host'),
+				'preservekeys' => true
+			);
+			$upd_templates = API::Template()->get($options);
+			foreach ($templates as $template) {
+				if (!isset($upd_templates[$template['templateid']])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				}
+			}
+		}
 
-			return array('hostmacroids' => $hostmacroids);
+		// Check on existing
+		$objectids = array_merge($hostids, $templateids);
+		$options = array(
+			'hostids' => $objectids,
+			'filter' => array('macro' => zbx_objectValues($data['macros'], 'macro')),
+			'output' => API_OUTPUT_EXTEND,
+			'limit' => 1
+		);
+		$existing_macros = $this->get($options);
+		foreach ($existing_macros as $exst_macro) {
+			if (isset($upd_hosts[$exst_macro['hostid']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_hosts[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
+			}
+			elseif (isset($upd_templates[$exst_macro['hostid']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_MACRO.' [ '.$upd_templates[$exst_macro['hostid']]['host'].':'.$exst_macro['macro'].' ] '.S_ALREADY_EXISTS_SMALL);
+			}
+		}
+
+		self::validate($data['macros']);
+
+		$insertData = array();
+		foreach ($data['macros'] as $macro) {
+			foreach ($objectids as $hostid) {
+				$insertData[] = array(
+					'hostid' => $hostid,
+					'macro' => $macro['macro'],
+					'value' => $macro['value']
+				);
+			}
+		}
+
+		$hostmacroids = DB::insert('hostmacro', $insertData);
+
+		return array('hostmacroids' => $hostmacroids);
 	}
 
 /**
