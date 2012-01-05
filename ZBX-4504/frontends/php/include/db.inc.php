@@ -1263,6 +1263,39 @@ class DB {
 	}
 
 
+	/**
+	 * Returns the names of the fields that are used as the primary key of the table.
+	 *
+	 * @static
+	 *
+	 * @param string $tableName
+	 *
+	 * @return string
+	 */
+	protected static function getPk($tableName) {
+		$schema = self::getSchema($tableName);
+
+		return $schema['key'];
+	}
+
+
+	/**
+	 * Returns true if the table $tableName has the $fieldName field.
+	 *
+	 * @static
+	 *
+	 * @param string $tableName
+	 * @param string $fieldName
+	 *
+	 * @return bool
+	 */
+	public static function hasField($tableName, $fieldName) {
+		$schema = self::getSchema($tableName);
+
+		return isset($schema['fields'][$fieldName]);
+	}
+
+
 	public static function getDefaults($table) {
 		$table = self::getSchema($table);
 
@@ -1354,6 +1387,41 @@ class DB {
 		}
 	}
 
+
+	/**
+	 * Returns the records that match the given criteria.
+	 *
+	 * @static
+	 *
+	 * @param string $tableName
+	 * @param array $criteria   An associative array of field-value pairs, where value can be either a single value
+	 *                          or an array (IN)
+	 *
+	 * @return array
+	 */
+	public static function find($tableName, array $criteria = array()) {
+
+		// build the WHERE part
+		$sqlWhere = array();
+		foreach ($criteria as $field => $value) {
+			// check if the table has this field
+			if (!self::hasField($tableName, $field)) {
+				self::exception(self::DBEXECUTE_ERROR, _s('Table "%1s" doesn\'t have a field named "%2s"', $tableName, $field));
+			}
+
+			$sqlWhere[] = DBcondition($field, zbx_toArray($value));
+		}
+
+		// build query
+		$sql = 'SELECT * FROM '.$tableName;
+		if ($sqlWhere) {
+			$sql .= ' WHERE '.implode(' AND ', $sqlWhere);
+		}
+
+		return DBfetchArray(DBSelect($sql));
+	}
+
+
 	/**
 	 * Insert data into DB
 	 *
@@ -1397,7 +1465,8 @@ class DB {
 	 * @param array $data
 	 * @param array $data[...]['values'] pair of fieldname => fieldvalue for SET clause
 	 * @param array $data[...]['where'] pair of fieldname => fieldvalue for WHERE clause
-	 * @return array of ids
+	 *
+	 * @return bool
 	 */
 	public static function update($table, $data) {
 		if (empty($data)) {
@@ -1441,6 +1510,31 @@ class DB {
 		}
 		return true;
 	}
+
+
+	/**
+	 * Updates the values by the given PK.
+	 *
+	 * @static
+	 *
+	 * @param string $tableName
+	 * @param mixed $pk         A single PK value or an associative array of values,
+	 *                          e.g. array('field1' => 'value1', 'field2' => 'value2')
+	 * @param array $values
+	 *
+	 * @return bool
+	 */
+	public static function updateByPk($tableName, $pk, array $values) {
+		if (!is_array($pk)) {
+			$pk = array(self::getPk($tableName) => $pk);
+		}
+
+		return self::update($tableName, array(
+			'where' => $pk,
+			'values' => $values
+		));
+	}
+
 
 	/**
 	 * Delete data from DB

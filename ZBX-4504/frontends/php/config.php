@@ -452,6 +452,7 @@ require_once('include/page_header.php');
 				'name' => $_REQUEST['rename'],
 				'test_string' => $_REQUEST['test_string']
 			);
+			$expressions = get_request('expressions', array());
 
 			DBstart();
 			if (isset($_REQUEST['regexpid'])) {
@@ -461,8 +462,11 @@ require_once('include/page_header.php');
 					error(_('Regular expression does not exist.'));
 				}
 				else {
-					delete_expressions_by_regexpid($_REQUEST['regexpid']);
 					$result = update_regexp($regexpid, $regexp);
+
+					if ($result) {
+						updateExpressions($regexpid, $expressions);
+					}
 				}
 
 				$msg1 = S_REGULAR_EXPRESSION_UPDATED;
@@ -471,15 +475,14 @@ require_once('include/page_header.php');
 			else {
 				$result = $regexpid = add_regexp($regexp);
 
+				if ($result) {
+					foreach ($expressions as $id => $expression) {
+						$expressionid = add_expression($regexpid,$expression);
+					}
+				}
+
 				$msg1 = S_REGULAR_EXPRESSION_ADDED;
 				$msg2 = S_CANNOT_ADD_REGULAR_EXPRESSION;
-			}
-
-			if ($result) {
-				$expressions = get_request('expressions', array());
-				foreach ($expressions as $id => $expression) {
-					$expressionid = add_expression($regexpid,$expression);
-				}
 			}
 
 			$result = Dbend($result);

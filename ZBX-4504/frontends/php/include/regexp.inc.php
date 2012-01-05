@@ -59,30 +59,27 @@ return $result?$regexpid:false;
 
 // Author: Aly
 // function update_regexp($regexpid, $regexp=array())
-function update_regexp($regexpid, $regexp=array()){
-	$db_fields = array('name' => null,
-						'test_string' => '',
-					);
+function update_regexp($regexpid, $regexp = array()) {
+	$db_fields = array(
+		'name' => null,
+		'test_string' => '',
+	);
 
-	if(!check_db_fields($db_fields, $regexp)){
+	if (!check_db_fields($db_fields, $regexp)) {
 		error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.' [update_regexp]');
 		return false;
 	}
 
 	$sql = 'SELECT regexpid FROM regexps WHERE name='.zbx_dbstr($regexp['name']);
-	if($db_regexp = DBfetch(DBselect($sql))){
-		if(bccomp($regexpid,$db_regexp['regexpid']) != 0){
+	if ($db_regexp = DBfetch(DBselect($sql))) {
+		if (bccomp($regexpid, $db_regexp['regexpid']) != 0) {
 			info(_s('Regular expression "%s" already exists.', $regexp['name']));
+
 			return false;
 		}
 	}
 
-	$sql = 'UPDATE regexps SET '.
-				' name='.zbx_dbstr($regexp['name']).','.
-				' test_string='.zbx_dbstr($regexp['test_string']).
-			' WHERE regexpid='.$regexpid;
-	$result = DBexecute($sql);
-return $result;
+	return DB::updateByPk('regexps', $regexpid, $regexp);
 }
 
 // Author: Aly
@@ -122,6 +119,57 @@ function add_expression($regexpid, $expression = array()){
 						zbx_dbstr($expression['exp_delimiter']).')');
 
 return $result?$expressionid:false;
+}
+
+
+/**
+ * Updates the given expressions. Existing expressions will be updated, new ones created an missing
+ * will be deleted.
+ *
+ * @param $regexpId
+ * @param array $expressions
+ */
+function updateExpressions($regexpId, array $expressions) {
+
+	// fetch existing expressions
+	$dbExpressions = DB::find('expressions', array(
+		'regexpid' => $regexpId
+	));
+	$dbExpressions = zbx_toHash($dbExpressions, 'expressionid');
+
+	// handle the given expressions
+	foreach ($expressions as $expression) {
+
+		// if this is an existing expression - update it
+		if (isset($expression['expressionid'])) {
+			$expressionid = $expression['expressionid'];
+
+			DB::updateByPk('expressions', $expressionid, $expression);
+			unset($dbExpressions[$expressionid]);
+		}
+		// if the expression is new - create it
+		else {
+			$def = array(
+				'expression' => null,
+				'expression_type' => null,
+				'case_sensitive' => 0,
+				'exp_delimiter' => ',',
+				'regexpid' => $regexpId
+			);
+			if(!check_db_fields($def, $expression)){
+				error(S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION.' [add_expression]');
+				return false;
+			}
+
+			DB::insert('expressions', array($expression));
+		}
+	}
+
+	// delete remaining expressions
+	DB::delete('expressions', array(
+		'expressionid' => zbx_objectValues($dbExpressions, 'expressionid')
+	));
+
 }
 
 // Author: Aly

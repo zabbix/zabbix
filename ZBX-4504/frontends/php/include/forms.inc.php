@@ -3187,6 +3187,10 @@
 			$tblExp->addItem(new CVar('expressions['.$id.'][expression_type]',	$expression['expression_type']));
 			$tblExp->addItem(new CVar('expressions['.$id.'][case_sensitive]',	$expression['case_sensitive']));
 			$tblExp->addItem(new CVar('expressions['.$id.'][exp_delimiter]',	$expression['exp_delimiter']));
+
+			if (isset($expression['expressionid'])) {
+				$tblExp->addItem(new CVar('expressions['.$id.'][expressionid]',	$expression['expressionid']));
+			}
 		}
 
 		$buttons = array();
@@ -3211,6 +3215,10 @@
 
 		if(is_array($new_expression) && isset($new_expression['id'])){
 			$tblExp->addItem(new Cvar('new_expression[id]', $new_expression['id']));
+
+			if (isset($new_expression['expressionid'])) {
+				$tblExp->addItem(new Cvar('new_expression[expressionid]', $new_expression['expressionid']));
+			}
 		}
 
 		if(!is_array($new_expression)){
