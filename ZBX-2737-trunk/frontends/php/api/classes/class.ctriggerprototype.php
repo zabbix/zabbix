@@ -1344,7 +1344,7 @@ COpt::memoryPick();
 			$dbHosts = API::Host()->get(array(
 				'triggerids' => $triggerid,
 				'output' => array('name'),
-				'selectHosts' => array('name'),
+				'limit' => 1,
 				'nopermissions' => true
 			));
 
