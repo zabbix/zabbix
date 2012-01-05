@@ -134,12 +134,12 @@ class CTemplate extends CZBXAPI {
 			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS( '.
-								' SELECT hgg.groupid '.
-								' FROM hosts_groups hgg, rights rr, users_groups gg '.
-								' WHERE hgg.hostid=hg.hostid '.
-									' AND rr.id=hgg.groupid '.
-									' AND rr.groupid=gg.usrgrpid '.
+			$sql_parts['where'][] = 'NOT EXISTS('.
+								' SELECT hgg.groupid'.
+								' FROM hosts_groups hgg,rights rr,users_groups gg'.
+								' WHERE hgg.hostid=hg.hostid'.
+									' AND rr.id=hgg.groupid'.
+									' AND rr.groupid=gg.usrgrpid'.
 									' AND gg.userid='.$userid.
 									' AND rr.permission<'.$permission.')';
 		}
@@ -295,20 +295,20 @@ class CTemplate extends CZBXAPI {
 
 // with_triggers
 		if(!is_null($options['with_triggers'])){
-			$sql_parts['where'][] = 'EXISTS( '.
-						' SELECT i.itemid '.
-						' FROM items i, functions f, triggers t '.
-						' WHERE i.hostid=h.hostid '.
-							' AND i.itemid=f.itemid '.
+			$sql_parts['where'][] = 'EXISTS('.
+						' SELECT i.itemid'.
+						' FROM items i,functions f,triggers t'.
+						' WHERE i.hostid=h.hostid'.
+							' AND i.itemid=f.itemid'.
 							' AND f.triggerid=t.triggerid)';
 		}
 
 // with_graphs
 		if(!is_null($options['with_graphs'])){
 			$sql_parts['where'][] = 'EXISTS('.
-					'SELECT DISTINCT i.itemid '.
-					' FROM items i, graphs_items gi '.
-					' WHERE i.hostid=h.hostid '.
+					'SELECT DISTINCT i.itemid'.
+					' FROM items i,graphs_items gi'.
+					' WHERE i.hostid=h.hostid'.
 						' AND i.itemid=gi.itemid)';
 		}
 
@@ -1173,8 +1173,8 @@ COpt::memoryPick();
 // disable actions
 // actions from conditions
 			$actionids = array();
-			$sql = 'SELECT DISTINCT actionid '.
-					' FROM conditions '.
+			$sql = 'SELECT DISTINCT actionid'.
+					' FROM conditions'.
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
 						' AND '.DBcondition('value', $templateids);
 			$db_actions = DBselect($sql);
@@ -1182,9 +1182,9 @@ COpt::memoryPick();
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
 
 // actions from operations
-			$sql = 'SELECT DISTINCT o.actionid '.
-					' FROM operations o, optemplate ot '.
-					' WHERE o.operationid=ot.operationid '.
+			$sql = 'SELECT DISTINCT o.actionid'.
+					' FROM operations o,optemplate ot'.
+					' WHERE o.operationid=ot.operationid'.
 						' AND '.DBcondition('ot.templateid',$templateids);
 			$db_actions = DBselect($sql);
 			while($db_action = DBfetch($db_actions))
@@ -1205,8 +1205,8 @@ COpt::memoryPick();
 
 // delete action operation commands
 			$operationids = array();
-			$sql = 'SELECT DISTINCT ot.operationid '.
-					' FROM optemplate ot '.
+			$sql = 'SELECT DISTINCT ot.operationid'.
+					' FROM optemplate ot'.
 					' WHERE '.DBcondition('ot.templateid', $templateids);
 			$dbOperations = DBselect($sql);
 			while($dbOperation = DBfetch($dbOperations))
@@ -1218,8 +1218,8 @@ COpt::memoryPick();
 
 // delete empty operations
 			$delOperationids = array();
-			$sql = 'SELECT DISTINCT o.operationid '.
-					' FROM operations o '.
+			$sql = 'SELECT DISTINCT o.operationid'.
+					' FROM operations o'.
 					' WHERE '.DBcondition('o.operationid', $operationids).
 						' AND NOT EXISTS(SELECT ot.optemplateid FROM optemplate ot WHERE ot.operationid=o.operationid)';
 			$dbOperations = DBselect($sql);
@@ -1679,22 +1679,22 @@ COpt::memoryPick();
 			));
 			$allids = array_merge($templateids, zbx_objectValues($linkedTpls, 'templateid'));
 
-			$sql = 'SELECT key_, count(itemid) as cnt '.
-				' FROM items '.
-				' WHERE '.DBcondition('hostid', $allids).
-				' GROUP BY key_ '.
-				' HAVING count(itemid) > 1';
+			$sql = 'SELECT key_,count(itemid) as cnt'.
+				' FROM items'.
+				' WHERE'.DBcondition('hostid', $allids).
+				' GROUP BY key_'.
+				' HAVING count(itemid)>1';
 			$res = DBselect($sql);
 			if($db_cnt = DBfetch($res)){
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					S_TEMPLATE_WITH_ITEM_KEY.' ['.htmlspecialchars($db_cnt['key_']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
 			}
 
-			$sql = 'SELECT name, count(applicationid) as cnt '.
-				' FROM applications '.
+			$sql = 'SELECT name,count(applicationid) as cnt'.
+				' FROM applications'.
 				' WHERE '.DBcondition('hostid', $allids).
-				' GROUP BY name '.
-				' HAVING count(applicationid) > 1';
+				' GROUP BY name'.
+				' HAVING count(applicationid)>1';
 			$res = DBselect($sql);
 			if($db_cnt = DBfetch($res)){
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1737,8 +1737,8 @@ COpt::memoryPick();
 
 
 		$linked = array();
-		$sql = 'SELECT hostid, templateid '.
-				' FROM hosts_templates '.
+		$sql = 'SELECT hostid,templateid'.
+				' FROM hosts_templates'.
 				' WHERE '.DBcondition('hostid', $targetids).
 					' AND '.DBcondition('templateid', $templateids);
 		$linked_db = DBselect($sql);
@@ -1797,8 +1797,8 @@ COpt::memoryPick();
 		// CHECK CIRCULAR LINKAGE
 		// get template linkage graph
 		$graph = array();
-		$sql = 'SELECT ht.hostid, ht.templateid'.
-			' FROM hosts_templates ht, hosts h'.
+		$sql = 'SELECT ht.hostid,ht.templateid'.
+			' FROM hosts_templates ht,hosts h'.
 			' WHERE ht.hostid=h.hostid'.
 				' AND h.status='.HOST_STATUS_TEMPLATE;
 		$db_graph = DBselect($sql);
@@ -1809,9 +1809,9 @@ COpt::memoryPick();
 
 		// get points that have more than one parent templates
 		$start_points = array();
-		$sql = 'SELECT max(ht.hostid) as hostid, ht.templateid'.
+		$sql = 'SELECT max(ht.hostid) as hostid,ht.templateid'.
 			' FROM('.
-				' SELECT count(htt.templateid) as ccc, htt.hostid'.
+				' SELECT count(htt.templateid) as ccc,htt.hostid'.
 				' FROM hosts_templates htt'.
 				' WHERE htt.hostid NOT IN ( SELECT httt.templateid FROM hosts_templates httt )'.
 				' GROUP BY htt.hostid'.
@@ -1929,10 +1929,10 @@ COpt::memoryPick();
 		}
 
 
-		$sql_from = 'triggers t';
+		$sql_from = ' triggers t';
 		$sql_where = ' EXISTS ('.
 				' SELECT ff.triggerid'.
-				' FROM functions ff, items ii'.
+				' FROM functions ff,items ii'.
 				' WHERE ff.triggerid=t.templateid'.
 					' AND ii.itemid=ff.itemid'.
 					' AND '.DBCondition('ii.hostid', $templateids).')'.
@@ -1940,24 +1940,31 @@ COpt::memoryPick();
 
 
 		if(!is_null($targetids)){
-			$sql_from = 'triggers t, functions f, items i';
+			$sql_from = ' triggers t,functions f,items i,hosts h';
 			$sql_where .= ' AND '.DBCondition('i.hostid', $targetids).
 				' AND f.itemid=i.itemid'.
-				' AND t.triggerid=f.triggerid';
+				' AND t.triggerid=f.triggerid'.
+				' AND h.hostid=i.hostid';
 		}
-		$sql = 'SELECT DISTINCT t.triggerid, t.description, t.flags, t.expression'.
+		$sql = 'SELECT DISTINCT t.triggerid,t.description,t.flags,t.expression,h.name as host'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_triggers = DBSelect($sql);
 		$triggers = array(
 			ZBX_FLAG_DISCOVERY_NORMAL => array(),
-			ZBX_FLAG_DISCOVERY_CHILD => array(),
+			ZBX_FLAG_DISCOVERY_CHILD => array()
 		);
+		$triggerids = array();
 		while($trigger = DBfetch($db_triggers)){
 			$triggers[$trigger['flags']][$trigger['triggerid']] = array(
 				'description' => $trigger['description'],
 				'expression' => explode_exp($trigger['expression']),
+				'triggerid' => $trigger['triggerid'],
+				'host' => $trigger['host']
 			);
+			if (!in_array($trigger['triggerid'], $triggerids)) {
+				array_push($triggerids, $trigger['triggerid']);
+			}
 		}
 
 		if(!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])){
@@ -1972,7 +1979,7 @@ COpt::memoryPick();
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_NORMAL] as $trigger){
-					info(_s('Trigger [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
+					info(_s('Unlinked: Trigger "%1$s" on "%2$s".', $trigger['description'], $trigger['host']));
 				}
 			}
 		}
@@ -1989,7 +1996,7 @@ COpt::memoryPick();
 				));
 
 				foreach($triggers[ZBX_FLAG_DISCOVERY_CHILD] as $trigger){
-					info(_s('Trigger prototype [%1$s:%2$s] unlinked.', $trigger['description'], $trigger['expression']));
+					info(_s('Unlinked: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], $trigger['host']));
 				}
 			}
 		}
@@ -1997,15 +2004,16 @@ COpt::memoryPick();
 
 
 /* ITEMS, DISCOVERY RULES {{{ */
-		$sql_from = 'items i1, items i2';
+		$sql_from = ' items i1,items i2,hosts h';
 		$sql_where = ' i2.itemid=i1.templateid'.
 			' AND '.DBCondition('i2.hostid', $templateids).
-			' AND '.DBCondition('i1.flags', $flags);
+			' AND '.DBCondition('i1.flags', $flags).
+			' AND h.hostid=i1.hostid';
 
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('i1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid, i1.key_, i1.flags, i1.name'.
+		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,i1.name,i1.hostid,h.name as host'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_items = DBSelect($sql);
@@ -2017,7 +2025,7 @@ COpt::memoryPick();
 		while($item = DBfetch($db_items)){
 			$items[$item['flags']][$item['itemid']] = array(
 				'name' => $item['name'],
-				'key_' => $item['key_'],
+				'host' => $item['host']
 			);
 		}
 
@@ -2033,7 +2041,7 @@ COpt::memoryPick();
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY] as $discoveryRule){
-					info(_s('Discovery rule [%1$s:%2$s] unlinked.', $discoveryRule['name'], $discoveryRule['key_']));
+					info(_s('Unlinked: Discovery rule "%1$s" on "%2$s".', $discoveryRule['name'], $discoveryRule['host']));
 				}
 			}
 		}
@@ -2051,7 +2059,7 @@ COpt::memoryPick();
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY_NORMAL] as $item){
-					info(_s('Item [%1$s:%2$s] unlinked.', $item['name'], $item['key_']));
+					info(_s('Unlinked: Item "%1$s" on "%2$s".', $item['name'], $item['host']));
 				}
 			}
 		}
@@ -2069,7 +2077,7 @@ COpt::memoryPick();
 				));
 
 				foreach($items[ZBX_FLAG_DISCOVERY_CHILD] as $item){
-					info(_s('Item prototype [%1$s:%2$s] unlinked.', $item['name'], $item['key_']));
+					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
 				}
 			}
 		}
@@ -2077,10 +2085,10 @@ COpt::memoryPick();
 
 
 /* GRAPHS {{{ */
-		$sql_from = 'graphs g';
+		$sql_from = ' graphs g';
 		$sql_where = ' EXISTS ('.
 				' SELECT ggi.graphid'.
-				' FROM graphs_items ggi, items ii'.
+				' FROM graphs_items ggi,items ii'.
 				' WHERE ggi.graphid=g.templateid'.
 					' AND ii.itemid=ggi.itemid'.
 					' AND '.DBCondition('ii.hostid', $templateids).')'.
@@ -2088,12 +2096,13 @@ COpt::memoryPick();
 
 
 		if(!is_null($targetids)){
-			$sql_from = 'graphs g, graphs_items gi, items i';
+			$sql_from = ' graphs g,graphs_items gi,items i,hosts h';
 			$sql_where .= ' AND '.DBCondition('i.hostid', $targetids).
-  				' AND gi.itemid=i.itemid'.
-				' AND g.graphid=gi.graphid';
+				' AND gi.itemid=i.itemid'.
+				' AND g.graphid=gi.graphid'.
+				' AND h.hostid=i.hostid';
 		}
-		$sql = 'SELECT DISTINCT g.graphid, g.name, g.flags'.
+		$sql = 'SELECT DISTINCT g.graphid,g.name,g.flags,h.name as host'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_graphs = DBSelect($sql);
@@ -2102,7 +2111,11 @@ COpt::memoryPick();
 			ZBX_FLAG_DISCOVERY_CHILD => array(),
 		);
 		while($graph = DBfetch($db_graphs)){
-			$graphs[$graph['flags']][$graph['graphid']] = $graph['name'];
+			$graphs[$graph['flags']][$graph['graphid']] = array(
+				'name' => $graph['name'],
+				'graphid' => $graph['graphid'],
+				'host' => $graph['host']
+			);
 		}
 
 		if(!empty($graphs[ZBX_FLAG_DISCOVERY_CHILD])){
@@ -2117,7 +2130,7 @@ COpt::memoryPick();
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_CHILD] as $graph){
-					info(_s('Graph prototype [%1$s] unlinked.', $graph));
+					info(_s('Unlinked: Graph prototype "%1$s" on "%2$s".', $graph['name'], $graph['host']));
 				}
 			}
 		}
@@ -2135,7 +2148,7 @@ COpt::memoryPick();
 				));
 
 				foreach($graphs[ZBX_FLAG_DISCOVERY_NORMAL] as $graph){
-					info(_s('Graph [%1$s] unlinked.', $graph));
+					info(_s('Unlinked: Graph "%1$s" on "%2$s".', $graph['name'], $graph['host']));
 				}
 			}
 		}
@@ -2143,19 +2156,24 @@ COpt::memoryPick();
 
 
 /* APPLICATIONS {{{ */
-		$sql_from = 'applications a1, applications a2';
+		$sql_from = ' applications a1,applications a2,hosts h';
 		$sql_where = ' a2.applicationid=a1.templateid'.
-			' AND '.DBCondition('a2.hostid', $templateids);
+			' AND '.DBCondition('a2.hostid', $templateids).
+			' AND h.hostid=a1.hostid';
 		if(!is_null($targetids)){
 			$sql_where .= ' AND '.DBCondition('a1.hostid', $targetids);
 		}
-		$sql = 'SELECT DISTINCT a1.applicationid, a1.name'.
+		$sql = 'SELECT DISTINCT a1.applicationid,a1.name,a1.hostid,h.name as host'.
 				' FROM '.$sql_from.
 				' WHERE '.$sql_where;
 		$db_applications = DBSelect($sql);
 		$applications = array();
 		while($application = DBfetch($db_applications)){
-			$applications[$application['applicationid']] = $application['name'];
+			$applications[$application['applicationid']] = array(
+				'name' => $application['name'],
+				'hostid' => $application['hostid'],
+				'host' => $application['host']
+			);
 		}
 
 		if(!empty($applications)){
@@ -2170,7 +2188,7 @@ COpt::memoryPick();
 				));
 
 				foreach($applications as $application){
-					info(_s('Application [%1$s] unlinked.', $application));
+					info(_s('Unlinked: Application "%1$s" on "%2$s".', $application['name'], $application['host']));
 				}
 			}
 		}
@@ -2206,7 +2224,7 @@ COpt::memoryPick();
 			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
 			$templates = implode(', ', zbx_objectValues($templates, 'host'));
 
-			info(_s('Templates [%1$s] unlinked from hosts [%2$s].', $templates, $hosts));
+			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
 		}
 
 		return true;
