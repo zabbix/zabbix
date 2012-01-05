@@ -438,6 +438,9 @@ require_once('include/page_header.php');
 	else if($_REQUEST['config'] == 10){
 		if (isset($_REQUEST['clone']) && isset($_REQUEST['regexpid'])) {
 			unset($_REQUEST['regexpid']);
+			foreach ($_REQUEST['expressions'] as &$expression) {
+				unset($expression['expressionid']);
+			}
 			$_REQUEST['form'] = 'clone';
 		}
 		else if(isset($_REQUEST['cancel_new_expression'])){
