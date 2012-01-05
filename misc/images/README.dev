@@ -11,3 +11,7 @@ pngcrush
 --- png_to_sql.sh dependencies
 
 hexdump
+
+--- png_to_xml.sh dependencies
+
+base64

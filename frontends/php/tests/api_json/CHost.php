@@ -23,24 +23,21 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class API_JSON_Host extends CZabbixTest
-{
-	public static function host_names()
-	{
+class API_JSON_Host extends CZabbixTest {
+	public static function host_names() {
 		return array(
 			array('Test host', true),
 			array('Fake host', false),
 		);
 	}
 
-	public static function dup_template_ids()
-	{
+	public static function dup_template_ids() {
 		return array(
 			array(
 				array(
 				'host' => 'Host to test dup ids 1',
 				'name' => 'Host visible to test dup ids 1',
-				'interfaces'=> array(
+				'interfaces' => array(
 						array(
 							"type" => 1,
 							"useip" => 1,
@@ -63,7 +60,7 @@ class API_JSON_Host extends CZabbixTest
 				array(
 				'host' => 'Host to test dup ids 2',
 				'name' => 'Host visible to test dup ids 2',
-				'interfaces'=> array(
+				'interfaces' => array(
 						array(
 							"type" => 1,
 							"useip" => 1,
@@ -87,7 +84,7 @@ class API_JSON_Host extends CZabbixTest
 				array(
 				'host' => 'Host to test dup ids 3',
 				'name' => 'Host visible to test dup ids 3',
-				'interfaces'=> array(
+				'interfaces' => array(
 						array(
 							"type" => 1,
 							"useip" => 1,
@@ -115,17 +112,16 @@ class API_JSON_Host extends CZabbixTest
 	/**
 	* @dataProvider host_names
 	*/
-	public function testCHost_exists($name, $exists)
-	{
+	public function testCHost_exists($name, $exists) {
 		$debug = null;
 
 		$result = $this->api_acall(
 			'host.exists',
-			array('host'=>$name),
+			array('host' => $name),
 			$debug
 		);
 
-		$this->assertTrue(!array_key_exists('error', $result),"Chuck Norris: Exists method returned an error. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
+		$this->assertTrue(!array_key_exists('error', $result), "Chuck Norris: Exists method returned an error. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
 
 		$this->assertFalse(
 			($result['result'] != $exists),
@@ -137,8 +133,7 @@ class API_JSON_Host extends CZabbixTest
 	/**
 	* @dataProvider dup_template_ids
 	*/
-	public function testCHostDuplicateTemplateIds($request, $successExpected)
-	{
+	public function testCHostDuplicateTemplateIds($request, $successExpected) {
 		$debug = null;
 
 		$result = $this->api_acall(
@@ -147,30 +142,27 @@ class API_JSON_Host extends CZabbixTest
 			$debug
 		);
 
-		if($successExpected){
+		if ($successExpected) {
 			$this->assertTrue(
 				!array_key_exists('error', $result) || strpos($result['error']['data'], 'Cannot pass duplicate template') === false,
-				"Chuck Norris: I was expecting that host.create would not complain on duplicate ids. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true)
+				"Chuck Norris: I was expecting that host.create would not complain on duplicate IDs. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true)
 			);
 		}
-		else{
+		else {
 			$this->assertTrue(
 				array_key_exists('error', $result) && strpos($result['error']['data'], 'Cannot pass duplicate template') !== false,
-				"Chuck Norris: I was expecting that host.create to complain on duplicate ids. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true)
+				"Chuck Norris: I was expecting that host.create would complain on duplicate IDs. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true)
 			);
 		}
-
 	}
 
-
-	public static function inventoryGetRequests()
-	{
+	public static function inventoryGetRequests() {
 		return array(
 			array(
 				// request
 				array(
 					'withInventory' => true,
-					'selectInventory'=> array('type'),
+					'selectInventory' => array('type'),
 					'hostids' => 10017
 				),
 				// expected result
@@ -183,7 +175,7 @@ class API_JSON_Host extends CZabbixTest
 				// request
 				array(
 					'withInventory' => true,
-					'selectInventory'=> array('os', 'tag'),
+					'selectInventory' => array('os', 'tag'),
 					'hostids' => 10017
 				),
 				// expected result
@@ -197,7 +189,7 @@ class API_JSON_Host extends CZabbixTest
 				// request
 				array(
 					'withInventory' => true,
-					'selectInventory'=> array('blabla'), // non existent field
+					'selectInventory' => array('blabla'), // non existent field
 					'hostids' => 10017
 				),
 				// expected result
@@ -226,11 +218,6 @@ class API_JSON_Host extends CZabbixTest
 			!isset($result['result'][0]['inventory']) || $result['result'][0]['inventory'] != $expectedResult,
 			"Chuck Norris: I was expecting that host.get would return this result in 'inventories' element: ".print_r($expectedResult, true).", but it returned: ".print_r($result, true)." \nDebug: ".print_r($debug, true)
 		);
-
 	}
-
-
-
-
 }
 ?>

@@ -1061,7 +1061,7 @@ switch($itemType) {
 			$trigger_hint->setHeader(array(
 				S_SEVERITY,
 				S_NAME,
-				S_EXPRESSION,
+				_('Expression'),
 				S_STATUS
 			));
 
@@ -1182,19 +1182,19 @@ switch($itemType) {
 
 // GO{
 		$goBox = new CComboBox('go');
-		$goOption = new CComboItem('activate',S_ACTIVATE_SELECTED);
+		$goOption = new CComboItem('activate', _('Activate selected'));
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('disable',S_DISABLE_SELECTED);
+		$goOption = new CComboItem('disable', _('Disable selected'));
 		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('massupdate',S_MASS_UPDATE);
+		$goOption = new CComboItem('massupdate', _('Mass update'));
 		//$goOption->setAttribute('confirm',S_MASS_UPDATE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('copy_to',S_COPY_SELECTED_TO);
+		$goOption = new CComboItem('copy_to', _('Copy selected to ...'));
 		//$goOption->setAttribute('confirm',S_COPY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
@@ -1202,7 +1202,7 @@ switch($itemType) {
 		$goOption->setAttribute('confirm',S_DELETE_HISTORY_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete',S_DELETE_SELECTED);
+		$goOption = new CComboItem('delete', _('Delete selected'));
 		$goOption->setAttribute('confirm',S_DELETE_SELECTED_ITEMS_Q);
 		$goBox->addItem($goOption);
 

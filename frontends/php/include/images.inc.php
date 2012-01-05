@@ -77,4 +77,85 @@ function zbx_unescape_image($image){
 	return $result;
 }
 
+
+/**
+ * Resizes the given image resource to the specified size keeping the original
+ * proportions of the image.
+ *
+ * @param resource $source
+ * @param int $thumbWidth
+ * @param int $thumbHeight
+ *
+ * @return resource
+ */
+function imageThumb($source, $thumbWidth = 0, $thumbHeight = 0) {
+	$srcWidth	= imagesx($source);
+	$srcHeight	= imagesy($source);
+
+	if ($srcWidth > $thumbWidth || $srcHeight > $thumbHeight) {
+		if ($thumbWidth == 0) {
+			$thumbWidth = $thumbHeight * $srcWidth / $srcHeight;
+		}
+		else if ($thumbHeight == 0) {
+			$thumbHeight = $thumbWidth * $srcHeight / $srcWidth;
+		}
+		else {
+			$a = $thumbWidth / $thumbHeight;
+			$b = $srcWidth / $srcHeight;
+
+			if ($a > $b) {
+				$thumbWidth = $b * $thumbHeight;
+				$thumbHeight = $thumbHeight;
+			}
+			else {
+				$thumbHeight = $thumbWidth / $b;
+				$thumbWidth = $thumbWidth;
+			}
+		}
+
+		if (function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
+			$thumb = imagecreatetruecolor($thumbWidth, $thumbHeight);
+		}
+		else {
+			$thumb = imagecreate($thumbWidth, $thumbHeight);
+		}
+
+		// preserve png transparency
+		imagealphablending($thumb, false);
+		imagesavealpha($thumb, true);
+
+		imagecopyresampled(
+			$thumb, $source,
+			0, 0,
+			0, 0,
+			$thumbWidth, $thumbHeight,
+			$srcWidth, $srcHeight);
+
+		imagedestroy($source);
+
+		$source = $thumb;
+	}
+
+	return $source;
+}
+
+
+/**
+ * Creates an image from a string preserving PNG transparency.
+ *
+ * @param $imageString
+ *
+ * @return resource
+ */
+function imageFromString($imageString) {
+	$image = imagecreatefromstring($imageString);
+
+	// preserve PNG transparency
+	imagealphablending($image, false);
+	imagesavealpha($image, true);
+
+	return $image;
+}
+
+
 ?>
