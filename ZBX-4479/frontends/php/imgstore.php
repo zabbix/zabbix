@@ -36,10 +36,18 @@ require_once('include/page_header.php');
 		'css'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	null,		null),
 		'imageid'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
 		'iconid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
+		'width'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000), NULL),
+		'height'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000), NULL),
 	);
 	check_fields($fields);
-?>
-<?php
+
+	$resize = false;
+	if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
+		$resize = true;
+		$width = get_request('width', 0);
+		$height = get_request('height', 0);
+	}
+
 	if (isset($_REQUEST['css'])) {
 		$css = 'div.sysmap_iconid_0{'.
 				' height: 50px; '.
@@ -56,13 +64,18 @@ require_once('include/page_header.php');
 			$image['image'] = base64_decode($image['image']);
 
 			$ico = imagecreatefromstring($image['image']);
+
+			if ($resize) {
+				$ico = imageThumb($ico, $width, $height);
+			}
+
 			$w = imagesx($ico);
 			$h = imagesy($ico);
 
 			$css .= 'div.sysmap_iconid_'.$image['imageid'].'{'.
 						' height: '.$h.'px;'.
 						' width: '.$w.'px;'.
-						' background: url("imgstore.php?iconid='.$image['imageid'].'") no-repeat center center;}'."\n";
+						' background: url("imgstore.php?iconid='.$image['imageid'].'&width='.$w.'&height='.$h.'") no-repeat center center;}'."\n";
 		}
 
 		print($css);
@@ -72,12 +85,19 @@ require_once('include/page_header.php');
 
 		if ($iconid > 0) {
 			$image = get_image_by_imageid($iconid);
-			print($image['image']);
+			$image = $image['image'];
+
+			$source = imageFromString($image);
 		}
 		else {
-			$image = get_default_image(true);
-			ImageOut($image);
+			$source = get_default_image(true);
 		}
+
+		if ($resize) {
+			$source = imageThumb($source, $width, $height);
+		}
+
+		imageOut($source);
 	}
 	elseif (isset($_REQUEST['imageid'])) {
 		$imageid = get_request('imageid',0);

@@ -34,6 +34,29 @@ INSERT INTO hosts (hostid, proxy_hostid, host, status, disable_until, error, ava
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10021,10053,1,1,1,'127.0.0.1','','10050');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (47,10053,4);
 
+-- Add regular expressions
+INSERT INTO regexps (regexpid, name, test_string) VALUES (1,'1_regexp_1','first test string');
+INSERT INTO regexps (regexpid, name, test_string) VALUES (2,'1_regexp_2','first test string');
+INSERT INTO regexps (regexpid, name, test_string) VALUES (3,'2_regexp_1','second test string');
+INSERT INTO regexps (regexpid, name, test_string) VALUES (4,'2_regexp_2','second test string');
+INSERT INTO regexps (regexpid, name, test_string) VALUES (5,'3_regexp_1','test');
+INSERT INTO regexps (regexpid, name, test_string) VALUES (6,'3_regexp_2','test');
+INSERT INTO regexps (regexpid, name, test_string) VALUES (7,'4_regexp_1','abcd');
+INSERT INTO regexps (regexpid, name, test_string) VALUES (8,'4_regexp_2','abcd');
+INSERT INTO regexps (regexpid, name, test_string) VALUES (9,'5_regexp_1','abcd');
+INSERT INTO regexps (regexpid, name, test_string) VALUES (10,'5_regexp_2','abcd');
+
+-- Add expressions for regexps
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (1,1,'first test string',0,',',1);
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (2,2,'first test string2',0,',',1);
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (3,3,'second test string',1,',',1);
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (4,4,'second string',1,',',1);
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (5,5,'abcd test',2,',',1);
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (6,6,'test',2,',',1);
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (7,7,'abcd',3,',',1);
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (8,8,'asdf',3,',',1);
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (9,9,'abcd',4,',',1);
+INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (10,10,'asdf',4,',',1);
 
 -- Add Trigger Actions
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, recovery_msg, r_shortdata, r_longdata) VALUES (4,'Simple action',0,0,0,60,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}',0,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}');
@@ -284,16 +307,16 @@ INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUE
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (1,1,4);
 INSERT INTO maintenances_groups (maintenance_groupid, maintenanceid, groupid) VALUES (2,2,4);
 
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (1,0,1,0,0,1,43200,184200,1294760386);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (2,2,2,0,0,1,43200,93780,1294760409);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (3,3,2,0,85,1,85800,300,1294760438);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (4,4,0,1365,0,15,37500,183840,1294760473);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (5,4,1,2730,85,0,84600,1800,1294760575);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (6,0,1,0,0,1,43200,184200,1294760386);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (7,2,2,0,0,1,43200,93780,1294760409);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (8,3,2,0,85,1,85800,300,1294760438);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,0,1365,0,15,37500,183840,1294760473);
-INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (10,4,1,2730,85,0,84600,1800,1294760575);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (1,0,1,0,0,1,43200,184200,1294760340);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (2,2,2,0,0,1,43200,93780,1294760400);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (3,3,2,0,85,1,85800,300,1294760400);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (4,4,0,1365,0,15,37500,183840,1294760460);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (5,4,1,2730,85,0,84600,1800,1294760520);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (6,0,1,0,0,1,43200,184200,1294760340);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (7,2,2,0,0,1,43200,93780,1294760400);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (8,3,2,0,85,1,85800,300,1294760400);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (9,4,0,1365,0,15,37500,183840,1294760460);
+INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (10,4,1,2730,85,0,84600,1800,1294760520);
 
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (1,1,1);
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (2,1,2);
@@ -341,7 +364,7 @@ INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, description, 
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, description, key_, delay, history, trends, lastvalue, lastclock, prevvalue, status, value_type, trapper_hosts, units, multiplier, delta, prevorgvalue, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, lastns, flags, filter, interfaceid, port, inventory_link) VALUES (22190, 0, '', '', 10017, 'i am populating filed Type', 'key.test.pop.type', 30, 90, 365, NULL, NULL, NULL, 0, 0, '', '', 0, 0, NULL, '', 0, '', '', '1', '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, NULL, 0, ':', 10017, '', 1);
 
 -- test discovery rule
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (3, 10047, 'External network', '192.168.1.3-255', 600, 0, 0);
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (3, NULL, 'External network', '192.168.3.1-255', 600, 0, 0);
 
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (3, 3, 9, 'system.uname', '', '10050', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (4, 3, 3, '', '', '21,1021', '', 0, '', '', 0);
@@ -360,3 +383,13 @@ INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (17, 3, 8, '', '', '10000-20000', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (18, 3, 15, '', '', '23', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (19, 3, 9, 'agent.uname', '', '10050', '', 0, '', '', 0);
+
+-- Global macros
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (1,'{$DEFAULT_DELAY}','30');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (2,'{$LOCALIP}','127.0.0.1');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (3,'{$DEFAULT_LINUX_IF}','eth0');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (4,'{$ALLPOSSIBLECHARS}','\'`\"~\\/?@$%&*');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (5,'{$0123456789012345678901234567890123456789012345678901234567890}','012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (6,'{$A}','Some text');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (7,'{$1}','Numeric macro');
+INSERT INTO globalmacro (globalmacroid, macro, value) VALUES (8,'{$_}','Underscore');

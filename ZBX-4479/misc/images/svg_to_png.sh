@@ -9,24 +9,25 @@
 
 pngcrushbin=pngcrush
 
-outputdir=${1:-png}
-elementdir=source/elements
+outputdir="${1:-png_modern}"
+sourcedir="svg"
+elementdir="$sourcedir/elements"
 
 pngcrushlog=pngcrush.log.txt
 pngcrushoutput=pngcrushoutput.txt
 inkscapelog=inkscape.log.txt
 
 crushpng() {
-			$pngcrushbin -brute -reduce -e .2.png "$1" >> $pngcrushoutput || exit 1
-			echo "$1 : $(echo "$(stat -c %s "${1%png}2.png")/$(stat -c %s "${1}")*100" | bc -l)" >> $pngcrushlog
-			mv "${1%png}2.png" "$1"
+	$pngcrushbin -brute -reduce -e .2.png "$1" >> "$pngcrushoutput" || exit 1
+	echo "$1 : $(echo "$(stat -c %s "${1%png}2.png")/$(stat -c %s "${1}")*100" | bc -l)" >> "$pngcrushlog"
+	mv "${1%png}2.png" "$1"
 }
 
 svgtopng() {
 	# parameters : svg, size, reported size, dimension
 	# 3rd parameter allows to override "reported" size; if missing, actual size is used
 	# 4th parameter allows to override width/height detection
-	pngoutfile="$outputdir/$(basename ${1%.svg}) (${3:-$2}).png"
+	pngoutfile="$outputdir/$(basename ${1%.svg})_(${3:-$2}).png"
 	[[ "$(stat -c "%Y" "$pngoutfile" 2>/dev/null)" -lt "$svgfilemod" ]] && {
 		# if png file modification time is older than svg file modification time
 		echo -n " to $2..."
@@ -76,7 +77,7 @@ rackimages=([64]=68 [96]=101 [128]=134)
 
 echo -n "Converting Rack_42.svg"
 for rackimagesize in "${!rackimages[@]}"; do
-	svgtopng "source/equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}" "$rackimagesize" "width"
+	svgtopng "$sourcedir/equipment_rack/Rack_42.svg" "${rackimages[$rackimagesize]}" "$rackimagesize" "width"
 done
 echo
 
@@ -84,12 +85,12 @@ rackwithdoorimages=([64]=100 [96]=149 [128]=199)
 
 echo -n "Converting Rack_42_with_door.svg"
 for rackwithdoorimagesize in "${!rackwithdoorimages[@]}"; do
-	svgtopng "source/equipment_rack/Rack_42_with_door.svg" "${rackwithdoorimages[$rackwithdoorimagesize]}" "$rackwithdoorimagesize" "width"
+	svgtopng "$sourcedir/equipment_rack/Rack_42_with_door.svg" "${rackwithdoorimages[$rackwithdoorimagesize]}" "$rackwithdoorimagesize" "width"
 done
 echo
 
 [[ -s "$pngcrushlog" ]] && {
 	echo "Biggest gain from pngcrush:"
-	sort -n -r -t : -k 2 $pngcrushlog | tail -n 1
-	awk 'BEGIN {FS=":"}; {sum+=$2} END { print "Average gain:",sum/NR}' $pngcrushlog
+	sort -n -r -t : -k 2 "$pngcrushlog" | tail -n 1
+	awk 'BEGIN {FS=":"}; {sum+=$2} END { print "Average gain:",sum/NR}' "$pngcrushlog"
 }
