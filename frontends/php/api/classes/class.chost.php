@@ -2192,6 +2192,12 @@ Copt::memoryPick();
 			'operationid' => $delOperationids,
 		));
 
+		$hosts = API::Host()->get(array(
+			'output' => array('hostid', 'name'),
+			'hostids' => $hostids,
+			'nopermissions' => true
+		));
+
 // delete host inventory
 		DB::delete('host_inventory', array('hostid' => $hostids));
 
@@ -2203,8 +2209,8 @@ Copt::memoryPick();
 
 // TODO: remove info from API
 		foreach ($hosts as $host) {
-			info(_s('Host "%s" deleted.', $host['host']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', NULL, NULL);
+			info(_s('Host "%s" deleted.', $host['name']));
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
 		}
 
 		return array('hostids' => $hostids);
