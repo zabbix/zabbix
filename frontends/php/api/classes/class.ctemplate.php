@@ -135,7 +135,7 @@ class CTemplate extends CZBXAPI {
 			$sql_parts['where'][] = 'ug.userid='.$userid;
 			$sql_parts['where'][] = 'r.permission>='.$permission;
 			$sql_parts['where'][] = 'NOT EXISTS('.
-								' SELECT hgg.groupid'.
+								'SELECT hgg.groupid'.
 								' FROM hosts_groups hgg,rights rr,users_groups gg'.
 								' WHERE hgg.hostid=hg.hostid'.
 									' AND rr.id=hgg.groupid'.
@@ -296,7 +296,7 @@ class CTemplate extends CZBXAPI {
 // with_triggers
 		if(!is_null($options['with_triggers'])){
 			$sql_parts['where'][] = 'EXISTS('.
-						' SELECT i.itemid'.
+						'SELECT i.itemid'.
 						' FROM items i,functions f,triggers t'.
 						' WHERE i.hostid=h.hostid'.
 							' AND i.itemid=f.itemid'.
@@ -1775,18 +1775,18 @@ COpt::memoryPick();
 					' AND i.hostid=h.hostid'.
 					' AND h.status='.HOST_STATUS_TEMPLATE.
 					' AND NOT EXISTS ('.
-						' SELECT 1'.
+						'SELECT 1'.
 						' FROM hosts_templates ht'.
 						' WHERE ht.templateid=i.hostid'.
 							' AND '.DBcondition('ht.hostid', $targetids).
-					' )'.
+					')'.
 					' AND EXISTS ('.
-						' SELECT 1'.
+						'SELECT 1'.
 						' FROM functions ff,items ii'.
 						' WHERE ff.itemid=ii.itemid'.
 							' AND ff.triggerid=t.triggerid'.
 							' AND '.DBcondition('ii.hostid', $templateids).
-					' )';
+					')';
 		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
@@ -1811,11 +1811,11 @@ COpt::memoryPick();
 		$start_points = array();
 		$sql = 'SELECT max(ht.hostid) as hostid,ht.templateid'.
 			' FROM('.
-				' SELECT count(htt.templateid) as ccc,htt.hostid'.
+				'SELECT count(htt.templateid) as ccc,htt.hostid'.
 				' FROM hosts_templates htt'.
-				' WHERE htt.hostid NOT IN ( SELECT httt.templateid FROM hosts_templates httt )'.
+				' WHERE htt.hostid NOT IN (SELECT httt.templateid FROM hosts_templates httt)'.
 				' GROUP BY htt.hostid'.
-				' ) ggg, hosts_templates ht'.
+				') ggg, hosts_templates ht'.
 			' WHERE ggg.ccc>1'.
 				' AND ht.hostid=ggg.hostid'.
 			' GROUP BY ht.templateid';
@@ -1914,12 +1914,12 @@ COpt::memoryPick();
 					' AND f.itemid=i.itemid'.
 					' AND '.DBCondition('i.hostid', $templateids).
 					' AND EXISTS ('.
-						' SELECT ff.triggerid'.
+						'SELECT ff.triggerid'.
 						' FROM functions ff,items ii'.
 						' WHERE ff.itemid=ii.itemid'.
 							' AND ff.triggerid=t.triggerid'.
 							' AND '.DBCondition('ii.hostid', $templateids, true).
-					' )'.
+					')'.
 					' AND t.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
 		if ($db_trigger = DBfetch(DBSelect($sql, 1))) {
 			self::exception(
@@ -1931,7 +1931,7 @@ COpt::memoryPick();
 
 		$sql_from = ' triggers t';
 		$sql_where = ' EXISTS ('.
-				' SELECT ff.triggerid'.
+				'SELECT ff.triggerid'.
 				' FROM functions ff,items ii'.
 				' WHERE ff.triggerid=t.templateid'.
 					' AND ii.itemid=ff.itemid'.
@@ -2087,7 +2087,7 @@ COpt::memoryPick();
 /* GRAPHS {{{ */
 		$sql_from = ' graphs g';
 		$sql_where = ' EXISTS ('.
-				' SELECT ggi.graphid'.
+				'SELECT ggi.graphid'.
 				' FROM graphs_items ggi,items ii'.
 				' WHERE ggi.graphid=g.templateid'.
 					' AND ii.itemid=ggi.itemid'.
