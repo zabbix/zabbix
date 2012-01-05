@@ -58,6 +58,7 @@ require_once(dirname(__FILE__).'/testFormAction.php');
 require_once(dirname(__FILE__).'/testFormAdministrationDMProxies.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralMacro.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php');
+require_once(dirname(__FILE__).'/testPageAdministrationGeneralValuemap.php');
 require_once(dirname(__FILE__).'/testFormConfigTriggerSeverity.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
