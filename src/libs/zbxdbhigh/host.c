@@ -30,7 +30,7 @@
  *                                                                            *
  * Description: Check of collisions between linked templates                  *
  *                                                                            *
- * Parameters: templateids - [IN] array of template ids                       *
+ * Parameters: templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
@@ -310,7 +310,7 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
  * Description: Check collisions in item inventory links                      *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
@@ -487,7 +487,7 @@ clean:
  * Description: Check collisions between host and linked template             *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: SUCCEED if no collisions found                               *
  *                                                                            *
@@ -1729,7 +1729,7 @@ static void	DBdelete_applications(zbx_uint64_t *applicationids, int applicationi
  * Purpose: delete template graphs from host                                  *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1787,7 +1787,7 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *t
  * Purpose: delete template triggers from host                                *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1843,7 +1843,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, zbx_vector_uint64_t 
  * Purpose: delete template items from host                                   *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -1900,7 +1900,7 @@ static void	DBdelete_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  * Purpose: delete application                                                *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -2258,7 +2258,7 @@ static int	DBadd_template_dependencies_for_new_triggers(zbx_uint64_t *trids, int
  * Description: Retrieve already linked templates for specified host          *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -2294,7 +2294,7 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
  * Purpose: delete template elements from host                                *
  *                                                                            *
  * Parameters: hostid          - [IN] host identificator from database        *
- *             del_templateids - [IN] array of template ids                   *
+ *             del_templateids - [IN] array of template IDs                   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -2371,7 +2371,7 @@ clean:
  * Purpose: copy applications from templates to host                          *
  *                                                                            *
  * Parameters: hostid      - [IN] host id                                     *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -2541,7 +2541,7 @@ static void	DBget_interfaces_by_hostid(zbx_uint64_t hostid, zbx_uint64_t *interf
  * Purpose: copy template items to host                                       *
  *                                                                            *
  * Parameters: hostid      - [IN] host id                                     *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -3045,7 +3045,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  * Purpose: Copy template triggers to host                                    *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -3380,7 +3380,7 @@ static int	DBcopy_graph_to_host(zbx_uint64_t hostid, zbx_uint64_t graphid,
  * Purpose: copy graphs from template to host                                 *
  *                                                                            *
  * Parameters: hostid      - [IN] host identificator from database            *
- *             templateids - [IN] array of template ids                       *
+ *             templateids - [IN] array of template IDs                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -3458,7 +3458,7 @@ static int	DBcopy_template_graphs(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
  * Purpose: copy elements from specified template                             *
  *                                                                            *
  * Parameters: hostid          - [IN] host identificator from database        *
- *             lnk_templateids - [IN] array of template ids                   *
+ *             lnk_templateids - [IN] array of template IDs                   *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *

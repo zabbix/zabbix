@@ -542,7 +542,7 @@ void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid)
  * Purpose: link host with template                                           *
  *                                                                            *
  * Parameters: event           - [IN] event data                              *
- *             lnk_templateids - [IN] array of template ids                   *
+ *             lnk_templateids - [IN] array of template IDs                   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -575,7 +575,7 @@ void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids)
  * Purpose: unlink and clear host from template                               *
  *                                                                            *
  * Parameters: event           - [IN] event data                              *
- *             lnk_templateids - [IN] array of template ids                   *
+ *             lnk_templateids - [IN] array of template IDs                   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
