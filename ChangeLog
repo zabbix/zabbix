@@ -2,6 +2,7 @@
 Changes for 1.9.9
 
 New features:
+A.......S. [ZBX-4479] added possibility to add a dependency from a template to a host (Sasha, Slava)
 ..F....... [ZBX-4483] added transparency support for image resizing (pavels)
 ..F....... [ZBXNEXT-905] redesign Configuration->Triggers (Eduard)
 ..F....... [ZBXNEXT-912] redesign Configuration->Slide shows (Eduard)
