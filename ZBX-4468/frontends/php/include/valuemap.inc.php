@@ -42,7 +42,7 @@ function add_valuemap($name, $mappings) {
 
 	$valuemapid = get_dbid('valuemaps', 'valuemapid');
 
-	$result = DBexecute('INSERT INTO valuemaps (valuemapid,name) VALUES ('.$valuemapid.','.zbx_dbstr($name).")");
+	$result = DBexecute('INSERT INTO valuemaps (valuemapid,name) VALUES ('.$valuemapid.','.zbx_dbstr($name).')');
 	if (!$result) {
 		return $result;
 	}
