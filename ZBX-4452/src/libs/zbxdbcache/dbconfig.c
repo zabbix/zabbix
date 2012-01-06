@@ -3698,9 +3698,9 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max
  *                                                                            *
  * Function: DCconfig_get_snmp_interfaceids_by_addr                           *
  *                                                                            *
- * Purpose: get array of interface ids for the specified address              *
+ * Purpose: get array of interface IDs for the specified address              *
  *                                                                            *
- * Return value: number of interface ids returned                             *
+ * Return value: number of interface IDs returned                             *
  *                                                                            *
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *

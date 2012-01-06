@@ -221,11 +221,11 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 	datalen = strlen(s);
 	zabbix_log(LOG_LEVEL_DEBUG, "Trapper got [%s] len " ZBX_FS_SIZE_T, s, (zbx_fs_size_t)datalen);
 
-	if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* Request for list of active checks */
+	if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
 		ret = send_list_of_active_checks(sock, s);
 	}
-	else if (strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23) == 0) /* Request for last ids */
+	else if (strncmp(s, "ZBX_GET_HISTORY_LAST_ID", 23) == 0) /* request for last IDs */
 	{
 		send_history_last_id(sock, s);
 		return ret;
