@@ -911,14 +911,14 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 
 	// triggers
 	if ($def_options['with_triggers']) {
-		$def_sql['where'][] = 'EXISTS( SELECT i.itemid'.
+		$def_sql['where'][] = 'EXISTS(SELECT i.itemid'.
 									' FROM items i, functions f, triggers t'.
 									' WHERE i.hostid=h.hostid'.
 										' AND i.itemid=f.itemid'.
 										' AND f.triggerid=t.triggerid)';
 	}
 	elseif ($def_options['with_monitored_triggers']) {
-		$def_sql['where'][] = 'EXISTS( SELECT i.itemid'.
+		$def_sql['where'][] = 'EXISTS(SELECT i.itemid'.
 									' FROM items i, functions f, triggers t'.
 									' WHERE i.hostid=h.hostid'.
 										' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -929,13 +929,13 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 
 	// httptests
 	if ($def_options['with_httptests']) {
-		$def_sql['where'][] = 'EXISTS( SELECT a.applicationid'.
+		$def_sql['where'][] = 'EXISTS(SELECT a.applicationid'.
 								' FROM applications a, httptest ht'.
 								' WHERE a.hostid=h.hostid'.
 									' AND ht.applicationid=a.applicationid)';
 	}
 	elseif ($def_options['with_monitored_httptests']) {
-		$def_sql['where'][] = 'EXISTS( SELECT a.applicationid'.
+		$def_sql['where'][] = 'EXISTS(SELECT a.applicationid'.
 								' FROM applications a, httptest ht'.
 								' WHERE a.hostid=h.hostid'.
 									' AND ht.applicationid=a.applicationid'.
@@ -944,7 +944,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 
 	// graphs
 	if ($def_options['with_graphs']) {
-		$def_sql['where'][] = 'EXISTS( SELECT DISTINCT i.itemid'.
+		$def_sql['where'][] = 'EXISTS(SELECT DISTINCT i.itemid'.
 									' FROM items i, graphs_items gi'.
 									' WHERE i.hostid=h.hostid'.
 										' AND i.itemid=gi.itemid)';

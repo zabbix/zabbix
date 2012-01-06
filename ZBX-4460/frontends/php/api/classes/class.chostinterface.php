@@ -535,7 +535,7 @@ Copt::memoryPick();
 					'nopermissions' => true,
 					'preservekeys' => true
 				));
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on host "%2$s".', $interface['ip'], $dbHosts[$interface['hostid']]['host']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".', $interface['ip'], $dbHosts[$interface['hostid']]['host']));
 			}
 
 			if (isset($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])) {
@@ -901,7 +901,7 @@ Copt::memoryPick();
 					$host = reset($host);
 
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No default interface for "%1$s" type on host "%2$s".', hostInterfaceTypeNumToName($type), $host['name']));
+						_s('No default interface for "%1$s" type on "%2$s".', hostInterfaceTypeNumToName($type), $host['name']));
 				}
 
 				if ($counters['main'] > 1) {
@@ -913,8 +913,8 @@ Copt::memoryPick();
 
 	private function checkIfInterfaceHasItems(array $interfaceIds) {
 		$items = API::Item()->get(array(
-			'output' => array('key_'),
-			'selectHosts' => array('host'),
+			'output' => array('name'),
+			'selectHosts' => array('name'),
 			'interfaceids' => $interfaceIds,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'preservekeys' => true,
@@ -924,7 +924,7 @@ Copt::memoryPick();
 
 		foreach ($items as $item) {
 			$host = reset($item['hosts']);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%1$s:%2$s"', $host['host'], $item['key_']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface is linked to item "%1$s" on "%2$s"', $item['name'], $host['name']));
 		}
 	}
 }
