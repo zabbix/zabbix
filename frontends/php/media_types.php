@@ -112,7 +112,7 @@ elseif (isset($_REQUEST['delete']) && !empty($mediatypeid)) {
 /*
  * Go - activate
  */
-else if($_REQUEST['go'] == 'activate'){
+elseif ($_REQUEST['go'] == 'activate') {
 	$mediatypeids = get_request('mediatypeids', array());
 
 	$options = array();
@@ -133,7 +133,7 @@ else if($_REQUEST['go'] == 'activate'){
 /*
  * Go - disable
  */
-else if($_REQUEST['go'] == 'disable'){
+elseif($_REQUEST['go'] == 'disable') {
 	$mediatypeids = get_request('mediatypeids', array());
 
 	$options = array();

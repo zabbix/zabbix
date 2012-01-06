@@ -181,7 +181,7 @@ void	main_alerter_loop()
 
 			alert.retries = atoi(row[17]);
 
-			switch(mediatype.status)
+			switch (mediatype.status)
 			{
 				case MEDIA_TYPE_STATUS_ACTIVE:
 					*error = '\0';
