@@ -84,6 +84,7 @@
 		$cmbConnectBy->useJQueryStyle();
 
 		$ifTab = new CTable();
+		$ifTab->addClass('formElementTable');
 		$ifTab->addRow(array(
 			S_IP_ADDRESS,
 			S_DNS_NAME,
