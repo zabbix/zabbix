@@ -147,7 +147,7 @@ void	main_alerter_loop()
 		result = DBselect(
 				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
 				"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
-				"mt.gsm_modem,mt.username,mt.passwd,a.retries"
+				"mt.gsm_modem,mt.username,mt.passwd,mt.status,a.retries"
 				" from alerts a,media_type mt"
 				" where a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
@@ -177,11 +177,20 @@ void	main_alerter_loop()
 			mediatype.gsm_modem = row[13];
 			mediatype.username = row[14];
 			mediatype.passwd = row[15];
+			mediatype.status = atoi(row[16]);
 
-			alert.retries = atoi(row[16]);
+			alert.retries = atoi(row[17]);
 
-			*error = '\0';
-			res = execute_action(&alert, &mediatype, error, sizeof(error));
+			switch(mediatype.status)
+			{
+				case MEDIA_TYPE_STATUS_ACTIVE:
+					*error = '\0';
+					res = execute_action(&alert, &mediatype, error, sizeof(error));
+					break;
+				default:
+					zbx_snprintf(error, sizeof(error), "Media type is not active");
+					res = FAIL;
+			}
 
 			if (SUCCEED == res)
 			{
