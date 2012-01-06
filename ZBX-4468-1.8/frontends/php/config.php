@@ -335,7 +335,7 @@ include_once('include/page_header.php');
 			}
 			else {
 				$msg_ok = _('Value map added');
-				$msg_fail = sprintf(S_CANNOT_UPDATE_VALUE_MAP, $_REQUEST['mapname']);
+				$msg_fail = sprintf(S_VALUE_MAP_WITH_NAME_EXISTS, $_REQUEST['mapname']);
 				$result = 0;
 			}
 			if($result){

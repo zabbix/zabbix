@@ -95,6 +95,8 @@
 
 	return $value;
 	}
+
+
 	function getValuemapByName($name) {
 		$result = DBselect(
 			'SELECT v.valuemapid, v.name'.
@@ -103,5 +105,6 @@
 		);
 		return DBfetch($result);
 	}
+
 /*************** END VALUE MAPPING ******************/
 ?>

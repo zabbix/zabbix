@@ -480,6 +480,7 @@
 	'S_CANNNOT_ADD_VALUE_MAP'=>			'Cannot add value map',
 	'S_VALUE_MAP_DELETED'=>				'Value map deleted',
 	'S_CANNNOT_DELETE_VALUE_MAP'=>			'Cannot delete value map',
+	'S_VALUE_MAP_WITH_NAME_EXISTS' => 'Cannot add or updated value map. Map with name "%s" already exists',
 	'S_VALUE_MAP_UPDATED'=>				'Value map updated',
 	'S_VALUE_MAPPING_BIG'=>				'VALUE MAPPING',
 	'S_VALUE_MAPPING'=>				'Value mapping',
@@ -2491,6 +2492,5 @@
 	'S_INCORRECT_SYNTAX_NEAR' => 'Incorrect syntax near \'%1$s\'',
 	'S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS' => 'Incorrect usage of bracket symbols. \'%s\' found after final bracket.',
 	'S_INVALID_KEY_FORMAT' => 'Invalid item key format.',
-	'S_CANNOT_UPDATE_VALUE_MAP' => 'Cannot add or update value map. Map with name "%s" already exists',
 );
 ?>
