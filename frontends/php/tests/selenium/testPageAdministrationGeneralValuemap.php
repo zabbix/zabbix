@@ -44,11 +44,11 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 
 		// checking that in the "Value map" column are correct values
 		// $sql1 = "SELECT m.value,m.newvalue FROM mappings m,valuemaps vm WHERE m.valuemapid=vm.valuemapid";
-		$sqlMappings = 'SELECT m.value FROM mappings m,valuemaps vm WHERE m.valuemapid='.$valuemap['valuemapid'];
+		$sqlMappings = 'SELECT m.value FROM mappings m WHERE m.valuemapid='.$valuemap['valuemapid'];
 		$result1 = DBfetch(DBselect($sqlMappings));
 		$value = $result1['value'];
 
-		$sqlValuemaps = 'SELECT m.newvalue FROM mappings m,valuemaps vm WHERE m.valuemapid='.$valuemap['valuemapid'];
+		$sqlValuemaps = 'SELECT m.newvalue FROM mappings m WHERE m.valuemapid='.$valuemap['valuemapid'];
 		$result2 = DBfetch(DBselect($sqlValuemaps));
 		$new_value = $result2['newvalue'];
 
