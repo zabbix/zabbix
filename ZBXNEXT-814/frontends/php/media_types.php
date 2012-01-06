@@ -44,6 +44,7 @@ $fields = array(
 	'gsm_modem' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_SMS.')'),
 	'username' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
 	'password' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
+	'status'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN(array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)), null),
 	// actions
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
@@ -73,7 +74,8 @@ if (isset($_REQUEST['save'])) {
 		'exec_path' => get_request('exec_path'),
 		'gsm_modem' => get_request('gsm_modem'),
 		'username' => get_request('username'),
-		'passwd' => get_request('password')
+		'passwd' => get_request('password'),
+		'status' => get_request('status', MEDIA_TYPE_STATUS_DISABLED)
 	);
 
 	if (is_null($mediatype['passwd'])) {
@@ -106,6 +108,48 @@ elseif (isset($_REQUEST['delete']) && !empty($mediatypeid)) {
 		unset($_REQUEST['form']);
 	}
 	show_messages($result, _('Media type deleted'), _('Cannot delete media type'));
+}
+/*
+ * Go - activate
+ */
+else if($_REQUEST['go'] == 'activate'){
+	$mediatypeids = get_request('mediatypeids', array());
+
+	$options = array();
+
+	foreach($mediatypeids as $mediatypeid) {
+		$options[] = array(
+		'mediatypeid' => $mediatypeid,
+		'status' => MEDIA_TYPE_STATUS_ACTIVE);
+	}
+
+	$go_result = API::Mediatype()->update($options);
+
+	if ($go_result) {
+		unset($_REQUEST['form']);
+	}
+	show_messages($go_result, _('Media type enabled'), _('Media type was not enabled'));
+}
+/*
+ * Go - disable
+ */
+else if($_REQUEST['go'] == 'disable'){
+	$mediatypeids = get_request('mediatypeids', array());
+
+	$options = array();
+
+	foreach($mediatypeids as $mediatypeid) {
+		$options[] = array(
+		'mediatypeid' => $mediatypeid,
+		'status' => MEDIA_TYPE_STATUS_DISABLED);
+	}
+
+	$go_result = API::Mediatype()->update($options);
+
+	if ($go_result) {
+		unset($_REQUEST['form']);
+	}
+	show_messages($go_result, _('Media type disabled'), _('Media type was not disabled'));
 }
 /*
 * Go - delete
@@ -150,6 +194,7 @@ if (!empty($data['form'])) {
 		$data['gsm_modem'] = $mediatype['gsm_modem'];
 		$data['username'] = $mediatype['username'];
 		$data['password'] = $mediatype['passwd'];
+		$data['status'] = $mediatype['status'];
 	}
 	else {
 		$data['type'] = get_request('type', MEDIA_TYPE_EMAIL);
@@ -161,6 +206,7 @@ if (!empty($data['form'])) {
 		$data['gsm_modem'] = get_request('gsm_modem', '/dev/ttyS0');
 		$data['username'] = get_request('username', ($data['type'] == MEDIA_TYPE_EZ_TEXTING) ? 'username' : 'user@server');
 		$data['password'] = get_request('password', '');
+		$data['status'] = get_request('status', MEDIA_TYPE_STATUS_ACTIVE);
 	}
 
 	// render view
