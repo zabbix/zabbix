@@ -121,12 +121,12 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 
 // create go button
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate',_('Enable selected'));
-$goOption->setAttribute('confirm',_('Enable selected media types?'));
+$goOption = new CComboItem('activate', _('Enable selected'));
+$goOption->setAttribute('confirm', _('Enable selected media types?'));
 $goComboBox->addItem($goOption);
 
-$goOption = new CComboItem('disable',_('Disable selected'));
-$goOption->setAttribute('confirm',_('Disable selected media types?'));
+$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption->setAttribute('confirm', _('Disable selected media types?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('delete', _('Delete selected'));
