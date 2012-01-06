@@ -579,6 +579,7 @@ COpt::memoryPick();
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true,
+			'selectHosts' => array('name')
 		);
 		$del_rules = $this->get($options);
 
@@ -610,7 +611,8 @@ COpt::memoryPick();
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $child_ruleids,
 			'nopermissions' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'selectHosts' => array('name')
 		);
 		$del_rules_childs = $this->get($options);
 
@@ -658,7 +660,8 @@ COpt::memoryPick();
 
 		// TODO: remove info from API
 		foreach ($del_rules as $item) {
-			info(_s('Discovery rule [%1$s:%2$s] deleted.', $item['name'], $item['key_']));
+			$host = reset($item['hosts']);
+			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
 		return array('ruleids' => $ruleids);
@@ -899,13 +902,13 @@ COpt::memoryPick();
 		// TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
+			'output' => array('key_', 'name'),
 			'selectHosts' => array('name'),
 			'nopermissions' => true
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_CREATED_SMALL);
+			info(_s('Created: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
@@ -956,13 +959,13 @@ COpt::memoryPick();
 		// TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
+			'output' => array('key_', 'name'),
 			'selectHosts' => array('name'),
-			'nopermissions' => true,
+			'nopermissions' => true
 		));
 		foreach($itemHosts as $item){
 			$host = reset($item['hosts']);
-			info(S_DISCOVERY_RULE.' ['.$host['name'].':'.$item['key_'].'] '.S_UPDATED_SMALL);
+			info(_s('Updated: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
 	}
@@ -1064,7 +1067,7 @@ COpt::memoryPick();
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['name']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s:%2$s" already exists, inherited from another template.', $host['name'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.', $item['key_'], $host['name']));
 					}
 				}
 
@@ -1079,7 +1082,7 @@ COpt::memoryPick();
 					}
 					// no matching interface found, throw an error
 					elseif($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['name'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $host['name'], $item['key_']));
 					}
 				}
 
@@ -1155,7 +1158,7 @@ COpt::memoryPick();
 			}
 			// no matching interface found, throw an error
 			elseif($interface !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['name'], $dstDiscovery['key_']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['name'], $dstDiscovery['key_']));
 			}
 		}
 

@@ -42,7 +42,7 @@ function add_valuemap($name, $mappings) {
 
 	$valuemapid = get_dbid('valuemaps', 'valuemapid');
 
-	$result = DBexecute("INSERT INTO valuemaps (valuemapid,name) VALUES ($valuemapid,".zbx_dbstr($name).")");
+	$result = DBexecute('INSERT INTO valuemaps (valuemapid,name) VALUES ('.$valuemapid.','.zbx_dbstr($name).')');
 	if (!$result) {
 		return $result;
 	}
@@ -81,21 +81,29 @@ function delete_valuemap($valuemapid) {
 	return $result;
 }
 
+function getValuemapByName($name) {
+	$result = DBselect(
+		'SELECT v.valuemapid, v.name'.
+			' FROM valuemaps v'.
+			' WHERE v.name='.zbx_dbstr($name)
+	);
+	return DBfetch($result);
+}
+
 function replace_value_by_map($value, $valuemapid) {
 	if ($valuemapid < 1) {
 		return $value;
 	}
 
 	static $valuemaps = array();
-
 	if (isset($valuemaps[$valuemapid][$value])) {
 		return $valuemaps[$valuemapid][$value];
 	}
 
 	$db_mappings = DBselect(
 		'SELECT m.newvalue'.
-		' FROM mappings m'.
-		' WHERE m.valuemapid='.$valuemapid.
+			' FROM mappings m'.
+			' WHERE m.valuemapid='.$valuemapid.
 			' AND m.value='.zbx_dbstr($value)
 	);
 	if ($mapping = DBfetch($db_mappings)) {
@@ -103,17 +111,5 @@ function replace_value_by_map($value, $valuemapid) {
 		return $valuemaps[$valuemapid][$value];
 	}
 	return $value;
-}
-
-function getValuemapByName($name) 	{
-	$result = DBselect(
-		'SELECT v.valuemapid, v.name' .
-			' FROM valuemaps v' .
-			' WHERE v.name=' . zbx_dbstr($name)
-	);
-	if ($row = DBfetch($result)) {
-		return $row;
-	}
-	return 0;
 }
 ?>
