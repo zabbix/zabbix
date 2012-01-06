@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4468] removed possibility to add to value mappings few items with same name (Slava)
 A......... [ZBX-4337] fixed possible typo in class.cusermacro.php (sanja)
 ....I..... [ZBX-4461] changed binary path from bin to sbin in FreeBSD initscripts (Richlv)
 ..F....... [ZBX-4491] updated Japanese translation; thanks to Kodai Terashima (Richlv)
