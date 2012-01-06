@@ -2491,5 +2491,6 @@
 	'S_INCORRECT_SYNTAX_NEAR' => 'Incorrect syntax near \'%1$s\'',
 	'S_INCORRECT_USAGE_OF_BRACKET_SYMBOLS' => 'Incorrect usage of bracket symbols. \'%s\' found after final bracket.',
 	'S_INVALID_KEY_FORMAT' => 'Invalid item key format.',
+	'S_CANNOT_UPDATE_VALUE_MAP' => 'Cannot add or update value map. Map with name "%s" already exists',
 );
 ?>

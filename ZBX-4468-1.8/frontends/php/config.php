@@ -313,24 +313,31 @@ include_once('include/page_header.php');
 		else if(isset($_REQUEST['save'])){
 
 			$mapping = get_request('valuemap',array());
-			if(isset($_REQUEST['valuemapid'])){
-				$result		= update_valuemap($_REQUEST['valuemapid'],$_REQUEST['mapname'], $mapping);
-				$audit_action	= AUDIT_ACTION_UPDATE;
-				$msg_ok		= S_VALUE_MAP_UPDATED;
-				$msg_fail	= S_CANNNOT_UPDATE_VALUE_MAP;
-				$valuemapid	= $_REQUEST['valuemapid'];
-			}
-			else{
-				if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))){
-					access_deny();
+			$prevMap = getValuemapByName($_REQUEST['mapname']);
+			if (!$prevMap || (isset($_REQUEST['valuemapid']) && bccomp($_REQUEST['valuemapid'], $prevMap['valuemapid']) == 0)) {
+				if (isset($_REQUEST['valuemapid'])) {
+					$result = update_valuemap($_REQUEST['valuemapid'], $_REQUEST['mapname'], $mapping);
+					$audit_action = AUDIT_ACTION_UPDATE;
+					$msg_ok = S_VALUE_MAP_UPDATED;
+					$msg_fail = S_CANNNOT_UPDATE_VALUE_MAP;
+					$valuemapid = $_REQUEST['valuemapid'];
 				}
-				$result		= add_valuemap($_REQUEST['mapname'], $mapping);
-				$audit_action	= AUDIT_ACTION_ADD;
-				$msg_ok		= S_VALUE_MAP_ADDED;
-				$msg_fail	= S_CANNNOT_ADD_VALUE_MAP;
-				$valuemapid	= $result;
+				else {
+					if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+						access_deny();
+					}
+					$result = add_valuemap($_REQUEST['mapname'], $mapping);
+					$audit_action = AUDIT_ACTION_ADD;
+					$msg_ok = S_VALUE_MAP_ADDED;
+					$msg_fail = S_CANNNOT_ADD_VALUE_MAP;
+					$valuemapid = $result;
+				}
 			}
-
+			else {
+				$msg_ok = _('Value map added');
+				$msg_fail = sprintf(S_CANNOT_UPDATE_VALUE_MAP, $_REQUEST['mapname']);
+				$result = 0;
+			}
 			if($result){
 				add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP,
 					S_VALUE_MAP.' ['.$_REQUEST['mapname'].'] ['.$valuemapid.']');

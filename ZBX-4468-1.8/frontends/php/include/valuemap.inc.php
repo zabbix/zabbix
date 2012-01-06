@@ -95,5 +95,13 @@
 
 	return $value;
 	}
+	function getValuemapByName($name) {
+		$result = DBselect(
+			'SELECT v.valuemapid, v.name'.
+				' FROM valuemaps v'.
+				' WHERE v.name='.zbx_dbstr($name)
+		);
+		return DBfetch($result);
+	}
 /*************** END VALUE MAPPING ******************/
 ?>
