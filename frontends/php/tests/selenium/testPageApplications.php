@@ -21,9 +21,9 @@
 <?php
 require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
-class testPageApplications extends CWebTest{
+class testPageApplications extends CWebTest {
 	// Returns all hosts
-	public static function allHosts(){
+	public static function allHosts() {
 		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 	}
 
@@ -31,11 +31,11 @@ class testPageApplications extends CWebTest{
 	* @dataProvider allHosts
 	*/
 
-	public function testPageApplications_CheckLayout($host){
-		$hostid=$host['hostid'];
+	public function testPageApplications_CheckLayout($host) {
+		$hostid = $host['hostid'];
 
 		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 
 		$this->assertTitle('Hosts');
 		$this->ok('HOSTS');
