@@ -21,46 +21,42 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageUserGroups extends CWebTest
-{
+class testPageUserGroups extends CWebTest {
 	// Returns all user groups
-	public static function allGroups()
-	{
+	public static function allGroups() {
 		return DBdata("select * from usrgrp where name<>'Disabled' order by usrgrpid");
 	}
 
 	/**
 	* @dataProvider allGroups
 	*/
-	public function testPageUserGroups_CheckLayout($group)
-	{
+	public function testPageUserGroups_CheckLayout($group) {
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 		$this->ok('Displaying');
 		// Header
-		$this->ok(array('Name','#','Members','Users status','Frontend access','Debug mode'));
+		$this->ok(array('Name', '#', 'Members', 'Users status', 'Frontend access', 'Debug mode'));
 		// Data
 		$this->ok(array($group['name']));
-		$this->dropdown_select('go','Enable selected');
-		$this->dropdown_select('go','Disable selected');
-		$this->dropdown_select('go','Enable DEBUG');
-		$this->dropdown_select('go','Disable DEBUG');
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Enable selected');
+		$this->dropdown_select('go', 'Disable selected');
+		$this->dropdown_select('go', 'Enable DEBUG');
+		$this->dropdown_select('go', 'Disable DEBUG');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
 	* @dataProvider allGroups
 	*/
-	public function testPageUserGroups_SimpleUpdate($group)
-	{
-		$usrgrpid=$group['usrgrpid'];
-		$name=$group['name'];
+	public function testPageUserGroups_SimpleUpdate($group) {
+		$usrgrpid = $group['usrgrpid'];
+		$name = $group['name'];
 
-		$sql1="select * from usrgrp where name='$name' order by usrgrpid";
-		$oldHashGroup=DBhash($sql1);
-		$sql2="select * from users_groups where usrgrpid=$usrgrpid order by id";
-		$oldHashUsersGroups=DBhash($sql2);
+		$sql1 = "select * from usrgrp where name='$name' order by usrgrpid";
+		$oldHashGroup = DBhash($sql1);
+		$sql2 = "select * from users_groups where usrgrpid=$usrgrpid order by id";
+		$oldHashUsersGroups = DBhash($sql2);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
@@ -73,12 +69,11 @@ class testPageUserGroups extends CWebTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 
-		$this->assertEquals($oldHashGroup,DBhash($sql1));
-		$this->assertEquals($oldHashUsersGroups,DBhash($sql2));
+		$this->assertEquals($oldHashGroup, DBhash($sql1));
+		$this->assertEquals($oldHashUsersGroups, DBhash($sql2));
 	}
 
-	public function testPageUserGroups_MassEnableAll()
-	{
+	public function testPageUserGroups_MassEnableAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -86,19 +81,18 @@ class testPageUserGroups extends CWebTest
 	/**
 	* @dataProvider allGroups
 	*/
-	public function testPageUserGroups_MassEnable($group)
-	{
-		$usrgrpid=$group['usrgrpid'];
-		$name=$group['name'];
+	public function testPageUserGroups_MassEnable($group) {
+		$usrgrpid = $group['usrgrpid'];
+		$name = $group['name'];
 
-		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$sql1 = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
 		$oldHashGroups=DBhash($sql1);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
 
 		$this->checkbox_select("group_groupid[$usrgrpid]");
-		$this->dropdown_select('go','Enable selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->button_click('goButton');
 
 		$this->getConfirmation();
@@ -107,13 +101,12 @@ class testPageUserGroups extends CWebTest
 		$this->ok('Users status updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
-		$this->assertEquals(1,DBcount($sql));
+		$this->assertEquals(1, DBcount($sql));
 
-		$this->assertEquals($oldHashGroups,DBhash($sql1));
+		$this->assertEquals($oldHashGroups, DBhash($sql1));
 	}
 
-	public function testPageUserGroups_MassDisableAll()
-	{
+	public function testPageUserGroups_MassDisableAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -121,42 +114,44 @@ class testPageUserGroups extends CWebTest
 	/**
 	* @dataProvider allGroups
 	*/
-	public function testPageUserGroups_MassDisable($group)
-	{
-		$usrgrpid=$group['usrgrpid'];
-		$name=$group['name'];
+	public function testPageUserGroups_MassDisable($group) {
+		$usrgrpid = $group['usrgrpid'];
+		$name = $group['name'];
 
 		$cannotDisable = ('Zabbix administrators' == $name);
 
-		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups=DBhash($sql1);
+		$sql1 = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups = DBhash($sql1);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
 
 		$this->checkbox_select("group_groupid[$usrgrpid]");
-		$this->dropdown_select('go','Disable selected');
+		$this->dropdown_select('go', 'Disable selected');
 		$this->button_click('goButton');
 
 		$this->getConfirmation();
 		$this->wait();
 		$this->assertTitle('User groups');
-		if($cannotDisable)
+		if ($cannotDisable) {
 			$this->ok('Cannot update users status');
-		else
+		}
+		else {
 			$this->ok('Users status updated');
+		}
 
-		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_DISABLED;
-		if($cannotDisable)
-			$this->assertEquals(0,DBcount($sql));
-		else
-			$this->assertEquals(1,DBcount($sql));
+		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_DISABLED;
+		if ($cannotDisable) {
+			$this->assertEquals(0, DBcount($sql));
+		}
+		else {
+			$this->assertEquals(1, DBcount($sql));
+		}
 
-		$this->assertEquals($oldHashGroups,DBhash($sql1));
+		$this->assertEquals($oldHashGroups, DBhash($sql1));
 	}
 
-	public function testPageUserGroups_MassEnableDEBUGAll()
-	{
+	public function testPageUserGroups_MassEnableDEBUGAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -164,19 +159,18 @@ class testPageUserGroups extends CWebTest
 	/**
 	* @dataProvider allGroups
 	*/
-	public function testPageUserGroups_MassEnableDEBUG($group)
-	{
-		$usrgrpid=$group['usrgrpid'];
-		$name=$group['name'];
+	public function testPageUserGroups_MassEnableDEBUG($group) {
+		$usrgrpid = $group['usrgrpid'];
+		$name = $group['name'];
 
-		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups=DBhash($sql1);
+		$sql1 = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups = DBhash($sql1);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
 
 		$this->checkbox_select("group_groupid[$usrgrpid]");
-		$this->dropdown_select('go','Enable DEBUG');
+		$this->dropdown_select('go', 'Enable DEBUG');
 		$this->button_click('goButton');
 
 		$this->getConfirmation();
@@ -185,13 +179,12 @@ class testPageUserGroups extends CWebTest
 		$this->ok('Debug mode updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
-		$this->assertEquals(1,DBcount($sql));
+		$this->assertEquals(1, DBcount($sql));
 
-		$this->assertEquals($oldHashGroups,DBhash($sql1));
+		$this->assertEquals($oldHashGroups, DBhash($sql1));
 	}
 
-	public function testPageUserGroups_MassDisableDEBUGAll()
-	{
+	public function testPageUserGroups_MassDisableDEBUGAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -199,19 +192,18 @@ class testPageUserGroups extends CWebTest
 	/**
 	* @dataProvider allGroups
 	*/
-	public function testPageUserGroups_MassDisableDEBUG($group)
-	{
-		$usrgrpid=$group['usrgrpid'];
-		$name=$group['name'];
+	public function testPageUserGroups_MassDisableDEBUG($group) {
+		$usrgrpid = $group['usrgrpid'];
+		$name = $group['name'];
 
-		$sql1="select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups=DBhash($sql1);
+		$sql1 = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups = DBhash($sql1);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
 
 		$this->checkbox_select("group_groupid[$usrgrpid]");
-		$this->dropdown_select('go','Disable DEBUG');
+		$this->dropdown_select('go', 'Disable DEBUG');
 		$this->button_click('goButton');
 
 		$this->getConfirmation();
@@ -220,25 +212,22 @@ class testPageUserGroups extends CWebTest
 		$this->ok('Debug mode updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
-		$this->assertEquals(1,DBcount($sql));
+		$this->assertEquals(1, DBcount($sql));
 
-		$this->assertEquals($oldHashGroups,DBhash($sql1));
+		$this->assertEquals($oldHashGroups, DBhash($sql1));
 	}
 
-	public function testPageUserGroups_MassDeleteAll()
-	{
+	public function testPageUserGroups_MassDeleteAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_MassDelete()
-	{
+	public function testPageUserGroups_MassDelete() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageUserGroups_Sorting()
-	{
+	public function testPageUserGroups_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}
