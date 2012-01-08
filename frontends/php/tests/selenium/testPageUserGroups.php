@@ -86,7 +86,7 @@ class testPageUserGroups extends CWebTest {
 		$name = $group['name'];
 
 		$sql1 = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups=DBhash($sql1);
+		$oldHashGroups = DBhash($sql1);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
@@ -211,7 +211,7 @@ class testPageUserGroups extends CWebTest {
 		$this->assertTitle('User groups');
 		$this->ok('Debug mode updated');
 
-		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
+		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
 		$this->assertEquals(1, DBcount($sql));
 
 		$this->assertEquals($oldHashGroups, DBhash($sql1));

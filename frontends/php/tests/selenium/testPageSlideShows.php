@@ -21,19 +21,16 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageSlideShows extends CWebTest
-{
+class testPageSlideShows extends CWebTest {
 	// Returns all slide shows
-	public static function allSlideShows()
-	{
+	public static function allSlideShows() {
 		return DBdata("select * from slideshows order by slideshowid");
 	}
 
 	/**
 	* @dataProvider allSlideShows
 	*/
-	public function testPageSlideShows_CheckLayout($slideshow)
-	{
+	public function testPageSlideShows_CheckLayout($slideshow) {
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slide shows');
 
@@ -42,24 +39,23 @@ class testPageSlideShows extends CWebTest
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
 		// Header
-		$this->ok(array('Name','Delay','Count of slides'));
+		$this->ok(array('Name', 'Delay', 'Count of slides'));
 		// Data
 		$this->ok(array($slideshow['name']));
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
 	* @dataProvider allSlideShows
 	*/
-	public function testPageSlideShows_SimpleUpdate($slideshow)
-	{
-		$name=$slideshow['name'];
-		$slideshowid=$slideshow['slideshowid'];
+	public function testPageSlideShows_SimpleUpdate($slideshow) {
+		$name = $slideshow['name'];
+		$slideshowid = $slideshow['slideshowid'];
 
-		$sql1="select * from slideshows where name='$name' order by slideshowid";
-		$oldHashSlideShow=DBhash($sql1);
-		$sql2="select * from slides where slideshowid=$slideshowid order by slideid";
-		$oldHashSlide=DBhash($sql2);
+		$sql1 = "select * from slideshows where name='$name' order by slideshowid";
+		$oldHashSlideShow = DBhash($sql1);
+		$sql2 = "select * from slides where slideshowid=$slideshowid order by slideid";
+		$oldHashSlide = DBhash($sql2);
 
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slide shows');
@@ -72,12 +68,11 @@ class testPageSlideShows extends CWebTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
-		$this->assertEquals($oldHashSlideShow,DBhash($sql1),"Chuck Norris: Slide show update changed data in table 'slideshows'");
-		$this->assertEquals($oldHashSlide,DBhash($sql2),"Chuck Norris: Slide show update changed data in table 'slides'");
+		$this->assertEquals($oldHashSlideShow, DBhash($sql1), "Chuck Norris: Slide show update changed data in table 'slideshows'");
+		$this->assertEquals($oldHashSlide, DBhash($sql2), "Chuck Norris: Slide show update changed data in table 'slides'");
 	}
 
-	public function testPageSlideShows_Create()
-	{
+	public function testPageSlideShows_Create() {
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slide shows');
 		$this->button_click('form');
@@ -94,8 +89,7 @@ class testPageSlideShows extends CWebTest
 		$this->ok('SLIDE SHOWS');
 	}
 
-	public function testPageSlideShows_MassDeleteAll()
-	{
+	public function testPageSlideShows_MassDeleteAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -103,10 +97,9 @@ class testPageSlideShows extends CWebTest
 	/**
 	* @dataProvider allSlideShows
 	*/
-	public function testPageSlideShows_MassDelete($slideshow)
-	{
-		$slideshowid=$slideshow['slideshowid'];
-		$name=$slideshow['name'];
+	public function testPageSlideShows_MassDelete($slideshow) {
+		$slideshowid = $slideshow['slideshowid'];
+		$name = $slideshow['name'];
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -115,7 +108,7 @@ class testPageSlideShows extends CWebTest
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slide shows');
 		$this->checkbox_select("shows[$slideshowid]");
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -126,15 +119,14 @@ class testPageSlideShows extends CWebTest
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
 		$sql="select * from slideshows where slideshowid=$slideshowid";
-		$this->assertEquals(0,DBcount($sql));
+		$this->assertEquals(0, DBcount($sql));
 		$sql="select * from slides where slideshowid=$slideshowid";
-		$this->assertEquals(0,DBcount($sql));
+		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('slideshows');
 	}
 
-	public function testPageSlideShows_Sorting()
-	{
+	public function testPageSlideShows_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}
