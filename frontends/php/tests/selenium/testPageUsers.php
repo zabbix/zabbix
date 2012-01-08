@@ -58,14 +58,14 @@ class testPageUsers extends CWebTest {
 	* @dataProvider allUsers
 	*/
 	public function testPageUsers_SimpleUpdate($user) {
-		$alias=$user['alias'];
+		$alias = $user['alias'];
 
-		$sql1="select * from users where alias='$alias' order by userid";
-		$oldHashUser=DBhash($sql1);
-		$sql2="select * from users,users_groups where users.userid=users_groups.userid and users.alias='$alias' order by users_groups.id";
-		$oldHashGroup=DBhash($sql2);
-		$sql3="select * from users,media where users.userid=media.userid and users.alias='$alias' order by media.mediaid";
-		$oldHashMedia=DBhash($sql3);
+		$sql1 = "select * from users where alias='$alias' order by userid";
+		$oldHashUser = DBhash($sql1);
+		$sql2 = "select * from users,users_groups where users.userid=users_groups.userid and users.alias='$alias' order by users_groups.id";
+		$oldHashGroup = DBhash($sql2);
+		$sql3 = "select * from users,media where users.userid=media.userid and users.alias='$alias' order by media.mediaid";
+		$oldHashMedia = DBhash($sql3);
 
 		$this->login('users.php');
 		$this->assertTitle('Users');
@@ -97,8 +97,8 @@ class testPageUsers extends CWebTest {
 
 		$result=DBselect("select userid from users where alias not in ('guest','Admin')");
 
-		while ($user=DBfetch($result)) {
-			$id=$user['userid'];
+		while ($user = DBfetch($result)) {
+			$id = $user['userid'];
 
 			$this->login('users.php');
 			$this->assertTitle('Users');
@@ -113,11 +113,11 @@ class testPageUsers extends CWebTest {
 			$this->assertTitle('Users');
 			$this->ok('User deleted');
 
-			$sql="select * from users where userid=$id";
+			$sql = "select * from users where userid=$id";
 			$this->assertEquals(0, DBcount($sql), "Chuck Norris: user $id deleted but still exists in table users");
-			$sql="select * from users_groups where userid=$id";
+			$sql = "select * from users_groups where userid=$id";
 			$this->assertEquals(0, DBcount($sql), "Chuck Norris: user $id deleted but still exists in table users_groups");
-			$sql="select * from media where userid=$id";
+			$sql = "select * from media where userid=$id";
 			$this->assertEquals(0, DBcount($sql), "Chuck Norris: user $id deleted but still exists in table media");
 		}
 
@@ -129,10 +129,10 @@ class testPageUsers extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$result=DBselect("select userid from users where alias in ('guest','Admin')");
+		$result = DBselect("select userid from users where alias in ('guest','Admin')");
 
-		while ($user=DBfetch($result)) {
-			$id=$user['userid'];
+		while ($user = DBfetch($result)) {
+			$id = $user['userid'];
 
 			$this->login('users.php');
 			$this->assertTitle('Users');
@@ -147,12 +147,12 @@ class testPageUsers extends CWebTest {
 			$this->assertTitle('Users');
 			$this->ok('Cannot delete user');
 
-			$sql="select * from users where userid=$id";
+			$sql = "select * from users where userid=$id";
 			$this->assertNotEquals(0, DBcount($sql));
-			$sql="select * from users_groups where userid=$id";
+			$sql = "select * from users_groups where userid=$id";
 			$this->assertNotEquals(0, DBcount($sql));
 // No media types by default for guest and Admin
-//			$sql="select * from media where userid=$id";
+//			$sql = "select * from media where userid=$id";
 //			$this->assertNotEquals(0, DBcount($sql));
 		}
 
