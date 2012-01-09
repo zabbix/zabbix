@@ -23,11 +23,11 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageAdministrationGeneralImages extends CWebTest {
 
-	public static function allIcons(){
+	public static function allIcons() {
 		return DBdata('SELECT name FROM images WHERE imagetype=1 limit 5');
 	}
 
-	public static function allBgImages(){
+	public static function allBgImages() {
 		return DBdata('SELECT name FROM images WHERE imagetype=2 limit 5');
 	}
 
@@ -84,7 +84,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Images');
 		$this->assertElementPresent('form');
-		$this->dropdown_select_wait('imagetype','Icon');
+		$this->dropdown_select_wait('imagetype', 'Icon');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
 		$this->click('link='.$icon_name['name']);
@@ -111,9 +111,9 @@ class testPageAdministrationGeneralImages extends CWebTest {
 
 		$this->login('config.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown','Images');
+		$this->dropdown_select_wait('configDropDown', 'Images');
 		$this->assertElementPresent('form');
-		$this->dropdown_select_wait('imagetype','Background');
+		$this->dropdown_select_wait('imagetype', 'Background');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
 		$this->click('link='.$bgimage_name['name']);
