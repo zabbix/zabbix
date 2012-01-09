@@ -47,15 +47,17 @@ class testPageInventory extends CWebTest {
 		$this->ok(array('Host', 'Group', 'Name', 'Type', 'OS', 'Serial number A', 'Tag', 'MAC address A'));
 
 // Data
-		$this->ok(array(
-			$name,
-			$inventory['name'],
-			$inventory['type'],
-			$inventory['os'],
-			$inventory['serialno_a'],
-			$inventory['tag'],
-			$inventory['macaddress_a'],
-		));
+		$this->ok(
+			array(
+				$name,
+				$inventory['name'],
+				$inventory['type'],
+				$inventory['os'],
+				$inventory['serialno_a'],
+				$inventory['tag'],
+				$inventory['macaddress_a'],
+			)
+		);
 	}
 
 	/**
