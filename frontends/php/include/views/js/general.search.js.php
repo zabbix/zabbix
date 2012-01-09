@@ -1,5 +1,5 @@
 <script type="text/javascript">
-jQuery(document).ready(function(){
+jQuery(function() {
 	jQuery('#searchbttn').button();
 	createSuggest('search');
 });
