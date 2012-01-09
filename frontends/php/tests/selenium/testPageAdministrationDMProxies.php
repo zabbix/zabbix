@@ -21,38 +21,34 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageAdministrationDMProxies extends CWebTest
-{
+class testPageAdministrationDMProxies extends CWebTest {
 	// Returns all proxies
-	public static function allProxies()
-	{
+	public static function allProxies() {
 		return DBdata("select * from hosts where status in (".HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.") order by hostid");
 	}
 
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageAdministrationDMProxies_CheckLayout($proxy)
-	{
+	public function testPageAdministrationDMProxies_CheckLayout($proxy) {
 		$this->login('proxies.php');
 		$this->assertTitle('Proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
 		// Header
-		$this->ok(array('Name','Mode','Last seen (age)','Host count','Item count','Required performance (vps)','Hosts'));
+		$this->ok(array('Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'));
 		// Data
 		$this->ok(array($proxy['host']));
-		$this->dropdown_select('go','Activate selected');
-		$this->dropdown_select('go','Disable selected');
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Disable selected');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageAdministrationDMProxies_SimpleUpdate($proxy)
-	{
+	public function testPageAdministrationDMProxies_SimpleUpdate($proxy) {
 		$proxyid=$proxy['hostid'];
 		$name=$proxy['host'];
 
@@ -72,12 +68,11 @@ class testPageAdministrationDMProxies extends CWebTest
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF PROXIES');
 
-		$this->assertEquals($oldHashProxy,DBhash($sql1),"Chuck Norris: no-change proxy update should not update data in table 'hosts'");
-		$this->assertEquals($oldHashHosts,DBhash($sql2),"Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");
+		$this->assertEquals($oldHashProxy, DBhash($sql1), "Chuck Norris: no-change proxy update should not update data in table 'hosts'");
+		$this->assertEquals($oldHashHosts, DBhash($sql2), "Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");
 	}
 
-	public function testPageAdministrationDMProxies_MassActivateAll()
-	{
+	public function testPageAdministrationDMProxies_MassActivateAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -85,29 +80,12 @@ class testPageAdministrationDMProxies extends CWebTest
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageAdministrationDMProxies_MassActivate($proxy)
-	{
+	public function testPageAdministrationDMProxies_MassActivate($proxy) {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageAdministrationDMProxies_MassDisableAll()
-	{
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	/**
-	* @dataProvider allProxies
-	*/
-	public function testPageAdministrationDMProxies_MassDisable($proxy)
-	{
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_MassDeleteAll()
-	{
+	public function testPageAdministrationDMProxies_MassDisableAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -115,14 +93,25 @@ class testPageAdministrationDMProxies extends CWebTest
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageAdministrationDMProxies_MassDelete($proxy)
-	{
+	public function testPageAdministrationDMProxies_MassDisable($proxy) {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageAdministrationDMProxies_Sorting()
-	{
+	public function testPageAdministrationDMProxies_MassDeleteAll() {
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	/**
+	* @dataProvider allProxies
+	*/
+	public function testPageAdministrationDMProxies_MassDelete($proxy) {
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageAdministrationDMProxies_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}

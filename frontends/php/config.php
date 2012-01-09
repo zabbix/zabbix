@@ -371,21 +371,28 @@ elseif ($_REQUEST['config'] == 6) {
 	}
 	elseif (isset($_REQUEST['save'])) {
 		$mapping = get_request('valuemap', array());
-		if (isset($_REQUEST['valuemapid'])) {
-			$result = update_valuemap($_REQUEST['valuemapid'], $_REQUEST['mapname'], $mapping);
-			$audit_action = AUDIT_ACTION_UPDATE;
-			$msg_ok = _('Value map updated');
-			$msg_fail = _('Cannot update value map');
-			$valuemapid = $_REQUEST['valuemapid'];
+		$prevMap = getValuemapByName($_REQUEST['mapname']);
+		if (!$prevMap || (isset($_REQUEST['valuemapid']) && bccomp($_REQUEST['valuemapid'], $prevMap['valuemapid']) == 0) ) {
+			if (isset($_REQUEST['valuemapid'])) {
+				$result = update_valuemap($_REQUEST['valuemapid'], $_REQUEST['mapname'], $mapping);
+				$audit_action = AUDIT_ACTION_UPDATE;
+				$msg_ok = _('Value map updated');
+				$msg_fail = _('Cannot update value map');
+				$valuemapid = $_REQUEST['valuemapid'];
+			}
+			else {
+				$result = add_valuemap($_REQUEST['mapname'], $mapping);
+				$audit_action = AUDIT_ACTION_ADD;
+				$msg_ok = _('Value map added');
+				$msg_fail = _('Cannot add value map');
+				$valuemapid = $result;
+			}
 		}
 		else {
-			$result = add_valuemap($_REQUEST['mapname'], $mapping);
-			$audit_action = AUDIT_ACTION_ADD;
 			$msg_ok = _('Value map added');
-			$msg_fail = _('Cannot add value map');
-			$valuemapid = $result;
+			$msg_fail = _s('Cannot add or update value map. Map with name "%s" already exists', $_REQUEST['mapname']);
+			$result = 0;
 		}
-
 		if ($result) {
 			add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _('Value map').' ['.$_REQUEST['mapname'].'] ['.$valuemapid.']');
 			unset($_REQUEST['form']);

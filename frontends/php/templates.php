@@ -555,11 +555,11 @@ require_once('include/page_header.php');
 	$_REQUEST['groupid'] = $pageFilter->groupid;
 ?>
 <?php
-	if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_IMPORT){
+	if (isset($_REQUEST['form'])) {
+		if ($_REQUEST['form'] == S_IMPORT) {
 			$template_wdgt->addItem(import_host_form(true));
 		}
-		else{
+		else {
 			if ($templateid = get_request('templateid', 0)) {
 				$template_wdgt->addItem(get_header_host_table($templateid));
 			}
@@ -568,11 +568,11 @@ require_once('include/page_header.php');
 			$template_wdgt->addItem($templateForm->render());
 		}
 	}
-	else{
+	else {
 // TABLE WITH TEMPLATES
 
 		$frmGroup = new CForm('get');
-		$frmGroup->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
+		$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
 // table header
 		$numrows = new CDiv();
@@ -607,7 +607,7 @@ require_once('include/page_header.php');
 		$sortfield = getPageSortField('name');
 		$sortorder = getPageSortOrder();
 
-		if($pageFilter->groupsSelected){
+		if ($pageFilter->groupsSelected) {
 			$options = array(
 				'editable' => 1,
 				'sortfield' => $sortfield,
@@ -615,7 +615,7 @@ require_once('include/page_header.php');
 				'limit' => ($config['search_limit']+1)
 			);
 
-			if($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
+			if ($pageFilter->groupid > 0) $options['groupids'] = $pageFilter->groupid;
 
 			$templates = API::Template()->get($options);
 		}
@@ -629,9 +629,9 @@ require_once('include/page_header.php');
 			'templateids' => zbx_objectValues($templates, 'templateid'),
 			'editable' => 1,
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid','name','status'),
-			'selectTemplates' => array('hostid','name','status'),
-			'selectParentTemplates' => array('hostid','name','status'),
+			'selectHosts' => array('hostid', 'name', 'status'),
+			'selectTemplates' => array('hostid', 'name', 'status'),
+			'selectParentTemplates' => array('hostid', 'name', 'status'),
 			'selectItems' => API_OUTPUT_COUNT,
 			'selectTriggers' => API_OUTPUT_COUNT,
 			'selectGraphs' => API_OUTPUT_COUNT,

@@ -601,13 +601,13 @@ COpt::memoryPick();
 // TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1
+			'output' => array('name'),
+			'selectHosts' => array('name'),
+			'nopermissions' => true
 		));
-		foreach($itemHosts as $item){
+		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
-			info(S_ITEM_PROTOTYPE.' ['.$host['host'].':'.$item['key_'].'] '.S_CREATED_SMALL);
+			info(_s('Created: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
@@ -615,7 +615,7 @@ COpt::memoryPick();
 		$items = zbx_toArray($items);
 
 		$data = array();
-		foreach($items as $inum => $item){
+		foreach ($items as $inum => $item) {
 			$itemsExists = API::Item()->get(array(
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
@@ -624,24 +624,31 @@ COpt::memoryPick();
 				),
 				'nopermissions' => 1
 			));
-			foreach($itemsExists as $inum => $itemExists){
-				if(bccomp($itemExists['itemid'],$item['itemid'])!=0){
+			foreach ($itemsExists as $inum => $itemExists) {
+				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
 				}
 			}
 
-			$data[] = array('values' => $item, 'where'=> array('itemid'=>$item['itemid']));
+			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
 		}
+
 		$result = DB::update('items', $data);
-		if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		if (!$result) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		}
 
 		$itemids = array();
+		$itemidsWithApplications = array();
 		$itemApplications = array();
-		foreach($items as $item){
-			if(!isset($item['applications'])) continue;
+		foreach ($items as $item) {
+			if (!isset($item['applications'])) {
+				array_push($itemids, $item['itemid']);
+				continue;
+			}
 
-			$itemids[] = $item['itemid'];
-			foreach($item['applications'] as $anum => $appid){
+			$itemidsWithApplications[] = $item['itemid'];
+			foreach ($item['applications'] as $anum => $appid) {
 				$itemApplications[] = array(
 					'applicationid' => $appid,
 					'itemid' => $item['itemid']
@@ -649,21 +656,22 @@ COpt::memoryPick();
 			}
 		}
 
-		if(!empty($itemids)){
-			DB::delete('items_applications', array('itemid'=>$itemids));
+		if (!empty($itemidsWithApplications)) {
+			DB::delete('items_applications', array('itemid' => $itemidsWithApplications));
 			DB::insert('items_applications', $itemApplications);
 		}
 
 // TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1,
+			'output' => array('name'),
+			'selectHosts' => array('name'),
+			'nopermissions' => true,
 		));
-		foreach($itemHosts as $item){
+
+		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
-			info(S_ITEM_PROTOTYPE." [".$host['host'].':'.$item['key_']."] ".S_UPDATED_SMALL);
+			info(_s('Updated: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
@@ -697,9 +705,10 @@ COpt::memoryPick();
 
 			$options = array(
 				'itemids' => $prototypeids,
-				'editable' => 1,
-				'preservekeys' => 1,
+				'editable' => true,
+				'preservekeys' => true,
 				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('name')
 			);
 			$del_itemPrototypes = $this->get($options);
 
@@ -732,6 +741,7 @@ COpt::memoryPick();
 				'itemids' => $child_prototypeids,
 				'nopermissions' => true,
 				'preservekeys' => true,
+				'selectHosts' => array('name')
 			);
 			$del_itemPrototypes_childs = $this->get($options);
 
@@ -810,8 +820,9 @@ COpt::memoryPick();
 // }}} HOUSEKEEPER
 
 // TODO: remove info from API
-			foreach($del_itemPrototypes as $item){
-				info(_s('Item prototype [%1$s:%2$s] deleted.', $item['name'], $item['key_']));
+			foreach ($del_itemPrototypes as $item) {
+				$host = reset($item['hosts']);
+				info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 			}
 
 			return array('prototypeids' => $prototypeids);
@@ -917,7 +928,7 @@ COpt::memoryPick();
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					else if(($exItem['templateid'] > 0) && (bccomp($exItem['templateid'], $item['itemid']) != 0)){
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $exItem['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" already exists on "%2$s", inherited from another template.', $exItem['key_'], $host['host']));
 					}
 				}
 
@@ -933,7 +944,7 @@ COpt::memoryPick();
 					}
 					// no matching interface found, throw an error
 					elseif($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
 					}
 				}
 // coping item
