@@ -117,7 +117,7 @@ elseif ($_REQUEST['go'] == 'activate') {
 
 	$options = array();
 
-	foreach($mediatypeids as $mediatypeid) {
+	foreach ($mediatypeids as $mediatypeid) {
 		$options[] = array(
 		'mediatypeid' => $mediatypeid,
 		'status' => MEDIA_TYPE_STATUS_ACTIVE);
@@ -133,12 +133,12 @@ elseif ($_REQUEST['go'] == 'activate') {
 /*
  * Go - disable
  */
-elseif($_REQUEST['go'] == 'disable') {
+elseif ($_REQUEST['go'] == 'disable') {
 	$mediatypeids = get_request('mediatypeids', array());
 
 	$options = array();
 
-	foreach($mediatypeids as $mediatypeid) {
+	foreach ($mediatypeids as $mediatypeid) {
 		$options[] = array(
 		'mediatypeid' => $mediatypeid,
 		'status' => MEDIA_TYPE_STATUS_DISABLED);

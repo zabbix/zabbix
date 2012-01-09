@@ -425,13 +425,6 @@ typedef enum
 	MEDIA_TYPE_EZ_TEXTING = 100
 } zbx_media_type_t;
 
-/* media type statuses */
-typedef enum
-{
-	MEDIA_TYPE_STATUS_ACTIVE = 0,
-	MEDIA_TYPE_STATUS_DISABLED
-} zbx_media_type_status_t;
-
 /* alert statuses */
 typedef enum
 {
@@ -598,6 +591,10 @@ const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
+
+/* media type statuses */
+#define MEDIA_TYPE_STATUS_ACTIVE	0
+#define MEDIA_TYPE_STATUS_DISABLED	1
 
 /* operation types */
 #define OPERATION_TYPE_MESSAGE		0

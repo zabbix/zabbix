@@ -94,7 +94,7 @@ static void	sync_config()
 	DB_RESULT	result;
 	DB_ROW		row;
 	ZBX_RECIPIENT	*recipient;
-	int		count = 0, old_count;
+	int		count = 0, old_count, status;
 	static int	no_recipients = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -102,7 +102,7 @@ static void	sync_config()
 	result = DBselect_once(
 			"select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,"
 				"mt.smtp_helo,mt.smtp_email,mt.exec_path,mt.gsm_modem,"
-				"mt.username,mt.passwd,mt.status,m.sendto"
+				"mt.username,mt.passwd,m.sendto"
 			" from media m,users_groups u,config c,media_type mt"
 			" where m.userid=u.userid"
 				" and u.usrgrpid=c.alert_usrgrpid"
@@ -146,9 +146,7 @@ static void	sync_config()
 		STR_REPLACE(recipient->mediatype.gsm_modem, row[7]);
 		STR_REPLACE(recipient->mediatype.username, row[8]);
 		STR_REPLACE(recipient->mediatype.passwd, row[9]);
-		recipient->mediatype.status = atoi(row[10]);
-
-		STR_REPLACE(recipient->alert.sendto, row[11]);
+		STR_REPLACE(recipient->alert.sendto, row[10]);
 
 		if (NULL == recipient->alert.subject)
 			recipient->alert.message = recipient->alert.subject = zbx_strdup(NULL, "Zabbix database is down.");

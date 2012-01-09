@@ -130,7 +130,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 void	main_alerter_loop()
 {
 	char			error[MAX_STRING_LEN], *error_esc;
-	int			res;
+	int			res, status;
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_ALERT		alert;
@@ -177,11 +177,11 @@ void	main_alerter_loop()
 			mediatype.gsm_modem = row[13];
 			mediatype.username = row[14];
 			mediatype.passwd = row[15];
-			mediatype.status = atoi(row[16]);
+			status = atoi(row[16]);
 
 			alert.retries = atoi(row[17]);
 
-			switch (mediatype.status)
+			switch (status)
 			{
 				case MEDIA_TYPE_STATUS_ACTIVE:
 					*error = '\0';
