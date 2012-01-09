@@ -33,12 +33,14 @@
 			recalculateSortOrder();
 		});
 
-		jQuery('#iconMapTable tbody').delegate('select.mappingIcon', 'change', function() {
-			jQuery(this).parent().next().children().attr('src', 'imgstore.php?iconid=' + jQuery(this).val());
+		jQuery("#iconMapTable tbody").delegate('select.mappingIcon, select#iconmap_default_iconid', 'change', function() {
+			jQuery(this).closest('tr').find('.preview')
+				.attr('src', 'imgstore.php?&width=<?php echo ZBX_ICON_PREVIEW_WIDTH ?>&height=<?php echo ZBX_ICON_PREVIEW_HEIGHT ?>&iconid=' + jQuery(this).val())
+				.data('imageFull', 'imgstore.php?iconid=' + jQuery(this).val());
 		});
 
-		jQuery('#iconMapTable tbody').delegate('img.preview', 'click', function() {
-			hintBox.onClick(this, '<img src=' + jQuery(this).attr('src') + ' >');
+		jQuery("#iconMapTable tbody").delegate('img.preview', 'click', function() {
+			hintBox.onClick(this, "<img src=" + jQuery(this).data('imageFull') + " >");
 		});
 
 		jQuery('#addMapping').click(function() {

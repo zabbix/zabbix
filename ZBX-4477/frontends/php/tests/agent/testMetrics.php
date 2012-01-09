@@ -30,50 +30,47 @@ define('TYPE_ANY', 2);
 define('ZBX_NOTSUPPORTED', '/ZBX_NOTSUPPORTED/');
 define('ZBX_ACTIVE_ONLY', '/Accessible only as active check!/');
 
-class testMetrics extends CZabbixTest
-{
+class testMetrics extends CZabbixTest {
 
-
-	public static function metrics()
-	{
+	public static function metrics() {
 		// List of all supported metrics by the agent
 		// metric type regexp range_from range_to
 		return array(
-			array('',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
-			array(' ',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
-			array('[agent.ping]',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
-			array('agent.ping [zzzz]',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
-			array('agent.ping zzzz',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
-			array('agent.ping,zzzz',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
-			array('agent.ping[]]',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
+			array('',					TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
+			array(' ',					TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
+			array('[agent.ping]',		TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
+			array('agent.ping [zzzz]',	TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
+			array('agent.ping zzzz',	TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
+			array('agent.ping,zzzz',	TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
+			array('agent.ping[]]',		TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
 			array('agent.ping[0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9]',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
 			array('longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongl',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
-			array('wrong_key',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
+			array('wrong_key',			TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
 
 
-			array('agent.ping',				TYPE_UINT,	'/1/',					1,	1),
-			array('agent.ping[]',				TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
-			array('agent.version',			TYPE_ANY,	'/[1-9]\.[0-9]\.[0-9]/',-1,	-1),
+			array('agent.ping',			TYPE_UINT,	'/1/',					1,	1),
+			array('agent.ping[]',		TYPE_ANY,	ZBX_NOTSUPPORTED,					-1,	-1),
+			array('agent.version',		TYPE_ANY,	'/[1-9]\.[0-9]\.[0-9]/',-1,	-1),
 			array('kernel.maxfiles',	TYPE_UINT,	'',		-1,	-1),
-			array('kernel.maxproc',	TYPE_UINT,	'',		-1,	-1),
+			array('kernel.maxproc',		TYPE_UINT,	'',		-1,	-1),
 
 
 
-			array('vfs.dev.read[]',	TYPE_UINT,	'',		-1,	-1),
-			array('vfs.dev.read[sda]',	TYPE_UINT,	'',	-1,	-1),
-			array('vfs.dev.read[sda,,avg1]',	TYPE_UINT,	'',	-1,	-1),
-			array('vfs.dev.read[sda,bytes]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
-			array('vfs.dev.read[sda,bytes,avg1]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
-			array('vfs.dev.read[sda,bytes,avg5]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
-			array('vfs.dev.read[sda,bytes,avg15]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
-			array('vfs.dev.read[sda,bytes,avg15,wrong_param]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
-			array('vfs.dev.read[sda,bytes,wrong_param]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
-			array('vfs.dev.read[sda,operations]',	TYPE_UINT,	'',		-1,	-1),
-			array('vfs.dev.read[sda,operations,avg1]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
-			array('vfs.dev.read[sda,operations,avg5]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
-			array('vfs.dev.read[sda,operations,avg15]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
-			array('vfs.dev.read[sda,operations,avg15,wrong_param]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
-			array('vfs.dev.read[sda,operations,wrong_param]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
+			array('vfs.dev.read[]',									TYPE_UINT,	'',					-1,	-1),
+			array('vfs.dev.read[sda]',								TYPE_UINT,	'',					-1,	-1),
+			array('vfs.dev.read[sda,,avg1]',						TYPE_UINT,	'',					-1,	-1),
+			array('vfs.dev.read[sda,bytes]',						TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,bytes,avg1]',					TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,bytes,avg5]',					TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,bytes,avg15]',					TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,bytes,avg15,wrong_param]',		TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,bytes,wrong_param]',			TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,operations]',					TYPE_UINT,	'',					-1,	-1),
+			array('vfs.dev.read[sda,operations,avg1]',				TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,operations,avg5]',				TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,operations,avg15]',				TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,operations,avg15,wrong_param]',	TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('vfs.dev.read[sda,operations,wrong_param]',		TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
 			array('vfs.dev.read[sda,ops]',	TYPE_UINT,	'',		-1,	-1),
 			array('vfs.dev.read[sda,ops,avg1]',	TYPE_UINT,	'',		-1,	-1),
 			array('vfs.dev.read[sda,ops,avg5]',	TYPE_UINT,	'',		-1,	-1),
@@ -331,28 +328,27 @@ class testMetrics extends CZabbixTest
 
 // All tests below this line should be enhanced
 
-			array('net.dns[,zabbix.com]',	TYPE_UINT,	'/1/',		1,	1),
-			array('net.dns.record[,zabbix.com]',	TYPE_ANY,	'/zabbix\.com/',		-1,	-1),
-			array('net.tcp.dns[,zabbix.com]',	TYPE_UINT,	'/1/',		1,	1),
-			array('net.tcp.dns.query[,zabbix.com]',	TYPE_ANY,	'/zabbix\.com/',		-1,	-1),
-			array('net.tcp.port[,80]',	TYPE_UINT,	'/1/',		1,	1),
+			array('net.dns[,zabbix.com]',			TYPE_UINT,	'/1/',				1,	1),
+			array('net.dns.record[,zabbix.com]',	TYPE_ANY,	'/zabbix\.com/',	-1,	-1),
+			array('net.tcp.dns[,zabbix.com]',		TYPE_UINT,	'/1/',				1,	1),
+			array('net.tcp.dns.query[,zabbix.com]',	TYPE_ANY,	'/zabbix\.com/',	-1,	-1),
+			array('net.tcp.port[,80]',				TYPE_UINT,	'/1/',				1,	1),
 // TODO
-			array('net.tcp.service[ssh,127.0.0.1,22]',	TYPE_UINT,	'/1/',		1,	1),
-			array('net.tcp.service.perf[ssh,127.0.0.1,22]',	TYPE_FLOAT,	'',		0.001,	10),
-			array('proc.num[inetd,,,]',	TYPE_ANY,	'/0/',		0,	0),
-			array('proc.mem[inetd,,]',	TYPE_ANY,	'/0/',		0,	0),
-			array('system.hw.chassis[]',	TYPE_ANY,	ZBX_NOTSUPPORTED,		-1,	-1),
-			array('system.hw.cpu[]',	TYPE_ANY,	'/MHz/',		-1,	-1),
-			array('system.hw.macaddr[]',	TYPE_ANY,	'/eth[0-9]/',		-1,	-1),
-			array('system.sw.packages[]',	TYPE_ANY,	'/php/',		-1,	-1),
+			array('net.tcp.service[ssh,127.0.0.1,22]',		TYPE_UINT,	'/1/',				1,	1),
+			array('net.tcp.service.perf[ssh,127.0.0.1,22]',	TYPE_FLOAT,	'',					0.001,	10),
+			array('proc.num[inetd,,,]',						TYPE_ANY,	'/0/',				0,	0),
+			array('proc.mem[inetd,,]',						TYPE_ANY,	'/0/'		,		0,	0),
+			array('system.hw.chassis[]',					TYPE_ANY,	ZBX_NOTSUPPORTED,	-1,	-1),
+			array('system.hw.cpu[]',						TYPE_ANY,	'/MHz/',			-1,	-1),
+			array('system.hw.macaddr[]',					TYPE_ANY,	'/eth[0-9]/',		-1,	-1),
+			array('system.sw.packages[]',					TYPE_ANY,	'/php/',			-1,	-1),
 		);
 	}
 
 	/**
 	* @dataProvider metrics
 	*/
-	public function testMetrics_remoteGet($metric, $type, $pattern, $range_from, $range_to)
-	{
+	public function testMetrics_remoteGet($metric, $type, $pattern, $range_from, $range_to) {
 		$agent_ip = "127.0.0.1";
 		$binary = "/home/hudson/public_html/".PHPUNIT_URL."/bin/zabbix_get";
 
@@ -361,29 +357,28 @@ class testMetrics extends CZabbixTest
 		$result = chop(shell_exec($cmd));
 
 // Validate value type
-		switch($type){
+		switch ($type) {
 		case TYPE_UINT:
 			$this->assertTrue(is_numeric($result), "I was expecting unsigned integer but got: \n".print_r($result, true).' for metric '.$metric);
-			$this->assertTrue(preg_match('/[0-9]{1,20}/',$result)>0, "I was expecting unsigned integer but got: \n".print_r($result, true).' for metric '.$metric);
-		break;
+			$this->assertTrue(preg_match('/[0-9]{1,20}/', $result) > 0, "I was expecting unsigned integer but got: \n".print_r($result, true).' for metric '.$metric);
+			break;
 		case TYPE_FLOAT:
 			$this->assertTrue(is_float((float)$result), "I was expecting float number but got: \n".print_r($result, true).' for metric '.$metric);
-		break;
+			break;
 		}
 
-		if($range_from!=-1){
+		if ($range_from != -1) {
 			$this->assertTrue($result >= $range_from, "I was expecting result to be more or equal to $range_from but got: \n".print_r($result, true).' for metric '.$metric);
 		}
 
-		if($range_to!=-1){
+		if ($range_to != -1) {
 			$this->assertTrue($result <= $range_to, "I was expecting result to be less or equal to $range_to but got: \n".print_r($result, true).' for metric '.$metric);
 		}
 
 
 // Validate regexp
-		if($pattern != '')
-		{
-			$this->assertTrue(preg_match($pattern, $result)>0, "I was expecting: \n".print_r($pattern, true)."but got: \n".print_r($result, true).' for metric '.$metric);
+		if ($pattern != '') {
+			$this->assertTrue(preg_match($pattern, $result) > 0, "I was expecting: \n".print_r($pattern, true)."but got: \n".print_r($result, true).' for metric '.$metric);
 		}
 	}
 }

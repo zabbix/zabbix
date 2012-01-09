@@ -21,21 +21,29 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageWeb extends CWebTest {
-	public function testPageWeb_CheckLayout() {
-		$this->login('httpmon.php');
-		$this->assertTitle('Status of Web monitoring');
-		$this->ok('STATUS OF WEB MONITORING');
-		$this->ok('WEB CHECKS');
-		$this->ok(array('Group', 'Host'));
-		$this->ok(array('Host', 'Name', 'Number of steps', 'State', 'Last check', 'Status'));
+class testPageHosts extends CWebTest {
+
+	/**
+	* @dataProvider testTriggerExpression_SimpleTestProvider
+	*/
+	public function testTriggerExpression_SimpleTest($where, $what, $expected) {
+		$this->login('index.php');
+		$this->open("tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C".$where);
+		$this->assertTitle('Test');
+		$this->input_type("//input[@type='text']", $what);
+
+		$this->button_click("//input[@value='Test']");
+		$this->button_click("//input[@id='test_expression']");
+		$this->button_click("//input[@name='test_expression']");
+		$this->ok($expected);
 	}
 
-// Check that no real host or template names displayed
-	public function testPageWeb_NoHostNames() {
-		$this->login('httpmon.php');
-		$this->assertTitle('Status of Web monitoring');
-		$this->checkNoRealHostnames();
+	public function testTriggerExpression_SimpleTestProvider() {
+		return array (
+		array('10M', '20M', 'FALSE'),
+		array('10T', '2G', 'TRUE'),
+		array('10T', '2T', 'TRUE')
+		);
 	}
 }
 ?>

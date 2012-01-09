@@ -3026,7 +3026,7 @@
 
 		$tblRE = new CTable('','formtable nowrap');
 
-		$tblRE->addRow(array(S_NAME, new CTextBox('rename', $rename, 60)));
+		$tblRE->addRow(array(S_NAME, new CTextBox('rename', $rename, 60, 'no', 128)));
 		$tblRE->addRow(array(_('Text string'), new CTextArea('test_string', $test_string)));
 
 		$tabExp = new CTableInfo();

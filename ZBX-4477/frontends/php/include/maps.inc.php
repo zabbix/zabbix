@@ -963,7 +963,7 @@ function getSelementsInfo($sysmap) {
 			'output' => API_OUTPUT_EXTEND
 		));
 		$iconMap = reset($iconMap);
-		$hostsToGetProfiles = array();
+		$hostsToGetInventories = array();
 	}
 
 	$selements = zbx_toHash($sysmap['selements'], 'selementid');
@@ -1012,10 +1012,10 @@ function getSelementsInfo($sysmap) {
 			case SYSMAP_ELEMENT_TYPE_HOST:
 				$hosts_map[$selement['elementid']][$selement['selementid']] = $selement['selementid'];
 
-				// if we have icon map applied, we need to get profiles for all hosts,
+				// if we have icon map applied, we need to get inventories for all hosts,
 				// where automatic icon selection is enabled.
 				if ($sysmap['iconmapid'] && $selement['use_iconmap']) {
-					$hostsToGetProfiles[] = $selement['elementid'];
+					$hostsToGetInventories[] = $selement['elementid'];
 				}
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
@@ -1029,7 +1029,7 @@ function getSelementsInfo($sysmap) {
 
 	if ($sysmap['iconmapid']) {
 		$options = array(
-			'hostids' => $hostsToGetProfiles,
+			'hostids' => $hostsToGetInventories,
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => true,
 			'preservekeys' => true,
@@ -2372,13 +2372,13 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
  */
 function getIconByMapping($iconMap, $inventory) {
 	$iconid = null;
-	$profiles = getHostInventories();
+	$inventories = getHostInventories();
 
 	if (isset($inventory['inventory'])) {
 		foreach ($iconMap['mappings'] as $mapping) {
 			try {
 				$expr = new GlobalRegExp($mapping['expression']);
-				if ($expr->match($inventory['inventory'][$profiles[$mapping['inventory_link']]['db_field']])) {
+				if ($expr->match($inventory['inventory'][$inventories[$mapping['inventory_link']]['db_field']])) {
 					$iconid = $mapping['iconid'];
 					break;
 				}

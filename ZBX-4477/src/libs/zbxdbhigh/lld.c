@@ -731,16 +731,15 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 	zbx_lld_trigger_t	*trigger;
 	zbx_lld_function_t	*function;
 	zbx_uint64_t		triggerid = 0, triggerdiscoveryid = 0, functionid = 0;
-	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL, *sql5 = NULL,
+	char			*sql1 = NULL, *sql2 = NULL, *sql3 = NULL, *sql4 = NULL,
 				*description_esc, *error_esc;
 	size_t			sql1_alloc = 8 * ZBX_KIBIBYTE, sql1_offset = 0,
 				sql2_alloc = 2 * ZBX_KIBIBYTE, sql2_offset = 0,
 				sql3_alloc = 2 * ZBX_KIBIBYTE, sql3_offset = 0,
-				sql4_alloc = 8 * ZBX_KIBIBYTE, sql4_offset = 0,
-				sql5_alloc = 2 * ZBX_KIBIBYTE, sql5_offset = 0;
+				sql4_alloc = 8 * ZBX_KIBIBYTE, sql4_offset = 0;
 	const char		*ins_triggers_sql =
 				"insert into triggers"
-				" (triggerid,description,priority,status,"
+				" (triggerid,description,expression,priority,status,"
 					"comments,url,type,value,value_flags,flags,error)"
 				" values ";
 	const char		*ins_trigger_discovery_sql =
@@ -789,9 +788,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		functionid = DBget_maxid_num("functions", new_functions);
 
 		sql3 = zbx_malloc(sql3, sql3_alloc);
-		sql5 = zbx_malloc(sql5, sql5_alloc);
 		DBbegin_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
-		DBbegin_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_functions_sql);
 #endif
@@ -805,68 +802,14 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
+		char	*expression_esc;
+
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
-
-		description_esc = DBdyn_escape_string(trigger->description);
-
-		if (0 == trigger->triggerid)
-		{
-			trigger->triggerid = triggerid++;
-
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_triggers_sql);
-#endif
-			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-					"(" ZBX_FS_UI64 ",'%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')%s",
-					trigger->triggerid, description_esc, (int)priority, (int)status, comments_esc,
-					url_esc, (int)type, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_FLAG_UNKNOWN,
-					ZBX_FLAG_DISCOVERY_CREATED, error_esc, row_dl);
-
-#ifndef HAVE_MULTIROW_INSERT
-			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_trigger_discovery_sql);
-#endif
-			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
-					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')%s",
-					triggerdiscoveryid, trigger->triggerid, parent_triggerid,
-					description_proto_esc, row_dl);
-
-			triggerdiscoveryid++;
-		}
-		else
-		{
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
-					"update triggers"
-					" set description='%s',"
-						"priority=%d,"
-						"comments='%s',"
-						"url='%s',"
-						"type=%d,"
-						"flags=%d"
-					" where triggerid=" ZBX_FS_UI64 ";\n",
-					description_esc, (int)priority,
-					comments_esc, url_esc, (int)type,
-					ZBX_FLAG_DISCOVERY_CREATED, trigger->triggerid);
-
-			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
-					"update trigger_discovery"
-					" set name='%s'"
-					" where triggerid=" ZBX_FS_UI64
-						" and parent_triggerid=" ZBX_FS_UI64 ";\n",
-					description_proto_esc, trigger->triggerid, parent_triggerid);
-
-			if (1 == trigger->update_expression)
-			{
-				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
-						"delete from functions"
-						" where triggerid=" ZBX_FS_UI64 ";\n",
-						trigger->triggerid);
-			}
-		}
 
 		if (1 == trigger->update_expression)
 		{
 			char	*old_expression, search[MAX_ID_LEN + 2], replace[MAX_ID_LEN + 2],
-				*function_esc, *parameter_esc, *expression_esc;
+				*function_esc, *parameter_esc;
 
 			for (j = 0; j < trigger->functions.values_num; j++)
 			{
@@ -887,7 +830,8 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 #endif
 				zbx_snprintf_alloc(&sql3, &sql3_alloc, &sql3_offset,
 						"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')%s",
-						functionid, function->itemid, trigger->triggerid,
+						functionid, function->itemid,
+						(0 == trigger->triggerid ? triggerid : trigger->triggerid),
 						function_esc, parameter_esc, row_dl);
 
 				zbx_free(parameter_esc);
@@ -895,14 +839,71 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 
 				functionid++;
 			}
+		}
 
+		description_esc = DBdyn_escape_string(trigger->description);
+
+		if (0 == trigger->triggerid)
+		{
+			trigger->triggerid = triggerid++;
+
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_triggers_sql);
+#endif
 			expression_esc = DBdyn_escape_string_len(trigger->expression, TRIGGER_EXPRESSION_LEN);
-
-			zbx_snprintf_alloc(&sql5, &sql5_alloc, &sql5_offset,
-					"update triggers set expression='%s' where triggerid=" ZBX_FS_UI64 ";\n",
-					expression_esc, trigger->triggerid);
-
+			zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
+					"(" ZBX_FS_UI64 ",'%s','%s',%d,%d,'%s','%s',%d,%d,%d,%d,'%s')%s",
+					trigger->triggerid, description_esc, expression_esc, (int)priority, (int)status,
+					comments_esc, url_esc, (int)type, TRIGGER_VALUE_FALSE,
+					TRIGGER_VALUE_FLAG_UNKNOWN, ZBX_FLAG_DISCOVERY_CREATED, error_esc, row_dl);
 			zbx_free(expression_esc);
+
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_trigger_discovery_sql);
+#endif
+			zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset,
+					" (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')%s",
+					triggerdiscoveryid, trigger->triggerid, parent_triggerid,
+					description_proto_esc, row_dl);
+
+			triggerdiscoveryid++;
+		}
+		else
+		{
+			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					"update triggers"
+					" set description='%s',",
+					description_esc);
+			if (1 == trigger->update_expression)
+			{
+				expression_esc = DBdyn_escape_string_len(trigger->expression, TRIGGER_EXPRESSION_LEN);
+				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+						"expression='%s',", expression_esc);
+				zbx_free(expression_esc);
+			}
+			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+						"priority=%d,"
+						"comments='%s',"
+						"url='%s',"
+						"type=%d,"
+						"flags=%d"
+					" where triggerid=" ZBX_FS_UI64 ";\n",
+					(int)priority, comments_esc, url_esc, (int)type,
+					ZBX_FLAG_DISCOVERY_CREATED, trigger->triggerid);
+			zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+					"update trigger_discovery"
+					" set name='%s'"
+					" where triggerid=" ZBX_FS_UI64
+						" and parent_triggerid=" ZBX_FS_UI64 ";\n",
+					description_proto_esc, trigger->triggerid, parent_triggerid);
+
+			if (1 == trigger->update_expression)
+			{
+				zbx_snprintf_alloc(&sql4, &sql4_alloc, &sql4_offset,
+						"delete from functions"
+						" where triggerid=" ZBX_FS_UI64 ";\n",
+						trigger->triggerid);
+			}
 		}
 
 		zbx_free(description_esc);
@@ -932,11 +933,8 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ";\n");
 #endif
 		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
-		DBend_multiple_update(&sql5, &sql5_alloc, &sql5_offset);
 		DBexecute("%s", sql3);
-		DBexecute("%s", sql5);
 		zbx_free(sql3);
-		zbx_free(sql5);
 	}
 
 	if (new_triggers < triggers->values_num)
