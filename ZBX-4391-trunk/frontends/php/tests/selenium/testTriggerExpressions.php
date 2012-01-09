@@ -21,12 +21,12 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageHosts extends CWebTest {
+class testTriggerExpressions extends CWebTest {
 
 	/**
-	* @dataProvider testTriggerExpression_SimpleTestProvider
+	* @dataProvider testTriggerExpressions_SimpleTestProvider
 	*/
-	public function testTriggerExpression_SimpleTest($where, $what, $expected) {
+	public function testTriggerExpressions_SimpleTest($where, $what, $expected) {
 		$this->login('index.php');
 		$this->open("tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C".$where);
 		$this->assertTitle('Test');
@@ -38,7 +38,7 @@ class testPageHosts extends CWebTest {
 		$this->ok($expected);
 	}
 
-	public function testTriggerExpression_SimpleTestProvider() {
+	public function testTriggerExpressions_SimpleTestProvider() {
 		return array (
 		array('10M', '20M', 'FALSE'),
 		array('10T', '2G', 'TRUE'),
