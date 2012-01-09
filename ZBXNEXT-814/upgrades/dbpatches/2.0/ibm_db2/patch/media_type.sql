@@ -6,7 +6,3 @@ ALTER TABLE media_type ALTER COLUMN mediatypeid SET WITH DEFAULT NULL
 /
 REORG TABLE media_type
 /
-CREATE INDEX media_type_1 ON media_type (status)
-/
-REORG TABLE media_type
-/

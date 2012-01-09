@@ -359,7 +359,6 @@ typedef struct
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
-	zbx_media_type_status_t	status;
 	char	*description;
 	char	*smtp_server;
 	char	*smtp_helo;
