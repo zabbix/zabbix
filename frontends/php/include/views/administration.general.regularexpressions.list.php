@@ -33,7 +33,7 @@ $goOption->setAttribute('confirm', _('Delete selected regular expressions?'));
 
 $goBox->addItem($goOption);
 
-$goButton = new CButton('goButton', S_GO, 'if(chkbxRange.pageGoCount>0) submit();');
+$goButton = new CButton('goButton', _('Go'), 'if(chkbxRange.pageGoCount>0) submit();');
 $goButton->setAttribute('id', 'goButton');
 
 zbx_add_post_js('chkbxRange.pageGoName = "regexpids";');
