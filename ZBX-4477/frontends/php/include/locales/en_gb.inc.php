@@ -160,8 +160,6 @@
 //	alarms.php
 	'S_TIME'=>				_('Time'),
 	'S_STATUS'=>				_('Status'),
-	'S_TRUE_BIG'=>				_('TRUE'),
-	'S_FALSE_BIG'=>				_('FALSE'),
 
 //	actions.php
 	'S_TYPE'=>				_('Type'),
@@ -825,7 +823,6 @@
 //scripts.php
 	'S_SCRIPTS'=>				_('Scripts'),
 	'S_COMMAND'=>				_('Command'),
-	'S_RESULT'=>				_('Result'),
 	'S_CLOSE'=>					_('Close'),
 
 	'S_SCRIPT_ERROR'=>					_('SCRIPT ERROR'),
@@ -896,7 +893,6 @@
 	'S_TEST_DATA'=>		_('Test data'),
 	'S_EXPRESSION_VARIABLE_ELEMENTS'=>	_('Expression Variable Elements'),
 	'S_RESULT_TYPE'=>	_('Result type'),
-	'S_COMBINED_RESULT'=>	_('Combined result'),
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	_('Incorrect time period'),

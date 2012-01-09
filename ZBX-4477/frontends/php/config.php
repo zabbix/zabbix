@@ -89,7 +89,7 @@ require_once('include/page_header.php');
 		// regexp
 		'regexpids'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 		'regexpid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({config})&&({config}==10)&&(isset({form})&&({form}=="update"))'),
-		'rename'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', S_NAME),
+		'rename'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', _('Name')),
 		'test_string'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({config})&&({config}==10)&&isset({save})', _('Test string')),
 		'delete_regexp'=>			array(T_ZBX_STR, O_OPT,	null,	null,		null),
 
