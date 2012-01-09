@@ -118,9 +118,9 @@ class testPageSlideShows extends CWebTest {
 		$this->ok('Slide show deleted');
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
-		$sql="select * from slideshows where slideshowid=$slideshowid";
+		$sql = "select * from slideshows where slideshowid=$slideshowid";
 		$this->assertEquals(0, DBcount($sql));
-		$sql="select * from slides where slideshowid=$slideshowid";
+		$sql = "select * from slides where slideshowid=$slideshowid";
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('slideshows');
