@@ -55,12 +55,10 @@ class testPageAdministrationGeneralImages extends CWebTest {
 
 		$BgImagesCount = DBdata('SELECT count(name) FROM images WHERE imagetype=2');
 
-		if ($BgImagesCount==0)
-			{
+		if ($BgImagesCount==0) {
 				$this->ok(array('No images defined.'));
-			}
-		else
-			{
+		}
+		else {
 				$this->login('config.php');
 				$this->assertElementPresent('configDropDown');
 				$this->dropdown_select_wait('imagetype', 'Background');
@@ -71,7 +69,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
 				$this->assertElementPresent("//form[@name='imageForm']//table//a[text()='".$bgimage['name']."']");
-			}
+		}
 	}
 
 	/**
@@ -84,7 +82,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 
 		$this->login('config.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown','Images');
+		$this->dropdown_select_wait('configDropDown', 'Images');
 		$this->assertElementPresent('form');
 		$this->dropdown_select_wait('imagetype','Icon');
 		$this->assertTitle('Configuration of Zabbix');
