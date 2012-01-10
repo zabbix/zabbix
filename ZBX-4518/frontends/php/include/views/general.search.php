@@ -19,8 +19,6 @@
 **/
 ?>
 <?php
-	require_once('include/views/js/general.search.js.php');
-
 	$searchForm = new CForm('get','search.php');
 
 	$searchBox = new CTextBox('search', get_request('search'));
