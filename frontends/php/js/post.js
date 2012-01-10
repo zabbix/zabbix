@@ -36,4 +36,8 @@ jQuery(function() {
 		window.location.hash = href[1];
 	});
 
+	// search
+	jQuery('#searchbttn').button();
+	createSuggest('search');
+
 });
