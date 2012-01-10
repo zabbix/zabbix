@@ -1055,7 +1055,7 @@ switch($itemType) {
 				$tsDelete = $item['itemDiscovery']['ts_delete'];
 
 				$deleteError = new CDiv(SPACE, 'status_icon iconerror');
-				$hintText = _s('The item is missing and will be deleted in %s (on %s)', zbx_date2age($tsDelete), zbx_date2str(_('d M Y H:i:s'), $tsDelete));
+				$hintText = _s('The item is not discovered anymore and will be deleted in %1s (on %2s at %3s)', zbx_date2age($tsDelete), zbx_date2str(_('d M Y'), $tsDelete), zbx_date2str(_('H:i:s'), $tsDelete));
 				$deleteError->setHint($hintText);
 				$statusIcons[] = $deleteError;
 			}
