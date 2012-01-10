@@ -1054,8 +1054,8 @@ switch($itemType) {
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
 				$tsDelete = $item['itemDiscovery']['ts_delete'];
 
-				$deleteError = new CDiv(SPACE, 'status_icon iconerror');
-				$hintText = _s('The item is not discovered anymore and will be deleted in %1s (on %2s at %3s)', zbx_date2age($tsDelete), zbx_date2str(_('d M Y'), $tsDelete), zbx_date2str(_('H:i:s'), $tsDelete));
+				$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
+				$hintText = _s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).', zbx_date2age($tsDelete), zbx_date2str(_('d M Y'), $tsDelete), zbx_date2str(_('H:i:s'), $tsDelete));
 				$deleteError->setHint($hintText);
 				$statusIcons[] = $deleteError;
 			}
