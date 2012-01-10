@@ -20,12 +20,9 @@
 ?>
 <?php
 /**
- * File containing CUserMacro class for API.
  * @package API
  */
-/**
- * Class containing methods for operations with UserMacro
- */
+
 class CUserMacro extends CZBXAPI {
 
 	protected $tableName = 'hostmacro';
@@ -464,69 +461,51 @@ class CUserMacro extends CZBXAPI {
 	public function deleteHostMacro($hostmacroids) {
 		$hostmacroids = zbx_toArray($hostmacroids);
 
-			if (empty($hostmacroids))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
+		if (empty($hostmacroids))
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
 
 // permissions + existance
-			$options = array(
-				'hostmacroids' => $hostmacroids,
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
-			);
-			$db_hmacros = $this->get($options);
+		$options = array(
+			'hostmacroids' => $hostmacroids,
+			'editable' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => 1
+		);
+		$db_hmacros = $this->get($options);
 
-			foreach ($hostmacroids as $hmnum => $hostmacroid) {
-				if (!isset($db_hmacros[$hostmacroid]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
+		foreach ($hostmacroids as $hostmacroid) {
+			if (!isset($db_hmacros[$hostmacroid]))
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 //--------
 
-			$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
-			if (!DBExecute($sql))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
+		if (!DBExecute($sql))
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
-			return array('hostmacroids' => $hostmacroids);
+		return array('hostmacroids' => $hostmacroids);
 	}
 
 /**
- * Add global macros
+ * Add global macros.
  *
  * @param array $macros
  * @param string $macros[0..]['macro']
  * @param string $macros[0..]['value']
- * @return array|boolean
+ * @return array
  */
-	public function createGlobal($macros){
-
+	public function createGlobal(array $macros){
+		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create global macros.'));
+		}
 
 		$macros = zbx_toArray($macros);
-		$macros_macros = zbx_objectValues($macros, 'macro');
-		$globalmacroids = array();
 
-// permission check
-			if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-//--
+		$this->validateGlobal($macros);
 
-			$this->validateGlobal($macros);
-//--
-			foreach($macros as $mnum => $macro){
-				$globalmacroids[] = $globalmacroid = get_dbid('globalmacro', 'globalmacroid');
+		$globalmacroids = DB::insert('globalmacro', $macros);
 
-				$values = array(
-					'globalmacroid' => $globalmacroid,
-					'macro' => zbx_dbstr($macro['macro']),
-					'value' => zbx_dbstr($macro['value'])
-				);
-				$sql = 'INSERT INTO globalmacro ('.implode(', ', array_keys($values)).')'.
-					' VALUES ('.implode(', ', $values).')';
-				if(!DBExecute($sql))
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-			}
-
-			return array('globalmacroids' => $globalmacroids);
+		return array('globalmacroids' => $globalmacroids);
 	}
 
 
@@ -538,17 +517,16 @@ class CUserMacro extends CZBXAPI {
 	 * @return array
 	 */
 	public function updateGlobal(array $globalmacros) {
-
 		$globalmacros = zbx_toArray($globalmacros);
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update global macros.'));
 		}
 
 		$this->validateGlobal($globalmacros);
 
-		// permissions + existence
+		// existence
 		$ids = zbx_objectValues($globalmacros, 'globalmacroid');
 		$dbGmacros = $this->get(array(
 			'globalmacroids' => $ids,
@@ -564,26 +542,24 @@ class CUserMacro extends CZBXAPI {
 			}
 			// check if the macro exists in the DB
 			if (!isset($dbGmacros[$gmacro['globalmacroid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" does not exist.', $gmacro['globalmacroid']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro with globalmacroid "%1$s" does not exist.', $gmacro['globalmacroid']));
 			}
 		}
 
 		// update macros
 		$data = array();
 		foreach($globalmacros as $gmacro){
-			$values = $gmacro;
-			unset($values['globalmacroid']);
+			$globalmacroid = $gmacro['globalmacroid'];
+			unset($gmacro['globalmacroid']);
 
 			$data[] = array(
-				'values'=> $values,
-				'where'=> array('globalmacroid' => $gmacro['globalmacroid'])
+				'values'=> $gmacro,
+				'where'=> array('globalmacroid' => $globalmacroid)
 			);
 		}
 		DB::update('globalmacro', $data);
 
-		return array(
-			'globalmacroids' => $ids
-		);
+		return array('globalmacroids' => $ids);
 	}
 
 
@@ -592,47 +568,48 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param mixed $globalmacroIds
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function deleteGlobal($globalmacroIds) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete global macros.'));
+		}
 
-		if (!$globalmacroIds) {
+		$globalmacroIds = zbx_toArray($globalmacroIds);
+
+		if (empty($globalmacroIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		// permissions + existence
+		// existence
 		$dbGmacros = $this->get(array(
 			'globalmacroids' => $globalmacroIds,
 			'globalmacro' => true,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true
 		));
 		foreach ($globalmacroIds as $gmacroId) {
 			if (!isset($dbGmacros[$gmacroId])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Global macro with globalmacroid "%1$s" does not exists.', $gmacroId));
 			}
 		}
 
 		// delete macros
-		DB::delete('globalmacro', array(
-			'globalmacroid' => $globalmacroIds
-		));
+		DB::delete('globalmacro', array('globalmacroid' => $globalmacroIds));
 
-		return array(
-			'globalmacroids' => $globalmacroIds
-		);
+		return array('globalmacroids' => $globalmacroIds);
 	}
 
-/**
- * Validates macros expression
- *
- * @param array $macros array with macros expressions
- * @return array|boolean
- */
+	/**
+	 * Validates macros expression
+	 *
+	 * @param array $macros array with macros expressions
+	 * @return boolean
+	 */
 	private function validate($macros){
 		$tmp = array();
-		foreach($macros as $mnum => $macro){
+		foreach($macros as $macro){
 			if(isset($tmp[$macro['macro']]))
 				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: not unique');
 			else
@@ -682,7 +659,7 @@ class CUserMacro extends CZBXAPI {
 			$dbMacros = $this->get($options);
 			foreach ($dbMacros as $dbMacro) {
 				$macro = $nameMacro[$dbMacro['macro']];
-				if (!isset($macro['globalmacroid']) || $macro['globalmacroid'] != $dbMacro['globalmacroid']) {
+				if (!isset($macro['globalmacroid']) || bccomp($macro['globalmacroid'], $dbMacro['globalmacroid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists.', $dbMacro['macro']));
 				}
 			}
