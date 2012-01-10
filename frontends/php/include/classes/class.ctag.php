@@ -53,15 +53,15 @@ class CTag extends CObject {
 		echo $this->endToString();
 	}
 
-	// Do not put new line symbol(\n) before or after html tags,
+	// Do not put new line symbol (\n) before or after html tags,
 	// it adds spaces in unwanted places
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
-			$value = str_replace(array("\r", "\n"), '', strval($value));
 			$res .= ' '.$key.'="'.$this->sanitize($value).'"';
 		}
 		$res .= ($this->paired === 'yes') ? '>' : ' />';
+
 		return $res;
 	}
 
