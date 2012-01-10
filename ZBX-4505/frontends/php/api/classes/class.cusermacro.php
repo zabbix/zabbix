@@ -585,10 +585,7 @@ class CUserMacro extends CZBXAPI {
 				'where'=> array('globalmacroid' => $gmacro['globalmacroid'])
 			);
 		}
-		$result = DB::update('globalmacro', $data);
-		if (!$result) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-		}
+		DB::update('globalmacro', $data);
 
 		return array(
 			'globalmacroids' => $ids
@@ -599,11 +596,11 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Delete global macros.
 	 *
-	 * @param array $globalmacroIds
+	 * @param mixed $globalmacroIds
 	 *
 	 * @return boolean
 	 */
-	public function deleteGlobal(array $globalmacroIds) {
+	public function deleteGlobal($globalmacroIds) {
 
 		if (!$globalmacroIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
@@ -624,12 +621,9 @@ class CUserMacro extends CZBXAPI {
 		}
 
 		// delete macros
-		$rs = DB::delete('globalmacro', array(
+		DB::delete('globalmacro', array(
 			'globalmacroid' => $globalmacroIds
 		));
-		if (!$rs) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-		}
 
 		return array(
 			'globalmacroids' => $globalmacroIds
