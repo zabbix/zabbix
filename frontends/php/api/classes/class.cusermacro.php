@@ -591,7 +591,7 @@ class CUserMacro extends CZBXAPI {
 		));
 		foreach ($globalmacroIds as $gmacroId) {
 			if (!isset($dbGmacros[$gmacroId])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Global macro with globalmacroid "%1$s" does not exists.', $gmacroId));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Global macro with globalmacroid "%1$s" does not exist.', $gmacroId));
 			}
 		}
 
