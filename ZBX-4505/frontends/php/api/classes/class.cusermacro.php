@@ -560,7 +560,7 @@ class CUserMacro extends CZBXAPI {
 		$this->validate($globalmacros);
 
 		// permissions + existence
-		$ids = zbx_objectValues($dbGmacros, 'globalmacroid');
+		$ids = zbx_objectValues($globalmacros, 'globalmacroid');
 		$dbGmacros = $this->get(array(
 			'globalmacroids' => $ids,
 			'globalmacro' => true,
@@ -568,7 +568,7 @@ class CUserMacro extends CZBXAPI {
 			'output'=> API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
-		foreach ($globalmacros as $key => $gmacro) {
+		foreach ($globalmacros as $gmacro) {
 			if (!isset($dbGmacros[$gmacro['globalmacroid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" does not exist.', $gmacro['globalmacroid']));
 			}
