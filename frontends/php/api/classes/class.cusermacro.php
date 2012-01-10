@@ -510,18 +510,7 @@ class CUserMacro extends CZBXAPI {
 			}
 //--
 
-			$this->validate($macros);
-
-// Check on existing
-			$options = array(
-				'globalmacro' => 1,
-				'filter' => array('macro' => $macros_macros ),
-				'output' => API_OUTPUT_EXTEND
-			);
-			$existing_macros = $this->get($options);
-			foreach($existing_macros as $exst_macro){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists.', $exst_macro['macro']));
-			}
+			$this->validateGlobal($macros);
 //--
 			foreach($macros as $mnum => $macro){
 				$globalmacroids[] = $globalmacroid = get_dbid('globalmacro', 'globalmacroid');
@@ -557,7 +546,7 @@ class CUserMacro extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->validate($globalmacros);
+		$this->validateGlobal($globalmacros);
 
 		// permissions + existence
 		$ids = zbx_objectValues($globalmacros, 'globalmacroid');
@@ -569,6 +558,11 @@ class CUserMacro extends CZBXAPI {
 			'preservekeys' => true
 		));
 		foreach ($globalmacros as $gmacro) {
+			// check if the macro has an id
+			if (!isset($gmacro['globalmacroid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
+			// check if the macro exists in the DB
 			if (!isset($dbGmacros[$gmacro['globalmacroid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" does not exist.', $gmacro['globalmacroid']));
 			}
@@ -663,6 +657,36 @@ class CUserMacro extends CZBXAPI {
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Performs global macro validation.
+	 *
+	 * @param array $macros
+	 */
+	protected function validateGlobal(array $macros) {
+		$this->validate($macros);
+
+		// check for duplicate names
+		$nameMacro = zbx_toHash($macros, 'macro');
+		$macroNames = zbx_objectValues($macros, 'macro');
+		if ($macroNames) {
+			$options = array(
+				'globalmacro' => true,
+				'filter' => array(
+					'macro' => $macroNames
+				),
+				'output' => API_OUTPUT_EXTEND
+			);
+			$dbMacros = $this->get($options);
+			foreach ($dbMacros as $dbMacro) {
+				$macro = $nameMacro[$dbMacro['macro']];
+				if (!isset($macro['globalmacroid']) || $macro['globalmacroid'] != $dbMacro['globalmacroid']) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists.', $dbMacro['macro']));
+				}
+			}
+		}
 	}
 
 /**
