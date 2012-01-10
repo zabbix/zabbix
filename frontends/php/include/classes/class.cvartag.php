@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-class CVarTag extends CTag{
-/* public */
-	public function __construct($name='',$value='0'){
-		parent::__construct('input','no');
+class CVarTag extends CTag {
+
+	public function __construct($name = '', $value = '0') {
+		parent::__construct('input', 'no');
 		$this->attributes['type'] = 'hidden';
 		$this->attributes['name'] = $name;
 		$this->attributes['id'] = $name;
@@ -30,8 +30,8 @@ class CVarTag extends CTag{
 		$this->setValue($value);
 	}
 
-	public function setValue($value){
-		$this->attributes['value'] = htmlspecialchars($value);
+	public function setValue($value) {
+		$this->setAttribute('value', $value);
 	}
 }
 ?>
