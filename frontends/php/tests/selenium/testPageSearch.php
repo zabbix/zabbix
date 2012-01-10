@@ -21,13 +21,11 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageSearch extends CWebTest
-{
-	public function testPageHosts_FindZabbixServer()
-	{
+class testPageSearch extends CWebTest {
+	public function testPageHosts_FindZabbixServer() {
 		$this->login('dashboard.php');
-		$this->input_type('search',"ЗАББИКС Сервер");
-		$this->keyPress('search',"\\13");
+		$this->input_type('search', "ЗАББИКС Сервер");
+		$this->keyPress('search', "\\13");
 		$this->wait();
 		$this->assertTitle('Search');
 		$this->ok('Hosts');
@@ -47,11 +45,10 @@ class testPageSearch extends CWebTest
 		$this->ok('Events');
 	}
 
-	public function testPageHosts_FindNone()
-	{
+	public function testPageHosts_FindNone() {
 		$this->login('dashboard.php');
-		$this->input_type('search',"_");
-		$this->keyPress('search',"\\13");
+		$this->input_type('search', "_");
+		$this->keyPress('search', "\\13");
 		$this->wait();
 		$this->assertTitle('Search');
 		$this->nok('Displaying 1 of 1 found');
@@ -60,11 +57,10 @@ class testPageSearch extends CWebTest
 		$this->ok('...');
 	}
 
-	public function testPageHosts_FindNone2()
-	{
+	public function testPageHosts_FindNone2() {
 		$this->login('dashboard.php');
-		$this->input_type('search',"%");
-		$this->keyPress('search',"\\13");
+		$this->input_type('search', "%");
+		$this->keyPress('search', "\\13");
 		$this->wait();
 		$this->assertTitle('Search');
 		$this->nok('Displaying 1 of 1 found');
@@ -73,8 +69,7 @@ class testPageSearch extends CWebTest
 		$this->ok('...');
 	}
 
-	public function testPageHosts_Sorting()
-	{
+	public function testPageHosts_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}

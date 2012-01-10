@@ -235,9 +235,9 @@ $ZBX_MENU = array(
 				'sub_pages' => array()
 			),
 			array(
-				'url' => 'nodes.php',
+				'url' => 'proxies.php',
 				'label' => _('DM'),
-				'sub_pages' => array('proxies.php')
+				'sub_pages' => array('nodes.php')
 			),
 			array(
 				'url' => 'authentication.php',
