@@ -23,7 +23,7 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageAdministrationGeneralRegexp extends CWebTest {
 
-	public static function allRegexps(){
+	public static function allRegexps() {
 		return DBdata('select * from regexps');
 	}
 

@@ -21,20 +21,16 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-
-class testPageScreens extends CWebTest
-{
+class testPageScreens extends CWebTest {
 	// Returns all screens
-	public static function allScreens()
-	{
+	public static function allScreens() {
 		return DBdata("select * from screens order by screenid");
 	}
 
 	/**
 	* @dataProvider allScreens
 	*/
-	public function testPageScreens_CheckLayout($screen)
-	{
+	public function testPageScreens_CheckLayout($screen) {
 		$this->login('screenconf.php');
 		$this->assertTitle('Configuration of screens');
 
@@ -43,20 +39,19 @@ class testPageScreens extends CWebTest
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
 		// Header
-		$this->ok(array('Name','Dimension (cols x rows)','Screens'));
+		$this->ok(array('Name', 'Dimension (cols x rows)', 'Screens'));
 		// Data
 		$this->ok(array($screen['name']));
-		$this->dropdown_select('go','Export selected');
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Export selected');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
 	* @dataProvider allScreens
 	*/
-	public function testPageScreens_SimpleEdit($screen)
-	{
-		$screenid=$screen['screenid'];
-		$name=$screen['name'];
+	public function testPageScreens_SimpleEdit($screen) {
+		$screenid = $screen['screenid'];
+		$name = $screen['name'];
 
 		$this->login('screenconf.php');
 		$this->assertTitle('Configuration of screens');
@@ -71,15 +66,14 @@ class testPageScreens extends CWebTest
 	/**
 	* @dataProvider allScreens
 	*/
-	public function testPageScreens_SimpleUpdate($screen)
-	{
-		$screenid=$screen['screenid'];
-		$name=$screen['name'];
+	public function testPageScreens_SimpleUpdate($screen) {
+		$screenid = $screen['screenid'];
+		$name = $screen['name'];
 
-		$sql1="select * from screens where screenid=$screenid order by screenid";
-		$oldHashScreen=DBhash($sql1);
-		$sql2="select * from screens_items where screenid=$screenid order by screenitemid";
-		$oldHashScreenItems=DBhash($sql2);
+		$sql1 = "select * from screens where screenid=$screenid order by screenid";
+		$oldHashScreen = DBhash($sql1);
+		$sql2 = "select * from screens_items where screenid=$screenid order by screenitemid";
+		$oldHashScreenItems = DBhash($sql2);
 
 		DBsave_tables('screens');
 
@@ -101,14 +95,13 @@ class testPageScreens extends CWebTest
 		$this->assertTitle('Configuration of screens');
 		$this->ok('Screen updated');
 
-		$this->assertEquals($oldHashScreen,DBhash($sql1));
-		$this->assertEquals($oldHashScreenItems,DBhash($sql2));
+		$this->assertEquals($oldHashScreen, DBhash($sql1));
+		$this->assertEquals($oldHashScreenItems, DBhash($sql2));
 
 		DBrestore_tables('screens');
 	}
 
-	public function testPageScreens_Create()
-	{
+	public function testPageScreens_Create() {
 		$this->login('screenconf.php');
 		$this->assertTitle('Configuration of screens');
 		$this->button_click('form');
@@ -127,29 +120,12 @@ class testPageScreens extends CWebTest
 		$this->nok('Columns');
 	}
 
-	public function testPageScreens_Import()
-	{
+	public function testPageScreens_Import() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageScreens_MassExportAll()
-	{
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	/**
-	* @dataProvider allScreens
-	*/
-	public function testPageScreens_MassExport($action)
-	{
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageScreens_MassDeleteAll()
-	{
+	public function testPageScreens_MassExportAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -157,10 +133,22 @@ class testPageScreens extends CWebTest
 	/**
 	* @dataProvider allScreens
 	*/
-	public function testPageScreens_MassDelete($screen)
-	{
-		$screenid=$screen['screenid'];
-		$name=$screen['name'];
+	public function testPageScreens_MassExport($action) {
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	public function testPageScreens_MassDeleteAll() {
+// TODO
+		$this->markTestIncomplete();
+	}
+
+	/**
+	* @dataProvider allScreens
+	*/
+	public function testPageScreens_MassDelete($screen) {
+		$screenid = $screen['screenid'];
+		$name = $screen['name'];
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -169,7 +157,7 @@ class testPageScreens extends CWebTest
 		$this->login('screenconf.php');
 		$this->assertTitle('Configuration of screens');
 		$this->checkbox_select("screens[$screenid]");
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -179,18 +167,17 @@ class testPageScreens extends CWebTest
 		$this->ok('Screen deleted');
 		$this->ok('CONFIGURATION OF SCREENS');
 
-		$sql="select * from screens where screenid=$screenid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from screens_items where screenid=$screenid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from slides where screenid=$screenid";
-		$this->assertEquals(0,DBcount($sql));
+		$sql = "select * from screens where screenid=$screenid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from screens_items where screenid=$screenid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from slides where screenid=$screenid";
+		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('screens');
 	}
 
-	public function testPageScreens_Sorting()
-	{
+	public function testPageScreens_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}
