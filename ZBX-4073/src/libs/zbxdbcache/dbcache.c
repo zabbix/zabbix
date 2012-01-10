@@ -2884,7 +2884,7 @@ void	init_database_cache()
 
 	/* trend cache */
 
-	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+	if (0 < CONFIG_TRENDS_CACHE_SIZE)
 	{
 		sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
 
