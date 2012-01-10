@@ -119,8 +119,9 @@ elseif ($_REQUEST['go'] == 'activate') {
 
 	foreach ($mediatypeids as $mediatypeid) {
 		$options[] = array(
-		'mediatypeid' => $mediatypeid,
-		'status' => MEDIA_TYPE_STATUS_ACTIVE);
+			'mediatypeid' => $mediatypeid,
+			'status' => MEDIA_TYPE_STATUS_ACTIVE
+		);
 	}
 
 	$go_result = API::Mediatype()->update($options);
@@ -140,8 +141,9 @@ elseif ($_REQUEST['go'] == 'disable') {
 
 	foreach ($mediatypeids as $mediatypeid) {
 		$options[] = array(
-		'mediatypeid' => $mediatypeid,
-		'status' => MEDIA_TYPE_STATUS_DISABLED);
+			'mediatypeid' => $mediatypeid,
+			'status' => MEDIA_TYPE_STATUS_DISABLED
+		);
 	}
 
 	$go_result = API::Mediatype()->update($options);
