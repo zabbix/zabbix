@@ -519,8 +519,8 @@ class CUserMacro extends CZBXAPI {
 				'output' => API_OUTPUT_EXTEND
 			);
 			$existing_macros = $this->get($options);
-			foreach($existing_macros as $emnum => $exst_macro){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" already exists.', $exst_macro['macro']));
+			foreach($existing_macros as $exst_macro){
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists.', $exst_macro['macro']));
 			}
 //--
 			foreach($macros as $mnum => $macro){
@@ -570,7 +570,7 @@ class CUserMacro extends CZBXAPI {
 		));
 		foreach ($globalmacros as $key => $gmacro) {
 			if (!isset($dbGmacros[$gmacro['globalmacroid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" does not exist.', $gmacro['globalmacroid']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" does not exist.', $gmacro['globalmacroid']));
 			}
 		}
 
@@ -653,18 +653,18 @@ class CUserMacro extends CZBXAPI {
 
 		foreach($macros as $mnum => $macro){
 			if(zbx_empty($macro['value'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty value for macro "%1s".', $macro['macro']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty value for macro "%1$s".', $macro['macro']));
 			}
 			if(zbx_strlen($macro['macro']) > 64){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro name "%1s" is too long, it should not exceed 64 chars.', $macro['macro']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro name "%1$s" is too long, it should not exceed 64 chars.', $macro['macro']));
 			}
 
 			if(zbx_strlen($macro['value']) > 255){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" value is too long, it should not exceed 255 chars.', $macro['macro']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" value is too long, it should not exceed 255 chars.', $macro['macro']));
 			}
 
 			if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro['macro'])){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong macro "%1s".', $macro['macro']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong macro "%1$s".', $macro['macro']));
 			}
 		}
 
@@ -735,9 +735,9 @@ class CUserMacro extends CZBXAPI {
 			$existing_macros = $this->get($options);
 			foreach($existing_macros as $emnum => $exst_macro){
 				if(isset($upd_hosts[$exst_macro['hostid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" already exists on "%2s".', $exst_macro['macro'], $upd_hosts[$exst_macro['hostid']]['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists on "%2$s".', $exst_macro['macro'], $upd_hosts[$exst_macro['hostid']]['host']));
 				else if(isset($upd_templates[$exst_macro['hstid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1s" already exists on "%2s".', $exst_macro['macro'], $upd_templates[$exst_macro['hostid']]['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists on "%2$s".', $exst_macro['macro'], $upd_templates[$exst_macro['hostid']]['host']));
 			}
 //--
 
