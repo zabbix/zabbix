@@ -365,12 +365,6 @@
 
 //	hosts.php
 	'S_HOST_INTERFACE' =>			_('Host interface'),
-	'S_MACROS'=>					_('Macros'),
-	'S_MACRO'=>					_('Macro'),
-	'S_WRONG_MACRO'=>				_('Wrong macro'),
-	'S_MACRO_TOO_LONG'=>				_('Macro name is too long, should not exceed 64 chars.'),
-	'S_MACRO_VALUE_TOO_LONG'=>			_('Macro value is too long, should not exceed 255 chars.'),
-	'S_EMPTY_MACRO_VALUE'=>				_('Empty macro value'),
 	'S_IN'=>					_('In'),
 	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
@@ -1011,7 +1005,6 @@
 	'S_LATEST_DATA'=>			_('Latest data'),
 
 //	Errors
-	'S_DOES_NOT_EXIST_SMALL'=>		_('does not exist'),
 	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	_('No permissions for screen'),
 	'S_NO_PERMISSIONS_FOR_MAP'=>	_('No permissions for map'),
