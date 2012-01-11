@@ -126,10 +126,6 @@
 		'groupid' => get_request('groupid', null),
 	);
 
-	$pageFilter = new CPageFilter($options);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-
 	$screenid = get_request('screenid', CProfile::get('web.hostscreen.screenid', null));
 
 	if(2 != $_REQUEST['fullscreen'])
@@ -156,7 +152,7 @@
 	order_result($screens, 'name');
 
 	if(empty($screens)){
-		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
+		$screens_wdgt->addPageHeader(_('SCREENS'), $formHeader);
 		$screens_wdgt->addItem(BR());
 		$screens_wdgt->addItem(new CTableInfo(_('No screens defined.')));
 		$screens_wdgt->show();
@@ -184,7 +180,7 @@
 		 */
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
-		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, /*$icon,*/ $fs_icon));
+		$screens_wdgt->addPageHeader(_('SCREENS'), array($formHeader, SPACE, /*$icon,*/ $fs_icon));
 // }}} PAGE HEADER
 
 

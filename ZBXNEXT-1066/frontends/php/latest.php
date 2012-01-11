@@ -23,7 +23,7 @@ require_once('include/config.inc.php');
 require_once('include/hosts.inc.php');
 require_once('include/items.inc.php');
 
-$page['title'] = 'S_LATEST_DATA';
+$page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
 $page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
 $page['scripts'] = array();
@@ -102,7 +102,7 @@ require_once('include/page_header.php');
 
 // Header
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$latest_wdgt->addPageHeader(S_LATEST_DATA_BIG,$fs_icon);
+	$latest_wdgt->addPageHeader(_('LATEST DATA'), $fs_icon);
 
 // 2nd header
 	$r_form = new CForm('get');
