@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+.......P.. [ZBX-4073] removed unused TrendCacheSize and CacheUpdateFrequency options from proxy (Sasha)
 ..F....... [ZBX-4506] removed unnecessary new line symbol stripping from HTML attributes (pavels)
 ..F....... [ZBX-4525] updated Brazilian Portuguese translation; thanks to Murilo Moreira de Oliveira (Richlv)
 ..F....... [ZBX-4468] removed possibility to add to value mappings few items with same name (Slava)
