@@ -77,7 +77,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralImages_IconSimpleUpdate($icon_name) {
 
-		$sqlIconImages = 'SELECT * FROM images WHERE imagetype=1';
+		$sqlIconImages = 'SELECT * FROM images WHERE imagetype=1 limit 5';
 		$oldHashIconImages=DBhash($sqlIconImages);
 
 		$this->login('config.php');
