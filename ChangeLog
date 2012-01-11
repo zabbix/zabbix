@@ -388,6 +388,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+.......P.. [ZBX-4073] removed unused TrendCacheSize and CacheUpdateFrequency options from proxy (Sasha)
 ..F....... [ZBX-4506] removed unnecessary new line symbol stripping from HTML attributes (pavels)
 .D........ [ZBX-4404] fixed incorrect max value for the MaxHousekeeperDelete option in the default zabbix_server.conf file (Sasha)
 A......... [ZBX-4337] fixed possible typo in class.cusermacro.php (sanja)
