@@ -955,13 +955,13 @@ class CItem extends CItemGeneral {
 // TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1
+			'output' => array('name'),
+			'selectHosts' => array('name'),
+			'nopermissions' => true
 		));
 		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
-			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_CREATED_SMALL);
+			info(_s('Created: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
@@ -1019,13 +1019,13 @@ class CItem extends CItemGeneral {
 // TODO: REMOVE info
 		$itemHosts = $this->get(array(
 			'itemids' => $itemids,
-			'output' => array('key_'),
-			'selectHosts' => array('host'),
-			'nopermissions' => 1,
+			'output' => array('name'),
+			'selectHosts' => array('name'),
+			'nopermissions' => true
 		));
-		foreach($itemHosts as $item){
+		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
-			info(S_ITEM." [".$host['host'].':'.$item['key_']."] ".S_UPDATED_SMALL);
+			info(_s('Updated: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 	}
 
@@ -1065,6 +1065,7 @@ class CItem extends CItemGeneral {
 				'editable' => true,
 				'preservekeys' => true,
 				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => array('name')
 			);
 			$del_items = $this->get($options);
 
@@ -1165,7 +1166,8 @@ class CItem extends CItemGeneral {
 
 			// TODO: remove info from API
 			foreach ($del_items as $item) {
-				info(_s('Item "%1$s:%2$s" deleted.', $item['name'], $item['key_']));
+				$host = reset($item['hosts']);
+				info(_s('Deleted: Item "%1$s" on "%2$s".', $item['name'], $host['name']));
 			}
 
 			return array('itemids' => $itemids);
@@ -1273,7 +1275,7 @@ class CItem extends CItemGeneral {
 						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['host']);
 					}
 					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s:%2$s" already exists, inherited from another template.', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item "%1$s" already exists on "%2$s", inherited from another template.', $item['key_'], $host['host']));
 					}
 				}
 
@@ -1290,7 +1292,7 @@ class CItem extends CItemGeneral {
 					}
 					// no matching interface found, throw an error
 					elseif($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
 					}
 				}
 

@@ -21,22 +21,35 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageQueueOverview extends CWebTest
-{
-	public function testPageQueueOverview_CheckLayout()
-	{
+class testPageQueueOverview extends CWebTest {
+	public function testPageQueueOverview_CheckLayout() {
 		$this->login('queue.php?config=0');
 		$this->assertTitle('Queue \[refreshed every 30 sec\]');
 		$this->ok('Queue');
 		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
-		$this->ok(array('Items','5 seconds','10 seconds','30 seconds','1 minute','5 minutes','More than 10 minutes'));
+		$this->ok(array('Items', '5 seconds', '10 seconds', '30 seconds', '1 minute', '5 minutes', 'More than 10 minutes'));
 		// Data
-		$this->ok(array('Zabbix agent','Zabbix agent (active)','SNMPv2 agent','SNMPv2 agent','SNMPv3 agent','IPMI agent','SSH agent','TELNET agent','Simple check','Zabbix internal','Zabbix aggregate','External check','Calculated'));
+		$this->ok(
+			array(
+				'Zabbix agent',
+				'Zabbix agent (active)',
+				'SNMPv2 agent',
+				'SNMPv2 agent',
+				'SNMPv3 agent',
+				'IPMI agent',
+				'SSH agent',
+				'TELNET agent',
+				'Simple check',
+				'Zabbix internal',
+				'Zabbix aggregate',
+				'External check',
+				'Calculated'
+			)
+		);
 	}
 
-	public function testPageQeueOverview_VerifyDisplayedNumbers()
-	{
+	public function testPageQeueOverview_VerifyDisplayedNumbers() {
 // TODO
 		$this->markTestIncomplete();
 	}
