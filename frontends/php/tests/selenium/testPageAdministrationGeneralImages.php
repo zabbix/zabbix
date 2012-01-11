@@ -106,7 +106,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralImages_BgImageSimpleUpdate($bgimage_name) {
 
-		$sqlBgImages = 'SELECT * FROM images WHERE imagetype=2';
+		$sqlBgImages = 'SELECT * FROM images WHERE imagetype=2 limit 5';
 		$oldHashBgImages=DBhash($sqlBgImages);
 
 		$this->login('config.php');
