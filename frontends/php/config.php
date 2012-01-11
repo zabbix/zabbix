@@ -583,8 +583,11 @@ require_once('include/page_header.php');
 			try {
 				DBstart();
 
-				$globalMacros = API::UserMacro()->get(array('globalmacro' => 1, 'output' => API_OUTPUT_EXTEND));
-				$globalMacros = zbx_toHash($globalMacros, 'macro');
+				$globalMacros = API::UserMacro()->get(array(
+					'globalmacro' => true,
+					'output' => API_OUTPUT_EXTEND,
+					'preservekeys' => true
+				));
 
 				$newMacros = get_request('macros', array());
 
@@ -613,17 +616,23 @@ require_once('include/page_header.php');
 					throw new Exception(_('More than one macro with same name found:').SPACE.implode(', ', array_unique($duplicatedMacros)));
 				}
 
-				// save filtered macro array
-				$_REQUEST['macros'] = $newMacros;
-
 				// update
 				$macrosToUpdate = array();
 				foreach ($newMacros as $number => $newMacro) {
-					if (isset($globalMacros[$newMacro['macro']])) {
-						$macrosToUpdate[] = $newMacro;
+					if (isset($newMacro['globalmacroid']) && isset($globalMacros[$newMacro['globalmacroid']])) {
+
+						$dbGlobalMacro = $globalMacros[$newMacro['globalmacroid']];
 
 						// remove item from new macros array
 						unset($newMacros[$number]);
+						unset($globalMacros[$newMacro['globalmacroid']]);
+
+						// if the macro is unchanged - skip it
+						if ($dbGlobalMacro == $newMacro) {
+							continue;
+						}
+
+						$macrosToUpdate[$newMacro['globalmacroid']] = $newMacro;
 					}
 				}
 				if (!empty($macrosToUpdate)) {
@@ -631,35 +640,18 @@ require_once('include/page_header.php');
 						throw new Exception(_('Cannot update macro'));
 					}
 					foreach ($macrosToUpdate as $macro) {
-						add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $globalMacros[$macro['macro']]['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
+						add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
 					}
 				}
 
-				$newMacroMacros = zbx_objectValues($newMacros, 'macro');
-				$newMacroMacros = zbx_toHash($newMacroMacros, 'macro');
-
-				// delete
-				$macrosToDelete = array();
-				$macrosToUpdate = zbx_toHash($macrosToUpdate, 'macro');
-				foreach ($globalMacros as $globalMacro) {
-					if (empty($newMacroMacros[$globalMacro['macro']]) && empty($macrosToUpdate[$globalMacro['macro']])) {
-						$macrosToDelete[] = $globalMacro['macro'];
-
-						// remove item from new macros array
-						foreach ($newMacros as $number => $newMacro) {
-							if ($newMacro['macro'] == $globalMacro['macro']) {
-								unset($newMacros[$number]);
-								break;
-							}
-						}
-					}
-				}
-				if (!empty($macrosToDelete)) {
-					if (!API::UserMacro()->deleteGlobal($macrosToDelete)) {
+				// delete the remaining global macros
+				if ($globalMacros) {
+					$ids = zbx_objectValues($globalMacros, 'globalmacroid');
+					if (!API::UserMacro()->deleteGlobal($ids)) {
 						throw new Exception(_('Cannot remove macro.'));
 					}
-					foreach ($macrosToDelete as $macro) {
-						add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $globalMacros[$macro]['globalmacroid'], $macro.SPACE.RARR.SPACE.$globalMacros[$macro]['value'], null, null, null);
+					foreach ($globalMacros as $macro) {
+						add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro.SPACE.RARR.SPACE.$macro['value'], null, null, null);
 					}
 				}
 
@@ -683,6 +675,13 @@ require_once('include/page_header.php');
 						add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
 					}
 				}
+
+				// reload macros after updating to properly display them in the form
+				$_REQUEST['macros'] = API::UserMacro()->get(array(
+					'globalmacro' => true,
+					'output' => API_OUTPUT_EXTEND,
+					'preservekeys' => true
+				));
 
 				DBend(true);
 				show_message(_('Macros updated'));
