@@ -618,7 +618,7 @@ switch($itemType) {
 		}
 
 		$frmItem->addRow(S_FILTER, array(
-			S_MACRO, SPACE, new CTextBox('item_filter_macro',$item_filter_macro,20),
+			_('Macro'), SPACE, new CTextBox('item_filter_macro',$item_filter_macro,20),
 			S_REGEXP, SPACE, new CTextBox('item_filter_value',$item_filter_value,40)
 		), null);
 

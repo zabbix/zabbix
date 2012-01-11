@@ -1332,6 +1332,14 @@ COpt::memoryPick();
 			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
 			$expression = implode_exp($trigger['expression'], $triggerid);
+			$hostnames = "";
+			$hosts = get_hostnames_from_expression($trigger['expression']);
+			foreach ($hosts as $key => $host) {
+				if (!empty($hostnames)) {
+					$hostnames .= ", ";
+				}
+				$hostnames .= $host;
+			}
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
@@ -1340,16 +1348,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			$dbHosts = API::Host()->get(array(
-				'triggerids' => $triggerid,
-				'output' => array('name'),
-				'limit' => 1,
-				'nopermissions' => true
-			));
-
-			$host = reset($dbHosts);
-
-			info(sprintf(_('Created: Trigger prototype "%1$s" on "%2$s".'), $trigger['description'], $host['name']));
+			info(sprintf(_('Created: Trigger prototype "%1$s" on "%2$s".'), $trigger['description'], $hostnames));
 		}
 
 	}
