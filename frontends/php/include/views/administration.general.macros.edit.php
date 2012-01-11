@@ -45,7 +45,11 @@ foreach ($macros as $macroid => $macro) {
 	$deleteButton = new CButton('macros_del', _('Remove'));
 	$deleteButton->addClass('link_menu macroRemove');
 
-	$macrosTable->addRow(array($text1, $span, $text2, $deleteButton), 'form_row');
+	$row = array($text1, $span, $text2, $deleteButton);
+	if (isset($macro['globalmacroid'])) {
+		$row[] = new CVar('macros['.$macroid.'][globalmacroid]', $macro['globalmacroid']);
+	}
+	$macrosTable->addRow($row, 'form_row');
 }
 
 // buttons
