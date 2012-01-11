@@ -343,7 +343,7 @@ class CApplication extends CZBXAPI {
 
 		// adding objects
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+		if ($options['selectHosts'] !== null && (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs))) {
 			$obj_params = array(
 				'output' => $options['selectHosts'],
 				'applicationids' => $applicationids,
@@ -538,7 +538,7 @@ class CApplication extends CZBXAPI {
 		));
 		foreach ($applications_created as $application_created) {
 			$host = reset($application_created['hosts']);
-			info(_s('Application "%1$s:%2$s" created.', $host['host'], $application_created['name']));
+			info(_s('Created: Application "%1$s" on "%2$s".', $application_created['name'], $host['name']));
 		}
 	}
 
@@ -561,7 +561,7 @@ class CApplication extends CZBXAPI {
 		));
 		foreach ($applications_upd as $application_upd) {
 			$host = reset($application_upd['hosts']);
-			info(_s('Application "%1$s:%2$s" updated.', $host['host'], $application_upd['name']));
+			info(_s('Updated: Application "%1$s" on "%2$s".', $application_upd['name'], $host['name']));
 		}
 	}
 
@@ -579,7 +579,8 @@ class CApplication extends CZBXAPI {
 			'applicationids' => $applicationids,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'selectHosts' => array('name', 'hostid')
 		);
 		$del_applications = $this->get($options);
 
@@ -609,7 +610,8 @@ class CApplication extends CZBXAPI {
 			'applicationids' => $child_applicationids,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'selectHosts' => array('name', 'hostid')
 		);
 		$del_application_childs = $this->get($options);
 		$del_applications = zbx_array_merge($del_applications, $del_application_childs);
@@ -628,7 +630,8 @@ class CApplication extends CZBXAPI {
 
 		// TODO: remove info from API
 		foreach ($del_applications as $del_application) {
-			info(_s('Application "%1$s" deleted.', $del_application['name']));
+			$host = reset($del_application['hosts']);
+			info(_s('Deleted: Application "%1$s" on "%2$s".', $del_application['name'], $host['name']));
 		}
 		return array('applicationids' => $applicationids);
 	}
@@ -781,7 +784,7 @@ class CApplication extends CZBXAPI {
 				if (isset($application['name']) && isset($exApplicationsNames[$application['name']])) {
 					$exApplication = $exApplicationsNames[$application['name']];
 					if ($exApplication['templateid'] > 0 && bccomp($exApplication['templateid'], $application['applicationid'] != 0)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['host']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['name']));
 					}
 				}
 

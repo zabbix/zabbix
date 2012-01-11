@@ -21,17 +21,15 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageStatusOfZabbix extends CWebTest
-{
-	public function testPageStatusOfZabbix_CheckLayout()
-	{
+class testPageStatusOfZabbix extends CWebTest {
+	public function testPageStatusOfZabbix_CheckLayout() {
 		$this->login('report1.php');
 		$this->assertTitle('Status of Zabbix');
 		$this->ok('Status of Zabbix');
 		$this->ok('STATUS OF ZABBIX');
 		$this->ok('REPORT');
 		// Header
-		$this->ok(array('Parameter','Value','Details'));
+		$this->ok(array('Parameter', 'Value', 'Details'));
 		// Data
 		$this->ok('Zabbix server is running');
 		$this->ok('Number of hosts (monitored/not monitored/templates)');
@@ -41,8 +39,7 @@ class testPageStatusOfZabbix extends CWebTest
 		$this->ok('Required server performance, new values per second');
 	}
 
-	public function testPageStatusOfZabbix_VerifyDisplayedNumbers()
-	{
+	public function testPageStatusOfZabbix_VerifyDisplayedNumbers() {
 // TODO
 		$this->markTestIncomplete();
 	}

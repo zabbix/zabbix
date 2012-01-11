@@ -63,7 +63,7 @@ class API_JSON_User extends CZabbixTest {
 			$debug
 		);
 
-		$this->assertTrue(!array_key_exists('error', $result),"Chuck Norris: Failed to create map through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
+		$this->assertTrue(!array_key_exists('error', $result), "Chuck Norris: Failed to create map through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
 
 		// looking at the DB, was the record created?
 		foreach ($maps as $map) {

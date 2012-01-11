@@ -48,8 +48,13 @@ const char	*DBnode(const char *fieldid, int nodeid)
 
 	if (-1 != nodeid)
 	{
-		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between %d00000000000000 and %d99999999999999",
-				fieldid, nodeid, nodeid);
+		zbx_uint64_t	min, max;
+
+		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
+		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
+
+		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+				fieldid, min, max);
 	}
 	else
 		*dbnode = '\0';

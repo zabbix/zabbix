@@ -21,16 +21,14 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageEvents extends CWebTest
-{
+class testPageEvents extends CWebTest {
 
-	public function testPageEvents_Triggers_CheckLayout()
-	{
+	public function testPageEvents_Triggers_CheckLayout() {
 		$this->login('events.php');
 
-		$this->dropdown_select_wait('source','Trigger');
-		$this->dropdown_select_wait('groupid','all');
-		$this->dropdown_select_wait('hostid','all');
+		$this->dropdown_select_wait('source', 'Trigger');
+		$this->dropdown_select_wait('groupid', 'all');
+		$this->dropdown_select_wait('hostid', 'all');
 
 		$this->assertTitle('Latest events');
 		$this->ok('HISTORY OF EVENTS');
@@ -40,19 +38,18 @@ class testPageEvents extends CWebTest
 		$this->ok('Filter');
 		$this->ok('Displaying');
 		// table header
-		if(0 == DBcount('select * from events where value_changed=1 and source='.EVENT_SOURCE_TRIGGERS)){
+		if (0 == DBcount('select * from events where value_changed=1 and source='.EVENT_SOURCE_TRIGGERS)) {
 			$this->ok('No events found');
 		}
-		else{
+		else {
 			$this->ok(array('Time', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
 		}
 	}
 
-	public function testPageEvents_Discovery_CheckLayout()
-	{
+	public function testPageEvents_Discovery_CheckLayout() {
 		$this->login('events.php');
 
-		$this->dropdown_select_wait('source','Discovery');
+		$this->dropdown_select_wait('source', 'Discovery');
 
 		$this->assertTitle('Latest events');
 		$this->ok('HISTORY OF EVENTS');
@@ -60,33 +57,32 @@ class testPageEvents extends CWebTest
 		$this->ok('Filter');
 		$this->ok('Displaying');
 		// table header
-		if(0 == DBcount('select * from events where source='.EVENT_SOURCE_DISCOVERY))
+		if (0 == DBcount('select * from events where source='.EVENT_SOURCE_DISCOVERY)) {
 			$this->ok('No events found');
-		else
+		}
+		else {
 			$this->ok(array('Time','IP','DNS','Description','Status'));
+		}
 	}
 
-	public function testPageEvents_Triggers_Sorting()
-	{
+	public function testPageEvents_Triggers_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
 // Check that no real host or template names displayed
-	public function testPageEvents_Triggers_NoHostNames()
-	{
+	public function testPageEvents_Triggers_NoHostNames() {
 		$this->login('events.php');
-		$this->dropdown_select_wait('source','Trigger');
+		$this->dropdown_select_wait('source', 'Trigger');
 		$this->assertTitle('Latest events');
 
 		$this->checkNoRealHostnames();
 	}
 
 // Check that no real host or template names displayed
-	public function testPageEvents_Discovery_NoHostNames()
-	{
+	public function testPageEvents_Discovery_NoHostNames() {
 		$this->login('events.php');
-		$this->dropdown_select_wait('source','Discovery');
+		$this->dropdown_select_wait('source', 'Discovery');
 		$this->assertTitle('Latest events');
 
 		$this->checkNoRealHostnames();

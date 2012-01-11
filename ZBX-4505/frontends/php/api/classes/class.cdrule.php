@@ -593,7 +593,7 @@ COpt::memoryPick();
 		// checking to the duplicate names
 		foreach($dRules as $dRule){
 			if($this->exists($dRule)){
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule [%s] already exists', $dRule['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
 			}
 		}
 
