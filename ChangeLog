@@ -18,6 +18,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+....I..... [ZBX-2701] removed empty value mappings from a default data (Sasha)
 A.F....... [ZBX-4505] fixed global macro recreation instead of updating (pavels)
 ..F....... [ZBX-4505] fixed audit message appearing when saving an unchanged global macro (pavels)
 A......... [ZBX-4519] fixed impossibility to delete template : Unknown column 'h.name' (sanja)
