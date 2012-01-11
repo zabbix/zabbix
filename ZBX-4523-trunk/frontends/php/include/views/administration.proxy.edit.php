@@ -118,7 +118,7 @@
 			($db_host['proxy_hostid'] == 0 || ($_REQUEST['hostid']>0) && (bccomp($db_host['proxy_hostid'],$_REQUEST['hostid']) == 0))
 		);
 	}
-	$proxyList->addRow(S_HOSTS,$cmbHosts->Get(S_PROXY.SPACE.S_HOSTS,S_OTHER.SPACE.S_HOSTS));
+	$proxyList->addRow(S_HOSTS,$cmbHosts->Get(S_PROXY_HOSTS,S_OTHER_HOSTS));
 
 // Tabed form
 	$proxyTabs = new CTabView();
