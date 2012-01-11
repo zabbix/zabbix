@@ -966,7 +966,7 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 		foreach ($options['sortfield'] as $i => $sortfield) {
 			// validate sortfield
 			if (!str_in_array($sortfield, $sort_columns)) {
-				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
+				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
 			}
 
 			// add sort field to order
@@ -1087,11 +1087,15 @@ function unlock_sqlite3_access() {
 
 class DB {
 	const SCHEMA_FILE = 'schema.inc.php';
+
 	const DBEXECUTE_ERROR = 1;
 	const RESERVEIDS_ERROR = 2;
 	const SCHEMA_ERROR = 3;
+	const INPUT_ERROR = 4;
+
 	const TABLE_TYPE_CONFIG = 1;
 	const TABLE_TYPE_HISTORY = 2;
+
 	const FIELD_TYPE_INT = 'int';
 	const FIELD_TYPE_CHAR = 'char';
 	const FIELD_TYPE_ID = 'id';
@@ -1258,7 +1262,7 @@ class DB {
 			return self::$schema[$table];
 		}
 		else {
-			self::exception(self::SCHEMA_ERROR, _s('Table "%s" does not exist.', $table));
+			self::exception(self::SCHEMA_ERROR, _s('Table "%1$s" does not exist.', $table));
 		}
 	}
 
@@ -1270,14 +1274,17 @@ class DB {
 	 *
 	 * @param string $tableName
 	 *
-	 * @return string
+	 * @return string|array
 	 */
 	protected static function getPk($tableName) {
 		$schema = self::getSchema($tableName);
-
-		return $schema['key'];
+		if (strpos($schema['key'], ',') !== false) {
+			return explode(',', $schema['key']);
+		}
+		else {
+			return $schema['key'];
+		}
 	}
-
 
 	/**
 	 * Returns true if the table $tableName has the $fieldName field.
@@ -1294,8 +1301,6 @@ class DB {
 
 		return isset($schema['fields'][$fieldName]);
 	}
-
-
 
 
 	public static function getDefaults($table) {
@@ -1340,7 +1345,7 @@ class DB {
 
 			if ($values[$field] === 'NULL') {
 				if (!$tableSchema['fields'][$field]['null']) {
-					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "NULL" for NOT NULL field "%s".', $field));
+					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "NULL" for NOT NULL field "%1$s".', $field));
 				}
 			}
 			else {
@@ -1389,7 +1394,6 @@ class DB {
 		}
 	}
 
-
 	/**
 	 * Returns the records that match the given criteria.
 	 *
@@ -1408,7 +1412,7 @@ class DB {
 		foreach ($criteria as $field => $value) {
 			// check if the table has this field
 			if (!self::hasField($tableName, $field)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Table "%1s" doesn\'t have a field named "%2s"', $tableName, $field));
+				self::exception(self::DBEXECUTE_ERROR, _s('Table "%1$s" doesn\'t have a field named "%2$s"', $tableName, $field));
 			}
 
 			$sqlWhere[] = DBcondition($field, zbx_toArray($value));
@@ -1422,8 +1426,6 @@ class DB {
 
 		return DBfetchArray(DBSelect($sql));
 	}
-
-
 
 	/**
 	 * Insert data into DB
@@ -1455,7 +1457,7 @@ class DB {
 			$sql = 'INSERT INTO '.$table.' ('.implode(',', array_keys($row)).')'.
 					' VALUES ('.implode(',', array_values($row)).')';
 			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
+				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s"', $sql));
 			}
 		}
 		return $resultIds;
@@ -1481,7 +1483,7 @@ class DB {
 			// check
 			self::checkValueTypes($table, $row['values']);
 			if (empty($row['values'])) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%s" without values.', $table));
+				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without values.', $table));
 			}
 
 			// set creation
@@ -1492,7 +1494,7 @@ class DB {
 			$sqlSet = rtrim($sqlSet, ',');
 
 			if (!isset($row['where']) || empty($row['where']) || !is_array($row['where'])) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%s" without where condition.', $table));
+				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without where condition.', $table));
 			}
 
 			// where condition proccess
@@ -1507,12 +1509,11 @@ class DB {
 			// sql execution
 			$sql = 'UPDATE '.$table.' SET '.$sqlSet.' WHERE '.implode(' AND ', $sqlWhere);
 			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s".', $sql));
+				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 			}
 		}
 		return true;
 	}
-
 
 	/**
 	 * Updates the values by the given PK.
@@ -1527,8 +1528,24 @@ class DB {
 	 * @return bool
 	 */
 	public static function updateByPk($tableName, $pk, array $values) {
-		if (!is_array($pk)) {
-			$pk = array(self::getPk($tableName) => $pk);
+		$dbPkNames = self::getPk($tableName);
+
+		if (is_array($pk)) {
+			if (!is_array($dbPkNames)) {
+				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has simple primary key, composite is given.', $tableName));
+			}
+
+			if (!array_equal(array_keys($pk), $dbPkNames)) {
+				self::exception(self::INPUT_ERROR, _s('Incorrect primary keys for table "%1$s".', $tableName));
+			}
+		}
+		else {
+			if (is_array($dbPkNames)) {
+				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has composite primary key, simple is given.', $tableName));
+			}
+
+			$pk = array($dbPkNames => $pk);
+
 		}
 
 		return self::update($tableName, array(
@@ -1554,7 +1571,7 @@ class DB {
 	 */
 	public static function delete($table, $wheres, $use_or = false) {
 		if (empty($wheres) || !is_array($wheres)) {
-			self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform delete statement on table "%s" without where condition.', $table));
+			self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform delete statement on table "%1$s" without where condition.', $table));
 		}
 		$table_schema = self::getSchema($table);
 
@@ -1568,7 +1585,7 @@ class DB {
 
 		$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sqlWhere);
 		if (!DBexecute($sql)) {
-			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
+			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s"', $sql));
 		}
 		return true;
 	}
