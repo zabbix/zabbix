@@ -115,7 +115,7 @@ function parse_schema($path){
 	}
 	$str .=  ");\n";
 
-	$str .=  '?>';
+	$str .=  "?>\n";
 
 	return $str;
 }
