@@ -58,15 +58,28 @@ class CScreenItem extends CZBXAPI {
 	);
 
 
-	/**
-	 * Sortable columns
-	 *
-	 * @var array
-	 */
 	protected $sortColumns = array(
 		'screenitemid',
 		'screenid'
 	);
+
+
+	public function __construct() {
+		parent::__construct();
+
+		$this->getOptions = zbx_array_merge($this->globalGetOptions, array(
+			'screenitemids'				=> null,
+			'screenids'					=> null,
+			'editable'					=> null,
+
+			'selectScreen'				=> null,				// not implemented
+
+			'sortfield'					=> '',
+			'sortorder'					=> '',
+			'preservekeys'				=> null,
+			'countOutput'				=> null,
+		));
+	}
 
 
 	/**
@@ -82,37 +95,11 @@ class CScreenItem extends CZBXAPI {
 	 * @return array|boolean Host data as array or false if error
 	 */
 	public function get(array $options = array()) {
-		$defOptions = array(
-			'nodeids'					=> null,
-			'screenitemids'				=> null,
-			'screenids'					=> null,
-			'editable'					=> null,
-
-			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
-			'searchWildcardsEnabled'	=> null,
-
-			// output
-			'output'					=> API_OUTPUT_REFER,
-			'selectScreen'				=> null,				// not implemented
-			'countOutput'				=> null,
-			'preservekeys'				=> null,
-
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
-		);
-
 		// options
-		$options = zbx_array_merge($defOptions, $options);
+		$options = zbx_array_merge($this->getOptions, $options);
 
 		// build and execute query
-		$sqlParts = $this->buildSqlParts($options);
-		$sql = $this->buildSql($options, $sqlParts);
+		$sql = $this->createSelectQuery($this->tableName(), $options);
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
@@ -125,10 +112,10 @@ class CScreenItem extends CZBXAPI {
 			// a normal select query
 			else {
 				if ($options['preservekeys'] !== null) {
-					$result[$row['screenitemid']] = $this->unsetExtraFields($row, $options, $sqlParts);
+					$result[$row['screenitemid']] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
 				}
 				else {
-					$result[] = $this->unsetExtraFields($row, $options, $sqlParts);
+					$result[] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
 				}
 			}
 		}
@@ -520,131 +507,24 @@ class CScreenItem extends CZBXAPI {
 	}
 
 
-	/**
-	 * Builds an SQL parts array from the given options.
-	 *
-	 * @param array $options
-	 *
-	 * @return array         The resulting SQL parts array
-	 */
-	protected function buildSqlParts(array $options) {
-		$sqlParts = array(
-			'select' => array($this->fieldId('screenitemid')),
-			'from' => array($this->tableId()),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
-			'limit' => null
-		);
-
-		// handle output
-		$sqlParts = $this->buildSqlOutput($options, $sqlParts);
-
-		// handle filters
-		$sqlParts = $this->buildSqlFilters($options, $sqlParts);
-
-		// sort
-		zbx_db_sorting($sqlParts, $options, $this->sortColumns, $this->tableAlias());
-
-		return $sqlParts;
-	}
-
-
-	/**
-	 * Builds a SELECT SQL query from the given SQL parts array.
-	 *
-	 * @param array $options   An array of API options
-	 * @param array $sqlParts  An SQL parts array
-	 *
-	 * @return string          The resulting SQL query
-	 */
-	protected function buildSql(array $options, array $sqlParts) {
-		// build query
-		$sqlSelect = implode(',', array_unique($sqlParts['select']));
-		$sqlFrom = implode(',', array_unique($sqlParts['from']));
-		$sqlWhere = $sqlParts['where'] ? implode(' AND ', $sqlParts['where']) : '';
-		$sqlGroup = $sqlParts['group'] ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
-		$sqlOrder = $sqlParts['order'] ? ' ORDER BY '.implode(',', $sqlParts['order']) : '';
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-
-		return $sql;
-	}
-
-
-	/**
-	 * Modifies the SQL parts to implement all of the ouput related options.
-	 *
-	 * @param array $options
-	 * @param array $sqlParts
-	 * @param array $schema
-	 * @return array
-	 */
-	protected function buildSqlOutput(array $options, array $sqlParts) {
-		// count
-		if ($options['countOutput'] !== null) {
-			$sqlParts['select'] = array('COUNT(DISTINCT '.$this->fieldId('screenitemid').') AS rowscount');
-		}
-		// custom output
-		elseif (is_array($options['output'])) {
-			$sqlParts['select'] = array();
-			foreach ($options['output'] as $field) {
-				if ($this->hasField($field)) {
-					$sqlParts['select'][] = $this->fieldId($field);
-				}
-			}
-
-			// make sure the id is included if the 'preservekeys' option is enabled
-			if ($options['preservekeys'] !== null) {
-				$sqlParts['select'][] = $this->fieldId('screenitemid');
-			}
-		}
-		// extended output
-		elseif ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select'] = array('si.*');
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// only appy the node option if no specific screen ids are given
+		if ($options['screenids'] === null) {
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
 
 		return $sqlParts;
 	}
 
 
-	/**
-	 * Modifies the SQL parts to implement all of the filter related options.
-	 *
-	 * @param array $options
-	 * @param array $sqlParts
-	 * @return type
-	 */
-	protected function buildSqlFilters(array $options, array $sqlParts) {
-		// screen item ids
-		if ($options['screenitemids'] !== null) {
-			zbx_value2array($options['screenitemids']);
-			$sqlParts['where'][] = DBcondition($this->fieldId('screenitemid'), $options['screenitemids']);
-		}
+	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		// screen ids
 		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
+			$sqlParts = $this->extendQuerySelect($this->fieldId('screenid'), $sqlParts);
 			$sqlParts['where'][] = DBcondition($this->fieldId('screenid'), $options['screenids']);
-		}
-
-		// if no specific ids are given, apply the node filter
-		if ($options['screenitemids'] === null && $options['screenids'] === null) {
-			$nodeids = ($options['nodeids'] !== null) ? $options['nodeids'] : get_current_nodeid();
-			$sqlParts['where'][] = DBin_node($this->fieldId('screenitemid'), $nodeids);
-		}
-
-		// filters
-		if (is_array($options['filter'])) {
-			zbx_db_filter($this->tableId(), $options, $sqlParts);
-		}
-
-		// search
-		if (is_array($options['search'])) {
-			zbx_db_search($this->tableId(), $options, $sqlParts);
 		}
 
 		return $sqlParts;
