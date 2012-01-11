@@ -13,6 +13,17 @@ build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
 create/src/data.tmpl -text
+frontends/php/adm.gui.php -text
+frontends/php/adm.housekeeper.php -text
+frontends/php/adm.iconmapping.php -text
+frontends/php/adm.images.php -text
+frontends/php/adm.macros.php -text
+frontends/php/adm.other.php -text
+frontends/php/adm.regexps.php -text
+frontends/php/adm.triggerdisplayingoptions.php -text
+frontends/php/adm.triggerseverities.php -text
+frontends/php/adm.valuemapping.php -text
+frontends/php/adm.workingtime.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text

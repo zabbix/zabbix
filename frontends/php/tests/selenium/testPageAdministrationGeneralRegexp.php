@@ -32,8 +32,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralRegexp_CheckLayout($regexp) {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
 		$this->ok('Regular expressions');
@@ -60,9 +59,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$sqlExpressions="select * from expressions order by expressionid";
 		$oldHashExpressions=DBhash($sqlExpressions);
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->ok('Regular expressions');
+		$this->login('adm.regexps.php');
 		// checking that can click on each regexp and then save it without any changes
 		$this->click('link='.$regexp['name']);
 		$this->wait();
@@ -83,13 +80,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		DBsave_tables('regexps');
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Regular expressions');
-		$this->ok(array('Name', 'Expressions'));
-
+		$this->login('adm.regexps.php');
 		// detecting "regexpid" values for clicking checkboxes "regexpids[$regexpid]"
 		$sql = "SELECT regexpid FROM regexps WHERE name='$name'";
 		$result = DBfetch(DBselect($sql));
@@ -114,13 +105,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		// DBsave_tables('regexps');
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Regular expressions');
-		$this->ok(array('Name', 'Expressions'));
-
+		$this->login('adm.regexps.php');
 		$this->checkbox_select("all_regexps");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
