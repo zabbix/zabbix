@@ -2921,7 +2921,7 @@
 			'item' => S_ITEM,
 			'trigger' => S_TRIGGER,
 			'graph' => S_GRAPH,
-			'screens' => S_SCREENS,
+			'screens' => _('Screens'),
 		);
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', true);

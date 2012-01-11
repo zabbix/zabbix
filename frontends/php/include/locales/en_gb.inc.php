@@ -227,7 +227,6 @@
 
 //	Latest values
 	'S_NO_PERMISSIONS'=>			_('No permissions to referred object or it does not exist!'),
-	'S_LATEST_DATA_BIG'=>			_('LATEST DATA'),
 	'S_ALL_S'=>						_('All'),
 	'S_ALL_SMALL'=>					_('all'),
 	'S_MINUS_OTHER_MINUS'=>			_('- other -'),
@@ -454,7 +453,6 @@
 	'S_MODE'=>						_('Mode'),
 	'S_COPY'=>						_('Copy'),
 	'S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q'=>	_('History clearing can take a long time. Continue?'),
-	'S_SEARCH'=>						_('Search'),
 	'S_ORIGINAL'=>						_('Original'),
 	'S_NEW_FLEXIBLE_INTERVAL'=>				_('New flexible interval'),
 	'S_FLEXIBLE_INTERVALS'=>				_('Flexible intervals (sec)'),
@@ -679,7 +677,6 @@
 	'S_REPORTS_BAR_REPORT_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	screenconf.php
-	'S_SCREENS'=>				_('Screens'),
 	'S_SCREEN'=>				_('Screen'),
 	'S_CONFIGURATION_OF_SCREENS_BIG'=>	_('CONFIGURATION OF SCREENS'),
 	'S_CONFIGURATION_OF_SCREENS'=>		_('Configuration of screens'),
@@ -746,7 +743,6 @@
 	'S_MIDDLE'=>				_('Middle'),
 
 //	screens.php
-	'S_SCREENS_BIG'=>				_('SCREENS'),
 	'S_HOST_SCREENS'=>				_('Host screens'),
 
 //	services.php
@@ -861,12 +857,7 @@
 	'S_HOST_INVENTORY_OVERVIEW'=>	_('Host inventory overview'),
 
 //	search.php
-	'S_EDIT_HOSTS'=>			_('Edit hosts'),
-	'S_SEARCH_BIG'=>			_('SEARCH'),
 	'S_GO'=>					_('Go'),
-	'S_FOUND_SMALL'=>			_('found'),
-	'S_DISPLAYING'=>			_('Displaying'),
-	'S_SEARCH_PATTERN_EMPTY'=>	_('Search pattern is empty'),
 
 //	popup.php
 	'S_CAPTION'=>				_('Caption'),
@@ -970,7 +961,6 @@
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
 	'S_LOGOUT'=>				_('Logout'),
-	'S_LATEST_DATA'=>			_('Latest data'),
 
 //	Errors
 	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),

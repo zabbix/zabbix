@@ -594,7 +594,7 @@ require_once('include/page_header.php');
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
-			S_SCREENS,
+			_('Screens'),
 			S_DISCOVERY,
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO
@@ -661,7 +661,7 @@ require_once('include/page_header.php');
 				' ('.$template['triggers'].')');
 			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['graphs'].')');
-			$screens = array(new CLink(S_SCREENS,'screenconf.php?templateid='.$template['templateid']),
+			$screens = array(new CLink(_('Screens'),'screenconf.php?templateid='.$template['templateid']),
 				' ('.$template['screens'].')');
 			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$template['hostid']),
 				' ('.$template['discoveries'].')');
