@@ -129,7 +129,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  ******************************************************************************/
 void	main_alerter_loop()
 {
-	char			error[MAX_STRING_LEN], *error_esc;
+	char			error[ALERT_ERROR_LEN_MAX], *error_esc;
 	int			res;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -186,7 +186,7 @@ void	main_alerter_loop()
 			}
 			else
 			{
-				zbx_snprintf(error, sizeof(error), "Media type is not active");
+				strscpy(error, "Media type is not active");
 				res = FAIL;
 			}
 
