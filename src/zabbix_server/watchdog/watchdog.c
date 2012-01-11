@@ -94,7 +94,7 @@ static void	sync_config()
 	DB_RESULT	result;
 	DB_ROW		row;
 	ZBX_RECIPIENT	*recipient;
-	int		count = 0, old_count, status;
+	int		count = 0, old_count;
 	static int	no_recipients = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
