@@ -23,33 +23,29 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class API_JSON_APIInfo extends CZabbixTest
-{
-	public function testAPIInfo_VersionWithAuth()
-	{
+class API_JSON_APIInfo extends CZabbixTest {
+	public function testAPIInfo_VersionWithAuth() {
 // Authenticate & call
 		$result = $this->api_acall(
 			'apiinfo.version',
 			array(),
 			$debug);
 
-		$this->assertTrue(isset($result['result']),"$debug");
-		$this->assertSame($result['result'],"1.2");
+		$this->assertTrue(isset($result['result']), "$debug");
+		$this->assertSame($result['result'], "1.2");
 	}
 
-	public function testAPIInfo_VersionWithoutAuth()
-	{
+	public function testAPIInfo_VersionWithoutAuth() {
 		$result = $this->api_call(
 			'apiinfo.version',
 			array(),
 			$debug);
 
-		$this->assertTrue(isset($result['result']),"$debug");
-		$this->assertSame($result['result'],"1.2");
+		$this->assertTrue(isset($result['result']), "$debug");
+		$this->assertSame($result['result'], "1.2");
 	}
 
-	public function testAPIInfo_RawJson()
-	{
+	public function testAPIInfo_RawJson() {
 		$json='{
 			"jsonrpc":"2.0",
 			"method":"apiinfo.version",
@@ -58,7 +54,7 @@ class API_JSON_APIInfo extends CZabbixTest
 		}';
 		$result = $this->api_call_raw($json, $debug);
 
-		$this->assertTrue(isset($result['result']),"$debug");
+		$this->assertTrue(isset($result['result']), "$debug");
 	}
 }
 ?>

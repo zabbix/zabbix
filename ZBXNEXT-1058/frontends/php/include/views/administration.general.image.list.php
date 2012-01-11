@@ -40,7 +40,7 @@ $count = 0;
 $imageRow = new CRow();
 foreach ($this->data['images'] as $number => $image) {
 	if ($image['imagetype'] == IMAGE_TYPE_BACKGROUND) {
-		$img = new CLink(new CImg('imgstore.php?iconid='.$image['imageid'], 'no image', 200), 'image.php?imageid='.$image['imageid']);
+		$img = new CLink(new CImg('imgstore.php?width=200&height=200&iconid='.$image['imageid'], 'no image'), 'image.php?imageid='.$image['imageid']);
 	}
 	else {
 		$img = new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');

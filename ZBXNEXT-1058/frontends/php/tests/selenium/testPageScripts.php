@@ -21,19 +21,16 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageScripts extends CWebTest
-{
+class testPageScripts extends CWebTest {
 	// Returns all scripts
-	public static function allScripts()
-	{
+	public static function allScripts() {
 		return DBdata('select * from scripts');
 	}
 
 	/**
 	* @dataProvider allScripts
 	*/
-	public function testPageScripts_CheckLayout($script)
-	{
+	public function testPageScripts_CheckLayout($script) {
 		$this->login('scripts.php');
 		$this->assertTitle('Scripts');
 
@@ -41,21 +38,20 @@ class testPageScripts extends CWebTest
 		$this->ok('CONFIGURATION OF SCRIPTS');
 		$this->ok('Displaying');
 		// Header
-		$this->ok(array('Name','Command','User group','Host group','Host access'));
+		$this->ok(array('Name', 'Command', 'User group', 'Host group', 'Host access'));
 		// Data
-		$this->ok(array($script['name'],$script['command'],'Read'));
-		$this->dropdown_select('go','Delete selected');
+		$this->ok(array($script['name'], $script['command'], 'Read'));
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
 	* @dataProvider allScripts
 	*/
-	public function testPageScripts_SimpleUpdate($script)
-	{
-		$name=$script['name'];
+	public function testPageScripts_SimpleUpdate($script) {
+		$name = $script['name'];
 
-		$sql="select * from scripts where name='$name' order by scriptid";
-		$oldHash=DBhash($sql);
+		$sql = "select * from scripts where name='$name' order by scriptid";
+		$oldHash = DBhash($sql);
 
 		$this->login('scripts.php');
 		$this->assertTitle('Scripts');
@@ -68,11 +64,10 @@ class testPageScripts extends CWebTest
 		$this->ok($name);
 		$this->ok('CONFIGURATION OF SCRIPTS');
 
-		$this->assertEquals($oldHash,DBhash($sql));
+		$this->assertEquals($oldHash, DBhash($sql));
 	}
 
-	public function testPageScripts_MassDeleteAll()
-	{
+	public function testPageScripts_MassDeleteAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -80,9 +75,8 @@ class testPageScripts extends CWebTest
 	/**
 	* @dataProvider allScripts
 	*/
-	public function testPageScripts_MassDelete($script)
-	{
-		$scriptid=$script['scriptid'];
+	public function testPageScripts_MassDelete($script) {
+		$scriptid = $script['scriptid'];
 
 		DBsave_tables('scripts');
 		$this->chooseOkOnNextConfirmation();
@@ -90,7 +84,7 @@ class testPageScripts extends CWebTest
 		$this->login('scripts.php');
 		$this->assertTitle('Scripts');
 		$this->checkbox_select("scripts[$scriptid]");
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -99,13 +93,12 @@ class testPageScripts extends CWebTest
 		$this->ok('Script deleted');
 
 		$sql="select * from scripts where scriptid='$scriptid'";
-		$this->assertEquals(0,DBcount($sql));
+		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('scripts');
 	}
 
-	public function testPageScripts_Sorting()
-	{
+	public function testPageScripts_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}

@@ -119,7 +119,7 @@
 	);
 
 	while($httpstep_data = DBfetch($db_httpsteps)){
-		$status['msg'] = S_OK_BIG;
+		$status['msg'] = _('OK');
 		$status['style'] = 'enabled';
 
 		if(HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
@@ -191,7 +191,7 @@
 		));
 	}
 
-	$status['msg'] = S_OK_BIG;
+	$status['msg'] = _('OK');
 	$status['style'] = 'enabled';
 
 	if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){

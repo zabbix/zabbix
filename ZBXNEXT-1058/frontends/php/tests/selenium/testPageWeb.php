@@ -21,21 +21,18 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageWeb extends CWebTest
-{
-	public function testPageWeb_CheckLayout()
-	{
+class testPageWeb extends CWebTest {
+	public function testPageWeb_CheckLayout() {
 		$this->login('httpmon.php');
 		$this->assertTitle('Status of Web monitoring');
 		$this->ok('STATUS OF WEB MONITORING');
 		$this->ok('WEB CHECKS');
-		$this->ok(array('Group','Host'));
-		$this->ok(array('Host','Name','Number of steps','State','Last check','Status'));
+		$this->ok(array('Group', 'Host'));
+		$this->ok(array('Host', 'Name', 'Number of steps', 'State', 'Last check', 'Status'));
 	}
 
 // Check that no real host or template names displayed
-	public function testPageWeb_NoHostNames()
-	{
+	public function testPageWeb_NoHostNames() {
 		$this->login('httpmon.php');
 		$this->assertTitle('Status of Web monitoring');
 		$this->checkNoRealHostnames();

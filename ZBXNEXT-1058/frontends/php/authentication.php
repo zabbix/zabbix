@@ -188,11 +188,12 @@ switch ($data['config']) {
 
 // get user list
 if (get_user_auth($USER_DETAILS['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
-	$sql = 'SELECT u.alias,u.userid'.
-				' FROM users u'.
-				' WHERE '.DBin_node('u.userid').
-				' ORDER BY alias';
-	$data['user_list'] = DBfetchArray(DBselect($sql));
+	$data['user_list'] = DBfetchArray(DBselect(
+		'SELECT u.alias,u.userid'.
+		' FROM users u'.
+		' WHERE '.DBin_node('u.userid').
+		' ORDER BY alias'
+	));
 }
 
 // render view

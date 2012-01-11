@@ -540,7 +540,7 @@ class CProxy extends CZBXAPI {
 
 // TODO: remove info from API
 		foreach($proxies as $hnum => $proxy) {
-			info(S_HOST_HAS_BEEN_DELETED_MSG_PART1.SPACE.$proxy['host'].SPACE.S_HOST_HAS_BEEN_DELETED_MSG_PART2);
+			info(_s('Proxy "%1$s" has been deleted from the system.', $proxy['host']));
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,'['.$proxy['host'].' ] ['.$proxy['hostid'].']');
 		}
 

@@ -742,14 +742,14 @@ require_once('include/page_header.php');
 
 ?>
 <?php
-	if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])){
+	if (($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])) {
 		$hostForm = new CView('configuration.host.massupdate');
 		$hosts_wdgt->addItem($hostForm->render());
 	}
-	else if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_IMPORT)
+	elseif (isset($_REQUEST['form'])) {
+		if ($_REQUEST['form'] == S_IMPORT)
 			$hosts_wdgt->addItem(import_host_form());
-		else{
+		else {
 			if ($hostid = get_request('hostid', 0)) {
 				$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
 			}
@@ -758,11 +758,11 @@ require_once('include/page_header.php');
 			$hosts_wdgt->addItem($hostForm->render());
 		}
 	}
-	else{
+	else {
 		$frmGroup = new CForm();
 		$frmGroup->setMethod('get');
 
-		$frmGroup->addItem(array(_('Group'), $pageFilter->getGroupsCB()));
+		$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
@@ -791,8 +791,8 @@ require_once('include/page_header.php');
 		$filter_table->addRow($footer_col);
 
 		$filter_form = new CForm('get');
-		$filter_form->setAttribute('name','zbx_filter');
-		$filter_form->setAttribute('id','zbx_filter');
+		$filter_form->setAttribute('name', 'zbx_filter');
+		$filter_form->setAttribute('id', 'zbx_filter');
 		$filter_form->addItem($filter_table);
 // }}} HOSTS FILTER
 		$hosts_wdgt->addFlicker($filter_form, CProfile::get('web.hosts.filter.state', 0));

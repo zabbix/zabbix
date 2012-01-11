@@ -67,7 +67,7 @@ class testGeneric extends CWebTest
 			array('actionconf.php?eventsource=2',	'Configuration of actions'),
 
 			array('screenconf.php',	'Configuration of screens'),
-			array('slideconf.php',	'Configuration of slideshows'),
+			array('slideconf.php',	'Configuration of slide shows'),
 			array('sysmaps.php',	'Network maps'),
 			array('discovery.php',	'Status of discovery'),
 			array('services.php',	'Configuration of IT services'),

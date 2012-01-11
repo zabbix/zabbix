@@ -213,6 +213,70 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 	{
 		zbx_mutex_lock(&log_file_access);
 
+		if (0 != CONFIG_LOG_FILE_SIZE && 0 == stat(log_filename, &buf))
+		{
+			if (CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < buf.st_size)
+			{
+				strscpy(filename_old, log_filename);
+				zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
+				remove(filename_old);
+
+				if (0 != rename(log_filename, filename_old))
+				{
+					log_file = fopen(log_filename, "w");
+
+					if (NULL != log_file)
+					{
+#ifdef _WINDOWS
+						_ftime(&current_time);
+						tm = localtime(&current_time.time);
+						milliseconds = current_time.millitm;
+#else
+						gettimeofday(&current_time,NULL);
+						tm = localtime(&current_time.tv_sec);
+						milliseconds = current_time.tv_usec / 1000;
+#endif
+						fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
+								" cannot rename log file \"%s\" to \"%s\": %s\n",
+								zbx_get_thread_id(),
+								tm->tm_year + 1900,
+								tm->tm_mon + 1,
+								tm->tm_mday,
+								tm->tm_hour,
+								tm->tm_min,
+								tm->tm_sec,
+								milliseconds,
+								log_filename,
+								filename_old,
+								zbx_strerror(errno));
+
+						fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
+								" Logfile \"%s\" size reached configured limit"
+								" LogFileSize. Renaming the logfile to \"%s\" and"
+								" starting a new logfile failed. The logfile"
+								" was truncated and started from beginning.\n",
+								zbx_get_thread_id(),
+								tm->tm_year + 1900,
+								tm->tm_mon + 1,
+								tm->tm_mday,
+								tm->tm_hour,
+								tm->tm_min,
+								tm->tm_sec,
+								milliseconds,
+								log_filename,
+								filename_old);
+
+						zbx_fclose(log_file);
+					}
+				}
+			}
+
+			if (old_size > (zbx_uint64_t)buf.st_size)
+				redirect_std(log_filename);
+
+			old_size = (zbx_uint64_t)buf.st_size;
+		}
+
 		log_file = fopen(log_filename,"a+");
 
 		if (NULL != log_file)
@@ -244,33 +308,12 @@ void __zbx_zabbix_log(int level, const char *fmt, ...)
 
 			fprintf(log_file, "\n");
 			zbx_fclose(log_file);
-
-			if (0 != CONFIG_LOG_FILE_SIZE && 0 == stat(log_filename, &buf))
-			{
-				if (CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < buf.st_size)
-				{
-					strscpy(filename_old, log_filename);
-					zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
-					remove(filename_old);
-
-					if (0 != rename(log_filename, filename_old))
-					{
-						zbx_error("cannot rename log file [%s] to [%s]: %s",
-								log_filename, filename_old, zbx_strerror(errno));
-					}
-				}
-
-				if (old_size > (zbx_uint64_t)buf.st_size)
-					redirect_std(log_filename);
-
-				old_size = (zbx_uint64_t)buf.st_size;
-			}
 		}
 
 		zbx_mutex_unlock(&log_file_access);
 
 		return;
-	}	/* LOG_TYPE_FILE */
+	}
 
 	va_start(args, fmt);
 	zbx_vsnprintf(message, sizeof(message), fmt, args);

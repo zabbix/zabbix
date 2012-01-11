@@ -75,17 +75,21 @@ $showDisabled = get_request('showdisabled', 1);
 CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_STR);
 $_REQUEST['go'] = get_request('go', 'none');
 
+if (!empty($_REQUEST['steps'])) {
+	order_result($_REQUEST['steps'], 'no');
+}
+
 /*
  * Filter
  */
 $options = array(
 	'groups' => array(
-		'real_hosts' => 1,
-		'not_proxy_hosts' => 1,
-		'editable' => 1
+		'real_hosts' => true,
+		'not_proxy_hosts' => true,
+		'editable' => true
 	),
 	'hosts' => array(
-		'editable' => 1
+		'editable' => true
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null)
@@ -168,8 +172,6 @@ elseif (isset($_REQUEST['save'])) {
 
 		$steps = get_request('steps', array());
 		if (!empty($steps)) {
-			order_result($steps, 'no');
-
 			$i = 1;
 			foreach ($steps as $snum => $step) {
 				$steps[$snum]['no'] = $i++;
@@ -207,7 +209,7 @@ elseif (isset($_REQUEST['save'])) {
 				'hostid' => $_REQUEST['hostid']
 			));
 			if (!$result) {
-				throw new Exception(_('Cannot add new application').' [ '.$application.' ]');
+				throw new Exception(_('Cannot add new application.').' [ '.$application.' ]');
 			}
 			else {
 				$webcheck['applicationid'] = reset($result['applicationids']);
