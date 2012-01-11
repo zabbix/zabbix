@@ -2704,21 +2704,25 @@ void	init_database_cache()
 
 	/* trend cache */
 
-	sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
+	if (0 < CONFIG_TRENDS_CACHE_SIZE)
+	{
+		sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
 
-	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
+		zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
 
-	cache->trends_num = 0;
-	cache->last_ts.sec = 0;
-	cache->last_ts.ns = 0;
+		cache->trends_num = 0;
 
 #define	INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
 
-	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
+		zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
+				ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+				__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
 
 #undef	INIT_HASHSET_SIZE
+	}
+
+	cache->last_ts.sec = 0;
+	cache->last_ts.ns = 0;
 
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_alloc);
