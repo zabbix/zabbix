@@ -1532,7 +1532,7 @@ class DB {
 
 		if (is_array($pk)) {
 			if (!is_array($dbPkNames)) {
-				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has simple primary key, composite is given.', $tableName));
+				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has a simple primary key, composite is given.', $tableName));
 			}
 
 			if (!array_equal(array_keys($pk), $dbPkNames)) {
@@ -1541,7 +1541,7 @@ class DB {
 		}
 		else {
 			if (is_array($dbPkNames)) {
-				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has composite primary key, simple is given.', $tableName));
+				self::exception(self::INPUT_ERROR, _s('Table "%1$s" has a composite primary key, simple is given.', $tableName));
 			}
 
 			$pk = array($dbPkNames => $pk);
