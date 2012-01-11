@@ -487,7 +487,7 @@ Copt::memoryPick();
 
 		foreach ($interfaces as &$interface) {
 			if (!check_db_fields($interfaceDBfields, $interface)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
 			}
 
 			if ($update) {
