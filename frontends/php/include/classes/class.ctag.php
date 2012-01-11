@@ -53,15 +53,15 @@ class CTag extends CObject {
 		echo $this->endToString();
 	}
 
-	// Do not put new line symbol(\n) before or after html tags,
+	// Do not put new line symbol (\n) before or after html tags,
 	// it adds spaces in unwanted places
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
-			$value = str_replace(array("\r", "\n"), '', strval($value));
 			$res .= ' '.$key.'="'.$this->sanitize($value).'"';
 		}
 		$res .= ($this->paired === 'yes') ? '>' : ' />';
+
 		return $res;
 	}
 
@@ -113,7 +113,6 @@ class CTag extends CObject {
 		return $this->attributes['class'];
 	}
 
-	// jQuery style alias
 	public function attr($name, $value = null) {
 		if (is_null($value)) {
 			$this->getAttribute($name);
@@ -166,10 +165,10 @@ class CTag extends CObject {
 		// if there are OK/PROBLEM statuses in hint, we might want them to blink
 		$blinkUpdate = $updateBlinking ? ' jqBlink.findObjects();' : '';
 
-		$this->addAction('onmouseover', "javascript: hintBox.showOver(this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
-		$this->addAction('onmouseout', "javascript: hintBox.hideOut(this);");
+		$this->addAction('onmouseover', 'javascript: hintBox.showOver(this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');'.$blinkUpdate);
+		$this->addAction('onmouseout', 'javascript: hintBox.hideOut(this);');
 		if ($byClick) {
-			$this->addAction('onclick', "javascript: hintBox.onClick(this,".zbx_jsvalue($text).",'".$width."','".$class."');".$blinkUpdate);
+			$this->addAction('onclick', 'javascript: hintBox.onClick(this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');'.$blinkUpdate);
 		}
 		return true;
 	}

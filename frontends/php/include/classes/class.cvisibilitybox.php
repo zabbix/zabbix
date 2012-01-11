@@ -19,34 +19,35 @@
 **/
 ?>
 <?php
-class CVisibilityBox extends CCheckBox{
-	public function __construct($name='visibilitybox', $value='yes', $object_name=null, $replace_to=null){
-		$action = '';
-
-		if(!is_array($object_name)) $object_name = array($object_name);
-
+class CVisibilityBox extends CCheckBox {
+	public function __construct($name = 'visibilitybox', $value = 'yes', $object_name = null, $replace_to = null) {
+		if (!is_array($object_name)) {
+			$object_name = array($object_name);
+		}
 		$this->object_name = $object_name;
 		$this->replace_to = unpack_object($replace_to);
 
-		foreach($this->object_name as $obj_name){
-			if(empty($obj_name)) continue;
-			$action .= 'visibility_status_changeds(this.checked, '.zbx_jsvalue($obj_name).','.zbx_jsvalue($this->replace_to).');';
+		$action = '';
+		foreach ($this->object_name as $obj_name) {
+			if (empty($obj_name)) {
+				continue;
+			}
+			$action .= 'visibility_status_changeds(this.checked, '.zbx_jsvalue($obj_name).', '.zbx_jsvalue($this->replace_to).');';
 		}
-
-		parent::__construct($name, $value, $action, '1');
-
+		parent::__construct($name, $value, $action, 1);
 		insert_javascript_for_visibilitybox();
 	}
 
-	public function toString($destroy=true){
-		if(!isset($this->attributes['checked'])){
-			foreach($this->object_name as $obj_name){
-				if(empty($obj_name)) continue;
-				zbx_add_post_js('visibility_status_changeds(false,'.zbx_jsvalue($obj_name).','.zbx_jsvalue($this->replace_to).');');
+	public function toString($destroy = true) {
+		if (!isset($this->attributes['checked'])) {
+			foreach ($this->object_name as $obj_name) {
+				if (empty($obj_name)) {
+					continue;
+				}
+				zbx_add_post_js('visibility_status_changeds(false, '.zbx_jsvalue($obj_name).', '.zbx_jsvalue($this->replace_to).');');
 			}
 		}
-
-	return parent::toString($destroy);
+		return parent::toString($destroy);
 	}
 }
 ?>

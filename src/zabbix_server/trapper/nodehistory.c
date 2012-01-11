@@ -37,7 +37,7 @@ static size_t	buffer_alloc, tmp_alloc;
  *                                                                            *
  * Function: send_history_last_id                                             *
  *                                                                            *
- * Purpose: send list of last historical tables ids                           *
+ * Purpose: send list of last historical tables IDs                           *
  *                                                                            *
  * Parameters: sock - opened socket of node-node connection                   *
  *             record                                                         *
@@ -100,7 +100,7 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 	if (NULL == (table = DBget_table(buffer)))
 		goto error;
 
-	if (0 == (table->flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
+	if (0 == (table->flags & ZBX_HISTORY))
 		goto error;
 
 	if (NULL == r)

@@ -626,7 +626,7 @@ function cloneRow(elementid, count) {
 }
 
 // dashboard js menu
-function create_page_menu(e,id) {
+function create_page_menu(e, id) {
 	if (!e) {
 		e = window.event;
 	}
@@ -710,7 +710,6 @@ function create_mon_trigger_menu(e, args, items) {
 	show_popup_menu(e, tr_menu, 280);
 }
 
-// users form
 function testUserSound(idx) {
 	var sound = $(idx).options[$(idx).selectedIndex].value;
 	var repeat = $('messages[sounds.repeat]').options[$('messages[sounds.repeat]').selectedIndex].value;
@@ -727,7 +726,7 @@ function testUserSound(idx) {
 }
 
 function removeObjectById(id) {
-	obj = document.getElementById(id);
+	var obj = document.getElementById(id);
 	if (obj != null && typeof(obj) == 'object') {
 		obj.parentNode.removeChild(obj);
 	}
@@ -737,12 +736,43 @@ function removeObjectById(id) {
  * Converts all HTML entities into the corresponding symbols.
  */
 jQuery.unescapeHtml = function(html) {
-	return jQuery("<div />").html(html).text();
+	return jQuery('<div />').html(html).text();
 }
 
 /**
  * Converts all HTML symbols into HTML entities.
  */
 jQuery.escapeHtml = function(html) {
-	return jQuery("<div />").text(html).html();
+	return jQuery('<div />').text(html).html();
+}
+
+function validateNumericBox(obj, allowempty, allownegative) {
+	if (obj != null) {
+		if (allowempty) {
+			if (obj.value.length == 0 || obj.value == null) {
+				obj.value = '';
+			}
+			else {
+				if (isNaN(parseInt(obj.value, 10))) {
+					obj.value = 0;
+				}
+				else {
+					obj.value = parseInt(obj.value, 10);
+				}
+			}
+		}
+		else {
+			if (isNaN(parseInt(obj.value, 10))) {
+				obj.value = 0;
+			}
+			else {
+				obj.value = parseInt(obj.value, 10);
+			}
+		}
+	}
+	if (!allownegative) {
+		if (obj.value < 0) {
+			obj.value = obj.value * -1;
+		}
+	}
 }

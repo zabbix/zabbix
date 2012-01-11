@@ -45,7 +45,7 @@ $fields = array(
 	'pmasterid' =>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,			null),
 	// actions
 	'action' =>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"), null),
-	'state' =>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
+	'state' =>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action})&&("flop"=={action})'),
 );
 check_fields($fields);
 
@@ -122,7 +122,7 @@ if (isset($_REQUEST['favobj'])) {
 		}
 	}
 
-	if ('set_rf_rate' == $_REQUEST['favobj']) {
+	if ($_REQUEST['favobj'] == 'set_rf_rate') {
 		if (str_in_array($_REQUEST['favref'], array('hat_syssum', 'hat_stszbx', 'hat_lastiss', 'hat_webovr', 'hat_dscvry', 'hat_hoststat'))) {
 			CProfile::update('web.dashboard.rf_rate.'.$_REQUEST['favref'], $_REQUEST['favcnt'], PROFILE_TYPE_INT);
 			$_REQUEST['favcnt'] = CProfile::get('web.dashboard.rf_rate.'.$_REQUEST['favref'], 60);
@@ -152,7 +152,7 @@ if (isset($_REQUEST['favobj'])) {
 			$result = rm4favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
-		if (PAGE_TYPE_JS == $page['type'] && $result) {
+		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			$innerHTML = make_favorite_graphs();
 			$innerHTML = $innerHTML->toString();
 			echo '$("hat_favgrph").update('.zbx_jsvalue($innerHTML).');';
@@ -175,7 +175,7 @@ if (isset($_REQUEST['favobj'])) {
 			$result = rm4favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
-		if (PAGE_TYPE_JS == $page['type'] && $result) {
+		if ($page['type'] == PAGE_TYPE_JS&& $result) {
 			$innerHTML = make_favorite_maps();
 			$innerHTML = $innerHTML->toString();
 			echo '$("hat_favmap").update('.zbx_jsvalue($innerHTML).');';
@@ -194,11 +194,11 @@ if (isset($_REQUEST['favobj'])) {
 				$result = add2favorites('web.favorite.screenids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
-		elseif ('remove' == $_REQUEST['action']) {
+		elseif ($_REQUEST['action'] == 'remove') {
 			$result = rm4favorites('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
-		if (PAGE_TYPE_JS == $page['type'] && $result) {
+		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			$innerHTML = make_favorite_screens();
 			$innerHTML = $innerHTML->toString();
 			echo '$("hat_favscr").update('.zbx_jsvalue($innerHTML).');';
@@ -210,7 +210,7 @@ if (isset($_REQUEST['favobj'])) {
 	}
 }
 
-if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once('include/page_footer.php');
 	exit();
 }
@@ -219,7 +219,7 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 require_once('include/views/js/general.script.confirm.js.php');
 
 /*
- * Dsiplay
+ * Display
  */
 $dashboardWidget = new CWidget('dashboard_wdgt');
 $dashboardWidget->setClass('header');
@@ -278,9 +278,9 @@ $leftColumn[] = $fav_maps;
 $refresh_tab = array(
 	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_syssum', 120)),
 	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_stszbx', 120)),
-	array('id' => 'hat_lastiss', 'frequency'  => CProfile::get('web.dashboard.rf_rate.hat_lastiss', 60)),
-	array('id' => 'hat_webovr', 'frequency'  => CProfile::get('web.dashboard.rf_rate.hat_webovr', 60)),
-	array('id' => 'hat_hoststat', 'frequency'  => CProfile::get('web.dashboard.rf_rate.hat_hoststat', 60))
+	array('id' => 'hat_lastiss', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_lastiss', 60)),
+	array('id' => 'hat_webovr', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_webovr', 60)),
+	array('id' => 'hat_hoststat', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_hoststat', 60))
 );
 
 /*

@@ -25,10 +25,8 @@ require_once(dirname(__FILE__).'/User.php');
 require_once(dirname(__FILE__).'/CHost.php');
 require_once(dirname(__FILE__).'/CItem.php');
 
-class ApiJsonTests
-{
-	public static function suite()
-	{
+class ApiJsonTests {
+	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
 
 		$suite->addTestSuite('API_JSON_APIInfo');
