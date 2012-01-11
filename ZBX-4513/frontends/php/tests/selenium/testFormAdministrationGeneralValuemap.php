@@ -28,9 +28,8 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 	public function testFormAdministrationGeneralValuemap_Layout() {
 
-		$this->login('config.php');
+		$this->login('adm.valuemapping.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Value mapping');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
 		$this->ok('Value mapping');
@@ -74,11 +73,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 	*/
 	public function testFormAdministrationGeneralValuemap_AddValueMap($mapname, $value, $newvalue) {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Value mapping');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Value mapping');
+		$this->login('adm.valuemapping.php');
 		$this->button_click('form');
 		$this->wait();
 		$this->ok(array('Name', 'Mapping', 'New mapping'));
@@ -125,11 +120,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$value3 = '3';
 		$newvalue3 = 'three';
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown','Value mapping');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Value mapping');
+		$this->login('adm.valuemapping.php');
 		$this->button_click('form');
 		$this->wait();
 		$this->ok(array('Name', 'Mapping', 'New mapping'));
@@ -164,11 +155,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 	*/
 	public function testFormAdministrationGeneralValuemap_UpdateValueMap($oldVmName, $newVmName) {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Value mapping');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Value mapping');
+		$this->login('adm.valuemapping.php');
 		$this->click('link='.$oldVmName);
 		$this->wait();
 		$this->input_type("mapname", $newVmName);
@@ -181,11 +168,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 	public function testFormAdministrationGeneralValuemap_IncorrectValueMap() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Value mapping');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Value mapping');
+		$this->login('adm.valuemapping.php');
 		$this->button_click('form');
 		$this->wait();
 		$this->ok('Name');
@@ -215,13 +198,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 	*/
 	public function testFormAdministrationGeneralValuemap_DeleteValueMap($oldVmName, $newVmName) {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown','Value mapping');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Value mapping');
-		$this->ok('Name');
-		$this->ok('Value map');
+		$this->login('adm.valuemapping.php');
 		$this->click('link='.$newVmName);
 		$this->wait();
 		$this->chooseOkOnNextConfirmation();
@@ -237,12 +214,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 	public function testFormAdministrationGeneralValuemap_CancelDeleteValueMap() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown','Value mapping');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Value mapping');
-		$this->ok('Name','Value map');
+		$this->login('adm.valuemapping.php');
 		$this->click('link='.$this->valuemapWithMultipleMappings);
 		$this->wait();
 		$this->button_click("cancel");
@@ -255,12 +227,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 	public function testFormAdministrationGeneralValuemap_DeleteRemainingValueMaps() {
 
 		// finally deleting remaining value maps
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown','Value mapping');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Value mapping');
-		$this->ok('Name','Value map');
+		$this->login('adm.valuemapping.php');
 		$this->click('link='.$this->valuemapWithMultipleMappings);
 		$this->wait();
 		$this->chooseOkOnNextConfirmation();

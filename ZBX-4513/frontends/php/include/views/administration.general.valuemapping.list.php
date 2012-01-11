@@ -21,7 +21,6 @@
 <?php
 $valueMappingForm = new CForm();
 $valueMappingForm->setName('valuemappingForm');
-$valueMappingForm->addVar('config', 6);
 $valueMappingForm->addItem(BR());
 
 $valueMappingTable = new CTableInfo();
@@ -35,7 +34,7 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 	foreach ($maps as $map) {
 		array_push($mappings_row, $map['value'], SPACE.RARR.SPACE, $map['newvalue'], BR());
 	}
-	$valueMappingTable->addRow(array(new CLink($valuemap['name'],'config.php?form=update&valuemapid='.$valuemap['valuemapid'].url_param('config')), empty($mappings_row) ? SPACE : $mappings_row));
+	$valueMappingTable->addRow(array(new CLink($valuemap['name'],'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']), empty($mappings_row) ? SPACE : $mappings_row));
 }
 
 $valueMappingForm->addItem($valueMappingTable);
