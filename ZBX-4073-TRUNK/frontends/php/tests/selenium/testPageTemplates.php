@@ -21,53 +21,49 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageTemplates extends CWebTest
-{
+class testPageTemplates extends CWebTest {
 	// Returns all templates
-	public static function allTemplates()
-	{
+	public static function allTemplates() {
 		return DBdata("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
 	}
 
 	/**
 	* @dataProvider allTemplates
 	*/
-	public function testPageTemplates_CheckLayout($template)
-	{
+	public function testPageTemplates_CheckLayout($template) {
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','Templates');
+		$this->dropdown_select_wait('groupid', 'Templates');
 //		$this->wait();
 		$this->assertTitle('Templates');
 		$this->ok('TEMPLATES');
 		$this->ok('Displaying');
 		// Header
-		$this->ok(array('Templates','Applications','Items','Triggers','Graphs','Screens','Discovery','Linked templates','Linked to'));
+		$this->ok(array('Templates', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Linked templates', 'Linked to'));
 		// Data
 		$this->ok(array($template['name']));
-		$this->dropdown_select('go','Export selected');
-		$this->dropdown_select('go','Delete selected');
-		$this->dropdown_select('go','Delete selected with linked elements');
+		$this->dropdown_select('go', 'Export selected');
+		$this->dropdown_select('go', 'Delete selected');
+		$this->dropdown_select('go', 'Delete selected with linked elements');
 	}
 
 	/**
 	* @dataProvider allTemplates
 	*/
-	public function testPageTemplates_SimpleUpdate($template)
-	{
-		$host=$template['host'];
-		$name=$template['name'];
+	public function testPageTemplates_SimpleUpdate($template) {
+		$host = $template['host'];
+		$name = $template['name'];
 
-		$sql1="select * from hosts where host='$host'";
-		$oldHashTemplate=DBhash($sql1);
-		$sql2="select * from hosts order by hostid";
-		$oldHashHosts=DBhash($sql2);
-		$sql3="select * from items order by itemid";
-		$oldHashItems=DBhash($sql3);
-		$sql4="select * from triggers order by triggerid";
-		$oldHashTriggers=DBhash($sql4);
+		$sql1 = "select * from hosts where host='$host'";
+		$oldHashTemplate = DBhash($sql1);
+		$sql2 = "select * from hosts order by hostid";
+		$oldHashHosts = DBhash($sql2);
+		$sql3 = "select * from items order by itemid";
+		$oldHashItems = DBhash($sql3);
+		$sql4 = "select * from triggers order by triggerid";
+		$oldHashTriggers = DBhash($sql4);
 
 		$this->login('templates.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 
 		$this->assertTitle('Templates');
 
@@ -81,62 +77,53 @@ class testPageTemplates extends CWebTest
 		$this->ok("$name");
 		$this->ok('TEMPLATES');
 
-		$this->assertEquals($oldHashTemplate,DBhash($sql1));
-		$this->assertEquals($oldHashHosts,DBhash($sql2));
-		$this->assertEquals($oldHashItems,DBhash($sql3));
-		$this->assertEquals($oldHashTriggers,DBhash($sql4));
+		$this->assertEquals($oldHashTemplate, DBhash($sql1));
+		$this->assertEquals($oldHashHosts, DBhash($sql2));
+		$this->assertEquals($oldHashItems, DBhash($sql3));
+		$this->assertEquals($oldHashTriggers, DBhash($sql4));
 	}
 
-	public function testPageTemplates_Create()
-	{
+	public function testPageTemplates_Create() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageTemplates_Import()
-	{
+	public function testPageTemplates_Import() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageTemplates_MassExportAll()
-	{
+	public function testPageTemplates_MassExportAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageTemplates_MassExport()
-	{
+	public function testPageTemplates_MassExport() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageTemplates_MassDeleteAll()
-	{
+	public function testPageTemplates_MassDeleteAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageTemplates_MassDelete()
-	{
+	public function testPageTemplates_MassDelete() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageTemplates_MassDeleteWithLinkedElementsAll()
-	{
+	public function testPageTemplates_MassDeleteWithLinkedElementsAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageTemplates_MassDeleteWithLinkedElements()
-	{
+	public function testPageTemplates_MassDeleteWithLinkedElements() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageTemplates_Sorting()
-	{
+	public function testPageTemplates_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}
