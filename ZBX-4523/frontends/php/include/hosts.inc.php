@@ -1601,7 +1601,7 @@ return $result;
 
 		$result=DBselect('SELECT * FROM hosts_profiles WHERE hostid='.$hostid);
 		if(DBfetch($result)){
-			error(S_HOST_PROFILE.SPACE.S_ALREADY_EXISTS);
+			error(S_HOST_PROFILE_ALREADY_EXISTS);
 			return 0;
 		}
 
@@ -1642,7 +1642,7 @@ return $result;
 
 		$result=DBselect('SELECT * FROM hosts_profiles_ext WHERE hostid='.$hostid);
 		if(DBfetch($result)){
-			error(S_HOST_PROFILE.SPACE.S_ALREADY_EXISTS);
+			error(S_HOST_PROFILE_ALREADY_EXISTS);
 			return false;
 		}
 

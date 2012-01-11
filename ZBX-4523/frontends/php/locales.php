@@ -129,7 +129,7 @@ if(isset($_REQUEST['next'])){
 
 	show_table_header(S_LOCALES);
 
-	$frmLcls = new CFormTable(SPACE.S_CREATE.SPACE.S_LOCALE_SMALL.SPACE.S_FROM_SMALL.SPACE.$ZBX_LOCALES[$_REQUEST['srclang']],'locales.php?action=1','post',null,'form');
+	$frmLcls = new CFormTable(SPACE.S_CREATE_LOCALE_FROM.SPACE.$ZBX_LOCALES[$_REQUEST['srclang']],'locales.php?action=1','post',null,'form');
 	$frmLcls->setAttribute('id','locales');
 	$frmLcls->setHelp($help);
 
@@ -197,7 +197,7 @@ else{
 	show_table_header(S_LOCALES);
 	echo SBR;
 
-	$frmLcls = new CFormTable(S_CREATE.SPACE.S_LOCALE_SMALL,'locales.php','post',null,'form');
+	$frmLcls = new CFormTable(S_CREATE_LOCALE,'locales.php','post',null,'form');
 	$frmLcls->setAttribute('id','locales');
 
 	$cmbLang = new CComboBox('srclang',get_request('srclang','en_gb'));

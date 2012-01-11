@@ -84,7 +84,7 @@ include_once('include/page_header.php');
 			DBstart();
 			$old_group = CHostGroup::get(array('groupids' => $_REQUEST['groupid'],	'output' => API_OUTPUT_EXTEND));
 			$old_group = reset($old_group);
-		
+
 			$result = CHostGroup::update(array('groupid' => $_REQUEST['groupid'], 'name' => $_REQUEST['gname']));
 			if($result){
 				$options = array(
@@ -261,7 +261,7 @@ include_once('include/page_header.php');
 			}
 		}
 
-		
+
 
 		$frmHostG = new CFormTable($frm_title, 'hostgroups.php');
 		$frmHostG->setName('hg_form');
@@ -284,10 +284,10 @@ include_once('include/page_header.php');
 			$gr = reset($db_groups);
 			$twb_groupid = $gr['groupid'];
 		}
-		
-		
 
-		
+
+
+
 		//creating <select> with list of host groups
 		$cmbGroups = new CComboBox('twb_groupid', $twb_groupid, 'submit()');
 
@@ -359,7 +359,7 @@ include_once('include/page_header.php');
 				$cmbHosts->addItem($host['hostid'], $host['host'], true, false);
 		}
 
-		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS.SPACE.S_IN,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
+		$frmHostG->addRow(S_HOSTS, $cmbHosts->Get(S_HOSTS_IN,array(S_OTHER_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
 
 		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
 		if($groupid > 0){

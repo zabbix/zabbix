@@ -107,7 +107,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		}
 
 		$filterForm->addRow(S_TRIGGER,$cmbTrigs);
-		$filterForm->addRow(S_FILTER.SPACE.S_HOST_GROUP,$cmbHGrps);
+		$filterForm->addRow(S_FILTER_HOST_GROUP,$cmbHGrps);
 	}
 
 //*
@@ -218,8 +218,8 @@ function bar_report_form(){
 	$reportForm->addVar('report_timetill',  date('YmdHis', $report_timetill));
 
 	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
-	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
-	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
+	$reportForm->addRow(S_X_LABEL, new CTextBox('xlabel',$xlabel,40));
+	$reportForm->addRow(S_Y_LABEL, new CTextBox('ylabel',$ylabel,40));
 	$reportForm->addRow(S_LEGEND, new CCheckBox('showlegend',$showlegend,null,1));
 
 	$scale = new CComboBox('scaletype', $scaletype);
@@ -386,8 +386,8 @@ function bar_report_form2(){
 // periods add later
 
 	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
-	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
-	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
+	$reportForm->addRow(S_X_LABEL, new CTextBox('xlabel',$xlabel,40));
+	$reportForm->addRow(S_Y_LABEL, new CTextBox('ylabel',$ylabel,40));
 
 	$reportForm->addRow(S_LEGEND, new CCheckBox('showlegend',$showlegend,null,1));
 
@@ -543,8 +543,8 @@ function bar_report_form3(){
 //	$reportForm->addVar('periods',$periods);
 
 	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
-	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
-	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
+	$reportForm->addRow(S_X_LABEL, new CTextBox('xlabel',$xlabel,40));
+	$reportForm->addRow(S_Y_LABEL, new CTextBox('ylabel',$ylabel,40));
 
 	$reportForm->addRow(S_LEGEND, new CCheckBox('showlegend',$showlegend,null,1));
 	$reportForm->addVar('sortorder',0);
@@ -565,7 +565,7 @@ function bar_report_form3(){
 		$group_tb->addItem($group['groupid'],$group['name']);
 	}
 
-	$reportForm->addRow(S_GROUPS, $group_tb->Get(S_SELECTED_GROUPS,S_OTHER.SPACE.S_GROUPS));
+	$reportForm->addRow(S_GROUPS, $group_tb->Get(S_SELECTED_GROUPS,S_OTHER_GROUPS));
 // ----------
 
 // HOSTS
@@ -610,7 +610,7 @@ function bar_report_form3(){
 			$host_tb->addItem($host['hostid'],$host['host']);
 	}
 
-	$reportForm->addRow(S_HOSTS, $host_tb->Get(S_SELECTED_HOSTS,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
+	$reportForm->addRow(S_HOSTS, $host_tb->Get(S_SELECTED_HOSTS,array(S_OTHER_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
 // ----------
 //*/
 // PERIOD

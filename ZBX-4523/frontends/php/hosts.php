@@ -311,7 +311,7 @@ include_once('include/page_header.php');
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
 		if($result) $result = zbxXML::parseMain($rules);
 		$result = DBend($result);
-		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
+		show_messages($result, S_IMPORTED_SUCCESSEFULLY, S_IMPORT_FAILED);
 	}
 
 /* FILTER */
@@ -445,7 +445,7 @@ include_once('include/page_header.php');
 
 			DBend(true);
 
-			show_messages(true, S_HOSTS.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HOSTS);
+			show_messages(true, S_HOSTS_UPDATED, S_CANNOT_UPDATE_HOSTS);
 
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
@@ -457,7 +457,7 @@ include_once('include/page_header.php');
 		}
 		catch(Exception $e){
 			DBend(false);
-			show_messages(false, S_HOSTS.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HOSTS);
+			show_messages(false, S_HOSTS_UPDATED, S_CANNOT_UPDATE_HOSTS);
 		}
 
 		unset($_REQUEST['save']);

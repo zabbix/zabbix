@@ -1170,7 +1170,7 @@ function make_graph_menu(&$menu,&$submenu){
 		);
 
 	$menu['menu_graphs'][] = array(
-				S_ADD.SPACE.S_GRAPH,
+				S_ADD_GRAPH,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=graphs".
 					'&srcfld1=graphid'.
@@ -1182,7 +1182,7 @@ function make_graph_menu(&$menu,&$submenu){
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))
 		);
 	$menu['menu_graphs'][] = array(
-				S_ADD.SPACE.S_SIMPLE_GRAPH,
+				S_ADD_SIMPLE_GRAPH,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=simple_graph".
 					'&srcfld1=itemid'.
@@ -1273,7 +1273,7 @@ function make_graph_submenu(){
 
 	if(isset($graph_added)){
 			$favGraphs[] = array(
-			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_GRAPHS,
+			'name'	=>	S_REMOVE_ALL_GRAPHS,
 			'favobj'=>	'graphid',
 			'favid'	=>	0,
 			'action'=>	'remove'
@@ -1282,7 +1282,7 @@ function make_graph_submenu(){
 
 	if(isset($item_added)){
 		$favGraphs[] = array(
-			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SIMPLE_GRAPHS,
+			'name'	=>	S_REMOVE_ALL_SIMPLE_GRAPHS,
 			'favobj'=>	'itemid',
 			'favid'	=>	0,
 			'action'=>	'remove'
@@ -1296,7 +1296,7 @@ function make_sysmap_menu(&$menu,&$submenu){
 
 	$menu['menu_sysmaps'][] = array(S_FAVOURITE_MAPS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_sysmaps'][] = array(
-				S_ADD.SPACE.S_MAP,
+				S_ADD_MAP,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=sysmaps".
 					'&srcfld1=sysmapid'.
@@ -1336,7 +1336,7 @@ function make_sysmap_submenu(){
 
 	if(!empty($favMaps)){
 		$favMaps[] = array(
-				'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_MAPS,
+				'name'	=>	S_REMOVE_ALL_MAPS,
 				'favobj'=>	'sysmapid',
 				'favid'	=>	0,
 				'action'=>	'remove'
@@ -1350,7 +1350,7 @@ function make_screen_menu(&$menu,&$submenu){
 
 	$menu['menu_screens'][] = array(S_FAVOURITE_SCREENS, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
 	$menu['menu_screens'][] = array(
-				S_ADD.SPACE.S_SCREEN,
+				S_ADD_SCREEN,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=screens".
 					'&srcfld1=screenid'.
@@ -1361,7 +1361,7 @@ function make_screen_menu(&$menu,&$submenu){
 				array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu')
 		));
 	$menu['menu_screens'][] = array(
-				S_ADD.SPACE.S_SLIDESHOW,
+				S_ADD_SLIDESHOW,
 				'javascript: '.
 				"PopUp('popup.php?srctbl=slides".
 					'&srcfld1=slideshowid'.
@@ -1429,7 +1429,7 @@ function make_screen_submenu(){
 
 	if(isset($screen_added)){
 		$favScreens[] = array(
-			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SCREENS,
+			'name'	=>	S_REMOVE_ALL_SCREENS,
 			'favobj'=>	'screenid',
 			'favid'	=>	0,
 			'action'=>	'remove'
@@ -1438,7 +1438,7 @@ function make_screen_submenu(){
 
 	if(isset($slide_added)){
 		$favScreens[] = array(
-			'name'	=>	S_REMOVE.SPACE.S_ALL_S.SPACE.S_SLIDES,
+			'name'	=>	S_REMOVE_ALL_SLIDES,
 			'favobj'=>	'slideshowid',
 			'favid'	=>	0,
 			'action'=>	'remove'

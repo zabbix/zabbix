@@ -135,7 +135,7 @@ include_once('include/page_header.php');
 		if($result) $result = zbxXML::parseMap($rules);
 
 		$result = DBend($result);
-		show_messages($result, S_IMPORTED.SPACE.S_SUCCESSEFULLY_SMALL, S_IMPORT.SPACE.S_FAILED_SMALL);
+		show_messages($result, S_IMPORTED_SUCCESSEFULLY, S_IMPORT_FAILED);
 	}
 
 ?>

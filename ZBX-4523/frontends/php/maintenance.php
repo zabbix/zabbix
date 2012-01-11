@@ -233,7 +233,7 @@ include_once('include/page_header.php');
 
 		$result = false;
 		if($new_timeperiod['period'] < 300) {	/* 5 min */
-			info(S_INCORRECT_MAINTENANCE_PERIOD.' ('.S_MIN_SMALL.SPACE.S_5_MINUTES.')');
+			info(S_INCORRECT_MAINTENANCE_PERIOD.' ('.S_MIN_5_MINUTES.')');
 		}
 		else if(($new_timeperiod['hour'] > 23) || ($new_timeperiod['minute'] > 59)){
 			info(S_INCORRECT_MAINTENANCE_PERIOD);
@@ -558,7 +558,7 @@ include_once('include/page_header.php');
 		}
 
 		$tblHlink = new CTable(null, 'formElementTable');
-		$tblHlink->addRow($host_tb->Get(S_IN.SPACE.S_MAINTENANCE, array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
+		$tblHlink->addRow($host_tb->Get(S_IN_MAINTENANCE, array(S_OTHER_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE, $cmbGroups)));
 
 		$right_tab->addRow(new CFormElement(S_HOSTS_IN_MAINTENANCE, $tblHlink));
 // }}} MAINTENANCE HOSTS
@@ -586,7 +586,7 @@ include_once('include/page_header.php');
 			$group_tb->addItem($group['groupid'], $group['name']);
 		}
 
-		$tblGlink->addRow($group_tb->Get(S_IN.SPACE.S_MAINTENANCE, S_OTHER.SPACE.S_GROUPS));
+		$tblGlink->addRow($group_tb->Get(S_IN_MAINTENANCE, S_OTHER_GROUPS));
 
 		$right_tab->addRow(new CFormElement(S_GROUPS_IN_MAINTENANCE, $tblGlink));
 // }}} MAINTENANCE GROUPS

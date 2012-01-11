@@ -96,7 +96,7 @@ include_once('include/page_header.php');
 
 			$result=update_config($config);
 
-			show_messages($result, S_ZABBIX_INTERNAL_AUTH.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HTTP_AUTH);
+			show_messages($result, S_ZABBIX_INTERNAL_AUTH_UPDATED, S_CANNOT_UPDATE_HTTP_AUTH);
 
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_HTTP_AUTH);
@@ -135,7 +135,7 @@ include_once('include/page_header.php');
 				$result=update_config($config);
 			}
 
-			show_messages($result, S_LDAP.SPACE.S_UPDATED, S_LDAP.SPACE.S_WAS_NOT.SPACE.S_UPDATED);
+			show_messages($result, S_LDAP_UPDATED, S_LDAP_WAS_NOT_UPDATED);
 
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_LDAP);
@@ -154,7 +154,7 @@ include_once('include/page_header.php');
 
 			$result = CUser::ldapLogin(array('user'=>$alias,'password'=>$passwd,'cnf'=>$ldap_cnf));
 
-			show_messages($result, S_LDAP.SPACE.S_LOGIN.SPACE.S_SUCCESSFUL_SMALL, S_LDAP.SPACE.S_LOGIN.SPACE.S_WAS_NOT.SPACE.S_SUCCESSFUL_SMALL);
+			show_messages($result, S_LDAP_LOGIN_SUCCESSFUL_SMALL, S_LDAP_LOGIN_WAS_NOT_SUCCESSFUL_SMALL);
 		}
 	}
 	else if(ZBX_AUTH_HTTP==$_REQUEST['config']){
@@ -189,7 +189,7 @@ include_once('include/page_header.php');
 
 			$result=update_config($config);
 
-			show_messages($result, S_HTTP_AUTH.SPACE.S_UPDATED, S_CANNOT_UPDATE.SPACE.S_HTTP_AUTH);
+			show_messages($result, S_HTTP_AUTH_UPDATED, S_CANNOT_UPDATE_HTTP_AUTH);
 
 			if($result){
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,S_HTTP_AUTH);
@@ -216,7 +216,7 @@ include_once('include/page_header.php');
 	}
 
 	show_table_header(S_AUTHENTICATION_TO_ZABBIX, $auth);
-	
+
 	if(ZBX_AUTH_INTERNAL==$_REQUEST['config']){
 
 		$form_refresh_internal = get_request('form_refresh_internal',0);
@@ -234,7 +234,7 @@ include_once('include/page_header.php');
 		$frmAuth->addRow(S_DEFAULT_AUTHENTICATION, $cmbConfig);
 
 		$action = "javascript: if(confirm('".S_SWITCHING_HTTP."')) return true; else return false;";
-		$frmAuth->addRow(S_ZABBIX_INTERNAL_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_INTERNAL == $config['authentication_type']), $action, ZBX_AUTH_INTERNAL));
+		$frmAuth->addRow(S_ZABBIX_INTERNAL_AUTH_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_INTERNAL == $config['authentication_type']), $action, ZBX_AUTH_INTERNAL));
 
 		$frmAuth->addItemToBottomRow(new CButton('save',S_SAVE));
 		$frmAuth->Show();
@@ -265,7 +265,7 @@ include_once('include/page_header.php');
 
 		$frmAuth->addRow(S_DEFAULT_AUTHENTICATION, $cmbConfig);
 
-		$frmAuth->addRow(S_LDAP.SPACE.S_HOST, new CTextBox('ldap_host',$config['ldap_host'],64));
+		$frmAuth->addRow(S_LDAP_HOST, new CTextBox('ldap_host',$config['ldap_host'],64));
 		$frmAuth->addRow(S_PORT, new CNumericBox('ldap_port',$config['ldap_port'],5));
 
 		$frmAuth->addRow(S_BASE_DN,new CTextBox('ldap_base_dn',$config['ldap_base_dn'],64));
@@ -275,9 +275,9 @@ include_once('include/page_header.php');
 		$frmAuth->addRow(S_BIND_PASSWORD.'*',new CPassBox('ldap_bind_password',$config['ldap_bind_password']));
 
 		$action = "javascript: if(confirm('".S_SWITCHING_LDAP."')) return true; else return false;";
-		$frmAuth->addRow(S_LDAP.SPACE.S_AUTHENTICATION.SPACE.S_ENABLED, new CCheckBox('authentication_type', $config['authentication_type'],$action,ZBX_AUTH_LDAP));
+		$frmAuth->addRow(S_LDAP_AUTHENTICATION_ENABLED, new CCheckBox('authentication_type', $config['authentication_type'],$action,ZBX_AUTH_LDAP));
 
-		$frmAuth->addRow(S_TEST.SPACE.S_AUTHENTICATION, ' ['.S_MUST_BE_VALID_SMALL.SPACE.S_LDAP.SPACE.S_USER.']');
+		$frmAuth->addRow(S_TEST_AUTHENTICATION, ' ['.S_MUST_BE_VALID_LDAP_USER.']');
 
 		if(GROUP_GUI_ACCESS_INTERNAL == get_user_auth($USER_DETAILS['userid'])){
 			$usr_test = new CComboBox('user', $USER_DETAILS['alias']);
@@ -297,7 +297,7 @@ include_once('include/page_header.php');
 		}
 
 		$frmAuth->addRow(S_LOGIN , $usr_test);
-		$frmAuth->addRow(S_USER.SPACE.S_PASSWORD,new CPassBox('user_password'));
+		$frmAuth->addRow(S_USER_PASSWORD,new CPassBox('user_password'));
 
 		$frmAuth->addItemToBottomRow(new CButton('save',S_SAVE));
 		$frmAuth->addItemToBottomRow(new CButton('test',S_TEST));
@@ -320,7 +320,7 @@ include_once('include/page_header.php');
 		$frmAuth->addRow(S_DEFAULT_AUTHENTICATION, $cmbConfig);
 
 		$action = "javascript: if(confirm('".S_SWITCHING_HTTP."')) return true; else return false;";
-		$frmAuth->addRow(S_HTTP_AUTH.SPACE.S_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_HTTP == $config['authentication_type']), $action, ZBX_AUTH_HTTP));
+		$frmAuth->addRow(S_HTTP_AUTH_ENABLED, new CCheckBox('authentication_type', (ZBX_AUTH_HTTP == $config['authentication_type']), $action, ZBX_AUTH_HTTP));
 
 		$frmAuth->addItemToBottomRow(new CButton('save',S_SAVE));
 		$frmAuth->Show();

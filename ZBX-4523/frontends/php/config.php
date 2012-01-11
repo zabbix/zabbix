@@ -211,7 +211,7 @@ include_once('include/page_header.php');
 			if(!is_null($val = get_request('event_ack_enable')))
 				$msg[] = S_EVENT_ACKNOWLEDGES.' ['.($val?(S_DISABLED):(S_ENABLED)).']';
 			if(!is_null($val = get_request('event_expire')))
-				$msg[] = S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')'.' ['.$val.']';
+				$msg[] = S_SHOW_EVENTS_NOT_OLDER_DAYS.' ['.$val.']';
 			if(!is_null($val = get_request('event_show_max')))
 				$msg[] = S_SHOW_EVENTS_MAX.' ['.$val.']';
 			if(!is_null($val = get_request('dropdown_first_entry')))
@@ -1026,7 +1026,7 @@ include_once('include/page_header.php');
 		$frmGUI->addRow(S_SEARCH_LIMIT, new CNumericBox('search_limit', $config['search_limit'], 6));
 		$frmGUI->addRow(S_MAX_IN_TABLE, new CNumericBox('max_in_table', $config['max_in_table'], 5));
 		$frmGUI->addRow(S_EVENT_ACKNOWLEDGES,$exp_select);
-		$frmGUI->addRow(S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')',
+		$frmGUI->addRow(S_SHOW_EVENTS_NOT_OLDER_DAYS,
 			new CTextBox('event_expire',$config['event_expire'],5));
 		$frmGUI->addRow(S_MAX_COUNT_OF_EVENTS,
 			new CTextBox('event_show_max',$config['event_show_max'],5));

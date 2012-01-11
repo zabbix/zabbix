@@ -1353,7 +1353,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 				new CButton('add_opcondition', S_ADD),
 				new CButton('cancel_new_opcondition', S_CANCEL)
 			);
-			$right_tab->addRow(new CFormElement(S_NEW.SPACE.S_OPERATION_CONDITION, $tblCond, $footer));
+			$right_tab->addRow(new CFormElement(S_NEW_OPERATION_CONDITION, $tblCond, $footer));
 		}
 // }}} NEW OPERATION CONDITION
 

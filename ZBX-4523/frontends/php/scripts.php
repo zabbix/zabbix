@@ -209,7 +209,7 @@ validate_sort_and_sortorder('name',ZBX_SORT_UP);
 		$select_acc->addItem(PERM_READ_ONLY,S_READ);
 		$select_acc->addItem(PERM_READ_WRITE,S_WRITE);
 
-		$frmScr->addRow(S_REQUIRED_HOST.SPACE.S_PERMISSIONS_SMALL,$select_acc);
+		$frmScr->addRow(S_REQUIRED_HOST_PERMISSIONS,$select_acc);
 
 		$frmScr->addItemToBottomRow(new CButton('save',S_SAVE,"javascript: document.getElementById('scripts').action+='?action=1'; "));
 		$frmScr->addItemToBottomRow(SPACE);

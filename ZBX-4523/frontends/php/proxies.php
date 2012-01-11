@@ -180,7 +180,7 @@
 	if(isset($_REQUEST['form'])){
 		$_REQUEST['hostid'] = get_request('hostid', 0);
 		$frm_title = S_PROXY;
-		
+
 		$frmHostG = new CFormTable($frm_title, 'proxies.php');
 		$frmHostG->setHelp('web.proxy.php');
 
@@ -270,12 +270,12 @@
 				($db_host['proxy_hostid'] == 0 || ($_REQUEST['hostid']>0) && ($db_host['proxy_hostid'] == $_REQUEST['hostid']))
 			);
 		}
-		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_PROXY.SPACE.S_HOSTS,S_OTHER.SPACE.S_HOSTS));
+		$frmHostG->addRow(S_HOSTS,$cmbHosts->Get(S_PROXY_HOSTS,S_OTHER_HOSTS));
 
 		$frmHostG->addItemToBottomRow(new CButton('save',S_SAVE));
 		if($_REQUEST['hostid']>0){
 			$frmHostG->addItemToBottomRow(array(
-				SPACE, new CButton('clone',S_CLONE), 
+				SPACE, new CButton('clone',S_CLONE),
 				SPACE, new CButtonDelete(S_DELETE_SELECTED_PROXY_Q, url_param('form').url_param('hostid')),
 				SPACE
 			));
@@ -325,7 +325,7 @@
 		$paging = getPagingLine($proxies);
 // --
 
-// CALCULATE PERFORMANCE {{{ 
+// CALCULATE PERFORMANCE {{{
 		$proxyids = array_keys($proxies);
 		$sql = 'SELECT h.proxy_hostid, sum(1.0/i.delay) as qps '.
 				' FROM items i,hosts h '.
@@ -359,7 +359,7 @@
 
 		foreach($proxies as $pnum => $proxy){
 			$hosts = array();
-			
+
 			foreach($proxy['hosts'] as $host){
 				$style = ($host['status']==HOST_STATUS_MONITORED) ? 'off':(($host['status']==HOST_STATUS_TEMPLATE)?'unknown' :'on');
 				$hosts[] = new CLink($host['host'], 'hosts.php?form=update&hostid='.$host['hostid'], $style);

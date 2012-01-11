@@ -729,7 +729,7 @@
 		$user_tb->addItem($row['userid'], $row['alias']);
 	}
 
-	$frmUserG->addRow(S_USERS, $user_tb->get(S_IN.SPACE.S_GROUP,array(S_OTHER.SPACE.S_GROUPS.SPACE.'|'.SPACE, $cmbGroups)));
+	$frmUserG->addRow(S_USERS, $user_tb->get(S_IN_GROUP,array(S_OTHER_GROUPS.SPACE.'|'.SPACE, $cmbGroups)));
 // -
 
 /////////////////
@@ -3643,7 +3643,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+		$table->setHeader(array(S_ELEMENT, S_UPDATE_EXISTING, S_ADD_MISSING), 'bold');
 
 		$titles = array('screen' => S_SCREEN);
 
@@ -3831,7 +3831,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		$templates = get_request('templates', array());
 		natsort($templates);
 
-		$frm_title = S_HOST.SPACE.S_MASS_UPDATE;
+		$frm_title = S_HOST_MASS_UPDATE;
 
 		$frmHost = new CFormTable($frm_title, 'hosts.php');
 		$frmHost->setHelp('web.hosts.host.php');
@@ -3856,7 +3856,7 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 
 		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL), S_REPLACE_HOST_GROUPS),
-						$grp_tb->get(S_IN.SPACE.S_GROUPS, S_OTHER.SPACE.S_GROUPS)
+						$grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS)
 					);
 
 		$frmHost->addRow(array(new CVisibilityBox('visible[newgroup]', isset($visible['newgroup']), 'newgroup', S_ORIGINAL), S_NEW_HOST_GROUP),
@@ -4101,7 +4101,7 @@ JAVASCRIPT;
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+		$table->setHeader(array(S_ELEMENT, S_UPDATE_EXISTING, S_ADD_MISSING), 'bold');
 
 		$titles = array('host' => $template?S_TEMPLATE:S_HOST, 'template' => S_TEMPLATE_LINKAGE, 'item' => S_ITEM, 'trigger' => S_TRIGGER, 'graph' => S_GRAPH);
 		foreach($titles as $key => $title){
@@ -4717,7 +4717,7 @@ JAVASCRIPT;
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+		$table->setHeader(array(S_ELEMENT, S_UPDATE_EXISTING, S_ADD_MISSING), 'bold');
 
 		$titles = array('maps' => S_MAP);
 		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
