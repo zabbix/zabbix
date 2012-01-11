@@ -131,7 +131,7 @@ require_once('include/page_header.php');
 
 /************************* FILTER **************************/
 /***********************************************************/
-	$filterForm = new CFormTable();
+	$filterForm = new CFormTable(null, null, 'get');
 	$filterForm->setAttribute('name','zbx_filter');
 	$filterForm->setAttribute('id','zbx_filter');
 

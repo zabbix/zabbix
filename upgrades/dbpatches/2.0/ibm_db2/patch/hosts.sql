@@ -113,7 +113,7 @@ ALTER TABLE items ADD inventory_link integer WITH DEFAULT '0' NOT NULL
 /
 REORG TABLE items
 /
-ALTER TABLE items ADD lifetime varchar(64) WITH DEFAULT '0' NOT NULL
+ALTER TABLE items ADD lifetime varchar(64) WITH DEFAULT '30' NOT NULL
 /
 REORG TABLE items
 /
