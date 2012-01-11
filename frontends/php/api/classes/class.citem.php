@@ -105,8 +105,8 @@ class CItem extends CItemGeneral {
 			'selectTriggers'			=> null,
 			'selectGraphs'				=> null,
 			'selectApplications'		=> null,
-			'selectPrototypes'			=> null,
 			'selectDiscoveryRule'		=> null,
+			'selectItemDiscovery'       => null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -492,9 +492,6 @@ class CItem extends CItemGeneral {
 					if (!is_null($options['selectApplications']) && !isset($result[$item['itemid']]['applications'])) {
 						$result[$item['itemid']]['applications'] = array();
 					}
-					if (!is_null($options['selectPrototypes']) && !isset($result[$item['itemid']]['prototypes'])) {
-						$result[$item['itemid']]['prototypes'] = array();
-					}
 					if (!is_null($options['selectDiscoveryRule']) && !isset($result[$item['itemid']]['discoveryRule'])) {
 						$result[$item['itemid']]['discoveryRule'] = array();
 					}
@@ -708,59 +705,6 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		// adding prototypes
-		if (!is_null($options['selectPrototypes'])) {
-			$obj_params = array(
-				'nodeids' => $nodeids,
-				'discoveryids' => $itemids,
-				'filter' => array('flags' => null),
-				'nopermissions' => 1,
-				'preservekeys' => 1
-			);
-
-			if (is_array($options['selectPrototypes']) || str_in_array($options['selectPrototypes'], $subselects_allowed_outputs)) {
-				$obj_params['output'] = $options['selectPrototypes'];
-				$prototypes = $this->get($obj_params);
-
-				if (!is_null($options['limitSelects'])) {
-					order_result($prototypes, 'name');
-				}
-				foreach ($prototypes as $itemid => $subrule) {
-					unset($prototypes[$itemid]['discoveries']);
-					$count = array();
-					foreach ($subrule['discoveries'] as $discovery) {
-						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$discovery['itemid']])) {
-								$count[$discovery['itemid']] = 0;
-							}
-							$count[$discovery['itemid']]++;
-
-							if ($count[$discovery['itemid']] > $options['limitSelects']) {
-								continue;
-							}
-						}
-						$result[$discovery['itemid']]['prototypes'][] = &$prototypes[$itemid];
-					}
-				}
-			}
-			elseif (API_OUTPUT_COUNT == $options['selectPrototypes']) {
-				$obj_params['countOutput'] = 1;
-				$obj_params['groupCount'] = 1;
-
-				$prototypes = $this->get($obj_params);
-				$prototypes = zbx_toHash($prototypes, 'parent_itemid');
-
-				foreach ($result as $itemid => $item) {
-					if (isset($prototypes[$itemid])) {
-						$result[$itemid]['prototypes'] = $prototypes[$itemid]['rowscount'];
-					}
-					else {
-						$result[$itemid]['prototypes'] = 0;
-					}
-				}
-			}
-		}
-
 		// adding discoveryrule
 		if (!is_null($options['selectDiscoveryRule'])) {
 			$ruleids = $rule_map = array();
@@ -809,6 +753,9 @@ class CItem extends CItemGeneral {
 				}
 			}
 		}
+
+		// add other related objects
+		$result = $this->addRelatedObjects($options, $result);
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
@@ -1510,6 +1457,38 @@ class CItem extends CItemGeneral {
 			}
 		}
 		return true;
+	}
+
+
+	public function addRelatedObjects(array $options, array $result) {
+
+		// TODO: move selectItemHosts to CItemGeneral::addRelatedObjects();
+		// TODO: move selectInterfaces to CItemGeneral::addRelatedObjects();
+		// TODO: move selectTriggers to CItemGeneral::addRelatedObjects();
+		// TODO: move selectGraphs to CItemGeneral::addRelatedObjects();
+		// TODO: move selectApplications to CItemGeneral::addRelatedObjects();
+		$result = parent::addRelatedObjects($options, $result);
+
+		$itemids = zbx_objectValues($result, 'itemid');
+
+		// adding item discovery
+		if ($options['selectItemDiscovery']) {
+			$itemDiscoveryOutput = $this->extendOutputOption('item_discovery', 'itemid', $options['selectItemDiscovery']);
+			$itemDiscoveries = $this->select('item_discovery', array(
+				'output' => $itemDiscoveryOutput,
+				'filter' => array(
+					'itemid' => $itemids
+				)
+			));
+			foreach ($itemDiscoveries as $itemDiscovery) {
+				$refId = $itemDiscovery['itemid'];
+				$itemDiscovery = $this->unsetExtraFields('item_discovery', $itemDiscovery, $options['selectItemDiscovery']);
+
+				$result[$refId]['itemDiscovery'] = $itemDiscovery;
+			}
+		}
+
+		return $result;
 	}
 }
 ?>

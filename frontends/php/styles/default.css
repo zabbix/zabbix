@@ -274,6 +274,7 @@ div.hintbox {
 	border: 1px solid black;
 	border-left: none;
 	border-top: none;
+	color: #1F1F1F;
 }
 
 /* node tree */

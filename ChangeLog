@@ -2,6 +2,8 @@
 Changes for 1.9.9
 
 New features:
+..F....... [ZBXNEXT-1058] added an item lifetime indicator icon in the item configuration (pavels, Sasha)
+..F....... [ZBXNEXT-1058] changed the default discovery rule 'lifetime' field value to 30 days (pavels, Sasha)
 A.......S. [ZBX-4479] added possibility to add a dependency from a template to a host (Sasha, Slava)
 ..F....... [ZBX-4483] added transparency support for image resizing (pavels)
 ..F....... [ZBXNEXT-905] redesign Configuration->Triggers (Eduard)
@@ -18,6 +20,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+..F....... [ZBXNEXT-1058] fixed confirmation pop-up showing up on auto refresh in latest data (pavels)
 ....I..... [ZBX-2701] removed empty value mappings from a default data (Sasha)
 A.F....... [ZBX-4505] fixed global macro recreation instead of updating (pavels)
 ..F....... [ZBX-4505] fixed audit message appearing when saving an unchanged global macro (pavels)
