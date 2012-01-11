@@ -189,7 +189,7 @@
 
 // PAGE HEADER {{{
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_ON.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
+	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
 // }}}PAGE HEADER
 
 // HEADER {{{

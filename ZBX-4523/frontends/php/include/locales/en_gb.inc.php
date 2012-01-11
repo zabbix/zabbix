@@ -2507,7 +2507,7 @@
 	'S_EVENTS_LIST' =>					'Event list',
 	'S_EVENT_SOURCE_DETAILS' => 		'Event source details',
 	'S_FILTER_HOST_GROUP' =>			'Filter host group',
-	'S_HISTORY_OF_EVENTS_ON' =>			'HISTORY OF EVENTS ON',
+	'S_HISTORY_OF_EVENTS_ON_BIG' =>			'HISTORY OF EVENTS ON',
 	'S_HOSTS_IN' =>						'Hosts in',
 	'S_HOSTS_UPDATED' =>				'Hosts updated',
 	'S_HOST_MASS_UPDATE' => 			'Host mass update',
