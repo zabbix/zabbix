@@ -130,7 +130,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 void	main_alerter_loop()
 {
 	char			error[MAX_STRING_LEN], *error_esc;
-	int			res, status;
+	int			res;
 	DB_RESULT		result;
 	DB_ROW			row;
 	DB_ALERT		alert;
@@ -145,9 +145,9 @@ void	main_alerter_loop()
 		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
 
 		result = DBselect(
-				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
-				"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
-				"mt.gsm_modem,mt.username,mt.passwd,mt.status,a.retries"
+				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,"
+				"mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,"
+				"mt.exec_path,mt.gsm_modem,mt.username,mt.passwd,mt.status"
 				" from alerts a,media_type mt"
 				" where a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
@@ -166,30 +166,28 @@ void	main_alerter_loop()
 			alert.subject = row[3];
 			alert.message = row[4];
 			alert.status = atoi(row[5]);
+			alert.retries = atoi(row[6]);
 
-			ZBX_STR2UINT64(mediatype.mediatypeid, row[6]);
-			mediatype.type = atoi(row[7]);
-			mediatype.description = row[8];
-			mediatype.smtp_server = row[9];
-			mediatype.smtp_helo = row[10];
-			mediatype.smtp_email = row[11];
-			mediatype.exec_path = row[12];
-			mediatype.gsm_modem = row[13];
-			mediatype.username = row[14];
-			mediatype.passwd = row[15];
-			status = atoi(row[16]);
+			ZBX_STR2UINT64(mediatype.mediatypeid, row[7]);
+			mediatype.type = atoi(row[8]);
+			mediatype.description = row[9];
+			mediatype.smtp_server = row[10];
+			mediatype.smtp_helo = row[11];
+			mediatype.smtp_email = row[12];
+			mediatype.exec_path = row[13];
+			mediatype.gsm_modem = row[14];
+			mediatype.username = row[15];
+			mediatype.passwd = row[16];
 
-			alert.retries = atoi(row[17]);
-
-			switch (status)
+			if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[17]))
 			{
-				case MEDIA_TYPE_STATUS_ACTIVE:
-					*error = '\0';
-					res = execute_action(&alert, &mediatype, error, sizeof(error));
-					break;
-				default:
-					zbx_snprintf(error, sizeof(error), "Media type is not active");
-					res = FAIL;
+				*error = '\0';
+				res = execute_action(&alert, &mediatype, error, sizeof(error));
+			}
+			else
+			{
+				zbx_snprintf(error, sizeof(error), "Media type is not active");
+				res = FAIL;
 			}
 
 			if (SUCCEED == res)
