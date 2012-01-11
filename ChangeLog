@@ -18,7 +18,6 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
-.D........ [ZBX-4404] fixed incorrect max value for the MaxHousekeeperDelete option in the default zabbix_server.conf file (Sasha)
 A......... [ZBX-4519] fixed impossibility to delete template : Unknown column 'h.name' (sanja)
 ..F....... [ZBX-4468] removed possibility to add to value mappings few items with same name (Slava)
 ..F....... [ZBX-4483] added proper icon image resizing (pavels)
@@ -388,6 +387,7 @@ New features:
 Changes for 1.8.11rc1
 
 ..F....... [ZBX-4506] removed unnecessary new line symbol stripping from HTML attributes (pavels)
+.D........ [ZBX-4404] fixed incorrect max value for the MaxHousekeeperDelete option in the default zabbix_server.conf file (Sasha)
 A......... [ZBX-4337] fixed possible typo in class.cusermacro.php (sanja)
 ....I..... [ZBX-4461] changed binary path from bin to sbin in FreeBSD initscripts (Richlv)
 ..F....... [ZBX-4491] updated Japanese translation; thanks to Kodai Terashima (Richlv)
