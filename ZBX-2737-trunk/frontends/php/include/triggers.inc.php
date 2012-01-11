@@ -1019,6 +1019,45 @@ function implode_exp($expression, $triggerid) {
 	return $expr;
 }
 
+/**
+ * Get al hosts related to trigger
+ *
+ * @param $expression
+ *
+ * @return array
+ */
+function get_hostnames_from_expression($expression) {
+	$trigExpr = new CTriggerExpression(array('expression' => $expression));
+	$result = array();
+
+	if (!empty($trigExpr->errors)) {
+		return null;
+	}
+	if (empty($trigExpr->expressions)) {
+		return null;
+	}
+
+	foreach ($trigExpr->expressions as $exprPart) {
+		if (zbx_empty($exprPart['item'])) {
+			continue;
+		}
+
+		$sql = 'SELECT h.name'.
+				' FROM items i,hosts h'.
+				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
+					' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
+					' AND h.host='.zbx_dbstr($exprPart['host']).
+					' AND h.hostid=i.hostid'.
+					' AND '.DBin_node('i.itemid');
+		if ($host = DBfetch(DBselect($sql))) {
+			array_push($result, $host['name']);
+		}
+
+	}
+
+	return $result;
+}
+
 // extract from string numbers with prefixes (A-Z)
 function extract_numbers($str) {
 	$numbers = array();

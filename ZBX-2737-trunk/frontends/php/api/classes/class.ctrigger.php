@@ -1606,6 +1606,14 @@ class CTrigger extends CZBXAPI {
 			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
 			$expression = implode_exp($trigger['expression'], $triggerid);
+			$hostnames = "";
+			$hosts = get_hostnames_from_expression($trigger['expression']);
+			foreach ($hosts as $key => $host) {
+				if (!empty($hostnames)) {
+					$hostnames .= ", ";
+				}
+				$hostnames .= $host;
+			}
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
@@ -1617,7 +1625,7 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], reset($hosts)));
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], $hostnames));
 		}
 
 		$this->validateDependencies($triggers);
