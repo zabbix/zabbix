@@ -47,11 +47,6 @@ $ZBX_MENU = array(
 				'sub_pages' => array('history.php', 'chart.php')
 			),
 			array(
-				'url' => 'hosts_mon.php',
-				'label' => _('Hosts'),
-				'sub_pages' => array('host_screen.php')
-			),
-			array(
 				'url' => 'tr_status.php',
 				'label' => _('Triggers'),
 				'sub_pages' => array('acknow.php', 'tr_comments.php', 'chart4.php', 'scripts_exec.php')
