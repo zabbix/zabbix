@@ -21,22 +21,19 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageStatusOfTriggers extends CWebTest
-{
-	public function testPageStatusOfTriggers_CheckLayout()
-	{
+class testPageStatusOfTriggers extends CWebTest {
+	public function testPageStatusOfTriggers_CheckLayout() {
 		$this->login('tr_status.php');
 		$this->assertTitle('Status of triggers \[refreshed every 30 sec\]');
 		$this->ok('STATUS OF TRIGGERS');
 		$this->ok('Triggers');
 		$this->ok('Displaying');
-		$this->ok(array('Group','Host'));
-		$this->ok(array('Severity','Status','Info','Last change','Age','Acknowledged','Host','Name','Comments'));
+		$this->ok(array('Group', 'Host'));
+		$this->ok(array('Severity', 'Status', 'Info', 'Last change', 'Age', 'Acknowledged', 'Host', 'Name', 'Comments'));
 	}
 
 // Check that no real host or template names displayed
-	public function testPageStatusOfTriggers_NoHostNames()
-	{
+	public function testPageStatusOfTriggers_NoHostNames() {
 		$this->login('tr_status.php');
 		$this->assertTitle('Status of triggers \[refreshed every 30 sec\]');
 		$this->checkNoRealHostnames();
