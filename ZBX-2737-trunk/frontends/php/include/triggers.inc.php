@@ -1020,7 +1020,7 @@ function implode_exp($expression, $triggerid) {
 }
 
 /**
- * Get al hosts related to trigger
+ * Get all hosts related to trigger
  *
  * @param $expression
  *
