@@ -1527,8 +1527,14 @@ class CTrigger extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
-			$host = reset($trigger['hosts']);
-			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['name']));
+			$hostnames = '';
+			foreach ($trigger['hosts'] as $host) {
+				if (!empty($hostnames)) {
+					$hostnames .= ", ";
+				}
+				$hostnames .= $host['name'];
+			}
+			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], $hostnames));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
@@ -1605,10 +1611,10 @@ class CTrigger extends CZBXAPI {
 
 			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
-			$expression = implode_exp($trigger['expression'], $triggerid);
+			$hosts = array();
 			$hostnames = "";
-			$hosts = get_hostnames_from_expression($trigger['expression']);
-			foreach ($hosts as $key => $host) {
+			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
+			foreach ($hosts as $host) {
 				if (!empty($hostnames)) {
 					$hostnames .= ", ";
 				}
@@ -1746,9 +1752,15 @@ class CTrigger extends CZBXAPI {
 			// restore the full expression to properly validate dependencies
 			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
-			$host = reset($dbTriggers[$trigger['triggerid']]['hosts']);
+			$hostnames = '';
+			foreach ($dbTriggers[$trigger['triggerid']]['hosts'] as $host) {
+				if (!empty($hostnames)) {
+					$hostnames .= ", ";
+				}
+				$hostnames .= $host['name'];
+			}
 
-			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['name']);
+			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], $hostnames);
 		}
 		unset($trigger);
 

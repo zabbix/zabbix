@@ -963,8 +963,17 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
 	return $exp;
 }
 
+/**
+ * Implodes expression, replaces names and keys with IDs
+ *
+ * @param string $expression Full expression with host names and item keys
+ * @param numeric $triggerid
+ * @param array optional $hostnames Reference to array which will be filled with hostnames.
+ *
+ * @return string Imploded expression (names and keys replaced by IDs)
+ */
 // translate localhost:procload.last(0)>10 to {12}>10 and create database representation.
-function implode_exp($expression, $triggerid) {
+function implode_exp($expression, $triggerid, &$hostnames=array()) {
 	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS = init_trigger_expression_structures(false, true);
 
 	$expr = $expression;
@@ -983,7 +992,7 @@ function implode_exp($expression, $triggerid) {
 			continue;
 		}
 
-		$sql = 'SELECT i.itemid,i.value_type'.
+		$sql = 'SELECT i.itemid,i.value_type,h.name'.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
@@ -995,6 +1004,7 @@ function implode_exp($expression, $triggerid) {
 				error(_s('Incorrect item value type "%1$s:%2$s" provided for trigger function "%3$s".', $exprPart['host'], $exprPart['item'], $exprPart['function']));
 				return null;
 			}
+			$hostnames[] = $item['name'];
 		}
 		else {
 			error(_s('Incorrect item key "%1$s:%2$s" provided for trigger expression.', $exprPart['host'], $exprPart['item']));
@@ -1017,45 +1027,6 @@ function implode_exp($expression, $triggerid) {
 		$expr = str_replace($exprPart['expression'], '{'.$usedItems[$exprPart['expression']].'}', $expr);
 	}
 	return $expr;
-}
-
-/**
- * Get all hosts related to trigger
- *
- * @param $expression
- *
- * @return array
- */
-function get_hostnames_from_expression($expression) {
-	$trigExpr = new CTriggerExpression(array('expression' => $expression));
-	$result = array();
-
-	if (!empty($trigExpr->errors)) {
-		return null;
-	}
-	if (empty($trigExpr->expressions)) {
-		return null;
-	}
-
-	foreach ($trigExpr->expressions as $exprPart) {
-		if (zbx_empty($exprPart['item'])) {
-			continue;
-		}
-
-		$sql = 'SELECT h.name'.
-				' FROM items i,hosts h'.
-				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-					' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
-					' AND h.host='.zbx_dbstr($exprPart['host']).
-					' AND h.hostid=i.hostid'.
-					' AND '.DBin_node('i.itemid');
-		if ($host = DBfetch(DBselect($sql))) {
-			array_push($result, $host['name']);
-		}
-
-	}
-
-	return $result;
 }
 
 // extract from string numbers with prefixes (A-Z)
