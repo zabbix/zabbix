@@ -493,7 +493,6 @@
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
 
 //	events.php
-	'S_LATEST_EVENTS'=>			_('Latest events'),
 	'S_HISTORY_OF_EVENTS_BIG'=>		_('HISTORY OF EVENTS'),
 	'S_NO_EVENTS_FOUND'=>			_('No events found'),
 	'S_EVENTS_DATE_FORMAT'=>		_('d M Y H:i:s'),
@@ -513,7 +512,6 @@
 	'S_SHOWN'=>				_('Shown'),
 	'S_URLS'=>				_('URLs'),
 	'S_LABEL'=>				_('Label'),
-	'S_GO_TO'=>				_('Go to'),
 	'S_X'=>					_('X'),
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
 	'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
@@ -781,7 +779,6 @@
 	'S_ADD'=>						_('Add'),
 
 //	tr_status.php
-	'S_STATUS_OF_TRIGGERS'=>			_('Status of triggers'),
 	'S_STATUS_OF_TRIGGERS_BIG'=>		_('STATUS OF TRIGGERS'),
 	'S_STATUS_OF_HOSTGROUP_TRIGGERS'=>	_('Status of hostgroup triggers'),
 	'S_STATUS_OF_HOST_TRIGGERS'=>		_('Status of host triggers'),
@@ -922,9 +919,6 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			_('Template with item key'),
 	'S_TEMPLATE_WITH_APPLICATION'=>			_('Template with application'),
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
-
-//	maps.inc.php
-	'S_SUBMAP'=>			_('Submap'),
 
 //	screens.inc.php
 	'S_DELETE_IT_Q'=>				_('Delete it?'),

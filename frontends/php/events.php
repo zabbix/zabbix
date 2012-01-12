@@ -38,7 +38,7 @@ if(isset($_REQUEST['csv_export'])){
 else{
 	$CSV_EXPORT = false;
 
-	$page['title'] = 'S_LATEST_EVENTS';
+	$page['title'] = _('Latest events');
 	$page['file'] = 'events.php';
 	$page['hist_arg'] = array('groupid','hostid');
 	$page['scripts'] = array('class.calendar.js','gtlc.js');

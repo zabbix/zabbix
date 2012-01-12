@@ -828,7 +828,7 @@ function make_latest_issues(array $filter = array()) {
 			'value' => TRIGGER_VALUE_TRUE
 		),
 		'selectGroups' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectHosts' => array('hostid', 'name'),
 		'output' => API_OUTPUT_EXTEND
 	);
 	$options['sortfield'] = isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange';
@@ -845,20 +845,32 @@ function make_latest_issues(array $filter = array()) {
 	unset($options['limit']);
 	$triggersTotalCount = API::Trigger()->get($options);
 
-	// get triger hosts
-	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger) {
 		// if trigger is lost(broken expression) we skip it
 		if (empty($trigger['hosts'])) {
 			unset($triggers[$tnum]);
 			continue;
 		}
-		$triggers_hosts = array_merge($triggers_hosts, $trigger['hosts']);
-	}
-	$triggers_hosts = zbx_toHash($triggers_hosts, 'hostid');
-	$triggers_hostids = array_keys($triggers_hosts);
 
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($triggers_hostids);
+		$host = reset($trigger['hosts']);
+		$trigger['hostid'] = $host['hostid'];
+		$trigger['hostname'] = $host['name'];
+
+		$triggers[$tnum] = $trigger;
+	}
+	$hostIds = zbx_objectValues($triggers, 'hostid');
+
+	// fetch trigger hosts
+	$hosts = API::Host()->get(array(
+		'hostids' => $hostIds,
+		'output' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectInventory' => true,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'preservekeys' => true
+	));
+
+	// fetch trigger scripts
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostIds);
 
 	// indicator of sort field
 	$sortDiv = new CDiv(SPACE, $options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
@@ -884,16 +896,10 @@ function make_latest_issues(array $filter = array()) {
 		)
 	);
 
-	$thosts_cache = array();
 	foreach ($triggers as $trigger) {
 		// check for dependencies
 		$group = reset($trigger['groups']);
-		$host = reset($trigger['hosts']);
-
-		$trigger['hostid'] = $host['hostid'];
-		$trigger['hostname'] = $host['name'];
-
-		$host = null;
+		$host = $hosts[$trigger['hostid']];
 		$menus = '';
 
 		$host_nodeid = id2nodeid($trigger['hostid']);
@@ -909,23 +915,13 @@ function make_latest_issues(array $filter = array()) {
 			$menus = "['"._('Scripts')."', null, null, {'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}], ".$menus;
 		}
 
-		if (isset($thosts_cache[$trigger['hostid']])) {
-			$hinventory = $thosts_cache[$trigger['hostid']];
-		}
-		else {
-			$hinventory = API::Host()->get(array(
-				'hostids' => $trigger['hostid'],
-				'output' => API_OUTPUT_SHORTEN,
-				'selectInventory' => true
-			));
-			$hinventory = reset($hinventory);
-			$thosts_cache[$hinventory['hostid']] = $hinventory;
-		}
-
 		$menus .= "['"._('Go to')."', null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],";
 		$menus .= "['"._('Latest data')."', \"javascript: redirect('latest.php?groupid=".$group['groupid'].'&hostid='.$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
-		if (!empty($hinventory['inventory'])) {
+		if (!empty($host['inventory'])) {
 			$menus .= "['"._('Host inventories')."', \"javascript: redirect('hostinventories.php?hostid=".$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
+		}
+		if (!empty($host['screens'])) {
+			$menus .= "['"._('Screens')."', \"javascript: redirect('host_screen.php?hostid=".$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
 		}
 
 		$menus = rtrim($menus, ',');
