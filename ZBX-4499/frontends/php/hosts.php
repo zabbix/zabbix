@@ -507,12 +507,27 @@ include_once('include/page_header.php');
 
 			$macros = get_request('macros', array());
 			foreach($macros as $mnum => $macro){
-				if (zbx_empty($macro['value']) || zbx_empty($macro['macro'])) {
+				if (zbx_empty($macro['value']) && zbx_empty($macro['macro'])) {
 					unset($macros[$mnum]);
 				}
-				else {
-					$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
+			}
+
+			$duplicatedMacros = array();
+			foreach ($macros as $mnum => $macro) {
+				// transform macros to uppercase {$aaa} => {$AAA}
+				$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
+
+				// search for duplicates items in new macros array
+				foreach ($macros as $duplicateNumber => $duplicateNewMacro) {
+					if ($mnum != $duplicateNumber && $macro['macro'] == $duplicateNewMacro['macro']) {
+						$duplicatedMacros[] = '"'.$duplicateNewMacro['macro'].'"';
+					}
 				}
+			}
+
+			// validate duplicates macros
+			if (!empty($duplicatedMacros)) {
+				throw new Exception(S_DUPLICATED_MACRO_FOUND.SPACE.implode(', ', array_unique($duplicatedMacros)));
 			}
 
 			$host = array(

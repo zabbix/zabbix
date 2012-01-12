@@ -527,7 +527,7 @@ include_once('include/page_header.php');
 
 				// remove item from new macros array if name and value is empty
 				foreach ($newMacros as $number => $newMacro) {
-					if (zbx_empty($newMacro['macro']) || zbx_empty($newMacro['value'])) {
+					if (zbx_empty($newMacro['macro']) && zbx_empty($newMacro['value'])) {
 						unset($newMacros[$number]);
 					}
 				}
