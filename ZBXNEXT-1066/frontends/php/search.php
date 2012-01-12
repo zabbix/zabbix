@@ -210,7 +210,7 @@ require_once('include/page_header.php');
 
 	$sysmap_menu = get_icon('menu', array('menu' => 'sysmaps'));
 
-	$wdgt_hosts = new CUIWidget('search_hosts',$table);
+	$wdgt_hosts = new CUIWidget('search_hosts' ,$table, CProfile::get('web.dashboard.hats.search_hosts.state', true));
 	$wdgt_hosts->setHeader(_('Hosts'), SPACE);
 	$wdgt_hosts->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 
@@ -292,7 +292,7 @@ require_once('include/page_header.php');
 		));
 	}
 
-	$wdgt_hgroups = new CUIWidget('search_hostgroup', $table);
+	$wdgt_hgroups = new CUIWidget('search_hostgroup', $table, CProfile::get('web.dashboard.hats.search_hostgroup.state', true));
 	$wdgt_hgroups->setHeader(_('Host groups'), SPACE);
 	$wdgt_hgroups->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 
@@ -387,7 +387,7 @@ require_once('include/page_header.php');
 			));
 		}
 
-		$wdgt_templates = new CUIWidget('search_templates',$table);
+		$wdgt_templates = new CUIWidget('search_templates', $table, CProfile::get('web.dashboard.hats.search_templates.state', true));
 		$wdgt_templates->setHeader(_('Templates'), SPACE);
 		$wdgt_templates->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 		$searchWidget->addItem(new CDiv($wdgt_templates));
