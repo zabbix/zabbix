@@ -210,7 +210,7 @@ require_once('include/page_header.php');
 
 	$sysmap_menu = get_icon('menu', array('menu' => 'sysmaps'));
 
-	$wdgt_hosts = new CUIWidget('search_hosts' ,$table, CProfile::get('web.dashboard.hats.search_hosts.state', true));
+	$wdgt_hosts = new CUIWidget('search_hosts', $table, CProfile::get('web.dashboard.hats.search_hosts.state', true));
 	$wdgt_hosts->setHeader(_('Hosts'), SPACE);
 	$wdgt_hosts->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 

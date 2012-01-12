@@ -22,7 +22,7 @@
 require_once('include/config.inc.php');
 
 $page['file'] = 'tr_status.php';
-$page['title'] = 'S_STATUS_OF_TRIGGERS';
+$page['title'] = _('Status of triggers');
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.cswitcher.js');
 
@@ -388,6 +388,13 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($tr_hostids);
 
+	// fetch all hosts
+	$hosts = API::Host()->get(array(
+		'hostids' => $tr_hostids,
+		'preservekeys' => true,
+		'selectScreens' => API_OUTPUT_COUNT
+	));
+
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
 			'nodeids' => get_current_nodeid(),
@@ -457,9 +464,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 		$description = new CSpan($description, 'link_menu');
 
-// trigger description js menu {{{
-		$hosts = reset($trigger['hosts']);
-
+		// trigger js menu
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
 			$str_tmp = zbx_jsvalue('javascript: redirect("triggers.php?form=update&triggerid='.
@@ -478,9 +483,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."],".
 			zbx_jsvalue($items, true).");"
 		);
-
-
-// }}} trigger description js menu
 
 		if($_REQUEST['show_details']){
 			$font = new CTag('font', 'yes');
@@ -536,6 +538,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$hosts_list = array();
 		foreach($trigger['hosts'] as $num => $trigger_host){
 			$menus = '';
+			$host = $hosts[$trigger_host['hostid']];
 
 			$host_nodeid = id2nodeid($trigger_host['hostid']);
 			if(isset($scripts_by_hosts[$trigger_host['hostid']])){
@@ -555,8 +558,12 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$menus = "[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
 			}
 
-			$menus.= "[".zbx_jsvalue(_('URLs')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus.= "[".zbx_jsvalue(_('Go to')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			$menus.= "['"._('Latest data')."',\"javascript: redirect('latest.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+
+			if ($host['screens']) {
+				$menus.= "['"._('Screens')."',\"javascript: redirect('host_screen.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			}
 
 			$menus = rtrim($menus,',');
 			$menus = 'show_popup_menu(event,['.$menus.'],180);';
