@@ -1153,7 +1153,7 @@ COpt::memoryPick();
 		$triggers = zbx_toArray($triggers);
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
-		$dbTriggers = $this->get($options = array(
+		$dbTriggers = $this->get(array(
 			'triggerids' => $triggerids,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
@@ -1237,13 +1237,12 @@ COpt::memoryPick();
 
 			if (empty($triggerids)) self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter.');
 
-			$options = array(
+			$del_triggers = $this->get(array(
 				'triggerids' => $triggerids,
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
 				'preservekeys' => true
-			);
-			$del_triggers = $this->get($options);
+			));
 
 // TODO: remove $nopermissions hack
 			if (!$nopermissions) {
@@ -1275,14 +1274,13 @@ COpt::memoryPick();
 
 
 // select all triggers which are deleted (include childs)
-			$options = array(
+			$del_triggers = $this->get(array(
 				'triggerids' => $triggerids,
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => true,
 				'preservekeys' => true,
 				'selectHosts' => array('name')
-			);
-			$del_triggers = $this->get($options);
+			));
 
 			DB::delete('events', array(
 				'objectid' => $triggerids,
