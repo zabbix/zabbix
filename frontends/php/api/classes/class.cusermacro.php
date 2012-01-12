@@ -691,14 +691,13 @@ class CUserMacro extends CZBXAPI {
 
 		// Host permission
 		if (!empty($hosts)) {
-			$options = array(
+			$upd_hosts = API::Host()->get(array(
 				'hostids' => $hostids,
 				'editable' => true,
-				'output' => array('hostid', 'host'),
+				'output' => array('hostid', 'name'),
 				'preservekeys' => true
-			);
-			$upd_hosts = API::Host()->get($options);
-			foreach($hosts as $host) {
+			));
+			foreach ($hosts as $host) {
 				if (!isset($upd_hosts[$host['hostid']])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
@@ -707,13 +706,12 @@ class CUserMacro extends CZBXAPI {
 
 		// Template permission
 		if (!empty($templates)) {
-			$options = array(
+			$upd_templates = API::Template()->get(array(
 				'templateids' => $templateids,
 				'editable' => true,
-				'output' => array('hostid', 'host'),
+				'output' => array('hostid', 'name'),
 				'preservekeys' => true
-			);
-			$upd_templates = API::Template()->get($options);
+			));
 			foreach ($templates as $template) {
 				if (!isset($upd_templates[$template['templateid']])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
@@ -723,19 +721,18 @@ class CUserMacro extends CZBXAPI {
 
 		// Check on existing
 		$objectids = array_merge($hostids, $templateids);
-		$options = array(
+		$existing_macros = $this->get(array(
 			'hostids' => $objectids,
 			'filter' => array('macro' => zbx_objectValues($data['macros'], 'macro')),
 			'output' => API_OUTPUT_EXTEND,
 			'limit' => 1
-		);
-		$existing_macros = $this->get($options);
+		));
 		foreach ($existing_macros as $exst_macro) {
 			if (isset($upd_hosts[$exst_macro['hostid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Macro [%1$s:%2$s] already exists', $upd_hosts[$exst_macro['hostid']]['host'], $exst_macro['macro']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Macro "%1$s" on "%2$s" already exists.', $exst_macro['macro'], $upd_hosts[$exst_macro['hostid']]['name']));
 			}
 			elseif (isset($upd_templates[$exst_macro['hostid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Macro [%1$s:%2$s] already exists', $upd_templates[$exst_macro['hostid']]['host'], $exst_macro['macro']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Macro "%1$s" on "%2$s" already exists.', $exst_macro['macro'], $upd_templates[$exst_macro['hostid']]['name']));
 			}
 		}
 
