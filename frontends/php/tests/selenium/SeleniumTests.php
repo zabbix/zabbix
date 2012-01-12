@@ -58,6 +58,7 @@ require_once(dirname(__FILE__).'/testPageWeb.php');
 require_once(dirname(__FILE__).'/testFormAction.php');
 require_once(dirname(__FILE__).'/testFormAdministrationDMProxies.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralGUI.php');
+require_once(dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralImages.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralMacro.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php');
@@ -118,6 +119,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
+		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
 		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralMacro');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
