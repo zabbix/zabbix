@@ -71,17 +71,14 @@ class testFormAdministrationGeneralGUI extends CWebTest
 
 		$this->assertAttribute("//select[@id='default_theme']/option[@selected='selected']/@value", $allValues['default_theme']);
 		$this->assertAttribute("//select[@id='dropdown_first_entry']/option[@selected='selected']/@value", $allValues['dropdown_first_entry']);
-
 		if ($allValues['dropdown_first_remember']) {
 			$this->assertElementPresent("//input[@id='dropdown_first_remember' and @checked]");
 		}
 		if ($allValues['dropdown_first_remember']==0) {
 			$this->assertElementPresent("//input[@id='dropdown_first_remember' and not (@checked)]");
 		}
-
 		$this->assertAttribute("//input[@id='search_limit']/@value", $allValues['search_limit']);
 		$this->assertAttribute("//input[@id='max_in_table']/@value", $allValues['max_in_table']);
-		// $this->assertAttribute("//input[@id='event_ack_enable']/option[@checked='checked']/@value", $allValues['event_ack_enable']);
 
 		if ($allValues['event_ack_enable']) {
 			$this->assertElementPresent("//input[@id='event_ack_enable' and @checked]");
@@ -89,10 +86,8 @@ class testFormAdministrationGeneralGUI extends CWebTest
 		if ($allValues['event_ack_enable']==0) {
 			$this->assertElementPresent("//input[@id='event_ack_enable' and not (@checked)]");
 		}
-
 		$this->assertAttribute("//input[@id='event_expire']/@value", $allValues['event_expire']);
 		$this->assertAttribute("//input[@id='event_show_max']/@value", $allValues['event_show_max']);
-
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeTheme() {
@@ -101,7 +96,6 @@ class testFormAdministrationGeneralGUI extends CWebTest
 		$this->dropdown_select_wait('configDropDown', 'GUI');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI', 'Default theme'));
-
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash = DBhash($sql_hash);
 
@@ -109,21 +103,22 @@ class testFormAdministrationGeneralGUI extends CWebTest
 		$this->button_click('save');
 		$this->wait();
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'GUI', 'Default theme'));
-		$sql = 'SELECT default_theme FROM config WHERE default_theme="css_bb.css"';
+		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('css_bb.css');
+
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Black and Blue" theme can not be selected as default theme: it does not exist in the DB');
 
 		$this->dropdown_select('default_theme', 'Dark orange');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'GUI', 'Default theme'));
-		$sql = 'SELECT default_theme FROM config WHERE default_theme="css_od.css"';
+		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('css_od.css');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Dark orange" theme can not be selected as default theme: it does not exist in the DB');
 
 		$this->dropdown_select('default_theme', 'Original blue');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Configuration updated');
-		$sql = 'SELECT default_theme FROM config WHERE default_theme="css_ob.css"';
+		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('css_ob.css');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Original blue" theme can not be selected as default theme: it does not exist in the DB');
 
 		$newHash = DBhash($sql_hash);
