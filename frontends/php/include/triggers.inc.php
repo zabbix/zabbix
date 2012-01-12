@@ -968,7 +968,7 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
  *
  * @param string $expression Full expression with host names and item keys
  * @param numeric $triggerid
- * @param array optional $hostnames Reference to array which will be filled with visible host names.
+ * @param array optional $hostnames Reference to array which will be filled with unique visible host names.
  *
  * @return string Imploded expression (names and keys replaced by IDs)
  */
@@ -1004,7 +1004,9 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 				error(_s('Incorrect item value type "%1$s:%2$s" provided for trigger function "%3$s".', $exprPart['host'], $exprPart['item'], $exprPart['function']));
 				return null;
 			}
-			$hostnames[] = $item['name'];
+			if (!in_array($item['name'], $hostnames)) {
+				$hostnames[] = $item['name'];
+			}
 		}
 		else {
 			error(_s('Incorrect item key "%1$s:%2$s" provided for trigger expression.', $exprPart['host'], $exprPart['item']));
