@@ -968,12 +968,12 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
  *
  * @param string $expression Full expression with host names and item keys
  * @param numeric $triggerid
- * @param array optional $hostnames Reference to array which will be filled with hostnames.
+ * @param array optional $hostnames Reference to array which will be filled with visible host names.
  *
  * @return string Imploded expression (names and keys replaced by IDs)
  */
 // translate localhost:procload.last(0)>10 to {12}>10 and create database representation.
-function implode_exp($expression, $triggerid, &$hostnames=array()) {
+function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS = init_trigger_expression_structures(false, true);
 
 	$expr = $expression;
