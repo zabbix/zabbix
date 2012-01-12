@@ -27,6 +27,9 @@ jQuery(function() {
 	}
 
 	// search
-	jQuery('#searchbttn').button();
-	createSuggest('search');
+	if (jQuery('#search').length) {
+		jQuery('#searchbttn').button();
+		createSuggest('search');
+	}
+
 });
