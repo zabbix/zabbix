@@ -1130,14 +1130,11 @@ COpt::memoryPick();
 
 		foreach ($createdTriggers as $trigger) {
 			$this->inherit($trigger);
-			$hostnames = '';
+			$hosts = array();
 			foreach ($trigger['hosts'] as $host) {
-				if (!empty($hostnames)) {
-					$hostnames .= ", ";
-				}
-				$hostnames .= $host['name'];
+				$hosts[] = $host['name'];
 			}
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], $hostnames));
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(", ", $hosts)));
 		}
 
 		return array('triggerids' => $triggerids);
@@ -1316,14 +1313,11 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach ($del_triggers as $triggerid => $trigger) {
-				$hostnames = '';
+				$hosts = array();
 				foreach ($trigger['hosts'] as $host) {
-					if (!empty($hostnames)) {
-						$hostnames .= ", ";
-					}
-					$hostnames .= $host['name'];
+					$hosts[] = $host['name'];
 				}
-				info(_s('Deleted: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], $hostnames));
+				info(_s('Deleted: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], implode(", ", $hosts)));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
@@ -1347,14 +1341,7 @@ COpt::memoryPick();
 			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
 			$hosts = array();
-			$hostnames = "";
 			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
-			foreach ($hosts as $host) {
-				if (!empty($hostnames)) {
-					$hostnames .= ", ";
-				}
-				$hostnames .= $host;
-			}
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
@@ -1363,7 +1350,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(sprintf(_('Created: Trigger prototype "%1$s" on "%2$s".'), $trigger['description'], $hostnames));
+			info(sprintf(_('Created: Trigger prototype "%1$s" on "%2$s".'), $trigger['description'], implode(", ", $hosts)));
 		}
 
 	}
@@ -1458,15 +1445,12 @@ COpt::memoryPick();
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
 			$expression = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
-			$hostnames = '';
+			$hosts = array();
 			foreach ($dbTrigger['hosts'] as $host) {
-				if (!empty($hostnames)) {
-					$hostnames .= ", ";
-				}
-				$hostnames .= $host['name'];
+				$hosts[] = $host['name'];
 			}
 
-			info(_s('Updated: Trigger prototype "%1$s" on "%2$s".', $description, $hostnames));
+			info(_s('Updated: Trigger prototype "%1$s" on "%2$s".', $description, implode(", ", $hosts)));
 		}
 		unset($trigger);
 	}

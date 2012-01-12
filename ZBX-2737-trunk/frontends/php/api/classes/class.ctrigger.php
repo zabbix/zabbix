@@ -1527,14 +1527,11 @@ class CTrigger extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
-			$hostnames = '';
+			$hosts = array();
 			foreach ($trigger['hosts'] as $host) {
-				if (!empty($hostnames)) {
-					$hostnames .= ", ";
-				}
-				$hostnames .= $host['name'];
+				$hosts[] = $host['name'];
 			}
-			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], $hostnames));
+			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(", ", $hosts)));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
@@ -1612,14 +1609,7 @@ class CTrigger extends CZBXAPI {
 			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
 			$hosts = array();
-			$hostnames = "";
 			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
-			foreach ($hosts as $host) {
-				if (!empty($hostnames)) {
-					$hostnames .= ", ";
-				}
-				$hostnames .= $host;
-			}
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
@@ -1631,7 +1621,7 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], $hostnames));
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(", ", $hosts)));
 		}
 
 		$this->validateDependencies($triggers);
@@ -1752,15 +1742,12 @@ class CTrigger extends CZBXAPI {
 			// restore the full expression to properly validate dependencies
 			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
-			$hostnames = '';
+			$hosts = array();
 			foreach ($dbTriggers[$trigger['triggerid']]['hosts'] as $host) {
-				if (!empty($hostnames)) {
-					$hostnames .= ", ";
-				}
-				$hostnames .= $host['name'];
+				$hosts[] = $host['name'];
 			}
 
-			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], $hostnames);
+			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(", ", $hosts));
 		}
 		unset($trigger);
 
