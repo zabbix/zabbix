@@ -26,18 +26,7 @@ jQuery(function() {
 		jQuery('head').append('<link rel="stylesheet" type="text/css" href="styles/handheld.css" />');
 	}
 
-
-	// tab switching via the anchor
-	if (window.location.hash) {
-		jQuery('.ui-tabs .ui-tabs-nav a[href="' + window.location.hash + '"]').trigger('click');
-	}
-	jQuery('.ui-tabs').bind('tabsselect', function(event, ui) {
-		var href = ui.tab.href.split('#');
-		window.location.hash = href[1];
-	});
-
 	// search
 	jQuery('#searchbttn').button();
 	createSuggest('search');
-
 });
