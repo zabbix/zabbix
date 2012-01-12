@@ -144,7 +144,10 @@ class CTag extends CObject{
 		unset($this->attributes[$name]);
 	}
 
-	public function addAction($name, $value){
+	public function addAction($name, $value) {
+		// strip new lines from scripts
+		$value = str_replace(array("\n", "\r"), '', $value);
+
 		$this->setAttribute($name, $value);
 	}
 
