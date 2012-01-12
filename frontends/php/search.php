@@ -70,7 +70,7 @@ require_once('include/page_header.php');
 	$admin = uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN));
 	$rows_per_page = $USER_DETAILS['rows_per_page'];
 
-	$search_wdgt = new CWidget('search_wdgt');
+	$searchWidget = new CWidget('search_wdgt');
 
 	$search = get_request('search', '');
 
@@ -78,12 +78,8 @@ require_once('include/page_header.php');
 	if(zbx_empty($search)){
 		$search = _('Search pattern is empty');
 	}
-	$search_wdgt->setClass('header');
-	$search_wdgt->addHeader(array(_('SEARCH').': ',bold($search)), SPACE);
-
-//-------------
-	$left_col[] = array();
-	$right_col[] = array();
+	$searchWidget->setClass('header');
+	$searchWidget->addHeader(array(_('SEARCH').': ',bold($search)), SPACE);
 
 // FIND Hosts
 	$params = array(
@@ -141,11 +137,11 @@ require_once('include/page_header.php');
 		new CCol(_('Latest data')),
 		new CCol(_('Triggers')),
 		new CCol(_('Events')),
+		new CCol(_('Screens')),
 		new CCol(_('Applications')),
 		new CCol(_('Items')),
 		new CCol(_('Triggers')),
 		new CCol(_('Graphs')),
-		new CCol(_('Screens')),
 	);
 
 	$table  = new CTableInfo();
@@ -180,7 +176,6 @@ require_once('include/page_header.php');
 			$items_link = array(new CLink(_('Items'), 'items.php?'.$link), ' ('.$host['items'].')');
 			$triggers_link = array(new CLink(_('Triggers'), 'triggers.php?'.$link), ' ('.$host['triggers'].')');
 			$graphs_link = array(new CLink(_('Graphs'), 'graphs.php?'.$link), ' ('.$host['graphs'].')');
-			$screenLink = array(new CLink(_('Screens'), 'host_screen.php?'.$link), ' ('.$host['screens'].')');
 		}
 		else {
 			$host_link = new CSpan($caption, $style);
@@ -188,7 +183,6 @@ require_once('include/page_header.php');
 			$items_link = array(new CSpan(_('Items'), 'unknown'), ' ('.$host['items'].')');
 			$triggers_link = array(new CSpan(_('Triggers'), 'unknown'), ' ('.$host['triggers'].')');
 			$graphs_link = array(new CSpan(_('Graphs'), 'unknown'), ' ('.$host['graphs'].')');
-			$screenLink = array(new CSpan(_('Screens'), 'unknown'), ' ('.$host['screens'].')');
 		}
 
 		if(!$admin){
@@ -206,11 +200,11 @@ require_once('include/page_header.php');
 			new CLink(_('Latest data'), 'latest.php?'.$link),
 			new CLink(_('Triggers'), 'tr_status.php?'.$link),
 			new CLink(_('Events'), 'events.php?'.$link),
+			new CLink(_('Screens'), 'host_screen.php?'.$link),
 			$applications_link,
 			$items_link,
 			$triggers_link,
 			$graphs_link,
-			$screenLink,
 		));
 	}
 
@@ -220,7 +214,7 @@ require_once('include/page_header.php');
 	$wdgt_hosts->setHeader(_('Hosts'), SPACE);
 	$wdgt_hosts->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
 
-	$left_col[] = $wdgt_hosts;
+	$searchWidget->addItem(new CDiv($wdgt_hosts));
 //----------------
 
 
@@ -300,8 +294,9 @@ require_once('include/page_header.php');
 
 	$wdgt_hgroups = new CUIWidget('search_hostgroup', $table);
 	$wdgt_hgroups->setHeader(_('Host groups'), SPACE);
-	$wdgt_hosts->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
-	$right_col[] = $wdgt_hgroups;
+	$wdgt_hgroups->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+
+	$searchWidget->addItem(new CDiv($wdgt_hgroups));
 //----------------
 
 // FIND Templates
@@ -394,19 +389,12 @@ require_once('include/page_header.php');
 
 		$wdgt_templates = new CUIWidget('search_templates',$table);
 		$wdgt_templates->setHeader(_('Templates'), SPACE);
-		$wdgt_hosts->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
-		$right_col[] = $wdgt_templates;
+		$wdgt_templates->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+		$searchWidget->addItem(new CDiv($wdgt_templates));
 	}
 //----------------
 
-	$leftDiv = new CDiv($left_col, 'column');
-	$rightDiv = new CDiv($right_col, 'column');
-
-	$ieTab = new CTable();
-	$ieTab->addRow(array($leftDiv,$rightDiv), 'top');
-
-	$search_wdgt->addItem($ieTab);
-	$search_wdgt->show();
+	$searchWidget->show();
 
 ?>
 <?php
