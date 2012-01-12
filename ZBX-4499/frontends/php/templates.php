@@ -335,7 +335,12 @@ include_once('include/page_header.php');
 
 			$macros = get_request('macros', array());
 			foreach($macros as $mnum => $macro){
-				if(zbx_empty($macro['value'])) unset($macros[$mnum]);
+				if (zbx_empty($macro['value']) || zbx_empty($macro['macro'])) {
+					unset($macros[$mnum]);
+				}
+				else {
+					$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
+				}
 			}
 
 			$template = array(

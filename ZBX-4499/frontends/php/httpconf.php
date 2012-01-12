@@ -378,6 +378,15 @@ include_once('include/page_header.php');
 		$macros = get_request('macros', array());
 		$steps = get_request('steps', array());
 
+		foreach($macros as $mnum => $macro){
+			if (zbx_empty($macro['value']) || zbx_empty($macro['macro'])) {
+				unset($macros[$mnum]);
+			}
+			else {
+				$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
+			}
+		}
+
 		$authentication = get_request('authentication', HTTPTEST_AUTH_NONE);
 		$http_user = get_request('http_user', '');
 		$http_password = get_request('http_password', '');
