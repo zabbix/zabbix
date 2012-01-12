@@ -355,6 +355,7 @@ include_once('include/page_header.php');
 
 			// validate duplicates macros
 			if (!empty($duplicatedMacros)) {
+				info(S_DUPLICATED_MACRO_FOUND.SPACE.implode(', ', array_unique($duplicatedMacros)));
 				throw new Exception(S_DUPLICATED_MACRO_FOUND.SPACE.implode(', ', array_unique($duplicatedMacros)));
 			}
 
