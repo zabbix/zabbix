@@ -900,38 +900,19 @@ function make_latest_issues(array $filter = array()) {
 		// check for dependencies
 		$group = reset($trigger['groups']);
 		$host = $hosts[$trigger['hostid']];
-		$menus = '';
 
-		$host_nodeid = id2nodeid($trigger['hostid']);
+		// fetch scripts for host pop up menu
+		$menuScripts = array();
 		foreach ($scripts_by_hosts[$trigger['hostid']] as $script) {
-			$script_nodeid = id2nodeid($script['scriptid']);
-			if (bccomp($host_nodeid, $script_nodeid) == 0) {
-				$str_tmp = zbx_jsvalue('javascript: executeScript('.$trigger['hostid'].', '.$script['scriptid'].', '.zbx_jsvalue($script['confirmation']).')');
-				$menus .= '['.zbx_jsvalue($script['name']).', '.$str_tmp.", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
-			}
+			$menuScripts[] = array(
+				'scriptid' => $script['scriptid'],
+				'confirmation' => $script['confirmation'],
+				'name' => $script['name']
+			);
 		}
-
-		if (!empty($scripts_by_hosts[$trigger['hostid']])) {
-			$menus = "['"._('Scripts')."', null, null, {'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}], ".$menus;
-		}
-
-		$menus .= "['"._('Go to')."', null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],";
-		$menus .= "['"._('Latest data')."', \"javascript: redirect('latest.php?groupid=".$group['groupid'].'&hostid='.$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
-		if (!empty($host['inventory'])) {
-			$menus .= "['"._('Host inventories')."', \"javascript: redirect('hostinventories.php?hostid=".$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
-		}
-		if (!empty($host['screens'])) {
-			$menus .= "['"._('Screens')."', \"javascript: redirect('host_screen.php?hostid=".$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
-		}
-
-		$menus = rtrim($menus, ',');
-		$menus = 'show_popup_menu(event, ['.$menus.'], 180);';
-
-		$host = new CSpan($trigger['hostname'], 'link_menu pointer');
-		$host->setAttribute('onclick', 'javascript: '.$menus);
 
 		// maintenance
-		$trigger_host = $triggers_hosts[$trigger['hostid']];
+		$trigger_host = $hosts[$trigger['hostid']];
 
 		$text = null;
 		$style = 'link_menu';
@@ -949,10 +930,16 @@ function make_latest_issues(array $filter = array()) {
 				: _('Maintenance with data collection')).']';
 		}
 
-		$host = new CSpan($trigger['hostname'], $style.' pointer');
-		$host->setAttribute('onclick', 'javascript: '.$menus);
+		$hostSpan = new CSpan($trigger['hostname'], $style.' pointer menu-host');
+		$hostSpan->setAttribute('data-menu', array(
+			'scripts' => $menuScripts,
+			'hostid' => $trigger['hostid'],
+			'groupid' => $group['groupid'],
+			'hasScreens' => (bool) $host['screens'],
+			'hasInventory' => (bool) $host['inventory']
+		));
 		if (!is_null($text)) {
-			$host->setHint($text, '', '', false);
+			$hostSpan->setHint($text, '', '', false);
 		}
 
 		// unknown triggers
@@ -994,7 +981,7 @@ function make_latest_issues(array $filter = array()) {
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
-				$host,
+				$hostSpan,
 				$description,
 				$clock,
 				zbx_date2age($event['clock']),
