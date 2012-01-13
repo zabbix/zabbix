@@ -111,7 +111,14 @@ $js = 'if(typeof(locale) == "undefined") var locale = {};'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
 		foreach ($tranStrings[$file] as $str) {
-			$js .= "locale['".$str."'] = ".zbx_jsvalue($translations[$str]).";";
+			// old translation string
+			if (isset($translations[$str])) {
+				$js .= "locale['".$str."'] = ".zbx_jsvalue($translations[$str]).";";
+			}
+			// a gettext string
+			else {
+				$js .= "locale['".$str."'] = ".zbx_jsvalue(_($str)).";";
+			}
 		}
 	}
 }
