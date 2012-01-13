@@ -43,33 +43,8 @@ $fields = array(
 check_fields($fields);
 
 try{
-	if (isset($_REQUEST['add_map'])) {
-		if (!zbx_is_int($_REQUEST['add_value'])) {
-			info(_('Value maps are used to create a mapping between numeric values and string representations.'));
-			show_messages(false, null, _('Cannot add value map'));
-		}
-		else {
-			$added = false;
-			foreach ($_REQUEST['valuemap'] as $num => $valueMap) {
-				if ($valueMap['value'] == $_REQUEST['add_value']) {
-					$_REQUEST['valuemap'][$num]['newvalue'] = $_REQUEST['add_newvalue'];
-					$added = true;
-					break;
-				}
-			}
-
-			if (!$added) {
-				$_REQUEST['valuemap'][] = array(
-					'value' => $_REQUEST['add_value'],
-					'newvalue' => $_REQUEST['add_newvalue']
-				);
-			}
-
-			unset($_REQUEST['add_value'], $_REQUEST['add_newvalue']);
-		}
-	}
-	elseif (isset($_REQUEST['save'])) {
-		$transaction = DBstart();
+	if (isset($_REQUEST['save'])) {
+		DBstart();
 
 		$valueMap = array('name' => get_request('mapname'));
 		$mappings = get_request('mappings', array());
@@ -99,22 +74,25 @@ try{
 		DBend(true);
 	}
 	elseif (isset($_REQUEST['delete']) && isset($_REQUEST['valuemapid'])) {
-		$transaction = DBstart();
+		DBstart();
 
 		$msg_ok = _('Value map deleted');
 		$msg_fail = _('Cannot delete value map');
 
-		$sql = 'SELECT m.name, m.valuemapid'.
-				' FROM valuemaps m WHERE '.DBin_node('m.valuemapid').
-				' AND m.valuemapid='.$_REQUEST['valuemapid'];
-		if ($map_data = DBfetch(DBselect($sql))) {
+		$sql = 'SELECT v.name,v.valuemapid'.
+				' FROM valuemaps v WHERE '.DBin_node('v.valuemapid').
+				' AND v.valuemapid='.$_REQUEST['valuemapid'];
+		if ($valueMapToDelete = DBfetch(DBselect($sql))) {
 			deleteValueMap($_REQUEST['valuemapid']);
+		}
+		else {
+			throw new Exception(_s('Value map with valuemapid "%1$s" does not exist.', $_REQUEST['valuemapid']));
 		}
 
 		add_audit(
 			AUDIT_ACTION_DELETE,
 			AUDIT_RESOURCE_VALUE_MAP,
-			_s('Value map [%1$s] [%2$s]', $map_data['name'], $map_data['valuemapid'])
+			_s('Value map [%1$s] [%2$s]', $valueMapToDelete['name'], $valueMapToDelete['valuemapid'])
 		);
 
 		show_messages(true, $msg_ok);
@@ -125,9 +103,8 @@ try{
 	}
 }
 catch (Exception $e) {
-	if ($transaction) {
-		DBend(false);
-	}
+	DBend(false);
+
 	error($e->getMessage());
 	show_messages(false, null, $msg_fail);
 }
@@ -163,7 +140,7 @@ if (isset($_REQUEST['form'])) {
 	$data['form'] = get_request('form', 1);
 	$data['form_refresh'] = get_request('form_refresh', 0);
 	$data['valuemapid'] = get_request('valuemapid');
-	$data['valuemap'] = array();
+	$data['mappings'] = array();
 	$data['mapname'] = '';
 	$data['confirmMessage'] = null;
 	$data['add_value'] = get_request('add_value');
@@ -174,11 +151,11 @@ if (isset($_REQUEST['form'])) {
 		$data['mapname'] = $db_valuemap['name'];
 
 		if (empty($data['form_refresh'])) {
-			$data['valuemap'] = DBfetchArray(DBselect('SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.$data['valuemapid']));
+			$data['mappings'] = DBfetchArray(DBselect('SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.$data['valuemapid']));
 		}
 		else {
 			$data['mapname'] = get_request('mapname', '');
-			$data['valuemap'] = get_request('valuemap', array());
+			$data['mappings'] = get_request('mappings', array());
 		}
 
 		$valuemap_count = DBfetch(DBselect('SELECT COUNT(i.itemid) as cnt FROM items i WHERE i.valuemapid='.$data['valuemapid']));
@@ -192,10 +169,10 @@ if (isset($_REQUEST['form'])) {
 
 	if (empty($data['valuemapid']) && !empty($data['form_refresh'])) {
 		$data['mapname'] = get_request('mapname', '');
-		$data['valuemap'] = get_request('valuemap', array());
+		$data['mappings'] = get_request('mappings', array());
 	}
 
-	order_result($data['valuemap'], 'value');
+	order_result($data['mappings'], 'value');
 
 	$valueMappingForm = new CView('administration.general.valuemapping.edit', $data);
 }

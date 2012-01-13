@@ -2,11 +2,13 @@
 
 	<tr>
 		<td>
-			<input class="input" type="text" name="mappings[#{mappingNum}][value]" value="#{value}" size="20" maxlength="64">
+			<input class="input" type="text" name="mappings[#{mappingNum}][value]" value="#{value}" size="20" maxlength="64"
+					title="<?php echo _('Only positive or negative number'); ?>" pattern="-?[0-9]+"
+					placeholder="<<?php echo _('integer number'); ?>>">
 		</td>
 		<td>&rArr;</td>
 		<td>
-			<input class="input" type="text" name="mappings[#{mappingNum}][newvalue]" value="#{newvalue}" size="20" maxlength="64">
+			<input class="input" type="text" name="mappings[#{mappingNum}][newvalue]" value="#{newvalue}" size="30" maxlength="64">
 		</td>
 		<td>
 			<input class="input link_menu removeMapping" type="button" value="<?php echo _('Remove'); ?>">

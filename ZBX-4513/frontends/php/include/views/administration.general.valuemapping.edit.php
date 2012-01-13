@@ -44,12 +44,12 @@ $valueMappingFormList->addRow(_('Mappings'), new CDiv($mappingsTable, 'border_do
 
 
 // add mappings to form by js
-if (empty($this->data['valuemap'])) {
+if (empty($this->data['mappings'])) {
 	zbx_add_post_js('mappingsManager.addNew();');
 }
 else {
 	$json = new CJSON();
-	zbx_add_post_js('mappingsManager.addExisting('.$json->encode(array_values($this->data['valuemap'])).');');
+	zbx_add_post_js('mappingsManager.addExisting('.$json->encode(array_values($this->data['mappings'])).');');
 }
 
 // append tab
