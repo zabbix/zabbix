@@ -729,10 +729,10 @@ class CUserMacro extends CZBXAPI {
 		));
 		foreach ($existing_macros as $exst_macro) {
 			if (isset($upd_hosts[$exst_macro['hostid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Macro "%1$s" already exists on "%2$s".', $exst_macro['macro'], $upd_hosts[$exst_macro['hostid']]['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists on "%2$s".', $exst_macro['macro'], $upd_hosts[$exst_macro['hostid']]['name']));
 			}
 			elseif (isset($upd_templates[$exst_macro['hostid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Macro "%1$s" already exists on "%2$s".', $exst_macro['macro'], $upd_templates[$exst_macro['hostid']]['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists on "%2$s".', $exst_macro['macro'], $upd_templates[$exst_macro['hostid']]['name']));
 			}
 		}
 
