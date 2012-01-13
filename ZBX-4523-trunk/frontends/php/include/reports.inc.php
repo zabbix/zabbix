@@ -583,7 +583,7 @@ function bar_report_form3(){
 			$host_tb->addItem($host['hostid'],$host['name']);
 	}
 
-	$reportForm->addRow(_('Hosts'), $host_tb->Get(_('Selected hosts'), array(_('Other hosts | Group '), $cmbGroups)));
+	$reportForm->addRow(_('Hosts'), $host_tb->Get(_('Selected hosts'), array(_('Other hosts | Group').SPACE, $cmbGroups)));
 // ----------
 //*/
 // PERIOD
