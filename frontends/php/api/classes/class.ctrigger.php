@@ -1287,6 +1287,21 @@ class CTrigger extends CZBXAPI {
 		}
 
 		foreach ($triggers as $tnum => &$trigger) {
+
+			if (isset($trigger['triggerid'])) {
+				$parentTriggerParams = $this->getHostByTrigerId($trigger['triggerid']);
+				$parentTriggerHost = DBfetch($parentTriggerParams);
+				if ($parentTriggerHost['status'] != HOST_STATUS_TEMPLATE) {
+					foreach ($trigger['dependencies'] as $triggerId) {
+						$dependTriggerHostParams = $this->getHostByTrigerId($triggerId);
+						$dependTriggerParentHost = DBfetch($dependTriggerHostParams);
+						if ($dependTriggerParentHost['status'] == HOST_STATUS_TEMPLATE) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from template to host.'));
+						}
+					}
+				}
+			}
+
 			$currentTrigger = $triggers[$tnum];
 
 			if (!check_db_fields($trigger_db_fields, $trigger)) {
@@ -2187,6 +2202,18 @@ class CTrigger extends CZBXAPI {
 			'countOutput' => true
 		));
 		return count($ids) == $count;
+	}
+
+	public function getHostByTrigerId($triggerid) {
+
+		zbx_value2array($triggerid);
+		return DBselect(
+			'SELECT DISTINCT h.*'.
+				' FROM hosts h,functions f,items i'.
+				' WHERE i.itemid=f.itemid'.
+				' AND h.hostid=i.hostid'.
+				' AND '.DBcondition('f.triggerid', $triggerid)
+		);
 	}
 }
 ?>
