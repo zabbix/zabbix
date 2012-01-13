@@ -579,7 +579,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 				'hostid' => $trigger_host['hostid'],
 				'groupid' => $group['groupid'],
 				'hasScreens' => (bool) $host['screens'],
-				'hashInventory' => (bool) $host['inventory'],
+				'hasInventory' => (bool) $host['inventory']
 			));
 
 			$hosts_list[] = $hosts_span;
