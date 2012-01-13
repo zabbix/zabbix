@@ -1132,15 +1132,17 @@ COpt::memoryPick();
  */
 	public function delete($templateids) {
 
-			if (empty($templateids)) self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+			if (empty($templateids)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+			}
 
 			$templateids = zbx_toArray($templateids);
 
 			$options = array(
 				'templateids' => $templateids,
-				'editable' => 1,
+				'editable' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1
+				'preservekeys' => true
 			);
 			$del_templates = $this->get($options);
 			foreach ($templateids as $templateid) {
@@ -1155,20 +1157,22 @@ COpt::memoryPick();
 				'templateids' => $templateids,
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'output' => API_OUTPUT_SHORTEN,
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			));
 
-			if (!empty($delItems))
+			if (!empty($delItems)) {
 				API::Item()->delete(array_keys($delItems), true);
+			}
 
 
 // delete screen items
 			DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
 
 // delete host from maps
-			if(!empty($templateids))
+			if (!empty($templateids)) {
 				DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids));
+			}
 
 // disable actions
 // actions from conditions
@@ -1178,8 +1182,9 @@ COpt::memoryPick();
 					' WHERE conditiontype='.CONDITION_TYPE_HOST.
 						' AND '.DBcondition('value', $templateids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions))
+			while ($db_action = DBfetch($db_actions)) {
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
+			}
 
 // actions from operations
 			$sql = 'SELECT DISTINCT o.actionid'.
@@ -1187,10 +1192,11 @@ COpt::memoryPick();
 					' WHERE o.operationid=ot.operationid'.
 						' AND '.DBcondition('ot.templateid',$templateids);
 			$db_actions = DBselect($sql);
-			while($db_action = DBfetch($db_actions))
+			while ($db_action = DBfetch($db_actions)) {
 				$actionids[$db_action['actionid']] = $db_action['actionid'];
+			}
 
-			if(!empty($actionids)){
+			if (!empty($actionids)) {
 				DB::update('actions', array(
 					'values' => array('status' => ACTION_STATUS_DISABLED),
 					'where' => array('actionid' => $actionids)
@@ -1209,8 +1215,9 @@ COpt::memoryPick();
 					' FROM optemplate ot'.
 					' WHERE '.DBcondition('ot.templateid', $templateids);
 			$dbOperations = DBselect($sql);
-			while($dbOperation = DBfetch($dbOperations))
+			while ($dbOperation = DBfetch($dbOperations)) {
 				$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+			}
 
 			DB::delete('optemplate', array(
 				'templateid'=>$templateids,
@@ -1223,8 +1230,9 @@ COpt::memoryPick();
 					' WHERE '.DBcondition('o.operationid', $operationids).
 						' AND NOT EXISTS(SELECT ot.optemplateid FROM optemplate ot WHERE ot.operationid=o.operationid)';
 			$dbOperations = DBselect($sql);
-			while($dbOperation = DBfetch($dbOperations))
+			while ($dbOperation = DBfetch($dbOperations)) {
 				$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+			}
 
 			DB::delete('operations', array(
 				'operationid'=>$delOperationids,
@@ -1237,7 +1245,7 @@ COpt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			));
-			if(!empty($delApplications)){
+			if (!empty($delApplications)) {
 				API::Application()->delete(array_keys($delApplications), true);
 			}
 
@@ -1245,8 +1253,8 @@ COpt::memoryPick();
 			DB::delete('hosts', array('hostid' => $templateids));
 
 // TODO: remove info from API
-			foreach($del_templates as $template) {
-				info(_s('Template [%1$s] deleted.', $template['host']));
+			foreach ($del_templates as $template) {
+				info(_s('Deleted: Template "%1$s"', $template['host']));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['hostid'], $template['host'], 'hosts', NULL, NULL);
 			}
 
@@ -1931,7 +1939,7 @@ COpt::memoryPick();
 		}
 
 
-		$sql_from = ' triggers t';
+		$sql_from = ' triggers t,hosts h';
 		$sql_where = ' EXISTS ('.
 				'SELECT ff.triggerid'.
 				' FROM functions ff,items ii'.
@@ -2087,7 +2095,7 @@ COpt::memoryPick();
 
 
 /* GRAPHS {{{ */
-		$sql_from = ' graphs g';
+		$sql_from = ' graphs g,hosts h';
 		$sql_where = ' EXISTS ('.
 				'SELECT ggi.graphid'.
 				' FROM graphs_items ggi,items ii'.
