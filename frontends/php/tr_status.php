@@ -393,7 +393,8 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$hosts = API::Host()->get(array(
 		'hostids' => $tr_hostids,
 		'preservekeys' => true,
-		'selectScreens' => API_OUTPUT_COUNT
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectInventory' => true
 	));
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
@@ -578,6 +579,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 				'hostid' => $trigger_host['hostid'],
 				'groupid' => $group['groupid'],
 				'hasScreens' => (bool) $host['screens'],
+				'hashInventory' => (bool) $host['inventory'],
 			));
 
 			$hosts_list[] = $hosts_span;
