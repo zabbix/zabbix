@@ -348,7 +348,8 @@ require_once('include/views/js/general.script.confirm.js.php');
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'selectItems' => API_OUTPUT_EXTEND,
-		'selectDependencies' => API_OUTPUT_EXTEND
+		'selectDependencies' => API_OUTPUT_EXTEND,
+		'selectGroups' => API_OUTPUT_REFER
 	);
 	$triggers = API::Trigger()->get($options);
 
@@ -431,10 +432,10 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 	}
 
-
 	foreach($triggers as $tnum => $trigger){
 
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
+		$group = reset($trigger['groups']);
 
 		$items = array();
 
@@ -540,35 +541,17 @@ require_once('include/views/js/general.script.confirm.js.php');
 			$menus = '';
 			$host = $hosts[$trigger_host['hostid']];
 
-			$host_nodeid = id2nodeid($trigger_host['hostid']);
-			if(isset($scripts_by_hosts[$trigger_host['hostid']])){
-				foreach($scripts_by_hosts[$trigger_host['hostid']] as $id => $script){
-					$script_nodeid = id2nodeid($script['scriptid']);
-					if( (bccomp($host_nodeid, $script_nodeid ) == 0)){
-						$str_tmp = zbx_jsvalue('javascript: executeScript('.$trigger_host['hostid'].', '.
-								$script['scriptid'].', '.
-								zbx_jsvalue($script['confirmation']).
-								')');
-
-						$menus.= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-					}
+			// fetch scripts for the host JS menu
+			$menuScripts = array();
+			if (isset($scripts_by_hosts[$trigger_host['hostid']])) {
+				foreach ($scripts_by_hosts[$trigger_host['hostid']] as $script) {
+					$menuScripts[] = array(
+						'scriptid' => $script['scriptid'],
+						'confirmation' => $script['confirmation'],
+						'name' => $script['name']
+					);
 				}
 			}
-			if(!empty($scripts_by_hosts)){
-				$menus = "[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
-			}
-
-			$menus.= "[".zbx_jsvalue(_('Go to')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-			$menus.= "['"._('Latest data')."',\"javascript: redirect('latest.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-
-			if ($host['screens']) {
-				$menus.= "['"._('Screens')."',\"javascript: redirect('host_screen.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-			}
-
-			$menus = rtrim($menus,',');
-			$menus = 'show_popup_menu(event,['.$menus.'],180);';
-
-
 
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
@@ -589,7 +572,14 @@ require_once('include/views/js/general.script.confirm.js.php');
 			}
 
 			$hosts_span = new CSpan($trigger_host['name'], 'link_menu');
-			$hosts_span->setAttribute('onclick','javascript: '.$menus);
+			$hosts_span->addClass('menu-host');
+			$hosts_span->setAttribute('data-menu', array(
+				'scripts' => $menuScripts,
+				'hostid' => $trigger_host['hostid'],
+				'groupid' => $group['groupid'],
+				'hasScreens' => (bool) $host['screens'],
+			));
+
 			$hosts_list[] = $hosts_span;
 			$hosts_list[] = $maint_span;
 			$hosts_list[] = ', ';

@@ -81,7 +81,10 @@ $tranStrings = array(
 	),
 	'class.cmessages.js' => array('S_MUTE', 'S_UNMUTE', 'S_MESSAGES', 'S_CLEAR', 'S_SNOOZE', 'S_MOVE'),
 	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'),
-	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED', 'S_INTERFACES')
+	'main.js' => array(
+		'S_CLOSE', 'S_NO_ELEMENTS_SELECTED', 'S_INTERFACES', 'Screens', 'Go to', 'Latest data',
+		'Scripts', 'Host inventories'
+	)
 );
 
 if (empty($_GET['files'])) {
