@@ -983,7 +983,7 @@ FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|test_string	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|name
 
-TABLE|user_history|userhistoryid|
+TABLE|user_history|userhistoryid|0
 FIELD		|userhistoryid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|userid		|t_id		|'0'	|NOT NULL	|0			|users
 FIELD		|title1		|t_varchar(255)	|''	|NOT NULL	|0
