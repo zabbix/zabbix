@@ -19,96 +19,144 @@
 **/
 ?>
 <?php
-function add_mapping_to_valuemap($valuemapid, $mappings) {
-	DBexecute('DELETE FROM mappings WHERE valuemapid='.$valuemapid);
+function addValueMap($valueMap, $mappings) {
+	// check duplicate name
+	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.name='.zbx_dbstr($valueMap['name']);
+	if (DBfetch(DBselect($sql))) {
+		throw new Exception(_s('Value map "%1$s" already exists.', $valueMap['name']));
+	}
 
-	foreach ($mappings as $map) {
-		$mappingid = get_dbid('mappings', 'mappingid');
+	$valueMapIds = DB::insert('valuemaps', array($valueMap));
+	$valueMapId = reset($valueMapIds);
 
-		$result = DBexecute('INSERT INTO mappings (mappingid,valuemapid, value, newvalue)'.
-			' VALUES ('.$mappingid.','.$valuemapid.','.zbx_dbstr($map['value']).','.zbx_dbstr($map['newvalue']).')'
-		);
-		if (!$result) {
-			return $result;
+	addValueMapMappings($valueMapId, $mappings);
+}
+
+
+function updateValueMap($valueMap, $mappings) {
+	$valueMapId = $valueMap['valuemapid'];
+	unset($valueMap['valuemapid']);
+
+	// check existance
+	if(!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId))) {
+		throw new Exception(_('Value map does not exist.'));
+	}
+
+	// check duplicate name
+	$sql = 'SELECT v.valuemapid FROM valuemaps v WHERE v.name='.zbx_dbstr($valueMap['name']);
+	$dbValueMap = DBfetch(DBselect($sql));
+	if ($dbValueMap && bccomp($valueMapId, $dbValueMap['valuemapid']) != 0) {
+		throw new Exception(_s('Value map "%1$s" already exists.', $valueMap['name']));
+	}
+
+	rewriteValueMapMappings($valueMapId, $mappings);
+
+	DB::update('valuemaps', array(
+		'values' => $valueMap,
+		'where' => array('valuemapid' => $valueMapId)
+	));
+}
+
+
+function deleteValueMap($valueMapId) {
+	DB::update('items', array(
+		'values' => array('valuemapid' => 0),
+		'where' => array('valuemapid' => $valueMapId)
+	));
+	DB::delete('valuemaps', array('valuemapid' => $valueMapId));
+}
+
+
+function rewriteValueMapMappings($valueMapId, array $mappings) {
+	$dbValueMaps = getValueMapMappings($valueMapId);
+
+	$mappingsToAdd = array();
+	$mappingsToUpdate = array();
+	foreach ($mappings as $mapping) {
+		if (!isset($mapping['mappingid'])) {
+			$mappingsToAdd[] = $mapping;
+		}
+		elseif (isset($dbValueMaps[$mapping['mappingid']])) {
+			$mappingsToUpdate[] = $mapping;
+			unset($dbValueMaps[$mapping['mappingid']]);
 		}
 	}
-	return true;
+
+	if (!empty($dbValueMaps)) {
+		$dbMappingIds = zbx_objectValues($dbValueMaps, 'mappingid');
+		deleteValueMapMappings($dbMappingIds);
+	}
+
+	if (!empty($mappingsToAdd)) {
+		addValueMapMappings($valueMapId, $mappingsToAdd);
+	}
+
+	if (!empty($mappingsToUpdate)) {
+		updateValueMapMappings($mappingsToUpdate);
+	}
 }
 
-function add_valuemap($name, $mappings) {
-	if (!is_array($mappings)) {
-		return false;
-	}
 
-	$valuemapid = get_dbid('valuemaps', 'valuemapid');
+function addValueMapMappings($valueMapId, $mappings) {
+	foreach ($mappings as &$mapping) {
+		$mapping['valuemapid'] = $valueMapId;
+	}
+	unset($mapping);
 
-	$result = DBexecute('INSERT INTO valuemaps (valuemapid,name) VALUES ('.$valuemapid.','.zbx_dbstr($name).')');
-	if (!$result) {
-		return $result;
-	}
-
-	$result = add_mapping_to_valuemap($valuemapid, $mappings);
-	if (!$result) {
-		delete_valuemap($valuemapid);
-	}
-	else {
-		$result = $valuemapid;
-	}
-	return $result;
+	DB::insert('mappings', $mappings);
 }
 
-function update_valuemap($valuemapid, $name, $mappings) {
-	if (!is_array($mappings)) {
-		return false;
-	}
+function updateValueMapMappings(array $mappings) {
+	foreach ($mappings as &$mapping) {
+		$mappingid = $mapping['mappingid'];
+		unset($mapping['mappingid']);
 
-	$result = DBexecute('UPDATE valuemaps SET name='.zbx_dbstr($name).' WHERE valuemapid='.$valuemapid);
-	if (!$result) {
-		return $result;
+		DB::update('mappings', array(
+			'values' => $mapping,
+			'where' => array('mappingid' => $mappingid)
+		));
 	}
-
-	$result = add_mapping_to_valuemap($valuemapid, $mappings);
-	if (!$result) {
-		delete_valuemap($valuemapid);
-	}
-	return $result;
+	unset($mapping);
 }
 
-function delete_valuemap($valuemapid) {
-	$result = DBexecute('UPDATE items SET valuemapid=NULL WHERE valuemapid='.$valuemapid);
-	$result &= DBexecute('DELETE FROM mappings WHERE valuemapid='.$valuemapid);
-	$result &= DBexecute('DELETE FROM valuemaps WHERE valuemapid='.$valuemapid);
-	return $result;
+function deleteValueMapMappings(array $mappingIds) {
+	DB::delete('mappings', array('mappingid' => $mappingIds));
 }
 
-function getValuemapByName($name) {
-	$result = DBselect(
-		'SELECT v.valuemapid, v.name'.
-			' FROM valuemaps v'.
-			' WHERE v.name='.zbx_dbstr($name)
+function getValueMapMappings($valueMapId) {
+	$mappings = array();
+
+	$dbMappings = DBselect(
+		'SELECT m.mappingid,m.value,m.newvalue'.
+				' FROM mappings m'.
+				' WHERE valuemapid='.$valueMapId
 	);
-	return DBfetch($result);
+	while ($mapping = DBfetch($dbMappings)) {
+		$mappings[$mapping['mappingid']] = $mapping;
+	}
+
+	return $mappings;
 }
 
-function replace_value_by_map($value, $valuemapid) {
-	if ($valuemapid < 1) {
+function applyValueMap($value, $valueMapId) {
+	if ($valueMapId < 1) {
 		return $value;
 	}
 
 	static $valuemaps = array();
-	if (isset($valuemaps[$valuemapid][$value])) {
-		return $valuemaps[$valuemapid][$value];
+	if (isset($valuemaps[$valueMapId][$value])) {
+		return $valuemaps[$valueMapId][$value];
 	}
 
 	$db_mappings = DBselect(
 		'SELECT m.newvalue'.
 			' FROM mappings m'.
-			' WHERE m.valuemapid='.$valuemapid.
+			' WHERE m.valuemapid='.$valueMapId.
 			' AND m.value='.zbx_dbstr($value)
 	);
 	if ($mapping = DBfetch($db_mappings)) {
-		$valuemaps[$valuemapid][$value] = $mapping['newvalue'].' '.'('.$value.')';
-		return $valuemaps[$valuemapid][$value];
+		$valuemaps[$valueMapId][$value] = $mapping['newvalue'].' '.'('.$value.')';
+		return $valuemaps[$valueMapId][$value];
 	}
 	return $value;
 }
