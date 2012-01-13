@@ -1527,11 +1527,7 @@ class CTrigger extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
-			$hosts = array();
-			foreach ($trigger['hosts'] as $host) {
-				$hosts[] = $host['name'];
-			}
-			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(", ", $hosts)));
+			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
@@ -1621,7 +1617,7 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(", ", $hosts)));
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts)));
 		}
 
 		$this->validateDependencies($triggers);
@@ -1742,12 +1738,7 @@ class CTrigger extends CZBXAPI {
 			// restore the full expression to properly validate dependencies
 			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
-			$hosts = array();
-			foreach ($dbTriggers[$trigger['triggerid']]['hosts'] as $host) {
-				$hosts[] = $host['name'];
-			}
-
-			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(", ", $hosts));
+			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', zbx_objectValues($dbTriggers[$trigger['triggerid']]['hosts'], 'name')));
 		}
 		unset($trigger);
 
