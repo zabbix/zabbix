@@ -1005,15 +1005,5 @@
 	'S_MAX_COOKIE_SIZE_REACHED'=>		_('We are sorry, the maximum possible number of elements to remember has been reached.'),
 
 	'S_ICONMAP_IS_NOT_ENABLED' => _('Iconmap is not enabled'),
-
-	'S_ADD_MISSING' =>				'Add missing',
-	'S_HISTORY_OF_EVENTS_ON_BIG' =>	'HISTORY OF EVENTS ON',
-	'S_IN_GROUPS' =>				'In groups',
-	'S_OTHER_GROUPS' =>				'Other groups',
-	'S_OTHER_HOSTS' =>				'Other hosts',
-	'S_PROXY_HOSTS' =>				'Proxy hosts',
-	'S_UPDATE_EXISTING' =>			'Update existing',
-	'S_X_LABEL' =>					'X Label',
-	'S_Y_LABEL' =>					'Y Label'
 );
 ?>
