@@ -1646,15 +1646,16 @@ class CTrigger extends CZBXAPI {
 		$options = array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('name'),
 			'preservekeys' => true,
-			'nopermissions' => true,
-			'selectHosts' => array('name')
+			'nopermissions' => true
 		);
 		$dbTriggers = $this->get($options);
 
 		$description_changed = $expression_changed = false;
 		foreach ($triggers as &$trigger) {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
+			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
 
 			if (isset($trigger['description']) && strcmp($dbTrigger['description'], $trigger['description']) != 0) {
 				$description_changed = true;
@@ -1708,7 +1709,7 @@ class CTrigger extends CZBXAPI {
 			if ($expression_changed) {
 				delete_function_by_triggerid($trigger['triggerid']);
 
-				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid']);
+				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid'], $hosts);
 				if (is_null($trigger['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expression_full));
 				}
@@ -1738,7 +1739,7 @@ class CTrigger extends CZBXAPI {
 			// restore the full expression to properly validate dependencies
 			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
-			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', zbx_objectValues($dbTriggers[$trigger['triggerid']]['hosts'], 'name')));
+			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
 		}
 		unset($trigger);
 
