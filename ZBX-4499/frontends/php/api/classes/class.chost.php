@@ -1297,6 +1297,7 @@ Copt::memoryPick();
 		catch(APIException $e){
 			self::EndTransaction(false, __METHOD__);
 			$error = $e->getErrors();
+			// Ignore exception with no error messages
 			if (count($error) == 0) {
 				return false;
 			}
