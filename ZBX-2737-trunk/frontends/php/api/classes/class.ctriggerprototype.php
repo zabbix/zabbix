@@ -1124,7 +1124,7 @@ COpt::memoryPick();
 			}
 			if (!$has_prototype) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-				sprintf(_('Trigger "%1$s:%2$s" does not have item prototype.'), $createdTrigger['description'], $createdTrigger['expression']));
+				_s('Trigger "%1$s:%2$s" does not have item prototype.', $createdTrigger['description'], $createdTrigger['expression']));
 			}
 		}
 
@@ -1342,7 +1342,7 @@ COpt::memoryPick();
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(sprintf(_('Created: Trigger prototype "%1$s" on "%2$s".'), $trigger['description'], implode(', ', $hosts)));
+			info(_s('Created: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts)));
 		}
 
 	}
@@ -1361,6 +1361,7 @@ COpt::memoryPick();
 		$description_changed = $expression_changed = false;
 		foreach ($triggers as &$trigger) {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
+			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
 
 			if (isset($trigger['description']) && strcmp($dbTrigger['description'], $trigger['description']) != 0) {
 				$description_changed = true;
@@ -1408,7 +1409,7 @@ COpt::memoryPick();
 			if ($expression_changed) {
 				delete_function_by_triggerid($trigger['triggerid']);
 
-				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid']);
+				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid'], $hosts);
 				if (is_null($trigger['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expression_full));
 				}
@@ -1437,7 +1438,7 @@ COpt::memoryPick();
 			$description = isset($trigger['description']) ? $trigger['description'] : $dbTrigger['description'];
 			$expression = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
-			info(_s('Updated: Trigger prototype "%1$s" on "%2$s".', $description, implode(', ', zbx_objectValues($dbTrigger['hosts'], 'name'))));
+			info(_s('Updated: Trigger prototype "%1$s" on "%2$s".', $description, implode(', ', $hosts)));
 		}
 		unset($trigger);
 	}
