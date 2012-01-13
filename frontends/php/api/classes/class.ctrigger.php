@@ -1527,8 +1527,10 @@ class CTrigger extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
-			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], null, null, null);
+			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
+					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'],
+					$trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
 		DB::delete('triggers', array('triggerid' => $triggerids));

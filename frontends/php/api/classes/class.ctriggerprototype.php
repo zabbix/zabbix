@@ -1130,7 +1130,8 @@ COpt::memoryPick();
 
 		foreach ($createdTriggers as $trigger) {
 			$this->inherit($trigger);
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'],
+					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
 		}
 
 		return array('triggerids' => $triggerids);
@@ -1309,8 +1310,10 @@ COpt::memoryPick();
 
 // TODO: REMOVE info
 			foreach ($del_triggers as $triggerid => $trigger) {
-				info(_s('Deleted: Trigger prototype "%1$s" on "%2$s".', $trigger['description'], implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
+				info(_s('Deleted: Trigger prototype "%1$s" on "%2$s".', $trigger['description'],
+						implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER_PROTOTYPE, $trigger['triggerid'],
+						$trigger['description'].':'.$trigger['expression'], NULL, NULL, NULL);
 			}
 
 
