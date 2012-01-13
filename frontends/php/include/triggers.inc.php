@@ -1004,9 +1004,7 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 				error(_s('Incorrect item value type "%1$s:%2$s" provided for trigger function "%3$s".', $exprPart['host'], $exprPart['item'], $exprPart['function']));
 				return null;
 			}
-			if (!in_array($item['name'], $hostnames)) {
-				$hostnames[] = $item['name'];
-			}
+			$hostnames[] = $item['name'];
 		}
 		else {
 			error(_s('Incorrect item key "%1$s:%2$s" provided for trigger expression.', $exprPart['host'], $exprPart['item']));
@@ -1028,6 +1026,7 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 		}
 		$expr = str_replace($exprPart['expression'], '{'.$usedItems[$exprPart['expression']].'}', $expr);
 	}
+	$hostnames = array_unique($hostnames);
 	return $expr;
 }
 
