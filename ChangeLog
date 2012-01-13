@@ -393,6 +393,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+A.F....... [ZBX-4499] fixed upper case error in some browsers while adding macro (sanja)
 ........S. [ZBX-4526] fixed processing of string trigger functions if the data contains CR character (Sasha)
 .......P.. [ZBX-4073] removed unused TrendCacheSize and CacheUpdateFrequency options from proxy (Sasha)
 ..F....... [ZBX-4506] removed unnecessary new line symbol stripping from HTML attributes (pavels)
