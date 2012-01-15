@@ -21,11 +21,10 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-
-class testPageDiscoveryRules extends CWebTest{
+class testPageDiscoveryRules extends CWebTest {
 
 	// Returns all Discovery Rules
-	public static function allRules(){
+	public static function allRules() {
 		$sql = 'SELECT h.hostid, i.itemid'.
 				' FROM hosts h, items i'.
 				' WHERE i.hostid=h.hostid'.
@@ -37,7 +36,7 @@ class testPageDiscoveryRules extends CWebTest{
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageActionsDiscovery_MassDelete($rule){
+	public function testPageActionsDiscovery_MassDelete($rule) {
 		$itemid = $rule['itemid'];
 		$this->chooseOkOnNextConfirmation();
 
@@ -56,17 +55,16 @@ class testPageDiscoveryRules extends CWebTest{
 		$this->ok('Discovery rule deleted');
 		$this->ok('CONFIGURATION OF DISCOVERY RULES');
 
-		$sql="select * from items where itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from item_discovery where parent_itemid=$itemid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="SELECT gi.gitemid from graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="SELECT f.functionid from functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
-		$this->assertEquals(0,DBcount($sql));
+		$sql = "select * from items where itemid=$itemid AND flags=".ZBX_FLAG_DISCOVERY;
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from item_discovery where parent_itemid=$itemid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "SELECT gi.gitemid from graphs_items gi, item_discovery id WHERE gi.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "SELECT f.functionid from functions f, item_discovery id WHERE f.itemid=id.itemid AND id.parent_itemid=$itemid";
+		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('triggers');
 	}
-
 }
 ?>
