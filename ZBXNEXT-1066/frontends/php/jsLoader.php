@@ -55,6 +55,7 @@ $availableJScripts = array(
 	'class.rpc.js' => '',
 	'class.pmaster.js' => '',
 	'class.cviewswitcher.js' => '',
+	'init.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/'
 );
@@ -103,7 +104,8 @@ if (empty($_GET['files'])) {
 		'class.cmessages.js',
 		'main.js',
 		'functions.js',
-		'menu.js'
+		'menu.js',
+		'init.js'
 	);
 }
 else {
