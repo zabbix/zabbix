@@ -800,7 +800,7 @@ switch($itemType) {
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$items_wdgt->addHeader(S_ITEMS_BIG, SPACE);
+		$items_wdgt->addHeader(_('ITEMS'), SPACE);
 		$items_wdgt->addHeader($numrows, SPACE);
 // ----------------
 
