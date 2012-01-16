@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-01-16 16:15+0200\n"
-"PO-Revision-Date: 2011-12-26 20:11+0200\n"
+"POT-Creation-Date: 2012-01-16 16:19+0200\n"
+"PO-Revision-Date: 2011-12-28 14:45+0200\n"
 "Last-Translator: vzanchettin <vzanchettin@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -11199,7 +11199,7 @@ msgstr ""
 #: api/classes/class.cuser.php:459
 #, php-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
-msgstr ""
+msgstr "Você não tem permissão para alterar os privilégios para o usuário \"%s\"."
 
 #: include/config.inc.php:327
 msgid "You are not logged in."
@@ -11207,7 +11207,7 @@ msgstr "Você não está logado."
 
 #: popup.php:376
 msgid "You can not switch hosts for current selection"
-msgstr ""
+msgstr "Você não pode alternar hosts para a seleção atual"
 
 #: include/config.inc.php:328
 msgid "You cannot view this URL as a"
@@ -11224,7 +11224,7 @@ msgstr "Você não especificou um grupo de host para operação."
 #: api/classes/class.caction.php:1627
 #, php-format
 msgid "You did not specify targets for action operation command \"%s\"."
-msgstr ""
+msgstr "Você não especificou um alvo para a ação de operação do comando \"%s\"."
 
 #: api/classes/class.caction.php:1624
 #, php-format
@@ -11282,11 +11282,11 @@ msgstr "Voucê não tem permisoes para alterar outros usuários."
 
 #: api/classes/class.cusermedia.php:392
 msgid "You do not have permissions to update user media or user media does not exist."
-msgstr ""
+msgstr "Você não tem permissão para atualização de mídia do usuário ou a mídia do usuário não existe."
 
 #: api/classes/class.cusermedia.php:402
 msgid "You do not have permissions to update user medias."
-msgstr ""
+msgstr "Você não tem permissão para atualizar as mídias do usuário."
 
 #: api/classes/class.cuser.php:383
 msgid "You do not have permissions to update user or user does not exist."
@@ -11347,7 +11347,7 @@ msgstr "Zabbix agregado"
 
 #: include/validate.inc.php:560
 msgid "Zabbix has received an incorrect request."
-msgstr ""
+msgstr "Zabbix recebeu uma uma solicitação incorreta."
 
 #: include/items.inc.php:84
 msgid "Zabbix internal"
@@ -11409,12 +11409,12 @@ msgstr "[H:i:s]"
 #: include/func.inc.php:118
 #, php-format
 msgid "[Wrong value for day: \"%s\" ]"
-msgstr ""
+msgstr "[Valor errado para o dia: \"%s\" ]"
 
 #: include/func.inc.php:104
 #, php-format
 msgid "[Wrong value for month: \"%s\" ]"
-msgstr ""
+msgstr "[Valor errado para o mês: \"%s\" ]"
 
 #: include/locales/en_gb.inc.php:324
 msgid "[Y.M.d H:i:s]"

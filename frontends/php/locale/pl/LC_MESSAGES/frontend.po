@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-01-16 16:15+0200\n"
-"PO-Revision-Date: 2011-12-28 01:01+0200\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2012-01-16 16:19+0200\n"
+"PO-Revision-Date: 2012-01-09 15:06+0200\n"
+"Last-Translator: Pawel <pawel.jarosz@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -3119,7 +3119,7 @@ msgstr ""
 #: api/classes/class.cdiscoveryrule.php:997
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr ""
+msgstr "Reguła wykrywania \"%1$s:%2$s\" ma nie poprawny czas życia: \"%3$s\". (min: %4$d, max: %5$d, makra użytkownika dozwolone)"
 
 #: api/classes/class.cdrule.php:596
 #, php-format
@@ -3513,7 +3513,7 @@ msgstr "Błąd"
 
 #: services.php:186 services.php:193
 msgid "Error adding service time. Should be from 00:00 to 24:00."
-msgstr ""
+msgstr "Błąd podczas dodania czasu serwisowego. Powinien być w ramach od 00:00 do 24:00"
 
 #: include/locales/en_gb.inc.php:823
 msgid "Error description"
@@ -3625,7 +3625,7 @@ msgstr "Istniejące"
 
 #: sysmap.php:197
 msgid "Expand macros"
-msgstr ""
+msgstr "Rozwiń makra"
 
 #: include/views/configuration.sysmap.edit.php:82
 msgid "Expand single problem"
@@ -4105,7 +4105,7 @@ msgstr "Usunięto wykresy"
 
 #: include/locales.inc.php:61
 msgid "Greek (el_GR)"
-msgstr ""
+msgstr "Grecki (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:61 sysmap.php:199
 msgid "Grid"
@@ -11485,7 +11485,7 @@ msgstr "jako Czerwone"
 
 #: include/graphs.inc.php:95 include/locales/en_gb.inc.php:259
 msgid "avg"
-msgstr "średnio"
+msgstr "śr."
 
 #: include/locales/en_gb.inc.php:37
 msgid "created"
