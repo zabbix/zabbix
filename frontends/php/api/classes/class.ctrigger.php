@@ -1631,8 +1631,8 @@ class CTrigger extends CZBXAPI {
 				'values' => array('expression' => $expression),
 				'where' => array('triggerid' => $triggerid)
 			));
-
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], reset($hosts)));
+			$hostName=explode(':',$trigger['expression']);
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], str_replace('{','',reset($hostName))));
 		}
 
 		$this->validateDependencies($triggers);
