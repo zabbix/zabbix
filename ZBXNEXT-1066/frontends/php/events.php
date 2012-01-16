@@ -370,7 +370,7 @@ require_once('include/page_header.php');
 
 	$csv_disabled = true;
 
-	if(empty($firstEvent)){dded host pop up menu to the events page
+	if(empty($firstEvent)){
 
 		$starttime = null;
 		$events = array();
