@@ -755,7 +755,9 @@ class CItem extends CItemGeneral {
 		}
 
 		// add other related objects
-		$result = $this->addRelatedObjects($options, $result);
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+		}
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
