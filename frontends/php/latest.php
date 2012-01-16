@@ -204,16 +204,37 @@ require_once('include/page_header.php');
 	$db_apps = array();
 	$db_appids = array();
 
+	$options = array(
+		'output' => array('name', 'hostid'),
+		'hostids' => $available_hosts,
+		'selectAppllications' => API_OUTPUT_EXTEND,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectInventory' => true,
+		'selectGroups' => API_OUTPUT_REFER,
+		'sortfield' => array('name', 'hostid'),
+		'preservekeys' => true,
+	);
+
 	$sql_from = '';
 	$sql_where = '';
 	if($_REQUEST['groupid'] > 0){
 		$sql_from .= ',hosts_groups hg ';
 		$sql_where.= ' AND hg.hostid=h.hostid AND hg.groupid='.$_REQUEST['groupid'];
+
+		$options['groupid'] = $_REQUEST['groupid'];
 	}
 
 	if($_REQUEST['hostid']>0){
 		$sql_where.= ' AND h.hostid='.$_REQUEST['hostid'];
+
+		$options['hostids'] = $_REQUEST['hostid'];
 	}
+
+	$hosts = API::Host()->get($options);
+
+	// fetch scripts for the host JS menu
+	$hostScripts = API::Script()->getScriptsByHosts($options['hostids']);
+
 	// select hosts
 	$sql = 'SELECT DISTINCT h.name as hostname,h.hostid, a.* '.
 			' FROM applications a, hosts h '.$sql_from.
@@ -398,6 +419,7 @@ require_once('include/page_header.php');
 			' ORDER BY i.name,i.itemid';
 	$db_items = DBselect($sql);
 	while ($db_item = DBfetch($db_items)) {
+		$host = $hosts[$db_item['hostid']];
 
 		$description = itemName($db_item);
 
@@ -469,6 +491,8 @@ require_once('include/page_header.php');
 	unset($db_host);
 
 	foreach($db_hosts as $hostid => $db_host){
+		$host = $hosts[$db_host['hostid']];
+		$group = reset($host['groups']);
 
 		if(!isset($tab_rows[$hostid])) continue;
 		$app_rows = $tab_rows[$hostid];
@@ -506,10 +530,32 @@ require_once('include/page_header.php');
 		$col = new CCol(array(bold(S_MINUS_OTHER_MINUS),SPACE.'('.$db_host['item_cnt'].SPACE.S_ITEMS.')'));
 		$col->setColSpan(5);
 
+		// fetch scripts for the host JS menu
+		$menuScripts = array();
+		if (isset($hostScripts[$db_host['hostid']])) {
+			foreach ($hostScripts[$db_host['hostid']] as $script) {
+				$menuScripts[] = array(
+					'scriptid' => $script['scriptid'],
+					'confirmation' => $script['confirmation'],
+					'name' => $script['name']
+				);
+			}
+		}
+
+		// host JS menu link
+		$hostSpan = new CSpan($db_host['name'], 'link_menu menu-host');
+		$hostSpan->setAttribute('data-menu', array(
+			'scripts' => $menuScripts,
+			'hostid' => $db_host['hostid'],
+			'groupid' => $group['groupid'],
+			'hasScreens' => (bool) $host['screens'],
+			'hasInventory' => (bool) $host['inventory']
+		));
+
 		$table->addRow(array(
 			$link,
 			get_node_name_by_elid($db_host['hostid']),
-			($_REQUEST['hostid'] > 0)?NULL:$db_host['name'],
+			($_REQUEST['hostid'] > 0) ? NULL : $hostSpan,
 			$col
 		));
 
