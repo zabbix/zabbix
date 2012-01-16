@@ -480,6 +480,7 @@
 	'S_CANNNOT_ADD_VALUE_MAP'=>			'Cannot add value map',
 	'S_VALUE_MAP_DELETED'=>				'Value map deleted',
 	'S_CANNNOT_DELETE_VALUE_MAP'=>			'Cannot delete value map',
+	'S_VALUE_MAP_WITH_NAME_EXISTS' => 'Cannot add or updated value map. Map with name "%s" already exists',
 	'S_VALUE_MAP_UPDATED'=>				'Value map updated',
 	'S_VALUE_MAPPING_BIG'=>				'VALUE MAPPING',
 	'S_VALUE_MAPPING'=>				'Value mapping',
