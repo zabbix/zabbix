@@ -21,7 +21,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
-class testFormAdministrationGeneral extends CWebTest {
+class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 	public static function allValues()
 	{
@@ -31,7 +31,7 @@ class testFormAdministrationGeneral extends CWebTest {
 	/**
 	* @dataProvider allValues
 	*/
-	public function testFormAdministrationGeneral_CheckLayout($allValues) {
+	public function testFormAdministrationGeneralHousekeeper_CheckLayout($allValues) {
 
 		$this->login('config.php');
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
@@ -49,7 +49,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		$this->assertAttribute("//input[@id='event_history']/@value", $allValues['event_history']);
 	}
 
-	public function testFormAdministrationGeneral_AlertHistory() {
+	public function testFormAdministrationGeneralHousekeeper_AlertHistory() {
 		// 0-65535
 
 		$this->login('config.php');
@@ -98,7 +98,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
 	}
 
-	public function testFormAdministrationGeneral_EventHistory() {
+	public function testFormAdministrationGeneralHousekeeper_EventHistory() {
 		// 0-65535
 
 		$this->login('config.php');
