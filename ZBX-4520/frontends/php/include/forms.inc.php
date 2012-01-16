@@ -3026,14 +3026,14 @@
 
 		$tblRE = new CTable('','formtable nowrap');
 
-		$tblRE->addRow(array(S_NAME, new CTextBox('rename', $rename, 60, 'no', 128)));
-		$tblRE->addRow(array(S_TEST_STRING, new CTextArea('test_string', $test_string)));
+		$tblRE->addRow(array(_('Name'), new CTextBox('rename', $rename, 60, 'no', 128)));
+		$tblRE->addRow(array(_('Test string'), new CTextArea('test_string', $test_string)));
 
 		$tabExp = new CTableInfo();
 
 		$td1 = new CCol(_('Expression'));
 		$td2 = new CCol(_('Expected result'));
-		$td3 = new CCol(S_RESULT);
+		$td3 = new CCol(_('Result'));
 
 		$tabExp->setHeader(array($td1,$td2,$td3));
 
@@ -3085,9 +3085,9 @@
 			}
 
 			if(isset($results[$id]) && $results[$id])
-				$exp_res = new CSpan(S_TRUE_BIG,'green bold');
+				$exp_res = new CSpan(_('TRUE'), 'green bold');
 			else
-				$exp_res = new CSpan(S_FALSE_BIG,'red bold');
+				$exp_res = new CSpan(_('FALSE'), 'red bold');
 
 			$expec_result = expression_type2str($expression['expression_type']);
 			if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
@@ -3100,14 +3100,14 @@
 			));
 		}
 
-		$td = new CCol(S_COMBINED_RESULT, 'bold');
+		$td = new CCol(_('Combined result'), 'bold');
 		$td->setColSpan(2);
 
 		if ($final_result) {
-			$final_result = new CSpan(S_TRUE_BIG, 'green bold');
+			$final_result = new CSpan(_('TRUE'), 'green bold');
 		}
 		else {
-			$final_result = new CSpan(S_FALSE_BIG, 'red bold');
+			$final_result = new CSpan(_('FALSE'), 'red bold');
 		}
 
 		$tabExp->addRow(array(
@@ -3115,11 +3115,11 @@
 			$final_result
 		));
 
-		$tblRE->addRow(array(S_RESULT, $tabExp));
+		$tblRE->addRow(array(_('Result'), $tabExp));
 
 		$tblFoot = new CTableInfo(null);
 
-		$td = new CCol(array(new CSubmit('save', S_SAVE)));
+		$td = new CCol(array(new CSubmit('save', _('Save'))));
 		$td->setColSpan(2);
 		$td->addStyle('text-align: right;');
 
@@ -3128,9 +3128,9 @@
 
 		if (isset($_REQUEST['regexpid'])) {
 			$td->addItem(SPACE);
-			$td->addItem(new CSubmit('clone', S_CLONE));
+			$td->addItem(new CSubmit('clone', _('Clone')));
 			$td->addItem(SPACE);
-			$td->addItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q, url_param('form').url_param('config').url_param('regexpid').url_param('delete', false, 'go')));
+			$td->addItem(new CButtonDelete(_('Delete regular expression?'), url_param('form').url_param('config').url_param('regexpid').url_param('delete', false, 'go')));
 		}
 
 		$td->addItem(SPACE);
@@ -3151,24 +3151,23 @@
 					' ORDER BY e.expression_type';
 
 			$db_exps = DBselect($sql);
-			while($exp = DBfetch($db_exps)){
+			while ($exp = DBfetch($db_exps)) {
 				$expressions[] = $exp;
 			}
 		}
-		else{
+		else {
 			$expressions = get_request('expressions',array());
 		}
 
 		$tblExp = new CTableInfo();
 		$tblExp->setHeader(array(
-				new CCheckBox('all_expressions', null, 'checkAll("regularExpressionsForm", "all_expressions", "g_expressionid");'),
-				_('Expression'),
-				_('Expected result'),
-				_('Case sensitive'),
-				_('Edit')
-			));
+			new CCheckBox('all_expressions', null, 'checkAll("regularExpressionsForm", "all_expressions", "g_expressionid");'),
+			_('Expression'),
+			_('Expected result'),
+			_('Case sensitive'),
+			_('Edit')
+		));
 
-//		zbx_rksort($timeperiods);
 		foreach($expressions as $id => $expression){
 
 			$exp_result = expression_type2str($expression['expression_type']);
@@ -3183,10 +3182,13 @@
 				new CSubmit('edit_expressionid['.$id.']', _('Edit'))
 			));
 
-			$tblExp->addItem(new CVar('expressions['.$id.'][expression]',		$expression['expression']));
-			$tblExp->addItem(new CVar('expressions['.$id.'][expression_type]',	$expression['expression_type']));
-			$tblExp->addItem(new CVar('expressions['.$id.'][case_sensitive]',	$expression['case_sensitive']));
-			$tblExp->addItem(new CVar('expressions['.$id.'][exp_delimiter]',	$expression['exp_delimiter']));
+			if (isset($expression['expressionid'])) {
+				$tblExp->addItem(new CVar('expressions['.$id.'][expressionid]', $expression['expressionid']));
+			}
+			$tblExp->addItem(new CVar('expressions['.$id.'][expression]', $expression['expression']));
+			$tblExp->addItem(new CVar('expressions['.$id.'][expression_type]', $expression['expression_type']));
+			$tblExp->addItem(new CVar('expressions['.$id.'][case_sensitive]', $expression['case_sensitive']));
+			$tblExp->addItem(new CVar('expressions['.$id.'][exp_delimiter]', $expression['exp_delimiter']));
 		}
 
 		$buttons = array();
@@ -3217,10 +3219,21 @@
 			$new_expression = array();
 		}
 
-		if(!isset($new_expression['expression']))			$new_expression['expression']		= '';
-		if(!isset($new_expression['expression_type']))		$new_expression['expression_type']	= EXPRESSION_TYPE_INCLUDED;
-		if(!isset($new_expression['case_sensitive']))		$new_expression['case_sensitive']	= 0;
-		if(!isset($new_expression['exp_delimiter']))		$new_expression['exp_delimiter']	= ',';
+		if (isset($new_expression['expressionid'])) {
+			$tblExp->addItem(new CVar('new_expression[expressionid]', $new_expression['expressionid']));
+		}
+		if (!isset($new_expression['expression'])) {
+			$new_expression['expression'] = '';
+		}
+		if (!isset($new_expression['expression_type'])) {
+			$new_expression['expression_type'] = EXPRESSION_TYPE_INCLUDED;
+		}
+		if (!isset($new_expression['case_sensitive'])) {
+			$new_expression['case_sensitive'] = 0;
+		}
+		if (!isset($new_expression['exp_delimiter'])) {
+			$new_expression['exp_delimiter'] = ',';
+		}
 
 		$tblExp->addRow(array(_('Expression'), new CTextBox('new_expression[expression]', $new_expression['expression'], 60)));
 

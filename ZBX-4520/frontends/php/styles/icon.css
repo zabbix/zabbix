@@ -75,10 +75,11 @@
 	margin: 0 1px;
 }
 
-.status_icon{ height: 14px; width: 14px; background-repeat:no-repeat; cursor:pointer; margin: 0 1px 0 1px;	}
+.status_icon { display: inline-block; vertical-align: middle; height: 14px; width: 14px; background-repeat:no-repeat; cursor:pointer; margin: 0 1px 0 1px;	}
 
 .iconerror			{ background-image: url('../images/general/error_icon.png');}
 .iconok				{ background-image: url('../images/general/ok_icon.png');}
+.iconwarning		{ background-image: url('../images/general/warning_icon.png');}
 .iconunknown		{ background-image: url('../images/general/unknown_icon.png');}
 .iconzbxunknown		{ background-image: url('../images/general/zabbix_unknown.png');}
 .iconzbxavailable	{ background-image: url('../images/general/zabbix_available.png');}
