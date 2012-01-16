@@ -29,7 +29,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$count = DBcount('select * from globalmacro');
 
-		$this->login('adm.macros.php');
+		$this->login('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
+		$this->dropdown_select_wait('configDropDown','Macros');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
 		$this->ok('Macros');
