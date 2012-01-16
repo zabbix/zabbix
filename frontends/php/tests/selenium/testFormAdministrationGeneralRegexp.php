@@ -28,7 +28,9 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	public function testFormAdministrationGeneralRegexp_Layout() {
 
-		$this->login('adm.regexps.php');
+		$this->login('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
+		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
 		$this->ok(array('Regular expressions', 'Name', 'Expressions'));

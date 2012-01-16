@@ -29,8 +29,9 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 	public function testFormAdministrationGeneralImages_CheckLayout() {
 
-		$this->login('adm.images.php');
+		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
+		$this->dropdown_select_wait('configDropDown', 'Images');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
