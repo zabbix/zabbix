@@ -19,41 +19,36 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageAvailabilityReport extends CWebTest
-{
-	public function testPageAvailabilityReport_ByHost_CheckLayout()
-	{
+class testPageAvailabilityReport extends CWebTest {
+	public function testPageAvailabilityReport_ByHost_CheckLayout() {
 		$this->login('report2.php?config=0');
 		$this->assertTitle('Availability report');
 		$this->ok('AVAILABILITY REPORT');
 		$this->ok('Mode');
 		$this->ok('Filter');
-		$this->ok(array('Host','Name','Problems','Ok','Unknown','Graph'));
+		$this->ok(array('Host', 'Name', 'Problems', 'Ok', 'Unknown', 'Graph'));
 	}
 
 // Check that no real host or template names displayed
-	public function testPageAvailabilityReport_ByHost_NoHostNames()
-	{
+	public function testPageAvailabilityReport_ByHost_NoHostNames() {
 		$this->login('report2.php?config=0');
 		$this->assertTitle('Availability report');
 		$this->checkNoRealHostnames();
 	}
 
-	public function testPageAvailabilityReport_ByTriggerTemplate_CheckLayout()
-	{
+	public function testPageAvailabilityReport_ByTriggerTemplate_CheckLayout() {
 		$this->login('report2.php?config=1');
 		$this->assertTitle('Availability report');
 		$this->ok('AVAILABILITY REPORT');
 		$this->ok('Mode');
 		$this->ok('Filter');
-		$this->ok(array('Host','Name','Problems','Ok','Unknown','Graph'));
+		$this->ok(array('Host', 'Name', 'Problems', 'Ok', 'Unknown', 'Graph'));
 	}
 
 // Check that no real host or template names displayed
-	public function testPageAvailabilityReport_ByTriggerTemplate_NoHostNames()
-	{
+	public function testPageAvailabilityReport_ByTriggerTemplate_NoHostNames() {
 		$this->login('report2.php?config=1');
 		$this->checkNoRealHostnames();
 	}
