@@ -195,7 +195,7 @@ if (!isset($data['slideshows'][$data['elementid']])) {
 }
 
 // get screen
-$data['screen'] = get_slideshow($data['elementid'], 0);
+$data['screen'] = !empty($data['elementid']) ? get_slideshow($data['elementid'], 0) : array();
 if (!empty($data['screen'])) {
 	$data['tmpstime'] = get_request('stime');
 
