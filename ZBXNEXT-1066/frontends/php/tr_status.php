@@ -572,8 +572,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$maint_span->setHint($maint_hint);
 			}
 
-			$hosts_span = new CSpan($trigger_host['name'], 'link_menu');
-			$hosts_span->addClass('menu-host');
+			$hosts_span = new CSpan($trigger_host['name'], 'link_menu menu-host');
 			$hosts_span->setAttribute('data-menu', array(
 				'scripts' => $menuScripts,
 				'hostid' => $trigger_host['hostid'],
