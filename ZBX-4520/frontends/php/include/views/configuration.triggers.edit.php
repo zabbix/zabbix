@@ -321,7 +321,7 @@ if (empty($this->data['parent_discoveryid'])) {
 	if (isset($_REQUEST['triggerid'])) {
 		$hostRes = get_hosts_by_triggerid($_REQUEST['triggerid']);
 		$parentHost = DBfetch($hostRes);
-		$parentHostStatus = HOST_STATUS_TEMPLATE;$parentHost['status'];
+		$parentHostStatus = $parentHost['status'];
 	}
 
 	$dependenciesFormList->addRow(
