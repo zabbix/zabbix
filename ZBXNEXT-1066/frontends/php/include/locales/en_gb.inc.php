@@ -229,7 +229,6 @@
 	'S_NO_PERMISSIONS'=>			_('No permissions to referred object or it does not exist!'),
 	'S_ALL_S'=>						_('All'),
 	'S_ALL_SMALL'=>					_('all'),
-	'S_MINUS_OTHER_MINUS'=>			_('- other -'),
 	'S_NOT_SELECTED_SMALL'=>		_('not selected'),
 	'S_GRAPH'=>						_('Graph'),
 
@@ -502,11 +501,6 @@
 //	events.inc.php
 	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
-//	latest.php
-	'S_LAST_CHECK'=>			_('Last check'),
-	'S_LAST_VALUE'=>			_('Last value'),
-	'S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
 //	sysmap.php
 	'S_HIDDEN'=>			_('Hidden'),
 	'S_SHOWN'=>				_('Shown'),
@@ -761,7 +755,6 @@
 	'S_ENABLED'=>				_('Enabled'),
 	'S_DISABLE'=>				_('Disable'),
 	'S_ENABLE'=>				_('Enable'),
-	'S_CHANGE'=>				_('Change'),
 	'S_URL'=>				_('URL'),
 	'S_INSERT'=>				_('Insert'),
 	'S_TIME_SHIFT'=>			_('Time shift'),
