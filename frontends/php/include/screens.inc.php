@@ -89,8 +89,8 @@ function get_slideshow($slideshowid, $step, $effectiveperiod = null) {
 	$db_slides = DBfetch(DBselect(
 		'SELECT MIN(s.step) AS min_step,MAX(s.step) AS max_step'.
 		' FROM slides s'.
-		' WHERE s.slideshowid='.$slideshowid)
-	);
+		' WHERE s.slideshowid='.$slideshowid
+	));
 	if (!$db_slides || is_null($db_slides['min_step'])) {
 		return false;
 	}
