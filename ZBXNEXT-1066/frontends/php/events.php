@@ -200,6 +200,9 @@ require_once('include/page_header.php');
 ?>
 <?php
 
+	// js templates
+	require_once('include/views/js/general.script.confirm.js.php');
+
 	$events_wdgt = new CWidget();
 
 // PAGE HEADER {{{
@@ -367,7 +370,8 @@ require_once('include/page_header.php');
 
 	$csv_disabled = true;
 
-	if(empty($firstEvent)){
+	if(empty($firstEvent)){dded host pop up menu to the events page
+
 		$starttime = null;
 		$events = array();
 		$paging = getPagingLine($events);
@@ -585,7 +589,7 @@ require_once('include/page_header.php');
 
 				$triggersOptions = array(
 					'triggerids' => zbx_objectValues($events, 'objectid'),
-					'selectHosts' => API_OUTPUT_EXTEND,
+					'selectHosts' => array('hostid'),
 					'selectTriggers' => API_OUTPUT_EXTEND,
 					'selectItems' => API_OUTPUT_EXTEND,
 					'output' => API_OUTPUT_EXTEND
@@ -593,9 +597,31 @@ require_once('include/page_header.php');
 				$triggers = API::Trigger()->get($triggersOptions);
 				$triggers = zbx_toHash($triggers, 'triggerid');
 
+				// fetch hosts
+				$hosts = array();
+				foreach ($triggers as $trigger) {
+					$hosts[] = reset($trigger['hosts']);
+				}
+				$hostids = zbx_objectValues($hosts, 'hostid');
+				$hosts = API::Host()->get(array(
+					'output' => array('name', 'hostid'),
+					'hostids' => $hostids,
+					'selectAppllications' => API_OUTPUT_EXTEND,
+					'selectScreens' => API_OUTPUT_COUNT,
+					'selectInventory' => true,
+					'selectGroups' => API_OUTPUT_REFER,
+					'sortfield' => array('name', 'hostid'),
+					'preservekeys' => true
+				));
+
+				// fetch scripts for the host JS menu
+				$hostScripts = API::Script()->getScriptsByHosts($hostids);
+
 				foreach($events as $enum => $event){
 					$trigger = $triggers[$event['objectid']];
 					$host = reset($trigger['hosts']);
+					$host = $hosts[$host['hostid']];
+					$group = reset($host['groups']);
 
 					$items = array();
 					foreach($trigger['items'] as $inum => $item){
@@ -636,18 +662,40 @@ require_once('include/page_header.php');
 						$event['acknowledged']
 					);
 
+					// fetch scripts for the host JS menu
+					$menuScripts = array();
+					if (isset($hostScripts[$host['hostid']])) {
+						foreach ($hostScripts[$host['hostid']] as $script) {
+							$menuScripts[] = array(
+								'scriptid' => $script['scriptid'],
+								'confirmation' => $script['confirmation'],
+								'name' => $script['name']
+							);
+						}
+					}
+
+					// host JS menu link
+					$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+					$hostSpan->setAttribute('data-menu', array(
+						'scripts' => $menuScripts,
+						'hostid' => $host['hostid'],
+						'groupid' => $group['groupid'],
+						'hasScreens' => (bool) $host['screens'],
+						'hasInventory' => (bool) $host['inventory']
+					));
+
 					$table->addRow(array(
-						new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
+						new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT, $event['clock']),
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 							'action'
-							),
+						),
 						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-						$_REQUEST['hostid'] == 0 ? $host['name'] : null,
+						(!$_REQUEST['hostid']) ? $hostSpan : null,
 						new CSpan($tr_desc, 'link_menu'),
 						$statusSpan,
 						getSeverityCell($trigger['priority'], null, !$event['value']),
 						$event['duration'],
-						($config['event_ack_enable'])?$ack:NULL,
+						($config['event_ack_enable']) ? $ack : NULL,
 						$actions
 					));
 
