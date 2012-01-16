@@ -610,22 +610,26 @@ switch($itemType) {
 // Filter
 
 		$item_filter_macro = $item_filter_value = '';
-		if(!empty($item_filter)){
+		if (!empty($item_filter)) {
 			//Exploding filter to two parts: before first ':' and after
 			$col_position = zbx_strpos($item_filter, ':');
-			$item_filter_macro = zbx_substr($item_filter, 0, $col_position); //before first ':'
-			$item_filter_value = zbx_substr($item_filter, $col_position+1); //after first ':'
+			// before first ':'
+			$item_filter_macro = zbx_substr($item_filter, 0, $col_position);
+			// after first ':'
+			$item_filter_value = zbx_substr($item_filter, $col_position + 1);
 		}
 
 		$frmItem->addRow(S_FILTER, array(
-			S_MACRO, SPACE, new CTextBox('item_filter_macro',$item_filter_macro,20),
-			S_REGEXP, SPACE, new CTextBox('item_filter_value',$item_filter_value,40)
+			_('Macro'), SPACE, new CTextBox('item_filter_macro', $item_filter_macro, 20),
+			S_REGEXP, SPACE, new CTextBox('item_filter_value', $item_filter_value, 40)
 		), null);
 
-// Update interval (in sec)
+		// Update interval (in sec)
 		$frmItem->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $delay, 5), null, 'row_delay');
-		foreach($type_keys as $it) {
-			if($it == ITEM_TYPE_TRAPPER) continue;
+		foreach ($type_keys as $it) {
+			if ($it == ITEM_TYPE_TRAPPER) {
+				continue;
+			}
 			zbx_subarray_push($typeVisibility, $it, 'delay');
 			zbx_subarray_push($typeVisibility, $it, 'row_delay');
 		}
