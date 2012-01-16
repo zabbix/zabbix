@@ -333,7 +333,10 @@ require_once('include/page_header.php');
 	unset($app_rows);
 	unset($db_app);
 
-	foreach($db_apps as $appid => $db_app){
+	foreach ($db_apps as $appid => $db_app) {
+		$host = $hosts[$db_app['hostid']];
+		$group = reset($host['groups']);
+
 		if(!isset($tab_rows[$appid])) continue;
 
 		$app_rows = $tab_rows[$appid];
@@ -367,13 +370,36 @@ require_once('include/page_header.php');
 		$url.= url_param('groupid').url_param('hostid').url_param('fullscreen').url_param('select');
 		$link = new CLink($img,$url);
 
-		$col = new CCol(array(bold($db_app['name']),SPACE.'('._n('%1$s Item', '%1$s Items', $db_host['item_cnt']).')').')');
+		$col = new CCol(array(bold($db_app['name']),SPACE.'('._n('%1$s Item', '%1$s Items', $db_app['item_cnt']).')'));
+
 		$col->setColSpan(5);
+
+		// fetch scripts for the host JS menu
+		$menuScripts = array();
+		if (isset($hostScripts[$db_app['hostid']])) {
+			foreach ($hostScripts[$db_app['hostid']] as $script) {
+				$menuScripts[] = array(
+					'scriptid' => $script['scriptid'],
+					'confirmation' => $script['confirmation'],
+					'name' => $script['name']
+				);
+			}
+		}
+
+		// host JS menu link
+		$hostSpan = new CSpan($db_app['hostname'], 'link_menu menu-host');
+		$hostSpan->setAttribute('data-menu', array(
+			'scripts' => $menuScripts,
+			'hostid' => $db_app['hostid'],
+			'groupid' => $group['groupid'],
+			'hasScreens' => (bool) $host['screens'],
+			'hasInventory' => (bool) $host['inventory']
+		));
 
 		$table->addRow(array(
 			$link,
 			get_node_name_by_elid($db_app['applicationid']),
-			($_REQUEST['hostid'] > 0)?NULL:$db_app['hostname'],
+			($_REQUEST['hostid'] > 0) ? null : $hostSpan,
 			$col
 		));
 
@@ -480,11 +506,10 @@ require_once('include/page_header.php');
 		}
 
 		$item_status = $db_item['status'] == ITEM_STATUS_NOTSUPPORTED ? 'unknown' : null;
-
 		array_push($app_rows, new CRow(array(
 			SPACE,
 			is_show_all_nodes() ? ($db_host['item_cnt'] ? SPACE : get_node_name_by_elid($db_item['itemid'])) : null,
-			$_REQUEST['hostid'] ? NULL : ($db_host['item_cnt'] ? SPACE : $db_item['hostname']),
+			$_REQUEST['hostid'] ? null : SPACE,
 			new CCol(SPACE.SPACE.$description, $item_status),
 			new CCol($lastclock, $item_status),
 			new CCol($lastvalue, $item_status),
@@ -495,7 +520,7 @@ require_once('include/page_header.php');
 	unset($app_rows);
 	unset($db_host);
 
-	foreach($db_hosts as $hostid => $db_host){
+	foreach ($db_hosts as $hostid => $db_host) {
 		$host = $hosts[$db_host['hostid']];
 		$group = reset($host['groups']);
 
