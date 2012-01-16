@@ -98,7 +98,6 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->dropdown_select('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->click('goButton');
-		$this->waitForConfirmation();
 		$this->wait();
 		$this->ok('Regular expression deleted');
 
@@ -126,7 +125,6 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->dropdown_select('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->click('goButton');
-		$this->waitForConfirmation();
 		$this->wait();
 		$this->ok('Regular expression deleted');
 

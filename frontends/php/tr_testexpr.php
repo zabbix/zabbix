@@ -158,7 +158,7 @@ require_once('include/page_header.php');
 	$col->setAttribute('style', $style);
 	$res_table->setFooter(array($outline, $col), $res_table->headerClass);
 
-	$frm_test->addRow(S_RESULT, $res_table);
+	$frm_test->addRow(_('Result'), $res_table);
 
 // action buttons
 	$btn_test = new CSubmit('test_expression', _('Test'));

@@ -1542,9 +1542,10 @@ class CTrigger extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
-			$host = reset($trigger['hosts']);
-			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['name']));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], null, null, null);
+			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
+					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'],
+					$trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
 		DB::delete('triggers', array('triggerid' => $triggerids));
@@ -1620,7 +1621,8 @@ class CTrigger extends CZBXAPI {
 
 			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
-			$expression = implode_exp($trigger['expression'], $triggerid);
+			$hosts = array();
+			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
@@ -1631,8 +1633,8 @@ class CTrigger extends CZBXAPI {
 				'values' => array('expression' => $expression),
 				'where' => array('triggerid' => $triggerid)
 			));
-			$hostName=explode(':',$trigger['expression']);
-			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], str_replace('{','',reset($hostName))));
+
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts)));
 		}
 
 		$this->validateDependencies($triggers);
@@ -1661,15 +1663,16 @@ class CTrigger extends CZBXAPI {
 		$options = array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('name'),
 			'preservekeys' => true,
-			'nopermissions' => true,
-			'selectHosts' => array('name')
+			'nopermissions' => true
 		);
 		$dbTriggers = $this->get($options);
 
 		$description_changed = $expression_changed = false;
 		foreach ($triggers as &$trigger) {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
+			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
 
 			if (isset($trigger['description']) && strcmp($dbTrigger['description'], $trigger['description']) != 0) {
 				$description_changed = true;
@@ -1723,7 +1726,7 @@ class CTrigger extends CZBXAPI {
 			if ($expression_changed) {
 				delete_function_by_triggerid($trigger['triggerid']);
 
-				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid']);
+				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid'], $hosts);
 				if (is_null($trigger['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expression_full));
 				}
@@ -1753,9 +1756,7 @@ class CTrigger extends CZBXAPI {
 			// restore the full expression to properly validate dependencies
 			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
-			$host = reset($dbTriggers[$trigger['triggerid']]['hosts']);
-
-			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], $host['name']);
+			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
 		}
 		unset($trigger);
 
