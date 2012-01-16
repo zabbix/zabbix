@@ -170,7 +170,7 @@ require_once('include/page_header.php');
 <?php
 
 	// js templates
-	require_once('include/views/js/general.script.confirm.js.php');
+	require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 	if(isset($showAll)){
 		$url = '?close=1'.
