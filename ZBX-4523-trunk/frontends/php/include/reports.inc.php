@@ -205,8 +205,8 @@ function bar_report_form(){
 	$reportForm->addVar('report_timetill',  date('YmdHis', $report_timetill));
 
 	$reportForm->addRow(_('Title'), new CTextBox('title',$title,40));
-	$reportForm->addRow(_('X Label'), new CTextBox('xlabel',$xlabel,40));
-	$reportForm->addRow(_('Y Label'), new CTextBox('ylabel',$ylabel,40));
+	$reportForm->addRow(_('X label'), new CTextBox('xlabel',$xlabel,40));
+	$reportForm->addRow(_('Y label'), new CTextBox('ylabel',$ylabel,40));
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend',$showlegend,null,1));
 
 	$scale = new CComboBox('scaletype', $scaletype);
@@ -367,8 +367,8 @@ function bar_report_form2(){
 // periods add later
 
 	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
-	$reportForm->addRow(_('X Label'), new CTextBox('xlabel', $xlabel, 40));
-	$reportForm->addRow(_('Y Label'), new CTextBox('ylabel', $ylabel, 40));
+	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
+	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
 
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 
@@ -516,8 +516,8 @@ function bar_report_form3(){
 //	$reportForm->addVar('periods',$periods);
 
 	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
-	$reportForm->addRow(_('X Label'), new CTextBox('xlabel', $xlabel, 40));
-	$reportForm->addRow(_('Y Label'), new CTextBox('ylabel', $ylabel, 40));
+	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
+	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
 
 	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 	$reportForm->addVar('sortorder', 0);
