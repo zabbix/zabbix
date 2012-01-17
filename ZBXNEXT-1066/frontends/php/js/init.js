@@ -53,7 +53,7 @@ jQuery(function() {
 				+ menuData.hostid + '")'));
 		}
 		if (menuData.hasScreens) {
-			menu.push(createMenuItem(_('Screens'), 'javascript: redirect("host_screen.php?hostid='
+			menu.push(createMenuItem(_('Host screens'), 'javascript: redirect("host_screen.php?hostid='
 				+ menuData.hostid + '")'));
 		}
 
