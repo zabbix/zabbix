@@ -318,19 +318,13 @@ if (empty($this->data['parent_discoveryid'])) {
 		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 		$dependenciesTable->addRow($row);
 	}
-	if (isset($_REQUEST['triggerid'])) {
-		$hostRes = get_hosts_by_triggerid($_REQUEST['triggerid']);
-		$parentHost = DBfetch($hostRes);
-		$parentHostStatus = $parentHost['status'];
-	}
 
 	$dependenciesFormList->addRow(
 		_('Dependencies'),
 		new CDiv(
 			array(
 				$dependenciesTable,
-				new CButton('bnt1', _('Add'), 'return PopUp(\'popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-					(isset($parentHostStatus) && $parentHostStatus != HOST_STATUS_TEMPLATE ? '&real_hosts=1' : '').'\', 1000, 700);', 'link_menu')
+				new CButton('bnt1', _('Add'), 'return PopUp(\'popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1\', 1000, 700);', 'link_menu')
 				),
 			'objectgroup inlineblock border_dotted ui-corner-all'
 		)
