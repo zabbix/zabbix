@@ -47,19 +47,19 @@ class CView{
 	 * @param array $data deprecated parameter, use set() and get() methods for passing variables to views
 	 * @example $scriptForm = new CView('administration.script.edit');
 	 */
-	public function __construct($view, $data=array()){
+	public function __construct($view, $data=array()) {
 		$this->assign($view, $data);
 		$this->data = $data;
 	}
 
-	public function assign($view){
-		if(!preg_match("/[a-z\.]+/", $view)){
+	public function assign($view) {
+		if (!preg_match("/[a-z\.]+/", $view)) {
 			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and "."', $view));
 		}
 
 		$this->filePath = self::viewsDir.'/'.$view.'.php';
 
-		if(!file_exists($this->filePath)){
+		if (!file_exists($this->filePath)) {
 			throw new Exception(_s('File provided to a view does not exist. Tried to find "%s"', $this->filePath));
 		}
 	}
@@ -70,7 +70,7 @@ class CView{
 	 * @param any $value variable value
 	 * @example set('hostName','Host ABC')
 	 */
-	public function set($var, $value){
+	public function set($var, $value) {
 		$this->data[$var] = $value;
 	}
 
@@ -80,7 +80,7 @@ class CView{
 	 * @return string variable value. Returns empty string if the variable is not defined.
 	 * @example get('hostName')
 	 */
-	public function get($var){
+	public function get($var) {
 		return isset($this->data[$var]) ? $this->data[$var] : '';
 	}
 
@@ -90,7 +90,7 @@ class CView{
 	 * @return array variable value. Returns empty array if the variable is not defined or not an array.
 	 * @example getArray('hosts')
 	 */
-	public function getArray($var){
+	public function getArray($var) {
 		return isset($this->data[$var]) && is_array($this->data[$var]) ? $this->data[$var] : array();
 	}
 
@@ -99,12 +99,12 @@ class CView{
 	 * TODO It outputs JavaScript code immediately, should be done in show() or processed separately.
 	 * @return object GUI object.
 	 */
-	public function render(){
+	public function render() {
 		// $data this variable will be used in included file
 		$data = $this->data;
 		ob_start();
 		$this->template = include($this->filePath);
-		if(false === $this->template){
+		if (false === $this->template) {
 			throw new Exception(_s('Cannot include view file "%s".', $this->filePath));
 		}
 		$this->scripts = ob_get_clean();
@@ -119,8 +119,8 @@ class CView{
 	 * It calls render() if not called already.
 	 * @return NULL
 	 */
-	public function show(){
-		if(!isset($this->template)){
+	public function show() {
+		if (!isset($this->template)) {
 			throw new Exception(_('View is not rendered.'));
 		}
 		$this->template->show();

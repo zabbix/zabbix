@@ -845,8 +845,8 @@ Copt::memoryPick();
 					order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
 
 				$count = array();
-				foreach ($interfaces as $interfaceid => $interface){
-					if (!is_null($options['limitSelects'])){
+				foreach ($interfaces as $interfaceid => $interface) {
+					if (!is_null($options['limitSelects'])) {
 						if (!isset($count[$interface['hostid']])) $count[$interface['hostid']] = 0;
 						$count[$interface['hostid']]++;
 
@@ -1788,7 +1788,7 @@ Copt::memoryPick();
 					'groups' => zbx_toObject($groups_to_add, 'groupid')
 				));
 
-				if(!$result){
+				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add host group.'));
 				}
 			}
@@ -1797,7 +1797,7 @@ Copt::memoryPick();
 
 			if (!empty($groupids_to_del)) {
 				$result = $this->massRemove(array('hostids' => $hostids, 'groupids' => $groupids_to_del));
-				if(!$result){
+				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host group.'));
 				}
 			}
@@ -1933,7 +1933,7 @@ Copt::memoryPick();
 				// when hosts are being updated to use automatic mode for host inventories,
 				// we must check if some items are set to populate inventory fields of every host.
 				// if they do, mass update for those fields should be ignored
-				if($updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC){
+				if ($updateInventory['inventory_mode'] == HOST_INVENTORY_AUTOMATIC) {
 					// getting all items on all affected hosts
 					$options = array(
 						'output' => array('inventory_link', 'hostid'),

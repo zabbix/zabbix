@@ -605,7 +605,7 @@ class CMap extends CMapElement {
 
 // LABELS
 			$mapLabels = array('label_type' => array('typeName' => _('icon')));
-			if ($dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON){
+			if ($dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
 				$mapLabels['label_type_hostgroup'] = array('string' => 'label_string_hostgroup', 'typeName' => _('host group'));
 				$mapLabels['label_type_host'] = array('string' => 'label_string_host', 'typeName' => _('host'));
 				$mapLabels['label_type_trigger'] = array('string' => 'label_string_trigger', 'typeName' => _('trigger'));
@@ -895,12 +895,12 @@ class CMap extends CMapElement {
 				$mapVirtSelements[$selement['selementid']] = $selement['selementid'];
 			}
 
-			foreach ($linksToAdd as $lnum => $link){
+			foreach ($linksToAdd as $lnum => $link) {
 				$linksToAdd[$lnum]['selementid1'] = $mapVirtSelements[$link['selementid1']];
 				$linksToAdd[$lnum]['selementid2'] = $mapVirtSelements[$link['selementid2']];
 			}
 
-			foreach ($linksToUpdate as $lnum => $link){
+			foreach ($linksToUpdate as $lnum => $link) {
 				$linksToUpdate[$lnum]['selementid1'] = $mapVirtSelements[$link['selementid1']];
 				$linksToUpdate[$lnum]['selementid2'] = $mapVirtSelements[$link['selementid2']];
 			}

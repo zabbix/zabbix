@@ -28,7 +28,7 @@ $page['hist_arg']	= array();
 
 require_once('include/page_header.php');
 
-$_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
+$_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -37,7 +37,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 		'name'=>			array(T_ZBX_STR, O_OPT,	 null, NOT_EMPTY, 'isset({save})'),
 		'eventsource'=>		array(T_ZBX_INT, O_MAND, null, IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTO_REGISTRATION)),	null),
 		'evaltype'=>		array(T_ZBX_INT, O_OPT, null, IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)),	'isset({save})'),
-		'esc_period'=>		array(T_ZBX_INT, O_OPT, null, BETWEEN(60,999999), 'isset({save})&&isset({escalation})'),
+		'esc_period'=>		array(T_ZBX_INT, O_OPT, null, BETWEEN(60, 999999), 'isset({save})&&isset({escalation})'),
 		'escalation'=>		array(T_ZBX_INT, O_OPT, null, IN("0,1"), null),
 		'status'=>			array(T_ZBX_INT, O_OPT, null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)), null),
 		'def_shortdata'=>	array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})'),
@@ -83,16 +83,16 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 	);
 
 	check_fields($fields);
-	validate_sort_and_sortorder('name',ZBX_SORT_UP);
+	validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-	$_REQUEST['go'] = get_request('go','none');
+	$_REQUEST['go'] = get_request('go', 'none');
 ?>
 <?php
 /* AJAX */
 // for future use
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.audit.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.audit.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -391,7 +391,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			$action['evaltype'] = get_request('evaltype', 0);
 			$action['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
 			$action['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
-			$action['recovery_msg'] = get_request('recovery_msg',0);
+			$action['recovery_msg'] = get_request('recovery_msg', 0);
 			$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
 			$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG_TRIGGER);
 			$action['conditions'] = get_request('conditions', array());
@@ -458,7 +458,7 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 
 		$tblActions = new CTableInfo(_('No actions defined.'));
 		$tblActions->setHeader(array(
-			new CCheckBox('all_items',null,"checkAll('".$form->getName()."','all_items','g_actionid');"),
+			new CCheckBox('all_items', null, "checkAll('".$form->getName()."','all_items','g_actionid');"),
 			make_sorting_header(_('Name'), 'name'),
 			_('Conditions'),
 			_('Operations'),
@@ -516,8 +516,8 @@ $_REQUEST['eventsource'] = get_request('eventsource',CProfile::get('web.actionco
 			}
 
 			$tblActions->addRow(array(
-				new CCheckBox('g_actionid['.$action['actionid'].']',null,null,$action['actionid']),
-				new CLink($action['name'],'actionconf.php?form=update&actionid='.$action['actionid']),
+				new CCheckBox('g_actionid['.$action['actionid'].']', null, null, $action['actionid']),
+				new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']),
 				$conditions,
 				new CCol($operations, 'wraptext'),
 				$status
