@@ -899,16 +899,6 @@ function make_latest_issues(array $filter = array()) {
 		// check for dependencies
 		$host = $hosts[$trigger['hostid']];
 
-		// fetch scripts for host pop up menu
-		$menuScripts = array();
-		foreach ($scripts_by_hosts[$trigger['hostid']] as $script) {
-			$menuScripts[] = array(
-				'scriptid' => $script['scriptid'],
-				'confirmation' => $script['confirmation'],
-				'name' => $script['name']
-			);
-		}
-
 		// maintenance
 		$trigger_host = $hosts[$trigger['hostid']];
 
@@ -928,13 +918,10 @@ function make_latest_issues(array $filter = array()) {
 				: _('Maintenance with data collection')).']';
 		}
 
-		$hostSpan = new CSpan($trigger['hostname'], $style.' pointer menu-host');
-		$hostSpan->setAttribute('data-menu', array(
-			'scripts' => $menuScripts,
-			'hostid' => $trigger['hostid'],
-			'hasScreens' => (bool) $host['screens'],
-			'hasInventory' => (bool) $host['inventory']
-		));
+
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 		if (!is_null($text)) {
 			$hostSpan->setHint($text, '', '', false);
 		}
