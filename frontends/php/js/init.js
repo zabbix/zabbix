@@ -39,7 +39,7 @@ jQuery(function() {
 			menu.push(createMenuHeader(_('Scripts')));
 			jQuery.each(menuData.scripts, function(i, script) {
 				var action = 'javascript: executeScript(' + menuData.hostid + ', ' + script.scriptid
-					+ ', ' + !!script.confirmation +')';
+					+ ', "' + script.confirmation +'")';
 				menu.push(createMenuItem(script.name, action));
 			});
 		}
