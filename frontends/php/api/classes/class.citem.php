@@ -775,16 +775,16 @@ class CItem extends CItemGeneral {
 	 *
 	 * @return int|bool
 	 */
-	public function getObjects($itemData){
+	public function getObjects($itemData) {
 		$options = array(
 			'filter' => $itemData,
 			'output'=>API_OUTPUT_EXTEND,
 			'webitems' => 1,
 		);
 
-		if(isset($itemData['node']))
+		if (isset($itemData['node']))
 			$options['nodeids'] = getNodeIdByNodeName($itemData['node']);
-		else if(isset($itemData['nodeids']))
+		else if (isset($itemData['nodeids']))
 			$options['nodeids'] = $itemData['nodeids'];
 
 		$result = $this->get($options);
@@ -799,7 +799,7 @@ class CItem extends CItemGeneral {
 	 *
 	 * @return bool
 	 */
-	public function exists(array $object){
+	public function exists(array $object) {
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'webitems' => 1,
@@ -808,12 +808,12 @@ class CItem extends CItemGeneral {
 			'limit' => 1
 		);
 
-		if(isset($object['hostid'])) $options['hostids'] = $object['hostid'];
-		if(isset($object['host'])) $options['filter']['host'] = $object['host'];
+		if (isset($object['hostid'])) $options['hostids'] = $object['hostid'];
+		if (isset($object['host'])) $options['filter']['host'] = $object['host'];
 
-		if(isset($object['node']))
+		if (isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		else if(isset($object['nodeids']))
+		else if (isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
@@ -843,7 +843,7 @@ class CItem extends CItemGeneral {
 	 *
 	 * @return array
 	 */
-	public function create($items){
+	public function create($items) {
 		$items = zbx_toArray($items);
 
 		$this->checkInput($items);
@@ -921,12 +921,12 @@ class CItem extends CItemGeneral {
 	 *
 	 * @return void
 	 */
-	protected function updateReal($items){
+	protected function updateReal($items) {
 		$items = zbx_toArray($items);
 
 		$itemids = array();
 		$data = array();
-		foreach($items as $inum => $item){
+		foreach ($items as $inum => $item) {
 			$itemsExists = API::Item()->get(array(
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
@@ -935,8 +935,8 @@ class CItem extends CItemGeneral {
 				),
 				'nopermissions' => 1
 			));
-			foreach($itemsExists as $inum => $itemExists){
-				if(bccomp($itemExists['itemid'],$item['itemid']) != 0){
+			foreach ($itemsExists as $inum => $itemExists) {
+				if (bccomp($itemExists['itemid'],$item['itemid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
 				}
 			}
@@ -945,14 +945,14 @@ class CItem extends CItemGeneral {
 			$itemids[] = $item['itemid'];
 		}
 		$result = DB::update('items', $data);
-		if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 		$itemApplications = $aids = array();
-		foreach($items as $key => $item){
-			if(!isset($item['applications'])) continue;
+		foreach ($items as $key => $item) {
+			if (!isset($item['applications'])) continue;
 			$aids[] = $item['itemid'];
 
-			foreach($item['applications'] as $anum => $appid){
+			foreach ($item['applications'] as $anum => $appid) {
 				$itemApplications[] = array(
 					'applicationid' => $appid,
 					'itemid' => $item['itemid']
@@ -960,7 +960,7 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		if(!empty($aids)){
+		if (!empty($aids)) {
 			DB::delete('items_applications', array('itemid' => $aids));
 			DB::insert('items_applications', $itemApplications);
 		}
@@ -984,7 +984,7 @@ class CItem extends CItemGeneral {
 	 * @param array $items
 	 * @return boolean
 	 */
-	public function update($items){
+	public function update($items) {
 		$items = zbx_toArray($items);
 
 		$this->checkInput($items, true);
@@ -1054,7 +1054,7 @@ class CItem extends CItemGeneral {
 							' AND '.DBcondition('gii.itemid', $itemids, true, false).
 					')'
 			);
-			while($db_graph = DBfetch($db_graphs)){
+			while ($db_graph = DBfetch($db_graphs)) {
 				$del_graphs[$db_graph['graphid']] = $db_graph['graphid'];
 			}
 
@@ -1123,20 +1123,20 @@ class CItem extends CItemGeneral {
 	}
 
 
-	public function syncTemplates($data){
+	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		if(!API::Host()->isWritable($data['hostids'])){
+		if (!API::Host()->isWritable($data['hostids'])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 		}
-		if(!API::Template()->isReadable($data['templateids'])){
+		if (!API::Template()->isReadable($data['templateids'])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 		}
 
 		$selectFields = array();
-		foreach($this->fieldRules as $key => $rules){
-			if(!isset($rules['system']) && !isset($rules['host'])){
+		foreach ($this->fieldRules as $key => $rules) {
+			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;
 			}
 		}
@@ -1149,7 +1149,7 @@ class CItem extends CItemGeneral {
 		);
 		$items = $this->get($options);
 
-		foreach($items as $inum => $item){
+		foreach ($items as $inum => $item) {
 			$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
 		}
 
@@ -1288,41 +1288,41 @@ class CItem extends CItemGeneral {
 	 * @param bool $update whether this is update operation
 	 * @return bool
 	 */
-	public static function validateInventoryLinks(array $items, $update=false){
+	public static function validateInventoryLinks(array $items, $update=false) {
 
 		// inventory link field is not being updated, or being updated to 0, no need to validate anything then
-		foreach($items as $i=>$item){
-			if(!isset($item['inventory_link']) || $item['inventory_link'] == 0){
+		foreach ($items as $i=>$item) {
+			if (!isset($item['inventory_link']) || $item['inventory_link'] == 0) {
 				unset($items[$i]);
 			}
 		}
 
-		if(zbx_empty($items)){
+		if (zbx_empty($items)) {
 			return true;
 		}
 
 		$possibleHostInventories = getHostInventories();
-		if($update){
+		if ($update) {
 			// for successful validation we need three fields for each item: inventory_link, hostid and key_
 			// problem is, that when we are updating an item, we might not have them, because they are not changed
 			// so, we need to find out what is missing and use API to get the lacking info
 			$itemsWithNoHostId = array();
 			$itemsWithNoInventoryLink = array();
 			$itemsWithNoKeys = array();
-			foreach($items as $item){
-				if(!isset($item['inventory_link'])){
+			foreach ($items as $item) {
+				if (!isset($item['inventory_link'])) {
 					$itemsWithNoInventoryLink[$item['itemid']] = $item['itemid'];
 				}
-				if(!isset($item['hostid'])){
+				if (!isset($item['hostid'])) {
 					$itemsWithNoHostId[$item['itemid']] = $item['itemid'];
 				}
-				if(!isset($item['key_'])){
+				if (!isset($item['key_'])) {
 					$itemsWithNoKeys[$item['itemid']] = $item['itemid'];
 				}
 			}
 			$itemsToFind = array_merge($itemsWithNoHostId, $itemsWithNoInventoryLink, $itemsWithNoKeys);
 			// are there any items with lacking info?
-			if(!zbx_empty($itemsToFind)){
+			if (!zbx_empty($itemsToFind)) {
 			// getting it
 				$options = array(
 					'output' => array('hostid', 'inventory_link', 'key_'),
@@ -1334,15 +1334,15 @@ class CItem extends CItemGeneral {
 				$missingInfo = API::Item()->get($options);
 				$missingInfo = zbx_toHash($missingInfo, 'itemid');
 				// appending host ids, inventory_links and keys where they are needed
-				foreach($items as $i=>$item){
-					if (isset($missingInfo[$item['itemid']])){
-						if(!isset($items[$i]['hostid'])){
+				foreach ($items as $i=>$item) {
+					if (isset($missingInfo[$item['itemid']])) {
+						if (!isset($items[$i]['hostid'])) {
 							$items[$i]['hostid'] = $missingInfo[$item['itemid']]['hostid'];
 						}
-						if(!isset($items[$i]['inventory_link'])){
+						if (!isset($items[$i]['inventory_link'])) {
 							$items[$i]['inventory_link'] = $missingInfo[$item['itemid']]['inventory_link'];
 						}
-						if(!isset($items[$i]['key_'])){
+						if (!isset($items[$i]['key_'])) {
 							$items[$i]['key_'] = $missingInfo[$item['itemid']]['key_'];
 						}
 					}
@@ -1364,10 +1364,10 @@ class CItem extends CItemGeneral {
 
 		// now, changing array to: 'hostid' => array('key_'=>'inventory_link')
 		$linksOnHostsCurr = array();
-		foreach($itemsOnHostsInfo as $info){
+		foreach ($itemsOnHostsInfo as $info) {
 			// 0 means no link - we are not interested in those ones
-			if($info['inventory_link'] != 0){
-				if(!isset($linksOnHostsCurr[$info['hostid']])){
+			if ($info['inventory_link'] != 0) {
+				if (!isset($linksOnHostsCurr[$info['hostid']])) {
 					$linksOnHostsCurr[$info['hostid']] = array($info['key_'] => $info['inventory_link']);
 				}
 				else{
@@ -1378,11 +1378,11 @@ class CItem extends CItemGeneral {
 
 		$linksOnHostsFuture = array();
 
-		foreach($items as $item){
+		foreach ($items as $item) {
 			// checking if inventory_link value is a valid number
-			if($update || $item['value_type'] != ITEM_VALUE_TYPE_LOG){
+			if ($update || $item['value_type'] != ITEM_VALUE_TYPE_LOG) {
 				// does inventory field with provided number exists?
-				if(!isset($possibleHostInventories[$item['inventory_link']])){
+				if (!isset($possibleHostInventories[$item['inventory_link']])) {
 					$maxVar = max(array_keys($possibleHostInventories));
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
@@ -1391,7 +1391,7 @@ class CItem extends CItemGeneral {
 				}
 			}
 
-			if(!isset($linksOnHostsFuture[$item['hostid']])){
+			if (!isset($linksOnHostsFuture[$item['hostid']])) {
 				$linksOnHostsFuture[$item['hostid']] = array($item['key_'] => $item['inventory_link']);
 			}
 			else{
@@ -1399,8 +1399,8 @@ class CItem extends CItemGeneral {
 			}
 		}
 
-		foreach($linksOnHostsFuture as $hostId => $linkFuture){
-			if(isset($linksOnHostsCurr[$hostId])){
+		foreach ($linksOnHostsFuture as $hostId => $linkFuture) {
+			if (isset($linksOnHostsCurr[$hostId])) {
 				$futureSituation = array_merge($linksOnHostsCurr[$hostId], $linksOnHostsFuture[$hostId]);
 			}
 			else{
@@ -1408,16 +1408,16 @@ class CItem extends CItemGeneral {
 			}
 			$valuesCount = array_count_values($futureSituation);
 			// if we have a duplicate inventory links after merging - we are in trouble
-			if(max($valuesCount) > 1){
+			if (max($valuesCount) > 1) {
 				// what inventory field caused this conflict?
 				$conflictedLink = array_keys($valuesCount, 2);
 				$conflictedLink = reset($conflictedLink);
 
 				// which of updated items populates this link?
 				$beingSavedItemName = '';
-				foreach($items as $item){
-					if($item['inventory_link'] == $conflictedLink){
-						if(isset($item['name'])){
+				foreach ($items as $item) {
+					if ($item['inventory_link'] == $conflictedLink) {
+						if (isset($item['name'])) {
 							$beingSavedItemName = $item['name'];
 						}
 						else{

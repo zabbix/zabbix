@@ -49,8 +49,8 @@ class CComboItem extends CTag {
 		parent::addItem($value);
 	}
 
-	public function setSelected($value='yes'){
-		if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on')) || (is_int($value) && $value <> 0)){
+	public function setSelected($value='yes') {
+		if ((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on')) || (is_int($value) && $value <> 0)) {
 			return $this->attributes['selected'] = 'selected';
 		}
 		$this->removeAttribute('selected');

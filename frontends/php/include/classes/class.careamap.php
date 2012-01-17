@@ -21,21 +21,21 @@
 <?php
 class CAreaMap extends CTag{
 /* public */
-	public function __construct($name=''){
+	public function __construct($name='') {
 		parent::__construct('map','yes');
 		$this->setName($name);
 	}
 
-	public function addRectArea($x1,$y1,$x2,$y2,$href,$alt){
+	public function addRectArea($x1,$y1,$x2,$y2,$href,$alt) {
 		return $this->addArea(array($x1,$y1,$x2,$y2),$href,$alt,'rect');
 	}
 
-	public function addArea($coords,$href,$alt,$shape){
+	public function addArea($coords,$href,$alt,$shape) {
 		return $this->addItem(new CArea($coords,$href,$alt,$shape));
 	}
 
-	public function addItem($value){
-		if(is_object($value) && zbx_strtolower(get_class($value)) != 'carea')
+	public function addItem($value) {
+		if (is_object($value) && zbx_strtolower(get_class($value)) != 'carea')
 			return $this->error('Incorrect value for addItem ['.$value.']');
 
 		return parent::addItem($value);

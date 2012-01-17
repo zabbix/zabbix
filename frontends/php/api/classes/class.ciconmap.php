@@ -533,7 +533,7 @@ class CIconMap extends CZBXAPI {
 				try {
 					GlobalRegExp::isValid($mapping['expression']);
 				}
-				catch(Exception $e) {
+				catch (Exception $e) {
 					switch ($e->getCode()) {
 						case GlobalRegExp::ERROR_REGEXP_EMPTY:
 							self::exception(ZBX_API_ERROR_PARAMETERS,
