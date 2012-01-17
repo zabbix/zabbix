@@ -19,55 +19,50 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-
-class testPageActionsTriggers extends CWebTest
-{
+class testPageActionsTriggers extends CWebTest {
 	// Returns all trigger actions
-	public static function allActions()
-	{
+	public static function allActions() {
 		return DBdata("select * from actions where eventsource=".EVENT_SOURCE_TRIGGERS." order by actionid");
 	}
 
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsTriggers_CheckLayout($action)
-	{
-		$name=$action['name'];
+	public function testPageActionsTriggers_CheckLayout($action) {
+		$name = $action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
 
 // eventsource is used for a hidden field, so it does not work. See above: ?eventsource=0 is used instead
-//		$this->dropdown_select('eventsource','Triggers');
+//		$this->dropdown_select('eventsource', 'Triggers');
 
 		$this->ok('Event source');
 		$this->ok('Displaying');
 		// Header
-		$this->ok(array('Name','Conditions','Operations','Status'));
+		$this->ok(array('Name', 'Conditions', 'Operations', 'Status'));
 		// Data
 		$this->ok(array($action['name']));
-		$this->dropdown_select('go','Enable selected');
-		$this->dropdown_select('go','Disable selected');
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Enable selected');
+		$this->dropdown_select('go', 'Disable selected');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsTriggers_SimpleUpdate($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsTriggers_SimpleUpdate($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
-		$sql1="select * from actions where actionid=$actionid order by actionid";
-		$oldHashAction=DBhash($sql1);
-		$sql2="select * from operations where actionid=$actionid order by operationid";
-		$oldHashOperations=DBhash($sql2);
-		$sql3="select * from conditions where actionid=$actionid order by conditionid";
-		$oldHashConditions=DBhash($sql3);
+		$sql1 = "select * from actions where actionid=$actionid order by actionid";
+		$oldHashAction = DBhash($sql1);
+		$sql2 = "select * from operations where actionid=$actionid order by operationid";
+		$oldHashOperations = DBhash($sql2);
+		$sql3 = "select * from conditions where actionid=$actionid order by conditionid";
+		$oldHashConditions = DBhash($sql3);
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
@@ -79,28 +74,27 @@ class testPageActionsTriggers extends CWebTest
 		$this->ok('Action updated');
 		$this->ok("$name");
 
-		$this->assertEquals($oldHashAction,DBhash($sql1),"Chuck Norris: Action update changed data in table 'actions'.");
-		$this->assertEquals($oldHashOperations,DBhash($sql2),"Chuck Norris: Action update changed data in table 'operations'");
-		$this->assertEquals($oldHashConditions,DBhash($sql3),"Chuck Norris: Action update changed data in table 'conditions'");
+		$this->assertEquals($oldHashAction, DBhash($sql1), "Chuck Norris: Action update changed data in table 'actions'.");
+		$this->assertEquals($oldHashOperations, DBhash($sql2), "Chuck Norris: Action update changed data in table 'operations'");
+		$this->assertEquals($oldHashConditions, DBhash($sql3), "Chuck Norris: Action update changed data in table 'conditions'");
 	}
 
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsTriggers_SingleEnableDisable($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsTriggers_SingleEnableDisable($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
 				$this->href_click("actionconf.php?go=disable&g_actionid%5B%5D=$actionid&");
-			break;
+				break;
 			case ACTION_STATUS_DISABLED:
 				$this->href_click("actionconf.php?go=activate&g_actionid%5B%5D=$actionid&");
-			break;
+				break;
 		}
 		$this->wait();
 
@@ -109,23 +103,21 @@ class testPageActionsTriggers extends CWebTest
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
-				$sql="select * from actions where actionid=$actionid and status=".ACTION_STATUS_DISABLED;
-			break;
+				$sql = "select * from actions where actionid=$actionid and status=".ACTION_STATUS_DISABLED;
+				break;
 			case ACTION_STATUS_DISABLED:
-				$sql="select * from actions where actionid=$actionid and status=".ACTION_STATUS_ENABLED;
-			break;
+				$sql = "select * from actions where actionid=$actionid and status=".ACTION_STATUS_ENABLED;
+				break;
 		}
-		$this->assertEquals(1,DBcount($sql));
+		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsTriggers_Create()
-	{
+	public function testPageActionsTriggers_Create() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageActionsTriggers_MassDisableAll()
-	{
+	public function testPageActionsTriggers_MassDisableAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -133,17 +125,16 @@ class testPageActionsTriggers extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsTriggers_MassDisable($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsTriggers_MassDisable($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
 		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go','Disable selected');
+		$this->dropdown_select('go', 'Disable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -153,12 +144,11 @@ class testPageActionsTriggers extends CWebTest
 		$this->ok('Status updated');
 		$this->ok('Disabled');
 
-		$sql="select * from actions where actionid=$actionid and status=1";
-		$this->assertEquals(1,DBcount($sql));
+		$sql = "select * from actions where actionid=$actionid and status=1";
+		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsTriggers_MassEnableAll()
-	{
+	public function testPageActionsTriggers_MassEnableAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -166,17 +156,16 @@ class testPageActionsTriggers extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsTriggers_MassEnable($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsTriggers_MassEnable($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
 		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go','Enable selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -186,12 +175,11 @@ class testPageActionsTriggers extends CWebTest
 		$this->ok('Status updated');
 		$this->ok('Enabled');
 
-		$sql="select * from actions where actionid=$actionid and status=0";
-		$this->assertEquals(1,DBcount($sql));
+		$sql = "select * from actions where actionid=$actionid and status=0";
+		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsTriggers_MassDeleteAll()
-	{
+	public function testPageActionsTriggers_MassDeleteAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -199,10 +187,9 @@ class testPageActionsTriggers extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsTriggers_MassDelete($action)
-	{
-		$actionid=$action['actionid'];
-		$name=$action['name'];
+	public function testPageActionsTriggers_MassDelete($action) {
+		$actionid = $action['actionid'];
+		$name = $action['name'];
 
 		$this->chooseOkOnNextConfirmation();
 
@@ -211,7 +198,7 @@ class testPageActionsTriggers extends CWebTest
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
 		$this->checkbox_select("g_actionid[$actionid]");
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -220,18 +207,17 @@ class testPageActionsTriggers extends CWebTest
 		$this->assertTitle('Configuration of actions');
 		$this->ok('Selected actions deleted');
 
-		$sql="select * from actions where actionid=$actionid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from operations where actionid=$actionid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from conditions where actionid=$actionid";
-		$this->assertEquals(0,DBcount($sql));
+		$sql = "select * from actions where actionid=$actionid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from operations where actionid=$actionid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from conditions where actionid=$actionid";
+		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('actions');
 	}
 
-	public function testPageActionsTriggers_Sorting()
-	{
+	public function testPageActionsTriggers_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}
