@@ -32,7 +32,7 @@ class testFormAdministrationGeneralWorkingtime extends CWebTest {
 	*/
 	public function testFormAdministrationGeneralWorkingtime_CheckLayout($WorkingTime) {
 
-		$this->login('config.php');
+		$this->login('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Working time');
 		$this->assertTitle('Configuration of Zabbix');
@@ -46,7 +46,7 @@ class testFormAdministrationGeneralWorkingtime extends CWebTest {
 
 	public function testFormAdministrationGeneralWorkingtime_SavingWorkperiod() {
 
-		$this->login('config.php');
+		$this->login('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Working time');
 		$this->assertTitle('Configuration of Zabbix');
