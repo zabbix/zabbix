@@ -23,10 +23,6 @@
 #include "sysinc.h"
 #include "zbxtypes.h"
 
-#ifndef INT_MAX
-#	define INT_MAX	2147483647
-#endif
-
 #ifdef DEBUG
 #	include "threads.h"
 
