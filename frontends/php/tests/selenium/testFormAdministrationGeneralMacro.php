@@ -29,7 +29,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$count = DBcount('select * from globalmacro');
 
-		$this->login('config.php');
+		$this->login('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown','Macros');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
@@ -52,11 +53,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$count = DBcount('select * from globalmacro');
 
 		// create new Global macro
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown','Macros');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Macros');
+		$this->login('adm.macros.php');
 		$this->click('id=macro_add');
 		$this->waitForVisible("macros[$count][macro]");
 		$this->input_type("macros[$count][macro]", $this->newmacro);		// id= macros_N_macro
@@ -76,13 +73,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$macro = '{$UPDATEDMACRO}';
 		$macrovalue = 'Value of the updated macro';
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown','Macros');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Macros');
-		$this->ok('Macro');
-		$this->ok('Value');
+		$this->login('adm.macros.php');
 		// id=macros_0_macro
 		$this->input_type('macros[0][macro]', $macro);
 		$this->input_type('macros[0][value]', $macrovalue);
@@ -99,11 +90,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$row = DBfetch(DBselect('select * from globalmacro order by macro limit 1'));
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown','Macros');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Macros');
+		$this->login('adm.macros.php');
 
 		// creating already existing macro
 		$this->button_click('macro_add');
@@ -147,11 +134,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$count = DBcount('select * from globalmacro');
 
 		// create new Global macro
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown','Macros');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Macros');
+		$this->login('adm.macros.php');
 		$this->click('id=macro_add');
 		$this->waitForVisible("macros[$count][macro]");
 		$this->input_type("macros[$count][macro]", $macro);
@@ -168,13 +151,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	public function testFormAdministrationGeneralMacro_Delete() {
 		$this->chooseOkOnNextConfirmation();
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown','Macros');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Macros');
-		$this->ok('Macro');
-		$this->ok('Value');
+		$this->login('adm.macros.php');
 		// No way to select what macro to remove currently
 		$this->click("id=macros_del");
 		$this->click("id=save");
