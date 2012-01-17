@@ -44,7 +44,7 @@ $fields = array(
 	'gsm_modem' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_SMS.')'),
 	'username' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
 	'password' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})&&isset({type})&&({type}=='.MEDIA_TYPE_JABBER.'||{type}=='.MEDIA_TYPE_EZ_TEXTING.')'),
-	'status'=>			array(T_ZBX_INT, O_OPT,	NULL,	IN(array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)), null),
+	'status'=>			array(T_ZBX_INT, O_OPT,	null,	IN(array(MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED)), null),
 	// actions
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
@@ -126,10 +126,7 @@ elseif ($_REQUEST['go'] == 'activate') {
 
 	$go_result = API::Mediatype()->update($options);
 
-	if ($go_result) {
-		unset($_REQUEST['form']);
-	}
-	show_messages($go_result, _('Media type enabled'), _('Media type was not enabled'));
+	show_messages($go_result, _('Media type enabled'), _('Cannot enable media type'));
 }
 /*
  * Go - disable
@@ -148,20 +145,16 @@ elseif ($_REQUEST['go'] == 'disable') {
 
 	$go_result = API::Mediatype()->update($options);
 
-	if ($go_result) {
-		unset($_REQUEST['form']);
-	}
-	show_messages($go_result, _('Media type disabled'), _('Media type was not disabled'));
+	show_messages($go_result, _('Media type disabled'), _('Cannot disable media type'));
 }
 /*
 * Go - delete
 */
 elseif ($_REQUEST['go'] == 'delete') {
 	$mediatypeids = get_request('mediatypeids', array());
+
 	$go_result = API::Mediatype()->delete($mediatypeids);
-	if ($go_result) {
-		unset($_REQUEST['form']);
-	}
+
 	show_messages($go_result, _('Media type deleted'), _('Cannot delete media type'));
 }
 

@@ -98,14 +98,11 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 	$statusLink = 'media_types.php?go='.(($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED) ? 'activate' : 'disable').
 		'&mediatypeids%5B%5D='.$mediatype['mediatypeid'];
 
-	switch ($mediatype['status']) {
-		case MEDIA_TYPE_STATUS_ACTIVE:
-			$status = new CLink(_('Enabled'), $statusLink, 'enabled');
-			break;
-
-		default:
-			$status = new CLink(_('Disabled'), $statusLink, 'disabled');
-			break;
+	if (MEDIA_TYPE_STATUS_ACTIVE == $mediatype['status']) {
+		$status = new CLink(_('Enabled'), $statusLink, 'enabled');
+	}
+	else {
+		$status = new CLink(_('Disabled'), $statusLink, 'disabled');
 	}
 
 	// append row
