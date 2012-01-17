@@ -216,7 +216,6 @@ require_once('include/page_header.php');
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => true,
 		'selectGroups' => API_OUTPUT_REFER,
-		'sortfield' => array('name', 'hostid'),
 		'preservekeys' => true
 	);
 
@@ -452,8 +451,6 @@ require_once('include/page_header.php');
 			' ORDER BY i.name,i.itemid';
 	$db_items = DBselect($sql);
 	while ($db_item = DBfetch($db_items)) {
-		$host = $hosts[$db_item['hostid']];
-
 		$description = itemName($db_item);
 
 		if (!empty($_REQUEST['select']) && !zbx_stristr($description, $_REQUEST['select'])) continue;

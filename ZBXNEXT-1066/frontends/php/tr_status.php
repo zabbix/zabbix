@@ -538,8 +538,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 // host JS menu {{{
 		$hosts_list = array();
-		foreach($trigger['hosts'] as $num => $trigger_host){
-			$menus = '';
+		foreach($trigger['hosts'] as $trigger_host){
 			$host = $hosts[$trigger_host['hostid']];
 
 			// fetch scripts for the host JS menu

@@ -610,7 +610,6 @@ require_once('include/page_header.php');
 					'selectScreens' => API_OUTPUT_COUNT,
 					'selectInventory' => true,
 					'selectGroups' => API_OUTPUT_REFER,
-					'sortfield' => array('name', 'hostid'),
 					'preservekeys' => true
 				));
 
@@ -690,7 +689,7 @@ require_once('include/page_header.php');
 							'action'
 						),
 						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-						(!$_REQUEST['hostid']) ? $hostSpan : null,
+						$_REQUEST['hostid'] ? null : $hostSpan,
 						new CSpan($tr_desc, 'link_menu'),
 						$statusSpan,
 						getSeverityCell($trigger['priority'], null, !$event['value']),
