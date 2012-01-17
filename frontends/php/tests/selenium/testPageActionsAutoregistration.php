@@ -19,10 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageActionsAutoregistration extends CWebTest
-{
+class testPageActionsAutoregistration extends CWebTest {
 	// Returns all trigger actions
 	public static function allActions() {
 		return DBdata("select * from actions where eventsource=".EVENT_SOURCE_AUTO_REGISTRATION." order by actionid");
@@ -31,9 +30,8 @@ class testPageActionsAutoregistration extends CWebTest
 	/**
 	* @dataProvider allActions
 	*/
-	public function testPageActionsAutoregistration_CheckLayout($action)
-	{
-		$name=$action['name'];
+	public function testPageActionsAutoregistration_CheckLayout($action) {
+		$name = $action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_AUTO_REGISTRATION);
 		$this->assertTitle('Configuration of actions');
@@ -76,9 +74,9 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->ok('Action updated');
 		$this->ok("$name");
 
-		$this->assertEquals($oldHashAction, DBhash($sql1),"Chuck Norris: Action update changed data in table 'actions'.");
-		$this->assertEquals($oldHashOperations, DBhash($sql2),"Chuck Norris: Action update changed data in table 'operations'");
-		$this->assertEquals($oldHashConditions, DBhash($sql3),"Chuck Norris: Action update changed data in table 'conditions'");
+		$this->assertEquals($oldHashAction, DBhash($sql1), "Chuck Norris: Action update changed data in table 'actions'.");
+		$this->assertEquals($oldHashOperations, DBhash($sql2), "Chuck Norris: Action update changed data in table 'operations'");
+		$this->assertEquals($oldHashConditions, DBhash($sql3), "Chuck Norris: Action update changed data in table 'conditions'");
 	}
 
 	/**
@@ -105,10 +103,10 @@ class testPageActionsAutoregistration extends CWebTest
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
-				$sql="select * from actions where actionid=$actionid and status=".ACTION_STATUS_DISABLED;
+				$sql = "select * from actions where actionid=$actionid and status=".ACTION_STATUS_DISABLED;
 				break;
 			case ACTION_STATUS_DISABLED:
-				$sql="select * from actions where actionid=$actionid and status=".ACTION_STATUS_ENABLED;
+				$sql = "select * from actions where actionid=$actionid and status=".ACTION_STATUS_ENABLED;
 				break;
 		}
 		$this->assertEquals(1, DBcount($sql));
@@ -146,7 +144,7 @@ class testPageActionsAutoregistration extends CWebTest
 		$this->ok('Status updated');
 		$this->ok('Disabled');
 
-		$sql="select * from actions where actionid=$actionid and status=1";
+		$sql = "select * from actions where actionid=$actionid and status=1";
 		$this->assertEquals(1, DBcount($sql));
 	}
 
