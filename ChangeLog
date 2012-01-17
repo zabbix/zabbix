@@ -2,6 +2,7 @@
 Changes for 1.9.9
 
 New features:
+..F....... [ZBXNEXT-1019] updated jQuery to 1.7.1 and jQuery-ui to 1.8.17 (Vedmak)
 ..F....... [ZBXNEXT-1058] added an item lifetime indicator icon in the item configuration (pavels, Sasha)
 ..F....... [ZBXNEXT-1058] changed the default discovery rule 'lifetime' field value to 30 days (pavels, Sasha)
 A.......S. [ZBX-4479] added possibility to add a dependency from a template to a host (Sasha, Slava)
