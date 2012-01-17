@@ -32,8 +32,8 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	* @dataProvider allValues
 	*/
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout($allValues) {
-
-		$this->login('config.php');
+		$this->login('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('Housekeeper', 'Do not keep actions older than (in days)', 'Do not keep events older than (in days)'));
@@ -52,10 +52,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	public function testFormAdministrationGeneralHousekeeper_AlertHistory() {
 		// 0-65535
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('Housekeeper'));
+		$this->login('adm.housekeeper.php');
 		$this->input_type('alert_history', '0');
 		$this->button_click('save');
 		$this->wait();
@@ -101,10 +98,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 	public function testFormAdministrationGeneralHousekeeper_EventHistory() {
 		// 0-65535
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('Housekeeper');
+		$this->login('adm.housekeeper.php');
 		$this->input_type('event_history', '0');
 		$this->button_click('save');
 		$this->wait();

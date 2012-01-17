@@ -29,10 +29,7 @@ $houseKeeperView->addTab('houseKeeper', _('Housekeeper'), $houseKeeperTab);
 
 $houseKeeperForm = new CForm();
 $houseKeeperForm->setName('houseKeeperForm');
-//$houseKeeperForm->setHelp('web.config.housekeeper.php');
-$houseKeeperForm->addVar('form', $this->data['form']);
 $houseKeeperForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
-$houseKeeperForm->addVar('config', get_request('config', 0));
 $houseKeeperForm->addItem($houseKeeperView);
 $houseKeeperForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save')))));
 
