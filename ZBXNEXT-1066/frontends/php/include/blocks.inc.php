@@ -827,7 +827,6 @@ function make_latest_issues(array $filter = array()) {
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
-		'selectGroups' => API_OUTPUT_EXTEND,
 		'selectHosts' => array('hostid', 'name'),
 		'output' => API_OUTPUT_EXTEND
 	);
@@ -898,7 +897,6 @@ function make_latest_issues(array $filter = array()) {
 
 	foreach ($triggers as $trigger) {
 		// check for dependencies
-		$group = reset($trigger['groups']);
 		$host = $hosts[$trigger['hostid']];
 
 		// fetch scripts for host pop up menu
@@ -934,7 +932,6 @@ function make_latest_issues(array $filter = array()) {
 		$hostSpan->setAttribute('data-menu', array(
 			'scripts' => $menuScripts,
 			'hostid' => $trigger['hostid'],
-			'groupid' => $group['groupid'],
 			'hasScreens' => (bool) $host['screens'],
 			'hasInventory' => (bool) $host['inventory']
 		));

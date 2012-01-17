@@ -609,7 +609,6 @@ require_once('include/page_header.php');
 					'selectAppllications' => API_OUTPUT_EXTEND,
 					'selectScreens' => API_OUTPUT_COUNT,
 					'selectInventory' => true,
-					'selectGroups' => API_OUTPUT_REFER,
 					'preservekeys' => true
 				));
 
@@ -620,7 +619,6 @@ require_once('include/page_header.php');
 					$trigger = $triggers[$event['objectid']];
 					$host = reset($trigger['hosts']);
 					$host = $hosts[$host['hostid']];
-					$group = reset($host['groups']);
 
 					$items = array();
 					foreach($trigger['items'] as $inum => $item){
@@ -678,7 +676,6 @@ require_once('include/page_header.php');
 					$hostSpan->setAttribute('data-menu', array(
 						'scripts' => $menuScripts,
 						'hostid' => $host['hostid'],
-						'groupid' => $group['groupid'],
 						'hasScreens' => (bool) $host['screens'],
 						'hasInventory' => (bool) $host['inventory']
 					));

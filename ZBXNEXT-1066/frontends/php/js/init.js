@@ -46,8 +46,7 @@ jQuery(function() {
 
 		// add go to links
 		menu.push(createMenuHeader(_('Go to')));
-		menu.push(createMenuItem(_('Latest data'), 'javascript: redirect("latest.php?groupid=' + menuData.groupid
-			+ '&hostid=' + menuData.hostid + '")'));
+		menu.push(createMenuItem(_('Latest data'), 'javascript: redirect("latest.php?hostid=' + menuData.hostid + '")'));
 		if (menuData.hasInventory) {
 			menu.push(createMenuItem(_('Host inventories'), 'javascript: redirect("hostinventories.php?hostid='
 				+ menuData.hostid + '")'));
