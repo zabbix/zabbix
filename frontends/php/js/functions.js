@@ -728,6 +728,6 @@ function validateNumericBox(obj, allowempty, allownegative) {
  *
  * @param str
  */
-function _(str) {
+function t(str) {
 	return (!!locale[str]) ? locale[str] : str;
 }
