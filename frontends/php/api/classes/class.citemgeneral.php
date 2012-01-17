@@ -300,8 +300,8 @@ abstract class CItemGeneral extends CZBXAPI{
 		return $item;
 	}
 
-	protected function errorInheritFlags($flag, $key, $host){
-		switch($flag){
+	protected function errorInheritFlags($flag, $key, $host) {
+		switch ($flag) {
 			case ZBX_FLAG_DISCOVERY_NORMAL:
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item.', $key, $host));
 				break;
@@ -319,8 +319,8 @@ abstract class CItemGeneral extends CZBXAPI{
 		}
 	}
 
-	public static function itemTypeInterface($itemType){
-		switch($itemType){
+	public static function itemTypeInterface($itemType) {
+		switch ($itemType) {
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
 			case ITEM_TYPE_SNMPV3:
@@ -394,9 +394,9 @@ abstract class CItemGeneral extends CZBXAPI{
 	}
 
 
-	public function isReadable($ids){
-		if(!is_array($ids)) return false;
-		if(empty($ids)) return true;
+	public function isReadable($ids) {
+		if (!is_array($ids)) return false;
+		if (empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
@@ -410,9 +410,9 @@ abstract class CItemGeneral extends CZBXAPI{
 		return (count($ids) == $count);
 	}
 
-	public function isWritable($ids){
-		if(!is_array($ids)) return false;
-		if(empty($ids)) return true;
+	public function isWritable($ids) {
+		if (!is_array($ids)) return false;
+		if (empty($ids)) return true;
 
 		$ids = array_unique($ids);
 

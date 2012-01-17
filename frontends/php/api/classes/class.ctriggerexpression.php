@@ -117,19 +117,19 @@ class CTriggerExpression {
 				if (isset($arg['type']) && isset($expression['functionParamList'][$anum])) {
 					$userMacro = preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $expression['functionParamList'][$anum]);
 
-					if($arg['type'] == 'str' && !is_string($expression['functionParamList'][$anum]) && !$userMacro) {
+					if ($arg['type'] == 'str' && !is_string($expression['functionParamList'][$anum]) && !$userMacro) {
 						throw new Exception(_s('Parameter of type string or user macro expected, "%1$s" given.', $expression['functionParamList'][$anum]));
 					}
 
-					if($arg['type'] == 'sec' && (validate_sec($expression['functionParamList'][$anum]) != 0) && !$userMacro) {
+					if ($arg['type'] == 'sec' && (validate_sec($expression['functionParamList'][$anum]) != 0) && !$userMacro) {
 						throw new Exception(_s('Parameter sec or user macro expected, "%1$s" given.', $expression['functionParamList'][$anum]));
 					}
 
-					if($arg['type'] == 'sec_num' && (validate_secnum($expression['functionParamList'][$anum]) != 0) && !$userMacro) {
+					if ($arg['type'] == 'sec_num' && (validate_secnum($expression['functionParamList'][$anum]) != 0) && !$userMacro) {
 						throw new Exception(_s('Parameter sec or #num or user macro expected, "%1$s" given.', $expression['functionParamList'][$anum]));
 					}
 
-					if($arg['type'] == 'num' && !is_numeric($expression['functionParamList'][$anum]) && !$userMacro) {
+					if ($arg['type'] == 'num' && !is_numeric($expression['functionParamList'][$anum]) && !$userMacro) {
 						throw new Exception(_s('Parameter num or user macro expected, "%1$s" given.', $expression['functionParamList'][$anum]));
 					}
 				}
@@ -319,7 +319,7 @@ class CTriggerExpression {
 		}
 
 		if ($this->currExpr['part']['functionParam']) {
-			if(!isset($this->currExpr['params']['function'][$this->currExpr['params']['count']])) {
+			if (!isset($this->currExpr['params']['function'][$this->currExpr['params']['count']])) {
 				return true;
 			}
 			if (zbx_empty($this->currExpr['params']['function'][$this->currExpr['params']['count']])) {
@@ -557,7 +557,7 @@ class CTriggerExpression {
 
 			if ($symbol == ')' && $this->currExpr['part']['functionParam']) {
 				// +1 because (checkSequence is not counted this symbol yet)
-				if ($this->symbols['params']['('] == ($this->symbols['params'][')'] + 1)){
+				if ($this->symbols['params']['('] == ($this->symbols['params'][')'] + 1)) {
 					$this->symbols['params'][$symbol]++;
 
 					$this->writeParams();
@@ -642,7 +642,7 @@ class CTriggerExpression {
 
 		// we shouldn't count open braces in params
 		if (!$this->currExpr['part']['itemParam'] && !$this->currExpr['part']['functionParam']) {
-			if(isset($this->symbols['open'][$symbol])) $this->symbols['open'][$symbol]++;
+			if (isset($this->symbols['open'][$symbol])) $this->symbols['open'][$symbol]++;
 		}
 
 		if (isset($this->symbols['close'][$symbol])) {

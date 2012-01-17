@@ -24,7 +24,7 @@ class CStringParser {
 	}
 
 	private function prepareRules() {
-		foreach($this->ess as $key => $ruleset) {
+		foreach ($this->ess as $key => $ruleset) {
 			$this->ess[$key]['ruleName'] = $key;
 			$indexKeys = isset($ruleset['parent']) ? $ruleset['parent'] : 'independent';
 
@@ -639,7 +639,7 @@ class CStringParser {
 			}
 
 			foreach ($this->ess[$levelData['levelType']]['customValidate'] as &$customFunction) {
-				if(!is_callable($customFunction)) {
+				if (!is_callable($customFunction)) {
 					continue;
 				}
 
