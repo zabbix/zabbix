@@ -36,7 +36,7 @@ jQuery(function() {
 
 		// add scripts
 		if (menuData.scripts.length) {
-			menu.push(createMenuHeader(_('Scripts')));
+			menu.push(createMenuHeader(t('Scripts')));
 			jQuery.each(menuData.scripts, function(i, script) {
 				var action = 'javascript: executeScript(' + menuData.hostid + ', ' + script.scriptid
 					+ ', "' + script.confirmation +'")';
@@ -45,14 +45,14 @@ jQuery(function() {
 		}
 
 		// add go to links
-		menu.push(createMenuHeader(_('Go to')));
-		menu.push(createMenuItem(_('Latest data'), 'javascript: redirect("latest.php?hostid=' + menuData.hostid + '")'));
+		menu.push(createMenuHeader(t('Go to')));
+		menu.push(createMenuItem(t('Latest data'), 'javascript: redirect("latest.php?hostid=' + menuData.hostid + '")'));
 		if (menuData.hasInventory) {
-			menu.push(createMenuItem(_('Host inventories'), 'javascript: redirect("hostinventories.php?hostid='
+			menu.push(createMenuItem(t('Host inventories'), 'javascript: redirect("hostinventories.php?hostid='
 				+ menuData.hostid + '")'));
 		}
 		if (menuData.hasScreens) {
-			menu.push(createMenuItem(_('Host screens'), 'javascript: redirect("host_screen.php?hostid='
+			menu.push(createMenuItem(t('Host screens'), 'javascript: redirect("host_screen.php?hostid='
 				+ menuData.hostid + '")'));
 		}
 
