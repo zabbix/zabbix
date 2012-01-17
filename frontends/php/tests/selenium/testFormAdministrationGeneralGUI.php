@@ -409,7 +409,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 
 	}
 
-	public function testFormAdministrationGeneralGUI_EventShowMax(){
+	public function testFormAdministrationGeneralGUI_EventShowMax() {
 
 		$this->login('config.php');
 		$this->dropdown_select_wait('configDropDown', 'GUI');

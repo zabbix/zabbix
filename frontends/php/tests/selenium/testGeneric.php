@@ -142,7 +142,7 @@ class testGeneric extends CWebTest
 	{
 		$this->login();
 		$this->open($a);
-		foreach($this->failIfExists as $str)
+		foreach ($this->failIfExists as $str)
 		{
 			$this->nok($str,'assertTextNotPresent('.$a.','.$str.')');
 		}
@@ -155,7 +155,7 @@ class testGeneric extends CWebTest
 	{
 		$this->login();
 		$this->open($a);
-		foreach($this->failIfNotExists as $str)
+		foreach ($this->failIfNotExists as $str)
 		{
 			$this->ok($str,'assertTextPresent('.$a.','.$str.')');
 		}
