@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageActionsTriggers extends CWebTest {
 	// Returns all trigger actions
 	public static function allActions() {
-		return DBdata("select * from actions where eventsource=".EVENT_SOURCE_TRIGGERS." order by actionid");
+		return DBdata("SELECT * FROM actions WHERE eventsource=".EVENT_SOURCE_TRIGGERS." ORDER BY actionid");
 	}
 
 	/**
@@ -57,11 +57,11 @@ class testPageActionsTriggers extends CWebTest {
 		$actionid = $action['actionid'];
 		$name = $action['name'];
 
-		$sql1 = "select * from actions where actionid=$actionid order by actionid";
+		$sql1 = "SELECT * FROM actions WHERE actionid=$actionid ORDER BY actionid";
 		$oldHashAction = DBhash($sql1);
-		$sql2 = "select * from operations where actionid=$actionid order by operationid";
+		$sql2 = "SELECT * FROM operations WHERE actionid=$actionid ORDER BY operationid";
 		$oldHashOperations = DBhash($sql2);
-		$sql3 = "select * from conditions where actionid=$actionid order by conditionid";
+		$sql3 = "SELECT * FROM conditions WHERE actionid=$actionid ORDER BY conditionid";
 		$oldHashConditions = DBhash($sql3);
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
@@ -103,10 +103,10 @@ class testPageActionsTriggers extends CWebTest {
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
-				$sql = "select * from actions where actionid=$actionid and status=".ACTION_STATUS_DISABLED;
+				$sql = "SELECT * FROM actions WHERE actionid=$actionid AND status=".ACTION_STATUS_DISABLED;
 				break;
 			case ACTION_STATUS_DISABLED:
-				$sql = "select * from actions where actionid=$actionid and status=".ACTION_STATUS_ENABLED;
+				$sql = "SELECT * FROM actions WHERE actionid=$actionid AND status=".ACTION_STATUS_ENABLED;
 				break;
 		}
 		$this->assertEquals(1, DBcount($sql));
@@ -144,7 +144,7 @@ class testPageActionsTriggers extends CWebTest {
 		$this->ok('Status updated');
 		$this->ok('Disabled');
 
-		$sql = "select * from actions where actionid=$actionid and status=1";
+		$sql = "SELECT * FROM actions WHERE actionid=$actionid AND status=1";
 		$this->assertEquals(1, DBcount($sql));
 	}
 
@@ -175,7 +175,7 @@ class testPageActionsTriggers extends CWebTest {
 		$this->ok('Status updated');
 		$this->ok('Enabled');
 
-		$sql = "select * from actions where actionid=$actionid and status=0";
+		$sql = "SELECT * FROM actions WHERE actionid=$actionid AND status=0";
 		$this->assertEquals(1, DBcount($sql));
 	}
 
@@ -207,11 +207,11 @@ class testPageActionsTriggers extends CWebTest {
 		$this->assertTitle('Configuration of actions');
 		$this->ok('Selected actions deleted');
 
-		$sql = "select * from actions where actionid=$actionid";
+		$sql = "SELECT * FROM actions WHERE actionid=$actionid";
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "select * from operations where actionid=$actionid";
+		$sql = "SELECT * FROM operations WHERE actionid=$actionid";
 		$this->assertEquals(0, DBcount($sql));
-		$sql = "select * from conditions where actionid=$actionid";
+		$sql = "SELECT * FROM conditions WHERE actionid=$actionid";
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('actions');
