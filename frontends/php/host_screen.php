@@ -113,19 +113,6 @@
 	}
 ?>
 <?php
-	$options = array(
-		'groups' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_items' => 1,
-		),
-		'hosts' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_items' => 1,
-		),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null),
-	);
-
 	$screenid = get_request('screenid', CProfile::get('web.hostscreen.screenid', null));
 
 	if(2 != $_REQUEST['fullscreen'])
