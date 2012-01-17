@@ -94,7 +94,7 @@ class testPageActionsTriggers extends CWebTest
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
-		switch($action['status']){
+		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
 				$this->href_click("actionconf.php?go=disable&g_actionid%5B%5D=$actionid&");
 			break;
@@ -107,7 +107,7 @@ class testPageActionsTriggers extends CWebTest
 		$this->assertTitle('Configuration of actions');
 		$this->ok('Status updated');
 
-		switch($action['status']){
+		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
 				$sql="select * from actions where actionid=$actionid and status=".ACTION_STATUS_DISABLED;
 			break;
