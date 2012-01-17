@@ -23,32 +23,27 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class function_DBselect extends CZabbixTest
-{
-	public function test_DBselectOK()
-	{
+class function_DBselect extends CZabbixTest {
+	public function test_DBselectOK() {
 		$result=DBselect('select * from users');
 		$this->assertTrue(is_resource($result) ||is_object($result));
 	}
 
-	public function test_DBselectRange()
-	{
-		$this->assertTrue(0 == DBcount('select * from items',0));
-		$this->assertTrue(1 == DBcount('select * from items',1));
-		$this->assertTrue(100 == DBcount('select * from items',100));
-		$this->assertTrue(1 == DBcount('select * from items','1'));
+	public function test_DBselectRange() {
+		$this->assertTrue(0 == DBcount('select * from items', 0));
+		$this->assertTrue(1 == DBcount('select * from items', 1));
+		$this->assertTrue(100 == DBcount('select * from items', 100));
+		$this->assertTrue(1 == DBcount('select * from items', '1'));
 	}
 
-	public function test_DBselectWrongParameters()
-	{
-		$this->assertTrue(false == DBselect('select * from items','ZZZ'));
-		$this->assertTrue(false == DBselect('select * from items',1.5));
-		$this->assertTrue(false == DBselect('select * from items',1.5));
-		$this->assertTrue(false == DBselect('select * from items',-1));
+	public function test_DBselectWrongParameters() {
+		$this->assertTrue(false == DBselect('select * from items', 'ZZZ'));
+		$this->assertTrue(false == DBselect('select * from items', 1.5));
+		$this->assertTrue(false == DBselect('select * from items', 1.5));
+		$this->assertTrue(false == DBselect('select * from items', -1));
 	}
 
-	public function test_DBselectFail()
-	{
+	public function test_DBselectFail() {
 		// TODO
 		$this->markTestIncomplete();
 /* Does not work this way
