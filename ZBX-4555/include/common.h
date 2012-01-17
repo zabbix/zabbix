@@ -149,6 +149,8 @@ const char	*zbx_result_string(int result);
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
 
+#define	ZBX_IS_UINT64_MAX_LEN	0xff
+
 #define ZBX_DM_DELIMITER	'\255'
 
 typedef struct
@@ -772,7 +774,7 @@ int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-#define is_uint64(src, value)	is_uint64_n(src, INT_MAX, value)
+#define is_uint64(src, value)	is_uint64_n(src, ZBX_IS_UINT64_MAX_LEN, value)
 int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
 int	is_boolean(const char *str, zbx_uint64_t *value);
