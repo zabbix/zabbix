@@ -19,62 +19,60 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testGeneric extends CWebTest
-{
-	public static function provider()
-	{
+class testGeneric extends CWebTest {
+	public static function provider() {
 		// List of URLs to test
 		// URL, expected page Title
 		return array(
 
 			// Monitoring
-			array('index.php',	'Dashboard'),
+			array('index.php',		'Dashboard'),
 			array('dashboard.php',	'Dashboard'),
 			array('dashconf.php',	'Dashboard configuration'),
 
 			array('overview.php',	'Overview \[refreshed every 30 sec\]'),
-			array('overview.php?form_refresh=1&groupid=0&type=1',	'Overview \[refreshed every 30 sec\]'),
+			array('overview.php?form_refresh=1&groupid=0&type=1',				'Overview \[refreshed every 30 sec\]'),
 			array('overview.php?form_refresh=1&groupid=0&type=1&view_style=0',	'Overview \[refreshed every 30 sec\]'),
 			array('overview.php?form_refresh=1&groupid=0&type=1&view_style=1',	'Overview \[refreshed every 30 sec\]'),
 
 			array('httpmon.php',	'Status of Web monitoring \[refreshed every 30 sec\]'),
-			array('latest.php',	'Latest data \[refreshed every 30 sec\]'),
+			array('latest.php',		'Latest data \[refreshed every 30 sec\]'),
 			array('hosts_mon.php',	'Hosts'),
 			array('tr_status.php',	'Status of triggers \[refreshed every 30 sec\]'),
 
-			array('events.php',	'Latest events \[refreshed every 30 sec\]'),
+			array('events.php',				'Latest events \[refreshed every 30 sec\]'),
 			array('events.php?source=0',	'Latest events \[refreshed every 30 sec\]'),
 			array('events.php?source=1',	'Latest events \[refreshed every 30 sec\]'),
 
-			array('charts.php',	'Custom graphs \[refreshed every 30 sec\]'),
+			array('charts.php',		'Custom graphs \[refreshed every 30 sec\]'),
 			array('screens.php',	'Custom screens \[refreshed every 30 sec\]'),
-			array('slides.php',	'Custom slides'),
-			array('maps.php',	'Network maps \[refreshed every 30 sec\]'),
+			array('slides.php',		'Custom slides'),
+			array('maps.php',		'Network maps \[refreshed every 30 sec\]'),
 			array('srv_status.php',	'IT services \[refreshed every 30 sec\]'),
 
 			// Configuration
-			array('hostgroups.php',	'Host groups'),
-			array('templates.php',	'Templates'),
-			array('hosts.php',	'Hosts'),
-			array('maintenance.php','Maintenance'),
-			array('httpconf.php',	'Configuration of Web monitoring'),
+			array('hostgroups.php',		'Host groups'),
+			array('templates.php',		'Templates'),
+			array('hosts.php',			'Hosts'),
+			array('maintenance.php',	'Maintenance'),
+			array('httpconf.php',		'Configuration of Web monitoring'),
 
-			array('actionconf.php',	'Configuration of actions'),
+			array('actionconf.php',					'Configuration of actions'),
 			array('actionconf.php?eventsource=0',	'Configuration of actions'),
 			array('actionconf.php?eventsource=1',	'Configuration of actions'),
 			array('actionconf.php?eventsource=2',	'Configuration of actions'),
 
-			array('screenconf.php',	'Configuration of screens'),
-			array('slideconf.php',	'Configuration of slide shows'),
-			array('sysmaps.php',	'Network maps'),
-			array('discovery.php',	'Status of discovery'),
-			array('services.php',	'Configuration of IT services'),
-			array('discoveryconf.php','Configuration of discovery'),
+			array('screenconf.php',		'Configuration of screens'),
+			array('slideconf.php',		'Configuration of slide shows'),
+			array('sysmaps.php',		'Network maps'),
+			array('discovery.php',		'Status of discovery'),
+			array('services.php',		'Configuration of IT services'),
+			array('discoveryconf.php',	'Configuration of discovery'),
 
 			// Inventory
-			array('hostinventories.php','Host inventories'),
+			array('hostinventories.php',	'Host inventories'),
 
 			// Reports
 			// TODO Does not work under SQLite well. Extremely slow!
@@ -83,12 +81,12 @@ class testGeneric extends CWebTest
 //			array('report2.php?config=0',	'Availability report'),
 //			array('report2.php?config=1',	'Availability report'),
 
-			array('report5.php',	'Most busy triggers top 100'),
-			array('report5.php?period=day',	'Most busy triggers top 100'),
+			array('report5.php',				'Most busy triggers top 100'),
+			array('report5.php?period=day',		'Most busy triggers top 100'),
 			array('report5.php?period=week',	'Most busy triggers top 100'),
 			array('report5.php?period=month',	'Most busy triggers top 100'),
 			array('report5.php?period=year',	'Most busy triggers top 100'),
-			array('report6.php',	'Bar reports'),
+			array('report6.php',				'Bar reports'),
 
 			// Administration
 			array('adm.gui.php', 'Configuration of Zabbix'),
@@ -130,8 +128,7 @@ class testGeneric extends CWebTest
 	/**
 	* @dataProvider provider
 	*/
-	public function testTitles($a, $b)
-	{
+	public function testTitles($a, $b) {
 		$this->login();
 		$this->open($a);
 		$this->assertTitle($b);
@@ -140,26 +137,22 @@ class testGeneric extends CWebTest
 	/**
 	* @dataProvider provider
 	*/
-	public function testNotExists($a,$b)
-	{
+	public function testNotExists($a, $b) {
 		$this->login();
 		$this->open($a);
-		foreach ($this->failIfExists as $str)
-		{
-			$this->nok($str,'assertTextNotPresent('.$a.','.$str.')');
+		foreach ($this->failIfExists as $str) {
+			$this->nok($str, 'assertTextNotPresent('.$a.','.$str.')');
 		}
 	}
 
 	/**
 	* @dataProvider provider
 	*/
-	public function testExists($a,$b)
-	{
+	public function testExists($a, $b) {
 		$this->login();
 		$this->open($a);
-		foreach ($this->failIfNotExists as $str)
-		{
-			$this->ok($str,'assertTextPresent('.$a.','.$str.')');
+		foreach ($this->failIfNotExists as $str) {
+			$this->ok($str, 'assertTextPresent('.$a.','.$str.')');
 		}
 	}
 }
