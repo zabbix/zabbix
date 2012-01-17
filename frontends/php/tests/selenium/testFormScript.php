@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormScript extends CWebTest{
+class testFormScript extends CWebTest {
 	// Data provider
 	public static function providerScripts() {
 		// data - values for form inputs
@@ -31,19 +31,19 @@ class testFormScript extends CWebTest{
 			array(
 				array(
 					array('name' => 'name', 'value' => 'script', 'type' => 'text'),
-					array('name' => 'command', 'value' => 'run', 'type' => 'text'),
+					array('name' => 'command', 'value' => 'run', 'type' => 'text')
 				),
 				true,
 				array(
 					'name' => 'script',
-					'command' => 'run',
+					'command' => 'run'
 				)
 			),
 			array(
 				array(
 					array('name' => 'name', 'value' => 'script', 'type' => 'text'),
 					array('name' => 'command', 'value' => 'run', 'type' => 'text'),
-					array('name' => 'type', 'value' => 'IPMI', 'type' => 'select'),
+					array('name' => 'type', 'value' => 'IPMI', 'type' => 'select')
 				),
 				true,
 				array(
@@ -56,7 +56,7 @@ class testFormScript extends CWebTest{
 				array(
 					array('name' => 'name', 'value' => 'script', 'type' => 'text'),
 					array('name' => 'command', 'value' => 'run', 'type' => 'text'),
-					array('name' => 'enableConfirmation', 'type' => 'check'),
+					array('name' => 'enableConfirmation', 'type' => 'check')
 				),
 				false,
 				array()
@@ -64,11 +64,11 @@ class testFormScript extends CWebTest{
 			array(
 				array(
 					array('name' => 'name', 'value' => 'script', 'type' => 'text'),
-					array('name' => 'command', 'value' => '', 'type' => 'text'),
+					array('name' => 'command', 'value' => '', 'type' => 'text')
 				),
 				false,
 				array()
-			),
+			)
 		);
 		return $data;
 	}
@@ -144,7 +144,7 @@ class testFormScript extends CWebTest{
 			}
 		}
 
-		$sql = 'SELECT ' . implode(', ', array_keys($DBvalues)) . ' FROM scripts';
+		$sql = 'SELECT '.implode(', ', array_keys($DBvalues)).' FROM scripts';
 		if ($resultSave && isset($keyField))
 			$sql .= ' WHERE name='.zbx_dbstr($keyField);
 
@@ -165,7 +165,7 @@ class testFormScript extends CWebTest{
 				$this->assertEquals($value, $DBvalues[$field], "Value for '$field' was not updated.");
 			}
 		}
-		else{
+		else {
 			$this->ok('ERROR:');
 			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}
