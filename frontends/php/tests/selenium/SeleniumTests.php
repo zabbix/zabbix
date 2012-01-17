@@ -63,6 +63,7 @@ require_once(dirname(__FILE__).'/testFormAdministrationGeneralImages.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralMacro.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php');
 require_once(dirname(__FILE__).'/testFormAdministrationGeneralValuemap.php');
+require_once(dirname(__FILE__).'/testFormAdministrationGeneralWorkperiod.php');
 require_once(dirname(__FILE__).'/testFormConfigTriggerSeverity.php');
 require_once(dirname(__FILE__).'/testFormHost.php');
 require_once(dirname(__FILE__).'/testFormHostGroup.php');
@@ -124,6 +125,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralMacro');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
 		$suite->addTestSuite('testFormAdministrationGeneralValuemap');
+		$suite->addTestSuite('testFormAdministrationGeneralWorkperiod');
 		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
