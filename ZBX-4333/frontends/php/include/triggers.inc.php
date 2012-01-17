@@ -1999,9 +1999,9 @@ function utf8RawUrlDecode($source){
 	function insert_dependency($triggerid_down,$triggerid_up){
 
 		$triggerdepid = get_dbid('trigger_depends','triggerdepid');
-		$result=DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up) '.
-							" VALUES ($triggerdepid,$triggerid_down,$triggerid_up)");
-		if(!$result){
+		$result=DBexecute('INSERT INTO trigger_depends (triggerdepid, triggerid_down, triggerid_up) '.
+							" VALUES ($triggerdepid, $triggerid_down, $triggerid_up)");
+	if(!$result){
 			return	$result;
 		}
 	return DBexecute('UPDATE triggers SET dep_level=dep_level+1 WHERE triggerid='.$triggerid_up);
@@ -2401,7 +2401,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 		copy_trigger_to_host($trigger['triggerid'], $hostid, $copy_mode);
 	}
 
-	update_template_dependencies_for_host($hostid, $templateid);
+	//update_template_dependencies_for_host($hostid, $templateid);
 }
 
 
