@@ -56,16 +56,16 @@ class testPageMaintenance extends CWebTest {
 		$name = $maintenance['name'];
 		$maintenanceid = $maintenance['maintenanceid'];
 
-		$sql1 = "select * from maintenances where name='$name' order by maintenanceid";
-		$oldHashMaintenance = DBhash($sql1);
-		$sql2 = "select * from maintenances_hosts where maintenanceid=$maintenanceid order by maintenance_hostid";
-		$oldHashHosts = DBhash($sql2);
-		$sql3 = "select * from maintenances_groups where maintenanceid=$maintenanceid order by maintenance_groupid";
-		$oldHashGroups = DBhash($sql3);
-		$sql4 = "select * from maintenances_windows where maintenanceid=$maintenanceid order by maintenance_timeperiodid";
-		$oldHashWindows = DBhash($sql4);
-		$sql5 = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid) order by timeperiodid";
-		$oldHashTimeperiods = DBhash($sql5);
+		$sqlMaintenance = "select * from maintenances where name='$name' order by maintenanceid";
+		$oldHashMaintenance = DBhash($sqlMaintenance);
+		$sqlHosts = "select * from maintenances_hosts where maintenanceid=$maintenanceid order by maintenance_hostid";
+		$oldHashHosts = DBhash($sqlHosts);
+		$sqlGroups = "select * from maintenances_groups where maintenanceid=$maintenanceid order by maintenance_groupid";
+		$oldHashGroups = DBhash($sqlGroups);
+		$sqlWindows = "select * from maintenances_windows where maintenanceid=$maintenanceid order by maintenance_timeperiodid";
+		$oldHashWindows = DBhash($sqlWindows);
+		$sqlTimeperiods = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid) order by timeperiodid";
+		$oldHashTimeperiods = DBhash($sqlTimeperiods);
 
 		$this->login('maintenance.php');
 		$this->dropdown_select_wait('groupid', 'all');
@@ -79,11 +79,11 @@ class testPageMaintenance extends CWebTest {
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MAINTENANCE PERIODS');
 
-		$this->assertEquals($oldHashMaintenance, DBhash($sql1), "Chuck Norris: Maintenance update changed data in table 'maintenances'");
-		$this->assertEquals($oldHashHosts, DBhash($sql2), "Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
-		$this->assertEquals($oldHashGroups, DBhash($sql3), "Chuck Norris: Maintenance update changed data in table 'maintenances_groups'");
-		$this->assertEquals($oldHashWindows, DBhash($sql4), "Chuck Norris: Maintenance update changed data in table 'maintenances_windows'");
-		$this->assertEquals($oldHashTimeperiods, DBhash($sql5), "Chuck Norris: Maintenance update changed data in table 'timeperiods'");
+		$this->assertEquals($oldHashMaintenance, DBhash($sqlMaintenance), "Chuck Norris: Maintenance update changed data in table 'maintenances'");
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
+		$this->assertEquals($oldHashGroups, DBhash($sqlGroups), "Chuck Norris: Maintenance update changed data in table 'maintenances_groups'");
+		$this->assertEquals($oldHashWindows, DBhash($sqlWindows), "Chuck Norris: Maintenance update changed data in table 'maintenances_windows'");
+		$this->assertEquals($oldHashTimeperiods, DBhash($sqlTimeperiods), "Chuck Norris: Maintenance update changed data in table 'timeperiods'");
 	}
 
 	public function testPageMaintenance_MassDeleteAll() {
