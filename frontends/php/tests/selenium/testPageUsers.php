@@ -60,12 +60,12 @@ class testPageUsers extends CWebTest {
 	public function testPageUsers_SimpleUpdate($user) {
 		$alias = $user['alias'];
 
-		$sql1 = "select * from users where alias='$alias' order by userid";
-		$oldHashUser = DBhash($sql1);
-		$sql2 = "select * from users,users_groups where users.userid=users_groups.userid and users.alias='$alias' order by users_groups.id";
-		$oldHashGroup = DBhash($sql2);
-		$sql3 = "select * from users,media where users.userid=media.userid and users.alias='$alias' order by media.mediaid";
-		$oldHashMedia = DBhash($sql3);
+		$sqlHashUser = "select * from users where alias='$alias' order by userid";
+		$oldHashUser = DBhash($sqlHashUser);
+		$sqlHashGroup = "select * from users,users_groups where users.userid=users_groups.userid and users.alias='$alias' order by users_groups.id";
+		$oldHashGroup = DBhash($sqlHashGroup);
+		$sqlHashMedia = "select * from users,media where users.userid=media.userid and users.alias='$alias' order by media.mediaid";
+		$oldHashMedia = DBhash($sqlHashMedia);
 
 		$this->login('users.php');
 		$this->assertTitle('Users');
@@ -80,9 +80,9 @@ class testPageUsers extends CWebTest {
 		$this->ok("$alias");
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 
-		$this->assertEquals($oldHashUser, DBhash($sql1));
-		$this->assertEquals($oldHashGroup, DBhash($sql2), "Chuck Norris: User update changed data in table users_groups");
-		$this->assertEquals($oldHashMedia, DBhash($sql3), "Chuck Norris: User update changed data in table medias");
+		$this->assertEquals($oldHashUser, DBhash($sqlHashUser));
+		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup), "Chuck Norris: User update changed data in table users_groups");
+		$this->assertEquals($oldHashMedia, DBhash($sqlHashMedia), "Chuck Norris: User update changed data in table medias");
 	}
 
 	public function testPageUsers_MassDeleteAll() {

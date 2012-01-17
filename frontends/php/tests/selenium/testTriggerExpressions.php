@@ -21,7 +21,7 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageHosts extends CWebTest {
+class testTriggerExpression extends CWebTest {
 
 	/**
 	* @dataProvider testTriggerExpression_SimpleTestProvider
