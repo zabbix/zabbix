@@ -349,7 +349,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_EXTEND,
-		'selectGroups' => API_OUTPUT_REFER
 	);
 	$triggers = API::Trigger()->get($options);
 
@@ -436,7 +435,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 	foreach($triggers as $tnum => $trigger){
 
 		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
-		$group = reset($trigger['groups']);
 
 		$items = array();
 
@@ -575,7 +573,6 @@ require_once('include/views/js/general.script.confirm.js.php');
 			$hosts_span->setAttribute('data-menu', array(
 				'scripts' => $menuScripts,
 				'hostid' => $trigger_host['hostid'],
-				'groupid' => $group['groupid'],
 				'hasScreens' => (bool) $host['screens'],
 				'hasInventory' => (bool) $host['inventory']
 			));
