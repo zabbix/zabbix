@@ -41,7 +41,6 @@
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'groupid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 
 // STATUS OF TRIGGER
