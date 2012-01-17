@@ -659,26 +659,10 @@ require_once('include/page_header.php');
 						$event['acknowledged']
 					);
 
-					// fetch scripts for the host JS menu
-					$menuScripts = array();
-					if (isset($hostScripts[$host['hostid']])) {
-						foreach ($hostScripts[$host['hostid']] as $script) {
-							$menuScripts[] = array(
-								'scriptid' => $script['scriptid'],
-								'confirmation' => $script['confirmation'],
-								'name' => $script['name']
-							);
-						}
-					}
-
 					// host JS menu link
 					$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
-					$hostSpan->setAttribute('data-menu', array(
-						'scripts' => $menuScripts,
-						'hostid' => $host['hostid'],
-						'hasScreens' => (bool) $host['screens'],
-						'hasInventory' => (bool) $host['inventory']
-					));
+					$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 
 					$table->addRow(array(
 						new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT, $event['clock']),
