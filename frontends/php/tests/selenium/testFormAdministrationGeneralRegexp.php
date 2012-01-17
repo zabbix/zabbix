@@ -28,7 +28,8 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	public function testFormAdministrationGeneralRegexp_Layout() {
 
-		$this->login('config.php');
+		$this->login('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
@@ -85,12 +86,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralRegexp_Create($result, $name, $test_string, $expression, $expression_type, $exp_delimiter, $case_sensitive) {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok(array('Regular expressions', 'Name', 'Expressions'));
-
+		$this->login('adm.regexps.php');
 		// clicking "New regular expression" button
 		$this->button_click('form');
 		$this->wait();
@@ -130,9 +126,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralRegexp_AddExisting($name) {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->login('adm.regexps.php');
 
 		// clicking "New regular expression" button
 		$this->button_click('form');
@@ -157,8 +151,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_AddIncorrect() {
 
 		// creating regexp without teststring
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 
 		// clicking "New regular expression" button
 		$this->button_click('form');
@@ -173,8 +166,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_AddIncorrect2() {
 
 		// Creating regexp without expression
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->button_click('form');
 		$this->wait();
 		$this->input_type('test_string', 'first test string');
@@ -188,8 +180,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Test() {
 
 		// Testing regexp using Test button in the regexp properties form
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->click('link='.$this->regexp);
 		$this->wait();
 
@@ -202,8 +193,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	public function testFormAdministrationGeneralRegexp_Test2() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		// test #2 for the result=False
 		$this->click('link='.$this->regexp);
 		$this->wait();
@@ -220,8 +210,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Clone() {
 
 		// cloning regexp
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->click('link='.$this->regexp);
 		$this->wait();
 		$this->button_click('clone');
@@ -238,8 +227,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Update() {
 
 		// Updating regexp
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->click('link='.$this->regexp);
 		$this->wait();
 		$this->input_type('rename', $this->regexp.'2');
@@ -267,8 +255,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		DBsave_tables('regexps');
 
 		// deleting regexp using "Delete" button in the regexp properties form
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->chooseOkOnNextConfirmation();
 		$this->click('link='.$this->regexp2);
 		$this->wait();
@@ -291,13 +278,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	public function testFormAdministrationGeneralRegexp_DeleteAll() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Regular expressions');
-		$this->ok(array('Name', 'Expressions'));
-
+		$this->login('adm.regexps.php');
 		$this->checkbox_select('all_regexps');
 		$this->dropdown_select('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();

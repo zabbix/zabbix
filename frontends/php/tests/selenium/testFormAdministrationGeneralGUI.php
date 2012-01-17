@@ -21,10 +21,9 @@
 <?php
 require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
-class testFormAdministrationGeneralGUI extends CWebTest
-{
-	public static function allValues()
-	{
+class testFormAdministrationGeneralGUI extends CWebTest {
+
+	public static function allValues() {
 		return DBdata('SELECT default_theme, dropdown_first_entry, dropdown_first_remember, search_limit, max_in_table, event_ack_enable, event_expire, event_show_max FROM config ORDER BY configid');
 	}
 
@@ -33,7 +32,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 	*/
 	public function testFormAdministrationGeneralGUI_CheckLayout($allValues) {
 
-		$this->login('config.php');
+		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'GUI');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
@@ -92,10 +91,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 
 	public function testFormAdministrationGeneralGUI_ChangeTheme() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI', 'Default theme'));
+		$this->login('adm.gui.php');
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash = DBhash($sql_hash);
 
@@ -127,13 +123,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstEntry() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('GUI');
-		$this->ok('Dropdown first entry');
-
+		$this->login('adm.gui.php');
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash = DBhash($sql_hash);
 
@@ -158,11 +148,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 
 	public function testFormAdministrationGeneralGUI_ChangeDropdownFirstRemember() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
-
+		$this->login('adm.gui.php');
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash=DBhash($sql_hash);
 
@@ -187,12 +173,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeSearchLimit() {
-
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
-
+		$this->login('adm.gui.php');
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash=DBhash($sql_hash);
 
@@ -257,10 +238,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 
 	public function testFormAdministrationGeneralGUI_ChangeMaxInTable() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
+		$this->login('adm.gui.php');
 		$this->input_type('max_in_table', '1000');
 		$this->button_click('save');
 		$this->wait();
@@ -311,12 +289,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 	}
 
 	public function testFormAdministrationGeneralGUI_EventAckEnable() {
-
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI', 'Enable event acknowledges'));
-
+		$this->login('adm.gui.php');
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash=DBhash($sql_hash);
 
@@ -350,10 +323,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 	public function testFormAdministrationGeneralGUI_EventExpire() {
 		// 1-99999
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
+		$this->login('adm.gui.php');
 
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash=DBhash($sql_hash);
@@ -410,12 +380,7 @@ class testFormAdministrationGeneralGUI extends CWebTest
 	}
 
 	public function testFormAdministrationGeneralGUI_EventShowMax() {
-
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('GUI');
+		$this->login('adm.gui.php');
 		$this->input_type('event_show_max', '99999');
 		$this->button_click('save');
 		$this->wait();

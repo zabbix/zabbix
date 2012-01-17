@@ -72,7 +72,7 @@
 	foreach ($iconMaps as $iconMap) {
 		$iconMappingComboBox->addItem($iconMap['iconmapid'], $iconMap['name']);
 	}
-	$iconMappingsLink = new CLink(_('show icon mappings'), 'config.php?config=14');
+	$iconMappingsLink = new CLink(_('show icon mappings'), 'adm.iconmapping.php');
 	$iconMappingsLink->setAttribute('target', '_blank');
 	$sysmapList->addRow(_('Automatic icon mapping'), array($iconMappingComboBox, SPACE, $iconMappingsLink));
 

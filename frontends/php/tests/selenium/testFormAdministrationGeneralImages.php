@@ -29,7 +29,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 	public function testFormAdministrationGeneralImages_CheckLayout() {
 
-		$this->login('config.php');
+		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Images');
 		$this->assertTitle('Configuration of Zabbix');
@@ -53,10 +53,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 	public function testFormAdministrationGeneralImages_AddImage() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Images');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images'));
+		$this->login('adm.images.php');
 		$this->button_click('form');
 		$this->wait();
 
@@ -80,10 +77,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$sqlIcons = 'SELECT * FROM images WHERE imagetype=1';
 		$oldHashIcons=DBhash($sqlIcons);
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Images');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
+		$this->login('adm.images.php');
 		$this->click('link='.$this->icon_image_name);
 		$this->wait();
 		$this->input_type('name', $this->icon_image_name2);
@@ -97,10 +91,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 	public function testFormAdministrationGeneralImages_UpdateImage() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Images');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
+		$this->login('adm.images.php');
 		$this->click('link='.$this->icon_image_name);
 		$this->wait();
 		$this->input_type('name', $this->icon_image_name2);
@@ -117,10 +108,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 	public function testFormAdministrationGeneralImages_DeleteImage() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Images');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
+		$this->login('adm.images.php');
 		$this->chooseOkOnNextConfirmation();
 		$this->click('link='.$this->icon_image_name2);
 		$this->wait();
@@ -136,10 +124,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 	public function testFormAdministrationGeneralImages_AddBgImage() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Images');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
+		$this->login('adm.images.php');
 		$this->button_click('form');
 		$this->wait();
 		$this->input_type('name', $this->bg_image_name);
@@ -157,10 +142,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 	public function testFormAdministrationGeneralImages_UpdateBgImage() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Images');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images'));
+		$this->login('adm.images.php');
 		$this->dropdown_select_wait('imagetype', 'Background');
 		$this->ok('Type');
 		$this->click("//form[@name='imageForm']//table//a[text()='".$this->bg_image_name."']");
@@ -178,10 +160,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 	public function testFormAdministrationGeneralImages_DeleteBgImage() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Images');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
+		$this->login('adm.images.php');
 		$this->dropdown_select_wait('imagetype', 'Background');
 		$this->chooseOkOnNextConfirmation();
 		$this->click("//form[@name='imageForm']//table//a[text()='".$this->bg_image_name2."']");
