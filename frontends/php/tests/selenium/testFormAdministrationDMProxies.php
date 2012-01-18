@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 define('PROXY_GOOD', 0);
 define('PROXY_BAD', 1);
@@ -60,7 +60,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertElementPresent('cancel');
 
 		// Switch to passive mode
-		$this->dropdown_select_wait('status','Passive');
+		$this->dropdown_select_wait('status', 'Passive');
 		$this->ok('Proxy name');
 		$this->ok('Proxy mode');
 		$this->ok('Interface');
@@ -90,34 +90,98 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 
 	// Returns all possible proxy data
-	public static function dataCreate()
-	{
+	public static function dataCreate() {
 		// Ok/bad, name, mode, hosts, ip, dns, connect_to, port, error
 		return array(
 			array(PROXY_GOOD, 'New active proxy 1', HOST_STATUS_PROXY_ACTIVE,
-				array('ЗАББИКС Сервер'), 0, 0, 0, 0, ''),
+				array('ЗАББИКС Сервер'), 0, 0, 0, 0, ''
+			),
 			array(PROXY_GOOD, 'New active proxy 2', HOST_STATUS_PROXY_ACTIVE,
-				array(), 0, 0, 0, 0, ''),
+				array(), 0, 0, 0, 0, ''
+			),
 			array(PROXY_GOOD, 'New passive proxy 1', HOST_STATUS_PROXY_PASSIVE,
-				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, 11051, ''),
+				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, 11051, ''
+			),
 			array(PROXY_GOOD, 'New passive proxy with IP macro', HOST_STATUS_PROXY_PASSIVE,
-				array(), '{$PROXY_IP}', 'proxy123.zabbix.com', 0, 11051, ''),
+				array(), '{$PROXY_IP}', 'proxy123.zabbix.com', 0, 11051, ''
+			),
 			array(PROXY_GOOD, 'New passive proxy with port macro', HOST_STATUS_PROXY_PASSIVE,
-				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, '{$PROXY_PORT}', ''),
-			array(PROXY_BAD, 'New passive proxy 2', HOST_STATUS_PROXY_PASSIVE,
-				array(), 'wrong ip', 'proxy123.zabbix.com', 11051, 0, array('Cannot add proxy', 'Incorrect interface IP parameter')),
-			array(PROXY_BAD, '%^&', HOST_STATUS_PROXY_PASSIVE,
-				array(), 'wrong ip', 'proxy123.zabbix.com', 11051, 0, array('Cannot add proxy', 'Incorrect characters used for Proxy name "%^&".')),
-			array(PROXY_BAD, 'Прокси', HOST_STATUS_PROXY_PASSIVE,
-				array(), 'wrong ip', 'proxy123.zabbix.com', 11051, 0, array('Cannot add proxy', 'Incorrect characters used for Proxy name "Прокси".')),
-			array(PROXY_BAD, 'New passive proxy 3', HOST_STATUS_PROXY_PASSIVE,
-				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, 'port', array('Cannot add proxy', 'Incorrect interface port "port" provided')),
-			array(PROXY_BAD, 'New active proxy 1', HOST_STATUS_PROXY_ACTIVE,
-				array(), 0, 0, 0, 0, array('Cannot add proxy', 'Host "New active proxy 1" already exists.')),
-			array(PROXY_BAD, 'New passive proxy with wrong port macro', HOST_STATUS_PROXY_PASSIVE,
-				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, '$PROXY_PORT', array('Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided')),
-			array(PROXY_BAD, 'New passive proxy with wrong IP macro', HOST_STATUS_PROXY_PASSIVE,
-				array(), '$PROXY_IP', 'proxy123.zabbix.com', 0, 11051, array('Cannot add proxy', 'Incorrect interface IP parameter "$PROXY_IP" provided.'))
+				array(), '192.168.1.1', 'proxy123.zabbix.com', 0, '{$PROXY_PORT}', ''
+			),
+			array(
+				PROXY_BAD,
+				'New passive proxy 2',
+				HOST_STATUS_PROXY_PASSIVE,
+				array(),
+				'wrong ip',
+				'proxy123.zabbix.com',
+				11051,
+				0,
+				array('Cannot add proxy', 'Incorrect interface IP parameter')
+			),
+			array(
+				PROXY_BAD,
+				'%^&',
+				HOST_STATUS_PROXY_PASSIVE,
+				array(),
+				'wrong ip',
+				'proxy123.zabbix.com',
+				11051,
+				0,
+				array('Cannot add proxy', 'Incorrect characters used for Proxy name "%^&".')
+			),
+			array(
+				PROXY_BAD,
+				'Прокси',
+				HOST_STATUS_PROXY_PASSIVE,
+				array(),
+				'wrong ip',
+				'proxy123.zabbix.com',
+				11051,
+				0,
+				array('Cannot add proxy', 'Incorrect characters used for Proxy name "Прокси".')
+			),
+			array(
+				PROXY_BAD,
+				'New passive proxy 3',
+				HOST_STATUS_PROXY_PASSIVE,
+				array(),
+				'192.168.1.1',
+				'proxy123.zabbix.com',
+				0,
+				'port',
+				array('Cannot add proxy', 'Incorrect interface port "port" provided')
+			),
+			array(PROXY_BAD,
+				'New active proxy 1',
+				HOST_STATUS_PROXY_ACTIVE,
+				array(),
+				0,
+				0,
+				0,
+				0,
+				array('Cannot add proxy', 'Host "New active proxy 1" already exists.')
+			),
+			array(PROXY_BAD,
+				'New passive proxy with wrong port macro',
+				HOST_STATUS_PROXY_PASSIVE,
+				array(),
+				'192.168.1.1',
+				'proxy123.zabbix.com',
+				0,
+				'$PROXY_PORT',
+				array('Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided')
+			),
+			array(PROXY_BAD,
+				'New passive proxy with wrong IP macro',
+				HOST_STATUS_PROXY_PASSIVE,
+				array(),
+				'$PROXY_IP',
+				'proxy123.zabbix.com',
+				0,
+				11051,
+				array('Cannot add proxy', 'Incorrect interface IP parameter "$PROXY_IP" provided.')
+			)
 		);
 	}
 
@@ -166,7 +230,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 		// adding host that will be monitored by this proxy
 		foreach ($hosts as $host) {
-			$this->dropdown_select('hosts_right',$host);
+			$this->dropdown_select('hosts_right', $host);
 			$this->click('add');
 		}
 		$this->button_click('save');
@@ -218,8 +282,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->markTestIncomplete();
 	}
 
-	public static function dataUpdateProxyName()
-	{
+	public static function dataUpdateProxyName() {
 		// Name, newname
 		return array(
 			array('New active proxy 1', 'New active proxy 1 updated'),
@@ -246,8 +309,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');
 
-		$sql_hash="SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
-		$oldHash=DBhash($sql_hash);
+		$sql_hash = "SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
+		$oldHash = DBhash($sql_hash);
 
 		// update proxy name
 		$this->input_type('host', $newname);
@@ -259,7 +322,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->ok('PROXIES');
 		$this->ok($newname);
 
-		$newHash=DBhash($sql_hash);
+		$newHash = DBhash($sql_hash);
 		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
 
 		// check that proxy name has been updated in the DB
@@ -267,8 +330,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Proxy name has not been updated');
 	}
 
-	public static function dataClone()
-	{
+	public static function dataClone() {
 		// Name, newname
 		return array(
 			array('Active proxy 1', 'Active proxy 1 cloned'),
@@ -296,8 +358,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');
 
-		$sql_hash="SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
-		$oldHash=DBhash($sql_hash);
+		$sql_hash = "SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
+		$oldHash = DBhash($sql_hash);
 
 		// update proxy name
 		$this->button_click('clone');
@@ -317,8 +379,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Proxy has not been created');
 	}
 
-	public static function dataDelete()
-	{
+	public static function dataDelete() {
 		// Name, newname
 		return array(
 			array('Active proxy 2'),
