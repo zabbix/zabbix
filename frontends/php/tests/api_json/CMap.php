@@ -23,7 +23,7 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class API_JSON_User extends CZabbixTest {
+class API_JSON_Map extends CZabbixTest {
 	public static function map_data() {
 		return array(
 			array(
