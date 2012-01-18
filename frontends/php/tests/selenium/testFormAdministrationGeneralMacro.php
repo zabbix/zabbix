@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralMacro extends CWebTest {
 	private $newmacro = '{$NEW_MACRO}';
@@ -31,7 +31,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown','Macros');
+		$this->dropdown_select_wait('configDropDown', 'Macros');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
 		$this->ok('Macros');
