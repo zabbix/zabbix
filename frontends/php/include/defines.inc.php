@@ -26,7 +26,7 @@ define('ZBX_LOGIN_ATTEMPTS',			5);
 define('ZBX_LOGIN_BLOCK',				30); // sec
 
 define('ZBX_MIN_PERIOD',				3600); // 1 hour
-define('ZBX_MAX_PERIOD',				2*365*86400); // ~2 years
+define('ZBX_MAX_PERIOD',				63072000); // ~2 years (2*365*86400)
 define('ZBX_PERIOD_DEFAULT',			3600); // 1 hour
 
 define('ZBX_WIDGET_ROWS',				20);
