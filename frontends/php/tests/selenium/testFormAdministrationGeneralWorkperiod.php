@@ -19,12 +19,11 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralWorperiod extends CWebTest {
 
-	public static function WorkingTime()
-	{
+	public static function WorkingTime() {
 		return DBdata('SELECT work_period FROM config ORDER BY configid');
 	}
 	/**
@@ -52,8 +51,17 @@ class testFormAdministrationGeneralWorperiod extends CWebTest {
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Working time'));
 
-		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash=DBhash($sql_hash);
+		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,alert_usrgrpid,'.
+				'event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,'.
+				'ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,'.
+				'ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,'.
+				'max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,'.
+				'severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,'.
+				'severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,'.
+				'blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,'.
+				'problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging'.
+				' FROM config ORDER BY configid';
+		$oldHash = DBhash($sql_hash);
 
 		$this->input_type('work_period', '1-7,09:00-20:00');
 		$this->button_click('save');
@@ -86,8 +94,6 @@ class testFormAdministrationGeneralWorperiod extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok(array('ERROR: Cannot update configuration', 'Incorrect working time: "".'));
-
 	}
-
 }
 ?>

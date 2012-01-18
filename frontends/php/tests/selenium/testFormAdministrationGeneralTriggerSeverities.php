@@ -19,13 +19,14 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 
-	public static function allValues()
-	{
-		return DBdata('SELECT severity_name_0, severity_color_0, severity_name_1, severity_color_1, severity_name_2, severity_color_2, severity_name_3, severity_color_3, severity_name_4, severity_color_4, severity_name_5, severity_color_5 FROM config ORDER BY configid');
+	public static function allValues() {
+		return DBdata('SELECT severity_name_0,severity_color_0,severity_name_1,severity_color_1,'.
+				'severity_name_2,severity_color_2,severity_name_3,severity_color_3,severity_name_4,'.
+				'severity_color_4,severity_name_5,severity_color_5 FROM config ORDER BY configid');
 	}
 	/**
 	* @dataProvider allValues
@@ -162,14 +163,22 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 
 		$sql = 'SELECT severity_color_5 FROM config WHERE severity_color_5='.zbx_dbstr('880000');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_5"');
-}
+	}
 
 	public function testFormAdministrationGeneralTriggerSeverities_ResetDefaults() {
 
 		$this->login('adm.triggerseverities.php');
 		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
 		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger severities', 'Custom severity', 'Colour', 'Custom severity names affect all locales and require manual translation!'));
+		$this->ok(
+			array(
+				'CONFIGURATION OF ZABBIX',
+				'Trigger severities',
+				'Custom severity',
+				'Colour',
+				'Custom severity names affect all locales and require manual translation!'
+			)
+		);
 		$this->button_click('resetDefaults');
 		$this->click("//button[@type='button']");
 		$this->click('save');
@@ -216,7 +225,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 		$sql = 'SELECT severity_color_5 FROM config WHERE severity_color_5='.zbx_dbstr('FF3838');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect severity color in the DB field "severity_color_5"');
 
-// TODO: can also check that trigger severities has NOT been reset after clicking Cancel in the "Reset confirmation" dialog box after clicking "Reset defaults" button
+// TODO: can also check that trigger severities have NOT been reset after clicking Cancel in the "Reset confirmation" dialog box after clicking "Reset defaults" button
 
 	}
 }
