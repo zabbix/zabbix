@@ -1254,7 +1254,7 @@ COpt::memoryPick();
 
 // TODO: remove info from API
 			foreach ($del_templates as $template) {
-				info(_s('Deleted: Template "%1$s"', $template['host']));
+				info(_s('Deleted: Template "%1$s".', $template['name']));
 				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $template['hostid'], $template['host'], 'hosts', NULL, NULL);
 			}
 
