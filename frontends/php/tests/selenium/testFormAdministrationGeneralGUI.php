@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralGUI extends CWebTest {
 
 	public static function allValues() {
-		return DBdata('SELECT default_theme, dropdown_first_entry, dropdown_first_remember, search_limit, max_in_table, event_ack_enable, event_expire, event_show_max FROM config ORDER BY configid');
+		return DBdata('SELECT default_theme,dropdown_first_entry,dropdown_first_remember,search_limit,max_in_table,event_ack_enable,event_expire,event_show_max FROM config ORDER BY configid');
 	}
 
 	/**
@@ -150,7 +150,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->login('adm.gui.php');
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash=DBhash($sql_hash);
+		$oldHash = DBhash($sql_hash);
 
 		$this->checkbox_select('dropdown_first_remember');
 		$this->button_click('save');
@@ -175,7 +175,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	public function testFormAdministrationGeneralGUI_ChangeSearchLimit() {
 		$this->login('adm.gui.php');
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash=DBhash($sql_hash);
+		$oldHash = DBhash($sql_hash);
 
 		$this->input_type('search_limit', '1000');
 		$this->button_click('save');
@@ -216,7 +216,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 
-		// this test will fail as there are no GUI conf form after this critical error "Zabbix has received an incorrect request"
+		// this test will fail as there is no GUI conf form after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI', 'Search/Filter elements limit'));
 		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "0" for "search_limit" field.'));
 
@@ -228,7 +228,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 
-		// this test will fail as there are no GUI conf form after this critical error "Zabbix has received an incorrect request"
+		// this test will fail as there is no GUI conf form after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI', 'Search/Filter elements limit'));
 		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "-1" for "search_limit" field.'));
 
@@ -245,7 +245,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'GUI', 'Max count of elements to show inside table cell'));
 
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash=DBhash($sql_hash);
+		$oldHash = DBhash($sql_hash);
 
 		$sql = 'SELECT max_in_table FROM config WHERE max_in_table=1000';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "max_in_table"');
@@ -280,10 +280,10 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->wait();
 		$this->ok(array('ERROR: Zabbix has received an incorrect request', 'Critical error. Incorrect value "-1" for "max_in_table" field.'));
 
-		// this test will fail as there are no GUI conf form after this critical error "Zabbix has received an incorrect request"
+		// this test will fail as there is no GUI conf form after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI', 'Max count of elements to show inside table cell'));
 
-		$newHash=DBhash($sql_hash);
+		$newHash = DBhash($sql_hash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
 
 	}
@@ -291,7 +291,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 	public function testFormAdministrationGeneralGUI_EventAckEnable() {
 		$this->login('adm.gui.php');
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash=DBhash($sql_hash);
+		$oldHash = DBhash($sql_hash);
 
 		$this->checkbox_select('event_ack_enable');
 		$this->button_click('save');
@@ -326,7 +326,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->login('adm.gui.php');
 
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash=DBhash($sql_hash);
+		$oldHash = DBhash($sql_hash);
 
 		$this->input_type('event_expire', '99999');
 		$this->button_click('save');
@@ -360,7 +360,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->wait();
 		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "100000" for "event_expire" field.'));
 
-		// this test will fail as there are no GUI conf form on the screen after this critical error "Zabbix has received an incorrect request"
+		// this test will fail as there is no GUI conf form on the screen after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI', 'Show events not older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
@@ -371,7 +371,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->wait();
 		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "0" for "event_expire" field.'));
 
-		// this test will fail as there are no GUI conf form on the screen after this critical error "Zabbix has received an incorrect request"
+		// this test will fail as there is no GUI conf form on the screen after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI', 'Show events not older than (in days)'));
 
 		$newHash = DBhash($sql_hash);
@@ -387,7 +387,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'GUI', 'Max count of events per trigger to show'));
 
 		$sql_hash = 'SELECT configid,alert_history,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash=DBhash($sql_hash);
+		$oldHash = DBhash($sql_hash);
 
 		$sql = 'SELECT event_show_max FROM config WHERE event_show_max=99999';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_show_max"');
