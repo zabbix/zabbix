@@ -240,8 +240,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Regexp name has not been changed in the DB');
 	}
 
-	public static function dataDelete()
-	{
+	public static function dataDelete() {
 		return array(
 			array('test_regexp2')
 		);
