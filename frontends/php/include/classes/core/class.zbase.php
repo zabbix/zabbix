@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,17 +36,7 @@ class ZBase {
 	 *
 	 * @var string
 	 */
-	public $rootDir;
-
-
-	/**
-	 * Class constructor.
-	 */
-	public function __construct() {
-		// set root dir
-		$this->rootDir = dirname(__FILE__).'/../../../';
-	}
-
+	private $rootDir;
 
 	/**
 	 * Returns the current instance of Z.
@@ -55,85 +45,61 @@ class ZBase {
 	 *
 	 * @return Z
 	 */
-	public static function getInstance() {
+	public static function i() {
+		if (self::$instance === null) {
+			self::$instance = new Z();
+		}
+
 		return self::$instance;
 	}
-
 
 	/**
 	 * Initializes the application.
 	 */
 	public function run() {
-		// register our autoloader
-		$this->registerAutoloader(array($this->createAutoloader(), 'load'));
+		$this->setRootDir();
+		$this->registerAutoloader();
 	}
-
 
 	/**
 	 * Returns the absolute path to the root dir.
 	 *
-	 * @static
-	 *
 	 * @return string
 	 */
-	public static function getRootDir() {
-		return self::$instance->rootDir;
+	public function getRootDir() {
+		return $this->rootDir;
 	}
 
+	/**
+	 * Set root dir absolute path.
+	 */
+	private function setRootDir() {
+		$this->rootDir = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..');
+	}
 
 	/**
-	 * An array of directories to add to the autoloader include paths. The paths must be given relative to the
-	 * frontend root directory and start with a slash "/".
+	 * Register autoloader.
+	 */
+	private function registerAutoloader() {
+		$autoloader = new CZabbixAutoloader($this->getIncludePaths());
+		$autoloader->register();
+	}
+
+	/**
+	 * An array of directories to add to the autoloader include paths.
 	 *
 	 * @return array
 	 */
-	public function autoload() {
+	private function getIncludePaths() {
 		return array(
-			'/include/classes',
-			'/include/classes/sysmaps',
-			'/api/classes',
-			'/api/rpc'
+			self::$instance->rootDir.DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.
+					'classes'.DIRECTORY_SEPARATOR,
+			self::$instance->rootDir.DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.
+					'classes'.DIRECTORY_SEPARATOR.'sysmaps'.DIRECTORY_SEPARATOR,
+			self::$instance->rootDir.DIRECTORY_SEPARATOR.'api'.DIRECTORY_SEPARATOR.
+					'classes'.DIRECTORY_SEPARATOR,
+			self::$instance->rootDir.DIRECTORY_SEPARATOR.'api'.DIRECTORY_SEPARATOR.
+					'rpc'.DIRECTORY_SEPARATOR
 		);
 	}
-
-
-	/**
-	 * Registers the callback as an autoloader.
-	 *
-	 * @param $callback
-	 *
-	 * @return bool
-	 */
-	public function registerAutoloader($callback) {
-		return spl_autoload_register($callback);
-	}
-
-
-	/**
-	 * Creates a new instance of Z.
-	 *
-	 * @static
-	 *
-	 * @return Z
-	 */
-	public static function createInstance() {
-		self::$instance = new Z();
-
-		return self::$instance;
-	}
-
-
-	/**
-	 * @return CZabbixAutoloader
-	 */
-	protected function createAutoloader() {
-		$autoloader = new CZabbixAutoloader();
-		$autoloader->addIncludeDirs($this->autoload(), self::getRootDir());
-
-		return $autoloader;
-	}
-
-
-
-
 }

@@ -21,7 +21,7 @@
 <?php
 
 require_once dirname(__FILE__).'/classes/core/class.z.php';
-Z::createInstance()->run();
+Z::i()->run();
 
 require_once dirname(__FILE__).'/debug.inc.php';
 
