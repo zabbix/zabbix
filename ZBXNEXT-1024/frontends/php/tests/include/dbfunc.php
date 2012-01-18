@@ -40,7 +40,7 @@ function DBdata($query) {
 	$objects=array();
 
 	$result=DBselect($query);
-	while($object=DBfetch($result)) {
+	while ($object=DBfetch($result)) {
 		$objects[]=array($object);
 	}
 
@@ -127,9 +127,9 @@ function DBrestore_tables($topTable) {
 
 	DBget_tables($tables, $topTable);
 
-	$tables_reversed = array_reverse($tables);
+	$tablesReversed = array_reverse($tables);
 
-	foreach ($tables_reversed as $table) {
+	foreach ($tablesReversed as $table) {
 		DBexecute("delete from $table");
 	}
 

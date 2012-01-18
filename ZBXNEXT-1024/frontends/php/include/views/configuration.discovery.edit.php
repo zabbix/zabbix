@@ -86,7 +86,7 @@ require_once('include/views/js/configuration.discovery.js.php');
 
 // Device uniqueness criteria
 	$cmbUniquenessCriteria = new CRadioButtonList('uniqueness_criteria', $data['uniqueness_criteria']);
-	$cmbUniquenessCriteria->addValue(_('IP address'), -1);
+	$cmbUniquenessCriteria->addValue(' '._('IP address'), -1);
 
 	$discoveryList->addRow(_('Device uniqueness criteria'), new CDiv($cmbUniquenessCriteria, 'objectgroup inlineblock border_dotted ui-corner-all', 'uniqList'));
 

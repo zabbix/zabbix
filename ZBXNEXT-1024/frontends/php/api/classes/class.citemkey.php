@@ -119,7 +119,7 @@ class CItemKey {
 
 		// for every byte, starting after '['
 		for ($this->currentByte++; $this->currentByte < $this->keyByteCnt; $this->currentByte++) {
-			switch($state) {
+			switch ($state) {
 				case 0:	// initial state
 					if ($this->key[$this->currentByte] == ',') {
 						if ($nestLevel == 0) {

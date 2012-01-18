@@ -24,14 +24,14 @@ class CFlashClock extends CFlash{
  public $timetype;
  public $src;
 
-	public function __construct($width = 200, $height = 200, $url = NULL){
+	public function __construct($width = 200, $height = 200, $url = NULL) {
 		$this->timetype = null;
 
-		if(!is_numeric($width) || $width < 24) $width = 200;
-		if(!is_numeric($height) || $height< 24) $height = 200;
+		if (!is_numeric($width) || $width < 24) $width = 200;
+		if (!is_numeric($height) || $height< 24) $height = 200;
 
 		$this->src = 'images/flash/zbxclock.swf?analog=1&smooth=1';
-		if(!is_null($url))	$this->src .= '&url='.urlencode($url);
+		if (!is_null($url))	$this->src .= '&url='.urlencode($url);
 
 		$this->timeError = null;
 		$this->timeType = null;
@@ -41,28 +41,28 @@ class CFlashClock extends CFlash{
 		parent::__construct($this->src,$width,$height);
 	}
 
-	public function setTimeType($value){
+	public function setTimeType($value) {
 		$this->timeType = $value;
 	}
 
-	public function setTimeZone($value){
+	public function setTimeZone($value) {
 		$this->timeZone = $value;
 	}
 
-	public function setTimeOffset($value){
+	public function setTimeOffset($value) {
 		$this->timeOffset = $value;
 	}
 
-	public function setTimeError($value){
+	public function setTimeError($value) {
 		$this->timeError = $value;
 	}
 
-	public function bodyToString(){
+	public function bodyToString() {
 		$src = $this->src;
-		if(!empty($this->timeError)) $src.='&timeerror='.$this->timeError;
-		if(!empty($this->timeType)) $src.='&timetype='.urlencode($this->timeType);
-		if(!is_null($this->timeZone)) $src.='&timezone='.urlencode($this->timeZone);
-		if(!is_null($this->timeOffset)) $src.='&timeoffset='.$this->timeOffset;
+		if (!empty($this->timeError)) $src.='&timeerror='.$this->timeError;
+		if (!empty($this->timeType)) $src.='&timetype='.urlencode($this->timeType);
+		if (!is_null($this->timeZone)) $src.='&timezone='.urlencode($this->timeZone);
+		if (!is_null($this->timeOffset)) $src.='&timeoffset='.$this->timeOffset;
 
 		$this->setSrc($src);
 

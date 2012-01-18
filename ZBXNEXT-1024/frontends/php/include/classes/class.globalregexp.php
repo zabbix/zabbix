@@ -100,7 +100,7 @@ class GlobalRegExp {
 		if ($this->isZabbixRegexp) {
 			$result = true;
 
-			foreach ($this->expression as $expression){
+			foreach ($this->expression as $expression) {
 				if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE || $expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
 					$result = $this->_matchRegular($expression, $string);
 				}

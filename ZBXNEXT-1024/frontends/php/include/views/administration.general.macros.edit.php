@@ -23,9 +23,7 @@ include('include/views/js/administration.general.macros.js.php');
 
 $macrosForm = new CForm();
 $macrosForm->setName('macrosForm');
-$macrosForm->addVar('form', $this->data['form']);
 $macrosForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
-$macrosForm->addVar('config', get_request('config', 11));
 
 $macrosTable = new CTable(SPACE, 'formElementTable');
 $macrosTable->setAttribute('id', 'tbl_macros');
@@ -45,7 +43,11 @@ foreach ($macros as $macroid => $macro) {
 	$deleteButton = new CButton('macros_del', _('Remove'));
 	$deleteButton->addClass('link_menu macroRemove');
 
-	$macrosTable->addRow(array($text1, $span, $text2, $deleteButton), 'form_row');
+	$row = array($text1, $span, $text2, $deleteButton);
+	if (isset($macro['globalmacroid'])) {
+		$row[] = new CVar('macros['.$macroid.'][globalmacroid]', $macro['globalmacroid']);
+	}
+	$macrosTable->addRow($row, 'form_row');
 }
 
 // buttons
