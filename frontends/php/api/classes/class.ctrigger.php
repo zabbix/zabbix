@@ -1287,17 +1287,15 @@ class CTrigger extends CZBXAPI {
 		}
 
 		foreach ($triggers as $tnum => &$trigger) {
-
-			if (isset($trigger['triggerid'])) {
-				$parentTriggerParams = $this->getHostByTrigerId($trigger['triggerid']);
-				$parentTriggerHost = DBfetch($parentTriggerParams);
-				if ($parentTriggerHost['status'] != HOST_STATUS_TEMPLATE) {
-					foreach ($trigger['dependencies'] as $triggerId) {
-						$dependTriggerHostParams = $this->getHostByTrigerId($triggerId);
-						$dependTriggerParentHost = DBfetch($dependTriggerHostParams);
-						if ($dependTriggerParentHost['status'] == HOST_STATUS_TEMPLATE) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from template to host.'));
-						}
+			if (($this->getStatusByTriggerExpression($trigger) != HOST_STATUS_TEMPLATE && isset($trigger['dependencies']))) {
+				foreach ($trigger['dependencies'] as $triggerId) {
+					$hostData = API::Host()->get(
+						array('triggerids' => $triggerId,
+							'templated_hosts' => true,
+							'output' => array('status')));
+					$hostData = reset($hostData);
+					if ($hostData['status'] == HOST_STATUS_TEMPLATE) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from template to host.'));
 					}
 				}
 			}
@@ -2205,16 +2203,24 @@ class CTrigger extends CZBXAPI {
 		return count($ids) == $count;
 	}
 
-	public function getHostByTrigerId($triggerid) {
+	public function getStatusByTriggerExpression($trigger) {
 
-		zbx_value2array($triggerid);
-		return DBselect(
-			'SELECT DISTINCT h.*'.
-				' FROM hosts h,functions f,items i'.
-				' WHERE i.itemid=f.itemid'.
-				' AND h.hostid=i.hostid'.
-				' AND '.DBcondition('f.triggerid', $triggerid)
-		);
+		$expressionData = new CTriggerExpression($trigger);
+		if (!empty($expressionData->errors)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
+		}
+
+		$hosts = API::Host()->get(array(
+			'filter' => array('host' => $expressionData->data['hosts']),
+			'editable' => true,
+			'output' => array(
+				'status'
+			),
+			'templated_hosts' => true,
+			'preservekeys' => true
+		));
+		$hostData = reset($hosts);
+		return $hostData['status'];
 	}
 }
 ?>
