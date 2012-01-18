@@ -234,6 +234,7 @@ frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/selenium/testFormAdministrationGeneralTrigDisplOptions.php -text
 frontends/php/tests/selenium/testFormAdministrationGeneralTriggerSeverities.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
