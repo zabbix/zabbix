@@ -188,7 +188,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->dropdown_select_wait('configDropDown', 'GUI');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
-		$this->input_type('search_limit','1');
+		$this->input_type('search_limit', '1');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'GUI', 'Search/Filter elements limit'));
@@ -304,7 +304,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT event_ack_enable FROM config WHERE event_ack_enable=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_ack_enable"');
 
-		$this->dropdown_select_wait('configDropDown','GUI');
+		$this->dropdown_select_wait('configDropDown', 'GUI');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
 		$this->checkbox_unselect('event_ack_enable');
@@ -337,11 +337,11 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT event_expire FROM config WHERE event_expire=99999';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_expire"');
 
-		$this->dropdown_select_wait('configDropDown','GUI');
+		$this->dropdown_select_wait('configDropDown', 'GUI');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
 		$this->ok('GUI');
-		$this->input_type('event_expire','1');
+		$this->input_type('event_expire', '1');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Configuration updated');
@@ -352,10 +352,10 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'select event_expire from config where event_expire=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_expire"');
 
-		$this->dropdown_select_wait('configDropDown','GUI');
+		$this->dropdown_select_wait('configDropDown', 'GUI');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
-		$this->input_type('event_expire','100000');
+		$this->input_type('event_expire', '100000');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "100000" for "event_expire" field.'));
@@ -403,7 +403,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sql = 'SELECT event_show_max FROM config WHERE event_show_max=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_show_max"');
 
-		$this->dropdown_select_wait('configDropDown','GUI');
+		$this->dropdown_select_wait('configDropDown', 'GUI');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
 		$this->input_type('event_show_max', '100000');
