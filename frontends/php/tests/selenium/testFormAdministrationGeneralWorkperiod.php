@@ -21,7 +21,7 @@
 <?php
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormAdministrationGeneralWorperiod extends CWebTest {
+class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 	public static function WorkingTime() {
 		return DBdata('SELECT work_period FROM config ORDER BY configid');
@@ -29,7 +29,7 @@ class testFormAdministrationGeneralWorperiod extends CWebTest {
 	/**
 	* @dataProvider WorkingTime
 	*/
-	public function testFormAdministrationGeneralWorperiod_CheckLayout($WorkingTime) {
+	public function testFormAdministrationGeneralWorkperiod_CheckLayout($WorkingTime) {
 
 		$this->login('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
@@ -43,7 +43,7 @@ class testFormAdministrationGeneralWorperiod extends CWebTest {
 
 	}
 
-	public function testFormAdministrationGeneralWorperiod_SavingWorkperiod() {
+	public function testFormAdministrationGeneralWorkperiod_SavingWorkperiod() {
 
 		$this->login('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
