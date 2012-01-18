@@ -34,10 +34,8 @@ require_once(dirname(__FILE__).'/function_DBrollback.php');
 require_once(dirname(__FILE__).'/function_DBselect.php');
 require_once(dirname(__FILE__).'/function_DBstart.php');
 
-class GeneralTests
-{
-	public static function suite()
-	{
+class GeneralTests {
+	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
 		$suite->addTestSuite('class_cItemKey');

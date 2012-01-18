@@ -88,11 +88,11 @@ class CDRule extends CZBXAPI {
 		$options = zbx_array_merge($def_options, $options);
 
 // editable + PERMISSION CHECK
-		if(USER_TYPE_SUPER_ADMIN == $user_type){
+		if (USER_TYPE_SUPER_ADMIN == $user_type) {
 		}
-		else if(is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)){
+		else if (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
 		}
-		else if(!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)){
+		else if (!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)) {
 			return array();
 		}
 
@@ -100,20 +100,20 @@ class CDRule extends CZBXAPI {
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // druleids
-		if(!is_null($options['druleids'])){
+		if (!is_null($options['druleids'])) {
 			zbx_value2array($options['druleids']);
 			$sql_parts['where']['druleid'] = DBcondition('dr.druleid', $options['druleids']);
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('dr.druleid', $nodeids);
 			}
 		}
 
 // dhostids
-		if(!is_null($options['dhostids'])){
+		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
-			if($options['output'] != API_OUTPUT_SHORTEN){
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['dhostid'] = 'dh.dhostid';
 			}
 
@@ -121,20 +121,20 @@ class CDRule extends CZBXAPI {
 			$sql_parts['where']['dhostid'] = DBcondition('dh.dhostid', $options['dhostids']);
 			$sql_parts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 
-			if(!is_null($options['groupCount'])){
+			if (!is_null($options['groupCount'])) {
 				$sql_parts['group']['dhostid'] = 'dh.dhostid';
 			}
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('dh.dhostid', $nodeids);
 			}
 		}
 
 // dserviceids
-		if(!is_null($options['dserviceids'])){
+		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
-			if($options['output'] != API_OUTPUT_SHORTEN){
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['dserviceid'] = 'ds.dserviceid';
 			}
 
@@ -145,11 +145,11 @@ class CDRule extends CZBXAPI {
 			$sql_parts['where']['dhdr'] = 'dh.druleid=dr.druleid';
 			$sql_parts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
-			if(!is_null($options['groupCount'])){
+			if (!is_null($options['groupCount'])) {
 				$sql_parts['group']['dserviceid'] = 'ds.dserviceid';
 			}
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('ds.dserviceid', $nodeids);
 			}
@@ -157,41 +157,41 @@ class CDRule extends CZBXAPI {
 
 // node check !!!!!
 // should be last, after all ****IDS checks
-		if(!$nodeCheck){
+		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sql_parts['where'][] = DBin_node('dr.druleid', $nodeids);
 		}
 
 // output
-		if($options['output'] == API_OUTPUT_EXTEND){
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$sql_parts['select']['drules'] = 'dr.*';
 		}
 
 // countOutput
-		if(!is_null($options['countOutput'])){
+		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('count(DISTINCT dr.druleid) as rowscount');
 
 //groupCount
-			if(!is_null($options['groupCount'])){
-				foreach($sql_parts['group'] as $key => $fields){
+			if (!is_null($options['groupCount'])) {
+				foreach ($sql_parts['group'] as $key => $fields) {
 					$sql_parts['select'][$key] = $fields;
 				}
 			}
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if (!is_null($options['search'])) {
 			zbx_db_search('drules dr', $options, $sql_parts);
 		}
 
 // filter
-		if(is_array($options['filter'])){
+		if (is_array($options['filter'])) {
 			zbx_db_filter('drules dr', $options, $sql_parts);
 		}
 
 // search
-		if(is_array($options['search'])){
+		if (is_array($options['search'])) {
 			zbx_db_search('drules dr', $options, $sql_parts);
 		}
 
@@ -199,7 +199,7 @@ class CDRule extends CZBXAPI {
 		zbx_db_sorting($sql_parts, $options, $sort_columns, 'dr');
 
 // limit
-		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sql_parts['limit'] = $options['limit'];
 		}
 //------------
@@ -217,11 +217,11 @@ class CDRule extends CZBXAPI {
 		$sql_where = '';
 		$sql_group = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
+		if (!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if (!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if (!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
+		if (!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
+		if (!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
@@ -230,41 +230,41 @@ class CDRule extends CZBXAPI {
 				$sql_group.
 				$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
-		while($drule = DBfetch($db_res)){
-			if(!is_null($options['countOutput'])){
-				if(!is_null($options['groupCount']))
+		while ($drule = DBfetch($db_res)) {
+			if (!is_null($options['countOutput'])) {
+				if (!is_null($options['groupCount']))
 					$result[] = $drule;
 				else
 					$result = $drule['rowscount'];
 			}
 			else{
-				if($options['output'] == API_OUTPUT_SHORTEN){
+				if ($options['output'] == API_OUTPUT_SHORTEN) {
 					$result[$drule['druleid']] = array('druleid' => $drule['druleid']);
 				}
 				else{
 					$druleids[$drule['druleid']] = $drule['druleid'];
 
-					if(!is_null($options['selectDHosts']) && !isset($result[$drule['druleid']]['dhosts'])){
+					if (!is_null($options['selectDHosts']) && !isset($result[$drule['druleid']]['dhosts'])) {
 						$result[$drule['druleid']]['dhosts'] = array();
 					}
-					if(!is_null($options['selectDChecks']) && !isset($result[$drule['druleid']]['dchecks'])){
+					if (!is_null($options['selectDChecks']) && !isset($result[$drule['druleid']]['dchecks'])) {
 						$result[$drule['druleid']]['dchecks'] = array();
 					}
-					if(!is_null($options['selectDServices']) && !isset($result[$drule['druleid']]['dservices'])){
+					if (!is_null($options['selectDServices']) && !isset($result[$drule['druleid']]['dservices'])) {
 						$result[$drule['druleid']]['dservices'] = array();
 					}
 
 // dhostids
-					if(isset($drule['dhostid']) && is_null($options['selectDHosts'])){
-						if(!isset($result[$drule['druleid']]['dhosts']))
+					if (isset($drule['dhostid']) && is_null($options['selectDHosts'])) {
+						if (!isset($result[$drule['druleid']]['dhosts']))
 							$result[$drule['druleid']]['dhosts'] = array();
 
 						$result[$drule['druleid']]['dhosts'][] = array('dhostid' => $drule['dhostid']);
 						unset($drule['dhostid']);
 					}
 // dchecks
-					if(isset($drule['dcheckid']) && is_null($options['selectDChecks'])){
-						if(!isset($result[$drule['druleid']]['dchecks']))
+					if (isset($drule['dcheckid']) && is_null($options['selectDChecks'])) {
+						if (!isset($result[$drule['druleid']]['dchecks']))
 							$result[$drule['druleid']]['dchecks'] = array();
 
 						$result[$drule['druleid']]['dchecks'][] = array('dcheckid' => $drule['dcheckid']);
@@ -272,15 +272,15 @@ class CDRule extends CZBXAPI {
 					}
 
 // dservices
-					if(isset($drule['dserviceid']) && is_null($options['selectDServices'])){
-						if(!isset($result[$drule['druleid']]['dservices']))
+					if (isset($drule['dserviceid']) && is_null($options['selectDServices'])) {
+						if (!isset($result[$drule['druleid']]['dservices']))
 							$result[$drule['druleid']]['dservices'] = array();
 
 						$result[$drule['druleid']]['dservices'][] = array('dserviceid' => $drule['dserviceid']);
 						unset($drule['dserviceid']);
 					}
 
-					if(!isset($result[$drule['druleid']]))
+					if (!isset($result[$drule['druleid']]))
 						$result[$drule['druleid']]= array();
 
 					$result[$drule['druleid']] += $drule;
@@ -289,14 +289,14 @@ class CDRule extends CZBXAPI {
 		}
 
 COpt::memoryPick();
-		if(($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])){
+		if (($options['output'] != API_OUTPUT_EXTEND) || !is_null($options['countOutput'])) {
 			return $result;
 		}
 
 // Adding Objects
 
 // Adding Discovery Checks
-		if(!is_null($options['selectDChecks'])){
+		if (!is_null($options['selectDChecks'])) {
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'druleids' => $druleids,
@@ -304,34 +304,34 @@ COpt::memoryPick();
 				'preservekeys' => true
 			);
 
-			if(is_array($options['selectDChecks']) || str_in_array($options['selectDChecks'], $subselects_allowed_outputs)){
+			if (is_array($options['selectDChecks']) || str_in_array($options['selectDChecks'], $subselects_allowed_outputs)) {
 				$obj_params['output'] = $options['selectDChecks'];
 				$dchecks = API::DCheck()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($dchecks, 'name');
+				if (!is_null($options['limitSelects'])) order_result($dchecks, 'name');
 
 				$count = array();
-				foreach($dchecks as $dcheckid => $dcheck){
+				foreach ($dchecks as $dcheckid => $dcheck) {
 					unset($dchecks[$dcheckid]['drules']);
 
-					if(!is_null($options['limitSelects'])){
-						if(!isset($count[$dcheck['druleid']])) $count[$dcheck['druleid']] = 0;
+					if (!is_null($options['limitSelects'])) {
+						if (!isset($count[$dcheck['druleid']])) $count[$dcheck['druleid']] = 0;
 						$count[$dcheck['druleid']]++;
 
-						if($count[$dcheck['druleid']] > $options['limitSelects']) continue;
+						if ($count[$dcheck['druleid']] > $options['limitSelects']) continue;
 					}
 
 					$result[$dcheck['druleid']]['dchecks'][] = &$dchecks[$dcheckid];
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['selectDChecks']){
+			else if (API_OUTPUT_COUNT == $options['selectDChecks']) {
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
 				$dchecks = API::DCheck()->get($obj_params);
 				$dchecks = zbx_toHash($dchecks, 'druleid');
-				foreach($result as $druleid => $drule){
-					if(isset($dchecks[$druleid]))
+				foreach ($result as $druleid => $drule) {
+					if (isset($dchecks[$druleid]))
 						$result[$druleid]['dchecks'] = $dchecks[$druleid]['rowscount'];
 					else
 						$result[$druleid]['dchecks'] = 0;
@@ -340,41 +340,41 @@ COpt::memoryPick();
 		}
 
 // Adding Discovery Hosts
-		if(!is_null($options['selectDHosts'])){
+		if (!is_null($options['selectDHosts'])) {
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'druleids' => $druleids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselects_allowed_outputs)){
+			if (is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselects_allowed_outputs)) {
 				$obj_params['output'] = $options['selectDHosts'];
 				$dhosts = API::DHost()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($dhosts, 'name');
-				foreach($dhosts as $dhostid => $dhost){
+				if (!is_null($options['limitSelects'])) order_result($dhosts, 'name');
+				foreach ($dhosts as $dhostid => $dhost) {
 					unset($dhosts[$dhostid]['drules']);
 
-					foreach($dhost['drules'] as $dnum => $drule){
-						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$drule['druleid']])) $count[$drule['druleid']] = 0;
+					foreach ($dhost['drules'] as $dnum => $drule) {
+						if (!is_null($options['limitSelects'])) {
+							if (!isset($count[$drule['druleid']])) $count[$drule['druleid']] = 0;
 							$count[$drule['druleid']]++;
 
-							if($count[$drule['druleid']] > $options['limitSelects']) continue;
+							if ($count[$drule['druleid']] > $options['limitSelects']) continue;
 						}
 
 						$result[$drule['druleid']]['dhosts'][] = &$dhosts[$dhostid];
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['selectDHosts']){
+			else if (API_OUTPUT_COUNT == $options['selectDHosts']) {
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
 				$dhosts = API::DHost()->get($obj_params);
 				$dhosts = zbx_toHash($dhosts, 'druleid');
-				foreach($result as $druleid => $drule){
-					if(isset($dhosts[$druleid]))
+				foreach ($result as $druleid => $drule) {
+					if (isset($dhosts[$druleid]))
 						$result[$druleid]['dhosts'] = $dhosts[$druleid]['rowscount'];
 					else
 						$result[$druleid]['dhosts'] = 0;
@@ -385,7 +385,7 @@ COpt::memoryPick();
 
 COpt::memoryPick();
 // removing keys (hash -> array)
-		if(is_null($options['preservekeys'])){
+		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -393,19 +393,19 @@ COpt::memoryPick();
 	}
 
 
-	public function exists(array $object){
+	public function exists(array $object) {
 		$options = array(
 			'filter' => array(),
 			'output' => API_OUTPUT_SHORTEN,
 			'nopermissions' => 1,
 			'limit' => 1
 		);
-		if(isset($object['name'])) $options['filter']['name'] = $object['name'];
-		if(isset($object['hostids'])) $options['druleids'] = zbx_toArray($object['druleids']);
+		if (isset($object['name'])) $options['filter']['name'] = $object['name'];
+		if (isset($object['hostids'])) $options['druleids'] = zbx_toArray($object['druleids']);
 
-		if(isset($object['node']))
+		if (isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		else if(isset($object['nodeids']))
+		else if (isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
@@ -413,96 +413,96 @@ COpt::memoryPick();
 	return !empty($objs);
 	}
 
-	public function checkInput(array &$dRules){
+	public function checkInput(array &$dRules) {
 		$dRules = zbx_toArray($dRules);
 
-		if(empty($dRules)){
+		if (empty($dRules)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
 		}
 
-		if(self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN){
-			if(!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
+		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
+			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 		}
 
 		$proxies = array();
-		foreach($dRules as $dRule){
-			if(!isset($dRule['iprange'])){
+		foreach ($dRules as $dRule) {
+			if (!isset($dRule['iprange'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
 			}
-			else if(!validate_ip_range($dRule['iprange'])){
+			else if (!validate_ip_range($dRule['iprange'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
 			}
 
-			if(isset($dRule['delay']) && $dRule['delay'] < 0){
+			if (isset($dRule['delay']) && $dRule['delay'] < 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
 			}
 
-			if(isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED) && ($dRule['status'] != DRULE_STATUS_ACTIVE))){
+			if (isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED) && ($dRule['status'] != DRULE_STATUS_ACTIVE))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
 			}
 
-			if(empty($dRule['dchecks'])){
+			if (empty($dRule['dchecks'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
 			}
 
 			$this->validateDChecks($dRule['dchecks']);
 
-			if(isset($dRule['proxy_hostid']) && $dRule['proxy_hostid']){
+			if (isset($dRule['proxy_hostid']) && $dRule['proxy_hostid']) {
 				$proxies[] = $dRule['proxy_hostid'];
 			}
 		}
 
-		if(!empty($proxies)){
+		if (!empty($proxies)) {
 			$proxiesDB = API::proxy()->get(array(
 				'proxyids' => $proxies,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => true,
 			));
-			foreach($proxies as $proxy){
-				if(!isset($proxiesDB[$proxy])){
+			foreach ($proxies as $proxy) {
+				if (!isset($proxiesDB[$proxy])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
 				}
 			}
 		}
 	}
 
-	protected function validateDChecks(array &$dChecks){
+	protected function validateDChecks(array &$dChecks) {
 		$uniq = 0;
 
-		foreach($dChecks as $dcnum => $dCheck){
-			if(isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) $uniq++;
+		foreach ($dChecks as $dcnum => $dCheck) {
+			if (isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) $uniq++;
 
-			if(isset($dCheck['ports']) && !validate_port_list($dCheck['ports'])){
+			if (isset($dCheck['ports']) && !validate_port_list($dCheck['ports'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
 			}
 
-			switch($dCheck['type']){
+			switch ($dCheck['type']) {
 				case SVC_AGENT:
-					if(!isset($dCheck['key_'])){
+					if (!isset($dCheck['key_'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect key.'));
 					}
 
 					$itemKey = new CItemKey($dCheck['key_']);
-					if(!$itemKey->isValid())
+					if (!$itemKey->isValid())
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect key: %s', $itemKey->getError()));
 					break;
 				case SVC_SNMPv1:
 				case SVC_SNMPv2c:
-					if(!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community']))
+					if (!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community']))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP community.'));
 				case SVC_SNMPv3:
-					if(!isset($dCheck['key_']) || zbx_empty($dCheck['key_']))
+					if (!isset($dCheck['key_']) || zbx_empty($dCheck['key_']))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
 					break;
 			}
 
 
-			if(!isset($dCheck['snmpv3_securitylevel'])){
+			if (!isset($dCheck['snmpv3_securitylevel'])) {
 				$dCheck['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
 			}
 
-			switch($dCheck['snmpv3_securitylevel']){
+			switch ($dCheck['snmpv3_securitylevel']) {
 				case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
 					$dChecks[$dcnum]['snmpv3_authpassphrase'] = $dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
 					break;
@@ -514,48 +514,48 @@ COpt::memoryPick();
 			$this->validateDuplicateChecks($dChecks);
 		}
 
-		if($uniq > 1){
+		if ($uniq > 1) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
 		}
 
 
 	}
 
-	protected function validateRequiredFields($dRules, $on){
-		if($on == 'update'){
-			foreach($dRules as $dRule){
-				if(!isset($dRule['druleid']) || zbx_empty($dRule['druleid'])){
+	protected function validateRequiredFields($dRules, $on) {
+		if ($on == 'update') {
+			foreach ($dRules as $dRule) {
+				if (!isset($dRule['druleid']) || zbx_empty($dRule['druleid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "druleid" is required.'));
 				}
 			}
 		}
 		else{
-			foreach($dRules as $dRule){
-				if(!isset($dRule['name']) || zbx_empty($dRule['name'])){
+			foreach ($dRules as $dRule) {
+				if (!isset($dRule['name']) || zbx_empty($dRule['name'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
 				}
 			}
 		}
 	}
 
-	protected function validateDuplicateChecks(array $dChecks){
+	protected function validateDuplicateChecks(array $dChecks) {
 		$defaultValues = DB::getDefaults('dchecks');
-		foreach($dChecks as &$dCheck){
+		foreach ($dChecks as &$dCheck) {
 			$dCheck += $defaultValues;
 			unset($dCheck['uniq']);
 		}
 		unset($dCheck);
 
-		while($current = array_pop($dChecks)){
-			foreach($dChecks as $dCheck){
+		while ($current = array_pop($dChecks)) {
+			foreach ($dChecks as $dCheck) {
 				$equal = true;
-				foreach($dCheck as $fieldName => $dCheckField){
-					if(isset($current[$fieldName]) && (strcmp($dCheckField, $current[$fieldName]) !== 0)){
+				foreach ($dCheck as $fieldName => $dCheckField) {
+					if (isset($current[$fieldName]) && (strcmp($dCheckField, $current[$fieldName]) !== 0)) {
 						$equal = false;
 						break;
 					}
 				}
-				if($equal) self::exception(ZBX_API_ERROR_PARAMETERS, _('Checks should be unique.'));
+				if ($equal) self::exception(ZBX_API_ERROR_PARAMETERS, _('Checks should be unique.'));
 			}
 		}
 	}
@@ -585,14 +585,14 @@ COpt::memoryPick();
  * ) $drules
  * @return array
  */
-	public function create(array $dRules){
+	public function create(array $dRules) {
 
 		$this->checkInput($dRules);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
 
 		// checking to the duplicate names
-		foreach($dRules as $dRule){
-			if($this->exists($dRule)){
+		foreach ($dRules as $dRule) {
+			if ($this->exists($dRule)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
 			}
 		}
@@ -600,8 +600,8 @@ COpt::memoryPick();
 		$druleids = DB::insert('drules', $dRules);
 
 		$dChecksCreate = array();
-		foreach($dRules as $dNum => $dRule){
-			foreach($dRule['dchecks'] as $dCheck){
+		foreach ($dRules as $dNum => $dRule) {
+			foreach ($dRule['dchecks'] as $dCheck) {
 				$dCheck['druleid'] = $druleids[$dNum];
 				$dChecksCreate[] = $dCheck;
 			}
@@ -639,7 +639,7 @@ COpt::memoryPick();
  * ) $drules
  * @return array
  */
-	public function update(array $dRules){
+	public function update(array $dRules) {
 		$this->checkInput($dRules);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
 
@@ -656,11 +656,11 @@ COpt::memoryPick();
 		$defaultValues = DB::getDefaults('dchecks');
 
 		$dRulesUpdate = $dCheckidsDelete = $dChecksCreate = array();
-		foreach($dRules as $dRule){
+		foreach ($dRules as $dRule) {
 
 			// checking to the duplicate names
-			if(strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0){
-				if($this->exists($dRule)){
+			if (strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
+				if ($this->exists($dRule)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule [%s] already exists', $dRule['name']));
 				}
 			}
@@ -672,28 +672,28 @@ COpt::memoryPick();
 
 			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
 			$newChecks = $dRule['dchecks'];
-			foreach($newChecks as &$dCheck){
+			foreach ($newChecks as &$dCheck) {
 				$dCheck += $defaultValues;
 			}
 			unset($dCheck);
 
-			foreach($newChecks as $newnum => $newdCheck){
-				foreach($dbChecks as $exnum => $exdCheck){
+			foreach ($newChecks as $newnum => $newdCheck) {
+				foreach ($dbChecks as $exnum => $exdCheck) {
 					$equal = true;
-					foreach($exdCheck as $fieldName => $dCheckField){
-						if(isset($newdCheck[$fieldName]) && (strcmp($dCheckField, $newdCheck[$fieldName]) !== 0)){
+					foreach ($exdCheck as $fieldName => $dCheckField) {
+						if (isset($newdCheck[$fieldName]) && (strcmp($dCheckField, $newdCheck[$fieldName]) !== 0)) {
 							$equal = false;
 							break;
 						}
 					}
-					if($equal){
+					if ($equal) {
 						unset($dRule['dchecks'][$newnum]);
 						unset($dbChecks[$exnum]);
 					}
 				}
 			}
 
-			foreach($dRule['dchecks'] as $dCheck){
+			foreach ($dRule['dchecks'] as $dCheck) {
 				$dCheck['druleid'] = $dRule['druleid'];
 				$dChecksCreate[] = $dCheck;
 			}
@@ -703,7 +703,7 @@ COpt::memoryPick();
 
 		DB::update('drules', $dRulesUpdate);
 
-		if(!empty($dCheckidsDelete)){
+		if (!empty($dCheckidsDelete)) {
 			$this->deleteChecks($dCheckidsDelete);
 		}
 
@@ -718,11 +718,11 @@ COpt::memoryPick();
  * @param array $druleids
  * @return boolean
  */
-	public function delete(array $druleids){
+	public function delete(array $druleids) {
 		$druleids = zbx_toArray($druleids);
 
-		if(self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN){
-			if(!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
+		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
+			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 		}
 
@@ -732,11 +732,11 @@ COpt::memoryPick();
 				' WHERE conditiontype='.CONDITION_TYPE_DRULE.
 				' AND '.DBcondition('value', $druleids);
 		$db_actions = DBselect($sql);
-		while($db_action = DBfetch($db_actions)){
+		while ($db_action = DBfetch($db_actions)) {
 			$actionids[] = $db_action['actionid'];
 		}
 
-		if(!empty($actionids)){
+		if (!empty($actionids)) {
 			DB::update('actions', array(
 				'values' => array('status' => ACTION_STATUS_DISABLED),
 				'where' => array('actionid' => $actionids),
@@ -753,7 +753,7 @@ COpt::memoryPick();
 		return array('druleids' => $druleids);
 	}
 
-	protected function deleteChecks(array $checkids){
+	protected function deleteChecks(array $checkids) {
 		$actionids = array();
 		// conditions
 		$sql = 'SELECT DISTINCT actionid '.
@@ -761,11 +761,11 @@ COpt::memoryPick();
 				' WHERE conditiontype='.CONDITION_TYPE_DCHECK.
 				' AND '.DBcondition('value', $checkids);
 		$db_actions = DBselect($sql);
-		while($db_action = DBfetch($db_actions))
+		while ($db_action = DBfetch($db_actions))
 			$actionids[] = $db_action['actionid'];
 
 		// disabling actions with deleted conditions
-		if(!empty($actionids)){
+		if (!empty($actionids)) {
 			DBexecute('UPDATE actions '.
 					' SET status='.ACTION_STATUS_DISABLED.
 					' WHERE '.DBcondition('actionid', $actionids));

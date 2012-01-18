@@ -41,7 +41,7 @@ class CDiv extends CTag {
 		$this->setAttribute('class', $this->getAttribute('class').' jqueryinputset');
 		if (!defined('ZBX_JQUERY_INPUTSET')) {
 			define('ZBX_JQUERY_INPUTSET', true);
-			zbx_add_post_js('setTimeout(function(){ jQuery("div.jqueryinputset").buttonset(); }, 10);');
+			zbx_add_post_js('setTimeout(function() { jQuery("div.jqueryinputset").buttonset(); }, 10);');
 		}
 		return $this;
 	}

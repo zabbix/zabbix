@@ -32,7 +32,7 @@ require_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'text'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,			null),
-		'font'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,5),	null),
+		'font'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1, 5),	null),
 		'theme'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 	);
 
@@ -44,7 +44,7 @@ require_once('include/page_header.php');
 	$font = get_request('font', 9);
 	$theme = get_request('theme', 'css_ob.css');
 
-	switch($theme){
+	switch ($theme) {
 		case 'css_bb.css':
 		case 'css_od.css':
 			$color = array('red' => 255, 'green' => 255, 'blue' => 255);
@@ -64,10 +64,10 @@ require_once('include/page_header.php');
 	$height = imagesy($im);
 
 	$white = imagecolorallocate($im, $shadow['red'], $shadow['green'], $shadow['blue']);
-	imagefilledrectangle($im, 0 ,0, $width-1, $height-1, $white);
+	imagefilledrectangle($im, 0, 0, $width-1, $height-1, $white);
 
-	$text_color = imagecolorallocate($im, $color['red'], $color['green'], $color['blue']);
-	imageText($im, $font, 0, 0, $size['height'], $text_color, $text);
+	$textColor = imagecolorallocate($im, $color['red'], $color['green'], $color['blue']);
+	imageText($im, $font, 0, 0, $size['height'], $textColor, $text);
 
 
 	$newImage = imagecreatetruecolor($height, $width);
@@ -75,8 +75,8 @@ require_once('include/page_header.php');
 
 	// imagealphablending($newImage, false);
 	// imagesavealpha($newImage, true);
-	for($w=0; $w<$width; $w++){
-		for($h=0; $h<$height; $h++){
+	for ($w=0; $w<$width; $w++) {
+		for ($h=0; $h<$height; $h++) {
 			$ref = imagecolorat($im, $w, $h);
 			imagesetpixel($newImage, $h, ($width-1)-$w, $ref);
 		}

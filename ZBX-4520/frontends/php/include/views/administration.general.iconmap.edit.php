@@ -32,7 +32,6 @@ $iconMapTable->setAttribute('id', 'iconMapTable');
 
 $iconMapForm = new CForm();
 $iconMapForm->addVar('form', 1);
-$iconMapForm->addVar('config', 14);
 if (isset($this->data['iconmapid'])) {
 	$iconMapForm->addVar('iconmapid', $this->data['iconmap']['iconmapid']);
 }
@@ -136,11 +135,11 @@ $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);
 $iconMapForm->addItem($iconMapView);
 
 // footer
-$secondaryActions = array(new CButtonCancel(url_param('config')));
+$secondaryActions = array(new CButtonCancel());
 if (isset($this->data['iconmapid'])) {
 	array_unshift($secondaryActions,
 		new CSubmit('clone', _('Clone')),
-		new CButtonDelete(_('Delete icon map?'), url_param('form').url_param('iconmapid').url_param('config'))
+		new CButtonDelete(_('Delete icon map?'), url_param('form').url_param('iconmapid'))
 	);
 }
 $iconMapForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions));

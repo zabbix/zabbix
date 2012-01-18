@@ -20,13 +20,13 @@
 ?>
 <?php
 class CFile extends CInput{
-	public function __construct($name='file',$value=''){
+	public function __construct($name='file',$value='') {
 		parent::__construct('file',$name, $value);
 		$this->setFile($value);
 	}
 
-	public function setFile($value=''){
-		if(!is_string($value)){
+	public function setFile($value='') {
+		if (!is_string($value)) {
 			return $this->error('Incorrect value for setFile ['.$value.']');
 		}
 	return $this->setAttribute('value',$value);

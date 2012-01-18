@@ -108,31 +108,31 @@ abstract class CMapElement extends CZBXAPI {
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // selementids
-		if(!is_null($options['selementids'])){
+		if (!is_null($options['selementids'])) {
 			zbx_value2array($options['selementids']);
 			$sql_parts['where']['selementid'] = DBcondition('se.selementid', $options['selementids']);
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('se.selementid', $nodeids);
 			}
 		}
 
 // sysmapids
-		if(!is_null($options['sysmapids'])){
+		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			if($options['output'] != API_OUTPUT_SHORTEN){
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['sysmapid'] = 'se.sysmapid';
 			}
 
 			$sql_parts['where']['sysmapid'] = DBcondition('se.sysmapid', $options['sysmapids']);
 
-			if(!is_null($options['groupCount'])){
+			if (!is_null($options['groupCount'])) {
 				$sql_parts['group']['sysmapid'] = 'se.sysmapid';
 			}
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('se.sysmapid', $nodeids);
 			}
@@ -140,28 +140,28 @@ abstract class CMapElement extends CZBXAPI {
 
 // node check !!!!!
 // should last, after all ****IDS checks
-		if(!$nodeCheck){
+		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sql_parts['where'][] = DBin_node('se.selementid', $nodeids);
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if (!is_null($options['search'])) {
 			zbx_db_search('sysmaps_elements se', $options, $sql_parts);
 		}
 
 // filter
-		if(!is_null($options['filter'])){
+		if (!is_null($options['filter'])) {
 			zbx_db_filter('sysmaps_elements se', $options, $sql_parts);
 		}
 
 // output
-		if($options['output'] == API_OUTPUT_EXTEND){
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$sql_parts['select']['sysmaps'] = 'se.*';
 		}
 
 // countOutput
-		if(!is_null($options['countOutput'])){
+		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
@@ -171,7 +171,7 @@ abstract class CMapElement extends CZBXAPI {
 		zbx_db_sorting($sql_parts, $options, $sort_columns, 'se');
 
 // limit
-		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sql_parts['limit'] = $options['limit'];
 		}
 //-------
@@ -189,11 +189,11 @@ abstract class CMapElement extends CZBXAPI {
 		$sql_where = '';
 		$sql_group = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
+		if (!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if (!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if (!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
+		if (!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
+		if (!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
@@ -203,24 +203,24 @@ abstract class CMapElement extends CZBXAPI {
 				$sql_order;
 //SDI($sql);
 		$res = DBselect($sql, $sql_limit);
-		while($selement = DBfetch($res)){
-			if($options['countOutput']){
+		while ($selement = DBfetch($res)) {
+			if ($options['countOutput']) {
 				$result = $selement['rowscount'];
 			}
 			else{
 				$selementids[$selement['selementid']] = $selement['selementid'];
 
-				if($options['output'] == API_OUTPUT_SHORTEN){
+				if ($options['output'] == API_OUTPUT_SHORTEN) {
 					$result[$selement['selementid']] = array('selementid' => $selement['selementid']);
 				}
 				else{
-					if(!isset($result[$selement['selementid']])) $result[$selement['selementid']]= array();
+					if (!isset($result[$selement['selementid']])) $result[$selement['selementid']]= array();
 
-					if(!is_null($options['selectLinks']) && !isset($result[$selement['selementid']]['links'])){
+					if (!is_null($options['selectLinks']) && !isset($result[$selement['selementid']]['links'])) {
 						$result[$selement['selementid']]['links'] = array();
 					}
 
-					if(!is_null($options['selectUrls']) && !isset($result[$selement['selementid']]['urls'])){
+					if (!is_null($options['selectUrls']) && !isset($result[$selement['selementid']]['urls'])) {
 						$result[$selement['selementid']]['urls'] = array();
 					}
 
@@ -236,34 +236,34 @@ abstract class CMapElement extends CZBXAPI {
 			' FROM sysmaps_elements se'.
 			' WHERE '.DBcondition('se.selementid', $selementids);
 		$db_sysmaps = DBselect($sql);
-		while($db_sysmap = DBfetch($db_sysmaps)){
+		while ($db_sysmap = DBfetch($db_sysmaps)) {
 			$sysmapids[$db_sysmap['sysmapid']] = $db_sysmap['sysmapid'];
 		}
 // ---
 
 COpt::memoryPick();
-		if(!is_null($options['countOutput'])){
+		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
 // Adding URLS
-		if(!is_null($options['selectUrls']) && str_in_array($options['selectUrls'], $subselects_allowed_outputs)){
+		if (!is_null($options['selectUrls']) && str_in_array($options['selectUrls'], $subselects_allowed_outputs)) {
 			$sql = 'SELECT sysmapelementurlid, selementid, name, url  '.
 					' FROM sysmap_element_url '.
 					' WHERE '.DBcondition('selementid', $selementids);
 			$db_selement_urls = DBselect($sql);
-			while($selement_url = DBfetch($db_selement_urls)){
+			while ($selement_url = DBfetch($db_selement_urls)) {
 				$result[$selement_url['selementid']]['urls'][] = $selement_url;
 			}
 		}
 // Adding Links
-		if(!is_null($options['selectLinks']) && str_in_array($options['selectLinks'], $subselects_allowed_outputs)){
+		if (!is_null($options['selectLinks']) && str_in_array($options['selectLinks'], $subselects_allowed_outputs)) {
 			$linkids = array();
 			$map_links = array();
 
 			$sql = 'SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids);
 			$db_links = DBselect($sql);
-			while($link = DBfetch($db_links)){
+			while ($link = DBfetch($db_links)) {
 				$link['linktriggers'] = array();
 
 				$map_links[$link['linkid']] = $link;
@@ -272,18 +272,18 @@ COpt::memoryPick();
 
 			$sql = 'SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
 			$db_link_triggers = DBselect($sql);
-			while($link_trigger = DBfetch($db_link_triggers)){
+			while ($link_trigger = DBfetch($db_link_triggers)) {
 				$map_links[$link_trigger['linkid']]['linktriggers'][] = $link_trigger;
 			}
 
-			foreach($map_links as $num => $link){
-				if(!isset($result[$link['selementid1']]['links']))
+			foreach ($map_links as $num => $link) {
+				if (!isset($result[$link['selementid1']]['links']))
 					$result[$link['selementid1']]['links'] = array();
 
-				if(!isset($result[$link['selementid2']]['links']))
+				if (!isset($result[$link['selementid2']]['links']))
 					$result[$link['selementid2']]['links'] = array();
 
-				if(!is_null($options['preservekeys'])){
+				if (!is_null($options['preservekeys'])) {
 					$result[$link['selementid1']]['links'][$link['linkid']] = $link;
 					$result[$link['selementid2']]['links'][$link['linkid']] = $link;
 				}
@@ -296,14 +296,14 @@ COpt::memoryPick();
 
 COpt::memoryPick();
 // removing keys (hash -> array)
-		if(is_null($options['preservekeys'])){
+		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;
 	}
 
-	protected function getLinks($options=array()){
+	protected function getLinks($options=array()) {
 		$result = array();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
@@ -345,13 +345,13 @@ COpt::memoryPick();
 		$options = zbx_array_merge($def_options, $options);
 
 
-		if(is_array($options['output'])){
+		if (is_array($options['output'])) {
 			unset($sql_parts['select']['sysmaps_links']);
 
 			$dbTable = DB::getSchema('sysmaps_links');
 			$sql_parts['select']['linkid'] = 'sl.linkid';
-			foreach($options['output'] as $key => $field){
-				if(isset($dbTable['fields'][$field]))
+			foreach ($options['output'] as $key => $field) {
+				if (isset($dbTable['fields'][$field]))
 					$sql_parts['select'][$field] = 'sl.'.$field;
 			}
 
@@ -364,31 +364,31 @@ COpt::memoryPick();
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // linkids
-		if(!is_null($options['linkids'])){
+		if (!is_null($options['linkids'])) {
 			zbx_value2array($options['linkids']);
 			$sql_parts['where']['linkid'] = DBcondition('sl.linkid', $options['linkids']);
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('sl.linkid', $nodeids);
 			}
 		}
 
 // sysmapids
-		if(!is_null($options['sysmapids'])){
+		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			if($options['output'] != API_OUTPUT_SHORTEN){
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['sysmapid'] = 'sl.sysmapid';
 			}
 
 			$sql_parts['where']['sysmapid'] = DBcondition('sl.sysmapid', $options['sysmapids']);
 
-			if(!is_null($options['groupCount'])){
+			if (!is_null($options['groupCount'])) {
 				$sql_parts['group']['sysmapid'] = 'sl.sysmapid';
 			}
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('sl.sysmapid', $nodeids);
 			}
@@ -396,28 +396,28 @@ COpt::memoryPick();
 
 // node check !!!!!
 // should last, after all ****IDS checks
-		if(!$nodeCheck){
+		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sql_parts['where'][] = DBin_node('sl.linkid', $nodeids);
 		}
 
 // search
-		if(!is_null($options['search'])){
+		if (!is_null($options['search'])) {
 			zbx_db_search('sysmaps_links sl', $options, $sql_parts);
 		}
 
 // filter
-		if(!is_null($options['filter'])){
+		if (!is_null($options['filter'])) {
 			zbx_db_filter('sysmaps_links sl', $options, $sql_parts);
 		}
 
 // output
-		if($options['output'] == API_OUTPUT_EXTEND){
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$sql_parts['select']['sysmaps'] = 'sl.*';
 		}
 
 // countOutput
-		if(!is_null($options['countOutput'])){
+		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 
 			$sql_parts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
@@ -427,7 +427,7 @@ COpt::memoryPick();
 		zbx_db_sorting($sql_parts, $options, $sort_columns, 'sl');
 
 // limit
-		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sql_parts['limit'] = $options['limit'];
 		}
 //-------
@@ -445,11 +445,11 @@ COpt::memoryPick();
 		$sql_where = '';
 		$sql_group = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
+		if (!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if (!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if (!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
+		if (!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
+		if (!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
@@ -459,14 +459,14 @@ COpt::memoryPick();
 				$sql_order;
 //SDI($sql);
 		$res = DBselect($sql, $sql_limit);
-		while($link = DBfetch($res)){
-			if($options['countOutput']){
+		while ($link = DBfetch($res)) {
+			if ($options['countOutput']) {
 				$result = $link['rowscount'];
 			}
 			else{
 				$linkids[$link['linkid']] = $link['linkid'];
 
-				if($options['output'] == API_OUTPUT_SHORTEN){
+				if ($options['output'] == API_OUTPUT_SHORTEN) {
 					$result[$link['linkid']] = array('linkid' => $link['linkid']);
 				}
 				else{
@@ -477,20 +477,20 @@ COpt::memoryPick();
 
 COpt::memoryPick();
 // removing keys (hash -> array)
-		if(is_null($options['preservekeys'])){
+		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
 
 	return $result;
 	}
 
-	protected function checkSelementInput(&$selements, $method){
+	protected function checkSelementInput(&$selements, $method) {
 		$create = ($method == 'createSelements');
 		$update = ($method == 'updateSelements');
 		$delete = ($method == 'deleteSelements');
 
 // permissions
-		if($update || $delete){
+		if ($update || $delete) {
 			$selementDbFields = array(
 				'selementid' => null,
 			);
@@ -513,12 +513,12 @@ COpt::memoryPick();
 			);
 		}
 
-		foreach($selements as &$selement){
-			if(!check_db_fields($selementDbFields, $selement))
+		foreach ($selements as &$selement) {
+			if (!check_db_fields($selementDbFields, $selement))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for element'));
 
-			if($update || $delete){
-				if(!isset($dbSelements[$selement['selementid']])){
+			if ($update || $delete) {
+				if (!isset($dbSelements[$selement['selementid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 
@@ -528,11 +528,11 @@ COpt::memoryPick();
 				$dbSelement = $selement;
 			}
 
-			if(isset($selement['iconid_off']) && ($selement['iconid_off'] == 0)){
+			if (isset($selement['iconid_off']) && ($selement['iconid_off'] == 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No icon for map element "%s"', $selement['label']));
 			}
 
-			if($this->checkCircleSelementsLink($dbSelement['sysmapid'], $dbSelement['elementid'], $dbSelement['elementtype'])){
+			if ($this->checkCircleSelementsLink($dbSelement['sysmapid'], $dbSelement['elementid'], $dbSelement['elementtype'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Circular link cannot be created for map element "%s".', $dbSelement['label']));
 			}
 		}
@@ -542,13 +542,13 @@ COpt::memoryPick();
 	}
 
 
-	protected function checkLinkInput($links, $method){
+	protected function checkLinkInput($links, $method) {
 		$create = ($method == 'createLink');
 		$update = ($method == 'updateLink');
 		$delete = ($method == 'deleteLink');
 
 // permissions
-		if($update || $delete){
+		if ($update || $delete) {
 			$linkDbFields = array(
 				'linkid' => null,
 			);
@@ -568,13 +568,13 @@ COpt::memoryPick();
 			);
 		}
 
-		foreach($links as $link){
-			if(!check_db_fields($linkDbFields, $link)){
+		foreach ($links as $link) {
+			if (!check_db_fields($linkDbFields, $link)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for map link'));
 			}
 
-			if($update || $delete){
-				if(!isset($dbLinks[$link['linkid']]))
+			if ($update || $delete) {
+				if (!isset($dbLinks[$link['linkid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 		}
@@ -582,10 +582,10 @@ COpt::memoryPick();
 		return true;
 	}
 
-	public function checkCircleSelementsLink($sysmapid, $elementid, $elementtype){
-		if($elementtype != SYSMAP_ELEMENT_TYPE_MAP) return false;
+	public function checkCircleSelementsLink($sysmapid, $elementid, $elementtype) {
+		if ($elementtype != SYSMAP_ELEMENT_TYPE_MAP) return false;
 
-		if(bccomp($sysmapid, $elementid) == 0) return true;
+		if (bccomp($sysmapid, $elementid) == 0) return true;
 
 		$sql = 'SELECT elementid, elementtype '.
 				' FROM sysmaps_elements '.
@@ -593,8 +593,8 @@ COpt::memoryPick();
 					' AND elementtype='.SYSMAP_ELEMENT_TYPE_MAP;
 		$dbElements = DBselect($sql);
 
-		while($element = DBfetch($dbElements)){
-			if($this->checkCircleSelementsLink($sysmapid, $element['elementid'], $element['elementtype']))
+		while ($element = DBfetch($dbElements)) {
+			if ($this->checkCircleSelementsLink($sysmapid, $element['elementid'], $element['elementtype']))
 				return true;
 		}
 		return false;
@@ -615,7 +615,7 @@ COpt::memoryPick();
  * @param array $elements[0,...]['urls'][0,...]
  * @param array $elements[0,...]['label_location']
  */
-	protected function createSelements($selements){
+	protected function createSelements($selements) {
 		$selements = zbx_toArray($selements);
 
 		$this->checkSelementInput($selements, __FUNCTION__);
@@ -623,8 +623,8 @@ COpt::memoryPick();
 		$selementids = DB::insert('sysmaps_elements', $selements);
 
 		$insert_urls = array();
-		foreach($selementids as $snum => $selementid){
-			foreach($selements[$snum]['urls'] as $url){
+		foreach ($selementids as $snum => $selementid) {
+			foreach ($selements[$snum]['urls'] as $url) {
 				$url['selementid'] = $selementid;
 				$insert_urls[] = $url;
 			}
@@ -652,7 +652,7 @@ COpt::memoryPick();
  * @param array $elements[0,...]['url']
  * @param array $elements[0,...]['label_location']
  */
-	protected function updateSelements($selements){
+	protected function updateSelements($selements) {
 		$selements = zbx_toArray($selements);
 		$selementids = array();
 
@@ -660,25 +660,25 @@ COpt::memoryPick();
 
 		$update = array();
 		$urlsToDelete = $urlsToUpdate = $urlsToAdd = array();
-		foreach($selements as $selement){
+		foreach ($selements as $selement) {
 			$update[] = array(
 				'values' => $selement,
 				'where' => array('selementid'=>$selement['selementid']),
 			);
 			$selementids[] = $selement['selementid'];
 
-			if(!isset($selement['urls'])) continue;
+			if (!isset($selement['urls'])) continue;
 
 			$diffUrls = zbx_array_diff($selement['urls'], $dbSelements[$selement['selementid']]['urls'], 'name');
 
 // Add
-			foreach($diffUrls['first'] as $newUrl){
+			foreach ($diffUrls['first'] as $newUrl) {
 				$newUrl['selementid'] = $selement['selementid'];
 				$urlsToAdd[] = $newUrl;
 			}
 
 // update url
-			foreach($diffUrls['both'] as $unum => $updUrl)
+			foreach ($diffUrls['both'] as $unum => $updUrl)
 				$urlsToUpdate[] = array(
 					'values' => $updUrl,
 					'where' => array('selementid'=>$selement['selementid'],'name'=>$updUrl['name'])
@@ -690,13 +690,13 @@ COpt::memoryPick();
 
 		DB::update('sysmaps_elements', $update);
 
-		if(!empty($urlsToDelete))
+		if (!empty($urlsToDelete))
 			DB::delete('sysmap_element_url', array('sysmapelementurlid' => $urlsToDelete));
 
-		if(!empty($urlsToUpdate))
+		if (!empty($urlsToUpdate))
 			DB::update('sysmap_element_url', $urlsToUpdate);
 
-		if(!empty($urlsToAdd))
+		if (!empty($urlsToAdd))
 			DB::insert('sysmap_element_url', $urlsToAdd);
 
 	return array('selementids' => $selementids);
@@ -708,7 +708,7 @@ COpt::memoryPick();
  * @param array $selements multidimensional array with selement objects
  * @param array $selements[0, ...]['selementid'] selementid to delete
  */
-	protected function deleteSelements($selements){
+	protected function deleteSelements($selements) {
 		$selements = zbx_toArray($selements);
 		$selementids = zbx_objectValues($selements, 'selementid');
 
@@ -730,7 +730,7 @@ COpt::memoryPick();
  * @param array $links[0,...]['color']
  * @return boolean
  */
-	protected function createLinks($links){
+	protected function createLinks($links) {
 		$links = zbx_toArray($links);
 
 		$this->checkLinkInput($links, __FUNCTION__);
@@ -741,13 +741,13 @@ COpt::memoryPick();
 	}
 
 
-	protected function updateLinks($links){
+	protected function updateLinks($links) {
 		$links = zbx_toArray($links);
 
 		$this->checkLinkInput($links, __FUNCTION__);
 
 		$udpateLinks = array();
-		foreach($links as $lnum => $link)
+		foreach ($links as $lnum => $link)
 			$udpateLinks[] = array('values' => $link, 'where' => array('linkid'=>$link['linkid']));
 
 		DB::update('sysmaps_links', $udpateLinks);
@@ -761,7 +761,7 @@ COpt::memoryPick();
  * @param array $links multidimensional array with link objects
  * @param array $links[0, ...]['linkid'] link ID to delete
  */
-	protected function deleteLinks($links){
+	protected function deleteLinks($links) {
 		zbx_value2array($links);
 		$linkids = zbx_objectValues($links, 'linkid');
 
@@ -780,7 +780,7 @@ COpt::memoryPick();
  * @param array $links[0,...]['drawtype']
  * @param array $links[0,...]['color']
  */
-	protected function createLinkTriggers($linktriggers){
+	protected function createLinkTriggers($linktriggers) {
 		$linktriggers = zbx_toArray($linktriggers);
 
 		$linktrigger_db_fields = array(
@@ -790,8 +790,8 @@ COpt::memoryPick();
 			'color' => 'DD0000'
 		);
 
-		foreach($linktriggers as $linktrigger){
-			if(!check_db_fields($linktrigger_db_fields, $linktrigger))
+		foreach ($linktriggers as $linktrigger) {
+			if (!check_db_fields($linktrigger_db_fields, $linktrigger))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger'));
 		}
 
@@ -801,7 +801,7 @@ COpt::memoryPick();
 	}
 
 
-	protected function updateLinkTriggers($linktriggers){
+	protected function updateLinkTriggers($linktriggers) {
 		$linktriggers = zbx_toArray($linktriggers);
 		$linktriggerids = zbx_objectValues($linktriggers, 'linktriggerid');
 
@@ -810,8 +810,8 @@ COpt::memoryPick();
 		);
 
 		$updateLinkTriggers = array();
-		foreach($linktriggers as $linktrigger){
-			if(!check_db_fields($linktrigger_db_fields, $linktrigger))
+		foreach ($linktriggers as $linktrigger) {
+			if (!check_db_fields($linktrigger_db_fields, $linktrigger))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger update'));
 
 			$updateLinkTriggers[] = array(
@@ -825,7 +825,7 @@ COpt::memoryPick();
 		return array('linktriggerids' => $linktriggerids);
 	}
 
-	protected function deleteLinkTriggers($linktriggers){
+	protected function deleteLinkTriggers($linktriggers) {
 		$linktriggers = zbx_toArray($linktriggers);
 		$linktriggerids = zbx_objectValues($linktriggers, 'linktriggerid');
 
@@ -833,8 +833,8 @@ COpt::memoryPick();
 			'linktriggerid' => null
 		);
 
-		foreach($linktriggers as $linktrigger){
-			if(!check_db_fields($linktrigger_db_fields, $linktrigger))
+		foreach ($linktriggers as $linktrigger) {
+			if (!check_db_fields($linktrigger_db_fields, $linktrigger))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger delete'));
 		}
 
