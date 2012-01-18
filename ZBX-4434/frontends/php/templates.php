@@ -337,7 +337,7 @@ require_once('include/page_header.php');
 			}
 
 			foreach ($macros as $mnum => $macro) {
-				if (zbx_empty($macro['value']) && zbx_empty($macro['macro'])) {
+				if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 					unset($macros[$mnum]);
 					continue;
 				}
