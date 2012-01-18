@@ -1287,18 +1287,6 @@ class CTrigger extends CZBXAPI {
 		}
 
 		foreach ($triggers as $tnum => &$trigger) {
-			if (($this->getStatusByTriggerExpression($trigger) != HOST_STATUS_TEMPLATE && isset($trigger['dependencies']))) {
-				foreach ($trigger['dependencies'] as $triggerId) {
-					$hostData = API::Host()->get(
-						array('triggerids' => $triggerId,
-							'templated_hosts' => true,
-							'output' => array('status')));
-					$hostData = reset($hostData);
-					if ($hostData['status'] == HOST_STATUS_TEMPLATE) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from template to host.'));
-					}
-				}
-			}
 
 			$currentTrigger = $triggers[$tnum];
 
@@ -1422,6 +1410,21 @@ class CTrigger extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s:%2$s" already exists.', $trigger['description'], $trigger['expression']));
 				}
 			}
+			$mainStatus = (isset($host) && isset($hosts[$host]) ? $hosts[$host]['status'] : $this->getStatusByTriggerExpression($trigger));
+			if (($mainStatus != HOST_STATUS_TEMPLATE && isset($trigger['dependencies']))) {
+				$hostsData = API::Host()->get(array(
+						'triggerids' => $trigger['dependencies'],
+						'templated_hosts' => true,
+						'output' => array('status'))
+				);
+				foreach ($hostsData as $hostData) {
+					if ($hostData['status'] == HOST_STATUS_TEMPLATE) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from template to host.'));
+					}
+				}
+			}
+
+
 		}
 		unset($trigger);
 	}
