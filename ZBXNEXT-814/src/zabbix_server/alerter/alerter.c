@@ -129,7 +129,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  ******************************************************************************/
 void	main_alerter_loop()
 {
-	char			error[ALERT_ERROR_LEN_MAX], *error_esc;
+	char			error[MAX_STRING_LEN], *error_esc;
 	int			res;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -145,9 +145,9 @@ void	main_alerter_loop()
 		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
 
 		result = DBselect(
-				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,"
-				"mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,"
-				"mt.exec_path,mt.gsm_modem,mt.username,mt.passwd,mt.status"
+				"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,"
+				"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
+				"mt.gsm_modem,mt.username,mt.passwd,a.retries"
 				" from alerts a,media_type mt"
 				" where a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
@@ -166,37 +166,34 @@ void	main_alerter_loop()
 			alert.subject = row[3];
 			alert.message = row[4];
 			alert.status = atoi(row[5]);
-			alert.retries = atoi(row[6]);
 
-			ZBX_STR2UINT64(mediatype.mediatypeid, row[7]);
-			mediatype.type = atoi(row[8]);
-			mediatype.description = row[9];
-			mediatype.smtp_server = row[10];
-			mediatype.smtp_helo = row[11];
-			mediatype.smtp_email = row[12];
-			mediatype.exec_path = row[13];
-			mediatype.gsm_modem = row[14];
-			mediatype.username = row[15];
-			mediatype.passwd = row[16];
+			ZBX_STR2UINT64(mediatype.mediatypeid, row[6]);
+			mediatype.type = atoi(row[7]);
+			mediatype.description = row[8];
+			mediatype.smtp_server = row[9];
+			mediatype.smtp_helo = row[10];
+			mediatype.smtp_email = row[11];
+			mediatype.exec_path = row[12];
+			mediatype.gsm_modem = row[13];
+			mediatype.username = row[14];
+			mediatype.passwd = row[15];
 
-			if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[17]))
-			{
-				*error = '\0';
-				res = execute_action(&alert, &mediatype, error, sizeof(error));
-			}
-			else
-			{
-				strscpy(error, "Media type is not active");
-				res = FAIL;
-			}
+			alert.retries = atoi(row[16]);
+
+			*error = '\0';
+			res = execute_action(&alert, &mediatype, error, sizeof(error));
 
 			if (SUCCEED == res)
 			{
+				zabbix_log(LOG_LEVEL_DEBUG, "alert ID [" ZBX_FS_UI64 "] was sent successfully",
+						alert.alertid);
 				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
 						ALERT_STATUS_SENT, alert.alertid);
 			}
 			else
 			{
+				zabbix_log(LOG_LEVEL_DEBUG, "error sending alert ID [" ZBX_FS_UI64 "]", alert.alertid);
+
 				error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
 
 				alert.retries++;
