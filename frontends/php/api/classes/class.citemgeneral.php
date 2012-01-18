@@ -151,7 +151,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			$fullItem = $items[$inum];
 
 			if (!check_db_fields($item_db_fields, $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
 			}
 
 			if ($update) {
@@ -300,27 +300,27 @@ abstract class CItemGeneral extends CZBXAPI{
 		return $item;
 	}
 
-	protected function errorInheritFlags($flag, $key, $host){
-		switch($flag){
+	protected function errorInheritFlags($flag, $key, $host) {
+		switch ($flag) {
 			case ZBX_FLAG_DISCOVERY_NORMAL:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on host "%2$s" as an item.', $key, $host));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item.', $key, $host));
 				break;
 			case ZBX_FLAG_DISCOVERY:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on host "%2$s" as a discovery rule.', $key, $host));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as a discovery rule.', $key, $host));
 				break;
 			case ZBX_FLAG_DISCOVERY_CHILD:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on host "%2$s" as an item prototype.', $key, $host));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item prototype.', $key, $host));
 				break;
 			case ZBX_FLAG_DISCOVERY_CREATED:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on host "%2$s" as an item created from item prototype.', $key, $host));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item created from item prototype.', $key, $host));
 				break;
 			default:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on host "%2$s" as unknown item element.', $key, $host));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as unknown item element.', $key, $host));
 		}
 	}
 
-	public static function itemTypeInterface($itemType){
-		switch($itemType){
+	public static function itemTypeInterface($itemType) {
+		switch ($itemType) {
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
 			case ITEM_TYPE_SNMPV3:
@@ -394,9 +394,9 @@ abstract class CItemGeneral extends CZBXAPI{
 	}
 
 
-	public function isReadable($ids){
-		if(!is_array($ids)) return false;
-		if(empty($ids)) return true;
+	public function isReadable($ids) {
+		if (!is_array($ids)) return false;
+		if (empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
@@ -410,9 +410,9 @@ abstract class CItemGeneral extends CZBXAPI{
 		return (count($ids) == $count);
 	}
 
-	public function isWritable($ids){
-		if(!is_array($ids)) return false;
-		if(empty($ids)) return true;
+	public function isWritable($ids) {
+		if (!is_array($ids)) return false;
+		if (empty($ids)) return true;
 
 		$ids = array_unique($ids);
 

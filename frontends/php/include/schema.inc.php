@@ -1127,7 +1127,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
-				'default' => '0',
+				'default' => '30',
 			),
 		),
 	),
@@ -5528,6 +5528,12 @@ return array(
 				'default' => '',
 			),
 			'lastcheck' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
+			'ts_delete' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

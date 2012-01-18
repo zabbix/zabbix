@@ -115,6 +115,7 @@ frontends/php/images/general/tree/zero.gif -text
 frontends/php/images/general/unknown_icon.png -text
 frontends/php/images/general/up_icon.png -text
 frontends/php/images/general/warning16r.gif -text
+frontends/php/images/general/warning_icon.png -text
 frontends/php/images/general/warning_small.gif -text
 frontends/php/images/general/x.gif -text
 frontends/php/images/general/zabbix.ico -text
@@ -233,6 +234,7 @@ frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/selenium/testFormAdministrationGeneralTriggerSeverities.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text

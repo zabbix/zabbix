@@ -21,7 +21,7 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class API_JSON_User extends CZabbixTest {
 
@@ -177,7 +177,8 @@ class API_JSON_User extends CZabbixTest {
 		$result = $this->api_call(
 			'user.authenticate',
 			$data,
-			$debug);
+			$debug
+		);
 		if ($expect) {
 			$this->assertTrue(isset($result['result']), "$debug");
 		}
@@ -208,7 +209,7 @@ class API_JSON_User extends CZabbixTest {
 
 		// checking result
 		if ($success_expected) {
-			$this->assertFalse(array_key_exists('error', $result),"Chuck Norris: Failed to create user through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
+			$this->assertFalse(array_key_exists('error', $result), "Chuck Norris: Failed to create user through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
 
 			// checking if record was inserted in the DB
 			$just_created_id = $result['id'];

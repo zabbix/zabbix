@@ -23,7 +23,7 @@ require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
 
 class testFormAction extends CWebTest {
 
-	public static function providerNewActions(){
+	public static function providerNewActions() {
 		$data = array(
 			array(array(
 				'name' => 'action test 2',
@@ -62,7 +62,7 @@ class testFormAction extends CWebTest {
 	/**
 	 * @dataProvider providerNewActions
 	 */
-	public function testActionCreateSimple($action){
+	public function testActionCreateSimple($action) {
 		DBsave_tables('actions');
 
 		$this->login('actionconf.php?form=1&eventsource=0');
@@ -74,10 +74,10 @@ class testFormAction extends CWebTest {
 		$this->type("def_longdata", $action['def_longdata']);
 
 		$this->click("link=Conditions");
-		foreach($action['conditions'] as $condition){
+		foreach ($action['conditions'] as $condition) {
 
 			$this->dropdown_select_wait("new_condition_conditiontype", $condition['type']);
-			switch($condition['type']){
+			switch ($condition['type']) {
 				case 'Trigger name':
 					$this->type("new_condition_value", $condition['value']);
 					$this->click('add_condition');
@@ -101,12 +101,12 @@ class testFormAction extends CWebTest {
 
 		$this->click("link=Operations");
 
-		foreach($action['operations'] as $operation){
+		foreach ($action['operations'] as $operation) {
 			$this->click('new_operation');
 			$this->wait();
 			$this->dropdown_select_wait('new_operation_operationtype', $operation['type']);
 
-			switch($operation['type']){
+			switch ($operation['type']) {
 				case 'Send message':
 					sleep(1);
 
@@ -145,7 +145,7 @@ class testFormAction extends CWebTest {
 		DBrestore_tables('actions');
 	}
 
-	public function testActionCreate(){
+	public function testActionCreate() {
 		DBsave_tables('actions');
 
 		$this->login('actionconf.php?form=1&eventsource=0');

@@ -27,7 +27,7 @@ require_once(dirname(__FILE__).'/dbfunc.php');
 class CZabbixTest extends PHPUnit_Framework_TestCase {
 	public $ID = 0;
 
-	function do_post_request($data, &$debug){
+	function do_post_request($data, &$debug) {
 		global $URL;
 
 		if (is_array($data)) $data = json_encode($data);
@@ -86,7 +86,7 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 			'id' => $this->ID
 		);
 
-		$response = $this->do_post_request($data,$debug);
+		$response = $this->do_post_request($data, $debug);
 		$decoded = json_decode($response, true);
 
 		return $decoded;
@@ -124,8 +124,7 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 	protected function setUp() {
 		global $DB, $URL;
 
-		if (strstr(PHPUNIT_URL, 'http://'))
-		{
+		if (strstr(PHPUNIT_URL, 'http://')) {
 			$URL=PHPUNIT_URL.'api_jsonrpc.php';
 		}
 		else {

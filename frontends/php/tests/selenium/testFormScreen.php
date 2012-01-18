@@ -21,18 +21,16 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormScreen extends CWebTest
-{
+class testFormScreen extends CWebTest {
 	public $testscreen = 'Test Screen';
 
-	public function testFormScreen_Create()
-	{
+	public function testFormScreen_Create() {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('screenconf.php');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('name',$this->testscreen);
+		$this->input_type('name', $this->testscreen);
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Screen added');

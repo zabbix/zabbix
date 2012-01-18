@@ -160,8 +160,6 @@
 //	alarms.php
 	'S_TIME'=>				_('Time'),
 	'S_STATUS'=>				_('Status'),
-	'S_TRUE_BIG'=>				_('TRUE'),
-	'S_FALSE_BIG'=>				_('FALSE'),
 
 //	actions.php
 	'S_TYPE'=>				_('Type'),
@@ -197,32 +195,11 @@
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		_('remember selected'),
 	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
 	'S_DEFAULT_THEME'=>				_('Default theme'),
-	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
-	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
-
-	'S_CHARACTER_STRING_INCLUDED'=>			_('Character string included'),
-	'S_ANY_CHARACTER_STRING_INCLUDED'=>		_('Any character string included'),
-	'S_CHARACTER_STRING_NOT_INCLUDED'=>		_('Character string not included'),
-	'S_RESULT_IS_TRUE'=>				_('Result is TRUE'),
-	'S_RESULT_IS_FALSE'=>				_('Result is FALSE'),
-	'S_TEST_STRING'=>				_('Test string'),
-	'S_INCORRECT_EXPRESSION'=>			_('Incorrect expression'),
-
-	'S_REGULAR_EXPRESSION_ADDED'=>			_('Regular expression added'),
-	'S_CANNOT_ADD_REGULAR_EXPRESSION'=>		_('Cannot add regular expression'),
-
-	'S_REGULAR_EXPRESSION_UPDATED'=>		_('Regular expression updated'),
-	'S_CANNOT_UPDATE_REGULAR_EXPRESSION'=>		_('Cannot update regular expression'),
-
-	'S_REGULAR_EXPRESSION_DELETED'=>		_('Regular expression deleted'),
-	'S_CANNOT_DELETE_REGULAR_EXPRESSION'=>		_('Cannot delete regular expression'),
-
-	'S_DELETE_REGULAR_EXPRESSION_Q'=>		_('Delete regular expression?'),
 
 //	nodes.php
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
@@ -365,12 +342,6 @@
 
 //	hosts.php
 	'S_HOST_INTERFACE' =>			_('Host interface'),
-	'S_MACROS'=>					_('Macros'),
-	'S_MACRO'=>					_('Macro'),
-	'S_WRONG_MACRO'=>				_('Wrong macro'),
-	'S_MACRO_TOO_LONG'=>				_('Macro name is too long, should not exceed 64 chars.'),
-	'S_MACRO_VALUE_TOO_LONG'=>			_('Macro value is too long, should not exceed 255 chars.'),
-	'S_EMPTY_MACRO_VALUE'=>				_('Empty macro value'),
 	'S_IN'=>					_('In'),
 	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
@@ -844,7 +815,6 @@
 //scripts.php
 	'S_SCRIPTS'=>				_('Scripts'),
 	'S_COMMAND'=>				_('Command'),
-	'S_RESULT'=>				_('Result'),
 	'S_CLOSE'=>					_('Close'),
 
 	'S_SCRIPT_ERROR'=>					_('SCRIPT ERROR'),
@@ -915,7 +885,6 @@
 	'S_TEST_DATA'=>		_('Test data'),
 	'S_EXPRESSION_VARIABLE_ELEMENTS'=>	_('Expression Variable Elements'),
 	'S_RESULT_TYPE'=>	_('Result type'),
-	'S_COMBINED_RESULT'=>	_('Combined result'),
 
 // popup_media.php
 	'S_INCORRECT_TIME_PERIOD'=>	_('Incorrect time period'),
@@ -949,7 +918,6 @@
 	'S_DO'=>				_('Do'),
 
 //	items.inc.php
-	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	_('Incorrect arguments passed to function'),
 	'S_UPDATED_SMALL'=>				_('updated'),
 
 //	httptest.inc.php
@@ -961,8 +929,6 @@
 	'S_TEMPLATE_WITH_ITEM_KEY'=>			_('Template with item key'),
 	'S_TEMPLATE_WITH_APPLICATION'=>			_('Template with application'),
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
-	'S_HOST_HAS_BEEN_DELETED_MSG_PART1'=>		_('Host'),
-	'S_HOST_HAS_BEEN_DELETED_MSG_PART2'=>		_('has been deleted from the system'),
 
 //	maps.inc.php
 	'S_SUBMAP'=>			_('Submap'),
@@ -995,14 +961,6 @@
 	'S_CUSER_ERROR_WRONG_PERIOD_PART1'=>			_('Wrong period ['),
 	'S_CUSER_ERROR_WRONG_PERIOD_PART2'=>			_(']'),
 
-// class.cmediatype.php
-	'S_CMEDIATYPE_ERROR_WRONG_FIELD_FOR_MEDIATYPE' =>	_('Wrong fields for media type'),
-	'S_CMEDIATYPE_ERROR_PASSWORD_REQUIRED' =>	_('Password required for media type'),
-	'S_MEDIA_TYPE_ALREADY_EXISTS'=>				_('Media type already exists:'),
-	'S_MEDIA_TYPES_USED_BY_ACTIONS'=>	_('Media types used by action:'),
-	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_CREATE_MEDIATYPES'=>_('Only Super Admins can create media types'),
-	'S_CMEDIATYPE_ERROR_ONLY_SUPER_ADMIN_CAN_DELETE_MEDIATYPES'=>_('Only Super Admins can delete media types'),
-
 //	Menu
 
 	'S_QUEUE'=>				_('Queue'),
@@ -1013,7 +971,6 @@
 	'S_LATEST_DATA'=>			_('Latest data'),
 
 //	Errors
-	'S_DOES_NOT_EXIST_SMALL'=>		_('does not exist'),
 	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	_('No permissions for screen'),
 	'S_NO_PERMISSIONS_FOR_MAP'=>	_('No permissions for map'),

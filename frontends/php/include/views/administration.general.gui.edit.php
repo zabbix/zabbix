@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-
 $comboTheme = new CComboBox('default_theme', $this->data['config']['default_theme']);
 $comboTheme->addItem('css_ob.css', _('Original blue'));
 $comboTheme->addItem('css_bb.css', _('Black & Blue'));
@@ -43,9 +42,7 @@ $guiView->addTab('gui', _('GUI'), $guiTab);
 
 $guiForm = new CForm();
 $guiForm->setName('guiForm');
-$guiForm->addVar('form', $this->data['form']);
 $guiForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
-$guiForm->addVar('config', get_request('config', 8));
 $guiForm->addItem($guiView);
 $guiForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save')))));
 

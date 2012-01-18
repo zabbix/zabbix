@@ -23,10 +23,8 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class function_DBid2nodeid extends CZabbixTest
-{
-	public function test_DBid2nodeid()
-	{
+class function_DBid2nodeid extends CZabbixTest {
+	public function test_DBid2nodeid() {
 		// TODO
 		$this->markTestIncomplete();
 	}

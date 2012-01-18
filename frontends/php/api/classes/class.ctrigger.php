@@ -1393,7 +1393,7 @@ class CTrigger extends CZBXAPI {
 								' AND '.DBin_node('i.itemid');
 					if (!DBfetch(DBselect($sql))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect item key "%1$s:%2$s" provided for trigger expression.', $exprPart['host'], $exprPart['item']));
+							_s('Incorrect item key "%1$s" provided for trigger expression on "%2$s".', $exprPart['item'], $exprPart['host']));
 					}
 				}
 			}
@@ -1490,7 +1490,8 @@ class CTrigger extends CZBXAPI {
 			'triggerids' => $triggerids,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'selectHosts' => array('name')
 		);
 		$del_triggers = $this->get($options);
 
@@ -1526,8 +1527,10 @@ class CTrigger extends CZBXAPI {
 
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
-			info(_s('Trigger "%1$s:%2$s" deleted.', $trigger['description'], explode_exp($trigger['expression'])));
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'].':'.$trigger['expression'], null, null, null);
+			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
+					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'],
+					$trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
 		DB::delete('triggers', array('triggerid' => $triggerids));
@@ -1603,7 +1606,8 @@ class CTrigger extends CZBXAPI {
 
 			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
 
-			$expression = implode_exp($trigger['expression'], $triggerid);
+			$hosts = array();
+			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
 			if (is_null($expression)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $trigger['expression']));
 			}
@@ -1615,7 +1619,7 @@ class CTrigger extends CZBXAPI {
 				'where' => array('triggerid' => $triggerid)
 			));
 
-			info(_s('Trigger "%1$s:%2$s" created.', $trigger['description'], $trigger['expression']));
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts)));
 		}
 
 		$this->validateDependencies($triggers);
@@ -1644,6 +1648,7 @@ class CTrigger extends CZBXAPI {
 		$options = array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => array('name'),
 			'preservekeys' => true,
 			'nopermissions' => true
 		);
@@ -1652,6 +1657,7 @@ class CTrigger extends CZBXAPI {
 		$description_changed = $expression_changed = false;
 		foreach ($triggers as &$trigger) {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
+			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
 
 			if (isset($trigger['description']) && strcmp($dbTrigger['description'], $trigger['description']) != 0) {
 				$description_changed = true;
@@ -1705,7 +1711,7 @@ class CTrigger extends CZBXAPI {
 			if ($expression_changed) {
 				delete_function_by_triggerid($trigger['triggerid']);
 
-				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid']);
+				$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid'], $hosts);
 				if (is_null($trigger['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expression_full));
 				}
@@ -1735,7 +1741,7 @@ class CTrigger extends CZBXAPI {
 			// restore the full expression to properly validate dependencies
 			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
-			$infos[] = _s('Trigger "%1$s:%2$s" updated.', $trigger['description'], $trigger['expression']);
+			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
 		}
 		unset($trigger);
 
@@ -1852,7 +1858,7 @@ class CTrigger extends CZBXAPI {
 					));
 					if ($exists) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Trigger [%1$s] already exists on [%2$s]', $newTrigger['description'], $chd_host['host']));
+							_s('Trigger "%1$s" already exists on "%2$s".', $newTrigger['description'], $chd_host['host']));
 					}
 				}
 				elseif ($childTrigger['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
@@ -1887,7 +1893,7 @@ class CTrigger extends CZBXAPI {
 				if ($childTrigger) {
 					if ($childTrigger['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Trigger [%1$s] already exists on [%2$s]', $childTrigger['description'], $chd_host['host']));
+							_s('Trigger "%1$s" already exists on "%2$s".', $childTrigger['description'], $chd_host['host']));
 					}
 					elseif ($childTrigger['flags'] != $newTrigger['flags']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists'));

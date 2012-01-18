@@ -28,7 +28,7 @@ class CRadioButtonList extends CDiv{
 	protected $value;
 	protected $orientation;
 
-	public function __construct($name='radio', $value='yes'){
+	public function __construct($name='radio', $value='yes') {
 		$this->count = 0;
 		$this->name = $name;
 		$this->value = $value;
@@ -38,7 +38,7 @@ class CRadioButtonList extends CDiv{
 	}
 
 
-	public function addValue($name, $value, $checked=null){
+	public function addValue($name, $value, $checked=null) {
 		$this->count++;
 
 		$id = str_replace(array('[', ']'), array('_'), $this->name).'_'.$this->count;
@@ -46,25 +46,25 @@ class CRadioButtonList extends CDiv{
 		$radio = new CInput('radio', $this->name, $value);
 		$radio->attr('id', zbx_formatDomId($id));
 
-		if((strcmp($value,$this->value) == 0) || !is_null($checked) || $checked){
+		if ((strcmp($value,$this->value) == 0) || !is_null($checked) || $checked) {
 			$radio->attr('checked', 'checked');
 		}
 
 		$label = new CLabel($name, $id);
 
 		$outerDiv = new CDiv(array($radio, $label));
-		if($this->orientation == self::ORIENTATION_HORIZONTAL){
+		if ($this->orientation == self::ORIENTATION_HORIZONTAL) {
 			$outerDiv->addClass('inlineblock');
 		}
 
 		parent::addItem($outerDiv);
 	}
 
-	public function makeHorizaontal(){
+	public function makeHorizaontal() {
 		$this->orientation = self::ORIENTATION_HORIZONTAL;
 	}
 
-	public function makeVertical(){
+	public function makeVertical() {
 		$this->orientation = self::ORIENTATION_VERTICAL;
 	}
 }

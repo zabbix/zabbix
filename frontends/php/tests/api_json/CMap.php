@@ -23,7 +23,7 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class API_JSON_User extends CZabbixTest {
+class API_JSON_Map extends CZabbixTest {
 	public static function map_data() {
 		return array(
 			array(
@@ -63,7 +63,7 @@ class API_JSON_User extends CZabbixTest {
 			$debug
 		);
 
-		$this->assertTrue(!array_key_exists('error', $result),"Chuck Norris: Failed to create map through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
+		$this->assertTrue(!array_key_exists('error', $result), "Chuck Norris: Failed to create map through JSON API. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
 
 		// looking at the DB, was the record created?
 		foreach ($maps as $map) {
