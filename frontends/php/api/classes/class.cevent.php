@@ -545,7 +545,7 @@ class CEvent extends CZBXAPI {
 					$result[$ack['eventid']]['acknowledges'] = $ack['rowscount'];
 				}
 			}
-			elseif ($options['select_acknowledges'] == API_OUTPUT_EXTEND){
+			elseif ($options['select_acknowledges'] == API_OUTPUT_EXTEND) {
 				$res = DBselect(
 					'SELECT a.*'.
 					' FROM acknowledges a'.
@@ -559,7 +559,7 @@ class CEvent extends CZBXAPI {
 		}
 
 		// removing keys (hash -> array)
-		if(is_null($options['preservekeys'])){
+		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -578,7 +578,7 @@ class CEvent extends CZBXAPI {
  * @param array $events[0,...]['acknowledged'] OPTIONAL
  * @return boolean
  */
-	public function create($events){
+	public function create($events) {
 		$events = zbx_toArray($events);
 		$eventids = array();
 
@@ -589,13 +589,13 @@ class CEvent extends CZBXAPI {
 			);
 			$triggers = API::Trigger()->get($options);
 
-			foreach($events as $num => $event){
-				if($event['object'] != EVENT_OBJECT_TRIGGER) continue;
+			foreach ($events as $num => $event) {
+				if ($event['object'] != EVENT_OBJECT_TRIGGER) continue;
 
-				if(isset($triggers[$event['objectid']])){
+				if (isset($triggers[$event['objectid']])) {
 					$trigger = $triggers[$event['objectid']];
 
-					if(($event['value'] != $trigger['value']) || (($event['value'] == TRIGGER_VALUE_TRUE) && ($trigger['type'] == TRIGGER_MULT_EVENT_ENABLED))){
+					if (($event['value'] != $trigger['value']) || (($event['value'] == TRIGGER_VALUE_TRUE) && ($trigger['type'] == TRIGGER_MULT_EVENT_ENABLED))) {
 						continue;
 					}
 				}
@@ -603,7 +603,7 @@ class CEvent extends CZBXAPI {
 				unset($events[$num]);
 			}
 
-			foreach($events as $num => $event){
+			foreach ($events as $num => $event) {
 				$event_db_fields = array(
 					'source'		=> null,
 					'object'		=> null,
@@ -613,7 +613,7 @@ class CEvent extends CZBXAPI {
 					'acknowledged'	=> 0
 				);
 
-				if(!check_db_fields($event_db_fields, $event)){
+				if (!check_db_fields($event_db_fields, $event)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for Event');
 				}
 
@@ -627,7 +627,7 @@ class CEvent extends CZBXAPI {
 									$event['value'].','.
 									$event['acknowledged'].
 								')';
-				if(!DBexecute($sql))
+				if (!DBexecute($sql))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 //			$triggers[] = array('triggerid' => $event['objectid'], 'value'=> $event['value'], 'lastchange'=> $event['clock']);
@@ -648,7 +648,7 @@ class CEvent extends CZBXAPI {
  * @param array $eventids['eventids']
  * @return boolean
  */
-	public function delete($eventids){
+	public function delete($eventids) {
 		$eventids = zbx_toArray($eventids);
 
 			$options = array(
@@ -658,8 +658,8 @@ class CEvent extends CZBXAPI {
 				'preservekeys' => 1
 			);
 			$del_events = $this->get($options);
-			foreach($eventids as $enum => $eventid){
-				if(!isset($del_events[$eventid])){
+			foreach ($eventids as $enum => $eventid) {
+				if (!isset($del_events[$eventid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
@@ -667,7 +667,7 @@ class CEvent extends CZBXAPI {
 			$result = DBexecute('DELETE FROM events WHERE '.DBcondition('eventid', $eventids));
 			$result &= DBexecute('DELETE FROM alerts WHERE '.DBcondition('eventid', $eventids));
 
-			if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete event');
+			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete event');
 
 			return array('eventids' => $eventids);
 	}
@@ -678,11 +678,11 @@ class CEvent extends CZBXAPI {
 	 * @param array $triggerids
 	 * @return boolean
 	 */
-	public function deleteByTriggerIDs($triggerids){
+	public function deleteByTriggerIDs($triggerids) {
 		zbx_value2array($triggerids);
 
 			$sql = 'DELETE FROM events e WHERE e.object='.EVENT_OBJECT_TRIGGER.' AND '.DBcondition('e.objectid', $triggerids);
-			if(!DBexecute($sql))
+			if (!DBexecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 	}
 

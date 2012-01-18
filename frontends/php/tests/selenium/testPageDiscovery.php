@@ -52,10 +52,10 @@ class testPageDiscovery extends CWebTest {
 		$name = $rule['name'];
 		$druleid = $rule['druleid'];
 
-		$sql1 = "select * from drules where name='$name' order by druleid";
-		$oldHashRules = DBhash($sql1);
-		$sql2 = "select * from dchecks where druleid=$druleid order by dcheckid";
-		$oldHashChecks = DBhash($sql2);
+		$sqlRules = "select * from drules where name='$name' order by druleid";
+		$oldHashRules = DBhash($sqlRules);
+		$sqlChecks = "select * from dchecks where druleid=$druleid order by dcheckid";
+		$oldHashChecks = DBhash($sqlChecks);
 
 		$this->login('discoveryconf.php');
 		$this->assertTitle('Configuration of discovery');
@@ -68,8 +68,8 @@ class testPageDiscovery extends CWebTest {
 		$this->ok("$name");
 		$this->ok('DISCOVERY');
 
-		$this->assertEquals($oldHashRules, DBhash($sql1));
-		$this->assertEquals($oldHashChecks, DBhash($sql2));
+		$this->assertEquals($oldHashRules, DBhash($sqlRules));
+		$this->assertEquals($oldHashChecks, DBhash($sqlChecks));
 	}
 
 	/**

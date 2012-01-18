@@ -494,7 +494,7 @@ class CUserMacro extends CZBXAPI {
  * @param string $macros[0..]['value']
  * @return array
  */
-	public function createGlobal(array $macros){
+	public function createGlobal(array $macros) {
 		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create global macros.'));
 		}
@@ -548,7 +548,7 @@ class CUserMacro extends CZBXAPI {
 
 		// update macros
 		$data = array();
-		foreach($globalmacros as $gmacro){
+		foreach ($globalmacros as $gmacro) {
 			$globalmacroid = $gmacro['globalmacroid'];
 			unset($gmacro['globalmacroid']);
 
@@ -607,28 +607,28 @@ class CUserMacro extends CZBXAPI {
 	 * @param array $macros array with macros expressions
 	 * @return boolean
 	 */
-	private function validate($macros){
+	private function validate($macros) {
 		$tmp = array();
-		foreach($macros as $macro){
-			if(isset($tmp[$macro['macro']]))
+		foreach ($macros as $macro) {
+			if (isset($tmp[$macro['macro']]))
 				self::exception(ZBX_API_ERROR_PARAMETERS, '['.$macro['macro'].']: not unique');
 			else
 				$tmp[$macro['macro']] = 1;
 		}
 
-		foreach($macros as $mnum => $macro){
-			if(zbx_empty($macro['value'])){
+		foreach ($macros as $mnum => $macro) {
+			if (zbx_empty($macro['value'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty value for macro "%1$s".', $macro['macro']));
 			}
-			if(zbx_strlen($macro['macro']) > 64){
+			if (zbx_strlen($macro['macro']) > 64) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro name "%1$s" is too long, it should not exceed 64 chars.', $macro['macro']));
 			}
 
-			if(zbx_strlen($macro['value']) > 255){
+			if (zbx_strlen($macro['value']) > 255) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" value is too long, it should not exceed 255 chars.', $macro['macro']));
 			}
 
-			if(!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro['macro'])){
+			if (!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro['macro'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong macro "%1$s".', $macro['macro']));
 			}
 		}
@@ -764,7 +764,7 @@ class CUserMacro extends CZBXAPI {
  * @param array $data['templateids']
  * @return boolean
  */
-	public function massRemove($data){
+	public function massRemove($data) {
 
 			$macros = zbx_toArray($data['macros'], 'macro');
 
@@ -782,8 +782,8 @@ class CUserMacro extends CZBXAPI {
 			);
 			$db_objects = API::Host()->get($options);
 
-			foreach($objectids as $objectid){
-				if(!isset($db_objects[$objectid]))
+			foreach ($objectids as $objectid) {
+				if (!isset($db_objects[$objectid]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 
@@ -811,19 +811,19 @@ class CUserMacro extends CZBXAPI {
  * @param array $data['templates']
  * @return boolean
  */
-	public function massUpdate($data){
+	public function massUpdate($data) {
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
 		$hostids = zbx_objectValues($hosts, 'hostid');
 
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
 		$templateids = zbx_objectValues($templates, 'templateid');
 
-			if(!isset($data['macros']) || empty($data['macros']))
+			if (!isset($data['macros']) || empty($data['macros']))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ macros ]');
-			else if(empty($hosts) && empty($templates))
+			else if (empty($hosts) && empty($templates))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ hosts ] or [ templates ]');
 
-			if(!empty($hosts)){
+			if (!empty($hosts)) {
 // Host permission
 				$options = array(
 					'hostids' => $hostids,
@@ -832,14 +832,14 @@ class CUserMacro extends CZBXAPI {
 					'preservekeys' => 1
 				);
 				$upd_hosts = API::Host()->get($options);
-				foreach($hosts as $hnum => $host){
-					if(!isset($upd_hosts[$host['hostid']]))
+				foreach ($hosts as $hnum => $host) {
+					if (!isset($upd_hosts[$host['hostid']]))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
 //--
 			}
 
-			if(!empty($templates)){
+			if (!empty($templates)) {
 // Template permission
 				$options = array(
 					'templateids' => $templateids,
@@ -848,8 +848,8 @@ class CUserMacro extends CZBXAPI {
 					'preservekeys' => 1
 				);
 				$upd_templates = API::Template()->get($options);
-				foreach($templates as $tnum => $template){
-					if(!isset($upd_templates[$template['templateid']]))
+				foreach ($templates as $tnum => $template) {
+					if (!isset($upd_templates[$template['templateid']]))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
 //--
@@ -875,7 +875,7 @@ class CUserMacro extends CZBXAPI {
 			$hostmacroids = array();
 			$data_update = array();
 
-			foreach($db_macros as $dbnum => $db_macro){
+			foreach ($db_macros as $dbnum => $db_macro) {
 				$hostmacroids[] = $db_macro['hostmacroid'];
 				$data_update[] = array(
 					'values' => array('value' => $updateMacros[$db_macro['macro']]['value']),
@@ -889,7 +889,7 @@ class CUserMacro extends CZBXAPI {
 	}
 
 // TODO: should be private
-	public function getMacros($data){
+	public function getMacros($data) {
 		$macros = $data['macros'];
 		$itemid = isset($data['itemid']) ? $data['itemid'] : null;
 		$triggerid = isset($data['triggerid']) ? $data['triggerid'] : null;
@@ -921,9 +921,9 @@ class CUserMacro extends CZBXAPI {
 			$host_macros = $this->get($obj_options);
 			order_result($host_macros, 'hostid');
 
-			foreach($macros as $mnum => $macro){
-				foreach($host_macros as $hmnum => $hmacro){
-					if($macro == $hmacro['macro']){
+			foreach ($macros as $mnum => $macro) {
+				foreach ($host_macros as $hmnum => $hmacro) {
+					if ($macro == $hmacro['macro']) {
 						$result[$macro] = $hmacro['value'];
 						unset($host_macros[$hmnum], $macros[$mnum]);
 						break;
@@ -931,7 +931,7 @@ class CUserMacro extends CZBXAPI {
 				}
 			}
 
-			if(!empty($macros)){
+			if (!empty($macros)) {
 				$obj_options = array(
 					'hostids' => $hostids,
 					'nopermissions' => 1,
@@ -941,10 +941,10 @@ class CUserMacro extends CZBXAPI {
 				$hosts = API::Template()->get($obj_options);
 				$hostids = array_keys($hosts);
 			}
-		}while(!empty($macros) && !empty($hostids));
+		}while (!empty($macros) && !empty($hostids));
 
 
-		if(!empty($macros)){
+		if (!empty($macros)) {
 			$obj_options = array(
 				'output' => API_OUTPUT_EXTEND,
 				'globalmacro' => 1,
@@ -953,9 +953,9 @@ class CUserMacro extends CZBXAPI {
 			);
 			$gmacros = $this->get($obj_options);
 
-			foreach($macros as $macro){
-				foreach($gmacros as $mid => $gmacro){
-					if($macro == $gmacro['macro']){
+			foreach ($macros as $macro) {
+				foreach ($gmacros as $mid => $gmacro) {
+					if ($macro == $gmacro['macro']) {
 						$result[$macro] = $gmacro['value'];
 						unset($gmacros[$mid]);
 						break;
@@ -967,17 +967,17 @@ class CUserMacro extends CZBXAPI {
 		return $result;
 	}
 
-	public function resolveTrigger($triggers){
+	public function resolveTrigger($triggers) {
 		$single = false;
-		if(isset($triggers['triggerid'])){
+		if (isset($triggers['triggerid'])) {
 			$single = true;
 			$triggers = array($triggers);
 		}
 
-		foreach($triggers as $num => $trigger){
-			if(!isset($trigger['triggerid']) || !isset($trigger['expression'])) continue;
+		foreach ($triggers as $num => $trigger) {
+			if (!isset($trigger['triggerid']) || !isset($trigger['expression'])) continue;
 
-			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['expression'], $arr)){
+			if ($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['expression'], $arr)) {
 				$macros = $this->getMacros(array('macros' => $arr[1], 'triggerid' => $trigger['triggerid']));
 
 				$search = array_keys($macros);
@@ -987,22 +987,22 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-		if($single) $triggers = reset($triggers);
+		if ($single) $triggers = reset($triggers);
 		return $triggers;
 	}
 
 
-	public function resolveItem($items){
+	public function resolveItem($items) {
 		$single = false;
-		if(isset($items['itemid'])){
+		if (isset($items['itemid'])) {
 			$single = true;
 			$items = array($items);
 		}
 
-		foreach($items as $num => $item){
-			if(!isset($item['itemid']) || !isset($item['key_'])) continue;
+		foreach ($items as $num => $item) {
+			if (!isset($item['itemid']) || !isset($item['key_'])) continue;
 
-			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)){
+			if ($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $item['key_'], $arr)) {
 				$macros = $this->getMacros(array('macros' => $arr[1],'itemid' => $item['itemid']));
 
 				$search = array_keys($macros);
@@ -1011,7 +1011,7 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-		if($single) $items = $items[0];
+		if ($single) $items = $items[0];
 
 		return $items;
 	}

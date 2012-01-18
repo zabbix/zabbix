@@ -1476,7 +1476,7 @@
 					);
 		}
 
-		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
+		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'adm.valuemapping.php');
 		$link->setAttribute('target','_blank');
 
 		$row = new CRow(array(new CCol(S_SHOW_VALUE), new CCol(array($cmbMap, SPACE, $link))));
@@ -1843,7 +1843,7 @@
 					get_node_name_by_elid($db_valuemap["valuemapid"], null, ': ').$db_valuemap["name"]
 					);
 
-		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
+		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'adm.valuemapping.php');
 		$link->setAttribute('target','_blank');
 
 		$frmItem->addRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
