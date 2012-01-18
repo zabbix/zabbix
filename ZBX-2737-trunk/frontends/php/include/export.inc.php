@@ -912,11 +912,11 @@ class zbxXML{
 							: API::Host()->exists($host_db);
 
 					if(!$current_host && !isset($rules['host']['missed'])){
-						info('Host ['.$host_db['host'].'] skipped - user rule');
+						info('Host "'.$host_db['host'].'" skipped - user rule');
 						continue; // break if update nonexist
 					}
 					if($current_host && !isset($rules['host']['exist'])){
-						info('Host ['.$host_db['host'].'] skipped - user rule');
+						info('Host "'.$host_db['host'].'" skipped - user rule');
 						continue; // break if not update exist
 					}
 
@@ -1010,7 +1010,7 @@ class zbxXML{
 							$current_host = API::Host()->get($options);
 
 						if(empty($current_host)){
-							throw new Exception('No permission for host ['.$host_db['host'].']');
+							throw new Exception('No permission for host "'.$host_db['host'].'"');
 						}
 						else{
 							$current_host = reset($current_host);
@@ -1120,18 +1120,18 @@ class zbxXML{
 							$current_template = API::Template()->get($options);
 
 							if(empty($current_template)){
-								throw new Exception('No permission for Template ['.$template->nodeValue.']');
+								throw new Exception('No permission for Template "'.$template->nodeValue.'"');
 							}
 
 							$current_template = reset($current_template);
 
 
 							if(!$current_template && !isset($rules['template']['missed'])){
-								info('Template ['.$template->nodeValue.'] skipped - user rule');
+								info('Template "'.$template->nodeValue.'" skipped - user rule');
 								continue;
 							}
 							if($current_template && !isset($rules['template']['exist'])){
-								info('Template ['.$template->nodeValue.'] skipped - user rule');
+								info('Template "'.$template->nodeValue.'" skipped - user rule');
 								continue;
 							}
 
@@ -1624,7 +1624,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missing item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing: Item "'.$graph_db['ymin_item_key'].'" on "'.$host_db['host'].'"');
 								}
 
 								$graph_db['ymin_itemid'] = $item['itemid'];
@@ -1637,7 +1637,7 @@ class zbxXML{
 								}
 
 								if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-									throw new APIException(1, 'Missing item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
+									throw new APIException(1, 'Missing: Item "'.$graph_db['ymax_item_key'].'" on "'.$host_db['host'].'"');
 								}
 
 								$graph_db['ymax_itemid'] = $item['itemid'];

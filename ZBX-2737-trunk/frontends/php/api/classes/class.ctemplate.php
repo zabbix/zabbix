@@ -985,7 +985,7 @@ COpt::memoryPick();
 // CHECK IF HOSTS HAVE AT LEAST 1 GROUP {{{
 			foreach ($templates as $tnum => $template) {
 				if (empty($template['groups'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template [ %s ]', $template['host']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No groups for template "%s"', $template['host']));
 				}
 				$templates[$tnum]['groups'] = zbx_toArray($templates[$tnum]['groups']);
 
@@ -1739,7 +1739,7 @@ COpt::memoryPick();
 				$tmp_tpl = reset($tmp_tpls);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]', $tmp_tpl['host'], $db_dephost['host']));
+					_s('Trigger in template "%1$s" has dependency with trigger in template "%2$s"', $tmp_tpl['host'], $db_dephost['host']));
 			}
 		}
 

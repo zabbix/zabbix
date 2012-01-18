@@ -132,7 +132,7 @@ elseif (isset($_REQUEST['delete'])) {
 		show_messages($result, _('Application deleted'), _('Cannot delete application'));
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'Application ['.$app['name'].'] from host ['.$host['host'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'Application "'.$app['name'].'" on "'.$host['host'].'"');
 		}
 		unset($_REQUEST['form'], $_REQUEST['applicationid']);
 	}
@@ -155,7 +155,7 @@ elseif ($_REQUEST['go'] == 'delete') {
 		$go_result &= (bool) API::Application()->delete($db_app['applicationid']);
 		if ($go_result) {
 			$host = get_host_by_hostid($db_app['hostid']);
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'Application ['.$db_app['name'].'] from host ['.$host['host'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_APPLICATION, 'Application "'.$db_app['name'].'" on "'.$host['host'].'"');
 		}
 	}
 	$go_result = DBend($go_result);
