@@ -2209,7 +2209,7 @@ Copt::memoryPick();
 
 // TODO: remove info from API
 		foreach ($hosts as $host) {
-			info(_s('Host "%s" deleted.', $host['name']));
+			info(_s('Deleted: Host "%1$s".', $host['name']));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['name'], 'hosts', NULL, NULL);
 		}
 
