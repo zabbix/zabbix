@@ -1083,15 +1083,18 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid, unsig
  ******************************************************************************/
 static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 {
-	const char	*__function_name = "execute_operations";
+	const char		*__function_name = "execute_operations";
 
-	DB_RESULT	result;
-	DB_ROW		row;
-	unsigned char	operationtype;
-	zbx_uint64_t	objectid;
+	DB_RESULT		result;
+	DB_ROW			row;
+	unsigned char		operationtype;
+	zbx_uint64_t		objectid;
+	zbx_vector_uint64_t	new_groupids, del_groupids;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64,
-			__function_name, actionid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
+
+	zbx_vector_uint64_create(&new_groupids);
+	zbx_vector_uint64_create(&del_groupids);
 
 	result = DBselect(
 			"select operationtype,objectid"
@@ -1119,10 +1122,10 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 				op_host_disable(event);
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
-				op_group_add(event, objectid);
+				zbx_vector_uint64_append(&new_groupids, objectid);
 				break;
 			case OPERATION_TYPE_GROUP_REMOVE:
-				op_group_del(event, objectid);
+				zbx_vector_uint64_append(&del_groupids, objectid);
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
 				op_template_add(event, objectid);
@@ -1135,6 +1138,21 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 		}
 	}
 	DBfree_result(result);
+
+	if (0 != new_groupids.values_num)
+	{
+		zbx_vector_uint64_sort(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		op_group_add(event, &new_groupids);
+	}
+
+	if (0 != del_groupids.values_num)
+	{
+		zbx_vector_uint64_sort(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		op_group_del(event, &del_groupids);
+	}
+
+	zbx_vector_uint64_destroy(&del_groupids);
+	zbx_vector_uint64_destroy(&new_groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
