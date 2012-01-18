@@ -309,8 +309,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');
 
-		$sql_hash = "SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
-		$oldHash = DBhash($sql_hash);
+		$sqlHash = "SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
+		$oldHash = DBhash($sqlHash);
 
 		// update proxy name
 		$this->input_type('host', $newname);
@@ -322,7 +322,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->ok('PROXIES');
 		$this->ok($newname);
 
-		$newHash = DBhash($sql_hash);
+		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
 
 		// check that proxy name has been updated in the DB
@@ -358,8 +358,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');
 
-		$sql_hash = "SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
-		$oldHash = DBhash($sql_hash);
+		$sqlHash = "SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
+		$oldHash = DBhash($sqlHash);
 
 		// update proxy name
 		$this->button_click('clone');

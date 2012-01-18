@@ -57,8 +57,8 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->wait();
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'Housekeeper', 'Do not keep actions older than (in days)'));
 
-		$sql_hash = 'SELECT configid,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
-		$oldHash = DBhash($sql_hash);
+		$sqlHash = 'SELECT configid,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
+		$oldHash = DBhash($sqlHash);
 
 		$sql = 'SELECT alert_history FROM config WHERE alert_history=0';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "alert_history"');
@@ -90,7 +90,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->wait();
 		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "alert_history".', 'CONFIGURATION OF ZABBIX', 'Housekeeper'));
 
-		$newHash = DBhash($sql_hash);
+		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
 	}
 
@@ -103,8 +103,8 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->wait();
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'Housekeeper', 'Do not keep events older than (in days)'));
 
-		$sql_hash = 'select configid,alert_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging from config order by configid';
-		$oldHash = DBhash($sql_hash);
+		$sqlHash = 'select configid,alert_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging from config order by configid';
+		$oldHash = DBhash($sqlHash);
 
 		$sql = 'SELECT event_history FROM config WHERE event_history=0';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_history"');
@@ -136,7 +136,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->wait();
 		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "event_history".', 'CONFIGURATION OF ZABBIX', 'Housekeeper', 'Do not keep events older than (in days)'));
 
-		$newHash = DBhash($sql_hash);
+		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
 	}
 }
