@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,60 +30,65 @@ class CZabbixAutoloader {
 	 *
 	 * @var array
 	 */
-	protected $includeDirs = array();
-
+	protected $includePaths = array();
 
 	/**
-	 * Attempts to find and load the given class in the current include directories.
+	 * Constructor initialize object with array of include paths.
 	 *
-	 * @param $className
-	 *
-	 * @return null
+	 * @param array $includePaths absolute paths
 	 */
-	public function load($className) {
-		foreach ($this->includeDirs as $dir) {
-			if ($this->requireClass($className, $dir)) {
-				return;
-			}
-		}
+	public function __construct(array $includePaths) {
+		$this->includePaths = $includePaths;
 	}
 
-
 	/**
-	 * Adds an array of include directories to the current $includeDirs array.
-	 *
-	 * @param array $dirs
-	 * @param string $prefix
-	 */
-	public function addIncludeDirs(array $dirs, $prefix = '') {
-		foreach ($dirs as $path) {
-			$this->includeDirs[] = $prefix.$path;
-		}
-	}
-
-
-	/**
-	 * Attempts to load the class $className from the directory $dir.
-	 *
-	 * @param $className
-	 * @param $dir
+	 * Add "loadClass" method as autoload handler.
 	 *
 	 * @return bool
 	 */
-	protected function requireClass($className, $dir) {
-		// try the new file name first
-		$path = $dir.'/'.$className.'.php';
-		if (!is_file($path)) {
-			// fallback to the old file name
-			$path = $dir.'/class.'.strtolower($className).'.php';
-			if (!is_file($path)) {
-				return false;
+	public function register() {
+		return spl_autoload_register(array($this, 'loadClass'));
+	}
+
+	/**
+	 * Attempts to find and load the given class.
+	 *
+	 * @param $className
+	 */
+	protected function loadClass($className) {
+		if ($classFile = $this->findClassFile($className)) {
+			require_once $classFile;
+		}
+	}
+
+	/**
+	 * Attempts to find corresponfing file for given class name in the current include directories.
+	 *
+	 * @param string $className
+	 *
+	 * @return bool|string
+	 */
+	protected function findClassFile($className) {
+		$foundFile = false;
+
+		foreach ($this->includePaths as $includePath) {
+			$filePath = $includePath.$className.'.php';
+
+			if (is_file($filePath)) {
+				$foundFile = $filePath;
+				break;
+			}
+			else {
+				// fallback to old class names
+				$filePath = $includePath.'class.'.strtolower($className).'.php';
+				if (is_file($filePath)) {
+					$foundFile = $filePath;
+					break;
+				}
 			}
 		}
 
-		require_once $path;
-
-		return true;
+		return $foundFile;
 	}
 
 }
