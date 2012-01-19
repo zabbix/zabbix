@@ -33,7 +33,7 @@ class CZabbixAutoloader {
 	protected $includePaths = array();
 
 	/**
-	 * Constructor initialize object with array of include paths.
+	 * Initializes object with array of include paths.
 	 *
 	 * @param array $includePaths absolute paths
 	 */
@@ -42,7 +42,7 @@ class CZabbixAutoloader {
 	}
 
 	/**
-	 * Add "loadClass" method as autoload handler.
+	 * Add "loadClass" method as an autoload handler.
 	 *
 	 * @return bool
 	 */
@@ -62,7 +62,7 @@ class CZabbixAutoloader {
 	}
 
 	/**
-	 * Attempts to find corresponfing file for given class name in the current include directories.
+	 * Attempts to find corresponding file for given class name in the current include directories.
 	 *
 	 * @param string $className
 	 *
@@ -72,7 +72,7 @@ class CZabbixAutoloader {
 		$foundFile = false;
 
 		foreach ($this->includePaths as $includePath) {
-			$filePath = $includePath.$className.'.php';
+			$filePath = $includePath.'/'.$className.'.php';
 
 			if (is_file($filePath)) {
 				$foundFile = $filePath;
@@ -80,7 +80,7 @@ class CZabbixAutoloader {
 			}
 			else {
 				// fallback to old class names
-				$filePath = $includePath.'class.'.strtolower($className).'.php';
+				$filePath = $includePath.'/class.'.strtolower($className).'.php';
 				if (is_file($filePath)) {
 					$foundFile = $filePath;
 					break;
