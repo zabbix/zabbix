@@ -95,7 +95,7 @@ class CTabView extends CDiv {
 			if ($this->rememberTab) {
 				$options['cookie'] = array();
 			}
-			zbx_add_post_js('jQuery(function() { jQuery( "#'.$this->id.'" ).tabs('.zbx_jsvalue($options, true).').show(); });');
+			zbx_add_post_js('jQuery( "#'.$this->id.'" ).tabs('.zbx_jsvalue($options, true).').show();');
 		}
 		return parent::toString($destroy);
 	}
