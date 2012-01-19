@@ -648,7 +648,7 @@ function item_type2str($type = null){
 		global $USER_DETAILS;
 
 		if (is_null($view_style)) {
-			$view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
+			$view_style = CProfile::get('web.overview.view.style', STYLE_TOP);
 		}
 
 		$table = new CTableInfo(_('No items defined.'));
