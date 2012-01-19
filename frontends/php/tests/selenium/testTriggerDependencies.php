@@ -27,7 +27,7 @@ class testTriggerDependenciesFromHost extends CWebTest {
 	* @dataProvider testTriggerDependenciesFromHost_SimpleTestProvider
 	*/
 	public function testTriggerDependenciesFromHost_SimpleTest($hostId, $expected) {
-		//$this->login('index.php');
+
 		$this->login('triggers.php?groupid=1&hostid='.$hostId);
 
 		$this->button_click("link=/etc/inetd.conf has been changed on server {HOST.NAME}");
@@ -52,7 +52,7 @@ class testTriggerDependenciesFromHost extends CWebTest {
 
 	public function testTriggerDependenciesFromHost_SimpleTestProvider() {
 		return array (
-			array('10055', 'Cannot add dependency from template to host'),     //for Hudson standard server 10054
+			array('10054', 'Cannot add dependency from template to host'),
 			array('10001', 'Trigger updated')
 		);
 	}
