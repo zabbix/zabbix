@@ -108,7 +108,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$table->show();
 	}
 	insert_js($post_script);
-	include_js('js/post.js');
 
 	echo '</body>'."\n".
 		'</html>'."\n";
