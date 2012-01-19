@@ -44,12 +44,12 @@ class CGraphItem extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('gitemid');
+		$sortColumns = array('gitemid');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('gitems' => 'gi.gitemid'),
 			'from'		=> array('graphs_items' => 'graphs_items gi'),
 			'where'		=> array(),
@@ -82,17 +82,17 @@ class CGraphItem extends CZBXAPI {
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['from']['rights'] = 'rights r';
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
-			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sql_parts['where'][] = 'r.id=hg.groupid ';
-			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sql_parts['where'][] = 'ug.userid='.$userid;
-			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS ('.
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['from']['rights'] = 'rights r';
+			$sqlParts['from']['users_groups'] = 'users_groups ug';
+			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sqlParts['where'][] = 'r.id=hg.groupid ';
+			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+			$sqlParts['where'][] = 'ug.userid='.$userid;
+			$sqlParts['where'][] = 'r.permission>='.$permission;
+			$sqlParts['where'][] = 'NOT EXISTS ('.
 										' SELECT hgg.groupid'.
 										' FROM hosts_groups hgg,rights rr,users_groups ugg'.
 										' WHERE i.hostid=hgg.hostid'.
@@ -109,88 +109,88 @@ class CGraphItem extends CZBXAPI {
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['graphid'] = 'gi.graphid';
+				$sqlParts['select']['graphid'] = 'gi.graphid';
 			}
-			$sql_parts['from']['graphs'] = 'graphs g';
-			$sql_parts['where']['gig'] = 'gi.graphid=g.graphid';
-			$sql_parts['where'][] = DBcondition('g.graphid', $options['graphids']);
+			$sqlParts['from']['graphs'] = 'graphs g';
+			$sqlParts['where']['gig'] = 'gi.graphid=g.graphid';
+			$sqlParts['where'][] = DBcondition('g.graphid', $options['graphids']);
 		}
 
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['itemid'] = 'gi.itemid';
+				$sqlParts['select']['itemid'] = 'gi.itemid';
 			}
-			$sql_parts['where'][] = DBcondition('gi.itemid', $options['itemids']);
+			$sqlParts['where'][] = DBcondition('gi.itemid', $options['itemids']);
 		}
 
 		// type
 		if (!is_null($options['type'] )) {
-			$sql_parts['where'][] = 'gi.type='.$options['type'];
+			$sqlParts['where'][] = 'gi.type='.$options['type'];
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['gitems'] = 'gi.*';
+			$sqlParts['select']['gitems'] = 'gi.*';
 		}
 
 		// expandData
 		if (!is_null($options['expandData'])) {
-			$sql_parts['select']['key'] = 'i.key_';
-			$sql_parts['select']['hostid'] = 'i.hostid';
-			$sql_parts['select']['host'] = 'h.host';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts'] = 'hosts h';
-			$sql_parts['where']['gii'] = 'gi.itemid=i.itemid';
-			$sql_parts['where']['hi'] = 'h.hostid=i.hostid';
+			$sqlParts['select']['key'] = 'i.key_';
+			$sqlParts['select']['hostid'] = 'i.hostid';
+			$sqlParts['select']['host'] = 'h.host';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['from']['hosts'] = 'hosts h';
+			$sqlParts['where']['gii'] = 'gi.itemid=i.itemid';
+			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(DISTINCT gi.gitemid) as rowscount');
+			$sqlParts['select'] = array('count(DISTINCT gi.gitemid) as rowscount');
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'gi');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'gi');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$gitemids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
-		$sql_limit = $sql_parts['limit'];
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
 				' WHERE '.DBin_node('gi.gitemid', $nodeids).
-					$sql_where.
-					$sql_order;
-		$db_res = DBselect($sql, $sql_limit);
+					$sqlWhere.
+					$sqlOrder;
+		$db_res = DBselect($sql, $sqlLimit);
 		while ($gitem = DBfetch($db_res)) {
 			if (!is_null($options['countOutput'])) {
 				$result = $gitem['rowscount'];
@@ -224,13 +224,13 @@ class CGraphItem extends CZBXAPI {
 
 		// adding graphs
 		if (!is_null($options['selectGraphs']) && str_in_array($options['selectGraphs'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectGraphs'],
 				'gitemids' => $gitemids,
 				'preservekeys' => true
 			);
-			$graphs = API::Graph()->get($obj_params);
+			$graphs = API::Graph()->get($objParams);
 			foreach ($graphs as $graphid => $graph) {
 				$gitems = $graph['gitems'];
 				unset($graph['gitems']);

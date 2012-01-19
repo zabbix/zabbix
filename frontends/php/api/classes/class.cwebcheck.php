@@ -34,12 +34,12 @@ class CWebCheck extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('httptestid', 'name');
+		$sortColumns = array('httptestid', 'name');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('httptests' => 'ht.httptestid'),
 			'from'		=> array('httptest' => 'httptest ht'),
 			'where'		=> array(),
@@ -80,17 +80,17 @@ class CWebCheck extends CZBXAPI {
 		else {
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['from']['rights'] = 'rights r';
-			$sql_parts['from']['applications'] = 'applications a';
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
-			$sql_parts['where'][] = 'a.applicationid=ht.applicationid';
-			$sql_parts['where'][] = 'hg.hostid=a.hostid';
-			$sql_parts['where'][] = 'r.id=hg.groupid ';
-			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sql_parts['where'][] = 'ug.userid='.$userid;
-			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS ('.
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['from']['rights'] = 'rights r';
+			$sqlParts['from']['applications'] = 'applications a';
+			$sqlParts['from']['users_groups'] = 'users_groups ug';
+			$sqlParts['where'][] = 'a.applicationid=ht.applicationid';
+			$sqlParts['where'][] = 'hg.hostid=a.hostid';
+			$sqlParts['where'][] = 'r.id=hg.groupid ';
+			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+			$sqlParts['where'][] = 'ug.userid='.$userid;
+			$sqlParts['where'][] = 'r.permission>='.$permission;
+			$sqlParts['where'][] = 'NOT EXISTS ('.
 									' SELECT hgg.groupid'.
 									' FROM hosts_groups hgg,rights rr,users_groups gg'.
 									' WHERE hgg.hostid=hg.hostid'.
@@ -108,9 +108,9 @@ class CWebCheck extends CZBXAPI {
 			zbx_value2array($options['httptestids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['httptestid'] = 'ht.httptestid';
+				$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			}
-			$sql_parts['where']['httptestid'] = DBcondition('ht.httptestid', $options['httptestids']);
+			$sqlParts['where']['httptestid'] = DBcondition('ht.httptestid', $options['httptestids']);
 		}
 
 		// hostids
@@ -118,14 +118,14 @@ class CWebCheck extends CZBXAPI {
 			zbx_value2array($options['hostids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['hostid'] = 'a.hostid';
+				$sqlParts['select']['hostid'] = 'a.hostid';
 			}
-			$sql_parts['from']['applications'] = 'applications a';
-			$sql_parts['where'][] = 'a.applicationid=ht.applicationid';
-			$sql_parts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
+			$sqlParts['from']['applications'] = 'applications a';
+			$sqlParts['where'][] = 'a.applicationid=ht.applicationid';
+			$sqlParts['where']['hostid'] = DBcondition('a.hostid', $options['hostids']);
 
 			if (!is_null($options['groupCount'])) {
-				$sql_parts['group']['hostid'] = 'a.hostid';
+				$sqlParts['group']['hostid'] = 'a.hostid';
 			}
 		}
 
@@ -134,84 +134,84 @@ class CWebCheck extends CZBXAPI {
 			zbx_value2array($options['applicationids']);
 
 			if ($options['output'] != API_OUTPUT_EXTEND) {
-				$sql_parts['select']['applicationid'] = 'a.applicationid';
+				$sqlParts['select']['applicationid'] = 'a.applicationid';
 			}
-			$sql_parts['where'][] = DBcondition('ht.applicationid', $options['applicationids']);
+			$sqlParts['where'][] = DBcondition('ht.applicationid', $options['applicationids']);
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['httptests'] = 'ht.*';
+			$sqlParts['select']['httptests'] = 'ht.*';
 		}
 
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(ht.httptestid) as rowscount');
+			$sqlParts['select'] = array('count(ht.httptestid) as rowscount');
 
 			// groupCount
 			if (!is_null($options['groupCount'])) {
-				foreach ($sql_parts['group'] as $key => $fields) {
-					$sql_parts['select'][$key] = $fields;
+				foreach ($sqlParts['group'] as $key => $fields) {
+					$sqlParts['select'][$key] = $fields;
 				}
 			}
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('httptest ht', $options, $sql_parts);
+			zbx_db_search('httptest ht', $options, $sqlParts);
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('httptest ht', $options, $sql_parts);
+			zbx_db_filter('httptest ht', $options, $sqlParts);
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'ht');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'ht');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$webcheckids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['group'] = array_unique($sql_parts['group']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['group'] = array_unique($sqlParts['group']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_group = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlGroup = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['group'])) {
-			$sql_where .= ' GROUP BY '.implode(',', $sql_parts['group']);
+		if (!empty($sqlParts['group'])) {
+			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
-		$sql_limit = $sql_parts['limit'];
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
 				' WHERE '.DBin_node('ht.httptestid', $nodeids).
-					$sql_where.
-					$sql_group.
-					$sql_order;
-		$res = DBselect($sql, $sql_limit);
+					$sqlWhere.
+					$sqlGroup.
+					$sqlOrder;
+		$res = DBselect($sql, $sqlLimit);
 		while ($webcheck = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -259,13 +259,13 @@ class CWebCheck extends CZBXAPI {
 
 		// adding hosts
 		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+			$objParams = array(
 				'output' => $options['selectHosts'],
 				'webcheckids' => $webcheckids,
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			$hosts = API::Host()->get($obj_params);
+			$hosts = API::Host()->get($objParams);
 			foreach ($hosts as $hostid => $host) {
 				$hwebchecks = $host['webchecks'];
 				unset($host['webchecks']);
@@ -363,7 +363,7 @@ class CWebCheck extends CZBXAPI {
 				));
 				$webcheck_exist = reset($webcheck_exist);
 
-				if ($webcheck_exist && (bccomp($webcheck_exist['webcheckid'],$webcheck_exist['webcheckid']) != 0)) {
+				if ($webcheck_exist && (bccomp($webcheck_exist['webcheckid'], $webcheck_exist['webcheckid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $webcheck['name']));
 				}
 			}

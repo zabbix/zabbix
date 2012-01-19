@@ -57,12 +57,12 @@ class CEvent extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('eventid', 'object', 'objectid');
+		$sortColumns = array('eventid', 'object', 'objectid');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('events' => array('e.eventid')),
 			'from'		=> array('events' => 'events e'),
 			'where'		=> array(),
@@ -132,20 +132,20 @@ class CEvent extends CZBXAPI {
 				else {
 					$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
-					$sql_parts['from']['functions'] = 'functions f';
-					$sql_parts['from']['items'] = 'items i';
-					$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-					$sql_parts['from']['rights'] = 'rights r';
-					$sql_parts['from']['users_groups'] = 'users_groups ug';
-					$sql_parts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
-					$sql_parts['where']['fe'] = 'f.triggerid=e.objectid';
-					$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
-					$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-					$sql_parts['where'][] = 'r.id=hg.groupid ';
-					$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-					$sql_parts['where'][] = 'ug.userid='.$userid;
-					$sql_parts['where'][] = 'r.permission>='.$permission;
-					$sql_parts['where'][] = 'NOT EXISTS ('.
+					$sqlParts['from']['functions'] = 'functions f';
+					$sqlParts['from']['items'] = 'items i';
+					$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+					$sqlParts['from']['rights'] = 'rights r';
+					$sqlParts['from']['users_groups'] = 'users_groups ug';
+					$sqlParts['where']['e'] = 'e.object='.EVENT_OBJECT_TRIGGER;
+					$sqlParts['where']['fe'] = 'f.triggerid=e.objectid';
+					$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+					$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+					$sqlParts['where'][] = 'r.id=hg.groupid ';
+					$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+					$sqlParts['where'][] = 'ug.userid='.$userid;
+					$sqlParts['where'][] = 'r.permission>='.$permission;
+					$sqlParts['where'][] = 'NOT EXISTS ('.
 												' SELECT ff.triggerid'.
 												' FROM functions ff,items ii'.
 												' WHERE ff.triggerid=e.objectid'.
@@ -168,22 +168,22 @@ class CEvent extends CZBXAPI {
 		// eventids
 		if (!is_null($options['eventids'])) {
 			zbx_value2array($options['eventids']);
-			$sql_parts['where'][] = DBcondition('e.eventid', $options['eventids']);
+			$sqlParts['where'][] = DBcondition('e.eventid', $options['eventids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('e.objectid', $nodeids);
+				$sqlParts['where'][] = DBin_node('e.objectid', $nodeids);
 			}
 		}
 
 		// triggerids
 		if (!is_null($options['triggerids']) && $options['object'] == EVENT_OBJECT_TRIGGER) {
 			zbx_value2array($options['triggerids']);
-			$sql_parts['where'][] = DBcondition('e.objectid', $options['triggerids']);
+			$sqlParts['where'][] = DBcondition('e.objectid', $options['triggerids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('e.objectid', $nodeids);
+				$sqlParts['where'][] = DBin_node('e.objectid', $nodeids);
 			}
 		}
 
@@ -192,15 +192,15 @@ class CEvent extends CZBXAPI {
 			zbx_value2array($options['groupids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['groupid'] = 'hg.groupid';
+				$sqlParts['select']['groupid'] = 'hg.groupid';
 			}
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['where']['hg'] = DBcondition('hg.groupid', $options['groupids']);
-			$sql_parts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sql_parts['where']['fe'] = 'f.triggerid=e.objectid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['where']['hg'] = DBcondition('hg.groupid', $options['groupids']);
+			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+			$sqlParts['where']['fe'] = 'f.triggerid=e.objectid';
+			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 		// hostids
@@ -208,34 +208,34 @@ class CEvent extends CZBXAPI {
 			zbx_value2array($options['hostids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['hostid'] = 'i.hostid';
+				$sqlParts['select']['hostid'] = 'i.hostid';
 			}
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
-			$sql_parts['where']['ft'] = 'f.triggerid=e.objectid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['where']['i'] = DBcondition('i.hostid', $options['hostids']);
+			$sqlParts['where']['ft'] = 'f.triggerid=e.objectid';
+			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
 		// should last, after all ****IDS checks
 		if (!$nodeCheck) {
 			$nodeCheck = true;
-			$sql_parts['where'][] = DBin_node('e.eventid', $nodeids);
+			$sqlParts['where'][] = DBin_node('e.eventid', $nodeids);
 		}
 
 		// object
 		if (!is_null($options['object'])) {
-			$sql_parts['where']['o'] = 'e.object='.$options['object'];
+			$sqlParts['where']['o'] = 'e.object='.$options['object'];
 		}
 
 		// source
 		if (!is_null($options['source'])) {
-			$sql_parts['where'][] = 'e.source='.$options['source'];
+			$sqlParts['where'][] = 'e.source='.$options['source'];
 		}
 
 		// acknowledged
 		if (!is_null($options['acknowledged'])) {
-			$sql_parts['where'][] = 'e.acknowledged='.($options['acknowledged']?1:0);
+			$sqlParts['where'][] = 'e.acknowledged='.($options['acknowledged']?1:0);
 		}
 
 		// showUnknown
@@ -248,101 +248,101 @@ class CEvent extends CZBXAPI {
 
 		// time_from
 		if (!is_null($options['time_from'])) {
-			$sql_parts['where'][] = 'e.clock>='.$options['time_from'];
+			$sqlParts['where'][] = 'e.clock>='.$options['time_from'];
 		}
 
 		// time_till
 		if (!is_null($options['time_till'])) {
-			$sql_parts['where'][] = 'e.clock<='.$options['time_till'];
+			$sqlParts['where'][] = 'e.clock<='.$options['time_till'];
 		}
 
 		// eventid_from
 		if (!is_null($options['eventid_from'])) {
-			$sql_parts['where'][] = 'e.eventid>='.$options['eventid_from'];
+			$sqlParts['where'][] = 'e.eventid>='.$options['eventid_from'];
 		}
 
 		// eventid_till
 		if (!is_null($options['eventid_till'])) {
-			$sql_parts['where'][] = 'e.eventid<='.$options['eventid_till'];
+			$sqlParts['where'][] = 'e.eventid<='.$options['eventid_till'];
 		}
 
 		// value
 		if (!is_null($options['value'])) {
 			zbx_value2array($options['value']);
-			$sql_parts['where'][] = DBcondition('e.value', $options['value']);
+			$sqlParts['where'][] = DBcondition('e.value', $options['value']);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('events e', $options, $sql_parts);
+			zbx_db_search('events e', $options, $sqlParts);
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('events e', $options, $sql_parts);
+			zbx_db_filter('events e', $options, $sqlParts);
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['events'] = array('e.*');
+			$sqlParts['select']['events'] = array('e.*');
 		}
 
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array(
+			$sqlParts['select'] = array(
 				'events' => array('COUNT(DISTINCT e.eventid) AS rowscount')
 			);
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, $this->tableAlias());
+		zbx_db_sorting($sqlParts, $options, $sortColumns, $this->tableAlias());
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		// selectHosts, selectTriggers, selectItems
 		if ($options['output'] != API_OUTPUT_EXTEND && (!is_null($options['selectHosts']) || !is_null($options['selectTriggers']) || !is_null($options['selectItems']))) {
-			$sql_parts['select']['events'][] = 'e.object';
-			$sql_parts['select']['events'][] = 'e.objectid';
+			$sqlParts['select']['events'][] = 'e.object';
+			$sqlParts['select']['events'][] = 'e.objectid';
 		}
 
 		$eventids = array();
 		$triggerids = array();
 
 		// event fields
-		$sql_parts['select']['events'] = implode(',', array_unique($sql_parts['select']['events']));
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select']['events'] = implode(',', array_unique($sqlParts['select']['events']));
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
-		$sql_limit = $sql_parts['limit'];
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
 				' WHERE '.
-					$sql_where.
-					$sql_order;
-		$db_res = DBselect($sql, $sql_limit);
+					$sqlWhere.
+					$sqlOrder;
+		$db_res = DBselect($sql, $sqlLimit);
 		while ($event = DBfetch($db_res)) {
 			if ($options['countOutput']) {
 				$result = $event['rowscount'];
@@ -416,14 +416,14 @@ class CEvent extends CZBXAPI {
 		 */
 		// adding hosts
 		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectHosts'],
 				'triggerids' => $triggerids,
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			$hosts = API::Host()->get($obj_params);
+			$hosts = API::Host()->get($objParams);
 
 			$triggers = array();
 			foreach ($hosts as $hostid => $host) {
@@ -450,14 +450,14 @@ class CEvent extends CZBXAPI {
 
 		// adding triggers
 		if (!is_null($options['selectTriggers']) && str_in_array($options['selectTriggers'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectTriggers'],
 				'triggerids' => $triggerids,
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			$triggers = API::Trigger()->get($obj_params);
+			$triggers = API::Trigger()->get($objParams);
 			foreach ($result as $eventid => $event) {
 				if (isset($triggers[$event['objectid']])) {
 					$result[$eventid]['triggers'][] = $triggers[$event['objectid']];
@@ -470,7 +470,7 @@ class CEvent extends CZBXAPI {
 
 		// adding items
 		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
@@ -479,7 +479,7 @@ class CEvent extends CZBXAPI {
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			$db_items = API::Item()->get($obj_params);
+			$db_items = API::Item()->get($objParams);
 			$items = array();
 			foreach ($db_items as $itemid => $item) {
 				$itriggers = $item['triggers'];
@@ -504,7 +504,7 @@ class CEvent extends CZBXAPI {
 
 		// adding alerts
 		if (!is_null($options['select_alerts']) && str_in_array($options['select_alerts'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+			$objParams = array(
 				'output' => $options['select_alerts'],
 				'selectMediatypes' => API_OUTPUT_EXTEND,
 				'nodeids' => $nodeids,
@@ -514,7 +514,7 @@ class CEvent extends CZBXAPI {
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN
 			);
-			$dbAlerts = API::Alert()->get($obj_params);
+			$dbAlerts = API::Alert()->get($objParams);
 			foreach ($dbAlerts as $alert) {
 				$result[$alert['eventid']]['alerts'][] = $alert;
 			}
@@ -617,7 +617,7 @@ class CEvent extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for Event');
 				}
 
-				$eventid = get_dbid('events','eventid');
+				$eventid = get_dbid('events', 'eventid');
 				$sql = 'INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged) '.
 						' VALUES ('.$eventid.','.
 									$event['source'].','.

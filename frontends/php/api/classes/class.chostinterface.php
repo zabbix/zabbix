@@ -55,12 +55,12 @@ class CHostInterface extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('interfaceid', 'dns', 'ip');
+		$sortColumns = array('interfaceid', 'dns', 'ip');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('interface' => 'hi.interfaceid'),
 			'from'		=> array('interface' => 'interface hi'),
 			'where'		=> array(),
@@ -100,13 +100,13 @@ class CHostInterface extends CZBXAPI {
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
-			unset($sql_parts['select']['interface']);
+			unset($sqlParts['select']['interface']);
 
 			$dbTable = DB::getSchema('interface');
-			$sql_parts['select']['interfaceid'] = 'hi.interfaceid';
+			$sqlParts['select']['interfaceid'] = 'hi.interfaceid';
 			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
-					$sql_parts['select'][$field] = 'hi.'.$field;
+					$sqlParts['select'][$field] = 'hi.'.$field;
 				}
 			}
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -120,15 +120,15 @@ class CHostInterface extends CZBXAPI {
 
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
 
-			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sql_parts['from']['rights'] = 'rights r';
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
-			$sql_parts['where'][] = 'hg.hostid=hi.hostid';
-			$sql_parts['where'][] = 'r.id=hg.groupid ';
-			$sql_parts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sql_parts['where'][] = 'ug.userid='.$userid;
-			$sql_parts['where'][] = 'r.permission>='.$permission;
-			$sql_parts['where'][] = 'NOT EXISTS( '.
+			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['from']['rights'] = 'rights r';
+			$sqlParts['from']['users_groups'] = 'users_groups ug';
+			$sqlParts['where'][] = 'hg.hostid=hi.hostid';
+			$sqlParts['where'][] = 'r.id=hg.groupid ';
+			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+			$sqlParts['where'][] = 'ug.userid='.$userid;
+			$sqlParts['where'][] = 'r.permission>='.$permission;
+			$sqlParts['where'][] = 'NOT EXISTS( '.
 								' SELECT hgg.groupid '.
 								' FROM hosts_groups hgg, rights rr, users_groups gg '.
 								' WHERE hgg.hostid=hg.hostid '.
@@ -144,23 +144,23 @@ class CHostInterface extends CZBXAPI {
 // interfaceids
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
-			$sql_parts['where']['interfaceid'] = DBcondition('hi.interfaceid', $options['interfaceids']);
+			$sqlParts['where']['interfaceid'] = DBcondition('hi.interfaceid', $options['interfaceids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('hi.interfaceid', $nodeids);
+				$sqlParts['where'][] = DBin_node('hi.interfaceid', $nodeids);
 			}
 		}
 
 // hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
-			$sql_parts['select']['hostid'] = 'hi.hostid';
-			$sql_parts['where']['hostid'] = DBcondition('hi.hostid', $options['hostids']);
+			$sqlParts['select']['hostid'] = 'hi.hostid';
+			$sqlParts['where']['hostid'] = DBcondition('hi.hostid', $options['hostids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('hi.hostid', $nodeids);
+				$sqlParts['where'][] = DBin_node('hi.hostid', $nodeids);
 			}
 		}
 
@@ -168,16 +168,16 @@ class CHostInterface extends CZBXAPI {
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['itemid'] = 'i.itemid';
+				$sqlParts['select']['itemid'] = 'i.itemid';
 			}
 
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
-			$sql_parts['where']['hi'] = 'hi.hostid=i.hostid';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
+			$sqlParts['where']['hi'] = 'hi.hostid=i.hostid';
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('i.itemid', $nodeids);
+				$sqlParts['where'][] = DBin_node('i.itemid', $nodeids);
 			}
 		}
 
@@ -185,18 +185,18 @@ class CHostInterface extends CZBXAPI {
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['triggerid'] = 'f.triggerid';
+				$sqlParts['select']['triggerid'] = 'f.triggerid';
 			}
 
-			$sql_parts['from']['functions'] = 'functions f';
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
-			$sql_parts['where']['hi'] = 'hi.hostid=i.hostid';
-			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['where'][] = DBcondition('f.triggerid', $options['triggerids']);
+			$sqlParts['where']['hi'] = 'hi.hostid=i.hostid';
+			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('f.triggerid', $nodeids);
+				$sqlParts['where'][] = DBin_node('f.triggerid', $nodeids);
 			}
 		}
 
@@ -204,74 +204,74 @@ class CHostInterface extends CZBXAPI {
 // should last, after all ****IDS checks
 		if (!$nodeCheck) {
 			$nodeCheck = true;
-			$sql_parts['where'][] = DBin_node('hi.interfaceid', $nodeids);
+			$sqlParts['where'][] = DBin_node('hi.interfaceid', $nodeids);
 		}
 
 // output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['interface'] = 'hi.*';
+			$sqlParts['select']['interface'] = 'hi.*';
 		}
 
 // countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(DISTINCT hi.interfaceid) as rowscount');
+			$sqlParts['select'] = array('count(DISTINCT hi.interfaceid) as rowscount');
 
 //groupCount
 			if (!is_null($options['groupCount'])) {
-				foreach ($sql_parts['group'] as $key => $fields) {
-					$sql_parts['select'][$key] = $fields;
+				foreach ($sqlParts['group'] as $key => $fields) {
+					$sqlParts['select'][$key] = $fields;
 				}
 			}
 		}
 
 // search
 		if (is_array($options['search'])) {
-			zbx_db_search('interface hi', $options, $sql_parts);
+			zbx_db_search('interface hi', $options, $sqlParts);
 		}
 
 // filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('interface hi', $options, $sql_parts);
+			zbx_db_filter('interface hi', $options, $sqlParts);
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'hi');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'hi');
 
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 //-------
 
 
 		$interfaceids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['group'] = array_unique($sql_parts['group']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['group'] = array_unique($sqlParts['group']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_group = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if (!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if (!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
-		if (!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
-		if (!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
-		$sql_limit = $sql_parts['limit'];
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlGroup = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
+		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
+		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
+		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
+		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
-				' WHERE '.$sql_where.
-				$sql_group.
-				$sql_order;
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
+				' WHERE '.$sqlWhere.
+				$sqlGroup.
+				$sqlOrder;
 //SDI($sql);
-		$res = DBselect($sql, $sql_limit);
+		$res = DBselect($sql, $sqlLimit);
 		while ($interface = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
@@ -318,15 +318,15 @@ Copt::memoryPick();
 // Adding Objects
 // Adding Hosts
 		if (!is_null($options['selectHosts'])) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
 				'preservekeys' => 1
 			);
 
 			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
-				$obj_params['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($obj_params);
+				$objParams['output'] = $options['selectHosts'];
+				$hosts = API::Host()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) order_result($hosts, 'host');
 
@@ -346,11 +346,11 @@ Copt::memoryPick();
 					}
 				}
 			}
-			else if (API_OUTPUT_COUNT == $options['selectHosts']) {
-				$obj_params['countOutput'] = 1;
-				$obj_params['groupCount'] = 1;
+			elseif (API_OUTPUT_COUNT == $options['selectHosts']) {
+				$objParams['countOutput'] = 1;
+				$objParams['groupCount'] = 1;
 
-				$hosts = API::Host()->get($obj_params);
+				$hosts = API::Host()->get($objParams);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach ($result as $templateid => $template) {
 					if (isset($hosts[$templateid]))
@@ -363,7 +363,7 @@ Copt::memoryPick();
 
 // Adding Items
 		if (!is_null($options['selectItems'])) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -371,8 +371,8 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)) {
-				$obj_params['output'] = $options['selectItems'];
-				$items = API::Item()->get($obj_params);
+				$objParams['output'] = $options['selectItems'];
+				$items = API::Item()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) order_result($items, 'name');
 
@@ -388,11 +388,11 @@ Copt::memoryPick();
 					$result[$item['interfaceid']]['items'][] = &$items[$itemid];
 				}
 			}
-			else if (API_OUTPUT_COUNT == $options['selectItems']) {
-				$obj_params['countOutput'] = 1;
-				$obj_params['groupCount'] = 1;
+			elseif (API_OUTPUT_COUNT == $options['selectItems']) {
+				$objParams['countOutput'] = 1;
+				$objParams['groupCount'] = 1;
 
-				$items = API::Item()->get($obj_params);
+				$items = API::Item()->get($objParams);
 				$items = zbx_toHash($items, 'interfaceid');
 				foreach ($result as $interfaceid => $interface) {
 					if (isset($items[$interfaceid]))
