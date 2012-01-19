@@ -653,17 +653,17 @@ require_once('include/page_header.php');
 			}
 			$templates_output[] = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid'].url_param('groupid'));
 
-			$applications = array(new CLink(S_APPLICATIONS,'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
+			$applications = array(new CLink(_('Applications'), 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['applications'].')');
-			$items = array(new CLink(S_ITEMS,'items.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
+			$items = array(new CLink(_('Items'), 'items.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['items'].')');
-			$triggers = array(new CLink(S_TRIGGERS,'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
+			$triggers = array(new CLink(_('Triggers'), 'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['triggers'].')');
-			$graphs = array(new CLink(S_GRAPHS,'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
+			$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['graphs'].')');
-			$screens = array(new CLink(S_SCREENS,'screenconf.php?templateid='.$template['templateid']),
+			$screens = array(new CLink(_('Screens'), 'screenconf.php?templateid='.$template['templateid']),
 				' ('.$template['screens'].')');
-			$discoveries = array(new CLink(S_DISCOVERY, 'host_discovery.php?&hostid='.$template['hostid']),
+			$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$template['hostid']),
 				' ('.$template['discoveries'].')');
 
 
@@ -735,8 +735,8 @@ require_once('include/page_header.php');
 				$graphs,
 				$screens,
 				$discoveries,
-				(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output,'wraptext')),
-				(empty($linked_to_output) ? '-' : new CCol($linked_to_output,'wraptext'))
+				(empty($linked_templates_output) ? '-' : new CCol($linked_templates_output, 'wraptext')),
+				(empty($linked_to_output) ? '-' : new CCol($linked_to_output, 'wraptext'))
 			));
 		}
 
@@ -748,13 +748,13 @@ require_once('include/page_header.php');
 		$goOption->setAttribute('confirm', S_DELETE_SELECTED_TEMPLATES_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
-		$goOption->setAttribute('confirm',S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR);
+		$goOption = new CComboItem('delete_and_clear', S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
+		$goOption->setAttribute('confirm', S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR);
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO);
-		$goButton->setAttribute('id','goButton');
+		$goButton = new CSubmit('goButton', _('Go'));
+		$goButton->setAttribute('id', 'goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "templates";');
 

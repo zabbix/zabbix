@@ -61,12 +61,12 @@ class CMap extends CMapElement {
 		$user_type = self::$userData['type'];
 
 		// allowed columns for sorting
-		$sort_columns = array('name', 'width', 'height');
+		$sortColumns = array('name', 'width', 'height');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('sysmaps' => 's.sysmapid'),
 			'from'		=> array('sysmaps' => 'sysmaps s'),
 			'where'		=> array(),
@@ -101,13 +101,13 @@ class CMap extends CMapElement {
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
-			unset($sql_parts['select']['sysmaps']);
+			unset($sqlParts['select']['sysmaps']);
 
 			$dbTable = DB::getSchema('sysmaps');
-			$sql_parts['select']['sysmapid'] = 's.sysmapid';
+			$sqlParts['select']['sysmapid'] = 's.sysmapid';
 			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
-					$sql_parts['select'][$field] = 's.'.$field;
+					$sqlParts['select'][$field] = 's.'.$field;
 				}
 			}
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -119,69 +119,69 @@ class CMap extends CMapElement {
 		// sysmapids
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
-			$sql_parts['where']['sysmapid'] = DBcondition('s.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['sysmapid'] = DBcondition('s.sysmapid', $options['sysmapids']);
 		}
 
 		// search
 		if (!is_null($options['search'])) {
-			zbx_db_search('sysmaps s', $options, $sql_parts);
+			zbx_db_search('sysmaps s', $options, $sqlParts);
 		}
 
 		// filter
 		if (!is_null($options['filter'])) {
-			zbx_db_filter('sysmaps s', $options, $sql_parts);
+			zbx_db_filter('sysmaps s', $options, $sqlParts);
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['sysmaps'] = 's.*';
+			$sqlParts['select']['sysmaps'] = 's.*';
 		}
 
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
+			$sqlParts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 's');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 's');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$sysmapids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
-		$sql_limit = $sql_parts['limit'];
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
 				' WHERE '.DBin_node('s.sysmapid', $nodeids).
-					$sql_where.
-					$sql_order;
-		$res = DBselect($sql, $sql_limit);
+					$sqlWhere.
+					$sqlOrder;
+		$res = DBselect($sql, $sqlLimit);
 		while ($sysmap = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $sysmap['rowscount'];
@@ -670,7 +670,7 @@ class CMap extends CMapElement {
 
 // Map selement links
 			if (!empty($map['links'])) {
-				$mapSelements = zbx_toHash($map['selements'],'selementid');
+				$mapSelements = zbx_toHash($map['selements'], 'selementid');
 
 				foreach ($map['links'] as $link) {
 					if (!isset($mapSelements[$link['selementid1']]))
@@ -934,7 +934,7 @@ class CMap extends CMapElement {
 
 		$dbLinks = array();
 
-		$linkTriggerResource = DBselect('SELECT * FROM sysmaps_link_triggers WHERE '.DBcondition('linkid',$updLinkIds['linkids']));
+		$linkTriggerResource = DBselect('SELECT * FROM sysmaps_link_triggers WHERE '.DBcondition('linkid', $updLinkIds['linkids']));
 		while ($dbLinkTrigger = DBfetch($linkTriggerResource))
 			zbx_subarray_push($dbLinks, $dbLinkTrigger['linkid'], $dbLinkTrigger);
 

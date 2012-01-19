@@ -51,12 +51,12 @@ abstract class CMapElement extends CZBXAPI {
 		$user_type = self::$userData['type'];
 
 		// allowed columns for sorting
-		$sort_columns = array('selementid');
+		$sortColumns = array('selementid');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('sysmaps_elements' => 'se.selementid'),
 			'from'		=> array('sysmaps_elements' => 'sysmaps_elements se'),
 			'where'		=> array(),
@@ -90,13 +90,13 @@ abstract class CMapElement extends CZBXAPI {
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
-			unset($sql_parts['select']['sysmaps_elements']);
+			unset($sqlParts['select']['sysmaps_elements']);
 
 			$dbTable = DB::getSchema('sysmaps_elements');
-			$sql_parts['select']['selementid'] = 'se.selementid';
+			$sqlParts['select']['selementid'] = 'se.selementid';
 			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
-					$sql_parts['select'][$field] = 'se.'.$field;
+					$sqlParts['select'][$field] = 'se.'.$field;
 				}
 			}
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -110,11 +110,11 @@ abstract class CMapElement extends CZBXAPI {
 // selementids
 		if (!is_null($options['selementids'])) {
 			zbx_value2array($options['selementids']);
-			$sql_parts['where']['selementid'] = DBcondition('se.selementid', $options['selementids']);
+			$sqlParts['where']['selementid'] = DBcondition('se.selementid', $options['selementids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('se.selementid', $nodeids);
+				$sqlParts['where'][] = DBin_node('se.selementid', $nodeids);
 			}
 		}
 
@@ -123,18 +123,18 @@ abstract class CMapElement extends CZBXAPI {
 			zbx_value2array($options['sysmapids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['sysmapid'] = 'se.sysmapid';
+				$sqlParts['select']['sysmapid'] = 'se.sysmapid';
 			}
 
-			$sql_parts['where']['sysmapid'] = DBcondition('se.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['sysmapid'] = DBcondition('se.sysmapid', $options['sysmapids']);
 
 			if (!is_null($options['groupCount'])) {
-				$sql_parts['group']['sysmapid'] = 'se.sysmapid';
+				$sqlParts['group']['sysmapid'] = 'se.sysmapid';
 			}
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('se.sysmapid', $nodeids);
+				$sqlParts['where'][] = DBin_node('se.sysmapid', $nodeids);
 			}
 		}
 
@@ -142,67 +142,67 @@ abstract class CMapElement extends CZBXAPI {
 // should last, after all ****IDS checks
 		if (!$nodeCheck) {
 			$nodeCheck = true;
-			$sql_parts['where'][] = DBin_node('se.selementid', $nodeids);
+			$sqlParts['where'][] = DBin_node('se.selementid', $nodeids);
 		}
 
 // search
 		if (!is_null($options['search'])) {
-			zbx_db_search('sysmaps_elements se', $options, $sql_parts);
+			zbx_db_search('sysmaps_elements se', $options, $sqlParts);
 		}
 
 // filter
 		if (!is_null($options['filter'])) {
-			zbx_db_filter('sysmaps_elements se', $options, $sql_parts);
+			zbx_db_filter('sysmaps_elements se', $options, $sqlParts);
 		}
 
 // output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['sysmaps'] = 'se.*';
+			$sqlParts['select']['sysmaps'] = 'se.*';
 		}
 
 // countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 
-			$sql_parts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
+			$sqlParts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'se');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'se');
 
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 //-------
 
 		$selementids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['group'] = array_unique($sql_parts['group']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['group'] = array_unique($sqlParts['group']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_group = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if (!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if (!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
-		if (!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
-		if (!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
-		$sql_limit = $sql_parts['limit'];
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlGroup = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
+		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
+		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
+		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
+		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
-				' WHERE '.$sql_where.
-				$sql_group.
-				$sql_order;
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
+				' WHERE '.$sqlWhere.
+				$sqlGroup.
+				$sqlOrder;
 //SDI($sql);
-		$res = DBselect($sql, $sql_limit);
+		$res = DBselect($sql, $sqlLimit);
 		while ($selement = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $selement['rowscount'];
@@ -308,11 +308,11 @@ COpt::memoryPick();
 		$nodeCheck = false;
 		$user_type = self::$userData['type'];
 
-		$sort_columns = array('linkid'); // allowed columns for sorting
+		$sortColumns = array('linkid'); // allowed columns for sorting
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select' => array('sysmaps_links' => 'sl.linkid'),
 			'from' => array('sysmaps_links' => 'sysmaps_links sl'),
 			'where' => array(),
@@ -346,13 +346,13 @@ COpt::memoryPick();
 
 
 		if (is_array($options['output'])) {
-			unset($sql_parts['select']['sysmaps_links']);
+			unset($sqlParts['select']['sysmaps_links']);
 
 			$dbTable = DB::getSchema('sysmaps_links');
-			$sql_parts['select']['linkid'] = 'sl.linkid';
+			$sqlParts['select']['linkid'] = 'sl.linkid';
 			foreach ($options['output'] as $key => $field) {
 				if (isset($dbTable['fields'][$field]))
-					$sql_parts['select'][$field] = 'sl.'.$field;
+					$sqlParts['select'][$field] = 'sl.'.$field;
 			}
 
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -366,11 +366,11 @@ COpt::memoryPick();
 // linkids
 		if (!is_null($options['linkids'])) {
 			zbx_value2array($options['linkids']);
-			$sql_parts['where']['linkid'] = DBcondition('sl.linkid', $options['linkids']);
+			$sqlParts['where']['linkid'] = DBcondition('sl.linkid', $options['linkids']);
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('sl.linkid', $nodeids);
+				$sqlParts['where'][] = DBin_node('sl.linkid', $nodeids);
 			}
 		}
 
@@ -379,18 +379,18 @@ COpt::memoryPick();
 			zbx_value2array($options['sysmapids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['sysmapid'] = 'sl.sysmapid';
+				$sqlParts['select']['sysmapid'] = 'sl.sysmapid';
 			}
 
-			$sql_parts['where']['sysmapid'] = DBcondition('sl.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['sysmapid'] = DBcondition('sl.sysmapid', $options['sysmapids']);
 
 			if (!is_null($options['groupCount'])) {
-				$sql_parts['group']['sysmapid'] = 'sl.sysmapid';
+				$sqlParts['group']['sysmapid'] = 'sl.sysmapid';
 			}
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
-				$sql_parts['where'][] = DBin_node('sl.sysmapid', $nodeids);
+				$sqlParts['where'][] = DBin_node('sl.sysmapid', $nodeids);
 			}
 		}
 
@@ -398,67 +398,67 @@ COpt::memoryPick();
 // should last, after all ****IDS checks
 		if (!$nodeCheck) {
 			$nodeCheck = true;
-			$sql_parts['where'][] = DBin_node('sl.linkid', $nodeids);
+			$sqlParts['where'][] = DBin_node('sl.linkid', $nodeids);
 		}
 
 // search
 		if (!is_null($options['search'])) {
-			zbx_db_search('sysmaps_links sl', $options, $sql_parts);
+			zbx_db_search('sysmaps_links sl', $options, $sqlParts);
 		}
 
 // filter
 		if (!is_null($options['filter'])) {
-			zbx_db_filter('sysmaps_links sl', $options, $sql_parts);
+			zbx_db_filter('sysmaps_links sl', $options, $sqlParts);
 		}
 
 // output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['sysmaps'] = 'sl.*';
+			$sqlParts['select']['sysmaps'] = 'sl.*';
 		}
 
 // countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 
-			$sql_parts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
+			$sqlParts['select'] = array('count(DISTINCT s.sysmapid) as rowscount');
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'sl');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'sl');
 
 // limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 //-------
 
 		$linkids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['group'] = array_unique($sql_parts['group']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['group'] = array_unique($sqlParts['group']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_group = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if (!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if (!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
-		if (!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
-		if (!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
-		$sql_limit = $sql_parts['limit'];
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlGroup = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
+		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
+		if (!empty($sqlParts['where']))		$sqlWhere.= implode(' AND ', $sqlParts['where']);
+		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
+		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
-				' WHERE '.$sql_where.
-				$sql_group.
-				$sql_order;
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
+				' WHERE '.$sqlWhere.
+				$sqlGroup.
+				$sqlOrder;
 //SDI($sql);
-		$res = DBselect($sql, $sql_limit);
+		$res = DBselect($sql, $sqlLimit);
 		while ($link = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $link['rowscount'];

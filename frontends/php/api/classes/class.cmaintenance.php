@@ -56,12 +56,12 @@ class CMaintenance extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('maintenanceid', 'name', 'maintenance_type');
+		$sortColumns = array('maintenanceid', 'name', 'maintenance_type');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('maintenance' => 'm.maintenanceid'),
 			'from'		=> array('maintenances' => 'maintenances m'),
 			'where'		=> array(),
@@ -131,7 +131,7 @@ class CMaintenance extends CZBXAPI {
 				while ($maintenance = DBfetch($res)) {
 					$maintenanceids[] = $maintenance['maintenanceid'];
 				}
-				$sql_parts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
+				$sqlParts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
 			}
 		}
 		else {
@@ -219,7 +219,7 @@ class CMaintenance extends CZBXAPI {
 			while ($maintenance = DBfetch($res)) {
 				$maintenanceids[] = $maintenance['maintenanceid'];
 			}
-			$sql_parts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
+			$sqlParts['where'][] = DBcondition('m.maintenanceid', $maintenanceids);
 		}
 
 		// nodeids
@@ -239,81 +239,81 @@ class CMaintenance extends CZBXAPI {
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
 
-			$sql_parts['where'][] = DBcondition('m.maintenanceid', $options['maintenanceids']);
+			$sqlParts['where'][] = DBcondition('m.maintenanceid', $options['maintenanceids']);
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['maintenance'] = 'm.*';
+			$sqlParts['select']['maintenance'] = 'm.*';
 		}
 
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('COUNT(DISTINCT m.maintenanceid) AS rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT m.maintenanceid) AS rowscount');
 
 			// groupCount
 			if (!is_null($options['groupCount'])) {
-				foreach ($sql_parts['group'] as $key => $fields) {
-					$sql_parts['select'][$key] = $fields;
+				foreach ($sqlParts['group'] as $key => $fields) {
+					$sqlParts['select'][$key] = $fields;
 				}
 			}
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('maintenances m', $options, $sql_parts);
+			zbx_db_filter('maintenances m', $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('maintenances m', $options, $sql_parts);
+			zbx_db_search('maintenances m', $options, $sqlParts);
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'm');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'm');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$maintenanceids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['group'] = array_unique($sql_parts['group']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['group'] = array_unique($sqlParts['group']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_group = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlGroup = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['group'])) {
-			$sql_where .= ' GROUP BY '.implode(',', $sql_parts['group']);
+		if (!empty($sqlParts['group'])) {
+			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
-		$sql_limit = $sql_parts['limit'];
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
 				' WHERE '.DBin_node('m.maintenanceid', $nodeids).
-					$sql_where.
-				$sql_order;
-		$res = DBselect($sql, $sql_limit);
+					$sqlWhere.
+				$sqlOrder;
+		$res = DBselect($sql, $sqlLimit);
 		while ($maintenance = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -369,13 +369,13 @@ class CMaintenance extends CZBXAPI {
 
 		// selectGroups
 		if (is_array($options['selectGroups']) || str_in_array($options['selectGroups'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'maintenanceids' => $maintenanceids,
 				'preservekeys' => true,
 				'output' => $options['selectGroups']
 			);
-			$groups = API::HostGroup()->get($obj_params);
+			$groups = API::HostGroup()->get($objParams);
 			foreach ($groups as $group) {
 				$gmaintenances = $group['maintenances'];
 				unset($group['maintenances']);
@@ -387,13 +387,13 @@ class CMaintenance extends CZBXAPI {
 
 		// selectHosts
 		if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'maintenanceids' => $maintenanceids,
 				'preservekeys' => true,
 				'output' => $options['selectHosts']
 			);
-			$hosts = API::Host()->get($obj_params);
+			$hosts = API::Host()->get($objParams);
 			foreach ($hosts as $host) {
 				$hmaintenances = $host['maintenances'];
 				unset($host['maintenances']);
