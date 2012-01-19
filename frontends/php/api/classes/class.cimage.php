@@ -228,15 +228,15 @@ class CImage extends CZBXAPI {
  * @param array $image['hostid']
  * @return array|boolean
  */
-	public function getObjects($imageData){
+	public function getObjects($imageData) {
 		$options = array(
 			'filter' => $imageData,
 			'output' => API_OUTPUT_EXTEND
 		);
 
-		if(isset($imageData['node']))
+		if (isset($imageData['node']))
 			$options['nodeids'] = getNodeIdByNodeName($imageData['node']);
-		else if(isset($imageData['nodeids']))
+		else if (isset($imageData['nodeids']))
 			$options['nodeids'] = $imageData['nodeids'];
 		else
 			$options['nodeids'] = get_current_nodeid(true);
@@ -254,7 +254,7 @@ class CImage extends CZBXAPI {
  * @param array $images['name']
  * @return boolean
  */
-	public function exists($object){
+	public function exists($object) {
 		$keyFields = array(array('imageid', 'name'), 'imagetype');
 
 		$options = array(
@@ -264,9 +264,9 @@ class CImage extends CZBXAPI {
 			'limit' => 1
 		);
 
-		if(isset($object['node']))
+		if (isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		else if(isset($object['nodeids']))
+		else if (isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
@@ -280,17 +280,17 @@ class CImage extends CZBXAPI {
  * @param array $images ['name' => string, 'image' => string, 'imagetype' => int]
  * @return array
  */
-	public function create($images){
+	public function create($images) {
 		global $DB;
 
 		$images = zbx_toArray($images);
 		$imageids = array();
 
-			if(self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN){
+			if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 			}
 
-			foreach($images as $snum => $image){
+			foreach ($images as $snum => $image) {
 
 				$image_db_fields = array(
 					'name' => null,
@@ -298,17 +298,17 @@ class CImage extends CZBXAPI {
 					'imagetype' => 1
 				);
 
-				if(!check_db_fields($image_db_fields, $image)){
+				if (!check_db_fields($image_db_fields, $image)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for image [ '.$image['name'].' ]');
 				}
 
-				if($this->exists(array('name' => $image['name']))){
+				if ($this->exists(array('name' => $image['name']))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 				}
 
 				// Decode BASE64
 				$image['image'] = base64_decode($image['image']);
-				if(strlen($image['image']) > ZBX_MAX_IMAGE_SIZE){
+				if (strlen($image['image']) > ZBX_MAX_IMAGE_SIZE) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB'));
 				}
 
@@ -319,7 +319,7 @@ class CImage extends CZBXAPI {
 					'imagetype' => $image['imagetype'],
 				);
 
-				switch($DB['TYPE']){
+				switch ($DB['TYPE']) {
 					case ZBX_DB_ORACLE:
 						$values['image'] = 'EMPTY_BLOB()';
 
@@ -328,13 +328,13 @@ class CImage extends CZBXAPI {
 						$sql = 'INSERT INTO images ('.implode(' ,', array_keys($values)).') VALUES ('.implode(',', $values).')'.
 							' returning image into :imgdata';
 						$stmt = oci_parse($DB['DB'], $sql);
-						if(!$stmt){
+						if (!$stmt) {
 							$e = oci_error($DB['DB']);
 							self::exception(ZBX_API_ERROR_PARAMETERS, S_PARSE_SQL_ERROR.' ['.$e['message'].'] '._('in').' ['.$e['sqltext'].']');
 						}
 
 						oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
-						if(!oci_execute($stmt)){
+						if (!oci_execute($stmt)) {
 							$e = oci_error($stid);
 							self::exception(ZBX_API_ERROR_PARAMETERS, S_EXECUTE_SQL_ERROR.' ['.$e['message'].'] '._('in').' ['.$e['sqltext'].']');
 						}
@@ -344,36 +344,36 @@ class CImage extends CZBXAPI {
 						$stmt = db2_prepare($DB['DB'], 'INSERT INTO images ('.implode(' ,', array_keys($values)).',image)'.
 							' VALUES ('.implode(',', $values).', ?)');
 
-						if(!$stmt){
+						if (!$stmt) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
 
 						$variable = $image['image'];
-						if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
+						if (!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
-						if(!db2_execute($stmt)){
+						if (!db2_execute($stmt)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
 					break;
 					case ZBX_DB_SQLITE3:
 						$values['image'] = zbx_dbstr(bin2hex($image['image']));
 						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-						if(!DBexecute($sql)){
+						if (!DBexecute($sql)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 						}
 					break;
 					case ZBX_DB_MYSQL:
 							$values['image'] = zbx_dbstr($image['image']);
 							$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-							if(!DBexecute($sql)){
+							if (!DBexecute($sql)) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 							}
 					break;
 					case ZBX_DB_POSTGRESQL:
 						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
 						$sql = 'INSERT INTO images ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')';
-						if(!DBexecute($sql)){
+						if (!DBexecute($sql)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 						}
 					break;
@@ -391,17 +391,17 @@ class CImage extends CZBXAPI {
  * @param array $images
  * @return array (updated images)
  */
-	public function update($images){
+	public function update($images) {
 		global $DB;
 
 		$images = zbx_toArray($images);
 
-		if(self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN){
+		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 		}
 
-		foreach($images as $num => $image){
-			if(!isset($image['imageid']))
+		foreach ($images as $num => $image) {
+			if (!isset($image['imageid']))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for image.');
 
 			$options = array(
@@ -412,19 +412,19 @@ class CImage extends CZBXAPI {
 			$image_exists = $this->get($options);
 			$image_exists = reset($image_exists);
 
-			if($image_exists && (bccomp($image_exists['imageid'],$image['imageid']) != 0)){
+			if ($image_exists && (bccomp($image_exists['imageid'],$image['imageid']) != 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
 			$values = array();
-			if(isset($image['name'])) $values['name'] = zbx_dbstr($image['name']);
-			if(isset($image['imagetype'])) $values['imagetype'] = $image['imagetype'];
+			if (isset($image['name'])) $values['name'] = zbx_dbstr($image['name']);
+			if (isset($image['imagetype'])) $values['imagetype'] = $image['imagetype'];
 
-			if(isset($image['image'])){
+			if (isset($image['image'])) {
 // Decode BASE64
 				$image['image'] = base64_decode($image['image']);
 
-				switch($DB['TYPE']){
+				switch ($DB['TYPE']) {
 					case ZBX_DB_POSTGRESQL:
 						$values['image'] = "'".pg_escape_bytea($image['image'])."'";
 					break;
@@ -437,17 +437,17 @@ class CImage extends CZBXAPI {
 					case ZBX_DB_ORACLE:
 						$sql = 'SELECT image FROM images WHERE imageid = '.$image['imageid'].' FOR UPDATE';
 
-						if(!$stmt = oci_parse($DB['DB'], $sql)){
+						if (!$stmt = oci_parse($DB['DB'], $sql)) {
 							$e = oci_error($DB['DB']);
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 						}
 
-						if(!oci_execute($stmt, OCI_DEFAULT)){
+						if (!oci_execute($stmt, OCI_DEFAULT)) {
 							$e = oci_error($stmt);
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 						}
 
-						if(FALSE === ($row = oci_fetch_assoc($stmt))){
+						if (FALSE === ($row = oci_fetch_assoc($stmt))) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 						}
 
@@ -458,16 +458,16 @@ class CImage extends CZBXAPI {
 					case ZBX_DB_DB2:
 						$stmt = db2_prepare($DB['DB'], 'UPDATE images SET image=? WHERE imageid='.$image['imageid']);
 
-						if(!$stmt){
+						if (!$stmt) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
 
 						// not unused, db2_bind_param requires variable name as string
 						$variable = $image['image'];
-						if(!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)){
+						if (!db2_bind_param($stmt, 1, "variable", DB2_PARAM_IN, DB2_BINARY)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
-						if(!db2_execute($stmt)){
+						if (!db2_execute($stmt)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, db2_conn_errormsg($DB['DB']));
 						}
 					break;
@@ -475,13 +475,13 @@ class CImage extends CZBXAPI {
 			}
 
 			$sql_upd = array();
-			foreach($values as $field => $value){
+			foreach ($values as $field => $value) {
 				$sql_upd[] = $field.'='.$value;
 			}
 			$sql = 'UPDATE images SET '.implode(', ', $sql_upd).' WHERE imageid='.$image['imageid'];
 			$result = DBexecute($sql);
 
-			if(!$result){
+			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_COULD_NOT_SAVE_IMAGE);
 			}
 		}

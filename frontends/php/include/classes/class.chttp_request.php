@@ -40,7 +40,7 @@ class CHTTP_request{
 		$this->request_method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : false;
 
 		$this->headers = array();
-		foreach($_SERVER as $i=>$val) {
+		foreach ($_SERVER as $i=>$val) {
 			if (zbx_strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
 				$name = str_replace(array('HTTP_', '_'), array('', '-'), $i);
 				$this->headers[$name] = $val;
@@ -92,7 +92,7 @@ class CHTTP_request{
 		$headers = $this->headers();
 		$this->raw = $this->method."\r\n";
 
-		foreach($headers as $i=>$header) {
+		foreach ($headers as $i=>$header) {
 			$this->raw .= $i.': '.$header."\r\n";
 		}
 

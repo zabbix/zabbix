@@ -204,7 +204,7 @@ require_once('include/page_header.php');
 
 // PAGE HEADER {{{
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
+	$events_wdgt->addPageHeader(array(_('HISTORY OF EVENTS ON '), zbx_date2str(S_EVENTS_DATE_FORMAT, time())), $fs_icon);
 // }}}PAGE HEADER
 
 // HEADER {{{

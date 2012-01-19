@@ -240,8 +240,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Regexp name has not been changed in the DB');
 	}
 
-	public static function dataDelete()
-	{
+	public static function dataDelete() {
 		return array(
 			array('test_regexp2')
 		);
@@ -265,13 +264,13 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->ok(array('Regular expression deleted', 'CONFIGURATION OF ZABBIX', 'Regular expressions', 'Name', 'Expressions'));
 
 		// checking that regexp "test_regexp2" has been deleted from the DB
-		$sql1 = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($name);
-		$this->assertEquals(0, DBcount($sql1), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($name);
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
 
-		$sql2 = 'SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid and r.name='.zbx_dbstr($name);
+		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid and r.name='.zbx_dbstr($name);
 
 		// this check will fail as at this moment expressions are not deleted when deleting related regexp
-		$this->assertEquals(0, DBcount($sql2), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 
 		DBrestore_tables('regexps');
 	}
@@ -287,11 +286,11 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->wait();
 		$this->ok('Regular expression deleted');
 
-		$sql1 = 'SELECT * FROM regexps';
-		$this->assertEquals(0, DBcount($sql1), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$sql = 'SELECT * FROM regexps';
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
 
-		$sql2 = 'SELECT * FROM expressions';
-		$this->assertEquals(0, DBcount($sql2), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$sql = 'SELECT * FROM expressions';
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 	}
 }
 ?>
