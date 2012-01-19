@@ -54,12 +54,12 @@ class CUserGroup extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('usrgrpid', 'name');
+		$sortColumns = array('usrgrpid', 'name');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('usrgrp' => 'g.usrgrpid'),
 			'from'		=> array('usrgrp' => 'usrgrp g'),
 			'where'		=> array(),
@@ -94,13 +94,13 @@ class CUserGroup extends CZBXAPI {
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
-			unset($sql_parts['select']['usrgrp']);
+			unset($sqlParts['select']['usrgrp']);
 
 			$dbTable = DB::getSchema('usrgrp');
-			$sql_parts['select']['usrgrpid'] = 'g.usrgrpid';
+			$sqlParts['select']['usrgrpid'] = 'g.usrgrpid';
 			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
-					$sql_parts['select'][$field] = 'g.'.$field;
+					$sqlParts['select'][$field] = 'g.'.$field;
 				}
 			}
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -110,7 +110,7 @@ class CUserGroup extends CZBXAPI {
 		if (USER_TYPE_SUPER_ADMIN == $user_type) {
 		}
 		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
-			$sql_parts['where'][] = 'g.usrgrpid IN ('.
+			$sqlParts['where'][] = 'g.usrgrpid IN ('.
 									' SELECT uug.usrgrpid'.
 										' FROM users_groups uug'.
 										' WHERE uug.userid='.self::$userData['userid'].
@@ -127,7 +127,7 @@ class CUserGroup extends CZBXAPI {
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
 
-			$sql_parts['where'][] = DBcondition('g.usrgrpid', $options['usrgrpids']);
+			$sqlParts['where'][] = DBcondition('g.usrgrpid', $options['usrgrpids']);
 		}
 
 		// userids
@@ -135,83 +135,83 @@ class CUserGroup extends CZBXAPI {
 			zbx_value2array($options['userids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['userid'] = 'ug.userid';
+				$sqlParts['select']['userid'] = 'ug.userid';
 			}
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
-			$sql_parts['where'][] = DBcondition('ug.userid', $options['userids']);
-			$sql_parts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
+			$sqlParts['from']['users_groups'] = 'users_groups ug';
+			$sqlParts['where'][] = DBcondition('ug.userid', $options['userids']);
+			$sqlParts['where']['gug'] = 'g.usrgrpid=ug.usrgrpid';
 		}
 
 		// status
 		if (!is_null($options['status'])) {
-			$sql_parts['where'][] = 'g.users_status='.$options['status'];
+			$sqlParts['where'][] = 'g.users_status='.$options['status'];
 		}
 
 		// with_gui_access
 		if (!is_null($options['with_gui_access'])) {
-			$sql_parts['where'][] = 'g.gui_access='.GROUP_GUI_ACCESS_ENABLED;
+			$sqlParts['where'][] = 'g.gui_access='.GROUP_GUI_ACCESS_ENABLED;
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['usrgrp'] = 'g.*';
+			$sqlParts['select']['usrgrp'] = 'g.*';
 		}
 
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(g.usrgrpid) as rowscount');
+			$sqlParts['select'] = array('count(g.usrgrpid) as rowscount');
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('usrgrp g', $options, $sql_parts);
+			zbx_db_filter('usrgrp g', $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('usrgrp g', $options, $sql_parts);
+			zbx_db_search('usrgrp g', $options, $sqlParts);
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'g');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'g');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$usrgrpids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
-		$sql_limit = $sql_parts['limit'];
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
-				FROM '.$sql_from.'
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
+				FROM '.$sqlFrom.'
 				WHERE '.DBin_node('g.usrgrpid', $nodeids).
-					$sql_where.
-					$sql_order;
-		$res = DBselect($sql, $sql_limit);
+					$sqlWhere.
+					$sqlOrder;
+		$res = DBselect($sql, $sqlLimit);
 		while ($usrgrp = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $usrgrp['rowscount'];
@@ -252,13 +252,13 @@ class CUserGroup extends CZBXAPI {
 		 */
 		// adding users
 		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+			$objParams = array(
 				'output' => $options['selectUsers'],
 				'usrgrpids' => $usrgrpids,
 				'getAccess' => $options['selectUsers'] == API_OUTPUT_EXTEND ? true : null,
 				'preservekeys' => true
 			);
-			$users = API::User()->get($obj_params);
+			$users = API::User()->get($objParams);
 			foreach ($users as $user) {
 				$uusrgrps = $user['usrgrps'];
 				unset($user['usrgrps']);
@@ -309,7 +309,7 @@ class CUserGroup extends CZBXAPI {
 		);
 		if (isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		else if (isset($object['nodeids']))
+		elseif (isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
@@ -500,7 +500,7 @@ class CUserGroup extends CZBXAPI {
 						'output' => API_OUTPUT_SHORTEN,
 					));
 					$group_exists = reset($group_exists);
-					if ($group_exists && (bccomp($group_exists['usrgrpid'],$usrgrpid) != 0) ) {
+					if ($group_exists && (bccomp($group_exists['usrgrpid'], $usrgrpid) != 0) ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_GROUP.' '.$data['name'].' '.S_ALREADY_EXISTS_SMALL);
 					}
 				}
@@ -585,7 +585,7 @@ class CUserGroup extends CZBXAPI {
 								'permission' => $right['permission'],
 							);
 						}
-						else if ($linked_rights[$usrgrpid][$right['id']] != $right['permission']) {
+						elseif ($linked_rights[$usrgrpid][$right['id']] != $right['permission']) {
 							$rights_update[] = array(
 								'values' => array('permission' => $right['permission']),
 								'where' => array('groupid' => $usrgrpid, 'id' => $right['id']),
@@ -662,7 +662,7 @@ class CUserGroup extends CZBXAPI {
 			// check, if this user group is used in the config. If so, it cannot be deleted
 			$config = select_config();
 			if (isset($dbUsrgrps[$config['alert_usrgrpid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,_s('User group [%s] is used in configuration for database down messages.', $dbUsrgrps[$config['alert_usrgrpid']]['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group [%s] is used in configuration for database down messages.', $dbUsrgrps[$config['alert_usrgrpid']]['name']));
 			}
 
 // delete action operation msg

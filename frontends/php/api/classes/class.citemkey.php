@@ -131,13 +131,13 @@ class CItemKey {
 						}
 					}
 					// Zapcat: '][' is treated as ','
-					else if ($this->key[$this->currentByte] == ']' && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == '[' && $nestLevel == 0) {
+					elseif ($this->key[$this->currentByte] == ']' && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == '[' && $nestLevel == 0) {
 						$currParamNo++;
 						$this->parameters[$currParamNo] = '';
 						$this->currentByte++;
 					}
 					// entering quotes
-					else if ($this->key[$this->currentByte] == '"') {
+					elseif ($this->key[$this->currentByte] == '"') {
 						$state = 1;
 						// in key[["a"]] param is "a"
 						if ($nestLevel > 0) {
@@ -145,14 +145,14 @@ class CItemKey {
 						}
 					}
 					// next nesting level
-					else if ($this->key[$this->currentByte] == '[') {
+					elseif ($this->key[$this->currentByte] == '[') {
 						if ($nestLevel > 0) {
 							$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 						}
 						$nestLevel++;
 					}
 					// one of the nested sets ended
-					else if ($this->key[$this->currentByte] == ']' && $nestLevel > 0) {
+					elseif ($this->key[$this->currentByte] == ']' && $nestLevel > 0) {
 
 						$nestLevel--;
 
@@ -189,7 +189,7 @@ class CItemKey {
 						}
 					}
 					// looks like we have reached final ']'
-					else if ($this->key[$this->currentByte] == ']' && $nestLevel == 0) {
+					elseif ($this->key[$this->currentByte] == ']' && $nestLevel == 0) {
 						if (!isset($this->key[$this->currentByte + 1])) {
 							return;
 						}
@@ -199,12 +199,12 @@ class CItemKey {
 						$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte + 1]);
 						return;
 					}
-					else if ($this->key[$this->currentByte] != ' ') {
+					elseif ($this->key[$this->currentByte] != ' ') {
 						$state = 2;
 						// this is a first symbol of unquoted param
 						$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 					}
-					else if ($nestLevel > 0) {
+					elseif ($nestLevel > 0) {
 						$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 					}
 					break;
@@ -229,7 +229,7 @@ class CItemKey {
 						if ($nestLevel == 0 && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ']' && !isset($this->key[$this->currentByte + 2])) {
 							return;
 						}
-						else if ($nestLevel == 0 && $this->key[$this->currentByte + 1] == ']' && isset($this->key[$this->currentByte + 2])) {
+						elseif ($nestLevel == 0 && $this->key[$this->currentByte + 1] == ']' && isset($this->key[$this->currentByte + 2])) {
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
 							$this->error = sprintf(_('incorrect usage of bracket symbols. \'%s\' found after final bracket.'), $this->key[$this->currentByte + 1]);
@@ -253,7 +253,7 @@ class CItemKey {
 						$state = 0;
 					}
 					//escaped quote (\")
-					else if ($this->key[$this->currentByte] == '\\' && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == '"') {
+					elseif ($this->key[$this->currentByte] == '\\' && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == '"') {
 						if ($nestLevel > 0) {
 							$this->parameters[$currParamNo] .= $this->key[$this->currentByte];
 						}
@@ -269,11 +269,11 @@ class CItemKey {
 						$this->currentByte--;
 						$state = 0;
 					}
-					else if ($this->key[$this->currentByte] == ',' || ($this->key[$this->currentByte] == ']' && $nestLevel > 0)) {
+					elseif ($this->key[$this->currentByte] == ',' || ($this->key[$this->currentByte] == ']' && $nestLevel > 0)) {
 						$this->currentByte--;
 						$state = 0;
 					}
-					else if ($this->key[$this->currentByte] == ']' && $nestLevel == 0) {
+					elseif ($this->key[$this->currentByte] == ']' && $nestLevel == 0) {
 						if (isset($this->key[$this->currentByte + 1])) {
 							// nothing else is allowed after final ']'
 							$this->isValid = false;

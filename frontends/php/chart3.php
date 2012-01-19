@@ -32,15 +32,15 @@ require_once('include/page_header.php');
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'period'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
+		'period'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD),	null),
 		'stime'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
 
 		'httptestid'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
 		'http_item_type'=>	array(T_ZBX_INT, O_OPT,	null,	null,			null),
 
 		'name'=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null),
-		'width'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
-		'height'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
+		'width'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0, 65535),	null),
+		'height'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0, 65535),	null),
 
 		'ymin_type'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1,2'),		null),
 		'ymax_type'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1,2'),		null),
@@ -57,8 +57,8 @@ require_once('include/page_header.php');
 		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
 		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
 
-		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
-		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
+		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0, 100),	null),
+		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0, 100),	null),
 
 		'items'=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null)
 	);
@@ -133,25 +133,25 @@ require_once('include/page_header.php');
 	$graph->setPeriod($_REQUEST['period']);
 	$graph->setSTime($_REQUEST['stime']);
 
-	$graph->setWidth(get_request('width',		900));
-	$graph->setHeight(get_request('height',		200));
+	$graph->setWidth(get_request('width', 900));
+	$graph->setHeight(get_request('height', 200));
 
-	$graph->showLegend(get_request('legend'	,1));
+	$graph->showLegend(get_request('legend', 1));
 
-	$graph->showWorkPeriod(get_request('showworkperiod'	,1));
-	$graph->showTriggers(get_request('showtriggers'		,1));
+	$graph->showWorkPeriod(get_request('showworkperiod', 1));
+	$graph->showTriggers(get_request('showtriggers', 1));
 
-	$graph->setYMinAxisType(get_request('ymin_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->setYMaxAxisType(get_request('ymax_type'		,GRAPH_YAXIS_TYPE_CALCULATED));
+	$graph->setYMinAxisType(get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
+	$graph->setYMaxAxisType(get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
 
-	$graph->setYAxisMin(get_request('yaxismin'		,0.00));
-	$graph->setYAxisMax(get_request('yaxismax'		,100.00));
+	$graph->setYAxisMin(get_request('yaxismin', 0.00));
+	$graph->setYAxisMax(get_request('yaxismax', 100.00));
 
-	$graph->setYMinItemId(get_request('ymin_itemid'		,0));
-	$graph->setYMaxItemId(get_request('ymax_itemid'		,0));
+	$graph->setYMinItemId(get_request('ymin_itemid', 0));
+	$graph->setYMaxItemId(get_request('ymax_itemid', 0));
 
-	$graph->setLeftPercentage(get_request('percent_left',0));
-	$graph->setRightPercentage(get_request('percent_right',0));
+	$graph->setLeftPercentage(get_request('percent_left', 0));
+	$graph->setRightPercentage(get_request('percent_right', 0));
 
 	foreach($items as $gnum => $gitem){
 		$graph->addItem(

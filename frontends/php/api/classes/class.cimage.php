@@ -54,9 +54,9 @@ class CImage extends CZBXAPI {
 		$result = array();
 
 		// allowed columns for sorting
-		$sort_columns = array('imageid', 'name');
+		$sortColumns = array('imageid', 'name');
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('images' => 'i.imageid'),
 			'from'		=> array('images' => 'images i'),
 			'where'		=> array(),
@@ -98,19 +98,19 @@ class CImage extends CZBXAPI {
 		// imageids
 		if (!is_null($options['imageids'])) {
 			zbx_value2array($options['imageids']);
-			$sql_parts['where']['imageid'] = DBcondition('i.imageid', $options['imageids']);
+			$sqlParts['where']['imageid'] = DBcondition('i.imageid', $options['imageids']);
 		}
 
 		// sysmapids
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 
-			$sql_parts['select']['sm'] = 'sm.sysmapid';
-			$sql_parts['from']['sysmaps'] = 'sysmaps sm';
-			$sql_parts['from']['sysmaps_elements'] = 'sysmaps_elements se';
-			$sql_parts['where']['sm'] = DBcondition('sm.sysmapid', $options['sysmapids']);
-			$sql_parts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
-			$sql_parts['where']['se'] = '('.
+			$sqlParts['select']['sm'] = 'sm.sysmapid';
+			$sqlParts['from']['sysmaps'] = 'sysmaps sm';
+			$sqlParts['from']['sysmaps_elements'] = 'sysmaps_elements se';
+			$sqlParts['where']['sm'] = DBcondition('sm.sysmapid', $options['sysmapids']);
+			$sqlParts['where']['smse'] = 'sm.sysmapid=se.sysmapid ';
+			$sqlParts['where']['se'] = '('.
 				'se.iconid_off=i.imageid'.
 				' OR se.iconid_on=i.imageid'.
 				' OR se.iconid_disabled=i.imageid'.
@@ -120,63 +120,63 @@ class CImage extends CZBXAPI {
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['images'] = 'i.imageid, i.imagetype, i.name';
+			$sqlParts['select']['images'] = 'i.imageid, i.imagetype, i.name';
 		}
 
 		// count
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(DISTINCT i.imageid) as rowscount');
+			$sqlParts['select'] = array('count(DISTINCT i.imageid) as rowscount');
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('images i', $options, $sql_parts);
+			zbx_db_filter('images i', $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('images i', $options, $sql_parts);
+			zbx_db_search('images i', $options, $sqlParts);
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'i');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'i');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$imageids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
 				' WHERE '.DBin_node('i.imageid', $nodeids).
-					$sql_where.
-					$sql_order;
-		$res = DBselect($sql, $sql_parts['limit']);
+					$sqlWhere.
+					$sqlOrder;
+		$res = DBselect($sql, $sqlParts['limit']);
 		while ($image = DBfetch($res)) {
 			if ($options['countOutput']) {
 				return $image['rowscount'];
@@ -236,7 +236,7 @@ class CImage extends CZBXAPI {
 
 		if (isset($imageData['node']))
 			$options['nodeids'] = getNodeIdByNodeName($imageData['node']);
-		else if (isset($imageData['nodeids']))
+		elseif (isset($imageData['nodeids']))
 			$options['nodeids'] = $imageData['nodeids'];
 		else
 			$options['nodeids'] = get_current_nodeid(true);
@@ -266,7 +266,7 @@ class CImage extends CZBXAPI {
 
 		if (isset($object['node']))
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		else if (isset($object['nodeids']))
+		elseif (isset($object['nodeids']))
 			$options['nodeids'] = $object['nodeids'];
 
 		$objs = $this->get($options);
@@ -312,7 +312,7 @@ class CImage extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Image size must be less than 1MB'));
 				}
 
-				$imageid = get_dbid('images','imageid');
+				$imageid = get_dbid('images', 'imageid');
 				$values = array(
 					'imageid' => $imageid,
 					'name' => zbx_dbstr($image['name']),
@@ -412,7 +412,7 @@ class CImage extends CZBXAPI {
 			$image_exists = $this->get($options);
 			$image_exists = reset($image_exists);
 
-			if ($image_exists && (bccomp($image_exists['imageid'],$image['imageid']) != 0)) {
+			if ($image_exists && (bccomp($image_exists['imageid'], $image['imageid']) != 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
@@ -474,11 +474,11 @@ class CImage extends CZBXAPI {
 				}
 			}
 
-			$sql_upd = array();
+			$sqlUpd = array();
 			foreach ($values as $field => $value) {
-				$sql_upd[] = $field.'='.$value;
+				$sqlUpd[] = $field.'='.$value;
 			}
-			$sql = 'UPDATE images SET '.implode(', ', $sql_upd).' WHERE imageid='.$image['imageid'];
+			$sql = 'UPDATE images SET '.implode(', ', $sqlUpd).' WHERE imageid='.$image['imageid'];
 			$result = DBexecute($sql);
 
 			if (!$result) {
