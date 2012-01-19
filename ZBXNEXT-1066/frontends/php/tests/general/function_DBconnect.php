@@ -23,19 +23,16 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class function_DBconnect extends CZabbixTest
-{
-	public function test_DBconnect()
-	{
+class function_DBconnect extends CZabbixTest {
+	public function test_DBconnect() {
 		DBclose();
 		return DBconnect($error);
 	}
 
-	public function test_DBconnectIfAlreadyConnected()
-	{
+	public function test_DBconnectIfAlreadyConnected() {
 		DBclose();
 		DBconnect($error);
-		$this->assertFalse(DBconnect($error),"Chuck Norris: DBconnect() must return False if the database is already opened");
+		$this->assertFalse(DBconnect($error), 'Chuck Norris: DBconnect() must return False if the database is already opened');
 	}
 }
 ?>

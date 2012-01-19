@@ -354,14 +354,14 @@ class CUserMedia extends CZBXAPI {
 		return $result;
 	}
 
-	protected function checkInput(&$medias, $method){
+	protected function checkInput(&$medias, $method) {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
 
 // permissions
 
-		if($update || $delete){
+		if ($update || $delete) {
 			$mediaDBfields = array('mediaid'=> null);
 			$dbMedias = $this->get(array(
 				'output' => array('mediaid','userid','mediatypeid'),
@@ -375,49 +375,49 @@ class CUserMedia extends CZBXAPI {
 		}
 
 		$alias = array();
-		foreach($medias as $unum => &$media){
-			if(!check_db_fields($mediaDBfields, $media)){
+		foreach ($medias as $unum => &$media) {
+			if (!check_db_fields($mediaDBfields, $media)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for user media "%s".', $media['sendto']));
 			}
 
 // PERMISSION CHECK
-			if($create){
-				if(self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN)
+			if ($create) {
+				if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN)
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to create user medias.'));
 
 				$dbMedia = $media;
 			}
-			else if($update){
-				if(!isset($dbMedias[$media['mediaid']]))
+			else if ($update) {
+				if (!isset($dbMedias[$media['mediaid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user media or user media does not exist.'));
 
 				$dbMedia = $dbMedias[$media['mediaid']];
 
-				if(bccomp(self::$userData['userid'], $dbMedia['userid']) != 0){
-					if(USER_TYPE_SUPER_ADMIN != self::$userData['type'])
+				if (bccomp(self::$userData['userid'], $dbMedia['userid']) != 0) {
+					if (USER_TYPE_SUPER_ADMIN != self::$userData['type'])
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update other users.'));
 				}
 				else{
-					if(USER_TYPE_ZABBIX_ADMIN != self::$userData['type'])
+					if (USER_TYPE_ZABBIX_ADMIN != self::$userData['type'])
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user medias.'));
 				}
 
 			}
 			else{
-				if(!isset($dbMedias[$media['mediaid']]))
+				if (!isset($dbMedias[$media['mediaid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions or user media does not exist.'));
 
-				if(bccomp(self::$userData['userid'], $media['userid']) == 0)
+				if (bccomp(self::$userData['userid'], $media['userid']) == 0)
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete himself.'));
 
-				if($dbMedias[$media['mediaid']]['alias'] == ZBX_GUEST_USER)
+				if ($dbMedias[$media['mediaid']]['alias'] == ZBX_GUEST_USER)
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete %1$s internal user "%2$s", try disabling that user.', S_ZABBIX, ZBX_GUEST_USER));
 
 				continue;
 			}
 
 
-			if(isset($media['period']) && !validate_period($media['period']))
+			if (isset($media['period']) && !validate_period($media['period']))
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_INCORRECT_TIME_PERIOD);
 
 		}
@@ -436,7 +436,7 @@ class CUserMedia extends CZBXAPI {
  * @param string $medias['medias']['period']
  * @return boolean
  */
-	public function create($medias){
+	public function create($medias) {
 		$medias = zbx_toArray($medias['medias']);
 		$mediaids = array();
 
@@ -461,7 +461,7 @@ class CUserMedia extends CZBXAPI {
  * @param string $media_data['medias']['period']
  * @return boolean
  */
-	public function update($medias){
+	public function update($medias) {
 		$medias = zbx_toArray($medias);
 
 		$this->checkInput($medias, __FUNCTION__);
@@ -474,14 +474,14 @@ class CUserMedia extends CZBXAPI {
 				' FROM media m '.
 				' WHERE '.DBcondition('userid', $userids);
 		$result = DBselect($sql);
-		while($media = DBfetch($result)){
+		while ($media = DBfetch($result)) {
 			$del_medias[$media['mediaid']] = $media;
 		}
 
-		foreach($medias as $mnum => $media){
-			if(!isset($media['mediaid'])) continue;
+		foreach ($medias as $mnum => $media) {
+			if (!isset($media['mediaid'])) continue;
 
-			if(isset($del_medias[$media['mediaid']])){
+			if (isset($del_medias[$media['mediaid']])) {
 				$upd_medias[$media['mediaid']] = $medias[$mnum];
 			}
 
@@ -490,12 +490,12 @@ class CUserMedia extends CZBXAPI {
 		}
 
 // DELETE
-		if(!empty($del_medias))
+		if (!empty($del_medias))
 			$this->delete($del_medias);
 
 // UPDATE
 		$update = array();
-		foreach($upd_medias as $mnum => $media){
+		foreach ($upd_medias as $mnum => $media) {
 			$update[] = array(
 				'values' => $media,
 				'where' => array('mediaid' => $media['mediaid'])
@@ -504,7 +504,7 @@ class CUserMedia extends CZBXAPI {
 		DB::update('media', $update);
 
 // CREATE
-		if(!empty($medias))
+		if (!empty($medias))
 			$this->create($medias);
 
 		return array('userids'=>$userids);
@@ -517,7 +517,7 @@ class CUserMedia extends CZBXAPI {
  * @param array $mediaids
  * @return boolean
  */
-	public function delete($medias){
+	public function delete($medias) {
 		$medias = zbx_toArray($medias);
 		$mediaids = zbx_objectValues($medias, 'mediaid');
 
@@ -529,9 +529,9 @@ class CUserMedia extends CZBXAPI {
 	}
 
 
-	public function isReadable($ids){
-		if(!is_array($ids)) return false;
-		if(empty($ids)) return true;
+	public function isReadable($ids) {
+		if (!is_array($ids)) return false;
+		if (empty($ids)) return true;
 
 		$ids = array_unique($ids);
 
@@ -545,9 +545,9 @@ class CUserMedia extends CZBXAPI {
 		return (count($ids) == $count);
 	}
 
-	public function isWritable($ids){
-		if(!is_array($ids)) return false;
-		if(empty($ids)) return true;
+	public function isWritable($ids) {
+		if (!is_array($ids)) return false;
+		if (empty($ids)) return true;
 
 		$ids = array_unique($ids);
 

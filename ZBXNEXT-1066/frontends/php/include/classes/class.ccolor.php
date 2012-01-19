@@ -20,7 +20,7 @@
 ?>
 <?php
 class CColor extends CObject{
-	public function __construct($name,$value){
+	public function __construct($name,$value) {
 		parent::__construct();
 
 		$lbl = new CColorCell('lbl_'.$name, $value, "javascript: show_color_picker('".$name."')");

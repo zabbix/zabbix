@@ -23,19 +23,16 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class function_DBclose extends CZabbixTest
-{
-	public function test_DBclose()
-	{
+class function_DBclose extends CZabbixTest {
+	public function test_DBclose() {
 		DBconnect($error);
 		return DBclose();
 	}
 
-	public function test_DBcloseOfClosedDatabase()
-	{
+	public function test_DBcloseOfClosedDatabase() {
 		DBconnect($error);
 		DBclose();
-		$this->assertFalse(DBclose(),"Chuck Norris: DBclose() must return False if the datbase is already closed");
+		$this->assertFalse(DBclose(), 'Chuck Norris: DBclose() must return False if the datbase is already closed');
 	}
 }
 ?>

@@ -448,11 +448,11 @@ class CAlert extends CZBXAPI {
  * @param array $alerts[0,...]['url'] OPTIONAL
  * @return boolean
  */
-	public function create($alerts){
+	public function create($alerts) {
 		$alerts = zbx_toArray($alerts);
 		$alertids = array();
 
-			foreach($alerts as $anum => $alert){
+			foreach ($alerts as $anum => $alert) {
 				$alert_db_fields = array(
 					'actionid'		=> null,
 					'eventid'		=> null,
@@ -470,7 +470,7 @@ class CAlert extends CZBXAPI {
 					'alerttype'		=> ALERT_TYPE_MESSAGE
 				);
 
-				if(!check_db_fields($alert_db_fields, $alert)){
+				if (!check_db_fields($alert_db_fields, $alert)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for Alert');
 				}
 
@@ -481,7 +481,7 @@ class CAlert extends CZBXAPI {
 									$alert['clock'].','.zbx_dbstr($alert['sendto']).','.zbx_dbstr($alert['subject']).','.zbx_dbstr($alert['message']).','.
 									$alert['status'].','.$alert['retries'].','.zbx_dbstr($alert['error']).','.$alert['nextcheck'].','.
 									$alert['esc_step'].','.$alert['alerttype'].' )';
-				if(!DBexecute($sql))
+				if (!DBexecute($sql))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 				$alertids[] = $alertid;
@@ -496,7 +496,7 @@ class CAlert extends CZBXAPI {
  * @param array $alertids
  * @return boolean
  */
-	public function delete($alertids){
+	public function delete($alertids) {
 
 			$options = array(
 			'alertids' => zbx_objectValues($alerts, 'alertid'),
@@ -505,14 +505,14 @@ class CAlert extends CZBXAPI {
 			'preservekeys' => 1
 			);
 			$del_alerts = $this->get($options);
-			foreach($alertids as $snum => $alertid){
-				if(!isset($del_alerts[$alertid])){
+			foreach ($alertids as $snum => $alertid) {
+				if (!isset($del_alerts[$alertid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
 
 			$sql = 'DELETE FROM alerts WHERE '.DBcondition('alertid', $alertids);
-			if(!DBexecute($sql))
+			if (!DBexecute($sql))
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 
 			return array('alertids'=> $alertids);

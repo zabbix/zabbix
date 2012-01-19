@@ -21,7 +21,7 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class API_JSON_Host extends CZabbixTest {
 	public static function host_names() {
@@ -204,8 +204,7 @@ class API_JSON_Host extends CZabbixTest {
 	/**
 	 * @dataProvider inventoryGetRequests
 	 */
-	public function testCHostGetInventories($request, $expectedResult)
-	{
+	public function testCHostGetInventories($request, $expectedResult) {
 		$debug = null;
 
 		$result = $this->api_acall(

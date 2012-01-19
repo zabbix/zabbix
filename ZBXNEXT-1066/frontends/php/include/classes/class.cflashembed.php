@@ -20,7 +20,7 @@
 ?>
 <?php
 class CFlashEmbed extends CTag{
-	public function __construct($src=NULL, $width = NULL, $height = NULL){
+	public function __construct($src=NULL, $width = NULL, $height = NULL) {
 		parent::__construct('embed');
 		$this->attributes['allowScriptAccess'] = 'sameDomain';
 		$this->attributes['type'] = 'application/x-shockwave-flash';
@@ -33,15 +33,15 @@ class CFlashEmbed extends CTag{
 		$this->attributes['src'] = $src;
 	}
 
-	public function setWidth($value){
+	public function setWidth($value) {
 		$this->attributes['width']  = $value;
 	}
 
-	public function setHeight($value){
+	public function setHeight($value) {
 		$this->attributes['height'] = $value;
 	}
 
-	public function setSrc($value){
+	public function setSrc($value) {
 		$this->attributes['src'] = $value;
 	}
 }

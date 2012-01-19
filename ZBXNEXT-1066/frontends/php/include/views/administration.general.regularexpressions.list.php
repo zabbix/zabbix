@@ -23,7 +23,6 @@ $this->data['cnf_wdgt']->addHeader(_('Regular expressions'));
 
 $regExpForm = new CForm();
 $regExpForm->setName('regularExpressionsForm');
-$regExpForm->addVar('config', get_request('config', 10));
 $regExpForm->addItem(BR());
 
 $goBox = new CComboBox('go');
@@ -59,7 +58,7 @@ foreach($this->data['db_exps'] as $exp) {
 foreach($this->data['regexps'] as $regexpid => $regexp) {
 	$regExpTable->addRow(array(
 		new CCheckBox('regexpids['.$regexp['regexpid'].']', null, null, $regexp['regexpid']),
-		new CLink($regexp['name'], 'config.php?form=update'.url_param('config').'&regexpid='.$regexp['regexpid'].'#form'),
+		new CLink($regexp['name'], 'adm.regexps.php?form=update'.'&regexpid='.$regexp['regexpid']),
 		isset($expressions[$regexpid]) ? $expressions[$regexpid] : '-'
 	));
 }

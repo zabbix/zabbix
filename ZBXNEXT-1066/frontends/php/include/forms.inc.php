@@ -1476,7 +1476,7 @@
 					);
 		}
 
-		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
+		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'adm.valuemapping.php');
 		$link->setAttribute('target','_blank');
 
 		$row = new CRow(array(new CCol(S_SHOW_VALUE), new CCol(array($cmbMap, SPACE, $link))));
@@ -1843,7 +1843,7 @@
 					get_node_name_by_elid($db_valuemap["valuemapid"], null, ': ').$db_valuemap["name"]
 					);
 
-		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'config.php?config=6');
+		$link = new CLink(S_SHOW_VALUE_MAPPINGS,'adm.valuemapping.php');
 		$link->setAttribute('target','_blank');
 
 		$frmItem->addRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
@@ -2884,7 +2884,7 @@
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
 
 		$titles = array('screen' => S_SCREEN);
 
@@ -2913,7 +2913,7 @@
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
 
 		$titles = array(
 			'host' => $template?S_TEMPLATE:S_HOST,
@@ -2970,7 +2970,7 @@
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
 
 		$titles = array('maps' => S_MAP);
 		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
