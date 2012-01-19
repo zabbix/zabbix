@@ -20,28 +20,16 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int	mib[] = {CTL_KERN, KERN_MAXFILES}, maxfiles;
-	size_t	len = sizeof(maxfiles);
+	int		mib[] = {CTL_KERN, KERN_BOOTTIME};
+	struct timeval	boottime;
+	size_t		len = sizeof(boottime);
 
-	if (0 != sysctl(mib, 2, &maxfiles, &len, NULL, 0))
+	if (0 != sysctl(mib, 2, &boottime, &len, NULL, 0))
 		return SYSINFO_RET_FAIL;
 
-	SET_UI64_RESULT(result, maxfiles);
-
-	return SYSINFO_RET_OK;
-}
-
-int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	int	mib[] = {CTL_KERN, KERN_MAXPROC}, maxproc;
-	size_t	len = sizeof(maxproc);
-
-	if (0 != sysctl(mib, 2, &maxproc, &len, NULL, 0))
-		return SYSINFO_RET_FAIL;
-
-	SET_UI64_RESULT(result, maxproc);
+	SET_UI64_RESULT(result, boottime.tv_sec);
 
 	return SYSINFO_RET_OK;
 }
