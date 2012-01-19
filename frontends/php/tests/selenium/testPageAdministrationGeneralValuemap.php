@@ -32,8 +32,7 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralValuemap_CheckLayout($valuemap) {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Value mapping');
+		$this->login('adm.valuemapping.php');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
 		$this->ok('Value mapping');
@@ -43,14 +42,13 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 		$this->ok(array($valuemap['name']));
 
 		// checking that in the "Value map" column are correct values
-		// $sql1 = "SELECT m.value,m.newvalue FROM mappings m,valuemaps vm WHERE m.valuemapid=vm.valuemapid";
 		$sqlMappings = 'SELECT m.value FROM mappings m WHERE m.valuemapid='.$valuemap['valuemapid'];
-		$result1 = DBfetch(DBselect($sqlMappings));
-		$value = $result1['value'];
+		$result = DBfetch(DBselect($sqlMappings));
+		$value = $result['value'];
 
 		$sqlValuemaps = 'SELECT m.newvalue FROM mappings m WHERE m.valuemapid='.$valuemap['valuemapid'];
-		$result2 = DBfetch(DBselect($sqlValuemaps));
-		$new_value = $result2['newvalue'];
+		$result = DBfetch(DBselect($sqlValuemaps));
+		$new_value = $result['newvalue'];
 
 		$this->ok("$value ? $new_value");
 
@@ -67,9 +65,7 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 		$sqlMappings = 'select * from mappings order by mappingid';
 		$oldHashMappings=DBhash($sqlMappings);
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Value mapping');
-		$this->ok('Value mapping');
+		$this->login('adm.valuemapping.php');
 		// checking that can click on each valuemap and then save it without any changes
 		$this->click('link='.$valuemap['name']);
 		$this->wait();

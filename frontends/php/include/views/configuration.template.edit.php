@@ -131,7 +131,7 @@
 	foreach($all_groups as $gnum => $group){
 		$group_tb->addItem($group['groupid'], $group['name']);
 	}
-	$templateList->addRow(S_GROUPS, $group_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS));
+	$templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
 	$newgroupTB = new CTextBox('newgroup', $newgroup);

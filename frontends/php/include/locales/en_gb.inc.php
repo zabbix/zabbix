@@ -195,8 +195,6 @@
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		_('remember selected'),
 	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
 	'S_DEFAULT_THEME'=>				_('Default theme'),
-	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
-	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
 	'S_DEFAULT'=>					_('Default'),

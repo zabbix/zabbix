@@ -53,10 +53,10 @@ class testPageUserGroups extends CWebTest {
 		$usrgrpid = $group['usrgrpid'];
 		$name = $group['name'];
 
-		$sql1 = "select * from usrgrp where name='$name' order by usrgrpid";
-		$oldHashGroup = DBhash($sql1);
-		$sql2 = "select * from users_groups where usrgrpid=$usrgrpid order by id";
-		$oldHashUsersGroups = DBhash($sql2);
+		$sqlHashGroup = "select * from usrgrp where name='$name' order by usrgrpid";
+		$oldHashGroup = DBhash($sqlHashGroup);
+		$sqlHashUsersGroups = "select * from users_groups where usrgrpid=$usrgrpid order by id";
+		$oldHashUsersGroups = DBhash($sqlHashUsersGroups);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
@@ -69,8 +69,8 @@ class testPageUserGroups extends CWebTest {
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 
-		$this->assertEquals($oldHashGroup, DBhash($sql1));
-		$this->assertEquals($oldHashUsersGroups, DBhash($sql2));
+		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup));
+		$this->assertEquals($oldHashUsersGroups, DBhash($sqlHashUsersGroups));
 	}
 
 	public function testPageUserGroups_MassEnableAll() {
@@ -85,8 +85,8 @@ class testPageUserGroups extends CWebTest {
 		$usrgrpid = $group['usrgrpid'];
 		$name = $group['name'];
 
-		$sql1 = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups = DBhash($sql1);
+		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
@@ -103,7 +103,7 @@ class testPageUserGroups extends CWebTest {
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
 		$this->assertEquals(1, DBcount($sql));
 
-		$this->assertEquals($oldHashGroups, DBhash($sql1));
+		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
 	}
 
 	public function testPageUserGroups_MassDisableAll() {
@@ -120,8 +120,8 @@ class testPageUserGroups extends CWebTest {
 
 		$cannotDisable = ('Zabbix administrators' == $name);
 
-		$sql1 = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups = DBhash($sql1);
+		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
@@ -148,7 +148,7 @@ class testPageUserGroups extends CWebTest {
 			$this->assertEquals(1, DBcount($sql));
 		}
 
-		$this->assertEquals($oldHashGroups, DBhash($sql1));
+		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
 	}
 
 	public function testPageUserGroups_MassEnableDEBUGAll() {
@@ -163,8 +163,8 @@ class testPageUserGroups extends CWebTest {
 		$usrgrpid = $group['usrgrpid'];
 		$name = $group['name'];
 
-		$sql1 = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups = DBhash($sql1);
+		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
@@ -181,7 +181,7 @@ class testPageUserGroups extends CWebTest {
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
 		$this->assertEquals(1, DBcount($sql));
 
-		$this->assertEquals($oldHashGroups, DBhash($sql1));
+		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
 	}
 
 	public function testPageUserGroups_MassDisableDEBUGAll() {
@@ -196,8 +196,8 @@ class testPageUserGroups extends CWebTest {
 		$usrgrpid = $group['usrgrpid'];
 		$name = $group['name'];
 
-		$sql1 = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups = DBhash($sql1);
+		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->login('usergrps.php');
 		$this->assertTitle('User groups');
@@ -214,7 +214,7 @@ class testPageUserGroups extends CWebTest {
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
 		$this->assertEquals(1, DBcount($sql));
 
-		$this->assertEquals($oldHashGroups, DBhash($sql1));
+		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
 	}
 
 	public function testPageUserGroups_MassDeleteAll() {

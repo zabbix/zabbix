@@ -21,32 +21,38 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testPageQueueOverviewByProxy extends CWebTest
-{
+class testPageQueueOverviewByProxy extends CWebTest {
 	// Returns all proxies
-	public static function allProxies()
-	{
+	public static function allProxies() {
 		return DBdata("select * from hosts where status in (".HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.") order by hostid");
 	}
 
 	/**
 	* @dataProvider allProxies
 	*/
-	public function testPageQueueOverviewByProxy_CheckLayout($proxy)
-	{
+	public function testPageQueueOverviewByProxy_CheckLayout($proxy) {
 		$this->login('queue.php?config=1');
 		$this->assertTitle('Queue \[refreshed every 30 sec\]');
 		$this->ok('Queue');
 		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
-		$this->ok(array('Proxy','5 seconds','10 seconds','30 seconds','1 minute','5 minutes','More than 10 minutes'));
+		$this->ok(
+			array(
+				'Proxy',
+				'5 seconds',
+				'10 seconds',
+				'30 seconds',
+				'1 minute',
+				'5 minutes',
+				'More than 10 minutes'
+			)
+		);
 		// Data
 		$this->ok($proxy['host']);
 		$this->ok('Server');
 	}
 
-	public function testPageQueueOverviewByProxy_VerifyDisplayedNumbers()
-	{
+	public function testPageQueueOverviewByProxy_VerifyDisplayedNumbers() {
 // TODO
 		$this->markTestIncomplete();
 	}

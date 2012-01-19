@@ -20,7 +20,7 @@
 ?>
 <?php
 class CIFrame extends CTag{
-	public function __construct($src=NULL,$width='100%',$height='100%',$scrolling='no',$id='iframe'){
+	public function __construct($src=NULL,$width='100%',$height='100%',$scrolling='no',$id='iframe') {
 		parent::__construct('iframe','yes');
 
 		$this->tag_start= '';
@@ -35,42 +35,42 @@ class CIFrame extends CTag{
 		$this->setAttribute('id',$id);
 	}
 
-	public function setSrc($value=NULL){
-		if(is_null($value)){
+	public function setSrc($value=NULL) {
+		if (is_null($value)) {
 			return $this->removeAttribute('src');
 		}
-		else if(!is_string($value)){
+		else if (!is_string($value)) {
 			return $this->error('Incorrect value for setSrc ['.$value.']');
 		}
 	return $this->setAttribute('src',$value);
 	}
 
-	public function setWidth($value){
-		if(is_null($value)){
+	public function setWidth($value) {
+		if (is_null($value)) {
 			return $this->removeAttribute('width');
 		}
-		else if(!is_string($value)){
+		else if (!is_string($value)) {
 			return $this->error('Incorrect value for setWidth ['.$value.']');
 		}
 
 		$this->setAttribute('width',$value);
 	}
 
-	public function setHeight($value){
-		if(is_null($value)){
+	public function setHeight($value) {
+		if (is_null($value)) {
 			return $this->removeAttribute('height');
 		}
-		else if(!is_string($value)){
+		else if (!is_string($value)) {
 			return $this->error('Incorrect value for setHeight ['.$value.']');
 		}
 
 		$this->setAttribute('height',$value);
 	}
 
-	public function setScrolling($value){
-		if(is_null($value)) $value = 'no';
+	public function setScrolling($value) {
+		if (is_null($value)) $value = 'no';
 
-		if(($value!=='no') && ($value!=='yes') && ($value!=='auto')){
+		if (($value!=='no') && ($value!=='yes') && ($value!=='auto')) {
 			return $this->error('Incorrect value for setScrolling ['.$value.']');
 		}
 
