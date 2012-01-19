@@ -609,7 +609,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 		}
 		else
 		{
-			error_esc	= DBdyn_escape_string("Media type is not active");
+			error_esc = DBdyn_escape_string("Media type is not active");
 
 			DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
 					",mediatypeid,sendto,subject,message,status,alerttype,esc_step,error)"
