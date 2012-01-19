@@ -543,27 +543,10 @@ require_once('include/page_header.php');
 		$col = new CCol(array(bold('- '.('other').' -'), SPACE.'('._n('%1$s Item', '%1$s Items', $db_host['item_cnt']).')'));
 		$col->setColSpan(5);
 
-		// fetch scripts for the host JS menu
-		$menuScripts = array();
-		if (isset($hostScripts[$db_host['hostid']])) {
-			foreach ($hostScripts[$db_host['hostid']] as $script) {
-				$menuScripts[] = array(
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation'],
-					'name' => $script['name']
-				);
-			}
-		}
-
 		// host JS menu link
-		$hostSpan = new CSpan($db_host['name'], 'link_menu menu-host');
-		$hostSpan->setAttribute('data-menu', array(
-			'scripts' => $menuScripts,
-			'hostid' => $db_host['hostid'],
-			'groupid' => $group['groupid'],
-			'hasScreens' => (bool) $host['screens'],
-			'hasInventory' => (bool) $host['inventory']
-		));
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 
 		$table->addRow(array(
 			$link,

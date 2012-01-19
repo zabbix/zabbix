@@ -38,22 +38,21 @@ jQuery(function() {
 		if (menuData.scripts.length) {
 			menu.push(createMenuHeader(t('Scripts')));
 			jQuery.each(menuData.scripts, function(i, script) {
-				var action = 'javascript: executeScript(' + menuData.hostid + ', ' + script.scriptid
-					+ ', "' + script.confirmation +'")';
-				menu.push(createMenuItem(script.name, action));
+				menu.push(createMenuItem(script.name, function () {
+					executeScript(menuData.hostid, script.scriptid, script.confirmation);
+					return false;
+				}));
 			});
 		}
 
 		// add go to links
 		menu.push(createMenuHeader(t('Go to')));
-		menu.push(createMenuItem(t('Latest data'), 'javascript: redirect("latest.php?hostid=' + menuData.hostid + '")'));
+		menu.push(createMenuItem(t('Latest data'), 'hostinventories.php?hostid=' + menuData.hostid));
 		if (menuData.hasInventory) {
-			menu.push(createMenuItem(t('Host inventories'), 'javascript: redirect("hostinventories.php?hostid='
-				+ menuData.hostid + '")'));
+			menu.push(createMenuItem(t('Host inventories'), 'hostinventories.php?hostid=' + menuData.hostid));
 		}
 		if (menuData.hasScreens) {
-			menu.push(createMenuItem(t('Host screens'), 'javascript: redirect("host_screen.php?hostid='
-				+ menuData.hostid + '")'));
+			menu.push(createMenuItem(t('Host screens'), 'host_screen.php?hostid=' + menuData.hostid));
 		}
 
 		// render the menu
