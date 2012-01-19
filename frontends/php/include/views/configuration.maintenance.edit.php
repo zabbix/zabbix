@@ -134,7 +134,7 @@ foreach ($this->data['all_groups'] as $group) {
 	$groupsComboBox->addItem($group['groupid'], $group['name']);
 }
 $hostTable = new CTable(null, 'formElementTable');
-$hostTable->addRow($hostTweenBox->get(_('In maintenance'), array(_('Other hosts | group').SPACE, $groupsComboBox)));
+$hostTable->addRow($hostTweenBox->get(_('In maintenance'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
 $hostsAndGroupsFormList->addRow(_('Hosts in maintenance'), $hostTable);
 
 $groupTable = new CTable(null, 'formElementTable');
