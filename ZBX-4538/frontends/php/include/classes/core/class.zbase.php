@@ -36,7 +36,7 @@ class ZBase {
 	 *
 	 * @var string
 	 */
-	private $rootDir;
+	protected $rootDir;
 
 	/**
 	 * Returns the current instance of Z.
@@ -45,7 +45,7 @@ class ZBase {
 	 *
 	 * @return Z
 	 */
-	public static function i() {
+	public static function getInstance() {
 		if (self::$instance === null) {
 			self::$instance = new Z();
 		}
@@ -57,7 +57,10 @@ class ZBase {
 	 * Initializes the application.
 	 */
 	public function run() {
-		$this->setRootDir();
+		// set the root dir
+		$this->rootDir = $this->findRootDir();
+
+		// register autoloader
 		$this->registerAutoloader();
 	}
 
@@ -66,15 +69,17 @@ class ZBase {
 	 *
 	 * @return string
 	 */
-	public function getRootDir() {
-		return $this->rootDir;
+	public static function getRootDir() {
+		return self::getInstance()->rootDir;
 	}
 
 	/**
-	 * Set root dir absolute path.
+	 * Returns the path to the frontend's root dir.
+	 *
+	 * @return string
 	 */
-	private function setRootDir() {
-		$this->rootDir = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..');
+	private function findRootDir() {
+		return realpath(dirname(__FILE__).'/../../..');
 	}
 
 	/**
@@ -92,14 +97,10 @@ class ZBase {
 	 */
 	private function getIncludePaths() {
 		return array(
-			self::$instance->rootDir.DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.
-					'classes'.DIRECTORY_SEPARATOR,
-			self::$instance->rootDir.DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.
-					'classes'.DIRECTORY_SEPARATOR.'sysmaps'.DIRECTORY_SEPARATOR,
-			self::$instance->rootDir.DIRECTORY_SEPARATOR.'api'.DIRECTORY_SEPARATOR.
-					'classes'.DIRECTORY_SEPARATOR,
-			self::$instance->rootDir.DIRECTORY_SEPARATOR.'api'.DIRECTORY_SEPARATOR.
-					'rpc'.DIRECTORY_SEPARATOR
+			$this->rootDir.'/include/classes',
+			$this->rootDir.'/include/classes/sysmaps',
+			$this->rootDir.'/api/classes',
+			$this->rootDir.'/api/rpc'
 		);
 	}
 }
