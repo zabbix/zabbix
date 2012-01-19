@@ -21,6 +21,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+....I...S. [ZBX-4555] fix compilation error on Solaris (get rid of INT_MAX dependency) (dimir, Sasha)
 ..F....... [ZBX-4523] fixed impossibility to correctly translate some parts of Zabbix (sanja)
 ..F....... [ZBX-4513] refactored value mappings form (Vedmak)
 ..F....... [ZBX-4477] fixed new expressions created on each Zabbix regexp update (Vedmak)
