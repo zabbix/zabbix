@@ -1033,10 +1033,7 @@ function utf8RawUrlDecode($source){
 		DBexecute('UPDATE triggers SET expression='.zbx_dbstr($newexpression).' WHERE triggerid='.$newtriggerid);
 		// copy dependencies
 		// delete_dependencies_by_triggerid($newtriggerid);
-		$deps = replace_template_dependencies(get_trigger_dependencies_by_triggerid($triggerid), $hostid);
-		foreach ($deps as $dep_id) {
-			add_trigger_dependency($newtriggerid, $dep_id);
-		}
+
 
 		info(S_ADDED_TRIGGER.SPACE.'"'.$host['host'].':'.$trigger['description'].'"');
 		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
@@ -2398,8 +2395,18 @@ function update_template_dependencies_for_host($hostid, $templateid) {
 function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 	$triggers = get_triggers_by_hostid($templateid);
 	while ($trigger = DBfetch($triggers)) {
-		copy_trigger_to_host($trigger['triggerid'], $hostid, $copy_mode);
+		$triggerArray[] = $trigger;
 	}
+	foreach ($triggerArray as $trig) {
+		$newId[$trig['triggerid']] = copy_trigger_to_host($trig['triggerid'], $hostid, $copy_mode);
+	}
+	foreach ($triggerArray as $trig) {
+		$deps = replace_template_dependencies(get_trigger_dependencies_by_triggerid($trig['triggerid']), $hostid);
+		foreach ($deps as $dep_id) {
+			add_trigger_dependency($newId[$trig['triggerid']], $dep_id);
+		}
+	}
+
 
 	//update_template_dependencies_for_host($hostid, $templateid);
 }
