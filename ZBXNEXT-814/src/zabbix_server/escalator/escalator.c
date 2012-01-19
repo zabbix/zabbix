@@ -609,8 +609,7 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 		}
 		else
 		{
-			zbx_snprintf(error, sizeof(error), "Media type is not active");
-			error_esc	= DBdyn_escape_string(error);
+			error_esc	= DBdyn_escape_string("Media type is not active");
 
 			DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
 					",mediatypeid,sendto,subject,message,status,alerttype,esc_step,error)"
@@ -629,10 +628,13 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 					ALERT_TYPE_MESSAGE,
 					escalation->esc_step,
 					error_esc);
+
+			zbx_free(error_esc);
 		}
 
-		zbx_free(error_esc);
+		zbx_free(sendto_esc);
 	}
+
 	DBfree_result(result);
 
 	if (0 == medias)
