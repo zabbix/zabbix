@@ -543,20 +543,24 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 
 	if (0 == mediatypeid)
 	{
-		result = DBselect("select m.mediatypeid,m.sendto,m.severity,m.period,mt.status from media m, media_type mt"
+		result = DBselect(
+				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status"
+				" from media m,media_type mt"
 				" where m.mediatypeid=mt.mediatypeid"
-				" and m.active=%d and m.userid=" ZBX_FS_UI64,
-				MEDIA_STATUS_ACTIVE,
-				userid);
+					" and m.active=%d"
+					" and m.userid=" ZBX_FS_UI64,
+				MEDIA_STATUS_ACTIVE, userid);
 	}
 	else
 	{
-		result = DBselect("select m.mediatypeid,m.sendto,m.severity,m.period,mt.status from media m, media_type mt"
+		result = DBselect(
+				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status"
+				" from media m,media_type mt"
 				" where m.mediatypeid=mt.mediatypeid"
-				" and m.active=%d and m.userid=" ZBX_FS_UI64 " and m.mediatypeid=" ZBX_FS_UI64,
-				MEDIA_STATUS_ACTIVE,
-				userid,
-				mediatypeid);
+					" and m.active=%d"
+					" and m.userid=" ZBX_FS_UI64
+					" and m.mediatypeid=" ZBX_FS_UI64,
+				MEDIA_STATUS_ACTIVE, userid, mediatypeid);
 	}
 
 	while (NULL != (row = DBfetch(result)))
@@ -586,7 +590,6 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 
 		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
 		{
-
 			DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
 					",mediatypeid,sendto,subject,message,status,alerttype,esc_step)"
 					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d"
