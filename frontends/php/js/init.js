@@ -19,6 +19,15 @@
 
 jQuery(function() {
 
+	cookie.init();
+	chkbxRange.init();
+
+	// search
+	if (jQuery('#search').length) {
+		jQuery('#searchbttn').button();
+		createSuggest('search');
+	}
+
 	/**
 	 * Handles host pop up menus.
 	 */
