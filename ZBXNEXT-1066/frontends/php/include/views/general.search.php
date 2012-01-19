@@ -26,7 +26,7 @@
 	$searchBox->addClass('search');
 	$searchForm->addItem($searchBox);
 
-	$searchBtn = new CSubmit('searchbttn', _('Search'), null, 'input button');
+	$searchBtn = new CSubmit('searchbttn', _('Search'), null, 'input button ui-button ui-widget ui-state-default ui-corner-all');
 	$searchForm->addItem($searchBtn);
 
 	return new CDiv($searchForm, 'zbx_search', 'zbx_search');

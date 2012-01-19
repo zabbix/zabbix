@@ -24,7 +24,6 @@ jQuery(function() {
 
 	// search
 	if (jQuery('#search').length) {
-		jQuery('#searchbttn').button();
 		createSuggest('search');
 	}
 
