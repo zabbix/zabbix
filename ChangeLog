@@ -2,6 +2,7 @@
 Changes for 1.9.9
 
 New features:
+...GI..... [ZBXNEXT-1024] added support for more vm.memory.size modes for various platforms (asaveljevs, dimir)
 ..F....... [ZBXNEXT-1019] updated jQuery to 1.7.1 and jQuery-ui to 1.8.17 (Vedmak)
 ..F....... [ZBXNEXT-1058] added an item lifetime indicator icon in the item configuration (pavels, Sasha)
 ..F....... [ZBXNEXT-1058] changed the default discovery rule 'lifetime' field value to 30 days (pavels, Sasha)
