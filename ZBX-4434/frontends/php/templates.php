@@ -355,15 +355,15 @@ require_once('include/page_header.php');
 
 				// search for duplicates items in new macros array
 				foreach ($macros as $duplicateNumber => $duplicateNewMacro) {
-					if ($mnum != $duplicateNumber && $macro['macro'] == $duplicateNewMacro['macro']) {
-						$duplicatedMacros[] = '"'.$duplicateNewMacro['macro'].'"';
+					if ($mnum != $duplicateNumber && $macros[$mnum]['macro'] == $duplicateNewMacro['macro']) {
+						$duplicatedMacros[] = '"'.$macros[$mnum]['macro'].'"';
 					}
 				}
 			}
 
 			// validate duplicates macros
 			if (!empty($duplicatedMacros)) {
-				error(_('More than one macro with same name found:').SPACE.implode(', ', array_unique($duplicatedMacros)));
+				error(_s('More than one macro with same name found: %1$s .', implode(', ', array_unique($duplicatedMacros))));
 				throw new Exception();
 			}
 
