@@ -113,7 +113,7 @@ class CHostInterface extends CZBXAPI {
 		}
 
 // editable + PERMISSION CHECK
-		if((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']){
+		if ((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']) {
 		}
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
@@ -142,32 +142,32 @@ class CHostInterface extends CZBXAPI {
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
 // interfaceids
-		if(!is_null($options['interfaceids'])){
+		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 			$sql_parts['where']['interfaceid'] = DBcondition('hi.interfaceid', $options['interfaceids']);
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('hi.interfaceid', $nodeids);
 			}
 		}
 
 // hostids
-		if(!is_null($options['hostids'])){
+		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 			$sql_parts['select']['hostid'] = 'hi.hostid';
 			$sql_parts['where']['hostid'] = DBcondition('hi.hostid', $options['hostids']);
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('hi.hostid', $nodeids);
 			}
 		}
 
 // itemids
-		if(!is_null($options['itemids'])){
+		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
-			if($options['output'] != API_OUTPUT_SHORTEN){
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['itemid'] = 'i.itemid';
 			}
 
@@ -175,16 +175,16 @@ class CHostInterface extends CZBXAPI {
 			$sql_parts['where'][] = DBcondition('i.itemid', $options['itemids']);
 			$sql_parts['where']['hi'] = 'hi.hostid=i.hostid';
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('i.itemid', $nodeids);
 			}
 		}
 
 // triggerids
-		if(!is_null($options['triggerids'])){
+		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
-			if($options['output'] != API_OUTPUT_SHORTEN){
+			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sql_parts['select']['triggerid'] = 'f.triggerid';
 			}
 
@@ -194,7 +194,7 @@ class CHostInterface extends CZBXAPI {
 			$sql_parts['where']['hi'] = 'hi.hostid=i.hostid';
 			$sql_parts['where']['fi'] = 'f.itemid=i.itemid';
 
-			if(!$nodeCheck){
+			if (!$nodeCheck) {
 				$nodeCheck = true;
 				$sql_parts['where'][] = DBin_node('f.triggerid', $nodeids);
 			}
@@ -202,36 +202,36 @@ class CHostInterface extends CZBXAPI {
 
 // node check !!!!!
 // should last, after all ****IDS checks
-		if(!$nodeCheck){
+		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sql_parts['where'][] = DBin_node('hi.interfaceid', $nodeids);
 		}
 
 // output
-		if($options['output'] == API_OUTPUT_EXTEND){
+		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$sql_parts['select']['interface'] = 'hi.*';
 		}
 
 // countOutput
-		if(!is_null($options['countOutput'])){
+		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 			$sql_parts['select'] = array('count(DISTINCT hi.interfaceid) as rowscount');
 
 //groupCount
-			if(!is_null($options['groupCount'])){
-				foreach($sql_parts['group'] as $key => $fields){
+			if (!is_null($options['groupCount'])) {
+				foreach ($sql_parts['group'] as $key => $fields) {
 					$sql_parts['select'][$key] = $fields;
 				}
 			}
 		}
 
 // search
-		if(is_array($options['search'])){
+		if (is_array($options['search'])) {
 			zbx_db_search('interface hi', $options, $sql_parts);
 		}
 
 // filter
-		if(is_array($options['filter'])){
+		if (is_array($options['filter'])) {
 			zbx_db_filter('interface hi', $options, $sql_parts);
 		}
 
@@ -239,7 +239,7 @@ class CHostInterface extends CZBXAPI {
 		zbx_db_sorting($sql_parts, $options, $sort_columns, 'hi');
 
 // limit
-		if(zbx_ctype_digit($options['limit']) && $options['limit']){
+		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sql_parts['limit'] = $options['limit'];
 		}
 //-------
@@ -258,11 +258,11 @@ class CHostInterface extends CZBXAPI {
 		$sql_where = '';
 		$sql_group = '';
 		$sql_order = '';
-		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
-		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
-		if(!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
-		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
+		if (!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
+		if (!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
+		if (!empty($sql_parts['where']))		$sql_where.= implode(' AND ',$sql_parts['where']);
+		if (!empty($sql_parts['group']))		$sql_where.= ' GROUP BY '.implode(',',$sql_parts['group']);
+		if (!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
@@ -272,9 +272,9 @@ class CHostInterface extends CZBXAPI {
 				$sql_order;
 //SDI($sql);
 		$res = DBselect($sql, $sql_limit);
-		while($interface = DBfetch($res)){
-			if(!is_null($options['countOutput'])){
-				if(!is_null($options['groupCount']))
+		while ($interface = DBfetch($res)) {
+			if (!is_null($options['countOutput'])) {
+				if (!is_null($options['groupCount']))
 					$result[] = $interface;
 				else
 					$result = $interface['rowscount'];
@@ -282,22 +282,22 @@ class CHostInterface extends CZBXAPI {
 			else{
 				$interfaceids[$interface['interfaceid']] = $interface['interfaceid'];
 
-				if($options['output'] == API_OUTPUT_SHORTEN){
+				if ($options['output'] == API_OUTPUT_SHORTEN) {
 					$result[$interface['interfaceid']] = array('interfaceid' => $interface['interfaceid']);
 				}
 				else{
-					if(!isset($result[$interface['interfaceid']])) $result[$interface['interfaceid']] = array();
+					if (!isset($result[$interface['interfaceid']])) $result[$interface['interfaceid']] = array();
 
-					if(!is_null($options['selectHosts']) && !isset($result[$interface['interfaceid']]['hosts'])){
+					if (!is_null($options['selectHosts']) && !isset($result[$interface['interfaceid']]['hosts'])) {
 						$result[$interface['interfaceid']]['hosts'] = array();
 					}
-					if(!is_null($options['selectItems']) && !isset($result[$interface['interfaceid']]['items'])){
+					if (!is_null($options['selectItems']) && !isset($result[$interface['interfaceid']]['items'])) {
 						$result[$interface['interfaceid']]['items'] = array();
 					}
 
 // itemids
-					if(isset($interface['itemid']) && is_null($options['selectItems'])){
-						if(!isset($result[$interface['interfaceid']]['items']))
+					if (isset($interface['itemid']) && is_null($options['selectItems'])) {
+						if (!isset($result[$interface['interfaceid']]['items']))
 							$result[$interface['interfaceid']]['items'] = array();
 
 						$result[$interface['interfaceid']]['items'][] = array('itemid' => $interface['itemid']);
@@ -311,49 +311,49 @@ class CHostInterface extends CZBXAPI {
 		}
 
 Copt::memoryPick();
-		if(!is_null($options['countOutput'])){
+		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
 // Adding Objects
 // Adding Hosts
-		if(!is_null($options['selectHosts'])){
+		if (!is_null($options['selectHosts'])) {
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
 				'preservekeys' => 1
 			);
 
-			if(is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)){
+			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
 				$obj_params['output'] = $options['selectHosts'];
 				$hosts = API::Host()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($hosts, 'host');
+				if (!is_null($options['limitSelects'])) order_result($hosts, 'host');
 
 				$count = array();
-				foreach($hosts as $hostid => $host){
+				foreach ($hosts as $hostid => $host) {
 					unset($hosts[$hostid]['interfaces']);
 
-					foreach($host['interfaces'] as $tnum => $interface){
-						if(!is_null($options['limitSelects'])){
-							if(!isset($count[$interface['interfaceid']])) $count[$interface['interfaceid']] = 0;
+					foreach ($host['interfaces'] as $tnum => $interface) {
+						if (!is_null($options['limitSelects'])) {
+							if (!isset($count[$interface['interfaceid']])) $count[$interface['interfaceid']] = 0;
 							$count[$interface['interfaceid']]++;
 
-							if($count[$interface['interfaceid']] > $options['limitSelects']) continue;
+							if ($count[$interface['interfaceid']] > $options['limitSelects']) continue;
 						}
 
 						$result[$interface['interfaceid']]['hosts'][] = &$hosts[$hostid];
 					}
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['selectHosts']){
+			else if (API_OUTPUT_COUNT == $options['selectHosts']) {
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
 				$hosts = API::Host()->get($obj_params);
 				$hosts = zbx_toHash($hosts, 'hostid');
-				foreach($result as $templateid => $template){
-					if(isset($hosts[$templateid]))
+				foreach ($result as $templateid => $template) {
+					if (isset($hosts[$templateid]))
 						$result[$templateid]['hosts'] = $hosts[$templateid]['rowscount'];
 					else
 						$result[$templateid]['hosts'] = 0;
@@ -362,7 +362,7 @@ Copt::memoryPick();
 		}
 
 // Adding Items
-		if(!is_null($options['selectItems'])){
+		if (!is_null($options['selectItems'])) {
 			$obj_params = array(
 				'nodeids' => $nodeids,
 				'interfaceids' => $interfaceids,
@@ -370,32 +370,32 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			if(is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)){
+			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)) {
 				$obj_params['output'] = $options['selectItems'];
 				$items = API::Item()->get($obj_params);
 
-				if(!is_null($options['limitSelects'])) order_result($items, 'name');
+				if (!is_null($options['limitSelects'])) order_result($items, 'name');
 
 				$count = array();
-				foreach($items as $itemid => $item){
-					if(!is_null($options['limitSelects'])){
-						if(!isset($count[$item['interfaceid']])) $count[$item['interfaceid']] = 0;
+				foreach ($items as $itemid => $item) {
+					if (!is_null($options['limitSelects'])) {
+						if (!isset($count[$item['interfaceid']])) $count[$item['interfaceid']] = 0;
 						$count[$item['interfaceid']]++;
 
-						if($count[$item['interfaceid']] > $options['limitSelects']) continue;
+						if ($count[$item['interfaceid']] > $options['limitSelects']) continue;
 					}
 
 					$result[$item['interfaceid']]['items'][] = &$items[$itemid];
 				}
 			}
-			else if(API_OUTPUT_COUNT == $options['selectItems']){
+			else if (API_OUTPUT_COUNT == $options['selectItems']) {
 				$obj_params['countOutput'] = 1;
 				$obj_params['groupCount'] = 1;
 
 				$items = API::Item()->get($obj_params);
 				$items = zbx_toHash($items, 'interfaceid');
-				foreach($result as $interfaceid => $interface){
-					if(isset($items[$interfaceid]))
+				foreach ($result as $interfaceid => $interface) {
+					if (isset($items[$interfaceid]))
 						$result[$interfaceid]['items'] = $items[$interfaceid]['rowscount'];
 					else
 						$result[$interfaceid]['items'] = 0;
@@ -405,7 +405,7 @@ Copt::memoryPick();
 
 
 // removing keys (hash -> array)
-		if(is_null($options['preservekeys'])){
+		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
 
@@ -757,7 +757,7 @@ Copt::memoryPick();
 	private function checkHostInterfaces(array $interfaces, $hostid) {
 		$interfacesWithMissingData = array();
 		foreach ($interfaces as $interface) {
-			if(!isset($interface['type'], $interface['main'])) {
+			if (!isset($interface['type'], $interface['main'])) {
 				$interfacesWithMissingData[] = $interface['interfaceid'];
 			}
 		}

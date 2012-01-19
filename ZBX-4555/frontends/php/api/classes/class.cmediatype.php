@@ -367,24 +367,24 @@ class CMediatype extends CZBXAPI {
  * @param string $mediatypes['passwd']
  * @return boolean
  */
-	public function update($mediatypes){
+	public function update($mediatypes) {
 
-		if(USER_TYPE_SUPER_ADMIN != self::$userData['type']){
+		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can edit media types.'));
 		}
 		$mediatypes = zbx_toArray($mediatypes);
 
 
 		$update = array();
-		foreach($mediatypes as $mediatype){
+		foreach ($mediatypes as $mediatype) {
 			$mediatype_db_fields = array(
 				'mediatypeid' => null,
 			);
-			if(!check_db_fields($mediatype_db_fields, $mediatype)){
+			if (!check_db_fields($mediatype_db_fields, $mediatype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
 			}
 
-			if(isset($mediatype['description'])){
+			if (isset($mediatype['description'])) {
 				$options = array(
 					'filter' => array('description' => $mediatype['description']),
 					'preservekeys' => 1,
@@ -393,22 +393,22 @@ class CMediatype extends CZBXAPI {
 				$exist_mediatypes = $this->get($options);
 				$exist_mediatype = reset($exist_mediatypes);
 
-				if($exist_mediatype && (bccomp($exist_mediatype['mediatypeid'],$mediatype['mediatypeid']) != 0))
+				if ($exist_mediatype && (bccomp($exist_mediatype['mediatypeid'],$mediatype['mediatypeid']) != 0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%s" already exists.', $mediatype['description']));
 			}
 
-			if(array_key_exists('passwd', $mediatype) && empty($mediatype['passwd'])){
+			if (array_key_exists('passwd', $mediatype) && empty($mediatype['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type.'));
 			}
 
-			if(!in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))){
+			if (!in_array($mediatype['type'], array(MEDIA_TYPE_JABBER, MEDIA_TYPE_EZ_TEXTING))) {
 				$mediatype['passwd'] = '';
 			}
 
 			$mediatypeid = $mediatype['mediatypeid'];
 			unset($mediatype['mediatypeid']);
 
-			if(!empty($mediatype)){
+			if (!empty($mediatype)) {
 				$update[] = array(
 					'values' => $mediatype,
 					'where' => array('mediatypeid'=>$mediatypeid),

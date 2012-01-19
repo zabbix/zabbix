@@ -21,7 +21,7 @@
 <?php
 
 class APIException extends Exception{
-	public function __construct($code = ZBX_API_ERROR_INTERNAL, $message = ''){
+	public function __construct($code = ZBX_API_ERROR_INTERNAL, $message = '') {
         parent::__construct($message, $code);
     }
 }

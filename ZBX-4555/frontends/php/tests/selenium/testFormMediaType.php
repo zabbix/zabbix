@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormMediaType extends CWebTest{
+class testFormMediaType extends CWebTest {
 	// Returns all media types
 	public static function allMediaTypes() {
 		return DBdata('select * from media_type');
@@ -30,14 +30,26 @@ class testFormMediaType extends CWebTest{
 	// Data for media type creation
 	public static function newMediaTypes() {
 		$data=array(
-			array('Email', array('Description'=>'Email2','SMTP server'=>'mail.zabbix.com',
-				'SMTP helo'=>'zabbix.com','SMTP email'=>'zabbix@zabbix.com')),
-			array('Email',array('Description'=>'Email3','SMTP server'=>'mail2.zabbix.com',
-				'SMTP helo'=>'zabbix.com','SMTP email'=>'zabbix2@zabbix.com')),
-			array('Script',array('Description'=>'Skype message','Script'=>'/usr/local/bin/skype.sh')),
-			array('Script',array('Description'=>'Skype message2','Script'=>'/usr/local/bin/skyp2.sh')),
-			array('SMS',array('Description'=>'Direct SMS messaging','GSM modem'=>'/dev/ttyS3')),
-			array('Jabber',array('Description'=>'Jabber messages','Jabber identifier'=>'zabbix@jabber.com','Password'=>'Secret password')),
+			array(
+				'Email', array('Description' => 'Email2', 'SMTP server' => 'mail.zabbix.com',
+						'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix@zabbix.com')
+			),
+			array(
+				'Email', array('Description' => 'Email3', 'SMTP server' => 'mail2.zabbix.com',
+					'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix2@zabbix.com')),
+			array('Script', array('Description' => 'Skype message', 'Script' => '/usr/local/bin/skype.sh')),
+			array(
+				'Script', array('Description' => 'Skype message2',
+						'Script' => '/usr/local/bin/skyp2.sh')),
+			array('SMS', array('Description' => 'Direct SMS messaging', 'GSM modem' => '/dev/ttyS3')),
+			array(
+				'Jabber',
+				array(
+					'Description' => 'Jabber messages',
+					'Jabber identifier' => 'zabbix@jabber.com',
+					'Password' => 'Secret password'
+				)
+			)
 		);
 		return $data;
 	}
@@ -52,7 +64,7 @@ class testFormMediaType extends CWebTest{
 		$this->ok('Media types');
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 		$this->nok('Displaying');
-		$this->ok(array('Description','Type','SMTP server','SMTP helo','SMTP email'));
+		$this->ok(array('Description', 'Type', 'SMTP server', 'SMTP helo', 'SMTP email'));
 
 		$this->click('cancel');
 		$this->wait();
@@ -63,7 +75,7 @@ class testFormMediaType extends CWebTest{
 	/**
 	* @dataProvider newMediaTypes
 	*/
-	public function testFormMediaType_Create($type,$data) {
+	public function testFormMediaType_Create($type, $data) {
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 		$this->button_click('form');
@@ -71,38 +83,38 @@ class testFormMediaType extends CWebTest{
 
 		switch ($type) {
 			case 'Email':
-				$this->dropdown_select('type',$type);
-				$this->input_type('description',$data['Description']);
-				$this->input_type('smtp_server',$data['SMTP server']);
-				$this->input_type('smtp_helo',$data['SMTP helo']);
-				$this->input_type('smtp_email',$data['SMTP email']);
-			break;
+				$this->dropdown_select('type', $type);
+				$this->input_type('description', $data['Description']);
+				$this->input_type('smtp_server', $data['SMTP server']);
+				$this->input_type('smtp_helo', $data['SMTP helo']);
+				$this->input_type('smtp_email', $data['SMTP email']);
+				break;
 			case 'Script':
-				$this->dropdown_select('type',$type);
+				$this->dropdown_select('type', $type);
 				$this->wait();
-				$this->input_type('description',$data['Description']);
-				$this->input_type('exec_path',$data['Script']);
-			break;
+				$this->input_type('description', $data['Description']);
+				$this->input_type('exec_path', $data['Script']);
+				break;
 			case 'SMS':
-				$this->dropdown_select('type',$type);
+				$this->dropdown_select('type', $type);
 				$this->wait();
-				$this->input_type('description',$data['Description']);
-				$this->input_type('gsm_modem',$data['GSM modem']);
-			break;
+				$this->input_type('description', $data['Description']);
+				$this->input_type('gsm_modem', $data['GSM modem']);
+				break;
 			case 'Jabber':
-				$this->dropdown_select('type',$type);
+				$this->dropdown_select('type', $type);
 				$this->wait();
-				$this->input_type('description',$data['Description']);
-				$this->input_type('username',$data['Jabber identifier']);
-				$this->input_type('password',$data['Password']);
-			break;
+				$this->input_type('description', $data['Description']);
+				$this->input_type('username', $data['Jabber identifier']);
+				$this->input_type('password', $data['Password']);
+				break;
 			case 'Ez Texting':
-				$this->dropdown_select('type',$type);
+				$this->dropdown_select('type', $type);
 				$this->wait();
-				$this->input_type('description',$data['Description']);
-				$this->input_type('username',$data['Username']);
-				$this->input_type('password',$data['Password']);
-			break;
+				$this->input_type('description', $data['Description']);
+				$this->input_type('username', $data['Username']);
+				$this->input_type('password', $data['Password']);
+				break;
 		}
 
 		$this->click('save');
@@ -120,8 +132,8 @@ class testFormMediaType extends CWebTest{
 	public function testFormMediaType_SimpleCancel($mediatype) {
 		$name=$mediatype['description'];
 
-		$sql="select * from media_type order by mediatypeid";
-		$oldHash=DBhash($sql);
+		$sql = "SELECT * FROM media_type ORDER BY mediatypeid";
+		$oldHash = DBhash($sql);
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
@@ -133,17 +145,17 @@ class testFormMediaType extends CWebTest{
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 
-		$this->assertEquals($oldHash,DBhash($sql));
+		$this->assertEquals($oldHash, DBhash($sql));
 	}
 
 	/**
 	* @dataProvider allMediaTypes
 	*/
 	public function testFormMediaType_SimpleDelete($mediatype) {
-		$name=$mediatype['description'];
-		$id=$mediatype['mediatypeid'];
+		$name = $mediatype['description'];
+		$id = $mediatype['mediatypeid'];
 
-		$row=DBfetch(DBselect("select count(*) as cnt from opmessage where mediatypeid=$id"));
+		$row = DBfetch(DBselect("SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid=$id"));
 		$used_by_operations = ($row['cnt'] > 0);
 
 		DBsave_tables('media_type');
@@ -165,12 +177,12 @@ class testFormMediaType extends CWebTest{
 				$this->nok('Media type deleted');
 				$this->ok('Cannot delete media type');
 				$this->ok('Media types used by action');
-			break;
+				break;
 			case false:
 				$this->ok('Media type deleted');
-				$sql="select * from media_type where mediatypeid=$id";
-				$this->assertEquals(0,DBcount($sql));
-			break;
+				$sql = "SELECT * FROM media_type WHERE mediatypeid=$id";
+				$this->assertEquals(0, DBcount($sql));
+				break;
 		}
 
 		DBrestore_tables('media_type');

@@ -20,7 +20,7 @@
 ?>
 <?php
 class CParam extends CTag{
-	function __construct($name,$value){
+	function __construct($name,$value) {
 		parent::__construct('param','no');
 		$this->attributes['name'] = $name;
 		$this->attributes['value'] = $value;

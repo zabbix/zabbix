@@ -49,7 +49,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->assertElementPresent('save');
 		$this->assertElementPresent('cancel');
 
-}
+	}
 
 	public function testFormAdministrationGeneralImages_AddImage() {
 

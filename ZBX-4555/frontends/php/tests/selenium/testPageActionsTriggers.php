@@ -57,12 +57,12 @@ class testPageActionsTriggers extends CWebTest {
 		$actionid = $action['actionid'];
 		$name = $action['name'];
 
-		$sql1 = "SELECT * FROM actions WHERE actionid=$actionid ORDER BY actionid";
-		$oldHashAction = DBhash($sql1);
-		$sql2 = "SELECT * FROM operations WHERE actionid=$actionid ORDER BY operationid";
-		$oldHashOperations = DBhash($sql2);
-		$sql3 = "SELECT * FROM conditions WHERE actionid=$actionid ORDER BY conditionid";
-		$oldHashConditions = DBhash($sql3);
+		$sqlAction = "SELECT * FROM actions WHERE actionid=$actionid ORDER BY actionid";
+		$oldHashAction = DBhash($sqlAction);
+		$sqlOperations = "SELECT * FROM operations WHERE actionid=$actionid ORDER BY operationid";
+		$oldHashOperations = DBhash($sqlOperations);
+		$sqlConditions = "SELECT * FROM conditions WHERE actionid=$actionid ORDER BY conditionid";
+		$oldHashConditions = DBhash($sqlConditions);
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS);
 		$this->assertTitle('Configuration of actions');
@@ -74,9 +74,9 @@ class testPageActionsTriggers extends CWebTest {
 		$this->ok('Action updated');
 		$this->ok("$name");
 
-		$this->assertEquals($oldHashAction, DBhash($sql1), "Chuck Norris: Action update changed data in table 'actions'.");
-		$this->assertEquals($oldHashOperations, DBhash($sql2), "Chuck Norris: Action update changed data in table 'operations'");
-		$this->assertEquals($oldHashConditions, DBhash($sql3), "Chuck Norris: Action update changed data in table 'conditions'");
+		$this->assertEquals($oldHashAction, DBhash($sqlAction), "Chuck Norris: Action update changed data in table 'actions'.");
+		$this->assertEquals($oldHashOperations, DBhash($sqlOperations), "Chuck Norris: Action update changed data in table 'operations'");
+		$this->assertEquals($oldHashConditions, DBhash($sqlConditions), "Chuck Norris: Action update changed data in table 'conditions'");
 	}
 
 	/**

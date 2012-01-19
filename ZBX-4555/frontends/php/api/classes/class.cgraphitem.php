@@ -192,7 +192,7 @@ class CGraphItem extends CZBXAPI {
 					$sql_order;
 		$db_res = DBselect($sql, $sql_limit);
 		while ($gitem = DBfetch($db_res)) {
-			if (!is_null($options['countOutput'])){
+			if (!is_null($options['countOutput'])) {
 				$result = $gitem['rowscount'];
 			}
 			else {

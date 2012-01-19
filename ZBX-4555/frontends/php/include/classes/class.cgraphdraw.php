@@ -23,7 +23,7 @@ require_once('include/items.inc.php');
 require_once('include/hosts.inc.php');
 
 class CGraphDraw{
-	public function __construct($type = GRAPH_TYPE_NORMAL){
+	public function __construct($type = GRAPH_TYPE_NORMAL) {
 		$this->stime = null;
 		$this->fullSizeX = null;
 		$this->fullSizeY = null;
@@ -87,7 +87,7 @@ class CGraphDraw{
 		$this->applyGraphTheme();
 	}
 
-	public function initColors(){
+	public function initColors() {
 
 		$colors = array(		/*  Red, Green, Blue, Alpha */
 			'Red'			=> array(255,0,0,50),
@@ -123,8 +123,8 @@ class CGraphDraw{
 		$this->colorsrgb = $colors;
 
 // I should rename No Alpha to Alpha at some point to get rid of some confusion
-		foreach($colors as $name => $RGBA){
-			if(isset($RGBA[3]) &&  function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1)){
+		foreach ($colors as $name => $RGBA) {
+			if (isset($RGBA[3]) &&  function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1)) {
 				$this->colors[$name]	= imagecolorexactalpha($this->im,$RGBA[0],$RGBA[1],$RGBA[2],$RGBA[3]);
 			}
 			else{
@@ -133,9 +133,9 @@ class CGraphDraw{
 		}
 	}
 
-	public function applyGraphTheme($description=null){
+	public function applyGraphTheme($description=null) {
 
-		if(!is_null($description)){
+		if (!is_null($description)) {
 			$sql_where = ' AND gt.description='.zbx_dbstr($description);
 		}
 		else{
@@ -149,22 +149,22 @@ class CGraphDraw{
 				$sql_where;
 //SDI($sql);
 		$res = DBselect($sql);
-		if($theme = DBfetch($res)){
+		if ($theme = DBfetch($res)) {
 			$this->graphtheme = $theme;
 		}
 	}
 
-	public function showLegend($type=true){
+	public function showLegend($type=true) {
 		$this->drawLegend = $type;
 	return $this->drawLegend;
 	}
 
-	public function setPeriod($period){
+	public function setPeriod($period) {
 		$this->period=$period;
 	}
 
-	public function setSTime($stime){
-		if($stime>19000000000000 && $stime<21000000000000){
+	public function setSTime($stime) {
+		if ($stime>19000000000000 && $stime<21000000000000) {
 			$this->stime = zbxDateToTime($stime);
 		}
 		else{
@@ -172,35 +172,35 @@ class CGraphDraw{
 		}
 	}
 
-	public function setFrom($from){
+	public function setFrom($from) {
 		$this->from=$from;
 	}
 
-	public function setWidth($value = NULL){
+	public function setWidth($value = NULL) {
 // Avoid sizeX==0, to prevent division by zero later
-		if($value == 0) $value = NULL;
-//		if($value > 1300) $value = 1300;
-		if(is_null($value)) $value = 900;
+		if ($value == 0) $value = NULL;
+//		if ($value > 1300) $value = 1300;
+		if (is_null($value)) $value = 900;
 
 		$this->sizeX = $value;
 	}
 
-	public function setHeight($value = NULL){
-		if($value == 0) $value = NULL;
-		if(is_null($value)) $value = 900;
+	public function setHeight($value = NULL) {
+		if ($value == 0) $value = NULL;
+		if (is_null($value)) $value = 900;
 
 		$this->sizeY = $value;
 	}
 
-	public function setBorder($border){
+	public function setBorder($border) {
 		$this->border=$border;
 	}
 
-	public function getLastValue($num){
+	public function getLastValue($num) {
 		$data = &$this->data[$this->items[$num]['itemid']][$this->items[$num]['calc_type']];
-		if(isset($data)) for($i=$this->sizeX-1;$i>=0;$i--){
-			if(isset($data['count'][$i]) && ($data['count'][$i] > 0)){
-				switch($this->items[$num]['calc_fnc']){
+		if (isset($data)) for($i=$this->sizeX-1;$i>=0;$i--) {
+			if (isset($data['count'][$i]) && ($data['count'][$i] > 0)) {
+				switch ($this->items[$num]['calc_fnc']) {
 					case CALC_FNC_MIN:	return	$data['min'][$i];
 					case CALC_FNC_MAX:	return	$data['max'][$i];
 					case CALC_FNC_ALL:	/* use avg */
@@ -212,18 +212,18 @@ class CGraphDraw{
 	return 0;
 	}
 
-	public function drawRectangle(){
+	public function drawRectangle() {
 		imagefilledrectangle($this->im,0,0,
 			$this->fullSizeX,$this->fullSizeY,
 			$this->getColor($this->graphtheme['backgroundcolor'], 0));
 
 
-		if($this->border==1){
+		if ($this->border==1) {
 			imagerectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1, $this->getColor($this->graphtheme['graphbordercolor'], 0));
 		}
 	}
 
-	public function drawSmallRectangle(){
+	public function drawSmallRectangle() {
 		dashedrectangle($this->im,
 			$this->shiftXleft+$this->shiftXCaption-1,
 			$this->shiftY-1,
@@ -233,7 +233,7 @@ class CGraphDraw{
 			);
 	}
 
-	public function period2str($period){
+	public function period2str($period) {
 
 		$str = '  ('.zbx_date2age(0,$period).')';
 //		$str.=' history ';
@@ -269,16 +269,16 @@ class CGraphDraw{
 		imageText($this->im, $fontsize, 0, $x, 24, $this->getColor($this->graphtheme['textcolor'], 0), $str);
 	}
 
-	public function setHeader($header){
+	public function setHeader($header) {
 		$this->header = $header;
 	}
 
-	public function drawLogo(){
+	public function drawLogo() {
 		imagestringup($this->im,0,$this->fullSizeX-10,$this->fullSizeY-50, 'http://www.zabbix.com', $this->getColor('Gray'));
 	}
 
-	public function getColor($color,$alfa=50){
-		if(isset($this->colors[$color]))
+	public function getColor($color,$alfa=50) {
+		if (isset($this->colors[$color]))
 			return $this->colors[$color];
 
 		$RGB = array(
@@ -287,7 +287,7 @@ class CGraphDraw{
 			hexdec('0x'.substr($color, 4,2))
 			);
 
-		if(isset($alfa) &&
+		if (isset($alfa) &&
 			function_exists('imagecolorexactalpha') &&
 			function_exists('imagecreatetruecolor') &&
 			@imagecreatetruecolor(1,1)
@@ -299,9 +299,9 @@ class CGraphDraw{
 		return imagecolorallocate($this->im,$RGB[0],$RGB[1],$RGB[2]);
 	}
 
-	public function getShadow($color,$alfa=0){
+	public function getShadow($color,$alfa=0) {
 
-		if(isset($this->colorsrgb[$color])){
+		if (isset($this->colorsrgb[$color])) {
 			$red = $this->colorsrgb[$color][0];
 			$green = $this->colorsrgb[$color][1];
 			$blue = $this->colorsrgb[$color][2];
@@ -310,7 +310,7 @@ class CGraphDraw{
 			list($red, $green, $blue) = hex2rgb($color);
 		}
 
-		if($this->sum > 0){
+		if ($this->sum > 0) {
 			$red = (int)($red * 0.6);
 			$green = (int)($green * 0.6);
 			$blue = (int)($blue * 0.6);
@@ -318,7 +318,7 @@ class CGraphDraw{
 
 		$RGB = array($red,$green,$blue);
 
-		if(isset($alfa) &&
+		if (isset($alfa) &&
 			function_exists('imagecolorexactalpha') &&
 			function_exists('imagecreatetruecolor') &&
 			@imagecreatetruecolor(1,1)

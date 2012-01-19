@@ -24,7 +24,7 @@ require_once('include/config.inc.php');
 $page['title'] = 'S_WARNING';
 $page['file'] = 'warning.php';
 
-define('ZBX_PAGE_DO_REFRESH',1);
+define('ZBX_PAGE_DO_REFRESH', 1);
 
 if(!defined('PAGE_HEADER_LOADED'))
 	define('ZBX_PAGE_NO_MENU', 1);
@@ -57,23 +57,23 @@ unset($USER_DETAILS);
 
 	$table = new CTable(null, 'warningTable');
 	$table->setAlign('center');
-	$table->setAttribute('style','width: 480px; margin-top: 100px;');
-	$table->setHeader(array(new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left')),'header');
+	$table->setAttribute('style', 'width: 480px; margin-top: 100px;');
+	$table->setHeader(array(new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left')), 'header');
 
 	$table->addRow(SPACE);
 
 	$warning_msg=(isset($_REQUEST['warning_msg']))?($_REQUEST['warning_msg']):(S_ZABBIX_IS_UNAVAILABLE.'!');
 
-	$img = new CImg('./images/general/warning16r.gif','warning',16,16,'img');
-	$img->setAttribute('style','border-width: 0px; vertical-align: bottom;');
+	$img = new CImg('./images/general/warning16r.gif', 'warning', 16, 16, 'img');
+	$img->setAttribute('style', 'border-width: 0px; vertical-align: bottom;');
 
 	$msg = new CSpan(bold(SPACE.$warning_msg));
-	$msg->setAttribute('style','line-height: 20px; vertical-align: top;');
+	$msg->setAttribute('style', 'line-height: 20px; vertical-align: top;');
 
-	$table->addRow(new CCol(array($img, $msg),'center'));
+	$table->addRow(new CCol(array($img, $msg), 'center'));
 	$table->addRow(SPACE);
 
-	$table->setFooter(new CCol(new CButton('retry',S_RETRY,'javascript: document.location.reload();'),'left'),'footer');
+	$table->setFooter(new CCol(new CButton('retry', S_RETRY, 'javascript: document.location.reload();'), 'left'), 'footer');
 
 	$table->show();
 	zbx_add_post_js('setTimeout("document.location.reload();",'.($refresh_rate*1000).');');
