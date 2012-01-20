@@ -199,37 +199,9 @@ include_once('include/page_header.php');
 	$writeonly	= get_request('writeonly');
 	$noempty	= get_request('noempty'); 		// display/hide "Empty" button
 
-check_fields($fields);
-$allowed_fields = array(
-	'name',
-	'host',
-	'description',
-	'hostid',
-	'groupid',
-	'triggerid',
-	'nodeid',
-	'druleid',
-	'dcheckid',
-	'usergrpid',
-	'userid',
-	'alias',
-	'itemid',
-	'graphid',
-	'sysmapid',
-	'screenid',
-	'slideshowid',
-	'_key',
-	'expression'
-);
-if (isset($srcfld1) && !in_array($srcfld1, $allowed_fields)) {
-	show_error_message('not valid field  '.$srcfld1);
-	exit;
-}
-elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
-	show_error_message('not valid field  '.$srcfld2);
-	exit;
-}
-
+	check_fields($fields);
+	checkInput($srcfld1);
+	checkInput($srcfld2);
 
 	$existed_templates = get_request('existed_templates', null);
 	$excludeids = get_request('excludeids', null);
@@ -457,6 +429,7 @@ elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
 		$hosts = CHost::get($options);
 
 		foreach($hosts as $hnum => $host){
+			checkIsSet($host, $srcfld1, $srcfld2);
 			$name = new CSpan($host['host'], 'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '');
@@ -581,6 +554,7 @@ elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
 		order_result($hostgroups, 'name');
 
 		foreach($hostgroups as $gnum => $row){
+			checkIsSet($row, $srcfld1, $srcfld2);
 			$row['node_name'] = get_node_name_by_elid($row['groupid'], true);
 			$name = new CSpan($row['name'],'link');
 
@@ -610,6 +584,7 @@ elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
 		$templates = CTemplate::get($options);
 
 		foreach($templates as $tnum => $row){
+			checkIsSet($row, $srcfld1, $srcfld2);
 			$name = new CSpan($row['host'],'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
@@ -640,6 +615,7 @@ elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
 		$objects = array_merge($templates, $hosts);
 
 		foreach($objects as $row){
+			checkIsSet($row, $srcfld1, $srcfld2);
 			$name = new CSpan($row['host'], 'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 			(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
@@ -663,6 +639,7 @@ elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
 		order_result($usergroups, 'name');
 
 		foreach($usergroups as $tnu => $row){
+			checkIsSet($row, $srcfld1, $srcfld2);
 			$name = new CSpan(get_node_name_by_elid($row['usrgrpid'], null, ': ').$row['name'],'link');
 
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -687,6 +664,7 @@ elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
 		order_result($users, 'alias');
 
 		foreach($users as $unum => $row){
+			checkIsSet($row, $srcfld1, $srcfld2);
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
 				(isset($_REQUEST['submit'])? " window.opener.document.getElementsByName('$dstfrm')[0].submit();":'');
@@ -705,6 +683,7 @@ elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
 		$result = DBselect("select * from help_items where itemtype=".$itemtype." ORDER BY key_");
 
 		while($row = DBfetch($result)){
+			checkIsSet($row, $srcfld1, $srcfld2);
 			$name = new CSpan($row["key_"],'link');
 			$action = get_window_opener($dstfrm, $dstfld1, html_entity_decode($row[$srcfld1])).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
@@ -1569,6 +1548,42 @@ elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
 		}
 		$table->show();
 	}
+
+function checkInput($field) {
+$allowed_fields = array(
+		'name',
+		'host',
+		'description',
+		'hostid',
+		'groupid',
+		'triggerid',
+		'nodeid',
+		'druleid',
+		'dcheckid',
+		'usergrpid',
+		'userid',
+		'alias',
+		'itemid',
+		'graphid',
+		'sysmapid',
+		'screenid',
+		'slideshowid',
+		'_key',
+		'expression'
+);
+	if (isset($field) && !in_array($field, $allowed_fields)) {
+		show_error_message(sprintf('not valid field  "%s"',$field));
+		exit;
+	}
+}
+function checkIsSet($field, $src1=false, $src2=false) {
+	if ($src1 && !isset($field[$src1])) $error = $src1;
+	if ($src2 && !isset($field[$src2])) $error = $src2;
+	if (isset($error)) {
+		show_error_message(sprintf('The field "%s" not exist', $error)) ;
+		exit;
+	}
+}
 ?>
 <?php
 
