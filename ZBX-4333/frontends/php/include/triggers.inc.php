@@ -2357,7 +2357,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 		$triggerArray[] = $trigger;
 	}
 	foreach ($triggerArray as $triggerData) {
-		$newId[$trig['triggerid']] = copy_trigger_to_host($triggerData['triggerid'], $hostid, $copy_mode);
+		$newId[$triggerData['triggerid']] = copy_trigger_to_host($triggerData['triggerid'], $hostid, $copy_mode);
 	}
 	foreach ($triggerArray as $triggerData) {
 		$deps = replace_template_dependencies(get_trigger_dependencies_by_triggerid($triggerData['triggerid']), $hostid);
