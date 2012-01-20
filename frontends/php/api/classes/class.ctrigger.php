@@ -1294,7 +1294,7 @@ class CTrigger extends CZBXAPI {
 			}
 
 			if (($update || $delete) && !isset($dbTriggers[$trigger['triggerid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			if ($update) {
@@ -1960,7 +1960,7 @@ class CTrigger extends CZBXAPI {
 		));
 		foreach ($data['hostids'] as $hostid) {
 			if (!isset($allowedHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
@@ -1972,7 +1972,7 @@ class CTrigger extends CZBXAPI {
 		));
 		foreach ($data['templateids'] as $templateid) {
 			if (!isset($allowedTemplates[$templateid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
@@ -2054,7 +2054,7 @@ class CTrigger extends CZBXAPI {
 				$up_triggerids = array();
 				while ($up_trigger = DBfetch($db_up_triggers)) {
 					if (bccomp($up_trigger['triggerid_up'], $trigger['triggerid']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_DEPENDENCY);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency'));
 					}
 					$up_triggerids[] = $up_trigger['triggerid_up'];
 				}
