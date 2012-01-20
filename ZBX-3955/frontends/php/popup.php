@@ -188,7 +188,6 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['itemtype']) && !str_in_array($_REQUEST['itemtype'], $allowed_item_types))
 			unset($_REQUEST['itemtype']);
 
-	check_fields($fields);
 
 	$dstfrm		= get_request('dstfrm',  '');	// destination form
 	$dstfld1	= get_request('dstfld1', '');	// output field on destination form
@@ -199,6 +198,38 @@ include_once('include/page_header.php');
 	$dstact 	= get_request('dstact', '');
 	$writeonly	= get_request('writeonly');
 	$noempty	= get_request('noempty'); 		// display/hide "Empty" button
+
+check_fields($fields);
+$allowed_fields = array(
+	'name',
+	'host',
+	'description',
+	'hostid',
+	'groupid',
+	'triggerid',
+	'nodeid',
+	'druleid',
+	'dcheckid',
+	'usergrpid',
+	'userid',
+	'alias',
+	'itemid',
+	'graphid',
+	'sysmapid',
+	'screenid',
+	'slideshowid',
+	'_key',
+	'expression'
+);
+if (isset($srcfld1) && !in_array($srcfld1, $allowed_fields)) {
+	show_error_message('not valid field  '.$srcfld1);
+	exit;
+}
+elseif (isset($srcfld2) && !in_array($srcfld2, $allowed_fields)) {
+	show_error_message('not valid field  '.$srcfld2);
+	exit;
+}
+
 
 	$existed_templates = get_request('existed_templates', null);
 	$excludeids = get_request('excludeids', null);
@@ -410,7 +441,6 @@ include_once('include/page_header.php');
 	show_table_header($page['title'], $frmTitle);
 ?>
 <?php
-
 	if($srctbl == 'hosts'){
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 		$table->setHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
