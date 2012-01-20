@@ -1,6 +1,6 @@
 Changes for 1.8.11rc1
 
-........S. [ZBX-4507] added possibility to remove a "Discovered hosts" group from a discovered host by an action (Sasha)
+........S. [ZBX-4507] added possibility to remove a discovered host from "Discovered hosts" group by action (Sasha)
 ........S. [ZBX-1609] added support for all data types in dynamic indexes in SNMP (dimir)
 ........S. [ZBX-4511] removed the "user_history" table from the list of synchronized tables between nodes (Sasha)
 A.F....... [ZBX-4499] fixed upper case error in some browsers while adding macro (sanja)

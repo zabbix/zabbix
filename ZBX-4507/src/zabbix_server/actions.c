@@ -1142,13 +1142,13 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 	if (0 != new_groupids.values_num)
 	{
 		zbx_vector_uint64_sort(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_group_add(event, &new_groupids);
+		op_groups_add(event, &new_groupids);
 	}
 
 	if (0 != del_groupids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_group_del(event, &del_groupids);
+		op_groups_del(event, &del_groupids);
 	}
 
 	zbx_vector_uint64_destroy(&del_groupids);

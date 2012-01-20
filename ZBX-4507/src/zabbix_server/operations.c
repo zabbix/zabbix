@@ -835,19 +835,19 @@ void	op_host_disable(DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
- * Function: op_group_add                                                     *
+ * Function: op_groups_add                                                    *
  *                                                                            *
- * Purpose: add group to discovered host                                      *
+ * Purpose: add groups to discovered host                                     *
  *                                                                            *
- * Parameters: event   - [IN] event data                                      *
- *             groupid - [IN] group identificator from database               *
+ * Parameters: event    - [IN] event data                                     *
+ *             groupids - [IN] IDs of groups to add                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_group_add(DB_EVENT *event, zbx_vector_uint64_t *groupids)
+void	op_groups_add(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "op_group_add";
+	const char	*__function_name = "op_groups_add";
 	zbx_uint64_t	hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -868,19 +868,19 @@ void	op_group_add(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 /******************************************************************************
  *                                                                            *
- * Function: op_group_del                                                     *
+ * Function: op_groups_del                                                    *
  *                                                                            *
- * Purpose: delete group from discovered host                                 *
+ * Purpose: delete groups from discovered host                                *
  *                                                                            *
- * Parameters: event   - [IN] event data                                      *
- *             groupid - [IN] group identificator from database               *
+ * Parameters: event    - [IN] event data                                     *
+ *             groupids - [IN] IDs of groups to delete                        *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_group_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
+void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "op_group_del";
+	const char	*__function_name = "op_groups_del";
 
 	DB_RESULT	result;
 	zbx_uint64_t	hostid;
