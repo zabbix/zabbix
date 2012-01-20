@@ -1448,8 +1448,19 @@ class CTrigger extends CZBXAPI {
 		$this->checkInput($triggers, __FUNCTION__);
 		$this->updateReal($triggers);
 
+		$options = array(
+			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+			'nopermissions' => true
+		);
+		$dbTriggers = $this->get($options);
 		foreach ($triggers as $trigger) {
-			$this->inherit($trigger);
+			// pass the full trigger so the children can inherit all of the data
+			$dbTrigger = $dbTriggers[$trigger['triggerid']];
+			$dbTrigger['expression'] = $trigger['expression'];
+
+			$this->inherit($dbTrigger);
 		}
 		return array('triggerids' => $triggerids);
 	}
@@ -1524,8 +1535,8 @@ class CTrigger extends CZBXAPI {
 		// disable actions
 		$actionids = array();
 		$db_actions = DBselect(
-			'SELECT DISTINCT actionid '.
-				' FROM conditions '.
+			'SELECT DISTINCT actionid'.
+				' FROM conditions'.
 				' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
 				' AND '.DBcondition('value', $pks, false, true)
 		);
