@@ -57,10 +57,8 @@ class ZBase {
 	 * Initializes the application.
 	 */
 	public function run() {
-		// set the root dir
 		$this->rootDir = $this->findRootDir();
 
-		// register autoloader
 		$this->registerAutoloader();
 	}
 
