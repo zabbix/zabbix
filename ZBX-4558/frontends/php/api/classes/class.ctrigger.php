@@ -1495,36 +1495,6 @@ class CTrigger extends CZBXAPI {
 		);
 		$del_triggers = $this->get($options);
 
-		DB::delete('events', array(
-			'objectid' => $triggerids,
-			'object' => EVENT_OBJECT_TRIGGER
-		));
-
-		DB::delete('sysmaps_elements', array(
-			'elementid' => $triggerids,
-			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
-		));
-
-		// disable actions
-		$actionids = array();
-		$db_actions = DBselect(
-			'SELECT DISTINCT actionid '.
-			' FROM conditions '.
-			' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
-				' AND '.DBcondition('value', $triggerids, false, true)
-		);
-		while ($db_action = DBfetch($db_actions)) {
-			$actionids[$db_action['actionid']] = $db_action['actionid'];
-		}
-
-		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.DBcondition('actionid', $actionids));
-
-		// delete action conditions
-		DB::delete('conditions', array(
-			'conditiontype' => CONDITION_TYPE_TRIGGER,
-			'value' => $triggerids
-		));
-
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
 			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
@@ -1533,12 +1503,48 @@ class CTrigger extends CZBXAPI {
 					$trigger['description'].':'.$trigger['expression'], null, null, null);
 		}
 
-		DB::delete('triggers', array('triggerid' => $triggerids));
-
-		update_services_status_all();
+		// execute delete
+		$this->deleteByPks($triggerids);
 
 		return array('triggerids' => $triggerids);
 	}
+
+
+	protected function deleteByPks(array $pks) {
+		DB::delete('events', array(
+			'objectid' => $pks,
+			'object' => EVENT_OBJECT_TRIGGER
+		));
+
+		DB::delete('sysmaps_elements', array(
+			'elementid' => $pks,
+			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER
+		));
+
+		// disable actions
+		$actionids = array();
+		$db_actions = DBselect(
+			'SELECT DISTINCT actionid '.
+				' FROM conditions '.
+				' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
+				' AND '.DBcondition('value', $pks, false, true)
+		);
+		while ($db_action = DBfetch($db_actions)) {
+			$actionids[$db_action['actionid']] = $db_action['actionid'];
+		}
+		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.DBcondition('actionid', $actionids));
+
+		// delete action conditions
+		DB::delete('conditions', array(
+			'conditiontype' => CONDITION_TYPE_TRIGGER,
+			'value' => $pks
+		));
+
+		parent::deleteByPks($pks);
+
+		update_services_status_all();
+	}
+
 
 	/**
 	 * Add dependency for trigger
@@ -1779,7 +1785,20 @@ class CTrigger extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
 		));
+
+		// fetch the existing child triggers
+		$templatedTriggers = $this->select('triggers', array(
+			'filter' => array(
+				'templateid' => $trigger['triggerid']
+			)
+		));
+
 		if (empty($triggerTemplates)) {
+			// no templates found, delete any child triggers, that may exist
+			if ($templatedTriggers) {
+				$this->deleteByPks(zbx_objectValues($templatedTriggers, 'triggerid'));
+			}
+
 			return true;
 		}
 
@@ -1813,6 +1832,8 @@ class CTrigger extends CZBXAPI {
 			'nopermissions' => true,
 			'templated_hosts' => true
 		));
+
+		$childTriggerIds = array();
 		foreach ($chd_hosts as $chd_host) {
 			$newTrigger = $trigger;
 			$newTrigger['templateid'] = $trigger['triggerid'];
@@ -1908,7 +1929,16 @@ class CTrigger extends CZBXAPI {
 				}
 			}
 			$this->inherit($newTrigger);
+
+			$childTriggerIds[] = $newTrigger['triggerid'];
 		}
+
+		// delete remaining child triggers
+		$remainingChildTriggerIds = array_diff(zbx_objectValues($templatedTriggers, 'triggerid'), $childTriggerIds);
+		if ($remainingChildTriggerIds) {
+			$this->deleteByPks($remainingChildTriggerIds);
+		}
+
 		return true;
 	}
 
