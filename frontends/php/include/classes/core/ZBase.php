@@ -20,7 +20,7 @@
 ?>
 <?php
 
-require_once dirname(__FILE__).'/class.czabbixautoloader.php';
+require_once dirname(__FILE__).'/CAutoloader.php';
 
 class ZBase {
 
@@ -84,7 +84,7 @@ class ZBase {
 	 * Register autoloader.
 	 */
 	private function registerAutoloader() {
-		$autoloader = new CZabbixAutoloader($this->getIncludePaths());
+		$autoloader = new CAutoloader($this->getIncludePaths());
 		$autoloader->register();
 	}
 

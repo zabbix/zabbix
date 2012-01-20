@@ -20,7 +20,7 @@
 ?>
 <?php
 
-require_once dirname(__FILE__).'/class.zbase.php';
+require_once dirname(__FILE__).'/ZBase.php';
 
 /**
  * A wrapper for the ZBase class.

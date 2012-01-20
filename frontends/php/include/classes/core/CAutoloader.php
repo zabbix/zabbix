@@ -23,7 +23,7 @@
 /**
  * The Zabbix autoloader class.
  */
-class CZabbixAutoloader {
+class CAutoloader {
 
 	/**
 	 * An array of directories, where the autoloader will look for the classes.
