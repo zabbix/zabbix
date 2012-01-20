@@ -900,6 +900,7 @@ void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	sql = zbx_malloc(sql, sql_alloc);
 
+	/* make sure host belongs to at least one hostgroup */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
 		"select groupid"
 		" from hosts_groups"
@@ -910,7 +911,12 @@ void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != DBfetch(result))
+	if (NULL == DBfetch(result))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove host \"%s\" from all host group(s): it must belong to at least one",
+				zbx_host_string(hostid));
+	}
+	else
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
@@ -921,11 +927,6 @@ void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 
 		DBexecute("%s", sql);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot delete group(s): the \"%s\" host remains without groups",
-				zbx_host_string(hostid));
 	}
 	DBfree_result(result);
 
