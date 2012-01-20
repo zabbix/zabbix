@@ -769,7 +769,6 @@
 	'S_URL'=>				_('URL'),
 	'S_INSERT'=>				_('Insert'),
 	'S_TIME_SHIFT'=>			_('Time shift'),
-	'S_INCORRECT_DEPENDENCY'=>		_('Incorrect dependency'),
 	'S_INSERT_MACRO'=>			_('Insert macro'),
 	'S_MASS_UPDATE_SELECTED_TRIGGERS_Q'=>	_('Mass update selected triggers?'),
 	'S_COPY_SELECTED_TRIGGERS_Q'=>		_('Copy selected triggers?'),
