@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Hosts
  */
-class CHost extends CZBXAPI{
+class CHost extends CZBXAPI {
 
 	protected $tableName = 'hosts';
 
@@ -575,10 +575,12 @@ class CHost extends CZBXAPI{
 		$res = DBselect($sql, $sqlLimit);
 		while ($host = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount']))
+				if (!is_null($options['groupCount'])) {
 					$result[] = $host;
-				else
+				}
+				else {
 					$result = $host['rowscount'];
+				}
 			}
 			else {
 				$hostids[$host['hostid']] = $host['hostid'];
@@ -1225,10 +1227,12 @@ Copt::memoryPick();
 			'output'=>API_OUTPUT_EXTEND
 		);
 
-		if (isset($hostData['node']))
+		if (isset($hostData['node'])) {
 			$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
-		elseif (isset($hostData['nodeids']))
+		}
+		elseif (isset($hostData['nodeids'])) {
 			$options['nodeids'] = $hostData['nodeids'];
+		}
 
 		$result = $this->get($options);
 
@@ -1245,10 +1249,12 @@ Copt::memoryPick();
 			'limit' => 1
 		);
 
-		if (isset($object['node']))
+		if (isset($object['node'])) {
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
+		}
+		elseif (isset($object['nodeids'])) {
 			$options['nodeids'] = $object['nodeids'];
+		}
 
 		$objs = $this->get($options);
 
@@ -1823,10 +1829,12 @@ Copt::memoryPick();
 		if (isset($updateTemplatesClear)) {
 			$templateids_clear = zbx_objectValues($updateTemplatesClear, 'templateid');
 			if (!empty($updateTemplatesClear)) {
-				$this->massRemove(array(
-				'hostids' => $hostids,
-				'templateids_clear' => $templateids_clear,
-			));
+				$this->massRemove(
+					array(
+						'hostids' => $hostids,
+						'templateids_clear' => $templateids_clear
+				)
+			);
 			}
 		}
 		else {
@@ -1839,7 +1847,7 @@ Copt::memoryPick();
 			$opt = array(
 				'hostids' => $hostids,
 				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => true,
+				'preservekeys' => true
 			);
 			$host_templates = API::Template()->get($opt);
 
