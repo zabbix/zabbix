@@ -162,19 +162,11 @@ function create_hat($caption, $items, $addicons = null, $id = null, $state = nul
 	return $table;
 }
 
-/* Function:
- *	hide_form_items()
- *
- * Desc:
- *	Searches items/objects for Form tags like "<input"/Form classes like CForm, and makes it empty
- *
- * Author:
- *	Aly
- */
+// searches items/objects for form tags like "<input"/form classes like CForm, and makes it empty
 function hide_form_items(&$obj) {
 	if (is_array($obj)) {
 		foreach ($obj as $id => $item) {
-			hide_form_items($obj[$id]); // Attention recursion;
+			hide_form_items($obj[$id]); // attention recursion
 		}
 	}
 	elseif (is_object($obj)) {
@@ -184,7 +176,7 @@ function hide_form_items(&$obj) {
 		}
 		if (isset($obj->items) && !empty($obj->items)) {
 			foreach ($obj->items as $id => $item) {
-				hide_form_items($obj->items[$id]); // Recursion
+				hide_form_items($obj->items[$id]); // attention recursion
 			}
 		}
 	}
@@ -250,7 +242,7 @@ function get_icon($name, $params = array()) {
 					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'", 0);'
 				);
 			}
-			else{
+			else {
 				$icon = new CIcon(
 					_('Add to favourites'),
 					'iconplus',

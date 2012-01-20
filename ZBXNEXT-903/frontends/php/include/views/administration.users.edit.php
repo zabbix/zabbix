@@ -61,9 +61,9 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 		}
 	}
 	else {
-		$passwdButton = new CSubmit('change_password', _('Change password'));
+		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'formlist');
 		if ($this->data['alias'] == ZBX_GUEST_USER) {
-			$passwdButton->setAttribute('disabled','disabled');
+			$passwdButton->setAttribute('disabled', 'disabled');
 		}
 		$userFormList->addRow(_('Password'), $passwdButton);
 	}

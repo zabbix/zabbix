@@ -126,7 +126,7 @@ require_once('include/page_header.php');
 	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
 
-	$latest_wdgt->addHeader(S_ITEMS_BIG,$r_form);
+	$latest_wdgt->addHeader(_('ITEMS'), $r_form);
 //-------------
 
 /************************* FILTER **************************/
