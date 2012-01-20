@@ -20,7 +20,7 @@
 ?>
 <?php
 
-require_once dirname(__FILE__).'/classes/core/class.z.php';
+require_once dirname(__FILE__).'/classes/core/Z.php';
 Z::getInstance()->run();
 
 require_once dirname(__FILE__).'/debug.inc.php';
