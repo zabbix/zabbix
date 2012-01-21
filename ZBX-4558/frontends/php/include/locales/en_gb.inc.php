@@ -34,7 +34,6 @@
 
 
 //	dicoveryconf.php
-	'S_CREATED_SMALL' => _('created'),
 	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
 	'S_DISCOVERY'=>				_('Discovery'),
 	'S_CONFIGURATION_OF_DISCOVERY'=>	_('Configuration of discovery'),
@@ -77,7 +76,6 @@
 	'S_IN_CHECK'=>				_('In check'),
 	'S_IDLE_TILL'=>				_('Idle till'),
 	'S_FAILED_ON'=>				_('Failed on'),
-	'S_FAILED'=>				_('Failed'),
 
 //	httpmon.php
 	'S_STATUS_OF_WEB_MONITORING'=>		_('Status of Web monitoring'),
@@ -87,7 +85,6 @@
 	'S_WEB_SCENARIO_IDLE_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	httpconf.php
-	'S_SORT'=>					_('Sort'),
 	'S_STEP'=>					_('Step'),
 
 //	exp_imp.php
@@ -100,8 +97,6 @@
 	'S_RULES'=>				_('Rules'),
 	'S_EXISTING'=>				_('Existing'),
 	'S_MISSING'=>				_('Missing'),
-	'S_LOCAL_BIG'=>				_('LOCAL'),
-	'S_SERVER_BIG'=>			_('SERVER'),
 
 //	export.inc.php
 	'S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT'=>	_('d.m.y'),
@@ -191,12 +186,6 @@
 // Colours
 
 //	config.php
-	'S_DROPDOWN_FIRST_ENTRY'=>			_('Dropdown first entry'),
-	'S_DROPDOWN_REMEMBER_SELECTED'=>		_('remember selected'),
-	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
-	'S_DEFAULT_THEME'=>				_('Default theme'),
-	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
-	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
@@ -450,7 +439,6 @@
 	'S_LOG_TIME_FORMAT'=>					_('Log time format'),
 	'S_CREATE_ITEM'=>					_('Create item'),
 	'S_MODE'=>						_('Mode'),
-	'S_COPY'=>						_('Copy'),
 	'S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q'=>	_('History clearing can take a long time. Continue?'),
 	'S_SEARCH'=>						_('Search'),
 	'S_ORIGINAL'=>						_('Original'),
@@ -499,9 +487,6 @@
 	'S_EVENTS_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	_('d M Y H:i:s'),
 	'S_EVENTS_ACTION_TIME_FORMAT'=>		_('d M Y H:i:s'),
-
-//	events.inc.php
-	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	latest.php
 	'S_LAST_CHECK'=>			_('Last check'),
@@ -692,18 +677,13 @@
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
 	'S_RESOURCE'=>					_('Resource'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
-	'S_SIMPLE_GRAPH'=>				_('Simple graph'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
-	'S_GRAPH_NAME'=>				_('Graph name'),
 	'S_WIDTH'=>						_('Width'),
 	'S_HEIGHT'=>					_('Height'),
 	'S_CREATE_SCREEN'=>				_('Create screen'),
 	'S_EDIT'=>						_('Edit'),
-	'S_DYNAMIC_ITEM'=>				_('Dynamic item'),
 	'S_DIMENSION_COLS_ROWS'=>		_('Dimension (cols x rows)'),
-	'S_SLIDES'=>					_('Slides'),
-	'S_SHOW_TEXT_AS_HTML'=>			_('Show text as HTML'),
 
 	'S_IMPORT_SCREEN'=>				_('Import screen'),
 
@@ -714,33 +694,14 @@
 //	screenedit.php
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
-	'S_PLAIN_TEXT'=>			_('Plain text'),
-	'S_COLUMN_SPAN'=>			_('Column span'),
-	'S_ROW_SPAN'=>				_('Row span'),
-	'S_SHOW_LINES'=>			_('Show lines'),
 	'S_HOSTS_INFO'=>			_('Hosts info'),
 	'S_TRIGGERS_INFO'=>			_('Triggers info'),
 	'S_SERVER_INFO'=>			_('Server info'),
-	'S_CLOCK'=>				_('Clock'),
-	'S_TRIGGERS_OVERVIEW'=>			_('Triggers overview'),
-	'S_DATA_OVERVIEW'=>			_('Data overview'),
-	'S_HISTORY_OF_ACTIONS'=>		_('History of actions'),
-	'S_HISTORY_OF_EVENTS'=>			_('History of events'),
 
-	'S_TIME_TYPE'=>				_('Time type'),
-	'S_SERVER_TIME'=>			_('Server time'),
 	'S_LOCAL_TIME'=>			_('Local time'),
-	'S_HOST_TIME'=>				_('Host time'),
 
-	'S_STYLE'=>				_('Style'),
-	'S_VERTICAL'=>				_('Vertical'),
-	'S_HORIZONTAL'=>			_('Horizontal'),
-
-	'S_HORIZONTAL_ALIGN'=>			_('Horizontal align'),
-	'S_CENTRE'=>				_('Centre'),
 	'S_RIGHT'=>				_('Right'),
 
-	'S_VERTICAL_ALIGN'=>			_('Vertical align'),
 	'S_MIDDLE'=>				_('Middle'),
 
 //	screens.php
@@ -767,11 +728,8 @@
 	'S_ENABLE'=>				_('Enable'),
 	'S_CHANGE'=>				_('Change'),
 	'S_URL'=>				_('URL'),
-	'S_INSERT'=>				_('Insert'),
 	'S_TIME_SHIFT'=>			_('Time shift'),
 	'S_INSERT_MACRO'=>			_('Insert macro'),
-	'S_MASS_UPDATE_SELECTED_TRIGGERS_Q'=>	_('Mass update selected triggers?'),
-	'S_COPY_SELECTED_TRIGGERS_Q'=>		_('Copy selected triggers?'),
 	'S_TRIGGER_LOG_FORM'=>	_('Trigger form'),
 
 //	tr_comments.php
@@ -784,8 +742,6 @@
 //	tr_status.php
 	'S_STATUS_OF_TRIGGERS'=>			_('Status of triggers'),
 	'S_STATUS_OF_TRIGGERS_BIG'=>		_('STATUS OF TRIGGERS'),
-	'S_STATUS_OF_HOSTGROUP_TRIGGERS'=>	_('Status of hostgroup triggers'),
-	'S_STATUS_OF_HOST_TRIGGERS'=>		_('Status of host triggers'),
 	'S_SHOW_DETAILS'=>			_('Show details'),
 	'S_FILTER_BY_NAME'=>				_('Filter by name'),
 	'S_ACK'=>				_('Ack'),
@@ -824,7 +780,6 @@
 	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value'),
 	'S_SCRIPT_ERROR_EMPTY_RESPONSE'=>	_('Empty response received'),
 
-	'S_SCRIPT_ERROR_BIG'=>				_('Possible reasons: 1. incorrect server IP/DNS in the "zabbix.conf.php"; 2. security environment like SELinux is blocking connection; 3. Zabbix server daemon not running.'),
 	'S_NOT_RUN' => 						_('Connection to Zabbix server "%s" refused. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Security environment (for example, SELinux) is blocking the connection; 3. Zabbix server daemon not running; 4. Firewall is blocking TCP connection.'),
 	'S_IP_NOT_AVAILABLE' => 			_('Zabbix server "%s" can not be reached. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect network configuration.'),
 	'S_TIME_OUT' => 					_('Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.'),
@@ -931,12 +886,6 @@
 
 //	maps.inc.php
 	'S_SUBMAP'=>			_('Submap'),
-
-//	screens.inc.php
-	'S_DELETE_IT_Q'=>				_('Delete it?'),
-	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>			_('This screen-row is not empty'),
-	'S_THIS_SCREEN_COLUMN_NOT_EMPTY'=>		_('This screen-column is not empty'),
-	'S_SCREENS_TRIGGER_FORM_DATE_FORMAT'=>		_('[H:i:s]'),
 
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					_('No graph item with'),
