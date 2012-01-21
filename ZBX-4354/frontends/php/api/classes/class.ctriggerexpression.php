@@ -515,11 +515,8 @@ class CTriggerExpression {
 
 			$this->currExpr['object']['expression'] = '{'.$this->currExpr['object']['expression'].'}';
 			$this->currExpr['object']['host'] = rtrim($this->currExpr['object']['host'], ':');
-			$this->currExpr['object']['item'] = $this->currExpr['object']['item'];
 			$this->currExpr['object']['itemParamList'] = $this->currExpr['params']['item'];
-			$this->currExpr['object']['function'] = $this->currExpr['object']['function'];
 			$this->currExpr['object']['functionName'] = rtrim($this->currExpr['object']['functionName'], '(');
-			$this->currExpr['object']['functionParam'] = $this->currExpr['object']['functionParam'];
 			$this->currExpr['object']['functionParamList'] = $this->currExpr['params']['function'];
 		}
 
