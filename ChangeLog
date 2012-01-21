@@ -398,6 +398,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4354] fixed validation of a trigger expression (Sasha)
 ........S. [ZBX-1609] added support for all data types in dynamic indexes in SNMP (dimir)
 ........S. [ZBX-4511] removed the "user_history" table from the list of synchronized tables between nodes (Sasha)
 A.F....... [ZBX-4499] fixed upper case error in some browsers while adding user macro (sanja)
