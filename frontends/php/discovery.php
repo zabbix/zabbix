@@ -48,7 +48,7 @@ require_once('include/page_header.php');
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.discovery.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.discovery.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -129,9 +129,9 @@ require_once('include/page_header.php');
 	ksort($services);
 
 	$header = array(
-		is_show_all_nodes() ? new CCol(S_NODE, 'left') : null,
-		make_sorting_header(S_DISCOVERED_DEVICE,'ip'),
-		new CCol(S_MONITORED_HOST, 'left'),
+		is_show_all_nodes() ? new CCol(_('Node'), 'left') : null,
+		make_sorting_header(_('Discovered device'), 'ip'),
+		new CCol(_('Monitored host'), 'left'),
 		new CCol(array(_('Uptime').'/', _('Downtime')), 'left')
 	);
 
@@ -268,7 +268,7 @@ require_once('include/page_header.php');
 					$time = $h_data['services'][$name]['time'];
 
 					$hintTable = new CTableInfo();
-					$hintTable->setAttribute('style','width: auto;');
+					$hintTable->setAttribute('style', 'width: auto;');
 
 					if($class == 'active') {
 						$hintTable->setHeader(S_UP_TIME);

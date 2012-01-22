@@ -63,29 +63,6 @@ class testPageNodes extends CWebTest {
 	public function testPageNodes_SimpleUpdate($node) {
 		// TODO
 		$this->markTestIncomplete();
-/*
-		$proxyid = $proxy['hostid'];
-		$name = $proxy['host'];
-
-		$sql1 = "select * from hosts where host='$name' order by hostid";
-		$oldHashProxy = DBhash($sql1);
-		$sql2 = "select proxy_hostid from hosts order by hostid";
-		$oldHashHosts = DBhash($sql2);
-
-		$this->login('proxies.php');
-		$this->assertTitle('Proxies');
-		$this->click("link=$name");
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
-		$this->assertTitle('Proxies');
-		$this->ok('Proxy updated');
-		$this->ok("$name");
-		$this->ok('CONFIGURATION OF PROXIES');
-
-		$this->assertEquals($oldHashProxy, DBhash($sql1), "Chuck Norris: no-change proxy update should not update data in table 'hosts'");
-		$this->assertEquals($oldHashHosts, DBhash($sql2), "Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");
-*/
 	}
 
 	public function testPageNodes_MassDeleteAll() {

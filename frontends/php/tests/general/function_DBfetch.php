@@ -23,10 +23,8 @@ require_once 'PHPUnit/Framework.php';
 
 require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
 
-class function_DBfetch extends CZabbixTest
-{
-	public function test_DBfetch()
-	{
+class function_DBfetch extends CZabbixTest {
+	public function test_DBfetch() {
 		// TODO
 		$this->markTestIncomplete();
 	}

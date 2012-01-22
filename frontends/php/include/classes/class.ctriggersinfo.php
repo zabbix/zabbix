@@ -29,7 +29,7 @@ class CTriggersInfo extends CTable{
  private $groupid;
  private $hostid;
 
-	public function __construct($groupid=null, $hostid=null, $style = STYLE_HORISONTAL){
+	public function __construct($groupid=null, $hostid=null, $style = STYLE_HORISONTAL) {
 		$this->style = null;
 
 		parent::__construct(NULL,'triggers_info');
@@ -40,18 +40,18 @@ class CTriggersInfo extends CTable{
 		$this->hostid = is_null($hostid) ? 0 : $hostid;
 	}
 
-	public function setOrientation($value){
-		if($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL)
+	public function setOrientation($value) {
+		if ($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL)
 			return $this->error('Incorrect value for SetOrientation ['.$value.']');
 
 		$this->style = $value;
 	}
 
-	public function hideHeader(){
+	public function hideHeader() {
 		$this->show_header = false;
 	}
 
-	public function bodyToString(){
+	public function bodyToString() {
 		$this->cleanItems();
 
 		$ok = $uncl = $info = $warn = $avg = $high = $dis = 0;
@@ -62,9 +62,9 @@ class CTriggersInfo extends CTable{
 			'output' => API_OUTPUT_SHORTEN
 		);
 
-		if($this->hostid > 0)
+		if ($this->hostid > 0)
 			$options['hostids'] = $this->hostid;
-		else if($this->groupid > 0)
+		else if ($this->groupid > 0)
 			$options['groupids'] = $this->groupid;
 
 
@@ -77,10 +77,10 @@ class CTriggersInfo extends CTable{
 				' GROUP BY t.priority,t.value';
 
 		$db_priority = DBselect($sql);
-		while($row = DBfetch($db_priority)){
-			switch($row['value']){
+		while ($row = DBfetch($db_priority)) {
+			switch ($row['value']) {
 				case TRIGGER_VALUE_TRUE:
-					switch($row['priority']){
+					switch ($row['priority']) {
 						case TRIGGER_SEVERITY_NOT_CLASSIFIED:	$uncl	+= $row['cnt'];	break;
 						case TRIGGER_SEVERITY_INFORMATION:	$info	+= $row['cnt'];	break;
 						case TRIGGER_SEVERITY_WARNING:		$warn	+= $row['cnt'];	break;
@@ -95,15 +95,15 @@ class CTriggersInfo extends CTable{
 			}
 		}
 
-		if($this->show_header){
+		if ($this->show_header) {
 			$header_str = S_TRIGGERS_INFO.SPACE;
 
-			if(!is_null($this->nodeid)){
+			if (!is_null($this->nodeid)) {
 				$node = get_node_by_nodeid($this->nodeid);
-				if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
+				if ($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
 			}
 
-			if(remove_nodes_from_id($this->groupid)>0){
+			if (remove_nodes_from_id($this->groupid)>0) {
 				$group = get_hostgroup_by_groupid($this->groupid);
 				$header_str.= S_GROUP.SPACE.'&quot;'.$group['name'].'&quot;';
 			}
@@ -112,7 +112,7 @@ class CTriggersInfo extends CTable{
 			}
 
 			$header = new CCol($header_str,'header');
-			if($this->style == STYLE_HORISONTAL)
+			if ($this->style == STYLE_HORISONTAL)
 				$header->SetColspan(8);
 			$this->addRow($header);
 		}
@@ -126,7 +126,7 @@ class CTriggersInfo extends CTable{
 		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER, $dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$dis);
 
 
-		if(STYLE_HORISONTAL == $this->style){
+		if (STYLE_HORISONTAL == $this->style) {
 			$this->addRow(array($trok, $uncl, $info, $warn, $avg, $high, $dis));
 		}
 		else{

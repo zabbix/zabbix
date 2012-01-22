@@ -57,34 +57,34 @@ require_once('include/page_header.php');
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
-		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.charts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		if ('filter' == $_REQUEST['favobj']) {
+			CProfile::update('web.charts.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		if ('hat' == $_REQUEST['favobj']) {
+			CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 		}
-		if('timeline' == $_REQUEST['favobj']){
+		if ('timeline' == $_REQUEST['favobj']) {
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
 				navigation_bar_calc('web.graph',$_REQUEST['favid'], true);
 			}
 		}
 		// saving fixed/dynamic setting to profile
-		if('timelinefixedperiod' == $_REQUEST['favobj']){
+		if ('timelinefixedperiod' == $_REQUEST['favobj']) {
 			if(isset($_REQUEST['favid'])){
 				CProfile::update('web.charts.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
 			}
 		}
 
-		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
+		if (str_in_array($_REQUEST['favobj'],array('itemid','graphid'))) {
 			$result = false;
-			if('add' == $_REQUEST['action']){
+			if ('add' == $_REQUEST['action']) {
 				$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 				if($result){
 					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("graphid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
-			else if('remove' == $_REQUEST['action']){
+			elseif ('remove' == $_REQUEST['action']) {
 				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
@@ -93,13 +93,13 @@ require_once('include/page_header.php');
 				}
 			}
 
-			if((PAGE_TYPE_JS == $page['type']) && $result){
+			if ((PAGE_TYPE_JS == $page['type']) && $result) {
 				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
 			}
 		}
 	}
 
-	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+	if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
 		require_once('include/page_footer.php');
 		exit();
 	}

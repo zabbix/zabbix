@@ -21,77 +21,39 @@
 #include "sysinfo.h"
 #include "stats.h"
 
-static int	get_cpu_num()
+static int	get_cpu_num(int online)
 {
-#ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU
-	size_t	len;
-	int	mib[] = {CTL_HW, HW_NCPU}, ncpu;
+	int	mib[2], cpu_num;
+	size_t	len = sizeof(cpu_num);
 
-	len = sizeof(ncpu);
+	mib[0] = CTL_HW;
+	mib[1] = (1 == online ? HW_AVAILCPU : HW_NCPU);
 
-	if (-1 == sysctl(mib, 2, &ncpu, &len, NULL, 0))
+	if (0 != sysctl(mib, 2, &cpu_num, &len, NULL, 0))
 		return -1;
 
-	return ncpu;
-#else
-	return -1;
-#endif
+	return cpu_num;
 }
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	tmp[16];
-	int	cpu_num;
+	int	cpu_num, online = 0;
 
 	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	/* only "online" (default) for parameter "type" is supported */
-	if (0 == get_param(param, 1, tmp, sizeof(tmp)) && '\0' != *tmp && 0 != strcmp(tmp, "online"))
+	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "online"))
+		online = 1;
+	else if (0 != strcmp(tmp, "max"))
 		return SYSINFO_RET_FAIL;
 
-	if (-1 == (cpu_num = get_cpu_num()))
+	if (-1 == (cpu_num = get_cpu_num(online)))
 		return SYSINFO_RET_FAIL;
 
 	SET_UI64_RESULT(result, cpu_num);
 
 	return SYSINFO_RET_OK;
-}
-
-int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	tmp[16];
-	int	cpu_num, state, mode;
-
-	if (3 < num_param(param))
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 1, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "all"))
-		cpu_num = 0;
-	else if (SUCCEED != is_uint(tmp) || 1 > (cpu_num = atoi(tmp) + 1))
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 2, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
-		state = ZBX_CPU_STATE_USER;
-	else if (0 == strcmp(tmp, "nice"))
-		state = ZBX_CPU_STATE_NICE;
-	else if (0 == strcmp(tmp, "system"))
-		state = ZBX_CPU_STATE_SYSTEM;
-	else if (0 == strcmp(tmp, "idle"))
-		state = ZBX_CPU_STATE_IDLE;
-	else
-		return SYSINFO_RET_FAIL;
-
-	if (0 != get_param(param, 3, tmp, sizeof(tmp)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
-		mode = ZBX_AVG1;
-	else if (0 == strcmp(tmp, "avg5"))
-		mode = ZBX_AVG5;
-	else if (0 == strcmp(tmp, "avg15"))
-		mode = ZBX_AVG15;
-	else
-		return SYSINFO_RET_FAIL;
-
-	return get_cpustat(result, cpu_num, state, mode);
 }
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -124,7 +86,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if (1 == per_cpu)
 	{
-		if (0 >= (cpu_num = get_cpu_num()))
+		if (0 >= (cpu_num = get_cpu_num(1)))
 			return SYSINFO_RET_FAIL;
 		value /= cpu_num;
 	}
