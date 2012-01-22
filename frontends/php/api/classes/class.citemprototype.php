@@ -35,14 +35,14 @@ class CItemprototype extends CItemGeneral{
  */
 	public function get($options = array()) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
@@ -53,7 +53,7 @@ class CItemprototype extends CItemGeneral{
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
@@ -86,7 +86,7 @@ class CItemprototype extends CItemGeneral{
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['items']);
@@ -102,7 +102,7 @@ class CItemprototype extends CItemGeneral{
 		}
 
 // editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']) {
+		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
@@ -361,7 +361,7 @@ COpt::memoryPick();
 // Adding Objects
 // Adding hosts
 		if (!is_null($options['selectHosts'])) {
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams = array(
 					'nodeids' => $nodeids,
 					'itemids' => $itemids,
@@ -400,7 +400,7 @@ COpt::memoryPick();
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			);
 
-			if (in_array($options['selectTriggers'], $subselects_allowed_outputs)) {
+			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTriggers'];
 				$triggers = API::Trigger()->get($objParams);
 
@@ -437,7 +437,7 @@ COpt::memoryPick();
 		}
 
 // Adding applications
-		if (!is_null($options['selectApplications']) && str_in_array($options['selectApplications'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectApplications']) && str_in_array($options['selectApplications'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectApplications'],
@@ -463,7 +463,7 @@ COpt::memoryPick();
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			);
 
-			if (in_array($options['selectGraphs'], $subselects_allowed_outputs)) {
+			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
 				$graphs = API::Graph()->get($objParams);
 
@@ -571,11 +571,11 @@ COpt::memoryPick();
 
 		$itemids = DB::insert('items', $items);
 
-		$itemApplications = $insert_item_discovery = array();
+		$itemApplications = $insertItemDiscovery = array();
 		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
 
-			$insert_item_discovery[] = array(
+			$insertItemDiscovery[] = array(
 				'itemid' => $items[$key]['itemid'],
 				'parent_itemid' => $item['ruleid']
 			);
@@ -592,7 +592,7 @@ COpt::memoryPick();
 			}
 		}
 
-		DB::insert('item_discovery', $insert_item_discovery);
+		DB::insert('item_discovery', $insertItemDiscovery);
 
 		if (!empty($itemApplications)) {
 			DB::insert('items_applications', $itemApplications);
@@ -710,53 +710,53 @@ COpt::memoryPick();
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => array('name')
 			);
-			$del_itemPrototypes = $this->get($options);
+			$delItemPrototypes = $this->get($options);
 
 // TODO: remove $nopermissions hack
 			if (!$nopermissions) {
 				foreach ($prototypeids as $prototypeid) {
-					if (!isset($del_itemPrototypes[$prototypeid])) {
+					if (!isset($delItemPrototypes[$prototypeid])) {
 						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 					}
-					if ($del_itemPrototypes[$prototypeid]['templateid'] != 0) {
+					if ($delItemPrototypes[$prototypeid]['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
 					}
 				}
 			}
 
 // first delete child items
-			$parent_itemids = $prototypeids;
-			$child_prototypeids = array();
+			$parentItemids = $prototypeids;
+			$childPrototypeids = array();
 			do{
-				$db_items = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parent_itemids));
-				$parent_itemids = array();
-				while ($db_item = DBfetch($db_items)) {
-					$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
-					$child_prototypeids[$db_item['itemid']] = $db_item['itemid'];
+				$dbItems = DBselect('SELECT itemid FROM items WHERE ' . DBcondition('templateid', $parentItemids));
+				$parentItemids = array();
+				while ($dbItem = DBfetch($dbItems)) {
+					$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
+					$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
 				}
-			}while (!empty($parent_itemids));
+			}while (!empty($parentItemids));
 
 			$options = array(
 				'output' => API_OUTPUT_EXTEND,
-				'itemids' => $child_prototypeids,
+				'itemids' => $childPrototypeids,
 				'nopermissions' => true,
 				'preservekeys' => true,
 				'selectHosts' => array('name')
 			);
-			$del_itemPrototypes_childs = $this->get($options);
+			$delItemPrototypesChilds = $this->get($options);
 
-			$del_itemPrototypes = array_merge($del_itemPrototypes, $del_itemPrototypes_childs);
-			$prototypeids = array_merge($prototypeids, $child_prototypeids);
+			$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChilds);
+			$prototypeids = array_merge($prototypeids, $childPrototypeids);
 
 			// delete graphs with this item prototype
-			$del_graphPrototypes = API::GraphPrototype()->get(array(
+			$delGraphPrototypes = API::GraphPrototype()->get(array(
 				'itemids' => $prototypeids,
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
 				'preservekeys' => true
 			));
-			if (!empty($del_graphPrototypes)) {
-				$result = API::GraphPrototype()->delete(zbx_objectValues($del_graphPrototypes, 'graphid'), true);
+			if (!empty($delGraphPrototypes)) {
+				$result = API::GraphPrototype()->delete(zbx_objectValues($delGraphPrototypes, 'graphid'), true);
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete graph prototype');
 				}
@@ -766,27 +766,27 @@ COpt::memoryPick();
 			$this->checkGraphReference($prototypeids);
 
 // CREATED ITEMS
-			$created_items = array();
+			$createdItems = array();
 			$sql = 'SELECT itemid FROM item_discovery WHERE '.DBcondition('parent_itemid', $prototypeids);
-			$db_items = DBselect($sql);
-			while ($item = DBfetch($db_items)) {
-				$created_items[$item['itemid']] = $item['itemid'];
+			$dbItems = DBselect($sql);
+			while ($item = DBfetch($dbItems)) {
+				$createdItems[$item['itemid']] = $item['itemid'];
 			}
-			if (!empty($created_items)) {
-				$result = API::Item()->delete($created_items, true);
+			if (!empty($createdItems)) {
+				$result = API::Item()->delete($createdItems, true);
 				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item prototype');
 			}
 
 
 // TRIGGER PROTOTYPES
-			$del_triggerPrototypes = API::TriggerPrototype()->get(array(
+			$delTriggerPrototypes = API::TriggerPrototype()->get(array(
 				'itemids' => $prototypeids,
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => true,
 				'preservekeys' => true,
 			));
-			if (!empty($del_triggerPrototypes)) {
-				$result = API::TriggerPrototype()->delete(zbx_objectValues($del_triggerPrototypes, 'triggerid'), true);
+			if (!empty($delTriggerPrototypes)) {
+				$result = API::TriggerPrototype()->delete(zbx_objectValues($delTriggerPrototypes, 'triggerid'), true);
 				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete trigger prototype');
 			}
 
@@ -796,7 +796,7 @@ COpt::memoryPick();
 
 
 // HOUSEKEEPER {{{
-			$item_data_tables = array(
+			$itemDataTables = array(
 				'trends',
 				'trends_uint',
 				'history_text',
@@ -808,7 +808,7 @@ COpt::memoryPick();
 
 			$insert = array();
 			foreach ($prototypeids as $id => $prototypeid) {
-				foreach ($item_data_tables as $table) {
+				foreach ($itemDataTables as $table) {
 					$insert[] = array(
 						'tablename' => $table,
 						'field' => 'itemid',
@@ -820,7 +820,7 @@ COpt::memoryPick();
 // }}} HOUSEKEEPER
 
 // TODO: remove info from API
-			foreach ($del_itemPrototypes as $item) {
+			foreach ($delItemPrototypes as $item) {
 				$host = reset($item['hosts']);
 				info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 			}
@@ -876,15 +876,15 @@ COpt::memoryPick();
 		));
 		if (empty($chdHosts)) return true;
 
-		$ruleIds = array();
+		$ruleids = array();
 		$sql = 'SELECT i.itemid as ruleid, id.itemid, i.hostid '.
 			' FROM items i, item_discovery id '.
 			' WHERE i.templateid=id.parent_itemid '.
 				' AND '.DBcondition('id.itemid', zbx_objectValues($items, 'itemid'));
-		$db_result = DBselect($sql);
-		while ($rule = DBfetch($db_result)) {
-			if (!isset($ruleIds[$rule['itemid']])) $ruleIds[$rule['itemid']] = array();
-			$ruleIds[$rule['itemid']][$rule['hostid']] = $rule['ruleid'];
+		$dbResult = DBselect($sql);
+		while ($rule = DBfetch($dbResult)) {
+			if (!isset($ruleids[$rule['itemid']])) $ruleids[$rule['itemid']] = array();
+			$ruleids[$rule['itemid']][$rule['hostid']] = $rule['ruleid'];
 		}
 
 		$insertItems = array();
@@ -965,7 +965,7 @@ COpt::memoryPick();
 					$updateItems[] = $newItem;
 				}
 				else{
-					$newItem['ruleid'] = $ruleIds[$item['itemid']][$host['hostid']];
+					$newItem['ruleid'] = $ruleids[$item['itemid']][$host['hostid']];
 					$newItem['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 					$insertItems[] = $newItem;
 				}

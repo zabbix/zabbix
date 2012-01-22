@@ -48,13 +48,13 @@ abstract class CMapElement extends CZBXAPI {
 	protected function getSelements($options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
 		$sortColumns = array('selementid');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('sysmaps_elements' => 'se.selementid'),
@@ -65,7 +65,7 @@ abstract class CMapElement extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'sysmapids'					=> null,
 			'editable'					=> null,
@@ -87,7 +87,7 @@ abstract class CMapElement extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['sysmaps_elements']);
@@ -235,9 +235,9 @@ abstract class CMapElement extends CZBXAPI {
 		$sql = 'SELECT se.sysmapid '.
 			' FROM sysmaps_elements se'.
 			' WHERE '.DBcondition('se.selementid', $selementids);
-		$db_sysmaps = DBselect($sql);
-		while ($db_sysmap = DBfetch($db_sysmaps)) {
-			$sysmapids[$db_sysmap['sysmapid']] = $db_sysmap['sysmapid'];
+		$dbSysmaps = DBselect($sql);
+		while ($dbSysmap = DBfetch($dbSysmaps)) {
+			$sysmapids[$dbSysmap['sysmapid']] = $dbSysmap['sysmapid'];
 		}
 // ---
 
@@ -247,36 +247,36 @@ COpt::memoryPick();
 		}
 
 // Adding URLS
-		if (!is_null($options['selectUrls']) && str_in_array($options['selectUrls'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectUrls']) && str_in_array($options['selectUrls'], $subselectsAllowedOutputs)) {
 			$sql = 'SELECT sysmapelementurlid, selementid, name, url  '.
 					' FROM sysmap_element_url '.
 					' WHERE '.DBcondition('selementid', $selementids);
-			$db_selement_urls = DBselect($sql);
-			while ($selement_url = DBfetch($db_selement_urls)) {
-				$result[$selement_url['selementid']]['urls'][] = $selement_url;
+			$dbSelementUrls = DBselect($sql);
+			while ($selementUrl = DBfetch($dbSelementUrls)) {
+				$result[$selementUrl['selementid']]['urls'][] = $selementUrl;
 			}
 		}
 // Adding Links
-		if (!is_null($options['selectLinks']) && str_in_array($options['selectLinks'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectLinks']) && str_in_array($options['selectLinks'], $subselectsAllowedOutputs)) {
 			$linkids = array();
-			$map_links = array();
+			$mapLinks = array();
 
 			$sql = 'SELECT sl.* FROM sysmaps_links sl WHERE '.DBcondition('sl.sysmapid', $sysmapids);
-			$db_links = DBselect($sql);
-			while ($link = DBfetch($db_links)) {
+			$dbLinks = DBselect($sql);
+			while ($link = DBfetch($dbLinks)) {
 				$link['linktriggers'] = array();
 
-				$map_links[$link['linkid']] = $link;
+				$mapLinks[$link['linkid']] = $link;
 				$linkids[$link['linkid']] = $link['linkid'];
 			}
 
 			$sql = 'SELECT DISTINCT slt.* FROM sysmaps_link_triggers slt WHERE '.DBcondition('slt.linkid', $linkids);
-			$db_link_triggers = DBselect($sql);
-			while ($link_trigger = DBfetch($db_link_triggers)) {
-				$map_links[$link_trigger['linkid']]['linktriggers'][] = $link_trigger;
+			$dbLinkTriggers = DBselect($sql);
+			while ($linkTrigger = DBfetch($dbLinkTriggers)) {
+				$mapLinks[$linkTrigger['linkid']]['linktriggers'][] = $linkTrigger;
 			}
 
-			foreach ($map_links as $num => $link) {
+			foreach ($mapLinks as $num => $link) {
 				if (!isset($result[$link['selementid1']]['links']))
 					$result[$link['selementid1']]['links'] = array();
 
@@ -306,10 +306,10 @@ COpt::memoryPick();
 	protected function getLinks($options=array()) {
 		$result = array();
 		$nodeCheck = false;
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 
 		$sortColumns = array('linkid'); // allowed columns for sorting
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND); // allowed output options for [ select_* ] params
 
 
 		$sqlParts = array(
@@ -319,7 +319,7 @@ COpt::memoryPick();
 			'order' => array(),
 			'limit' => null);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'sysmapids'					=> null,
 			'editable'					=> null,
@@ -342,7 +342,7 @@ COpt::memoryPick();
 			'limit'						=> null
 		);
 
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 
 		if (is_array($options['output'])) {
@@ -622,15 +622,15 @@ COpt::memoryPick();
 
 		$selementids = DB::insert('sysmaps_elements', $selements);
 
-		$insert_urls = array();
+		$insertUrls = array();
 		foreach ($selementids as $snum => $selementid) {
 			foreach ($selements[$snum]['urls'] as $url) {
 				$url['selementid'] = $selementid;
-				$insert_urls[] = $url;
+				$insertUrls[] = $url;
 			}
 		}
 
-		DB::insert('sysmap_element_url', $insert_urls);
+		DB::insert('sysmap_element_url', $insertUrls);
 
 	return array('selementids' => $selementids);
 	}
@@ -783,7 +783,7 @@ COpt::memoryPick();
 	protected function createLinkTriggers($linktriggers) {
 		$linktriggers = zbx_toArray($linktriggers);
 
-		$linktrigger_db_fields = array(
+		$linktriggerDbFields = array(
 			'linkid' => null,
 			'triggerid' => null,
 			'drawtype' => 0,
@@ -791,7 +791,7 @@ COpt::memoryPick();
 		);
 
 		foreach ($linktriggers as $linktrigger) {
-			if (!check_db_fields($linktrigger_db_fields, $linktrigger))
+			if (!check_db_fields($linktriggerDbFields, $linktrigger))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger'));
 		}
 
@@ -805,13 +805,13 @@ COpt::memoryPick();
 		$linktriggers = zbx_toArray($linktriggers);
 		$linktriggerids = zbx_objectValues($linktriggers, 'linktriggerid');
 
-		$linktrigger_db_fields = array(
+		$linktriggerDbFields = array(
 			'linktriggerid' => null
 		);
 
 		$updateLinkTriggers = array();
 		foreach ($linktriggers as $linktrigger) {
-			if (!check_db_fields($linktrigger_db_fields, $linktrigger))
+			if (!check_db_fields($linktriggerDbFields, $linktrigger))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger update'));
 
 			$updateLinkTriggers[] = array(
@@ -829,12 +829,12 @@ COpt::memoryPick();
 		$linktriggers = zbx_toArray($linktriggers);
 		$linktriggerids = zbx_objectValues($linktriggers, 'linktriggerid');
 
-		$linktrigger_db_fields = array(
+		$linktriggerDbFields = array(
 			'linktriggerid' => null
 		);
 
 		foreach ($linktriggers as $linktrigger) {
-			if (!check_db_fields($linktrigger_db_fields, $linktrigger))
+			if (!check_db_fields($linktriggerDbFields, $linktrigger))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for linktrigger delete'));
 		}
 

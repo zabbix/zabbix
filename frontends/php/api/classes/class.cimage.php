@@ -64,7 +64,7 @@ class CImage extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'imageids'					=> null,
 			'sysmapids'					=> null,
@@ -85,7 +85,7 @@ class CImage extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
 		if (!is_null($options['editable']) && (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN)) {
@@ -206,8 +206,8 @@ class CImage extends CZBXAPI {
 
 		// adding objects
 		if (!is_null($options['select_image'])) {
-			$db_img = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.DBCondition('i.imageid', $imageids));
-			while ($img = DBfetch($db_img)) {
+			$dbImg = DBselect('SELECT i.imageid,i.image FROM images i WHERE '.DBCondition('i.imageid', $imageids));
+			while ($img = DBfetch($dbImg)) {
 				// PostgreSQL and SQLite images are stored escaped in the DB
 				$img['image'] = zbx_unescape_image($img['image']);
 				$result[$img['imageid']]['image'] = base64_encode($img['image']);
@@ -292,13 +292,13 @@ class CImage extends CZBXAPI {
 
 			foreach ($images as $snum => $image) {
 
-				$image_db_fields = array(
+				$imageDbFields = array(
 					'name' => null,
 					'image' => null,
 					'imagetype' => 1
 				);
 
-				if (!check_db_fields($image_db_fields, $image)) {
+				if (!check_db_fields($imageDbFields, $image)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for image [ '.$image['name'].' ]');
 				}
 
@@ -409,10 +409,10 @@ class CImage extends CZBXAPI {
 				'output' => API_OUTPUT_SHORTEN,
 				'nopermissions' => 1
 			);
-			$image_exists = $this->get($options);
-			$image_exists = reset($image_exists);
+			$imageExists = $this->get($options);
+			$imageExists = reset($imageExists);
 
-			if ($image_exists && (bccomp($image_exists['imageid'], $image['imageid']) != 0)) {
+			if ($imageExists && (bccomp($imageExists['imageid'], $image['imageid']) != 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
@@ -514,10 +514,10 @@ class CImage extends CZBXAPI {
 					DBCondition('im.default_iconid', $imageids).
 					' OR '.DBCondition('imp.iconid', $imageids).
 				')';
-		$db_iconmaps = DBselect($sql);
+		$dbIconmaps = DBselect($sql);
 
 		$usedInIconmaps = array();
-		while ($iconmap = DBfetch($db_iconmaps)) {
+		while ($iconmap = DBfetch($dbIconmaps)) {
 			$usedInIconmaps[] = $iconmap['name'];
 		}
 
@@ -543,10 +543,10 @@ class CImage extends CZBXAPI {
 					' OR '.DBCondition('se.iconid_maintenance', $imageids).
 					' OR '.DBCondition('sm.backgroundid', $imageids).
 				')';
-		$db_sysmaps = DBselect($sql);
+		$dbSysmaps = DBselect($sql);
 
 		$usedInMaps = array();
-		while ($sysmap = DBfetch($db_sysmaps)) {
+		while ($sysmap = DBfetch($dbSysmaps)) {
 			$usedInMaps[] = $sysmap['name'];
 		}
 

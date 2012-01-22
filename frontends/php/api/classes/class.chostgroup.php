@@ -40,14 +40,14 @@ class CHostGroup extends CZBXAPI{
  */
 	public function get($params) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('groupid', 'name');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('groups' => 'g.groupid'),
@@ -57,7 +57,7 @@ class CHostGroup extends CZBXAPI{
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
@@ -98,7 +98,7 @@ class CHostGroup extends CZBXAPI{
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-		$options = zbx_array_merge($def_options, $params);
+		$options = zbx_array_merge($defOptions, $params);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['groups']);
@@ -114,7 +114,7 @@ class CHostGroup extends CZBXAPI{
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $user_type || $options['nopermissions']) {
+		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
@@ -454,7 +454,7 @@ class CHostGroup extends CZBXAPI{
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectHosts'];
 				$hosts = API::Host()->get($objParams);
 
@@ -506,7 +506,7 @@ class CHostGroup extends CZBXAPI{
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectTemplates']) || str_in_array($options['selectTemplates'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectTemplates']) || str_in_array($options['selectTemplates'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTemplates'];
 				$templates = API::Template()->get($objParams);
 				if (!is_null($options['limitSelects'])) {
@@ -652,9 +652,9 @@ class CHostGroup extends CZBXAPI{
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 		);
-		$upd_groups = $this->get($options);
+		$updGroups = $this->get($options);
 		foreach ($groups as $gnum => $group) {
-			if (!isset($upd_groups[$group['groupid']])) {
+			if (!isset($updGroups[$group['groupid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 			}
 		}
@@ -705,23 +705,23 @@ class CHostGroup extends CZBXAPI{
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => 1
 			);
-			$del_groups = $this->get($options);
+			$delGroups = $this->get($options);
 			foreach ($groupids as $groupid) {
-				if (!isset($del_groups[$groupid])) {
+				if (!isset($delGroups[$groupid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 				}
 			}
 
-			$dlt_groupids = getDeletableHostGroups($groupids);
-			if (count($groupids) != count($dlt_groupids)) {
+			$dltGroupids = getDeletableHostGroups($groupids);
+			if (count($groupids) != count($dltGroupids)) {
 				foreach ($groupids as $num => $groupid) {
-					if ($del_groups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
+					if ($delGroups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-								S_GROUP.' ['.$del_groups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
+								S_GROUP.' ['.$delGroups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Group "%s" cannot be deleted, because some hosts depend on it.', $del_groups[$groupid]['name']));
+						_s('Group "%s" cannot be deleted, because some hosts depend on it.', $delGroups[$groupid]['name']));
 					}
 			}
 		}
@@ -737,7 +737,7 @@ class CHostGroup extends CZBXAPI{
 					continue;
 				}
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Group "%s" cannot be deleted, because it is used in a global script.', $del_groups[$script['groupid']]['name']));
+					_s('Group "%s" cannot be deleted, because it is used in a global script.', $delGroups[$script['groupid']]['name']));
 				}
 			}
 
@@ -831,7 +831,7 @@ class CHostGroup extends CZBXAPI{
 
 		// TODO: remove audit
 		foreach ($groupids as $groupid) {
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $del_groups[$groupid]['name'], 'groups', null, null);
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $delGroups[$groupid]['name'], 'groups', null, null);
 		}
 
 		return array('groupids' => $groupids);
@@ -855,9 +855,9 @@ class CHostGroup extends CZBXAPI{
 			'editable' => 1,
 			'preservekeys' => 1
 		);
-		$upd_groups = $this->get($options);
+		$updGroups = $this->get($options);
 		foreach ($groups as $group) {
-			if (!isset($upd_groups[$group['groupid']])) {
+			if (!isset($updGroups[$group['groupid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 			}
 		}
@@ -874,8 +874,8 @@ class CHostGroup extends CZBXAPI{
 				' FROM hosts_groups hg'.
 				' WHERE '.DBcondition('hg.hostid', $objectids).
 					' AND '.DBcondition('hg.groupid', $groupids);
-		$linked_db = DBselect($sql);
-		while ($pair = DBfetch($linked_db)) {
+		$linkedDb = DBselect($sql);
+		while ($pair = DBfetch($linkedDb)) {
 			$linked[$pair['groupid']][$pair['hostid']] = 1;
 		}
 
@@ -910,23 +910,23 @@ class CHostGroup extends CZBXAPI{
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_SHORTEN
 		);
-		$upd_groups = $this->get($options);
+		$updGroups = $this->get($options);
 		foreach ($groupids as $groupid) {
-			if (!isset($upd_groups[$groupid])) {
+			if (!isset($updGroups[$groupid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 			}
 		}
 		$hostids = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
 		$templateids = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
-		$objectids_to_unlink = array_merge($hostids, $templateids);
-		if (!empty($objectids_to_unlink)) {
-			$unlinkable = getUnlinkableHosts($groupids, $objectids_to_unlink);
-			if (count($objectids_to_unlink) != count($unlinkable)) {
+		$objectidsToUnlink = array_merge($hostids, $templateids);
+		if (!empty($objectidsToUnlink)) {
+			$unlinkable = getUnlinkableHosts($groupids, $objectidsToUnlink);
+			if (count($objectidsToUnlink) != count($unlinkable)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the objects is left without host group.');
 			}
 
 			DB::delete('hosts_groups', array(
-				'hostid' => $objectids_to_unlink,
+				'hostid' => $objectidsToUnlink,
 				'groupid' => $groupids
 			));
 		}
@@ -949,26 +949,26 @@ class CHostGroup extends CZBXAPI{
 		$groupids = zbx_objectValues($groups, 'groupid');
 		$hostids = zbx_objectValues($hosts, 'hostid');
 		$templateids = zbx_objectValues($templates, 'templateid');
-		$hosts_to_unlink = $hosts_to_link = array();
+		$hostsToUnlink = $hostsToLink = array();
 
 		$options = array(
 			'groupids' => $groupids,
 			'preservekeys' => 1
 		);
 		if (!is_null($hosts)) {
-			$groups_hosts = API::Host()->get($options);
-			$hosts_to_unlink = array_diff(array_keys($groups_hosts), $hostids);
-			$hosts_to_link = array_diff($hostids, array_keys($groups_hosts));
+			$groupsHosts = API::Host()->get($options);
+			$hostsToUnlink = array_diff(array_keys($groupsHosts), $hostids);
+			$hostsToLink = array_diff($hostids, array_keys($groupsHosts));
 		}
 
-		$templates_to_unlink = $templates_to_link = array();
+		$templatesToUnlink = $templatesToLink = array();
 		if (!is_null($templates)) {
-			$groups_templates = API::Template()->get($options);
-			$templates_to_unlink = array_diff(array_keys($groups_templates), $templateids);
-			$templates_to_link = array_diff($templateids, array_keys($groups_templates));
+			$groupsTemplates = API::Template()->get($options);
+			$templatesToUnlink = array_diff(array_keys($groupsTemplates), $templateids);
+			$templatesToLink = array_diff($templateids, array_keys($groupsTemplates));
 		}
-		$objectids_to_link = array_merge($hosts_to_link, $templates_to_link);
-		$objectids_to_unlink = array_merge($hosts_to_unlink, $templates_to_unlink);
+		$objectidsToLink = array_merge($hostsToLink, $templatesToLink);
+		$objectidsToUnlink = array_merge($hostsToUnlink, $templatesToUnlink);
 
 		// permission
 		$options = array(
@@ -976,55 +976,55 @@ class CHostGroup extends CZBXAPI{
 			'editable' => 1,
 			'preservekeys' => 1
 		);
-		$allowed_groups = $this->get($options);
+		$allowedGroups = $this->get($options);
 		foreach ($groups as $group) {
-			if (!isset($allowed_groups[$group['groupid']])) {
+			if (!isset($allowedGroups[$group['groupid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 			}
 		}
 
 		if (!is_null($hosts)) {
-			$hosts_to_check = array_merge($hosts_to_link, $hosts_to_unlink);
+			$hostsToCheck = array_merge($hostsToLink, $hostsToUnlink);
 			$options = array(
-				'hostids' => $hosts_to_check,
+				'hostids' => $hostsToCheck,
 				'editable' => 1,
 				'preservekeys' => 1
 			);
-			$allowed_hosts = API::Host()->get($options);
-			foreach ($hosts_to_check as $hostid) {
-				if (!isset($allowed_hosts[$hostid])) {
+			$allowedHosts = API::Host()->get($options);
+			foreach ($hostsToCheck as $hostid) {
+				if (!isset($allowedHosts[$hostid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 				}
 			}
 		}
 
 		if (!is_null($templates)) {
-			$templates_to_check = array_merge($templates_to_link, $templates_to_unlink);
+			$templatesToCheck = array_merge($templatesToLink, $templatesToUnlink);
 			$options = array(
-				'templateids' => $templates_to_check,
+				'templateids' => $templatesToCheck,
 				'editable' => 1,
 				'preservekeys' => 1
 			);
-			$allowed_templates = API::Template()->get($options);
-			foreach ($templates_to_check as $templateid) {
-				if (!isset($allowed_templates[$templateid])) {
+			$allowedTemplates = API::Template()->get($options);
+			foreach ($templatesToCheck as $templateid) {
+				if (!isset($allowedTemplates[$templateid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 				}
 			}
 		}
 
-		$unlinkable = getUnlinkableHosts($groupids, $objectids_to_unlink);
-		if (count($objectids_to_unlink) != count($unlinkable)) {
+		$unlinkable = getUnlinkableHosts($groupids, $objectidsToUnlink);
+		if (count($objectidsToUnlink) != count($unlinkable)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'One of the objects is left without host group.');
 		}
 
-		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('groupid', $groupids).' AND '.DBcondition('hostid', $objectids_to_unlink);
+		$sql = 'DELETE FROM hosts_groups WHERE '.DBcondition('groupid', $groupids).' AND '.DBcondition('hostid', $objectidsToUnlink);
 		if (!DBexecute($sql)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
 
 		foreach ($groupids as $groupid) {
-			foreach ($objectids_to_link as $objectid) {
+			foreach ($objectidsToLink as $objectid) {
 				$hostgroupid = get_dbid('hosts_groups', 'hostgroupid');
 				$result = DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ($hostgroupid, $objectid, $groupid)");
 				if (!$result) {

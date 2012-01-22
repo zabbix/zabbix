@@ -50,14 +50,14 @@ class CMediatype extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('mediatypeid');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('media_type' => 'mt.mediatypeid'),
@@ -68,7 +68,7 @@ class CMediatype extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'mediatypeids'				=> null,
 			'mediaids'					=> null,
@@ -92,10 +92,10 @@ class CMediatype extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
-		if (USER_TYPE_SUPER_ADMIN == $user_type) {
+		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
 		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
 		}
@@ -278,7 +278,7 @@ class CMediatype extends CZBXAPI {
 		 * Adding objects
 		 */
 		// adding users
-		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'output' => $options['selectUsers'],
 				'mediatypeids' => $mediatypeids,
@@ -324,11 +324,11 @@ class CMediatype extends CZBXAPI {
 		$mediatypes = zbx_toArray($mediatypes);
 
 		foreach ($mediatypes as $mediatype) {
-			$mediatype_db_fields = array(
+			$mediatypeDbFields = array(
 				'type' => null,
 				'description' => null,
 			);
-			if (!check_db_fields($mediatype_db_fields, $mediatype)) {
+			if (!check_db_fields($mediatypeDbFields, $mediatype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
 			}
 
@@ -341,9 +341,9 @@ class CMediatype extends CZBXAPI {
 				'filter' => array('description' => $mediatype['description']),
 				'output' => API_OUTPUT_EXTEND
 			);
-			$mediatype_exist = $this->get($options);
-			if (!empty($mediatype_exist)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%s" already exists.', $mediatype_exist[0]['description']));
+			$mediatypeExist = $this->get($options);
+			if (!empty($mediatypeExist)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%s" already exists.', $mediatypeExist[0]['description']));
 			}
 
 		}
@@ -377,10 +377,10 @@ class CMediatype extends CZBXAPI {
 
 		$update = array();
 		foreach ($mediatypes as $mediatype) {
-			$mediatype_db_fields = array(
+			$mediatypeDbFields = array(
 				'mediatypeid' => null,
 			);
-			if (!check_db_fields($mediatype_db_fields, $mediatype)) {
+			if (!check_db_fields($mediatypeDbFields, $mediatype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
 			}
 
@@ -390,10 +390,10 @@ class CMediatype extends CZBXAPI {
 					'preservekeys' => 1,
 					'output' => API_OUTPUT_SHORTEN,
 				);
-				$exist_mediatypes = $this->get($options);
-				$exist_mediatype = reset($exist_mediatypes);
+				$existMediatypes = $this->get($options);
+				$existMediatype = reset($existMediatypes);
 
-				if ($exist_mediatype && (bccomp($exist_mediatype['mediatypeid'], $mediatype['mediatypeid']) != 0))
+				if ($existMediatype && (bccomp($existMediatype['mediatypeid'], $mediatype['mediatypeid']) != 0))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%s" already exists.', $mediatype['description']));
 			}
 
