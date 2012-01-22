@@ -53,14 +53,14 @@ class CAlert extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('alertid', 'clock', 'eventid', 'status');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sqlParts = array(
 			'select'	=> array('alerts' => 'a.alertid'),
@@ -70,7 +70,7 @@ class CAlert extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
@@ -102,7 +102,7 @@ class CAlert extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['alerts']);
@@ -118,7 +118,7 @@ class CAlert extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $user_type || $options['nopermissions']) {
+		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
@@ -317,8 +317,8 @@ class CAlert extends CZBXAPI {
 				' WHERE '.DBin_node('a.alertid', $nodeids).
 					$sqlWhere.
 					$sqlOrder;
-		$db_res = DBselect($sql, $sqlLimit);
-		while ($alert = DBfetch($db_res)) {
+		$dbRes = DBselect($sql, $sqlLimit);
+		while ($alert = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $alert['rowscount'];
 			}
@@ -389,7 +389,7 @@ class CAlert extends CZBXAPI {
 		$mediatypes = array();
 
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'output' => $options['selectHosts'],
 				'hostids' => $hostids,
@@ -399,7 +399,7 @@ class CAlert extends CZBXAPI {
 		}
 
 		// adding users
-		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'output' => $options['selectUsers'],
 				'userids' => $userids,
@@ -409,7 +409,7 @@ class CAlert extends CZBXAPI {
 		}
 
 		// adding mediatypes
-		if (!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselectsAllowedOutputs)) {
 			$res = DBselect('SELECT mt.* FROM media_type mt WHERE '.DBcondition('mt.mediatypeid', $mediatypeids));
 			while ($media = DBfetch($res)) {
 				$mediatypes[$media['mediatypeid']] = $media;
@@ -453,7 +453,7 @@ class CAlert extends CZBXAPI {
 		$alertids = array();
 
 			foreach ($alerts as $anum => $alert) {
-				$alert_db_fields = array(
+				$alertDbFields = array(
 					'actionid'		=> null,
 					'eventid'		=> null,
 					'userid'		=> null,
@@ -470,7 +470,7 @@ class CAlert extends CZBXAPI {
 					'alerttype'		=> ALERT_TYPE_MESSAGE
 				);
 
-				if (!check_db_fields($alert_db_fields, $alert)) {
+				if (!check_db_fields($alertDbFields, $alert)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for Alert');
 				}
 
@@ -504,9 +504,9 @@ class CAlert extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1
 			);
-			$del_alerts = $this->get($options);
+			$delAlerts = $this->get($options);
 			foreach ($alertids as $snum => $alertid) {
-				if (!isset($del_alerts[$alertid])) {
+				if (!isset($delAlerts[$alertid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}

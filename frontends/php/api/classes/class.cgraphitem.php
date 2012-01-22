@@ -40,14 +40,14 @@ class CGraphItem extends CZBXAPI {
 	*/
 	public function get($options = array()) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('gitemid');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('gitems' => 'gi.gitemid'),
@@ -57,7 +57,7 @@ class CGraphItem extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'		=> null,
 			'graphids'		=> null,
 			'itemids'		=> null,
@@ -74,10 +74,10 @@ class CGraphItem extends CZBXAPI {
 			'sortorder'		=> '',
 			'limit'			=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $user_type || $options['nopermissions']) {
+		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
@@ -190,8 +190,8 @@ class CGraphItem extends CZBXAPI {
 				' WHERE '.DBin_node('gi.gitemid', $nodeids).
 					$sqlWhere.
 					$sqlOrder;
-		$db_res = DBselect($sql, $sqlLimit);
-		while ($gitem = DBfetch($db_res)) {
+		$dbRes = DBselect($sql, $sqlLimit);
+		while ($gitem = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				$result = $gitem['rowscount'];
 			}
@@ -223,7 +223,7 @@ class CGraphItem extends CZBXAPI {
 		}
 
 		// adding graphs
-		if (!is_null($options['selectGraphs']) && str_in_array($options['selectGraphs'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectGraphs']) && str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectGraphs'],
@@ -250,22 +250,22 @@ class CGraphItem extends CZBXAPI {
 	/**
 	 * Get graph items by graph id and graph item id
 	 *
-	 * @param array $gitem_data
-	 * @param array $gitem_data['itemid']
-	 * @param array $gitem_data['graphid']
+	 * @param array $gitemData
+	 * @param array $gitemData['itemid']
+	 * @param array $gitemData['graphid']
 	 * @return string|boolean graphid
 	 */
-	public function getObjects($gitem_data) {
+	public function getObjects($gitemData) {
 		$result = array();
 		$gitemids = array();
 
-		$db_res = DBselect(
+		$dbRes = DBselect(
 			'SELECT gi.gitemid'.
 			' FROM graphs_items gi'.
-			' WHERE gi.itemid='.$gitem_data['itemid'].
-				' AND gi.graphid='.$gitem_data['graphid']
+			' WHERE gi.itemid='.$gitemData['itemid'].
+				' AND gi.graphid='.$gitemData['graphid']
 		);
-		while ($gitem = DBfetch($db_res)) {
+		while ($gitem = DBfetch($dbRes)) {
 			$gitemids[$gitem['gitemid']] = $gitem['gitemid'];
 		}
 

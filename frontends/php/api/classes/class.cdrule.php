@@ -41,13 +41,13 @@ class CDRule extends CZBXAPI {
 	public function get(array $options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
 		$sortColumns = array('druleid', 'name');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('drules' => 'dr.druleid'),
@@ -58,7 +58,7 @@ class CDRule extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'druleids'					=> null,
 			'dhostids'					=> null,
@@ -85,10 +85,10 @@ class CDRule extends CZBXAPI {
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 // editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $user_type) {
+		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
 		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
 		}
@@ -229,8 +229,8 @@ class CDRule extends CZBXAPI {
 				' WHERE '.$sqlWhere.
 				$sqlGroup.
 				$sqlOrder;
-		$db_res = DBselect($sql, $sqlLimit);
-		while ($drule = DBfetch($db_res)) {
+		$dbRes = DBselect($sql, $sqlLimit);
+		while ($drule = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
 					$result[] = $drule;
@@ -304,7 +304,7 @@ COpt::memoryPick();
 				'preservekeys' => true
 			);
 
-			if (is_array($options['selectDChecks']) || str_in_array($options['selectDChecks'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectDChecks']) || str_in_array($options['selectDChecks'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDChecks'];
 				$dchecks = API::DCheck()->get($objParams);
 
@@ -347,7 +347,7 @@ COpt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDHosts'];
 				$dhosts = API::DHost()->get($objParams);
 

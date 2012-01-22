@@ -51,14 +51,14 @@ class CHostInterface extends CZBXAPI {
 	public function get(array $options=array()) {
 		$result = array();
 		$nodeCheck = false;
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('interfaceid', 'dns', 'ip');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sqlParts = array(
 			'select'	=> array('interface' => 'hi.interfaceid'),
@@ -69,7 +69,7 @@ class CHostInterface extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
@@ -97,7 +97,7 @@ class CHostInterface extends CZBXAPI {
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['interface']);
@@ -113,7 +113,7 @@ class CHostInterface extends CZBXAPI {
 		}
 
 // editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']) {
+		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
 		else{
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
@@ -324,7 +324,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectHosts'];
 				$hosts = API::Host()->get($objParams);
 
@@ -370,7 +370,7 @@ Copt::memoryPick();
 				'nopermissions' => 1,
 				'preservekeys' => 1
 			);
-			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectItems'];
 				$items = API::Item()->get($objParams);
 
@@ -624,32 +624,32 @@ Copt::memoryPick();
 	 * Interface cannot be deleted if it's main interface and exists other interface of same type on same host.
 	 * Interface cannot be deleted if it is used in items.
 	 *
-	 * @param array $interfaceIds
+	 * @param array $interfaceids
 	 *
 	 * @return array
 	 */
-	public function delete(array $interfaceIds) {
-		if (empty($interfaceIds)) {
+	public function delete(array $interfaceids) {
+		if (empty($interfaceids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$dbInterfaces = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
-			'interfaceids' => $interfaceIds,
+			'interfaceids' => $interfaceids,
 			'editable' => true,
 			'preservekeys' => true
 		));
-		foreach ($interfaceIds as $interfaceId) {
+		foreach ($interfaceids as $interfaceId) {
 			if (!isset($dbInterfaces[$interfaceId])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 			}
 		}
 
-		$this->checkMainInterfacesOnDelete($interfaceIds);
+		$this->checkMainInterfacesOnDelete($interfaceids);
 
-		DB::delete('interface', array('interfaceid' => $interfaceIds));
+		DB::delete('interface', array('interfaceid' => $interfaceids));
 
-		return array('interfaceids' => $interfaceIds);
+		return array('interfaceids' => $interfaceids);
 	}
 
 	public function massAdd(array $data) {
@@ -782,13 +782,13 @@ Copt::memoryPick();
 	}
 
 	private function checkMainInterfacesOnCreate(array $interfaces) {
-		$hostIds = array();
+		$hostids = array();
 		foreach ($interfaces as $interface) {
-			$hostIds[$interface['hostid']] = $interface['hostid'];
+			$hostids[$interface['hostid']] = $interface['hostid'];
 		}
 
 		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => $hostIds,
+			'hostids' => $hostids,
 			'output' => array('hostid', 'main', 'type'),
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -799,30 +799,30 @@ Copt::memoryPick();
 	}
 
 	private function checkMainInterfacesOnUpdate(array $interfaces) {
-		$interfaceIdsWithoutHostIds = array();
+		$interfaceidsWithoutHostids = array();
 		// gather all hostids where interfaces should be checked
 		foreach ($interfaces as $interface) {
 			if (isset($interface ['type']) || isset($interface['main'])) {
 				if (isset($interface['hostid'])) {
-					$hostIds[$interface['hostid']] = $interface['hostid'];
+					$hostids[$interface['hostid']] = $interface['hostid'];
 				}
 				else {
-					$interfaceIdsWithoutHostIds[] = $interface['interfaceid'];
+					$interfaceidsWithoutHostids[] = $interface['interfaceid'];
 				}
 			}
 		}
 
 		// gathrer missing host ids
-		$hostIds = array();
-		if ($interfaceIdsWithoutHostIds) {
-			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.DBcondition('i.interfaceid', $interfaceIdsWithoutHostIds));
+		$hostids = array();
+		if ($interfaceidsWithoutHostids) {
+			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.DBcondition('i.interfaceid', $interfaceidsWithoutHostids));
 			while ($hostData = DBfetch($dbResult)) {
-				$hostIds[$hostData['hostid']] = $hostData['hostid'];
+				$hostids[$hostData['hostid']] = $hostData['hostid'];
 			}
 		}
 
 		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => $hostIds,
+			'hostids' => $hostids,
 			'output' => array('hostid', 'main', 'type'),
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -844,14 +844,14 @@ Copt::memoryPick();
 	private function checkMainInterfacesOnDelete(array $interfaceids) {
 		$this->checkIfInterfaceHasItems($interfaceids);
 
-		$hostIds = array();
+		$hostids = array();
 		$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.DBcondition('i.interfaceid', $interfaceids));
 		while ($hostData = DBfetch($dbResult)) {
-			$hostIds[$hostData['hostid']] = $hostData['hostid'];
+			$hostids[$hostData['hostid']] = $hostData['hostid'];
 		}
 
 		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => $hostIds,
+			'hostids' => $hostids,
 			'output' => array('hostid', 'main', 'type'),
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -911,11 +911,11 @@ Copt::memoryPick();
 		}
 	}
 
-	private function checkIfInterfaceHasItems(array $interfaceIds) {
+	private function checkIfInterfaceHasItems(array $interfaceids) {
 		$items = API::Item()->get(array(
 			'output' => array('name'),
 			'selectHosts' => array('name'),
-			'interfaceids' => $interfaceIds,
+			'interfaceids' => $interfaceids,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'preservekeys' => true,
 			'nopermissions' => true,

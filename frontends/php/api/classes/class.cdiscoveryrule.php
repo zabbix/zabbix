@@ -42,14 +42,14 @@ class CDiscoveryRule extends CItemGeneral {
  */
 	public function get($options = array()) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sqlParts = array(
 			'select'	=> array('items' => 'i.itemid'),
@@ -60,7 +60,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'templateids'				=> null,
@@ -92,7 +92,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['items']);
@@ -108,7 +108,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 // editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']) {
+		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
@@ -326,7 +326,7 @@ COpt::memoryPick();
 // Adding Objects
 // Adding hosts
 		if (!is_null($options['selectHosts'])) {
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams = array(
 					'nodeids' => $nodeids,
 					'itemids' => $itemids,
@@ -365,7 +365,7 @@ COpt::memoryPick();
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			);
 
-			if (in_array($options['selectTriggers'], $subselects_allowed_outputs)) {
+			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTriggers'];
 				$triggers = API::Trigger()->get($objParams);
 
@@ -410,7 +410,7 @@ COpt::memoryPick();
 				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 			);
 
-			if (in_array($options['selectGraphs'], $subselects_allowed_outputs)) {
+			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
 				$graphs = API::Graph()->get($objParams);
 
@@ -456,7 +456,7 @@ COpt::memoryPick();
 				'selectDiscoveryRule' => API_OUTPUT_EXTEND
 			);
 
-			if (is_array($options['selectPrototypes']) || str_in_array($options['selectPrototypes'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectPrototypes']) || str_in_array($options['selectPrototypes'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectPrototypes'];
 				$prototypes = API::Item()->get($objParams);
 
@@ -581,51 +581,51 @@ COpt::memoryPick();
 			'preservekeys' => true,
 			'selectHosts' => array('name')
 		);
-		$del_rules = $this->get($options);
+		$delRules = $this->get($options);
 
 		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
 			foreach ($ruleids as $ruleid) {
-				if (!isset($del_rules[$ruleid])) {
+				if (!isset($delRules[$ruleid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
-				if ($del_rules[$ruleid]['templateid'] != 0) {
+				if ($delRules[$ruleid]['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated items'));
 				}
 			}
 		}
 
 		// get child discovery rules
-		$parent_itemids = $ruleids;
-		$child_ruleids = array();
+		$parentItemids = $ruleids;
+		$childTuleids = array();
 		do {
-			$db_items = DBselect('SELECT itemid FROM items WHERE '.DBcondition('templateid', $parent_itemids));
-			$parent_itemids = array();
-			while ($db_item = DBfetch($db_items)) {
-				$parent_itemids[$db_item['itemid']] = $db_item['itemid'];
-				$child_ruleids[$db_item['itemid']] = $db_item['itemid'];
+			$dbItems = DBselect('SELECT itemid FROM items WHERE '.DBcondition('templateid', $parentItemids));
+			$parentItemids = array();
+			while ($dbItem = DBfetch($dbItems)) {
+				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
+				$childTuleids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
-		} while (!empty($parent_itemids));
+		} while (!empty($parentItemids));
 
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
-			'itemids' => $child_ruleids,
+			'itemids' => $childTuleids,
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'selectHosts' => array('name')
 		);
-		$del_rules_childs = $this->get($options);
+		$delRulesChilds = $this->get($options);
 
-		$del_rules = array_merge($del_rules, $del_rules_childs);
-		$ruleids = array_merge($ruleids, $child_ruleids);
+		$delRules = array_merge($delRules, $delRulesChilds);
+		$ruleids = array_merge($ruleids, $childTuleids);
 
 		$iprototypeids = array();
 		$sql = 'SELECT i.itemid'.
 				' FROM item_discovery id, items i'.
 				' WHERE i.itemid=id.itemid'.
 					' AND '.DBcondition('parent_itemid', $ruleids);
-		$db_items = DBselect($sql);
-		while ($item = DBfetch($db_items)) {
+		$dbItems = DBselect($sql);
+		while ($item = DBfetch($dbItems)) {
 			$iprototypeids[$item['itemid']] = $item['itemid'];
 		}
 		if (!empty($iprototypeids)) {
@@ -637,7 +637,7 @@ COpt::memoryPick();
 		DB::delete('items', array('itemid' => $ruleids));
 
 		// housekeeper
-		$item_data_tables = array(
+		$itemDataTables = array(
 			'trends',
 			'trends_uint',
 			'history_text',
@@ -648,7 +648,7 @@ COpt::memoryPick();
 		);
 		$insert = array();
 		foreach ($ruleids as $id => $ruleid) {
-			foreach ($item_data_tables as $table) {
+			foreach ($itemDataTables as $table) {
 				$insert[] = array(
 					'tablename' => $table,
 					'field' => 'itemid',
@@ -659,7 +659,7 @@ COpt::memoryPick();
 		DB::insert('housekeeper', $insert);
 
 		// TODO: remove info from API
-		foreach ($del_rules as $item) {
+		foreach ($delRules as $item) {
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
@@ -1266,7 +1266,7 @@ COpt::memoryPick();
 		}
 
 
-		$srcItemIds = array();
+		$srcItemids = array();
 		$itemKeys = array();
 		foreach ($srcGraphs as $key => $graph) {
 
@@ -1283,13 +1283,13 @@ COpt::memoryPick();
 			}
 
 			foreach ($graph['gitems'] as $item) {
-				$srcItemIds[] = $item['itemid'];
+				$srcItemids[] = $item['itemid'];
 			}
 		}
 
 		// fetch source items
 		$items = API::Item()->get(array(
-			'itemids' => $srcItemIds,
+			'itemids' => $srcItemids,
 			'output' => API_OUTPUT_EXTEND,
 		));
 		$srcItems = array();

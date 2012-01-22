@@ -68,13 +68,13 @@ class CDHost extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
 		$sortColumns = array('dhostid', 'druleid');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sqlParts = array(
 			'select'	=> array('dhosts' => 'dh.dhostid'),
@@ -85,7 +85,7 @@ class CDHost extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'druleids'					=> null,
 			'dhostids'					=> null,
@@ -115,7 +115,7 @@ class CDHost extends CZBXAPI {
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['dhosts']);
@@ -130,7 +130,7 @@ class CDHost extends CZBXAPI {
 		}
 
 // editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $user_type) {
+		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
 		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
 		}
@@ -394,7 +394,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectDRules']) || str_in_array($options['selectDRules'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectDRules']) || str_in_array($options['selectDRules'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDRules'];
 				$drules = API::DRule()->get($objParams);
 
@@ -437,7 +437,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectDServices']) || str_in_array($options['selectDServices'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectDServices']) || str_in_array($options['selectDServices'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDServices'];
 				$dservices = API::DService()->get($objParams);
 
@@ -472,7 +472,7 @@ Copt::memoryPick();
 		}
 
 // TODO :selectGroups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 					'nodeids' => $nodeids,
 					'output' => $options['selectGroups'],
@@ -498,7 +498,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectHosts'];
 				$hosts = API::Host()->get($objParams);
 

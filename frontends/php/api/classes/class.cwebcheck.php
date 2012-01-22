@@ -30,14 +30,14 @@ class CWebCheck extends CZBXAPI {
 
 	public function get($options = array()) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('httptestid', 'name');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('httptests' => 'ht.httptestid'),
@@ -48,7 +48,7 @@ class CWebCheck extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'			=> null,
 			'httptestids'		=> null,
 			'applicationids'	=> null,
@@ -72,10 +72,10 @@ class CWebCheck extends CZBXAPI {
 			'sortorder'			=> '',
 			'limit'				=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $user_type || $options['nopermissions']) {
+		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
@@ -258,7 +258,7 @@ class CWebCheck extends CZBXAPI {
 		}
 
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'output' => $options['selectHosts'],
 				'webcheckids' => $webcheckids,
@@ -276,13 +276,13 @@ class CWebCheck extends CZBXAPI {
 		}
 
 		// adding steps
-		if (!is_null($options['selectSteps']) && str_in_array($options['selectSteps'], $subselects_allowed_outputs)) {
-			$db_steps = DBselect(
+		if (!is_null($options['selectSteps']) && str_in_array($options['selectSteps'], $subselectsAllowedOutputs)) {
+			$dbSteps = DBselect(
 				'SELECT h.*'.
 				' FROM httpstep h'.
 				' WHERE '.DBcondition('h.httptestid', $webcheckids)
 			);
-			while ($step = DBfetch($db_steps)) {
+			while ($step = DBfetch($dbSteps)) {
 				$stepid = $step['httpstepid'];
 				$step['webstepid'] = $stepid;
 				unset($step['httpstepid']);
@@ -299,19 +299,19 @@ class CWebCheck extends CZBXAPI {
 
 	public function create($webchecks) {
 		$webchecks = zbx_toArray($webchecks);
-		$webcheck_names = zbx_objectValues($webchecks, 'name');
+		$webcheckNames = zbx_objectValues($webchecks, 'name');
 
-		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $webcheck_names)) {
+		if (!preg_grep('/^(['.ZBX_PREG_PRINT.'])+$/u', $webcheckNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
 		}
 
-		$db_webchecks = $this->get(array(
-			'filter' => array('name' => $webcheck_names),
+		$dbWebchecks = $this->get(array(
+			'filter' => array('name' => $webcheckNames),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-		foreach ($db_webchecks as $webcheck) {
+		foreach ($dbWebchecks as $webcheck) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $webcheck['name']));
 		}
 
@@ -355,15 +355,15 @@ class CWebCheck extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only characters are allowed.'));
 				}
 
-				$webcheck_exist = $this->get(array(
+				$webcheckExist = $this->get(array(
 					'filter' => array('name' => $webcheck['name']),
 					'preservekeys' => true,
 					'nopermissions' => true,
 					'output' => API_OUTPUT_SHORTEN
 				));
-				$webcheck_exist = reset($webcheck_exist);
+				$webcheckExist = reset($webcheckExist);
 
-				if ($webcheck_exist && (bccomp($webcheck_exist['webcheckid'], $webcheck_exist['webcheckid']) != 0)) {
+				if ($webcheckExist && (bccomp($webcheckExist['webcheckid'], $webcheckExist['webcheckid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Scenario "%s" already exists.', $webcheck['name']));
 				}
 			}
@@ -376,38 +376,38 @@ class CWebCheck extends CZBXAPI {
 				'where' => array('httptestid' => $webcheck['webcheckid'])
 			));
 
-			$checkitems_update = $update_fields = array();
-			$db_checkitems = DBselect(
+			$checkItemsUpdate = $updateFields = array();
+			$dbCheckItems = DBselect(
 				'SELECT i.itemid,hi.type'.
 				' FROM items i,httptestitem hi'.
 				' WHERE hi.httptestid='.$webcheck['webcheckid'].
 					' AND hi.itemid=i.itemid'
 			);
-			while ($checkitem = DBfetch($db_checkitems)) {
+			while ($checkitem = DBfetch($dbCheckItems)) {
 				$itemids[] = $checkitem['itemid'];
 
 				if (isset($webcheck['name'])) {
 					switch ($checkitem['type']) {
 						case HTTPSTEP_ITEM_TYPE_IN:
-							$update_fields['key_'] = 'web.test.in['.$webcheck['name'].',,bps]';
+							$updateFields['key_'] = 'web.test.in['.$webcheck['name'].',,bps]';
 							break;
 						case HTTPSTEP_ITEM_TYPE_LASTSTEP:
-							$update_fields['key_'] = 'web.test.fail['.$webcheck['name'].']';
+							$updateFields['key_'] = 'web.test.fail['.$webcheck['name'].']';
 							break;
 					}
 				}
 
 				if (isset($webcheck['status'])) {
-					$update_fields['status'] = $webcheck['status'];
+					$updateFields['status'] = $webcheck['status'];
 				}
-				if (!empty($update_fields)) {
-					$checkitems_update[] = array(
-						'values' => $update_fields,
+				if (!empty($updateFields)) {
+					$checkItemsUpdate[] = array(
+						'values' => $updateFields,
 						'where' => array('itemid' => $checkitem['itemid'])
 					);
 				}
 			}
-			DB::update('items', $checkitems_update);
+			DB::update('items', $checkItemsUpdate);
 
 			// update application
 			if (isset($webcheck['applicationid'])) {
@@ -418,28 +418,28 @@ class CWebCheck extends CZBXAPI {
 			}
 
 			// update steps
-			$steps_create = $steps_update = array();
+			$stepsCreate = $stepsUpdate = array();
 			$dbSteps = zbx_toHash($dbWebchecks[$webcheck['webcheckid']]['steps'], 'webstepid');
 
 			foreach ($webcheck['steps'] as $webstep) {
 				if (isset($webstep['webstepid']) && isset($dbSteps[$webstep['webstepid']])) {
-					$steps_update[] = $webstep;
+					$stepsUpdate[] = $webstep;
 					unset($dbSteps[$webstep['webstepid']]);
 				}
 				elseif (!isset($webstep['webstepid'])) {
-					$steps_create[] = $webstep;
+					$stepsCreate[] = $webstep;
 				}
 			}
-			$stepids_delete = array_keys($dbSteps);
+			$stepidsDelete = array_keys($dbSteps);
 
-			if (!empty($steps_create)) {
-				$this->createStepsReal($webcheck, $steps_create);
+			if (!empty($stepsCreate)) {
+				$this->createStepsReal($webcheck, $stepsCreate);
 			}
-			if (!empty($steps_update)) {
-				$this->updateStepsReal($webcheck, $steps_update);
+			if (!empty($stepsUpdate)) {
+				$this->updateStepsReal($webcheck, $stepsUpdate);
 			}
-			if (!empty($stepids_delete)) {
-				$this->deleteStepsReal($stepids_delete);
+			if (!empty($stepidsDelete)) {
+				$this->deleteStepsReal($stepidsDelete);
 			}
 		}
 		return array('webchekids' => $webcheckids);
@@ -451,7 +451,7 @@ class CWebCheck extends CZBXAPI {
 		}
 		$webcheckids = zbx_toArray($webcheckids);
 
-		$del_webchecks = $this->get(array(
+		$delWebchecks = $this->get(array(
 			'httptestids' => $webcheckids,
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true,
@@ -459,44 +459,44 @@ class CWebCheck extends CZBXAPI {
 			'preservekeys' => true
 		));
 		foreach ($webcheckids as $webcheckid) {
-			if (!isset($del_webchecks[$webcheckid])) {
+			if (!isset($delWebchecks[$webcheckid])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
-		$itemids_del = array();
-		$db_testitems = DBselect(
+		$itemidsDel = array();
+		$dbTestItems = DBselect(
 			'SELECT hsi.itemid'.
 			' FROM httptestitem hsi'.
 			' WHERE '.DBcondition('hsi.httptestid', $webcheckids)
 		);
-		while ($testitem = DBfetch($db_testitems)) {
-			$itemids_del[] = $testitem['itemid'];
+		while ($testitem = DBfetch($dbTestItems)) {
+			$itemidsDel[] = $testitem['itemid'];
 		}
 
-		$db_stepitems = DBselect(
+		$dbStepItems = DBselect(
 			'SELECT DISTINCT hsi.itemid'.
 			' FROM httpstepitem hsi,httpstep hs'.
 			' WHERE '.DBcondition('hs.httptestid', $webcheckids).
 				' AND hs.httpstepid=hsi.httpstepid'
 		);
-		while ($stepitem = DBfetch($db_stepitems)) {
-			$itemids_del[] = $stepitem['itemid'];
+		while ($stepitem = DBfetch($dbStepItems)) {
+			$itemidsDel[] = $stepitem['itemid'];
 		}
 
-		if (!empty($itemids_del)) {
-			API::Item()->delete($itemids_del, true);
+		if (!empty($itemidsDel)) {
+			API::Item()->delete($itemidsDel, true);
 		}
 
 		DB::delete('httptest', array('httptestid' => $webcheckids));
 
 		// TODO: REMOVE info
-		foreach ($del_webchecks as $webcheck) {
+		foreach ($delWebchecks as $webcheck) {
 			info(_s('Scenario "%s" deleted.', $webcheck['name']));
 		}
 
 		// TODO: REMOVE audit
-		foreach ($del_webchecks as $webcheck) {
+		foreach ($delWebchecks as $webcheck) {
 			$host = reset($webcheck['hosts']);
 			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO,
 				_s('Scenario "%1$s" "%2$s" host "%3$s".', $webcheck['name'], $webcheck['webcheckid'], $host['host']));
@@ -524,11 +524,11 @@ class CWebCheck extends CZBXAPI {
 		);
 
 		foreach ($checkitems as &$item) {
-			$items_exist = API::Item()->exists(array(
+			$itemsExist = API::Item()->exists(array(
 				'key_' => $item['key_'],
 				'hostid' => $webcheck['hostid']
 			));
-			if ($items_exist) {
+			if ($itemsExist) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%s" already exists.', $item['key_']));
 			}
 			$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
@@ -542,9 +542,9 @@ class CWebCheck extends CZBXAPI {
 		}
 		unset($item);
 
-		$check_itemids = DB::insert('items', $checkitems);
+		$checkItemids = DB::insert('items', $checkitems);
 
-		foreach ($check_itemids as $itemid) {
+		foreach ($checkItemids as $itemid) {
 			$itemApplications[] = array(
 				'applicationid' => $webcheck['applicationid'],
 				'itemid' => $itemid
@@ -556,7 +556,7 @@ class CWebCheck extends CZBXAPI {
 		foreach ($checkitems as $inum => $item) {
 			$webcheckitems[] = array(
 				'httptestid' => $webcheck['webcheckid'],
-				'itemid' => $check_itemids[$inum],
+				'itemid' => $checkItemids[$inum],
 				'type' => $item['httptestitemtype']
 			);
 		}
@@ -568,18 +568,18 @@ class CWebCheck extends CZBXAPI {
 	}
 
 	protected function createStepsReal($webcheck, $websteps) {
-		$websteps_names = zbx_objectValues($websteps, 'name');
+		$webstepsNames = zbx_objectValues($websteps, 'name');
 
-		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $websteps_names)) {
+		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $webstepsNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
 		}
 
 		$sql = 'SELECT h.httpstepid,h.name'.
 				' FROM httpstep h'.
 				' WHERE h.httptestid='.$webcheck['webcheckid'].
-					' AND '.DBcondition('h.name', $websteps_names);
-		if ($httpstep_data = DBfetch(DBselect($sql))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%s" already exists.', $httpstep_data['name']));
+					' AND '.DBcondition('h.name', $webstepsNames);
+		if ($httpstepData = DBfetch(DBselect($sql))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Step "%s" already exists.', $httpstepData['name']));
 		}
 
 		foreach ($websteps as $snum => $webstep) {
@@ -617,11 +617,11 @@ class CWebCheck extends CZBXAPI {
 				)
 			);
 			foreach ($stepitems as &$item) {
-				$items_exist = API::Item()->exists(array(
+				$itemsExist = API::Item()->exists(array(
 					'key_' => $item['key_'],
 					'hostid' => $webcheck['hostid']
 				));
-				if ($items_exist) {
+				if ($itemsExist) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web item with key "%s" already exists.', $item['key_']));
 				}
 				$item['hostid'] = $webcheck['hostid'];
@@ -635,10 +635,10 @@ class CWebCheck extends CZBXAPI {
 			}
 			unset($item);
 
-			$step_itemids = DB::insert('items', $stepitems);
+			$stepItemids = DB::insert('items', $stepitems);
 
 			$itemApplications = array();
-			foreach ($step_itemids as $itemid) {
+			foreach ($stepItemids as $itemid) {
 				$itemApplications[] = array(
 					'applicationid' => $webcheck['applicationid'],
 					'itemid' => $itemid
@@ -650,7 +650,7 @@ class CWebCheck extends CZBXAPI {
 			foreach ($stepitems as $inum => $item) {
 				$webstepitems[] = array(
 					'httpstepid' => $webstepid,
-					'itemid' => $step_itemids[$inum],
+					'itemid' => $stepItemids[$inum],
 					'type' => $item['httpstepitemtype']
 				);
 			}
@@ -663,21 +663,21 @@ class CWebCheck extends CZBXAPI {
 	}
 
 	protected function updateStepsReal($webcheck, $websteps) {
-		$websteps_names = zbx_objectValues($websteps, 'name');
+		$webstepsNames = zbx_objectValues($websteps, 'name');
 
-		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $websteps_names)) {
+		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $webstepsNames)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
 		}
 
 		// get all used keys
 		$webstepids = zbx_objectValues($websteps, 'webstepid');
-		$db_keys = DBfetchArray(DBselect(
+		$dbKeys = DBfetchArray(DBselect(
 			'SELECT i.key_'.
 			' FROM items i,httpstepitem hi'.
 			' WHERE '.DBcondition('hi.httpstepid', $webstepids).
 				' AND hi.itemid=i.itemid'
 		));
-		$db_keys = zbx_toHash($db_keys, 'key_');
+		$dbKeys = zbx_toHash($dbKeys, 'key_');
 
 		foreach ($websteps as $webstep) {
 			if ($webstep['no'] <= 0) {
@@ -691,43 +691,43 @@ class CWebCheck extends CZBXAPI {
 
 			// update item keys
 			$itemids = array();
-			$stepitems_update = $update_fields = array();
-			$db_stepitems = DBselect(
+			$stepitemsUpdate = $updateFields = array();
+			$dbStepItems = DBselect(
 				'SELECT i.itemid,hi.type'.
 				' FROM items i,httpstepitem hi'.
 				' WHERE hi.httpstepid='.$webstep['webstepid'].
 					' AND hi.itemid=i.itemid'
 			);
-			while ($stepitem = DBfetch($db_stepitems)) {
+			while ($stepitem = DBfetch($dbStepItems)) {
 				$itemids[] = $stepitem['itemid'];
 
 				if (isset($webcheck['name']) || $webstep['name']) {
 					switch ($stepitem['type']) {
 						case HTTPSTEP_ITEM_TYPE_IN:
-							$update_fields['key_'] = 'web.test.in['.$webcheck['name'].','.$webstep['name'].',bps]';
+							$updateFields['key_'] = 'web.test.in['.$webcheck['name'].','.$webstep['name'].',bps]';
 							break;
 						case HTTPSTEP_ITEM_TYPE_TIME:
-							$update_fields['key_'] = 'web.test.time['.$webcheck['name'].','.$webstep['name'].',resp]';
+							$updateFields['key_'] = 'web.test.time['.$webcheck['name'].','.$webstep['name'].',resp]';
 							break;
 						case HTTPSTEP_ITEM_TYPE_RSPCODE:
-							$update_fields['key_'] = 'web.test.rspcode['.$webcheck['name'].','.$webstep['name'].']';
+							$updateFields['key_'] = 'web.test.rspcode['.$webcheck['name'].','.$webstep['name'].']';
 							break;
 					}
 				}
-				if (isset($db_keys[$update_fields['key_']])) {
-					unset($update_fields['key_']);
+				if (isset($dbKeys[$updateFields['key_']])) {
+					unset($updateFields['key_']);
 				}
 				if (isset($webcheck['status'])) {
-					$update_fields['status'] = $webcheck['status'];
+					$updateFields['status'] = $webcheck['status'];
 				}
-				if (!empty($update_fields)) {
-					$stepitems_update[] = array(
-						'values' => $update_fields,
+				if (!empty($updateFields)) {
+					$stepitemsUpdate[] = array(
+						'values' => $updateFields,
 						'where' => array('itemid' => $stepitem['itemid'])
 					);
 				}
 			}
-			DB::update('items', $stepitems_update);
+			DB::update('items', $stepitemsUpdate);
 
 			// update application
 			if (isset($webcheck['applicationid'])) {
@@ -741,13 +741,13 @@ class CWebCheck extends CZBXAPI {
 
 	protected function deleteStepsReal($webstepids) {
 		$itemids = array();
-		$db_stepitems = DBselect(
+		$dbStepItems = DBselect(
 			'SELECT i.itemid'.
 			' FROM items i,httpstepitem hi'.
 			' WHERE '.DBcondition('hi.httpstepid', $webstepids).
 				' AND hi.itemid=i.itemid'
 		);
-		while ($stepitem = DBfetch($db_stepitems)) {
+		while ($stepitem = DBfetch($dbStepItems)) {
 			$itemids[] = $stepitem['itemid'];
 		}
 

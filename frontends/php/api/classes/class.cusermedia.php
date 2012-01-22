@@ -52,14 +52,14 @@ class CUserMedia extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('mediaid', 'userid', 'mediatypeid');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('media' => 'm.mediaid'),
@@ -70,7 +70,7 @@ class CUserMedia extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
@@ -95,7 +95,7 @@ class CUserMedia extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['media']);
@@ -111,7 +111,7 @@ class CUserMedia extends CZBXAPI {
 		}
 
 		// permission check
-		if (USER_TYPE_SUPER_ADMIN == $user_type) {
+		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
 		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
@@ -322,7 +322,7 @@ class CUserMedia extends CZBXAPI {
 		 * Adding objects
 		 */
 		// adding usergroups
-		if (!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'output' => $options['selectUsrgrps'],
 				'userids' => $userids,
@@ -340,11 +340,11 @@ class CUserMedia extends CZBXAPI {
 
 		// TODO:
 		// adding users
-		if (!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], $subselectsAllowedOutputs)) {
 		}
 
 		// adding mediatypes
-		if (!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselectsAllowedOutputs)) {
 		}
 
 		// removing keys (hash -> array)
@@ -450,15 +450,15 @@ class CUserMedia extends CZBXAPI {
 /**
  * Update Medias for User
  *
- * @param array $media_data
- * @param array $media_data['users']
- * @param array $media_data['users']['userid']
- * @param array $media_data['medias']
- * @param string $media_data['medias']['mediatypeid']
- * @param string $media_data['medias']['sendto']
- * @param int $media_data['medias']['severity']
- * @param int $media_data['medias']['active']
- * @param string $media_data['medias']['period']
+ * @param array $mediaData
+ * @param array $mediaData['users']
+ * @param array $mediaData['users']['userid']
+ * @param array $mediaData['medias']
+ * @param string $mediaData['medias']['mediatypeid']
+ * @param string $mediaData['medias']['sendto']
+ * @param int $mediaData['medias']['severity']
+ * @param int $mediaData['medias']['active']
+ * @param string $mediaData['medias']['period']
  * @return boolean
  */
 	public function update($medias) {
@@ -466,8 +466,8 @@ class CUserMedia extends CZBXAPI {
 
 		$this->checkInput($medias, __FUNCTION__);
 
-		$upd_medias = array();
-		$del_medias = array();
+		$updMedias = array();
+		$delMedias = array();
 
 		$userids = zbx_objectValues($users, 'userid');
 		$sql = 'SELECT m.mediaid '.
@@ -475,27 +475,27 @@ class CUserMedia extends CZBXAPI {
 				' WHERE '.DBcondition('userid', $userids);
 		$result = DBselect($sql);
 		while ($media = DBfetch($result)) {
-			$del_medias[$media['mediaid']] = $media;
+			$delMedias[$media['mediaid']] = $media;
 		}
 
 		foreach ($medias as $mnum => $media) {
 			if (!isset($media['mediaid'])) continue;
 
-			if (isset($del_medias[$media['mediaid']])) {
-				$upd_medias[$media['mediaid']] = $medias[$mnum];
+			if (isset($delMedias[$media['mediaid']])) {
+				$updMedias[$media['mediaid']] = $medias[$mnum];
 			}
 
 			unset($medias[$mnum]);
-			unset($del_medias[$media['mediaid']]);
+			unset($delMedias[$media['mediaid']]);
 		}
 
 // DELETE
-		if (!empty($del_medias))
-			$this->delete($del_medias);
+		if (!empty($delMedias))
+			$this->delete($delMedias);
 
 // UPDATE
 		$update = array();
-		foreach ($upd_medias as $mnum => $media) {
+		foreach ($updMedias as $mnum => $media) {
 			$update[] = array(
 				'values' => $media,
 				'where' => array('mediaid' => $media['mediaid'])

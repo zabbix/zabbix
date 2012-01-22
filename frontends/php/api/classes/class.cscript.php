@@ -52,14 +52,14 @@ class CScript extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('scriptid', 'name');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('scripts' => 's.scriptid'),
@@ -69,7 +69,7 @@ class CScript extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'				=> null,
 			'groupids'				=> null,
 			'hostids'				=> null,
@@ -94,7 +94,7 @@ class CScript extends CZBXAPI {
 			'sortorder'				=> '',
 			'limit'					=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['scripts']);
@@ -110,7 +110,7 @@ class CScript extends CZBXAPI {
 		}
 
 		// editable + permission check
-		if (USER_TYPE_SUPER_ADMIN == $user_type) {
+		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
 		elseif (!is_null($options['editable'])) {
 			return $result;
@@ -282,7 +282,7 @@ class CScript extends CZBXAPI {
 		 * Adding objects
 		 */
 		// adding groups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			foreach ($result as $scriptid => $script) {
 				$objParams = array(
 					'output' => $options['selectGroups'],
@@ -299,7 +299,7 @@ class CScript extends CZBXAPI {
 		}
 
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 			foreach ($result as $scriptid => $script) {
 				$objParams = array(
 					'output' => $options['selectHosts'],
@@ -374,11 +374,11 @@ class CScript extends CZBXAPI {
 
 		$scriptNames = array();
 		foreach ($scripts as $script) {
-			$script_db_fields = array(
+			$scriptDbFields = array(
 				'name' => null,
 				'command' => null,
 			);
-			if (!check_db_fields($script_db_fields, $script)) {
+			if (!check_db_fields($scriptDbFields, $script)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
 			}
 
@@ -427,10 +427,10 @@ class CScript extends CZBXAPI {
 			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true
 		);
-		$upd_scripts = $this->get($options);
+		$updScripts = $this->get($options);
 		$scriptNames = array();
 		foreach ($scripts as $script) {
-			if (!isset($upd_scripts[$script['scriptid']])) {
+			if (!isset($updScripts[$script['scriptid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script with scriptid "%s" does not exist.', $script['scriptid']));
 			}
 
@@ -546,22 +546,22 @@ class CScript extends CZBXAPI {
 
 			switch ($errorMsg) {
 				case 'Connection refused':
-					$d_errorMsg = sprintf(S_NOT_RUN, $ZBX_SERVER)." ";
+					$dErrorMsg = sprintf(S_NOT_RUN, $ZBX_SERVER)." ";
 					break;
 				case 'No route to host':
-					$d_errorMsg = sprintf(S_IP_NOT_AVAILABLE, $ZBX_SERVER)." ";
+					$dErrorMsg = sprintf(S_IP_NOT_AVAILABLE, $ZBX_SERVER)." ";
 					break;
 				case 'Connection timed out':
-					$d_errorMsg = sprintf(S_TIME_OUT, $ZBX_SERVER)." ";
+					$dErrorMsg = sprintf(S_TIME_OUT, $ZBX_SERVER)." ";
 					break;
 				case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
-					$d_errorMsg = sprintf(S_WRONG_DNS, $ZBX_SERVER)." ";
+					$dErrorMsg = sprintf(S_WRONG_DNS, $ZBX_SERVER)." ";
 					break;
 				default:
-					$d_errorMsg = '';
+					$dErrorMsg = '';
 			}
 
-			self::exception(ZBX_API_ERROR_INTERNAL, $d_errorMsg.S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
+			self::exception(ZBX_API_ERROR_INTERNAL, $dErrorMsg.S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
 		}
 
 		$json = new CJSON();
@@ -652,21 +652,21 @@ class CScript extends CZBXAPI {
 			'hostids' => $hostids,
 			'preservekeys' => 1
 		);
-		$hosts_read_only  = API::Host()->get($objParams);
-		$hosts_read_only = zbx_objectValues($hosts_read_only, 'hostid');
+		$hostsReadOnly  = API::Host()->get($objParams);
+		$hostsReadOnly = zbx_objectValues($hostsReadOnly, 'hostid');
 
 		$objParams = array(
 			'editable' => 1,
 			'hostids' => $hostids,
 			'preservekeys' => 1
 		);
-		$hosts_read_write = API::Host()->get($objParams);
-		$hosts_read_write = zbx_objectValues($hosts_read_write, 'hostid');
+		$hostsReadWrite = API::Host()->get($objParams);
+		$hostsReadWrite = zbx_objectValues($hostsReadWrite, 'hostid');
 
 // initialize array
-		$scripts_by_host = array();
+		$scriptsByHost = array();
 		foreach ($hostids as $id => $hostid) {
-			$scripts_by_host[$hostid] = array();
+			$scriptsByHost[$hostid] = array();
 		}
 //-----
 
@@ -687,28 +687,27 @@ class CScript extends CZBXAPI {
 		$scripts  = API::Script()->get($objParams);
 
 		foreach ($scripts as $num => $script) {
-			$add_to_hosts = array();
+			$addToHosts = array();
 			$hostids = zbx_objectValues($groups[$script['groupid']]['hosts'], 'hostid');
 
 			if (PERM_READ_WRITE == $script['host_access']) {
 				if ($script['groupid'] > 0)
-					$add_to_hosts = zbx_uint_array_intersect($hosts_read_write, $hostids);
+					$addToHosts = zbx_uint_array_intersect($hostsReadWrite, $hostids);
 				else
-					$add_to_hosts = $hosts_read_write;
+					$addToHosts = $hostsReadWrite;
 			}
 			elseif (PERM_READ_ONLY == $script['host_access']) {
 				if ($script['groupid'] > 0)
-					$add_to_hosts = zbx_uint_array_intersect($hosts_read_only, $hostids);
+					$addToHosts = zbx_uint_array_intersect($hostsReadOnly, $hostids);
 				else
-					$add_to_hosts = $hosts_read_only;
+					$addToHosts = $hostsReadOnly;
 			}
 
-			foreach ($add_to_hosts as $id => $hostid) {
-				$scripts_by_host[$hostid][] = $script;
+			foreach ($addToHosts as $id => $hostid) {
+				$scriptsByHost[$hostid][] = $script;
 			}
 		}
-//SDII(count($scripts_by_host));
-	return $scripts_by_host;
+	return $scriptsByHost;
 	}
 
 }
