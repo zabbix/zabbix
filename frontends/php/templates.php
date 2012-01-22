@@ -271,22 +271,24 @@ require_once('include/page_header.php');
 	/**
 	 * Unlink, unlink_and_clear
 	 */
-	if((isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear']))){
+	if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
-		if(isset($_REQUEST['unlink'])){
+		if (isset($_REQUEST['unlink'])) {
 			$unlink_templates = array_keys($_REQUEST['unlink']);
 		}
-		else{
+		else {
 			$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
 			$_REQUEST['clear_templates'] = zbx_array_merge($_REQUEST['clear_templates'], $unlink_templates);
 		}
-		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
+		foreach ($unlink_templates as $id) {
+			unset($_REQUEST['templates'][$id]);
+		}
 	}
 	/**
 	 * Clone
 	 */
-	else if(isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])){
+	elseif (isset($_REQUEST['clone']) && isset($_REQUEST['templateid'])) {
 		unset($_REQUEST['templateid']);
 		unset($_REQUEST['hosts']);
 		$_REQUEST['form'] = 'clone';
@@ -294,72 +296,92 @@ require_once('include/page_header.php');
 	/**
 	 * Full_clone
 	 */
-	else if(isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])){
+	elseif (isset($_REQUEST['full_clone']) && isset($_REQUEST['templateid'])) {
 		$_REQUEST['form'] = 'full_clone';
 		$_REQUEST['hosts'] = array();
 	}
 	/**
 	 * Save
 	 */
-	else if(isset($_REQUEST['save'])){
-
-		$macros = get_request('macros', array());
-		$groups = get_request('groups', array());
-		$hosts = get_request('hosts', array());
-		$templates = get_request('templates', array());
-		$templates_clear = get_request('clear_templates', array());
-		$templateid = get_request('templateid', 0);
-		$newgroup = get_request('newgroup', 0);
-		$template_name = get_request('template_name', '');
-		$visiblename = get_request('visiblename', '');
-
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
+	elseif (isset($_REQUEST['save'])) {
+		if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 			access_deny();
-
-		$clone_templateid = false;
-		if($_REQUEST['form'] == 'full_clone'){
-			$clone_templateid = $templateid;
-			$templateid = null;
 		}
 
-		foreach($macros as $mnum => $macro){
-			if(zbx_empty($macro['value'])){
-				unset($macros[$mnum]);
-				continue;
+		try {
+			DBstart();
+
+			$macros = get_request('macros', array());
+			$groups = get_request('groups', array());
+			$hosts = get_request('hosts', array());
+			$templates = get_request('templates', array());
+			$templates_clear = get_request('clear_templates', array());
+			$templateid = get_request('templateid', 0);
+			$newgroup = get_request('newgroup', 0);
+			$template_name = get_request('template_name', '');
+			$visiblename = get_request('visiblename', '');
+
+			$clone_templateid = false;
+			if ($_REQUEST['form'] == 'full_clone') {
+				$clone_templateid = $templateid;
+				$templateid = null;
 			}
 
-			if($macro['new'] == 'create') unset($macros[$mnum]['macroid']);
-			unset($macros[$mnum]['new']);
-		}
+			if ($templateid) {
+				$msg_ok = _('Template updated');
+				$msg_fail = _('Cannot update template');
+			}
+			else {
+				$msg_ok = _('Template added');
+				$msg_fail = _('Cannot add template');
+			}
 
-		if($templateid){
-			$msg_ok = S_TEMPLATE_UPDATED;
-			$msg_fail = S_CANNOT_UPDATE_TEMPLATE;
-		}
-		else{
-			$msg_ok = S_TEMPLATE_ADDED;
-			$msg_fail = S_CANNOT_ADD_TEMPLATE;
-		}
+			foreach ($macros as $mnum => $macro) {
+				if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
+					unset($macros[$mnum]);
+					continue;
+				}
 
-		try{
-			DBstart();
+				if ($macro['new'] == 'create') {
+					unset($macros[$mnum]['macroid']);
+				}
+				unset($macros[$mnum]['new']);
+			}
+
+			$duplicatedMacros = array();
+			foreach ($macros as $mnum => $macro) {
+				// transform macros to uppercase {$aaa} => {$AAA}
+				$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
+
+				// search for duplicates items in new macros array
+				foreach ($macros as $duplicateNumber => $duplicateNewMacro) {
+					if ($mnum != $duplicateNumber && $macros[$mnum]['macro'] == $duplicateNewMacro['macro']) {
+						$duplicatedMacros[] = '"'.$macros[$mnum]['macro'].'"';
+					}
+				}
+			}
+
+			// validate duplicates macros
+			if (!empty($duplicatedMacros)) {
+				error(_s('More than one macro with same name found: %1$s .', implode(', ', array_unique($duplicatedMacros))));
+				throw new Exception();
+			}
 
 			// Create new group
 			$groups = zbx_toObject($groups, 'groupid');
-			if(!zbx_empty($newgroup)){
+			if (!zbx_empty($newgroup)) {
 				$result = API::HostGroup()->create(array('name' => $newgroup));
-				if(!$result){
+				if (!$result) {
 					throw new Exception();
 				}
-				$options = array(
+				$newgroup = API::HostGroup()->get(array(
 					'groupids' => $result['groupids'],
 					'output' => API_OUTPUT_EXTEND
-				);
-				$newgroup = API::HostGroup()->get($options);
-				if($newgroup){
+				));
+				if ($newgroup) {
 					$groups = array_merge($groups, $newgroup);
 				}
-				else{
+				else {
 					throw new Exception();
 				}
 			}
@@ -380,27 +402,27 @@ require_once('include/page_header.php');
 			);
 
 			// Create/update template
-			if($templateid){
-				$created = 0;
+			if ($templateid) {
+				$created = false;
 				$template['templateid'] = $templateid;
 				$template['templates_clear'] = $templates_clear;
-				if(!API::Template()->update($template)){
+				if (!API::Template()->update($template)) {
 					throw new Exception();
 				}
 			}
-			else{
-				$created = 1;
+			else {
+				$created = true;
 				$result = API::Template()->create($template);
-				if($result){
+				if ($result) {
 					$templateid = reset($result['templateids']);
 				}
-				else{
+				else {
 					throw new Exception();
 				}
 			}
 
 			// Full clone
-			if(!zbx_empty($templateid) && $templateid && $clone_templateid && ($_REQUEST['form'] == 'full_clone')){
+			if (!zbx_empty($templateid) && $templateid && $clone_templateid && $_REQUEST['form'] == 'full_clone') {
 				if (!copyApplications($clone_templateid, $templateid)) {
 					throw new Exception();
 				}
@@ -414,22 +436,23 @@ require_once('include/page_header.php');
 				}
 
 				// Host graphs
-				$options = array(
+				$db_graphs = API::Graph()->get(array(
 					'hostids' => $clone_templateid,
-					'inherited' => 0,
+					'inherited' => false,
 					'output' => API_OUTPUT_REFER
-				);
-				$db_graphs = API::Graph()->get($options);
+				));
 				$result = true;
-				foreach($db_graphs as $gnum => $db_graph){
+				foreach ($db_graphs as $gnum => $db_graph) {
 					$result &= (bool) copy_graph_to_host($db_graph['graphid'], $templateid);
 				}
-				if(!$result) throw new Exception();
+				if (!$result) {
+					throw new Exception();
+				}
 
 				// clone discovery rules
 				$discoveryRules = API::DiscoveryRule()->get(array(
 					'hostids' => $clone_templateid,
-					'inherited' => false,
+					'inherited' => false
 				));
 				if ($discoveryRules) {
 					$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
@@ -442,17 +465,19 @@ require_once('include/page_header.php');
 				}
 			}
 
-			if(!DBend(true)) throw new Exception();
+			if (!DBend(true)) {
+				throw new Exception();
+			}
 			show_messages(true, $msg_ok, $msg_fail);
 
-			if($created){
+			if ($created) {
 				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TEMPLATE, $templateid, $template_name, 'hosts', NULL, NULL);
 			}
 			unset($_REQUEST['form']);
 			unset($_REQUEST['templateid']);
 
 		}
-		catch(Exception $e){
+		catch (Exception $e) {
 			DBend(false);
 			show_messages(false, $msg_ok, $msg_fail);
 		}
