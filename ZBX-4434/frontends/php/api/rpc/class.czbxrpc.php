@@ -25,7 +25,7 @@ class czbxrpc{
 	private static $transactionStarted = false;
 
 
-	public static function call($method, $params, $sessionid=null){
+	public static function call($method, $params, $sessionid=null) {
 // List of methods without params
 		$notifications = array(
 			'apiinfo.version' => 1
@@ -40,21 +40,21 @@ class czbxrpc{
 		);
 //-----
 
-		if(is_null($params) && !isset($notifications[$method])){
+		if (is_null($params) && !isset($notifications[$method])) {
 			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => _('Empty parameters'));
 		}
 
 // Authentication {{{
-		if(!isset($withoutAuth[$method]) || !zbx_empty($sessionid)){
+		if (!isset($withoutAuth[$method]) || !zbx_empty($sessionid)) {
 // compatibility mode
-			if($method == 'user.authenticate') $method = 'user.login';
+			if ($method == 'user.authenticate') $method = 'user.login';
 
-			if(!zbx_empty($sessionid)){
+			if (!zbx_empty($sessionid)) {
 				$usr = self::callAPI('user.checkAuthentication', $sessionid);
-				if(!isset($usr['result']))
+				if (!isset($usr['result']))
 					return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 			}
-			else if(!isset($withoutAuth[$method])){
+			elseif (!isset($withoutAuth[$method])) {
 				return array('error' => ZBX_API_ERROR_NO_AUTH, 'data' => _('Not authorized'));
 			}
 		}
@@ -63,38 +63,38 @@ class czbxrpc{
 		return self::callAPI($method, $params);
 	}
 
-	private static function transactionBegin(){
+	private static function transactionBegin() {
 		global $DB;
 
-		if($DB['TRANSACTIONS'] == 0){
+		if ($DB['TRANSACTIONS'] == 0) {
 			DBstart();
 			self::$transactionStarted = true;
 		}
 	}
 
-	private static function transactionEnd($result){
-		if(self::$transactionStarted){
+	private static function transactionEnd($result) {
+		if (self::$transactionStarted) {
 			self::$transactionStarted = false;
 			DBend($result);
 		}
 	}
 
-	private static function callJSON($method, $params){
+	private static function callJSON($method, $params) {
 		// http bla bla
 	}
 
-	private static function callAPI($method, $params){
-		if(is_array($params))
+	private static function callAPI($method, $params) {
+		if (is_array($params))
 			unset($params['nopermissions']);
 
 		list($resource, $action) = explode('.', $method);
 
 		$class_name = 'C'.$resource;
-		if(!class_exists($class_name)){
+		if (!class_exists($class_name)) {
 			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
 		}
 
-		if(!method_exists($class_name, $action)){
+		if (!method_exists($class_name, $action)) {
 			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Action ('.$action.') does not exist');
 		}
 
@@ -109,7 +109,7 @@ class czbxrpc{
 
 			return array('result' => $result);
 		}
-		catch(APIException $e){
+		catch (APIException $e) {
 			API::setReturnRPC();
 			$result = ($method === 'user.login');
 			self::transactionEnd($result);
@@ -119,7 +119,7 @@ class czbxrpc{
 				'data' => $e->getMessage(),
 			);
 
-			if(isset(CZBXAPI::$userData['debug_mode']) && CZBXAPI::$userData['debug_mode']){
+			if (isset(CZBXAPI::$userData['debug_mode']) && CZBXAPI::$userData['debug_mode']) {
 				$result['debug'] = $e->getTrace();
 			}
 

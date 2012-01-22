@@ -70,10 +70,10 @@ class testPageScreens extends CWebTest {
 		$screenid = $screen['screenid'];
 		$name = $screen['name'];
 
-		$sql1 = "select * from screens where screenid=$screenid order by screenid";
-		$oldHashScreen = DBhash($sql1);
-		$sql2 = "select * from screens_items where screenid=$screenid order by screenitemid";
-		$oldHashScreenItems = DBhash($sql2);
+		$sqlScreen = "select * from screens where screenid=$screenid order by screenid";
+		$oldHashScreen = DBhash($sqlScreen);
+		$sqlScreenItems = "select * from screens_items where screenid=$screenid order by screenitemid";
+		$oldHashScreenItems = DBhash($sqlScreenItems);
 
 		DBsave_tables('screens');
 
@@ -95,8 +95,8 @@ class testPageScreens extends CWebTest {
 		$this->assertTitle('Configuration of screens');
 		$this->ok('Screen updated');
 
-		$this->assertEquals($oldHashScreen, DBhash($sql1));
-		$this->assertEquals($oldHashScreenItems, DBhash($sql2));
+		$this->assertEquals($oldHashScreen, DBhash($sqlScreen));
+		$this->assertEquals($oldHashScreenItems, DBhash($sqlScreenItems));
 
 		DBrestore_tables('screens');
 	}

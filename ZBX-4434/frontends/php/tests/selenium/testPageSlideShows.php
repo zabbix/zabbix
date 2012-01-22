@@ -52,10 +52,10 @@ class testPageSlideShows extends CWebTest {
 		$name = $slideshow['name'];
 		$slideshowid = $slideshow['slideshowid'];
 
-		$sql1 = "select * from slideshows where name='$name' order by slideshowid";
-		$oldHashSlideShow = DBhash($sql1);
-		$sql2 = "select * from slides where slideshowid=$slideshowid order by slideid";
-		$oldHashSlide = DBhash($sql2);
+		$sqlSlideShow = "select * from slideshows where name='$name' order by slideshowid";
+		$oldHashSlideShow = DBhash($sqlSlideShow);
+		$sqlSlide = "select * from slides where slideshowid=$slideshowid order by slideid";
+		$oldHashSlide = DBhash($sqlSlide);
 
 		$this->login('slideconf.php');
 		$this->assertTitle('Configuration of slide shows');
@@ -68,8 +68,8 @@ class testPageSlideShows extends CWebTest {
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF SLIDE SHOWS');
 
-		$this->assertEquals($oldHashSlideShow, DBhash($sql1), "Chuck Norris: Slide show update changed data in table 'slideshows'");
-		$this->assertEquals($oldHashSlide, DBhash($sql2), "Chuck Norris: Slide show update changed data in table 'slides'");
+		$this->assertEquals($oldHashSlideShow, DBhash($sqlSlideShow), "Chuck Norris: Slide show update changed data in table 'slideshows'");
+		$this->assertEquals($oldHashSlide, DBhash($sqlSlide), "Chuck Norris: Slide show update changed data in table 'slides'");
 	}
 
 	public function testPageSlideShows_Create() {

@@ -258,7 +258,7 @@ class CScreenItem extends CZBXAPI {
 			'preservekeys' => true
 		));
 		foreach ($screenItemIds as $screenItemId) {
-			if(!isset($dbScreenItems[$screenItemId])) {
+			if (!isset($dbScreenItems[$screenItemId])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
@@ -411,14 +411,14 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		// check host groups
-		if(!empty($hostgroups)){
+		if (!empty($hostgroups)) {
 			$result = API::HostGroup()->get(array(
 				'groupids' => $hostgroups,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => true
 			));
-			foreach($hostgroups as $id){
-				if(!isset($result[$id]))
+			foreach ($hostgroups as $id) {
+				if (!isset($result[$id]))
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host group ID "%s" provided for screen element.', $id));
 			}
 		}

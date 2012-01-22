@@ -19,11 +19,9 @@
 **/
 ?>
 <?php
-
 $imageForm = new CForm('post', null, 'multipart/form-data');
 $imageForm->setName('imageForm');
 $imageForm->addVar('form', $this->data['form']);
-$imageForm->addVar('config', 3);
 $imageForm->addVar('imageid', $this->data['imageid']);
 
 $imageCb = new CComboBox('imagetype', $this->data['imagetype']);
@@ -51,10 +49,10 @@ $imageTab->addTab('imageTab', _('Image'), $imageFormList);
 // append buttons
 $imageForm->addItem($imageTab);
 if (!empty($this->data['imageid'])) {
-	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid').url_param('config')), new CButtonCancel(url_param('config')))));
+	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')), new CButtonCancel())));
 }
 else {
-	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButtonCancel(url_param('config'))));
+	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButtonCancel()));
 }
 
 return $imageForm;

@@ -20,8 +20,8 @@
 ?>
 <?php
 class CHelp extends CIcon{
-	public function __construct($url='index.php', $side='right'){
-		if($side != 'right'){
+	public function __construct($url='index.php', $side='right') {
+		if ($side != 'right') {
 			$side = 'left';
 		}
 

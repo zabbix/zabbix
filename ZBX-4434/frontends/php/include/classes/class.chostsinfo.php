@@ -21,7 +21,7 @@
 <?php
 class CHostsInfo extends CTable{
  public $style;
-	public function __construct($groupid=0, $style = STYLE_HORISONTAL){
+	public function __construct($groupid=0, $style = STYLE_HORISONTAL) {
 		$this->nodeid = id2nodeid($groupid);
 		$this->groupid = $groupid;
 		$this->style = null;
@@ -30,14 +30,14 @@ class CHostsInfo extends CTable{
 		$this->setOrientation($style);
 	}
 
-	public function setOrientation($value){
-		if($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL)
+	public function setOrientation($value) {
+		if ($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL)
 			return $this->error('Incorrect value for SetOrientation ['.$value.']');
 
 		$this->style = $value;
 	}
 
-	public function bodyToString(){
+	public function bodyToString() {
 		$this->cleanItems();
 
 		$total = 0;
@@ -45,7 +45,7 @@ class CHostsInfo extends CTable{
 		$accessible_hosts = get_accessible_hosts_by_user(CWebUser::$data,PERM_READ_ONLY,PERM_RES_IDS_ARRAY,get_current_nodeid(true));
 
 		$cond_from = '';
-		if(remove_nodes_from_id($this->groupid)>0){
+		if (remove_nodes_from_id($this->groupid)>0) {
 			$cond_from = ', hosts_groups hg ';
 			$cond_where = 'AND hg.hostid=h.hostid AND hg.groupid='.$this->groupid;
 		}
@@ -92,11 +92,11 @@ class CHostsInfo extends CTable{
 		$header_str = S_HOSTS_INFO.SPACE;
 
 
-		if($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
+		if ($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
 
 
 
-		if(remove_nodes_from_id($this->groupid)>0){
+		if (remove_nodes_from_id($this->groupid)>0) {
 			$group = get_hostgroup_by_groupid($this->groupid);
 			$header_str.= S_GROUP.SPACE.'&quot;'.$group['name'].'&quot;';
 		}
@@ -105,7 +105,7 @@ class CHostsInfo extends CTable{
 		}
 
 		$header = new CCol($header_str,"header");
-		if($this->style == STYLE_HORISONTAL)
+		if ($this->style == STYLE_HORISONTAL)
 			$header->SetColspan(4);
 
 		$this->addRow($header);
@@ -115,7 +115,7 @@ class CHostsInfo extends CTable{
 		$uncn	= new CCol($uncn.'  '.S_UNKNOWN,		'uncn');
 		$total	= new CCol($total.'  '.S_TOTAL,			'total');
 
-		if($this->style == STYLE_HORISONTAL){
+		if ($this->style == STYLE_HORISONTAL) {
 			$this->addRow(array($avail, $notav, $uncn, $total));
 		}
 		else{

@@ -52,12 +52,12 @@ class CAction extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sort_columns = array('actionid', 'name', 'status');
+		$sortColumns = array('actionid', 'name', 'status');
 
 		// allowed output options for [ select_* ] params
 		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('actions' => 'a.actionid'),
 			'from'		=> array('actions' => 'actions a'),
 			'where'		=> array(),
@@ -97,13 +97,13 @@ class CAction extends CZBXAPI {
 		$options = zbx_array_merge($def_options, $options);
 
 		if (is_array($options['output'])) {
-			unset($sql_parts['select']['actions']);
+			unset($sqlParts['select']['actions']);
 
 			$dbTable = DB::getSchema('actions');
-			$sql_parts['select']['actionid'] = 'a.actionid';
+			$sqlParts['select']['actionid'] = 'a.actionid';
 			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
-					$sql_parts['select'][$field] = 'a.'.$field;
+					$sqlParts['select'][$field] = 'a.'.$field;
 				}
 			}
 			$options['output'] = API_OUTPUT_CUSTOM;
@@ -117,7 +117,7 @@ class CAction extends CZBXAPI {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
 			// condition hostgroup
-			$sql_parts['where'][] =
+			$sqlParts['where'][] =
 				' NOT EXISTS ('.
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
@@ -144,7 +144,7 @@ class CAction extends CZBXAPI {
 				')';
 
 			// condition host or template
-			$sql_parts['where'][] =
+			$sqlParts['where'][] =
 				' NOT EXISTS ('.
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
@@ -171,7 +171,7 @@ class CAction extends CZBXAPI {
 				')';
 
 			// condition trigger
-			$sql_parts['where'][] =
+			$sqlParts['where'][] =
 				' NOT EXISTS ('.
 					' SELECT cc.conditionid'.
 					' FROM conditions cc'.
@@ -213,9 +213,9 @@ class CAction extends CZBXAPI {
 			zbx_value2array($options['actionids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['actionid'] = 'a.actionid';
+				$sqlParts['select']['actionid'] = 'a.actionid';
 			}
-			$sql_parts['where'][] = DBcondition('a.actionid', $options['actionids']);
+			$sqlParts['where'][] = DBcondition('a.actionid', $options['actionids']);
 		}
 
 		// groupids
@@ -223,12 +223,12 @@ class CAction extends CZBXAPI {
 			zbx_value2array($options['groupids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['groupids'] = 'c.value';
+				$sqlParts['select']['groupids'] = 'c.value';
 			}
-			$sql_parts['from']['conditions'] = 'conditions c';
-			$sql_parts['where'][] = DBcondition('c.value', $options['groupids']);
-			$sql_parts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST_GROUP;
-			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
+			$sqlParts['from']['conditions'] = 'conditions c';
+			$sqlParts['where'][] = DBcondition('c.value', $options['groupids']);
+			$sqlParts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST_GROUP;
+			$sqlParts['where']['ac'] = 'a.actionid=c.actionid';
 		}
 
 		// hostids
@@ -236,12 +236,12 @@ class CAction extends CZBXAPI {
 			zbx_value2array($options['hostids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['hostids'] = 'c.value';
+				$sqlParts['select']['hostids'] = 'c.value';
 			}
-			$sql_parts['from']['conditions'] = 'conditions c';
-			$sql_parts['where'][] = DBcondition('c.value', $options['hostids']);
-			$sql_parts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST;
-			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
+			$sqlParts['from']['conditions'] = 'conditions c';
+			$sqlParts['where'][] = DBcondition('c.value', $options['hostids']);
+			$sqlParts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_HOST;
+			$sqlParts['where']['ac'] = 'a.actionid=c.actionid';
 		}
 
 		// triggerids
@@ -249,12 +249,12 @@ class CAction extends CZBXAPI {
 			zbx_value2array($options['triggerids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['triggerids'] = 'c.value';
+				$sqlParts['select']['triggerids'] = 'c.value';
 			}
-			$sql_parts['from']['conditions'] = 'conditions c';
-			$sql_parts['where'][] = DBcondition('c.value', $options['triggerids']);
-			$sql_parts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_TRIGGER;
-			$sql_parts['where']['ac'] = 'a.actionid=c.actionid';
+			$sqlParts['from']['conditions'] = 'conditions c';
+			$sqlParts['where'][] = DBcondition('c.value', $options['triggerids']);
+			$sqlParts['where']['c'] = 'c.conditiontype='.CONDITION_TYPE_TRIGGER;
+			$sqlParts['where']['ac'] = 'a.actionid=c.actionid';
 		}
 
 		// mediatypeids
@@ -262,13 +262,13 @@ class CAction extends CZBXAPI {
 			zbx_value2array($options['mediatypeids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['mediatypeid'] = 'om.mediatypeid';
+				$sqlParts['select']['mediatypeid'] = 'om.mediatypeid';
 			}
-			$sql_parts['from']['opmessage'] = 'opmessage om';
-			$sql_parts['from']['operations'] = 'operations o';
-			$sql_parts['where'][] = DBcondition('om.mediatypeid', $options['mediatypeids']);
-			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
-			$sql_parts['where']['oom'] = 'o.operationid=om.operationid';
+			$sqlParts['from']['opmessage'] = 'opmessage om';
+			$sqlParts['from']['operations'] = 'operations o';
+			$sqlParts['where'][] = DBcondition('om.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
+			$sqlParts['where']['oom'] = 'o.operationid=om.operationid';
 		}
 
 		// operation messages
@@ -277,13 +277,13 @@ class CAction extends CZBXAPI {
 			zbx_value2array($options['usrgrpids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['usrgrpid'] = 'omg.usrgrpid';
+				$sqlParts['select']['usrgrpid'] = 'omg.usrgrpid';
 			}
-			$sql_parts['from']['opmessage_grp'] = 'opmessage_grp omg';
-			$sql_parts['from']['operations'] = 'operations o';
-			$sql_parts['where'][] = DBcondition('omg.usrgrpid', $options['usrgrpids']);
-			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
-			$sql_parts['where']['oomg'] = 'o.operationid=omg.operationid';
+			$sqlParts['from']['opmessage_grp'] = 'opmessage_grp omg';
+			$sqlParts['from']['operations'] = 'operations o';
+			$sqlParts['where'][] = DBcondition('omg.usrgrpid', $options['usrgrpids']);
+			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
+			$sqlParts['where']['oomg'] = 'o.operationid=omg.operationid';
 		}
 
 		// userids
@@ -291,13 +291,13 @@ class CAction extends CZBXAPI {
 			zbx_value2array($options['userids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['userid'] = 'omu.userid';
+				$sqlParts['select']['userid'] = 'omu.userid';
 			}
-			$sql_parts['from']['opmessage_usr'] = 'opmessage_usr omu';
-			$sql_parts['from']['operations'] = 'operations o';
-			$sql_parts['where'][] = DBcondition('omu.userid', $options['userids']);
-			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
-			$sql_parts['where']['oomu'] = 'o.operationid=omu.operationid';
+			$sqlParts['from']['opmessage_usr'] = 'opmessage_usr omu';
+			$sqlParts['from']['operations'] = 'operations o';
+			$sqlParts['where'][] = DBcondition('omu.userid', $options['userids']);
+			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
+			$sqlParts['where']['oomu'] = 'o.operationid=omu.operationid';
 		}
 
 		// operation commands
@@ -306,76 +306,76 @@ class CAction extends CZBXAPI {
 			zbx_value2array($options['scriptids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['scriptid'] = 'oc.scriptid';
+				$sqlParts['select']['scriptid'] = 'oc.scriptid';
 			}
-			$sql_parts['from']['opmessage_usr'] = 'opcommand oc';
-			$sql_parts['from']['operations'] = 'operations o';
-			$sql_parts['where'][] = '('.DBcondition('oc.scriptid', $options['scriptids']).' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT.')' ;
-			$sql_parts['where']['ao'] = 'a.actionid=o.actionid';
-			$sql_parts['where']['ooc'] = 'o.operationid=oc.operationid';
+			$sqlParts['from']['opmessage_usr'] = 'opcommand oc';
+			$sqlParts['from']['operations'] = 'operations o';
+			$sqlParts['where'][] = '('.DBcondition('oc.scriptid', $options['scriptids']).' AND oc.type='.ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT.')' ;
+			$sqlParts['where']['ao'] = 'a.actionid=o.actionid';
+			$sqlParts['where']['ooc'] = 'o.operationid=oc.operationid';
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('actions a', $options, $sql_parts);
+			zbx_db_filter('actions a', $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('actions a', $options, $sql_parts);
+			zbx_db_search('actions a', $options, $sqlParts);
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['actions'] = 'a.*';
+			$sqlParts['select']['actions'] = 'a.*';
 		}
 
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 
-			$sql_parts['select'] = array('COUNT(DISTINCT a.actionid) as rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT a.actionid) as rowscount');
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'a');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'a');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$actionids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
-		$sql_limit = $sql_parts['limit'];
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.$sql_select.
-				' FROM '.$sql_from.
+		$sql = 'SELECT '.$sqlSelect.
+				' FROM '.$sqlFrom.
 				' WHERE '.DBin_node('a.actionid', $nodeids).
-					$sql_where.
-					$sql_order;
-		$db_res = DBselect($sql, $sql_limit);
+					$sqlWhere.
+					$sqlOrder;
+		$db_res = DBselect($sql, $sqlLimit);
 		while ($action = DBfetch($db_res)) {
 			if ($options['countOutput']) {
 				$result = $action['rowscount'];
@@ -1624,7 +1624,7 @@ class CAction extends CZBXAPI {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('You did not specify targets for action operation global script "%s".', $scripts[$operation['opcommand']['scriptid']]['name']));
 						}
 						else {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('You did not specify targets for action operation command "%s".',$operation['opcommand']['command']));
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('You did not specify targets for action operation command "%s".', $operation['opcommand']['command']));
 						}
 					}
 
