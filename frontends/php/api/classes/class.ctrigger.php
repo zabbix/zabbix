@@ -1448,13 +1448,12 @@ class CTrigger extends CZBXAPI {
 		$this->checkInput($triggers, __FUNCTION__);
 		$this->updateReal($triggers);
 
-		$options = array(
+		$dbTriggers = $this->get(array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'nopermissions' => true
-		);
-		$dbTriggers = $this->get($options);
+		));
 		foreach ($triggers as $trigger) {
 			// pass the full trigger so the children can inherit all of the data
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
@@ -1492,20 +1491,17 @@ class CTrigger extends CZBXAPI {
 			$parent_triggerids = array();
 			while ($db_trigger = DBfetch($db_items)) {
 				$parent_triggerids[] = $db_trigger['triggerid'];
-				$triggerids[$db_trigger['triggerid']] = $db_trigger['triggerid'];
+				$triggerids[] = $db_trigger['triggerid'];
 			}
 		} while (!empty($parent_triggerids));
 
 		// select all triggers which are deleted (including children)
-		$options = array(
+		$del_triggers = $this->get(array(
 			'triggerids' => $triggerids,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('triggerid', 'description', 'expression'),
 			'nopermissions' => true,
-			'preservekeys' => true,
 			'selectHosts' => array('name')
-		);
-		$del_triggers = $this->get($options);
-
+		));
 		// TODO: REMOVE info
 		foreach ($del_triggers as $trigger) {
 			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
@@ -1536,8 +1532,8 @@ class CTrigger extends CZBXAPI {
 		$actionids = array();
 		$db_actions = DBselect(
 			'SELECT DISTINCT actionid'.
-				' FROM conditions'.
-				' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
+			' FROM conditions'.
+			' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
 				' AND '.DBcondition('value', $pks, false, true)
 		);
 		while ($db_action = DBfetch($db_actions)) {
@@ -1799,9 +1795,7 @@ class CTrigger extends CZBXAPI {
 
 		// fetch the existing child triggers
 		$templatedTriggers = $this->select('triggers', array(
-			'filter' => array(
-				'templateid' => $trigger['triggerid']
-			)
+			'filter' => array('templateid' => $trigger['triggerid'])
 		));
 
 		if (empty($triggerTemplates)) {
