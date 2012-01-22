@@ -70,14 +70,14 @@ class CHost extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = false;
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('hostid', 'host', 'name', 'status');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sqlParts = array(
 			'select'	=> array('hosts' => 'h.hostid'),
@@ -88,7 +88,7 @@ class CHost extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
@@ -148,7 +148,7 @@ class CHost extends CZBXAPI {
 			'limit'						=> null,
 			'limitSelects'				=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['hosts']);
@@ -164,7 +164,7 @@ class CHost extends CZBXAPI {
 		}
 
 // editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $user_type) || $options['nopermissions']) {
+		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
@@ -744,7 +744,7 @@ Copt::memoryPick();
 
 // Adding Objects
 // Adding Groups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 					'nodeids' => $nodeids,
 					'output' => $options['selectGroups'],
@@ -781,8 +781,8 @@ Copt::memoryPick();
 			$sql = 'SELECT '.implode(', ', $selectHIn).
 				' FROM host_inventory hin'.
 				' WHERE '.DBcondition('hin.hostid', $hostids);
-			$db_inventory = DBselect($sql);
-			while ($inventory = DBfetch($db_inventory))
+			$dbInventory = DBselect($sql);
+			while ($inventory = DBfetch($dbInventory))
 				$result[$inventory['hostid']]['inventory'] = $inventory;
 		}
 
@@ -794,7 +794,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectParentTemplates']) || str_in_array($options['selectParentTemplates'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectParentTemplates']) || str_in_array($options['selectParentTemplates'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectParentTemplates'];
 				$templates = API::Template()->get($objParams);
 
@@ -838,7 +838,7 @@ Copt::memoryPick();
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectInterfaces'];
 				$interfaces = API::HostInterface()->get($objParams);
 
@@ -883,7 +883,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectItems'];
 				$items = API::Item()->get($objParams);
 
@@ -924,7 +924,7 @@ Copt::memoryPick();
 				'preservekeys' => 1,
 			);
 
-			if (is_array($options['selectDiscoveries']) || str_in_array($options['selectDiscoveries'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectDiscoveries']) || str_in_array($options['selectDiscoveries'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDiscoveries'];
 				$items = API::DiscoveryRule()->get($objParams);
 
@@ -969,7 +969,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectTriggers']) || str_in_array($options['selectTriggers'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectTriggers']) || str_in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectTriggers'];
 				$triggers = API::Trigger()->get($objParams);
 
@@ -1015,7 +1015,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectGraphs']) || str_in_array($options['selectGraphs'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectGraphs']) || str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
 				$graphs = API::Graph()->get($objParams);
 
@@ -1061,7 +1061,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectDHosts'];
 				$dhosts = API::DHost()->get($objParams);
 
@@ -1107,7 +1107,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectApplications']) || str_in_array($options['selectApplications'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectApplications']) || str_in_array($options['selectApplications'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectApplications'];
 				$applications = API::Application()->get($objParams);
 
@@ -1146,7 +1146,7 @@ Copt::memoryPick();
 		}
 
 // Adding macros
-		if (!is_null($options['selectMacros']) && str_in_array($options['selectMacros'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectMacros']) && str_in_array($options['selectMacros'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectMacros'],
@@ -1174,7 +1174,7 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 
-			if (is_array($options['selectScreens']) || str_in_array($options['selectScreens'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectScreens']) || str_in_array($options['selectScreens'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectScreens'];
 
 				$screens = API::TemplateScreen()->get($objParams);
@@ -1589,10 +1589,10 @@ Copt::memoryPick();
 			'editable' => 1,
 			'preservekeys' => 1
 		);
-		$upd_hosts = $this->get($options);
+		$updHosts = $this->get($options);
 
 		foreach ($data['hosts'] as $hnum => $host) {
-			if (!isset($upd_hosts[$host['hostid']])) {
+			if (!isset($updHosts[$host['hostid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have enough rights for operation.'));
 			}
 		}
@@ -1675,9 +1675,9 @@ Copt::memoryPick();
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 		);
-		$upd_hosts = $this->get($options);
+		$updHosts = $this->get($options);
 		foreach ($hosts as $hnum => $host) {
-			if (!isset($upd_hosts[$host['hostid']])) {
+			if (!isset($updHosts[$host['hostid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 		}
@@ -1705,24 +1705,24 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update host name.'));
 			}
 
-			$cur_host = reset($hosts);
+			$curHost = reset($hosts);
 
 			$options = array(
 				'filter' => array(
-				'host' => $cur_host['host']),
+				'host' => $curHost['host']),
 				'output' => API_OUTPUT_SHORTEN,
 				'editable' => 1,
 				'nopermissions' => 1
 			);
-			$host_exists = $this->get($options);
-			$host_exist = reset($host_exists);
-			if ($host_exist && (bccomp($host_exist['hostid'], $cur_host['hostid']) != 0)) {
+			$hostExists = $this->get($options);
+			$hostExist = reset($hostExists);
+			if ($hostExist && (bccomp($hostExist['hostid'], $curHost['hostid']) != 0)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
 			// can't add host with the same name as existing template
-			if (API::Template()->exists(array('host' => $cur_host['host'])))
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$cur_host['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+			if (API::Template()->exists(array('host' => $curHost['host'])))
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$curHost['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 		}
 
 
@@ -1782,16 +1782,16 @@ Copt::memoryPick();
 		if (isset($updateGroups)) {
 			$updateGroups = zbx_toArray($updateGroups);
 
-			$host_groups = API::HostGroup()->get(array('hostids' => $hostids));
-			$host_groupids = zbx_objectValues($host_groups, 'groupid');
-			$new_groupids = zbx_objectValues($updateGroups, 'groupid');
+			$hostGroups = API::HostGroup()->get(array('hostids' => $hostids));
+			$hostGroupids = zbx_objectValues($hostGroups, 'groupid');
+			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
 
-			$groups_to_add = array_diff($new_groupids, $host_groupids);
+			$groupsToAdd = array_diff($newGroupids, $hostGroupids);
 
-			if (!empty($groups_to_add)) {
+			if (!empty($groupsToAdd)) {
 				$result = $this->massAdd(array(
 					'hosts' => $hosts,
-					'groups' => zbx_toObject($groups_to_add, 'groupid')
+					'groups' => zbx_toObject($groupsToAdd, 'groupid')
 				));
 
 				if (!$result) {
@@ -1799,10 +1799,10 @@ Copt::memoryPick();
 				}
 			}
 
-			$groupids_to_del = array_diff($host_groupids, $new_groupids);
+			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
 
-			if (!empty($groupids_to_del)) {
-				$result = $this->massRemove(array('hostids' => $hostids, 'groupids' => $groupids_to_del));
+			if (!empty($groupidsToDel)) {
+				$result = $this->massRemove(array('hostids' => $hostids, 'groupids' => $groupidsToDel));
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete host group.'));
 				}
@@ -1827,18 +1827,18 @@ Copt::memoryPick();
 
 
 		if (isset($updateTemplatesClear)) {
-			$templateids_clear = zbx_objectValues($updateTemplatesClear, 'templateid');
+			$templateidsClear = zbx_objectValues($updateTemplatesClear, 'templateid');
 			if (!empty($updateTemplatesClear)) {
 				$this->massRemove(
 					array(
 						'hostids' => $hostids,
-						'templateids_clear' => $templateids_clear
+						'templateids_clear' => $templateidsClear
 				)
 			);
 			}
 		}
 		else {
-			$templateids_clear = array();
+			$templateidsClear = array();
 		}
 
 
@@ -1849,16 +1849,16 @@ Copt::memoryPick();
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => true
 			);
-			$host_templates = API::Template()->get($opt);
+			$hostTemplates = API::Template()->get($opt);
 
-			$host_templateids = array_keys($host_templates);
-			$new_templateids = zbx_objectValues($updateTemplates, 'templateid');
+			$hostTemplateids = array_keys($hostTemplates);
+			$newTemplateids = zbx_objectValues($updateTemplates, 'templateid');
 
-			$templates_to_del = array_diff($host_templateids, $new_templateids);
-			$templates_to_del = array_diff($templates_to_del, $templateids_clear);
+			$templatesToDel = array_diff($hostTemplateids, $newTemplateids);
+			$templatesToDel = array_diff($templatesToDel, $templateidsClear);
 
-			if (!empty($templates_to_del)) {
-				$result = $this->massRemove(array('hostids' => $hostids, 'templateids' => $templates_to_del));
+			if (!empty($templatesToDel)) {
+				$result = $this->massRemove(array('hostids' => $hostids, 'templateids' => $templatesToDel));
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_UNLINK_TEMPLATE);
 				}
@@ -1933,9 +1933,9 @@ Copt::memoryPick();
 
 			else {
 				$hostsWithInventories = array();
-				$existing_inventories_db = DBselect('SELECT hostid FROM host_inventory WHERE '.DBcondition('hostid', $hostids));
-				while ($existing_inventory = DBfetch($existing_inventories_db)) {
-					$hostsWithInventories[] = $existing_inventory['hostid'];
+				$existingInventoriesDb = DBselect('SELECT hostid FROM host_inventory WHERE '.DBcondition('hostid', $hostids));
+				while ($existingInventory = DBfetch($existingInventoriesDb)) {
+					$hostsWithInventories[] = $existingInventory['hostid'];
 				}
 
 				// when hosts are being updated to use automatic mode for host inventories,
@@ -2024,9 +2024,9 @@ Copt::memoryPick();
 			'preservekeys' => 1,
 			'output' => API_OUTPUT_SHORTEN,
 		);
-		$upd_hosts = $this->get($options);
+		$updHosts = $this->get($options);
 		foreach ($hostids as $hostid) {
-			if (!isset($upd_hosts[$hostid])) {
+			if (!isset($updHosts[$hostid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 		}
@@ -2103,8 +2103,8 @@ Copt::memoryPick();
 			'preservekeys' => true
 		));
 		if (!empty($delItems)) {
-			$delItemIds = zbx_objectValues($delItems, 'itemid');
-			API::Item()->delete($delItemIds, true);
+			$delItemids = zbx_objectValues($delItems, 'itemid');
+			API::Item()->delete($delItemids, true);
 		}
 
 		$delRules = API::DiscoveryRule()->get(array(
@@ -2113,18 +2113,18 @@ Copt::memoryPick();
 			'preservekeys' => 1
 		));
 		if (!empty($delRules)) {
-			$delRulesIds = zbx_objectValues($delRules, 'itemid');
-			API::DiscoveryRule()->delete($delRulesIds, true);
+			$delRulesids = zbx_objectValues($delRules, 'itemid');
+			API::DiscoveryRule()->delete($delRulesids, true);
 		}
 
 // delete web tests
-		$del_httptests = array();
-		$db_httptests = get_httptests_by_hostid($hostids);
-		while ($db_httptest = DBfetch($db_httptests)) {
-			$del_httptests[$db_httptest['httptestid']] = $db_httptest['httptestid'];
+		$delHttptests = array();
+		$dbHttptests = get_httptests_by_hostid($hostids);
+		while ($dbHttptest = DBfetch($dbHttptests)) {
+			$delHttptests[$dbHttptest['httptestid']] = $dbHttptest['httptestid'];
 		}
-		if (!empty($del_httptests)) {
-			API::WebCheck()->delete($del_httptests);
+		if (!empty($delHttptests)) {
+			API::WebCheck()->delete($delHttptests);
 		}
 
 

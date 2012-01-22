@@ -48,13 +48,13 @@ class CProxy extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
 		$sortColumns = array('hostid', 'host', 'status');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('hostid' => 'h.hostid'),
@@ -64,7 +64,7 @@ class CProxy extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'proxyids'					=> null,
 			'editable'					=> null,
@@ -87,7 +87,7 @@ class CProxy extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
 			unset($sqlParts['select']['hosts']);
@@ -106,7 +106,7 @@ class CProxy extends CZBXAPI {
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $user_type || $options['nopermissions']) {
+		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
@@ -228,7 +228,7 @@ class CProxy extends CZBXAPI {
 				'proxyids' => $proxyids,
 				'preservekeys' => true
 			);
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectHosts'];
 				$hosts = API::Host()->get($objParams);
 				foreach ($hosts as $host) {
@@ -245,7 +245,7 @@ class CProxy extends CZBXAPI {
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselects_allowed_outputs)) {
+			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectInterfaces'];
 				$interfaces = API::HostInterface()->get($objParams);
 
@@ -450,9 +450,9 @@ class CProxy extends CZBXAPI {
 					'output' => API_OUTPUT_REFER,
 					'hostids' => $proxy['hostid']
 				));
-				$interfaceIds = zbx_objectValues($interfaces, 'interfaceid');
-				if ($interfaceIds) {
-					API::HostInterface()->delete($interfaceIds);
+				$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
+				if ($interfaceids) {
+					API::HostInterface()->delete($interfaceids);
 				}
 			}
 			// update the interface of a passive proxy

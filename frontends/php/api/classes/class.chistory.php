@@ -52,7 +52,7 @@ class CHistory extends CZBXAPI {
 		$sortColumns = array('itemid', 'clock');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('history' => 'h.itemid'),
@@ -63,7 +63,7 @@ class CHistory extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'history'					=> ITEM_VALUE_TYPE_UINT64,
 			'nodeids'					=> null,
 			'hostids'					=> null,
@@ -90,7 +90,7 @@ class CHistory extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		switch ($options['history']) {
 			case ITEM_VALUE_TYPE_LOG:
@@ -252,10 +252,10 @@ class CHistory extends CZBXAPI {
 				' WHERE '.
 					$sqlWhere.
 					$sqlOrder;
-		$db_res = DBselect($sql, $sqlLimit);
+		$dbRes = DBselect($sql, $sqlLimit);
 		$count = 0;
 		$group = array();
-		while ($data = DBfetch($db_res)) {
+		while ($data = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $data;
 			}

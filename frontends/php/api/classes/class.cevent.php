@@ -53,14 +53,14 @@ class CEvent extends CZBXAPI {
 	public function get($options = array()) {
 		$result = array();
 		$nodeCheck = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('eventid', 'object', 'objectid');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('events' => array('e.eventid')),
@@ -71,7 +71,7 @@ class CEvent extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'groupids'					=> null,
 			'hostids'					=> null,
@@ -110,10 +110,10 @@ class CEvent extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $user_type || $options['nopermissions']) {
+		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
 			if (is_null($options['source']) && is_null($options['object'])) {
@@ -342,8 +342,8 @@ class CEvent extends CZBXAPI {
 				' WHERE '.
 					$sqlWhere.
 					$sqlOrder;
-		$db_res = DBselect($sql, $sqlLimit);
-		while ($event = DBfetch($db_res)) {
+		$dbRes = DBselect($sql, $sqlLimit);
+		while ($event = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				$result = $event['rowscount'];
 			}
@@ -415,7 +415,7 @@ class CEvent extends CZBXAPI {
 		 * Adding objects
 		 */
 		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectHosts'],
@@ -449,7 +449,7 @@ class CEvent extends CZBXAPI {
 		}
 
 		// adding triggers
-		if (!is_null($options['selectTriggers']) && str_in_array($options['selectTriggers'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectTriggers']) && str_in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectTriggers'],
@@ -469,7 +469,7 @@ class CEvent extends CZBXAPI {
 		}
 
 		// adding items
-		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselects_allowed_outputs)) {
+		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
@@ -479,9 +479,9 @@ class CEvent extends CZBXAPI {
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			$db_items = API::Item()->get($objParams);
+			$dbItems = API::Item()->get($objParams);
 			$items = array();
-			foreach ($db_items as $itemid => $item) {
+			foreach ($dbItems as $itemid => $item) {
 				$itriggers = $item['triggers'];
 				unset($item['triggers']);
 				foreach ($itriggers as $trigger) {
@@ -503,7 +503,7 @@ class CEvent extends CZBXAPI {
 		}
 
 		// adding alerts
-		if (!is_null($options['select_alerts']) && str_in_array($options['select_alerts'], $subselects_allowed_outputs)) {
+		if (!is_null($options['select_alerts']) && str_in_array($options['select_alerts'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'output' => $options['select_alerts'],
 				'selectMediatypes' => API_OUTPUT_EXTEND,
@@ -522,7 +522,7 @@ class CEvent extends CZBXAPI {
 
 		// adding acknowledges
 		if (!is_null($options['select_acknowledges'])) {
-			if (is_array($options['select_acknowledges']) || str_in_array($options['select_acknowledges'], $subselects_allowed_outputs)) {
+			if (is_array($options['select_acknowledges']) || str_in_array($options['select_acknowledges'], $subselectsAllowedOutputs)) {
 				$res = DBselect(
 					'SELECT a.*,u.alias'.
 					' FROM acknowledges a'.
@@ -604,7 +604,7 @@ class CEvent extends CZBXAPI {
 			}
 
 			foreach ($events as $num => $event) {
-				$event_db_fields = array(
+				$eventDbFields = array(
 					'source'		=> null,
 					'object'		=> null,
 					'objectid'		=> null,
@@ -613,7 +613,7 @@ class CEvent extends CZBXAPI {
 					'acknowledged'	=> 0
 				);
 
-				if (!check_db_fields($event_db_fields, $event)) {
+				if (!check_db_fields($eventDbFields, $event)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for Event');
 				}
 
@@ -657,9 +657,9 @@ class CEvent extends CZBXAPI {
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => 1
 			);
-			$del_events = $this->get($options);
+			$delEvents = $this->get($options);
 			foreach ($eventids as $enum => $eventid) {
-				if (!isset($del_events[$eventid])) {
+				if (!isset($delEvents[$eventid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 				}
 			}
