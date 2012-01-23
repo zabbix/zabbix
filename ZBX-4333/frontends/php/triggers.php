@@ -426,13 +426,23 @@ include_once('include/page_header.php');
 			foreach($hosts_ids as $num => $host_id){
 				foreach($_REQUEST['g_triggerid'] as $tnum => $trigger_id){
 					$newtrigid = copy_trigger_to_host($trigger_id, $host_id, true);
-
 					$new_triggerids[$trigger_id] = $newtrigid;
 					$go_result |= (bool) $newtrigid;
 				}
-
-//				replace_triggers_depenedencies($new_triggerids);
+				foreach ($_REQUEST['g_triggerid'] as $tnum => $trigger_id) {
+					$deps = replace_template_dependencies(get_trigger_dependencies_by_triggerid($trigger_id), $host_id);
+					foreach ($deps as $dep_id) {
+						add_trigger_dependency($new_triggerids[$trigger_id], $dep_id);
+					}
+				}
 			}
+			replace_triggers_depenedencies($new_triggerids);
+
+
+
+
+
+
 
 			$go_result = DBend($go_result);
 			$_REQUEST['go'] = 'none2';
