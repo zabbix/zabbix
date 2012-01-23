@@ -114,7 +114,7 @@ class testFormHost extends CWebTest {
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('No groups for host');
-		$this->assertEquals(1, DBcount("select * from hosts where host='Test host'"));
+		$this->assertEquals(0, DBcount("select * from hosts where host='Test host'"));
 	}
 
 	public function testFormHost_CloneHost() {
@@ -229,7 +229,7 @@ class testFormHost extends CWebTest {
 		$host = "Template linkage test host";
 
 		$sql = "select hostid from hosts where host='".$host."' and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")";
-		$this->assertEquals(1, DBcount($sql),"Chuck Norris: No such host:$host");
+		$this->assertEquals(1, DBcount($sql), "Chuck Norris: No such host:$host");
 		$row = DBfetch(DBselect($sql));
 		$hostid = $row['hostid'];
 

@@ -6,25 +6,25 @@ class CConfigFile{
 	public $error = '';
 
 // STATIC methods
-	private static function exception($error){
+	private static function exception($error) {
 		throw new Exception($error);
 	}
 
 // PUBLIC methods
-	public function __construct($file=null){
+	public function __construct($file=null) {
 		$this->setDefaults();
 
-		if(!is_null($file))
+		if (!is_null($file))
 			$this->setFile($file);
 	}
 
-	public function setFile($file){
+	public function setFile($file) {
 		$this->configFile = $file;
 	}
 
-	public function load(){
+	public function load() {
 		try{
-			if(!file_exists($this->configFile)){
+			if (!file_exists($this->configFile)) {
 				self::exception('Config file does not exist.');
 			}
 
@@ -35,51 +35,51 @@ class CConfigFile{
 // config file in plain php is bad
 // {{{
 			$dbs = array(ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3);
-			if(!isset($DB['TYPE']) && !isset($DB_TYPE))
+			if (!isset($DB['TYPE']) && !isset($DB_TYPE))
 				self::exception('DB type is not set.');
-			else if(isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs))
+			else if (isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs))
 				self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
-			else if(isset($DB_TYPE) && !isset($DB['TYPE']) && !in_array($DB_TYPE, $dbs))
+			else if (isset($DB_TYPE) && !isset($DB['TYPE']) && !in_array($DB_TYPE, $dbs))
 				self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
-			else if(!isset($DB['DATABASE']) && !isset($DB_DATABASE))
+			else if (!isset($DB['DATABASE']) && !isset($DB_DATABASE))
 				self::exception('DB database is not set.');
 // }}}
 
 			$this->setDefaults();
 
-			if(isset($DB['TYPE'])) $this->config['DB']['TYPE'] = $DB['TYPE'];
-			else if(isset($DB_TYPE)) $this->config['DB']['TYPE'] = $DB_TYPE;
+			if (isset($DB['TYPE'])) $this->config['DB']['TYPE'] = $DB['TYPE'];
+			else if (isset($DB_TYPE)) $this->config['DB']['TYPE'] = $DB_TYPE;
 
-			if(isset($DB['DATABASE'])) $this->config['DB']['DATABASE'] = $DB['DATABASE'];
-			else if(isset($DB_DATABASE)) $this->config['DB']['DATABASE'] = $DB_DATABASE;
+			if (isset($DB['DATABASE'])) $this->config['DB']['DATABASE'] = $DB['DATABASE'];
+			else if (isset($DB_DATABASE)) $this->config['DB']['DATABASE'] = $DB_DATABASE;
 
-			if(isset($DB['SERVER'])) $this->config['DB']['SERVER'] = $DB['SERVER'];
-			else if(isset($DB_SERVER)) $this->config['DB']['SERVER'] = $DB_SERVER;
+			if (isset($DB['SERVER'])) $this->config['DB']['SERVER'] = $DB['SERVER'];
+			else if (isset($DB_SERVER)) $this->config['DB']['SERVER'] = $DB_SERVER;
 
-			if(isset($DB['PORT'])) $this->config['DB']['PORT'] = $DB['PORT'];
-			else if(isset($DB_PORT)) $this->config['DB']['PORT'] = $DB_PORT;
+			if (isset($DB['PORT'])) $this->config['DB']['PORT'] = $DB['PORT'];
+			else if (isset($DB_PORT)) $this->config['DB']['PORT'] = $DB_PORT;
 
-			if(isset($DB['USER'])) $this->config['DB']['USER'] = $DB['USER'];
-			else if(isset($DB_USER)) $this->config['DB']['USER'] = $DB_USER;
+			if (isset($DB['USER'])) $this->config['DB']['USER'] = $DB['USER'];
+			else if (isset($DB_USER)) $this->config['DB']['USER'] = $DB_USER;
 
-			if(isset($DB['PASSWORD'])) $this->config['DB']['PASSWORD'] = $DB['PASSWORD'];
-			else if(isset($DB_PASSWORD)) $this->config['DB']['PASSWORD'] = $DB_PASSWORD;
+			if (isset($DB['PASSWORD'])) $this->config['DB']['PASSWORD'] = $DB['PASSWORD'];
+			else if (isset($DB_PASSWORD)) $this->config['DB']['PASSWORD'] = $DB_PASSWORD;
 
-			if(isset($DB['SCHEMA'])) $this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
+			if (isset($DB['SCHEMA'])) $this->config['DB']['SCHEMA'] = $DB['SCHEMA'];
 
-			if(isset($ZBX_SERVER)) $this->config['ZBX_SERVER'] = $ZBX_SERVER;
-			if(isset($ZBX_SERVER_PORT)) $this->config['ZBX_SERVER_PORT'] = $ZBX_SERVER_PORT;
-			if(isset($ZBX_SERVER_NAME)) $this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;
+			if (isset($ZBX_SERVER)) $this->config['ZBX_SERVER'] = $ZBX_SERVER;
+			if (isset($ZBX_SERVER_PORT)) $this->config['ZBX_SERVER_PORT'] = $ZBX_SERVER_PORT;
+			if (isset($ZBX_SERVER_NAME)) $this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;
 
 			return true;
 		}
-		catch(Exception $e){
+		catch (Exception $e) {
 			$this->error = $e->getMessage();
 			return false;
 		}
 	}
 
-	public function makeGlobal(){
+	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME;
 
 		$DB = $this->config['DB'];
@@ -88,25 +88,25 @@ class CConfigFile{
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
 	}
 
-	public function save(){
+	public function save() {
 		try{
-			if(is_null($this->configFile)){
+			if (is_null($this->configFile)) {
 				self::exception('Cannot save, config file is not set.');
 			}
 
 			$this->check();
 
-			if(!file_put_contents($this->configFile, $this->getString())){
+			if (!file_put_contents($this->configFile, $this->getString())) {
 				self::exception('Cannot write config file.');
 			}
 		}
-		catch(Exception $e){
+		catch (Exception $e) {
 			$this->error = $e->getMessage();
 			return false;
 		}
 	}
 
-	public function getString(){
+	public function getString() {
 		return
 '<?php
 // Zabbix GUI configuration file
@@ -131,7 +131,7 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 	}
 
 // PROTECTED methods
-	protected function setDefaults(){
+	protected function setDefaults() {
 		$this->config['DB'] = array(
 			'TYPE' => null,
 			'SERVER' => 'localhost',
@@ -146,16 +146,16 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 		$this->config['ZBX_SERVER_NAME'] = '';
 	}
 
-	protected function check(){
+	protected function check() {
 		$dbs = array(ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3);
 
-		if(!isset($this->config['DB']['TYPE'])){
+		if (!isset($this->config['DB']['TYPE'])) {
 			self::exception('DB type is not set.');
 		}
-		else if(!in_array($this->config['DB']['TYPE'], $dbs)){
+		else if (!in_array($this->config['DB']['TYPE'], $dbs)) {
 			self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
 		}
-		else if(!isset($this->config['DB']['DATABASE'])){
+		else if (!isset($this->config['DB']['DATABASE'])) {
 			self::exception('DB database is not set.');
 		}
 	}

@@ -54,14 +54,14 @@ class testPageMaps extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$sql1 = "select * from sysmaps where name='$name' order by sysmapid";
-		$oldHashMap = DBhash($sql1);
-		$sql2 = "select * from sysmaps_elements where sysmapid=$sysmapid order by selementid";
-		$oldHashElements = DBhash($sql2);
-		$sql3 = "select * from sysmaps_links where sysmapid=$sysmapid order by linkid";
-		$oldHashLinks = DBhash($sql3);
-		$sql4 = "SELECT slt.* FROM sysmaps_link_triggers slt, sysmaps_links sl WHERE slt.linkid = sl.linkid AND sl.sysmapid=$sysmapid ORDER BY slt.linktriggerid";
-		$oldHashLinkTriggers = DBhash($sql4);
+		$sqlMap = "select * from sysmaps where name='$name' order by sysmapid";
+		$oldHashMap = DBhash($sqlMap);
+		$sqlElements = "select * from sysmaps_elements where sysmapid=$sysmapid order by selementid";
+		$oldHashElements = DBhash($sqlElements);
+		$sqlLinks = "select * from sysmaps_links where sysmapid=$sysmapid order by linkid";
+		$oldHashLinks = DBhash($sqlLinks);
+		$sqlLinkTriggers = "SELECT slt.* FROM sysmaps_link_triggers slt, sysmaps_links sl WHERE slt.linkid = sl.linkid AND sl.sysmapid=$sysmapid ORDER BY slt.linktriggerid";
+		$oldHashLinkTriggers = DBhash($sqlLinkTriggers);
 
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
@@ -82,10 +82,10 @@ class testPageMaps extends CWebTest {
 		$this->ok("$name");
 		$this->ok('Configuration of network maps');
 
-		$this->assertEquals($oldHashMap, DBhash($sql1), "Chuck Norris: Map update changed data in table 'sysmaps'");
-		$this->assertEquals($oldHashElements, DBhash($sql2), "Chuck Norris: Map update changed data in table 'sysmaps_elements'");
-		$this->assertEquals($oldHashLinks, DBhash($sql3), "Chuck Norris: Map update changed data in table 'sysmaps_links'");
-		$this->assertEquals($oldHashLinkTriggers, DBhash($sql4), "Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
+		$this->assertEquals($oldHashMap, DBhash($sqlMap), "Chuck Norris: Map update changed data in table 'sysmaps'");
+		$this->assertEquals($oldHashElements, DBhash($sqlElements), "Chuck Norris: Map update changed data in table 'sysmaps_elements'");
+		$this->assertEquals($oldHashLinks, DBhash($sqlLinks), "Chuck Norris: Map update changed data in table 'sysmaps_links'");
+		$this->assertEquals($oldHashLinkTriggers, DBhash($sqlLinkTriggers), "Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
 	}
 
 	/**
@@ -97,14 +97,14 @@ class testPageMaps extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 
-		$sql1 = "select * from sysmaps where name='$name' order by sysmapid";
-		$oldHashMap = DBhash($sql1);
-		$sql2 = "select * from sysmaps_elements where sysmapid=$sysmapid order by selementid";
-		$oldHashElements = DBhash($sql2);
-		$sql3 = "select * from sysmaps_links where sysmapid=$sysmapid order by linkid";
-		$oldHashLinks = DBhash($sql3);
-		$sql4 = "select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
-		$oldHashLinkTriggers = DBhash($sql4);
+		$sqlMap = "select * from sysmaps where name='$name' order by sysmapid";
+		$oldHashMap = DBhash($sqlMap);
+		$sqlElements = "select * from sysmaps_elements where sysmapid=$sysmapid order by selementid";
+		$oldHashElements = DBhash($sqlElements);
+		$sqlLinks = "select * from sysmaps_links where sysmapid=$sysmapid order by linkid";
+		$oldHashLinks = DBhash($sqlLinks);
+		$sqlLinkTriggers = "select * from sysmaps_link_triggers where linkid in (select linkid from sysmaps_links where sysmapid=$sysmapid) order by linktriggerid";
+		$oldHashLinkTriggers = DBhash($sqlLinkTriggers);
 
 		$this->login('sysmaps.php');
 		$this->assertTitle('Network maps');
@@ -117,10 +117,10 @@ class testPageMaps extends CWebTest {
 		$this->ok("$name");
 		$this->ok('Configuration of network maps');
 
-		$this->assertEquals($oldHashMap, DBhash($sql1), "Chuck Norris: Map update changed data in table 'sysmaps'");
-		$this->assertEquals($oldHashElements, DBhash($sql2), "Chuck Norris: Map update changed data in table 'sysmaps_elements'");
-		$this->assertEquals($oldHashLinks, DBhash($sql3), "Chuck Norris: Map update changed data in table 'sysmaps_links'");
-		$this->assertEquals($oldHashLinkTriggers, DBhash($sql4), "Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
+		$this->assertEquals($oldHashMap, DBhash($sqlMap), "Chuck Norris: Map update changed data in table 'sysmaps'");
+		$this->assertEquals($oldHashElements, DBhash($sqlElements), "Chuck Norris: Map update changed data in table 'sysmaps_elements'");
+		$this->assertEquals($oldHashLinks, DBhash($sqlLinks), "Chuck Norris: Map update changed data in table 'sysmaps_links'");
+		$this->assertEquals($oldHashLinkTriggers, DBhash($sqlLinkTriggers), "Chuck Norris: Map update changed data in table 'sysmaps_link_triggers'");
 	}
 
 	/**

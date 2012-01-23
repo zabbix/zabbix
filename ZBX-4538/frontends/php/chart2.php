@@ -33,7 +33,7 @@ require_once('include/page_header.php');
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'graphid'=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
-		'period'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
+		'period'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD),	null),
 		'stime'=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
 		'border'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
 		'width'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
@@ -67,7 +67,7 @@ require_once('include/page_header.php');
 
 	$effectiveperiod = navigation_bar_calc();
 
-	CProfile::update('web.charts.graphid',$_REQUEST['graphid'], PROFILE_TYPE_ID);
+	CProfile::update('web.charts.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
 	$chart_header = '';
 	if(id2nodeid($db_data['graphid']) != get_current_nodeid()){

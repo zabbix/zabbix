@@ -352,7 +352,7 @@ function get_screen_plaintext($itemid, $elements, $style = 0) {
 		}
 
 		if ($item['valuemapid'] > 0) {
-			$value = replace_value_by_map($value, $item['valuemapid']);
+			$value = applyValueMap($value, $item['valuemapid']);
 		}
 
 		$table->addRow(

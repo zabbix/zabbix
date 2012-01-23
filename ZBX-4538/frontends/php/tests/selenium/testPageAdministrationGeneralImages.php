@@ -36,9 +36,8 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralImages_CheckLayoutIcons($icon_name) {
 
-		$this->login('config.php');
+		$this->login('adm.images.php');
 		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Images');
 		$this->assertElementPresent('form');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
@@ -59,7 +58,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 				$this->ok(array('No images defined.'));
 		}
 		else {
-				$this->login('config.php');
+				$this->login('adm.images.php');
 				$this->assertElementPresent('configDropDown');
 				$this->dropdown_select_wait('imagetype', 'Background');
 				$this->assertElementPresent('form');
@@ -80,13 +79,9 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$sqlIconImages = 'SELECT * FROM images WHERE imagetype=1 limit 5';
 		$oldHashIconImages=DBhash($sqlIconImages);
 
-		$this->login('config.php');
-		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Images');
+		$this->login('adm.images.php');
 		$this->assertElementPresent('form');
 		$this->dropdown_select_wait('imagetype', 'Icon');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
 		$this->click('link='.$icon_name['name']);
 		$this->wait();
 		$this->ok(array('Name', 'Type', 'Upload', 'Image'));
@@ -109,13 +104,9 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$sqlBgImages = 'SELECT * FROM images WHERE imagetype=2 limit 5';
 		$oldHashBgImages=DBhash($sqlBgImages);
 
-		$this->login('config.php');
-		$this->assertElementPresent('configDropDown');
-		$this->dropdown_select_wait('configDropDown', 'Images');
+		$this->login('adm.images.php');
 		$this->assertElementPresent('form');
 		$this->dropdown_select_wait('imagetype', 'Background');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
 		$this->click('link='.$bgimage_name['name']);
 		$this->wait();
 		$this->ok(array('Name', 'Type', 'Upload', 'Image'));

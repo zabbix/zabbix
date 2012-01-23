@@ -230,9 +230,20 @@ $ZBX_MENU = array(
 		'force_disable_all_nodes'=> true,
 		'pages' => array(
 			array(
-				'url' => 'config.php',
+				'url' => 'adm.gui.php',
 				'label' => _('General'),
-				'sub_pages' => array()
+				'sub_pages' => array(
+					'adm.housekeeper.php',
+					'adm.images.php',
+					'adm.iconmapping.php',
+					'adm.regexps.php',
+					'adm.macros.php',
+					'adm.valuemapping.php',
+					'adm.workingtime.php',
+					'adm.triggerseverities.php',
+					'adm.triggerdisplayingoptions.php',
+					'adm.other.php'
+				)
 			),
 			array(
 				'url' => 'proxies.php',
