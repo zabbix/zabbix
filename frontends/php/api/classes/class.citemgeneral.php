@@ -99,7 +99,7 @@ abstract class CItemGeneral extends CZBXAPI{
 	protected function checkInput(array &$items, $update = false) {
 		// permissions
 		if ($update) {
-			$item_db_fields = array('itemid' => null);
+			$itemDbFields = array('itemid' => null);
 
 			$dbItemsFields = array('itemid', 'templateid');
 			foreach ($this->fieldRules as $field => $rule) {
@@ -124,7 +124,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			));
 		}
 		else {
-			$item_db_fields = array('name' => null, 'key_' => null, 'hostid' => null, 'type' => null,
+			$itemDbFields = array('name' => null, 'key_' => null, 'hostid' => null, 'type' => null,
 				'value_type' => null, 'delay' => '0', 'delay_flex' => ''
 			);
 
@@ -150,7 +150,7 @@ abstract class CItemGeneral extends CZBXAPI{
 
 			$fullItem = $items[$inum];
 
-			if (!check_db_fields($item_db_fields, $item)) {
+			if (!check_db_fields($itemDbFields, $item)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
 			}
 
@@ -434,11 +434,11 @@ abstract class CItemGeneral extends CZBXAPI{
 	 *
 	 * @throws APIException if at least one of the item can't be deleted
 	 *
-	 * @param array $itemIds   An array of item IDs
+	 * @param array $itemids   An array of item IDs
 	 */
-	protected function checkGraphReference(array $itemIds) {
-		$this->checkUseInGraphAxis($itemIds, true);
-		$this->checkUseInGraphAxis($itemIds);
+	protected function checkGraphReference(array $itemids) {
+		$this->checkUseInGraphAxis($itemids, true);
+		$this->checkUseInGraphAxis($itemids);
 	}
 
 
@@ -454,20 +454,20 @@ abstract class CItemGeneral extends CZBXAPI{
 	 *
 	 * @throws APIException if any of the given items are used as min/max Y values in a graph.
 	 *
-	 * @param array $itemIds   An array of items IDs
+	 * @param array $itemids   An array of items IDs
 	 * @param type $checkMax
 	 */
-	protected function checkUseInGraphAxis(array $itemIds, $checkMax = false) {
+	protected function checkUseInGraphAxis(array $itemids, $checkMax = false) {
 		if ($checkMax) {
 			$filter = array(
-				'ymax_itemid' => $itemIds,
+				'ymax_itemid' => $itemids,
 			);
 			$itemIdColumn = 'ymax_itemid';
 			$typeColumn = 'ymax_type';
 		}
 		else {
 			$filter = array(
-				'ymin_itemid' => $itemIds,
+				'ymin_itemid' => $itemids,
 			);
 			$itemIdColumn = 'ymin_itemid';
 			$typeColumn = 'ymin_type';

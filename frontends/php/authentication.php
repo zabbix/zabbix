@@ -34,7 +34,7 @@ $fields = array(
 	'config'=>					array(T_ZBX_INT, O_OPT,	null,	IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP),	null),
 	// LDAP
 	'ldap_host'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_port'=>				array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535), 'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_port'=>				array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 65535), 'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 	'ldap_base_dn'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 	'ldap_bind_dn'=>			array(T_ZBX_STR, O_OPT,	null,	null,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
 	'ldap_bind_password'=>		array(T_ZBX_STR, O_OPT,	null,	null,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),

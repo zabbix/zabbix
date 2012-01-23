@@ -40,9 +40,9 @@ require_once('include/page_header.php');
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 // filter
-		'action'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,6),	NULL),
-		'resourcetype'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1,31),	NULL),
-		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		'action'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1, 6),	NULL),
+		'resourcetype'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(-1, 31),	NULL),
+		'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0, 1)),	NULL),
 		'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 		'alias' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
 
@@ -65,7 +65,7 @@ require_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.auditlogs.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.auditlogs.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 		// saving fixed/dynamic setting to profile
 		if('timelinefixedperiod' == $_REQUEST['favobj']){
@@ -89,10 +89,10 @@ require_once('include/page_header.php');
 	}
 
 	$_REQUEST['alias'] = get_request('alias', CProfile::get('web.auditlogs.filter.alias', ''));
-	$_REQUEST['action'] = get_request('action', CProfile::get('web.auditlogs.filter.action',-1));
-	$_REQUEST['resourcetype'] = get_request('resourcetype', CProfile::get('web.auditlogs.filter.resourcetype',-1));
+	$_REQUEST['action'] = get_request('action', CProfile::get('web.auditlogs.filter.action', -1));
+	$_REQUEST['resourcetype'] = get_request('resourcetype', CProfile::get('web.auditlogs.filter.resourcetype', -1));
 
-	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
+	if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
 		CProfile::update('web.auditlogs.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
 		CProfile::update('web.auditlogs.filter.action', $_REQUEST['action'], PROFILE_TYPE_INT);
 		CProfile::update('web.auditlogs.filter.resourcetype', $_REQUEST['resourcetype'], PROFILE_TYPE_INT);
@@ -113,7 +113,7 @@ require_once('include/page_header.php');
 	$cmbConf->addItem('auditacts.php', S_ACTIONS);
 	$frmForm->addItem($cmbConf);
 
-	$audit_wdgt->addPageHeader(S_AUDIT_LOGS_BIG,$frmForm);
+	$audit_wdgt->addPageHeader(S_AUDIT_LOGS_BIG, $frmForm);
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
@@ -130,44 +130,44 @@ require_once('include/page_header.php');
 	$filterForm->setAttribute('id', 'zbx_filter');
 
 	$row = new CRow(array(
-		new CCol(S_USER,'form_row_l'),
+		new CCol(S_USER, 'form_row_l'),
 		new CCol(array(
 			new CTextBox('alias', $_REQUEST['alias'], 32),
-			new CButton('btn1', S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1');",'T')
-		),'form_row_r')
+			new CButton('btn1', _('Select'), "return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1');", 'T')
+		), 'form_row_r')
 	));
 
 	$filterForm->addRow($row);
 
-	$cmbAction = new CComboBox('action',$_REQUEST['action']);
-		$cmbAction->addItem(-1,S_ALL_S);
+	$cmbAction = new CComboBox('action', $_REQUEST['action']);
+		$cmbAction->addItem(-1, S_ALL_S);
 		$cmbAction->addItem(AUDIT_ACTION_LOGIN,		_('Login'));
-		$cmbAction->addItem(AUDIT_ACTION_LOGOUT,	S_LOGOUT);
-		$cmbAction->addItem(AUDIT_ACTION_ADD,		S_ADD);
-		$cmbAction->addItem(AUDIT_ACTION_UPDATE,	S_UPDATE);
-		$cmbAction->addItem(AUDIT_ACTION_DELETE,	S_DELETE);
-		$cmbAction->addItem(AUDIT_ACTION_ENABLE,	S_ENABLE);
-		$cmbAction->addItem(AUDIT_ACTION_DISABLE,	S_DISABLE);
+		$cmbAction->addItem(AUDIT_ACTION_LOGOUT,	_('Logout'));
+		$cmbAction->addItem(AUDIT_ACTION_ADD,		_('Add'));
+		$cmbAction->addItem(AUDIT_ACTION_UPDATE,	_('Update'));
+		$cmbAction->addItem(AUDIT_ACTION_DELETE,	_('Delete'));
+		$cmbAction->addItem(AUDIT_ACTION_ENABLE,	_('Enable'));
+		$cmbAction->addItem(AUDIT_ACTION_DISABLE,	_('Disable'));
 
 	$filterForm->addRow(S_ACTION, $cmbAction);
 
-	$cmbResource = new CComboBox('resourcetype',$_REQUEST['resourcetype']);
+	$cmbResource = new CComboBox('resourcetype', $_REQUEST['resourcetype']);
 	$resources = array(-1 => S_ALL_S) + audit_resource2str();
 	$cmbResource->addItems($resources);
 
 	$filterForm->addRow(S_RESOURCE, $cmbResource);
 
 
-	$reset = new CButton('filter_rst',S_RESET,'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+	$reset = new CButton('filter_rst', _('Reset'), 'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-	$filterForm->addItemToBottomRow(new CSubmit('filter_set',S_FILTER));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
 	$filterForm->addItemToBottomRow($reset);
 
-	$audit_wdgt->addFlicker($filterForm, CProfile::get('web.auditlogs.filter.state',1));
+	$audit_wdgt->addFlicker($filterForm, CProfile::get('web.auditlogs.filter.state', 1));
 
 	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$audit_wdgt->addFlicker($scroll_div, CProfile::get('web.auditlogs.filter.state',1));
+	$scroll_div->setAttribute('id', 'scrollbar_cntr');
+	$audit_wdgt->addFlicker($scroll_div, CProfile::get('web.auditlogs.filter.state', 1));
 //-------
 
 	$effectiveperiod = navigation_bar_calc('web.auditlogs.timeline', 0, true);
@@ -177,10 +177,10 @@ require_once('include/page_header.php');
 
 
 	$sql_cond = array();
-	if($_REQUEST['alias'])
+	if ($_REQUEST['alias'])
 		$sql_cond['alias'] = ' AND u.alias='.zbx_dbstr($_REQUEST['alias']);
 
-	if(($_REQUEST['action']>-1))
+	if (($_REQUEST['action']>-1))
 		$sql_cond['action'] = ' AND a.action='.$_REQUEST['action'].' ';
 
 	if(($_REQUEST['resourcetype']>-1))
@@ -266,7 +266,7 @@ require_once('include/page_header.php');
 		}
 
 		$table->addRow(array(
-			zbx_date2str(S_AUDITLOGS_RECORD_DATE_FORMAT,$row['clock']),
+			zbx_date2str(S_AUDITLOGS_RECORD_DATE_FORMAT, $row['clock']),
 			$row['alias'],
 			$row['ip'],
 			$row['resourcetype'],

@@ -45,10 +45,10 @@ $fields = array(
 	'lang' =>				array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})'),
 	'theme' =>				array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null),
-	'autologout' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(90,10000), null),
+	'autologout' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(90, 10000), null),
 	'url' =>				array(T_ZBX_STR, O_OPT, null, null, 'isset({save})'),
 	'refresh' =>			array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({save})'),
-	'rows_per_page' =>		array(T_ZBX_INT, O_OPT, null, BETWEEN(1,999999), 'isset({save})'),
+	'rows_per_page' =>		array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({save})'),
 	'change_password' =>	array(T_ZBX_STR, O_OPT, null, null, null),
 	'user_medias' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, null),
 	'user_medias_to_del' =>	array(T_ZBX_STR, O_OPT, null, DB_ID, null),
@@ -164,7 +164,7 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		if ($result) {
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER,
 				'User alias ['.$USER_DETAILS['alias'].'] Name ['.$USER_DETAILS['name'].']'.
 				' Surname ['.$USER_DETAILS['surname'].'] profile id ['.$USER_DETAILS['userid'].']');
 

@@ -137,10 +137,10 @@ class CScreenItem extends CZBXAPI {
 		$this->checkInput($screenItems);
 
 		// insert items
-		$screenItemIds = DB::insert($this->tableName(), $screenItems);
+		$screenItemids = DB::insert($this->tableName(), $screenItems);
 
 		return array(
-			'screenitemids' => $screenItemIds
+			'screenitemids' => $screenItemids
 		);
 	}
 
@@ -155,9 +155,9 @@ class CScreenItem extends CZBXAPI {
 	public function update(array $screenItems) {
 
 		// fetch the items we're updating
-		$screenItemIds = zbx_objectValues($screenItems, 'screenitemid');
+		$screenItemids = zbx_objectValues($screenItems, 'screenitemid');
 		$dbScreenItems = $this->get(array(
-			'screenitemids' => $screenItemIds,
+			'screenitemids' => $screenItemids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
@@ -224,20 +224,20 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		// save items
-		$updateItemIds = array();
-		$createItemIds = array();
+		$updateItemids = array();
+		$createItemids = array();
 		if ($updateItems) {
-			$updateItemIds = $this->update($updateItems);
-			$updateItemIds = $updateItemIds['screenitemids'];
+			$updateItemids = $this->update($updateItems);
+			$updateItemids = $updateItemids['screenitemids'];
 		}
 		if ($createItems) {
-			$createItemIds = $this->create($createItems);
-			$createItemIds = $createItemIds['screenitemids'];
+			$createItemids = $this->create($createItems);
+			$createItemids = $createItemids['screenitemids'];
 		}
 
 		// return the ids of the affected items
 		return array(
-			'screenitemids' => array_merge($updateItemIds, $createItemIds)
+			'screenitemids' => array_merge($updateItemids, $createItemids)
 		);
 	}
 
@@ -245,19 +245,19 @@ class CScreenItem extends CZBXAPI {
 	/**
 	 * Deletes the given screen items.
 	 *
-	 * @param array|int $screenItemIds	The IDs of the screen items to delete
+	 * @param array|int $screenItemids	The IDs of the screen items to delete
 	 * @return array					An array, that contains the IDs of the deleted items
 	 *									under the 'screenitemids' key
 	 */
-	public function delete($screenItemIds) {
-		$screenItemIds = zbx_toArray($screenItemIds);
+	public function delete($screenItemids) {
+		$screenItemids = zbx_toArray($screenItemids);
 
 		// check permissions
 		$dbScreenItems = $this->get(array(
-			'screenitemids' => $screenItemIds,
+			'screenitemids' => $screenItemids,
 			'preservekeys' => true
 		));
-		foreach ($screenItemIds as $screenItemId) {
+		foreach ($screenItemids as $screenItemId) {
 			if (!isset($dbScreenItems[$screenItemId])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
@@ -265,61 +265,61 @@ class CScreenItem extends CZBXAPI {
 
 		// delete screen items
 		DB::delete($this->tableName(), array(
-			'screenitemid' => $screenItemIds
+			'screenitemid' => $screenItemids
 		));
 
-		return array('screenitemids' => $screenItemIds);
+		return array('screenitemids' => $screenItemids);
 	}
 
 
 	/**
 	 * Returns true if the given screen items exist and are available for reading.
 	 *
-	 * @param array $screenItemIds  An array if screen item IDs
+	 * @param array $screenItemids  An array if screen item IDs
 	 * @return boolean
 	 */
-	public function isReadable(array $screenItemIds) {
-		if (!is_array($screenItemIds)) {
+	public function isReadable(array $screenItemids) {
+		if (!is_array($screenItemids)) {
 			return false;
 		}
-		elseif (empty($screenItemIds)) {
+		elseif (empty($screenItemids)) {
 			return true;
 		}
 
-		$screenItemIds = array_unique($screenItemIds);
+		$screenItemids = array_unique($screenItemids);
 
 		$count = $this->get(array(
-			'screenitemids' => $screenItemIds,
+			'screenitemids' => $screenItemids,
 			'countOutput' => true
 		));
 
-		return (count($screenItemIds) == $count);
+		return (count($screenItemids) == $count);
 	}
 
 
 	/**
 	 * Returns true if the given screen items exist and are available for writing.
 	 *
-	 * @param array $screenItemIds  An array if screen item IDs
+	 * @param array $screenItemids  An array if screen item IDs
 	 * @return boolean
 	 */
-	public function isWritable(array $screenItemIds) {
-		if (!is_array($screenItemIds)) {
+	public function isWritable(array $screenItemids) {
+		if (!is_array($screenItemids)) {
 			return false;
 		}
-		elseif (empty($screenItemIds)) {
+		elseif (empty($screenItemids)) {
 			return true;
 		}
 
-		$screenItemIds = array_unique($screenItemIds);
+		$screenItemids = array_unique($screenItemids);
 
 		$count = $this->get(array(
-			'screenitemids' => $screenItemIds,
+			'screenitemids' => $screenItemids,
 			'editable' => true,
 			'countOutput' => true
 		));
 
-		return (count($screenItemIds) == $count);
+		return (count($screenItemids) == $count);
 	}
 
 
