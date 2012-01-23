@@ -1569,7 +1569,8 @@ $allowed_fields = array(
 		'screenid',
 		'slideshowid',
 		'_key',
-		'expression'
+		'expression',
+		'usrgrpid',
 );
 	if (isset($field) && !in_array($field, $allowed_fields)) {
 		show_error_message(sprintf('not valid field  "%s"',$field));

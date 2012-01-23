@@ -1,6 +1,6 @@
 Changes for 1.8.11rc1
 
-..F....... [ZBX-3955] added field verification (Slava)
+..F....... [ZBX-3955] added pop up field name parameter validation (Slava)
 ........S. [ZBX-1609] added support for all data types in dynamic indexes in SNMP (dimir)
 ........S. [ZBX-4511] removed the "user_history" table from the list of synchronized tables between nodes (Sasha)
 A.F....... [ZBX-4499] fixed upper case error in some browsers while adding macro (sanja)
