@@ -1457,7 +1457,7 @@ class CTrigger extends CZBXAPI {
 		foreach ($triggers as $trigger) {
 			// pass the full trigger so the children can inherit all of the data
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
-			if (isset($trigger['exrpession'])) {
+			if (isset($trigger['expression'])) {
 				$dbTrigger['expression'] = $trigger['expression'];
 			}
 
@@ -1799,13 +1799,22 @@ class CTrigger extends CZBXAPI {
 		));
 
 		// fetch the existing child triggers
-		$templatedTriggers = $this->select('triggers', array(
-			'filter' => array('templateid' => $trigger['triggerid'])
+		$templatedTriggers = $this->get(array(
+			'output' => array('triggerid', 'description'),
+			'filter' => array(
+				'templateid' => $trigger['triggerid']
+			),
+			'selectHosts' => array('name'),
+			'preservekeys' => true
 		));
 
 		if (empty($triggerTemplates)) {
 			// no templates found, delete any child triggers, that may exist
 			if ($templatedTriggers) {
+				foreach ($templatedTriggers as $trigger) {
+					info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
+						implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+				}
 				$this->deleteByPks(zbx_objectValues($templatedTriggers, 'triggerid'));
 			}
 
@@ -1843,7 +1852,6 @@ class CTrigger extends CZBXAPI {
 			'templated_hosts' => true
 		));
 
-		$childTriggerIds = array();
 		foreach ($chd_hosts as $chd_host) {
 			$newTrigger = $trigger;
 			$newTrigger['templateid'] = $trigger['triggerid'];
@@ -1940,13 +1948,16 @@ class CTrigger extends CZBXAPI {
 			}
 			$this->inherit($newTrigger);
 
-			$childTriggerIds[] = $newTrigger['triggerid'];
+			unset($templatedTriggers[$newTrigger['triggerid']]);
 		}
 
 		// delete remaining child triggers
-		$remainingChildTriggerIds = array_diff(zbx_objectValues($templatedTriggers, 'triggerid'), $childTriggerIds);
-		if ($remainingChildTriggerIds) {
-			$this->deleteByPks($remainingChildTriggerIds);
+		if ($templatedTriggers) {
+			foreach ($templatedTriggers as $trigger) {
+				info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
+					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+			}
+			$this->deleteByPks(zbx_objectValues($templatedTriggers, 'triggerid'));
 		}
 
 		return true;
