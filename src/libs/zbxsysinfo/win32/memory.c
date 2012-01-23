@@ -26,64 +26,66 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 	PERFORMANCE_INFORMATION pfi;
 	MEMORYSTATUSEX		ms_ex;
 	MEMORYSTATUS		ms;
+	char			mode[16];
 
-	char	mode[10];
-
-	if(num_param(param) > 1)
-	{
+	if (1 < num_param(param))
 		return SYSINFO_RET_FAIL;
-	}
 
-	if(get_param(param, 1, mode, sizeof(mode)) != 0)
-	{
-		mode[0] = '\0';
-	}
-	if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "total");
-	}
+	if (0 != get_param(param, 1, mode, sizeof(mode)) || '\0' == *mode)
+		strscpy(mode, "total");
 
-	if (strcmp(mode,"cached") == 0)
+	if (0 == strcmp(mode, "cached"))
 	{
-		if(NULL == zbx_GetPerformanceInfo)
+		if (NULL == zbx_GetPerformanceInfo)
 			return SYSINFO_RET_FAIL;
 
-		zbx_GetPerformanceInfo(&pfi,sizeof(PERFORMANCE_INFORMATION));
+		zbx_GetPerformanceInfo(&pfi, sizeof(PERFORMANCE_INFORMATION));
 
-		SET_UI64_RESULT(result, (zbx_uint64_t)pfi.SystemCache * (zbx_uint64_t)pfi.PageSize);
+		SET_UI64_RESULT(result, (zbx_uint64_t)pfi.SystemCache * pfi.PageSize);
 
 		return SYSINFO_RET_OK;
 	}
 
-	if(NULL != zbx_GlobalMemoryStatusEx) {
+	if (NULL != zbx_GlobalMemoryStatusEx)
+	{
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 
 		zbx_GlobalMemoryStatusEx(&ms_ex);
 
-		if (strcmp(mode, "total") == 0)	{
+		if (0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, ms_ex.ullTotalPhys);
-			return SYSINFO_RET_OK;
-		} else if (strcmp(mode, "free") == 0) {
+		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
-			return SYSINFO_RET_OK;
-		} else if (strcmp(mode, "pfree") == 0) {
-			SET_UI64_RESULT(result, (100.0 * (double)ms_ex.ullAvailPhys) / (double)ms_ex.ullTotalPhys);
-			return SYSINFO_RET_OK;
-		}
-	} else {
+		else if (0 == strcmp(mode, "used"))
+			SET_UI64_RESULT(result, ms_ex.ullTotalPhys - ms_ex.ullAvailPhys);
+		else if (0 == strcmp(mode, "pused") && 0 != ms_ex.ullTotalPhys)
+			SET_DBL_RESULT(result, (ms_ex.ullTotalPhys - ms_ex.ullAvailPhys) / (double)ms_ex.ullTotalPhys * 100);
+		else if (0 == strcmp(mode, "available"))
+			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
+		else if (0 == strcmp(mode, "pavailable") && 0 != ms_ex.ullTotalPhys)
+			SET_DBL_RESULT(result, ms_ex.ullAvailPhys / (double)ms_ex.ullTotalPhys * 100);
+		else
+			return SYSINFO_RET_FAIL;
+	}
+	else
+	{
 		GlobalMemoryStatus(&ms);
 
-		if (strcmp(mode,"total") == 0) {
+		if (0 == strcmp(mode, "total"))
 			SET_UI64_RESULT(result, ms.dwTotalPhys);
-			return SYSINFO_RET_OK;
-		} else if (strcmp(mode,"free") == 0) {
+		else if (0 == strcmp(mode, "free"))
 			SET_UI64_RESULT(result, ms.dwAvailPhys);
-			return SYSINFO_RET_OK;
-		} else if (strcmp(mode,"pfree") == 0) {
-			SET_UI64_RESULT(result, (100.0 * (double)ms.dwAvailPhys) / (double)ms.dwTotalPhys);
-			return SYSINFO_RET_OK;
-		}
+		else if (0 == strcmp(mode, "used"))
+			SET_UI64_RESULT(result, ms.dwTotalPhys - ms.dwAvailPhys);
+		else if (0 == strcmp(mode, "pused") && 0 != ms.dwTotalPhys)
+			SET_DBL_RESULT(result, (ms.dwTotalPhys - ms.dwAvailPhys) / (double)ms.dwTotalPhys * 100);
+		else if (0 == strcmp(mode, "available"))
+			SET_UI64_RESULT(result, ms.dwAvailPhys);
+		else if (0 == strcmp(mode, "pavailable") && 0 != ms.dwTotalPhys)
+			SET_DBL_RESULT(result, ms.dwAvailPhys / (double)ms.dwTotalPhys * 100);
+		else
+			return SYSINFO_RET_FAIL;
 	}
-	return SYSINFO_RET_FAIL;
+
+	return SYSINFO_RET_OK;
 }

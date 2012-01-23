@@ -941,7 +941,7 @@ function item_type2str($type = null){
 			$lastvalue=_('Unknown value type');
 		}
 		if($db_item["valuemapid"] > 0);
-			$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+			$lastvalue = applyValueMap($lastvalue, $db_item["valuemapid"]);
 
 	return $lastvalue;
 	}

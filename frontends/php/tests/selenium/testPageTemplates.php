@@ -53,14 +53,14 @@ class testPageTemplates extends CWebTest {
 		$host = $template['host'];
 		$name = $template['name'];
 
-		$sql1 = "select * from hosts where host='$host'";
-		$oldHashTemplate = DBhash($sql1);
-		$sql2 = "select * from hosts order by hostid";
-		$oldHashHosts = DBhash($sql2);
-		$sql3 = "select * from items order by itemid";
-		$oldHashItems = DBhash($sql3);
-		$sql4 = "select * from triggers order by triggerid";
-		$oldHashTriggers = DBhash($sql4);
+		$sqlTemplate = "select * from hosts where host='$host'";
+		$oldHashTemplate = DBhash($sqlTemplate);
+		$sqlHosts = "select * from hosts order by hostid";
+		$oldHashHosts = DBhash($sqlHosts);
+		$sqlItems = "select * from items order by itemid";
+		$oldHashItems = DBhash($sqlItems);
+		$sqlTriggers = "select * from triggers order by triggerid";
+		$oldHashTriggers = DBhash($sqlTriggers);
 
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid', 'all');
@@ -77,10 +77,10 @@ class testPageTemplates extends CWebTest {
 		$this->ok("$name");
 		$this->ok('TEMPLATES');
 
-		$this->assertEquals($oldHashTemplate, DBhash($sql1));
-		$this->assertEquals($oldHashHosts, DBhash($sql2));
-		$this->assertEquals($oldHashItems, DBhash($sql3));
-		$this->assertEquals($oldHashTriggers, DBhash($sql4));
+		$this->assertEquals($oldHashTemplate, DBhash($sqlTemplate));
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
+		$this->assertEquals($oldHashItems, DBhash($sqlItems));
+		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
 
 	public function testPageTemplates_Create() {

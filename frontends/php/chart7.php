@@ -37,8 +37,8 @@ require_once('include/page_header.php');
 		'stime'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
 		'border'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		'name'=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null),
-		'width'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
-		'height'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
+		'width'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0, 65535),	null),
+		'height'=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0, 65535),	null),
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('2,3'),		null),
 		'graph3d'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		'legend'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
@@ -69,8 +69,8 @@ require_once('include/page_header.php');
 	$graph = new CPie(get_request('graphtype', GRAPH_TYPE_NORMAL));
 	$graph->setHeader(get_request('name', ''));
 
-	$graph3d = get_request('graph3d',0);
-	$legend = get_request('legend',0);
+	$graph3d = get_request('graph3d', 0);
+	$legend = get_request('legend', 0);
 
 	if($graph3d == 1) $graph->switchPie3D();
 	$graph->showLegend($legend);
