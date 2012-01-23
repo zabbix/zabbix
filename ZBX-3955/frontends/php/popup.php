@@ -1550,28 +1550,28 @@ include_once('include/page_header.php');
 	}
 
 function checkInput($field) {
-$allowed_fields = array(
-		'name',
-		'host',
-		'description',
-		'hostid',
-		'groupid',
-		'triggerid',
-		'nodeid',
-		'druleid',
-		'dcheckid',
-		'usergrpid',
-		'userid',
-		'alias',
-		'itemid',
-		'graphid',
-		'sysmapid',
-		'screenid',
-		'slideshowid',
-		'_key',
-		'expression',
-		'usrgrpid',
-);
+	$allowed_fields = array(
+			'name',
+			'host',
+			'description',
+			'hostid',
+			'groupid',
+			'triggerid',
+			'nodeid',
+			'druleid',
+			'dcheckid',
+			'usergrpid',
+			'userid',
+			'alias',
+			'itemid',
+			'graphid',
+			'sysmapid',
+			'screenid',
+			'slideshowid',
+			'_key',
+			'expression',
+			'usrgrpid'
+	);
 	if (isset($field) && !in_array($field, $allowed_fields)) {
 		show_error_message(sprintf('not valid field  "%s"',$field));
 		exit;
