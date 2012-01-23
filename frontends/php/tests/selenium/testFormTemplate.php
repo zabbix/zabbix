@@ -34,7 +34,7 @@ class testFormTemplate extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Templates');
-		$this->ok('New template added');
+		$this->ok('Template added');
 		$this->ok($this->template);
 	}
 
