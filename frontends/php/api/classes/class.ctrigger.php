@@ -1457,7 +1457,9 @@ class CTrigger extends CZBXAPI {
 		foreach ($triggers as $trigger) {
 			// pass the full trigger so the children can inherit all of the data
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
-			$dbTrigger['expression'] = $trigger['expression'];
+			if (isset($trigger['exrpession'])) {
+				$dbTrigger['expression'] = $trigger['expression'];
+			}
 
 			$this->inherit($dbTrigger);
 		}
@@ -1633,6 +1635,7 @@ class CTrigger extends CZBXAPI {
 			));
 
 			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts)));
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerid, $trigger['description'], null, null, null);
 		}
 
 		$this->validateDependencies($triggers);
@@ -1755,6 +1758,8 @@ class CTrigger extends CZBXAPI {
 			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
 			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $dbTrigger['triggerid'], $dbTrigger['description'],
+				null, $dbTrigger, $trigger_update);
 		}
 		unset($trigger);
 
