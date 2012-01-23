@@ -1410,8 +1410,10 @@ class CTrigger extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s:%2$s" already exists.', $trigger['description'], $trigger['expression']));
 				}
 			}
-			$mainStatus = (isset($host) && isset($hosts[$host]) ? $hosts[$host]['status'] : $this->getStatusByTriggerExpression($trigger));
-			if (($mainStatus != HOST_STATUS_TEMPLATE && isset($trigger['dependencies']))) {
+			$mainStatus = isset($host) && isset($hosts[$host]) ? $hosts[$host]['status'] : (isset($trigger['dependencies'])) ? $this->getStatusByTriggerExpression(
+				array('output' => array('status'), 'trigger_id' => $trigger
+				)) : '' ;
+			if ((isset($trigger['dependencies']) && $mainStatus != HOST_STATUS_TEMPLATE)) {
 				$hostsData = API::Host()->get(array(
 						'triggerids' => $trigger['dependencies'],
 						'templated_hosts' => true,
@@ -1423,8 +1425,6 @@ class CTrigger extends CZBXAPI {
 					}
 				}
 			}
-
-
 		}
 		unset($trigger);
 	}
@@ -2206,9 +2206,9 @@ class CTrigger extends CZBXAPI {
 		return count($ids) == $count;
 	}
 
-	public function getStatusByTriggerExpression($trigger) {
+	public function getStatusByTriggerExpression($parameter) {
 
-		$expressionData = new CTriggerExpression($trigger);
+		$expressionData = new CTriggerExpression($parameter['trigger_id']);
 		if (!empty($expressionData->errors)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
 		}
@@ -2216,9 +2216,7 @@ class CTrigger extends CZBXAPI {
 		$hosts = API::Host()->get(array(
 			'filter' => array('host' => $expressionData->data['hosts']),
 			'editable' => true,
-			'output' => array(
-				'status'
-			),
+			'output' =>$parameter['output'],
 			'templated_hosts' => true,
 			'preservekeys' => true
 		));
