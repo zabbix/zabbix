@@ -20,7 +20,6 @@
 jQuery(function() {
 
 	cookie.init();
-	chkbxRange.init();
 
 	// search
 	if (jQuery('#search').length) {
