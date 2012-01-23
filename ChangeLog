@@ -399,6 +399,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+....I..... [ZBX-4569] fixed newline at end of file for some upgrade patches (Sasha)
 ..F....... [ZBX-4354] fixed validation of a trigger expression (Sasha)
 ........S. [ZBX-1609] added support for all data types in dynamic indexes in SNMP (dimir)
 ........S. [ZBX-4511] removed the "user_history" table from the list of synchronized tables between nodes (Sasha)
