@@ -1703,7 +1703,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		}
 	}
 
-	$sql = 'SELECT COUNT(e.*) AS cnt,MIN(e.clock) AS minn,MAX(e.clock) AS maxx'.
+	$sql = 'SELECT COUNT(e.eventid) AS cnt,MIN(e.clock) AS min_clock,MAX(e.clock) AS max_clock'.
 			' FROM events e'.
 			' WHERE e.objectid='.$triggerid.
 				' AND e.object='.EVENT_OBJECT_TRIGGER;
@@ -1717,9 +1717,9 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 	$db_events = DBfetch(DBselect($sql));
 	if ($db_events['cnt'] > 0) {
 		if (!isset($min)) {
-			$min = $db_events['minn'];
+			$min = $db_events['min_clock'];
 		}
-		$max = $db_events['maxx'];
+		$max = $db_events['max_clock'];
 	}
 	else {
 		if ($period_start == 0 && $period_end == 0) {
@@ -1755,8 +1755,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		' FROM events e'.
 		' WHERE e.objectid='.$triggerid.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
-			' AND e.clock>='.$min.
-			' AND e.clock<='.$max.
+			' AND e.clock BETWEEN '.$min.' AND '.$max.
 		' ORDER BY e.clock,e.eventid'
 	);
 	while ($row = DBfetch($db_events)) {
