@@ -61,8 +61,8 @@ require_once('include/page_header.php');
 
 	check_fields($fields);
 
-	$config = get_request('config',1);
-	$title = get_request('title',S_REPORT);
+	$config = get_request('config', 1);
+	$title = get_request('title', _('Report'));
 	$xlabel = get_request('xlabel', S_X);
 	$ylabel = get_request('ylabel', S_Y);
 
@@ -70,27 +70,27 @@ require_once('include/page_header.php');
 	$sorttype = get_request('sorttype', 0);
 
 	if($config == 1){
-		$items = get_request('items',array());
-		$scaletype = get_request('scaletype',TIMEPERIOD_TYPE_WEEKLY);
+		$items = get_request('items', array());
+		$scaletype = get_request('scaletype', TIMEPERIOD_TYPE_WEEKLY);
 
 		$timesince = get_request('report_timesince', time() - SEC_PER_DAY);
-		$timetill = get_request('report_timetill',time());
+		$timetill = get_request('report_timetill', time());
 
-		$str_since['hour'] = date('H',$timesince);
-		$str_since['day'] = date('d',$timesince);
-		$str_since['weekday'] = date('w',$timesince);
+		$str_since['hour'] = date('H', $timesince);
+		$str_since['day'] = date('d', $timesince);
+		$str_since['weekday'] = date('w', $timesince);
 		if($str_since['weekday'] == 0) $str_since['weekday'] = 7;
 
-		$str_since['mon'] = date('m',$timesince);
-		$str_since['year'] = date('Y',$timesince);
+		$str_since['mon'] = date('m', $timesince);
+		$str_since['year'] = date('Y', $timesince);
 
-		$str_till['hour'] = date('H',$timetill);
-		$str_till['day'] = date('d',$timetill);
-		$str_till['weekday'] = date('w',$timetill);
+		$str_till['hour'] = date('H', $timetill);
+		$str_till['day'] = date('d', $timetill);
+		$str_till['weekday'] = date('w', $timetill);
 		if($str_till['weekday'] == 0) $str_till['weekday'] = 7;
 
-		$str_till['mon'] = date('m',$timetill);
-		$str_till['year'] = date('Y',$timetill);
+		$str_till['mon'] = date('m', $timetill);
+		$str_till['year'] = date('Y', $timetill);
 
 		switch($scaletype){
 			case TIMEPERIOD_TYPE_HOURLY:
@@ -131,7 +131,7 @@ require_once('include/page_header.php');
 
 				$str = $str_till['year'].'-'.$str_till['mon'].'-01 00:00:00';
 				$timetill = strtotime($str);
-				$timetill = strtotime('+1 month',$timetill);
+				$timetill = strtotime('+1 month', $timetill);
 
 				break;
 			case TIMEPERIOD_TYPE_YEARLY:
@@ -141,7 +141,7 @@ require_once('include/page_header.php');
 
 				$str = $str_till['year'].'-01-01 00:00:00';
 				$timetill = strtotime($str);
-				$timetill = strtotime('+1 year',$timetill);
+				$timetill = strtotime('+1 year', $timetill);
 
 				break;
 		}
@@ -208,31 +208,31 @@ require_once('include/page_header.php');
 						case TIMEPERIOD_TYPE_MONTHLY:
 							$start = $end;
 
-							$str_start['mon'] = date('m',$start);
-							$str_start['year'] = date('Y',$start);
+							$str_start['mon'] = date('m', $start);
+							$str_start['year'] = date('Y', $start);
 
 							$str = $str_start['year'].'-'.$str_start['mon'].'-01 00:00:00';
 							$end = strtotime($str);
-							$end = strtotime('+1 month',$end);
+							$end = strtotime('+1 month', $end);
 							break;
 						case TIMEPERIOD_TYPE_YEARLY:
 							$start = $end;
 
-							$str_start['year'] = date('Y',$start);
+							$str_start['year'] = date('Y', $start);
 
 							$str = $str_start['year'].'-01-01 00:00:00';
 							$end = strtotime($str);
-							$end = strtotime('+1 year',$end);
+							$end = strtotime('+1 year', $end);
 							break;
 					}
 
-					if(!isset($row) || ($row['clock']<$start)){
+					if (!isset($row) || ($row['clock']<$start)) {
 						$row=DBfetch($result);
 //SDI($row['clock']);
 					}
 
 //SDI($start.' < '.$row['clock'].' < '.$end);
-					if(isset($row) && $row && ($row['clock']>=$start) && (($row['clock']<$end))){
+					if (isset($row) && $row && ($row['clock']>=$start) && (($row['clock']<$end))) {
 						$item_data['count'][$i]	= $row['count'];
 						$item_data['min'][$i]		= $row['min'];
 						$item_data['avg'][$i]		= $row['avg'];
@@ -240,7 +240,7 @@ require_once('include/page_header.php');
 						$item_data['clock'][$i]		= $start;
 						$item_data['type'][$i]		= true;
 					}
-					else{
+					else {
 						if(isset($item_data['type'][$i]) && $item_data['type'][$i]) continue;
 
 						$item_data['count'][$i]	= 0;

@@ -51,15 +51,15 @@ class CUser extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
-		$sort_columns = array('userid', 'alias');
+		$sortColumns = array('userid', 'alias');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('users' => 'u.userid'),
 			'from'		=> array('users' => 'users u'),
 			'where'		=> array(),
@@ -67,7 +67,7 @@ class CUser extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'usrgrpids'					=> null,
 			'userids'					=> null,
@@ -93,28 +93,28 @@ class CUser extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
-			unset($sql_parts['select']['users']);
+			unset($sqlParts['select']['users']);
 
 			$dbTable = DB::getSchema('users');
-			$sql_parts['select']['userid'] = ' u.userid';
+			$sqlParts['select']['userid'] = ' u.userid';
 			foreach ($options['output'] as $field) {
 				if (isset($dbTable['fields'][$field])) {
-					$sql_parts['select'][$field] = 'u.'.$field;
+					$sqlParts['select'][$field] = 'u.'.$field;
 				}
 			}
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
 		// permission check
-		if (USER_TYPE_SUPER_ADMIN == $user_type) {
+		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
 		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
-			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
-			$sql_parts['where'][] = 'ug.usrgrpid IN ('.
+			$sqlParts['from']['users_groups'] = 'users_groups ug';
+			$sqlParts['where']['uug'] = 'u.userid=ug.userid';
+			$sqlParts['where'][] = 'ug.usrgrpid IN ('.
 				' SELECT uug.usrgrpid'.
 				' FROM users_groups uug'.
 				' WHERE uug.userid='.self::$userData['userid'].
@@ -130,51 +130,51 @@ class CUser extends CZBXAPI {
 		// userids
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
-			$sql_parts['where'][] = DBcondition('u.userid', $options['userids']);
+			$sqlParts['where'][] = DBcondition('u.userid', $options['userids']);
 		}
 
 		// usrgrpids
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['usrgrpid'] = 'ug.usrgrpid';
+				$sqlParts['select']['usrgrpid'] = 'ug.usrgrpid';
 			}
-			$sql_parts['from']['users_groups'] = 'users_groups ug';
-			$sql_parts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
-			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
+			$sqlParts['from']['users_groups'] = 'users_groups ug';
+			$sqlParts['where'][] = DBcondition('ug.usrgrpid', $options['usrgrpids']);
+			$sqlParts['where']['uug'] = 'u.userid=ug.userid';
 		}
 
 		// mediaids
 		if (!is_null($options['mediaids'])) {
 			zbx_value2array($options['mediaids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['mediaid'] = 'm.mediaid';
+				$sqlParts['select']['mediaid'] = 'm.mediaid';
 			}
-			$sql_parts['from']['media'] = 'media m';
-			$sql_parts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
-			$sql_parts['where']['mu'] = 'm.userid=u.userid';
+			$sqlParts['from']['media'] = 'media m';
+			$sqlParts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
+			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 		}
 
 		// mediatypeids
 		if (!is_null($options['mediatypeids'])) {
 			zbx_value2array($options['mediatypeids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sql_parts['select']['mediatypeid'] = 'm.mediatypeid';
+				$sqlParts['select']['mediatypeid'] = 'm.mediatypeid';
 			}
-			$sql_parts['from']['media'] = 'media m';
-			$sql_parts['where'][] = DBcondition('m.mediatypeid', $options['mediatypeids']);
-			$sql_parts['where']['mu'] = 'm.userid=u.userid';
+			$sqlParts['from']['media'] = 'media m';
+			$sqlParts['where'][] = DBcondition('m.mediatypeid', $options['mediatypeids']);
+			$sqlParts['where']['mu'] = 'm.userid=u.userid';
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['users'] = 'u.*';
+			$sqlParts['select']['users'] = 'u.*';
 		}
 
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(DISTINCT u.userid) as rowscount');
+			$sqlParts['select'] = array('count(DISTINCT u.userid) as rowscount');
 		}
 
 		// filter
@@ -182,7 +182,7 @@ class CUser extends CZBXAPI {
 			if (isset($options['filter']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password'));
 			}
-			zbx_db_filter('users u', $options, $sql_parts);
+			zbx_db_filter('users u', $options, $sqlParts);
 		}
 
 		// search
@@ -190,48 +190,48 @@ class CUser extends CZBXAPI {
 			if ($options['search']['passwd']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password'));
 			}
-			zbx_db_search('users u', $options, $sql_parts);
+			zbx_db_search('users u', $options, $sqlParts);
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'u');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'u');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$userids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select.= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect.= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from.= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom.= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
-		$sql_limit = $sql_parts['limit'];
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.
-				' FROM '.$sql_from.
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
+				' FROM '.$sqlFrom.
 				' WHERE '.DBin_node('u.userid', $nodeids).
-				$sql_where.
-				$sql_order;
-		$res = DBselect($sql, $sql_limit);
+				$sqlWhere.
+				$sqlOrder;
+		$res = DBselect($sql, $sqlLimit);
 		while ($user = DBfetch($res)) {
 			unset($user['passwd']);
 			if (!is_null($options['countOutput'])) {
@@ -308,13 +308,13 @@ class CUser extends CZBXAPI {
 		}
 
 		// adding usergroups
-		if (!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+		if (!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], $subselectsAllowedOutputs)) {
+			$objParams = array(
 				'output' => $options['selectUsrgrps'],
 				'userids' => $userids,
 				'preservekeys' => true
 			);
-			$usrgrps = API::UserGroup()->get($obj_params);
+			$usrgrps = API::UserGroup()->get($objParams);
 			foreach ($usrgrps as $usrgrp) {
 				$uusers = $usrgrp['users'];
 				unset($usrgrp['users']);
@@ -325,13 +325,13 @@ class CUser extends CZBXAPI {
 		}
 
 		// adding medias
-		if (!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], $subselects_allowed_outputs)) {
-			$obj_params = array(
+		if (!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], $subselectsAllowedOutputs)) {
+			$objParams = array(
 				'output' => $options['selectMedias'],
 				'userids' => $userids,
 				'preservekeys' => true
 			);
-			$userMedias = API::UserMedia()->get($obj_params);
+			$userMedias = API::UserMedia()->get($objParams);
 			foreach ($userMedias as $mediaid => $media) {
 				$result[$media['userid']]['medias'][] = $media;
 			}
@@ -378,7 +378,7 @@ class CUser extends CZBXAPI {
 
 				$dbUser = $user;
 			}
-			else if ($update) {
+			elseif ($update) {
 				if (!isset($dbUsers[$user['userid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user or user does not exist.'));
 
@@ -518,7 +518,7 @@ class CUser extends CZBXAPI {
 	public function create($users) {
 		$users = zbx_toArray($users);
 
-		$this->checkInput($users,__FUNCTION__);
+		$this->checkInput($users, __FUNCTION__);
 
 		$userids = DB::insert('users', $users);
 
@@ -527,20 +527,20 @@ class CUser extends CZBXAPI {
 
 			$usrgrps = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 			foreach ($usrgrps as $groupid) {
-				$users_groups_id = get_dbid("users_groups","id");
+				$usersGroupdId = get_dbid('users_groups', 'id');
 				$sql = 'INSERT INTO users_groups (id,usrgrpid,userid)'.
-					'values('.$users_groups_id.','.$groupid.','.$userid.')';
+					'values('.$usersGroupdId.','.$groupid.','.$userid.')';
 
 				if (!DBexecute($sql))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 			}
 
-			foreach ($user['user_medias'] as $media_data) {
+			foreach ($user['user_medias'] as $mediaData) {
 				$mediaid = get_dbid('media', 'mediaid');
 				$sql = 'INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
-					' VALUES ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
-					zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
-					zbx_dbstr($media_data['period']).')';
+					' VALUES ('.$mediaid.','.$userid.','.$mediaData['mediatypeid'].','.
+					zbx_dbstr($mediaData['sendto']).','.$mediaData['active'].','.$mediaData['severity'].','.
+					zbx_dbstr($mediaData['period']).')';
 				if (!DBexecute($sql))
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 			}
@@ -576,9 +576,9 @@ class CUser extends CZBXAPI {
  */
 	public function update($users) {
 		$users = zbx_toArray($users);
-		$userids = zbx_objectValues($users,'userid');
+		$userids = zbx_objectValues($users, 'userid');
 
-		$this->checkInput($users,__FUNCTION__);
+		$this->checkInput($users, __FUNCTION__);
 
 		foreach ($users as $unum => $user) {
 			$self = (bccomp(self::$userData['userid'], $user['userid']) == 0);
@@ -615,9 +615,9 @@ class CUser extends CZBXAPI {
 // if user is not already in a given group
 					if (isset($groupsUserIn[$groupid])) continue;
 
-					$users_groups_id = get_dbid('users_groups', 'id');
+					$usersGroupdId = get_dbid('users_groups', 'id');
 					$sql = 'INSERT INTO users_groups (id,usrgrpid,userid)'.
-							' VALUES ('.$users_groups_id.','.$groupid.','.$user['userid'].')';
+							' VALUES ('.$usersGroupdId.','.$groupid.','.$user['userid'].')';
 
 					if (!DBexecute($sql))
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -679,20 +679,20 @@ class CUser extends CZBXAPI {
 /**
  * Add Medias for User
  *
- * @param array $media_data
- * @param string $media_data['userid']
- * @param string $media_data['medias']['mediatypeid']
- * @param string $media_data['medias']['address']
- * @param int $media_data['medias']['severity']
- * @param int $media_data['medias']['active']
- * @param string $media_data['medias']['period']
+ * @param array $mediaData
+ * @param string $mediaData['userid']
+ * @param string $mediaData['medias']['mediatypeid']
+ * @param string $mediaData['medias']['address']
+ * @param int $mediaData['medias']['severity']
+ * @param int $mediaData['medias']['active']
+ * @param string $mediaData['medias']['period']
  * @return boolean
  */
-	public function addMedia($media_data) {
+	public function addMedia($mediaData) {
 
 
-			$medias = zbx_toArray($media_data['medias']);
-			$users = zbx_toArray($media_data['users']);
+			$medias = zbx_toArray($mediaData['medias']);
+			$users = zbx_toArray($mediaData['users']);
 			$mediaids = array();
 
 		$userids = array();
@@ -709,7 +709,7 @@ class CUser extends CZBXAPI {
 						self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_INCORRECT_TIME_PERIOD);
 					}
 
-					$mediaid = get_dbid('media','mediaid');
+					$mediaid = get_dbid('media', 'mediaid');
 
 					$sql='INSERT INTO media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
 							' VALUES ('.$mediaid.','.$user['userid'].','.$media['mediatypeid'].','.
@@ -749,28 +749,28 @@ class CUser extends CZBXAPI {
 /**
  * Update Medias for User
  *
- * @param array $media_data
- * @param array $media_data['users']
- * @param array $media_data['users']['userid']
- * @param array $media_data['medias']
- * @param string $media_data['medias']['mediatypeid']
- * @param string $media_data['medias']['sendto']
- * @param int $media_data['medias']['severity']
- * @param int $media_data['medias']['active']
- * @param string $media_data['medias']['period']
+ * @param array $mediaData
+ * @param array $mediaData['users']
+ * @param array $mediaData['users']['userid']
+ * @param array $mediaData['medias']
+ * @param string $mediaData['medias']['mediatypeid']
+ * @param string $mediaData['medias']['sendto']
+ * @param int $mediaData['medias']['severity']
+ * @param int $mediaData['medias']['active']
+ * @param string $mediaData['medias']['period']
  * @return boolean
  */
-	public function updateMedia($media_data) {
+	public function updateMedia($mediaData) {
 
-		$new_medias = zbx_toArray($media_data['medias']);
-		$users = zbx_toArray($media_data['users']);
+		$newMedias = zbx_toArray($mediaData['medias']);
+		$users = zbx_toArray($mediaData['users']);
 
 			if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS);
 			}
 
-			$upd_medias = array();
-			$del_medias = array();
+			$updMedias = array();
+			$delMedias = array();
 
 			$userids = zbx_objectValues($users, 'userid');
 			$sql = 'SELECT m.mediaid'.
@@ -778,23 +778,23 @@ class CUser extends CZBXAPI {
 					' WHERE '.DBcondition('userid', $userids);
 			$result = DBselect($sql);
 			while ($media = DBfetch($result)) {
-				$del_medias[$media['mediaid']] = $media;
+				$delMedias[$media['mediaid']] = $media;
 			}
 
-			foreach ($new_medias as $mnum => $media) {
+			foreach ($newMedias as $mnum => $media) {
 				if (!isset($media['mediaid'])) continue;
 
-				if (isset($del_medias[$media['mediaid']])) {
-					$upd_medias[$media['mediaid']] = $new_medias[$mnum];
+				if (isset($delMedias[$media['mediaid']])) {
+					$updMedias[$media['mediaid']] = $newMedias[$mnum];
 				}
 
-				unset($new_medias[$mnum]);
-				unset($del_medias[$media['mediaid']]);
+				unset($newMedias[$mnum]);
+				unset($delMedias[$media['mediaid']]);
 			}
 
 // DELETE
-			if (!empty($del_medias)) {
-				$mediaids = zbx_objectValues($del_medias, 'mediaid');
+			if (!empty($delMedias)) {
+				$mediaids = zbx_objectValues($delMedias, 'mediaid');
 				$result = $this->deleteMedia($mediaids);
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_DELETE_USER_MEDIAS);
@@ -802,7 +802,7 @@ class CUser extends CZBXAPI {
 			}
 
 // UPDATE
-			foreach ($upd_medias as $mnum => $media) {
+			foreach ($updMedias as $mnum => $media) {
 				if (!validate_period($media['period'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_PERIOD_PART1.' '.$media['period'].' '.S_CUSER_ERROR_WRONG_PERIOD_PART2);
 				}
@@ -821,8 +821,8 @@ class CUser extends CZBXAPI {
 			}
 
 // CREATE
-			if (!empty($new_medias)) {
-				$result = $this->addMedia(array('users' => $users, 'medias' => $new_medias));
+			if (!empty($newMedias)) {
+				$result = $this->addMedia(array('users' => $users, 'medias' => $newMedias));
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_INSERT_USER_MEDIAS);
 				}
@@ -933,25 +933,25 @@ class CUser extends CZBXAPI {
 			' FROM usrgrp g,users_groups ug'.
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid';
-		$db_access = DBfetch(DBselect($sql));
-		if (!zbx_empty($db_access['gui_access']))
-			$guiAccess = $db_access['gui_access'];
+		$dbAccess = DBfetch(DBselect($sql));
+		if (!zbx_empty($dbAccess['gui_access']))
+			$guiAccess = $dbAccess['gui_access'];
 		else
 			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
 
 		switch ($guiAccess) {
 			case GROUP_GUI_ACCESS_INTERNAL:
-				$auth_type = ZBX_AUTH_INTERNAL;
+				$authType = ZBX_AUTH_INTERNAL;
 				break;
 			case GROUP_GUI_ACCESS_DISABLED:
 			case GROUP_GUI_ACCESS_SYSTEM:
 				$config = select_config();
-				$auth_type = $config['authentication_type'];
+				$authType = $config['authentication_type'];
 				break;
 		}
 
 		try{
-			switch ($auth_type) {
+			switch ($authType) {
 				case ZBX_AUTH_LDAP:
 					$this->ldapLogin($user);
 					break;
@@ -979,7 +979,7 @@ class CUser extends CZBXAPI {
 		}
 
 // start session
-		$sessionid = md5(time().$password.$name.rand(0,10000000));
+		$sessionid = md5(time().$password.$name.rand(0, 10000000));
 		DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userInfo['userid'].','.time().','.ZBX_SESSION_ACTIVE.')');
 // --
 
@@ -1034,9 +1034,9 @@ class CUser extends CZBXAPI {
 			' FROM usrgrp g,users_groups ug'.
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid';
-		$db_access = DBfetch(DBselect($sql));
-		if (!zbx_empty($db_access['gui_access']))
-			$guiAccess = $db_access['gui_access'];
+		$dbAccess = DBfetch(DBselect($sql));
+		if (!zbx_empty($dbAccess['gui_access']))
+			$guiAccess = $dbAccess['gui_access'];
 		else
 			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
 

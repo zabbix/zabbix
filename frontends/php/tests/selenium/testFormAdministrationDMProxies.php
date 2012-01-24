@@ -69,8 +69,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->ok('Connect to');
 		$this->ok('Port');
 		$this->ok('Hosts');
-		$this->ok('Proxy Hosts');
-		$this->ok('Other Hosts');
+		$this->ok('Proxy hosts');
+		$this->ok('Other hosts');
 
 		$this->assertElementPresent('host');
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!

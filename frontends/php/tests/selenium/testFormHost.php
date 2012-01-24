@@ -114,7 +114,7 @@ class testFormHost extends CWebTest {
 		$this->wait();
 		$this->assertTitle('Hosts');
 		$this->ok('No groups for host');
-		$this->assertEquals(1, DBcount("select * from hosts where host='Test host'"));
+		$this->assertEquals(0, DBcount("select * from hosts where host='Test host'"));
 	}
 
 	public function testFormHost_CloneHost() {
