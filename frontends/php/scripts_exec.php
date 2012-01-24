@@ -60,7 +60,7 @@ if (isset($_REQUEST['execute'])) {
 			$message = '';
 		}
 		$frmResult = new CFormTable($script_info['name']);
-		$frmResult->addRow(S_RESULT, new CTextArea('message', $message, 25, ZBX_TEXTAREA_BIG_WIDTH, 'yes'));
+		$frmResult->addRow(_('Result'), new CTextArea('message', $message, 25, ZBX_TEXTAREA_BIG_WIDTH, 'yes'));
 		$frmResult->addItemToBottomRow(new CButton('close', S_CLOSE, 'window.close();'));
 		$frmResult->show();
 	}

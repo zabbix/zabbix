@@ -66,7 +66,7 @@ switch($itemType) {
 		'new_delay_flex'=>		array(T_ZBX_STR, O_OPT,  NOT_EMPTY,  '',	'isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
 		'rem_delay_flex'=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0, SEC_PER_DAY), null),
 		'delay_flex'=>		array(T_ZBX_STR, O_OPT,  null,  '',null),
-		'status'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
+		'status'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0, 65535),'isset({save})'),
 		'type'=>			array(T_ZBX_INT, O_OPT,  null,
 				IN(array(-1,ITEM_TYPE_ZABBIX,ITEM_TYPE_SNMPV1,ITEM_TYPE_TRAPPER,ITEM_TYPE_SIMPLE,
 					ITEM_TYPE_SNMPV2C,ITEM_TYPE_INTERNAL,ITEM_TYPE_SNMPV3,ITEM_TYPE_ZABBIX_ACTIVE,
@@ -105,7 +105,7 @@ switch($itemType) {
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
-		'port'=>		array(T_ZBX_STR, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({type})&&'.IN(
+		'port'=>		array(T_ZBX_STR, O_OPT,  null,  BETWEEN(0, 65535),	'isset({save})&&isset({type})&&'.IN(
 													ITEM_TYPE_SNMPV1.','.
 													ITEM_TYPE_SNMPV2C.','.
 													ITEM_TYPE_SNMPV3,'type')),
@@ -118,11 +118,11 @@ switch($itemType) {
 		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
 
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
-		'units'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'units'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&isset({value_type})&&'.IN('0,3', 'value_type')),
 		'multiplier'=>		array(T_ZBX_INT, O_OPT,  null,  null,		null),
-		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'delta'=>		array(T_ZBX_INT, O_OPT,  null,  IN('0,1,2'),	'isset({save})&&isset({value_type})&&'.IN('0,3', 'value_type')),
 
-		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  NOT_ZERO,	'isset({save})&&isset({multiplier})&&({multiplier}==1)&&'.IN('0,3','value_type'), S_CUSTOM_MULTIPLIER),
+		'formula'=>		array(T_ZBX_DBL, O_OPT,  null,  NOT_ZERO,	'isset({save})&&isset({multiplier})&&({multiplier}==1)&&'.IN('0,3', 'value_type'), S_CUSTOM_MULTIPLIER),
 		'logtimefmt'=>		array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
 
 		'group_itemid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
@@ -131,8 +131,8 @@ switch($itemType) {
 		'new_application'=>	array(T_ZBX_STR, O_OPT, null,	null,	'isset({save})'),
 		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 
-		'history'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),'isset({save})'),
-		'trends'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	'isset({save})&&isset({value_type})&&'.IN(
+		'history'=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0, 65535),'isset({save})'),
+		'trends'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0, 65535),	'isset({save})&&isset({value_type})&&'.IN(
 												ITEM_VALUE_TYPE_FLOAT.','.
 												ITEM_VALUE_TYPE_UINT64, 'value_type')),
 		'del_history'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -200,7 +200,7 @@ switch($itemType) {
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.host_discovery.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.host_discovery.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -212,17 +212,17 @@ switch($itemType) {
 
 
 
-	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex'])){
-		$_REQUEST['delay_flex'] = get_request('delay_flex',array());
-		foreach($_REQUEST['rem_delay_flex'] as $val){
+	if (isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex'])) {
+		$_REQUEST['delay_flex'] = get_request('delay_flex', array());
+		foreach ($_REQUEST['rem_delay_flex'] as $val) {
 			unset($_REQUEST['delay_flex'][$val]);
 		}
 	}
-	else if(isset($_REQUEST['add_delay_flex'])&&isset($_REQUEST['new_delay_flex'])){
+	elseif (isset($_REQUEST['add_delay_flex'])&&isset($_REQUEST['new_delay_flex'])) {
 		$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 		array_push($_REQUEST['delay_flex'],$_REQUEST['new_delay_flex']);
 	}
-	else if(isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])){
+	elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 		DBstart();
 		$result = API::Itemprototype()->delete($_REQUEST['itemid']);
 		$result = DBend($result);
@@ -231,14 +231,14 @@ switch($itemType) {
 		unset($_REQUEST['itemid']);
 		unset($_REQUEST['form']);
 	}
-	else if(isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])){
+	elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 		unset($_REQUEST['itemid']);
 		$_REQUEST['form'] = 'clone';
 	}
-	else if(isset($_REQUEST['save'])){
+	elseif (isset($_REQUEST['save'])) {
 		$delay_flex = get_request('delay_flex', array());
 		$db_delay_flex = '';
-		foreach($delay_flex as $num => $val){
+		foreach ($delay_flex as $num => $val) {
 			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
 		}
 		$db_delay_flex = trim($db_delay_flex,';');
@@ -328,7 +328,7 @@ switch($itemType) {
 	}
 
 // GO {{{
-	else if((($_REQUEST['go'] == 'activate') || ($_REQUEST['go'] == 'disable')) && isset($_REQUEST['group_itemid'])){
+	elseif ((($_REQUEST['go'] == 'activate') || ($_REQUEST['go'] == 'disable')) && isset($_REQUEST['group_itemid'])) {
 		$group_itemid = $_REQUEST['group_itemid'];
 
 		DBstart();
@@ -336,7 +336,7 @@ switch($itemType) {
 		$go_result = DBend($go_result);
 		show_messages($go_result, ($_REQUEST['go'] == 'activate') ? _('Items activated') : _('Items disabled'), null);
 	}
-	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])){
+	elseif (($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_itemid'])) {
 		$group_itemid = $_REQUEST['group_itemid'];
 		DBstart();
 		$go_result = API::Itemprototype()->delete($group_itemid);

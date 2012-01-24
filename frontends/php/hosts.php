@@ -443,30 +443,33 @@ require_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 // SAVE HOST
-	else if(isset($_REQUEST['save'])){
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
+	elseif (isset($_REQUEST['save'])) {
+		if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 			access_deny();
+		}
 
-		try{
+		try {
+			DBstart();
+
 			$macros = get_request('macros', array());
 			$interfaces = get_request('interfaces', array());
 			$templates = get_request('templates', array());
 			$templates_clear = get_request('clear_templates', array());
 			$groups = get_request('groups', array());
 
-			if(isset($_REQUEST['hostid']) && $_REQUEST['form'] != 'full_clone'){
+			if (isset($_REQUEST['hostid']) && $_REQUEST['form'] != 'full_clone') {
 				$create_new = false;
 				$msg_ok = _('Host updated');
 				$msg_fail = _('Cannot update host');
 			}
-			else{
+			else {
 				$create_new = true;
 				$msg_ok = _('Host added');
 				$msg_fail = _('Cannot add host');
 			}
 
 			$clone_hostid = false;
-			if($_REQUEST['form'] == 'full_clone'){
+			if ($_REQUEST['form'] == 'full_clone') {
 				$create_new = true;
 				$clone_hostid = $_REQUEST['hostid'];
 			}
@@ -476,13 +479,14 @@ require_once('include/page_header.php');
 			$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
 			foreach($interfaces as $inum => $interface){
-				if(zbx_empty($interface['ip']) && zbx_empty($interface['dns'])){
+				if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
 					unset($interface[$inum]);
 					continue;
 				}
 
-				if($interface['isNew'])
+				if ($interface['isNew']) {
 					unset($interfaces[$inum]['interfaceid']);
+				}
 				unset($interfaces[$inum]['isNew']);
 				$interfaces[$inum]['main'] = 0;
 			}
@@ -504,19 +508,36 @@ require_once('include/page_header.php');
 				$interfaces[$jmxAgentId]['main'] = '1';
 			}
 
-			foreach($macros as $mnum => $macro){
-				if(zbx_empty($macro['value'])){
+			foreach ($macros as $mnum => $macro) {
+				if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 					unset($macros[$mnum]);
 					continue;
 				}
 
-				if($macro['new'] == 'create') unset($macros[$mnum]['macroid']);
+				if ($macro['new'] == 'create') {
+					unset($macros[$mnum]['macroid']);
+				}
 				unset($macros[$mnum]['new']);
 			}
 
+			$duplicatedMacros = array();
+			foreach ($macros as $mnum => $macro) {
+				// transform macros to uppercase {$aaa} => {$AAA}
+				$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
 
-// START SAVE TRANSACTION {{{
-			DBstart();
+				// search for duplicates items in new macros array
+				foreach ($macros as $duplicateNumber => $duplicateNewMacro) {
+					if ($mnum != $duplicateNumber && $macros[$mnum]['macro'] == $duplicateNewMacro['macro']) {
+						$duplicatedMacros[] = '"'.$macros[$mnum]['macro'].'"';
+					}
+				}
+			}
+
+			// validate duplicates macros
+			if (!empty($duplicatedMacros)) {
+				error(_s('More than one macro with same name found: %1$s .', implode(', ', array_unique($duplicatedMacros))));
+				throw new Exception();
+			}
 
 			// create new group
 			if (!zbx_empty($_REQUEST['newgroup'])) {
@@ -544,34 +565,38 @@ require_once('include/page_header.php');
 				'inventory_mode' => get_request('inventory_mode')
 			);
 
-			if($create_new){
+			if ($create_new) {
 				$hostids = API::Host()->create($host);
-				if($hostids){
+				if ($hostids) {
 					$hostid = reset($hostids['hostids']);
 				}
-				else throw new Exception();
+				else {
+					throw new Exception();
+				}
 
 				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST,
 					$hostid,
 					$host['host'],
 					null,null,null);
 			}
-			else{
+			else {
 				$hostid = $host['hostid'] = $_REQUEST['hostid'];
 				$host['templates_clear'] = $templates_clear;
 
 				$host_old = API::Host()->get(array(
 					'hostids' => $hostid,
-					'editable' => 1,
+					'editable' => true,
 					'output' => API_OUTPUT_EXTEND
 				));
 				$host_old = reset($host_old);
 
-				if(!API::Host()->update($host)) throw new Exception();
+				if (!API::Host()->update($host)) {
+					throw new Exception();
+				}
 
 				$host_new = API::Host()->get(array(
 					'hostids' => $hostid,
-					'editable' => 1,
+					'editable' => true,
 					'output' => API_OUTPUT_EXTEND
 				));
 				$host_new = reset($host_new);
@@ -602,7 +627,7 @@ require_once('include/page_header.php');
 				// clone discovery rules
 				$discoveryRules = API::DiscoveryRule()->get(array(
 					'hostids' => $clone_hostid,
-					'inherited' => false,
+					'inherited' => false
 				));
 				if ($discoveryRules) {
 					$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
@@ -614,15 +639,14 @@ require_once('include/page_header.php');
 					}
 				}
 
-				$options = array(
+				$graphs = API::Graph()->get(array(
 					'hostids' => $clone_hostid,
 					'selectItems' => API_OUTPUT_EXTEND,
 					'output' => API_OUTPUT_EXTEND,
 					'inherited' => false,
 					'selectHosts' => API_OUTPUT_REFER,
-					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-				);
-				$graphs = API::Graph()->get($options);
+					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
+				));
 				foreach($graphs as $gnum => $graph){
 					if (count($graph['hosts']) > 1) {
 						continue;
@@ -632,7 +656,7 @@ require_once('include/page_header.php');
 						continue;
 					}
 
-					if(!copy_graph_to_host($graph['graphid'], $hostid)) {
+					if (!copy_graph_to_host($graph['graphid'], $hostid)) {
 						throw new Exception();
 					}
 				}
@@ -648,7 +672,7 @@ require_once('include/page_header.php');
 			unset($_REQUEST['form']);
 			unset($_REQUEST['hostid']);
 		}
-		catch(Exception $e){
+		catch (Exception $e) {
 			DBend(false);
 			show_messages(false, $msg_ok, $msg_fail);
 		}

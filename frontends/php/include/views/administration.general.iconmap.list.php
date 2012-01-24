@@ -34,9 +34,9 @@ foreach ($this->data['iconmaps'] as $iconmap) {
 		$row[] = BR();
 	}
 	$table->addRow(array(
-			new CLink($iconmap['name'], 'config.php?form=update&iconmapid='.$iconmap['iconmapid'].url_param('config')),
-			$row
-		));
+		new CLink($iconmap['name'], 'adm.iconmapping.php?form=update&iconmapid='.$iconmap['iconmapid']),
+		$row
+	));
 }
 
 return $table;

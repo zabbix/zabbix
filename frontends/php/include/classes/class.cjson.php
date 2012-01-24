@@ -99,7 +99,7 @@ class CJSON{
 	 * @param mixed $config User-defined configuration values.
 	 *
 	 */
-	public function __construct($config = null){
+	public function __construct($config = null) {
 		$this->_mapAscii();
 		$this->_setStateTransitionTable();
 	}
@@ -112,7 +112,7 @@ class CJSON{
 	 * @return void
 	 *
 	 */
-	public function __destruct(){
+	public function __destruct() {
 	}
 
 	/**
@@ -127,17 +127,17 @@ class CJSON{
 	 * @return string JSON encoded value
 	 *
 	 */
-	public function encode($valueToEncode, $deQuote = array()){
+	public function encode($valueToEncode, $deQuote = array()) {
 		mb_internal_encoding('ASCII');
-		if(!$this->_config['bypass_ext'] && function_exists('json_encode')){
+		if (!$this->_config['bypass_ext'] && function_exists('json_encode')) {
 
-			if($this->_config['noerror']){
+			if ($this->_config['noerror']) {
 				$old_errlevel = error_reporting(E_ERROR ^ E_WARNING);
 			}
 
 			$encoded = json_encode($valueToEncode);
 
-			if($this->_config['noerror']){
+			if ($this->_config['noerror']) {
 				error_reporting($old_errlevel);
 			}
 
@@ -148,7 +148,7 @@ class CJSON{
 		}
 
 // Sometimes you just don't want some values quoted
-		if(!empty($deQuote)){
+		if (!empty($deQuote)) {
 			$encoded = $this->_deQuote($encoded, $deQuote);
 		}
 
@@ -174,8 +174,8 @@ class CJSON{
 	 * @return string $encoded Cleaned string
 	 *
 	 */
-	protected function _deQuote($encoded, $keys){
-		foreach($keys as $key){
+	protected function _deQuote($encoded, $keys) {
+		foreach ($keys as $key) {
 			$pattern = "/(\"".$key."\"\:)(\".*(?:[^\\\]\"))/U";
 			$encoded = preg_replace_callback(
 				$pattern,
@@ -200,7 +200,7 @@ class CJSON{
 	 * @return string replacement string
 	 *
 	 */
-	protected function _stripvalueslashes($matches){
+	protected function _stripvalueslashes($matches) {
 		return $matches[1].stripslashes(substr($matches[2], 1, -1));
 	}
 
@@ -227,13 +227,13 @@ class CJSON{
 	 * @return mixed decoded value
 	 *
 	 */
-	public function decode($encodedValue, $asArray = false){
-		if(!$this->_config['bypass_ext'] && function_exists('json_decode')){
+	public function decode($encodedValue, $asArray = false) {
+		if (!$this->_config['bypass_ext'] && function_exists('json_decode')) {
 			return json_decode($encodedValue, (bool) $asArray);
 		}
 
 		$first_char = substr(ltrim($encodedValue), 0, 1);
-		if($first_char != '{' && $first_char != '['){
+		if ($first_char != '{' && $first_char != '[') {
 			return null;
 		}
 
@@ -245,7 +245,7 @@ class CJSON{
 
 // Required for internal parser, it operates with ASCII data
 		mb_internal_encoding('ASCII');
-		if($this->isValid($encodedValue)){
+		if ($this->isValid($encodedValue)) {
 			$result = $this->_json_decode($encodedValue, (bool) $asArray);
 		}
 		mb_internal_encoding('UTF-8');
@@ -264,8 +264,8 @@ class CJSON{
 	 * @return mixed JSON string representation of input value
 	 *
 	 */
-	protected function _json_encode($var){
-		switch(gettype($var)){
+	protected function _json_encode($var) {
+		switch (gettype($var)) {
 			case 'boolean':
 				return $var ? 'true' : 'false';
 
@@ -296,11 +296,11 @@ class CJSON{
 				* Iterate over every character in the string,
 				* escaping with a slash or encoding to UTF-8 where necessary
 				*/
-				for($c = 0; $c < $strlen_var; ++$c){
+				for($c = 0; $c < $strlen_var; ++$c) {
 
 					$ord_var_c = ord($var{$c});
 
-					switch(true){
+					switch (true) {
 						case $ord_var_c == 0x08:
 							$ascii .= '\b';
 							break;
@@ -414,8 +414,8 @@ class CJSON{
 				*/
 
 				// treat as a JSON object
-				if(is_array($var) && count($var) &&
-					(array_keys($var) !== range(0, sizeof($var) - 1))){
+				if (is_array($var) && count($var) &&
+					(array_keys($var) !== range(0, sizeof($var) - 1))) {
 						$properties = array_map(array($this, '_name_value'),
 											array_keys($var),
 											array_values($var));
@@ -439,7 +439,7 @@ class CJSON{
 
 			default:
 
-				if($this->_config['noerror']){
+				if ($this->_config['noerror']) {
 					return 'null';
 				}
 
@@ -476,16 +476,16 @@ class CJSON{
 	 * @todo Rewrite this based off of method used in Solar_Json_Checker
 	 *
 	 */
-	protected function _json_decode($str, $asArray = false){
+	protected function _json_decode($str, $asArray = false) {
 		$str = $this->_reduce_string($str);
 
-		switch (zbx_strtolower($str)){
+		switch (zbx_strtolower($str)) {
 			case 'true':
 				// JSON_checker test suite claims
 				// "A JSON payload should be an object or array, not a string."
 				// Thus, returning bool(true) is invalid parsing, unless
 				// we're nested inside an array or object.
-				if(in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))){
+				if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
 					return true;
 				}
 				else {
@@ -498,7 +498,7 @@ class CJSON{
 				// "A JSON payload should be an object or array, not a string."
 				// Thus, returning bool(false) is invalid parsing, unless
 				// we're nested inside an array or object.
-				if(in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))){
+				if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
 					return false;
 				}
 				else {
@@ -512,9 +512,9 @@ class CJSON{
 			default:
 				$m = array();
 
-				if(is_numeric($str) || ctype_digit($str) || ctype_xdigit($str)){
+				if (is_numeric($str) || ctype_digit($str) || ctype_xdigit($str)) {
 					// Return float or int, or null as appropriate
-					if(in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))){
+					if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
 						return ((float) $str == (integer) $str)
 							? (integer) $str
 							: (float) $str;
@@ -525,20 +525,20 @@ class CJSON{
 					break;
 
 				}
-				else if(preg_match('/^("|\').*(\1)$/s', $str, $m)
-							&& $m[1] == $m[2]){
+				else if (preg_match('/^("|\').*(\1)$/s', $str, $m)
+							&& $m[1] == $m[2]) {
 					// STRINGS RETURNED IN UTF-8 FORMAT
 					$delim = substr($str, 0, 1);
 					$chrs = substr($str, 1, -1);
 					$utf8 = '';
 					$strlen_chrs = zbx_strlen($chrs);
 
-					for ($c = 0; $c < $strlen_chrs; ++$c){
+					for ($c = 0; $c < $strlen_chrs; ++$c) {
 
 						$substr_chrs_c_2 = substr($chrs, $c, 2);
 						$ord_chrs_c = ord($chrs{$c});
 
-						switch(true){
+						switch (true) {
 							case $substr_chrs_c_2 == '\b':
 								$utf8 .= chr(0x08);
 								++$c;
@@ -564,8 +564,8 @@ class CJSON{
 							case $substr_chrs_c_2 == '\\\'':
 							case $substr_chrs_c_2 == '\\\\':
 							case $substr_chrs_c_2 == '\\/':
-								if(($delim == '"' && $substr_chrs_c_2 != '\\\'') ||
-								   ($delim == "'" && $substr_chrs_c_2 != '\\"')){
+								if (($delim == '"' && $substr_chrs_c_2 != '\\\'') ||
+									($delim == "'" && $substr_chrs_c_2 != '\\"')) {
 									$utf8 .= $chrs{++$c};
 								}
 								break;
@@ -621,23 +621,23 @@ class CJSON{
 
 					}
 
-					if(in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))){
+					if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
 						return $utf8;
 					}
 					else {
 						return null;
 					}
 
-				} else if(preg_match('/^\[.*\]$/s', $str) || preg_match('/^\{.*\}$/s', $str)){
+				} else if (preg_match('/^\[.*\]$/s', $str) || preg_match('/^\{.*\}$/s', $str)) {
 					// array, or object notation
 
-					if($str{0} == '['){
+					if ($str{0} == '[') {
 						$stk = array(self::IN_ARR);
 						$this->_level = self::IN_ARR;
 						$arr = array();
 					}
 					else {
-						if($asArray){
+						if ($asArray) {
 							$stk = array(self::IN_OBJ);
 							$obj = array();
 						}
@@ -655,8 +655,8 @@ class CJSON{
 					$chrs = substr($str, 1, -1);
 					$chrs = $this->_reduce_string($chrs);
 
-					if($chrs == ''){
-						if(reset($stk) == self::IN_ARR){
+					if ($chrs == '') {
+						if (reset($stk) == self::IN_ARR) {
 							return $arr;
 
 						}
@@ -668,25 +668,25 @@ class CJSON{
 
 					$strlen_chrs = zbx_strlen($chrs);
 
-					for ($c = 0; $c <= $strlen_chrs; ++$c){
+					for ($c = 0; $c <= $strlen_chrs; ++$c) {
 
 						$top = end($stk);
 						$substr_chrs_c_2 = substr($chrs, $c, 2);
 
-						if(($c == $strlen_chrs) || (($chrs{$c} == ',') && ($top['what'] == self::SLICE))){
+						if (($c == $strlen_chrs) || (($chrs{$c} == ',') && ($top['what'] == self::SLICE))) {
 							// found a comma that is not inside a string, array, etc.,
 							// OR we've reached the end of the character list
 							$slice = substr($chrs, $top['where'], ($c - $top['where']));
 							array_push($stk, array('what' => self::SLICE, 'where' => ($c + 1), 'delim' => false));
 							//print("Found split at {$c}: ".substr($chrs, $top['where'], (1 + $c - $top['where']))."\n");
 
-							if(reset($stk) == self::IN_ARR){
+							if (reset($stk) == self::IN_ARR) {
 								$this->_level = self::IN_ARR;
 								// we are in an array, so just push an element onto the stack
 								array_push($arr, $this->_json_decode($slice, $asArray));
 
 							}
-							else if(reset($stk) == self::IN_OBJ){
+							else if (reset($stk) == self::IN_OBJ) {
 								$this->_level = self::IN_OBJ;
 								// we are in an object, so figure
 								// out the property name and set an
@@ -694,38 +694,38 @@ class CJSON{
 								// for now
 								$parts = array();
 
-								if(preg_match('/^\s*(["\'].*[^\\\]["\'])\s*:\s*(\S.*),?$/Uis', $slice, $parts)){
+								if (preg_match('/^\s*(["\'].*[^\\\]["\'])\s*:\s*(\S.*),?$/Uis', $slice, $parts)) {
 									// "name":value pair
 									$key = $this->_json_decode($parts[1],$asArray);
 									$val = $this->_json_decode($parts[2],$asArray);
 
-									if($asArray){
+									if ($asArray) {
 										$obj[$key] = $val;
 									}
 									else {
 										$obj->$key = $val;
 									}
 								}
-								else if(preg_match('/^\s*(\w+)\s*:\s*(\S.*),?$/Uis', $slice, $parts)){
+								else if (preg_match('/^\s*(\w+)\s*:\s*(\S.*),?$/Uis', $slice, $parts)) {
 									// name:value pair, where name is unquoted
 									$key = $parts[1];
 									$val = $this->_json_decode($parts[2],$asArray);
 
-									if($asArray){
+									if ($asArray) {
 										$obj[$key] = $val;
 									}
 									else {
 										$obj->$key = $val;
 									}
 								}
-								else if(preg_match('/^\s*(["\']["\'])\s*:\s*(\S.*),?$/Uis', $slice, $parts)){
+								else if (preg_match('/^\s*(["\']["\'])\s*:\s*(\S.*),?$/Uis', $slice, $parts)) {
 									// "":value pair
 									//$key = $this->_json_decode($parts[1]);
 									// use string that matches ext/json
 									$key = '_empty_';
 									$val = $this->_json_decode($parts[2],$asArray);
 
-									if($asArray){
+									if ($asArray) {
 										$obj[$key] = $val;
 									}
 									else {
@@ -736,15 +736,15 @@ class CJSON{
 							}
 
 						}
-						else if((($chrs{$c} == '"') || ($chrs{$c} == "'")) && ($top['what'] != self::IN_STR)){
+						else if ((($chrs{$c} == '"') || ($chrs{$c} == "'")) && ($top['what'] != self::IN_STR)) {
 							// found a quote, and we are not inside a string
 							array_push($stk, array('what' => self::IN_STR, 'where' => $c, 'delim' => $chrs{$c}));
 							//print("Found start of string at {$c}\n");
 
 						}
-						else if(($chrs{$c} == $top['delim']) &&
-								 ($top['what'] == self::IN_STR) &&
-								 ((zbx_strlen(substr($chrs, 0, $c)) - zbx_strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)){
+						else if (($chrs{$c} == $top['delim']) &&
+								($top['what'] == self::IN_STR) &&
+								((zbx_strlen(substr($chrs, 0, $c)) - zbx_strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)) {
 							// found a quote, we're in a string, and it's not escaped
 							// we know that it's not escaped becase there is _not_ an
 							// odd number of backslashes at the end of the string so far
@@ -752,43 +752,43 @@ class CJSON{
 							//print("Found end of string at {$c}: ".substr($chrs, $top['where'], (1 + 1 + $c - $top['where']))."\n");
 
 						}
-						else if(($chrs{$c} == '[') &&
-								 in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))){
+						else if (($chrs{$c} == '[') &&
+							in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
 							// found a left-bracket, and we are in an array, object, or slice
 							array_push($stk, array('what' => self::IN_ARR, 'where' => $c, 'delim' => false));
 							//print("Found start of array at {$c}\n");
 
 						}
-						else if(($chrs{$c} == ']') && ($top['what'] == self::IN_ARR)){
+						else if (($chrs{$c} == ']') && ($top['what'] == self::IN_ARR)) {
 							// found a right-bracket, and we're in an array
 							$this->_level = null;
 							array_pop($stk);
 							//print("Found end of array at {$c}: ".substr($chrs, $top['where'], (1 + $c - $top['where']))."\n");
 
 						}
-						else if(($chrs{$c} == '{') &&
-								 in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))){
+						else if (($chrs{$c} == '{') &&
+							in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
 							// found a left-brace, and we are in an array, object, or slice
 							array_push($stk, array('what' => self::IN_OBJ, 'where' => $c, 'delim' => false));
 							//print("Found start of object at {$c}\n");
 
 						}
-						else if(($chrs{$c} == '}') && ($top['what'] == self::IN_OBJ)){
+						else if (($chrs{$c} == '}') && ($top['what'] == self::IN_OBJ)) {
 							// found a right-brace, and we're in an object
 							$this->_level = null;
 							array_pop($stk);
 							//print("Found end of object at {$c}: ".substr($chrs, $top['where'], (1 + $c - $top['where']))."\n");
 
 						}
-						else if(($substr_chrs_c_2 == '/*') &&
-								 in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))){
+						else if (($substr_chrs_c_2 == '/*') &&
+							in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
 							// found a comment start, and we are in an array, object, or slice
 							array_push($stk, array('what' => self::IN_CMT, 'where' => $c, 'delim' => false));
 							$c++;
 							//print("Found start of comment at {$c}\n");
 
 						}
-						else if(($substr_chrs_c_2 == '*/') && ($top['what'] == self::IN_CMT)){
+						else if (($substr_chrs_c_2 == '*/') && ($top['what'] == self::IN_CMT)) {
 							// found a comment end, and we're in one now
 							array_pop($stk);
 							$c++;
@@ -802,11 +802,11 @@ class CJSON{
 
 					}
 
-					if(reset($stk) == self::IN_ARR){
+					if (reset($stk) == self::IN_ARR) {
 						return $arr;
 
 					}
-					else if(reset($stk) == self::IN_OBJ){
+					else if (reset($stk) == self::IN_OBJ) {
 						return $obj;
 
 					}
@@ -827,7 +827,7 @@ class CJSON{
 	 * @return string JSON-formatted name-value pair
 	 *
 	 */
-	protected function _name_value($name, $value){
+	protected function _name_value($name, $value) {
 		$encoded_value = $this->_json_encode($value);
 		return $this->_json_encode(strval($name)) . ':' . $encoded_value;
 	}
@@ -845,16 +845,16 @@ class CJSON{
 	 * @return string UTF-8 character
 	 *
 	 */
-	protected function _utf162utf8($utf16){
+	protected function _utf162utf8($utf16) {
 		// oh please oh please oh please oh please oh please
-		if(!$this->_config['bypass_mb'] &&
-			function_exists('mb_convert_encoding')){
+		if (!$this->_config['bypass_mb'] &&
+			function_exists('mb_convert_encoding')) {
 				return mb_convert_encoding($utf16, 'UTF-8', 'UTF-16');
 		}
 
 		$bytes = (ord($utf16{0}) << 8) | ord($utf16{1});
 
-		switch (true){
+		switch (true) {
 			case ((0x7F & $bytes) == $bytes):
 				// this case should never be reached, because we are in ASCII range
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
@@ -891,14 +891,14 @@ class CJSON{
 	 * @return string UTF-16 character
 	 *
 	 */
-	protected function _utf82utf16($utf8){
+	protected function _utf82utf16($utf8) {
 		// oh please oh please oh please oh please oh please
-		if(!$this->_config['bypass_mb'] &&
-			function_exists('mb_convert_encoding')){
+		if (!$this->_config['bypass_mb'] &&
+			function_exists('mb_convert_encoding')) {
 				return mb_convert_encoding($utf8, 'UTF-16', 'UTF-8');
 		}
 
-		switch (zbx_strlen($utf8)){
+		switch (zbx_strlen($utf8)) {
 			case 1:
 				// this case should never be reached, because we are in ASCII range
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
@@ -933,7 +933,7 @@ class CJSON{
 	 * @return string string value stripped of comments and whitespace
 	 *
 	 */
-	protected function _reduce_string($str){
+	protected function _reduce_string($str) {
 		$str = preg_replace(array(
 			// eliminate single line comments in '// ...' form
 			'#^\s*//(.+)$#m',
@@ -950,7 +950,7 @@ class CJSON{
 	return trim($str);
 	}
 
-	protected function _exception($code, $info = array()){
+	protected function _exception($code, $info = array()) {
 		$class = get_class($this);
 
 		SDI(array($class, $code, (array) $info));
@@ -1065,7 +1065,7 @@ class CJSON{
 	 * @return bool
 	 *
 	 */
-	public function isValid($str){
+	public function isValid($str) {
 // string length
 		$len = zbx_strlen($str);
 
@@ -1080,12 +1080,12 @@ class CJSON{
 		$this->_the_top = -1;
 		$this->_push(self::MODE_DONE);
 
-		for($_the_index = 0; $_the_index < $len; $_the_index++){
+		for($_the_index = 0; $_the_index < $len; $_the_index++) {
 			$b = $str{$_the_index};
 
-			if(chr(ord($b) & 127) == $b){
+			if (chr(ord($b) & 127) == $b) {
 				$c = $this->_ascii_class[ord($b)];
-				if($c <= self::S_ERR){
+				if ($c <= self::S_ERR) {
 					return false;
 				}
 			}
@@ -1096,13 +1096,13 @@ class CJSON{
 // Get the next state from the transition table
 			$s = $this->_state_transition_table[$_the_state][$c];
 
-			if($s < 0){
+			if ($s < 0) {
 // Perform one of the predefined actions
 
-				switch($s){
+				switch ($s) {
 // empty }
 					case -9:
-						if(!$this->_pop(self::MODE_KEY)){
+						if (!$this->_pop(self::MODE_KEY)) {
 							return false;
 						}
 						$_the_state = 9;
@@ -1110,7 +1110,7 @@ class CJSON{
 
 					// {
 					case -8:
-						if(!$this->_push(self::MODE_KEY)){
+						if (!$this->_push(self::MODE_KEY)) {
 							return false;
 						}
 						$_the_state = 1;
@@ -1118,7 +1118,7 @@ class CJSON{
 
 					// }
 					case -7:
-						if(!$this->_pop(self::MODE_OBJECT)){
+						if (!$this->_pop(self::MODE_OBJECT)) {
 							return false;
 						}
 						$_the_state = 9;
@@ -1126,7 +1126,7 @@ class CJSON{
 
 					// [
 					case -6:
-						if(!$this->_push(self::MODE_ARRAY)){
+						if (!$this->_push(self::MODE_ARRAY)) {
 							return false;
 						}
 						$_the_state = 2;
@@ -1134,7 +1134,7 @@ class CJSON{
 
 					// ]
 					case -5:
-						if(!$this->_pop(self::MODE_ARRAY)){
+						if (!$this->_pop(self::MODE_ARRAY)) {
 							return false;
 						}
 						$_the_state = 9;
@@ -1142,7 +1142,7 @@ class CJSON{
 
 					// "
 					case -4:
-						switch($this->_the_stack[$this->_the_top]){
+						switch ($this->_the_stack[$this->_the_top]) {
 							case self::MODE_KEY:
 								$_the_state = 27;
 								break;
@@ -1157,9 +1157,9 @@ class CJSON{
 
 					// '
 					case -3:
-						switch($this->_the_stack[$this->_the_top]){
+						switch ($this->_the_stack[$this->_the_top]) {
 							case self::MODE_OBJECT:
-								if($this->_pop(self::MODE_OBJECT) && $this->_push(self::MODE_KEY)){
+								if ($this->_pop(self::MODE_OBJECT) && $this->_push(self::MODE_KEY)) {
 									$_the_state = 29;
 								}
 								break;
@@ -1173,7 +1173,7 @@ class CJSON{
 
 					// :
 					case -2:
-						if($this->_pop(self::MODE_KEY) && $this->_push(self::MODE_OBJECT)){
+						if ($this->_pop(self::MODE_KEY) && $this->_push(self::MODE_OBJECT)) {
 							$_the_state = 28;
 							break;
 						}
@@ -1192,7 +1192,7 @@ class CJSON{
 
 		}
 
-		if($_the_state == 9 && $this->_pop(self::MODE_DONE)){
+		if ($_the_state == 9 && $this->_pop(self::MODE_DONE)) {
 			return true;
 		}
 
@@ -1207,7 +1207,7 @@ class CJSON{
 	 * @return void
 	 *
 	 */
-	protected function _mapAscii(){
+	protected function _mapAscii() {
 		$this->_ascii_class = array(
 			self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR, self::S_ERR,
 			self::S_ERR, self::S_WSP, self::S_WSP, self::S_ERR, self::S_ERR, self::S_WSP, self::S_ERR, self::S_ERR,
@@ -1241,7 +1241,7 @@ class CJSON{
 	 * @return void;
 	 *
 	 */
-	protected function _setStateTransitionTable(){
+	protected function _setStateTransitionTable() {
 
 		$this->_state_transition_table = array(
 			array( 0, 0,-8,-1,-6,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
@@ -1286,10 +1286,10 @@ class CJSON{
 	 * @return bool Success/failure of stack push
 	 *
 	 */
-	protected function _push($mode){
+	protected function _push($mode) {
 		$this->_the_top++;
 
-		if($this->_the_top >= self::MAX_DEPTH){
+		if ($this->_the_top >= self::MAX_DEPTH) {
 			return false;
 		}
 
@@ -1308,8 +1308,8 @@ class CJSON{
 	 * @return bool Success/failure of stack pop
 	 *
 	 */
-	protected function _pop($mode){
-		if($this->_the_top < 0 || $this->_the_stack[$this->_the_top] != $mode){
+	protected function _pop($mode) {
+		if ($this->_the_top < 0 || $this->_the_stack[$this->_the_top] != $mode) {
 			return false;
 		}
 
