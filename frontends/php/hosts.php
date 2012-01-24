@@ -1072,8 +1072,8 @@ require_once('include/page_header.php');
 		$goBox->addItem('export', _('Export selected'));
 		$goBox->addItem('massupdate', _('Mass update'));
 
-		$goOption = new CComboItem('activate', _('Activate selected'));
-		$goOption->setAttribute('confirm', _('Activate selected hosts?'));
+		$goOption = new CComboItem('activate', _('Enable selected'));
+		$goOption->setAttribute('confirm', _('Enable selected hosts?'));
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable', _('Disable selected'));

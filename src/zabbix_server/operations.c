@@ -92,34 +92,95 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Function: add_discovered_host_group                                        *
+ * Function: add_discovered_host_groups                                       *
  *                                                                            *
  * Purpose: add group to host if not added already                            *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	add_discovered_host_group(zbx_uint64_t hostid, zbx_uint64_t groupid)
+static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
 {
+	const char	*__function_name = "add_discovered_host_groups";
+
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	hostgroupid;
+	zbx_uint64_t	groupid;
+	char		*sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
+	int		i;
 
-	result = DBselect(
-			"select hostgroupid"
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select groupid"
 			" from hosts_groups"
-			" where groupid=" ZBX_FS_UI64
-				" and hostid=" ZBX_FS_UI64,
-			groupid, hostid);
+			" where hostid=" ZBX_FS_UI64
+				" and",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 
-	if (NULL == (row = DBfetch(result)))
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		hostgroupid = DBget_maxid("hosts_groups");
-		DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid)"
-				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				hostgroupid, hostid, groupid);
+		ZBX_STR2UINT64(groupid, row[0]);
+
+		if (FAIL == (i = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_vector_uint64_remove_noorder(groupids, i);
 	}
 	DBfree_result(result);
+
+	if (0 != groupids->values_num)
+	{
+		const char	*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
+		zbx_uint64_t	hostgroupid;
+#ifdef HAVE_MULTIROW_INSERT
+		const char	*row_dl = ",";
+#else
+		const char	*row_dl = ";\n";
+#endif
+
+		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
+
+		sql_offset = 0;
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "begin\n");
+#endif
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
+#endif
+		for (i = 0; i < groupids->values_num; i++)
+		{
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
+#endif
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")%s",
+					hostgroupid++, hostid, groupids->values[i], row_dl);
+
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "end;\n");
+#endif
+		}
+
+#ifdef HAVE_MULTIROW_INSERT
+		sql_offset--;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+#endif
+		DBexecute("%s", sql);
+	}
+
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -137,25 +198,30 @@ static void	add_discovered_host_group(zbx_uint64_t hostid, zbx_uint64_t groupid)
  ******************************************************************************/
 static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 {
-	const char	*__function_name = "add_discovered_host";
-	DB_RESULT	result;
-	DB_RESULT	result2;
-	DB_ROW		row;
-	DB_ROW		row2;
-	zbx_uint64_t	dhostid, hostid = 0, proxy_hostid, host_proxy_hostid;
-	char		*host = NULL, *host_esc, *host_unique;
-	unsigned short	port;
-	zbx_uint64_t	groupid;
-	unsigned char	svc_type, interface_type;
+	const char		*__function_name = "add_discovered_host";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(eventid:" ZBX_FS_UI64 ")",
-			__function_name, event->eventid);
+	DB_RESULT		result;
+	DB_RESULT		result2;
+	DB_ROW			row;
+	DB_ROW			row2;
+	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid, host_proxy_hostid;
+	char			*host = NULL, *host_esc, *host_unique;
+	unsigned short		port;
+	zbx_uint64_t		groupid;
+	zbx_vector_uint64_t	groupids;
+	unsigned char		svc_type, interface_type;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
+
+	zbx_vector_uint64_create(&groupids);
 
 	if (0 == *(zbx_uint64_t *)DCconfig_get_config_data(&groupid, CONFIG_DISCOVERY_GROUPID))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host: group for discovered hosts is not defined");
-		return hostid;
+		goto clean;
 	}
+
+	zbx_vector_uint64_append(&groupids, groupid);
 
 	if (EVENT_OBJECT_DHOST == event->object || EVENT_OBJECT_DSERVICE == event->object)
 	{
@@ -250,6 +316,8 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 				zbx_free(host_unique);
 				zbx_free(host_esc);
+
+				add_discovered_host_groups(hostid, &groupids);
 			}
 			else
 			{
@@ -304,6 +372,8 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 						hostid, DBsql_id_ins(proxy_hostid), host_esc, host_esc);
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[3], port);
+
+				add_discovered_host_groups(hostid, &groupids);
 			}
 			else
 			{
@@ -326,9 +396,8 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 		}
 		DBfree_result(result);
 	}
-
-	if (0 != hostid)
-		add_discovered_host_group(hostid, groupid);
+clean:
+	zbx_vector_uint64_destroy(&groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -466,19 +535,19 @@ void	op_host_disable(DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
- * Function: op_group_add                                                     *
+ * Function: op_groups_add                                                    *
  *                                                                            *
- * Purpose: add group to discovered host                                      *
+ * Purpose: add groups to discovered host                                     *
  *                                                                            *
- * Parameters: event   - [IN] event data                                      *
- *             groupid - [IN] group identificator from database               *
+ * Parameters: event    - [IN] event data                                     *
+ *             groupids - [IN] IDs of groups to add                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid)
+void	op_groups_add(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "op_group_add";
+	const char	*__function_name = "op_groups_add";
 	zbx_uint64_t	hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -492,27 +561,31 @@ void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid)
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
 
-	add_discovered_host_group(hostid, groupid);
+	add_discovered_host_groups(hostid, groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: op_group_del                                                     *
+ * Function: op_groups_del                                                    *
  *                                                                            *
- * Purpose: delete group from discovered host                                 *
+ * Purpose: delete groups from discovered host                                *
  *                                                                            *
- * Parameters: event   - [IN] event data                                      *
- *             groupid - [IN] group identificator from database               *
+ * Parameters: event    - [IN] event data                                     *
+ *             groupids - [IN] IDs of groups to delete                        *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid)
+void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "op_group_del";
+	const char	*__function_name = "op_groups_del";
+
+	DB_RESULT	result;
 	zbx_uint64_t	hostid;
+	char		*sql = NULL;
+	size_t		sql_alloc = 256, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -525,12 +598,39 @@ void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid)
 	if (0 == (hostid = select_discovered_host(event)))
 		return;
 
-	DBexecute(
-			"delete from hosts_groups"
+	sql = zbx_malloc(sql, sql_alloc);
+
+	/* make sure host belongs to at least one hostgroup */
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select groupid"
+			" from hosts_groups"
 			" where hostid=" ZBX_FS_UI64
-				" and groupid=" ZBX_FS_UI64,
-			hostid,
-			groupid);
+				" and not",
+			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL == DBfetch(result))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove host \"%s\" from all host groups:"
+				" it must belong to at least one", zbx_host_string(hostid));
+	}
+	else
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"delete from hosts_groups"
+				" where hostid=" ZBX_FS_UI64
+					" and",
+				hostid);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+
+		DBexecute("%s", sql);
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

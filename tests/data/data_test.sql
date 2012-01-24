@@ -5,7 +5,7 @@ UPDATE hosts SET status=0,name='ЗАББИКС Сервер',host='Test host' WH
 UPDATE usrgrp SET debug_mode = 1 WHERE usrgrpid = 7;
 
 -- New media types
-INSERT INTO media_type (mediatypeid, type, description, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd) VALUES (4,100,'SMS via IP','','','','0','','test','test');
+INSERT INTO media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd,status) VALUES (4,100,'SMS via IP','','','','0','','test','test',0);
 
 -- More medias for user 'Admin'
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (1,1,1,'test@zabbix.com',0,63,'1-7,00:00-24:00;');

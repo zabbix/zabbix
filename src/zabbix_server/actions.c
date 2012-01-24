@@ -1107,12 +1107,15 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 	DB_ROW			row;
 	unsigned char		operationtype;
 	zbx_uint64_t		groupid, templateid;
-	zbx_vector_uint64_t	lnk_templateids, del_templateids;
+	zbx_vector_uint64_t	lnk_templateids, del_templateids,
+				new_groupids, del_groupids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
 
 	zbx_vector_uint64_create(&lnk_templateids);
 	zbx_vector_uint64_create(&del_templateids);
+	zbx_vector_uint64_create(&new_groupids);
+	zbx_vector_uint64_create(&del_groupids);
 
 	result = DBselect(
 			"select o.operationtype,g.groupid,t.templateid"
@@ -1144,11 +1147,11 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
 				if (0 != groupid)
-					op_group_add(event, groupid);
+					zbx_vector_uint64_append(&new_groupids, groupid);
 				break;
 			case OPERATION_TYPE_GROUP_REMOVE:
 				if (0 != groupid)
-					op_group_del(event, groupid);
+					zbx_vector_uint64_append(&del_groupids, groupid);
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
 				if (0 != templateid)
@@ -1176,6 +1179,20 @@ static void	execute_operations(DB_EVENT *event, zbx_uint64_t actionid)
 		op_template_del(event, &del_templateids);
 	}
 
+	if (0 != new_groupids.values_num)
+	{
+		zbx_vector_uint64_sort(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		op_groups_add(event, &new_groupids);
+	}
+
+	if (0 != del_groupids.values_num)
+	{
+		zbx_vector_uint64_sort(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		op_groups_del(event, &del_groupids);
+	}
+
+	zbx_vector_uint64_destroy(&del_groupids);
+	zbx_vector_uint64_destroy(&new_groupids);
 	zbx_vector_uint64_destroy(&del_templateids);
 	zbx_vector_uint64_destroy(&lnk_templateids);
 

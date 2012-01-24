@@ -204,6 +204,13 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		echo '<script type="text/javascript" src="'.$path.'"></script>'."\n";
 	}
 ?>
+
+<script>
+	if (jQuery(window).width() < 1024) {
+		document.write('<link rel="stylesheet" type="text/css" href="styles/handheld.css" />');
+	}
+</script>
+
 </head>
 <body class="<?php echo $bodyCSS; ?>" >
 <?php

@@ -619,7 +619,7 @@ require_once('include/page_header.php');
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
-			S_SCREENS,
+			_('Screens'),
 			S_DISCOVERY,
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO

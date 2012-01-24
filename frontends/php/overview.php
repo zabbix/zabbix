@@ -66,7 +66,9 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		require_once('include/page_footer.php');
 		exit();
 	}
-//--------
+
+	// js templates
+	require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 	$_REQUEST['view_style'] = get_request('view_style',CProfile::get('web.overview.view.style',STYLE_TOP));
 	CProfile::update('web.overview.view.style',$_REQUEST['view_style'],PROFILE_TYPE_INT);
