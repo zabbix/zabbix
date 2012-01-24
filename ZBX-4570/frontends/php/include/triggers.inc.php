@@ -1756,7 +1756,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 		' WHERE e.objectid='.$triggerid.
 			' AND e.object='.EVENT_OBJECT_TRIGGER.
 			' AND e.clock BETWEEN '.$min.' AND '.$max.
-		' ORDER BY e.clock,e.eventid'
+		' ORDER BY e.eventid'
 	);
 	while ($row = DBfetch($db_events)) {
 		$clock = $row['clock'];
