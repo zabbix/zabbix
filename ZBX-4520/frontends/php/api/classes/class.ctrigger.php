@@ -1646,14 +1646,14 @@ class CTrigger extends CZBXAPI {
 		$triggers = zbx_toArray($triggers);
 		$infos = array();
 
-		$options = array(
+		$dbTriggers = $this->get(array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name'),
+			'selectDependencies' => API_OUTPUT_REFER,
 			'preservekeys' => true,
 			'nopermissions' => true
-		);
-		$dbTriggers = $this->get($options);
+		));
 
 		$descriptionChanged = $expressionChanged = false;
 		foreach ($triggers as &$trigger) {
@@ -1723,6 +1723,11 @@ class CTrigger extends CZBXAPI {
 
 						$trigger['value_flags'] = TRIGGER_VALUE_FLAG_UNKNOWN;
 					}
+				}
+
+				// if the expression has changed, we must revalidate the existing dependencies
+				if (!isset($trigger['dependencies'])) {
+					$trigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
 				}
 			}
 
@@ -2018,15 +2023,16 @@ class CTrigger extends CZBXAPI {
 				continue;
 			}
 
-			// forbid dependencies from templates to hosts
-			if ($this->isTemplatedTrigger($trigger)) {
-				$realHosts = API::Host()->get(array(
+			// forbid dependencies from hosts to templates
+			if (!$this->isTemplatedTrigger($trigger)) {
+				$templates = API::Template()->get(array(
 					'triggerids' => $trigger['dependencies'],
 					'output' => array('status'),
+					'nopermissions' => true,
 					'limit' => 1
 				));
-				if ($realHosts) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from template to host.'));
+				if ($templates) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from a host to a template.'));
 				}
 			}
 
