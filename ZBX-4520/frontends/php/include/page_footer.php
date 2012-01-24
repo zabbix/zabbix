@@ -69,7 +69,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$post_script .= 'var locale = (typeof(locale) == "undefined" ? {} : locale);'."\n";
 		$post_script .= 'for(key in newLocale){locale[key] = newLocale[key];}'."\n";
 	}
-	$post_script .= 'jQuery(document).ready(function(){'."\n";
+	$post_script .= "jQuery(function() {\n";
 
 	if (isset($ZBX_PAGE_POST_JS)) {
 		foreach ($ZBX_PAGE_POST_JS as $num => $script) {
@@ -81,11 +81,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$post_script .= 'PageRefresh.init('.(CWebUser::$data['refresh'] * 1000).');'."\n";
 	}
 
-	$post_script .= 'cookie.init();'."\n";
-	$post_script .= 'chkbxRange.init();'."\n";
-	$post_script .= 'var screenCSS = null;'."\n";
-	$post_script .= 'if (jQuery(window).width() < 1024) { screenCSS = "handheld.css"; }'."\n";
-	$post_script .= 'if (!is_null(screenCSS)) { jQuery("head").append(\'<link rel="stylesheet" type="text/css" href="styles/\' + screenCSS + \'" />\'); }';
+	// the chkbxRange.init() method must be called after the inserted post scripts
+	$post_script .= "chkbxRange.init();\n";
 	$post_script .= '});'."\n";
 
 	if (!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')) {

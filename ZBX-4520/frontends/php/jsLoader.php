@@ -55,6 +55,7 @@ $availableJScripts = array(
 	'class.rpc.js' => '',
 	'class.pmaster.js' => '',
 	'class.cviewswitcher.js' => '',
+	'init.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/'
 );
@@ -81,7 +82,10 @@ $tranStrings = array(
 	),
 	'class.cmessages.js' => array('S_MUTE', 'S_UNMUTE', 'S_MESSAGES', 'S_CLEAR', 'S_SNOOZE', 'S_MOVE'),
 	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'),
-	'main.js' => array('S_CLOSE', 'S_NO_ELEMENTS_SELECTED', 'S_INTERFACES')
+	'main.js' => array(
+		'S_CLOSE', 'S_NO_ELEMENTS_SELECTED', 'S_INTERFACES', 'Host screens', 'Go to', 'Latest data',
+		'Scripts', 'Host inventories'
+	)
 );
 
 if (empty($_GET['files'])) {
@@ -100,7 +104,8 @@ if (empty($_GET['files'])) {
 		'class.cmessages.js',
 		'main.js',
 		'functions.js',
-		'menu.js'
+		'menu.js',
+		'init.js'
 	);
 }
 else {
@@ -111,7 +116,14 @@ $js = 'if(typeof(locale) == "undefined") var locale = {};'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
 		foreach ($tranStrings[$file] as $str) {
-			$js .= "locale['".$str."'] = ".zbx_jsvalue($translations[$str]).";";
+			// old translation string
+			if (isset($translations[$str])) {
+				$js .= "locale['".$str."'] = ".zbx_jsvalue($translations[$str]).";";
+			}
+			// a gettext string
+			else {
+				$js .= "locale['".$str."'] = ".zbx_jsvalue(_($str)).";";
+			}
 		}
 	}
 }

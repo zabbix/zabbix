@@ -308,7 +308,7 @@ require_once('include/page_header.php');
 		$numrows = new CDiv();
 		$numrows->setAttribute('name', 'numrows');
 
-		$screen_wdgt->addHeader(S_SCREENS_BIG);
+		$screen_wdgt->addHeader(_('SCREENS'));
 		$screen_wdgt->addHeader($numrows);
 
 		if($templateid){

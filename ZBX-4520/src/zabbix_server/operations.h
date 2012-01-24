@@ -28,8 +28,8 @@ extern int	CONFIG_TIMEOUT;
 
 void	op_template_add(DB_EVENT *event, zbx_vector_uint64_t *lnk_templateids);
 void	op_template_del(DB_EVENT *event, zbx_vector_uint64_t *del_templateids);
-void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid);
-void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid);
+void	op_groups_add(DB_EVENT *event, zbx_vector_uint64_t *groupids);
+void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids);
 void	op_host_add(DB_EVENT *event);
 void	op_host_del(DB_EVENT *event);
 void	op_host_enable(DB_EVENT *event);

@@ -39,7 +39,6 @@ class testGeneric extends CWebTest {
 
 			array('httpmon.php',	'Status of Web monitoring \[refreshed every 30 sec\]'),
 			array('latest.php',		'Latest data \[refreshed every 30 sec\]'),
-			array('hosts_mon.php',	'Hosts'),
 			array('tr_status.php',	'Status of triggers \[refreshed every 30 sec\]'),
 
 			array('events.php',				'Latest events \[refreshed every 30 sec\]'),
