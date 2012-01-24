@@ -131,7 +131,7 @@
 	foreach($all_groups as $gnum => $group){
 		$group_tb->addItem($group['groupid'], $group['name']);
 	}
-	$templateList->addRow(S_GROUPS, $group_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS));
+	$templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
 	$newgroupTB = new CTextBox('newgroup', $newgroup);
@@ -369,7 +369,7 @@
 	}
 
 	$macroTab = new CTable();
-	$macroTab->addRow(array(S_MACRO, SPACE, S_VALUE));
+	$macroTab->addRow(array(_('Macro'), SPACE, _('Value')));
 	$macroTab->setAttribute('id', 'userMacros');
 
 	$jsInsert = '';
@@ -394,7 +394,7 @@
 	$macrolist = new CFormList('macrolist');
 	$macrolist->addRow($macroTab);
 
-	$divTabs->addTab('macroTab', S_MACROS, $macrolist);
+	$divTabs->addTab('macroTab', _('Macros'), $macrolist);
 // } MACROS WIDGET
 
 	$frmHost->addItem($divTabs);

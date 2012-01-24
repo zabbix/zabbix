@@ -21,7 +21,7 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class API_JSON_APIInfo extends CZabbixTest {
 	public function testAPIInfo_VersionWithAuth() {
@@ -29,7 +29,8 @@ class API_JSON_APIInfo extends CZabbixTest {
 		$result = $this->api_acall(
 			'apiinfo.version',
 			array(),
-			$debug);
+			$debug
+		);
 
 		$this->assertTrue(isset($result['result']), "$debug");
 		$this->assertSame($result['result'], "1.2");
@@ -39,7 +40,8 @@ class API_JSON_APIInfo extends CZabbixTest {
 		$result = $this->api_call(
 			'apiinfo.version',
 			array(),
-			$debug);
+			$debug
+		);
 
 		$this->assertTrue(isset($result['result']), "$debug");
 		$this->assertSame($result['result'], "1.2");

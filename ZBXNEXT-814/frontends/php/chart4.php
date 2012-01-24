@@ -59,34 +59,33 @@ require_once('include/page_header.php');
 	$shiftYup	= 17;
 	$shiftYdown	= 25+15*3;
 
-	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10);
+	$im = imagecreate($sizeX+$shiftX+61, $sizeY+$shiftYup+$shiftYdown+10);
 
-	$red		= imagecolorallocate($im,255,0,0);
-	$darkred	= imagecolorallocate($im,150,0,0);
-	$green		= imagecolorallocate($im,0,255,0);
-	$darkgreen	= imagecolorallocate($im,0,150,0);
-	$bluei		= imagecolorallocate($im,0,0,255);
-	$darkblue	= imagecolorallocate($im,0,0,150);
-	$yellow		= imagecolorallocate($im,255,255,0);
-	$darkyellow	= imagecolorallocate($im,150,150,0);
-	$cyan		= imagecolorallocate($im,0,255,255);
-	$black		= imagecolorallocate($im,0,0,0);
-	$gray		= imagecolorallocate($im,150,150,150);
-	$white		= imagecolorallocate($im,255,255,255);
-	$bg			= imagecolorallocate($im,6+6*16,7+7*16,8+8*16);
+	$red		= imagecolorallocate($im, 255, 0, 0);
+	$darkred	= imagecolorallocate($im, 150, 0, 0);
+	$green		= imagecolorallocate($im, 0, 255, 0);
+	$darkgreen	= imagecolorallocate($im, 0, 150, 0);
+	$bluei		= imagecolorallocate($im, 0, 0, 255);
+	$darkblue	= imagecolorallocate($im, 0, 0, 150);
+	$yellow		= imagecolorallocate($im, 255, 255, 0);
+	$darkyellow	= imagecolorallocate($im, 150, 150, 0);
+	$cyan		= imagecolorallocate($im, 0, 255, 255);
+	$black		= imagecolorallocate($im, 0, 0, 0);
+	$gray		= imagecolorallocate($im, 150, 150, 150);
+	$white		= imagecolorallocate($im, 255, 255, 255);
+	$bg			= imagecolorallocate($im, 6+6*16, 7+7*16, 8+8*16);
 
 	$x=imagesx($im);
 	$y=imagesy($im);
 
-	imagefilledrectangle($im,0,0,$x,$y,$white);
-	imagerectangle($im,0,0,$x-1,$y-1,$black);
+	imagefilledrectangle($im, 0, 0, $x, $y, $white);
+	imagerectangle($im, 0, 0, $x-1, $y-1, $black);
 
 	$str = expand_trigger_description_by_data($db_data);
 
 	$d = zbx_date2str('Y');
 	$str = _s('%1$s (year %2$s)', $str, $d);
 	$x = imagesx($im)/2-imagefontwidth(4)*zbx_strlen($str)/2;
-	//imagestring($im, 4,$x,1, $str , $darkred);
 	imageText($im, 10, 0, $x, 14, $darkred, $str);
 
 	$now = time(NULL);
@@ -96,19 +95,19 @@ require_once('include/page_header.php');
 	$false = array();
 	$unknown = array();
 
-	$start=mktime(0,0,0,1,1,date('Y'));
+	$start=mktime(0, 0, 0, 1, 1, date('Y'));
 
-	$wday=date('w',$start);
+	$wday=date('w', $start);
 	if($wday==0) $wday=7;
 	$start = $start - ($wday - 1) * SEC_PER_DAY;
 
 	$weeks = (int)(date('z')/7 +1);
 
-	for($i=0;$i<$weeks;$i++){
+	for ($i=0; $i<$weeks; $i++) {
 		$period_start = $start + SEC_PER_WEEK * $i;
 		$period_end = $start + SEC_PER_WEEK * ($i + 1);
 
-		$stat=calculate_availability($_REQUEST['triggerid'],$period_start,$period_end);
+		$stat=calculate_availability($_REQUEST['triggerid'], $period_start, $period_end);
 		$true[$i]=$stat['true'];
 		$false[$i]=$stat['false'];
 		$unknown[$i]=$stat['unknown'];
@@ -116,15 +115,14 @@ require_once('include/page_header.php');
 //SDI($false[$i]);
 	}
 
-	for($i=0;$i<=$sizeY;$i+=$sizeY/10){
-		DashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
+	for ($i=0; $i<=$sizeY; $i+=$sizeY/10) {
+		DashedLine($im, $shiftX, $i+$shiftYup, $sizeX+$shiftX, $i+$shiftYup, $gray);
 	}
 
 
-	for($i=0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52){
-		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		//imagestringup($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, zbx_date2str(S_CHART4_TIMELINE_DATE_FORMAT,$period_start) , $black);
-		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, zbx_date2str(S_CHART4_TIMELINE_DATE_FORMAT,$period_start));
+	for ($i=0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52) {
+		DashedLine($im, $i+$shiftX, $shiftYup, $i+$shiftX, $sizeY+$shiftYup, $gray);
+		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, zbx_date2str(S_CHART4_TIMELINE_DATE_FORMAT, $period_start));
 
 		$period_start += SEC_PER_WEEK;
 	}
@@ -141,20 +139,18 @@ require_once('include/page_header.php');
 //		imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,0,0,0)); 	// WHITE
 
 		$yt=$sizeY*$true[$i-1]/100;
-		if($yt > 0) imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$yt+$shiftYup,imagecolorallocate($im,235,120,120));	// RED
+		if($yt > 0) imagefilledrectangle($im, $x1+$shiftX, $shiftYup, $x1+$shiftX+8, $yt+$shiftYup, imagecolorallocate($im, 235, 120, 120));	// RED
 
 		$yu=(int)($sizeY*$unknown[$i-1]/100+0.5);
-		if($yu > 0) imagefilledrectangle($im,$x1+$shiftX,$yt+$shiftYup,$x1+$shiftX+8,$yt+$yu+$shiftYup,imagecolorallocate($im,235,235,235)); 	// UNKNOWN
+		if($yu > 0) imagefilledrectangle($im, $x1+$shiftX, $yt+$shiftYup, $x1+$shiftX+8, $yt+$yu+$shiftYup, imagecolorallocate($im, 235, 235, 235)); 	// UNKNOWN
 
 		$yf=$sizeY*$false[$i-1]/100;
-		if($yf > 0) imagefilledrectangle($im,$x1+$shiftX,$yt+$yu+$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,120,235,120));  // GREEN
+		if($yf > 0) imagefilledrectangle($im, $x1+$shiftX, $yt+$yu+$shiftYup, $x1+$shiftX+8, $sizeY+$shiftYup, imagecolorallocate($im, 120, 235, 120));  // GREEN
 
-//SDI($yt.'+'.$yf.'+'.$yu);
-		if($yt+$yf+$yu > 0) imagerectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,$black);
+		if($yt+$yf+$yu > 0) imagerectangle($im, $x1+$shiftX, $shiftYup, $x1+$shiftX+8, $sizeY+$shiftYup, $black);
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10){
-		//imagestring($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
 		imageText($im, 7, 0, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup+8, $darkred, $i*($maxY-$minY)/$sizeY+$minY);
 	}
 
@@ -172,8 +168,7 @@ require_once('include/page_header.php');
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$black);
 	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*2+45, $black, S_UNKNOWN." (%)");
 
-	imagestringup($im,0,imagesx($im)-10,imagesy($im)-50, 'http://www.zabbix.com', $gray);
-
+	imagestringup($im, 0, imagesx($im)-10, imagesy($im)-50, 'http://www.zabbix.com', $gray);
 
 	$str = sprintf('%0.2f', microtime(true) - $start_time);
 	$str = _s('Generated in %s sec', $str);

@@ -204,18 +204,18 @@ function bar_report_form(){
 	$reportForm->addVar('report_timesince', date('YmdHis', $report_timesince));
 	$reportForm->addVar('report_timetill',  date('YmdHis', $report_timetill));
 
-	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
-	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
-	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
-	$reportForm->addRow(S_LEGEND, new CCheckBox('showlegend',$showlegend,null,1));
+	$reportForm->addRow(_('Title'), new CTextBox('title',$title,40));
+	$reportForm->addRow(_('X label'), new CTextBox('xlabel',$xlabel,40));
+	$reportForm->addRow(_('Y label'), new CTextBox('ylabel',$ylabel,40));
+	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend',$showlegend,null,1));
 
 	$scale = new CComboBox('scaletype', $scaletype);
-		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, S_HOURLY);
-		$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	S_DAILY);
-		$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	S_WEEKLY);
-		$scale->addItem(TIMEPERIOD_TYPE_MONTHLY,S_MONTHLY);
-		$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	S_YEARLY);
-	$reportForm->addRow(S_SCALE, $scale);
+		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
+		$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
+		$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
+		$scale->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
+		$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
+	$reportForm->addRow(_('Scale'), $scale);
 
 //*
 
@@ -366,21 +366,21 @@ function bar_report_form2(){
 	$reportForm->addVar('items',$items);
 // periods add later
 
-	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
-	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
-	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
+	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
+	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
+	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
 
-	$reportForm->addRow(S_LEGEND, new CCheckBox('showlegend',$showlegend,null,1));
+	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
 
-	if(count($periods) < 2){
+	if (count($periods) < 2) {
 		$sortCmb = new CComboBox('sorttype', $sorttype);
-			$sortCmb->addItem(0, S_NAME);
-			$sortCmb->addItem(1, S_VALUE);
+			$sortCmb->addItem(0, _('Name'));
+			$sortCmb->addItem(1, _('Value'));
 
-		$reportForm->addRow(S_SORT_BY,$sortCmb);
+		$reportForm->addRow(_('Sort by'), $sortCmb);
 	}
-	else{
-		$reportForm->addVar('sortorder',0);
+	else {
+		$reportForm->addVar('sortorder', 0);
 	}
 
 //*/
@@ -515,12 +515,12 @@ function bar_report_form3(){
 //	$reportForm->addVar('items',$items); 				//params are set later!!
 //	$reportForm->addVar('periods',$periods);
 
-	$reportForm->addRow(S_TITLE, new CTextBox('title',$title,40));
-	$reportForm->addRow(S_X.SPACE.S_LABEL, new CTextBox('xlabel',$xlabel,40));
-	$reportForm->addRow(S_Y.SPACE.S_LABEL, new CTextBox('ylabel',$ylabel,40));
+	$reportForm->addRow(_('Title'), new CTextBox('title', $title, 40));
+	$reportForm->addRow(_('X label'), new CTextBox('xlabel', $xlabel, 40));
+	$reportForm->addRow(_('Y label'), new CTextBox('ylabel', $ylabel, 40));
 
-	$reportForm->addRow(S_LEGEND, new CCheckBox('showlegend',$showlegend,null,1));
-	$reportForm->addVar('sortorder',0);
+	$reportForm->addRow(_('Legend'), new CCheckBox('showlegend', $showlegend, null, 1));
+	$reportForm->addVar('sortorder', 0);
 
 // GROUPS
 	$groupids = get_request('groupids', array());
@@ -538,7 +538,7 @@ function bar_report_form3(){
 		$group_tb->addItem($group['groupid'],$group['name']);
 	}
 
-	$reportForm->addRow(S_GROUPS, $group_tb->Get(S_SELECTED_GROUPS,S_OTHER.SPACE.S_GROUPS));
+	$reportForm->addRow(_('Groups'), $group_tb->Get(_('Selected groups'), _('Other groups')));
 // ----------
 
 // HOSTS
@@ -583,7 +583,7 @@ function bar_report_form3(){
 			$host_tb->addItem($host['hostid'],$host['name']);
 	}
 
-	$reportForm->addRow(S_HOSTS, $host_tb->Get(S_SELECTED_HOSTS,array(S_OTHER.SPACE.S_HOSTS.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
+	$reportForm->addRow(_('Hosts'), $host_tb->Get(_('Selected hosts'), array(_('Other hosts | Group').SPACE, $cmbGroups)));
 // ----------
 //*/
 // PERIOD

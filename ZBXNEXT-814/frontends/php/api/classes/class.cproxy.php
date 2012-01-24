@@ -48,15 +48,15 @@ class CProxy extends CZBXAPI {
 	 */
 	public function get($options = array()) {
 		$result = array();
-		$user_type = self::$userData['type'];
+		$userType = self::$userData['type'];
 
 		// allowed columns for sorting
-		$sort_columns = array('hostid', 'host', 'status');
+		$sortColumns = array('hostid', 'host', 'status');
 
 		// allowed output options for [ select_* ] params
-		$subselects_allowed_outputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
-		$sql_parts = array(
+		$sqlParts = array(
 			'select'	=> array('hostid' => 'h.hostid'),
 			'from'		=> array('hosts' => 'hosts h'),
 			'where'		=> array('h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'),
@@ -64,7 +64,7 @@ class CProxy extends CZBXAPI {
 			'limit'		=> null
 		);
 
-		$def_options = array(
+		$defOptions = array(
 			'nodeids'					=> null,
 			'proxyids'					=> null,
 			'editable'					=> null,
@@ -87,26 +87,26 @@ class CProxy extends CZBXAPI {
 			'sortorder'					=> '',
 			'limit'						=> null
 		);
-		$options = zbx_array_merge($def_options, $options);
+		$options = zbx_array_merge($defOptions, $options);
 
 		if (is_array($options['output'])) {
-			unset($sql_parts['select']['hosts']);
+			unset($sqlParts['select']['hosts']);
 
 			$dbTable = DB::getSchema('hosts');
-			$sql_parts['select']['hostid'] = 'h.hostid';
+			$sqlParts['select']['hostid'] = 'h.hostid';
 			foreach ($options['output'] as $field) {
 				if ($field == 'proxyid') {
 					continue;
 				}
 				if (isset($dbTable['fields'][$field])) {
-					$sql_parts['select'][$field] = 'h.'.$field;
+					$sqlParts['select'][$field] = 'h.'.$field;
 				}
 			}
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
 		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $user_type || $options['nopermissions']) {
+		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
@@ -121,72 +121,72 @@ class CProxy extends CZBXAPI {
 		// proxyids
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
-			$sql_parts['where'][] = DBcondition('h.hostid', $options['proxyids']);
+			$sqlParts['where'][] = DBcondition('h.hostid', $options['proxyids']);
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			zbx_db_filter('hosts h', $options, $sql_parts);
+			zbx_db_filter('hosts h', $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('hosts h', $options, $sql_parts);
+			zbx_db_search('hosts h', $options, $sqlParts);
 		}
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sql_parts['select']['hostid'] = 'h.hostid';
-			$sql_parts['select']['host'] = 'h.host';
-			$sql_parts['select']['status'] = 'h.status';
-			$sql_parts['select']['lastaccess'] = 'h.lastaccess';
+			$sqlParts['select']['hostid'] = 'h.hostid';
+			$sqlParts['select']['host'] = 'h.host';
+			$sqlParts['select']['status'] = 'h.status';
+			$sqlParts['select']['lastaccess'] = 'h.lastaccess';
 		}
 
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sql_parts['select'] = array('count(DISTINCT h.hostid) as rowscount');
+			$sqlParts['select'] = array('count(DISTINCT h.hostid) as rowscount');
 		}
 
 		// sorting
-		zbx_db_sorting($sql_parts, $options, $sort_columns, 'h');
+		zbx_db_sorting($sqlParts, $options, $sortColumns, 'h');
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
+			$sqlParts['limit'] = $options['limit'];
 		}
 
 		$proxyids = array();
 
-		$sql_parts['select'] = array_unique($sql_parts['select']);
-		$sql_parts['from'] = array_unique($sql_parts['from']);
-		$sql_parts['where'] = array_unique($sql_parts['where']);
-		$sql_parts['order'] = array_unique($sql_parts['order']);
+		$sqlParts['select'] = array_unique($sqlParts['select']);
+		$sqlParts['from'] = array_unique($sqlParts['from']);
+		$sqlParts['where'] = array_unique($sqlParts['where']);
+		$sqlParts['order'] = array_unique($sqlParts['order']);
 
-		$sql_select = '';
-		$sql_from = '';
-		$sql_where = '';
-		$sql_order = '';
-		if (!empty($sql_parts['select'])) {
-			$sql_select .= implode(',', $sql_parts['select']);
+		$sqlSelect = '';
+		$sqlFrom = '';
+		$sqlWhere = '';
+		$sqlOrder = '';
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
-		if (!empty($sql_parts['from'])) {
-			$sql_from .= implode(',', $sql_parts['from']);
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
 		}
-		if (!empty($sql_parts['where'])) {
-			$sql_where .= ' AND '.implode(' AND ', $sql_parts['where']);
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
 		}
-		if (!empty($sql_parts['order'])) {
-			$sql_order .= ' ORDER BY '.implode(',', $sql_parts['order']);
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
-		$sql_limit = $sql_parts['limit'];
+		$sqlLimit = $sqlParts['limit'];
 
-		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
-				FROM '.$sql_from.'
+		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
+				FROM '.$sqlFrom.'
 				WHERE '.DBin_node('h.hostid', $nodeids).
-					$sql_where.
-					$sql_order;
-		$res = DBselect($sql, $sql_limit);
+					$sqlWhere.
+					$sqlOrder;
+		$res = DBselect($sql, $sqlLimit);
 		while ($proxy = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $proxy['rowscount'];
@@ -223,14 +223,14 @@ class CProxy extends CZBXAPI {
 		 */
 		// selectHosts
 		if (!is_null($options['selectHosts'])) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'proxyids' => $proxyids,
 				'preservekeys' => true
 			);
-			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselects_allowed_outputs)) {
-				$obj_params['output'] = $options['selectHosts'];
-				$hosts = API::Host()->get($obj_params);
+			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+				$objParams['output'] = $options['selectHosts'];
+				$hosts = API::Host()->get($objParams);
 				foreach ($hosts as $host) {
 					$result[$host['proxy_hostid']]['hosts'][] = $host;
 				}
@@ -239,15 +239,15 @@ class CProxy extends CZBXAPI {
 
 		// adding hostinterfaces
 		if (!is_null($options['selectInterfaces'])) {
-			$obj_params = array(
+			$objParams = array(
 				'nodeids' => $nodeids,
 				'hostids' => $proxyids,
 				'nopermissions' => true,
 				'preservekeys' => true
 			);
-			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselects_allowed_outputs)) {
-				$obj_params['output'] = $options['selectInterfaces'];
-				$interfaces = API::HostInterface()->get($obj_params);
+			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselectsAllowedOutputs)) {
+				$objParams['output'] = $options['selectInterfaces'];
+				$interfaces = API::HostInterface()->get($objParams);
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
@@ -268,10 +268,10 @@ class CProxy extends CZBXAPI {
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectInterfaces']) {
-				$obj_params['countOutput'] = 1;
-				$obj_params['groupCount'] = 1;
+				$objParams['countOutput'] = 1;
+				$objParams['groupCount'] = 1;
 
-				$interfaces = API::HostInterface()->get($obj_params);
+				$interfaces = API::HostInterface()->get($objParams);
 				$interfaces = zbx_toHash($interfaces, 'hostid');
 				foreach ($result as $proxyid => $proxy) {
 					if (isset($interfaces[$proxyid])) {
@@ -291,21 +291,21 @@ class CProxy extends CZBXAPI {
 		return $result;
 	}
 
-	protected function checkInput(&$proxies, $method){
+	protected function checkInput(&$proxies, $method) {
 
 
 		$create = ($method == 'create');
 		$update = ($method == 'update');
 		$delete = ($method == 'delete');
 
-		foreach($proxies as $inum => &$proxy){
-			if(isset($proxy['proxyid'])) $proxy['hostid'] = $proxy['proxyid'];
-			if(isset($proxy['hostid'])) $proxy['proxyid'] = $proxy['hostid'];
+		foreach ($proxies as $inum => &$proxy) {
+			if (isset($proxy['proxyid'])) $proxy['hostid'] = $proxy['proxyid'];
+			if (isset($proxy['hostid'])) $proxy['proxyid'] = $proxy['hostid'];
 		}
 		unset($proxy);
 
 // permissions
-		if($update || $delete){
+		if ($update || $delete) {
 			$proxyDBfields = array('proxyid'=> null);
 			$dbProxies = $this->get(array(
 				'output' => array('proxyid', 'hostid', 'host', 'status'),
@@ -320,32 +320,32 @@ class CProxy extends CZBXAPI {
 
 
 		foreach ($proxies as &$proxy) {
-			if(!check_db_fields($proxyDBfields, $proxy)){
+			if (!check_db_fields($proxyDBfields, $proxy)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Wrong fields for proxy [ '.$proxy['host'].' ]');
 			}
 
-			if($update || $delete){
-				if(!isset($dbProxies[$proxy['proxyid']]))
+			if ($update || $delete) {
+				if (!isset($dbProxies[$proxy['proxyid']]))
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if(isset($proxy['status']) && ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE)){
-					if($dbProxies[$proxy['proxyid']]['status'] == $proxy['status'])
+				if (isset($proxy['status']) && ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE)) {
+					if ($dbProxies[$proxy['proxyid']]['status'] == $proxy['status'])
 						unset($proxy['status']);
-					else if(!isset($proxy['interfaces']))
+					elseif (!isset($proxy['interfaces']))
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s".', $proxy['host']));
 				}
 
-				if($delete) $proxy['host'] = $dbProxies[$proxy['proxyid']]['host'];
+				if ($delete) $proxy['host'] = $dbProxies[$proxy['proxyid']]['host'];
 			}
 			else{
-				if(USER_TYPE_SUPER_ADMIN != self::$userData['type'])
+				if (USER_TYPE_SUPER_ADMIN != self::$userData['type'])
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
-				if(($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) && !isset($proxy['interfaces']))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s"',$proxy['host']));
+				if (($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) && !isset($proxy['interfaces']))
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s"', $proxy['host']));
 			}
 
-			if($delete) continue;
+			if ($delete) continue;
 
 			if (isset($proxy['interfaces'])) {
 				if (!is_array($proxy['interfaces']) || empty($proxy['interfaces'])) {
@@ -359,16 +359,16 @@ class CProxy extends CZBXAPI {
 				$proxy['interfaces'][0]['main'] = INTERFACE_PRIMARY;
 			}
 
-			if(isset($proxy['host'])){
-				if(!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Proxy name "%s".',$proxy['host']));
+			if (isset($proxy['host'])) {
+				if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect characters used for Proxy name "%s".', $proxy['host']));
 				}
 
 				$proxiesExists = $this->get(array(
 					'filter' => array('host' => $proxy['host'])
 				));
 				foreach ($proxiesExists as $proxyExists) {
-					if(!$update || (bccomp($proxyExists['proxyid'],$proxy['proxyid']) != 0)){
+					if (!$update || (bccomp($proxyExists['proxyid'], $proxy['proxyid']) != 0)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host "%s" already exists.', $proxy['host']));
 					}
 				}
@@ -378,7 +378,7 @@ class CProxy extends CZBXAPI {
 	}
 
 
-	public function create($proxies){
+	public function create($proxies) {
 		$proxies = zbx_toArray($proxies);
 
 		$this->checkInput($proxies, __FUNCTION__);
@@ -415,7 +415,7 @@ class CProxy extends CZBXAPI {
 	}
 
 
-	public function update($proxies){
+	public function update($proxies) {
 		$proxies = zbx_toArray($proxies);
 		$proxyids = array();
 
@@ -431,7 +431,7 @@ class CProxy extends CZBXAPI {
 				'where' => array('hostid' => $proxy['proxyid'])
 			);
 
-			if(!isset($proxy['hosts'])) continue;
+			if (!isset($proxy['hosts'])) continue;
 
 			$hostUpdate[] = array(
 				'values' => array('proxy_hostid' => 0),
@@ -450,9 +450,9 @@ class CProxy extends CZBXAPI {
 					'output' => API_OUTPUT_REFER,
 					'hostids' => $proxy['hostid']
 				));
-				$interfaceIds = zbx_objectValues($interfaces, 'interfaceid');
-				if ($interfaceIds) {
-					API::HostInterface()->delete($interfaceIds);
+				$interfaceids = zbx_objectValues($interfaces, 'interfaceid');
+				if ($interfaceids) {
+					API::HostInterface()->delete($interfaceids);
 				}
 			}
 			// update the interface of a passive proxy
@@ -503,9 +503,9 @@ class CProxy extends CZBXAPI {
 				' FROM conditions'.
 				' WHERE conditiontype='.CONDITION_TYPE_PROXY.
 					' AND '.DBcondition('value', $proxyids);
-		$db_actions = DBselect($sql);
-		while ($db_action = DBfetch($db_actions)) {
-			$actionids[$db_action['actionid']] = $db_action['actionid'];
+		$dbActions = DBselect($sql);
+		while ($dbAction = DBfetch($dbActions)) {
+			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
 		}
 
 		if (!empty($actionids)) {
@@ -539,9 +539,9 @@ class CProxy extends CZBXAPI {
 		DB::delete('hosts', array('hostid'=>$proxyids));
 
 // TODO: remove info from API
-		foreach($proxies as $hnum => $proxy) {
+		foreach ($proxies as $hnum => $proxy) {
 			info(_s('Proxy "%1$s" has been deleted from the system.', $proxy['host']));
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_PROXY,'['.$proxy['host'].' ] ['.$proxy['hostid'].']');
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_PROXY, '['.$proxy['host'].' ] ['.$proxy['hostid'].']');
 		}
 
 		return array('proxyids' => $proxyids);

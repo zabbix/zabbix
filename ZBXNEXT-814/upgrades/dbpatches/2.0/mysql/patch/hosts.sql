@@ -60,7 +60,7 @@ ALTER TABLE items
 	ADD port varchar(64) DEFAULT '' NOT NULL,
 	ADD description text NOT NULL,
 	ADD inventory_link integer DEFAULT '0' NOT NULL,
-	ADD lifetime varchar(64) DEFAULT '0' NOT NULL;
+	ADD lifetime varchar(64) DEFAULT '30' NOT NULL;
 
 UPDATE items SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_items_itemid (itemid bigint unsigned PRIMARY KEY);

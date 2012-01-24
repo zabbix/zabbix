@@ -816,6 +816,7 @@ switch($itemType) {
 			'selectTriggers' => API_OUTPUT_REFER,
 			'selectApplications' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectItemDiscovery' => array('ts_delete'),
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => ($config['search_limit']+1)
@@ -1038,12 +1039,25 @@ switch($itemType) {
 				($item['status']? 'activate':'disable'), item_status2style($item['status'])));
 
 
-			if(zbx_empty($item['error'])){
+			// error icon
+			if (zbx_empty($item['error'])) {
 				$error = new CDiv(SPACE, 'status_icon iconok');
 			}
-			else{
+			else {
 				$error = new CDiv(SPACE, 'status_icon iconerror');
 				$error->setHint($item['error'], '', 'on');
+			}
+			$statusIcons = array($error);
+
+			// discovered item lifetime indicator
+			$tsDelete = false;
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
+				$tsDelete = $item['itemDiscovery']['ts_delete'];
+
+				$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
+				$hintText = _s('The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).', zbx_date2age($tsDelete), zbx_date2str(_('d M Y'), $tsDelete), zbx_date2str(_('H:i:s'), $tsDelete));
+				$deleteError->setHint($hintText);
+				$statusIcons[] = $deleteError;
 			}
 
 
@@ -1059,10 +1073,10 @@ switch($itemType) {
 
 			$trigger_hint = new CTableInfo();
 			$trigger_hint->setHeader(array(
-				S_SEVERITY,
-				S_NAME,
+				_('Severity'),
+				_('Name'),
 				_('Expression'),
-				S_STATUS
+				_('Status')
 			));
 
 // TRIGGERS INFO
@@ -1176,7 +1190,7 @@ switch($itemType) {
 				item_type2str($item['type']),
 				new CCol($applications, 'wraptext'),
 				$status,
-				$error
+				$statusIcons
 			));
 		}
 

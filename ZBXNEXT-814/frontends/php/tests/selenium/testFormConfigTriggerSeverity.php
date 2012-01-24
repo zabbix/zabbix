@@ -21,9 +21,9 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormConfigTriggerSeverity extends CWebTest{
+class testFormConfigTriggerSeverity extends CWebTest {
 	// Data provider
-	public static function providerTriggerSeverity(){
+	public static function providerTriggerSeverity() {
 		// array of data, saveResult, db fields value
 		// if saveResult is false. values should not change
 		$data = array(
@@ -109,8 +109,8 @@ class testFormConfigTriggerSeverity extends CWebTest{
 	}
 
 
-	public function testFormTriggerSeverity_Layout(){
-		$this->login('config.php');
+	public function testFormTriggerSeverity_Layout() {
+		$this->login('adm.gui.php');
 		$this->assertTitle('Configuration of Zabbix');
 
 		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
@@ -148,33 +148,32 @@ class testFormConfigTriggerSeverity extends CWebTest{
 	/**
 	 * @dataProvider providerTriggerSeverity
 	 */
-	public function testFormTriggerSeverity_Update($data, $resultSave, $DBvalues){
+	public function testFormTriggerSeverity_Update($data, $resultSave, $DBvalues) {
 		DBsave_tables('config');
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
+		$this->login('adm.triggerseverities.php');
 
-		foreach($data as $field => $value){
+		foreach ($data as $field => $value) {
 			$this->input_type($field, $value);
 		}
 
-		$sql = 'SELECT ' . implode(', ', array_keys($data)) . ' FROM config';
-		if(!$resultSave){
+		$sql = 'SELECT '.implode(', ', array_keys($data)).' FROM config';
+		if (!$resultSave) {
 			$DBhash = DBhash($sql);
 		}
 
 		$this->click('save');
 		$this->wait();
 
-		if($resultSave){
+		if ($resultSave) {
 			$this->ok('Configuration updated');
 
 			$dbres = DBfetch(DBselect($sql));
-			foreach($dbres as $field => $value){
+			foreach ($dbres as $field => $value) {
 				$this->assertEquals($value, $DBvalues[$field], "Value for '$field' was not updated.");
 			}
 		}
-		else{
+		else {
 			$this->ok('ERROR:');
 			$this->assertEquals($DBhash, DBhash($sql), "DB fields changed after unsuccessful save.");
 		}

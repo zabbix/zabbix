@@ -21,9 +21,8 @@
 <?php
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
-class testFormLogin extends CWebTest
-{
-	public function testFormLogin_LoginOK(){
+class testFormLogin extends CWebTest {
+	public function testFormLogin_LoginOK() {
 		$this->login('dashboard.php');
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
@@ -31,8 +30,8 @@ class testFormLogin extends CWebTest
 		$this->ok('Username');
 		$this->ok('Password');
 
-		$this->input_type('name','Admin');
-		$this->input_type('password','zabbix');
+		$this->input_type('name', 'Admin');
+		$this->input_type('password', 'zabbix');
 		$this->click('enter');
 		$this->wait();
 
@@ -40,7 +39,7 @@ class testFormLogin extends CWebTest
 		$this->nok('Login name');
 	}
 
-	public function testFormLogin_LoginIncorrectPassword(){
+	public function testFormLogin_LoginIncorrectPassword() {
 		$this->login('dashboard.php');
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
@@ -48,8 +47,8 @@ class testFormLogin extends CWebTest
 		$this->ok('Username');
 		$this->ok('Password');
 
-		$this->input_type('name','Admin');
-		$this->input_type('password','!@$#%$&^*(\"\'\\*;:');
+		$this->input_type('name', 'Admin');
+		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->click('enter');
 		$this->wait();
 		$this->ok('Login name or password is incorrect');
@@ -57,25 +56,25 @@ class testFormLogin extends CWebTest
 		$this->ok('Password');
 
 		$sql="select * from users where alias='Admin' and attempt_failed>0";
-		$this->assertEquals(1,DBcount($sql),"Chuck Norris: Field users.attempt_failed should not be zero after incorrect login.");
+		$this->assertEquals(1, DBcount($sql), "Chuck Norris: Field users.attempt_failed should not be zero after incorrect login.");
 		$sql="select * from users where alias='Admin' and attempt_clock>0";
-		$this->assertEquals(1,DBcount($sql),"Chuck Norris: Field users.attempt_clock should not be zero after incorrect login.");
+		$this->assertEquals(1, DBcount($sql), "Chuck Norris: Field users.attempt_clock should not be zero after incorrect login.");
 		$sql="select * from users where alias='Admin' and attempt_ip<>''";
-		$this->assertEquals(1,DBcount($sql),"Chuck Norris: Field users.attempt_ip should not be empty after incorrect login.");
+		$this->assertEquals(1, DBcount($sql), "Chuck Norris: Field users.attempt_ip should not be empty after incorrect login.");
 	}
 
-	public function testFormLogin_LoginAfterIncorrectLogin(){
+	public function testFormLogin_LoginAfterIncorrectLogin() {
 		// TODO
-		// Make sure to check for 'N  failed login attempts logged. Last failed attempt was from';
+		// Make sure to check for 'N failed login attempts logged. Last failed attempt was from';
 		$this->markTestIncomplete();
 	}
 
-	public function testFormLogin_BlockAccount(){
+	public function testFormLogin_BlockAccount() {
 		// TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds(){
+	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
 		// TODO
 		$this->markTestIncomplete();
 	}
