@@ -233,7 +233,7 @@ else {
 		$valuemapComboBox->addItem($valuemap['valuemapid'], get_node_name_by_elid($valuemap['valuemapid'], null, ': ').$valuemap['name']);
 	}
 }
-$link = new CLink(_('show value mappings'), 'config.php?config=6');
+$link = new CLink(_('show value mappings'), 'adm.valuemapping.php');
 $link->setAttribute('target', '_blank');
 $itemFormList->addRow(_('Show value'), array($valuemapComboBox, SPACE, $link), null, 'row_valuemap');
 $itemFormList->addRow(_('Allowed hosts'), new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE), false, 'row_trapper_hosts');

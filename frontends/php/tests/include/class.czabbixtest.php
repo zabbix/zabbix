@@ -27,7 +27,7 @@ require_once(dirname(__FILE__).'/dbfunc.php');
 class CZabbixTest extends PHPUnit_Framework_TestCase {
 	public $ID = 0;
 
-	function do_post_request($data, &$debug){
+	function do_post_request($data, &$debug) {
 		global $URL;
 
 		if (is_array($data)) $data = json_encode($data);

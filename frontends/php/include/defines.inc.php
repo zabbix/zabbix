@@ -421,6 +421,9 @@ define('ALERT_STATUS_FAILED',		2);
 define('ALERT_TYPE_MESSAGE',		0);
 define('ALERT_TYPE_COMMAND',		1);
 
+define('MEDIA_TYPE_STATUS_ACTIVE',	0);
+define('MEDIA_TYPE_STATUS_DISABLED',1);
+
 define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);

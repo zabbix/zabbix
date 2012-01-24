@@ -19,12 +19,10 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageDashboard extends CWebTest
-{
-	public function testPageDashboard_CheckLayout()
-	{
+class testPageDashboard extends CWebTest {
+	public function testPageDashboard_CheckLayout() {
 		$this->login('dashboard.php');
 		$this->assertTitle('Dashboard');
 		$this->ok('PERSONAL DASHBOARD');
@@ -40,8 +38,7 @@ class testPageDashboard extends CWebTest
 	}
 
 // Check that no real host or template names displayed
-	public function testPageDashboard_NoHostNames()
-	{
+	public function testPageDashboard_NoHostNames() {
 		$this->login('dashboard.php');
 		$this->assertTitle('Dashboard');
 		$this->checkNoRealHostnames();

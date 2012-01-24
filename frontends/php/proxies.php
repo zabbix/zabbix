@@ -289,7 +289,7 @@
 //----- GO ------
 		$goBox = new CComboBox('go');
 
-		$goOption = new CComboItem('activate', _('Activate selected'));
+		$goOption = new CComboItem('activate', _('Enable selected'));
 		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_PROXIES);
 		$goBox->addItem($goOption);
 

@@ -173,6 +173,9 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/core/CAutoloader.php -text
+frontends/php/include/classes/core/Z.php -text
+frontends/php/include/classes/core/ZBase.php -text
 frontends/php/include/views/configuration.item.copy.php -text
 frontends/php/include/views/configuration.item.discovery.list.php -text
 frontends/php/include/views/configuration.item.edit.php -text
@@ -239,6 +242,7 @@ frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/selenium/testFormAdministrationGeneralTriggerSeverities.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -515,6 +519,8 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
+src/libs/zbxsysinfo/osx/boottime.c -text
+src/libs/zbxsysinfo/osx/net.c -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text

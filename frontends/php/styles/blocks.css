@@ -75,18 +75,6 @@ div.messagecontainer .messagebox span.body { line-height: 14px; font-size: 7pt; 
 div.messagecontainer .messagebox span.body a { color: #EAEAEA; line-height: 14px; font-size: 7pt; white-space: nowrap; }
 
 /************************************************************/
-/*						SEARCH Suggest						*/
-/************************************************************/
-div input.search { padding: 1px; width: 16em; }
-div.suggest {
-	position: absolute;
-	border: 1px #5C7099 solid;
-	width: 162px;
-	z-index: 100;
-	display: none;
-}
-
-/************************************************************/
 /*					SCROLLBAR III STYLES					*/
 /************************************************************/
 div.scrollbar {
@@ -412,8 +400,14 @@ div.calendar input.calendar_textbox {
 #color_picker a { text-decoration: none; padding: 0; margin: 0; }
 /************ END OF COLOR PICKER ***********/
 
-.zbx_search { padding-top: 1px; font-weight:bold; float:right; height: 18px; min-width: 228px; }
-.zbx_search input[type=text] { margin-right: 0; vertical-align:top; padding: 0 2px; height: 16px; width: 160px; border-right: 0; border-color: #9DB2CD; }
+#zbx_search { padding-top: 1px; font-weight:bold; float:right; height: 18px; min-width: 228px; }
+#zbx_search input[type=text] { margin-right: 0; vertical-align: top; padding: 0 2px; height: 16px; width: 160px;
+	border-right: 0; border-color: #9DB2CD; }
+#zbx_search input.button { margin: 0 3px 0 0; height: 18px; line-height: 17px; padding-top: 0; padding-bottom: 0; }
+#search_wdgt { padding: 5px; }
+#search_wdgt .widget { display: inline-block; }
+
+div.suggest { position: absolute; border: 1px #5C7099 solid; width: 162px; z-index: 100; display: none; }
 
 /**************** TRIGGER DISPLAYING FORM ***************/
 div.trigger_displaying_form_col { width: 12em; zoom:1; *display: inline; }

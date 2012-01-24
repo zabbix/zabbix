@@ -135,6 +135,9 @@ class CTag extends CObject {
 		if (is_object($value)) {
 			$value = unpack_object($value);
 		}
+		elseif (is_array($value)) {
+			$value = zbx_jsvalue($value);
+		}
 		if (!is_null($value)) {
 			$this->attributes[$name] = $value;
 		}

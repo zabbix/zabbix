@@ -23,9 +23,7 @@ include('include/views/js/administration.general.macros.js.php');
 
 $macrosForm = new CForm();
 $macrosForm->setName('macrosForm');
-$macrosForm->addVar('form', $this->data['form']);
 $macrosForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
-$macrosForm->addVar('config', get_request('config', 11));
 
 $macrosTable = new CTable(SPACE, 'formElementTable');
 $macrosTable->setAttribute('id', 'tbl_macros');

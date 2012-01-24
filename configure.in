@@ -231,120 +231,6 @@ AC_DEFINE(HAVE_SEMUN, 1, [Define to 1 if union 'semun' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
-AC_MSG_CHECKING(for struct vmtotal in sys/vmmeter.h)
-AC_TRY_COMPILE(
-[
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif /* HAVE_SYS_TYPES_H */
-
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */
-
-#include <sys/sysctl.h>
-
-#ifdef HAVE_VM_VM_PARAM_H
-#include <vm/vm_param.h>
-#endif /* HAVE_VM_VM_PARAM_H */
-
-#ifdef HAVE_SYS_VMMETER_H
-#include <sys/vmmeter.h>
-#endif /* HAVE_SYS_VMMETER_H */
-
-#ifndef NULL
-#define NULL (void *)0
-#endif
-],
-[
-	int		mib[] = {CTL_VM, VM_METER};
-	size_t		len;
-	struct vmtotal	v;
-
-	len = sizeof(struct vmtotal);
-
-	sysctl(mib, 2, &v, &len, NULL, 0);
-],
-AC_DEFINE(HAVE_SYS_VMMETER_VMTOTAL,1,[Define to 1 if struct 'vmtotal' exists.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for struct uvmexp_sysctl in uvm/uvm_extern.h)
-AC_TRY_COMPILE(
-[
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif /* HAVE_SYS_TYPES_H */
-
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */
-
-#include <sys/sysctl.h>
-
-#ifdef HAVE_VM_VM_PARAM_H
-#include <vm/vm_param.h>
-#endif /* HAVE_VM_VM_PARAM_H */
-
-#ifdef HAVE_SYS_VMMETER_H
-#include <sys/vmmeter.h>
-#endif /* HAVE_SYS_VMMETER_H */
-
-#ifndef NULL
-#define NULL (void *)0
-#endif
-],
-[
-	int			mib[] = {CTL_VM, VM_UVMEXP2};
-	size_t			len;
-	struct uvmexp_sysctl	v;
-
-	len = sizeof(struct uvmexp_sysctl);
-
-	sysctl(mib, 2, &v, &len, NULL, 0);
-],
-AC_DEFINE(HAVE_UVM_UVMEXP2,1,[Define to 1 if struct 'uvmexp_sysctl' exists.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for struct uvmexp in uvm/uvm_extern.h)
-AC_TRY_COMPILE(
-[
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif /* HAVE_SYS_TYPES_H */
-
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif /* HAVE_SYS_PARAM_H */
-
-#include <sys/sysctl.h>
-
-#ifdef HAVE_VM_VM_PARAM_H
-#include <vm/vm_param.h>
-#endif /* HAVE_VM_VM_PARAM_H */
-
-#ifdef HAVE_SYS_VMMETER_H
-#include <sys/vmmeter.h>
-#endif /* HAVE_SYS_VMMETER_H */
-
-#ifndef NULL
-#define NULL (void *)0
-#endif
-],
-[
-	int		mib[] = {CTL_VM, VM_UVMEXP};
-	size_t		len;
-	struct uvmexp	v;
-
-	len = sizeof(struct uvmexp);
-
-	sysctl(mib, 2, &v, &len, NULL, 0);
-],
-AC_DEFINE(HAVE_UVM_UVMEXP,1,[Define to 1 if struct 'uvmexp' exists.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
 AC_MSG_CHECKING(for struct swaptable in sys/swap.h)
 AC_TRY_COMPILE(
 [
@@ -879,14 +765,6 @@ AC_MSG_CHECKING(for file /proc/cpuinfo)
 if test -r /proc/cpuinfo; then
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_PROC_CPUINFO,1,[Define to 1 if file '/proc/cpuinfo' should be used.])
-else
-	AC_MSG_RESULT(no)
-fi
-
-AC_MSG_CHECKING(for file /proc/1/status)
-if test -r /proc/1/status; then
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PROC_1_STATUS,1,[Define to 1 if file '/proc/1/status' should be used.])
 else
 	AC_MSG_RESULT(no)
 fi
