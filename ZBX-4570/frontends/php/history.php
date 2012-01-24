@@ -186,7 +186,7 @@ require_once('include/page_header.php');
 
 // HEADER
 	$header = array(
-		'left' => count($items).SPACE.S_ITEMS_BIG,
+		'left' => count($items).SPACE._('ITEMS'),
 		'right' => array()
 	);
 
