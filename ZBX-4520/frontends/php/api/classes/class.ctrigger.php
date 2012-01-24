@@ -1410,21 +1410,6 @@ class CTrigger extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s:%2$s" already exists.', $trigger['description'], $trigger['expression']));
 				}
 			}
-			$mainStatus = isset($host) && isset($hosts[$host]) ? $hosts[$host]['status'] : (isset($trigger['dependencies'])) ? $this->getStatusByTriggerExpression(
-				array('output' => array('status'), 'trigger_id' => $trigger
-				)) : '' ;
-			if ((isset($trigger['dependencies']) && $mainStatus != HOST_STATUS_TEMPLATE)) {
-				$hostsData = API::Host()->get(array(
-						'triggerids' => $trigger['dependencies'],
-						'templated_hosts' => true,
-						'output' => array('status'))
-				);
-				foreach ($hostsData as $hostData) {
-					if ($hostData['status'] == HOST_STATUS_TEMPLATE) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from template to host.'));
-					}
-				}
-			}
 		}
 		unset($trigger);
 	}
@@ -2021,12 +2006,28 @@ class CTrigger extends CZBXAPI {
 	}
 
 	/**
-	 * @param $triggers
+	 * Validates the dependencies of the given triggers.
+	 *
+	 * @param array $triggers
+	 *
+	 * @trows APIException if any of the dependencies is invalid
 	 */
 	protected function validateDependencies(array $triggers) {
 		foreach ($triggers as $trigger) {
 			if (!isset($trigger['dependencies']) || empty($trigger['dependencies'])) {
 				continue;
+			}
+
+			// forbid dependencies from templates to hosts
+			if ($this->isTemplatedTrigger($trigger)) {
+				$realHosts = API::Host()->get(array(
+					'triggerids' => $trigger['dependencies'],
+					'output' => array('status'),
+					'limit' => 1
+				));
+				if ($realHosts) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from template to host.'));
+				}
 			}
 
 			// check circular dependency
@@ -2206,22 +2207,30 @@ class CTrigger extends CZBXAPI {
 		return count($ids) == $count;
 	}
 
-	public function getStatusByTriggerExpression($parameter) {
 
-		$expressionData = new CTriggerExpression($parameter['trigger_id']);
+	/**
+	 * Returns true if the trigger belongs to a template.
+	 *
+	 * @param array $trigger
+	 *
+	 * @return boolean
+	 */
+	public function isTemplatedTrigger(array $trigger) {
+		$expressionData = new CTriggerExpression($trigger);
 		if (!empty($expressionData->errors)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
 		}
 
-		$hosts = API::Host()->get(array(
-			'filter' => array('host' => $expressionData->data['hosts']),
-			'editable' => true,
-			'output' =>$parameter['output'],
-			'templated_hosts' => true,
-			'preservekeys' => true
+		$hosts = $this->select('hosts', array(
+			'output' => 'status',
+			'filter' => array(
+				'host' => $expressionData->data['hosts'],
+				'status' => HOST_STATUS_TEMPLATE
+			),
+			'limit' => 1
 		));
-		$hostData = reset($hosts);
-		return $hostData['status'];
+
+		return ($hosts);
 	}
 }
 ?>
