@@ -19,26 +19,22 @@
 **/
 ?>
 <?php
-$valueMappingForm = new CForm();
-$valueMappingForm->setName('valuemappingForm');
-$valueMappingForm->addVar('config', 6);
-$valueMappingForm->addItem(BR());
-
 $valueMappingTable = new CTableInfo();
 $valueMappingTable->setHeader(array(_('Name'), _('Value map')));
 
 foreach ($this->data['valuemaps'] as $valuemap) {
-	$maps = $valuemap['maps'];
-	order_result($maps, 'value');
+	order_result($valuemap['maps'], 'value');
 
 	$mappings_row = array();
-	foreach ($maps as $map) {
-		array_push($mappings_row, $map['value'], SPACE.RARR.SPACE, $map['newvalue'], BR());
+	foreach ($valuemap['maps'] as $map) {
+		$mappings_row[] = $map['value'].SPACE.RARR.SPACE.$map['newvalue'];
+		$mappings_row[] = BR();
 	}
-	$valueMappingTable->addRow(array(new CLink($valuemap['name'],'config.php?form=update&valuemapid='.$valuemap['valuemapid'].url_param('config')), empty($mappings_row) ? SPACE : $mappings_row));
+	$valueMappingTable->addRow(array(
+		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
+		$mappings_row
+	));
 }
 
-$valueMappingForm->addItem($valueMappingTable);
-
-return $valueMappingForm;
+return $valueMappingTable;
 ?>

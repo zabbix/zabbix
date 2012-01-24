@@ -42,7 +42,7 @@ function httptest_authentications($type = null) {
 
 function httptest_status2str($status = null) {
 	$statuses = array(
-		HTTPTEST_STATUS_ACTIVE => _('Active'),
+		HTTPTEST_STATUS_ACTIVE => _('Enabled'),
 		HTTPTEST_STATUS_DISABLED => _('Disabled')
 	);
 

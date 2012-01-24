@@ -28,7 +28,8 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	public function testFormAdministrationGeneralRegexp_Layout() {
 
-		$this->login('config.php');
+		$this->login('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok('CONFIGURATION OF ZABBIX');
@@ -85,12 +86,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralRegexp_Create($result, $name, $test_string, $expression, $expression_type, $exp_delimiter, $case_sensitive) {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok(array('Regular expressions', 'Name', 'Expressions'));
-
+		$this->login('adm.regexps.php');
 		// clicking "New regular expression" button
 		$this->button_click('form');
 		$this->wait();
@@ -130,9 +126,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	 */
 	public function testFormAdministrationGeneralRegexp_AddExisting($name) {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->login('adm.regexps.php');
 
 		// clicking "New regular expression" button
 		$this->button_click('form');
@@ -157,8 +151,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_AddIncorrect() {
 
 		// creating regexp without teststring
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 
 		// clicking "New regular expression" button
 		$this->button_click('form');
@@ -173,8 +166,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_AddIncorrect2() {
 
 		// Creating regexp without expression
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->button_click('form');
 		$this->wait();
 		$this->input_type('test_string', 'first test string');
@@ -188,8 +180,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Test() {
 
 		// Testing regexp using Test button in the regexp properties form
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->click('link='.$this->regexp);
 		$this->wait();
 
@@ -202,8 +193,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	public function testFormAdministrationGeneralRegexp_Test2() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		// test #2 for the result=False
 		$this->click('link='.$this->regexp);
 		$this->wait();
@@ -220,8 +210,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Clone() {
 
 		// cloning regexp
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->click('link='.$this->regexp);
 		$this->wait();
 		$this->button_click('clone');
@@ -238,8 +227,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	public function testFormAdministrationGeneralRegexp_Update() {
 
 		// Updating regexp
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->click('link='.$this->regexp);
 		$this->wait();
 		$this->input_type('rename', $this->regexp.'2');
@@ -252,8 +240,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Regexp name has not been changed in the DB');
 	}
 
-	public static function dataDelete()
-	{
+	public static function dataDelete() {
 		return array(
 			array('test_regexp2')
 		);
@@ -267,8 +254,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		DBsave_tables('regexps');
 
 		// deleting regexp using "Delete" button in the regexp properties form
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->login('adm.regexps.php');
 		$this->chooseOkOnNextConfirmation();
 		$this->click('link='.$this->regexp2);
 		$this->wait();
@@ -278,26 +264,20 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->ok(array('Regular expression deleted', 'CONFIGURATION OF ZABBIX', 'Regular expressions', 'Name', 'Expressions'));
 
 		// checking that regexp "test_regexp2" has been deleted from the DB
-		$sql1 = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($name);
-		$this->assertEquals(0, DBcount($sql1), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($name);
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
 
-		$sql2 = 'SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid and r.name='.zbx_dbstr($name);
+		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid and r.name='.zbx_dbstr($name);
 
 		// this check will fail as at this moment expressions are not deleted when deleting related regexp
-		$this->assertEquals(0, DBcount($sql2), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 
 		DBrestore_tables('regexps');
 	}
 
 	public function testFormAdministrationGeneralRegexp_DeleteAll() {
 
-		$this->login('config.php');
-		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
-		$this->ok('Regular expressions');
-		$this->ok(array('Name', 'Expressions'));
-
+		$this->login('adm.regexps.php');
 		$this->checkbox_select('all_regexps');
 		$this->dropdown_select('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
@@ -306,11 +286,11 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->wait();
 		$this->ok('Regular expression deleted');
 
-		$sql1 = 'SELECT * FROM regexps';
-		$this->assertEquals(0, DBcount($sql1), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$sql = 'SELECT * FROM regexps';
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
 
-		$sql2 = 'SELECT * FROM expressions';
-		$this->assertEquals(0, DBcount($sql2), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$sql = 'SELECT * FROM expressions';
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 	}
 }
 ?>

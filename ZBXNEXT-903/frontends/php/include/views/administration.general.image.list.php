@@ -31,7 +31,6 @@ $this->data['widget']->addHeader(_('Images'), $imageCbForm);
 // form
 $imageForm = new CForm();
 $imageForm->setName('imageForm');
-$imageForm->addVar('config', 3);
 $imageForm->addItem(BR());
 
 $imageTable = new CTable(_('No images defined.'), 'header_wide');
@@ -46,7 +45,7 @@ foreach ($this->data['images'] as $number => $image) {
 		$img = new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');
 	}
 
-	$name = new CLink($image['name'], 'config.php?form=update'.url_param('config').'&imageid='.$image['imageid']);
+	$name = new CLink($image['name'], 'adm.images.php?form=update'.'&imageid='.$image['imageid']);
 
 	$imgColumn = new CCol();
 	$imgColumn->setAttribute('align', 'center');

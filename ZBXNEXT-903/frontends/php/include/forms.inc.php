@@ -2030,7 +2030,7 @@
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
 
 		$titles = array('screen' => S_SCREEN);
 
@@ -2059,7 +2059,7 @@
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
 
 		$titles = array(
 			'host' => $template?S_TEMPLATE:S_HOST,
@@ -2067,7 +2067,7 @@
 			'item' => S_ITEM,
 			'trigger' => S_TRIGGER,
 			'graph' => S_GRAPH,
-			'screens' => S_SCREENS,
+			'screens' => _('Screens'),
 		);
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', true);
@@ -2116,7 +2116,7 @@
 		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->setHeader(array(S_ELEMENT, S_UPDATE.SPACE.S_EXISTING, S_ADD.SPACE.S_MISSING), 'bold');
+		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
 
 		$titles = array('maps' => S_MAP);
 		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){

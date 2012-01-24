@@ -42,7 +42,7 @@ class CButtonQMessage extends CSubmit {
 		$this->setAction(null);
 	}
 
-	public function setMessage($value = null){
+	public function setMessage($value = null) {
 		if (is_null($value)) {
 			$value = _('Are you sure you want perform this action?');
 		}

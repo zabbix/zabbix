@@ -592,6 +592,10 @@ const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
 
+/* media type statuses */
+#define MEDIA_TYPE_STATUS_ACTIVE	0
+#define MEDIA_TYPE_STATUS_DISABLED	1
+
 /* operation types */
 #define OPERATION_TYPE_MESSAGE		0
 #define OPERATION_TYPE_COMMAND		1
@@ -772,7 +776,8 @@ int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-#define is_uint64(src, value)	is_uint64_n(src, INT_MAX, value)
+#define ZBX_IS_UINT64_MAX_LEN	0xff
+#define is_uint64(src, value)	is_uint64_n(src, ZBX_IS_UINT64_MAX_LEN, value)
 int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
 int	is_boolean(const char *str, zbx_uint64_t *value);

@@ -1224,4 +1224,33 @@ function getDeletableHostGroups($groupids = null) {
 	}
 	return $deletable_groupids;
 }
+
+
+/**
+ * A helper function for building the value for the 'data-host-menu' attribute.
+ *
+ * @param array $host
+ * @param array $scripts
+ *
+ * @return array
+ */
+function hostMenuData(array $host, array $scripts = array()) {
+	// fetch scripts for the host JS menu
+	$menuScripts = array();
+	foreach ($scripts as $script) {
+		$menuScripts[] = array(
+			'scriptid' => $script['scriptid'],
+			'confirmation' => $script['confirmation'],
+			'name' => $script['name']
+		);
+	}
+
+	return array(
+		'scripts' => $menuScripts,
+		'hostid' => $host['hostid'],
+		'hasScreens' => (bool) $host['screens'],
+		'hasInventory' => (bool) $host['inventory']
+	);
+}
+
 ?>

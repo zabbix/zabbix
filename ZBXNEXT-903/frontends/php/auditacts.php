@@ -58,33 +58,33 @@ require_once('include/page_header.php');
 ?>
 <?php
 /* AJAX */
-	if(isset($_REQUEST['favobj'])){
-		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.auditacts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+	if (isset($_REQUEST['favobj'])) {
+		if ('filter' == $_REQUEST['favobj']) {
+			CProfile::update('web.auditacts.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 		// saving fixed/dynamic setting to profile
-		if('timelinefixedperiod' == $_REQUEST['favobj']){
+		if ('timelinefixedperiod' == $_REQUEST['favobj']) {
 			if(isset($_REQUEST['favid'])){
 				CProfile::update('web.auditacts.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
 			}
 		}
 	}
 
-	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+	if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
 		require_once('include/page_footer.php');
 		exit();
 	}
 //--------
 
 /* FILTER */
-	if(isset($_REQUEST['filter_rst'])){
+	if (isset($_REQUEST['filter_rst'])) {
 		$_REQUEST['alias'] = '';
 	}
 
-	$_REQUEST['alias'] = get_request('alias',CProfile::get('web.auditacts.filter.alias', ''));
+	$_REQUEST['alias'] = get_request('alias', CProfile::get('web.auditacts.filter.alias', ''));
 
-	if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
-		CProfile::update('web.auditacts.filter.alias',$_REQUEST['alias'], PROFILE_TYPE_STR);
+	if (isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])) {
+		CProfile::update('web.auditacts.filter.alias', $_REQUEST['alias'], PROFILE_TYPE_STR);
 	}
 // -------------
 
@@ -95,10 +95,10 @@ require_once('include/page_header.php');
 // HEADER
 	$frmForm = new CForm('get');
 
-	$cmbConf = new CComboBox('config','auditacts.php');
-	$cmbConf->setAttribute('onchange','javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('auditlogs.php',S_LOGS);
-		$cmbConf->addItem('auditacts.php',S_ACTIONS);
+	$cmbConf = new CComboBox('config', 'auditacts.php');
+	$cmbConf->setAttribute('onchange', 'javascript: redirect(this.options[this.selectedIndex].value);');
+		$cmbConf->addItem('auditlogs.php', _('Logs'));
+		$cmbConf->addItem('auditacts.php', _('Actions'));
 
 	$frmForm->addItem($cmbConf);
 
@@ -115,15 +115,15 @@ require_once('include/page_header.php');
 /***********************************************************/
 
 	$filterForm = new CFormTable();
-	$filterForm->setAttribute('name','zbx_filter');
-	$filterForm->setAttribute('id','zbx_filter');
+	$filterForm->setAttribute('name', 'zbx_filter');
+	$filterForm->setAttribute('id', 'zbx_filter');
 
 	$row = new CRow(array(
-		new CCol(S_RECIPIENT,'form_row_l'),
+		new CCol(S_RECIPIENT, 'form_row_l'),
 		new CCol(array(
-			new CTextBox('alias',$_REQUEST['alias'],32),
-			new CButton('btn1',S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->getName()."&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1');",'T')
-		),'form_row_r')
+			new CTextBox('alias', $_REQUEST['alias'], 32),
+			new CButton('btn1', _('Select'), "return PopUp('popup.php?"."dstfrm=".$filterForm->getName()."&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1');", 'T')
+		), 'form_row_r')
 	));
 
 	$filterForm->addRow($row);
@@ -133,11 +133,11 @@ require_once('include/page_header.php');
 	$filterForm->addItemToBottomRow(new CSubmit("filter_set", S_FILTER));
 	$filterForm->addItemToBottomRow($reset);
 
-	$alerts_wdgt->addFlicker($filterForm, CProfile::get('web.auditacts.filter.state',1));
+	$alerts_wdgt->addFlicker($filterForm, CProfile::get('web.auditacts.filter.state', 1));
 
 	$scroll_div = new CDiv();
-	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$alerts_wdgt->addFlicker($scroll_div, CProfile::get('web.auditacts.filter.state',1));
+	$scroll_div->setAttribute('id', 'scrollbar_cntr');
+	$alerts_wdgt->addFlicker($scroll_div, CProfile::get('web.auditacts.filter.state', 1));
 //-------
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
@@ -152,7 +152,7 @@ require_once('include/page_header.php');
 		S_ERROR
 	));
 
-	$effectiveperiod = navigation_bar_calc('web.auditacts.timeline',0, true);
+	$effectiveperiod = navigation_bar_calc('web.auditacts.timeline', 0, true);
 	$bstime = $_REQUEST['stime'];
 	$from = zbxDateToTime($_REQUEST['stime']);
 	$till = $from + $effectiveperiod;
@@ -195,18 +195,18 @@ require_once('include/page_header.php');
 
 		if($row['status'] == ALERT_STATUS_SENT){
 			if ($row['alerttype'] == ALERT_TYPE_MESSAGE)
-				$status=new CSpan(S_SENT,'green');
+				$status=new CSpan(S_SENT, 'green');
 			else
-				$status=new CSpan(S_EXECUTED,'green');
-			$retries=new CSpan(SPACE,'green');
+				$status=new CSpan(S_EXECUTED, 'green');
+			$retries=new CSpan(SPACE, 'green');
 		}
 		else if($row['status'] == ALERT_STATUS_NOT_SENT){
-			$status=new CSpan(S_IN_PROGRESS,'orange');
-			$retries=new CSpan(ALERT_MAX_RETRIES - $row['retries'],'orange');
+			$status=new CSpan(S_IN_PROGRESS, 'orange');
+			$retries=new CSpan(ALERT_MAX_RETRIES - $row['retries'], 'orange');
 		}
 		else{
 			$status=new CSpan(_('not sent'), 'red');
-			$retries=new CSpan(0,'red');
+			$retries=new CSpan(0, 'red');
 		}
 
 		if($row['alerttype'] == ALERT_TYPE_MESSAGE)
@@ -214,11 +214,11 @@ require_once('include/page_header.php');
 		else
 			$message = array(bold(S_COMMAND.': '), br(), zbx_nl2br($row['message']));
 
-		$error = empty($row['error']) ? new CSpan(SPACE,'off') : new CSpan($row['error'],'on');
+		$error = empty($row['error']) ? new CSpan(SPACE, 'off') : new CSpan($row['error'], 'on');
 
 		$table->addRow(array(
 			get_node_name_by_elid($row['alertid']),
-			new CCol(zbx_date2str(S_AUDITACTS_DESCRIPTION_DATE_FORMAT,$row['clock']), 'top'),
+			new CCol(zbx_date2str(S_AUDITACTS_DESCRIPTION_DATE_FORMAT, $row['clock']), 'top'),
 			new CCol($mediatype['description'], 'top'),
 			new CCol($status, 'top'),
 			new CCol($retries, 'top'),

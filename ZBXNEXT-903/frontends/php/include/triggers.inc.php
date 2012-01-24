@@ -963,8 +963,17 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
 	return $exp;
 }
 
+/**
+ * Implodes expression, replaces names and keys with IDs
+ *
+ * @param string $expression Full expression with host names and item keys
+ * @param numeric $triggerid
+ * @param array optional $hostnames Reference to array which will be filled with unique visible host names.
+ *
+ * @return string Imploded expression (names and keys replaced by IDs)
+ */
 // translate localhost:procload.last(0)>10 to {12}>10 and create database representation.
-function implode_exp($expression, $triggerid) {
+function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	$ZBX_TR_EXPR_ALLOWED_FUNCTIONS = init_trigger_expression_structures(false, true);
 
 	$expr = $expression;
@@ -983,7 +992,7 @@ function implode_exp($expression, $triggerid) {
 			continue;
 		}
 
-		$sql = 'SELECT i.itemid,i.value_type'.
+		$sql = 'SELECT i.itemid,i.value_type,h.name'.
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
 					' AND'.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_CHILD)).
@@ -995,6 +1004,7 @@ function implode_exp($expression, $triggerid) {
 				error(_s('Incorrect item value type "%1$s:%2$s" provided for trigger function "%3$s".', $exprPart['host'], $exprPart['item'], $exprPart['function']));
 				return null;
 			}
+			$hostnames[] = $item['name'];
 		}
 		else {
 			error(_s('Incorrect item key "%1$s:%2$s" provided for trigger expression.', $exprPart['host'], $exprPart['item']));
@@ -1016,6 +1026,7 @@ function implode_exp($expression, $triggerid) {
 		}
 		$expr = str_replace($exprPart['expression'], '{'.$usedItems[$exprPart['expression']].'}', $expr);
 	}
+	$hostnames = array_unique($hostnames);
 	return $expr;
 }
 
@@ -1423,14 +1434,34 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		'selectHosts' => array('hostid', 'name'),
 		'sortfield' => 'description'
 	));
-	foreach ($db_triggers as $tnum => $row) {
+
+	// fetch data for the host JS menu
+	$hostids = array();
+	foreach($db_triggers as $trigger) {
+		$hostids[] = $trigger['hosts'][0]['hostid'];
+	}
+	$hosts = API::Host()->get(array(
+		'output' => array('name', 'hostid'),
+		'hotids' => $hostids,
+		'selectAppllications' => API_OUTPUT_EXTEND,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectInventory' => true,
+		'preservekeys' => true
+	));
+	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+	foreach ($hostScripts as $hostid => $scripts) {
+		$hosts[$hostid]['scripts'] = $scripts;
+	}
+
+	$hostNames = array();
+	foreach ($db_triggers as $row) {
 		// fill host details from first selected host to make old code untouched
 		$row['host'] = $row['hosts'][0]['name'];
 		$row['hostid'] = $row['hosts'][0]['hostid'];
 		$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
 		$row['description'] = expand_trigger_description_constants($row['description'], $row);
 
-		$hosts[zbx_strtolower($row['host'])] = $row['host'];
+		$hostNames[$row['hostid']] = $row['host'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
@@ -1453,16 +1484,16 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		}
 	}
 
-	if (!isset($hosts)) {
+	if (!isset($hostNames)) {
 		return $table;
 	}
-	ksort($hosts);
+	ksort($hostNames);
 
 	$css = getUserTheme(CWebUser::$data);
 	if ($view_style == STYLE_TOP) {
 		$header = array(new CCol(_('Triggers'), 'center'));
 
-		foreach ($hosts as $hostname) {
+		foreach ($hostNames as $hostname) {
 			$header = array_merge($header, array(new CCol(array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)), 'hosts')));
 		}
 		$table->setHeader($header, 'vertical_header');
@@ -1483,9 +1514,16 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($hosts as $hostname) {
-			$table_row = array(nbsp($hostname));
-			foreach ($triggers as $descr => $trhosts) {
+		foreach ($hostNames as $hostid => $hostname) {
+			$host = $hosts[$hostid];
+
+			// host js link
+			$hostSpan = new CSpan(nbsp($hostname), 'link_menu menu-host');
+			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+
+			$table_row = array($hostSpan);
+			foreach ($triggers as $trhosts) {
 				$table_row = get_trigger_overview_cells($table_row, $trhosts, $hostname, $params);
 			}
 			$table->addRow($table_row);
@@ -1910,8 +1948,25 @@ function make_trigger_details($trigger) {
 	}
 	$expression = explode_exp($trigger['expression'], true, true);
 
+	$host = API::Host()->get(array(
+		'output' => array('name', 'hostid'),
+		'hostids' => $trigger['hosts'][0]['hostid'],
+		'selectAppllications' => API_OUTPUT_EXTEND,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectInventory' => true,
+		'preservekeys' => true
+	));
+	$host = reset($host);
+
+	$hostScripts = API::Script()->getScriptsByHosts($host['hostid']);
+
+	// host js link
+	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+
 	// get visible name of the first host
-	$table->addRow(array(_('Host'), $trigger['hosts'][0]['name']));
+	$table->addRow(array(_('Host'), $hostSpan));
 	$table->addRow(array(_('Trigger'), $trigger['description']));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
 	$table->addRow(array(_('Expression'), $expression));

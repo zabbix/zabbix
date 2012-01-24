@@ -641,24 +641,33 @@ function get_items_data_overview($hostids, $view_style = null) {
 			' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 		' ORDER BY i.name,i.itemid'
 	);
-	unset($items);
-	unset($hosts);
 
-	// get rid of warnings about $triggers undefined
+	// fetch data for the host JS menu
+	$hosts = API::Host()->get(array(
+		'output' => array('name', 'hostid'),
+		'monitored_hosts' => true,
+		'selectAppllications' => API_OUTPUT_EXTEND,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectInventory' => true,
+		'preservekeys' => true
+	));
+	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+	foreach ($hostScripts as $hostid => $scripts) {
+		$hosts[$hostid]['scripts'] = $scripts;
+	}
+
 	$items = array();
 	while ($row = DBfetch($db_items)) {
 		$descr = itemName($row);
 		$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
-		$hosts[zbx_strtolower($row['hostname'])] = $row['hostname'];
+		$hostNames[$row['hostid']] = $row['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
 		if (!isset($items[$descr][$row['hostname']])
-			|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $row['tr_value'] == TRIGGER_VALUE_TRUE)
-				|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $row['tr_value'] == TRIGGER_VALUE_TRUE)
-					&& $row['priority'] > $items[$descr][$row['hostname']]['severity'])
-				)
-			) {
+				|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $row['tr_value'] == TRIGGER_VALUE_TRUE)
+					|| (($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $row['tr_value'] == TRIGGER_VALUE_TRUE)
+						&& $row['priority'] > $items[$descr][$row['hostname']]['severity']))) {
 			$items[$descr][$row['hostname']] = array(
 				'itemid'	=> $row['itemid'],
 				'value_type'=> $row['value_type'],
@@ -666,30 +675,31 @@ function get_items_data_overview($hostids, $view_style = null) {
 				'lastclock'	=> $row['lastclock'],
 				'units'		=> $row['units'],
 				'name'		=> $row['name'],
-				'valuemapid'=> $row['valuemapid'],
+				'valuemapid' => $row['valuemapid'],
 				'severity'	=> $row['priority'],
 				'tr_value'	=> $row['tr_value'],
 				'triggerid'	=> $row['triggerid']
 			);
 		}
 	}
-	if (!isset($hosts)) {
+
+	if (!isset($hostNames)) {
 		return $table;
 	}
 
-	ksort($hosts, SORT_STRING);
+	ksort($hostNames, SORT_STRING);
 
 	$css = getUserTheme($USER_DETAILS);
 	if ($view_style == STYLE_TOP) {
 		$header = array(new CCol(_('Items'), 'center'));
-		foreach ($hosts as $hostname) {
+		foreach ($hostNames as $hostname) {
 			$header = array_merge($header, array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)));
 		}
 		$table->setHeader($header, 'vertical_header');
 
 		foreach ($items as $descr => $ithosts) {
 			$table_row = array(nbsp($descr));
-			foreach ($hosts as $hostname) {
+			foreach ($hostNames as $hostname) {
 				$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
 			}
 			$table->addRow($table_row);
@@ -702,9 +712,16 @@ function get_items_data_overview($hostids, $view_style = null) {
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($hosts as $hostname) {
-			$table_row = array(nbsp($hostname));
-			foreach ($items as $descr => $ithosts) {
+		foreach ($hostNames as $hostid => $hostname) {
+			$host = $hosts[$hostid];
+
+			// host JS menu link
+			$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
+			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+
+			$table_row = array(new CCol($hostSpan));
+			foreach ($items as $ithosts) {
 				$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
 			}
 			$table->addRow($table_row);
@@ -881,7 +898,6 @@ function format_lastvalue($db_item) {
 	if (!isset($db_item['lastvalue']) || $db_item['lastclock'] == 0) {
 		return '-';
 	}
-
 	if ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$lastvalue=convert_units($db_item['lastvalue'], $db_item['units']);
 	}
@@ -895,9 +911,8 @@ function format_lastvalue($db_item) {
 	else {
 		$lastvalue = _('Unknown value type');
 	}
-
 	if ($db_item['valuemapid'] > 0) {
-		$lastvalue = replace_value_by_map($lastvalue, $db_item['valuemapid']);
+		$lastvalue = applyValueMap($lastvalue, $db_item['valuemapid']);
 	}
 	return $lastvalue;
 }

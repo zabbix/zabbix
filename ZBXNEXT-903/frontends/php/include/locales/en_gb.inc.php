@@ -190,8 +190,6 @@
 	'S_DROPDOWN_REMEMBER_SELECTED'=>		_('remember selected'),
 	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
 	'S_DEFAULT_THEME'=>				_('Default theme'),
-	'S_EVENT_ACKNOWLEDGES'=>			_('Event acknowledges'),
-	'S_SHOW_EVENTS_MAX'=>				_('Show events max'),
 	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
 	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
 	'S_DEFAULT'=>					_('Default'),
@@ -222,10 +220,8 @@
 
 //	Latest values
 	'S_NO_PERMISSIONS'=>			_('No permissions to referred object or it does not exist!'),
-	'S_LATEST_DATA_BIG'=>			_('LATEST DATA'),
 	'S_ALL_S'=>						_('All'),
 	'S_ALL_SMALL'=>					_('all'),
-	'S_MINUS_OTHER_MINUS'=>			_('- other -'),
 	'S_GRAPH'=>						_('Graph'),
 
 //	Footer
@@ -392,7 +388,6 @@
 	'S_ITEM'=>						_('Item'),
 	'S_MODE'=>						_('Mode'),
 	'S_COPY'=>						_('Copy'),
-	'S_SEARCH'=>						_('Search'),
 	'S_ORIGINAL'=>						_('Original'),
 	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			_('Mass update selected items?'),
 	'S_COPY_SELECTED_ITEMS_Q'=>				_('Copy selected items?'),
@@ -411,7 +406,6 @@
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
 
 //	events.php
-	'S_LATEST_EVENTS'=>			_('Latest events'),
 	'S_HISTORY_OF_EVENTS_BIG'=>		_('HISTORY OF EVENTS'),
 	'S_NO_EVENTS_FOUND'=>			_('No events found'),
 	'S_EVENTS_DATE_FORMAT'=>		_('d M Y H:i:s'),
@@ -421,17 +415,11 @@
 //	events.inc.php
 	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
-//	latest.php
-	'S_LAST_CHECK'=>			_('Last check'),
-	'S_LAST_VALUE'=>			_('Last value'),
-	'S_LATEST_ITEMS_TRIGGERS_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
 //	sysmap.php
 	'S_HIDDEN'=>			_('Hidden'),
 	'S_SHOWN'=>				_('Shown'),
 	'S_URLS'=>				_('URLs'),
 	'S_LABEL'=>				_('Label'),
-	'S_GO_TO'=>				_('Go to'),
 	'S_X'=>					_('X'),
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
 	'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
@@ -594,7 +582,6 @@
 	'S_REPORTS_BAR_REPORT_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	screenconf.php
-	'S_SCREENS'=>				_('Screens'),
 	'S_SCREEN'=>				_('Screen'),
 	'S_CONFIGURATION_OF_SCREENS_BIG'=>	_('CONFIGURATION OF SCREENS'),
 	'S_CONFIGURATION_OF_SCREENS'=>		_('Configuration of screens'),
@@ -661,7 +648,6 @@
 	'S_MIDDLE'=>				_('Middle'),
 
 //	screens.php
-	'S_SCREENS_BIG'=>				_('SCREENS'),
 	'S_HOST_SCREENS'=>				_('Host screens'),
 
 //	services.php
@@ -682,7 +668,6 @@
 	'S_ENABLED'=>				_('Enabled'),
 	'S_DISABLE'=>				_('Disable'),
 	'S_ENABLE'=>				_('Enable'),
-	'S_CHANGE'=>				_('Change'),
 	'S_URL'=>				_('URL'),
 	'S_INSERT'=>				_('Insert'),
 	'S_TIME_SHIFT'=>			_('Time shift'),
@@ -700,7 +685,6 @@
 	'S_ADD'=>						_('Add'),
 
 //	tr_status.php
-	'S_STATUS_OF_TRIGGERS'=>			_('Status of triggers'),
 	'S_STATUS_OF_TRIGGERS_BIG'=>		_('STATUS OF TRIGGERS'),
 	'S_STATUS_OF_HOSTGROUP_TRIGGERS'=>	_('Status of hostgroup triggers'),
 	'S_STATUS_OF_HOST_TRIGGERS'=>		_('Status of host triggers'),
@@ -776,12 +760,7 @@
 	'S_HOST_INVENTORY_OVERVIEW'=>	_('Host inventory overview'),
 
 //	search.php
-	'S_EDIT_HOSTS'=>			_('Edit hosts'),
-	'S_SEARCH_BIG'=>			_('SEARCH'),
 	'S_GO'=>					_('Go'),
-	'S_FOUND_SMALL'=>			_('found'),
-	'S_DISPLAYING'=>			_('Displaying'),
-	'S_SEARCH_PATTERN_EMPTY'=>	_('Search pattern is empty'),
 
 //	popup.php
 	'S_CAPTION'=>				_('Caption'),
@@ -843,9 +822,6 @@
 	'S_TEMPLATE_WITH_APPLICATION'=>			_('Template with application'),
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
 
-//	maps.inc.php
-	'S_SUBMAP'=>			_('Submap'),
-
 //	screens.inc.php
 	'S_DELETE_IT_Q'=>				_('Delete it?'),
 	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>			_('This screen-row is not empty'),
@@ -881,7 +857,6 @@
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
 	'S_LOGOUT'=>				_('Logout'),
-	'S_LATEST_DATA'=>			_('Latest data'),
 
 //	Errors
 	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),

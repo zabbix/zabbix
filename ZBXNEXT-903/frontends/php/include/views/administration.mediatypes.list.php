@@ -44,6 +44,7 @@ $mediaTypeTable->setHeader(array(
 	new CCheckBox('all_media_types', null, "checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"),
 	make_sorting_header(_('Description'), 'description'),
 	make_sorting_header(_('Type'), 'type'),
+	_('Status'),
 	_('Used in actions'),
 	_('Details')
 ));
@@ -57,20 +58,26 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 			_('SMTP helo').': "'.$mediatype['smtp_helo'].'", '.
 			_('SMTP email').': "'.$mediatype['smtp_email'].'"';
 			break;
+
 		case MEDIA_TYPE_EXEC:
 			$details = _('Script name').': "'.$mediatype['exec_path'].'"';
 			break;
+
 		case MEDIA_TYPE_SMS:
 			$details = _('GSM modem').': "'.$mediatype['gsm_modem'].'"';
 			break;
+
 		case MEDIA_TYPE_JABBER:
 			$details = _('Jabber identifier').': "'.$mediatype['username'].'"';
 			break;
+
 		case MEDIA_TYPE_EZ_TEXTING:
 			$details = _('Username').': "'.$mediatype['username'].'"';
 			break;
+
 		default:
 			$details = '';
+			break;
 	}
 
 	$actionLinks = array();
@@ -88,11 +95,22 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 	$actionColumn = new CCol($actionLinks);
 	$actionColumn->setAttribute('style', 'white-space: normal;');
 
+	$statusLink = 'media_types.php?go='.(($mediatype['status'] == MEDIA_TYPE_STATUS_DISABLED) ? 'activate' : 'disable').
+		'&mediatypeids%5B%5D='.$mediatype['mediatypeid'];
+
+	if (MEDIA_TYPE_STATUS_ACTIVE == $mediatype['status']) {
+		$status = new CLink(_('Enabled'), $statusLink, 'enabled');
+	}
+	else {
+		$status = new CLink(_('Disabled'), $statusLink, 'disabled');
+	}
+
 	// append row
 	$mediaTypeTable->addRow(array(
 		new CCheckBox('mediatypeids['.$mediatype['mediatypeid'].']', null, null, $mediatype['mediatypeid']),
 		new CLink($mediatype['description'], '?form=edit&mediatypeid='.$mediatype['mediatypeid']),
 		media_type2str($mediatype['typeid']),
+		$status,
 		$actionColumn,
 		$details
 	));
@@ -100,6 +118,14 @@ foreach ($this->data['mediatypes'] as $mediatype) {
 
 // create go button
 $goComboBox = new CComboBox('go');
+$goOption = new CComboItem('activate', _('Enable selected'));
+$goOption->setAttribute('confirm', _('Enable selected media types?'));
+$goComboBox->addItem($goOption);
+
+$goOption = new CComboItem('disable', _('Disable selected'));
+$goOption->setAttribute('confirm', _('Disable selected media types?'));
+$goComboBox->addItem($goOption);
+
 $goOption = new CComboItem('delete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected media types?'));
 $goComboBox->addItem($goOption);
