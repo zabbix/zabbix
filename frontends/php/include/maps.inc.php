@@ -143,6 +143,7 @@ function getActionMapBySysmap($sysmap) {
 		'output' => array('status'),
 		'nopermissions' => true,
 		'preservekeys' => true,
+		'selectScreens' => API_OUTPUT_COUNT,
 	);
 	$hosts = API::Host()->get($options);
 
@@ -154,40 +155,38 @@ function getActionMapBySysmap($sysmap) {
 		if ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$host = $hosts[$db_element['elementid']];
 			if ($host['status'] == HOST_STATUS_MONITORED) {
-				$host_nodeid = id2nodeid($db_element['elementid']);
 				$tools_menus = '';
 				foreach ($scripts_by_hosts[$db_element['elementid']] as $script) {
-					$script_nodeid = id2nodeid($script['scriptid']);
+					$str_tmp = zbx_jsvalue('javascript: executeScript('.$db_element['elementid'].', '.
+								$script['scriptid'].', '.
+								zbx_jsvalue($script['confirmation']).')'
+					);
 
-					if ((bccomp($host_nodeid, $script_nodeid) == 0)) {
-						$str_tmp = zbx_jsvalue('javascript: executeScript('.$db_element['elementid'].', '.
-									$script['scriptid'].', '.
-									zbx_jsvalue($script['confirmation']).')'
-						);
-
-						$tools_menus .= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-					}
+					$tools_menus .= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 
 				if (!empty($tools_menus)) {
 					$menus .= "['"._('Scripts')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 					$menus .= $tools_menus;
 				}
-				$links_menus .= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?hostid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$links_menus .= "['"._('Status of triggers')."',\"javascript: redirect('tr_status.php?hostid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				if ($host['screens']) {
+					$links_menus .= "['"._('Host screens')."',\"javascript: redirect('host_screen.php?hostid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				}
 			}
 		}
 		elseif ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-			$links_menus .= "['".S_SUBMAP."',\"javascript: redirect('maps.php?sysmapid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			$links_menus .= "['"._('Submap')."',\"javascript: redirect('maps.php?sysmapid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 		elseif ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-			$links_menus .= "['".S_LATEST_EVENTS."',\"javascript: redirect('events.php?source=0&triggerid=".$db_element['elementid']."&nav_time=".(time() - SEC_PER_WEEK)."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			$links_menus .= "['"._('Latest events')."',\"javascript: redirect('events.php?source=0&triggerid=".$db_element['elementid']."&nav_time=".(time() - SEC_PER_WEEK)."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 		elseif ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-			$links_menus .= "['".S_STATUS_OF_TRIGGERS."',\"javascript: redirect('tr_status.php?hostid=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			$links_menus .= "['"._('Status of triggers')."',\"javascript: redirect('tr_status.php?hostid=0&groupid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 		}
 
 		if (!empty($links_menus)) {
-			$menus .= "['".S_GO_TO."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+			$menus .= "['"._('Go to')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 			$menus .= $links_menus;
 		}
 

@@ -448,24 +448,27 @@ function menu_item (o_parent, n_order) {
 		this.n_y -= this.getprop('height') * (o_parent.a_config.length - item_offset);
 	}
 
-	if (!is_null(this.a_config[1]) && (this.a_config[1].indexOf('javascript') == -1) && !(!is_null(this.a_config[2]) || this.a_config[2] == 'nosid')) {
-		var url = new Curl(this.a_config[1]);
-		this.a_config[1] = url.getUrl();
-	}
-
 	// generate item's HMTL
 	var el = document.createElement('a');
-	el.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id + 'o');
+	var menuItemId = 'e' + o_root.n_id + '_' + this.n_id + 'o';
+	el.setAttribute('id', menuItemId);
 
-	if (this.a_config[1] != null) {
-		el.setAttribute('href', this.a_config[1]);
-		if(this.a_config[2] && this.a_config[2]['tw'])
-			el.setAttribute('target', this.a_config[2]['tw']);
+	// js callback action
+	if (jQuery.isFunction(this.a_config[1])) {
+		jQuery(document).on('click', '#' + menuItemId, this.a_config[1]);
 	}
-	el.setAttribute('href', this.a_config[1]);
+	// url action
+	else {
+		if (!is_null(this.a_config[1]) && (this.a_config[1].indexOf('javascript') == -1)
+				&& !(!is_null(this.a_config[2]) || this.a_config[2] == 'nosid')) {
+			var url = new Curl(this.a_config[1]);
+			this.a_config[1] = url.getUrl();
+		}
 
-	if (this.a_config[2] && this.a_config[2]['tw']) {
-		el.setAttribute('target', this.a_config[2]['tw']);
+		el.setAttribute('href', this.a_config[1]);
+		if (this.a_config[2] && this.a_config[2]['tw']) {
+			el.setAttribute('target', this.a_config[2]['tw']);
+		}
 	}
 
 	el.className = this.getstyle(0, 0);

@@ -827,8 +827,7 @@ function make_latest_issues(array $filter = array()) {
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
-		'selectGroups' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectHosts' => array('hostid', 'name'),
 		'output' => API_OUTPUT_EXTEND
 	);
 	$options['sortfield'] = isset($filter['sortfield']) ? $filter['sortfield'] : 'lastchange';
@@ -845,20 +844,32 @@ function make_latest_issues(array $filter = array()) {
 	unset($options['limit']);
 	$triggersTotalCount = API::Trigger()->get($options);
 
-	// get triger hosts
-	$triggers_hosts = array();
 	foreach($triggers as $tnum => $trigger) {
 		// if trigger is lost(broken expression) we skip it
 		if (empty($trigger['hosts'])) {
 			unset($triggers[$tnum]);
 			continue;
 		}
-		$triggers_hosts = array_merge($triggers_hosts, $trigger['hosts']);
-	}
-	$triggers_hosts = zbx_toHash($triggers_hosts, 'hostid');
-	$triggers_hostids = array_keys($triggers_hosts);
 
-	$scripts_by_hosts = API::Script()->getScriptsByHosts($triggers_hostids);
+		$host = reset($trigger['hosts']);
+		$trigger['hostid'] = $host['hostid'];
+		$trigger['hostname'] = $host['name'];
+
+		$triggers[$tnum] = $trigger;
+	}
+	$hostIds = zbx_objectValues($triggers, 'hostid');
+
+	// fetch trigger hosts
+	$hosts = API::Host()->get(array(
+		'hostids' => $hostIds,
+		'output' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectInventory' => true,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'preservekeys' => true
+	));
+
+	// fetch trigger scripts
+	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostIds);
 
 	// indicator of sort field
 	$sortDiv = new CDiv(SPACE, $options['sortorder'] === ZBX_SORT_DOWN ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
@@ -884,58 +895,12 @@ function make_latest_issues(array $filter = array()) {
 		)
 	);
 
-	$thosts_cache = array();
 	foreach ($triggers as $trigger) {
 		// check for dependencies
-		$group = reset($trigger['groups']);
-		$host = reset($trigger['hosts']);
-
-		$trigger['hostid'] = $host['hostid'];
-		$trigger['hostname'] = $host['name'];
-
-		$host = null;
-		$menus = '';
-
-		$host_nodeid = id2nodeid($trigger['hostid']);
-		foreach ($scripts_by_hosts[$trigger['hostid']] as $script) {
-			$script_nodeid = id2nodeid($script['scriptid']);
-			if (bccomp($host_nodeid, $script_nodeid) == 0) {
-				$str_tmp = zbx_jsvalue('javascript: executeScript('.$trigger['hostid'].', '.$script['scriptid'].', '.zbx_jsvalue($script['confirmation']).')');
-				$menus .= '['.zbx_jsvalue($script['name']).', '.$str_tmp.", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
-			}
-		}
-
-		if (!empty($scripts_by_hosts[$trigger['hostid']])) {
-			$menus = "['"._('Scripts')."', null, null, {'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}], ".$menus;
-		}
-
-		if (isset($thosts_cache[$trigger['hostid']])) {
-			$hinventory = $thosts_cache[$trigger['hostid']];
-		}
-		else {
-			$hinventory = API::Host()->get(array(
-				'hostids' => $trigger['hostid'],
-				'output' => API_OUTPUT_SHORTEN,
-				'selectInventory' => true
-			));
-			$hinventory = reset($hinventory);
-			$thosts_cache[$hinventory['hostid']] = $hinventory;
-		}
-
-		$menus .= "['"._('Go to')."', null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],";
-		$menus .= "['"._('Latest data')."', \"javascript: redirect('latest.php?groupid=".$group['groupid'].'&hostid='.$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
-		if (!empty($hinventory['inventory'])) {
-			$menus .= "['"._('Host inventories')."', \"javascript: redirect('hostinventories.php?hostid=".$trigger['hostid']."')\", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],";
-		}
-
-		$menus = rtrim($menus, ',');
-		$menus = 'show_popup_menu(event, ['.$menus.'], 180);';
-
-		$host = new CSpan($trigger['hostname'], 'link_menu pointer');
-		$host->setAttribute('onclick', 'javascript: '.$menus);
+		$host = $hosts[$trigger['hostid']];
 
 		// maintenance
-		$trigger_host = $triggers_hosts[$trigger['hostid']];
+		$trigger_host = $hosts[$trigger['hostid']];
 
 		$text = null;
 		$style = 'link_menu';
@@ -953,10 +918,12 @@ function make_latest_issues(array $filter = array()) {
 				: _('Maintenance with data collection')).']';
 		}
 
-		$host = new CSpan($trigger['hostname'], $style.' pointer');
-		$host->setAttribute('onclick', 'javascript: '.$menus);
+
+		$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+		$scripts = ($scripts_by_hosts[$host['hostid']]) ? $scripts_by_hosts[$host['hostid']] : array();
+		$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 		if (!is_null($text)) {
-			$host->setHint($text, '', '', false);
+			$hostSpan->setHint($text, '', '', false);
 		}
 
 		// unknown triggers
@@ -998,7 +965,7 @@ function make_latest_issues(array $filter = array()) {
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
-				$host,
+				$hostSpan,
 				$description,
 				$clock,
 				zbx_date2age($event['clock']),

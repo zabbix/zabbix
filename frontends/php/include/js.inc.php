@@ -17,15 +17,20 @@ function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
 			$escaped = str_replace("\\", "\\\\", $escaped); // escaping slashes: \ => \\
 			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
 			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
-			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
 			$escaped = str_replace('/', '\/', $escaped); // escaping forward slash: / => \/
 			if ($addQuotes) {
-				$escaped = "'".$escaped."'";
+				$escaped = '"'.$escaped.'"';
+			}
+			else {
+				$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
 			}
 			return $escaped;
 		}
 		elseif (is_null($value)) {
 			return 'null';
+		}
+		elseif (is_bool($value)) {
+			return ($value) ? 'true' : 'false';
 		}
 		else {
 			return strval($value);
@@ -39,7 +44,7 @@ function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
 		if ((!isset($is_object) && is_string($id)) || $asObject) {
 			$is_object = true;
 		}
-		$value[$id] = (isset($is_object) ? '"'.str_replace('\'', '\\\'', $id).'" : ' : '').zbx_jsvalue($v, $asObject, $addQuotes);
+		$value[$id] = (isset($is_object) ? '"'.str_replace('\'', '\\\'', $id).'":' : '').zbx_jsvalue($v, $asObject, $addQuotes);
 	}
 
 	if (isset($is_object)) {
