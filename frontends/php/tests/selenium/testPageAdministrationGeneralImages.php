@@ -24,11 +24,11 @@ require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 class testPageAdministrationGeneralImages extends CWebTest {
 
 	public static function allIcons() {
-		return DBdata('SELECT name FROM images WHERE imagetype=1 limit 5');
+		return DBdata('SELECT name FROM images WHERE imagetype=1 ORDER BY imageid limit 5');
 	}
 
 	public static function allBgImages() {
-		return DBdata('SELECT name FROM images WHERE imagetype=2 limit 5');
+		return DBdata('SELECT name FROM images WHERE imagetype=2 ORDER BY imageid limit 5');
 	}
 
 	/**
@@ -52,7 +52,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralImages_CheckLayoutBgImages($bgimage) {
 
-		$BgImagesCount = DBdata('SELECT count(name) FROM images WHERE imagetype=2');
+		$BgImagesCount = DBdata('SELECT count(name) FROM images WHERE imagetype=2 ORDER BY imageid');
 
 		if ($BgImagesCount==0) {
 				$this->ok(array('No images defined.'));
@@ -76,7 +76,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralImages_IconSimpleUpdate($icon_name) {
 
-		$sqlIconImages = 'SELECT * FROM images WHERE imagetype=1 limit 5';
+		$sqlIconImages = 'SELECT * FROM images WHERE imagetype=1 ORDER BY imageid limit 5';
 		$oldHashIconImages=DBhash($sqlIconImages);
 
 		$this->login('adm.images.php');
@@ -101,7 +101,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	*/
 	public function testPageAdministrationGeneralImages_BgImageSimpleUpdate($bgimage_name) {
 
-		$sqlBgImages = 'SELECT * FROM images WHERE imagetype=2 limit 5';
+		$sqlBgImages = 'SELECT * FROM images WHERE imagetype=2 ORDER BY imageid limit 5';
 		$oldHashBgImages=DBhash($sqlBgImages);
 
 		$this->login('adm.images.php');
