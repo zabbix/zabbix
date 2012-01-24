@@ -2,6 +2,10 @@
 Changes for 1.9.9
 
 New features:
+..F....... [ZBXNEXT-1066] removed the "Monotoring - Hosts" page (pavels)
+..F....... [ZBXNEXT-1066] remade the "Search" page layout (pavels)
+..F....... [ZBXNEXT-1066] added the host pop up menu to the "Event", "Event details", "Trigger status" and "Overview" pages (pavels)
+..F....... [ZBXNEXT-1066] added the "Host screens" link to all of the host pop up menus (pavels)
 A.F.....S. [ZBXNEXT-814] added support of disabling media types (Alexei)
 ...GI..... [ZBXNEXT-1024] added support for more vm.memory.size modes for various platforms (asaveljevs, dimir)
 ..F....... [ZBXNEXT-1019] updated jQuery to 1.7.1 and jQuery-ui to 1.8.17 (Vedmak)

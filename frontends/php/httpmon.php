@@ -160,7 +160,7 @@ require_once('include/page_header.php');
 		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
 		_('Number of steps'),
 		S_STATE,
-		S_LAST_CHECK,
+		_('Last check'),
 		S_STATUS
 	));
 
