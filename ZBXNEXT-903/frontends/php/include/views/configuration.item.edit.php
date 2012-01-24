@@ -44,7 +44,7 @@ if (empty($this->data['parent_discoveryid'])) {
 		empty($this->data['itemid'])
 			? new CButton('btn_host', _('Select'),
 				"return PopUp('popup.php?dstfrm=".$itemForm->getName().
-				"&dstfld1=hostname&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&noempty=1', 450, 450);",
+				"&dstfld1=hostname&dstfld2=form_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&noempty=1&submitParent=1', 450, 450);",
 				'formlist'
 			)
 			: null
@@ -184,7 +184,7 @@ for ($i = 0, $size = count($this->data['delay_flex']); $i < $size; $i++) {
 }
 array_push($delayFlexElements, count($delayFlexElements) == 0
 	? _('No flexible intervals')
-	: new CSubmit('del_delay_flex', _('Delete selected'), null, 'jqueryinput')
+	: new CSubmit('del_delay_flex', _('Delete selected'), null, 'formlist')
 );
 $itemFormList->addRow(_('Flexible intervals (sec)'), $delayFlexElements, false, 'row_flex_intervals');
 
@@ -194,7 +194,7 @@ $itemFormList->addRow(
 	array(
 		_('Delay'),
 		SPACE,
-		new CNumericBox('new_delay_flex[delay]', '50', 5),
+		new CNumericBox('new_delay_flex[delay]', 50, 5),
 		SPACE,
 		_('Period'),
 		SPACE,
@@ -203,7 +203,8 @@ $itemFormList->addRow(
 		new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
 	),
 	false,
-	'row_new_delay_flex'
+	'row_new_delay_flex',
+	'new'
 );
 
 // append keep history to from list
@@ -234,9 +235,9 @@ else {
 }
 $link = new CLink(_('show value mappings'), 'config.php?config=6');
 $link->setAttribute('target', '_blank');
-$itemFormList->addRow(_('Show value'), array($valuemapComboBox, SPACE, $link), false, 'row_valuemap');
+$itemFormList->addRow(_('Show value'), array($valuemapComboBox, SPACE, $link), null, 'row_valuemap');
 $itemFormList->addRow(_('Allowed hosts'), new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE), false, 'row_trapper_hosts');
-$itemFormList->addRow(_('New application'), new CTextBox('new_application', $this->data['new_application'], ZBX_TEXTBOX_STANDARD_SIZE));
+$itemFormList->addRow(_('New application'), new CTextBox('new_application', $this->data['new_application'], ZBX_TEXTBOX_STANDARD_SIZE), false, null, 'new');
 
 // append applications to from list
 $applicationComboBox = new CListBox('applications[]', $this->data['applications'], 6);

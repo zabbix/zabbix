@@ -713,6 +713,9 @@ elseif ($srctbl == 'hosts_and_templates') {
 
 	foreach ($objects as $row) {
 		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+		if ($submitParent) {
+			$action .= ' var form = window.opener.document.forms['.zbx_jsvalue($dstfrm).']; if (form) { form.submit(); }';
+		}
 		$name = new CSpan($row['name'], 'link');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
@@ -1129,7 +1132,7 @@ elseif ($srctbl == 'prototypes') {
 			);
 
 			// if we need to submit parent window
-			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).', '.($submitParent?'true':'false').'); return false;';
+			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).','.zbx_jsvalue($values).', '.($submitParent ? 'true' : 'false').'); return false;';
 		}
 		$description->setAttribute('onclick', $js_action);
 

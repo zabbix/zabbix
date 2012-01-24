@@ -391,24 +391,28 @@ function get_header_host_table($hostid, $current = null) {
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
-function makeFormFooter($main, $other = array()) {
-	$mainBttns = new CDiv();
-	foreach ($main as $bttn) {
-		$bttn->addClass('main');
-		$bttn->useJQueryStyle();
-		$mainBttns->addItem($bttn);
+function makeFormFooter($main, $others = array()) {
+	if (!is_array($main)) {
+		$main = array($main);
 	}
-	$otherBttns = new CDiv($other);
-	$otherBttns->useJQueryStyle();
+	$mainButtons = new CDiv();
+	foreach ($main as $button) {
+		$button->addClass('main');
+		$button->useJQueryStyle();
+		$mainButtons->addItem($button);
+	}
+	$othersButtons = new CDiv($others);
+	$othersButtons->useJQueryStyle();
 
-	if (empty($other)) {
-		$space = new CDiv($mainBttns, 'dt right');
-	}
-	else {
-		$space = new CDiv($mainBttns, 'dt floatleft right');
-	}
-	$buttons = new CDiv(array($otherBttns), 'dd');
-
-	return new CDiv(new CDiv(array($space, $buttons), 'formrow'), 'objectgroup footer min-width ui-widget-content ui-corner-all');
+	return new CDiv(
+		new CDiv(
+			array(
+				empty($others) ? new CDiv($mainButtons, 'dt right') : new CDiv($mainButtons, 'dt floatleft right'),
+				new CDiv(array($othersButtons), 'dd')
+			),
+			'formrow'
+		),
+		'objectgroup footer min-width ui-widget-content ui-corner-all'
+	);
 }
 ?>

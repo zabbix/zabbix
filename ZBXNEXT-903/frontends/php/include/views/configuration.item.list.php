@@ -223,7 +223,7 @@ foreach ($this->data['items'] as $item) {
 		$item['history'],
 		in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends'],
 		item_type2str($item['type']),
-		new CCol($item['applications'], 'wraptext'),
+		new CCol($item['applications_list'], 'wraptext'),
 		$status,
 		$statusIcons
 	));
