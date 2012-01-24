@@ -55,7 +55,7 @@ class testPageHosts extends CWebTest {
 		$this->ok(array($host['name']));
 		$this->dropdown_select('go', 'Export selected');
 		$this->dropdown_select('go', 'Mass update');
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Delete selected');
 	}
@@ -256,7 +256,7 @@ class testPageHosts extends CWebTest {
 		$this->dropdown_select_wait('groupid', 'all');
 
 		$this->checkbox_select("all_hosts");
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -283,7 +283,7 @@ class testPageHosts extends CWebTest {
 		$this->dropdown_select_wait('groupid', 'all');
 
 		$this->checkbox_select("hosts_$hostid");
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
