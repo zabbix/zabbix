@@ -41,7 +41,6 @@
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'groupid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 
 // STATUS OF TRIGGER
@@ -113,23 +112,6 @@
 	}
 ?>
 <?php
-	$options = array(
-		'groups' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_items' => 1,
-		),
-		'hosts' => array(
-			'monitored_hosts' => 1,
-			'with_monitored_items' => 1,
-		),
-		'hostid' => get_request('hostid', null),
-		'groupid' => get_request('groupid', null),
-	);
-
-	$pageFilter = new CPageFilter($options);
-	$_REQUEST['groupid'] = $pageFilter->groupid;
-	$_REQUEST['hostid'] = $pageFilter->hostid;
-
 	$screenid = get_request('screenid', CProfile::get('web.hostscreen.screenid', null));
 
 	if(2 != $_REQUEST['fullscreen'])
@@ -156,7 +138,7 @@
 	order_result($screens, 'name');
 
 	if(empty($screens)){
-		$screens_wdgt->addPageHeader(S_SCREENS_BIG, $formHeader);
+		$screens_wdgt->addPageHeader(_('SCREENS'), $formHeader);
 		$screens_wdgt->addItem(BR());
 		$screens_wdgt->addItem(new CTableInfo(_('No screens defined.')));
 		$screens_wdgt->show();
@@ -184,7 +166,7 @@
 		 */
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
-		$screens_wdgt->addPageHeader(S_SCREENS_BIG, array($formHeader, SPACE, /*$icon,*/ $fs_icon));
+		$screens_wdgt->addPageHeader(_('SCREENS'), array($formHeader, SPACE, /*$icon,*/ $fs_icon));
 // }}} PAGE HEADER
 
 

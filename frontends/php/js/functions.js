@@ -551,61 +551,6 @@ function call_menu(evnt, id, name) {
 	return false;
 }
 
-function services_showsla(sla) {
-	try {
-		if (sla.checked) {
-			document.getElementById('SLA').style.display = 'none';
-		} else {
-			document.getElementById('SLA').style.display = (!IE || OP) ? 'table-row' : 'block';
-		}
-	} catch(e) {
-		alert(e);
-	}
-}
-
-function check_childs(form_name, chkMain, chkName) {
-	var frmForm = document.forms[form_name];
-	var value = frmForm.elements[chkName].checked;
-
-	for (var i=0; i < frmForm.length; i++) {
-		if (frmForm.elements[i].type != 'checkbox') {
-			continue;
-		}
-		if (frmForm.elements[i].disabled) {
-			continue;
-		}
-
-		var splt = frmForm.elements[i].name.split('[');
-		var name = splt[0];
-		var serviceid = splt[1];
-
-		if (chkName && chkName == name) {
-			continue;
-		}
-		if (chkMain && chkMain != name) {
-			continue;
-		}
-
-		if (frmForm.elements[i].name != chkMain + '[' + serviceid + '[serviceid]') {
-			continue;
-		}
-		frmForm.elements[i].checked = value;
-	}
-}
-
-function display_element(name) {
-	var elmnt = document.getElementById(name);
-	if (typeof(elmnt) == 'undefined') {
-		return null;
-	}
-	else if (elmnt.offsetWidth == 0 || elmnt.style.display == 'none') {
-		elmnt.style.display = IE ? 'block' : 'table-row';
-	}
-	else {
-		elmnt.style.display = 'none';
-	}
-}
-
 function cloneRow(elementid, count) {
 	if (typeof(cloneRow.count) == 'undefined') {
 		cloneRow.count = count;
@@ -775,4 +720,14 @@ function validateNumericBox(obj, allowempty, allownegative) {
 			obj.value = obj.value * -1;
 		}
 	}
+}
+
+
+/**
+ * Translates the given string.
+ *
+ * @param str
+ */
+function t(str) {
+	return (!!locale[str]) ? locale[str] : str;
 }
