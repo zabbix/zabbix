@@ -67,7 +67,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.tr_status.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.tr_status.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -125,7 +125,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$_REQUEST['txt_select'] = get_request('txt_select', CProfile::get('web.tr_status.filter.txt_select', ''));
 
 		if(EVENT_ACK_DISABLED == $config['event_ack_enable']){
-			if(!str_in_array($_REQUEST['show_events'],array(EVENTS_OPTION_NOEVENT,EVENTS_OPTION_ALL))){
+			if(!str_in_array($_REQUEST['show_events'], array(EVENTS_OPTION_NOEVENT, EVENTS_OPTION_ALL))){
 				$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 			}
 			$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
@@ -254,7 +254,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$triggerInfo->show();
 	}
 
-	$m_form = new CForm('get','acknow.php');
+	$m_form = new CForm('get', 'acknow.php');
 	$m_form->setName('tr_status');
 	$m_form->addVar('backurl', $page['file']);
 
@@ -522,8 +522,8 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 
 		if($dependency){
-			$img = new Cimg('images/general/up_icon.png','DEP_UP');
-			$img->setAttribute('style','vertical-align: middle; border: 0px;');
+			$img = new Cimg('images/general/up_icon.png', 'DEP_UP');
+			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
 			$description = array($img,SPACE,$description);
@@ -631,7 +631,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 // Unknown triggers
 		$unknown = SPACE;
 		if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
-			$unknown = new CDiv(SPACE,'status_icon iconunknown');
+			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 //----

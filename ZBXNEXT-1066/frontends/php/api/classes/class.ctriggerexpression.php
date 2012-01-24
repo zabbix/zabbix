@@ -399,9 +399,9 @@ class CTriggerExpression {
 
 			$lastDot = strrpos($this->currExpr['object']['item'], '.');
 
-			$this->currExpr['object']['functionName'] = substr($this->currExpr['object']['item'],$lastDot+1);
-			$this->currExpr['object']['function'] = substr($this->currExpr['object']['item'],$lastDot+1);
-			$this->currExpr['object']['item'] = substr($this->currExpr['object']['item'],0,$lastDot);
+			$this->currExpr['object']['functionName'] = substr($this->currExpr['object']['item'], $lastDot+1);
+			$this->currExpr['object']['function'] = substr($this->currExpr['object']['item'], $lastDot+1);
+			$this->currExpr['object']['item'] = substr($this->currExpr['object']['item'], 0, $lastDot);
 		}
 	}
 

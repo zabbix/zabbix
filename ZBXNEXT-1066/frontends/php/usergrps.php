@@ -206,7 +206,7 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 	$sql = 'SELECT ug.usrgrpid, ug.name '.
 			' FROM usrgrp ug '.
 			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.DBcondition('ug.usrgrpid',$groupids);
+				' AND '.DBcondition('ug.usrgrpid', $groupids);
 	$db_groups = DBselect($sql);
 	while ($group = DBfetch($db_groups)) {
 		$groups[$group['usrgrpid']] = $group;
@@ -235,7 +235,7 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 	$sql = 'SELECT ug.usrgrpid, ug.name '.
 			' FROM usrgrp ug '.
 			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.DBcondition('ug.usrgrpid',$groupids);
+				' AND '.DBcondition('ug.usrgrpid', $groupids);
 	$db_group = DBselect($sql);
 	while ($group = DBfetch($db_group)) {
 		$groups[$group['usrgrpid']] = $group;
@@ -263,7 +263,7 @@ elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status')))
 	$sql = 'SELECT ug.usrgrpid, ug.name '.
 			' FROM usrgrp ug '.
 			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.DBcondition('ug.usrgrpid',$groupids);
+				' AND '.DBcondition('ug.usrgrpid', $groupids);
 	$db_groups = DBselect($sql);
 	while ($group = DBfetch($db_groups)) {
 		$groups[$group['usrgrpid']] = $group;

@@ -29,7 +29,7 @@ require_once('include/page_header.php');
 <?php
 $fields = array(
 	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'refresh_unsupported'=>		array(T_ZBX_INT, O_NO,	null,	BETWEEN(0,65535),	'isset({save})'),
+	'refresh_unsupported'=>		array(T_ZBX_INT, O_NO,	null,	BETWEEN(0, 65535),	'isset({save})'),
 	'alert_usrgrpid'=>			array(T_ZBX_INT, O_NO,	null,	DB_ID,				'isset({save})'),
 	'discovery_groupid'=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,				'isset({save})'),
 	'snmptrap_logging'=>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),			null),
