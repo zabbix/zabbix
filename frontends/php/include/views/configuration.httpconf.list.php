@@ -125,8 +125,8 @@ foreach ($httpTableRows as $appid => $app_rows) {
 
 // create go buttons
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Activate selected'));
-$goOption->setAttribute('confirm', _('Activate selected WEB scenarios?'));
+$goOption = new CComboItem('activate', _('Enable selected'));
+$goOption->setAttribute('confirm', _('Enable selected WEB scenarios?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));
