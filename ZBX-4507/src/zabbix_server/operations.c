@@ -913,8 +913,8 @@ void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 
 	if (NULL == DBfetch(result))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot remove host \"%s\" from all host group(s): it must belong to at least one",
-				zbx_host_string(hostid));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove host \"%s\" from all host groups:"
+				" it must belong to at least one", zbx_host_string(hostid));
 	}
 	else
 	{
