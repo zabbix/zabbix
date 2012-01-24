@@ -504,9 +504,9 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		'applications' => $applications,
 		'data_type' => get_request('data_type')
 	);
-	foreach ($item as $num => $field) {
+	foreach ($item as $number => $field) {
 		if (is_null($field)) {
-			unset($item[$num]);
+			unset($item[$number]);
 		}
 	}
 
@@ -724,11 +724,114 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], array(_('Create 
 	$itemView->render();
 	$itemView->show();
 }
-elseif (($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate'])) && isset($_REQUEST['group_itemid'])) {
-	$itemsWidget->addItem(insert_mass_update_item_form());
+elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
+	$data = array(
+		'form' => get_request('form', null),
+		'hostid' => get_request('hostid', null),
+		'itemids' => get_request('group_itemid', array()),
+		'description' => get_request('description', ''),
+		'delay' => get_request('delay', ZBX_ITEM_DELAY_DEFAULT),
+		'delay_flex' => get_request('delay_flex', array()),
+		'history' => get_request('history', 90),
+		'status' => get_request('status', 0),
+		'type' => get_request('type', 0),
+		'snmp_community' => get_request('snmp_community', 'public'),
+		'port' => get_request('port', ''),
+		'value_type' => get_request('value_type', ITEM_VALUE_TYPE_UINT64),
+		'data_type' => get_request('data_type', ITEM_DATA_TYPE_DECIMAL),
+		'trapper_hosts' => get_request('trapper_hosts', ''),
+		'units' => get_request('units', ''),
+		'authtype' => get_request('authtype', ''),
+		'username' => get_request('username', ''),
+		'password' => get_request('password', ''),
+		'publickey' => get_request('publickey', ''),
+		'privatekey' => get_request('privatekey', ''),
+		'valuemapid' => get_request('valuemapid', 0),
+		'delta' => get_request('delta', 0),
+		'trends' => get_request('trends', DAY_IN_YEAR),
+		'applications' => get_request('applications', array()),
+		'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
+		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
+		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),
+		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase', ''),
+		'formula' => get_request('formula', '1'),
+		'logtimefmt' => get_request('logtimefmt', '')
+	);
+
+	// hosts
+	$data['hosts'] = API::Host()->get(array(
+		'itemids' => $data['itemids'],
+		'selectInterfaces' => API_OUTPUT_EXTEND
+	));
+	$data['hosts'] = reset($data['hosts']);
+
+	// application
+	if (count($data['applications']) == 0) {
+		array_push($data['applications'], 0);
+	}
+	if (!empty($data['hostid'])) {
+		$data['db_applications'] = DBfetchArray(DBselect(
+			'SELECT a.applicationid,a.name'.
+			' FROM applications a'.
+			' WHERE a.hostid='.$data['hostid'].
+			' ORDER BY a.name'
+		));
+	}
+
+	// item types
+	$data['itemTypes'] = item_type2str();
+	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST]);
+
+	// valuemap
+	$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.valuemapid,v.name FROM valuemaps v WHERE '.DBin_node('v.valuemapid')));
+	order_result($data['valuemaps'], 'name');
+
+	// render view
+	$itemView = new CView('configuration.item.massupdate', $data);
+	$itemView->render();
+	$itemView->show();
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
-	$itemsWidget->addItem(insert_copy_elements_to_forms('group_itemid'));
+	$data = array(
+		'group_itemid' => get_request('group_itemid', array()),
+		'hostid' => get_request('hostid', 0),
+		'copy_type' => get_request('copy_type', 0),
+		'filter_groupid' => get_request('filter_groupid', 0),
+		'copy_targetid' => get_request('copy_targetid', array()),
+	);
+
+	if (!is_array($data['group_itemid']) || (is_array($data['group_itemid']) && count($data['group_itemid']) < 1)) {
+		error(_('Incorrect list of items.'));
+	}
+	else {
+		// group
+		$data['groups'] = API::HostGroup()->get(array(
+			'output' => API_OUTPUT_EXTEND
+		));
+		order_result($data['groups'], 'name');
+
+		// hosts
+		if ($data['copy_type'] == 0) {
+			// set filter group id
+			if (empty($data['filter_groupid'])) {
+				foreach ($data['groups'] as $group) {
+					$data['filter_groupid'] = $group['groupid'];
+				}
+			}
+
+			$data['hosts'] = API::Host()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'groupids' => $data['filter_groupid'],
+				'templated_hosts' => true
+			));
+			order_result($data['hosts'], 'name');
+		}
+	}
+
+	// render view
+	$itemView = new CView('configuration.item.copy', $data);
+	$itemView->render();
+	$itemView->show();
 }
 else {
 	$data = array(
@@ -738,6 +841,8 @@ else {
 		'sortfield' => getPageSortField('name'),
 		'sortorder' => getPageSortOrder()
 	);
+
+	// items
 	$options = array(
 		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 		'search' => array(),
@@ -753,7 +858,6 @@ else {
 		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
-
 	if (!empty($data['hostid'])) {
 		$options['hostids'] = $hostid;
 	}
@@ -870,7 +974,10 @@ else {
 				foreach ($item['applications'] as $application) {
 					$applications[] = $application['name'];
 				}
-				$item['applications'] = implode(', ', $applications);
+				$item['applications_list'] = implode(', ', $applications);
+			}
+			else {
+				$item['applications_list'] = '';
 			}
 		}
 	}

@@ -903,7 +903,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '365',
+				'default' => DAY_IN_YEAR
 			),
 			'lastvalue' => array(
 				'null' => true,

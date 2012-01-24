@@ -203,16 +203,14 @@ abstract class CItemGeneral extends CZBXAPI{
 				if (!$fullItem['interfaceid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
 				}
-				elseif (!isset($interfaces[$fullItem['interfaceid']])
-						|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
+				elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
 				}
-				elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY
-						&& $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
+				elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
 				}
 			}
-			// no interface required, just set it to NULL
+			// no interface required, just set it to null
 			else {
 				$item['interfaceid'] = 0;
 			}
@@ -245,7 +243,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
 					&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
 					&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid.'));
 			}
 
 			// type of information
@@ -253,8 +251,7 @@ abstract class CItemGeneral extends CZBXAPI{
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Value type must be Float for aggregate items.'));
 			}
 
-			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG
-					&& str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
+			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG && str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
 			}
 
