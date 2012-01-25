@@ -23,9 +23,10 @@ class CTag extends CObject {
 	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
 		parent::__construct();
 		$this->attributes = array();
+		$this->dataAttributes = array();
 
 		if (!is_string($tagname)) {
-			return $this->error('Incorrect tagname for CTag ['.$tagname.']');
+			return $this->error('Incorrect tagname for CTag "'.$tagname.'".');
 		}
 
 		$this->tagname = $tagname;
@@ -53,8 +54,7 @@ class CTag extends CObject {
 		echo $this->endToString();
 	}
 
-	// Do not put new line symbol (\n) before or after html tags,
-	// it adds spaces in unwanted places
+	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
@@ -91,7 +91,7 @@ class CTag extends CObject {
 			return $value;
 		}
 		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetName ['.$value.']');
+			return $this->error('Incorrect value for SetName "'.$value.'".');
 		}
 		return $this->setAttribute('name', $value);
 	}

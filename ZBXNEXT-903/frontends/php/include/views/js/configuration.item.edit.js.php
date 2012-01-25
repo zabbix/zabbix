@@ -25,7 +25,7 @@
 			});
 
 			jQuery('#interface_row option').each(function() {
-				if (jQuery(this).attr('interface_type') == type) {
+				if (jQuery(this).data('interfacetype') == type) {
 					jQuery(this).css('display', 'block');
 					if (!isSelected) {
 						if (jQuery(this).val() == selectedInterfaceId) {
@@ -42,7 +42,7 @@
 			// select first available option if we previously don't selected it by interfaceid
 			if (!isSelected) {
 				jQuery('#interface_row option').each(function() {
-					if (jQuery(this).attr('interface_type') == type) {
+					if (jQuery(this).data('interfacetype') == type) {
 						if (!isSelected) {
 							jQuery(this).attr('selected', 'selected');
 							isSelected = true;

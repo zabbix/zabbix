@@ -21,7 +21,7 @@
 <?php
 require_once('include/views/js/configuration.item.edit.js.php');
 
-$itemWidget = new CWidget();
+$itemWidget = new CWidget('item-edit');
 $itemWidget->addPageHeader($this->data['page_header']);
 
 // create form
@@ -80,7 +80,7 @@ if (!empty($this->data['interfaces'])) {
 	$intereacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
 	foreach ($this->data['interfaces'] as $interface) {
 		$option = new CComboItem($interface['interfaceid'], $interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port']);
-		$option->setAttribute('interface_type', $interface['type']);
+		$option->setAttribute('data-interfacetype', $interface['type']);
 		$intereacesComboBox->addItem($option);
 	}
 	$itemFormList->addRow(_('Host interface'), $intereacesComboBox, false, 'interface_row');
