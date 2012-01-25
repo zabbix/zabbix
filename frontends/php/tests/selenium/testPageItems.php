@@ -65,7 +65,7 @@ class testPageItems extends CWebTest {
 		);
 		// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Mass update');
 		$this->dropdown_select('go', 'Copy selected to ...');

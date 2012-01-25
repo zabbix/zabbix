@@ -40,7 +40,7 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->ok(array('Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'));
 		// Data
 		$this->ok(array($proxy['host']));
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Delete selected');
 	}
