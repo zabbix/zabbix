@@ -1287,7 +1287,6 @@ class CTrigger extends CZBXAPI {
 		}
 
 		foreach ($triggers as $tnum => &$trigger) {
-
 			$currentTrigger = $triggers[$tnum];
 
 			if (!check_db_fields($triggerDbFields, $trigger)) {
