@@ -50,7 +50,7 @@ class testPageApplications extends CWebTest {
 		// Header
 		$this->ok(array('Applications', 'Show'));
 
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Delete selected');
 	}
