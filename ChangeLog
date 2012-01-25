@@ -27,6 +27,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+..F....... [ZBX-4467] removed the warning message when setting the zoom to "All" in screen monitoring (sanja)
 ..F....... [ZBX-4434] fixed validation of duplicated user macros; fixed some error messages (sanja)
 ....I...S. [ZBX-4555] fix compilation error on Solaris (get rid of INT_MAX dependency) (dimir, Sasha)
 ..F....... [ZBX-4523] fixed impossibility to correctly translate some parts of Zabbix (sanja)
