@@ -80,8 +80,8 @@ foreach ($this->data['applications'] as $application) {
 
 // create go buttons
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Activate selected'));
-$goOption->setAttribute('confirm', _('Activate selected applications?'));
+$goOption = new CComboItem('activate', _('Enable selected'));
+$goOption->setAttribute('confirm', _('Enable selected applications?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));

@@ -27,10 +27,8 @@ require_once(dirname(__FILE__).'/../../include/defines.inc.php');
 require_once(dirname(__FILE__).'/../../include/locales.inc.php');
 require_once(dirname(__FILE__).'/../../include/items.inc.php');
 
-class class_cItemKey extends PHPUnit_Framework_TestCase
-{
-	public static function provider()
-	{
+class class_cItemKey extends PHPUnit_Framework_TestCase {
+	public static function provider() {
 		return array(
 			// valid keys
 			array(
@@ -602,7 +600,7 @@ class class_cItemKey extends PHPUnit_Framework_TestCase
 	/**
 	* @dataProvider provider
 	*/
-	public function test_parseItemKey($key, $expectedResult){
+	public function test_parseItemKey($key, $expectedResult) {
 
 		$itemKey = new CItemKey($key);
 		$result = array(

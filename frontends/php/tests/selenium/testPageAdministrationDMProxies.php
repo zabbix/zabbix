@@ -40,7 +40,7 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->ok(array('Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'));
 		// Data
 		$this->ok(array($proxy['host']));
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Delete selected');
 	}
@@ -52,10 +52,10 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$proxyid=$proxy['hostid'];
 		$name=$proxy['host'];
 
-		$sql1="select * from hosts where host='$name' order by hostid";
-		$oldHashProxy=DBhash($sql1);
-		$sql2="select proxy_hostid from hosts order by hostid";
-		$oldHashHosts=DBhash($sql2);
+		$sqlProxy="select * from hosts where host='$name' order by hostid";
+		$oldHashProxy=DBhash($sqlProxy);
+		$sqlHosts="select proxy_hostid from hosts order by hostid";
+		$oldHashHosts=DBhash($sqlHosts);
 
 		$this->login('proxies.php');
 		$this->assertTitle('Proxies');
@@ -68,8 +68,8 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF PROXIES');
 
-		$this->assertEquals($oldHashProxy, DBhash($sql1), "Chuck Norris: no-change proxy update should not update data in table 'hosts'");
-		$this->assertEquals($oldHashHosts, DBhash($sql2), "Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");
+		$this->assertEquals($oldHashProxy, DBhash($sqlProxy), "Chuck Norris: no-change proxy update should not update data in table 'hosts'");
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");
 	}
 
 	public function testPageAdministrationDMProxies_MassActivateAll() {

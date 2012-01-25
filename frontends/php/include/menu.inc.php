@@ -47,11 +47,6 @@ $ZBX_MENU = array(
 				'sub_pages' => array('history.php', 'chart.php')
 			),
 			array(
-				'url' => 'hosts_mon.php',
-				'label' => _('Hosts'),
-				'sub_pages' => array('host_screen.php')
-			),
-			array(
 				'url' => 'tr_status.php',
 				'label' => _('Triggers'),
 				'sub_pages' => array('acknow.php', 'tr_comments.php', 'chart4.php', 'scripts_exec.php')
@@ -230,9 +225,20 @@ $ZBX_MENU = array(
 		'force_disable_all_nodes'=> true,
 		'pages' => array(
 			array(
-				'url' => 'config.php',
+				'url' => 'adm.gui.php',
 				'label' => _('General'),
-				'sub_pages' => array()
+				'sub_pages' => array(
+					'adm.housekeeper.php',
+					'adm.images.php',
+					'adm.iconmapping.php',
+					'adm.regexps.php',
+					'adm.macros.php',
+					'adm.valuemapping.php',
+					'adm.workingtime.php',
+					'adm.triggerseverities.php',
+					'adm.triggerdisplayingoptions.php',
+					'adm.other.php'
+				)
 			),
 			array(
 				'url' => 'proxies.php',

@@ -20,11 +20,11 @@
 ?>
 <?php
 
-function getSounds(){
+function getSounds() {
 	$fileList = array();
 
 	$dir = scandir('./audio');
-	foreach($dir as $fnum => $file){
+	foreach ($dir as $fnum => $file) {
 		if(!preg_match('/^([\w\d_]+)\.(wav|ogg)$/i', $file)) continue;
 
 		list($filename, $type) = explode('.', $file);
@@ -34,11 +34,11 @@ function getSounds(){
 return $fileList;
 }
 
-function getLatestCloseTime(){
+function getLatestCloseTime() {
 
 }
 
-function getMessageSettings(){
+function getMessageSettings() {
 
 	$defSeverities = array(
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => 1,
@@ -69,13 +69,13 @@ function getMessageSettings(){
 	$sql = 'SELECT idx, source, value_str '.
 			' FROM profiles '.
 			' WHERE userid='.CWebUser::$data['userid'].
-				' AND '.DBcondition('idx',array('web.messages'));
-	$db_profiles = DBselect($sql);
-	while($profile = DBfetch($db_profiles)){
+				' AND '.DBcondition('idx', array('web.messages'));
+	$dbProfiles = DBselect($sql);
+	while ($profile = DBfetch($dbProfiles)) {
 		$messages[$profile['source']] = $profile['value_str'];
 	}
 
-	if(is_null($messages['triggers.severities']))
+	if (is_null($messages['triggers.severities']))
 		$messages['triggers.severities'] = $defSeverities;
 	else
 		$messages['triggers.severities'] = unserialize($messages['triggers.severities']);
@@ -83,7 +83,7 @@ function getMessageSettings(){
 return $messages;
 }
 
-function updateMessageSettings($messages){
+function updateMessageSettings($messages) {
 
 	if(!isset($messages['enabled'])) $messages['enabled'] = 0;
 	if(isset($messages['triggers.severities']))
@@ -92,9 +92,9 @@ function updateMessageSettings($messages){
 	$sql = 'SELECT profileid, idx, source, value_str '.
 			' FROM profiles '.
 			' WHERE userid='.CWebUser::$data['userid'].
-				' AND '.DBcondition('idx',array('web.messages'));
-	$db_profiles = DBselect($sql);
-	while($profile = DBfetch($db_profiles)){
+				' AND '.DBcondition('idx', array('web.messages'));
+	$dbProfiles = DBselect($sql);
+	while ($profile = DBfetch($dbProfiles)) {
 		$profile['value'] = $profile['value_str'];
 		$dbMessages[$profile['source']] = $profile;
 	}
@@ -102,7 +102,7 @@ function updateMessageSettings($messages){
 	$inserts = array();
 	$updates = array();
 
-	foreach($messages as $key => $value){
+	foreach ($messages as $key => $value) {
 		$values = array(
 			'userid' => CWebUser::$data['userid'],
 			'idx' => 'web.messages',
@@ -111,10 +111,10 @@ function updateMessageSettings($messages){
 			'type' => PROFILE_TYPE_STR
 		);
 
-		if(!isset($dbMessages[$key])){
+		if (!isset($dbMessages[$key])) {
 			$inserts[] = $values;
 		}
-		else if($dbMessages[$key]['value'] != $value){
+		elseif ($dbMessages[$key]['value'] != $value) {
 			$updates[] = array(
 				'values' => $values,
 				'where' => array('profileid' => $dbMessages[$key]['profileid'])
@@ -126,7 +126,7 @@ function updateMessageSettings($messages){
 		DB::insert('profiles', $inserts);
 		DB::update('profiles', $updates);
 	}
-	catch(APIException $e){
+	catch (APIException $e) {
 		error($e->getMessage());
 	}
 
