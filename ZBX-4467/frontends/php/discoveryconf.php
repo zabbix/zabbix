@@ -154,7 +154,7 @@ else if(str_in_array($_REQUEST['go'], array('activate','disable')) && isset($_RE
 	foreach($_REQUEST['g_druleid'] as $drid){
 		if(DBexecute('update drules set status='.$status.' where druleid='.$drid)){
 			$rule_data = get_discovery_rule_by_druleid($drid);
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_DISCOVERY_RULE,
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_DISCOVERY_RULE,
 				'['.$drid.'] '.$rule_data['name']);
 			$go_result = true;
 		}
@@ -165,7 +165,7 @@ else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['g_druleid'])){
 	$go_result = false;
 	foreach($_REQUEST['g_druleid'] as $drid){
 		if(delete_discovery_rule($drid)){
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_DISCOVERY_RULE,
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE,
 				'['.$drid.']');
 			$go_result = true;
 		}

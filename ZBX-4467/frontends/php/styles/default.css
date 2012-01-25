@@ -219,12 +219,13 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 
 /* sortable */
 .header { height: 18px; line-height: 18px; font-size: 1.1em; font-weight: bold; margin-bottom: 2px; }
+.widget { min-width: 230px }
 .widget .header { padding: 3px; }
 .widget .header .menu_icon { float: right; margin-right: 2px; }
 .widget .footer { color: white; line-height: 12px; height: 12px; padding: 4px 4px; margin-top: 2px; }
 
 .column { margin: 5px 0 5px 5px; min-width: 240px; padding-bottom: 100px; }
-.column .widget { padding: 2px; margin-bottom: 5px; overflow: hidden; }
+.column .widget, #search_wdgt .widget { padding: 2px; margin-bottom: 5px; overflow: hidden; }
 
 .inlineblock { display: inline-block; }
 

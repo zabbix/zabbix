@@ -186,7 +186,7 @@ require_once('include/page_header.php');
 
 // HEADER
 	$header = array(
-		'left' => count($items).SPACE.S_ITEMS_BIG,
+		'left' => count($items).SPACE._('ITEMS'),
 		'right' => array()
 	);
 
@@ -424,7 +424,7 @@ require_once('include/page_header.php');
 				if(!isset($data['value'])) $data['value'] = '';
 
 				if($item['valuemapid'] > 0){
-					$value = replace_value_by_map($data['value'], $item['valuemapid']);
+					$value = applyValueMap($data['value'], $item['valuemapid']);
 					$value_mapped = true;
 				}
 				else{

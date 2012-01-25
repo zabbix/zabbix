@@ -225,7 +225,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 // create go button
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Activate selected'));
+$goOption = new CComboItem('activate', _('Enable selected'));
 $goOption->setAttribute('confirm', _('Enable selected triggers?'));
 $goComboBox->addItem($goOption);
 $goOption = new CComboItem('disable', _('Disable selected'));

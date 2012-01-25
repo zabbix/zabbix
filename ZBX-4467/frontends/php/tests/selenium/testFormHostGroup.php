@@ -19,37 +19,33 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormHostGroup extends CWebTest
-{
+class testFormHostGroup extends CWebTest {
 	public $hostgroup = 'Test Group';
 
-	public function testFormHostGroup_Create()
-	{
+	public function testFormHostGroup_Create() {
 
 		$this->login('hostgroups.php');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('name',$this->hostgroup);
+		$this->input_type('name', $this->hostgroup);
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Group added');
 	}
 
-	public function testFormHostGroup_Update()
-	{
+	public function testFormHostGroup_Update() {
 		$this->login('hostgroups.php');
 		$this->click('link='.$this->hostgroup);
 		$this->wait();
-		$this->input_type('name',$this->hostgroup.'2');
+		$this->input_type('name', $this->hostgroup.'2');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Group updated');
 	}
 
-	public function testFormHostGroup_Delete()
-	{
+	public function testFormHostGroup_Delete() {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('hostgroups.php');

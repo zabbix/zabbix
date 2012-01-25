@@ -116,7 +116,7 @@
 
 	function discovery_status2str($status=null){
 		$discovery_statuses = array(
-			DRULE_STATUS_ACTIVE => _('Active'),
+			DRULE_STATUS_ACTIVE => _('Enabled'),
 			DRULE_STATUS_DISABLED => _('Disabled'),
 		);
 
