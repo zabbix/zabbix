@@ -147,14 +147,43 @@ include_once('include/page_header.php');
 	if(defined($page['title']))     $page['title'] = constant($page['title']);
 ?>
 <?php
+
+	// allowed 'srcfld1' and 'srcfld2' parameter values for each 'srctbl' value
+	$allowedSrcFields = array(
+		'hosts'                 => '"name", "host", "hostid"',
+		'groups'                => '"groups"',
+		'host_group'            => '"groupid", "name"',
+		'items'                 => '"itemid", "_key", "description"',
+		'help_items'            => '"key_"',
+		'triggers'              => '"description", "triggerid", "expression"',
+		'graphs'                => '"graphid", "name"',
+		'simple_graph'          => '"itemid", "description"',
+		'usrgrp'                => '"usrgrpid","name"',
+		'users'                 => '"usergrpid", "alias", "userid"',
+		'applications'          => '"name"',
+		'sysmaps'               => '"sysmapid", "name"',
+		'screens'               => '"screenid", "name"',
+		'slides'                => '"slideshowid"',
+		'drules'                => '"druleid"',
+		'dcheckes'              => '"dcheckid"',
+		'proxies'               => '"hostid", "host"',
+		'nodes'                 => '"nodeid"',
+		'host_templates'        => '"hostid", "host"',
+		'hosts_and_templates'   => '"hostid", "host"',
+		'overview'              => '"groupid", "name"',
+		'host_group_scr'        => '"groupid", "name"',
+		'plain_text'            => '"itemid", "description"',
+		'screens2'              => '"screenid", "name"'
+	);
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'dstfrm' =>		array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 		'dstfld1'=>		array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 		'dstfld2'=>		array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
 		'srctbl' =>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		'srcfld1'=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		'srcfld2'=>		array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
+		'srcfld1'=>		array(T_ZBX_STR, O_MAND,P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]),	null),
+		'srcfld2'=>		array(T_ZBX_STR, O_OPT,P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]),		null),
 		'nodeid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
@@ -200,8 +229,6 @@ include_once('include/page_header.php');
 	$noempty	= get_request('noempty'); 		// display/hide "Empty" button
 
 	check_fields($fields);
-	checkInput($srcfld1);
-	checkInput($srcfld2);
 
 	$existed_templates = get_request('existed_templates', null);
 	$excludeids = get_request('excludeids', null);
@@ -429,7 +456,6 @@ include_once('include/page_header.php');
 		$hosts = CHost::get($options);
 
 		foreach($hosts as $hnum => $host){
-			checkIsSet($host, $srcfld1, $srcfld2);
 			$name = new CSpan($host['host'], 'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '');
@@ -554,7 +580,6 @@ include_once('include/page_header.php');
 		order_result($hostgroups, 'name');
 
 		foreach($hostgroups as $gnum => $row){
-			checkIsSet($row, $srcfld1, $srcfld2);
 			$row['node_name'] = get_node_name_by_elid($row['groupid'], true);
 			$name = new CSpan($row['name'],'link');
 
@@ -584,7 +609,6 @@ include_once('include/page_header.php');
 		$templates = CTemplate::get($options);
 
 		foreach($templates as $tnum => $row){
-			checkIsSet($row, $srcfld1, $srcfld2);
 			$name = new CSpan($row['host'],'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
@@ -615,7 +639,6 @@ include_once('include/page_header.php');
 		$objects = array_merge($templates, $hosts);
 
 		foreach($objects as $row){
-			checkIsSet($row, $srcfld1, $srcfld2);
 			$name = new CSpan($row['host'], 'link');
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 			(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
@@ -639,7 +662,6 @@ include_once('include/page_header.php');
 		order_result($usergroups, 'name');
 
 		foreach($usergroups as $tnu => $row){
-			checkIsSet($row, $srcfld1, $srcfld2);
 			$name = new CSpan(get_node_name_by_elid($row['usrgrpid'], null, ': ').$row['name'],'link');
 
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
@@ -664,7 +686,6 @@ include_once('include/page_header.php');
 		order_result($users, 'alias');
 
 		foreach($users as $unum => $row){
-			checkIsSet($row, $srcfld1, $srcfld2);
 			$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
 				(isset($_REQUEST['submit'])? " window.opener.document.getElementsByName('$dstfrm')[0].submit();":'');
@@ -683,7 +704,6 @@ include_once('include/page_header.php');
 		$result = DBselect("select * from help_items where itemtype=".$itemtype." ORDER BY key_");
 
 		while($row = DBfetch($result)){
-			checkIsSet($row, $srcfld1, $srcfld2);
 			$name = new CSpan($row["key_"],'link');
 			$action = get_window_opener($dstfrm, $dstfld1, html_entity_decode($row[$srcfld1])).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
@@ -1549,42 +1569,6 @@ include_once('include/page_header.php');
 		$table->show();
 	}
 
-function checkInput($field) {
-	$allowed_fields = array(
-			'name',
-			'host',
-			'description',
-			'hostid',
-			'groupid',
-			'triggerid',
-			'nodeid',
-			'druleid',
-			'dcheckid',
-			'usergrpid',
-			'userid',
-			'alias',
-			'itemid',
-			'graphid',
-			'sysmapid',
-			'screenid',
-			'slideshowid',
-			'_key',
-			'expression',
-			'usrgrpid'
-	);
-	if (isset($field) && !in_array($field, $allowed_fields)) {
-		show_error_message(sprintf('not valid field  "%s"',$field));
-		exit;
-	}
-}
-function checkIsSet($field, $src1=false, $src2=false) {
-	if ($src1 && !isset($field[$src1])) $error = $src1;
-	if ($src2 && !isset($field[$src2])) $error = $src2;
-	if (isset($error)) {
-		show_error_message(sprintf('The field "%s" not exist', $error)) ;
-		exit;
-	}
-}
 ?>
 <?php
 
