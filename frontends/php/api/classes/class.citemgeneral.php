@@ -339,7 +339,6 @@ abstract class CItemGeneral extends CZBXAPI{
 		}
 	}
 
-
 	/**
 	 * Returns the interface that best matches the given item.
 	 *
