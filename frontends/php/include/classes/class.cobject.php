@@ -75,7 +75,6 @@ class CObject {
 		return $this;
 	}
 
-
 	/**
 	 * Sanitizes a string before outputting it to the browser.
 	 *
