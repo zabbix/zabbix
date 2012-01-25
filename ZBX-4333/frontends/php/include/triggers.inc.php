@@ -1031,9 +1031,6 @@ function utf8RawUrlDecode($source){
 		}
 
 		DBexecute('UPDATE triggers SET expression='.zbx_dbstr($newexpression).' WHERE triggerid='.$newtriggerid);
-		// copy dependencies
-		// delete_dependencies_by_triggerid($newtriggerid);
-
 
 		info(S_ADDED_TRIGGER.SPACE.'"'.$host['host'].':'.$trigger['description'].'"');
 		add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $newtriggerid, $host['host'].':'.$trigger['description'], NULL, NULL, NULL);
@@ -1993,15 +1990,14 @@ function utf8RawUrlDecode($source){
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
-	function insert_dependency($triggerid_down,$triggerid_up){
-
-		$triggerdepid = get_dbid('trigger_depends','triggerdepid');
+	function insert_dependency($triggerid_down, $triggerid_up) {
+		$triggerdepid = get_dbid('trigger_depends', 'triggerdepid');
 		$result = DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up)'.
-							" VALUES ($triggerdepid,$triggerid_down,$triggerid_up)");
-	if(!$result){
-			return	$result;
+			" VALUES ($triggerdepid,$triggerid_down,$triggerid_up)");
+		if (!$result) {
+			return $result;
 		}
-	return DBexecute('UPDATE triggers SET dep_level=dep_level+1 WHERE triggerid='.$triggerid_up);
+		return DBexecute('UPDATE triggers SET dep_level=dep_level+1 WHERE triggerid='.$triggerid_up);
 	}
 
 	function replace_triggers_depenedencies($new_triggerids){
@@ -2018,42 +2014,6 @@ function utf8RawUrlDecode($source){
 		foreach($new_triggerids as $old_triggerid => $newtriggerid){
 			if(isset($deps[$old_triggerid]))
 				insert_dependency($deps[$old_triggerid], $newtriggerid);
-		}
-	}
-/*
-	 * Function: update_template_dependencies_for_host
-	 *
-	 * Description:
-	 *	 Update template triggers
-	 *
-	 * Author:
-	 *	 Eugene Grigorjev (eugene.grigorjev@zabbix.com)
-	 *
-	 * Comments: !!! Don't forget sync code with C !!!
-	 *
-	 *
-	function update_template_dependencies_for_host($hostid){
-
-		$db_triggers = get_triggers_by_hostid($hostid);
-
-		while($trigger_data = DBfetch($db_triggers)){
-			$db_chd_triggers = get_triggers_by_templateid($trigger_data['triggerid']);
-
-			while($chd_trigger_data = DBfetch($db_chd_triggers)){
-				update_trigger($chd_trigger_data['triggerid'],
-								NULL,	//expression
-								NULL,	//description
-								NULL,	//type
-								NULL,	//priority
-								NULL,	//status
-								NULL,	//comments
-								NULL,	//url
-					replace_template_dependencies(
-						get_trigger_dependencies_by_triggerid($trigger_data['triggerid']),
-						$hostid),
-					$trigger_data['triggerid']);
-			}
-
 		}
 	}
 
