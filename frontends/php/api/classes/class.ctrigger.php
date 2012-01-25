@@ -1509,7 +1509,7 @@ class CTrigger extends CZBXAPI {
 			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
 					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'],
-					$trigger['description'].':'.$trigger['expression'], null, null, null);
+					$trigger['description'], null, null, null);
 		}
 
 		// execute delete
@@ -1635,7 +1635,8 @@ class CTrigger extends CZBXAPI {
 			));
 
 			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts)));
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerid, $trigger['description'], null, null, null);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerid,
+					$trigger['description'], null, null, null);
 		}
 
 		$this->validateDependencies($triggers);
@@ -1758,8 +1759,8 @@ class CTrigger extends CZBXAPI {
 			$trigger['expression'] = $expression_changed ? explode_exp($trigger['expression']) : $expression_full;
 
 			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $dbTrigger['triggerid'], $dbTrigger['description'],
-				null, $dbTrigger, $trigger_update);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $dbTrigger['triggerid'],
+					$dbTrigger['description'], null, $dbTrigger, $trigger_update);
 		}
 		unset($trigger);
 
