@@ -241,11 +241,6 @@ int	daemon_start(int allow_root)
 
 	redirect_std(CONFIG_LOG_FILE);
 
-#ifdef HAVE_SYS_RESOURCE_SETPRIORITY
-	if (0 != setpriority(PRIO_PROCESS, 0, 5))
-		zbx_error("Unable to set process priority to 5. Leaving default.");
-#endif
-
 	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(FAIL);
 
