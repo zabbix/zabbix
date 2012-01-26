@@ -22,12 +22,15 @@
 require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
 
 class testPageNodes extends CWebTest {
+
 	// Returns all nodes
 	public static function allNodes() {
-		return DBdata("select * from nodes order by nodeid");
+
+		return DBdata('SELECT * FROM nodes ORDER BY nodeid');
 	}
 
 	public function testPageNodes_StandaloneSetup() {
+
 		$this->login('nodes.php');
 		$this->assertTitle('Nodes');
 		$this->ok('DM');
@@ -41,46 +44,36 @@ class testPageNodes extends CWebTest {
 	* @dataProvider allNodes
 	*/
 	public function testPageNodes_CheckLayout($node) {
-		// TODO
-		$this->markTestIncomplete();
-/*		$this->login('proxies.php');
-		$this->assertTitle('Proxies');
-		$this->ok('CONFIGURATION OF PROXIES');
-		$this->ok('Displaying');
-		$this->nok('Displaying 0');
-		// Header
-		$this->ok(array('Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'));
-		// Data
-		$this->ok(array($proxy['host']));
-		$this->dropdown_select('go', 'Activate selected');
-		$this->dropdown_select('go', 'Disable selected');
-		$this->dropdown_select('go', 'Delete selected');*/
+
+		$this->login('nodes.php');
+		$this->assertTitle('Nodes');
+		$this->ok(array('CONFIGURATION OF NODES', 'NODES', 'ID', 'Name', 'IP:Port'));
+		$this->assertElementPresent('config');
+		$this->assertElementPresent('form');
+		$this->ok(array($node['name']));
+
 	}
 
 	/**
 	* @dataProvider allNodes
 	*/
 	public function testPageNodes_SimpleUpdate($node) {
-		// TODO
-		$this->markTestIncomplete();
+
+		$this->login('nodes.php');
+
+		$sqlNodes = 'SELECT * FROM nodes ORDER BY nodeid';
+		$oldHashNodes=DBhash($sqlNodes);
+
+		$this->click('link='.$node['name']);
+		$this->wait();
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('Node updated');
+
+		$newHashNodes = DBhash($sqlNodes);
+		$this->assertEquals($oldHashNodes, $newHashNodes, "Chuck Norris: no-change node update should not update data in table 'nodes'");
+
 	}
 
-	public function testPageNodes_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	/**
-	* @dataProvider allNodes
-	*/
-	public function testPageNodes_MassDelete($node) {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageNodes_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }
 ?>
