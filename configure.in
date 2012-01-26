@@ -444,20 +444,6 @@ dnl *                     Checks for functions                      *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_MSG_CHECKING(for function setpriority() in sys/resource.h)
-AC_TRY_COMPILE(
-[
-#include <sys/time.h>
-#include <sys/resource.h>
-],
-[	int i;
-
-	i=setpriority(PRIO_PROCESS,0,5);
-],
-AC_DEFINE(HAVE_SYS_RESOURCE_SETPRIORITY,1,[Define to 1 if function 'setpriority' exists.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
 AC_MSG_CHECKING(for function sysconf() in unistd.h)
 AC_TRY_COMPILE(
 [
