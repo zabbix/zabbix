@@ -321,7 +321,7 @@
 		return $output;
 	}
 
-	function get_item_filter_form(&$items) {
+	function getItemFilterForm(&$items) {
 		$filter_group				= $_REQUEST['filter_group'];
 		$filter_hostname			= $_REQUEST['filter_hostname'];
 		$filter_application			= $_REQUEST['filter_application'];
@@ -355,7 +355,7 @@
 		$form->setAttribute('name', 'zbx_filter');
 		$form->setAttribute('id', 'zbx_filter');
 		$form->setMethod('get');
-		$form->addVar('filter_hostid', get_request('filter_hostid', get_request('hostid')));
+		$form->addVar('filter_hostid',				get_request('filter_hostid', get_request('hostid')));
 		$form->addVar('subfilter_hosts',			$subfilter_hosts);
 		$form->addVar('subfilter_apps',				$subfilter_apps);
 		$form->addVar('subfilter_types',			$subfilter_types);
@@ -920,7 +920,7 @@
 			$data['hostid'] = $discoveryRule['hostid'];
 		}
 		else {
-			$data['hostid'] = get_request('form_hostid', 0);
+			$data['hostid'] = get_request('form_hostid', get_request('hostid', 0));
 		}
 
 		// types, http items only for internal processes
