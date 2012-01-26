@@ -2,6 +2,7 @@
 Changes for 1.9.9
 
 New features:
+..F....... [ZBX-4558] added audit logging when udpating and creating triggers (pavels)
 ..F....... [ZBXNEXT-1066] removed the "Monotoring - Hosts" page (pavels)
 ..F....... [ZBXNEXT-1066] remade the "Search" page layout (pavels)
 ..F....... [ZBXNEXT-1066] added the host pop up menu to the "Events", "Event details", "Latest data" and "Overview" pages (pavels)
@@ -27,6 +28,9 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+A.F....... [ZBX-4558] fixed deleting child template triggers when moving a trigger to a template (pavels)
+A......... [ZBX-4558] fixed child template trigger attributes being reset when updating a template trigger (pavels)
+..F....... [ZBX-4558] fixed trigger form "type" field value being inverted (pavels)
 A......... [ZBX-4520] removed possibility to create dependencies from hosts to templates (pavels)
 ..F....... [ZBX-4467] removed the warning message when setting the zoom to "All" in screen monitoring (sanja)
 ..F....... [ZBX-4434] fixed validation of duplicated user macros; fixed some error messages (sanja)
