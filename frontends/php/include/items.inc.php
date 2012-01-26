@@ -644,14 +644,16 @@ function item_type2str($type = null){
 	 * @param null $view_style
 	 * @return CTableInfo
 	 */
-	function get_items_data_overview($hostids,$view_style=null){
+	function get_items_data_overview($hostids, $view_style = null) {
 		global $USER_DETAILS;
 
-		if(is_null($view_style)) $view_style = CProfile::get('web.overview.view.style',STYLE_TOP);
+		if (is_null($view_style)) {
+			$view_style = CProfile::get('web.overview.view.style', STYLE_TOP);
+		}
 
 		$table = new CTableInfo(_('No items defined.'));
 
-// COpt::profiling_start('prepare_data');
+		// COpt::profiling_start('prepare_data');
 		$result = DBselect('SELECT DISTINCT h.hostid, h.name as hostname,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.lastclock, '.
 				' i.name, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' FROM hosts h, items i '.
@@ -664,17 +666,28 @@ function item_type2str($type = null){
 				' AND '.DBcondition('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
 			' ORDER BY i.name,i.itemid');
 
-		unset($items);
-		unset($hosts);
-// get rid of warnings about $triggers undefined
+		// fetch data for the host JS menu
+		$hosts = API::Host()->get(array(
+			'output' => array('name', 'hostid'),
+			'monitored_hosts' => true,
+			'selectAppllications' => API_OUTPUT_EXTEND,
+			'selectScreens' => API_OUTPUT_COUNT,
+			'selectInventory' => true,
+			'preservekeys' => true
+		));
+		$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
+		foreach ($hostScripts as $hostid => $scripts) {
+			$hosts[$hostid]['scripts'] = $scripts;
+		}
+
 		$items = array();
-		while($row = DBfetch($result)){
+		while ($row = DBfetch($result)) {
 			$descr = itemName($row);
 			$row['hostname'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['hostname'];
-			$hosts[zbx_strtolower($row['hostname'])] = $row['hostname'];
+			$hostNames[$row['hostid']] = $row['hostname'];
 
-// A little tricky check for attempt to overwrite active trigger (value=1) with
-// inactive or active trigger with lower priority.
+			// A little tricky check for attempt to overwrite active trigger (value=1) with
+			// inactive or active trigger with lower priority.
 			if (!isset($items[$descr][$row['hostname']]) ||
 				(
 					(($items[$descr][$row['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE) && ($row['tr_value'] == TRIGGER_VALUE_TRUE)) ||
@@ -700,50 +713,55 @@ function item_type2str($type = null){
 			}
 		}
 
-		if(!isset($hosts)){
+		if (!isset($hostNames)) {
 			return $table;
 		}
 
-		ksort($hosts, SORT_STRING);
-// COpt::profiling_stop('prepare_data');
-// COpt::profiling_start('prepare_table');
+		ksort($hostNames, SORT_STRING);
 
 		$css = getUserTheme($USER_DETAILS);
-		if($view_style == STYLE_TOP){
-			$header=array(new CCol(S_ITEMS,'center'));
-			foreach($hosts as $hostname){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)));
+		if ($view_style == STYLE_TOP) {
+			$header = array(new CCol(_('Items'), 'center'));
+			foreach ($hostNames as $hostname) {
+				$header = array_merge($header, array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)));
 			}
 
-			$table->SetHeader($header,'vertical_header');
+			$table->SetHeader($header, 'vertical_header');
 
-			foreach($items as $descr => $ithosts){
+			foreach ($items as $descr => $ithosts) {
 				$table_row = array(nbsp($descr));
-				foreach($hosts as $hostname){
-					$table_row = get_item_data_overview_cells($table_row,$ithosts,$hostname);
+				foreach ($hostNames as $hostname) {
+					$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
 				}
 				$table->AddRow($table_row);
 			}
 		}
-		else{
-			$header=array(new CCol(S_HOSTS,'center'));
-			foreach($items as $descr => $ithosts){
-				$header = array_merge($header,array(new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css)));
+		else {
+			$header = array(new CCol(_('Hosts'), 'center'));
+			foreach ($items as $descr => $ithosts) {
+				$header = array_merge($header, array(new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css)));
 			}
 
-			$table->SetHeader($header,'vertical_header');
+			$table->SetHeader($header, 'vertical_header');
 
-			foreach($hosts as $hostname){
-				$table_row = array(nbsp($hostname));
-				foreach($items as $descr => $ithosts){
-					$table_row = get_item_data_overview_cells($table_row,$ithosts,$hostname);
+			foreach ($hostNames as $hostid => $hostname) {
+				$host = $hosts[$hostid];
+
+				// host JS menu link
+				$hostSpan = new CSpan(nbsp($host['name']), 'link_menu menu-host');
+				$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+				$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+
+				$table_row = array(new CCol($hostSpan));
+				foreach ($items as $ithosts) {
+					$table_row = get_item_data_overview_cells($table_row, $ithosts, $hostname);
 				}
+
 				$table->AddRow($table_row);
 			}
 		}
-// COpt::profiling_stop('prepare_table');
 
-	return $table;
+		return $table;
 	}
 
 	function get_item_data_overview_cells(&$table_row,&$ithosts,$hostname){

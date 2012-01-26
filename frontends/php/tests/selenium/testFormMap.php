@@ -19,11 +19,9 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormMap extends CWebTest
-{
-
+class testFormMap extends CWebTest {
 	/**
 	 * Possible combinations of grid settings
 	 * @return array
@@ -63,8 +61,7 @@ class testFormMap extends CWebTest
 	 *
 	 * @dataProvider possibleGridOptions
 	 */
-	public function testFormMap_UpdateGridOptions($gridSize, $showGrid, $autoAlign)
-	{
+	public function testFormMap_UpdateGridOptions($gridSize, $showGrid, $autoAlign) {
 
 		$map_name = 'Test map 1';
 
@@ -87,7 +84,7 @@ class testFormMap extends CWebTest
 		if ($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON) {
 			$this->ok('Shown');
 		}
-		else{
+		else {
 			$this->ok('Hidden');
 		}
 
@@ -95,7 +92,7 @@ class testFormMap extends CWebTest
 		if ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON) {
 			$this->ok('On');
 		}
-		else{
+		else {
 			$this->ok('Off');
 		}
 
@@ -116,7 +113,6 @@ class testFormMap extends CWebTest
 		$this->button_click('save');
 		$this->wait();
 		$this->getConfirmation();
-
 
 		// checking if DB was updated as expected
 		$db_result = DBSelect("SELECT * FROM sysmaps WHERE name = '$map_name'");
@@ -144,14 +140,14 @@ class testFormMap extends CWebTest
 		if ($showGrid) {
 			$this->ok('Shown');
 		}
-		else{
+		else {
 			$this->ok('Hidden');
 		}
 
 		if ($autoAlign) {
 			$this->ok('On');
 		}
-		else{
+		else {
 			$this->ok('Off');
 		}
 

@@ -3,7 +3,7 @@
 	<td>
 		<input type="hidden" name="macros[#{macroid}][new]" value="#{newValue}">
 		<input type="hidden" name="macros[#{macroid}][macroid]" value="#{macroid}">
-		<input class="input text" name="macros[#{macroid}][macro]" type="text" size="30" value="#{macro}" placeholder="{$MACRO}">
+		<input class="input text" name="macros[#{macroid}][macro]" type="text" size="30" value="#{macro}" placeholder="{$MACRO}" style="text-transform:uppercase;">
 	</td>
 	<td><span style="vertical-align:top;">⇒</span></td>
 	<td>
