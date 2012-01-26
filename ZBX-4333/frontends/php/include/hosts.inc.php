@@ -93,48 +93,63 @@
 	return true;
 	}
 
-/*
- * Function: copy_template_elements
- *
- * Description:
- *     Copy all elements from template to host
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function copy_template_elements($hostid, $templateid = null, $copy_mode = false){
-		$result = true;
-		copy_template_applications($hostid, $templateid, $copy_mode);
-		copy_template_items($hostid, $templateid, $copy_mode);
-		copy_template_triggers($hostid, $templateid, $copy_mode);
-		// razvilka $copy
-		if($copy_mode){
-			copy_template_graphs($hostid, $templateid, $copy_mode);
+
+	/**
+	 * Copies all of the objects from the templates to the host.
+	 *
+	 * @param $targetHostId
+	 * @param array $templatedIds
+	 * @param bool $copyMode
+	 *
+	 * @return bool
+	 */
+	function copyTemplateElements($targetHostId, array $templatedIds, $copyMode = false) {
+
+		$newTriggerIds = array();
+		foreach ($templatedIds as $templateId) {
+			copy_template_applications($targetHostId, $templateId, $copyMode);
+			copy_template_items($targetHostId, $templateId, $copyMode);
+
+			// copy triggers
+			$newTemplateTriggerIds = copy_template_triggers($targetHostId, $templateId, $copyMode);
+			$newTriggerIds = zbx_array_merge($newTriggerIds, $newTemplateTriggerIds);
+
+			if ($copyMode) {
+				copy_template_graphs($targetHostId, $templateId, $copyMode);
+			}
+			else {
+				$result = CGraph::syncTemplates(array('hostids' => $targetHostId, 'templateids' => $templateId));
+			}
+
+			if (!$result) {
+				return false;
+			}
 		}
-		else{
-			$result = CGraph::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
+
+		// update trigger dependencies
+		foreach ($newTriggerIds as $templateTriggerId => $hostTriggerId) {
+			$templateDependencies = get_trigger_dependencies_by_triggerid($templateTriggerId);
+			$hostDependencies = replace_template_dependencies($templateDependencies, $targetHostId);
+			foreach ($hostDependencies as $depTriggerId) {
+				add_trigger_dependency($hostTriggerId, $depTriggerId);
+			}
 		}
-		return $result;
+
+		return true;
 	}
 
-/*
- * Function: sync_host_with_templates
- *
- * Description:
- *     Synchronize template elements with host
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function sync_host_with_templates($hostid, $templateid = null){
-		delete_template_elements($hostid, $templateid);
-		$res = copy_template_elements($hostid, $templateid);
+	/**
+	 * Synchronizes the host with the given templates.
+	 *
+	 * @param $hostid
+	 * @param array $templateIds
+	 *
+	 * @return bool
+	 */
+	function syncHostWithTemplates($hostid, array $templateIds) {
+		delete_template_elements($hostid, $templateIds);
+		$res = copyTemplateElements($hostid, $templateIds);
+
 		return $res;
 	}
 

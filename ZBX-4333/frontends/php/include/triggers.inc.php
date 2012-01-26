@@ -2306,25 +2306,24 @@ function utf8RawUrlDecode($source){
 
 /**
  * Copy triggers from template.
+ *
  * @param $hostid
  * @param $templateid
  * @param bool $copy_mode
- * @return void
+ *
+ * @return array            An map of new trigger IDs in the form of array('oldTriggerId' => 'newTriggerId')
  */
 function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 	$triggers = get_triggers_by_hostid($templateid);
 	while ($trigger = DBfetch($triggers)) {
 		$triggerArray[] = $trigger;
 	}
+	$newId = array();
 	foreach ($triggerArray as $triggerData) {
 		$newId[$triggerData['triggerid']] = copy_trigger_to_host($triggerData['triggerid'], $hostid, $copy_mode);
 	}
-	foreach ($triggerArray as $triggerData) {
-		$deps = replace_template_dependencies(get_trigger_dependencies_by_triggerid($triggerData['triggerid']), $hostid);
-		foreach ($deps as $dep_id) {
-			add_trigger_dependency($newId[$triggerData['triggerid']], $dep_id);
-		}
-	}
+
+	return $newId;
 }
 
 /*
