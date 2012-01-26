@@ -1489,11 +1489,11 @@ class CTrigger extends CZBXAPI {
 		// get child triggers
 		$parentTriggerids = $triggerids;
 		do {
-			$db_items = DBselect('SELECT triggerid FROM triggers WHERE '.DBcondition('templateid', $parentTriggerids));
+			$dbItems = DBselect('SELECT triggerid FROM triggers WHERE '.DBcondition('templateid', $parentTriggerids));
 			$parentTriggerids = array();
-			while ($db_trigger = DBfetch($db_items)) {
-				$parentTriggerids[] = $db_trigger['triggerid'];
-				$triggerids[] = $db_trigger['triggerid'];
+			while ($dbTrigger = DBfetch($dbItems)) {
+				$parentTriggerids[] = $dbTrigger['triggerid'];
+				$triggerids[] = $dbTrigger['triggerid'];
 			}
 		} while (!empty($parentTriggerids));
 
@@ -1507,9 +1507,9 @@ class CTrigger extends CZBXAPI {
 		// TODO: REMOVE info
 		foreach ($delTriggers as $trigger) {
 			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
-				implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'],
-				$trigger['description'], null, null, null);
+					$trigger['description'], null, null, null);
 		}
 
 		// execute delete
@@ -1534,9 +1534,9 @@ class CTrigger extends CZBXAPI {
 		$actionids = array();
 		$dbActions = DBselect(
 			'SELECT DISTINCT actionid'.
-				' FROM conditions'.
-				' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
-				' AND '.DBcondition('value', $pks, false, true)
+			' FROM conditions'.
+			' WHERE conditiontype='.CONDITION_TYPE_TRIGGER.
+			' AND '.DBcondition('value', $pks, false, true)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -2097,7 +2097,7 @@ class CTrigger extends CZBXAPI {
 				$upTriggerids = array();
 				while ($upTrigger = DBfetch($dbUpTriggers)) {
 					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_DEPENDENCY);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency'));
 					}
 					$upTriggerids[] = $upTrigger['triggerid_up'];
 				}
