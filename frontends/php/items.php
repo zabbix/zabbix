@@ -34,7 +34,7 @@ require_once('include/page_header.php');
 <?php
 $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'description_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'type_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -182,7 +182,7 @@ $fields = array(
 	// ajax
 	'favobj' =>					array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favref' =>					array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
-	'state' =>					array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj}) && ("filter"=={favobj})')
+	'state' =>					array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
 );
 
 check_fields($fields);
@@ -230,7 +230,6 @@ $hostid = get_request('hostid', 0);
 if (!empty($hostid)) {
 	$_REQUEST['filter_hostname'] = reset($hosts);
 	$_REQUEST['filter_hostname'] = $_REQUEST['filter_hostname']['name'];
-	$_REQUEST['filter_set'] = 1;
 }
 
 // filter
@@ -836,7 +835,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 else {
 	$data = array(
 		'form' => get_request('form', null),
-		'form_hostid' => get_request('form_hostid', null),
+		'form_hostid' => get_request('form_hostid', $hostid),
 		'hostid' => $hostid,
 		'sortfield' => getPageSortField('name'),
 		'sortorder' => getPageSortOrder()
@@ -982,7 +981,7 @@ else {
 		}
 	}
 
-	$data['flicker'] = get_item_filter_form($data['items']);
+	$data['flicker'] = getItemFilterForm($data['items']);
 
 	// remove subfiltered items
 	if (!empty($data['items'])) {
