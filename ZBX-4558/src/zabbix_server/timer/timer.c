@@ -638,6 +638,21 @@ static void	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, i
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: day_in_month                                                     *
+ *                                                                            *
+ * Purpose: returns number of days in a month                                 *
+ *                                                                            *
+ * Parameters: year - year, month - month (0-11)                              *
+ *                                                                            *
+ * Return value: 28-31 depending on number of days in the month               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 static int	day_in_month(int year, int mon)
 {
 #define is_leap_year(year) (((year % 4) == 0 && (year % 100) != 0) || (year % 400) == 0)

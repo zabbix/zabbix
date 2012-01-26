@@ -19,80 +19,12 @@
 **/
 ?>
 <?php
-require_once('include/debug.inc.php');
 
-function __autoload($class_name) {
-	$class_name_lower = zbx_strtolower($class_name);
-	$api = array(
-		'apiexception' => 1,
-		'caction' => 1,
-		'calert' => 1,
-		'capiinfo' => 1,
-		'capplication' => 1,
-		'cdcheck' => 1,
-		'cdhost' => 1,
-		'cdiscoveryrule' => 1,
-		'cdrule' => 1,
-		'cdservice' => 1,
-		'cevent' => 1,
-		'cgraph' => 1,
-		'cgraphprototype' => 1,
-		'cgraphitem' => 1,
-		'chistory' => 1,
-		'chost' => 1,
-		'chostgroup' => 1,
-		'chostinterface'=> 1,
-		'ciconmap' => 1,
-		'cimage' => 1,
-		'citem' => 1,
-		'citemgeneral' => 1,
-		'citemprototype' => 1,
-		'cmaintenance' => 1,
-		'cmap' => 1,
-		'cmapelement' => 1,
-		'cmediatype' => 1,
-		'cproxy' => 1,
-		'cscreen' => 1,
-		'cscreenitem' => 1,
-		'cscript' => 1,
-		'ctemplate' => 1,
-		'ctemplatescreen' => 1,
-		'ctrigger' => 1,
-		'ctriggerexpression' => 1,
-		'citemkey' => 1,
-		'ctriggerprototype' => 1,
-		'cuser' => 1,
-		'cusergroup' => 1,
-		'cusermacro' => 1,
-		'cusermedia' => 1,
-		'cwebcheck' => 1,
-		'czbxapi' => 1,
-	);
+require_once dirname(__FILE__).'/classes/core/Z.php';
+Z::getInstance()->run();
 
-	$rpc = array(
-		'cjsonrpc' =>1,
-		'czbxrpc' => 1,
-		'cxmlrpc' => null,
-		'csoap' => null,
-		'csoapjr' => null
-	);
+require_once dirname(__FILE__).'/debug.inc.php';
 
-	if (isset($api[$class_name_lower])) {
-		require_once('api/classes/class.'.$class_name_lower.'.php');
-	}
-	elseif (isset($rpc[$class_name_lower])) {
-		require_once('api/rpc/class.'.$class_name_lower.'.php');
-	}
-	elseif (file_exists('include/classes/class.'.$class_name_lower.'.php')) {
-		require_once('include/classes/class.'.$class_name_lower.'.php');
-	}
-	// a temporary fix to support new classes folder structure
-	else {
-		require_once('include/classes/sysmaps/'.$class_name.'.php');
-	}
-}
-?>
-<?php
 require_once('include/api.inc.php');
 require_once('include/gettextwrapper.inc.php');
 require_once('include/defines.inc.php');

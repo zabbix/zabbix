@@ -21,7 +21,7 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class API_JSON_User extends CZabbixTest {
 
@@ -177,7 +177,8 @@ class API_JSON_User extends CZabbixTest {
 		$result = $this->api_call(
 			'user.authenticate',
 			$data,
-			$debug);
+			$debug
+		);
 		if ($expect) {
 			$this->assertTrue(isset($result['result']), "$debug");
 		}

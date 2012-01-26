@@ -20,7 +20,7 @@
 ?>
 <?php
 class CLdap{
-	public function __construct($arg=array()){
+	public function __construct($arg=array()) {
 		$this->ds = false;
 		$this->info = array();
 
@@ -52,42 +52,42 @@ class CLdap{
 			);
 
 
-		if(is_array($arg)){
+		if (is_array($arg)) {
 			$this->cnf = zbx_array_merge($this->cnf,$arg);
 		}
 
-		if(!function_exists('ldap_connect')) {
+		if (!function_exists('ldap_connect')) {
 			error('LDAP lib error. Cannot find needed functions');
 		return false;
 		}
 	}
 
-	public function connect(){
+	public function connect() {
 // connection already established
-		if($this->ds) return true;
+		if ($this->ds) return true;
 
 		$this->bound = 0;
 
-		if(!$this->ds=ldap_connect($this->cnf['host'],$this->cnf['port'])){
+		if (!$this->ds=ldap_connect($this->cnf['host'],$this->cnf['port'])) {
 			error("LDAP: couldn't connect to LDAP server");
 			return false;
 		}
 
 //set protocol version and dependend options
-		if($this->cnf['version']){
-			if(!ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, $this->cnf['version'])){
+		if ($this->cnf['version']) {
+			if (!ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, $this->cnf['version'])) {
 			   error('Setting LDAP Protocol version '.$this->cnf['version'].' failed');
 			}
 			else{
 //use TLS (needs version 3)
-				if(isset($this->cnf['starttls'])){
-					if(!ldap_start_tls($this->ds)){
+				if (isset($this->cnf['starttls'])) {
+					if (!ldap_start_tls($this->ds)) {
 						error('Starting TLS failed');
 					}
 				}
 // needs version 3
-				if(!zbx_empty($this->cnf['referrals'])) {
-					if(!ldap_set_option($this->ds, LDAP_OPT_REFERRALS,$this->cnf['referrals'])){
+				if (!zbx_empty($this->cnf['referrals'])) {
+					if (!ldap_set_option($this->ds, LDAP_OPT_REFERRALS,$this->cnf['referrals'])) {
 					   error('Setting LDAP referrals to off failed');
 					}
 				}
@@ -95,8 +95,8 @@ class CLdap{
 		}
 
 //set deref mode
-		if(isset($this->cnf['deref'])){
-			if(!ldap_set_option($this->ds, LDAP_OPT_DEREF, $this->cnf['deref'])){
+		if (isset($this->cnf['deref'])) {
+			if (!ldap_set_option($this->ds, LDAP_OPT_DEREF, $this->cnf['deref'])) {
 				error('Setting LDAP Deref mode '.$this->cnf['deref'].' failed');
 			}
 		}
@@ -104,39 +104,39 @@ class CLdap{
 	return true;
 	}
 
-	public function checkPass($user,$pass){
+	public function checkPass($user,$pass) {
 // reject empty password
-		if(empty($pass)) return false;
-		if(!$this->connect()) return false;
+		if (empty($pass)) return false;
+		if (!$this->connect()) return false;
 // indirect user bind
-		if(!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password'])){
+		if (!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password'])) {
 // use superuser credentials
-			if(!ldap_bind($this->ds,$this->cnf['bind_dn'],$this->cnf['bind_password'])){
+			if (!ldap_bind($this->ds,$this->cnf['bind_dn'],$this->cnf['bind_password'])) {
 				error('LDAP: cannot bind by given Bind DN');
 				return false;
 			}
 			$this->bound = 2;
 		}
-		else if(!empty($this->cnf['bind_dn']) && !empty($this->cnf['base_dn']) && !empty($this->cnf['userfilter'])){
+		else if (!empty($this->cnf['bind_dn']) && !empty($this->cnf['base_dn']) && !empty($this->cnf['userfilter'])) {
 // special bind string
 			$dn = $this->makeFilter($this->cnf['bind_dn'],array('user'=>$user,'host'=>$this->cnf['host']));
 		}
-		else if(zbx_strpos($this->cnf['base_dn'], '%{user}')) {
+		else if (zbx_strpos($this->cnf['base_dn'], '%{user}')) {
 // direct user bind
 			$dn = $this->makeFilter($this->cnf['base_dn'],array('user'=>$user,'host'=>$this->cnf['host']));
 		}
 		else{
 // Anonymous bind
-			if(!ldap_bind($this->ds)){
+			if (!ldap_bind($this->ds)) {
 				error('LDAP: can not bind anonymously');
 				return false;
 			}
 		}
 
 // Try to bind to with the dn if we have one.
-		if(!empty($dn)) {
+		if (!empty($dn)) {
 // User/Password bind
-			if(!ldap_bind($this->ds,$dn,$pass)){
+			if (!ldap_bind($this->ds,$dn,$pass)) {
 				return false;
 			}
 
@@ -147,7 +147,7 @@ class CLdap{
 // See if we can find the user
 			$this->info = $this->getUserData($user);
 
-			if(empty($this->info['dn'])) {
+			if (empty($this->info['dn'])) {
 				return false;
 			}
 			else {
@@ -157,7 +157,7 @@ class CLdap{
 //SDI($dn.' - '.$this->info['passwd'].' : '.$pass);
 
 // Try to bind with the dn provided
-			if(!ldap_bind($this->ds,$dn,$pass)){
+			if (!ldap_bind($this->ds,$dn,$pass)) {
 				return false;
 			}
 
@@ -169,11 +169,11 @@ class CLdap{
 	}
 
 	private function getUserData($user) {
-		if(!$this->connect()) return false;
+		if (!$this->connect()) return false;
 
 // force superuser bind if wanted and not bound as superuser yet
-		if(!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password']) && ($this->bound < 2)){
-			if(!ldap_bind($this->ds,$this->cnf['bind_dn'],$this->cnf['bind_password'])){
+		if (!empty($this->cnf['bind_dn']) && !empty($this->cnf['bind_password']) && ($this->bound < 2)) {
+			if (!ldap_bind($this->ds,$this->cnf['bind_dn'],$this->cnf['bind_password'])) {
 				return false;
 			}
 			$this->bound = 2;
@@ -186,7 +186,7 @@ class CLdap{
 //get info for given user
 		$base = $this->makeFilter($this->cnf['base_dn'], $info);
 
-		if(isset($this->cnf['userfilter']) && !empty($this->cnf['userfilter'])) {
+		if (isset($this->cnf['userfilter']) && !empty($this->cnf['userfilter'])) {
 			$filter = $this->makeFilter($this->cnf['userfilter'], $info);
 		}
 		else {
@@ -196,7 +196,7 @@ class CLdap{
 		$result	= ldap_get_entries($this->ds, $sr);
 
 // Don't accept more or less than one response
-		if($result['count'] != 1){
+		if ($result['count'] != 1) {
 			error('LDAP: User not found');
 			return false;
 		}
@@ -210,36 +210,36 @@ class CLdap{
 		$info['grps'] = array();
 
 // overwrite if other attribs are specified.
-		if(is_array($this->cnf['mapping'])){
-			foreach($this->cnf['mapping'] as $localkey => $key){
+		if (is_array($this->cnf['mapping'])) {
+			foreach ($this->cnf['mapping'] as $localkey => $key) {
 				$info[$localkey] = isset($user_result[$key])?$user_result[$key][0]:null;
 			}
 		}
 		$user_result = zbx_array_merge($info,$user_result);
 
 //get groups for given user if grouptree is given
-		if(isset($this->cnf['grouptree']) && isset($this->cnf['groupfilter'])) {
+		if (isset($this->cnf['grouptree']) && isset($this->cnf['groupfilter'])) {
 			$base   = $this->makeFilter($this->cnf['grouptree'], $user_result);
 			$filter = $this->makeFilter($this->cnf['groupfilter'], $user_result);
 
 			$sr = ldap_search($this->ds, $base, $filter, array($this->cnf['groupkey']));
 
-			if(!$sr){
+			if (!$sr) {
 				error('LDAP: Reading group memberships failed');
 				return false;
 			}
 
 			$result = ldap_get_entries($this->ds, $sr);
 
-			foreach($result as $grp){
-				if(!empty($grp[$this->cnf['groupkey']][0])){
+			foreach ($result as $grp) {
+				if (!empty($grp[$this->cnf['groupkey']][0])) {
 					$info['grps'][] = $grp[$this->cnf['groupkey']][0];
 				}
 			}
 		}
 
 // always add the default group to the list of groups
-		if(isset($conf['defaultgroup']) && !str_in_array($conf['defaultgroup'],$info['grps'])){
+		if (isset($conf['defaultgroup']) && !str_in_array($conf['defaultgroup'],$info['grps'])) {
 			$info['grps'][] = $conf['defaultgroup'];
 		}
 
@@ -254,7 +254,7 @@ class CLdap{
 		foreach ($matches[1] as $match) {
 //take first element if array
 //SDII($placeholders);
-			if(is_array($placeholders[$match])) {
+			if (is_array($placeholders[$match])) {
 				$value = $placeholders[$match][0];
 			}
 			else{

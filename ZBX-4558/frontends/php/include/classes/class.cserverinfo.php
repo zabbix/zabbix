@@ -20,16 +20,16 @@
 ?>
 <?php
 class CServerInfo extends CTable{
-	public function __construct(){
+	public function __construct() {
 		parent::__construct(NULL,'server_info');
 	}
 
-	public function bodyToString(){
+	public function bodyToString() {
 		$this->cleanItems();
 
 		$status = get_status();
 
-		if($status['zabbix_server'] == S_YES)
+		if ($status['zabbix_server'] == S_YES)
 			$server = new CSpan(S_RUNNING,'off');
 		else
 			$server = new CSpan(S_NOT_RUNNING,'on');

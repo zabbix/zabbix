@@ -45,7 +45,7 @@ $fields = array(
 	'tr_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'elementid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO,	DB_ID, null),
 	'screenname' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,null),
-	'step' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0,65535), null),
+	'step' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
 	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null, null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null, null),
 	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
@@ -274,7 +274,8 @@ else {
 			'scrollWidthByImage' => 0,
 			'dynamic' => 0,
 			'mainObject' => 1,
-			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1)
+			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 		zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
 		zbx_add_post_js('timeControl.processObjects();');

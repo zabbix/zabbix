@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../../include/class.capitest.php');
+require_once dirname(__FILE__).'/../../include/class.capitest.php';
 
 /**
  * @property CItem $api

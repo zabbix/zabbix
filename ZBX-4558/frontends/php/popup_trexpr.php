@@ -155,13 +155,13 @@ $functions = array(
 		'allowed_types' => $allowed_types_any
 	),
 	'max' => array(
-		'description' => 'Maximal value for period of time T {OP} N.',
+		'description' => 'Maximum value for period of time T {OP} N.',
 		'operators' => $operators,
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric
 	),
 	'min' => array(
-		'description' => 'Minimal value for period of time T {OP} N.',
+		'description' => 'Minimum value for period of time T {OP} N.',
 		'operators' => $operators,
 		'params' => $param1_sec_count,
 		'allowed_types' => $allowed_types_numeric

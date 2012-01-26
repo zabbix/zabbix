@@ -93,11 +93,11 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->ok('Regular expression deleted');
 
 		// $sql = "SELECT * FROM regexps r WHERE r.name='$name'";
-		$sql1 = "SELECT * FROM regexps r WHERE r.name='$name'";
-		$this->assertEquals(0, DBcount($sql1), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$sql = "SELECT * FROM regexps r WHERE r.name='$name'";
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
 
-		$sql2 = "SELECT * FROM expressions e WHERE e.regexpid=$regexpid";
-		$this->assertEquals(0, DBcount($sql2), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$sql = "SELECT * FROM expressions e WHERE e.regexpid=$regexpid";
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 		DBrestore_tables('regexps');
 	}
 
@@ -113,11 +113,11 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->wait();
 		$this->ok('Regular expression deleted');
 
-		$sql1 = "SELECT * FROM regexps";
-		$this->assertEquals(0, DBcount($sql1), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$sql = "SELECT * FROM regexps";
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
 
-		$sql2 = "SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid";
-		$this->assertEquals(0, DBcount($sql2), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$sql = "SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid";
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
 
 		// DBrestore_tables('regexps');
 	}

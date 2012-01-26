@@ -21,7 +21,7 @@
 <?php
 class CPie extends CGraphDraw{
 
-	public function __construct($type = GRAPH_TYPE_PIE){
+	public function __construct($type = GRAPH_TYPE_PIE) {
 		parent::__construct($type);
 
 		$this->background = false;
@@ -49,8 +49,8 @@ class CPie extends CGraphDraw{
 		$this->num++;
 	}
 
-	public function set3DAngle($angle = 70){
-		if(is_numeric($angle) && ($angle < 85) && ($angle > 10)){
+	public function set3DAngle($angle = 70) {
+		if (is_numeric($angle) && ($angle < 85) && ($angle > 10)) {
 			$this->angle3d = (int) $angle;
 		}
 		else {
@@ -58,12 +58,12 @@ class CPie extends CGraphDraw{
 		}
 	}
 
-	public function switchPie3D($type = false){
-		if($type){
+	public function switchPie3D($type = false) {
+		if ($type) {
 			$this->type = $type;
 		}
 		else{
-			switch($this->type){
+			switch ($this->type) {
 				case GRAPH_TYPE_EXPLODED:
 					$this->type = GRAPH_TYPE_3D_EXPLODED;
 					break;
@@ -83,12 +83,12 @@ class CPie extends CGraphDraw{
 	return $this->type;
 	}
 
-	public function switchPieExploded($type){
-		if($type){
+	public function switchPieExploded($type) {
+		if ($type) {
 			$this->type = $type;
 		}
 		else{
-			switch($this->type){
+			switch ($this->type) {
 				case GRAPH_TYPE_EXPLODED:
 					$this->type = GRAPH_TYPE_PIE;
 					break;
@@ -108,11 +108,11 @@ class CPie extends CGraphDraw{
 	return $this->type;
 	}
 
-	protected function calc3dheight($height){
+	protected function calc3dheight($height) {
 		$this->graphheight3d = (int) ($height/20);
 	}
 
-	protected function calcExplodedCenter($anglestart,$angleend,$x,$y,$count){
+	protected function calcExplodedCenter($anglestart,$angleend,$x,$y,$count) {
 		$count *= $this->exploderad;
 		$anglemid = (int) (($anglestart + $angleend) / 2 );
 
@@ -122,19 +122,19 @@ class CPie extends CGraphDraw{
 	return array($x,$y);
 	}
 
-	protected function calcExplodedRadius($sizeX,$sizeY,$count){
+	protected function calcExplodedRadius($sizeX,$sizeY,$count) {
 		$count *= $this->exploderad*2;
 		$sizeX -= $count;
 		$sizeY -= $count;
 	return array($sizeX,$sizeY);
 	}
 
-	protected function calc3DAngle($sizeX,$sizeY){
+	protected function calc3DAngle($sizeX,$sizeY) {
 		$sizeY *= (GRAPH_3D_ANGLE / 90);
 	return array($sizeX,round($sizeY));
 	}
 
-	protected function selectData(){
+	protected function selectData() {
 		$this->data = array();
 
 		$now = time(NULL);
@@ -150,7 +150,7 @@ class CPie extends CGraphDraw{
 
 		$strvaluelength = 0;	// we need to know how long in px will be our legend
 
-		for($i=0; $i < $this->num; $i++){
+		for($i=0; $i < $this->num; $i++) {
 
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
 			$type = $this->items[$i]['calc_type'];
@@ -161,7 +161,7 @@ class CPie extends CGraphDraw{
 			$sql_arr = array();
 
 // [ZBX-3249] for partitioned DB installs!
-			if(ZBX_HISTORY_DATA_UPKEEP > -1) $real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
+			if (ZBX_HISTORY_DATA_UPKEEP > -1) $real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
 //---
 
 			if (($real_item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)) &&	// should pick data from history or trends
@@ -223,10 +223,10 @@ class CPie extends CGraphDraw{
 			$curr_data->avg = NULL;
 			$curr_data->clock = NULL;
 
-			foreach($sql_arr as $sql){
+			foreach ($sql_arr as $sql) {
 				$result=DBselect($sql);
 
-				while($row=DBfetch($result)){
+				while ($row=DBfetch($result)) {
 					$curr_data->min	= $row['min'];
 					$curr_data->max	= $row['max'];
 					$curr_data->avg	= $row['avg'];
@@ -239,7 +239,7 @@ class CPie extends CGraphDraw{
 				unset($row);
 			}
 
-			switch($this->items[$i]['calc_fnc']){
+			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
 					$item_value = abs($curr_data->min);
 
@@ -255,7 +255,7 @@ class CPie extends CGraphDraw{
 					$item_value = abs($curr_data->avg);
 			}
 
-			if($type == GRAPH_ITEM_SUM){
+			if ($type == GRAPH_ITEM_SUM) {
 				$this->background = $i;
 				$graph_sum = $item_value;
 			}
@@ -264,28 +264,28 @@ class CPie extends CGraphDraw{
 			$strvaluelength = max($strvaluelength,zbx_strlen(convert_units($item_value,$this->items[$i]['unit'])));
 		}
 
-		if(isset($graph_sum)) $this->sum = $graph_sum;
+		if (isset($graph_sum)) $this->sum = $graph_sum;
 		$this->shiftlegendright += $strvaluelength * 7;
 	}
 
-	protected function drawLegend(){
+	protected function drawLegend() {
 
 		$shiftY = $this->shiftY + $this->shiftYLegend;
 
 		$max_host_len=0;
 		$max_name_len=0;
 
-		for($i=0;$i<$this->num;$i++){
-			if(zbx_strlen($this->items[$i]['host'])>$max_host_len) $max_host_len=zbx_strlen($this->items[$i]['host']);
-			if(zbx_strlen($this->items[$i]['name'])>$max_name_len) $max_name_len=zbx_strlen($this->items[$i]['name']);
+		for($i=0;$i<$this->num;$i++) {
+			if (zbx_strlen($this->items[$i]['host'])>$max_host_len) $max_host_len=zbx_strlen($this->items[$i]['host']);
+			if (zbx_strlen($this->items[$i]['name'])>$max_name_len) $max_name_len=zbx_strlen($this->items[$i]['name']);
 		}
 
-		for($i=0;$i<$this->num;$i++){
+		for($i=0;$i<$this->num;$i++) {
 
 			$color = $this->getColor($this->items[$i]['color'], 0);
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];
 
-			switch($this->items[$i]['calc_fnc']){
+			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
 					$fnc_name = 'min';
 					$datavalue = $data->min;
@@ -307,7 +307,7 @@ class CPie extends CGraphDraw{
 			$proc = ($datavalue * 100)/ $this->sum;
 
 //			convert_units($datavalue,$this->items[$i]["units"]),
-			if(isset($data) && isset($datavalue)){
+			if (isset($data) && isset($datavalue)) {
 				$strvalue = sprintf(S_VALUE.': %s ('.(round($proc)!=$proc? '%0.2f':'%s').'%%)',convert_units($datavalue,$this->items[$i]['units']),$proc);
 
 				$str = sprintf('%s: %s [%s] ',
@@ -377,26 +377,26 @@ class CPie extends CGraphDraw{
 				);
 		}
 
-		if($this->sizeY < 120) return;
+		if ($this->sizeY < 120) return;
 	}
 
 
-	protected function drawElementPie($values){
+	protected function drawElementPie($values) {
 
 		$sum = $this->sum;
 
-		if($this->background !== false){
+		if ($this->background !== false) {
 			$least = 0;
-			foreach($values as $item => $value){
+			foreach ($values as $item => $value) {
 	//			SDI($item.' : '.$value.' , '.$this->background);
-				if($item != $this->background){
+				if ($item != $this->background) {
 					$least += $value;
 				}
 			}
 			$values[$this->background] -= $least;
 		}
 
-		if($sum <= 0){
+		if ($sum <= 0) {
 			$this->items[0]['color'] = 'FFFFFF';
 			$values = array(0 => 1);
 			$sum = 1;
@@ -406,7 +406,7 @@ class CPie extends CGraphDraw{
 		$sizeX = $this->sizeX;
 		$sizeY = $this->sizeY;
 
-		if($this->type == GRAPH_TYPE_EXPLODED){
+		if ($this->type == GRAPH_TYPE_EXPLODED) {
 			list($sizeX,$sizeY) = $this->calcExplodedRadius($sizeX,$sizeY,count($values));
 		} else {
 			$sizeX =(int) $sizeX * 0.95;
@@ -418,12 +418,12 @@ class CPie extends CGraphDraw{
 
 		$anglestart = 0;
 		$angleend = 0;
-		foreach($values as $item => $value){
+		foreach ($values as $item => $value) {
 			$angleend += (int)(360 * $value/$sum)+1;
 			$angleend = ($angleend > 360)?(360):($angleend);
-			if(($angleend - $anglestart) < 1) continue;
+			if (($angleend - $anglestart) < 1) continue;
 
-			if($this->type == GRAPH_TYPE_EXPLODED){
+			if ($this->type == GRAPH_TYPE_EXPLODED) {
 				list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
 			}
 
@@ -434,21 +434,21 @@ class CPie extends CGraphDraw{
 	//		imageline($this->im, $xc, $yc, $xc, $yc, $this->GetColor('Black'));
 	}
 
-	protected function drawElementPie3D($values){
+	protected function drawElementPie3D($values) {
 
 		$sum = $this->sum;
 
-		if($this->background !== false){
+		if ($this->background !== false) {
 			$least = 0;
-			foreach($values as $item => $value){
-				if($item != $this->background){
+			foreach ($values as $item => $value) {
+				if ($item != $this->background) {
 					$least += $value;
 				}
 			}
 			$values[$this->background] -= $least;
 		}
 
-		if($sum <= 0){
+		if ($sum <= 0) {
 			$this->items[0]['color'] = 'FFFFFF';
 			$values = array(0 => 1);
 			$sum = 1;
@@ -460,7 +460,7 @@ class CPie extends CGraphDraw{
 
 		$this->exploderad = $this->exploderad3d;
 
-		if($this->type == GRAPH_TYPE_3D_EXPLODED){
+		if ($this->type == GRAPH_TYPE_3D_EXPLODED) {
 			list($sizeX,$sizeY) = $this->calcExplodedRadius($sizeX,$sizeY,count($values));
 		}
 
@@ -472,13 +472,13 @@ class CPie extends CGraphDraw{
 	// ----- bottom angle line ----
 		$anglestart = 0;
 		$angleend = 0;
-		foreach($values as $item => $value){
+		foreach ($values as $item => $value) {
 
 			$angleend += (int)(360 * $value/$sum)+1;
 			$angleend = ($angleend > 360)?(360):($angleend);
-			if(($angleend - $anglestart) < 1) continue;
+			if (($angleend - $anglestart) < 1) continue;
 
-			if($this->type == GRAPH_TYPE_3D_EXPLODED){
+			if ($this->type == GRAPH_TYPE_3D_EXPLODED) {
 				list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
 			}
 			imagefilledarc($this->im, $x, $y+$this->graphheight3d+1, $sizeX, $sizeY, $anglestart, $angleend, $this->GetShadow($this->items[$item]['color'],0), IMG_ARC_PIE);
@@ -490,14 +490,14 @@ class CPie extends CGraphDraw{
 		for ($i = $this->graphheight3d; $i > 0; $i--) {
 			$anglestart = 0;
 			$angleend = 0;
-			foreach($values as $item => $value){
+			foreach ($values as $item => $value) {
 				$angleend += (int)(360 * $value/$sum)+1;
 				$angleend = ($angleend > 360)?(360):($angleend);
 
-				if(($angleend - $anglestart) < 1) continue;
+				if (($angleend - $anglestart) < 1) continue;
 				elseif($this->sum == 0) continue;
 
-				if($this->type == GRAPH_TYPE_3D_EXPLODED){
+				if ($this->type == GRAPH_TYPE_3D_EXPLODED) {
 					list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
 				}
 
@@ -508,13 +508,13 @@ class CPie extends CGraphDraw{
 
 		$anglestart = 0;
 		$angleend = 0;
-		foreach($values as $item => $value){
+		foreach ($values as $item => $value) {
 
 			$angleend += (int)(360 * $value/$sum)+1;
 			$angleend = ($angleend > 360)?(360):($angleend);
-			if(($angleend - $anglestart) < 1) continue;
+			if (($angleend - $anglestart) < 1) continue;
 
-			if($this->type == GRAPH_TYPE_3D_EXPLODED){
+			if ($this->type == GRAPH_TYPE_3D_EXPLODED) {
 				list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
 			}
 
@@ -524,7 +524,7 @@ class CPie extends CGraphDraw{
 		}//*/
 	}
 
-	public function draw(){
+	public function draw() {
 		$start_time = microtime(true);
 		set_image_header();
 
@@ -538,9 +538,9 @@ class CPie extends CGraphDraw{
 		$this->fullSizeX = $this->sizeX;
 		$this->fullSizeY = $this->sizeY;
 
-		if(($this->sizeX < 300) || ($this->sizeY < 200)) $this->showLegend(0);
+		if (($this->sizeX < 300) || ($this->sizeY < 200)) $this->showLegend(0);
 
-		if($this->drawLegend == 1){
+		if ($this->drawLegend == 1) {
 			$this->sizeX -= ($this->shiftXleft+$this->shiftXright+$this->shiftlegendright);
 			$this->sizeY -= ($this->shiftY+$this->shiftYLegend+12*$this->num+8);
 		}
@@ -559,7 +559,7 @@ class CPie extends CGraphDraw{
 		$this->exploderad = (int) $this->sizeX / 100;
 		$this->exploderad3d = (int) $this->sizeX / 60;
 
-		if(function_exists('ImageColorExactAlpha')&&function_exists('ImageCreateTrueColor')&&@imagecreatetruecolor(1,1))
+		if (function_exists('ImageColorExactAlpha')&&function_exists('ImageCreateTrueColor')&&@imagecreatetruecolor(1,1))
 			$this->im = imagecreatetruecolor($this->fullSizeX,$this->fullSizeY);
 		else
 			$this->im = imagecreate($this->fullSizeX,$this->fullSizeY);
@@ -570,14 +570,14 @@ class CPie extends CGraphDraw{
 		$this->drawHeader();
 
 // For each metric
-		for($item = 0; $item < $this->num; $item++){
+		for($item = 0; $item < $this->num; $item++) {
 			$data = &$this->data[$this->items[$item]['itemid']][$this->items[$item]['calc_type']];
 
-			if(!isset($data))	continue;
+			if (!isset($data))	continue;
 
 			$calc_fnc = $this->items[$item]['calc_fnc'];
 
-			switch($calc_fnc){
+			switch ($calc_fnc) {
 				case CALC_FNC_MAX:
 					$values[$item] = abs($data->max);
 					break;
@@ -593,7 +593,7 @@ class CPie extends CGraphDraw{
 			}
 		}
 
-		switch($this->type){
+		switch ($this->type) {
 			case GRAPH_TYPE_EXPLODED:
 				$this->drawElementPie($values);
 				break;
@@ -609,7 +609,7 @@ class CPie extends CGraphDraw{
 		}
 
 		$this->drawLogo();
-		if($this->drawLegend == 1)	$this->drawLegend();
+		if ($this->drawLegend == 1)	$this->drawLegend();
 
 		$str = sprintf('%0.2f', microtime(true) - $start_time);
 		$str = _s('Data from %1$s. Generated in %2$s sec', $this->dataFrom, $str);

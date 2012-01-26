@@ -39,9 +39,9 @@ require_once('include/page_header.php');
 		'groupids'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
 		'new_right'=>	array(T_ZBX_STR, O_OPT,	null,	null,				null),
 		'trgSeverity'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-		'grpswitch'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0,1),		NULL),
+		'grpswitch'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),		NULL),
 
-		'maintenance'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0,1),		NULL),
+		'maintenance'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),		NULL),
 		'extAck'=>	array(T_ZBX_INT, O_OPT, P_SYS,	null,		NULL),
 
 		'form_refresh'=>array(T_ZBX_INT, O_OPT, P_SYS,	null,				NULL),
@@ -53,12 +53,12 @@ require_once('include/page_header.php');
 ?>
 <?php
 // ACTION /////////////////////////////////////////////////////////////////////////////
-	if(isset($_REQUEST['save'])){
+	if (isset($_REQUEST['save'])) {
 // FILTER
 		$filterEnable = get_request('filterEnable', 0);
 		CProfile::update('web.dashconf.filter.enable', $filterEnable, PROFILE_TYPE_INT);
 
-		if($filterEnable == 1){
+		if ($filterEnable == 1) {
 // GROUPS
 			$groupids = get_request('groupids', array());
 
@@ -85,18 +85,18 @@ require_once('include/page_header.php');
 
 		jsRedirect('dashboard.php');
 	}
-	else if(isset($_REQUEST['new_right'])){
+	elseif (isset($_REQUEST['new_right'])) {
 		$_REQUEST['groupids'] = get_request('groupids', array());
 
-		foreach($_REQUEST['new_right'] as $id => $group){
+		foreach ($_REQUEST['new_right'] as $id => $group) {
 			$_REQUEST['groupids'][$id] = $id;
 		}
 	}
-	else if(isset($_REQUEST['delete'])){
-		$del_groups = get_request('del_groups',array());
+	elseif (isset($_REQUEST['delete'])) {
+		$del_groups = get_request('del_groups', array());
 
-		foreach($del_groups as $gnum => $groupid){
-			if(!isset($_REQUEST['groupids'][$groupid])) continue;
+		foreach ($del_groups as $gnum => $groupid) {
+			if (!isset($_REQUEST['groupids'][$groupid])) continue;
 
 			unset($_REQUEST['groupids'][$groupid]);
 		}

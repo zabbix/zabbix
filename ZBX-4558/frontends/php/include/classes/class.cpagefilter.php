@@ -223,7 +223,7 @@ class CPageFilter {
 			}
 
 			if (is_null($options['hostid'])) {
-				if(isset($templates[$this->_profileIds['hostid']])){
+				if (isset($templates[$this->_profileIds['hostid']])) {
 					$options['hostid'] = $this->_profileIds['hostid'];
 				}
 				else {
