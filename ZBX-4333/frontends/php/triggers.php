@@ -429,10 +429,12 @@ include_once('include/page_header.php');
 					$new_triggerids[$trigger_id] = $newtrigid;
 					$go_result |= (bool) $newtrigid;
 				}
-				foreach ($_REQUEST['g_triggerid'] as $trigger_id) {
-					$deps = replace_template_dependencies(get_trigger_dependencies_by_triggerid($trigger_id), $host_id);
-					foreach ($deps as $dep_id) {
-						add_trigger_dependency($new_triggerids[$trigger_id], $dep_id);
+				if ($go_result) {
+					foreach ($_REQUEST['g_triggerid'] as $trigger_id) {
+						$deps = replace_template_dependencies(get_trigger_dependencies_by_triggerid($trigger_id), $host_id);
+						foreach ($deps as $dep_id) {
+							add_trigger_dependency($new_triggerids[$trigger_id], $dep_id);
+						}
 					}
 				}
 			}
