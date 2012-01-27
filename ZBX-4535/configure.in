@@ -1260,7 +1260,7 @@ AM_CONDITIONAL(WITH_ODBC, test "x$have_odbc" != "xno")
 
 found_ldap="no"
 dnl Check for libLDAP [by default - skip]
-LIBLDAP_CHECK_CONFIG([no])
+LDAP_CHECK_CONFIG([no])
 if test "x$want_ldap" = "xyes"; then
 	if test "x$found_ldap" != "xyes"; then
 		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
@@ -1270,6 +1270,9 @@ CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
 SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LDAP_LDFLAGS}"
 PROXY_LDFLAGS="${PROXY_LDFLAGS} ${LDAP_LDFLAGS}"
 AGENT_LDFLAGS="${AGENT_LDFLAGS} ${LDAP_LDFLAGS}"
+SERVER_LIBS="${SERVER_LIBS} ${LDAP_LIBS}"
+PROXY_LIBS="${PROXY_LIBS} ${LDAP_LIBS}"
+AGENT_LIBS="${AGENT_LIBS} ${LDAP_LIBS}"
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]

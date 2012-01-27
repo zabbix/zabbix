@@ -1,4 +1,4 @@
-# LIBLDAP_CHECK_CONFIG ([DEFAULT-ACTION])
+# LDAP_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
 #	Eugene Grigorjev <eugene@zabbix.com>   Feb-02-2007
 #
@@ -17,7 +17,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-AC_DEFUN([LIBLDAP_CHECK_CONFIG],
+AC_DEFUN([LDAP_CHECK_CONFIG],
 [
 	AC_ARG_WITH(ldap,
 		[If you want to check LDAP servers:
@@ -25,21 +25,21 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@], [Include LDAP support @<:@default=no@:
 		[
 			if test "$withval" = "no"; then
 				want_ldap="no"
-				_libldap_with="no"
+				_ldap_with="no"
 			elif test "$withval" = "yes"; then
 				want_ldap="yes"
-				_libldap_with="yes"
+				_ldap_with="yes"
 			else
 				want_ldap="yes"
-				_libldap_with=$withval
+				_ldap_with=$withval
 			fi
 		],
-		[_libldap_with=ifelse([$1],,[no],[$1])])
+		[_ldap_with=ifelse([$1],,[no],[$1])])
 
-	if test "x$_libldap_with" != x"no"; then
+	if test "x$_ldap_with" != x"no"; then
 		AC_MSG_CHECKING(for LDAP support)
 
-		if test "$_libldap_with" = "yes"; then
+		if test "$_ldap_with" = "yes"; then
 			if test -f /usr/local/openldap/include/ldap.h; then
 				LDAP_INCDIR=/usr/local/openldap/include/
 				LDAP_LIBDIR=/usr/local/openldap/lib/
@@ -57,9 +57,9 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@], [Include LDAP support @<:@default=no@:
 				AC_MSG_RESULT(no)
 			fi
 		else
-			if test -f $_libldap_with/include/ldap.h; then
-				LDAP_INCDIR=$_libldap_with/include
-				LDAP_LIBDIR=$_libldap_with/lib
+			if test -f $_ldap_with/include/ldap.h; then
+				LDAP_INCDIR=$_ldap_with/include
+				LDAP_LIBDIR=$_ldap_with/lib
 				found_ldap="yes"
 			else
 				found_ldap="no"
@@ -69,11 +69,12 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@], [Include LDAP support @<:@default=no@:
 
 		if test "x$found_ldap" != "xno"; then
 			if test "x$enable_static" = "xyes"; then
-				LDAP_LIBS=" -lgnutls -lpthread -lsasl2 $LDAP_LIBS"
+				LDAP_LIBS="-lgnutls -lpthread -lsasl2 $LDAP_LIBS"
 			fi
 
 			LDAP_CPPFLAGS=-I$LDAP_INCDIR
-			LDAP_LDFLAGS="-L$LDAP_LIBDIR -lldap -llber $LDAP_LIBS"
+			LDAP_LDFLAGS="-L$LDAP_LIBDIR"
+			LDAP_LIBS="-lldap -llber $LDAP_LIBS"
 
 			found_ldap="yes"
 			AC_DEFINE(HAVE_LDAP, 1, [Define to 1 if LDAP should be enabled.])
@@ -90,6 +91,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@], [Include LDAP support @<:@default=no@:
 
 	AC_SUBST(LDAP_CPPFLAGS)
 	AC_SUBST(LDAP_LDFLAGS)
+	AC_SUBST(LDAP_LIBS)
 
-	unset _libldap_with
+	unset _ldap_with
 ])dnl
