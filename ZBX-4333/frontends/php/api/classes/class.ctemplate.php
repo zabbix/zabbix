@@ -1686,7 +1686,7 @@ COpt::memoryPick();
 
 		foreach($targetids as $targetid){
 
-			$syncTemplatedIds = array();
+			$syncTemplateIds = array();
 			foreach ($templateids as $templateid) {
 				foreach($linked as $lnum => $link){
 					if(isset($link[$targetid]) && ($link[$targetid] == $templateid)){
@@ -1695,12 +1695,14 @@ COpt::memoryPick();
 					}
 				}
 
-				$syncTemplatedIds[] = $templateid;
+				$syncTemplateIds[] = $templateid;
 			}
 
 			// sync templates
-			if (!syncHostWithTemplates($targetid, $syncTemplatedIds)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_SYNC_TEMPLATE);
+			if ($syncTemplateIds) {
+				if (!syncHostWithTemplates($targetid, $syncTemplateIds)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_SYNC_TEMPLATE);
+				}
 			}
 		}
 
