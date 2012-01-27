@@ -457,33 +457,34 @@ switch($itemType) {
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
-		else{
+		else {
 			DBstart();
+
+			// when cloning an item, replace the old applications with the same applications from the new host
+			if ($_REQUEST['form'] == 'clone') {
+				$applications = get_same_applications_for_host($applications, $item['hostid']);
+			}
 
 			$new_appid = true;
 			$itemid = false;
-			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
+			if (!zbx_empty($_REQUEST['new_application'])) {
+				if ($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['form_hostid'])) {
 					$applications[$new_appid] = $new_appid;
+				}
 			}
 
 			$item['applications'] = $applications;
 
-			if($new_appid){
+			if ($new_appid) {
 				$itemid = add_item($item);
 			}
 
 			$result = DBend($itemid);
 
-/*			$action = AUDIT_ACTION_ADD;*/
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
-		if($result){
-/*			$host = get_host_by_hostid($_REQUEST['hostid']);
-
-			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');*/
-
+		if ($result) {
 			unset($_REQUEST['itemid']);
 			unset($_REQUEST['form']);
 		}
