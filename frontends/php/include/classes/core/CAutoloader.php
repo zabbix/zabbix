@@ -57,7 +57,7 @@ class CAutoloader {
 	 */
 	protected function loadClass($className) {
 		if ($classFile = $this->findClassFile($className)) {
-			require_once $classFile;
+			require $classFile;
 		}
 	}
 

@@ -224,7 +224,7 @@ require_once('include/page_header.php');
 		}
 
 		$triggers = API::Trigger()->get($options);
-		ArraySorter::sort($triggers, array('host', 'description'));
+		ArrayHelper::sort($triggers, array('host', 'description'));
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
