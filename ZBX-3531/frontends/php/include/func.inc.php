@@ -965,10 +965,21 @@ function zbx_rksort(&$array, $flags = null) {
  * Class for sorting array by multiple fields.
  * When PHP 5.3+ arraives to Zabbix should be changed to function with closure.
  */
-class ArraySorter {
+class ArrayHelper {
 	protected static $fields;
 
 	private function __construct() {}
+
+	public function getByKey(array $array, array $keys) {
+		$result = array();
+		foreach ($keys as $key) {
+			if (isset($array[$key])) {
+				$result[$key] = $array[$key];
+			}
+		}
+
+		return $result;
+	}
 
 	/**
 	 * Sort array by multiple fields

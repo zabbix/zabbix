@@ -96,6 +96,9 @@ class ZBase {
 	private function getIncludePaths() {
 		return array(
 			$this->rootDir.'/include/classes',
+			$this->rootDir.'/include/classes/export',
+			$this->rootDir.'/include/classes/export/writers',
+			$this->rootDir.'/include/classes/export/elements',
 			$this->rootDir.'/include/classes/sysmaps',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/rpc'

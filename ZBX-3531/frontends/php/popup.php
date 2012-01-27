@@ -1183,7 +1183,7 @@ elseif ($srctbl == 'applications') {
 		$options['templated'] = $templated;
 	}
 	$apps = API::Application()->get($options);
-	ArraySorter::sort($apps, array('host', 'name'));
+	ArrayHelper::sort($apps, array('host', 'name'));
 
 	foreach ($apps as $app) {
 		$action = get_window_opener($dstfrm, $dstfld1, $app[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $app[$srcfld2]) : '');
