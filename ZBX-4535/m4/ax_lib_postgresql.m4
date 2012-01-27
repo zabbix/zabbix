@@ -25,14 +25,13 @@
 #
 #   This macro calls:
 #
-#	 AC_SUBST(POSTGRESQL_CFLAGS)
-#	 AC_SUBST(POSTGRESQL_LDFLAGS)
-#	 AC_SUBST(POSTGRESQL_LIBS)
-#	 AC_SUBST(POSTGRESQL_VERSION)
+#     AC_SUBST(POSTGRESQL_CPPFLAGS)
+#     AC_SUBST(POSTGRESQL_LDFLAGS)
+#     AC_SUBST(POSTGRESQL_VERSION)
 #
 #   And sets:
 #
-#	 HAVE_POSTGRESQL
+#     HAVE_POSTGRESQL
 #
 # LAST MODIFICATION
 #
@@ -48,70 +47,69 @@
 
 AC_DEFUN([AX_LIB_POSTGRESQL],
 [
-	PG_CONFIG="no"
+    PG_CONFIG="no"
 
-	AC_ARG_WITH([pgsql],
-		AC_HELP_STRING([--with-pgsql@<:@=ARG@:>@],
-			[use PostgreSQL library @<:@default=no@:>@, optionally specify path to pg_config]),
-		[
-			if test "$withval" = "no"; then
-				want_postgresql="no"
-			elif test "$withval" = "yes"; then
-				want_postgresql="yes"
-			else
-				want_postgresql="yes"
-				PG_CONFIG="$withval"
-			fi
-		],
-		[want_postgresql="no"]
-	)
+    AC_ARG_WITH([pgsql],
+        AC_HELP_STRING([--with-pgsql@<:@=ARG@:>@],
+            [use PostgreSQL library @<:@default=no@:>@, optionally specify path to pg_config]
+        ),
+        [
+        if test "$withval" = "no"; then
+            want_postgresql="no"
+        elif test "$withval" = "yes"; then
+            want_postgresql="yes"
+        else
+            want_postgresql="yes"
+            PG_CONFIG="$withval"
+        fi
+        ],
+        [want_postgresql="no"]
+    )
 
-	POSTGRESQL_CFLAGS=""
-	POSTGRESQL_LDFLAGS=""
-	POSTGRESQL_LIBS=""
-	POSTGRESQL_VERSION=""
+    POSTGRESQL_CPPFLAGS=""
+    POSTGRESQL_LDFLAGS=""
+    POSTGRESQL_POSTGRESQL=""
 
-	dnl
-	dnl Check PostgreSQL libraries (libpq)
-	dnl
+    dnl
+    dnl Check PostgreSQL libraries (libpq)
+    dnl
 
-	if test "$want_postgresql" = "yes"; then
-		if test -z "$PG_CONFIG" -o test; then
-			AC_PATH_PROG([PG_CONFIG], [pg_config], [no])
-		fi
+    if test "$want_postgresql" = "yes"; then
 
-		if test -f "$PG_CONFIG"; then
-			AC_MSG_CHECKING([for PostgreSQL libraries])
+        if test -z "$PG_CONFIG" -o test; then
+            AC_PATH_PROG([PG_CONFIG], [pg_config], [no])
+        fi
 
-			POSTGRESQL_CFLAGS="-I`$PG_CONFIG --includedir`"
-			POSTGRESQL_LDFLAGS="-L`$PG_CONFIG --libdir`"
-			POSTGRESQL_LIBS="-lpq"
-			POSTGRESQL_VERSION="`$PG_CONFIG --version | sed -e 's#PostgreSQL ##'`"
+        if test -f "$PG_CONFIG"; then
+            AC_MSG_CHECKING([for PostgreSQL libraries])
 
-			AC_DEFINE([HAVE_POSTGRESQL], [1], [Define to 1 if PostgreSQL libraries are available])
+            POSTGRESQL_CPPFLAGS="-I`$PG_CONFIG --includedir`"
+            POSTGRESQL_LDFLAGS="-L`$PG_CONFIG --libdir` -lpq"
 
-			found_postgresql="yes"
-			AC_MSG_RESULT([yes])
-		else
-			found_postgresql="no"
-			AC_MSG_RESULT([no])
-		fi
-	fi
+            POSTGRESQL_VERSION=`$PG_CONFIG --version | sed -e 's#PostgreSQL ##'`
 
-	dnl
-	dnl Check for function PQserverVersion()
-	dnl
+            AC_DEFINE([HAVE_POSTGRESQL], [1],
+                [Define to 1 if PostgreSQL libraries are available])
 
-	_save_postgresql_cflags="${CFLAGS}"
-	_save_postgresql_ldflags="${LDFLAGS}"
-	_save_postgresql_libs="${LIBS}"
+            found_postgresql="yes"
+            AC_MSG_RESULT([yes])
+        else
+            found_postgresql="no"
+            AC_MSG_RESULT([no])
+        fi
+    fi
 
-	CFLAGS="${CFLAGS} ${POSTGRESQL_CFLAGS}"
-	LDFLAGS="${LDFLAGS} ${POSTGRESQL_LDFLAGS}"
-	LIBS="${LIBS} ${POSTGRESQL_LIBS}"
+    dnl
+    dnl Check for function PQserverVersion()
+    dnl
 
-	AC_MSG_CHECKING(for function PQserverVersion())
-	AC_TRY_LINK(
+    _save_postgresql_ldflags="${LDFLAGS}"
+    _save_postgresql_cflags="${CFLAGS}"
+    LDFLAGS="${LDFLAGS} ${POSTGRESQL_LDFLAGS}"
+    CFLAGS="${CFLAGS} ${POSTGRESQL_CPPFLAGS}"
+
+    AC_MSG_CHECKING(for function PQserverVersion())
+    AC_TRY_LINK(
 [
 #include <libpq-fe.h>
 ],
@@ -119,66 +117,66 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
 PGconn	*conn = NULL;
 PQserverVersion(conn);
 ],
-	AC_DEFINE(HAVE_FUNCTION_PQSERVERVERSION, 1, [Define to 1 if 'PQserverVersion' exist.])
-	AC_MSG_RESULT(yes),
-	AC_MSG_RESULT(no))
+    AC_DEFINE(HAVE_FUNCTION_PQSERVERVERSION,1,[Define to 1 if 'PQserverVersion' exist.])
+    AC_MSG_RESULT(yes),
+    AC_MSG_RESULT(no))
 
-	CFLAGS="${_save_postgresql_cflags}"
-	LDFLAGS="${_save_postgresql_ldflags}"
-	LIBS="${_save_postgresql_libs}"
+    LDFLAGS="${_save_postgresql_ldflags}"
+    CFLAGS="${_save_postgresql_cflags}"
+    unset _save_postgresql_ldflags
+    unset _save_postgresql_cflags
 
-	unset _save_postgresql_cflags
-	unset _save_postgresql_ldflags
-	unset _save_postgresql_libs
+    dnl
+    dnl Check if required version of PostgreSQL is available
+    dnl
 
-	dnl
-	dnl Check if required version of PostgreSQL is available
-	dnl
 
-	postgresql_version_req=ifelse([$1], [], [], [$1])
+    postgresql_version_req=ifelse([$1], [], [], [$1])
 
-	if test "$found_postgresql" = "yes"; then
-		dnl Decompose version string of installed PostgreSQL
-		dnl and calculate its number representation
-		postgresql_version_major=`expr $POSTGRESQL_VERSION : '\([[0-9]]*\)'`
-		postgresql_version_minor=`expr $POSTGRESQL_VERSION : '[[0-9]]*\.\([[0-9]]*\)'`
-		postgresql_version_micro=`expr $POSTGRESQL_VERSION : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
-		if test "x$postgresql_version_micro" = "x"; then
-			postgresql_version_micro="0"
-		fi
+    if test "$found_postgresql" = "yes"; then
 
-		postgresql_version_number=`expr $postgresql_version_major \* 1000000 \
-								   \+ $postgresql_version_minor \* 1000 \
-								   \+ $postgresql_version_micro`
+        dnl Decompose version string of installed PostgreSQL
+        dnl and calculate its number representation
+        postgresql_version_major=`expr $POSTGRESQL_VERSION : '\([[0-9]]*\)'`
+        postgresql_version_minor=`expr $POSTGRESQL_VERSION : '[[0-9]]*\.\([[0-9]]*\)'`
+        postgresql_version_micro=`expr $POSTGRESQL_VERSION : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
+        if test "x$postgresql_version_micro" = "x"; then
+            postgresql_version_micro="0"
+        fi
 
-		if test -n "$postgresql_version_req"; then
+        postgresql_version_number=`expr $postgresql_version_major \* 1000000 \
+                                   \+ $postgresql_version_minor \* 1000 \
+                                   \+ $postgresql_version_micro`
+	
+        if test -n "$postgresql_version_req"; then
 
-			AC_MSG_CHECKING([if PostgreSQL version is >= $postgresql_version_req])
+            AC_MSG_CHECKING([if PostgreSQL version is >= $postgresql_version_req])
 
-			dnl Decompose required version string of PostgreSQL
-			dnl and calculate its number representation
-			postgresql_version_req_major=`expr $postgresql_version_req : '\([[0-9]]*\)'`
-			postgresql_version_req_minor=`expr $postgresql_version_req : '[[0-9]]*\.\([[0-9]]*\)'`
-			postgresql_version_req_micro=`expr $postgresql_version_req : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
-			if test "x$postgresql_version_req_micro" = "x"; then
-				postgresql_version_req_micro="0"
-			fi
+            dnl Decompose required version string of PostgreSQL
+            dnl and calculate its number representation
+            postgresql_version_req_major=`expr $postgresql_version_req : '\([[0-9]]*\)'`
+            postgresql_version_req_minor=`expr $postgresql_version_req : '[[0-9]]*\.\([[0-9]]*\)'`
+            postgresql_version_req_micro=`expr $postgresql_version_req : '[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\)'`
+            if test "x$postgresql_version_req_micro" = "x"; then
+                postgresql_version_req_micro="0"
+            fi
 
-			postgresql_version_req_number=`expr $postgresql_version_req_major \* 1000000 \
-									   \+ $postgresql_version_req_minor \* 1000 \
-									   \+ $postgresql_version_req_micro`
+            postgresql_version_req_number=`expr $postgresql_version_req_major \* 1000000 \
+                                       \+ $postgresql_version_req_minor \* 1000 \
+                                       \+ $postgresql_version_req_micro`
 
-			postgresql_version_check=`expr $postgresql_version_number \>\= $postgresql_version_req_number`
-			if test "$postgresql_version_check" = "1"; then
-				AC_MSG_RESULT([yes])
-			else
-				AC_MSG_RESULT([no])
-			fi
-		fi
+            postgresql_version_check=`expr $postgresql_version_number \>\= $postgresql_version_req_number`
+            if test "$postgresql_version_check" = "1"; then
+                AC_MSG_RESULT([yes])
+            else
+                AC_MSG_RESULT([no])
+            fi
+
 	fi
 
-	AC_SUBST([POSTGRESQL_CFLAGS])
-	AC_SUBST([POSTGRESQL_LDFLAGS])
-	AC_SUBST([POSTGRESQL_LIBS])
-	AC_SUBST([POSTGRESQL_VERSION])
+    fi
+
+    AC_SUBST([POSTGRESQL_VERSION])
+    AC_SUBST([POSTGRESQL_CPPFLAGS])
+    AC_SUBST([POSTGRESQL_LDFLAGS])
 ])
