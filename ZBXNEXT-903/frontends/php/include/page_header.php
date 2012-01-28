@@ -121,7 +121,7 @@ switch ($page['type']) {
 			$page_title = $ZBX_SERVER_NAME.': ';
 		}
 		if (!isset($page['title'])) {
-			$page['title'] = 'S_ZABBIX';
+			$page['title'] = _('Zabbix');
 		}
 		$page_title = defined($page['title']) ? constant($page['title']) : $page['title'];
 		if (ZBX_DISTRIBUTED) {
@@ -135,7 +135,7 @@ switch ($page['type']) {
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
 			$page_title .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
 		}
-	break;
+		break;
 }
 
 // construct menu
