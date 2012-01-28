@@ -322,6 +322,7 @@
 	}
 
 	function getItemFilterForm(&$items) {
+		$filter_groupid				= $_REQUEST['filter_groupid'];
 		$filter_group				= $_REQUEST['filter_group'];
 		$filter_hostname			= $_REQUEST['filter_hostname'];
 		$filter_application			= $_REQUEST['filter_application'];
@@ -351,21 +352,21 @@
 		$subfilter_trends			= $_REQUEST['subfilter_trends'];
 		$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
-		$form = new CForm();
+		$form = new CForm('get');
 		$form->setAttribute('name', 'zbx_filter');
 		$form->setAttribute('id', 'zbx_filter');
-		$form->setMethod('get');
-		$form->addVar('filter_hostid',				get_request('filter_hostid', get_request('hostid')));
-		$form->addVar('subfilter_hosts',			$subfilter_hosts);
-		$form->addVar('subfilter_apps',				$subfilter_apps);
-		$form->addVar('subfilter_types',			$subfilter_types);
-		$form->addVar('subfilter_value_types',		$subfilter_value_types);
-		$form->addVar('subfilter_status',			$subfilter_status);
-		$form->addVar('subfilter_templated_items',	$subfilter_templated_items);
-		$form->addVar('subfilter_with_triggers',	$subfilter_with_triggers);
-		$form->addVar('subfilter_history',			$subfilter_history);
-		$form->addVar('subfilter_trends',			$subfilter_trends);
-		$form->addVar('subfilter_interval',			$subfilter_interval);
+		$form->addVar('filter_groupid', !empty($filter_groupid) && !empty($filter_group) ? $filter_groupid : 0);
+		$form->addVar('filter_hostid', get_request('filter_hostid', get_request('hostid', 0)));
+		$form->addVar('subfilter_hosts', $subfilter_hosts);
+		$form->addVar('subfilter_apps', $subfilter_apps);
+		$form->addVar('subfilter_types', $subfilter_types);
+		$form->addVar('subfilter_value_types', $subfilter_value_types);
+		$form->addVar('subfilter_status', $subfilter_status);
+		$form->addVar('subfilter_templated_items', $subfilter_templated_items);
+		$form->addVar('subfilter_with_triggers', $subfilter_with_triggers);
+		$form->addVar('subfilter_history', $subfilter_history);
+		$form->addVar('subfilter_trends', $subfilter_trends);
+		$form->addVar('subfilter_interval', $subfilter_interval);
 
 		$table = new CTable('', 'itemfilter');
 		$table->setCellPadding(0);
@@ -377,7 +378,7 @@
 			array(
 				new CTextBox('filter_group', $filter_group, 20),
 				new CButton('btn_group', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_group&srctbl=host_group&srcfld1=name", 450, 450);', 'G'
+					'&dstfld1=filter_group&dstfld2=filter_groupid&srctbl=host_group&srcfld1=name&srcfld2=groupid", 450, 450);', 'G'
 				)
 			)
 		));
@@ -385,7 +386,7 @@
 			array(
 				new CTextBox('filter_hostname', $filter_hostname, 20),
 				new CButton('btn_host', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_hostname&srctbl=hosts_and_templates&srcfld1=name", 450, 450);', 'H'
+					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&groupid=" + jQuery("#filter_groupid").val(), 450, 450);', 'H'
 				)
 			)
 		));
@@ -393,7 +394,7 @@
 			array(
 				new CTextBox('filter_application', $filter_application, 20),
 				new CButton('btn_app', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_application&srctbl=applications&srcfld1=name", 400, 300, "application");', 'A'
+					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&hostid=" + jQuery("#filter_hostid").val(), 400, 300, "application");', 'A'
 				)
 			)
 		));
@@ -558,14 +559,14 @@
 		$col4 = new CCol($col_table4, 'top');
 		$table->addRow(array($col1, $col2, $col3, $col4));
 
-		$reset = new CSpan(_('Reset'), 'link_menu');
-		$reset->onClick("javascript: clearAllForm('zbx_filter');");
+		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
+		$reset->useJQueryStyle();
 
 		$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 		$filter->useJQueryStyle();
 
-		$div_buttons = new CDiv(array($filter, SPACE, SPACE, SPACE, $reset));
-		$div_buttons->setAttribute('style', 'padding: 4px 0;');
+		$div_buttons = new CDiv(array($filter, SPACE, $reset));
+		$div_buttons->setAttribute('style', 'padding: 4px 0px;');
 		$footer = new CCol($div_buttons, 'center');
 		$footer->setColSpan(4);
 
@@ -573,9 +574,6 @@
 		$form->addItem($table);
 
 		// subfilters
-		$h = new CDiv(_('Subfilter [affects only filtered data!]'), 'thin_header');
-		$form->addItem($h);
-
 		$table_subfilter = new CTable(null, 'filter');
 
 		// array contains subfilters and number of items in each
@@ -855,6 +853,7 @@
 			$table_subfilter->addRow(array(_('Interval'), $interval_output));
 		}
 
+		$form->addItem(new CDiv(_('Subfilter [affects only filtered data!]'), 'thin_header'));
 		$form->addItem($table_subfilter);
 		return $form;
 	}

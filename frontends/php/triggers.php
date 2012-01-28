@@ -338,7 +338,7 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		'nopermissions' => true
 	));
 	foreach ($db_triggers as $triggerid => $trigger) {
-		$servStatus = (isset($_REQUEST['activate'])) ? get_service_status_of_trigger($triggerid) : 0;
+		$servStatus = isset($_REQUEST['activate']) ? get_service_status_of_trigger($triggerid) : 0;
 
 		// updating status to all services by the dependency
 		update_services($trigger['triggerid'], $servStatus);

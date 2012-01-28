@@ -136,7 +136,7 @@
 // FORM ITEM : new group text box [  ]
 	$newgroupTB = new CTextBox('newgroup', $newgroup);
 	$newgroupTB->setAttribute('maxlength', 64);
-	$templateList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB));
+	$templateList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 	$twb_groupid = get_request('twb_groupid', 0);
