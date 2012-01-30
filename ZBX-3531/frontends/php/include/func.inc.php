@@ -973,9 +973,10 @@ class ArrayHelper {
 	public static function getByKeys(array $array, array $keys) {
 		$result = array();
 		foreach ($keys as $key) {
-			if (isset($array[$key])) {
-				$result[$key] = $array[$key];
+			if (!isset($array[$key])) {
+				throw new InvalidArgumentException(sprintf('Array does not have element with key "%1$s".', $key));
 			}
+			$result[$key] = $array[$key];
 		}
 
 		return $result;

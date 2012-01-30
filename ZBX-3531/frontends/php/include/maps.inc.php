@@ -1393,8 +1393,6 @@ function prepareMapExport(&$exportMaps) {
 
 	try{
 		foreach ($exportMaps as &$sysmap) {
-			unset($sysmap['sysmapid']);
-			unset($sysmap['iconmapid']);
 			if (!empty($sysmap['iconmap'])) {
 				$sysmap['iconmap'] = $sysmap['iconmap']['name'];
 			}
@@ -1406,12 +1404,6 @@ function prepareMapExport(&$exportMaps) {
 			$sysmap['backgroundid'] = ($sysmap['backgroundid'] > 0) ? $images[$sysmap['backgroundid']] : '';
 
 			foreach ($sysmap['selements'] as &$selement) {
-				unset($selement['sysmapid']);
-
-				foreach ($selement['urls'] as $unum => $url) {
-					unset($selement['urls'][$unum]['sysmapelementurlid']);
-					unset($selement['urls'][$unum]['selementid']);
-				}
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
 						$selement['elementid'] = $sysmaps[$selement['elementid']];
@@ -1438,11 +1430,7 @@ function prepareMapExport(&$exportMaps) {
 			unset($selement);
 
 			foreach ($sysmap['links'] as &$link) {
-				unset($link['sysmapid']);
-				unset($link['linkid']);
 				foreach ($link['linktriggers'] as &$linktrigger) {
-					unset($linktrigger['linktriggerid']);
-					unset($linktrigger['linkid']);
 					$linktrigger['triggerid'] = $triggers[$linktrigger['triggerid']];
 				}
 			}
