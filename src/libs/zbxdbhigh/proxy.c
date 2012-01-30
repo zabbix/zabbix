@@ -22,7 +22,6 @@
 #include "log.h"
 #include "sysinfo.h"
 #include "zbxserver.h"
-#include "zbxalgo.h"
 
 #include "proxy.h"
 #include "dbcache.h"
