@@ -325,11 +325,11 @@ if(defined('USE_PROFILING')){
 					// parameters
 					$debug_str .= '<table><tr><td width="300" valign="top">Parameters:';
 					foreach($params as $p){
-						$debug_str .= '<pre>'.print_r(sanitize($p), true).'</pre>';
+						$debug_str .= '<pre>'.print_r(CHtml::encode($p), true).'</pre>';
 					}
 					$debug_str .= '</td>';
 					// result
-					$debug_str .= '<td valign="top">Result:<pre>'.print_r(sanitize($result), true).'</pre></td>';
+					$debug_str .= '<td valign="top">Result:<pre>'.print_r(CHtml::encode($result), true).'</pre></td>';
 
 					$debug_str .= '</tr></table>';
 					$debug_str .= '</div>';

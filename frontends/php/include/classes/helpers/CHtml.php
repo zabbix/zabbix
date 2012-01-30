@@ -59,7 +59,7 @@ class CHtml {
 	 * @return string
 	 */
 	public static function serialize($data) {
-		return self::encode(CJs::encode($data));
+		return self::encode(CJs::encodeJson($data));
 	}
 
 }

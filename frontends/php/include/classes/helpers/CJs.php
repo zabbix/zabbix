@@ -42,7 +42,7 @@ class CJs {
 	 *
 	 * @return mixed
 	 */
-	public static function encode($data) {
+	public static function encodeJson($data) {
 		if (self::$json === null) {
 			self::$json = new CJSON();
 		}
