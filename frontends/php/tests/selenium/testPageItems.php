@@ -45,6 +45,7 @@ class testPageItems extends CWebTest {
 		// We are in the list of items
 		$this->assertTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
+		$this->ok('Items');
 		$this->ok('Displaying');
 		$this->ok('Host list');
 		// Header
@@ -58,14 +59,14 @@ class testPageItems extends CWebTest {
 				'History',
 				'Trends',
 				'Type',
-				'Status',
 				'Applications',
+				'Status',
 				'Error'
 			)
 		);
 		// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Mass update');
 		$this->dropdown_select('go', 'Copy selected to ...');
