@@ -27,6 +27,7 @@
 #
 #     AC_SUBST(MYSQL_CFLAGS)
 #     AC_SUBST(MYSQL_LDFLAGS)
+#     AC_SUBST(MYSQL_LIBS)
 #     AC_SUBST(MYSQL_VERSION)
 #
 #   And sets:
@@ -87,7 +88,7 @@ dnl            AC_MSG_CHECKING([for MySQL libraries])
             MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"
 
             _full_libmysql_libs="`$MYSQL_CONFIG --libs`"
- 
+
             for i in $_full_libmysql_libs; do
                 case $i in
                 -lmysqlclient)
@@ -99,7 +100,6 @@ dnl            AC_MSG_CHECKING([for MySQL libraries])
             done
 
             if test "x$enable_static" = "xyes"; then
- 
                for i in $_full_libmysql_libs; do
                    case $i in
            	      -lmysqlclient)
