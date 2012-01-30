@@ -989,6 +989,7 @@ int	zbx_check_hostname(const char *hostname);
 int	is_hostname_char(char c);
 int	is_key_char(char c);
 int	is_function_char(char c);
+int	is_macro_char(char c);
 
 int	is_time_function(const char *func);
 
