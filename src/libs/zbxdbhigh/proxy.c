@@ -436,25 +436,13 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	char			buf[MAX_STRING_LEN], *esc;
 	const char		*p, *pf;
 	zbx_uint64_t		recid;
-	char			*sql = NULL, *sql2 = NULL;
-	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset, sql2_alloc = 256, sql2_offset = 0;
+	zbx_vector_uint64_t	ins;
+	char			*sql = NULL;
+	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset;
 	DB_RESULT		result;
 	DB_ROW			row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __function_name, table->table);
-
-	sql = zbx_malloc(sql, sql_alloc);
-
-	result = DBselect("select %s from %s", table->recid, table->table);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(recid, row[0]);
-		zbx_vector_uint64_append(del, recid);
-	}
-	DBfree_result(result);
-
-	zbx_vector_uint64_sort(del, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/************************************************************************************/
 	/* T1. RECEIVED JSON (jp_obj) DATA FORMAT                                           */
@@ -493,7 +481,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	if (FAIL == zbx_json_brackets_by_name(jp_obj, "fields", &jp_data))
 	{
 		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto clean;
+		goto out;
 	}
 
 	p = NULL;
@@ -501,37 +489,41 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* iterate column names (lines 4-6 in T1) */
 	while (NULL != (p = zbx_json_next_value(&jp_data, p, buf, sizeof(buf), NULL)))
 	{
-		if (NULL == (fields[field_count] = DBget_field(table, buf)))
+		if (NULL == (fields[field_count++] = DBget_field(table, buf)))
 		{
 			*error = zbx_dsprintf(*error, "invalid field name \"%s.%s\"", table->table, buf);
-			goto clean;
+			goto out;
 		}
-
-		field_count++;
 	}
 
 	/* get the entries (line 8 in T1) */
 	if (FAIL == zbx_json_brackets_by_name(jp_obj, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		*error = zbx_strdup(*error, zbx_json_strerror());
-		goto clean;
+		goto out;
 	}
 
-	p = NULL;
-	sql_offset = 0;
+	/* selecting all existing records */
+	result = DBselect("select %s from %s", table->recid, table->table);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the entries (lines 9, 14 and 19 in T1) */
+	while (NULL != (row = DBfetch(result)))
 	{
-		if (FAIL == zbx_json_brackets_open(p, &jp_row))
-		{
-			*error = zbx_strdup(*error, zbx_json_strerror());
-			goto clean;
-		}
+		ZBX_STR2UINT64(recid, row[0]);
+		zbx_vector_uint64_append(del, recid);
+	}
+	DBfree_result(result);
 
-		pf = NULL;
-		if (NULL == (pf = zbx_json_next_value(&jp_row, pf, buf, sizeof(buf), NULL)))
+	zbx_vector_uint64_sort(del, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	sql = zbx_malloc(sql, sql_alloc);
+	zbx_vector_uint64_create(&ins);
+
+	p = NULL;
+	/* iterate the entries (lines 9, 14 and 19 in T1) */
+	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	{
+		if (FAIL == zbx_json_brackets_open(p, &jp_row) ||
+				NULL == (pf = zbx_json_next_value(&jp_row, NULL, buf, sizeof(buf), NULL)))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
 			goto clean;
@@ -541,7 +533,59 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		ZBX_STR2UINT64(recid, buf);
 		if (FAIL != (i = zbx_vector_uint64_bsearch(del, recid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			zbx_vector_uint64_remove(del, i);
-		insert = (FAIL == i);
+		else
+			zbx_vector_uint64_append(&ins, recid);
+	}
+
+	zbx_vector_uint64_sort(&ins, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	/* these tables has unique indexes */
+	if (0 != del->values_num && SUCCEED == str_in_list("hosts_templates,hostmacro,items", table->table, ','))
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where", table->table);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table->recid, del->values, del->values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto clean;
+
+		zbx_vector_uint64_clear(del);
+
+		/* special preprocessing for 'hostmacro' and 'items' tables */
+		/* in order to eliminate the conflicts in the 'hostid,macro' and 'hostid,key_' unique indexes */
+		if (0 == strcmp(table->table, "hostmacro"))
+		{
+#ifdef HAVE_MYSQL
+			if (ZBX_DB_OK > DBexecute("update hostmacro set macro=concat('#',hostmacroid)"))
+#else
+			if (ZBX_DB_OK > DBexecute("update hostmacro set macro='#'||hostmacroid"))
+#endif
+				goto clean;
+		}
+		else if (0 == strcmp(table->table, "items"))
+		{
+#ifdef HAVE_MYSQL
+			if (ZBX_DB_OK > DBexecute("update items set key_=concat('#',itemid)"))
+#else
+			if (ZBX_DB_OK > DBexecute("update items set key_='#'||itemid"))
+#endif
+				goto clean;
+		}
+	}
+
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	p = NULL;
+	/* iterate the entries (lines 9, 14 and 19 in T1) */
+	while (NULL != (p = zbx_json_next(&jp_data, p)))
+	{
+		zbx_json_brackets_open(p, &jp_row);
+		pf = zbx_json_next_value(&jp_row, NULL, buf, sizeof(buf), NULL);
+
+		/* check whether we need to insert a new entry or update an existing */
+		ZBX_STR2UINT64(recid, buf);
+		insert = (FAIL != zbx_vector_uint64_bsearch(&ins, recid, ZBX_DEFAULT_UINT64_COMPARE_FUNC));
 
 		if (0 != insert)
 		{
@@ -628,41 +672,6 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			goto clean;
 	}
 
-	/* these tables has unique indexes */
-	if (0 != del->values_num && SUCCEED == str_in_list("hosts_templates,hostmacro,items", table->table, ','))
-	{
-		sql2 = zbx_malloc(sql2, sql2_alloc);
-
-		zbx_snprintf_alloc(&sql2, &sql2_alloc, &sql2_offset, "delete from %s where", table->table);
-		DBadd_condition_alloc(&sql2, &sql2_alloc, &sql2_offset, table->recid, del->values, del->values_num);
-
-		if (ZBX_DB_OK > DBexecute("%s", sql2))
-			goto clean;
-
-		zbx_vector_uint64_clear(del);
-
-		/* special preprocessing for 'hostmacro' and 'items' tables */
-		/* in order to eliminate the conflicts in the 'hostid,macro' and 'hostid,key_' unique indexes */
-		if (0 == strcmp(table->table, "hostmacro"))
-		{
-#ifdef HAVE_MYSQL
-			if (ZBX_DB_OK > DBexecute("update hostmacro set macro=concat('#',hostmacroid)"))
-#else
-			if (ZBX_DB_OK > DBexecute("update hostmacro set macro='#'||hostmacroid"))
-#endif
-				goto clean;
-		}
-		else if (0 == strcmp(table->table, "items"))
-		{
-#ifdef HAVE_MYSQL
-			if (ZBX_DB_OK > DBexecute("update items set key_=concat('#',itemid)"))
-#else
-			if (ZBX_DB_OK > DBexecute("update items set key_='#'||itemid"))
-#endif
-				goto clean;
-		}
-	}
-
 	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -673,9 +682,9 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	ret = SUCCEED;
 clean:
+	zbx_vector_uint64_destroy(&ins);
 	zbx_free(sql);
-	zbx_free(sql2);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
