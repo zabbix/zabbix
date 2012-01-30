@@ -25,8 +25,8 @@ define('ZBX_PAGE_NO_FOOTER', 1);
 $sessionid = get_cookie('zbx_sessionid');
 CWebUser::checkAuthentication($sessionid);
 
-$request = zbx_htmlstr(get_request('request',''));
-$message = zbx_htmlstr(get_request('message','')) ;
+$request = CHtml::encode(get_request('request',''));
+$message = CHtml::encode(get_request('message','')) ;
 
 require_once('include/page_header.php');
 ?>
