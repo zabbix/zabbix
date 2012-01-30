@@ -225,22 +225,9 @@ class CConfigurationExportBuilder {
 
 	public function buildMaps(array $maps) {
 		$mapsElement = new CExportElement('maps');
-
 		foreach ($maps as $map) {
-			$mapElement = new CMapExportElement($map);
-
-			$mapUrlsElement = new CExportElement('urls');
-			foreach ($map['urls'] as $url) {
-				$mapUrlsElement->addElement(new CMapUrlExportElement($url));
-			}
-			$mapElement->addElement($mapUrlsElement);
-
-			$mapElement->addElement($this->prepareMapSelements($map['selements']));
-			$mapElement->addElement($this->prepareMapLinks($map['links']));
-
-			$mapsElement->addElement($mapElement);
+			$mapsElement->addElement(new CMapExportElement($map));
 		}
-
 		$this->rootElement->addElement($mapsElement);
 	}
 
@@ -314,50 +301,6 @@ class CConfigurationExportBuilder {
 		}
 
 		return $graphItemsElement;
-	}
-
-	protected function prepareMapSelements(array $selements) {
-		$mapSelementsElement = new CExportElement('selements');
-
-		foreach ($selements as $selement) {
-			$mapSelementElement = new CMapSelementExportElement($selement);
-			$mapSelementElement->addElement(new CExportElement('element', $selement['elementid']));
-			$mapSelementElement->addElement(new CExportElement('icon_off', $selement['iconid_off']));
-			$mapSelementElement->addElement(new CExportElement('icon_on', $selement['iconid_on']));
-			$mapSelementElement->addElement(new CExportElement('icon_disabled', $selement['iconid_disabled']));
-			$mapSelementElement->addElement(new CExportElement('icon_maintenance', $selement['iconid_maintenance']));
-
-			$mapUrlsElement = new CExportElement('urls');
-			foreach ($selement['urls'] as $url) {
-				$mapUrlsElement->addElement(new CMapUrlExportElement($url));
-			}
-			$mapSelementElement->addElement($mapUrlsElement);
-
-
-			$mapSelementsElement->addElement($mapSelementElement);
-		}
-
-		return $mapSelementsElement;
-	}
-
-	protected function prepareMapLinks(array $links) {
-		$mapLinksElement = new CExportElement('links');
-
-		foreach ($links as $link) {
-			$mapLinkElement = new CMapLinkExportElement($link);
-
-			$mapLinkTriggersElement = new CExportElement('linktriggers');
-			foreach ($link['linktriggers'] as $linktrigger) {
-				$linkTriggerElement = new CMapLinkTriggerExportElement($linktrigger);
-				$linkTriggerElement->addElement(new CExportElement('trigger', $linktrigger['triggerid']));
-				$mapLinkTriggersElement->addElement($linkTriggerElement);
-			}
-			$mapLinkElement->addElement($mapLinkTriggersElement);
-
-			$mapLinksElement->addElement($mapLinkElement);
-		}
-
-		return $mapLinksElement;
 	}
 
 }
