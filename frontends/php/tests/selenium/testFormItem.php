@@ -21,8 +21,8 @@
 <?php
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-define('PROXY_GOOD', 0);
-define('PROXY_BAD', 1);
+define('ITEM_GOOD', 0);
+define('ITEM_BAD', 1);
 
 class testFormItem extends CWebTest {
 
@@ -70,7 +70,7 @@ class testFormItem extends CWebTest {
 
 		$this->assertElementPresent('hostname');
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!
-////TODO		$this->assertAttribute("//input[@id='hostname']/@maxlength", '64');
+		$this->assertAttribute("//input[@id='hostname']/@maxlength", '64');
 
 		$this->assertElementPresent('btn_host');
 
@@ -156,6 +156,94 @@ class testFormItem extends CWebTest {
 		$this->assertElementPresent("//select[@id='status']/option[text()='Enabled']");
 		$this->assertElementPresent("//select[@id='status']/option[text()='Disabled']");
 		$this->assertElementPresent("//select[@id='status']/option[text()='Not supported']");
+	}
+
+	// Returns all possible item data
+	public static function dataCreate() {
+		// Ok/bad, visible host name, name, key, errors
+		return array(
+			array(
+				ITEM_GOOD,
+				'ЗАББИКС Сервер',
+				'Checksum of $1',
+				'vfs.file.cksum[/sbin/shutdown]',
+				array()
+			),
+			// Duplicate item
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				'Checksum of $1',
+				'vfs.file.cksum[/sbin/shutdown]',
+				array('Cannot add item', 'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on given host.')
+			),
+			// Item name is missing
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				'',
+				'agent.ping123',
+				array('Page received incorrect data.', 'Warning. Incorrect value for field "name".')
+			),
+			// Item key is missing
+			array(
+				ITEM_BAD,
+				'ЗАББИКС Сервер',
+				'Item name',
+				'',
+				array('Page received incorrect data.', 'Warning. Incorrect value for field "key".')
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider dataCreate
+	 */
+	public function testFormItem_Create($expected, $visibleHostname, $name, $key, $errorMsgs) {
+		$this->login('hosts.php');
+		$this->assertTitle('Hosts');
+		$this->ok('HOSTS');
+		$this->dropdown_select_wait('groupid', 'all');
+		$this->assertTitle('Hosts');
+		$this->ok('HOSTS');
+
+
+		$row = DBfetch(DBselect("select hostid from hosts where name='$visibleHostname'"));
+		$hostid = $row['hostid'];
+
+		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
+		$this->wait();
+
+		$this->assertTitle('Configuration of items');
+		$this->ok('CONFIGURATION OF ITEMS');
+
+		$this->button_click('form');
+		$this->wait();
+		$this->assertTitle('Configuration of items');
+
+		$this->input_type('name', $name);
+		$this->input_type('key', $key);
+
+		$this->button_click('save');
+		$this->wait();
+		switch ($expected) {
+			case ITEM_GOOD:
+				$this->ok('Item added');
+				$this->assertTitle('Configuration of items');
+				$this->ok('CONFIGURATION OF ITEMS');
+				break;
+
+			case ITEM_BAD:
+				$this->assertTitle('Configuration of items');
+				$this->ok('CONFIGURATION OF ITEMS');
+				foreach ($errorMsgs as $msg) {
+					$this->ok($msg);
+				}
+				$this->ok('Host');
+				$this->ok('Name');
+				$this->ok('Key');
+				break;
+		}
 	}
 }
 ?>
