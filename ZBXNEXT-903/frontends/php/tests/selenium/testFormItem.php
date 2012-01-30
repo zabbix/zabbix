@@ -26,7 +26,32 @@ define('ITEM_BAD', 1);
 
 class testFormItem extends CWebTest {
 
-	public function testFormItem_CheckLayout() {
+	// Returns all possible item types
+	public static function itemTypes() {
+		return array(
+			array(ITEM_TYPE_ZABBIX, 'Zabbix agent'),
+			array(ITEM_TYPE_SNMPV1, 'SNMPv1 agent'),
+			array(ITEM_TYPE_TRAPPER, 'Zabbix trapper'),
+			array(ITEM_TYPE_SIMPLE, 'Simple check'),
+			array(ITEM_TYPE_SNMPV2C, 'SNMPv2 agent'),
+			array(ITEM_TYPE_INTERNAL, 'Zabbix internal'),
+			array(ITEM_TYPE_SNMPV3, 'SNMPv3 agent'),
+			array(ITEM_TYPE_ZABBIX_ACTIVE, 'Zabbix agent (active)'),
+			array(ITEM_TYPE_AGGREGATE, 'Zabbix aggregate'),
+			array(ITEM_TYPE_EXTERNAL, 'External check'),
+			array(ITEM_TYPE_DB_MONITOR, 'Database monitor'),
+			array(ITEM_TYPE_IPMI, 'IPMI agent'),
+			array(ITEM_TYPE_SSH, 'SSH agent'),
+			array(ITEM_TYPE_TELNET, 'TELNET agent'),
+			array(ITEM_TYPE_CALCULATED, 'Calculated'),
+			array(ITEM_TYPE_JMX, 'JMX agent')
+		);
+	}
+
+	/**
+	 * @dataProvider itemTypes
+	 */
+	public function testFormItem_CheckLayout($itemTypeID, $itemType ) {
 
 		$this->login('items.php');
 		$this->assertTitle('Configuration of items');
@@ -35,48 +60,45 @@ class testFormItem extends CWebTest {
 		$this->button_click('form');
 		$this->wait();
 		$this->assertTitle('Configuration of items');
-		// Labels
-		$this->ok(
-			array(
-				'Host',
-				'Name',
-				'Key',
-				'Type',
-				'Host interface',
-				'Type of information',
-				'Data type',
-				'Units',
-				'Use custom multiplier',
-				'Update interval (in sec)',
-				'Flexible intervals (sec)',
-				'Interval',
-				'Period',
-				'Action',
-				'No flexible intervals defined.',
-				'New flexible interval',
-				'Period',
-				'Keep history (in days)',
-				'Keep trends (in days)',
-				'Store value',
-				'Show value',
-				'show value mappings',
-				'New application',
-				'Applications',
-				'Populates host inventory field',
-				'Description',
-				'Status'
-			)
-		);
 
+		$this->ok('Host interface');
+		$this->ok('Type of information');
+		$this->ok('Data type');
+		$this->ok('Units');
+		$this->ok('Use custom multiplier');
+		$this->ok('Update interval (in sec)');
+		$this->ok('Flexible intervals (sec)');
+		$this->ok('Interval');
+		$this->ok('Period');
+		$this->ok('Action');
+		$this->ok('No flexible intervals defined');
+		$this->ok('New flexible interval');
+		$this->ok('Period');
+		$this->ok('Keep history (in days)');
+		$this->ok('Keep trends (in days)');
+		$this->ok('Store value');
+		$this->ok('Show value');
+		$this->ok('show value mappings');
+		$this->ok('New application');
+		$this->ok('Applications');
+		$this->ok('Populates host inventory field');
+		$this->ok('Description');
+		$this->ok('Status');
+
+		$this->ok('Host');
 		$this->assertElementPresent('hostname');
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!
-		$this->assertAttribute("//input[@id='hostname']/@maxlength", '64');
+////TODO	$this->assertAttribute("//input[@id='hostname']/@maxlength", '64');
 
 		$this->assertElementPresent('btn_host');
 
+		$this->dropdown_select('type', $itemType);
+
+		$this->ok('Name');
 		$this->assertElementPresent('name');
 		$this->assertAttribute("//input[@id='name']/@maxlength", '255');
 
+		$this->ok('Key');
 		$this->assertElementPresent('key');
 		$this->assertAttribute("//input[@id='key']/@maxlength", '255');
 
@@ -99,7 +121,12 @@ class testFormItem extends CWebTest {
 		$this->assertElementPresent("//select[@id='type']/option[text()='JMX agent']");
 		$this->assertElementPresent("//select[@id='type']/option[text()='Calculated']");
 
-		$this->assertElementPresent('interfaceid');
+		if (in_array($itemTypeID, array(ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER,
+						ITEM_TYPE_AGGREGATE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED))) {
+			$this->assertNotVisible('interfaceid');
+		} else {
+			$this->assertVisible('interfaceid');
+		}
 
 		$this->assertElementPresent('value_type');
 		$this->assertElementPresent("//select[@id='value_type']/option[text()='Numeric (unsigned)']");
@@ -119,8 +146,12 @@ class testFormItem extends CWebTest {
 
 		$this->assertElementPresent('multiplier');
 
-		$this->assertElementPresent('delay');
-		$this->assertAttribute("//input[@id='delay']/@maxlength", '5');
+		if (in_array($itemTypeID, array(ITEM_TYPE_TRAPPER))) {
+			$this->assertNotVisible('delay');
+		} else {
+			$this->assertVisible('delay');
+			$this->assertAttribute("//input[@id='delay']/@maxlength", '5');
+		}
 
 		$this->assertElementPresent('new_delay_flex_delay');
 
@@ -160,12 +191,13 @@ class testFormItem extends CWebTest {
 
 	// Returns all possible item data
 	public static function dataCreate() {
-		// Ok/bad, visible host name, name, key, errors
+		// Ok/bad, visible host name, name, type, key, errors
 		return array(
 			array(
 				ITEM_GOOD,
 				'ЗАББИКС Сервер',
 				'Checksum of $1',
+				ITEM_TYPE_ZABBIX,
 				'vfs.file.cksum[/sbin/shutdown]',
 				array()
 			),
@@ -174,6 +206,7 @@ class testFormItem extends CWebTest {
 				ITEM_BAD,
 				'ЗАББИКС Сервер',
 				'Checksum of $1',
+				ITEM_TYPE_ZABBIX,
 				'vfs.file.cksum[/sbin/shutdown]',
 				array('Cannot add item', 'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on given host.')
 			),
@@ -182,6 +215,7 @@ class testFormItem extends CWebTest {
 				ITEM_BAD,
 				'ЗАББИКС Сервер',
 				'',
+				ITEM_TYPE_ZABBIX,
 				'agent.ping123',
 				array('Page received incorrect data.', 'Warning. Incorrect value for field "name".')
 			),
@@ -199,7 +233,7 @@ class testFormItem extends CWebTest {
 	/**
 	 * @dataProvider dataCreate
 	 */
-	public function testFormItem_Create($expected, $visibleHostname, $name, $key, $errorMsgs) {
+	public function testFormItem_Create($expected, $visibleHostname, $name, $type, $key, $errorMsgs) {
 		$this->login('hosts.php');
 		$this->assertTitle('Hosts');
 		$this->ok('HOSTS');
