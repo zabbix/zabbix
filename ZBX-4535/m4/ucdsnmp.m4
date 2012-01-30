@@ -76,8 +76,8 @@ AC_DEFUN([LIBSNMP_CHECK_CONFIG],
 
                 AC_CHECK_LIB(crypto, main, SNMP_LIBS="$SNMP_LIBS -lcrypto")
 
-                SNMP_CPPFLAGS=-I$SNMP_INCDIR
-                SNMP_LDFLAGS="-L$SNMP_LIBDIR"
+		SNMP_CPPFLAGS=-I$SNMP_INCDIR
+		SNMP_LDFLAGS="-L$SNMP_LIBDIR"
 		SNMP_LIBS="-lsnmp $SNMP_LIBS"
 
 		_save_udcsnmp_cflags="$CFLAGS"
