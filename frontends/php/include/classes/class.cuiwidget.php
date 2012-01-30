@@ -67,13 +67,16 @@ class CUIWidget extends CDiv {
 	}
 
 	public function setDoubleHeader($left, $right) {
-		$left = new CDiv($left);
-		$left->addStyle('float: left;');
-		$right = new CDiv($right);
-		$right->addStyle('float: right;');
+		$table = new CTable();
+		$table->addStyle('width: 100%;');
+		$lCol = new CCol($left);
+		$lCol->addStyle('text-align: left; border: 0;');
+		$rCol = new CCol($right);
+		$rCol->addStyle('text-align: right; border: 0;');
+		$table->addRow(array($lCol, $rCol));
 
 		$this->_header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header '.$this->css_class);
-		$this->_header->addItem(array($left, $right));
+		$this->_header->addItem($table);
 		return $this->_header;
 	}
 
