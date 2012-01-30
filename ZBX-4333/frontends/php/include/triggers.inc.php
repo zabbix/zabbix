@@ -1992,12 +1992,8 @@ function utf8RawUrlDecode($source){
  ******************************************************************************/
 	function insert_dependency($triggerid_down, $triggerid_up) {
 		$triggerdepid = get_dbid('trigger_depends', 'triggerdepid');
-		$result = DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up)'.
-			" VALUES ($triggerdepid,$triggerid_down,$triggerid_up)");
-		if (!$result) {
-			return $result;
-		}
-		return DBexecute('UPDATE triggers SET dep_level=dep_level+1 WHERE triggerid='.$triggerid_up);
+		return DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up)'.
+				' VALUES ('.$triggerdepid.','.$triggerid_down.','.$triggerid_up.')');
 	}
 
 	function replace_triggers_depenedencies($new_triggerids){
@@ -2051,7 +2047,6 @@ function utf8RawUrlDecode($source){
 						' WHERE '.DBcondition('triggerid_down',$triggerids));
 
 		while($db_dep = DBfetch($db_deps)){
-			DBexecute('UPDATE triggers SET dep_level=dep_level-1 WHERE triggerid='.$db_dep['triggerid_up']);
 			DBexecute('DELETE FROM trigger_depends'.
 				' WHERE triggerid_up='.$db_dep['triggerid_up'].
 					' AND triggerid_down='.$db_dep['triggerid_down']);

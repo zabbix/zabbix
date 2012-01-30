@@ -1685,7 +1685,6 @@ COpt::memoryPick();
 		}
 
 		foreach($targetids as $targetid){
-
 			$syncTemplateIds = array();
 			foreach ($templateids as $templateid) {
 				foreach($linked as $lnum => $link){

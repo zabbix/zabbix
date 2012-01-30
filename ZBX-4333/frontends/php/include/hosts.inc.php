@@ -148,9 +148,7 @@
 	 */
 	function syncHostWithTemplates($hostid, array $templateIds) {
 		delete_template_elements($hostid, $templateIds);
-		$res = copyTemplateElements($hostid, $templateIds);
-
-		return $res;
+		return copyTemplateElements($hostid, $templateIds);
 	}
 
 /*
