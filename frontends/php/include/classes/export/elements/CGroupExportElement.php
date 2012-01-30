@@ -1,10 +1,13 @@
 <?php
 
-class CGroupExportElement extends CNodeExportElement {
+class CGroupExportElement extends CExportElement {
 
 	public function __construct($group) {
-		$group = ArrayHelper::getByKeys($group, array('name'));
 		parent::__construct('group', $group);
+	}
+
+	protected function requiredFields() {
+		return array('name');
 	}
 
 }

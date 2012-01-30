@@ -1,10 +1,18 @@
 <?php
 
-class CTemplateExportElement extends CNodeExportElement{
+class CTemplateExportElement extends CExportElement{
 
 	public function __construct(array $template) {
-		$template = ArrayHelper::getByKeys($template, array('host', 'name'));
 		parent::__construct('template', $template);
 	}
 
+	protected function requiredFields() {
+		return array('host', 'name');
+	}
+
+	protected function fieldNameMap() {
+		return array(
+			'host' => 'template'
+		);
+	}
 }

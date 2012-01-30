@@ -196,7 +196,6 @@ frontends/php/include/classes/export/elements/CItemApplicationExportElement.php 
 frontends/php/include/classes/export/elements/CItemExportElement.php -text
 frontends/php/include/classes/export/elements/CItemPrototypeExportElement.php -text
 frontends/php/include/classes/export/elements/CMacroExportElement.php -text
-frontends/php/include/classes/export/elements/CNodeExportElement.php -text
 frontends/php/include/classes/export/elements/CTemplateExportElement.php -text
 frontends/php/include/classes/export/elements/CTriggerExportElement.php -text
 frontends/php/include/classes/export/elements/CTriggerPrototypeExportElement.php -text

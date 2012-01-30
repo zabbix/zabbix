@@ -970,7 +970,7 @@ class ArrayHelper {
 
 	private function __construct() {}
 
-	public function getByKey(array $array, array $keys) {
+	public static function getByKeys(array $array, array $keys) {
 		$result = array();
 		foreach ($keys as $key) {
 			if (isset($array[$key])) {

@@ -1,10 +1,13 @@
 <?php
 
-class CHostGroupExportElement extends CNodeExportElement {
+class CHostGroupExportElement extends CExportElement {
 
 	public function __construct($hostGroup) {
-		$hostGroup = ArrayHelper::getByKeys($hostGroup, array('name'));
 		parent::__construct('group', $hostGroup);
+	}
+
+	protected function requiredFields() {
+		return array('name');
 	}
 
 }

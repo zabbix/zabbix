@@ -1,5 +1,5 @@
 <?php
 
-class CHostInventoryExportElement extends CNodeExportElement {
+class CHostInventoryExportElement extends CExportElement {
 
 }
