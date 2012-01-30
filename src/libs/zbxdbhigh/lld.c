@@ -161,14 +161,14 @@ static void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_r
 
 	for (l = 0; l < sz_data; l++)
 	{
-		if ((*data)[l] != '{' || (*data)[l + 1] != '#')
+		if ('{' != (*data)[l] || '#' != (*data)[l + 1])
 			continue;
 
-		for (r = l + 2; r < sz_data && (*data)[r] != '}'; r++)
+		for (r = l + 2; r < sz_data && SUCCEED == is_macro_char((*data)[r]); r++)
 			;
 
-		if (r == sz_data)
-			break;
+		if ('}' != (*data)[r])
+			continue;
 
 		c = (*data)[r + 1];
 		(*data)[r + 1] = '\0';
@@ -197,11 +197,15 @@ static void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_r
 			memmove(dst, src, sz_data - l - sz_value + 1);
 
 			memcpy(&(*data)[l], replace_to, sz_value);
+
+			l += sz_value - 1;
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro: \"%.*s\" is not found in value set",
 					__function_name, (int)sz_macro, *data + l);
+
+			l += sz_macro - 1;
 		}
 	}
 
