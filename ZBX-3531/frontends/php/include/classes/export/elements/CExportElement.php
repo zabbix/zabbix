@@ -1,15 +1,42 @@
 <?php
 
-abstract class CExportElement {
-
-	const EXPORT_ELEMENT_TYPE_NODE = 'node';
-	const EXPORT_ELEMENT_TYPE_TEXT = 'text';
+class CExportElement {
 
 	protected $data;
 	protected $name;
+	protected $childElements = array();
 
-	abstract public function elementType();
-	abstract public function getChilds();
+
+	/**
+	 * @param string $name element name
+	 * @param array  $data
+	 */
+	public function __construct($name, array $data = array()) {
+		$this->name = $name;
+
+		$this->data = $data;
+
+		$this->cleanData();
+		$this->renameData();
+	}
+
+	/**
+	 * Add child element.
+	 *
+	 * @param CExportElement $element
+	 */
+	public function addElement(CExportElement $element) {
+		$this->childElements[] = $element;
+	}
+
+	/**
+	 * Get child elements.
+	 *
+	 * @return array
+	 */
+	public function getChilds() {
+		return $this->childElements;
+	}
 
 	/**
 	 * @return string
@@ -24,9 +51,30 @@ abstract class CExportElement {
 	 * @return array
 	 */
 	public function getData() {
-		// TODO: natural sorting
-		ksort($this->data);
 		return $this->data;
+	}
+
+	protected function cleanData() {
+		$requiredFields = $this->requiredFields();
+		$referenceFields = $this->referenceFields();
+		foreach ($referenceFields as $field) {
+			if (isset($this->data[$field])) {
+				$requiredFields[] = $field;
+			}
+		}
+		if ($requiredFields) {
+			$this->data = ArrayHelper::getByKeys($this->data, $requiredFields);
+		}
+	}
+
+	protected function renameData() {
+		$fieldMap = $this->fieldNameMap();
+		foreach ($this->data as $key => $value) {
+			if (isset($fieldMap[$key])) {
+				$this->data[$fieldMap[$key]] = $value;
+				unset($this->data[$key]);
+			}
+		}
 	}
 
 	protected function requiredFields() {
@@ -39,27 +87,6 @@ abstract class CExportElement {
 
 	protected function fieldNameMap() {
 		return array();
-	}
-
-	protected function cleanData() {
-		$requiredFields = $this->requiredFields();
-		$referenceFields = $this->referenceFields();
-		foreach ($referenceFields as $field) {
-			if (isset($this->data[$field])) {
-				$requiredFields[] = $field;
-			}
-		}
-		$this->data = ArrayHelper::getByKeys($this->data, $requiredFields);
-	}
-
-	protected function renameData() {
-		$fieldMap = $this->fieldNameMap();
-		foreach ($this->data as $key => $value) {
-			if (isset($fieldMap[$key])) {
-				$this->data[$fieldMap[$key]] = $value;
-				unset($this->data[$key]);
-			}
-		}
 	}
 
 }

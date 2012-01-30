@@ -1,6 +1,6 @@
 <?php
 
-class CInterfaceExportElement extends CNodeExportElement {
+class CInterfaceExportElement extends CExportElement {
 
 	public function __construct($interface) {
 		$interface = ArrayHelper::getByKeys($interface, array('main', 'type', 'useip', 'ip', 'dns', 'port', 'interface_ref'));

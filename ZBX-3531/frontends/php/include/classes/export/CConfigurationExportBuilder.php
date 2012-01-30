@@ -5,7 +5,7 @@ class CConfigurationExportBuilder {
 	const EXPORT_VERSION = '2.0';
 
 	/**
-	 * @var CNodeExportElement
+	 * @var CExportElement
 	 */
 	private $rootElement;
 
@@ -30,12 +30,12 @@ class CConfigurationExportBuilder {
 			'version' => self::EXPORT_VERSION,
 			'date' => date('Y-m-d\TH:i:s\Z', time() - date('Z')),
 		);
-		$this->rootElement = new CNodeExportElement('zabbix_export', $zabbixExportData);
+		$this->rootElement = new CExportElement('zabbix_export', $zabbixExportData);
 	}
 
 	public function buildGroups($groups) {
 		order_result($groups, 'name');
-		$groupsElement = new CNodeExportElement('groups');
+		$groupsElement = new CExportElement('groups');
 
 		foreach ($groups as $group) {
 			$groupsElement->addElement(new CGroupExportElement($group));
@@ -45,7 +45,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildHosts($hosts) {
-		$hostsElement = new CNodeExportElement('hosts');
+		$hostsElement = new CExportElement('hosts');
 
 		order_result($hosts, 'host');
 		foreach ($hosts as $host) {
@@ -95,7 +95,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildTemplates($templates) {
-		$templatesElement = new CNodeExportElement('templates');
+		$templatesElement = new CExportElement('templates');
 
 		order_result($templates, 'host');
 
@@ -138,7 +138,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildGraphs(array $graphs) {
-		$graphsElement = new CNodeExportElement('graphs');
+		$graphsElement = new CExportElement('graphs');
 
 		foreach ($graphs as $graph) {
 
@@ -147,10 +147,10 @@ class CConfigurationExportBuilder {
 				$graphElement->addElement($this->prepareGraphItems($graph['gitems']));
 			}
 			if ($graph['ymin_itemid']) {
-				$graphElement->addElement(new CNodeExportElement('ymin_itemid', $graph['ymin_itemid']));
+				$graphElement->addElement(new CExportElement('ymin_item', $graph['ymin_itemid']));
 			}
 			if ($graph['ymax_itemid']) {
-				$graphElement->addElement(new CNodeExportElement('ymax_itemid', $graph['ymax_itemid']));
+				$graphElement->addElement(new CExportElement('ymax_item', $graph['ymax_itemid']));
 			}
 			$graphsElement->addElement($graphElement);
 		}
@@ -159,7 +159,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildGraphPrototypes(array $graphPrototypes) {
-		$graphPrototypesElement = new CNodeExportElement('graph_prototypes');
+		$graphPrototypesElement = new CExportElement('graph_prototypes');
 
 		foreach ($graphPrototypes as $graphPrototype) {
 			$graphPrototypeElement = new CGraphPrototypeExportElement($graphPrototype);
@@ -167,10 +167,10 @@ class CConfigurationExportBuilder {
 				$graphPrototypeElement->addElement($this->prepareGraphItems($graphPrototype['gitems']));
 			}
 			if ($graphPrototype['ymin_itemid']) {
-				$graphPrototypeElement->addElement(new CNodeExportElement('ymin_itemid', $graphPrototype['ymin_itemid']));
+				$graphPrototypeElement->addElement(new CExportElement('ymin_itemid', $graphPrototype['ymin_itemid']));
 			}
 			if ($graphPrototype['ymax_itemid']) {
-				$graphPrototypeElement->addElement(new CNodeExportElement('ymax_itemid', $graphPrototype['ymax_itemid']));
+				$graphPrototypeElement->addElement(new CExportElement('ymax_itemid', $graphPrototype['ymax_itemid']));
 			}
 			$graphPrototypesElement->addElement($graphPrototypeElement);
 		}
@@ -179,7 +179,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildTriggers(array $triggers) {
-		$triggersElement = new CNodeExportElement('triggers');
+		$triggersElement = new CExportElement('triggers');
 
 		foreach ($triggers as $trigger) {
 
@@ -194,7 +194,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildTriggerPrototypes(array $triggerPrototypes) {
-		$triggerPrototypesElement = new CNodeExportElement('trigger_prototypes');
+		$triggerPrototypesElement = new CExportElement('trigger_prototypes');
 
 		foreach ($triggerPrototypes as $triggerPrototype) {
 			$triggerPrototypesElement->addElement(new CTriggerPrototypeExportElement($triggerPrototype));
@@ -205,7 +205,7 @@ class CConfigurationExportBuilder {
 
 
 	protected function prepareElement($data, $NodeName, $class) {
-		$element = new CNodeExportElement($NodeName);
+		$element = new CExportElement($NodeName);
 
 		foreach ($data as $value) {
 			$element->addElement(new $class($value));
@@ -215,7 +215,7 @@ class CConfigurationExportBuilder {
 	}
 
 	protected function prepareInterfaces(array $interfaces) {
-		$interfacesElement = new CNodeExportElement('interfaces');
+		$interfacesElement = new CExportElement('interfaces');
 
 		foreach ($interfaces as $interface) {
 			$interface = $this->referral->createReference('interface_ref', $interface);
@@ -226,7 +226,7 @@ class CConfigurationExportBuilder {
 	}
 
 	protected function prepareItems(array $items) {
-		$itemsElement = new CNodeExportElement('items');
+		$itemsElement = new CExportElement('items');
 
 		foreach ($items as $item) {
 			$item = $this->referral->addReference('interface_ref', $item);
@@ -242,7 +242,7 @@ class CConfigurationExportBuilder {
 	}
 
 	protected function prepareItemPrototypes(array $itemPrototypes) {
-		$itemPrototypesElement = new CNodeExportElement('item_prototypes');
+		$itemPrototypesElement = new CExportElement('item_prototypes');
 
 		foreach ($itemPrototypes as $itemPrototype) {
 			$itemPrototype = $this->referral->addReference('interface_ref', $itemPrototype);
@@ -264,10 +264,11 @@ class CConfigurationExportBuilder {
 	}
 
 	protected function prepareGraphItems(array $graphItems) {
-		$graphItemsElement = new CNodeExportElement('item_prototypes');
+		$graphItemsElement = new CExportElement('graph_items');
+
 		foreach ($graphItems as $graphItem) {
 			$graphItemElement = new CGraphItemExportElement($graphItem);
-			$graphItemElement->addElement(new CNodeExportElement('itemid', $graphItem['itemid']));
+			$graphItemElement->addElement(new CExportElement('item', $graphItem['itemid']));
 			$graphItemsElement->addElement($graphItemElement);
 		}
 

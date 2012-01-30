@@ -1,6 +1,10 @@
 <?php
 
-class CItemExportElement extends CNodeExportElement{
+class CItemExportElement extends CExportElement{
+
+	public function __construct($item) {
+		parent::__construct('item', $item);
+	}
 
 	protected function requiredFields() {
 		return array(
@@ -20,15 +24,6 @@ class CItemExportElement extends CNodeExportElement{
 		return array(
 			'key_' => 'key'
 		);
-	}
-
-	public function __construct($item) {
-		$requiredField = array();
-		if (isset($item['interface_ref'])) {
-			$requiredField[] = 'interface_ref';
-		}
-		$item = ArrayHelper::getByKeys($item, $requiredField);
-		parent::__construct('item', $item);
 	}
 
 }

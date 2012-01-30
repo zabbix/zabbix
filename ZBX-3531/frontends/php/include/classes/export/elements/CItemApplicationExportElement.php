@@ -1,10 +1,13 @@
 <?php
 
-class CItemApplicationExportElement extends CNodeExportElement{
+class CItemApplicationExportElement extends CExportElement{
 
 	public function __construct($application) {
-		$application = ArrayHelper::getByKeys($application, array('name'));
 		parent::__construct('application', $application);
+	}
+
+	protected function requiredFields() {
+		return array('name');
 	}
 
 }
