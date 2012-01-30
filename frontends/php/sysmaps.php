@@ -109,30 +109,11 @@ require_once('include/page_header.php');
 	if($EXPORT_DATA){
 		$maps = get_request('maps', array());
 
-		$options = array(
-			'sysmapids' => $maps,
-			'selectSelements' => API_OUTPUT_EXTEND,
-			'selectLinks' => API_OUTPUT_EXTEND,
-			'selectIconMap' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
-		);
-		$sysmaps = API::Map()->get($options);
+		$export = new CConfigurationExport(array('maps' => $maps));
+		$export->setBuilder(new CConfigurationExportBuilder());
+		$export->setWriter(CExportWriterFactory::getWriter('XMLWriter'));
 
-		$options = array(
-			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
-			'output' => API_OUTPUT_EXTEND,
-			'select_image' => 1
-		);
-		$images = API::Image()->get($options);
-
-
-		prepareMapExport($sysmaps);
-		$images = prepareImageExport($images);
-		$sysmaps = array('images' => $images, 'sysmaps' => $sysmaps);
-
-		$xml = zbxXML::arrayToXML($sysmaps);
-		print($xml);
-
+		print($export->export());
 		exit();
 	}
 

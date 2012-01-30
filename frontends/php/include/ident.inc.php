@@ -32,7 +32,6 @@ function screenIdents($screenids){
 	$screens = API::Screen()->get($options);
 	foreach($screens as $inum => $screen){
 		$idents[$screen['screenid']] = array(
-			'node' => get_node_name_by_elid($screen['screenid'], true),
 			'name' => $screen['name']
 		);
 	}
@@ -50,14 +49,13 @@ function sysmapIdents($sysmapids){
 	);
 
 	$sysmaps = API::Map()->get($options);
-	foreach($sysmaps as $snum => $sysmap){
+	foreach($sysmaps as $sysmap){
 		$idents[$sysmap['sysmapid']] = array(
-			'node' => get_node_name_by_elid($sysmap['sysmapid'], true),
 			'name' => $sysmap['name']
 		);
 	}
 
-return $idents;
+	return $idents;
 }
 
 function hostgroupIdents($groupids){
@@ -70,14 +68,13 @@ function hostgroupIdents($groupids){
 	);
 
 	$groups = API::HostGroup()->get($options);
-	foreach($groups as $gnum => $group){
+	foreach($groups as $group){
 		$idents[$group['groupid']] = array(
-			'node' => get_node_name_by_elid($group['groupid'], true),
 			'name' => $group['name']
 		);
 	}
 
-return $idents;
+	return $idents;
 }
 
 function hostIdents($hostids){
@@ -90,14 +87,13 @@ function hostIdents($hostids){
 	);
 
 	$hosts = API::Host()->get($options);
-	foreach($hosts as $hnum => $host){
+	foreach($hosts as $host){
 		$idents[$host['hostid']] = array(
-			'node' => get_node_name_by_elid($host['hostid'], true),
 			'host' => $host['host']
 		);
 	}
 
-return $idents;
+	return $idents;
 }
 
 function itemIdents($itemids){
@@ -112,17 +108,16 @@ function itemIdents($itemids){
 	);
 
 	$items = API::Item()->get($options);
-	foreach($items as $inum => $item){
+	foreach($items as $item){
 		$host = reset($item['hosts']);
 
 		$idents[$item['itemid']] = array(
-			'node' => get_node_name_by_elid($item['itemid'], true),
 			'host' => $host['host'],
-			'key_' => $item['key_']
+			'key' => $item['key_']
 		);
 	}
 
-return $idents;
+	return $idents;
 }
 
 function triggerIdents($triggerids){
@@ -130,24 +125,19 @@ function triggerIdents($triggerids){
 
 	$options = array(
 		'triggerids' => $triggerids,
-		'selectHosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 		'nodeids'=> get_current_nodeid(true)
 	);
 
 	$triggers = API::Trigger()->get($options);
-	foreach($triggers as $tnum => $trigger){
-		$host = reset($trigger['hosts']);
-
+	foreach($triggers as $trigger){
 		$idents[$trigger['triggerid']] = array(
-			'node' => get_node_name_by_elid($host['hostid'], true),
-			'host' => $host['host'],
 			'description' => $trigger['description'],
 			'expression' => explode_exp($trigger['expression'])
 		);
 	}
 
-return $idents;
+	return $idents;
 }
 
 function graphIdents($graphids){
@@ -161,17 +151,16 @@ function graphIdents($graphids){
 	);
 
 	$graphs = API::Graph()->get($options);
-	foreach($graphs as $inum => $graph){
+	foreach($graphs as $graph){
 		$host = reset($graph['hosts']);
 
 		$idents[$graph['graphid']] = array(
-			'node' => get_node_name_by_elid($graph['graphid'], true),
 			'host' => $host['host'],
 			'name' => $graph['name']
 		);
 	}
 
-return $idents;
+	return $idents;
 }
 
 function imageIdents($imageids){
@@ -184,14 +173,13 @@ function imageIdents($imageids){
 	);
 
 	$images = API::Image()->get($options);
-	foreach($images as $inum => $image){
+	foreach($images as $image){
 		$idents[$image['imageid']] = array(
-			'node' => get_node_name_by_elid($image['imageid'], true),
 			'name' => $image['name']
 		);
 	}
 
-return $idents;
+	return $idents;
 }
 
 function getImageByIdent($ident){

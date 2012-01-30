@@ -21,6 +21,7 @@ class CConfigurationExport {
 			'templates' => array(),
 			'groups' => array(),
 			'screens' => array(),
+			'images' => array(),
 			'maps' => array()
 		);
 		$this->options = array_merge($this->options, $options);
@@ -32,7 +33,10 @@ class CConfigurationExport {
 			'triggers' => array(),
 			'triggerPrototypes' => array(),
 			'graphs' => array(),
-			'graphPrototypes' => array()
+			'graphPrototypes' => array(),
+			'screens' => array(),
+			'images' => array(),
+			'maps' => array()
 		);
 		$this->gatherData();
 	}
@@ -69,6 +73,15 @@ class CConfigurationExport {
 		if ($this->data['graphPrototypes']) {
 			$this->builder->buildGraphPrototypes($this->data['graphPrototypes']);
 		}
+		if ($this->data['screens']) {
+			$this->builder->buildScreens($this->data['screens']);
+		}
+		if ($this->data['images']) {
+			$this->builder->buildImages($this->data['images']);
+		}
+		if ($this->data['maps']) {
+			$this->builder->buildMaps($this->data['maps']);
+		}
 
 		return $this->writer->write($this->builder->getExport());
 	}
@@ -89,6 +102,14 @@ class CConfigurationExport {
 		if ($this->options['templates'] || $this->options['hosts']) {
 			$this->gatherGraphs();
 			$this->gathertriggers();
+		}
+
+		if ($this->options['screens']) {
+			$this->gatherScreens();
+		}
+
+		if ($this->options['maps']) {
+			$this->gatherMaps();
 		}
 	}
 
@@ -377,6 +398,11 @@ class CConfigurationExport {
 		foreach($triggers as $trigger){
 			$trigger['expression'] = explode_exp($trigger['expression']);
 
+			foreach ($trigger['dependencies'] as &$dependency) {
+				$dependency['expression'] = explode_exp($dependency['expression']);
+			}
+			unset($dependency);
+
 			switch ($trigger['flags']) {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
 					$this->data['triggers'][] = $trigger;
@@ -392,6 +418,33 @@ class CConfigurationExport {
 		}
 	}
 
+	private function gatherMaps() {
+		$options = array(
+			'sysmapids' => $this->options['maps'],
+			'selectSelements' => API_OUTPUT_EXTEND,
+			'selectLinks' => API_OUTPUT_EXTEND,
+			'selectIconMap' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		);
+		$sysmaps = API::Map()->get($options);
+		prepareMapExport($sysmaps);
+		$this->data['maps'] = $sysmaps;
 
+		$options = array(
+			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
+			'output' => API_OUTPUT_EXTEND,
+			'select_image' => true,
+			'preservekeys' => true
+		);
+		$images = API::Image()->get($options);
+		$images = prepareImageExport($images);
+		$this->data['images'] = $images;
+
+	}
+
+	private function gatherScreens() {
+
+	}
 
 }
