@@ -164,15 +164,16 @@ include_once('include/page_header.php');
 		'sysmaps'               => '"sysmapid", "name"',
 		'screens'               => '"screenid", "name"',
 		'slides'                => '"slideshowid"',
-		'drules'                => '"druleid"',
-		'dcheckes'              => '"dcheckid"',
+		'drules'                => '"druleid", "name"',
+		'dcheckes'              => '"dcheckid", "name"',
 		'proxies'               => '"hostid", "host"',
-		'nodes'                 => '"nodeid"',
+		'nodes'                 => '"nodeid", "name"',
 		'host_templates'        => '"hostid", "host"',
 		'hosts_and_templates'   => '"hostid", "host"',
 		'overview'              => '"groupid", "name"',
 		'host_group_scr'        => '"groupid", "name"',
 		'plain_text'            => '"itemid", "description"',
+		'templates' 			=> '"hostid", "host"',
 		'screens2'              => '"screenid", "name"'
 	);
 
