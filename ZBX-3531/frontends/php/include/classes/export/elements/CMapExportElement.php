@@ -36,10 +36,10 @@ class CMapExportElement extends CExportElement {
 	protected function addSelements(array $selements) {
 		$mapSelementsElement = new CExportElement('selements');
 		foreach ($selements as $selement) {
-
 			$refNum = $this->references['num']++;
 			$referenceKey = 'sel'.$refNum;
 			$selement['selement_ref'] = $referenceKey;
+
 			$this->references['refs'][$selement['selementid']] = $referenceKey;
 
 			$mapSelementsElement->addElement(new CMapSelementExportElement($selement));

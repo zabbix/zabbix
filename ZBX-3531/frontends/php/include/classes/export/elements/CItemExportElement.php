@@ -4,6 +4,8 @@ class CItemExportElement extends CExportElement{
 
 	public function __construct($item) {
 		parent::__construct('item', $item);
+
+		$this->addApplications($item['applications']);
 	}
 
 	protected function requiredFields() {
@@ -24,6 +26,14 @@ class CItemExportElement extends CExportElement{
 		return array(
 			'key_' => 'key'
 		);
+	}
+
+	protected function addApplications(array $applications) {
+		$applicationsElement = new CExportElement('applications');
+		foreach ($applications as $application) {
+			$applicationsElement->addElement(new CItemApplicationExportElement($application));
+		}
+		$this->addElement($applicationsElement);
 	}
 
 }

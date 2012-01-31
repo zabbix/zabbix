@@ -4,6 +4,8 @@ class CItemPrototypeExportElement extends CExportElement{
 
 	public function __construct($item) {
 		parent::__construct('item_prototype', $item);
+
+		$this->addApplications($item['applications']);
 	}
 
 	protected function requiredFields() {
@@ -24,4 +26,11 @@ class CItemPrototypeExportElement extends CExportElement{
 		);
 	}
 
+	protected function addApplications(array $applications) {
+		$applicationsElement = new CExportElement('applications');
+		foreach ($applications as $application) {
+			$applicationsElement->addElement(new CItemApplicationExportElement($application));
+		}
+		$this->addElement($applicationsElement);
+	}
 }
