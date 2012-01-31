@@ -972,6 +972,8 @@ else {
 			}
 
 			if (!empty($item['applications'])) {
+				order_result($item['applications'], 'name');
+
 				$applications = array();
 				foreach ($item['applications'] as $application) {
 					$applications[] = $application['name'];

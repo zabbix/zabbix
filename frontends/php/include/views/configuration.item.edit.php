@@ -148,6 +148,7 @@ if ($this->data['limited']) {
 
 	$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes':'no');
 	$multiplierCheckBox->setAttribute('disabled', 'disabled');
+	$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
 	$multiplier[] = $multiplierCheckBox;
 	if ($this->data['multiplier']) {
 		$multiplier[] = SPACE;
@@ -157,12 +158,14 @@ if ($this->data['limited']) {
 	}
 }
 else {
-	$multiplier[] = new CCheckBox(
+	$multiplierCheckBox = new CCheckBox(
 		'multiplier',
 		$this->data['multiplier'] == 1 ? 'yes': 'no',
 		'var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }',
 		1
 	);
+	$multiplierCheckBox->setAttribute('style', 'vertical-align: middle;');
+	$multiplier[] = $multiplierCheckBox;
 	$multiplier[] = SPACE;
 	$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE);
 	$formulaTextBox->setAttribute('style', 'text-align: right;');
