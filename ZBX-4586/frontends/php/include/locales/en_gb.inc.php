@@ -858,6 +858,7 @@
 	'S_APPLICATION_DELETED'=>					'Application deleted',
 	'S_CANNOT_DELETE_APPLICATION'=>				'Cannot delete application',
 	'S_NO_APPLICATIONS_DEFINED'=>				'No applications defined',
+	'S_APPLICTATION_IS_NOT_AVAILABLE_ON_HOST' => 'Application with ID "%1$s" is not available on host "%2$s"',
 	'S_NO_TEMPLATES_LINKED'=>					'No templates linked',
 	'S_HOSTS'=>									'Hosts',
 	'S_ITEMS'=>									'Items',

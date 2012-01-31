@@ -684,17 +684,9 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$dbHosts = CHost::get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'hostids' => zbx_objectValues($items, 'hostid'),
-				'templated_hosts' => true,
-				'editable' => true,
-				'preservekeys' => true
-			));
+			self::checkInput($items);
 
 			foreach($items as $inum => $item){
-				if(!isset($dbHosts[$item['hostid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
 				$result = add_item($item);
 
@@ -741,6 +733,8 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
+
+			self::checkInput($items, $upd_items);
 
 			foreach($items as $inum => $item){
 				$item_db_fields = $upd_items[$item['itemid']];
@@ -891,6 +885,57 @@ COpt::memoryPick();
 			$error = reset($error);
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
+		}
+	}
+
+
+	/**
+	 * Validates the input parameters.
+	 *
+	 * @static
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $items	    An array of items to validate
+	 * @param array $dbItems	An array of items $dbItems should be matched against
+	 */
+	protected static function checkInput(array $items, array $dbItems = array()) {
+
+		// fetch hosts
+		if ($dbItems) {
+			$options = array('itemids' => zbx_objectValues($items, 'itemid'));
+		}
+		else {
+			$options = array('hostids' => zbx_objectValues($items, 'hostid'));
+		}
+		$dbHosts = CHost::get(array_merge($options, array(
+			'output' => array('hostid', 'host'),
+			'templated_hosts' => true,
+			'editable' => true,
+			'select_applications' => API_OUTPUT_REFER,
+			'preservekeys' => true
+		)));
+
+		// validate items
+		foreach ($items as $item) {
+			$hostId = ($dbItems) ? $dbItems[$item['itemid']]['hostid'] : $item['hostid'];
+			$host = ($dbHosts[$hostId]);
+
+			// check that the host is writable
+			if (!isset($dbHosts[$hostId])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			}
+
+			// check that the given applications belong to the item's host
+			if (isset($item['applications']) && $item['applications']) {
+				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
+				foreach($item['applications'] as $appId) {
+					if (!in_array($appId, $dbApplicationIds)) {
+						$error = sprintf(S_APPLICTATION_IS_NOT_AVAILABLE_ON_HOST, $appId, $host['host']);
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					}
+				}
+			}
 		}
 	}
 
