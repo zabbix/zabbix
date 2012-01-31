@@ -528,7 +528,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			goto clean;
 		}
 
-		/* check whether we need to insert a new entry or update an existing */
+		/* check whether we need to update existing entry or insert a new one */
 		ZBX_STR2UINT64(recid, buf);
 		if (FAIL != (i = zbx_vector_uint64_bsearch(del, recid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			zbx_vector_uint64_remove(del, i);
@@ -538,7 +538,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	zbx_vector_uint64_sort(&ins, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	/* these tables has unique indexes */
+	/* these tables have unique indexes */
 	if (0 != del->values_num && SUCCEED == str_in_list("hosts_templates,hostmacro,items", table->table, ','))
 	{
 		sql_offset = 0;
