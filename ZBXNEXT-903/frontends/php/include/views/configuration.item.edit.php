@@ -58,7 +58,7 @@ $itemFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_T
 $itemFormList->addRow(_('Key'), array(
 	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
 	!$this->data['limited']
-		? new CButton('btn1', _('Select'),
+		? new CButton('keyButton', _('Select'),
 			"return PopUp('popup.php?dstfrm=".$itemForm->getName()."&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+jQuery('#type option:selected').val());",
 			'formlist')
 		: null

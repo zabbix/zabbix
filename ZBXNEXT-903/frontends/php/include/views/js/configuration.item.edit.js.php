@@ -53,6 +53,18 @@
 		}
 	}
 
+	function displayKeyButton() {
+		var type = itemTypeInterface(parseInt(jQuery('#type').val()));
+		switch (type) {
+			case 2: // INTERFACE_TYPE_SNMP
+			case 3: // INTERFACE_TYPE_IPMI
+				jQuery('#keyButton').attr('disabled', 'disabled');
+				break;
+			default:
+				jQuery('#keyButton').removeAttr('disabled');
+		}
+	}
+
 	function setAuthTypeLabel() {
 		if (jQuery('#authtype').val() == 1) {
 			jQuery('#row_password label').html('<?php echo _('Key passphrase'); ?>');
@@ -65,8 +77,10 @@
 	jQuery(document).ready(function() {
 		jQuery('#type').bind('change', function() {
 			organizeInterfaces();
+			displayKeyButton();
 		});
 		organizeInterfaces();
+		displayKeyButton();
 
 		jQuery('#authtype').bind('change', function() {
 			setAuthTypeLabel();
