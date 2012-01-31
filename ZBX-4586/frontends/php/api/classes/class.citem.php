@@ -900,7 +900,6 @@ COpt::memoryPick();
 	 * @param array $dbItems	An array of items $dbItems should be matched against
 	 */
 	protected static function checkInput(array $items, array $dbItems = array()) {
-
 		// fetch hosts
 		if ($dbItems) {
 			$options = array('itemids' => zbx_objectValues($items, 'itemid'));
@@ -918,8 +917,8 @@ COpt::memoryPick();
 
 		// validate items
 		foreach ($items as $item) {
-			$hostId = ($dbItems) ? $dbItems[$item['itemid']]['hostid'] : $item['hostid'];
-			$host = ($dbHosts[$hostId]);
+			$hostId = $dbItems ? $dbItems[$item['itemid']]['hostid'] : $item['hostid'];
+			$host = $dbHosts[$hostId];
 
 			// check that the host is writable
 			if (!isset($dbHosts[$hostId])) {
@@ -931,7 +930,7 @@ COpt::memoryPick();
 				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
 				foreach($item['applications'] as $appId) {
 					if (!in_array($appId, $dbApplicationIds)) {
-						$error = sprintf(S_APPLICTATION_IS_NOT_AVAILABLE_ON_HOST, $appId, $host['host']);
+						$error = sprintf(S_APPLICTATION_IS_NOT_AVAILABLE_ON, $appId, $host['host']);
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 					}
 				}
