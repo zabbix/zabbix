@@ -16,11 +16,11 @@ class CGraphPrototypeExportElement extends CExportElement{
 	}
 
 	protected function addYMinItemId(array $yMinItemId) {
-		$this->addElement(new CExportElement('ymin_item', $yMinItemId));
+		$this->addElement(new CExportElement('ymin_item1', $yMinItemId));
 	}
 
 	protected function addYMaxItemId(array $yMaxItemId) {
-		$this->addElement(new CExportElement('ymax_item', $yMaxItemId));
+		$this->addElement(new CExportElement('ymax_item1', $yMaxItemId));
 	}
 
 	protected function addGraphItems(array $graphItems) {
