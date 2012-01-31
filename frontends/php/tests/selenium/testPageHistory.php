@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageHistory extends CWebTest {
 	// Returns all enabled items that belong to enabled hosts
