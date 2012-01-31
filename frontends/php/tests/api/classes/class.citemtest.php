@@ -64,26 +64,34 @@ class CItemTest extends CApiTest {
 
 		// create a test item
 		$rs = $this->createTestObject($object);
-		$items = $this->api->get(array(
-			'itemids' => $rs['itemids'],
-			'output' => API_OUTPUT_EXTEND,
-		));
+		$items = $this->api->get(
+			array(
+				'itemids' => $rs['itemids'],
+				'output' => API_OUTPUT_EXTEND,
+			)
+		);
 		$item = reset($items);
 
 		// update the item with some data
-		$rs = $this->api->update(array(array(
-			'itemid' => $item['itemid'],
-			'name' => 'Test item 2',
-			'interfaceid' => $item['interfaceid']
-		)));
+		$rs = $this->api->update(
+			array(
+				array(
+					'itemid' => $item['itemid'],
+					'name' => 'Test item 2',
+					'interfaceid' => $item['interfaceid']
+				)
+			)
+		);
 
 		$this->assertArrayHasKey($this->api->pkOption(), $rs, 'Item update failed.');
 
 		// fetch the updated item
-		$updatedItems = $this->api->get(array(
-			'itemids' => $rs['itemids'],
-			'output' => API_OUTPUT_EXTEND,
-		));
+		$updatedItems = $this->api->get(
+			array(
+				'itemids' => $rs['itemids'],
+				'output' => API_OUTPUT_EXTEND,
+			)
+		);
 		$updatedItem = reset($updatedItems);
 
 		$this->assertEquals($item['interfaceid'], $updatedItem['interfaceid'], 'Item interface has changed after the update.');

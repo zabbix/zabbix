@@ -152,9 +152,11 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 	public function testGet(array $object) {
 		$this->createTestObject($object);
 
-		$rs = $this->api->get(array(
-			$this->api->pkOption() => $this->createdPks
-		));
+		$rs = $this->api->get(
+			array(
+				$this->api->pkOption() => $this->createdPks
+			)
+		);
 
 		$this->assertCount(1, $rs, 'One of the objects has not been retrieved.');
 	}
@@ -228,9 +230,11 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 
 		// create a test group
 		$hostGroupApi = API::HostGroup();
-		$hostGroupRs = $hostGroupApi->create(array(
-			'name' => 'Test host group'
-		));
+		$hostGroupRs = $hostGroupApi->create(
+			array(
+				'name' => 'Test host group'
+			)
+		);
 
 		// create a test host
 		$hostApi = new CHost();
