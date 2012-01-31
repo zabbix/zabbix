@@ -107,6 +107,8 @@ class CHostExportElement extends CExportElement {
 	}
 
 	protected function addInventory(array $inventory) {
-		$this->addElement(new CHostInventoryExportElement($inventory));
+		if ($inventory) {
+			$this->addElement(new CHostInventoryExportElement($inventory));
+		}
 	}
 }

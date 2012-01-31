@@ -233,7 +233,6 @@ class CConfigurationExport {
 			'preservekeys' => true
 		));
 
-
 		// merge host groups with all groups
 		$hostGroups = array();
 		foreach ($hosts as $host) {
