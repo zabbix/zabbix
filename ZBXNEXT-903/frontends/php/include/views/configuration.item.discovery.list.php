@@ -85,9 +85,16 @@ foreach ($this->data['items'] as $item) {
 		$error->setHint($item['error'], '', 'on');
 	}
 
-	$applications = zbx_objectValues($item['applications'], 'name');
-	$applications = implode(', ', $applications);
-	if (empty($applications)) {
+	if (!empty($item['applications'])) {
+		order_result($item['applications'], 'name');
+
+		$applications = zbx_objectValues($item['applications'], 'name');
+		$applications = implode(', ', $applications);
+		if (empty($applications)) {
+			$applications = '-';
+		}
+	}
+	else {
 		$applications = '-';
 	}
 
