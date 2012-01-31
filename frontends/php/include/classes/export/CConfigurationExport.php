@@ -144,7 +144,7 @@ class CConfigurationExport {
 
 		// items
 		$params = array(
-			'hostids' => $this->options['hosts'],
+			'hostids' => $this->options['templates'],
 			'output' => array('hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
 				'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
 				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'valuemapid', 'delay_flex', 'params',
@@ -158,23 +158,23 @@ class CConfigurationExport {
 		$items = API::Item()->get($params);
 
 		foreach ($items as $item) {
-			if (!isset($hosts[$item['hostid']]['items'])) {
-				$hosts[$item['hostid']]['items'] = array();
-				$hosts[$item['hostid']]['discoveryRules'] = array();
-				$hosts[$item['hostid']]['itemPrototypes'] = array();
+			if (!isset($templates[$item['hostid']]['items'])) {
+				$templates[$item['hostid']]['items'] = array();
+				$templates[$item['hostid']]['discoveryRules'] = array();
+				$templates[$item['hostid']]['itemPrototypes'] = array();
 			}
 
 			switch ($item['flags']) {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
-					$hosts[$item['hostid']]['items'][] = $item;
+					$templates[$item['hostid']]['items'][] = $item;
 					break;
 
 				case ZBX_FLAG_DISCOVERY:
-					$hosts[$item['hostid']]['discoveryRules'][] = $item;
+					$templates[$item['hostid']]['discoveryRules'][] = $item;
 					break;
 
 				case ZBX_FLAG_DISCOVERY_CHILD:
-					$hosts[$item['hostid']]['itemPrototypes'][] = $item;
+					$templates[$item['hostid']]['itemPrototypes'][] = $item;
 					break;
 
 				default:
@@ -444,7 +444,15 @@ class CConfigurationExport {
 	}
 
 	private function gatherScreens() {
+		$options = array(
+			'screenids' => $this->options['screens'],
+			'selectScreenItems' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
+		);
+		$screens = API::Screen()->get($options);
 
+		prepareScreenExport($screens);
+		$this->data['screens'] = $screens;
 	}
 
 }

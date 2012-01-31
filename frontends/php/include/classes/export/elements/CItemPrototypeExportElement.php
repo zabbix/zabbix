@@ -2,7 +2,7 @@
 
 class CItemPrototypeExportElement extends CExportElement{
 
-	public function __construct($item) {
+	public function __construct(array $item) {
 		parent::__construct('item_prototype', $item);
 
 		$this->addApplications($item['applications']);

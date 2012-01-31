@@ -1981,8 +1981,6 @@ function prepareScreenExport(&$exportScreens) {
 			unset($screen['screenid'], $screen['hostid']);
 
 			foreach	($screen['screenitems'] as &$screenItem) {
-				unset($screenItem['screenid'], $screenItem['screenitemid'], $screenItem['dynamic']);
-
 				if ($screenItem['resourceid'] == 0) {
 					continue;
 				}

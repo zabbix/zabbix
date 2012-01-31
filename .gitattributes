@@ -201,6 +201,8 @@ frontends/php/include/classes/export/elements/CMapLinkExportElement.php -text
 frontends/php/include/classes/export/elements/CMapLinkTriggerExportElement.php -text
 frontends/php/include/classes/export/elements/CMapSelementExportElement.php -text
 frontends/php/include/classes/export/elements/CMapUrlExportElement.php -text
+frontends/php/include/classes/export/elements/CScreenExportElement.php -text
+frontends/php/include/classes/export/elements/CScreenItemExportElement.php -text
 frontends/php/include/classes/export/elements/CTemplateExportElement.php -text
 frontends/php/include/classes/export/elements/CTriggerDependencyExportElement.php -text
 frontends/php/include/classes/export/elements/CTriggerExportElement.php -text
