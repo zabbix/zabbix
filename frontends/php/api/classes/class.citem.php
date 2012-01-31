@@ -930,7 +930,7 @@ COpt::memoryPick();
 				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
 				foreach($item['applications'] as $appId) {
 					if (!in_array($appId, $dbApplicationIds)) {
-						$error = sprintf(S_APPLICTATION_IS_NOT_AVAILABLE_ON, $appId, $host['host']);
+						$error = sprintf(S_APPLICATION_IS_NOT_AVAILABLE_ON, $appId, $host['host']);
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 					}
 				}
