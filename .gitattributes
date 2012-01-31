@@ -178,7 +178,6 @@ frontends/php/include/classes/core/Z.php -text
 frontends/php/include/classes/core/ZBase.php -text
 frontends/php/include/classes/export/CConfigurationExport.php -text
 frontends/php/include/classes/export/CConfigurationExportBuilder.php -text
-frontends/php/include/classes/export/CExportReferral.php -text
 frontends/php/include/classes/export/elements/CDiscoveyRuleExportElement.php -text
 frontends/php/include/classes/export/elements/CExportElement.php -text
 frontends/php/include/classes/export/elements/CExportElementFactory.php -text

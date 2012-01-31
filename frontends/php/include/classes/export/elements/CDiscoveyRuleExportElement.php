@@ -13,4 +13,10 @@ class CDiscoveyRuleExportElement extends CExportElement {
 			'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 			'interfaceid', 'port', 'description', 'inventory_link');
 	}
+
+	protected function fieldNameMap() {
+		return array(
+			'key_' => 'key'
+		);
+	}
 }

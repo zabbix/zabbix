@@ -10,4 +10,10 @@ class CHostTemplateExportElement extends CExportElement{
 		return array('host');
 	}
 
+	protected function fieldNameMap() {
+		return array(
+			'host' => 'template'
+		);
+	}
+
 }

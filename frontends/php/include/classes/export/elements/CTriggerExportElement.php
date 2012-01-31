@@ -4,6 +4,8 @@ class CTriggerExportElement extends CExportElement{
 
 	public function __construct($trigger) {
 		parent::__construct('trigger', $trigger);
+
+		$this->addDependencies($trigger['dependencies']);
 	}
 
 	protected function requiredFields() {
@@ -11,4 +13,11 @@ class CTriggerExportElement extends CExportElement{
 			'type', 'comments');
 	}
 
+	protected function addDependencies(array $dependencies) {
+		$dependenciesElement = new CExportElement('dependencies');
+		foreach ($dependencies as $dependency) {
+			$dependenciesElement->addElement(new CTriggerDependencyExportElement($dependency));
+		}
+		$this->addElement($dependenciesElement);
+	}
 }
