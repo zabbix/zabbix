@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralImages extends CWebTest {
 		public $icon_image_name = '1image1';

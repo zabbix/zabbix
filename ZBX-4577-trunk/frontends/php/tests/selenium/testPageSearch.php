@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageSearch extends CWebTest {
 	public function testPageHosts_FindZabbixServer() {
