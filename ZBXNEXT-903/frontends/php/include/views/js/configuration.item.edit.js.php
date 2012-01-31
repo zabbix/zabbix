@@ -13,49 +13,58 @@
 	}
 
 	function organizeInterfaces() {
-		var type = itemTypeInterface(parseInt(jQuery('#type').val()));
+		var interfaceType = itemTypeInterface(parseInt(jQuery('#type').val()));
 		var selectedInterfaceId = jQuery('#selectedInterfaceId').val();
 		var isSelected = false;
+		var isInterfaceExist = false;
 
-		if (type > 0) {
+		if (interfaceType > 0) {
 			jQuery('#interface_row option').each(function() {
-				if (jQuery(this).is('[selected]')) {
-					jQuery(this).removeAttr('selected');
+				if (jQuery(this).data('interfacetype') == interfaceType) {
+					isInterfaceExist = true;
 				}
 			});
 
-			jQuery('#interface_row option').each(function() {
-				if (jQuery(this).data('interfacetype') == type) {
-					jQuery(this).css('display', 'block');
-					if (!isSelected) {
-						if (jQuery(this).val() == selectedInterfaceId) {
-							jQuery(this).attr('selected', 'selected');
-							isSelected = true;
-						}
-					}
-				}
-				else {
-					jQuery(this).css('display', 'none');
-				}
-			});
-
-			// select first available option if we previously don't selected it by interfaceid
-			if (!isSelected) {
+			if (isInterfaceExist) {
 				jQuery('#interface_row option').each(function() {
-					if (jQuery(this).data('interfacetype') == type) {
-						if (!isSelected) {
-							jQuery(this).attr('selected', 'selected');
-							isSelected = true;
-						}
+					if (jQuery(this).is('[selected]')) {
+						jQuery(this).removeAttr('selected');
 					}
 				});
+
+				jQuery('#interface_row option').each(function() {
+					if (jQuery(this).data('interfacetype') == interfaceType) {
+						jQuery(this).css('display', 'block');
+						if (!isSelected) {
+							if (jQuery(this).val() == selectedInterfaceId) {
+								jQuery(this).attr('selected', 'selected');
+								isSelected = true;
+							}
+						}
+					}
+					else {
+						jQuery(this).css('display', 'none');
+					}
+				});
+
+				// select first available option if we previously don't selected it by interfaceid
+				if (!isSelected) {
+					jQuery('#interface_row option').each(function() {
+						if (jQuery(this).data('interfacetype') == interfaceType) {
+							if (!isSelected) {
+								jQuery(this).attr('selected', 'selected');
+								isSelected = true;
+							}
+						}
+					});
+				}
 			}
 		}
 	}
 
 	function displayKeyButton() {
-		var type = itemTypeInterface(parseInt(jQuery('#type').val()));
-		switch (type) {
+		var interfaceType = itemTypeInterface(parseInt(jQuery('#type').val()));
+		switch (interfaceType) {
 			case 2: // INTERFACE_TYPE_SNMP
 			case 3: // INTERFACE_TYPE_IPMI
 				jQuery('#keyButton').attr('disabled', 'disabled');
