@@ -99,18 +99,11 @@ require_once('include/page_header.php');
 	if($EXPORT_DATA){
 		$screens = get_request('screens', array());
 
-		$options = array(
-			'screenids' => $screens,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
-		);
-		$screens = API::Screen()->get($options);
+		$export = new CConfigurationExport(array('screens' => $screens));
+		$export->setBuilder(new CConfigurationExportBuilder());
+		$export->setWriter(CExportWriterFactory::getWriter('XMLWriter'));
 
-		prepareScreenExport($screens);
-
-		$xml = zbxXML::arrayToXML(array('screens' => $screens));
-		print($xml);
-
+		print($export->export());
 		exit();
 	}
 

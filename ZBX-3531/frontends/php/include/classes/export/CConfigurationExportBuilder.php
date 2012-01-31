@@ -52,6 +52,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildGraphs(array $graphs) {
+		order_result($graphs, 'name');
 		$graphsElement = new CExportElement('graphs');
 		foreach ($graphs as $graph) {
 			$graphsElement->addElement(new CGraphExportElement($graph));
@@ -60,6 +61,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildGraphPrototypes(array $graphPrototypes) {
+		order_result($graphPrototypes, 'name');
 		$graphPrototypesElement = new CExportElement('graph_prototypes');
 		foreach ($graphPrototypes as $graphPrototype) {
 			$graphPrototypesElement->addElement(new CGraphPrototypeExportElement($graphPrototype));
@@ -68,6 +70,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildTriggers(array $triggers) {
+		order_result($triggers, 'description');
 		$triggersElement = new CExportElement('triggers');
 		foreach ($triggers as $trigger) {
 			$triggersElement->addElement(new CTriggerExportElement($trigger));
@@ -76,6 +79,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildTriggerPrototypes(array $triggerPrototypes) {
+		order_result($triggerPrototypes, 'description');
 		$triggerPrototypesElement = new CExportElement('trigger_prototypes');
 		foreach ($triggerPrototypes as $triggerPrototype) {
 			$triggerPrototypesElement->addElement(new CTriggerPrototypeExportElement($triggerPrototype));
@@ -84,7 +88,12 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildScreens(array $screens) {
-
+		order_result($screens, 'name');
+		$screensElement = new CExportElement('screens');
+		foreach ($screens as $screen) {
+			$screensElement->addElement(new CScreenExportElement($screen));
+		}
+		$this->rootElement->addElement($screensElement);
 	}
 
 	public function buildImages(array $images) {
