@@ -345,6 +345,5 @@ else {
 	$itemView->show();
 }
 
-
 require_once('include/page_footer.php');
 ?>
