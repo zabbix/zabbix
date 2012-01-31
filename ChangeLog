@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4586] fixed items being bound to the wrong applications when cloning to a different host (pavels)
 ...GI..PS. [ZBX-4535] fixed build with --as-needed linker flag (Sasha)
 ..F....... [ZBX-3955] added pop up field name parameter validation (pavels)
 ...G...PS. [ZBX-4564] daemon processes will use default priority, no prioritization on startup (Alexei)
