@@ -28,6 +28,7 @@ A.F....... [ZBXNEXT-906] redesign Configuration->Host groups (Eduard)
 ....I..... [ZBX-4024] new build process for database schema and data, also new location of database related files; db data file uses transactions now (Alexei)
 
 Bug fixes:
+.......P.. [ZBX-4577] fixed possible SQL errors when updating a configuration on a proxy (Sasha)
 ..F....... [ZBX-4106] fixed "Status of triggers" screen element layout (Vedmak)
 A.F....... [ZBX-4558] fixed deleting child template triggers when moving a trigger to a template (pavels)
 A......... [ZBX-4558] fixed child template trigger attributes being reset when updating a template trigger (pavels)
