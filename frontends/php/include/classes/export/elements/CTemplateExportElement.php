@@ -12,6 +12,7 @@ class CTemplateExportElement extends CExportElement{
 		$this->addMacros($template['macros']);
 		$this->addTemplates($template['parentTemplates']);
 		$this->addApplications($template['applications']);
+		$this->addScreens($template['screens']);
 	}
 
 	protected function requiredFields() {
@@ -86,4 +87,14 @@ class CTemplateExportElement extends CExportElement{
 		}
 		$this->addElement($applicationsElement);
 	}
+
+	protected function addScreens(array $screens) {
+		order_result($screens, 'name');
+		$screensElement = new CExportElement('screen');
+		foreach ($screens as $screen) {
+			$screensElement->addElement(new CScreenExportElement($screen));
+		}
+		$this->addElement($screensElement);
+	}
+
 }

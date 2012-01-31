@@ -114,36 +114,38 @@ class CConfigurationExport {
 	}
 
 	private function gatherGroups() {
-		$params = array(
+		$this->data['groups'] = API::HostGroup()->get(array(
 			'hostids' => $this->options['groups'],
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND
-		);
-		$this->data['groups'] = API::HostGroup()->get($params);
+		));
 	}
 
 	private function gatherTemplates() {
-		$params = array(
+		$templates = API::Template()->get(array(
 			'templateids' => $this->options['templates'],
 			'output' => array('host', 'name'),
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
+			'selectScreens' => API_OUTPUT_REFER,
 			'preservekeys' => true
-		);
-		$templates = API::Template()->get($params);
+		));
 
 
 		// merge host groups with all groups
-		$templateGroups = array();
-		foreach ($templates as $template) {
+		$templateGroups = $templateScreenIds = array();
+		foreach ($templates as &$template) {
 			$templateGroups += zbx_toHash($template['groups'], 'groupid');
+			$templateScreenIds = array_merge($templateScreenIds, zbx_objectValues($template['screens'], 'screenid'));
+			unset($template['screens']);
 		}
+		unset($template);
 		$this->data['groups'] += $templateGroups;
 
 
 		// items
-		$params = array(
+		$items = API::Item()->get(array(
 			'hostids' => $this->options['templates'],
 			'output' => array('hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
 				'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
@@ -154,8 +156,7 @@ class CConfigurationExport {
 			'inherited' => false,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD)),
 			'preservekeys' => true
-		);
-		$items = API::Item()->get($params);
+		));
 
 		foreach ($items as $item) {
 			if (!isset($templates[$item['hostid']]['items'])) {
@@ -184,13 +185,12 @@ class CConfigurationExport {
 
 
 		// applications
-		$params = array(
+		$applications = API::Application()->get(array(
 			'hostids' => $this->options['templates'],
 			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true
-		);
-		$applications = API::Application()->get($params);
+		));
 
 		foreach ($applications as $application) {
 			if (!isset($templates[$application['hostid']]['applications'])) {
@@ -199,11 +199,29 @@ class CConfigurationExport {
 			$templates[$application['hostid']]['applications'][] = $application;
 		}
 
+
+		// screens
+		$screens = API::TemplateScreen()->get(array(
+			'screenids' => $templateScreenIds,
+			'selectScreenItems' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		prepareScreenExport($screens);
+
+		foreach ($screens as $screen) {
+			if (!isset($templates[$screen['templateid']]['screens'])) {
+				$templates[$screen['templateid']]['screens'] = array();
+			}
+			$templates[$screen['templateid']]['screens'][] = $screen;
+		}
+
 		$this->data['templates'] = $templates;
 	}
 
 	private function gatherHosts() {
-		$params = array(
+		$hosts = API::Host()->get(array(
 			'hostids' => $this->options['hosts'],
 			'output' => array('proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 				'ipmi_password', 'ipmi_disable_until', 'ipmi_available', 'name'),
@@ -213,8 +231,7 @@ class CConfigurationExport {
 			'selectGroups' => API_OUTPUT_EXTEND,
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		);
-		$hosts = API::Host()->get($params);
+		));
 
 
 		// merge host groups with all groups
@@ -226,7 +243,7 @@ class CConfigurationExport {
 
 
 		// items
-		$params = array(
+		$items = API::Item()->get(array(
 			'hostids' => $this->options['hosts'],
 			'output' => array('hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
 				'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
@@ -237,8 +254,7 @@ class CConfigurationExport {
 			'inherited' => false,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD)),
 			'preservekeys' => true
-		);
-		$items = API::Item()->get($params);
+		));
 
 		foreach ($items as $item) {
 			if (!isset($hosts[$item['hostid']]['items'])) {
@@ -267,13 +283,12 @@ class CConfigurationExport {
 
 
 		// applications
-		$params = array(
+		$applications = API::Application()->get(array(
 			'hostids' => $this->options['hosts'],
 			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true
-		);
-		$applications = API::Application()->get($params);
+		));
 
 		foreach ($applications as $application) {
 			if (!isset($hosts[$application['hostid']]['applications'])) {
@@ -289,15 +304,14 @@ class CConfigurationExport {
 	private function gatherGraphs() {
 		$hostIds = array_merge($this->options['hosts'], $this->options['templates']);
 
-		$params = array(
+		$graphs = API::Graph()->get(array(
 			'hostids' => $hostIds,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		);
-		$graphs = API::Graph()->get($params);
+		));
 
 		// get item axis items info
 		$graphItemIds = array();
@@ -314,13 +328,12 @@ class CConfigurationExport {
 		}
 
 
-		$params = array(
+		$graphItems = API::Item()->get(array(
 			'itemids' => $graphItemIds,
 			'output' => array('key_', 'flags'),
 			'selectHosts' => array('host'),
 			'preservekeys' => true
-		);
-		$graphItems = API::Item()->get($params);
+		));
 
 		foreach ($graphs as $gnum => $graph) {
 			if ($graph['ymin_itemid']) {
@@ -384,7 +397,7 @@ class CConfigurationExport {
 	private function gatherTriggers() {
 		$hostIds = array_merge($this->options['hosts'], $this->options['templates']);
 
-		$params = array(
+		$triggers = API::Trigger()->get(array(
 			'hostids' => $hostIds,
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
@@ -392,8 +405,7 @@ class CConfigurationExport {
 			'inherited' => false,
 			'preservekeys' => true,
 			'expandData' => true
-		);
-		$triggers = API::Trigger()->get($params);
+		));
 
 		foreach($triggers as $trigger){
 			$trigger['expression'] = explode_exp($trigger['expression']);
@@ -419,37 +431,34 @@ class CConfigurationExport {
 	}
 
 	private function gatherMaps() {
-		$options = array(
+		$sysmaps = API::Map()->get(array(
 			'sysmapids' => $this->options['maps'],
 			'selectSelements' => API_OUTPUT_EXTEND,
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectIconMap' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		);
-		$sysmaps = API::Map()->get($options);
+		));
 		prepareMapExport($sysmaps);
 		$this->data['maps'] = $sysmaps;
 
-		$options = array(
+		$images = API::Image()->get(array(
 			'sysmapids' => zbx_objectValues($sysmaps, 'sysmapid'),
 			'output' => API_OUTPUT_EXTEND,
 			'select_image' => true,
 			'preservekeys' => true
-		);
-		$images = API::Image()->get($options);
+		));
 		$images = prepareImageExport($images);
 		$this->data['images'] = $images;
 
 	}
 
 	private function gatherScreens() {
-		$options = array(
+		$screens = API::Screen()->get(array(
 			'screenids' => $this->options['screens'],
 			'selectScreenItems' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
-		);
-		$screens = API::Screen()->get($options);
+		));
 
 		prepareScreenExport($screens);
 		$this->data['screens'] = $screens;
