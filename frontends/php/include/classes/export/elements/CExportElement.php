@@ -54,6 +54,36 @@ class CExportElement {
 		return $this->data;
 	}
 
+	public function toArray() {
+		$array = $this->getData();
+		$childs = $this->getChilds();
+
+		$namesList = array();
+		$duplicateNames = false;
+		foreach ($childs as $child) {
+			if (isset($namesList[$child->getName()])) {
+				$duplicateNames = true;
+				break;
+			}
+			$namesList[$child->getName()] = 1;
+		}
+
+		if (count($childs) <= 1 && empty($array)) {
+			$duplicateNames = true;
+		}
+
+		foreach ($childs as $child) {
+			if ($duplicateNames) {
+				$array[] = $child->toArray();
+			}
+			else {
+				$array[$child->getName()] = $child->toArray();
+			}
+		}
+
+		return $array;
+	}
+
 	protected function cleanData() {
 		$requiredFields = $this->requiredFields();
 		$referenceFields = $this->referenceFields();

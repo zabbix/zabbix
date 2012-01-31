@@ -180,7 +180,6 @@ frontends/php/include/classes/export/CConfigurationExport.php -text
 frontends/php/include/classes/export/CConfigurationExportBuilder.php -text
 frontends/php/include/classes/export/elements/CDiscoveyRuleExportElement.php -text
 frontends/php/include/classes/export/elements/CExportElement.php -text
-frontends/php/include/classes/export/elements/CExportElementFactory.php -text
 frontends/php/include/classes/export/elements/CGraphExportElement.php -text
 frontends/php/include/classes/export/elements/CGraphItemExportElement.php -text
 frontends/php/include/classes/export/elements/CGraphPrototypeExportElement.php -text
@@ -210,6 +209,7 @@ frontends/php/include/classes/export/elements/CTriggerPrototypeExportElement.php
 frontends/php/include/classes/export/writers/CDomExportWriter.php -text
 frontends/php/include/classes/export/writers/CExportWriter.php -text
 frontends/php/include/classes/export/writers/CExportWriterFactory.php -text
+frontends/php/include/classes/export/writers/CJsonExportWriter.php -text
 frontends/php/include/classes/export/writers/CXmlWriterExportWriter.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
