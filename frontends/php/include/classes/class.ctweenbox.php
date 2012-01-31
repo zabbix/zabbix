@@ -85,13 +85,12 @@ class CTweenBox {
 			$grp_tab->addRow(array($caption_l, SPACE, $caption_r));
 		}
 
-		$add_btn = new CButton('add', ' &laquo; ');
-		$add_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'","'.$this->varname.'","'.$this->id_r.'","'.$this->id_l.'","add");');
-		$rmv_btn = new CButton('remove', ' &raquo; ');
-		$rmv_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'","'.$this->varname.'","'.$this->id_l.'","'.$this->id_r.'","rmv");');
+		$add_btn = new CButton('add', ' &laquo; ', null, 'formlist');
+		$add_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
+		$rmv_btn = new CButton('remove', ' &raquo; ', null, 'formlist');
+		$rmv_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
 
 		$grp_tab->addRow(array($this->lbox, new CCol(array($add_btn, BR(), $rmv_btn), 'top'), $this->rbox));
-
 		return $grp_tab;
 	}
 

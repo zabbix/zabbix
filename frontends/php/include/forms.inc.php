@@ -933,7 +933,6 @@
 				'output' => API_OUTPUT_EXTEND
 			));
 			$data['item'] = reset($data['item']);
-
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 			$data['limited'] = $data['item']['templateid'] != 0;
 
@@ -948,21 +947,23 @@
 					'selectDiscoveryRule' => array('itemid')
 				));
 				$item = reset($item);
-				$host = reset($item['hosts']);
 				if (!empty($item)) {
-					if (bccomp($data['itemid'], $itemid) == 0) {
-						$data['caption'][] = SPACE;
-						$data['caption'][] = $host['name'];
-					}
-					// item prototype
-					elseif ($item['discoveryRule']) {
-						$data['caption'][] = ' : ';
-						$data['caption'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline');
-					}
-					// plain item
-					else {
-						$data['caption'][] = ' : ';
-						$data['caption'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline');
+					$host = reset($item['hosts']);
+					if (!empty($item['hosts'])) {
+						if (bccomp($data['itemid'], $itemid) == 0) {
+							$data['caption'][] = SPACE;
+							$data['caption'][] = $host['name'];
+						}
+						// item prototype
+						elseif ($item['discoveryRule']) {
+							$data['caption'][] = ' : ';
+							$data['caption'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline');
+						}
+						// plain item
+						else {
+							$data['caption'][] = ' : ';
+							$data['caption'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline');
+						}
 					}
 					$itemid = $item['templateid'];
 				}
