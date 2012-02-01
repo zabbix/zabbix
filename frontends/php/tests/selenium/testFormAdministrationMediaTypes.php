@@ -24,7 +24,7 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 class testFormAdministrationMediaTypes extends CWebTest {
 
 	public static function allMediaTypes() {
-		return DBdata('select * from media_type');
+		return DBdata('SELECT * FROM media_type');
 	}
 
 	public static function newMediaTypes() {
@@ -174,7 +174,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
-		$this->click("link=$name");
+		$this->click('link='.$name);
 		$this->wait();
 		$this->button_click('cancel');
 		$this->wait();
@@ -197,8 +197,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
-
-		$this->click("link=$name");
+		$this->click('link='.$name);
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
@@ -224,7 +223,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
-		$this->click("link=$name");
+		$this->click('link='.$name);
 		$this->chooseOkOnNextConfirmation();
 		$this->wait();
 
