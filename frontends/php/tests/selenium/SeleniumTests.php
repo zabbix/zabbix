@@ -137,7 +137,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralValuemap');
 		$suite->addTestSuite('testFormAdministrationGeneralWorkperiod');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
-		$suite->addTestSuite('testFormAdministrationScript');
+		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
