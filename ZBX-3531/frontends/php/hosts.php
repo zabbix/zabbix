@@ -152,7 +152,7 @@ require_once('include/page_header.php');
 	if ($EXPORT_DATA) {
 		$export = new CConfigurationExport(array('hosts' => $hostids));
 		$export->setBuilder(new CConfigurationExportBuilder());
-		$export->setWriter(CExportWriterFactory::getWriter('JSON'));
+		$export->setWriter(CExportWriterFactory::getWriter('XMLWriter'));
 
 		print($export->export());
 		exit();

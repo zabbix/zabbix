@@ -255,11 +255,23 @@ class CConfigurationExport {
 			'preservekeys' => true
 		));
 
+		// gather value maps
+		$valueMapIds = zbx_objectValues($items, 'valuemapid');
+		$DbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
+		$valueMaps = array();
+		while ($valueMap = DBfetch($DbValueMaps)) {
+			$valueMaps[$valueMap['valuemapid']] = array('name' => $valueMap['name']);
+		}
+
 		foreach ($items as $item) {
 			if (!isset($hosts[$item['hostid']]['items'])) {
 				$hosts[$item['hostid']]['items'] = array();
 				$hosts[$item['hostid']]['discoveryRules'] = array();
 				$hosts[$item['hostid']]['itemPrototypes'] = array();
+			}
+
+			if ($item['valuemapid']) {
+				$item['valuemapid'] = $valueMaps[$item['valuemapid']];
 			}
 
 			switch ($item['flags']) {
