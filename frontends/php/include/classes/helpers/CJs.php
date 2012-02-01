@@ -32,7 +32,6 @@ class CJs {
 	 */
 	protected static $json;
 
-
 	/**
 	 * Encodes the data as a JSON string to be used in JavaScript code.
 	 *
@@ -49,5 +48,4 @@ class CJs {
 
 		return self::$json->encode($data);
 	}
-
 }

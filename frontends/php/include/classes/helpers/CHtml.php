@@ -25,7 +25,6 @@
  */
 class CHtml {
 
-
 	/**
 	 * Encodes the value to be used in HTML code. If the given value is an array, the values will be
 	 * encoded recursively.
@@ -34,10 +33,11 @@ class CHtml {
 	 *
 	 * @param mixed $data
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	public static function encode($data) {
 		if (is_array($data)) {
+			$rs = array();
 			foreach ($data as $key => $value) {
 				$rs[$key] = self::encode($value);
 			}
@@ -45,21 +45,19 @@ class CHtml {
 			return $rs;
 		}
 
-		return htmlspecialchars($data, ENT_QUOTES);
+		return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 	}
-
 
 	/**
 	 * Encodes the data as a JSON string with HTML entities escaped.
 	 *
 	 * @static
 	 *
-	 * @param mixed $data
+	 * @param array $data
 	 *
 	 * @return string
 	 */
-	public static function serialize($data) {
+	public static function serialize(array $data) {
 		return self::encode(CJs::encodeJson($data));
 	}
-
 }
