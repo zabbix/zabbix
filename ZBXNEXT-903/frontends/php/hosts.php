@@ -803,13 +803,16 @@ require_once('include/page_header.php');
 			array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 		));
 
-		$reset = new CSpan(_('Reset'), 'link_menu');
-		$reset->onClick("javascript: clearAllForm('zbx_filter');");
-
 		$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 		$filter->useJQueryStyle();
 
-		$footer_col = new CCol(array($filter, SPACE, SPACE, SPACE, $reset), 'center');
+		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
+		$reset->useJQueryStyle();
+
+		$div_buttons = new CDiv(array($filter, SPACE, $reset));
+		$div_buttons->setAttribute('style', 'padding: 4px 0px;');
+
+		$footer_col = new CCol($div_buttons, 'center');
 		$footer_col->setColSpan(4);
 
 		$filter_table->addRow($footer_col);
