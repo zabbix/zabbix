@@ -412,6 +412,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+..F....... [ZBX-3955] added pop up field name parameter validation (pavels)
 ...GI..PS. [ZBX-4535] fixed build with --as-needed linker flag (Sasha)
 ........S. [ZBX-4507] added possibility to remove a discovered host from "Discovered hosts" group by action (Sasha)
 ....I..... [ZBX-4569] fixed newline at end of file for some upgrade patches (Sasha)
