@@ -156,14 +156,46 @@ if (defined($page['title'])) {
 }
 ?>
 <?php
+
+// allowed 'srcfld1' and 'srcfld2' parameter values for each 'srctbl' value
+$allowedSrcFields = array(
+	'users'                 => '"usergrpid", "alias", "userid"',
+	'triggers'              => '"description", "triggerid"',
+	'items'                 => '"itemid", "name"',
+	'prototypes'            => '"itemid", "name"',
+	'graphs'                => '"graphid", "name"',
+	'sysmaps'               => '"sysmapid", "name"',
+	'screens'               => '"screenid"',
+	'slides'                => '"slideshowid"',
+	'host_group'            => '"groupid", "name"',
+	'hosts_and_templates'   => '"name", "hostid"',
+	'help_items'            => '"key_"',
+	'simple_graph'          => '"itemid", "name"',
+	'plain_text'            => '"itemid", "name"',
+	'hosts'                 => '"name", "hostid"',
+	'overview'              => '"groupid", "name"',
+	'screens'               => '"screenid"',
+	'screens2'              => '"screenid", "name"',
+	'host_group_scr'        => '"groupid", "name"',
+	'host_templates'        => '"hostid", "host", "templateid", "name"',
+	'nodes'                 => '"nodeid", "name"',
+	'drules'                => '"druleid", "name"',
+	'dcheckes'              => '"dcheckid", "name"',
+	'proxies'               => '"hostid", "host"',
+	'usrgrp'                => '"usrgrpid", "name"',
+	'templates' 			=> '"hostid", "host"',
+	'applications'          => '"name"',
+	'scripts'               => '"scriptid", "name"',
+);
+
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'dstfrm' =>				array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 	'dstfld1' =>			array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 	'dstfld2' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'srctbl' =>				array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,	null),
-	'srcfld1' =>			array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,	null),
-	'srcfld2' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'srcfld1'=>		        array(T_ZBX_STR, O_MAND,P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
+	'srcfld2'=>		        array(T_ZBX_STR, O_OPT,P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
 	'nodeid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -196,8 +228,6 @@ if (isset($_REQUEST['itemtype']) && !str_in_array($_REQUEST['itemtype'], $allowe
 	unset($_REQUEST['itemtype']);
 }
 
-check_fields($fields);
-
 $dstfrm = get_request('dstfrm', ''); // destination form
 $dstfld1 = get_request('dstfld1', ''); // output field on destination form
 $dstfld2 = get_request('dstfld2', ''); // second output field on destination form
@@ -217,6 +247,8 @@ $templated_hosts = get_request('templated_hosts', 0);
 $only_hostid = get_request('only_hostid', null);
 $value_types = get_request('value_types', null);
 $submitParent = get_request('submitParent', 0);
+
+check_fields($fields);
 
 $host_status = null;
 $templated = null;
