@@ -1,4 +1,34 @@
 <script type="text/javascript">
+	jQuery(document).ready(function() {
+		var valueTypeSwitcher = new CViewSwitcher('value_type', 'change',
+			<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>
+		);
+		var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
+			<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>
+		);
+		var typeSwitcher = new CViewSwitcher('type', 'change',
+			<?php echo zbx_jsvalue($this->data['typeVisibility'], true).(!empty($this->data['itemid']) ? ', true' : ''); ?>
+		);
+		var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
+			<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>
+		);
+
+		var multpStat = document.getElementById('multiplier');
+		if (multpStat && multpStat.onclick) {
+			multpStat.onclick();
+		}
+
+		var mnFrmTbl = document.getElementById('web.items.item.php');
+		if (mnFrmTbl) {
+			mnFrmTbl.style.visibility = 'visible';
+		}
+
+		var maxReached = <?php echo $this->data['maxReached'] ? 'true' : 'false'; ?>;
+		if (maxReached) {
+			jQuery('#row_new_delay_flex').css('display', 'none');
+		}
+	});
+
 	function removeDelayFlex(index) {
 		jQuery('#delayFlex_' + index).remove();
 		jQuery('#delay_flex_' + index + '_delay').remove();

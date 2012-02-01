@@ -88,26 +88,34 @@ function prepare_url(&$var, $varname = null) {
 	return $result;
 }
 
-function url_param($parameter, $request = true, $name = null) {
+function url_param($param, $request = true, $name = null) {
 	$result = '';
-	if (!is_array($parameter)) {
+	if (!is_array($param)) {
 		if (is_null($name)) {
 			if (!$request) {
 				fatal_error('not request variable require url name [url_param]');
 			}
-			$name = $parameter;
+			$name = $param;
 		}
 	}
 
 	if ($request) {
-		$var =& $_REQUEST[$parameter];
+		$var =& $_REQUEST[$param];
 	}
 	else {
-		$var =& $parameter;
+		$var =& $param;
 	}
 
 	if (isset($var)) {
 		$result = prepare_url($var, $name);
+	}
+	return $result;
+}
+
+function url_params($params) {
+	$result = '';
+	foreach ($params as $param) {
+		$result .= url_param($param);
 	}
 	return $result;
 }

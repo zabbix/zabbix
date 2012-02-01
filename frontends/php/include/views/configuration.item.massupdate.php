@@ -35,7 +35,10 @@ $itemFormList = new CFormList('itemFormList');
 if (!empty($this->data['hosts'])) {
 	$intereacesComboBox = new CComboBox('interfaceid');
 	foreach ($this->data['hosts']['interfaces'] as $interface) {
-		$intereacesComboBox->addItem($interface['interfaceid'], $interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port']);
+		$intereacesComboBox->addItem($interface['interfaceid'], $interface['useip']
+			? $interface['ip'].' : '.$interface['port']
+			: $interface['dns'].' : '.$interface['port']
+		);
 	}
 	$itemFormList->addRow(
 		array(

@@ -567,6 +567,7 @@
 
 		$div_buttons = new CDiv(array($filter, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0px;');
+
 		$footer = new CCol($div_buttons, 'center');
 		$footer->setColSpan(4);
 
