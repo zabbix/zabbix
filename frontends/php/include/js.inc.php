@@ -28,6 +28,9 @@ function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
 			}
 			return $escaped;
 		}
+		elseif (is_null($value)) {
+			return 'null';
+		}
 		elseif (is_bool($value)) {
 			return ($value) ? 'true' : 'false';
 		}
