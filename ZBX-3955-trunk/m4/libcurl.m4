@@ -107,19 +107,18 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
         fi
 
 	if test $_libcurl_wanted -eq 0 || test x$libcurl_cv_lib_version_ok = xyes ; then
-           if test x"$LIBCURL_CFLAGS" = "x" ; then
+           if test x"$LIBCURL_CFLAGS" = "x"; then
               LIBCURL_CFLAGS=`$_libcurl_config --cflags`
            fi
-           if test x"$LIBCURL_LIBS" = "x" ; then
-
+           if test x"$LIBCURL_LIBS" = "x"; then
 		_full_libcurl_libs=`$_libcurl_config --libs`
 		for i in $_full_libcurl_libs; do
 			case $i in
-				-l*)
-					LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS $i"
-			;;
 				-L*)
 					LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS $i"
+			;;
+				-l*)
+					LIBCURL_LIBS="$LIBCURL_LIBS $i"
 			;;
 			esac
 		done
@@ -143,25 +142,21 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 			done
 		fi
 
-		_save_curl_libs="${LIBS}"
-		_save_curl_ldflags="${LDFLAGS}"
-		_save_curl_cflags="${CFLAGS}"
-		LIBS="${LIBS} ${LIBCURL_LIBS}"
-		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
-		CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
+		_save_curl_cflags="$CFLAGS"
+		_save_curl_ldflags="$LDFLAGS"
+		_save_curl_libs="$LIBS"
+		CFLAGS="$CFLAGS $LIBCURL_CFLAGS"
+		LDFLAGS="$LDFLAGS $LIBCURL_LDFLAGS"
+		LIBS="$LIBS $LIBCURL_LIBS"
 
-		AC_CHECK_LIB(curl, main,[
-				LIBCURL_LIBS="-lcurl $LIBCURL_LIBS"
-			],[
-				AC_MSG_ERROR([libcurl library not found])
-			])
+		AC_CHECK_LIB(curl, main, , [AC_MSG_ERROR([libcurl library not found])])
 
-		LIBS="${_save_curl_libs}"
-		LDFLAGS="${_save_curl_ldflags}"
-		CFLAGS="${_save_curl_cflags}"
-		unset _save_curl_libs
-		unset _save_curl_ldflags
+		CFLAGS="$_save_curl_cflags"
+		LDFLAGS="$_save_curl_ldflags"
+		LIBS="$_save_curl_libs"
 		unset _save_curl_cflags
+		unset _save_curl_ldflags
+		unset _save_curl_libs
 
               # This is so silly, but Apple actually has a bug in their
 	      # curl-config script.  Fixed in Tiger, but there are still
@@ -187,7 +182,6 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 	unset _libcurl_wanted
      fi
      if test $_libcurl_try_link = yes ; then
-
         # we didn't find curl-config, so let's see if the user-supplied
         # link line (or failing that, "-lcurl") is enough.
         LIBCURL_LIBS=${LIBCURL_LIBS-"$_libcurl_libs -lcurl"}
