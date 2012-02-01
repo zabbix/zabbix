@@ -116,7 +116,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			));
 
 			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status', 'name'),
+				'output' => array('hostid', 'status', 'name'),
 				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
@@ -130,7 +130,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			);
 
 			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status', 'name'),
+				'output' => array('hostid', 'status', 'name'),
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
@@ -162,7 +162,6 @@ abstract class CItemGeneral extends CZBXAPI{
 				}
 
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
-				$host = $dbHosts[$fullItem['hostid']];
 
 				// apply rules
 				foreach ($this->fieldRules as $field => $rules) {
@@ -187,6 +186,8 @@ abstract class CItemGeneral extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 			}
+
+			$host = $dbHosts[$fullItem['hostid']];
 
 			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
 				$item['delay_flex'] = '';
