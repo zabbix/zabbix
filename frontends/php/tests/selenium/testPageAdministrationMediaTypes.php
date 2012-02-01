@@ -139,7 +139,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$sql = 'SELECT mediatypeid FROM media_type WHERE mediatypeid = '.$mediatypeid;
 		$result = DBfetch(DBselect($sql));
 
-		$row = DBfetch(DBselect("SELECT count(*) AS count FROM opmessage WHERE mediatypeid=$mediatypeid"));
+		$row = DBfetch(DBselect('SELECT count(*) AS count FROM opmessage WHERE mediatypeid = '.$mediatypeid.''));
 		$used_in_operations = ($row['count'] > 0);
 
 		$this->checkbox_select("mediatypeids_$mediatypeid");
@@ -157,7 +157,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				break;
 			case false:
 				$this->ok('Media type deleted');
-				$sql = 'SELECT * FROM media_type WHERE mediatypeid=$mediatypeid';
+				$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.zbx_dbstr($mediatypeid);
 				$this->assertEquals(0, DBcount($sql));
 				break;
 		}
@@ -180,7 +180,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$mediatypeid = $mediatype['mediatypeid'];
 		$this->assertTitle('Media types');
 
-		$row = DBfetch(DBselect("SELECT count(*) AS count FROM opmessage WHERE mediatypeid=$mediatypeid"));
+		$row = DBfetch(DBselect('SELECT count(*) AS count FROM opmessage WHERE mediatypeid = '.$mediatypeid.''));
 		$used_in_operations = ($row['count'] > 0);
 
 		$this->checkbox_select("all_media_types");
@@ -198,7 +198,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				break;
 			case false:
 				$this->ok('Media type deleted');
-				$sql = 'SELECT * FROM media_type WHERE mediatypeid=$mediatypeid';
+				$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.zbx_dbstr($mediatypeid);
 				$this->assertEquals(0, DBcount($sql));
 				break;
 		}
@@ -217,7 +217,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	public function testPageAdministrationMediaTypes_MassDelete($mediatype) {
 		$id = $mediatype['mediatypeid'];
 
-		$row = DBfetch(DBselect("select count(*) as cnt from opmessage where mediatypeid=$id"));
+		$row = DBfetch(DBselect('SELECT count(*) as cnt FROM opmessage WHERE mediatypeid = '.$id.''));
 		$used_by_operations = ($row['cnt'] > 0);
 
 		DBsave_tables('media_type');
@@ -240,7 +240,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 		else {
 			$this->ok('Media type deleted');
-			$sql = "select * from media_type where mediatypeid=$id";
+			$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.$id.'';
 			$this->assertEquals(0, DBcount($sql));
 		}
 
