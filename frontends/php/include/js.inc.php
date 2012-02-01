@@ -3,14 +3,11 @@
  * Convert PHP variable to string version of JavaScript style
  *
  * @deprecated use CJs::encodeJson() instead
- *
  * @see CJs::encodeJson()
  *
- * @author Eugene Grigorjev
- *
  * @param mixed $value
- * @param bool $asObject return string containing javascript object
- * @param bool $addQuotes whether quotes should be added at the beginning and at the end of string
+ * @param bool  $asObject  return string containing javascript object
+ * @param bool  $addQuotes whether quotes should be added at the beginning and at the end of string
  *
  * @return string
  */
