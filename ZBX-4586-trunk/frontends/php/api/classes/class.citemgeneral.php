@@ -282,7 +282,7 @@ abstract class CItemGeneral extends CZBXAPI{
 				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
 				foreach($item['applications'] as $appId) {
 					if (!in_array($appId, $dbApplicationIds)) {
-						$error = _s('Application with ID "%1$s" is not available on host "%2$s"', $appId, $host['name']);
+						$error = _s('Application with ID "%1$s" is not available on "%2$s"', $appId, $host['name']);
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 					}
 				}
