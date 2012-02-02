@@ -4,7 +4,6 @@ Changes for 1.9.10
 New features:
 
 Bug fixes:
-....I..... [ZBX-3262] fixed warning "no AC_LANG_SOURCE call detected in body" raised during compilation (alexei)
 ..F....... [ZBX-4580] fixed trigger info pop up in the item configuration list (pavels)
 
 --------------------------------------------------------------------------------
@@ -422,6 +421,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+....I..... [ZBX-3262] fixed warning "no AC_LANG_SOURCE call detected in body" raised during compilation (Alexei)
 ..F....... [ZBX-3955] added pop up field name parameter validation (pavels)
 ...GI..PS. [ZBX-4535] fixed build with --as-needed linker flag (Sasha)
 ........S. [ZBX-4507] added possibility to remove a discovered host from "Discovered hosts" group by action (Sasha)
