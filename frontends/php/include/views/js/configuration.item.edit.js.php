@@ -56,6 +56,9 @@
 			});
 
 			if (isInterfaceExist) {
+				jQuery('#interfaceid').css('display', 'inline');
+				jQuery('#interface_not_defined').css('display', 'none');
+
 				jQuery('#interface_row option').each(function() {
 					if (jQuery(this).is('[selected]')) {
 						jQuery(this).removeAttr('selected');
@@ -88,6 +91,10 @@
 						}
 					});
 				}
+			}
+			else {
+				jQuery('#interfaceid').css('display', 'none');
+				jQuery('#interface_not_defined').css('display', 'inline');
 			}
 		}
 	}
