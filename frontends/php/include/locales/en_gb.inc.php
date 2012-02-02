@@ -36,21 +36,8 @@
 //	dicoveryconf.php
 	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
 	'S_DISCOVERY'=>				_('Discovery'),
-	'S_CONFIGURATION_OF_DISCOVERY'=>	_('Configuration of discovery'),
-	'S_CREATE_RULE'=>			_('Create rule'),
-	'S_SSH'=>				_('SSH'),
-	'S_SMTP'=>				_('SMTP'),
-	'S_FTP'=>				_('FTP'),
-	'S_POP'=>				_('POP'),
-	'S_NNTP'=>				_('NNTP'),
-	'S_IMAP'=>				_('IMAP'),
-	'S_TCP'=>				_('TCP'),
-	'S_ICMPPING'=>				_('ICMP ping'),
-
 	'S_STATUS_OF_DISCOVERY_BIG'=>		_('STATUS OF DISCOVERY'),
 	'S_STATUS_OF_DISCOVERY'=>		_('Status of discovery'),
-	'S_DISCOVERED'=>			_('Discovered'),
-	'S_LOST'=>				_('Lost'),
 
 //	discovery.php
 	'S_UP_TIME'=>				_('Uptime'),
@@ -748,7 +735,6 @@
 	'S_PROXY_DELETED'=>			_('Proxy deleted'),
 	'S_CANNOT_DELETE_PROXY'=>	_('Cannot delete proxy'),
 	'S_NAME'=>					_('Name'),
-	'S_DEBUG'=>					_('Debug'),
 	'S_HIDE'=>					_('Hide'),
 	'S_ADD_TO'=>				_('Add to'),
 	'S_REMOVE_FROM'=>			_('Remove from'),
@@ -791,9 +777,6 @@
 	'S_SNOOZE'=>				_('Snooze'),
 	'S_MESSAGES'=>				_('Messages'),
 	'S_PROBLEM_ON'=>			_('Problem on'),
-
-//	index.php
-	'S_ZABBIX_BIG'=>			_('ZABBIX'),
 
 //	hostinventoriesoverview.php
 	'S_HOST_INVENTORY_OVERVIEW'=>	_('Host inventory overview'),
