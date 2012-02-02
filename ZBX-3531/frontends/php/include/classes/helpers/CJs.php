@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,23 +19,33 @@
 **/
 ?>
 <?php
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageOverview extends CWebTest {
-	public function testPageOverview_CheckLayout() {
-		$this->login('overview.php');
-		$this->assertTitle('Overview \[refreshed every 30 sec\]');
-		$this->ok('OVERVIEW');
-		$this->ok('Hosts location');
-		$this->ok('Group');
-		$this->ok('Type');
-	}
+/**
+ * A helper class for working with JavaScript.
+ */
+class CJs {
 
-// Check that no real host or template names displayed
-	public function testPageOverview_NoHostNames() {
-		$this->login('overview.php');
-		$this->assertTitle('Overview \[refreshed every 30 sec\]');
-		$this->checkNoRealHostnames();
+	/**
+	 * The object used to encode values in JSON.
+	 *
+	 * @var CJSON
+	 */
+	protected static $json;
+
+	/**
+	 * Encodes the data as a JSON string to be used in JavaScript code.
+	 *
+	 * @static
+	 *
+	 * @param mixed $data
+	 *
+	 * @return mixed
+	 */
+	public static function encodeJson($data) {
+		if (self::$json === null) {
+			self::$json = new CJSON();
+		}
+
+		return self::$json->encode($data);
 	}
 }
-?>

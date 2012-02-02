@@ -116,10 +116,11 @@ abstract class CItemGeneral extends CZBXAPI{
 			));
 
 			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status'),
+				'output' => array('hostid', 'status', 'name'),
 				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
+				'selectApplications' => API_OUTPUT_REFER,
 				'preservekeys' => true
 			));
 		}
@@ -129,10 +130,11 @@ abstract class CItemGeneral extends CZBXAPI{
 			);
 
 			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status'),
+				'output' => array('hostid', 'status', 'name'),
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
+				'selectApplications' => API_OUTPUT_REFER,
 				'preservekeys' => true
 			));
 		}
@@ -184,6 +186,8 @@ abstract class CItemGeneral extends CZBXAPI{
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 				}
 			}
+
+			$host = $dbHosts[$fullItem['hostid']];
 
 			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
 				$item['delay_flex'] = '';
@@ -271,6 +275,17 @@ abstract class CItemGeneral extends CZBXAPI{
 			if (isset($fullItem['port']) && !zbx_empty($fullItem['port']) && !validatePortNumberOrMacro($fullItem['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Item "%1$s:%2$s" has invalid port: "%3$s".', $fullItem['name'], $fullItem['key_'], $fullItem['port']));
+			}
+
+			// check that the given applications belong to the item's host
+			if (isset($item['applications']) && $item['applications']) {
+				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
+				foreach($item['applications'] as $appId) {
+					if (!in_array($appId, $dbApplicationIds)) {
+						$error = _s('Application with ID "%1$s" is not available on "%2$s"', $appId, $host['name']);
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					}
+				}
 			}
 
 			$this->checkSpecificFields($fullItem);

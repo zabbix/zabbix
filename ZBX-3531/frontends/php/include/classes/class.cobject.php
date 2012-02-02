@@ -79,11 +79,13 @@ class CObject {
 	/**
 	 * Sanitizes a string before outputting it to the browser.
 	 *
-	 * @param string $str
-	 * @return string
+	 * @param mixed $value
+	 *
+	 * @return mixed
 	 */
 	protected function sanitize($value) {
-		return zbx_htmlstr($value);
+		// avoid encoding the ampersand character
+		return str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $value);
 	}
 }
 
