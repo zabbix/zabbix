@@ -30,7 +30,7 @@ function get_default_image($image = false, $imagetype = IMAGE_TYPE_ICON) {
 				' FROM images i'.
 				' WHERE '.DBin_node('i.imageid', false).
 					' AND i.imagetype='.$imagetype.
-				' ORDER BY i.name ASC';
+				' ORDER BY i.name';
 		$result = DBselect($sql, 1);
 		if ($image = DBfetch($result)) {
 			return $image;

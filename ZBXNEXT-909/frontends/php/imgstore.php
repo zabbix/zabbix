@@ -50,16 +50,15 @@ if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
 
 if (isset($_REQUEST['css'])) {
 	$css = 'div.sysmap_iconid_0 {'.
-			' height: 50px; '.
-			' width: 50px; '.
+			' height: 50px;'.
+			' width: 50px;'.
 			' background-image: url("images/general/no_icon.png"); }'."\n";
 
-	$options = array(
+	$images = API::Image()->get(array(
 		'filter' => array('imagetype' => IMAGE_TYPE_ICON),
 		'output' => API_OUTPUT_EXTEND,
 		'select_image' => 1
-	);
-	$images = API::Image()->get($options);
+	));
 	foreach ($images as $image) {
 		$image['image'] = base64_decode($image['image']);
 		$ico = imagecreatefromstring($image['image']);

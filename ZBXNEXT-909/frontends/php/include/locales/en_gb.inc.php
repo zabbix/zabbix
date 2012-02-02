@@ -42,8 +42,6 @@
 //	discovery.php
 	'S_UP_TIME'=>				_('Uptime'),
 	'S_DOWN_TIME'=>				_('Downtime'),
-	'S_DISCOVERED_DEVICE'=>			_('Discovered device'),
-	'S_MONITORED_HOST'=>			_('Monitored host'),
 
 //	auditacts.php
 	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -82,8 +80,6 @@
 	'S_PREVIEW'=>				_('Preview'),
 	'S_NO_DATA_SMALL'=>			_('no data'),
 	'S_RULES'=>				_('Rules'),
-	'S_EXISTING'=>				_('Existing'),
-	'S_MISSING'=>				_('Missing'),
 
 //	export.inc.php
 	'S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT'=>	_('d.m.y'),
@@ -129,7 +125,6 @@
 	'S_ACTIONS'=>				_('Actions'),
 	'S_LOGS'=>				_('Logs'),
 	'S_LOGS_BIG'=>				_('LOGS'),
-	'S_ON_BIG'=>				_('ON'),
 	'S_ON'=>					_('On'),
 	'S_OFF'=>					_('Off'),
 	'S_GROUP'=>				_('Group'),
@@ -191,11 +186,9 @@
 	'S_DISABLE_SELECTED_PROXIES' =>	_('Disable hosts monitored by selected proxies?'),
 	'S_DELETE_SELECTED_PROXIES' =>	_('Delete selected proxies?'),
 	'S_CONFIGURATION_OF_PROXIES'=>	_('CONFIGURATION OF PROXIES'),
-	'S_DELETE_SELECTED_PROXY_Q'=>	_('Delete selected proxy?'),
 	'S_HOST_COUNT' => _('Host count'),
 	'S_ITEM_COUNT' => _('Item count'),
 	'S_REQUIRED_PERFORMANCE' => _('Required performance (vps)'),
-	'S_PROXY_MODE' => _('Proxy mode'),
 	'S_PROXY_PASSIVE' => _('Passive'),
 	'S_PROXY_ACTIVE' => _('Active'),
 
@@ -215,7 +208,6 @@
 	'S_ITEM_ADDED'=>			_('Item added'),
 	'S_ITEM_UPDATED'=>			_('Item updated'),
 	'S_ITEMS_UPDATED'=>			_('Items updated'),
-	'S_SORT_BY'=>				_('Sort by'),
 	'S_PARAMETER'=>				_('Parameter'),
 	'S_COLOR'=>					_('Colour'),
 	'S_UP'=>					_('Up'),
@@ -237,7 +229,6 @@
 
 //	graphs.php
 	'S_ADD_GRAPH_ITEMS' => _('add graph items first'),
-	'S_TITLE'=>				_('Title'),
 	'S_PERCENTILE_LINE'=>			_('Percentile line'),
 	'S_CONFIGURATION_OF_GRAPHS'=>		_('Configuration of graphs'),
 	'S_GRAPH_ADDED'=>			_('Graph added'),
@@ -260,7 +251,6 @@
 	'S_SHOW_WORKING_TIME'=>			_('Show working time'),
 	'S_SHOW_TRIGGERS'=>			_('Show triggers'),
 	'S_3D_VIEW'=>				_('3D view'),
-	'S_LEGEND'=>				_('Legend'),
 	'S_SHOW_LEGEND'=>			_('Show legend'),
 	'S_GRAPH_SUM'=>				_('Graph sum'),
 	'S_GRAPH_ITEM'=>			_('Graph item'),
@@ -321,11 +311,9 @@
 	'S_APPLICATIONS'=>				_('Applications'),
 	'S_HOSTS'=>					_('Hosts'),
 	'S_ITEMS'=>					_('Items'),
-	'S_ITEMS_BIG'=>					_('ITEMS'),
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
 	'S_HOST'=>					_('Host'),
-	'S_CONNECT_TO'=>				_('Connect to'),
 	'S_DNS'=>					_('DNS'),
 	'S_IP'=>					_('IP'),
 	'S_PORT'=>					_('Port'),
@@ -334,28 +322,19 @@
 	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
 	'S_ALL_GROUPS'=>				_('All groups'),
-	'S_DNS_NAME'=>					_('DNS name'),
-	'S_IP_ADDRESS'=>				_('IP address'),
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_HOST_GROUP'=>				_('Host group'),
 	'S_UPDATE'=>					_('Update'),
-	'S_AVAILABILITY'=>				_('Availability'),
 	'S_AVAILABLE'=>					_('Available'),
 	'S_NOT_AVAILABLE'=>				_('Not available'),
 	'S_PROXIES'=>					_('Proxies'),
 	'S_PROXIES_BIG'=>				_('PROXIES'),
-	'S_PROXY'=>					_('Proxy'),
 	'S_CREATE_PROXY'=>				_('Create proxy'),
-	'S_PROXY_NAME'=>				_('Proxy name'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
 	'S_INTERFACES' =>				_('Interfaces'),
 	'S_INTERFACE' =>				_('Interface'),
 
 // templates.php
-	'S_TEMPLATE_ADDED'=>			_('New template added'),
-	'S_CANNOT_ADD_TEMPLATE'=>		_('Cannot add template'),
-	'S_TEMPLATE_UPDATED'=>			_('Template updated'),
-	'S_CANNOT_UPDATE_TEMPLATE'=>		_('Cannot update template'),
 	'S_LINKED_TEMPLATES'=>			_('Linked templates'),
 	'S_LINKED_TO'=>				_('Linked to'),
 	'S_DELETE_AND_CLEAR'=>			_('Delete and clear'),
@@ -465,7 +444,6 @@
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
 
 //	events.php
-	'S_HISTORY_OF_EVENTS_BIG'=>		_('HISTORY OF EVENTS'),
 	'S_NO_EVENTS_FOUND'=>			_('No events found'),
 	'S_EVENTS_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	_('d M Y H:i:s'),
@@ -627,8 +605,6 @@
 	'S_BAR_REPORT_2'=>			_('Distribution of values for multiple items'),
 	'S_BAR_REPORT_3'=>			_('Compare values for multiple periods'),
 
-	'S_SELECTED_HOSTS'=>			_('Selected hosts'),
-	'S_SELECTED_GROUPS'=>			_('Selected groups'),
 	'S_SCALE'=>				_('Scale'),
 	'S_AVERAGE_BY'=>			_('Average by'),
 	'S_PALETTE'=>				_('Palette'),
@@ -699,8 +675,6 @@
 	'S_DISABLED'=>				_('Disabled'),
 	'S_DISABLED_BIG'=>			_('DISABLED'),
 	'S_ENABLED'=>				_('Enabled'),
-	'S_DISABLE'=>				_('Disable'),
-	'S_ENABLE'=>				_('Enable'),
 	'S_URL'=>				_('URL'),
 	'S_TIME_SHIFT'=>			_('Time shift'),
 	'S_INSERT_MACRO'=>			_('Insert macro'),
@@ -873,7 +847,6 @@
 //	Menu
 
 	'S_QUEUE'=>				_('Queue'),
-	'S_EVENTS'=>				_('Events'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
 	'S_LOGOUT'=>				_('Logout'),
