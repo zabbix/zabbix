@@ -45,7 +45,7 @@ $itempForm->setName('items');
 $itempForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$itemTable = new CTableInfo();
+$itemTable = new CTableInfo(_('No items defined.'));
 $itemTable->setHeader(array(
 	new CCheckBox('all_items', null, "checkAll('".$itempForm->getName()."', 'all_items', 'group_itemid');"),
 	_('Wizard'),

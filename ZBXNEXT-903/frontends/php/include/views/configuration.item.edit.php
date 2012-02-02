@@ -66,7 +66,9 @@ $itemFormList->addRow(_('Key'), array(
 // append type to form list
 if ($this->data['limited']) {
 	$itemForm->addVar('type', $this->data['type']);
-	$itemFormList->addRow(_('Type'), new CTextBox('typename', item_type2str($this->data['type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes'));
+	$itemFormList->addRow(_('Type'),
+		new CTextBox('typename', item_type2str($this->data['type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes')
+	);
 }
 else {
 	$typeComboBox = new CComboBox('type', $this->data['type']);
@@ -85,7 +87,12 @@ if (!empty($this->data['interfaces'])) {
 		$option->setAttribute('data-interfacetype', $interface['type']);
 		$intereacesComboBox->addItem($option);
 	}
-	$itemFormList->addRow(_('Host interface'), $intereacesComboBox, false, 'interface_row');
+
+	$span = new CSpan(_('No interface defined'), 'red');
+	$span->setAttribute('id', 'interface_not_defined');
+	$span->setAttribute('style', 'display: none;');
+
+	$itemFormList->addRow(_('Host interface'), array($intereacesComboBox, SPACE, $span), false, 'interface_row');
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),
