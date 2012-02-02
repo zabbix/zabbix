@@ -164,7 +164,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		// checking that media type has been deleted from the DB
 		$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.$mediatypeid.' ORDER BY mediatypeid';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
 
 		DBrestore_tables('media_type');
 	}
@@ -205,7 +205,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		// checking that media type has been deleted from the DB
 		$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.$mediatypeid.' ORDER BY mediatypeid';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
 
 		DBrestore_tables('media_type');
 	}
