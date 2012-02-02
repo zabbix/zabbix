@@ -88,7 +88,7 @@ if (!empty($this->data['interfaces'])) {
 		$intereacesComboBox->addItem($option);
 	}
 
-	$span = new CSpan(_('No interface defined'), 'red');
+	$span = new CSpan(_('No interface found'), 'red');
 	$span->setAttribute('id', 'interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
