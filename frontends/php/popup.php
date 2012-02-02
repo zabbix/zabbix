@@ -793,7 +793,7 @@ elseif ($srctbl == 'usrgrp') {
 		$name->setAttribute('onclick', $js_action);
 
 		$table->addRow(array(
-			$multiselect ? new CCheckBox('usrgrps['.zbx_jsValue($usrgrp[$srcfld1]).']', null, null, $usrgrp['usrgrpid']) : null,
+			$multiselect ? new CCheckBox('usrgrps['.$usrgrp['usrgrpid'].']', null, null, $usrgrp['usrgrpid']) : null,
 			$name,
 		));
 	}
