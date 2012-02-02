@@ -398,7 +398,6 @@ function discovery_value_style($val) {
 	return $style;
 }
 
-// retrieve real hostw for triggerw
 function getParentHostsByTriggers($triggers) {
 	$hosts = array();
 	$triggerParent = array();

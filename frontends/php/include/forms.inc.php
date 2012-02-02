@@ -563,7 +563,7 @@
 		$reset->useJQueryStyle();
 
 		$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
-		$filter->useJQueryStyle();
+		$filter->useJQueryStyle('main');
 
 		$div_buttons = new CDiv(array($filter, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0px;');

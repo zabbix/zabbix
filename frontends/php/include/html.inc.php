@@ -405,8 +405,7 @@ function makeFormFooter($main, $others = array()) {
 	}
 	$mainButtons = new CDiv();
 	foreach ($main as $button) {
-		$button->addClass('main');
-		$button->useJQueryStyle();
+		$button->useJQueryStyle('main');
 		$mainButtons->addItem($button);
 	}
 	$othersButtons = new CDiv($others);
