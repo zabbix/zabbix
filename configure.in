@@ -789,7 +789,7 @@ dnl *****************************************************************
 dnl Check for %qu format (FreeBSD 4.x)
 dnl FreeBSD 4.x does not support %llu
 AC_MSG_CHECKING(for long long format)
-AC_RUN_IFELSE(
+AC_TRY_RUN(
 [
 #include <sys/types.h>
 int main()

@@ -196,7 +196,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=no@:>@
 		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
 		CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
 
-           AC_LINK_IFELSE(AC_LANG_PROGRAM([#include <curl/curl.h>
+           AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <curl/curl.h>
 #ifndef NULL
 #define NULL (void *)0
 #endif],[
@@ -210,7 +210,7 @@ x=CURLOPT_FILE;
 x=CURLOPT_ERRORBUFFER;
 x=CURLOPT_STDERR;
 x=CURLOPT_VERBOSE;
-]),libcurl_cv_lib_curl_usable=yes,libcurl_cv_lib_curl_usable=no)
+])],libcurl_cv_lib_curl_usable=yes,libcurl_cv_lib_curl_usable=no)
 
 		LIBS="${_save_curl_libs}"
 		LDFLAGS="${_save_curl_ldflags}"
