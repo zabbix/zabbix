@@ -232,17 +232,15 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->getConfirmation();
 		$this->wait();
 		$this->assertTitle('Media types');
-		switch ($used_by_operations) {
-			case true:
+		if ($used_by_operations) {
 				$this->nok('Media type deleted');
 				$this->ok('Cannot delete media type');
 				$this->ok('Media types used by action');
-				break;
-			case false:
+		}
+		else {
 				$this->ok('Media type deleted');
 				$sql = 'SELECT count(*) AS cnt FROM media_type WHERE mediatypeid='.zbx_dbstr($id).'';
-				$this->assertEquals(1, DBcount($sql), "Chuck Norris: Media type has not been deleted from the DB");
-				break;
+				$this->assertEquals(0, DBcount($sql), "Chuck Norris: Media type has not been deleted from the DB");
 		}
 
 		DBrestore_tables('media_type');
