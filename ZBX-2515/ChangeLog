@@ -4,6 +4,7 @@ Changes for 1.9.10
 New features:
 
 Bug fixes:
+..F....... [ZBX-2515] set 15 minutes autologout as default for new users (Alexei)
 ..F....... [ZBX-4580] fixed trigger info pop up in the item configuration list (pavels)
 
 --------------------------------------------------------------------------------
