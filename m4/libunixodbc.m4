@@ -59,14 +59,14 @@ AC_DEFUN([LIBUNIXODBC_CHECK_CONFIG],
 		AC_CACHE_CHECK([whether unixodbc is usable],
 			[libunixodbc_cv_usable],
 			[AC_LINK_IFELSE([AC_LANG_PROGRAM([
-				#include <sql.h>
-				#include <sqlext.h>
-				#include <sqltypes.h>
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
 			],[
-			/* Try and use a few common options to force a failure if we are
-			   missing symbols or can't link. */
-			SQLRETURN       retcode;
-			retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, (SQLHENV*)0);
+/* try and use a few common options to force a failure if we are missing symbols or can't link */
+SQLRETURN	retcode;
+
+retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, (SQLHENV*)0);
 			])],libunixodbc_cv_usable=yes,libunixodbc_cv_usable=no)
 		])
 
