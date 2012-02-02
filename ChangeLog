@@ -4,6 +4,7 @@ Changes for 1.9.10
 New features:
 
 Bug fixes:
+....I..... [ZBX-3262] fixed warning "no AC_LANG_SOURCE call detected in body" raised during compilation (alexei)
 ..F....... [ZBX-4580] fixed trigger info pop up in the item configuration list (pavels)
 
 --------------------------------------------------------------------------------
