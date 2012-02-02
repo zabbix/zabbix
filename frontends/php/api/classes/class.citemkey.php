@@ -86,14 +86,14 @@ class CItemKey {
 	 */
 	private function parseKeyParameters() {
 		if ($this->currentByte == $this->keyByteCnt) {
-			return null;
+			return;
 		}
 
 		// invalid symbol instead of '[', which would be the beginning of params
 		if ($this->key[$this->currentByte] != '[') {
 			$this->isValid = false;
 			$this->error = _('Invalid item key format.');
-			return null;
+			return;
 		}
 
 		// let the parsing begin!
@@ -152,27 +152,27 @@ class CItemKey {
 						}
 						// all nestings are closed correctly
 						if ($nestLevel == 0 && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ']' && !isset($this->key[$this->currentByte + 2])) {
-							return null;
+							return;
 						}
 						if (!isset($this->key[$this->currentByte + 1]) || $this->key[$this->currentByte + 1] != ','
-							&& !($nestLevel > 0 && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ']')
-							&& $this->key[$this->currentByte + 1] != ']' // Zapcat - '][' is the same as ','
-							&& $this->key[$this->currentByte + 2] != '[') {
+								&& !($nestLevel > 0 && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ']')
+								&& $this->key[$this->currentByte + 1] != ']' // Zapcat - '][' is the same as ','
+								&& $this->key[$this->currentByte + 2] != '[') {
 							$this->isValid = false;
 							$this->error = _s('Incorrect syntax near "%1$s".', $this->key[$this->currentByte]);
-							return null;
+							return;
 						}
 					}
 					// looks like we have reached final ']'
 					elseif ($this->key[$this->currentByte] == ']' && $nestLevel == 0) {
 						if (!isset($this->key[$this->currentByte + 1])) {
-							return null;
+							return;
 						}
 
 						// nothing else is allowed after final ']'
 						$this->isValid = false;
 						$this->error = _s('Incorrect usage of bracket symbols. "%1$s" found after final bracket.', $this->key[$this->currentByte + 1]);
-						return null;
+						return;
 					}
 					elseif ($this->key[$this->currentByte] != ' ') {
 						$state = 2;
@@ -202,13 +202,13 @@ class CItemKey {
 						}
 
 						if ($nestLevel == 0 && isset($this->key[$this->currentByte + 1]) && $this->key[$this->currentByte + 1] == ']' && !isset($this->key[$this->currentByte + 2])) {
-							return null;
+							return;
 						}
 						elseif ($nestLevel == 0 && $this->key[$this->currentByte + 1] == ']' && isset($this->key[$this->currentByte + 2])) {
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
 							$this->error = _s('Incorrect usage of bracket symbols. "%1$s" found after final bracket.', $this->key[$this->currentByte + 1]);
-							return null;
+							return;
 						}
 
 						if ((!isset($this->key[$this->currentByte + 1]) || $this->key[$this->currentByte + 1] != ',') // if next symbol is not ','
@@ -216,7 +216,7 @@ class CItemKey {
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
 							$this->error = _s('Incorrect syntax near "%1$s" at position "%2$s"', $this->key[$this->currentByte], $this->currentByte);
-							return null;
+							return;
 						}
 
 						// in key[["a"]] param is "a"
@@ -250,10 +250,10 @@ class CItemKey {
 							// nothing else is allowed after final ']'
 							$this->isValid = false;
 							$this->error = _s('Incorrect usage of bracket symbols. "%1$s" found after final bracket.', $this->key[$this->currentByte + 1]);
-							return null;
+							return;
 						}
 						else {
-							return null;
+							return;
 						}
 					}
 					else {

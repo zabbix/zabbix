@@ -175,7 +175,8 @@ class CJSON {
 	 */
 	protected function _deQuote($encoded, $keys) {
 		foreach ($keys as $key) {
-			$encoded = preg_replace_callback("/(\"".$key."\"\:)(\".*(?:[^\\\]\"))/U", array($this, '_stripvalueslashes'), $encoded);
+			$encoded = preg_replace_callback("/(\"".$key."\"\:)(\".*(?:[^\\\]\"))/U",
+					array($this, '_stripvalueslashes'), $encoded);
 		}
 		return $encoded;
 	}
@@ -504,13 +505,14 @@ class CJSON {
 							case $substr_chrs_c_2 == '\\\'':
 							case $substr_chrs_c_2 == '\\\\':
 							case $substr_chrs_c_2 == '\\/':
-								if ($delim == '"' && $substr_chrs_c_2 != '\\\'' || $delim == "'" && $substr_chrs_c_2 != '\\"') {
+								if ($delim == '"' && $substr_chrs_c_2 != '\\\'' || $delim == "'"
+										&& $substr_chrs_c_2 != '\\"') {
 									$utf8 .= $chrs{++$c};
 								}
 								break;
 							case preg_match('/\\\u[0-9A-F]{4}/i', substr($chrs, $c, 6)):
 								// single, escaped unicode character
-								$utf16 = chr(hexdec(substr($chrs, ($c + 2), 2))).chr(hexdec(substr($chrs, ($c + 4), 2)));
+								$utf16 = chr(hexdec(substr($chrs, $c + 2, 2))).chr(hexdec(substr($chrs, $c + 4, 2)));
 								$utf8 .= $this->_utf162utf8($utf16);
 								$c += 5;
 								break;
@@ -658,13 +660,14 @@ class CJSON {
 							array_push($stk, array('what' => self::IN_STR, 'where' => $c, 'delim' => $chrs{$c}));
 						}
 						elseif ($chrs{$c} == $top['delim'] && $top['what'] == self::IN_STR
-									&& ((zbx_strlen(substr($chrs, 0, $c)) - zbx_strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)) {
+								&& ((zbx_strlen(substr($chrs, 0, $c)) - zbx_strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)) {
 							// found a quote, we're in a string, and it's not escaped
 							// we know that it's not escaped becase there is _not_ an
 							// odd number of backslashes at the end of the string so far
 							array_pop($stk);
 						}
-						elseif ($chrs{$c} == '[' && in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
+						elseif ($chrs{$c} == '['
+								&& in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
 							// found a left-bracket, and we are in an array, object, or slice
 							array_push($stk, array('what' => self::IN_ARR, 'where' => $c, 'delim' => false));
 						}
@@ -673,7 +676,8 @@ class CJSON {
 							$this->_level = null;
 							array_pop($stk);
 						}
-						elseif ($chrs{$c} == '{' && in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
+						elseif ($chrs{$c} == '{'
+								&& in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
 							// found a left-brace, and we are in an array, object, or slice
 							array_push($stk, array('what' => self::IN_OBJ, 'where' => $c, 'delim' => false));
 						}
@@ -682,7 +686,8 @@ class CJSON {
 							$this->_level = null;
 							array_pop($stk);
 						}
-						elseif ($substr_chrs_c_2 == '/*' && in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
+						elseif ($substr_chrs_c_2 == '/*'
+								&& in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
 							// found a comment start, and we are in an array, object, or slice
 							array_push($stk, array('what' => self::IN_CMT, 'where' => $c, 'delim' => false));
 							$c++;
@@ -783,7 +788,8 @@ class CJSON {
 			case 3:
 				// return a UTF-16 character from a 3-byte UTF-8 char
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-				return chr((0xF0 & (ord($utf8{0}) << 4)) | (0x0F & (ord($utf8{1}) >> 2))).chr((0xC0 & (ord($utf8{1}) << 6)) | (0x7F & ord($utf8{2})));
+				return chr((0xF0 & (ord($utf8{0}) << 4)) | (0x0F & (ord($utf8{1}) >> 2))).
+						chr((0xC0 & (ord($utf8{1}) << 6)) | (0x7F & ord($utf8{2})));
 		}
 		// ignoring UTF-32 for now, sorry
 		return '';
@@ -925,7 +931,7 @@ class CJSON {
 			$s = $this->_state_transition_table[$_the_state][$c];
 
 			if ($s < 0) {
-				// Perform one of the predefined actions
+				// perform one of the predefined actions
 				switch ($s) {
 					// empty }
 					case -9:
