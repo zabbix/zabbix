@@ -158,8 +158,8 @@ input[type="button"].formlist { margin-bottom: 1px; cursor: pointer; vertical-al
 input[type="submit"].formlist { margin-bottom: 1px; cursor: pointer; }
 #groups_tweenbox input[type="button"].formlist { margin-top: 1px; }
 
-div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #FFAA33; }
-div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #DD7711; }
+div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #FFAA33; }
+div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #DD7711; }
 
 .select { cursor: pointer; margin: 1px 2px 1px 1px; }
 .selectShorten { width: 200px; }
