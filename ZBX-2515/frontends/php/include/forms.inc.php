@@ -119,9 +119,6 @@
 		if ($data['autologin'] || !isset($data['autologout'])) {
 			$data['autologout'] = 0;
 		}
-		elseif (isset($data['autologout']) && $data['autologout'] < 90) {
-			$data['autologout'] = 900;
-		}
 
 		// set media types
 		$data['media_types'] = array();
