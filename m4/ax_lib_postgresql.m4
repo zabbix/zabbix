@@ -27,6 +27,7 @@
 #
 #     AC_SUBST(POSTGRESQL_CPPFLAGS)
 #     AC_SUBST(POSTGRESQL_LDFLAGS)
+#     AC_SUBST(POSTGRESQL_LIBS)
 #     AC_SUBST(POSTGRESQL_VERSION)
 #
 #   And sets:
@@ -68,7 +69,8 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
 
     POSTGRESQL_CPPFLAGS=""
     POSTGRESQL_LDFLAGS=""
-    POSTGRESQL_POSTGRESQL=""
+    POSTGRESQL_LIBS=""
+    POSTGRESQL_VERSION=""
 
     dnl
     dnl Check PostgreSQL libraries (libpq)
@@ -84,7 +86,8 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
             AC_MSG_CHECKING([for PostgreSQL libraries])
 
             POSTGRESQL_CPPFLAGS="-I`$PG_CONFIG --includedir`"
-            POSTGRESQL_LDFLAGS="-L`$PG_CONFIG --libdir` -lpq"
+            POSTGRESQL_LDFLAGS="-L`$PG_CONFIG --libdir`"
+            POSTGRESQL_LIBS="-lpq"
 
             POSTGRESQL_VERSION=`$PG_CONFIG --version | sed -e 's#PostgreSQL ##'`
 
@@ -103,10 +106,12 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
     dnl Check for function PQserverVersion()
     dnl
 
-    _save_postgresql_ldflags="${LDFLAGS}"
     _save_postgresql_cflags="${CFLAGS}"
-    LDFLAGS="${LDFLAGS} ${POSTGRESQL_LDFLAGS}"
+    _save_postgresql_ldflags="${LDFLAGS}"
+    _save_postgresql_libs="${LIBS}"
     CFLAGS="${CFLAGS} ${POSTGRESQL_CPPFLAGS}"
+    LDFLAGS="${LDFLAGS} ${POSTGRESQL_LDFLAGS}"
+    LIBS="${LIBS} ${POSTGRESQL_LIBS}"
 
     AC_MSG_CHECKING(for function PQserverVersion())
     AC_TRY_LINK(
@@ -121,10 +126,12 @@ PQserverVersion(conn);
     AC_MSG_RESULT(yes),
     AC_MSG_RESULT(no))
 
-    LDFLAGS="${_save_postgresql_ldflags}"
     CFLAGS="${_save_postgresql_cflags}"
-    unset _save_postgresql_ldflags
+    LDFLAGS="${_save_postgresql_ldflags}"
+    LIBS="${_save_postgresql_libs}"
     unset _save_postgresql_cflags
+    unset _save_postgresql_ldflags
+    unset _save_postgresql_libs
 
     dnl
     dnl Check if required version of PostgreSQL is available
@@ -176,7 +183,8 @@ PQserverVersion(conn);
 
     fi
 
-    AC_SUBST([POSTGRESQL_VERSION])
     AC_SUBST([POSTGRESQL_CPPFLAGS])
     AC_SUBST([POSTGRESQL_LDFLAGS])
+    AC_SUBST([POSTGRESQL_LIBS])
+    AC_SUBST([POSTGRESQL_VERSION])
 ])

@@ -1,10 +1,14 @@
 <?php
 /**
  * Convert PHP variable to string version of JavaScript style
- * @author Eugene Grigorjev
+ *
+ * @deprecated use CJs::encodeJson() instead
+ * @see CJs::encodeJson()
+ *
  * @param mixed $value
- * @param bool $asObject return string containing javascript object
- * @param bool $addQuotes whether quotes should be added at the beginning and at the end of string
+ * @param bool  $asObject  return string containing javascript object
+ * @param bool  $addQuotes whether quotes should be added at the beginning and at the end of string
+ *
  * @return string
  */
 function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
@@ -17,12 +21,10 @@ function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
 			$escaped = str_replace("\\", "\\\\", $escaped); // escaping slashes: \ => \\
 			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
 			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
+			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
 			$escaped = str_replace('/', '\/', $escaped); // escaping forward slash: / => \/
 			if ($addQuotes) {
-				$escaped = '"'.$escaped.'"';
-			}
-			else {
-				$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
+				$escaped = "'".$escaped."'";
 			}
 			return $escaped;
 		}

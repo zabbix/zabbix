@@ -100,6 +100,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/export/writers',
 			$this->rootDir.'/include/classes/export/elements',
 			$this->rootDir.'/include/classes/sysmaps',
+			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/rpc'
 		);
