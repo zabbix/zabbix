@@ -7,4 +7,10 @@ class CInterfaceExportElement extends CExportElement {
 		parent::__construct('interface', $interface);
 	}
 
+	protected function fieldNameMap() {
+		return array(
+			'main' => 'default'
+		);
+	}
+
 }

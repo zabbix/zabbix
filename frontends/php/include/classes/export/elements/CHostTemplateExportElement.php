@@ -12,7 +12,7 @@ class CHostTemplateExportElement extends CExportElement{
 
 	protected function fieldNameMap() {
 		return array(
-			'host' => 'template'
+			'host' => 'name'
 		);
 	}
 

@@ -224,7 +224,7 @@ class CConfigurationExport {
 		$hosts = API::Host()->get(array(
 			'hostids' => $this->options['hosts'],
 			'output' => array('proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-				'ipmi_password', 'ipmi_disable_until', 'ipmi_available', 'name'),
+				'ipmi_password', 'name'),
 			'selectInventory' => true,
 			'selectInterfaces' => array('interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port'),
 			'selectMacros' => API_OUTPUT_EXTEND,
@@ -244,7 +244,7 @@ class CConfigurationExport {
 		// items
 		$items = API::Item()->get(array(
 			'hostids' => $this->options['hosts'],
-			'output' => array('hostid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
+			'output' => array('hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
 				'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
 				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'valuemapid', 'delay_flex', 'params',
 				'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',

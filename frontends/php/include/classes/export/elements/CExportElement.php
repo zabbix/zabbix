@@ -2,8 +2,19 @@
 
 class CExportElement {
 
+	/**
+	 * @var array
+	 */
 	protected $data;
+
+	/**
+	 * @var string
+	 */
 	protected $name;
+
+	/**
+	 * @var array
+	 */
 	protected $childElements = array();
 
 
@@ -39,6 +50,8 @@ class CExportElement {
 	}
 
 	/**
+	 * Get element name.
+	 *
 	 * @return string
 	 */
 	public function getName() {
@@ -46,7 +59,7 @@ class CExportElement {
 	}
 
 	/**
-	 * Gets this elements data.
+	 * Get element data.
 	 *
 	 * @return array
 	 */
@@ -54,6 +67,11 @@ class CExportElement {
 		return $this->data;
 	}
 
+	/**
+	 * Convert element to array representation.
+	 *
+	 * @return array
+	 */
 	public function toArray() {
 		$array = $this->getData();
 		$childs = $this->getChilds();
@@ -84,6 +102,9 @@ class CExportElement {
 		return $array;
 	}
 
+	/**
+	 * Remove not needed field values from element's data.
+	 */
 	protected function cleanData() {
 		$requiredFields = $this->requiredFields();
 		$referenceFields = $this->referenceFields();
@@ -97,6 +118,9 @@ class CExportElement {
 		}
 	}
 
+	/**
+	 * Rename some fields according to value map.
+	 */
 	protected function renameData() {
 		$fieldMap = $this->fieldNameMap();
 		foreach ($this->data as $key => $value) {

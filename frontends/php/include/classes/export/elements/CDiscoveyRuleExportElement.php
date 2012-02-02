@@ -7,16 +7,17 @@ class CDiscoveyRuleExportElement extends CExportElement {
 	}
 
 	protected function requiredFields() {
-		return array('type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
-			'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
-			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'valuemapid', 'delay_flex', 'params',
-			'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-			'interfaceid', 'port', 'description', 'inventory_link');
+		return array('type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'multiplier',
+			'status', 'trapper_hosts', 'snmpv3_securityname', 'snmpv3_securitylevel',
+			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'delay_flex', 'params',
+			'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+			'port', 'description');
 	}
 
 	protected function fieldNameMap() {
 		return array(
-			'key_' => 'key'
+			'key_' => 'key',
+			'trapper_hosts' => 'allowed_hosts'
 		);
 	}
 }

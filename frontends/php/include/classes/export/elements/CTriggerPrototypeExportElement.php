@@ -7,9 +7,16 @@ class CTriggerPrototypeExportElement extends CExportElement{
 	}
 
 	protected function requiredFields() {
-		return array('expression', 'description', 'url', 'status', 'value', 'priority', 'comments',
+		return array('expression', 'description', 'url', 'status', 'priority', 'comments',
 			'type', 'comments');
 	}
 
+	protected function fieldNameMap() {
+		return array(
+			'description' => 'name',
+			'priority' => 'severity',
+			'comments' => 'description'
+		);
+	}
 
 }
