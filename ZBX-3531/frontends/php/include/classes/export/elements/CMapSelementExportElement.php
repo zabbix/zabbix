@@ -15,7 +15,7 @@ class CMapSelementExportElement extends CExportElement{
 
 	protected function requiredFields() {
 		return array('elementtype', 'label', 'label_location', 'x', 'y', 'elementsubtype', 'areatype', 'width', 'height',
-			'viewtype', 'use_iconmap', 'selement_ref1');
+			'viewtype', 'use_iconmap', 'selement_ref');
 	}
 
 	protected function addElementRef(array $element) {
