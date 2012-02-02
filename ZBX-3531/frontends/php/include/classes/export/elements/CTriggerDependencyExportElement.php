@@ -10,4 +10,9 @@ class CTriggerDependencyExportElement extends CExportElement{
 		return array('expression', 'description');
 	}
 
+	protected function fieldNameMap() {
+		return array(
+			'description' => 'name'
+		);
+	}
 }

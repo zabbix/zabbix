@@ -15,12 +15,20 @@ class CGraphPrototypeExportElement extends CExportElement{
 			'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_left', 'percent_right', 'ymin_type', 'ymax_type');
 	}
 
+	protected function fieldNameMap() {
+		return array(
+			'graphtype' => 'type',
+			'ymin_type' => 'ymin_type_1',
+			'ymax_type' => 'ymax_type_1'
+		);
+	}
+
 	protected function addYMinItemId(array $yMinItemId) {
-		$this->addElement(new CExportElement('ymin_item1', $yMinItemId));
+		$this->addElement(new CExportElement('ymin_item_1', $yMinItemId));
 	}
 
 	protected function addYMaxItemId(array $yMaxItemId) {
-		$this->addElement(new CExportElement('ymax_item1', $yMaxItemId));
+		$this->addElement(new CExportElement('ymax_item_1', $yMaxItemId));
 	}
 
 	protected function addGraphItems(array $graphItems) {

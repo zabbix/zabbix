@@ -1,6 +1,6 @@
 <?php
 
-class CItemExportElement extends CExportElement{
+class CItemExportElement extends CExportElement {
 
 	public function __construct($item) {
 		parent::__construct('item', $item);
@@ -11,7 +11,7 @@ class CItemExportElement extends CExportElement{
 
 	protected function requiredFields() {
 		return array(
-			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
+			'type', 'snmp_community', 'multiplier', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
 			'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'delay_flex', 'params',
 			'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
@@ -25,11 +25,13 @@ class CItemExportElement extends CExportElement{
 
 	protected function fieldNameMap() {
 		return array(
-			'key_' => 'key'
+			'key_' => 'key',
+			'trapper_hosts' => 'allowed_hosts'
 		);
 	}
 
 	protected function addApplications(array $applications) {
+		order_result($applications, 'name');
 		$applicationsElement = new CExportElement('applications');
 		foreach ($applications as $application) {
 			$applicationsElement->addElement(new CItemApplicationExportElement($application));

@@ -23,8 +23,13 @@ class CHostExportElement extends CExportElement {
 
 	protected function requiredFields() {
 		return array('proxy_hostid', 'host', 'status',
-			'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'ipmi_disable_until', 'ipmi_available',
-			'name');
+			'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name');
+	}
+
+	protected function fieldNameMap() {
+		return array(
+			'proxy_hostid' => 'proxyid'
+		);
 	}
 
 	protected function addGroups(array $groups) {
@@ -64,6 +69,7 @@ class CHostExportElement extends CExportElement {
 		order_result($discoveryRules, 'name');
 		$discoveryRulesElement = new CExportElement('discovery_rules');
 		foreach ($discoveryRules as $discoveryRule) {
+			$discoveryRule['interface_ref'] = $this->references['refs'][$discoveryRule['interfaceid']];
 			$discoveryRulesElement->addElement(new CDiscoveyRuleExportElement($discoveryRule));
 		}
 		$this->addElement($discoveryRulesElement);
