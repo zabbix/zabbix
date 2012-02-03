@@ -2310,6 +2310,7 @@ function utf8RawUrlDecode($source){
  */
 function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 	$triggers = get_triggers_by_hostid($templateid);
+	$triggerArray = array();
 	while ($trigger = DBfetch($triggers)) {
 		$triggerArray[] = $trigger;
 	}
