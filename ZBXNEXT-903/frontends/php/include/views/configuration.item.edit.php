@@ -293,7 +293,7 @@ $itemFormList->addRow(_('Store value'), $deltaComboBox, false, 'row_delta');
 // append valuemap to form list
 if ($this->data['limited']) {
 	$itemForm->addVar('valuemapid', $this->data['valuemapid']);
-	$valuemapComboBox = new CTextBox('valuemap_name', $this->data['valuemaps'], ZBX_TEXTBOX_SMALL_SIZE, 'yes');
+	$valuemapComboBox = new CTextBox('valuemap_name', !empty($this->data['valuemaps']) ? $this->data['valuemaps'] : _('As is'), ZBX_TEXTBOX_SMALL_SIZE, 'yes');
 }
 else {
 	$valuemapComboBox = new CComboBox('valuemapid', $this->data['valuemapid']);
@@ -368,7 +368,7 @@ $buttons = array();
 if (!empty($this->data['itemid'])) {
 	array_push($buttons, new CSubmit('clone', _('Clone')));
 
-	if (!empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
+	if (!$this->data['limited'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
 		array_push($buttons,
 			new CButtonQMessage('del_history', _('Clear history and trends'), _('History clearing can take a long time. Continue?'))
 		);
