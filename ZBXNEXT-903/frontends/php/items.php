@@ -880,6 +880,7 @@ else {
 	}
 	if (isset($_REQUEST['filter_hostname']) && !zbx_empty($_REQUEST['filter_hostname'])) {
 		$options['name'] = $_REQUEST['filter_hostname'];
+		$data['filter_hostname'] = $_REQUEST['filter_hostname'];
 	}
 	if (isset($_REQUEST['filter_application']) && !zbx_empty($_REQUEST['filter_application'])) {
 		$options['application'] = $_REQUEST['filter_application'];
@@ -966,12 +967,9 @@ else {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
 			$item['name_expanded'] = itemName($item);
 
-			if (!empty($data['hostid'])) {
+			if (empty($data['filter_hostname'])) {
 				$host = reset($item['hosts']);
 				$item['host'] = $host['name'];
-			}
-			else {
-				$item['host'] = null;
 			}
 
 			$item['subfilters'] = array(
@@ -997,7 +995,7 @@ else {
 					|| uint_in_array($item['delay'], $_REQUEST['subfilter_interval']),
 				'subfilter_apps' => empty($_REQUEST['subfilter_apps'])
 			);
-			if (!$_REQUEST['subfilter_apps']) {
+			if (!empty($_REQUEST['subfilter_apps'])) {
 				foreach ($item['applications'] as $application) {
 					if (str_in_array($application['name'], $_REQUEST['subfilter_apps'])) {
 						$item['subfilters']['subfilter_apps'] = true;
