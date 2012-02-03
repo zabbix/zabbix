@@ -97,6 +97,7 @@ class ZBase {
 		return array(
 			$this->rootDir.'/include/classes',
 			$this->rootDir.'/include/classes/sysmaps',
+			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/rpc'
 		);

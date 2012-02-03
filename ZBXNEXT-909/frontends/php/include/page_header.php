@@ -108,12 +108,7 @@ switch ($page['type']) {
 		break;
 	case PAGE_TYPE_HTML:
 	default:
-		if (!isset($page['encoding'])) {
-			header('Content-Type: text/html; charset=UTF-8');
-		}
-		else {
-			header('Content-Type: text/html; charset='.$page['encoding']);
-		}
+		header('Content-Type: text/html; charset=UTF-8');
 
 		// page title
 		$page_title = '';
