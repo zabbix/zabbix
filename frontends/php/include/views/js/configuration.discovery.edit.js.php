@@ -336,7 +336,7 @@
 						}
 					},
 					error: function() {
-						alert('AJAX request error');
+						//alert('AJAX request error');
 						jQuery('#add_new_dcheck').removeAttr('disabled');
 					},
 					dataType: 'json'
@@ -368,7 +368,7 @@
 
 	jQuery(document).ready(function() {
 		addPopupValues(<?php echo zbx_jsvalue(array_values($this->data['drule']['dchecks'])); ?>);
-		jQuery("input:radio[name=uniqueness_criteria][value=<?php echo zbx_jsvalue($this->data['drule']['uniqueness_criteria']); ?>]").attr('checked', 'checked');
+		jQuery('input:radio[name="uniqueness_criteria"][value=<?php echo zbx_jsvalue($this->data['drule']['uniqueness_criteria']); ?>]').attr('checked', 'checked');
 
 		setTimeout(function(){ jQuery('#name').focus() }, 10);
 

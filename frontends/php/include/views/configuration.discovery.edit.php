@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/views/js/configuration.discovery.js.php');
+require_once('include/views/js/configuration.discovery.edit.js.php');
 
 $discoveryWidget = new CWidget();
 $discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULE'));
@@ -77,7 +77,7 @@ $discoveryForm->addItem($discoveryTabs);
 
 // append buttons to form
 $deleteButton = new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid'));
-if (!empty($this->data['druleid'])) {
+if (empty($this->data['druleid'])) {
 	$deleteButton->setAttribute('disabled', 'disabled');
 }
 $discoveryForm->addItem(makeFormFooter(
