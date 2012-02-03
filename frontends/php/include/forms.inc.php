@@ -997,7 +997,7 @@
 		}
 
 		// fill data from item
-		if ((!empty($data['itemid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
+		if ((!empty($data['itemid']) && !isset($_REQUEST['form_refresh'])) || ($data['limited'] && !isset($_REQUEST['form_refresh']))) {
 			$data['name'] = $data['item']['name'];
 			$data['description'] = $data['item']['description'];
 			$data['key'] = $data['item']['key_'];
