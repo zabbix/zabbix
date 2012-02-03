@@ -1290,7 +1290,7 @@ class CTrigger extends CZBXAPI {
 			$currentTrigger = $triggers[$tnum];
 
 			if (!check_db_fields($triggerDbFields, $trigger)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect fields for trigger.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
 			}
 
 			if (($update || $delete) && !isset($dbTriggers[$trigger['triggerid']])) {
@@ -1941,7 +1941,7 @@ class CTrigger extends CZBXAPI {
 							_s('Trigger "%1$s" already exists on "%2$s".', $childTrigger['description'], $chdHost['host']));
 					}
 					elseif ($childTrigger['flags'] != $newTrigger['flags']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Trigger with same name but other type exists'));
 					}
 
 					$newTrigger['triggerid'] = $childTrigger['triggerid'];
@@ -2083,7 +2083,7 @@ class CTrigger extends CZBXAPI {
 					'limit' => 1
 				));
 				if ($templates) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add dependency from a host to a template.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add dependency from a host to a template.'));
 				}
 			}
 
@@ -2098,7 +2098,7 @@ class CTrigger extends CZBXAPI {
 				$upTriggerids = array();
 				while ($upTrigger = DBfetch($dbUpTriggers)) {
 					if (bccomp($upTrigger['triggerid_up'], $trigger['triggerid']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
 					}
 					$upTriggerids[] = $upTrigger['triggerid_up'];
 				}

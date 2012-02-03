@@ -48,8 +48,12 @@ $fields = array(
 	'macros' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'steps' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'authentication' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),'isset({save})'),
-	'http_user' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.'||{authentication}=='.HTTPTEST_AUTH_NTLM.')'),
-	'http_password' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.'||{authentication}=='.HTTPTEST_AUTH_NTLM.')'),
+	'http_user' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+			'||{authentication}=='.HTTPTEST_AUTH_NTLM.')'),
+	'http_password' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+			'||{authentication}=='.HTTPTEST_AUTH_NTLM.')'),
 	'new_httpstep' =>	array(T_ZBX_STR, O_OPT,	null,	null,		null),
 	'move_up' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0,65534), null),
 	'move_down' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0,65534), null),
@@ -147,7 +151,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	if ($result) {
 		$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$_REQUEST['httptestid'].'] '._('Host').' ['.$host['host'].']');
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.
+			$_REQUEST['httptestid'].'] '._('Host').' ['.$host['host'].']');
 	}
 	unset($_REQUEST['httptestid'], $_REQUEST['form']);
 }
@@ -241,7 +246,8 @@ elseif (isset($_REQUEST['save'])) {
 		}
 
 		$host = get_host_by_hostid($_REQUEST['hostid']);
-		add_audit($action, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$_REQUEST['name'].'] ['.$httptestid.'] '._('Host').' ['.$host['host'].']');
+		add_audit($action, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$_REQUEST['name'].'] ['.$httptestid.'] '.
+			_('Host').' ['.$host['host'].']');
 
 		unset($_REQUEST['httptestid'], $_REQUEST['form']);
 		show_messages(true, $message_true);
@@ -267,7 +273,8 @@ elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_httptestid'])) {
 			$go_result = true;
 			$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']'._('Scenario activated'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
+				_('Host').' ['.$host['host'].']'._('Scenario activated'));
 		}
 	}
 	show_messages($go_result, _('Scenario activated'), null);
@@ -284,7 +291,8 @@ elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_httptestid'])) {
 			$go_result = true;
 			$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '._('Host').' ['.$host['host'].']'._('Scenario disabled'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
+				_('Host').' ['.$host['host'].']'._('Scenario disabled'));
 		}
 	}
 	show_messages($go_result, _('Scenario disabled'), null);
@@ -303,7 +311,8 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 
 			$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '._('Host').' ['.$host['host'].']'._('History cleared'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
+				_('Host').' ['.$host['host'].']'._('History cleared'));
 		}
 	}
 	show_messages($go_result, _('History cleared'), null);

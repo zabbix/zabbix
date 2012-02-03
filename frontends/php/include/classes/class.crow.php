@@ -20,10 +20,11 @@
 ?>
 <?php
 class CRow extends CTag {
-	public function __construct($item = null, $class = null) {
+	public function __construct($item = null, $class = null, $id = null) {
 		parent::__construct('tr', 'yes');
 		$this->addItem($item);
 		$this->setAttribute('class', $class);
+		$this->setAttribute('id', $id);
 	}
 
 	public function setAlign($value) {
