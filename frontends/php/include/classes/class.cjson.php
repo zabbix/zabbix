@@ -32,7 +32,7 @@
 **
 ** @license http://opensource.org/licenses/bsd-license.php BSD
 **/
-class CJSON{
+class CJSON {
 	/**
 	 *
 	 * User-defined configuration, primarily of use in unit testing.
@@ -143,18 +143,17 @@ class CJSON{
 
 		}
 		else {
-// Fall back to PHP-only method
+			// fall back to php-only method
 			$encoded = $this->_json_encode($valueToEncode);
 		}
 
-// Sometimes you just don't want some values quoted
+		// sometimes you just don't want some values quoted
 		if (!empty($deQuote)) {
 			$encoded = $this->_deQuote($encoded, $deQuote);
 		}
-
 		mb_internal_encoding('UTF-8');
 
-	return $encoded;
+		return $encoded;
 	}
 
 	/**
@@ -176,14 +175,9 @@ class CJSON{
 	 */
 	protected function _deQuote($encoded, $keys) {
 		foreach ($keys as $key) {
-			$pattern = "/(\"".$key."\"\:)(\".*(?:[^\\\]\"))/U";
-			$encoded = preg_replace_callback(
-				$pattern,
-				array($this, '_stripvalueslashes'),
-				$encoded
-			);
+			$encoded = preg_replace_callback("/(\"".$key."\"\:)(\".*(?:[^\\\]\"))/U",
+					array($this, '_stripvalueslashes'), $encoded);
 		}
-
 		return $encoded;
 	}
 
@@ -237,13 +231,13 @@ class CJSON{
 			return null;
 		}
 
-// Fall back to PHP-only method
+		// fall back to php-only method
 		ini_set('pcre.backtrack_limit', '10000000');
 
 		$this->_level = 0;
 		$result = null;
 
-// Required for internal parser, it operates with ASCII data
+		// required for internal parser, it operates with ASCII data
 		mb_internal_encoding('ASCII');
 		if ($this->isValid($encodedValue)) {
 			$result = $this->_json_decode($encodedValue, (bool) $asArray);
@@ -268,38 +262,30 @@ class CJSON{
 		switch (gettype($var)) {
 			case 'boolean':
 				return $var ? 'true' : 'false';
-
 			case 'NULL':
 				return 'null';
-
 			case 'integer':
 				// BREAK WITH Services_JSON:
 				// disabled for compatibility with ext/json. ext/json returns
 				// a string for integers, so we will to.
-				//return (int) $var;
 				return (string) $var;
-
 			case 'double':
 			case 'float':
 				// BREAK WITH Services_JSON:
 				// disabled for compatibility with ext/json. ext/json returns
 				// a string for floats and doubles, so we will to.
-				//return (float) $var;
 				return (string) $var;
-
 			case 'string':
 				// STRINGS ARE EXPECTED TO BE IN ASCII OR UTF-8 FORMAT
 				$ascii = '';
 				$strlen_var = zbx_strlen($var);
 
-			   /**
-				* Iterate over every character in the string,
-				* escaping with a slash or encoding to UTF-8 where necessary
-				*/
-				for($c = 0; $c < $strlen_var; ++$c) {
-
+				/*
+				 * Iterate over every character in the string,
+				 * escaping with a slash or encoding to UTF-8 where necessary
+				 */
+				for ($c = 0; $c < $strlen_var; ++$c) {
 					$ord_var_c = ord($var{$c});
-
 					switch (true) {
 						case $ord_var_c == 0x08:
 							$ascii .= '\b';
@@ -316,19 +302,16 @@ class CJSON{
 						case $ord_var_c == 0x0D:
 							$ascii .= '\r';
 							break;
-
 						case $ord_var_c == 0x22:
 						case $ord_var_c == 0x2F:
 						case $ord_var_c == 0x5C:
 							// double quote, slash, slosh
 							$ascii .= '\\'.$var{$c};
 							break;
-
-						case (($ord_var_c >= 0x20) && ($ord_var_c <= 0x7F)):
+						case ($ord_var_c >= 0x20 && $ord_var_c <= 0x7F):
 							// characters U-00000000 - U-0000007F (same as ASCII)
 							$ascii .= $var{$c};
 							break;
-
 						case (($ord_var_c & 0xE0) == 0xC0):
 							// characters U-00000080 - U-000007FF, mask 110XXXXX
 							// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
@@ -337,30 +320,22 @@ class CJSON{
 							$utf16 = $this->_utf82utf16($char);
 							$ascii .= sprintf('\u%04s', bin2hex($utf16));
 							break;
-
 						case (($ord_var_c & 0xF0) == 0xE0):
 							// characters U-00000800 - U-0000FFFF, mask 1110XXXX
 							// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-							$char = pack('C*', $ord_var_c,
-										 ord($var{$c + 1}),
-										 ord($var{$c + 2}));
+							$char = pack('C*', $ord_var_c, ord($var{$c + 1}), ord($var{$c + 2}));
 							$c += 2;
 							$utf16 = $this->_utf82utf16($char);
 							$ascii .= sprintf('\u%04s', bin2hex($utf16));
 							break;
-
 						case (($ord_var_c & 0xF8) == 0xF0):
 							// characters U-00010000 - U-001FFFFF, mask 11110XXX
 							// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-							$char = pack('C*', $ord_var_c,
-										 ord($var{$c + 1}),
-										 ord($var{$c + 2}),
-										 ord($var{$c + 3}));
+							$char = pack('C*', $ord_var_c, ord($var{$c + 1}), ord($var{$c + 2}), ord($var{$c + 3}));
 							$c += 3;
 							$utf16 = $this->_utf82utf16($char);
 							$ascii .= sprintf('\u%04s', bin2hex($utf16));
 							break;
-
 						case (($ord_var_c & 0xFC) == 0xF8):
 							// characters U-00200000 - U-03FFFFFF, mask 111110XX
 							// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
@@ -373,7 +348,6 @@ class CJSON{
 							$utf16 = $this->_utf82utf16($char);
 							$ascii .= sprintf('\u%04s', bin2hex($utf16));
 							break;
-
 						case (($ord_var_c & 0xFE) == 0xFC):
 							// characters U-04000000 - U-7FFFFFFF, mask 1111110X
 							// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
@@ -389,71 +363,54 @@ class CJSON{
 							break;
 					}
 				}
-
 				return '"'.$ascii.'"';
-
 			case 'array':
-			   /**
-				*
-				* As per JSON spec ifany array key is not an integer
-				* we must treat the the whole array as an object. We
-				* also try to catch a sparsely populated associative
-				* array with numeric keys here because some JS engines
-				* will create an array with empty indexes up to
-				* max_index which can cause memory issues and because
-				* the keys, which may be relevant, will be remapped
-				* otherwise.
-				*
-				* As per the ECMA and JSON specification an object may
-				* have any string as a property. Unfortunately due to
-				* a hole in the ECMA specification ifthe key is a
-				* ECMA reserved word or starts with a digit the
-				* parameter is only accessible using ECMAScript's
-				* bracket notation.
-				*
-				*/
+				/*
+				 *
+				 * As per JSON spec ifany array key is not an integer
+				 * we must treat the the whole array as an object. We
+				 * also try to catch a sparsely populated associative
+				 * array with numeric keys here because some JS engines
+				 * will create an array with empty indexes up to
+				 * max_index which can cause memory issues and because
+				 * the keys, which may be relevant, will be remapped
+				 * otherwise.
+				 *
+				 * As per the ECMA and JSON specification an object may
+				 * have any string as a property. Unfortunately due to
+				 * a hole in the ECMA specification ifthe key is a
+				 * ECMA reserved word or starts with a digit the
+				 * parameter is only accessible using ECMAScript's
+				 * bracket notation.
+				 */
 
 				// treat as a JSON object
-				if (is_array($var) && count($var) &&
-					(array_keys($var) !== range(0, sizeof($var) - 1))) {
-						$properties = array_map(array($this, '_name_value'),
-											array_keys($var),
-											array_values($var));
-
+				if (is_array($var) && count($var) && array_keys($var) !== range(0, sizeof($var) - 1)) {
+					$properties = array_map(array($this, '_name_value'), array_keys($var), array_values($var));
 					return '{' . join(',', $properties) . '}';
 				}
 
 				// treat it like a regular array
 				$elements = array_map(array($this, '_json_encode'), $var);
-
 				return '[' . join(',', $elements) . ']';
-
 			case 'object':
 				$vars = get_object_vars($var);
-
-				$properties = array_map(array($this, '_name_value'),
-										array_keys($vars),
-										array_values($vars));
-
+				$properties = array_map(array($this, '_name_value'), array_keys($vars), array_values($vars));
 				return '{' . join(',', $properties) . '}';
-
 			default:
-
 				if ($this->_config['noerror']) {
 					return 'null';
 				}
-
 				throw Solar::exception(
 					'Solar_Json',
 					'ERR_CANNOT_ENCODE',
-					gettype($var) . ' cannot be encoded as a JSON string',
+					gettype($var).' cannot be encoded as a JSON string',
 					array('var' => $var)
 				);
 		}
 	}
 
 	/**
-	 *
 	 * Decodes a JSON string into appropriate variable.
 	 *
 	 * Note: several changes were made in translating this method from
@@ -468,17 +425,12 @@ class CJSON{
 	 * nested inside of an array or object.
 	 *
 	 * @param string $str String encoded in JSON format
-	 *
 	 * @param bool $asArray Optional argument to decode as an array.
-	 *
 	 * @return mixed decoded value
-	 *
 	 * @todo Rewrite this based off of method used in Solar_Json_Checker
-	 *
 	 */
 	protected function _json_decode($str, $asArray = false) {
 		$str = $this->_reduce_string($str);
-
 		switch (zbx_strtolower($str)) {
 			case 'true':
 				// JSON_checker test suite claims
@@ -492,7 +444,6 @@ class CJSON{
 					return null;
 				}
 				break;
-
 			case 'false':
 				// JSON_checker test suite claims
 				// "A JSON payload should be an object or array, not a string."
@@ -505,39 +456,30 @@ class CJSON{
 					return null;
 				}
 				break;
-
 			case 'null':
 				return null;
-
 			default:
 				$m = array();
 
 				if (is_numeric($str) || ctype_digit($str) || ctype_xdigit($str)) {
-					// Return float or int, or null as appropriate
+					// return float or int, or null as appropriate
 					if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
-						return ((float) $str == (integer) $str)
-							? (integer) $str
-							: (float) $str;
+						return ((float) $str == (integer) $str) ? (integer) $str : (float) $str;
 					}
 					else {
 						return null;
 					}
 					break;
-
 				}
-				else if (preg_match('/^("|\').*(\1)$/s', $str, $m)
-							&& $m[1] == $m[2]) {
-					// STRINGS RETURNED IN UTF-8 FORMAT
+				elseif (preg_match('/^("|\').*(\1)$/s', $str, $m) && $m[1] == $m[2]) {
+					// strings returned in UTF-8 format
 					$delim = substr($str, 0, 1);
 					$chrs = substr($str, 1, -1);
 					$utf8 = '';
 					$strlen_chrs = zbx_strlen($chrs);
-
 					for ($c = 0; $c < $strlen_chrs; ++$c) {
-
 						$substr_chrs_c_2 = substr($chrs, $c, 2);
 						$ord_chrs_c = ord($chrs{$c});
-
 						switch (true) {
 							case $substr_chrs_c_2 == '\b':
 								$utf8 .= chr(0x08);
@@ -559,66 +501,55 @@ class CJSON{
 								$utf8 .= chr(0x0D);
 								++$c;
 								break;
-
 							case $substr_chrs_c_2 == '\\"':
 							case $substr_chrs_c_2 == '\\\'':
 							case $substr_chrs_c_2 == '\\\\':
 							case $substr_chrs_c_2 == '\\/':
-								if (($delim == '"' && $substr_chrs_c_2 != '\\\'') ||
-									($delim == "'" && $substr_chrs_c_2 != '\\"')) {
+								if ($delim == '"' && $substr_chrs_c_2 != '\\\'' || $delim == "'"
+										&& $substr_chrs_c_2 != '\\"') {
 									$utf8 .= $chrs{++$c};
 								}
 								break;
-
 							case preg_match('/\\\u[0-9A-F]{4}/i', substr($chrs, $c, 6)):
 								// single, escaped unicode character
-								$utf16 = chr(hexdec(substr($chrs, ($c + 2), 2)))
-									   . chr(hexdec(substr($chrs, ($c + 4), 2)));
+								$utf16 = chr(hexdec(substr($chrs, $c + 2, 2))).chr(hexdec(substr($chrs, $c + 4, 2)));
 								$utf8 .= $this->_utf162utf8($utf16);
 								$c += 5;
 								break;
-
-							case ($ord_chrs_c >= 0x20) && ($ord_chrs_c <= 0x7F):
+							case $ord_chrs_c >= 0x20 && $ord_chrs_c <= 0x7F:
 								$utf8 .= $chrs{$c};
 								break;
-
 							case ($ord_chrs_c & 0xE0) == 0xC0:
 								// characters U-00000080 - U-000007FF, mask 110XXXXX
 								//see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 								$utf8 .= substr($chrs, $c, 2);
 								++$c;
 								break;
-
 							case ($ord_chrs_c & 0xF0) == 0xE0:
 								// characters U-00000800 - U-0000FFFF, mask 1110XXXX
 								// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 								$utf8 .= substr($chrs, $c, 3);
 								$c += 2;
 								break;
-
 							case ($ord_chrs_c & 0xF8) == 0xF0:
 								// characters U-00010000 - U-001FFFFF, mask 11110XXX
 								// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 								$utf8 .= substr($chrs, $c, 4);
 								$c += 3;
 								break;
-
 							case ($ord_chrs_c & 0xFC) == 0xF8:
 								// characters U-00200000 - U-03FFFFFF, mask 111110XX
 								// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 								$utf8 .= substr($chrs, $c, 5);
 								$c += 4;
 								break;
-
 							case ($ord_chrs_c & 0xFE) == 0xFC:
 								// characters U-04000000 - U-7FFFFFFF, mask 1111110X
 								// see http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 								$utf8 .= substr($chrs, $c, 6);
 								$c += 5;
 								break;
-
 						}
-
 					}
 
 					if (in_array($this->_level, array(self::IN_ARR, self::IN_OBJ))) {
@@ -627,10 +558,9 @@ class CJSON{
 					else {
 						return null;
 					}
-
-				} else if (preg_match('/^\[.*\]$/s', $str) || preg_match('/^\{.*\}$/s', $str)) {
+				}
+				elseif (preg_match('/^\[.*\]$/s', $str) || preg_match('/^\{.*\}$/s', $str)) {
 					// array, or object notation
-
 					if ($str{0} == '[') {
 						$stk = array(self::IN_ARR);
 						$this->_level = self::IN_ARR;
@@ -647,10 +577,7 @@ class CJSON{
 						}
 						$this->_level = self::IN_OBJ;
 					}
-
-					array_push($stk, array('what'  => self::SLICE,
-										   'where' => 0,
-										   'delim' => false));
+					array_push($stk, array('what' => self::SLICE, 'where' => 0, 'delim' => false));
 
 					$chrs = substr($str, 1, -1);
 					$chrs = $this->_reduce_string($chrs);
@@ -658,35 +585,29 @@ class CJSON{
 					if ($chrs == '') {
 						if (reset($stk) == self::IN_ARR) {
 							return $arr;
-
 						}
 						else {
 							return $obj;
-
 						}
 					}
 
 					$strlen_chrs = zbx_strlen($chrs);
-
 					for ($c = 0; $c <= $strlen_chrs; ++$c) {
-
 						$top = end($stk);
 						$substr_chrs_c_2 = substr($chrs, $c, 2);
 
-						if (($c == $strlen_chrs) || (($chrs{$c} == ',') && ($top['what'] == self::SLICE))) {
+						if ($c == $strlen_chrs || ($chrs{$c} == ',' && $top['what'] == self::SLICE)) {
 							// found a comma that is not inside a string, array, etc.,
 							// OR we've reached the end of the character list
-							$slice = substr($chrs, $top['where'], ($c - $top['where']));
-							array_push($stk, array('what' => self::SLICE, 'where' => ($c + 1), 'delim' => false));
-							//print("Found split at {$c}: ".substr($chrs, $top['where'], (1 + $c - $top['where']))."\n");
+							$slice = substr($chrs, $top['where'], $c - $top['where']);
+							array_push($stk, array('what' => self::SLICE, 'where' => $c + 1, 'delim' => false));
 
 							if (reset($stk) == self::IN_ARR) {
 								$this->_level = self::IN_ARR;
 								// we are in an array, so just push an element onto the stack
 								array_push($arr, $this->_json_decode($slice, $asArray));
-
 							}
-							else if (reset($stk) == self::IN_OBJ) {
+							elseif (reset($stk) == self::IN_OBJ) {
 								$this->_level = self::IN_OBJ;
 								// we are in an object, so figure
 								// out the property name and set an
@@ -696,8 +617,8 @@ class CJSON{
 
 								if (preg_match('/^\s*(["\'].*[^\\\]["\'])\s*:\s*(\S.*),?$/Uis', $slice, $parts)) {
 									// "name":value pair
-									$key = $this->_json_decode($parts[1],$asArray);
-									$val = $this->_json_decode($parts[2],$asArray);
+									$key = $this->_json_decode($parts[1], $asArray);
+									$val = $this->_json_decode($parts[2], $asArray);
 
 									if ($asArray) {
 										$obj[$key] = $val;
@@ -706,10 +627,10 @@ class CJSON{
 										$obj->$key = $val;
 									}
 								}
-								else if (preg_match('/^\s*(\w+)\s*:\s*(\S.*),?$/Uis', $slice, $parts)) {
+								elseif (preg_match('/^\s*(\w+)\s*:\s*(\S.*),?$/Uis', $slice, $parts)) {
 									// name:value pair, where name is unquoted
 									$key = $parts[1];
-									$val = $this->_json_decode($parts[2],$asArray);
+									$val = $this->_json_decode($parts[2], $asArray);
 
 									if ($asArray) {
 										$obj[$key] = $val;
@@ -718,12 +639,12 @@ class CJSON{
 										$obj->$key = $val;
 									}
 								}
-								else if (preg_match('/^\s*(["\']["\'])\s*:\s*(\S.*),?$/Uis', $slice, $parts)) {
+								elseif (preg_match('/^\s*(["\']["\'])\s*:\s*(\S.*),?$/Uis', $slice, $parts)) {
 									// "":value pair
 									//$key = $this->_json_decode($parts[1]);
 									// use string that matches ext/json
 									$key = '_empty_';
-									$val = $this->_json_decode($parts[2],$asArray);
+									$val = $this->_json_decode($parts[2], $asArray);
 
 									if ($asArray) {
 										$obj[$key] = $val;
@@ -732,100 +653,72 @@ class CJSON{
 										$obj->$key = $val;
 									}
 								}
-
 							}
-
 						}
-						else if ((($chrs{$c} == '"') || ($chrs{$c} == "'")) && ($top['what'] != self::IN_STR)) {
+						elseif (($chrs{$c} == '"' || $chrs{$c} == "'") && $top['what'] != self::IN_STR) {
 							// found a quote, and we are not inside a string
 							array_push($stk, array('what' => self::IN_STR, 'where' => $c, 'delim' => $chrs{$c}));
-							//print("Found start of string at {$c}\n");
-
 						}
-						else if (($chrs{$c} == $top['delim']) &&
-								($top['what'] == self::IN_STR) &&
-								((zbx_strlen(substr($chrs, 0, $c)) - zbx_strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)) {
+						elseif ($chrs{$c} == $top['delim'] && $top['what'] == self::IN_STR
+								&& ((zbx_strlen(substr($chrs, 0, $c)) - zbx_strlen(rtrim(substr($chrs, 0, $c), '\\'))) % 2 != 1)) {
 							// found a quote, we're in a string, and it's not escaped
 							// we know that it's not escaped becase there is _not_ an
 							// odd number of backslashes at the end of the string so far
 							array_pop($stk);
-							//print("Found end of string at {$c}: ".substr($chrs, $top['where'], (1 + 1 + $c - $top['where']))."\n");
-
 						}
-						else if (($chrs{$c} == '[') &&
-							in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
+						elseif ($chrs{$c} == '['
+								&& in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
 							// found a left-bracket, and we are in an array, object, or slice
 							array_push($stk, array('what' => self::IN_ARR, 'where' => $c, 'delim' => false));
-							//print("Found start of array at {$c}\n");
-
 						}
-						else if (($chrs{$c} == ']') && ($top['what'] == self::IN_ARR)) {
+						elseif ($chrs{$c} == ']' && $top['what'] == self::IN_ARR) {
 							// found a right-bracket, and we're in an array
 							$this->_level = null;
 							array_pop($stk);
-							//print("Found end of array at {$c}: ".substr($chrs, $top['where'], (1 + $c - $top['where']))."\n");
-
 						}
-						else if (($chrs{$c} == '{') &&
-							in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
+						elseif ($chrs{$c} == '{'
+								&& in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
 							// found a left-brace, and we are in an array, object, or slice
 							array_push($stk, array('what' => self::IN_OBJ, 'where' => $c, 'delim' => false));
-							//print("Found start of object at {$c}\n");
-
 						}
-						else if (($chrs{$c} == '}') && ($top['what'] == self::IN_OBJ)) {
+						elseif ($chrs{$c} == '}' && $top['what'] == self::IN_OBJ) {
 							// found a right-brace, and we're in an object
 							$this->_level = null;
 							array_pop($stk);
-							//print("Found end of object at {$c}: ".substr($chrs, $top['where'], (1 + $c - $top['where']))."\n");
-
 						}
-						else if (($substr_chrs_c_2 == '/*') &&
-							in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
+						elseif ($substr_chrs_c_2 == '/*'
+								&& in_array($top['what'], array(self::SLICE, self::IN_ARR, self::IN_OBJ))) {
 							// found a comment start, and we are in an array, object, or slice
 							array_push($stk, array('what' => self::IN_CMT, 'where' => $c, 'delim' => false));
 							$c++;
-							//print("Found start of comment at {$c}\n");
-
 						}
-						else if (($substr_chrs_c_2 == '*/') && ($top['what'] == self::IN_CMT)) {
+						elseif ($substr_chrs_c_2 == '*/' && ($top['what'] == self::IN_CMT)) {
 							// found a comment end, and we're in one now
 							array_pop($stk);
 							$c++;
-
-							for ($i = $top['where']; $i <= $c; ++$i)
+							for ($i = $top['where']; $i <= $c; ++$i) {
 								$chrs = substr_replace($chrs, ' ', $i, 1);
-
-							//print("Found end of comment at {$c}: ".substr($chrs, $top['where'], (1 + $c - $top['where']))."\n");
-
+							}
 						}
-
 					}
 
 					if (reset($stk) == self::IN_ARR) {
 						return $arr;
-
 					}
-					else if (reset($stk) == self::IN_OBJ) {
+					elseif (reset($stk) == self::IN_OBJ) {
 						return $obj;
-
 					}
-
 				}
 		}
 	}
 
 	/**
-	 *
 	 * Array-walking method for use in generating JSON-formatted name-value
 	 * pairs in the form of '"name":value'.
 	 *
 	 * @param string $name name of key to use
-	 *
 	 * @param mixed $value element to be encoded
-	 *
 	 * @return string JSON-formatted name-value pair
-	 *
 	 */
 	protected function _name_value($name, $value) {
 		$encoded_value = $this->_json_encode($value);
@@ -833,7 +726,6 @@ class CJSON{
 	}
 
 	/**
-	 *
 	 * Convert a string from one UTF-16 char to one UTF-8 char.
 	 *
 	 * Normally should be handled by mb_convert_encoding, but
@@ -841,17 +733,13 @@ class CJSON{
 	 * that lack the multibye string extension.
 	 *
 	 * @param string $utf16 UTF-16 character
-	 *
 	 * @return string UTF-8 character
-	 *
 	 */
 	protected function _utf162utf8($utf16) {
 		// oh please oh please oh please oh please oh please
-		if (!$this->_config['bypass_mb'] &&
-			function_exists('mb_convert_encoding')) {
-				return mb_convert_encoding($utf16, 'UTF-8', 'UTF-16');
+		if (!$this->_config['bypass_mb'] && function_exists('mb_convert_encoding')) {
+			return mb_convert_encoding($utf16, 'UTF-8', 'UTF-16');
 		}
-
 		$bytes = (ord($utf16{0}) << 8) | ord($utf16{1});
 
 		switch (true) {
@@ -859,27 +747,20 @@ class CJSON{
 				// this case should never be reached, because we are in ASCII range
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 				return chr(0x7F & $bytes);
-
 			case (0x07FF & $bytes) == $bytes:
 				// return a 2-byte UTF-8 character
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-				return chr(0xC0 | (($bytes >> 6) & 0x1F))
-					 . chr(0x80 | ($bytes & 0x3F));
-
+				return chr(0xC0 | (($bytes >> 6) & 0x1F)).chr(0x80 | ($bytes & 0x3F));
 			case (0xFFFF & $bytes) == $bytes:
 				// return a 3-byte UTF-8 character
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-				return chr(0xE0 | (($bytes >> 12) & 0x0F))
-					 . chr(0x80 | (($bytes >> 6) & 0x3F))
-					 . chr(0x80 | ($bytes & 0x3F));
+				return chr(0xE0 | (($bytes >> 12) & 0x0F)).chr(0x80 | (($bytes >> 6) & 0x3F)).chr(0x80 | ($bytes & 0x3F));
 		}
-
-	// ignoring UTF-32 for now, sorry
-	return '';
+		// ignoring UTF-32 for now, sorry
+		return '';
 	}
 
 	/**
-	 *
 	 * Convert a string from one UTF-8 char to one UTF-16 char.
 	 *
 	 * Normally should be handled by mb_convert_encoding, but
@@ -887,15 +768,12 @@ class CJSON{
 	 * that lack the multibye string extension.
 	 *
 	 * @param string $utf8 UTF-8 character
-	 *
 	 * @return string UTF-16 character
-	 *
 	 */
 	protected function _utf82utf16($utf8) {
 		// oh please oh please oh please oh please oh please
-		if (!$this->_config['bypass_mb'] &&
-			function_exists('mb_convert_encoding')) {
-				return mb_convert_encoding($utf8, 'UTF-16', 'UTF-8');
+		if (!$this->_config['bypass_mb'] && function_exists('mb_convert_encoding')) {
+			return mb_convert_encoding($utf8, 'UTF-16', 'UTF-8');
 		}
 
 		switch (zbx_strlen($utf8)) {
@@ -903,35 +781,25 @@ class CJSON{
 				// this case should never be reached, because we are in ASCII range
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 				return $utf8;
-
 			case 2:
 				// return a UTF-16 character from a 2-byte UTF-8 char
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-				return chr(0x07 & (ord($utf8{0}) >> 2))
-					 . chr((0xC0 & (ord($utf8{0}) << 6))
-						 | (0x3F & ord($utf8{1})));
-
+				return chr(0x07 & (ord($utf8{0}) >> 2)).chr((0xC0 & (ord($utf8{0}) << 6)) | (0x3F & ord($utf8{1})));
 			case 3:
 				// return a UTF-16 character from a 3-byte UTF-8 char
 				// see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-				return chr((0xF0 & (ord($utf8{0}) << 4))
-						 | (0x0F & (ord($utf8{1}) >> 2)))
-					 . chr((0xC0 & (ord($utf8{1}) << 6))
-						 | (0x7F & ord($utf8{2})));
+				return chr((0xF0 & (ord($utf8{0}) << 4)) | (0x0F & (ord($utf8{1}) >> 2))).
+						chr((0xC0 & (ord($utf8{1}) << 6)) | (0x7F & ord($utf8{2})));
 		}
-
 		// ignoring UTF-32 for now, sorry
 		return '';
 	}
 
 	/**
-	 *
 	 * Reduce a string by removing leading and trailing comments and whitespace.
 	 *
 	 * @param string $str string value to strip of comments and whitespace
-	 *
 	 * @return string string value stripped of comments and whitespace
-	 *
 	 */
 	protected function _reduce_string($str) {
 		$str = preg_replace(array(
@@ -945,80 +813,68 @@ class CJSON{
 			'#/\*(.+)\*/\s*$#Us'
 
 		), '', $str);
-
 		// eliminate extraneous space
-	return trim($str);
+		return trim($str);
 	}
 
 	protected function _exception($code, $info = array()) {
 		$class = get_class($this);
-
 		SDI(array($class, $code, (array) $info));
 	}
 
-
-//***************************************************************************
-// 								CHECK JSON									*
-//***************************************************************************
-	const S_ERR = -1;			// Error
-	const S_SPA = 0;			// Space
-	const S_WSP = 1;			// Other whitespace
-	const S_LBE = 2;			// {
-	const S_RBE = 3;			// }
-	const S_LBT = 4;			// [
-	const S_RBT = 5;			// ]
-	const S_COL = 6;			// :
-	const S_COM = 7;			// ,
-	const S_QUO = 8;			// "
-	const S_BAC = 9;			// \
-	const S_SLA = 10;			// /
-	const S_PLU = 11;			// +
-	const S_MIN = 12;			// -
-	const S_DOT = 13;			// .
-	const S_ZER = 14;			// 0
-	const S_DIG = 15;			// 123456789
-	const S__A_ = 16;			// a
-	const S__B_ = 17;			// b
-	const S__C_ = 18;			// c
-	const S__D_ = 19;			// d
-	const S__E_ = 20;			// e
-	const S__F_ = 21;			// f
-	const S__L_ = 22;			// l
-	const S__N_ = 23;			// n
-	const S__R_ = 24;			// r
-	const S__S_ = 25;			// s
-	const S__T_ = 26;			// t
-	const S__U_ = 27;			// u
-	const S_A_F = 28;			// ABCDF
-	const S_E = 29;				// E
-	const S_ETC = 30;			// Everything else
+	//***************************************************************************
+	// 								CHECK JSON									*
+	//***************************************************************************
+	const S_ERR = -1;	// Error
+	const S_SPA = 0;	// Space
+	const S_WSP = 1;	// Other whitespace
+	const S_LBE = 2;	// {
+	const S_RBE = 3;	// }
+	const S_LBT = 4;	// [
+	const S_RBT = 5;	// ]
+	const S_COL = 6;	// :
+	const S_COM = 7;	// ,
+	const S_QUO = 8;	// "
+	const S_BAC = 9;	// \
+	const S_SLA = 10;	// /
+	const S_PLU = 11;	// +
+	const S_MIN = 12;	// -
+	const S_DOT = 13;	// .
+	const S_ZER = 14;	// 0
+	const S_DIG = 15;	// 123456789
+	const S__A_ = 16;	// a
+	const S__B_ = 17;	// b
+	const S__C_ = 18;	// c
+	const S__D_ = 19;	// d
+	const S__E_ = 20;	// e
+	const S__F_ = 21;	// f
+	const S__L_ = 22;	// l
+	const S__N_ = 23;	// n
+	const S__R_ = 24;	// r
+	const S__S_ = 25;	// s
+	const S__T_ = 26;	// t
+	const S__U_ = 27;	// u
+	const S_A_F = 28;	// ABCDF
+	const S_E = 29;		// E
+	const S_ETC = 30;	// Everything else
 
 	/**
-	 *
 	 * Map of 128 ASCII characters into the 32 character classes.
-	 *
 	 * The remaining Unicode characters should be mapped to S_ETC.
 	 *
 	 * @var array
-	 *
 	 */
 	protected $_ascii_class = array();
 
 	/**
-	 *
 	 * State transition table.
-	 *
 	 * @var array
-	 *
 	 */
 	protected $_state_transition_table = array();
 
 	/**
-	 *
 	 * These modes can be pushed on the "pushdown automata" (PDA) stack.
-	 *
 	 * @constant
-	 *
 	 */
 	const MODE_DONE	 = 1;
 	const MODE_KEY	  = 2;
@@ -1026,34 +882,24 @@ class CJSON{
 	const MODE_ARRAY	= 4;
 
 	/**
-	 *
 	 * Max depth allowed for nested structures.
-	 *
 	 * @constant
-	 *
 	 */
 	const MAX_DEPTH = 20;
 
 	/**
-	 *
 	 * The stack to maintain the state of nested structures.
-	 *
 	 * @var array
-	 *
 	 */
 	protected $_the_stack = array();
 
 	/**
-	 *
 	 * Pointer for the top of the stack.
-	 *
 	 * @var int
-	 *
 	 */
 	protected $_the_top;
 
 	/**
-	 *
 	 * The isValid method takes a UTF-16 encoded string and determines if it is
 	 * a syntactically correct JSON text.
 	 *
@@ -1061,28 +907,16 @@ class CJSON{
 	 * state machine with a stack.
 	 *
 	 * @param string $str The JSON text to validate
-	 *
 	 * @return bool
-	 *
 	 */
 	public function isValid($str) {
-// string length
 		$len = zbx_strlen($str);
-
-// the next character
-//$b = 0;
-// the next character class
-//$c = 0;
-// the next state
-//$s = 0;
-
 		$_the_state = 0;
 		$this->_the_top = -1;
 		$this->_push(self::MODE_DONE);
 
-		for($_the_index = 0; $_the_index < $len; $_the_index++) {
+		for ($_the_index = 0; $_the_index < $len; $_the_index++) {
 			$b = $str{$_the_index};
-
 			if (chr(ord($b) & 127) == $b) {
 				$c = $this->_ascii_class[ord($b)];
 				if ($c <= self::S_ERR) {
@@ -1093,21 +927,19 @@ class CJSON{
 				$c = self::S_ETC;
 			}
 
-// Get the next state from the transition table
+			// get the next state from the transition table
 			$s = $this->_state_transition_table[$_the_state][$c];
 
 			if ($s < 0) {
-// Perform one of the predefined actions
-
+				// perform one of the predefined actions
 				switch ($s) {
-// empty }
+					// empty }
 					case -9:
 						if (!$this->_pop(self::MODE_KEY)) {
 							return false;
 						}
 						$_the_state = 9;
 						break;
-
 					// {
 					case -8:
 						if (!$this->_push(self::MODE_KEY)) {
@@ -1115,7 +947,6 @@ class CJSON{
 						}
 						$_the_state = 1;
 						break;
-
 					// }
 					case -7:
 						if (!$this->_pop(self::MODE_OBJECT)) {
@@ -1123,7 +954,6 @@ class CJSON{
 						}
 						$_the_state = 9;
 						break;
-
 					// [
 					case -6:
 						if (!$this->_push(self::MODE_ARRAY)) {
@@ -1131,7 +961,6 @@ class CJSON{
 						}
 						$_the_state = 2;
 						break;
-
 					// ]
 					case -5:
 						if (!$this->_pop(self::MODE_ARRAY)) {
@@ -1139,7 +968,6 @@ class CJSON{
 						}
 						$_the_state = 9;
 						break;
-
 					// "
 					case -4:
 						switch ($this->_the_stack[$this->_the_top]) {
@@ -1154,7 +982,6 @@ class CJSON{
 								return false;
 						}
 						break;
-
 					// '
 					case -3:
 						switch ($this->_the_stack[$this->_the_top]) {
@@ -1170,42 +997,33 @@ class CJSON{
 								return false;
 						}
 						break;
-
 					// :
 					case -2:
 						if ($this->_pop(self::MODE_KEY) && $this->_push(self::MODE_OBJECT)) {
 							$_the_state = 28;
 							break;
 						}
-
 					// syntax error
 					case -1:
 						return false;
 				}
 			}
 			else {
-
 				// change the state and iterate
 				$_the_state = $s;
-
 			}
-
 		}
-
 		if ($_the_state == 9 && $this->_pop(self::MODE_DONE)) {
 			return true;
 		}
-
-	return false;
+		return false;
 	}
 
 	/**
-	 *
 	 * Map the 128 ASCII characters into the 32 character classes.
 	 * The remaining Unicode characters should be mapped to S_ETC.
 	 *
 	 * @return void
-	 *
 	 */
 	protected function _mapAscii() {
 		$this->_ascii_class = array(
@@ -1232,17 +1050,14 @@ class CJSON{
 	}
 
 	/**
-	 *
 	 * The state transition table takes the current state and the current symbol,
 	 * and returns either a new state or an action. A new state is a number between
 	 * 0 and 29. An action is a negative number between -1 and -9. A JSON text is
 	 * accepted if the end of the text is in state 9 and mode is MODE_DONE.
 	 *
 	 * @return void;
-	 *
 	 */
 	protected function _setStateTransitionTable() {
-
 		$this->_state_transition_table = array(
 			array( 0, 0,-8,-1,-6,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
 			array( 1, 1,-1,-9,-1,-1,-1,-1, 3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
@@ -1278,45 +1093,34 @@ class CJSON{
 	}
 
 	/**
-	 *
 	 * Push a mode onto the stack. Return false if there is overflow.
 	 *
 	 * @param int $mode Mode to push onto the stack
-	 *
 	 * @return bool Success/failure of stack push
-	 *
 	 */
 	protected function _push($mode) {
 		$this->_the_top++;
-
 		if ($this->_the_top >= self::MAX_DEPTH) {
 			return false;
 		}
-
 		$this->_the_stack[$this->_the_top] = $mode;
-
-	return true;
+		return true;
 	}
 
 	/**
-	 *
 	 * Pop the stack, assuring that the current mode matches the expectation.
 	 * Return false if there is underflow or if the modes mismatch.
 	 *
 	 * @param int $mode Mode to pop from the stack
-	 *
 	 * @return bool Success/failure of stack pop
-	 *
 	 */
 	protected function _pop($mode) {
 		if ($this->_the_top < 0 || $this->_the_stack[$this->_the_top] != $mode) {
 			return false;
 		}
-
 		$this->_the_stack[$this->_the_top] = 0;
 		$this->_the_top--;
-
-	return true;
+		return true;
 	}
 }
 ?>

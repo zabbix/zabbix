@@ -299,7 +299,7 @@ class CIconMap extends CZBXAPI {
 	 */
 	public function update(array $iconMaps) {
 		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can create icon maps.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only super admins can update icon maps.'));
 		}
 
 		$iconMaps = zbx_toArray($iconMaps);

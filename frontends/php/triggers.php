@@ -86,7 +86,7 @@ check_fields($fields);
 validate_sort_and_sortorder('description', ZBX_SORT_UP);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
-$_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_DISABLED : TRIGGER_MULT_EVENT_ENABLED;
+$_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 $_REQUEST['go'] = get_request('go', 'none');
 
 // validate permissions
