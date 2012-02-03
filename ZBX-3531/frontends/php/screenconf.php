@@ -64,10 +64,6 @@ require_once('include/page_header.php');
 		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
-
-// Import
-		'rules' =>			array(T_ZBX_STR, O_OPT,	null,	DB_ID,		null),
-		'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL)
 	);
 
 	check_fields($fields);
@@ -106,28 +102,6 @@ require_once('include/page_header.php');
 		print($export->export());
 		exit();
 	}
-
-// IMPORT ///////////////////////////////////
-	$rules = get_request('rules', array());
-	if(!isset($_FILES['import_file'])){
-		foreach(array('screen') as $key){
-			$rules[$key]['exist'] = 1;
-			$rules[$key]['missed'] = 1;
-		}
-	}
-
-
-	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
-		require_once('include/export.inc.php');
-		DBstart();
-
-		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		if($result) $result = zbxXML::parseScreen($rules);
-
-		$result = DBend($result);
-		show_messages($result, _('Imported successfully'), _('Import failed'));
-	}
-
 ?>
 <?php
 	$_REQUEST['go'] = get_request('go', 'none');
@@ -235,64 +209,60 @@ require_once('include/page_header.php');
 	$screen_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREENS_BIG, $form);
 
 	if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_IMPORT_SCREEN)
-			$screen_wdgt->addItem(import_screen_form($rules));
-		else if(($_REQUEST['form'] == S_CREATE_SCREEN) || ($_REQUEST['form'] == 'update')){
-			$frmScr = new CFormTable();
+		$frmScr = new CFormTable();
 
-			if(isset($_REQUEST['screenid'])){
-				$options = array(
-					'screenids' => $_REQUEST['screenid'],
-					'editable' => 1,
-					'output' => API_OUTPUT_EXTEND
-				);
-				if(isset($_REQUEST['templateid']))
-					$screens = API::TemplateScreen()->get($options);
-				else
-					$screens = API::Screen()->get($options);
+		if(isset($_REQUEST['screenid'])){
+			$options = array(
+				'screenids' => $_REQUEST['screenid'],
+				'editable' => 1,
+				'output' => API_OUTPUT_EXTEND
+			);
+			if(isset($_REQUEST['templateid']))
+				$screens = API::TemplateScreen()->get($options);
+			else
+				$screens = API::Screen()->get($options);
 
-				$screen = reset($screens);
+			$screen = reset($screens);
 
-				$frmScr->setTitle(S_SCREEN.' "'.$screen['name'].'"');
-				$frmScr->addVar('screenid',$_REQUEST['screenid']);
-			}
-			else{
-				$frmScr->setTitle(S_SCREEN);
-			}
-
-
-			if(isset($_REQUEST['screenid']) && !isset($_REQUEST['form_refresh'])){
-				$name = $screen['name'];
-				$hsize = $screen['hsize'];
-				$vsize = $screen['vsize'];
-
-				$templateid = ($screen['templateid'] > 0) ? $screen['templateid'] : null;
-			}
-			else{
-				$name = get_request('name', '');
-				$hsize = get_request('hsize', 1);
-				$vsize = get_request('bsize', 1);
-
-				$templateid = get_request('templateid');
-			}
-
-			$frmScr->addVar('templateid', $templateid);
-
-			$frmScr->addRow(S_NAME, new CTextBox('name', $name, 32));
-			$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize', $hsize, 3));
-			$frmScr->addRow(S_ROWS, new CNumericBox('vsize', $vsize, 3));
-
-
-			$frmScr->addItemToBottomRow(new CSubmit('save', S_SAVE));
-			if(isset($_REQUEST['screenid'])){
-				/* $frmScr->addItemToBottomRow(SPACE);
-				$frmScr->addItemToBottomRow(new CSubmit('clone',S_CLONE)); !!! TODO */
-				$frmScr->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SCREEN_Q, url_param('form').url_param('screenid'))));
-			}
-			$frmScr->addItemToBottomRow(array(SPACE, new CButtonCancel(url_param('templateid'))));
-
-			$screen_wdgt->addItem($frmScr);
+			$frmScr->setTitle(S_SCREEN.' "'.$screen['name'].'"');
+			$frmScr->addVar('screenid',$_REQUEST['screenid']);
 		}
+		else{
+			$frmScr->setTitle(S_SCREEN);
+		}
+
+
+		if(isset($_REQUEST['screenid']) && !isset($_REQUEST['form_refresh'])){
+			$name = $screen['name'];
+			$hsize = $screen['hsize'];
+			$vsize = $screen['vsize'];
+
+			$templateid = ($screen['templateid'] > 0) ? $screen['templateid'] : null;
+		}
+		else{
+			$name = get_request('name', '');
+			$hsize = get_request('hsize', 1);
+			$vsize = get_request('bsize', 1);
+
+			$templateid = get_request('templateid');
+		}
+
+		$frmScr->addVar('templateid', $templateid);
+
+		$frmScr->addRow(S_NAME, new CTextBox('name', $name, 32));
+		$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize', $hsize, 3));
+		$frmScr->addRow(S_ROWS, new CNumericBox('vsize', $vsize, 3));
+
+
+		$frmScr->addItemToBottomRow(new CSubmit('save', S_SAVE));
+		if(isset($_REQUEST['screenid'])){
+			/* $frmScr->addItemToBottomRow(SPACE);
+			$frmScr->addItemToBottomRow(new CSubmit('clone',S_CLONE)); !!! TODO */
+			$frmScr->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SCREEN_Q, url_param('form').url_param('screenid'))));
+		}
+		$frmScr->addItemToBottomRow(array(SPACE, new CButtonCancel(url_param('templateid'))));
+
+		$screen_wdgt->addItem($frmScr);
 	}
 	else{
 		$form = new CForm();

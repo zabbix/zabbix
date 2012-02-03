@@ -98,10 +98,6 @@
 	'S_EXISTING'=>				_('Existing'),
 	'S_MISSING'=>				_('Missing'),
 
-//	export.inc.php
-	'S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT'=>	_('d.m.y'),
-	'S_EXPORT_TIME_ATTRIBUTE_DATE_FORMAT'=>	_('H.i'),
-
 //	admin.php
 	'S_PREVIOUS'=>				_('Previous'),
 	'S_NEXT'=>				_('Next'),
