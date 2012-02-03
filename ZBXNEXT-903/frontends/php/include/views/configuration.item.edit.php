@@ -79,6 +79,7 @@ else {
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
 	$intereacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
+	$intereacesComboBox->addItem(new CComboItem(0, '', null, 'no'));
 	foreach ($this->data['interfaces'] as $interface) {
 		$option = new CComboItem(
 			$interface['interfaceid'],
@@ -569,6 +570,28 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'p
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
+
+$this->data['dataTypeVisibility'] = array();
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_DECIMAL, 'units');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_DECIMAL, 'row_units');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_OCTAL, 'units');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_OCTAL, 'row_units');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL, 'units');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL, 'row_units');
+
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_DECIMAL, 'multiplier');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_DECIMAL, 'row_multiplier');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_OCTAL, 'multiplier');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_OCTAL, 'row_multiplier');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL, 'multiplier');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL, 'row_multiplier');
+
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_DECIMAL, 'delta');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_DECIMAL, 'row_delta');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_OCTAL, 'delta');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_OCTAL, 'row_delta');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL, 'delta');
+zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL, 'row_delta');
 
 require_once('include/views/js/configuration.item.edit.js.php');
 return $itemWidget;

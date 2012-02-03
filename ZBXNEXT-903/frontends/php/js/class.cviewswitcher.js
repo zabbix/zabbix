@@ -235,6 +235,11 @@ var CViewSwitcher = Class.create({
 	}
 });
 
+function ActionProcessor(actions) {
+	this.actions = actions || {};
+	this.bindEvents();
+}
+
 ActionProcessor.prototype = {
 	bindEvents: function() {
 		var elementId, elementsList = {};
@@ -368,8 +373,3 @@ ActionProcessor.prototype = {
 		jQuery(value).prop('disabled', true);
 	}
 };
-
-function ActionProcessor(actions) {
-	this.actions = actions || {};
-	this.bindEvents();
-}
