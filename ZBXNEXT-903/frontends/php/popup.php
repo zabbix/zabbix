@@ -157,14 +157,45 @@ if (defined($page['title'])) {
 }
 ?>
 <?php
+// allowed 'srcfld1' and 'srcfld2' parameter values for each 'srctbl' value
+$allowedSrcFields = array(
+	'users'					=> '"usergrpid", "alias", "userid"',
+	'triggers'				=> '"description", "triggerid"',
+	'items'					=> '"itemid", "name"',
+	'prototypes'			=> '"itemid", "name"',
+	'graphs'				=> '"graphid", "name"',
+	'sysmaps'				=> '"sysmapid", "name"',
+	'screens'				=> '"screenid"',
+	'slides'				=> '"slideshowid"',
+	'host_group'			=> '"groupid", "name"',
+	'hosts_and_templates'	=> '"name", "hostid"',
+	'help_items'			=> '"key_"',
+	'simple_graph'			=> '"itemid", "name"',
+	'plain_text'			=> '"itemid", "name"',
+	'hosts'					=> '"name", "hostid"',
+	'overview'				=> '"groupid", "name"',
+	'screens'				=> '"screenid"',
+	'screens2'				=> '"screenid", "name"',
+	'host_group_scr'		=> '"groupid", "name"',
+	'host_templates'		=> '"hostid", "host", "templateid", "name"',
+	'nodes'					=> '"nodeid", "name"',
+	'drules'				=> '"druleid", "name"',
+	'dcheckes'				=> '"dcheckid", "name"',
+	'proxies'				=> '"hostid", "host"',
+	'usrgrp'				=> '"usrgrpid", "name"',
+	'templates'				=> '"hostid", "host"',
+	'applications'			=> '"name"',
+	'scripts'				=> '"scriptid", "name"',
+);
+
 //	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'dstfrm' =>				array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 	'dstfld1' =>			array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 	'dstfld2' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'srctbl' =>				array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,	null),
-	'srcfld1' =>			array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,	null),
-	'srcfld2' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'srcfld1'=>				array(T_ZBX_STR, O_MAND,P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
+	'srcfld2'=>				array(T_ZBX_STR, O_OPT,P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
 	'nodeid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
@@ -762,7 +793,7 @@ elseif ($srctbl == 'usrgrp') {
 		$name->setAttribute('onclick', $js_action);
 
 		$table->addRow(array(
-			$multiselect ? new CCheckBox('usrgrps['.zbx_jsValue($usrgrp[$srcfld1]).']', null, null, $usrgrp['usrgrpid']) : null,
+			$multiselect ? new CCheckBox('usrgrps['.$usrgrp['usrgrpid'].']', null, null, $usrgrp['usrgrpid']) : null,
 			$name,
 		));
 	}

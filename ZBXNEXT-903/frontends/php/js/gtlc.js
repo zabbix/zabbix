@@ -46,7 +46,8 @@ addObject: function(domid, time, objData){
 		'loadImage': 0,
 		'loadScroll': 1,
 		'scrollWidthByImage': 0,
-		'mainObject': 0			// object on changing will reflect on all others
+		'mainObject': 0,						// object on changing will reflect on all others
+		'sliderMaximumTimePeriod': 63072000		// maximal allowed period - count of seconds in maximal allowed years count
 	};
 
 	for(var key in this.objectList[domid]){
@@ -68,10 +69,12 @@ addObject: function(domid, time, objData){
 
 	this.objectList[domid].time = time;
 	this.objectList[domid].timeline = create_timeline(this.objectList[domid].domid,
-									  parseInt(time.period),
-									  parseInt(time.starttime),
-									  parseInt(time.usertime),
-									  parseInt(time.endtime));
+		parseInt(time.period),
+		parseInt(time.starttime),
+		parseInt(time.usertime),
+		parseInt(time.endtime),
+		this.objectList[domid].sliderMaximumTimePeriod
+	);
 },
 
 processObjects: function(){
@@ -179,7 +182,8 @@ addScroll: function(e, objid){
 		if(!is_number(g_width)) g_width = 900;
 	}
 
-	var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid, this.objectList[objid].periodFixed);
+	var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid, this.objectList[objid].periodFixed,
+		this.objectList[objid].sliderMaximumTimePeriod);
 	scrl.onchange = this.objectUpdate.bind(this);
 
 	if(obj.dynamic && !is_null($(g_img))){
@@ -376,7 +380,7 @@ function onload_update_scroll(id,w,period,stime,timel,bar_stime){
 // Title: TimeLine COntrol CORE
 var ZBX_TIMELINES = {};
 
-function create_timeline(tlid, period, starttime, usertime, endtime){
+function create_timeline(tlid, period, starttime, usertime, endtime, maximumperiod){
 	if(is_null(tlid)){
 		tlid = ZBX_TIMELINES.length;
 	}
@@ -387,7 +391,7 @@ function create_timeline(tlid, period, starttime, usertime, endtime){
 	if('undefined' == typeof(usertime)) usertime = now;
 	if('undefined' == typeof(endtime)) endtime = now;
 
-	ZBX_TIMELINES[tlid] = new CTimeLine(tlid, period, starttime, usertime, endtime);
+	ZBX_TIMELINES[tlid] = new CTimeLine(tlid, period, starttime, usertime, endtime, maximumperiod);
 
 return ZBX_TIMELINES[tlid];
 }
@@ -403,8 +407,9 @@ _period: null,					// selected period
 _now: false,					// state if time is set to NOW
 
 minperiod: 3600,				// minimal allowed period
+maxperiod: 63072000,			// maximal allowed period - count of seconds in maximal allowed years count
 
-initialize: function($super,id, period, starttime, usertime, endtime){
+initialize: function($super,id, period, starttime, usertime, endtime, maximumperiod) {
 	this.timelineid = id;
 	$super('CTimeLine['+id+']');
 
@@ -415,6 +420,7 @@ initialize: function($super,id, period, starttime, usertime, endtime){
 
 	this.usertime(usertime);
 	this.period(period);
+	this.maxperiod = maximumperiod;
 },
 
 timeNow: function(){
@@ -510,8 +516,8 @@ debug: function(fnc_name, id){
 // Title: graph scrolling
 var ZBX_SCROLLBARS = {};
 
-function scrollCreate(sbid, w, timelineid, fixedperiod){
-	if(is_null(sbid)){
+function scrollCreate(sbid, w, timelineid, fixedperiod, maximumperiod) {
+	if (is_null(sbid)) {
 		sbid = ZBX_SCROLLBARS.length;
 	}
 
@@ -526,7 +532,7 @@ function scrollCreate(sbid, w, timelineid, fixedperiod){
 
 	if(w < 600) w = 600;
 
-	ZBX_SCROLLBARS[sbid] = new CScrollBar(sbid, timelineid, w, fixedperiod);
+	ZBX_SCROLLBARS[sbid] = new CScrollBar(sbid, timelineid, w, fixedperiod, maximumperiod);
 
 return ZBX_SCROLLBARS[sbid];
 }
@@ -603,10 +609,12 @@ arrow: '',					// pressed arrow (l/r)
 changed: 0,					// switches to 1, when scrollbar been moved or period changed
 fixedperiod: 1,				// fixes period on bar changes
 disabled: 1,				// activates/disables scrollbars
+maxperiod: 63072000,		// maximal allowed period - count of seconds in maximal allowed years count
 
-initialize: function($super,sbid, timelineid, width, fixedperiod){ // where to put bar on start(time on graph)
+initialize: function($super,sbid, timelineid, width, fixedperiod, maximalperiod) { // where to put bar on start(time on graph)
 	this.scrollbarid = sbid;
 	$super('CScrollBar['+sbid+']');
+	this.maxperiod = maximalperiod;
 
 try{
 		this.fixedperiod = fixedperiod == 1 ? 1 : 0;
@@ -677,7 +685,7 @@ setFullPeriod: function(){
 	if(this.disabled) return false;
 //---
 	this.timeline.setNow();
-	this.timeline.period(this.timeline.endtime() - this.timeline.starttime());
+	this.timeline.period(this.maxperiod);
 
 // bar
 	this.setBarPosition();
@@ -1431,7 +1439,7 @@ appendZoomLinks: function(){
 	this.dom.linklist[links] = document.createElement('span');
 	this.dom.links.appendChild(this.dom.linklist[links]);
 	this.dom.linklist[links].className = 'link';
-	this.dom.linklist[links].setAttribute('zoom', zooms[key]);
+	this.dom.linklist[links].setAttribute('zoom', this.maxperiod);
 	this.dom.linklist[links].appendChild(document.createTextNode(locale['S_ALL_S']));
 
 	addListener(this.dom.linklist[links],'click',this.setFullPeriod.bindAsEventListener(this),true);

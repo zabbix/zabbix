@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testFormAction extends CWebTest {
 
@@ -185,8 +185,8 @@ class testFormAction extends CWebTest {
 		sleep(1);
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
-		$this->click("usrgrps_'7'");
-		$this->click("usrgrps_'2'");
+		$this->click("usrgrps_7");
+		$this->click("usrgrps_2");
 		$this->click("select");
 		$this->selectWindow("null");
 		sleep(1);
@@ -261,7 +261,5 @@ class testFormAction extends CWebTest {
 
 		DBrestore_tables('actions');
 	}
-
 }
-
 ?>

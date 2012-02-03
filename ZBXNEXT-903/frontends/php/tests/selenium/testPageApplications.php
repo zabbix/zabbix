@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testPageApplications extends CWebTest {
 	// Returns all hosts
@@ -50,7 +50,7 @@ class testPageApplications extends CWebTest {
 		// Header
 		$this->ok(array('Applications', 'Show'));
 
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Delete selected');
 	}

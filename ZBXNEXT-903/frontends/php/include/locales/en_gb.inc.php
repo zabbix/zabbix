@@ -34,30 +34,14 @@
 
 
 //	dicoveryconf.php
-	'S_CREATED_SMALL' => _('created'),
 	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
 	'S_DISCOVERY'=>				_('Discovery'),
-	'S_CONFIGURATION_OF_DISCOVERY'=>	_('Configuration of discovery'),
-	'S_CREATE_RULE'=>			_('Create rule'),
-	'S_SSH'=>				_('SSH'),
-	'S_SMTP'=>				_('SMTP'),
-	'S_FTP'=>				_('FTP'),
-	'S_POP'=>				_('POP'),
-	'S_NNTP'=>				_('NNTP'),
-	'S_IMAP'=>				_('IMAP'),
-	'S_TCP'=>				_('TCP'),
-	'S_ICMPPING'=>				_('ICMP ping'),
-
 	'S_STATUS_OF_DISCOVERY_BIG'=>		_('STATUS OF DISCOVERY'),
 	'S_STATUS_OF_DISCOVERY'=>		_('Status of discovery'),
-	'S_DISCOVERED'=>			_('Discovered'),
-	'S_LOST'=>				_('Lost'),
 
 //	discovery.php
 	'S_UP_TIME'=>				_('Uptime'),
 	'S_DOWN_TIME'=>				_('Downtime'),
-	'S_DISCOVERED_DEVICE'=>			_('Discovered device'),
-	'S_MONITORED_HOST'=>			_('Monitored host'),
 
 //	auditacts.php
 	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -77,7 +61,6 @@
 	'S_IN_CHECK'=>				_('In check'),
 	'S_IDLE_TILL'=>				_('Idle till'),
 	'S_FAILED_ON'=>				_('Failed on'),
-	'S_FAILED'=>				_('Failed'),
 
 //	httpmon.php
 	'S_STATUS_OF_WEB_MONITORING'=>		_('Status of Web monitoring'),
@@ -87,7 +70,6 @@
 	'S_WEB_SCENARIO_IDLE_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	httpconf.php
-	'S_SORT'=>					_('Sort'),
 	'S_STEP'=>					_('Step'),
 
 //	exp_imp.php
@@ -98,10 +80,6 @@
 	'S_PREVIEW'=>				_('Preview'),
 	'S_NO_DATA_SMALL'=>			_('no data'),
 	'S_RULES'=>				_('Rules'),
-	'S_EXISTING'=>				_('Existing'),
-	'S_MISSING'=>				_('Missing'),
-	'S_LOCAL_BIG'=>				_('LOCAL'),
-	'S_SERVER_BIG'=>			_('SERVER'),
 
 //	export.inc.php
 	'S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT'=>	_('d.m.y'),
@@ -145,7 +123,6 @@
 	'S_ACTIONS'=>				_('Actions'),
 	'S_LOGS'=>				_('Logs'),
 	'S_LOGS_BIG'=>				_('LOGS'),
-	'S_ON_BIG'=>				_('ON'),
 	'S_ON'=>					_('On'),
 	'S_OFF'=>					_('Off'),
 	'S_GROUP'=>				_('Group'),
@@ -186,12 +163,6 @@
 // Colours
 
 //	config.php
-	'S_DROPDOWN_FIRST_ENTRY'=>			_('Dropdown first entry'),
-	'S_DROPDOWN_REMEMBER_SELECTED'=>		_('remember selected'),
-	'S_MAX_IN_TABLE' =>				_('Max count of elements to show inside table cell'),
-	'S_DEFAULT_THEME'=>				_('Default theme'),
-	'S_CONFIGURATION_UPDATED'=>			_('Configuration updated'),
-	'S_CONFIGURATION_WAS_NOT_UPDATED'=>		_('Configuration was not updated'),
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
@@ -210,11 +181,9 @@
 	'S_DISABLE_SELECTED_PROXIES' =>	_('Disable hosts monitored by selected proxies?'),
 	'S_DELETE_SELECTED_PROXIES' =>	_('Delete selected proxies?'),
 	'S_CONFIGURATION_OF_PROXIES'=>	_('CONFIGURATION OF PROXIES'),
-	'S_DELETE_SELECTED_PROXY_Q'=>	_('Delete selected proxy?'),
 	'S_HOST_COUNT' => _('Host count'),
 	'S_ITEM_COUNT' => _('Item count'),
 	'S_REQUIRED_PERFORMANCE' => _('Required performance (vps)'),
-	'S_PROXY_MODE' => _('Proxy mode'),
 	'S_PROXY_PASSIVE' => _('Passive'),
 	'S_PROXY_ACTIVE' => _('Active'),
 
@@ -230,7 +199,6 @@
 //	graph.php
 	'S_GRAPHS_COPIED'=>			_('Graphs copied'),
 	'S_CANNOT_COPY_GRAPHS'=>	_('Cannot copy graphs'),
-	'S_SORT_BY'=>				_('Sort by'),
 	'S_PARAMETER'=>				_('Parameter'),
 	'S_COLOR'=>					_('Colour'),
 	'S_UP'=>					_('Up'),
@@ -252,7 +220,6 @@
 
 //	graphs.php
 	'S_ADD_GRAPH_ITEMS' => _('add graph items first'),
-	'S_TITLE'=>				_('Title'),
 	'S_PERCENTILE_LINE'=>			_('Percentile line'),
 	'S_CONFIGURATION_OF_GRAPHS'=>		_('Configuration of graphs'),
 	'S_GRAPH_ADDED'=>			_('Graph added'),
@@ -275,7 +242,6 @@
 	'S_SHOW_WORKING_TIME'=>			_('Show working time'),
 	'S_SHOW_TRIGGERS'=>			_('Show triggers'),
 	'S_3D_VIEW'=>				_('3D view'),
-	'S_LEGEND'=>				_('Legend'),
 	'S_SHOW_LEGEND'=>			_('Show legend'),
 	'S_GRAPH_SUM'=>				_('Graph sum'),
 	'S_GRAPH_ITEM'=>			_('Graph item'),
@@ -331,7 +297,6 @@
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
 	'S_HOST'=>					_('Host'),
-	'S_CONNECT_TO'=>				_('Connect to'),
 	'S_DNS'=>					_('DNS'),
 	'S_IP'=>					_('IP'),
 	'S_PORT'=>					_('Port'),
@@ -340,27 +305,18 @@
 	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
 	'S_ALL_GROUPS'=>				_('All groups'),
-	'S_DNS_NAME'=>					_('DNS name'),
-	'S_IP_ADDRESS'=>				_('IP address'),
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_HOST_GROUP'=>				_('Host group'),
 	'S_UPDATE'=>					_('Update'),
-	'S_AVAILABILITY'=>				_('Availability'),
 	'S_AVAILABLE'=>					_('Available'),
 	'S_NOT_AVAILABLE'=>				_('Not available'),
 	'S_PROXIES'=>					_('Proxies'),
 	'S_PROXIES_BIG'=>				_('PROXIES'),
-	'S_PROXY'=>					_('Proxy'),
 	'S_CREATE_PROXY'=>				_('Create proxy'),
-	'S_PROXY_NAME'=>				_('Proxy name'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
 	'S_INTERFACES' =>				_('Interfaces'),
 
 // templates.php
-	'S_TEMPLATE_ADDED'=>			_('New template added'),
-	'S_CANNOT_ADD_TEMPLATE'=>		_('Cannot add template'),
-	'S_TEMPLATE_UPDATED'=>			_('Template updated'),
-	'S_CANNOT_UPDATE_TEMPLATE'=>		_('Cannot update template'),
 	'S_LINKED_TEMPLATES'=>			_('Linked templates'),
 	'S_LINKED_TO'=>				_('Linked to'),
 	'S_DELETE_AND_CLEAR'=>			_('Delete and clear'),
@@ -387,7 +343,6 @@
 	'S_TEXT'=>						_('Text'),
 	'S_ITEM'=>						_('Item'),
 	'S_MODE'=>						_('Mode'),
-	'S_COPY'=>						_('Copy'),
 	'S_ORIGINAL'=>						_('Original'),
 	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			_('Mass update selected items?'),
 	'S_COPY_SELECTED_ITEMS_Q'=>				_('Copy selected items?'),
@@ -406,14 +361,10 @@
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
 
 //	events.php
-	'S_HISTORY_OF_EVENTS_BIG'=>		_('HISTORY OF EVENTS'),
 	'S_NO_EVENTS_FOUND'=>			_('No events found'),
 	'S_EVENTS_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	_('d M Y H:i:s'),
 	'S_EVENTS_ACTION_TIME_FORMAT'=>		_('d M Y H:i:s'),
-
-//	events.inc.php
-	'S_EVENTS_TRIGGERS_EVENTS_HISTORY_LIST_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	sysmap.php
 	'S_HIDDEN'=>			_('Hidden'),
@@ -570,8 +521,6 @@
 	'S_BAR_REPORT_2'=>			_('Distribution of values for multiple items'),
 	'S_BAR_REPORT_3'=>			_('Compare values for multiple periods'),
 
-	'S_SELECTED_HOSTS'=>			_('Selected hosts'),
-	'S_SELECTED_GROUPS'=>			_('Selected groups'),
 	'S_SCALE'=>				_('Scale'),
 	'S_AVERAGE_BY'=>			_('Average by'),
 	'S_PALETTE'=>				_('Palette'),
@@ -596,18 +545,13 @@
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
 	'S_RESOURCE'=>					_('Resource'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
-	'S_SIMPLE_GRAPH'=>				_('Simple graph'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
-	'S_GRAPH_NAME'=>				_('Graph name'),
 	'S_WIDTH'=>						_('Width'),
 	'S_HEIGHT'=>					_('Height'),
 	'S_CREATE_SCREEN'=>				_('Create screen'),
 	'S_EDIT'=>						_('Edit'),
-	'S_DYNAMIC_ITEM'=>				_('Dynamic item'),
 	'S_DIMENSION_COLS_ROWS'=>		_('Dimension (cols x rows)'),
-	'S_SLIDES'=>					_('Slides'),
-	'S_SHOW_TEXT_AS_HTML'=>			_('Show text as HTML'),
 
 	'S_IMPORT_SCREEN'=>				_('Import screen'),
 
@@ -618,33 +562,14 @@
 //	screenedit.php
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
-	'S_PLAIN_TEXT'=>			_('Plain text'),
-	'S_COLUMN_SPAN'=>			_('Column span'),
-	'S_ROW_SPAN'=>				_('Row span'),
-	'S_SHOW_LINES'=>			_('Show lines'),
 	'S_HOSTS_INFO'=>			_('Hosts info'),
 	'S_TRIGGERS_INFO'=>			_('Triggers info'),
 	'S_SERVER_INFO'=>			_('Server info'),
-	'S_CLOCK'=>				_('Clock'),
-	'S_TRIGGERS_OVERVIEW'=>			_('Triggers overview'),
-	'S_DATA_OVERVIEW'=>			_('Data overview'),
-	'S_HISTORY_OF_ACTIONS'=>		_('History of actions'),
-	'S_HISTORY_OF_EVENTS'=>			_('History of events'),
 
-	'S_TIME_TYPE'=>				_('Time type'),
-	'S_SERVER_TIME'=>			_('Server time'),
 	'S_LOCAL_TIME'=>			_('Local time'),
-	'S_HOST_TIME'=>				_('Host time'),
 
-	'S_STYLE'=>				_('Style'),
-	'S_VERTICAL'=>				_('Vertical'),
-	'S_HORIZONTAL'=>			_('Horizontal'),
-
-	'S_HORIZONTAL_ALIGN'=>			_('Horizontal align'),
-	'S_CENTRE'=>				_('Centre'),
 	'S_RIGHT'=>				_('Right'),
 
-	'S_VERTICAL_ALIGN'=>			_('Vertical align'),
 	'S_MIDDLE'=>				_('Middle'),
 
 //	screens.php
@@ -666,15 +591,9 @@
 	'S_DISABLED'=>				_('Disabled'),
 	'S_DISABLED_BIG'=>			_('DISABLED'),
 	'S_ENABLED'=>				_('Enabled'),
-	'S_DISABLE'=>				_('Disable'),
-	'S_ENABLE'=>				_('Enable'),
 	'S_URL'=>				_('URL'),
-	'S_INSERT'=>				_('Insert'),
 	'S_TIME_SHIFT'=>			_('Time shift'),
-	'S_INCORRECT_DEPENDENCY'=>		_('Incorrect dependency'),
 	'S_INSERT_MACRO'=>			_('Insert macro'),
-	'S_MASS_UPDATE_SELECTED_TRIGGERS_Q'=>	_('Mass update selected triggers?'),
-	'S_COPY_SELECTED_TRIGGERS_Q'=>		_('Copy selected triggers?'),
 	'S_TRIGGER_LOG_FORM'=>	_('Trigger form'),
 
 //	tr_comments.php
@@ -686,8 +605,6 @@
 
 //	tr_status.php
 	'S_STATUS_OF_TRIGGERS_BIG'=>		_('STATUS OF TRIGGERS'),
-	'S_STATUS_OF_HOSTGROUP_TRIGGERS'=>	_('Status of hostgroup triggers'),
-	'S_STATUS_OF_HOST_TRIGGERS'=>		_('Status of host triggers'),
 	'S_SHOW_DETAILS'=>			_('Show details'),
 	'S_FILTER_BY_NAME'=>				_('Filter by name'),
 	'S_ACK'=>				_('Ack'),
@@ -708,7 +625,6 @@
 	'S_PROXY_DELETED'=>			_('Proxy deleted'),
 	'S_CANNOT_DELETE_PROXY'=>	_('Cannot delete proxy'),
 	'S_NAME'=>					_('Name'),
-	'S_DEBUG'=>					_('Debug'),
 	'S_HIDE'=>					_('Hide'),
 	'S_ADD_TO'=>				_('Add to'),
 	'S_REMOVE_FROM'=>			_('Remove from'),
@@ -726,7 +642,6 @@
 	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value'),
 	'S_SCRIPT_ERROR_EMPTY_RESPONSE'=>	_('Empty response received'),
 
-	'S_SCRIPT_ERROR_BIG'=>				_('Possible reasons: 1. incorrect server IP/DNS in the "zabbix.conf.php"; 2. security environment like SELinux is blocking connection; 3. Zabbix server daemon not running.'),
 	'S_NOT_RUN' => 						_('Connection to Zabbix server "%s" refused. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Security environment (for example, SELinux) is blocking the connection; 3. Zabbix server daemon not running; 4. Firewall is blocking TCP connection.'),
 	'S_IP_NOT_AVAILABLE' => 			_('Zabbix server "%s" can not be reached. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect network configuration.'),
 	'S_TIME_OUT' => 					_('Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.'),
@@ -752,9 +667,6 @@
 	'S_SNOOZE'=>				_('Snooze'),
 	'S_MESSAGES'=>				_('Messages'),
 	'S_PROBLEM_ON'=>			_('Problem on'),
-
-//	index.php
-	'S_ZABBIX_BIG'=>			_('ZABBIX'),
 
 //	hostinventoriesoverview.php
 	'S_HOST_INVENTORY_OVERVIEW'=>	_('Host inventory overview'),
@@ -822,12 +734,6 @@
 	'S_TEMPLATE_WITH_APPLICATION'=>			_('Template with application'),
 	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
 
-//	screens.inc.php
-	'S_DELETE_IT_Q'=>				_('Delete it?'),
-	'S_THIS_SCREEN_ROW_NOT_EMPTY'=>			_('This screen-row is not empty'),
-	'S_THIS_SCREEN_COLUMN_NOT_EMPTY'=>		_('This screen-column is not empty'),
-	'S_SCREENS_TRIGGER_FORM_DATE_FORMAT'=>		_('[H:i:s]'),
-
 //	graphs.inc.php
 	'S_NO_GRAPH_WITH'=>					_('No graph item with'),
 	'S_MISSING_ITEMS_FOR_GRAPH'=>				_('Missing items for graph'),
@@ -853,7 +759,6 @@
 //	Menu
 
 	'S_QUEUE'=>				_('Queue'),
-	'S_EVENTS'=>				_('Events'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
 	'S_LOGOUT'=>				_('Logout'),

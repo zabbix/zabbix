@@ -278,7 +278,7 @@ $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm('get');
 		$form->addVar('hostid', $_REQUEST['hostid']);
-		$form->addItem(new CSubmit('form', S_CREATE_RULE));
+		$form->addItem(new CSubmit('form', _('Create rule')));
 	}
 
 	$items_wdgt->addPageHeader(S_CONFIGURATION_OF_DISCOVERY_RULES_BIG, $form);

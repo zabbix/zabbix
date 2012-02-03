@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralValuemap extends CWebTest {
 		private $valuemap1 = '1valuemap1';

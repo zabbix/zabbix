@@ -88,7 +88,7 @@
 			$data['password2']		= get_request('password2', '');
 			$data['url']			= get_request('url', '');
 			$data['autologin']		= get_request('autologin', 0);
-			$data['autologout']		= get_request('autologout', 90);
+			$data['autologout']		= get_request('autologout', 900);
 			$data['lang']			= get_request('lang', 'en_gb');
 			$data['theme']			= get_request('theme', 'default.css');
 			$data['refresh']		= get_request('refresh', 30);
@@ -116,11 +116,8 @@
 		}
 
 		// set autologout
-		if ($data['autologin'] || !isset($_REQUEST['autologout'])) {
+		if ($data['autologin'] || !isset($data['autologout'])) {
 			$data['autologout'] = 0;
-		}
-		elseif (isset($_REQUEST['autologout']) && $data['autologout'] < 90) {
-			$data['autologout'] = 90;
 		}
 
 		// set media types
