@@ -20,12 +20,11 @@
 ?>
 <?php
 class CComboItem extends CTag {
+
 	public function __construct($value, $caption = null, $selected = null, $enabled = null) {
 		parent::__construct('option', 'yes');
 		$this->tag_body_start = '';
-		$this->attributes['value'] = $value;
-		$this->setAttribute('title', $caption);
-
+		$this->setAttribute('value', $value);
 		$this->addItem($caption);
 		$this->setSelected($selected);
 		$this->setEnabled($enabled);
@@ -45,7 +44,6 @@ class CComboItem extends CTag {
 
 	public function addItem($value) {
 		$value = $this->sanitize($value);
-
 		parent::addItem($value);
 	}
 

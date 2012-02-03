@@ -443,8 +443,8 @@ function hostInterfaceTypeNumToName($type) {
 		$hosts = array();
 
 		$db_hostsItems = DBselect(
-			'SELECT i.itemid, h.*'.
-			' FROM hosts h, items i'.
+			'SELECT i.itemid,h.*'.
+			' FROM hosts h,items i'.
 			' WHERE i.hostid=h.hostid'.
 				' AND '.DBcondition('i.itemid', $itemids)
 		);
@@ -480,7 +480,7 @@ function hostInterfaceTypeNumToName($type) {
 		zbx_value2array($templateids);
 		return DBselect(
 			'SELECT h.*'.
-			' FROM hosts h, hosts_templates ht'.
+			' FROM hosts h,hosts_templates ht'.
 			' WHERE h.hostid=ht.hostid'.
 				' AND '.DBcondition('ht.templateid', $templateids)
 		);
@@ -616,7 +616,7 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 		$def_sql['from'][] = 'hosts_groups hg';
 
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid )';
+		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid)';
 	}
 	elseif ($def_options['with_monitored_items']) {
 		$def_sql['from'][] = 'hosts_groups hg';

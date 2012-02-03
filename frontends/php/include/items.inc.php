@@ -444,7 +444,7 @@ function get_item_by_itemid_limited($itemid) {
 	if ($row) {
 		return $row;
 	}
-	error(_s('No item with itemid="%1$s".', $itemid));
+	error(_s('No item with itemid "%1$s".', $itemid));
 	return false;
 }
 
@@ -597,9 +597,25 @@ function itemName($item) {
 function get_realhost_by_itemid($itemid) {
 	$item = get_item_by_itemid($itemid);
 	if ($item['templateid'] <> 0) {
-		return get_realhost_by_itemid($item['templateid']);
+		return get_realhost_by_itemid($item['templateid']); // attention recursion!
 	}
 	return get_host_by_itemid($itemid);
+}
+
+function fillItemsWithChildTemplates(&$items) {
+	$processSecondLevel = false;
+	$dbItems = DBselect('SELECT i.itemid,i.templateid FROM items i WHERE '.DBcondition('i.itemid', zbx_objectValues($items, 'templateid')));
+	while ($dbItem = DBfetch($dbItems)) {
+		foreach ($items as $itemid => $item) {
+			if ($item['templateid'] == $dbItem['itemid'] && !empty($dbItem['templateid'])) {
+				$items[$itemid]['templateid'] = $dbItem['templateid'];
+				$processSecondLevel = true;
+			}
+		}
+	}
+	if ($processSecondLevel) {
+		fillItemsWithChildTemplates($items); // attention recursion!
+	}
 }
 
 function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
@@ -1249,7 +1265,6 @@ function calculate_item_nextcheck($interfaceid, $itemid, $item_type, $delay, $fl
 	return array('nextcheck' => $nextcheck, 'delay' => $delay);
 }
 
-
 /**
  * Check if given character is a valid key id char
  * this function is a copy of is_key_char() from /src/libs/zbxcommon/misc.c
@@ -1272,7 +1287,6 @@ function isKeyIdChar($char) {
  * Description:
  *	Function returns true if http items exists in the $items array.
  *	The array should contain a field 'type'
- *
  */
 function httpItemExists($items) {
 	foreach ($items as $item) {
@@ -1288,11 +1302,11 @@ function getParamFieldNameByType($itemType) {
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_JMX:
-			return _('Executed script');
+			return 'params_es';
 		case ITEM_TYPE_DB_MONITOR:
-			return _('Additional parameters');
+			return 'params_ap';
 		case ITEM_TYPE_CALCULATED:
-			return _('Formula');
+			return 'params_f';
 		default:
 			return 'params';
 	}
