@@ -145,9 +145,8 @@ static void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_r
 {
 	const char	*__function_name = "substitute_discovery_macros";
 
-	char		*src, *dst, *replace_to = NULL, c;
-	size_t		l, r, sz_data, sz_macro, sz_value,
-			replace_to_alloc = 0, data_alloc;
+	char		*replace_to = NULL, c;
+	size_t		l, r, replace_to_alloc = 0;
 	int		res;
 
 	assert(data);
@@ -156,12 +155,190 @@ static void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_r
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
+	for (l = 0; '\0' != (*data)[l]; l++)
+	{
+printf("%s\n", *data);
+printf("%*.s^\n", (int)l, " ");
+		if ('{' != (*data)[l] || '#' != (*data)[l + 1])
+			continue;
+
+		for (r = l + 2; SUCCEED == is_macro_char((*data)[r]); r++)
+			;
+
+		if ('}' != (*data)[r])
+			continue;
+
+		c = (*data)[r + 1];
+		(*data)[r + 1] = '\0';
+
+		res = zbx_json_value_by_name_dyn(jp_row, &(*data)[l], &replace_to, &replace_to_alloc);
+
+		(*data)[r + 1] = c;
+
+		if (SUCCEED != res)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro: \"%.*s\" is not found in value set",
+					__function_name, (int)(r - l + 1), *data + l);
+		}
+		else
+			zbx_replace_string(data, l, &r, replace_to);
+
+		l = r;
+	}
+
+	zbx_free(replace_to);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
+}
+
+static void	quote_key_param(char **param, int forced)
+{
+	char	*src, *dst = NULL, *p;
+	size_t	sz;
+
+	if (0 == forced)
+	{
+		if ('"' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
+			return;
+	}
+
+	sz = zbx_get_escape_string_len(*param, "\"") + 3;
+	p = dst = zbx_malloc(dst, sz);
+	*p++ = '"';
+
+	for (src = *param; '\0' != *src; src++)
+	{
+		if ('"' == *src)
+			*p++ = '\\';
+		*p++ = *src;
+	}
+	*p++ = '"';
+	*p = '\0';
+
+	zbx_free(*param);
+	*param = dst;
+}
+
+/*static */void	substitute_discovery_macros_key(char **data, struct zbx_json_parse *jp_row)
+{
+	const char	*__function_name = "substitute_discovery_macros_key";
+
+	char		*src, *dst, *replace_to = NULL, c, *param = NULL;
+	size_t		l, r, sz_data, sz_macro, sz_value,
+			replace_to_alloc = 0, data_alloc, param_alloc = 64, param_offset;
+	int		res;
+	int		state = 0;
+	int		level = 0;
+
+	assert(data);
+	assert(*data);
+	assert(jp_row);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
+
+	param = zbx_malloc(param, param_alloc);
+
 	sz_data = strlen(*data);
 	data_alloc = sz_data + 1;
 
-	for (l = 0; l < sz_data; l++)
+	for (l = 0; '\0' != (*data)[l]; l++)
 	{
-		if ('{' != (*data)[l] || '#' != (*data)[l + 1])
+printf("[%zd/%zd] [%d] [%d] %s\n", sz_data, data_alloc, state, level, *data);
+printf("[%zd/%zd] [%d] [%d] %*.s^\n", sz_data, data_alloc, state, level, (int)l, " ");
+/*printf("[%zd/%zd] %*.s^%*.s^\n", sz_data, data_alloc, (int)l, " ", (int)(r - l - 1), " ");
+*/
+		if (0 != state && 0 == level)
+			break;
+
+		switch (state)
+		{
+			case 0:	/* an item key */
+				if (SUCCEED == is_key_char((*data)[l]))
+					continue;
+				if ('[' != (*data)[l])
+					goto clean;
+				level++;
+				state = 1;
+				break;
+			case 1:	/* a new parameter started */
+				switch ((*data)[l])
+				{
+					case ' ':
+						break;
+					case '[':
+						level++;
+						break;
+					case ']':
+						level--;
+						state = 2;
+						break;
+					case '"':
+						param_offset = 0;
+						state = 4;
+						break;
+					default:
+						param_offset = 0;
+						zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[l]);
+						state = 3;
+				}
+				break;
+			case 2:	/* end of parameter */
+				switch ((*data)[l])
+				{
+					case ' ':
+						break;
+					case ',':
+						state = 1;
+						break;
+					case ']':
+						level--;
+						break;
+					default:
+						goto clean;
+				}
+				break;
+			case 3:	/* an unquoted parameter */
+				switch ((*data)[l])
+				{
+					case ']':
+						level--;
+						state = 2;
+						substitute_discovery_macros(&param, jp_row);
+						quote_key_param(&param, 0);
+printf("'%s'\n", param);
+						break;
+					case ',':
+						state = 1;
+						substitute_discovery_macros(&param, jp_row);
+						quote_key_param(&param, 0);
+printf("'%s'\n", param);
+						break;
+					default:
+						zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[l]);
+				}
+				break;
+			case 4:	/* a quoted parameter */
+				if ('"' == (*data)[l])
+				{
+					if ('\\' != (*data)[l - 1])
+					{
+						state = 2;
+						substitute_discovery_macros(&param, jp_row);
+						quote_key_param(&param, 1);
+						;
+//						zbx_dyn_escape_string(&param);
+printf("'%s'\n", param);
+						break;
+					}
+				}
+				else if ('\\' == (*data)[l] && '"' == (*data)[l + 1])
+					break;
+				zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[l]);
+				break;
+		}
+	}
+
+/*		if ('{' != (*data)[l] || '#' != (*data)[l + 1])
 			continue;
 
 		for (r = l + 2; r < sz_data && SUCCEED == is_macro_char((*data)[r]); r++)
@@ -207,6 +384,15 @@ static void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_r
 
 			l += sz_macro - 1;
 		}
+	}*/
+
+clean:
+	printf("[%zd/%zd] [%d] [%d]\n", sz_data, data_alloc, state, level);
+
+	if (l != sz_data || 0 != level)
+	{
+		printf("%s() An item key is invalid: %s\n", __function_name, *data);
+		printf("%s()                         %*.s^\n", __function_name, (int)l, " ");
 	}
 
 	zbx_free(replace_to);

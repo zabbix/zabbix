@@ -803,6 +803,7 @@ void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
+size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
 		int delay, const char *flex_intervals, time_t now, int *effective_delay);
@@ -1004,5 +1005,7 @@ void	make_hostname(char *host);
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 int	calculate_sleeptime(int nextcheck, int max_sleeptime);
+
+void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 
 #endif
