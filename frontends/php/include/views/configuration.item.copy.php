@@ -41,7 +41,7 @@ $itemFormList->addRow(_('Target type'), $copyTypeComboBox);
 // append targets to form list
 $targetList = array();
 if ($this->data['copy_type'] == 0) {
-	$groupComboBox = new CComboBox('filter_groupid', $this->data['filter_groupid'], 'submit()');
+	$groupComboBox = new CComboBox('copy_groupid', $this->data['copy_groupid'], 'submit()');
 	foreach ($this->data['groups'] as $group) {
 		$groupComboBox->addItem($group['groupid'],$group['name']);
 	}
@@ -66,7 +66,7 @@ else {
 		));
 	}
 }
-$itemFormList->addRow(_('Target'), $targetList);
+$itemFormList->addRow(_('Target'), !empty($targetList) ? $targetList : SPACE);
 
 // append tabs to form
 $itemTab = new CTabView();
