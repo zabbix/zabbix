@@ -1,7 +1,7 @@
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		var valueTypeSwitcher = new CViewSwitcher('value_type', 'change',
-			<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>
+			<?php echo zbx_jsvalue($this->data['valueTypeVisibility'], true); ?>
 		);
 		var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
 			<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>
