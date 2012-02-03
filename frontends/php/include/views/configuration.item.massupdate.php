@@ -255,7 +255,7 @@ for ($i = 0, $size = count($this->data['delay_flex']); $i < $size; $i++) {
 	}
 }
 if (count($delayFlexElements) == 0) {
-	array_push($delayFlexElements, _('No flexible intervals'));
+	array_push($delayFlexElements, _('No flexible intervals.'));
 }
 else {
 	array_push($delayFlexElements, new CSubmit('del_delay_flex', _('Delete selected')));
@@ -265,7 +265,7 @@ $delayFlexElements->setAttribute('id', 'delay_flex_list');
 
 $itemFormList->addRow(
 	array(
-		_('Flexible intervals (sec)'),
+		_('Flexible intervals'),
 		SPACE,
 		new CVisibilityBox('delay_flex_visible', get_request('delay_flex_visible'), array('delay_flex_list', 'new_delay_flex_el'), _('Original'))
 	),
@@ -274,14 +274,14 @@ $itemFormList->addRow(
 
 // append new delay to form list
 $newDelayFlexElements = new CSpan(array(
-	_('Delay'),
+	_('Interval (in sec)'),
 	SPACE,
 	new CNumericBox('new_delay_flex[delay]', 50, 5),
+	SPACE,
 	_('Period'),
 	SPACE,
 	new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 27),
-	BR(),
-	new CSubmit('add_delay_flex', _('Add'))
+	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
 ));
 $newDelayFlexElements->setAttribute('id', 'new_delay_flex_el');
 $itemFormList->addRow(_('New flexible interval'), $newDelayFlexElements, false, null, 'new');
@@ -352,13 +352,14 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 }
 $valueMapLink = new CLink(_('show value mappings'), 'config.php?config=6');
 $valueMapLink->setAttribute('target', '_blank');
+
 $itemFormList->addRow(
 	array(
 		_('Show value'),
 		SPACE,
-		new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', _('Original'))
+		new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemap', _('Original'))
 	),
-	array($valueMapsComboBox, SPACE, $valueMapLink)
+	new CDiv(array($valueMapsComboBox, SPACE, $valueMapLink), null, 'valuemap')
 );
 
 // append trapper hosts to form list

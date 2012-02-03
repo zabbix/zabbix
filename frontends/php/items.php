@@ -1020,16 +1020,17 @@ else {
 				$item['applications_list'] = '';
 			}
 		}
+		unset($item);
 	}
 
 	$data['flicker'] = getItemFilterForm($data['items']);
 
 	// remove subfiltered items
 	if (!empty($data['items'])) {
-		foreach ($data['items'] as $num => &$item) {
+		foreach ($data['items'] as $number => $item) {
 			foreach ($item['subfilters'] as $subfilter => $value) {
 				if (!$value) {
-					unset($data['items'][$num]);
+					unset($data['items'][$number]);
 					break;
 				}
 			}

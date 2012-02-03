@@ -201,7 +201,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
 			if ($itemInterfaceType !== false && $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
 				if (!$fullItem['interfaceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
 				}
 				elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
