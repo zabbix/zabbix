@@ -1971,6 +1971,8 @@ class CChart extends CGraphDraw{
 				$red = ($avg_color&$bitmask)>>16;
 				// $red_diff = 255 - $red;
 
+				// note: though gradients on the chart looks OK, the formula used is completely incorrect
+				// if you plan to fix something here, it would be better to start from scratch
 				$maxAlpha = 110;
 				$startAlpha = 50;
 				$alphaRatio = $maxAlpha / ($this->sizeY - $startAlpha);
