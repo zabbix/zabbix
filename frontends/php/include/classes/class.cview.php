@@ -19,23 +19,28 @@
 **/
 ?>
 <?php
-class CView{
+class CView {
+
 	/**
 	 * @var string - name of the template file without extension, for example 'general.search'
 	 */
 	private $filePath;
+
 	/**
 	 * @var array - hash of 'variable_name'=>'variable_value' to be used inside template
 	 */
 	private $data;
+
 	/**
 	 * @var object - actual template object being shown
 	 */
 	private $template;
+
 	/**
 	 * @var string - scripts on page
 	 */
 	private $scripts;
+
 	/**
 	 * @const string - directory where views are stored
 	 */
@@ -47,20 +52,20 @@ class CView{
 	 * @param array $data deprecated parameter, use set() and get() methods for passing variables to views
 	 * @example $scriptForm = new CView('administration.script.edit');
 	 */
-	public function __construct($view, $data=array()) {
+	public function __construct($view, $data = array()) {
 		$this->assign($view, $data);
 		$this->data = $data;
 	}
 
 	public function assign($view) {
 		if (!preg_match("/[a-z\.]+/", $view)) {
-			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and "."', $view));
+			throw new Exception(_s('Invalid view name given "%s". Allowed chars: "a-z" and ".".', $view));
 		}
 
 		$this->filePath = self::viewsDir.'/'.$view.'.php';
 
 		if (!file_exists($this->filePath)) {
-			throw new Exception(_s('File provided to a view does not exist. Tried to find "%s"', $this->filePath));
+			throw new Exception(_s('File provided to a view does not exist. Tried to find "%s".', $this->filePath));
 		}
 	}
 
@@ -110,7 +115,7 @@ class CView{
 		$this->scripts = ob_get_clean();
 
 		/* TODO It is for output of JS code. Should be moved to show() method. */
-		print($this->scripts);
+		echo $this->scripts;
 		return $this->template;
 	}
 

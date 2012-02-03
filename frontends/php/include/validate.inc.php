@@ -55,7 +55,7 @@ function is_hex_color($value) {
 }
 
 function BETWEEN($min, $max, $var = null) {
-	return "({".$var."}>=".$min."&&{".$var."}<=".$max.")&&";
+	return '({'.$var.'}>='.$min.'&&{'.$var.'}<='.$max.')&&';
 }
 
 function REGEXP($regexp, $var = null) {
@@ -63,14 +63,14 @@ function REGEXP($regexp, $var = null) {
 }
 
 function GT($value, $var = '') {
-	return "({".$var."}>=".$value.")&&";
+	return '({'.$var.'}>='.$value.')&&';
 }
 
 function IN($array, $var = '') {
 	if (is_array($array)) {
 		$array = implode(',', $array);
 	}
-	return "str_in_array({".$var."},array(".$array."))&&";
+	return 'str_in_array({'.$var.'},array('.$array.'))&&';
 }
 
 function HEX($var = null) {
