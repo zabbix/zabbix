@@ -133,7 +133,7 @@ $fields = array(
 		'isset({save})&&(isset({value_type})&&({value_type}==2))'),
 	'group_itemid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_targetid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'filter_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+	'copy_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	'new_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'del_history' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -811,7 +811,7 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 		'group_itemid' => get_request('group_itemid', array()),
 		'hostid' => get_request('hostid', 0),
 		'copy_type' => get_request('copy_type', 0),
-		'filter_groupid' => get_request('filter_groupid', 0),
+		'copy_groupid' => get_request('copy_groupid', 0),
 		'copy_targetid' => get_request('copy_targetid', array())
 	);
 
@@ -827,16 +827,15 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 
 		// hosts
 		if ($data['copy_type'] == 0) {
-			// set filter group id
-			if (empty($data['filter_groupid'])) {
+			if (empty($data['copy_groupid'])) {
 				foreach ($data['groups'] as $group) {
-					$data['filter_groupid'] = $group['groupid'];
+					$data['copy_groupid'] = $group['groupid'];
 				}
 			}
 
 			$data['hosts'] = API::Host()->get(array(
 				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $data['filter_groupid'],
+				'groupids' => $data['copy_groupid'],
 				'templated_hosts' => true
 			));
 			order_result($data['hosts'], 'name');
