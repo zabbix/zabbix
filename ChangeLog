@@ -2,6 +2,7 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
 ..F....... [ZBX-2515] set 15 minutes autologout as default for new users (Alexei)
