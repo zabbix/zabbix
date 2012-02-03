@@ -117,7 +117,7 @@ $userFormList->addRow(_('Theme'), $themeComboBox);
 
 // append auto-login & auto-logout to form list
 $autologoutCheckBox = new CCheckBox('autologout_visible', ($this->data['autologout'] == 0) ? 'no' : 'yes');
-$autologoutTextBox = new CNumericBox('autologout', ($this->data['autologout'] == 0) ? '90' : $this->data['autologout'], 4);
+$autologoutTextBox = new CNumericBox('autologout', ($this->data['autologout'] == 0) ? '900' : $this->data['autologout'], 4);
 if (!$this->data['autologout']) {
 	$autologoutTextBox->setAttribute('disabled', 'disabled');
 }
