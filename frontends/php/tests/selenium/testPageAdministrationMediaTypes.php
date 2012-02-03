@@ -166,10 +166,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	/**
 	 * @dataProvider allMediaTypes
 	 */
-	public function testPageAdministrationMediaTypes_MassDeleteAll($mediatype) {
+/*	public function testPageAdministrationMediaTypes_MassDeleteAll($mediatype) {
 
 		DBsave_tables('media_type');
-		DBsave_tables('media');
+		// DBsave_tables('media');
 		$this->login('media_types.php');
 
 		$mediatypeid = $mediatype['mediatypeid'];
@@ -198,6 +198,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		DBrestore_tables('media_type');
 	}
+*/
 
 	/**
 	 * @dataProvider allMediaTypes
@@ -206,7 +207,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$id = $mediatype['mediatypeid'];
 
 		$row = DBfetch(DBselect('SELECT count(*) as cnt FROM opmessage WHERE mediatypeid = '.$id.''));
-		$used_by_operations = ($row['cnt'] > 0);
+		$used_in_operations = ($row['cnt'] > 0);
 
 		DBsave_tables('media_type');
 
@@ -221,7 +222,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->getConfirmation();
 		$this->wait();
 		$this->assertTitle('Media types');
-		if ($used_by_operations) {
+		if ($used_in_operations) {
 			$this->nok('Media type deleted');
 			$this->ok('Cannot delete media type');
 			$this->ok('Media types used by action');
