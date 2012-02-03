@@ -100,9 +100,6 @@ require_once('include/page_header.php');
 // other
 		'form'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>		array(T_ZBX_STR, O_OPT, null,	null,	null),
-// Import
-		'rules' =>				array(T_ZBX_STR, O_OPT,	null,			DB_ID,	null),
-		'import' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // Filter
 		'filter_set' =>			array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
 
@@ -156,24 +153,6 @@ require_once('include/page_header.php');
 
 		print($export->export());
 		exit();
-	}
-
-// IMPORT ///////////////////////////////////
-	$rules = get_request('rules', array());
-	if(!isset($_REQUEST['form_refresh'])){
-		foreach(array('host', 'template', 'item', 'trigger', 'graph') as $key){
-			$rules[$key]['exist'] = 1;
-			$rules[$key]['missed'] = 1;
-		}
-	}
-
-	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
-		require_once('include/export.inc.php');
-		DBstart();
-		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		if($result) $result = zbxXML::parseMain($rules);
-		$result = DBend($result);
-		show_messages($result, _('Imported successfully'), _('Import failed'));
 	}
 
 /* FILTER */
@@ -652,16 +631,12 @@ require_once('include/page_header.php');
 		$hosts_wdgt->addItem($hostForm->render());
 	}
 	elseif (isset($_REQUEST['form'])) {
-		if ($_REQUEST['form'] == S_IMPORT)
-			$hosts_wdgt->addItem(import_host_form());
-		else {
-			if ($hostid = get_request('hostid', 0)) {
-				$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
-			}
-
-			$hostForm = new CView('configuration.host.edit');
-			$hosts_wdgt->addItem($hostForm->render());
+		if ($hostid = get_request('hostid', 0)) {
+			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
 		}
+
+		$hostForm = new CView('configuration.host.edit');
+		$hosts_wdgt->addItem($hostForm->render());
 	}
 	else {
 		$frmGroup = new CForm();

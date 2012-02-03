@@ -2878,69 +2878,6 @@
 		return $tblPeriod;
 	}
 
-	function import_screen_form($rules){
-
-		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
-		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
-
-		$table = new CTable();
-		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
-
-		$titles = array('screen' => S_SCREEN);
-
-		foreach($titles as $key => $title){
-			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
-
-			if($key == 'template')
-				$cbMissed = null;
-			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
-
-			$table->addRow(array($title, $cbExist, $cbMissed));
-		}
-
-		$form->addRow(S_RULES, $table);
-
-		$form->addItemToBottomRow(new CSubmit('import', S_IMPORT));
-		return $form;
-	}
-
-// HOSTS
-
-// Host import form
-	function import_host_form($template=false){
-		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
-		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
-
-		$table = new CTable();
-		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
-
-		$titles = array(
-			'host' => $template?S_TEMPLATE:S_HOST,
-			'template' => S_TEMPLATE_LINKAGE,
-			'item' => S_ITEM,
-			'trigger' => S_TRIGGER,
-			'graph' => S_GRAPH,
-			'screens' => _('Screens'),
-		);
-		foreach($titles as $key => $title){
-			$cbExist = new CCheckBox('rules['.$key.'][exist]', true);
-
-			if($key == 'template')
-				$cbMissed = null;
-			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', true);
-
-			$table->addRow(array($title, $cbExist, $cbMissed));
-		}
-
-		$form->addRow(S_RULES, $table);
-
-		$form->addItemToBottomRow(new CSubmit('import', S_IMPORT));
-
-	return $form;
-	}
-
 	function insert_host_inventory_form(){
 		$frmHostP = new CFormTable(_('Host Inventory'));
 
@@ -2961,37 +2898,6 @@
 		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
 
 		return $frmHostP;
-	}
-
-	function import_map_form($rules){
-		global $USER_DETAILS;
-
-		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
-		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
-
-		$table = new CTable();
-		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
-
-		$titles = array('maps' => S_MAP);
-		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
-			$titles += array('icons' => _('Icon'), 'background' => _('Background'));
-		}
-
-		foreach($titles as $key => $title){
-			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
-
-			if($key != 'maps')
-				$cbExist->setAttribute('onclick', 'javascript: if(this.checked) return confirm(\'Images for all maps will be updated\')');
-
-			$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
-
-			$table->addRow(array($title, $cbExist, $cbMissed));
-		}
-
-		$form->addRow(S_RULES, $table);
-
-		$form->addItemToBottomRow(new CSubmit('import', S_IMPORT));
-		return $form;
 	}
 
 	function get_regexp_form(){

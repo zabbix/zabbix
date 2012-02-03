@@ -81,10 +81,6 @@ require_once('include/page_header.php');
 // other
 		'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 		'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
-
-// Import
-		'rules' =>				array(T_ZBX_STR, O_OPT,	null,			DB_ID,	null),
-		'import' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
 
 // OUTER DATA
@@ -114,24 +110,6 @@ require_once('include/page_header.php');
 
 		print($export->export());
 		exit();
-	}
-
-// IMPORT ///////////////////////////////////
-	$rules = get_request('rules', array());
-	if(!isset($_REQUEST['form_refresh'])){
-		foreach(array('host', 'template', 'item', 'trigger', 'graph') as $key){
-			$rules[$key]['exist'] = 1;
-			$rules[$key]['missed'] = 1;
-		}
-	}
-
-	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
-		require_once('include/export.inc.php');
-		DBstart();
-		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		if($result) $result = zbxXML::parseMain($rules);
-		$result = DBend($result);
-		show_messages($result, _('Imported successfully'), _('Import failed'));
 	}
 ?>
 <?php
@@ -451,17 +429,12 @@ require_once('include/page_header.php');
 ?>
 <?php
 	if (isset($_REQUEST['form'])) {
-		if ($_REQUEST['form'] == S_IMPORT) {
-			$template_wdgt->addItem(import_host_form(true));
+		if ($templateid = get_request('templateid', 0)) {
+			$template_wdgt->addItem(get_header_host_table($templateid));
 		}
-		else {
-			if ($templateid = get_request('templateid', 0)) {
-				$template_wdgt->addItem(get_header_host_table($templateid));
-			}
 
-			$templateForm = new CView('configuration.template.edit');
-			$template_wdgt->addItem($templateForm->render());
-		}
+		$templateForm = new CView('configuration.template.edit');
+		$template_wdgt->addItem($templateForm->render());
 	}
 	else {
 // TABLE WITH TEMPLATES
