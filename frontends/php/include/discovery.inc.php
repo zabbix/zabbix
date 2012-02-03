@@ -168,21 +168,21 @@ function get_discovery_rule_by_druleid($druleid) {
 }
 
 function delete_discovery_rule($druleid) {
-	$actionIds = array();
+	$actionids = array();
 
-	$db_actions = DBselect(
+	$dbActions = DBselect(
 		'SELECT DISTINCT c.actionid'.
 		' FROM conditions c'.
 		' WHERE c.conditiontype='.CONDITION_TYPE_DRULE.
-			' AND c.value='.$druleid
+			' AND c.value=\''.$druleid.'\''
 	);
-	while ($db_action = DBfetch($db_actions)) {
-		$actionIds[] = $db_action['actionid'];
+	while ($action = DBfetch($dbActions)) {
+		$actionids[] = $action['actionid'];
 	}
 
 	// disabling actions with deleted conditions
-	if (!empty($actionIds)) {
-		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.DBcondition('actionid', $actionIds));
+	if (!empty($actionids)) {
+		DBexecute('UPDATE actions SET status='.ACTION_STATUS_DISABLED.' WHERE '.DBcondition('actionid', $actionids));
 		DBexecute('DELETE FROM conditions WHERE conditiontype='.CONDITION_TYPE_DRULE.' AND value='.$druleid);
 	}
 	return DBexecute('DELETE FROM drules WHERE druleid='.$druleid);
