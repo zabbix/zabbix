@@ -1426,15 +1426,45 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
-void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
+void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const zbx_uint64_t *values, const int num)
 {
 #define MAX_EXPRESSIONS	950
-	int	i;
+	int		i;
+	zbx_uint64_t	value;
 
 	if (0 == num)
 		return;
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
+
+	/* if only one value in an array we return " <field name>=<id>"*/
+
+	if (1 == num)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname, values[0]);
+		return;
+	}
+
+	/* if all values in an array are consecutive we return " <field name> between <id1> and <idN>"*/
+
+	value = values[0];
+
+	for (i = 1; i < num; i++)
+	{
+		if (values[i] != ++value)
+			break;
+	}
+
+	if (i == num)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+				fieldname, values[0], values[num - 1]);
+		return;
+	}
+
+	/* ... else we return " <field name> in (<id1>,<id2>,...,<idN>)"*/
+
 	if (MAX_EXPRESSIONS < num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 

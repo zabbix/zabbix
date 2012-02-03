@@ -75,9 +75,8 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		$sql = 'SELECT groupid FROM groups';
 		$hgroups = DBfetchArray(DBselect($sql));
-		foreach ($hgroups as $group)
-		{
-		$this->assertElementPresent("//select[@id='discovery_groupid']/option[@value='".$group['groupid']."']");
+		foreach ($hgroups as $group) {
+			$this->assertElementPresent("//select[@id='discovery_groupid']/option[@value='".$group['groupid']."']");
 		}
 	}
 
@@ -91,9 +90,8 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		$sql = 'SELECT usrgrpid FROM usrgrp';
 		$usrgrp = DBfetchArray(DBselect($sql));
-		foreach ($usrgrp as $usrgroup)
-		{
-		$this->assertElementPresent("//select[@id='alert_usrgrpid']/option[@value='".$usrgroup['usrgrpid']."']");
+		foreach ($usrgrp as $usrgroup) {
+			$this->assertElementPresent("//select[@id='alert_usrgrpid']/option[@value='".$usrgroup['usrgrpid']."']");
 		}
 
 		$this->assertElementPresent("//select[@id='alert_usrgrpid']/option[text()='None']");
