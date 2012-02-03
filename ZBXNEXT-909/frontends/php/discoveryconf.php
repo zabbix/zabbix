@@ -197,13 +197,7 @@ if (isset($_REQUEST['form'])) {
 				if ($dcheck['uniq']) {
 					$data['drule']['uniqueness_criteria'] = $dcheck['dcheckid'];
 				}
-				$data['drule']['dchecks'][$id]['name'] = discovery_check2str(
-					$dcheck['type'],
-					isset($dcheck['key_']) ? $dcheck['key_'] : '',
-					isset($dcheck['ports']) ? $dcheck['ports'] : ''
-				);
 			}
-			order_result($data['drule']['dchecks'], 'name');
 		}
 	}
 	else {
@@ -215,6 +209,17 @@ if (isset($_REQUEST['form'])) {
 		$data['drule']['dchecks'] = get_request('dchecks', array());
 		$data['drule']['nextcheck'] = get_request('nextcheck', 0);
 		$data['drule']['uniqueness_criteria'] = get_request('uniqueness_criteria', -1);
+	}
+
+	if (!empty($data['drule']['dchecks'])) {
+		foreach ($data['drule']['dchecks'] as $id => $dcheck) {
+			$data['drule']['dchecks'][$id]['name'] = discovery_check2str(
+				$dcheck['type'],
+				isset($dcheck['key_']) ? $dcheck['key_'] : '',
+				isset($dcheck['ports']) ? $dcheck['ports'] : ''
+			);
+		}
+		order_result($data['drule']['dchecks'], 'name');
 	}
 
 	// get proxies
