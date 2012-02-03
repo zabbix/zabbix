@@ -45,18 +45,19 @@ foreach ($this->data['proxies'] as $proxy) {
 }
 $discoveryFormList->addRow(_('Discovery by proxy'), $proxyComboBox);
 $discoveryFormList->addRow(_('IP range'), new CTextBox('iprange', $this->data['drule']['iprange'], ZBX_TEXTBOX_SMALL_SIZE));
-$discoveryFormList->addRow(_('Delay (seconds)'), new CNumericBox('delay', $this->data['drule']['delay'], 8));
+$discoveryFormList->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->data['drule']['delay'], 8));
 
 // append checks to form list
 $checkTable = new CTable(null, 'formElementTable');
-$addDCheckBtn = new CButton('newCheck', _('New'), null, 'link_menu');
-
-$col = new CCol($addDCheckBtn);
-$col->setAttribute('colspan', 2);
-
-$buttonRow = new CRow($col);
-$buttonRow->setAttribute('id', 'dcheckListFooter');
-$checkTable->addRow($buttonRow);
+$checkTable->addRow(new CRow(
+	new CCol(
+		new CButton('newCheck', _('New'), null, 'link_menu'),
+		null,
+		2
+	),
+	null,
+	'dcheckListFooter'
+));
 $discoveryFormList->addRow(_('Checks'),
 	new CDiv($checkTable, 'objectgroup inlineblock border_dotted ui-corner-all', 'dcheckList'));
 

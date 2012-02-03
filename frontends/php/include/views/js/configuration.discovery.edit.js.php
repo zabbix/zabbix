@@ -336,7 +336,7 @@
 						}
 					},
 					error: function() {
-						//alert('AJAX request error');
+						alert('AJAX request error');
 						jQuery('#add_new_dcheck').removeAttr('disabled');
 					},
 					dataType: 'json'
