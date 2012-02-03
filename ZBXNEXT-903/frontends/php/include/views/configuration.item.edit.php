@@ -80,9 +80,10 @@ else {
 if (!empty($this->data['interfaces'])) {
 	$intereacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
 	foreach ($this->data['interfaces'] as $interface) {
-		$option = new CComboItem($interface['interfaceid'], $interface['useip']
-			? $interface['ip'].' : '.$interface['port']
-			: $interface['dns'].' : '.$interface['port']
+		$option = new CComboItem(
+			$interface['interfaceid'],
+			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
+			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
 		$intereacesComboBox->addItem($option);
@@ -92,7 +93,7 @@ if (!empty($this->data['interfaces'])) {
 	$span->setAttribute('id', 'interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
-	$itemFormList->addRow(_('Host interface'), array($intereacesComboBox, SPACE, $span), false, 'interface_row');
+	$itemFormList->addRow(_('Host interface'), array($intereacesComboBox, $span), false, 'interface_row');
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),
@@ -148,15 +149,15 @@ $itemFormList->addRow(_('Password'),
 	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
-	new CTextArea('params', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CTextArea('params_es', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
 	false, 'label_executed_script'
 );
 $itemFormList->addRow(_('Additional parameters'),
-	new CTextArea('params', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CTextArea('params_ap', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
 	false, 'label_params'
 );
 $itemFormList->addRow(_('Formula'),
-	new CTextArea('params', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
+	new CTextArea('params_f', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
 	false, 'label_formula'
 );
 

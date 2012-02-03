@@ -77,12 +77,8 @@ $fields = array(
 		ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 	'privatekey' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type})=='.
 		ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
-	'params' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
-		ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
-	// hidden
-	'params_script' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'params_dbmonitor' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'params_calculted' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	$paramsFieldName =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
+		ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED,'type')),
 	'snmp_community' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C,'type')),
 	'snmp_oid' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -149,6 +145,8 @@ check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['params'] = get_request($paramsFieldName, '');
+unset($_REQUEST[$paramsFieldName]);
 
 // permissions
 if (get_request('parent_discoveryid', false)) {
@@ -357,7 +355,10 @@ else {
 		'sortfield' => $sortfield,
 		'limit' => $config['search_limit'] + 1
 	));
-	order_result($data['items'], $sortfield, getPageSortOrder());
+
+	if (!empty($data['items'])) {
+		order_result($data['items'], $sortfield, getPageSortOrder());
+	}
 	$data['paging'] = getPagingLine($data['items']);
 
 	// render view

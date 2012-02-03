@@ -66,7 +66,7 @@ foreach ($this->data['items'] as $item) {
 	// description
 	$description = array();
 	if (!empty($item['template_host'])) {
-		$description[] = new CLink($item['template_host']['name'], '?hostid='.$item['template_host']['hostid'], 'unknown');
+		$description[] = new CLink($item['template_host']['name'], '?hostid='.$item['template_host']['hostid'].'&filter_set=1', 'unknown');
 		$description[] = ':';
 	}
 	if (!empty($item['discoveryRule'])) {

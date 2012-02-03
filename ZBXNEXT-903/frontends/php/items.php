@@ -101,13 +101,9 @@ $fields = array(
 		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 	'privatekey' =>				array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
-	'params' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
-		ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'), $paramsFieldName),
+	$paramsFieldName =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
+		ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type')),
 	'inventory_link' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
-	// hidden fields for better gui
-	'params_script' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'params_dbmonitor' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'params_calculted' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'snmp_community' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C,'type')),
 	'snmp_oid' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
@@ -197,10 +193,11 @@ $fields = array(
 	'favref' =>					array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
 	'state' =>					array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
 );
-
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 $_REQUEST['go'] = get_request('go', 'none');
+$_REQUEST['params'] = get_request($paramsFieldName, '');
+unset($_REQUEST[$paramsFieldName]);
 
 // permissions
 if (get_request('itemid', false)) {
@@ -950,6 +947,22 @@ else {
 
 	// set values for subfilters, if any of subfilters = false then item shouldnt be shown
 	if (!empty($data['items'])) {
+		// fill template host
+		fillItemsWithChildTemplates($data['items']);
+		$dbHostItems = DBselect(
+				'SELECT i.itemid,h.name,h.hostid'.
+				' FROM hosts h,items i'.
+				' WHERE i.hostid=h.hostid'.
+					' AND '.DBcondition('i.itemid', zbx_objectValues($data['items'], 'templateid'))
+		);
+		while ($dbHostItem = DBfetch($dbHostItems)) {
+			foreach ($data['items'] as $itemid => $item) {
+				if ($item['templateid'] == $dbHostItem['itemid']) {
+					$data['items'][$itemid]['template_host'] = $dbHostItem;
+				}
+			}
+		}
+
 		foreach ($data['items'] as &$item) {
 			$item['hostids'] = zbx_objectValues($item['hosts'], 'hostid');
 			$item['name_expanded'] = itemName($item);
@@ -960,10 +973,6 @@ else {
 			}
 			else {
 				$item['host'] = null;
-			}
-
-			if ($item['templateid']) {
-				$item['template_host'] = get_realhost_by_itemid($item['templateid']);
 			}
 
 			$item['subfilters'] = array(

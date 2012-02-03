@@ -97,6 +97,14 @@
 				jQuery('#interface_not_defined').css('display', 'inline');
 			}
 		}
+		else {
+			jQuery('#interfaceid').css('display', 'inline');
+			jQuery('#interface_not_defined').css('display', 'none');
+
+			jQuery('#interface_row option').each(function() {
+				jQuery(this).css('display', 'block');
+			});
+		}
 	}
 
 	function displayKeyButton() {

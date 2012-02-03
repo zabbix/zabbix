@@ -42,8 +42,7 @@ $itempForm->addVar('hostid', $this->data['hostid']);
 $itempForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$itemTable = new CTableInfo();
-
+$itemTable = new CTableInfo(_('No items defined.'));
 
 $sortLink = new Curl();
 $sortLink->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
