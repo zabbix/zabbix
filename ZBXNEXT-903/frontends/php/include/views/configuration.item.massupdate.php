@@ -27,30 +27,10 @@ $itemForm = new CForm();
 $itemForm->setName('itemForm');
 $itemForm->addVar('massupdate', 1);
 $itemForm->addVar('group_itemid', $this->data['itemids']);
+$itemForm->addVar('hostid', $this->data['hostid']);
 
 // create form list
 $itemFormList = new CFormList('itemFormList');
-
-// append hosts to form list
-if (!empty($this->data['hosts']) && count($this->data['hosts']) == 1) {
-	$this->data['hosts'] = reset($this->data['hosts']);
-
-	$intereacesComboBox = new CComboBox('interfaceid');
-	foreach ($this->data['hosts']['interfaces'] as $interface) {
-		$intereacesComboBox->addItem($interface['interfaceid'], $interface['useip']
-			? $interface['ip'].' : '.$interface['port']
-			: $interface['dns'].' : '.$interface['port']
-		);
-	}
-	$itemFormList->addRow(
-		array(
-			_('Host interface'),
-			SPACE,
-			new CVisibilityBox('interface_visible', get_request('interface_visible'), 'interfaceid', _('Original'))
-		),
-		$intereacesComboBox
-	);
-}
 
 // append type to form list
 $typeComboBox = new CComboBox('type', $this->data['type']);
@@ -63,6 +43,37 @@ $itemFormList->addRow(
 	),
 	$typeComboBox
 );
+
+// append hosts to form list
+if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) && !$this->data['is_multiple_hosts']) {
+	$intereacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
+	$intereacesComboBox->addItem(new CComboItem(0, '', null, 'no'));
+	foreach ($this->data['hosts']['interfaces'] as $interface) {
+		$option = new CComboItem(
+			$interface['interfaceid'],
+			$interface['useip'] ? $interface['ip'].' : '.$interface['port'] : $interface['dns'].' : '.$interface['port'],
+			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
+		);
+		$option->setAttribute('data-interfacetype', $interface['type']);
+		$intereacesComboBox->addItem($option);
+	}
+
+	$span = new CSpan(_('No interface found'), 'red');
+	$span->setAttribute('id', 'interface_not_defined');
+	$span->setAttribute('style', 'display: none;');
+
+	$itemFormList->addRow(
+		array(
+			_('Host interface'),
+			SPACE,
+			new CVisibilityBox('interface_visible', get_request('interface_visible'), 'interfaceDiv', _('Original'))
+		),
+		new CDiv(array($intereacesComboBox, $span), null, 'interfaceDiv'),
+		false,
+		'interface_row'
+	);
+	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
+}
 
 // append snmp community to form list
 $itemFormList->addRow(
@@ -240,53 +251,65 @@ $itemFormList->addRow(
 );
 
 // append delay flex to form list
-$delayFlexElements = array();
-for ($i = 0, $size = count($this->data['delay_flex']); $i < $size; $i++) {
-	$delayFlex = $this->data['delay_flex'][$i];
+$delayFlexTable = new CTable(_('No flexible intervals defined.'), 'formElementTable');
+$delayFlexTable->setAttribute('style', 'min-width: 310px;');
+$delayFlexTable->setAttribute('id', 'delayFlexTable');
+$delayFlexTable->setHeader(array(_('Interval'), _('Period'), _('Action')));
+$i = 0;
+$this->data['maxReached'] = false;
+foreach ($this->data['delay_flex'] as $delayFlex) {
 	if (!isset($delayFlex['delay']) && !isset($delayFlex['period'])) {
 		continue;
 	}
 	$itemForm->addVar('delay_flex['.$i.'][delay]', $delayFlex['delay']);
 	$itemForm->addVar('delay_flex['.$i.'][period]', $delayFlex['period']);
 
-	array_push($delayFlexElements, array(new CCheckBox('rem_delay_flex['.$i.']', 'no', null, $i), $delayFlex['delay'], ' sec at ', $delayFlex['period']), BR());
+	$row = new CRow(array(
+		$delayFlex['delay'],
+		$delayFlex['period'],
+		new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');', 'link_menu')
+	));
+	$row->setAttribute('id', 'delayFlex_'.$i);
+	$delayFlexTable->addRow($row);
 
-	if ($i >= 7) {
-		// limit count of intervals, 7 intervals by 30 symbols = 210 characters, db storage field is 256
+	// limit count of intervals, 7 intervals by 30 symbols = 210 characters, db storage field is 256
+	$i++;
+	if ($i == 7) {
+		$this->data['maxReached'] = true;
 		break;
 	}
 }
-if (count($delayFlexElements) == 0) {
-	array_push($delayFlexElements, _('No flexible intervals.'));
-}
-else {
-	array_push($delayFlexElements, new CSubmit('del_delay_flex', _('Delete selected')));
-}
-$delayFlexElements = new CSpan($delayFlexElements);
-$delayFlexElements->setAttribute('id', 'delay_flex_list');
-
 $itemFormList->addRow(
 	array(
 		_('Flexible intervals'),
 		SPACE,
-		new CVisibilityBox('delay_flex_visible', get_request('delay_flex_visible'), array('delay_flex_list', 'new_delay_flex_el'), _('Original'))
+		new CVisibilityBox('delay_flex_visible', get_request('delay_flex_visible'), array('delayFlexDiv', 'newDelayFlexDiv'), _('Original'))
 	),
-	$delayFlexElements
+	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted ui-corner-all', 'delayFlexDiv')
 );
 
 // append new delay to form list
-$newDelayFlexElements = new CSpan(array(
-	_('Interval (in sec)'),
-	SPACE,
-	new CNumericBox('new_delay_flex[delay]', 50, 5),
-	SPACE,
-	_('Period'),
-	SPACE,
-	new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 27),
-	new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
-));
-$newDelayFlexElements->setAttribute('id', 'new_delay_flex_el');
-$itemFormList->addRow(_('New flexible interval'), $newDelayFlexElements, false, null, 'new');
+$itemFormList->addRow(
+	_('New flexible interval'),
+	new CDiv(
+		array(
+			_('Interval (in sec)'),
+			SPACE,
+			new CNumericBox('new_delay_flex[delay]', 50, 5),
+			SPACE,
+			_('Period'),
+			SPACE,
+			new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
+			SPACE,
+			new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
+		),
+		null,
+		'newDelayFlexDiv'
+	),
+	$this->data['maxReached'],
+	'row_new_delay_flex',
+	'new'
+);
 
 // append history to form list
 $itemFormList->addRow(
@@ -374,21 +397,24 @@ $itemFormList->addRow(
 	new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE)
 );
 
-$applicationsComboBox = new CListBox('applications[]', $this->data['applications'], 6);
-$applicationsComboBox->addItem(0, '-'._('None').'-');
-if (!empty($this->data['db_applications'])) {
-	foreach ($this->data['db_applications'] as $application) {
-		$applicationsComboBox->addItem($application['applicationid'], $application['name']);
+// append applications to form list
+if (!$this->data['is_multiple_hosts']) {
+	$applicationsComboBox = new CListBox('applications[]', $this->data['applications'], 6);
+	$applicationsComboBox->addItem(0, '-'._('None').'-');
+	if (!empty($this->data['db_applications'])) {
+		foreach ($this->data['db_applications'] as $application) {
+			$applicationsComboBox->addItem($application['applicationid'], $application['name']);
+		}
 	}
+	$itemFormList->addRow(
+		array(
+			_('Applications'),
+			SPACE,
+			new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications_', _('Original'))
+		),
+		$applicationsComboBox
+	);
 }
-$itemFormList->addRow(
-	array(
-		_('Applications'),
-		SPACE,
-		new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications_', _('Original'))
-	),
-	$applicationsComboBox
-);
 
 // append description to form list
 $descriptionTextArea = new CTextArea('description', $this->data['description']);
@@ -410,5 +436,7 @@ $itemForm->addItem($itemTab);
 // append buttons to form
 $itemForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), new CButtonCancel(url_param('groupid').url_param('hostid').url_param('config'))));
 $itemWidget->addItem($itemForm);
+
+require_once('include/views/js/configuration.item.edit.js.php');
 return $itemWidget;
 ?>
