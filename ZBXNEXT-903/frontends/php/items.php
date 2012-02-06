@@ -778,7 +778,6 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'itemids' => $data['itemids'],
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	));
-	$data['hosts'] = reset($data['hosts']);
 
 	// application
 	if (count($data['applications']) == 0) {

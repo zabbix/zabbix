@@ -156,6 +156,8 @@ form .thin .input { height: 14px; }
 input.formlist { padding-top: 2px; padding-bottom: 2px; }
 input[type="button"].formlist { margin-bottom: 1px; cursor: pointer; vertical-align: top; background: #ffffff; }
 input[type="submit"].formlist { margin-bottom: 1px; cursor: pointer; }
+input[type="button"].input[disabled].formlist,
+input[type="submit"].input[disabled].formlist { cursor: default; }
 #groups_tweenbox input[type="button"].formlist { margin-top: 1px; }
 
 div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #FFAA33; }

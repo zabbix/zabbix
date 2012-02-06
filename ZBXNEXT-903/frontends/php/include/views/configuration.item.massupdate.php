@@ -32,7 +32,9 @@ $itemForm->addVar('group_itemid', $this->data['itemids']);
 $itemFormList = new CFormList('itemFormList');
 
 // append hosts to form list
-if (!empty($this->data['hosts'])) {
+if (!empty($this->data['hosts']) && count($this->data['hosts']) == 1) {
+	$this->data['hosts'] = reset($this->data['hosts']);
+
 	$intereacesComboBox = new CComboBox('interfaceid');
 	foreach ($this->data['hosts']['interfaces'] as $interface) {
 		$intereacesComboBox->addItem($interface['interfaceid'], $interface['useip']
