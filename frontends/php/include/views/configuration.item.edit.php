@@ -368,7 +368,7 @@ $buttons = array();
 if (!empty($this->data['itemid'])) {
 	array_push($buttons, new CSubmit('clone', _('Clone')));
 
-	if (!$this->data['limited'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
+	if (!$this->data['is_template'] && !empty($this->data['itemid']) && empty($this->data['parent_discoveryid'])) {
 		array_push($buttons,
 			new CButtonQMessage('del_history', _('Clear history and trends'), _('History clearing can take a long time. Continue?'))
 		);
