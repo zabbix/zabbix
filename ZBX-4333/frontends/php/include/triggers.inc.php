@@ -566,9 +566,9 @@ return $caption;
 	return $trigger;
 	}
 
-	function get_triggers_by_templateid($triggerids){
+	function get_triggers_by_templateid($triggerids) {
 		zbx_value2array($triggerids);
-	return DBselect('SELECT * FROM triggers WHERE '.DBcondition('templateid',$triggerids));
+		return DBselect('SELECT * FROM triggers WHERE '.DBcondition('templateid', $triggerids));
 	}
 
 /*
@@ -913,13 +913,6 @@ function utf8RawUrlDecode($source){
 
 		DBexecute('update triggers set expression='.zbx_dbstr($expression).' where triggerid='.$triggerid);
 
-		foreach ($deps as $id => $triggerid_up) {
-			if (!$result2 = add_trigger_dependency($triggerid, $triggerid_up)) {
-				error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
-				return false;
-			}
-		}
-
 		$trig_hosts = get_hosts_by_triggerid($triggerid);
 		$trig_host = DBfetch($trig_hosts);
 
@@ -933,6 +926,14 @@ function utf8RawUrlDecode($source){
 				if (!$result = copy_trigger_to_host($triggerid, $child_host['hostid'])) {
 					return false;
 				}
+			}
+		}
+
+		// add trigger dependencies
+		foreach ($deps as $triggerid_up) {
+			if (!$result2 = add_trigger_dependency($triggerid, $triggerid_up)) {
+				error(S_INCORRECT_DEPENDENCY.' ['.expand_trigger_description($triggerid_up).']');
+				return false;
 			}
 		}
 
@@ -1975,14 +1976,59 @@ function utf8RawUrlDecode($source){
 	return $result;
 	}
 
-	function add_trigger_dependency($triggerid,$depid){
-		$result = false;
+	/**
+	 * Adds a dependency from $triggerId to $depTriggerId and inherit it to all child triggers.
+	 *
+	 * @param $triggerId
+	 * @param $depTriggerId
+	 *
+	 * @return bool
+	 */
+	function add_trigger_dependency($triggerId, $depTriggerId) {
+		if (check_dependency_by_triggerid($triggerId, $depTriggerId)) {
+			// save the dependency for the current trigger
+			$result = insert_dependency($triggerId, $depTriggerId);
+			if (!$result) {
+				return false;
+			}
 
-		if(check_dependency_by_triggerid($triggerid,$depid)){
-			$result=insert_dependency($triggerid,$depid);
+			// fetch all child triggers
+			$childTriggers = array();
+			$childTriggerQuery = get_triggers_by_templateid($triggerId);
+			while ($childTrigger = DBfetch($childTriggerQuery)) {
+				$childTriggers[$childTrigger['triggerid']] = $childTrigger;
+			}
+
+			// propagate the dependency to the child triggers
+			if ($childTriggers) {
+				$childHosts = CHost::get(array(
+					'output' => array('hostid', 'status'),
+					'triggerids' => array_keys($childTriggers),
+					'templated_hosts' => true,
+					'nopermissions' => true
+				));
+				foreach ($childHosts as $childHost) {
+					$childTrigger = reset($childHost['triggers']);
+
+					$childDep = array($childTrigger['triggerid'] => $depTriggerId);
+					$childDep = replace_template_dependencies($childDep, $childHost['hostid']);
+
+					// if the child host is a template, propagate the dependency to the children
+					if($childHost['status'] == HOST_STATUS_TEMPLATE) {
+						$result = add_trigger_dependency($childTrigger['triggerid'], $childDep[$childTrigger['triggerid']]);
+					}
+					// if the child host is not a template, just save the dependency
+					else {
+						$result = insert_dependency($childTrigger['triggerid'], $childDep[$childTrigger['triggerid']]);
+					}
+					if (!$result) {
+						return false;
+					}
+				}
+			}
 		}
 
-	return $result;
+		return true;
 	}
 
 /******************************************************************************
@@ -1990,6 +2036,18 @@ function utf8RawUrlDecode($source){
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
+
+	/**
+	 * Adds the dependency from $triggerid_down to $triggerid_up, does not propagate the dependency to the
+	 * child triggers.
+	 *
+	 * @see add_trigger_dependency() for a way to a add a dependency with inheritance support
+	 *
+	 * @param $triggerid_down
+	 * @param $triggerid_up
+	 *
+	 * @return bool
+	 */
 	function insert_dependency($triggerid_down, $triggerid_up) {
 		$triggerdepid = get_dbid('trigger_depends', 'triggerdepid');
 		return DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up)'.
