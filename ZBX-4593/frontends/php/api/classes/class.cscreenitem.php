@@ -417,7 +417,6 @@ class CScreenItem extends CZBXAPI {
 			// save the affected object ids to validate them later
 			$hostGroupResourceTypes = array(
 				SCREEN_RESOURCE_HOSTS_INFO,
-				SCREEN_RESOURCE_TRIGGERS_INFO,
 				SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
 				SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
 				SCREEN_RESOURCE_DATA_OVERVIEW
