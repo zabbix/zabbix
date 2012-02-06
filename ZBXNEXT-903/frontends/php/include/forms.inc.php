@@ -1104,6 +1104,9 @@
 		));
 		order_result($data['hostGroups'], 'name');
 
+		// template
+		$data['is_template'] = isTemplatedHost($data['hostid']);
+
 		return $data;
 	}
 

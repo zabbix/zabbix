@@ -1253,4 +1253,8 @@ function hostMenuData(array $host, array $scripts = array()) {
 	);
 }
 
+function isTemplatedHost($hostid) {
+	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.$hostid));
+	return !empty($dbHost) && $dbHost['status'] == HOST_STATUS_TEMPLATE;
+}
 ?>
