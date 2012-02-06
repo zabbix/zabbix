@@ -20,7 +20,6 @@
 ?>
 <?php
 include('include/views/js/configuration.host.edit.js.php');
-include('include/views/js/configuration.host.edit.macros.js.php');
 
 $divTabs = new CTabView(array('remember' => 1));
 if (!isset($_REQUEST['form_refresh'])) {
@@ -551,32 +550,9 @@ if (empty($macros)) {
 	$macros = array(array('macro' => '', 'value' => ''));
 }
 
-$macroTab = new CTable(null, 'formElementTable');
-$macroTab->addRow(array(_('Macro'), SPACE, _('Value')));
-$macroTab->setAttribute('id', 'userMacros');
-
-$jsInsert = '';
-foreach ($macros as $inum => $macro) {
-	if (!empty($jsInsert) && zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
-		continue;
-	}
-	$jsInsert .= 'addMacroRow('.zbx_jsvalue($macro).');';
-}
-zbx_add_post_js($jsInsert);
-
-$addButton = new CButton('add', _('Add'), 'javascript: addMacroRow({});');
-$addButton->setAttribute('class', 'link_menu');
-
-$column = new CCol(array($addButton));
-$column->setAttribute('colspan', 4);
-$buttonRow = new CRow($column);
-$buttonRow->setAttribute('id', 'userMacroFooter');
-$macroTab->addRow($buttonRow);
-
-$macrolist = new CFormList('macrolist');
-$macrolist->addRow($macroTab);
-
-$divTabs->addTab('macroTab', _('Macros'), $macrolist);
+$divTabs->addTab('macroTab', _('Macros'), new CView('common.macros', array(
+	'macros' => $macros
+)));
 
 $inventoryFormList = new CFormList('inventorylist');
 

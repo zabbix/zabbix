@@ -18,7 +18,7 @@
 </script>
 
 <script type="text/javascript">
-	jQuery(document).ready(function() {
+	jQuery(function() {
 		'use strict';
 
 		var rowTemplate = new Template(jQuery('#macroRow').html());

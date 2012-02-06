@@ -1874,25 +1874,26 @@ Copt::memoryPick();
 
 // UPDATE MACROS {{{
 		if (isset($updateMacros)) {
-			$macrosToAdd = zbx_toHash($updateMacros, 'macro');
+			$macrosToAdd = $updateMacros;
+			$hostmacrosIds = zbx_objectValues($macrosToAdd, 'hostmacroid');
 
 			$hostMacros = API::UserMacro()->get(array(
 				'hostids' => $hostids,
 				'output' => API_OUTPUT_EXTEND,
 			));
-			$hostMacros = zbx_toHash($hostMacros, 'macro');
+			$hostMacros = zbx_toHash($hostMacros, 'hostmacroid');
 
 // Delete
 			$macrosToDelete = array();
-			foreach ($hostMacros as $hmnum => $hmacro) {
-				if (!isset($macrosToAdd[$hmacro['macro']])) {
-					$macrosToDelete[] = $hmacro['macro'];
+			foreach ($hostMacros as $hmacro) {
+				if (!in_array($hmacro['hostmacroid'], $hostmacrosIds)) {
+					$macrosToDelete[] = $hmacro['hostmacroid'];
 				}
 			}
 // Update
 			$macrosToUpdate = array();
 			foreach ($macrosToAdd as $nhmnum => $nhmacro) {
-				if (isset($hostMacros[$nhmacro['macro']])) {
+				if (isset($nhmacro['hostmacroid']) && isset($hostMacros[$nhmacro['hostmacroid']])) {
 					$macrosToUpdate[] = $nhmacro;
 					unset($macrosToAdd[$nhmnum]);
 				}
@@ -2059,11 +2060,7 @@ Copt::memoryPick();
 		}
 
 		if (isset($data['macros'])) {
-			$options = array(
-				'hostids' => $hostids,
-				'macros' => zbx_toArray($data['macros'])
-			);
-			$result = API::UserMacro()->massRemove($options);
+			$result = API::UserMacro()->massRemove(zbx_toArray($data['macros']));
 			if (!$result) self::exception();
 		}
 
