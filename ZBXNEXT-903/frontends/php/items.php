@@ -75,7 +75,6 @@ $fields = array(
 		'('.BETWEEN(0, SEC_PER_DAY).'isset({delay_flex})&&is_array({delay_flex})&&count({delay_flex})>0))&&',
 		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.' && {type}!='.ITEM_TYPE_SNMPTRAP.'))'),
 	'new_delay_flex' =>			array(T_ZBX_STR, O_OPT, NOT_EMPTY, '',		'isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
-	'rem_delay_flex' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY), null),
 	'delay_flex' =>				array(T_ZBX_STR, O_OPT, null,	'',			null),
 	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
 	'status' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
@@ -138,7 +137,6 @@ $fields = array(
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'del_history' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'del_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
 	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'register' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -328,13 +326,7 @@ foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'su
  * Actions
  */
 $result = false;
-if (isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex'])) {
-	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
-	foreach ($_REQUEST['rem_delay_flex'] as $value) {
-		unset($_REQUEST['delay_flex'][$value]);
-	}
-}
-elseif (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
+if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 	array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
 }
@@ -531,9 +523,11 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 		}
 	}
 	$result = DBend($result);
+	show_messages($result, _('Items updated'), _('Cannot update items'));
 
-	show_messages($result, _('Items updated'));
-	unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
+	if ($result) {
+		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
+	}
 }
 elseif (isset($_REQUEST['register'])) {
 	// getting data about how item should look after update or creation

@@ -730,32 +730,3 @@ function validateNumericBox(obj, allowempty, allownegative) {
 function t(str) {
 	return (!!locale[str]) ? locale[str] : str;
 }
-
-/**
- * Javascript implementation of CItemGeneral::itemTypeInterface()
- *
- * @param itemType
- * @returns
- */
-function itemTypeInterface(itemType) {
-	switch (itemType) {
-		case 1: // ITEM_TYPE_SNMPV1
-		case 4: // ITEM_TYPE_SNMPV2C
-		case 6: // ITEM_TYPE_SNMPV3
-		case 17: // ITEM_TYPE_SNMPTRAP
-			return 2; // INTERFACE_TYPE_SNMP
-		case 12: // ITEM_TYPE_IPMI
-			return 3; // INTERFACE_TYPE_IPMI
-		case 0: // ITEM_TYPE_ZABBIX
-			return 1; // INTERFACE_TYPE_AGENT
-		case 3: // ITEM_TYPE_SIMPLE
-		case 10: // ITEM_TYPE_EXTERNAL
-		case 13: // ITEM_TYPE_SSH
-		case 14: // ITEM_TYPE_TELNET
-			return -1; // INTERFACE_TYPE_ANY
-		case 16: // ITEM_TYPE_JMX
-			return 4; // INTERFACE_TYPE_JMX
-		default:
-			return false;
-	}
-}

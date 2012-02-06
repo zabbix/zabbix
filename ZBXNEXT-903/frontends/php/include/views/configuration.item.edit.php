@@ -19,6 +19,8 @@
 **/
 ?>
 <?php
+CItemGeneral::insert_javascript_itemTypeInterface();
+
 $itemWidget = new CWidget('item-edit');
 $itemWidget->addPageHeader($this->data['page_header']);
 
@@ -398,7 +400,6 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 		}
 		zbx_subarray_push($this->data['typeVisibility'], $type, 'delay_flex['.$i.'][delay]');
 		zbx_subarray_push($this->data['typeVisibility'], $type, 'delay_flex['.$i.'][period]');
-		zbx_subarray_push($this->data['typeVisibility'], $type, 'rem_delay_flex['.$i.']');
 	}
 	$i++;
 	if ($i == 7) {
