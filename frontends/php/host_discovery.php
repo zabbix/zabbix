@@ -74,7 +74,7 @@ $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 												ITEM_TYPE_SSH.','.
 												ITEM_TYPE_DB_MONITOR.','.
 												ITEM_TYPE_TELNET.','.
-												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
+												ITEM_TYPE_CALCULATED,'type'), getParamFieldLabelByType(get_request('type', 0))),
 //hidden fields for better gui
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_dbmonitor'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),

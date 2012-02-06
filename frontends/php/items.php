@@ -102,7 +102,7 @@ $fields = array(
 	'privatekey' =>				array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 	$paramsFieldName =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
-		ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type')),
+		ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'), getParamFieldLabelByType(get_request('type', 0))),
 	'inventory_link' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
 	'snmp_community' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C,'type')),
@@ -750,6 +750,7 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'history' => get_request('history', 90),
 		'status' => get_request('status', 0),
 		'type' => get_request('type', 0),
+		'interfaceid' => get_request('interfaceid', 0),
 		'snmp_community' => get_request('snmp_community', 'public'),
 		'port' => get_request('port', ''),
 		'value_type' => get_request('value_type', ITEM_VALUE_TYPE_UINT64),
@@ -778,6 +779,10 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'itemids' => $data['itemids'],
 		'selectInterfaces' => API_OUTPUT_EXTEND
 	));
+	$data['is_multiple_hosts'] = count($data['hosts']) > 1;
+	if (!$data['is_multiple_hosts']) {
+		$data['hosts'] = reset($data['hosts']);
+	}
 
 	// application
 	if (count($data['applications']) == 0) {
