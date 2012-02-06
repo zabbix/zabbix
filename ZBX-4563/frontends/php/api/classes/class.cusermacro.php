@@ -756,50 +756,23 @@ class CUserMacro extends CZBXAPI {
 		return array('hostmacroids' => $hostmacroids);
 	}
 
-/**
- * Remove Macros from Hosts
- *
- * @param array $data
- * @param array $data['hostids']
- * @param array $data['templateids']
- * @return boolean
- */
-	public function massRemove($data) {
+	/**
+	 * Remove Macros from Hosts
+	 *
+	 * @param mixed $hostmacroIds
+	 *
+	 * @return boolean
+	 */
+	public function massRemove($hostmacroIds) {
+		$hostmacroIds = zbx_toArray($hostmacroIds);
 
-			$macros = zbx_toArray($data['macros'], 'macro');
+		if (!$hostmacroIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
 
-			$hostids = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
-			$templateids = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
-			$objectids = array_merge($hostids, $templateids);
+		DB::delete('hostmacro', array('hostmacroid' => $hostmacroIds));
 
-// Check on existing
-			$options = array(
-				'hostids' => $objectids,
-				'templated_hosts' => 1,
-				'editable' => true,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => true
-			);
-			$dbObjects = API::Host()->get($options);
-
-			foreach ($objectids as $objectid) {
-				if (!isset($dbObjects[$objectid]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
-
-			$options = array(
-				'hostids' => $objectids,
-				'filter' => array('macro' => $macros),
-				'nopermissions' => true,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => true
-			);
-			$dbMacros = $this->get($options);
-			$hostmacroids = array_keys($dbMacros);
-
-			DB::delete('hostmacro', array('hostmacroid'=>$hostmacroids));
-
-			return array('hostmacroids' => $hostmacroids);
+		return array('hostmacroids' => $hostmacroIds);
 	}
 
 /**
@@ -824,7 +797,7 @@ class CUserMacro extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ hosts ] or [ templates ]');
 
 			if (!empty($hosts)) {
-// Host permission
+				// Host permission
 				$options = array(
 					'hostids' => $hostids,
 					'editable' => 1,
@@ -836,11 +809,11 @@ class CUserMacro extends CZBXAPI {
 					if (!isset($updHosts[$host['hostid']]))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
-//--
+
 			}
 
 			if (!empty($templates)) {
-// Template permission
+				// Template permission
 				$options = array(
 					'templateids' => $templateids,
 					'editable' => 1,
@@ -852,34 +825,22 @@ class CUserMacro extends CZBXAPI {
 					if (!isset($updTemplates[$template['templateid']]))
 						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
-//--
+
 			}
 
-			$objectids = array_merge($hostids, $templateids);
-
-// first we need to validate input data
+			// first we need to validate input data
 			$this->validate($data['macros']);
-
-// Check on existing
-			$options = array(
-				'hostids' => $objectids,
-				'filter' => array('macro' => zbx_objectValues($data['macros'], 'macro')),
-				'editable' => 1,
-				'output' => API_OUTPUT_EXTEND
-			);
-			$dbMacros = $this->get($options);
-//--
-
-			$updateMacros = zbx_toHash($data['macros'], 'macro');
 
 			$hostmacroids = array();
 			$dataUpdate = array();
-
-			foreach ($dbMacros as $dbnum => $dbMacro) {
-				$hostmacroids[] = $dbMacro['hostmacroid'];
+			foreach ($data['macros'] as $macro) {
+				$hostmacroids[] = $macro['hostmacroid'];
 				$dataUpdate[] = array(
-					'values' => array('value' => $updateMacros[$dbMacro['macro']]['value']),
-					'where' => array('hostmacroid' => $dbMacro['hostmacroid'])
+					'values' => array(
+						'value' => $macro['value'],
+						'macro' => $macro['macro'],
+					),
+					'where' => array('hostmacroid' => $macro['hostmacroid'])
 				);
 			}
 
