@@ -53,7 +53,6 @@ $fields = array(
 		'('.BETWEEN(0, SEC_PER_DAY).'isset({delay_flex})&&is_array({delay_flex})&&count({delay_flex})>0))&&',
 		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.' && {type}!='.ITEM_TYPE_SNMPTRAP.'))'),
 	'new_delay_flex' =>			array(T_ZBX_STR, O_OPT, NOT_EMPTY, '',		'isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
-	'rem_delay_flex' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY), null),
 	'delay_flex' =>				array(T_ZBX_STR, O_OPT, null,	'',			null),
 	'status' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
 	'type' =>					array(T_ZBX_INT, O_OPT, null,
@@ -118,7 +117,6 @@ $fields = array(
 		'isset({save})&&isset({value_type})&&'.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')),
 	'del_history' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'del_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
 	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'register' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -191,13 +189,7 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 /*
  * Actions
  */
-if (isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex'])) {
-	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
-	foreach ($_REQUEST['rem_delay_flex'] as $value) {
-		unset($_REQUEST['delay_flex'][$value]);
-	}
-}
-elseif (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
+if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 	array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
 }

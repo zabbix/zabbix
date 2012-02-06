@@ -23,11 +23,10 @@
  * @package API
  */
 
-abstract class CItemGeneral extends CZBXAPI{
+abstract class CItemGeneral extends CZBXAPI {
 
 	protected $fieldRules;
-
-	abstract public function get($options=array());
+	abstract public function get($options = array());
 
 	public function __construct() {
 		parent::__construct();
@@ -153,7 +152,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			$fullItem = $items[$inum];
 
 			if (!check_db_fields($itemDbFields, $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if ($update) {
@@ -279,7 +278,7 @@ abstract class CItemGeneral extends CZBXAPI{
 				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
 				foreach($item['applications'] as $appId) {
 					if (!in_array($appId, $dbApplicationIds)) {
-						$error = _s('Application with ID "%1$s" is not available on "%2$s"', $appId, $host['name']);
+						$error = _s('Application with ID "%1$s" is not available on "%2$s".', $appId, $host['name']);
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 					}
 				}
@@ -354,6 +353,33 @@ abstract class CItemGeneral extends CZBXAPI{
 		}
 	}
 
+	public static function insert_javascript_itemTypeInterface() {
+		insert_js('
+			function itemTypeInterface(itemType) {
+				switch (itemType) {
+					case 1: // ITEM_TYPE_SNMPV1
+					case 4: // ITEM_TYPE_SNMPV2C
+					case 6: // ITEM_TYPE_SNMPV3
+					case 17: // ITEM_TYPE_SNMPTRAP
+						return 2; // INTERFACE_TYPE_SNMP
+					case 12: // ITEM_TYPE_IPMI
+						return 3; // INTERFACE_TYPE_IPMI
+					case 0: // ITEM_TYPE_ZABBIX
+						return 1; // INTERFACE_TYPE_AGENT
+					case 3: // ITEM_TYPE_SIMPLE
+					case 10: // ITEM_TYPE_EXTERNAL
+					case 13: // ITEM_TYPE_SSH
+					case 14: // ITEM_TYPE_TELNET
+						return -1; // INTERFACE_TYPE_ANY
+					case 16: // ITEM_TYPE_JMX
+						return 4; // INTERFACE_TYPE_JMX
+					default:
+						return false;
+				}
+			}'
+		);
+	}
+
 	/**
 	 * Returns the interface that best matches the given item.
 	 *
@@ -406,8 +432,12 @@ abstract class CItemGeneral extends CZBXAPI{
 
 
 	public function isReadable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -422,8 +452,12 @@ abstract class CItemGeneral extends CZBXAPI{
 	}
 
 	public function isWritable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -471,14 +505,14 @@ abstract class CItemGeneral extends CZBXAPI{
 	protected function checkUseInGraphAxis(array $itemids, $checkMax = false) {
 		if ($checkMax) {
 			$filter = array(
-				'ymax_itemid' => $itemids,
+				'ymax_itemid' => $itemids
 			);
 			$itemIdColumn = 'ymax_itemid';
 			$typeColumn = 'ymax_type';
 		}
 		else {
 			$filter = array(
-				'ymin_itemid' => $itemids,
+				'ymin_itemid' => $itemids
 			);
 			$itemIdColumn = 'ymin_itemid';
 			$typeColumn = 'ymin_type';
@@ -521,6 +555,5 @@ abstract class CItemGeneral extends CZBXAPI{
 			API::Graph()->update($updateGraphs);
 		}
 	}
-
 }
 ?>
