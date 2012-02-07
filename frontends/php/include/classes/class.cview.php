@@ -130,11 +130,5 @@ class CView {
 		}
 		$this->template->show();
 	}
-
-
-	public function toString()
-	{
-		return $this->render();
-	}
 }
 ?>

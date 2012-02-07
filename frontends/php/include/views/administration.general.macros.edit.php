@@ -26,9 +26,11 @@ $macrosForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 
 // tab
 $macrosTab = new CTabView();
-$macrosTab->addTab('macros', _('Macros'), new CView('common.macros', array(
+
+$macrosView = new CView('common.macros', array(
 	'macros' => $this->get('macros')
-)));
+));
+$macrosTab->addTab('macros', _('Macros'), $macrosView->render());
 
 $saveButton = new CSubmit('save', _('Save'));
 $saveButton->attr('data-removed-count', 0);

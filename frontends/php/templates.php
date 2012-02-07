@@ -339,13 +339,7 @@ require_once('include/page_header.php');
 			foreach ($macros as $mnum => $macro) {
 				if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 					unset($macros[$mnum]);
-					continue;
 				}
-
-				if ($macro['new'] == 'create') {
-					unset($macros[$mnum]['macroid']);
-				}
-				unset($macros[$mnum]['new']);
 			}
 
 			$duplicatedMacros = array();
