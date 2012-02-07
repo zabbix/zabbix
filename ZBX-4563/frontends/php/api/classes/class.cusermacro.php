@@ -630,92 +630,36 @@ class CUserMacro extends CZBXAPI {
 		}
 	}
 
-/**
- * Add Macros to Hosts
- *
- * @param array $data
- * @param array $data['templates']
- * @param array $data['hosts']
- * @param array $data['macros']
- * @return boolean
- */
-	public function massAdd($data) {
-		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
-		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
-
-		$hostids = zbx_objectValues($hosts, 'hostid');
-		$templateids = zbx_objectValues($templates, 'templateid');
-
-		if (!isset($data['macros']) || empty($data['macros'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ macros ]');
-		}
-		elseif (empty($hosts) && empty($templates)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'Not set input parameter [ hosts ] or [ templates ]');
+	/**
+	 * Validates the input parameters for the massAdd method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $hostMacros
+	 */
+	public function validateMassAdd(array $hostMacros) {
+		foreach ($hostMacros as $hostMacro) {
+			$this->validateMacro($hostMacro);
+			$this->validateValue($hostMacro);
+			$this->validateHostId($hostMacro);
 		}
 
-		// Host permission
-		if (!empty($hosts)) {
-			$updHosts = API::Host()->get(array(
-				'hostids' => $hostids,
-				'editable' => true,
-				'output' => array('hostid', 'name'),
-				'preservekeys' => true
-			));
-			foreach ($hosts as $host) {
-				if (!isset($updHosts[$host['hostid']])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
-		}
+		$this->validateDuplicateMacros($hostMacros);
+		$this->validateHostPermissions(zbx_objectValues($hostMacros, 'hostid'));
+		$this->validateHostMacrosDontRepeat($hostMacros);
+	}
 
-		// Template permission
-		if (!empty($templates)) {
-			$updTemplates = API::Template()->get(array(
-				'templateids' => $templateids,
-				'editable' => true,
-				'output' => array('hostid', 'name'),
-				'preservekeys' => true
-			));
-			foreach ($templates as $template) {
-				if (!isset($updTemplates[$template['templateid']])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
-		}
+	/**
+	 * Add new host macros.
+	 *
+	 * @param array $hostMacros an array of host macros
+	 *
+	 * @return array
+	 */
+	public function massAdd(array $hostMacros) {
+		$this->validateMassAdd($hostMacros);
 
-		// Check on existing
-		$objectids = array_merge($hostids, $templateids);
-		$existingMacros = $this->get(array(
-			'hostids' => $objectids,
-			'filter' => array('macro' => zbx_objectValues($data['macros'], 'macro')),
-			'output' => API_OUTPUT_EXTEND,
-			'limit' => 1
-		));
-		foreach ($existingMacros as $exstMacro) {
-			if (isset($updHosts[$exstMacro['hostid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists on "%2$s".',
-						$exstMacro['macro'], $updHosts[$exstMacro['hostid']]['name']));
-			}
-			elseif (isset($updTemplates[$exstMacro['hostid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists on "%2$s".',
-						$exstMacro['macro'], $updTemplates[$exstMacro['hostid']]['name']));
-			}
-		}
-
-		self::validate($data['macros']);
-
-		$insertData = array();
-		foreach ($data['macros'] as $macro) {
-			foreach ($objectids as $hostid) {
-				$insertData[] = array(
-					'hostid' => $hostid,
-					'macro' => $macro['macro'],
-					'value' => $macro['value']
-				);
-			}
-		}
-
-		$hostmacroids = DB::insert('hostmacro', $insertData);
+		$hostmacroids = DB::insert('hostmacro', $hostMacros);
 
 		return array('hostmacroids' => $hostmacroids);
 	}
@@ -755,6 +699,7 @@ class CUserMacro extends CZBXAPI {
 		$hostMacroIds = zbx_toArray($hostMacroIds);
 
 		$this->validateMassRemove($hostMacroIds);
+
 		DB::delete('hostmacro', array('hostmacroid' => $hostMacroIds));
 
 		return array('hostmacroids' => $hostMacroIds);
@@ -798,7 +743,7 @@ class CUserMacro extends CZBXAPI {
 		$this->validateHostMacrosExistIn(zbx_objectValues($hostMacros, 'hostmacroid'), $dbHostMacros);
 
 		// check permissions for all affected hosts
-		$affectedHostIds = array_merge(zbx_objectValues($dbHostMacros, 'hostid'), zbx_objectValues($hostMacro, 'hostid'));
+		$affectedHostIds = array_merge(zbx_objectValues($dbHostMacros, 'hostid'), zbx_objectValues($hostMacros, 'hostid'));
 		$this->validateHostPermissions($affectedHostIds);
 
 		$this->validateHostMacrosDontRepeat($hostMacros);
