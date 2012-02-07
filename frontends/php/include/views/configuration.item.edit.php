@@ -310,11 +310,11 @@ $itemFormList->addRow(_('Show value'), array($valuemapComboBox, SPACE, $link), n
 $itemFormList->addRow(_('Allowed hosts'),
 	new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE), false, 'row_trapper_hosts'
 );
+
+// append applications to form list
 $itemFormList->addRow(_('New application'),
 	new CTextBox('new_application', $this->data['new_application'], ZBX_TEXTBOX_STANDARD_SIZE), false, null, 'new'
 );
-
-// append applications to form list
 $applicationComboBox = new CListBox('applications[]', $this->data['applications'], 6);
 $applicationComboBox->addItem(0, '-'._('None').'-');
 foreach ($this->data['db_applications'] as $application) {
