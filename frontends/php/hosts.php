@@ -518,19 +518,6 @@ require_once('include/page_header.php');
 			foreach ($macros as $mnum => $macro) {
 				// transform macros to uppercase {$aaa} => {$AAA}
 				$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
-
-				// search for duplicates items in new macros array
-				foreach ($macros as $duplicateNumber => $duplicateNewMacro) {
-					if ($mnum != $duplicateNumber && $macros[$mnum]['macro'] == $duplicateNewMacro['macro']) {
-						$duplicatedMacros[] = '"'.$macros[$mnum]['macro'].'"';
-					}
-				}
-			}
-
-			// validate duplicates macros
-			if (!empty($duplicatedMacros)) {
-				error(_s('More than one macro with same name found: %1$s .', implode(', ', array_unique($duplicatedMacros))));
-				throw new Exception();
 			}
 
 			// create new group
