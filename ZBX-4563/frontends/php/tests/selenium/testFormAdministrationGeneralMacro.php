@@ -99,7 +99,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('ERROR: Cannot update macros');
-		$this->ok('More than one macro with same name found:');
+		$this->ok('Macro "'.$row['macro'].'" already exists');
 		$this->ok('Macros');
 		$this->ok('Macro');
 		$this->ok('Value');

@@ -67,18 +67,6 @@ if (isset($_REQUEST['save'])) {
 		foreach ($newMacros as $number => $newMacro) {
 			// transform macros to uppercase {$aaa} => {$AAA}
 			$newMacros[$number]['macro'] = zbx_strtoupper($newMacro['macro']);
-
-			// search for duplicates items in new macros array
-			foreach ($newMacros as $duplicateNumber => $duplicateNewMacro) {
-				if ($number != $duplicateNumber && $newMacros[$number]['macro'] == $duplicateNewMacro['macro']) {
-					$duplicatedMacros[] = '"'.$newMacros[$number]['macro'].'"';
-				}
-			}
-		}
-
-		// validate duplicates macros
-		if (!empty($duplicatedMacros)) {
-			throw new Exception(_s('More than one macro with same name found: %1$s .', implode(', ', array_unique($duplicatedMacros))));
 		}
 
 		// update
