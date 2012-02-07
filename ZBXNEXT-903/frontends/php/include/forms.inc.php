@@ -1061,9 +1061,11 @@
 		$data['db_applications'] = DBfetchArray(DBselect(
 			'SELECT DISTINCT a.applicationid,a.name'.
 			' FROM applications a'.
-			' WHERE a.hostid='.$data['hostid'].
-			' ORDER BY a.name'
+			' WHERE a.hostid='.$data['hostid']
 		));
+		if (!empty($data['db_applications'])) {
+			order_result($data['db_applications'], 'name');
+		}
 
 		// interfaces
 		$data['interfaces'] = API::HostInterface()->get(array(
