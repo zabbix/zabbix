@@ -3316,7 +3316,7 @@ void	zbx_strarr_free(char **arr)
  ******************************************************************************/
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
 {
-	size_t	sz_data, sz_block, sz_value, data_alloc;
+	size_t	sz_data, sz_block, data_alloc, sz_value;
 	char	*src, *dst;
 
 	sz_data = *r + strlen(*data + *r);
