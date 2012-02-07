@@ -279,33 +279,33 @@
 	function prepare_subfilter_output($data, $subfilter, $subfilter_name) {
 		$output = array();
 		order_result($data, 'name');
-		foreach ($data as $id => $elem) {
+		foreach ($data as $id => $element) {
 			// subfilter is activated
 			if (str_in_array($id, $subfilter)) {
-				$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'subfilter_enabled');
-				$script = "javascript: create_var('zbx_filter', '".$subfilter_name.'['.$id."]', null, true);";
+				$span = new CSpan($element['name'].' ('.$element['count'].')', 'subfilter_enabled');
+				$script = CHtml::encode('javascript: create_var("zbx_filter", '.CJs::encodeJson($subfilter_name.'['.$id.']').', null, true);');
 				$span->onClick($script);
 				$output[] = $span;
 			}
 			// subfilter isn't activated
 			else {
-				$script = "javascript: create_var('zbx_filter', '".$subfilter_name.'['.$id."]', '$id', true);";
+				$script = CHtml::encode('javascript: create_var("zbx_filter", '.CJs::encodeJson($subfilter_name.'['.$id.']').', '.CJs::encodeJson($id).', true);');
 
 				// subfilter has 0 items
-				if ($elem['count'] == 0) {
-					$span = new CSpan($elem['name'].' ('.$elem['count'].')', 'subfilter_inactive');
+				if ($element['count'] == 0) {
+					$span = new CSpan($element['name'].' ('.$element['count'].')', 'subfilter_inactive');
 					$span->onClick($script);
 					$output[] = $span;
 				}
 				else {
 					// this level has no active subfilters
 					if (empty($subfilter)) {
-						$nspan = new CSpan(' ('.$elem['count'].')', 'subfilter_active');
+						$nspan = new CSpan(' ('.$element['count'].')', 'subfilter_active');
 					}
 					else {
-						$nspan = new CSpan(' (+'.$elem['count'].')', 'subfilter_active');
+						$nspan = new CSpan(' (+'.$element['count'].')', 'subfilter_active');
 					}
-					$span = new CSpan($elem['name'], 'subfilter_disabled');
+					$span = new CSpan($element['name'], 'subfilter_disabled');
 					$span->onClick($script);
 
 					$output[] = $span;
