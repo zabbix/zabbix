@@ -3206,7 +3206,7 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 clean:
 	if (0 == i || '\0' != (*data)[i] || 0 != level)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Invalid %s at position %d: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "invalid %s at position %d: \"%s\"",
 				MACRO_TYPE_ITEM_KEY == macro_type ? "item key" : "OID", (int)i, *data);
 	}
 
