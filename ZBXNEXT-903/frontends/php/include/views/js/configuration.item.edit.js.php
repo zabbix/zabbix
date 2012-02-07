@@ -90,15 +90,20 @@
 		}
 	}
 
+	/*
+	 * ITEM_TYPE_SNMPTRAP: 17
+	 * INTERFACE_TYPE_SNMP: 2
+	 * INTERFACE_TYPE_IPMI :3
+	 */
 	function displayKeyButton() {
-		var interfaceType = itemTypeInterface(parseInt(jQuery('#type').val()));
-		switch (interfaceType) {
-			case 2: // INTERFACE_TYPE_SNMP
-			case 3: // INTERFACE_TYPE_IPMI
-				jQuery('#keyButton').attr('disabled', 'disabled');
-				break;
-			default:
-				jQuery('#keyButton').removeAttr('disabled');
+		var type = parseInt(jQuery('#type').val());
+		var interfaceType = itemTypeInterface(type);
+
+		if (type != 17 && (interfaceType == 2 || interfaceType == 3)) {
+			jQuery('#keyButton').attr('disabled', 'disabled');
+		}
+		else {
+			jQuery('#keyButton').removeAttr('disabled');
 		}
 	}
 

@@ -548,7 +548,9 @@ function expand_item_key_by_data($item) {
 			}
 		}
 	}
-	$item = API::UserMacro()->resolveItem($item);
+	if (preg_match('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $key)) {
+		$item = API::UserMacro()->resolveItem($item);
+	}
 	return $item['key_'];
 }
 

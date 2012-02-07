@@ -850,8 +850,7 @@ else {
 		'form' => get_request('form', null),
 		'form_hostid' => get_request('form_hostid', $hostid),
 		'hostid' => $hostid,
-		'sortfield' => getPageSortField('name'),
-		'sortorder' => getPageSortOrder()
+		'sortfield' => getPageSortField('name')
 	);
 
 	// items
@@ -866,7 +865,6 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => array('ts_delete'),
 		'sortfield' => $data['sortfield'],
-		'sortorder' => $data['sortorder'],
 		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
@@ -1032,7 +1030,7 @@ else {
 		}
 	}
 
-	order_result($data['items'], $data['sortfield'], $data['sortorder']);
+	order_result($data['items'], $data['sortfield'], getPageSortOrder());
 	$data['paging'] = getPagingLine($data['items']);
 
 	$itemTriggerIds = array();
