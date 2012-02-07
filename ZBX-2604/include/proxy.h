@@ -34,15 +34,16 @@
 AGENT_VALUE
 {
 	zbx_timespec_t	ts;
-	char	host_name[HOST_HOST_LEN_MAX];
-	char	key[ITEM_KEY_LEN_MAX];
-	char	*value;
-	int	lastlogsize;
-	int	mtime;
-	int	timestamp;
-	char	*source;
-	int	severity;
-	int	logeventid;
+	char		host_name[HOST_HOST_LEN_MAX];
+	char		key[ITEM_KEY_LEN_MAX];
+	char		*value;
+	char		*source;
+	int		lastlogsize;
+	int		mtime;
+	int		timestamp;
+	int		severity;
+	int		logeventid;
+	unsigned char	status;
 };
 
 int	get_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char *error, int max_error_len);
