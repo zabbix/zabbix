@@ -631,13 +631,13 @@ class CUserMacro extends CZBXAPI {
 	}
 
 	/**
-	 * Validates the input parameters for the massAdd method.
+	 * Validates the input parameters for the create() method.
 	 *
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostMacros
 	 */
-	public function validateMassAdd(array $hostMacros) {
+	public function validateCreate(array $hostMacros) {
 		foreach ($hostMacros as $hostMacro) {
 			$this->validateMacro($hostMacro);
 			$this->validateValue($hostMacro);
@@ -656,8 +656,8 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function massAdd(array $hostMacros) {
-		$this->validateMassAdd($hostMacros);
+	public function create(array $hostMacros) {
+		$this->validateCreate($hostMacros);
 
 		$hostmacroids = DB::insert('hostmacro', $hostMacros);
 
@@ -665,13 +665,13 @@ class CUserMacro extends CZBXAPI {
 	}
 
 	/**
-	 * Validates the input parameters for the massRemove method.
+	 * Validates the input parameters for the delete() method.
 	 *
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostMacroIds
 	 */
-	protected function validateMassRemove(array $hostMacroIds) {
+	protected function validateDelete(array $hostMacroIds) {
 		if (!$hostMacroIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -695,10 +695,10 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @return boolean
 	 */
-	public function massRemove($hostMacroIds) {
+	public function delete($hostMacroIds) {
 		$hostMacroIds = zbx_toArray($hostMacroIds);
 
-		$this->validateMassRemove($hostMacroIds);
+		$this->validateDelete($hostMacroIds);
 
 		DB::delete('hostmacro', array('hostmacroid' => $hostMacroIds));
 
@@ -706,13 +706,13 @@ class CUserMacro extends CZBXAPI {
 	}
 
 	/**
-	 * Validates the input parameters for the massUpdate method.
+	 * Validates the input parameters for the update() method.
 	 *
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $hostMacros
 	 */
-	protected function validateMassUpdate(array $hostMacros) {
+	protected function validateUpdate(array $hostMacros) {
 		foreach ($hostMacros as $macro) {
 			$this->validateHostMacroId($macro);
 		}
@@ -735,7 +735,7 @@ class CUserMacro extends CZBXAPI {
 		$this->validateDuplicateMacros($hostMacros);
 
 		$dbHostMacros = $this->get(array(
-			'hostmacroids' => zbx_objectValues($hostMacro, 'hostmacroid'),
+			'hostmacroids' => zbx_objectValues($hostMacros, 'hostmacroid'),
 			'output' => API_OUTPUT_EXTEND
 		));
 
@@ -756,10 +756,10 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @return boolean
 	 */
-	public function massUpdate($hostMacros) {
+	public function update($hostMacros) {
 		$hostMacros = zbx_toArray($hostMacros);
 
-		$this->validateMassUpdate($hostMacros);
+		$this->validateUpdate($hostMacros);
 
 		$hostMacroIds = array();
 		$dataUpdate = array();

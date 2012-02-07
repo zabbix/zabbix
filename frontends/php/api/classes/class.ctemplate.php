@@ -1306,7 +1306,7 @@ COpt::memoryPick();
 
 			if (isset($data['macros']) && !empty($data['macros'])) {
 				$options = array('templates' => zbx_toArray($data['templates']), 'macros' => $data['macros']);
-				$result = API::UserMacro()->massAdd($options);
+				$result = API::UserMacro()->create($options);
 				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t link macros');
 			}
 
@@ -1578,7 +1578,7 @@ COpt::memoryPick();
 				}
 
 				if (!empty($macrosToUpdate)) {
-					$result = API::UserMacro()->massUpdate(array('templates' => $templates, 'macros' => $macrosToUpdate));
+					$result = API::UserMacro()->update(array('templates' => $templates, 'macros' => $macrosToUpdate));
 					if (!$result) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro'));
 					}
@@ -1653,7 +1653,7 @@ COpt::memoryPick();
 					'templateids' => $templateids,
 					'macros' => zbx_toArray($data['macros'])
 				);
-				$result = API::UserMacro()->massRemove($options);
+				$result = API::UserMacro()->delete($options);
 				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove macros"));
 			}
 
