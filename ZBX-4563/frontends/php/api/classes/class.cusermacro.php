@@ -494,15 +494,15 @@ class CUserMacro extends CZBXAPI {
 	 * @param array $macros
 	 */
 	protected function validateCreateGlobal(array $macros) {
-		$this->validateGlobalMacrosPermissions(_('Only Super Admins can create global macros.'));
+		$this->checkGlobalMacrosPermissions(_('Only Super Admins can create global macros.'));
 
 		foreach ($macros as $macro) {
-			$this->validateMacro($macro);
-			$this->validateValue($macro);
+			$this->checkMacro($macro);
+			$this->checkValue($macro);
 		}
 
-		$this->validateDuplicateMacros($macros);
-		$this->validateGlobalMacrosDontRepeat($macros);
+		$this->checkDuplicateMacros($macros);
+		$this->checkIfGlobalMacrosDontRepeat($macros);
 	}
 
 	/**
@@ -530,7 +530,7 @@ class CUserMacro extends CZBXAPI {
 	 * @param array $globalMacros
 	 */
 	protected function validateUpdateGlobal(array $globalMacros) {
-		$this->validateGlobalMacrosPermissions(_('Only Super Admins can update global macros.'));
+		$this->checkGlobalMacrosPermissions(_('Only Super Admins can update global macros.'));
 
 		foreach ($globalMacros as $globalMacro) {
 			if (!isset($globalMacro['globalmacroid']) || zbx_empty($globalMacro['globalmacroid'])) {
@@ -538,20 +538,20 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-		$this->validateDuplicateMacros($globalMacros);
+		$this->checkDuplicateMacros($globalMacros);
 
 		foreach ($globalMacros as $globalMacro) {
 			if (isset($globalMacro['macro'])) {
-				$this->validateMacro($globalMacro);
+				$this->checkMacro($globalMacro);
 			}
 			if (isset($globalMacro['value'])) {
-				$this->validateValue($globalMacro);
+				$this->checkValue($globalMacro);
 			}
 		}
 
-		$this->validateDuplicateMacros($globalMacros);
-		$this->validateGlobalMacrosExist(zbx_objectValues($globalMacros, 'globalmacroid'));
-		$this->validateGlobalMacrosDontRepeat($globalMacros);
+		$this->checkDuplicateMacros($globalMacros);
+		$this->checkIfGlobalMacrosExist(zbx_objectValues($globalMacros, 'globalmacroid'));
+		$this->checkIfGlobalMacrosDontRepeat($globalMacros);
 	}
 
 	/**
@@ -594,8 +594,8 @@ class CUserMacro extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->validateGlobalMacrosPermissions($globalMacroIds);
-		$this->validateGlobalMacrosExist($globalMacroIds);
+		$this->checkGlobalMacrosPermissions($globalMacroIds);
+		$this->checkIfGlobalMacrosExist($globalMacroIds);
 	}
 
 	/**
@@ -625,14 +625,14 @@ class CUserMacro extends CZBXAPI {
 	 */
 	public function validateCreate(array $hostMacros) {
 		foreach ($hostMacros as $hostMacro) {
-			$this->validateMacro($hostMacro);
-			$this->validateValue($hostMacro);
-			$this->validateHostId($hostMacro);
+			$this->checkMacro($hostMacro);
+			$this->checkValue($hostMacro);
+			$this->checkHostId($hostMacro);
 		}
 
-		$this->validateDuplicateMacros($hostMacros);
-		$this->validateHostPermissions(zbx_objectValues($hostMacros, 'hostid'));
-		$this->validateHostMacrosDontRepeat($hostMacros);
+		$this->checkDuplicateMacros($hostMacros);
+		$this->checkHostPermissions(zbx_objectValues($hostMacros, 'hostid'));
+		$this->checkIfHostMacrosDontRepeat($hostMacros);
 	}
 
 	/**
@@ -668,10 +668,10 @@ class CUserMacro extends CZBXAPI {
 		));
 
 		// check if the macros exist
-		$this->validateHostMacrosExistIn($hostMacroIds, $dbHostMacros);
+		$this->checkIfHostMacrosExistIn($hostMacroIds, $dbHostMacros);
 
 		// check permissions for all affected hosts
-		$this->validateHostPermissions(zbx_objectValues($dbHostMacros, 'hostid'));
+		$this->checkHostPermissions(zbx_objectValues($dbHostMacros, 'hostid'));
 	}
 
 	/**
@@ -710,17 +710,17 @@ class CUserMacro extends CZBXAPI {
 
 		foreach ($hostMacros as $hostMacro) {
 			if (isset($hostMacro['macro'])) {
-				$this->validateMacro($hostMacro);
+				$this->checkMacro($hostMacro);
 			}
 			if (isset($hostMacro['value'])) {
-				$this->validateValue($hostMacro);
+				$this->checkValue($hostMacro);
 			}
 			if (isset($hostMacro['hostid'])) {
-				$this->validateHostId($hostMacro);
+				$this->checkHostId($hostMacro);
 			}
 		}
 
-		$this->validateDuplicateMacros($hostMacros);
+		$this->checkDuplicateMacros($hostMacros);
 
 		$dbHostMacros = $this->get(array(
 			'hostmacroids' => zbx_objectValues($hostMacros, 'hostmacroid'),
@@ -728,13 +728,13 @@ class CUserMacro extends CZBXAPI {
 		));
 
 		// check if the macros exist
-		$this->validateHostMacrosExistIn(zbx_objectValues($hostMacros, 'hostmacroid'), $dbHostMacros);
+		$this->checkIfHostMacrosExistIn(zbx_objectValues($hostMacros, 'hostmacroid'), $dbHostMacros);
 
 		// check permissions for all affected hosts
 		$affectedHostIds = array_merge(zbx_objectValues($dbHostMacros, 'hostid'), zbx_objectValues($hostMacros, 'hostid'));
-		$this->validateHostPermissions($affectedHostIds);
+		$this->checkHostPermissions($affectedHostIds);
 
-		$this->validateHostMacrosDontRepeat($hostMacros);
+		$this->checkIfHostMacrosDontRepeat($hostMacros);
 	}
 
 	/**
@@ -904,7 +904,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $macro
 	 */
-	protected function validateMacro(array $macro) {
+	protected function checkMacro(array $macro) {
 		if (!isset($macro['macro']) || zbx_empty($macro['macro'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty macro.'));
 		}
@@ -923,7 +923,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $macro
 	 */
-	protected function validateValue(array $macro) {
+	protected function checkValue(array $macro) {
 		if (!isset($macro['value']) || zbx_empty($macro['value'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Empty value for macro "%1$s".', $macro['macro']));
 		}
@@ -939,7 +939,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $macro
 	 */
-	protected function validateHostId(array $macro) {
+	protected function checkHostId(array $macro) {
 		if (!isset($macro['hostid']) || zbx_empty($macro['hostid'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('No host given for macro "%1$s".', $macro['macro']));
 		}
@@ -952,7 +952,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $hostIds    an array of host or template IDs
 	 */
-	protected function validateHostPermissions(array $hostIds) {
+	protected function checkHostPermissions(array $hostIds) {
 		// host permission
 		$hosts = API::Host()->get(array(
 			'hostids' => $hostIds,
@@ -982,7 +982,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $macros
 	 */
-	protected function validateDuplicateMacros(array $macros) {
+	protected function checkDuplicateMacros(array $macros) {
 		$existingMacros = array();
 		foreach ($macros as $macro) {
 			if (isset($existingMacros[$macro['macro']])) {
@@ -1002,7 +1002,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $hostMacros
 	 */
-	protected function validateHostMacrosDontRepeat(array $hostMacros) {
+	protected function checkIfHostMacrosDontRepeat(array $hostMacros) {
 		$dbHostMacros = $this->select($this->tableName(), array(
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array(
@@ -1041,7 +1041,7 @@ class CUserMacro extends CZBXAPI {
 	 * @param array $hostMacrosIds
 	 * @param array $hostMacros
 	 */
-	protected function validateHostMacrosExistIn(array $hostMacrosIds, array $hostMacros) {
+	protected function checkIfHostMacrosExistIn(array $hostMacrosIds, array $hostMacros) {
 		$hostMacros = zbx_toHash($hostMacros, 'hostmacroid');
 		foreach ($hostMacrosIds as $hostMacroId) {
 			if (!isset($hostMacros[$hostMacroId])) {
@@ -1059,7 +1059,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $macros
 	 */
-	protected function validateGlobalMacrosDontRepeat(array $macros) {
+	protected function checkIfGlobalMacrosDontRepeat(array $macros) {
 		$nameMacro = zbx_toHash($macros, 'macro');
 		$macroNames = zbx_objectValues($macros, 'macro');
 		if ($macroNames) {
@@ -1083,7 +1083,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param string $error a message that will be used as the error text
 	 */
-	protected function validateGlobalMacrosPermissions($error) {
+	protected function checkGlobalMacrosPermissions($error) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
 		}
@@ -1097,7 +1097,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @param array $globalMacroIds
 	 */
-	protected function validateGlobalMacrosExist(array $globalMacroIds) {
+	protected function checkIfGlobalMacrosExist(array $globalMacroIds) {
 		$globalMacros = $this->select('globalmacro', array(
 			'output' => API_OUTPUT_EXTEND,
 			'globalmacroids' => $globalMacroIds
