@@ -201,7 +201,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			}
 
 			// check if the item requires an interface
-			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
+			$itemInterfaceType = itemTypeInterface($fullItem['type']);
 			if ($itemInterfaceType !== false && $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
 				if (!$fullItem['interfaceid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
@@ -330,56 +330,6 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 	}
 
-	public static function itemTypeInterface($itemType) {
-		switch ($itemType) {
-			case ITEM_TYPE_SNMPV1:
-			case ITEM_TYPE_SNMPV2C:
-			case ITEM_TYPE_SNMPV3:
-			case ITEM_TYPE_SNMPTRAP:
-				return INTERFACE_TYPE_SNMP;
-			case ITEM_TYPE_IPMI:
-				return INTERFACE_TYPE_IPMI;
-			case ITEM_TYPE_ZABBIX:
-				return INTERFACE_TYPE_AGENT;
-			case ITEM_TYPE_SIMPLE:
-			case ITEM_TYPE_EXTERNAL:
-			case ITEM_TYPE_SSH:
-			case ITEM_TYPE_TELNET:
-				return INTERFACE_TYPE_ANY;
-			case ITEM_TYPE_JMX:
-				return INTERFACE_TYPE_JMX;
-			default:
-				return false;
-		}
-	}
-
-	public static function insert_javascript_itemTypeInterface() {
-		insert_js('
-			function itemTypeInterface(itemType) {
-				switch (itemType) {
-					case 1: // ITEM_TYPE_SNMPV1
-					case 4: // ITEM_TYPE_SNMPV2C
-					case 6: // ITEM_TYPE_SNMPV3
-					case 17: // ITEM_TYPE_SNMPTRAP
-						return 2; // INTERFACE_TYPE_SNMP
-					case 12: // ITEM_TYPE_IPMI
-						return 3; // INTERFACE_TYPE_IPMI
-					case 0: // ITEM_TYPE_ZABBIX
-						return 1; // INTERFACE_TYPE_AGENT
-					case 3: // ITEM_TYPE_SIMPLE
-					case 10: // ITEM_TYPE_EXTERNAL
-					case 13: // ITEM_TYPE_SSH
-					case 14: // ITEM_TYPE_TELNET
-						return -1; // INTERFACE_TYPE_ANY
-					case 16: // ITEM_TYPE_JMX
-						return 4; // INTERFACE_TYPE_JMX
-					default:
-						return false;
-				}
-			}'
-		);
-	}
-
 	/**
 	 * Returns the interface that best matches the given item.
 	 *
@@ -399,7 +349,7 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 
 		// find item interface type
-		$type = self::itemTypeInterface($item['type']);
+		$type = itemTypeInterface($item['type']);
 
 		$matchingInterface = array();
 

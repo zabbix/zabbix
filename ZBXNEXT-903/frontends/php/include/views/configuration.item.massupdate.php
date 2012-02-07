@@ -19,8 +19,6 @@
 **/
 ?>
 <?php
-CItemGeneral::insert_javascript_itemTypeInterface();
-
 $itemWidget = new CWidget();
 $itemWidget->addPageHeader(_('CONFIGURATION OF ITEMS'));
 

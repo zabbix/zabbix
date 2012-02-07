@@ -137,7 +137,7 @@ if ($_REQUEST['hostid'] > 0 && !isset($_REQUEST['form_refresh'])) {
 		// check if interface has items that require specific interface type, if so type cannot be changed
 		$locked = 0;
 		foreach ($dbHost['interfaces'][$interface['interfaceid']]['items'] as $item) {
-			$itemInterfaceType = CItem::itemTypeInterface($item['type']);
+			$itemInterfaceType = itemTypeInterface($item['type']);
 			if (!($itemInterfaceType === false || $itemInterfaceType === INTERFACE_TYPE_ANY)) {
 				$locked = 1;
 				break;

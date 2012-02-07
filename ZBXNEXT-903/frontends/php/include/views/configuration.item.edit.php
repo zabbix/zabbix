@@ -19,8 +19,6 @@
 **/
 ?>
 <?php
-CItemGeneral::insert_javascript_itemTypeInterface();
-
 $itemWidget = new CWidget('item-edit');
 $itemWidget->addPageHeader($this->data['page_header']);
 

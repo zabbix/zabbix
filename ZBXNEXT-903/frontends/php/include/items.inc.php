@@ -171,6 +171,31 @@ function item_status2style($status) {
 	}
 }
 
+function itemTypeInterface($type = null) {
+	$types = array(
+		ITEM_TYPE_SNMPV1 => INTERFACE_TYPE_SNMP,
+		ITEM_TYPE_SNMPV2C => INTERFACE_TYPE_SNMP,
+		ITEM_TYPE_SNMPV3 => INTERFACE_TYPE_SNMP,
+		ITEM_TYPE_SNMPTRAP => INTERFACE_TYPE_SNMP,
+		ITEM_TYPE_IPMI => INTERFACE_TYPE_IPMI,
+		ITEM_TYPE_ZABBIX => INTERFACE_TYPE_AGENT,
+		ITEM_TYPE_SIMPLE => INTERFACE_TYPE_ANY,
+		ITEM_TYPE_EXTERNAL => INTERFACE_TYPE_ANY,
+		ITEM_TYPE_SSH => INTERFACE_TYPE_ANY,
+		ITEM_TYPE_TELNET => INTERFACE_TYPE_ANY,
+		ITEM_TYPE_JMX => INTERFACE_TYPE_JMX
+	);
+	if (is_null($type)) {
+		return $types;
+	}
+	elseif (isset($types[$type])) {
+		return $types[$type];
+	}
+	else {
+		return null;
+	}
+}
+
 function update_item_in_group($groupid, $itemid, $item) {
 	$db_items = DBSelect(
 		'SELECT i.itemid,i.hostid'.
@@ -279,7 +304,7 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 		}
 		foreach ($srcItems as &$srcItem) {
 			if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
-				$type = CItem::itemTypeInterface($srcItem['type']);
+				$type = itemTypeInterface($srcItem['type']);
 
 				if ($type == INTERFACE_TYPE_ANY) {
 					foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
