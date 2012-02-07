@@ -22,11 +22,12 @@
 
 #include "common.h"
 #include "db.h"
+#include "zbxalgo.h"
 
 void	op_template_add(DB_EVENT *event, zbx_uint64_t templateid);
 void	op_template_del(DB_EVENT *event, zbx_uint64_t templateid);
-void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid);
-void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid);
+void	op_groups_add(DB_EVENT *event, zbx_vector_uint64_t *groupids);
+void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids);
 void	op_host_add(DB_EVENT *event);
 void	op_host_del(DB_EVENT *event);
 void	op_host_enable(DB_EVENT *event);

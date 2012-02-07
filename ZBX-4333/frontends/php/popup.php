@@ -147,14 +147,44 @@ include_once('include/page_header.php');
 	if(defined($page['title']))     $page['title'] = constant($page['title']);
 ?>
 <?php
+
+	// allowed 'srcfld1' and 'srcfld2' parameter values for each 'srctbl' value
+	$allowedSrcFields = array(
+		'hosts'                 => '"name", "host", "hostid"',
+		'groups'                => '"groups"',
+		'host_group'            => '"groupid", "name"',
+		'items'                 => '"itemid", "_key", "description"',
+		'help_items'            => '"key_"',
+		'triggers'              => '"description", "triggerid", "expression"',
+		'graphs'                => '"graphid", "name"',
+		'simple_graph'          => '"itemid", "description"',
+		'usrgrp'                => '"usrgrpid","name"',
+		'users'                 => '"usergrpid", "alias", "userid"',
+		'applications'          => '"name"',
+		'sysmaps'               => '"sysmapid", "name"',
+		'screens'               => '"screenid", "name"',
+		'slides'                => '"slideshowid"',
+		'drules'                => '"druleid", "name"',
+		'dcheckes'              => '"dcheckid", "name"',
+		'proxies'               => '"hostid", "host"',
+		'nodes'                 => '"nodeid", "name"',
+		'host_templates'        => '"hostid", "host"',
+		'hosts_and_templates'   => '"hostid", "host"',
+		'overview'              => '"groupid", "name"',
+		'host_group_scr'        => '"groupid", "name"',
+		'plain_text'            => '"itemid", "description"',
+		'templates' 			=> '"hostid", "host"',
+		'screens2'              => '"screenid", "name"'
+	);
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'dstfrm' =>		array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 		'dstfld1'=>		array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 		'dstfld2'=>		array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
 		'srctbl' =>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		'srcfld1'=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
-		'srcfld2'=>		array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
+		'srcfld1'=>		array(T_ZBX_STR, O_MAND,P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]),	null),
+		'srcfld2'=>		array(T_ZBX_STR, O_OPT,P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]),		null),
 		'nodeid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'groupid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'hostid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
@@ -188,7 +218,6 @@ include_once('include/page_header.php');
 	if(isset($_REQUEST['itemtype']) && !str_in_array($_REQUEST['itemtype'], $allowed_item_types))
 			unset($_REQUEST['itemtype']);
 
-	check_fields($fields);
 
 	$dstfrm		= get_request('dstfrm',  '');	// destination form
 	$dstfld1	= get_request('dstfld1', '');	// output field on destination form
@@ -199,6 +228,8 @@ include_once('include/page_header.php');
 	$dstact 	= get_request('dstact', '');
 	$writeonly	= get_request('writeonly');
 	$noempty	= get_request('noempty'); 		// display/hide "Empty" button
+
+	check_fields($fields);
 
 	$existed_templates = get_request('existed_templates', null);
 	$excludeids = get_request('excludeids', null);

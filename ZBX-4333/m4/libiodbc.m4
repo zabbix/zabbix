@@ -51,31 +51,27 @@ AC_HELP_STRING([--with-iodbc@<:@=ARG@:>@],
 	fi
 
 	if test -f "$_libiodbc_with/include/sql.h"; then
-
 		IODBC_CFLAGS="-I$_libiodbc_with/include"
-		IODBC_LDFLAGS="$LDFLAGS -L$_libiodbc_with/lib"
+		IODBC_LDFLAGS="-L$_libiodbc_with/lib"
+		IODBC_LIBS="-liodbc"
 
-		_save_iodbc_libs="${LIBS}"
-		_save_iodbc_ldflags="${LDFLAGS}"
-		_save_iodbc_cflags="${CFLAGS}"
-		LIBS="${LIBS} ${IODBC_LIBS}"
-		LDFLAGS="${LDFLAGS} ${IODBC_LDFLAGS}"
-		CFLAGS="${CFLAGS} ${IODBC_CFLAGS}"
+		_save_iodbc_cflags="$CFLAGS"
+		_save_iodbc_ldflags="$LDFLAGS"
+		_save_iodbc_libs="$LIBS"
+		CFLAGS="$CFLAGS $IODBC_CFLAGS"
+		LDFLAGS="$LDFLAGS $IODBC_LDFLAGS"
+		LIBS="$LIBS $IODBC_LIBS"
 
-		AC_CHECK_LIB(iodbc, main,[
-				IODBC_LIBS="-liodbc $IODBC_LIBS"
-			],[
-				AC_MSG_ERROR([Not found libiodbc library])
-			])
+		AC_CHECK_LIB(iodbc, main, , [AC_MSG_ERROR([Not found libiodbc library])])
 
-		LIBS="${_save_iodbc_libs}"
-		LDFLAGS="${_save_iodbc_ldflags}"
-		CFLAGS="${_save_iodbc_cflags}"
-		unset _save_iodbc_libs
-		unset _save_iodbc_ldflags
+		CFLAGS="$_save_iodbc_cflags"
+		LDFLAGS="$_save_iodbc_ldflags"
+		LIBS="$_save_iodbc_libs"
 		unset _save_iodbc_cflags
+		unset _save_iodbc_ldflags
+		unset _save_iodbc_libs
 
-		AC_DEFINE(HAVE_IODBC,1,[Define to 1 if iODBC Driver Manager should be used.])
+		AC_DEFINE(HAVE_IODBC, 1, [Define to 1 if iODBC Driver Manager should be used.])
 
 		found_iodbc="yes"
 		AC_MSG_RESULT(yes)
