@@ -192,7 +192,7 @@ function itemTypeInterface($type = null) {
 		return $types[$type];
 	}
 	else {
-		return null;
+		return false;
 	}
 }
 

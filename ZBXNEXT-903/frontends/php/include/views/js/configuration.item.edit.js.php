@@ -103,19 +103,18 @@
 	}
 
 	/*
+	 * ITEM_TYPE_ZABBIX: 0
 	 * ITEM_TYPE_SNMPTRAP: 17
-	 * INTERFACE_TYPE_SNMP: 2
-	 * INTERFACE_TYPE_IPMI :3
+	 * ITEM_TYPE_SIMPLE: 3
 	 */
 	function displayKeyButton() {
 		var type = parseInt(jQuery('#type').val());
-		var interfaceType = itemTypeInterface(type);
 
-		if (type != 17 && (interfaceType == 2 || interfaceType == 3)) {
-			jQuery('#keyButton').attr('disabled', 'disabled');
+		if (type == 0 || type == 7 || type == 3 || type == 5 || type == 8 || type == 17) {
+			jQuery('#keyButton').removeAttr('disabled');
 		}
 		else {
-			jQuery('#keyButton').removeAttr('disabled');
+			jQuery('#keyButton').attr('disabled', 'disabled');
 		}
 	}
 
