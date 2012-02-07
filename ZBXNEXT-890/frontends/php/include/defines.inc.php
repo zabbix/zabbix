@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-	define('ZABBIX_VERSION','1.8.7rc1');
-	define('ZABBIX_API_VERSION','1.3');
+	define('ZABBIX_VERSION',		'1.8.11rc1');
+	define('ZABBIX_API_VERSION',	'1.3');
 /* USER DEFINES */
 
 	define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -364,8 +364,13 @@
 	define('EZ_TEXTING_LIMIT_USA',		0);
 	define('EZ_TEXTING_LIMIT_CANADA',	1);
 
-	define('ACTION_DEFAULT_SUBJ',		'{TRIGGER.NAME}: {TRIGGER.STATUS}');
-	define('ACTION_DEFAULT_MSG',		"{TRIGGER.NAME}: {TRIGGER.STATUS}\nLast value: {ITEM.LASTVALUE}\n\n{TRIGGER.URL}");
+	define('ACTION_DEFAULT_SUBJ_TRIGGER', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
+	define('ACTION_DEFAULT_SUBJ_AUTOREG', 'Auto registration: {HOSTNAME}');
+	define('ACTION_DEFAULT_SUBJ_DISCOVERY', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
+
+	define('ACTION_DEFAULT_MSG_TRIGGER', "Trigger: {TRIGGER.NAME}\nTrigger status: {TRIGGER.STATUS}\nTrigger severity: {TRIGGER.SEVERITY}\nTrigger URL: {TRIGGER.URL}\n\nItem values:\n\n1. {ITEM.NAME1} ({HOSTNAME1}:{TRIGGER.KEY1}): {ITEM.VALUE1}\n2. {ITEM.NAME2} ({HOSTNAME2}:{TRIGGER.KEY2}): {ITEM.VALUE2}\n3. {ITEM.NAME3} ({HOSTNAME3}:{TRIGGER.KEY3}): {ITEM.VALUE3}");
+	define('ACTION_DEFAULT_MSG_AUTOREG', 'Host name: {HOSTNAME}');
+	define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}\nDevice status: {DISCOVERY.DEVICE.STATUS}\nDevice uptime: {DISCOVERY.DEVICE.UPTIME}\n\nDevice service name: {DISCOVERY.SERVICE.NAME}\nDevice service port: {DISCOVERY.SERVICE.PORT}\nDevice service status: {DISCOVERY.SERVICE.STATUS}\nDevice service uptime: {DISCOVERY.SERVICE.UPTIME}");
 
 	define('ACTION_STATUS_ENABLED',		0);
 	define('ACTION_STATUS_DISABLED',	1);
@@ -650,7 +655,7 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 
 	define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?){0,1}');
 	define('ZBX_PREG_SIGN', '([&|><=+*\/#\-])');
-	define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[KMGTsmhdw]{0,1})');
+	define('ZBX_PREG_NUMBER', '([\-+]{0,1}[0-9]+[.]{0,1}[0-9]*[YZEPKMGTsmhdw]{0,1})');
 
 	define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 //--
@@ -796,6 +801,6 @@ if(in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))){
 // BC Math scale
 	bcscale(7);
 
-// Numeric Locale to default
-	setLocale(LC_NUMERIC, array('en','en_US','en_US.UTF-8','English_United States.1252'));
+	// numeric locale to default
+	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 ?>

@@ -5,6 +5,6 @@ CREATE TABLE slides (
         step            integer         DEFAULT '0'     NOT NULL,
         delay           integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (slideid)
-)  ENGINE=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX slides_slides_1 on slides (slideshowid);
 

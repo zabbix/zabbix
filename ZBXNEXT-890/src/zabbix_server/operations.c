@@ -51,11 +51,7 @@
  * Parameters: host_name - host name                                          *
  *             command - remote command                                       *
  *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 
@@ -129,7 +125,7 @@ static void run_remote_command(char* host_name, char* command)
 		else
 		{
 #endif
-			param = dyn_escape_param(p);
+			param = zbx_dyn_escape_string(p, "\"");
 			item.key = zbx_dsprintf(NULL, "system.run[\"%s\",\"nowait\"]", param);
 			zbx_free(param);
 
@@ -168,8 +164,6 @@ static void run_remote_command(char* host_name, char* command)
  *               1 - EOL                                                      *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 
@@ -251,8 +245,6 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
  * Parameters: trigger - trigger data                                         *
  *             action  - action data                                          *
  *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: commands separated with newline                                  *
@@ -305,8 +297,6 @@ void	op_run_commands(char *cmd_list)
  * Return value: hostid - existing hostid, 0 - if not found                   *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	select_discovered_host(DB_EVENT *event)
@@ -365,13 +355,9 @@ exit:
  *                                                                            *
  * Purpose: return port of the discovered zabbix_agent                        *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: discovered port number, otherwise default port - 10050       *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static unsigned short	get_discovered_agent_port(DB_EVENT *event)
@@ -422,43 +408,94 @@ end:
 
 /******************************************************************************
  *                                                                            *
- * Function: add_discovered_host_group                                        *
+ * Function: add_discovered_host_groups                                       *
  *                                                                            *
  * Purpose: add group to host if not added already                            *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-static void	add_discovered_host_group(zbx_uint64_t hostid, zbx_uint64_t groupid)
+static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
 {
+	const char	*__function_name = "add_discovered_host_groups";
+
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	hostgroupid;
+	zbx_uint64_t	groupid;
+	char		*sql = NULL;
+	int		sql_alloc = 256, sql_offset = 0, i;
 
-	result = DBselect(
-			"select hostgroupid"
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+			"select groupid"
 			" from hosts_groups"
-			" where groupid=" ZBX_FS_UI64
-				" and hostid=" ZBX_FS_UI64,
-			groupid,
+			" where hostid=" ZBX_FS_UI64
+				" and",
 			hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 
-	if (NULL == (row = DBfetch(result)))
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
 	{
-		hostgroupid = DBget_maxid("hosts_groups");
-		DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid)"
-				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				hostgroupid,
-				hostid,
-				groupid);
+		ZBX_STR2UINT64(groupid, row[0]);
+
+		if (FAIL == (i = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		zbx_vector_uint64_remove_noorder(groupids, i);
 	}
 	DBfree_result(result);
+
+	if (0 != groupids->values_num)
+	{
+		const char	*ins_hosts_groups_sql = "insert into hosts_groups (hostgroupid,hostid,groupid) values ";
+		zbx_uint64_t	hostgroupid;
+#ifdef HAVE_MULTIROW_INSERT
+		const char	*row_dl = ",";
+#else
+		const char	*row_dl = ";\n";
+#endif
+
+		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
+
+		sql_offset = 0;
+#ifdef HAVE_ORACLE
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 7, "begin\n");
+#endif
+#ifdef HAVE_MULTIROW_INSERT
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
+#endif
+		for (i = 0; i < groupids->values_num; i++)
+		{
+#ifndef HAVE_MULTIROW_INSERT
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_hosts_groups_sql);
+#endif
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 67,
+					"(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")%s",
+					hostgroupid++, hostid, groupids->values[i], row_dl);
+
+#ifdef HAVE_ORACLE
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 6, "end;\n");
+#endif
+		}
+
+#ifdef HAVE_MULTIROW_INSERT
+		sql_offset--;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+#endif
+		DBexecute("%s", sql);
+	}
+
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -473,23 +510,24 @@ static void	add_discovered_host_group(zbx_uint64_t hostid, zbx_uint64_t groupid)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 {
-	const char	*__function_name = "add_discovered_host";
-	DB_RESULT	result;
-	DB_RESULT	result2;
-	DB_ROW		row;
-	DB_ROW		row2;
-	zbx_uint64_t	hostid = 0, proxy_hostid, host_proxy_hostid;
-	char		host[MAX_STRING_LEN], *host_esc, *ip_esc, *host_unique, *host_unique_esc;
-	int		port;
-	zbx_uint64_t	groupid;
+	const char		*__function_name = "add_discovered_host";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(eventid:" ZBX_FS_UI64 ")",
-			__function_name, event->eventid);
+	DB_RESULT		result;
+	DB_RESULT		result2;
+	DB_ROW			row;
+	DB_ROW			row2;
+	zbx_uint64_t		hostid = 0, proxy_hostid, host_proxy_hostid;
+	char			host[MAX_STRING_LEN], *host_esc, *ip_esc, *host_unique, *host_unique_esc;
+	int			port;
+	zbx_uint64_t		groupid;
+	zbx_vector_uint64_t	groupids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
+
+	zbx_vector_uint64_create(&groupids);
 
 	result = DBselect(
 			"select discovery_groupid"
@@ -501,44 +539,45 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 	if (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
+		zbx_vector_uint64_append(&groupids, groupid);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can't add discovered host:"
-				" Group for discovered hosts is not defined");
-		return 0;
+		zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host: group for discovered hosts is not defined");
+		goto clean;
 	}
 	DBfree_result(result);
 
-	switch (event->object) {
-	case EVENT_OBJECT_DHOST:
-		result = DBselect(
-				"select dr.proxy_hostid,ds.ip"
-				" from drules dr,dchecks dc,dservices ds"
-				" where dc.druleid=dr.druleid"
-					" and ds.dcheckid=dc.dcheckid"
-					" and ds.dhostid=" ZBX_FS_UI64
-				" order by ds.dserviceid",
-				event->objectid);
-		break;
-	case EVENT_OBJECT_DSERVICE:
-		result = DBselect(
-				"select dr.proxy_hostid,ds.ip"
-				" from drules dr,dchecks dc,dservices ds,dservices ds1"
-				" where dc.druleid=dr.druleid"
-					" and ds.dcheckid=dc.dcheckid"
-					" and ds1.dhostid=ds.dhostid"
-					" and ds1.dserviceid=" ZBX_FS_UI64
-				" order by ds.dserviceid",
-				event->objectid);
-		break;
-	case EVENT_OBJECT_ZABBIX_ACTIVE:
-		result = DBselect("select proxy_hostid,host from autoreg_host"
-				" where autoreg_hostid=" ZBX_FS_UI64,
-				event->objectid);
-		break;
-	default:
-		return 0;
+	switch (event->object)
+	{
+		case EVENT_OBJECT_DHOST:
+			result = DBselect(
+					"select dr.proxy_hostid,ds.ip"
+					" from drules dr,dchecks dc,dservices ds"
+					" where dc.druleid=dr.druleid"
+						" and ds.dcheckid=dc.dcheckid"
+						" and ds.dhostid=" ZBX_FS_UI64
+					" order by ds.dserviceid",
+					event->objectid);
+			break;
+		case EVENT_OBJECT_DSERVICE:
+			result = DBselect(
+					"select dr.proxy_hostid,ds.ip"
+					" from drules dr,dchecks dc,dservices ds,dservices ds1"
+					" where dc.druleid=dr.druleid"
+						" and ds.dcheckid=dc.dcheckid"
+						" and ds1.dhostid=ds.dhostid"
+						" and ds1.dserviceid=" ZBX_FS_UI64
+					" order by ds.dserviceid",
+					event->objectid);
+			break;
+		case EVENT_OBJECT_ZABBIX_ACTIVE:
+			result = DBselect("select proxy_hostid,host from autoreg_host"
+					" where autoreg_hostid=" ZBX_FS_UI64,
+					event->objectid);
+			break;
+		default:
+			goto clean;
 	}
 
 	if (NULL != (row = DBfetch(result)))
@@ -568,10 +607,9 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,dns)"
 						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',0,'%s')",
-						hostid,
-						proxy_hostid,
-						host_esc,
-						host_esc);
+						hostid, proxy_hostid, host_esc, host_esc);
+
+				add_discovered_host_groups(hostid, &groupids);
 			}
 			else
 			{
@@ -583,15 +621,14 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					DBexecute("update hosts"
 							" set proxy_hostid=" ZBX_FS_UI64
 							" where hostid=" ZBX_FS_UI64,
-							proxy_hostid,
-							hostid);
+							proxy_hostid, hostid);
 				}
 			}
 			DBfree_result(result2);
 
 			zbx_free(host_esc);
 		}
-		else /* EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE */
+		else	/* EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE */
 		{
 			alarm(CONFIG_TIMEOUT);
 			zbx_gethost_by_ip(row[1], host, sizeof(host));
@@ -618,13 +655,13 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 				if ('\0' != *host)
 				{
 					/* by host name */
-					make_hostname(host); /* replace not-allowed symbols */
+					make_hostname(host);	/* replace not-allowed characters */
 					host_unique = DBget_unique_hostname_by_sample(host);
 				}
 				else
 				{
 					/* by ip */
-					make_hostname(row[1]); /* replace not-allowed symbols */
+					make_hostname(row[1]);	/* replace not-allowed characters */
 					host_unique = DBget_unique_hostname_by_sample(row[1]);
 				}
 
@@ -632,16 +669,12 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 
 				DBexecute("insert into hosts (hostid,proxy_hostid,host,useip,ip,dns,port)"
 						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',1,'%s','%s',%d)",
-						hostid,
-						proxy_hostid,
-						/*(*host != '\0' ? host_esc : ip_esc),*/ /* Use host name if exists, IP otherwise */
-						host_unique_esc,
-						ip_esc,
-						host_esc,
-						port);
+						hostid, proxy_hostid, host_unique_esc, ip_esc, host_esc, port);
 
 				zbx_free(host_unique);
 				zbx_free(host_unique_esc);
+
+				add_discovered_host_groups(hostid, &groupids);
 			}
 			else
 			{
@@ -653,8 +686,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 					DBexecute("update hosts"
 							" set dns='%s',proxy_hostid=" ZBX_FS_UI64
 							" where hostid=" ZBX_FS_UI64,
-							host_esc, proxy_hostid,
-							hostid);
+							host_esc, proxy_hostid, hostid);
 				}
 			}
 			DBfree_result(result2);
@@ -664,9 +696,8 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
 		}
 	}
 	DBfree_result(result);
-
-	if (0 != hostid)
-		add_discovered_host_group(hostid, groupid);
+clean:
+	zbx_vector_uint64_destroy(&groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
@@ -682,11 +713,7 @@ static zbx_uint64_t	add_discovered_host(DB_EVENT *event)
  * Parameters: trigger - trigger data                                         *
  *             action  - action data                                          *
  *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	op_host_add(DB_EVENT *event)
@@ -712,13 +739,7 @@ void	op_host_add(DB_EVENT *event)
  *                                                                            *
  * Purpose: delete host                                                       *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	op_host_del(DB_EVENT *event)
@@ -748,13 +769,7 @@ void	op_host_del(DB_EVENT *event)
  *                                                                            *
  * Purpose: enable discovered                                                 *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	op_host_enable(DB_EVENT *event)
@@ -789,13 +804,7 @@ void	op_host_enable(DB_EVENT *event)
  *                                                                            *
  * Purpose: disable host                                                      *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	op_host_disable(DB_EVENT *event)
@@ -826,23 +835,19 @@ void	op_host_disable(DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
- * Function: op_group_add                                                     *
+ * Function: op_groups_add                                                    *
  *                                                                            *
- * Purpose: add group to discovered host                                      *
+ * Purpose: add groups to discovered host                                     *
  *                                                                            *
- * Parameters: event   - [IN] event data                                      *
- *             groupid - [IN] group identificator from database               *
- *                                                                            *
- * Return value: nothing                                                      *
+ * Parameters: event    - [IN] event data                                     *
+ *             groupids - [IN] IDs of groups to add                           *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid)
+void	op_groups_add(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "op_group_add";
+	const char	*__function_name = "op_groups_add";
 	zbx_uint64_t	hostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -856,31 +861,31 @@ void	op_group_add(DB_EVENT *event, zbx_uint64_t groupid)
 	if (0 == (hostid = add_discovered_host(event)))
 		return;
 
-	add_discovered_host_group(hostid, groupid);
+	add_discovered_host_groups(hostid, groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: op_group_del                                                     *
+ * Function: op_groups_del                                                    *
  *                                                                            *
- * Purpose: delete group from discovered host                                 *
+ * Purpose: delete groups from discovered host                                *
  *                                                                            *
- * Parameters: event   - [IN] event data                                      *
- *             groupid - [IN] group identificator from database               *
- *                                                                            *
- * Return value: nothing                                                      *
+ * Parameters: event    - [IN] event data                                     *
+ *             groupids - [IN] IDs of groups to delete                        *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid)
+void	op_groups_del(DB_EVENT *event, zbx_vector_uint64_t *groupids)
 {
-	const char	*__function_name = "op_group_del";
+	const char	*__function_name = "op_groups_del";
+
+	DB_RESULT	result;
 	zbx_uint64_t	hostid;
+	char		*sql = NULL;
+	int		sql_alloc = 256, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -893,12 +898,39 @@ void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid)
 	if (0 == (hostid = select_discovered_host(event)))
 		return;
 
-	DBexecute(
-			"delete from hosts_groups"
-			" where hostid=" ZBX_FS_UI64
-				" and groupid=" ZBX_FS_UI64,
-			hostid,
-			groupid);
+	sql = zbx_malloc(sql, sql_alloc);
+
+	/* make sure host belongs to at least one hostgroup */
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+		"select groupid"
+		" from hosts_groups"
+		" where hostid=" ZBX_FS_UI64
+			" and not",
+		hostid);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+
+	result = DBselectN(sql, 1);
+
+	if (NULL == DBfetch(result))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove host \"%s\" from all host groups:"
+				" it must belong to at least one", zbx_host_string(hostid));
+	}
+	else
+	{
+		sql_offset = 0;
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 256,
+				"delete from hosts_groups"
+				" where hostid=" ZBX_FS_UI64
+					" and",
+				hostid);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+
+		DBexecute("%s", sql);
+	}
+	DBfree_result(result);
+
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -912,11 +944,7 @@ void	op_group_del(DB_EVENT *event, zbx_uint64_t groupid)
  * Parameters: event      - [IN] event data                                   *
  *             templateid - [IN] host template identificator from database    *
  *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	op_template_add(DB_EVENT *event, zbx_uint64_t templateid)
@@ -949,11 +977,7 @@ void	op_template_add(DB_EVENT *event, zbx_uint64_t templateid)
  * Parameters: event      - [IN] event data                                   *
  *             templateid - [IN] host template identificator from database    *
  *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
  * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	op_template_del(DB_EVENT *event, zbx_uint64_t templateid)

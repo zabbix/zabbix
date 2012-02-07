@@ -849,7 +849,7 @@ return $table;
 // author Aly
 function make_latest_issues($filter = array()){
 	global $page;
-	
+
 	$config = select_config();
 
 	$limit = isset($filter['limit']) ? $filter['limit'] : 20;
@@ -1001,7 +1001,6 @@ function make_latest_issues($filter = array()){
 				}
 			}
 
-//			$description = expand_trigger_description($row['triggerid']);
 			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$row_event['clock'])),ZBX_FLAG_EVENT);
 
 //actions
@@ -1013,13 +1012,13 @@ function make_latest_issues($filter = array()){
 					);
 
 			if($trigger['url'])
-				$description = new CLink($description, $trigger['url'], null, null, true);
+				$description = new CLink($description, resolveTriggerUrl($trigger), null, null, true);
 			else
 				$description = new CSpan($description,'pointer');
 
 			$description = new CCol($description,get_severity_style($trigger['priority']));
 			$description->setHint(make_popup_eventlist($row_event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
-		
+
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),
 				$host,
@@ -1176,7 +1175,7 @@ function make_graph_menu(&$menu,&$submenu){
 				"PopUp('popup.php?srctbl=graphs".
 					'&srcfld1=graphid'.
 					'&reference=graphid'.
-					'&real_hosts=1'.
+					'&monitored_hosts=1'.
 					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
@@ -1187,8 +1186,8 @@ function make_graph_menu(&$menu,&$submenu){
 				'javascript: '.
 				"PopUp('popup.php?srctbl=simple_graph".
 					'&srcfld1=itemid'.
-					'&real_hosts=1'.
 					'&reference=itemid'.
+					'&monitored_hosts=1'.
 					"&multiselect=1',800,450);".
 				"void(0);",
 				null,
@@ -1250,7 +1249,7 @@ function make_graph_submenu(){
 			$item['description'] = item_description($item);
 
 			$favGraphs[] = array(
-							'name'	=>	$host['host'].':'.$item['description'],
+							'name'	=>	htmlspecialchars($host['host'].':'.$item['description']),
 							'favobj'=>	'itemid',
 							'favid'	=>	$sourceid,
 							'action'=>	'remove'
@@ -1264,7 +1263,7 @@ function make_graph_submenu(){
 			$ghost = reset($graph['hosts']);
 
 			$favGraphs[] = array(
-							'name'	=>	$ghost['host'].':'.$graph['name'],
+							'name'	=>	htmlspecialchars($ghost['host'].':'.$graph['name']),
 							'favobj'=>	'graphid',
 							'favid'	=>	$sourceid,
 							'action'=>	'remove'
@@ -1328,7 +1327,7 @@ function make_sysmap_submenu(){
 
 	foreach($sysmaps as $snum => $sysmap){
 		$favMaps[] = array(
-				'name'	=>	$sysmap['name'],
+				'name'	=>	htmlspecialchars($sysmap['name']),
 				'favobj'=>	'sysmapid',
 				'favid'	=>	$sysmap['sysmapid'],
 				'action'=>	'remove'
@@ -1405,7 +1404,7 @@ function make_screen_submenu(){
 			$slide_added = true;
 
 			$favScreens[] = array(
-				'name'	=>	$slide['name'],
+				'name'	=>	htmlspecialchars($slide['name']),
 				'favobj'=>	'slideshowid',
 				'favid'	=>	$slide['slideshowid'],
 				'action'=>	'remove'
@@ -1419,7 +1418,7 @@ function make_screen_submenu(){
 			$screen_added = true;
 
 			$favScreens[] = array(
-				'name'	=>	$screen['name'],
+				'name'	=>	htmlspecialchars($screen['name']),
 				'favobj'=>	'screenid',
 				'favid'	=>	$screen['screenid'],
 				'action'=>	'remove'

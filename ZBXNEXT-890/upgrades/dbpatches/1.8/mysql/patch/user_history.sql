@@ -12,5 +12,5 @@ CREATE TABLE user_history (
       title5          varchar(255)            DEFAULT ''      NOT NULL,
       url5            varchar(255)            DEFAULT ''      NOT NULL,
       PRIMARY KEY (userhistoryid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE UNIQUE INDEX user_history_1 on user_history (userid);

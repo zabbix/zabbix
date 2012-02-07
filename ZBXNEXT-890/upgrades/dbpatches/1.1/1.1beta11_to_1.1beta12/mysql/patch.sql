@@ -14,4 +14,4 @@ CREATE TABLE history_text (
   value                 text            DEFAULT '' NOT NULL,
   PRIMARY KEY (id),
   KEY itemidclock (itemid, clock)
-) type=InnoDB;
+) ENGINE=InnoDB;

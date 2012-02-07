@@ -19,32 +19,28 @@
 
 #include "common.h"
 #include "mutexs.h"
-
-#include "log.h" /* required for strerror_from_system() on Windows */
+#include "log.h"
 
 #if !defined(_WINDOWS)
-
 #	if !HAVE_SEMUN
 		union semun
 		{
-			int val;			/* <= value for SETVAL */
-			struct semid_ds *buf;		/* <= buffer for IPC_STAT & IPC_SET */
-			unsigned short int *array;	/* <= array for GETALL & SETALL */
-			struct seminfo *__buf;		/* <= buffer for IPC_INFO */
+			int			val;	/* value for SETVAL */
+			struct semid_ds		*buf;	/* buffer for IPC_STAT & IPC_SET */
+			unsigned short int	*array;	/* array for GETALL & SETALL */
+			struct seminfo		*__buf;	/* buffer for IPC_INFO */
 		};
 
 #		undef HAVE_SEMUN
 #		define HAVE_SEMUN 1
-
-#	endif /* semun */
+#	endif	/* HAVE_SEMUN */
 
 #	include "cfg.h"
 #	include "threads.h"
 
 	static int		ZBX_SEM_LIST_ID = -1;
 	static unsigned char	mutexes = 0;
-
-#endif /* not _WINDOWS */
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -61,22 +57,22 @@
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: you can use alias 'zbx_mutex_create' and 'zbx_mutex_create_force'*
+ * Comments: use alias 'zbx_mutex_create' and 'zbx_mutex_create_force'        *
  *                                                                            *
  ******************************************************************************/
 int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char forced)
 {
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 
-	if(NULL == ((*mutex) = CreateMutex(NULL, FALSE, name)))
+	if (NULL == (*mutex = CreateMutex(NULL, FALSE, name)))
 	{
 		zbx_error("error on mutex creating: %s", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
 	}
 
-#else /* not _WINDOWS */
+#else
 
-#define ZBX_MAX_ATTEMPTS 10
+#define ZBX_MAX_ATTEMPTS	10
 	int		attempts = 0, i;
 	key_t		sem_key;
 	union semun	semopts;
@@ -93,13 +89,13 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 			return ZBX_MUTEX_ERROR;
 		}
 	}
-
 lbl_create:
 	if (-1 != ZBX_SEM_LIST_ID || -1 != (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0600 /* 0022 */)) )
 	{
 		/* set default semaphore value */
+
 		semopts.val = 1;
-		for (i = 0; i < ZBX_MUTEX_COUNT; i++)
+		for (i = 0; ZBX_MUTEX_COUNT > i; i++)
 		{
 			if (-1 == semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
 			{
@@ -112,11 +108,11 @@ lbl_create:
 			zbx_mutex_unlock(&i);	/* release semaphore */
 		}
 	}
-	else if (errno == EEXIST)
+	else if (EEXIST == errno)
 	{
 		ZBX_SEM_LIST_ID = semget(sem_key, 0 /* get reference */, 0600 /* 0022 */);
 
-		if (forced)
+		if (1 == forced)
 		{
 			if (0 != semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
 			{
@@ -125,33 +121,36 @@ lbl_create:
 				exit(FAIL);
 			}
 
-			/* Semaphore is successfully removed */
+			/* semaphore is successfully removed */
 			ZBX_SEM_LIST_ID = -1;
 
-			if (++attempts > ZBX_MAX_ATTEMPTS)
+			if (ZBX_MAX_ATTEMPTS < ++attempts)
 			{
-				zbx_error("Can't recreate Zabbix semaphores for IPC key 0x%lx. [too many attempts]",
+				zbx_error("cannot recreate Zabbix semaphores for IPC key 0x%lx: too many attempts",
 						sem_key);
 				exit(FAIL);
 			}
-			if (attempts > (ZBX_MAX_ATTEMPTS / 2))
-			{
+
+			if ((ZBX_MAX_ATTEMPTS / 2) < attempts)
 				zbx_sleep(1);
-			}
+
 			goto lbl_create;
 		}
 
 		semopts.buf = &seminfo;
 		/* wait for initialization */
-		for (i = 0; i < ZBX_MUTEX_MAX_TRIES; i++)
+		for (i = 0; ZBX_MUTEX_MAX_TRIES > i; i++)
 		{
 			if (-1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_STAT, semopts))
 			{
 				zbx_error("semaphore [%i] error in semctl(IPC_STAT): %s",
-					name, zbx_strerror(errno));
+						name, zbx_strerror(errno));
 				break;
 			}
-			if(semopts.buf->sem_otime !=0 ) goto lbl_return;
+
+			if (0 != semopts.buf->sem_otime)
+				goto lbl_return;
+
 			zbx_sleep(1);
 		}
 
@@ -163,13 +162,11 @@ lbl_create:
 		zbx_error("cannot create Semaphore: %s", zbx_strerror(errno));
 		return ZBX_MUTEX_ERROR;
 	}
-
 lbl_return:
-
 	*mutex = name;
 	mutexes++;
 
-#endif /* _WINDOWS */
+#endif	/* _WINDOWS */
 
 	return ZBX_MUTEX_OK;
 }
@@ -182,17 +179,12 @@ lbl_return:
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #if defined(_WINDOWS)
-
 	if (!*mutex)
 		return;
 
@@ -204,7 +196,6 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 	}
 
 #else
-
 	struct sembuf	sem_lock;
 
 	sem_lock.sem_num = *mutex;
@@ -223,7 +214,6 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 			exit(FAIL);
 		}
 	}
-
 #endif
 }
 
@@ -235,17 +225,12 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
  *                                                                            *
  * Parameters: mutex - handle of mutex                                        *
  *                                                                            *
- * Return value:                                                              *
- *                                                                            *
  * Author: Eugene Grigorjev, Alexander Vladishev                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #if defined(_WINDOWS)
-
 	if (!*mutex)
 		return;
 
@@ -255,9 +240,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 				filename, line, strerror_from_system(GetLastError()));
 		exit(FAIL);
 	}
-
 #else
-
 	struct sembuf	sem_unlock;
 
 	sem_unlock.sem_num = *mutex;
@@ -276,7 +259,6 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
 			exit(FAIL);
 		}
 	}
-
 #endif
 }
 
@@ -292,28 +274,22 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex)
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 {
-
 #if defined(_WINDOWS)
+	if (!*mutex)
+		return ZBX_MUTEX_OK;
 
-	if(!*mutex) return ZBX_MUTEX_OK;
-
-	if(CloseHandle(*mutex) == 0)
+	if (0 == CloseHandle(*mutex))
 	{
 		zbx_error("error on mutex destroying: %s", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
 	}
-
-#else /* not _WINDOWS */
-
+#else
 	if (0 == --mutexes)
 		semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0);
-
-#endif /* _WINDOWS */
+#endif
 
 	*mutex = ZBX_MUTEX_NULL;
 
@@ -418,6 +394,7 @@ int	php_sem_get(PHP_MUTEX *sem_ptr, const char *path_name)
 	sop[2].sem_num = SYSVSEM_USAGE;
 	sop[2].sem_op = 1;
 	sop[2].sem_flg = SEM_UNDO;
+
 	while (-1 == semop(semid, sop, 3))
 	{
 		if (EINTR != errno)
@@ -449,6 +426,7 @@ int	php_sem_get(PHP_MUTEX *sem_ptr, const char *path_name)
 	sop[0].sem_num = SYSVSEM_SETVAL;
 	sop[0].sem_op = -1;
 	sop[0].sem_flg = SEM_UNDO;
+
 	while (-1 == semop(semid, sop, 1))
 	{
 		if (EINTR != errno)
@@ -473,7 +451,7 @@ static int	php_sysvsem_semop(PHP_MUTEX *sem_ptr, int acquire)
 	if (-1 == sem_ptr->semid)
 		return PHP_MUTEX_OK;
 
-	if (!acquire && sem_ptr->count == 0)
+	if (0 == acquire && 0 == sem_ptr->count)
 	{
 		zbx_error("SysV semaphore (id %d) is not currently acquired", sem_ptr->semid);
 		return PHP_MUTEX_ERROR;

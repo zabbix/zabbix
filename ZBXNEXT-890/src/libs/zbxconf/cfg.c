@@ -253,7 +253,8 @@ unknown_parameter:
 
 garbage:
 	fclose(file);
-	zbx_error("garbage [%s] in config file [%s], line %d", line, cfg_file, lineno);
+	zbx_error("invalid entry [%s] (not following \"parameter=value\" notation) in config file [%s], line %d",
+			line, cfg_file, lineno);
 	exit(1);
 }
 

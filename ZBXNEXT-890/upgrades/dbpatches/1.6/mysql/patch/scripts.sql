@@ -7,4 +7,4 @@ CREATE TABLE scripts (
 	groupid         bigint unsigned         DEFAULT '0'     NOT NULL,
 
         PRIMARY KEY (scriptid)
-) type=InnoDB;
+) ENGINE=InnoDB;

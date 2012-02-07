@@ -9,6 +9,6 @@ CREATE TABLE escalations (
         esc_step                integer         DEFAULT '0'     NOT NULL,
         status          integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (escalationid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX escalations_1 on escalations (actionid,triggerid);
 CREATE INDEX escalations_2 on escalations (status,nextcheck);

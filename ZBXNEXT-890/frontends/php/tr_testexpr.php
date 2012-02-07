@@ -42,7 +42,7 @@ include_once('include/page_header.php');
 
 // expression analyze
 	$expression = urldecode(get_request('expression', ''));
-	
+
 	define('NO_LINK_IN_TESTING', true);
 	$triggerExpr = new CTriggerExpression(array('expression' => $expression));
 	list($outline, $eHTMLTree) = analyze_expression($expression);
@@ -79,12 +79,12 @@ include_once('include/page_header.php');
 			if(substr($validation, 0, COMBO_PATTERN_LENGTH) == COMBO_PATTERN){
 				$vals = explode(',', substr($validation, COMBO_PATTERN_LENGTH, zbx_strlen($validation) - COMBO_PATTERN_LENGTH - 4));
 
-				$control = new CComboBox($fname, $macrosData[$macrosId]['cValue']);
+				$control = new CComboBox($fname, $macrosData[$exprPart['expression']]);
 				foreach ($vals as $v) $control->addItem($v, $v);
 			}
 			else
 				$control = new CTextBox($fname, $macrosData[$exprPart['expression']], 30);
-			
+
 			if(!is_array($info) && isset($definedErrorPhrases[$info])) {
 				$control->setAttribute('disabled', 'disabled');
 				$allowedTesting = false;
@@ -127,9 +127,9 @@ include_once('include/page_header.php');
 	$res_table->setOddRowClass('even_row');
 	$res_table->setEvenRowClass('even_row');
 	$res_table->setHeader(array(S_EXPRESSION, S_RESULT));
-	
+
 	ksort($rplcts, SORT_NUMERIC);
-	
+
 	//$exprs = make_disp_tree($tree, $map);
 	foreach($eHTMLTree as $e){
 		//if(!isset($e['expression']))

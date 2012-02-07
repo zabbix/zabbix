@@ -61,16 +61,16 @@ class CTag extends CObject{
 	public function showBody(){	echo $this->bodyToString();	}
 	public function showEnd(){		echo $this->endToString();	}
 
-// Do not put new line symbol(\n) before of after html tags,
-// it adds spaces in unwanted places
-	public function startToString(){
+	// Do not put new line symbol (\n) before or after html tags,
+	// it adds spaces in unwanted places
+	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
-		foreach($this->attributes as $key => $value){
-			$res .= ' '.$key.'="'.$value.'"';
+		foreach ($this->attributes as $key => $value) {
+			$res .= ' '.$key.'="'.$this->sanitize($value).'"';
 		}
-		$res .= ($this->paired==='yes')? '>':' />';
+		$res .= ($this->paired === 'yes') ? '>' : ' />';
 
-	return $res;
+		return $res;
 	}
 
 	public function bodyToString(){
@@ -135,7 +135,7 @@ class CTag extends CObject{
 			$this->attributes[$name] = unpack_object($value);
 		}
 		else if(isset($value))
-			$this->attributes[$name] = htmlspecialchars(str_replace(array("\r", "\n"), '', strval($value)));
+			$this->attributes[$name] = $value;
 		else
 			unset($this->attributes[$name]);
 	}
@@ -144,7 +144,10 @@ class CTag extends CObject{
 		unset($this->attributes[$name]);
 	}
 
-	public function addAction($name, $value){
+	public function addAction($name, $value) {
+		// strip new lines from scripts
+		$value = str_replace(array("\n", "\r"), '', $value);
+
 		$this->setAttribute($name, $value);
 	}
 

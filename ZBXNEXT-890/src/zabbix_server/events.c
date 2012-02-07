@@ -247,7 +247,7 @@ static void	copy_acknowledges(zbx_uint64_t src_eventid, zbx_uint64_t dst_eventid
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 8, "end;\n");
 #endif
 
-	if (sql_offset > 16) /* In ORACLE always present begin..end; */
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
 	zbx_free(sql);

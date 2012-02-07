@@ -5,5 +5,5 @@ CREATE TABLE opconditions (
         operator                integer         DEFAULT '0'     NOT NULL,
         value           varchar(255)            DEFAULT ''      NOT NULL,
         PRIMARY KEY (opconditionid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX opconditions_1 on opconditions (operationid);

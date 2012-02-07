@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 
 $page['title'] = 'S_CONFIGURATION_OF_ITEMS';
 $page['file'] = 'items.php';
-$page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
+$page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
 include_once('include/page_header.php');
@@ -457,33 +457,34 @@ switch($itemType) {
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
-		else{
+		else {
 			DBstart();
+
+			// when cloning an item, replace the old applications with the same applications from the new host
+			if ($_REQUEST['form'] == 'clone') {
+				$applications = get_same_applications_for_host($applications, $item['hostid']);
+			}
 
 			$new_appid = true;
 			$itemid = false;
-			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
+			if (!zbx_empty($_REQUEST['new_application'])) {
+				if ($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['form_hostid'])) {
 					$applications[$new_appid] = $new_appid;
+				}
 			}
 
 			$item['applications'] = $applications;
 
-			if($new_appid){
+			if ($new_appid) {
 				$itemid = add_item($item);
 			}
 
 			$result = DBend($itemid);
 
-/*			$action = AUDIT_ACTION_ADD;*/
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
-		if($result){
-/*			$host = get_host_by_hostid($_REQUEST['hostid']);
-
-			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');*/
-
+		if ($result) {
 			unset($_REQUEST['itemid']);
 			unset($_REQUEST['form']);
 		}
@@ -918,8 +919,8 @@ switch($itemType) {
 			make_sorting_header(S_HISTORY,'history'),
 			make_sorting_header(S_TRENDS,'trends'),
 			make_sorting_header(S_TYPE,'type'),
-			make_sorting_header(S_STATUS,'status'),
 			S_APPLICATIONS,
+			make_sorting_header(S_STATUS,'status'),
 			S_ERROR
 		));
 
@@ -1171,8 +1172,8 @@ switch($itemType) {
 				$item['history'],
 				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),
-				$status,
 				new CCol($applications, 'wraptext'),
+				$status,
 				$error
 			));
 		}
@@ -1222,12 +1223,6 @@ switch($itemType) {
 
 	$items_wdgt->show();
 
-	$jsmenu = new CPUMenu(null,200);
-	$jsmenu->InsertJavaScript();
-
-?>
-<?php
 
 include_once('include/page_footer.php');
-
 ?>

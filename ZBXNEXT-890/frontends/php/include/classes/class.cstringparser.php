@@ -481,6 +481,9 @@ class CStringParser {
 	}
 
 	private function validateFatal() {
+		return true;
+
+		/*
 		if(count($this->levelData) == 1) return true;
 
 		$this->errors[] = Array('errorCode' => 1,
@@ -489,6 +492,7 @@ class CStringParser {
 					'errEnd' => mb_strlen($this->expression)-1);
 
 		return false;
+		*/
 	}
 
 	private function validate(&$parent, &$levelData, $index) {
@@ -684,6 +688,10 @@ class CStringParser {
 	private function levelValue(&$levelData) {
 		//$this->saveDebug("Clearing value of {$levelData['levelType']}: ".var_export($levelData['value'], true)."\n");
 		//$value = $levelData['value'];
+		if (!isset($levelData['levelType'])) {
+			$levelData['levelType'] = 'independent';
+		}
+
 		$value = '';
 		$values = Array();
 		$openprepend = (!isset($this->ess[$levelData['levelType']]['inclusive']) || $this->ess[$levelData['levelType']]['inclusive'] !== true) && isset($levelData['openSymbol']) ? mb_strlen($levelData['openSymbol']) : 0;

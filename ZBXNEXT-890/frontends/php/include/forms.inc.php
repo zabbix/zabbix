@@ -1788,9 +1788,8 @@
 		if(isset($limited))
 			$btnSelect = null;
 		else
-			$btnSelect = new CButton('btn1',S_SELECT,
-				"return PopUp('popup.php?dstfrm=".$frmItem->getName().
-				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');",
+			$btnSelect = new CButton('btn1', S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmItem->getName()."&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+$('type')[$('type').selectedIndex].value);",
 				'T');
 
 		$frmItem->addRow(S_KEY, array(new CTextBox('key',$key,40,$limited), $btnSelect));
@@ -1899,7 +1898,6 @@ ITEM_TYPE_TELNET $key = 'telnet.run[<unique short description>,<ip>,<port>,<enco
 ITEM_TYPE_CALCULATED $key = ''; $params = '';
 //*/
 
-
 		if(isset($limited)){
 			$frmItem->addVar('value_type', $value_type);
 			$cmbValType = new CTextBox('value_type_name', item_value_type2str($value_type), 40, 'yes');
@@ -1941,24 +1939,20 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'row_units');
 
 		$mltpbox = Array();
-		if(isset($limited)){
+		if (isset($limited)) {
 			$frmItem->addVar('multiplier', $multiplier);
 
 			$mcb = new CCheckBox('multiplier', $multiplier == 1 ? 'yes':'no');
 			$mcb->setAttribute('disabled', 'disabled');
 			$mltpbox[] = $mcb;
-			if($multiplier){
-				$mltpbox[] = SPACE;
-				$ctb = new CTextBox('formula', $formula, 10, 1);
-				$ctb->setAttribute('style', 'text-align: right;');
-				$mltpbox[] = $ctb;
-			}
-			else{
-				$frmItem->addVar('formula', $formula);
-			}
+
+			$mltpbox[] = SPACE;
+			$ctb = new CTextBox('formula', $formula, 10, 1);
+			$ctb->setAttribute('style', 'text-align: right;');
+			$mltpbox[] = $ctb;
 		}
-		else{
-			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.disabled = !this.checked;', 1);
+		else {
+			$mltpbox[] = new CCheckBox('multiplier',$multiplier == 1 ? 'yes':'no', 'var editbx = document.getElementById(\'formula\'); if(editbx) editbx.readOnly = !this.checked;', 1);
 			$mltpbox[] = SPACE;
 			$ctb = new CTextBox('formula', $formula, 10);
 			$ctb->setAttribute('style', 'text-align: right;');
@@ -2033,11 +2027,20 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'logtimefmt');
 		zbx_subarray_push($valueTypeVisibility, ITEM_VALUE_TYPE_LOG, 'row_logtimefmt');
 
-		$cmbDelta= new CComboBox('delta',$delta);
-		$cmbDelta->addItem(0,S_AS_IS);
-		$cmbDelta->addItem(1,S_DELTA_SPEED_PER_SECOND);
-		$cmbDelta->addItem(2,S_DELTA_SIMPLE_CHANGE);
-
+		$deltaOptions = array(
+			0 => S_AS_IS,
+			1 => S_DELTA_SPEED_PER_SECOND,
+			2 => S_DELTA_SIMPLE_CHANGE
+		);
+		// delta row
+		if ($limited) {
+			$frmItem->addVar('delta', $delta);
+			$cmbDelta = new CTextBox('delta_name', $deltaOptions[$delta], null, 'yes');
+		}
+		else {
+			$cmbDelta= new CComboBox('delta', $delta);
+			$cmbDelta->addItems($deltaOptions);
+		}
 		$row = new CRow(array(new CCol(S_STORE_VALUE,'form_row_l'), new CCol($cmbDelta,'form_row_r')));
 		$row->setAttribute('id', 'row_delta');
 		$frmItem->addRow($row);
@@ -2861,8 +2864,8 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 // end new dependency
 
 		$type_select = new CComboBox('type');
-		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)? 'no':'yes'));
-		$type_select->additem(TRIGGER_MULT_EVENT_ENABLED,S_NORMAL.SPACE.'+'.SPACE.S_MULTIPLE_PROBLEM_EVENTS,(($type == TRIGGER_MULT_EVENT_ENABLED)? 'yes':'no'));
+		$type_select->additem(TRIGGER_MULT_EVENT_DISABLED, S_NORMAL, ($type == TRIGGER_MULT_EVENT_ENABLED) ? 'no' : 'yes');
+		$type_select->additem(TRIGGER_MULT_EVENT_ENABLED, S_NORMAL.' + '.S_MULTIPLE_PROBLEM_EVENTS, ($type == TRIGGER_MULT_EVENT_ENABLED) ? 'yes' : 'no');
 
 		$frmTrig->addRow(S_EVENT_GENERATION,$type_select);
 
@@ -2889,9 +2892,6 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 		}
 		$frmTrig->addItemToBottomRow(SPACE);
 		$frmTrig->addItemToBottomRow(new CButtonCancel(url_param('groupid').url_param("hostid")));
-
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
 
 		$script = "function addPopupValues(list){
 						if(!isset('object', list)) return false;
@@ -3602,12 +3602,12 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 
 		$perHours = new CComboBox('new_timeperiod[period_hours]',$new_timeperiod['period_hours']);
-		for($i=0; $i < 25; $i++){
-			$perHours->addItem($i,$i.SPACE);
+		for($i=0; $i < 24; $i++){
+			$perHours->addItem($i,$i);
 		}
 		$perMinutes = new CComboBox('new_timeperiod[period_minutes]',$new_timeperiod['period_minutes']);
 		for($i=0; $i < 60; $i++){
-			$perMinutes->addItem($i,$i.SPACE);
+			$perMinutes->addItem($i,$i);
 		}
 		$tblPeriod->addRow(array(
 							S_MAINTENANCE_PERIOD_LENGTH,
@@ -3828,41 +3828,39 @@ ITEM_TYPE_CALCULATED $key = ''; $params = '';
 
 // END:   HOSTS PROFILE EXTENDED Section
 
-		$templates	= get_request('templates',array());
+		$templates = get_request('templates', array());
 		natsort($templates);
 
-		$frm_title	= S_HOST.SPACE.S_MASS_UPDATE;
+		$frm_title = S_HOST.SPACE.S_MASS_UPDATE;
 
-		$frmHost = new CFormTable($frm_title,'hosts.php');
+		$frmHost = new CFormTable($frm_title, 'hosts.php');
 		$frmHost->setHelp('web.hosts.host.php');
 		$frmHost->addVar('go', 'massupdate');
 
 		$hosts = $_REQUEST['hosts'];
-		foreach($hosts as $id => $hostid){
-			$frmHost->addVar('hosts['.$hostid.']',$hostid);
+		foreach ($hosts as $id => $hostid) {
+			$frmHost->addVar('hosts['.$hostid.']', $hostid);
 		}
 
-//		$frmItem->addRow(array( new CVisibilityBox('visible[type]', isset($visible['type']), 'type', S_ORIGINAL),S_TYPE), $cmbType);
+		$frmHost->addRow(S_NAME, S_ORIGINAL);
 
-		$frmHost->addRow(S_NAME,S_ORIGINAL);
-
-		$grp_tb = new CTweenBox($frmHost,'groups',$groups,6);
+		$grp_tb = new CTweenBox($frmHost, 'groups', $groups, 6);
 		$options = array(
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => 1,
 		);
 		$all_groups = CHostGroup::get($options);
 		order_result($all_groups, 'name');
-		foreach($all_groups as $grp){
+		foreach ($all_groups as $grp) {
 			$grp_tb->addItem($grp['groupid'], $grp['name']);
 		}
 
-		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL),S_GROUPS),
-						$grp_tb->get(S_IN.SPACE.S_GROUPS,S_OTHER.SPACE.S_GROUPS)
+		$frmHost->addRow(array(new CVisibilityBox('visible[groups]', isset($visible['groups']), $grp_tb->getName(), S_ORIGINAL), S_REPLACE_HOST_GROUPS),
+						$grp_tb->get(S_IN.SPACE.S_GROUPS, S_OTHER.SPACE.S_GROUPS)
 					);
 
-		$frmHost->addRow(array(new CVisibilityBox('visible[newgroup]', isset($visible['newgroup']), 'newgroup', S_ORIGINAL),S_NEW_GROUP),
-						new CTextBox('newgroup',$newgroup),
+		$frmHost->addRow(array(new CVisibilityBox('visible[newgroup]', isset($visible['newgroup']), 'newgroup', S_ORIGINAL), S_NEW_HOST_GROUP),
+						new CTextBox('newgroup', $newgroup),
 						'new'
 					);
 
@@ -4327,40 +4325,40 @@ JAVASCRIPT;
 		$host_tbl->setOddRowClass('form_odd_row');
 		$host_tbl->setEvenRowClass('form_even_row');
 
-		if($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
-		if($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
+		if ($_REQUEST['hostid']>0) $frmHost->addVar('hostid', $_REQUEST['hostid']);
+		if ($_REQUEST['groupid']>0) $frmHost->addVar('groupid', $_REQUEST['groupid']);
 
-		$host_tbl->addRow(array(S_NAME, new CTextBox('host',$host,54)));
+		$host_tbl->addRow(array(S_NAME, new CTextBox('host', $host, 54)));
 
 		$grp_tb = new CTweenBox($frmHost, 'groups', $host_groups, 10);
 
 		$all_groups = CHostGroup::get(array('editable' => 1, 'extendoutput' => 1));
 		order_result($all_groups, 'name');
-		foreach($all_groups as $group){
+		foreach ($all_groups as $group) {
 			$grp_tb->addItem($group['groupid'], $group['name']);
 		}
 
-		$host_tbl->addRow(array(S_GROUPS,$grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS)));
+		$host_tbl->addRow(array(S_GROUPS, $grp_tb->get(S_IN_GROUPS, S_OTHER_GROUPS)));
 
-		$host_tbl->addRow(array(S_NEW_GROUP, new CTextBox('newgroup',$newgroup)));
+		$host_tbl->addRow(array(S_NEW_HOST_GROUP, new CTextBox('newgroup', $newgroup)));
 
 // onchange does not work on some browsers: MacOS, KDE browser
-		$host_tbl->addRow(array(S_DNS_NAME,new CTextBox('dns',$dns,'40')));
-		if(defined('ZBX_HAVE_IPV6')){
-			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip',$ip,'39')));
+		$host_tbl->addRow(array(S_DNS_NAME,new CTextBox('dns', $dns, '40')));
+		if (defined('ZBX_HAVE_IPV6')) {
+			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip', $ip, '39')));
 		}
-		else{
-			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip',$ip,'15')));
+		else {
+			$host_tbl->addRow(array(S_IP_ADDRESS,new CTextBox('ip', $ip, '15')));
 		}
 
 		$cmbConnectBy = new CComboBox('useip', $useip);
 		$cmbConnectBy->addItem(0, S_DNS_NAME);
 		$cmbConnectBy->addItem(1, S_IP_ADDRESS);
-		$host_tbl->addRow(array(S_CONNECT_TO,$cmbConnectBy));
+		$host_tbl->addRow(array(S_CONNECT_TO, $cmbConnectBy));
 
-		$host_tbl->addRow(array(S_AGENT_PORT,new CNumericBox('port',$port,5)));
+		$host_tbl->addRow(array(S_AGENT_PORT, new CNumericBox('port', $port, 5)));
 
-//Proxy
+// Proxy
 		$cmbProxy = new CComboBox('proxy_hostid', $proxy_hostid);
 
 		$cmbProxy->addItem(0, S_NO_PROXY);
@@ -4957,42 +4955,44 @@ JAVASCRIPT;
 				$expec_result.=' ('.S_DELIMITER."='".$expression['exp_delimiter']."')";
 
 			$tabExp->addRow(array(
-						$expression['expression'],
-						$expec_result,
-						$exp_res
-					));
+				$expression['expression'],
+				$expec_result,
+				$exp_res
+			));
 		}
 
-		$td = new CCol(S_COMBINED_RESULT,'bold');
+		$td = new CCol(S_COMBINED_RESULT, 'bold');
 		$td->setColSpan(2);
 
-		if($final_result)
-			$final_result = new CSpan(S_TRUE_BIG,'green bold');
-		else
-			$final_result = new CSpan(S_FALSE_BIG,'red bold');
+		if ($final_result) {
+			$final_result = new CSpan(S_TRUE_BIG, 'green bold');
+		}
+		else {
+			$final_result = new CSpan(S_FALSE_BIG, 'red bold');
+		}
 
 		$tabExp->addRow(array(
-					$td,
-					$final_result
-				));
+			$td,
+			$final_result
+		));
 
-		$tblRE->addRow(array(S_RESULT,$tabExp));
+		$tblRE->addRow(array(S_RESULT, $tabExp));
 
 		$tblFoot = new CTableInfo(null);
 
-		$td = new CCol(array(new CButton('save',S_SAVE)));
+		$td = new CCol(array(new CButton('save', S_SAVE)));
 		$td->setColSpan(2);
 		$td->addStyle('text-align: right;');
 
 		$td->addItem(SPACE);
-		$td->addItem(new CButton('test',S_TEST));
+		$td->addItem(new CButton('test', S_TEST));
 
-		if(isset($_REQUEST['regexpid'])){
+		if (isset($_REQUEST['regexpid'])) {
 			$td->addItem(SPACE);
-			$td->addItem(new CButton('clone',S_CLONE));
+			$td->addItem(new CButton('clone', S_CLONE));
 
 			$td->addItem(SPACE);
-			$td->addItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q,url_param('form').url_param('config').url_param('regexpid')));
+			$td->addItem(new CButtonDelete(S_DELETE_REGULAR_EXPRESSION_Q, url_param('form').url_param('config').url_param('regexpid').url_param('delete', false, 'go')));
 		}
 
 		$td->addItem(SPACE);
@@ -5000,12 +5000,12 @@ JAVASCRIPT;
 
 		$tblFoot->setFooter($td);
 
-	return array($tblRE,$tblFoot);
+		return array($tblRE, $tblFoot);
 	}
 
-	function get_expressions_tab(){
+	function get_expressions_tab() {
 
-		if(isset($_REQUEST['regexpid']) && !isset($_REQUEST["form_refresh"])){
+		if (isset($_REQUEST['regexpid']) && !isset($_REQUEST["form_refresh"])) {
 			$expressions = array();
 			$sql = 'SELECT e.* '.
 					' FROM expressions e '.
@@ -5297,6 +5297,7 @@ JAVASCRIPT;
 				text1.className = "biginput";
 				text1.setAttribute("size",30);
 				text1.setAttribute("placeholder","{$MACRO}");
+				text1.setAttribute("style", "text-transform:uppercase;");
 				td2.appendChild(text1);
 				td2.appendChild(document.createTextNode(" "));
 
@@ -5328,16 +5329,30 @@ JAVASCRIPT;
 		foreach($macros as $macroid => $macro){
 			$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30);
 			$text1->setAttribute('placeholder', '{$MACRO}');
+			$text1->setAttribute('style', 'text-transform:uppercase;');
 			$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40);
 			$text2->setAttribute('placeholder', '<'.S_VALUE.'>');
 			$span = new CSpan(RARR);
 			$span->addStyle('vertical-align:top;');
+			$checkbox = new CCheckBox();
+			if (empty($macro['macro']) || (!empty($macro['type']) && $macro['type'] == 'new')) {
+				$checkbox->setAttribute('value', 'no');
+			}
 
-			$macros_tbl->addRow(array(new CCheckBox(), $text1, $span, $text2));
+			$macros_tbl->addRow(array($checkbox, $text1, $span, $text2));
 		}
 
-
-		$script = '$$("#tbl_macros input:checked").each(function(obj){ $(obj.parentNode.parentNode).remove(); if (typeof(deleted_macro_cnt) == \'undefined\') deleted_macro_cnt=1; else deleted_macro_cnt++; });';
+		$script = '	$$("#tbl_macros input:checked").each(function(obj) {
+						$(obj.parentNode.parentNode).remove();
+						if ($(obj).value == \'yes\') {
+							if (typeof(deleted_macro_cnt) == \'undefined\') {
+								deleted_macro_cnt = 1;
+							}
+							else {
+								deleted_macro_cnt++;
+							}
+						}
+					});';
 		$delete_btn = new CButton('macros_del', S_DELETE_SELECTED, $script);
 		$delete_btn->setType('button');
 

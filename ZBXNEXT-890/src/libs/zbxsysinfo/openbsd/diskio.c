@@ -42,7 +42,7 @@ static int	get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_
 
 	len = (drive_count * sizeof(struct diskstats));
 
-	if (NULL == (stats = calloc(drive_count, len)))
+	if (NULL == (stats = zbx_calloc(NULL, drive_count, len)))
 		return SYSINFO_RET_FAIL;
 
 	mib[0] = CTL_HW;

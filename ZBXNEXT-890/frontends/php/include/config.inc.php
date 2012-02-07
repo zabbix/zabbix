@@ -46,6 +46,7 @@ function __autoload($class_name){
 		'cmediatype' => 1,
 		'cproxy' => 1,
 		'cscreen' => 1,
+		'cscreenitem' => 1,
 		'cscript' => 1,
 		'ctemplate' => 1,
 		'ctrigger' => 1,

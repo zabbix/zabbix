@@ -374,7 +374,7 @@ int	zbx_json_close(struct zbx_json *j)
 {
 	if (1 == j->level)
 	{
-		zbx_set_json_strerror("Can't close top level object");
+		zbx_set_json_strerror("cannot close top level object");
 		return FAIL;
 	}
 
@@ -792,7 +792,7 @@ const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name)
  ******************************************************************************/
 int	zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *string, size_t len)
 {
-	const char	*p = NULL;
+	const char	*p;
 
 	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
 		return FAIL;
@@ -850,7 +850,7 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
  ******************************************************************************/
 int	zbx_json_brackets_by_name(struct zbx_json_parse *jp, const char *name, struct zbx_json_parse *out)
 {
-	const char	*p = NULL;
+	const char	*p;
 
 	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
 		return FAIL;

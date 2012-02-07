@@ -9,4 +9,4 @@ CREATE TABLE timeperiods (
       period          integer         DEFAULT '0'     NOT NULL,
       start_date              integer         DEFAULT '0'     NOT NULL,
       PRIMARY KEY (timeperiodid)
-) type=InnoDB;
+) ENGINE=InnoDB;

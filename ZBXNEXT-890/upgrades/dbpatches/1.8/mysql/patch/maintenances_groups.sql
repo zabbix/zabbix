@@ -3,5 +3,5 @@ CREATE TABLE maintenances_groups (
       maintenanceid           bigint unsigned         DEFAULT '0'     NOT NULL,
       groupid         bigint unsigned         DEFAULT '0'     NOT NULL,
       PRIMARY KEY (maintenance_groupid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX maintenances_groups_1 on maintenances_groups (maintenanceid,groupid);

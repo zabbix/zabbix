@@ -10,5 +10,5 @@ CREATE TABLE profiles (
         source          varchar(96)             DEFAULT ''      NOT NULL,
         type            integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (profileid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX profiles_1 on profiles (userid,idx,idx2);

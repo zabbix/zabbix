@@ -280,16 +280,7 @@ class CGraph extends CZBXAPI{
 
 // filter
 		if(is_array($options['filter'])){
-
-			if(isset($options['filter']['name'])){
-				zbx_value2array($options['filter']['name']);
-				$sql_parts['where']['name'] = DBcondition('g.name', $options['filter']['name'], false, true);
-			}
-
-			if(isset($options['filter']['templateid'])){
-				zbx_value2array($options['filter']['templateid']);
-				$sql_parts['where']['templateid'] = DBcondition('g.templateid', $options['filter']['templateid']);
-			}
+			zbx_db_filter('graphs g', $options, $sql_parts);
 
 			if(isset($options['filter']['host'])){
 				zbx_value2array($options['filter']['host']);

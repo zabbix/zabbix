@@ -15,7 +15,7 @@ CREATE TABLE escalations (
   dflt			int(2)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (escalationid),
   UNIQUE (name)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 --
 -- Table structure for table 'escalation_rules'
@@ -30,7 +30,7 @@ CREATE TABLE escalation_rules (
   actiontype		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (escalationruleid),
   KEY (escalationid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 --
 -- Table structure for table 'escalation_log'
@@ -49,4 +49,4 @@ CREATE TABLE escalation_log (
   PRIMARY KEY (escalationlogid),
   KEY (alarmid,escalationid),
   KEY (triggerid)
-) type=InnoDB;
+) ENGINE=InnoDB;

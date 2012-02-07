@@ -27,7 +27,6 @@ class CPUMenu{
 	*/
 /* public */
 	public function __construct($items=array(), $width=null){
-		$this->insertJavaScript();
 		/*********************** ITEM ARRAY ***********************
 		 ITEM: array(name, url, param, css, submenu1, submenu2, ... , submenuN)
 
@@ -53,12 +52,6 @@ class CPUMenu{
 
 		return 'return show_popup_menu(event,'.zbx_jsvalue($this->items).','.zbx_jsvalue($this->width).');';
 	}
-
-	public function insertJavaScript(){
-		if(defined('CPUMENU_INSERTJAVASCRIPT_INSERTED')) return;
-		define('CPUMENU_INSERTJAVASCRIPT_INSERTED', 1);
-
-		echo '<script language="JavaScript" type="text/javascript" src="js/menu.js"></script>';
-	}
 }
+
 ?>

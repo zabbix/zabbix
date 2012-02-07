@@ -110,11 +110,17 @@ include_once('include/page_header.php');
 		if(is_null($_REQUEST['sysmapid']) || !isset($maps[$_REQUEST['sysmapid']])){
 			$first_map = reset($maps);
 			$_REQUEST['sysmapid'] = $first_map['sysmapid'];
+			if (!$first_map) {
+				unset($_REQUEST['sysmapid']);
+			}
+			else {
+				$_REQUEST['sysmapid'] = $first_map['sysmapid'];
+			}
 		}
 	}
 
 
-	if(!(isset($_REQUEST['sysmapid']) && isset($maps[$_REQUEST['sysmapid']]))){
+	if (isset($_REQUEST['sysmapid']) && !isset($maps[$_REQUEST['sysmapid']])) {
 		show_error_message(S_NO_PERMISSIONS_OR_MAP_DOES_NOT_EXIST);
 	}
 	else{

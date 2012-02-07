@@ -99,7 +99,7 @@ PERF_COUNTER_DATA	*add_perf_counter(const char *name, const char *counterpath, i
 
 			if (ERROR_SUCCESS != pdh_status && PDH_CSTATUS_NO_INSTANCE != pdh_status)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: invalid format");
+				zabbix_log(LOG_LEVEL_WARNING, "PerfCounter '%s' FAILED: invalid format", counterpath);
 				cptr = NULL;	/* indicate a failure */
 			}
 

@@ -1579,9 +1579,6 @@
 
 
 //	services.php
-	'S_AVERAGE_PROBLEM'=>			'Střední problém',
-	'S_SERIOUS_PROBLEM'=>			'Vážný problém',
-	'S_MINOR_PROBLEM'=>			'Menší problém',
 	'S_ROOT_SMALL'=>			'kořen',
 	'S_IT_SERVICE'=>			'Služba IT',
 	'S_IT_SERVICES'=>			'Služby IT',
@@ -2041,7 +2038,6 @@
 
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	'Funkci byly předány neplatné argumenty',
-	'S_INCORRECT_KEY_FORMAT'=>			'Neplatný formát klíče',
 	'S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL'=>	'Položka nebude akutalizována. Zadejte, prosím, správný interval aktualizací.',
 	'S_INVALID_SNMP_PORT'=>				'Neplatný SNMP port',
 	'S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY'=>	'Type of information must be Log for log key',
@@ -2077,7 +2073,6 @@
 	'S_NO_HOST_GROUPS_WITH'=>			'Neexistuje skupina hostitelů s',
 	'S_INCORRECT_PARAMETERS_FOR_SMALL'=>			'neplatné parametry pro',
 	'S_NO_HOST_WITH'=>				'Neexistuje hostitel s',
-	'S_ALREADY_EXISTS_IN_LINKED_HOSTS_SMALL'=>	'již pro propojené hostitele existuje',
 	'S_ADDED_NEW_APPLICATION'=>			'Přidána nová aplikace',
 	'S_UPDATED_APPLICATION'=>			'Aktualizována aplikace',
 	'S_USED_BY_ITEM_SMALL'=>			'použita položkou',
@@ -2159,7 +2154,6 @@
 	'S_MUST_USE_ITEMS_ONLY_FROM_HOST'=>			'Můžete použít položky pouze z hostitele',
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'pro šablonu grafu',
 	'S_UPDATED_FOR_HOSTS'=>					'aktualizován pro hostitele',
-	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Kopírování grafu přeskočeno',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graf "',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" byl smazaný z hostitelů',
 

@@ -23,17 +23,16 @@
 #include "common.h"
 #include "db.h"
 
-#define ZBX_FLAG_SEC			0
-#define ZBX_FLAG_VALUES			1
+#define ZBX_FLAG_SEC	0
+#define ZBX_FLAG_VALUES	1
 
-extern  int     CONFIG_SERVER_STARTUP_TIME;
+extern int     CONFIG_SERVER_STARTUP_TIME;
+
+int	cmp_double(double a, double b);
 
 int	evaluate_macro_function(char *value, const char *host, const char *key, const char *function, const char *parameter);
 
 int	replace_value_by_map(char *value, int max_len, zbx_uint64_t valuemapid);
 int	add_value_suffix(char *value, int max_len, const char *units, int value_type);
-
-const char	*get_table_by_value_type(int value_type);
-const char	*get_key_by_value_type(int value_type);
 
 #endif

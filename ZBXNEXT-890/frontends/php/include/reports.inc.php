@@ -342,7 +342,7 @@ function bar_report_form(){
 					$items_table,
 					new CButton('add_item',S_ADD,
 						"return PopUp('popup_bitem.php?config=1&dstfrm=".$reportForm->getName().
-						"',550,400,'graph_item_form');"),
+						"',800,400,'graph_item_form');"),
 					$delete_button
 				));
 	unset($items_table, $delete_button);
@@ -707,12 +707,17 @@ function bar_report_form3(){
 		$description = get_item_by_itemid($itemid);
 		$description = item_description($description);
 	}
-	$reportForm->addVar('items[0][itemid]',$itemid);
+
+	$itemidVar = new CVarTag('items[0][itemid]', $itemid);
+	$itemidVar->setAttribute('id', 'items_0_itemid');
+	$reportForm->addItem($itemidVar);
 
 	$txtCondVal = new CTextBox('items[0][description]',$description,50,'yes');
+	$txtCondVal->setAttribute('id', 'items_0_description');
+
 	$btnSelect = new CButton('btn1',S_SELECT,
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
-			"&dstfld1=items[0][itemid]&dstfld2=items[0][description]&".
+			"&dstfld1=items_0_itemid&dstfld2=items_0_description&".
 			"srctbl=items&srcfld1=itemid&srcfld2=description&monitored_hosts=1');",
 			'T');
 

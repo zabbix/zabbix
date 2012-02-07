@@ -425,8 +425,9 @@ include_once('include/page_header.php');
 			}
 
 			$result = CHost::massUpdate(array_merge($hosts, $new_values));
-			if($result === false) throw new Exception();
-
+			if ($result === false) {
+				throw new Exception();
+			}
 
 			$add = array();
 			if(!empty($templates) && isset($visible['template_table'])){
@@ -462,42 +463,44 @@ include_once('include/page_header.php');
 		unset($_REQUEST['save']);
 	}
 // SAVE HOST
-	else if(isset($_REQUEST['save'])){
-		try{
-		$templates = get_request('templates', array());
-		$templates_clear = get_request('clear_templates', array());
-		$groups = get_request('groups', array());
+	elseif (isset($_REQUEST['save'])) {
+		try {
+			$templates = get_request('templates', array());
+			$templates_clear = get_request('clear_templates', array());
+			$groups = get_request('groups', array());
 
-		if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY))) access_deny();
+			if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+				access_deny();
+			}
 
-		if(isset($_REQUEST['hostid']) && $_REQUEST['form'] != 'full_clone'){
-			$create_new = false;
-			$msg_ok = S_HOST_UPDATED;
-			$msg_fail = S_CANNOT_UPDATE_HOST;
-		}
-		else{
-			$create_new = true;
-			$msg_ok = S_HOST_ADDED;
-			$msg_fail = S_CANNOT_ADD_HOST;
-		}
+			if (isset($_REQUEST['hostid']) && $_REQUEST['form'] != 'full_clone') {
+				$create_new = false;
+				$msg_ok = S_HOST_UPDATED;
+				$msg_fail = S_CANNOT_UPDATE_HOST;
+			}
+			else {
+				$create_new = true;
+				$msg_ok = S_HOST_ADDED;
+				$msg_fail = S_CANNOT_ADD_HOST;
+			}
 
-		$clone_hostid = false;
-		if($_REQUEST['form'] == 'full_clone'){
-			$create_new = true;
-			$clone_hostid = $_REQUEST['hostid'];
-		}
+			$clone_hostid = false;
+			if ($_REQUEST['form'] == 'full_clone') {
+				$create_new = true;
+				$clone_hostid = $_REQUEST['hostid'];
+			}
 
-		$templates = array_keys($templates);
-		$templates = zbx_toObject($templates, 'templateid');
-		$templates_clear = zbx_toObject($templates_clear, 'templateid');
+			$templates = array_keys($templates);
+			$templates = zbx_toObject($templates, 'templateid');
+			$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
-// START SAVE TRANSACTION {{{
-		DBstart();
+			// START SAVE TRANSACTION {{{
+			DBstart();
 
 			// create new group
-			if(!zbx_empty($_REQUEST['newgroup'])){
+			if (!zbx_empty($_REQUEST['newgroup'])) {
 				$newGroup = CHostGroup::create(array('name' => $_REQUEST['newgroup']));
-				if(!$newGroup){
+				if (!$newGroup) {
 					throw new Exception();
 				}
 				$groups[] = reset($newGroup['groupids']);
@@ -505,8 +508,29 @@ include_once('include/page_header.php');
 			$groups = zbx_toObject($groups, 'groupid');
 
 			$macros = get_request('macros', array());
-			foreach($macros as $mnum => $macro){
-				if(zbx_empty($macro['value'])) unset($macros[$mnum]);
+			foreach ($macros as $mnum => $macro) {
+				if (zbx_empty($macro['value']) && zbx_empty($macro['macro'])) {
+					unset($macros[$mnum]);
+				}
+			}
+
+			$duplicatedMacros = array();
+			foreach ($macros as $mnum => $macro) {
+				// transform macros to uppercase {$aaa} => {$AAA}
+				$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
+
+				// search for duplicates items in new macros array
+				foreach ($macros as $duplicateNumber => $duplicateNewMacro) {
+					if ($mnum != $duplicateNumber && $macro['macro'] == $duplicateNewMacro['macro']) {
+						$duplicatedMacros[] = '"'.$duplicateNewMacro['macro'].'"';
+					}
+				}
+			}
+
+			// validate duplicates macros
+			if (!empty($duplicatedMacros)) {
+				error(S_DUPLICATED_MACRO_FOUND.SPACE.implode(', ', array_unique($duplicatedMacros)));
+				throw new Exception();
 			}
 
 			$host = array(

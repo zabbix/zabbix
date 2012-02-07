@@ -679,16 +679,16 @@ Copt::memoryPick();
 		}
 	}
 
-	public static function acknowledge($data){
+	public static function acknowledge($data) {
 		global $USER_DETAILS;
 
 		$eventids = isset($data['eventids']) ? zbx_toArray($data['eventids']) : array();
 		$eventids = zbx_toHash($eventids);
 
-		try{
+		try {
 			self::BeginTransaction(__METHOD__);
 
-// PERMISSIONS {{{
+			// PERMISSIONS {{{
 			$options = array(
 				'eventids' => $eventids,
 				'output' => API_OUTPUT_EXTEND,
@@ -696,61 +696,63 @@ Copt::memoryPick();
 				'preservekeys' => 1
 			);
 			$allowedEvents = self::get($options);
-			foreach($eventids as $num => $eventid){
-				if(!isset($allowedEvents[$eventid])){
+			foreach ($eventids as $eventid) {
+				if (!isset($allowedEvents[$eventid])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
-// }}} PERMISSIONS
+			// }}} PERMISSIONS
 
-			foreach($allowedEvents as $aenum => $event){
+			foreach ($allowedEvents as $event) {
 				$trig = reset($event['triggers']);
-				if(!(($trig['type'] == TRIGGER_MULT_EVENT_ENABLED) && ($event['value'] == TRIGGER_VALUE_TRUE))){
+				if ($trig['type'] == TRIGGER_MULT_EVENT_ENABLED && $event['value'] == TRIGGER_VALUE_TRUE) {
+					continue;
+				}
 
-					$val = ($event['value'] == TRIGGER_VALUE_TRUE ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE);
+				$val = ($event['value'] == TRIGGER_VALUE_TRUE) ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 
-					$sql = ' SELECT eventid, object, objectid '.
-						' FROM events '.
-						' WHERE eventid < '.$event['eventid'].
-							' AND objectid = '.$event['objectid'].
-							' AND value = '.$val.
-							' AND object = '.EVENT_OBJECT_TRIGGER.
-						' ORDER BY object desc, objectid desc, eventid DESC';
-					$first = DBfetch(DBselect($sql, 1));
-					$first_sql = $first ? ' AND e.eventid > '.$first['eventid'] : '';
+				$sql = 'SELECT e.object,e.objectid,e.eventid'.
+					' FROM events e'.
+					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.objectid='.$event['objectid'].
+						' AND e.value='.$val.
+						' AND e.eventid<'.$event['eventid'].
+					' ORDER BY e.object DESC,e.objectid DESC,e.eventid DESC';
+				$first = DBfetch(DBselect($sql, 1));
+				$first_sql = $first ? ' AND e.eventid>'.$first['eventid'] : '';
 
+				$sql = 'SELECT e.object,e.objectid,e.eventid'.
+					' FROM events e'.
+					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.objectid='.$event['objectid'].
+						' AND e.value='.$val.
+						' AND e.eventid>'.$event['eventid'].
+					' ORDER BY e.object,e.objectid,e.eventid';
+				$last = DBfetch(DBselect($sql, 1));
+				$last_sql = $last ? ' AND e.eventid<'.$last['eventid'] : '';
 
-					$sql = ' SELECT eventid, object, objectid'.
-						' FROM events'.
-						' WHERE eventid > '.$event['eventid'].
-							' AND objectid = '.$event['objectid'].
-							' AND value = '.$val.
-							' AND object = '.EVENT_OBJECT_TRIGGER.
-						' ORDER BY object ASC, objectid ASC, eventid ASC';
-					$last = DBfetch(DBselect($sql, 1));
-					$last_sql = $last ? ' AND e.eventid < '.$last['eventid'] : '';
+				$sql = 'SELECT e.eventid'.
+					' FROM events e'.
+					' WHERE e.object='.EVENT_OBJECT_TRIGGER.
+						' AND e.objectid='.$event['objectid'].
+						' AND e.value='.$event['value'].
+						$first_sql.
+						$last_sql;
 
-
-					$sql = 'SELECT e.eventid'.
-						' FROM events e'.
-						' WHERE e.objectid = '.$event['objectid'].
-							' AND e.value = '. ($val ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE).
-							$first_sql.
-							$last_sql;
-
-					$db_events = DBselect($sql);
-					while($eventid = DBfetch($db_events)){
-						$eventids[$eventid['eventid']] = $eventid['eventid'];
-					}
+				$db_events = DBselect($sql);
+				while ($eventid = DBfetch($db_events)) {
+					$eventids[$eventid['eventid']] = $eventid['eventid'];
 				}
 			}
 
 			$sql = 'UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids);
-			if(!DBexecute($sql)) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			if (!DBexecute($sql)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+			}
 
 			$time = time();
 			$dataInsert = array();
-			foreach($eventids as $enum => $eventid){
+			foreach ($eventids as $eventid) {
 				$dataInsert[] = array(
 					'userid' => $USER_DETAILS['userid'],
 					'eventid' => $eventid,
@@ -765,7 +767,7 @@ Copt::memoryPick();
 
 			return array('eventids' => array_values($eventids));
 		}
-		catch(APIException $e){
+		catch (APIException $e) {
 			self::EndTransaction(false, __METHOD__);
 
 			$error = $e->getErrors();
@@ -775,6 +777,5 @@ Copt::memoryPick();
 			return false;
 		}
 	}
-
 }
 ?>

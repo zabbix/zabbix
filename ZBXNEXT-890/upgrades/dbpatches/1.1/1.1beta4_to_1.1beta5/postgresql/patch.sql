@@ -15,7 +15,7 @@ CREATE TABLE conditions (
   value			varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (conditionid),
   KEY (actionid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 insert into conditions (actionid, conditiontype, operator, value)
 select actionid, 2, 0, triggerid from actions where scope=0;

@@ -631,15 +631,17 @@ COpt::memoryPick();
 
 			foreach($actions as $anum => $action){
 // Existance
-				$options = array(
-					'filter' => array( 'name' => $action['name'] ),
-					'output' => API_OUTPUT_SHORTEN,
-					'editable' => 1,
-					'nopermissions' => 1
-				);
-				$action_exists = self::get($options);
-				if(($action_exist = reset($action_exists)) && ($action_exist['actionid'] != $action['actionid'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_ACTION.' [ '.$action['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+				if (isset($action['name'])) {
+					$options = array(
+						'filter' => array( 'name' => $action['name'] ),
+						'output' => API_OUTPUT_SHORTEN,
+						'editable' => 1,
+						'nopermissions' => 1
+					);
+					$action_exists = self::get($options);
+					if(($action_exist = reset($action_exists)) && ($action_exist['actionid'] != $action['actionid'])){
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_ACTION.' [ '.$action['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+					}
 				}
 //----
 
@@ -649,11 +651,8 @@ COpt::memoryPick();
 					}
 				}
 
-				if(!isset($action['operations']) || empty($action['operations'])){
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_INCORRECT_PARAMETER_USED_FOR_ACTION.' [ '.$action['name'].' ]');
-				}
-				else{
-					foreach($action['operations'] as $operation){
+				if (isset($action['operations']) && !empty($action['operations'])) {
+					foreach ($action['operations'] as $operation) {
 						$operations[] = array_merge(array('actionid' => $action['actionid']), $operation);
 					}
 				}
@@ -670,20 +669,25 @@ COpt::memoryPick();
 
 			DB::update('actions', $update);
 
-			$operationids = array();
-			$sql = 'SELECT operationid FROM operations WHERE '.DBcondition('actionid', $actionids);
-			$operations_db = DBselect($sql);
-			while($operationid = DBfetch($operations_db)){
-				$operationids[] = $operationid['operationid'];
+			if (!empty($operations)) {
+				$operationids = array();
+				$sql = 'SELECT operationid FROM operations WHERE '.DBcondition('actionid', $actionids);
+				$operations_db = DBselect($sql);
+				while($operationid = DBfetch($operations_db)){
+					$operationids[] = $operationid['operationid'];
+				}
+
+				DB::delete('opconditions', DBcondition('operationid', $operationids));
+				DB::delete('opmediatypes', DBcondition('operationid', $operationids));
+				DB::delete('operations', DBcondition('actionid', $actionids));
+
+				self::addOperations($operations);
 			}
 
-			DB::delete('conditions', DBcondition('actionid', $actionids));
-			DB::delete('opconditions', DBcondition('operationid', $operationids));
-			DB::delete('opmediatypes', DBcondition('operationid', $operationids));
-			DB::delete('operations', DBcondition('actionid', $actionids));
-
-			self::addOperations($operations);
-			self::addConditions($conditions);
+			if (!empty($conditions)) {
+				DB::delete('conditions', DBcondition('actionid', $actionids));
+				self::addConditions($conditions);
+			}
 
 			self::EndTransaction(true, __METHOD__);
 			return array('actionids' => $actionids);

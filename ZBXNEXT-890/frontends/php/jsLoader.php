@@ -78,7 +78,24 @@ $tranStrings = array(
 );
 
 if(empty($_GET['files'])){
-	$files = array('prototype.js', 'effects.js', 'dragdrop.js', 'common.js', 'dom.js', 'class.cdebug.js', 'class.cdate.js', 'class.cookie.js', 'class.curl.js', 'class.rpc.js', 'class.bbcode.js', 'class.csuggest.js', 'class.cmessages.js', 'main.js', 'functions.js');
+	$files = array(
+		'prototype.js',
+		'effects.js',
+		'dragdrop.js',
+		'common.js',
+		'dom.js',
+		'class.cdebug.js',
+		'class.cdate.js',
+		'class.cookie.js',
+		'class.curl.js',
+		'class.rpc.js',
+		'class.bbcode.js',
+		'class.csuggest.js',
+		'class.cmessages.js',
+		'main.js',
+		'functions.js',
+		'menu.js'
+	);
 }
 else{
 	$files = $_GET['files'];

@@ -3,5 +3,5 @@ CREATE TABLE maintenances_windows (
       maintenanceid           bigint unsigned         DEFAULT '0'     NOT NULL,
       timeperiodid            bigint unsigned         DEFAULT '0'     NOT NULL,
       PRIMARY KEY (maintenance_timeperiodid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 CREATE INDEX maintenances_windows_1 on maintenances_windows (maintenanceid,timeperiodid);

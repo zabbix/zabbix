@@ -14,7 +14,7 @@ CREATE TABLE httptest_tmp (
         time            double(16,4)            DEFAULT '0'     NOT NULL,
         error           varchar(255)            DEFAULT ''      NOT NULL,
         PRIMARY KEY (httptestid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 insert into httptest_tmp select * from httptest;
 drop table httptest;

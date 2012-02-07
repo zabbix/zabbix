@@ -22,6 +22,7 @@
 #include "log.h"
 #include "daemon.h"
 #include "zbxself.h"
+#include "zbxalgo.h"
 
 #include "housekeeper.h"
 
@@ -29,33 +30,29 @@ extern unsigned char	process_type;
 
 /******************************************************************************
  *                                                                            *
- * Function: housekeeping_process_log                                         *
+ * Function: housekeeping_cleanup                                             *
  *                                                                            *
- * Purpose: process table 'housekeeper' and remove data if required           *
+ * Purpose: remove deleted items data                                         *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: SUCCEED - information removed successfully                   *
- *               FAIL - otherwise                                             *
+ * Return value: number of rows deleted                                       *
  *                                                                            *
  * Author: Alexei Vladishev, Dmitry Borovikov                                 *
  *                                                                            *
  * Comments: sqlite3 does not use CONFIG_MAX_HOUSEKEEPER_DELETE, deletes all  *
  *                                                                            *
  ******************************************************************************/
-static int	housekeeping_process_log()
+static int	housekeeping_cleanup()
 {
-	const char	*__function_name = "housekeeping_process_log";
-	DB_HOUSEKEEPER	housekeeper;
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		deleted;
-	char		*sql = NULL;
-	int		sql_alloc = 512, sql_offset = 0;
-	zbx_uint64_t	*ids = NULL;
-	int		ids_alloc = 0, ids_num = 0;
+	const char		*__function_name = "housekeeping_cleanup";
+	DB_HOUSEKEEPER		housekeeper;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			d, deleted = 0;
+	zbx_vector_uint64_t	housekeeperids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&housekeeperids);
 
 	/* order by tablename to effectively use DB cache */
 	result = DBselect(
@@ -72,7 +69,7 @@ static int	housekeeping_process_log()
 
 		if (0 == CONFIG_MAX_HOUSEKEEPER_DELETE)
 		{
-			deleted = DBexecute(
+			d = DBexecute(
 					"delete from %s"
 					" where %s=" ZBX_FS_UI64,
 					housekeeper.tablename,
@@ -82,7 +79,7 @@ static int	housekeeping_process_log()
 		else
 		{
 #if defined(HAVE_IBM_DB2) || defined(HAVE_ORACLE)
-			deleted = DBexecute(
+			d = DBexecute(
 					"delete from %s"
 					" where %s=" ZBX_FS_UI64
 						" and rownum<=%d",
@@ -91,7 +88,7 @@ static int	housekeeping_process_log()
 					housekeeper.value,
 					CONFIG_MAX_HOUSEKEEPER_DELETE);
 #elif defined(HAVE_MYSQL)
-			deleted = DBexecute(
+			d = DBexecute(
 					"delete from %s"
 					" where %s=" ZBX_FS_UI64 " limit %d",
 					housekeeper.tablename,
@@ -104,7 +101,7 @@ static int	housekeeping_process_log()
 			/* PostgreSQL array constructors are available since version 7.4 */
 			if (70400 > ZBX_PG_SVERSION)
 			{
-				deleted = DBexecute(
+				d = DBexecute(
 						"delete from %s"
 						" where %s=" ZBX_FS_UI64
 							" and clock in (select clock from %s"
@@ -119,7 +116,7 @@ static int	housekeeping_process_log()
 			}
 			else
 			{
-				deleted = DBexecute(
+				d = DBexecute(
 						"delete from %s"
 						" where ctid = any(array(select ctid from %s"
 							" where %s=" ZBX_FS_UI64 " limit %d))",
@@ -130,37 +127,40 @@ static int	housekeeping_process_log()
 						CONFIG_MAX_HOUSEKEEPER_DELETE);
 			}
 #elif defined(HAVE_SQLITE3)
-			deleted = 0;
+			d = 0;
 #endif
 		}
 
-		if (0 == deleted || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > deleted)
-			uint64_array_add(&ids, &ids_alloc, &ids_num, housekeeper.housekeeperid, 64);
+		if (0 == d || 0 == CONFIG_MAX_HOUSEKEEPER_DELETE || CONFIG_MAX_HOUSEKEEPER_DELETE > d)
+			zbx_vector_uint64_append(&housekeeperids, housekeeper.housekeeperid);
 
-		if (0 < deleted)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table '%s'",
-					deleted, housekeeper.tablename);
-		}
+		deleted += d;
 	}
 	DBfree_result(result);
 
-	if (NULL != ids)
+	if (0 != housekeeperids.values_num)
 	{
+		char	*sql = NULL;
+		int	sql_alloc = 512, sql_offset = 0;
+
 		sql = zbx_malloc(sql, sql_alloc);
 
+		zbx_vector_uint64_sort(&housekeeperids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, 32, "delete from housekeeper where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "housekeeperid", ids, ids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "housekeeperid",
+				housekeeperids.values, housekeeperids.values_num);
 
 		DBexecute("%s", sql);
 
 		zbx_free(sql);
-		zbx_free(ids);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED", __function_name);
+	zbx_vector_uint64_destroy(&housekeeperids);
 
-	return SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+
+	return deleted;
 }
 
 static int	housekeeping_sessions(int now)
@@ -172,11 +172,9 @@ static int	housekeeping_sessions(int now)
 
 	deleted = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_YEAR);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'sessions'", deleted);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED", __function_name);
-
-	return SUCCEED;
+	return deleted;
 }
 
 static int	housekeeping_alerts(int now)
@@ -185,8 +183,7 @@ static int	housekeeping_alerts(int now)
 	int		alert_history;
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		res = SUCCEED;
-	int		deleted;
+	int		deleted = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
@@ -195,33 +192,29 @@ static int	housekeeping_alerts(int now)
 	if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
-		res = FAIL;
 	}
 	else
 	{
 		alert_history = atoi(row[0]);
 
 		deleted = DBexecute("delete from alerts where clock<%d", now - alert_history * SEC_PER_DAY);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "deleted %d records from table 'alerts'", deleted);
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
-	return res;
+	return deleted;
 }
 
 static int	housekeeping_events(int now)
 {
 	const char	*__function_name = "housekeeping_events";
-	int		event_history;
+	int		event_history, deleted = 0;
 	DB_RESULT	result;
 	DB_RESULT	result2;
 	DB_ROW		row1;
 	DB_ROW		row2;
 	zbx_uint64_t	eventid;
-	int		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
@@ -230,7 +223,6 @@ static int	housekeeping_events(int now)
 	if (NULL == (row1 = DBfetch(result)) || SUCCEED == DBis_null(row1[0]))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
-		res = FAIL;
 	}
 	else
 	{
@@ -243,15 +235,15 @@ static int	housekeeping_events(int now)
 			ZBX_STR2UINT64(eventid, row2[0]);
 
 			DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64, eventid);
-			DBexecute("delete from events where eventid=" ZBX_FS_UI64, eventid);
+			deleted += DBexecute("delete from events where eventid=" ZBX_FS_UI64, eventid);
 		}
 		DBfree_result(result2);
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
 
-	return res;
+	return deleted;
 }
 
 /******************************************************************************
@@ -316,28 +308,32 @@ static int	delete_history(const char *table, zbx_uint64_t itemid, int keep_histo
 static int	housekeeping_history_and_trends(int now)
 {
 	const char	*__function_name = "housekeeping_history_and_trends";
-	DB_ITEM         item;
+	zbx_uint64_t	itemid;
 	DB_RESULT       result;
 	DB_ROW          row;
-	int             deleted = 0;
+	int             history, trends, deleted = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	result = DBselect("select itemid,history,trends from items");
+	result = DBselect(
+			"select i.itemid,i.history,i.trends from items i,hosts h"
+			" where i.hostid=h.hostid"
+				" and h.status in (%d,%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(item.itemid, row[0]);
-		item.history = atoi(row[1]);
-		item.trends = atoi(row[2]);
+		ZBX_STR2UINT64(itemid, row[0]);
+		history = atoi(row[1]);
+		trends = atoi(row[2]);
 
-		deleted += delete_history("history", item.itemid, item.history, now);
-		deleted += delete_history("history_uint", item.itemid, item.history, now);
-		deleted += delete_history("history_str", item.itemid, item.history, now);
-		deleted += delete_history("history_text", item.itemid, item.history, now);
-		deleted += delete_history("history_log", item.itemid, item.history, now);
-		deleted += delete_history("trends", item.itemid, item.trends, now);
-		deleted += delete_history("trends_uint", item.itemid, item.trends, now);
+		deleted += delete_history("history", itemid, history, now);
+		deleted += delete_history("history_uint", itemid, history, now);
+		deleted += delete_history("history_str", itemid, history, now);
+		deleted += delete_history("history_text", itemid, history, now);
+		deleted += delete_history("history_log", itemid, history, now);
+		deleted += delete_history("trends", itemid, trends, now);
+		deleted += delete_history("trends_uint", itemid, trends, now);
 	}
 	DBfree_result(result);
 
@@ -348,47 +344,35 @@ static int	housekeeping_history_and_trends(int now)
 
 void	main_housekeeper_loop()
 {
-	int	d, now;
+	int	now, d_history_and_trends, d_cleanup, d_events, d_alerts, d_sessions;
 
 	for (;;)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Executing housekeeper");
+		zabbix_log(LOG_LEVEL_WARNING, "executing housekeeper");
 		now = time(NULL);
 
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-/* Transaction is not required here. It causes timeouts under MySQL. */
-/*		DBbegin();*/
+		zbx_setproctitle("%s [removing old history and trends]", get_process_type_string(process_type));
+		d_history_and_trends = housekeeping_history_and_trends(now);
 
-		zbx_setproctitle("%s [removing old history]", get_process_type_string(process_type));
-
-		d = housekeeping_history_and_trends(now);
-		zabbix_log(LOG_LEVEL_WARNING, "Deleted %d records from history and trends", d);
-
-		zbx_setproctitle("%s [removing old history]", get_process_type_string(process_type));
-
-		housekeeping_process_log(now);
+		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
+		d_cleanup = housekeeping_cleanup(now);
 
 		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
-
-		housekeeping_events(now);
+		d_events = housekeeping_events(now);
 
 		zbx_setproctitle("%s [removing old alerts]", get_process_type_string(process_type));
-
-		housekeeping_alerts(now);
+		d_alerts = housekeeping_alerts(now);
 
 		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
+		d_sessions = housekeeping_sessions(now);
 
-		housekeeping_sessions(now);
-
-/* Transaction is not required here. It causes timeouts under MySQL. */
-/*		DBcommit();*/
-
-/*		zbx_setproctitle("housekeeper [vacuuming database]");*/
-
-/*		DBvacuum();*/
+		zabbix_log(LOG_LEVEL_WARNING, "housekeeper deleted: %d records from history and trends,"
+				" %d records of deleted items, %d events, %d alerts, %d sessions",
+				d_history_and_trends, d_cleanup, d_events, d_alerts, d_sessions);
 
 		DBclose();
 

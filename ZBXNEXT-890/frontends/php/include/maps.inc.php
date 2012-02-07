@@ -346,8 +346,10 @@
 			if(!empty($db_element['url']) || !empty($links_menus)){
 				$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 				$menus .= $links_menus;
-				if(!empty($db_element['url']))
-					$menus .= "['".S_URL."',\"javascript: location.replace('".$db_element['url']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				if (!empty($db_element['url'])) {
+					// double zbx_jsvalue is required to prevent XSS attacks
+					$menus .= "['".S_URL."',\"javascript: location.replace(".zbx_jsvalue(zbx_jsvalue($db_element['url'], null, false)).");\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				}
 			}
 
 			$menus = trim($menus,',');
@@ -370,10 +372,7 @@
 			$action_map->addItem($r_area);
 		}
 
-		$jsmenu = new CPUMenu(null,170);
-		$jsmenu->InsertJavaScript();
-
-	return $action_map;
+		return $action_map;
 	}
 
 	function get_icon_center_by_selement($element, $info=null){
@@ -1568,10 +1567,10 @@
 //SDII($exportMaps);
 	}
 
-	function prepareImageExport($images){
+	function prepareImageExport($images) {
 		$formatted = array();
 
-		foreach($images as $inum => $image){
+		foreach ($images as $image) {
 			$formatted[] = array(
 				'name' => $image['name'],
 				'imagetype' => $image['imagetype'],

@@ -26,7 +26,7 @@ require_once('include/forms.inc.php');
 $page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('effects.js', 'dragdrop.js','class.cmap.js');
+$page['scripts'] = array('class.cmap.js');
 $page['type'] = detect_page_type();
 
 include_once('include/page_header.php');
@@ -127,7 +127,7 @@ include_once('include/page_header.php');
 						foreach($link['linktriggers'] as $lnum => $linktrigger){
 							$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
 							if($host = DBfetch($hosts)){
-								$description = $host['host'].':'.expand_trigger_description($linktrigger['triggerid']);
+								$description = $host['host'].':'.expand_trigger_description_simple($linktrigger['triggerid']);
 							}
 
 							$link['linktriggers'][$lnum]['desc_exp'] = $description;

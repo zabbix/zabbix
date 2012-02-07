@@ -3,7 +3,7 @@ CREATE TABLE escalations (
   name			varchar(64)	DEFAULT '0' NOT NULL,
   PRIMARY KEY (escalationid),
   UNIQUE (name)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 --
 -- Table structure for table 'hosts_templates'
@@ -20,7 +20,7 @@ CREATE TABLE hosts_templates (
   screens		int(1)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (hosttemplateid),
   UNIQUE (hostid, templateid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 alter table hosts add available	int(4)		DEFAULT '0' NOT NULL;
 update hosts set available=1 where status=0;

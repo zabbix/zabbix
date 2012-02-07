@@ -73,8 +73,9 @@ include_once('include/page_header.php');
 			}
 		}
 
+		$json = new CJSON();
 		$script = 'addLinkTriggers('.zbx_jsvalue($_REQUEST['mapid']).','.
-								zbx_jsvalue($triggers, true).','.
+								$json->encode($triggers).','.
 								zbx_jsvalue($_REQUEST['drawtype']).','.
 								zbx_jsvalue($_REQUEST['color']).');';
 

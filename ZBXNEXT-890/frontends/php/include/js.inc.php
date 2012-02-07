@@ -19,6 +19,7 @@ function zbx_jsvalue($value, $asObject=false, $addQuotes=true){
 			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
 			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
 			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
+			$escaped = str_replace('/', '\/', $escaped); // escaping forward slash: / => \/
 			if($addQuotes){
 				$escaped = "'".$escaped."'";
 			}
@@ -515,48 +516,6 @@ function insert_js_function($fnct_name){
 					var items = { "object": object, "values": new Array(singleValue) };
 
 					parent.addPopupValues(items);
-					close_window();
-				}');
-		break;
-		case 'addValues':
-			insert_js('
-				function addValues(frame, values, submitParent) {
-					var parentDocument = window.opener.document;
-					if(!parentDocument) return close_window();
-
-					if(IE){
-						// in internet explorer prototype filters by form name does not work
-						var pForms = parentDocument.body.getElementsByTagName("form");
-						for(i=0; i < pForms.length; i++){
-							if(pForms[i].id === frame){
-								parentDocumentForms = [pForms[i]];
-								break;
-							}
-						}
-					}
-					else{
-						var parentDocumentForms = $(parentDocument.body).select("form[name="+frame+"]");
-					}
-
-					var submitParent = submitParent || false;
-
-					var tmpStorage = null;
-					for(var key in values){
-						if(is_null(values[key])) continue;
-
-						if(parentDocumentForms.length)
-							tmpStorage = $(parentDocumentForms[0].parentNode).select("#"+key).first();
-
-						if(typeof(tmpStorage) == "undefined" || is_null(tmpStorage))
-							tmpStorage = parentDocument.getElementById(key);
-
-						tmpStorage.value = values[key];
-					}
-
-					if(!is_null(tmpStorage) && submitParent){
-						tmpStorage.form.submit();
-					}
-
 					close_window();
 				}');
 		break;

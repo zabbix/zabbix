@@ -24,7 +24,7 @@ CREATE TABLE acknowledges (
 	KEY userid (userid),
 	KEY alarmid (alarmid),
 	KEY clock (clock)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 alter table screens_items add		valign	int(2)	DEFAULT '0' NOT NULL;
 alter table screens_items add		halign	int(2)	DEFAULT '0' NOT NULL;

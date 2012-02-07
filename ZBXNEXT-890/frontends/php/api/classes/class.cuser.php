@@ -1221,12 +1221,17 @@ Copt::memoryPick();
 		if($login){
 			$sessionid = zbx_session_start($user['userid'], $name, $password);
 
+			// we assign $USER_DETAILS first time, so that it could be used in Cprofile::get
+			$USER_DETAILS = $user;
+
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER, 'Correct login ['.$name.']');
 			if(empty($user['url'])){
 				$user['url'] = CProfile::get('web.menu.view.last','index.php');
+
+				// we assign $USER_DETAILS second time, to update 'url'
+				$USER_DETAILS['url'] = $user['url'];
 			}
 
-			$USER_DETAILS = $user;
 			$login = $sessionid;
 		}
 		else{

@@ -8,7 +8,7 @@ CREATE TABLE autoreg (
   pattern               varchar(255)    DEFAULT '' NOT NULL,
   hostid                int(4)          DEFAULT '0' NOT NULL,
   PRIMARY KEY (id)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 alter table alerts add triggerid	int(4)	DEFAULT '0' NOT NULL after actionid;
 alter table alerts add repeats		int(4)		DEFAULT '0' NOT NULL;

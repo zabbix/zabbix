@@ -6,4 +6,4 @@ CREATE TABLE trends_uint (
         value_avg               bigint unsigned         DEFAULT '0'     NOT NULL,
         value_max               bigint unsigned         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (itemid,clock)
-) type=InnoDB;
+) ENGINE=InnoDB;

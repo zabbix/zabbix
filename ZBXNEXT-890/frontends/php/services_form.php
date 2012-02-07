@@ -46,7 +46,7 @@ include_once('include/page_header.php');
 		'algorithm'=>		array(T_ZBX_INT, O_OPT,  NULL,	IN('0,1,2'),	'isset({save_service})'),
 		'showsla'=>			array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1'),null),
 		'goodsla'=>			array(T_ZBX_DBL, O_OPT,  NULL,  BETWEEN(0,100),		null),
-		'sortorder'=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),	null),
+		'sortorder'=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,999),	null),
 		'service_times'=>	array(T_ZBX_STR, O_OPT,  null,  null,			null),
 
 		'linktrigger'=>		array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1'),null),
@@ -167,7 +167,7 @@ if(isset($_REQUEST['saction'])){
 		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	if($result){
-		zbx_add_post_js("closeform('services.php');");
+		zbx_add_post_js("closeForm('services.php');");
 		include_once('include/page_footer.php');
 	}
 }
@@ -734,7 +734,7 @@ if(isset($_REQUEST['sform'])){
 	$frmService->addRow(S_LINK_TO_TRIGGER_Q, new CCheckBox('linktrigger',$linktrigger,"javascript: display_element('trigger_name');",1));
 
 	if($triggerid > 0){
-		$trigger = expand_trigger_description($triggerid);
+		$trigger = expand_trigger_description_simple($triggerid);
 	}
 	else{
 		$trigger = '';

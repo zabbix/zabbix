@@ -28,7 +28,7 @@ require_once('include/blocks.inc.php');
 $page['title'] = 'S_CONFIGURATION_OF_SCREENS';
 $page['file'] = 'screenedit.php';
 $page['hist_arg'] = array('screenid');
-$page['scripts'] = array('effects.js','dragdrop.js','class.cscreen.js','class.calendar.js','gtlc.js');
+$page['scripts'] = array('class.cscreen.js','class.calendar.js','gtlc.js');
 
 include_once('include/page_header.php');
 
@@ -79,7 +79,7 @@ include_once('include/page_header.php');
 <?php
 	$trigg_wdgt = new CWidget();
 	$trigg_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREEN_BIG);
-	
+
 	//show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
 
 	$options = array(
@@ -91,62 +91,42 @@ include_once('include/page_header.php');
 	if(empty($screens)) access_deny();
 
 	$screen = reset($screens);
-	
+
 	$trigg_wdgt->addHeader($screen['name']);
 	$trigg_wdgt->addItem(BR());
-	
+
 	if(isset($_REQUEST['save'])){
 		if(!isset($_REQUEST['elements'])) $_REQUEST['elements'] = 0;
 
-		try{
-			DBstart();
+		DBstart();
 
-			if(isset($_REQUEST['screenitemid'])){
-				$msg_ok = S_ITEM_UPDATED;
-				$msg_err = S_CANNOT_UPDATE_ITEM;
-			}
-			else{
-				$msg_ok = S_ITEM_ADDED;
-				$msg_err = S_CANNOT_ADD_ITEM;
-			}
+		if (isset($_REQUEST['screenitemid'])) {
+			$msg_ok = S_ITEM_UPDATED;
+			$msg_err = S_CANNOT_UPDATE_ITEM;
 
-			if(isset($_REQUEST['screenitemid'])){
-				$result = update_screen_item($_REQUEST['screenitemid'],
-					$_REQUEST['resourcetype'],$_REQUEST['resourceid'],$_REQUEST['width'],
-					$_REQUEST['height'],$_REQUEST['colspan'],$_REQUEST['rowspan'],
-					$_REQUEST['elements'],$_REQUEST['valign'],
-					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
-
-				if(!$result) throw new Exception();
-			}
-			else{
-				$result = add_screen_item(
-					$_REQUEST['resourcetype'],$_REQUEST['screenid'],
-					$_REQUEST['x'],$_REQUEST['y'],$_REQUEST['resourceid'],
-					$_REQUEST['width'],$_REQUEST['height'],$_REQUEST['colspan'],
-					$_REQUEST['rowspan'],$_REQUEST['elements'],$_REQUEST['valign'],
-					$_REQUEST['halign'],$_REQUEST['style'],$_REQUEST['url'],$_REQUEST['dynmic']);
-
-				if(!$result) throw new Exception();
-			}
-
-			DBend(true);
-
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_SCREEN,' Name ['.$screen['name'].'] cell changed '.
-				(isset($_REQUEST['screenitemid']) ? '['.$_REQUEST['screenitemid'].']' :	'['.$_REQUEST['x'].','.$_REQUEST['y'].']'));
-				unset($_REQUEST['form']);
-
-			show_messages(true, $msg_ok, $msg_err);
+			$result = CScreenItem::update(array($_REQUEST));
 		}
-		catch(Exception $e){
-			DBend(false);
-			error($e->getMessage());
-			show_messages(false, $msg_ok, $msg_err);
+		else {
+			$msg_ok = S_ITEM_ADDED;
+			$msg_err = S_CANNOT_ADD_ITEM;
+
+			$result = CScreenItem::create(array($_REQUEST));
+		}
+
+		DBend($result);
+		show_messages($result, $msg_ok, $msg_err);
+
+		// success
+		if ($result) {
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, ' Name ['.$screen['name'].'] cell changed '.
+				(isset($_REQUEST['screenitemid']) ? '['.$_REQUEST['screenitemid'].']' : '['.$_REQUEST['x'].','.$_REQUEST['y'].']'));
+
+			unset($_REQUEST['form']);
 		}
 	}
-	else if(isset($_REQUEST['delete'])){
+	elseif (isset($_REQUEST['delete'])) {
 		DBstart();
-		$result=delete_screen_item($_REQUEST['screenitemid']);
+		$result = CScreenItem::delete($_REQUEST['screenitemid']);
 		$result = DBend($result);
 
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
@@ -204,14 +184,14 @@ include_once('include/page_header.php');
 						' AND x='.$sw_pos[1].
 						' AND screenid='.$screen['screenid'];
 			$fitem = DBfetch(DBselect($sql));
-			
+
 			$sql = 'SELECT screenitemid, colspan, rowspan '.
 					' FROM screens_items '.
 					' WHERE y='.$sw_pos[2].
 						' AND x='.$sw_pos[3].
 						' AND screenid='.$screen['screenid'];
 			$sitem = DBfetch(DBselect($sql));
-			
+
 			if($fitem){
 				DBexecute('UPDATE screens_items '.
 							' SET y='.$sw_pos[2].',x='.$sw_pos[3].
@@ -221,7 +201,7 @@ include_once('include/page_header.php');
 								' AND x='.$sw_pos[1].
 								' AND screenid='.$screen['screenid'].
 								' AND screenitemid='.$fitem['screenitemid']);
-								
+
 			}
 
 			if($sitem){

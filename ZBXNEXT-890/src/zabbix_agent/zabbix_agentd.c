@@ -460,7 +460,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* allocate memory for a collector, all listeners and an active check */
 	threads_num = 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0);
-	threads = calloc(threads_num, sizeof(ZBX_THREAD_HANDLE));
+	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	/* start the collector thread */
 	thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));

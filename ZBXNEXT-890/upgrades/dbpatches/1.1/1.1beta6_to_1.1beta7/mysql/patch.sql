@@ -16,7 +16,7 @@ CREATE TABLE valuemaps (
   name			varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (valuemapid),
   UNIQUE (name)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 --
 -- Table structure for table 'mapping'
@@ -29,7 +29,7 @@ CREATE TABLE mappings (
   newvalue		varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (mappingid),
   KEY valuemapid (valuemapid)
-) type=InnoDB;
+) ENGINE=InnoDB;
 
 --
 -- Table structure for table 'housekeeper'
@@ -41,4 +41,4 @@ CREATE TABLE housekeeper (
   field			varchar(64)	DEFAULT '' NOT NULL,
   value			int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (housekeeperid)
-) type=InnoDB;
+) ENGINE=InnoDB;

@@ -60,6 +60,18 @@ static zbx_uint64_t	last_xfers = 0;			/* total number of transfers to/from disk 
 static zbx_uint64_t	last_wblks = 0;			/* 512 bytes blocks written to all disks */
 static zbx_uint64_t	last_rblks = 0;			/* 512 bytes blocks read from all disks */
 
+/******************************************************************************
+ *                                                                            *
+ * Function: update_vmstat                                                    *
+ *                                                                            *
+ * Purpose: update vmstat values at most once per second                      *
+ *                                                                            *
+ * Parameters: vmstat - a structure containing vmstat data                    *
+ *                                                                            *
+ * Comments: on first iteration only save last data, on second - set vmstat   *
+ *           data and indicate that it is available                           *
+ *                                                                            *
+ ******************************************************************************/
 static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 {
 #if defined(HAVE_LIBPERFSTAT)
@@ -108,7 +120,18 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		return;
 	}
 
-	if (last_clock && now > last_clock)
+	/* set static vmstat values on first iteration, dynamic on next iterations (at most once per second) */
+	if (0 == last_clock)
+	{
+#ifdef _AIXVERSION_530
+		vmstat->shared_enabled = (unsigned char)lparstats.type.b.shared_enabled;
+		vmstat->pool_util_authority = (unsigned char)lparstats.type.b.pool_util_authority;
+#endif
+#ifdef HAVE_AIXOSLEVEL_520004
+		vmstat->aix52stats = 1;
+#endif
+	}
+	else if (now > last_clock)
 	{
 		/* --- kthr --- */
 		vmstat->kthr_r = (double)(cpustats.runque - last_runque) / (double)(now - last_clock);
@@ -164,7 +187,7 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 			dpcpu_sy += dbusy_donated_purr + dbusy_stolen_purr;
 
 			delta_purr += didle_donated_purr + dbusy_donated_purr + didle_stolen_purr + dbusy_stolen_purr;
-			pcputime = delta_purr; 
+			pcputime = delta_purr;
 		}
 #endif	/* HAVE_AIXOSLEVEL_530006 */
 
@@ -198,8 +221,8 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 		vmstat->cpu_wa = (double)dpcpu_wa * 100.0 / (double)pcputime;
 
 		if (lparstats.type.b.shared_enabled)
-		{   
-			/* Physical Processor Consumed */  
+		{
+			/* Physical Processor Consumed */
 			vmstat->cpu_pc = (double)delta_purr / (double)dtimebase;
 
 			/* Percentage of Entitlement Consumed */
@@ -209,8 +232,8 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 			vmstat->cpu_lbusy = (double)(dlcpu_us + dlcpu_sy) * 100.0 / (double)lcputime;
 
 			if (lparstats.type.b.pool_util_authority)
-			{ 
-				/* Available Pool Processor (app) */ 
+			{
+				/* Available Pool Processor (app) */
 				vmstat->cpu_app = (double)(lparstats.pool_idle_time - last_pool_idle_time) / (XINTFRAC * (double)dtimebase);
 			}
 		}
@@ -233,16 +256,9 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 									   active if they have been accessed */
 #endif
 		vmstat->mem_fre = (zbx_uint64_t)memstats.real_free;	/* free real memory (in 4KB pages) */
-	}
-	else
-	{
-#ifdef _AIXVERSION_530
-		vmstat->shared_enabled = (unsigned char)lparstats.type.b.shared_enabled;
-		vmstat->pool_util_authority = (unsigned char)lparstats.type.b.pool_util_authority;
-#endif
-#ifdef HAVE_AIXOSLEVEL_520004
-		vmstat->aix52stats = 1;
-#endif
+
+		/* indicate that vmstat data is available */
+		vmstat->data_available = 1;
 	}
 
 	/* saving last values */

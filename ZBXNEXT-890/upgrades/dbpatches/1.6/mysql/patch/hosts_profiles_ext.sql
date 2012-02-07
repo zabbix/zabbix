@@ -59,4 +59,4 @@ CREATE TABLE hosts_profiles_ext (
 	poc_2_screen		varchar(64)		DEFAULT ''	NOT NULL,
 	poc_2_notes		blob			NOT NULL,
 	PRIMARY KEY (hostid)
-) type=InnoDB;
+) ENGINE=InnoDB;
