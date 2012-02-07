@@ -451,41 +451,6 @@ class CUserMacro extends CZBXAPI {
 		return $result;
 	}
 
-/**
- * Delete UserMacros
- *
- * @param array $hostmacroids
- * @param array $hostmacroids['hostmacroids']
- * @return boolean
- */
-	public function deleteHostMacro($hostmacroids) {
-		$hostmacroids = zbx_toArray($hostmacroids);
-
-		if (empty($hostmacroids))
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'Empty input parameter [ hostmacroids ]');
-
-// permissions + existance
-		$options = array(
-			'hostmacroids' => $hostmacroids,
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$dbHMacros = $this->get($options);
-
-		foreach ($hostmacroids as $hostmacroid) {
-			if (!isset($dbHMacros[$hostmacroid]))
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-//--------
-
-		$sql = 'DELETE FROM hostmacro WHERE '.DBcondition('hostmacroid', $hostmacroids);
-		if (!DBExecute($sql))
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-
-		return array('hostmacroids' => $hostmacroids);
-	}
-
 	/**
 	 * Validates the input parameters for the createGlobal() method.
 	 *
@@ -538,7 +503,7 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 
-		$this->checkDuplicateMacros($globalMacros);
+		$globalMacros = $this->extendObjects('globalmacro', $globalMacros, array('macro'));
 
 		foreach ($globalMacros as $globalMacro) {
 			if (isset($globalMacro['macro'])) {
