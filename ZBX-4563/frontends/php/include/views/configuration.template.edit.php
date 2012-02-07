@@ -359,43 +359,17 @@
 	$divTabs->addTab('tmplTab', S_LINKED_TEMPLATES, $tmplList);
 // } TEMPLATES
 
-// MACROS WIDGET {
-// macros
+	// macros
 	if(empty($macros)){
 		$macros = array(array(
 			'macro' => '',
 			'value' => ''
 		));
 	}
-
-	$macroTab = new CTable();
-	$macroTab->addRow(array(_('Macro'), SPACE, _('Value')));
-	$macroTab->setAttribute('id', 'userMacros');
-
-	$jsInsert = '';
-	foreach($macros as $inum => $macro){
-		if(!empty($jsInsert) && zbx_empty($macro['macro']) && zbx_empty($macro['value'])) continue;
-
-		$jsInsert.= 'addMacroRow('.zbx_jsvalue($macro).');';
-	}
-	zbx_add_post_js($jsInsert);
-
-	$addButton = new CButton('add', S_ADD, 'javascript: addMacroRow({});');
-	$addButton->setAttribute('class', 'link_menu');
-
-	$col = new CCol(array($addButton));
-	$col->setAttribute('colspan', 4);
-
-	$buttonRow = new CRow($col);
-	$buttonRow->setAttribute('id', 'userMacroFooter');
-
-	$macroTab->addRow($buttonRow);
-
-	$macrolist = new CFormList('macrolist');
-	$macrolist->addRow($macroTab);
-
-	$divTabs->addTab('macroTab', _('Macros'), $macrolist);
-// } MACROS WIDGET
+	$macrosView = new CView('common.macros', array(
+		'macros' => $macros
+	));
+	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
 	$frmHost->addItem($divTabs);
 

@@ -550,9 +550,10 @@ if (empty($macros)) {
 	$macros = array(array('macro' => '', 'value' => ''));
 }
 
-$divTabs->addTab('macroTab', _('Macros'), new CView('common.macros', array(
+$macrosView = new CView('common.macros', array(
 	'macros' => $macros
-)));
+));
+$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
 $inventoryFormList = new CFormList('inventorylist');
 
