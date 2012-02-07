@@ -12,6 +12,18 @@
 		}
 	}
 
+	function itemTypeInterface(type) {
+		var result = null;
+		var types = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
+		jQuery.each(types, function(itemType, interfaceType) {
+			if (type == itemType) {
+				result = interfaceType;
+				return interfaceType;
+			}
+		});
+		return result;
+	}
+
 	function organizeInterfaces() {
 		var interfaceType = itemTypeInterface(parseInt(jQuery('#type').val()));
 		var selectedInterfaceId = jQuery('#selectedInterfaceId').val();
@@ -117,30 +129,26 @@
 	}
 
 	jQuery(document).ready(function() {
-		<?php if (!empty($this->data['valueTypeVisibility'])) { ?>
+		<?php
+		if (!empty($this->data['valueTypeVisibility'])) { ?>
 			var valueTypeSwitcher = new CViewSwitcher('value_type', 'change',
-				<?php echo zbx_jsvalue($this->data['valueTypeVisibility'], true); ?>
-			);
+				<?php echo zbx_jsvalue($this->data['valueTypeVisibility'], true); ?>);
 		<?php }
 		if (!empty($this->data['authTypeVisibility'])) { ?>
-		var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
-			<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>
-		);
+			var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
+				<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>);
 		<?php }
 		if (!empty($this->data['typeVisibility'])) { ?>
-		var typeSwitcher = new CViewSwitcher('type', 'change',
-			<?php echo zbx_jsvalue($this->data['typeVisibility'], true).(!empty($this->data['itemid']) ? ', true' : ''); ?>
-		);
+			var typeSwitcher = new CViewSwitcher('type', 'change',
+				<?php echo zbx_jsvalue($this->data['typeVisibility'], true).(!empty($this->data['itemid']) ? ', true' : ''); ?>);
 		<?php }
-		if (!empty($this->data['snmpv3_securitylevel'])) { ?>
-		var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
-			<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>
-		);
+		if (!empty($this->data['securityLevelVisibility'])) { ?>
+			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
+				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
 		<?php }
-		if (!empty($this->data['data_type'])) { ?>
-		var dataTypeSwitcher = new CViewSwitcher('data_type', 'change',
-			<?php echo zbx_jsvalue($this->data['dataTypeVisibility'], true); ?>
-		);
+		if (!empty($this->data['dataTypeVisibility'])) { ?>
+			var dataTypeSwitcher = new CViewSwitcher('data_type', 'change',
+				<?php echo zbx_jsvalue($this->data['dataTypeVisibility'], true); ?>);
 		<?php } ?>
 
 		var multpStat = document.getElementById('multiplier');
