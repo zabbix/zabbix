@@ -86,6 +86,7 @@ class CZBXAPI {
 
 			// output
 			'output'					=> API_OUTPUT_REFER,
+			'preservekeys'              => null,
 			'limit'						=> null
 		);
 	}
@@ -276,7 +277,6 @@ class CZBXAPI {
 	/**
 	 * Constructs an SQL SELECT query from the given options, executes it and returns the result.
 	 *
-	 * TODO: add global 'preservekeys' support
 	 * TODO: add global 'countOutput' support
 	 *
 	 * @param string $tableName
@@ -284,13 +284,25 @@ class CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function select($tableName, array $options) {
+	protected function select($tableName, array $options) {
 		$limit = (isset($options['limit'])) ? $options['limit'] : null;
 
 		$sql = $this->createSelectQuery($tableName, $options);
 		$query = DBSelect($sql, $limit);
 
-		return DBfetchArray($query);
+		$objects = DBfetchArray($query);
+
+		if (isset($options['preservekeys'])) {
+			$rs = array();
+			foreach ($objects as $object) {
+				$rs[$object[$this->pk($tableName)]] = $this->unsetExtraFields($tableName, $object, $options['output']);
+			}
+
+			return $rs;
+		}
+		else {
+			return $objects;
+		}
 	}
 
 
@@ -533,6 +545,32 @@ class CZBXAPI {
 		DB::delete($this->tableName(), array(
 			$this->pk() => $pks
 		));
+	}
+
+	/**
+	 * Fetches the fields given in $fields from the database and extends the objects with the loaded data.
+	 *
+	 * @param $tableName
+	 * @param array $objects
+	 * @param array $fields
+	 *
+	 * @return array
+	 */
+	protected function extendObjects($tableName, array $objects, array $fields) {
+		$dbObjects = $this->select($tableName, array(
+			'output' => $fields,
+			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
+			'preservekeys' => true
+		));
+
+		foreach ($objects as &$object) {
+			$pk = $object[$this->pk($tableName)];
+			if (isset($dbObjects[$pk])) {
+				check_db_fields($dbObjects[$pk], $object);
+			}
+		}
+
+		return $objects;
 	}
 
 
