@@ -52,17 +52,6 @@ if (empty($this->data['parent_discoveryid'])) {
 }
 $itemFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']));
 
-// append key to form list
-$itemFormList->addRow(_('Key'), array(
-	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
-	!$this->data['limited']
-		? new CButton('keyButton', _('Select'),
-			"return PopUp('popup.php?dstfrm=".$itemForm->getName().
-				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+jQuery('#type option:selected').val());",
-			'formlist')
-		: null
-));
-
 // append type to form list
 if ($this->data['limited']) {
 	$itemForm->addVar('type', $this->data['type']);
@@ -75,6 +64,17 @@ else {
 	$typeComboBox->addItems($this->data['types']);
 	$itemFormList->addRow(_('Type'), $typeComboBox);
 }
+
+// append key to form list
+$itemFormList->addRow(_('Key'), array(
+	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
+	!$this->data['limited']
+	? new CButton('keyButton', _('Select'),
+		"return PopUp('popup.php?dstfrm=".$itemForm->getName().
+			"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+jQuery('#type option:selected').val());",
+		'formlist')
+	: null
+));
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
@@ -154,8 +154,15 @@ $itemFormList->addRow(_('Executed script'),
 	false, 'label_executed_script'
 );
 $itemFormList->addRow(_('Additional parameters'),
-	new CTextArea('params_ap', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'label_params'
+	new CTextArea('params_ap',
+		!empty($this->data['params'])
+			? $this->data['params']
+			: 'DSN=<database source name>'."\n".'user=<user name>'."\n".'password=<password>'."\n".'sql=<query>',
+		ZBX_TEXTAREA_STANDARD_ROWS,
+		ZBX_TEXTAREA_STANDARD_WIDTH
+	),
+	false,
+	'label_params'
 );
 $itemFormList->addRow(_('Formula'),
 	new CTextArea('params_f', $this->data['params'], ZBX_TEXTAREA_STANDARD_ROWS, ZBX_TEXTAREA_STANDARD_WIDTH),
