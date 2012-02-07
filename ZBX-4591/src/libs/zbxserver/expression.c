@@ -2994,6 +2994,13 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_discovery_macros                                      *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
 void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "substitute_discovery_macros";
@@ -3066,6 +3073,23 @@ static void	quote_key_param(char **param, int forced)
 	*param = dst;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_key_macros                                            *
+ *                                                                            *
+ * Purpose: safely substitutes macros in parameters of an item key and OID    *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Example:  key                 | {$MACRO}    | result                       *
+ *          ---------------------+-------------+-----------------             *
+ *           echo.sh[{$MACRO}]   | a           | echo.sh[a]                   *
+ *           echo.sh["{$MACRO}"] | a           | echo.sh["a"]                 *
+ *           echo.sh[{$MACRO}]   | "a"         | echo.sh["\"a\""]             *
+ *           echo.sh["{$MACRO}"] | "a"         | echo.sh["\"a\""]             *
+ *           echo.sh["{$MACRO}"] | a,b         | echo.sh["a,b"]               *
+ *                                                                            *
+ ******************************************************************************/
 void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *jp_row, int macro_type)
 {
 	const char	*__function_name = "substitute_key_macros";
