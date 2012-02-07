@@ -22,19 +22,6 @@
 require_once('include/config.inc.php');
 require_once('include/forms.inc.php');
 
-API::UserMacro()->massAdd(array(
-	array(
-		'hostid' => 10091,
-		'macro' => '{$C1}',
-		'value' => 'C1'
-	),
-	array(
-		'hostid' => 10091,
-		'macro' => '{$C2}',
-		'value' => 'C2'
-	)
-));
-
 if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['hosts'])){
 	$EXPORT_DATA = true;
 
