@@ -168,6 +168,8 @@ Requires	: dejavu-sans-fonts
 %endif
 Requires	: zabbix = %{version}-%{release}
 Requires	: zabbix-web-database = %{version}-%{release}
+Requires(post)	: %{_sbindir}/update-alternatives
+Requires(preun)	: %{_sbindir}/update-alternatives
 
 %description web
 The php frontend to display the zabbix web interface.
@@ -203,17 +205,32 @@ Conflicts	: zabbix-web-sqlite3
 %description web-pgsql
 Zabbix web frontend for PostgreSQL
 
+%package web-japanese
+Summary		: Japanese font for Zabbix web frontend
+Group		: Applications/Internet
+%if 0%{?fedora} > 9 || 0%{?rhel} >= 6
+BuildArch	: noarch
+Requires	: vlgothic-p-fonts
+%else
+Requires	: ipa-pgothic-fonts
+%endif
+Requires	: %{name}-web = %{version}-%{release}
+Requires(post)	: %{_sbindir}/update-alternatives
+Requires(preun)	: %{_sbindir}/update-alternatives
+
+%description web-japanese
+Japanese font for Zabbix web frontend
+
 
 %prep
 %setup0 -q
 %patch0 -p1
+%patch1 -p1
 
 # DejaVu fonts doesn't exist on EL <= 5
 %if 0%{?fedora} || 0%{?rhel} >= 6
-%patch1 -p1
-
 # remove included fonts
-rm -rf frontends/php/fonts
+rm -rf frontends/php/fonts/DejaVuSans.ttf
 %endif
 
 # remove executable permissions
@@ -226,6 +243,8 @@ sed -i.orig -e 's|_LIBDIR=/usr/lib|_LIBDIR=%{_libdir}|g' \
 # kill off .htaccess files, options set in SOURCE1
 rm -f frontends/php/include/.htaccess
 rm -f frontends/php/include/classes/.htaccess
+rm -f frontends/php/api/.htaccess
+rm -f frontends/php/conf/.htaccess
 
 # set timestamp on modified config file and directories
 touch -r frontends/php/css.css frontends/php/include/config.inc.php \
@@ -233,6 +252,14 @@ touch -r frontends/php/css.css frontends/php/include/config.inc.php \
     frontends/php/include \
     frontends/php/include/classes
 
+# fix path to traceroute utility
+sed -i.orig -e 's|/usr/bin/traceroute|/bin/traceroute|' create/data/data.sql
+
+# remove .orig files in frontend
+find frontends/php -name '*.orig'|xargs rm -f
+
+# remove prebuild Windows binaries
+rm -rf bin
 
 %build
 
@@ -396,6 +423,14 @@ then
 fi
 :
 
+%post server-mysql
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_server zabbix-server %{_sbindir}/zabbix_server_mysql 10
+:
+
+%post server-pgsql
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_server zabbix-server %{_sbindir}/zabbix_server_pgsql 10
+:
+
 %post proxy
 /sbin/chkconfig --add zabbix-proxy
 if [ $1 -gt 1 ]
@@ -406,7 +441,24 @@ then
 fi
 :
 
+%post proxy-mysql
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy zabbix-proxy %{_sbindir}/zabbix_proxy_mysql 10
+:
+
+%post proxy-pgsql
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy zabbix-proxy %{_sbindir}/zabbix_proxy_pgsql 10
+:
+
+%post proxy-sqlite3
+/usr/sbin/update-alternatives --install %{_sbindir}/zabbix_proxy zabbix-proxy %{_sbindir}/zabbix_proxy_sqlite3 10
+:
+
 %post web
+%if 0%{?fedora} || 0%{?rhel} >= 6
+/usr/sbin/update-alternatives --install %{_datadir}/%{name}/fonts/graphfont.ttf zabbix-web-font %{_datadir}/fonts/dejavu/DejaVuSans.ttf 10
+%else
+/usr/sbin/update-alternatives --install %{_datadir}/%{name}/fonts/graphfont.ttf zabbix-web-font %{_datadir}/%{name}/fonts/DejaVuSans.ttf 10
+%endif
 # move existing config file on update
 if [ "$1" -ge "1" ]
 then
@@ -416,6 +468,14 @@ then
         chown apache:apache %{_sysconfdir}/zabbix/web/zabbix.conf.php
     fi
 fi
+:
+
+%post web-japanese
+%if 0%{?fedora} || 0%{?rhel} >= 6
+  /usr/sbin/update-alternatives --install %{_datadir}/%{name}/fonts/graphfont.ttf zabbix-web-font %{_datadir}/fonts/vlgothic/VL-PGothic-Regular.ttf 20
+%else
+  /usr/sbin/update-alternatives --install %{_datadir}/%{name}/fonts/graphfont.ttf zabbix-web-font %{_datadir}/fonts/ipa-pgothic/ipagp.ttf 20
+%endif
 :
 
 %preun agent
@@ -431,6 +491,20 @@ if [ "$1" = 0 ]
 then
   /sbin/service zabbix-server stop >/dev/null 2>&1
   /sbin/chkconfig --del zabbix-server
+fi
+:
+
+%preun server-mysql
+if [ "$1" = 0 ]
+then
+  /usr/sbin/update-alternatives --remove zabbix-server %{_sbindir}/zabbix_server_mysql
+fi
+:
+
+%preun server-pgsql
+if [ "$1" = 0 ]
+then
+  /usr/sbin/update-alternatives --remove zabbix-server %{_sbindir}/zabbix_server_pgsql
 fi
 :
 
@@ -460,6 +534,49 @@ then
   /sbin/service zabbix-proxy try-restart >/dev/null 2>&1 || :
 fi
 
+%preun proxy-mysql
+if [ "$1" = 0 ]
+then
+  /usr/sbin/update-alternatives --remove zabbix-proxy %{_sbindir}/zabbix_proxy_mysql
+fi
+:
+
+%preun proxy-pgsql
+if [ "$1" = 0 ]
+then
+  /usr/sbin/update-alternatives --remove zabbix-proxy %{_sbindir}/zabbix_proxy_pgsql
+fi
+:
+
+%preun proxy-sqlite3
+if [ "$1" = 0 ]
+then
+  /usr/sbin/update-alternatives --remove zabbix-proxy %{_sbindir}/zabbix_proxy_sqlite3
+fi
+:
+
+%preun web
+if [ "$1" = 0 ]
+then
+  %if 0%{?fedora} || 0%{?rhel} >= 6
+    /usr/sbin/update-alternatives --remove zabbix-web-font %{_datadir}/fonts/dejavu/DejaVuSans.ttf
+  %else
+    /usr/sbin/update-alternatives --remove zabbix-web-font %{_datadir}/%{name}/fonts/DejaVuSans.ttf
+  %endif
+fi
+:
+
+%preun web-japanese
+if [ "$1" = 0 ]
+then
+  %if 0%{?fedora} || 0%{?rhel} >= 6
+    /usr/sbin/update-alternatives --remove zabbix-web-font %{_datadir}/fonts/vlgothic/VL-PGothic-Regular.ttf 
+  %else
+    /usr/sbin/update-alternatives --remove zabbix-web-font %{_datadir}/fonts/ipa-pgothic/ipagp.ttf
+  %endif
+fi
+:
+
 
 %files
 %defattr(-,root,root,-)
@@ -470,16 +587,12 @@ fi
 
 %files agent
 %defattr(-,root,root,-)
-%doc zabbix_snmptrap.README
 %config(noreplace) %{_sysconfdir}/zabbix/zabbix_agent.conf
 %config(noreplace) %{_sysconfdir}/zabbix/zabbix_agentd.conf
-%config(noreplace) %{_sysconfdir}/zabbix/zabbix_snmptrap.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-agent
 %{_sysconfdir}/init.d/zabbix-agent
 %{_sbindir}/zabbix_agent
 %{_sbindir}/zabbix_agentd
-%{_mandir}/man1/zabbix_sender.1*
-%{_mandir}/man1/zabbix_get.1*
 %{_mandir}/man8/zabbix_agentd.8*
 
 %files get
@@ -499,7 +612,6 @@ fi
 %config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-server
 %{_sysconfdir}/init.d/zabbix-server
 %{_mandir}/man8/zabbix_server.8*
-%attr(0755,zabbix,zabbix) %dir %{_localstatedir}/lib/zabbix
 
 %files server-mysql
 %defattr(-,root,root,-)
@@ -547,6 +659,9 @@ fi
 %files web-pgsql
 %defattr(-,root,root,-)
 
+%files web-japanese
+%defattr(-,root,root,-)
+
 
 %changelog
 * Wed Feb 8 2012 Kodai Terashima <kodai.terashima@zabbix.com> - 1.8.10-1
@@ -555,6 +670,7 @@ fi
 - move init scripts to zabbix source
 - separate get and sender subpackages
 - remove server-sqlite3 and web-sqlite3 subpackages
+- add web-japanese subpackage
 
 * Tue Aug  9 2011 Dan Horák <dan[at]danny.cz> - 1.8.6-1
 - updated to 1.8.6 (#729164, #729165)

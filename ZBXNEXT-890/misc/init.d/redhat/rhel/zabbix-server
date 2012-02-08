@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # chkconfig: - 85 15
-# description: ZABBIX server daemon
+# description: Zabbix server daemon
 # config: /etc/zabbix/zabbix_server.conf
 #
 
@@ -11,29 +11,27 @@
 # Required-Stop: $local_fs $network
 # Default-Start:
 # Default-Stop: 0 1 2 3 4 5 6
-# Short-Description: Start and stop ZABBIX server
-# Description: ZABBIX server
+# Short-Description: Start and stop Zabbix server
+# Description: Zabbix server
 ### END INIT INFO
 
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-if [ -x /usr/sbin/zabbix_server_mysql ]; then
-    exec=zabbix_server_mysql
-elif [ -x /usr/sbin/zabbix_server_pgsql ]; then
-    exec=zabbix_server_pgsql
-elif [ -x /usr/sbin/zabbix_server_sqlite3 ]; then
-    exec=zabbix_server_sqlite3
+if [ -x /usr/sbin/zabbix_server ]; then
+    exec=zabbix_server
 else
     exit 5
 fi
+
 prog=${exec##*/}
+conf=/etc/zabbix/zabbix_server.conf
 lockfile=/var/lock/subsys/zabbix
 
 start()
 {
-    echo -n $"Starting ZABBIX server: "
-    daemon $exec
+    echo -n $"Starting Zabbix server: "
+    daemon $exec -c $conf
     rv=$?
     echo
     [ $rv -eq 0 ] && touch $lockfile
@@ -42,7 +40,7 @@ start()
 
 stop()
 {
-    echo -n $"Shutting down ZABBIX server: "
+    echo -n $"Shutting down Zabbix server: "
     killproc $prog
     rv=$?
     echo
