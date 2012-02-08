@@ -52,7 +52,6 @@
 
 				jQuery('#interface_row option').each(function() {
 					if (jQuery(this).data('interfacetype') == interfaceType) {
-						jQuery(this).css('display', 'block');
 						jQuery(this).removeAttr('disabled');
 						if (!isSelected) {
 							if (jQuery(this).val() == selectedInterfaceId) {
@@ -62,7 +61,6 @@
 						}
 					}
 					else {
-						jQuery(this).css('display', 'none');
 						jQuery(this).attr('disabled', 'disabled');
 					}
 				});
@@ -99,7 +97,6 @@
 
 			jQuery('#interface_row option').each(function() {
 				if (jQuery(this).val() != 0) {
-					jQuery(this).css('display', 'block');
 					jQuery(this).removeAttr('disabled');
 					if (!isSelected) {
 						jQuery(this).attr('selected', 'selected');
