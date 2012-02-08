@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[1.9.9])
+AM_INIT_AUTOMAKE([zabbix],[1.9.10])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -789,7 +789,7 @@ dnl *****************************************************************
 dnl Check for %qu format (FreeBSD 4.x)
 dnl FreeBSD 4.x does not support %llu
 AC_MSG_CHECKING(for long long format)
-AC_RUN_IFELSE(
+AC_TRY_RUN(
 [
 #include <sys/types.h>
 int main()

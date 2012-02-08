@@ -176,6 +176,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/core/CAutoloader.php -text
 frontends/php/include/classes/core/Z.php -text
 frontends/php/include/classes/core/ZBase.php -text
+frontends/php/include/views/configuration.discovery.list.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text

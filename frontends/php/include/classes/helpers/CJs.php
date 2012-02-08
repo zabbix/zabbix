@@ -1,6 +1,7 @@
+<?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,18 +17,35 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
+<?php
 
-package com.zabbix.gateway;
+/**
+ * A helper class for working with JavaScript.
+ */
+class CJs {
 
-class GeneralInformation
-{
-	public static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	public static final String REVISION_DATE = "01 February 2012";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "1.9.10";
+	/**
+	 * The object used to encode values in JSON.
+	 *
+	 * @var CJSON
+	 */
+	protected static $json;
 
-	public static void printVersion()
-	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
+	/**
+	 * Encodes the data as a JSON string to be used in JavaScript code.
+	 *
+	 * @static
+	 *
+	 * @param mixed $data
+	 *
+	 * @return mixed
+	 */
+	public static function encodeJson($data) {
+		if (self::$json === null) {
+			self::$json = new CJSON();
+		}
+
+		return self::$json->encode($data);
 	}
 }
