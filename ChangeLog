@@ -6,6 +6,8 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4598] fixed audit error when saving triggers (pavels)
+A.F....... [ZBX-4598] fixed templated trigger inheritance (pavels)
 ..F....... [ZBX-3373] fixed host interfaces filtering in items. (Eduard)
 ..F....... [ZBX-4110] fixed "ssh key" field and "password" field names in items. (Eduard)
 ..F....... [ZBX-3466] fixed creating new item without hostname. (Eduard)
