@@ -35,6 +35,7 @@ if (isset($_REQUEST['form_refresh'])) {
 }
 else {
 	$data['rules'] = array(
+		'groups' => array('missed' => true),
 		'hosts' => array('exist' => true, 'missed' => true),
 		'templates' => array('exist' => true, 'missed' => true),
 		'template_linkages' => array('exist' => true, 'missed' => true),

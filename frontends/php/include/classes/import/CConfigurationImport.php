@@ -14,7 +14,7 @@ class CConfigurationImport {
 
 	public function __construct($file, $options = array()) {
 		$this->options = array(
-			'groups' => array('exist' => true, 'missed' => true),
+			'groups' => array('missed' => true),
 			'hosts' => array('exist' => true, 'missed' => true),
 			'templates' => array('exist' => true, 'missed' => true),
 			'template_linkages' => array('exist' => true, 'missed' => true),
@@ -40,8 +40,11 @@ class CConfigurationImport {
 	public function import() {
 		$this->formatter->setData($this->data);
 
-		if ($this->options['groups']['exist'] || $this->options['groups']['missed']) {
+		if ($this->options['groups']['missed']) {
 			$this->processGroups();
+		}
+		if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
+			$this->processHosts();
 		}
 
 	}
@@ -59,6 +62,27 @@ class CConfigurationImport {
 
 		if ($this->options['groups']['missed']) {
 			API::HostGroup()->create($sepGroups['first']);
+		}
+
+	}
+
+	private function processHosts() {
+		$hosts = $this->formatter->getHosts();
+
+		$hostNames = zbx_objectValues($hosts, 'host');
+		$dbHosts = API::Host()->get(array(
+			'filter' => array('host' => $hostNames),
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		$sepHosts = zbx_array_diff($hosts, $dbHosts, 'host');
+
+		if ($this->options['hosts']['missed'] && $sepHosts['first']) {
+			API::Host()->create($sepHosts['first']);
+		}
+		if ($this->options['hosts']['exist'] && $sepHosts['both']) {
+			API::Host()->update(array_values($sepHosts['both']));
 		}
 
 	}
@@ -83,7 +107,7 @@ class CConfigurationImport {
 				return new C20ImportFormatter;
 
 			default:
-				throw new InvalidArgumentException('Unknown import file extension.');
+				throw new InvalidArgumentException('Unknown import version.');
 		}
 
 	}

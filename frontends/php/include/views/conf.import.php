@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ $table = new CTable();
 $table->setHeader(array(SPACE, _('Update existing'), _('Add missing')), 'bold');
 
 $titles = array(
+	'groups' => _('Groups'),
 	'hosts' => _('Hosts'),
 	'templates' => _('Templates'),
 	'template_linkages' => _('Template linkages'),
@@ -39,16 +40,23 @@ $titles = array(
 );
 $rules = $this->get('rules');
 foreach ($titles as $key => $title) {
-	$cbExist = new CCheckBox('rules['.$key.'][exist]', $rules[$key]['exist']);
+	$cbExist = $cbMissed = SPACE;
 
-	if ($key == 'images') {
-		if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-			continue;
+	if (isset($rules[$key]['exist'])) {
+		$cbExist = new CCheckBox('rules['.$key.'][exist]', $rules[$key]['exist']);
+
+		if ($key == 'images') {
+			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
+				continue;
+			}
+
+			$cbExist->setAttribute('onclick', 'if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
 		}
-
-		$cbExist->setAttribute('onclick', 'if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
 	}
-	$cbMissed = new CCheckBox('rules['.$key.'][missed]', $rules[$key]['missed']);
+
+	if (isset($rules[$key]['missed'])) {
+		$cbMissed = new CCheckBox('rules['.$key.'][missed]', $rules[$key]['missed']);
+	}
 
 	$table->addRow(array($title, $cbExist, $cbMissed));
 }

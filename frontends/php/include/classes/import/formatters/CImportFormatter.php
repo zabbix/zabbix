@@ -1,6 +1,6 @@
 <?php
 
-class CimportFormatter {
+class CImportFormatter {
 
 	protected $data;
 
