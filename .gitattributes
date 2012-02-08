@@ -220,6 +220,7 @@ frontends/php/include/classes/import/readers/CImportReader.php -text
 frontends/php/include/classes/import/readers/CJsonImportReader.php -text
 frontends/php/include/classes/import/readers/CXmlImportReader.php -text
 frontends/php/include/views/conf.import.php -text
+frontends/php/include/views/configuration.discovery.list.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text

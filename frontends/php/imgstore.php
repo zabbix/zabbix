@@ -31,87 +31,78 @@ require_once('include/page_header.php');
 
 ?>
 <?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields = array(
-		'css'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	null,		null),
-		'imageid'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
-		'iconid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-		'width'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000), NULL),
-		'height'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000), NULL),
-	);
-	check_fields($fields);
+//	VAR		TYPE	OPTIONAL 	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'css' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,				null),
+	'imageid' =>	array(T_ZBX_STR, O_OPT, P_SYS, null,				null),
+	'iconid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null),
+	'width' =>		array(T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null),
+	'height' =>		array(T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null),
+);
+check_fields($fields);
 
-	$resize = false;
-	if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
-		$resize = true;
-		$width = get_request('width', 0);
-		$height = get_request('height', 0);
-	}
+$resize = false;
+if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
+	$resize = true;
+	$width = get_request('width', 0);
+	$height = get_request('height', 0);
+}
 
-	if (isset($_REQUEST['css'])) {
-		$css = 'div.sysmap_iconid_0{'.
-				' height: 50px; '.
-				' width: 50px; '.
-				' background-image: url("images/general/no_icon.png"); }'."\n";
+if (isset($_REQUEST['css'])) {
+	$css = 'div.sysmap_iconid_0 {'.
+			' height: 50px;'.
+			' width: 50px;'.
+			' background-image: url("images/general/no_icon.png"); }'."\n";
 
-		$options = array(
-			'filter' => array('imagetype'=> IMAGE_TYPE_ICON),
-			'output' => API_OUTPUT_EXTEND,
-			'select_image' => 1,
-		);
-		$images = API::Image()->get($options);
-		foreach ($images as $inum => $image) {
-			$image['image'] = base64_decode($image['image']);
-
-			$ico = imagecreatefromstring($image['image']);
-
-			if ($resize) {
-				$ico = imageThumb($ico, $width, $height);
-			}
-
-			$w = imagesx($ico);
-			$h = imagesy($ico);
-
-			$css .= 'div.sysmap_iconid_'.$image['imageid'].'{'.
-						' height: '.$h.'px;'.
-						' width: '.$w.'px;'.
-						' background: url("imgstore.php?iconid='.$image['imageid'].'&width='.$w.'&height='.$h.'") no-repeat center center;}'."\n";
-		}
-
-		print($css);
-	}
-	elseif (isset($_REQUEST['iconid'])) {
-		$iconid = get_request('iconid', 0);
-
-		if ($iconid > 0) {
-			$image = get_image_by_imageid($iconid);
-			$image = $image['image'];
-
-			$source = imageFromString($image);
-		}
-		else {
-			$source = get_default_image(true);
-		}
+	$images = API::Image()->get(array(
+		'filter' => array('imagetype' => IMAGE_TYPE_ICON),
+		'output' => API_OUTPUT_EXTEND,
+		'select_image' => 1
+	));
+	foreach ($images as $image) {
+		$image['image'] = base64_decode($image['image']);
+		$ico = imagecreatefromstring($image['image']);
 
 		if ($resize) {
-			$source = imageThumb($source, $width, $height);
+			$ico = imageThumb($ico, $width, $height);
 		}
+		$w = imagesx($ico);
+		$h = imagesy($ico);
 
-		imageOut($source);
+		$css .= 'div.sysmap_iconid_'.$image['imageid'].'{'.
+					' height: '.$h.'px;'.
+					' width: '.$w.'px;'.
+					' background: url("imgstore.php?iconid='.$image['imageid'].'&width='.$w.'&height='.$h.'") no-repeat center center;}'."\n";
 	}
-	elseif (isset($_REQUEST['imageid'])) {
-		$imageid = get_request('imageid',0);
+	echo $css;
+}
+elseif (isset($_REQUEST['iconid'])) {
+	$iconid = get_request('iconid', 0);
 
-		session_start();
-		if (isset($_SESSION['image_id'][$imageid])) {
-			echo $_SESSION['image_id'][$imageid];
-			unset($_SESSION['image_id'][$imageid]);
-		}
-		session_write_close();
+	if ($iconid > 0) {
+		$image = get_image_by_imageid($iconid);
+		$image = $image['image'];
+		$source = imageFromString($image);
 	}
-?>
-<?php
+	else {
+		$source = get_default_image(true);
+	}
+
+	if ($resize) {
+		$source = imageThumb($source, $width, $height);
+	}
+	imageOut($source);
+}
+elseif (isset($_REQUEST['imageid'])) {
+	$imageid = get_request('imageid', 0);
+
+	session_start();
+	if (isset($_SESSION['image_id'][$imageid])) {
+		echo $_SESSION['image_id'][$imageid];
+		unset($_SESSION['image_id'][$imageid]);
+	}
+	session_write_close();
+}
 
 require_once('include/page_footer.php');
-
 ?>

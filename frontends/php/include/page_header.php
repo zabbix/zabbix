@@ -168,13 +168,13 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				$bodyCSS = 'originalblue';
 		}
 		echo '<style type="text/css">'."\n".
-				'.disaster { background-color: #'.$config['severity_color_5'].' !important;}'."\n".
-				'.high { background-color: #'.$config['severity_color_4'].' !important;}'."\n".
-				'.average { background-color: #'.$config['severity_color_3'].' !important;}'."\n".
-				'.warning { background-color: #'.$config['severity_color_2'].' !important;}'."\n".
-				'.information { background-color: #'.$config['severity_color_1'].' !important;}'."\n".
-				'.not_classified { background-color: #'.$config['severity_color_0'].' !important;}'."\n".
-				'.trigger_unknown { background-color: #DBDBDB !important;}'."\n".
+				'.disaster { background-color: #'.$config['severity_color_5'].' !important; }'."\n".
+				'.high { background-color: #'.$config['severity_color_4'].' !important; }'."\n".
+				'.average { background-color: #'.$config['severity_color_3'].' !important; }'."\n".
+				'.warning { background-color: #'.$config['severity_color_2'].' !important; }'."\n".
+				'.information { background-color: #'.$config['severity_color_1'].' !important; }'."\n".
+				'.not_classified { background-color: #'.$config['severity_color_0'].' !important; }'."\n".
+				'.trigger_unknown { background-color: #DBDBDB !important; }'."\n".
 			'</style>';
 	}
 	echo '<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n";
@@ -199,15 +199,13 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		echo '<script type="text/javascript" src="'.$path.'"></script>'."\n";
 	}
 ?>
-
-<script>
+<script type="text/javascript">
 	if (jQuery(window).width() < 1024) {
 		document.write('<link rel="stylesheet" type="text/css" href="styles/handheld.css" />');
 	}
 </script>
-
 </head>
-<body class="<?php echo $bodyCSS; ?>" >
+<body class="<?php echo $bodyCSS; ?>">
 <?php
 }
 
@@ -252,15 +250,14 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'), '|');
 
 		if (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-			$debug = new CLink(S_DEBUG, '#debug', 'small_font', null, 'nosid');
-			$d_script = " if (!isset('state', this)) this.state = 'none';".
-						" if (this.state == 'none') this.state = 'block';".
-						" else this.state = 'none';".
+			$debug = new CLink(_('Debug'), '#debug', 'small_font', null, 'nosid');
+			$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
+						" if (this.state == 'none') { this.state = 'block'; }".
+						" else { this.state = 'none'; }".
 						" showHideByName('zbx_gebug_info', this.state);";
 			$debug->setAttribute('onclick', 'javascript: '.$d_script);
 			array_push($page_header_r_col, $debug, '|');
 		}
-
 		array_push($page_header_r_col, new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
 	}
 	else {
@@ -292,9 +289,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
 		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); // remove parent nodes
-
 		if (!empty($available_nodes)) {
-
 			$node_form = new CForm();
 			$node_form->setMethod('get');
 			$node_form->setAttribute('id', 'node_form');
