@@ -79,7 +79,6 @@ $itemFormList->addRow(_('Key'), array(
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
 	$intereacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
-	$intereacesComboBox->addItem(new CComboItem(0, '', null, 'no'));
 	foreach ($this->data['interfaces'] as $interface) {
 		$option = new CComboItem(
 			$interface['interfaceid'],
