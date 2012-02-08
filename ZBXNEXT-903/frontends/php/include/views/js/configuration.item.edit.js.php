@@ -45,11 +45,15 @@
 					if (jQuery(this).is('[selected]')) {
 						jQuery(this).removeAttr('selected');
 					}
+					if (jQuery(this).data('empty') == 1) {
+						jQuery(this).remove();
+					}
 				});
 
 				jQuery('#interface_row option').each(function() {
 					if (jQuery(this).data('interfacetype') == interfaceType) {
 						jQuery(this).css('display', 'block');
+						jQuery(this).removeAttr('disabled');
 						if (!isSelected) {
 							if (jQuery(this).val() == selectedInterfaceId) {
 								jQuery(this).attr('selected', 'selected');
@@ -59,6 +63,7 @@
 					}
 					else {
 						jQuery(this).css('display', 'none');
+						jQuery(this).attr('disabled', 'disabled');
 					}
 				});
 
@@ -75,12 +80,14 @@
 				}
 			}
 			else {
+				// hide combobox and display warning text
 				jQuery('#interfaceid').css('display', 'none');
 				jQuery('#interface_row option').each(function() {
 					if (jQuery(this).is('[selected]')) {
 						jQuery(this).removeAttr('selected');
 					}
 				});
+				jQuery('#interfaceid').append('<option value="0" selected="selected" data-empty="1"></option>');
 				jQuery('#interfaceid').val(0);
 				jQuery('#interface_not_defined').css('display', 'inline');
 			}
@@ -93,6 +100,7 @@
 			jQuery('#interface_row option').each(function() {
 				if (jQuery(this).val() != 0) {
 					jQuery(this).css('display', 'block');
+					jQuery(this).removeAttr('disabled');
 					if (!isSelected) {
 						jQuery(this).attr('selected', 'selected');
 						isSelected = true;
