@@ -115,37 +115,40 @@
 /*
  * Validate IP mask. IP/bits
  */
-	function validate_ip_range_mask($ip_range){
+	function validate_ip_range_mask($ip_range) {
 		$parts = explode('/', $ip_range);
 
-		if( 2 != ($parts_count = count($parts)) )
-			return false;
-
-		if(validate_ipv4($parts[0], $arr)){
-			$ip_parts = explode('.', $parts[0]);
-
-//			if( !ereg('^[0-9]{1,2}$', $parts[1])) return false;
-			if(!preg_match('/^([0-9]{1,2})$/', $parts[1])) return false;
-
-			sscanf($parts[1], "%d", $mask);
-
-			if( $mask > 32 ) return false;
-		}
-		else if( defined('ZBX_HAVE_IPV6') && validate_ipv6($parts[0], $arr) ){
-			$ip_parts = explode(':', $parts[0]);
-
-//			if( !ereg('^[0-9]{1,3}$', $parts[1]) ) return false;
-			if(!preg_match('/^([0-9]{1,3})$/', $parts[1])) return false;
-
-			sscanf($parts[1], "%d", $mask);
-
-			if($mask > 128) return false;
-		}
-		else{
+		if (2 != ($parts_count = count($parts))) {
 			return false;
 		}
 
-	return true;
+		if (validate_ipv4($parts[0], $arr)) {
+			if (!preg_match('/^([0-9]{1,2})$/', $parts[1])) {
+				return false;
+			}
+
+			sscanf($parts[1], '%d', $mask);
+
+			if ($mask < 16 || $mask > 32) {
+				return false;
+			}
+		}
+		else if (defined('ZBX_HAVE_IPV6') && validate_ipv6($parts[0], $arr)) {
+			if (!preg_match('/^([0-9]{1,3})$/', $parts[1])) {
+				return false;
+			}
+
+			sscanf($parts[1], '%d', $mask);
+
+			if ($mask < 112 || $mask > 128) {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+
+		return true;
 	}
 
 /*
