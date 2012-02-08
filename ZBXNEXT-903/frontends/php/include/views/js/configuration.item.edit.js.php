@@ -96,7 +96,10 @@
 			jQuery('#interface_not_defined').css('display', 'none');
 
 			jQuery('#interface_row option').each(function() {
-				if (jQuery(this).val() != 0) {
+				if (jQuery(this).data('empty') == 1) {
+					jQuery(this).remove();
+				}
+				else {
 					jQuery(this).removeAttr('disabled');
 					if (!isSelected) {
 						jQuery(this).attr('selected', 'selected');
