@@ -88,14 +88,12 @@
 //	admin.php
 	'S_PREVIOUS'=>				_('Previous'),
 	'S_NEXT'=>				_('Next'),
-	'S_RETRY'=>				_('Retry'),
 	'S_FINISH'=>				_('Finish'),
 	'S_FAIL'=>				_('Fail'),
 	'S_UPDATE_BIG'=>			_('UPDATE'),
 	'S_NEW_INSTALLATION'=>			_('New installation'),
 	'S_NEW_INSTALLATION_BIG'=>		_('NEW INSTALLATION'),
 	'S_INSTALLATION_UPDATE'=>		_('Installation/Update'),
-	'S_ZABBIX_IS_UNAVAILABLE'=>		_('Zabbix is temporarily unavailable'),
 
 //	actions.inc.php
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -128,10 +126,7 @@
 	'S_ON'=>					_('On'),
 	'S_OFF'=>					_('Off'),
 	'S_GROUP'=>				_('Group'),
-	'S_INFORMATION'=>			_('Information'),
-	'S_WARNING'=>				_('Warning'),
 	'S_OR'=>				_('or'),
-	'S_LIKE_SMALL'=>			_('like'),
 	'S_RETRIES_LEFT'=>			_('Retries left'),
 
 //	alarms.php
@@ -196,7 +191,6 @@
 	'S_NO_PERMISSIONS'=>			_('No permissions to referred object or it does not exist!'),
 	'S_ALL_S'=>						_('All'),
 	'S_ALL_SMALL'=>					_('all'),
-	'S_NOT_SELECTED_SMALL'=>		_('not selected'),
 	'S_GRAPH'=>						_('Graph'),
 
 //	Footer
@@ -205,9 +199,6 @@
 //	graph.php
 	'S_GRAPHS_COPIED'=>			_('Graphs copied'),
 	'S_CANNOT_COPY_GRAPHS'=>	_('Cannot copy graphs'),
-	'S_ITEM_ADDED'=>			_('Item added'),
-	'S_ITEM_UPDATED'=>			_('Item updated'),
-	'S_ITEMS_UPDATED'=>			_('Items updated'),
 	'S_PARAMETER'=>				_('Parameter'),
 	'S_COLOR'=>					_('Colour'),
 	'S_UP'=>					_('Up'),
@@ -260,10 +251,6 @@
 
 //	history.php
 	'S_SELECT_ROWS_WITH_VALUE_LIKE'=>	_('Select rows with value like'),
-	'S_LAST_HOUR_GRAPH'=>			_('Last hour graph'),
-	'S_LAST_WEEK_GRAPH'=>			_('Last week graph'),
-	'S_LAST_MONTH_GRAPH'=>			_('Last month graph'),
-	'S_500_LATEST_VALUES'=>			_('500 latest values'),
 	'S_TIMESTAMP'=>				_('Timestamp'),
 	'S_SOURCE'=>				_('Source'),
 	'S_INFO'=>					_('Info'),
@@ -279,9 +266,6 @@
 	'S_AS_RED'=>				_('as Red'),
 	'S_AS_GREEN'=>				_('as Green'),
 	'S_AS_BLUE'=>				_('as Blue'),
-
-	'S_FAILURE_AUDIT'=>			_('Failure Audit'),
-	'S_SUCCESS_AUDIT'=>			_('Success Audit'),
 
 	'S_HISTORY_LOG_ITEM_DATE_FORMAT'=>	_('[Y.M.d H:i:s]'),
 	'S_HISTORY_LOG_LOCALTIME_DATE_FORMAT'=>	_('Y.M.d H:i:s'),
@@ -305,7 +289,6 @@
 	'S_DECEMBER'=>				_('December'),
 
 //	hosts.php
-	'S_HOST_INTERFACE' =>			_('Host interface'),
 	'S_IN'=>					_('In'),
 	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
@@ -332,7 +315,6 @@
 	'S_CREATE_PROXY'=>				_('Create proxy'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
 	'S_INTERFACES' =>				_('Interfaces'),
-	'S_INTERFACE' =>				_('Interface'),
 
 // templates.php
 	'S_LINKED_TEMPLATES'=>			_('Linked templates'),
@@ -351,81 +333,19 @@
 	'S_UNLINK_AND_CLEAR'=>			_('Unlink and clear'),
 
 //	items.php
-	'S_TEMPLATED_ITEMS'=>					_('Templated items'),
-	'S_NOT_TEMPLATED_ITEMS'=>				_('Not Templated items'),
-	'S_WITH_TRIGGERS'=>					_('With triggers'),
-	'S_WITHOUT_TRIGGERS'=>					_('Without triggers'),
 	'S_TYPES'=>						_('Types'),
-	'S_CLEAR_HISTORY'=>					_('Clear history'),
-	'S_CANNOT_CLEAR_HISTORY'=>				_('Cannot clear history'),
-	'S_CONFIGURATION_OF_ITEMS'=>				_('Configuration of items'),
-	'S_CONFIGURATION_OF_ITEMS_BIG'=>			_('CONFIGURATION OF ITEMS'),
-	'S_CANNOT_UPDATE_ITEM'=>				_('Cannot update item'),
-	'S_CANNOT_ADD_ITEM'=>					_('Cannot add item'),
-	'S_ITEM_DELETED'=>					_('Item deleted'),
-	'S_CANNOT_DELETE_ITEM'=>				_('Cannot delete item'),
-	'S_ITEMS_DELETED'=>					_('Items deleted'),
-	'S_CANNOT_DELETE_ITEMS'=>				_('Cannot delete items'),
 	'S_KEY'=>						_('Key'),
 	'S_DESCRIPTION'=>					_('Description'),
-	'S_INTERVAL'=>						_('Interval'),
 	'S_HISTORY'=>						_('History'),
-	'S_TRENDS'=>						_('Trends'),
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
 	'S_ACTIVE'=>						_('Active'),
-	'S_NOT_SUPPORTED'=>					_('Not supported'),
-	'S_UNITS'=>						_('Units'),
-	'S_KEEP_HISTORY_IN_DAYS'=>				_('Keep history (in days)'),
-	'S_KEEP_TRENDS_IN_DAYS'=>				_('Keep trends (in days)'),
-	'S_DATA_TYPE'=>						_('Data type'),
-	'S_DECIMAL'=>						_('Decimal'),
-	'S_OCTAL'=>						_('Octal'),
-	'S_HEXADECIMAL'=>					_('Hexadecimal'),
-	'S_BOOLEAN'=>					_('Boolean'),
-	'S_STORE_VALUE'=>					_('Store value'),
-	'S_SHOW_VALUE'=>					_('Show value'),
-	'S_NUMERIC_UNSIGNED'=>					_('Numeric (unsigned)'),
 	'S_LOG'=>						_('Log'),
 	'S_TEXT'=>						_('Text'),
-	'S_AS_IS'=>						_('As is'),
-	'S_DELTA_SPEED_PER_SECOND'=>				_('Delta (speed per second)'),
-	'S_DELTA_SIMPLE_CHANGE'=>				_('Delta (simple change)'),
 	'S_ITEM'=>						_('Item'),
-	'S_SNMP_COMMUNITY'=>					_('SNMP community'),
-	'S_SNMP_OID'=>						_('SNMP OID'),
-	'S_ALLOWED_HOSTS'=>					_('Allowed hosts'),
-	'S_SNMPV3_SECURITY_NAME'=>				_('SNMPv3 security name'),
-	'S_SNMPV3_SECURITY_LEVEL'=>				_('SNMPv3 security level'),
-	'S_SNMPV3_AUTH_PASSPHRASE'=>				_('SNMPv3 auth passphrase'),
-	'S_SNMPV3_PRIV_PASSPHRASE'=>				_('SNMPv3 priv passphrase'),
-	'S_CUSTOM_MULTIPLIER'=>					_('Custom multiplier'),
-	'S_USE_CUSTOM_MULTIPLIER'=>				_('Use custom multiplier'),
-	'S_LOG_TIME_FORMAT'=>					_('Log time format'),
-	'S_CREATE_ITEM'=>					_('Create item'),
 	'S_MODE'=>						_('Mode'),
-	'S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q'=>	_('History clearing can take a long time. Continue?'),
 	'S_ORIGINAL'=>						_('Original'),
-	'S_NEW_FLEXIBLE_INTERVAL'=>				_('New flexible interval'),
-	'S_FLEXIBLE_INTERVALS'=>				_('Flexible intervals (sec)'),
-	'S_NO_FLEXIBLE_INTERVALS'=>				_('No flexible intervals'),
-	'S_PARAMS'=>						_('Additional parameters'),
-	'S_IPMI_SENSOR'=>					_('IPMI sensor'),
-	'S_TEMPLATED_ITEM'=>					_('Templated item'),
-	'S_WEB_ITEM'=>						_('Web item'),
-	'S_EXECUTED_SCRIPT'=>					_('Executed script'),
-	'S_USER_NAME'=>						_('User name'),
-	'S_PUBLIC_KEY_FILE'=>					_('Public key file'),
-	'S_PRIVATE_KEY_FILE'=>					_('Private key file'),
-	'S_PUBLIC_KEY'=>					_('Public key'),
-	'S_AUTHENTICATION_METHOD'=>				_('Authentication method'),
-	'S_EDIT_TRIGGER'=>					_('Edit trigger'),
-	'S_ENABLE_SELECTED_ITEMS_Q'=>				_('Enable selected items?'),
-	'S_DISABLE_SELECTED_ITEMS_Q'=>				_('Disable selected items?'),
 	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			_('Mass update selected items?'),
 	'S_COPY_SELECTED_ITEMS_Q'=>				_('Copy selected items?'),
-	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			_('Delete history of selected items?'),
-	'S_DELETE_SELECTED_ITEMS_Q'=>				_('Delete selected items?'),
-	'S_FORMULA'=>						_('Formula'),
 	'S_RULE'=>						_('Rule'),
 
 // host_discovery.php
@@ -433,10 +353,7 @@
 	'S_REGEXP' => _('Regexp'),
 
 // disc_prototypes.php
-	'S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG' => _('CONFIGURATION OF ITEM PROTOTYPES'),
-	'S_ITEM_PROTOTYPES_OF_BIG' => _('ITEM PROTOTYPES OF'),
 	'S_ADD_PROTOTYPE' => _('Add prototype'),
-	'S_ITEM_PROTOTYPE' => _('Item prototype'),
 
 	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => _('CONFIGURATION OF GRAPH PROTOTYPES'),
 
@@ -515,7 +432,6 @@
 //	dashboard.php
 	'S_AGE'=>				_('Age'),
 	'S_FAVOURITES'=>			_('Favourites'),
-	'S_MENU'=>				_('Menu'),
 	'S_RESET'=>				_('Reset'),
 
 // dashconf.php
@@ -803,10 +719,6 @@
 	'S_Y'=>			_('Y'),
 
 //	forms.inc.php
-	'S_SUBFILTER'=>				_('Subfilter'),
-	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	_('affects only filtered data!'),
-	'S_SHOW_VALUE_MAPPINGS'=>			_('show value mappings'),
-	'S_DELETE_SELECTED_ITEM_Q'=>		_('Delete selected item?'),
 	'S_DO'=>				_('Do'),
 
 //	items.inc.php

@@ -2,9 +2,19 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBXNEXT-903] redesign Configuration->Items (Eduard)
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-3373] fixed host interfaces filtering in items. (Eduard)
+..F....... [ZBX-4110] fixed "ssh key" field and "password" field names in items. (Eduard)
+..F....... [ZBX-3466] fixed creating new item without hostname. (Eduard)
+..F....... [ZBX-1601] fixed clear history and trends of items for templates. (Eduard)
+..F....... [ZBX-3330,ZBX-4280] fixed remembering of item filter parameters. (Eduard)
+..F....... [ZBX-2662,ZBX-3304] fixed reset button style in filter. (Eduard)
+..F....... [ZBX-2071] fixed IPMI sensors with trailing spaces in items. (Eduard)
+..F....... [ZBX-2631] fixed flexible interval configuration in items. (Eduard)
+..F....... [ZBX-4596] fixed trigger prototype deletion. (Eduard)
 ..F....... [ZBX-2515] set 15 minutes autologout as default for new users (Alexei)
 ..F....... [ZBX-4580] fixed trigger info pop up in the item configuration list (pavels)
 
