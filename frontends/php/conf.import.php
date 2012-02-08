@@ -44,14 +44,23 @@ else {
 		'graphs' => array('exist' => true, 'missed' => true),
 		'screens' => array('exist' => true, 'missed' => true),
 		'maps' => array('exist' => true, 'missed' => true),
-		'images' => array('exist' => false, 'missed' => false),
+		'images' => array('exist' => false, 'missed' => false)
 	);
 }
 
 if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
-	$result = zbxXML::import($_FILES['import_file']['tmp_name']);
 
-	show_messages($result, _('Imported successfully'), _('Import failed'));
+	try {
+		$configurationImport = new CConfigurationImport($_FILES['import_file']);
+		$configurationImport->import();
+		show_messages(true, _('Imported successfully'));
+	}
+	catch (Exception $e) {
+		error($e->getMessage());
+		show_messages(false, null, _('Import failed'));
+	}
+
+
 }
 
 

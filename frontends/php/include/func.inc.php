@@ -621,7 +621,17 @@ function zbx_is_int($var) {
 	return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
-function zbx_array_diff($primary, $secondary, $field) {
+/**
+ * Look for two arrays field value and create 3 array lists, one with arrays where field value exists only in first array
+ * second with arrays where field values are only in second array and both where fiel values are in both arrays.
+ *
+ * @param array  $primary
+ * @param array  $secondary
+ * @param string $field field that is searched in arrays
+ *
+ * @return array
+ */
+function zbx_array_diff(array $primary, array $secondary, $field) {
 	$fields1 = zbx_objectValues($primary, $field);
 	$fields2 = zbx_objectValues($secondary, $field);
 
