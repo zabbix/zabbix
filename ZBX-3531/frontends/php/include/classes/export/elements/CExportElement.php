@@ -114,7 +114,7 @@ class CExportElement {
 			}
 		}
 		if ($requiredFields) {
-			$this->data = ArrayHelper::getByKeys($this->data, $requiredFields);
+			$this->data = ArrayHelper::getByKeysStrict($this->data, $requiredFields);
 		}
 	}
 

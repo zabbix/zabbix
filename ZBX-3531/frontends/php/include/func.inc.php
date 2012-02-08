@@ -976,13 +976,47 @@ class ArrayHelper {
 
 	private function __construct() {}
 
-	public static function getByKeys(array $array, array $keys) {
+	/**
+	 * Get from array only values with given keys.
+	 * If requested key is not in given array exception is thrown.
+	 *
+	 * @static
+	 * @throws InvalidArgumentException
+	 *
+	 * @param array $array
+	 * @param array $keys
+	 *
+	 * @return array
+	 */
+	public static function getByKeysStrict(array $array, array $keys) {
 		$result = array();
 		foreach ($keys as $key) {
 			if (!isset($array[$key])) {
 				throw new InvalidArgumentException(sprintf('Array does not have element with key "%1$s".', $key));
 			}
 			$result[$key] = $array[$key];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get from array only values with given keys.
+	 * If requested key is not in given array it is skipped.
+	 *
+	 * @static
+	 *
+	 * @param array $array
+	 * @param array $keys
+	 *
+	 * @return array
+	 */
+	public static function getByKeys(array $array, array $keys) {
+		$result = array();
+		foreach ($keys as $key) {
+			if (isset($array[$key])) {
+				$result[$key] = $array[$key];
+			}
 		}
 
 		return $result;
