@@ -443,8 +443,8 @@ function hostInterfaceTypeNumToName($type) {
 		$hosts = array();
 
 		$db_hostsItems = DBselect(
-			'SELECT i.itemid, h.*'.
-			' FROM hosts h, items i'.
+			'SELECT i.itemid,h.*'.
+			' FROM hosts h,items i'.
 			' WHERE i.hostid=h.hostid'.
 				' AND '.DBcondition('i.itemid', $itemids)
 		);
@@ -480,7 +480,7 @@ function hostInterfaceTypeNumToName($type) {
 		zbx_value2array($templateids);
 		return DBselect(
 			'SELECT h.*'.
-			' FROM hosts h, hosts_templates ht'.
+			' FROM hosts h,hosts_templates ht'.
 			' WHERE h.hostid=ht.hostid'.
 				' AND '.DBcondition('ht.templateid', $templateids)
 		);
@@ -616,7 +616,7 @@ function get_viewed_groups($perm, $options = array(), $nodeid = null, $sql = arr
 		$def_sql['from'][] = 'hosts_groups hg';
 
 		$def_sql['where'][] = 'hg.groupid=g.groupid';
-		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid )';
+		$def_sql['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE hg.hostid=i.hostid)';
 	}
 	elseif ($def_options['with_monitored_items']) {
 		$def_sql['from'][] = 'hosts_groups hg';
@@ -834,7 +834,7 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 	$hosts = &$result['hosts'];
 	$hostids = &$result['hostids'];
 
-	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) ? S_NOT_SELECTED_SMALL : S_ALL_SMALL;
+	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : S_ALL_SMALL;
 	$hosts['0'] = $first_entry;
 
 	if (!is_array($groupid) && ($groupid == 0)) {
@@ -1253,4 +1253,8 @@ function hostMenuData(array $host, array $scripts = array()) {
 	);
 }
 
+function isTemplatedHost($hostid) {
+	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.$hostid));
+	return !empty($dbHost) && $dbHost['status'] == HOST_STATUS_TEMPLATE;
+}
 ?>

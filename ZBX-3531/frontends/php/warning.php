@@ -21,65 +21,57 @@
 <?php
 require_once('include/config.inc.php');
 
-$page['title'] = 'S_WARNING';
+$page['title'] = _('Warning');
 $page['file'] = 'warning.php';
 
 define('ZBX_PAGE_DO_REFRESH', 1);
-
-if (!defined('PAGE_HEADER_LOADED'))
+if (!defined('PAGE_HEADER_LOADED')) {
 	define('ZBX_PAGE_NO_MENU', 1);
+}
 
-// seconds
-$refreshRate = 30;
-
+$refresh_rate = 30; //seconds
 ?>
 <?php
-	$fields=array(
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-		'warning_msg'=>	array(T_ZBX_STR, O_OPT,	NULL,			NULL,	NULL),
-		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,			NULL,	NULL),
-		'retry'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL)
-	);
-
-	check_fields($fields, false);
+//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'warning_msg' =>	array(T_ZBX_STR, O_OPT, null,		 null, null),
+	'message' =>		array(T_ZBX_STR, O_OPT, null,		 null, null),
+	'retry' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null)
+);
+check_fields($fields, false);
 ?>
 <?php
-	if (isset($_REQUEST['cancel'])) {
-		zbx_unsetcookie('ZBX_CONFIG');
-		redirect('index.php');
-	}
-//	clear_messages();
-CWebUser::$data['refresh'] = $refreshRate;
+if (isset($_REQUEST['cancel'])) {
+	zbx_unsetcookie('ZBX_CONFIG');
+	redirect('index.php');
+}
+// clear_messages();
+CWebUser::$data['refresh'] = $refresh_rate;
 
 require_once('include/page_header.php');
 
 unset($USER_DETAILS);
 
-	$table = new CTable(null, 'warningTable');
-	$table->setAlign('center');
-	$table->setAttribute('style', 'width: 480px; margin-top: 100px;');
-	$table->setHeader(array(new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left')), 'header');
+$table = new CTable(null, 'warningTable');
+$table->setAlign('center');
+$table->setAttribute('style', 'width: 480px; margin-top: 100px;');
+$table->setHeader(array(new CCol(_('Zabbix').SPACE.ZABBIX_VERSION, 'left')),'header');
+$table->addRow(SPACE);
 
-	$table->addRow(SPACE);
+$img = new CImg('./images/general/warning16r.gif', 'warning', 16, 16, 'img');
+$img->setAttribute('style', 'border-width: 0px; vertical-align: bottom;');
 
-	$warningMsg = (isset($_REQUEST['warning_msg']))?($_REQUEST['warning_msg']):(S_ZABBIX_IS_UNAVAILABLE.'!');
+$msg = new CSpan(bold(SPACE.(isset($_REQUEST['warning_msg']) ? $_REQUEST['warning_msg'] : _('Zabbix is temporarily unavailable').'!')));
+$msg->setAttribute('style', 'line-height: 20px; vertical-align: top;');
 
-	$img = new CImg('./images/general/warning16r.gif', 'warning', 16, 16, 'img');
-	$img->setAttribute('style', 'border-width: 0px; vertical-align: bottom;');
+$table->addRow(new CCol(array($img, $msg), 'center'));
+$table->addRow(SPACE);
+$table->setFooter(new CCol(new CButton('retry', _('Retry'), 'javascript: document.location.reload();'), 'left'), 'footer');
+$table->show();
 
-	$msg = new CSpan(bold(SPACE.$warningMsg));
-	$msg->setAttribute('style', 'line-height: 20px; vertical-align: top;');
+zbx_add_post_js('setTimeout("document.location.reload();",'.($refresh_rate * 1000).');');
+echo SBR;
 
-	$table->addRow(new CCol(array($img, $msg), 'center'));
-	$table->addRow(SPACE);
-
-	$table->setFooter(new CCol(new CButton('retry', S_RETRY, 'javascript: document.location.reload();'), 'left'), 'footer');
-
-	$table->show();
-	zbx_add_post_js('setTimeout("document.location.reload();",'.($refreshRate*1000).');');
-	echo SBR;
-?>
-<?php
 require_once('include/page_footer.php');
 ?>

@@ -80,7 +80,7 @@ class CTriggerExpression {
 
 		$itemKey = new CItemKey($item);
 		if (!$itemKey->isValid()) {
-			throw new Exception(_s('Incorrect item key "%1$s" is used in expression.'.SPACE.$itemKey->getError(), $item));
+			throw new Exception(_s('Incorrect item key "%1$s" is used in expression.', $item).SPACE.$itemKey->getError());
 		}
 	}
 
@@ -136,7 +136,7 @@ class CTriggerExpression {
 			}
 		}
 		catch (Exception $e) {
-			throw new Exception(_s('Incorrect trigger function "%1$s" provided in expression.'.SPACE.$e->getMessage(), $expression['function']));
+			throw new Exception(_s('Incorrect trigger function "%1$s" provided in expression.', $expression['function']).SPACE.$e->getMessage());
 		}
 	}
 
