@@ -1,7 +1,3 @@
-# TODO, maybe sometime:
-# * Do something about mutex errors sometimes occurring when init scripts'
-#   restart is invoked; something like "sleep 2" between stop and start?
-
 Name		: zabbix
 Version		: __TMPL_ZABBIX_VERSION__
 Release		: 1
@@ -12,18 +8,9 @@ License		: GPLv2+
 URL		: http://www.zabbix.com/
 Source0		: %{name}-%{version}.tar.gz
 Source1		: zabbix-web.conf
-Source2		: zabbix-server.init
-Source3		: zabbix-agent.init
-Source4		: zabbix-proxy.init
-Source5		: zabbix-logrotate.in
-# processing of SNMP traps
-Source6		: zabbix_snmptrap
-Source7		: zabbix_snmptrap.conf
-Source8		: zabbix_snmptrap.README
-# local rules for config files
-Patch0		: zabbix-1.8.4-config.patch
-# local rules for config files - fonts
-Patch1		: zabbix-1.8.4-fonts-config.patch
+Source2		: zabbix-logrotate.in
+Patch0		: config.patch
+Patch1		: fonts-config.patch
 
 Buildroot	: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -263,8 +250,6 @@ touch -r frontends/php/css.css frontends/php/include/config.inc.php \
     frontends/php/include \
     frontends/php/include/classes
 
-cp -p %{SOURCE8} .
-
 
 %build
 
@@ -357,17 +342,17 @@ cat misc/conf/zabbix_proxy.conf | sed \
     > $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/zabbix_proxy.conf
 
 # install log rotation
-cat %{SOURCE5} | sed -e 's|COMPONENT|server|g' > \
+cat %{SOURCE2} | sed -e 's|COMPONENT|server|g' > \
      $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-server
-cat %{SOURCE5} | sed -e 's|COMPONENT|agentd|g' > \
+cat %{SOURCE2} | sed -e 's|COMPONENT|agentd|g' > \
      $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-agent
-cat %{SOURCE5} | sed -e 's|COMPONENT|proxy|g' > \
+cat %{SOURCE2} | sed -e 's|COMPONENT|proxy|g' > \
      $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/zabbix-proxy
 
 # init scripts
-install -m 0755 -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-server
-install -m 0755 -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-agent
-install -m 0755 -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-proxy
+install -m 0755 -p misc/init.d/redhat/rhel/zabbix-server $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-server
+install -m 0755 -p misc/init.d/redhat/rhel/zabbix-agent $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-agent
+install -m 0755 -p misc/init.d/redhat/rhel/zabbix-proxy $RPM_BUILD_ROOT%{_sysconfdir}/init.d/zabbix-proxy
 
 # install
 make DESTDIR=$RPM_BUILD_ROOT install
@@ -403,10 +388,6 @@ for pkg in proxy server ; do
 done
 # remove extraneous ones
 rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}/create
-
-# processing of SNMP traps
-install -m 755 -p %{SOURCE6} $RPM_BUILD_ROOT%{_bindir}
-install -m 644 -p %{SOURCE7} $RPM_BUILD_ROOT%{_sysconfdir}/zabbix
 
 
 %clean
@@ -588,8 +569,10 @@ fi
 
 
 %changelog
-* __TMPL_CHLOG_DATE__ __TMPL_CHLOG_NAME__ <__TMPL_CHLOG_EMAIL__> - __TMPL_ZABBIX_VERSION__-__TMPL_ZABBIX_RPM_RELEASE__
-- rebuild for __TMPL_ZABBIX_VERSION__
+* Wed Feb 8 2012 Kodai Terashima <kodai.terashima@zabbix.com> - 1.8.10-1
+- update to 1.8.10
+- remove snmptrap related files
+- move init scripts to zabbix source
 
 * Tue Aug  9 2011 Dan Horák <dan[at]danny.cz> - 1.8.6-1
 - updated to 1.8.6 (#729164, #729165)
