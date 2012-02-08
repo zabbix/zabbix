@@ -1,6 +1,6 @@
 Name		: zabbix
 Version		: __TMPL_ZABBIX_VERSION__
-Release		: 1
+Release		: 1%{?dist}
 Summary		: Enterprise-class open source distributed monitoring solution.
 
 Group		: Applications/Internet
@@ -22,34 +22,55 @@ BuildRequires	: gnutls-devel
 BuildRequires	: iksemel-devel
 BuildRequires	: sqlite-devel
 BuildRequires	: unixODBC-devel
-%if 0%{!?el4:1}
 BuildRequires	: curl-devel >= 7.13.1
 BuildRequires	: OpenIPMI-devel >= 2
-%endif
-%if 0%{?fedora} || 0%{?rhel} >= 6
-BuildRequires	: libssh2-devel
-%endif
+BuildRequires	: libssh2-devel >= 1
 
 Requires	: logrotate
 Requires(pre)	: /usr/sbin/useradd
 
 %description
-ZABBIX is software that monitors numerous parameters of a network and
-the health and integrity of servers. ZABBIX uses a flexible
+Zabbix is software that monitors numerous parameters of a network and
+the health and integrity of servers. Zabbix uses a flexible
 notification mechanism that allows users to configure e-mail based
 alerts for virtually any event.  This allows a fast reaction to server
-problems. ZABBIX offers excellent reporting and data visualisation
-features based on the stored data. This makes ZABBIX ideal for
+problems. Zabbix offers excellent reporting and data visualisation
+features based on the stored data. This makes Zabbix ideal for
 capacity planning.
 
-ZABBIX supports both polling and trapping. All ZABBIX reports and
+Zabbix supports both polling and trapping. All Zabbix reports and
 statistics, as well as configuration parameters are accessed through a
 web-based front end. A web-based front end ensures that the status of
 your network and the health of your servers can be assessed from any
-location. Properly configured, ZABBIX can play an important role in
+location. Properly configured, Zabbix can play an important role in
 monitoring IT infrastructure. This is equally true for small
 organisations with a few servers and for large companies with a
 multitude of servers.
+
+%package agent
+Summary		: Zabbix Agent
+Group		: Applications/Internet
+Requires	: zabbix = %{version}-%{release}
+Requires(post)	: /sbin/chkconfig
+Requires(preun)	: /sbin/chkconfig
+Requires(preun)	: /sbin/service
+
+%description agent
+The Zabbix client agent, to be installed on monitored systems.
+
+%package get
+Summary		: Zabbix Get
+Group		: Applications/Internet
+
+%description get
+Zabbix get command line utility
+
+%package sender
+Summary		: Zabbix Sender
+Group		: Applications/Internet
+
+%description sender
+Zabbix sender command line utility
 
 %package server
 Summary		: Zabbix server common files
@@ -73,7 +94,6 @@ Requires	: zabbix-server = %{version}-%{release}
 Provides	: zabbix-server-implementation = %{version}-%{release}
 Obsoletes	: zabbix <= 1.5.3-0.1
 Conflicts	: zabbix-server-pgsql
-Conflicts	: zabbix-server-sqlite3
 
 %description server-mysql
 Zabbix server compiled with MySQL database support.
@@ -85,36 +105,12 @@ Requires	: zabbix = %{version}-%{release}
 Requires	: zabbix-server = %{version}-%{release}
 Provides	: zabbix-server-implementation = %{version}-%{release}
 Conflicts	: zabbix-server-mysql
-Conflicts	: zabbix-server-sqlite3
 
 %description server-pgsql
 Zabbix server compiled with PostgresSQL database support.
 
-%package server-sqlite3
-Summary		: Zabbix server compiled to use SQLite database
-Group		: Applications/Internet
-Requires	: zabbix = %{version}-%{release}
-Requires	: zabbix-server = %{version}-%{release}
-Provides	: zabbix-server-implementation = %{version}-%{release}
-Conflicts	: zabbix-server-mysql
-Conflicts	: zabbix-server-pgsql
-
-%description server-sqlite3
-Zabbix server compiled with SQLite database support.
-
-%package agent
-Summary		: Zabbix Agent
-Group		: Applications/Internet
-Requires	: zabbix = %{version}-%{release}
-Requires(post)	: /sbin/chkconfig
-Requires(preun)	: /sbin/chkconfig
-Requires(preun)	: /sbin/service
-
-%description agent
-The Zabbix client agent, to be installed on monitored systems.
-
 %package proxy
-Summary		: Zabbix Proxy
+Summary		: Zabbix Proxy common files
 Group		: Applications/Internet
 Requires	: zabbix = %{version}-%{release}
 Requires	: zabbix-proxy-implementation = %{version}-%{release}
@@ -122,9 +118,11 @@ Requires(post)	: /sbin/chkconfig
 Requires(preun)	: /sbin/chkconfig
 Requires(preun)	: /sbin/service
 Requires	: fping
+Conflicts	: %{name}-server
+Conflicts	: %{name}-web
 
 %description proxy
-The Zabbix proxy
+The Zabbix proxy common files
 
 %package proxy-mysql
 Summary		: Zabbix proxy compiled to use MySQL
@@ -145,13 +143,13 @@ Provides	: zabbix-proxy-implementation = %{version}-%{release}
 The Zabbix proxy compiled to use PostgreSQL
 
 %package proxy-sqlite3
-Summary		: Zabbix proxy compiled to use SQLite
+Summary		: Zabbix proxy compiled to use SQLite3
 Group		: Applications/Internet
 Requires	: zabbix-proxy = %{version}-%{release}
 Provides	: zabbix-proxy-implementation = %{version}-%{release}
 
 %description proxy-sqlite3
-The Zabbix proxy compiled to use SQLite
+The Zabbix proxy compiled to use SQLite3
 
 %package web
 Summary		: Zabbix Web Frontend
@@ -205,21 +203,6 @@ Conflicts	: zabbix-web-sqlite3
 %description web-pgsql
 Zabbix web frontend for PostgreSQL
 
-%package web-sqlite3
-Summary		: Zabbix web frontend for SQLite
-Group		: Applications/Internet
-%if 0%{?fedora} > 9 || 0%{?rhel} >= 6
-BuildArch	: noarch
-%endif
-Requires	: zabbix-web = %{version}-%{release}
-# Need to use the same db file as the server
-Requires	: zabbix-server-sqlite3 = %{version}-%{release}
-Provides	: zabbix-web-database = %{version}-%{release}
-Conflicts	: zabbix-web-mysql
-Conflicts	: zabbix-web-pgsql
-
-%description web-sqlite3
-Zabbix web frontend for SQLite
 
 %prep
 %setup0 -q
@@ -261,15 +244,11 @@ common_flags="
     --enable-ipv6
     --with-net-snmp
     --with-ldap
-%if 0%{!?el4:1}
     --with-libcurl
     --with-openipmi
-%endif
     --with-jabber
     --with-unixodbc
-%if 0%{?fedora} || 0%{?rhel} >= 6
     --with-ssh2
-%endif
 "
 
 %configure $common_flags --with-mysql
@@ -284,7 +263,7 @@ mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_pgsql
 
 %configure $common_flags --with-sqlite3
 make %{?_smp_mflags}
-mv src/zabbix_server/zabbix_server src/zabbix_server/zabbix_server_sqlite3
+#mv src/zabbix_server/zabbix_server src/zabbix_server/zabbix_server_sqlite3
 mv src/zabbix_proxy/zabbix_proxy src/zabbix_proxy/zabbix_proxy_sqlite3
 
 touch src/zabbix_server/zabbix_server
@@ -380,11 +359,14 @@ for pkg in proxy server ; do
     cp -p --parents create/data/images_pgsql.sql $docdir
     cp -pR --parents upgrades/dbpatches/1.6/postgresql $docdir
     cp -pR --parents upgrades/dbpatches/1.8/postgresql $docdir
-    docdir=$RPM_BUILD_ROOT%{_docdir}/%{name}-$pkg-sqlite3-%{version}
-    install -dm 755 $docdir
-    cp -p --parents create/schema/sqlite.sql $docdir
-    cp -p --parents create/data/data.sql $docdir
-    cp -p --parents create/data/images_sqlite3.sql $docdir
+
+    if ["$pkg" = "proxy" ]; then
+        docdir=$RPM_BUILD_ROOT%{_docdir}/%{name}-$pkg-sqlite3-%{version}
+        install -dm 755 $docdir
+        cp -p --parents create/schema/sqlite.sql $docdir
+        cp -p --parents create/data/data.sql $docdir
+        cp -p --parents create/data/images_sqlite3.sql $docdir
+    fi
 done
 # remove extraneous ones
 rm -rf $RPM_BUILD_ROOT%{_datadir}/%{name}/create
@@ -401,6 +383,9 @@ getent passwd zabbix > /dev/null || \
     -c "Zabbix Monitoring System" zabbix
 :
 
+%post agent
+/sbin/chkconfig --add zabbix-agent || :
+
 %post server
 /sbin/chkconfig --add zabbix-server
 if [ $1 -gt 1 ]
@@ -411,9 +396,6 @@ then
 fi
 :
 
-%post agent
-/sbin/chkconfig --add zabbix-agent || :
-
 %post proxy
 /sbin/chkconfig --add zabbix-proxy
 if [ $1 -gt 1 ]
@@ -423,49 +405,6 @@ then
   chown root:zabbix %{_sysconfdir}/zabbix/zabbix_proxy.conf
 fi
 :
-
-%preun server
-if [ "$1" = 0 ]
-then
-  /sbin/service zabbix-server stop >/dev/null 2>&1
-  /sbin/chkconfig --del zabbix-server
-fi
-:
-
-%preun agent
-if [ "$1" = 0 ]
-then
-  /sbin/service zabbix-agent stop >/dev/null 2>&1
-  /sbin/chkconfig --del zabbix-agent
-fi
-:
-
-%preun proxy
-if [ "$1" = 0 ]
-then
-  /sbin/service zabbix-proxy stop >/dev/null 2>&1
-  /sbin/chkconfig --del zabbix-proxy
-fi
-:
-
-%postun server
-if [ $1 -ge 1 ]
-then
-  /sbin/service zabbix-server try-restart >/dev/null 2>&1 || :
-fi
-
-%postun proxy
-if [ $1 -ge 1 ]
-then
-  /sbin/service zabbix-proxy try-restart >/dev/null 2>&1 || :
-fi
-
-%postun agent
-if [ $1 -ge 1 ]
-then
-  /sbin/service zabbix-agent try-restart >/dev/null 2>&1 || :
-fi
-
 
 %post web
 # move existing config file on update
@@ -479,6 +418,48 @@ then
 fi
 :
 
+%preun agent
+if [ "$1" = 0 ]
+then
+  /sbin/service zabbix-agent stop >/dev/null 2>&1
+  /sbin/chkconfig --del zabbix-agent
+fi
+:
+
+%preun server
+if [ "$1" = 0 ]
+then
+  /sbin/service zabbix-server stop >/dev/null 2>&1
+  /sbin/chkconfig --del zabbix-server
+fi
+:
+
+%preun proxy
+if [ "$1" = 0 ]
+then
+  /sbin/service zabbix-proxy stop >/dev/null 2>&1
+  /sbin/chkconfig --del zabbix-proxy
+fi
+:
+
+%postun agent
+if [ $1 -ge 1 ]
+then
+  /sbin/service zabbix-agent try-restart >/dev/null 2>&1 || :
+fi
+
+%postun server
+if [ $1 -ge 1 ]
+then
+  /sbin/service zabbix-server try-restart >/dev/null 2>&1 || :
+fi
+
+%postun proxy
+if [ $1 -ge 1 ]
+then
+  /sbin/service zabbix-proxy try-restart >/dev/null 2>&1 || :
+fi
+
 
 %files
 %defattr(-,root,root,-)
@@ -486,6 +467,30 @@ fi
 %dir %{_sysconfdir}/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/log/zabbix
 %attr(0755,zabbix,zabbix) %dir %{_localstatedir}/run/zabbix
+
+%files agent
+%defattr(-,root,root,-)
+%doc zabbix_snmptrap.README
+%config(noreplace) %{_sysconfdir}/zabbix/zabbix_agent.conf
+%config(noreplace) %{_sysconfdir}/zabbix/zabbix_agentd.conf
+%config(noreplace) %{_sysconfdir}/zabbix/zabbix_snmptrap.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-agent
+%{_sysconfdir}/init.d/zabbix-agent
+%{_sbindir}/zabbix_agent
+%{_sbindir}/zabbix_agentd
+%{_mandir}/man1/zabbix_sender.1*
+%{_mandir}/man1/zabbix_get.1*
+%{_mandir}/man8/zabbix_agentd.8*
+
+%files get
+%defattr(-,root,root,-)
+%{_bindir}/zabbix_get
+%{_mandir}/man1/zabbix_get.1*
+
+%files sender
+%defattr(-,root,root,-)
+%{_bindir}/zabbix_sender
+%{_mandir}/man1/zabbix_sender.1*
 
 %files server
 %defattr(-,root,root,-)
@@ -505,28 +510,6 @@ fi
 %defattr(-,root,root,-)
 %{_docdir}/%{name}-server-pgsql-%{version}/
 %{_sbindir}/zabbix_server_pgsql
-
-%files server-sqlite3
-%defattr(-,root,root,-)
-%{_docdir}/%{name}-server-sqlite3-%{version}/
-%{_sbindir}/zabbix_server_sqlite3
-
-%files agent
-%defattr(-,root,root,-)
-%doc zabbix_snmptrap.README
-%config(noreplace) %{_sysconfdir}/zabbix/zabbix_agent.conf
-%config(noreplace) %{_sysconfdir}/zabbix/zabbix_agentd.conf
-%config(noreplace) %{_sysconfdir}/zabbix/zabbix_snmptrap.conf
-%config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-agent
-%{_sysconfdir}/init.d/zabbix-agent
-%{_sbindir}/zabbix_agent
-%{_sbindir}/zabbix_agentd
-%{_bindir}/zabbix_sender
-%{_bindir}/zabbix_get
-%{_bindir}/zabbix_snmptrap
-%{_mandir}/man1/zabbix_sender.1*
-%{_mandir}/man1/zabbix_get.1*
-%{_mandir}/man8/zabbix_agentd.8*
 
 %files proxy
 %defattr(-,root,root,-)
@@ -564,15 +547,14 @@ fi
 %files web-pgsql
 %defattr(-,root,root,-)
 
-%files web-sqlite3
-%defattr(-,root,root,-)
-
 
 %changelog
 * Wed Feb 8 2012 Kodai Terashima <kodai.terashima@zabbix.com> - 1.8.10-1
 - update to 1.8.10
 - remove snmptrap related files
 - move init scripts to zabbix source
+- separate get and sender subpackages
+- remove server-sqlite3 and web-sqlite3 subpackages
 
 * Tue Aug  9 2011 Dan Horák <dan[at]danny.cz> - 1.8.6-1
 - updated to 1.8.6 (#729164, #729165)
