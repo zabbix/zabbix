@@ -19,50 +19,42 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/images.inc.php');
+require_once('include/config.inc.php');
+require_once('include/images.inc.php');
 
-	$page['file']	= 'image.php';
-	$page['title']	= 'S_IMAGE';
-	$page['type']	= PAGE_TYPE_IMAGE;
+$page['file'] = 'image.php';
+$page['title'] = _('Image');
+$page['type'] = PAGE_TYPE_IMAGE;
 
 require_once('include/page_header.php');
-
 ?>
 <?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'imageid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,	NULL),
-		'width'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000),	NULL),
-		'height'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000),	NULL),
-	);
-	check_fields($fields);
+//	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'imageid' =>	array(T_ZBX_INT, O_MAND, P_SYS, DB_ID,				null),
+	'width' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(1, 2000),	null),
+	'height' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(1, 2000),	null),
+);
+check_fields($fields);
 ?>
 <?php
+$resize = false;
+if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
+	$resize = true;
+	$width = get_request('width', 0);
+	$height = get_request('height', 0);
+}
+if (!($row = get_image_by_imageid($_REQUEST['imageid']))) {
+	error(_('Incorrect image index.'));
+	require_once('include/page_footer.php');
+}
+$source = imageFromString($row['image']);
+unset($row);
 
-	$resize = false;
-	if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
-		$resize = true;
-		$width = get_request('width', 0);
-		$height = get_request('height', 0);
-	}
+if ($resize) {
+	$source = imageThumb($source, $width, $height);
+}
+imageout($source);
 
-	if(!($row = get_image_by_imageid($_REQUEST['imageid']))){
-		error('Incorrect image index');
-		require_once('include/page_footer.php');
-	}
-
-	$source = imageFromString($row['image']);
-
-	unset($row);
-
-	if ($resize) {
-		$source = imageThumb($source, $width, $height);
-	}
-	imageout($source);
-?>
-<?php
-
-require_once "include/page_footer.php";
-
+require_once 'include/page_footer.php';
 ?>

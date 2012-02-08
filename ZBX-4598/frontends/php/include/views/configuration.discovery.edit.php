@@ -19,101 +19,77 @@
 **/
 ?>
 <?php
-// include JS + templates
-require_once('include/views/js/configuration.discovery.js.php');
-?>
-<?php
-	$data = $data;
+require_once('include/views/js/configuration.discovery.edit.js.php');
 
-	$divTabs = new CTabView(array('remember' => 1));
-	if(!isset($_REQUEST['form_refresh'])) $divTabs->setSelected(0);
+$discoveryWidget = new CWidget();
+$discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULE'));
 
-	$formDsc = new CForm();
-	$formDsc->setName('discovery.edit');
+// create form
+$discoveryForm = new CForm();
+$discoveryForm->setName('discoveryForm');
+$discoveryForm->addVar('form', $this->data['form']);
+$discoveryForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
+if (!empty($this->data['druleid'])) {
+	$discoveryForm->addVar('druleid', $this->data['druleid']);
+}
 
-	$from_rfr = get_request('form_refresh', 0);
-	$formDsc->addVar('form_refresh', $from_rfr+1);
-	$formDsc->addVar('form', get_request('form', 1));
+// create form list
+$discoveryFormList = new CFormList('discoveryFormList');
+$discoveryFormList->addRow(_('Name'), new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 
-	if(isset($_REQUEST['druleid'])) $formDsc->addVar('druleid', $_REQUEST['druleid']);
+// append proxy to form list
+$proxyComboBox = new CComboBox('proxy_hostid', $this->data['drule']['proxy_hostid']);
+$proxyComboBox->addItem(0, _('No proxy'));
+foreach ($this->data['proxies'] as $proxy) {
+	$proxyComboBox->addItem($proxy['proxyid'], $proxy['host']);
+}
+$discoveryFormList->addRow(_('Discovery by proxy'), $proxyComboBox);
+$discoveryFormList->addRow(_('IP range'), new CTextBox('iprange', $this->data['drule']['iprange'], ZBX_TEXTBOX_SMALL_SIZE));
+$discoveryFormList->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->data['drule']['delay'], 8));
 
-// Name
-	$discoveryList = new CFormList('actionlist');
-	$discoveryList->addRow(_('Name'), new CTextBox('name', $data['name'], 60));
+// append checks to form list
+$checkTable = new CTable(null, 'formElementTable');
+$checkTable->addRow(new CRow(
+	new CCol(
+		new CButton('newCheck', _('New'), null, 'link_menu'),
+		null,
+		2
+	),
+	null,
+	'dcheckListFooter'
+));
+$discoveryFormList->addRow(_('Checks'),
+	new CDiv($checkTable, 'objectgroup inlineblock border_dotted ui-corner-all', 'dcheckList'));
 
-// Discovery by proxy
-	$cmbProxy = new CComboBox('proxy_hostid', $data['proxy_hostid']);
-	$cmbProxy->addItem(0, _('No proxy'));
+// append uniqueness criteria to form list
+$uniquenessCriteriaRadio = new CRadioButtonList('uniqueness_criteria', $this->data['drule']['uniqueness_criteria']);
+$uniquenessCriteriaRadio->addValue(' '._('IP address'), -1);
+$discoveryFormList->addRow(_('Device uniqueness criteria'),
+	new CDiv($uniquenessCriteriaRadio, 'objectgroup inlineblock border_dotted ui-corner-all', 'uniqList'));
 
-	$proxies = API::Proxy()->get(array(
-		'output' => API_OUTPUT_EXTEND
-	));
-	order_result($proxies, 'host');
-	foreach($proxies as $proxy){
-		$cmbProxy->addItem($proxy['proxyid'], $proxy['host']);
-	}
-	$discoveryList->addRow(_('Discovery by proxy'), $cmbProxy);
+// append status to form list
+$discoveryFormList->addRow(_('Enabled'),
+	new CCheckBox('status', !empty($this->data['druleid']) ? ($this->data['drule']['status'] == 0 ? 'yes' : 'no') : 'yes', null, 1));
 
-// IP range
-	$discoveryList->addRow(_('IP range'), new CTextBox('iprange', $data['iprange'], 27));
+// append tabs to form
+$discoveryTabs = new CTabView();
+$discoveryTabs->addTab('druleTab', _('Discovery rule'), $discoveryFormList);
+$discoveryForm->addItem($discoveryTabs);
 
-// Delay (seconds)
-	$discoveryList->addRow(_('Delay (seconds)'), new CNumericBox('delay', $data['delay'], 8));
+// append buttons to form
+$deleteButton = new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid'));
+if (empty($this->data['druleid'])) {
+	$deleteButton->setAttribute('disabled', 'disabled');
+}
+$discoveryForm->addItem(makeFormFooter(
+	array(new CSubmit('save', _('Save'))),
+	array(
+		new CSubmit('clone', _('Clone')),
+		$deleteButton,
+		new CButtonCancel()
+	)
+));
 
-// Checks
-	$dcheckList = new CTable(null, 'formElementTable');
-	$addDCheckBtn = new CButton('newCheck', _('New'), null, 'link_menu');
-
-	$col = new CCol($addDCheckBtn);
-	$col->setAttribute('colspan', 2);
-
-	$buttonRow = new CRow($col);
-	$buttonRow->setAttribute('id', 'dcheckListFooter');
-	$dcheckList->addRow($buttonRow);
-
-	// Add Discovery Checks
-	foreach($data['dchecks'] as $id => $dcheck){
-		$key = isset($dcheck['key_']) ? $dcheck['key_'] : '';
-		$ports = isset($dcheck['ports']) ? $dcheck['ports'] : '';
-		$data['dchecks'][$id]['name'] = discovery_check2str($dcheck['type'], $key, $ports);
-	}
-	order_result($data['dchecks'], 'name');
-
-	$jsInsert = 'addPopupValues('.zbx_jsvalue(array_values($data['dchecks'])).');';
-
-	$discoveryList->addRow(_('Checks'), new CDiv($dcheckList, 'objectgroup inlineblock border_dotted ui-corner-all', 'dcheckList'));
-	// -------
-
-// Device uniqueness criteria
-	$cmbUniquenessCriteria = new CRadioButtonList('uniqueness_criteria', $data['uniqueness_criteria']);
-	$cmbUniquenessCriteria->addValue(' '._('IP address'), -1);
-
-	$discoveryList->addRow(_('Device uniqueness criteria'), new CDiv($cmbUniquenessCriteria, 'objectgroup inlineblock border_dotted ui-corner-all', 'uniqList'));
-
-	$jsInsert .= 'jQuery("input:radio[name=uniqueness_criteria][value='.zbx_jsvalue($data['uniqueness_criteria']).']").attr("checked", "checked");';
-
-// Status
-	$cmbStatus = new CComboBox('status', $data['status']);
-	$cmbStatus->addItems(discovery_status2str());
-	$discoveryList->addRow(_('Status'), $cmbStatus);
-
-
-	$divTabs->addTab('druleTab', _('Discovery rule'), $discoveryList);
-	$formDsc->addItem($divTabs);
-
-// Footer
-	$main = array(new CSubmit('save', _('Save')));
-	$others = array();
-	if(isset($_REQUEST['druleid'])){
-		$others[] = new CButton('clone', _('Clone'));
-		$others[] = new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid'));
-	}
-	$others[] = new CButtonCancel();
-
-	$footer = makeFormFooter($main, $others);
-	$formDsc->addItem($footer);
-
-	zbx_add_post_js($jsInsert);
-
-	return $formDsc;
+$discoveryWidget->addItem($discoveryForm);
+return $discoveryWidget;
 ?>
