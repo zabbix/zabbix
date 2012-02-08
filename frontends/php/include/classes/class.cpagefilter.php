@@ -1,5 +1,4 @@
 <?php
-
 class CPageFilter {
 	protected $data = array(); // groups, hosts, ...
 	protected $ids = array(); // groupid, hostid, ...
@@ -174,7 +173,7 @@ class CPageFilter {
 	private function _updateByHost(&$options) {
 		$hosts = API::Host()->get(array(
 			'hostids' => $options['hostid'],
-			'templated_hosts' => 1,
+			'templated_hosts' => true,
 			'output' => array('hostid', 'host'),
 			'selectGroups' => API_OUTPUT_REFER
 		));
@@ -241,7 +240,6 @@ class CPageFilter {
 		);
 		$options = zbx_array_merge($def_options, $options);
 		$groups = API::HostGroup()->get($options);
-
 		order_result($groups, 'name');
 
 		$this->data['groups'] = array();
@@ -253,11 +251,11 @@ class CPageFilter {
 			$groupid = $this->_profileIds['groupid'];
 		}
 
-		if ((!isset($this->data['groups'][$groupid]) && ($groupid > 0)) || is_null($groupid)) {
+		if ((!isset($this->data['groups'][$groupid]) && $groupid > 0) || is_null($groupid)) {
 			if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) {
 				$groupid = 0;
 			}
-			elseif (is_null($this->_requestIds['groupid']) || ($this->_requestIds['groupid'] > 0)) {
+			elseif (is_null($this->_requestIds['groupid']) || $this->_requestIds['groupid'] > 0) {
 				$groupids = array_keys($this->data['groups']);
 				$groupid = empty($groupids) ? 0 : reset($groupids);
 			}
@@ -300,9 +298,9 @@ class CPageFilter {
 				if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) {
 					$hostid = 0;
 				}
-				elseif (is_null($this->_requestIds['hostid']) || ($this->_requestIds['hostid'] > 0)) {
+				elseif (is_null($this->_requestIds['hostid']) || $this->_requestIds['hostid'] > 0) {
 					$hostids = array_keys($this->data['hosts']);
-					$hostid = empty($hostids)?0:reset($hostids);
+					$hostid = empty($hostids) ? 0 : reset($hostids);
 				}
 			}
 		}
@@ -434,7 +432,7 @@ class CPageFilter {
 	}
 
 	private function _getCB($cbname, $selectedid, $items, $withNode) {
-		$cmb = new CComboBox($cbname, $selectedid,'javascript: submit();');
+		$cmb = new CComboBox($cbname, $selectedid, 'javascript: submit();');
 
 		if ($withNode) {
 			foreach ($items as $id => $item) {
