@@ -231,34 +231,34 @@ class CScreen extends CZBXAPI {
 
 			$dbSitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
 			while ($sitem = DBfetch($dbSitems)) {
-				if ($sitem['resourceid'] == 0) continue;
-
 				$screensItems[$sitem['screenitemid']] = $sitem;
 
-				switch ($sitem['resourcetype']) {
-					case SCREEN_RESOURCE_HOSTS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-					case SCREEN_RESOURCE_DATA_OVERVIEW:
-					case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-						$groupsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_HOST_TRIGGERS:
-						$hostsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_GRAPH:
-						$graphsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_SIMPLE_GRAPH:
-					case SCREEN_RESOURCE_PLAIN_TEXT:
-						$itemsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_MAP:
-						$mapsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_SCREEN:
-						$screensToCheck[] = $sitem['resourceid'];
-					break;
+				if ($sitem['resourceid']) {
+					switch ($sitem['resourcetype']) {
+						case SCREEN_RESOURCE_HOSTS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+						case SCREEN_RESOURCE_DATA_OVERVIEW:
+						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+							$groupsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_HOST_TRIGGERS:
+							$hostsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_GRAPH:
+							$graphsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$itemsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_MAP:
+							$mapsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_SCREEN:
+							$screensToCheck[] = $sitem['resourceid'];
+						break;
+					}
 				}
 			}
 
@@ -391,7 +391,6 @@ class CScreen extends CZBXAPI {
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
-
 
 // Adding ScreenItems
 		if (!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselectsAllowedOutputs)) {
