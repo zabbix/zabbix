@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+A.F....... [ZBX-4599] fixed errors in building select queries in Event.get() (pavels)
 ..F....... [ZBX-1787] fixed gradient element rendering if the value exceeds the max Y scale value (pavels)
 A.F....... [ZBX-4494] fixed some types of screen items not being returned by Screen.get() (pavels)
 .......PS. [ZBX-4591] more secure substituting of macros in item keys and dynamic SNMP OIDs (Sasha)
