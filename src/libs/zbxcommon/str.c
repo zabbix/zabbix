@@ -3302,14 +3302,12 @@ void	zbx_strarr_free(char **arr)
  *                                                                            *
  * Function: zbx_replace_string                                               *
  *                                                                            *
- * Purpose: returns the string with replaced block by the 'value'             *
+ * Purpose: replace data block with 'value'                                   *
  *                                                                            *
  * Parameters: data  - [IN/OUT] pointer to the string                         *
- *             l     - [IN] left position of replaced block                   *
- *             r     - [IN/OUT] right position of replaced block              *
- *             value - [IN] the string with which the block will be replaced  *
- *                                                                            *
- * Return value:                                                              *
+ *             l     - [IN] left position of the block                        *
+ *             r     - [IN/OUT] right position of the block                   *
+ *             value - [IN] the string to replace the block with              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -3340,4 +3338,3 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
 
 	memcpy(&(*data)[l], value, sz_value);
 }
-
