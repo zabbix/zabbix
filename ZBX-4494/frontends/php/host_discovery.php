@@ -32,19 +32,13 @@ $page['hist_arg'] = array('hostid');
 require_once('include/page_header.php');
 ?>
 <?php
-// needed type to know which field name to use
-$itemType = get_request('type', 0);
-switch($itemType) {
-	case ITEM_TYPE_SSH: case ITEM_TYPE_TELNET: case ITEM_TYPE_JMX: $paramsFieldName = S_EXECUTED_SCRIPT; break;
-	case ITEM_TYPE_DB_MONITOR: $paramsFieldName = S_PARAMS; break;
-	case ITEM_TYPE_CALCULATED: $paramsFieldName = S_FORMULA; break;
-	default: $paramsFieldName = 'params';
-}
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+$paramsFieldName = getParamFieldNameByType(get_request('type', 0));
+
+//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,			'!isset({form})'),
 		'itemid'=>			array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null, S_INTERFACE),
+		'interfaceid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null, _('Interface')),
 
 		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
 		'description'=>		array(T_ZBX_STR, O_OPT,  null,	null,		'isset({save})'),
@@ -80,7 +74,7 @@ switch($itemType) {
 												ITEM_TYPE_SSH.','.
 												ITEM_TYPE_DB_MONITOR.','.
 												ITEM_TYPE_TELNET.','.
-												ITEM_TYPE_CALCULATED,'type'), $paramsFieldName),
+												ITEM_TYPE_CALCULATED,'type'), getParamFieldLabelByType(get_request('type', 0))),
 //hidden fields for better gui
 		'params_script'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
 		'params_dbmonitor'=>	array(T_ZBX_STR, O_OPT, NULL, NULL, NULL),
@@ -101,7 +95,7 @@ switch($itemType) {
 		'snmpv3_securityname'=>	array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 		'snmpv3_authpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'||{snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.'))'),
 		'snmpv3_privpassphrase'=>array(T_ZBX_STR, O_OPT,  null,  null,		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.')&&({snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.'))'),
-		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', S_IPMI_SENSOR),
+		'ipmi_sensor'=>		array(T_ZBX_STR, O_OPT,  null,  NOT_EMPTY,	'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', _('IPMI sensor')),
 		'trapper_hosts'=>	array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})&&isset({type})&&({type}==2)'),
 
 		'add_delay_flex'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -430,7 +424,7 @@ switch($itemType) {
 			if($i >= 7) break;
 		}
 
-		array_push($delay_flex_el, count($delay_flex_el) == 0 ? S_NO_FLEXIBLE_INTERVALS : new CSubmit('del_delay_flex', _('Delete selected')));
+		array_push($delay_flex_el, count($delay_flex_el) == 0 ? _('No flexible intervals') : new CSubmit('del_delay_flex', _('Delete selected')));
 
 
 // Interfaces
@@ -446,7 +440,7 @@ switch($itemType) {
 
 				$sbIntereaces->addItem($interface['interfaceid'], $caption);
 			}
-			$frmItem->addRow(S_HOST_INTERFACE, $sbIntereaces, null, 'interface_row');
+			$frmItem->addRow(_('Host interface'), $sbIntereaces, null, 'interface_row');
 			zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interface_row');
 			zbx_subarray_push($typeVisibility, ITEM_TYPE_ZABBIX, 'interfaceid');
 			zbx_subarray_push($typeVisibility, ITEM_TYPE_SIMPLE, 'interface_row');
@@ -489,7 +483,7 @@ switch($itemType) {
 		$frmItem->addRow(S_KEY, new CTextBox('key', $key, 40, $limited));
 
 // SNMP OID
-		$frmItem->addRow(S_SNMP_OID, new CTextBox('snmp_oid',$snmp_oid,40,$limited), null, 'row_snmp_oid');
+		$frmItem->addRow(_('SNMP OID'), new CTextBox('snmp_oid',$snmp_oid,40,$limited), null, 'row_snmp_oid');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_oid');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_oid');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmp_oid');
@@ -498,14 +492,14 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmp_oid');
 
 // SNMP community
-		$frmItem->addRow(S_SNMP_COMMUNITY, new CTextBox('snmp_community',$snmp_community,16), null, 'row_snmp_community');
+		$frmItem->addRow(_('SNMP community'), new CTextBox('snmp_community',$snmp_community,16), null, 'row_snmp_community');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'snmp_community');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'snmp_community');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV1, 'row_snmp_community');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV2C, 'row_snmp_community');
 
 // SNMPv3 security name
-		$frmItem->addRow(S_SNMPV3_SECURITY_NAME, new CTextBox('snmpv3_securityname',$snmpv3_securityname,64), null, 'row_snmpv3_securityname');
+		$frmItem->addRow(_('SNMPv3 security name'), new CTextBox('snmpv3_securityname',$snmpv3_securityname,64), null, 'row_snmpv3_securityname');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_securityname');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
 
@@ -514,16 +508,16 @@ switch($itemType) {
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'noAuthNoPriv');
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'authNoPriv');
 		$cmbSecLevel->addItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'authPriv');
-		$frmItem->addRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel, null, 'row_snmpv3_securitylevel');
+		$frmItem->addRow(_('SNMPv3 security level'), $cmbSecLevel, null, 'row_snmpv3_securitylevel');
 
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'snmpv3_securitylevel');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_snmpv3_securitylevel');
 
 // SNMPv3 auth passphrase
-		$frmItem->addRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64), null, 'row_snmpv3_authpassphrase');
+		$frmItem->addRow(_('SNMPv3 auth passphrase'), new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64), null, 'row_snmpv3_authpassphrase');
 
 // SNMPv3 priv passphrase
-		$frmItem->addRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64), null, 'row_snmpv3_privpassphrase');
+		$frmItem->addRow(_('SNMPv3 priv passphrase'), new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64), null, 'row_snmpv3_privpassphrase');
 
 // SNMP port
 		$frmItem->addRow(S_PORT, new CNumericBox('port',$port,5), null, 'row_port');
@@ -535,21 +529,21 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SNMPV3, 'row_port');
 
 // IPMI sensor
-		$frmItem->addRow(S_IPMI_SENSOR, new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited), null, 'row_ipmi_sensor');
+		$frmItem->addRow(_('IPMI sensor'), new CTextBox('ipmi_sensor', $ipmi_sensor, 64, $limited), null, 'row_ipmi_sensor');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'ipmi_sensor');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_IPMI, 'row_ipmi_sensor');
 
 // Authentication method
 		$cmbAuthType = new CComboBox('authtype', $authtype);
 		$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
-		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY,S_PUBLIC_KEY);
+		$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
 
-		$frmItem->addRow(S_AUTHENTICATION_METHOD, $cmbAuthType, null, 'row_authtype');
+		$frmItem->addRow(_('Authentication method'), $cmbAuthType, null, 'row_authtype');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'authtype');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_authtype');
 
-// User name
-		$frmItem->addRow(S_USER_NAME, new CTextBox('username',$username,16), null, 'row_username');
+		// User name
+		$frmItem->addRow(_('User name'), new CTextBox('username', $username, 16), null, 'row_username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'username');
@@ -558,12 +552,12 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_username');
 
 // Public key
-		$frmItem->addRow(S_PUBLIC_KEY_FILE, new CTextBox('publickey',$publickey,16), null, 'row_publickey');
+		$frmItem->addRow(_('Public key file'), new CTextBox('publickey',$publickey,16), null, 'row_publickey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
 
-// Private key
-		$frmItem->addRow(S_PRIVATE_KEY_FILE, new CTextBox('privatekey',$privatekey,16), null, 'row_privatekey');
+		// Private key
+		$frmItem->addRow(_('Private key file'), new CTextBox('privatekey', $privatekey, 16), null, 'row_privatekey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
 		zbx_subarray_push($authTypeVisibility, ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
 
@@ -576,16 +570,16 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'password');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_JMX, 'row_password');
 
-		$spanEC = new CSpan(S_EXECUTED_SCRIPT);
+		$spanEC = new CSpan(_('Executed script'));
 		$spanEC->setAttribute('id', 'label_executed_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'label_executed_script');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'label_executed_script');
 
-		$spanP = new CSpan(S_PARAMS);
+		$spanP = new CSpan(_('Additional parameters'));
 		$spanP->setAttribute('id', 'label_params');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_DB_MONITOR, 'label_params');
 
-		$spanF = new CSpan(S_FORMULA);
+		$spanF = new CSpan(_('Formula'));
 		$spanF->setAttribute('id', 'label_formula');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_CALCULATED, 'label_formula');
 
@@ -635,10 +629,10 @@ switch($itemType) {
 		}
 
 // Flexible intervals (sec)
-		$frmItem->addRow(S_FLEXIBLE_INTERVALS, $delay_flex_el, null, 'row_flex_intervals');
+		$frmItem->addRow(_('Flexible intervals (sec)'), $delay_flex_el, null, 'row_flex_intervals');
 
 // New flexible interval
-		$frmItem->addRow(S_NEW_FLEXIBLE_INTERVAL, array(
+		$frmItem->addRow(_('New flexible interval'), array(
 			_('Delay'), SPACE,	new CNumericBox('new_delay_flex[delay]', '50', 5),
 			S_PERIOD, SPACE, new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 27),
 			BR(),
@@ -654,8 +648,8 @@ switch($itemType) {
 			zbx_subarray_push($typeVisibility, $it, 'add_delay_flex');
 		}
 
-// allowed hosts
-		$frmItem->addRow(S_ALLOWED_HOSTS, new CTextBox('trapper_hosts',$trapper_hosts,40), null, 'row_trapper_hosts');
+		// allowed hosts
+		$frmItem->addRow(_('Allowed hosts'), new CTextBox('trapper_hosts', $trapper_hosts, 40), null, 'row_trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'trapper_hosts');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
 
@@ -720,8 +714,8 @@ switch($itemType) {
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
-			make_sorting_header(S_KEY,'key_', $sortlink),
-			make_sorting_header(S_INTERVAL,'delay', $sortlink),
+			make_sorting_header(_('Key'),'key_', $sortlink),
+			make_sorting_header(_('Interval'), 'delay', $sortlink),
 			make_sorting_header(S_TYPE,'type', $sortlink),
 			make_sorting_header(S_STATUS,'status', $sortlink),
 			S_ERROR
@@ -796,15 +790,15 @@ switch($itemType) {
 // GO{
 		$goBox = new CComboBox('go');
 		$goOption = new CComboItem('activate', _('Enable selected'));
-		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_ITEMS_Q);
+		$goOption->setAttribute('confirm', _('Enable selected items?'));
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable', _('Disable selected'));
-		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_ITEMS_Q);
+		$goOption->setAttribute('confirm', _('Disable selected items?'));
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete', _('Delete selected'));
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_ITEMS_Q);
+		$goOption->setAttribute('confirm', _('Delete selected items?'));
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!

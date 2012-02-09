@@ -839,6 +839,8 @@ define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
 define('SEC_PER_MONTH', 2592000); // 30 * SEC_PER_DAY
 define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
 
+define('DAY_IN_YEAR',	365);
+
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
@@ -848,6 +850,15 @@ define('ZBX_TEXTBOX_SMALL_SIZE',		25);
 define('ZBX_TEXTAREA_STANDARD_WIDTH',	312);
 define('ZBX_TEXTAREA_BIG_WIDTH',		524);
 define('ZBX_TEXTAREA_STANDARD_ROWS',	7);
+
+// validation
+define('NOT_EMPTY', "({}!='')&&");
+define('NO_TRIM', 'NO_TRIM');
+define('DB_ID', "({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
+define('NOT_ZERO', "({}!=0)&&");
+define('ZBX_VALID_OK',		0);
+define('ZBX_VALID_ERROR',	1);
+define('ZBX_VALID_WARNING',	2);
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

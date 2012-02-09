@@ -45,6 +45,7 @@ class testPageItems extends CWebTest {
 		// We are in the list of items
 		$this->assertTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
+		$this->ok('Items');
 		$this->ok('Displaying');
 		$this->ok('Host list');
 		// Header
@@ -58,8 +59,8 @@ class testPageItems extends CWebTest {
 				'History',
 				'Trends',
 				'Type',
-				'Status',
 				'Applications',
+				'Status',
 				'Error'
 			)
 		);

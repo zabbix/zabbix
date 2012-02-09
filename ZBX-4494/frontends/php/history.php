@@ -220,7 +220,7 @@ require_once('include/page_header.php');
 
 	if(isset($iv_numeric[$item['value_type']])) $cmbAction->addItem('showgraph',S_GRAPH);
 	$cmbAction->addItem('showvalues',S_VALUES);
-	$cmbAction->addItem('showlatest',S_500_LATEST_VALUES);
+	$cmbAction->addItem('showlatest', _('500 latest values'));
 
 	$form->addItem($cmbAction);
 
