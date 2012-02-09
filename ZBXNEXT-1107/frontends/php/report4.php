@@ -138,8 +138,8 @@ require_once('include/page_header.php');
 				function format_time2($t){	return null; }
 				break;
 			case 'daily':
-				$from	= 1;
-				$to	= 365;
+				$from = 1;
+				$to = DAY_IN_YEAR;
 				array_unshift($header, new CCol(S_DAY,'center'));
 				function get_time($d)	{	global $year;	return mktime(0,0,0,1,$d,$year);	}
 				function format_time($t){	return zbx_date2str(S_REPORT4_DAILY_DATE_FORMAT,$t);	}
