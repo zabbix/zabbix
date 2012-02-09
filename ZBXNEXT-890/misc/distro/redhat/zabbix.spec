@@ -223,7 +223,7 @@ Japanese font for Zabbix web frontend
 
 
 %prep
-%setup0 -q
+%setup0 -q -n %{name}-%{version}
 %patch0 -p1
 %patch1 -p1
 
@@ -302,11 +302,12 @@ rm -rf $RPM_BUILD_ROOT
 
 # set up some required directories
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/externalscripts
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/web
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/init.d
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/alertscripts
+mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/externalscripts
 mkdir -p $RPM_BUILD_ROOT%{_datadir}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/%{name}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
@@ -321,30 +322,33 @@ touch $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/web/zabbix.conf.php
 # drop config files in place
 install -m 0644 -p misc/conf/zabbix_agent.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -m 0644 -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/%{name}.conf
+cp -a misc/conf/zabbix_agentd $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/zabbix_agentd.d
 
 # fix config file options
 cat misc/conf/zabbix_agentd.conf | sed \
-    -e 's|# PidFile=.*|PidFile=%{_localstatedir}/run/zabbix/zabbix_agentd.pid|g' \
-    -e 's|^LogFile=.*|LogFile=%{_localstatedir}/log/zabbix/zabbix_agentd.log|g' \
-    -e 's|# LogFileSize=.*|LogFileSize=0|g' \
+    -e '/^# PidFile=/a \\nPidFile=%{_localstatedir}/run/zabbix/zabbix_agentd.pid' \
+    -e 's|^LogFile=.*|LogFile=%{_localstatedir}/log/%{name}/zabbix_agentd.log|g' \
+    -e '/^# LogFileSize=.*/a \\nLogFileSize=0' \
+    -e '/^# Include=$/a \\nInclude=%{_sysconfdir}/%{name}/zabbix_agentd.d/' \
     > $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/zabbix_agentd.conf
 
 cat misc/conf/zabbix_server.conf | sed \
-    -e 's|# PidFile=.*|PidFile=%{_localstatedir}/run/zabbix/zabbix.pid|g' \
-    -e 's|^LogFile=.*|LogFile=%{_localstatedir}/log/zabbix/zabbix_server.log|g' \
-    -e 's|# LogFileSize=.*|LogFileSize=0|g' \
-    -e 's|# AlertScriptsPath=/home/zabbix/bin/|AlertScriptsPath=%{_localstatedir}/lib/zabbix/|g' \
+    -e '/^# PidFile=/a \\nPidFile=%{_localstatedir}/run/zabbix/zabbix_server.pid' \
+    -e 's|^LogFile=.*|LogFile=%{_localstatedir}/log/%{name}/zabbix_server.log|g' \
+    -e '/^# LogFileSize=/a \\nLogFileSize=0' \
+    -e '/^# AlertScriptsPath=/a \\nAlertScriptsPath=%{_sharedstatedir}/%{name}/alertscripts' \
+    -e '/^# ExternalScripts=/a \\nExternalScripts=%{_sharedstatedir}/%{name}/externalscripts' \
     -e 's|^DBUser=root|DBUser=zabbix|g' \
-    -e 's|# DBSocket=/tmp/mysql.sock|DBSocket=%{_localstatedir}/lib/mysql/mysql.sock|g' \
+    -e '/^# DBSocket=/a \\nDBSocket=%{_localstatedir}/lib/mysql/mysql.sock' \
     > $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/zabbix_server.conf
 
 cat misc/conf/zabbix_proxy.conf | sed \
-    -e 's|# PidFile=.*|PidFile=%{_localstatedir}/run/zabbix/zabbix_proxy.pid|g' \
-    -e 's|^LogFile=.*|LogFile=%{_localstatedir}/log/zabbix/zabbix_proxy.log|g' \
-    -e 's|# LogFileSize=.*|LogFileSize=0|g' \
-    -e 's|# AlertScriptsPath=/home/zabbix/bin/|AlertScriptsPath=%{_localstatedir}/lib/zabbix/|g' \
+    -e '/^# PidFile=/a \\nPidFile=%{_localstatedir}/run/zabbix/zabbix_proxy.pid' \
+    -e 's|^LogFile=.*|LogFile=%{_localstatedir}/log/%{name}/zabbix_proxy.log|g' \
+    -e '/^# LogFileSize=/a \\nLogFileSize=0' \
+    -e '/^# ExternalScripts=/a \\nExternalScripts=%{_sharedstatedir}/%{name}/externalscripts' \
     -e 's|^DBUser=root|DBUser=zabbix|g' \
-    -e 's|# DBSocket=/tmp/mysql.sock|DBSocket=%{_localstatedir}/lib/mysql/mysql.sock|g' \
+    -e '/^# DBSocket=/a \\nDBSocket=%{_localstatedir}/lib/mysql/mysql.sock' \
     > $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/zabbix_proxy.conf
 
 # install log rotation
@@ -590,6 +594,9 @@ fi
 %config(noreplace) %{_sysconfdir}/zabbix/zabbix_agent.conf
 %config(noreplace) %{_sysconfdir}/zabbix/zabbix_agentd.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-agent
+%dir %{_sysconfdir}/zabbix/zabbix_agentd.d
+%config(noreplace) %{_sysconfdir}/zabbix/zabbix_agentd.d/userparameter_examples.conf
+%config(noreplace) %{_sysconfdir}/zabbix/zabbix_agentd.d/userparameter_mysql.conf
 %{_sysconfdir}/init.d/zabbix-agent
 %{_sbindir}/zabbix_agent
 %{_sbindir}/zabbix_agentd
@@ -608,7 +615,8 @@ fi
 %files server
 %defattr(-,root,root,-)
 %attr(0640,root,zabbix) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_server.conf
-%attr(0755,zabbix,zabbix) %dir %{_sysconfdir}/zabbix/externalscripts
+%dir %{_libdir}/%{name}/alertscripts
+%dir %{_libdir}/%{name}/externalscripts
 %config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-server
 %{_sysconfdir}/init.d/zabbix-server
 %{_mandir}/man8/zabbix_server.8*
@@ -671,6 +679,8 @@ fi
 - separate get and sender subpackages
 - remove server-sqlite3 and web-sqlite3 subpackages
 - add web-japanese subpackage
+- move alertscripts and externalscripts to /usr/lib/zabbix
+- improve default parameter of config files
 
 * Tue Aug  9 2011 Dan Horák <dan[at]danny.cz> - 1.8.6-1
 - updated to 1.8.6 (#729164, #729165)
