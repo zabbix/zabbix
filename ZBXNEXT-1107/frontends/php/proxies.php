@@ -176,7 +176,7 @@
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$cmbConf = new CComboBox('config', 'proxies.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('nodes.php',S_NODES);
+		$cmbConf->addItem('nodes.php', _('Nodes'));
 		$cmbConf->addItem('proxies.php',S_PROXIES);
 	$frmForm->addItem($cmbConf);
 	if(!isset($_REQUEST['form'])){

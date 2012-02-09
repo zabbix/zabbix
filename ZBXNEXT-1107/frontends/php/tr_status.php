@@ -60,14 +60,14 @@ require_once('include/views/js/general.script.confirm.js.php');
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})')
 	);
 
 	check_fields($fields);
 
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.tr_status.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.tr_status.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -170,7 +170,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG . ' [' . date(S_DATE_FORMAT_YMDHMS) . ']', array($fs_icon));
+	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG . ' [' . date(_('d M Y H:i:s')) . ']', array($fs_icon));
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
@@ -211,7 +211,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 	$severity_select = new CComboBox('show_severity', $show_severity);
 	$cb_items = array(
-		-1 => S_ALL_S,
+		-1 => _('All'),
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
 		TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
@@ -596,7 +596,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 			$config['event_ack_enable'] ? $trigger['event_count'] == 0 : false
 		);
 
-		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
+		$lastchange = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
 		//.'&stime='.date('YmdHis', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
@@ -681,7 +681,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 					$ack_cb = SPACE;
 				}
 
-				$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $row_event['clock']),
+				$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $row_event['clock']),
 					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
 				$next_clock = isset($trigger['events'][$enum-1]) ? $trigger['events'][$enum-1]['clock'] : time();
 
@@ -732,7 +732,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$trigg_wdgt->show();
 
 	zbx_add_post_js('jqBlink.blink();');
-	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
+	zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
 
 require_once('include/page_footer.php');
 

@@ -121,7 +121,7 @@ switch($itemType) {
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
 
 		'item_filter' => array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 	);
@@ -158,7 +158,7 @@ switch($itemType) {
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.host_discovery.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.host_discovery.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -549,7 +549,7 @@ switch($itemType) {
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_authtype');
 
 // User name
-		$frmItem->addRow(S_USER_NAME, new CTextBox('username',$username,16), null, 'row_username');
+		$frmItem->addRow(_('User name'), new CTextBox('username',$username,16), null, 'row_username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_username');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_TELNET, 'username');

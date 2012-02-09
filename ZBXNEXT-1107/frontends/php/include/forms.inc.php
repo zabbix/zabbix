@@ -406,7 +406,7 @@
 //first row
 		$cmbType = new CComboBox("filter_type", $filter_type); //"javascript: create_var('zbx_filter', 'filter_set', '1', true); ");
 		$cmbType->setAttribute('id', 'filter_type');
-		$cmbType->addItem(-1, S_ALL_SMALL);
+		$cmbType->addItem(-1, _('all'));
 		foreach(array('filter_delay_label','filter_delay') as $vItem){
 			zbx_subarray_push($fTypeVisibility, -1, $vItem);
 		}
@@ -494,7 +494,7 @@
 		$fVTypeVisibility = array();
 
 		$cmbValType = new CComboBox('filter_value_type', $filter_value_type); //, "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
-		$cmbValType->addItem(-1, S_ALL_SMALL);
+		$cmbValType->addItem(-1, _('all'));
 		$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UNSIGNED);
 		$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT, _('Numeric (float)'));
 		$cmbValType->addItem(ITEM_VALUE_TYPE_STR, _('Character'));
@@ -512,7 +512,7 @@
 		$label321->setAttribute('id', 'filter_data_type_label');
 
 		$field321 = new CComboBox('filter_data_type', $filter_data_type);//, 'submit()');
-		$field321->addItem(-1, S_ALL_SMALL);
+		$field321->addItem(-1, _('all'));
 		$field321->addItems(item_data_type2str());
 		$field321->setEnabled('no');
 
@@ -525,17 +525,17 @@
 		$col_table4 = new CTable(null, 'filter');
 
 		$cmbStatus = new CComboBox('filter_status',$filter_status);
-		$cmbStatus->addItem(-1,S_ALL_SMALL);
+		$cmbStatus->addItem(-1,_('all'));
 		foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
 			$cmbStatus->addItem($st,item_status2str($st));
 
 		$cmbBelongs = new CComboBox('filter_templated_items', $filter_templated_items);
-		$cmbBelongs->addItem(-1, S_ALL_SMALL);
+		$cmbBelongs->addItem(-1, _('all'));
 		$cmbBelongs->addItem(1, S_TEMPLATED_ITEMS);
 		$cmbBelongs->addItem(0, S_NOT_TEMPLATED_ITEMS);
 
 		$cmbWithTriggers = new CComboBox('filter_with_triggers', $filter_with_triggers);
-		$cmbWithTriggers->addItem(-1, S_ALL_SMALL);
+		$cmbWithTriggers->addItem(-1, _('all'));
 		$cmbWithTriggers->addItem(1, S_WITH_TRIGGERS);
 		$cmbWithTriggers->addItem(0, S_WITHOUT_TRIGGERS);
 
@@ -1244,7 +1244,7 @@
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'authtype');
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'row_authtype');
 
-		$row = new CRow(array(new CCol(S_USER_NAME,'form_row_l'), new CCol(new CTextBox('username',$username,16),'form_row_r')));
+		$row = new CRow(array(new CCol(_('User name'),'form_row_l'), new CCol(new CTextBox('username',$username,16),'form_row_r')));
 		$row->setAttribute('id', 'row_username');
 		$frmItem->addRow($row);
 		zbx_subarray_push($typeVisibility, ITEM_TYPE_SSH, 'username');
@@ -1767,7 +1767,7 @@
 			$cmbAuthType
 		);
 		$frmItem->addRow(
-			array(new CVisibilityBox('username_visible', get_request('username_visible'), 'username', S_ORIGINAL), S_USER_NAME),
+			array(new CVisibilityBox('username_visible', get_request('username_visible'), 'username', S_ORIGINAL), _('User name')),
 			new CTextBox('username', $username, 40)
 		);
 		$frmItem->addRow(

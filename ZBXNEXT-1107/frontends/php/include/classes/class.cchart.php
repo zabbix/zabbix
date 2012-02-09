@@ -1628,7 +1628,7 @@ class CChart extends CGraphDraw{
 					$fnc_name = S_MAX_SMALL;
 					break;
 				case CALC_FNC_ALL:
-					$fnc_name = S_ALL_SMALL;
+					$fnc_name = _('all');
 					break;
 				case CALC_FNC_AVG:
 				default:
