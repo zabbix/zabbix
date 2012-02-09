@@ -21,16 +21,16 @@
 <?php
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageScripts extends CWebTest {
+class testPageAdministrationScripts extends CWebTest {
 	// Returns all scripts
 	public static function allScripts() {
-		return DBdata('select * from scripts');
+		return DBdata('SELECT * FROM scripts');
 	}
 
 	/**
 	* @dataProvider allScripts
 	*/
-	public function testPageScripts_CheckLayout($script) {
+	public function testPageAdministrationScripts_CheckLayout($script) {
 		$this->login('scripts.php');
 		$this->assertTitle('Scripts');
 
@@ -47,10 +47,10 @@ class testPageScripts extends CWebTest {
 	/**
 	* @dataProvider allScripts
 	*/
-	public function testPageScripts_SimpleUpdate($script) {
+	public function testPageAdministrationScripts_SimpleUpdate($script) {
 		$name = $script['name'];
 
-		$sql = "select * from scripts where name='$name' order by scriptid";
+		$sql = 'SELECT * FROM scripts WHERE name = '.zbx_dbstr($name).' ORDER BY scriptid';
 		$oldHash = DBhash($sql);
 
 		$this->login('scripts.php');
@@ -64,18 +64,35 @@ class testPageScripts extends CWebTest {
 		$this->ok($name);
 		$this->ok('CONFIGURATION OF SCRIPTS');
 
-		$this->assertEquals($oldHash, DBhash($sql));
+		$this->assertEquals($oldHash, DBhash($sql), 'Chuck Norris: Non-change update should not change contents of the "scripts" table');
 	}
 
-	public function testPageScripts_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
+	public function testPageAdministrationScripts_MassDeleteAll() {
+
+		DBsave_tables('scripts');
+		$this->chooseOkOnNextConfirmation();
+
+		$this->login('scripts.php');
+		$this->assertTitle('Scripts');
+		$this->checkbox_select("all_scripts");
+		$this->dropdown_select('go', 'Delete selected');
+		$this->button_click('goButton');
+		$this->wait();
+
+		$this->getConfirmation();
+		$this->assertTitle('Scripts');
+		$this->ok('Script deleted');
+
+		$sql = 'SELECT * FROM scripts';
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Not all scripts has been deleted from the "scripts" table');
+
+		DBrestore_tables('scripts');
 	}
 
 	/**
 	* @dataProvider allScripts
 	*/
-	public function testPageScripts_MassDelete($script) {
+	public function testPageAdministrationScripts_MassDelete($script) {
 		$scriptid = $script['scriptid'];
 
 		DBsave_tables('scripts');
@@ -92,13 +109,13 @@ class testPageScripts extends CWebTest {
 		$this->assertTitle('Scripts');
 		$this->ok('Script deleted');
 
-		$sql="select * from scripts where scriptid='$scriptid'";
+		$sql = 'SELECT * FROM scripts WHERE scriptid='.zbx_dbstr($scriptid).'';
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('scripts');
 	}
 
-	public function testPageScripts_Sorting() {
+	public function testPageAdministrationScripts_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}

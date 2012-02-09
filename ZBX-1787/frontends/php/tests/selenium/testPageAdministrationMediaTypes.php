@@ -139,7 +139,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$sql = 'SELECT mediatypeid FROM media_type WHERE mediatypeid = '.$mediatypeid;
 		$result = DBfetch(DBselect($sql));
 
-		$row = DBfetch(DBselect("SELECT count(*) AS count FROM opmessage WHERE mediatypeid=$mediatypeid"));
+		$row = DBfetch(DBselect('SELECT count(*) AS count FROM opmessage WHERE mediatypeid = '.$mediatypeid.''));
 		$used_in_operations = ($row['count'] > 0);
 
 		$this->checkbox_select("mediatypeids_$mediatypeid");
@@ -149,22 +149,16 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->wait();
 		$this->getConfirmation();
 
-		switch ($used_in_operations) {
-			case true:
+		if ($used_in_operations) {
 				$this->nok('Media type deleted');
 				$this->ok('Cannot delete media type');
 				$this->ok('Media types used by action');
-				break;
-			case false:
-				$this->ok('Media type deleted');
-				$sql = 'SELECT * FROM media_type WHERE mediatypeid=$mediatypeid';
-				$this->assertEquals(0, DBcount($sql));
-				break;
 		}
-
-		// checking that media type has been deleted from the DB
-		$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.$mediatypeid.' ORDER BY mediatypeid';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
+		else {
+				$this->ok('Media type deleted');
+				$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.zbx_dbstr($mediatypeid);
+				$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
+		}
 
 		DBrestore_tables('media_type');
 	}
@@ -172,16 +166,17 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	/**
 	 * @dataProvider allMediaTypes
 	 */
-	public function testPageAdministrationMediaTypes_MassDeleteAll($mediatype) {
+/*	public function testPageAdministrationMediaTypes_MassDeleteAll($mediatype) {
 
 		DBsave_tables('media_type');
+		// DBsave_tables('media');
 		$this->login('media_types.php');
 
 		$mediatypeid = $mediatype['mediatypeid'];
 		$this->assertTitle('Media types');
 
-		$row = DBfetch(DBselect("SELECT count(*) AS count FROM opmessage WHERE mediatypeid=$mediatypeid"));
-		$used_in_operations = ($row['count'] > 0);
+		$row = DBfetch(DBselect('SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid = '.$mediatypeid.''));
+		$used_in_operations = ($row['cnt'] > 0);
 
 		$this->checkbox_select("all_media_types");
 		$this->dropdown_select('go', 'Delete selected');
@@ -190,35 +185,29 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->wait();
 		$this->getConfirmation();
 
-		switch ($used_in_operations) {
-			case true:
+		if ($used_in_operations) {
 				$this->nok('Media type deleted');
 				$this->ok('Cannot delete media type');
 				$this->ok('Media types used by action');
-				break;
-			case false:
-				$this->ok('Media type deleted');
-				$sql = 'SELECT * FROM media_type WHERE mediatypeid=$mediatypeid';
-				$this->assertEquals(0, DBcount($sql));
-				break;
 		}
-
-		// checking that media type has been deleted from the DB
-		$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.$mediatypeid.' ORDER BY mediatypeid';
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
+		else {
+				$this->ok('Media type deleted');
+				$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.zbx_dbstr($mediatypeid);
+				$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
+		}
 
 		DBrestore_tables('media_type');
 	}
+*/
 
 	/**
 	 * @dataProvider allMediaTypes
 	 */
-
 	public function testPageAdministrationMediaTypes_MassDelete($mediatype) {
 		$id = $mediatype['mediatypeid'];
 
-		$row = DBfetch(DBselect("select count(*) as cnt from opmessage where mediatypeid=$id"));
-		$used_by_operations = ($row['cnt'] > 0);
+		$row = DBfetch(DBselect('SELECT count(*) as cnt FROM opmessage WHERE mediatypeid = '.$id.''));
+		$used_in_operations = ($row['cnt'] > 0);
 
 		DBsave_tables('media_type');
 
@@ -233,20 +222,23 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->getConfirmation();
 		$this->wait();
 		$this->assertTitle('Media types');
-		if ($used_by_operations) {
+		if ($used_in_operations) {
 			$this->nok('Media type deleted');
 			$this->ok('Cannot delete media type');
 			$this->ok('Media types used by action');
 		}
 		else {
 			$this->ok('Media type deleted');
-			$sql = "select * from media_type where mediatypeid=$id";
-			$this->assertEquals(0, DBcount($sql));
+			$sql = 'SELECT * FROM media_type WHERE mediatypeid = '.$id.'';
+			$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Media type has not been deleted from the DB');
 		}
 
 		DBrestore_tables('media_type');
 	}
 
+	/**
+	 * @dataProvider allMediaTypes
+	 */
 	public function testPageAdministrationMediaTypes_Sorting() {
 		// TODO
 		$this->markTestIncomplete();
