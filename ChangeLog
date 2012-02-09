@@ -436,6 +436,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+........S. [ZBX-4612] Unix style exit codes when converting database to DM (Sasha) 
 A.F....... [ZBX-2679] fixed validation of masks in IP ranges in discovery (Sasha)
 ....I..... [ZBX-3262] fixed warning "no AC_LANG_SOURCE call detected in body" raised during compilation (Alexei)
 ..F....... [ZBX-3955] added pop up field name parameter validation (pavels)
