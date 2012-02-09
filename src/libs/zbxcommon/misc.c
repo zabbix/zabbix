@@ -2199,13 +2199,13 @@ int	is_function_char(char c)
  ******************************************************************************/
 int	is_macro_char(char c)
 {
-	if ('A' <= c && 'Z' >= c)
+	if ('A' <= c && c <= 'Z')
 		return SUCCEED;
 
 	if ('.' == c || '_' == c)
 		return SUCCEED;
 
-	if ('0' <= c && '9' >= c)
+	if ('0' <= c && c <= '9')
 		return SUCCEED;
 
 	return FAIL;
