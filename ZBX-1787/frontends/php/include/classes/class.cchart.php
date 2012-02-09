@@ -1787,7 +1787,7 @@ class CChart extends CGraphDraw{
 		if ( (($value1 > ($max+$min)) && ($value2 > ($max+$min))) || (($value1 < $min) && ($value2 < $min)) ) {
 			if (!in_array($drawtype, array(GRAPH_ITEM_DRAWTYPE_FILLED_REGION, GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE))) {
 				return false;
-			};
+			}
 		}
 
 		$y_first = (($value1 > ($max+$min)) || ($value1 < $min));
