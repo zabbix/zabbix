@@ -1559,11 +1559,10 @@ class CTrigger extends CZBXAPI {
 	/**
 	 * Add dependency for trigger
 	 *
-	 * @param array $triggersData
-	 * @param array $triggersData['triggerid]
-	 * @param array $triggersData['dependsOnTriggerid']
+	 * @param array $triggersData   an array of trigger dependency pairs, each pair in the form of
+	 *                              array('triggerid' => 1, 'dependsOnTriggerid' => 2)
 	 *
-	 * @return boolean
+	 * @return array
 	 */
 	public function addDependencies(array $triggersData) {
 		$triggersData = zbx_toArray($triggersData);
@@ -1572,8 +1571,15 @@ class CTrigger extends CZBXAPI {
 		foreach ($triggersData as $dep) {
 			$triggerids[$dep['triggerid']] = $dep['triggerid'];
 
-			$result = (bool) insert_dependency($dep['triggerid'], $dep['dependsOnTriggerid']);
-			if (!$result) {
+			try {
+				DB::insert('trigger_depends', array(
+					array(
+						'triggerid_down' => $dep['triggerid'],
+						'triggerid_up' => $dep['dependsOnTriggerid']
+					)
+				));
+			}
+			catch(APIException $result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create dependency');
 			}
 		}
@@ -1590,16 +1596,17 @@ class CTrigger extends CZBXAPI {
 	public function deleteDependencies(array $triggersData) {
 		$triggersData = zbx_toArray($triggersData);
 
-		$triggerids = array();
-		foreach ($triggersData as $num => $trigger) {
-			$triggerids[] = $trigger['triggerid'];
-		}
+		$triggerids = zbx_objectValues($triggersData, 'triggerid');
 
-		$result = delete_dependencies_by_triggerid($triggerids);
-		if (!$result) {
+		try {
+			DB::delete('trigger_depends', array(
+				'triggerid_down' => $triggerids
+			));
+		}
+		catch (APIException $e) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete dependency');
 		}
-		return array('triggerids' => zbx_objectValues($triggersData, 'triggerid'));
+		return array('triggerids' => $triggerids);
 	}
 
 	/**

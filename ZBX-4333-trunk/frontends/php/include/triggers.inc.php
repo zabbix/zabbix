@@ -1376,17 +1376,6 @@ function check_right_on_trigger_by_expression($permission, $expression) {
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
-function insert_dependency($triggerid_down, $triggerid_up) {
-	$triggerdepid = get_dbid('trigger_depends', 'triggerdepid');
-	return DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up)'.
-						' VALUES ('.$triggerdepid.','.$triggerid_down.','.$triggerid_up.')');
-}
-
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
 function replace_template_dependencies($deps, $hostid) {
 	foreach ($deps as $id => $val) {
 		$sql = 'SELECT t.triggerid'.
@@ -1407,10 +1396,6 @@ function replace_template_dependencies($deps, $hostid) {
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
-function delete_dependencies_by_triggerid($triggerids) {
-	zbx_value2array($triggerids);
-	return DBexecute('DELETE FROM trigger_depends WHERE '.DBcondition('triggerid_down', $triggerids));
-}
 
 function delete_function_by_triggerid($triggerids) {
 	zbx_value2array($triggerids);
