@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-1787] fixed gradient element rendering if the value exceeds the max Y scale value (pavels)
 A.F....... [ZBX-4494] fixed some types of screen items not being returned by Screen.get() (pavels)
 .......PS. [ZBX-4591] more secure substituting of macros in item keys and dynamic SNMP OIDs (Sasha)
 ..F....... [ZBX-4598] fixed audit error when saving triggers (pavels)
