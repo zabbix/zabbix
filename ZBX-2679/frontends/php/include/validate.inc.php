@@ -131,18 +131,11 @@
 		$ip = $parts[0];
 		$bits = $parts[1];
 
-		if (validate_ipv4($ip, $arr)
-				&& preg_match('/^\d{1,2}$/', $bits)
-				&& $bits > 15
-				&& $bits < 33) {
-			return true;
+		if (validate_ipv4($ip, $arr)) {
+			return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 32;
 		}
-		else if (defined('ZBX_HAVE_IPV6')
-				&& validate_ipv6($ip, $arr)
-				&& preg_match('/^\d{1,3}$/', $bits)
-				&& $bits > 111
-				&& $bits < 129) {
-			return true;
+		else if (defined('ZBX_HAVE_IPV6') && validate_ipv6($ip, $arr)) {
+			return preg_match('/^\d{1,3}$/', $bits) && $bits >= 112 && $bits <= 128;
 		}
 		else {
 			return false;
