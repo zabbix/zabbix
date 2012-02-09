@@ -383,7 +383,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	for (i = 0; i < num; i++)
 	{
 		items[i].key = strdup(items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, &items[i].host, NULL, &items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		substitute_key_macros(&items[i].key, &items[i].host, NULL, MACRO_TYPE_ITEM_KEY);
 
 		items[i].interface.addr = (1 == items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
 

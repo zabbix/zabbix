@@ -141,75 +141,6 @@ static void	DBlld_clean_triggers(zbx_vector_ptr_t *triggers)
 	}
 }
 
-static void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
-{
-	const char	*__function_name = "substitute_discovery_macros";
-
-	char		*src, *dst, *replace_to = NULL, c;
-	size_t		l, r, sz_data, sz_macro, sz_value,
-			replace_to_alloc = 0, data_alloc;
-	int		res;
-
-	assert(data);
-	assert(*data);
-	assert(jp_row);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
-
-	sz_data = strlen(*data);
-	data_alloc = sz_data + 1;
-
-	for (l = 0; l < sz_data; l++)
-	{
-		if ((*data)[l] != '{' || (*data)[l + 1] != '#')
-			continue;
-
-		for (r = l + 2; r < sz_data && (*data)[r] != '}'; r++)
-			;
-
-		if (r == sz_data)
-			break;
-
-		c = (*data)[r + 1];
-		(*data)[r + 1] = '\0';
-
-		res = zbx_json_value_by_name_dyn(jp_row, &(*data)[l], &replace_to, &replace_to_alloc);
-
-		(*data)[r + 1] = c;
-
-		sz_macro = r - l + 1;
-
-		if (SUCCEED == res)
-		{
-			sz_value = strlen(replace_to);
-
-			sz_data += sz_value - sz_macro;
-
-			while (data_alloc <= sz_data)
-			{
-				data_alloc *= 2;
-				*data = realloc(*data, data_alloc);
-			}
-
-			src = *data + l + sz_macro;
-			dst = *data + l + sz_value;
-
-			memmove(dst, src, sz_data - l - sz_value + 1);
-
-			memcpy(&(*data)[l], replace_to, sz_value);
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro: \"%.*s\" is not found in value set",
-					__function_name, (int)sz_macro, *data + l);
-		}
-	}
-
-	zbx_free(replace_to);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DBget_applications_by_itemid                                     *
@@ -334,7 +265,7 @@ static int	DBlld_compare_trigger_items(zbx_uint64_t triggerid, struct zbx_json_p
 	while (NULL != (row = DBfetch(result)))
 	{
 		old_key = zbx_strdup(old_key, row[0]);
-		substitute_discovery_macros(&old_key, jp_row);
+		substitute_key_macros(&old_key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
 
 		if (0 == strcmp(old_key, row[1]))
 		{
@@ -373,7 +304,7 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
 	if (NULL != jp_row)
 	{
 		key = zbx_strdup(key, tmpl_key);
-		substitute_discovery_macros(&key, jp_row);
+		substitute_key_macros(&key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
 		key_esc = DBdyn_escape_string(key);
 	}
 	else
@@ -451,7 +382,7 @@ static void	DBlld_get_trigger_functions(zbx_uint64_t triggerid, struct zbx_json_
 		zbx_vector_ptr_append(functions, function);
 
 		if (NULL != jp_row && 0 != (function->flags & ZBX_FLAG_DISCOVERY_CHILD))
-			substitute_discovery_macros(&function->key, jp_row);
+			substitute_key_macros(&function->key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
 	}
 	DBfree_result(result);
 
@@ -1098,7 +1029,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 	item = zbx_calloc(NULL, 1, sizeof(zbx_lld_item_t));
 	item->key = zbx_strdup(NULL, key_proto);
-	substitute_discovery_macros(&item->key, jp_row);
+	substitute_key_macros(&item->key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
 
 	key_esc = DBdyn_escape_string(item->key);
 
@@ -1128,7 +1059,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 			char	*old_key = NULL;
 
 			old_key = zbx_strdup(old_key, row[1]);
-			substitute_discovery_macros(&old_key, jp_row);
+			substitute_key_macros(&old_key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
 
 			if (0 == strcmp(old_key, row[2]))
 				ZBX_STR2UINT64(item->itemid, row[0]);
@@ -1153,7 +1084,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	substitute_discovery_macros(&item->name, jp_row);
 
 	item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
-	substitute_discovery_macros(&item->snmp_oid, jp_row);
+	substitute_key_macros(&item->snmp_oid, NULL, jp_row, MACRO_TYPE_SNMP_OID);
 
 	item->params = zbx_strdup(NULL, params_proto);
 	if (ITEM_TYPE_DB_MONITOR == type || ITEM_TYPE_SSH == type ||

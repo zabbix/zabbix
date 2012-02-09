@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+.......PS. [ZBX-4591] more secure substituting of macros in item keys and dynamic SNMP OIDs (Sasha)
 ..F....... [ZBX-4598] fixed audit error when saving triggers (pavels)
 A.F....... [ZBX-4598] fixed templated trigger inheritance (pavels)
 ..F....... [ZBX-3373] fixed host interfaces filtering in items. (Eduard)

@@ -345,8 +345,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[0]);
 
 		key = strdup(row[0]);
-		substitute_simple_macros(NULL, NULL, &dc_item.host, NULL,
-				&key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		substitute_key_macros(&key, &dc_item.host, NULL, MACRO_TYPE_ITEM_KEY);
 
 		zbx_json_addobject(&json, NULL);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
