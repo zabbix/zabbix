@@ -136,7 +136,7 @@ switch ($period) {
 		break;
 	case 'daily':
 		$from = 1;
-		$to = 365;
+		$to = DAY_IN_YEAR;
 		array_unshift($header, new CCol(_('Day'), 'center'));
 
 		function get_time($d) {
