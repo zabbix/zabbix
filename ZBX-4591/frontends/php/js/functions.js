@@ -722,11 +722,10 @@ function validateNumericBox(obj, allowempty, allownegative) {
 	}
 }
 
-
 /**
  * Translates the given string.
  *
- * @param str
+ * @param string str
  */
 function t(str) {
 	return (!!locale[str]) ? locale[str] : str;

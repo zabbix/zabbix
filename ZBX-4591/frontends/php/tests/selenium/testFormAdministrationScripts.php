@@ -21,7 +21,7 @@
 <?php
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormScript extends CWebTest {
+class testFormAdministrationScripts extends CWebTest {
 	// Data provider
 	public static function providerScripts() {
 		// data - values for form inputs
@@ -73,8 +73,7 @@ class testFormScript extends CWebTest {
 		return $data;
 	}
 
-
-	public function testLayout() {
+	public function testFormAdministrationScripts_testLayout() {
 		$this->login('scripts.php?form=1');
 		$this->assertTitle('Scripts');
 
@@ -120,7 +119,7 @@ class testFormScript extends CWebTest {
 	/**
 	 * @dataProvider providerScripts
 	 */
-	public function testCreate($data, $resultSave, $DBvalues) {
+	public function testFormAdministrationScripts_testCreate($data, $resultSave, $DBvalues) {
 
 		DBsave_tables('scripts');
 

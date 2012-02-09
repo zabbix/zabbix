@@ -298,7 +298,8 @@ function get_service_status_of_trigger($triggerid) {
 			' WHERE t.triggerid='.$triggerid.
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
 				' AND t.value='.TRIGGER_VALUE_TRUE;
-	return $rows = DBfetch(DBselect($sql, 1)) ? $rows['priority'] : 0;
+	$rows = DBfetch(DBselect($sql, 1));
+	return !empty($rows['priority']) ? $rows['priority'] : 0;
 }
 
 /**
@@ -397,7 +398,6 @@ function discovery_value_style($val) {
 	return $style;
 }
 
-// retrieve real hostw for triggerw
 function getParentHostsByTriggers($triggers) {
 	$hosts = array();
 	$triggerParent = array();

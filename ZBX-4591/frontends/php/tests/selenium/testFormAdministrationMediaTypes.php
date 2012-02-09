@@ -19,15 +19,14 @@
 **/
 ?>
 <?php
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
-class testFormMediaType extends CWebTest {
-	// Returns all media types
+class testFormAdministrationMediaTypes extends CWebTest {
+
 	public static function allMediaTypes() {
-		return DBdata('select * from media_type');
+		return DBdata('SELECT * FROM media_type');
 	}
 
-	// Data for media type creation
 	public static function newMediaTypes() {
 		$data=array(
 			array(
@@ -54,7 +53,10 @@ class testFormMediaType extends CWebTest {
 		return $data;
 	}
 
-	public function testFormMediaType_CheckLayout() {
+	/**
+	* @dataProvider allMediaTypes
+	*/
+	public function testFormAdministrationMediaTypes_CheckLayout($allMediaTypes) {
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 
@@ -63,8 +65,43 @@ class testFormMediaType extends CWebTest {
 
 		$this->ok('Media types');
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
+		$this->ok('Media');
 		$this->nok('Displaying');
 		$this->ok(array('Description', 'Type', 'SMTP server', 'SMTP helo', 'SMTP email'));
+
+		$this->assertElementPresent('description');
+		$this->assertAttribute("//input[@id='description']/@maxlength", '100');
+		$this->assertAttribute("//input[@id='description']/@size", '50');
+
+		$this->assertElementPresent('type');
+		$this->assertElementPresent("//select[@id='type']/option[text()='Email']");
+		$this->assertElementPresent("//select[@id='type']/option[text()='Script']");
+		$this->assertElementPresent("//select[@id='type']/option[text()='SMS']");
+		$this->assertElementPresent("//select[@id='type']/option[text()='Jabber']");
+
+		$this->assertElementPresent("//select[@id='type']/optgroup[@label='Commercial']/option[text()='Ez Texting']");
+
+		$this->assertElementPresent('smtp_server');
+		$this->assertAttribute("//input[@id='smtp_server']/@maxlength", '255');
+		$this->assertAttribute("//input[@id='smtp_server']/@size", '50');
+
+		$this->assertElementPresent('smtp_helo');
+		$this->assertAttribute("//input[@id='smtp_helo']/@maxlength", '255');
+		$this->assertAttribute("//input[@id='smtp_helo']/@size", '50');
+
+		$this->assertElementPresent('smtp_email');
+		$this->assertAttribute("//input[@id='smtp_email']/@maxlength", '255');
+		$this->assertAttribute("//input[@id='smtp_email']/@size", '50');
+
+		$this->assertElementPresent('status');
+		if ($allMediaTypes['status']) {
+			$this->assertElementPresent("//input[@id='status' and not @checked]");
+		}
+
+		// media type enabled
+		if ($allMediaTypes['status']==0) {
+			$this->assertElementPresent("//input[@id='status' and (@checked)]");
+		}
 
 		$this->click('cancel');
 		$this->wait();
@@ -75,7 +112,7 @@ class testFormMediaType extends CWebTest {
 	/**
 	* @dataProvider newMediaTypes
 	*/
-	public function testFormMediaType_Create($type, $data) {
+	public function testFormAdministrationMediaTypes_Create($type, $data) {
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
 		$this->button_click('form');
@@ -129,15 +166,15 @@ class testFormMediaType extends CWebTest {
 	/**
 	* @dataProvider allMediaTypes
 	*/
-	public function testFormMediaType_SimpleCancel($mediatype) {
-		$name=$mediatype['description'];
+	public function testFormAdministrationMediaTypes_SimpleCancel($mediatype) {
+		$name = $mediatype['description'];
 
-		$sql = "SELECT * FROM media_type ORDER BY mediatypeid";
-		$oldHash = DBhash($sql);
+		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
+		$oldHashMediaType = DBhash($sql);
 
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
-		$this->click("link=$name");
+		$this->click('link='.$name);
 		$this->wait();
 		$this->button_click('cancel');
 		$this->wait();
@@ -145,26 +182,49 @@ class testFormMediaType extends CWebTest {
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 
-		$this->assertEquals($oldHash, DBhash($sql));
+		$this->assertEquals($oldHashMediaType, DBhash($sql), 'Chuck Norris: Media type values in the DB should not be changed in this case');
 	}
 
 	/**
 	* @dataProvider allMediaTypes
 	*/
-	public function testFormMediaType_SimpleDelete($mediatype) {
+	public function testFormAdministrationMediaTypes_SimpleUpdate($mediatype) {
+
+		$name = $mediatype['description'];
+		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY description';
+		$oldHashMediaType=DBhash($sqlMediaType);
+
+		$this->login('media_types.php');
+		$this->assertTitle('Media types');
+		$this->ok('CONFIGURATION OF MEDIA TYPES');
+		$this->click('link='.$name);
+		$this->wait();
+		$this->button_click('save');
+		$this->wait();
+		$this->ok('Media type updated');
+
+		$newHashMediaType = DBhash($sqlMediaType);
+		$this->assertEquals($oldHashMediaType, $newHashMediaType, "Chuck Norris: no-change media type update should not update data in table 'media_type'");
+
+	}
+
+	/**
+	* @dataProvider allMediaTypes
+	*/
+	public function testFormAdministrationMediaTypes_SimpleDelete($mediatype) {
+
 		$name = $mediatype['description'];
 		$id = $mediatype['mediatypeid'];
 
-		$row = DBfetch(DBselect("SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid=$id"));
+		$row = DBfetch(DBselect('SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid='.zbx_dbstr($id).''));
 		$used_by_operations = ($row['cnt'] > 0);
 
 		DBsave_tables('media_type');
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->login('media_types.php');
 		$this->assertTitle('Media types');
-		$this->click("link=$name");
+		$this->click('link='.$name);
+		$this->chooseOkOnNextConfirmation();
 		$this->wait();
 
 		$this->button_click('delete');
@@ -172,17 +232,15 @@ class testFormMediaType extends CWebTest {
 		$this->getConfirmation();
 		$this->wait();
 		$this->assertTitle('Media types');
-		switch ($used_by_operations) {
-			case true:
+		if ($used_by_operations) {
 				$this->nok('Media type deleted');
 				$this->ok('Cannot delete media type');
 				$this->ok('Media types used by action');
-				break;
-			case false:
+		}
+		else {
 				$this->ok('Media type deleted');
-				$sql = "SELECT * FROM media_type WHERE mediatypeid=$id";
-				$this->assertEquals(0, DBcount($sql));
-				break;
+				$sql = 'SELECT count(*) AS cnt FROM media_type WHERE mediatypeid='.zbx_dbstr($id).'';
+				//$this->assertEquals(0, DBcount($sql), "Chuck Norris: Media type has not been deleted from the DB");
 		}
 
 		DBrestore_tables('media_type');

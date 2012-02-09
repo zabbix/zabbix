@@ -120,7 +120,7 @@ class CWidget {
 
 			$widget[] = $flicker_tab;
 		}
-		$div = new CDiv($this->body, 'mainwidget');
+		$div = new CDiv($this->body, 'w');
 		$div->setAttribute('id', $this->domid);
 		if (!$this->state) {
 			$div->setAttribute('style', 'display: none;');

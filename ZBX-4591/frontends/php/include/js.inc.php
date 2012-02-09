@@ -1,10 +1,34 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+?>
+<?php
 /**
  * Convert PHP variable to string version of JavaScript style
- * @author Eugene Grigorjev
+ *
+ * @deprecated use CJs::encodeJson() instead
+ * @see CJs::encodeJson()
+ *
  * @param mixed $value
- * @param bool $asObject return string containing javascript object
- * @param bool $addQuotes whether quotes should be added at the beginning and at the end of string
+ * @param bool  $asObject  return string containing javascript object
+ * @param bool  $addQuotes whether quotes should be added at the beginning and at the end of string
+ *
  * @return string
  */
 function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
@@ -17,12 +41,10 @@ function zbx_jsvalue($value, $asObject = false, $addQuotes = true) {
 			$escaped = str_replace("\\", "\\\\", $escaped); // escaping slashes: \ => \\
 			$escaped = str_replace('"', '\"', $escaped); // escaping quotes: " => \"
 			$escaped = str_replace("\n", '\n', $escaped); // changing LF to '\n' string
+			$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
 			$escaped = str_replace('/', '\/', $escaped); // escaping forward slash: / => \/
 			if ($addQuotes) {
-				$escaped = '"'.$escaped.'"';
-			}
-			else {
-				$escaped = str_replace('\'', '\\\'', $escaped); // escaping single quotes: ' => \'
+				$escaped = "'".$escaped."'";
 			}
 			return $escaped;
 		}
@@ -104,7 +126,7 @@ function zbx_addJSLocale($to_translate) {
 	}
 }
 
-function inseret_javascript_for_editable_combobox() {
+function insert_javascript_for_editable_combobox() {
 	if (defined('EDITABLE_COMBOBOX_SCRIPT_INSERTTED')) {
 		return null;
 	}

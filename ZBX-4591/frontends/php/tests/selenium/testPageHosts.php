@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageHosts extends CWebTest {
 	// Returns all hosts
@@ -145,7 +145,7 @@ class testPageHosts extends CWebTest {
 		$this->login('hosts.php');
 
 		// Reset filter
-		$this->click('css=span.link_menu');
+		$this->click('reset');
 
 		$this->input_type('filter_host', '1928379128ksdhksdjfh');
 		$this->click('filter');
@@ -157,7 +157,7 @@ class testPageHosts extends CWebTest {
 		$this->login('hosts.php');
 
 		// Reset filter
-		$this->click('css=span.link_menu');
+		$this->click('reset');
 
 		$this->input_type('filter_host', '_');
 		$this->click('filter');
@@ -169,7 +169,7 @@ class testPageHosts extends CWebTest {
 		$this->login('hosts.php');
 
 		// Reset filter
-		$this->click('css=span.link_menu');
+		$this->click('reset');
 
 		$this->input_type('filter_host', '%');
 		$this->click('filter');
@@ -184,7 +184,7 @@ class testPageHosts extends CWebTest {
 	*/
 	public function testPageHosts_FilterReset($host) {
 		$this->login('hosts.php');
-		$this->click('css=span.link_menu');
+		$this->click('reset');
 		$this->click('filter');
 		$this->wait();
 		$this->ok($host['name']);
