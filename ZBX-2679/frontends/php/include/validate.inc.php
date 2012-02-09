@@ -134,7 +134,7 @@
 		if (validate_ipv4($ip, $arr)) {
 			return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 32;
 		}
-		else if (defined('ZBX_HAVE_IPV6') && validate_ipv6($ip, $arr)) {
+		elseif (defined('ZBX_HAVE_IPV6') && validate_ipv6($ip, $arr)) {
 			return preg_match('/^\d{1,3}$/', $bits) && $bits >= 112 && $bits <= 128;
 		}
 		else {
