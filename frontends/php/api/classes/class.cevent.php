@@ -63,7 +63,7 @@ class CEvent extends CZBXAPI {
 		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
-			'select'	=> array('events' => array('e.eventid')),
+			'select'	=> array($this->fieldId('eventid')),
 			'from'		=> array('events' => 'events e'),
 			'where'		=> array(),
 			'order'		=> array(),
@@ -165,6 +165,17 @@ class CEvent extends CZBXAPI {
 		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
+		// output
+		if ($options['output'] == API_OUTPUT_EXTEND) {
+			$sqlParts = $this->extendQuerySelect('e.*', $sqlParts);
+		}
+
+		// countOutput
+		if (!is_null($options['countOutput'])) {
+			$options['sortfield'] = '';
+			$sqlParts['select'] = array('COUNT(DISTINCT e.eventid) AS rowscount');
+		}
+
 		// eventids
 		if (!is_null($options['eventids'])) {
 			zbx_value2array($options['eventids']);
@@ -192,7 +203,7 @@ class CEvent extends CZBXAPI {
 			zbx_value2array($options['groupids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['groupid'] = 'hg.groupid';
+				$sqlParts = $this->extendQuerySelect('hg.groupid', $sqlParts);
 			}
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
@@ -208,7 +219,7 @@ class CEvent extends CZBXAPI {
 			zbx_value2array($options['hostids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['hostid'] = 'i.hostid';
+				$sqlParts = $this->extendQuerySelect('i.hostid', $sqlParts);
 			}
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
@@ -282,19 +293,6 @@ class CEvent extends CZBXAPI {
 			zbx_db_filter('events e', $options, $sqlParts);
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['events'] = array('e.*');
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array(
-				'events' => array('COUNT(DISTINCT e.eventid) AS rowscount')
-			);
-		}
-
 		// sorting
 		zbx_db_sorting($sqlParts, $options, $sortColumns, $this->tableAlias());
 
@@ -305,15 +303,14 @@ class CEvent extends CZBXAPI {
 
 		// selectHosts, selectTriggers, selectItems
 		if ($options['output'] != API_OUTPUT_EXTEND && (!is_null($options['selectHosts']) || !is_null($options['selectTriggers']) || !is_null($options['selectItems']))) {
-			$sqlParts['select']['events'][] = 'e.object';
-			$sqlParts['select']['events'][] = 'e.objectid';
+			$sqlParts = $this->extendQuerySelect($this->fieldId('object'), $sqlParts);
+			$sqlParts = $this->extendQuerySelect($this->fieldId('objectid'), $sqlParts);
 		}
 
 		$eventids = array();
 		$triggerids = array();
 
 		// event fields
-		$sqlParts['select']['events'] = implode(',', array_unique($sqlParts['select']['events']));
 		$sqlParts['select'] = array_unique($sqlParts['select']);
 		$sqlParts['from'] = array_unique($sqlParts['from']);
 		$sqlParts['where'] = array_unique($sqlParts['where']);
