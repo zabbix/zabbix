@@ -606,4 +606,6 @@ char	*DBget_unique_hostname_by_sample(char *host_name_sample);
 char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to, const char *field_name, int last_n);
 void	DBfree_history(char **value);
 
+int	DBtxn_status();
+
 #endif

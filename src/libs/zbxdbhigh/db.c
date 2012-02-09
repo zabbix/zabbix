@@ -2113,3 +2113,8 @@ void	DBfree_history(char **h_value)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+int	DBtxn_status()
+{
+	return 0 != txn_error ? FAIL : SUCCEED;
+}
