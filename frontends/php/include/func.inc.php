@@ -717,10 +717,6 @@ function zbx_nl2br($str) {
 	return $str_res;
 }
 
-function zbx_htmlstr($str) {
-	return str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $str);
-}
-
 function zbx_formatDomId($value) {
 	return str_replace(array('[',']'), array('_', ''), $value);
 }
@@ -1682,26 +1678,6 @@ function bcround($number, $precision = 0) {
 	// according to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
 	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
-}
-
-
-/**
- * Sanitizes the data before outputting.
- *
- * @param mixed $data
- *
- * @return mixed
- */
-function sanitize($data) {
-	if (is_array($data)) {
-		foreach ($data as &$value) {
-			$value = sanitize($value);
-		}
-	}
-	else {
-		$data = zbx_htmlstr($data);
-	}
-	return $data;
 }
 
 ?>

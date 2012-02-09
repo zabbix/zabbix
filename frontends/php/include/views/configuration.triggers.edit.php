@@ -227,7 +227,7 @@ if ($this->data['input_method'] == IM_TREE) {
 }
 
 $triggersFormList->addRow(_('Multiple PROBLEM events generation'), new CCheckBox('type', ($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED) ? 'yes' : 'no', null, 1));
-$triggersFormList->addRow(_('Comments'), new CTextArea('comments', $this->data['comments']));
+$triggersFormList->addRow(_('Description'), new CTextArea('comments', $this->data['comments']));
 $triggersFormList->addRow(_('URL'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
 
 // append severity to form list
