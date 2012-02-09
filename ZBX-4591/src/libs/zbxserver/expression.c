@@ -3031,7 +3031,7 @@ void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 
 		if (SUCCEED != res)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro: \"%.*s\" is not found in value set",
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro \"%.*s\": not found in value set",
 					__function_name, (int)(r - l + 1), *data + l);
 		}
 		else

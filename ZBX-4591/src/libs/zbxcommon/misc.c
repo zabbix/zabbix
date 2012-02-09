@@ -2188,24 +2188,24 @@ int	is_function_char(char c)
  *                                                                            *
  * Function: is_macro_char                                                    *
  *                                                                            *
- * Return value:  SUCCEED - the char is allowed in the macros                 *
+ * Return value:  SUCCEED - the char is allowed in the macro name             *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: in macros allowed characters: '0-9A-Z._'                         *
+ * Comments: allowed characters in macro names: '0-9A-Z._'                    *
  *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
 int	is_macro_char(char c)
 {
-	if ('A' <= c && c <= 'Z')
+	if ('A' <= c && 'Z' >= c)
 		return SUCCEED;
 
 	if ('.' == c || '_' == c)
 		return SUCCEED;
 
-	if ('0' <= c && c <= '9')
+	if ('0' <= c && '9' >= c)
 		return SUCCEED;
 
 	return FAIL;
