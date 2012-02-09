@@ -460,8 +460,7 @@ int	main(int argc, char **argv)
 	switch (task)
 	{
 		case ZBX_TASK_CHANGE_NODEID:
-			change_nodeid(0, nodeid);
-			exit(-1);
+			exit(SUCCEED == change_nodeid(0, nodeid) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 		default:
 			break;

@@ -797,19 +797,22 @@ require_once('include/page_header.php');
 // HOSTS FILTER {{{
 		$filter_table = new CTable('', 'filter_config');
 		$filter_table->addRow(array(
-			array(array(bold(S_NAME), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
-			array(array(bold(S_DNS), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
-			array(array(bold(S_IP), SPACE.S_LIKE_SMALL.': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
+			array(array(bold(S_NAME), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
+			array(array(bold(S_DNS), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
+			array(array(bold(S_IP), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
 			array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 		));
 
-		$reset = new CSpan(_('Reset'), 'link_menu');
-		$reset->onClick("javascript: clearAllForm('zbx_filter');");
-
 		$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
-		$filter->useJQueryStyle();
+		$filter->useJQueryStyle('main');
 
-		$footer_col = new CCol(array($filter, SPACE, SPACE, SPACE, $reset), 'center');
+		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
+		$reset->useJQueryStyle();
+
+		$div_buttons = new CDiv(array($filter, SPACE, $reset));
+		$div_buttons->setAttribute('style', 'padding: 4px 0px;');
+
+		$footer_col = new CCol($div_buttons, 'center');
 		$footer_col->setColSpan(4);
 
 		$filter_table->addRow($footer_col);

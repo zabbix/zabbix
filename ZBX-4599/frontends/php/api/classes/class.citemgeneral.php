@@ -23,11 +23,10 @@
  * @package API
  */
 
-abstract class CItemGeneral extends CZBXAPI{
+abstract class CItemGeneral extends CZBXAPI {
 
 	protected $fieldRules;
-
-	abstract public function get($options=array());
+	abstract public function get($options = array());
 
 	public function __construct() {
 		parent::__construct();
@@ -153,7 +152,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			$fullItem = $items[$inum];
 
 			if (!check_db_fields($itemDbFields, $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			if ($update) {
@@ -202,21 +201,19 @@ abstract class CItemGeneral extends CZBXAPI{
 			}
 
 			// check if the item requires an interface
-			$itemInterfaceType = self::itemTypeInterface($fullItem['type']);
+			$itemInterfaceType = itemTypeInterface($fullItem['type']);
 			if ($itemInterfaceType !== false && $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
 				if (!$fullItem['interfaceid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface for item.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
 				}
-				elseif (!isset($interfaces[$fullItem['interfaceid']])
-						|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
+				elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
 				}
-				elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY
-						&& $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
+				elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
 				}
 			}
-			// no interface required, just set it to NULL
+			// no interface required, just set it to null
 			else {
 				$item['interfaceid'] = 0;
 			}
@@ -249,7 +246,7 @@ abstract class CItemGeneral extends CZBXAPI{
 			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
 					&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
 					&& strcmp($itemKey->getKeyId(), 'snmptrap') != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid.'));
 			}
 
 			// type of information
@@ -257,8 +254,7 @@ abstract class CItemGeneral extends CZBXAPI{
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Value type must be Float for aggregate items.'));
 			}
 
-			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG
-					&& str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
+			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG && str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
 			}
 
@@ -282,7 +278,7 @@ abstract class CItemGeneral extends CZBXAPI{
 				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
 				foreach($item['applications'] as $appId) {
 					if (!in_array($appId, $dbApplicationIds)) {
-						$error = _s('Application with ID "%1$s" is not available on "%2$s"', $appId, $host['name']);
+						$error = _s('Application with ID "%1$s" is not available on "%2$s".', $appId, $host['name']);
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 					}
 				}
@@ -334,30 +330,6 @@ abstract class CItemGeneral extends CZBXAPI{
 		}
 	}
 
-	public static function itemTypeInterface($itemType) {
-		switch ($itemType) {
-			case ITEM_TYPE_SNMPV1:
-			case ITEM_TYPE_SNMPV2C:
-			case ITEM_TYPE_SNMPV3:
-			case ITEM_TYPE_SNMPTRAP:
-				return INTERFACE_TYPE_SNMP;
-			case ITEM_TYPE_IPMI:
-				return INTERFACE_TYPE_IPMI;
-			case ITEM_TYPE_ZABBIX:
-				return INTERFACE_TYPE_AGENT;
-			case ITEM_TYPE_SIMPLE:
-			case ITEM_TYPE_EXTERNAL:
-			case ITEM_TYPE_SSH:
-			case ITEM_TYPE_TELNET:
-				return INTERFACE_TYPE_ANY;
-			case ITEM_TYPE_JMX:
-				return INTERFACE_TYPE_JMX;
-			default:
-				return false;
-		}
-	}
-
-
 	/**
 	 * Returns the interface that best matches the given item.
 	 *
@@ -377,7 +349,7 @@ abstract class CItemGeneral extends CZBXAPI{
 		}
 
 		// find item interface type
-		$type = self::itemTypeInterface($item['type']);
+		$type = itemTypeInterface($item['type']);
 
 		$matchingInterface = array();
 
@@ -410,8 +382,12 @@ abstract class CItemGeneral extends CZBXAPI{
 
 
 	public function isReadable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -426,8 +402,12 @@ abstract class CItemGeneral extends CZBXAPI{
 	}
 
 	public function isWritable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -475,14 +455,14 @@ abstract class CItemGeneral extends CZBXAPI{
 	protected function checkUseInGraphAxis(array $itemids, $checkMax = false) {
 		if ($checkMax) {
 			$filter = array(
-				'ymax_itemid' => $itemids,
+				'ymax_itemid' => $itemids
 			);
 			$itemIdColumn = 'ymax_itemid';
 			$typeColumn = 'ymax_type';
 		}
 		else {
 			$filter = array(
-				'ymin_itemid' => $itemids,
+				'ymin_itemid' => $itemids
 			);
 			$itemIdColumn = 'ymin_itemid';
 			$typeColumn = 'ymin_type';
@@ -525,6 +505,5 @@ abstract class CItemGeneral extends CZBXAPI{
 			API::Graph()->update($updateGraphs);
 		}
 	}
-
 }
 ?>
