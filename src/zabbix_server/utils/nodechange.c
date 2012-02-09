@@ -448,14 +448,16 @@ int	change_nodeid(int old_id, int new_id)
 
 	DBexecute("delete from ids where nodeid=0");
 
-	if (SUCCEED != (ret = DBtxn_status()))
-		printf("Conversion failed.\n");
-	else
-		printf(" done.\nConversion completed successfully.\n");
+	ret = DBtxn_status();
 
 	DBcommit();
 
 	DBclose();
+
+	if (SUCCEED != ret)
+		printf("Conversion failed.\n");
+	else
+		printf(" done.\nConversion completed successfully.\n");
 
 	return ret;
 }
