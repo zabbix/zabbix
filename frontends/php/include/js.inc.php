@@ -126,7 +126,7 @@ function zbx_addJSLocale($to_translate) {
 	}
 }
 
-function inseret_javascript_for_editable_combobox() {
+function insert_javascript_for_editable_combobox() {
 	if (defined('EDITABLE_COMBOBOX_SCRIPT_INSERTTED')) {
 		return null;
 	}
