@@ -1430,6 +1430,18 @@ class CTrigger extends CZBXAPI {
 
 		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
+
+			// replace dependencies
+			if (isset($trigger['dependencies'])) {
+				$newDeps = array();
+				foreach ($trigger['dependencies'] as $depTriggerId) {
+					$newDeps[] = array(
+						'triggerid' => $trigger['triggerid'],
+						'dependsOnTriggerid' => $depTriggerId
+					);
+				}
+				$this->addDependencies($newDeps);
+			}
 		}
 		return array('triggerids' => zbx_objectValues($triggers, 'triggerid'));
 	}
@@ -1454,6 +1466,7 @@ class CTrigger extends CZBXAPI {
 			'preservekeys' => true,
 			'nopermissions' => true
 		));
+
 		foreach ($triggers as $trigger) {
 			// pass the full trigger so the children can inherit all of the data
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
@@ -1462,6 +1475,20 @@ class CTrigger extends CZBXAPI {
 			}
 
 			$this->inherit($dbTrigger);
+
+			// replace dependencies
+			if (isset($trigger['dependencies'])) {
+				$this->deleteDependencies($trigger);
+
+				$newDeps = array();
+				foreach ($trigger['dependencies'] as $depTriggerId) {
+					$newDeps[] = array(
+						'triggerid' => $trigger['triggerid'],
+						'dependsOnTriggerid' => $depTriggerId
+					);
+				}
+				$this->addDependencies($newDeps);
+			}
 		}
 		return array('triggerids' => $triggerids);
 	}
@@ -1691,19 +1718,6 @@ class CTrigger extends CZBXAPI {
 		}
 
 		$this->validateDependencies($triggers);
-
-		foreach ($triggers as $trigger) {
-			if (isset($trigger['dependencies'])) {
-				foreach ($trigger['dependencies'] as $triggeridUp) {
-					DB::insert('trigger_depends', array(
-						array(
-							'triggerid_down' => $trigger['triggerid'],
-							'triggerid_up' => $triggeridUp
-						)
-					));
-				}
-			}
-		}
 	}
 
 	/**
@@ -1819,21 +1833,6 @@ class CTrigger extends CZBXAPI {
 					$dbTrigger['description'], null, $dbTrigger, $triggerUpdate);
 		}
 		unset($trigger);
-
-		foreach ($triggers as $trigger) {
-			if (isset($trigger['dependencies'])) {
-				DB::delete('trigger_depends', array('triggerid_down' => $trigger['triggerid']));
-
-				foreach ($trigger['dependencies'] as $triggeridUp) {
-					DB::insert('trigger_depends', array(
-						array(
-							'triggerid_down' => $trigger['triggerid'],
-							'triggerid_up' => $triggeridUp
-						)
-					));
-				}
-			}
-		}
 
 		$this->validateDependencies($triggers);
 

@@ -577,27 +577,10 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 				$host = $srcTrigger['hosts'][0]['host'];
 			}
 			$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $host, $dstHost['host']);
-			$srcTrigger['dependencies'] = array();
 			if (!$result = API::Trigger()->create($srcTrigger)) {
 				return false;
 			}
 			$hash[$srcTrigger['triggerid']] = reset($result['triggerids']);
-		}
-
-		$deps = array();
-		foreach ($db_srcTriggers as $srcTrigger) {
-			if (httpItemExists($srcTrigger['items'])) {
-				continue;
-			}
-			foreach ($srcTrigger['dependencies'] as $dep) {
-				$deps[] = array(
-					'triggerid' => $hash[$srcTrigger['triggerid']],
-					'dependsOnTriggerid' => isset($hash[$dep['triggerid']]) ? $hash[$dep['triggerid']] : $dep['triggerid']
-				);
-			}
-		}
-		if (!API::Trigger()->addDependencies($deps)) {
-			return false;
 		}
 	}
 	return true;
@@ -2633,7 +2616,6 @@ function copyTriggers($srcHostId, $dstHostId) {
 			continue;
 		}
 		$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
-		$srcTrigger['dependencies'] = array();
 
 		if (!$result = API::Trigger()->create($srcTrigger)) {
 			return false;
@@ -2641,22 +2623,6 @@ function copyTriggers($srcHostId, $dstHostId) {
 		$hash[$srcTrigger['triggerid']] = reset($result['triggerids']);
 	}
 
-	$deps = array();
-	foreach ($srcTriggers as $srcTrigger) {
-		if (httpItemExists($srcTrigger['items'])) {
-			continue;
-		}
-		foreach ($srcTrigger['dependencies'] as $dep) {
-			$deps[] = array(
-				'triggerid' => $hash[$srcTrigger['triggerid']],
-				'dependsOnTriggerid' => isset($hash[$dep['triggerid']]) ? $hash[$dep['triggerid']] : $dep['triggerid']
-			);
-		}
-	}
-
-	if (!API::Trigger()->addDependencies($deps)) {
-		return false;
-	}
 	return true;
 }
 
