@@ -559,7 +559,7 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 		'templated_hosts' => true
 	));
 
-	$hash = array();
+	$newTriggerIds = array();
 	foreach ($db_dstHosts as $dstHost) {
 		foreach ($db_srcTriggers as $srcTrigger) {
 			if (httpItemExists($srcTrigger['items'])) {
@@ -577,12 +577,37 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 				$host = $srcTrigger['hosts'][0]['host'];
 			}
 			$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $host, $dstHost['host']);
+
+			// the dependencies must be added after all triggers are created
+			unset($srcTrigger['dependencies']);
+
 			if (!$result = API::Trigger()->create($srcTrigger)) {
 				return false;
 			}
-			$hash[$srcTrigger['triggerid']] = reset($result['triggerids']);
+			$newTriggerIds[$srcTrigger['triggerid']] = reset($result['triggerids']);
 		}
 	}
+
+	// map dependencies to the new trigger IDs and save
+	$dependencies = array();
+	foreach ($db_srcTriggers as $trigger) {
+		$triggerId = $trigger['triggerid'];
+		$triggerId = (isset($newTriggerIds[$triggerId])) ? $newTriggerIds[$triggerId] : $triggerId;
+
+		if ($trigger['dependencies']) {
+			foreach ($trigger['dependencies'] as $depTrigger) {
+				$depTriggerId = $depTrigger['triggerid'];
+				$depTriggerId = (isset($newTriggerIds[$depTriggerId])) ? $newTriggerIds[$depTriggerId] : $depTriggerId;
+
+				$dependencies[] = array(
+					'triggerid' => $triggerId,
+					'dependsOnTriggerid' => $depTriggerId
+				);
+			}
+		}
+	}
+	API::Trigger()->addDependencies($dependencies);
+
 	return true;
 }
 

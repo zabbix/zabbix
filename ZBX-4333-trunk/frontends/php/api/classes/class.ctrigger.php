@@ -1582,6 +1582,28 @@ class CTrigger extends CZBXAPI {
 		update_services_status_all();
 	}
 
+	/**
+	 * Validates the input for the addDependencies() method.
+	 *
+	 * @throws APIException if the given dependencies are invalid
+	 *
+	 * @param array $triggersData
+	 */
+	protected function validateAddDependencies(array $triggersData) {
+		$triggers = array();
+		foreach ($triggersData as $dep) {
+			$triggerId = $dep['triggerid'];
+
+			if (!isset($triggers[$dep['triggerid']])) {
+				$triggers[$triggerId] = array(
+					'triggerid' => $triggerId,
+					'dependencies' => array(),
+				);
+			}
+			$triggers[$triggerId]['dependencies'][] = $dep['dependsOnTriggerid'];
+		}
+		$this->checkDependencies($triggers);
+	}
 
 	/**
 	 * Add the given dependencies and inherit them on all child triggers.
@@ -1593,8 +1615,10 @@ class CTrigger extends CZBXAPI {
 	 */
 	public function addDependencies(array $triggersData) {
 		$triggersData = zbx_toArray($triggersData);
-		$triggerids = array();
 
+		$this->validateAddDependencies($triggersData);
+
+		$triggerids = array();
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
 			$depTriggerId = $dep['dependsOnTriggerid'];
@@ -1716,8 +1740,6 @@ class CTrigger extends CZBXAPI {
 			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_TRIGGER, $triggerid,
 					$trigger['description'], null, null, null);
 		}
-
-		$this->validateDependencies($triggers);
 	}
 
 	/**
@@ -1834,8 +1856,6 @@ class CTrigger extends CZBXAPI {
 		}
 		unset($trigger);
 
-		$this->validateDependencies($triggers);
-
 		foreach ($infos as $info) {
 			info($info);
 		}
@@ -1946,7 +1966,7 @@ class CTrigger extends CZBXAPI {
 	 *
 	 * @return array|mixed  the updated child trigger
 	 */
-	public function inheritOnHost(array $trigger, array $chdHost, array $triggerTemplates) {
+	protected function inheritOnHost(array $trigger, array $chdHost, array $triggerTemplates) {
 		$newTrigger = $trigger;
 		$newTrigger['templateid'] = $trigger['triggerid'];
 
@@ -2143,14 +2163,18 @@ class CTrigger extends CZBXAPI {
 	 *
 	 * @trows APIException if any of the dependencies is invalid
 	 */
-	protected function validateDependencies(array $triggers) {
+	protected function checkDependencies(array $triggers) {
 		foreach ($triggers as $trigger) {
 			if (!isset($trigger['dependencies']) || empty($trigger['dependencies'])) {
 				continue;
 			}
 
+			// trigger hosts
+			$hosts = DBFetchArray(get_hosts_by_triggerid($trigger['triggerid']));
+
 			// forbid dependencies from hosts to templates
-			if (!$this->isTemplatedTrigger($trigger)) {
+			$isTemplatedTrigger = in_array(HOST_STATUS_TEMPLATE, zbx_objectValues($hosts, 'status'));
+			if (!$isTemplatedTrigger) {
 				$templates = API::Template()->get(array(
 					'triggerids' => $trigger['dependencies'],
 					'output' => array('status'),
@@ -2181,24 +2205,7 @@ class CTrigger extends CZBXAPI {
 
 			} while (!empty($upTriggerids));
 
-			if (isset($trigger['expression'])) {
-				$expr = new CTriggerExpression($trigger);
-				$hosts = $expr->data['hosts'];
-			}
-			else {
-				$hosts = array();
-			}
-
-			$templates = API::Template()->get(array(
-				'output' => array(
-					'hostid',
-					'host'
-				),
-				'filter' => array('host' => $hosts),
-				'nopermissions' => true,
-				'preservekeys' => true
-			));
-			$templateids = array_keys($templates);
+			$templateids = zbx_objectValues($hosts, 'hostid');
 			$templateids = zbx_toHash($templateids);
 
 			$delTemplateids = array();
@@ -2337,32 +2344,6 @@ class CTrigger extends CZBXAPI {
 			'countOutput' => true
 		));
 		return count($ids) == $count;
-	}
-
-
-	/**
-	 * Returns true if the trigger belongs to a template.
-	 *
-	 * @param array $trigger
-	 *
-	 * @return boolean
-	 */
-	public function isTemplatedTrigger(array $trigger) {
-		$expressionData = new CTriggerExpression($trigger);
-		if (!empty($expressionData->errors)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
-		}
-
-		$hosts = $this->select('hosts', array(
-			'output' => 'status',
-			'filter' => array(
-				'host' => $expressionData->data['hosts'],
-				'status' => HOST_STATUS_TEMPLATE
-			),
-			'limit' => 1
-		));
-
-		return ($hosts);
 	}
 }
 ?>
