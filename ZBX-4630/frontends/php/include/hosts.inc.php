@@ -1225,7 +1225,6 @@ function getDeletableHostGroups($groupids = null) {
 	return $deletable_groupids;
 }
 
-
 /**
  * A helper function for building the value for the 'data-host-menu' attribute.
  *
@@ -1235,7 +1234,6 @@ function getDeletableHostGroups($groupids = null) {
  * @return array
  */
 function hostMenuData(array $host, array $scripts = array()) {
-	// fetch scripts for the host JS menu
 	$menuScripts = array();
 	foreach ($scripts as $script) {
 		$menuScripts[] = array(
