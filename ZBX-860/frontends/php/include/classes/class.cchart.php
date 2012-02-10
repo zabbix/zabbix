@@ -1785,9 +1785,11 @@ class CChart extends CGraphDraw{
 	}
 
 	protected function limitToBounds(&$value1, &$value2, $min, $max, $drawtype){
-// Fixes graph out of bounds problem
-		if( (($value1 > ($max+$min)) && ($value2 > ($max+$min))) || (($value1 < $min) && ($value2 < $min)) ){
-			if($drawtype != GRAPH_ITEM_DRAWTYPE_FILLED_REGION) return false;
+		// Fixes graph out of bounds problem
+		if ( (($value1 > ($max+$min)) && ($value2 > ($max+$min))) || (($value1 < $min) && ($value2 < $min)) ) {
+			if (!in_array($drawtype, array(GRAPH_ITEM_DRAWTYPE_FILLED_REGION, GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE))) {
+				return false;
+			}
 		}
 
 		$y_first = (($value1 > ($max+$min)) || ($value1 < $min));
