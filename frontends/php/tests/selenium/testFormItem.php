@@ -224,6 +224,7 @@ class testFormItem extends CWebTest {
 			array(
 				ITEM_BAD,
 				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
 				'Item name',
 				'',
 				array('Page received incorrect data.', 'Warning. Incorrect value for field "key".')
