@@ -391,7 +391,7 @@ for pkg in proxy server ; do
     cp -pR --parents upgrades/dbpatches/1.6/postgresql $docdir
     cp -pR --parents upgrades/dbpatches/1.8/postgresql $docdir
 
-    if ["$pkg" = "proxy" ]; then
+    if [ "$pkg" = "proxy" ]; then
         docdir=$RPM_BUILD_ROOT%{_docdir}/%{name}-$pkg-sqlite3-%{version}
         install -dm 755 $docdir
         cp -p --parents create/schema/sqlite.sql $docdir
@@ -634,7 +634,7 @@ fi
 %files proxy
 %defattr(-,root,root,-)
 %attr(0640,root,zabbix) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_proxy.conf
-%attr(0755,zabbix,zabbix) %dir %{_sysconfdir}/zabbix/externalscripts
+%attr(0755,zabbix,zabbix) %dir %{_libdir}/zabbix/externalscripts
 %config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-proxy
 %{_sysconfdir}/init.d/zabbix-proxy
 %{_mandir}/man8/zabbix_proxy.8*
