@@ -352,7 +352,6 @@
 		$form = new CForm('get');
 		$form->setAttribute('name', 'zbx_filter');
 		$form->setAttribute('id', 'zbx_filter');
-		$form->addVar('filter_groupid', !empty($filter_groupid) && !empty($filter_group) ? $filter_groupid : 0);
 		$form->addVar('filter_hostid', get_request('filter_hostid', get_request('hostid', 0)));
 		$form->addVar('subfilter_hosts', $subfilter_hosts);
 		$form->addVar('subfilter_apps', $subfilter_apps);
@@ -375,7 +374,7 @@
 			array(
 				new CTextBox('filter_group', $filter_group, 20),
 				new CButton('btn_group', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_group&dstfld2=filter_groupid&srctbl=host_group&srcfld1=name&srcfld2=groupid", 450, 450);', 'G'
+					'&dstfld1=filter_group&srctbl=host_group&srcfld1=name", 450, 450);', 'G'
 				)
 			)
 		));
@@ -383,7 +382,7 @@
 			array(
 				new CTextBox('filter_hostname', $filter_hostname, 20),
 				new CButton('btn_host', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&groupid=" + jQuery("#filter_groupid").val(), 450, 450);', 'H'
+					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
 				)
 			)
 		));
@@ -391,7 +390,7 @@
 			array(
 				new CTextBox('filter_application', $filter_application, 20),
 				new CButton('btn_app', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&hostid=" + jQuery("#filter_hostid").val(), 400, 300, "application");', 'A'
+					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&host=" + jQuery("#filter_hostname").val(), 400, 300, "application");', 'A'
 				)
 			)
 		));
@@ -528,8 +527,8 @@
 
 		$cmbStatus = new CComboBox('filter_status', $filter_status);
 		$cmbStatus->addItem(-1, _('all'));
-		foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $st) {
-			$cmbStatus->addItem($st, item_status2str($st));
+		foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $status) {
+			$cmbStatus->addItem($status, item_status2str($status));
 		}
 
 		$cmbBelongs = new CComboBox('filter_templated_items', $filter_templated_items);
@@ -565,8 +564,7 @@
 		$div_buttons = new CDiv(array($filter, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0px;');
 
-		$footer = new CCol($div_buttons, 'center');
-		$footer->setColSpan(4);
+		$footer = new CCol($div_buttons, 'center', 4);
 
 		$table->addRow($footer);
 		$form->addItem($table);
@@ -590,8 +588,8 @@
 
 		// generate array with values for subfilters of selected items
 		foreach ($items as $item) {
+			// hosts
 			if (zbx_empty($filter_hostname)) {
-				// hosts
 				$host = reset($item['hosts']);
 
 				if (!isset($item_params['hosts'][$host['hostid']])) {
