@@ -1557,7 +1557,7 @@ class CTrigger extends CZBXAPI {
 
 
 	/**
-	 * Add dependency for trigger
+	 * Add the given dependencies and inherit them on all child triggers.
 	 *
 	 * @param array $triggersData   an array of trigger dependency pairs, each pair in the form of
 	 *                              array('triggerid' => 1, 'dependsOnTriggerid' => 2)
@@ -1569,15 +1569,47 @@ class CTrigger extends CZBXAPI {
 		$triggerids = array();
 
 		foreach ($triggersData as $dep) {
+			$triggerId = $dep['triggerid'];
+			$depTriggerId = $dep['dependsOnTriggerid'];
 			$triggerids[$dep['triggerid']] = $dep['triggerid'];
 
 			try {
-				DB::insert('trigger_depends', array(
-					array(
-						'triggerid_down' => $dep['triggerid'],
-						'triggerid_up' => $dep['dependsOnTriggerid']
+				DB::insert('trigger_depends', array(array(
+					'triggerid_down' => $triggerId,
+					'triggerid_up' => $depTriggerId
+				)));
+
+				// propagate the dependencies to the child triggers
+				$childTriggers = $this->select($this->tableName(), array(
+					'output' => array('triggerid'),
+					'filter' => array(
+						'templateid' => $triggerId
 					)
 				));
+				if ($childTriggers) {
+					foreach ($childTriggers as $childTrigger) {
+						$childHostsQuery = get_hosts_by_triggerid($childTrigger['triggerid']);
+						while ($childHost = DBfetch($childHostsQuery)) {
+							$newDep = array($childTrigger['triggerid'] => $depTriggerId);
+							$newDep = replace_template_dependencies($newDep, $childHost['hostid']);
+
+							// if the child host is a template - propagate the dependency to the children
+							if ($childHost['status'] == HOST_STATUS_TEMPLATE) {
+								$this->addDependencies(array(array(
+									'triggerid' => $childTrigger['triggerid'],
+									'dependsOnTriggerid' => $newDep[$childTrigger['triggerid']]
+								)));
+							}
+							// if it's a host, just add the dependency
+							else {
+								DB::insert('trigger_depends', array(array(
+									'triggerid_down' => $childTrigger['triggerid'],
+									'triggerid_up' => $newDep[$childTrigger['triggerid']]
+								)));
+							}
+						}
+					}
+				}
 			}
 			catch(APIException $result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create dependency');
@@ -1587,18 +1619,29 @@ class CTrigger extends CZBXAPI {
 	}
 
 	/**
-	 * Delete trigger dependencies
+	 * Deletes all trigger dependencies from the given triggers and their children.
 	 *
-	 * @param array $triggersData
+	 * @param array $triggers   an array of triggers with the 'triggerid' field defined
 	 *
 	 * @return boolean
 	 */
-	public function deleteDependencies(array $triggersData) {
-		$triggersData = zbx_toArray($triggersData);
+	public function deleteDependencies(array $triggers) {
+		$triggers = zbx_toArray($triggers);
 
-		$triggerids = zbx_objectValues($triggersData, 'triggerid');
+		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
 		try {
+			// delete the dependencies from the child triggers
+			$childTriggers = $this->select($this->tableName(), array(
+				'output' => array('triggerid'),
+				'filter' => array(
+					'templateid' => $triggerids
+				)
+			));
+			if ($childTriggers) {
+				$this->deleteDependencies($childTriggers);
+			}
+
 			DB::delete('trigger_depends', array(
 				'triggerid_down' => $triggerids
 			));
