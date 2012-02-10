@@ -40,11 +40,11 @@ static char	*zbx_get_snmp_type_error(u_char type)
 {
 	switch (type)
 	{
-		case 0x80:
+		case SNMP_NOSUCHOBJECT:
 			return zbx_strdup(NULL, "No Such Object available on this agent at this OID");
-		case 0x81:
+		case SNMP_NOSUCHINSTANCE:
 			return zbx_strdup(NULL, "No Such Instance currently exists at this OID");
-		case 0x82:
+		case SNMP_ENDOFMIBVIEW:
 			return zbx_strdup(NULL, "No more variables left in this MIB View"
 					" (It is past the end of the MIB tree)");
 		default:
