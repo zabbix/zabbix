@@ -3081,13 +3081,14 @@ static void	quote_key_param(char **param, int forced)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Example:  key                 | {$MACRO}    | result                       *
- *          ---------------------+-------------+-----------------             *
- *           echo.sh[{$MACRO}]   | a           | echo.sh[a]                   *
- *           echo.sh["{$MACRO}"] | a           | echo.sh["a"]                 *
- *           echo.sh[{$MACRO}]   | "a"         | echo.sh["\"a\""]             *
- *           echo.sh["{$MACRO}"] | "a"         | echo.sh["\"a\""]             *
- *           echo.sh["{$MACRO}"] | a,b         | echo.sh["a,b"]               *
+ * Example:  key                     | macro       | result                   *
+ *          -------------------------+-------------+-----------------         *
+ *           echo.sh[{$MACRO}]       | a           | echo.sh[a]               *
+ *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
+ *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
+ *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *
+ *           echo.sh["{$MACRO}"]     | a,b         | echo.sh["a,b"]           *
+ *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1             *
  *                                                                            *
  ******************************************************************************/
 void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *jp_row, int macro_type)
@@ -3096,7 +3097,7 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 
 	char		*param = NULL;
 	size_t		i, l = 0, param_alloc = 64, param_offset = 0;
-	int		state = 0, level = 0;
+	int		state = 2, level = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
@@ -3104,11 +3105,34 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 
 	param = zbx_malloc(param, param_alloc);
 
-	for (i = 0; '\0' != (*data)[i]; i++)
+	if (MACRO_TYPE_ITEM_KEY == macro_type)
 	{
-		if (0 == level && 0 != state)
+		for (i = 0; SUCCEED == is_key_char((*data)[i]) && '\0' != (*data)[i]; i++)
+			;
+		if ('[' != (*data)[i] || 0 == i)
+			goto clean;
+	}
+	else
+	{
+		*param = '\0';
+
+		for (i = 0; '[' != (*data)[i] && '\0' != (*data)[i]; i++)
+			zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[i]);
+
+		if (NULL == jp_row)
+			substitute_simple_macros(NULL, NULL, dc_host, NULL, &param, macro_type, NULL, 0);
+		else
+			substitute_discovery_macros(&param, jp_row);
+
+		l = 0;
+		i--; zbx_replace_string(data, l, &i, param); i++;
+	}
+
+	for (; '\0' != (*data)[i]; i++)
+	{
+		if (0 == level)
 		{
-			if (2 == state && '[' == (*data)[i])	/* Zapcat compatibility */
+			if (2 == state && '[' == (*data)[i])	/* first square bracket + Zapcat compatibility */
 				state = 1;
 			else
 				break;
@@ -3116,19 +3140,6 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 
 		switch (state)
 		{
-			case 0:	/* an item key */
-				if (MACRO_TYPE_ITEM_KEY == macro_type)
-				{
-					if (SUCCEED == is_key_char((*data)[i]))
-						continue;
-				}
-				else if ('[' != (*data)[i])
-					continue;
-				if ('[' != (*data)[i] || 0 == i)
-					goto clean;
-				level++;
-				state = 1;
-				break;
 			case 1:	/* a new parameter started */
 				switch ((*data)[i])
 				{
