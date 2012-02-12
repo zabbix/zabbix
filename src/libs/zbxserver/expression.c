@@ -3117,7 +3117,9 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 		*param = '\0';
 
 		for (i = 0; '[' != (*data)[i] && '\0' != (*data)[i]; i++)
-			zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[i]);
+			;
+
+		zbx_strncpy_alloc(&param, &param_alloc, &param_offset, *data, i);
 
 		if (NULL == jp_row)
 			substitute_simple_macros(NULL, NULL, dc_host, NULL, &param, macro_type, NULL, 0);
@@ -3239,6 +3241,8 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 		}
 	}
 clean:
+	zbx_free(param);
+
 	if (0 == i || '\0' != (*data)[i] || 0 != level)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid %s at position %d: \"%s\"",
