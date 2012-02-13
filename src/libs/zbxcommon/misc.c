@@ -842,7 +842,6 @@ int	is_ip(const char *ip)
 	return FAIL;
 }
 
-#if defined(HAVE_IPV6)
 /******************************************************************************
  *                                                                            *
  * Function: expand_ipv6                                                      *
@@ -923,6 +922,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 	return SUCCEED;
 }
 
+#if defined(HAVE_IPV6)
 /******************************************************************************
  *                                                                            *
  * Function: collapse_ipv6                                                    *

@@ -439,6 +439,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+.......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
 .......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)
 .......PS. [ZBX-860] more useful SNMP error messages (Sasha)
 ........S. [ZBX-4612] Unix style exit codes when converting database to DM (Sasha)
