@@ -81,7 +81,7 @@ class CTemplateExportElement extends CExportElement{
 
 	protected function addApplications(array $applications) {
 		order_result($applications, 'name');
-		$applicationsElement = new CExportElement('application');
+		$applicationsElement = new CExportElement('applications');
 		foreach ($applications as $application) {
 			$applicationsElement->addElement(new CHostApplicationExportElement($application));
 		}
