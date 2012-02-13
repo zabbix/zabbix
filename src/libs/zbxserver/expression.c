@@ -94,15 +94,15 @@ static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_u
 
 	typedef enum
 	{
-		EXP_NONE,
-		EXP_FUNCTIONID
+		ZBX_EXP_NONE,
+		ZBX_EXP_FUNCTIONID
 	}
-	parsing_state_t;
+	zbx_parser_state_t;
 
-	parsing_state_t	state = EXP_NONE;
-	int		num = 0, ret = FAIL;
-	char		*p_functionid = NULL;
-	register char	*c;
+	zbx_parser_state_t	state = ZBX_EXP_NONE;
+	int			num = 0, ret = FAIL;
+	char			*p_functionid = NULL;
+	register char		*c;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d",
 			__function_name, trigger->expression, N_functionid);
@@ -114,10 +114,10 @@ static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_u
 	{
 		if ('{' == *c)
 		{
-			state = EXP_FUNCTIONID;
+			state = ZBX_EXP_FUNCTIONID;
 			p_functionid = c + 1;
 		}
-		else if ('}' == *c && EXP_FUNCTIONID == state && p_functionid)
+		else if ('}' == *c && ZBX_EXP_FUNCTIONID == state && p_functionid)
 		{
 			*c = '\0';
 
@@ -132,7 +132,7 @@ static int	trigger_get_N_functionid(DB_TRIGGER *trigger, int N_functionid, zbx_u
 			}
 
 			*c = '}';
-			state = EXP_NONE;
+			state = ZBX_EXP_NONE;
 		}
 	}
 fail:
@@ -3081,22 +3081,33 @@ static void	quote_key_param(char **param, int forced)
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Example:  key                 | {$MACRO}    | result                       *
- *          ---------------------+-------------+-----------------             *
- *           echo.sh[{$MACRO}]   | a           | echo.sh[a]                   *
- *           echo.sh["{$MACRO}"] | a           | echo.sh["a"]                 *
- *           echo.sh[{$MACRO}]   | "a"         | echo.sh["\"a\""]             *
- *           echo.sh["{$MACRO}"] | "a"         | echo.sh["\"a\""]             *
- *           echo.sh["{$MACRO}"] | a,b         | echo.sh["a,b"]               *
+ * Example:  key                     | macro       | result                   *
+ *          -------------------------+-------------+-----------------         *
+ *           echo.sh[{$MACRO}]       | a           | echo.sh[a]               *
+ *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
+ *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
+ *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *
+ *           echo.sh["{$MACRO}"]     | a,b         | echo.sh["a,b"]           *
+ *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1             *
  *                                                                            *
  ******************************************************************************/
 void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *jp_row, int macro_type)
 {
 	const char	*__function_name = "substitute_key_macros";
 
-	char		*param = NULL;
-	size_t		i, l = 0, param_alloc = 64, param_offset = 0;
-	int		state = 0, level = 0;
+	typedef enum
+	{
+		ZBX_STATE_NEW,
+		ZBX_STATE_END,
+		ZBX_STATE_UNQUOTED,
+		ZBX_STATE_QUOTED
+	}
+	zbx_parser_state_t;
+
+	char			*param = NULL;
+	size_t			i, l = 0, param_alloc = 64, param_offset = 0;
+	int			level = 0;
+	zbx_parser_state_t	state = ZBX_STATE_END;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
@@ -3104,32 +3115,45 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 
 	param = zbx_malloc(param, param_alloc);
 
-	for (i = 0; '\0' != (*data)[i]; i++)
+	if (MACRO_TYPE_ITEM_KEY == macro_type)
 	{
-		if (0 == level && 0 != state)
+		for (i = 0; SUCCEED == is_key_char((*data)[i]) && '\0' != (*data)[i]; i++)
+			;
+		if ('[' != (*data)[i] || 0 == i)
+			goto clean;
+	}
+	else
+	{
+		*param = '\0';
+
+		for (i = 0; '[' != (*data)[i] && '\0' != (*data)[i]; i++)
+			;
+
+		zbx_strncpy_alloc(&param, &param_alloc, &param_offset, *data, i);
+
+		if (NULL == jp_row)
+			substitute_simple_macros(NULL, NULL, dc_host, NULL, &param, macro_type, NULL, 0);
+		else
+			substitute_discovery_macros(&param, jp_row);
+
+		l = 0;
+		i--; zbx_replace_string(data, l, &i, param); i++;
+	}
+
+	for (; '\0' != (*data)[i]; i++)
+	{
+		if (0 == level)
 		{
-			if (2 == state && '[' == (*data)[i])	/* Zapcat compatibility */
-				state = 1;
+			/* first square bracket + Zapcat compatibility */
+			if (ZBX_STATE_END == state && '[' == (*data)[i])
+				state = ZBX_STATE_NEW;
 			else
 				break;
 		}
 
 		switch (state)
 		{
-			case 0:	/* an item key */
-				if (MACRO_TYPE_ITEM_KEY == macro_type)
-				{
-					if (SUCCEED == is_key_char((*data)[i]))
-						continue;
-				}
-				else if ('[' != (*data)[i])
-					continue;
-				if ('[' != (*data)[i] || 0 == i)
-					goto clean;
-				level++;
-				state = 1;
-				break;
-			case 1:	/* a new parameter started */
+			case ZBX_STATE_NEW:	/* a new parameter started */
 				switch ((*data)[i])
 				{
 					case ' ':
@@ -3140,29 +3164,29 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 						break;
 					case ']':
 						level--;
-						state = 2;
+						state = ZBX_STATE_END;
 						break;
 					case '"':
 						param_offset = 0;
 						*param = '\0';
-						state = 4;
+						state = ZBX_STATE_QUOTED;
 						l = i;
 						break;
 					default:
 						param_offset = 0;
 						*param = '\0';
 						zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[i]);
-						state = 3;
+						state = ZBX_STATE_UNQUOTED;
 						l = i;
 				}
 				break;
-			case 2:	/* end of parameter */
+			case ZBX_STATE_END:	/* end of parameter */
 				switch ((*data)[i])
 				{
 					case ' ':
 						break;
 					case ',':
-						state = 1;
+						state = ZBX_STATE_NEW;
 						break;
 					case ']':
 						level--;
@@ -3171,12 +3195,12 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 						goto clean;
 				}
 				break;
-			case 3:	/* an unquoted parameter */
+			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
 				switch ((*data)[i])
 				{
 					case ']':
 						level--;
-						state = 2;
+						state = ZBX_STATE_END;
 						if (NULL == jp_row)
 						{
 							substitute_simple_macros(NULL, NULL, dc_host, NULL,
@@ -3188,7 +3212,7 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 						i--; zbx_replace_string(data, l, &i, param); i++;
 						break;
 					case ',':
-						state = 1;
+						state = ZBX_STATE_NEW;
 						if (NULL == jp_row)
 						{
 							substitute_simple_macros(NULL, NULL, dc_host, NULL,
@@ -3203,12 +3227,12 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 						zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[i]);
 				}
 				break;
-			case 4:	/* a quoted parameter */
+			case ZBX_STATE_QUOTED:	/* a quoted parameter */
 				if ('"' == (*data)[i])
 				{
 					if ('\\' != (*data)[i - 1])
 					{
-						state = 2;
+						state = ZBX_STATE_END;
 						if (NULL == jp_row)
 						{
 							substitute_simple_macros(NULL, NULL, dc_host, NULL,
@@ -3228,6 +3252,8 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 		}
 	}
 clean:
+	zbx_free(param);
+
 	if (0 == i || '\0' != (*data)[i] || 0 != level)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid %s at position %d: \"%s\"",
