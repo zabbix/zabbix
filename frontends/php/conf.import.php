@@ -25,32 +25,48 @@ require_once 'include/page_header.php';
 $fields = array(
 	'rules' => array(T_ZBX_STR, O_OPT, null, null,	null),
 	'import' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'form_refresh' => array(T_ZBX_INT, O_OPT, null, null, null)
+
 );
 check_fields($fields);
 
 
-$data = array();
+$data['rules'] = array(
+	'groups' => array('missed' => true),
+	'hosts' => array('exist' => true, 'missed' => true),
+	'templates' => array('exist' => true, 'missed' => true),
+	'template_linkages' => array('missed' => true),
+	'items' => array('exist' => true, 'missed' => true),
+	'discoveryrules' => array('exist' => true, 'missed' => true),
+	'triggers' => array('exist' => true, 'missed' => true),
+	'graphs' => array('exist' => true, 'missed' => true),
+	'screens' => array('exist' => true, 'missed' => true),
+	'maps' => array('exist' => true, 'missed' => true),
+	'images' => array('exist' => false, 'missed' => false)
+);
 if (isset($_REQUEST['form_refresh'])) {
-	$data['rules'] = get_request('rules', array());
-}
-else {
-	$data['rules'] = array(
-		'groups' => array('missed' => true),
-		'hosts' => array('exist' => true, 'missed' => true),
-		'templates' => array('exist' => true, 'missed' => true),
-		'template_linkages' => array('exist' => true, 'missed' => true),
-		'items' => array('exist' => true, 'missed' => true),
-		'discoveryrules' => array('exist' => true, 'missed' => true),
-		'triggers' => array('exist' => true, 'missed' => true),
-		'graphs' => array('exist' => true, 'missed' => true),
-		'screens' => array('exist' => true, 'missed' => true),
-		'maps' => array('exist' => true, 'missed' => true),
-		'images' => array('exist' => false, 'missed' => false)
-	);
+	$requestRules = get_request('rules', array());
+	foreach ($data['rules'] as $ruleName => $rule) {
+
+		if (!isset($requestRules[$ruleName])) {
+			if (isset($rule['exist'])) {
+				$requestRules[$ruleName]['exist'] = false;
+			}
+			if (isset($rule['missed'])) {
+				$requestRules[$ruleName]['missed'] = false;
+			}
+		}
+		elseif (!isset($requestRules[$ruleName]['exist']) && isset($rule['exist'])){
+			$requestRules[$ruleName]['exist'] = false;
+		}
+		elseif (!isset($requestRules[$ruleName]['missed']) && isset($rule['missed'])){
+			$requestRules[$ruleName]['missed'] = false;
+		}
+	}
+	$data['rules'] = $requestRules;
 }
 
 if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
-
 	try {
 		$configurationImport = new CConfigurationImport($_FILES['import_file']);
 		$configurationImport->import();
