@@ -160,7 +160,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->input_type('rename', '1_regexp3');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Test string"', 'Warning. Field [expressions] is mandatory.'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Test string"', 'Warning. Field "expressions" is mandatory.'));
 	}
 
 	public function testFormAdministrationGeneralRegexp_AddIncorrect2() {
@@ -174,7 +174,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Field [expressions] is mandatory.'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Field "expressions" is mandatory.'));
 	}
 
 	public function testFormAdministrationGeneralRegexp_Test() {
