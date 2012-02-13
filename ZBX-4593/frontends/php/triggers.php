@@ -420,18 +420,30 @@ include_once('include/page_header.php');
 			}
 
 			$go_result = false;
-			$new_triggerids = array();
+			$newTriggerIds = array();
 
 			DBstart();
-			foreach($hosts_ids as $num => $host_id){
-				foreach($_REQUEST['g_triggerid'] as $tnum => $trigger_id){
+			foreach($hosts_ids as $host_id){
+				foreach($_REQUEST['g_triggerid'] as $trigger_id){
 					$newtrigid = copy_trigger_to_host($trigger_id, $host_id, true);
-
-					$new_triggerids[$trigger_id] = $newtrigid;
+					$newTriggerIds[$trigger_id] = $newtrigid;
 					$go_result |= (bool) $newtrigid;
 				}
+				if ($go_result) {
+					// copy trigger dependencies
+					foreach ($_REQUEST['g_triggerid'] as $trigger_id) {
+						$dependencies = get_trigger_dependencies_by_triggerid($trigger_id);
+						foreach ($dependencies as $depTriggerId) {
+							// if the trigger we just copied is dependant on another trigger we copied,
+							// map the dependency to the new trigger
+							if (isset($newTriggerIds[$depTriggerId])) {
+								$depTriggerId = $newTriggerIds[$depTriggerId];
+							}
 
-//				replace_triggers_depenedencies($new_triggerids);
+							add_trigger_dependency($newTriggerIds[$trigger_id], $depTriggerId);
+						}
+					}
+				}
 			}
 
 			$go_result = DBend($go_result);
