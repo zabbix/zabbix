@@ -6,6 +6,13 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+A.F....... [ZBX-4593] fixed "Trigger info" type screen item resource validation (pavels)
+A.F....... [ZBX-4599] fixed errors in building select queries in Event.get() (pavels)
+..F....... [ZBX-1787] fixed gradient element rendering if the value exceeds the max Y scale value (pavels)
+A.F....... [ZBX-4494] fixed some types of screen items not being returned by Screen.get() (pavels)
+.......PS. [ZBX-4591] more secure substituting of macros in item keys and dynamic SNMP OIDs (Sasha)
+..F....... [ZBX-4598] fixed audit error when saving triggers (pavels)
+A.F....... [ZBX-4598] fixed templated trigger inheritance (pavels)
 ..F....... [ZBX-3373] fixed host interfaces filtering in items. (Eduard)
 ..F....... [ZBX-4110] fixed "ssh key" field and "password" field names in items. (Eduard)
 ..F....... [ZBX-3466] fixed creating new item without hostname. (Eduard)
@@ -433,6 +440,11 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+.......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
+.......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)
+.......PS. [ZBX-860] more useful SNMP error messages (Sasha)
+........S. [ZBX-4612] Unix style exit codes when converting database to DM (Sasha)
+A.F....... [ZBX-2679] fixed validation of masks in IP ranges in discovery (Sasha)
 ....I..... [ZBX-3262] fixed warning "no AC_LANG_SOURCE call detected in body" raised during compilation (Alexei)
 ..F....... [ZBX-3955] added pop up field name parameter validation (pavels)
 ...GI..PS. [ZBX-4535] fixed build with --as-needed linker flag (Sasha)

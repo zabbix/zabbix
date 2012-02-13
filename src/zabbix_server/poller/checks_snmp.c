@@ -36,6 +36,23 @@ zbx_snmp_index_t;
 static zbx_snmp_index_t	*snmpidx = NULL;
 static int		snmpidx_count = 0, snmpidx_alloc = 16;
 
+
+static char	*zbx_get_snmp_type_error(u_char type)
+{
+	switch (type)
+	{
+		case SNMP_NOSUCHOBJECT:
+			return zbx_strdup(NULL, "No Such Object available on this agent at this OID");
+		case SNMP_NOSUCHINSTANCE:
+			return zbx_strdup(NULL, "No Such Instance currently exists at this OID");
+		case SNMP_ENDOFMIBVIEW:
+			return zbx_strdup(NULL, "No more variables left in this MIB View"
+					" (It is past the end of the MIB tree)");
+		default:
+			return zbx_dsprintf(NULL, "Value has unknown type 0x%02X", type);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_snmp_index_compare                                           *
@@ -408,7 +425,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 	const char		*__function_name = "snmp_get_index";
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN;
-	char			temp[MAX_STRING_LEN], strval[MAX_STRING_LEN], snmp_oid[MAX_STRING_LEN];
+	char			temp[MAX_STRING_LEN], strval[MAX_STRING_LEN], snmp_oid[MAX_STRING_LEN], *error;
 	int			status, running, ret = NOTSUPPORTED;
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*vars;
@@ -517,9 +534,9 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 						}
 						else
 						{
-							zabbix_log(LOG_LEVEL_DEBUG,
-									"OID [%s] value has unknown type [0x%02X]",
-									snmp_oid, vars->type);
+							error = zbx_get_snmp_type_error(vars->type);
+							zabbix_log(LOG_LEVEL_DEBUG, "OID \"%s\": %s", snmp_oid, error);
+							zbx_free(error);
 						}
 
 						if (0 == strcmp(value, strval))
@@ -652,9 +669,7 @@ static int	snmp_set_value(const char *snmp_oid, struct variable_list *vars, DC_I
 	}
 	else
 	{
-		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "OID [%s] value has unknown type [0x%02X]",
-				snmp_oid,
-				vars->type));
+		SET_MSG_RESULT(value, zbx_get_snmp_type_error(vars->type));
 		ret = NOTSUPPORTED;
 	}
 
