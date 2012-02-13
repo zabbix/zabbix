@@ -3093,15 +3093,16 @@ static void	quote_key_param(char **param, int forced)
  ******************************************************************************/
 void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *jp_row, int macro_type)
 {
+	const char	*__function_name = "substitute_key_macros";
+
 	typedef enum
 	{
 		ZBX_STATE_NEW,
 		ZBX_STATE_END,
 		ZBX_STATE_UNQUOTED,
 		ZBX_STATE_QUOTED
-	} zbx_parser_state_t;
-
-	const char	*__function_name = "substitute_key_macros";
+	}
+	zbx_parser_state_t;
 
 	char			*param = NULL;
 	size_t			i, l = 0, param_alloc = 64, param_offset = 0;
@@ -3143,7 +3144,8 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 	{
 		if (0 == level)
 		{
-			if (ZBX_STATE_END == state && '[' == (*data)[i])	/* first square bracket + Zapcat compatibility */
+			/* first square bracket + Zapcat compatibility */
+			if (ZBX_STATE_END == state && '[' == (*data)[i])
 				state = ZBX_STATE_NEW;
 			else
 				break;
