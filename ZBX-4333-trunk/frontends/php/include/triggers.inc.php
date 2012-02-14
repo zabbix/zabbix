@@ -606,7 +606,9 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 			}
 		}
 	}
-	API::Trigger()->addDependencies($dependencies);
+	if (!API::Trigger()->addDependencies($dependencies)) {
+		return false;
+	}
 
 	return true;
 }
