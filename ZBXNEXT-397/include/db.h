@@ -200,12 +200,6 @@ zbx_graph_item_type;
 #define HTTPTEST_ERROR_LEN		255
 #define HTTPTEST_ERROR_LEN_MAX		HTTPTEST_ERROR_LEN+1
 
-#define HTTPSTEP_STATUS_LEN		255
-#define HTTPSTEP_STATUS_LEN_MAX		HTTPSTEP_STATUS_LEN+1
-
-#define HTTPSTEP_REQUIRED_LEN		255
-#define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
-
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
 				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
 				"i.lastclock,i.units,i.multiplier,i.formula,i.status,"		\
@@ -428,15 +422,12 @@ typedef struct
 {
 	zbx_uint64_t	httptestid;
 	char		*name;
-	zbx_uint64_t	applicationid;
-	int		nextcheck;
-	int		status;
 	char		*macros;
 	char		*agent;
-	double		time;
-	int		authentication;
 	char		*http_user;
 	char		*http_password;
+	double		time;
+	int		authentication;
 }
 DB_HTTPTEST;
 
@@ -444,13 +435,13 @@ typedef struct
 {
 	zbx_uint64_t	httpstepid;
 	zbx_uint64_t	httptestid;
-	int		no;
 	char		*name;
 	char		url[MAX_STRING_LEN];	/* excessive length is required to support macros */
-	int		timeout;
 	char		posts[MAX_STRING_LEN];
-	char		required[HTTPSTEP_REQUIRED_LEN_MAX];
-	char		status_codes[HTTPSTEP_STATUS_LEN_MAX];
+	char		*required;
+	char		*status_codes;
+	int		no;
+	int		timeout;
 }
 DB_HTTPSTEP;
 
