@@ -274,22 +274,20 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 			if (0 == (table->fields[f].flags & ZBX_PROXY))
 				continue;
 
-			if (SUCCEED != DBis_null(row[fld]))
+			switch (table->fields[f].type)
 			{
-				switch (table->fields[f].type)
-				{
-					case ZBX_TYPE_INT:
-					case ZBX_TYPE_UINT:
-					case ZBX_TYPE_ID:
+				case ZBX_TYPE_INT:
+				case ZBX_TYPE_UINT:
+				case ZBX_TYPE_ID:
+					if (SUCCEED != DBis_null(row[fld]))
 						zbx_json_addstring(j, NULL, row[fld], ZBX_JSON_TYPE_INT);
-						break;
-					default:
-						zbx_json_addstring(j, NULL, row[fld], ZBX_JSON_TYPE_STRING);
-						break;
-				}
+					else
+						zbx_json_addstring(j, NULL, NULL, ZBX_JSON_TYPE_NULL);
+					break;
+				default:
+					zbx_json_addstring(j, NULL, row[fld], ZBX_JSON_TYPE_STRING);
+					break;
 			}
-			else
-				zbx_json_addstring(j, NULL, NULL, ZBX_JSON_TYPE_NULL);
 
 			fld++;
 		}
