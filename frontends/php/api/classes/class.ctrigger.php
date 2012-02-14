@@ -1431,8 +1431,8 @@ class CTrigger extends CZBXAPI {
 		foreach ($triggers as $trigger) {
 			$this->inherit($trigger);
 
-			// replace dependencies
-			if (isset($trigger['dependencies'])) {
+			// add dependencies
+			if (isset($trigger['dependencies']) && $trigger['dependencies']) {
 				$newDeps = array();
 				foreach ($trigger['dependencies'] as $depTriggerId) {
 					$newDeps[] = array(
