@@ -1590,6 +1590,10 @@ class CTrigger extends CZBXAPI {
 	 * @param array $triggersData
 	 */
 	protected function validateAddDependencies(array $triggersData) {
+		if (!$triggersData) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$triggers = array();
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
@@ -1670,6 +1674,19 @@ class CTrigger extends CZBXAPI {
 	}
 
 	/**
+	 * Validates the input for the deleteDependencies() method.
+	 *
+	 * @throws APIException if the given input is invalid
+	 *
+	 * @param array $triggers
+	 */
+	protected function validateDeleteDependencies(array $triggers) {
+		if (!$triggers) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+	}
+
+	/**
 	 * Deletes all trigger dependencies from the given triggers and their children.
 	 *
 	 * @param array $triggers   an array of triggers with the 'triggerid' field defined
@@ -1678,6 +1695,8 @@ class CTrigger extends CZBXAPI {
 	 */
 	public function deleteDependencies(array $triggers) {
 		$triggers = zbx_toArray($triggers);
+
+		$this->validateDeleteDependencies($triggers);
 
 		$triggerids = zbx_objectValues($triggers, 'triggerid');
 
@@ -2145,26 +2164,31 @@ class CTrigger extends CZBXAPI {
 			'selectDependencies' => API_OUTPUT_REFER,
 			'selectHosts' => array('hostid')
 		));
-		$newDependencies = array();
-		foreach ($childTriggers as $childTrigger) {
-			$parentDependencies = $parentTriggers[$childTrigger['templateid']]['dependencies'];
-			if ($parentDependencies) {
-				$dependencies = array();
-				foreach ($parentDependencies as $depTrigger) {
-					$dependencies[$childTrigger['triggerid']] = $depTrigger['triggerid'];
-				}
-				$host = reset($childTrigger['hosts']);
-				$dependencies = replace_template_dependencies($dependencies, $host['hostid']);
-				foreach ($dependencies as $triggerId => $depTriggerId) {
-					$newDependencies[] = array(
-						'triggerid' => $triggerId,
-						'dependsOnTriggerid' => $depTriggerId
-					);
+		if ($childTriggers) {
+			$newDependencies = array();
+			foreach ($childTriggers as $childTrigger) {
+				$parentDependencies = $parentTriggers[$childTrigger['templateid']]['dependencies'];
+				if ($parentDependencies) {
+					$dependencies = array();
+					foreach ($parentDependencies as $depTrigger) {
+						$dependencies[$childTrigger['triggerid']] = $depTrigger['triggerid'];
+					}
+					$host = reset($childTrigger['hosts']);
+					$dependencies = replace_template_dependencies($dependencies, $host['hostid']);
+					foreach ($dependencies as $triggerId => $depTriggerId) {
+						$newDependencies[] = array(
+							'triggerid' => $triggerId,
+							'dependsOnTriggerid' => $depTriggerId
+						);
+					}
 				}
 			}
+			$this->deleteDependencies($childTriggers);
+
+			if ($newDependencies) {
+				$this->addDependencies($newDependencies);
+			}
 		}
-		$this->deleteDependencies($childTriggers);
-		$this->addDependencies($newDependencies);
 	}
 
 	/**
