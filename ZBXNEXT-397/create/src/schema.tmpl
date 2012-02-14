@@ -1202,3 +1202,17 @@ FIELD		|url4		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|title5		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|url5		|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|userid
+
+TABLE|proxy_http_history|id|0
+FIELD		|id		|t_serial	|	|NOT NULL	|0
+FIELD		|httptestid	|t_id		|	|NOT NULL	|0			|-|httptest
+FIELD		|httpstepid	|t_id		|	|NULL		|0			|-|httpstep
+FIELD		|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|timestamp	|t_time		|'0'	|NOT NULL	|0
+FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value		|t_history_log	|''	|NOT NULL	|0
+FIELD		|logeventid	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
+INDEX		|1		|clock
