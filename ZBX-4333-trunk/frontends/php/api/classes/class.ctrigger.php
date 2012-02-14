@@ -2109,11 +2109,26 @@ class CTrigger extends CZBXAPI {
 			$this->inherit($trigger, $data['hostids']);
 		}
 
-		// Update dependencies, do it after all triggers that can be dependent were created/updated on all child hosts/templates.
-		// Starting from highest level template triggers select triggers from one level lower, then for each lower trigger
-		// look if it's parent has dependencies, if so find this dependency trigger child on dependent trigger host and add new dependency.
+		// updated dependencies
+		$this->syncTemplateDependencies($data['templateids'], $data['hostids']);
+
+		return true;
+	}
+
+	/**
+	 * Synchronizes the templated trigger dependencies on the given hosts inherited from the given
+	 * templates.
+	 *
+	 * @param array $templateIds
+	 * @param array $hostIds
+	 */
+	protected function syncTemplateDependencies(array $templateIds, array $hostIds = array()) {
+		// Update dependencies, do it after all triggers that can be dependent were created/updated on
+		// all child hosts/templates. Starting from highest level template triggers select triggers from
+		// one level lower, then for each lower trigger look if it's parent has dependencies, if so
+		// find this dependency trigger child on dependent trigger host and add new dependency.
 		$parentTriggers = $this->get(array(
-			'hostids' => $data['templateids'],
+			'hostids' => $templateIds,
 			'preservekeys' => true,
 			'output' => array(
 				'triggerid',
@@ -2121,39 +2136,35 @@ class CTrigger extends CZBXAPI {
 			),
 			'selectDependencies' => API_OUTPUT_REFER
 		));
-
-		while (!empty($parentTriggers)) {
-			$childTriggers = $this->get(array(
-				'filter' => array('templateid' => array_keys($parentTriggers)),
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'output' => array(
-					'triggerid',
-					'templateid'
-				),
-				'selectDependencies' => API_OUTPUT_REFER,
-				'selectHosts' => array('host')
-			));
-			foreach ($childTriggers as $childTrigger) {
-				if (!empty($parentTriggers[$childTrigger['templateid']]['dependencies'])) {
-					$deps = zbx_objectValues($parentTriggers[$childTrigger['templateid']]['dependencies'], 'triggerid');
-					$host = reset($childTrigger['hosts']);
-					$newDeps = replace_template_dependencies($deps, $host['hostid']);
-
-					DB::delete('trigger_depends', array('triggerid_down' => $childTrigger['triggerid']));
-					foreach ($newDeps as $triggeridUp) {
-						DB::insert('trigger_depends', array(
-							array(
-								'triggerid_down' => $childTrigger['triggerid'],
-								'triggerid_up' => $triggeridUp
-							)
-						));
-					}
+		$childTriggers = $this->get(array(
+			'hostids' => ($hostIds) ? $hostIds : null,
+			'filter' => array('templateid' => array_keys($parentTriggers)),
+			'nopermissions' => true,
+			'preservekeys' => true,
+			'output' => array('triggerid', 'templateid'),
+			'selectDependencies' => API_OUTPUT_REFER,
+			'selectHosts' => array('hostid')
+		));
+		$newDependencies = array();
+		foreach ($childTriggers as $childTrigger) {
+			$parentDependencies = $parentTriggers[$childTrigger['templateid']]['dependencies'];
+			if ($parentDependencies) {
+				$dependencies = array();
+				foreach ($parentDependencies as $depTrigger) {
+					$dependencies[$childTrigger['triggerid']] = $depTrigger['triggerid'];
+				}
+				$host = reset($childTrigger['hosts']);
+				$dependencies = replace_template_dependencies($dependencies, $host['hostid']);
+				foreach ($dependencies as $triggerId => $depTriggerId) {
+					$newDependencies[] = array(
+						'triggerid' => $triggerId,
+						'dependsOnTriggerid' => $depTriggerId
+					);
 				}
 			}
-			$parentTriggers = $childTriggers;
 		}
-		return true;
+		$this->deleteDependencies($childTriggers);
+		$this->addDependencies($newDependencies);
 	}
 
 	/**
