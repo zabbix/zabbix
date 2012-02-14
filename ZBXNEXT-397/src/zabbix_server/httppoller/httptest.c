@@ -26,6 +26,26 @@
 #include "httpmacro.h"
 #include "httptest.h"
 
+typedef struct
+{
+	char	*data;
+	size_t	allocated;
+	size_t	offset;
+}
+ZBX_HTTPPAGE;
+
+typedef struct
+{
+	long   	rspcode;
+	double 	total_time;
+	double 	speed_download;
+	double	test_total_time;
+	int	test_last_step;
+}
+ZBX_HTTPSTAT;
+
+extern int	CONFIG_HTTPPOLLER_FORKS;
+
 #ifdef HAVE_LIBCURL
 
 static ZBX_HTTPPAGE	page;
@@ -305,8 +325,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 		memset(&stat, 0, sizeof(stat));
 
-		http_substitute_macros(httptest, httpstep.url, sizeof(httpstep.url));
-		http_substitute_macros(httptest, httpstep.posts, sizeof(httpstep.posts));
+		http_substitute_macros(httptest->macros, httpstep.url, sizeof(httpstep.url));
+		http_substitute_macros(httptest->macros, httpstep.posts, sizeof(httpstep.posts));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() use step \"%s\"", __function_name, httpstep.name);
 

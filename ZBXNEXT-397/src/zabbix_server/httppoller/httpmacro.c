@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-
 #include "db.h"
 #include "log.h"
 
@@ -30,12 +29,13 @@
  *                                                                            *
  * Purpose: substitute macros in input string by value from http test config  *
  *                                                                            *
- * Parameters: httptest - http test data, data - string to substitute macros  *
+ * Parameters: macros - [IN]     macros from httptest                         *
+ *             data   - [IN\OUT] string to substitute macros                  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	http_substitute_macros(DB_HTTPTEST *httptest, char *data, size_t data_max_len)
+void	http_substitute_macros(char *macros, char *data, size_t data_max_len)
 {
 	const char	*__function_name = "http_substitute_macros";
 
@@ -45,8 +45,7 @@ void	http_substitute_macros(DB_HTTPTEST *httptest, char *data, size_t data_max_l
 
 	assert(data);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " data:'%s'",
-			__function_name, httptest->httptestid, data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, data);
 
 	*str_out = '\0';
 	outlen = sizeof(str_out) - 1;
@@ -66,7 +65,7 @@ void	http_substitute_macros(DB_HTTPTEST *httptest, char *data, size_t data_max_l
 			/* Macro in pr */
 			save = c[1]; c[1] = 0;
 
-			if (NULL != (c2 = strstr(httptest->macros, pr)))
+			if (NULL != (c2 = strstr(macros, pr)))
 			{
 				if (NULL != (replacement = strchr(c2, '=')))
 				{
