@@ -134,9 +134,12 @@
 	$templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
-	$newgroupTB = new CTextBox('newgroup', $newgroup);
-	$newgroupTB->setAttribute('maxlength', 64);
-	$templateList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
+	global $USER_DETAILS;
+	if ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
+		$newgroupTB = new CTextBox('newgroup', $newgroup);
+		$newgroupTB->setAttribute('maxlength', 64);
+		$templateList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
+	}
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 	$twb_groupid = get_request('twb_groupid', 0);
