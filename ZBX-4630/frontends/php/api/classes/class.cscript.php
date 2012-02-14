@@ -503,9 +503,10 @@ class CScript extends CZBXAPI {
 			'output' => array('actionid','name')
 		));
 
-		foreach ($scriptActions as $action)
+		foreach ($scriptActions as $action) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete scripts. Script "%1$s" is used in action operation "%2$s".',
 				$dbScripts[$action['scriptid']]['name'], $action['name']));
+		}
 
 		DB::delete('scripts', array('scriptid' => $scriptids));
 
