@@ -1190,7 +1190,7 @@ class DB {
 	 * Refresh id record for given table.
 	 * Record is deleted and then created again with value of maximum id from table or minimu allowed.
 	 *
-	 * @throw APIException
+	 * @throws APIException
 	 * @static
 	 *
 	 * @param string $table table name
@@ -1218,7 +1218,7 @@ class DB {
 					' AND '.$id_name.'<='.self::$maxNodeId;
 		$row = DBfetch(DBselect($sql));
 
-		$nextid = (!$row || is_null($row['id'])) ? self::$minNodeId : $row['id'];
+		$nextid = (!$row || !$row['id']) ? self::$minNodeId : $row['id'];
 
 		$maxNextId = bcadd($nextid, $count, 0);
 		if (bccomp($maxNextId, self::$maxNodeId, 0) == 1) {
