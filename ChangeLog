@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-1335] improved Item filter. (Eduard)
 ..F....... [ZBX-4630] fixed "Trigger overview" screen. (Eduard)
 .......PS. [ZBX-4628] fixed an "invalid number of fields" error when syncing configuration on proxy (Sasha)
 A.F....... [ZBX-4593] fixed "Trigger info" type screen item resource validation (pavels)
