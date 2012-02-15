@@ -12,15 +12,54 @@ class C20ImportFormatter extends CImportFormatter {
 	}
 
 	public function getGroups() {
+		if (!isset($this->data['groups'])) {
+			return array();
+		}
 		return $this->data['groups'];
 	}
 
+	public function getTemplates() {
+		if (!isset($this->data['templates'])) {
+			return array();
+		}
+		$hostsData = array();
+
+		foreach ($this->data['templates'] as $host) {
+			if (empty($host['templates'])) {
+				unset($host['templates']);
+			}
+			else {
+				foreach ($host['templates'] as $tnum => $template) {
+					$this->renameData($host['templates'][$tnum], array('template' => 'host'));
+				}
+				$host['templates'] = array_values($host['templates']);
+			}
+
+			if (empty($host['macros'])) {
+				unset($host['macros']);
+			}
+			else {
+				$host['macros'] = array_values($host['macros']);
+			}
+
+			$this->renameData($host, array('template' => 'host'));
+
+			$host['groups'] = array_values($host['groups']);
+
+
+			$hostsData[] = ArrayHelper::getByKeys($host, array('groups', 'macros', 'templates', 'host', 'status', 'name'));
+		}
+
+		return $hostsData;
+	}
+
 	public function getHosts() {
-		$hostsData = $allGroups = array();
+		if (!isset($this->data['hosts'])) {
+			return array();
+		}
+		$hostsData = array();
 
 		foreach ($this->data['hosts'] as $host) {
-			$allGroups += zbx_objectValues($host['groups'], 'name');
-
 			$this->renameData($host, array('proxyid' => 'proxy_hostid'));
 
 			foreach ($host['interfaces'] as $inum => $interface) {
@@ -28,15 +67,28 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 			$host['interfaces'] = array_values($host['interfaces']);
 
-			foreach ($host['templates'] as $tnum => $template) {
-				$this->renameData($host['templates'][$tnum], array('name' => 'host'));
+
+			if (empty($host['templates'])) {
+				unset($host['templates']);
 			}
-			$host['templates'] = array_values($host['templates']);
+			else {
+				foreach ($host['templates'] as $tnum => $template) {
+					$this->renameData($host['templates'][$tnum], array('name' => 'host'));
+				}
+				$host['templates'] = array_values($host['templates']);
+			}
+
+			if (empty($host['macros'])) {
+				unset($host['macros']);
+			}
+			else {
+				$host['macros'] = array_values($host['macros']);
+			}
+
+			$host['groups'] = array_values($host['groups']);
 
 
-			$host['interfaces'] = array_values($host['interfaces']);
-
-			$hostsData[] = ArrayHelper::getByKeys($host, array('proxy_hostid', 'groups', 'templates', 'interfaces',
+			$hostsData[] = ArrayHelper::getByKeys($host, array('proxy_hostid', 'groups', 'templates', 'macros', 'interfaces',
 				'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name'));
 		}
 
@@ -46,9 +98,18 @@ class C20ImportFormatter extends CImportFormatter {
 	public function getApplications() {
 		$applicationsData = array();
 
-		foreach ($this->data['hosts'] as $host) {
-			foreach ($host['applications'] as $application) {
-				$applicationsData[$host['host']][$application['name']] = $application;
+		if (isset($this->data['hosts'])) {
+			foreach ($this->data['hosts'] as $host) {
+				foreach ($host['applications'] as $application) {
+					$applicationsData[$host['host']][$application['name']] = $application;
+				}
+			}
+		}
+		if (isset($this->data['templates'])) {
+			foreach ($this->data['templates'] as $template) {
+				foreach ($template['applications'] as $application) {
+					$applicationsData[$template['template']][$application['name']] = $application;
+				}
 			}
 		}
 
@@ -58,14 +119,68 @@ class C20ImportFormatter extends CImportFormatter {
 	public function getItems() {
 		$itemsData = array();
 
-		foreach ($this->data['hosts'] as $host) {
-			foreach ($host['items'] as $item) {
-				$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
-				$itemsData[$host['host']][$item['key_']] = $item;
+		if (isset($this->data['hosts'])) {
+			foreach ($this->data['hosts'] as $host) {
+				foreach ($host['items'] as $item) {
+					$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					$itemsData[$host['host']][$item['key_']] = $item;
+				}
+			}
+		}
+		if (isset($this->data['templates'])) {
+			foreach ($this->data['templates'] as $template) {
+				foreach ($template['items'] as $item) {
+					$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					$itemsData[$template['host']][$item['key_']] = $item;
+				}
 			}
 		}
 
 		return $itemsData;
+	}
+
+	public function getDiscoveryRules() {
+		$discoveryRulesData = array();
+
+		if (isset($this->data['hosts'])) {
+			foreach ($this->data['hosts'] as $host) {
+				foreach ($host['discovery_rules'] as $item) {
+					$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					$discoveryRulesData[$host['host']][$item['key_']] = $item;
+				}
+			}
+		}
+		if (isset($this->data['templates'])) {
+			foreach ($this->data['templates'] as $template) {
+				foreach ($template['discovery_rules'] as $item) {
+					$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					$discoveryRulesData[$template['host']][$item['key_']] = $item;
+				}
+			}
+		}
+
+		return $discoveryRulesData;
+	}
+
+	public function getGraphs() {
+		if (!isset($this->data['graphs'])) {
+			return array();
+		}
+
+		$graphsData = array();
+		foreach ($this->data['graphs'] as $graph) {
+			$this->renameData($graph, array(
+				'type' => 'graphtype',
+				'ymin_type_1' => 'ymin_type',
+				'ymax_type_1' => 'ymax_type'
+			));
+
+			$graph['graph_items'] = array_values($graph['graph_items']);
+
+			$graphsData[] = $graph;
+		}
+
+		return $graphsData;
 	}
 
 }

@@ -213,6 +213,7 @@ frontends/php/include/classes/export/writers/CExportWriterFactory.php -text
 frontends/php/include/classes/export/writers/CJsonExportWriter.php -text
 frontends/php/include/classes/export/writers/CXmlWriterExportWriter.php -text
 frontends/php/include/classes/import/CConfigurationImport.php -text
+frontends/php/include/classes/import/CImportReferencer.php -text
 frontends/php/include/classes/import/formatters/C18ImportFormatter.php -text
 frontends/php/include/classes/import/formatters/C20ImportFormatter.php -text
 frontends/php/include/classes/import/formatters/CImportFormatter.php -text
