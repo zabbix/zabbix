@@ -16,12 +16,14 @@ class CConfigurationImport {
 	protected $applicationsCache = array();
 	protected $interfacesCache = array();
 	protected $itemsCache = array();
+	protected $discoveryRulesCache = array();
 
 	public function __construct($file, $options = array()) {
 		$this->options = array(
 			'groups' => array('missed' => true),
 			'hosts' => array('exist' => true, 'missed' => true),
 			'templates' => array('exist' => true, 'missed' => true),
+			'applications' => array('exist' => true, 'missed' => true),
 			'template_linkages' => array('exist' => true, 'missed' => true),
 			'items' => array('exist' => true, 'missed' => true),
 			'discoveryrules' => array('exist' => true, 'missed' => true),
@@ -40,44 +42,149 @@ class CConfigurationImport {
 		$this->data = $this->reader->read($file['tmp_name']);
 
 		$this->formatter = $this->getFormatter($this->getImportVersion());
+
+		$this->referencer = new CImportReferencer();
 	}
 
 	public function import() {
+		DBstart();
 		$this->formatter->setData($this->data['zabbix_export']);
+
+		$this->gatherReferences();
 
 		if ($this->options['groups']['missed']) {
 			$this->processGroups();
 		}
+		if ($this->options['templates']['exist'] || $this->options['templates']['missed']) {
+			$this->processTemplates();
+		}
 		if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
 			$this->processHosts();
+		}
+		if ($this->options['templates']['exist']
+				|| $this->options['templates']['missed']
+				|| $this->options['hosts']['exist']
+				|| $this->options['hosts']['missed']) {
 			$this->processApplications();
 		}
+
 		if ($this->options['items']['exist'] || $this->options['items']['missed']) {
 			$this->processItems();
 		}
+		if ($this->options['discoveryrules']['exist'] || $this->options['discoveryrules']['missed']) {
+			$this->processDiscoveryRules();
+		}
+		if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
+			$this->processGraphs();
+		}
+		DBend(false);
+	}
 
+	protected function gatherReferences() {
+		if ($this->options['groups']['missed']) {
+			$groups = $this->formatter->getGroups();
+			$this->referencer->addGroups(zbx_objectValues($groups, 'name'));
+		}
+
+		if ($this->options['templates']['exist'] || $this->options['templates']['missed']) {
+			$templates = $this->formatter->getTemplates();
+
+			$templatesRefs = array();
+			$groupsRefs = array();
+			foreach ($templates as $template) {
+				$templatesRefs[] = $template['template'];
+				$groupsRefs = zbx_objectValues($template['groups'], 'name');
+			}
+			$this->referencer->addTemplates($templatesRefs);
+			$this->referencer->addGroups($groupsRefs);
+		}
+
+		if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
+			$hosts = $this->formatter->getHosts();
+
+			$hostsRefs = array();
+			$groupsRefs = array();
+			$templatesRefs = array();
+			foreach ($hosts as $host) {
+				$hostsRefs[] = $host['host'];
+				$groupsRefs = zbx_objectValues($host['groups'], 'name');
+				if (isset($host['templates'])) {
+					$templatesRefs = zbx_objectValues($host['templates'], 'name');
+				}
+			}
+			$this->referencer->addHosts($hostsRefs);
+			$this->referencer->addTemplates($templatesRefs);
+			$this->referencer->addGroups($groupsRefs);
+		}
+
+		if ($this->options['templates']['exist']
+				|| $this->options['templates']['missed']
+				|| $this->options['hosts']['exist']
+				|| $this->options['hosts']['missed']) {
+
+			$applicationsRefs = array();
+			$allApplications = $this->formatter->getApplications();
+			foreach ($allApplications as $host => $applications) {
+				$applicationsRefs[$host] = zbx_objectValues($applications, 'name');
+			}
+			$this->referencer->addApplications($applicationsRefs);
+		}
+
+		if ($this->options['items']['exist'] || $this->options['items']['missed']) {
+			$allItems = $this->formatter->getItems();
+
+			$itemsRefs = array();
+			$applicationsRefs = array();
+			$valueMapsRefs = array();
+
+			foreach ($allItems as $host => $items) {
+				foreach ($items as $item) {
+					$applicationsRefs[$host] = zbx_objectValues($item['applications'], 'name');
+					$valueMapsRefs = zbx_objectValues($item['valuemap'], 'name');
+				}
+				$itemsRefs[$host] = zbx_objectValues($items, 'key_');
+			}
+			$this->referencer->addItems($itemsRefs);
+			$this->referencer->addApplications($applicationsRefs);
+			$this->referencer->addValueMaps($valueMapsRefs);
+		}
+
+		if ($this->options['discoveryrules']['exist'] || $this->options['discoveryrules']['missed']) {
+			$allItems = $this->formatter->getDiscoveryRules();
+
+			$itemsRefs = array();
+			foreach ($allItems as $host => $items) {
+				$itemsRefs[$host] = zbx_objectValues($items, 'key_');
+			}
+			$this->referencer->addItems($itemsRefs);
+		}
 	}
 
 	private function processGroups() {
 		$groups = $this->formatter->getGroups();
-		$groupNames = zbx_objectValues($groups, 'name');
-		$dbGroups = API::HostGroup()->get(array(
-			'filter' => array('name' => $groupNames),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'editable' => true
-		));
-
-		$sepGroups = zbx_array_diff($groups, $dbGroups, 'name');
-
-		if ($this->options['groups']['missed']) {
-			API::HostGroup()->create($sepGroups['first']);
+		if (empty($groups)) {
+			return;
 		}
 
+		foreach ($groups as $gnum => $group) {
+			if ($this->referencer->resolveGroup($group['name'])) {
+				unset($groups[$gnum]);
+			}
+		}
+
+		if ($groups) {
+			$newGroups = API::HostGroup()->create($groups);
+			foreach ($newGroups['groupids'] as $gnum => $groupid) {
+				$this->referencer->addGroupRef($groups[$gnum]['name'], $groupid);
+			}
+		}
 	}
 
 	private function processTemplates() {
 		$hosts = $this->formatter->getTemplates();
+		if (empty($hosts)) {
+			return;
+		}
 
 		$allGroups = array();
 		foreach ($hosts as $host) {
@@ -85,12 +192,14 @@ class CConfigurationImport {
 			$allGroups += zbx_objectValues($host['groups'], 'name');
 		}
 
+
 		// set host groups ids
 		$allDbGroups = $this->getGroupIds($allGroups);
 		foreach ($hosts as &$host) {
 			foreach ($host['groups'] as $gnum => $group) {
+				unset($host['groups'][$gnum]);
 				if (isset($allDbGroups[$group['name']])) {
-					$host['groups'][$gnum] = $allDbGroups[$group['name']];
+					$host['groups'][$gnum] = array('groupid' => $allDbGroups[$group['name']]['groupid']);
 				}
 			}
 		}
@@ -108,7 +217,7 @@ class CConfigurationImport {
 		$hostsToCreate = $hostsToUpdate = array();
 		foreach ($hosts as $host) {
 			if (isset($dbHosts[$host['host']])) {
-				$host['hostid'] = $dbHosts[$host['host']]['hostid'];
+				$host['templateid'] = $dbHosts[$host['host']]['templateid'];
 				$hostsToUpdate[] = $host;
 			}
 			else {
@@ -120,71 +229,85 @@ class CConfigurationImport {
 		// create/update hosts and create hash host->hostid
 		if ($this->options['templates']['missed'] && $hostsToCreate) {
 			$newHostIds = API::Template()->create($hostsToCreate);
-			foreach ($newHostIds['hostids'] as $hnum => $hostid) {
+			foreach ($newHostIds['templateids'] as $hnum => $hostid) {
 				$this->hostsCache[$hostsToCreate[$hnum]['host']] = $hostid;
 			}
 		}
 		if ($this->options['templates']['exist'] && $hostsToUpdate) {
 			API::Template()->update($hostsToUpdate);
 			foreach ($hostsToUpdate as $host) {
-				$this->hostsCache[$host['host']] = $host['hostid'];
+				$this->hostsCache[$host['host']] = $host['templateid'];
 			}
 		}
 	}
 
 	private function processHosts() {
 		$hosts = $this->formatter->getHosts();
+		if (empty($hosts)) {
+			return;
+		}
 
 		// create interfaces references
 		$hostInterfacesRefsByName = array();
-		$allGroups = array();
-		$allTemplates = array();
 		foreach ($hosts as $host) {
-			// gather all host group names
-			$allGroups += zbx_objectValues($host['groups'], 'name');
-			$allTemplates += zbx_objectValues($host['templates'], 'name');
-
 			$hostInterfacesRefsByName[$host['host']] = array();
 			foreach ($host['interfaces'] as $interface) {
 				$hostInterfacesRefsByName[$host['host']][$interface['interface_ref']] = $interface;
 			}
 		}
 
-		// set host groups ids
-		$allDbGroups = $this->getGroupIds($allGroups);
-		$allDbTemplates = $this->getTemplateIds($allTemplates);
-		foreach ($hosts as &$host) {
-			foreach ($host['groups'] as $gnum => $group) {
-				if (isset($allDbGroups[$group['name']])) {
-					$host['groups'][$gnum] = $allDbGroups[$group['name']];
-				}
-			}
-			foreach ($host['templates'] as $tnum => $template) {
-				if (isset($allDbTemplates[$template['host']])) {
-					$host['templates'][$tnum] = array('templateid' => $allDbTemplates[$template['host']]['templateid']);
-				}
-			}
-		}
-		unset($host);
 
-
-
-		// get hostids for existing hosts
-		$dbHosts = API::Host()->get(array(
-			'filter' => array('host' => zbx_objectValues($hosts, 'host')),
-			'output' => array('hostid', 'host'),
-			'preservekeys' => true,
-			'editable' => true
-		));
-		$dbHosts = zbx_toHash($dbHosts, 'host');
 		$hostsToCreate = $hostsToUpdate = array();
 		foreach ($hosts as $host) {
-			if (isset($dbHosts[$host['host']])) {
-				$host['hostid'] = $dbHosts[$host['host']]['hostid'];
+			foreach ($host['groups'] as $gnum => $group) {
+				if (!$this->referencer->resolveGroup($group['name'])) {
+					throw new Exception(_s('Group "%1$s" does not exist', $group['name']));
+				}
+				$host['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
+			}
+			if (isset($host['templates'])) {
+				foreach ($host['templates'] as $tnum => $template) {
+					if (!$this->referencer->resolveTemplate($template['host'])) {
+						throw new Exception(_s('Template "%1$s" does not exist', $template['host']));
+					}
+					$host['templates'][$tnum] = array('templateid' => $this->referencer->resolveHostOrTemplate($template['host']));
+				}
+			}
+
+			if ($this->referencer->resolveHost($host['host'])) {
+				$host['hostid'] = $this->referencer->resolveHost($host['host']);
+				$this->hostsCache[$host['host']] = $host['hostid'];
 				$hostsToUpdate[] = $host;
 			}
 			else {
 				$hostsToCreate[] = $host;
+			}
+		}
+
+
+		// for exisitng hosts need to set interfaceid for existing interfaces
+		$dbInterfaces = API::HostInterface()->get(array(
+			'hostids' => zbx_objectValues($hostsToUpdate, 'hostid'),
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+		foreach ($dbInterfaces as $dbInterface) {
+			foreach ($hostsToUpdate as $hnum => $host) {
+				if (bccomp($host['hostid'], $dbInterface['hostid']) == 0) {
+					foreach ($host['interfaces'] as $inum => $interface) {
+						if ($dbInterface['ip'] == $interface['ip']
+								&& $dbInterface['dns'] == $interface['dns']
+								&& $dbInterface['useip'] == $interface['useip']
+								&& $dbInterface['port'] == $interface['port']
+								&& $dbInterface['type'] == $interface['type']
+								&& $dbInterface['main'] == $interface['main']) {
+							unset($hostsToUpdate[$hnum]['interfaces'][$inum]);
+						}
+					}
+				}
+				if (empty($hostsToUpdate[$hnum]['interfaces'])) {
+					unset($hostsToUpdate[$hnum]['interfaces']);
+				}
 			}
 		}
 
@@ -194,13 +317,11 @@ class CConfigurationImport {
 			$newHostIds = API::Host()->create($hostsToCreate);
 			foreach ($newHostIds['hostids'] as $hnum => $hostid) {
 				$this->hostsCache[$hostsToCreate[$hnum]['host']] = $hostid;
+				$this->referencer->addHostRef($hostsToCreate[$hnum]['host'], $hostid);
 			}
 		}
 		if ($this->options['hosts']['exist'] && $hostsToUpdate) {
 			API::Host()->update($hostsToUpdate);
-			foreach ($hostsToUpdate as $host) {
-				$this->hostsCache[$host['host']] = $host['hostid'];
-			}
 		}
 
 		// create interface hash interface_ref->interfaceid
@@ -212,7 +333,7 @@ class CConfigurationImport {
 		foreach ($dbInterfaces as $dbInterface) {
 			foreach ($hostInterfacesRefsByName as $hostName => $interfaceRefs) {
 				if (!isset($this->interfacesCache[$this->hostsCache[$hostName]])) {
-					$this->interfacesCache[$this->hostsCache[$hostName]] = array();
+					$this->interfacesCache[$this->referencer->resolveHost($hostName)] = array();
 				}
 
 				foreach ($interfaceRefs as $refName => $interface) {
@@ -222,7 +343,7 @@ class CConfigurationImport {
 							&& $dbInterface['port'] == $interface['port']
 							&& $dbInterface['type'] == $interface['type']
 							&& $dbInterface['main'] == $interface['main']) {
-						$this->interfacesCache[$this->hostsCache[$hostName]][$refName] = $dbInterface['interfaceid'];
+						$this->interfacesCache[$this->referencer->resolveHost($hostName)][$refName] = $dbInterface['interfaceid'];
 					}
 				}
 			}
@@ -231,151 +352,219 @@ class CConfigurationImport {
 
 	private function processApplications() {
 		$allApplciations = $this->formatter->getApplications();
+		if (empty($allApplciations)) {
+			return;
+		}
 
-		$applicationsByHostId = array();
-		// build where clause for finding existing items
-		$sqlWhere = array();
+		$applicationsToCreate = array();
 		foreach ($allApplciations as $host => $applications) {
-			if (isset($this->hostsCache[$host])) {
-				$hostid = $this->hostsCache[$host];
-
-				foreach ($applications as &$application) {
+			$hostid = $this->referencer->resolveHost($host);
+			if (isset($hostid)) {
+				foreach ($applications as $application) {
 					$application['hostid'] = $hostid;
+					$appId = $this->referencer->resolveApplication($hostid, $application['name']);
+					if (!$appId) {
+						$applicationsToCreate[] = $application;
+					}
 				}
-				unset($application);
-
-				// create list of all applications by hostid
-				$applicationsByHostId[$hostid] = $applications;
-
-				$sqlWhere[] = '(hostid='.$hostid.' AND '.DBcondition('name', array_keys($applications)).')';
 			}
 		}
-
-		$applicationsToCreate = $applicationsToUpdate = array();
-		if ($sqlWhere) {
-			$exisistingApplicationsDb = DBselect('SELECT applicationid, hostid, name FROM applications WHERE '.implode(' OR ', $sqlWhere));
-			while ($dbApplication = DBfetch($exisistingApplicationsDb)) {
-				unset($applicationsByHostId[$dbApplication['hostid']][$dbApplication['name']]);
-				$this->applicationsCache[$dbApplication['hostid']][$dbApplication['name']] = $dbApplication['applicationid'];
-			}
-		}
-
-		foreach ($applicationsByHostId as $applications) {
-			foreach ($applications as $application) {
-				$applicationsToCreate[] = $application;
-			}
-		}
-
 
 		// create applications and create hash hostid->name->applicationid
 		$newApplicationsIds = API::Application()->create($applicationsToCreate);
 		foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
 			$application = $applicationsToCreate[$anum];
-
-			if (!isset($applicationsCache[$application['hostid']])) {
-				$this->applicationsCache[$application['hostid']] = array();
-			}
-			$this->applicationsCache[$application['hostid']][$application['name']] = $applicationId;
+			$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
 		}
 	}
 
 	private function processItems() {
 		$allItems = $this->formatter->getItems();
+		if (empty($allItems)) {
+			return;
+		}
 
-		$itemsByHostId = array();
-		// build where clause for finding existing items
-		$sqlWhere = array();
+		$itemsToCreate = array();
+		$itemsToUpdate = array();
 		foreach ($allItems as $host => $items) {
-			if (isset($this->hostsCache[$host])) {
-				$hostid = $this->hostsCache[$host];
-
-				foreach ($items as &$item) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			if ($hostid) {
+				foreach ($items as $item) {
 					$item['hostid'] = $hostid;
-					$applicationsIds = array();
-					foreach ($item['applications'] as $application) {
-						$applicationsIds[] = $this->applicationsCache[$hostid][$application['name']];
+
+					if (!empty($item['applications'])) {
+						$applicationsIds = array();
+						foreach ($item['applications'] as $application) {
+							$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
+						}
+						$item['applications'] = $applicationsIds;
 					}
-					$item['applications'] = $applicationsIds;
-				}
-				unset($item);
 
-				// create list of all items by hostid
-				$itemsByHostId[$hostid] = $items;
-
-				$sqlWhere[] = '(hostid='.$hostid.' AND '.DBcondition('key_', array_keys($items)).')';
-			}
-		}
-
-		$itemsToCreate = $itemsToUpdate = array();
-		if ($sqlWhere) {
-			$exisistingItemsDb = DBselect('SELECT itemid, hostid, key_ FROM items WHERE '.implode(' OR ', $sqlWhere));
-			while ($dbItem = DBfetch($exisistingItemsDb)) {
-				if (isset($itemsByHostId[$dbItem['hostid']][$dbItem['key_']])) {
-					$item = $itemsByHostId[$dbItem['hostid']][$dbItem['key_']];
-					$item['itemid'] = $dbItem['itemid'];
 					if (isset($item['interface_ref'])) {
-						$item['interfaceid'] = $this->interfacesCache[$item['interface_ref']];
+						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
 					}
 
-					$itemsToUpdate[] = $item;
-					unset($itemsByHostId[$dbItem['hostid']][$dbItem['key_']]);
+					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
+					if ($itemsId) {
+						$item['itemid'] = $itemsId;
+						$itemsToUpdate[] = $item;
+					}
+					else {
+						$itemsToCreate[] = $item;
+					}
 				}
 			}
 		}
-
-		foreach ($itemsByHostId as $items) {
-			foreach ($items as $item) {
-				if (isset($item['interface_ref'])) {
-					$item['interfaceid'] = $this->interfacesCache[$item['interface_ref']];
-				}
-				$itemsToCreate[] = $item;
-			}
-		}
-
 
 		// create/update items and create hash hostid->key_->itemid
-		$itemsCache = array();
 		if ($this->options['items']['missed'] && $itemsToCreate) {
 			$newItemsIds = API::Item()->create($itemsToCreate);
 			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
 				$item = $itemsToCreate[$inum];
-
-				if (!isset($itemsCache[$item['hostid']])) {
-					$itemsCache[$item['hostid']] = array();
-				}
-				$itemsCache[$item['hostid']][$item['key_']] = $itemid;
+				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
 			}
 		}
 		if ($this->options['items']['exist'] && $itemsToUpdate) {
 			API::Item()->update($itemsToUpdate);
-			foreach ($itemsToUpdate as $item) {
-				if (!isset($itemsCache[$item['hostid']])) {
-					$itemsCache[$item['hostid']] = array();
-				}
-				$itemsCache[$item['hostid']][$item['key_']] = $item['itemid'];
-			}
 		}
 	}
 
-	private function getGroupIds(array $groupsNames) {
-		$allDbGroups = API::HostGroup()->get(array(
-			'filter' => array('name' => array_unique($groupsNames)),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'editable' => true
-		));
-		return zbx_toHash($allDbGroups, 'name');
+	private function processDiscoveryRules() {
+		$allDiscoveryRules = $this->formatter->getDiscoveryRules();
+		if (empty($allDiscoveryRules)) {
+			return;
+		}
+
+		$itemsToCreate = array();
+		$itemsToUpdate = array();
+		foreach ($allDiscoveryRules as $host => $items) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			if ($hostid) {
+				foreach ($items as $item) {
+					$item['hostid'] = $hostid;
+
+					if (isset($item['interface_ref'])) {
+						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+					}
+
+					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
+					if ($itemsId) {
+						$item['itemid'] = $itemsId;
+						$itemsToUpdate[] = $item;
+					}
+					else {
+						$itemsToCreate[] = $item;
+					}
+				}
+			}
+		}
+
+		// create/update items and create hash hostid->key_->itemid
+		if ($this->options['items']['missed'] && $itemsToCreate) {
+			$newItemsIds = API::DiscoveryRule()->create($itemsToCreate);
+			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
+				$item = $itemsToCreate[$inum];
+				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
+			}
+		}
+		if ($this->options['items']['exist'] && $itemsToUpdate) {
+			API::DiscoveryRule()->update($itemsToUpdate);
+		}
 	}
 
-	private function getTemplateIds(array $templatesNames) {
-		$allDbTemplates = API::Template()->get(array(
-			'filter' => array('host' => array_unique($templatesNames)),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'editable' => true
-		));
-		return zbx_toHash($allDbTemplates, 'host');
+	private function processgraphs() {
+		$allGraphs = $this->formatter->getGraphs();
+		if (empty($allGraphs)) {
+			return;
+		}
+
+		foreach ($allGraphs as $graph) {
+			$graphHosts = array();
+			foreach ($graph['graph_items'] as $gitem) {
+				$gitemhostId = $this->referencer->resolveHost($gitem['item']['host']);
+				$gitem['itemid'] = $this->referencer->resolveItem($gitemhostId, $gitem['item']['key']);
+
+				$graphHosts[$gitemhostId] = $gitemhostId;
+			}
+
+			$sqlWhere[] = '(name='.$graph['name'].' AND '.DBcondition('hostid', $graphHosts).')';
+
+		}
+
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			if ($hostid) {
+				foreach ($items as $item) {
+					$item['hostid'] = $hostid;
+
+					if (!empty($item['applications'])) {
+						$applicationsIds = array();
+						foreach ($item['applications'] as $application) {
+							$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
+						}
+						$item['applications'] = $applicationsIds;
+					}
+
+					if (isset($item['interface_ref'])) {
+						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+					}
+
+					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
+					if ($itemsId) {
+						$item['itemid'] = $itemsId;
+						$itemsToUpdate[] = $item;
+					}
+					else {
+						$itemsToCreate[] = $item;
+					}
+				}
+			}
+
+		$itemsToCreate = array();
+		$itemsToUpdate = array();
+		foreach ($allGraphs as $host => $items) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			if ($hostid) {
+				foreach ($items as $item) {
+					$item['hostid'] = $hostid;
+
+					if (!empty($item['applications'])) {
+						$applicationsIds = array();
+						foreach ($item['applications'] as $application) {
+							$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
+						}
+						$item['applications'] = $applicationsIds;
+					}
+
+					if (isset($item['interface_ref'])) {
+						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+					}
+
+					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
+					if ($itemsId) {
+						$item['itemid'] = $itemsId;
+						$itemsToUpdate[] = $item;
+					}
+					else {
+						$itemsToCreate[] = $item;
+					}
+				}
+			}
+		}
+
+		// create/update items and create hash hostid->key_->itemid
+		if ($this->options['items']['missed'] && $itemsToCreate) {
+			$newItemsIds = API::Item()->create($itemsToCreate);
+			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
+				$item = $itemsToCreate[$inum];
+				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
+			}
+		}
+		if ($this->options['items']['exist'] && $itemsToUpdate) {
+			API::Item()->update($itemsToUpdate);
+		}
 	}
+
+
 
 	private function getReader($ext) {
 		switch ($ext) {

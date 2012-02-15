@@ -14,6 +14,10 @@ class CDiscoveyRuleExportElement extends CExportElement {
 			'port', 'description');
 	}
 
+	protected function referenceFields() {
+		return array('interface_ref');
+	}
+
 	protected function fieldNameMap() {
 		return array(
 			'key_' => 'key',
