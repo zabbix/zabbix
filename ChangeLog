@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+........S. [ZBX-4662] fixed server crash while linking a template with DebugLevel=4 (Sasha)
 ..F....... [ZBX-1335] improved Item filter. (Eduard)
 ..F....... [ZBX-4630] fixed "Trigger overview" screen. (Eduard)
 .......PS. [ZBX-4628] fixed an "invalid number of fields" error when syncing configuration on proxy (Sasha)
