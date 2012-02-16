@@ -93,49 +93,62 @@
 	return true;
 	}
 
-/*
- * Function: copy_template_elements
- *
- * Description:
- *     Copy all elements from template to host
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function copy_template_elements($hostid, $templateid = null, $copy_mode = false){
-		$result = true;
-		copy_template_applications($hostid, $templateid, $copy_mode);
-		copy_template_items($hostid, $templateid, $copy_mode);
-		copy_template_triggers($hostid, $templateid, $copy_mode);
-		// razvilka $copy
-		if($copy_mode){
-			copy_template_graphs($hostid, $templateid, $copy_mode);
+
+	/**
+	 * Copies all of the objects from the templates to the host.
+	 *
+	 * @param $targetHostId
+	 * @param array $templatedIds
+	 * @param bool $copyMode
+	 *
+	 * @return bool
+	 */
+	function copyTemplateElements($targetHostId, array $templatedIds, $copyMode = false) {
+
+		$newTriggerIds = array();
+		foreach ($templatedIds as $templateId) {
+			copy_template_applications($targetHostId, $templateId, $copyMode);
+			copy_template_items($targetHostId, $templateId, $copyMode);
+
+			// copy triggers
+			$newTemplateTriggerIds = copy_template_triggers($targetHostId, $templateId, $copyMode);
+			$newTriggerIds = zbx_array_merge($newTriggerIds, $newTemplateTriggerIds);
+
+			if ($copyMode) {
+				copy_template_graphs($targetHostId, $templateId, $copyMode);
+			}
+			else {
+				$result = CGraph::syncTemplates(array('hostids' => $targetHostId, 'templateids' => $templateId));
+			}
+
+			if (!$result) {
+				return false;
+			}
 		}
-		else{
-			$result = CGraph::syncTemplates(array('hostids' => $hostid, 'templateids' => $templateid));
+
+		// update trigger dependencies
+		foreach ($newTriggerIds as $templateTriggerId => $hostTriggerId) {
+			$templateDependencies = get_trigger_dependencies_by_triggerid($templateTriggerId);
+			$hostDependencies = replace_template_dependencies($templateDependencies, $targetHostId);
+			foreach ($hostDependencies as $depTriggerId) {
+				add_trigger_dependency($hostTriggerId, $depTriggerId);
+			}
 		}
-		return $result;
+
+		return true;
 	}
 
-/*
- * Function: sync_host_with_templates
- *
- * Description:
- *     Synchronize template elements with host
- *
- * Author:
- *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
- *
- * Comments: !!! Don't forget sync code with C !!!
- *
- */
-	function sync_host_with_templates($hostid, $templateid = null){
-		delete_template_elements($hostid, $templateid);
-		$res = copy_template_elements($hostid, $templateid);
-		return $res;
+	/**
+	 * Synchronizes the host with the given templates.
+	 *
+	 * @param $hostid
+	 * @param array $templateIds
+	 *
+	 * @return bool
+	 */
+	function syncHostWithTemplates($hostid, array $templateIds) {
+		delete_template_elements($hostid, $templateIds);
+		return copyTemplateElements($hostid, $templateIds);
 	}
 
 /*
@@ -194,6 +207,9 @@
 
 // delete host from template linkages
 		DBexecute('DELETE FROM hosts_templates WHERE '.DBcondition('hostid',$hostids));
+
+		// delete host macros
+		DBexecute('DELETE FROM hostmacro WHERE '.DBcondition('hostid', $hostids));
 
 // disable actions
 		$actionids = array();
@@ -1276,7 +1292,7 @@ return $result;
 			$sql = 'INSERT INTO applications (applicationid, name, hostid, templateid) '.
 				" VALUES ($applicationid_new, ".zbx_dbstr($name).", $hostid, $templateid)";
 			if($result = DBexecute($sql)){
-				info(S_ADDED_NEW_APPLICATION.SPACE.$host['host'].':'.$name);
+				info(S_ADDED_NEW_APPLICATION.SPACE.'"'.$host['host'].':'.$name.'"');
 			}
 		}
 		else{
@@ -1284,7 +1300,7 @@ return $result;
 			$result = DBexecute('UPDATE applications SET name='.zbx_dbstr($name).', hostid='.$hostid.', templateid='.$templateid.
 				' WHERE applicationid='.$applicationid);
 			if($result)
-				info(S_UPDATED_APPLICATION.SPACE.$host['host'].':'.$old_app['name']);
+				info(S_APPLICATION.SPACE.'"'.$host['host'].':'.$old_app['name'].'"'.SPACE.S_UPDATED_SMALL);
 		}
 
 		if(!$result) return $result;
@@ -1380,12 +1396,12 @@ return $result;
 				' FROM httptest ht '.
 				' WHERE '.DBcondition('ht.applicationid', $applicationids);
 		$res = DBselect($sql);
-		while($info = DBfetch($res)){
-			if($apps[$info['applicationid']]['templateid'] > 0){
+		while ($info = DBfetch($res)) {
+			if ($apps[$info['applicationid']]['templateid'] > 0) {
 				$unlink_apps[$info['applicationid']] = $info['applicationid'];
 				unset($applicationids[$info['applicationid']]);
 			}
-			else{
+			else {
 				error(S_APPLICATION.' ['.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'] '.S_USED_IN_WEB_SCENARIO);
 				return false;
 			}
@@ -1397,8 +1413,8 @@ return $result;
 					' AND i.itemid=ia.itemid '.
 					' AND '.DBcondition('ia.applicationid', $applicationids);
 		$res = DBselect($sql);
-		if($info = DBfetch($res)){
-			error(S_APPLICATION.' ['.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'] '.S_USED_BY_ITEM_SMALL.' ['.item_description($info).']');
+		if ($info = DBfetch($res)) {
+			error(S_APPLICATION.SPACE.'"'.$apps[$info['applicationid']]['host'].':'.$apps[$info['applicationid']]['name'].'"'.SPACE.S_USED_BY_ITEM_SMALL.' ['.item_description($info).']');
 			return false;
 		}
 
@@ -1406,13 +1422,13 @@ return $result;
 		$result &= DBexecute('DELETE FROM items_applications WHERE '.DBcondition('applicationid', $applicationids));
 		$result &= DBexecute('DELETE FROM applications WHERE '.DBcondition('applicationid', $applicationids));
 
-		if($result){
-			foreach($apps as $appid => $app){
-				if(isset($unlink_apps[$appid])){
-					info(S_APPLICATION.' ['.$app['host'].':'.$app['name'].'] '.S_USED_IN_WEB_SCENARIO.' ('.S_UNLINKED_SMALL.')');
+		if ($result) {
+			foreach ($apps as $appid => $app) {
+				if (isset($unlink_apps[$appid])) {
+					info(S_APPLICATION.SPACE.'"'.$app['host'].':'.$app['name'].'"'.SPACE.S_USED_IN_WEB_SCENARIO.' ('.S_UNLINKED_SMALL.')');
 				}
-				else{
-					info(S_APPLICATION.' ['.$app['host'].':'.$app['name'].'] '.S_DELETED_SMALL);
+				else {
+					info(S_APPLICATION.SPACE.'"'.$app['host'].':'.$app['name'].'"'.SPACE.S_DELETED_SMALL);
 				}
 			}
 		}
@@ -1479,23 +1495,29 @@ return $result;
 		zbx_value2array($templateids);
 
 		$db_apps = get_applications_by_hostid($hostid);
-		while($db_app = DBfetch($db_apps)){
-			if($db_app["templateid"] == 0)
+
+		$host = get_host_by_hostid($hostid);
+
+		while ($db_app = DBfetch($db_apps)) {
+			if ($db_app["templateid"] == 0) {
 				continue;
+			}
 
 			// check if application is from right template
-			if(!is_null($templateids)){
-				if($tmp_app_data = get_application_by_applicationid($db_app["templateid"])){
-					if(!uint_in_array($tmp_app_data["hostid"], $templateids)) continue;
+			if (!is_null($templateids)) {
+				if ($tmp_app_data = get_application_by_applicationid($db_app["templateid"])) {
+					if (!uint_in_array($tmp_app_data["hostid"], $templateids)) {
+						continue;
+					}
 				}
 			}
 
-			if($unlink_mode){
-				if(DBexecute("update applications set templateid=0 where applicationid=".$db_app["applicationid"])){
-					info(S_APPLICATION.SPACE."'".$db_app["name"]."'".SPACE.S_UNLINKED_SMALL);
+			if ($unlink_mode) {
+				if (DBexecute("update applications set templateid=0 where applicationid=".$db_app["applicationid"])) {
+					info(S_APPLICATION.SPACE.'"'.$host["host"].':'.$db_app["name"].'"'.SPACE.S_UNLINKED_SMALL);
 				}
 			}
-			else{
+			else {
 				delete_application($db_app["applicationid"]);
 			}
 		}

@@ -72,7 +72,7 @@
 	}
 
 	function validate_sec($str){
-		return (preg_match('/^[ ]*\d+[KMGTsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1);
+		return (preg_match('/^[ ]*\d+[KMGTYZEPsmhdw]{0,1}[ ]*$/', $str, $arr) ? 0 : -1);
 	}
 
 	function validate_secnum($str){
@@ -112,40 +112,34 @@
 	return false;
 	}
 
-/*
- * Validate IP mask. IP/bits
- */
-	function validate_ip_range_mask($ip_range){
+
+	/**
+	 * Validate IP mask. IP/bits.
+	 * bits range for IPv4: 16 - 32
+	 * bits range for IPv6: 112 - 128
+	 *
+	 * @param string $ip_range
+	 *
+	 * @return bool
+	 */
+	function validate_ip_range_mask($ip_range) {
 		$parts = explode('/', $ip_range);
 
-		if( 2 != ($parts_count = count($parts)) )
-			return false;
-
-		if(validate_ipv4($parts[0], $arr)){
-			$ip_parts = explode('.', $parts[0]);
-
-//			if( !ereg('^[0-9]{1,2}$', $parts[1])) return false;
-			if(!preg_match('/^([0-9]{1,2})$/', $parts[1])) return false;
-
-			sscanf($parts[1], "%d", $mask);
-
-			if( $mask > 32 ) return false;
-		}
-		else if( defined('ZBX_HAVE_IPV6') && validate_ipv6($parts[0], $arr) ){
-			$ip_parts = explode(':', $parts[0]);
-
-//			if( !ereg('^[0-9]{1,3}$', $parts[1]) ) return false;
-			if(!preg_match('/^([0-9]{1,3})$/', $parts[1])) return false;
-
-			sscanf($parts[1], "%d", $mask);
-
-			if($mask > 128) return false;
-		}
-		else{
+		if (count($parts) != 2) {
 			return false;
 		}
+		$ip = $parts[0];
+		$bits = $parts[1];
 
-	return true;
+		if (validate_ipv4($ip, $arr)) {
+			return preg_match('/^\d{1,2}$/', $bits) && $bits >= 16 && $bits <= 32;
+		}
+		elseif (defined('ZBX_HAVE_IPV6') && validate_ipv6($ip, $arr)) {
+			return preg_match('/^\d{1,3}$/', $bits) && $bits >= 112 && $bits <= 128;
+		}
+		else {
+			return false;
+		}
 	}
 
 /*
@@ -548,10 +542,12 @@
 		if(is_null($exception) || ($except == true)){
 
 			if(!$validation)	$valid = TRUE;
-			else				$valid = calc_exp($fields,$field,$validation);
+			else			{	$valid = calc_exp($fields,$field,$validation);  }
 
 			if(!$valid){
+
 				if($flags&P_SYS){
+
 					info(S_CRITICAL_ERROR.'.'.SPACE.S_INCORRECT_VALUE_FOR.SPACE.'['.$caption.'] = "'.$_REQUEST[$field].'"');
 					return ZBX_VALID_ERROR;
 				}
@@ -593,7 +589,7 @@
 
 		$err = ZBX_VALID_OK;
 
-		$fields = zbx_array_merge($fields, $system_fields);
+		$fields = zbx_array_merge($system_fields, $fields);
 
 		foreach($fields as $field => $checks){
 			$err |= check_field($fields, $field,$checks);

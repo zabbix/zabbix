@@ -480,6 +480,7 @@
 	'S_CANNNOT_ADD_VALUE_MAP'=>			'Cannot add value map',
 	'S_VALUE_MAP_DELETED'=>				'Value map deleted',
 	'S_CANNNOT_DELETE_VALUE_MAP'=>			'Cannot delete value map',
+	'S_VALUE_MAP_WITH_NAME_EXISTS' => 'Cannot add or updated value map. Map with name "%s" already exists',
 	'S_VALUE_MAP_UPDATED'=>				'Value map updated',
 	'S_VALUE_MAPPING_BIG'=>				'VALUE MAPPING',
 	'S_VALUE_MAPPING'=>				'Value mapping',
@@ -684,7 +685,7 @@
 	'S_PERCENTILE_LINE'=>			'Percentile line',
 	'S_CONFIGURATION_OF_GRAPHS'=>		'Configuration of graphs',
 	'S_CONFIGURATION_OF_GRAPHS_BIG'=>	'CONFIGURATION OF GRAPHS',
-	'S_GRAPH_ADDED'=>			'Graph added',
+	'S_GRAPH_ADDED'=>			'Added new graph',
 	'S_GRAPH_UPDATED'=>			'Graph updated',
 	'S_CANNOT_UPDATE_GRAPH'=>		'Cannot update graph',
 	'S_GRAPH_DELETED'=>			'Graph deleted',
@@ -857,6 +858,7 @@
 	'S_APPLICATION_DELETED'=>					'Application deleted',
 	'S_CANNOT_DELETE_APPLICATION'=>				'Cannot delete application',
 	'S_NO_APPLICATIONS_DEFINED'=>				'No applications defined',
+	'S_APPLICATION_IS_NOT_AVAILABLE_ON' =>		'Application with ID "%1$s" is not available on "%2$s"',
 	'S_NO_TEMPLATES_LINKED'=>					'No templates linked',
 	'S_HOSTS'=>									'Hosts',
 	'S_ITEMS'=>									'Items',
@@ -1910,9 +1912,13 @@
 	'S_TOOLS'=>				'Tools',
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
+	'S_SCRIPT_ERROR_BIG'=>			'Possible reasons: 1. incorrect server IP/DNS in the "zabbix.conf.php"; 2. security environment like SELinux is blocking connection; 3. Zabbix server daemon not running.',
 	'S_DELETE_SELECTED_SCRIPTS_Q'=>		'Delete selected scripts?',
-
-	'S_SCRIPT_ERROR'=>			'SCRIPT ERROR',
+	'S_NOT_RUN' => 'Connection to Zabbix server "%s" refused. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Security environment (for example, SELinux) is blocking the connection; 3. Zabbix server daemon not running; 4. Firewall is blocking TCP connection.',
+	'S_IP_NOT_AVAILABLE' => 'Zabbix server "%s" can not be reached. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect network configuration.',
+	'S_TIME_OUT' => 'Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.',
+	'S_WRONG_DNS' => 'Connection to Zabbix server "%s" faileds. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.',
+	'S_SCRIPT_ERROR'=>			'Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.',
 	'S_SCRIPT_ERROR_DESCRIPTION'=>		'Error Description',
 	'S_SCRIPT_SEND_ERROR'=>			'Can\'t send command, check connection',
 	'S_SCRIPT_READ_ERROR'=>			'Can\'t read script response, check connection',
@@ -2125,7 +2131,6 @@
 
 //	items.inc.php
 	'S_INCORRECT_ARGUMENTS_PASSED_TO_FUNCTION'=>	'Incorrect arguments passed to function',
-	'S_INCORRECT_KEY_FORMAT'=>			'Incorrect key format',
 	'S_ITEM_WILL_NOT_BE_REFRESHED_PLEASE_ENTER_A_CORRECT_UPDATE_INTERVAL'=>	'Item will not be refreshed. Please enter a correct update interval.',
 	'S_INVALID_SNMP_PORT'=>				'Invalid SNMP port',
 	'S_TYPE_INFORMATION_BUST_LOG_FOR_LOG_KEY'=>	'Type of information must be Log for log key',
@@ -2215,7 +2220,7 @@
 	'S_ITEM_KEY_MUST_BE_USED_IN_TRIGGER_EXPRESSION'=>	'An item key must be used in trigger expression',
 	'S_INCORRECT_TRIGGER_EXPRESSION'=>			'Incorrect trigger expression',
 	'S_YOU_CAN_NOT_USE_TEMPLATE_HOSTS_MIXED_EXPR'=>		'You can not use template hosts in mixed expressions.',
-	'S_ADDED_TRIGGER'=>					'Added trigger',
+	'S_ADDED_TRIGGER'=>					'Added new trigger',
 	'S_TO_HOST_SMALL'=>					'to host',
 	'S_MISSING_KEY'=>					'Missing key',
 	'S_INCORRECT_FUNCTION_IS_USED'=>			'Incorrect function is used',
@@ -2252,7 +2257,6 @@
 	'S_MUST_USE_ITEMS_ONLY_FROM_HOST'=>			'You must use items only from host',
 	'S_FOR_TEMPLATE_GRAPH_SMALL'=>				'for template graph',
 	'S_UPDATED_FOR_HOSTS'=>					'updated for hosts',
-	'S_SKIPPED_COPYING_OF_GRAPH'=>				'Skipped copying of graph',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART1'=>			'Graph "',
 	'S_GRAPH_DELETED_FROM_HOSTS_PART2'=>			'" deleted from host',
 
@@ -2475,10 +2479,11 @@
 
 // class.cscreen.php
 	'S_INCORRECT_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'Incorrect resource provided for screen item',
+	'S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM' => 'No resource provided for screen item',
 
 // class.cbuttonqmessage.php
 	'S_ARE_YOU_SURE_YOU_WANT_TO_PERFORM_THIS_ACTION' => 'Are you sure you want perform this action?',
-	'S_INCORRECT_VALUE_FOR_SETMESSAGE' => 'Incorrect value for setMessage(): "%s".',
+	'S_INCORRECT_VALUE_FOR_SETMESSAGE' => 'Incorrect value for setMessage(): "%s%s".',
 
 // class.citemkey.php
 	'S_KEY_CANNOT_BE_EMPTY' => 'Key cannot be empty.',

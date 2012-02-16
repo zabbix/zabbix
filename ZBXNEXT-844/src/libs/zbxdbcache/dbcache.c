@@ -57,6 +57,7 @@ static int		sql_allocated = 65536;
 extern unsigned char	daemon_type;
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
+extern int		CONFIG_NODE_NOHISTORY;
 
 static int		ZBX_HISTORY_SIZE = 0;
 int			ZBX_SYNC_MAX = 1000;	/* must be less than ZBX_HISTORY_SIZE */
@@ -1621,15 +1622,15 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-		value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
+		value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 				"(" ZBX_FS_UI64 ",%d,'%s'),",
 				history[i].itemid,
 				history[i].clock,
 				value_esc);
 #else
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 				"insert into history_str (itemid,clock,value) values "
 				"(" ZBX_FS_UI64 ",%d,'%s');\n",
 				history[i].itemid,
@@ -1668,16 +1669,16 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 			if (0 != history[i].value_null)
 				continue;
 
-			value_esc = DBdyn_escape_string_len(history[i].value_orig.str, HISTORY_STR_VALUE_LEN);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"(%d," ZBX_FS_UI64 ",%d,'%s'),",
 					get_nodeid_by_id(history[i].itemid),
 					history[i].itemid,
 					history[i].clock,
 					value_esc);
 #else
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 					"insert into history_str_sync (nodeid,itemid,clock,value) values "
 					"(%d," ZBX_FS_UI64 ",%d,'%s');\n",
 					get_nodeid_by_id(history[i].itemid),
@@ -1975,13 +1976,13 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 		value_esc = DBdyn_escape_string(history[i].value_orig.str);
 #ifdef HAVE_MULTIROW_INSERT
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 				"(" ZBX_FS_UI64 ",%d,'%s'),",
 				history[i].itemid,
 				history[i].clock,
 				value_esc);
 #else
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512 + strlen(value_esc),
 				"insert into proxy_history (itemid,clock,value) values "
 				"(" ZBX_FS_UI64 ",%d,'%s');\n",
 				history[i].itemid,
@@ -2601,9 +2602,12 @@ retry:
 static void	DCadd_text(char **dst, const char *src, size_t len)
 {
 	*dst = cache->last_text;
-	memcpy(cache->last_text, src, len);
 	cache->last_text += len;
 	cache->text_free -= len;
+
+	len--;	/* '\0' */
+	memcpy(*dst, src, len);
+	(*dst)[len] = '\0';
 }
 
 static void	DCadd_history(zbx_uint64_t itemid, double value_orig, int clock)
@@ -2655,8 +2659,7 @@ static void	DCadd_history_str(zbx_uint64_t itemid, const char *value_orig, int c
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	if (HISTORY_STR_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
-		len = HISTORY_STR_VALUE_LEN_MAX;
+	len = zbx_strlen_utf8_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
 
 	LOCK_CACHE;
 
@@ -2680,8 +2683,7 @@ static void	DCadd_history_text(zbx_uint64_t itemid, const char *value_orig, int 
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	if (HISTORY_TEXT_VALUE_LEN_MAX < (len = strlen(value_orig) + 1))
-		len = HISTORY_TEXT_VALUE_LEN_MAX;
+	len = zbx_strlen_utf8_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
 
 	LOCK_CACHE;
 
@@ -2706,14 +2708,10 @@ static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, int c
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
 
-	if (HISTORY_LOG_VALUE_LEN_MAX < (len1 = strlen(value_orig) + 1))
-		len1 = HISTORY_LOG_VALUE_LEN_MAX;
+	len1 = zbx_strlen_utf8_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
 
 	if (NULL != source && '\0' != *source)
-	{
-		if (HISTORY_LOG_SOURCE_LEN_MAX < (len2 = strlen(source) + 1))
-			len2 = HISTORY_LOG_SOURCE_LEN_MAX;
-	}
+		len2 = zbx_strlen_utf8_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
 	else
 		len2 = 0;
 
@@ -2750,8 +2748,7 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, i
 	ZBX_DC_HISTORY	*history;
 	size_t		len;
 
-	if (ITEM_ERROR_LEN_MAX < (len = strlen(error) + 1))
-		len = ITEM_ERROR_LEN_MAX;
+	len = zbx_strlen_utf8_n(error, ITEM_ERROR_LEN) + 1;
 
 	LOCK_CACHE;
 
@@ -2914,19 +2911,22 @@ void	init_database_cache()
 
 	/* trend cache */
 
-	sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
+	if (0 < CONFIG_TRENDS_CACHE_SIZE)
+	{
+		sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
 
-	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
+		zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
 
-	cache->trends_num = 0;
+		cache->trends_num = 0;
 
 #define	INIT_HASHSET_SIZE	1000 /* should be calculated dynamically based on trends size? */
 
-	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
+		zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
+				ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+				__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
 
 #undef	INIT_HASHSET_SIZE
+	}
 
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_allocated);

@@ -457,33 +457,34 @@ switch($itemType) {
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
-		else{
+		else {
 			DBstart();
+
+			// when cloning an item, replace the old applications with the same applications from the new host
+			if ($_REQUEST['form'] == 'clone') {
+				$applications = get_same_applications_for_host($applications, $item['hostid']);
+			}
 
 			$new_appid = true;
 			$itemid = false;
-			if(!zbx_empty($_REQUEST['new_application'])){
-				if($new_appid = add_application($_REQUEST['new_application'],$_REQUEST['form_hostid']))
+			if (!zbx_empty($_REQUEST['new_application'])) {
+				if ($new_appid = add_application($_REQUEST['new_application'], $_REQUEST['form_hostid'])) {
 					$applications[$new_appid] = $new_appid;
+				}
 			}
 
 			$item['applications'] = $applications;
 
-			if($new_appid){
+			if ($new_appid) {
 				$itemid = add_item($item);
 			}
 
 			$result = DBend($itemid);
 
-/*			$action = AUDIT_ACTION_ADD;*/
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 
-		if($result){
-/*			$host = get_host_by_hostid($_REQUEST['hostid']);
-
-			add_audit($action, AUDIT_RESOURCE_ITEM, S_ITEM.' ['.$_REQUEST['key'].'] ['.$itemid.'] '.S_HOST.' ['.$host['host'].']');*/
-
+		if ($result) {
 			unset($_REQUEST['itemid']);
 			unset($_REQUEST['form']);
 		}
@@ -910,7 +911,6 @@ switch($itemType) {
 		$table->setHeader(array(
 			new CCheckBox('all_items',null,"checkAll('".$form->GetName()."','all_items','group_itemid');"),
 			S_WIZARD,
-			make_sorting_header(S_STATUS,'status'),
 			$show_host?S_HOST:null,
 			make_sorting_header(S_DESCRIPTION,'description'),
 			S_TRIGGERS,
@@ -920,6 +920,7 @@ switch($itemType) {
 			make_sorting_header(S_TRENDS,'trends'),
 			make_sorting_header(S_TYPE,'type'),
 			S_APPLICATIONS,
+			make_sorting_header(S_STATUS,'status'),
 			S_ERROR
 		));
 
@@ -1163,7 +1164,6 @@ switch($itemType) {
 			$table->addRow(array(
 				new CCheckBox('group_itemid['.$item['itemid'].']',null,null,$item['itemid']),
 				$menuicon,
-				$status,
 				$host,
 				$description,
 				$trigger_info,
@@ -1173,6 +1173,7 @@ switch($itemType) {
 				(in_array($item['value_type'], array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT)) ? '' : $item['trends']),
 				item_type2str($item['type']),
 				new CCol($applications, 'wraptext'),
+				$status,
 				$error
 			));
 		}

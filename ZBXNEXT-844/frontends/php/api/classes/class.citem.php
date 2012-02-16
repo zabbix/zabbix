@@ -684,17 +684,9 @@ COpt::memoryPick();
 		try{
 			self::BeginTransaction(__METHOD__);
 
-			$dbHosts = CHost::get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'hostids' => zbx_objectValues($items, 'hostid'),
-				'templated_hosts' => true,
-				'editable' => true,
-				'preservekeys' => true
-			));
+			self::checkInput($items);
 
 			foreach($items as $inum => $item){
-				if(!isset($dbHosts[$item['hostid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
 
 				$result = add_item($item);
 
@@ -741,6 +733,8 @@ COpt::memoryPick();
 					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
 				}
 			}
+
+			self::checkInput($items, $upd_items);
 
 			foreach($items as $inum => $item){
 				$item_db_fields = $upd_items[$item['itemid']];
@@ -842,6 +836,8 @@ COpt::memoryPick();
 				if(!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete item');
 			}
 //--
+			// check if these items are referenced by any graphs
+			self::checkGraphReference($itemids);
 
 			$itemids_condition = DBcondition('itemid', $itemids);
 
@@ -889,6 +885,133 @@ COpt::memoryPick();
 			$error = reset($error);
 			self::setError(__METHOD__, $e->getCode(), $error);
 			return false;
+		}
+	}
+
+
+	/**
+	 * Validates the input parameters.
+	 *
+	 * @static
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $items	    An array of items to validate
+	 * @param array $dbItems	An array of items $dbItems should be matched against
+	 */
+	protected static function checkInput(array $items, array $dbItems = array()) {
+		// fetch hosts
+		if ($dbItems) {
+			$options = array('itemids' => zbx_objectValues($items, 'itemid'));
+		}
+		else {
+			$options = array('hostids' => zbx_objectValues($items, 'hostid'));
+		}
+		$dbHosts = CHost::get(array_merge($options, array(
+			'output' => array('hostid', 'host'),
+			'templated_hosts' => true,
+			'editable' => true,
+			'select_applications' => API_OUTPUT_REFER,
+			'preservekeys' => true
+		)));
+
+		// validate items
+		foreach ($items as $item) {
+			$hostId = $dbItems ? $dbItems[$item['itemid']]['hostid'] : $item['hostid'];
+			$host = $dbHosts[$hostId];
+
+			// check that the host is writable
+			if (!isset($dbHosts[$hostId])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			}
+
+			// check that the given applications belong to the item's host
+			if (isset($item['applications']) && $item['applications']) {
+				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
+				foreach($item['applications'] as $appId) {
+					if (!in_array($appId, $dbApplicationIds)) {
+						$error = sprintf(S_APPLICATION_IS_NOT_AVAILABLE_ON, $appId, $host['host']);
+						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+					}
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Checks whether the given items are referenced by any graphs and tries to
+	 * unset these references, if they are no longer used.
+	 *
+	 * @throws APIException if at least one of the item can't be deleted
+	 *
+	 * @param array $itemIds   An array of item IDs
+	 */
+	protected static function checkGraphReference(array $itemIds) {
+		self::checkUseInGraphAxis($itemIds, true);
+		self::checkUseInGraphAxis($itemIds);
+	}
+
+
+	/**
+	 * Checks if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * if there are graphs, that have an y*_itemid column set, but the
+	 * y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, the y*_itemid
+	 * column will be set to NULL.
+	 *
+	 * If the $checkMax parameter is set to true, the items will be checked against
+	 * max Y values, otherwise, they will be checked against min Y values.
+	 *
+	 * @throws APIException if any of the given items are used as min/max Y values in a graph.
+	 *
+	 * @param array $itemIds   An array of items IDs
+	 * @param type $checkMax
+	 */
+	protected static function checkUseInGraphAxis(array $itemIds, $checkMax = false) {
+		if ($checkMax) {
+			$filter = array(
+				'ymax_itemid' => $itemIds,
+			);
+			$itemIdColumn = 'ymax_itemid';
+			$typeColumn = 'ymax_type';
+		}
+		else {
+			$filter = array(
+				'ymin_itemid' => $itemIds,
+			);
+			$itemIdColumn = 'ymin_itemid';
+			$typeColumn = 'ymin_type';
+		}
+
+		// check if the items are used in Y axis min/max values in any graphs
+		$graphs = CGraph::get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'filter' => $filter
+		));
+
+		$updateGraphs = array();
+		foreach ($graphs as &$graph) {
+			// check if Y type is actually set to GRAPH_YAXIS_TYPE_ITEM_VALUE
+			if ($graph[$typeColumn] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+				if ($checkMax) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Could not delete these items because some of them are used as MAX values for graphs.');
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Could not delete these items because some of them are used as MIN values for graphs.');
+				}
+			}
+			else {
+				$graph[$itemIdColumn] = null;
+				$updateGraphs[] = $graph;
+			}
+		}
+
+		// if there are graphs, that have an y*_itemid column set, but the
+		// y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, set y*_itemid to NULL.
+		// Otherwise we won't be able to delete them.
+		if ($updateGraphs) {
+			CGraph::update($updateGraphs);
 		}
 	}
 }

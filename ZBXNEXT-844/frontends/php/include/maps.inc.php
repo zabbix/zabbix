@@ -346,8 +346,10 @@
 			if(!empty($db_element['url']) || !empty($links_menus)){
 				$menus .= "['".S_LINKS."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
 				$menus .= $links_menus;
-				if(!empty($db_element['url']))
-					$menus .= "['".S_URL."',\"javascript: location.replace('".$db_element['url']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				if (!empty($db_element['url'])) {
+					// double zbx_jsvalue is required to prevent XSS attacks
+					$menus .= "['".S_URL."',\"javascript: location.replace(".zbx_jsvalue(zbx_jsvalue($db_element['url'], null, false)).");\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				}
 			}
 
 			$menus = trim($menus,',');

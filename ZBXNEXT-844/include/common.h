@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"11 November 2011"
-#define	ZABBIX_VERSION		"1.8.9rc1"
+#define	ZABBIX_REVDATE		"28 December 2011"
+#define	ZABBIX_VERSION		"1.8.11rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -860,10 +860,10 @@ int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(char *list, char *ip);
 
-#ifdef HAVE_IPV6
 int	expand_ipv6(const char *ip, char *str, size_t str_len);
+#ifdef HAVE_IPV6
 char	*collapse_ipv6(char *str, size_t str_len);
-#endif /* HAVE_IPV6 */
+#endif
 
 /* time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);
@@ -894,7 +894,8 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
-int	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8(const char *text);
+size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
 
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 char	*zbx_replace_utf8(const char *text);
