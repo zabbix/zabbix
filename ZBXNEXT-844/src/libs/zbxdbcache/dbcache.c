@@ -1403,7 +1403,22 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 /*
  * history
  */
-/* #if !defined(HAVE_CASSANDRA) && defined(HAVE_MULTIROW_INSERT) */
+#ifdef HAVE_CASSANDRA
+	for (i = 0; i < history_num; i++)
+	{
+		if (0 == history[i].keep_history)
+			continue;
+
+		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
+			continue;
+
+		if (0 != history[i].value_null)
+			continue;
+
+		zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, history[i].value.dbl);
+		zbx_cassandra_add_history_value(history[i].itemid, history[i].clock, value);
+	}
+#else	/* HAVE_CASSANDRA */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1421,11 +1436,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-#if defined(HAVE_CASSANDRA)
-		zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, history[i].value.dbl);
-		zbx_cassandra_add_history_value(history[i].itemid, history[i].clock, value);
-#endif
-/* #elif defined(HAVE_MULTIROW_INSERT) */
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_DBL "),",
@@ -1442,7 +1452,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 	}
 
-/* #if !defined(HAVE_CASSANDRA) && defined(HAVE_MULTIROW_INSERT) */
 #ifdef HAVE_MULTIROW_INSERT
 	if (sql[sql_offset - 1] == ',')
 	{
@@ -1452,6 +1461,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	else
 		sql_offset = tmp_offset;
 #endif
+#endif	/* HAVE_CASSANDRA */
 
 	if (CONFIG_NODE_NOHISTORY == 0 && CONFIG_MASTER_NODEID > 0)
 	{
@@ -1504,7 +1514,22 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 /*
  * history_uint
  */
-/* #if !defined(HAVE_CASSANDRA) && defined(HAVE_MULTIROW_INSERT) */
+#ifdef HAVE_CASSANDRA
+	for (i = 0; i < history_num; i++)
+	{
+		if (0 == history[i].keep_history)
+			continue;
+
+		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
+			continue;
+
+		if (0 != history[i].value_null)
+			continue;
+
+		zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, history[i].value.ui64);
+		zbx_cassandra_add_history_value(history[i].itemid, history[i].clock, value);
+	}
+#else	/* HAVE_CASSANDRA */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1522,11 +1547,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != history[i].value_null)
 			continue;
 
-#if defined(HAVE_CASSANDRA)
-		zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, history[i].value.ui64);
-		zbx_cassandra_add_history_value(history[i].itemid, history[i].clock, value);
-#endif
-/* #elif defined(HAVE_MULTIROW_INSERT) */
 #ifdef HAVE_MULTIROW_INSERT
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 				"(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 "),",
@@ -1543,7 +1563,6 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 #endif
 	}
 
-/* #if !defined(HAVE_CASSANDRA) && defined(HAVE_MULTIROW_INSERT) */
 #ifdef HAVE_MULTIROW_INSERT
 	if (sql[sql_offset - 1] == ',')
 	{
@@ -1553,6 +1572,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	else
 		sql_offset = tmp_offset;
 #endif
+#endif	/* HAVE_CASSANDRA */
 
 	if (CONFIG_NODE_NOHISTORY == 0 && CONFIG_MASTER_NODEID > 0)
 	{
