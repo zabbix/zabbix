@@ -29,9 +29,9 @@ $createForm = new CForm('get');
 $createForm->cleanItems();
 if ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
 	$tmp_item = new CSubmit('form', _('Create group'));
-} else {
-	//$createForm->addItem(array(new CSpan(_('Only superadmins can create group')),SPACE));
-	$tmp_item = new CSubmit('form', _('Create group (Only superadmins can create group)'));
+}
+else {
+	$tmp_item = new CSubmit('form', _('Create group').SPACE._('(Only superadmins can create group)'));
 	$tmp_item->setEnabled(false);
 }
 $createForm->addItem($tmp_item);
