@@ -1042,7 +1042,6 @@ class CGraph extends CZBXAPI {
 
 	private function checkInput($graphs, $update=false) {
 		$itemids = array();
-
 		foreach ($graphs as $gnum => $graph) {
 // EXCEPTION: GRAPH FIELDS {{{
 			$fields = array('name' => null);

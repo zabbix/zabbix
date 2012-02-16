@@ -72,9 +72,6 @@ class C20ImportFormatter extends CImportFormatter {
 				unset($host['templates']);
 			}
 			else {
-				foreach ($host['templates'] as $tnum => $template) {
-					$this->renameData($host['templates'][$tnum], array('name' => 'host'));
-				}
 				$host['templates'] = array_values($host['templates']);
 			}
 
@@ -172,15 +169,37 @@ class C20ImportFormatter extends CImportFormatter {
 			$this->renameData($graph, array(
 				'type' => 'graphtype',
 				'ymin_type_1' => 'ymin_type',
-				'ymax_type_1' => 'ymax_type'
+				'ymax_type_1' => 'ymax_type',
+				'graph_items' => 'gitems'
 			));
 
-			$graph['graph_items'] = array_values($graph['graph_items']);
+			$graph['gitems'] = array_values($graph['gitems']);
 
 			$graphsData[] = $graph;
 		}
 
 		return $graphsData;
+	}
+
+	public function getTriggers() {
+		if (!isset($this->data['triggers'])) {
+			return array();
+		}
+
+		$triggersData = array();
+		foreach ($this->data['triggers'] as $trigger) {
+			$this->renameData($trigger, array(
+				'description' => 'comments',
+			));
+			$this->renameData($trigger, array(
+				'name' => 'description',
+				'severity' => 'priority'
+			));
+
+			$triggersData[] = $trigger;
+		}
+
+		return $triggersData;
 	}
 
 }
