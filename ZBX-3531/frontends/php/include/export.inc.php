@@ -294,6 +294,23 @@ class zbxXML{
 	}
 
 
+	protected static function createDOMDocument(){
+		$doc = new DOMDocument('1.0', 'UTF-8');
+		$doc->preserveWhiteSpace = false;
+		$doc->formatOutput = true;
+
+		$root = $doc->appendChild(new DOMElement('zabbix_export'));
+		$root->setAttributeNode(new DOMAttr('version', '1.0'));
+		$root->setAttributeNode(new DOMAttr('date', zbx_date2str(S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT)));
+		$root->setAttributeNode(new DOMAttr('time', zbx_date2str(S_EXPORT_TIME_ATTRIBUTE_DATE_FORMAT)));
+
+		return $root;
+	}
+
+	protected static function outputXML($doc){
+		return $doc->ownerDocument->saveXML();
+	}
+
 	/**
 	 * Converts Simple key from old format to new.
 	 *
@@ -318,6 +335,41 @@ class zbxXML{
 		return $newKey;
 	}
 
+	private static function space2tab($matches){
+		return str_repeat("\t", zbx_strlen($matches[0]) / 2 );
+	}
+
+	public static function arrayToXML($array){
+		$xml = self::createDOMDocument();
+
+		self::arrayToDOM($xml, $array);
+
+		return self::outputXML($xml);
+	}
+
+	public static function arrayToDOM(&$dom, $array, $parentKey=null){
+		if(!is_null($parentKey)){
+			$parentNode = $dom->appendChild(new DOMElement($parentKey));
+		}
+		else{
+			$parentNode = $dom;
+		}
+
+		foreach($array as $key => $value){
+			if(is_numeric($key)) $key = rtrim($parentKey, 's');
+
+			if(is_array($value)){
+				$child = self::arrayToDOM($dom, $value, $key);
+				$parentNode->appendChild($child);
+			}
+			else if(!zbx_empty($value)){
+				$n = $parentNode->appendChild(new DOMElement($key));
+				$n->appendChild(new DOMText($value));
+			}
+		}
+
+		return $parentNode;
+	}
 
 	public static function XMLtoArray($parentNode){
 		$array = array();
@@ -355,6 +407,74 @@ class zbxXML{
 	return $child_node;
 	}
 
+	private static function mapXML2arr($xml, $tag){
+		$array = array();
+
+		foreach(self::$ZBX_EXPORT_MAP[$tag]['attributes'] as $attr => $value){
+			if($value == '') $value = $attr;
+
+			if($xml->getAttribute($value) != ''){
+				$array[$attr] = $xml->getAttribute($value);
+			}
+		}
+
+		// fill empty values with key if empty
+		$map = self::$ZBX_EXPORT_MAP[$tag]['elements'];
+		foreach($map as $db_name => $xml_name){
+			if($xml_name == '')
+				$map[$db_name] = $db_name;
+			else
+				$map[$xml_name] = $db_name;
+		}
+
+		foreach($xml->childNodes as $node){
+			if(isset($map[$node->nodeName]))
+				$array[$map[$node->nodeName]] = $node->nodeValue;
+		}
+
+		return $array;
+	}
+
+	public static function import($file){
+
+		libxml_use_internal_errors(true);
+
+		$xml = new DOMDocument();
+		if(!$xml->load($file)){
+			foreach(libxml_get_errors() as $error){
+				$text = '';
+
+				switch($error->level){
+					case LIBXML_ERR_WARNING:
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Warning '.$error->code.': ';
+						break;
+					case LIBXML_ERR_ERROR:
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Error '.$error->code.': ';
+						break;
+					case LIBXML_ERR_FATAL:
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Fatal Error '.$error->code.': ';
+						break;
+				}
+
+				$text .= trim($error->message) . ' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
+				error($text);
+				break;
+			}
+
+			libxml_clear_errors();
+			return false;
+		}
+
+		if($xml->childNodes->item(0)->nodeName != 'zabbix_export'){
+			$xml2 = self::createDOMDocument();
+			$xml2->appendChild($xml2->ownerDocument->importNode($xml->childNodes->item(0), true));
+			self::$xml = $xml2->ownerDocument;
+		}
+		else
+			self::$xml = $xml;
+
+		return true;
+	}
 
 	private static function validate($schema){
 		libxml_use_internal_errors(true);
@@ -463,7 +583,7 @@ class zbxXML{
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_PLAIN_TEXT:
 								$db_items = API::Item()->getObjects($screenitem['resourceid']);
-//SDII($db_items);
+
 								if(empty($db_items)){
 									$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 									throw new Exception($error);
@@ -1644,14 +1764,12 @@ class zbxXML{
 
 						$trigger_description = $dependency->getAttribute('description');
 						$current_triggerid = get_trigger_by_description($trigger_description);
-// sdi('<b><u>Trigger Description: </u></b>'.$trigger_description.' | <b>Current_triggerid: </b>'. $current_triggerid['triggerid']);
 
 						if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
 							$depends_on_list = $xpath->query('depends', $dependency);
 
 							foreach($depends_on_list as $depends_on){
 								$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
-// sdi('<b>depends on description: </b>'.$depends_on->nodeValue.' | <b>depends_triggerid: </b>'. $depends_triggerid['triggerid']);
 								if($depends_triggerid['triggerid']){
 									$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
 								}

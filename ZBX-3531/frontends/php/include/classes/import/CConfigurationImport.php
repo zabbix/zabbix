@@ -47,7 +47,7 @@ class CConfigurationImport {
 	}
 
 	public function import() {
-		DBstart();
+//		DBstart();
 		$this->formatter->setData($this->data['zabbix_export']);
 
 		$this->gatherReferences();
@@ -74,10 +74,13 @@ class CConfigurationImport {
 		if ($this->options['discoveryrules']['exist'] || $this->options['discoveryrules']['missed']) {
 			$this->processDiscoveryRules();
 		}
+		if ($this->options['triggers']['exist'] || $this->options['triggers']['missed']) {
+			$this->processTriggers();
+		}
 		if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
 			$this->processGraphs();
 		}
-		DBend(false);
+//		DBend(false);
 	}
 
 	protected function gatherReferences() {
@@ -106,12 +109,27 @@ class CConfigurationImport {
 			$groupsRefs = array();
 			$templatesRefs = array();
 			foreach ($hosts as $host) {
-				$hostsRefs[] = $host['host'];
-				$groupsRefs = zbx_objectValues($host['groups'], 'name');
+				$hostsRefs[$host['host']] = $host['host'];
+				$groupsRefs = array_merge($groupsRefs, zbx_objectValues($host['groups'], 'name'));
 				if (isset($host['templates'])) {
-					$templatesRefs = zbx_objectValues($host['templates'], 'name');
+					$templatesRefs = array_merge($templatesRefs, zbx_objectValues($host['templates'], 'name'));
 				}
 			}
+
+
+			$allGraphs = $this->formatter->getGraphs();
+			foreach ($allGraphs as $graph) {
+				if ($graph['ymin_item_1']) {
+					$hostsRefs[$graph['ymin_item_1']['host']] = $graph['ymin_item_1']['host'];
+				}
+				if ($graph['ymax_item_1']) {
+					$hostsRefs[$graph['ymax_item_1']['host']] = $graph['ymax_item_1']['host'];
+				}
+				foreach ($graph['gitems'] as $gitem) {
+					$hostsRefs[$gitem['item']['host']] = $gitem['item']['host'];
+				}
+			}
+
 			$this->referencer->addHosts($hostsRefs);
 			$this->referencer->addTemplates($templatesRefs);
 			$this->referencer->addGroups($groupsRefs);
@@ -157,6 +175,40 @@ class CConfigurationImport {
 				$itemsRefs[$host] = zbx_objectValues($items, 'key_');
 			}
 			$this->referencer->addItems($itemsRefs);
+		}
+
+		if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
+			$allGraphs = $this->formatter->getGraphs();
+
+			$graphsRefs = array();
+			foreach ($allGraphs as $graph) {
+				if ($graph['ymin_item_1']) {
+					$graphsRefs[$graph['ymin_item_1']['host']][] = $graph['ymin_item_1']['key'];
+				}
+				if ($graph['ymax_item_1']) {
+					$graphsRefs[$graph['ymax_item_1']['host']][] = $graph['ymax_item_1']['key'];
+				}
+				foreach ($graph['gitems'] as $gitem) {
+					$graphsRefs[$gitem['item']['host']][] = $gitem['item']['key'];
+				}
+			}
+
+			$this->referencer->addItems($graphsRefs);
+		}
+
+		if ($this->options['triggers']['exist'] || $this->options['triggers']['missed']) {
+			$allTriggers = $this->formatter->getTriggers();
+
+			$triggersRefs = array();
+			foreach ($allTriggers as $trigger) {
+				$triggersRefs[$trigger['description']][] = $trigger['expression'];
+
+				foreach ($trigger['dependencies'] as $dependency) {
+					$triggersRefs[$dependency['name']][] = $dependency['expression'];
+				}
+			}
+
+			$this->referencer->addTriggers($triggersRefs);
 		}
 	}
 
@@ -267,10 +319,10 @@ class CConfigurationImport {
 			}
 			if (isset($host['templates'])) {
 				foreach ($host['templates'] as $tnum => $template) {
-					if (!$this->referencer->resolveTemplate($template['host'])) {
-						throw new Exception(_s('Template "%1$s" does not exist', $template['host']));
+					if (!$this->referencer->resolveTemplate($template['name'])) {
+						throw new Exception(_s('Template "%1$s" does not exist', $template['name']));
 					}
-					$host['templates'][$tnum] = array('templateid' => $this->referencer->resolveHostOrTemplate($template['host']));
+					$host['templates'][$tnum] = array('templateid' => $this->referencer->resolveHostOrTemplate($template['name']));
 				}
 			}
 
@@ -310,7 +362,6 @@ class CConfigurationImport {
 				}
 			}
 		}
-
 
 		// create/update hosts and create hash host->hostid
 		if ($this->options['hosts']['missed'] && $hostsToCreate) {
@@ -472,96 +523,125 @@ class CConfigurationImport {
 		}
 	}
 
-	private function processgraphs() {
+	private function processGraphs() {
 		$allGraphs = $this->formatter->getGraphs();
 		if (empty($allGraphs)) {
 			return;
 		}
 
+		$graphsToCreate = array();
+		$graphsToUpdate = array();
 		foreach ($allGraphs as $graph) {
-			$graphHosts = array();
-			foreach ($graph['graph_items'] as $gitem) {
+			$graphHostIds = array();
+
+			if (!empty($graph['ymin_item_1'])) {
+				$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
+				$graph['ymin_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key']);
+			}
+			if (!empty($graph['ymax_item_1'])) {
+				$hostId = $this->referencer->resolveHostOrTemplate($graph['ymax_item_1']['host']);
+				$graph['ymax_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key']);
+			}
+
+
+			foreach ($graph['gitems'] as &$gitem) {
 				$gitemhostId = $this->referencer->resolveHost($gitem['item']['host']);
+
 				$gitem['itemid'] = $this->referencer->resolveItem($gitemhostId, $gitem['item']['key']);
 
-				$graphHosts[$gitemhostId] = $gitemhostId;
+				$graphHostIds[$gitemhostId] = $gitemhostId;
 			}
+			unset($gitem);
 
-			$sqlWhere[] = '(name='.$graph['name'].' AND '.DBcondition('hostid', $graphHosts).')';
 
-		}
+			// TODO: do this for all graphs at once
+			$sql = 'SELECT g.graphid
+			FROM graphs g, graphs_items gi, items i
+			WHERE g.graphid=gi.graphid
+				AND gi.itemid=i.itemid
+				AND g.name='.zbx_dbstr($graph['name']).'
+				AND '.DBcondition('i.hostid', $graphHostIds);
+			$graphExists = DBfetch(DBselect($sql));
 
-			$hostid = $this->referencer->resolveHostOrTemplate($host);
-			if ($hostid) {
-				foreach ($items as $item) {
-					$item['hostid'] = $hostid;
-
-					if (!empty($item['applications'])) {
-						$applicationsIds = array();
-						foreach ($item['applications'] as $application) {
-							$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
-						}
-						$item['applications'] = $applicationsIds;
-					}
-
-					if (isset($item['interface_ref'])) {
-						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
-					}
-
-					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
-					if ($itemsId) {
-						$item['itemid'] = $itemsId;
-						$itemsToUpdate[] = $item;
-					}
-					else {
-						$itemsToCreate[] = $item;
-					}
+			if ($graphExists) {
+				$dbGraph = API::Graph()->get(array(
+					'graphids' => $graphExists['graphid'],
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => true
+				));
+				if (empty($dbGraph)) {
+					throw new Exception(_s('No permission for Graph "%1$s".', $graph['name']));
 				}
+				$graph['graphid'] = $graphExists['graphid'];
+				$graphsToUpdate[] = $graph;
 			}
-
-		$itemsToCreate = array();
-		$itemsToUpdate = array();
-		foreach ($allGraphs as $host => $items) {
-			$hostid = $this->referencer->resolveHostOrTemplate($host);
-			if ($hostid) {
-				foreach ($items as $item) {
-					$item['hostid'] = $hostid;
-
-					if (!empty($item['applications'])) {
-						$applicationsIds = array();
-						foreach ($item['applications'] as $application) {
-							$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
-						}
-						$item['applications'] = $applicationsIds;
-					}
-
-					if (isset($item['interface_ref'])) {
-						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
-					}
-
-					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
-					if ($itemsId) {
-						$item['itemid'] = $itemsId;
-						$itemsToUpdate[] = $item;
-					}
-					else {
-						$itemsToCreate[] = $item;
-					}
-				}
+			else {
+				$graphsToCreate[] = $graph;
 			}
 		}
 
 		// create/update items and create hash hostid->key_->itemid
-		if ($this->options['items']['missed'] && $itemsToCreate) {
-			$newItemsIds = API::Item()->create($itemsToCreate);
-			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
-				$item = $itemsToCreate[$inum];
-				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
+		if ($this->options['graphs']['missed'] && $graphsToCreate) {
+			API::Graph()->create($graphsToCreate);
+		}
+		if ($this->options['graphs']['exist'] && $graphsToUpdate) {
+			API::Graph()->update($graphsToUpdate);
+		}
+	}
+
+	private function processTriggers() {
+		$allTriggers = $this->formatter->getTriggers();
+		if (empty($allTriggers)) {
+			return;
+		}
+
+		$triggersToCreate = array();
+		$triggersToUpdate = array();
+
+		foreach ($allTriggers as $trigger) {
+			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+			if ($triggerId) {
+				$deps = array();
+				foreach ($trigger['dependencies'] as $dependency) {
+					$deps[] = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+				}
+
+				$trigger['dependencies'] = $deps;
+				$trigger['triggerid'] = $triggerId;
+				$triggersToUpdate[] = $trigger;
+			}
+			else {
+				unset($trigger['dependencies']);
+				$triggersToCreate[] = $trigger;
 			}
 		}
-		if ($this->options['items']['exist'] && $itemsToUpdate) {
-			API::Item()->update($itemsToUpdate);
+
+		// create/update items and create hash hostid->key_->itemid
+		$triggerDependencies = array();
+		if ($this->options['triggers']['missed'] && $triggersToCreate) {
+			$newTriggerIds = API::Trigger()->create($triggersToCreate);
+			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
+				$deps = array();
+				foreach ($triggersToCreate[$tnum]['dependencies'] as $dependency) {
+					$deps[] = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+				}
+
+				$triggerDependencies[] = array(
+					'triggerid' => $triggerId,
+					'dependencies' => $deps
+				);
+			}
 		}
+		if ($this->options['triggers']['exist'] && $triggersToUpdate) {
+
+			API::Trigger()->update($triggersToUpdate);
+		}
+
+		if ($triggerDependencies) {
+			API::Trigger()->update($triggerDependencies);
+		}
+
 	}
 
 
