@@ -52,7 +52,6 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	switch (sig)
 	{
 		case SIGALRM:
-			zabbix_log(LOG_LEVEL_DEBUG, "timeout while answering request");
 			break;
 		case SIGILL:
 		case SIGFPE:
