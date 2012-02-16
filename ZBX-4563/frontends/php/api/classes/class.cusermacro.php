@@ -234,35 +234,7 @@ class CUserMacro extends CZBXAPI {
 
 		// init GLOBALS
 		if (!is_null($options['globalmacro'])) {
-			$sqlPartsGlobal['select'] = array_unique($sqlPartsGlobal['select']);
-			$sqlPartsGlobal['from'] = array_unique($sqlPartsGlobal['from']);
-			$sqlPartsGlobal['where'] = array_unique($sqlPartsGlobal['where']);
-			$sqlPartsGlobal['order'] = array_unique($sqlPartsGlobal['order']);
-
-			$sqlSelect = '';
-			$sqlFrom = '';
-			$sqlWhere = '';
-			$sqlOrder = '';
-			if (!empty($sqlPartsGlobal['select'])) {
-				$sqlSelect .= implode(',', $sqlPartsGlobal['select']);
-			}
-			if (!empty($sqlPartsGlobal['from'])) {
-				$sqlFrom .= implode(',', $sqlPartsGlobal['from']);
-			}
-			if (!empty($sqlPartsGlobal['where'])) {
-				$sqlWhere .= ' AND '.implode(' AND ', $sqlPartsGlobal['where']);
-			}
-			if (!empty($sqlPartsGlobal['order'])) {
-				$sqlOrder .= ' ORDER BY '.implode(',', $sqlPartsGlobal['order']);
-			}
-			$sqlLimit = $sqlPartsGlobal['limit'];
-
-			$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
-					FROM '.$sqlFrom.'
-					WHERE '.DBin_node('gm.globalmacroid', $nodeids).
-						$sqlWhere.
-						$sqlOrder;
-			$res = DBselect($sql, $sqlLimit);
+			$res = DBselect($this->createSelectQueryFromParts($sqlPartsGlobal), $sqlPartsGlobal['limit']);
 			while ($macro = DBfetch($res)) {
 				if ($options['countOutput']) {
 					$result = $macro['rowscount'];
@@ -286,35 +258,7 @@ class CUserMacro extends CZBXAPI {
 		else {
 			$hostids = array();
 
-			$sqlParts['select'] = array_unique($sqlParts['select']);
-			$sqlParts['from'] = array_unique($sqlParts['from']);
-			$sqlParts['where'] = array_unique($sqlParts['where']);
-			$sqlParts['order'] = array_unique($sqlParts['order']);
-
-			$sqlSelect = '';
-			$sqlFrom = '';
-			$sqlWhere = '';
-			$sqlOrder = '';
-			if (!empty($sqlParts['select'])) {
-				$sqlSelect .= implode(',', $sqlParts['select']);
-			}
-			if (!empty($sqlParts['from'])) {
-				$sqlFrom .= implode(',', $sqlParts['from']);
-			}
-			if (!empty($sqlParts['where'])) {
-				$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-			}
-			if (!empty($sqlParts['order'])) {
-				$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-			}
-			$sqlLimit = $sqlParts['limit'];
-
-			$sql = 'SELECT '.$sqlSelect.'
-					FROM '.$sqlFrom.'
-					WHERE '.DBin_node('hm.hostmacroid', $nodeids).
-						$sqlWhere.
-						$sqlOrder;
-			$res = DBselect($sql, $sqlLimit);
+			$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 			while ($macro = DBfetch($res)) {
 				if ($options['countOutput']) {
 					$result = $macro['rowscount'];
