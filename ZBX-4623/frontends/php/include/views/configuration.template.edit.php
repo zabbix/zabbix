@@ -135,11 +135,15 @@
 
 // FORM ITEM : new group text box [  ]
 	global $USER_DETAILS;
+	$newgroupTB = new CTextBox('newgroup', $newgroup);
+	$newgroupTB->setAttribute('maxlength', 64);
 	if ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
-		$newgroupTB = new CTextBox('newgroup', $newgroup);
-		$newgroupTB->setAttribute('maxlength', 64);
-		$templateList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
+		$tmp_label = new CLabel(_('New group'), 'newgroup');
+	} else {
+		$tmp_label = new CLabel(_('New group (Only superadmins can create group)'), 'newgroup');
+		$newgroupTB->setReadonly(true);
 	}
+	$templateList->addRow(array($tmp_label, BR(), $newgroupTB), null, null, null, 'new');
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 	$twb_groupid = get_request('twb_groupid', 0);
