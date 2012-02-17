@@ -47,7 +47,7 @@ class CConfigurationImport {
 	}
 
 	public function import() {
-//		DBstart();
+		DBstart();
 		$this->formatter->setData($this->data['zabbix_export']);
 
 		$this->gatherReferences();
@@ -80,7 +80,7 @@ class CConfigurationImport {
 		if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
 			$this->processGraphs();
 		}
-//		DBend(false);
+		DBend(false);
 	}
 
 	protected function gatherReferences() {
@@ -172,16 +172,21 @@ class CConfigurationImport {
 
 			$itemsRefs = array();
 			$triggersRefs = array();
+			$applicationsRefs = array();
 			foreach ($allDiscoveryRules as $host => $discoveryRules) {
 				$itemsRefs[$host] = zbx_objectValues($discoveryRules, 'key_');
 
 				foreach ($discoveryRules as $discoveryRule) {
+					foreach ($discoveryRule['item_prototypes'] as $itemp) {
+						$applicationsRefs[$host] = zbx_objectValues($itemp['applications'], 'name');
+					}
 					foreach ($discoveryRule['trigger_prototypes'] as $trigerp) {
 						$triggersRefs[$trigerp['name']][] = $trigerp['expression'];
 					}
 				}
 			}
 			$this->referencer->addItems($itemsRefs);
+			$this->referencer->addApplications($applicationsRefs);
 			$this->referencer->addTriggers($triggersRefs);
 		}
 
@@ -496,10 +501,14 @@ class CConfigurationImport {
 
 		$itemsToCreate = array();
 		$itemsToUpdate = array();
-		foreach ($allDiscoveryRules as $host => $items) {
+		$prototypesToUpdate = array();
+		$prototypesToCreate = array();
+		$triggersToCreate = array();
+		$triggersToUpdate = array();
+		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
 			if ($hostid) {
-				foreach ($items as $item) {
+				foreach ($discoveryRules as $item) {
 					$item['hostid'] = $hostid;
 
 					if (isset($item['interface_ref'])) {
@@ -513,6 +522,48 @@ class CConfigurationImport {
 					}
 					else {
 						$itemsToCreate[] = $item;
+					}
+
+					if (($itemsId && $this->options['items']['exist']) || (!$itemsId && $this->options['items']['missed'])) {
+						// prototypes
+						foreach ($item['item_prototypes'] as $prototype) {
+							$prototype['hostid'] = $hostid;
+
+							$applicationsIds = array();
+							foreach ($prototype['applications'] as $application) {
+								$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
+							}
+							$prototype['applications'] = $applicationsIds;
+
+
+							if (isset($prototype['interface_ref'])) {
+								$prototype['interfaceid'] = $this->interfacesCache[$hostid][$prototype['interface_ref']];
+							}
+
+							$prototypeId = $this->referencer->resolveItem($hostid, $prototype['key_']);
+							if ($prototypeId) {
+								$prototype['itemid'] = $prototypeId;
+								$prototypesToUpdate[] = $prototype;
+							}
+							else {
+								$prototypesToCreate[] = $prototype;
+							}
+						}
+
+						// trigger prototypes
+						foreach ($item['trigger_prototypes'] as $trigger) {
+							$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+							if ($triggerId) {
+								$trigger['triggerid'] = $triggerId;
+								$triggersToUpdate[] = $trigger;
+							}
+							else {
+								$triggersToCreate[] = $trigger;
+							}
+						}
+
+						// graph prototypes
 					}
 				}
 			}
@@ -530,51 +581,21 @@ class CConfigurationImport {
 			API::DiscoveryRule()->update($itemsToUpdate);
 		}
 
-
-		$triggersToCreate = array();
-		$triggersToUpdate = array();
-
-
-
-		foreach ($allTriggers as $trigger) {
-			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
-
-			if ($triggerId) {
-				$deps = array();
-				foreach ($trigger['dependencies'] as $dependency) {
-					$deps[] = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
-				}
-
-				$trigger['dependencies'] = $deps;
-				$trigger['triggerid'] = $triggerId;
-				$triggersToUpdate[] = $trigger;
-			}
-			else {
-				unset($trigger['dependencies']);
-				$triggersToCreate[] = $trigger;
-			}
+		if ($prototypesToCreate) {
+			API::ItemPrototype()->create($prototypesToCreate);
+		}
+		if ($prototypesToUpdate) {
+			API::ItemPrototype()->update($prototypesToUpdate);
 		}
 
-		// create/update items and create hash hostid->key_->itemid
-		$triggerDependencies = array();
-		if ($this->options['triggers']['missed'] && $triggersToCreate) {
-			$newTriggerIds = API::Trigger()->create($triggersToCreate);
-			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
-				$deps = array();
-				foreach ($triggersToCreate[$tnum]['dependencies'] as $dependency) {
-					$deps[] = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
-				}
-
-				$triggerDependencies[] = array(
-					'triggerid' => $triggerId,
-					'dependencies' => $deps
-				);
-			}
+		if ($triggersToCreate) {
+			API::TriggerPrototype()->create($triggersToCreate);
 		}
-		if ($this->options['triggers']['exist'] && $triggersToUpdate) {
-
-			API::Trigger()->update($triggersToUpdate);
+		if ($triggersToUpdate) {
+			API::TriggerPrototype()->update($triggersToUpdate);
 		}
+
+
 	}
 
 	private function processGraphs() {
@@ -651,6 +672,7 @@ class CConfigurationImport {
 
 		$triggersToCreate = array();
 		$triggersToUpdate = array();
+		$triggersToCreateDependencies = array();
 		foreach ($allTriggers as $trigger) {
 			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
 
@@ -665,18 +687,18 @@ class CConfigurationImport {
 				$triggersToUpdate[] = $trigger;
 			}
 			else {
+				$triggersToCreateDependencies[] = $trigger['dependencies'];
 				unset($trigger['dependencies']);
 				$triggersToCreate[] = $trigger;
 			}
 		}
 
-		// create/update items and create hash hostid->key_->itemid
 		$triggerDependencies = array();
 		if ($this->options['triggers']['missed'] && $triggersToCreate) {
 			$newTriggerIds = API::Trigger()->create($triggersToCreate);
 			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
 				$deps = array();
-				foreach ($triggersToCreate[$tnum]['dependencies'] as $dependency) {
+				foreach ($triggersToCreateDependencies[$tnum] as $dependency) {
 					$deps[] = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
 				}
 
@@ -687,7 +709,6 @@ class CConfigurationImport {
 			}
 		}
 		if ($this->options['triggers']['exist'] && $triggersToUpdate) {
-
 			API::Trigger()->update($triggersToUpdate);
 		}
 

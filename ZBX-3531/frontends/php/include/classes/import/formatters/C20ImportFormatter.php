@@ -143,6 +143,10 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				foreach ($host['discovery_rules'] as $item) {
 					$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					foreach ($item['item_prototypes'] as &$prototype) {
+						$this->renameData($prototype, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					}
+					unset($prototype);
 					$discoveryRulesData[$host['host']][$item['key_']] = $item;
 				}
 			}
