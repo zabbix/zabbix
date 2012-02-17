@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+...G...... [ZBX-4624] fixed processing of system.cpu.switches metric (Sasha)
 ..F....... [ZBX-4623] fixed host group visibility for non superadmins. (Toms)
 ........S. [ZBX-4662] fixed server crash while linking a template with DebugLevel=4 (Sasha)
 ..F....... [ZBX-1335] improved Item filter. (Eduard)
