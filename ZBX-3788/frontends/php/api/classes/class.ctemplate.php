@@ -1685,15 +1685,23 @@ COpt::memoryPick();
 		}
 
 		foreach($targetids as $targetid){
-			foreach($templateids as $tnum => $templateid){
+			$syncTemplateIds = array();
+			foreach ($templateids as $templateid) {
 				foreach($linked as $lnum => $link){
 					if(isset($link[$targetid]) && ($link[$targetid] == $templateid)){
 						unset($linked[$lnum]);
 						continue 2;
 					}
 				}
-				if(!sync_host_with_templates($targetid, $templateid))
+
+				$syncTemplateIds[] = $templateid;
+			}
+
+			// sync templates
+			if ($syncTemplateIds) {
+				if (!syncHostWithTemplates($targetid, $syncTemplateIds)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_SYNC_TEMPLATE);
+				}
 			}
 		}
 
