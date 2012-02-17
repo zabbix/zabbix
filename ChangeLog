@@ -7,6 +7,8 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-4624] fixed processing of system.cpu.switches metric (Sasha)
+..F....... [ZBX-4623] fixed host group visibility for non superadmins. (Toms)
+........S. [ZBX-4662] fixed server crash while linking a template with DebugLevel=4 (Sasha)
 ..F....... [ZBX-1335] improved Item filter. (Eduard)
 ..F....... [ZBX-4630] fixed "Trigger overview" screen. (Eduard)
 .......PS. [ZBX-4628] fixed an "invalid number of fields" error when syncing configuration on proxy (Sasha)
@@ -444,6 +446,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+...G...PS. [ZBX-3788] signal handlers changed to reduce probability of process hang on exit (Andris)
 .......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
 .......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)
 .......PS. [ZBX-860] more useful SNMP error messages (Sasha)
