@@ -14,7 +14,6 @@ class CHostExportElement extends CExportElement {
 		$this->addInterfaces($host['interfaces']);
 		$this->addItems($host['items']);
 		$this->addDiscoveryRules($host['discoveryRules']);
-		$this->addItemPrototypes($host['itemPrototypes']);
 		$this->addMacros($host['macros']);
 		$this->addTemplates($host['parentTemplates']);
 		$this->addApplications($host['applications']);
@@ -70,19 +69,15 @@ class CHostExportElement extends CExportElement {
 		$discoveryRulesElement = new CExportElement('discovery_rules');
 		foreach ($discoveryRules as $discoveryRule) {
 			$discoveryRule['interface_ref'] = $this->references['refs'][$discoveryRule['interfaceid']];
+
+			foreach ($discoveryRule['itemPrototypes'] as &$prototype) {
+				$prototype['interface_ref'] = $this->references['refs'][$prototype['interfaceid']];
+			}
+			unset($prototype);
+
 			$discoveryRulesElement->addElement(new CDiscoveyRuleExportElement($discoveryRule));
 		}
 		$this->addElement($discoveryRulesElement);
-	}
-
-	protected function addItemPrototypes(array $itemPrototypes) {
-		order_result($itemPrototypes, 'name');
-		$itemPrototypesElement = new CExportElement('item_prototypes');
-		foreach ($itemPrototypes as $itemPrototype) {
-			$itemPrototype['interface_ref'] = $this->references['refs'][$itemPrototype['interfaceid']];
-			$itemPrototypesElement->addElement(new CItemPrototypeExportElement($itemPrototype));
-		}
-		$this->addElement($itemPrototypesElement);
 	}
 
 	protected function addMacros(array $macros) {
