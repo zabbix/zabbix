@@ -32,17 +32,6 @@
 	'S_HOUR_SHORT' =>			_('h'),
 	'S_MINUTE_SHORT' =>			_('m'),
 
-
-//	dicoveryconf.php
-	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
-	'S_DISCOVERY'=>				_('Discovery'),
-	'S_STATUS_OF_DISCOVERY_BIG'=>		_('STATUS OF DISCOVERY'),
-	'S_STATUS_OF_DISCOVERY'=>		_('Status of discovery'),
-
-//	discovery.php
-	'S_UP_TIME'=>				_('Uptime'),
-	'S_DOWN_TIME'=>				_('Downtime'),
-
 //	auditacts.php
 	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
