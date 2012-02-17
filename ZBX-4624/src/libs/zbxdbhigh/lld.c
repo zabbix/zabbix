@@ -2229,7 +2229,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
-		error = zbx_dsprintf(error, "value should be JSON object");
+		error = zbx_strdup(error, "Value should be a JSON object");
 		goto error;
 	}
 
@@ -2237,7 +2237,8 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
  *                     ^-------------------------------------------^
  */	if (SUCCEED != zbx_json_brackets_by_name(&jp, discovery_key, &jp_data))
 	{
-		error = zbx_dsprintf(error, "wrong data in JSON object");
+		error = zbx_dsprintf(error, "Cannot find the \"%s\" key in received JSON object",
+				discovery_key);
 		goto error;
 	}
 
