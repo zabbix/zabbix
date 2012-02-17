@@ -52,7 +52,6 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	switch (sig)
 	{
 		case SIGALRM:
-			zabbix_log(LOG_LEVEL_DEBUG, "timeout while answering request");
 			break;
 		case SIGILL:
 		case SIGFPE:
@@ -112,20 +111,33 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		case SIGQUIT:
 		case SIGINT:
 		case SIGTERM:
-			zabbix_log(parent_pid == CHECKED_FIELD(siginfo, si_pid) ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
-					"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,reason:%d]. Exiting ...",
-					sig, get_signal_name(sig),
-					CHECKED_FIELD(siginfo, si_pid),
-					CHECKED_FIELD(siginfo, si_uid),
-					CHECKED_FIELD(siginfo, si_code));
-
 			if (!PARENT_PROCESS)
-				exit(FAIL);
-
-			if (0 == exiting)
 			{
-				exiting = 1;
-				zbx_on_exit();
+				zabbix_log(parent_pid == CHECKED_FIELD(siginfo, si_pid) ?
+						LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
+						"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
+						"reason:%d]. Exiting ...",
+						sig, get_signal_name(sig),
+						CHECKED_FIELD(siginfo, si_pid),
+						CHECKED_FIELD(siginfo, si_uid),
+						CHECKED_FIELD(siginfo, si_code));
+				exit(FAIL);
+			}
+			else
+			{
+				if (0 == exiting)
+				{
+					exiting = 1;
+					zabbix_log(parent_pid == CHECKED_FIELD(siginfo, si_pid) ?
+							LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
+							"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
+							"reason:%d]. Exiting ...",
+							sig, get_signal_name(sig),
+							CHECKED_FIELD(siginfo, si_pid),
+							CHECKED_FIELD(siginfo, si_uid),
+							CHECKED_FIELD(siginfo, si_code));
+					zbx_on_exit();
+				}
 			}
 
 			break;
@@ -152,9 +164,9 @@ static void	parent_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 			if (0 == exiting)
 			{
+				exiting = 1;
 				zabbix_log(LOG_LEVEL_CRIT, "One child process died (PID:%d,exitcode/signal:%d). Exiting ...",
 						CHECKED_FIELD(siginfo, si_pid), CHECKED_FIELD(siginfo, si_status));
-				exiting = 1;
 				zbx_on_exit();
 			}
 
