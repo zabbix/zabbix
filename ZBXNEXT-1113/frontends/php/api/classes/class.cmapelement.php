@@ -519,7 +519,7 @@ COpt::memoryPick();
 
 			if ($update || $delete) {
 				if (!isset($dbSelements[$selement['selementid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
 				$dbSelement = array_merge($dbSelements[$selement['selementid']], $selement);
@@ -575,7 +575,7 @@ COpt::memoryPick();
 
 			if ($update || $delete) {
 				if (!isset($dbLinks[$link['linkid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 

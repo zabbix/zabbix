@@ -94,7 +94,7 @@ require_once('include/page_header.php');
 	$r_form->addItem(array(S_DISCOVERY_RULE.SPACE, $cmbDRules));
 
 
-	$dscvry_wdgt->addHeader(S_DISCOVERY_RULES_BIG, $r_form);
+	$dscvry_wdgt->addHeader(_('DISCOVERY RULES'), $r_form);
 	$options = array(
 		'selectHosts' => array('hostid', 'name', 'status'),
 		'output' => API_OUTPUT_EXTEND,

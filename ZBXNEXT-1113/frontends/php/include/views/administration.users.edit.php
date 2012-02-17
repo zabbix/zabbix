@@ -195,8 +195,8 @@ if ($this->data['is_profile']) {
 		new CCheckBox('messages[triggers.recovery]', $this->data['messages']['triggers.recovery'], null, 1),
 		_('Recovery'),
 		$soundList,
-		new CButton('start', _('Play'), "javascript: testUserSound('messages[sounds.recovery]');"),
-		new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();')
+		new CButton('start', _('Play'), "javascript: testUserSound('messages[sounds.recovery]');", 'formlist'),
+		new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
 	);
 
 	$triggersTable = new CTable('', 'invisible');
@@ -230,8 +230,8 @@ if ($this->data['is_profile']) {
 			new CCheckBox('messages[triggers.severities]['.$severity.']', isset($this->data['messages']['triggers.severities'][$severity]), null, 1),
 			getSeverityCaption($severity),
 			$soundList,
-			new CButton('start', _('Play'), "javascript: testUserSound('messages[sounds.".$severity."]');"),
-			new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();')
+			new CButton('start', _('Play'), "javascript: testUserSound('messages[sounds.".$severity."]');", 'formlist'),
+			new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
 		));
 
 		zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');

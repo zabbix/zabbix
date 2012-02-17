@@ -188,7 +188,6 @@
 	'S_PROXY_ACTIVE' => _('Active'),
 
 //	Latest values
-	'S_NO_PERMISSIONS'=>			_('No permissions to referred object or it does not exist!'),
 	'S_ALL_S'=>						_('All'),
 	'S_ALL_SMALL'=>					_('all'),
 	'S_GRAPH'=>						_('Graph'),
@@ -347,10 +346,6 @@
 	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			_('Mass update selected items?'),
 	'S_COPY_SELECTED_ITEMS_Q'=>				_('Copy selected items?'),
 	'S_RULE'=>						_('Rule'),
-
-// host_discovery.php
-	'S_CONFIGURATION_OF_DISCOVERY_RULES_BIG' => _('CONFIGURATION OF DISCOVERY RULES'),
-	'S_REGEXP' => _('Regexp'),
 
 // disc_prototypes.php
 	'S_ADD_PROTOTYPE' => _('Add prototype'),
@@ -676,7 +671,6 @@
 
 //	popup.php
 	'S_CAPTION'=>				_('Caption'),
-	'S_DISCOVERY_RULES_BIG'=>	_('DISCOVERY RULES'),
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
