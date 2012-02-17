@@ -60,15 +60,6 @@ class CConfigurationExportBuilder {
 		$this->rootElement->addElement($graphsElement);
 	}
 
-	public function buildGraphPrototypes(array $graphPrototypes) {
-		order_result($graphPrototypes, 'name');
-		$graphPrototypesElement = new CExportElement('graph_prototypes');
-		foreach ($graphPrototypes as $graphPrototype) {
-			$graphPrototypesElement->addElement(new CGraphPrototypeExportElement($graphPrototype));
-		}
-		$this->rootElement->addElement($graphPrototypesElement);
-	}
-
 	public function buildTriggers(array $triggers) {
 		order_result($triggers, 'description');
 		$triggersElement = new CExportElement('triggers');
@@ -76,15 +67,6 @@ class CConfigurationExportBuilder {
 			$triggersElement->addElement(new CTriggerExportElement($trigger));
 		}
 		$this->rootElement->addElement($triggersElement);
-	}
-
-	public function buildTriggerPrototypes(array $triggerPrototypes) {
-		order_result($triggerPrototypes, 'description');
-		$triggerPrototypesElement = new CExportElement('trigger_prototypes');
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			$triggerPrototypesElement->addElement(new CTriggerPrototypeExportElement($triggerPrototype));
-		}
-		$this->rootElement->addElement($triggerPrototypesElement);
 	}
 
 	public function buildScreens(array $screens) {

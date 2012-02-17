@@ -64,14 +64,8 @@ class CConfigurationExport {
 		if ($this->data['triggers']) {
 			$this->builder->buildTriggers($this->data['triggers']);
 		}
-		if ($this->data['triggerPrototypes']) {
-			$this->builder->buildTriggerPrototypes($this->data['triggerPrototypes']);
-		}
 		if ($this->data['graphs']) {
 			$this->builder->buildGraphs($this->data['graphs']);
-		}
-		if ($this->data['graphPrototypes']) {
-			$this->builder->buildGraphPrototypes($this->data['graphPrototypes']);
 		}
 		if ($this->data['screens']) {
 			$this->builder->buildScreens($this->data['screens']);
@@ -241,7 +235,27 @@ class CConfigurationExport {
 		$this->data['groups'] += $hostGroups;
 
 
-		// items
+		// applications
+		$applications = API::Application()->get(array(
+			'hostids' => $this->options['hosts'],
+			'output' => API_OUTPUT_EXTEND,
+			'inherited' => false,
+			'preservekeys' => true
+		));
+		foreach ($applications as $application) {
+			if (!isset($hosts[$application['hostid']]['applications'])) {
+				$hosts[$application['hostid']]['applications'] = array();
+			}
+			$hosts[$application['hostid']]['applications'][] = $application;
+		}
+
+		$this->data['hosts'] = $hosts;
+
+		$this->gatherHostItems();
+		$this->gatherHostDiscoveryRules();
+	}
+
+	private function gatherHostItems() {
 		$items = API::Item()->get(array(
 			'hostids' => $this->options['hosts'],
 			'output' => array('hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
@@ -251,7 +265,7 @@ class CConfigurationExport {
 				'interfaceid', 'port', 'description', 'inventory_link', 'flags'),
 			'selectApplications' => API_OUTPUT_EXTEND,
 			'inherited' => false,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY, ZBX_FLAG_DISCOVERY_CHILD)),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'preservekeys' => true
 		));
 
@@ -264,52 +278,164 @@ class CConfigurationExport {
 		}
 
 		foreach ($items as $item) {
-			if (!isset($hosts[$item['hostid']]['items'])) {
-				$hosts[$item['hostid']]['items'] = array();
-				$hosts[$item['hostid']]['discoveryRules'] = array();
-				$hosts[$item['hostid']]['itemPrototypes'] = array();
+			if (!isset($this->data['hosts'][$item['hostid']]['items'])) {
+				$this->data['hosts'][$item['hostid']]['items'] = array();
 			}
 
 			if ($item['valuemapid']) {
 				$item['valuemapid'] = $valueMaps[$item['valuemapid']];
 			}
 
-			switch ($item['flags']) {
-				case ZBX_FLAG_DISCOVERY_NORMAL:
-					$hosts[$item['hostid']]['items'][] = $item;
-					break;
-
-				case ZBX_FLAG_DISCOVERY:
-					$hosts[$item['hostid']]['discoveryRules'][] = $item;
-					break;
-
-				case ZBX_FLAG_DISCOVERY_CHILD:
-					$hosts[$item['hostid']]['itemPrototypes'][] = $item;
-					break;
-
-				default:
-					throw new LogicException(sprintf('Incorrect item flag "%1$s".', $item['flags']));
-			}
+			$this->data['hosts'][$item['hostid']]['items'][] = $item;
 		}
+	}
 
-
-		// applications
-		$applications = API::Application()->get(array(
+	private function gatherHostDiscoveryRules() {
+		$items = API::DiscoveryRule()->get(array(
 			'hostids' => $this->options['hosts'],
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('itemid', 'hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
+				'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
+				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'valuemapid', 'delay_flex', 'params',
+				'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'inventory_link', 'flags'),
 			'inherited' => false,
 			'preservekeys' => true
 		));
 
-		foreach ($applications as $application) {
-			if (!isset($hosts[$application['hostid']]['applications'])) {
-				$hosts[$application['hostid']]['applications'] = array();
+
+		// gather item prototypes
+		$prototypes = API::ItemPrototype()->get(array(
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
+			'output' => array('hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
+				'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
+				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'valuemapid', 'delay_flex', 'params',
+				'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'inventory_link', 'flags'),
+			'selectApplications' => API_OUTPUT_EXTEND,
+			'inherited' => false,
+			'preservekeys' => true
+		));
+
+		// gather value maps
+		$valueMapIds = zbx_objectValues($prototypes, 'valuemapid');
+		$DbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
+		$valueMaps = array();
+		while ($valueMap = DBfetch($DbValueMaps)) {
+			$valueMaps[$valueMap['valuemapid']] = array('name' => $valueMap['name']);
+		}
+
+		foreach ($prototypes as $prototype) {
+			if (!isset($hosts[$prototype['hostid']]['items'])) {
+				$hosts[$prototype['hostid']]['items'] = array();
+				$hosts[$prototype['hostid']]['discoveryRules'] = array();
+				$hosts[$prototype['hostid']]['itemPrototypes'] = array();
 			}
-			$hosts[$application['hostid']]['applications'][] = $application;
+
+			if ($prototype['valuemapid']) {
+				$prototype['valuemapid'] = $valueMaps[$prototype['valuemapid']];
+			}
+
+			$items[$prototype['parent_itemid']]['itemPrototypes'][] = $prototype;
 		}
 
 
-		$this->data['hosts'] = $hosts;
+
+		// gather graph prototypes
+		$graphs = API::GraphPrototype()->get(array(
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
+			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectGraphItems' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND,
+			'inherited' => false,
+			'preservekeys' => true
+		));
+		// get item axis items info
+		$graphItemIds = array();
+		foreach ($graphs as $graph) {
+			foreach ($graph['gitems'] as $gItem) {
+				$graphItemIds[$gItem['itemid']] = $gItem['itemid'];
+			}
+			if ($graph['ymin_itemid']) {
+				$graphItemIds[$graph['ymin_itemid']] = $graph['ymin_itemid'];
+			}
+			if ($graph['ymax_itemid']) {
+				$graphItemIds[$graph['ymax_itemid']] = $graph['ymax_itemid'];
+			}
+		}
+		$graphItems = API::Item()->get(array(
+			'itemids' => $graphItemIds,
+			'output' => array('key_', 'flags'),
+			'selectHosts' => array('host'),
+			'preservekeys' => true
+		));
+
+		foreach ($graphs as $gnum => $graph) {
+			if ($graph['ymin_itemid']) {
+				$axisItem = $graphItems[$graph['ymin_itemid']];
+				// unset lld dependeent graphs
+				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					unset($graphs[$gnum]);
+					continue;
+				}
+
+				$axisItemHost = reset($axisItem['hosts']);
+				$graph['ymin_itemid'] = array(
+					'host' => $axisItemHost['host'],
+					'key' => $axisItem['key_']
+				);
+			}
+			if ($graph['ymax_itemid']) {
+				$axisItem = $graphItems[$graph['ymax_itemid']];
+				// unset lld dependeent graphs
+				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					unset($graphs[$gnum]);
+					continue;
+				}
+				$axisItemHost = reset($axisItem['hosts']);
+				$graph['ymax_itemid'] = array(
+					'host' => $axisItemHost['host'],
+					'key' => $axisItem['key_']
+				);
+			}
+
+			foreach ($graph['gitems'] as $ginum => $gItem) {
+				$item = $graphItems[$gItem['itemid']];
+
+				if($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					unset($graphs[$gnum]);
+					continue 2;
+				}
+				$itemHost = reset($item['hosts']);
+				$graph['gitems'][$ginum]['itemid'] = array(
+					'host' => $itemHost['host'],
+					'key' => $item['key_']
+				);
+			}
+			$items[$graph['discoveryRule']['itemid']]['graphPrototypes'][] = $graph;
+		}
+
+
+		// gather trigger prortotypes
+		$triggers = API::TriggerPrototype()->get(array(
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
+			'output' => API_OUTPUT_EXTEND,
+			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'inherited' => false,
+			'preservekeys' => true,
+			'expandData' => true
+		));
+
+		foreach($triggers as $trigger){
+			$trigger['expression'] = explode_exp($trigger['expression']);
+			$items[$trigger['discoveryRule']['itemid']]['triggerPrototypes'][] = $trigger;
+		}
+
+		foreach ($items as $item) {
+			if (!isset($this->data['hosts'][$item['hostid']]['items'])) {
+				$this->data['hosts'][$item['hostid']]['discoveryRules'] = array();
+			}
+			$this->data['hosts'][$item['hostid']]['discoveryRules'][] = $item;
+		}
 	}
 
 	private function gatherGraphs() {
@@ -317,7 +443,7 @@ class CConfigurationExport {
 
 		$graphs = API::Graph()->get(array(
 			'hostids' => $hostIds,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND,
@@ -389,18 +515,7 @@ class CConfigurationExport {
 				);
 			}
 
-			switch ($graph['flags']) {
-				case ZBX_FLAG_DISCOVERY_NORMAL:
-					$this->data['graphs'][] = $graph;
-					break;
-
-				case ZBX_FLAG_DISCOVERY_CHILD:
-					$this->data['graphPrototypes'][] = $graph;
-					break;
-
-				default:
-					throw new LogicException(sprintf('Incorrect graph flag "%1$s".', $graph['flags']));
-			}
+			$this->data['graphs'][] = $graph;
 		}
 
 	}
@@ -411,7 +526,7 @@ class CConfigurationExport {
 		$triggers = API::Trigger()->get(array(
 			'hostids' => $hostIds,
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CHILD)),
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'selectDependencies' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true,
@@ -426,18 +541,7 @@ class CConfigurationExport {
 			}
 			unset($dependency);
 
-			switch ($trigger['flags']) {
-				case ZBX_FLAG_DISCOVERY_NORMAL:
-					$this->data['triggers'][] = $trigger;
-					break;
-
-				case ZBX_FLAG_DISCOVERY_CHILD:
-					$this->data['triggerPrototypes'][] = $trigger;
-					break;
-
-				default:
-					throw new LogicException(sprintf('Incorrect trigger flag "%1$s".', $trigger['flags']));
-			}
+			$this->data['triggers'][] = $trigger;
 		}
 	}
 
