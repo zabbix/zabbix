@@ -445,6 +445,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+...G...PS. [ZBX-3788] signal handlers changed to reduce probability of process hang on exit (Andris)
 .......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
 .......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)
 .......PS. [ZBX-860] more useful SNMP error messages (Sasha)
