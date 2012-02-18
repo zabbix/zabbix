@@ -800,6 +800,7 @@ int	DBget_queue_count(int from, int to)
 					" or (h.ipmi_available<>%d and i.type in (%d))"
 					" or (h.jmx_available<>%d and i.type in (%d))"
 					")"
+				" and i.flags not in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
@@ -816,6 +817,7 @@ int	DBget_queue_count(int from, int to)
 				ITEM_TYPE_IPMI,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_JMX,
+			ZBX_FLAG_DISCOVERY_CHILD,
 			DBnode_local("i.itemid"));
 
 	while (NULL != (row = DBfetch(result)))

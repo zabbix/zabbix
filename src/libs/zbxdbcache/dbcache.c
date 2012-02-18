@@ -2581,7 +2581,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 	/* check for low-level discovery (lld) item */
 	if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type) && 0 != (ZBX_FLAG_DISCOVERY & flags))
 	{
-		DBlld_process_discovery_rule(itemid, value->text);
+		DBlld_process_discovery_rule(itemid, value->text, ts);
 		return;
 	}
 
