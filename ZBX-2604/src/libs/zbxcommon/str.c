@@ -2279,9 +2279,9 @@ int	num_key_param(char *param)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
+size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
 {
-	size_t	sz = 1;	/* '\0' */
+	size_t	sz = 0;
 
 	for (; '\0' != *src; src++, sz++)
 	{
@@ -2311,7 +2311,7 @@ char	*zbx_dyn_escape_string(const char *src, const char *charlist)
 	size_t	sz;
 	char	*d, *dst = NULL;
 
-	sz = zbx_get_escape_string_len(src, charlist);
+	sz = zbx_get_escape_string_len(src, charlist) + 1;
 
 	dst = zbx_malloc(dst, sz);
 
@@ -3296,4 +3296,45 @@ void	zbx_strarr_free(char **arr)
 	for (p = arr; NULL != *p; p++)
 		zbx_free(*p);
 	zbx_free(arr);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_replace_string                                               *
+ *                                                                            *
+ * Purpose: replace data block with 'value'                                   *
+ *                                                                            *
+ * Parameters: data  - [IN/OUT] pointer to the string                         *
+ *             l     - [IN] left position of the block                        *
+ *             r     - [IN/OUT] right position of the block                   *
+ *             value - [IN] the string to replace the block with              *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
+{
+	size_t	sz_data, sz_block, sz_value;
+	char	*src, *dst;
+
+	sz_value = strlen(value);
+	sz_block = *r - l + 1;
+
+	if (sz_value != sz_block)
+	{
+		sz_data = *r + strlen(*data + *r);
+		sz_data += sz_value - sz_block;
+
+		if (sz_value > sz_block)
+			*data = realloc(*data, sz_data + 1);
+
+		src = *data + l + sz_block;
+		dst = *data + l + sz_value;
+
+		memmove(dst, src, sz_data - l - sz_value + 1);
+
+		*r = l + sz_value - 1;
+	}
+
+	memcpy(&(*data)[l], value, sz_value);
 }

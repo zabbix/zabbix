@@ -22,10 +22,20 @@
 zbx_add_post_js('chkbxRange.pageGoName = "groups";');
 $hostgroupWidget = new CWidget();
 
+global $USER_DETAILS;
+
 // create new hostgroup button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create group')));
+if ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
+	$tmp_item = new CSubmit('form', _('Create group'));
+}
+else {
+	$tmp_item = new CSubmit('form', _('Create group').SPACE._('(Only superadmins can create group)'));
+	$tmp_item->setEnabled(false);
+}
+$createForm->addItem($tmp_item);
+
 $hostgroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'), $createForm);
 
 // header

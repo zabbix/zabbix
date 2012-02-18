@@ -842,7 +842,6 @@ int	is_ip(const char *ip)
 	return FAIL;
 }
 
-#if defined(HAVE_IPV6)
 /******************************************************************************
  *                                                                            *
  * Function: expand_ipv6                                                      *
@@ -923,6 +922,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 	return SUCCEED;
 }
 
+#if defined(HAVE_IPV6)
 /******************************************************************************
  *                                                                            *
  * Function: collapse_ipv6                                                    *
@@ -2179,6 +2179,33 @@ int	is_key_char(char c)
 int	is_function_char(char c)
 {
 	if (c >= 'a' && c <= 'z')
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_macro_char                                                    *
+ *                                                                            *
+ * Return value:  SUCCEED - the char is allowed in the macro name             *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments: allowed characters in macro names: '0-9A-Z._'                    *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_macro_char(char c)
+{
+	if ('A' <= c && c <= 'Z')
+		return SUCCEED;
+
+	if ('.' == c || '_' == c)
+		return SUCCEED;
+
+	if ('0' <= c && c <= '9')
 		return SUCCEED;
 
 	return FAIL;

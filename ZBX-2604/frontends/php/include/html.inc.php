@@ -88,26 +88,34 @@ function prepare_url(&$var, $varname = null) {
 	return $result;
 }
 
-function url_param($parameter, $request = true, $name = null) {
+function url_param($param, $request = true, $name = null) {
 	$result = '';
-	if (!is_array($parameter)) {
+	if (!is_array($param)) {
 		if (is_null($name)) {
 			if (!$request) {
 				fatal_error('not request variable require url name [url_param]');
 			}
-			$name = $parameter;
+			$name = $param;
 		}
 	}
 
 	if ($request) {
-		$var =& $_REQUEST[$parameter];
+		$var =& $_REQUEST[$param];
 	}
 	else {
-		$var =& $parameter;
+		$var =& $param;
 	}
 
 	if (isset($var)) {
 		$result = prepare_url($var, $name);
+	}
+	return $result;
+}
+
+function url_params($params) {
+	$result = '';
+	foreach ($params as $param) {
+		$result .= url_param($param);
 	}
 	return $result;
 }
@@ -162,19 +170,11 @@ function create_hat($caption, $items, $addicons = null, $id = null, $state = nul
 	return $table;
 }
 
-/* Function:
- *	hide_form_items()
- *
- * Desc:
- *	Searches items/objects for Form tags like "<input"/Form classes like CForm, and makes it empty
- *
- * Author:
- *	Aly
- */
+// searches items/objects for form tags like "<input"/form classes like CForm, and makes it empty
 function hide_form_items(&$obj) {
 	if (is_array($obj)) {
 		foreach ($obj as $id => $item) {
-			hide_form_items($obj[$id]); // Attention recursion;
+			hide_form_items($obj[$id]); // attention recursion
 		}
 	}
 	elseif (is_object($obj)) {
@@ -184,7 +184,7 @@ function hide_form_items(&$obj) {
 		}
 		if (isset($obj->items) && !empty($obj->items)) {
 			foreach ($obj->items as $id => $item) {
-				hide_form_items($obj->items[$id]); // Recursion
+				hide_form_items($obj->items[$id]); // attention recursion
 			}
 		}
 	}
@@ -250,7 +250,7 @@ function get_icon($name, $params = array()) {
 					'rm4favorites("'.$params['elname'].'", "'.$params['elid'].'", 0);'
 				);
 			}
-			else{
+			else {
 				$icon = new CIcon(
 					_('Add to favourites'),
 					'iconplus',
@@ -399,24 +399,27 @@ function get_header_host_table($hostid, $current = null) {
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
-function makeFormFooter($main, $other = array()) {
-	$mainBttns = new CDiv();
-	foreach ($main as $bttn) {
-		$bttn->addClass('main');
-		$bttn->useJQueryStyle();
-		$mainBttns->addItem($bttn);
+function makeFormFooter($main, $others = array()) {
+	if (!is_array($main)) {
+		$main = array($main);
 	}
-	$otherBttns = new CDiv($other);
-	$otherBttns->useJQueryStyle();
+	$mainButtons = new CDiv();
+	foreach ($main as $button) {
+		$button->useJQueryStyle('main');
+		$mainButtons->addItem($button);
+	}
+	$othersButtons = new CDiv($others);
+	$othersButtons->useJQueryStyle();
 
-	if (empty($other)) {
-		$space = new CDiv($mainBttns, 'dt right');
-	}
-	else {
-		$space = new CDiv($mainBttns, 'dt floatleft right');
-	}
-	$buttons = new CDiv(array($otherBttns), 'dd');
-
-	return new CDiv(new CDiv(array($space, $buttons), 'formrow'), 'objectgroup footer min-width ui-widget-content ui-corner-all');
+	return new CDiv(
+		new CDiv(
+			array(
+				empty($others) ? new CDiv($mainButtons, 'dt right') : new CDiv($mainButtons, 'dt floatleft right'),
+				new CDiv(array($othersButtons), 'dd')
+			),
+			'formrow'
+		),
+		'objectgroup footer min-width ui-widget-content ui-corner-all'
+	);
 }
 ?>

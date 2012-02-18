@@ -39,6 +39,7 @@ class CForm extends CTag {
 
 	public function setAction($value) {
 		global $page;
+
 		if (is_null($value)) {
 			$value = isset($page['file']) ? $page['file'] : '#';
 		}

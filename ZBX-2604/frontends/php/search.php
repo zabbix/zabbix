@@ -173,7 +173,7 @@ require_once('include/page_header.php');
 		if (isset($rw_hosts[$hostid])) {
 			$host_link = new CLink($caption, 'hosts.php?form=update&'.$link, $style);
 			$applications_link = array(new CLink(_('Applications'), 'applications.php?'.$link), ' ('.$host['applications'].')');
-			$items_link = array(new CLink(_('Items'), 'items.php?'.$link), ' ('.$host['items'].')');
+			$items_link = array(new CLink(_('Items'), 'items.php?filter_set=1&'.$link), ' ('.$host['items'].')');
 			$triggers_link = array(new CLink(_('Triggers'), 'triggers.php?'.$link), ' ('.$host['triggers'].')');
 			$graphs_link = array(new CLink(_('Graphs'), 'graphs.php?'.$link), ' ('.$host['graphs'].')');
 		}
@@ -362,7 +362,7 @@ require_once('include/page_header.php');
 			if (isset($rw_templates[$templateid])) {
 				$template_link = new CLink($caption, 'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid));
 				$applications_link = array(new CLink(_('Applications'), 'applications.php?'.$link), ' ('.$template['applications'].')');
-				$items_link = array(new CLink(_('Items'), 'items.php?'.$link), ' ('.$template['items'].')');
+				$items_link = array(new CLink(_('Items'), 'items.php?filter_set=1&'.$link), ' ('.$template['items'].')');
 				$triggers_link = array(new CLink(_('Triggers'), 'triggers.php?'.$link), ' ('.$template['triggers'].')');
 				$graphs_link = array(new CLink(_('Graphs'), 'graphs.php?'.$link), ' ('.$template['graphs'].')');
 				$screensLink = array(new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid), ' ('.$template['screens'].')');

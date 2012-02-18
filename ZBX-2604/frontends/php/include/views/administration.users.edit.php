@@ -61,9 +61,9 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 		}
 	}
 	else {
-		$passwdButton = new CSubmit('change_password', _('Change password'));
+		$passwdButton = new CSubmit('change_password', _('Change password'), null, 'formlist');
 		if ($this->data['alias'] == ZBX_GUEST_USER) {
-			$passwdButton->setAttribute('disabled','disabled');
+			$passwdButton->setAttribute('disabled', 'disabled');
 		}
 		$userFormList->addRow(_('Password'), $passwdButton);
 	}
@@ -77,27 +77,25 @@ if (!$this->data['is_profile']) {
 	foreach ($this->data['groups'] as $group) {
 		$lstGroups->addItem($group['usrgrpid'], $group['name']);
 	}
-
 	$userFormList->addRow(_('Groups'),
 		array(
 			$lstGroups,
+			new CButton('add_group', _('Add'), 'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups", 450, 450);', 'formlist'),
 			BR(),
-			new CButton('add_group', _('Add'), 'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups",450, 450);'),
-			SPACE,
-			(count($this->data['user_groups']) > 0) ? new CSubmit('del_user_group', _('Delete selected')) : null
+			count($this->data['user_groups']) > 0 ? new CSubmit('del_user_group', _('Delete selected'), null, 'formlist') : null
 		)
 	);
 }
 
 // append languages to form list
-$LangComboBox = new CComboBox('lang', $this->data['lang']);
+$languageComboBox = new CComboBox('lang', $this->data['lang']);
 $languages_unable_set = 0;
 foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
 	// checking if this locale exists in the system. The only way of doing it is to try and set one
 	// trying to set only the LC_MESSAGES locale to avoid changing LC_NUMERIC
 	$locale_exists = setlocale(LC_MESSAGES, zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
 	$selected = ($loc_id == $USER_DETAILS['lang']) ? true : null;
-	$LangComboBox->addItem($loc_id, $loc_name, $selected, $locale_exists);
+	$languageComboBox->addItem($loc_id, $loc_name, $selected, $locale_exists);
 
 	if ($locale_exists != 'yes') {
 		$languages_unable_set++;
@@ -105,7 +103,7 @@ foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
 }
 setlocale(LC_MESSAGES, zbx_locale_variants($USER_DETAILS['lang'])); // restoring original locale
 $lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
-$userFormList->addRow(_('Language'), array($LangComboBox, new CSpan($lang_hint, 'red wrap')));
+$userFormList->addRow(_('Language'), array($languageComboBox, new CSpan($lang_hint, 'red wrap')));
 
 // append themes to form list
 $themeComboBox = new CComboBox('theme', $this->data['theme']);
@@ -123,10 +121,9 @@ if (!$this->data['autologout']) {
 }
 $userFormList->addRow(_('Auto-login'), new CCheckBox('autologin', $this->data['autologin'], null, 1));
 $userFormList->addRow(_('Auto-logout (min 90 seconds)'), array($autologoutCheckBox, $autologoutTextBox));
-
 $userFormList->addRow(_('Refresh (in seconds)'), new CNumericBox('refresh', $this->data['refresh'], 4));
 $userFormList->addRow(_('Rows per page'), new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6));
-$userFormList->addRow(_('URL (after login)'), new CTextBox('url', $this->data['url'], 50));
+$userFormList->addRow(_('URL (after login)'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
 
 /*
  * Media tab
@@ -160,16 +157,16 @@ if (uint_in_array($USER_DETAILS['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE
 			new CSpan($media['period'], 'nowrap'),
 			media_severity2str($media['severity']),
 			$status,
-			new CButton('edit_media', _('Edit'), 'javascript: return PopUp("popup_media.php'.$mediaUrl.'",550,400);', 'link_menu'))
+			new CButton('edit_media', _('Edit'), 'javascript: return PopUp("popup_media.php'.$mediaUrl.'", 550, 400);', 'link_menu'))
 		);
 	}
 
 	$userMediaFormList->addRow(_('Media'),
 		array($mediaTableInfo,
-			new CButton('add_media', _('Add'), 'javascript: return PopUp("popup_media.php?dstfrm='.$userForm->getName().'",550,400);', 'link_menu'),
+			new CButton('add_media', _('Add'), 'javascript: return PopUp("popup_media.php?dstfrm='.$userForm->getName().'", 550, 400);', 'link_menu'),
 			SPACE,
 			SPACE,
-			(count($this->data['user_medias']) > 0) ? new CSubmit('del_user_media', _('Delete selected'), null, 'link_menu') : null
+			count($this->data['user_medias']) > 0 ? new CSubmit('del_user_media', _('Delete selected'), null, 'link_menu') : null
 	));
 }
 
@@ -181,7 +178,7 @@ if ($this->data['is_profile']) {
 	$userMessagingFormList->addRow(_('Frontend messaging'), new CCheckBox('messages[enabled]', $this->data['messages']['enabled'], null, 1));
 	$userMessagingFormList->addRow(_('Message timeout (seconds)'), new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5), false, 'timeout_row');
 
-	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'], 'javascript: if(IE) submit();');
+	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'], 'javascript: if (IE) { submit(); }');
 	$repeatSound->setAttribute('id', 'messages[sounds.repeat]');
 	$repeatSound->addItem(1, _('Once'));
 	$repeatSound->addItem(10, '10 '._('Seconds'));
@@ -206,14 +203,14 @@ if ($this->data['is_profile']) {
 	$triggersTable->addRow($resolved);
 
 	$msgVisibility = array('1' => array(
-			'messages[timeout]',
-			'messages[sounds.repeat]',
-			'messages[sounds.recovery]',
-			'messages[triggers.recovery]',
-			'timeout_row',
-			'repeat_row',
-			'triggers_row')
-	);
+		'messages[timeout]',
+		'messages[sounds.repeat]',
+		'messages[sounds.recovery]',
+		'messages[triggers.recovery]',
+		'timeout_row',
+		'repeat_row',
+		'triggers_row'
+	));
 
 	// trigger sounds
 	$severities = array(
@@ -229,7 +226,6 @@ if ($this->data['is_profile']) {
 		foreach ($zbxSounds as $filename => $file) {
 			$soundList->addItem($file, $filename);
 		}
-
 		$triggersTable->addRow(array(
 			new CCheckBox('messages[triggers.severities]['.$severity.']', isset($this->data['messages']['triggers.severities'][$severity]), null, 1),
 			getSeverityCaption($severity),
@@ -279,7 +275,8 @@ if ($this->data['is_profile']) {
 					else {
 						jQuery('#messagingTab input, #messagingTab select').attr('disabled', 'disabled');
 						jQuery('#messages_enabled').removeAttr('disabled');
-					}");
+					}"
+	);
 }
 
 // append form lists to tab
@@ -339,6 +336,5 @@ else {
 
 // append form to widget
 $userWidget->addItem($userForm);
-
 return $userWidget;
 ?>

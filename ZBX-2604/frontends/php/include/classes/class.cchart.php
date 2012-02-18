@@ -1783,9 +1783,11 @@ class CChart extends CGraphDraw{
 	}
 
 	protected function limitToBounds(&$value1, &$value2, $min, $max, $drawtype) {
-// Fixes graph out of bounds problem
+		// Fixes graph out of bounds problem
 		if ( (($value1 > ($max+$min)) && ($value2 > ($max+$min))) || (($value1 < $min) && ($value2 < $min)) ) {
-			if ($drawtype != GRAPH_ITEM_DRAWTYPE_FILLED_REGION) return false;
+			if (!in_array($drawtype, array(GRAPH_ITEM_DRAWTYPE_FILLED_REGION, GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE))) {
+				return false;
+			}
 		}
 
 		$y_first = (($value1 > ($max+$min)) || ($value1 < $min));
@@ -1969,6 +1971,8 @@ class CChart extends CGraphDraw{
 				$red = ($avg_color&$bitmask)>>16;
 				// $red_diff = 255 - $red;
 
+				// note: though gradients on the chart looks OK, the formula used is completely incorrect
+				// if you plan to fix something here, it would be better to start from scratch
 				$maxAlpha = 110;
 				$startAlpha = 50;
 				$alphaRatio = $maxAlpha / ($this->sizeY - $startAlpha);
