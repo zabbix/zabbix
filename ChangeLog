@@ -2,6 +2,7 @@
 Changes for 1.9.10
 
 New features:
+....I..PS. [ZBX-2604] added processing of not supported items monitored by a proxy (Sasha)
 ..F....... [ZBXNEXT-903] redesign Configuration->Items (Eduard)
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
