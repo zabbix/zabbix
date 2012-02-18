@@ -1797,7 +1797,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",%d,%d,'%s',%d)%s",
 					history[i].itemid, history[i].clock, history[i].ns,
-					value_esc, history[i].status, row_dl);
+					value_esc, (int)history[i].status, row_dl);
 
 			zbx_free(value_esc);
 		}
@@ -1809,13 +1809,13 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_DBL "',%d)%s",
 							history[i].itemid, history[i].clock, history[i].ns,
-							history[i].value_orig.dbl, history[i].status, row_dl);
+							history[i].value_orig.dbl, (int)history[i].status, row_dl);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_UI64 "',%d)%s",
 							history[i].itemid, history[i].clock, history[i].ns,
-							history[i].value_orig.ui64, history[i].status, row_dl);
+							history[i].value_orig.ui64, (int)history[i].status, row_dl);
 					break;
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
@@ -1824,7 +1824,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 							"(" ZBX_FS_UI64 ",%d,%d,'%s',%d)%s",
 							history[i].itemid, history[i].clock, history[i].ns,
-							value_esc, history[i].status, row_dl);
+							value_esc, (int)history[i].status, row_dl);
 
 					zbx_free(value_esc);
 					break;
@@ -1862,7 +1862,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"(" ZBX_FS_UI64 ",%d,%d,0,'',0,'%s',0,%d)%s",
 					history[i].itemid, history[i].clock, history[i].ns,
-					value_esc, history[i].status, row_dl);
+					value_esc, (int)history[i].status, row_dl);
 
 			zbx_free(value_esc);
 		}
@@ -1875,7 +1875,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 					"(" ZBX_FS_UI64 ",%d,%d,%d,'%s',%d,'%s',%d,%d)%s",
 					history[i].itemid, history[i].clock, history[i].ns,
 					history[i].timestamp, source_esc, history[i].severity,
-					value_esc, history[i].logeventid, history[i].status, row_dl);
+					value_esc, history[i].logeventid, (int)history[i].status, row_dl);
 
 			zbx_free(value_esc);
 			zbx_free(source_esc);
