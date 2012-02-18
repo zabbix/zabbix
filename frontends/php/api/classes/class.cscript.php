@@ -550,7 +550,7 @@ class CScript extends CZBXAPI {
 					$dErrorMsg = _s('Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.', $ZBX_SERVER).SPACE;
 					break;
 				case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
-					$dErrorMsg = _s('Connection to Zabbix server "%s" faileds. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.', $ZBX_SERVER).SPACE;
+					$dErrorMsg = _s('Connection to Zabbix server "%s" failed. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.', $ZBX_SERVER).SPACE;
 					break;
 				default:
 					$dErrorMsg = '';
