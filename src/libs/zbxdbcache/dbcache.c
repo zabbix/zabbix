@@ -1764,6 +1764,14 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 #else
 	const char	*row_dl = ";\n";
 #endif
+	const char	*ins_proxy_history_sql =
+			"insert into proxy_history"
+			" (itemid,clock,ns,value,status)"
+			" values ";
+	const char      *ins_proxy_history_log_sql =
+			"insert into proxy_history"
+			" (itemid,clock,ns,timestamp,source,severity,value,logeventid,status)"
+			" values ";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1771,61 +1779,56 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into proxy_history (itemid,clock,ns,value) values ");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_proxy_history_sql);
 #endif
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 != history[i].value_null)
+		if (ITEM_VALUE_TYPE_LOG == history[i].value_type)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-		switch (history[i].value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-			case ITEM_VALUE_TYPE_UINT64:
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-						"insert into proxy_history (itemid,clock,ns,value) values ");
-				break;
-		}
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_proxy_history_sql);
 #endif
-		switch (history[i].value_type)
+		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
 		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_DBL "')%s",
-						history[i].itemid,
-						history[i].clock,
-						history[i].ns,
-						history[i].value_orig.dbl,
-						row_dl);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_UI64 "')%s",
-						history[i].itemid,
-						history[i].clock,
-						history[i].ns,
-						history[i].value_orig.ui64,
-						row_dl);
-				break;
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-				value_esc = DBdyn_escape_string(history[i].value_orig.str);
+			value_esc = DBdyn_escape_string(history[i].value_orig.err);
 
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'%s')%s",
-						history[i].itemid,
-						history[i].clock,
-						history[i].ns,
-						value_esc,
-						row_dl);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 ",%d,%d,'%s',%d)%s",
+					history[i].itemid, history[i].clock, history[i].ns,
+					value_esc, (int)history[i].status, row_dl);
 
-				zbx_free(value_esc);
-				break;
+			zbx_free(value_esc);
+		}
+		else
+		{
+			switch (history[i].value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_DBL "',%d)%s",
+							history[i].itemid, history[i].clock, history[i].ns,
+							history[i].value_orig.dbl, (int)history[i].status, row_dl);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_UI64 "',%d)%s",
+							history[i].itemid, history[i].clock, history[i].ns,
+							history[i].value_orig.ui64, (int)history[i].status, row_dl);
+					break;
+				case ITEM_VALUE_TYPE_STR:
+				case ITEM_VALUE_TYPE_TEXT:
+					value_esc = DBdyn_escape_string(history[i].value_orig.str);
+
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"(" ZBX_FS_UI64 ",%d,%d,'%s',%d)%s",
+							history[i].itemid, history[i].clock, history[i].ns,
+							value_esc, (int)history[i].status, row_dl);
+
+					zbx_free(value_esc);
+					break;
+			}
 		}
 	}
 
@@ -1841,39 +1844,42 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into proxy_history (itemid,clock,ns,timestamp,source,severity,value,logeventid) values ");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_proxy_history_log_sql);
 #endif
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 != history[i].value_null)
-			continue;
-
 		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into proxy_history (itemid,clock,ns,timestamp,source,severity,value,logeventid) values ");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_proxy_history_log_sql);
 #endif
-		source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
-		value_esc = DBdyn_escape_string(history[i].value_orig.str);
+		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
+		{
+			value_esc = DBdyn_escape_string(history[i].value_orig.err);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 ",%d,%d,%d,'%s',%d,'%s',%d)%s",
-				history[i].itemid,
-				history[i].clock,
-				history[i].ns,
-				history[i].timestamp,
-				source_esc,
-				history[i].severity,
-				value_esc,
-				history[i].logeventid,
-				row_dl);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 ",%d,%d,0,'',0,'%s',0,%d)%s",
+					history[i].itemid, history[i].clock, history[i].ns,
+					value_esc, (int)history[i].status, row_dl);
 
-		zbx_free(value_esc);
-		zbx_free(source_esc);
+			zbx_free(value_esc);
+		}
+		else
+		{
+			source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 ",%d,%d,%d,'%s',%d,'%s',%d,%d)%s",
+					history[i].itemid, history[i].clock, history[i].ns,
+					history[i].timestamp, source_esc, history[i].severity,
+					value_esc, history[i].logeventid, (int)history[i].status, row_dl);
+
+			zbx_free(value_esc);
+			zbx_free(source_esc);
+		}
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
