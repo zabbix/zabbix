@@ -2173,7 +2173,7 @@ static void	DBlld_remove_lost_resources(zbx_uint64_t discovery_itemid, unsigned 
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
+void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "DBlld_process_discovery_rule";
 	DB_RESULT		result;
@@ -2185,9 +2185,15 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 	unsigned short		lifetime;
 	char			*f_macro = NULL, *f_regexp = NULL;
 	ZBX_REGEXP		*regexps = NULL;
-	int			regexps_alloc = 0, regexps_num = 0, now;
+	int			regexps_alloc = 0, regexps_num = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 128, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set lastclock=%d,lastns=%d", ts->sec, ts->ns);
 
 	result = DBselect(
 			"select hostid,key_,status,filter,error,lifetime"
@@ -2273,12 +2279,10 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 				__function_name, f_macro, f_regexp);
 	}
 
-	now = time(NULL);
-
-	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, now);
+	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, ts->sec);
 	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-	DBlld_remove_lost_resources(discovery_itemid, lifetime, now);
+	DBlld_remove_lost_resources(discovery_itemid, lifetime, ts->sec);
 
 	zbx_free(regexps);
 
@@ -2287,17 +2291,21 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
 
-		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64, ITEM_STATUS_ACTIVE, discovery_itemid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ITEM_STATUS_ACTIVE);
 	}
 error:
 	if (NULL != error && 0 != strcmp(error, db_error))
 	{
 		error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
 
-		DBexecute("update items set error='%s' where itemid=" ZBX_FS_UI64, error_esc, discovery_itemid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",error='%s'", error_esc);
 
 		zbx_free(error_esc);
 	}
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, discovery_itemid);
+
+	DBexecute("%s", sql);
 
 	DBcommit();
 clean:
