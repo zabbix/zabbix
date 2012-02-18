@@ -188,9 +188,15 @@ foreach ($all_groups as $group) {
 
 $hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
 
+global $USER_DETAILS;
 $newgroupTB = new CTextBox('newgroup', $newgroup, ZBX_TEXTBOX_SMALL_SIZE);
 $newgroupTB->setAttribute('maxlength', 64);
-$hostList->addRow(array(new CLabel(_('New host group'), 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
+$tmp_label = _('New host group');
+if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
+	$tmp_label .= SPACE._('(Only superadmins can create group)');
+	$newgroupTB->setReadonly(true);
+}
+$hostList->addRow(array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
 
 if (empty($interfaces)) {
 	$script = 'hostInterfacesManager.addNew("agent");';
