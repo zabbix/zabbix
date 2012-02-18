@@ -396,25 +396,25 @@ JS;
 
 			return array(
 				$table, BR(),
-				$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', S_RETRY), BR(),BR()) : null,
+				$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry')), BR(),BR()) : null,
 				!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false) ?
-					array('Please install configuration file manually, or fix permissions on conf directory.',BR(),BR(),
+					array('Please install configuration file manually, or fix permissions on conf directory.', BR(), BR(),
 						'Press "Save configuration file" button, download configuration file ',
 						'and save it as ',BR(),
-						'"'.$ZBX_CONFIGURATION_FILE.'"',BR(),BR(),
-						new CSubmit('save_config',"Save configuration file"),
-						BR(),BR()
-						)
+						'"'.$ZBX_CONFIGURATION_FILE.'"', BR(), BR(),
+						new CSubmit('save_config', 'Save configuration file'),
+						BR(), BR()
+					)
 					: null,
 				'When done, press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Next"').' button'
 			);
 		}
 
-		function stage7(){
+		function stage7() {
 			return array(
-				'Congratulations on successful instalation of Zabbix frontend.',BR(),BR(),
+				'Congratulations on successful instalation of Zabbix frontend.', BR(), BR(),
 				'Press "Finish" button to complete installation'
-				);
+			);
 		}
 
 		function CheckConnection(){

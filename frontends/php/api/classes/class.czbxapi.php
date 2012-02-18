@@ -498,9 +498,19 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function extendQuerySelect($fieldId, array $sqlParts) {
-		list($tableAlias,) = explode('.', $fieldId);
+		list($tableAlias, $field) = explode('.', $fieldId);
 
 		if (!in_array($fieldId, $sqlParts['select']) && !in_array($this->fieldId('*', $tableAlias), $sqlParts['select'])) {
+			// if we want to select all of the columns, other columns from this table can be removed
+			if ($field == '*') {
+				foreach ($sqlParts['select'] as $key => $selectFieldId) {
+					list($selectTableAlias,) = explode('.', $selectFieldId);
+					if ($selectTableAlias == $tableAlias) {
+						unset($sqlParts['select'][$key]);
+					}
+				}
+			}
+
 			$sqlParts['select'][] = $fieldId;
 		}
 

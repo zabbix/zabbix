@@ -87,7 +87,7 @@ else {
 		24 => _('Last 24 hours'),
 		24 * 7 => _('Last 7 days'),
 		24 * 30 => _('Last 30 days'),
-		24 * 365 => _('Last 365 days'),
+		24 * DAY_IN_YEAR => _('Last 365 days')
 	);
 	$period = get_request('period', 7 * 24);
 	$period_end = time();
@@ -108,7 +108,7 @@ else {
 		case 24:
 		case 24 * 7:
 		case 24 * 30:
-		case 24 * 365:
+		case 24 * DAY_IN_YEAR:
 			$period_start = $period_end - ($period * 3600);
 			break;
 	}
@@ -125,7 +125,7 @@ else {
 		'sla' => SPACE,
 		'sla2' => SPACE,
 		'graph' => SPACE,
-		'linkid'=> ''
+		'linkid' => ''
 	);
 	$services[0] = $row;
 

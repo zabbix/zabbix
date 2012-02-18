@@ -117,6 +117,8 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
 ul.formlist li.top-aligned { margin: -1px 0 0 0; padding-top: 0; }
+ul.formlist li.new { background: #EEFFEE; }
+ul.formlist li .floatleft { padding-top: 2px; }
 
 /* any object list inline */
 ul.objectlist { padding: 0; list-style: none; margin: 0;}
@@ -152,10 +154,14 @@ form .thin .input { height: 14px; }
 .input[disabled]:hover { text-decoration: none; border-color: #ACA899; }
 
 input.formlist { padding-top: 2px; padding-bottom: 2px; }
-input[type="button"].formlist { cursor: pointer; vertical-align: top; background: #ffffff; }
+input[type="button"].formlist { margin-bottom: 1px; cursor: pointer; vertical-align: top; background: #ffffff; }
+input[type="submit"].formlist { margin-bottom: 1px; cursor: pointer; }
+input[type="button"].input[disabled].formlist,
+input[type="submit"].input[disabled].formlist { cursor: default; }
+#groups_tweenbox input[type="button"].formlist { margin-top: 1px; }
 
-div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #FFAA33; }
-div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main { border-color: #DD7711; }
+div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #FFAA33; }
+div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input[type="button"].main { border-color: #DD7711; }
 
 .select { cursor: pointer; margin: 1px 2px 1px 1px; }
 .selectShorten { width: 200px; }
@@ -233,7 +239,6 @@ span.footer_sign { padding-right: 5px; padding-left: 5px; }
 span.divider { color: #558; font-weight: normal; }
 
 /* icon mapping */
-
 #iconMapTable .sortable { height: 30px; }
 #iconMapTable .sortable .preview { vertical-align: middle; }
 
