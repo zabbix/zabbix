@@ -415,6 +415,11 @@ typedef enum
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
 
+/* value for not supported items */
+#define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
+/* Zabbix Agent non-critical error */
+#define ZBX_ERROR		"ZBX_ERROR"
+
 /* media types */
 typedef enum
 {
