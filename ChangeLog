@@ -7,6 +7,7 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4677] fixed minor typo in class.cscript.php; thanks to Łukasz Jernaś (Alexei)
 ..F.....S. [ZBX-4261] fixed disovery rules in the queue calculation (Sasha)
 ...G...... [ZBX-4624] fixed processing of system.cpu.switches metric (Sasha)
 ..F....... [ZBX-4623] fixed host group visibility for non superadmins. (Toms)
