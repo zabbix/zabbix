@@ -1387,7 +1387,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			continue;
 		}
 
-		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
+		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
 		{
 			dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
 					ITEM_STATUS_NOTSUPPORTED, values[i].value, 0, NULL, 0, 0, 0, 0);
