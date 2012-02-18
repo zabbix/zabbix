@@ -608,7 +608,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 	if (SUCCEED == DBlld_trigger_exists(hostid, trigger->triggerid, trigger->description,
 			trigger->full_expression, triggers))
 	{
-		*error = zbx_strdcatf(*error, "cannot %s trigger [%s]: trigger already exists\n",
+		*error = zbx_strdcatf(*error, "Cannot %s trigger [%s]: trigger already exists\n",
 				0 != trigger->triggerid ? "update" : "create", trigger->description);
 		res = FAIL;
 		goto out;
@@ -1074,7 +1074,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 	if (SUCCEED == DBlld_item_exists(hostid, item->itemid, item->key, items))
 	{
-		*error = zbx_strdcatf(*error, "cannot %s item [%s]: item already exists\n",
+		*error = zbx_strdcatf(*error, "Cannot %s item [%s]: item already exists\n",
 				0 != item->itemid ? "update" : "create", item->key);
 		res = FAIL;
 		goto out;
@@ -1614,7 +1614,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 
 	if (SUCCEED == DBlld_graph_exists(hostid, graph->graphid, graph->name, graphs))
 	{
-		*error = zbx_strdcatf(*error, "cannot %s graph [%s]: graph already exists\n",
+		*error = zbx_strdcatf(*error, "Cannot %s graph [%s]: graph already exists\n",
 				0 != graph->graphid ? "update" : "create", graph->name);
 		res = FAIL;
 		goto out;
