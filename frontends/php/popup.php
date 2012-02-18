@@ -148,12 +148,12 @@ define('ZBX_PAGE_NO_MENU', 1);
 
 require_once('include/page_header.php');
 
+global $USER_DETAILS;
+if ($min_user_type > $USER_DETAILS['type']) {
+	access_deny();
+}
 if (isset($error)) {
 	invalid_url();
-}
-
-if (defined($page['title'])) {
-	$page['title'] = constant($page['title']);
 }
 ?>
 <?php
@@ -168,7 +168,7 @@ $allowedSrcFields = array(
 	'screens'				=> '"screenid"',
 	'slides'				=> '"slideshowid"',
 	'host_group'			=> '"groupid", "name"',
-	'hosts_and_templates'	=> '"name", "hostid"',
+	'hosts_and_templates'	=> '"name", "hostid", "group"',
 	'help_items'			=> '"key_"',
 	'simple_graph'			=> '"itemid", "name"',
 	'plain_text'			=> '"itemid", "name"',
@@ -184,11 +184,11 @@ $allowedSrcFields = array(
 	'proxies'				=> '"hostid", "host"',
 	'usrgrp'				=> '"usrgrpid", "name"',
 	'templates'				=> '"hostid", "host"',
-	'applications'			=> '"name"',
-	'scripts'				=> '"scriptid", "name"',
+	'applications'			=> '"name", "host"',
+	'scripts'				=> '"scriptid", "name"'
 );
 
-//	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'dstfrm' =>				array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
 	'dstfld1' =>			array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'!isset({multiselect})'),
@@ -198,7 +198,9 @@ $fields = array(
 	'srcfld2'=>				array(T_ZBX_STR, O_OPT,P_SYS,	IN($allowedSrcFields[$_REQUEST['srctbl']]), null),
 	'nodeid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'group' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
+	'host' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'parent_discoveryid' => array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'screenid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'templates' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
@@ -247,6 +249,8 @@ $value_types = get_request('value_types', null);
 $submitParent = get_request('submitParent', 0);
 $normal_only = get_request('normal_only');
 $nodeid = get_request('nodeid', get_current_nodeid(false));
+$group = get_request('group', '');
+$host = get_request('host', '');
 $only_hostid = get_request('only_hostid', null);
 if (isset($only_hostid)) {
 	$_REQUEST['hostid'] = $only_hostid;
@@ -266,17 +270,10 @@ elseif ($templated_hosts) {
 	$host_status = 'templated_hosts';
 }
 
-global $USER_DETAILS;
-if ($min_user_type > $USER_DETAILS['type']) {
-	access_deny();
-}
-
 $url = new CUrl();
 $path = $url->getPath();
 insert_js('cookie.eraseArray(\''.$path.'\')');
 
-?>
-<?php
 function get_window_opener($frame, $field, $value) {
 	if (empty($field)) {
 		return '';
@@ -292,6 +289,20 @@ function get_window_opener($frame, $field, $value) {
 /*
  * Page filter
  */
+if (!empty($group)) {
+	$dbGroup = DBfetch(DBselect('SELECT g.groupid FROM groups g WHERE g.name='.zbx_dbstr($group)));
+	if (!empty($dbGroup) && !empty($dbGroup['groupid'])) {
+		$_REQUEST['groupid'] = $dbGroup['groupid'];
+	}
+	unset($dbGroup);
+}
+if (!empty($host)) {
+	$dbHost = DBfetch(DBselect('SELECT h.hostid FROM hosts h WHERE h.name='.zbx_dbstr($host)));
+	if (!empty($dbHost) && !empty($dbHost['hostid'])) {
+		$_REQUEST['hostid'] = $dbHost['hostid'];
+	}
+	unset($dbHost);
+}
 $options = array(
 	'config' => array('select_latest' => true, 'deny_all' => true),
 	'groups' => array('nodeids' => $nodeid),
@@ -455,9 +466,9 @@ else {
 		}
 	}
 }
-show_table_header($page['title'], $frmTitle);
-?>
-<?php
+
+show_table_header(defined($page['title']) ? constant($page['title']) : $page['title'], $frmTitle);
+
 insert_js_function('addSelectedValues');
 insert_js_function('addValues');
 insert_js_function('addValue');
@@ -773,27 +784,27 @@ elseif ($srctbl == 'usrgrp') {
 	if (!is_null($writeonly)) {
 		$options['editable'] = true;
 	}
-	$usergroups = API::UserGroup()->get($options);
-	order_result($usergroups, 'name');
+	$userGroups = API::UserGroup()->get($options);
+	order_result($userGroups, 'name');
 
-	foreach ($usergroups as $usrgrp) {
-		$name = new CSpan(get_node_name_by_elid($usrgrp['usrgrpid'], null, ': ').$usrgrp['name'], 'link');
-		$name->attr('id', 'spanid'.$usrgrp['usrgrpid']);
+	foreach ($userGroups as $userGroup) {
+		$name = new CSpan(get_node_name_by_elid($userGroup['usrgrpid'], null, ': ').$userGroup['name'], 'link');
+		$name->attr('id', 'spanid'.$userGroup['usrgrpid']);
 
 		if ($multiselect) {
-			$js_action = "javascript: addValue(".zbx_jsvalue($reference).', '.zbx_jsvalue($usrgrp['usrgrpid']).');';
+			$js_action = "javascript: addValue(".zbx_jsvalue($reference).', '.zbx_jsvalue($userGroup['usrgrpid']).');';
 		}
 		else {
 			$values = array(
-				$dstfld1 => $usrgrp[$srcfld1],
-				$dstfld2 => $usrgrp[$srcfld2]
+				$dstfld1 => $userGroup[$srcfld1],
+				$dstfld2 => $userGroup[$srcfld2]
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
 		$name->setAttribute('onclick', $js_action);
 
 		$table->addRow(array(
-			$multiselect ? new CCheckBox('usrgrps['.$usrgrp['usrgrpid'].']', null, null, $usrgrp['usrgrpid']) : null,
+			$multiselect ? new CCheckBox('usrgrps['.$userGroup['usrgrpid'].']', null, null, $userGroup['usrgrpid']) : null,
 			$name,
 		));
 	}
@@ -802,7 +813,7 @@ elseif ($srctbl == 'usrgrp') {
 		$button = new CButton('select', _('Select'), "javascript: addSelectedValues('usrgrps', ".zbx_jsvalue($reference).');');
 		$table->setFooter(new CCol($button, 'right'));
 
-		insert_js('var popupReference = '.zbx_jsvalue($usergroups, true).';');
+		insert_js('var popupReference = '.zbx_jsvalue($userGroups, true).';');
 	}
 	zbx_add_post_js('chkbxRange.pageGoName = "usrgrps";');
 
@@ -1756,17 +1767,17 @@ elseif ($srctbl == 'overview') {
 	if (!is_null($writeonly)) {
 		$options['editable'] = true;
 	}
-	$hostgroups = API::HostGroup()->get($options);
-	order_result($hostgroups, 'name');
+	$hostGroups = API::HostGroup()->get($options);
+	order_result($hostGroups, 'name');
 
-	foreach ($hostgroups as $row) {
-		$row['node_name'] = get_node_name_by_elid($row['groupid']);
-		$name = new CSpan($row['name'], 'link');
+	foreach ($hostGroups as $hostGroup) {
+		$hostGroup['node_name'] = get_node_name_by_elid($hostGroup['groupid']);
+		$name = new CSpan($hostGroup['name'], 'link');
 
-		$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
-		$row['name'] = $row['node_name'].$row['name'];
+		$hostGroup['node_name'] = isset($hostGroup['node_name']) ? '('.$$hostGroup['node_name'].') ' : '';
+		$hostGroup['name'] = $hostGroup['node_name'].$hostGroup['name'];
 
-		$action = get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '');
+		$action = get_window_opener($dstfrm, $dstfld1, $hostGroup[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $hostGroup[$srcfld2]) : '');
 		$name->setAttribute('onclick', $action.' close_window(); return false;');
 		$table->addRow($name);
 	}
@@ -1786,26 +1797,26 @@ elseif ($srctbl == 'host_group_scr') {
 	if (!is_null($writeonly)) {
 		$options['editable'] = true;
 	}
-	$hostgroups = API::HostGroup()->get($options);
-	order_result($hostgroups, 'name');
+	$hostGroups = API::HostGroup()->get($options);
+	order_result($hostGroups, 'name');
 
 	$all = false;
-	foreach ($hostgroups as $row) {
-		$row['node_name'] = get_node_name_by_elid($row['groupid']);
+	foreach ($hostGroups as $hostGroup) {
+		$hostGroup['node_name'] = get_node_name_by_elid($hostGroup['groupid']);
 
 		if (!$all) {
-			$action = get_window_opener($dstfrm, $dstfld1, create_id_by_nodeid(0, $nodeid)).get_window_opener($dstfrm, $dstfld2, $row['node_name']._('- all groups -'));
+			$action = get_window_opener($dstfrm, $dstfld1, create_id_by_nodeid(0, $nodeid)).get_window_opener($dstfrm, $dstfld2, $hostGroup['node_name']._('- all groups -'));
 			$name = new CLink(bold(_('- all groups -')), '#');
 			$name->setAttribute('onclick', $action.' close_window(); return false;');
 			$table->addRow($name);
 			$all = true;
 		}
-		$name = new CLink($row['name'], '#');
-		$row['name'] = $row['node_name'].$row['name'];
+		$name = new CLink($hostGroup['name'], '#');
+		$hostGroup['name'] = $hostGroup['node_name'].$hostGroup['name'];
 
 		$name->setAttribute('onclick',
-			get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-			get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+			get_window_opener($dstfrm, $dstfld1, $hostGroup[$srcfld1]).
+			get_window_opener($dstfrm, $dstfld2, $hostGroup[$srcfld2]).
 			' return close_window();'
 		);
 		$table->addRow($name);

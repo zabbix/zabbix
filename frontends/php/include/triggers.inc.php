@@ -1417,16 +1417,13 @@ function delete_function_by_triggerid($triggerids) {
 	return DBexecute('DELETE FROM functions WHERE '.DBcondition('triggerid', $triggerids));
 }
 
-// retrieve table with overview of triggers
 function get_triggers_overview($hostids, $view_style = null, $params = array()) {
 	if (is_null($view_style)) {
 		$view_style = CProfile::get('web.overview.view.style', STYLE_TOP);
 	}
 
-	$table = new CTableInfo(_('No triggers defined.'));
-	$triggers = array();
-
-	$db_triggers = API::Trigger()->get(array(
+	// get triggers
+	$dbTriggers = API::Trigger()->get(array(
 		'hostids' => $hostids,
 		'monitored' => true,
 		'skipDependent' => true,
@@ -1435,9 +1432,9 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		'sortfield' => 'description'
 	));
 
-	// fetch data for the host JS menu
+	// get hosts
 	$hostids = array();
-	foreach($db_triggers as $trigger) {
+	foreach ($dbTriggers as $trigger) {
 		$hostids[] = $trigger['hosts'][0]['hostid'];
 	}
 	$hosts = API::Host()->get(array(
@@ -1453,98 +1450,97 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 		$hosts[$hostid]['scripts'] = $scripts;
 	}
 
+	$triggers = array();
 	$hostNames = array();
-	foreach ($db_triggers as $row) {
-		// fill host details from first selected host to make old code untouched
-		$row['host'] = $row['hosts'][0]['name'];
-		$row['hostid'] = $row['hosts'][0]['hostid'];
-		$row['host'] = get_node_name_by_elid($row['hostid'], null, ': ').$row['host'];
-		$row['description'] = expand_trigger_description_constants($row['description'], $row);
+	foreach ($dbTriggers as $trigger) {
+		$trigger['host'] = $trigger['hosts'][0]['name'];
+		$trigger['hostid'] = $trigger['hosts'][0]['hostid'];
+		$trigger['host'] = get_node_name_by_elid($trigger['hostid'], null, ': ').$trigger['host'];
+		$trigger['description'] = expand_trigger_description_constants($trigger['description'], $trigger);
 
-		$hostNames[$row['hostid']] = $row['host'];
+		$hostNames[$trigger['hostid']] = $trigger['host'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
-		if (!isset($triggers[$row['description']][$row['host']]) ||
-			(
-				($triggers[$row['description']][$row['host']]['value'] == TRIGGER_VALUE_FALSE && $row['value'] == TRIGGER_VALUE_TRUE) ||
-				(
-					($triggers[$row['description']][$row['host']]['value'] == TRIGGER_VALUE_FALSE || $row['value'] == TRIGGER_VALUE_TRUE) &&
-					$row['priority'] > $triggers[$row['description']][$row['host']]['priority']
-				)
-			)
-		) {
-			$triggers[$row['description']][$row['host']] = array(
-				'hostid'	=> $row['hostid'],
-				'triggerid'	=> $row['triggerid'],
-				'value'		=> $row['value'],
-				'lastchange'=> $row['lastchange'],
-				'priority'	=> $row['priority']
+		if (!isset($triggers[$trigger['description']][$trigger['host']])
+				|| (($triggers[$trigger['description']][$trigger['host']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
+					|| (($triggers[$trigger['description']][$trigger['host']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
+						&& $trigger['priority'] > $triggers[$trigger['description']][$trigger['host']]['priority']))) {
+			$triggers[$trigger['description']][$trigger['host']] = array(
+				'hostid'	=> $trigger['hostid'],
+				'triggerid'	=> $trigger['triggerid'],
+				'value'		=> $trigger['value'],
+				'lastchange'=> $trigger['lastchange'],
+				'priority'	=> $trigger['priority']
 			);
 		}
 	}
 
-	if (!isset($hostNames)) {
-		return $table;
+	$triggerTable = new CTableInfo(_('No triggers defined.'));
+	if (empty($hostNames)) {
+		return $triggerTable;
 	}
 	ksort($hostNames);
 
 	$css = getUserTheme(CWebUser::$data);
 	if ($view_style == STYLE_TOP) {
+		// header
 		$header = array(new CCol(_('Triggers'), 'center'));
-
-		foreach ($hostNames as $hostname) {
-			$header = array_merge($header, array(new CCol(array(new CImg('vtext.php?text='.urlencode($hostname).'&theme='.$css)), 'hosts')));
+		foreach ($hostNames as $hostName) {
+			$header = array_merge($header, array(new CCol(array(new CImg('vtext.php?text='.urlencode($hostName).'&theme='.$css)), 'hosts')));
 		}
-		$table->setHeader($header, 'vertical_header');
+		$triggerTable->setHeader($header, 'vertical_header');
 
-		foreach ($triggers as $descr => $trhosts) {
-			$table_row = array(nbsp($descr));
-			foreach ($hosts as $hostname) {
-				$table_row = get_trigger_overview_cells($table_row, $trhosts, $hostname, $params);
+		// data
+		foreach ($triggers as $description => $triggerHosts) {
+			$tableColumns = array(nbsp($description));
+			foreach ($hostNames as $hostid => $hostName) {
+				array_push($tableColumns, get_trigger_overview_cells($triggerHosts, $hostName, $params));
 			}
-			$table->addRow($table_row);
+			$triggerTable->addRow($tableColumns);
 		}
 	}
 	else {
-		$header = array(new CCol(_('Host'),'center'));
-		foreach ($triggers as $descr => $trhosts) {
-			$descr = array(new CImg('vtext.php?text='.urlencode($descr).'&theme='.$css));
-			array_push($header, $descr);
+		// header
+		$header = array(new CCol(_('Host'), 'center'));
+		foreach ($triggers as $description => $triggerHosts) {
+			$description = array(new CImg('vtext.php?text='.urlencode($description).'&theme='.$css));
+			array_push($header, $description);
 		}
-		$table->setHeader($header, 'vertical_header');
+		$triggerTable->setHeader($header, 'vertical_header');
 
-		foreach ($hostNames as $hostid => $hostname) {
+		// data
+		foreach ($hostNames as $hostid => $hostName) {
 			$host = $hosts[$hostid];
 
 			// host js link
-			$hostSpan = new CSpan(nbsp($hostname), 'link_menu menu-host');
-			$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-			$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+			$hostSpan = new CSpan(nbsp($hostName), 'link_menu menu-host');
+			$hostSpan->setAttribute('data-menu', hostMenuData($host, ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array()));
 
-			$table_row = array($hostSpan);
-			foreach ($triggers as $trhosts) {
-				$table_row = get_trigger_overview_cells($table_row, $trhosts, $hostname, $params);
+			$tableColumns = array($hostSpan);
+			foreach ($triggers as $triggerHosts) {
+				array_push($tableColumns, get_trigger_overview_cells($triggerHosts, $hostName, $params));
 			}
-			$table->addRow($table_row);
+			$triggerTable->addRow($tableColumns);
 		}
 	}
-	return $table;
+	return $triggerTable;
 }
 
-function get_trigger_overview_cells(&$table_row, &$trhosts, &$hostname, $params = array()) {
-	$css_class = null;
-	$config = select_config();
+function get_trigger_overview_cells($triggerHosts, $hostName, $params = array()) {
 	$ack = null;
+	$css_class = null;
+	$desc = array();
+	$config = select_config(); // for how long triggers should blink on status change (set by user in administration->general)
 
-	if (isset($trhosts[$hostname])) {
-		switch ($trhosts[$hostname]['value']) {
+	if (isset($triggerHosts[$hostName])) {
+		switch ($triggerHosts[$hostName]['value']) {
 			case TRIGGER_VALUE_TRUE:
-				$css_class = getSeverityStyle($trhosts[$hostname]['priority']);
+				$css_class = getSeverityStyle($triggerHosts[$hostName]['priority']);
 				$ack = null;
 
 				if ($config['event_ack_enable'] == 1) {
-					$event = get_last_event_by_triggerid($trhosts[$hostname]['triggerid']);
+					$event = get_last_event_by_triggerid($triggerHosts[$hostName]['triggerid']);
 					if ($event) {
 						if (!empty($params['screenid'])) {
 							global $page;
@@ -1568,14 +1564,9 @@ function get_trigger_overview_cells(&$table_row, &$trhosts, &$hostname, $params 
 		}
 		$style = 'cursor: pointer; ';
 
-		// for how long triggers should blink on status change (set by user in administration->general)
-		$config = select_config();
-
 		// set blinking gif as background if trigger age is less then $config['blink_period']
-		if ($config['blink_period'] > 0 && time() - $trhosts[$hostname]['lastchange'] < $config['blink_period']) {
-			$style .= 'background-image: url(images/gradients/blink.gif); '.
-				'background-position: top left; '.
-				'background-repeat: repeat;';
+		if ($config['blink_period'] > 0 && time() - $triggerHosts[$hostName]['lastchange'] < $config['blink_period']) {
+			$style .= 'background-image: url(images/gradients/blink.gif); background-position: top left; background-repeat: repeat;';
 		}
 
 		unset($item_menu);
@@ -1586,7 +1577,7 @@ function get_trigger_overview_cells(&$table_row, &$trhosts, &$hostname, $params 
 				null,
 				null,
 				array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
-				array(_('Events'), 'events.php?triggerid='.$trhosts[$hostname]['triggerid'], array('tw' => '_blank')
+				array(_('Events'), 'events.php?triggerid='.$triggerHosts[$hostName]['triggerid'], array('tw' => '_blank')
 			)
 		);
 
@@ -1594,15 +1585,15 @@ function get_trigger_overview_cells(&$table_row, &$trhosts, &$hostname, $params 
 			$tr_ov_menu[] = $ack_menu;
 		}
 
-		$db_items = DBselect(
+		$dbItems = DBselect(
 			'SELECT DISTINCT i.itemid,i.name,i.key_,i.value_type'.
 			' FROM items i,functions f'.
 			' WHERE f.itemid=i.itemid'.
-				' AND f.triggerid='.$trhosts[$hostname]['triggerid']
+				' AND f.triggerid='.$triggerHosts[$hostName]['triggerid']
 		);
-		while ($item_data = DBfetch($db_items)) {
-			$description = itemName($item_data);
-			switch ($item_data['value_type']) {
+		while ($item = DBfetch($dbItems)) {
+			$description = itemName($item);
+			switch ($item['value_type']) {
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_FLOAT:
 					$action = 'showgraph';
@@ -1623,7 +1614,7 @@ function get_trigger_overview_cells(&$table_row, &$trhosts, &$hostname, $params 
 
 			$item_menu[$action][] = array(
 				$description,
-				'history.php?action='.$action.'&itemid='.$item_data['itemid'].'&period=3600',
+				'history.php?action='.$action.'&itemid='.$item['itemid'].'&period=3600',
 				array('tw' => '', 'sb' => $status_bar)
 			);
 		}
@@ -1648,12 +1639,9 @@ function get_trigger_overview_cells(&$table_row, &$trhosts, &$hostname, $params 
 			$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showlatest']);
 		}
 		unset($item_menu);
-	}
 
-	// dependency: triggers on which depends this
-	$desc = array();
-	if (isset($trhosts[$hostname])) {
-		$triggerid = $trhosts[$hostname]['triggerid'];
+		// dependency: triggers on which depends this
+		$triggerid = !empty($triggerHosts[$hostName]['triggerid']) ? $triggerHosts[$hostName]['triggerid'] : 0;
 
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
@@ -1696,23 +1684,22 @@ function get_trigger_overview_cells(&$table_row, &$trhosts, &$hostname, $params 
 	}
 
 	if ((is_array($desc) && count($desc) > 0) || $ack) {
-		$status_col = new CCol(array($desc, $ack), $css_class.' hosts');
+		$tableColumn = new CCol(array($desc, $ack), $css_class.' hosts');
 	}
 	else {
-		$status_col = new CCol(SPACE, $css_class.' hosts');
+		$tableColumn = new CCol(SPACE, $css_class.' hosts');
 	}
 	if (isset($style)) {
-		$status_col->setAttribute('style', $style);
+		$tableColumn->setAttribute('style', $style);
 	}
 
 	if (isset($tr_ov_menu)) {
 		$tr_ov_menu  = new CPUMenu($tr_ov_menu, 170);
-		$status_col->onClick($tr_ov_menu->getOnActionJS());
-		$status_col->addAction('onmouseover', 'jQuery(this).css({border:\'1px dotted #0C0CF0\', padding: \'0px 2px\'})');
-		$status_col->addAction('onmouseout', 'jQuery(this).css({border:\'\', padding: \'1px 3px\'})');
+		$tableColumn->onClick($tr_ov_menu->getOnActionJS());
+		$tableColumn->addAction('onmouseover', 'jQuery(this).css({border: \'1px dotted #0C0CF0\', padding: \'0px 2px\'})');
+		$tableColumn->addAction('onmouseout', 'jQuery(this).css({border: \'\', padding: \'1px 3px\'})');
 	}
-	array_push($table_row, $status_col);
-	return $table_row;
+	return $tableColumn;
 }
 
 function calculate_availability($triggerid, $period_start, $period_end) {
