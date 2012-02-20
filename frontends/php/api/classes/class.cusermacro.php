@@ -895,7 +895,7 @@ class CUserMacro extends CZBXAPI {
 		$existingMacros = array();
 		foreach ($macros as $macro) {
 			if (isset($existingMacros[$macro['macro']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s is not unique."', $macro['macro']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
 			}
 
 			$existingMacros[$macro['macro']] = 1;
