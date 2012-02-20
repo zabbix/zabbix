@@ -530,7 +530,6 @@ src/zabbix_java/lib/org-json-2010-12-28.jar -text
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
 tests/data/README -text
-tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text
 tests/templates/zabbix.conf.php -text
 tests/templates/zabbix_agentd.conf -text
