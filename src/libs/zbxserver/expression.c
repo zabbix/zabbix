@@ -3208,42 +3208,39 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 				}
 				break;
 			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
-				switch ((*data)[i])
+				if (']' == (*data)[i] || ',' == (*data)[i])
 				{
-					case ']':
-					case ',':
-						if (NULL != zbx_strnchr(*data + l, '{', i - l))
+					switch ((*data)[i])
+					{
+						case ']':
+							level--;
+							state = ZBX_STATE_END;
+							break;
+						case ',':
+							state = ZBX_STATE_NEW;
+							break;
+					}
+
+					if (NULL != zbx_strnchr(*data + l, '{', i - l))
+					{
+						c = (*data)[i];
+						(*data)[i] = '\0';
+						param = zbx_strdup(param, *data + l);
+						(*data)[i] = c;
+
+						if (NULL == jp_row)
 						{
-							c = (*data)[i];
-							(*data)[i] = '\0';
-							param = zbx_strdup(param, *data + l);
-							(*data)[i] = c;
-
-							if (NULL == jp_row)
-							{
-								substitute_simple_macros(NULL, NULL, dc_host, NULL,
-										&param, macro_type, NULL, 0);
-							}
-							else
-								substitute_discovery_macros(&param, jp_row);
-
-							quote_key_param(&param, 0);
-							i--; zbx_replace_string(data, l, &i, param); i++;
-
-							zbx_free(param);
+							substitute_simple_macros(NULL, NULL, dc_host, NULL,
+									&param, macro_type, NULL, 0);
 						}
-						break;
-				}
+						else
+							substitute_discovery_macros(&param, jp_row);
 
-				switch ((*data)[i])
-				{
-					case ']':
-						level--;
-						state = ZBX_STATE_END;
-						break;
-					case ',':
-						state = ZBX_STATE_NEW;
-						break;
+						quote_key_param(&param, 0);
+						i--; zbx_replace_string(data, l, &i, param); i++;
+
+						zbx_free(param);
+					}
 				}
 				break;
 			case ZBX_STATE_QUOTED:	/* a quoted parameter */
@@ -3282,7 +3279,7 @@ clean:
 	if (0 == i || '\0' != (*data)[i] || 0 != level)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid %s at position %d: \"%s\"",
-				MACRO_TYPE_ITEM_KEY == macro_type ? "item key" : "OID", (int)i, *data);
+				MACRO_TYPE_ITEM_KEY == macro_type ? "item key" : "SNMP OID", (int)i, *data);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
