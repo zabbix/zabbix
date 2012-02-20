@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
 ........S. [ZBX-4671] fixed processing of calculated items with expressions more than 2KB (Sasha)
 ...G...PS. [ZBX-3788] signal handlers changed to reduce probability of process hang on exit (Andris)
 A.F....... [ZBX-4593] fixed "trigger info" type screen item resource validation (pavels)
