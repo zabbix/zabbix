@@ -359,7 +359,7 @@ class CZBXAPI {
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
 		$sqlWhere = $sqlParts['where'] ? implode(' AND ', $sqlParts['where']) : '';
-		$sqlGroup = $sqlParts['group'] ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
+		$sqlGroup = (!empty($sqlParts['group'])) ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
 		$sqlOrder = $sqlParts['order'] ? ' ORDER BY '.implode(',', $sqlParts['order']) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 			' FROM '.$sqlFrom.
