@@ -177,6 +177,7 @@ frontends/php/include/classes/core/CAutoloader.php -text
 frontends/php/include/classes/core/Z.php -text
 frontends/php/include/classes/core/ZBase.php -text
 frontends/php/include/views/administration.auditacts.list.php -text
+frontends/php/include/views/administration.auditlogs.list.php -text
 frontends/php/include/views/configuration.discovery.list.php -text
 frontends/php/include/views/configuration.item.copy.php -text
 frontends/php/include/views/configuration.item.discovery.list.php -text
