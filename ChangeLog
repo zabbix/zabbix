@@ -2,6 +2,7 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBXNEXT-1113] redesign Configuration->Host->Discovery rules (Eduard)
 ..F....... [ZBXNEXT-1107] redesign Configuration->Audit (Eduard)
 ....I..PS. [ZBX-2604] added processing of not supported items monitored by a proxy (Sasha)
 ..F....... [ZBXNEXT-903] redesign Configuration->Items (Eduard)

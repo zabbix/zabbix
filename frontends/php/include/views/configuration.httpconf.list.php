@@ -67,8 +67,6 @@ $httpTable->setHeader(array(
 	make_sorting_header(_('Status'), 'status'))
 );
 
-$httpWidget->addItem(BR());
-
 $httpTableRows = array();
 foreach ($this->data['db_httptests'] as $httptestid => $httptest_data) {
 	$db_app = $this->data['db_apps'][$httptest_data['applicationid']];

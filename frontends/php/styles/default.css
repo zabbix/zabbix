@@ -199,7 +199,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 
 /* object list */
 .objectgroup { padding: 4px; }
-.objectgroup.top { margin-bottom: 2px; }
+.objectgroup.top { margin: 2px 0px; }
 .objectgroup.footer { margin-top: 2px; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
