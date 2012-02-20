@@ -119,7 +119,7 @@ class C20ImportFormatter extends CImportFormatter {
 		if (isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
 				foreach ($host['items'] as $item) {
-					$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					$item = $this->renameItemFields($item);
 					$itemsData[$host['host']][$item['key_']] = $item;
 				}
 			}
@@ -127,7 +127,7 @@ class C20ImportFormatter extends CImportFormatter {
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
 				foreach ($template['items'] as $item) {
-					$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					$item = $this->renameItemFields($item);
 					$itemsData[$template['host']][$item['key_']] = $item;
 				}
 			}
@@ -142,19 +142,48 @@ class C20ImportFormatter extends CImportFormatter {
 		if (isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
 				foreach ($host['discovery_rules'] as $item) {
-					$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					$item = $this->renameItemFields($item);
 					foreach ($item['item_prototypes'] as &$prototype) {
-						$this->renameData($prototype, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+						$prototype = $this->renameItemFields($prototype);
 					}
 					unset($prototype);
+
+					foreach ($item['trigger_prototypes'] as &$trigger) {
+						$this->renameData($trigger, array(
+							'description' => 'comments',
+						));
+						$this->renameData($trigger, array(
+							'name' => 'description',
+							'severity' => 'priority'
+						));
+					}
+					unset($trigger);
+
 					$discoveryRulesData[$host['host']][$item['key_']] = $item;
 				}
 			}
 		}
+
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
 				foreach ($template['discovery_rules'] as $item) {
-					$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+					$item = $this->renameItemFields($item);
+					foreach ($item['item_prototypes'] as &$prototype) {
+						$prototype = $this->renameItemFields($prototype);
+					}
+					unset($prototype);
+
+					foreach ($item['trigger_prototypes'] as &$trigger) {
+						$this->renameData($trigger, array(
+							'description' => 'comments',
+						));
+						$this->renameData($trigger, array(
+							'name' => 'description',
+							'severity' => 'priority'
+						));
+					}
+					unset($trigger);
+
 					$discoveryRulesData[$template['host']][$item['key_']] = $item;
 				}
 			}
@@ -204,6 +233,22 @@ class C20ImportFormatter extends CImportFormatter {
 		}
 
 		return $triggersData;
+	}
+
+	public function getImages() {
+		if (!isset($this->data['images'])) {
+			return array();
+		}
+		foreach ($this->data['images'] as &$image) {
+			$this->renameData($image, array('encodedImage' => 'image'));
+		}
+		unset($image);
+		return $this->data['images'];
+	}
+
+	protected function renameItemFields(array $item) {
+		$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+		return $item;
 	}
 
 }

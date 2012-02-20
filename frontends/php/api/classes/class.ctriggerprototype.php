@@ -1327,6 +1327,11 @@ COpt::memoryPick();
 	protected function createReal(&$triggers) {
 		$triggers = zbx_toArray($triggers);
 
+		foreach ($triggers as &$trigger) {
+			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		}
+		unset($trigger);
+
 		$triggerids = DB::insert('triggers', $triggers);
 
 		foreach ($triggers as $tnum => $trigger) {
