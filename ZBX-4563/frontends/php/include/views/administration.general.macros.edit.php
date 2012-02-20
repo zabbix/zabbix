@@ -22,7 +22,6 @@
 
 $macrosForm = new CForm();
 $macrosForm->setName('macrosForm');
-$macrosForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 
 // tab
 $macrosTab = new CTabView();
