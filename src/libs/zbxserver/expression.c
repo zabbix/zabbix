@@ -3045,10 +3045,23 @@ void	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
 }
 
+static void	unquote_key_param(char *param)
+{
+	char	*dst;
+
+	for (dst = param; '\0' != *param; param++)
+	{
+		if ('\\' == *param && '"' == param[1])
+			continue;
+
+		*dst++ = *param;
+	}
+	*dst = '\0';
+}
+
 static void	quote_key_param(char **param, int forced)
 {
-	char	*src, *dst = NULL, *p;
-	size_t	sz;
+	size_t	sz_src, sz_dst;
 
 	if (0 == forced)
 	{
@@ -3056,21 +3069,21 @@ static void	quote_key_param(char **param, int forced)
 			return;
 	}
 
-	sz = zbx_get_escape_string_len(*param, "\"") + 3;
-	p = dst = zbx_malloc(dst, sz);
-	*p++ = '"';
+	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
+	sz_src = strlen(*param);
 
-	for (src = *param; '\0' != *src; src++)
+	*param = zbx_realloc(*param, sz_dst);
+
+	(*param)[--sz_dst] = '\0';
+	(*param)[--sz_dst] = '"';
+
+	while (0 < sz_src)
 	{
-		if ('"' == *src)
-			*p++ = '\\';
-		*p++ = *src;
+		(*param)[--sz_dst] = (*param)[--sz_src];
+		if ('"' == (*param)[sz_src])
+			(*param)[--sz_dst] = '\\';
 	}
-	*p++ = '"';
-	*p = '\0';
-
-	zbx_free(*param);
-	*param = dst;
+	(*param)[--sz_dst] = '"';
 }
 
 /******************************************************************************
@@ -3104,8 +3117,8 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 	}
 	zbx_parser_state_t;
 
-	char			*param = NULL;
-	size_t			i, l = 0, param_alloc = 64, param_offset = 0;
+	char			*param = NULL, c;
+	size_t			i, l = 0;
 	int			level = 0;
 	zbx_parser_state_t	state = ZBX_STATE_END;
 
@@ -3113,31 +3126,35 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 
 	assert(MACRO_TYPE_ITEM_KEY == macro_type || MACRO_TYPE_SNMP_OID == macro_type);
 
-	param = zbx_malloc(param, param_alloc);
-
 	if (MACRO_TYPE_ITEM_KEY == macro_type)
 	{
 		for (i = 0; SUCCEED == is_key_char((*data)[i]) && '\0' != (*data)[i]; i++)
 			;
+
 		if ('[' != (*data)[i] || 0 == i)
 			goto clean;
 	}
 	else
 	{
-		*param = '\0';
-
 		for (i = 0; '[' != (*data)[i] && '\0' != (*data)[i]; i++)
 			;
 
-		zbx_strncpy_alloc(&param, &param_alloc, &param_offset, *data, i);
+		if (NULL != zbx_strnchr(*data, '{', i))
+		{
+			c = (*data)[i];
+			(*data)[i] = '\0';
+			param = zbx_strdup(param, *data);
+			(*data)[i] = c;
 
-		if (NULL == jp_row)
-			substitute_simple_macros(NULL, NULL, dc_host, NULL, &param, macro_type, NULL, 0);
-		else
-			substitute_discovery_macros(&param, jp_row);
+			if (NULL == jp_row)
+				substitute_simple_macros(NULL, NULL, dc_host, NULL, &param, macro_type, NULL, 0);
+			else
+				substitute_discovery_macros(&param, jp_row);
 
-		l = 0;
-		i--; zbx_replace_string(data, l, &i, param); i++;
+			i--; zbx_replace_string(data, 0, &i, param); i++;
+
+			zbx_free(param);
+		}
 	}
 
 	for (; '\0' != (*data)[i]; i++)
@@ -3167,15 +3184,10 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 						state = ZBX_STATE_END;
 						break;
 					case '"':
-						param_offset = 0;
-						*param = '\0';
 						state = ZBX_STATE_QUOTED;
 						l = i;
 						break;
 					default:
-						param_offset = 0;
-						*param = '\0';
-						zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[i]);
 						state = ZBX_STATE_UNQUOTED;
 						l = i;
 				}
@@ -3199,40 +3211,55 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 				switch ((*data)[i])
 				{
 					case ']':
+					case ',':
+						if (NULL != zbx_strnchr(*data + l, '{', i - l))
+						{
+							c = (*data)[i];
+							(*data)[i] = '\0';
+							param = zbx_strdup(param, *data + l);
+							(*data)[i] = c;
+
+							if (NULL == jp_row)
+							{
+								substitute_simple_macros(NULL, NULL, dc_host, NULL,
+										&param, macro_type, NULL, 0);
+							}
+							else
+								substitute_discovery_macros(&param, jp_row);
+
+							quote_key_param(&param, 0);
+							i--; zbx_replace_string(data, l, &i, param); i++;
+
+							zbx_free(param);
+						}
+						break;
+				}
+
+				switch ((*data)[i])
+				{
+					case ']':
 						level--;
 						state = ZBX_STATE_END;
-						if (NULL == jp_row)
-						{
-							substitute_simple_macros(NULL, NULL, dc_host, NULL,
-									&param, macro_type, NULL, 0);
-						}
-						else
-							substitute_discovery_macros(&param, jp_row);
-						quote_key_param(&param, 0);
-						i--; zbx_replace_string(data, l, &i, param); i++;
 						break;
 					case ',':
 						state = ZBX_STATE_NEW;
-						if (NULL == jp_row)
-						{
-							substitute_simple_macros(NULL, NULL, dc_host, NULL,
-									&param, macro_type, NULL, 0);
-						}
-						else
-							substitute_discovery_macros(&param, jp_row);
-						quote_key_param(&param, 0);
-						i--; zbx_replace_string(data, l, &i, param); i++;
 						break;
-					default:
-						zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[i]);
 				}
 				break;
 			case ZBX_STATE_QUOTED:	/* a quoted parameter */
-				if ('"' == (*data)[i])
+				if ('"' == (*data)[i] && '\\' != (*data)[i - 1])
 				{
-					if ('\\' != (*data)[i - 1])
+					state = ZBX_STATE_END;
+
+					if (NULL != zbx_strnchr(*data + l + 1, '{', i - l - 1))
 					{
-						state = ZBX_STATE_END;
+						c = (*data)[i];
+						(*data)[i] = '\0';
+						param = zbx_strdup(param, *data + l + 1);
+						(*data)[i] = c;
+
+						unquote_key_param(param);
+
 						if (NULL == jp_row)
 						{
 							substitute_simple_macros(NULL, NULL, dc_host, NULL,
@@ -3240,19 +3267,17 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 						}
 						else
 							substitute_discovery_macros(&param, jp_row);
+
 						quote_key_param(&param, 1);
 						zbx_replace_string(data, l, &i, param);
-						break;
+
+						zbx_free(param);
 					}
 				}
-				else if ('\\' == (*data)[i] && '"' == (*data)[i + 1])
-					break;
-				zbx_chrcpy_alloc(&param, &param_alloc, &param_offset, (*data)[i]);
 				break;
 		}
 	}
 clean:
-	zbx_free(param);
 
 	if (0 == i || '\0' != (*data)[i] || 0 != level)
 	{
@@ -3262,5 +3287,3 @@ clean:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
 }
-
-

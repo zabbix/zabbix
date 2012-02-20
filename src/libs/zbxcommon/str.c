@@ -252,8 +252,6 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
 {
-	size_t	i;
-
 	if (*offset + n >= *alloc_len)
 	{
 		while (*offset + n >= *alloc_len)
@@ -261,8 +259,11 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 		*str = zbx_realloc(*str, *alloc_len);
 	}
 
-	for (i = 0; i < n && '\0' != src[i]; i++)
-		(*str)[(*offset)++] = src[i];
+	while (0 != n && '\0' != *src)
+	{
+		(*str)[(*offset)++] = *src++;
+		n--;
+	}
 
 	(*str)[*offset] = '\0';
 }
@@ -3337,4 +3338,29 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
 	}
 
 	memcpy(&(*data)[l], value, sz_value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strnchr                                                      *
+ *                                                                            *
+ * Purpose: locate character in string                                        *
+ *                                                                            *
+ * Return value: a pointer to the first occurrence of the character c         *
+ *               in the string str; NULL otherwise                            *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_strnchr(const char *str, char c, size_t n)
+{
+	while (0 != n && '\0' != *str)
+	{
+		if (c == *str)
+			return (char *)str;
+		str++;
+		n--;
+	}
+
+	return NULL;
 }
