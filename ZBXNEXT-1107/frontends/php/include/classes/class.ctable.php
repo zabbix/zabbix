@@ -74,7 +74,7 @@ class CTable extends CTag {
 			}
 			$item = new CRow($item, $rowClass);
 		}
-		if (is_object($item) && zbx_strtolower(get_class($item))=='crow') {
+		if (is_object($item) && zbx_strtolower(get_class($item)) == 'crow') {
 			if (isset($rowClass)) {
 				$item->setAttribute('class', $rowClass);
 			}

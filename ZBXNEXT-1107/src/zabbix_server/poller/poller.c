@@ -529,7 +529,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED != res)
 	{
 		if (!ISSET_MSG(result))
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
@@ -587,7 +587,7 @@ static int	get_values(unsigned char poller_type)
 		errcodes[i] = SUCCEED;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, &items[i].host, NULL, &items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		substitute_key_macros(&items[i].key, &items[i].host, NULL, MACRO_TYPE_ITEM_KEY);
 
 		items[i].interface.addr = (1 == items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
 
@@ -633,8 +633,7 @@ static int	get_values(unsigned char poller_type)
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				substitute_key_macros(&items[i].snmp_oid, &items[i].host, NULL, MACRO_TYPE_SNMP_OID);
 				break;
 			case ITEM_TYPE_DB_MONITOR:
 				ZBX_STRDUP(items[i].params, items[i].params_orig);

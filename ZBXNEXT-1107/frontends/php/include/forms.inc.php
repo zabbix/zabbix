@@ -352,7 +352,6 @@
 		$form = new CForm('get');
 		$form->setAttribute('name', 'zbx_filter');
 		$form->setAttribute('id', 'zbx_filter');
-		$form->addVar('filter_groupid', !empty($filter_groupid) && !empty($filter_group) ? $filter_groupid : 0);
 		$form->addVar('filter_hostid', get_request('filter_hostid', get_request('hostid', 0)));
 		$form->addVar('subfilter_hosts', $subfilter_hosts);
 		$form->addVar('subfilter_apps', $subfilter_apps);
@@ -373,30 +372,30 @@
 		$col_table1 = new CTable(null, 'filter');
 		$col_table1->addRow(array(bold(_('Host group').': '),
 			array(
-				new CTextBox('filter_group', $filter_group, 20),
+				new CTextBox('filter_group', $filter_group, ZBX_TEXTBOX_FILTER_SIZE),
 				new CButton('btn_group', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_group&dstfld2=filter_groupid&srctbl=host_group&srcfld1=name&srcfld2=groupid", 450, 450);', 'G'
+					'&dstfld1=filter_group&srctbl=host_group&srcfld1=name", 450, 450);', 'G'
 				)
 			)
 		));
 		$col_table1->addRow(array(bold(_('Host').': '),
 			array(
-				new CTextBox('filter_hostname', $filter_hostname, 20),
+				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
 				new CButton('btn_host', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&groupid=" + jQuery("#filter_groupid").val(), 450, 450);', 'H'
+					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
 				)
 			)
 		));
 		$col_table1->addRow(array(bold(_('Application').': '),
 			array(
-				new CTextBox('filter_application', $filter_application, 20),
+				new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
 				new CButton('btn_app', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&hostid=" + jQuery("#filter_hostid").val(), 400, 300, "application");', 'A'
+					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&host=" + jQuery("#filter_hostname").val(), 400, 300, "application");', 'A'
 				)
 			)
 		));
-		$col_table1->addRow(array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_name', $filter_name, 30)));
-		$col_table1->addRow(array(array(bold(_('Key')), SPACE._('like').': '), new CTextBox('filter_key', $filter_key, 30)));
+		$col_table1->addRow(array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE)));
+		$col_table1->addRow(array(array(bold(_('Key')), SPACE._('like').': '), new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE)));
 
 		// 2nd column
 		$col_table2 = new CTable(null, 'filter');
@@ -449,7 +448,7 @@
 		$col_table2->addRow(array($col21, $cmbType));
 
 		// second row
-		$label221 = new CSpan(bold(_('Update interval (in sec)').': '));
+		$label221 = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').': '));
 		$label221->setAttribute('id', 'filter_delay_label');
 
 		$field221 = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
@@ -461,13 +460,13 @@
 		$label231 = new CSpan(array(bold(_('SNMP community')), SPACE._('like').': '));
 		$label231->setAttribute('id', 'filter_snmp_community_label');
 
-		$field231 = new CTextBox('filter_snmp_community', $filter_snmp_community, 40);
+		$field231 = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
 		$field231->setEnabled('no');
 
 		$label232 = new CSpan(array(bold(_('SNMPv3 security name')), SPACE._('like').': '));
 		$label232->setAttribute('id', 'filter_snmpv3_securityname_label');
 
-		$field232 = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, 40);
+		$field232 = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
 		$field232->setEnabled('no');
 
 		$col_table2->addRow(array(array($label231, $label232, SPACE), array($field231, $field232, SPACE)));
@@ -476,7 +475,7 @@
 		$label241 = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').': '));
 		$label241->setAttribute('id', 'filter_snmp_oid_label');
 
-		$field241 = new CTextBox('filter_snmp_oid', $filter_snmp_oid, 40);
+		$field241 = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
 		$field241->setEnabled('no');
 
 		$col_table2->addRow(array(array($label241, SPACE), array($field241, SPACE)));
@@ -520,16 +519,16 @@
 		$field321->setEnabled('no');
 
 		$col_table3->addRow(array(array($label321, SPACE), array($field321, SPACE)));
-		$col_table3->addRow(array(bold(_('Keep history (in days)').': '), new CNumericBox('filter_history', $filter_history, 8, null, true)));
-		$col_table3->addRow(array(bold(_('Keep trends (in days)').': '), new CNumericBox('filter_trends', $filter_trends, 8, null, true)));
+		$col_table3->addRow(array(array(bold(_('Keep history')), SPACE._('(in days)').': '), new CNumericBox('filter_history', $filter_history, 8, null, true)));
+		$col_table3->addRow(array(array(bold(_('Keep trends')), SPACE._('(in days)').': '), new CNumericBox('filter_trends', $filter_trends, 8, null, true)));
 
 		// 4th column
 		$col_table4 = new CTable(null, 'filter');
 
 		$cmbStatus = new CComboBox('filter_status', $filter_status);
 		$cmbStatus->addItem(-1, _('all'));
-		foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $st) {
-			$cmbStatus->addItem($st, item_status2str($st));
+		foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $status) {
+			$cmbStatus->addItem($status, item_status2str($status));
 		}
 
 		$cmbBelongs = new CComboBox('filter_templated_items', $filter_templated_items);
@@ -565,8 +564,7 @@
 		$div_buttons = new CDiv(array($filter, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0px;');
 
-		$footer = new CCol($div_buttons, 'center');
-		$footer->setColSpan(4);
+		$footer = new CCol($div_buttons, 'center', 4);
 
 		$table->addRow($footer);
 		$form->addItem($table);
@@ -590,8 +588,8 @@
 
 		// generate array with values for subfilters of selected items
 		foreach ($items as $item) {
+			// hosts
 			if (zbx_empty($filter_hostname)) {
-				// hosts
 				$host = reset($item['hosts']);
 
 				if (!isset($item_params['hosts'][$host['hostid']])) {
