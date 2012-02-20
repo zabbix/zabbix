@@ -249,22 +249,6 @@ class CScript extends CZBXAPI {
 						$result[$script['scriptid']]['hosts'] = array();
 					}
 
-					// groupids
-					if (isset($script['groupid']) && is_null($options['selectGroups'])) {
-						if (!isset($result[$script['scriptid']]['groups'])) {
-							$result[$script['scriptid']]['groups'] = array();
-						}
-						$result[$script['scriptid']]['groups'][] = array('groupid' => $script['groupid']);
-					}
-
-					// hostids
-					if (isset($script['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$script['scriptid']]['hosts'])) {
-							$result[$script['scriptid']]['hosts'] = array();
-						}
-						$result[$script['scriptid']]['hosts'][] = array('hostid' => $script['hostid']);
-						unset($script['hostid']);
-					}
 					$result[$script['scriptid']] += $script;
 				}
 			}
@@ -280,34 +264,23 @@ class CScript extends CZBXAPI {
 		// adding groups
 		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			foreach ($result as $scriptid => $script) {
-				$objParams = array(
+				$result[$scriptid]['groups'] = API::HostGroup()->get(array(
 					'output' => $options['selectGroups'],
-				);
-				if ($script['host_access'] == PERM_READ_WRITE) {
-					$objParams['editable'] = 1;
-				}
-				if ($script['groupid'] > 0) {
-					$objParams['groupids'] = $script['groupid'];
-				}
-				$groups = API::HostGroup()->get($objParams);
-				$result[$scriptid]['groups'] = $groups;
+					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
+					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
+				));
 			}
 		}
 
 		// adding hosts
 		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 			foreach ($result as $scriptid => $script) {
-				$objParams = array(
+				$result[$scriptid]['hosts'] = API::Host()->get(array(
 					'output' => $options['selectHosts'],
-				);
-				if ($script['host_access'] == PERM_READ_WRITE) {
-					$objParams['editable'] = 1;
-				}
-				if ($script['groupid'] > 0) {
-					$objParams['groupids'] = $script['groupid'];
-				}
-				$hosts = API::Host()->get($objParams);
-				$result[$scriptid]['hosts'] = $hosts;
+					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
+					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
+					'nodeids' => id2nodeid($script['scriptid'])
+				));
 			}
 		}
 
