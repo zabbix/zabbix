@@ -29,7 +29,7 @@ if (!defined('PAGE_HEADER_LOADED')) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 
-$refresh_rate = 30; //seconds
+$refresh_rate = 30; // seconds
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

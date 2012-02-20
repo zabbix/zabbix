@@ -208,7 +208,7 @@ require_once('include/page_header.php');
 		}
 		else {
 			if ($graphtype == GRAPH_TYPE_NORMAL) {
-				$cmbFnc->addItem(CALC_FNC_ALL, S_ALL_SMALL);
+				$cmbFnc->addItem(CALC_FNC_ALL, _('all'));
 			}
 
 			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);

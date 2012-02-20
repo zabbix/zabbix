@@ -83,8 +83,8 @@ require_once('include/page_header.php');
 		'showUnknown'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 	);
 
@@ -93,7 +93,7 @@ require_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.events.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.events.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		// saving fixed/dynamic setting to profile
 		if('timelinefixedperiod' == $_REQUEST['favobj']){
@@ -323,12 +323,12 @@ require_once('include/page_header.php');
 		$filterForm->addItemToBottomRow($reset);
 	}
 
-	$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
+	$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0));
 
 
 	$scroll_div = new CDiv();
 	$scroll_div->setAttribute('id', 'scrollbar_cntr');
-	$events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state',0));
+	$events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state', 0));
 // }}} FILTER
 
 
@@ -439,7 +439,7 @@ require_once('include/page_header.php');
 				S_TIME,
 				S_IP,
 				S_DNS,
-				S_DESCRIPTION,
+				_('Description'),
 				S_STATUS
 			));
 
@@ -448,7 +448,7 @@ require_once('include/page_header.php');
 					S_TIME,
 					S_IP,
 					S_DNS,
-					S_DESCRIPTION,
+					_('Description'),
 					S_STATUS
 				);
 			}
@@ -512,12 +512,12 @@ require_once('include/page_header.php');
 				S_TIME,
 				is_show_all_nodes()?S_NODE:null,
 				($_REQUEST['hostid'] == 0)?S_HOST:null,
-				S_DESCRIPTION,
+				_('Description'),
 				S_STATUS,
 				S_SEVERITY,
 				_('Duration'),
 				($config['event_ack_enable'])?S_ACK:NULL,
-				S_ACTIONS
+				_('Actions')
 			));
 
 			if($CSV_EXPORT){
@@ -525,12 +525,12 @@ require_once('include/page_header.php');
 					S_TIME,
 					is_show_all_nodes()?S_NODE:null,
 					($_REQUEST['hostid'] == 0)?S_HOST:null,
-					S_DESCRIPTION,
+					_('Description'),
 					S_STATUS,
 					S_SEVERITY,
 					_('Duration'),
 					($config['event_ack_enable'])?S_ACK:NULL,
-					S_ACTIONS
+					_('Actions')
 				);
 			}
 

@@ -56,7 +56,7 @@ else {
 	$expandLink = new CLink(new CImg('images/general/closed.gif'), '?open=1'.url_param('groupid').url_param('hostid'));
 }
 
-$httpTable = new CTableInfo(_('No scenarios defined.'));
+$httpTable = new CTableInfo(_('No web scenarios defined.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
 	is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,

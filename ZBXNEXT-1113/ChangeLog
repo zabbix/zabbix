@@ -2,10 +2,22 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBXNEXT-1107] redesign Configuration->Audit (Eduard)
+....I..PS. [ZBX-2604] added processing of not supported items monitored by a proxy (Sasha)
 ..F....... [ZBXNEXT-903] redesign Configuration->Items (Eduard)
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+........S. [ZBX-4560] fixed low level discovery error messages to start with uppercase 'Cannot ...' (Alexei)
+..F....... [ZBX-4677] fixed minor typo in class.cscript.php; thanks to Łukasz Jernaś (Alexei)
+..F.....S. [ZBX-4261] fixed disovery rules in the queue calculation (Sasha)
+...G...... [ZBX-4624] fixed processing of system.cpu.switches metric (Sasha)
+..F....... [ZBX-4623] fixed host group visibility for non superadmins. (Toms)
+........S. [ZBX-4662] fixed server crash while linking a template with DebugLevel=4 (Sasha)
+..F....... [ZBX-1335] improved Item filter. (Eduard)
+..F....... [ZBX-4630] fixed "Trigger overview" screen. (Eduard)
+.......PS. [ZBX-4628] fixed an "invalid number of fields" error when syncing configuration on proxy (Sasha)
+A.F....... [ZBX-4593] fixed "Trigger info" type screen item resource validation (pavels)
 A.F....... [ZBX-4599] fixed errors in building select queries in Event.get() (pavels)
 ..F....... [ZBX-1787] fixed gradient element rendering if the value exceeds the max Y scale value (pavels)
 A.F....... [ZBX-4494] fixed some types of screen items not being returned by Screen.get() (pavels)
@@ -439,7 +451,11 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
-........S. [ZBX-4612] Unix style exit codes when converting database to DM (Sasha) 
+...G...PS. [ZBX-3788] signal handlers changed to reduce probability of process hang on exit (Andris)
+.......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
+.......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)
+.......PS. [ZBX-860] more useful SNMP error messages (Sasha)
+........S. [ZBX-4612] Unix style exit codes when converting database to DM (Sasha)
 A.F....... [ZBX-2679] fixed validation of masks in IP ranges in discovery (Sasha)
 ....I..... [ZBX-3262] fixed warning "no AC_LANG_SOURCE call detected in body" raised during compilation (Alexei)
 ..F....... [ZBX-3955] added pop up field name parameter validation (pavels)

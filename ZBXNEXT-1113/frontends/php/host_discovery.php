@@ -101,8 +101,7 @@ $fields = array(
 	// ajax
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
-	'state' =>				array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})'),
-	'item_filter' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null)
+	'favstate' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -143,7 +142,7 @@ elseif (get_request('hostid', 0) > 0) {
  */
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.host_discovery.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.host_discovery.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
 

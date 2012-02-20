@@ -35,7 +35,7 @@ $fields = array(
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT, NOT_EMPTY,	'isset({favobj})'),
-	'state' =>		array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY,	'isset({favobj})')
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY,	'isset({favobj})')
 );
 check_fields($fields);
 validate_sort_and_sortorder('ip', ZBX_SORT_UP);
@@ -45,7 +45,7 @@ validate_sort_and_sortorder('ip', ZBX_SORT_UP);
  */
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'hat') {
-		CProfile::update('web.discovery.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.discovery.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
