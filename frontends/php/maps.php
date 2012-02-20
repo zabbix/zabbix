@@ -48,26 +48,26 @@ $fields = array(
 	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT, 			NOT_EMPTY,				null),
 	'favid'=>			array(T_ZBX_INT, O_OPT, P_ACT, 			null,					null),
 	// actions
-	'state'=>			array(T_ZBX_INT, O_OPT, P_ACT,  		NOT_EMPTY,				null),
-	'action'=>			array(T_ZBX_STR, O_OPT, P_ACT, 			IN("'add', 'remove'"),	null)
+	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,  		NOT_EMPTY,				null),
+	'favaction'=>		array(T_ZBX_STR, O_OPT, P_ACT, 			IN("'add','remove'"),	null)
 );
 check_fields($fields);
 ?>
 <?php
 if (isset($_REQUEST['favobj'])) {
 	if ('hat' == $_REQUEST['favobj']) {
-		CProfile::update('web.maps.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.maps.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 	elseif ('sysmapid' == $_REQUEST['favobj']) {
 		$result = false;
-		if ('add' == $_REQUEST['action']) {
+		if ('add' == $_REQUEST['favaction']) {
 			$result = add2favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Remove from Favourites').'";'."\n".
 					'$("addrm_fav").onclick = function(){rm4favorites("sysmapid","'.$_REQUEST['favid'].'",0);}'."\n";
 			}
 		}
-		elseif ('remove' == $_REQUEST['action']) {
+		elseif ('remove' == $_REQUEST['favaction']) {
 			$result = rm4favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo '$("addrm_fav").title = "'._('Add to Favourites').'";'."\n".
