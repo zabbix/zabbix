@@ -620,7 +620,7 @@ require_once('include/page_header.php');
 			S_TRIGGERS,
 			S_GRAPHS,
 			_('Screens'),
-			S_DISCOVERY,
+			_('Discovery'),
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO
 		));

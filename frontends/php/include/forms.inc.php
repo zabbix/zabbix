@@ -854,10 +854,11 @@
 		return $form;
 	}
 
-	function getItemFormData() {
+	function getItemFormData($options = array()) {
 		$data = array(
 			'form' => get_request('form'),
 			'form_refresh' => get_request('form_refresh'),
+			'is_discovery_rule' => !empty($options['is_discovery_rule']),
 			'parent_discoveryid' => get_request('parent_discoveryid'),
 			'itemid' => get_request('itemid', null),
 			'limited' => false,
@@ -901,7 +902,9 @@
 			'add_groupid' => get_request('add_groupid', get_request('groupid', 0)),
 			'valuemaps' => null,
 			'possibleHostInventories' => null,
-			'alreadyPopulated' => null
+			'alreadyPopulated' => null,
+			'lifetime' => get_request('lifetime', 30),
+			'filter' => get_request('filter', '')
 		);
 
 		// hostid
@@ -924,58 +927,74 @@
 
 		// item
 		if (!empty($data['itemid'])) {
-			$data['item'] = API::Item()->get(array(
-				'itemids' => $_REQUEST['itemid'],
+			$options = array(
+				'itemids' => $data['itemid'],
 				'output' => API_OUTPUT_EXTEND
-			));
+			);
+			if ($data['is_discovery_rule']) {
+				$options['hostids'] = $data['hostid'];
+				$options['filter'] = array('flags' => ZBX_FLAG_DISCOVERY);
+				$options['editable'] = true;
+			}
+			$data['item'] = API::Item()->get($options);
 			$data['item'] = reset($data['item']);
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 			$data['limited'] = $data['item']['templateid'] != 0;
 
 			// caption
-			$data['caption'] = array();
-			$itemid = $data['itemid'];
-			do {
-				$item = API::Item()->get(array(
-					'itemids' => $itemid,
-					'output' => array('itemid', 'templateid'),
-					'selectHosts' => array('name'),
-					'selectDiscoveryRule' => array('itemid')
-				));
-				$item = reset($item);
-				if (!empty($item)) {
-					$host = reset($item['hosts']);
-					if (!empty($item['hosts'])) {
-						if (bccomp($data['itemid'], $itemid) == 0) {
-							$data['caption'][] = SPACE;
-							$data['caption'][] = $host['name'];
+			if (empty($data['is_discovery_rule'])) {
+				$data['caption'] = array();
+				$itemid = $data['itemid'];
+				do {
+					$item = API::Item()->get(array(
+						'itemids' => $itemid,
+						'output' => array('itemid', 'templateid'),
+						'selectHosts' => array('name'),
+						'selectDiscoveryRule' => array('itemid')
+					));
+					$item = reset($item);
+					if (!empty($item)) {
+						$host = reset($item['hosts']);
+						if (!empty($item['hosts'])) {
+							if (bccomp($data['itemid'], $itemid) == 0) {
+								$data['caption'][] = SPACE;
+								$data['caption'][] = $host['name'];
+							}
+							// item prototype
+							elseif ($item['discoveryRule']) {
+								$data['caption'][] = ' : ';
+								$data['caption'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline');
+							}
+							// plain item
+							else {
+								$data['caption'][] = ' : ';
+								$data['caption'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline');
+							}
 						}
-						// item prototype
-						elseif ($item['discoveryRule']) {
-							$data['caption'][] = ' : ';
-							$data['caption'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline');
-						}
-						// plain item
-						else {
-							$data['caption'][] = ' : ';
-							$data['caption'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline');
-						}
+						$itemid = $item['templateid'];
 					}
-					$itemid = $item['templateid'];
-				}
-				else {
-					break;
-				}
-			} while ($itemid != 0);
+					else {
+						break;
+					}
+				} while ($itemid != 0);
 
-			$data['caption'][] = !empty($data['parent_discoveryid']) ? _('Item prototype').' "' : _('Item').' "';
-			$data['caption'] = array_reverse($data['caption']);
-			$data['caption'][] = ': ';
-			$data['caption'][] = $data['item']['name'];
-			$data['caption'][] = '"';
+				$data['caption'][] = !empty($data['parent_discoveryid']) ? _('Item prototype').' "' : _('Item').' "';
+				$data['caption'] = array_reverse($data['caption']);
+				$data['caption'][] = ': ';
+				$data['caption'][] = $data['item']['name'];
+				$data['caption'][] = '"';
+			}
+			else {
+				$data['caption'] = _('Discovery rule');
+			}
 		}
 		else {
-			$data['caption'] = _s('Item %1$s : %2$s', $data['hostname'], $data['name']);
+			if (empty($data['is_discovery_rule'])) {
+				$data['caption'] = _s('Item %1$s : %2$s', $data['hostname'], $data['name']);
+			}
+			else {
+				$data['caption'] = _('Discovery rule');
+			}
 		}
 
 		// hostname
@@ -1026,6 +1045,8 @@
 			$data['logtimefmt'] = $data['item']['logtimefmt'];
 			$data['inventory_link'] = $data['item']['inventory_link'];
 			$data['new_application'] = get_request('new_application', '');
+			$data['lifetime'] = $data['item']['lifetime'];
+			$data['filter'] = $data['item']['filter'];
 
 			if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 				$data['delay'] = $data['item']['delay'];

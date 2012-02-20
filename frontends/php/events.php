@@ -246,7 +246,7 @@ require_once('include/page_header.php');
 	if($allow_discovery){
 		$cmbSource = new CComboBox('source', $source, 'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, S_TRIGGER);
-		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
+		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
 		$r_form->addItem(array(SPACE.S_SOURCE.SPACE, $cmbSource));
 	}
 
