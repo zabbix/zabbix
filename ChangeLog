@@ -2,10 +2,16 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBXNEXT-1113] redesign Configuration->Host->Discovery rules (Eduard)
+..F....... [ZBXNEXT-1107] redesign Configuration->Audit (Eduard)
+....I..PS. [ZBX-2604] added processing of not supported items monitored by a proxy (Sasha)
 ..F....... [ZBXNEXT-903] redesign Configuration->Items (Eduard)
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+........S. [ZBX-4560] fixed low level discovery error messages to start with uppercase 'Cannot ...' (Alexei)
+..F....... [ZBX-4677] fixed minor typo in class.cscript.php; thanks to Łukasz Jernaś (Alexei)
+..F.....S. [ZBX-4261] fixed disovery rules in the queue calculation (Sasha)
 ...G...... [ZBX-4624] fixed processing of system.cpu.switches metric (Sasha)
 ..F....... [ZBX-4623] fixed host group visibility for non superadmins. (Toms)
 ........S. [ZBX-4662] fixed server crash while linking a template with DebugLevel=4 (Sasha)

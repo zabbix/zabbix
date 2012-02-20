@@ -220,14 +220,18 @@ frontends/php/include/classes/import/formatters/CImportFormatter.php -text
 frontends/php/include/classes/import/readers/CImportReader.php -text
 frontends/php/include/classes/import/readers/CJsonImportReader.php -text
 frontends/php/include/classes/import/readers/CXmlImportReader.php -text
+frontends/php/include/views/administration.auditacts.list.php -text
+frontends/php/include/views/administration.auditlogs.list.php -text
 frontends/php/include/views/conf.import.php -text
 frontends/php/include/views/configuration.discovery.list.php -text
+frontends/php/include/views/configuration.host.discovery.list.php -text
 frontends/php/include/views/configuration.item.copy.php -text
-frontends/php/include/views/configuration.item.discovery.list.php -text
 frontends/php/include/views/configuration.item.edit.php -text
 frontends/php/include/views/configuration.item.list.php -text
 frontends/php/include/views/configuration.item.massupdate.php -text
+frontends/php/include/views/configuration.item.prototype.list.php -text
 frontends/php/include/views/js/configuration.item.edit.js.php -text
+frontends/php/include/views/monitoring.discovery.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
@@ -575,7 +579,6 @@ src/zabbix_java/lib/org-json-2010-12-28.jar -text
 src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
 tests/data/README -text
-tests/data/data_test.sql -text
 tests/templates/sqlite3.init -text
 tests/templates/zabbix.conf.php -text
 tests/templates/zabbix_agentd.conf -text

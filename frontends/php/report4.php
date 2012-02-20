@@ -84,7 +84,7 @@ require_once('include/page_header.php');
 
 		$form->addItem(SPACE._('Media type').SPACE);
 		$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
-		$cmbMedia->addItem(0,S_ALL_SMALL);
+		$cmbMedia->addItem(0, _('all'));
 
 		foreach($media_types as $media_type_id => $media_type_description){
 			$cmbMedia->addItem($media_type_id, $media_type_description);
@@ -231,14 +231,10 @@ require_once('include/page_header.php');
 			}
 			array_pop($links);
 
-			$linksDiv = new CDiv(array(SPACE . S_ALL_SMALL . SPACE . '(' . SPACE, $links, SPACE.')'));
+			$linksDiv = new CDiv(array(SPACE . _('all') . SPACE . '(' . SPACE, $links, SPACE.')'));
 			$linksDiv->show();
 		}
 	}
 
-?>
-<?php
-
 require_once('include/page_footer.php');
-
 ?>

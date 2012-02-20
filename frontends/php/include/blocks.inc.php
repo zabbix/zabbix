@@ -1167,7 +1167,7 @@ function make_graph_submenu() {
 	$items = zbx_toHash($items, 'itemid');
 
 	$favGraphs = array();
-	foreach($fav_graphs as $favorite) {
+	foreach ($fav_graphs as $favorite) {
 		$source = $favorite['source'];
 		$sourceid = $favorite['value'];
 
@@ -1183,7 +1183,7 @@ function make_graph_submenu() {
 				'name' => $host['host'].':'.$item['name'],
 				'favobj' => 'itemid',
 				'favid' => $sourceid,
-				'action' => 'remove'
+				'favaction' => 'remove'
 			);
 		}
 		else {
@@ -1197,7 +1197,7 @@ function make_graph_submenu() {
 				'name' => $ghost['host'].':'.$graph['name'],
 				'favobj' => 'graphid',
 				'favid' => $sourceid,
-				'action' => 'remove'
+				'favaction' => 'remove'
 			);
 		}
 	}
@@ -1207,7 +1207,7 @@ function make_graph_submenu() {
 			'name' => _('Remove').' '._('All').' '._('Graphs'),
 			'favobj' => 'graphid',
 			'favid' => 0,
-			'action' => 'remove'
+			'favaction' => 'remove'
 		);
 	}
 
@@ -1216,7 +1216,7 @@ function make_graph_submenu() {
 			'name' => _('Remove').' '._('All').' '._('Simple graphs'),
 			'favobj' => 'itemid',
 			'favid' => 0,
-			'action' => 'remove'
+			'favaction' => 'remove'
 		);
 	}
 	return $favGraphs;
@@ -1252,7 +1252,7 @@ function make_sysmap_submenu() {
 			'name' => $sysmap['name'],
 			'favobj' => 'sysmapid',
 			'favid' => $sysmap['sysmapid'],
-			'action' => 'remove'
+			'favaction' => 'remove'
 		);
 	}
 
@@ -1261,7 +1261,7 @@ function make_sysmap_submenu() {
 			'name' => _('Remove').' '._('All').' '._('Maps'),
 			'favobj' => 'sysmapid',
 			'favid' => 0,
-			'action' => 'remove'
+			'favaction' => 'remove'
 		);
 	}
 	return $favMaps;
@@ -1316,7 +1316,7 @@ function make_screen_submenu() {
 				'name' => $slide['name'],
 				'favobj' => 'slideshowid',
 				'favid' => $slide['slideshowid'],
-				'action' => 'remove'
+				'favaction' => 'remove'
 			);
 		}
 		else {
@@ -1329,7 +1329,7 @@ function make_screen_submenu() {
 				'name' => $screen['name'],
 				'favobj' => 'screenid',
 				'favid' => $screen['screenid'],
-				'action' => 'remove'
+				'favaction' => 'remove'
 			);
 		}
 	}
@@ -1339,7 +1339,7 @@ function make_screen_submenu() {
 			'name' => _('Remove').' '._('All').' '._('Screens'),
 			'favobj' => 'screenid',
 			'favid' => 0,
-			'action' => 'remove'
+			'favaction' => 'remove'
 		);
 	}
 
@@ -1348,7 +1348,7 @@ function make_screen_submenu() {
 			'name' => _('Remove').' '._('All').' '._('Slides'),
 			'favobj' => 'slideshowid',
 			'favid' => 0,
-			'action' => 'remove'
+			'favaction' => 'remove'
 		);
 	}
 	return $favScreens;

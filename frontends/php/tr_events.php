@@ -38,7 +38,7 @@ require_once 'include/page_header.php';
 <?php
 define('PAGE_SIZE', 100);
 
-//	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'triggerid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']),
 	'eventid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']),
@@ -49,7 +49,7 @@ $fields = array(
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'filter','hat'"), null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
-	'state' =>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
 );
 check_fields($fields);
 
@@ -58,7 +58,7 @@ check_fields($fields);
  */
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'hat') {
-		CProfile::update('web.tr_events.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.tr_events.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
 

@@ -55,13 +55,12 @@
 
 		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1,2'),		NULL),
-//ajax
+		// ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
-
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','flop'"),NULL)
+		'favaction'=>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','flop'"), null),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL)
 	);
 
 	check_fields($fields);
@@ -69,11 +68,11 @@
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.hostscreen.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.hostscreen.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.hostscreen.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.hostscreen.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 
 		if('timeline' == $_REQUEST['favobj']){
@@ -84,14 +83,14 @@
 
 		if(str_in_array($_REQUEST['favobj'],array('screenid','slideshowid'))){
 			$result = false;
-			if('add' == $_REQUEST['action']){
+			if('add' == $_REQUEST['favaction']){
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 				if($result){
 					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
-			else if('remove' == $_REQUEST['action']){
+			else if('remove' == $_REQUEST['favaction']){
 				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
@@ -122,7 +121,7 @@
 
 	$scroll_div = new CDiv();
 	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$screens_wdgt->addFlicker($scroll_div, CProfile::get('web.hostscreen.filter.state',1));
+	$screens_wdgt->addFlicker($scroll_div, CProfile::get('web.hostscreen.filter.state', 1));
 
 	$formHeader = new CForm();
 	$cmbConfig = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
@@ -155,15 +154,6 @@
 
 		$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
 
-// PAGE HEADER {{{
-		//KB: Removing favourites icon from screens (ZBX-3129)
-		/*
-		$icon = get_icon('favourite', array(
-			'fav' => 'web.favorite.screenids',
-			'elname' => 'screenid',
-			'elid' => $screen['screenid'],
-		));
-		 */
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 
 		$screens_wdgt->addPageHeader(_('SCREENS'), array($formHeader, SPACE, /*$icon,*/ $fs_icon));

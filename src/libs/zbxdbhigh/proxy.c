@@ -45,8 +45,7 @@ typedef struct
 ZBX_HISTORY_TABLE;
 
 static ZBX_HISTORY_TABLE ht = {
-	"proxy_history", "history_lastid", "hosts h,items i,",
-	"h.hostid=i.hostid and i.itemid=p.itemid and ",
+	"proxy_history", "history_lastid", "hosts h,items i,", "h.hostid=i.hostid and i.itemid=p.itemid and ",
 		{
 		{"h.host",	ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"i.key_",	ZBX_PROTO_TAG_KEY,		ZBX_JSON_TYPE_STRING,	NULL},
@@ -57,6 +56,7 @@ static ZBX_HISTORY_TABLE ht = {
 		{"p.severity",	ZBX_PROTO_TAG_LOGSEVERITY,	ZBX_JSON_TYPE_INT,	"0"},
 		{"p.value",	ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"p.logeventid",ZBX_PROTO_TAG_LOGEVENTID,	ZBX_JSON_TYPE_INT,	"0"},
+		{"p.status",	ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
 		{NULL}
 		}
 };
@@ -1391,7 +1391,7 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 			continue;
 		}
 
-		if (0 == strcmp(values[i].value, "ZBX_NOTSUPPORTED"))
+		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
 		{
 			dc_add_history(item.itemid, item.value_type, item.flags, NULL, &values[i].ts,
 					ITEM_STATUS_NOTSUPPORTED, values[i].value, 0, NULL, 0, 0, 0, 0);
@@ -1567,6 +1567,9 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGEVENTID, tmp, sizeof(tmp)))
 			av->logeventid = atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
+			av->status = (unsigned char)atoi(tmp);
 
 		value_num++;
 

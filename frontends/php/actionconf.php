@@ -79,7 +79,7 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL, NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favobj}) && ("filter"=={favobj})'),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favobj}) && ("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
@@ -92,7 +92,7 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 // for future use
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.audit.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.audit.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 

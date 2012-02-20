@@ -1656,7 +1656,7 @@ function format_doll_init($doll) {
 	$obj['url'] .= (zbx_empty($obj['url']) ? '?' : '&').'output=html';
 	$obj['params']['favobj'] = 'hat';
 	$obj['params']['favref'] = $doll['id'];
-	$obj['params']['action'] = 'refresh';
+	$obj['params']['favaction'] = 'refresh';
 	return $obj;
 }
 
