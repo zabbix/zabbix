@@ -21,7 +21,7 @@
 <?php
 require_once('include/config.inc.php');
 
-$page['title'] = "S_RESOURCE";
+$page['title'] = _('Resource');
 $page['file'] = 'popup_right.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
@@ -53,7 +53,7 @@ check_fields($fields);
 		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 
 		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
-		$cmbResourceNode->addItem(0, S_ALL_S);
+		$cmbResourceNode->addItem(0, _('All'));
 
 		$sql = 'SELECT name,nodeid '.
 			' FROM nodes '.

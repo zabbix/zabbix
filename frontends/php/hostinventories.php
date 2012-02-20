@@ -42,7 +42,7 @@ $fields=array(
 	//ajax
 	'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-	'state'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})')
+	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
 );
 
 check_fields($fields);
@@ -50,7 +50,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 if(isset($_REQUEST['favobj'])){
 	if('filter' == $_REQUEST['favobj']){
-		CProfile::update('web.hostinventories.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.hostinventories.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
 

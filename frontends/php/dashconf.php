@@ -167,7 +167,7 @@ require_once('include/page_header.php');
 	$dashForm->addVar('groupids', $groupids);
 
 	$cmbGroups = new CComboBox('grpswitch', $grpswitch, 'submit();');
-	$cmbGroups->addItem(0, S_ALL_S);
+	$cmbGroups->addItem(0, _('All'));
 	$cmbGroups->addItem(1, S_SELECTED);
 
 	if(!$filterEnable) $cmbGroups->setAttribute('disabled', 'disabled');

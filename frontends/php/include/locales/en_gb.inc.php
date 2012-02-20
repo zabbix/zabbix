@@ -23,8 +23,6 @@
 
 	$TRANSLATION=array(
 
-	'S_DATE_FORMAT_YMDHMS'=>		_('d M Y H:i:s'),
-
 	'S_YEAR_SHORT'=>			_('y'),
 	'S_MONTH_SHORT'=>			_('m'),
 	'S_WEEK_SHORT'=>			_('w'),
@@ -43,12 +41,6 @@
 	'S_UP_TIME'=>				_('Uptime'),
 	'S_DOWN_TIME'=>				_('Downtime'),
 
-//	auditacts.php
-	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
-//	auditlogs.php
-	'S_AUDITLOGS_RECORD_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		_('Details of scenario'),
 	'S_DETAILS_OF_SCENARIO_BIG'=>		_('DETAILS OF SCENARIO'),
@@ -56,7 +48,6 @@
 	'S_RESPONSE_CODE'=>			_('Response code'),
 	'S_TOTAL_BIG'=>				_('TOTAL'),
 	'S_RESPONSE_TIME'=>			_('Response time'),
-	'S_IN_PROGRESS'=>			_('In progress'),
 	'S_OF_SMALL'=>				_('of'),
 	'S_IN_CHECK'=>				_('In check'),
 	'S_IDLE_TILL'=>				_('Idle till'),
@@ -90,10 +81,6 @@
 	'S_NEXT'=>				_('Next'),
 	'S_FINISH'=>				_('Finish'),
 	'S_FAIL'=>				_('Fail'),
-	'S_UPDATE_BIG'=>			_('UPDATE'),
-	'S_NEW_INSTALLATION'=>			_('New installation'),
-	'S_NEW_INSTALLATION_BIG'=>		_('NEW INSTALLATION'),
-	'S_INSTALLATION_UPDATE'=>		_('Installation/Update'),
 
 //	actions.inc.php
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -120,14 +107,10 @@
 	'S_FILTER'=>				_('Filter'),
 
 //	actions.php
-	'S_ACTIONS'=>				_('Actions'),
-	'S_LOGS'=>				_('Logs'),
-	'S_LOGS_BIG'=>				_('LOGS'),
 	'S_ON'=>					_('On'),
 	'S_OFF'=>					_('Off'),
 	'S_GROUP'=>				_('Group'),
 	'S_OR'=>				_('or'),
-	'S_RETRIES_LEFT'=>			_('Retries left'),
 
 //	alarms.php
 	'S_TIME'=>				_('Time'),
@@ -135,12 +118,7 @@
 
 //	actions.php
 	'S_TYPE'=>				_('Type'),
-	'S_RECIPIENTS'=>			_('Recipient(s)'),
-	'S_RECIPIENT'=>				_('Recipient'),
 	'S_ERROR'=>				_('Error'),
-	'S_SENT'=>				_('sent'),
-	'S_EXECUTED'=>				_('executed'),
-	'S_NO_ACTIONS_FOUND'=>			_('No actions found'),
 
 // Lines
 	'S_LINE'=>				_('Line'),
@@ -171,7 +149,6 @@
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
 	'S_CONFIGURATION_OF_NODES'=>		_('CONFIGURATION OF NODES'),
 	'S_NODE'=>				_('Node'),
-	'S_NODES'=>				_('Nodes'),
 	'S_NODES_BIG'=>				_('NODES'),
 	'S_NEW_NODE'=>				_('New node'),
 	'S_DELETE_SELECTED_NODE_Q'=>		_('Delete selected node?'),
@@ -190,7 +167,6 @@
 //	Latest values
 	'S_NO_PERMISSIONS'=>			_('No permissions to referred object or it does not exist!'),
 	'S_ALL_S'=>						_('All'),
-	'S_ALL_SMALL'=>					_('all'),
 	'S_GRAPH'=>						_('Graph'),
 
 //	Footer
@@ -301,7 +277,6 @@
 	'S_IP'=>					_('IP'),
 	'S_PORT'=>					_('Port'),
 	'S_TEMPLATE'=>					_('Template'),
-	'S_DELETED'=>					_('Deleted'),
 	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
 	'S_ALL_GROUPS'=>				_('All groups'),
@@ -491,7 +466,6 @@
 	'S_FROM'=>					_('From'),
 	'S_TILL'=>					_('Till'),
 	'S_OK'=>					_('Ok'),
-	'S_RESOLVED'=>				_('Resolved'),
 	'S_PROBLEM'=>					_('Problem'),
 	'S_PROBLEMS'=>					_('Problems'),
 	'S_SLA'=>					_('SLA'),
@@ -543,7 +517,6 @@
 	'S_COLUMNS'=>				_('Columns'),
 	'S_ROWS'=>				_('Rows'),
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
-	'S_RESOURCE'=>					_('Resource'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
@@ -617,7 +590,6 @@
 	'S_SELECT' => _('Select'),
 
 //	users.php
-	'S_USER'=>					_('User'),
 	'S_PROXY_ADDED'=>			_('Proxy added'),
 	'S_CANNOT_ADD_PROXY'=>		_('Cannot add proxy'),
 	'S_PROXY_UPDATED'=>			_('Proxy updated'),
@@ -631,20 +603,12 @@
 
 //scripts.php
 	'S_SCRIPTS'=>				_('Scripts'),
-	'S_COMMAND'=>				_('Command'),
 	'S_CLOSE'=>					_('Close'),
 	'S_SCRIPT_ERROR'=>					_('SCRIPT ERROR'),
 	'S_SCRIPT_ERROR'=>					_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'),
 
 //	audit.php
-	'S_AUDIT'=>					_('Audit'),
-	'S_AUDIT_LOGS_BIG'=>		_('AUDIT LOGS'),
-	'S_AUDIT_ACTIONS_BIG'=>		_('AUDIT ACTIONS'),
-	'S_ACTION'=>				_('Action'),
 	'S_DETAILS'=>				_('Details'),
-	'S_UNKNOWN_ACTION'=>		_('Unknown action'),
-	'S_ADDED'=>					_('Added'),
-	'S_UPDATED'=>				_('Updated'),
 	'S_ALREADY_EXISTS_SMALL'=>	_('already exists'),
 
 //	profile.php
@@ -654,7 +618,6 @@
 	'S_MUTE'=>					_('Mute'),
 	'S_SNOOZE'=>				_('Snooze'),
 	'S_MESSAGES'=>				_('Messages'),
-	'S_PROBLEM_ON'=>			_('Problem on'),
 
 //	hostinventoriesoverview.php
 	'S_HOST_INVENTORY_OVERVIEW'=>	_('Host inventory overview'),
@@ -749,7 +712,6 @@
 	'S_QUEUE'=>				_('Queue'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
-	'S_LOGOUT'=>				_('Logout'),
 
 //	Errors
 	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),
