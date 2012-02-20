@@ -63,8 +63,6 @@
 	$frmHost->setName('tpl_for');
 
 	$frmHost->addVar('form', get_request('form', 1));
-	$from_rfr = get_request('form_refresh', 0);
-	$frmHost->addVar('form_refresh', $from_rfr+1);
 	$frmHost->addVar('clear_templates', $clear_templates);
 	$frmHost->addVar('groupid', $_REQUEST['groupid']);
 

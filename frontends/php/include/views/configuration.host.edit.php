@@ -154,8 +154,6 @@ $frmHost = new CForm();
 $frmHost->setName('web.hosts.host.php.');
 $frmHost->addVar('form', get_request('form', 1));
 
-$from_rfr = get_request('form_refresh', 0);
-$frmHost->addVar('form_refresh', $from_rfr + 1);
 $frmHost->addVar('clear_templates', $clear_templates);
 
 $hostList = new CFormList('hostlist');
