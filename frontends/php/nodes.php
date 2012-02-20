@@ -110,8 +110,8 @@
 
 	$frmForm = new CForm('get');
 	$cmbConf = new CComboBox('config', 'nodes.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('nodes.php', S_NODES);
-		$cmbConf->addItem('proxies.php', S_PROXIES);
+		$cmbConf->addItem('nodes.php', _('Nodes'));
+		$cmbConf->addItem('proxies.php', _('Proxies'));
 	$frmForm->addItem($cmbConf);
 
 	if(!isset($_REQUEST['form']) && ZBX_DISTRIBUTED){
