@@ -24,7 +24,7 @@ require_once('include/hosts.inc.php');
 require_once('include/items.inc.php');
 require_once('include/forms.inc.php');
 
-$page['title'] = 'S_CONFIGURATION_OF_DISCOVERY';
+$page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array('hostid');

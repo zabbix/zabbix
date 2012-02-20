@@ -68,7 +68,7 @@ if (isset($_REQUEST['form_refresh'])) {
 
 if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
 	try {
-		$configurationImport = new CConfigurationImport($_FILES['import_file']);
+		$configurationImport = new CConfigurationImport($_FILES['import_file'], get_request('rules', array()));
 		$configurationImport->import();
 		show_messages(true, _('Imported successfully'));
 	}
