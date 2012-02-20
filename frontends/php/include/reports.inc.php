@@ -51,8 +51,8 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		$cmbTrigs = new CComboBox('tpl_triggerid',get_request('tpl_triggerid',0),'submit()');
 		$cmbHGrps = new CComboBox('hostgroupid',get_request('hostgroupid',0),'submit()');
 
-		$cmbTrigs->addItem(0,S_ALL_SMALL);
-		$cmbHGrps->addItem(0,S_ALL_SMALL);
+		$cmbTrigs->addItem(0, _('all'));
+		$cmbHGrps->addItem(0, _('all'));
 
 		$sql_cond = ' AND h.hostid=ht.hostid ';
 		if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
@@ -546,7 +546,7 @@ function bar_report_form3(){
 
 	$groupid = get_request('groupid',0);
 	$cmbGroups = new CComboBox('groupid',$groupid,'submit()');
-	$cmbGroups->addItem(0,S_ALL_S);
+	$cmbGroups->addItem(0, _('All'));
 	foreach($db_groups as $gnum => $group){
 		$cmbGroups->addItem($group['groupid'],$group['name']);
 	}

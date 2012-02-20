@@ -910,7 +910,7 @@ function add2favorites(favobj, favid) {
 	var params = {
 		'favobj': favobj,
 		'favid': favid,
-		'action': 'add'
+		'favaction': 'add'
 	};
 
 	send_params(params);
@@ -929,7 +929,7 @@ function rm4favorites(favobj, favid, menu_rowid) {
 		'favobj': favobj,
 		'favid': favid,
 		'favcnt': menu_rowid,
-		'action': 'remove'
+		'favaction': 'remove'
 	};
 
 	send_params(params);
@@ -951,12 +951,11 @@ function change_flicker_state(divid) {
 	}
 
 	var params = {
-		'action': 'flop',
+		'favaction': 'flop',
 		'favobj': 'filter',
 		'favref': divid,
-		'state': filter_state
+		'favstate': filter_state
 	};
-
 	send_params(params);
 
 	// selection box position
@@ -984,12 +983,11 @@ function changeHatStateUI(icon, divid) {
 	}
 
 	var params = {
-		'action': 'flop',
+		'favaction': 'flop',
 		'favobj': 'hat',
 		'favref': divid,
-		'state': hat_state
+		'favstate': hat_state
 	};
-
 	send_params(params);
 }
 
@@ -1008,12 +1006,11 @@ function change_hat_state(icon, divid) {
 	}
 
 	var params = {
-		'action': 'flop',
+		'favaction': 'flop',
 		'favobj': 'hat',
 		'favref': divid,
-		'state': hat_state
+		'favstate': hat_state
 	};
-
 	send_params(params);
 }
 
@@ -1028,8 +1025,10 @@ function send_params(params) {
 	new Ajax.Request(url.getUrl(), {
 			'method': 'post',
 			'parameters': params,
-			'onSuccess': function(){ },
-			'onFailure': function(){ document.location = url.getPath() + '?' + Object.toQueryString(params); }
+			'onSuccess': function() { },
+			'onFailure': function() {
+				document.location = url.getPath() + '?' + Object.toQueryString(params);
+			}
 		}
 	);
 }
@@ -1061,9 +1060,8 @@ function switch_mute(icon) {
 	var params = {
 		'favobj': 'sound',
 		'favref': 'sound',
-		'state': sound_state
+		'favstate': sound_state
 	};
-
 	send_params(params);
 }
 

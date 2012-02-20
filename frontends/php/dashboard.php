@@ -43,9 +43,8 @@ $fields = array(
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 	'favcnt' =>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
 	'pmasterid' =>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,			null),
-	// actions
-	'action' =>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"), null),
-	'state' =>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action})&&("flop"=={action})'),
+	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"), null),
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favaction})&&("flop"=={favaction})'),
 );
 check_fields($fields);
 
@@ -89,10 +88,10 @@ if (isset($_REQUEST['favobj'])) {
 	$_REQUEST['pmasterid'] = get_request('pmasterid', 'mainpage');
 
 	if ($_REQUEST['favobj'] == 'hat') {
-		if ($_REQUEST['action'] == 'flop') {
-			CProfile::update('web.dashboard.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		if ($_REQUEST['favaction'] == 'flop') {
+			CProfile::update('web.dashboard.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
-		elseif ($_REQUEST['action'] == 'refresh') {
+		elseif ($_REQUEST['favaction'] == 'refresh') {
 			switch ($_REQUEST['favref']) {
 				case 'hat_syssum':
 					$syssum = make_system_status($dashconf);
@@ -141,14 +140,14 @@ if (isset($_REQUEST['favobj'])) {
 
 	if (str_in_array($_REQUEST['favobj'], array('itemid', 'graphid'))) {
 		$result = false;
-		if ($_REQUEST['action'] == 'add') {
+		if ($_REQUEST['favaction'] == 'add') {
 			zbx_value2array($_REQUEST['favid']);
 
 			foreach ($_REQUEST['favid'] as $sourceid) {
 				$result = add2favorites('web.favorite.graphids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
-		elseif ($_REQUEST['action'] == 'remove') {
+		elseif ($_REQUEST['favaction'] == 'remove') {
 			$result = rm4favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
@@ -165,13 +164,13 @@ if (isset($_REQUEST['favobj'])) {
 
 	if ($_REQUEST['favobj'] == 'sysmapid') {
 		$result = false;
-		if ($_REQUEST['action'] == 'add') {
+		if ($_REQUEST['favaction'] == 'add') {
 			zbx_value2array($_REQUEST['favid']);
 			foreach ($_REQUEST['favid'] as $sourceid) {
 				$result = add2favorites('web.favorite.sysmapids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
-		elseif ($_REQUEST['action'] == 'remove') {
+		elseif ($_REQUEST['favaction'] == 'remove') {
 			$result = rm4favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
@@ -188,13 +187,13 @@ if (isset($_REQUEST['favobj'])) {
 
 	if (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
 		$result = false;
-		if ($_REQUEST['action'] == 'add') {
+		if ($_REQUEST['favaction'] == 'add') {
 			zbx_value2array($_REQUEST['favid']);
 			foreach ($_REQUEST['favid'] as $sourceid) {
 				$result = add2favorites('web.favorite.screenids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
-		elseif ($_REQUEST['action'] == 'remove') {
+		elseif ($_REQUEST['favaction'] == 'remove') {
 			$result = rm4favorites('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
@@ -367,7 +366,7 @@ zbx_add_post_js('jqBlink.blink();');
 			var params = {
 				'favobj': list.object,
 				'favid[]': favid,
-				'action': 'add'
+				'favaction': 'add'
 			}
 			send_params(params);
 		}

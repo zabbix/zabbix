@@ -22,7 +22,7 @@
 	require_once('include/config.inc.php');
 	require_once('include/nodes.inc.php');
 
-	$page['title'] = 'S_NODES';
+	$page['title'] = _('Nodes');
 	$page['file'] = 'nodes.php';
 	$page['hist_arg'] = array();
 

@@ -365,7 +365,7 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 				CProfile::update($idx.'.period', $_REQUEST['period'], PROFILE_TYPE_INT, $idx2);
 			}
 			if (isset($_REQUEST['stime'])) {
-				CProfile::update($idx.'.stime',$_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
+				CProfile::update($idx.'.stime', $_REQUEST['stime'], PROFILE_TYPE_STR, $idx2);
 			}
 		}
 		$_REQUEST['period'] = get_request('period', CProfile::get($idx.'.period', ZBX_PERIOD_DEFAULT, $idx2));
