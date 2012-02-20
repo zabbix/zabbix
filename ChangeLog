@@ -452,6 +452,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+........S. [ZBX-4671] fixed processing of calculated items with expressions more than 2KB (Sasha)
 ...G...PS. [ZBX-3788] signal handlers changed to reduce probability of process hang on exit (Andris)
 .......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
 .......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)
