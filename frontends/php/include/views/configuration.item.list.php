@@ -40,14 +40,14 @@ if (!empty($this->data['hostid'])) {
 $itemsWidget->addFlicker($this->data['flicker'], CProfile::get('web.items.filter.state', 0));
 
 // create form
-$itempForm = new CForm('get');
-$itempForm->setName('items');
-$itempForm->addVar('hostid', $this->data['hostid']);
+$itemForm = new CForm('get');
+$itemForm->setName('items');
+$itemForm->addVar('hostid', $this->data['hostid']);
 
 // create table
 $itemTable = new CTableInfo(_('No items defined.'));
 $itemTable->setHeader(array(
-	new CCheckBox('all_items', null, "checkAll('".$itempForm->getName()."', 'all_items', 'group_itemid');"),
+	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
 	_('Wizard'),
 	empty($this->data['filter_hostname']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'name'),
@@ -258,9 +258,9 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
 
 // append table to form
-$itempForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
-$itemsWidget->addItem($itempForm);
+$itemsWidget->addItem($itemForm);
 return $itemsWidget;
 ?>

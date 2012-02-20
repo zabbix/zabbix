@@ -687,19 +687,17 @@ class CEvent extends CZBXAPI {
 		$eventids = isset($data['eventids']) ? zbx_toArray($data['eventids']) : array();
 		$eventids = zbx_toHash($eventids);
 
-		// PERMISSIONS {{{
 		$options = array(
 			'eventids' => $eventids,
 			'output' => API_OUTPUT_REFER,
-			'preservekeys' => 1
+			'preservekeys' => true
 		);
 		$allowedEvents = $this->get($options);
 		foreach ($eventids as $eventid) {
 			if (!isset($allowedEvents[$eventid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
-		// }}} PERMISSIONS
 
 		$sql = 'UPDATE events SET acknowledged=1 WHERE '.DBcondition('eventid', $eventids);
 		if (!DBexecute($sql)) {
