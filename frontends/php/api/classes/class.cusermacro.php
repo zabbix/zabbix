@@ -533,6 +533,8 @@ class CUserMacro extends CZBXAPI {
 	 * @param array $hostMacros
 	 */
 	public function validateCreate(array $hostMacros) {
+		$this->checkHostPermissions(zbx_objectValues($hostMacros, 'hostid'));
+
 		foreach ($hostMacros as $hostMacro) {
 			$this->checkMacro($hostMacro);
 			$this->checkValue($hostMacro);
@@ -540,7 +542,6 @@ class CUserMacro extends CZBXAPI {
 		}
 
 		$this->checkDuplicateMacros($hostMacros);
-		$this->checkHostPermissions(zbx_objectValues($hostMacros, 'hostid'));
 		$this->checkIfHostMacrosDontRepeat($hostMacros);
 	}
 
@@ -617,6 +618,10 @@ class CUserMacro extends CZBXAPI {
 		// make sure we have all the data we need
 		$hostMacros = $this->extendObjects($this->tableName(), $hostMacros, array('macro', 'hostid'));
 
+		// check permissions for all affected hosts
+		$affectedHostIds = array_merge(zbx_objectValues($dbHostMacros, 'hostid'), zbx_objectValues($hostMacros, 'hostid'));
+		$this->checkHostPermissions($affectedHostIds);
+
 		foreach ($hostMacros as $hostMacro) {
 			if (isset($hostMacro['macro'])) {
 				$this->checkMacro($hostMacro);
@@ -638,10 +643,6 @@ class CUserMacro extends CZBXAPI {
 
 		// check if the macros exist
 		$this->checkIfHostMacrosExistIn(zbx_objectValues($hostMacros, 'hostmacroid'), $dbHostMacros);
-
-		// check permissions for all affected hosts
-		$affectedHostIds = array_merge(zbx_objectValues($dbHostMacros, 'hostid'), zbx_objectValues($hostMacros, 'hostid'));
-		$this->checkHostPermissions($affectedHostIds);
 
 		$this->checkIfHostMacrosDontRepeat($hostMacros);
 	}
