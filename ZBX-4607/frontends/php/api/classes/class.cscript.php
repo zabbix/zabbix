@@ -54,9 +54,6 @@ class CScript extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('scriptid', 'name');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('scripts' => 's.scriptid'),
 			'from'		=> array('scripts s'),
@@ -237,31 +234,8 @@ class CScript extends CZBXAPI {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// adding groups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			foreach ($result as $scriptid => $script) {
-				$result[$scriptid]['groups'] = API::HostGroup()->get(array(
-					'output' => $options['selectGroups'],
-					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
-					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
-				));
-			}
-		}
-
-		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-			foreach ($result as $scriptid => $script) {
-				$result[$scriptid]['hosts'] = API::Host()->get(array(
-					'output' => $options['selectHosts'],
-					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
-					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
-					'nodeids' => id2nodeid($script['scriptid'])
-				));
-			}
-		}
+		// add related objects
+		$result = $this->addRelatedObjects($options, $result);
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
@@ -600,6 +574,38 @@ class CScript extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// allowed output options for [ select_* ] params
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+
+		// adding groups
+		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
+			foreach ($result as $scriptid => $script) {
+				$result[$scriptid]['groups'] = API::HostGroup()->get(array(
+					'output' => $options['selectGroups'],
+					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
+					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
+				));
+			}
+		}
+
+		// adding hosts
+		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+			foreach ($result as $scriptid => $script) {
+				$result[$scriptid]['hosts'] = API::Host()->get(array(
+					'output' => $options['selectHosts'],
+					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
+					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
+					'nodeids' => id2nodeid($script['scriptid'])
+				));
+			}
+		}
+
+		return $result;
 	}
 }
 ?>
