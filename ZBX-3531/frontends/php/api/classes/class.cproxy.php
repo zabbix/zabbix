@@ -326,7 +326,7 @@ class CProxy extends CZBXAPI {
 
 			if ($update || $delete) {
 				if (!isset($dbProxies[$proxy['proxyid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 
 				if (isset($proxy['status']) && ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE)) {
 					if ($dbProxies[$proxy['proxyid']]['status'] == $proxy['status'])
@@ -339,7 +339,7 @@ class CProxy extends CZBXAPI {
 			}
 			else{
 				if (USER_TYPE_SUPER_ADMIN != self::$userData['type'])
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 
 				if (($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) && !isset($proxy['interfaces']))
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interfaces provided for proxy "%s"', $proxy['host']));

@@ -832,7 +832,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, "ZBX_NOTSUPPORTED",
+						active_metrics[i].key_orig, ZBX_NOTSUPPORTED,
 						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
 			}
 		}
@@ -933,7 +933,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, "ZBX_NOTSUPPORTED",
+						active_metrics[i].key_orig, ZBX_NOTSUPPORTED,
 						&active_metrics[i].lastlogsize, &active_metrics[i].mtime,
 						NULL, NULL, NULL, NULL, 0);
 			}
@@ -1071,7 +1071,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].key);
 
 				process_value(server, port, CONFIG_HOSTNAME,
-						active_metrics[i].key_orig, "ZBX_NOTSUPPORTED",
+						active_metrics[i].key_orig, ZBX_NOTSUPPORTED,
 						&active_metrics[i].lastlogsize, NULL, NULL, NULL, NULL, NULL, 0);
 			}
 		}
@@ -1090,7 +1090,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].key_orig, *pvalue, NULL,
 						NULL, NULL, NULL, NULL, NULL, 0);
 
-				if (0 == strcmp(*pvalue, "ZBX_NOTSUPPORTED"))
+				if (0 == strcmp(*pvalue, ZBX_NOTSUPPORTED))
 				{
 					active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 					zabbix_log(LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",

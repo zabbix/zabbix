@@ -59,7 +59,8 @@ require_once('include/page_header.php');
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		NULL),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','flop'"), null),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 /* actions */
 		'remove_log'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'reset'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -79,18 +80,18 @@ require_once('include/page_header.php');
 			navigation_bar_calc('web.item.graph', $_REQUEST['favid'], true);
 		}
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.history.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.history.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
 			$result = false;
-			if('add' == $_REQUEST['action']){
+			if('add' == $_REQUEST['favaction']){
 				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 				if($result){
 					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("itemid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
-			else if('remove' == $_REQUEST['action']){
+			else if('remove' == $_REQUEST['favaction']){
 				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
@@ -517,7 +518,7 @@ require_once('include/page_header.php');
 		$historyWidget->addPageHeader($header['left'], $right);
 
 		if(isset($iv_string[$item['value_type']])){
-			$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state',1));
+			$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
 		}
 
 		$historyWidget->addItem($table);
@@ -528,7 +529,7 @@ require_once('include/page_header.php');
 
 			$scroll_div = new CDiv();
 			$scroll_div->setAttribute('id','scrollbar_cntr');
-			$historyWidget->addFlicker($scroll_div, CProfile::get('web.history.filter.state',1));
+			$historyWidget->addFlicker($scroll_div, CProfile::get('web.history.filter.state', 1));
 		}
 
 		$historyWidget->show();
