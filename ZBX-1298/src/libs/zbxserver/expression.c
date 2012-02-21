@@ -2416,7 +2416,7 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, DB_TRIGGE
 
 			if (NULL == (func = zbx_get_func_by_functionid(ifuncs, functionid)))
 			{
-				tr[i].new_error = zbx_dsprintf(tr[i].new_error, "Could not obtain function"
+				tr[i].new_error = zbx_dsprintf(tr[i].new_error, "Cannot obtain function"
 						" and item for functionid: " ZBX_FS_UI64, functionid);
 				tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
 				break;
@@ -2429,6 +2429,14 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, DB_TRIGGE
 				break;
 			}
 
+			if (NULL == func->value)
+			{
+				tr[i].new_error = zbx_strdup(tr[i].new_error, "Unexpected error while"
+						" processing a trigger expression");
+				tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
+				break;
+			}
+
 			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
 		}
 
@@ -2436,7 +2444,8 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, DB_TRIGGE
 		{
 			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, br);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() expression[%d]:'%s' => '%s'", __function_name, i, tr[i].expression, out);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() expression[%d]:'%s' => '%s'",
+					__function_name, i, tr[i].expression, out);
 
 			tr[i].expression = zbx_strdup(tr[i].expression, out);
 		}
