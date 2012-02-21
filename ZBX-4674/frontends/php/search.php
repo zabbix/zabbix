@@ -38,9 +38,8 @@ require_once('include/page_header.php');
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			NULL),
-
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'flop','refresh'"),NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
+		'favaction'=>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'flop','refresh'"), null),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favaction})&&("flop"=={favaction})'),
 	);
 
 	check_fields($fields);
@@ -50,10 +49,10 @@ require_once('include/page_header.php');
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
 		if('hat' == $_REQUEST['favobj']){
-			if('flop' == $_REQUEST['action']){
-				CProfile::update('web.search.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			if('flop' == $_REQUEST['favaction']){
+				CProfile::update('web.search.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 			}
-			else if('refresh' == $_REQUEST['action']){
+			else if('refresh' == $_REQUEST['favaction']){
 				switch($_REQUEST['favref']){
 				}
 			}

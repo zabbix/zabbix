@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
 $httpWidget = new CWidget();
 
 // create new scenario button
@@ -57,7 +56,7 @@ else {
 	$expandLink = new CLink(new CImg('images/general/closed.gif'), '?open=1'.url_param('groupid').url_param('hostid'));
 }
 
-$httpTable = new CTableInfo();
+$httpTable = new CTableInfo(_('No web scenarios defined.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
 	is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
@@ -67,8 +66,6 @@ $httpTable->setHeader(array(
 	_('Update interval'),
 	make_sorting_header(_('Status'), 'status'))
 );
-
-$httpWidget->addItem(BR());
 
 $httpTableRows = array();
 foreach ($this->data['db_httptests'] as $httptestid => $httptest_data) {
@@ -143,6 +140,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
 
 // append table to form
 $httpForm->addItem(array($this->data['paging'], $httpTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

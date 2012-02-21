@@ -2812,7 +2812,7 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, zbx_vecto
 
 			if (NULL == (func = zbx_get_func_by_functionid(ifuncs, functionid)))
 			{
-				tr->new_error = zbx_dsprintf(tr->new_error, "Could not obtain function"
+				tr->new_error = zbx_dsprintf(tr->new_error, "Cannot obtain function"
 						" and item for functionid: " ZBX_FS_UI64, functionid);
 				tr->new_value = TRIGGER_VALUE_UNKNOWN;
 				break;
@@ -2821,6 +2821,14 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, zbx_vecto
 			if (NULL != func->error)
 			{
 				tr->new_error = zbx_strdup(tr->new_error, func->error);
+				tr->new_value = TRIGGER_VALUE_UNKNOWN;
+				break;
+			}
+
+			if (NULL == func->value)
+			{
+				tr->new_error = zbx_strdup(tr->new_error, "Unexpected error while"
+						" processing a trigger expression");
 				tr->new_value = TRIGGER_VALUE_UNKNOWN;
 				break;
 			}

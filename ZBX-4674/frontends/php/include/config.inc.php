@@ -248,7 +248,7 @@ function access_deny() {
 	require_once('include/page_header.php');
 
 	if (CWebUser::$data['alias'] != ZBX_GUEST_USER) {
-		show_error_message(S_NO_PERMISSIONS);
+		show_error_message(_('No permissions to referred object or it does not exist!'));
 	}
 	else {
 		$req = new Curl($_SERVER['REQUEST_URI']);
