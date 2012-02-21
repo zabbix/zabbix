@@ -822,7 +822,9 @@ static void	DCsync_items(DB_RESULT result)
 
 		/* SNMP items */
 
-		if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type || ITEM_TYPE_SNMPv3 == item->type)
+		if (ITEM_TYPE_SNMPv1 == item->type ||
+				ITEM_TYPE_SNMPv2c == item->type ||
+				ITEM_TYPE_SNMPv3 == item->type)
 		{
 			snmpitem = zbx_hashset_search(&config->snmpitems, &itemid);
 
@@ -1558,172 +1560,104 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 
 static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 {
-#define ZBX_COPY_PARAM(param, _struct)						\
-{										\
-	dst_item->param = dst_item->string_list + offset;			\
-	memcpy(dst_item->string_list + offset, _struct->param, sz_ ## param);	\
-	offset += sz_ ## param;							\
-}
-
-#define ZBX_COPY_PARAM_NULL(param, _struct)					\
-{										\
-	dst_item->param = dst_item->string_list + offset;			\
-	memcpy(dst_item->string_list + offset, "", sz_ ## param);		\
-	offset += sz_ ## param;							\
-}
-
-#define ZBX_COPY_PARAM_ORIG(param, _struct)					\
-{										\
-	dst_item->param ## _orig = dst_item->string_list + offset;		\
-	dst_item->param = NULL;							\
-	memcpy(dst_item->string_list + offset, _struct->param, sz_ ## param);	\
-	offset += sz_ ## param;							\
-}
-
-	const ZBX_DC_LOGITEM		*logitem = NULL;
-	const ZBX_DC_SNMPITEM		*snmpitem = NULL;
-	const ZBX_DC_TRAPITEM		*trapitem = NULL;
-	const ZBX_DC_IPMIITEM		*ipmiitem = NULL;
-	const ZBX_DC_DBITEM		*dbitem = NULL;
-	const ZBX_DC_SSHITEM		*sshitem = NULL;
-	const ZBX_DC_TELNETITEM		*telnetitem = NULL;
-	const ZBX_DC_CALCITEM		*calcitem = NULL;
-	size_t				sz = 0, offset = 0, sz_key = 0, sz_logtimefmt = 0, sz_snmp_community = 0,
-					sz_snmp_oid = 0, sz_snmpv3_securityname = 0, sz_snmpv3_authpassphrase = 0,
-					sz_snmpv3_privpassphrase = 0, sz_trapper_hosts = 0, sz_ipmi_sensor = 0,
-					sz_params = 0, sz_username = 0, sz_publickey = 0, sz_privatekey = 0,
-					sz_password = 0;
-
-	sz += sz_key = strlen(src_item->key) + 1;
-
-	if (ITEM_VALUE_TYPE_LOG == src_item->value_type)
-	{
-		if (NULL != (logitem = zbx_hashset_search(&config->logitems, &src_item->itemid)))
-			sz += sz_logtimefmt = strlen(logitem->logtimefmt) + 1;
-		else
-			sz += sz_logtimefmt = 1;	/* '\0' */
-	}
-
-	switch (src_item->type)
-	{
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid)))
-			{
-				sz += sz_snmp_community = strlen(snmpitem->snmp_community) + 1;
-				sz += sz_snmp_oid = strlen(snmpitem->snmp_oid) + 1;
-				sz += sz_snmpv3_securityname = strlen(snmpitem->snmpv3_securityname) + 1;
-				sz += sz_snmpv3_authpassphrase = strlen(snmpitem->snmpv3_authpassphrase) + 1;
-				sz += sz_snmpv3_privpassphrase = strlen(snmpitem->snmpv3_privpassphrase) + 1;
-			}
-			break;
-		case ITEM_TYPE_TRAPPER:
-			if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &src_item->itemid)))
-				sz += sz_trapper_hosts = strlen(trapitem->trapper_hosts) + 1;
-			break;
-		case ITEM_TYPE_IPMI:
-			if (NULL != (ipmiitem = zbx_hashset_search(&config->ipmiitems, &src_item->itemid)))
-				sz += sz_ipmi_sensor = strlen(ipmiitem->ipmi_sensor) + 1;
-			break;
-		case ITEM_TYPE_DB_MONITOR:
-			if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid)))
-				sz += sz_params = strlen(dbitem->params) + 1;
-			break;
-		case ITEM_TYPE_SSH:
-			if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &src_item->itemid)))
-			{
-				sz += sz_username = strlen(sshitem->username) + 1;
-				sz += sz_publickey = strlen(sshitem->publickey) + 1;
-				sz += sz_privatekey = strlen(sshitem->privatekey) + 1;
-				sz += sz_password = strlen(sshitem->password) + 1;
-				sz += sz_params = strlen(sshitem->params) + 1;
-			}
-			break;
-		case ITEM_TYPE_TELNET:
-			if (NULL != (telnetitem = zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
-			{
-				sz += sz_username = strlen(telnetitem->username) + 1;
-				sz += sz_password = strlen(telnetitem->password) + 1;
-				sz += sz_params = strlen(telnetitem->params) + 1;
-			}
-			break;
-		case ITEM_TYPE_CALCULATED:
-			if (NULL != (calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid)))
-				sz += sz_params = strlen(calcitem->params) + 1;
-			break;
-	}
+	const ZBX_DC_LOGITEM		*logitem;
+	const ZBX_DC_SNMPITEM		*snmpitem;
+	const ZBX_DC_TRAPITEM		*trapitem;
+	const ZBX_DC_IPMIITEM		*ipmiitem;
+	const ZBX_DC_DBITEM		*dbitem;
+	const ZBX_DC_FLEXITEM		*flexitem;
+	const ZBX_DC_SSHITEM		*sshitem;
+	const ZBX_DC_TELNETITEM		*telnetitem;
+	const ZBX_DC_CALCITEM		*calcitem;
 
 	dst_item->itemid = src_item->itemid;
-	dst_item->string_list = zbx_malloc(dst_item->string_list, sz);
 	dst_item->type = src_item->type;
 	dst_item->data_type = src_item->data_type;
 	dst_item->value_type = src_item->value_type;
-	ZBX_COPY_PARAM_ORIG(key, src_item)
+	strscpy(dst_item->key_orig, src_item->key);
+	dst_item->key = NULL;
 	dst_item->delay = src_item->delay;
 	dst_item->nextcheck = src_item->nextcheck;
 	dst_item->status = src_item->status;
+	*dst_item->trapper_hosts = '\0';
+	*dst_item->logtimefmt = '\0';
+	*dst_item->delay_flex = '\0';
 
-	if (ITEM_VALUE_TYPE_LOG == dst_item->value_type)
+	if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &src_item->itemid)))
+		strscpy(dst_item->delay_flex, flexitem->delay_flex);
+
+	if (ITEM_VALUE_TYPE_LOG == dst_item->value_type &&
+			NULL != (logitem = zbx_hashset_search(&config->logitems, &src_item->itemid)))
 	{
-		if (NULL != logitem)
-			ZBX_COPY_PARAM(logtimefmt, logitem)
-		else
-			ZBX_COPY_PARAM_NULL(logtimefmt, logitem)
+		strscpy(dst_item->logtimefmt, logitem->logtimefmt);
 	}
 
 	switch (src_item->type) {
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			if (NULL != snmpitem)
-			{
-				ZBX_COPY_PARAM_ORIG(snmp_community, snmpitem)
-				ZBX_COPY_PARAM_ORIG(snmp_oid, snmpitem)
-				dst_item->snmp_port = snmpitem->snmp_port;
-				ZBX_COPY_PARAM_ORIG(snmpv3_securityname, snmpitem)
-				dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
-				ZBX_COPY_PARAM_ORIG(snmpv3_authpassphrase, snmpitem)
-				ZBX_COPY_PARAM_ORIG(snmpv3_privpassphrase, snmpitem)
-			}
-			break;
-		case ITEM_TYPE_TRAPPER:
-			if (NULL != trapitem)
-				ZBX_COPY_PARAM(trapper_hosts, trapitem)
-			break;
-		case ITEM_TYPE_IPMI:
-			if (NULL != ipmiitem)
-				ZBX_COPY_PARAM(ipmi_sensor, ipmiitem)
-			break;
-		case ITEM_TYPE_DB_MONITOR:
-			if (NULL != dbitem)
-				ZBX_COPY_PARAM_ORIG(params, dbitem)
-			break;
-		case ITEM_TYPE_SSH:
-			if (NULL != sshitem)
-			{
-				dst_item->authtype = sshitem->authtype;
-				ZBX_COPY_PARAM_ORIG(username, sshitem)
-				ZBX_COPY_PARAM_ORIG(publickey, sshitem)
-				ZBX_COPY_PARAM_ORIG(privatekey, sshitem)
-				ZBX_COPY_PARAM_ORIG(password, sshitem)
-				ZBX_COPY_PARAM_ORIG(params, sshitem)
-			}
-			break;
-		case ITEM_TYPE_TELNET:
-			if (NULL != telnetitem)
-			{
-				ZBX_COPY_PARAM_ORIG(username, telnetitem)
-				ZBX_COPY_PARAM_ORIG(password, telnetitem)
-				ZBX_COPY_PARAM_ORIG(params, telnetitem)
-			}
-			break;
-		case ITEM_TYPE_CALCULATED:
-			if (NULL != calcitem)
-				ZBX_COPY_PARAM_ORIG(params, calcitem)
-			break;
-		default:
-			/* nothing to do */;
+	case ITEM_TYPE_SNMPv1:
+	case ITEM_TYPE_SNMPv2c:
+	case ITEM_TYPE_SNMPv3:
+		if (NULL != (snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid)))
+		{
+			strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
+			strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
+			dst_item->snmp_port = snmpitem->snmp_port;
+			strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
+			dst_item->snmpv3_securitylevel = snmpitem->snmpv3_securitylevel;
+			strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
+			strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
+		}
+		break;
+	case ITEM_TYPE_TRAPPER:
+		if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &src_item->itemid)))
+			strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
+		break;
+	case ITEM_TYPE_IPMI:
+		if (NULL != (ipmiitem = zbx_hashset_search(&config->ipmiitems, &src_item->itemid)))
+			strscpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor);
+		break;
+	case ITEM_TYPE_DB_MONITOR:
+		if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid)))
+		{
+			strscpy(dst_item->params_orig, dbitem->params);
+			dst_item->params = NULL;
+		}
+		break;
+	case ITEM_TYPE_SSH:
+		if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &src_item->itemid)))
+		{
+			dst_item->authtype = sshitem->authtype;
+			strscpy(dst_item->username_orig, sshitem->username);
+			strscpy(dst_item->publickey_orig, sshitem->publickey);
+			strscpy(dst_item->privatekey_orig, sshitem->privatekey);
+			strscpy(dst_item->password_orig, sshitem->password);
+			strscpy(dst_item->params_orig, sshitem->params);
+			dst_item->username = NULL;
+			dst_item->publickey = NULL;
+			dst_item->privatekey = NULL;
+			dst_item->password = NULL;
+			dst_item->params = NULL;
+		}
+		break;
+	case ITEM_TYPE_TELNET:
+		if (NULL != (telnetitem = zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
+		{
+			strscpy(dst_item->username_orig, telnetitem->username);
+			strscpy(dst_item->password_orig, telnetitem->password);
+			strscpy(dst_item->params_orig, telnetitem->params);
+			dst_item->username = NULL;
+			dst_item->password = NULL;
+			dst_item->params = NULL;
+		}
+		break;
+	case ITEM_TYPE_CALCULATED:
+		if (NULL != (calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid)))
+		{
+			strscpy(dst_item->params_orig, calcitem->params);
+			dst_item->params = NULL;
+		}
+		break;
+	default:
+		/* nothing to do */;
 	}
 }
 

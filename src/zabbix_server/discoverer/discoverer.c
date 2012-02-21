@@ -186,8 +186,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 			case SVC_SNMPv2c:
 			case SVC_SNMPv3:
 				memset(&item, 0, sizeof(DC_ITEM));
-				item.key_orig = dcheck->key_;
-				item.key = zbx_strdup(item.key, item.key_orig);
+				zbx_strlcpy(item.key_orig, dcheck->key_, sizeof(item.key_orig));
+				item.key = item.key_orig;
 				zbx_strlcpy(item.host.ip, ip, sizeof(item.host.ip));
 				item.host.useip = 1;
 				item.host.port = port;
@@ -262,13 +262,12 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 #else
 					ret = FAIL;
 #endif	/* HAVE_SNMP */
+
 				if (FAIL == ret && ISSET_MSG(&result))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "discovery: item [%s] error: %s",
 							item.key, result.msg);
 				}
-
-				zbx_free(item.key);
 				break;
 			case SVC_ICMPPING:
 				memset(&host, 0, sizeof(host));
