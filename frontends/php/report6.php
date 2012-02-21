@@ -70,7 +70,7 @@ require_once('include/page_header.php');
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
@@ -78,7 +78,7 @@ require_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.report6.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.report6.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 
@@ -180,7 +180,7 @@ require_once('include/page_header.php');
 		default: $rep_form = bar_report_form();
 	}
 
-	$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state',1));
+	$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
 
 	if(isset($_REQUEST['report_show'])){
 		$src = 'chart_bar.php?config='.$_REQUEST['config'].

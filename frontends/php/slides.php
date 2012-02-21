@@ -33,7 +33,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 require_once('include/page_header.php');
 ?>
 <?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
@@ -52,8 +52,8 @@ $fields = array(
 	'favcnt' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
 	'pmasterid' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 	// actions
-	'action' =>			array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','refresh','flop'"), null),
-	'state' =>			array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({action})&&("flop"=={action})'),
+	'favaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','refresh','flop'"), null),
+	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favaction})&&("flop"=={favaction})'),
 	'upd_counter' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
 );
 check_fields($fields);
@@ -65,7 +65,7 @@ if (isset($_REQUEST['favobj'])) {
 	$_REQUEST['pmasterid'] = get_request('pmasterid', 'mainpage');
 
 	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.slides.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.slides.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 	elseif ($_REQUEST['favobj'] == 'timeline') {
 		if (isset($_REQUEST['elementid']) && isset($_REQUEST['period'])) {
@@ -74,14 +74,14 @@ if (isset($_REQUEST['favobj'])) {
 	}
 	elseif (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
 		$result = false;
-		if ($_REQUEST['action'] == 'add') {
+		if ($_REQUEST['favaction'] == 'add') {
 			$result = add2favorites('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo 'jQuery("#addrm_fav").title = "'._('Remove from').' '._('Favourites').'";'."\n".
 					'jQuery("#addrm_fav").click(function() { rm4favorites("'.$_REQUEST['favobj'].'", "'.$_REQUEST['favid'].'", 0); });'."\n";
 			}
 		}
-		elseif ($_REQUEST['action'] == 'remove') {
+		elseif ($_REQUEST['favaction'] == 'remove') {
 			$result = rm4favorites('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
 				echo 'jQuery("#addrm_fav").title = "'._('Add to').' '._('Favourites').'";'."\n".

@@ -49,8 +49,8 @@ require_once('include/page_header.php');
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),null)
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null),
+		'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"), null)
 	);
 
 	check_fields($fields);
@@ -58,10 +58,10 @@ require_once('include/page_header.php');
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if ('filter' == $_REQUEST['favobj']) {
-			CProfile::update('web.charts.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.charts.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		if ('hat' == $_REQUEST['favobj']) {
-			CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		if ('timeline' == $_REQUEST['favobj']) {
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
@@ -77,14 +77,14 @@ require_once('include/page_header.php');
 
 		if (str_in_array($_REQUEST['favobj'],array('itemid','graphid'))) {
 			$result = false;
-			if ('add' == $_REQUEST['action']) {
+			if ('add' == $_REQUEST['favaction']) {
 				$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 				if($result){
 					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("graphid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
-			elseif ('remove' == $_REQUEST['action']) {
+			elseif ('remove' == $_REQUEST['favaction']) {
 				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){

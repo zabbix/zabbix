@@ -2,10 +2,17 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBXNEXT-1113] redesign Configuration->Host->Discovery rules (Eduard)
+..F....... [ZBXNEXT-1107] redesign Configuration->Audit (Eduard)
+....I..PS. [ZBX-2604] added processing of not supported items monitored by a proxy (Sasha)
 ..F....... [ZBXNEXT-903] redesign Configuration->Items (Eduard)
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+A.F....... [ZBX-4604] fixed "screen" type screen item validation (pavels)
+........S. [ZBX-4560] fixed low level discovery error messages to start with uppercase 'Cannot ...' (Alexei)
+..F....... [ZBX-4677] fixed minor typo in class.cscript.php; thanks to Łukasz Jernaś (Alexei)
+..F.....S. [ZBX-4261] fixed disovery rules in the queue calculation (Sasha)
 ...G...... [ZBX-4624] fixed processing of system.cpu.switches metric (Sasha)
 ..F....... [ZBX-4623] fixed host group visibility for non superadmins. (Toms)
 ........S. [ZBX-4662] fixed server crash while linking a template with DebugLevel=4 (Sasha)
@@ -446,6 +453,10 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4680] fixed minor typo in frontends/php/js/class.rpc.js (Alexei)
+...G...... [ZBX-1298] fixed processing of command line arguments more than 2KB in proc.num and proc.mem checks on Linux (Sasha)
+........S. [ZBX-4650] fixed possible server crash while processing trigger expressions (Sasha)
+.......PS. [ZBX-3688] fixed changing host's availabitily for dynamic SNMP checks (Sasha)
 ...G...PS. [ZBX-3788] signal handlers changed to reduce probability of process hang on exit (Andris)
 .......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
 .......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)

@@ -81,7 +81,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			'interfaceid'			=> array('host' => 1),
 			'port'					=> array(),
 			'inventory_link'		=> array(),
-			'lifetime'				=> array(),
+			'lifetime'				=> array()
 		);
 	}
 
@@ -124,8 +124,14 @@ abstract class CItemGeneral extends CZBXAPI {
 			));
 		}
 		else {
-			$itemDbFields = array('name' => null, 'key_' => null, 'hostid' => null, 'type' => null,
-				'value_type' => null, 'delay' => '0', 'delay_flex' => ''
+			$itemDbFields = array(
+				'name' => null,
+				'key_' => null,
+				'hostid' => null,
+				'type' => null,
+				'value_type' => null,
+				'delay' => '0',
+				'delay_flex' => ''
 			);
 
 			$dbHosts = API::Host()->get(array(
@@ -157,7 +163,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 			if ($update) {
 				if (!isset($dbItems[$item['itemid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
 				check_db_fields($dbItems[$item['itemid']], $fullItem);
@@ -175,14 +181,13 @@ abstract class CItemGeneral extends CZBXAPI {
 				if (!isset($item['hostid'])) {
 					$item['hostid'] = $fullItem['hostid'];
 				}
-
 				if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
 					$item['error'] = '';
 				}
 			}
 			else {
 				if (!isset($dbHosts[$item['hostid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 			}
 
@@ -191,11 +196,9 @@ abstract class CItemGeneral extends CZBXAPI {
 			if ($fullItem['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
 				$item['delay_flex'] = '';
 			}
-
 			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR) {
 				$item['delta'] = 0;
 			}
-
 			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 				$item['data_type'] = 0;
 			}
@@ -283,7 +286,6 @@ abstract class CItemGeneral extends CZBXAPI {
 					}
 				}
 			}
-
 			$this->checkSpecificFields($fullItem);
 		}
 		unset($item);
@@ -380,7 +382,6 @@ abstract class CItemGeneral extends CZBXAPI {
 		return $matchingInterface;
 	}
 
-
 	public function isReadable($ids) {
 		if (!is_array($ids)) {
 			return false;
@@ -422,7 +423,6 @@ abstract class CItemGeneral extends CZBXAPI {
 		return (count($ids) == $count);
 	}
 
-
 	/**
 	 * Checks whether the given items are referenced by any graphs and tries to
 	 * unset these references, if they are no longer used.
@@ -435,7 +435,6 @@ abstract class CItemGeneral extends CZBXAPI {
 		$this->checkUseInGraphAxis($itemids, true);
 		$this->checkUseInGraphAxis($itemids);
 	}
-
 
 	/**
 	 * Checks if any of the given items are used as min/max Y values in a graph.
@@ -454,16 +453,12 @@ abstract class CItemGeneral extends CZBXAPI {
 	 */
 	protected function checkUseInGraphAxis(array $itemids, $checkMax = false) {
 		if ($checkMax) {
-			$filter = array(
-				'ymax_itemid' => $itemids
-			);
+			$filter = array('ymax_itemid' => $itemids);
 			$itemIdColumn = 'ymax_itemid';
 			$typeColumn = 'ymax_type';
 		}
 		else {
-			$filter = array(
-				'ymin_itemid' => $itemids
-			);
+			$filter = array('ymin_itemid' => $itemids);
 			$itemIdColumn = 'ymin_itemid';
 			$typeColumn = 'ymin_type';
 		}

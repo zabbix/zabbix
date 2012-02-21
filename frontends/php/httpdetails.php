@@ -49,7 +49,7 @@
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 	);
 
 	if(!check_fields($fields)) exit();
@@ -57,7 +57,7 @@
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.httpdetails.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.httpdetails.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['favid']) && isset($_REQUEST['period'])){
@@ -99,7 +99,7 @@
 	$rst_icon = get_icon('reset', array('id' => $_REQUEST['httptestid']));
 
 	$details_wdgt->addPageHeader(
-		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS, $httptest_data['lastcheck']).']'),
+		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']),' ['.date(_('d M Y H:i:s'), $httptest_data['lastcheck']).']'),
 		array($rst_icon, $fs_icon)
 	);
 //-------------
@@ -124,7 +124,7 @@
 
 		if(HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 			if($httptest_data['curstep'] == ($httpstep_data['no'])){
-				$status['msg'] = S_IN_PROGRESS;
+				$status['msg'] = _('In progress');
 				$status['style'] = 'unknown';
 				$status['skip'] = true;
 			}
@@ -195,7 +195,7 @@
 	$status['style'] = 'enabled';
 
 	if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
-		$status['msg'] = S_IN_PROGRESS;
+		$status['msg'] = _('In progress');
 		$status['style'] = 'unknown';
 	}
 	else if ( HTTPTEST_STATE_UNKNOWN == $httptest_data['curstate'] ){
@@ -224,7 +224,7 @@
 
 	$scroll_div = new CDiv();
 	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$graphsWidget->addFlicker($scroll_div, CProfile::get('web.httpdetails.filter.state',0));
+	$graphsWidget->addFlicker($scroll_div, CProfile::get('web.httpdetails.filter.state', 0));
 	$graphsWidget->addItem(SPACE);
 
 	$graphTable = new CTableInfo();

@@ -22,8 +22,8 @@
 require_once('include/config.inc.php');
 require_once('include/forms.inc.php');
 
-$page["title"] = _('Installation');
-$page["file"] = 'instal.php';
+$page['title'] = _('Installation');
+$page['file'] = 'instal.php';
 
 require_once('include/page_header.php');
 require_once('setup.php');
@@ -32,48 +32,32 @@ require_once('include/page_footer.php');
 /*******************************/
 /* THIS POINT NEVER BE REACHED */
 /*******************************/
-?>
-<?php
-	$fields=array(
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'install' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'update' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null)
+);
+check_fields($fields);
 
-/* actions */
-		"install"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"update"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-	);
+if (isset($_REQUEST['install'])) {
+	jsRedirect('setup.php');
+	exit();
+}
+elseif (isset($_REQUEST['update'])) {
+	error('*UNDER CONSTRUCTION*');
+}
 
-	check_fields($fields);
-?>
-<?php
-	if(isset($_REQUEST['install'])){
-		jsRedirect('setup.php');
-		exit();
-	}
-	else if(isset($_REQUEST['update'])){
-		error('*UNDER CONSTRUCTION*');
-	}
-
-	$form = new CFormTable(S_INSTALLATION_UPDATE);
-	$form->setHelp('install_source_web.php');
-	$form->addRow(
-		array(bold(S_NEW_INSTALLATION_BIG),BR(),BR(),
-			bold(S_DESCRIPTION),BR(),
-			'Not implemented yet!',
-			BR(),BR(),BR()
-			),
-		new CSubmit('install',S_NEW_INSTALLATION));
-	$form->addRow(
-		array(bold(S_UPDATE_BIG),BR(),BR(),
-			bold(S_DESCRIPTION),BR(),
-			'Not implemented yet!',
-			BR(),BR(),BR()
-			),
-		new CSubmit('update',S_UPDATE));
-	$form->show();
-
-?>
-<?php
+$form = new CFormTable(_('Installation/Update'));
+$form->setHelp('install_source_web.php');
+$form->addRow(
+	array(bold(_('NEW INSTALLATION')), BR(), BR(), bold(_('Description')), BR(), 'Not implemented yet!', BR(),BR(),BR()),
+	new CSubmit('install', _('New installation'))
+);
+$form->addRow(
+	array(bold(_('UPDATE')), BR(), BR(), bold(_('Description')), BR(), 'Not implemented yet!', BR(), BR(), BR()),
+	new CSubmit('update', _('Update'))
+);
+$form->show();
 
 require_once('include/page_footer.php');
-
 ?>
