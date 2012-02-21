@@ -452,6 +452,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4680] fixed minor typo in frontends/php/js/class.rpc.js (Alexei)
 ...G...... [ZBX-1298] fixed processing of command line arguments more than 2KB in proc.num and proc.mem checks on Linux (Sasha)
 ........S. [ZBX-4650] fixed possible server crash while processing trigger expressions (Sasha)
 .......PS. [ZBX-3688] fixed changing host's availabitily for dynamic SNMP checks (Sasha)
