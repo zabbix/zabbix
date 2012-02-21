@@ -438,7 +438,7 @@ class CMaintenance extends CZBXAPI {
 	public function create(array $maintenances) {
 		$maintenances = zbx_toArray($maintenances);
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		$hostids = array();
@@ -463,7 +463,7 @@ class CMaintenance extends CZBXAPI {
 		$updHosts = API::Host()->get($options);
 		foreach ($hostids as $hostid) {
 			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 		// groups permissions
@@ -476,7 +476,7 @@ class CMaintenance extends CZBXAPI {
 		$updGroups = API::HostGroup()->get($options);
 		foreach ($groupids as $groupid) {
 			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
@@ -584,7 +584,7 @@ class CMaintenance extends CZBXAPI {
 
 		// validate maintenance permissions
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		$hostids = array();
@@ -601,7 +601,7 @@ class CMaintenance extends CZBXAPI {
 
 		foreach ($maintenances as $maintenance) {
 			if (!isset($updMaintenances[$maintenance['maintenanceid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 
 			// Checking whether a maintenance with this name already exists. First, getting all maintenances with the same name as this
@@ -655,7 +655,7 @@ class CMaintenance extends CZBXAPI {
 		$updHosts = API::Host()->get($options);
 		foreach ($hostids as $hostid) {
 			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 		// validate groups permissions
@@ -668,7 +668,7 @@ class CMaintenance extends CZBXAPI {
 		$updGroups = API::HostGroup()->get($options);
 		foreach ($groupids as $groupid) {
 			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
@@ -826,7 +826,7 @@ class CMaintenance extends CZBXAPI {
 	public function delete(array $maintenanceids) {
 		$maintenanceids = zbx_toArray($maintenanceids);
 			if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 
 			$options = array(
@@ -838,7 +838,7 @@ class CMaintenance extends CZBXAPI {
 			$maintenances = $this->get($options);
 			foreach ($maintenanceids as $maintenanceid) {
 				if (!isset($maintenances[$maintenanceid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 

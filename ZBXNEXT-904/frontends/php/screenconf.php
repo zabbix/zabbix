@@ -37,7 +37,7 @@ else{
 	$EXPORT_DATA = false;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
+	$page['title'] = _('Configuration of screens');
 	$page['file'] = 'screenconf.php';
 	$page['hist_arg'] = array('templateid');
 }
@@ -239,7 +239,7 @@ require_once('include/page_header.php');
 
 
 	$screen_wdgt = new CWidget();
-	$screen_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREENS_BIG, $form);
+	$screen_wdgt->addPageHeader(_('CONFIGURATION OF SCREENS'), $form);
 
 	if(isset($_REQUEST['form'])){
 		if($_REQUEST['form'] == S_IMPORT_SCREEN)

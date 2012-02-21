@@ -1005,7 +1005,7 @@ COpt::memoryPick();
 			$updGroups = API::HostGroup()->get($options);
 			foreach ($groupids as $gnum => $groupid) {
 				if (!isset($updGroups[$groupid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 // }}} PERMISSIONS
@@ -1097,7 +1097,7 @@ COpt::memoryPick();
 
 			foreach ($templates as $tnum => $template) {
 				if (!isset($updTemplates[$template['templateid']])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 
@@ -1147,7 +1147,7 @@ COpt::memoryPick();
 			$delTemplates = $this->get($options);
 			foreach ($templateids as $templateid) {
 				if (!isset($delTemplates[$templateid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 
@@ -1284,7 +1284,7 @@ COpt::memoryPick();
 
 			foreach ($templates as $tnum => $template) {
 				if (!isset($updTemplates[$template['templateid']])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 
@@ -1335,7 +1335,7 @@ COpt::memoryPick();
 			$updTemplates = $this->get($options);
 			foreach ($templates as $tnum => $template) {
 				if (!isset($updTemplates[$template['templateid']])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 
@@ -1620,7 +1620,7 @@ COpt::memoryPick();
 
 			foreach ($templateids as $templateid) {
 				if (!isset($updTemplates[$templateid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 

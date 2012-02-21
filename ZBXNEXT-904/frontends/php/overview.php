@@ -114,7 +114,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(getSeverityCell($i), S_ENABLED));
 	}
 
-	$help_table->addRow(array(new CCol(SPACE, 'trigger_unknown'), S_UNKNOWN));
+	$help_table->addRow(array(new CCol(SPACE, 'trigger_unknown'), _('Unknown')));
 
 	if($_REQUEST['type']==SHOW_TRIGGERS){
 		// blinking preview in help popup (only if blinking is enabled)

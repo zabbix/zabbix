@@ -58,7 +58,6 @@
 	'S_IMPORT'=>				_('Import'),
 	'S_EXPORT_SELECTED'=>		_('Export selected'),
 	'S_PREVIEW'=>				_('Preview'),
-	'S_NO_DATA_SMALL'=>			_('no data'),
 	'S_RULES'=>				_('Rules'),
 
 //	export.inc.php
@@ -265,14 +264,10 @@
 	'S_IP'=>					_('IP'),
 	'S_PORT'=>					_('Port'),
 	'S_TEMPLATE'=>					_('Template'),
-	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
-	'S_ALL_GROUPS'=>				_('All groups'),
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_HOST_GROUP'=>				_('Host group'),
 	'S_UPDATE'=>					_('Update'),
-	'S_AVAILABLE'=>					_('Available'),
-	'S_NOT_AVAILABLE'=>				_('Not available'),
 	'S_PROXIES'=>					_('Proxies'),
 	'S_PROXIES_BIG'=>				_('PROXIES'),
 	'S_CREATE_PROXY'=>				_('Create proxy'),
@@ -334,8 +329,6 @@
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
 	'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 
-	'S_MAINTENANCE_BIG'=>			_('MAINTENANCE'),
-
 //	sysmaps.php
 	'S_MAP_DELETED'=>			_('Network map deleted'),
 	'S_CANNOT_DELETE_MAP'=>			_('Cannot delete network map'),
@@ -370,7 +363,6 @@
 
 //	map.php
 	'S_ZABBIX_URL'=>		_('http://www.zabbix.com'),
-	'S_UNACKNOWLEDGED' => _('Unacknowledged'),
 	'S_EVENT_ACKNOWLEDGING_DISABLED' => _('Event acknowledging disabled'),
 
 //	maps.php
@@ -450,8 +442,6 @@
 	'S_FROM'=>					_('From'),
 	'S_TILL'=>					_('Till'),
 	'S_OK'=>					_('Ok'),
-	'S_PROBLEM'=>					_('Problem'),
-	'S_PROBLEMS'=>					_('Problems'),
 	'S_SLA'=>					_('SLA'),
 	'S_DAY'=>					_('Day'),
 	'S_MONTH'=>					_('Month'),
@@ -490,8 +480,6 @@
 
 //	screenconf.php
 	'S_SCREEN'=>				_('Screen'),
-	'S_CONFIGURATION_OF_SCREENS_BIG'=>	_('CONFIGURATION OF SCREENS'),
-	'S_CONFIGURATION_OF_SCREENS'=>		_('Configuration of screens'),
 	'S_SCREEN_ADDED'=>			_('Screen added'),
 	'S_CANNOT_ADD_SCREEN'=>			_('Cannot add screen'),
 	'S_SCREEN_UPDATED'=>			_('Screen updated'),
@@ -519,8 +507,6 @@
 //	screenedit.php
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
-	'S_HOSTS_INFO'=>			_('Hosts info'),
-	'S_TRIGGERS_INFO'=>			_('Triggers info'),
 	'S_SERVER_INFO'=>			_('Server info'),
 
 	'S_LOCAL_TIME'=>			_('Local time'),
@@ -546,7 +532,6 @@
 	'S_SEVERITY'=>				_('Severity'),
 	'S_MIN_SEVERITY'=>			_('Min severity'),
 	'S_DISABLED'=>				_('Disabled'),
-	'S_DISABLED_BIG'=>			_('DISABLED'),
 	'S_ENABLED'=>				_('Enabled'),
 	'S_URL'=>				_('URL'),
 	'S_TIME_SHIFT'=>			_('Time shift'),
@@ -593,7 +578,6 @@
 
 //	audit.php
 	'S_DETAILS'=>				_('Details'),
-	'S_ALREADY_EXISTS_SMALL'=>	_('already exists'),
 
 //	profile.php
 	'S_CLEAR' =>				_('Clear'),
@@ -697,7 +681,6 @@
 	'S_REPORTS'=>				_('Reports'),
 
 //	Errors
-	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	_('No permissions for screen'),
 	'S_NO_PERMISSIONS_FOR_MAP'=>	_('No permissions for map'),
 	'S_XML_FILE_CONTAINS_ERRORS'=>	_('XML file contains errors'),

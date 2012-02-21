@@ -29,7 +29,6 @@
 class CScreenItem extends CZBXAPI {
 
 	protected $tableName = 'screens_items';
-
 	protected $tableAlias = 'si';
 
 	/**
@@ -57,30 +56,25 @@ class CScreenItem extends CZBXAPI {
 		SCREEN_RESOURCE_HOST_TRIGGERS
 	);
 
-
 	protected $sortColumns = array(
 		'screenitemid',
 		'screenid'
 	);
 
-
 	public function __construct() {
 		parent::__construct();
 
 		$this->getOptions = zbx_array_merge($this->globalGetOptions, array(
-			'screenitemids'				=> null,
-			'screenids'					=> null,
-			'editable'					=> null,
-
-			'selectScreen'				=> null,				// not implemented
-
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'preservekeys'				=> null,
-			'countOutput'				=> null,
+			'screenitemids'	=> null,
+			'screenids'		=> null,
+			'editable'		=> null,
+			'selectScreen'	=> null, // not implemented
+			'sortfield'		=> '',
+			'sortorder'		=> '',
+			'preservekeys'	=> null,
+			'countOutput'	=> null
 		));
 	}
-
 
 	/**
 	 * Get ScreemItem data
@@ -95,7 +89,6 @@ class CScreenItem extends CZBXAPI {
 	 * @return array|boolean Host data as array or false if error
 	 */
 	public function get(array $options = array()) {
-		// options
 		$options = zbx_array_merge($this->getOptions, $options);
 
 		// build and execute query
@@ -119,10 +112,8 @@ class CScreenItem extends CZBXAPI {
 				}
 			}
 		}
-
 		return $result;
 	}
-
 
 	/**
 	 * Saves the given screen items.
@@ -132,18 +123,14 @@ class CScreenItem extends CZBXAPI {
 	 *								under the 'screenitemids' key
 	 */
 	public function create(array $screenItems) {
-
 		// validate input
 		$this->checkInput($screenItems);
 
 		// insert items
 		$screenItemids = DB::insert($this->tableName(), $screenItems);
 
-		return array(
-			'screenitemids' => $screenItemids
-		);
+		return array('screenitemids' => $screenItemids);
 	}
-
 
 	/**
 	 * Updates the given screen items.
@@ -153,7 +140,6 @@ class CScreenItem extends CZBXAPI {
 	 *								under the 'screenitemids' key
 	 */
 	public function update(array $screenItems) {
-
 		// fetch the items we're updating
 		$screenItemids = zbx_objectValues($screenItems, 'screenitemid');
 		$dbScreenItems = $this->get(array(
@@ -172,18 +158,13 @@ class CScreenItem extends CZBXAPI {
 			unset($screenItem['screenitemid']);
 			$update[] = array(
 				'values' => $screenItem,
-				'where' => array(
-					'screenitemid' => $screenItemId
-				)
+				'where' => array('screenitemid' => $screenItemId)
 			);
 		}
 		DB::update($this->tableName(), $update);
 
-		return array(
-			'screenitemids' => zbx_objectValues($screenItems, 'screenitemid')
-		);
+		return array('screenitemids' => zbx_objectValues($screenItems, 'screenitemid'));
 	}
-
 
 	/**
 	 * Update screen items using the given 'x' and 'y' parameters.
@@ -194,7 +175,6 @@ class CScreenItem extends CZBXAPI {
 	 *								under the 'screenitemids' key
 	 */
 	public function updateByPosition(array $screenItems) {
-
 		// create a screen-position map
 		$dbScreenItems = $this->get(array(
 			'output' => array('screenitemid', 'x', 'y', 'screenid'),
@@ -236,11 +216,8 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		// return the ids of the affected items
-		return array(
-			'screenitemids' => array_merge($updateItemids, $createItemids)
-		);
+		return array('screenitemids' => array_merge($updateItemids, $createItemids));
 	}
-
 
 	/**
 	 * Deletes the given screen items.
@@ -271,7 +248,6 @@ class CScreenItem extends CZBXAPI {
 		return array('screenitemids' => $screenItemids);
 	}
 
-
 	/**
 	 * Returns true if the given screen items exist and are available for reading.
 	 *
@@ -295,7 +271,6 @@ class CScreenItem extends CZBXAPI {
 
 		return (count($screenItemids) == $count);
 	}
-
 
 	/**
 	 * Returns true if the given screen items exist and are available for writing.
@@ -322,7 +297,6 @@ class CScreenItem extends CZBXAPI {
 		return (count($screenItemids) == $count);
 	}
 
-
 	/**
 	 * Validates the given screen items.
 	 *
@@ -337,7 +311,6 @@ class CScreenItem extends CZBXAPI {
 	 *								be matched against
 	 */
 	protected function checkInput(array $screenItems, array $dbScreenItems = array()) {
-
 		$hostgroups = array();
 		$hosts = array();
 		$graphs = array();
@@ -346,7 +319,6 @@ class CScreenItem extends CZBXAPI {
 		$screens = array();
 
 		foreach ($screenItems as $screenItem) {
-
 			// check if the item is editable
 			if ($dbScreenItems && !isset($dbScreenItems[$screenItem['screenitemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -389,7 +361,6 @@ class CScreenItem extends CZBXAPI {
 			}
 			elseif (in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))
 					|| $screenItem['resourcetype'] == SCREEN_RESOURCE_CLOCK && $screenItem['style'] == TIME_TYPE_HOST) {
-
 				if (!$screenItem['resourceid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
 				}
@@ -422,8 +393,9 @@ class CScreenItem extends CZBXAPI {
 				'preservekeys' => true
 			));
 			foreach ($hostgroups as $id) {
-				if (!isset($result[$id]))
+				if (!isset($result[$id])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host group ID "%s" provided for screen element.', $id));
+				}
 			}
 		}
 
@@ -499,7 +471,6 @@ class CScreenItem extends CZBXAPI {
 		}
 	}
 
-
 	/**
 	 * Returns true if the given resource type is supported.
 	 *
@@ -510,7 +481,6 @@ class CScreenItem extends CZBXAPI {
 		return in_array($resourceType, self::$resourceTypes);
 	}
 
-
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// only appy the node option if no specific screen ids are given
 		if ($options['screenids'] === null) {
@@ -519,7 +489,6 @@ class CScreenItem extends CZBXAPI {
 
 		return $sqlParts;
 	}
-
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -533,6 +502,5 @@ class CScreenItem extends CZBXAPI {
 
 		return $sqlParts;
 	}
-
 }
 ?>

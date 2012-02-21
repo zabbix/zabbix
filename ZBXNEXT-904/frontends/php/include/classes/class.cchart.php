@@ -1657,9 +1657,9 @@ class CChart extends CGraphDraw{
 				$legend->addCell($colNum, array('text' => convert_units($data['avg_orig'],$this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align'=> 2));
 				$legend->addCell($colNum, array('text' => convert_units(max($data['max']),$this->items[$i]['units'], ITEM_CONVERT_NO_UNITS), 'align'=> 2));
 			}
-			else{
-				$legend->addCell($colNum,array('text' => $item_caption));
-				$legend->addCell($colNum,array('text' => '[ '. S_NO_DATA_SMALL . ' ]'));
+			else {
+				$legend->addCell($colNum, array('text' => $item_caption));
+				$legend->addCell($colNum, array('text' => '[ '. _('no data') . ' ]'));
 			}
 
 			imagefilledrectangle($this->im,

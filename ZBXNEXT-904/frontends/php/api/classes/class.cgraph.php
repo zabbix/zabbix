@@ -923,7 +923,7 @@ class CGraph extends CZBXAPI {
 			$allowedHosts = API::Host()->get($options);
 			foreach ($data['hostids'] as $hostid) {
 				if (!isset($allowedHosts[$hostid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 			$options = array(
@@ -934,7 +934,7 @@ class CGraph extends CZBXAPI {
 			$allowedTemplates = API::Template()->get($options);
 			foreach ($data['templateids'] as $templateid) {
 				if (!isset($allowedTemplates[$templateid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 
@@ -995,7 +995,7 @@ class CGraph extends CZBXAPI {
 		if (!$nopermissions) {
 			foreach ($graphids as $graphid) {
 				if (!isset($delGraphs[$graphid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 				if ($delGraphs[$graphid]['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete templated graphs'));

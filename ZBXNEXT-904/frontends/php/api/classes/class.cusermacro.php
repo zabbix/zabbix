@@ -699,7 +699,7 @@ class CUserMacro extends CZBXAPI {
 			));
 			foreach ($hosts as $host) {
 				if (!isset($updHosts[$host['hostid']])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 		}
@@ -714,7 +714,7 @@ class CUserMacro extends CZBXAPI {
 			));
 			foreach ($templates as $template) {
 				if (!isset($updTemplates[$template['templateid']])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 		}
