@@ -617,6 +617,10 @@ class CUserMacro extends CZBXAPI {
 
 		// make sure we have all the data we need
 		$hostMacros = $this->extendObjects($this->tableName(), $hostMacros, array('macro', 'hostid'));
+		$dbHostMacros = $this->get(array(
+			'hostmacroids' => zbx_objectValues($hostMacros, 'hostmacroid'),
+			'output' => API_OUTPUT_EXTEND
+		));
 
 		// check permissions for all affected hosts
 		$affectedHostIds = array_merge(zbx_objectValues($dbHostMacros, 'hostid'), zbx_objectValues($hostMacros, 'hostid'));
@@ -635,11 +639,6 @@ class CUserMacro extends CZBXAPI {
 		}
 
 		$this->checkDuplicateMacros($hostMacros);
-
-		$dbHostMacros = $this->get(array(
-			'hostmacroids' => zbx_objectValues($hostMacros, 'hostmacroid'),
-			'output' => API_OUTPUT_EXTEND
-		));
 
 		// check if the macros exist
 		$this->checkIfHostMacrosExistIn(zbx_objectValues($hostMacros, 'hostmacroid'), $dbHostMacros);
