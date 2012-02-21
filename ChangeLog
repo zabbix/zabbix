@@ -9,6 +9,7 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+A.F....... [ZBX-4604] fixed "screen" type screen item validation (pavels)
 ........S. [ZBX-4560] fixed low level discovery error messages to start with uppercase 'Cannot ...' (Alexei)
 ..F....... [ZBX-4677] fixed minor typo in class.cscript.php; thanks to Łukasz Jernaś (Alexei)
 ..F.....S. [ZBX-4261] fixed disovery rules in the queue calculation (Sasha)
