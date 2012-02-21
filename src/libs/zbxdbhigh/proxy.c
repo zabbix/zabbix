@@ -1217,7 +1217,7 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid)
 	return proxy_get_history_data(j, &areg, lastid);
 }
 
-static void	calc_timestamp(char *line, int *timestamp, char *format)
+static void	calc_timestamp(char *line, int *timestamp, const char *format)
 {
 
 	const char	*__function_name = "calc_timestamp";
@@ -1238,7 +1238,7 @@ static void	calc_timestamp(char *line, int *timestamp, char *format)
 
 		num = (int)line[i] - 48;
 
-		switch ((char)format[i])
+		switch (format[i])
 		{
 			case 'h':
 				hh = 10 * hh + num;
