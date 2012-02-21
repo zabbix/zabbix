@@ -1007,6 +1007,5 @@ unsigned char	get_interface_type_by_item_type(unsigned char type);
 int	calculate_sleeptime(int nextcheck, int max_sleeptime);
 
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
-char	*zbx_strnchr(const char *str, char c, size_t n);
 
 #endif
