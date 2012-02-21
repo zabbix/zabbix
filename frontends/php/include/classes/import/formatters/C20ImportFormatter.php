@@ -84,9 +84,14 @@ class C20ImportFormatter extends CImportFormatter {
 
 			$host['groups'] = array_values($host['groups']);
 
+			if (!empty($host['inventory']) && isset($host['inventory']['inventory_mode'])) {
+				$host['inventory_mode'] = $host['inventory']['inventory_mode'];
+				unset($host['inventory']['inventory_mode']);
+			}
 
-			$hostsData[] = ArrayHelper::getByKeys($host, array('proxy_hostid', 'groups', 'templates', 'macros', 'interfaces',
-				'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name'));
+
+			$hostsData[] = ArrayHelper::getByKeys($host, array('inventory', 'proxy_hostid', 'groups', 'templates', 'macros', 'interfaces',
+				'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'inventory_mode'));
 		}
 
 		return $hostsData;
