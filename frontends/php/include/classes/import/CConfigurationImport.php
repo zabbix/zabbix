@@ -47,7 +47,7 @@ class CConfigurationImport {
 	}
 
 	public function import() {
-		DBstart();
+//		DBstart();
 		$this->formatter->setData($this->data['zabbix_export']);
 
 		$this->gatherReferences();
@@ -87,7 +87,7 @@ class CConfigurationImport {
 		if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
 			$this->processMaps();
 		}
-		DBend(false);
+//		DBend(false);
 	}
 
 	protected function gatherReferences() {
@@ -847,11 +847,15 @@ class CConfigurationImport {
 				if (!isset($selement['elementid'])) {
 					$selement['elementid'] = 0;
 				}
+
+				if (empty($selement['urls'])) {
+					unset($selement['urls']);
+				}
 				switch ($selement['elementtype']) {
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$db_sysmaps = API::Map()->getObjects($selement['elementid']);
+						$db_sysmaps = API::Map()->getObjects($selement['element']);
 						if (empty($db_sysmaps)) {
-							$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
+							$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['element']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
 							throw new Exception($error);
 						}
 
@@ -859,9 +863,9 @@ class CConfigurationImport {
 						$selement['elementid'] = $tmp['sysmapid'];
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-						$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
+						$db_hostgroups = API::HostGroup()->getObjects($selement['element']);
 						if (empty($db_hostgroups)) {
-							$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
+							$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['element']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
 							throw new Exception($error);
 						}
 
@@ -869,9 +873,9 @@ class CConfigurationImport {
 						$selement['elementid'] = $tmp['groupid'];
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						$db_hosts = API::Host()->getObjects($selement['elementid']);
+						$db_hosts = API::Host()->getObjects($selement['element']);
 						if (empty($db_hosts)) {
-							$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['elementid']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
+							$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['element']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
 							throw new Exception($error);
 						}
 
@@ -879,9 +883,9 @@ class CConfigurationImport {
 						$selement['elementid'] = $tmp['hostid'];
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$db_triggers = API::Trigger()->getObjects($selement['elementid']);
+						$db_triggers = API::Trigger()->getObjects($selement['element']);
 						if (empty($db_triggers)) {
-							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
+							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['element']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
 							throw new Exception($error);
 						}
 
@@ -892,28 +896,36 @@ class CConfigurationImport {
 					default:
 				}
 
-				$icons = array('iconid_off', 'iconid_on', 'iconid_disabled', 'iconid_maintenance');
-				foreach ($icons as $icon) {
-					if (isset($selement[$icon])) {
-						$image = getImageByIdent($selement[$icon]);
+				$icons = array(
+					'icon_off' => 'iconid_off',
+					'icon_on' => 'iconid_on',
+					'icon_disabled' => 'iconid_disabled',
+					'icon_maintenance' => 'iconid_maintenance',
+				);
+				foreach ($icons as $element => $field) {
+					if (!empty($selement[$element])) {
+						$image = getImageByIdent($selement[$element]);
 						if (!$image) {
-							throw new Exception(_s('Cannot find icon "%1$s" for map "%2$s".', $selement[$icon]['name'], $map['name']));
+							throw new Exception(_s('Cannot find icon "%1$s" for map "%2$s".',
+								$selement[$element]['name'], $map['name']));
 						}
-						$selement[$icon] = $image['imageid'];
+						$selement[$field] = $image['imageid'];
 					}
 				}
 			}
 			unset($selement);
 
 			foreach ($map['links'] as &$link) {
-				if (!isset($link['linktriggers'])) continue;
+				if (empty($link['linktriggers'])) {
+					unset($link['linktriggers']);
+					continue;
+				}
 
 				foreach ($link['linktriggers'] as &$linktrigger) {
-					$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
+					$db_triggers = API::Trigger()->getObjects($linktrigger['trigger']);
 					if (empty($db_triggers)) {
-						$nodeCaption = isset($linktrigger['triggerid']['node']) ? $linktrigger['triggerid']['node'].':' : '';
-						$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
-						throw new Exception($error);
+						throw new Exception(_s('Cannot find trigger "%1$s" for map "%2$s".',
+							$linktrigger['trigger']['description'], $map['name']));
 					}
 
 					$tmp = reset($db_triggers);

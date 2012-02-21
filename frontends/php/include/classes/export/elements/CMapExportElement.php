@@ -5,6 +5,7 @@ class CMapExportElement extends CExportElement {
 	public function __construct(array $map) {
 		parent::__construct('map', $map);
 
+		$this->addIconMap($map['iconmap']);
 		$this->addUrls($map['urls']);
 		$this->addSelements($map['selements']);
 		$this->addLinks($map['links']);
@@ -15,6 +16,10 @@ class CMapExportElement extends CExportElement {
 			'markelements', 'show_unack', 'grid_size', 'grid_show', 'grid_align', 'label_format', 'label_type_host',
 			'label_type_hostgroup', 'label_type_trigger', 'label_type_map', 'label_type_image', 'label_string_host',
 			'label_string_hostgroup', 'label_string_trigger', 'label_string_map', 'label_string_image', 'expand_macros');
+	}
+
+	protected function addIconMap(array $iconMap) {
+		$this->addElement(new CExportElement('iconmap', $iconMap));
 	}
 
 	protected function addUrls(array $urls) {

@@ -41,7 +41,7 @@ class CMapSelementExportElement extends CExportElement{
 	protected function addUrls(array $urls) {
 		$mapUrlsElement = new CExportElement('urls');
 		foreach ($urls as $url) {
-			$mapUrlsElement->addElement(new CMapUrlExportElement($url));
+			$mapUrlsElement->addElement(new CMapSelementUrlExportElement($url));
 		}
 		$this->addElement($mapUrlsElement);
 	}
