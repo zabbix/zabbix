@@ -3139,10 +3139,11 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 		for (i = 0; '[' != (*data)[i] && '\0' != (*data)[i]; i++)
 			;
 
-		if (NULL != zbx_strnchr(*data, '{', i))
+		c = (*data)[i];
+		(*data)[i] = '\0';
+
+		if (NULL != strchr(*data, '{'))
 		{
-			c = (*data)[i];
-			(*data)[i] = '\0';
 			param = zbx_strdup(param, *data);
 			(*data)[i] = c;
 
@@ -3155,6 +3156,8 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 
 			zbx_free(param);
 		}
+		else
+			(*data)[i] = c;
 	}
 
 	for (; '\0' != (*data)[i]; i++)
@@ -3210,21 +3213,19 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
 				if (']' == (*data)[i] || ',' == (*data)[i])
 				{
-					switch ((*data)[i])
+					if (']' == (*data)[i])
 					{
-						case ']':
-							level--;
-							state = ZBX_STATE_END;
-							break;
-						case ',':
-							state = ZBX_STATE_NEW;
-							break;
+						level--;
+						state = ZBX_STATE_END;
 					}
+					else
+						state = ZBX_STATE_NEW;
 
-					if (NULL != zbx_strnchr(*data + l, '{', i - l))
+					c = (*data)[i];
+					(*data)[i] = '\0';
+
+					if (NULL != strchr(*data + l, '{'))
 					{
-						c = (*data)[i];
-						(*data)[i] = '\0';
 						param = zbx_strdup(param, *data + l);
 						(*data)[i] = c;
 
@@ -3241,6 +3242,8 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 
 						zbx_free(param);
 					}
+					else
+						(*data)[i] = c;
 				}
 				break;
 			case ZBX_STATE_QUOTED:	/* a quoted parameter */
@@ -3248,10 +3251,11 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 				{
 					state = ZBX_STATE_END;
 
-					if (NULL != zbx_strnchr(*data + l + 1, '{', i - l - 1))
+					c = (*data)[i];
+					(*data)[i] = '\0';
+
+					if (NULL != strchr(*data + l + 1, '{'))
 					{
-						c = (*data)[i];
-						(*data)[i] = '\0';
 						param = zbx_strdup(param, *data + l + 1);
 						(*data)[i] = c;
 
@@ -3270,6 +3274,8 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 
 						zbx_free(param);
 					}
+					else
+						(*data)[i] = c;
 				}
 				break;
 		}
