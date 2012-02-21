@@ -250,10 +250,6 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!isset($this->data['maps'])) {
 			return array();
 		}
-		foreach ($this->data['maps'] as &$image) {
-			$this->renameData($image, array('encodedImage' => 'image'));
-		}
-		unset($image);
 		return $this->data['maps'];
 	}
 

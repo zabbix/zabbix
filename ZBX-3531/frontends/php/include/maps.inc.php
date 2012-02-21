@@ -1394,7 +1394,7 @@ function prepareMapExport(&$exportMaps) {
 	try{
 		foreach ($exportMaps as &$sysmap) {
 			if (!empty($sysmap['iconmap'])) {
-				$sysmap['iconmap'] = $sysmap['iconmap']['name'];
+				$sysmap['iconmap'] = array('name' => $sysmap['iconmap']['name']);
 			}
 
 			foreach ($sysmap['urls'] as $unum => $url) {
