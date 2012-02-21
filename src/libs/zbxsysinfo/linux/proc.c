@@ -35,17 +35,42 @@ static FILE	*open_proc_file(const char *filename)
 	return fopen(filename, "r");
 }
 
-static int	get_cmdline(FILE *f_cmd, char *line, size_t *n)
+static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 {
+	size_t	line_alloc = ZBX_KIBIBYTE, n;
+
 	rewind(f_cmd);
 
-	if (0 != (*n = fread(line, 1, MAX_STRING_LEN, f_cmd)))
+	*line = zbx_malloc(*line, line_alloc + 2);
+	*line_offset = 0;
+
+	while (0 != (n = fread(*line + *line_offset, 1, line_alloc - *line_offset, f_cmd)))
+	{
+		*line_offset += n;
+
+		if (0 != feof(f_cmd))
+			break;
+
+		line_alloc *= 2;
+		*line = zbx_realloc(*line, line_alloc + 2);
+	}
+
+	if (0 == ferror(f_cmd))
+	{
+		if (0 == *line_offset || '\0' != (*line)[*line_offset - 1])
+			(*line)[(*line_offset)++] = '\0';
+		if (1 == *line_offset || '\0' != (*line)[*line_offset - 2])
+			(*line)[(*line_offset)++] = '\0';
+
 		return SUCCEED;
+	}
+
+	zbx_free(*line);
 
 	return FAIL;
 }
 
-static int	get_procname(FILE *f_stat, char *line)
+static int	get_procname(FILE *f_stat, char **line)
 {
 	char	tmp[MAX_STRING_LEN];
 
@@ -56,8 +81,8 @@ static int	get_procname(FILE *f_stat, char *line)
 		if (0 != strncmp(tmp, "Name:\t", 6))
 			continue;
 
-		zbx_rtrim(tmp, "\n");
-		zbx_strlcpy(line, tmp + 6, MAX_STRING_LEN);
+		zbx_rtrim(tmp + 6, "\n");
+		*line = zbx_strdup(*line, tmp + 6);
 
 		return SUCCEED;
 	}
@@ -67,16 +92,19 @@ static int	get_procname(FILE *f_stat, char *line)
 
 static int	check_procname(FILE *f_cmd, FILE *f_stat, const char *procname)
 {
-	char	tmp[MAX_STRING_LEN], *p;
+	char	*tmp = NULL, *p;
 	size_t	l;
+	int	ret = SUCCEED;
 
-	if (*procname == '\0')
+	if ('\0' == *procname)
 		return SUCCEED;
 
-	if (SUCCEED == get_procname(f_stat, tmp) && 0 == strcmp(tmp, procname))
-		return SUCCEED;
-
-	if (SUCCEED == get_cmdline(f_cmd, tmp, &l))
+	if (SUCCEED == get_procname(f_stat, &tmp))
+	{
+		if (0 == strcmp(tmp, procname))
+			goto clean;
+	}
+	else if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
 	{
 		if (NULL == (p = strrchr(tmp, '/')))
 			p = tmp;
@@ -84,10 +112,14 @@ static int	check_procname(FILE *f_cmd, FILE *f_stat, const char *procname)
 			p++;
 
 		if (0 == strcmp(p, procname))
-			return SUCCEED;
+			goto clean;
 	}
 
-	return FAIL;
+	ret = FAIL;
+clean:
+	zbx_free(tmp);
+
+	return ret;
 }
 
 static int	check_user(FILE *f_stat, struct passwd *usrinfo)
@@ -122,23 +154,28 @@ static int	check_user(FILE *f_stat, struct passwd *usrinfo)
 
 static int	check_proccomm(FILE *f_cmd, const char *proccomm)
 {
-	char	tmp[MAX_STRING_LEN];
+	char	*tmp = NULL;
 	size_t	i, l;
+	int	ret = SUCCEED;
 
-	if (*proccomm == '\0')
+	if ('\0' == *proccomm)
 		return SUCCEED;
 
-	if (SUCCEED == get_cmdline(f_cmd, tmp, &l))
+	if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
 	{
-		for (i = 0; i < l - 1; i++)
-			if (tmp[i] == '\0')
+		for (i = 0, l -= 2; i < l; i++)
+			if ('\0' == tmp[i])
 				tmp[i] = ' ';
 
 		if (NULL != zbx_regexp_match(tmp, proccomm, NULL))
-			return SUCCEED;
+			goto clean;
 	}
 
-	return FAIL;
+	ret = FAIL;
+clean:
+	zbx_free(tmp);
+
+	return ret;
 }
 
 static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
