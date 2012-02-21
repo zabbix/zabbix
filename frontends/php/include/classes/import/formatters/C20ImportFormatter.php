@@ -246,6 +246,17 @@ class C20ImportFormatter extends CImportFormatter {
 		return $this->data['images'];
 	}
 
+	public function getMaps() {
+		if (!isset($this->data['maps'])) {
+			return array();
+		}
+		foreach ($this->data['maps'] as &$image) {
+			$this->renameData($image, array('encodedImage' => 'image'));
+		}
+		unset($image);
+		return $this->data['maps'];
+	}
+
 	protected function renameItemFields(array $item) {
 		$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
 		return $item;

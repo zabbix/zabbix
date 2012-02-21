@@ -9,7 +9,7 @@ class CMapLinkExportElement extends CExportElement{
 	}
 
 	protected function requiredFields() {
-		return array('drawtype', 'color', 'label', 'selement_ref1', 'selement_ref2');
+		return array('drawtype', 'color', 'label', 'selementid1', 'selementid2');
 	}
 
 	protected function addLinkTriggers(array $linkTriggers) {

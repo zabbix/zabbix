@@ -2,16 +2,8 @@
 
 class CMapExportElement extends CExportElement {
 
-	private $references = array();
-
-
 	public function __construct(array $map) {
 		parent::__construct('map', $map);
-
-		$this->references = array(
-			'num' => 1,
-			'refs' => array()
-		);
 
 		$this->addUrls($map['urls']);
 		$this->addSelements($map['selements']);
@@ -36,12 +28,6 @@ class CMapExportElement extends CExportElement {
 	protected function addSelements(array $selements) {
 		$mapSelementsElement = new CExportElement('selements');
 		foreach ($selements as $selement) {
-			$refNum = $this->references['num']++;
-			$referenceKey = 'sel'.$refNum;
-			$selement['selement_ref'] = $referenceKey;
-
-			$this->references['refs'][$selement['selementid']] = $referenceKey;
-
 			$mapSelementsElement->addElement(new CMapSelementExportElement($selement));
 		}
 		$this->addElement($mapSelementsElement);
@@ -50,9 +36,6 @@ class CMapExportElement extends CExportElement {
 	protected function addLinks(array $links) {
 		$mapLinksElement = new CExportElement('links');
 		foreach ($links as $link) {
-			$link['selement_ref1'] = $this->references['refs'][$link['selementid1']];
-			$link['selement_ref2'] = $this->references['refs'][$link['selementid2']];
-
 			$mapLinksElement->addElement(new CMapLinkExportElement($link));
 		}
 		$this->addElement($mapLinksElement);
