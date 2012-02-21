@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4600] fixed trigger dependencies being reset when executing a mass update (pavels)
 A.F....... [ZBX-4604] fixed "screen" type screen item validation (pavels)
 ..F....... [ZBX-4680] fixed minor typo in frontends/php/js/class.rpc.js (Alexei)
 ...G...... [ZBX-1298] fixed processing of command line arguments more than 2KB in proc.num and proc.mem checks on Linux (Sasha)
