@@ -860,10 +860,10 @@ int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(char *list, char *ip);
 
-#ifdef HAVE_IPV6
 int	expand_ipv6(const char *ip, char *str, size_t str_len);
+#ifdef HAVE_IPV6
 char	*collapse_ipv6(char *str, size_t str_len);
-#endif /* HAVE_IPV6 */
+#endif
 
 /* time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);

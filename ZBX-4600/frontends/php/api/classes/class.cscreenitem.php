@@ -423,7 +423,11 @@ class CScreenItem extends CZBXAPI {
 				SCREEN_RESOURCE_DATA_OVERVIEW
 			);
 			if (in_array($screenItem['resourcetype'], $hostGroupResourceTypes)) {
-				if (!$screenItem['resourceid'] && $screenItem['resourcetype'] != SCREEN_RESOURCE_HOSTGROUP_TRIGGERS) {
+				$resourceIdRequired = !in_array($screenItem['resourcetype'], array(
+					SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+					SCREEN_RESOURCE_TRIGGERS_INFO
+				));
+				if (!$screenItem['resourceid'] && $resourceIdRequired) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_RESOURCE_PROVIDED_FOR_SCREEN_ITEM);
 				}
 				elseif ($screenItem['resourceid']) {
@@ -537,7 +541,7 @@ class CScreenItem extends CZBXAPI {
 
 		// check screens
 		if ($screens) {
-			$result = self::get(array(
+			$result = CScreen::get(array(
 				'screenids' => $screens,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => true
