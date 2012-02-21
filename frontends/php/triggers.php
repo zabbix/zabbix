@@ -208,24 +208,13 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 	// update triggers
 	DBstart();
 	foreach ($db_triggers as $trigger) {
-		foreach ($trigger as $key => $value) {
-			if (isset($visible[$key]) && isset($_REQUEST[$key])) {
-				$trigger[$key] = $_REQUEST[$key];
-			}
-		}
-
-		$options = array('triggerid' => $trigger['triggerid']);
-		if (!empty($visible['priority'])) {
-			$options['priority'] = $trigger['priority'];
-		}
-		if (!empty($visible['dependencies'])) {
-			$options['dependencies'] = $trigger['dependencies'];
-		}
-		if (!empty($options['priority']) || !empty($options['dependencies'])) {
-			$result = API::Trigger()->update($options);
-			if (!$result) {
-				break;
-			}
+		$result = API::Trigger()->update(array(
+			'triggerid' => $trigger['triggerid'],
+			'priority' => (isset($visible['priority'])) ? get_request('priority') : null,
+			'dependencies' => (isset($visible['dependencies'])) ? get_request('dependencies', array()) : null
+		));
+		if (!$result) {
+			break;
 		}
 	}
 	if (isset($result)) {

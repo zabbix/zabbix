@@ -134,7 +134,7 @@ if (empty($this->data['parent_discoveryid'])) {
 
 	$triggersFormList->addRow(
 		array(
-			_('Dependencies'),
+			_('Replace depenencies'),
 			SPACE,
 			new CVisibilityBox('visible[dependencies]', !empty($this->data['visible']['dependencies']) ? 'yes' : 'no', 'dependencies_div', _('Original'))
 		),
