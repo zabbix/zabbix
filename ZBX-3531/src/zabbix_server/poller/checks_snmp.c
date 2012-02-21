@@ -1072,7 +1072,6 @@ int	get_value_snmp(DC_ITEM *item, AGENT_RESULT *value)
 								oid_index,
 								item->snmp_oid,
 								err));
-						ret = NOTSUPPORTED;
 						break;
 					}
 

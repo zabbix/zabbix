@@ -22,7 +22,7 @@
 	require_once('include/config.inc.php');
 	require_once('include/hosts.inc.php');
 
-	$page['title'] = 'S_PROXIES';
+	$page['title'] = _('Proxies');
 	$page['file'] = 'proxies.php';
 	$page['hist_arg'] = array('');
 
@@ -177,7 +177,7 @@
 	$frmForm->cleanItems();
 	$cmbConf = new CComboBox('config', 'proxies.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 		$cmbConf->addItem('nodes.php', _('Nodes'));
-		$cmbConf->addItem('proxies.php',S_PROXIES);
+		$cmbConf->addItem('proxies.php', _('Proxies'));
 	$frmForm->addItem($cmbConf);
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CSubmit('form',S_CREATE_PROXY));
