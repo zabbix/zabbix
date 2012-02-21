@@ -1129,6 +1129,7 @@ COpt::memoryPick();
 		}
 
 		foreach ($createdTriggers as $trigger) {
+			$trigger['expression'] = explode_exp($trigger['expression']);
 			$this->inherit($trigger);
 			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'],
 					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
@@ -1447,6 +1448,7 @@ COpt::memoryPick();
 	}
 
 	protected function inherit($trigger, $hostids = null) {
+//		var_dump($trigger);die;
 		$triggerTemplate = API::Template()->get(array(
 			'triggerids' => $trigger['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
