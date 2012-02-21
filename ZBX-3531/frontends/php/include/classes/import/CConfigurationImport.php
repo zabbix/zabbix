@@ -47,7 +47,7 @@ class CConfigurationImport {
 	}
 
 	public function import() {
-//		DBstart();
+		DBstart();
 		$this->formatter->setData($this->data['zabbix_export']);
 
 		$this->gatherReferences();
@@ -84,7 +84,10 @@ class CConfigurationImport {
 				&& ($this->options['images']['exist'] || $this->options['images']['missed'])) {
 			$this->processImages();
 		}
-//		DBend(false);
+		if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
+			$this->processMaps();
+		}
+		DBend(false);
 	}
 
 	protected function gatherReferences() {
@@ -770,239 +773,169 @@ class CConfigurationImport {
 	}
 
 	private function processMaps() {
-		global $USER_DETAILS;
-		$importMaps = $this->formatter->getMaps();
+		$allMaps = $this->formatter->getMaps();
 
-		try{
-			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
-				$images = $importMaps['zabbix_export']['images'];
-				$images_to_add = array();
-				$images_to_update = array();
-				foreach($images as $inum => $image){
-					if(API::Image()->exists($image)){
-						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['exist']))
-								|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['background']['exist']))))
-						{
+		$mapsToCreate = array();
+		$mapsToUpdate = array();
+		$existingMaps = array();
+		$allMaps = zbx_toHash($allMaps, 'name');
+		$dbMaps = DBselect('SELECT s.sysmapid, s.name FROM sysmaps s WHERE '.DBcondition('s.name', array_keys($allMaps)));
+		while ($dbMap = DBfetch($dbMaps)) {
+			$existingMaps[$dbMap['sysmapid']] = $dbMap['name'];
+			$allMaps[$dbMap['name']]['sysmapid'] = $dbMap['sysmapid'];
+		}
 
-							$options = array(
-								'filter' => array('name' => $image['name']),
-								'output' => API_OUTPUT_SHORTEN
-							);
-							$imgs = API::Image()->get($options);
-							$img = reset($imgs);
+		// if we are going to update maps, check for permissions
+		if ($existingMaps && $this->options['maps']['exist']) {
+			$allowedMaps = API::Map()->get(array(
+				'sysmapids' => array_keys($existingMaps),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => true,
+				'preservekeys' => true
+			));
+			foreach ($existingMaps as $existingMapId => $existingMapName) {
+				if (!isset($allowedMaps[$existingMapId])) {
+					throw new Exception(_s('No permissions for map "%1$s".', $existingMapName));
+				}
+			}
+		}
 
-							$image['imageid'] = $img['imageid'];
-
-							// image will be decoded in class.image.php
-							$image['image'] = $image['encodedImage'];
-							unset($image['encodedImage']);
-
-							$images_to_update[] = $image;
-						}
-					}
-					else{
-						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['missed']))
-								|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['background']['missed'])))
-						{
-
-							// No need to decode_base64
-							$image['image'] = $image['encodedImage'];
-
-							unset($image['encodedImage']);
-							$images_to_add[] = $image;
-						}
-					}
+		foreach ($allMaps as $map) {
+			// resolve icon map
+			if (isset($map['iconmap'])) {
+				$iconMap = API::IconMap()->get(array(
+					'filter' => array('name' => $map['iconmap']),
+					'output' => API_OUTPUT_SHORTEN,
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+				$iconMap = reset($iconMap);
+				if (!$iconMap) {
+					throw new Exception(_s('Cannot find icon map "%1$s" for map "%2$s".', $map['iconmap'], $map['name']));
 				}
 
-				if (!empty($images_to_add)) {
-					$result = API::Image()->create($images_to_add);
-					if (!$result) throw new Exception(_('Cannot add image'));
-				}
-
-				if (!empty($images_to_update)) {
-					$result = API::Image()->update($images_to_update);
-					if (!$result) throw new Exception(_('Cannot update image'));
-				}
+				$map['iconmapid'] = $iconMap['iconmapid'];
 			}
 
 
-			$importMaps = $importMaps['zabbix_export']['sysmaps'];
-			foreach($importMaps as $mnum => &$sysmap){
-				unset($sysmap['sysmapid']);
-				$exists = API::Map()->exists(array('name' => $sysmap['name']));
+			if (isset($map['backgroundid'])) {
+				$image = getImageByIdent($map['backgroundid']);
 
-				if(!isset($sysmap['label_format'])){
-					$sysmap['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
+				if (!$image) {
+					throw new Exception(_s('Cannot find background image for map "%1$s.', $map['name']));
 				}
+				$map['backgroundid'] = $image['imageid'];
+			}
 
-				if($exists && isset($rules['maps']['exist'])){
-					$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
-					if(empty($db_maps)) throw new Exception(S_NO_PERMISSIONS_FOR_MAP.' ['.$sysmap['name'].'] import');
+			if (!isset($map['selements'])) {
+				$map['selements'] = array();
+			}
+			else {
+				$map['selements'] = array_values($map['selements']);
+			}
 
-					$db_map = reset($db_maps);
-					$sysmap['sysmapid'] = $db_map['sysmapid'];
+			if (!isset($map['links'])) {
+				$map['links'] = array();
+			}
+			else {
+				$map['links'] = array_values($map['links']);
+			}
+
+			foreach ($map['selements'] as &$selement) {
+				$nodeCaption = isset($selement['elementid']['node']) ? $selement['elementid']['node'].':' : '';
+
+				if (!isset($selement['elementid'])) {
+					$selement['elementid'] = 0;
 				}
-				else if($exists || !isset($rules['maps']['missed'])){
-					info('Map ['.$sysmap['name'].'] skipped - user rule');
-					unset($importMaps[$mnum]);
-					continue; // break if not update exist
-				}
-
-				// icon map
-				if (isset($sysmap['iconmap'])) {
-					$iconMap = API::IconMap()->get(array(
-						'filter' => array('name' => $sysmap['iconmap']),
-						'output' => API_OUTPUT_SHORTEN,
-						'nopermissions' => true,
-						'preservekeys' => true
-					));
-					$iconMap = reset($iconMap);
-					if (!$iconMap) {
-						$error = _s('Cannot find icon map "%1$s" used in exported map "%2$s".', $sysmap['iconmap'], $sysmap['name']);
-						throw new Exception($error);
-					}
-
-					$sysmap['iconmapid'] = $iconMap['iconmapid'];
-				}
-
-				if(isset($sysmap['backgroundid'])){
-					$image = getImageByIdent($sysmap['backgroundid']);
-
-					if(!$image){
-						error(S_CANNOT_FIND_BACKGROUND_IMAGE.' "'.$sysmap['backgroundid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"');
-						$sysmap['backgroundid'] = 0;
-					}
-					else{
-						$sysmap['backgroundid'] = $image['imageid'];
-					}
-				}
-				else{
-					$sysmap['backgroundid'] = 0;
-				}
-
-				if(!isset($sysmap['selements']))
-					$sysmap['selements'] = array();
-				else
-					$sysmap['selements'] = array_values($sysmap['selements']);
-
-				if(!isset($sysmap['links']))
-					$sysmap['links'] = array();
-				else
-					$sysmap['links'] = array_values($sysmap['links']);
-
-				foreach($sysmap['selements'] as &$selement){
-					$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
-
-					if(!isset($selement['elementid'])) $selement['elementid'] = 0;
-					switch($selement['elementtype']){
-						case SYSMAP_ELEMENT_TYPE_MAP:
-							$db_sysmaps = API::Map()->getObjects($selement['elementid']);
-							if(empty($db_sysmaps)){
-								$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-
-							$tmp = reset($db_sysmaps);
-							$selement['elementid'] = $tmp['sysmapid'];
-							break;
-						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-							$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
-							if(empty($db_hostgroups)){
-								$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-
-							$tmp = reset($db_hostgroups);
-							$selement['elementid'] = $tmp['groupid'];
-							break;
-						case SYSMAP_ELEMENT_TYPE_HOST:
-							$db_hosts = API::Host()->getObjects($selement['elementid']);
-							if(empty($db_hosts)){
-								$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['elementid']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-
-							$tmp = reset($db_hosts);
-							$selement['elementid'] = $tmp['hostid'];
-							break;
-						case SYSMAP_ELEMENT_TYPE_TRIGGER:
-							$db_triggers = API::Trigger()->getObjects($selement['elementid']);
-							if(empty($db_triggers)){
-								$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-
-							$tmp = reset($db_triggers);
-							$selement['elementid'] = $tmp['triggerid'];
-							break;
-						case SYSMAP_ELEMENT_TYPE_IMAGE:
-						default:
-					}
-
-					$icons = array('iconid_off','iconid_on','iconid_disabled','iconid_maintenance');
-					foreach($icons as $icon){
-						if(isset($selement[$icon])){
-							$image = getImageByIdent($selement[$icon]);
-							if(!$image){
-								$error = S_CANNOT_FIND_IMAGE.' "'.$selement[$icon]['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-							$selement[$icon] = $image['imageid'];
+				switch ($selement['elementtype']) {
+					case SYSMAP_ELEMENT_TYPE_MAP:
+						$db_sysmaps = API::Map()->getObjects($selement['elementid']);
+						if (empty($db_sysmaps)) {
+							$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
+							throw new Exception($error);
 						}
-						else{
-							$selement[$icon] = 0;
+
+						$tmp = reset($db_sysmaps);
+						$selement['elementid'] = $tmp['sysmapid'];
+						break;
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+						$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
+						if (empty($db_hostgroups)) {
+							$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
+							throw new Exception($error);
 						}
-					}
-				}
-				unset($selement);
 
-				foreach($sysmap['links'] as &$link){
-					if(!isset($link['linktriggers'])) continue;
+						$tmp = reset($db_hostgroups);
+						$selement['elementid'] = $tmp['groupid'];
+						break;
+					case SYSMAP_ELEMENT_TYPE_HOST:
+						$db_hosts = API::Host()->getObjects($selement['elementid']);
+						if (empty($db_hosts)) {
+							$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['elementid']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
+							throw new Exception($error);
+						}
 
-					foreach($link['linktriggers'] as &$linktrigger){
-						$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
-						if(empty($db_triggers)){
-							$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
-							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+						$tmp = reset($db_hosts);
+						$selement['elementid'] = $tmp['hostid'];
+						break;
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$db_triggers = API::Trigger()->getObjects($selement['elementid']);
+						if (empty($db_triggers)) {
+							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
 							throw new Exception($error);
 						}
 
 						$tmp = reset($db_triggers);
-						$linktrigger['triggerid'] = $tmp['triggerid'];
-					}
-					unset($linktrigger);
+						$selement['elementid'] = $tmp['triggerid'];
+						break;
+					case SYSMAP_ELEMENT_TYPE_IMAGE:
+					default:
 				}
-				unset($link);
-			}
-			unset($sysmap);
 
-
-			foreach($importMaps as $importMap){
-				if(isset($importMap['sysmapid'])){
-					$result = API::Map()->update($importMap);
-					if($result === false){
-						throw new Exception(_s('Cannot update map "%s".', $importMap['name']));
-					}
-					else{
-						info(_s('Map "%s" updated.', $importMap['name']));
-					}
-				}
-				else{
-					$result = API::Map()->create($importMap);
-					if($result === false){
-						throw new Exception(_s('Cannot create map "%s".', $importMap['name']));
-					}
-					else{
-						info(_s('Map "%s" created.', $importMap['name']));
+				$icons = array('iconid_off', 'iconid_on', 'iconid_disabled', 'iconid_maintenance');
+				foreach ($icons as $icon) {
+					if (isset($selement[$icon])) {
+						$image = getImageByIdent($selement[$icon]);
+						if (!$image) {
+							throw new Exception(_s('Cannot find icon "%1$s" for map "%2$s".', $selement[$icon]['name'], $map['name']));
+						}
+						$selement[$icon] = $image['imageid'];
 					}
 				}
 			}
+			unset($selement);
 
-			return true;
+			foreach ($map['links'] as &$link) {
+				if (!isset($link['linktriggers'])) continue;
+
+				foreach ($link['linktriggers'] as &$linktrigger) {
+					$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
+					if (empty($db_triggers)) {
+						$nodeCaption = isset($linktrigger['triggerid']['node']) ? $linktrigger['triggerid']['node'].':' : '';
+						$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
+						throw new Exception($error);
+					}
+
+					$tmp = reset($db_triggers);
+					$linktrigger['triggerid'] = $tmp['triggerid'];
+				}
+				unset($linktrigger);
+			}
+			unset($link);
+
+			if (isset($map['sysmapid'])) {
+				$mapsToUpdate[] = $map;
+			}
+			else {
+				$mapsToCreate[] = $map;
+			}
 		}
-		catch(Exception $e){
-			error($e->getMessage());
-			return false;
+
+		if ($this->options['maps']['missed'] && $mapsToCreate) {
+			API::Map()->create($mapsToCreate);
+		}
+		if ($this->options['maps']['exist'] && $mapsToUpdate) {
+			API::Map()->update($mapsToUpdate);
 		}
 	}
 
