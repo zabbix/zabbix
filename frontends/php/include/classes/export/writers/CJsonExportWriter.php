@@ -2,8 +2,7 @@
 
 class CJsonExportWriter implements CExportWriter {
 
-	public function write(CExportElement $elem) {
-		return json_encode($elem->toArray());
+	public function write(array $array) {
+		return json_encode($array);
 	}
-
 }

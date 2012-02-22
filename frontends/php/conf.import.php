@@ -67,6 +67,8 @@ if (isset($_REQUEST['form_refresh'])) {
 }
 
 if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
+	require_once 'include/export.inc.php';
+	DBstart();
 	try {
 		$configurationImport = new CConfigurationImport($_FILES['import_file'], get_request('rules', array()));
 		$configurationImport->import();
@@ -76,11 +78,8 @@ if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])
 		error($e->getMessage());
 		show_messages(false, null, _('Import failed'));
 	}
-
-
+	DBend(false);
 }
-
-
 
 $view = new CView('conf.import', $data);
 $view->render();

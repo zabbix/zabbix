@@ -26,11 +26,8 @@ require_once('include/forms.inc.php');
 
 if (isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])) {
 	$EXPORT_DATA = true;
-
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_maps_export.xml';
-
-	require_once('include/export.inc.php');
 }
 else {
 	$EXPORT_DATA = false;
@@ -42,8 +39,8 @@ else {
 }
 
 require_once('include/page_header.php');
-?>
-<?php
+
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'maps'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
@@ -99,9 +96,7 @@ require_once('include/page_header.php');
 			$sysmap = reset($maps);
 		}
 	}
-?>
-<?php
-// EXPORT ///////////////////////////////////
+
 
 	if($EXPORT_DATA){
 		$maps = get_request('maps', array());
@@ -113,8 +108,8 @@ require_once('include/page_header.php');
 		print($export->export());
 		exit();
 	}
-?>
-<?php
+
+
 	$_REQUEST['go'] = get_request('go', 'none');
 
 	if(isset($_REQUEST['save'])){
@@ -203,8 +198,7 @@ require_once('include/page_header.php');
 		insert_js('cookie.eraseArray("'.$path.'")');
 	}
 
-?>
-<?php
+
 	$form = new CForm('get');
 	$form->cleanItems();
 	$form->addItem(new CSubmit('form', S_CREATE_MAP));
@@ -322,9 +316,6 @@ require_once('include/page_header.php');
 	}
 
 	$map_wdgt->show();
-?>
-<?php
+
 
 require_once('include/page_footer.php');
-
-?>

@@ -704,7 +704,7 @@ class CMap extends CMapElement {
 /**
  * Add Map
  *
- * @param _array $maps
+ * @param array $maps
  * @param string $maps['name']
  * @param array $maps['width']
  * @param int $maps['height']

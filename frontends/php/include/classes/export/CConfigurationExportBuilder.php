@@ -456,7 +456,6 @@ class CConfigurationExportBuilder {
 
 	private function formatMapUrls(array $urls) {
 		$result = array();
-
 		foreach ($urls as $url) {
 			$result[] = array(
 				'name' => $url['name'],
@@ -510,7 +509,6 @@ class CConfigurationExportBuilder {
 
 	private function formatMapElements(array $elements) {
 		$result = array();
-
 		foreach ($elements as $element) {
 			$result[] = array(
 				'elementtype' => $element['elementtype'],
@@ -525,12 +523,12 @@ class CConfigurationExportBuilder {
 				'viewtype' => $element['viewtype'],
 				'use_iconmap' => $element['use_iconmap'],
 				'selementid' => $element['selementid'],
-				'element' => $element['element'],
+				'element' => $element['elementid'],
 				'icon_off' => $element['iconid_off'],
 				'icon_on' => $element['iconid_on'],
 				'icon_disabled' => $element['iconid_disabled'],
 				'icon_maintenance' => $element['iconid_maintenance'],
-				'urls' => $this->formatMapLinkTriggers($element['urls'])
+				'urls' => $this->formatMapElementUrls($element['urls'])
 			);
 		}
 		return $result;

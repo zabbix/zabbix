@@ -17,8 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
 
 class zbxXML{
 	private static $xml = null;
@@ -293,7 +291,6 @@ class zbxXML{
 		return isset($map[$name]) ? $map[$name] : $name;
 	}
 
-
 	protected static function createDOMDocument(){
 		$doc = new DOMDocument('1.0', 'UTF-8');
 		$doc->preserveWhiteSpace = false;
@@ -509,10 +506,13 @@ class zbxXML{
 
 	public static function parseScreen($rules, $xml=null){
 		try{
-			self::validate(dirname(__FILE__).'/xmlschemas/screens.rng');
+//			self::validate(dirname(__FILE__).'/xmlschemas/screens.rng');
 
 			$xml = is_null($xml) ? self::$xml : $xml;
 			$importScreens = self::XMLtoArray($xml);
+			if (!isset($importScreens['zabbix_export']['screens'])) {
+				return true;
+			}
 			$importScreens = $importScreens['zabbix_export']['screens'];
 
 			$result = true;
@@ -522,7 +522,7 @@ class zbxXML{
 				unset($screen['screenid']);
 				$exists = API::Screen()->exists(array('name' => $screen['name']));
 
-				if($exists && isset($rules['screen']['exist'])){
+				if($exists && isset($rules['screens']['exist'])){
 					$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
 					if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
 
@@ -530,7 +530,7 @@ class zbxXML{
 
 					$screen['screenid'] = $db_screen['screenid'];
 				}
-				else if($exists || !isset($rules['screen']['missed'])){
+				else if($exists || !isset($rules['screens']['missed'])){
 					info('Screen ['.$screen['name'].'] skipped - user rule');
 					unset($importScreens[$mnum]);
 					continue; // break if not update exist
@@ -660,14 +660,14 @@ class zbxXML{
 		}
 
 		try{
-			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
+			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN && isset($importMaps['zabbix_export']['images'])){
 				$images = $importMaps['zabbix_export']['images'];
 				$images_to_add = array();
 				$images_to_update = array();
 				foreach($images as $inum => $image){
 					if(API::Image()->exists($image)){
-						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['exist']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['background']['exist']))))
+						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['exist']))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['exist']))))
 						{
 
 							$options = array(
@@ -687,8 +687,8 @@ class zbxXML{
 						}
 					}
 					else{
-						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['icons']['missed']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['background']['missed'])))
+						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['missed']))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['images']['missed'])))
 						{
 
 							// No need to decode_base64
@@ -712,6 +712,9 @@ class zbxXML{
 			}
 
 
+			if (!isset($importMaps['zabbix_export']['sysmaps'])) {
+				return true;
+			}
 			$importMaps = $importMaps['zabbix_export']['sysmaps'];
 			foreach($importMaps as $mnum => &$sysmap){
 				unset($sysmap['sysmapid']);
@@ -896,7 +899,7 @@ class zbxXML{
 		$triggers_for_dependencies = array();
 
 		try{
-			if(isset($rules['host']['exist']) || isset($rules['host']['missed'])){
+			if(isset($rules['hosts']['exist']) || isset($rules['hosts']['missed'])){
 				$xpath = new DOMXPath(self::$xml);
 
 				$hosts = $xpath->query('hosts/host');
@@ -909,11 +912,11 @@ class zbxXML{
 							? API::Template()->exists($host_db)
 							: API::Host()->exists($host_db);
 
-					if(!$current_host && !isset($rules['host']['missed'])){
+					if(!$current_host && !isset($rules['hosts']['missed'])){
 						info('Host ['.$host_db['host'].'] skipped - user rule');
 						continue; // break if update nonexist
 					}
-					if($current_host && !isset($rules['host']['exist'])){
+					if($current_host && !isset($rules['hosts']['exist'])){
 						info('Host ['.$host_db['host'].'] skipped - user rule');
 						continue; // break if not update exist
 					}
@@ -1104,7 +1107,7 @@ class zbxXML{
 
 
 // TEMPLATES {{{
-					if(isset($rules['template']['exist'])){
+					if(isset($rules['templates']['exist'])){
 						$templates = $xpath->query('templates/template', $host);
 
 						$host_db['templates'] = array();
@@ -1124,11 +1127,11 @@ class zbxXML{
 							$current_template = reset($current_template);
 
 
-							if(!$current_template && !isset($rules['template']['missed'])){
+							if(!$current_template && !isset($rules['templates']['missed'])){
 								info('Template ['.$template->nodeValue.'] skipped - user rule');
 								continue;
 							}
-							if($current_template && !isset($rules['template']['exist'])){
+							if($current_template && !isset($rules['templates']['exist'])){
 								info('Template ['.$template->nodeValue.'] skipped - user rule');
 								continue;
 							}
@@ -1180,7 +1183,7 @@ class zbxXML{
 						}
 					}
 
-					if ($current_host && isset($rules['host']['exist'])) {
+					if ($current_host && isset($rules['hosts']['exist'])) {
 						if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 							$host_db['templateid'] = $current_host['hostid'];
 							$result = API::Template()->update($host_db);
@@ -1195,7 +1198,7 @@ class zbxXML{
 						$current_hostid = $current_host['hostid'];
 					}
 
-					if (!$current_host && isset($rules['host']['missed'])) {
+					if (!$current_host && isset($rules['hosts']['missed'])) {
 						if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 							$result = API::Template()->create($host_db);
 							if (!$result) {
@@ -1214,7 +1217,7 @@ class zbxXML{
 					$current_hostname = $host_db['host'];
 
 // ITEMS {{{
-					if(isset($rules['item']['exist']) || isset($rules['item']['missed'])){
+					if(isset($rules['items']['exist']) || isset($rules['items']['missed'])){
 						$items = $xpath->query('items/item', $host);
 
 						// if this is an export from 1.8, we need to make some adjustments to items
@@ -1323,11 +1326,11 @@ class zbxXML{
 							$current_item = API::Item()->get($options);
 							$current_item = reset($current_item);
 
-							if(!$current_item && !isset($rules['item']['missed'])){
+							if(!$current_item && !isset($rules['items']['missed'])){
 								info('Item ['.$item_db['key_'].'] skipped - user rule');
 								continue; // break if not update exist
 							}
-							if($current_item && !isset($rules['item']['exist'])){
+							if($current_item && !isset($rules['items']['exist'])){
 								info('Item ['.$item_db['key_'].'] skipped - user rule');
 								continue; // break if not update exist
 							}
@@ -1374,7 +1377,7 @@ class zbxXML{
 							}
 // }}} ITEM APPLICATIONS
 
-							if($current_item && isset($rules['item']['exist'])){
+							if($current_item && isset($rules['items']['exist'])){
 								$item_db['itemid'] = $current_item['itemid'];
 								$result = API::Item()->update($item_db);
 								if(!$result){
@@ -1390,7 +1393,7 @@ class zbxXML{
 							}
 
 
-							if(!$current_item && isset($rules['item']['missed'])){
+							if(!$current_item && isset($rules['items']['missed'])){
 								$result = API::Item()->create($item_db);
 								if(!$result){
 									throw new Exception();
@@ -1419,7 +1422,7 @@ class zbxXML{
 
 
 // TRIGGERS {{{
-					if(isset($rules['trigger']['exist']) || isset($rules['trigger']['missed'])){
+					if(isset($rules['triggers']['exist']) || isset($rules['triggers']['missed'])){
 						$triggers = $xpath->query('triggers/trigger', $host);
 
 						$triggers_to_add = array();
@@ -1471,20 +1474,20 @@ class zbxXML{
 							}
 
 
-							if(!$current_trigger && !isset($rules['trigger']['missed'])){
+							if(!$current_trigger && !isset($rules['triggers']['missed'])){
 								info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 								continue; // break if not update exist
 							}
-							if($current_trigger && !isset($rules['trigger']['exist'])){
+							if($current_trigger && !isset($rules['triggers']['exist'])){
 								info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 								continue; // break if not update exist
 							}
 
-							if($current_trigger && isset($rules['trigger']['exist'])){
+							if($current_trigger && isset($rules['triggers']['exist'])){
 								$trigger_db['triggerid'] = $current_trigger['triggerid'];
 								$triggers_to_upd[] = $trigger_db;
 							}
-							if(!$current_trigger && isset($rules['trigger']['missed'])){
+							if(!$current_trigger && isset($rules['triggers']['missed'])){
 								$triggers_to_add[] = $trigger_db;
 							}
 						}
@@ -1521,7 +1524,7 @@ class zbxXML{
 
 
 // GRAPHS {{{
-					if(isset($rules['graph']['exist']) || isset($rules['graph']['missed'])){
+					if(isset($rules['graphs']['exist']) || isset($rules['graphs']['missed'])){
 						$graphs = $xpath->query('graphs/graph', $host);
 
 						$graphs_to_add = array();
@@ -1598,11 +1601,11 @@ class zbxXML{
 								$current_graph = reset($current_graph);
 							}
 
-							if(!$current_graph && !isset($rules['graph']['missed'])){
+							if(!$current_graph && !isset($rules['graphs']['missed'])){
 								info('Graph ['.$graph_db['name'].'] skipped - user rule');
 								continue; // break if not update exist
 							}
-							if($current_graph && !isset($rules['graph']['exist'])){
+							if($current_graph && !isset($rules['graphs']['exist'])){
 								info('Graph ['.$graph_db['name'].'] skipped - user rule');
 								continue; // break if not update exist
 							}
@@ -1796,5 +1799,3 @@ class zbxXML{
 	}
 
 }
-
-?>
