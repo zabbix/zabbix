@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="macroRow">
 	<tr class="form_row">
 		<td>
-			<input class="input text" type="text" name="macros[#{macroNum}][macro]" size="30" maxlength="64"
+			<input class="input text" type="text" id="macros_#{macroNum}_macro" name="macros[#{macroNum}][macro]" size="30" maxlength="64"
 				placeholder="{$MACRO}" style="text-transform:uppercase;">
 		</td>
 		<td>
