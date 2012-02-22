@@ -27,7 +27,7 @@ class CXmlExportWriterA extends XMLWriter implements CExportWriter {
 			if (is_array($value)) {
 				$this->fromArray($value, $name);
 			}
-			else {
+			elseif ($value !== null) {
 				$this->text($value);
 			}
 
