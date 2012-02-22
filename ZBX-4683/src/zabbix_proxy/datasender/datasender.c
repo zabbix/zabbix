@@ -102,11 +102,11 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 
 	zbx_json_close(j);
 
-	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
 	if (*records > 0)
 	{
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
 		if (SUCCEED == put_data_to_server(&sock, j))
 		{
