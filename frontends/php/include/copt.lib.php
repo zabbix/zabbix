@@ -355,11 +355,12 @@ if(defined('USE_PROFILING')){
 						$sqlrequests[$i][1] = str_replace(array('<','>'), array('&lt;','&gt;'), $sqlrequests[$i][1]);
 
 						$sql_time+=$time;
+						$query = '<span style="color: green; font-size: 1.2em;">'.$sqlrequests[$i][1].'</span>';
 						if($time < LONG_QUERY){
-							$debug_str.= S_TIME.':'.round($time,8).'<br />SQL:&nbsp;'.$sqlrequests[$i][1].OBR;
+							$debug_str.= S_TIME.':'.round($time,8).'<br />SQL:&nbsp;'.$query.OBR;
 						}
 						else{
-							$debug_str.= '<b>'.S_TIME.':'.round($time,8).' LONG SQL:&nbsp;'.$sqlrequests[$i][1].'</b>'.OBR;
+							$debug_str.= '<b>'.S_TIME.':'.round($time,8).' LONG SQL:&nbsp;'.$query.'</b>'.OBR;
 						}
 
 						$callStack = array_reverse($sqlrequests[$i][2]);
