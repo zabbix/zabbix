@@ -415,7 +415,7 @@ function makeFormFooter($main, $others = array()) {
 		new CDiv(
 			array(
 				empty($others) ? new CDiv($mainButtons, 'dt right') : new CDiv($mainButtons, 'dt floatleft right'),
-				new CDiv(array($othersButtons), 'dd')
+				new CDiv(array($othersButtons), 'dd left')
 			),
 			'formrow'
 		),

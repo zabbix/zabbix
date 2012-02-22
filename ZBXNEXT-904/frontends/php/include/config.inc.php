@@ -265,8 +265,9 @@ function access_deny() {
 				new CButton('login', _('Login'), "javascript: document.location = 'index.php?request=$url';"),
 				new CButton('back', _('Cancel'), 'javascript: window.history.back();')
 			),
-			'left');
-		$table->setFooter($footer,'footer');
+			'left'
+		);
+		$table->setFooter($footer, 'footer');
 		$table->show();
 	}
 	require_once('include/page_footer.php');
@@ -449,6 +450,7 @@ function show_error_message($msg) {
 
 function info($msgs) {
 	global $ZBX_MESSAGES;
+
 	zbx_value2array($msgs);
 	if (is_null($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = array();
@@ -460,6 +462,7 @@ function info($msgs) {
 
 function error($msgs) {
 	global $ZBX_MESSAGES;
+
 	$msgs = zbx_toArray($msgs);
 
 	if (is_null($ZBX_MESSAGES)) {
@@ -476,6 +479,7 @@ function error($msgs) {
 
 function clear_messages($count = null) {
 	global $ZBX_MESSAGES;
+
 	$result = array();
 	if (!is_null($count)) {
 		while ($count-- > 0) {
@@ -542,7 +546,8 @@ function parse_period($str) {
 					'start_m'	=> $arr[4],
 					'end_h'		=> $arr[5],
 					'end_m'		=> $arr[6]
-				));
+				)
+			);
 		}
 	}
 	return $out;
@@ -656,6 +661,7 @@ function get_status() {
 
 function set_image_header($format = null) {
 	global $IMAGE_FORMAT_DEFAULT;
+
 	if (is_null($format)) {
 		$format = $IMAGE_FORMAT_DEFAULT;
 	}
@@ -702,15 +708,15 @@ function imageOut(&$image, $format = null) {
 
 	switch ($page['type']) {
 		case PAGE_TYPE_IMAGE:
-			print($imageSource);
+			echo $imageSource;
 			break;
 		case PAGE_TYPE_JSON:
 			$json = new CJSON();
-			print($json->encode(array('result' => $imageId)));
+			echo $json->encode(array('result' => $imageId));
 			break;
 		case PAGE_TYPE_TEXT:
 		default:
-			print($imageId);
+			echo $imageId;
 	}
 }
 

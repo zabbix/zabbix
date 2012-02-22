@@ -162,7 +162,6 @@
 //	graph.php
 	'S_GRAPHS_COPIED'=>			_('Graphs copied'),
 	'S_CANNOT_COPY_GRAPHS'=>	_('Cannot copy graphs'),
-	'S_PARAMETER'=>				_('Parameter'),
 	'S_COLOR'=>					_('Colour'),
 	'S_UP'=>					_('Up'),
 	'S_DOWN'=>					_('Down'),

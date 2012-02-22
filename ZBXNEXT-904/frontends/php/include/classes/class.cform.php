@@ -20,6 +20,7 @@
 ?>
 <?php
 class CForm extends CTag {
+
 	public function __construct($method = 'post', $action = null, $enctype = null) {
 		parent::__construct('form', 'yes');
 		$this->setMethod($method);

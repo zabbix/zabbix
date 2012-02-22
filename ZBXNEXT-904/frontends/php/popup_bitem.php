@@ -121,8 +121,6 @@ require_once 'include/page_header.php';
 		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT),
 			S_CAPTION), new CTextBox('caption',$caption,32));
 
-//		$frmGItem->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
-
 		$txtCondVal = new CTextBox('name',$description,50,'yes');
 
 		$btnSelect = new CSubmit('btn1',S_SELECT,
@@ -131,7 +129,7 @@ require_once 'include/page_header.php';
 				"&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
 				'T');
 
-		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
+		$frmGItem->addRow(_('Parameter') ,array($txtCondVal,$btnSelect));
 
 		$cmbFnc = new CComboBox('calc_fnc',$calc_fnc);
 			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
@@ -161,9 +159,6 @@ require_once 'include/page_header.php';
 		$frmGItem->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmGItem->Show();
 	}
-?>
-<?php
 
 require_once 'include/page_footer.php';
-
 ?>
