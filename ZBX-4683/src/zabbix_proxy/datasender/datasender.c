@@ -82,7 +82,8 @@ static void	host_availability_sender(struct zbx_json *j)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	history_sender(struct zbx_json *j, int *records, const char *tag, int (*f_get_data)(), void (*f_set_lastid)())
+static void	history_sender(struct zbx_json *j, int *records, const char *tag,
+		int (*f_get_data)(), void (*f_set_lastid)())
 {
 	const char	*__function_name = "history_sender";
 
