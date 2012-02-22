@@ -181,8 +181,8 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'globalmacro' => 1
 	));
-	order_result($data['macros'], 'macro');
 }
+order_result($data['macros'], 'macro');
 if (empty($data['macros'])) {
 	$data['macros'] = array(
 		0 => array(
