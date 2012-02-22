@@ -541,11 +541,11 @@ class CConfigurationImport {
 						foreach ($item['item_prototypes'] as $prototype) {
 							$prototype['hostid'] = $hostid;
 
-							$applicationsIds = array();
-							foreach ($prototype['applications'] as $application) {
-								$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
-							}
-							$prototype['applications'] = $applicationsIds;
+								$applicationsIds = array();
+								foreach ($prototype['applications'] as $application) {
+									$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
+								}
+								$prototype['applications'] = $applicationsIds;
 
 
 							if (isset($prototype['interface_ref'])) {

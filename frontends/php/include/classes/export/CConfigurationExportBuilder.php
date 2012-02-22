@@ -12,10 +12,10 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * @return mixed
+	 * @return array
 	 */
 	public function getExport() {
-		return array ('zabbix_export' => $this->data);
+		return array('zabbix_export' => $this->data);
 	}
 
 	public function buildGroups(array $groups) {
@@ -83,7 +83,7 @@ class CConfigurationExportBuilder {
 				'ipmi_privilege' => $host['ipmi_privilege'],
 				'ipmi_username' => $host['ipmi_username'],
 				'ipmi_password' => $host['ipmi_password'],
-				'templates' => $host['templates'],
+				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
 				'groups' => $this->formatGroups($host['groups']),
 				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
 				'applications' => $this->formatApplications($host['applications']),
@@ -241,12 +241,24 @@ class CConfigurationExportBuilder {
 				'percent_right' => $graph['percent_right'],
 				'ymin_type_1' => $graph['ymin_type'],
 				'ymax_type_1' => $graph['ymax_type'],
-				'ymin_item_1' => $graph['ymin_item_1'],
-				'ymax_item_1' => $graph['ymax_item_1'],
+				'ymin_item_1' => $graph['ymin_itemid'],
+				'ymax_item_1' => $graph['ymax_itemid'],
 				'graph_items' => $this->formatGraphItems($graph['gitems'])
 			);
 		}
 
+		return $result;
+	}
+
+	private function formatTemplateLinkage(array $templates) {
+		$result = array();
+		order_result($templates, 'host');
+
+		foreach ($templates as $template) {
+			$result[] = array(
+				'name' => $template['host'],
+			);
+		}
 		return $result;
 	}
 
@@ -523,6 +535,4 @@ class CConfigurationExportBuilder {
 		}
 		return $result;
 	}
-
 }
-
