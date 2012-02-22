@@ -50,8 +50,6 @@ class CConfigurationExport {
 	}
 
 	public function export() {
-		$this->builder->buildRoot();
-
 		if ($this->data['groups']) {
 			$this->builder->buildGroups($this->data['groups']);
 		}
@@ -76,7 +74,6 @@ class CConfigurationExport {
 		if ($this->data['maps']) {
 			$this->builder->buildMaps($this->data['maps']);
 		}
-
 		return $this->writer->write($this->builder->getExport());
 	}
 

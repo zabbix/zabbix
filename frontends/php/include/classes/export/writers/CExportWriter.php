@@ -1,5 +1,5 @@
 <?php
 
 interface CExportWriter {
-	public function write(CExportElement $elem);
+	public function write(array $elem);
 }
