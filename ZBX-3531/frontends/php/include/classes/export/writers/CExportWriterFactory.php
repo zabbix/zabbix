@@ -6,7 +6,7 @@ class CExportWriterFactory {
 			case 'DOM':
 				return new CDomExportWriter();
 			case 'XMLWriter':
-				return new CXmlWriterExportWriter();
+				return new CXmlExportWriterA();
 			case 'JSON':
 				return new CJsonExportWriter();
 			default:
