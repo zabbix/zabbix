@@ -261,5 +261,4 @@ class C20ImportFormatter extends CImportFormatter {
 		$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
 		return $item;
 	}
-
 }
