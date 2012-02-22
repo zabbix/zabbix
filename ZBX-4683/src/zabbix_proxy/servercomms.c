@@ -117,8 +117,7 @@ int	get_data_from_server(zbx_sock_t *sock, const char *request, char **data)
 	int		ret = FAIL;
 	struct zbx_json	j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'",
-			__function_name, request);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() request:'%s'", __function_name, request);
 
 	zbx_json_init(&j, 128);
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
@@ -134,8 +133,7 @@ int	get_data_from_server(zbx_sock_t *sock, const char *request, char **data)
 exit:
 	zbx_json_free(&j);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -172,8 +170,7 @@ int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j)
 
 	ret = SUCCEED;
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s",
-			__function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
