@@ -11,7 +11,7 @@
 			<input class="input text" type="text" placeholder="value" name="macros[#{macroNum}][value]" size="40" maxlength="255">
 		</td>
 		<td>
-			<input class="input link_menu macroRemove" type="button" value="<?php echo _('Remove'); ?>" data-is-new="1">
+			<input id="macros_#{macroNum}_del" class="input link_menu macroRemove" type="button" name="macros_#{macroNum}_del" value="<?php echo _('Remove'); ?>" data-is-new="1">
 		</td>
 	</tr>
 

@@ -35,8 +35,7 @@ foreach ($macros as $macroid => $macro) {
 	$span = new CSpan(RARR);
 	$span->addStyle('vertical-align:top;');
 
-	$deleteButton = new CButton('macros_del', _('Remove'));
-	$deleteButton->addClass('link_menu macroRemove');
+	$deleteButton = new CButton('macros_'.$macroid.'_del', _('Remove'), null, 'link_menu macroRemove');
 
 	$row = array($text1, $span, $text2, $deleteButton);
 	if (isset($macro['globalmacroid'])) {
@@ -49,8 +48,7 @@ foreach ($macros as $macroid => $macro) {
 }
 
 // buttons
-$addButton = new CButton('macro_add', _('Add'));
-$addButton->addClass('link_menu');
+$addButton = new CButton('macro_add', _('Add'), null, 'link_menu');
 
 $buttonColumn = new CCol($addButton);
 $buttonColumn->setAttribute('colspan', 5);
