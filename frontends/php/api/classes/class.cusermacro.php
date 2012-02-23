@@ -405,9 +405,11 @@ class CUserMacro extends CZBXAPI {
 	protected function validateCreateGlobal(array $globalMacros) {
 		$this->checkGlobalMacrosPermissions(_('Only Super Admins can create global macros.'));
 
-		foreach ($globalMacros as $macro) {
-			$this->checkMacro($macro);
-			$this->checkValue($macro);
+		foreach ($globalMacros as $globalMacro) {
+			$this->checkMacro($globalMacro);
+			$this->checkValue($globalMacro);
+			$this->checkUnsupportedFields('globalmacro', $globalMacro,
+				_s('Wrong fields for macro "%1$s".', $globalMacro['macro']));
 		}
 
 		$this->checkDuplicateMacros($globalMacros);
@@ -454,6 +456,8 @@ class CUserMacro extends CZBXAPI {
 			if (isset($globalMacro['value'])) {
 				$this->checkValue($globalMacro);
 			}
+			$this->checkUnsupportedFields('globalmacro', $globalMacro,
+				_s('Wrong fields for macro "%1$s".', $globalMacro['macro']));
 		}
 
 		$this->checkDuplicateMacros($globalMacros);
@@ -541,6 +545,8 @@ class CUserMacro extends CZBXAPI {
 
 		foreach ($hostMacros as $hostMacro) {
 			$this->checkValue($hostMacro);
+			$this->checkUnsupportedFields('hostmacro', $hostMacro,
+				_s('Wrong fields for macro "%1$s".', $hostMacro['macro']));
 		}
 
 		$this->checkDuplicateMacros($hostMacros);
@@ -596,6 +602,8 @@ class CUserMacro extends CZBXAPI {
 			if (isset($hostMacro['value'])) {
 				$this->checkValue($hostMacro);
 			}
+			$this->checkUnsupportedFields('hostmacro', $hostMacro,
+				_s('Wrong fields for macro "%1$s".', $hostMacro['macro']));
 		}
 
 		$this->checkDuplicateMacros($hostMacros);
@@ -860,25 +868,8 @@ class CUserMacro extends CZBXAPI {
 	 * @param array $hostIds    an array of host or template IDs
 	 */
 	protected function checkHostPermissions(array $hostIds) {
-		// host permission
-		$hosts = API::Host()->get(array(
-			'hostids' => $hostIds,
-			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN,
-			'preservekeys' => true
-		));
-
-		// template permission
-		$templates = API::Template()->get(array(
-			'templateids' => $hostIds,
-			'editable' => true,
-			'output' => API_OUTPUT_SHORTEN,
-			'preservekeys' => true
-		));
-		foreach ($hostIds as $hostId) {
-			if (!isset($templates[$hostId]) && !isset($hosts[$hostId])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
+		if (!API::Host()->isWritable($hostIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
