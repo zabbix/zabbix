@@ -398,9 +398,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Validates the input parameters for the createGlobal() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $globalMacros
+	 *
+	 * @throws APIException if the input is invalid
 	 */
 	protected function validateCreateGlobal(array $globalMacros) {
 		$this->checkGlobalMacrosPermissions(_('Only Super Admins can create global macros.'));
@@ -436,9 +436,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Validates the input parameters for the updateGlobal() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $globalMacros
+	 *
+	 * @throws APIException if the input is invalid
 	 */
 	protected function validateUpdateGlobal(array $globalMacros) {
 		$this->checkGlobalMacrosPermissions(_('Only Super Admins can update global macros.'));
@@ -496,9 +496,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Validates the input parameters for the deleteGlobal() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $globalMacroIds
+	 *
+	 * @throws APIException if the input is invalid
 	 */
 	protected function validateDeleteGlobal(array $globalMacroIds) {
 		if (empty($globalMacroIds)) {
@@ -530,9 +530,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Validates the input parameters for the create() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $hostMacros
+	 *
+	 * @throws APIException if the input is invalid
 	 */
 	public function validateCreate(array $hostMacros) {
 		// check the data required for authorization first
@@ -573,9 +573,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $hostMacros
+	 *
+	 * @throws APIException if the input is invalid
 	 */
 	protected function validateUpdate(array $hostMacros) {
 		foreach ($hostMacros as $macro) {
@@ -645,9 +645,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $hostMacroIds
+	 *
+	 * @throws APIException if the input is invalid
 	 */
 	protected function validateDelete(array $hostMacroIds) {
 		if (!$hostMacroIds) {
@@ -814,10 +814,10 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Validates the "macro" field.
 	 *
+	 * @param array $macro
+	 *
 	 * @throws APIException if the field is empty, too long or doesn't match the ZBX_PREG_EXPRESSION_USER_MACROS
 	 * regex.
-	 *
-	 * @param array $macro
 	 */
 	protected function checkMacro(array $macro) {
 		if (!isset($macro['macro']) || zbx_empty($macro['macro'])) {
@@ -834,9 +834,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Validate the "value" field.
 	 *
-	 * @throws APIException if the field is empty or too long.
-	 *
 	 * @param array $macro
+	 *
+	 * @throws APIException if the field is empty or too long.
 	 */
 	protected function checkValue(array $macro) {
 		if (!isset($macro['value']) || zbx_empty($macro['value'])) {
@@ -850,9 +850,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Validates the "hostid" field.
 	 *
-	 * @throw APIException if the field is empty.
-	 *
 	 * @param array $macro
+	 *
+	 * @throws APIException if the field is empty.
 	 */
 	protected function checkHostId(array $macro) {
 		if (!isset($macro['hostid']) || zbx_empty($macro['hostid'])) {
@@ -876,9 +876,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Checks if the given macros contain duplicates. Assumes the "macro" field is valid.
 	 *
-	 * @throws APIException if the given macros contain duplicates
-	 *
 	 * @param array $macros
+	 *
+	 * @throws APIException if the given macros contain duplicates
 	 */
 	protected function checkDuplicateMacros(array $macros) {
 		$existingMacros = array();
@@ -896,9 +896,9 @@ class CUserMacro extends CZBXAPI {
 	 * the "hostmacroid" field is set, the method will only fail, if a macro with a different hostmacroid exists.
 	 * Assumes the "macro", "hostid" and "hostmacroid" fields are valid.
 	 *
-	 * @throws APIException if any of the given macros already exist
-	 *
 	 * @param array $hostMacros
+	 *
+	 * @throws APIException if any of the given macros already exist
 	 */
 	protected function checkIfHostMacrosDontRepeat(array $hostMacros) {
 		$dbHostMacros = $this->select($this->tableName(), array(
@@ -934,10 +934,10 @@ class CUserMacro extends CZBXAPI {
 	 * Checks if all of the host macros with hostmacrosids given in $hostMacrosIds are present in $hostMacros.
 	 * Assumes the "hostmacroid" field is valid.
 	 *
-	 * @throws APIException if any of the host macros is not present in $hostMacros
-	 *
 	 * @param array $hostMacrosIds
 	 * @param array $hostMacros
+	 *
+	 * @throws APIException if any of the host macros is not present in $hostMacros
 	 */
 	protected function checkIfHostMacrosExistIn(array $hostMacrosIds, array $hostMacros) {
 		$hostMacros = zbx_toHash($hostMacros, 'hostmacroid');
@@ -953,9 +953,9 @@ class CUserMacro extends CZBXAPI {
 	 * the "globalmacroid" field is set, the method will only fail, if a macro with a different globalmacroid exists.
 	 * Assumes the "macro", "hostmacroid" fields are valid.
 	 *
-	 * @throws APIException if any of the given macros already exist
-	 *
 	 * @param array $globalMacros
+	 *
+	 * @throws APIException if any of the given macros already exist
 	 */
 	protected function checkIfGlobalMacrosDontRepeat(array $globalMacros) {
 		$nameMacro = zbx_toHash($globalMacros, 'macro');
@@ -977,9 +977,9 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Checks if the user has the permissions to edit global macros.
 	 *
-	 * @throws APIException if the user doesn't have the required permissions
-	 *
 	 * @param string $error a message that will be used as the error text
+	 *
+	 * @throws APIException if the user doesn't have the required permissions
 	 */
 	protected function checkGlobalMacrosPermissions($error) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
@@ -991,9 +991,9 @@ class CUserMacro extends CZBXAPI {
 	 * Checks if all of the host macros with globalmacroids given in $globalMacroIds are present in $globalMacros.
 	 * Assumes the "globalmacroids" field is valid.
 	 *
-	 * @throws APIException if any of the host macros is not present in $globalMacros
-	 *
 	 * @param array $globalMacroIds
+	 *
+	 * @throws APIException if any of the host macros is not present in $globalMacros
 	 */
 	protected function checkIfGlobalMacrosExist(array $globalMacroIds) {
 		$globalMacros = $this->select('globalmacro', array(
