@@ -13,6 +13,7 @@ build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
 create/src/data.tmpl -text
+frontends/php/api/classes/CImport.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -189,6 +190,7 @@ frontends/php/include/classes/import/CImportReferencer.php -text
 frontends/php/include/classes/import/formatters/C20ImportFormatter.php -text
 frontends/php/include/classes/import/formatters/CImportFormatter.php -text
 frontends/php/include/classes/import/readers/CImportReader.php -text
+frontends/php/include/classes/import/readers/CImportReaderFactory.php -text
 frontends/php/include/classes/import/readers/CJsonImportReader.php -text
 frontends/php/include/classes/import/readers/CXmlImportReader.php -text
 frontends/php/include/views/administration.auditacts.list.php -text

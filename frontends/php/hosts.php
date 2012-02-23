@@ -147,7 +147,7 @@ require_once('include/page_header.php');
 	if ($EXPORT_DATA) {
 		$export = new CConfigurationExport(array('hosts' => $hostids));
 		$export->setBuilder(new CConfigurationExportBuilder());
-		$export->setWriter(CExportWriterFactory::getWriter('XMLWriter'));
+		$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
 		print($export->export());
 		exit();

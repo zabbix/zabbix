@@ -2,5 +2,5 @@
 
 abstract class CImportReader {
 
-	abstract public function read($file);
+	abstract public function read($string);
 }

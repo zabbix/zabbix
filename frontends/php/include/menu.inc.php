@@ -155,6 +155,9 @@ $ZBX_MENU = array(
 		'force_disable_all_nodes' => true,
 		'pages' => array(
 			array(
+				'url' => 'conf.import.php'
+			),
+			array(
 				'url' => 'hostgroups.php',
 				'label' => _('Host groups')
 			),

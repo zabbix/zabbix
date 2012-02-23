@@ -2,9 +2,9 @@
 
 class CXmlImportReader extends CImportReader {
 
-	public function read($file) {
+	public function read($string) {
 		$xml = new XMLReader();
-		$xml->open($file);
+		$xml->xml($string);
 		$array = $this->xmlToArray($xml);
 		$xml->close();
 		return $array;
