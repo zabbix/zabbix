@@ -648,6 +648,7 @@ static void	DCadd_trend(ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, int *tre
 
 	trend->value_type = history->value_type;
 	trend->clock = hour;
+	trend->disable_from = 0;
 
 	switch (trend->value_type)
 	{
