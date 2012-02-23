@@ -92,11 +92,9 @@ require_once('include/page_header.php');
 // EXPORT ///////////////////////////////////
 	if($EXPORT_DATA){
 		$screens = get_request('screens', array());
-
 		$export = new CConfigurationExport(array('screens' => $screens));
 		$export->setBuilder(new CConfigurationExportBuilder());
-		$export->setWriter(CExportWriterFactory::getWriter('XMLWriter'));
-
+		$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 		print($export->export());
 		exit();
 	}

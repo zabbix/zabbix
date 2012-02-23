@@ -100,11 +100,9 @@ require_once('include/page_header.php');
 
 	if($EXPORT_DATA){
 		$maps = get_request('maps', array());
-
 		$export = new CConfigurationExport(array('maps' => $maps));
 		$export->setBuilder(new CConfigurationExportBuilder());
-		$export->setWriter(CExportWriterFactory::getWriter('XMLWriter'));
-
+		$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 		print($export->export());
 		exit();
 	}

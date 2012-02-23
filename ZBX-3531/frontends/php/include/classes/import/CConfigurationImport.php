@@ -8,19 +8,26 @@ class CConfigurationImport {
 	protected $reader;
 
 	/**
+	 * @var CImportFormatter
+	 */
+	protected $formatter;
+
+	/**
+	 * @var CImportReferencer
+	 */
+	protected $referencer;
+
+	/**
 	 * @var array
 	 */
 	protected $options;
 
-	protected $hostsCache = array();
-	protected $applicationsCache = array();
-	protected $interfacesCache = array();
-	protected $itemsCache = array();
-	protected $discoveryRulesCache = array();
+	protected $source;
 
-	public function __construct($file, $options = array()) {
-		$this->file = $file;
+	protected $data;
 
+
+	public function __construct($source, $options = array()) {
 		$this->options = array(
 			'groups' => array('missed' => true),
 			'hosts' => array('exist' => true, 'missed' => true),
@@ -37,22 +44,19 @@ class CConfigurationImport {
 		);
 		$this->options = array_merge($this->options, $options);
 
-		$ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-		$this->reader = $this->getReader($ext);
+		$this->source = $source;
+	}
 
-		$this->data = $this->reader->read($file['tmp_name']);
-
-		$this->version = $this->getImportVersion();
-
-		if ($this->version != '1.8') {
-			$this->formatter = $this->getFormatter($this->getImportVersion());
-
-			$this->referencer = new CImportReferencer();
-		}
+	public function setReader(CImportReader $reader) {
+		$this->reader = $reader;
 	}
 
 	public function import() {
-		if ($this->version == '1.8') {
+		$this->data = $this->reader->read($this->source);
+
+		$version = $this->getImportVersion();
+
+		if ($version == '1.8') {
 			zbxXML::import($this->file['tmp_name']);
 			if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
 				zbxXML::parseMap($this->options);
@@ -65,6 +69,10 @@ class CConfigurationImport {
 			}
 		}
 		else {
+			$this->formatter = $this->getFormatter($version);
+
+			$this->referencer = new CImportReferencer();
+
 			$this->formatter->setData($this->data['zabbix_export']);
 
 			$this->gatherReferences();
@@ -105,6 +113,8 @@ class CConfigurationImport {
 				$this->processMaps();
 			}
 		}
+
+		return true;
 	}
 
 	protected function gatherReferences() {
@@ -970,22 +980,8 @@ class CConfigurationImport {
 
 
 
-	private function getReader($ext) {
-		switch ($ext) {
-			case 'xml':
-				return new CXmlImportReader();
-
-			default:
-				throw new InvalidArgumentException('Unknown import file extension.');
-		}
-
-	}
-
 	private function getFormatter($version) {
 		switch ($version) {
-			case '1.8':
-				return new C18ImportFormatter;
-
 			case '2.0':
 				return new C20ImportFormatter;
 

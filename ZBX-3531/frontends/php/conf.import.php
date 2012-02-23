@@ -68,9 +68,15 @@ if (isset($_REQUEST['form_refresh'])) {
 
 if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
 	require_once 'include/export.inc.php';
-	DBstart();
+//	DBstart();
 	try {
-		$configurationImport = new CConfigurationImport($_FILES['import_file'], get_request('rules', array()));
+		$ext = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
+		$importReader = CImportReaderFactory::getReader($ext);
+		$fileContent = file_get_contents($_FILES['import_file']['tmp_name']);
+
+		$configurationImport = new CConfigurationImport($fileContent, get_request('rules', array()));
+		$configurationImport->setReader($importReader);
+
 		$configurationImport->import();
 		show_messages(true, _('Imported successfully'));
 	}
@@ -78,7 +84,7 @@ if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])
 		error($e->getMessage());
 		show_messages(false, null, _('Import failed'));
 	}
-	DBend(false);
+//	DBend(false);
 }
 
 $view = new CView('conf.import', $data);
