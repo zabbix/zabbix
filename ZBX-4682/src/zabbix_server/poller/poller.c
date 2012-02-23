@@ -570,7 +570,7 @@ static int	get_values(unsigned char poller_type)
 	int		errcodes[MAX_BUNCH_ITEMS];
 	zbx_timespec_t	timespecs[MAX_BUNCH_ITEMS];
 	int		i, num;
-	char		*port;
+	char		*port = NULL, error[ITEM_ERROR_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -587,9 +587,17 @@ static int	get_values(unsigned char poller_type)
 		errcodes[i] = SUCCEED;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		substitute_key_macros(&items[i].key, &items[i].host, NULL, MACRO_TYPE_ITEM_KEY);
+		if (SUCCEED != substitute_key_macros(&items[i].key, &items[i].host, NULL,
+				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
+		{
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = NOTSUPPORTED;
+			zbx_timespec(&timespecs[i]);
+			continue;
+		}
 
-		items[i].interface.addr = (1 == items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
+		items[i].interface.addr = (1 == items[i].interface.useip ?
+				items[i].interface.ip_orig : items[i].interface.dns_orig);
 
 		switch (items[i].type)
 		{
@@ -599,7 +607,7 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_SNMPv3:
 			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
-				port = zbx_strdup(NULL, items[i].interface.port_orig);
+				ZBX_STRDUP(port, items[i].interface.port_orig);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL,
 						&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
@@ -608,8 +616,8 @@ static int	get_values(unsigned char poller_type)
 								items[i].interface.port_orig));
 					errcodes[i] = NETWORK_ERROR;
 					zbx_timespec(&timespecs[i]);
+					continue;
 				}
-				zbx_free(port);
 				break;
 		}
 
@@ -633,40 +641,34 @@ static int	get_values(unsigned char poller_type)
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_key_macros(&items[i].snmp_oid, &items[i].host, NULL, MACRO_TYPE_SNMP_OID);
-				break;
-			case ITEM_TYPE_DB_MONITOR:
-				ZBX_STRDUP(items[i].params, items[i].params_orig);
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host, NULL,
+						MACRO_TYPE_SNMP_OID, error, sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = NOTSUPPORTED;
+					zbx_timespec(&timespecs[i]);
+					continue;
+				}
 				break;
 			case ITEM_TYPE_SSH:
-				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
-				ZBX_STRDUP(items[i].password, items[i].password_orig);
-				ZBX_STRDUP(items[i].params, items[i].params_orig);
 
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				break;
 			case ITEM_TYPE_TELNET:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
-				ZBX_STRDUP(items[i].params, items[i].params_orig);
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+			case ITEM_TYPE_DB_MONITOR:
+				ZBX_STRDUP(items[i].params, items[i].params_orig);
+
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
@@ -682,20 +684,22 @@ static int	get_values(unsigned char poller_type)
 		}
 	}
 
+	zbx_free(port);
+
 	/* retrieve item values */
-	if (SUCCEED == errcodes[0])
+	if (SUCCEED != is_bunch_poller(poller_type))
 	{
-		if (SUCCEED != is_bunch_poller(poller_type))
+		if (SUCCEED == errcodes[0])
 		{
 			errcodes[0] = get_value(&items[0], &results[0]);
 			zbx_timespec(&timespecs[0]);
 		}
-		else if (ZBX_POLLER_TYPE_JAVA == poller_type)
-		{
-			alarm(CONFIG_TIMEOUT);
-			get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, timespecs, num);
-			alarm(0);
-		}
+	}
+	else if (ZBX_POLLER_TYPE_JAVA == poller_type)
+	{
+		alarm(CONFIG_TIMEOUT);
+		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, timespecs, num);
+		alarm(0);
 	}
 
 	/* process item values */
@@ -749,19 +753,13 @@ static int	get_values(unsigned char poller_type)
 				zbx_free(items[i].snmp_community);
 				zbx_free(items[i].snmp_oid);
 				break;
-			case ITEM_TYPE_DB_MONITOR:
-				zbx_free(items[i].params);
-				break;
 			case ITEM_TYPE_SSH:
-				zbx_free(items[i].username);
 				zbx_free(items[i].publickey);
 				zbx_free(items[i].privatekey);
-				zbx_free(items[i].password);
-				zbx_free(items[i].params);
-				break;
 			case ITEM_TYPE_TELNET:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
+			case ITEM_TYPE_DB_MONITOR:
 				zbx_free(items[i].params);
 				break;
 			case ITEM_TYPE_JMX:
