@@ -370,9 +370,9 @@ class CZBXAPI {
 		// build query
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
-		$sqlWhere = (isset($sqlParts['where']) && $sqlParts['where']) ? ' WHERE '.implode(' AND ', $sqlParts['where']) : '';
-		$sqlGroup = (isset($sqlParts['group']) && $sqlParts['group']) ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
-		$sqlOrder = (isset($sqlParts['order']) && $sqlParts['order']) ? ' ORDER BY '.implode(',', $sqlParts['order']) : '';
+		$sqlWhere = (!empty($sqlParts['where'])) ? ' WHERE '.implode(' AND ', array_unique($sqlParts['where'])) : '';
+		$sqlGroup = (!empty($sqlParts['group'])) ? ' GROUP BY '.implode(',', array_unique($sqlParts['group'])) : '';
+		$sqlOrder = (!empty($sqlParts['order'])) ? ' ORDER BY '.implode(',', array_unique($sqlParts['order'])) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 			' FROM '.$sqlFrom.
 			$sqlWhere.

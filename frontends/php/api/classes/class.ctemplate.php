@@ -281,10 +281,9 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
-// node check !!!!
-// should last, after all ****IDS checks
+		// node check !!!!
+		// should last, after all ****IDS checks
 		if (!$nodeCheck) {
-			$nodeCheck = true;
 			$sqlParts['where'][] = DBin_node('h.hostid', $nodeids);
 		}
 
@@ -351,32 +350,7 @@ class CTemplate extends CZBXAPI {
 
 		$templateids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= ' AND '.implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlGroup.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('h.hostid', $nodeids).
-					$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-//SDI($sql);
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($template = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount']))
