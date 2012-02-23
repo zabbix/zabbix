@@ -1472,6 +1472,7 @@ class zbxXML{
 									throw new Exception(_s('No permission for trigger "%s"', $trigger_db['description']));
 								}
 							}
+							unset($trigger_db['hostid']);
 
 
 							if(!$current_trigger && !isset($rules['triggers']['missed'])){
