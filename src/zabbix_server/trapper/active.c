@@ -272,7 +272,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	struct zbx_json	json;
 	int		res = FAIL, refresh_unsupported;
 	zbx_uint64_t	hostid;
-	char		error[MAX_STRING_LEN], *key;
+	char		error[MAX_STRING_LEN], *key = NULL;
 	DC_ITEM		dc_item;
 	unsigned short	port;
 
@@ -344,8 +344,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[0]);
 
-		key = strdup(row[0]);
-		substitute_key_macros(&key, &dc_item.host, NULL, MACRO_TYPE_ITEM_KEY);
+		ZBX_STRDUP(key, row[0]);
+		substitute_key_macros(&key, &dc_item.host, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 		zbx_json_addobject(&json, NULL);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
@@ -366,7 +366,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			if (0 != strncmp(key, "log[", 4) && 0 != strncmp(key, "logrt[", 6))
 				break;
 
-			if (2 != parse_command(key, NULL, 0, params, MAX_STRING_LEN))
+			if (2 != parse_command(key, NULL, 0, params, sizeof(params)))
 				break;
 
 			/*dealing with `pattern' parameter*/
@@ -383,7 +383,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 			if (0 != strncmp(key, "eventlog[", 9))
 				break;
 
-			if (2 != parse_command(key, NULL, 0, params, MAX_STRING_LEN))
+			if (2 != parse_command(key, NULL, 0, params, sizeof(params)))
 				break;
 
 			/*dealing with `pattern' parameter*/
@@ -450,7 +450,7 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 	alarm(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send(sock, json.buffer))
-		zbx_snprintf(error, MAX_STRING_LEN, "%s", zbx_tcp_strerror());
+		strscpy(error, zbx_tcp_strerror());
 	else
 		res = SUCCEED;
 	alarm(0);
