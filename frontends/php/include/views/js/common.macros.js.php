@@ -8,10 +8,10 @@
 			<span style="vertical-align:top;">⇒</span>
 		</td>
 		<td>
-			<input class="input text" type="text" placeholder="value" name="macros[#{macroNum}][value]" size="40" maxlength="255">
+			<input class="input text" type="text" id="macros_#{macroNum}_value" name="macros[#{macroNum}][value]" size="40" maxlength="255" placeholder="value">
 		</td>
 		<td>
-			<input id="macros_#{macroNum}_del" class="input link_menu macroRemove" type="button" name="macros_#{macroNum}_del" value="<?php echo _('Remove'); ?>" data-is-new="1">
+			<input class="input link_menu macroRemove" type="button" id="macros_#{macroNum}_del" name="macros_#{macroNum}_del" value="<?php echo _('Remove'); ?>" data-is-new="1">
 		</td>
 	</tr>
 
