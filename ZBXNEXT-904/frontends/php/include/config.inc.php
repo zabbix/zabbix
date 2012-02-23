@@ -555,6 +555,7 @@ function parse_period($str) {
 
 function get_status() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
 	$status = array();
 
 	// server
@@ -613,11 +614,11 @@ function get_status() {
 	$status['items_count_not_supported'] = $row['cnt'];
 
 	// hosts
-	$sql = 'SELECT COUNT(hostid) AS cnt'.
-			' FROM hosts'.
-			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
-
-	$row = DBfetch(DBselect($sql));
+	$row = DBfetch(DBselect(
+		'SELECT COUNT(hostid) AS cnt'.
+		' FROM hosts'.
+		' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
+	));
 	$status['hosts_count'] = $row['cnt'];
 
 	$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_MONITORED));
@@ -632,15 +633,15 @@ function get_status() {
 	// users
 	$row = DBfetch(DBselect('SELECT COUNT(userid) as usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
 	$status['users_count'] = $row['usr_cnt'];
-
 	$status['users_online'] = 0;
 
-	$sql = 'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
-			' FROM sessions s'.
-			' WHERE '.DBin_node('s.userid').
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-			' GROUP BY s.userid,s.status';
-	$db_sessions = DBselect($sql);
+	$db_sessions = DBselect(
+		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
+		' FROM sessions s'.
+		' WHERE '.DBin_node('s.userid').
+			' AND s.status='.ZBX_SESSION_ACTIVE.
+		' GROUP BY s.userid,s.status'
+	);
 	while ($session = DBfetch($db_sessions)) {
 		if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) {
 			$status['users_online']++;
@@ -648,14 +649,16 @@ function get_status() {
 	}
 
 	// comments: !!! Don't forget sync code with C !!!
-	$sql = 'SELECT sum(1.0/i.delay) AS qps'.
-			' FROM items i,hosts h'.
-			' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.hostid=h.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.delay<>0';
-	$row = DBfetch(DBselect($sql));
+	$row = DBfetch(DBselect(
+		'SELECT sum(1.0/i.delay) AS qps'.
+		' FROM items i,hosts h'.
+		' WHERE i.status='.ITEM_STATUS_ACTIVE.
+			' AND i.hostid=h.hostid'.
+			' AND h.status='.HOST_STATUS_MONITORED.
+			' AND i.delay<>0'
+	));
 	$status['qps_total'] = round($row['qps'], 2);
+
 	return $status;
 }
 

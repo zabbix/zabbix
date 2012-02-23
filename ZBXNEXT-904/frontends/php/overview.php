@@ -137,7 +137,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$over_wdgt = new CWidget();
 // Header
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
+	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, SPACE, $help));
 
 // 2nd header
 	$form_l = new CForm('get');

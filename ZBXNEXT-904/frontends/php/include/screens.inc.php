@@ -370,7 +370,7 @@ function check_dynamic_items($elid, $config = 0) {
 					' AND si.dynamic='.SCREEN_DYNAMIC_ITEM;
 	}
 	else {
-		$sql = 'SELECT si.screenitemid '.
+		$sql = 'SELECT si.screenitemid'.
 				' FROM slides s,screens_items si'.
 				' WHERE s.slideshowid='.$elid.
 					' AND si.screenid=s.screenid'.

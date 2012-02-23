@@ -228,6 +228,7 @@ $dashboardWidget->addHeader(_('PERSONAL DASHBOARD'), array(
 		$dashconf['filterEnable'] ? 'iconconfig_hl' : 'iconconfig',
 		"document.location = 'dashconf.php';"
 	),
+	SPACE,
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
 );
 

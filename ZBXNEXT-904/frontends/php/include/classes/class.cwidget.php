@@ -20,6 +20,7 @@
 ?>
 <?php
 class CWidget {
+
 	public $domid;
 	public $state;
 	public $flicker_state;
@@ -233,6 +234,7 @@ class CWidget {
 		if (isset($_REQUEST['print'])) {
 			hide_form_items($col1);
 			hide_form_items($col2);
+
 			// if empty header, do not show it
 			if ($col1 === SPACE && $col2 === SPACE) {
 				return new CJSscript('');

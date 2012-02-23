@@ -201,6 +201,7 @@ function get_table_header($col1, $col2 = SPACE) {
 	if (isset($_REQUEST['print'])) {
 		hide_form_items($col1);
 		hide_form_items($col2);
+
 		// if empty header than do not show it
 		if ($col1 == SPACE && $col2 == SPACE) {
 			return new CJSscript('');
