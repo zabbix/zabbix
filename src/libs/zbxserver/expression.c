@@ -773,7 +773,7 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 				strscpy(dc_host.host, row[4]);
 
 				key = zbx_strdup(key, row[1]);
-				substitute_key_macros(&key, &dc_host, NULL, MACRO_TYPE_ITEM_KEY);
+				substitute_key_macros(&key, &dc_host, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 				if (ZBX_REQUEST_ITEM_NAME == request)
 				{
@@ -3112,7 +3112,8 @@ static void	quote_key_param(char **param, int forced)
  *           ifInOctets.{#SNMPINDEX} | 1           | ifInOctets.1             *
  *                                                                            *
  ******************************************************************************/
-void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *jp_row, int macro_type)
+int	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse *jp_row, int macro_type,
+		char *error, size_t maxerrlen)
 {
 	const char	*__function_name = "substitute_key_macros";
 
@@ -3127,7 +3128,7 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 
 	char			*param = NULL, c;
 	size_t			i, l = 0;
-	int			level = 0;
+	int			level = 0, res = SUCCEED;
 	zbx_parser_state_t	state = ZBX_STATE_END;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
@@ -3289,12 +3290,17 @@ void	substitute_key_macros(char **data, DC_HOST *dc_host, struct zbx_json_parse 
 		}
 	}
 clean:
-
 	if (0 == i || '\0' != (*data)[i] || 0 != level)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid %s at position %d: \"%s\"",
-				MACRO_TYPE_ITEM_KEY == macro_type ? "item key" : "SNMP OID", (int)i, *data);
+		if (NULL != error)
+		{
+			zbx_snprintf(error, maxerrlen, "Invalid %s at position " ZBX_FS_SIZE_T,
+					(MACRO_TYPE_ITEM_KEY == macro_type ? "item key" : "SNMP OID"), (zbx_fs_size_t)i);
+		}
+		res = FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(res), *data);
+
+	return res;
 }
