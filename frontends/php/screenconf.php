@@ -30,8 +30,6 @@ if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['s
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_screens_export.xml';
-
-	require_once('include/export.inc.php');
 }
 else{
 	$EXPORT_DATA = false;
@@ -201,7 +199,7 @@ require_once('include/page_header.php');
 		$form->addVar('templateid', $templateid);
 	}
 	else{
-		$form->addItem(new CSubmit('form', S_IMPORT_SCREEN));
+		$form->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php")'));
 	}
 
 
