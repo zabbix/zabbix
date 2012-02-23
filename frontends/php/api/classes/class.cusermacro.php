@@ -531,11 +531,15 @@ class CUserMacro extends CZBXAPI {
 	 * @param array $hostMacros
 	 */
 	public function validateCreate(array $hostMacros) {
-		$this->checkHostPermissions(array_unique(zbx_objectValues($hostMacros, 'hostid')));
-
+		// check the data required for authorization first
 		foreach ($hostMacros as $hostMacro) {
 			$this->checkMacro($hostMacro);
 			$this->checkHostId($hostMacro);
+		}
+
+		$this->checkHostPermissions(array_unique(zbx_objectValues($hostMacros, 'hostid')));
+
+		foreach ($hostMacros as $hostMacro) {
 			$this->checkValue($hostMacro);
 		}
 
@@ -551,6 +555,8 @@ class CUserMacro extends CZBXAPI {
 	 * @return array
 	 */
 	public function create(array $hostMacros) {
+		$hostMacros = zbx_toArray($hostMacros);
+
 		$this->validateCreate($hostMacros);
 
 		$hostmacroids = DB::insert('hostmacro', $hostMacros);
@@ -640,16 +646,16 @@ class CUserMacro extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$dbHostMacros = $this->get(array(
-			'hostmacroids' => $hostMacroIds,
-			'output' => API_OUTPUT_EXTEND
+		$dbHostMacros = $this->select('hostmacro', array(
+			'output' => array('hostid', 'hostmacroid'),
+			'hostmacroids' => $hostMacroIds
 		));
-
-		// check if the macros exist
-		$this->checkIfHostMacrosExistIn($hostMacroIds, $dbHostMacros);
 
 		// check permissions for all affected hosts
 		$this->checkHostPermissions(array_unique(zbx_objectValues($dbHostMacros, 'hostid')));
+
+		// check if the macros exist
+		$this->checkIfHostMacrosExistIn($hostMacroIds, $dbHostMacros);
 	}
 
 	/**
@@ -905,7 +911,7 @@ class CUserMacro extends CZBXAPI {
 	 */
 	protected function checkIfHostMacrosDontRepeat(array $hostMacros) {
 		$dbHostMacros = $this->select($this->tableName(), array(
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('hostmacroid', 'hostid', 'macro'),
 			'filter' => array(
 				'macro' => zbx_objectValues($hostMacros, 'macro'),
 				'hostid' => array_unique(zbx_objectValues($hostMacros, 'hostid'))
