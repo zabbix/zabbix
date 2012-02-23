@@ -80,7 +80,6 @@ require_once('include/page_header.php');
 		'macro_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	'isset({macro_add})'),
 		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	'isset({macro_add})'),
 		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
-		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 // mass update
 		'massupdate'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'visible'=>			array(T_ZBX_STR, O_OPT,	NULL, 	NULL,	NULL),

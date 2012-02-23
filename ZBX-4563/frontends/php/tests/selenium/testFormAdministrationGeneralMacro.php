@@ -44,7 +44,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 			$this->assertElementPresent("macros[$i][value]");
 		}
 		$this->assertElementPresent('macro_add');		// button "Add"
-		$this->assertElementPresent('macros_del');		// button "Delete selected"
+		$this->assertElementPresent('macros_0_del');		// button "Delete selected"
 		$this->assertElementPresent('save');
 	}
 
@@ -153,7 +153,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->login('adm.macros.php');
 		// No way to select what macro to remove currently
-		$this->click("id=macros_del");
+		$this->click("id=macros_0_del");
 		$this->click("id=save");
 		$this->waitForConfirmation();
 		$this->wait();
