@@ -29,17 +29,17 @@ class CConfigurationImport {
 
 	public function __construct($source, $options = array()) {
 		$this->options = array(
-			'groups' => array('missed' => true),
-			'hosts' => array('exist' => true, 'missed' => true),
-			'templates' => array('exist' => true, 'missed' => true),
-			'applications' => array('exist' => true, 'missed' => true),
-			'template_linkages' => array('exist' => true, 'missed' => true),
-			'items' => array('exist' => true, 'missed' => true),
-			'discoveryrules' => array('exist' => true, 'missed' => true),
-			'triggers' => array('exist' => true, 'missed' => true),
-			'graphs' => array('exist' => true, 'missed' => true),
-			'screens' => array('exist' => true, 'missed' => true),
-			'maps' => array('exist' => true, 'missed' => true),
+			'groups' => array('missed' => false),
+			'hosts' => array('exist' => false, 'missed' => false),
+			'templates' => array('exist' => false, 'missed' => false),
+			'applications' => array('exist' => false, 'missed' => false),
+			'template_linkages' => array('exist' => false, 'missed' => false),
+			'items' => array('exist' => false, 'missed' => false),
+			'discoveryrules' => array('exist' => false, 'missed' => false),
+			'triggers' => array('exist' => false, 'missed' => false),
+			'graphs' => array('exist' => false, 'missed' => false),
+			'screens' => array('exist' => false, 'missed' => false),
+			'maps' => array('exist' => false, 'missed' => false),
 			'images' => array('exist' => false, 'missed' => false),
 		);
 		$this->options = array_merge($this->options, $options);
@@ -57,7 +57,7 @@ class CConfigurationImport {
 		$version = $this->getImportVersion();
 
 		if ($version == '1.8') {
-			zbxXML::import($this->file['tmp_name']);
+			zbxXML::import($this->source);
 			if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
 				zbxXML::parseMap($this->options);
 			}

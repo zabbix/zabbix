@@ -44,7 +44,7 @@ $data['rules'] = array(
 	'maps' => array('exist' => true, 'missed' => true),
 	'images' => array('exist' => false, 'missed' => false)
 );
-if (isset($_REQUEST['form_refresh'])) {
+if (isset($_REQUEST['rules'])) {
 	$requestRules = get_request('rules', array());
 	foreach ($data['rules'] as $ruleName => $rule) {
 
