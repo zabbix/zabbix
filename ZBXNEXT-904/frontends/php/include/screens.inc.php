@@ -422,11 +422,6 @@ function templated_screen($screenid) {
 	return $result;
 }
 
-function get_screen_item_form($screen) {
-	$screenView = new CView('configuration.screen.constructor.edit', array('screen' => $screen));
-	return $screenView->render();
-}
-
 // editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
 function get_screen($screen, $editmode, $effectiveperiod = null) {
 	if (is_null($effectiveperiod)) {
@@ -547,14 +542,17 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 			/*
 			 * Edit form
 			 */
-			if ($editmode == 1 && isset($_REQUEST['form']) && isset($_REQUEST['x']) && $_REQUEST['x'] == $c
+			if ($editmode == 1 && isset($_REQUEST['form'])
+					&& isset($_REQUEST['x']) && $_REQUEST['x'] == $c
 					&& isset($_REQUEST['y']) && $_REQUEST['y'] == $r) {
-				$item = get_screen_item_form($screen);
+				$screenView = new CView('configuration.screen.constructor.edit', array('screen' => $screen));
+				$item = $screenView->render();
 				$item_form = true;
 			}
-			elseif ($editmode == 1 && isset($_REQUEST['form']) && isset($_REQUEST['screenitemid'])
-					&& bccomp($_REQUEST['screenitemid'], $screenitemid) == 0) {
-				$item = get_screen_item_form($screen);
+			elseif ($editmode == 1 && isset($_REQUEST['form'])
+					&& isset($_REQUEST['screenitemid']) && bccomp($_REQUEST['screenitemid'], $screenitemid) == 0) {
+				$screenView = new CView('configuration.screen.constructor.edit', array('screen' => $screen));
+				$item = $screenView->render();
 				$item_form = true;
 			}
 			/*

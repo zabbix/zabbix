@@ -56,7 +56,6 @@
 	'S_ELEMENT'=>				_('Element'),
 	'S_IMPORT_FILE'=>			_('Import file'),
 	'S_IMPORT'=>				_('Import'),
-	'S_EXPORT_SELECTED'=>		_('Export selected'),
 	'S_PREVIEW'=>				_('Preview'),
 	'S_RULES'=>				_('Rules'),
 
@@ -478,27 +477,12 @@
 	'S_REPORTS_BAR_REPORT_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	screenconf.php
-	'S_SCREEN'=>				_('Screen'),
-	'S_SCREEN_ADDED'=>			_('Screen added'),
-	'S_CANNOT_ADD_SCREEN'=>			_('Cannot add screen'),
-	'S_SCREEN_UPDATED'=>			_('Screen updated'),
-	'S_CANNOT_UPDATE_SCREEN'=>		_('Cannot update screen'),
-	'S_SCREEN_DELETED'=>			_('Screen deleted'),
-	'S_CANNOT_DELETE_SCREEN'=>		_('Cannot delete screen'),
-	'S_COLUMNS'=>				_('Columns'),
-	'S_ROWS'=>				_('Rows'),
-	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
 	'S_WIDTH'=>						_('Width'),
 	'S_HEIGHT'=>					_('Height'),
-	'S_CREATE_SCREEN'=>				_('Create screen'),
 	'S_EDIT'=>						_('Edit'),
-	'S_DIMENSION_COLS_ROWS'=>		_('Dimension (cols x rows)'),
-
-	'S_IMPORT_SCREEN'=>				_('Import screen'),
-
 	'S_CANNOT_FIND_GRAPH'=>			_('Cannot find graph'),
 	'S_CANNOT_FIND_ITEM'=>			_('Cannot find item'),
 	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>_('used in exported screen'),
@@ -507,11 +491,8 @@
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
 	'S_SERVER_INFO'=>			_('Server info'),
-
 	'S_LOCAL_TIME'=>			_('Local time'),
-
 	'S_RIGHT'=>				_('Right'),
-
 	'S_MIDDLE'=>				_('Middle'),
 
 //	screens.php
