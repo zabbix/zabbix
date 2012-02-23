@@ -573,6 +573,23 @@ class CZBXAPI {
 		return $objects;
 	}
 
+	/**
+	 * Checks if the object has any fields, that are not defined in the schema.
+	 *
+	 * @param $tableName
+	 * @param array $object
+	 * @param $error
+	 *
+	 * @throws APIException
+	 */
+	protected function checkUnsupportedFields($tableName, array $object, $error) {
+		foreach ($object as $field => $value) {
+			if (!DB::hasField($tableName, $field)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+	}
+
 
 	/**
 	 * Throws an API exception.
