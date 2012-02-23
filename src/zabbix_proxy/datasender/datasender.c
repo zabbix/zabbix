@@ -82,139 +82,36 @@ static void	host_availability_sender(struct zbx_json *j)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	history_sender(struct zbx_json *j, int *records)
+static void	history_sender(struct zbx_json *j, int *records, const char *tag,
+		int (*f_get_data)(), void (*f_set_lastid)())
 {
 	const char	*__function_name = "history_sender";
+
 	zbx_sock_t	sock;
 	zbx_uint64_t	lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_json_clean(j);
-	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_HISTORY_DATA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, tag, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
 
-	*records = proxy_get_hist_data(j, &lastid);
+	*records = f_get_data(j, &lastid);
 
 	zbx_json_close(j);
-
-	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
 	if (*records > 0)
 	{
 		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
+
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+
 		if (SUCCEED == put_data_to_server(&sock, j))
 		{
 			DBbegin();
-			proxy_set_hist_lastid(lastid);
-			DBcommit();
-		}
-		else
-			*records = 0;
-
-		disconnect_server(&sock);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: dhistory_sender                                                  *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	dhistory_sender(struct zbx_json *j, int *records)
-{
-	const char	*__function_name = "dhistory_sender";
-	zbx_sock_t	sock;
-	zbx_uint64_t	lastid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_json_clean(j);
-	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_DISCOVERY_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
-
-	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
-
-	*records = proxy_get_dhis_data(j, &lastid);
-
-	zbx_json_close(j);
-
-	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
-	if (*records > 0)
-	{
-		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
-		if (SUCCEED == put_data_to_server(&sock, j))
-		{
-			DBbegin();
-			proxy_set_dhis_lastid(lastid);
-			DBcommit();
-		}
-		else
-			*records = 0;
-
-		disconnect_server(&sock);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: autoreg_host_sender                                              *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	autoreg_host_sender(struct zbx_json *j, int *records)
-{
-	const char	*__function_name = "autoreg_host_sender";
-	zbx_sock_t	sock;
-	zbx_uint64_t	lastid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_json_clean(j);
-	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
-
-	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
-
-	*records = proxy_get_areg_data(j, &lastid);
-
-	zbx_json_close(j);
-
-	zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
-	if (*records > 0)
-	{
-		connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY); /* retry till have a connection */
-		if (SUCCEED == put_data_to_server(&sock, j))
-		{
-			DBbegin();
-			proxy_set_areg_lastid(lastid);
+			f_set_lastid(lastid);
 			DBcommit();
 		}
 		else
@@ -265,19 +162,22 @@ void	main_datasender_loop()
 
 		records = 0;
 retry_history:
-		history_sender(&j, &r);
+		history_sender(&j, &r, ZBX_PROTO_VALUE_HISTORY_DATA,
+				proxy_get_hist_data, proxy_set_hist_lastid);
 		records += r;
 
 		if (ZBX_MAX_HRECORDS == r)
 			goto retry_history;
 retry_dhistory:
-		dhistory_sender(&j, &r);
+		history_sender(&j, &r, ZBX_PROTO_VALUE_DISCOVERY_DATA,
+				proxy_get_dhis_data, proxy_set_dhis_lastid);
 		records += r;
 
 		if (ZBX_MAX_HRECORDS == r)
 			goto retry_dhistory;
 retry_autoreg_host:
-		autoreg_host_sender(&j, &r);
+		history_sender(&j, &r, ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA,
+				proxy_get_areg_data, proxy_set_areg_lastid);
 		records += r;
 
 		if (ZBX_MAX_HRECORDS == r)

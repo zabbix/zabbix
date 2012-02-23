@@ -454,6 +454,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+.......P.. [ZBX-4683] fixed timestamps mismatch while sending history data from proxy (Sasha)
 ..F....... [ZBX-4140] fixed trigger test functionality for operator '#' (Alexei)
 ..F....... [ZBX-4680] fixed minor typo in frontends/php/js/class.rpc.js (Alexei)
 ...G...... [ZBX-1298] fixed processing of command line arguments more than 2KB in proc.num and proc.mem checks on Linux (Sasha)
