@@ -1,6 +1,7 @@
 Changes for 1.8.11rc1
 
 .......P.. [ZBX-4683] fixed timestamps mismatch while sending history data from proxy (Sasha)
+..F....... [ZBX-4140] fixed trigger test functionality for operator '#' (Alexei)
 ..F....... [ZBX-4600] fixed trigger dependencies being reset when executing a mass update (pavels)
 A.F....... [ZBX-4604] fixed "screen" type screen item validation (pavels)
 ..F....... [ZBX-4680] fixed minor typo in frontends/php/js/class.rpc.js (Alexei)
