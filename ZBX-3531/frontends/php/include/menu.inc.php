@@ -159,10 +159,6 @@ $ZBX_MENU = array(
 				'label' => _('Host groups')
 			),
 			array(
-				'url' => 'conf.import.php',
-				'label' => _('Import')
-			),
-			array(
 				'url' => 'templates.php',
 				'label' => _('Templates')
 			),

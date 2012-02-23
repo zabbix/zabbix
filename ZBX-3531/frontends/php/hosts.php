@@ -27,8 +27,6 @@ if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['h
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_hosts_export.xml';
-
-	require_once('include/export.inc.php');
 }
 else{
 	$EXPORT_DATA = false;
@@ -604,7 +602,7 @@ require_once('include/page_header.php');
 		$frmForm->cleanItems();
 		$buttons = new CDiv(array(
 			new CSubmit('form', S_CREATE),
-			new CSubmit('form', S_IMPORT)
+			new CButton('form', _('Import'), 'redirect("conf.import.php")')
 		));
 		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);

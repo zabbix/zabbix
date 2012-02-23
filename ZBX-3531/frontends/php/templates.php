@@ -30,8 +30,6 @@ if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['t
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_templates_export.xml';
-
-	require_once('include/export.inc.php');
 }
 else{
 	$EXPORT_DATA = false;
@@ -64,10 +62,8 @@ require_once('include/page_header.php');
 		'value_new'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	'isset({macro_add})'),
 		'macro_add'			=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'macros_del'		=> array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-
 // actions
 		'go'				=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
-
 //form
 		'unlink'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'unlink_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
@@ -77,7 +73,6 @@ require_once('include/page_header.php');
 		'delete'			=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'delete_and_clear'	=> array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	NULL,		NULL),
 		'cancel'			=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
-
 // other
 		'form'				=> array(T_ZBX_STR, O_OPT,	P_SYS,			NULL,		NULL),
 		'form_refresh'		=> array(T_ZBX_STR, O_OPT,	NULL,			NULL,		NULL),
@@ -406,7 +401,7 @@ require_once('include/page_header.php');
 		$frmForm->cleanItems();
 		$buttons = new CDiv(array(
 			new CSubmit('form', S_CREATE),
-			new CSubmit('form', S_IMPORT)
+			new CButton('form', _('Import'), 'redirect("conf.import.php")')
 		));
 		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);
