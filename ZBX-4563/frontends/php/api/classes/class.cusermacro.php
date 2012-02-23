@@ -450,9 +450,7 @@ class CUserMacro extends CZBXAPI {
 		$globalMacros = $this->extendObjects('globalmacro', $globalMacros, array('macro'));
 
 		foreach ($globalMacros as $globalMacro) {
-			if (isset($globalMacro['macro'])) {
-				$this->checkMacro($globalMacro);
-			}
+			$this->checkMacro($globalMacro);
 			if (isset($globalMacro['value'])) {
 				$this->checkValue($globalMacro);
 			}
@@ -503,7 +501,7 @@ class CUserMacro extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkGlobalMacrosPermissions($globalMacroIds);
+		$this->checkGlobalMacrosPermissions(_('Only Super Admins can delete global macros.'));
 		$this->checkIfGlobalMacrosExist($globalMacroIds);
 	}
 
@@ -628,14 +626,10 @@ class CUserMacro extends CZBXAPI {
 		$this->checkHostPermissions($affectedHostIds);
 
 		foreach ($hostMacros as $hostMacro) {
-			if (isset($hostMacro['macro'])) {
-				$this->checkMacro($hostMacro);
-			}
+			$this->checkMacro($hostMacro);
+			$this->checkHostId($hostMacro);
 			if (isset($hostMacro['value'])) {
 				$this->checkValue($hostMacro);
-			}
-			if (isset($hostMacro['hostid'])) {
-				$this->checkHostId($hostMacro);
 			}
 		}
 
@@ -975,7 +969,7 @@ class CUserMacro extends CZBXAPI {
 		if ($macroNames) {
 			$dbMacros = $this->select('globalmacro', array(
 				'filter' => array('macro' => $macroNames),
-				'output' => API_OUTPUT_EXTEND
+				'output' => array('globalmacroid', 'macro')
 			));
 			foreach ($dbMacros as $dbMacro) {
 				$macro = $nameMacro[$dbMacro['macro']];
@@ -1009,7 +1003,7 @@ class CUserMacro extends CZBXAPI {
 	 */
 	protected function checkIfGlobalMacrosExist(array $globalMacroIds) {
 		$globalMacros = $this->select('globalmacro', array(
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_SHORTEN,
 			'globalmacroids' => $globalMacroIds
 		));
 		$globalMacros = zbx_toHash($globalMacros, 'globalmacroid');
