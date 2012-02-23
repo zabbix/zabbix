@@ -357,23 +357,28 @@ require_once('include/views/js/general.script.confirm.js.php');
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
+
 	if($config['event_ack_enable']){
+		$triggerids = Array();
 		foreach($triggers as $tnum => $trigger){
-			$options = array(
-				'countOutput' => true,
-				'triggerids' => $trigger['triggerid'],
+			$triggerids[] = $tnum;
+		}
+		$options = array(
+				'groupCount' => true,
+				'triggerids' => $triggerids,
 				'filter' => array(
 					'object' => EVENT_OBJECT_TRIGGER,
 					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 					'acknowledged' => 0,
 					'value' => TRIGGER_VALUE_TRUE,
-				),
+		),
 				'nopermissions' => true
-			);
-			$triggers[$tnum]['event_count'] = API::Event()->get($options);
+		);
+		$event_counts = API::Event()->get($options);
+		foreach($triggers as $tnum => $trigger){
+			$triggers[$tnum]['event_count'] = $event_counts[$tnum];
 		}
 	}
-
 
 	$tr_hostids = array();
 	foreach($triggers as $tnum => $trigger){
