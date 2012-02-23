@@ -400,33 +400,33 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @throws APIException if the input is invalid
 	 *
-	 * @param array $macros
+	 * @param array $globalMacros
 	 */
-	protected function validateCreateGlobal(array $macros) {
+	protected function validateCreateGlobal(array $globalMacros) {
 		$this->checkGlobalMacrosPermissions(_('Only Super Admins can create global macros.'));
 
-		foreach ($macros as $macro) {
+		foreach ($globalMacros as $macro) {
 			$this->checkMacro($macro);
 			$this->checkValue($macro);
 		}
 
-		$this->checkDuplicateMacros($macros);
-		$this->checkIfGlobalMacrosDontRepeat($macros);
+		$this->checkDuplicateMacros($globalMacros);
+		$this->checkIfGlobalMacrosDontRepeat($globalMacros);
 	}
 
 	/**
 	 * Add global macros.
 	 *
-	 * @param array $macros
+	 * @param array $globalMacros
 	 *
 	 * @return array
 	 */
-	public function createGlobal(array $macros) {
-		$macros = zbx_toArray($macros);
+	public function createGlobal(array $globalMacros) {
+		$globalMacros = zbx_toArray($globalMacros);
 
-		$this->validateCreateGlobal($macros);
+		$this->validateCreateGlobal($globalMacros);
 
-		$globalmacroids = DB::insert('globalmacro', $macros);
+		$globalmacroids = DB::insert('globalmacro', $globalMacros);
 
 		return array('globalmacroids' => $globalmacroids);
 	}
@@ -464,29 +464,29 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Updates global macros.
 	 *
-	 * @param array $globalmacros
+	 * @param array $globalMacros
 	 *
 	 * @return array
 	 */
-	public function updateGlobal(array $globalmacros) {
-		$globalmacros = zbx_toArray($globalmacros);
+	public function updateGlobal(array $globalMacros) {
+		$globalMacros = zbx_toArray($globalMacros);
 
-		$this->validateUpdateGlobal($globalmacros);
+		$this->validateUpdateGlobal($globalMacros);
 
 		// update macros
 		$data = array();
-		foreach ($globalmacros as $gmacro) {
-			$globalmacroid = $gmacro['globalmacroid'];
+		foreach ($globalMacros as $gmacro) {
+			$globalMacroId = $gmacro['globalmacroid'];
 			unset($gmacro['globalmacroid']);
 
 			$data[] = array(
 				'values'=> $gmacro,
-				'where'=> array('globalmacroid' => $globalmacroid)
+				'where'=> array('globalmacroid' => $globalMacroId)
 			);
 		}
 		DB::update('globalmacro', $data);
 
-		return array('globalmacroids' => zbx_objectValues($globalmacros, 'globalmacroid'));
+		return array('globalmacroids' => zbx_objectValues($globalMacros, 'globalmacroid'));
 	}
 
 	/**
@@ -508,19 +508,19 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Delete global macros.
 	 *
-	 * @param mixed $globalmacroids
+	 * @param mixed $globalMacroIds
 	 *
 	 * @return array
 	 */
-	public function deleteGlobal($globalmacroids) {
-		$globalmacroids = zbx_toArray($globalmacroids);
+	public function deleteGlobal($globalMacroIds) {
+		$globalMacroIds = zbx_toArray($globalMacroIds);
 
-		$this->validateDeleteGlobal($globalmacroids);
+		$this->validateDeleteGlobal($globalMacroIds);
 
 		// delete macros
-		DB::delete('globalmacro', array('globalmacroid' => $globalmacroids));
+		DB::delete('globalmacro', array('globalmacroid' => $globalMacroIds));
 
-		return array('globalmacroids' => $globalmacroids);
+		return array('globalmacroids' => $globalMacroIds);
 	}
 
 	/**
@@ -535,8 +535,8 @@ class CUserMacro extends CZBXAPI {
 
 		foreach ($hostMacros as $hostMacro) {
 			$this->checkMacro($hostMacro);
-			$this->checkValue($hostMacro);
 			$this->checkHostId($hostMacro);
+			$this->checkValue($hostMacro);
 		}
 
 		$this->checkDuplicateMacros($hostMacros);
@@ -556,47 +556,6 @@ class CUserMacro extends CZBXAPI {
 		$hostmacroids = DB::insert('hostmacro', $hostMacros);
 
 		return array('hostmacroids' => $hostmacroids);
-	}
-
-	/**
-	 * Validates the input parameters for the delete() method.
-	 *
-	 * @throws APIException if the input is invalid
-	 *
-	 * @param array $hostMacroIds
-	 */
-	protected function validateDelete(array $hostMacroIds) {
-		if (!$hostMacroIds) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-		}
-
-		$dbHostMacros = $this->get(array(
-			'hostmacroids' => $hostMacroIds,
-			'output' => API_OUTPUT_EXTEND
-		));
-
-		// check if the macros exist
-		$this->checkIfHostMacrosExistIn($hostMacroIds, $dbHostMacros);
-
-		// check permissions for all affected hosts
-		$this->checkHostPermissions(array_unique(zbx_objectValues($dbHostMacros, 'hostid')));
-	}
-
-	/**
-	 * Remove Macros from Hosts
-	 *
-	 * @param mixed $hostMacroIds
-	 *
-	 * @return boolean
-	 */
-	public function delete($hostMacroIds) {
-		$hostMacroIds = zbx_toArray($hostMacroIds);
-
-		$this->validateDelete($hostMacroIds);
-
-		DB::delete('hostmacro', array('hostmacroid' => $hostMacroIds));
-
-		return array('hostmacroids' => $hostMacroIds);
 	}
 
 	/**
@@ -653,21 +612,59 @@ class CUserMacro extends CZBXAPI {
 
 		$this->validateUpdate($hostMacros);
 
-		$hostMacroIds = array();
-		$dataUpdate = array();
+		$data = array();
 		foreach ($hostMacros as $macro) {
 			$hostMacroId = $macro['hostmacroid'];
 			unset($macro['hostmacroid']);
 
-			$dataUpdate[] = array(
+			$data[] = array(
 				'values' => $macro,
 				'where' => array('hostmacroid' => $hostMacroId)
 			);
-
-			$hostMacroIds[] = $hostMacroId;
 		}
 
-		DB::update('hostmacro', $dataUpdate);
+		DB::update('hostmacro', $data);
+
+		return array('hostmacroids' => zbx_objectValues($globalMacros, 'hostmacroid'));
+	}
+
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $hostMacroIds
+	 */
+	protected function validateDelete(array $hostMacroIds) {
+		if (!$hostMacroIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$dbHostMacros = $this->get(array(
+			'hostmacroids' => $hostMacroIds,
+			'output' => API_OUTPUT_EXTEND
+		));
+
+		// check if the macros exist
+		$this->checkIfHostMacrosExistIn($hostMacroIds, $dbHostMacros);
+
+		// check permissions for all affected hosts
+		$this->checkHostPermissions(array_unique(zbx_objectValues($dbHostMacros, 'hostid')));
+	}
+
+	/**
+	 * Remove Macros from Hosts
+	 *
+	 * @param mixed $hostMacroIds
+	 *
+	 * @return boolean
+	 */
+	public function delete($hostMacroIds) {
+		$hostMacroIds = zbx_toArray($hostMacroIds);
+
+		$this->validateDelete($hostMacroIds);
+
+		DB::delete('hostmacro', array('hostmacroid' => $hostMacroIds));
 
 		return array('hostmacroids' => $hostMacroIds);
 	}
@@ -961,11 +958,11 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @throws APIException if any of the given macros already exist
 	 *
-	 * @param array $macros
+	 * @param array $globalMacros
 	 */
-	protected function checkIfGlobalMacrosDontRepeat(array $macros) {
-		$nameMacro = zbx_toHash($macros, 'macro');
-		$macroNames = zbx_objectValues($macros, 'macro');
+	protected function checkIfGlobalMacrosDontRepeat(array $globalMacros) {
+		$nameMacro = zbx_toHash($globalMacros, 'macro');
+		$macroNames = zbx_objectValues($globalMacros, 'macro');
 		if ($macroNames) {
 			$dbMacros = $this->select('globalmacro', array(
 				'filter' => array('macro' => $macroNames),
