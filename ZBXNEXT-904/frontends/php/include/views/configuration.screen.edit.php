@@ -43,14 +43,11 @@ $screenTab->addTab('screenTab', _('Screen'), $screenFormList);
 $screenForm->addItem($screenTab);
 
 // append buttons to form
-$deleteButton = new CButtonDelete(_('Delete screen?'), url_param('form').url_param('screenid'));
-if (empty($this->data['screenid'])) {
-	$deleteButton->setAttribute('disabled', 'disabled');
-}
 $screenForm->addItem(makeFormFooter(
 	new CSubmit('save', _('Save')),
 	array(
-		$deleteButton,
+		!empty($this->data['screenid']) ? new CSubmit('clone', _('Clone')) : null,
+		!empty($this->data['screenid']) ? new CButtonDelete(_('Delete screen?'), url_param('form').url_param('screenid')) : null,
 		new CButtonCancel(url_param('templateid'))
 	)
 ));

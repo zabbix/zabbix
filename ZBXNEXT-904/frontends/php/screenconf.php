@@ -225,7 +225,7 @@ if (isset($_REQUEST['form'])) {
 		$screenWidget->addItem(import_screen_form($rules));
 		$screenWidget->show();
 	}
-	elseif ($_REQUEST['form'] == _('Create screen') || $_REQUEST['form'] == 'update') {
+	elseif ($_REQUEST['form'] == _('Create screen') || $_REQUEST['form'] == 'update' || $_REQUEST['form'] == 'clone') {
 		$data = array(
 			'form' => get_request('form', null),
 			'screenid' => get_request('screenid', null),
