@@ -1,5 +1,6 @@
 <?php
 
-interface CExportWriter {
-	public function write(array $elem);
+abstract class CExportWriter {
+
+	abstract public function write(array $array);
 }

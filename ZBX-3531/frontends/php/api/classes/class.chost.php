@@ -1214,19 +1214,18 @@ Copt::memoryPick();
 		return $result;
 	}
 
-/**
- * Get Host ID by Host name
- *
- * @param _array $host_data
- * @param string $host_data['host']
- * @return int|boolean
- */
+	/**
+	 * Get Host ID by Host name
+	 *
+	 * @param $hostData
+	 *
+	 * @return array
+	 */
 	public function getObjects($hostData) {
 		$options = array(
 			'filter' => $hostData,
-			'output'=>API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND
 		);
-
 		if (isset($hostData['node'])) {
 			$options['nodeids'] = getNodeIdByNodeName($hostData['node']);
 		}
@@ -1234,9 +1233,7 @@ Copt::memoryPick();
 			$options['nodeids'] = $hostData['nodeids'];
 		}
 
-		$result = $this->get($options);
-
-	return $result;
+		return $this->get($options);
 	}
 
 	public function exists($object) {

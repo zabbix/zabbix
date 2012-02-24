@@ -12,7 +12,6 @@ class CXmlImportReader extends CImportReader {
 
 	function xmlToArray($xml) {
 		$array = '';
-
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:

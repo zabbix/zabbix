@@ -22,9 +22,15 @@ class CConfigurationImport {
 	 */
 	protected $options;
 
+	/**
+	 * @var string with import data in one of supported formats
+	 */
 	protected $source;
 
 	protected $data;
+
+	protected $interfacesCache = array();
+	protected $hostsCache = array();
 
 
 	public function __construct($source, $options = array()) {
@@ -129,7 +135,7 @@ class CConfigurationImport {
 			$templatesRefs = array();
 			$groupsRefs = array();
 			foreach ($templates as $template) {
-				$templatesRefs[] = $template['template'];
+				$templatesRefs[] = $template['host'];
 				$groupsRefs = zbx_objectValues($template['groups'], 'name');
 			}
 			$this->referencer->addTemplates($templatesRefs);
@@ -264,7 +270,7 @@ class CConfigurationImport {
 		}
 	}
 
-	private function processGroups() {
+	protected function processGroups() {
 		$groups = $this->formatter->getGroups();
 		if (empty($groups)) {
 			return;
@@ -284,68 +290,54 @@ class CConfigurationImport {
 		}
 	}
 
-	private function processTemplates() {
-		$hosts = $this->formatter->getTemplates();
-		if (empty($hosts)) {
+	protected function processTemplates() {
+		$templates = $this->formatter->getTemplates();
+		if (empty($templates)) {
 			return;
 		}
 
-		$allGroups = array();
-		foreach ($hosts as $host) {
-			// gather all host group names
-			$allGroups += zbx_objectValues($host['groups'], 'name');
-		}
-
-
-		// set host groups ids
-		$allDbGroups = $this->getGroupIds($allGroups);
-		foreach ($hosts as &$host) {
-			foreach ($host['groups'] as $gnum => $group) {
-				unset($host['groups'][$gnum]);
-				if (isset($allDbGroups[$group['name']])) {
-					$host['groups'][$gnum] = array('groupid' => $allDbGroups[$group['name']]['groupid']);
+		$templatesToCreate = array();
+		$templatesToUpdate = array();
+		foreach ($templates as $template) {
+			foreach ($template['groups'] as $gnum => $group) {
+				if (!$this->referencer->resolveGroup($group['name'])) {
+					throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
+				}
+				$template['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
+			}
+			if (isset($template['templates'])) {
+				foreach ($template['templates'] as $tnum => $parentTemplate) {
+					if (!$this->referencer->resolveTemplate($parentTemplate['name'])) {
+						throw new Exception(_s('Template "%1$s" does not exist.', $parentTemplate['name']));
+					}
+					$template['templates'][$tnum] = array('templateid' => $this->referencer->resolveHostOrTemplate($parentTemplate['name']));
 				}
 			}
-		}
-		unset($host);
 
-
-		// get hostids for existing hosts
-		$dbHosts = API::Template()->get(array(
-			'filter' => array('host' => zbx_objectValues($hosts, 'host')),
-			'output' => array('hostid', 'host'),
-			'preservekeys' => true,
-			'editable' => true
-		));
-		$dbHosts = zbx_toHash($dbHosts, 'host');
-		$hostsToCreate = $hostsToUpdate = array();
-		foreach ($hosts as $host) {
-			if (isset($dbHosts[$host['host']])) {
-				$host['templateid'] = $dbHosts[$host['host']]['templateid'];
-				$hostsToUpdate[] = $host;
+			if ($this->referencer->resolveTemplate($template['host'])) {
+				$template['templateid'] = $this->referencer->resolveTemplate($template['host']);
+				$this->hostsCache[$template['host']] = $template['templateid'];
+				$templatesToUpdate[] = $template;
 			}
 			else {
-				$hostsToCreate[] = $host;
+				$templatesToCreate[] = $template;
 			}
 		}
 
-
-		// create/update hosts and create hash host->hostid
-		if ($this->options['templates']['missed'] && $hostsToCreate) {
-			$newHostIds = API::Template()->create($hostsToCreate);
+		// create/update templates and create hash template->hostid
+		if ($this->options['templates']['missed'] && $templatesToCreate) {
+			$newHostIds = API::Template()->create($templatesToCreate);
 			foreach ($newHostIds['templateids'] as $hnum => $hostid) {
-				$this->hostsCache[$hostsToCreate[$hnum]['host']] = $hostid;
+				$this->hostsCache[$templatesToCreate[$hnum]['host']] = $hostid;
+				$this->referencer->addTemplateRef($templatesToCreate[$hnum]['host'], $hostid);
 			}
 		}
-		if ($this->options['templates']['exist'] && $hostsToUpdate) {
-			API::Template()->update($hostsToUpdate);
-			foreach ($hostsToUpdate as $host) {
-				$this->hostsCache[$host['host']] = $host['templateid'];
-			}
+		if ($this->options['templates']['exist'] && $templatesToUpdate) {
+			API::Template()->update($templatesToUpdate);
 		}
 	}
 
-	private function processHosts() {
+	protected function processHosts() {
 		$hosts = $this->formatter->getHosts();
 		if (empty($hosts)) {
 			return;
@@ -360,19 +352,18 @@ class CConfigurationImport {
 			}
 		}
 
-
 		$hostsToCreate = $hostsToUpdate = array();
 		foreach ($hosts as $host) {
 			foreach ($host['groups'] as $gnum => $group) {
 				if (!$this->referencer->resolveGroup($group['name'])) {
-					throw new Exception(_s('Group "%1$s" does not exist', $group['name']));
+					throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
 				}
 				$host['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
 			}
 			if (isset($host['templates'])) {
 				foreach ($host['templates'] as $tnum => $template) {
 					if (!$this->referencer->resolveTemplate($template['name'])) {
-						throw new Exception(_s('Template "%1$s" does not exist', $template['name']));
+						throw new Exception(_s('Template "%1$s" does not exist.', $template['name']));
 					}
 					$host['templates'][$tnum] = array('templateid' => $this->referencer->resolveHostOrTemplate($template['name']));
 				}
@@ -453,7 +444,7 @@ class CConfigurationImport {
 		}
 	}
 
-	private function processApplications() {
+	protected function processApplications() {
 		$allApplciations = $this->formatter->getApplications();
 		if (empty($allApplciations)) {
 			return;
@@ -481,7 +472,7 @@ class CConfigurationImport {
 		}
 	}
 
-	private function processItems() {
+	protected function processItems() {
 		$allItems = $this->formatter->getItems();
 		if (empty($allItems)) {
 			return;
@@ -532,7 +523,7 @@ class CConfigurationImport {
 		}
 	}
 
-	private function processDiscoveryRules() {
+	protected function processDiscoveryRules() {
 		$allDiscoveryRules = $this->formatter->getDiscoveryRules();
 		if (empty($allDiscoveryRules)) {
 			return;
@@ -650,7 +641,7 @@ class CConfigurationImport {
 
 	}
 
-	private function processGraphs() {
+	protected function processGraphs() {
 		$allGraphs = $this->formatter->getGraphs();
 		if (empty($allGraphs)) {
 			return;
@@ -672,7 +663,7 @@ class CConfigurationImport {
 
 
 			foreach ($graph['gitems'] as &$gitem) {
-				$gitemhostId = $this->referencer->resolveHost($gitem['item']['host']);
+				$gitemhostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
 
 				$gitem['itemid'] = $this->referencer->resolveItem($gitemhostId, $gitem['item']['key']);
 
@@ -716,7 +707,7 @@ class CConfigurationImport {
 		}
 	}
 
-	private function processTriggers() {
+	protected function processTriggers() {
 		$allTriggers = $this->formatter->getTriggers();
 		if (empty($allTriggers)) {
 			return;
@@ -770,7 +761,7 @@ class CConfigurationImport {
 
 	}
 
-	private function processImages() {
+	protected function processImages() {
 		$allImages = $this->formatter->getImages();
 
 		$imagesToUpdate = array();
@@ -799,7 +790,7 @@ class CConfigurationImport {
 		}
 	}
 
-	private function processMaps() {
+	protected function processMaps() {
 		$allMaps = $this->formatter->getMaps();
 
 		$mapsToCreate = array();
@@ -882,45 +873,47 @@ class CConfigurationImport {
 					case SYSMAP_ELEMENT_TYPE_MAP:
 						$db_sysmaps = API::Map()->getObjects($selement['element']);
 						if (empty($db_sysmaps)) {
-							$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['element']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
-							throw new Exception($error);
+							throw new Exception(_s('Cannot find map "%1$s" used in map %2$s".',
+									$nodeCaption.$selement['element']['name'], $map['name']));
 						}
 
 						$tmp = reset($db_sysmaps);
 						$selement['elementid'] = $tmp['sysmapid'];
 						break;
+
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$db_hostgroups = API::HostGroup()->getObjects($selement['element']);
 						if (empty($db_hostgroups)) {
-							$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['element']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
-							throw new Exception($error);
+							throw new Exception(_s('Cannot find group "%1$s" used in map "$2%s".',
+									$nodeCaption.$selement['element']['name'], $map['name']));
 						}
 
 						$tmp = reset($db_hostgroups);
 						$selement['elementid'] = $tmp['groupid'];
 						break;
+
 					case SYSMAP_ELEMENT_TYPE_HOST:
 						$db_hosts = API::Host()->getObjects($selement['element']);
 						if (empty($db_hosts)) {
-							$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['element']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
-							throw new Exception($error);
+							throw new Exception(_s('Cannot find host "%1$s" used in map "$2%s".',
+									$nodeCaption.$selement['element']['host'], $map['name']));
 						}
 
 						$tmp = reset($db_hosts);
 						$selement['elementid'] = $tmp['hostid'];
 						break;
+
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$db_triggers = API::Trigger()->getObjects($selement['element']);
 						if (empty($db_triggers)) {
-							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['element']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$map['name'].'"';
-							throw new Exception($error);
+							throw new Exception(_s('Cannot find trigger "%1$s" used in map "$2%s".',
+									$nodeCaption.$selement['element']['host'], $map['name']));
 						}
 
 						$tmp = reset($db_triggers);
 						$selement['elementid'] = $tmp['triggerid'];
 						break;
 					case SYSMAP_ELEMENT_TYPE_IMAGE:
-					default:
 				}
 
 				$icons = array(
@@ -979,8 +972,7 @@ class CConfigurationImport {
 	}
 
 
-
-	private function getFormatter($version) {
+	protected function getFormatter($version) {
 		switch ($version) {
 			case '2.0':
 				return new C20ImportFormatter;
@@ -991,14 +983,14 @@ class CConfigurationImport {
 
 	}
 
-	private function getImportVersion() {
+	protected function getImportVersion() {
 		if (isset($this->data['zabbix_export']['version'])) {
 			return $this->data['zabbix_export']['version'];
 		}
 		return '1.8';
 	}
 
-	private static function validate($schema) {
+	protected static function validate($schema) {
 		libxml_use_internal_errors(true);
 
 		$result = self::$xml->relaxNGValidate($schema);
