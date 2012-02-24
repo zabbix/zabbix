@@ -1315,10 +1315,12 @@ Copt::memoryPick();
 			}
 
 			if ($update || $delete) {
-				if (!isset($dbHosts[$host['hostid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
-
-				if ($delete) $host['host'] = $dbHosts[$host['hostid']]['host'];
+				if (!isset($dbHosts[$host['hostid']])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+				}
+				if ($delete) {
+					$host['host'] = $dbHosts[$host['hostid']]['host'];
+				}
 			}
 			else {
 				// if visible name is not given or empty it should be set to host name
@@ -1341,7 +1343,7 @@ Copt::memoryPick();
 
 				foreach ($host['groups'] as $gnum => $group) {
 					if (!isset($dbGroups[$group['groupid']])) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 					}
 				}
 			}

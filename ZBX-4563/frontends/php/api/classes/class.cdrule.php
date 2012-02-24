@@ -421,8 +421,9 @@ COpt::memoryPick();
 		}
 
 		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
 		}
 
 		$proxies = array();
@@ -722,8 +723,9 @@ COpt::memoryPick();
 		$druleids = zbx_toArray($druleids);
 
 		if (self::$userData['type'] >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+			if (!count(get_accessible_nodes_by_user(self::$userData, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
 		}
 
 		$actionids = array();

@@ -66,6 +66,12 @@ class CWidget {
 		$this->headers[] = array('left' => $header, 'right' => $headerright);
 	}
 
+	public function addHeaderRowNumber($name = 'numrows') {
+		$numRows = new CDiv();
+		$numRows->setAttribute('name', $name);
+		$this->addHeader($numRows);
+	}
+
 	public function addFlicker($items = null, $state = 0) {
 		if (!is_null($items)) {
 			$this->flicker[] = $items;
@@ -120,7 +126,7 @@ class CWidget {
 
 			$widget[] = $flicker_tab;
 		}
-		$div = new CDiv($this->body, 'mainwidget');
+		$div = new CDiv($this->body, 'w');
 		$div->setAttribute('id', $this->domid);
 		if (!$this->state) {
 			$div->setAttribute('style', 'display: none;');

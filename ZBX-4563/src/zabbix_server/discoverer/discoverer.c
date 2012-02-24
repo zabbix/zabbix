@@ -240,8 +240,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 
 					substitute_simple_macros(NULL, NULL, NULL, NULL,
 							&item.snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-					substitute_simple_macros(NULL, NULL, NULL, NULL,
-							&item.snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+					substitute_key_macros(&item.snmp_oid, NULL, NULL, MACRO_TYPE_SNMP_OID, NULL, 0);
 
 					if (ITEM_TYPE_SNMPv3 == item.type)
 					{
@@ -443,9 +442,7 @@ static void	process_rule(DB_DRULE *drule)
 	unsigned int	j[9], i, first, last, mask, network, broadcast;
 	char		ip[INTERFACE_IP_LEN_MAX], *curr_range, *next_range,
 			*dash, *slash, dns[INTERFACE_DNS_LEN_MAX];
-#ifdef HAVE_IPV6
 	int		ipv6;
-#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __function_name,
 			drule->name, drule->iprange);
@@ -464,10 +461,11 @@ static void	process_rule(DB_DRULE *drule)
 			*slash = '\0';
 
 		first = last = 0;
-#ifdef HAVE_IPV6
+
 		if (SUCCEED == expand_ipv6(curr_range, ip, sizeof(ip)))
 		{
 			ipv6 = 1;
+#ifdef HAVE_IPV6
 			if (8 == sscanf(ip, "%x:%x:%x:%x:%x:%x:%x:%x", &j[0], &j[1], &j[2], &j[3], &j[4], &j[5], &j[6], &j[7]))
 			{
 				first = (j[6] << 16) + j[7];
@@ -523,11 +521,11 @@ static void	process_rule(DB_DRULE *drule)
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() IPv6 To:'%s'",
 						__function_name, collapse_ipv6(ip, sizeof(ip)));
 			}
+#endif
 		}
 		else
 		{
 			ipv6 = 0;
-#endif	/* HAVE_IPV6 */
 			if (4 == sscanf(curr_range, "%u.%u.%u.%u", &j[0], &j[1], &j[2], &j[3]) &&
 					j[0] <= 255 && j[1] <= 255 && j[2] <= 255 && j[3] <= 255)
 			{
@@ -571,9 +569,7 @@ static void	process_rule(DB_DRULE *drule)
 						(last & 0xff000000) >> 24, (last & 0x00ff0000) >> 16,
 						(last & 0x0000ff00) >> 8, (last & 0x000000ff));
 			}
-#ifdef HAVE_IPV6
 		}
-#endif
 
 		if (NULL != dash)
 		{
@@ -592,11 +588,18 @@ static void	process_rule(DB_DRULE *drule)
 			*next_range = ',';
 			next_range ++;
 		}
-
+#ifndef HAVE_IPV6
+		if (1 == ipv6)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": encountered IP range \"%s\","
+					" but IPv6 support not compiled in", drule->name, curr_range);
+			continue;
+		}
+#endif
 		if (0 == first || 0 == last || first > last)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery: wrong format of IP range '%s'",
-					curr_range);
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": wrong format of IP range \"%s\"",
+					drule->name, curr_range);
 			continue;
 		}
 

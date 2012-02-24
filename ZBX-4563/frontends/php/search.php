@@ -38,9 +38,8 @@ require_once('include/page_header.php');
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			NULL),
-
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'flop','refresh'"),NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
+		'favaction'=>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'flop','refresh'"), null),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favaction})&&("flop"=={favaction})'),
 	);
 
 	check_fields($fields);
@@ -50,10 +49,10 @@ require_once('include/page_header.php');
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
 		if('hat' == $_REQUEST['favobj']){
-			if('flop' == $_REQUEST['action']){
-				CProfile::update('web.search.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			if('flop' == $_REQUEST['favaction']){
+				CProfile::update('web.search.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 			}
-			else if('refresh' == $_REQUEST['action']){
+			else if('refresh' == $_REQUEST['favaction']){
 				switch($_REQUEST['favref']){
 				}
 			}
@@ -173,7 +172,7 @@ require_once('include/page_header.php');
 		if (isset($rw_hosts[$hostid])) {
 			$host_link = new CLink($caption, 'hosts.php?form=update&'.$link, $style);
 			$applications_link = array(new CLink(_('Applications'), 'applications.php?'.$link), ' ('.$host['applications'].')');
-			$items_link = array(new CLink(_('Items'), 'items.php?'.$link), ' ('.$host['items'].')');
+			$items_link = array(new CLink(_('Items'), 'items.php?filter_set=1&'.$link), ' ('.$host['items'].')');
 			$triggers_link = array(new CLink(_('Triggers'), 'triggers.php?'.$link), ' ('.$host['triggers'].')');
 			$graphs_link = array(new CLink(_('Graphs'), 'graphs.php?'.$link), ' ('.$host['graphs'].')');
 		}
@@ -362,7 +361,7 @@ require_once('include/page_header.php');
 			if (isset($rw_templates[$templateid])) {
 				$template_link = new CLink($caption, 'templates.php?form=update&'.'&templateid='.$templateid.'&switch_node='.id2nodeid($templateid));
 				$applications_link = array(new CLink(_('Applications'), 'applications.php?'.$link), ' ('.$template['applications'].')');
-				$items_link = array(new CLink(_('Items'), 'items.php?'.$link), ' ('.$template['items'].')');
+				$items_link = array(new CLink(_('Items'), 'items.php?filter_set=1&'.$link), ' ('.$template['items'].')');
 				$triggers_link = array(new CLink(_('Triggers'), 'triggers.php?'.$link), ' ('.$template['triggers'].')');
 				$graphs_link = array(new CLink(_('Graphs'), 'graphs.php?'.$link), ' ('.$template['graphs'].')');
 				$screensLink = array(new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid), ' ('.$template['screens'].')');

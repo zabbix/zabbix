@@ -54,7 +54,6 @@ require_once('include/page_header.php');
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,	null),
 
 		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	NOT_EMPTY,		NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("hat"=={favobj})'),
 
 		'selements'=>	array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),
 		'links'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID, NULL),

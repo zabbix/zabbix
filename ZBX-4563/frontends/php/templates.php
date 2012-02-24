@@ -600,7 +600,7 @@ require_once('include/page_header.php');
 			S_TRIGGERS,
 			S_GRAPHS,
 			_('Screens'),
-			S_DISCOVERY,
+			_('Discovery'),
 			S_LINKED_TEMPLATES,
 			S_LINKED_TO
 		));
@@ -660,7 +660,7 @@ require_once('include/page_header.php');
 
 			$applications = array(new CLink(_('Applications'), 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['applications'].')');
-			$items = array(new CLink(_('Items'), 'items.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
+			$items = array(new CLink(_('Items'), 'items.php?filter_set=1&groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['items'].')');
 			$triggers = array(new CLink(_('Triggers'), 'triggers.php?groupid='.$_REQUEST['groupid'].'&hostid='.$template['templateid']),
 				' ('.$template['triggers'].')');

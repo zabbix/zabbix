@@ -1168,14 +1168,14 @@ function str_in_array($needle, $haystack, $strict = false) {
 		return in_array($needle, $haystack, $strict);
 	}
 	elseif ($strict) {
-		foreach ($haystack as $id => $value) {
+		foreach ($haystack as $value) {
 			if ($needle === $value) {
 				return true;
 			}
 		}
 	}
 	else {
-		foreach ($haystack as $id => $value) {
+		foreach ($haystack as $value) {
 			if (strcmp($needle, $value) == 0) {
 				return true;
 			}
@@ -1643,7 +1643,7 @@ function format_doll_init($doll) {
 	$obj['url'] .= (zbx_empty($obj['url']) ? '?' : '&').'output=html';
 	$obj['params']['favobj'] = 'hat';
 	$obj['params']['favref'] = $doll['id'];
-	$obj['params']['action'] = 'refresh';
+	$obj['params']['favaction'] = 'refresh';
 	return $obj;
 }
 

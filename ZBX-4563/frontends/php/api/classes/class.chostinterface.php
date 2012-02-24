@@ -492,7 +492,7 @@ Copt::memoryPick();
 
 			if ($update) {
 				if (!isset($dbInterfaces[$interface['interfaceid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
 				$dbInterface = $dbInterfaces[$interface['interfaceid']];
@@ -505,11 +505,10 @@ Copt::memoryPick();
 				// we check all fields on "updated" interface
 				$updInterface = $interface;
 				$interface = zbx_array_merge($dbInterface, $interface);
-				//--
 			}
 			else {
 				if (!isset($dbHosts[$interface['hostid']]) && !isset($dbProxies[$interface['hostid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 
 				if (isset($dbProxies[$interface['hostid']])) {
@@ -641,7 +640,7 @@ Copt::memoryPick();
 		));
 		foreach ($interfaceids as $interfaceId) {
 			if (!isset($dbInterfaces[$interfaceId])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 

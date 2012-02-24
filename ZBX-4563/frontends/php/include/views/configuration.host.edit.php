@@ -136,7 +136,7 @@ if ($_REQUEST['hostid'] > 0 && !isset($_REQUEST['form_refresh'])) {
 		// check if interface has items that require specific interface type, if so type cannot be changed
 		$locked = 0;
 		foreach ($dbHost['interfaces'][$interface['interfaceid']]['items'] as $item) {
-			$itemInterfaceType = CItem::itemTypeInterface($item['type']);
+			$itemInterfaceType = itemTypeInterface($item['type']);
 			if (!($itemInterfaceType === false || $itemInterfaceType === INTERFACE_TYPE_ANY)) {
 				$locked = 1;
 				break;
@@ -185,13 +185,15 @@ foreach ($all_groups as $group) {
 
 $hostList->addRow(_('Groups'), $grp_tb->get(_('In groups'), _('Other groups')));
 
+global $USER_DETAILS;
 $newgroupTB = new CTextBox('newgroup', $newgroup, ZBX_TEXTBOX_SMALL_SIZE);
 $newgroupTB->setAttribute('maxlength', 64);
-$hostList->addRow(array(
-	new CLabel(_('New host group'), 'newgroup'),
-	BR(),
-	$newgroupTB
-));
+$tmp_label = _('New host group');
+if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
+	$tmp_label .= SPACE._('(Only superadmins can create group)');
+	$newgroupTB->setReadonly(true);
+}
+$hostList->addRow(array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
 
 if (empty($interfaces)) {
 	$script = 'hostInterfacesManager.addNew("agent");';

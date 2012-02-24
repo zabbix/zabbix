@@ -268,8 +268,7 @@ if(isset($_REQUEST['sform'])){
 
 	$keys = get_request('keys',array());
 
-//sdi('<pre>'.print_r($expressions, true).'</pre>');
-	$frmTRLog->addRow(S_DESCRIPTION,new CTextBox('description',$description,80));
+	$frmTRLog->addRow(_('Description'), new CTextBox('description', $description, 80));
 
 	$item = '';
 	$db_items = DBselect('SELECT DISTINCT * FROM items WHERE itemid='.$itemid);
@@ -312,11 +311,11 @@ if(isset($_REQUEST['sform'])){
 
 	$keyTable = new CTableInfo(null);
 	$keyTable->setAttribute('id','key_list');
-	$keyTable->setHeader(array(S_KEYWORD, S_TYPE, S_ACTION));
+	$keyTable->setHeader(array(S_KEYWORD, S_TYPE, _('Action')));
 
 	$table = new CTableInfo(null);
 	$table->setAttribute('id','exp_list');
-	$table->setHeader(array(_('Expression'), S_TYPE, S_POSITION, S_ACTION));
+	$table->setHeader(array(_('Expression'), S_TYPE, S_POSITION, _('Action')));
 
 	$maxid=0;
 
@@ -335,7 +334,7 @@ if(isset($_REQUEST['sform'])){
 		$expressions[0]['view'] = $expr_incase;
 		$bExprResult = false;
 	}
-//sdi('<pre>'.print_r($expressions,true).'</pre>');
+
 	foreach($expressions as $id => $expr){
 
 		$imgup = new CImg('images/general/arrowup.gif','up',12,14);

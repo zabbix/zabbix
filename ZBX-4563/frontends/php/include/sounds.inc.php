@@ -19,34 +19,27 @@
 **/
 ?>
 <?php
-
 function getSounds() {
 	$fileList = array();
-
 	$dir = scandir('./audio');
 	foreach ($dir as $fnum => $file) {
-		if(!preg_match('/^([\w\d_]+)\.(wav|ogg)$/i', $file)) continue;
-
+		if (!preg_match('/^([\w\d_]+)\.(wav|ogg)$/i', $file)) {
+			continue;
+		}
 		list($filename, $type) = explode('.', $file);
 		$fileList[$filename] = $file;
 	}
-
-return $fileList;
-}
-
-function getLatestCloseTime() {
-
+	return $fileList;
 }
 
 function getMessageSettings() {
-
 	$defSeverities = array(
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => 1,
 		TRIGGER_SEVERITY_INFORMATION => 1,
 		TRIGGER_SEVERITY_WARNING => 1,
 		TRIGGER_SEVERITY_AVERAGE => 1,
 		TRIGGER_SEVERITY_HIGH => 1,
-		TRIGGER_SEVERITY_DISASTER => 1,
+		TRIGGER_SEVERITY_DISASTER => 1
 	);
 
 	$messages = array(
@@ -66,34 +59,39 @@ function getMessageSettings() {
 		'sounds.'.TRIGGER_SEVERITY_DISASTER => 'alarm_disaster.wav'
 	);
 
-	$sql = 'SELECT idx, source, value_str '.
-			' FROM profiles '.
-			' WHERE userid='.CWebUser::$data['userid'].
-				' AND '.DBcondition('idx', array('web.messages'));
-	$dbProfiles = DBselect($sql);
+	$dbProfiles = DBselect(
+		'SELECT p.idx,p.source,p.value_str'.
+		' FROM profiles p'.
+		' WHERE p.userid='.CWebUser::$data['userid'].
+			' AND '.DBcondition('p.idx', array('web.messages'))
+	);
 	while ($profile = DBfetch($dbProfiles)) {
 		$messages[$profile['source']] = $profile['value_str'];
 	}
 
-	if (is_null($messages['triggers.severities']))
+	if (is_null($messages['triggers.severities'])) {
 		$messages['triggers.severities'] = $defSeverities;
-	else
+	}
+	else {
 		$messages['triggers.severities'] = unserialize($messages['triggers.severities']);
-
-return $messages;
+	}
+	return $messages;
 }
 
 function updateMessageSettings($messages) {
-
-	if(!isset($messages['enabled'])) $messages['enabled'] = 0;
-	if(isset($messages['triggers.severities']))
+	if (!isset($messages['enabled'])) {
+		$messages['enabled'] = 0;
+	}
+	if (isset($messages['triggers.severities'])) {
 		$messages['triggers.severities'] = serialize($messages['triggers.severities']);
+	}
 
-	$sql = 'SELECT profileid, idx, source, value_str '.
-			' FROM profiles '.
-			' WHERE userid='.CWebUser::$data['userid'].
-				' AND '.DBcondition('idx', array('web.messages'));
-	$dbProfiles = DBselect($sql);
+	$dbProfiles = DBselect(
+		'SELECT p.profileid,p.idx,p.source,p.value_str'.
+		' FROM profiles p'.
+		' WHERE p.userid='.CWebUser::$data['userid'].
+			' AND '.DBcondition('p.idx', array('web.messages'))
+	);
 	while ($profile = DBfetch($dbProfiles)) {
 		$profile['value'] = $profile['value_str'];
 		$dbMessages[$profile['source']] = $profile;
@@ -129,7 +127,6 @@ function updateMessageSettings($messages) {
 	catch (APIException $e) {
 		error($e->getMessage());
 	}
-
-return $messages;
+	return $messages;
 }
 ?>
