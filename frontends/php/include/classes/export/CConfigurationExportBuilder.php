@@ -4,7 +4,7 @@ class CConfigurationExportBuilder {
 
 	const EXPORT_VERSION = '2.0';
 
-	private $data = array();
+	protected $data = array();
 
 	public function __construct() {
 		$this->data['version'] = self::EXPORT_VERSION;
@@ -157,7 +157,7 @@ class CConfigurationExportBuilder {
 		}
 	}
 
-	private function formatDiscoveryRules(array $discoveryRules) {
+	protected function formatDiscoveryRules(array $discoveryRules) {
 		$result = array();
 		order_result($discoveryRules, 'name');
 
@@ -198,12 +198,12 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatHostInventory(array $inventory) {
+	protected function formatHostInventory(array $inventory) {
 		unset($inventory['hostid']);
 		return $inventory;
 	}
 
-	private function formatGraphs(array $graphs) {
+	protected function formatGraphs(array $graphs) {
 		$result = array();
 		order_result($graphs, 'name');
 
@@ -232,7 +232,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatTemplateLinkage(array $templates) {
+	protected function formatTemplateLinkage(array $templates) {
 		$result = array();
 		order_result($templates, 'host');
 
@@ -244,7 +244,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatTriggers(array $triggers) {
+	protected function formatTriggers(array $triggers) {
 		$result = array();
 		order_result($triggers, 'description');
 
@@ -263,7 +263,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatHostInterfaces(array $interfaces) {
+	protected function formatHostInterfaces(array $interfaces) {
 		$result = array();
 		order_result($interfaces, 'ip');
 
@@ -281,7 +281,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatGroups(array $groups) {
+	protected function formatGroups(array $groups) {
 		$result = array();
 		order_result($groups, 'name');
 
@@ -293,7 +293,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatItems(array $items) {
+	protected function formatItems(array $items) {
 		$result = array();
 		order_result($items, 'name');
 
@@ -341,7 +341,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatApplications(array $applications) {
+	protected function formatApplications(array $applications) {
 		$result = array();
 		order_result($applications, 'name');
 
@@ -353,7 +353,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatMacros(array $macros) {
+	protected function formatMacros(array $macros) {
 		$result = array();
 		order_result($macros, 'macro');
 
@@ -366,7 +366,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatScreens(array $screens) {
+	protected function formatScreens(array $screens) {
 		$result = array();
 		order_result($screens, 'name');
 
@@ -381,7 +381,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatDependencies(array $dependencies) {
+	protected function formatDependencies(array $dependencies) {
 		$result = array();
 
 		foreach ($dependencies as $dependency) {
@@ -393,7 +393,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatScreenItems(array $screenItems) {
+	protected function formatScreenItems(array $screenItems) {
 		$result = array();
 
 		foreach ($screenItems as $screenItem) {
@@ -419,7 +419,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatGraphItems(array $graphItems) {
+	protected function formatGraphItems(array $graphItems) {
 		$result = array();
 
 		foreach ($graphItems as $graphItem) {
@@ -436,7 +436,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatMapUrls(array $urls) {
+	protected function formatMapUrls(array $urls) {
 		$result = array();
 		foreach ($urls as $url) {
 			$result[] = array(
@@ -448,7 +448,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatMapElementUrls(array $urls) {
+	protected function formatMapElementUrls(array $urls) {
 		$result = array();
 
 		foreach ($urls as $url) {
@@ -460,7 +460,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatMapLinks(array $links) {
+	protected function formatMapLinks(array $links) {
 		$result = array();
 
 		foreach ($links as $link) {
@@ -476,7 +476,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatMapLinkTriggers(array $linktriggers) {
+	protected function formatMapLinkTriggers(array $linktriggers) {
 		$result = array();
 
 		foreach ($linktriggers as $linktrigger) {
@@ -489,7 +489,7 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
-	private function formatMapElements(array $elements) {
+	protected function formatMapElements(array $elements) {
 		$result = array();
 		foreach ($elements as $element) {
 			$result[] = array(

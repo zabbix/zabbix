@@ -1,37 +1,43 @@
 <?php
 
-class CXmlExportWriterA extends XMLWriter implements CExportWriter {
+class CXmlExportWriterA extends CExportWriter {
+
+	protected $xmlWriter;
+
+	public function __construct() {
+		$this->xmlWriter = new XMLWriter();
+	}
 
 	public function write(array $array) {
-		$this->openMemory();
-		$this->setIndent(true);
-		$this->setIndentString('    ');
-		$this->startDocument('1.0', 'UTF-8');
+		$this->xmlWriter->openMemory();
+		$this->xmlWriter->setIndent(true);
+		$this->xmlWriter->setIndentString('    ');
+		$this->xmlWriter->startDocument('1.0', 'UTF-8');
 
 		$this->fromArray($array);
 
-		$this->endDocument();
+		$this->xmlWriter->endDocument();
 
-		return $this->outputMemory();
+		return $this->xmlWriter->outputMemory();
 	}
 
-	private function fromArray(array $array, $parentName = null) {
+	protected function fromArray(array $array, $parentName = null) {
 		foreach ($array as $name => $value) {
 			if ($newName = $this->mapName($parentName)) {
-				$this->startElement($newName);
+				$this->xmlWriter->startElement($newName);
 			}
 			else {
-				$this->startElement($name);
+				$this->xmlWriter->startElement($name);
 			}
 
 			if (is_array($value)) {
 				$this->fromArray($value, $name);
 			}
 			elseif ($value !== null) {
-				$this->text($value);
+				$this->xmlWriter->text($value);
 			}
 
-			$this->endElement();
+			$this->xmlWriter->endElement();
 		}
 	}
 

@@ -2,15 +2,6 @@
 
 class C20ImportFormatter extends CImportFormatter {
 
-	protected function renameData(&$data, $fieldMap) {
-		foreach ($data as $key => $value) {
-			if (isset($fieldMap[$key])) {
-				$data[$fieldMap[$key]] = $value;
-				unset($data[$key]);
-			}
-		}
-	}
-
 	public function getGroups() {
 		if (!isset($this->data['groups'])) {
 			return array();
@@ -30,19 +21,14 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 			else {
 				foreach ($host['templates'] as $tnum => $template) {
-					$this->renameData($host['templates'][$tnum], array('template' => 'host'));
+					$host['templates'][$tnum] = $this->renameData($template, array('template' => 'host'));
 				}
 				$host['templates'] = array_values($host['templates']);
 			}
 
-			if (empty($host['macros'])) {
-				unset($host['macros']);
-			}
-			else {
-				$host['macros'] = array_values($host['macros']);
-			}
+			$host['macros'] = array_values($host['macros']);
 
-			$this->renameData($host, array('template' => 'host'));
+			$host = $this->renameData($host, array('template' => 'host'));
 
 			$host['groups'] = array_values($host['groups']);
 
@@ -60,10 +46,10 @@ class C20ImportFormatter extends CImportFormatter {
 		$hostsData = array();
 
 		foreach ($this->data['hosts'] as $host) {
-			$this->renameData($host, array('proxyid' => 'proxy_hostid'));
+			$host = $this->renameData($host, array('proxyid' => 'proxy_hostid'));
 
 			foreach ($host['interfaces'] as $inum => $interface) {
-				$this->renameData($host['interfaces'][$inum], array('default' => 'main'));
+				$host['interfaces'][$inum] = $this->renameData($interface, array('default' => 'main'));
 			}
 			$host['interfaces'] = array_values($host['interfaces']);
 
@@ -75,12 +61,7 @@ class C20ImportFormatter extends CImportFormatter {
 				$host['templates'] = array_values($host['templates']);
 			}
 
-			if (empty($host['macros'])) {
-				unset($host['macros']);
-			}
-			else {
-				$host['macros'] = array_values($host['macros']);
-			}
+			$host['macros'] = array_values($host['macros']);
 
 			$host['groups'] = array_values($host['groups']);
 
@@ -132,7 +113,7 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['templates'] as $template) {
 				foreach ($template['items'] as $item) {
 					$item = $this->renameItemFields($item);
-					$itemsData[$template['host']][$item['key_']] = $item;
+					$itemsData[$template['template']][$item['key_']] = $item;
 				}
 			}
 		}
@@ -153,10 +134,8 @@ class C20ImportFormatter extends CImportFormatter {
 					unset($prototype);
 
 					foreach ($item['trigger_prototypes'] as &$trigger) {
-						$this->renameData($trigger, array(
-							'description' => 'comments',
-						));
-						$this->renameData($trigger, array(
+						$trigger = $this->renameData($trigger, array('description' => 'comments'));
+						$trigger = $this->renameData($trigger, array(
 							'name' => 'description',
 							'severity' => 'priority'
 						));
@@ -178,10 +157,8 @@ class C20ImportFormatter extends CImportFormatter {
 					unset($prototype);
 
 					foreach ($item['trigger_prototypes'] as &$trigger) {
-						$this->renameData($trigger, array(
-							'description' => 'comments',
-						));
-						$this->renameData($trigger, array(
+						$trigger = $this->renameData($trigger, array('description' => 'comments'));
+						$trigger = $this->renameData($trigger, array(
 							'name' => 'description',
 							'severity' => 'priority'
 						));
@@ -203,7 +180,7 @@ class C20ImportFormatter extends CImportFormatter {
 
 		$graphsData = array();
 		foreach ($this->data['graphs'] as $graph) {
-			$this->renameData($graph, array(
+			$graph = $this->renameData($graph, array(
 				'type' => 'graphtype',
 				'ymin_type_1' => 'ymin_type',
 				'ymax_type_1' => 'ymax_type',
@@ -225,10 +202,8 @@ class C20ImportFormatter extends CImportFormatter {
 
 		$triggersData = array();
 		foreach ($this->data['triggers'] as $trigger) {
-			$this->renameData($trigger, array(
-				'description' => 'comments',
-			));
-			$this->renameData($trigger, array(
+			$trigger = $this->renameData($trigger, array('description' => 'comments'));
+			$trigger = $this->renameData($trigger, array(
 				'name' => 'description',
 				'severity' => 'priority'
 			));
@@ -244,7 +219,7 @@ class C20ImportFormatter extends CImportFormatter {
 			return array();
 		}
 		foreach ($this->data['images'] as &$image) {
-			$this->renameData($image, array('encodedImage' => 'image'));
+			$image = $this->renameData($image, array('encodedImage' => 'image'));
 		}
 		unset($image);
 		return $this->data['images'];
@@ -258,7 +233,7 @@ class C20ImportFormatter extends CImportFormatter {
 	}
 
 	protected function renameItemFields(array $item) {
-		$this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+		$item = $this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
 		return $item;
 	}
 }

@@ -5,14 +5,14 @@ class CConfigurationExport {
 	/**
 	 * @var CExportWriter
 	 */
-	private $writer;
+	protected $writer;
 
 	/**
 	 * @var CConfigurationExportBuilder
 	 */
-	private $builder;
+	protected $builder;
 
-	private $data;
+	protected $data;
 
 
 	public function __construct(array $options) {
@@ -77,7 +77,7 @@ class CConfigurationExport {
 		return $this->writer->write($this->builder->getExport());
 	}
 
-	private function gatherData() {
+	protected function gatherData() {
 		if ($this->options['groups']) {
 			$this->gatherGroups();
 		}
@@ -104,7 +104,7 @@ class CConfigurationExport {
 		}
 	}
 
-	private function gatherGroups() {
+	protected function gatherGroups() {
 		$this->data['groups'] = API::HostGroup()->get(array(
 			'hostids' => $this->options['groups'],
 			'preservekeys' => true,
@@ -112,7 +112,7 @@ class CConfigurationExport {
 		));
 	}
 
-	private function gatherTemplates() {
+	protected function gatherTemplates() {
 		$templates = API::Template()->get(array(
 			'templateids' => $this->options['templates'],
 			'output' => array('host', 'name'),
@@ -211,7 +211,7 @@ class CConfigurationExport {
 		$this->data['templates'] = $templates;
 	}
 
-	private function gatherHosts() {
+	protected function gatherHosts() {
 		$hosts = API::Host()->get(array(
 			'hostids' => $this->options['hosts'],
 			'output' => array('proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
@@ -252,7 +252,7 @@ class CConfigurationExport {
 		$this->gatherHostDiscoveryRules();
 	}
 
-	private function gatherHostItems() {
+	protected function gatherHostItems() {
 		$items = API::Item()->get(array(
 			'hostids' => $this->options['hosts'],
 			'output' => array('hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
@@ -287,7 +287,7 @@ class CConfigurationExport {
 		}
 	}
 
-	private function gatherHostDiscoveryRules() {
+	protected function gatherHostDiscoveryRules() {
 		$items = API::DiscoveryRule()->get(array(
 			'hostids' => $this->options['hosts'],
 			'output' => array('itemid', 'hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends',
@@ -435,7 +435,7 @@ class CConfigurationExport {
 		}
 	}
 
-	private function gatherGraphs() {
+	protected function gatherGraphs() {
 		$hostIds = array_merge($this->options['hosts'], $this->options['templates']);
 
 		$graphs = API::Graph()->get(array(
@@ -517,7 +517,7 @@ class CConfigurationExport {
 
 	}
 
-	private function gatherTriggers() {
+	protected function gatherTriggers() {
 		$hostIds = array_merge($this->options['hosts'], $this->options['templates']);
 
 		$triggers = API::Trigger()->get(array(
@@ -542,7 +542,7 @@ class CConfigurationExport {
 		}
 	}
 
-	private function gatherMaps() {
+	protected function gatherMaps() {
 		$sysmaps = API::Map()->get(array(
 			'sysmapids' => $this->options['maps'],
 			'selectSelements' => API_OUTPUT_EXTEND,
@@ -565,7 +565,7 @@ class CConfigurationExport {
 
 	}
 
-	private function gatherScreens() {
+	protected function gatherScreens() {
 		$screens = API::Screen()->get(array(
 			'screenids' => $this->options['screens'],
 			'selectScreenItems' => API_OUTPUT_EXTEND,
@@ -575,5 +575,4 @@ class CConfigurationExport {
 		prepareScreenExport($screens);
 		$this->data['screens'] = $screens;
 	}
-
 }
