@@ -537,13 +537,13 @@ class CUserMacro extends CZBXAPI {
 	public function validateCreate(array $hostMacros) {
 		// check the data required for authorization first
 		foreach ($hostMacros as $hostMacro) {
-			$this->checkMacro($hostMacro);
 			$this->checkHostId($hostMacro);
 		}
 
 		$this->checkHostPermissions(array_unique(zbx_objectValues($hostMacros, 'hostid')));
 
 		foreach ($hostMacros as $hostMacro) {
+			$this->checkMacro($hostMacro);
 			$this->checkValue($hostMacro);
 			$this->checkUnsupportedFields('hostmacro', $hostMacro,
 				_s('Wrong fields for macro "%1$s".', $hostMacro['macro']));
@@ -578,8 +578,8 @@ class CUserMacro extends CZBXAPI {
 	 * @throws APIException if the input is invalid
 	 */
 	protected function validateUpdate(array $hostMacros) {
-		foreach ($hostMacros as $macro) {
-			if (!isset($macro['hostmacroid']) || zbx_empty($macro['hostmacroid'])) {
+		foreach ($hostMacros as $hostMacro) {
+			if (!isset($hostMacro['hostmacroid']) || zbx_empty($hostMacro['hostmacroid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
 		}
@@ -590,6 +590,11 @@ class CUserMacro extends CZBXAPI {
 			'hostmacroids' => zbx_objectValues($hostMacros, 'hostmacroid'),
 			'output' => API_OUTPUT_EXTEND
 		));
+
+		// check the data required for authorization first
+		foreach ($hostMacros as $hostMacro) {
+			$this->checkHostId($hostMacro);
+		}
 
 		// check permissions for all affected hosts
 		$affectedHostIds = array_merge(zbx_objectValues($dbHostMacros, 'hostid'), zbx_objectValues($hostMacros, 'hostid'));
@@ -639,7 +644,7 @@ class CUserMacro extends CZBXAPI {
 
 		DB::update('hostmacro', $data);
 
-		return array('hostmacroids' => zbx_objectValues($globalMacros, 'hostmacroid'));
+		return array('hostmacroids' => zbx_objectValues($hostMacros, 'hostmacroid'));
 	}
 
 	/**
@@ -857,6 +862,9 @@ class CUserMacro extends CZBXAPI {
 	protected function checkHostId(array $macro) {
 		if (!isset($macro['hostid']) || zbx_empty($macro['hostid'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('No host given for macro "%1$s".', $macro['macro']));
+		}
+		if (!is_numeric($macro['hostid'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid hostid for macro "%1$s".', $macro['macro']));
 		}
 	}
 
