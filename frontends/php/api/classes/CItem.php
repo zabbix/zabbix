@@ -1184,16 +1184,15 @@ class CItem extends CItemGeneral {
 
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
-// skip items not from parent templates of current host
+			// skip items not from parent templates of current host
 			$parentItems = array();
 			foreach ($items as $inum => $item) {
 				if (isset($templateids[$item['hostid']])) {
 					$parentItems[$inum] = $item;
 				}
 			}
-//----
 
-// check existing items to decide insert or update
+			// check existing items to decide insert or update
 			$exItems = $this->get(array(
 				'output' => array('itemid', 'type', 'key_', 'flags', 'templateid'),
 				'hostids' => $hostid,
@@ -1207,12 +1206,12 @@ class CItem extends CItemGeneral {
 			foreach ($parentItems as $item) {
 				$exItem = null;
 
-// update by templateid
+				// update by templateid
 				if (isset($exItemsTpl[$item['itemid']])) {
 					$exItem = $exItemsTpl[$item['itemid']];
 				}
 
-// update by key
+				// update by key
 				if (isset($exItemsKeys[$item['key_']])) {
 					$exItem = $exItemsKeys[$item['key_']];
 
@@ -1241,16 +1240,16 @@ class CItem extends CItemGeneral {
 					}
 				}
 
-// coping item
+				// coping item
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];
 				$newItem['templateid'] = $item['itemid'];
 
-// setting item application
+				// setting item application
 				if (isset($item['applications'])) {
 					$newItem['applications'] = get_same_applications_for_host($item['applications'], $host['hostid']);
 				}
-//--
+
 				if ($exItem) {
 					$newItem['itemid'] = $exItem['itemid'];
 					$updateItems[] = $newItem;

@@ -889,19 +889,17 @@ COpt::memoryPick();
 
 		$insertItems = array();
 		$updateItems = array();
-		$inheritedItems = array();
 		foreach ($chdHosts as $hostid => $host) {
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
-// skip items not from parent templates of current host
+			// skip items not from parent templates of current host
 			$parentItems = array();
 			foreach ($items as $itemid => $item) {
 				if (isset($templateids[$item['hostid']]))
 					$parentItems[$itemid] = $item;
 			}
-//----
 
-// check existing items to decide insert or update
+			// check existing items to decide insert or update
 			$exItems = $this->get(array(
 				'output' => array('itemid', 'key_', 'type', 'flags', 'templateid'),
 				'hostids' => $hostid,
@@ -915,12 +913,12 @@ COpt::memoryPick();
 			foreach ($parentItems as $item) {
 				$exItem = null;
 
-// update by tempalteid
+				// update by tempalteid
 				if (isset($exItemsTpl[$item['itemid']])) {
 					$exItem = $exItemsTpl[$item['itemid']];
 				}
 
-// update by key
+				// update by key
 				if (isset($item['key_']) && isset($exItemsKeys[$item['key_']])) {
 					$exItem = $exItemsKeys[$item['key_']];
 
@@ -947,20 +945,19 @@ COpt::memoryPick();
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $host['host'], $item['key_']));
 					}
 				}
-// coping item
+
+				// coping item
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];
 				$newItem['templateid'] = $item['itemid'];
 
-// setting item application
+				// setting item application
 				if (isset($item['applications'])) {
 					$newItem['applications'] = get_same_applications_for_host($item['applications'], $host['hostid']);
 				}
-//--
 
 				if ($exItem) {
 					$newItem['itemid'] = $exItem['itemid'];
-					$inheritedItems[] = $newItem;
 					unset($newItem['ruleid']);
 					$updateItems[] = $newItem;
 				}
@@ -975,7 +972,7 @@ COpt::memoryPick();
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
 
-		$this->inherit($inheritedItems);
+		$this->inherit(array_merge($insertItems, $updateItems));
 	}
 }
 ?>
