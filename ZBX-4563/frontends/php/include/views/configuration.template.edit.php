@@ -365,7 +365,7 @@
 		));
 	}
 	$macrosView = new CView('common.macros', array(
-		'macros' => $macros
+		'macros' => order_macros($macros, 'macro')
 	));
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 

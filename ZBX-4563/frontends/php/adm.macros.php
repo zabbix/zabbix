@@ -192,7 +192,7 @@ if (empty($data['macros'])) {
 	);
 }
 if ($result) {
-	order_result($data['macros'], 'macro');
+	$data['macros'] = order_macros($data['macros'], 'macro');
 }
 $macrosForm = new CView('administration.general.macros.edit', $data);
 $cnf_wdgt->addItem($macrosForm->render());

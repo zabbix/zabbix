@@ -1009,6 +1009,19 @@ class ArraySorter {
 	}
 }
 
+/**
+ * Sorts the data using a natural sort algorithm.
+ *
+ * Not suitable for sorting macros, use order_macros() instead.
+ *
+ * @param $data
+ * @param null $sortfield
+ * @param string $sortorder
+ *
+ * @return bool
+ *
+ * @see order_macros()
+ */
 function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 	if (empty($data)) {
 		return false;
@@ -1062,6 +1075,36 @@ function order_by($def, $allways = '') {
 		$orderString .= $allways;
 	}
 	return empty($orderString) ? '' : ' ORDER BY '.$orderString;
+}
+
+/**
+ * Sorts the macros in the given order.
+ *
+ * order_result() is not suitable for sorting macros, because it treats the "}" as a symbol with a lower priority
+ * then any alphanumeric character, and the result will be invalid.
+ *
+ * E.g: order_result() will sort array('{$DD}', '{$D}', '{$D1}') as
+ * array('{$D1}', '{$DD}', '{$D}') while the correct result is array('{$D}', '{$D1}', '{$DD}').
+ *
+ * @param array $macros
+ * @param string $sortfield
+ * @param string $order
+ *
+ * @return array
+ */
+function order_macros(array $macros, $sortfield = null, $order = ZBX_SORT_UP) {
+	$temp = array();
+	foreach ($macros as $key => $macro) {
+		$temp[$key] = preg_replace(ZBX_PREG_EXPRESSION_USER_MACROS, '$1', $macro[$sortfield]);
+	}
+	order_result($temp, null, $order);
+
+	$rs = array();
+	foreach ($temp as $key => $macroLabel) {
+		$rs[$key] = $macros[$key];
+	}
+
+	return $rs;
 }
 
 function unsetExcept(&$array, $allowedFields) {
