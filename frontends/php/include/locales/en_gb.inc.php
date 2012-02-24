@@ -23,31 +23,12 @@
 
 	$TRANSLATION=array(
 
-	'S_DATE_FORMAT_YMDHMS'=>		_('d M Y H:i:s'),
-
 	'S_YEAR_SHORT'=>			_('y'),
 	'S_MONTH_SHORT'=>			_('m'),
 	'S_WEEK_SHORT'=>			_('w'),
 	'S_DAY_SHORT'=>				_('d'),
 	'S_HOUR_SHORT' =>			_('h'),
 	'S_MINUTE_SHORT' =>			_('m'),
-
-
-//	dicoveryconf.php
-	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
-	'S_DISCOVERY'=>				_('Discovery'),
-	'S_STATUS_OF_DISCOVERY_BIG'=>		_('STATUS OF DISCOVERY'),
-	'S_STATUS_OF_DISCOVERY'=>		_('Status of discovery'),
-
-//	discovery.php
-	'S_UP_TIME'=>				_('Uptime'),
-	'S_DOWN_TIME'=>				_('Downtime'),
-
-//	auditacts.php
-	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
-//	auditlogs.php
-	'S_AUDITLOGS_RECORD_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		_('Details of scenario'),
@@ -56,7 +37,6 @@
 	'S_RESPONSE_CODE'=>			_('Response code'),
 	'S_TOTAL_BIG'=>				_('TOTAL'),
 	'S_RESPONSE_TIME'=>			_('Response time'),
-	'S_IN_PROGRESS'=>			_('In progress'),
 	'S_OF_SMALL'=>				_('of'),
 	'S_IN_CHECK'=>				_('In check'),
 	'S_IDLE_TILL'=>				_('Idle till'),
@@ -88,14 +68,8 @@
 //	admin.php
 	'S_PREVIOUS'=>				_('Previous'),
 	'S_NEXT'=>				_('Next'),
-	'S_RETRY'=>				_('Retry'),
 	'S_FINISH'=>				_('Finish'),
 	'S_FAIL'=>				_('Fail'),
-	'S_UPDATE_BIG'=>			_('UPDATE'),
-	'S_NEW_INSTALLATION'=>			_('New installation'),
-	'S_NEW_INSTALLATION_BIG'=>		_('NEW INSTALLATION'),
-	'S_INSTALLATION_UPDATE'=>		_('Installation/Update'),
-	'S_ZABBIX_IS_UNAVAILABLE'=>		_('Zabbix is temporarily unavailable'),
 
 //	actions.inc.php
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -122,17 +96,10 @@
 	'S_FILTER'=>				_('Filter'),
 
 //	actions.php
-	'S_ACTIONS'=>				_('Actions'),
-	'S_LOGS'=>				_('Logs'),
-	'S_LOGS_BIG'=>				_('LOGS'),
 	'S_ON'=>					_('On'),
 	'S_OFF'=>					_('Off'),
 	'S_GROUP'=>				_('Group'),
-	'S_INFORMATION'=>			_('Information'),
-	'S_WARNING'=>				_('Warning'),
 	'S_OR'=>				_('or'),
-	'S_LIKE_SMALL'=>			_('like'),
-	'S_RETRIES_LEFT'=>			_('Retries left'),
 
 //	alarms.php
 	'S_TIME'=>				_('Time'),
@@ -140,12 +107,7 @@
 
 //	actions.php
 	'S_TYPE'=>				_('Type'),
-	'S_RECIPIENTS'=>			_('Recipient(s)'),
-	'S_RECIPIENT'=>				_('Recipient'),
 	'S_ERROR'=>				_('Error'),
-	'S_SENT'=>				_('sent'),
-	'S_EXECUTED'=>				_('executed'),
-	'S_NO_ACTIONS_FOUND'=>			_('No actions found'),
 
 // Lines
 	'S_LINE'=>				_('Line'),
@@ -176,7 +138,6 @@
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
 	'S_CONFIGURATION_OF_NODES'=>		_('CONFIGURATION OF NODES'),
 	'S_NODE'=>				_('Node'),
-	'S_NODES'=>				_('Nodes'),
 	'S_NODES_BIG'=>				_('NODES'),
 	'S_NEW_NODE'=>				_('New node'),
 	'S_DELETE_SELECTED_NODE_Q'=>		_('Delete selected node?'),
@@ -193,10 +154,7 @@
 	'S_PROXY_ACTIVE' => _('Active'),
 
 //	Latest values
-	'S_NO_PERMISSIONS'=>			_('No permissions to referred object or it does not exist!'),
 	'S_ALL_S'=>						_('All'),
-	'S_ALL_SMALL'=>					_('all'),
-	'S_NOT_SELECTED_SMALL'=>		_('not selected'),
 	'S_GRAPH'=>						_('Graph'),
 
 //	Footer
@@ -205,9 +163,6 @@
 //	graph.php
 	'S_GRAPHS_COPIED'=>			_('Graphs copied'),
 	'S_CANNOT_COPY_GRAPHS'=>	_('Cannot copy graphs'),
-	'S_ITEM_ADDED'=>			_('Item added'),
-	'S_ITEM_UPDATED'=>			_('Item updated'),
-	'S_ITEMS_UPDATED'=>			_('Items updated'),
 	'S_PARAMETER'=>				_('Parameter'),
 	'S_COLOR'=>					_('Colour'),
 	'S_UP'=>					_('Up'),
@@ -260,10 +215,6 @@
 
 //	history.php
 	'S_SELECT_ROWS_WITH_VALUE_LIKE'=>	_('Select rows with value like'),
-	'S_LAST_HOUR_GRAPH'=>			_('Last hour graph'),
-	'S_LAST_WEEK_GRAPH'=>			_('Last week graph'),
-	'S_LAST_MONTH_GRAPH'=>			_('Last month graph'),
-	'S_500_LATEST_VALUES'=>			_('500 latest values'),
 	'S_TIMESTAMP'=>				_('Timestamp'),
 	'S_SOURCE'=>				_('Source'),
 	'S_INFO'=>					_('Info'),
@@ -280,16 +231,11 @@
 	'S_AS_GREEN'=>				_('as Green'),
 	'S_AS_BLUE'=>				_('as Blue'),
 
-	'S_FAILURE_AUDIT'=>			_('Failure Audit'),
-	'S_SUCCESS_AUDIT'=>			_('Success Audit'),
-
 	'S_HISTORY_LOG_ITEM_DATE_FORMAT'=>	_('[Y.M.d H:i:s]'),
 	'S_HISTORY_LOG_LOCALTIME_DATE_FORMAT'=>	_('Y.M.d H:i:s'),
 	'S_HISTORY_LOG_ITEM_PLAINTEXT'=>	_('Y-m-d H:i:s'),
 	'S_HISTORY_PLAINTEXT_DATE_FORMAT'=>	_('Y-m-d H:i:s'),
 	'S_HISTORY_ITEM_DATE_FORMAT'=>		_('Y.M.d H:i:s'),
-
-	'S_DATE'=>				_('Date'),
 
 	'S_JANUARY'=>				_('January'),
 	'S_FEBRUARY'=>				_('February'),
@@ -305,9 +251,7 @@
 	'S_DECEMBER'=>				_('December'),
 
 //	hosts.php
-	'S_HOST_INTERFACE' =>			_('Host interface'),
 	'S_IN'=>					_('In'),
-	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
 	'S_HOSTS'=>					_('Hosts'),
 	'S_ITEMS'=>					_('Items'),
@@ -318,7 +262,6 @@
 	'S_IP'=>					_('IP'),
 	'S_PORT'=>					_('Port'),
 	'S_TEMPLATE'=>					_('Template'),
-	'S_DELETED'=>					_('Deleted'),
 	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
 	'S_ALL_GROUPS'=>				_('All groups'),
@@ -327,12 +270,10 @@
 	'S_UPDATE'=>					_('Update'),
 	'S_AVAILABLE'=>					_('Available'),
 	'S_NOT_AVAILABLE'=>				_('Not available'),
-	'S_PROXIES'=>					_('Proxies'),
 	'S_PROXIES_BIG'=>				_('PROXIES'),
 	'S_CREATE_PROXY'=>				_('Create proxy'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
 	'S_INTERFACES' =>				_('Interfaces'),
-	'S_INTERFACE' =>				_('Interface'),
 
 // templates.php
 	'S_LINKED_TEMPLATES'=>			_('Linked templates'),
@@ -351,92 +292,14 @@
 	'S_UNLINK_AND_CLEAR'=>			_('Unlink and clear'),
 
 //	items.php
-	'S_TEMPLATED_ITEMS'=>					_('Templated items'),
-	'S_NOT_TEMPLATED_ITEMS'=>				_('Not Templated items'),
-	'S_WITH_TRIGGERS'=>					_('With triggers'),
-	'S_WITHOUT_TRIGGERS'=>					_('Without triggers'),
-	'S_TYPES'=>						_('Types'),
-	'S_CLEAR_HISTORY'=>					_('Clear history'),
-	'S_CANNOT_CLEAR_HISTORY'=>				_('Cannot clear history'),
-	'S_CONFIGURATION_OF_ITEMS'=>				_('Configuration of items'),
-	'S_CONFIGURATION_OF_ITEMS_BIG'=>			_('CONFIGURATION OF ITEMS'),
-	'S_CANNOT_UPDATE_ITEM'=>				_('Cannot update item'),
-	'S_CANNOT_ADD_ITEM'=>					_('Cannot add item'),
-	'S_ITEM_DELETED'=>					_('Item deleted'),
-	'S_CANNOT_DELETE_ITEM'=>				_('Cannot delete item'),
-	'S_ITEMS_DELETED'=>					_('Items deleted'),
-	'S_CANNOT_DELETE_ITEMS'=>				_('Cannot delete items'),
-	'S_KEY'=>						_('Key'),
 	'S_DESCRIPTION'=>					_('Description'),
-	'S_INTERVAL'=>						_('Interval'),
 	'S_HISTORY'=>						_('History'),
-	'S_TRENDS'=>						_('Trends'),
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
-	'S_ACTIVE'=>						_('Active'),
-	'S_NOT_SUPPORTED'=>					_('Not supported'),
-	'S_UNITS'=>						_('Units'),
-	'S_KEEP_HISTORY_IN_DAYS'=>				_('Keep history (in days)'),
-	'S_KEEP_TRENDS_IN_DAYS'=>				_('Keep trends (in days)'),
-	'S_DATA_TYPE'=>						_('Data type'),
-	'S_DECIMAL'=>						_('Decimal'),
-	'S_OCTAL'=>						_('Octal'),
-	'S_HEXADECIMAL'=>					_('Hexadecimal'),
-	'S_BOOLEAN'=>					_('Boolean'),
-	'S_STORE_VALUE'=>					_('Store value'),
-	'S_SHOW_VALUE'=>					_('Show value'),
-	'S_NUMERIC_UNSIGNED'=>					_('Numeric (unsigned)'),
-	'S_LOG'=>						_('Log'),
-	'S_TEXT'=>						_('Text'),
-	'S_AS_IS'=>						_('As is'),
-	'S_DELTA_SPEED_PER_SECOND'=>				_('Delta (speed per second)'),
-	'S_DELTA_SIMPLE_CHANGE'=>				_('Delta (simple change)'),
 	'S_ITEM'=>						_('Item'),
-	'S_SNMP_COMMUNITY'=>					_('SNMP community'),
-	'S_SNMP_OID'=>						_('SNMP OID'),
-	'S_ALLOWED_HOSTS'=>					_('Allowed hosts'),
-	'S_SNMPV3_SECURITY_NAME'=>				_('SNMPv3 security name'),
-	'S_SNMPV3_SECURITY_LEVEL'=>				_('SNMPv3 security level'),
-	'S_SNMPV3_AUTH_PASSPHRASE'=>				_('SNMPv3 auth passphrase'),
-	'S_SNMPV3_PRIV_PASSPHRASE'=>				_('SNMPv3 priv passphrase'),
-	'S_CUSTOM_MULTIPLIER'=>					_('Custom multiplier'),
-	'S_USE_CUSTOM_MULTIPLIER'=>				_('Use custom multiplier'),
-	'S_LOG_TIME_FORMAT'=>					_('Log time format'),
-	'S_CREATE_ITEM'=>					_('Create item'),
 	'S_MODE'=>						_('Mode'),
-	'S_HISTORY_CLEARING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q'=>	_('History clearing can take a long time. Continue?'),
-	'S_ORIGINAL'=>						_('Original'),
-	'S_NEW_FLEXIBLE_INTERVAL'=>				_('New flexible interval'),
-	'S_FLEXIBLE_INTERVALS'=>				_('Flexible intervals (sec)'),
-	'S_NO_FLEXIBLE_INTERVALS'=>				_('No flexible intervals'),
-	'S_PARAMS'=>						_('Additional parameters'),
-	'S_IPMI_SENSOR'=>					_('IPMI sensor'),
-	'S_TEMPLATED_ITEM'=>					_('Templated item'),
-	'S_WEB_ITEM'=>						_('Web item'),
-	'S_EXECUTED_SCRIPT'=>					_('Executed script'),
-	'S_USER_NAME'=>						_('User name'),
-	'S_PUBLIC_KEY_FILE'=>					_('Public key file'),
-	'S_PRIVATE_KEY_FILE'=>					_('Private key file'),
-	'S_PUBLIC_KEY'=>					_('Public key'),
-	'S_AUTHENTICATION_METHOD'=>				_('Authentication method'),
-	'S_EDIT_TRIGGER'=>					_('Edit trigger'),
-	'S_ENABLE_SELECTED_ITEMS_Q'=>				_('Enable selected items?'),
-	'S_DISABLE_SELECTED_ITEMS_Q'=>				_('Disable selected items?'),
-	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			_('Mass update selected items?'),
-	'S_COPY_SELECTED_ITEMS_Q'=>				_('Copy selected items?'),
-	'S_DELETE_HISTORY_SELECTED_ITEMS_Q'=>			_('Delete history of selected items?'),
-	'S_DELETE_SELECTED_ITEMS_Q'=>				_('Delete selected items?'),
-	'S_FORMULA'=>						_('Formula'),
-	'S_RULE'=>						_('Rule'),
-
-// host_discovery.php
-	'S_CONFIGURATION_OF_DISCOVERY_RULES_BIG' => _('CONFIGURATION OF DISCOVERY RULES'),
-	'S_REGEXP' => _('Regexp'),
 
 // disc_prototypes.php
-	'S_CONFIGURATION_OF_ITEM_PROTOTYPES_BIG' => _('CONFIGURATION OF ITEM PROTOTYPES'),
-	'S_ITEM_PROTOTYPES_OF_BIG' => _('ITEM PROTOTYPES OF'),
 	'S_ADD_PROTOTYPE' => _('Add prototype'),
-	'S_ITEM_PROTOTYPE' => _('Item prototype'),
 
 	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => _('CONFIGURATION OF GRAPH PROTOTYPES'),
 
@@ -515,7 +378,6 @@
 //	dashboard.php
 	'S_AGE'=>				_('Age'),
 	'S_FAVOURITES'=>			_('Favourites'),
-	'S_MENU'=>				_('Menu'),
 	'S_RESET'=>				_('Reset'),
 
 // dashconf.php
@@ -575,7 +437,6 @@
 	'S_FROM'=>					_('From'),
 	'S_TILL'=>					_('Till'),
 	'S_OK'=>					_('Ok'),
-	'S_RESOLVED'=>				_('Resolved'),
 	'S_PROBLEM'=>					_('Problem'),
 	'S_PROBLEMS'=>					_('Problems'),
 	'S_SLA'=>					_('SLA'),
@@ -627,7 +488,6 @@
 	'S_COLUMNS'=>				_('Columns'),
 	'S_ROWS'=>				_('Rows'),
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
-	'S_RESOURCE'=>					_('Resource'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
@@ -661,7 +521,6 @@
 
 //	services.php
 	'S_NO_IT_SERVICE_DEFINED'=>		_('No IT services defined.'),
-	'S_NONE'=>				_('None'),
 	'S_TRIGGER'=>				_('Trigger'),
 	'S_DELETE'=>				_('Delete'),
 	'S_CLONE'=>				_('Clone'),
@@ -701,7 +560,6 @@
 	'S_SELECT' => _('Select'),
 
 //	users.php
-	'S_USER'=>					_('User'),
 	'S_PROXY_ADDED'=>			_('Proxy added'),
 	'S_CANNOT_ADD_PROXY'=>		_('Cannot add proxy'),
 	'S_PROXY_UPDATED'=>			_('Proxy updated'),
@@ -715,32 +573,11 @@
 
 //scripts.php
 	'S_SCRIPTS'=>				_('Scripts'),
-	'S_COMMAND'=>				_('Command'),
 	'S_CLOSE'=>					_('Close'),
-
 	'S_SCRIPT_ERROR'=>					_('SCRIPT ERROR'),
-	'S_SCRIPT_ERROR_DESCRIPTION'=>		_('Error description'),
-	'S_SCRIPT_SEND_ERROR'=>				_('Can\'t send command, check connection'),
-	'S_SCRIPT_READ_ERROR'=>				_('Can\'t read script response, check connection'),
-	'S_SCRIPT_TIMEOUT_ERROR'=>			_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value'),
-	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value'),
-	'S_SCRIPT_ERROR_EMPTY_RESPONSE'=>	_('Empty response received'),
-
-	'S_NOT_RUN' => 						_('Connection to Zabbix server "%s" refused. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Security environment (for example, SELinux) is blocking the connection; 3. Zabbix server daemon not running; 4. Firewall is blocking TCP connection.'),
-	'S_IP_NOT_AVAILABLE' => 			_('Zabbix server "%s" can not be reached. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect network configuration.'),
-	'S_TIME_OUT' => 					_('Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.'),
-	'S_WRONG_DNS' => 					_('Connection to Zabbix server "%s" faileds. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.'),
 	'S_SCRIPT_ERROR'=>					_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'),
 
 //	audit.php
-	'S_AUDIT'=>					_('Audit'),
-	'S_AUDIT_LOGS_BIG'=>		_('AUDIT LOGS'),
-	'S_AUDIT_ACTIONS_BIG'=>		_('AUDIT ACTIONS'),
-	'S_ACTION'=>				_('Action'),
-	'S_DETAILS'=>				_('Details'),
-	'S_UNKNOWN_ACTION'=>		_('Unknown action'),
-	'S_ADDED'=>					_('Added'),
-	'S_UPDATED'=>				_('Updated'),
 	'S_ALREADY_EXISTS_SMALL'=>	_('already exists'),
 
 //	profile.php
@@ -750,7 +587,6 @@
 	'S_MUTE'=>					_('Mute'),
 	'S_SNOOZE'=>				_('Snooze'),
 	'S_MESSAGES'=>				_('Messages'),
-	'S_PROBLEM_ON'=>			_('Problem on'),
 
 //	hostinventoriesoverview.php
 	'S_HOST_INVENTORY_OVERVIEW'=>	_('Host inventory overview'),
@@ -760,7 +596,6 @@
 
 //	popup.php
 	'S_CAPTION'=>				_('Caption'),
-	'S_DISCOVERY_RULES_BIG'=>	_('DISCOVERY RULES'),
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -802,13 +637,6 @@
 	'S_E'=>			_('E'),
 	'S_Y'=>			_('Y'),
 
-//	forms.inc.php
-	'S_SUBFILTER'=>				_('Subfilter'),
-	'S_AFFECTS_ONLY_FILTERED_DATA_SMALL'=>	_('affects only filtered data!'),
-	'S_SHOW_VALUE_MAPPINGS'=>			_('show value mappings'),
-	'S_DELETE_SELECTED_ITEM_Q'=>		_('Delete selected item?'),
-	'S_DO'=>				_('Do'),
-
 //	items.inc.php
 	'S_UPDATED_SMALL'=>				_('updated'),
 
@@ -849,7 +677,6 @@
 	'S_QUEUE'=>				_('Queue'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
-	'S_LOGOUT'=>				_('Logout'),
 
 //	Errors
 	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),

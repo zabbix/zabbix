@@ -42,7 +42,7 @@ $fields=array(
 	//ajax
 	'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-	'state'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})')
+	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
 );
 
 check_fields($fields);
@@ -50,7 +50,7 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 if(isset($_REQUEST['favobj'])){
 	if('filter' == $_REQUEST['favobj']){
-		CProfile::update('web.hostinventories.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.hostinventories.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
 
@@ -131,13 +131,16 @@ else{
 		),
 	));
 
-	$reset = new CSpan(S_RESET,'link_menu');
-	$reset->onClick("javascript: clearAllForm('zbx_filter');");
-
 	$filter = new CButton('filter', S_FILTER, "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
-	$filter->useJQueryStyle();
+	$filter->useJQueryStyle('main');
 
-	$footer_col = new CCol(array($filter, SPACE, SPACE, SPACE, $reset), 'center');
+	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
+	$reset->useJQueryStyle();
+
+	$div_buttons = new CDiv(array($filter, SPACE, $reset));
+	$div_buttons->setAttribute('style', 'padding: 4px 0px;');
+
+	$footer_col = new CCol($div_buttons, 'center');
 	$footer_col->setColSpan(4);
 
 	$filter_table->addRow($footer_col);

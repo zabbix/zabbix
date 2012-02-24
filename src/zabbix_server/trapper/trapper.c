@@ -384,6 +384,9 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 
 		zbx_timespec(&av.ts);
 
+		if (0 == strcmp(av.value, ZBX_NOTSUPPORTED))
+			av.status = ITEM_STATUS_NOTSUPPORTED;
+
 		process_mass_data(sock, 0, &av, 1, NULL);
 
 		alarm(CONFIG_TIMEOUT);

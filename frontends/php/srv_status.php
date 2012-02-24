@@ -33,7 +33,7 @@ define('ZBX_PAGE_DO_REFRESH', 1);
 include_once('include/page_header.php');
 ?>
 <?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'serviceid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null),
 	'showgraph' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('1'),		'isset({serviceid})'),
@@ -42,7 +42,7 @@ $fields = array(
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"hat"'),	null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj})'),
-	'state' =>		array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj})'),
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		'isset({favobj})')
 );
 check_fields($fields);
 
@@ -51,7 +51,7 @@ check_fields($fields);
  */
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'hat') {
-		CProfile::update('web.srv_status.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.srv_status.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
@@ -87,7 +87,7 @@ else {
 		24 => _('Last 24 hours'),
 		24 * 7 => _('Last 7 days'),
 		24 * 30 => _('Last 30 days'),
-		24 * 365 => _('Last 365 days'),
+		24 * DAY_IN_YEAR => _('Last 365 days')
 	);
 	$period = get_request('period', 7 * 24);
 	$period_end = time();
@@ -108,7 +108,7 @@ else {
 		case 24:
 		case 24 * 7:
 		case 24 * 30:
-		case 24 * 365:
+		case 24 * DAY_IN_YEAR:
 			$period_start = $period_end - ($period * 3600);
 			break;
 	}
@@ -125,7 +125,7 @@ else {
 		'sla' => SPACE,
 		'sla2' => SPACE,
 		'graph' => SPACE,
-		'linkid'=> ''
+		'linkid' => ''
 	);
 	$services[0] = $row;
 

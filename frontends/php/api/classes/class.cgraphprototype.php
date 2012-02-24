@@ -670,11 +670,10 @@ COpt::memoryPick();
 		$graphs = zbx_toArray($graphs);
 		$graphids = zbx_objectValues($graphs, 'graphid');
 
-// GRAPHS PERMISSIONS {{{
 			$options = array(
 				'graphids' => $graphids,
-				'editable' => 1,
-				'preservekeys' => 1,
+				'editable' => true,
+				'preservekeys' => true,
 				'output' => API_OUTPUT_SHORTEN,
 				'selectGraphItems'=> API_OUTPUT_EXTEND
 			);
@@ -682,14 +681,12 @@ COpt::memoryPick();
 
 			foreach ($graphs as $gnum => $graph) {
 				if (!isset($updGraphs[$graph['graphid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
-
-				if (!isset($graph['gitems']))
+				if (!isset($graph['gitems'])) {
 					$graphs[$gnum]['gitems'] = $updGraphs[$graph['graphid']]['gitems'];
+				}
 			}
-
-// }}} GRAPHS PERMISSIONS
 
 			$this->checkInput($graphs, true);
 
@@ -1071,27 +1068,24 @@ COpt::memoryPick();
 
 
 		if (!empty($itemids)) {
-// EXCEPTION: ITEMS PERMISSIONS {{{
 			$options = array(
 				'nodeids' => get_current_nodeid(true),
 				'itemids' => array_unique($itemids),
 				'webitems' => 1,
-				'editable' => 1,
+				'editable' => true,
 				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => 1,
+				'preservekeys' => true
 			);
 			$allowedItems = API::Item()->get($options);
 
 			foreach ($itemids as $inum => $itemid) {
 				if (!isset($allowedItems[$itemid])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 			}
-// }}} EXCEPTION: ITEMS PERMISSIONS
 		}
 
 		foreach ($graphs as $graph) {
-
 			// check if the graph has at least one prototype
 			$hasPrototype = false;
 			foreach ($graph['gitems'] as $gitem) {

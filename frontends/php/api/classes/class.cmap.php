@@ -582,7 +582,7 @@ class CMap extends CMapElement {
 
 			if ($update || $delete) {
 				if (!isset($dbMaps[$map['sysmapid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 
 				$dbMap = array_merge($dbMaps[$map['sysmapid']], $map);
 			}
@@ -603,7 +603,7 @@ class CMap extends CMapElement {
 			if (isset($map['height']) && (($map['height'] > 65535) || ($map['height'] < 1)))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map height value for map "%s".', $dbMap['name']));
 
-// LABELS
+			// labels
 			$mapLabels = array('label_type' => array('typeName' => _('icon')));
 			if ($dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
 				$mapLabels['label_type_hostgroup'] = array('string' => 'label_string_hostgroup', 'typeName' => _('host group'));

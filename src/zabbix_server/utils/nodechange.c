@@ -33,15 +33,12 @@
  * Parameters: old_id - old id, new_id - new node id                          *
  *             old_exp - old expression, new_exp - new expression             *
  *                                                                            *
- * Return value: SUCCEED - converted successfully                             *
- *               FAIL - an error occurred                                     *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const char *old_exp, char *new_exp)
+static void	convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const char *old_exp, char *new_exp)
 {
 	int				i;
 	char				id[MAX_STRING_LEN];
@@ -76,8 +73,6 @@ static int	convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
 		else
 			*p++ = old_exp[i];
 	}
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -88,15 +83,12 @@ static int	convert_expression(int old_id, int new_id, zbx_uint64_t prefix, const
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCEED - converted successfully                             *
- *               FAIL - an error occurred                                     *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	convert_triggers_expression(int old_id, int new_id)
+static void	convert_triggers_expression(int old_id, int new_id)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
@@ -104,11 +96,7 @@ static int	convert_triggers_expression(int old_id, int new_id)
 	DB_ROW		row;
 	char		new_expression[MAX_STRING_LEN], *new_expression_esc;
 
-	if (NULL == (r_table = DBget_table("functions")))
-	{
-		printf("triggers.expression FAILED\n");
-		return FAIL;
-	}
+	assert(NULL != (r_table = DBget_table("functions")));
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 	if (0 != (r_table->flags & ZBX_SYNC))
@@ -127,8 +115,6 @@ static int	convert_triggers_expression(int old_id, int new_id)
 		zbx_free(new_expression_esc);
 	}
 	DBfree_result(result);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -139,15 +125,12 @@ static int	convert_triggers_expression(int old_id, int new_id)
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCEED - converted successfully                             *
- *               FAIL - an error occurred                                     *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	convert_profiles(int old_id, int new_id, const char *field_name)
+static void	convert_profiles(int old_id, int new_id, const char *field_name)
 {
 	zbx_uint64_t	prefix;
 
@@ -156,8 +139,6 @@ static int	convert_profiles(int old_id, int new_id, const char *field_name)
 
 	DBexecute("update profiles set %s=%s+" ZBX_FS_UI64 " where %s>0",
 			field_name, field_name, prefix, field_name);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -168,26 +149,19 @@ static int	convert_profiles(int old_id, int new_id, const char *field_name)
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCEED - converted successfully                             *
- *               FAIL - an error occurred                                     *
- *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	convert_special_field(int old_id, int new_id, const char *table_name,
+static void	convert_special_field(int old_id, int new_id, const char *table_name,
 		const char *field_name, const char *type_field_name,
 		const char *rel_table_name, int type)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
-	if (NULL == (r_table = DBget_table(rel_table_name)))
-	{
-		printf("%s.%s FAILED\n", table_name, field_name);
-		return FAIL;
-	}
+	assert(NULL != (r_table = DBget_table(rel_table_name)));
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 	if (0 != (r_table->flags & ZBX_SYNC))
@@ -195,8 +169,6 @@ static int	convert_special_field(int old_id, int new_id, const char *table_name,
 
 	DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s=%d and %s>0",
 			table_name, field_name, field_name, prefix, type_field_name, type, field_name);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -207,15 +179,12 @@ static int	convert_special_field(int old_id, int new_id, const char *table_name,
  *                                                                            *
  * Parameters: old_id - old id, new_id - new node id                          *
  *                                                                            *
- * Return value: SUCCEED - converted successfully                             *
- *               FAIL - an error occurred                                     *
- *                                                                            *
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	convert_condition_values(int old_id, int new_id, const char *rel_table_name, int type)
+static void	convert_condition_values(int old_id, int new_id, const char *rel_table_name, int type)
 {
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
@@ -223,11 +192,7 @@ static int	convert_condition_values(int old_id, int new_id, const char *rel_tabl
 	DB_ROW		row;
 	zbx_uint64_t	value;
 
-	if (NULL == (r_table = DBget_table(rel_table_name)))
-	{
-		printf("conditions.value FAILED\n");
-		return FAIL;
-	}
+	assert(NULL != (r_table = DBget_table(rel_table_name)));
 
 	prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 	if (0 != (r_table->flags & ZBX_SYNC))
@@ -248,8 +213,6 @@ static int	convert_condition_values(int old_id, int new_id, const char *rel_tabl
 			value, row[0]);
 	}
 	DBfree_result(result);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -374,20 +337,20 @@ int	change_nodeid(int old_id, int new_id)
 		{NULL},
 	};
 
-	int		i, j, s, t;
+	int		i, j, s, t, ret = FAIL;
 	zbx_uint64_t	prefix;
 	const ZBX_TABLE	*r_table;
 
 	if (0 != old_id)
 	{
 		printf("Conversion from non-zero node ID is not supported.\n");
-		return FAIL;
+		return ret;
 	}
 
 	if (1 > new_id || new_id > 999)
 	{
 		printf("Node ID must be in range of 1-999.\n");
-		return FAIL;
+		return ret;
 	}
 
 	zabbix_set_log_level(LOG_LEVEL_WARNING);
@@ -439,38 +402,32 @@ int	change_nodeid(int old_id, int new_id)
 			if (ZBX_TYPE_ID != tables[i].fields[j].type)
 				continue;
 
-			if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))	/* primary key */
+			/* primary key */
+			if (0 == strcmp(tables[i].fields[j].name, tables[i].recid))
 			{
 				prefix = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)new_id;
 
 				if (0 != (tables[i].flags & ZBX_SYNC))
 					prefix += (zbx_uint64_t)__UINT64_C(100000000000) * (zbx_uint64_t)new_id;
 			}
-			else if (NULL != tables[i].fields[j].fk_table)	/* relations */
+			/* relations */
+			else if (NULL != tables[i].fields[j].fk_table)
 			{
-				if (NULL == (r_table = DBget_table(tables[i].fields[j].fk_table)))
-				{
-					printf("%s.%s FAILED\n", tables[i].table, tables[i].fields[j].name);
-					fflush(stdout);
-					continue;
-				}
+				assert(NULL != (r_table = DBget_table(tables[i].fields[j].fk_table)));
 
 				prefix = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
 
 				if (0 != (r_table->flags & ZBX_SYNC))
 					prefix += (zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)new_id;
 			}
-			else if (0 == strcmp("profiles", tables[i].table))	/* special processing for table 'profiles' */
+			/* special processing for table 'profiles' */
+			else if (0 == strcmp("profiles", tables[i].table))
 			{
 				convert_profiles(old_id, new_id, tables[i].fields[j].name);
 				continue;
 			}
 			else
-			{
-				printf("%s.%s FAILED\n", tables[i].table, tables[i].fields[j].name);
-				fflush(stdout);
-				continue;
-			}
+				assert(0);
 
 			DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s>0",
 					tables[i].table,
@@ -492,6 +449,9 @@ int	change_nodeid(int old_id, int new_id)
 
 	DBexecute("delete from ids where nodeid=0");
 
+	if (SUCCEED != (ret = DBtxn_status()))
+		goto error;
+
 	printf(" done.\nCreating foreign keys ");
 	fflush(stdout);
 
@@ -502,14 +462,18 @@ int	change_nodeid(int old_id, int new_id)
 		fflush(stdout);
 	}
 
-	printf(" done.\nConversion completed.\n");
-	fflush(stdout);
-
+	ret = DBtxn_status();
+error:
 	DBcommit();
 
 	DBclose();
 
-	return SUCCEED;
+	if (SUCCEED != ret)
+		printf("Conversion failed.\n");
+	else
+		printf(" done.\nConversion completed successfully.\n");
+
+	return ret;
 }
 #else	/* HAVE_SQLITE3 */
 int	change_nodeid(int old_id, int new_id)
