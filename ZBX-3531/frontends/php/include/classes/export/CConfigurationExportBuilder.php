@@ -104,7 +104,7 @@ class CConfigurationExportBuilder {
 	}
 
 	public function buildScreens(array $screens) {
-		$this->data['groups'] = $this->formatScreens($screens);
+		$this->data['screens'] = $this->formatScreens($screens);
 	}
 
 	public function buildImages(array $images) {
@@ -413,7 +413,7 @@ class CConfigurationExportBuilder {
 				'url'=> $screenItem['url'],
 				'dynamic'=> $screenItem['dynamic'],
 				'sort_triggers'=> $screenItem['sort_triggers'],
-				'resource'=> $screenItem['resource']
+				'resource'=> $screenItem['resourceid']
 			);
 		}
 		return $result;

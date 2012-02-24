@@ -1,14 +1,35 @@
 <?php
 
+/**
+ * Abstract class to extend for all import formatters.
+ * For each different version of configuration import new formatter should be defined. All forammetters must return
+ * data in one format, so that forther processing is independent from configuration omport version.
+ */
 abstract class CImportFormatter {
 
+	/**
+	 * @var array configuration import data
+	 */
 	protected $data;
 
+	/**
+	 * Data property setter.
+	 *
+	 * @param array $data
+	 */
 	public function setData(array $data) {
 		$this->data = $data;
 	}
 
-	protected function renameData($data, $fieldMap) {
+	/**
+	 * Renames array elements keys according to given map.
+	 *
+	 * @param array $data
+	 * @param array $fieldMap
+	 *
+	 * @return array
+	 */
+	protected function renameData(array $data, array $fieldMap) {
 		foreach ($data as $key => $value) {
 			if (isset($fieldMap[$key])) {
 				$data[$fieldMap[$key]] = $value;
@@ -41,4 +62,6 @@ abstract class CImportFormatter {
 	abstract public function getImages();
 
 	abstract public function getMaps();
+
+	abstract public function getScreens();
 }

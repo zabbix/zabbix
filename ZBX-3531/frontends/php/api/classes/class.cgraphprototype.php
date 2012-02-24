@@ -724,6 +724,7 @@ COpt::memoryPick();
 	}
 
 	protected function createReal($graph) {
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
 

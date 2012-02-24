@@ -142,6 +142,16 @@ class C20ImportFormatter extends CImportFormatter {
 					}
 					unset($trigger);
 
+					foreach ($item['graph_prototypes'] as &$graph) {
+						$graph = $this->renameData($graph, array(
+							'type' => 'graphtype',
+							'ymin_type_1' => 'ymin_type',
+							'ymax_type_1' => 'ymax_type',
+							'graph_items' => 'gitems'
+						));
+					}
+					unset($graph);
+
 					$discoveryRulesData[$host['host']][$item['key_']] = $item;
 				}
 			}
@@ -230,6 +240,13 @@ class C20ImportFormatter extends CImportFormatter {
 			return array();
 		}
 		return $this->data['maps'];
+	}
+
+	public function getScreens() {
+		if (!isset($this->data['screens'])) {
+			return array();
+		}
+		return $this->data['screens'];
 	}
 
 	protected function renameItemFields(array $item) {
