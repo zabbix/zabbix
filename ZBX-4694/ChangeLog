@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
 .......P.. [ZBX-4683] fixed timestamps mismatch while sending history data from proxy (Sasha)
 ..F....... [ZBX-4140] fixed trigger test functionality for operator '#' (Alexei)
 ..F....... [ZBX-4600] fixed trigger dependencies being reset when executing a mass update (pavels)
