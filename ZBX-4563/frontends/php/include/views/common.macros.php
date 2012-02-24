@@ -35,15 +35,15 @@ foreach ($macros as $macroid => $macro) {
 	$span = new CSpan(RARR);
 	$span->addStyle('vertical-align:top;');
 
-	$deleteButton = new CButton('macros_'.$macroid.'_del', _('Remove'), null, 'link_menu macroRemove');
-
-	$row = array($text1, $span, $text2, $deleteButton);
+	$deleteButtonCell = array(new CButton('macros_'.$macroid.'_remove', _('Remove'), null, 'link_menu macroRemove'));
 	if (isset($macro['globalmacroid'])) {
-		$row[] = new CVar('macros['.$macroid.'][globalmacroid]', $macro['globalmacroid']);
+		$deleteButtonCell[] = new CVar('macros['.$macroid.'][globalmacroid]', $macro['globalmacroid'], 'macros_'.$macroid.'_id');
 	}
 	if (isset($macro['hostmacroid'])) {
-		$row[] = new CVar('macros['.$macroid.'][hostmacroid]', $macro['hostmacroid']);
+		$deleteButtonCell[] = new CVar('macros['.$macroid.'][hostmacroid]', $macro['hostmacroid'], 'macros_'.$macroid.'_id');
 	}
+
+	$row = array($text1, $span, $text2, $deleteButtonCell);
 	$macrosTable->addRow($row, 'form_row');
 }
 
