@@ -35,7 +35,7 @@ class CZBXAPI {
 	 *
 	 * @var string
 	 */
-	protected $tableAlias;
+	protected $tableAlias = 't';
 
 	/**
 	 * The name of the field used as a private key.
@@ -257,7 +257,8 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Constructs an SQL SELECT query from the given options, executes it and returns the result.
+	 * Constructs an SQL SELECT query for a specific table from the given API options, executes it and returns
+	 * the result.
 	 *
 	 * TODO: add global 'preservekeys' support
 	 * TODO: add global 'countOutput' support
@@ -267,7 +268,7 @@ class CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function select($tableName, array $options) {
+	protected function select($tableName, array $options) {
 		$limit = (isset($options['limit'])) ? $options['limit'] : null;
 
 		$sql = $this->createSelectQuery($tableName, $options);
@@ -285,7 +286,7 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function createSelectQuery($tableName, array $options) {
-		$sqlParts = $this->createSelectQueryParts($tableName, $this->tableAlias, $options);
+		$sqlParts = $this->createSelectQueryParts($tableName, $this->tableAlias(), $options);
 
 		return $this->createSelectQueryFromParts($sqlParts);
 	}

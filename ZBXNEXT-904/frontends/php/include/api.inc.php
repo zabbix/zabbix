@@ -84,15 +84,25 @@ class API {
 		self::$return = self::RETURN_TYPE_RPC;
 	}
 
-	private static function getAPIObject($className) {
-		$c = 'C'.$className;
-		if (!isset(self::$APIobjects[$className]))
-			self::$APIobjects[$className] = new $c;
+	public static function getApi($className = null) {
+		if ($className) {
+			$c = 'C'.$className;
+			if (!isset(self::$APIobjects[$className])) {
+				self::$APIobjects[$className] = new $c;
+			}
 
-		return self::$APIobjects[$className];
+			return self::$APIobjects[$className];
+		}
+		else {
+			if (!isset(self::$APIobjects[0])) {
+				self::$APIobjects[0] = new CZBXAPI();
+			}
+
+			return self::$APIobjects[0];
+		}
 	}
 
-	private static function getRPCObject($className) {
+	private static function getRpc($className) {
 		if (!isset(self::$RPCobjects[$className]))
 			self::$RPCobjects[$className] = new CAPIObject($className);
 
@@ -100,7 +110,7 @@ class API {
 	}
 
 	public static function getObject($className) {
-		return self::$return == self::RETURN_TYPE_API ? self::getAPIObject($className) : self::getRPCObject($className);
+		return self::$return == self::RETURN_TYPE_API ? self::getApi($className) : self::getRpc($className);
 	}
 
 	/**
