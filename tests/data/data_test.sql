@@ -454,7 +454,7 @@ INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip,
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (516, 1, 1328684550, 0, 13, '0', '192.168.3.32', 13000, 'Trigger1');
 
 -- update trigger
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (517, 1, 1328684550, 0, 13, '0', '192.168.3.32', 13000, 'Trigger1');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (517, 1, 1328684555, 0, 13, '0', '192.168.3.32', 13000, 'Trigger1');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (505, 517, '', 'description', 'Trigger1', 'Trigger1 updated');
 
 -- disable trigger
@@ -464,6 +464,8 @@ INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, ol
 -- enable trigger
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (519, 1, 1328684570, 1, 13, '0', '192.168.3.32', 13000, 'H1 updated:Trigger1');
 INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (507, 519, 'triggers', 'status', '1', '0');
+
+-- TODO: delete trigger
 
 -- add action
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (520, 1, 1328684580, 0, 5, 'Name: Action1', '192.168.3.32', 0, '');
@@ -576,13 +578,91 @@ INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip,
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (555, 1, 1328684640, 2, 19, '0', '192.168.3.32', 20, 'Test Map2');
 
 -- add media type
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (556, 1, 1328684650, 0, 3, 'Media1', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (556, 1, 1328684650, 0, 3, 'Media type [Media1]', '192.168.3.32', 0, '');
 
 -- update media type
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (557, 1, 1328684660, 1, 3, 'Media2', '192.168.3.32', 0, '');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (557, 1, 1328684660, 1, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
+
+-- disable media type
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (558, 1, 1328684660, 1, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
+
+-- enable media type
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (559, 1, 1328684670, 1, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
 
 -- delete media type
-INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (558, 1, 1328684670, 2, 19, '0', '192.168.3.32', 20, 'Test Map2');
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (560, 1, 1328684680, 2, 3, 'Media type [Media2]', '192.168.3.32', 0, '');
+
+-- add node
+-- update node
+-- delete node
+
+-- add proxy
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (564, 1, 1328684720, 0, 26, '[test_proxy1] [10054]', '192.168.3.32', 0, '');
+
+-- update proxy
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (565, 1, 1328684730, 1, 26, '[test_proxy2] [10054]', '192.168.3.32', 0, '');
+
+-- disable proxy - this will disable all hosts that are monitored by this proxy
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (566, 1, 1328684740, 1, 4, '0', '192.168.3.32', 10017, 'Test host');
+INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (510, 566, 'hosts', 'status', '0', '1');
+
+-- enable proxy - this will enable all hosts that are monitored by this proxy
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (567, 1, 1328684750, 1, 4, '0', '192.168.3.32', 10017, 'Test host');
+INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (511, 567, 'hosts', 'status', '1', '0');
+
+-- delete proxy
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (568, 1, 1328684760, 1, 4, '0', '192.168.3.32', 10017, 'Test host');
+
+-- add web scenario
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (569, 1, 1328684770, 0, 22, 'Scenario [Scenario1] [1] Host [Test host]', '192.168.3.32', 0, '');
+
+-- update web scenario
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (570, 1, 1328684780, 1, 22, 'Scenario [Scenario1] [1] Host [Test host]', '192.168.3.32', 0, '');
+
+-- disable scenario
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (571, 1, 1328684790, 1, 22, 'Scenario [Scenario1] [1] Host [Test host]Scenario disabled', '192.168.3.32', 0, '');
+
+-- enable scenario
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (572, 1, 1328684800, 1, 22, 'Scenario [Scenario1] [1] Host [Test host]Scenario activated', '192.168.3.32', 0, '');
+
+-- delete scenario
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (573, 1, 1328684810, 1, 22, 'Scenario "Scenario1" "1" host "Test host".', '192.168.3.32', 0, '');
+
+-- add screen
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (574, 1, 1328684820, 0, 20, 'Name [screen1]', '192.168.3.32', 0, '');
+
+-- update screen
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (575, 1, 1328684830, 1, 20, 'Name [screen1]', '192.168.3.32', 0, '');
+
+-- delete screen
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (576, 1, 1328684840, 2, 20, '0', '192.168.3.32', 24, 'screen1');
+
+-- add script
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (577, 1, 1328684850, 0, 25, 'Name [script1] id [4]', '192.168.3.32', 0, '');
+
+-- update script
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (578, 1, 1328684860, 1, 25, 'Name [script1] id [4]', '192.168.3.32', 0, '');
+
+-- delete script
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (579, 1, 1328684870, 2, 25, 'Script [4]', '192.168.3.32', 0, '');
+
+-- add slideshow
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (580, 1, 1328684880, 0, 24, 'Name Slideshow_4', '192.168.3.32', 0, '');
+
+-- update slideshow
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (581, 1, 1328684890, 1, 24, 'Name Slideshow_4', '192.168.3.32', 0, '');
+
+-- delete slideshow
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (582, 1, 1328684900, 2, 24, 'Name Slideshow_4', '192.168.3.32', 0, '');
+
+-- add template
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (583, 1, 1328684910, 0, 30, '', '192.168.3.32', 10055, 'Test_template1');
+
+-- update template
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (584, 1, 1328684920, 1, 30, '', '192.168.3.32', 10055, 'Test_template1');
+
+-- delete template
+INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (585, 1, 1328684930, 2, 30, '0', '192.168.3.32', 10055, 'Test_template1');
 
 -- updating record "Configuration of Zabbix" in the auditlog
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (700, 1, 1328684860, 1, 2, 'Default theme [css_ob.css]; Event acknowledges [1]; Show events not older than (in days) [7]; Show events max [100]; Dropdown...', '192.168.3.32', 0, '');
