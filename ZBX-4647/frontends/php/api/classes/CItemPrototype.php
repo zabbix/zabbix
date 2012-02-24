@@ -23,7 +23,7 @@
  * @package API
  */
 
-class CItemprototype extends CItemGeneral{
+class CItemPrototype extends CItemGeneral{
 
 	protected $tableName = 'items';
 

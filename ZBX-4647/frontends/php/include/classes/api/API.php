@@ -55,7 +55,7 @@ class API {
 		'image' => 'CImage',
 		'iconmap' => 'CIconMap',
 		'item' => 'CItem',
-		'itemprototype' => 'CItemprototype',
+		'itemprototype' => 'CItemPrototype',
 		'maintenance' => 'CMaintenance',
 		'map' => 'CMap',
 		'mediatype' => 'CMediatype',
