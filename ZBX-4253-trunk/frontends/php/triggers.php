@@ -151,10 +151,6 @@ elseif (isset($_REQUEST['save'])) {
 		'dependencies' => get_request('dependencies', array())
 	);
 
-	// secure Url against XSS
-
-	$trigger['url'] = CHtml::encode(CHtml::encode($trigger['url']));
-
 	if (isset($_REQUEST['triggerid'])) {
 		$trigger['triggerid'] = $_REQUEST['triggerid'];
 		$result = API::Trigger()->update($trigger);
