@@ -199,7 +199,7 @@ class CConfigurationExport {
 			'preservekeys' => true
 		));
 
-		prepareScreenExport($screens);
+		$this->prepareScreenExport($screens);
 
 		foreach ($screens as $screen) {
 			if (!isset($templates[$screen['templateid']]['screens'])) {
@@ -560,9 +560,16 @@ class CConfigurationExport {
 			'select_image' => true,
 			'preservekeys' => true
 		));
-		$images = prepareImageExport($images);
-		$this->data['images'] = $images;
+		foreach ($images as &$image) {
+			$image = array(
+				'name' => $image['name'],
+				'imagetype' => $image['imagetype'],
+				'encodedImage' => $image['image'],
+			);
+		}
+		unset($image);
 
+		$this->data['images'] = $images;
 	}
 
 	protected function gatherScreens() {
@@ -572,7 +579,178 @@ class CConfigurationExport {
 			'output' => API_OUTPUT_EXTEND
 		));
 
-		prepareScreenExport($screens);
+		$this->prepareScreenExport($screens);
 		$this->data['screens'] = $screens;
+	}
+
+	/**
+	 * Format screens data for export.
+	 * @todo It's copy of old prepareScreenExport function, should be refactored
+	 *
+	 * @param array $exportScreens
+	 */
+	protected function prepareScreenExport(array &$exportScreens) {
+		$screens = array();
+		$sysmaps = array();
+		$hostgroups = array();
+		$hosts = array();
+		$graphs = array();
+		$items = array();
+
+		foreach ($exportScreens as $screen) {
+			$screenItems = separateScreenElements($screen);
+
+			$screens = array_merge($screens, zbx_objectValues($screenItems['screens'], 'resourceid'));
+			$sysmaps = array_merge($sysmaps, zbx_objectValues($screenItems['sysmaps'], 'resourceid'));
+			$hostgroups = array_merge($hostgroups, zbx_objectValues($screenItems['hostgroups'], 'resourceid'));
+			$hosts = array_merge($hosts, zbx_objectValues($screenItems['hosts'], 'resourceid'));
+			$graphs = array_merge($graphs, zbx_objectValues($screenItems['graphs'], 'resourceid'));
+			$items = array_merge($items, zbx_objectValues($screenItems['items'], 'resourceid'));
+		}
+
+		$screens = screenIdents($screens);
+		$sysmaps = sysmapIdents($sysmaps);
+		$hostgroups = hostgroupIdents($hostgroups);
+		$hosts = hostIdents($hosts);
+		$graphs = graphIdents($graphs);
+		$items = itemIdents($items);
+
+		foreach ($exportScreens as &$screen) {
+			unset($screen['screenid'], $screen['hostid']);
+
+			foreach	($screen['screenitems'] as &$screenItem) {
+				if ($screenItem['resourceid'] == 0) {
+					continue;
+				}
+
+				switch ($screenItem['resourcetype']) {
+					case SCREEN_RESOURCE_HOSTS_INFO:
+					case SCREEN_RESOURCE_TRIGGERS_INFO:
+					case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+					case SCREEN_RESOURCE_DATA_OVERVIEW:
+					case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+						$screenItem['resourceid'] = $hostgroups[$screenItem['resourceid']];
+						break;
+					case SCREEN_RESOURCE_HOST_TRIGGERS:
+						$screenItem['resourceid'] = $hosts[$screenItem['resourceid']];
+						break;
+					case SCREEN_RESOURCE_GRAPH:
+						$screenItem['resourceid'] = $graphs[$screenItem['resourceid']];
+						break;
+					case SCREEN_RESOURCE_SIMPLE_GRAPH:
+					case SCREEN_RESOURCE_PLAIN_TEXT:
+						$screenItem['resourceid'] = $items[$screenItem['resourceid']];
+						break;
+					case SCREEN_RESOURCE_MAP:
+						$screenItem['resourceid'] = $sysmaps[$screenItem['resourceid']];
+						break;
+					case SCREEN_RESOURCE_SCREEN:
+						$screenItem['resourceid'] = $screens[$screenItem['resourceid']];
+						break;
+				}
+			}
+			unset($screenItem);
+		}
+		unset($screen);
+	}
+
+	/**
+	 * Format maps data for export.
+	 * @todo It's copy of old prepareMapExport function, should be refactored
+	 *
+	 * @param array $exportMaps
+	 */
+	protected function prepareMapExport(array &$exportMaps) {
+		$sysmaps = array();
+		$hostgroups = array();
+		$hosts = array();
+		$triggers = array();
+		$images = array();
+
+		foreach ($exportMaps as $sysmap) {
+			$selements = separateMapElements($sysmap);
+
+			$sysmaps += zbx_objectValues($selements['sysmaps'], 'elementid');
+			$hostgroups += zbx_objectValues($selements['hostgroups'], 'elementid');
+			$hosts += zbx_objectValues($selements['hosts'], 'elementid');
+			$triggers += zbx_objectValues($selements['triggers'], 'elementid');
+			$images += zbx_objectValues($selements['images'], 'elementid');
+
+			foreach ($sysmap['selements'] as $selement) {
+				if ($selement['iconid_off'] > 0) {
+					$images[$selement['iconid_off']] = $selement['iconid_off'];
+				}
+				if ($selement['iconid_on'] > 0) {
+					$images[$selement['iconid_on']] = $selement['iconid_on'];
+				}
+				if ($selement['iconid_disabled'] > 0) {
+					$images[$selement['iconid_disabled']] = $selement['iconid_disabled'];
+				}
+				if ($selement['iconid_maintenance'] > 0) {
+					$images[$selement['iconid_maintenance']] = $selement['iconid_maintenance'];
+				}
+			}
+
+			$images[$sysmap['backgroundid']] = $sysmap['backgroundid'];
+
+			foreach ($sysmap['links'] as $link) {
+				foreach ($link['linktriggers'] as $linktrigger) {
+					array_push($triggers, $linktrigger['triggerid']);
+				}
+			}
+		}
+
+		$sysmaps = sysmapIdents($sysmaps);
+		$hostgroups = hostgroupIdents($hostgroups);
+		$hosts = hostIdents($hosts);
+		$triggers = triggerIdents($triggers);
+		$images = imageIdents($images);
+
+		foreach ($exportMaps as &$sysmap) {
+			if (!empty($sysmap['iconmap'])) {
+				$sysmap['iconmap'] = array('name' => $sysmap['iconmap']['name']);
+			}
+
+			foreach ($sysmap['urls'] as $unum => $url) {
+				unset($sysmap['urls'][$unum]['sysmapurlid']);
+			}
+
+			$sysmap['backgroundid'] = ($sysmap['backgroundid'] > 0) ? $images[$sysmap['backgroundid']] : '';
+
+			foreach ($sysmap['selements'] as &$selement) {
+				switch ($selement['elementtype']) {
+					case SYSMAP_ELEMENT_TYPE_MAP:
+						$selement['elementid'] = $sysmaps[$selement['elementid']];
+						break;
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+						$selement['elementid'] = $hostgroups[$selement['elementid']];
+						break;
+					case SYSMAP_ELEMENT_TYPE_HOST:
+						$selement['elementid'] = $hosts[$selement['elementid']];
+						break;
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$selement['elementid'] = $triggers[$selement['elementid']];
+						break;
+					case SYSMAP_ELEMENT_TYPE_IMAGE:
+					default:
+						$selement['elementid'] = $images[$selement['elementid']];
+				}
+
+				$selement['iconid_off'] = ($selement['iconid_off'] > 0) ? $images[$selement['iconid_off']] : '';
+				$selement['iconid_on'] = ($selement['iconid_on'] > 0) ? $images[$selement['iconid_on']] : '';
+				$selement['iconid_disabled'] = ($selement['iconid_disabled'] > 0) ? $images[$selement['iconid_disabled']] : '';
+				$selement['iconid_maintenance'] = ($selement['iconid_maintenance'] > 0) ? $images[$selement['iconid_maintenance']] : '';
+			}
+			unset($selement);
+
+			foreach ($sysmap['links'] as &$link) {
+				foreach ($link['linktriggers'] as &$linktrigger) {
+					$linktrigger['triggerid'] = $triggers[$linktrigger['triggerid']];
+				}
+			}
+			unset($linktrigger);
+			unset($link);
+		}
+		unset($sysmap);
 	}
 }

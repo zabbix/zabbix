@@ -1,16 +1,16 @@
 <?php
 
 class CExportWriterFactory {
-	const XML = 'XmlWriter';
-	const JSON = 'JsonWriter';
+	const XML = 'xml';
+	const JSON = 'json';
 
 	public static function getWriter($type) {
 		switch ($type) {
 			case 'DOM':
 				return new CDomExportWriter();
-			case 'XmlWriter':
+			case self::XML:
 				return new CXmlExportWriterA();
-			case 'JsonWriter':
+			case self::JSON:
 				return new CJsonExportWriter();
 			default:
 				throw new Exception('Incorrect export writer type.');

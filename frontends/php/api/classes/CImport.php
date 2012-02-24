@@ -22,9 +22,9 @@
 class CImport extends CZBXAPI {
 
 	public function export(array $params) {
-		$export = new CConfigurationExport($params);
+		$export = new CConfigurationExport($params['options']);
 		$export->setBuilder(new CConfigurationExportBuilder());
-		$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::JSON));
+		$export->setWriter(CExportWriterFactory::getWriter($params['format']));
 
 		return $export->export();
 	}
