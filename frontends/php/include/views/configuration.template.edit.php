@@ -81,7 +81,7 @@
 		$groups = $dbTemplate['groups'];
 		$groups = zbx_objectValues($groups, 'groupid');
 
-		$macros = $dbTemplate['macros'];
+		$macros = order_macros($dbTemplate['macros'], 'macro');
 
 // get template hosts from db
 		$hosts_linked_to = API::Host()->get(array(
@@ -371,7 +371,7 @@
 		));
 	}
 	$macrosView = new CView('common.macros', array(
-		'macros' => order_macros($macros, 'macro')
+		'macros' => $macros
 	));
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
