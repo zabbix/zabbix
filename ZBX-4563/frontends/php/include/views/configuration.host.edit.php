@@ -117,7 +117,7 @@ if ($_REQUEST['hostid'] > 0 && !isset($_REQUEST['form_refresh'])) {
 	$ipmi_username = $dbHost['ipmi_username'];
 	$ipmi_password = $dbHost['ipmi_password'];
 
-	$macros = $dbHost['macros'];
+	$macros = order_macros($dbHost['macros'], 'macro');
 	$host_groups = zbx_objectValues($dbHost['groups'], 'groupid');
 
 	$host_inventory = $dbHost['inventory'];
@@ -551,7 +551,7 @@ if (empty($macros)) {
 }
 
 $macrosView = new CView('common.macros', array(
-	'macros' => order_macros($macros, 'macro')
+	'macros' => $macros
 ));
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
