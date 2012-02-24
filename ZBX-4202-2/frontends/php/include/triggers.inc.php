@@ -1301,6 +1301,23 @@ function expand_trigger_description($triggerid) {
 	return htmlspecialchars(expand_trigger_description_simple($triggerid));
 }
 
+function expand_trigger_description_multiple($triggerids) {
+	$result = Array();
+	$sqlWhereIn = DBcondition('t.triggerid', $triggerids);
+	$cursor = DBselect(
+		'SELECT DISTINCT h.host,t.description,t.expression,t.triggerid'.
+		' FROM triggers t,functions f,items i,hosts h'.
+		' WHERE f.triggerid=t.triggerid '.
+			' AND i.itemid=f.itemid '.
+			' AND h.hostid=i.hostid '.
+			' AND '.$sqlWhereIn
+	);
+	while ($row = DBfetch($cursor)) {
+		$result[$row['triggerid']] = htmlspecialchars(expand_trigger_description_by_data($row));
+	}
+	return $result;
+}
+
 function updateTriggerValueToUnknownByHostId($hostIds) {
 	zbx_value2array($hostIds);
 	$triggerIds = array();

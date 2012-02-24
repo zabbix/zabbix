@@ -361,6 +361,10 @@ class CEvent extends CZBXAPI {
 		if ($options['groupCount']) {
 			$res = DBfetchArray($dbRes);
 			$result = Array();
+			// important to fill with zeros
+			foreach ($options['triggerids'] as $triggerid) {
+				$result[$triggerid] = 0;
+			}
 			foreach ($res as $val) {
 				$result[$val['objectid']] = intval($val['rowscount']);
 			}
