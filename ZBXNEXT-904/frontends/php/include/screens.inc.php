@@ -24,7 +24,7 @@ require_once('include/events.inc.php');
 require_once('include/actions.inc.php');
 require_once('include/js.inc.php');
 
-function screen_resources($res = null) {
+function screen_resources($resource = null) {
 	$resources = array(
 		SCREEN_RESOURCE_CLOCK => _('Clock'),
 		SCREEN_RESOURCE_DATA_OVERVIEW => _('Data overview'),
@@ -45,12 +45,12 @@ function screen_resources($res = null) {
 		SCREEN_RESOURCE_URL => _('Url')
 	);
 
-	if (is_null($res)) {
+	if (is_null($resource)) {
 		natsort($resources);
 		return $resources;
 	}
-	elseif (isset($resources[$res])) {
-		return $resources[$res];
+	elseif (isset($resources[$resource])) {
+		return $resources[$resource];
 	}
 	else {
 		return _('Unknown');
@@ -832,7 +832,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 					}
 				}
 				$item = array(get_screen_plaintext($resourceid, $elements, $style));
-				if ($editmode == 1)	{
+				if ($editmode == 1) {
 					array_push($item,new CLink(_('Change'), $action));
 				}
 			}

@@ -340,6 +340,7 @@ class CScreenItem extends CZBXAPI {
 			);
 			if (in_array($screenItem['resourcetype'], $hostGroupResourceTypes)) {
 				$resourceIdRequired = !in_array($screenItem['resourcetype'], array(
+					SCREEN_RESOURCE_HOSTS_INFO,
 					SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
 					SCREEN_RESOURCE_TRIGGERS_INFO
 				));
@@ -482,7 +483,7 @@ class CScreenItem extends CZBXAPI {
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only appy the node option if no specific screen ids are given
+		// only apply the node option if no specific screen ids are given
 		if ($options['screenids'] === null) {
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}

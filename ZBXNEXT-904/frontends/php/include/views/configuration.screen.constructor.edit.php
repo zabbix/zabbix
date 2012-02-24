@@ -215,8 +215,8 @@ elseif ($resourcetype == SCREEN_RESOURCE_MAP) {
 	$screenFormList->addRow(_('Parameter'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 		new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName()."&dstfld1=resourceid'.
-				'&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name', 400, 450);", 'formlist'
+			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&dstfld1=resourceid'.
+				"&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name', 400, 450);", 'formlist'
 		)
 	));
 }

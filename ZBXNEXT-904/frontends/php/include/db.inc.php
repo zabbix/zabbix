@@ -1406,13 +1406,12 @@ class DB {
 	 * @return array
 	 */
 	public static function find($tableName, array $criteria = array()) {
-
 		// build the WHERE part
 		$sqlWhere = array();
 		foreach ($criteria as $field => $value) {
 			// check if the table has this field
 			if (!self::hasField($tableName, $field)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Table "%1$s" doesn\'t have a field named "%2$s"', $tableName, $field));
+				self::exception(self::DBEXECUTE_ERROR, _s('Table "%1$s" doesn\'t have a field named "%2$s".', $tableName, $field));
 			}
 
 			$sqlWhere[] = DBcondition($field, zbx_toArray($value));
@@ -1457,7 +1456,7 @@ class DB {
 			$sql = 'INSERT INTO '.$table.' ('.implode(',', array_keys($row)).')'.
 					' VALUES ('.implode(',', array_values($row)).')';
 			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s"', $sql));
+				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 			}
 		}
 		return $resultIds;
@@ -1553,7 +1552,6 @@ class DB {
 			'values' => $values
 		));
 	}
-
 
 	/**
 	 * Delete data from DB
