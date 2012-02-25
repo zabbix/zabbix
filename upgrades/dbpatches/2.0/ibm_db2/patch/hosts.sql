@@ -341,7 +341,7 @@ REORG TABLE hosts
 /
 UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0
 /
-UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0
+UPDATE hosts SET maintenanceid=NULL
 /
 UPDATE hosts SET name=host WHERE status in (0,1,3)
 /
