@@ -213,7 +213,7 @@ ALTER TABLE hosts ADD jmx_errors_from number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE hosts ADD jmx_error nvarchar2(128) DEFAULT '';
 ALTER TABLE hosts ADD name nvarchar2(64) DEFAULT '';
 UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
-UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
+UPDATE hosts SET maintenanceid=NULL;
 UPDATE hosts SET name=host WHERE status in (0,1,3)	-- MONITORED, NOT_MONITORED, TEMPLATE
 /
 CREATE INDEX hosts_4 on hosts (name);
