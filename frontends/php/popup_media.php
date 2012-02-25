@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/js.inc.php');
+	require_once dirname(__FILE__).'/include/config.inc.php';
+	require_once dirname(__FILE__).'/include/triggers.inc.php';
+	require_once dirname(__FILE__).'/include/forms.inc.php';
+	require_once dirname(__FILE__).'/include/js.inc.php';
 
 	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
@@ -31,7 +31,7 @@
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 	if($USER_DETAILS['alias'] == ZBX_GUEST_USER) {
 		access_deny();
@@ -152,5 +152,5 @@ require_once('include/page_header.php');
 	$frmMedia->Show();
 
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

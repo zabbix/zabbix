@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/events.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/discovery.inc.php');
-require_once('include/html.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/events.inc.php';
+require_once dirname(__FILE__).'/include/actions.inc.php';
+require_once dirname(__FILE__).'/include/discovery.inc.php';
+require_once dirname(__FILE__).'/include/html.inc.php';
 
 if(isset($_REQUEST['csv_export'])){
 	$CSV_EXPORT = true;
@@ -33,7 +33,7 @@ if(isset($_REQUEST['csv_export'])){
 	$page['type'] = detect_page_type(PAGE_TYPE_CSV);
 	$page['file'] = 'zbx_events_export.csv';
 
-	require_once('include/func.inc.php');
+	require_once dirname(__FILE__).'/include/func.inc.php';
 }
 else{
 	$CSV_EXPORT = false;
@@ -50,7 +50,7 @@ else{
 	}
 }
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 	$allow_discovery = check_right_on_discovery(PERM_READ_ONLY);
@@ -104,7 +104,7 @@ require_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--------
@@ -738,6 +738,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

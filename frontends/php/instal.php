@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Installation');
 $page['file'] = 'instal.php';
 
-require_once('include/page_header.php');
-require_once('setup.php');
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_header.php';
+require_once dirname(__FILE__).'/setup.php';
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 /*******************************/
 /* THIS POINT NEVER BE REACHED */
@@ -59,5 +59,5 @@ $form->addRow(
 );
 $form->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

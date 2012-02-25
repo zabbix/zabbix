@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
+	require_once dirname(__FILE__).'/include/config.inc.php';
+	require_once dirname(__FILE__).'/include/hosts.inc.php';
 
 	$page['title'] = _('Proxies');
 	$page['file'] = 'proxies.php';
 	$page['hist_arg'] = array('');
 
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -317,5 +317,5 @@
 	}
 
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

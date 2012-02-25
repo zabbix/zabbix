@@ -20,9 +20,9 @@
 ?>
 <?php
 
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/reports.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/reports.inc.php';
 
 $page['title'] = 'S_AVAILABILITY_REPORT';
 $page['file'] = 'report2.php';
@@ -30,7 +30,7 @@ $page['hist_arg'] = array('config', 'groupid', 'hostid', 'tpl_triggerid');
 $page['scripts'] = array('class.calendar.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 
@@ -62,7 +62,7 @@ require_once('include/page_header.php');
 		}
 	}
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 
@@ -261,5 +261,5 @@ require_once('include/page_header.php');
 	}
 ?>
 <?php
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 ?>
