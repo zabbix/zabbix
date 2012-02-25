@@ -28,7 +28,7 @@ CWebUser::checkAuthentication($sessionid);
 $request = CHtml::encode(get_request('request', ''));
 $message = CHtml::encode(get_request('message', '')) ;
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/../page_header.php';
 ?>
 <form action="index.php">
 <input type="hidden" name="request" class="input hidden" value="<?php echo $request; ?>" />
@@ -97,5 +97,5 @@ require_once('include/page_header.php');
 	});
 </script>
 <?php
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/../page_footer.php';
 ?>

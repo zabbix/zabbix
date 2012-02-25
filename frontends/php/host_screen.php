@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/graphs.inc.php');
-	require_once('include/screens.inc.php');
-	require_once('include/blocks.inc.php');
+	require_once dirname(__FILE__).'/include/config.inc.php';
+	require_once dirname(__FILE__).'/include/graphs.inc.php';
+	require_once dirname(__FILE__).'/include/screens.inc.php';
+	require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 	$page['title'] = 'S_HOST_SCREENS';
 	$page['file'] = 'screens.php';
@@ -35,7 +35,7 @@
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -106,7 +106,7 @@
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 ?>
@@ -223,6 +223,6 @@
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/views/js/configuration.triggers.expression.js.php');
+require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 
 $expressionWidget = new CWidget();
 

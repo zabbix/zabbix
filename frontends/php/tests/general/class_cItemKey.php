@@ -21,11 +21,11 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../../include/func.inc.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.citemkey.php');
-require_once(dirname(__FILE__).'/../../include/defines.inc.php');
-require_once(dirname(__FILE__).'/../../include/locales.inc.php');
-require_once(dirname(__FILE__).'/../../include/items.inc.php');
+require_once dirname(__FILE__).'/../../include/func.inc.php';
+require_once dirname(__FILE__).'/../../api/classes/class.citemkey.php';
+require_once dirname(__FILE__).'/../../include/defines.inc.php';
+require_once dirname(__FILE__).'/../../include/locales.inc.php';
+require_once dirname(__FILE__).'/../../include/items.inc.php';
 
 class class_cItemKey extends PHPUnit_Framework_TestCase {
 	public static function provider() {

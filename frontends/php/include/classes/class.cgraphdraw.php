@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/items.inc.php');
-require_once('include/hosts.inc.php');
+require_once dirname(__FILE__).'/../items.inc.php';
+require_once dirname(__FILE__).'/../hosts.inc.php';
 
 class CGraphDraw{
 	public function __construct($type = GRAPH_TYPE_NORMAL) {
