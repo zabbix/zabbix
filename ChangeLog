@@ -10,6 +10,7 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-3735] fixed login form to send passwords via POST not GET; thanks to Joseph Bueno (Alexei)
 A......... [ZBX-954] increased API version to 1.4, Zabbix 1.8.x is using 1.3 (Alexei)
 A.F....... [ZBX-4604] fixed "screen" type screen item validation (pavels)
 ........S. [ZBX-4560] fixed low level discovery error messages to start with uppercase 'Cannot ...' (Alexei)
