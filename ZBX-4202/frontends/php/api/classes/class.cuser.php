@@ -1007,7 +1007,9 @@ class CUser extends CZBXAPI {
 		global $ZBX_LOCALNODEID;
 
 		// access DB only once per page load
-		if (!is_null(self::$userData)) return self::$userData;
+		if (!is_null(self::$userData)) {
+			return self::$userData;
+		}
 
 		$time = time();
 		$sql = 'SELECT u.userid,u.autologout,s.lastaccess'.
