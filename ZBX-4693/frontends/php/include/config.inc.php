@@ -25,34 +25,34 @@ Z::getInstance()->run();
 
 require_once dirname(__FILE__).'/debug.inc.php';
 
-require_once('include/api.inc.php');
-require_once('include/gettextwrapper.inc.php');
-require_once('include/defines.inc.php');
-require_once('include/func.inc.php');
-require_once('include/html.inc.php');
-require_once('include/copt.lib.php');
-require_once('include/profiles.inc.php');
-require_once('conf/maintenance.inc.php');
+require_once dirname(__FILE__).'/api.inc.php';
+require_once dirname(__FILE__).'/gettextwrapper.inc.php';
+require_once dirname(__FILE__).'/defines.inc.php';
+require_once dirname(__FILE__).'/func.inc.php';
+require_once dirname(__FILE__).'/html.inc.php';
+require_once dirname(__FILE__).'/copt.lib.php';
+require_once dirname(__FILE__).'/profiles.inc.php';
+require_once dirname(__FILE__).'/../conf/maintenance.inc.php';
 // abc sorting
-require_once('include/acknow.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/discovery.inc.php');
-require_once('include/events.inc.php');
-require_once('include/graphs.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/httptest.inc.php');
-require_once('include/ident.inc.php');
-require_once('include/images.inc.php');
-require_once('include/items.inc.php');
-require_once('include/maintenances.inc.php');
-require_once('include/maps.inc.php');
-require_once('include/media.inc.php');
-require_once('include/nodes.inc.php');
-require_once('include/services.inc.php');
-require_once('include/sounds.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/users.inc.php');
-require_once('include/valuemap.inc.php');
+require_once dirname(__FILE__).'/acknow.inc.php';
+require_once dirname(__FILE__).'/actions.inc.php';
+require_once dirname(__FILE__).'/discovery.inc.php';
+require_once dirname(__FILE__).'/events.inc.php';
+require_once dirname(__FILE__).'/graphs.inc.php';
+require_once dirname(__FILE__).'/hosts.inc.php';
+require_once dirname(__FILE__).'/httptest.inc.php';
+require_once dirname(__FILE__).'/ident.inc.php';
+require_once dirname(__FILE__).'/images.inc.php';
+require_once dirname(__FILE__).'/items.inc.php';
+require_once dirname(__FILE__).'/maintenances.inc.php';
+require_once dirname(__FILE__).'/maps.inc.php';
+require_once dirname(__FILE__).'/media.inc.php';
+require_once dirname(__FILE__).'/nodes.inc.php';
+require_once dirname(__FILE__).'/services.inc.php';
+require_once dirname(__FILE__).'/sounds.inc.php';
+require_once dirname(__FILE__).'/triggers.inc.php';
+require_once dirname(__FILE__).'/users.inc.php';
+require_once dirname(__FILE__).'/valuemap.inc.php';
 
 global $USER_DETAILS, $USER_RIGHTS, $ZBX_PAGE_POST_JS, $page;
 global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
@@ -68,13 +68,13 @@ $ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
 $ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
 // include Tactical Overview modules
-require_once('include/locales.inc.php');
-require_once('include/perm.inc.php');
-require_once('include/audit.inc.php');
-require_once('include/js.inc.php');
+require_once dirname(__FILE__).'/locales.inc.php';
+require_once dirname(__FILE__).'/perm.inc.php';
+require_once dirname(__FILE__).'/audit.inc.php';
+require_once dirname(__FILE__).'/js.inc.php';
 
 // include Validation
-require_once('include/validate.inc.php');
+require_once dirname(__FILE__).'/validate.inc.php';
 
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	$pathLength = strlen(__FILE__);
@@ -118,7 +118,7 @@ if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !i
 		error($config->error);
 	}
 
-	require_once('include/db.inc.php');
+	require_once dirname(__FILE__).'/db.inc.php';
 
 	if (!isset($show_warning)) {
 		$error = '';
@@ -156,7 +156,7 @@ else {
 		ob_end_clean();
 	}
 
-	require_once('include/db.inc.php');
+	require_once dirname(__FILE__).'/db.inc.php';
 
 	if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
 		define('ZBX_PAGE_NO_AUTHORIZATION', true);
@@ -167,7 +167,7 @@ else {
 
 if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
-		require_once('include/locales/en_gb.inc.php');
+		require_once dirname(__FILE__).'/locales/en_gb.inc.php';
 		process_locales();
 
 		include('index.php');
@@ -217,7 +217,7 @@ else {
 	$USER_DETAILS = CWebUser::$data;
 }
 
-require_once('include/locales/en_gb.inc.php');
+require_once dirname(__FILE__).'/locales/en_gb.inc.php';
 process_locales();
 set_zbx_locales();
 
@@ -232,20 +232,20 @@ if ((isset($DENY_GUI) || isset($show_setup) || isset($show_warning)) && PAGE_TYP
 
 if (isset($DENY_GUI)) {
 	unset($show_warning);
-	require_once('warning.php');
+	require_once dirname(__FILE__).'/../warning.inc.php';
 }
 
 if (isset($show_setup)) {
 	unset($show_setup);
-	require_once('setup.php');
+	require_once dirname(__FILE__).'/../setup.inc.php';
 }
 elseif (isset($show_warning)) {
 	unset($show_warning);
-	require_once('warning.php');
+	require_once dirname(__FILE__).'/../warning.inc.php';
 }
 
 function access_deny() {
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/page_header.php';
 
 	if (CWebUser::$data['alias'] != ZBX_GUEST_USER) {
 		show_error_message(_('No permissions to referred object or it does not exist!'));
@@ -269,7 +269,7 @@ function access_deny() {
 		$table->setFooter($footer,'footer');
 		$table->show();
 	}
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/page_footer.php';
 }
 
 function detect_page_type($default = PAGE_TYPE_HTML) {
@@ -490,9 +490,9 @@ function clear_messages($count = null) {
 }
 
 function fatal_error($msg) {
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/page_header.php';
 	show_error_message($msg);
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/page_footer.php';
 }
 
 function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {

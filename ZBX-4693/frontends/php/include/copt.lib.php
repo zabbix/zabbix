@@ -222,27 +222,29 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		public static function savesqlrequest($time, $sql){
+		public static function savesqlrequest($time, $sql) {
 			global $USER_DETAILS;
 
-			if(is_null(self::$max_memory_bytes)) self::$max_memory_bytes = (ini_get('memory_limit') * 0.8 * 1024 * 1024);
+			if (is_null(self::$max_memory_bytes)) self::$max_memory_bytes = (ini_get('memory_limit') * 0.8 * 1024 * 1024);
 
-			if((!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED))
-				|| self::$memory_limit_reached){
+			if ((!is_null($USER_DETAILS) && isset($USER_DETAILS['debug_mode']) && ($USER_DETAILS['debug_mode'] == GROUP_DEBUG_MODE_DISABLED))
+				|| self::$memory_limit_reached
+			) {
 				return false;
 			}
-			if(self::getmemoryusage() > self::$max_memory_bytes){
+			if (self::getmemoryusage() > self::$max_memory_bytes) {
 				self::$memory_limit_reached = true;
 			}
 
-			if(defined('USE_SQLREQUEST_PROF')){
+			if (defined('USE_SQLREQUEST_PROF')) {
 				global $sqlrequests;
-				$time=round($time,6);
-//				echo $time,"<br>";
-				if(defined('SHOW_SQLREQUEST_DETAILS')){
-					array_push($sqlrequests, array($time,$sql));
+				$time = round($time, 6);
+				if (defined('SHOW_SQLREQUEST_DETAILS')) {
+					$callStack = array_slice(debug_backtrace(), 1);
+
+					array_push($sqlrequests, array($time, $sql, $callStack));
 				}
-				else{
+				else {
 					$sqlrequests++;
 				}
 			}
@@ -353,12 +355,23 @@ if(defined('USE_PROFILING')){
 						$sqlrequests[$i][1] = str_replace(array('<','>'), array('&lt;','&gt;'), $sqlrequests[$i][1]);
 
 						$sql_time+=$time;
+						$query = '<span style="color: green; font-size: 1.2em;">'.$sqlrequests[$i][1].'</span>';
 						if($time < LONG_QUERY){
-							$debug_str.= S_TIME.':'.round($time,8).' SQL:&nbsp;'.$sqlrequests[$i][1].OBR;
+							$debug_str.= S_TIME.':'.round($time,8).'<br />SQL:&nbsp;'.$query.OBR;
 						}
 						else{
-							$debug_str.= '<b>'.S_TIME.':'.round($time,8).' LONG SQL:&nbsp;'.$sqlrequests[$i][1].'</b>'.OBR;
+							$debug_str.= '<b>'.S_TIME.':'.round($time,8).' LONG SQL:&nbsp;'.$query.'</b>'.OBR;
 						}
+
+						$callStack = array_reverse($sqlrequests[$i][2]);
+						$callStackStr = '<i>';
+						foreach ($callStack as $call) {
+							if (isset($call['class'])) {
+								$callStackStr .= $call['class'].$call['type'];
+							}
+							$callStackStr .= $call['function'].'() -> ';
+						}
+						$debug_str .= rtrim($callStackStr, '-> ').'</i>'.OBR.OBR;
 					}
 				}
 				else{

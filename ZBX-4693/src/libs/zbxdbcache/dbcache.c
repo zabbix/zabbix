@@ -281,7 +281,6 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			table_name = "trends_uint";
 			break;
 		default:
-			zbx_error("unsupported value type for trends: %d", (int)value_type);
 			assert(0);
 	}
 
@@ -335,11 +334,14 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			{
 				trend = &trends[i];
 
-				if (itemid == trend->itemid && clock == trend->clock && value_type == trend->value_type)
-				{
-					trend->disable_from = clock;
-					break;
-				}
+				if (itemid != trend->itemid)
+					continue;
+
+				if (clock != trend->clock || value_type != trend->value_type)
+					continue;
+
+				trend->disable_from = clock;
+				break;
 			}
 		}
 	}
@@ -381,8 +383,13 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			{
 				trend = &trends[i];
 
-				if (itemid == trend->itemid && clock == trend->clock && value_type == trend->value_type)
-					break;
+				if (itemid != trend->itemid)
+					continue;
+
+				if (clock != trend->clock || value_type != trend->value_type)
+					continue;
+
+				break;
 			}
 
 			if (i == trends_to)
@@ -470,7 +477,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			if (clock != trends[i].clock || value_type != trends[i].value_type)
 				continue;
 
-			if (0 == trend[i].disable_from || trend[i].disable_from > clock)
+			if (0 == trends[i].disable_from || trends[i].disable_from > clock)
 				continue;
 
 			if (NULL != (trend = zbx_hashset_search(&cache->trends, &trends[i].itemid)))

@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/discovery.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/discovery.inc.php';
 
 $page['hist_arg'] = array('druleid');
 $page['file'] = 'discovery.php';
 $page['title'] = _('Status of discovery');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -49,7 +49,7 @@ if (isset($_REQUEST['favobj'])) {
 	}
 }
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
@@ -140,5 +140,5 @@ $discoveryView = new CView('monitoring.discovery', $data);
 $discoveryView->render();
 $discoveryView->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>
