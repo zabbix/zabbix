@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/forms.inc.php');
-require_once('include/regexp.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/regexp.inc.php';
 
 $page['title'] = _('Configuration of Zabbix');
 $page['file'] = 'adm.regexps.php';
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 $fields = array(
@@ -233,5 +233,5 @@ else {
 $cnf_wdgt->addItem($regExpForm->render());
 $cnf_wdgt->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

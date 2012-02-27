@@ -19,13 +19,13 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = "S_IT_NOTIFICATIONS";
 $page['file'] = 'report4.php';
 $page['hist_arg'] = array('media_type','period','year');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -236,5 +236,5 @@ require_once('include/page_header.php');
 		}
 	}
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

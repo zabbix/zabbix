@@ -371,7 +371,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 {
 	const char		*__function_name = "get_pinger_hosts";
 	DC_ITEM			items[MAX_ITEMS];
-	int			i, num, count, interval, size, timeout;
+	int			i, num, count, interval, size, timeout, rc;
 	char			error[MAX_STRING_LEN], *addr = NULL;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
@@ -382,16 +382,23 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	for (i = 0; i < num; i++)
 	{
-		items[i].key = strdup(items[i].key_orig);
-		substitute_key_macros(&items[i].key, &items[i].host, NULL, MACRO_TYPE_ITEM_KEY);
+		ZBX_STRDUP(items[i].key, items[i].key_orig);
+		rc = substitute_key_macros(&items[i].key, &items[i].host, NULL, MACRO_TYPE_ITEM_KEY,
+				error, sizeof(error));
 
-		items[i].interface.addr = (1 == items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
+		if (SUCCEED == rc)
+		{
+			items[i].interface.addr = (1 == items[i].interface.useip ?
+					items[i].interface.ip_orig : items[i].interface.dns_orig);
 
-		if (SUCCEED == parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
-					&interval, &size, &timeout, &type, error, sizeof(error)))
+			rc = parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
+					&interval, &size, &timeout, &type, error, sizeof(error));
+		}
+
+		if (SUCCEED == rc)
 		{
 			add_icmpping_item(icmp_items, icmp_items_alloc, icmp_items_count, count, interval, size,
-					timeout, items[i].itemid, addr, icmpping, type);
+				timeout, items[i].itemid, addr, icmpping, type);
 		}
 		else
 		{

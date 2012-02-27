@@ -17,9 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/html.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Search');
 $page['file'] = 'search.php';
@@ -28,7 +28,7 @@ $page['scripts'] = array('class.pmaster.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -60,7 +60,7 @@ require_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 ?>
@@ -398,6 +398,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

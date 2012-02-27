@@ -19,15 +19,17 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/maps.inc.php');
-require_once('include/ident.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/maps.inc.php';
+require_once dirname(__FILE__).'/include/ident.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 if (isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])) {
 	$EXPORT_DATA = true;
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_maps_export.xml';
+
+	require_once dirname(__FILE__).'/include/export.inc.php';
 }
 else {
 	$EXPORT_DATA = false;
@@ -38,7 +40,7 @@ else {
 	$page['hist_arg'] = array();
 }
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -315,5 +317,4 @@ require_once('include/page_header.php');
 
 	$map_wdgt->show();
 
-
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';

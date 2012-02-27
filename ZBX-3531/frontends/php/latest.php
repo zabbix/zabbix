@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/items.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
@@ -37,7 +37,7 @@ if(PAGE_TYPE_HTML == $page['type']){
 }
 //	define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			     			 TYPE	   OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -73,7 +73,7 @@ require_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--------

@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/services.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('IT services availability report');
 $page['file'] = 'report3.php';
 $page['hist_arg'] = array();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -232,5 +232,5 @@ for ($t = $from; $t <= $to; $t++) {
 }
 $table->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

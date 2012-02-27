@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/maps.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/maps.inc.php';
 
 $page['title'] = 'S_NETWORK_MAPS';
 $page['file'] = 'maps.php';
@@ -34,7 +34,7 @@ if (PAGE_TYPE_HTML == $page['type']) {
 
 define('GET_PARAM_NAME', 'mapname');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -81,12 +81,12 @@ if (isset($_REQUEST['favobj'])) {
 	}
 }
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
 // js templates
-require_once('include/views/js/general.script.confirm.js.php');
+require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 $options = array(
 	'output' => API_OUTPUT_EXTEND,
@@ -179,5 +179,5 @@ $map_wdgt->addItem($table);
 $map_wdgt->addPageHeader(_('NETWORK MAPS'), array($icon, $fs_icon));
 $map_wdgt->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>
