@@ -2665,7 +2665,7 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 	function calculate_availability($triggerid,$period_start,$period_end){
 		$start_value = -1;
 
-		if(($period_start>0) && ($period_start < time())){
+		if(($period_start>0) && ($period_start <= time())){
 			$sql='SELECT e.eventid, e.value '.
 					' FROM events e '.
 					' WHERE e.objectid='.$triggerid.
@@ -2702,9 +2702,9 @@ function copy_template_triggers($hostid, $templateid, $copy_mode = false) {
 				$ret['true_time']		= 0;
 				$ret['false_time']		= 0;
 				$ret['unknown_time']	= 0;
-				$ret['true']		= (TRIGGER_VALUE_TRUE==$start_value)?100:0;
-				$ret['false']		= (TRIGGER_VALUE_FALSE==$start_value)?100:0;
-				$ret['unknown']		= (TRIGGER_VALUE_UNKNOWN==$start_value)?100:0;
+				$ret['true']		= (TRIGGER_VALUE_TRUE == $start_value) ? 100 : 0;
+				$ret['false']		= (TRIGGER_VALUE_FALSE == $start_value)? 100 : 0;
+				$ret['unknown']		= (TRIGGER_VALUE_UNKNOWN == $start_value || -1 == $start_value) ? 100 : 0;
 				return $ret;
 			}
 		}
