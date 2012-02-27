@@ -53,16 +53,8 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 			$host['interfaces'] = array_values($host['interfaces']);
 
-
-			if (empty($host['templates'])) {
-				unset($host['templates']);
-			}
-			else {
-				$host['templates'] = array_values($host['templates']);
-			}
-
+			$host['templates'] = array_values($host['templates']);
 			$host['macros'] = array_values($host['macros']);
-
 			$host['groups'] = array_values($host['groups']);
 
 			if (!empty($host['inventory']) && isset($host['inventory']['inventory_mode'])) {

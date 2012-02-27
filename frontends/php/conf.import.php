@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$page['file'] = 'conf.import.php';
+$page['title'] = _('Configuration import');
 
 require_once 'include/config.inc.php';
 require_once 'include/page_header.php';
@@ -26,7 +28,6 @@ $fields = array(
 	'rules' => array(T_ZBX_STR, O_OPT, null, null,	null),
 	'import' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'form_refresh' => array(T_ZBX_INT, O_OPT, null, null, null)
-
 );
 check_fields($fields);
 
@@ -46,6 +47,8 @@ $data['rules'] = array(
 );
 if (isset($_REQUEST['rules'])) {
 	$requestRules = get_request('rules', array());
+	// if form was submitted with some checkboxes unchecked, those values aare not submitted
+	// so that we set missing values to false
 	foreach ($data['rules'] as $ruleName => $rule) {
 
 		if (!isset($requestRules[$ruleName])) {
@@ -67,11 +70,12 @@ if (isset($_REQUEST['rules'])) {
 }
 
 if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
-	require_once 'include/export.inc.php';
-//	DBstart();
+	// required for version 1.8 import
+	require_once dirname(__FILE__).'/include/export.inc.php';
+
 	try {
-		$ext = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
-		$importReader = CImportReaderFactory::getReader($ext);
+		$fileExtension = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
+		$importReader = CImportReaderFactory::getReader($fileExtension);
 		$fileContent = file_get_contents($_FILES['import_file']['tmp_name']);
 
 		$configurationImport = new CConfigurationImport($fileContent, get_request('rules', array()));
@@ -84,7 +88,6 @@ if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])
 		error($e->getMessage());
 		show_messages(false, null, _('Import failed'));
 	}
-//	DBend(false);
 }
 
 $view = new CView('conf.import', $data);

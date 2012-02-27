@@ -60,72 +60,80 @@ class CConfigurationImport {
 	}
 
 	public function import() {
-		$this->data = $this->reader->read($this->source);
+		try {
+			DBstart();
+			$this->data = $this->reader->read($this->source);
 
-		$version = $this->getImportVersion();
+			$version = $this->getImportVersion();
 
-		if ($version == '1.8') {
-			zbxXML::import($this->source);
-			if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
-				zbxXML::parseMap($this->options);
+			if ($version == '1.8') {
+				zbxXML::import($this->source);
+				if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
+					zbxXML::parseMap($this->options);
+				}
+				if ($this->options['screens']['exist'] || $this->options['screens']['missed']) {
+					zbxXML::parseScreen($this->options);
+				}
+				if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
+					zbxXML::parseMain($this->options);
+				}
 			}
-			if ($this->options['screens']['exist'] || $this->options['screens']['missed']) {
-				zbxXML::parseScreen($this->options);
+			else {
+				$this->formatter = $this->getFormatter($version);
+
+				$this->referencer = new CImportReferencer();
+
+				$this->formatter->setData($this->data['zabbix_export']);
+
+				$this->gatherReferences();
+
+				if ($this->options['groups']['missed']) {
+					$this->processGroups();
+				}
+				if ($this->options['templates']['exist'] || $this->options['templates']['missed']) {
+					$this->processTemplates();
+				}
+				if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
+					$this->processHosts();
+				}
+				if ($this->options['templates']['exist']
+						|| $this->options['templates']['missed']
+						|| $this->options['hosts']['exist']
+						|| $this->options['hosts']['missed']) {
+					$this->processApplications();
+				}
+
+				if ($this->options['items']['exist'] || $this->options['items']['missed']) {
+					$this->processItems();
+				}
+				if ($this->options['discoveryrules']['exist'] || $this->options['discoveryrules']['missed']) {
+					$this->processDiscoveryRules();
+				}
+				if ($this->options['triggers']['exist'] || $this->options['triggers']['missed']) {
+					$this->processTriggers();
+				}
+				if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
+					$this->processGraphs();
+				}
+				if ($this->options['screens']['exist'] || $this->options['screens']['missed']) {
+					$this->processScreens();
+				}
+				if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN
+						&& ($this->options['images']['exist'] || $this->options['images']['missed'])) {
+					$this->processImages();
+				}
+				if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
+					$this->processMaps();
+				}
 			}
-			if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
-				zbxXML::parseMain($this->options);
-			}
+
+			return DBend(true);
 		}
-		else {
-			$this->formatter = $this->getFormatter($version);
-
-			$this->referencer = new CImportReferencer();
-
-			$this->formatter->setData($this->data['zabbix_export']);
-
-			$this->gatherReferences();
-
-			if ($this->options['groups']['missed']) {
-				$this->processGroups();
-			}
-			if ($this->options['templates']['exist'] || $this->options['templates']['missed']) {
-				$this->processTemplates();
-			}
-			if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
-				$this->processHosts();
-			}
-			if ($this->options['templates']['exist']
-					|| $this->options['templates']['missed']
-					|| $this->options['hosts']['exist']
-					|| $this->options['hosts']['missed']) {
-				$this->processApplications();
-			}
-
-			if ($this->options['items']['exist'] || $this->options['items']['missed']) {
-				$this->processItems();
-			}
-			if ($this->options['discoveryrules']['exist'] || $this->options['discoveryrules']['missed']) {
-				$this->processDiscoveryRules();
-			}
-			if ($this->options['triggers']['exist'] || $this->options['triggers']['missed']) {
-				$this->processTriggers();
-			}
-			if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
-				$this->processGraphs();
-			}
-			if ($this->options['screens']['exist'] || $this->options['screens']['missed']) {
-				$this->processScreens();
-			}
-			if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN
-					&& ($this->options['images']['exist'] || $this->options['images']['missed'])) {
-				$this->processImages();
-			}
-			if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
-				$this->processMaps();
-			}
+		catch (Exception $e) {
+			DBend(false);
+			throw $e;
 		}
 
-		return true;
 	}
 
 	protected function gatherReferences() {
