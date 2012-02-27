@@ -21,7 +21,7 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 define('TYPE_UINT', 0);
 define('TYPE_FLOAT', 1);

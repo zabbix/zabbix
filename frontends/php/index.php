@@ -23,8 +23,8 @@ define('ZBX_PAGE_NO_AUTHORIZATION', 1);
 define('ZBX_NOT_ALLOW_ALL_NODES', 1);
 define('ZBX_HIDE_NODE_SELECTION', 1);
 
-require_once('include/config.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('ZABBIX');
 $page['file'] = 'index.php';

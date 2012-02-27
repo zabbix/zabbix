@@ -1,24 +1,24 @@
 <script type="text/x-jquery-tmpl" id="macroRow">
 	<tr class="form_row">
 		<td>
-			<input class="input text" type="text" name="macros[#{macroNum}][macro]" size="30" maxlength="64"
+			<input class="input text" type="text" id="macros_#{macroNum}_macro" name="macros[#{macroNum}][macro]" size="30" maxlength="64"
 				placeholder="{$MACRO}" style="text-transform:uppercase;">
 		</td>
 		<td>
-			<span style="vertical-align:top;">⇒</span>
+			<span style="vertical-align:top;"><?php echo RARR ?></span>
 		</td>
 		<td>
-			<input class="input text" type="text" placeholder="value" name="macros[#{macroNum}][value]" size="40" maxlength="255">
+			<input class="input text" type="text" id="macros_#{macroNum}_value" name="macros[#{macroNum}][value]" size="40" maxlength="255" placeholder="value">
 		</td>
 		<td>
-			<input class="input link_menu macroRemove" type="button" value="<?php echo _('Remove'); ?>" data-is-new="1">
+			<input class="input link_menu macroRemove" type="button" id="macros_#{macroNum}_remove" name="macros_#{macroNum}_remove" value="<?php echo _('Remove'); ?>">
 		</td>
 	</tr>
 
 </script>
 
 <script type="text/javascript">
-	jQuery(document).ready(function() {
+	jQuery(function() {
 		'use strict';
 
 		var rowTemplate = new Template(jQuery('#macroRow').html());
@@ -35,12 +35,15 @@
 		jQuery('#macro_add').click(addMacroRow);
 
 		jQuery('#tbl_macros').on('click', 'input.macroRemove', function() {
+			var e = jQuery(this);
 
-			if (!jQuery(this).data('isNew')) {
+			// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
+			var macroNum = e.attr('id').split('_')[1];
+			if (jQuery('#macros_' + macroNum + '_id').length) {
 				var count = jQuery('#save').data('removedCount') + 1;
 				jQuery('#save').data('removedCount', count);
 			}
-			jQuery(this).closest('.form_row').remove();
+			e.closest('.form_row').remove();
 		});
 
 		jQuery('#save').click(function() {

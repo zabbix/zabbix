@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title']		= 'S_CONFIGURATION_OF_ACTIONS';
 $page['file']		= 'actionconf.php';
 $page['hist_arg']	= array();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 ?>
@@ -97,7 +97,7 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--------
@@ -554,6 +554,6 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

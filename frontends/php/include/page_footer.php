@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/config.inc.php';
 
 // if we include footer in some function
 if (!isset($page)) {

@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/views/js/configuration.action.edit.js.php');
+require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
 $inputLength = 60;
 

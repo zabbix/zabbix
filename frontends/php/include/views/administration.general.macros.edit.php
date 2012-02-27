@@ -19,61 +19,21 @@
 **/
 ?>
 <?php
-include('include/views/js/administration.general.macros.js.php');
 
 $macrosForm = new CForm();
 $macrosForm->setName('macrosForm');
-$macrosForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 
-$macrosTable = new CTable(SPACE, 'formElementTable');
-$macrosTable->setAttribute('id', 'tbl_macros');
-$macrosTable->addRow(array(_('Macro'), SPACE, _('Value'), SPACE));
+// tab
+$macrosTab = new CTabView();
 
-// fields
-$macros = array_values($this->data['macros']);
-foreach ($macros as $macroid => $macro) {
-	$text1 = new CTextBox('macros['.$macroid.'][macro]', $macro['macro'], 30, 'no', 64);
-	$text1->setAttribute('placeholder', '{$MACRO}');
-	$text1->setAttribute('style', 'text-transform:uppercase;');
-	$text2 = new CTextBox('macros['.$macroid.'][value]', $macro['value'], 40, 'no', 255);
-	$text2->setAttribute('placeholder', _('value'));
-	$span = new CSpan(RARR);
-	$span->addStyle('vertical-align:top;');
-
-	$deleteButton = new CButton('macros_del', _('Remove'));
-	$deleteButton->addClass('link_menu macroRemove');
-
-	$row = array($text1, $span, $text2, $deleteButton);
-	if (isset($macro['globalmacroid'])) {
-		$row[] = new CVar('macros['.$macroid.'][globalmacroid]', $macro['globalmacroid']);
-	}
-	$macrosTable->addRow($row, 'form_row');
-}
-
-// buttons
-$addButton = new CButton('macro_add', _('Add'));
-$addButton->addClass('link_menu');
+$macrosView = new CView('common.macros', array(
+	'macros' => $this->get('macros')
+));
+$macrosTab->addTab('macros', _('Macros'), $macrosView->render());
 
 $saveButton = new CSubmit('save', _('Save'));
 $saveButton->attr('data-removed-count', 0);
 $saveButton->addClass('main');
-
-$buttonColumn = new CCol($addButton);
-$buttonColumn->setAttribute('colspan', 5);
-
-$buttonRow = new CRow();
-$buttonRow->setAttribute('id', 'row_new_macro');
-$buttonRow->addItem($buttonColumn);
-
-$macrosTable->addRow($buttonRow);
-
-// form list
-$macrosFormList = new CFormList('macrosFormList');
-$macrosFormList->addRow($macrosTable);
-
-// tab
-$macrosTab = new CTabView();
-$macrosTab->addTab('macros', _('Macros'), $macrosFormList);
 
 $macrosForm->addItem($macrosTab);
 $macrosForm->addItem(makeFormFooter(array(), array($saveButton)));

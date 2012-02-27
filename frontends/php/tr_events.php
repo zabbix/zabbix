@@ -19,13 +19,13 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/acknow.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/events.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/users.inc.php');
-require_once('include/html.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/acknow.inc.php';
+require_once dirname(__FILE__).'/include/actions.inc.php';
+require_once dirname(__FILE__).'/include/events.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/users.inc.php';
+require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
@@ -63,7 +63,7 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
@@ -150,5 +150,5 @@ $ieTab->addRow(array($leftDiv, $middleDiv), 'top');
 $tr_event_wdgt->addItem($ieTab);
 $tr_event_wdgt->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

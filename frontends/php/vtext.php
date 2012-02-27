@@ -20,12 +20,12 @@
 ?>
 <?php
 define('ZBX_PAGE_NO_AUTHORIZATION', 1);
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'vtext.php';
 $page['type'] = PAGE_TYPE_IMAGE;
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -79,5 +79,5 @@ imageOut($newImage);
 imagedestroy($newImage);
 imagedestroy($im);
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>
