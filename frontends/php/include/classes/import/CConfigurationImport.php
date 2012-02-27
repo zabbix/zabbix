@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class for importing configuration data.
+ */
 class CConfigurationImport {
 
 	/**
@@ -27,6 +30,9 @@ class CConfigurationImport {
 	 */
 	protected $source;
 
+	/**
+	 * @var array with data read from source string
+	 */
 	protected $data;
 
 	/**
@@ -35,7 +41,15 @@ class CConfigurationImport {
 	protected $interfacesCache = array();
 
 
-	public function __construct($source, $options = array()) {
+	/**
+	 * Constructor.
+	 * Source string must be suitable for reader class,
+	 * i.e. if string contains json then reader should be able to read json.
+	 *
+	 * @param string $source
+	 * @param array $options
+	 */
+	public function __construct($source, array $options = array()) {
 		$this->options = array(
 			'groups' => array('missed' => false),
 			'hosts' => array('exist' => false, 'missed' => false),
@@ -55,13 +69,31 @@ class CConfigurationImport {
 		$this->source = $source;
 	}
 
+	/**
+	 * Set reader that is used to read data from source string that is passed to constructor.
+	 *
+	 * @param CImportReader $reader
+	 */
 	public function setReader(CImportReader $reader) {
 		$this->reader = $reader;
 	}
 
+	/**
+	 * Import configuration data.
+	 *
+	 * @todo for 1.8 version import old class zbxXML is used
+	 * @throws Exception
+	 * @return bool
+	 */
 	public function import() {
 		try {
+			// hack to make api throw exceptions
+			czbxrpc::$useExceptions = true;
 			DBstart();
+
+			if (empty($this->reader)) {
+				throw new UnexpectedValueException('Reader is not set.');
+			}
 			$this->data = $this->reader->read($this->source);
 
 			$version = $this->getImportVersion();
@@ -127,9 +159,11 @@ class CConfigurationImport {
 				}
 			}
 
+			czbxrpc::$useExceptions = false;
 			return DBend(true);
 		}
 		catch (Exception $e) {
+			czbxrpc::$useExceptions = false;
 			DBend(false);
 			throw $e;
 		}
@@ -1195,6 +1229,15 @@ class CConfigurationImport {
 	}
 
 
+	/**
+	 * Method for creating import formatter for specified import version.
+	 *
+	 * @throws InvalidArgumentException
+	 *
+	 * @param string $version
+	 *
+	 * @return C20ImportFormatter
+	 */
 	protected function getFormatter($version) {
 		switch ($version) {
 			case '2.0':
@@ -1206,42 +1249,15 @@ class CConfigurationImport {
 
 	}
 
+	/**
+	 * Get configuration import version.
+	 *
+	 * @return string
+	 */
 	protected function getImportVersion() {
 		if (isset($this->data['zabbix_export']['version'])) {
 			return $this->data['zabbix_export']['version'];
 		}
 		return '1.8';
-	}
-
-
-	protected static function validate($schema) {
-		libxml_use_internal_errors(true);
-
-		$result = self::$xml->relaxNGValidate($schema);
-
-		if (!$result) {
-			$errors = libxml_get_errors();
-			libxml_clear_errors();
-
-			foreach ($errors as $error) {
-				$text = '';
-
-				switch ($error->level) {
-					case LIBXML_ERR_WARNING:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Warning '.$error->code.': ';
-						break;
-					case LIBXML_ERR_ERROR:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Error '.$error->code.': ';
-						break;
-					case LIBXML_ERR_FATAL:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Fatal Error '.$error->code.': ';
-						break;
-				}
-
-				$text .= trim($error->message).' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
-				throw new Exception($text);
-			}
-		}
-		return true;
 	}
 }
