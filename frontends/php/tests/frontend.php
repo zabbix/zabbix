@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/general/GeneralTests.php');
-require_once(dirname(__FILE__).'/api/ApiTests.php');
-require_once(dirname(__FILE__).'/api_json/ApiJsonTests.php');
-require_once(dirname(__FILE__).'/selenium/SeleniumTests.php');
+require_once dirname(__FILE__).'/general/GeneralTests.php';
+require_once dirname(__FILE__).'/api/ApiTests.php';
+require_once dirname(__FILE__).'/api_json/ApiJsonTests.php';
+require_once dirname(__FILE__).'/selenium/SeleniumTests.php';
 
 class All {
 	public static function suite() {

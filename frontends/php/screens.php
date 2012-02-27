@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/graphs.inc.php');
-require_once('include/screens.inc.php');
-require_once('include/blocks.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/graphs.inc.php';
+require_once dirname(__FILE__).'/include/screens.inc.php';
+require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Custom screens');
 $page['file'] = 'screens.php';
@@ -34,7 +34,7 @@ if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -106,13 +106,13 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 ?>
 <?php
 // js templates
-require_once('include/views/js/general.script.confirm.js.php');
+require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 // whether we should use screen name to fetch a screen (if this is false, elementid is used)
 $use_screen_name = isset($_REQUEST['screenname']);
@@ -284,5 +284,5 @@ else {
 
 	echo SBR;
 }
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

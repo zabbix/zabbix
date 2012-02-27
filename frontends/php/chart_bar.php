@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/reports.inc.php');
-	require_once('include/graphs.inc.php');
+	require_once dirname(__FILE__).'/include/config.inc.php';
+	require_once dirname(__FILE__).'/include/reports.inc.php';
+	require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 	$page['file']	= 'chart_bar.php';
 	// $page['title']	= "S_CHART";
 	$page['type']	= PAGE_TYPE_IMAGE;
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -655,5 +655,5 @@ require_once('include/page_header.php');
 	$graph->Draw();
 ?>
 <?php
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

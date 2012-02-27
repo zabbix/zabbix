@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/perm.inc.php');
+require_once dirname(__FILE__).'/config.inc.php';
+require_once dirname(__FILE__).'/perm.inc.php';
 
 if (!isset($page['type'])) {
 	$page['type'] = PAGE_TYPE_HTML;
@@ -32,7 +32,7 @@ if ($_REQUEST['fullscreen'] = get_request('fullscreen', 0)) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 
-require_once('include/menu.inc.php');
+require_once dirname(__FILE__).'/menu.inc.php';
 
 zbx_define_menu_restrictions($page, $ZBX_MENU);
 

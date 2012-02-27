@@ -19,17 +19,17 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/items.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/items.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('CONFIGURATION OF DISCOVERY RULES');
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array('hostid');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 
@@ -147,7 +147,7 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
@@ -291,5 +291,5 @@ else {
 	$discoveryView->show();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

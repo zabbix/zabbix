@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/services.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['file'] = 'chart5.php';
 $page['type'] = PAGE_TYPE_IMAGE;

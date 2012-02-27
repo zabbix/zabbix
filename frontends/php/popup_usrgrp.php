@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/users.inc.php');
+	require_once dirname(__FILE__).'/include/config.inc.php';
+	require_once dirname(__FILE__).'/include/users.inc.php';
 
 	$page['title'] = "S_GROUPS";
 	$page['file'] = 'popup_usrgrp.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -106,6 +106,6 @@ if(form){
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

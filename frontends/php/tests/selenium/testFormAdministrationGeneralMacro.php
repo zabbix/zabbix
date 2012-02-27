@@ -44,7 +44,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 			$this->assertElementPresent("macros[$i][value]");
 		}
 		$this->assertElementPresent('macro_add');		// button "Add"
-		$this->assertElementPresent('macros_del');		// button "Delete selected"
+		$this->assertElementPresent('macros_0_remove');		// button "Delete selected"
 		$this->assertElementPresent('save');
 	}
 
@@ -99,7 +99,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('ERROR: Cannot update macros');
-		$this->ok('More than one macro with same name found:');
+		$this->ok('Macro "'.$row['macro'].'" already exists');
 		$this->ok('Macros');
 		$this->ok('Macro');
 		$this->ok('Value');
@@ -153,7 +153,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->login('adm.macros.php');
 		// No way to select what macro to remove currently
-		$this->click("id=macros_del");
+		$this->click("id=macros_0_remove");
 		$this->click("id=save");
 		$this->waitForConfirmation();
 		$this->wait();

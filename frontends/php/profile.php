@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/users.inc.php');
-require_once('include/forms.inc.php');
-require_once('include/media.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/users.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/media.inc.php';
 
 $page['title'] = _('User profile');
 $page['file'] = 'profile.php';
@@ -31,7 +31,7 @@ $page['scripts'] = array('class.cviewswitcher.js');
 
 ob_start();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 if ($USER_DETAILS['alias'] == ZBX_GUEST_USER) {
 	access_deny();
@@ -192,5 +192,5 @@ $usersView = new CView('administration.users.edit', $data);
 $usersView->render();
 $usersView->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

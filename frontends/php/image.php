@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/images.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/images.inc.php';
 
 $page['file'] = 'image.php';
 $page['title'] = _('Image');
 $page['type'] = PAGE_TYPE_IMAGE;
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -46,7 +46,7 @@ if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
 }
 if (!($row = get_image_by_imageid($_REQUEST['imageid']))) {
 	error(_('Incorrect image index.'));
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 }
 $source = imageFromString($row['image']);
 unset($row);
