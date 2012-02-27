@@ -461,6 +461,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
 ..F....... [ZBX-4579] fixed incorrect "unknown" values in availability report if no events present (Alexei)
 .......P.. [ZBX-4683] fixed timestamps mismatch while sending history data from proxy (Sasha)
 ..F....... [ZBX-4140] fixed trigger test functionality for operator '#' (Alexei)
