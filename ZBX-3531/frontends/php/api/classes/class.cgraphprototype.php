@@ -415,7 +415,6 @@ class CGraphPrototype extends CZBXAPI{
 			}
 		}
 
-COpt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}

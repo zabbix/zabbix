@@ -184,6 +184,9 @@ class CConfigurationImport {
 			foreach ($templates as $template) {
 				$templatesRefs[] = $template['host'];
 				$groupsRefs = zbx_objectValues($template['groups'], 'name');
+				if (!empty($template['templates'])) {
+					$templatesRefs = array_merge($templatesRefs, zbx_objectValues($template['templates'], 'name'));
+				}
 			}
 			$this->referencer->addTemplates($templatesRefs);
 			$this->referencer->addGroups($groupsRefs);
@@ -354,10 +357,56 @@ class CConfigurationImport {
 		if (empty($templates)) {
 			return;
 		}
+		$templates = zbx_toHash($templates, 'host');
 
-		$templatesToCreate = array();
-		$templatesToUpdate = array();
+
+		$orderedList = array();
+		$templatesInSource = array_keys($templates);
+		$parentTemplateRefs = array();
 		foreach ($templates as $template) {
+			$parentTemplateRefs[$template['host']] = array();
+
+			if (!empty($template['templates'])) {
+				foreach ($template['templates'] as $ref) {
+					// if template already exists in system, we skip it
+					if ($this->referencer->resolveTemplate($ref['name'])) {
+						continue;
+					}
+					else {
+						// if template is not in system and not in import, throw error
+						if (!in_array($ref['name'], $templatesInSource)) {
+							throw new Exception(_s('Template "%1$s" does not exist.', $ref['name']));
+						}
+						$parentTemplateRefs[$template['host']][$ref['name']] = $ref['name'];
+					}
+				}
+			}
+		}
+
+		// we go in cycle through all templates looking for one without parent templates
+		// when one fount it's pushed to ordered list and removed from list parent templates of all other templates
+		while (!empty($parentTemplateRefs)) {
+			$templateWithoutParents = false;
+			foreach ($parentTemplateRefs as $template => $refs) {
+				if (empty($refs)) {
+					$templateWithoutParents = $template;
+					$orderedList[] = $template;
+					unset($parentTemplateRefs[$template]);
+					break;
+				}
+			}
+			if (!$templateWithoutParents) {
+				throw new Exception('Circular template reference.');
+			}
+
+			foreach ($parentTemplateRefs as $template => $refs) {
+				unset($parentTemplateRefs[$template][$templateWithoutParents]);
+			}
+		}
+
+
+		foreach ($orderedList as $name) {
+			$template = $templates[$name];
 			foreach ($template['groups'] as $gnum => $group) {
 				if (!$this->referencer->resolveGroup($group['name'])) {
 					throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
@@ -366,31 +415,19 @@ class CConfigurationImport {
 			}
 			if (isset($template['templates'])) {
 				foreach ($template['templates'] as $tnum => $parentTemplate) {
-					if (!$this->referencer->resolveTemplate($parentTemplate['name'])) {
-						throw new Exception(_s('Template "%1$s" does not exist.', $parentTemplate['name']));
-					}
-					$template['templates'][$tnum] = array('templateid' => $this->referencer->resolveHostOrTemplate($parentTemplate['name']));
+					$template['templates'][$tnum] = array('templateid' => $this->referencer->resolveTemplate($parentTemplate['name']));
 				}
 			}
 
 			if ($this->referencer->resolveTemplate($template['host'])) {
 				$template['templateid'] = $this->referencer->resolveTemplate($template['host']);
-				$templatesToUpdate[] = $template;
+				API::Template()->update($template);
 			}
 			else {
-				$templatesToCreate[] = $template;
+				$newHostIds = API::Template()->create($template);
+				$hostid = reset($newHostIds['templateids']);
+				$this->referencer->addTemplateRef($template['host'], $hostid);
 			}
-		}
-
-		// create/update templates and create hash template->hostid
-		if ($this->options['templates']['missed'] && $templatesToCreate) {
-			$newHostIds = API::Template()->create($templatesToCreate);
-			foreach ($newHostIds['templateids'] as $hnum => $hostid) {
-				$this->referencer->addTemplateRef($templatesToCreate[$hnum]['host'], $hostid);
-			}
-		}
-		if ($this->options['templates']['exist'] && $templatesToUpdate) {
-			API::Template()->update($templatesToUpdate);
 		}
 	}
 

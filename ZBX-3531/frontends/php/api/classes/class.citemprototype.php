@@ -353,7 +353,6 @@ class CItemprototype extends CItemGeneral{
 			}
 		}
 
-COpt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -499,7 +498,6 @@ COpt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}

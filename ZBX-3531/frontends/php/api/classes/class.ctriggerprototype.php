@@ -647,7 +647,6 @@ class CTriggerPrototype extends CZBXAPI {
 			}
 		}
 
-Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -1020,7 +1019,6 @@ Copt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);

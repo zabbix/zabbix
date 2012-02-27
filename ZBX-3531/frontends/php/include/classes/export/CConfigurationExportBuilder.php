@@ -35,7 +35,7 @@ class CConfigurationExportBuilder {
 				'items' => $this->formatItems($template['items']),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'macros' => $this->formatMacros($template['macros']),
-				'templates' => $template['templates'],
+				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'screens' => $this->formatScreens($template['screens']),
 			);
 		}

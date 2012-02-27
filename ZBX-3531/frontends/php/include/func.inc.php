@@ -1266,7 +1266,7 @@ function createParentToChildRelation(&$chain, $link, $parentField, $childField) 
 }
 
 // object or array of objects to hash
-function zbx_toHash(&$value, $field = null) {
+function zbx_toHash($value, $field = null) {
 	if (is_null($value)) {
 		return $value;
 	}
@@ -1279,7 +1279,7 @@ function zbx_toHash(&$value, $field = null) {
 		$result[$value[$field]] = $value;
 	}
 	else {
-		foreach ($value as $key => $val) {
+		foreach ($value as $val) {
 			if (!is_array($val)) {
 				$result[$val] = $val;
 			}
@@ -1292,7 +1292,7 @@ function zbx_toHash(&$value, $field = null) {
 }
 
 // Value or Array to Object or Array of objects
-function zbx_toObject(&$value, $field) {
+function zbx_toObject($value, $field) {
 	if (is_null($value)) {
 		return $value;
 	}
@@ -1303,7 +1303,7 @@ function zbx_toObject(&$value, $field) {
 		$result = array(array($field => $value));
 	}
 	elseif (!isset($value[$field])) {
-		foreach ($value as $key => $val) {
+		foreach ($value as $val) {
 			if (!is_array($val)) {
 				$result[] = array($field => $val);
 			}
@@ -1336,7 +1336,7 @@ function zbx_toArray($value) {
 }
 
 // value OR object OR array of objects TO an array
-function zbx_objectValues(&$value, $field) {
+function zbx_objectValues($value, $field) {
 	if (is_null($value)) {
 		return $value;
 	}
@@ -1349,7 +1349,7 @@ function zbx_objectValues(&$value, $field) {
 		$result = array($value[$field]);
 	}
 	else {
-		foreach ($value as $key => $val) {
+		foreach ($value as $val) {
 			if (!is_array($val)) {
 				$result[] = $val;
 			}
