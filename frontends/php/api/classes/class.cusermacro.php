@@ -534,7 +534,7 @@ class CUserMacro extends CZBXAPI {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	public function validateCreate(array $hostMacros) {
+	protected function validateCreate(array $hostMacros) {
 		// check the data required for authorization first
 		foreach ($hostMacros as $hostMacro) {
 			$this->checkHostId($hostMacro);
