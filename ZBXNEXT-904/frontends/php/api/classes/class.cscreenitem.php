@@ -464,10 +464,8 @@ class CScreenItem extends CZBXAPI {
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => true
 			));
-			foreach ($screens as $id) {
-				if (!isset($result[$id])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect screen ID "%s" provided for screen element.', $id));
-				}
+			if (empty($result)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect screen ID "%s" provided for screen element.', $id));
 			}
 		}
 	}

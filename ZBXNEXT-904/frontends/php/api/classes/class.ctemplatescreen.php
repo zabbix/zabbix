@@ -26,7 +26,7 @@
 /**
  * Class containing methods for operations with Screens
  */
-class CTemplateScreen extends CScreen{
+class CTemplateScreen extends CScreen {
 
 	protected $tableName = 'screens';
 	protected $tableAlias = 's';
@@ -142,7 +142,7 @@ class CTemplateScreen extends CScreen{
 				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
 				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
 				$sqlParts['where'][] = 'r.permission>='.$permission;
-				$sqlParts['where'][] = 'NOT EXISTS('.
+				$sqlParts['where'][] = 'NOT EXISTS ('.
 									' SELECT hgg.groupid'.
 									' FROM hosts_groups hgg,rights rr,users_groups gg'.
 									' WHERE hgg.hostid=hg.hostid'.
@@ -181,7 +181,7 @@ class CTemplateScreen extends CScreen{
 				zbx_value2array($options['hostids']);
 				$options['hostids'] = array_merge($options['hostids'], $options['templateids']);
 			}
-			else{
+			else {
 				$options['hostids'] = $options['templateids'];
 			}
 		}
@@ -491,7 +491,6 @@ class CTemplateScreen extends CScreen{
 			'nopermissions' => true,
 			'limit' => 1
 		);
-
 		if (isset($data['node'])) {
 			$options['nodeids'] = getNodeIdByNodeName($data['node']);
 		}
@@ -519,17 +518,14 @@ class CTemplateScreen extends CScreen{
 		$screenNames = zbx_objectValues($screens, 'name');
 		$templateids = zbx_objectValues($screens, 'templateid');
 
-		// exists
-		$options = array(
+		$dbScreens = $this->get(array(
 			'filter' => array(
 				'name' => $screenNames,
 				'templateid' => $templateids
 			),
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
-		);
-		$dbScreens = $this->get($options);
-
+		));
 		foreach ($screens as $screen) {
 			$screenDbFields = array('name' => null, 'templateid' => null);
 			if (!check_db_fields($screenDbFields, $screen)) {
@@ -538,7 +534,7 @@ class CTemplateScreen extends CScreen{
 
 			foreach ($dbScreens as $dbsnum => $dbScreen) {
 				if ($dbScreen['name'] == $screen['name'] && bccomp($dbScreen['templateid'], $screen['templateid']) == 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen').' [ '.$dbScreen['name'].' ] '._('already exists'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen').' "'.$dbScreen['name'].'" '._('already exists'));
 				}
 			}
 		}
@@ -584,7 +580,7 @@ class CTemplateScreen extends CScreen{
 			}
 		}
 
-		foreach ($screens as $snum => $screen) {
+		foreach ($screens as $screen) {
 			$screenDbFields = array('screenid' => null);
 			if (!check_db_fields($screenDbFields, $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%s".', $screen['name']));
@@ -609,7 +605,7 @@ class CTemplateScreen extends CScreen{
 				$existScreen = reset($existScreens);
 
 				if ($existScreen && (bccomp($existScreen['screenid'], $screen['screenid']) != 0))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen').' [ '.$screen['name'].' ] '._('already exists'));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen').' "'.$screen['name'].'" '._('already exists'));
 			}
 
 			$screenid = $screen['screenid'];
@@ -639,12 +635,11 @@ class CTemplateScreen extends CScreen{
 	public function delete($screenids) {
 		$screenids = zbx_toArray($screenids);
 
-		$options = array(
+		$delScreens = $this->get(array(
 			'screenids' => $screenids,
 			'editable' => true,
 			'preservekeys' => true
-		);
-		$delScreens = $this->get($options);
+		));
 		foreach ($screenids as $screenid) {
 			if (!isset($delScreens[$screenid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));

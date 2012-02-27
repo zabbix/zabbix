@@ -63,8 +63,8 @@ else {
 	$resourceid		= get_request('resourceid', 0);
 	$width			= get_request('width', 500);
 	$height			= get_request('height', 100);
-	$colspan		= get_request('colspan', 0);
-	$rowspan		= get_request('rowspan', 0);
+	$colspan		= get_request('colspan', 1);
+	$rowspan		= get_request('rowspan', 1);
 	$elements		= get_request('elements', 25);
 	$valign			= get_request('valign', VALIGN_DEFAULT);
 	$halign			= get_request('halign', HALIGN_DEFAULT);
@@ -397,7 +397,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_SCREEN) {
 				continue;
 			}
 
-			$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+			$row['node_name'] = !empty($row['node_name']) ? '('.$row['node_name'].') ' : '';
 			$caption = $row['node_name'].$row['name'];
 			$id = $resourceid;
 		}
@@ -564,8 +564,8 @@ $verticalAlignRadioButton = array(
 	new CLabel(_('Bottom'), 'valign_'.VALIGN_BOTTOM)
 );
 $screenFormList->addRow(_('Vertical align'), new CDiv($verticalAlignRadioButton, 'jqueryinputset'));
-$screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 2));
-$screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 2));
+$screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
+$screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
 
 // dynamic addon
 if ($this->data['screen']['templateid'] == 0 && in_array($resourcetype, array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
