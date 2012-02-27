@@ -2,6 +2,15 @@
 
 class CXmlImportReader extends CImportReader {
 
+	/**
+	 * Convert string with xml data to php array.
+	 *
+	 * @throws Exception
+	 *
+	 * @param string $string
+	 *
+	 * @return array
+	 */
 	public function read($string) {
 		libxml_use_internal_errors(true);
 		$result = simplexml_load_string($string);
@@ -36,7 +45,14 @@ class CXmlImportReader extends CImportReader {
 		return $array;
 	}
 
-	function xmlToArray($xml) {
+	/**
+	 * Method for recursive processing of xml dom nodes.
+	 *
+	 * @param string $xml
+	 *
+	 * @return array|string
+	 */
+	protected function xmlToArray($xml) {
 		$array = '';
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
