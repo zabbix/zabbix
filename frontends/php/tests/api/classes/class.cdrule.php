@@ -21,18 +21,18 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../../../include/defines.inc.php');
-require_once(dirname(__FILE__).'/../../../include/validate.inc.php');
-require_once(dirname(__FILE__).'/../../../include/func.inc.php');
-require_once(dirname(__FILE__).'/../../../include/gettextwrapper.inc.php');
-require_once(dirname(__FILE__).'/../../../include/nodes.inc.php');
-require_once(dirname(__FILE__).'/../../../conf/zabbix.conf.php');
-require_once(dirname(__FILE__).'/../../../include/db.inc.php');
-require_once(dirname(__FILE__).'/../../../include/copt.lib.php');
-require_once(dirname(__FILE__).'/../../../include/api.inc.php');
-require_once(dirname(__FILE__).'/../../../include/items.inc.php');
-require_once(dirname(__FILE__).'/../../../include/triggers.inc.php');
-require_once(dirname(__FILE__).'/../../../api/classes/class.apiexception.php');
+require_once dirname(__FILE__).'/../../../include/defines.inc.php';
+require_once dirname(__FILE__).'/../../../include/validate.inc.php';
+require_once dirname(__FILE__).'/../../../include/func.inc.php';
+require_once dirname(__FILE__).'/../../../include/gettextwrapper.inc.php';
+require_once dirname(__FILE__).'/../../../include/nodes.inc.php';
+require_once dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+require_once dirname(__FILE__).'/../../../include/db.inc.php';
+require_once dirname(__FILE__).'/../../../include/copt.lib.php';
+require_once dirname(__FILE__).'/../../../include/api.inc.php';
+require_once dirname(__FILE__).'/../../../include/items.inc.php';
+require_once dirname(__FILE__).'/../../../include/triggers.inc.php';
+require_once dirname(__FILE__).'/../../../api/classes/class.apiexception.php';
 
 
 if (!function_exists('error')) {
@@ -54,11 +54,11 @@ class CDRuleTest extends PHPUnit_Framework_TestCase {
 
 	public static function autoloadRegister($name) {
 		if (is_file(dirname(__FILE__).'/../../../api/classes/class.'.strtolower($name).'.php'))
-			require_once(dirname(__FILE__).'/../../../api/classes/class.'.strtolower($name).'.php');
+			require_once dirname(__FILE__).'/../../../api/classes/class.'.strtolower($name).'.php';
 		elseif (is_file(dirname(__FILE__).'/../../../include/classes/class.'.strtolower($name).'.php'))
-			require_once(dirname(__FILE__).'/../../../include/classes/class.'.strtolower($name).'.php');
+			require_once dirname(__FILE__).'/../../../include/classes/class.'.strtolower($name).'.php';
 		else
-			require_once(dirname(__FILE__).'/../../../api/rpc/class.'.strtolower($name).'.php');
+			require_once dirname(__FILE__).'/../../../api/rpc/class.'.strtolower($name).'.php';
 	}
 
 	public static function setUpBeforeClass() {

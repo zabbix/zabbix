@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/graphs.inc.php');
-require_once('include/screens.inc.php');
-require_once('include/blocks.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/graphs.inc.php';
+require_once dirname(__FILE__).'/include/screens.inc.php';
+require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Custom slides');
 $page['file'] = 'slides.php';
@@ -30,7 +30,7 @@ $page['hist_arg'] = array('elementid');
 $page['scripts'] = array('class.pmaster.js', 'class.calendar.js', 'gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -162,7 +162,7 @@ if (isset($_REQUEST['favobj'])) {
 	}
 }
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
@@ -240,5 +240,5 @@ $slidesView = new CView('monitoring.slides', $data);
 $slidesView->render();
 $slidesView->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

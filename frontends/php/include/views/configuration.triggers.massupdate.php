@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/views/js/configuration.triggers.edit.js.php');
+require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $triggersWidget = new CWidget();
 $triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
