@@ -745,8 +745,6 @@ require_once('include/js.inc.php');
 
 	// editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
 	function get_screen($screenid, $editmode, $effectiveperiod=NULL){
-		global $USER_DETAILS;
-
 		if($screenid == 0) return new CTableInfo(S_NO_SCREENS_DEFINED);
 		$r = CScreen::get(array(
 			'screenids' => $screenid,
@@ -1349,15 +1347,17 @@ require_once('include/js.inc.php');
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SERVER_INFO) ){
-//					$item = array(get_table_header(S_STATUS_OF_ZABBIX_BIG),make_status_of_zbx());
 					$item = array(new CServerInfo());
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_CLOCK) ){
-					$item = new CFlashClock($width, $height, $style, $action);
+				else if (($screenitemid != 0) && ($resourcetype == SCREEN_RESOURCE_CLOCK)) {
+					$item = array(new CDiv(new CFlashClock($width, $height, $style, $action)));
+					if ($editmode == 1) {
+						array_push($item, new CLink(S_CHANGE, $action));
+					}
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SCREEN) ){
-					$item = array(get_screen($resourceid, 2, $effectiveperiod));
+					$item = array(get_screen($resourceid, 0, $effectiveperiod));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) ){
