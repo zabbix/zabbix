@@ -34,7 +34,6 @@ $fields = array(
 	'macro_new'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
 	'value_new'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
 	'macro_add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'macros_del' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 
 	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
@@ -43,7 +42,7 @@ $fields = array(
 <?php
 check_fields($fields);
 
-
+$result = true;
 if (isset($_REQUEST['save'])) {
 	try {
 		DBstart();
@@ -67,18 +66,6 @@ if (isset($_REQUEST['save'])) {
 		foreach ($newMacros as $number => $newMacro) {
 			// transform macros to uppercase {$aaa} => {$AAA}
 			$newMacros[$number]['macro'] = zbx_strtoupper($newMacro['macro']);
-
-			// search for duplicates items in new macros array
-			foreach ($newMacros as $duplicateNumber => $duplicateNewMacro) {
-				if ($number != $duplicateNumber && $newMacros[$number]['macro'] == $duplicateNewMacro['macro']) {
-					$duplicatedMacros[] = '"'.$newMacros[$number]['macro'].'"';
-				}
-			}
-		}
-
-		// validate duplicates macros
-		if (!empty($duplicatedMacros)) {
-			throw new Exception(_s('More than one macro with same name found: %1$s .', implode(', ', array_unique($duplicatedMacros))));
 		}
 
 		// update
@@ -148,10 +135,12 @@ if (isset($_REQUEST['save'])) {
 			'preservekeys' => true
 		));
 
+		$result = true;
 		DBend(true);
 		show_message(_('Macros updated'));
 	}
 	catch (Exception $e) {
+		$result = false;
 		DBend(false);
 		error($e->getMessage());
 		show_error_message(_('Cannot update macros'));
@@ -193,7 +182,6 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'globalmacro' => 1
 	));
-	order_result($data['macros'], 'macro');
 }
 if (empty($data['macros'])) {
 	$data['macros'] = array(
@@ -203,7 +191,9 @@ if (empty($data['macros'])) {
 		)
 	);
 }
-
+if ($result) {
+	$data['macros'] = order_macros($data['macros'], 'macro');
+}
 $macrosForm = new CView('administration.general.macros.edit', $data);
 $cnf_wdgt->addItem($macrosForm->render());
 

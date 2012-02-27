@@ -2,6 +2,8 @@
 Changes for 1.9.10
 
 New features:
+A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces (pavels)
+..F....... [ZBX-4563] improved SQL query debug log design (pavels)
 ..F....... [ZBX-4537] improved include_once statements to make Zabbix code easier to reuse (Alexei)
 ..F....... [ZBXNEXT-1113] redesign Configuration->Host->Discovery rules (Eduard)
 ..F....... [ZBXNEXT-1107] redesign Configuration->Audit (Eduard)
@@ -10,6 +12,9 @@ New features:
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+A.F....... [ZBX-4563] fixed host macro IDs being regenerated when updating macros (pavels)
+A.F....... [ZBX-4563] fixed several macro validation issues (pavels)
+..F....... [ZBX-4563] fixed macro sorting (pavels)
 ..F....... [ZBX-3735] fixed login form to send passwords via POST not GET; thanks to Joseph Bueno (Alexei)
 A......... [ZBX-954] increased API version to 1.4, Zabbix 1.8.x is using 1.3 (Alexei)
 A.F....... [ZBX-4604] fixed "screen" type screen item validation (pavels)
