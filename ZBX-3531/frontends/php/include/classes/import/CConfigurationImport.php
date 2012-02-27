@@ -483,20 +483,23 @@ class CConfigurationImport {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
+
 		foreach ($dbInterfaces as $dbInterface) {
 			foreach ($hostInterfacesRefsByName as $hostName => $interfaceRefs) {
+				$hostId = $this->referencer->resolveHost($hostName);
 				if (!isset($this->interfacesCache[$processedHosts[$hostName]])) {
-					$this->interfacesCache[$this->referencer->resolveHost($hostName)] = array();
+					$this->interfacesCache[$hostId] = array();
 				}
 
 				foreach ($interfaceRefs as $refName => $interface) {
-					if ($dbInterface['ip'] == $interface['ip']
+					if ($hostId == $dbInterface['hostid']
+							&& $dbInterface['ip'] == $interface['ip']
 							&& $dbInterface['dns'] == $interface['dns']
 							&& $dbInterface['useip'] == $interface['useip']
 							&& $dbInterface['port'] == $interface['port']
 							&& $dbInterface['type'] == $interface['type']
 							&& $dbInterface['main'] == $interface['main']) {
-						$this->interfacesCache[$this->referencer->resolveHost($hostName)][$refName] = $dbInterface['interfaceid'];
+						$this->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
 					}
 				}
 			}
