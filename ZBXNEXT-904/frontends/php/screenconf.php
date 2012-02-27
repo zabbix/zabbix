@@ -143,16 +143,33 @@ elseif (isset($_REQUEST['save'])) {
 			'name' => $_REQUEST['name'],
 			'hsize' => $_REQUEST['hsize'],
 			'vsize' => $_REQUEST['vsize'],
-			'templateid' => get_request('templateid')
+			'templateid' => get_request('templateid', 0)
 		);
 		if (isset($_REQUEST['templateid'])) {
-			$result = API::TemplateScreen()->update($screen);
+			$screenOld = API::TemplateScreen()->get(array(
+				'screenids' => $_REQUEST['screenid'],
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true
+			));
+			$screenOld = reset($screenOld);
+
+			$screenids = API::TemplateScreen()->update($screen);
 		}
 		else {
-			$result = API::Screen()->update($screen);
+			$screenOld = API::Screen()->get(array(
+				'screenids' => $_REQUEST['screenid'],
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true
+			));
+			$screenOld = reset($screenOld);
+
+			$screenids = API::Screen()->update($screen);
 		}
-		$audit_action = AUDIT_ACTION_UPDATE;
-		show_messages($result, _('Screen updated'), _('Cannot update screen'));
+
+		if (!empty($screenids)) {
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'screens', $screenOld, $screen);
+		}
+		show_messages(!empty($screenids), _('Screen updated'), _('Cannot update screen'));
 	}
 	else {
 		if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
@@ -166,16 +183,21 @@ elseif (isset($_REQUEST['save'])) {
 			'templateid' => get_request('templateid')
 		);
 		if (isset($_REQUEST['templateid'])) {
-			$result = API::TemplateScreen()->create($screen);
+			$screenids = API::TemplateScreen()->create($screen);
 		}
 		else {
-			$result = API::Screen()->create($screen);
+			$screenids = API::Screen()->create($screen);
 		}
-		$audit_action = AUDIT_ACTION_ADD;
-		show_messages($result, _('Screen added'), _('Cannot add screen'));
+
+		if (!empty($screenids)) {
+			$screenid = reset($screenids);
+			$screenid = reset($screenid);
+			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCREEN, $screenid, $screen['name']);
+		}
+		show_messages(!empty($screenids), _('Screen added'), _('Cannot add screen'));
 	}
-	if ($result) {
-		add_audit($audit_action, AUDIT_RESOURCE_SCREEN,' Name ['.$_REQUEST['name'].'] ');
+
+	if (!empty($screenids)) {
 		unset($_REQUEST['form'], $_REQUEST['screenid']);
 	}
 }
@@ -184,27 +206,40 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST[
 	if (isset($_REQUEST['screenid'])) {
 		$screenids[] = $_REQUEST['screenid'];
 	}
-	$options = array(
+
+	$screens = API::Screen()->get(array(
 		'screenids' => $screenids,
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true
-	);
-	$screens = API::Screen()->get($options);
-	$templatedScreens = API::TemplateScreen()->get($options);
+	));
 
 	if (!empty($screens)) {
 		$go_result = API::Screen()->delete($screenids);
+
+		if ($go_result) {
+			foreach ($screens as $screen) {
+				add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name']);
+			}
+		}
 	}
 	else {
 		$go_result = API::TemplateScreen()->delete($screenids);
+
+		if ($go_result) {
+			$templatedScreens = API::TemplateScreen()->get(array(
+				'screenids' => $screenids,
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true
+			));
+
+			foreach ($templatedScreens as $screen) {
+				add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name']);
+			}
+		}
 	}
 
 	if ($go_result) {
 		unset($_REQUEST['screenid'], $_REQUEST['form']);
-
-		foreach ($screens as $screen) {
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], null, null, null);
-		}
 	}
 
 	show_messages($go_result, _('Screen deleted'), _('Cannot delete screen'));
