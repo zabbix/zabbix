@@ -3,6 +3,32 @@
 class CXmlImportReader extends CImportReader {
 
 	public function read($string) {
+		libxml_use_internal_errors(true);
+		$result = simplexml_load_string($string);
+		if (!$result) {
+			$errors = libxml_get_errors();
+			libxml_clear_errors();
+
+			foreach ($errors as $error) {
+				$text = '';
+
+				switch ($error->level) {
+					case LIBXML_ERR_WARNING:
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Warning '.$error->code.': ';
+						break;
+					case LIBXML_ERR_ERROR:
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Error '.$error->code.': ';
+						break;
+					case LIBXML_ERR_FATAL:
+						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Fatal Error '.$error->code.': ';
+						break;
+				}
+
+				$text .= trim($error->message).' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
+				throw new Exception($text);
+			}
+		}
+
 		$xml = new XMLReader();
 		$xml->xml($string);
 		$array = $this->xmlToArray($xml);
@@ -15,7 +41,7 @@ class CXmlImportReader extends CImportReader {
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:
-					if ($array === null) {
+					if ($array === '') {
 						$array = array();
 					}
 

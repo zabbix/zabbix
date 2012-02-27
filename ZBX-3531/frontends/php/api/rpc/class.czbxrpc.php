@@ -22,6 +22,7 @@
 
 class czbxrpc{
 
+	public static $useExceptions = false;
 	private static $transactionStarted = false;
 
 
@@ -114,16 +115,21 @@ class czbxrpc{
 			$result = ($method === 'user.login');
 			self::transactionEnd($result);
 
-			$result = array(
-				'error' => $e->getCode(),
-				'data' => $e->getMessage(),
-			);
-
-			if (isset(CZBXAPI::$userData['debug_mode']) && CZBXAPI::$userData['debug_mode']) {
-				$result['debug'] = $e->getTrace();
+			if (self::$useExceptions) {
+				throw new Exception($e->getMessage(), $e->getCode());
 			}
+			else {
+				$result = array(
+					'error' => $e->getCode(),
+					'data' => $e->getMessage(),
+				);
 
-			return $result;
+				if (isset(CZBXAPI::$userData['debug_mode']) && CZBXAPI::$userData['debug_mode']) {
+					$result['debug'] = $e->getTrace();
+				}
+
+				return $result;
+			}
 		}
 	}
 
