@@ -35,7 +35,6 @@ class CImportReferencer {
 		if ($this->templatesRefs === null) {
 			$this->selectTemplates();
 		}
-
 		return isset($this->templatesRefs[$host]) ? $this->templatesRefs[$host] : false;
 	}
 

@@ -123,7 +123,6 @@ class CConfigurationExport {
 			'preservekeys' => true
 		));
 
-
 		// merge host groups with all groups
 		$templateGroups = $templateScreenIds = array();
 		foreach ($templates as &$template) {

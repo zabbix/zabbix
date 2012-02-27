@@ -80,7 +80,7 @@ $ZBX_MENU = array(
 				'url' => 'srv_status.php',
 				'label' => _('IT services'),
 				'force_disable_all_nodes' => true,
-				'sub_pages' => array('report3.php', 'report7.php', 'chart_sla.php', 'chart5.php')
+				'sub_pages' => array('report3.php', 'chart_sla.php', 'chart5.php')
 			),
 			array(
 				'url' => 'vtext.php'
@@ -208,7 +208,7 @@ $ZBX_MENU = array(
 			array(
 				'url' => 'sysmaps.php',
 				'label' => _('Maps'),
-				'sub_pages' => array('image.php', 'sysmap.php', 'popup_link_tr.php')
+				'sub_pages' => array('image.php', 'sysmap.php')
 			),
 			array(
 				'url' => 'discoveryconf.php',
