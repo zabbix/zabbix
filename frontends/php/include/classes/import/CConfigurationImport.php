@@ -550,10 +550,6 @@ class CConfigurationImport {
 		$itemsToUpdate = array();
 		$prototypesToUpdate = array();
 		$prototypesToCreate = array();
-		$triggersToCreate = array();
-		$triggersToUpdate = array();
-		$graphsToCreate = array();
-		$graphsToUpdate = array();
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
 			if ($hostid) {
@@ -597,7 +593,53 @@ class CConfigurationImport {
 							$prototypesToCreate[] = $prototype;
 						}
 					}
+				}
+			}
+		}
 
+		// create/update items and create hash hostid->key_->itemid
+		if ($this->options['items']['missed'] && $itemsToCreate) {
+			$newItemsIds = API::DiscoveryRule()->create($itemsToCreate);
+			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
+				$item = $itemsToCreate[$inum];
+				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
+			}
+		}
+		if ($this->options['items']['exist'] && $itemsToUpdate) {
+			API::DiscoveryRule()->update($itemsToUpdate);
+		}
+
+
+		if ($prototypesToCreate) {
+			foreach ($prototypesToCreate as &$prototype) {
+				$prototype['ruleid'] = $this->referencer->resolveItem($prototype['rule']['hostid'], $prototype['rule']['key']);
+			}
+			unset($prototype);
+			$newPrototypeIds = API::ItemPrototype()->create($prototypesToCreate);
+			foreach ($newPrototypeIds['itemids'] as $inum => $itemid) {
+				$item = $prototypesToCreate[$inum];
+				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
+			}
+		}
+		if ($prototypesToUpdate) {
+			foreach ($prototypesToCreate as &$prototype) {
+				$prototype['ruleid'] = $this->referencer->resolveItem($prototype['rule']['hostid'], $prototype['rule']['key']);
+			}
+			unset($prototype);
+
+			API::ItemPrototype()->update($prototypesToUpdate);
+		}
+
+
+		// first we need to create item prototypes and only then graph prototypes
+		$triggersToCreate = array();
+		$triggersToUpdate = array();
+		$graphsToCreate = array();
+		$graphsToUpdate = array();
+		foreach ($allDiscoveryRules as $host => $discoveryRules) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			if ($hostid) {
+				foreach ($discoveryRules as $item) {
 					// trigger prototypes
 					foreach ($item['trigger_prototypes'] as $trigger) {
 						$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
@@ -662,36 +704,6 @@ class CConfigurationImport {
 				}
 			}
 		}
-
-		// create/update items and create hash hostid->key_->itemid
-		if ($this->options['items']['missed'] && $itemsToCreate) {
-			$newItemsIds = API::DiscoveryRule()->create($itemsToCreate);
-			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
-				$item = $itemsToCreate[$inum];
-				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
-			}
-		}
-		if ($this->options['items']['exist'] && $itemsToUpdate) {
-			API::DiscoveryRule()->update($itemsToUpdate);
-		}
-
-
-		if ($prototypesToCreate) {
-			foreach ($prototypesToCreate as &$prototype) {
-				$prototype['ruleid'] = $this->referencer->resolveItem($prototype['rule']['hostid'], $prototype['rule']['key']);
-			}
-			unset($prototype);
-			API::ItemPrototype()->create($prototypesToCreate);
-		}
-		if ($prototypesToUpdate) {
-			foreach ($prototypesToCreate as &$prototype) {
-				$prototype['ruleid'] = $this->referencer->resolveItem($prototype['rule']['hostid'], $prototype['rule']['key']);
-			}
-			unset($prototype);
-
-			API::ItemPrototype()->update($prototypesToUpdate);
-		}
-
 
 		if ($triggersToCreate) {
 			API::TriggerPrototype()->create($triggersToCreate);
