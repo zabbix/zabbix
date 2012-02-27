@@ -237,13 +237,6 @@ foreach ($sysmap['links'] as &$link) {
 }
 unset($link);
 
-
-$iconList = array();
-$result = DBselect('SELECT imageid, name FROM images WHERE imagetype=1 AND '.DBin_node('imageid'));
-while($row = DBfetch($result)){
-	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
-}
-
 if ($sysmap['iconmapid']) {
 	$iconMaps = API::IconMap()->get(array(
 		'iconmapids' => $sysmap['iconmapid'],
@@ -258,7 +251,7 @@ else {
 }
 
 $iconList = array();
-$result = DBselect('SELECT i.imageid, i.name FROM images i WHERE i.imagetype='.IMAGE_TYPE_ICON.' AND '.DBin_node('i.imageid'));
+$result = DBselect('SELECT i.imageid, i.name FROM images i WHERE i.imagetype='.IMAGE_TYPE_ICON.' AND '.DBin_node('i.imageid').' ORDER BY i.name ASC');
 while ($row = DBfetch($result)) {
 	$iconList[] = array('imageid' => $row['imageid'], 'name' => $row['name']);
 }
