@@ -61,20 +61,19 @@ ALTER TABLE items
 	ADD description text NOT NULL,
 	ADD inventory_link integer DEFAULT '0' NOT NULL,
 	ADD lifetime varchar(64) DEFAULT '30' NOT NULL;
-
-UPDATE items SET templateid=NULL WHERE templateid=0;
 CREATE TEMPORARY TABLE tmp_items_itemid (itemid bigint unsigned PRIMARY KEY);
-
 INSERT INTO tmp_items_itemid (itemid) (SELECT itemid FROM items);
-UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM tmp_items_itemid);
+UPDATE items
+	SET templateid=NULL
+	WHERE templateid=0
+		OR templateid NOT IN (SELECT itemid FROM tmp_items_itemid);
 DROP TABLE tmp_items_itemid;
-
-UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
-UPDATE items SET valuemapid=NULL WHERE valuemapid IS NOT NULL AND valuemapid NOT IN (SELECT valuemapid from valuemaps);
+UPDATE items
+	SET valuemapid=NULL
+	WHERE valuemapid=0
+		OR valuemapid NOT IN (SELECT valuemapid FROM valuemaps);
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
-
 DELETE FROM items WHERE hostid NOT IN (SELECT hostid FROM hosts);
-
 ALTER TABLE items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
 ALTER TABLE items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE;
 ALTER TABLE items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);
@@ -192,8 +191,20 @@ ALTER TABLE hosts MODIFY hostid bigint unsigned NOT NULL,
 		  ADD jmx_errors_from integer DEFAULT '0' NOT NULL,
 		  ADD jmx_error varchar(128) DEFAULT '' NOT NULL,
 		  ADD name varchar(64) DEFAULT '' NOT NULL;
-UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
-UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
+CREATE TEMPORARY TABLE tmp_hosts_hostid (hostid bigint unsigned PRIMARY KEY);
+INSERT INTO tmp_hosts_hostid (hostid) (SELECT hostid FROM hosts);
+UPDATE hosts
+	SET proxy_hostid=NULL
+	WHERE proxy_hostid=0
+		OR proxy_hostid NOT IN (SELECT hostid FROM tmp_hosts_hostid);
+DROP TABLE tmp_hosts_hostid;
+UPDATE hosts
+	SET maintenanceid=NULL,
+		maintenance_status=0,
+		maintenance_type=0,
+		maintenance_from=0
+	WHERE maintenanceid=0
+		OR maintenanceid NOT IN (SELECT maintenanceid FROM maintenances);
 UPDATE hosts SET name=host WHERE status in (0,1,3);	-- MONITORED, NOT_MONITORED, TEMPLATE
 CREATE INDEX hosts_4 on hosts (name);
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);
