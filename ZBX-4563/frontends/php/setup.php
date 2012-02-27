@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/setup.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/setup.inc.php';
 
 /* ******** */
 
@@ -121,7 +121,7 @@ if(!defined('PAGE_HEADER_LOADED'))
 	zbx_set_post_cookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 ?>
 <?php
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 	global	$ZBX_CONFIGURATION_FILE;
 
@@ -135,5 +135,5 @@ require_once('include/page_header.php');
 	unset($_POST);
 
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

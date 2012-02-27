@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/forms.inc.php');
-require_once('include/discovery.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/discovery.inc.php';
 
 $page['title'] = _('Configuration of discovery');
 $page['file'] = 'discoveryconf.php';
@@ -29,7 +29,7 @@ $page['hist_arg'] = array();
 $page['scripts'] = array();
 $page['type'] = detect_page_type();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -86,7 +86,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	}
 	$ajaxResponse->send();
 
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
@@ -272,5 +272,5 @@ else {
 	$discoveryView->show();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>
