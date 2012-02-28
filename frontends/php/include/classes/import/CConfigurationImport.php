@@ -991,7 +991,7 @@ class CConfigurationImport {
 
 		foreach ($allMaps as $map) {
 			// resolve icon map
-			if (isset($map['iconmap'])) {
+			if (!empty($map['iconmap'])) {
 				$iconMap = API::IconMap()->get(array(
 					'filter' => array('name' => $map['iconmap']),
 					'output' => API_OUTPUT_SHORTEN,
