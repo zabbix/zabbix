@@ -1,8 +1,8 @@
 <?php
 // get language translations
-require_once('include/gettextwrapper.inc.php');
-require_once('include/js.inc.php');
-require_once('include/locales.inc.php');
+require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
+require_once dirname(__FILE__).'/include/js.inc.php';
+require_once dirname(__FILE__).'/include/locales.inc.php';
 
 // if we must provide language constants on language different from English
 if (isset($_GET['lang'])) {
@@ -25,7 +25,7 @@ if (isset($_GET['lang'])) {
 	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
 
-require_once('include/locales/en_gb.inc.php');
+require_once dirname(__FILE__).'/include/locales/en_gb.inc.php';
 $translations = $TRANSLATION;
 
 // available scripts 'scriptFileName' => 'path relative to js/'

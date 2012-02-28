@@ -80,6 +80,7 @@ class CZBXAPI {
 			'searchWildcardsEnabled'=> null,
 			// output
 			'output'				=> API_OUTPUT_REFER,
+			'preservekeys'			=> null,
 			'limit'					=> null
 		);
 	}
@@ -259,7 +260,6 @@ class CZBXAPI {
 	 * Constructs an SQL SELECT query for a specific table from the given API options, executes it and returns
 	 * the result.
 	 *
-	 * TODO: add global 'preservekeys' support
 	 * TODO: add global 'countOutput' support
 	 *
 	 * @param string $tableName
@@ -273,7 +273,19 @@ class CZBXAPI {
 		$sql = $this->createSelectQuery($tableName, $options);
 		$query = DBSelect($sql, $limit);
 
-		return DBfetchArray($query);
+		$objects = DBfetchArray($query);
+
+		if (isset($options['preservekeys'])) {
+			$rs = array();
+			foreach ($objects as $object) {
+				$rs[$object[$this->pk($tableName)]] = $this->unsetExtraFields($tableName, $object, $options['output']);
+			}
+
+			return $rs;
+		}
+		else {
+			return $objects;
+		}
 	}
 
 	/**
@@ -338,12 +350,12 @@ class CZBXAPI {
 		// build query
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
-		$sqlWhere = $sqlParts['where'] ? implode(' AND ', $sqlParts['where']) : '';
-		$sqlGroup = $sqlParts['group'] ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
-		$sqlOrder = $sqlParts['order'] ? ' ORDER BY '.implode(',', $sqlParts['order']) : '';
+		$sqlWhere = (!empty($sqlParts['where'])) ? ' WHERE '.implode(' AND ', array_unique($sqlParts['where'])) : '';
+		$sqlGroup = (!empty($sqlParts['group'])) ? ' GROUP BY '.implode(',', array_unique($sqlParts['group'])) : '';
+		$sqlOrder = (!empty($sqlParts['order'])) ? ' ORDER BY '.implode(',', array_unique($sqlParts['order'])) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 			' FROM '.$sqlFrom.
-			' WHERE '.$sqlWhere.
+			$sqlWhere.
 			$sqlGroup.
 			$sqlOrder;
 
@@ -516,6 +528,49 @@ class CZBXAPI {
 		DB::delete($this->tableName(), array(
 			$this->pk() => $pks
 		));
+	}
+
+	/**
+	 * Fetches the fields given in $fields from the database and extends the objects with the loaded data.
+	 *
+	 * @param $tableName
+	 * @param array $objects
+	 * @param array $fields
+	 *
+	 * @return array
+	 */
+	protected function extendObjects($tableName, array $objects, array $fields) {
+		$dbObjects = $this->select($tableName, array(
+			'output' => $fields,
+			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
+			'preservekeys' => true
+		));
+
+		foreach ($objects as &$object) {
+			$pk = $object[$this->pk($tableName)];
+			if (isset($dbObjects[$pk])) {
+				check_db_fields($dbObjects[$pk], $object);
+			}
+		}
+
+		return $objects;
+	}
+
+	/**
+	 * Checks if the object has any fields, that are not defined in the schema.
+	 *
+	 * @param $tableName
+	 * @param array $object
+	 * @param $error
+	 *
+	 * @throws APIException
+	 */
+	protected function checkUnsupportedFields($tableName, array $object, $error) {
+		foreach ($object as $field => $value) {
+			if (!DB::hasField($tableName, $field)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
 	}
 
 	/**

@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/items.inc.php');
-require_once('include/users.inc.php');
-require_once('include/nodes.inc.php');
-require_once('include/js.inc.php');
-require_once('include/discovery.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/items.inc.php';
+require_once dirname(__FILE__).'/include/users.inc.php';
+require_once dirname(__FILE__).'/include/nodes.inc.php';
+require_once dirname(__FILE__).'/include/js.inc.php';
+require_once dirname(__FILE__).'/include/discovery.inc.php';
 
 $srctbl = get_request('srctbl', ''); // source table name
 
@@ -146,7 +146,7 @@ $page['scripts'] = array();
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 global $USER_DETAILS;
 if ($min_user_type > $USER_DETAILS['type']) {
@@ -1602,7 +1602,7 @@ elseif ($srctbl == 'plain_text') {
  * Slides
  */
 elseif ($srctbl == 'slides') {
-	require_once('include/screens.inc.php');
+	require_once dirname(__FILE__).'/include/screens.inc.php';
 
 	$form = new CForm();
 	$form->setName('slideform');
@@ -1661,7 +1661,7 @@ elseif ($srctbl == 'slides') {
  * Screens
  */
 elseif ($srctbl == 'screens') {
-	require_once('include/screens.inc.php');
+	require_once dirname(__FILE__).'/include/screens.inc.php';
 
 	$form = new CForm();
 	$form->setName('screenform');
@@ -1723,7 +1723,7 @@ elseif ($srctbl == 'screens') {
  * Screens 2
  */
 elseif ($srctbl == 'screens2') {
-	require_once('include/screens.inc.php');
+	require_once dirname(__FILE__).'/include/screens.inc.php';
 
 	$table = new CTableInfo(_('No screens defined.'));
 	$table->setHeader(_('Name'));
@@ -1971,5 +1971,5 @@ elseif ($srctbl == 'scripts') {
 	$form->addItem($table);
 	$form->show();
 }
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

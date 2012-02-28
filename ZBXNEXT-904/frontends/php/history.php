@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/items.inc.php');
-require_once('include/graphs.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/items.inc.php';
+require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file']	= 'history.php';
 $page['title']	= 'S_HISTORY';
@@ -33,7 +33,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 if(isset($_REQUEST['plaintext'])) define('ZBX_PAGE_NO_MENU', 1);
 else if(PAGE_TYPE_HTML == $page['type']) define('ZBX_PAGE_DO_REFRESH', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -113,7 +113,7 @@ require_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 ?>
@@ -169,7 +169,7 @@ require_once('include/page_header.php');
 		navigation_bar_calc('web.item.graph', $item['itemid'], true);
 		if ($_REQUEST['action'] != 'showvalues') {
 			jsRedirect('history.php?action=' . get_request('action', 'showgraph') . '&itemid=' . $item['itemid']);
-			require_once('include/page_footer.php');
+			require_once dirname(__FILE__).'/include/page_footer.php';
 			exit();
 		}
 	}
@@ -571,6 +571,6 @@ function addPopupValues(list){
 </script>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/graphs.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['title'] = 'S_CUSTOM_GRAPHS';
 $page['file'] = 'charts.php';
@@ -32,7 +32,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -100,7 +100,7 @@ require_once('include/page_header.php');
 	}
 
 	if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 ?>
@@ -121,7 +121,7 @@ require_once('include/page_header.php');
 	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
 		navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
 		jsRedirect('charts.php?graphid=' . $_REQUEST['graphid']);
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--
@@ -217,6 +217,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>
