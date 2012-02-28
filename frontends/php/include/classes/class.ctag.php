@@ -168,13 +168,10 @@ class CTag extends CObject {
 		}
 		$text = unpack_object($text);
 
-		// if there are OK/PROBLEM statuses in hint, we might want them to blink
-		$blinkUpdate = $updateBlinking ? ' jqBlink.findObjects();' : '';
-
-		$this->addAction('onmouseover', 'javascript: hintBox.showOver(this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');'.$blinkUpdate);
+		$this->addAction('onmouseover', 'javascript: hintBox.showOver(this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');');
 		$this->addAction('onmouseout', 'javascript: hintBox.hideOut(this);');
 		if ($byClick) {
-			$this->addAction('onclick', 'javascript: hintBox.onClick(this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');'.$blinkUpdate);
+			$this->addAction('onclick', 'javascript: hintBox.onClick(this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');');
 		}
 		return true;
 	}
