@@ -357,23 +357,29 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
+	$triggerids = zbx_objectValues($triggers, 'triggerid');
+
 	if($config['event_ack_enable']){
-		foreach($triggers as $tnum => $trigger){
-			$options = array(
+		$options = array(
 				'countOutput' => true,
-				'triggerids' => $trigger['triggerid'],
+				'groupCount' => true,
+				'triggerids' => $triggerids,
 				'filter' => array(
 					'object' => EVENT_OBJECT_TRIGGER,
 					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
 					'acknowledged' => 0,
 					'value' => TRIGGER_VALUE_TRUE,
-				),
+		),
 				'nopermissions' => true
-			);
-			$triggers[$tnum]['event_count'] = API::Event()->get($options);
+		);
+		$event_counts = API::Event()->get($options);
+		foreach($triggers as $tnum => $trigger){
+			$triggers[$tnum]['event_count'] = 0;
+		}
+		foreach($event_counts as $event_count){
+			$triggers[$event_count['objectid']]['event_count'] = $event_count['rowscount'];
 		}
 	}
-
 
 	$tr_hostids = array();
 	foreach($triggers as $tnum => $trigger){
@@ -432,10 +438,18 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 	}
 
+	$trigger_descriptions = expand_trigger_description_multiple($triggerids);
+
+	$sql_dep = 'SELECT triggerid_down, triggerid_up FROM trigger_depends WHERE '.DBcondition('triggerid_up', $triggerids);
+	$dep_res = DBselect($sql_dep);
+	$triggerids_down = Array();
+	while ($row = DBfetch($dep_res)) {
+		//if (is_null($triggerids_down[$row['triggerid_up']])) $triggerids_down[$row['triggerid_up']] = Array();
+		$triggerids_down[$row['triggerid_up']][] = intval($row['triggerid_down']);
+	}
+
 	foreach($triggers as $tnum => $trigger){
-
-		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
-
+		$trigger['desc'] = $description = $trigger_descriptions[$tnum];
 		$items = array();
 
 		$used_hosts = array();
@@ -513,12 +527,13 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
-
-		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$trigger['triggerid'];
-		$dep_res = DBselect($sql_dep);
-		while($dep_row = DBfetch($dep_res)){
-			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
-			$dependency = true;
+		if (!empty($triggerids_down[$trigger['triggerid']])){
+			//$dep_rows = expand_trigger_description_multiple($triggerids_down);
+			$dep_rows = expand_trigger_description_multiple($triggerids_down[$trigger['triggerid']]);
+			foreach($dep_rows as $dep_row){
+				$dep_table->addRow(SPACE.'-'.SPACE.$dep_row);
+				$dependency = true;
+			}
 		}
 
 		if($dependency){
@@ -708,7 +723,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			}
 		}
 	}
-
 
 //----- GO ------
 	$footer = null;
