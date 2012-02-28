@@ -1160,12 +1160,19 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 				$item->setTimeZone($timeZone);
 				$item->setTimeOffset($timeOffset);
 
-				$flashclockOverDiv = new CDiv(null, 'flashclock');
-
-				$item = array($flashclockOverDiv, $item);
 				if ($editmode == 1) {
-					$item[] = BR();
-					$item[] = new CLink(_('Change'), $action);
+					$flashclockOverDiv = new CDiv(null, 'flashclock');
+					$flashclockOverDiv->setAttribute('style', 'width: '.$width.'px; height: '.$height.'px;');
+
+					$item = array(
+						$flashclockOverDiv,
+						$item,
+						BR(),
+						new CLink(_('Change'), $action)
+					);
+				}
+				else {
+					$item = array($item);
 				}
 			}
 			/*
@@ -1451,7 +1458,7 @@ function prepareScreenExport(&$exportScreens) {
 		foreach ($exportScreens as &$screen) {
 			unset($screen['screenid'], $screen['hostid']);
 
-			foreach	($screen['screenitems'] as &$screenItem) {
+			foreach ($screen['screenitems'] as &$screenItem) {
 				unset($screenItem['screenid'], $screenItem['screenitemid'], $screenItem['dynamic']);
 
 				if ($screenItem['resourceid'] == 0) {

@@ -232,7 +232,6 @@ class CZBXAPI {
 	 * @return array           The resulting object
 	 */
 	protected function unsetExtraFields($tableName, array $object, $output) {
-
 		// for API_OUTPUT_SHORTEN return only the private key
 		if ($output == API_OUTPUT_SHORTEN) {
 			$pkField = $this->pk($tableName);

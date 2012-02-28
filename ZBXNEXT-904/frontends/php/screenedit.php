@@ -184,10 +184,10 @@ if (isset($_REQUEST['save'])) {
 elseif (isset($_REQUEST['delete'])) {
 	DBstart();
 	$screenitemid = API::ScreenItem()->delete($_REQUEST['screenitemid']);
-	$screenitemid = DBend($screenitemid);
+	$result = DBend($screenitemid);
 
-	show_messages(!empty($screenitemid), _('Item deleted'), _('Cannot delete item'));
-	if (!empty($screenitemid)) {
+	show_messages($result, _('Item deleted'), _('Cannot delete item'));
+	if ($result && !empty($screenitemid)) {
 		$screenitemid = reset($screenitemid);
 		$screenitemid = reset($screenitemid);
 		add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Screen itemid "'.$screenitemid.'"');

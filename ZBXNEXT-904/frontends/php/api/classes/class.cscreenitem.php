@@ -123,8 +123,14 @@ class CScreenItem extends CZBXAPI {
 	 *								under the 'screenitemids' key
 	 */
 	public function create(array $screenItems) {
+		$dbScreenItems = $this->get(array(
+			'screenids' => zbx_objectValues($screenItems, 'screenid'),
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
 		// validate input
-		$this->checkInput($screenItems);
+		$this->checkInput($screenItems, $dbScreenItems);
 
 		// insert items
 		$screenItemids = DB::insert($this->tableName(), $screenItems);
@@ -320,13 +326,24 @@ class CScreenItem extends CZBXAPI {
 
 		foreach ($screenItems as $screenItem) {
 			// check if the item is editable
-			if ($dbScreenItems && !isset($dbScreenItems[$screenItem['screenitemid']])) {
+			if ($dbScreenItems && !empty($screenItem['screenitemid'] ) && !isset($dbScreenItems[$screenItem['screenitemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			// check resource type
 			if (!$this->isValidResourceType($screenItem['resourcetype'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource type provided for screen item.'));
+			}
+
+			// check duplicates resource in cell
+			if (isset($screenItem['x']) && isset($screenItem['y'])) {
+				foreach ($dbScreenItems as $dbScreenItem) {
+					if ($dbScreenItem['screenid'] == $screenItem['screenid']
+							&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
+							&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exist.'));
+					}
+				}
 			}
 
 			// perform resource type specific validation
