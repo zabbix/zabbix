@@ -1053,19 +1053,6 @@ function DBfetchArray($cursor) {
 }
 
 /**
-* Transform DB cursor first column to array
-*
-* @return array
-*/
-function DBfetchFirstArray($cursor) {
-	$result = array();
-	while ($row = DBfetch($cursor)) {
-		$result[] = intval(reset($row));
-	}
-	return $result;
-}
-
-/**
  * Initialize access to SQLite3 database
  *
  * The function creates a semaphore for exclusive SQLite3 access. It is
