@@ -158,14 +158,11 @@ class CTag extends CObject {
 		$this->attributes[$name] = $value;
 	}
 
-	public function setHint($text, $width = '', $class = '', $byClick = true, $updateBlinking = false, $encode = true) {
+	public function setHint($text, $width = '', $class = '', $byClick = true, $updateBlinking = false) {
 		if (empty($text)) {
 			return false;
 		}
-
-		if ($encode){
-			encodeValues($text);
-		}
+		encodeValues($text);
 		$text = unpack_object($text);
 
 		// if there are OK/PROBLEM statuses in hint, we might want them to blink
