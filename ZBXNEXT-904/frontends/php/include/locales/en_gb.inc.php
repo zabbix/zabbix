@@ -234,8 +234,6 @@
 	'S_HISTORY_PLAINTEXT_DATE_FORMAT'=>	_('Y-m-d H:i:s'),
 	'S_HISTORY_ITEM_DATE_FORMAT'=>		_('Y.M.d H:i:s'),
 
-	'S_DATE'=>				_('Date'),
-
 	'S_JANUARY'=>				_('January'),
 	'S_FEBRUARY'=>				_('February'),
 	'S_MARCH'=>				_('March'),
@@ -251,7 +249,6 @@
 
 //	hosts.php
 	'S_IN'=>					_('In'),
-	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
 	'S_HOSTS'=>					_('Hosts'),
 	'S_ITEMS'=>					_('Items'),
@@ -266,7 +263,6 @@
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_HOST_GROUP'=>				_('Host group'),
 	'S_UPDATE'=>					_('Update'),
-	'S_PROXIES'=>					_('Proxies'),
 	'S_PROXIES_BIG'=>				_('PROXIES'),
 	'S_CREATE_PROXY'=>				_('Create proxy'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
@@ -289,20 +285,11 @@
 	'S_UNLINK_AND_CLEAR'=>			_('Unlink and clear'),
 
 //	items.php
-	'S_TYPES'=>						_('Types'),
-	'S_KEY'=>						_('Key'),
 	'S_DESCRIPTION'=>					_('Description'),
 	'S_HISTORY'=>						_('History'),
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
-	'S_ACTIVE'=>						_('Active'),
-	'S_LOG'=>						_('Log'),
-	'S_TEXT'=>						_('Text'),
 	'S_ITEM'=>						_('Item'),
 	'S_MODE'=>						_('Mode'),
-	'S_ORIGINAL'=>						_('Original'),
-	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			_('Mass update selected items?'),
-	'S_COPY_SELECTED_ITEMS_Q'=>				_('Copy selected items?'),
-	'S_RULE'=>						_('Rule'),
 
 // disc_prototypes.php
 	'S_ADD_PROTOTYPE' => _('Add prototype'),
@@ -492,7 +479,6 @@
 
 //	services.php
 	'S_NO_IT_SERVICE_DEFINED'=>		_('No IT services defined.'),
-	'S_NONE'=>				_('None'),
 	'S_TRIGGER'=>				_('Trigger'),
 	'S_DELETE'=>				_('Delete'),
 	'S_CLONE'=>				_('Clone'),
@@ -549,7 +535,6 @@
 	'S_SCRIPT_ERROR'=>					_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'),
 
 //	audit.php
-	'S_DETAILS'=>				_('Details'),
 
 //	profile.php
 	'S_CLEAR' =>				_('Clear'),
@@ -607,9 +592,6 @@
 // 	func.inc.php
 	'S_E'=>			_('E'),
 	'S_Y'=>			_('Y'),
-
-//	forms.inc.php
-	'S_DO'=>				_('Do'),
 
 //	items.inc.php
 	'S_UPDATED_SMALL'=>				_('updated'),

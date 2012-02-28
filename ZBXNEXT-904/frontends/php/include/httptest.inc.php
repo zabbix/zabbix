@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/defines.inc.php');
-require_once('include/items.inc.php');
+require_once dirname(__FILE__).'/defines.inc.php';
+require_once dirname(__FILE__).'/items.inc.php';
 
 function httptest_authentications($type = null) {
 	$authentication_types = array(
