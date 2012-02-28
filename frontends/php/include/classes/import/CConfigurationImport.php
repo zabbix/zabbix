@@ -147,15 +147,19 @@ class CConfigurationImport {
 				if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
 					$this->processGraphs();
 				}
-				if ($this->options['screens']['exist'] || $this->options['screens']['missed']) {
-					$this->processScreens();
-				}
 				if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN
 						&& ($this->options['images']['exist'] || $this->options['images']['missed'])) {
 					$this->processImages();
 				}
 				if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
 					$this->processMaps();
+				}
+				// screens should be created after all other elements
+				if ($this->options['templates']['exist'] || $this->options['templates']['missed']) {
+					$this->processTemplateScreens();
+				}
+				if ($this->options['screens']['exist'] || $this->options['screens']['missed']) {
+					$this->processScreens();
 				}
 			}
 
@@ -404,7 +408,6 @@ class CConfigurationImport {
 			}
 		}
 
-
 		foreach ($orderedList as $name) {
 			$template = $templates[$name];
 			foreach ($template['groups'] as $gnum => $group) {
@@ -425,8 +428,8 @@ class CConfigurationImport {
 			}
 			else {
 				$newHostIds = API::Template()->create($template);
-				$hostid = reset($newHostIds['templateids']);
-				$this->referencer->addTemplateRef($template['host'], $hostid);
+				$templateid = reset($newHostIds['templateids']);
+				$this->referencer->addTemplateRef($template['host'], $templateid);
 			}
 		}
 	}
@@ -1144,10 +1147,56 @@ class CConfigurationImport {
 
 	protected function processScreens() {
 		$allScreens = $this->formatter->getScreens();
-
+		$allScreens = $this->prepareScreenImport($allScreens);
 		$screensToCreate = array();
 		$screensToUpdate = array();
 
+		foreach ($allScreens as $screen) {
+			if (isset($screen['screenid'])) {
+				$screensToUpdate[] = $screen;
+			}
+			else {
+				$screensToCreate[] = $screen;
+			}
+		}
+
+		if ($this->options['screens']['missed'] && $screensToCreate) {
+			API::Screen()->create($screensToCreate);
+		}
+		if ($this->options['screens']['exist'] && $screensToUpdate) {
+			API::Screen()->update($screensToUpdate);
+		}
+	}
+
+	protected function processTemplateScreens() {
+		$templates = $this->formatter->getTemplates();
+
+		$screensToCreate = array();
+		$screensToUpdate = array();
+		foreach ($templates as $template) {
+			if (!empty($template['screens'])) {
+				$screens = $this->prepareScreenImport($template['screens']);
+				foreach ($screens as $screen) {
+					$screen['templateid'] = $this->referencer->resolveTemplate($template['host']);
+					if (isset($screen['screenid'])) {
+						$screensToUpdate[] = $screen;
+					}
+					else {
+						$screensToCreate[] = $screen;
+					}
+				}
+			}
+		}
+
+		if ($screensToCreate) {
+			API::TemplateScreen()->create($screensToCreate);
+		}
+		if ($screensToUpdate) {
+			API::TemplateScreen()->update($screensToUpdate);
+		}
+	}
+
+	protected function prepareScreenImport(array $allScreens) {
 		$existingScreens = array();
 		$allScreens = zbx_toHash($allScreens, 'name');
 		$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE '.DBcondition('s.name', array_keys($allScreens)));
@@ -1164,14 +1213,20 @@ class CConfigurationImport {
 				'editable' => true,
 				'preservekeys' => true
 			));
+			$allowedTplScreens = API::TemplateScreen()->get(array(
+				'screenids' => array_keys($existingScreens),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => true,
+				'preservekeys' => true
+			));
 			foreach ($existingScreens as $existingScreenId => $existingScreenName) {
-				if (!isset($allowedScreens[$existingScreenId])) {
+				if (!isset($allowedScreens[$existingScreenId]) && !isset($allowedTplScreens[$existingScreenId])) {
 					throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
 				}
 			}
 		}
 
-		foreach ($allScreens as $screen) {
+		foreach ($allScreens as &$screen) {
 			if (!isset($screen['screenitems'])) {
 				$screen['screenitems'] = array();
 			}
@@ -1263,23 +1318,11 @@ class CConfigurationImport {
 				}
 			}
 			unset($screenitem);
+		}
+		unset($screen);
 
-			if (isset($screen['screenid'])) {
-				$screensToUpdate[] = $screen;
-			}
-			else {
-				$screensToCreate[] = $screen;
-			}
-		}
-
-		if ($this->options['screens']['missed'] && $screensToCreate) {
-			API::Screen()->create($screensToCreate);
-		}
-		if ($this->options['screens']['exist'] && $screensToUpdate) {
-			API::Screen()->update($screensToUpdate);
-		}
+		return $allScreens;
 	}
-
 
 	/**
 	 * Method for creating import formatter for specified import version.

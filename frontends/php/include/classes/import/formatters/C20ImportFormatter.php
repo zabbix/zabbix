@@ -32,8 +32,12 @@ class C20ImportFormatter extends CImportFormatter {
 
 			$host['groups'] = array_values($host['groups']);
 
+			foreach ($host['screens'] as &$screen) {
+				$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+			}
+			unset($screen);
 
-			$hostsData[] = ArrayHelper::getByKeys($host, array('groups', 'macros', 'templates', 'host', 'status', 'name'));
+			$hostsData[] = ArrayHelper::getByKeys($host, array('groups', 'macros', 'screens', 'templates', 'host', 'status', 'name'));
 		}
 
 		return $hostsData;
