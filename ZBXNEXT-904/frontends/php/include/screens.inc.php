@@ -1154,6 +1154,10 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 						break;
 				}
 
+				if ($width > $height) {
+					$width = $height;
+				}
+
 				$item = new CFlashClock($width, $height, $action);
 				$item->setTimeError($error);
 				$item->setTimeType($timeType);
