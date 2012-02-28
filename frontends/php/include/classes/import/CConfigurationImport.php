@@ -321,10 +321,10 @@ class CConfigurationImport {
 
 			$triggersRefs = array();
 			foreach ($allTriggers as $trigger) {
-				$triggersRefs[$trigger['description']][] = $trigger['expression'];
+				$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
 
 				foreach ($trigger['dependencies'] as $dependency) {
-					$triggersRefs[$dependency['name']][] = $dependency['expression'];
+					$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
 				}
 			}
 
@@ -900,17 +900,28 @@ class CConfigurationImport {
 		if ($this->options['triggers']['missed'] && $triggersToCreate) {
 			$newTriggerIds = API::Trigger()->create($triggersToCreate);
 			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
+				$trigger = $triggersToCreate[$tnum];
+				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerId);
+			}
+		}
+
+		if ($triggersToCreateDependencies) {
+			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
 				$deps = array();
 				foreach ($triggersToCreateDependencies[$tnum] as $dependency) {
 					$deps[] = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
 				}
 
-				$triggerDependencies[] = array(
-					'triggerid' => $triggerId,
-					'dependencies' => $deps
-				);
+				if (!empty($deps)) {
+					$triggerDependencies[] = array(
+						'triggerid' => $triggerId,
+						'dependencies' => $deps
+					);
+				}
 			}
 		}
+
+
 		if ($this->options['triggers']['exist'] && $triggersToUpdate) {
 			API::Trigger()->update($triggersToUpdate);
 		}

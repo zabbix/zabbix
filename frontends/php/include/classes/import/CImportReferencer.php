@@ -149,7 +149,7 @@ class CImportReferencer {
 	}
 
 	public function addTriggerRef($name, $expression, $id) {
-		$this->triggers[$name][$expression] = $id;
+		$this->triggersRefs[$name][$expression] = $id;
 	}
 
 
@@ -292,8 +292,4 @@ class CImportReferencer {
 			$this->triggers = array();
 		}
 	}
-
-
-
-
 }
