@@ -447,24 +447,6 @@ DB_HTTPSTEP;
 
 typedef struct
 {
-	zbx_uint64_t	httpstepitemid;
-	zbx_uint64_t	httpstepid;
-	zbx_uint64_t	itemid;
-	zbx_httpitem_type_t	type;
-}
-DB_HTTPSTEPITEM;
-
-typedef struct
-{
-	zbx_uint64_t	httptestitemid;
-	zbx_uint64_t	httptestid;
-	zbx_uint64_t	itemid;
-	zbx_httpitem_type_t	type;
-}
-DB_HTTPTESTITEM;
-
-typedef struct
-{
 	zbx_uint64_t		escalationid;
 	zbx_uint64_t		actionid;
 	zbx_uint64_t		triggerid;

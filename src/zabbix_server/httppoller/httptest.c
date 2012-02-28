@@ -74,98 +74,80 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 
 #endif	/* HAVE_LIBCURL */
 
-static int	process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
-{
-	const char	*__function_name = "process_value";
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret;
-	zbx_timespec_t	ts;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, itemid);
-
-	result = DBselect(
-			"select i.value_type"
-			" from items i,hosts h"
-			" where h.hostid=i.hostid"
-				" and h.status=%d"
-				" and i.status=%d"
-				" and i.type=%d"
-				" and i.itemid=" ZBX_FS_UI64
-				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
-				DB_NODE,
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE,
-			ITEM_TYPE_HTTPTEST,
-			itemid,
-			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL,
-			DBnode_local("h.hostid"));
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		zbx_timespec(&ts);
-		dc_add_history(itemid, (unsigned char)atoi(row[0]), 0, value, &ts,
-				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
-		ret = SUCCEED;
-	}
-	else
-		ret = FAIL;
-
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
 static void	process_test_data(zbx_uint64_t httptestid, ZBX_HTTPSTAT *stat)
 {
 	const char	*__function_name = "process_test_data";
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_HTTPTESTITEM	httptestitem;
-
+	unsigned char	types[3];
+	DC_ITEM		items[3];
+	zbx_uint64_t	itemids[3];
+	int		errcodes[3];
+	size_t		i, num = 0;
 	AGENT_RESULT    value;
+	zbx_timespec_t	ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " total_time:" ZBX_FS_DBL " last_step:%d",
-			__function_name, httptestid, stat->test_total_time, stat->test_last_step);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect("select httptestitemid,httptestid,itemid,type"
-				" from httptestitem"
-				" where httptestid=" ZBX_FS_UI64,
-				httptestid);
+	zbx_timespec(&ts);
+
+	result = DBselect("select type,itemid from httptestitem where httptestid=" ZBX_FS_UI64, httptestid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(httptestitem.httptestitemid, row[0]);
-		ZBX_STR2UINT64(httptestitem.httptestid, row[1]);
-		ZBX_STR2UINT64(httptestitem.itemid, row[2]);
-		httptestitem.type = atoi(row[3]);
+		if (3 == num)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
+		}
+
+		if (ZBX_HTTPITEM_TYPE_TIME != (types[num] = (unsigned char)atoi(row[0])) &&
+				ZBX_HTTPITEM_TYPE_SPEED != types[num] && ZBX_HTTPITEM_TYPE_LASTSTEP != types[num])
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		ZBX_STR2UINT64(itemids[num], row[1]);
+		errcodes[num] = SUCCEED;
+		num++;
+	}
+	DBfree_result(result);
+
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, num);
+
+	for (i = 0; i < num; i++)
+	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
+				MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+		{
+			continue;
+		}
 
 		init_result(&value);
 
-		switch (httptestitem.type)
+		switch (types[i])
 		{
 			case ZBX_HTTPITEM_TYPE_TIME:
 				SET_DBL_RESULT(&value, stat->test_total_time);
-				process_value(httptestitem.itemid, &value);
-				break;
-			case ZBX_HTTPITEM_TYPE_LASTSTEP:
-				SET_UI64_RESULT(&value, stat->test_last_step);
-				process_value(httptestitem.itemid, &value);
 				break;
 			case ZBX_HTTPITEM_TYPE_SPEED:
 				SET_UI64_RESULT(&value, stat->speed_download);
-				process_value(httptestitem.itemid, &value);
 				break;
-			default:
+			case ZBX_HTTPITEM_TYPE_LASTSTEP:
+				SET_UI64_RESULT(&value, stat->test_last_step);
 				break;
 		}
 
+		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, &ts,
+				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
+
 		free_result(&value);
 	}
-	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -176,48 +158,75 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat)
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_HTTPSTEPITEM	httpstepitem;
-
+	unsigned char	types[3];
+	DC_ITEM		items[3];
+	zbx_uint64_t	itemids[3];
+	int		errcodes[3];
+	size_t		i, num = 0;
 	AGENT_RESULT    value;
+	zbx_timespec_t	ts;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httpstepid:" ZBX_FS_UI64 " rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_FS_DBL,
-			__function_name, httpstepid, stat->rspcode, stat->total_time, stat->speed_download);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_FS_DBL,
+			__function_name, stat->rspcode, stat->total_time, stat->speed_download);
 
-	result = DBselect("select httpstepitemid,httpstepid,itemid,type"
-				" from httpstepitem"
-				" where httpstepid=" ZBX_FS_UI64,
-				httpstepid);
+	zbx_timespec(&ts);
+
+	result = DBselect("select type,itemid from httpstepitem where httpstepid=" ZBX_FS_UI64, httpstepid);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_STR2UINT64(httpstepitem.httpstepitemid, row[0]);
-		ZBX_STR2UINT64(httpstepitem.httpstepid, row[1]);
-		ZBX_STR2UINT64(httpstepitem.itemid, row[2]);
-		httpstepitem.type = atoi(row[3]);
+		if (3 == num)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
+		}
+
+		if (ZBX_HTTPITEM_TYPE_RSPCODE != (types[num] = (unsigned char)atoi(row[0])) &&
+				ZBX_HTTPITEM_TYPE_TIME != types[num] && ZBX_HTTPITEM_TYPE_SPEED != types[num])
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+
+		ZBX_STR2UINT64(itemids[num], row[1]);
+		errcodes[num] = SUCCEED;
+		num++;
+	}
+	DBfree_result(result);
+
+	DCconfig_get_items_by_itemids(items, itemids, errcodes, num);
+
+	for (i = 0; i < num; i++)
+	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
+		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status &&
+				MAINTENANCE_TYPE_NODATA == items[i].host.maintenance_type)
+		{
+			continue;
+		}
 
 		init_result(&value);
 
-		switch (httpstepitem.type)
+		switch (types[i])
 		{
 			case ZBX_HTTPITEM_TYPE_RSPCODE:
 				SET_UI64_RESULT(&value, stat->rspcode);
-				process_value(httpstepitem.itemid, &value);
 				break;
 			case ZBX_HTTPITEM_TYPE_TIME:
 				SET_DBL_RESULT(&value, stat->total_time);
-				process_value(httpstepitem.itemid, &value);
 				break;
 			case ZBX_HTTPITEM_TYPE_SPEED:
 				SET_DBL_RESULT(&value, stat->speed_download);
-				process_value(httpstepitem.itemid, &value);
-				break;
-			default:
 				break;
 		}
 
+		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, &ts,
+				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
+
 		free_result(&value);
 	}
-	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -262,11 +271,6 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	httptest->time = 0;
 
 	now = time(NULL);
-
-	DBexecute("update httptest"
-			" set lastcheck=%d"
-			" where httptestid=" ZBX_FS_UI64,
-			now, httptest->httptestid);
 
 	result = DBselect(
 			"select httpstepid,no,name,url,timeout,posts,required,status_codes"
@@ -317,11 +321,10 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 		DBexecute("update httptest"
 				" set curstep=%d,"
-					"curstate=%d"
+					"curstate=%d,"
+					"lastcheck=%d"
 				" where httptestid=" ZBX_FS_UI64,
-				httpstep.no,
-				HTTPTEST_STATE_BUSY,
-				httptest->httptestid);
+				httpstep.no, HTTPTEST_STATE_BUSY, now, httptest->httptestid);
 
 		memset(&stat, 0, sizeof(stat));
 
