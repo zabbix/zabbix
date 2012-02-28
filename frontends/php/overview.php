@@ -132,7 +132,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(new CCol(SPACE), S_DISABLED.' '.S_OR.' '.S_NO_TRIGGER));
 	}
 
-	overview $help->setHint($help_table,'','',true,false,true);
+	$help->setHint($help_table);
 
 	$over_wdgt = new CWidget();
 // Header
