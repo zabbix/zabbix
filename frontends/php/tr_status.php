@@ -357,13 +357,11 @@ require_once('include/views/js/general.script.confirm.js.php');
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
-	$triggerids = Array();
-	foreach($triggers as $tnum => $trigger){
-		$triggerids[] = $tnum;
-	}
+	$triggerids = zbx_objectValues($triggers, 'triggerid');
 
 	if($config['event_ack_enable']){
 		$options = array(
+				'countOutput' => true,
 				'groupCount' => true,
 				'triggerids' => $triggerids,
 				'filter' => array(
@@ -376,7 +374,10 @@ require_once('include/views/js/general.script.confirm.js.php');
 		);
 		$event_counts = API::Event()->get($options);
 		foreach($triggers as $tnum => $trigger){
-			$triggers[$tnum]['event_count'] = $event_counts[$tnum];
+			$triggers[$tnum]['event_count'] = 0;
+		}
+		foreach($event_counts as $event_count){
+			$triggers[$event_count['objectid']]['event_count'] = $event_count['rowscount'];
 		}
 	}
 
