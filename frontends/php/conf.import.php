@@ -78,7 +78,7 @@ if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])
 		$importReader = CImportReaderFactory::getReader($fileExtension);
 		$fileContent = file_get_contents($_FILES['import_file']['tmp_name']);
 
-		$configurationImport = new CConfigurationImport($fileContent, get_request('rules', array()));
+		$configurationImport = new CConfigurationImport($fileContent, $data['rules']);
 		$configurationImport->setReader($importReader);
 
 		$configurationImport->import();
