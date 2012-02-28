@@ -550,7 +550,7 @@ class CConfigurationExport {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
-		prepareMapExport($sysmaps);
+		$this->prepareMapExport($sysmaps);
 		$this->data['maps'] = $sysmaps;
 
 		$images = API::Image()->get(array(
