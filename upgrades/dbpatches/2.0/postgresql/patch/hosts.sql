@@ -63,11 +63,14 @@ ALTER TABLE ONLY items
 	ADD description text DEFAULT '' NOT NULL,
 	ADD inventory_link integer DEFAULT '0' NOT NULL,
 	ADD lifetime varchar(64) DEFAULT '30' NOT NULL;
-
-UPDATE items SET templateid=NULL WHERE templateid=0;
-UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);
-UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
-UPDATE items SET valuemapid=NULL WHERE NOT valuemapid IS NULL AND NOT valuemapid IN (SELECT valuemapid from valuemaps);
+UPDATE items
+	SET templateid=NULL
+	WHERE templateid=0
+		OR NOT EXISTS (SELECT 1 FROM items i WHERE i.itemid=items.templateid);
+UPDATE items
+	SET valuemapid=NULL
+	WHERE valuemapid=0
+		OR NOT EXISTS (SELECT 1 FROM valuemaps v WHERE v.valuemapid=items.valuemapid);
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
 DELETE FROM items WHERE NOT hostid IN (SELECT hostid FROM hosts);
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
@@ -191,8 +194,17 @@ ALTER TABLE ONLY hosts ALTER hostid DROP DEFAULT,
 		       ADD jmx_errors_from integer DEFAULT '0' NOT NULL,
 		       ADD jmx_error varchar(128) DEFAULT '' NOT NULL,
 		       ADD name varchar(64) DEFAULT '' NOT NULL;
-UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
-UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
+UPDATE hosts
+	SET proxy_hostid=NULL
+	WHERE proxy_hostid=0
+		OR NOT EXISTS (SELECT 1 FROM hosts h WHERE h.hostid=hosts.proxy_hostid);
+UPDATE hosts
+	SET maintenanceid=NULL,
+		maintenance_status=0,
+		maintenance_type=0,
+		maintenance_from=0
+	WHERE maintenanceid=0
+		OR NOT EXISTS (SELECT 1 FROM maintenances m WHERE m.maintenanceid=hosts.maintenanceid);
 UPDATE hosts SET name=host WHERE status in (0,1,3);	-- MONITORED, NOT_MONITORED, TEMPLATE
 CREATE INDEX hosts_4 on hosts (name);
 ALTER TABLE ONLY hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);

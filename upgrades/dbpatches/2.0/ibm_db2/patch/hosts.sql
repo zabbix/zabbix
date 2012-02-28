@@ -117,13 +117,15 @@ ALTER TABLE items ADD lifetime varchar(64) WITH DEFAULT '30' NOT NULL
 /
 REORG TABLE items
 /
-UPDATE items SET templateid=NULL WHERE templateid=0
+UPDATE items
+	SET templateid=NULL
+	WHERE templateid=0
+		OR templateid NOT IN (SELECT itemid FROM items)
 /
-UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM items)
-/
-UPDATE items SET valuemapid=NULL WHERE valuemapid=0
-/
-UPDATE items SET valuemapid=NULL WHERE valuemapid IS NOT NULL AND valuemapid NOT IN (SELECT valuemapid from valuemaps)
+UPDATE items
+	SET valuemapid=NULL
+	WHERE valuemapid=0
+		OR valuemapid NOT IN (SELECT valuemapid from valuemaps)
 /
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps'
 /
@@ -339,9 +341,18 @@ ALTER TABLE hosts ADD name varchar(64) WITH DEFAULT '' NOT NULL
 /
 REORG TABLE hosts
 /
-UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0
+UPDATE hosts
+	SET proxy_hostid=NULL
+	WHERE proxy_hostid=0
+		OR NOT EXISTS (SELECT 1 FROM hosts h WHERE h.hostid=hosts.proxy_hostid)
 /
-UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0
+UPDATE hosts
+	SET maintenanceid=NULL,
+		maintenance_status=0,
+		maintenance_type=0,
+		maintenance_from=0
+	WHERE maintenanceid=0
+		OR NOT EXISTS (SELECT 1 FROM maintenances m WHERE m.maintenanceid=hosts.maintenanceid)
 /
 UPDATE hosts SET name=host WHERE status in (0,1,3)
 /
