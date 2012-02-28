@@ -1160,7 +1160,9 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 				$item->setTimeZone($timeZone);
 				$item->setTimeOffset($timeOffset);
 
-				$item = array($item);
+				$flashclockOverDiv = new CDiv(null, 'flashclock');
+
+				$item = array($flashclockOverDiv, $item);
 				if ($editmode == 1) {
 					$item[] = BR();
 					$item[] = new CLink(_('Change'), $action);

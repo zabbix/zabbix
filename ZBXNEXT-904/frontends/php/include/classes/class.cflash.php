@@ -33,6 +33,7 @@ class CFlash extends CTag {
 
 		$this->addItem(new CParam('allowScriptAccess', 'sameDomain'));
 		$this->addItem(new CParam('quality', 'high'));
+		$this->addItem(new CParam('wmode', 'opaque'));
 
 		$this->srcParam = new CParam('movie', $src);
 		$this->embededFlash = new CFlashEmbed();

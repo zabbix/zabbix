@@ -29,6 +29,7 @@ class CFlashEmbed extends CTag {
 		$this->attributes['pluginspage'] = 'http://www.macromedia.com/go/getflashplayer';
 		$this->attributes['align'] = 'middle';
 		$this->attributes['quality'] = 'high';
+		$this->attributes['wmode'] = 'opaque';
 		$this->attributes['width'] = $width;
 		$this->attributes['height'] = $height;
 		$this->attributes['src'] = $src;
