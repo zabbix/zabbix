@@ -154,21 +154,21 @@ function getActionMapBySysmap($sysmap) {
 
 		if ($db_element['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 			$host = $hosts[$db_element['elementid']];
+			$tools_menus = '';
+			foreach ($scripts_by_hosts[$db_element['elementid']] as $script) {
+				$str_tmp = zbx_jsvalue('javascript: executeScript('.$db_element['elementid'].', '.
+							$script['scriptid'].', '.
+							zbx_jsvalue($script['confirmation']).')'
+				);
+
+				$tools_menus .= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			}
+
+			if (!empty($tools_menus)) {
+				$menus .= "['"._('Scripts')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
+				$menus .= $tools_menus;
+			}
 			if ($host['status'] == HOST_STATUS_MONITORED) {
-				$tools_menus = '';
-				foreach ($scripts_by_hosts[$db_element['elementid']] as $script) {
-					$str_tmp = zbx_jsvalue('javascript: executeScript('.$db_element['elementid'].', '.
-								$script['scriptid'].', '.
-								zbx_jsvalue($script['confirmation']).')'
-					);
-
-					$tools_menus .= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-				}
-
-				if (!empty($tools_menus)) {
-					$menus .= "['"._('Scripts')."',null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-					$menus .= $tools_menus;
-				}
 				$links_menus .= "['"._('Status of triggers')."',\"javascript: redirect('tr_status.php?hostid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				if ($host['screens']) {
 					$links_menus .= "['"._('Host screens')."',\"javascript: redirect('host_screen.php?hostid=".$db_element['elementid']."');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
