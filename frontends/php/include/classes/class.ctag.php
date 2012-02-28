@@ -158,7 +158,7 @@ class CTag extends CObject {
 		$this->attributes[$name] = $value;
 	}
 
-	public function setHint($text, $width = '', $class = '', $byClick = true, $updateBlinking = false, $encode = true) {
+	public function setHint($text, $width = '', $class = '', $byClick = true, $encode = true) {
 		if (empty($text)) {
 			return false;
 		}
