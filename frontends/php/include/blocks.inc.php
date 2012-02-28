@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/graphs.inc.php');
-require_once('include/screens.inc.php');
-require_once('include/maps.inc.php');
-require_once('include/users.inc.php');
+require_once dirname(__FILE__).'/graphs.inc.php';
+require_once dirname(__FILE__).'/screens.inc.php';
+require_once dirname(__FILE__).'/maps.inc.php';
+require_once dirname(__FILE__).'/users.inc.php';
 
 function make_favorite_graphs() {
 	$favList = new CList(null, 'favorites');

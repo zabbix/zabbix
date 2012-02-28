@@ -19,17 +19,17 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/maintenances.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/maintenances.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Maintenance');
 $page['file'] = 'maintenance.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.calendar.js');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -474,5 +474,5 @@ else {
 	$maintenanceView->show();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

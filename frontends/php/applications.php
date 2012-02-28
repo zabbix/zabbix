@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Applications');
 $page['file'] = 'applications.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -294,5 +294,5 @@ else {
 	$applicationView->show();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

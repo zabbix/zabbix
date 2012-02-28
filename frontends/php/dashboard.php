@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once('include/config.inc.php');
-require_once('include/blocks.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Dashboard');
 $page['file'] = 'dashboard.php';
@@ -27,7 +27,7 @@ $page['hist_arg'] = array();
 $page['scripts'] = array('class.pmaster.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -210,12 +210,12 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
 // js templates
-require_once('include/views/js/general.script.confirm.js.php');
+require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 /*
  * Display
@@ -374,5 +374,5 @@ zbx_add_post_js('jqBlink.blink();');
 	//]]> -->
 </script>
 <?php
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = 'RPC';
 $page['file'] = 'jsrpc.php';
 $page['hist_arg'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_JSON);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 $http_request = new CHTTP_request();
 $data = $http_request->body();
@@ -158,5 +158,5 @@ if (isset($data['id'])) {
 	echo $json->encode($rpcResp);
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

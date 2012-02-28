@@ -630,6 +630,6 @@ if (!$this->data['is_discovery_rule']) {
 	zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL, 'row_delta');
 }
 
-require_once('include/views/js/configuration.item.edit.js.php');
+require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 return $itemWidget;
 ?>

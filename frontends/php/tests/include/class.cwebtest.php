@@ -21,9 +21,9 @@
 <?php
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
-require_once(dirname(__FILE__).'/../../include/defines.inc.php');
-require_once(dirname(__FILE__).'/../../include/hosts.inc.php');
-require_once(dirname(__FILE__).'/dbfunc.php');
+require_once dirname(__FILE__).'/../../include/defines.inc.php';
+require_once dirname(__FILE__).'/../../include/hosts.inc.php';
+require_once dirname(__FILE__).'/dbfunc.php';
 
 class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	protected $captureScreenshotOnFailure = TRUE;

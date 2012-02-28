@@ -58,7 +58,7 @@ initialize: function(userParams){
 		'params': {},
 		'notification': 0,
 		'request':	{},
-		'onSucces': function(){},
+		'onSuccess': function(){},
 		'onFailure': function(){}
 	};
 
