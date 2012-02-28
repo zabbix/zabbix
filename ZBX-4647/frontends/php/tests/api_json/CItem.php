@@ -21,8 +21,8 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
-require_once(dirname(__FILE__).'/../../include/hosts.inc.php');
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 
 class API_JSON_Item extends CZabbixTest {
 	public static function inventory_links() {

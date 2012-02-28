@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/views/js/configuration.httpconf.edit.js.php');
+require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 
 $httpWidget = new CWidget();
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'));

@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/perm.inc.php');
+require_once dirname(__FILE__).'/perm.inc.php';
 
 function check_right_on_discovery($permission) {
 	global $USER_DETAILS;

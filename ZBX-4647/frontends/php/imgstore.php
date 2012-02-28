@@ -21,13 +21,13 @@
 <?php
 define('ZBX_PAGE_NO_AUTHERIZATION', 1);
 
-require_once('include/config.inc.php');
-require_once('include/maps.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/maps.inc.php';
 
 $page['file'] = 'imgstore.php';
 $page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -104,5 +104,5 @@ elseif (isset($_REQUEST['imageid'])) {
 	session_write_close();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

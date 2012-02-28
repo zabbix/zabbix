@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/items.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = 'S_TRIGGER_LOG_FORM';
 $page['file'] = 'tr_logform.php';
@@ -31,7 +31,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //---------------------------------- CHECKS ------------------------------------
@@ -167,7 +167,7 @@ if(isset($_REQUEST['save_trigger'])){
 			unset($_REQUEST["sform"]);
 
 			zbx_add_post_js('closeForm("items.php");');
-			require_once('include/page_footer.php');
+			require_once dirname(__FILE__).'/include/page_footer.php';
 		}
 	}
 }
@@ -393,5 +393,5 @@ if(isset($_REQUEST['sform'])){
 	}
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

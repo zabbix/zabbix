@@ -19,17 +19,17 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/acknow.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/acknow.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Acknowledges');
 $page['file'] = 'acknow.php';
 $page['hist_arg'] = array('eventid');
 
 ob_start();
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 $_REQUEST['go'] = get_request('go', null);
@@ -73,7 +73,7 @@ if (isset($_REQUEST['cancel'])) {
 
 if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQUEST['triggers'])) {
 	show_message(_('No events to acknowledge'));
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 }
 
 $bulk = !isset($_REQUEST['eventid']);
@@ -213,5 +213,5 @@ $bulk ? '' : $frmMsg->addItemToBottomRow(new CSubmit('save', $btn_txt));
 $frmMsg->addItemToBottomRow(new CButtonCancel(url_param('backurl').url_param('eventid').url_param('triggerid').url_param('screenid')));
 $frmMsg->show(false);
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

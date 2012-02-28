@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of Zabbix');
 $page['file'] = 'adm.housekeeper.php';
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 $fields = array(
@@ -96,5 +96,5 @@ $houseKeeperForm = new CView('administration.general.housekeeper.edit', $data);
 $cnf_wdgt->addItem($houseKeeperForm->render());
 $cnf_wdgt->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

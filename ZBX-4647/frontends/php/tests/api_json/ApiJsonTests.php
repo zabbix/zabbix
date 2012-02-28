@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/APIInfo.php');
-require_once(dirname(__FILE__).'/General.php');
-require_once(dirname(__FILE__).'/User.php');
-require_once(dirname(__FILE__).'/CHost.php');
-require_once(dirname(__FILE__).'/CItem.php');
+require_once dirname(__FILE__).'/APIInfo.php';
+require_once dirname(__FILE__).'/General.php';
+require_once dirname(__FILE__).'/User.php';
+require_once dirname(__FILE__).'/CHost.php';
+require_once dirname(__FILE__).'/CItem.php';
 
 class ApiJsonTests {
 	public static function suite() {

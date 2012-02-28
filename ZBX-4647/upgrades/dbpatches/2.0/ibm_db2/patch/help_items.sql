@@ -111,7 +111,7 @@ INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.regmatc
 /
 INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.size[file]','Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]')
 /
-INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.time[file &lt;,mode&gt;]','File time information. Number of seconds.The mode is optional. If mode is missing modify is used.')
+INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.time[file &lt;,mode&gt;]','File time information. Number of seconds. The mode is optional. If mode is missing modify is used.')
 /
 INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing total is used.')
 /
@@ -279,7 +279,7 @@ INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.regmatc
 /
 INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.size[file]','Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]')
 /
-INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.time[file&lt;, mode&gt;]','File time information. Number of seconds.The mode is optional. If mode is missing modify is used.')
+INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.time[file&lt;, mode&gt;]','File time information. Number of seconds. The mode is optional. If mode is missing modify is used.')
 /
 INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing total is used.')
 /
