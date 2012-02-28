@@ -623,13 +623,10 @@ const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 #define	NODE_CONFIGLOG_OP_DELETE	2
 
 /* HTTP item types */
-typedef enum
-{
-	ZBX_HTTPITEM_TYPE_RSPCODE = 0,
-	ZBX_HTTPITEM_TYPE_TIME,
-	ZBX_HTTPITEM_TYPE_SPEED,
-	ZBX_HTTPITEM_TYPE_LASTSTEP
-} zbx_httpitem_type_t;
+#define ZBX_HTTPITEM_TYPE_RSPCODE	0
+#define ZBX_HTTPITEM_TYPE_TIME		1
+#define ZBX_HTTPITEM_TYPE_SPEED		2
+#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
 
 /* user permissions */
 typedef enum

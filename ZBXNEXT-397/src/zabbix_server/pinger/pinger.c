@@ -63,13 +63,16 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	const char	*__function_name = "process_value";
 
 	DC_ITEM		item;
+	int		errcode;
 	AGENT_RESULT	value;
 
 	assert(value_ui64 || value_dbl);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != DCconfig_get_item_by_itemid(&item, itemid))
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+
+	if (SUCCEED != errcode)
 		return;
 
 	if (NOTSUPPORTED == ping_result)
