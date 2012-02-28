@@ -1176,22 +1176,23 @@ class CConfigurationImport {
 				$screen['screenitems'] = array();
 			}
 			foreach ($screen['screenitems'] as &$screenitem) {
-				$nodeCaption = isset($screenitem['resourceid']['node']) ? $screenitem['resourceid']['node'] . ':' : '';
+				$nodeCaption = isset($screenitem['resource']['node']) ? $screenitem['resource']['node'] . ':' : '';
 
-				if (!isset($screenitem['resourceid'])) {
+				if (!isset($screenitem['resource'])) {
 					$screenitem['resourceid'] = 0;
 				}
-				if (is_array($screenitem['resourceid'])) {
+
+				if (is_array($screenitem['resource'])) {
 					switch ($screenitem['resourcetype']) {
 						case SCREEN_RESOURCE_HOSTS_INFO:
 						case SCREEN_RESOURCE_TRIGGERS_INFO:
 						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
 						case SCREEN_RESOURCE_DATA_OVERVIEW:
 						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$db_hostgroups = API::HostGroup()->getObjects($screenitem['resourceid']);
+							$db_hostgroups = API::HostGroup()->getObjects($screenitem['resource']);
 							if (empty($db_hostgroups)) {
 								throw new Exception(_s('Cannot find group "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']));
+										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
 							}
 
 							$tmp = reset($db_hostgroups);
@@ -1199,10 +1200,10 @@ class CConfigurationImport {
 							break;
 
 						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$db_hosts = API::Host()->getObjects($screenitem['resourceid']);
+							$db_hosts = API::Host()->getObjects($screenitem['resource']);
 							if (empty($db_hosts)) {
 								throw new Exception(_s('Cannot find host "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['host'], $screen['name']));
+										$nodeCaption.$screenitem['resource']['host'], $screen['name']));
 							}
 
 							$tmp = reset($db_hosts);
@@ -1210,10 +1211,10 @@ class CConfigurationImport {
 							break;
 
 						case SCREEN_RESOURCE_GRAPH:
-							$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
+							$db_graphs = API::Graph()->getObjects($screenitem['resource']);
 							if (empty($db_graphs)) {
 								throw new Exception(_s('Cannot find graph "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']));
+										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
 							}
 
 							$tmp = reset($db_graphs);
@@ -1222,11 +1223,11 @@ class CConfigurationImport {
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$db_items = API::Item()->getObjects($screenitem['resourceid']);
+							$db_items = API::Item()->getObjects($screenitem['resource']);
 
 							if (empty($db_items)) {
 								throw new Exception(_s('Cannot find item "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']));
+										$nodeCaption.$screenitem['resource']['host'].':'.$screenitem['resource']['key_'], $screen['name']));
 							}
 
 							$tmp = reset($db_items);
@@ -1234,10 +1235,10 @@ class CConfigurationImport {
 							break;
 
 						case SCREEN_RESOURCE_MAP:
-							$db_sysmaps = API::Map()->getObjects($screenitem['resourceid']);
+							$db_sysmaps = API::Map()->getObjects($screenitem['resource']);
 							if (empty($db_sysmaps)) {
 								throw new Exception(_s('Cannot find map "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']));
+										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
 							}
 
 							$tmp = reset($db_sysmaps);
@@ -1245,10 +1246,10 @@ class CConfigurationImport {
 							break;
 
 						case SCREEN_RESOURCE_SCREEN:
-							$db_screens = API::Screen()->get(array('screenids' => $screenitem['resourceid']));
+							$db_screens = API::Screen()->get(array('screenids' => $screenitem['resource']));
 							if (empty($db_screens)) {
 								throw new Exception(_s('Cannot find screen "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']));
+										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
 							}
 
 							$tmp = reset($db_screens);
