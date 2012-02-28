@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CIFrame extends CTag{
 
 	public function __construct($src = null, $width = '100%', $height = '100%', $scrolling = 'no', $id = 'iframe') {

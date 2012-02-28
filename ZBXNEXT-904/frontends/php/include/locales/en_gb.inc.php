@@ -413,14 +413,7 @@
 	'S_VALUE'=>				_('Value'),
 	'S_VALUES_STORED'=>			_('Values stored'),
 	'S_TRENDS_STORED'=>			_('Trends stored'),
-	'S_NUMBER_OF_TRIGGERS_SHORT'=>		_('Triggers (e/d)[p/u/o]'),
-	'S_NUMBER_OF_ITEMS_SHORT'=>		_('Items (m/d/n)'),
-	'S_NUMBER_OF_USERS_SHORT'=>		_('Users (online)'),
-	'S_NUMBER_OF_HOSTS_SHORT'=>		_('Hosts (m/n/t)'),
-	'S_YES'=>				_('Yes'),
 	'S_NO'=>				_('No'),
-	'S_RUNNING'=>				_('running'),
-	'S_NOT_RUNNING'=>			_('not running'),
 
 //	report2.php
 	'S_AVAILABILITY_REPORT'=>		_('Availability report'),
@@ -490,7 +483,6 @@
 //	screenedit.php
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
-	'S_SERVER_INFO'=>			_('Server info'),
 	'S_LOCAL_TIME'=>			_('Local time'),
 	'S_RIGHT'=>				_('Right'),
 	'S_MIDDLE'=>				_('Middle'),

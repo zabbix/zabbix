@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CDiv extends CTag {
 
 	public function __construct($items = null, $class = null, $id = null) {

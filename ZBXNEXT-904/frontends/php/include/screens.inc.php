@@ -513,8 +513,8 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 				$resourceid = 0;
 				$width = 0;
 				$height = 0;
-				$colspan = 0;
-				$rowspan = 0;
+				$colspan = 1;
+				$rowspan = 1;
 				$elements = 0;
 				$valign = VALIGN_DEFAULT;
 				$halign = HALIGN_DEFAULT;
@@ -1336,10 +1336,10 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 
 			$new_col = new CCol($item, $str_halign.'_'.$str_valign);
 
-			if ($colspan) {
+			if (!empty($colspan)) {
 				$new_col->setColSpan($colspan);
 			}
-			if ($rowspan) {
+			if (!empty($rowspan)) {
 				$new_col->setRowSpan($rowspan);
 			}
 			array_push($new_cols, $new_col);

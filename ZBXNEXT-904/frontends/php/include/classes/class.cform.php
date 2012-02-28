@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CForm extends CTag {
 
 	public function __construct($method = 'post', $action = null, $enctype = null) {
@@ -52,7 +53,7 @@ class CForm extends CTag {
 			return $this->removeAttribute('enctype');
 		}
 		elseif (!is_string($value)) {
-			return $this->error('Incorrect value for SetEnctype ['.$value.']');
+			return $this->error('Incorrect value for SetEnctype "'.$value.'".');
 		}
 		return $this->setAttribute('enctype', $value);
 	}
