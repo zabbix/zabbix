@@ -523,14 +523,12 @@ class CScreenItem extends CZBXAPI {
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
-
 		// screen ids
 		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
-			$sqlParts = $this->extendQuerySelect($this->fieldId('screenid'), $sqlParts);
-			$sqlParts['where'][] = DBcondition($this->fieldId('screenid'), $options['screenids']);
+			$sqlParts = $this->extendQuerySelect($this->fieldId('screenid', 't'), $sqlParts);
+			$sqlParts['where'][] = DBcondition($this->fieldId('screenid', 't'), $options['screenids']);
 		}
-
 		return $sqlParts;
 	}
 

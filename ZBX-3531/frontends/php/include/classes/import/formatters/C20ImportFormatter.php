@@ -238,7 +238,13 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!isset($this->data['screens'])) {
 			return array();
 		}
-		return $this->data['screens'];
+
+		$screensData = array();
+		foreach ($this->data['screens'] as $screen) {
+			$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+			$screensData[] = $screen;
+		}
+		return $screensData;
 	}
 
 	protected function renameItemFields(array $item) {
