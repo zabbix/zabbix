@@ -1302,7 +1302,7 @@ function expand_trigger_description($triggerid) {
 	return htmlspecialchars(expand_trigger_description_simple($triggerid));
 }
 
-function expand_trigger_description_multiple($triggerids) {
+function expand_trigger_descriptions($triggerids) {
 	$result = Array();
 	$sqlWhereIn = DBcondition('t.triggerid', $triggerids);
 	$cursor = DBselect(

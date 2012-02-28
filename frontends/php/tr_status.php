@@ -438,7 +438,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 	}
 
-	$trigger_descriptions = expand_trigger_description_multiple($triggerids);
+	$trigger_descriptions = expand_trigger_descriptions($triggerids);
 
 	$sql_dep = 'SELECT triggerid_down, triggerid_up FROM trigger_depends WHERE '.DBcondition('triggerid_up', $triggerids);
 	$dep_res = DBselect($sql_dep);
@@ -528,8 +528,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
 		if (!empty($triggerids_down[$trigger['triggerid']])){
-			//$dep_rows = expand_trigger_description_multiple($triggerids_down);
-			$dep_rows = expand_trigger_description_multiple($triggerids_down[$trigger['triggerid']]);
+			$dep_rows = expand_trigger_descriptions($triggerids_down[$trigger['triggerid']]);
 			foreach($dep_rows as $dep_row){
 				$dep_table->addRow(SPACE.'-'.SPACE.$dep_row);
 				$dependency = true;
