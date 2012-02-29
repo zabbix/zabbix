@@ -171,7 +171,7 @@ class C20ImportFormatter extends CImportFormatter {
 					}
 					unset($trigger);
 
-					$discoveryRulesData[$template['host']][$item['key_']] = $item;
+					$discoveryRulesData[$template['template']][$item['key_']] = $item;
 				}
 			}
 		}
