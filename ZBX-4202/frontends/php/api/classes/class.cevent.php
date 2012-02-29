@@ -362,7 +362,8 @@ class CEvent extends CZBXAPI {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
 					$result[] = $event;
-				} else {
+				}
+				else {
 					$result = $event['rowscount'];
 				}
 			}
