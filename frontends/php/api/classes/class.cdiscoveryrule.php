@@ -870,19 +870,7 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	protected function createReal(&$items) {
-		foreach ($items as $key => $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => true
-			));
-			foreach ($itemsExists as $inum => $itemExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with item "%1$s" already exists.', $item['key_']));
-			}
-		}
+		$this->checkExistingItems($items);
 
 		$itemids = DB::insert('items', $items);
 

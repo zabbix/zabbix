@@ -553,19 +553,7 @@ class CItemprototype extends CItemGeneral{
 	}
 
 	protected function createReal(&$items) {
-		foreach ($items as $key => $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => 1
-			));
-			foreach ($itemsExists as $inum => $itemExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item ['.$item['key_'].'] already exists');
-			}
-		}
+		$this->checkExistingItems($items);
 
 		$itemids = DB::insert('items', $items);
 

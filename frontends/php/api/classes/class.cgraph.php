@@ -747,11 +747,12 @@ class CGraph extends CZBXAPI {
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
 
-		foreach ($graph['gitems'] as $gitem) {
+		foreach ($graph['gitems'] as &$gitem) {
 			$gitem['graphid'] = $graphid;
-
-			DB::insert('graphs_items', array($gitem));
 		}
+		unset($gitem);
+
+		DB::insert('graphs_items', $graph['gitems']);
 
 		return $graphid;
 	}
@@ -909,63 +910,62 @@ class CGraph extends CZBXAPI {
  * @return bool
  */
 	public function syncTemplates($data) {
+		$data['templateids'] = zbx_toArray($data['templateids']);
+		$data['hostids'] = zbx_toArray($data['hostids']);
 
-			$data['templateids'] = zbx_toArray($data['templateids']);
-			$data['hostids'] = zbx_toArray($data['hostids']);
+		$options = array(
+			'hostids' => $data['hostids'],
+			'editable' => 1,
+			'preservekeys' => 1,
+			'templated_hosts' => 1,
+			'output' => API_OUTPUT_SHORTEN
+		);
+		$allowedHosts = API::Host()->get($options);
+		foreach ($data['hostids'] as $hostid) {
+			if (!isset($allowedHosts[$hostid])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
+		}
+		$options = array(
+			'templateids' => $data['templateids'],
+			'preservekeys' => 1,
+			'output' => API_OUTPUT_SHORTEN
+		);
+		$allowedTemplates = API::Template()->get($options);
+		foreach ($data['templateids'] as $templateid) {
+			if (!isset($allowedTemplates[$templateid])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			}
+		}
 
-			$options = array(
-				'hostids' => $data['hostids'],
-				'editable' => 1,
-				'preservekeys' => 1,
-				'templated_hosts' => 1,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$allowedHosts = API::Host()->get($options);
+		$sql = 'SELECT hostid, templateid'.
+			' FROM hosts_templates'.
+			' WHERE '.DBcondition('hostid', $data['hostids']).
+			' AND '.DBcondition('templateid', $data['templateids']);
+		$dbLinks = DBSelect($sql);
+		$linkage = array();
+		while ($link = DBfetch($dbLinks)) {
+			if (!isset($linkage[$link['templateid']])) $linkage[$link['templateid']] = array();
+			$linkage[$link['templateid']][$link['hostid']] = 1;
+		}
+
+		$options = array(
+			'hostids' => $data['templateids'],
+			'preservekeys' => 1,
+			'output' => API_OUTPUT_EXTEND,
+			'selectGraphItems' => API_OUTPUT_EXTEND,
+		);
+		$graphs = $this->get($options);
+
+		foreach ($graphs as $graph) {
 			foreach ($data['hostids'] as $hostid) {
-				if (!isset($allowedHosts[$hostid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				if (isset($linkage[$graph['hosts'][0]['hostid']][$hostid])) {
+					$this->inherit($graph, $hostid);
 				}
 			}
-			$options = array(
-				'templateids' => $data['templateids'],
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_SHORTEN
-			);
-			$allowedTemplates = API::Template()->get($options);
-			foreach ($data['templateids'] as $templateid) {
-				if (!isset($allowedTemplates[$templateid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
-			}
+		}
 
-			$sql = 'SELECT hostid, templateid'.
-				' FROM hosts_templates'.
-				' WHERE '.DBcondition('hostid', $data['hostids']).
-				' AND '.DBcondition('templateid', $data['templateids']);
-			$dbLinks = DBSelect($sql);
-			$linkage = array();
-			while ($link = DBfetch($dbLinks)) {
-				if (!isset($linkage[$link['templateid']])) $linkage[$link['templateid']] = array();
-				$linkage[$link['templateid']][$link['hostid']] = 1;
-			}
-
-			$options = array(
-				'hostids' => $data['templateids'],
-				'preservekeys' => 1,
-				'output' => API_OUTPUT_EXTEND,
-				'selectGraphItems' => API_OUTPUT_EXTEND,
-			);
-			$graphs = $this->get($options);
-
-			foreach ($graphs as $graph) {
-				foreach ($data['hostids'] as $hostid) {
-					if (isset($linkage[$graph['hosts'][0]['hostid']][$hostid])) {
-						$this->inherit($graph, $hostid);
-					}
-				}
-			}
-
-			return true;
+		return true;
 	}
 
 	/**

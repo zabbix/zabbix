@@ -500,5 +500,31 @@ abstract class CItemGeneral extends CZBXAPI {
 			API::Graph()->update($updateGraphs);
 		}
 	}
+
+	/**
+	 * Check if any item from list already exists.
+	 *
+	 * @param array $items
+	 */
+	protected function checkExistingItems(array $items) {
+		$itemKeysByHostId = array();
+		foreach ($items as $item) {
+			if (!isset($itemKeysByHostId[$item['hostid']])) {
+				$itemKeysByHostId[$item['hostid']] = array();
+			}
+			$itemKeysByHostId[$item['hostid']][] = $item['key_'];
+		}
+
+		$sqlWhere = array();
+		foreach ($itemKeysByHostId as $hostId => $keys) {
+			$sqlWhere[] = '(i.hostid='.$hostId.' AND '.DBcondition('i.key_', $keys).')';
+		}
+
+		if ($sqlWhere) {
+			$dbItems = DBselect('SELECT i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere), 1);
+			while ($dbItem = DBfetch($dbItems)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on given host.', $dbItem['key_']));
+			}
+		}
+	}
 }
-?>

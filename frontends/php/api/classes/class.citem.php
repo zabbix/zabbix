@@ -857,19 +857,7 @@ class CItem extends CItemGeneral {
 	 * @param array $items
 	 */
 	protected function createReal(array &$items) {
-		foreach ($items as $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => true
-			));
-			if (!empty($itemsExists)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%s" already exists on given host.', $item['key_']));
-			}
-		}
+		$this->checkExistingItems($items);
 
 		$itemids = DB::insert('items', $items);
 
@@ -881,16 +869,16 @@ class CItem extends CItemGeneral {
 				continue;
 			}
 
-				foreach ($item['applications'] as $appid) {
-					if ($appid == 0) {
-						continue;
-					}
-
-					$itemApplications[] = array(
-						'applicationid' => $appid,
-						'itemid' => $items[$key]['itemid']
-					);
+			foreach ($item['applications'] as $appid) {
+				if ($appid == 0) {
+					continue;
 				}
+
+				$itemApplications[] = array(
+					'applicationid' => $appid,
+					'itemid' => $items[$key]['itemid']
+				);
+			}
 			}
 
 		if (!empty($itemApplications)) {

@@ -727,11 +727,12 @@ class CGraphPrototype extends CZBXAPI{
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
 
-		foreach ($graph['gitems'] as $gitem) {
+		foreach ($graph['gitems'] as &$gitem) {
 			$gitem['graphid'] = $graphid;
-
-			DB::insert('graphs_items', array($gitem));
 		}
+		unset($gitem);
+
+		DB::insert('graphs_items', $graph['gitems']);
 
 		return $graphid;
 	}
