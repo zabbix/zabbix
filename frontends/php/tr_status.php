@@ -361,32 +361,32 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	if($config['event_ack_enable']){
 		$options = array(
-				'countOutput' => true,
-				'groupCount' => true,
-				'triggerids' => $triggerids,
-				'filter' => array(
-					'object' => EVENT_OBJECT_TRIGGER,
-					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
-					'acknowledged' => 0,
-					'value' => TRIGGER_VALUE_TRUE,
-		),
-				'nopermissions' => true
+			'countOutput' => true,
+			'groupCount' => true,
+			'triggerids' => $triggerids,
+			'filter' => array(
+				'object' => EVENT_OBJECT_TRIGGER,
+				'value_changed' => TRIGGER_VALUE_CHANGED_YES,
+				'acknowledged' => 0,
+				'value' => TRIGGER_VALUE_TRUE
+			),
+			'nopermissions' => true
 		);
 		$event_counts = API::Event()->get($options);
-		foreach($triggers as $tnum => $trigger){
+		foreach ($triggers as $tnum => $trigger) {
 			$triggers[$tnum]['event_count'] = 0;
 		}
-		foreach($event_counts as $event_count){
+		foreach ($event_counts as $event_count) {
 			$triggers[$event_count['objectid']]['event_count'] = $event_count['rowscount'];
 		}
 	}
 
 	$tr_hostids = array();
-	foreach($triggers as $tnum => $trigger){
+	foreach ($triggers as $tnum => $trigger) {
 		$triggers[$tnum]['events'] = array();
 
 		//getting all host ids and names
-		foreach($trigger['hosts'] as $tr_hosts){
+		foreach ($trigger['hosts'] as $tr_hosts) {
 			$tr_hostids[$tr_hosts['hostid']] = $tr_hosts['hostid'];
 		}
 	}
@@ -438,27 +438,26 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 	}
 
-	$trigger_descriptions = expand_trigger_descriptions($triggerids);
+	$trigger_descriptions = expandTriggersDescriptions($triggerids);
 
-	$sql_dep = 'SELECT triggerid_down, triggerid_up FROM trigger_depends WHERE '.DBcondition('triggerid_up', $triggerids);
+	$sql_dep = 'SELECT triggerid_down,triggerid_up FROM trigger_depends WHERE '.DBcondition('triggerid_up', $triggerids);
 	$dep_res = DBselect($sql_dep);
 	$triggerids_down = Array();
 	while ($row = DBfetch($dep_res)) {
-		//if (is_null($triggerids_down[$row['triggerid_up']])) $triggerids_down[$row['triggerid_up']] = Array();
 		$triggerids_down[$row['triggerid_up']][] = intval($row['triggerid_down']);
 	}
 
-	foreach($triggers as $tnum => $trigger){
-		$trigger['desc'] = $description = $trigger_descriptions[$tnum];
+	foreach ($triggers as $tnum => $trigger) {
+		$trigger['desc'] = $trigger_descriptions[$tnum];
 		$items = array();
 
 		$used_hosts = array();
-		foreach($trigger['hosts'] as $th){
+		foreach ($trigger['hosts'] as $th) {
 			$used_hosts[$th['hostid']] = $th['name'];
 		}
 		$used_host_count = count($used_hosts);
 
-		foreach($trigger['items'] as $inum => $item){
+		foreach ($trigger['items'] as $inum => $item) {
 			$item_name = itemName($item);
 
 			//if we have items from different hosts, we must prefix a host name
@@ -527,9 +526,9 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
-		if (!empty($triggerids_down[$trigger['triggerid']])){
-			$dep_rows = expand_trigger_descriptions($triggerids_down[$trigger['triggerid']]);
-			foreach($dep_rows as $dep_row){
+		if (!empty($triggerids_down[$trigger['triggerid']])) {
+			$dep_rows = expandTriggersDescriptions($triggerids_down[$trigger['triggerid']]);
+			foreach ($dep_rows as $dep_row) {
 				$dep_table->addRow(SPACE.'-'.SPACE.$dep_row);
 				$dependency = true;
 			}
