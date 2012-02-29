@@ -12,6 +12,7 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4295] Fixed icons ending outside map. Removed icon resizing responsible for infinite loop (Toms)
 ..F....... [ZBX-4296] fixed popup menu unavailable for disabled hosts (Toms)
 ....I..... [ZBX-4693] fixed hosts table foreign key constraint error during database upgrade (dimir, Sasha)
 A.F....... [ZBX-4563] fixed host macro IDs being regenerated when updating macros (pavels)
