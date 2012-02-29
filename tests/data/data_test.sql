@@ -667,6 +667,7 @@ INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip,
 -- updating record "Configuration of Zabbix" in the auditlog
 INSERT INTO auditlog (auditid, userid, clock, action, resourcetype, details, ip, resourceid, resourcename) VALUES (700, 1, 1328684860, 1, 2, 'Default theme [css_ob.css]; Event acknowledges [1]; Show events not older than (in days) [7]; Show events max [100]; Dropdown...', '192.168.3.32', 0, '');
 
+<<<<<<< .working
 -- adding test data to the 'alerts' table for testing Audit->Actions report
 INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns, value_changed) VALUES (1, 0, 0, 12779, 1329724790, 1, 0, 0, 0);
 
@@ -678,5 +679,7 @@ INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, send
 INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, nextcheck, esc_step, alerttype) VALUES (6, 4, 1, NULL, 1329724850, NULL, '', '', 'Command: H1:ls -la', 1, 0, '', 0, 1, 1);
 INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, nextcheck, esc_step, alerttype) VALUES (7, 4, 1, NULL, 1329724860, NULL, '', '', 'Command: H1:ls -la', 1, 0, '', 0, 1, 1);
 
+=======
+>>>>>>> .merge-right.r25614
 -- deleting auditid from the ids table
 -- delete from ids where table_name='auditlog' and field_name='auditid'
