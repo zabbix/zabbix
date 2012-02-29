@@ -171,6 +171,16 @@ class C20ImportFormatter extends CImportFormatter {
 					}
 					unset($trigger);
 
+					foreach ($item['graph_prototypes'] as &$graph) {
+						$graph = $this->renameData($graph, array(
+							'type' => 'graphtype',
+							'ymin_type_1' => 'ymin_type',
+							'ymax_type_1' => 'ymax_type',
+							'graph_items' => 'gitems'
+						));
+					}
+					unset($graph);
+
 					$discoveryRulesData[$template['template']][$item['key_']] = $item;
 				}
 			}
