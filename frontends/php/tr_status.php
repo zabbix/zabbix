@@ -467,15 +467,13 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		// trigger js menu
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
-			$str_tmp = zbx_jsvalue('javascript: redirect("triggers.php?form=update&triggerid='.
-					$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid']).'")');
+			$str_tmp = CJs::encodeJson("triggers.php?form=update&triggerid=".$trigger['triggerid']."&switch_node=".id2nodeid($trigger['triggerid']));
 			$menu_trigger_conf = "['"._('Configuration of triggers')."',". $str_tmp .",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
 		if (!zbx_empty($trigger['url'])) {
-			// double zbx_jsvalue is required to prevent XSS attacks
-			$menu_trigger_url = "['"._('URL')."',\"javascript: window.location.href=".zbx_jsvalue(zbx_jsvalue(resolveTriggerUrl($trigger), null, false))."\",
+			$menu_trigger_url = "['"._('URL')."',".CJs::encodeJson(CHtml::encode(resolveTriggerUrl($trigger))).",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$description->addAction('onclick',
