@@ -1033,7 +1033,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$insertItems = array();
 		$updateItems = array();
-		$inheritedItems = array();
 		foreach ($chdHosts as $hostid => $host) {
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
@@ -1103,11 +1102,9 @@ class CDiscoveryRule extends CItemGeneral {
 
 				if ($exItem) {
 					$newItem['itemid'] = $exItem['itemid'];
-					$inheritedItems[] = $newItem;
 					$updateItems[] = $newItem;
 				}
 				else {
-					$inheritedItems[] = $newItem;
 					$newItem['flags'] = ZBX_FLAG_DISCOVERY;
 					$insertItems[] = $newItem;
 				}
@@ -1115,7 +1112,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
-		$this->inherit($inheritedItems);
+		$this->inherit(array_merge($insertItems, $updateItems));
 	}
 
 	/**
