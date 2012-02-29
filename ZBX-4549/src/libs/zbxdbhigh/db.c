@@ -2116,3 +2116,8 @@ int	DBtxn_status()
 {
 	return 0 == zbx_db_txn_error() ? SUCCEED : FAIL;
 }
+
+int	DBtxn_ongoing()
+{
+	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
+}
