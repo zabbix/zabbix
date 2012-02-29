@@ -123,7 +123,12 @@ class CProfiler {
 			$sql = htmlspecialchars($query[1], ENT_QUOTES, 'UTF-8');
 			$callStack = array_reverse($query[2]);
 
-			$sqlString = '<span style="color: green; font-size: 1.2em;">'.$sql.'</span>';
+			if (strpos($sql, 'SELECT ') !== false) {
+				$sqlString = '<span style="color: green; font-size: 1.2em;">'.$sql.'</span>';
+			}
+			else {
+				$sqlString = '<span style="color: blue; font-size: 1.2em;">'.$sql.'</span>';
+			}
 			$sqlString = _s('Time: %s', $time).'<br>'.'SQL: '.$sqlString.'<br>';
 			if ($time > $this->longSqlQueryTime) {
 				$sqlString = '<b>'.$sqlString.'</b>';
