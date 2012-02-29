@@ -473,7 +473,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 		$menu_trigger_url = 'null';
 		if (!zbx_empty($trigger['url'])) {
-			$menu_trigger_url = "['"._('URL')."',".CJs::encodeJson(CHtml::encode(resolveTriggerUrl($trigger))).",
+			// double escape is necessary
+			$menu_trigger_url = "['"._('URL')."',".CJs::encodeJson(CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))).",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$description->addAction('onclick',
