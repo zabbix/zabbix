@@ -629,5 +629,6 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 void	DBfree_history(char **value);
 
 int	DBtxn_status();
+int	DBtxn_ongoing();
 
 #endif

@@ -466,6 +466,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+........S. [ZBX-4549] fixed nested db transaction error when stopping server (dimir)
 ........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
 ..F....... [ZBX-4579] fixed incorrect "unknown" values in availability report if no events present (Alexei)
 .......P.. [ZBX-4683] fixed timestamps mismatch while sending history data from proxy (Sasha)
@@ -473,7 +474,7 @@ Changes for 1.8.11rc1
 ..F....... [ZBX-4680] fixed minor typo in frontends/php/js/class.rpc.js (Alexei)
 ...G...... [ZBX-1298] fixed processing of command line arguments more than 2KB in proc.num and proc.mem checks on Linux (Sasha)
 ........S. [ZBX-4650] fixed possible server crash while processing trigger expressions (Sasha)
-.......PS. [ZBX-3688] fixed changing host's availabitily for dynamic SNMP checks (Sasha)
+.......PS. [ZBX-3688] fixed changing host's availability for dynamic SNMP checks (Sasha)
 ...G...PS. [ZBX-3788] signal handlers changed to reduce probability of process hang on exit (Andris)
 .......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
 .......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)
