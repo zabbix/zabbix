@@ -94,7 +94,8 @@ CONFFLAGS_COMMON  = --host=$(DEB_HOST_GNU_TYPE) \
                     --with-net-snmp \
                     --with-openipmi \
                     --with-ssh2 \
-                    --with-libcurl
+                    --with-libcurl \
+                    --with-iodbc
 
 CONFFLAGS_SERVER_MYSQL = $(CONFFLAGS_COMMON) --with-mysql
 CONFFLAGS_SERVER_PGSQL = $(CONFFLAGS_COMMON) --with-pgsql
@@ -108,9 +109,18 @@ BUILDDIR := $(CURDIR)/debian/tmp-build
 # and reconfigure the autoconf magic to have the "-lcrypto" linking removed.
 prepare: patch prepare-stamp
 prepare-stamp:
-	dh_autotools-dev_updateconfig
-	# we removed -lcrypto stuff so lets re-run autotools:
-	autoreconf
+	if test -e /usr/share/misc/config.guess ; then 
+		if ! test -e config.guess.orig; then
+			mv config.guess config.guess.orig ;
+			cp --remove-destination /usr/share/misc/config.guess config.guess ;
+		fi ;
+	fi
+	if test -e /usr/share/misc/config.sub ; then
+		if ! test -e config.sub.orig; then
+			mv config.sub config.sub.orig ;
+			cp --remove-destination /usr/share/misc/config.sub config.sub ;
+		fi ; \
+	fi
 	touch prepare-stamp
 
 # Copy the source directory (without the 'debian' directory) to other locations
@@ -121,7 +131,7 @@ extract-%-stamp:
 	@echo "Copying source directory to $(BUILDDIR)-$(*) for building the $(*) variant there"
 	@echo "--------------------------"
 	mkdir $(BUILDDIR)-$(*)
-	tar -cSf - --exclude=./.svn --exclude=./debian --exclude zbxclock.swf . | tar -xSpf - -C $(BUILDDIR)-$(*)
+	tar -cSf - --exclude=./.svn --exclude=./debian . | tar -xSpf - -C $(BUILDDIR)-$(*)
 	touch $@
 
 # Configure the flavors
@@ -155,7 +165,12 @@ clean: unpatch
 	[ ! -f src/zabbix_sender/Makefile ] || $(MAKE) -C src/zabbix_sender/ clean
 	[ ! -f src/zabbix_proxy/Makefile ] || $(MAKE) -C src/zabbix_proxy/ clean
 	debconf-updatepo
-	dh_autotools-dev_restoreconfig
+	if test -e config.guess.orig ; then
+		mv config.guess.orig config.guess ;
+	fi ; 
+	if test -e config.sub.orig ; then
+		mv config.sub.orig config.sub ;
+	fi ;
 	@echo Removing build directories in $(BUILDDIR)
 	$(RM) -r debian/tmp*
 	dh_clean
@@ -170,15 +185,13 @@ binary-indep: build
 	# --------------------------------
 	# Rename during install
 	# zabbix-frontend-php
-	cp debian/templates/dbconfig.php.in $(TMP_FRONTEND)/usr/share/doc/zabbix-frontend-php/dbconfig.php
 	cp debian/conf/apache.conf $(TMP_FRONTEND)/etc/zabbix/apache.conf
+	find $(TMP_FRONTEND)/usr/share/zabbix -name .htaccess | xargs rm -rf
 	# --------------------------------
 	# zabbix-frontend-php
-	# javscript libraries and fonts come from the respective Debian packages.
-	# they get linked later with dh_link.
+	# fonts come from the respective Debian packages.
+	# it get linked later with dh_link.
 	rm -r $(TMP_FRONTEND)/usr/share/zabbix/fonts/DejaVuSans.ttf
-	rm -r $(TMP_FRONTEND)/usr/share/zabbix/js/prototype.js
-	rm -r $(TMP_FRONTEND)/usr/share/zabbix/js/scriptaculous*
 	rm -f $(TMP_FRONTEND)/usr/share/zabbix/conf/COPYING
 	# --------------------------------
 	dh_installdocs -i
@@ -193,8 +206,6 @@ binary-indep: build
 	dh_fixperms -i
 	# --------------------------------
 	# zabbix-frontend-php
-	# disable frontend-based installation
-	mv $(TMP_FRONTEND)/usr/share/zabbix/setup.php $(TMP_FRONTEND)/usr/share/zabbix/setup.php.disabled
 	# remove executable permissions on PNG file
 	find $(TMP_FRONTEND) -type f -name '*.png' -print0 | xargs -0r chmod a-x
 	# --------------------------------
