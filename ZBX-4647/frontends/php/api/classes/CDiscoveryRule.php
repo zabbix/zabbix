@@ -730,7 +730,7 @@ class CDiscoveryRule extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 		}
 
-		$selectFields = array();
+		$selectFields = array('flags');
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;
