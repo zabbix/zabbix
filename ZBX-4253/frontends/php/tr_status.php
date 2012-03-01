@@ -456,14 +456,13 @@ include_once('include/page_header.php');
 
 		$menu_trigger_conf = 'null';
 		if($admin_links){
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',\"javascript:
-				redirect('triggers.php?form=update&triggerid=".$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid'])."')\",
+			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."','triggers.php?form=update&triggerid=".$trigger['triggerid']."&switch_node=".id2nodeid($trigger['triggerid'])."',
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
 		if (!zbx_empty($trigger['url'])) {
-			// double zbx_jsvalue is required to prevent XSS attacks
-			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href=".zbx_jsvalue(zbx_jsvalue(resolveTriggerUrl($trigger), null, false))."\",
+			// double htmlentities is required to prevent XSS attacks
+			$menu_trigger_url = "['".S_URL."','".htmlentities(htmlentities(resolveTriggerUrl($trigger), ENT_QUOTES, "UTF"), ENT_QUOTES, "UTF")."',
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$description->addAction('onclick',
@@ -471,7 +470,6 @@ include_once('include/page_header.php');
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."),".
 			zbx_jsvalue($items, true).");"
 		);
-
 
 // }}} trigger description js menu
 
