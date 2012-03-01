@@ -74,7 +74,8 @@ static size_t	HEADERFUNCTION2(void *ptr, size_t size, size_t nmemb, void *userda
 
 #endif	/* HAVE_LIBCURL */
 
-static void	process_test_data(zbx_uint64_t httptestid, ZBX_HTTPSTAT *stat)
+static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, double speed_download,
+		const char *err_str, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "process_test_data";
 
@@ -86,11 +87,8 @@ static void	process_test_data(zbx_uint64_t httptestid, ZBX_HTTPSTAT *stat)
 	int		errcodes[3];
 	size_t		i, num = 0;
 	AGENT_RESULT    value;
-	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_timespec(&ts);
 
 	result = DBselect("select type,itemid from httptestitem where httptestid=" ZBX_FS_UI64, httptestid);
 
@@ -102,11 +100,17 @@ static void	process_test_data(zbx_uint64_t httptestid, ZBX_HTTPSTAT *stat)
 			break;
 		}
 
-		if (ZBX_HTTPITEM_TYPE_TIME != (types[num] = (unsigned char)atoi(row[0])) &&
-				ZBX_HTTPITEM_TYPE_SPEED != types[num] && ZBX_HTTPITEM_TYPE_LASTSTEP != types[num])
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
+		switch (types[num] = (unsigned char)atoi(row[0])) {
+			case ZBX_HTTPITEM_TYPE_SPEED:
+			case ZBX_HTTPITEM_TYPE_LASTSTEP:
+				break;
+			case ZBX_HTTPITEM_TYPE_LASTERROR:
+				if (NULL == err_str)
+					continue;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
 		}
 
 		ZBX_STR2UINT64(itemids[num], row[1]);
@@ -132,18 +136,18 @@ static void	process_test_data(zbx_uint64_t httptestid, ZBX_HTTPSTAT *stat)
 
 		switch (types[i])
 		{
-			case ZBX_HTTPITEM_TYPE_TIME:
-				SET_DBL_RESULT(&value, stat->test_total_time);
-				break;
 			case ZBX_HTTPITEM_TYPE_SPEED:
-				SET_UI64_RESULT(&value, stat->speed_download);
+				SET_UI64_RESULT(&value, speed_download);
 				break;
 			case ZBX_HTTPITEM_TYPE_LASTSTEP:
-				SET_UI64_RESULT(&value, stat->test_last_step);
+				SET_UI64_RESULT(&value, lastfailedstep);
+				break;
+			case ZBX_HTTPITEM_TYPE_LASTERROR:
+				SET_STR_RESULT(&value, zbx_strdup(NULL, err_str));
 				break;
 		}
 
-		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, &ts,
+		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts,
 				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&value);
@@ -152,7 +156,7 @@ static void	process_test_data(zbx_uint64_t httptestid, ZBX_HTTPSTAT *stat)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat)
+static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "process_step_data";
 
@@ -164,12 +168,9 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat)
 	int		errcodes[3];
 	size_t		i, num = 0;
 	AGENT_RESULT    value;
-	zbx_timespec_t	ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_FS_DBL,
 			__function_name, stat->rspcode, stat->total_time, stat->speed_download);
-
-	zbx_timespec(&ts);
 
 	result = DBselect("select type,itemid from httpstepitem where httpstepid=" ZBX_FS_UI64, httpstepid);
 
@@ -222,7 +223,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat)
 				break;
 		}
 
-		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, &ts,
+		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts,
 				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
 
 		free_result(&value);
@@ -253,8 +254,9 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPSTEP	httpstep;
-	char		*err_str = NULL, *err_str_esc = NULL;
-	int		now, lastfailedstep;
+	char		*err_str = NULL;
+	int		lastfailedstep;
+	zbx_timespec_t	ts;
 	ZBX_HTTPSTAT	stat;
 	double		speed_download = 0;
 	int		speed_download_num = 0;
@@ -268,9 +270,6 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			__function_name, httptest->httptestid, httptest->name);
 
 	lastfailedstep = 0;
-	httptest->time = 0;
-
-	now = time(NULL);
 
 	result = DBselect(
 			"select httpstepid,no,name,url,timeout,posts,required,status_codes"
@@ -304,7 +303,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		goto clean;
 	}
 
-	while (NULL == err_str && NULL != (row = DBfetch(result)))
+	while (NULL != (row = DBfetch(result)))
 	{
 		/* NOTE: do not use break or return for this block!
 		 *       process_step_data calling required!
@@ -318,13 +317,6 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		strscpy(httpstep.posts, row[5]);
 		httpstep.required = row[6];
 		httpstep.status_codes = row[7];
-
-		DBexecute("update httptest"
-				" set curstep=%d,"
-					"curstate=%d,"
-					"lastcheck=%d"
-				" where httptestid=" ZBX_FS_UI64,
-				httpstep.no, HTTPTEST_STATE_BUSY, now, httptest->httptestid);
 
 		memset(&stat, 0, sizeof(stat));
 
@@ -453,17 +445,22 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			zbx_free(page.data);
 		}
 
-		if (NULL != err_str)
-			lastfailedstep = httpstep.no;
+		zbx_timespec(&ts);
+		process_step_data(httpstep.httpstepid, &stat, &ts);
 
-		httptest->time += stat.total_time;
-		process_step_data(httpstep.httpstepid, &stat);
+		if (NULL != err_str)
+		{
+			lastfailedstep = httpstep.no;
+			break;
+		}
 	}
 clean:
 	curl_easy_cleanup(easyhandle);
 #else
 	err_str = zbx_strdup(err_str, "cURL library is required for Web monitoring support");
 #endif	/* HAVE_LIBCURL */
+
+	zbx_timespec(&ts);
 
 	if (0 == lastfailedstep && NULL != err_str)
 	{
@@ -478,41 +475,24 @@ clean:
 
 			memset(&stat, 0, sizeof(stat));
 
-			process_step_data(httpstep.httpstepid, &stat);
+			process_step_data(httpstep.httpstepid, &stat, &ts);
 		}
 		else
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
 	DBfree_result(result);
 
-	err_str_esc = DBdyn_escape_string_len(err_str, HTTPTEST_ERROR_LEN);
+	DBexecute("update httptest set nextcheck=%d+delay where httptestid=" ZBX_FS_UI64,
+			ts.sec, httptest->httptestid);
 
-	DBexecute("update httptest"
-			" set curstep=0,"
-				"curstate=%d,"
-				"lastcheck=%d,"
-				"nextcheck=%d+delay,"
-				"lastfailedstep=%d,"
-				"time=" ZBX_FS_DBL ","
-				"error='%s'"
-			" where httptestid=" ZBX_FS_UI64,
-			HTTPTEST_STATE_IDLE,
-			now, now,
-			lastfailedstep,
-			httptest->time,
-			err_str_esc,
-			httptest->httptestid);
+	if (0 != speed_download_num)
+		speed_download /= speed_download_num;
 
-	zbx_free(err_str_esc);
+	process_test_data(httptest->httptestid, lastfailedstep, speed_download, err_str, &ts);
+
 	zbx_free(err_str);
 
-	stat.test_total_time = httptest->time;
-	stat.test_last_step = lastfailedstep;
-	stat.speed_download = speed_download_num ? speed_download / speed_download_num : 0;
-
-	process_test_data(httptest->httptestid, &stat);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() total_time:" ZBX_FS_DBL, __function_name, httptest->time);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -548,6 +528,7 @@ void	process_httptests(int httppoller_num, int now)
 				" and t.nextcheck<=%d"
 				" and " ZBX_SQL_MOD(t.httptestid,%d) "=%d"
 				" and t.status=%d"
+				" and h.proxy_hostid is null"
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				DB_NODE,

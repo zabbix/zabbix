@@ -66,8 +66,6 @@
 	'S_STATUS_OF_WEB_MONITORING'=>		_('Status of Web monitoring'),
 	'S_STATUS_OF_WEB_MONITORING_BIG'=>	_('STATUS OF WEB MONITORING'),
 	'S_STATE'=>				_('State'),
-	'S_WEB_SCENARIO_DATE_FORMAT'=>		_('d M Y H:i:s'),
-	'S_WEB_SCENARIO_IDLE_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	httpconf.php
 	'S_STEP'=>					_('Step'),

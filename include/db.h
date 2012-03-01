@@ -426,7 +426,6 @@ typedef struct
 	char		*agent;
 	char		*http_user;
 	char		*http_password;
-	double		time;
 	int		authentication;
 }
 DB_HTTPTEST;

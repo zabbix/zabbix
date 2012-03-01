@@ -89,6 +89,27 @@
 		access_deny();
 	}
 
+	$httptest_data['lastfailedstep'] = 0;
+	$httptest_data['error'] = '';
+
+	$result = DBselect(
+			'SELECT hti.httptestid,hti.type,i.lastvalue,i.lastclock'.
+			' FROM httptestitem hti,items i'.
+			' WHERE hti.itemid=i.itemid'.
+				' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
+				' AND i.lastclock IS NOT NULL'.
+				' AND hti.httptestid='.$httptest_data['httptestid']
+	);
+	while ($row = DBfetch($result)) {
+		if ($row['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
+			$httptest_data['lastcheck'] = $row['lastclock'];
+			$httptest_data['lastfailedstep'] = $row['lastvalue'];
+		}
+		else {
+			$httptest_data['error'] = $row['lastvalue'];
+		}
+	}
+
 	navigation_bar_calc('web.httptest', $_REQUEST['httptestid'], true);
 ?>
 <?php
@@ -98,8 +119,13 @@
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$rst_icon = get_icon('reset', array('id' => $_REQUEST['httptestid']));
 
+	$lastcheck = NULL;
+	if (isset($httptest_data['lastcheck'])) {
+		$lastcheck = ' ['.zbx_date2str(S_DATE_FORMAT_YMDHMS, $httptest_data['lastcheck']).']';
+	}
+
 	$details_wdgt->addPageHeader(
-		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']),' ['.date(S_DATE_FORMAT_YMDHMS, $httptest_data['lastcheck']).']'),
+		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']), $lastcheck),
 		array($rst_icon, $fs_icon)
 	);
 //-------------
@@ -122,36 +148,20 @@
 		$status['msg'] = _('OK');
 		$status['style'] = 'enabled';
 
-		if(HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
-			if($httptest_data['curstep'] == ($httpstep_data['no'])){
-				$status['msg'] = S_IN_PROGRESS;
+		if (!isset($httptest_data['lastcheck'])) {
+				$status['msg'] = _('Never executed');
 				$status['style'] = 'unknown';
-				$status['skip'] = true;
+		}
+		elseif ($httptest_data['lastfailedstep'] != 0) {
+			if ($httptest_data['lastfailedstep'] == $httpstep_data['no']) {
+				$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
+				$status['style'] = 'disabled';
 			}
-			else if($httptest_data['curstep'] < ($httpstep_data['no'])){
+			elseif ($httptest_data['lastfailedstep'] < $httpstep_data['no']) {
 				$status['msg'] = S_UNKNOWN;
 				$status['style'] = 'unknown';
 				$status['skip'] = true;
 			}
-		}
-		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
-			if($httptest_data['lastfailedstep'] != 0){
-				if($httptest_data['lastfailedstep'] == ($httpstep_data['no'])){
-					$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
-					$status['style'] = 'disabled';
-					//$status['skip'] = true;
-				}
-				else if($httptest_data['lastfailedstep'] < ($httpstep_data['no'])){
-					$status['msg'] = S_UNKNOWN;
-					$status['style'] = 'unknown';
-					$status['skip'] = true;
-				}
-			}
-		}
-		else{
-			$status['msg'] = S_UNKNOWN;
-			$status['style'] = 'unknown';
-			$status['skip'] = true;
 		}
 
 		$itemids = array();
@@ -191,20 +201,17 @@
 		));
 	}
 
-	$status['msg'] = _('OK');
-	$status['style'] = 'enabled';
-
-	if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
-		$status['msg'] = S_IN_PROGRESS;
+	if (!isset($httptest_data['lastcheck'])) {
+		$status['msg'] = _('Never executed');;
 		$status['style'] = 'unknown';
 	}
-	else if ( HTTPTEST_STATE_UNKNOWN == $httptest_data['curstate'] ){
-		$status['msg'] = S_UNKNOWN;
-		$status['style'] = 'unknown';
-	}
-	else if($httptest_data['lastfailedstep'] > 0){
+	elseif ($httptest_data['lastfailedstep'] != 0) {
 		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 		$status['style'] = 'disabled';
+	}
+	else {
+		$status['msg'] = _('OK');
+		$status['style'] = 'enabled';
 	}
 
 	$table->addRow(array(
