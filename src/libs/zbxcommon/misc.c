@@ -1198,26 +1198,27 @@ out:
  ******************************************************************************/
 int	int_in_list(char *list, int value)
 {
-	char	*start = NULL, *end = NULL;
-	int	i1,i2;
-	int	ret = FAIL;
-	char	c = '\0';
+	const char	*__function_name = "int_in_list";
+	char		*start = NULL, *end = NULL;
+	int		i1,i2;
+	int		ret = FAIL;
+	char		c = '\0';
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:%d)", list, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s', value:%d", list, value);
 
 	for (start = list; start[0] != '\0';)
 	{
-		end=strchr(start, ',');
+		end = strchr(start, ',');
 
-		if (end != NULL)
+		if (NULL != end)
 		{
-			c=end[0];
-			end[0]='\0';
+			c = end[0];
+			end[0] = '\0';
 		}
 
-		if (sscanf(start,"%d-%d",&i1,&i2) == 2)
+		if (sscanf(start, "%d-%d", &i1, &i2) == 2)
 		{
-			if (value>=i1 && value<=i2)
+			if (value >= i1 && value <= i2)
 			{
 				ret = SUCCEED;
 				break;
@@ -1225,17 +1226,17 @@ int	int_in_list(char *list, int value)
 		}
 		else
 		{
-			if (atoi(start) == value)
+			if (value == atoi(start))
 			{
 				ret = SUCCEED;
 				break;
 			}
 		}
 
-		if (end != NULL)
+		if (NULL != end)
 		{
-			end[0]=c;
-			start=end+1;
+			end[0] = c;
+			start = end+1;
 		}
 		else
 		{
@@ -1243,13 +1244,10 @@ int	int_in_list(char *list, int value)
 		}
 	}
 
-	if (end != NULL)
-	{
-		end[0]=c;
-	}
+	if (NULL != end)
+		end[0] = c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of int_in_list():%s",
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1273,31 +1271,26 @@ int	int_in_list(char *list, int value)
 int	is_double_prefix(const char *c)
 {
 	int i;
-	int dot=-1;
+	int dot =- 1;
 
-	for (i=0;c[i]!=0;i++)
+	for (i = 0; c[i] != 0; i++)
 	{
-		/* Negative number? */
-		if (c[i]=='-' && i==0)
+		/* negative number? */
+		if (c[i] == '-' && 0 == i)
+			continue;
+
+		if (c[i] >= '0' && c[i] <= '9')
+			continue;
+
+		if (c[i] == '.' && -1 == dot)
 		{
+			dot = i;
 			continue;
 		}
 
-		if ((c[i]>='0')&&(c[i]<='9'))
-		{
+		/* last character is suffix 'K', 'M', 'G', 'T', 's', 'm', 'h', 'd', 'w' */
+		if (NULL != strchr("KMGTsmhdw", c[i]) && c[i+1] == '\0')
 			continue;
-		}
-
-		if ((c[i]=='.')&&(dot==-1))
-		{
-			dot=i;
-			continue;
-		}
-		/* Last character is suffix 'K', 'M', 'G', 'T', 's', 'm', 'h', 'd', 'w' */
-		if (strchr("KMGTsmhdw", c[i])!=NULL && c[i+1]=='\0')
-		{
-			continue;
-		}
 
 		return FAIL;
 	}
@@ -1321,43 +1314,42 @@ int	is_double_prefix(const char *c)
 int	is_double(const char *c)
 {
 	int i;
-	int dot=-1;
+	int dot = -1;
 	int len;
 
-	for (i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
+	for (i = 0; c[i] == ' ' && c[i] != 0; i++);	/* trim left spaces */
 
-	for (len=0; c[i]!=0; i++, len++)
+	for (len = 0; c[i] != 0; i++, len++)
 	{
-		/* Negative number? */
-		if (c[i]=='-' && i==0)
+		/* negative number? */
+		if (c[i] == '-' && i == 0)
+			continue;
+
+		if (c[i] >= '0' && c[i] <= '9')
+			continue;
+
+		if (c[i] == '.' && dot == -1)
 		{
+			dot = i;
 			continue;
 		}
 
-		if ((c[i]>='0')&&(c[i]<='9'))
+		if (c[i] == ' ')	/* check right spaces */
 		{
-			continue;
-		}
+			for (; c[i] == ' ' && c[i] != 0; i++);	/* trim right spaces */
 
-		if ((c[i]=='.')&&(dot==-1))
-		{
-			dot=i;
-			continue;
-		}
-
-		if (c[i]==' ') /* check right spaces */
-		{
-			for ( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
-
-			if (c[i]==0) break; /* SUCCEED */
+			if (c[i] == 0)
+				break;	/* SUCCEED */
 		}
 
 		return FAIL;
 	}
 
-	if (len <= 0) return FAIL;
+	if (len <= 0)
+		return FAIL;
 
-	if (len == 1 && dot!=-1) return FAIL;
+	if (1 == len && -1 != dot)
+		return FAIL;
 
 	return SUCCEED;
 }
@@ -1382,23 +1374,23 @@ int	is_uint_prefix(const char *c)
 {
 	int	i = 0;
 
-	while (c[i]==' ') /* trim left spaces */
+	while (c[i] == ' ')	/* trim left spaces */
 		i++;
 
 	if (!isdigit(c[i]))
 		return FAIL;
-	else
-		do
-			i++;
-		while (isdigit(c[i]));
 
-	if (c[i]=='s' || c[i]=='m' || c[i]=='h' || c[i]=='d' || c[i]=='w') /* check suffix */
+	do
+		i++;
+	while (isdigit(c[i]));
+
+	if (c[i] == 's' || c[i] == 'm' || c[i] == 'h' || c[i] == 'd' || c[i] == 'w')	/* check suffix */
 		i++;
 
-	while (c[i]==' ') /* trim right spaces */
+	while (c[i] == ' ')	/* trim right spaces */
 		i++;
 
-	return c[i]=='\0' ? SUCCEED : FAIL;
+	return c[i] == '\0' ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
