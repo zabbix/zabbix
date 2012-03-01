@@ -240,7 +240,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 		int	clock_from;
 		char	**h_value;
 
-		clock_from = time(NULL) - atoi(param);
+		clock_from = time(NULL) - str2uint(param);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select itemid,value_type"
