@@ -316,7 +316,7 @@ class CConfigurationExport {
 		$items = $this->prepareDiscoveryRules($items);
 
 		foreach ($items as $item) {
-			if (!isset($this->data['templates'][$item['hostid']]['items'])) {
+			if (!isset($this->data['templates'][$item['hostid']]['discoveryRules'])) {
 				$this->data['templates'][$item['hostid']]['discoveryRules'] = array();
 			}
 			$this->data['templates'][$item['hostid']]['discoveryRules'][] = $item;
