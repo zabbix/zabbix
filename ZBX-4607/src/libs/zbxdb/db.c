@@ -24,8 +24,8 @@
 #include "log.h"
 #include "mutexs.h"
 
-int		txn_level = 0;	/* transaction level, nested transactions are not supported */
-int		txn_error = 0;	/* failed transaction */
+static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
+static int	txn_error = 0;	/* failed transaction */
 static int	txn_init = 0;	/* connecting to db */
 
 #if defined(HAVE_IBM_DB2)
@@ -513,8 +513,7 @@ int	zbx_db_begin()
 
 	if (txn_level > 0)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected."
-				" Please report it to Zabbix Team.");
+		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
 		assert(0);
 	}
 
@@ -653,6 +652,16 @@ int	zbx_db_rollback()
 		txn_error = last_txn_error;	/* in case of DB down we will repeat this operation */
 
 	return rc;
+}
+
+int	zbx_db_txn_level()
+{
+	return txn_level;
+}
+
+int	zbx_db_txn_error()
+{
+	return txn_error;
 }
 
 /*

@@ -50,7 +50,7 @@ $usersTweenBox = new CTweenBox($userGroupForm, 'group_users', $this->data['group
 foreach ($this->data['users'] as $user) {
 	$usersTweenBox->addItem($user['userid'], $user['alias']);
 }
-$userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), array(_('Other groups'), $groupsComboBox)));
+$userGroupFormList->addRow(_('Users'), $usersTweenBox->get(_('In group'), array(_('Other groups'), SPACE, $groupsComboBox)));
 
 // append frontend and user status to from list
 $isGranted = isset($_REQUEST['usrgrpid']) ? granted2update_group($_REQUEST['usrgrpid']) : true;
@@ -60,13 +60,13 @@ if ($isGranted) {
 	$frontendComboBox->addItem(GROUP_GUI_ACCESS_INTERNAL, user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL));
 	$frontendComboBox->addItem(GROUP_GUI_ACCESS_DISABLED, user_auth_type2str(GROUP_GUI_ACCESS_DISABLED));
 	$userGroupFormList->addRow(_('Frontend access'), $frontendComboBox);
-	$userGroupFormList->addRow(_('Users status'), new CCheckBox('users_status', $this->data['users_status'] ? (!isset($_REQUEST['usrgrpid']) ? 1 : 0) : 1, null, 1)); // invert user status 0 - enable, 1 - disable
+	$userGroupFormList->addRow(_('Enabled'), new CCheckBox('users_status', $this->data['users_status'] ? (!isset($_REQUEST['usrgrpid']) ? 1 : 0) : 1, null, 1)); // invert user status 0 - enable, 1 - disable
 }
 else {
 	$userGroupForm->addVar('gui_access', $this->data['gui_access']);
 	$userGroupForm->addVar('users_status', GROUP_STATUS_ENABLED);
 	$userGroupFormList->addRow(_('Frontend access'), new CSpan(user_auth_type2str($this->data['gui_access']), 'green'));
-	$userGroupFormList->addRow(_('Users status'), new CSpan(_('Enabled'), 'green'));
+	$userGroupFormList->addRow(_('Enabled'), new CSpan(_('Enabled'), 'green'));
 }
 $userGroupFormList->addRow(_('Debug mode'), new CCheckBox('debug_mode', $this->data['debug_mode'], null, 1));
 
@@ -98,16 +98,16 @@ foreach ($this->data['group_rights'] as $id => $rights) {
 $permissionsTable->addRow(array(new CCol($lstWrite, 'read_write'), new CCol($lstRead, 'read_only'), new CCol($lstDeny, 'deny')));
 $permissionsTable->addRow(array(
 	array(
-		new CButton('add_read_write', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ_WRITE."', 450, 450);"),
-		new CSubmit('del_read_write', _('Delete selected'))
+		new CButton('add_read_write', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ_WRITE."', 450, 450);", 'formlist'),
+		new CSubmit('del_read_write', _('Delete selected'), null, 'formlist')
 	),
 	array(
-		new CButton('add_read_only', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ_ONLY."', 450, 450);"),
-		new CSubmit('del_read_only', _('Delete selected'))
+		new CButton('add_read_only', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_READ_ONLY."', 450, 450);", 'formlist'),
+		new CSubmit('del_read_only', _('Delete selected'), null, 'formlist')
 	),
 	array(
-		new CButton('add_deny', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_DENY."', 450, 450);"),
-		new CSubmit('del_deny', _('Delete selected'))
+		new CButton('add_deny', _('Add'), "return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().'&permission='.PERM_DENY."', 450, 450);", 'formlist'),
+		new CSubmit('del_deny', _('Delete selected'), null, 'formlist')
 	)
 ));
 $permissionsFormList->addRow(_('Composing permissions'), $permissionsTable);

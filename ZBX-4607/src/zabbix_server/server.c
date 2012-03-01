@@ -753,6 +753,9 @@ void	zbx_on_exit()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
 
+	if (SUCCEED == DBtxn_ongoing())
+		DBrollback();
+
 	if (NULL != threads)
 	{
 		int		i;

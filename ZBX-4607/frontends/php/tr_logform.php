@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/items.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = 'S_TRIGGER_LOG_FORM';
 $page['file'] = 'tr_logform.php';
@@ -31,7 +31,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //---------------------------------- CHECKS ------------------------------------
@@ -167,7 +167,7 @@ if(isset($_REQUEST['save_trigger'])){
 			unset($_REQUEST["sform"]);
 
 			zbx_add_post_js('closeForm("items.php");');
-			require_once('include/page_footer.php');
+			require_once dirname(__FILE__).'/include/page_footer.php';
 		}
 	}
 }
@@ -268,8 +268,7 @@ if(isset($_REQUEST['sform'])){
 
 	$keys = get_request('keys',array());
 
-//sdi('<pre>'.print_r($expressions, true).'</pre>');
-	$frmTRLog->addRow(S_DESCRIPTION,new CTextBox('description',$description,80));
+	$frmTRLog->addRow(_('Description'), new CTextBox('description', $description, 80));
 
 	$item = '';
 	$db_items = DBselect('SELECT DISTINCT * FROM items WHERE itemid='.$itemid);
@@ -312,11 +311,11 @@ if(isset($_REQUEST['sform'])){
 
 	$keyTable = new CTableInfo(null);
 	$keyTable->setAttribute('id','key_list');
-	$keyTable->setHeader(array(S_KEYWORD, S_TYPE, S_ACTION));
+	$keyTable->setHeader(array(S_KEYWORD, S_TYPE, _('Action')));
 
 	$table = new CTableInfo(null);
 	$table->setAttribute('id','exp_list');
-	$table->setHeader(array(_('Expression'), S_TYPE, S_POSITION, S_ACTION));
+	$table->setHeader(array(_('Expression'), S_TYPE, S_POSITION, _('Action')));
 
 	$maxid=0;
 
@@ -335,7 +334,7 @@ if(isset($_REQUEST['sform'])){
 		$expressions[0]['view'] = $expr_incase;
 		$bExprResult = false;
 	}
-//sdi('<pre>'.print_r($expressions,true).'</pre>');
+
 	foreach($expressions as $id => $expr){
 
 		$imgup = new CImg('images/general/arrowup.gif','up',12,14);
@@ -394,5 +393,5 @@ if(isset($_REQUEST['sform'])){
 	}
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

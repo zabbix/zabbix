@@ -252,8 +252,6 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
 {
-	size_t	i;
-
 	if (*offset + n >= *alloc_len)
 	{
 		while (*offset + n >= *alloc_len)
@@ -261,8 +259,11 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
 		*str = zbx_realloc(*str, *alloc_len);
 	}
 
-	for (i = 0; i < n && '\0' != src[i]; i++)
-		(*str)[(*offset)++] = src[i];
+	while (0 != n && '\0' != *src)
+	{
+		(*str)[(*offset)++] = *src++;
+		n--;
+	}
 
 	(*str)[*offset] = '\0';
 }

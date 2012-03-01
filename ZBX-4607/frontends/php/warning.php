@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Warning');
 $page['file'] = 'warning.php';
@@ -29,7 +29,7 @@ if (!defined('PAGE_HEADER_LOADED')) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 
-$refresh_rate = 30; //seconds
+$refresh_rate = 30; // seconds
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -49,7 +49,7 @@ if (isset($_REQUEST['cancel'])) {
 // clear_messages();
 CWebUser::$data['refresh'] = $refresh_rate;
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 unset($USER_DETAILS);
 
@@ -73,5 +73,5 @@ $table->show();
 zbx_add_post_js('setTimeout("document.location.reload();",'.($refresh_rate * 1000).');');
 echo SBR;
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

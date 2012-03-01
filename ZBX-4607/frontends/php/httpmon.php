@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/httptest.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/httptest.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = 'S_STATUS_OF_WEB_MONITORING';
 $page['file'] = 'httpmon.php';
@@ -30,7 +30,7 @@ $page['hist_arg'] = array('open','groupid','hostid');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -48,8 +48,7 @@ require_once('include/page_header.php');
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})')
 	);
 
 	check_fields($fields);
@@ -57,12 +56,12 @@ require_once('include/page_header.php');
 /* AJAX	*/
 	if(isset($_REQUEST['favobj'])){
 		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.httpmon.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.httpmon.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--------
@@ -241,7 +240,7 @@ require_once('include/page_header.php');
 			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
 			$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].']';
 
-			$status['msg'] = S_IN_PROGRESS;
+			$status['msg'] = _('In progress');
 			$status['style'] = 'orange';
 		}
 		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
@@ -319,6 +318,6 @@ require_once('include/page_header.php');
 	$httpmon_wdgt->show();
 
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>
