@@ -1218,7 +1218,7 @@ class DB {
 					' AND '.$id_name.'<='.self::$maxNodeId;
 		$row = DBfetch(DBselect($sql));
 
-		$nextid = (!$row || is_null($row['id'])) ? self::$minNodeId : $row['id'];
+		$nextid = ($row && $row['id']) ? $row['id'] : self::$minNodeId;
 
 		$maxNextId = bcadd($nextid, $count, 0);
 		if (bccomp($maxNextId, self::$maxNodeId, 0) == 1) {
