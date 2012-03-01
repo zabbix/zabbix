@@ -2,10 +2,34 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBX-4600] trigger dependencies will now be deleted when executing a mass update with no dependencies selected (pavels)
+A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces (pavels)
+..F....... [ZBX-4563] improved SQL query debug log design (pavels)
+..F....... [ZBX-4537] improved include_once statements to make Zabbix code easier to reuse (Alexei)
+..F....... [ZBXNEXT-1113] redesign Configuration->Host->Discovery rules (Eduard)
+..F....... [ZBXNEXT-1107] redesign Configuration->Audit (Eduard)
+....I..PS. [ZBX-2604] added processing of not supported items monitored by a proxy (Sasha)
 ..F....... [ZBXNEXT-903] redesign Configuration->Items (Eduard)
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4253] fixed menu link inconsistency in tr_status.php (Toms)
+..F....... [ZBX-4554] fixed ordering (Toms)
+..F....... [ZBX-4295] fixed icons ending outside map. Removed icon resizing responsible for infinite loop (Toms)
+..F....... [ZBX-4296] fixed popup menu unavailable for disabled hosts (Toms)
+....I..... [ZBX-4693] fixed hosts table foreign key constraint error during database upgrade (dimir, Sasha)
+A.F....... [ZBX-4563] fixed host macro IDs being regenerated when updating macros (pavels)
+A.F....... [ZBX-4563] fixed several macro validation issues (pavels)
+..F....... [ZBX-4563] fixed macro sorting (pavels)
+..F....... [ZBX-3735] fixed login form to send passwords via POST not GET; thanks to Joseph Bueno (Alexei)
+A......... [ZBX-954] increased API version to 1.4, Zabbix 1.8.x is using 1.3 (Alexei)
+A.F....... [ZBX-4604] fixed "screen" type screen item validation (pavels)
+........S. [ZBX-4560] fixed low level discovery error messages to start with uppercase 'Cannot ...' (Alexei)
+..F....... [ZBX-4677] fixed minor typo in class.cscript.php; thanks to Łukasz Jernaś (Alexei)
+..F.....S. [ZBX-4261] fixed disovery rules in the queue calculation (Sasha)
+...G...... [ZBX-4624] fixed processing of system.cpu.switches metric (Sasha)
+..F....... [ZBX-4623] fixed host group visibility for non superadmins. (Toms)
+........S. [ZBX-4662] fixed server crash while linking a template with DebugLevel=4 (Sasha)
 ..F....... [ZBX-1335] improved Item filter. (Eduard)
 ..F....... [ZBX-4630] fixed "Trigger overview" screen. (Eduard)
 .......PS. [ZBX-4628] fixed an "invalid number of fields" error when syncing configuration on proxy (Sasha)
@@ -443,6 +467,16 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+........S. [ZBX-4549] fixed nested db transaction error when stopping server (dimir)
+........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
+..F....... [ZBX-4579] fixed incorrect "unknown" values in availability report if no events present (Alexei)
+.......P.. [ZBX-4683] fixed timestamps mismatch while sending history data from proxy (Sasha)
+..F....... [ZBX-4140] fixed trigger test functionality for operator '#' (Alexei)
+..F....... [ZBX-4680] fixed minor typo in frontends/php/js/class.rpc.js (Alexei)
+...G...... [ZBX-1298] fixed processing of command line arguments more than 2KB in proc.num and proc.mem checks on Linux (Sasha)
+........S. [ZBX-4650] fixed possible server crash while processing trigger expressions (Sasha)
+.......PS. [ZBX-3688] fixed changing host's availability for dynamic SNMP checks (Sasha)
+...G...PS. [ZBX-3788] signal handlers changed to reduce probability of process hang on exit (Andris)
 .......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
 .......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)
 .......PS. [ZBX-860] more useful SNMP error messages (Sasha)

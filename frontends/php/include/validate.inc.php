@@ -547,10 +547,10 @@ function invalid_url($msg = null) {
 	if (empty($msg)) {
 		$msg = _('Zabbix has received an incorrect request.');
 	}
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/page_header.php';
 	unset_all();
 	show_error_message($msg);
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/page_footer.php';
 }
 
 function check_fields(&$fields, $show_messages = true) {

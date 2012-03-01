@@ -17,9 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/html.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Search');
 $page['file'] = 'search.php';
@@ -28,7 +28,7 @@ $page['scripts'] = array('class.pmaster.js');
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -38,9 +38,8 @@ require_once('include/page_header.php');
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
 		'favcnt'=>		array(T_ZBX_INT, O_OPT,	null,	null,			NULL),
-
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'flop','refresh'"),NULL),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
+		'favaction'=>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'flop','refresh'"), null),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favaction})&&("flop"=={favaction})'),
 	);
 
 	check_fields($fields);
@@ -50,10 +49,10 @@ require_once('include/page_header.php');
 		$_REQUEST['pmasterid'] = get_request('pmasterid','mainpage');
 
 		if('hat' == $_REQUEST['favobj']){
-			if('flop' == $_REQUEST['action']){
-				CProfile::update('web.search.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			if('flop' == $_REQUEST['favaction']){
+				CProfile::update('web.search.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 			}
-			else if('refresh' == $_REQUEST['action']){
+			else if('refresh' == $_REQUEST['favaction']){
 				switch($_REQUEST['favref']){
 				}
 			}
@@ -61,7 +60,7 @@ require_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 ?>
@@ -399,6 +398,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

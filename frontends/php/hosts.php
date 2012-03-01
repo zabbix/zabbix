@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['hosts'])){
 	$EXPORT_DATA = true;
@@ -28,7 +28,7 @@ if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['h
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_hosts_export.xml';
 
-	require_once('include/export.inc.php');
+	require_once dirname(__FILE__).'/include/export.inc.php';
 }
 else{
 	$EXPORT_DATA = false;
@@ -39,7 +39,7 @@ else{
 	$page['hist_arg'] = array('groupid');
 }
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -80,7 +80,6 @@ require_once('include/page_header.php');
 		'macro_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	'isset({macro_add})'),
 		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	'isset({macro_add})'),
 		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
-		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 // mass update
 		'massupdate'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'visible'=>			array(T_ZBX_STR, O_OPT,	NULL, 	NULL,	NULL),
@@ -113,7 +112,7 @@ require_once('include/page_header.php');
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})')
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
 	);
 
 // OUTER DATA
@@ -137,12 +136,12 @@ require_once('include/page_header.php');
 	/* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.hosts.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.hosts.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--------
@@ -287,7 +286,7 @@ require_once('include/page_header.php');
 	}
 
 	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
-		require_once('include/export.inc.php');
+		require_once dirname(__FILE__).'/include/export.inc.php';
 		DBstart();
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
 		if($result) $result = zbxXML::parseMain($rules);
@@ -511,32 +510,13 @@ require_once('include/page_header.php');
 			foreach ($macros as $mnum => $macro) {
 				if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 					unset($macros[$mnum]);
-					continue;
 				}
-
-				if ($macro['new'] == 'create') {
-					unset($macros[$mnum]['macroid']);
-				}
-				unset($macros[$mnum]['new']);
 			}
 
 			$duplicatedMacros = array();
 			foreach ($macros as $mnum => $macro) {
 				// transform macros to uppercase {$aaa} => {$AAA}
 				$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
-
-				// search for duplicates items in new macros array
-				foreach ($macros as $duplicateNumber => $duplicateNewMacro) {
-					if ($mnum != $duplicateNumber && $macros[$mnum]['macro'] == $duplicateNewMacro['macro']) {
-						$duplicatedMacros[] = '"'.$macros[$mnum]['macro'].'"';
-					}
-				}
-			}
-
-			// validate duplicates macros
-			if (!empty($duplicatedMacros)) {
-				error(_s('More than one macro with same name found: %1$s .', implode(', ', array_unique($duplicatedMacros))));
-				throw new Exception();
 			}
 
 			// create new group
@@ -1108,6 +1088,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

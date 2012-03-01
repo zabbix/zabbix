@@ -58,7 +58,7 @@ INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.md5sum[
 INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.regexp[file,regexp]','Find string in a file. Matched string');
 INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.regmatch[file,regexp]','Find string in a file. 0 - expression not found, 1 - found');
 INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.size[file]','Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]');
-INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.time[file &lt;,mode&gt;]','File time information. Number of seconds.The mode is optional. If mode is missing modify is used.');
+INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.file.time[file &lt;,mode&gt;]','File time information. Number of seconds. The mode is optional. If mode is missing modify is used.');
 INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing total is used.');
 INSERT INTO help_items (itemtype,key_,description) values ('0','vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].');
 INSERT INTO help_items (itemtype,key_,description) values ('0','vm.memory.size[&lt;mode&gt;]','Amount of memory size in bytes. If mode is missing total is used.');
@@ -142,7 +142,7 @@ INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.md5sum[
 INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.regexp[file,regexp]','Find string in a file. Matched string');
 INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.regmatch[file,regexp]','Find string in a file. 0 - expression not found, 1 - found');
 INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.size[file]','Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]');
-INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.time[file&lt;, mode&gt;]','File time information. Number of seconds.The mode is optional. If mode is missing modify is used.');
+INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.file.time[file&lt;, mode&gt;]','File time information. Number of seconds. The mode is optional. If mode is missing modify is used.');
 INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing total is used.');
 INSERT INTO help_items (itemtype,key_,description) values ('7','vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].');
 INSERT INTO help_items (itemtype,key_,description) values ('7','vm.memory.size[&lt;mode&gt;]','Amount of memory size in bytes. If mode is missing total is used.');

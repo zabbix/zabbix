@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/testMetrics.php');
+require_once dirname(__FILE__).'/testMetrics.php';
 
 class AgentTests {
 	public static function suite() {
