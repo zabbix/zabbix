@@ -197,9 +197,6 @@ zbx_graph_item_type;
 #define PROXY_DHISTORY_VALUE_LEN	255
 #define PROXY_DHISTORY_VALUE_LEN_MAX	PROXY_DHISTORY_VALUE_LEN+1
 
-#define HTTPTEST_ERROR_LEN		255
-#define HTTPTEST_ERROR_LEN_MAX		HTTPTEST_ERROR_LEN+1
-
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
 				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
 				"i.lastclock,i.units,i.multiplier,i.formula,i.status,"		\
