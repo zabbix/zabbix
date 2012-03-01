@@ -92,7 +92,7 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 	if ($action == AUDIT_ACTION_UPDATE && !empty($values_new)) {
 		foreach ($values_new as $id => $value_new) {
 			// log only the values that have changed, skip arrays
-			if (!is_array($values_old[$id]) && !is_array($value_new) && strcmp($values_old[$id], $value_new) <> 0) {
+			if (!is_array($values_old[$id]) && !is_array($value_new) && strcmp($values_old[$id], $value_new) != 0) {
 				array_push($values_diff, $id);
 			}
 		}
