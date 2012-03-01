@@ -460,8 +460,7 @@ int	main(int argc, char **argv)
 	switch (task)
 	{
 		case ZBX_TASK_CHANGE_NODEID:
-			change_nodeid(0, nodeid);
-			exit(-1);
+			exit(SUCCEED == change_nodeid(0, nodeid) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 		default:
 			break;
@@ -753,6 +752,9 @@ int	MAIN_ZABBIX_ENTRY()
 void	zbx_on_exit()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
+
+	if (SUCCEED == DBtxn_ongoing())
+		DBrollback();
 
 	if (NULL != threads)
 	{

@@ -640,14 +640,14 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 
 	$alerts = array();
 	$clock = array();
-	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
+	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? make_sorting_header(S_NODES,'a.alertid') : null,
+		is_show_all_nodes() ? make_sorting_header(_('Nodes'), 'a.alertid') : null,
 		make_sorting_header(S_TIME,'clock'),
 		make_sorting_header(S_TYPE,'description'),
 		make_sorting_header(S_STATUS,'status'),
-		make_sorting_header(S_RETRIES_LEFT,'retries'),
-		make_sorting_header(S_RECIPIENTS,'sendto'),
+		make_sorting_header(_('Retries left'), 'retries'),
+		make_sorting_header(_('Recipient(s)'), 'sendto'),
 		_('Message'),
 		S_ERROR
 	));
@@ -677,15 +677,15 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 	foreach($alerts as $num => $row){
 		$time=zbx_date2str(S_HISTORY_OF_ACTIONS_DATE_FORMAT,$row['clock']);
 
-		if($row['status'] == ALERT_STATUS_SENT){
-			$status=new CSpan(S_SENT,'green');
-			$retries=new CSpan(SPACE,'green');
+		if ($row['status'] == ALERT_STATUS_SENT) {
+			$status = new CSpan(_('sent'), 'green');
+			$retries = new CSpan(SPACE, 'green');
 		}
-		else if($row['status'] == ALERT_STATUS_NOT_SENT){
-			$status=new CSpan(S_IN_PROGRESS,'orange');
-			$retries=new CSpan(ALERT_MAX_RETRIES - $row['retries'],'orange');
+		elseif ($row['status'] == ALERT_STATUS_NOT_SENT) {
+			$status = new CSpan(_('In progress'), 'orange');
+			$retries = new CSpan(ALERT_MAX_RETRIES - $row['retries'],'orange');
 		}
-		else{
+		else {
 			$status = new CSpan(_('not sent'), 'red');
 			$retries = new CSpan(0, 'red');
 		}
@@ -716,14 +716,14 @@ return $table;
 // Author: Aly
 function get_action_msgs_for_event($event){
 
-	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
+	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
-		is_show_all_nodes() ? S_NODES:null,
+		is_show_all_nodes() ? _('Nodes') : null,
 		S_TIME,
 		S_TYPE,
 		S_STATUS,
-		S_RETRIES_LEFT,
-		S_RECIPIENTS,
+		_('Retries left'),
+		_('Recipient(s)'),
 		_('Message'),
 		S_ERROR
 	));
@@ -741,15 +741,15 @@ function get_action_msgs_for_event($event){
 			$time = array(bold(S_STEP.': '),$alert["esc_step"],br(),bold(S_TIME.': '),br(),$time);
 		}
 
-		if($alert["status"] == ALERT_STATUS_SENT){
-			$status=new CSpan(S_SENT,"green");
-			$retries=new CSpan(SPACE,"green");
+		if ($alert['status'] == ALERT_STATUS_SENT) {
+			$status = new CSpan(_('sent'), 'green');
+			$retries = new CSpan(SPACE, 'green');
 		}
-		else if($alert["status"] == ALERT_STATUS_NOT_SENT){
-			$status=new CSpan(S_IN_PROGRESS,"orange");
-			$retries=new CSpan(ALERT_MAX_RETRIES - $alert["retries"],"orange");
+		elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
+			$status = new CSpan(_('In progress'), 'orange');
+			$retries = new CSpan(ALERT_MAX_RETRIES - $alert['retries'], 'orange');
 		}
-		else{
+		else {
 			$status = new CSpan(_('not sent'), 'red');
 			$retries = new CSpan(0, 'red');
 		}
@@ -782,12 +782,12 @@ return $table;
 // Author: Aly
 function get_action_cmds_for_event($event){
 
-	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
+	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
-		is_show_all_nodes()?S_NODES:null,
+		is_show_all_nodes() ? _('Nodes') : null,
 		S_TIME,
 		S_STATUS,
-		S_COMMAND,
+		_('Command'),
 		S_ERROR
 	));
 
@@ -802,17 +802,17 @@ function get_action_cmds_for_event($event){
 
 		switch($alert['status']){
 			case ALERT_STATUS_SENT:
-				$status = new CSpan(S_EXECUTED, 'green');
+				$status = new CSpan(_('executed'), 'green');
 			break;
 			case ALERT_STATUS_NOT_SENT:
-				$status = new CSpan(S_IN_PROGRESS, 'orange');
+				$status = new CSpan(_('In progress'), 'orange');
 			break;
 			default:
 				$status = new CSpan(_('not sent'), 'red');
 			break;
 		}
 
-		$message = array(bold(S_COMMAND.':'));
+		$message = array(bold(_('Command').':'));
 		array_push($message, BR(), zbx_nl2br($alert['message']));
 
 		$error = empty($alert['error']) ? new CSpan(SPACE, 'off') : new CSpan($alert['error'], 'on');
@@ -842,7 +842,7 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 	}
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, $hostids);
 
-	$tab_hint = new CTableInfo(S_NO_ACTIONS_FOUND);
+	$tab_hint = new CTableInfo(_('No actions found.'));
 	$tab_hint->setAttribute('style', 'width: 300px;');
 	$tab_hint->setHeader(array(
 		is_show_all_nodes() ? _('Nodes') : null,

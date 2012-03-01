@@ -1018,10 +1018,10 @@ class CItem extends CItemGeneral {
 			if (!$nopermissions) {
 				foreach ($itemids as $itemid) {
 					if (!isset($delItems[$itemid])) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 					}
 					if ($delItems[$itemid]['templateid'] != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated item.');
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item.'));
 					}
 				}
 			}

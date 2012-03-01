@@ -1155,7 +1155,7 @@ COpt::memoryPick();
 		));
 		foreach ($triggers as $tnum => $trigger) {
 			if (!isset($dbTriggers[$trigger['triggerid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			if (!isset($trigger['triggerid'])) {
@@ -1242,7 +1242,7 @@ COpt::memoryPick();
 			if (!$nopermissions) {
 				foreach ($triggerids as $gnum => $triggerid) {
 					if (!isset($delTriggers[$triggerid])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_NO_PERMISSIONS);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 					}
 
 					if ($delTriggers[$triggerid]['templateid'] != 0) {

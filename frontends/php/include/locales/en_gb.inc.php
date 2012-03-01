@@ -23,31 +23,12 @@
 
 	$TRANSLATION=array(
 
-	'S_DATE_FORMAT_YMDHMS'=>		_('d M Y H:i:s'),
-
 	'S_YEAR_SHORT'=>			_('y'),
 	'S_MONTH_SHORT'=>			_('m'),
 	'S_WEEK_SHORT'=>			_('w'),
 	'S_DAY_SHORT'=>				_('d'),
 	'S_HOUR_SHORT' =>			_('h'),
 	'S_MINUTE_SHORT' =>			_('m'),
-
-
-//	dicoveryconf.php
-	'S_DISCOVERY_RULE'=>			_('Discovery rule'),
-	'S_DISCOVERY'=>				_('Discovery'),
-	'S_STATUS_OF_DISCOVERY_BIG'=>		_('STATUS OF DISCOVERY'),
-	'S_STATUS_OF_DISCOVERY'=>		_('Status of discovery'),
-
-//	discovery.php
-	'S_UP_TIME'=>				_('Uptime'),
-	'S_DOWN_TIME'=>				_('Downtime'),
-
-//	auditacts.php
-	'S_AUDITACTS_DESCRIPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
-//	auditlogs.php
-	'S_AUDITLOGS_RECORD_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	httpdetails.php
 	'S_DETAILS_OF_SCENARIO'=>		_('Details of scenario'),
@@ -56,7 +37,6 @@
 	'S_RESPONSE_CODE'=>			_('Response code'),
 	'S_TOTAL_BIG'=>				_('TOTAL'),
 	'S_RESPONSE_TIME'=>			_('Response time'),
-	'S_IN_PROGRESS'=>			_('In progress'),
 	'S_OF_SMALL'=>				_('of'),
 	'S_IN_CHECK'=>				_('In check'),
 	'S_IDLE_TILL'=>				_('Idle till'),
@@ -90,10 +70,6 @@
 	'S_NEXT'=>				_('Next'),
 	'S_FINISH'=>				_('Finish'),
 	'S_FAIL'=>				_('Fail'),
-	'S_UPDATE_BIG'=>			_('UPDATE'),
-	'S_NEW_INSTALLATION'=>			_('New installation'),
-	'S_NEW_INSTALLATION_BIG'=>		_('NEW INSTALLATION'),
-	'S_INSTALLATION_UPDATE'=>		_('Installation/Update'),
 
 //	actions.inc.php
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -120,14 +96,10 @@
 	'S_FILTER'=>				_('Filter'),
 
 //	actions.php
-	'S_ACTIONS'=>				_('Actions'),
-	'S_LOGS'=>				_('Logs'),
-	'S_LOGS_BIG'=>				_('LOGS'),
 	'S_ON'=>					_('On'),
 	'S_OFF'=>					_('Off'),
 	'S_GROUP'=>				_('Group'),
 	'S_OR'=>				_('or'),
-	'S_RETRIES_LEFT'=>			_('Retries left'),
 
 //	alarms.php
 	'S_TIME'=>				_('Time'),
@@ -135,12 +107,7 @@
 
 //	actions.php
 	'S_TYPE'=>				_('Type'),
-	'S_RECIPIENTS'=>			_('Recipient(s)'),
-	'S_RECIPIENT'=>				_('Recipient'),
 	'S_ERROR'=>				_('Error'),
-	'S_SENT'=>				_('sent'),
-	'S_EXECUTED'=>				_('executed'),
-	'S_NO_ACTIONS_FOUND'=>			_('No actions found'),
 
 // Lines
 	'S_LINE'=>				_('Line'),
@@ -171,7 +138,6 @@
 	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
 	'S_CONFIGURATION_OF_NODES'=>		_('CONFIGURATION OF NODES'),
 	'S_NODE'=>				_('Node'),
-	'S_NODES'=>				_('Nodes'),
 	'S_NODES_BIG'=>				_('NODES'),
 	'S_NEW_NODE'=>				_('New node'),
 	'S_DELETE_SELECTED_NODE_Q'=>		_('Delete selected node?'),
@@ -188,9 +154,7 @@
 	'S_PROXY_ACTIVE' => _('Active'),
 
 //	Latest values
-	'S_NO_PERMISSIONS'=>			_('No permissions to referred object or it does not exist!'),
 	'S_ALL_S'=>						_('All'),
-	'S_ALL_SMALL'=>					_('all'),
 	'S_GRAPH'=>						_('Graph'),
 
 //	Footer
@@ -273,8 +237,6 @@
 	'S_HISTORY_PLAINTEXT_DATE_FORMAT'=>	_('Y-m-d H:i:s'),
 	'S_HISTORY_ITEM_DATE_FORMAT'=>		_('Y.M.d H:i:s'),
 
-	'S_DATE'=>				_('Date'),
-
 	'S_JANUARY'=>				_('January'),
 	'S_FEBRUARY'=>				_('February'),
 	'S_MARCH'=>				_('March'),
@@ -290,7 +252,6 @@
 
 //	hosts.php
 	'S_IN'=>					_('In'),
-	'S_APPLICATION'=>				_('Application'),
 	'S_APPLICATIONS'=>				_('Applications'),
 	'S_HOSTS'=>					_('Hosts'),
 	'S_ITEMS'=>					_('Items'),
@@ -301,7 +262,6 @@
 	'S_IP'=>					_('IP'),
 	'S_PORT'=>					_('Port'),
 	'S_TEMPLATE'=>					_('Template'),
-	'S_DELETED'=>					_('Deleted'),
 	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
 	'S_ALL_GROUPS'=>				_('All groups'),
@@ -310,7 +270,6 @@
 	'S_UPDATE'=>					_('Update'),
 	'S_AVAILABLE'=>					_('Available'),
 	'S_NOT_AVAILABLE'=>				_('Not available'),
-	'S_PROXIES'=>					_('Proxies'),
 	'S_PROXIES_BIG'=>				_('PROXIES'),
 	'S_CREATE_PROXY'=>				_('Create proxy'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
@@ -333,24 +292,11 @@
 	'S_UNLINK_AND_CLEAR'=>			_('Unlink and clear'),
 
 //	items.php
-	'S_TYPES'=>						_('Types'),
-	'S_KEY'=>						_('Key'),
 	'S_DESCRIPTION'=>					_('Description'),
 	'S_HISTORY'=>						_('History'),
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
-	'S_ACTIVE'=>						_('Active'),
-	'S_LOG'=>						_('Log'),
-	'S_TEXT'=>						_('Text'),
 	'S_ITEM'=>						_('Item'),
 	'S_MODE'=>						_('Mode'),
-	'S_ORIGINAL'=>						_('Original'),
-	'S_MASS_UPDATE_SELECTED_ITEMS_Q'=>			_('Mass update selected items?'),
-	'S_COPY_SELECTED_ITEMS_Q'=>				_('Copy selected items?'),
-	'S_RULE'=>						_('Rule'),
-
-// host_discovery.php
-	'S_CONFIGURATION_OF_DISCOVERY_RULES_BIG' => _('CONFIGURATION OF DISCOVERY RULES'),
-	'S_REGEXP' => _('Regexp'),
 
 // disc_prototypes.php
 	'S_ADD_PROTOTYPE' => _('Add prototype'),
@@ -491,7 +437,6 @@
 	'S_FROM'=>					_('From'),
 	'S_TILL'=>					_('Till'),
 	'S_OK'=>					_('Ok'),
-	'S_RESOLVED'=>				_('Resolved'),
 	'S_PROBLEM'=>					_('Problem'),
 	'S_PROBLEMS'=>					_('Problems'),
 	'S_SLA'=>					_('SLA'),
@@ -543,7 +488,6 @@
 	'S_COLUMNS'=>				_('Columns'),
 	'S_ROWS'=>				_('Rows'),
 	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
-	'S_RESOURCE'=>					_('Resource'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
@@ -577,7 +521,6 @@
 
 //	services.php
 	'S_NO_IT_SERVICE_DEFINED'=>		_('No IT services defined.'),
-	'S_NONE'=>				_('None'),
 	'S_TRIGGER'=>				_('Trigger'),
 	'S_DELETE'=>				_('Delete'),
 	'S_CLONE'=>				_('Clone'),
@@ -617,7 +560,6 @@
 	'S_SELECT' => _('Select'),
 
 //	users.php
-	'S_USER'=>					_('User'),
 	'S_PROXY_ADDED'=>			_('Proxy added'),
 	'S_CANNOT_ADD_PROXY'=>		_('Cannot add proxy'),
 	'S_PROXY_UPDATED'=>			_('Proxy updated'),
@@ -631,32 +573,11 @@
 
 //scripts.php
 	'S_SCRIPTS'=>				_('Scripts'),
-	'S_COMMAND'=>				_('Command'),
 	'S_CLOSE'=>					_('Close'),
-
 	'S_SCRIPT_ERROR'=>					_('SCRIPT ERROR'),
-	'S_SCRIPT_ERROR_DESCRIPTION'=>		_('Error description'),
-	'S_SCRIPT_SEND_ERROR'=>				_('Can\'t send command, check connection'),
-	'S_SCRIPT_READ_ERROR'=>				_('Can\'t read script response, check connection'),
-	'S_SCRIPT_TIMEOUT_ERROR'=>			_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value'),
-	'S_SCRIPT_BYTES_LIMIT_ERROR'=>		_('Defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value'),
-	'S_SCRIPT_ERROR_EMPTY_RESPONSE'=>	_('Empty response received'),
-
-	'S_NOT_RUN' => 						_('Connection to Zabbix server "%s" refused. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Security environment (for example, SELinux) is blocking the connection; 3. Zabbix server daemon not running; 4. Firewall is blocking TCP connection.'),
-	'S_IP_NOT_AVAILABLE' => 			_('Zabbix server "%s" can not be reached. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect network configuration.'),
-	'S_TIME_OUT' => 					_('Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.'),
-	'S_WRONG_DNS' => 					_('Connection to Zabbix server "%s" faileds. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.'),
 	'S_SCRIPT_ERROR'=>					_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'),
 
 //	audit.php
-	'S_AUDIT'=>					_('Audit'),
-	'S_AUDIT_LOGS_BIG'=>		_('AUDIT LOGS'),
-	'S_AUDIT_ACTIONS_BIG'=>		_('AUDIT ACTIONS'),
-	'S_ACTION'=>				_('Action'),
-	'S_DETAILS'=>				_('Details'),
-	'S_UNKNOWN_ACTION'=>		_('Unknown action'),
-	'S_ADDED'=>					_('Added'),
-	'S_UPDATED'=>				_('Updated'),
 	'S_ALREADY_EXISTS_SMALL'=>	_('already exists'),
 
 //	profile.php
@@ -666,7 +587,6 @@
 	'S_MUTE'=>					_('Mute'),
 	'S_SNOOZE'=>				_('Snooze'),
 	'S_MESSAGES'=>				_('Messages'),
-	'S_PROBLEM_ON'=>			_('Problem on'),
 
 //	hostinventoriesoverview.php
 	'S_HOST_INVENTORY_OVERVIEW'=>	_('Host inventory overview'),
@@ -676,7 +596,6 @@
 
 //	popup.php
 	'S_CAPTION'=>				_('Caption'),
-	'S_DISCOVERY_RULES_BIG'=>	_('DISCOVERY RULES'),
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -718,9 +637,6 @@
 	'S_E'=>			_('E'),
 	'S_Y'=>			_('Y'),
 
-//	forms.inc.php
-	'S_DO'=>				_('Do'),
-
 //	items.inc.php
 	'S_UPDATED_SMALL'=>				_('updated'),
 
@@ -761,7 +677,6 @@
 	'S_QUEUE'=>				_('Queue'),
 	'S_REPORT'=>				_('Report'),
 	'S_REPORTS'=>				_('Reports'),
-	'S_LOGOUT'=>				_('Logout'),
 
 //	Errors
 	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),

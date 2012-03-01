@@ -124,9 +124,11 @@ ZABBIX.apps.map = (function() {
 			if (this.container.length === 0) {
 				this.container = jQuery(document.body);
 			}
+
 			this.container.css({
 				width: this.data.width + 'px',
-				height: this.data.height + 'px'
+				height: this.data.height + 'px',
+				overflow: 'hidden'
 			});
 
 			if (IE) {
@@ -953,14 +955,6 @@ ZABBIX.apps.map = (function() {
 						newY += gridSize;
 					}
 
-					if ((newX + dims.width) > this.sysmap.data.width) {
-						newWidth = this.sysmap.data.width - newX * 2;
-						realign = true;
-					}
-					if ((newY + dims.height) > this.sysmap.data.height) {
-						newHeight = this.sysmap.data.height - newY * 2;
-						realign = true;
-					}
 				}
 
 				this.data.y = newY;
@@ -977,9 +971,6 @@ ZABBIX.apps.map = (function() {
 					height: newHeight
 				});
 
-				if (realign) {
-					this.align(doAutoAlign);
-				}
 			},
 
 			/**

@@ -800,6 +800,7 @@ int	DBget_queue_count(int from, int to)
 					" or (h.ipmi_available<>%d and i.type in (%d))"
 					" or (h.jmx_available<>%d and i.type in (%d))"
 					")"
+				" and i.flags not in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
@@ -816,6 +817,7 @@ int	DBget_queue_count(int from, int to)
 				ITEM_TYPE_IPMI,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_JMX,
+			ZBX_FLAG_DISCOVERY_CHILD,
 			DBnode_local("i.itemid"));
 
 	while (NULL != (row = DBfetch(result)))
@@ -1327,7 +1329,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	while (FAIL == found)
 	{
 		/* avoid eternal loop within failed transaction */
-		if (0 < txn_level && 0 != txn_error)
+		if (0 < zbx_db_txn_level() && 0 != zbx_db_txn_error())
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() transaction failed", __function_name);
 			return 0;
@@ -2177,4 +2179,14 @@ void	DBfree_history(char **h_value)
 	zbx_free(h_value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+int	DBtxn_status()
+{
+	return 0 == zbx_db_txn_error() ? SUCCEED : FAIL;
+}
+
+int	DBtxn_ongoing()
+{
+	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
 }
