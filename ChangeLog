@@ -2,6 +2,7 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBX-4600] trigger dependencies will now be deleted when executing a mass update with no dependencies selected (pavels)
 A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces (pavels)
 ..F....... [ZBX-4563] improved SQL query debug log design (pavels)
 ..F....... [ZBX-4537] improved include_once statements to make Zabbix code easier to reuse (Alexei)
