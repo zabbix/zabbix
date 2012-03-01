@@ -196,6 +196,7 @@ class CImportReferencer {
 				'filter' => array('host' => $this->hosts),
 				'output' => array('hostid', 'host'),
 				'preservekeys' => true,
+				'templated_hosts' => true,
 				'editable' => true
 			));
 			foreach ($dbHosts as $host) {
