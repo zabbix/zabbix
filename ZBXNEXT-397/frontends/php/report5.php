@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/triggers.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('Most busy triggers top 100');
 $page['file'] = 'report5.php';
 $page['hist_arg'] = array('period');
 $page['scripts'] = array();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -173,6 +173,6 @@ foreach ($triggers as $trigger) {
 $rprt_wdgt->addItem($table);
 $rprt_wdgt->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

@@ -403,7 +403,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	return SUCCEED;
 notsupported:
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
+	SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
 	return NOTSUPPORTED;
 }
 

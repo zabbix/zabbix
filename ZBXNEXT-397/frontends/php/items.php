@@ -19,22 +19,22 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/items.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/items.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
 $page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 
-//	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'description_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'type_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -71,9 +71,9 @@ $fields = array(
 	'description' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'key' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
 	'delay' =>					array(T_ZBX_INT, O_OPT, null,	'(('.BETWEEN(1, SEC_PER_DAY).
-		'(!isset({delay_flex}) || !({delay_flex}) || is_array({delay_flex}) && !count({delay_flex}))) ||'.
+		'(!isset({delay_flex})||!({delay_flex})||is_array({delay_flex})&&!count({delay_flex})))||'.
 		'('.BETWEEN(0, SEC_PER_DAY).'isset({delay_flex})&&is_array({delay_flex})&&count({delay_flex})>0))&&',
-		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.' && {type}!='.ITEM_TYPE_SNMPTRAP.'))'),
+		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.'&&{type}!='.ITEM_TYPE_SNMPTRAP.'))'),
 	'new_delay_flex' =>			array(T_ZBX_STR, O_OPT, NOT_EMPTY, '',		'isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
 	'delay_flex' =>				array(T_ZBX_STR, O_OPT, null,	'',			null),
 	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
@@ -100,8 +100,9 @@ $fields = array(
 		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
 	'privatekey' =>				array(T_ZBX_STR, O_OPT, null,	null,
 		'isset({save})&&isset({type})&&({type})=='.ITEM_TYPE_SSH.'&&({authtype})=='.ITEM_AUTHTYPE_PUBLICKEY),
-	$paramsFieldName =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
-		ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'), getParamFieldLabelByType(get_request('type', 0))),
+	$paramsFieldName =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.
+		IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'),
+		getParamFieldLabelByType(get_request('type', 0))),
 	'inventory_link' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
 	'snmp_community' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C,'type')),
@@ -189,7 +190,7 @@ $fields = array(
 	// ajax
 	'favobj' =>					array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favref' =>					array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
-	'state' =>					array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
+	'favstate' =>				array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -225,12 +226,12 @@ elseif (get_request('hostid', 0) > 0) {
 // ajax
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'filter') {
-		CProfile::update('web.items.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.items.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
@@ -1054,5 +1055,5 @@ else {
 	$itemView->show();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

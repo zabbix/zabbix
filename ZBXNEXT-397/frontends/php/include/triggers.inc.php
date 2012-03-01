@@ -1704,7 +1704,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $params = array())
 
 function calculate_availability($triggerid, $period_start, $period_end) {
 	$start_value = -1;
-	if ($period_start > 0 && $period_start < time()) {
+	if ($period_start > 0 && $period_start <= time()) {
 		$sql = 'SELECT e.eventid,e.value'.
 				' FROM events e'.
 				' WHERE e.objectid='.$triggerid.
@@ -1746,7 +1746,7 @@ function calculate_availability($triggerid, $period_start, $period_end) {
 			$ret['unknown_time'] = 0;
 			$ret['true'] = TRIGGER_VALUE_TRUE == $start_value ? 100 : 0;
 			$ret['false'] = TRIGGER_VALUE_FALSE == $start_value ? 100 : 0;
-			$ret['unknown'] = TRIGGER_VALUE_UNKNOWN == $start_value ? 100 : 0;
+			$ret['unknown'] = (TRIGGER_VALUE_UNKNOWN == $start_value || -1 == $start_value) ? 100 : 0;
 			return $ret;
 		}
 	}
@@ -2669,7 +2669,7 @@ function evalExpressionData($expression, $rplcts, $oct = false) {
 	preg_match_all("/[0-9\.]+[KMGThmdw]?/", $evStr, $arr);
 	$evStr = str_replace(array($arr[0][0], $arr[0][1]), array(convert($arr[0][0]), convert($arr[0][1])), $evStr);
 
-	if (!preg_match("/^[0-9.\s=!()><+*\/&E|\-]+$/is", $evStr)) {
+	if (!preg_match("/^[0-9.\s=#()><+*\/&E|\-]+$/is", $evStr)) {
 		return 'FALSE';
 	}
 
