@@ -20,7 +20,7 @@
 ?>
 <?php
 define('ZABBIX_VERSION',		'1.9.10');
-define('ZABBIX_API_VERSION',	'1.2');
+define('ZABBIX_API_VERSION',	'1.4');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);
 define('ZBX_LOGIN_BLOCK',				30); // sec
@@ -844,6 +844,7 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 // input fields
 define('ZBX_TEXTBOX_STANDARD_SIZE',		50);
 define('ZBX_TEXTBOX_SMALL_SIZE',		25);
+define('ZBX_TEXTBOX_FILTER_SIZE',		20);
 define('ZBX_TEXTAREA_STANDARD_WIDTH',	312);
 define('ZBX_TEXTAREA_BIG_WIDTH',		524);
 define('ZBX_TEXTAREA_STANDARD_ROWS',	7);

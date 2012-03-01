@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/agent/AgentTests.php');
+require_once dirname(__FILE__).'/agent/AgentTests.php';
 
 class All {
 	public static function suite() {

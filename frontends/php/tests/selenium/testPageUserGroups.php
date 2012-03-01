@@ -36,7 +36,7 @@ class testPageUserGroups extends CWebTest {
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 		$this->ok('Displaying');
 		// Header
-		$this->ok(array('Name', '#', 'Members', 'Users status', 'Frontend access', 'Debug mode'));
+		$this->ok(array('Name', '#', 'Members', 'Status', 'Frontend access', 'Debug mode'));
 		// Data
 		$this->ok(array($group['name']));
 		$this->dropdown_select('go', 'Enable selected');

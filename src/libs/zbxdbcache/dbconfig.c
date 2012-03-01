@@ -3065,18 +3065,19 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->delay = src_item->delay;
 	dst_item->nextcheck = src_item->nextcheck;
 	dst_item->status = src_item->status;
-	*dst_item->trapper_hosts = '\0';
-	*dst_item->logtimefmt = '\0';
-	*dst_item->delay_flex = '\0';
 	dst_item->flags = src_item->flags;
 
 	if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &src_item->itemid)))
 		strscpy(dst_item->delay_flex, flexitem->delay_flex);
+	else
+		*dst_item->delay_flex = '\0';
 
-	if (ITEM_VALUE_TYPE_LOG == dst_item->value_type &&
-			NULL != (logitem = zbx_hashset_search(&config->logitems, &src_item->itemid)))
+	if (ITEM_VALUE_TYPE_LOG == src_item->value_type)
 	{
-		strscpy(dst_item->logtimefmt, logitem->logtimefmt);
+		if (NULL != (logitem = zbx_hashset_search(&config->logitems, &src_item->itemid)))
+			strscpy(dst_item->logtimefmt, logitem->logtimefmt);
+		else
+			*dst_item->logtimefmt = '\0';
 	}
 
 	switch (src_item->type)
@@ -3093,21 +3094,39 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				strscpy(dst_item->snmpv3_authpassphrase_orig, snmpitem->snmpv3_authpassphrase);
 				strscpy(dst_item->snmpv3_privpassphrase_orig, snmpitem->snmpv3_privpassphrase);
 			}
+			else
+			{
+				*dst_item->snmp_community_orig = '\0';
+				*dst_item->snmp_oid_orig = '\0';
+				*dst_item->snmpv3_securityname_orig = '\0';
+				dst_item->snmpv3_securitylevel = 0;
+				*dst_item->snmpv3_authpassphrase_orig = '\0';
+				*dst_item->snmpv3_privpassphrase_orig = '\0';
+			}
+			dst_item->snmp_community = NULL;
+			dst_item->snmp_oid = NULL;
+			dst_item->snmpv3_securityname = NULL;
+			dst_item->snmpv3_authpassphrase = NULL;
+			dst_item->snmpv3_privpassphrase = NULL;
 			break;
 		case ITEM_TYPE_TRAPPER:
 			if (NULL != (trapitem = zbx_hashset_search(&config->trapitems, &src_item->itemid)))
 				strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
+			else
+				*dst_item->trapper_hosts = '\0';
 			break;
 		case ITEM_TYPE_IPMI:
 			if (NULL != (ipmiitem = zbx_hashset_search(&config->ipmiitems, &src_item->itemid)))
 				strscpy(dst_item->ipmi_sensor, ipmiitem->ipmi_sensor);
+			else
+				*dst_item->ipmi_sensor = '\0';
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 			if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid)))
-			{
 				strscpy(dst_item->params_orig, dbitem->params);
-				dst_item->params = NULL;
-			}
+			else
+				*dst_item->params_orig = '\0';
+			dst_item->params = NULL;
 			break;
 		case ITEM_TYPE_SSH:
 			if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &src_item->itemid)))
@@ -3118,12 +3137,21 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				strscpy(dst_item->privatekey_orig, sshitem->privatekey);
 				strscpy(dst_item->password_orig, sshitem->password);
 				strscpy(dst_item->params_orig, sshitem->params);
-				dst_item->username = NULL;
-				dst_item->publickey = NULL;
-				dst_item->privatekey = NULL;
-				dst_item->password = NULL;
-				dst_item->params = NULL;
 			}
+			else
+			{
+				dst_item->authtype = 0;
+				*dst_item->username_orig = '\0';
+				*dst_item->publickey_orig = '\0';
+				*dst_item->privatekey_orig = '\0';
+				*dst_item->password_orig = '\0';
+				*dst_item->params_orig = '\0';
+			}
+			dst_item->username = NULL;
+			dst_item->publickey = NULL;
+			dst_item->privatekey = NULL;
+			dst_item->password = NULL;
+			dst_item->params = NULL;
 			break;
 		case ITEM_TYPE_TELNET:
 			if (NULL != (telnetitem = zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
@@ -3131,26 +3159,37 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				strscpy(dst_item->username_orig, telnetitem->username);
 				strscpy(dst_item->password_orig, telnetitem->password);
 				strscpy(dst_item->params_orig, telnetitem->params);
-				dst_item->username = NULL;
-				dst_item->password = NULL;
-				dst_item->params = NULL;
 			}
+			else
+			{
+				*dst_item->username_orig = '\0';
+				*dst_item->password_orig = '\0';
+				*dst_item->params_orig = '\0';
+			}
+			dst_item->username = NULL;
+			dst_item->password = NULL;
+			dst_item->params = NULL;
 			break;
 		case ITEM_TYPE_JMX:
 			if (NULL != (jmxitem = zbx_hashset_search(&config->jmxitems, &src_item->itemid)))
 			{
 				strscpy(dst_item->username_orig, jmxitem->username);
 				strscpy(dst_item->password_orig, jmxitem->password);
-				dst_item->username = NULL;
-				dst_item->password = NULL;
 			}
+			else
+			{
+				*dst_item->username_orig = '\0';
+				*dst_item->password_orig = '\0';
+			}
+			dst_item->username = NULL;
+			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_CALCULATED:
 			if (NULL != (calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid)))
-			{
 				strscpy(dst_item->params_orig, calcitem->params);
-				dst_item->params = NULL;
-			}
+			else
+				*dst_item->params_orig = '\0';
+			dst_item->params = NULL;
 			break;
 		default:
 			/* nothing to do */;

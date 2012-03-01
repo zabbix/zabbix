@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/views/js/configuration.triggers.edit.js.php');
+require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $triggersWidget = new CWidget();
 $triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
@@ -134,7 +134,7 @@ if (empty($this->data['parent_discoveryid'])) {
 
 	$triggersFormList->addRow(
 		array(
-			_('Dependencies'),
+			_('Replace depenencies'),
 			SPACE,
 			new CVisibilityBox('visible[dependencies]', !empty($this->data['visible']['dependencies']) ? 'yes' : 'no', 'dependencies_div', _('Original'))
 		),

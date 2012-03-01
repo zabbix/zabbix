@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
-	require_once('include/httptest.inc.php');
-	require_once('include/forms.inc.php');
+	require_once dirname(__FILE__).'/include/config.inc.php';
+	require_once dirname(__FILE__).'/include/hosts.inc.php';
+	require_once dirname(__FILE__).'/include/httptest.inc.php';
+	require_once dirname(__FILE__).'/include/forms.inc.php';
 
 	$page['title'] = 'S_DETAILS_OF_SCENARIO';
 	$page['file'] = 'httpdetails.php';
@@ -33,7 +33,7 @@
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 
@@ -49,7 +49,7 @@
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
 	);
 
 	if(!check_fields($fields)) exit();
@@ -57,7 +57,7 @@
 <?php
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.httpdetails.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.httpdetails.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		if('timeline' == $_REQUEST['favobj']){
 			if(isset($_REQUEST['favid']) && isset($_REQUEST['period'])){
@@ -73,7 +73,7 @@
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 ?>
@@ -121,7 +121,7 @@
 
 	$lastcheck = NULL;
 	if (isset($httptest_data['lastcheck'])) {
-		$lastcheck = ' ['.zbx_date2str(S_DATE_FORMAT_YMDHMS, $httptest_data['lastcheck']).']';
+		$lastcheck = ' ['.zbx_date2str(_('d M Y H:i:s'), $httptest_data['lastcheck']).']';
 	}
 
 	$details_wdgt->addPageHeader(
@@ -149,8 +149,8 @@
 		$status['style'] = 'enabled';
 
 		if (!isset($httptest_data['lastcheck'])) {
-				$status['msg'] = _('Never executed');
-				$status['style'] = 'unknown';
+			$status['msg'] = _('Never executed');
+			$status['style'] = 'unknown';
 		}
 		elseif ($httptest_data['lastfailedstep'] != 0) {
 			if ($httptest_data['lastfailedstep'] == $httpstep_data['no']) {
@@ -231,7 +231,7 @@
 
 	$scroll_div = new CDiv();
 	$scroll_div->setAttribute('id','scrollbar_cntr');
-	$graphsWidget->addFlicker($scroll_div, CProfile::get('web.httpdetails.filter.state',0));
+	$graphsWidget->addFlicker($scroll_div, CProfile::get('web.httpdetails.filter.state', 0));
 	$graphsWidget->addItem(SPACE);
 
 	$graphTable = new CTableInfo();
@@ -332,5 +332,5 @@
 
 ?>
 <?php
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

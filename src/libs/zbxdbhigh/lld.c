@@ -265,7 +265,7 @@ static int	DBlld_compare_trigger_items(zbx_uint64_t triggerid, struct zbx_json_p
 	while (NULL != (row = DBfetch(result)))
 	{
 		old_key = zbx_strdup(old_key, row[0]);
-		substitute_key_macros(&old_key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
+		substitute_key_macros(&old_key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 		if (0 == strcmp(old_key, row[1]))
 		{
@@ -304,7 +304,7 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
 	if (NULL != jp_row)
 	{
 		key = zbx_strdup(key, tmpl_key);
-		substitute_key_macros(&key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
+		substitute_key_macros(&key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 		key_esc = DBdyn_escape_string(key);
 	}
 	else
@@ -382,7 +382,7 @@ static void	DBlld_get_trigger_functions(zbx_uint64_t triggerid, struct zbx_json_
 		zbx_vector_ptr_append(functions, function);
 
 		if (NULL != jp_row && 0 != (function->flags & ZBX_FLAG_DISCOVERY_CHILD))
-			substitute_key_macros(&function->key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
+			substitute_key_macros(&function->key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 	}
 	DBfree_result(result);
 
@@ -608,7 +608,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 	if (SUCCEED == DBlld_trigger_exists(hostid, trigger->triggerid, trigger->description,
 			trigger->full_expression, triggers))
 	{
-		*error = zbx_strdcatf(*error, "cannot %s trigger [%s]: trigger already exists\n",
+		*error = zbx_strdcatf(*error, "Cannot %s trigger [%s]: trigger already exists\n",
 				0 != trigger->triggerid ? "update" : "create", trigger->description);
 		res = FAIL;
 		goto out;
@@ -1029,7 +1029,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 	item = zbx_calloc(NULL, 1, sizeof(zbx_lld_item_t));
 	item->key = zbx_strdup(NULL, key_proto);
-	substitute_key_macros(&item->key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
+	substitute_key_macros(&item->key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 	key_esc = DBdyn_escape_string(item->key);
 
@@ -1059,7 +1059,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 			char	*old_key = NULL;
 
 			old_key = zbx_strdup(old_key, row[1]);
-			substitute_key_macros(&old_key, NULL, jp_row, MACRO_TYPE_ITEM_KEY);
+			substitute_key_macros(&old_key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 			if (0 == strcmp(old_key, row[2]))
 				ZBX_STR2UINT64(item->itemid, row[0]);
@@ -1074,7 +1074,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 	if (SUCCEED == DBlld_item_exists(hostid, item->itemid, item->key, items))
 	{
-		*error = zbx_strdcatf(*error, "cannot %s item [%s]: item already exists\n",
+		*error = zbx_strdcatf(*error, "Cannot %s item [%s]: item already exists\n",
 				0 != item->itemid ? "update" : "create", item->key);
 		res = FAIL;
 		goto out;
@@ -1084,7 +1084,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	substitute_discovery_macros(&item->name, jp_row);
 
 	item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
-	substitute_key_macros(&item->snmp_oid, NULL, jp_row, MACRO_TYPE_SNMP_OID);
+	substitute_key_macros(&item->snmp_oid, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
 
 	item->params = zbx_strdup(NULL, params_proto);
 	if (ITEM_TYPE_DB_MONITOR == type || ITEM_TYPE_SSH == type ||
@@ -1614,7 +1614,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 
 	if (SUCCEED == DBlld_graph_exists(hostid, graph->graphid, graph->name, graphs))
 	{
-		*error = zbx_strdcatf(*error, "cannot %s graph [%s]: graph already exists\n",
+		*error = zbx_strdcatf(*error, "Cannot %s graph [%s]: graph already exists\n",
 				0 != graph->graphid ? "update" : "create", graph->name);
 		res = FAIL;
 		goto out;
@@ -2173,7 +2173,7 @@ static void	DBlld_remove_lost_resources(zbx_uint64_t discovery_itemid, unsigned 
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
+void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "DBlld_process_discovery_rule";
 	DB_RESULT		result;
@@ -2185,9 +2185,15 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 	unsigned short		lifetime;
 	char			*f_macro = NULL, *f_regexp = NULL;
 	ZBX_REGEXP		*regexps = NULL;
-	int			regexps_alloc = 0, regexps_num = 0, now;
+	int			regexps_alloc = 0, regexps_num = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 128, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, discovery_itemid);
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set lastclock=%d,lastns=%d", ts->sec, ts->ns);
 
 	result = DBselect(
 			"select hostid,key_,status,filter,error,lifetime"
@@ -2229,7 +2235,7 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 
 	if (SUCCEED != zbx_json_open(value, &jp))
 	{
-		error = zbx_dsprintf(error, "value should be JSON object");
+		error = zbx_strdup(error, "Value should be a JSON object");
 		goto error;
 	}
 
@@ -2237,7 +2243,8 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
  *                     ^-------------------------------------------^
  */	if (SUCCEED != zbx_json_brackets_by_name(&jp, discovery_key, &jp_data))
 	{
-		error = zbx_dsprintf(error, "wrong data in JSON object");
+		error = zbx_dsprintf(error, "Cannot find the \"%s\" key in received JSON object",
+				discovery_key);
 		goto error;
 	}
 
@@ -2272,12 +2279,10 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 				__function_name, f_macro, f_regexp);
 	}
 
-	now = time(NULL);
-
-	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, now);
+	DBlld_update_items(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num, ts->sec);
 	DBlld_update_triggers(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
 	DBlld_update_graphs(hostid, discovery_itemid, &jp_data, &error, f_macro, f_regexp, regexps, regexps_num);
-	DBlld_remove_lost_resources(discovery_itemid, lifetime, now);
+	DBlld_remove_lost_resources(discovery_itemid, lifetime, ts->sec);
 
 	zbx_free(regexps);
 
@@ -2286,17 +2291,21 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value)
 		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
 				discovery_itemid, zbx_host_key_string(discovery_itemid));
 
-		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64, ITEM_STATUS_ACTIVE, discovery_itemid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ITEM_STATUS_ACTIVE);
 	}
 error:
 	if (NULL != error && 0 != strcmp(error, db_error))
 	{
 		error_esc = DBdyn_escape_string_len(error, ITEM_ERROR_LEN);
 
-		DBexecute("update items set error='%s' where itemid=" ZBX_FS_UI64, error_esc, discovery_itemid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",error='%s'", error_esc);
 
 		zbx_free(error_esc);
 	}
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemid=" ZBX_FS_UI64, discovery_itemid);
+
+	DBexecute("%s", sql);
 
 	DBcommit();
 clean:

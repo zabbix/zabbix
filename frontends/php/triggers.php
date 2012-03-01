@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
 $page['hist_arg'] = array('hostid','groupid');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -208,24 +208,13 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 	// update triggers
 	DBstart();
 	foreach ($db_triggers as $trigger) {
-		foreach ($trigger as $key => $value) {
-			if (isset($visible[$key]) && isset($_REQUEST[$key])) {
-				$trigger[$key] = $_REQUEST[$key];
-			}
-		}
-
-		$options = array('triggerid' => $trigger['triggerid']);
-		if (!empty($visible['priority'])) {
-			$options['priority'] = $trigger['priority'];
-		}
-		if (!empty($visible['dependencies'])) {
-			$options['dependencies'] = $trigger['dependencies'];
-		}
-		if (!empty($options['priority']) || !empty($options['dependencies'])) {
-			$result = API::Trigger()->update($options);
-			if (!$result) {
-				break;
-			}
+		$result = API::Trigger()->update(array(
+			'triggerid' => $trigger['triggerid'],
+			'priority' => (isset($visible['priority'])) ? get_request('priority') : null,
+			'dependencies' => (isset($visible['dependencies'])) ? get_request('dependencies', array()) : null
+		));
+		if (!$result) {
+			break;
 		}
 	}
 	if (isset($result)) {
@@ -474,5 +463,5 @@ else {
 	$triggersView->show();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

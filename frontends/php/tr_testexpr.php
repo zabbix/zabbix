@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/triggers.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('Test');
 $page['file'] = 'tr_testexpr.php';
@@ -36,7 +36,7 @@ $definedErrorPhrases = array(
 	EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro')
 );
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //----------------------------------------------------------------------
@@ -175,6 +175,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>
