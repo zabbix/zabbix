@@ -2200,7 +2200,7 @@ class CTrigger extends CZBXAPI {
 	 */
 	protected function checkDependencies(array $triggers) {
 		foreach ($triggers as $trigger) {
-			if (!isset($trigger['dependencies']) || empty($trigger['dependencies'])) {
+			if (empty($trigger['dependencies'])) {
 				continue;
 			}
 
@@ -2221,13 +2221,19 @@ class CTrigger extends CZBXAPI {
 				}
 			}
 
+			$downTriggerIds = $trigger['dependencies'];
+
+			// the trigger can't be dependant on itself
+			if (in_array($trigger['triggerid'], $trigger['dependencies'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
+			}
+
 			// check circular dependency
-			$triggeridDown = $trigger['dependencies'];
 			do {
 				$dbUpTriggers = DBselect(
 					'SELECT td.triggerid_up'.
 					' FROM trigger_depends td'.
-					' WHERE'.DBcondition('td.triggerid_down', $triggeridDown)
+					' WHERE'.DBcondition('td.triggerid_down', $downTriggerIds)
 				);
 				$upTriggerids = array();
 				while ($upTrigger = DBfetch($dbUpTriggers)) {
@@ -2236,7 +2242,7 @@ class CTrigger extends CZBXAPI {
 					}
 					$upTriggerids[] = $upTrigger['triggerid_up'];
 				}
-				$triggeridDown = $upTriggerids;
+				$downTriggerIds = $upTriggerids;
 
 			} while (!empty($upTriggerids));
 
