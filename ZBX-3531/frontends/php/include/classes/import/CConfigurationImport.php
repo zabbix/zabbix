@@ -211,20 +211,6 @@ class CConfigurationImport {
 			}
 
 
-			$allGraphs = $this->formatter->getGraphs();
-			foreach ($allGraphs as $graph) {
-				if ($graph['ymin_item_1']) {
-					$hostsRefs[$graph['ymin_item_1']['host']] = $graph['ymin_item_1']['host'];
-				}
-				if ($graph['ymax_item_1']) {
-					$hostsRefs[$graph['ymax_item_1']['host']] = $graph['ymax_item_1']['host'];
-				}
-				foreach ($graph['gitems'] as $gitem) {
-					$hostsRefs[$gitem['item']['host']] = $gitem['item']['host'];
-				}
-			}
-
-			$this->referencer->addHosts($hostsRefs);
 			$this->referencer->addTemplates($templatesRefs);
 			$this->referencer->addGroups($groupsRefs);
 		}
@@ -278,18 +264,18 @@ class CConfigurationImport {
 						$applicationsRefs[$host] = zbx_objectValues($itemp['applications'], 'name');
 					}
 					foreach ($discoveryRule['trigger_prototypes'] as $trigerp) {
-						$triggersRefs[$trigerp['description']][] = $trigerp['expression'];
+						$triggersRefs[$trigerp['description']][$trigerp['expression']] = $trigerp['expression'];
 					}
 
 					foreach ($discoveryRule['graph_prototypes'] as $graph) {
 						if ($graph['ymin_item_1']) {
-							$itemsRefs[$graph['ymin_item_1']['host']][] = $graph['ymin_item_1']['key'];
+							$itemsRefs[$graph['ymin_item_1']['host']][$graph['ymin_item_1']['key']] = $graph['ymin_item_1']['key'];
 						}
 						if ($graph['ymax_item_1']) {
-							$itemsRefs[$graph['ymax_item_1']['host']][] = $graph['ymax_item_1']['key'];
+							$itemsRefs[$graph['ymax_item_1']['host']][$graph['ymax_item_1']['key']] = $graph['ymax_item_1']['key'];
 						}
 						foreach ($graph['gitems'] as $gitem) {
-							$itemsRefs[$gitem['item']['host']][] = $gitem['item']['key'];
+							$itemsRefs[$gitem['item']['host']][$gitem['item']['key']] = $gitem['item']['key'];
 						}
 					}
 
@@ -304,20 +290,25 @@ class CConfigurationImport {
 		if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
 			$allGraphs = $this->formatter->getGraphs();
 
-			$graphsRefs = array();
+			$hostsRefs = array();
+			$itemsRefs = array();
 			foreach ($allGraphs as $graph) {
 				if ($graph['ymin_item_1']) {
-					$graphsRefs[$graph['ymin_item_1']['host']][] = $graph['ymin_item_1']['key'];
+					$hostsRefs[$graph['ymin_item_1']['host']] = $graph['ymin_item_1']['host'];
+					$itemsRefs[$graph['ymin_item_1']['host']][$graph['ymin_item_1']['key']] = $graph['ymin_item_1']['key'];
 				}
 				if ($graph['ymax_item_1']) {
-					$graphsRefs[$graph['ymax_item_1']['host']][] = $graph['ymax_item_1']['key'];
+					$hostsRefs[$graph['ymax_item_1']['host']] = $graph['ymax_item_1']['host'];
+					$itemsRefs[$graph['ymax_item_1']['host']][$graph['ymax_item_1']['key']] = $graph['ymax_item_1']['key'];
 				}
 				foreach ($graph['gitems'] as $gitem) {
-					$graphsRefs[$gitem['item']['host']][] = $gitem['item']['key'];
+					$hostsRefs[$gitem['item']['host']] = $gitem['item']['host'];
+					$itemsRefs[$gitem['item']['host']][$gitem['item']['key']] = $gitem['item']['key'];
 				}
 			}
 
-			$this->referencer->addItems($graphsRefs);
+			$this->referencer->addHosts($hostsRefs);
+			$this->referencer->addItems($itemsRefs);
 		}
 
 		if ($this->options['triggers']['exist'] || $this->options['triggers']['missed']) {
