@@ -1001,47 +1001,43 @@ function make_webmon_overview($filter) {
 		_('Host group'),
 		_('Ok'),
 		_('Failed'),
-		_('In progress'),
 		_('Unknown')
 	));
 
 	$groups = API::HostGroup()->get(array(
 		'monitored_hosts' => true,
 		'with_monitored_httptests' => true,
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('groupid', 'name')
 	));
 	foreach ($groups as $group) {
 		$showGroup = false;
 		$apps['ok'] = 0;
 		$apps['failed'] = 0;
-		$apps[HTTPTEST_STATE_BUSY] = 0;
-		$apps[HTTPTEST_STATE_UNKNOWN] = 0;
+		$apps['unknown'] = 0;
 
-		$db_httptests = DBselect(
-			'SELECT DISTINCT ht.name,ht.httptestid,ht.curstate,ht.lastfailedstep'.
-			' FROM httptest ht,applications a,hosts_groups hg,groups g'.
-			' WHERE g.groupid='.$group['groupid'].
-				' AND '.DBcondition('hg.hostid',$available_hosts).
-				' AND hg.groupid=g.groupid'.
-				' AND a.hostid=hg.hostid'.
+		$result = DBselect(
+			'SELECT DISTINCT i.lastclock,i.lastvalue'.
+			' FROM items i,httptestitem hti,httptest ht,applications a,hosts_groups hg'.
+			' WHERE i.itemid=hti.itemid'.
+				' AND hti.httptestid=ht.httptestid'.
 				' AND ht.applicationid=a.applicationid'.
-				' AND ht.status='.HTTPTEST_STATUS_ACTIVE
+				' AND a.hostid=hg.hostid'.
+				' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
+				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
+				' AND '.DBcondition('hg.hostid', $available_hosts).
+				' AND hg.groupid='.$group['groupid']
 		);
-		while ($httptest_data = DBfetch($db_httptests)) {
+		while ($row = DBfetch($result)) {
 			$showGroup = true;
-			if (HTTPTEST_STATE_BUSY == $httptest_data['curstate']) {
-				$apps[HTTPTEST_STATE_BUSY]++;
+
+			if (!$row['lastclock']) {
+				$apps['unknown']++;
 			}
-			elseif (HTTPTEST_STATE_IDLE == $httptest_data['curstate']) {
-				if ($httptest_data['lastfailedstep'] > 0) {
-					$apps['failed']++;
-				}
-				else {
-					$apps['ok']++;
-				}
+			elseif ($row['lastvalue'] != 0) {
+				$apps['failed']++;
 			}
 			else {
-				$apps[HTTPTEST_STATE_UNKNOWN]++;
+				$apps['ok']++;
 			}
 		}
 		if (!$showGroup) {
@@ -1052,8 +1048,7 @@ function make_webmon_overview($filter) {
 			$group['name'],
 			new CSpan($apps['ok'], 'off'),
 			new CSpan($apps['failed'], $apps['failed'] ? 'on' : 'off'),
-			new CSpan($apps[HTTPTEST_STATE_BUSY], $apps[HTTPTEST_STATE_BUSY] ? 'orange' : 'off'),
-			new CSpan($apps[HTTPTEST_STATE_UNKNOWN], 'unknown')
+			new CSpan($apps['unknown'], 'unknown')
 		));
 	}
 	$script = new CJSScript(get_js("jQuery('#hat_webovr_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));

@@ -159,7 +159,6 @@ require_once('include/page_header.php');
 		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.name') : NULL,
 		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
 		_('Number of steps'),
-		S_STATE,
 		_('Last check'),
 		S_STATUS
 	));
@@ -170,54 +169,75 @@ require_once('include/page_header.php');
 	$db_appids = array();
 
 	$sql_where = '';
-	if($_REQUEST['hostid']>0){
+	if ($_REQUEST['hostid'] > 0) {
 		$sql_where = ' AND h.hostid='.$_REQUEST['hostid'];
 	}
 
-	$sql = 'SELECT DISTINCT h.name as hostname,h.hostid,a.* '.
-			' FROM applications a,hosts h '.
-			' WHERE a.hostid=h.hostid '.
+	$result = DBselect(
+			'SELECT DISTINCT h.name as hostname,h.hostid,a.*'.
+			' FROM applications a,hosts h'.
+			' WHERE a.hostid=h.hostid'.
 				$sql_where.
 				' AND '.DBcondition('h.hostid',$available_hosts).
-			order_by('a.applicationid,h.name,h.hostid','a.name');
-//SDI($sql);
-	$db_app_res = DBselect($sql);
-	while($db_app = DBfetch($db_app_res)){
-		$db_app['scenarios_cnt'] = 0;
+			order_by('a.applicationid,h.name,h.hostid','a.name')
+	);
+	while ($row = DBfetch($result)) {
+		$row['scenarios_cnt'] = 0;
 
-		$db_apps[$db_app['applicationid']] = $db_app;
-		$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
+		$db_apps[$row['applicationid']] = $row;
+		$db_appids[$row['applicationid']] = $row['applicationid'];
 	}
-
 
 	$db_httptests = array();
 	$db_httptestids = array();
 
-	$sql = 'SELECT wt.*,a.name as application,h.name as hostname,h.hostid'.
+	$result = DBselect(
+			'SELECT wt.*,a.name as application,h.name as hostname,h.hostid'.
 			' FROM httptest wt,applications a,hosts h'.
 			' WHERE wt.applicationid=a.applicationid'.
 				' AND a.hostid=h.hostid'.
 				' AND '.DBcondition('a.applicationid', $db_appids).
 				' AND wt.status<>1'.
-			order_by('wt.name', 'h.host');
+			order_by('wt.name', 'h.host')
+	);
+	while ($row = DBfetch($result)) {
+		$row['step_count'] = null;
+		$row['lastfailedstep'] = 0;
+		$row['error'] = '';
+		$db_apps[$row['applicationid']]['scenarios_cnt']++;
 
-	$db_httptests_res = DBselect($sql);
-	while ($httptest_data = DBfetch($db_httptests_res)) {
-		$httptest_data['step_count'] = null;
-		$db_apps[$httptest_data['applicationid']]['scenarios_cnt']++;
-
-		$db_httptests[$httptest_data['httptestid']] = $httptest_data;
-		$db_httptestids[$httptest_data['httptestid']] = $httptest_data['httptestid'];
+		$db_httptests[$row['httptestid']] = $row;
+		$db_httptestids[$row['httptestid']] = $row['httptestid'];
 	}
 
-	$sql = 'SELECT hs.httptestid, COUNT(hs.httpstepid) as cnt '.
+	$result = DBselect(
+			'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
 			' FROM httpstep hs'.
-			' WHERE '.DBcondition('hs.httptestid',$db_httptestids).
-			' GROUP BY hs.httptestid';
+			' WHERE '.DBcondition('hs.httptestid', $db_httptestids).
+			' GROUP BY hs.httptestid'
+	);
+	while($row = DBfetch($result)){
+		$db_httptests[$row['httptestid']]['step_count'] = $row['cnt'];
+	}
 
-	$httpstep_res = DBselect($sql);
-	while($step_cout = DBfetch($httpstep_res)){
-		$db_httptests[$step_cout['httptestid']]['step_count'] = $step_cout['cnt'];
+	$result = DBselect(
+			'SELECT hti.httptestid,hti.type,i.lastvalue,i.lastclock'.
+			' FROM httptestitem hti,items i'.
+			' WHERE hti.itemid=i.itemid'.
+				' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
+				' AND i.lastclock IS NOT NULL'.
+				' AND '.DBcondition('hti.httptestid', $db_httptestids)
+	);
+	while ($row = DBfetch($result)) {
+		if ($row['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
+			if (!isset($db_httptests[$row['httptestid']]['lastcheck'])) {
+				$db_httptests[$row['httptestid']]['lastcheck'] = $row['lastclock'];
+			}
+			$db_httptests[$row['httptestid']]['lastfailedstep'] = $row['lastvalue'];
+		}
+		else {
+			$db_httptests[$row['httptestid']]['error'] = $row['lastvalue'];
+		}
 	}
 
 	$tab_rows = array();
@@ -232,37 +252,27 @@ require_once('include/page_header.php');
 		$name = array();
 		array_push($name, new CLink($httptest_data['name'],'httpdetails.php?httptestid='.$httptest_data['httptestid']));
 
-		if(isset($httptest_data['lastcheck']))
-			$lastcheck = zbx_date2str(S_WEB_SCENARIO_DATE_FORMAT,$httptest_data['lastcheck']);
-		else
-			$lastcheck = new CCol('-', 'center');
-
-		if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
-			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
-			$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].']';
-
-			$status['msg'] = S_IN_PROGRESS;
-			$status['style'] = 'orange';
+		if (isset($httptest_data['lastcheck'])) {
+			$lastcheck = zbx_date2str(S_DATE_FORMAT_YMDHMS, $httptest_data['lastcheck']);
 		}
-		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
-			$state = S_IDLE_TILL.' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
+		else {
+			$lastcheck = new CCol(_('Never'));
+		}
 
-			if($httptest_data['lastfailedstep'] > 0){
-				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
-				$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
-					'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].'] '.
-					SPACE.S_ERROR.': '.$httptest_data['error'];
-				$status['style'] = 'disabled';
-			}
-			else{
-				$status['msg'] = _('OK');
-				$status['style'] = 'enabled';
-			}
+		if (!isset($httptest_data['lastcheck'])) {
+			$status['msg'] = _('Unknown');
+			$status['style'] = 'unknown';
+		}
+		elseif ($httptest_data['lastfailedstep'] != 0) {
+			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
+			$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
+				'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].'] '.
+				SPACE.S_ERROR.': '.$httptest_data['error'];
+			$status['style'] = 'disabled';
 		}
 		else{
-			$state = S_IDLE_TILL.' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
-			$status['msg'] = S_UNKNOWN;
-			$status['style'] = 'unknown';
+			$status['msg'] = _('OK');
+			$status['style'] = 'enabled';
 		}
 
 		array_push($app_rows, new CRow(array(
@@ -270,7 +280,6 @@ require_once('include/page_header.php');
 			($_REQUEST['hostid']>0)?NULL:SPACE,
 			array(str_repeat(SPACE,6), $name),
 			$httptest_data['step_count'],
-			$state,
 			$lastcheck,
 			new CSpan($status['msg'], $status['style'])
 			)));

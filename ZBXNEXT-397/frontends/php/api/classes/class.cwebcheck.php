@@ -368,9 +368,6 @@ class CWebCheck extends CZBXAPI {
 				}
 			}
 
-			$webcheck['curstate'] = HTTPTEST_STATE_UNKNOWN;
-			$webcheck['error'] = '';
-
 			DB::update('httptest', array(
 				'values' => $webcheck,
 				'where' => array('httptestid' => $webcheck['webcheckid'])
@@ -394,11 +391,17 @@ class CWebCheck extends CZBXAPI {
 						case HTTPSTEP_ITEM_TYPE_LASTSTEP:
 							$updateFields['key_'] = 'web.test.fail['.$webcheck['name'].']';
 							break;
+						case HTTPSTEP_ITEM_TYPE_LASTERROR:
+							$updateFields['key_'] = 'web.test.error['.$webcheck['name'].']';
+							break;
 					}
 				}
 
 				if (isset($webcheck['status'])) {
-					$updateFields['status'] = $webcheck['status'];
+					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $webcheck['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+				}
+				if (isset($webcheck['delay'])) {
+					$updateFields['delay'] = $webcheck['delay'];
 				}
 				if (!empty($updateFields)) {
 					$checkItemsUpdate[] = array(
@@ -520,6 +523,13 @@ class CWebCheck extends CZBXAPI {
 				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'				=> '',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTSTEP
+			),
+			array(
+				'name'				=> _s('Last error message of scenario "%s".', '$1'),
+				'key_'				=> 'web.test.error['.$webcheck['name'].']',
+				'value_type'		=> ITEM_VALUE_TYPE_STR,
+				'units'				=> '',
+				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTERROR
 			)
 		);
 
@@ -535,10 +545,9 @@ class CWebCheck extends CZBXAPI {
 			$item['hostid'] = $webcheck['hostid'];
 			$item['delay'] = $webcheck['delay'];
 			$item['type'] = ITEM_TYPE_HTTPTEST;
-			$item['trapper_hosts'] = 'localhost';
 			$item['history'] = $this->history;
 			$item['trends'] = $this->trends;
-			$item['status'] = $webcheck['status'];
+			$item['status'] = (HTTPTEST_STATUS_ACTIVE == $webcheck['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 		}
 		unset($item);
 
@@ -628,10 +637,9 @@ class CWebCheck extends CZBXAPI {
 				$item['delay'] = $webcheck['delay'];
 				$item['type'] = ITEM_TYPE_HTTPTEST;
 				$item['data_type'] = ITEM_DATA_TYPE_DECIMAL;
-				$item['trapper_hosts'] = 'localhost';
 				$item['history'] = $this->history;
 				$item['trends'] = $this->trends;
-				$item['status'] = $webcheck['status'];
+				$item['status'] = (HTTPTEST_STATUS_ACTIVE == $webcheck['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 			}
 			unset($item);
 
@@ -718,7 +726,10 @@ class CWebCheck extends CZBXAPI {
 					unset($updateFields['key_']);
 				}
 				if (isset($webcheck['status'])) {
-					$updateFields['status'] = $webcheck['status'];
+					$updateFields['status'] = (HTTPTEST_STATUS_ACTIVE == $webcheck['status']) ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
+				}
+				if (isset($webcheck['delay'])) {
+					$updateFields['delay'] = $webcheck['delay'];
 				}
 				if (!empty($updateFields)) {
 					$stepitemsUpdate[] = array(

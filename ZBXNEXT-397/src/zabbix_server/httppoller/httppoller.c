@@ -59,6 +59,7 @@ static int	get_minnextcheck(int now)
 				" and a.hostid=h.hostid"
 				" and " ZBX_SQL_MOD(t.httptestid,%d) "=%d"
 				" and t.status=%d"
+				" and h.proxy_hostid is null"
 				" and h.status=%d"
 				" and (h.maintenance_status=%d or h.maintenance_type=%d)"
 				DB_NODE,
