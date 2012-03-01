@@ -106,7 +106,13 @@ class CassandraHistory {
 			$keyFrom = $keyTo;
 			$keyTo = $tmp;
 		}
-		$keys = $this->itemidIndex->get($itemid, null, $keyFrom, $keyTo, ($order == ZBX_SORT_DOWN));
+		try {
+			$keys = $this->itemidIndex->get($itemid, null, $keyFrom, $keyTo, ($order == ZBX_SORT_DOWN));
+		}
+		catch (cassandra_NotFoundException $e) {
+		// No records found
+			$keys=array();
+		}
 		$keys = array_keys($keys);
 
 		$rows = $this->metric->multiget($keys, null, '', '', ($order == ZBX_SORT_DOWN));
