@@ -1980,6 +1980,10 @@ int	str2uint(const char *str)
 	size_t	sz = strlen(str) - 1;
 	int	factor = 1;
 
+	/* trim right spaces */
+	while (str[sz] == ' ' && 0 < sz)
+		sz--;
+
 	switch (str[sz])
 	{
 		case 's': factor = 1;			break;
