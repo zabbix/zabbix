@@ -2,6 +2,7 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBX-4600] trigger dependencies will now be deleted when executing a mass update with no dependencies selected (pavels)
 A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces (pavels)
 ..F....... [ZBX-4563] improved SQL query debug log design (pavels)
 ..F....... [ZBX-4537] improved include_once statements to make Zabbix code easier to reuse (Alexei)
@@ -12,6 +13,7 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4253] fixed menu link inconsistency in tr_status.php (Toms)
 ..F....... [ZBX-4554] fixed ordering (Toms)
 ..F....... [ZBX-4295] fixed icons ending outside map. Removed icon resizing responsible for infinite loop (Toms)
 ..F....... [ZBX-4296] fixed popup menu unavailable for disabled hosts (Toms)
@@ -465,6 +467,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+........S. [ZBX-4549] fixed nested db transaction error when stopping server (dimir)
 ........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
 ..F....... [ZBX-4579] fixed incorrect "unknown" values in availability report if no events present (Alexei)
 .......P.. [ZBX-4683] fixed timestamps mismatch while sending history data from proxy (Sasha)
@@ -472,7 +475,7 @@ Changes for 1.8.11rc1
 ..F....... [ZBX-4680] fixed minor typo in frontends/php/js/class.rpc.js (Alexei)
 ...G...... [ZBX-1298] fixed processing of command line arguments more than 2KB in proc.num and proc.mem checks on Linux (Sasha)
 ........S. [ZBX-4650] fixed possible server crash while processing trigger expressions (Sasha)
-.......PS. [ZBX-3688] fixed changing host's availabitily for dynamic SNMP checks (Sasha)
+.......PS. [ZBX-3688] fixed changing host's availability for dynamic SNMP checks (Sasha)
 ...G...PS. [ZBX-3788] signal handlers changed to reduce probability of process hang on exit (Andris)
 .......PS. [ZBX-1555] fixed discovery error message if IPv6 support is not compiled in (Sasha)
 .......PS. [ZBX-3992] removed web monitoring items from synchronization of the proxy (Sasha)
