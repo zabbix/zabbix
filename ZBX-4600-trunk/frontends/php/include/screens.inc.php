@@ -20,9 +20,9 @@
 
 ?>
 <?php
-require_once('include/events.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/js.inc.php');
+require_once dirname(__FILE__).'/events.inc.php';
+require_once dirname(__FILE__).'/actions.inc.php';
+require_once dirname(__FILE__).'/js.inc.php';
 ?>
 <?php
 function screen_resources($res = null) {

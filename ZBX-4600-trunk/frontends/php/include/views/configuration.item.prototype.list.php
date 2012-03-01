@@ -31,25 +31,25 @@ $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEM PROTOTYPES'), $createForm);
 // header
 $numRows = new CDiv();
 $numRows->setAttribute('name', 'numrows');
-$itemsWidget->addHeader(array(_('ITEM PROTOTYPES OF').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
+$itemsWidget->addHeader(array(_('Item prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
 $itemsWidget->addHeader($numRows, SPACE);
 $itemsWidget->addItem(get_header_host_table($this->data['hostid']));
 
 // create form
-$itempForm = new CForm('get');
-$itempForm->setName('items');
-$itempForm->addVar('hostid', $this->data['hostid']);
-$itempForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
+$itemForm = new CForm('get');
+$itemForm->setName('items');
+$itemForm->addVar('hostid', $this->data['hostid']);
+$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$itemTable = new CTableInfo(_('No items defined.'));
+$itemTable = new CTableInfo(_('No items prototypes defined.'));
 
 $sortLink = new Curl();
 $sortLink->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
 $sortLink = $sortLink->getUrl();
 
 $itemTable->setHeader(array(
-	new CCheckBox('all_items', null, "checkAll('".$itempForm->getName()."', 'all_items', 'group_itemid');"),
+	new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');"),
 	make_sorting_header(_('Name'),'name', $sortLink),
 	make_sorting_header(_('Key'), 'key_', $sortLink),
 	make_sorting_header(_('Interval'), 'delay', $sortLink),
@@ -130,9 +130,9 @@ $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_itemid";');
 
 // append table to form
-$itempForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
+$itemForm->addItem(array($this->data['paging'], $itemTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
-$itemsWidget->addItem($itempForm);
+$itemsWidget->addItem($itemForm);
 return $itemsWidget;
 ?>

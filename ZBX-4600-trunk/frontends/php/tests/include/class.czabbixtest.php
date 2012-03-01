@@ -21,8 +21,8 @@
 <?php
 //require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
-require_once(dirname(__FILE__).'/../../include/defines.inc.php');
-require_once(dirname(__FILE__).'/dbfunc.php');
+require_once dirname(__FILE__).'/../../include/defines.inc.php';
+require_once dirname(__FILE__).'/dbfunc.php';
 
 class CZabbixTest extends PHPUnit_Framework_TestCase {
 	public $ID = 0;

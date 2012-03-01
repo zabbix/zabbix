@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/testClicks.php';
 require_once dirname(__FILE__).'/testPageActionsAutoregistration.php';
 require_once dirname(__FILE__).'/testPageActionsDiscovery.php';
 require_once dirname(__FILE__).'/testPageActionsTriggers.php';
+require_once dirname(__FILE__).'/testPageAdministrationAudit.php';
 require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
@@ -89,6 +90,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageActionsAutoregistration');
 		$suite->addTestSuite('testPageActionsDiscovery');
 		$suite->addTestSuite('testPageActionsTriggers');
+		$suite->addTestSuite('testPageAdministrationAudit');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');

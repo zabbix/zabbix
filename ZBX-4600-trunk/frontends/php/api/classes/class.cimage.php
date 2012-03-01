@@ -287,7 +287,7 @@ class CImage extends CZBXAPI {
 		$imageids = array();
 
 			if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			foreach ($images as $snum => $image) {
@@ -397,7 +397,7 @@ class CImage extends CZBXAPI {
 		$images = zbx_toArray($images);
 
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		foreach ($images as $num => $image) {
@@ -421,7 +421,7 @@ class CImage extends CZBXAPI {
 			if (isset($image['imagetype'])) $values['imagetype'] = $image['imagetype'];
 
 			if (isset($image['image'])) {
-// Decode BASE64
+				// decode BASE64
 				$image['image'] = base64_decode($image['image']);
 
 				switch ($DB['TYPE']) {
@@ -503,7 +503,7 @@ class CImage extends CZBXAPI {
 		}
 
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		// check if icon is used in icon maps

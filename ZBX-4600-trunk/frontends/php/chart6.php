@@ -99,6 +99,6 @@ require_once 'include/page_header.php';
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/items.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
@@ -37,7 +37,7 @@ if(PAGE_TYPE_HTML == $page['type']){
 }
 //	define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			     			 TYPE	   OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -59,7 +59,7 @@ require_once('include/page_header.php');
 //ajax
 		'favobj'=>				array(T_ZBX_STR, O_OPT, P_ACT,	NULL,		NULL),
 		'favref'=>				array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
-		'state'=>				array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
+		'favstate'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
 	);
 
 	check_fields($fields);
@@ -68,12 +68,12 @@ require_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.latest.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.latest.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--------
@@ -143,7 +143,7 @@ require_once('include/page_header.php');
 	$filterForm->addItemToBottomRow(new CSubmit("filter_set", _('Filter')));
 	$filterForm->addItemToBottomRow($reset);
 
-	$latest_wdgt->addFlicker($filterForm, CProfile::get('web.latest.filter.state',1));
+	$latest_wdgt->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 1));
 //-------
 
 	validate_sort_and_sortorder('i.name',ZBX_SORT_UP);

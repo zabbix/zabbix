@@ -19,13 +19,13 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = "S_IT_NOTIFICATIONS";
 $page['file'] = 'report4.php';
 $page['hist_arg'] = array('media_type','period','year');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -84,7 +84,7 @@ require_once('include/page_header.php');
 
 		$form->addItem(SPACE._('Media type').SPACE);
 		$cmbMedia = new CComboBox('media_type', $media_type, 'submit();');
-		$cmbMedia->addItem(0,S_ALL_SMALL);
+		$cmbMedia->addItem(0, _('all'));
 
 		foreach($media_types as $media_type_id => $media_type_description){
 			$cmbMedia->addItem($media_type_id, $media_type_description);
@@ -231,14 +231,10 @@ require_once('include/page_header.php');
 			}
 			array_pop($links);
 
-			$linksDiv = new CDiv(array(SPACE . S_ALL_SMALL . SPACE . '(' . SPACE, $links, SPACE.')'));
+			$linksDiv = new CDiv(array(SPACE . _('all') . SPACE . '(' . SPACE, $links, SPACE.')'));
 			$linksDiv->show();
 		}
 	}
 
-?>
-<?php
-
-require_once('include/page_footer.php');
-
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

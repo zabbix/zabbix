@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/nodes.inc.php');
+	require_once dirname(__FILE__).'/include/config.inc.php';
+	require_once dirname(__FILE__).'/include/nodes.inc.php';
 
-	$page['title'] = 'S_NODES';
+	$page['title'] = _('Nodes');
 	$page['file'] = 'nodes.php';
 	$page['hist_arg'] = array();
 
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 	$fields=array(
@@ -110,8 +110,8 @@
 
 	$frmForm = new CForm('get');
 	$cmbConf = new CComboBox('config', 'nodes.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('nodes.php', S_NODES);
-		$cmbConf->addItem('proxies.php', S_PROXIES);
+		$cmbConf->addItem('nodes.php', _('Nodes'));
+		$cmbConf->addItem('proxies.php', _('Proxies'));
 	$frmForm->addItem($cmbConf);
 
 	if(!isset($_REQUEST['form']) && ZBX_DISTRIBUTED){
@@ -244,5 +244,5 @@
 	$nodes_wdgt->show();
 
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

@@ -114,6 +114,7 @@ require_once 'include/page_header.php';
 				' OR (h.jmx_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$jmx_item_types).'))'.
 				')'.
 			' AND '.DBin_node('i.itemid', get_current_nodeid()).
+			' AND i.flags NOT IN ('.ZBX_FLAG_DISCOVERY_CHILD.')'.
 		' ORDER BY i.lastclock,h.name,i.name,i.key_';
 	$result = DBselect($sql);
 
@@ -289,5 +290,5 @@ require_once 'include/page_header.php';
 	}
 
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>
