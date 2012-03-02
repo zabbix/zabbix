@@ -305,9 +305,9 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		/* NOTE: do not use break or return for this block!
-		 *       process_step_data calling required!
-		 */
+		/* NOTE: do not break or return from this block! */
+		/*       process_step_data() call is required! */
+
 		ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
 		httpstep.httptestid = httptest->httptestid;
 		httpstep.no = atoi(row[1]);
@@ -337,9 +337,9 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		{
 			long	curlauth = 0;
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() Setting HTTPAUTH [%d]",
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() setting HTTPAUTH [%d]",
 					__function_name, httptest->authentication);
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() Setting USERPWD for authentication", __function_name);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() setting USERPWD for authentication", __function_name);
 
 			switch (httptest->authentication)
 			{
@@ -464,8 +464,8 @@ clean:
 
 	if (0 == lastfailedstep && NULL != err_str)
 	{
-		/* we are here either because cURL initialization failed before */
-		/* the first step or we have been compiled without cURL library */
+		/* we are here either because cURL initialization failed */
+		/* or we have been compiled without cURL library */
 
 		lastfailedstep = 1;
 
