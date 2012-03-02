@@ -31,8 +31,6 @@
 
 #define ZBX_DB_WAIT_DOWN	10
 
-extern int	txn_level;
-extern int	txn_error;
 #if HAVE_POSTGRESQL
 extern char	ZBX_PG_ESCAPE_BACKSLASH;
 #endif
@@ -1494,7 +1492,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	do
 	{
 		/* avoid eternal loop within failed transaction */
-		if (0 < txn_level && 0 != txn_error)
+		if (0 < zbx_db_txn_level() && 0 != zbx_db_txn_error())
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() transaction failed", __function_name);
 			return 0;
@@ -2253,5 +2251,10 @@ void	DBfree_history(char **h_value)
 
 int	DBtxn_status()
 {
-	return 0 != txn_error ? FAIL : SUCCEED;
+	return 0 == zbx_db_txn_error() ? SUCCEED : FAIL;
+}
+
+int	DBtxn_ongoing()
+{
+	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
 }

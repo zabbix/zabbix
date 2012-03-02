@@ -85,8 +85,6 @@ typedef enum {
 #define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
 #define TRIGGER_EXPRESSION_LEN		255
 #define TRIGGER_EXPRESSION_LEN_MAX	TRIGGER_EXPRESSION_LEN+1
-#define TRIGGER_URL_LEN			255
-#define TRIGGER_URL_LEN_MAX		TRIGGER_URL_LEN+1
 #define TRIGGER_ERROR_LEN		128
 #define TRIGGER_ERROR_LEN_MAX		TRIGGER_ERROR_LEN+1
 
@@ -606,5 +604,6 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 void	DBfree_history(char **value);
 
 int	DBtxn_status();
+int	DBtxn_ongoing();
 
 #endif
