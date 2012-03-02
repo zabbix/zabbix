@@ -435,6 +435,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
+..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)
 ....I..... [ZBX-3262] fixed warning "no AC_LANG_SOURCE call detected in body" raised during compilation (Alexei)
 ..F....... [ZBX-3955] added pop up field name parameter validation (pavels)
 ...GI..PS. [ZBX-4535] fixed build with --as-needed linker flag (Sasha)
