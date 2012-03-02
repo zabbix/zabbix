@@ -138,12 +138,12 @@ class CProfiler {
 		$debug_str .= $sqlTotalTimeStr.'<br>';
 
 		if (isset($DB) && isset($DB['SELECT_COUNT'])) {
-			$debug_str .= _s('SQL count: %s (selects: %s | executes %s)',
+			$debug_str .= _s('SQL count: %s (selects: %s | executes: %s)',
 				count($this->sqlQueryLog), $DB['SELECT_COUNT'], $DB['EXECUTE_COUNT']).'<br>';
 		}
 
-		$debug_str .= _s('Memory limit: %s', ini_get('memory_limit')).'<br>';
 		$debug_str .= _s('Peak memory usage: %s', mem2str(memory_get_peak_usage(true))).'<br>';
+		$debug_str .= _s('Memory limit: %s', ini_get('memory_limit')).'<br>';
 
 		$debug_str .= '<br>';
 
@@ -182,7 +182,7 @@ class CProfiler {
 			else {
 				$sqlString = '<span style="color: blue; font-size: 1.2em;">'.$sql.'</span>';
 			}
-			$sqlString = _s('Time: %s', $time).'<br>'.'SQL: '.$sqlString.'<br>';
+			$sqlString = 'SQL ('.$time.'): '.$sqlString.'<br>';
 			if ($time > $this->slowSqlQueryTime) {
 				$sqlString = '<b>'.$sqlString.'</b>';
 			}
