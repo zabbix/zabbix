@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+...G...PS. [ZBX-4721] fixed handling of \u0000 by JSON parser; thanks to Rick Alm (Sasha)
 ..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
 ..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)
 ........S. [ZBX-4549] fixed nested db transaction error when stopping server (dimir)
