@@ -28,14 +28,13 @@
 
 #include "pinger.h"
 
-/*some defines so the `fping' and `fping6' could successfully process pings*/
+/* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1
 #define MAX_COUNT	10000
 #define MIN_INTERVAL	20
 #define MIN_SIZE	24
 #define MAX_SIZE	65507
 #define MIN_TIMEOUT	50
-/*end some defines*/
 
 #define MAX_ITEMS	128
 
