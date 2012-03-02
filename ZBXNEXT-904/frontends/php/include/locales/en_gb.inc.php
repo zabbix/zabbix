@@ -84,7 +84,6 @@
 	'S_CANNOT_ADD_NODE'=>			_('Cannot add node'),
 	'S_NODE_DELETED'=>			_('Node deleted'),
 	'S_CANNOT_DELETE_NODE'=>		_('Cannot delete node'),
-	'S_SELECT_NODES'=>			_('Select Nodes'),
 
 //	acknow.php
 	'S_BULK_ACKNOWLEDGE'=>			_('Bulk acknowledge'),
@@ -574,20 +573,6 @@
 
 // main.js
 	'S_NO_ELEMENTS_SELECTED'=>	_('No elements selected!'),
-
-// page_header.php
-
-//	copt.inc.php
-	'S_STATS_FOR'=>			_('Stats for'),
-	'S_TOTAL_TIME'=>		_('Total time'),
-	'S_MEMORY_LIMIT'=>		_('Memory limit'),
-	'S_MEMORY_USAGE'=>		_('Memory usage'),
-	'S_SQL_SELECTS_COUNT'=>		_('SQL selects count'),
-	'S_SQL_EXECUTES_COUNT'=>	_('SQL executes count'),
-	'S_SQL_REQUESTS_COUNT'=>	_('SQL requests count'),
-	'S_TOTAL_TIME_SPENT_ON_SQL'=>	_('Total time spent on SQL'),
-	'S_END_OF'=>			_('End of'),
-	'S_MEMORY_LIMIT_REACHED'=>	_('MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing.'),
 
 // 	func.inc.php
 	'S_E'=>			_('E'),

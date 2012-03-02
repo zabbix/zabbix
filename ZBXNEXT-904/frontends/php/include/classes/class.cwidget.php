@@ -110,7 +110,7 @@ class CWidget {
 			}
 
 			$icon_l = new CDiv(SPACE.SPACE, ($this->flicker_state ? 'dbl_arrow_up' : 'dbl_arrow_down'), 'flicker_icon_l');
-			$icon_l->setAttribute('title',_('Maximize').'/'._('Minimize'));
+			$icon_l->setAttribute('title', _('Maximize').'/'._('Minimize'));
 
 			$icon_r = new CDiv(SPACE.SPACE, ($this->flicker_state ? 'dbl_arrow_up' : 'dbl_arrow_down'), 'flicker_icon_r');
 			$icon_r->setAttribute('title', _('Maximize').'/'._('Minimize'));
@@ -203,7 +203,7 @@ class CWidget {
 			}
 		}
 		if (!is_null($this->state)) {
-			$icon = new CIcon(_('Show').'/'._('Hide'), ($this->state ? 'arrowup' : 'arrowdown'), "change_hat_state(this,'".$this->domid."');");
+			$icon = new CIcon(_('Show').'/'._('Hide'), ($this->state ? 'arrowup' : 'arrowdown'), "change_hat_state(this, '".$this->domid."');");
 			$icon->setAttribute('id', $this->domid.'_icon');
 			$right_row[] = new CCol($icon);
 		}

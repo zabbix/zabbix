@@ -520,7 +520,7 @@ function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {
 		$child = $tree[$id];
 		if (bccomp($child[$parent_field],$parentid) == 0) {
 			$result[$id] = $child;
-			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // ATTENTION RECURSION !!!
+			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // attention recursion !!!
 			$result += $childs;
 		}
 	}
@@ -679,7 +679,7 @@ function set_image_header($format = null) {
 		header('Content-type:  image/png');
 	}
 
-	header('Expires:  Mon, 17 Aug 1998 12:51:50 GMT');
+	header('Expires: Mon, 17 Aug 1998 12:51:50 GMT');
 }
 
 function imageOut(&$image, $format = null) {
@@ -724,12 +724,9 @@ function imageOut(&$image, $format = null) {
 }
 
 function encode_log($data) {
-	if (defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding')) {
-		return mb_convert_encoding($data, _('UTF-8'), ZBX_LOG_ENCODING_DEFAULT);
-	}
-	else {
-		return $data;
-	}
+	return (defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding'))
+		? mb_convert_encoding($data, _('UTF-8'), ZBX_LOG_ENCODING_DEFAULT)
+		: $data;
 }
 
 // function used in defines, so can't move it to func.inc.php
