@@ -275,7 +275,7 @@ div.hintbox {
 	position: absolute;
 	background-color: #FFFFE0;
 	padding: 2px;
-	font-size: 8pt;
+	font-size: 1em;
 	line-height:15px;
 	border: 1px solid black;
 	border-left: none;
