@@ -114,7 +114,6 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		}
 
 		ZBX_STR2UINT64(itemids[num], row[1]);
-		errcodes[num] = SUCCEED;
 		num++;
 	}
 	DBfree_result(result);
@@ -190,7 +189,6 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_t
 		}
 
 		ZBX_STR2UINT64(itemids[num], row[1]);
-		errcodes[num] = SUCCEED;
 		num++;
 	}
 	DBfree_result(result);
