@@ -1669,7 +1669,7 @@ class CTrigger extends CZBXAPI {
 				}
 			}
 			catch(APIException $result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot create dependency');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create dependency'));
 			}
 		}
 		return array('triggerids' => $triggerids);
@@ -1719,7 +1719,7 @@ class CTrigger extends CZBXAPI {
 			));
 		}
 		catch (APIException $e) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete dependency');
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete dependency'));
 		}
 		return array('triggerids' => $triggerids);
 	}
