@@ -13,6 +13,7 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4187] fixed dashbord fonts on popup. fixed js error on last 20 issues (Toms)
 A.F....... [ZBX-4607] fixed the script.getscriptbyhosts method returning scripts from nodes defferent from hosts (pavels)
 A.F....... [ZBX-4607] fixed the script "Host groups" parameter (pavels)
 A......... [ZBX-4607] fixed the script.get methods "selectHosts" and "selectGroups" options (pavels)
