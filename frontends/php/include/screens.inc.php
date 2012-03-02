@@ -743,10 +743,21 @@ require_once('include/js.inc.php');
 		return $form;
 	}
 
-	// editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
-	function get_screen($screenid, $editmode, $effectiveperiod=NULL){
-		global $USER_DETAILS;
-
+	/**
+	 * Returns the requested screen view.
+	 *
+	 * Possible $editmode values:
+	 * 0 - view with screen item actions (e.g. links to graphs, graph interval selection);
+	 * 1 - displays configuration grid;
+	 * 2 - view without item actions.
+	 *
+	 * @param int $screenid
+	 * @param int $editmode
+	 * @param null $effectiveperiod
+	 *
+	 * @return CTable|CTableInfo
+	 */
+	function get_screen($screenid, $editmode, $effectiveperiod = null) {
 		if($screenid == 0) return new CTableInfo(S_NO_SCREENS_DEFINED);
 		$r = CScreen::get(array(
 			'screenids' => $screenid,
@@ -1025,7 +1036,10 @@ require_once('include/js.inc.php');
 								$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 							}
 
-							$objData['loadSBox'] = 1;
+							// enable graph interval selection
+							if ($editmode == 0) {
+								$objData['loadSBox'] = 1;
+							}
 						}
 
 						$objData['src'] = $src;
@@ -1038,7 +1052,6 @@ require_once('include/js.inc.php');
 
 					$item = array($item);
 					if($editmode == 1){
-						$item[] = BR();
 						$item[] = new CLink(S_CHANGE, $action);
 					}
 
@@ -1094,7 +1107,10 @@ require_once('include/js.inc.php');
 							$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
 
-						$objData['loadSBox'] = 1;
+						// enable graph interval selection
+						if ($editmode == 0) {
+							$objData['loadSBox'] = 1;
+						}
 					}
 
 					$src = (zbx_empty($resourceid))?'chart3.php?':'chart.php?itemid='.$resourceid.'&';
@@ -1109,7 +1125,6 @@ require_once('include/js.inc.php');
 
 					$item = array($item);
 					if($editmode == 1){
-						$item[] = BR();
 						$item[] = new CLink(S_CHANGE, $action);
 					}
 
@@ -1357,7 +1372,7 @@ require_once('include/js.inc.php');
 					$item = new CFlashClock($width, $height, $style, $action);
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SCREEN) ){
-					$item = array(get_screen($resourceid, 2, $effectiveperiod));
+					$item = array(get_screen($resourceid, ($editmode == 1 || $editmode == 2) ? 2 : 0, $effectiveperiod));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else if( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) ){

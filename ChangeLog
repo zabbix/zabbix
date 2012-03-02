@@ -1,5 +1,7 @@
 Changes for 1.8.11rc1
 
+..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
+..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)
 ........S. [ZBX-4549] fixed nested db transaction error when stopping server (dimir)
 ........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
 ..F....... [ZBX-4579] fixed incorrect "unknown" values in availability report if no events present (Alexei)
