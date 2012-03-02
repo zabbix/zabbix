@@ -589,25 +589,27 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 	}
 
 	// map dependencies to the new trigger IDs and save
-	$dependencies = array();
-	foreach ($db_srcTriggers as $trigger) {
-		$triggerId = $trigger['triggerid'];
-		$triggerId = (isset($newTriggerIds[$triggerId])) ? $newTriggerIds[$triggerId] : $triggerId;
+	if ($newTriggerIds) {
+		$dependencies = array();
+		foreach ($db_srcTriggers as $trigger) {
+			$triggerId = $trigger['triggerid'];
+			$triggerId = (isset($newTriggerIds[$triggerId])) ? $newTriggerIds[$triggerId] : $triggerId;
 
-		if ($trigger['dependencies']) {
-			foreach ($trigger['dependencies'] as $depTrigger) {
-				$depTriggerId = $depTrigger['triggerid'];
-				$depTriggerId = (isset($newTriggerIds[$depTriggerId])) ? $newTriggerIds[$depTriggerId] : $depTriggerId;
+			if ($trigger['dependencies']) {
+				foreach ($trigger['dependencies'] as $depTrigger) {
+					$depTriggerId = $depTrigger['triggerid'];
+					$depTriggerId = (isset($newTriggerIds[$depTriggerId])) ? $newTriggerIds[$depTriggerId] : $depTriggerId;
 
-				$dependencies[] = array(
-					'triggerid' => $triggerId,
-					'dependsOnTriggerid' => $depTriggerId
-				);
+					$dependencies[] = array(
+						'triggerid' => $triggerId,
+						'dependsOnTriggerid' => $depTriggerId
+					);
+				}
 			}
 		}
-	}
-	if (!API::Trigger()->addDependencies($dependencies)) {
-		return false;
+		if (!API::Trigger()->addDependencies($dependencies)) {
+			return false;
+		}
 	}
 
 	return true;
