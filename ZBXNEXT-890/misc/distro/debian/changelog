@@ -11,6 +11,8 @@ zabbix (1:1.8.10-1) unstable; urgency=low
   * Add php configs and access restriction to apache.conf
   * Use original man pages
   * Add upgrade sql to proxy
+  * Move zabbix_agent to /usr/sbin
+  * Create zabbix-get and zabbix-sender sub-packages
 
  -- Kodai Terashima <kodai.terashima@zabbix.com> Fri, 02 Mar 2012 12:00:18 +0200
 

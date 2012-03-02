@@ -26,6 +26,39 @@ Description: network monitoring solution - agent
  This package provides the software needed to monitor a host using a
  Zabbix agent.
 
+Package: zabbix-get
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: network monitoring solution - get
+ Zabbix is a server/client network monitoring system with many features.
+ It can be used for:
+ .
+  - high level monitoring of IT services;
+  - centralized monitoring of your servers and applications;
+  - monitoring of SNMP-enabled devices;
+  - performance monitoring (process load, network activity, disk
+    activity, memory usage, OS parameters etc.);
+  - data visualization.
+ .
+ This package provides the command line utility needed to get data from agent.
+
+Package: zabbix-sender
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: network monitoring solution - sender
+ Zabbix is a server/client network monitoring system with many features.
+ It can be used for:
+ .
+  - high level monitoring of IT services;
+  - centralized monitoring of your servers and applications;
+  - monitoring of SNMP-enabled devices;
+  - performance monitoring (process load, network activity, disk
+    activity, memory usage, OS parameters etc.);
+  - data visualization.
+ .
+ This package provides the command line utility needed to send data to
+ Zabbix server or Zabix proxy.
+
 Package: zabbix-server-mysql
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, mysql-client, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base

@@ -1,5 +1,3 @@
 debian/tmp-build-PGSQL/src/zabbix_server/zabbix_server usr/sbin
-debian/tmp-build-PGSQL/src/zabbix_get/zabbix_get usr/bin
 create/schema/postgresql.sql usr/share/zabbix-server
 create/data/data.sql usr/share/zabbix-server
-

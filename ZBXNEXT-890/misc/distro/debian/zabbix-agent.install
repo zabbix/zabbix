@@ -1,4 +1,2 @@
 debian/tmp-build-MYSQL/src/zabbix_agent/zabbix_agentd usr/sbin
-debian/tmp-build-MYSQL/src/zabbix_agent/zabbix_agent usr/bin
-debian/tmp-build-MYSQL/src/zabbix_sender/zabbix_sender usr/bin
-
+debian/tmp-build-MYSQL/src/zabbix_agent/zabbix_agent usr/sbin

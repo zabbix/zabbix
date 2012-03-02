@@ -41,6 +41,8 @@ include /usr/share/quilt/quilt.make
 
 ## Define the names of the resulting binary packages
 PKG_AGENT = zabbix-agent
+PKG_GET = zabbix-get
+PKG_SENDER = zabbix-sender
 PKG_SERVER_MYSQL = zabbix-server-mysql
 PKG_SERVER_PGSQL = zabbix-server-pgsql
 PKG_SERVER_SQLITE3 = zabbix-server-sqlite3
@@ -51,6 +53,8 @@ PKG_PROXY_SQLITE3 = zabbix-proxy-sqlite3
 
 # Define the directories where the binary packages' files are assembled
 TMP_AGENT = $(CURDIR)/debian/$(PKG_AGENT)
+TMP_GET = $(CURDIR)/debian/$(PKG_GET)
+TMP_SENDER = $(CURDIR)/debian/$(PKG_SENDER)
 TMP_SERVER_MYSQL = $(CURDIR)/debian/$(PKG_SERVER_MYSQL)
 TMP_SERVER_PGSQL = $(CURDIR)/debian/$(PKG_SERVER_PGSQL)
 TMP_SERVER_SQLITE3 = $(CURDIR)/debian/$(PKG_SERVER_SQLITE3)
