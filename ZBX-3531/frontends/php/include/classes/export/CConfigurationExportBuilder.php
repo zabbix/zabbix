@@ -1,9 +1,31 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2000-2012 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 
 class CConfigurationExportBuilder {
 
 	const EXPORT_VERSION = '2.0';
 
+	/**
+	 * @var array
+	 */
 	protected $data = array();
 
 	public function __construct() {
@@ -12,16 +34,27 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Get array with formatted export data.
 	 * @return array
 	 */
 	public function getExport() {
 		return array('zabbix_export' => $this->data);
 	}
 
+	/**
+	 * Format groups.
+	 *
+	 * @param array $groups
+	 */
 	public function buildGroups(array $groups) {
 		$this->data['groups'] = $this->formatGroups($groups);
 	}
 
+	/**
+	 * Format templates.
+	 *
+	 * @param array $templates
+	 */
 	public function buildTemplates(array $templates) {
 		order_result($templates, 'host');
 		$this->data['templates'] = array();
@@ -41,6 +74,11 @@ class CConfigurationExportBuilder {
 		}
 	}
 
+	/**
+	 * Format hosts.
+	 *
+	 * @param $hosts
+	 */
 	public function buildHosts($hosts) {
 		order_result($hosts, 'host');
 		$this->data['hosts'] = array();
@@ -95,18 +133,38 @@ class CConfigurationExportBuilder {
 		}
 	}
 
+	/**
+	 * Format graphs.
+	 *
+	 * @param array $graphs
+	 */
 	public function buildGraphs(array $graphs) {
 		$this->data['graphs'] = $this->formatGraphs($graphs);
 	}
 
+	/**
+	 * Format triggers.
+	 *
+	 * @param array $triggers
+	 */
 	public function buildTriggers(array $triggers) {
 		$this->data['triggers'] = $this->formatTriggers($triggers);
 	}
 
+	/**
+	 * Format screens.
+	 *
+	 * @param array $screens
+	 */
 	public function buildScreens(array $screens) {
 		$this->data['screens'] = $this->formatScreens($screens);
 	}
 
+	/**
+	 * Format images.
+	 *
+	 * @param array $images
+	 */
 	public function buildImages(array $images) {
 		$this->data['images'] = array();
 
@@ -119,6 +177,11 @@ class CConfigurationExportBuilder {
 		}
 	}
 
+	/**
+	 * Format maps.
+	 *
+	 * @param array $maps
+	 */
 	public function buildMaps(array $maps) {
 		order_result($maps, 'name');
 		$this->data['maps'] = array();
@@ -157,6 +220,13 @@ class CConfigurationExportBuilder {
 		}
 	}
 
+	/**
+	 * Format discovery rules.
+	 *
+	 * @param array $discoveryRules
+	 *
+	 * @return array
+	 */
 	protected function formatDiscoveryRules(array $discoveryRules) {
 		$result = array();
 		order_result($discoveryRules, 'name');
@@ -198,6 +268,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format host inventory.
+	 *
+	 * @param array $inventory
+	 *
+	 * @return array
+	 */
 	protected function formatHostInventory(array $inventory) {
 		unset($inventory['hostid']);
 		return $inventory;
@@ -232,6 +309,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format template linkage.
+	 *
+	 * @param array $templates
+	 *
+	 * @return array
+	 */
 	protected function formatTemplateLinkage(array $templates) {
 		$result = array();
 		order_result($templates, 'host');
@@ -244,6 +328,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format triggers.
+	 *
+	 * @param array $triggers
+	 *
+	 * @return array
+	 */
 	protected function formatTriggers(array $triggers) {
 		$result = array();
 		order_result($triggers, 'description');
@@ -263,6 +354,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format host interfaces.
+	 *
+	 * @param array $interfaces
+	 *
+	 * @return array
+	 */
 	protected function formatHostInterfaces(array $interfaces) {
 		$result = array();
 		order_result($interfaces, 'ip');
@@ -281,6 +379,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format groups.
+	 *
+	 * @param array $groups
+	 *
+	 * @return array
+	 */
 	protected function formatGroups(array $groups) {
 		$result = array();
 		order_result($groups, 'name');
@@ -293,6 +398,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format items.
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
 	protected function formatItems(array $items) {
 		$result = array();
 		order_result($items, 'name');
@@ -341,6 +453,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format applications.
+	 *
+	 * @param array $applications
+	 *
+	 * @return array
+	 */
 	protected function formatApplications(array $applications) {
 		$result = array();
 		order_result($applications, 'name');
@@ -353,6 +472,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format macros.
+	 *
+	 * @param array $macros
+	 *
+	 * @return array
+	 */
 	protected function formatMacros(array $macros) {
 		$result = array();
 		order_result($macros, 'macro');
@@ -366,6 +492,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format screens.
+	 *
+	 * @param array $screens
+	 *
+	 * @return array
+	 */
 	protected function formatScreens(array $screens) {
 		$result = array();
 		order_result($screens, 'name');
@@ -381,6 +514,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format trigger dependencies.
+	 *
+	 * @param array $dependencies
+	 *
+	 * @return array
+	 */
 	protected function formatDependencies(array $dependencies) {
 		$result = array();
 
@@ -393,6 +533,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format screen items.
+	 *
+	 * @param array $screenItems
+	 *
+	 * @return array
+	 */
 	protected function formatScreenItems(array $screenItems) {
 		$result = array();
 
@@ -419,6 +566,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format graph items.
+	 *
+	 * @param array $graphItems
+	 *
+	 * @return array
+	 */
 	protected function formatGraphItems(array $graphItems) {
 		$result = array();
 
@@ -436,6 +590,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format map urls.
+	 *
+	 * @param array $urls
+	 *
+	 * @return array
+	 */
 	protected function formatMapUrls(array $urls) {
 		$result = array();
 		foreach ($urls as $url) {
@@ -448,6 +609,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format map element urls.
+	 *
+	 * @param array $urls
+	 *
+	 * @return array
+	 */
 	protected function formatMapElementUrls(array $urls) {
 		$result = array();
 
@@ -460,6 +628,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format map links.
+	 *
+	 * @param array $links
+	 *
+	 * @return array
+	 */
 	protected function formatMapLinks(array $links) {
 		$result = array();
 
@@ -476,6 +651,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format map link triggers.
+	 *
+	 * @param array $linktriggers
+	 *
+	 * @return array
+	 */
 	protected function formatMapLinkTriggers(array $linktriggers) {
 		$result = array();
 
@@ -489,6 +671,13 @@ class CConfigurationExportBuilder {
 		return $result;
 	}
 
+	/**
+	 * Format map elements.
+	 *
+	 * @param array $elements
+	 *
+	 * @return array
+	 */
 	protected function formatMapElements(array $elements) {
 		$result = array();
 		foreach ($elements as $element) {

@@ -1,4 +1,23 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2000-2012 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 
 class CConfigurationExport {
 
@@ -12,9 +31,20 @@ class CConfigurationExport {
 	 */
 	protected $builder;
 
+	/**
+	 * Array with data that must be exported.
+	 *
+	 * @var array
+	 */
 	protected $data;
 
 
+	/**
+	 * Constructor.
+	 * $options array contains ids of elements that should be exported.
+	 *
+	 * @param array $options
+	 */
 	public function __construct(array $options) {
 		$this->options = array(
 			'hosts' => array(),
@@ -38,18 +68,36 @@ class CConfigurationExport {
 			'images' => array(),
 			'maps' => array()
 		);
-		$this->gatherData();
 	}
 
+	/**
+	 * Setter for $writer property.
+	 *
+	 * @param CExportWriter $writer
+	 */
 	public function setWriter(CExportWriter $writer) {
 		$this->writer = $writer;
 	}
 
+	/**
+	 * Setter for builder property.
+	 *
+	 * @param CConfigurationExportBuilder $builder
+	 */
 	public function setBuilder(CConfigurationExportBuilder $builder) {
 		$this->builder = $builder;
 	}
 
+	/**
+	 * Export elements which ids were passed to constructor.
+	 * Resulting export format depends on export writter that was set,
+	 * export structure depends on builder that was set.	 *
+	 *
+	 * @return string
+	 */
 	public function export() {
+		$this->gatherData();
+
 		if ($this->data['groups']) {
 			$this->builder->buildGroups($this->data['groups']);
 		}
@@ -77,6 +125,9 @@ class CConfigurationExport {
 		return $this->writer->write($this->builder->getExport());
 	}
 
+	/**
+	 * Gathers data required for export from database depends on $options passed to constructor.
+	 */
 	protected function gatherData() {
 		if ($this->options['groups']) {
 			$this->gatherGroups();
@@ -104,6 +155,9 @@ class CConfigurationExport {
 		}
 	}
 
+	/**
+	 * Get groups for export from database.
+	 */
 	protected function gatherGroups() {
 		$this->data['groups'] = API::HostGroup()->get(array(
 			'hostids' => $this->options['groups'],
@@ -112,6 +166,9 @@ class CConfigurationExport {
 		));
 	}
 
+	/**
+	 * Get templates for export from database.
+	 */
 	protected function gatherTemplates() {
 		$templates = API::Template()->get(array(
 			'templateids' => $this->options['templates'],
@@ -172,6 +229,9 @@ class CConfigurationExport {
 		$this->gatherTemplateDiscoveryRules();
 	}
 
+	/**
+	 * Get Hosts for export from database.
+	 */
 	protected function gatherHosts() {
 		$hosts = API::Host()->get(array(
 			'hostids' => $this->options['hosts'],
@@ -213,6 +273,9 @@ class CConfigurationExport {
 		$this->gatherHostDiscoveryRules();
 	}
 
+	/**
+	 * Get hosts items from database.
+	 */
 	protected function gatherHostItems() {
 		$items = API::Item()->get(array(
 			'hostids' => $this->options['hosts'],
@@ -236,6 +299,9 @@ class CConfigurationExport {
 		}
 	}
 
+	/**
+	 * Get templates items from database.
+	 */
 	protected function gatherTemplateItems() {
 		$items = API::Item()->get(array(
 			'hostids' => $this->options['templates'],
@@ -261,6 +327,13 @@ class CConfigurationExport {
 		}
 	}
 
+	/**
+	 * Get items related objects data from database.
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
 	protected function prepareItems(array $items) {
 		// gather value maps
 		$valueMapIds = zbx_objectValues($items, 'valuemapid');
@@ -279,6 +352,9 @@ class CConfigurationExport {
 		return $items;
 	}
 
+	/**
+	 * Get hosts discovery rules from database.
+	 */
 	protected function gatherHostDiscoveryRules() {
 		$items = API::DiscoveryRule()->get(array(
 			'hostids' => $this->options['hosts'],
@@ -301,6 +377,9 @@ class CConfigurationExport {
 		}
 	}
 
+	/**
+	 * Get templates discovery rules from database.
+	 */
 	protected function gatherTemplateDiscoveryRules() {
 		$items = API::DiscoveryRule()->get(array(
 			'hostids' => $this->options['templates'],
@@ -323,6 +402,13 @@ class CConfigurationExport {
 		}
 	}
 
+	/**
+	 * Get discovery rules related objects from database.
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
 	protected function prepareDiscoveryRules(array $items) {
 		// gather item prototypes
 		$prototypes = API::ItemPrototype()->get(array(
@@ -451,6 +537,9 @@ class CConfigurationExport {
 		return $items;
 	}
 
+	/**
+	 * Get graphs for export from database.
+	 */
 	protected function gatherGraphs() {
 		$hostIds = array_merge($this->options['hosts'], $this->options['templates']);
 
@@ -533,6 +622,9 @@ class CConfigurationExport {
 
 	}
 
+	/**
+	 * Get triggers for export from database.
+	 */
 	protected function gatherTriggers() {
 		$hostIds = array_merge($this->options['hosts'], $this->options['templates']);
 
@@ -558,6 +650,9 @@ class CConfigurationExport {
 		}
 	}
 
+	/**
+	 * Get maps for export dfrom database.
+	 */
 	protected function gatherMaps() {
 		$sysmaps = API::Map()->get(array(
 			'sysmapids' => $this->options['maps'],
@@ -588,6 +683,9 @@ class CConfigurationExport {
 		$this->data['images'] = $images;
 	}
 
+	/**
+	 * Get screens for export from database.
+	 */
 	protected function gatherScreens() {
 		$screens = API::Screen()->get(array(
 			'screenids' => $this->options['screens'],

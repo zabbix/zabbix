@@ -21,17 +21,67 @@
 
 class CProfiler {
 
-	protected $longSqlQueryTime = 0.01;
-	protected $longTotalSqlTime = 0.5;
-	protected $longScriptTime = 1;
+	/**
+	 * Determines time for single sql query to be considered slow.
+	 *
+	 * @var float
+	 */
+	protected $slowSqlQueryTime = 0.01;
 
+	/**
+	 * Determines time for sum of all script sql query times to be considered slow.
+	 *
+	 * @var float
+	 */
+	protected $slowTotalSqlTime = 0.5;
+
+	/**
+	 * Determines time for script execution time to be considered slow.
+	 *
+	 * @var float
+	 */
+	protected $slowScriptTime = 1.0;
+
+	/**
+	 * Contains all api requests info.
+	 *
+	 * @var array
+	 */
 	protected $apiLog = array();
 
+	/**
+	 * Contains sql queryes info.
+	 *
+	 * @var array
+	 */
 	protected $sqlQueryLog = array();
-	protected $sqlTotalTime = 0;
 
+	/**
+	 * Total time of all performed sql queries.
+	 *
+	 * @var float
+	 */
+	protected $sqlTotalTime = 0.0;
+
+	/**
+	 * Timestamp of profiling start.
+	 *
+	 * @var float
+	 */
 	private $startTime;
+
+	/**
+	 * Timestamp of profiling stop.
+	 *
+	 * @var float
+	 */
 	private $stopTime;
+
+	/**
+	 * Instance of this class object.
+	 *
+	 * @var CProfiler
+	 */
 	private static $instance;
 
 
@@ -46,6 +96,9 @@ class CProfiler {
 		return self::$instance;
 	}
 
+	/**
+	 * Private constructor.
+	 */
 	private function __construct() {}
 
 	/**
@@ -73,13 +126,13 @@ class CProfiler {
 
 		$totalScriptTime = $this->stopTime - $this->startTime;
 		$totalTimeStr = _s('Total time: %s', round($totalScriptTime, 6));
-		if ($totalTimeStr > $this->longScriptTime) {
+		if ($totalTimeStr > $this->slowScriptTime) {
 			$totalTimeStr = '<b>'.$totalTimeStr.'</b>';
 		}
 		$debug_str .= $totalTimeStr.'<br>';
 
 		$sqlTotalTimeStr = _s('Total SQL time: %s', $this->sqlTotalTime);
-		if ($sqlTotalTimeStr > $this->longTotalSqlTime) {
+		if ($sqlTotalTimeStr > $this->slowTotalSqlTime) {
 			$sqlTotalTimeStr = '<b>'.$sqlTotalTimeStr.'</b>';
 		}
 		$debug_str .= $sqlTotalTimeStr.'<br>';
@@ -130,7 +183,7 @@ class CProfiler {
 				$sqlString = '<span style="color: blue; font-size: 1.2em;">'.$sql.'</span>';
 			}
 			$sqlString = _s('Time: %s', $time).'<br>'.'SQL: '.$sqlString.'<br>';
-			if ($time > $this->longSqlQueryTime) {
+			if ($time > $this->slowSqlQueryTime) {
 				$sqlString = '<b>'.$sqlString.'</b>';
 			}
 			$debug_str .= $sqlString;
