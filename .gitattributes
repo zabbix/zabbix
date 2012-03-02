@@ -180,11 +180,10 @@ frontends/php/include/classes/core/Z.php -text
 frontends/php/include/classes/core/ZBase.php -text
 frontends/php/include/classes/export/CConfigurationExport.php -text
 frontends/php/include/classes/export/CConfigurationExportBuilder.php -text
-frontends/php/include/classes/export/writers/CDomExportWriter.php -text
 frontends/php/include/classes/export/writers/CExportWriter.php -text
 frontends/php/include/classes/export/writers/CExportWriterFactory.php -text
 frontends/php/include/classes/export/writers/CJsonExportWriter.php -text
-frontends/php/include/classes/export/writers/CXmlExportWriterA.php -text
+frontends/php/include/classes/export/writers/CXmlExportWriter.php -text
 frontends/php/include/classes/import/CConfigurationImport.php -text
 frontends/php/include/classes/import/CImportReferencer.php -text
 frontends/php/include/classes/import/formatters/C20ImportFormatter.php -text

@@ -1,6 +1,6 @@
 <?php
 
-class CXmlExportWriterA extends CExportWriter {
+class CXmlExportWriter extends CExportWriter {
 
 	protected $xmlWriter;
 
