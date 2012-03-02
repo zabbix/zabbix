@@ -202,7 +202,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$form = new CForm('get');
 	$form->cleanItems();
 	$form->addItem(new CSubmit('form', S_CREATE_MAP));
-	$form->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php")'));
+	$form->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'));
 
 	$map_wdgt = new CWidget();
 	$map_wdgt->addPageHeader(S_CONFIGURATION_OF_NETWORK_MAPS, $form);

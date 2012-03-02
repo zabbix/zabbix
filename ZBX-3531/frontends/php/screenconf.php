@@ -199,7 +199,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$form->addVar('templateid', $templateid);
 	}
 	else{
-		$form->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php")'));
+		$form->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=screen")'));
 	}
 
 

@@ -382,7 +382,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$frmForm->cleanItems();
 		$buttons = new CDiv(array(
 			new CSubmit('form', S_CREATE),
-			new CButton('form', _('Import'), 'redirect("conf.import.php")')
+			new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")')
 		));
 		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);

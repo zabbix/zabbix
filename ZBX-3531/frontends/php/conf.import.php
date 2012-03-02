@@ -28,24 +28,57 @@ require_once 'include/page_header.php';
 $fields = array(
 	'rules' => array(T_ZBX_STR, O_OPT, null, null,	null),
 	'import' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'rules_preset' => array(T_ZBX_STR, O_OPT, null, null, null),
 	'form_refresh' => array(T_ZBX_INT, O_OPT, null, null, null)
 );
 check_fields($fields);
 
 
 $data['rules'] = array(
-	'groups' => array('missed' => true),
-	'hosts' => array('exist' => true, 'missed' => true),
-	'templates' => array('exist' => true, 'missed' => true),
-	'template_linkages' => array('missed' => true),
-	'items' => array('exist' => true, 'missed' => true),
-	'discoveryrules' => array('exist' => true, 'missed' => true),
-	'triggers' => array('exist' => true, 'missed' => true),
-	'graphs' => array('exist' => true, 'missed' => true),
-	'screens' => array('exist' => true, 'missed' => true),
-	'maps' => array('exist' => true, 'missed' => true),
+	'groups' => array('missed' => false),
+	'hosts' => array('exist' => false, 'missed' => false),
+	'templates' => array('exist' => false, 'missed' => false),
+	'template_linkages' => array('missed' => false),
+	'items' => array('exist' => false, 'missed' => false),
+	'discoveryrules' => array('exist' => false, 'missed' => false),
+	'triggers' => array('exist' => false, 'missed' => false),
+	'graphs' => array('exist' => false, 'missed' => false),
+	'screens' => array('exist' => false, 'missed' => false),
+	'maps' => array('exist' => false, 'missed' => false),
 	'images' => array('exist' => false, 'missed' => false)
 );
+if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
+	switch ($_REQUEST['rules_preset']) {
+		case 'host':
+			$data['rules']['groups'] = array('missed' => true);
+			$data['rules']['hosts'] = array('exist' => true, 'missed' => true);
+			$data['rules']['items'] = array('exist' => true, 'missed' => true);
+			$data['rules']['discoveryrules'] = array('exist' => true, 'missed' => true);
+			$data['rules']['triggers'] = array('exist' => true, 'missed' => true);
+			$data['rules']['graphs'] = array('exist' => true, 'missed' => true);
+			$data['rules']['template_linkages'] = array('missed' => true);
+			break;
+
+		case 'template':
+			$data['rules']['groups'] = array('missed' => true);
+			$data['rules']['templates'] = array('exist' => true, 'missed' => true);
+			$data['rules']['items'] = array('exist' => true, 'missed' => true);
+			$data['rules']['discoveryrules'] = array('exist' => true, 'missed' => true);
+			$data['rules']['triggers'] = array('exist' => true, 'missed' => true);
+			$data['rules']['graphs'] = array('exist' => true, 'missed' => true);
+			$data['rules']['template_linkages'] = array('missed' => true);
+			break;
+
+		case 'map':
+			$data['rules']['maps'] = array('exist' => true, 'missed' => true);
+			break;
+
+		case 'screen':
+			$data['rules']['screens'] = array('exist' => true, 'missed' => true);
+			break;
+
+	}
+}
 if (isset($_REQUEST['rules'])) {
 	$requestRules = get_request('rules', array());
 	// if form was submitted with some checkboxes unchecked, those values aare not submitted
