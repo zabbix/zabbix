@@ -1016,7 +1016,7 @@ function make_webmon_overview($filter) {
 		$apps['unknown'] = 0;
 
 		$result = DBselect(
-			'SELECT DISTINCT i.lastclock,i.lastvalue'.
+			'SELECT DISTINCT ht.httptestid,i.lastclock,i.lastvalue'.
 			' FROM items i,httptestitem hti,httptest ht,applications a,hosts_groups hg'.
 			' WHERE i.itemid=hti.itemid'.
 				' AND hti.httptestid=ht.httptestid'.
