@@ -1263,6 +1263,7 @@ class CConfigurationImport {
 	/**
 	 * Prepare screen data for import.
 	 *
+	 * @todo: it's copy of old frontend function, should be refactored
 	 * @throws Exception
 	 *
 	 * @param array $allScreens
@@ -1374,7 +1375,12 @@ class CConfigurationImport {
 							break;
 
 						case SCREEN_RESOURCE_SCREEN:
-							$db_screens = API::Screen()->get(array('screenids' => $screenitem['resource']));
+							$db_screens = API::Screen()->get(array(
+								'output' => API_OUTPUT_SHORTEN,
+								'preservekeys' => true,
+								'editable' => true,
+								'filter' => array('name' => $screenitem['resource']['name'])
+							));
 							if (empty($db_screens)) {
 								throw new Exception(_s('Cannot find screen "%1$s" used in screen "%2$s".',
 										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
