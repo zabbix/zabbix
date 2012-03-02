@@ -1,4 +1,23 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2000-2012 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 
 /**
  * Class for importing configuration data.
@@ -81,7 +100,8 @@ class CConfigurationImport {
 	/**
 	 * Import configuration data.
 	 *
-	 * @todo for 1.8 version import old class zbxXML is used
+	 * @todo   for 1.8 version import old class zbxXML is used
+	 *
 	 * @throws Exception
 	 * @return bool
 	 */
@@ -169,11 +189,16 @@ class CConfigurationImport {
 		catch (Exception $e) {
 			czbxrpc::$useExceptions = false;
 			DBend(false);
-			throw $e;
+			throw new Exception($e->getMessage(), $e->getCode());
 		}
 
 	}
 
+	/**
+	 * Parse all import data and collect references to objcets.
+	 * For host objects it collects host names, for items it's host name and item key, etc.
+	 * Collected references are resolved in separate referencer object.
+	 */
 	protected function gatherReferences() {
 		if ($this->options['groups']['missed']) {
 			$groups = $this->formatter->getGroups();
@@ -327,6 +352,9 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import groups.
+	 */
 	protected function processGroups() {
 		$groups = $this->formatter->getGroups();
 		if (empty($groups)) {
@@ -347,6 +375,11 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import templates.
+	 *
+	 * @throws Exception
+	 */
 	protected function processTemplates() {
 		$templates = $this->formatter->getTemplates();
 		if (empty($templates)) {
@@ -425,6 +458,11 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import hosts.
+	 *
+	 * @throws Exception
+	 */
 	protected function processHosts() {
 		$hosts = $this->formatter->getHosts();
 		if (empty($hosts)) {
@@ -537,6 +575,9 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import applications.
+	 */
 	protected function processApplications() {
 		$allApplciations = $this->formatter->getApplications();
 		if (empty($allApplciations)) {
@@ -565,6 +606,9 @@ class CConfigurationImport {
 		}
 	}
 
+	/*
+	 * Import items.
+	 */
 	protected function processItems() {
 		$allItems = $this->formatter->getItems();
 		if (empty($allItems)) {
@@ -616,6 +660,11 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import discovery rules.
+	 *
+	 * @throws Exception
+	 */
 	protected function processDiscoveryRules() {
 		$allDiscoveryRules = $this->formatter->getDiscoveryRules();
 		if (empty($allDiscoveryRules)) {
@@ -796,6 +845,11 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import graphs.
+	 *
+	 * @throws Exception
+	 */
 	protected function processGraphs() {
 		$allGraphs = $this->formatter->getGraphs();
 		if (empty($allGraphs)) {
@@ -861,6 +915,9 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import triggers.
+	 */
 	protected function processTriggers() {
 		$allTriggers = $this->formatter->getTriggers();
 		if (empty($allTriggers)) {
@@ -926,6 +983,11 @@ class CConfigurationImport {
 
 	}
 
+	/**
+	 * Import images.
+	 *
+	 * @throws Exception
+	 */
 	protected function processImages() {
 		$allImages = $this->formatter->getImages();
 
@@ -955,6 +1017,11 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import maps.
+	 *
+	 * @throws Exception
+	 */
 	protected function processMaps() {
 		$allMaps = $this->formatter->getMaps();
 
@@ -1136,6 +1203,9 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import screens.
+	 */
 	protected function processScreens() {
 		$allScreens = $this->formatter->getScreens();
 		$allScreens = $this->prepareScreenImport($allScreens);
@@ -1159,6 +1229,9 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Import template screens.
+	 */
 	protected function processTemplateScreens() {
 		$templates = $this->formatter->getTemplates();
 
@@ -1187,6 +1260,15 @@ class CConfigurationImport {
 		}
 	}
 
+	/**
+	 * Prepare screen data for import.
+	 *
+	 * @throws Exception
+	 *
+	 * @param array $allScreens
+	 *
+	 * @return array
+	 */
 	protected function prepareScreenImport(array $allScreens) {
 		$existingScreens = array();
 		$allScreens = zbx_toHash($allScreens, 'name');

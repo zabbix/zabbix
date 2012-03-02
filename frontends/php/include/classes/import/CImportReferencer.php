@@ -1,4 +1,23 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2000-2012 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 
 class CImportReferencer {
 
@@ -81,9 +100,6 @@ class CImportReferencer {
 		return isset($this->triggersRefs[$name][$expression]) ? $this->triggersRefs[$name][$expression] : false;
 	}
 
-
-
-
 	public function addGroups($groups) {
 		$this->groups = array_unique(array_merge($this->groups, $groups));
 	}
@@ -92,7 +108,6 @@ class CImportReferencer {
 		$this->groupsRefs[$name] = $id;
 	}
 
-
 	public function addTemplates($templatesRefs) {
 		$this->templates = array_unique(array_merge($this->templates, $templatesRefs));
 	}
@@ -100,7 +115,6 @@ class CImportReferencer {
 	public function addTemplateRef($name, $id) {
 		$this->templatesRefs[$name] = $id;
 	}
-
 
 	public function addHosts($hostsRefs) {
 		$this->hosts = array_unique(array_merge($this->hosts, $hostsRefs));
@@ -151,9 +165,6 @@ class CImportReferencer {
 	public function addTriggerRef($name, $expression, $id) {
 		$this->triggersRefs[$name][$expression] = $id;
 	}
-
-
-
 
 	protected function selectGroups() {
 		if (!empty($this->groups)) {
