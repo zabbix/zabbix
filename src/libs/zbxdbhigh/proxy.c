@@ -408,8 +408,8 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
 				" and a.hostid=h.hostid"
 				" and t.status=%d"
 				" and h.proxy_hostid=" ZBX_FS_UI64
-				" and h.status in (%d,%d)",
-			HTTPTEST_STATUS_MONITORED, proxy_hostid, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+				" and h.status=%d",
+			HTTPTEST_STATUS_MONITORED, proxy_hostid, HOST_STATUS_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
 	{
