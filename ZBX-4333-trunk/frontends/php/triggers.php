@@ -148,7 +148,7 @@ elseif (isset($_REQUEST['save'])) {
 		'type' => $_REQUEST['type'],
 		'comments' => $_REQUEST['comments'],
 		'url' => $_REQUEST['url'],
-		'dependencies' => get_request('dependencies', array())
+		'dependencies' => zbx_toObject(get_request('dependencies', array()), 'triggerid')
 	);
 
 	if (isset($_REQUEST['triggerid'])) {
