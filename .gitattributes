@@ -175,23 +175,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/core/CAutoloader.php -text
-frontends/php/include/classes/core/Z.php -text
-frontends/php/include/classes/core/ZBase.php -text
-frontends/php/include/classes/export/CConfigurationExport.php -text
-frontends/php/include/classes/export/CConfigurationExportBuilder.php -text
-frontends/php/include/classes/export/writers/CExportWriter.php -text
-frontends/php/include/classes/export/writers/CExportWriterFactory.php -text
-frontends/php/include/classes/export/writers/CJsonExportWriter.php -text
-frontends/php/include/classes/export/writers/CXmlExportWriter.php -text
-frontends/php/include/classes/import/CConfigurationImport.php -text
-frontends/php/include/classes/import/CImportReferencer.php -text
-frontends/php/include/classes/import/formatters/C20ImportFormatter.php -text
-frontends/php/include/classes/import/formatters/CImportFormatter.php -text
-frontends/php/include/classes/import/readers/CImportReader.php -text
-frontends/php/include/classes/import/readers/CImportReaderFactory.php -text
-frontends/php/include/classes/import/readers/CJsonImportReader.php -text
-frontends/php/include/classes/import/readers/CXmlImportReader.php -text
 frontends/php/include/views/administration.auditacts.list.php -text
 frontends/php/include/views/administration.auditlogs.list.php -text
 frontends/php/include/views/conf.import.php -text
