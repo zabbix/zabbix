@@ -24,7 +24,7 @@ $discoveryWidget = new CWidget();
 // create new discovery rule button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create rule')));
+$createForm->addItem(new CSubmit('form', _('Create discovery rule')));
 $discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULE'), $createForm);
 
 // header

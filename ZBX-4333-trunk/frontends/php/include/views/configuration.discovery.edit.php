@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-require_once('include/views/js/configuration.discovery.edit.js.php');
+require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
 $discoveryWidget = new CWidget();
 $discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULE'));

@@ -19,13 +19,13 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Authentication to Zabbix');
 $page['file'] = 'authentication.php';
 $page['hist_arg'] = array('config');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php

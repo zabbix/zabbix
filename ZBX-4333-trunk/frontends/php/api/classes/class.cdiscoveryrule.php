@@ -22,7 +22,6 @@
 /**
  * @package API
  */
-
 class CDiscoveryRule extends CItemGeneral {
 
 	const MIN_LIFETIME = 0;
@@ -31,15 +30,13 @@ class CDiscoveryRule extends CItemGeneral {
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 
-
 	public function __construct() {
 		parent::__construct();
 	}
 
-
-/**
- * Get DiscoveryRule data
- */
+	/**
+	 * Get DiscoveryRule data
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
@@ -107,11 +104,11 @@ class CDiscoveryRule extends CItemGeneral {
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
-// editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
+		// editable + PERMISSION CHECK
+		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
 		}
-		else{
-			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
+		else {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['from']['rights'] = 'rights r';
@@ -121,20 +118,20 @@ class CDiscoveryRule extends CItemGeneral {
 			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
 			$sqlParts['where'][] = 'ug.userid='.$userid;
 			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS( '.
-								' SELECT hgg.groupid '.
-								' FROM hosts_groups hgg, rights rr, users_groups gg '.
-								' WHERE hgg.hostid=hg.hostid '.
-									' AND rr.id=hgg.groupid '.
-									' AND rr.groupid=gg.usrgrpid '.
+			$sqlParts['where'][] = 'NOT EXISTS('.
+								' SELECT hgg.groupid'.
+								' FROM hosts_groups hgg,rights rr,users_groups gg'.
+								' WHERE hgg.hostid=hg.hostid'.
+									' AND rr.id=hgg.groupid'.
+									' AND rr.groupid=gg.usrgrpid'.
 									' AND gg.userid='.$userid.
 									' AND rr.permission<'.$permission.')';
 		}
 
-// nodeids
+		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
-// templateids
+		// templateids
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 
@@ -142,12 +139,12 @@ class CDiscoveryRule extends CItemGeneral {
 				zbx_value2array($options['hostids']);
 				$options['hostids'] = array_merge($options['hostids'], $options['templateids']);
 			}
-			else{
+			else {
 				$options['hostids'] = $options['templateids'];
 			}
 		}
 
-// hostids
+		// hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
@@ -162,33 +159,37 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-// itemids
+		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 
 			$sqlParts['where']['itemid'] = DBcondition('i.itemid', $options['itemids']);
 		}
 
-// inherited
+		// inherited
 		if (!is_null($options['inherited'])) {
-			if ($options['inherited'])
+			if ($options['inherited']) {
 				$sqlParts['where'][] = 'i.templateid IS NOT NULL';
-			else
+			}
+			else {
 				$sqlParts['where'][] = 'i.templateid IS NULL';
+			}
 		}
 
-// templated
+		// templated
 		if (!is_null($options['templated'])) {
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 
-			if ($options['templated'])
+			if ($options['templated']) {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
-			else
+			}
+			else {
 				$sqlParts['where'][] = 'h.status<>'.HOST_STATUS_TEMPLATE;
+			}
 		}
 
-// monitored
+		// monitored
 		if (!is_null($options['monitored'])) {
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
@@ -197,18 +198,17 @@ class CDiscoveryRule extends CItemGeneral {
 				$sqlParts['where'][] = 'h.status='.HOST_STATUS_MONITORED;
 				$sqlParts['where'][] = 'i.status='.ITEM_STATUS_ACTIVE;
 			}
-			else{
+			else {
 				$sqlParts['where'][] = '(h.status<>'.HOST_STATUS_MONITORED.' OR i.status<>'.ITEM_STATUS_ACTIVE.')';
 			}
 		}
 
-
-// search
+		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('items i', $options, $sqlParts);
 		}
 
-// --- FILTER ---
+		// filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('items i', $options, $sqlParts);
 
@@ -221,17 +221,17 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-// output
+		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$sqlParts['select']['items'] = 'i.*';
 		}
 
-// countOutput
+		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 			$sqlParts['select'] = array('count(DISTINCT i.itemid) as rowscount');
 
-//groupCount
+			// groupCount
 			if (!is_null($options['groupCount'])) {
 				foreach ($sqlParts['group'] as $key => $fields) {
 					$sqlParts['select'][$key] = $fields;
@@ -242,11 +242,10 @@ class CDiscoveryRule extends CItemGeneral {
 		// sorting
 		zbx_db_sorting($sqlParts, $options, $sortColumns, 'i');
 
-// limit
+		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
-//----------
 
 		$itemids = array();
 
@@ -261,11 +260,21 @@ class CDiscoveryRule extends CItemGeneral {
 		$sqlWhere = '';
 		$sqlGroup = '';
 		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect.= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom.= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))		$sqlWhere.= ' AND '.implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))		$sqlWhere.= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))		$sqlOrder.= ' ORDER BY '.implode(',', $sqlParts['order']);
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
+		}
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
+		}
+		if (!empty($sqlParts['where'])) {
+			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
+		}
+		if (!empty($sqlParts['group'])) {
+			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
+		}
+		if (!empty($sqlParts['order'])) {
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
+		}
 		$sqlLimit = $sqlParts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
@@ -274,25 +283,27 @@ class CDiscoveryRule extends CItemGeneral {
 					$sqlWhere.
 				$sqlGroup.
 				$sqlOrder;
-//SDI($sql);
+
 		$res = DBselect($sql, $sqlLimit);
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
-				if (!is_null($options['groupCount']))
+				if (!is_null($options['groupCount'])) {
 					$result[] = $item;
-				else
+				}
+				else {
 					$result = $item['rowscount'];
+				}
 			}
-			else{
+			else {
 				$itemids[$item['itemid']] = $item['itemid'];
 
 				if ($options['output'] == API_OUTPUT_SHORTEN) {
 					$result[$item['itemid']] = array('itemid' => $item['itemid']);
 				}
-				else{
-					if (!isset($result[$item['itemid']]))
+				else {
+					if (!isset($result[$item['itemid']])) {
 						$result[$item['itemid']]= array();
-
+					}
 					if (!is_null($options['selectHosts']) && !isset($result[$item['itemid']]['hosts'])) {
 						$result[$item['itemid']]['hosts'] = array();
 					}
@@ -306,41 +317,40 @@ class CDiscoveryRule extends CItemGeneral {
 						$result[$item['itemid']]['prototypes'] = array();
 					}
 
-// hostids
+					// hostids
 					if (isset($item['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$item['itemid']]['hosts'])) $result[$item['itemid']]['hosts'] = array();
-
+						if (!isset($result[$item['itemid']]['hosts'])) {
+							$result[$item['itemid']]['hosts'] = array();
+						}
 						$result[$item['itemid']]['hosts'][] = array('hostid' => $item['hostid']);
 					}
-
 					$result[$item['itemid']] += $item;
 				}
 			}
 		}
 
-COpt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
 
-// Adding Objects
-// Adding hosts
+		// adding objects
+		// adding hosts
 		if (!is_null($options['selectHosts'])) {
 			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams = array(
 					'nodeids' => $nodeids,
 					'itemids' => $itemids,
-					'templated_hosts' => 1,
+					'templated_hosts' => true,
 					'output' => $options['selectHosts'],
-					'nopermissions' => 1,
-					'preservekeys' => 1
+					'nopermissions' => true,
+					'preservekeys' => true
 				);
 				$hosts = API::Host()->get($objParams);
 
 				foreach ($hosts as $hostid => $host) {
 					$hitems = $host['items'];
 					unset($host['items']);
-					foreach ($hitems as $inum => $item) {
+					foreach ($hitems as $item) {
 						$result[$item['itemid']]['hosts'][] = $host;
 					}
 				}
@@ -349,20 +359,20 @@ COpt::memoryPick();
 				foreach ($templates as $templateid => $template) {
 					$titems = $template['items'];
 					unset($template['items']);
-					foreach ($titems as $inum => $item) {
+					foreach ($titems as $item) {
 						$result[$item['itemid']]['hosts'][] = $template;
 					}
 				}
 			}
 		}
 
-// Adding triggers
+		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'preservekeys' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'preservekeys' => true,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
 			);
 
 			if (in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
@@ -375,12 +385,15 @@ COpt::memoryPick();
 					$count = array();
 					foreach ($trigger['items'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
 
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
-
 						$result[$item['itemid']]['triggers'][] = &$triggers[$triggerid];
 					}
 				}
@@ -388,44 +401,50 @@ COpt::memoryPick();
 			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-
 				$triggers = API::Trigger()->get($objParams);
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					if (isset($triggers[$itemid]))
+					if (isset($triggers[$itemid])) {
 						$result[$itemid]['triggers'] = $triggers[$itemid]['rowscount'];
-					else
+					}
+					else {
 						$result[$itemid]['triggers'] = 0;
+					}
 				}
 			}
 		}
 
-// Adding graphs
+		// adding graphs
 		if (!is_null($options['selectGraphs'])) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'preservekeys' => 1,
-				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
+				'preservekeys' => true,
+				'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD)
 			);
 
 			if (in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
 				$graphs = API::Graph()->get($objParams);
 
-				if (!is_null($options['limitSelects'])) order_result($graphs, 'name');
+				if (!is_null($options['limitSelects'])) {
+					order_result($graphs, 'name');
+				}
 				foreach ($graphs as $graphid => $graph) {
 					unset($graphs[$graphid]['discoveries']);
 					$count = array();
 					foreach ($graph['discoveries'] as $item) {
 						if (!is_null($options['limitSelects'])) {
-							if (!isset($count[$item['itemid']])) $count[$item['itemid']] = 0;
+							if (!isset($count[$item['itemid']])) {
+								$count[$item['itemid']] = 0;
+							}
 							$count[$item['itemid']]++;
 
-							if ($count[$item['itemid']] > $options['limitSelects']) continue;
+							if ($count[$item['itemid']] > $options['limitSelects']) {
+								continue;
+							}
 						}
-
 						$result[$item['itemid']]['graphs'][] = &$graphs[$graphid];
 					}
 				}
@@ -433,26 +452,27 @@ COpt::memoryPick();
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-
 				$graphs = API::Graph()->get($objParams);
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					if (isset($graphs[$itemid]))
+					if (isset($graphs[$itemid])) {
 						$result[$itemid]['graphs'] = $graphs[$itemid]['rowscount'];
-					else
+					}
+					else {
 						$result[$itemid]['graphs'] = 0;
+					}
 				}
 			}
 		}
 
-// Adding prototypes
+		// adding prototypes
 		if (!is_null($options['selectPrototypes'])) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
-				'nopermissions' => 1,
-				'preservekeys' => 1,
+				'nopermissions' => true,
+				'preservekeys' => true,
 				'selectDiscoveryRule' => API_OUTPUT_EXTEND
 			);
 
@@ -460,13 +480,16 @@ COpt::memoryPick();
 				$objParams['output'] = $options['selectPrototypes'];
 				$prototypes = API::Item()->get($objParams);
 
-				if (!is_null($options['limitSelects'])) order_result($prototypes, 'name');
+				if (!is_null($options['limitSelects'])) {
+					order_result($prototypes, 'name');
+				}
 
 				$count = array();
-				foreach ($prototypes as $itemid => $prototype) {
-
+				foreach ($prototypes as $prototype) {
 					$discoveryId = $prototype['discoveryRule']['itemid'];
-					if (!isset($count[$discoveryId])) $count[$discoveryId] = 0;
+					if (!isset($count[$discoveryId])) {
+						$count[$discoveryId] = 0;
+					}
 					$count[$discoveryId]++;
 
 					if ($options['limitSelects'] && $options['limitSelects'] > $count[$discoveryId]) {
@@ -480,15 +503,16 @@ COpt::memoryPick();
 			elseif (API_OUTPUT_COUNT == $options['selectPrototypes']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-
 				$prototypes = API::Item()->get($objParams);
 
 				$prototypes = zbx_toHash($prototypes, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
-					if (isset($prototypes[$itemid]))
+					if (isset($prototypes[$itemid])) {
 						$result[$itemid]['prototypes'] = $prototypes[$itemid]['rowscount'];
-					else
+					}
+					else {
 						$result[$itemid]['prototypes'] = 0;
+					}
 				}
 			}
 		}
@@ -496,70 +520,61 @@ COpt::memoryPick();
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
-
 		return $result;
 	}
-
 
 	public function exists($object) {
 		$options = array(
 			'filter' => array('key_' => $object['key_']),
 			'output' => API_OUTPUT_SHORTEN,
-			'nopermissions' => 1,
+			'nopermissions' => true,
 			'limit' => 1
 		);
 
-		if (isset($object['hostid'])) $options['hostids'] = $object['hostid'];
-		if (isset($object['host'])) $options['filter']['host'] = $object['host'];
+		if (isset($object['hostid'])) {
+			$options['hostids'] = $object['hostid'];
+		}
+		if (isset($object['host'])) {
+			$options['filter']['host'] = $object['host'];
+		}
 
-		if (isset($object['node']))
+		if (isset($object['node'])) {
 			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		elseif (isset($object['nodeids']))
+		}
+		elseif (isset($object['nodeids'])) {
 			$options['nodeids'] = $object['nodeids'];
-
+		}
 		$objs = $this->get($options);
-
 		return !empty($objs);
 	}
 
-
-/**
- * Add DiscoveryRule
- *
- * @param array $items
- * @return array|boolean
- */
+	/**
+	 * Add DiscoveryRule
+	 *
+	 * @param array $items
+	 * @return array|boolean
+	 */
 	public function create($items) {
 		$items = zbx_toArray($items);
-
 		$this->checkInput($items);
-
 		$this->createReal($items);
-
 		$this->inherit($items);
-
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
-
-/**
- * Update DiscoveryRule
- *
- * @param array $items
- * @return boolean
- */
+	/**
+	 * Update DiscoveryRule
+	 *
+	 * @param array $items
+	 * @return boolean
+	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
-
 		$this->checkInput($items, true);
-
 		$this->updateReal($items);
-
 		$this->inherit($items);
-
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
-
 
 	/**
 	 * Delete DiscoveryRules
@@ -571,7 +586,6 @@ COpt::memoryPick();
 		if (empty($ruleids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-
 		$ruleids = zbx_toHash($ruleids);
 
 		$options = array(
@@ -587,10 +601,10 @@ COpt::memoryPick();
 		if (!$nopermissions) {
 			foreach ($ruleids as $ruleid) {
 				if (!isset($delRules[$ruleid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 				}
 				if ($delRules[$ruleid]['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated items'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
 				}
 			}
 		}
@@ -599,7 +613,7 @@ COpt::memoryPick();
 		$parentItemids = $ruleids;
 		$childTuleids = array();
 		do {
-			$dbItems = DBselect('SELECT itemid FROM items WHERE '.DBcondition('templateid', $parentItemids));
+			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.DBcondition('i.templateid', $parentItemids));
 			$parentItemids = array();
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
@@ -620,11 +634,12 @@ COpt::memoryPick();
 		$ruleids = array_merge($ruleids, $childTuleids);
 
 		$iprototypeids = array();
-		$sql = 'SELECT i.itemid'.
-				' FROM item_discovery id, items i'.
-				' WHERE i.itemid=id.itemid'.
-					' AND '.DBcondition('parent_itemid', $ruleids);
-		$dbItems = DBselect($sql);
+		$dbItems = DBselect(
+			'SELECT i.itemid'.
+			' FROM item_discovery id,items i'.
+			' WHERE i.itemid=id.itemid'.
+				' AND '.DBcondition('parent_itemid', $ruleids)
+		);
 		while ($item = DBfetch($dbItems)) {
 			$iprototypeids[$item['itemid']] = $item['itemid'];
 		}
@@ -633,7 +648,6 @@ COpt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete discovery rule'));
 			}
 		}
-
 		DB::delete('items', array('itemid' => $ruleids));
 
 		// housekeeper
@@ -644,10 +658,10 @@ COpt::memoryPick();
 			'history_log',
 			'history_uint',
 			'history_str',
-			'history',
+			'history'
 		);
 		$insert = array();
-		foreach ($ruleids as $id => $ruleid) {
+		foreach ($ruleids as $ruleid) {
 			foreach ($itemDataTables as $table) {
 				$insert[] = array(
 					'tablename' => $table,
@@ -663,10 +677,8 @@ COpt::memoryPick();
 			$host = reset($item['hosts']);
 			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
-
 		return array('ruleids' => $ruleids);
 	}
-
 
 	/**
 	 * Copies the given discovery rules to the specified hosts.
@@ -707,7 +719,6 @@ COpt::memoryPick();
 		return true;
 	}
 
-
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
@@ -729,7 +740,7 @@ COpt::memoryPick();
 		$options = array(
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
-			'output' => $selectFields,
+			'output' => $selectFields
 		);
 		$items = $this->get($options);
 
@@ -737,7 +748,6 @@ COpt::memoryPick();
 
 		return true;
 	}
-
 
 	/**
 	 * Returns true if the given discovery rules exists and are available for
@@ -765,7 +775,6 @@ COpt::memoryPick();
 
 		return (count($ids) == $count);
 	}
-
 
 	/**
 	 * Returns true if the given discovery rules exists and are available for
@@ -795,7 +804,6 @@ COpt::memoryPick();
 		return (count($ids) == $count);
 	}
 
-
 	/**
 	 * Copies all of the triggers from the source discovery to the target discovery rule.
 	 *
@@ -815,7 +823,7 @@ COpt::memoryPick();
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectFunctions' => API_OUTPUT_EXTEND,
+			'selectFunctions' => API_OUTPUT_EXTEND
 		));
 
 		if (!$srcTriggers) {
@@ -836,7 +844,7 @@ COpt::memoryPick();
 			'filter' => array(
 				'key_' => $itemKeys
 			),
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		));
 		$dstItems = array();
 		foreach ($items as $item) {
@@ -861,7 +869,6 @@ COpt::memoryPick();
 		return $rs;
 	}
 
-
 	protected function createReal(&$items) {
 		foreach ($items as $key => $item) {
 			$itemsExists = API::Item()->get(array(
@@ -870,10 +877,10 @@ COpt::memoryPick();
 					'hostid' => $item['hostid'],
 					'key_' => $item['key_']
 				),
-				'nopermissions' => 1
+				'nopermissions' => true
 			));
 			foreach ($itemsExists as $inum => $itemExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item ['.$item['key_'].'] already exists');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with item "%1$s" already exists.', $item['key_']));
 			}
 		}
 
@@ -883,11 +890,14 @@ COpt::memoryPick();
 		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
 
-			if (!isset($item['applications'])) continue;
+			if (!isset($item['applications'])) {
+				continue;
+			}
 
-			foreach ($item['applications'] as $anum => $appid) {
-				if ($appid == 0) continue;
-
+			foreach ($item['applications'] as $appid) {
+				if ($appid == 0) {
+					continue;
+				}
 				$itemApplications[] = array(
 					'applicationid' => $appid,
 					'itemid' => $items[$key]['itemid']
@@ -912,27 +922,26 @@ COpt::memoryPick();
 		}
 	}
 
-
 	protected function updateReal($items) {
 		$items = zbx_toArray($items);
 
 		$data = array();
-		foreach ($items as $inum => $item) {
+		foreach ($items as $item) {
 			$itemsExists = API::Item()->get(array(
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array(
 					'hostid' => $item['hostid'],
 					'key_' => $item['key_']
 				),
-				'nopermissions' => 1
+				'nopermissions' => true
 			));
-			foreach ($itemsExists as $inum => $itemExists) {
+			foreach ($itemsExists as $itemExists) {
 				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host with item "%1$s" already exists.', $item['key_']));
 				}
 			}
 
-			$data[] = array('values' => $item, 'where'=> array('itemid'=>$item['itemid']));
+			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
 		}
 		$result = DB::update('items', $data);
 		if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -942,8 +951,10 @@ COpt::memoryPick();
 		foreach ($items as $key => $item) {
 			$itemids[] = $item['itemid'];
 
-			if (!isset($item['applications'])) continue;
-			foreach ($item['applications'] as $anum => $appid) {
+			if (!isset($item['applications'])) {
+				continue;
+			}
+			foreach ($item['applications'] as $appid) {
 				$itemApplications[] = array(
 					'applicationid' => $appid,
 					'itemid' => $item['itemid']
@@ -952,7 +963,7 @@ COpt::memoryPick();
 		}
 
 		if (!empty($itemids)) {
-			DB::delete('items_applications', array('itemid'=>$itemids));
+			DB::delete('items_applications', array('itemid' => $itemids));
 			DB::insert('items_applications', $itemApplications);
 		}
 
@@ -967,9 +978,7 @@ COpt::memoryPick();
 			$host = reset($item['hosts']);
 			info(_s('Updated: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
-
 	}
-
 
 	/**
 	 * Check item data and set missing default values.
@@ -986,10 +995,8 @@ COpt::memoryPick();
 			$item['flags'] = ZBX_FLAG_DISCOVERY;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 		}
-
 		parent::checkInput($items, $update);
 	}
-
 
 	protected function checkSpecificFields(array $item) {
 		if (isset($item['lifetime']) && !$this->validateLifetime($item['lifetime'])) {
@@ -1000,14 +1007,13 @@ COpt::memoryPick();
 		}
 	}
 
-
 	/**
 	 * Inherit discovery rules to child hosts/templates.
 	 * @param array $items
 	 * @param null|array $hostids array of hostids which discovery rules should be inherited to
 	 * @return bool
 	 */
-	protected function inherit(array $items, $hostids=null) {
+	protected function inherit(array $items, $hostids = null) {
 		if (empty($items)) {
 			return true;
 		}
@@ -1029,10 +1035,9 @@ COpt::memoryPick();
 		$updateItems = array();
 		$inheritedItems = array();
 		foreach ($chdHosts as $hostid => $host) {
-
 			$templateids = zbx_toHash($host['templates'], 'templateid');
 
-// skip items not from parent templates of current host
+			// skip items not from parent templates of current host
 			$parentItems = array();
 			foreach ($items as $itemid => $item) {
 				if (isset($templateids[$item['hostid']])) {
@@ -1040,7 +1045,7 @@ COpt::memoryPick();
 				}
 			}
 
-// check existing items to decide insert or update
+			// check existing items to decide insert or update
 			$exItems = $this->get(array(
 				'output' => array('itemid', 'key_', 'type', 'flags', 'templateid'),
 				'hostids' => $hostid,
@@ -1054,12 +1059,12 @@ COpt::memoryPick();
 			foreach ($parentItems as $item) {
 				$exItem = null;
 
-// update by tempalteid
+				// update by tempalteid
 				if (isset($exItemsTpl[$item['itemid']])) {
 					$exItem = $exItemsTpl[$item['itemid']];
 				}
 
-// update by key
+				// update by key
 				if (isset($exItemsKeys[$item['key_']])) {
 					$exItem = $exItemsKeys[$item['key_']];
 
@@ -1081,26 +1086,24 @@ COpt::memoryPick();
 						$item['interfaceid'] = $interface['interfaceid'];
 					}
 					// no matching interface found, throw an error
-					elseif($interface !== false) {
+					elseif ($interface !== false) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $host['name'], $item['key_']));
 					}
 				}
 
-// coping item
+				// coping item
 				$newItem = $item;
 				$newItem['hostid'] = $host['hostid'];
 				$newItem['templateid'] = $item['itemid'];
 
-// setting item application
+				// setting item application
 				if (isset($item['applications'])) {
 					$newItem['applications'] = get_same_applications_for_host($item['applications'], $host['hostid']);
 				}
-//--
 
 				if ($exItem) {
 					$newItem['itemid'] = $exItem['itemid'];
 					$inheritedItems[] = $newItem;
-
 					$updateItems[] = $newItem;
 				}
 				else {
@@ -1110,13 +1113,10 @@ COpt::memoryPick();
 				}
 			}
 		}
-
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
-
 		$this->inherit($inheritedItems);
 	}
-
 
 	/**
 	 * Copies the given discovery rule to the specified host.
@@ -1131,7 +1131,7 @@ COpt::memoryPick();
 		// fetch discovery to clone
 		$srcDiscovery = $this->get(array(
 			'itemids' => $discoveryid,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		));
 		$srcDiscovery = $srcDiscovery[0];
 
@@ -1157,7 +1157,7 @@ COpt::memoryPick();
 				$dstDiscovery['interfaceid'] = $interface['interfaceid'];
 			}
 			// no matching interface found, throw an error
-			elseif($interface !== false) {
+			elseif ($interface !== false) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['name'], $dstDiscovery['key_']));
 			}
 		}
@@ -1174,7 +1174,7 @@ COpt::memoryPick();
 			// fetch new prototypes
 			$newPrototypes = API::ItemPrototype()->get(array(
 				'itemids' => $newPrototypes['itemids'],
-				'output' => API_OUTPUT_EXTEND,
+				'output' => API_OUTPUT_EXTEND
 			));
 			$dstDiscovery['prototypes'] = $newPrototypes;
 
@@ -1184,11 +1184,8 @@ COpt::memoryPick();
 			// copy triggers
 			$this->copyDiscoveryTriggers($srcDiscovery, $dstDiscovery, $srcHost, $dstHost);
 		}
-
-
 		return true;
 	}
-
 
 	/**
 	 * Copies all of the item prototypes from the source discovery to the target
@@ -1205,7 +1202,7 @@ COpt::memoryPick();
 	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$prototypes = API::ItemPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		));
 
 		$rs = array();
@@ -1234,12 +1231,9 @@ COpt::memoryPick();
 			if (!$rs) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone item prototypes.'));
 			}
-
 		}
-
 		return $rs;
 	}
-
 
 	/**
 	 * Copies all of the graphs from the source discovery to the target discovery rule.
@@ -1252,7 +1246,6 @@ COpt::memoryPick();
 	 * @return array
 	 */
 	protected function copyDiscoveryGraphs(array $srcDiscovery, array $dstDiscovery) {
-
 		// fetch source graphs
 		$srcGraphs = API::GraphPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
@@ -1265,11 +1258,9 @@ COpt::memoryPick();
 			return array();
 		}
 
-
 		$srcItemids = array();
 		$itemKeys = array();
 		foreach ($srcGraphs as $key => $graph) {
-
 			// skip graphs with items from multiple hosts
 			if (count($graph['hosts']) > 1) {
 				unset($srcGraphs[$key]);
@@ -1290,13 +1281,12 @@ COpt::memoryPick();
 		// fetch source items
 		$items = API::Item()->get(array(
 			'itemids' => $srcItemids,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_EXTEND
 		));
 		$srcItems = array();
 		$itemKeys = array();
 		foreach ($items as $item) {
 			$srcItems[$item['itemid']] = $item;
-
 			$itemKeys[] = $item['key_'];
 		}
 		$itemKeys = array_unique($itemKeys);
@@ -1319,13 +1309,11 @@ COpt::memoryPick();
 			unset($graph['graphid']);
 
 			foreach ($graph['gitems'] as $key => &$gitem) {
-
 				// replace the old item with the new one with the same key
 				$item = $srcItems[$gitem['itemid']];
 				$gitem['itemid'] = $dstItems[$item['key_']]['itemid'];
 
-				unset($gitem['gitemid']);
-				unset($gitem['graphid']);
+				unset($gitem['gitemid'], $gitem['graphid']);
 			}
 		}
 
@@ -1334,14 +1322,11 @@ COpt::memoryPick();
 		if (!$rs) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone graph prototypes.'));
 		}
-
 		return $rs;
 	}
-
 
 	private function validateLifetime($lifetime) {
 		return (validateNumber($lifetime, self::MIN_LIFETIME, self::MAX_LIFETIME) || validateUserMacro($lifetime));
 	}
-
 }
 ?>

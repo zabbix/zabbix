@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/screens.inc.php');
-require_once('include/ident.inc.php');
-require_once('include/forms.inc.php');
-require_once('include/maps.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/screens.inc.php';
+require_once dirname(__FILE__).'/include/ident.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/maps.inc.php';
 
 if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['screens'])){
 	$EXPORT_DATA = true;
@@ -31,7 +31,7 @@ if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['s
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_screens_export.xml';
 
-	require_once('include/export.inc.php');
+	require_once dirname(__FILE__).'/include/export.inc.php';
 }
 else{
 	$EXPORT_DATA = false;
@@ -42,7 +42,7 @@ else{
 	$page['hist_arg'] = array('templateid');
 }
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -125,7 +125,7 @@ require_once('include/page_header.php');
 
 
 	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
-		require_once('include/export.inc.php');
+		require_once dirname(__FILE__).'/include/export.inc.php';
 		DBstart();
 
 		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
@@ -377,6 +377,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

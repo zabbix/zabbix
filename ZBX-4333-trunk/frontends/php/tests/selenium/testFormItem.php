@@ -67,12 +67,13 @@ class testFormItem extends CWebTest {
 		$this->ok('Units');
 		$this->ok('Use custom multiplier');
 		$this->ok('Update interval (in sec)');
-		$this->ok('Flexible intervals (sec)');
+		$this->ok('Flexible intervals');
 		$this->ok('Interval');
 		$this->ok('Period');
 		$this->ok('Action');
 		$this->ok('No flexible intervals defined');
 		$this->ok('New flexible interval');
+		$this->ok('Interval (in sec)');
 		$this->ok('Period');
 		$this->ok('Keep history (in days)');
 		$this->ok('Keep trends (in days)');
@@ -223,6 +224,7 @@ class testFormItem extends CWebTest {
 			array(
 				ITEM_BAD,
 				'ЗАББИКС Сервер',
+				ITEM_TYPE_ZABBIX,
 				'Item name',
 				'',
 				array('Page received incorrect data.', 'Warning. Incorrect value for field "key".')

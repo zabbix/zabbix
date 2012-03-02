@@ -712,11 +712,11 @@ COpt::memoryPick();
 			);
 			$delItemPrototypes = $this->get($options);
 
-// TODO: remove $nopermissions hack
+			// TODO: remove $nopermissions hack
 			if (!$nopermissions) {
 				foreach ($prototypeids as $prototypeid) {
 					if (!isset($delItemPrototypes[$prototypeid])) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSIONS);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 					}
 					if ($delItemPrototypes[$prototypeid]['templateid'] != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete templated items');
@@ -724,7 +724,7 @@ COpt::memoryPick();
 				}
 			}
 
-// first delete child items
+			// first delete child items
 			$parentItemids = $prototypeids;
 			$childPrototypeids = array();
 			do{

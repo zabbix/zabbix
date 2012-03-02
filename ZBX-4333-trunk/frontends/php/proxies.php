@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/hosts.inc.php');
+	require_once dirname(__FILE__).'/include/config.inc.php';
+	require_once dirname(__FILE__).'/include/hosts.inc.php';
 
-	$page['title'] = 'S_PROXIES';
+	$page['title'] = _('Proxies');
 	$page['file'] = 'proxies.php';
 	$page['hist_arg'] = array('');
 
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -176,8 +176,8 @@
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$cmbConf = new CComboBox('config', 'proxies.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('nodes.php',S_NODES);
-		$cmbConf->addItem('proxies.php',S_PROXIES);
+		$cmbConf->addItem('nodes.php', _('Nodes'));
+		$cmbConf->addItem('proxies.php', _('Proxies'));
 	$frmForm->addItem($cmbConf);
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CSubmit('form',S_CREATE_PROXY));
@@ -317,5 +317,5 @@
 	}
 
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

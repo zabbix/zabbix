@@ -231,34 +231,34 @@ class CScreen extends CZBXAPI {
 
 			$dbSitems = DBselect('SELECT * FROM screens_items WHERE '.DBcondition('screenid', $screenids));
 			while ($sitem = DBfetch($dbSitems)) {
-				if ($sitem['resourceid'] == 0) continue;
-
 				$screensItems[$sitem['screenitemid']] = $sitem;
 
-				switch ($sitem['resourcetype']) {
-					case SCREEN_RESOURCE_HOSTS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-					case SCREEN_RESOURCE_DATA_OVERVIEW:
-					case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-						$groupsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_HOST_TRIGGERS:
-						$hostsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_GRAPH:
-						$graphsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_SIMPLE_GRAPH:
-					case SCREEN_RESOURCE_PLAIN_TEXT:
-						$itemsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_MAP:
-						$mapsToCheck[] = $sitem['resourceid'];
-					break;
-					case SCREEN_RESOURCE_SCREEN:
-						$screensToCheck[] = $sitem['resourceid'];
-					break;
+				if ($sitem['resourceid']) {
+					switch ($sitem['resourcetype']) {
+						case SCREEN_RESOURCE_HOSTS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+						case SCREEN_RESOURCE_DATA_OVERVIEW:
+						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+							$groupsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_HOST_TRIGGERS:
+							$hostsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_GRAPH:
+							$graphsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$itemsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_MAP:
+							$mapsToCheck[] = $sitem['resourceid'];
+						break;
+						case SCREEN_RESOURCE_SCREEN:
+							$screensToCheck[] = $sitem['resourceid'];
+						break;
+					}
 				}
 			}
 
@@ -392,7 +392,6 @@ class CScreen extends CZBXAPI {
 			return $result;
 		}
 
-
 // Adding ScreenItems
 		if (!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselectsAllowedOutputs)) {
 			if (!isset($screensItems)) {
@@ -441,128 +440,6 @@ class CScreen extends CZBXAPI {
 		return !empty($screens);
 	}
 
-	protected function checkItems($screenitems) {
-		$hostgroups = array();
-		$hosts = array();
-		$graphs = array();
-		$items = array();
-		$maps = array();
-		$screens = array();
-
-		$resources = array(SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT,
-					SCREEN_RESOURCE_MAP,SCREEN_RESOURCE_SCREEN, SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
-					SCREEN_RESOURCE_DATA_OVERVIEW);
-
-		foreach ($screenitems as $item) {
-			if ((isset($item['resourcetype']) && !isset($item['resourceid'])) ||
-				(!isset($item['resourcetype']) && isset($item['resourceid'])))
-			{
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-			}
-
-			if (isset($item['resourceid']) && ($item['resourceid'] == 0)) {
-				if (uint_in_array($item['resourcetype'], $resources))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource provided for screen item'));
-				else
-					continue;
-			}
-
-			switch ($item['resourcetype']) {
-				case SCREEN_RESOURCE_HOSTS_INFO:
-				case SCREEN_RESOURCE_TRIGGERS_INFO:
-				case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-				case SCREEN_RESOURCE_DATA_OVERVIEW:
-				case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-					$hostgroups[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_HOST_TRIGGERS:
-					$hosts[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_GRAPH:
-					$graphs[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_SIMPLE_GRAPH:
-				case SCREEN_RESOURCE_PLAIN_TEXT:
-					$items[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_MAP:
-					$maps[] = $item['resourceid'];
-				break;
-				case SCREEN_RESOURCE_SCREEN:
-					$screens[] = $item['resourceid'];
-				break;
-			}
-		}
-
-		if (!empty($hostgroups)) {
-			$result = API::HostGroup()->get(array(
-				'groupids' => $hostgroups,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach ($hostgroups as $id) {
-				if (!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host group ID "%s" provided for screen element.', $id));
-			}
-		}
-		if (!empty($hosts)) {
-			$result = API::Host()->get(array(
-				'hostids' => $hosts,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach ($hosts as $id) {
-				if (!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host ID "%s" provided for screen element.', $id));
-			}
-		}
-		if (!empty($graphs)) {
-			$result = API::Graph()->get(array(
-				'graphids' => $graphs,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach ($graphs as $id) {
-				if (!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect graph ID "%s" provided for screen element.', $id));
-			}
-		}
-		if (!empty($items)) {
-			$result = API::Item()->get(array(
-				'itemids' => $items,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-				'webitems' => 1,
-			));
-			foreach ($items as $id) {
-				if (!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect item ID "%s" provided for screen element.', $id));
-			}
-		}
-		if (!empty($maps)) {
-			$result = API::Map()->get(array(
-				'sysmapids' => $maps,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach ($maps as $id) {
-				if (!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect map ID "%s" provided for screen element.', $id));
-			}
-		}
-		if (!empty($screens)) {
-			$result = $this->get(array(
-				'screenids' => $screens,
-				'output' => API_OUTPUT_SHORTEN,
-				'preservekeys' => 1,
-			));
-			foreach ($screens as $id) {
-				if (!isset($result[$id]))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect screen ID "%s" provided for screen element.', $id));
-			}
-		}
-	}
-
 /**
  * Create Screen
  *
@@ -584,20 +461,16 @@ class CScreen extends CZBXAPI {
 				'nopermissions' => 1
 			);
 			$dbScreens = $this->get($options);
-			foreach ($dbScreens as $dbsnum => $dbScreen) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$dbScreen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+			foreach ($dbScreens as $dbScreen) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $dbScreen['name']));
 			}
 //---
 
-			foreach ($screens as $snum => $screen) {
+			foreach ($screens as $screen) {
 
 				$screenDbFields = array('name' => null);
 				if (!check_db_fields($screenDbFields, $screen)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen [ %s ]', $screen['name']));
-				}
-
-				if ($this->exists($screen)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%1$s".', $screen['name']));
 				}
 			}
 			$screenids = DB::insert('screens', $screens);
@@ -640,7 +513,7 @@ class CScreen extends CZBXAPI {
 		$updScreens = $this->get($options);
 		foreach ($screens as $gnum => $screen) {
 				if (!isset($screen['screenid'], $updScreens[$screen['screenid']])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
@@ -658,7 +531,7 @@ class CScreen extends CZBXAPI {
 				$existScreen = reset($existScreen);
 
 				if ($existScreen && (bccomp($existScreen['screenid'], $screen['screenid']) != 0))
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_SCREEN.' [ '.$screen['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Screen "%1$s" already exists.', $screen['name']));
 			}
 
 			$screenid = $screen['screenid'];
@@ -698,7 +571,7 @@ class CScreen extends CZBXAPI {
 
 		foreach ($screenids as $screenid) {
 			if (!isset($delScreens[$screenid]))
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		DB::delete('screens_items', array('screenid'=>$screenids));
