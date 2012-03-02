@@ -1208,6 +1208,33 @@ class CConfigurationImport {
 	 */
 	protected function processScreens() {
 		$allScreens = $this->formatter->getScreens();
+
+		$existingScreens = array();
+		$allScreens = zbx_toHash($allScreens, 'name');
+		$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE'.
+			' s.templateid IS NULL '.
+			' AND '.DBcondition('s.name', array_keys($allScreens)));
+		while ($dbScreen = DBfetch($dbScreens)) {
+			$existingScreens[$dbScreen['screenid']] = $dbScreen['name'];
+			$allScreens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
+		}
+
+		// if we are going to update screens, check for permissions
+		if ($existingScreens && $this->options['screens']['exist']) {
+			$allowedScreens = API::Screen()->get(array(
+				'screenids' => array_keys($existingScreens),
+				'output' => API_OUTPUT_SHORTEN,
+				'editable' => true,
+				'preservekeys' => true
+			));
+			foreach ($existingScreens as $existingScreenId => $existingScreenName) {
+				if (!isset($allowedScreens[$existingScreenId])) {
+					throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
+				}
+			}
+		}
+
+
 		$allScreens = $this->prepareScreenImport($allScreens);
 		$screensToCreate = array();
 		$screensToUpdate = array();
@@ -1239,7 +1266,33 @@ class CConfigurationImport {
 		$screensToUpdate = array();
 		foreach ($templates as $template) {
 			if (!empty($template['screens'])) {
-				$screens = $this->prepareScreenImport($template['screens']);
+				$allScreens = zbx_toHash($template['screens'], 'name');
+
+				$existingScreens = array();
+				$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE '.
+						' s.templateid='.zbx_dbstr($this->referencer->resolveTemplate($template['host'])).
+						' AND '.DBcondition('s.name', array_keys($allScreens)));
+				while ($dbScreen = DBfetch($dbScreens)) {
+					$existingScreens[$dbScreen['screenid']] = $dbScreen['name'];
+					$allScreens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
+				}
+
+				// if we are going to update screens, check for permissions
+				if ($existingScreens && $this->options['screens']['exist']) {
+					$allowedTplScreens = API::TemplateScreen()->get(array(
+						'screenids' => array_keys($existingScreens),
+						'output' => API_OUTPUT_SHORTEN,
+						'editable' => true,
+						'preservekeys' => true
+					));
+					foreach ($existingScreens as $existingScreenId => $existingScreenName) {
+						if (!isset($allowedTplScreens[$existingScreenId])) {
+							throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
+						}
+					}
+				}
+
+				$screens = $this->prepareScreenImport($allScreens);
 				foreach ($screens as $screen) {
 					$screen['templateid'] = $this->referencer->resolveTemplate($template['host']);
 					if (isset($screen['screenid'])) {
@@ -1271,35 +1324,6 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function prepareScreenImport(array $allScreens) {
-		$existingScreens = array();
-		$allScreens = zbx_toHash($allScreens, 'name');
-		$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE '.DBcondition('s.name', array_keys($allScreens)));
-		while ($dbScreen = DBfetch($dbScreens)) {
-			$existingScreens[$dbScreen['screenid']] = $dbScreen['name'];
-			$allScreens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
-		}
-
-		// if we are going to update screens, check for permissions
-		if ($existingScreens && $this->options['screens']['exist']) {
-			$allowedScreens = API::Screen()->get(array(
-				'screenids' => array_keys($existingScreens),
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true,
-				'preservekeys' => true
-			));
-			$allowedTplScreens = API::TemplateScreen()->get(array(
-				'screenids' => array_keys($existingScreens),
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($existingScreens as $existingScreenId => $existingScreenName) {
-				if (!isset($allowedScreens[$existingScreenId]) && !isset($allowedTplScreens[$existingScreenId])) {
-					throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
-				}
-			}
-		}
-
 		foreach ($allScreens as &$screen) {
 			if (!isset($screen['screenitems'])) {
 				$screen['screenitems'] = array();
