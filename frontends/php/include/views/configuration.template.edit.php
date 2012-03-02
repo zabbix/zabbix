@@ -63,8 +63,6 @@
 	$frmHost->setName('tpl_for');
 
 	$frmHost->addVar('form', get_request('form', 1));
-	$from_rfr = get_request('form_refresh', 0);
-	$frmHost->addVar('form_refresh', $from_rfr+1);
 	$frmHost->addVar('clear_templates', $clear_templates);
 	$frmHost->addVar('groupid', $_REQUEST['groupid']);
 
@@ -83,7 +81,7 @@
 		$groups = $dbTemplate['groups'];
 		$groups = zbx_objectValues($groups, 'groupid');
 
-		$macros = $dbTemplate['macros'];
+		$macros = order_macros($dbTemplate['macros'], 'macro');
 
 // get template hosts from db
 		$hosts_linked_to = API::Host()->get(array(
@@ -134,9 +132,15 @@
 	$templateList->addRow(_('Groups'), $group_tb->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
+	global $USER_DETAILS;
 	$newgroupTB = new CTextBox('newgroup', $newgroup);
 	$newgroupTB->setAttribute('maxlength', 64);
-	$templateList->addRow(array(new CLabel(_('New group'), 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
+	$tmp_label = _('New group');
+	if ($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN) {
+		$tmp_label .= SPACE._('(Only superadmins can create group)');
+		$newgroupTB->setReadonly(true);
+	}
+	$templateList->addRow(array(new CLabel($tmp_label, 'newgroup'), BR(), $newgroupTB), null, null, null, 'new');
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 	$twb_groupid = get_request('twb_groupid', 0);
@@ -359,43 +363,17 @@
 	$divTabs->addTab('tmplTab', S_LINKED_TEMPLATES, $tmplList);
 // } TEMPLATES
 
-// MACROS WIDGET {
-// macros
+	// macros
 	if(empty($macros)){
 		$macros = array(array(
 			'macro' => '',
 			'value' => ''
 		));
 	}
-
-	$macroTab = new CTable();
-	$macroTab->addRow(array(_('Macro'), SPACE, _('Value')));
-	$macroTab->setAttribute('id', 'userMacros');
-
-	$jsInsert = '';
-	foreach($macros as $inum => $macro){
-		if(!empty($jsInsert) && zbx_empty($macro['macro']) && zbx_empty($macro['value'])) continue;
-
-		$jsInsert.= 'addMacroRow('.zbx_jsvalue($macro).');';
-	}
-	zbx_add_post_js($jsInsert);
-
-	$addButton = new CButton('add', S_ADD, 'javascript: addMacroRow({});');
-	$addButton->setAttribute('class', 'link_menu');
-
-	$col = new CCol(array($addButton));
-	$col->setAttribute('colspan', 4);
-
-	$buttonRow = new CRow($col);
-	$buttonRow->setAttribute('id', 'userMacroFooter');
-
-	$macroTab->addRow($buttonRow);
-
-	$macrolist = new CFormList('macrolist');
-	$macrolist->addRow($macroTab);
-
-	$divTabs->addTab('macroTab', _('Macros'), $macrolist);
-// } MACROS WIDGET
+	$macrosView = new CView('common.macros', array(
+		'macros' => $macros
+	));
+	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
 	$frmHost->addItem($divTabs);
 

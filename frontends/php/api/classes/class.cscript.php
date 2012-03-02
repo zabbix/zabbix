@@ -19,18 +19,14 @@
 **/
 ?>
 <?php
-/**
- * File containing CScript class for API.
- * @package API
- */
+
 /**
  * Class containing methods for operations with Scripts
- *
+ * @package API
  */
 class CScript extends CZBXAPI {
 
 	protected $tableName = 'scripts';
-
 	protected $tableAlias = 's';
 
 	/**
@@ -57,9 +53,6 @@ class CScript extends CZBXAPI {
 
 		// allowed columns for sorting
 		$sortColumns = array('scriptid', 'name');
-
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
 
 		$sqlParts = array(
 			'select'	=> array('scripts' => 's.scriptid'),
@@ -126,9 +119,6 @@ class CScript extends CZBXAPI {
 			$sqlParts['where'][] = '(ug.usrgrpid=s.usrgrpid OR s.usrgrpid IS NULL)';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
@@ -155,13 +145,20 @@ class CScript extends CZBXAPI {
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
+			// only fetch scripts from the same nodes as the hosts
+			$hostNodeIds = array();
+			foreach ($options['hostids'] as $hostId) {
+				$hostNodeIds[] = id2nodeid($hostId);
+			}
+			$hostNodeIds = array_unique($hostNodeIds);
+
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['hostid'] = 'hg.hostid';
 			}
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = '(('.DBcondition('hg.hostid', $options['hostids']).' AND hg.groupid=s.groupid)'.
 									' OR '.
-									'(s.groupid IS NULL))';
+									'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).'))';
 		}
 
 		// scriptids
@@ -201,37 +198,11 @@ class CScript extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
+		// node options
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+
 		$scriptids = array();
-
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('s.scriptid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($script = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $script['rowscount'];
@@ -253,22 +224,7 @@ class CScript extends CZBXAPI {
 						$result[$script['scriptid']]['hosts'] = array();
 					}
 
-					// groupids
-					if (isset($script['groupid']) && is_null($options['selectGroups'])) {
-						if (!isset($result[$script['scriptid']]['groups'])) {
-							$result[$script['scriptid']]['groups'] = array();
-						}
-						$result[$script['scriptid']]['groups'][] = array('groupid' => $script['groupid']);
-					}
-
-					// hostids
-					if (isset($script['hostid']) && is_null($options['selectHosts'])) {
-						if (!isset($result[$script['scriptid']]['hosts'])) {
-							$result[$script['scriptid']]['hosts'] = array();
-						}
-						$result[$script['scriptid']]['hosts'][] = array('hostid' => $script['hostid']);
-						unset($script['hostid']);
-					}
+					unset($script['hostid']);
 					$result[$script['scriptid']] += $script;
 				}
 			}
@@ -278,42 +234,8 @@ class CScript extends CZBXAPI {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// adding groups
-		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			foreach ($result as $scriptid => $script) {
-				$objParams = array(
-					'output' => $options['selectGroups'],
-				);
-				if ($script['host_access'] == PERM_READ_WRITE) {
-					$objParams['editable'] = 1;
-				}
-				if ($script['groupid'] > 0) {
-					$objParams['groupids'] = $script['groupid'];
-				}
-				$groups = API::HostGroup()->get($objParams);
-				$result[$scriptid]['groups'] = $groups;
-			}
-		}
-
-		// adding hosts
-		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
-			foreach ($result as $scriptid => $script) {
-				$objParams = array(
-					'output' => $options['selectHosts'],
-				);
-				if ($script['host_access'] == PERM_READ_WRITE) {
-					$objParams['editable'] = 1;
-				}
-				if ($script['groupid'] > 0) {
-					$objParams['groupids'] = $script['groupid'];
-				}
-				$hosts = API::Host()->get($objParams);
-				$result[$scriptid]['hosts'] = $hosts;
-			}
-		}
+		// add related objects
+		$result = $this->addRelatedObjects($options, $result);
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
@@ -322,31 +244,32 @@ class CScript extends CZBXAPI {
 		return $result;
 	}
 
-/**
- * Get Script ID by host.name and item.key
- *
- * @param array $script
- * @param array $script['name']
- * @param array $script['hostid']
- * @return int|boolean
- */
+	/**
+	 * Get Script ID by host.name and item.key
+	 *
+	 * @param array $script
+	 * @param array $script['name']
+	 * @param array $script['hostid']
+	 * @return int|boolean
+	 */
 	public function getObjects($script) {
 		$result = array();
 		$scriptids = array();
 
-		$sql = 'SELECT scriptid '.
-				' FROM scripts '.
-				' WHERE '.DBin_node('scriptid').
-					' AND name='.$script['name'];
-		$res = DBselect($sql);
-		while ($script = DBfetch($res)) {
+		$dbScripts = DBselect(
+			'SELECT s.scriptid'.
+			' FROM scripts s'.
+			' WHERE '.DBin_node('s.scriptid').
+				' AND s.name='.$script['name']
+		);
+		while ($script = DBfetch($dbScripts)) {
 			$scriptids[$script['scriptid']] = $script['scriptid'];
 		}
 
-		if (!empty($scriptids))
-			$result = $this->get(array('scriptids'=>$scriptids, 'output' => API_OUTPUT_EXTEND));
-
-	return $result;
+		if (!empty($scriptids)) {
+			$result = $this->get(array('scriptids' => $scriptids, 'output' => API_OUTPUT_EXTEND));
+		}
+		return $result;
 	}
 
 	private function _clearData(&$scripts) {
@@ -357,14 +280,14 @@ class CScript extends CZBXAPI {
 		}
 	}
 
-/**
- * Add Scripts
- *
- * @param _array $scripts
- * @param array $script['name']
- * @param array $script['hostid']
- * @return boolean
- */
+	/**
+	 * Add Scripts
+	 *
+	 * @param _array $scripts
+	 * @param array $script['name']
+	 * @param array $script['hostid']
+	 * @return boolean
+	 */
 	public function create($scripts) {
 		$scripts = zbx_toArray($scripts);
 
@@ -376,26 +299,25 @@ class CScript extends CZBXAPI {
 		foreach ($scripts as $script) {
 			$scriptDbFields = array(
 				'name' => null,
-				'command' => null,
+				'command' => null
 			);
 			if (!check_db_fields($scriptDbFields, $script)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
 			}
 
 			if (isset($scriptNames[$script['name']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%s"', $script['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%s".', $script['name']));
 			}
 
 			$scriptNames[$script['name']] = $script['name'];
 		}
 
-		$options = array(
+		$scriptsDB = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'filter' => array('name' => $scriptNames),
-			'limit' => 1,
-		);
-		$scriptsDB = $this->get($options);
+			'limit' => 1
+		));
 		if ($exScript = reset($scriptsDB)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%s" already exists.', $exScript['name']));
 		}
@@ -406,14 +328,14 @@ class CScript extends CZBXAPI {
 		return array('scriptids' => $scriptids);
 	}
 
-/**
- * Update Scripts
- *
- * @param _array $scripts
- * @param array $script['name']
- * @param array $script['hostid']
- * @return boolean
- */
+	/**
+	 * Update Scripts
+	 *
+	 * @param _array $scripts
+	 * @param array $script['name']
+	 * @param array $script['hostid']
+	 * @return boolean
+	 */
 	public function update($scripts) {
 		$scripts = zbx_toHash($scripts, 'scriptid');
 		$scriptids = array_keys($scripts);
@@ -422,12 +344,11 @@ class CScript extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 		}
 
-		$options = array(
+		$updScripts = $this->get(array(
 			'scriptids' => $scriptids,
 			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true
-		);
-		$updScripts = $this->get($options);
+		));
 		$scriptNames = array();
 		foreach ($scripts as $script) {
 			if (!isset($updScripts[$script['scriptid']])) {
@@ -436,22 +357,19 @@ class CScript extends CZBXAPI {
 
 			if (isset($script['name'])) {
 				if (isset($scriptNames[$script['name']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%s"', $script['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate script name "%s".', $script['name']));
 				}
-
 				$scriptNames[$script['name']] = $script['name'];
 			}
 		}
 
-
 		if (!empty($scriptNames)) {
-			$options = array(
+			$dbScripts = $this->get(array(
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
-				'filter' => array('name' => $scriptNames),
-			);
-			$scriptsDB = $this->get($options);
-			foreach ($scriptsDB as $exScript) {
+				'filter' => array('name' => $scriptNames)
+			));
+			foreach ($dbScripts as $exScript) {
 				if (!isset($scripts[$exScript['scriptid']]) || (bccomp($scripts[$exScript['scriptid']]['scriptid'], $exScript['scriptid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%s" already exists.', $exScript['name']));
 				}
@@ -473,13 +391,13 @@ class CScript extends CZBXAPI {
 		return array('scriptids' => $scriptids);
 	}
 
-/**
- * Delete Scripts
- *
- * @param _array $scriptids
- * @param array $scriptids
- * @return boolean
- */
+	/**
+	 * Delete Scripts
+	 *
+	 * @param _array $scriptids
+	 * @param array $scriptids
+	 * @return boolean
+	 */
 	public function delete($scriptids) {
 		$scriptids = zbx_toArray($scriptids);
 
@@ -488,7 +406,7 @@ class CScript extends CZBXAPI {
 		}
 
 		if (empty($scriptids)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'Cannot delete scripts. Empty input parameter "scriptids"');
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete scripts. Empty input parameter "scriptids".'));
 		}
 
 		$dbScripts = $this->get(array(
@@ -497,8 +415,10 @@ class CScript extends CZBXAPI {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
-		foreach ($scriptids as $snum => $scriptid) {
-			if (isset($dbScripts[$scriptid])) continue;
+		foreach ($scriptids as $scriptid) {
+			if (isset($dbScripts[$scriptid])) {
+				continue;
+			}
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete scripts. Script with scriptid "%s" does not exist.', $scriptid));
 		}
 
@@ -509,8 +429,10 @@ class CScript extends CZBXAPI {
 			'output' => array('actionid','name')
 		));
 
-		foreach ($scriptActions as $anum => $action)
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete scripts. Script "%1$s" is used in action operation "%2$s".', $dbScripts[$action['scriptid']]['name'], $action['name']));
+		foreach ($scriptActions as $action) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete scripts. Script "%1$s" is used in action operation "%2$s".',
+				$dbScripts[$action['scriptid']]['name'], $action['name']));
+		}
 
 		DB::delete('scripts', array('scriptid' => $scriptids));
 
@@ -527,7 +449,7 @@ class CScript extends CZBXAPI {
 			'hostids' => $hostid,
 			'scriptids' => $scriptid,
 			'output' => API_OUTPUT_SHORTEN,
-			'preservekeys' => true,
+			'preservekeys' => true
 		);
 		$alowedScripts = $this->get($options);
 		if (!isset($alowedScripts[$scriptid])) {
@@ -536,32 +458,30 @@ class CScript extends CZBXAPI {
 		if (!$socket = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errorCode, $errorMsg, ZBX_SCRIPT_TIMEOUT)) {
 			// remove warnings generated by fsockopen
 			foreach ($ZBX_MESSAGES as $arrayNum => $fsockErrorCheck) {
-				foreach ($fsockErrorCheck as $key => $val) {
-					if ($key == 'message' && strpos($val, 'fsockopen()') !== false) {
+				foreach ($fsockErrorCheck as $key => $value) {
+					if ($key == 'message' && strpos($value, 'fsockopen()') !== false) {
 						unset($ZBX_MESSAGES[$arrayNum]);
 					}
 				}
-
 			}
 
 			switch ($errorMsg) {
 				case 'Connection refused':
-					$dErrorMsg = sprintf(S_NOT_RUN, $ZBX_SERVER)." ";
+					$dErrorMsg = _s('Connection to Zabbix server "%s" refused. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Security environment (for example, SELinux) is blocking the connection; 3. Zabbix server daemon not running; 4. Firewall is blocking TCP connection.', $ZBX_SERVER).SPACE;
 					break;
 				case 'No route to host':
-					$dErrorMsg = sprintf(S_IP_NOT_AVAILABLE, $ZBX_SERVER)." ";
+					$dErrorMsg = _s('Zabbix server "%s" can not be reached. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect network configuration.', $ZBX_SERVER).SPACE;
 					break;
 				case 'Connection timed out':
-					$dErrorMsg = sprintf(S_TIME_OUT, $ZBX_SERVER)." ";
+					$dErrorMsg = _s('Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.', $ZBX_SERVER).SPACE;
 					break;
 				case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
-					$dErrorMsg = sprintf(S_WRONG_DNS, $ZBX_SERVER)." ";
+					$dErrorMsg = _s('Connection to Zabbix server "%s" failed. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.', $ZBX_SERVER).SPACE;
 					break;
 				default:
 					$dErrorMsg = '';
 			}
-
-			self::exception(ZBX_API_ERROR_INTERNAL, $dErrorMsg.S_SCRIPT_ERROR_DESCRIPTION.': '.$errorMsg);
+			self::exception(ZBX_API_ERROR_INTERNAL, $dErrorMsg._('Error description').': '.$errorMsg);
 		}
 
 		$json = new CJSON();
@@ -569,14 +489,14 @@ class CScript extends CZBXAPI {
 			'request' => 'command',
 			'nodeid' => id2nodeid($hostid),
 			'scriptid' => $scriptid,
-			'hostid' => $hostid,
+			'hostid' => $hostid
 		);
 		$dataToSend = $json->encode($array, false);
 
 		stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
 
 		if (fwrite($socket, $dataToSend) === false) {
-			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_SEND_ERROR);
+			self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: can\'t send command, check connection.'));
 		}
 
 		$response = '';
@@ -586,129 +506,106 @@ class CScript extends CZBXAPI {
 		$i = 0;
 		while (!feof($socket)) {
 			$i++;
-			if ((time()-$now) >= ZBX_SCRIPT_TIMEOUT) {
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
+			if ((time() - $now) >= ZBX_SCRIPT_TIMEOUT) {
+				self::exception(ZBX_API_ERROR_INTERNAL,
+					_('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value.'));
 			}
-			elseif ( ($i*$pbl) >= ZBX_SCRIPT_BYTES_LIMIT ) {
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
+			elseif (($i * $pbl) >= ZBX_SCRIPT_BYTES_LIMIT) {
+				self::exception(ZBX_API_ERROR_INTERNAL,
+					_('Error description: defined in "include/defines.inc.php" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value.'));
 			}
 
 			if (($out = fread($socket, $pbl)) !== false) {
 				$response .= $out;
 			}
-			else{
-				self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
+			else {
+				self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: can\'t read script response, check connection.'));
 			}
 		}
 
 		if (strlen($response) > 0) {
 			$rcv = $json->decode($response, true);
 		}
-		else{
-			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
+		else {
+			self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: empty response received.'));
 		}
-
 		fclose($socket);
 		return $rcv;
-
-/*
-		$dataToSend = $json->encode($array, false);
-
-
-		if (fwrite($socket, $dataToSend) === false) {
-			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_SEND_ERROR);
-		}
-
-		stream_set_blocking($socket, true);
-		stream_set_timeout($socket, ZBX_SCRIPT_TIMEOUT);
-		$response = stream_get_contents($socket, ZBX_SCRIPT_BYTES_LIMIT);
-
-		$info = stream_get_meta_data($socket);
-
-		if ($info['timed_out']) {
-			self::exception(S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_TIMEOUT_ERROR);
-		}
-		if (false === $response) {
-			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_READ_ERROR);
-		}
-		if (strlen($response) == 0) {
-			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_ERROR_EMPTY_RESPONSE);
-		}
-		if (!feof($socket)) {
-			self::exception(ZBX_API_ERROR_INTERNAL, S_SCRIPT_ERROR_DESCRIPTION.': '.S_SCRIPT_BYTES_LIMIT_ERROR);
-		}
-
-
-		fclose($socket);
-
-		return $json->decode($response, true);
-*/
 	}
 
-	public function getScriptsByHosts($hostids) {
-		zbx_value2array($hostids);
+	/**
+	 * Returns all the scripts that are available on each given host.
+	 *
+	 * @param $hostIds
+	 *
+	 * @return array    an array of scripts in the form of array($hostId => array($script1, $script2, ...), ...)
+	 */
+	public function getScriptsByHosts($hostIds) {
+		zbx_value2array($hostIds);
 
-		$objParams = array(
-			'hostids' => $hostids,
-			'preservekeys' => 1
-		);
-		$hostsReadOnly  = API::Host()->get($objParams);
-		$hostsReadOnly = zbx_objectValues($hostsReadOnly, 'hostid');
-
-		$objParams = array(
-			'editable' => 1,
-			'hostids' => $hostids,
-			'preservekeys' => 1
-		);
-		$hostsReadWrite = API::Host()->get($objParams);
-		$hostsReadWrite = zbx_objectValues($hostsReadWrite, 'hostid');
-
-// initialize array
 		$scriptsByHost = array();
-		foreach ($hostids as $id => $hostid) {
+		foreach ($hostIds as $hostid) {
 			$scriptsByHost[$hostid] = array();
 		}
-//-----
 
-
-		$options = array(
-			'hostids' => $hostids,
+		$scripts  = $this->get(array(
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-		);
-		$groups = API::HostGroup()->get($options);
-
-		$objParams = array(
-			'groupids' => zbx_objectValues($groups, 'groupid'),
-			'output' => API_OUTPUT_EXTEND,
+			'selectHosts' => API_OUTPUT_REFER,
+			'hostids' => $hostIds,
 			'sortfield' => 'name',
-			'preservekeys' => 1
-		);
-		$scripts  = API::Script()->get($objParams);
-
-		foreach ($scripts as $num => $script) {
-			$addToHosts = array();
-			$hostids = zbx_objectValues($groups[$script['groupid']]['hosts'], 'hostid');
-
-			if (PERM_READ_WRITE == $script['host_access']) {
-				if ($script['groupid'] > 0)
-					$addToHosts = zbx_uint_array_intersect($hostsReadWrite, $hostids);
-				else
-					$addToHosts = $hostsReadWrite;
-			}
-			elseif (PERM_READ_ONLY == $script['host_access']) {
-				if ($script['groupid'] > 0)
-					$addToHosts = zbx_uint_array_intersect($hostsReadOnly, $hostids);
-				else
-					$addToHosts = $hostsReadOnly;
-			}
-
-			foreach ($addToHosts as $id => $hostid) {
-				$scriptsByHost[$hostid][] = $script;
+			'preservekeys' => true
+		));
+		foreach ($scripts as $script) {
+			foreach ($script['hosts'] as $host) {
+				$hostId = $host['hostid'];
+				if (isset($scriptsByHost[$hostId])) {
+					$scriptsByHost[$hostId][] = $script;
+				}
 			}
 		}
-	return $scriptsByHost;
+		return $scriptsByHost;
 	}
 
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// only apply the node option if no specific ids are given
+		if ($options['scriptids'] === null && $options['hostids'] === null && $options['groupids'] === null) {
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		// allowed output options for [ select_* ] params
+		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
+
+		// adding groups
+		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
+			foreach ($result as $scriptid => $script) {
+				$result[$scriptid]['groups'] = API::HostGroup()->get(array(
+					'output' => $options['selectGroups'],
+					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
+					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
+				));
+			}
+		}
+
+		// adding hosts
+		if (!is_null($options['selectHosts']) && str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
+			foreach ($result as $scriptid => $script) {
+				$result[$scriptid]['hosts'] = API::Host()->get(array(
+					'output' => $options['selectHosts'],
+					'groupids' => ($script['groupid']) ? $script['groupid'] : null,
+					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null,
+					'nodeids' => id2nodeid($script['scriptid'])
+				));
+			}
+		}
+
+		return $result;
+	}
 }
 ?>

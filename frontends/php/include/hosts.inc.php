@@ -834,7 +834,8 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 	$hosts = &$result['hosts'];
 	$hostids = &$result['hostids'];
 
-	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : S_ALL_SMALL;
+	$first_entry = ($dd_first_entry == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all');
+
 	$hosts['0'] = $first_entry;
 
 	if (!is_array($groupid) && ($groupid == 0)) {
@@ -1225,7 +1226,6 @@ function getDeletableHostGroups($groupids = null) {
 	return $deletable_groupids;
 }
 
-
 /**
  * A helper function for building the value for the 'data-host-menu' attribute.
  *
@@ -1235,7 +1235,6 @@ function getDeletableHostGroups($groupids = null) {
  * @return array
  */
 function hostMenuData(array $host, array $scripts = array()) {
-	// fetch scripts for the host JS menu
 	$menuScripts = array();
 	foreach ($scripts as $script) {
 		$menuScripts[] = array(

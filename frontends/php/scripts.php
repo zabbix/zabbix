@@ -19,13 +19,13 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = 'S_SCRIPTS';
 $page['file'] = 'scripts.php';
 $page['hist_arg'] = array('scriptid');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR						TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -286,5 +286,5 @@ if($sid){
 	}
 ?>
 <?php
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

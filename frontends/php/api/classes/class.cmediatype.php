@@ -367,15 +367,15 @@ class CMediatype extends CZBXAPI {
  * @param string $mediatypes['username']
  * @param string $mediatypes['passwd']
  * @param integer $mediatypes['status']
- * @return boolean
+ * @return array
  */
 	public function update($mediatypes) {
 
 		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can edit media types.'));
 		}
-		$mediatypes = zbx_toArray($mediatypes);
 
+		$mediatypes = zbx_toArray($mediatypes);
 
 		$update = array();
 		foreach ($mediatypes as $mediatype) {
@@ -418,7 +418,8 @@ class CMediatype extends CZBXAPI {
 			}
 		}
 
-		$mediatypeids = DB::update('media_type', $update);
+		DB::update('media_type', $update);
+		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
 
 		return array('mediatypeids' => $mediatypeids);
 	}
