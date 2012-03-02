@@ -1432,7 +1432,7 @@ class CTrigger extends CZBXAPI {
 			$this->inherit($trigger);
 
 			// add dependencies
-			if (isset($trigger['dependencies']) && $trigger['dependencies']) {
+			if (!empty($trigger['dependencies'])) {
 				$newDeps = array();
 				foreach ($trigger['dependencies'] as $depTriggerId) {
 					$newDeps[] = array(
@@ -1480,14 +1480,16 @@ class CTrigger extends CZBXAPI {
 			if (isset($trigger['dependencies'])) {
 				$this->deleteDependencies($trigger);
 
-				$newDeps = array();
-				foreach ($trigger['dependencies'] as $depTriggerId) {
-					$newDeps[] = array(
-						'triggerid' => $trigger['triggerid'],
-						'dependsOnTriggerid' => $depTriggerId
-					);
+				if ($trigger['dependencies']) {
+					$newDeps = array();
+					foreach ($trigger['dependencies'] as $depTriggerId) {
+						$newDeps[] = array(
+							'triggerid' => $trigger['triggerid'],
+							'dependsOnTriggerid' => $depTriggerId
+						);
+					}
+					$this->addDependencies($newDeps);
 				}
-				$this->addDependencies($newDeps);
 			}
 		}
 		return array('triggerids' => $triggerids);
