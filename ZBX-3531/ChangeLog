@@ -13,6 +13,7 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+A......... [ZBX-4562] Fixed meditype.update returning wrong formatted result (Toms)
 ..F....... [ZBX-4187] fixed dashbord fonts on popup. fixed js error on last 20 issues (Toms)
 A.F....... [ZBX-4607] fixed the script.getscriptbyhosts method returning scripts from nodes defferent from hosts (Pavels)
 A.F....... [ZBX-4607] fixed the script "Host groups" parameter (Pavels)
@@ -472,6 +473,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+...G...PS. [ZBX-4721] fixed handling of \u0000 by JSON parser; thanks to Rick Alm (Sasha)
 ........S. [ZBX-4549] fixed nested db transaction error when stopping server (dimir)
 ........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
 ..F....... [ZBX-4579] fixed incorrect "unknown" values in availability report if no events present (Alexei)
