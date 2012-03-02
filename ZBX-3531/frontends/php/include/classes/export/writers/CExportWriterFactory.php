@@ -6,12 +6,12 @@ class CExportWriterFactory {
 
 	public static function getWriter($type) {
 		switch ($type) {
-			case 'DOM':
-				return new CDomExportWriter();
 			case self::XML:
-				return new CXmlExportWriterA();
+				return new CXmlExportWriter();
+
 			case self::JSON:
 				return new CJsonExportWriter();
+
 			default:
 				throw new Exception('Incorrect export writer type.');
 		}

@@ -1,6 +1,6 @@
 <?php
 
-class CJsonExportWriter implements CExportWriter {
+class CJsonExportWriter extends CExportWriter {
 
 	public function write(array $array) {
 		$json = new CJSON();
