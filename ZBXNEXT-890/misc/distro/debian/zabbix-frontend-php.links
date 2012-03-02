@@ -1,6 +1,4 @@
 usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf usr/share/zabbix/fonts/DejaVuSans.ttf
-usr/share/javascript/prototype/prototype.js usr/share/zabbix/js/prototype.js
-usr/share/javascript/scriptaculous usr/share/zabbix/js/scriptaculous
 usr/share/common-licenses/GPL-2 usr/share/zabbix/conf/COPYING
-etc/zabbix/dbconfig.php usr/share/zabbix/conf/zabbix.conf.php
+etc/zabbix/web/zabbix.conf.php usr/share/zabbix/conf/zabbix.conf.php
 

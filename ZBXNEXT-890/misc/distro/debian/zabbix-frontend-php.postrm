@@ -4,12 +4,6 @@ if [ -e /usr/share/debconf/confmodule ]; then
 	 . /usr/share/debconf/confmodule
 fi
 
-if [ -f /usr/share/dbconfig-common/dpkg/frontend.postrm ]; then
-    dbc_dbtypes="mysql, pgsql, sqlite3"
-    . /usr/share/dbconfig-common/dpkg/frontend.postrm
-    dbc_go zabbix-frontend-php $@
-fi
-
 case "$1" in
     failed-upgrade|abort-install|abort-upgrade|disappear|upgrade)
     ;;

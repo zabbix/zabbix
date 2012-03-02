@@ -1,4 +1,5 @@
 etc/zabbix
+etc/zabbix/web
 usr/share/zabbix
 usr/share/zabbix/fonts
 usr/share/doc/zabbix-frontend-php

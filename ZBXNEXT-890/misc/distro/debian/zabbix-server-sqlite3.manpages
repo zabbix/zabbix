@@ -1,2 +1,1 @@
-debian/manpages/zabbix_server.8
-debian/manpages/zabbix_get.1
+man/zabbix_server.man

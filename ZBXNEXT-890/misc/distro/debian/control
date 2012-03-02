@@ -3,7 +3,7 @@ Section: net
 Priority: optional
 Maintainer: Christoph Haas <haas@debian.org>
 Uploaders: Fabio Tranchitella <kobold@debian.org>, Michael Ablassmeier <abi@debian.org>
-Build-Depends: debhelper (>= 7), libsnmp9-dev | libsnmp-dev, libmysqlclient15-dev, automake1.9, po-debconf, libpq-dev, libsqlite3-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev, libldap2-dev,libiksemel-dev, libopenipmi-dev, quilt (>=0.40), autotools-dev (>= 20100122.1), libssh2-1-dev (>= 1.0.0)
+Build-Depends: debhelper (>= 7), libsnmp9-dev | libsnmp-dev, libmysqlclient15-dev, automake1.9, po-debconf, libpq-dev, libsqlite3-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev, libldap2-dev,libiksemel-dev, libopenipmi-dev, quilt (>=0.40), autotools-dev, libssh2-1-dev (>= 1.0.0)
 Standards-Version: 3.9.2
 Vcs-Git: git://git.debian.org/git/collab-maint/zabbix.git
 Vcs-Browser: http://git.debian.org/?p=collab-maint/zabbix.git
@@ -28,7 +28,7 @@ Description: network monitoring solution - agent
 
 Package: zabbix-server-mysql
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Depends: ${shlibs:Depends}, ${misc:Depends}, mysql-client, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
 Pre-Depends: debconf
 Recommends: mysql-server (>= 4.0.16-2), snmpd
 Suggests: zabbix-frontend-php, logrotate
@@ -50,7 +50,7 @@ Description: network monitoring solution - server (using MySQL)
 
 Package: zabbix-server-pgsql
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Depends: ${shlibs:Depends}, ${misc:Depends}, postgresql-client, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
 Pre-Depends: debconf
 Recommends: postgresql, snmpd
 Suggests: zabbix-frontend-php, logrotate
@@ -77,7 +77,7 @@ Pre-Depends: debconf
 Recommends: sqlite3, snmpd
 Suggests: zabbix-frontend-php, logrotate
 Conflicts: zabbix-server-mysql, zabbix-server-pgsql, zabbix-proxy-mysql, zabbix-proxy-pgsql, zabbix-proxy-sqlite3
-Description: network monitoring solution - server (using PostgreSQL)
+Description: network monitoring solution - server (using SQLite3)
  Zabbix is a server/client network monitoring system with many features.
  It can be used for:
  .
@@ -95,7 +95,7 @@ Description: network monitoring solution - server (using PostgreSQL)
 
 Package: zabbix-frontend-php
 Architecture: all
-Depends: ${misc:Depends}, apache2 | httpd, php5, php5-mysql | php5-pgsql, php5-gd, ucf, dbconfig-common (>= 1.8.19), libjs-prototype (>= 1.6.0.3), libjs-scriptaculous (>= 1.8.2), ttf-dejavu-core
+Depends: ${misc:Depends}, apache2 | httpd, php5, php5-mysql | php5-pgsql, php5-gd, ucf, dbconfig-common (>= 1.8.19), ttf-dejavu-core | ttf-vlgothic
 Description: network monitoring solution - PHP front-end
  Zabbix is a server/client network monitoring system with many features.
  It can be used for:
@@ -112,7 +112,7 @@ Description: network monitoring solution - PHP front-end
 
 Package: zabbix-proxy-pgsql
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Depends: ${shlibs:Depends}, ${misc:Depends}, postgresql-client, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
 Recommends: postgresql
 Conflicts: zabbix-proxy-mysql, zabbix-proxy-sqlite3, zabbix-server-mysql, zabbix-server-pgsql, zabbix-server-sqlite3
 Suggests: logrotate
@@ -133,7 +133,7 @@ Description: network monitoring solution - proxy (using PostgreSQL)
 
 Package: zabbix-proxy-mysql
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Depends: ${shlibs:Depends}, ${misc:Depends}, mysql-client, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
 Recommends: mysql-server (>= 4.0.16-2)
 Suggests: logrotate
 Conflicts: zabbix-proxy-pgsql, zabbix-proxy-sqite3, zabbix-server-mysql, zabbix-server-pgsql, zabbix-server-sqlite3
@@ -154,10 +154,10 @@ Description: network monitoring solution - proxy (using MySQL)
 
 Package: zabbix-proxy-sqlite3
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Depends: ${shlibs:Depends}, ${misc:Depends}, sqlite3, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
 Suggests: logrotate
 Conflicts: zabbix-proxy-pgsql, zabbix-proxy-mysql, zabbix-server-mysql, zabbix-server-pgsql, zabbix-server-sqlite3
-Description: network monitoring solution - proxy (using MySQL)
+Description: network monitoring solution - proxy (using SQLite3)
  Zabbix is a server/client network monitoring system with many features.
  It can be used for:
  .

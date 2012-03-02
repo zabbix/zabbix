@@ -1,3 +1,19 @@
+zabbix (1:1.8.10-1) unstable; urgency=low
+
+  * New upstream release
+  * Remove unnecessary files
+  * Don't use dh_autotools_dev for ubuntu 10.04LTS
+  * Add iODBC support
+  * Remove dependency libjs-prototype and libjs-scriptaculous
+  * Add dependency japanese font package for frontend
+  * Add dependency database client packages for server and proxy
+  * Remove using dbconfig-common from frontend to use original web installer
+  * Add php configs and access restriction to apache.conf
+  * Use original man pages
+  * Add upgrade sql to proxy
+
+ -- Kodai Terashima <kodai.terashima@zabbix.com> Fri, 02 Mar 2012 12:00:18 +0200
+
 zabbix (1:1.8.7rc1-1) unstable; urgency=low
 
   * Bump version number

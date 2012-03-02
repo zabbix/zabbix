@@ -1,2 +1,1 @@
-debian/manpages/zabbix_agentd.8
-debian/manpages/zabbix_sender.1
+man/zabbix_agentd.man

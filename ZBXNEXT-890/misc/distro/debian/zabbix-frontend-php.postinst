@@ -4,27 +4,6 @@
 db_version 2.0 || [ $? -lt 30 ]
 
 if [ "$1" = "configure" ]; then
-    db_get zabbix-frontend-php/zabbix-server || true
-    zabbix_server="$RET"
-    db_get zabbix-frontend-php/zabbix-server-port || true
-    zabbix_server_port="$RET"
-
-	sed -i "s/_ZBX_SERVER_/$zabbix_server/"  /usr/share/doc/zabbix-frontend-php/dbconfig.php
-	sed -i "s/_ZBX_SERVERPORT_/$zabbix_server_port/" /usr/share/doc/zabbix-frontend-php/dbconfig.php
-fi
-
-
-. /usr/share/dbconfig-common/dpkg/frontend.postinst
-
-dbc_first_version="1:1.4.2-3"
-dbc_generate_include=template:/etc/zabbix/dbconfig.php
-dbc_generate_include_owner="root:www-data"
-dbc_generate_include_perms="640"
-dbc_generate_include_args="-U -o template_infile=/usr/share/doc/zabbix-frontend-php/dbconfig.php"
-
-dbc_go zabbix-frontend-php $@
-
-if [ "$1" = "configure" ]; then
     # Has the user decided to have us configure apache2?
     db_get zabbix-frontend-php/configure-apache || true
     if [ "$RET" = "true" ]; then
@@ -45,6 +24,11 @@ if [ "$1" = "configure" ]; then
         else
             /etc/init.d/apache2 restart
         fi
+    fi
+
+    if [ -d /etc/zabbix/web ]; then
+       chown www-data.root /etc/zabbix/web
+       chmod 755 /etc/zabbix/web
     fi
 fi
 
