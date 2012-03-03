@@ -80,7 +80,7 @@ A.......S. [ZBX-4479] added possibility to add a dependency from a template to a
 ..F.I..... [ZBX-4009] added new option in map configuration which enables macros expanding (Vedmak)
 ..F.I...S. [ZBX-3286] added ability to automatically delete low level discovered resources (Sasha, Vedmak)
 ........S. [ZBX-2806] improved processing of escalations (dimir, Sasha)
-..F....... [ZBX-1357] updated Brazilian Portuguese, Dutch, Greek, Latvian, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBX-1357] updated Brazilian Portuguese, Dutch, French, Greek, Latvian, Polish, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 A.F....... [ZBX-3527] improved host form to allow selection of default interface (Vedmak)
 A.F.....S. [ZBX-4262] added support of item prototypes for graph y axis min/max (pavels, Sasha)
 A.F....... [ZBX-4311] fixed graph prototype name validation (Pavels)
