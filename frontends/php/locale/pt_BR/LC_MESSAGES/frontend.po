@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-03 04:19+0200\n"
-"PO-Revision-Date: 2011-12-28 14:45+0200\n"
+"POT-Creation-Date: 2012-03-03 04:24+0200\n"
+"PO-Revision-Date: 2012-02-05 14:18+0200\n"
 "Last-Translator: vzanchettin <vzanchettin@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -1523,7 +1523,7 @@ msgstr "Não foi possível atualizar em massa o nome da máquina."
 
 #: api/classes/class.ctemplate.php:1362
 msgid "Cannot mass update template name"
-msgstr ""
+msgstr "Não foi possível a atualização em massa do nome do template"
 
 #: api/classes/class.chost.php:1701
 msgid "Cannot mass update visible host name."
@@ -1563,7 +1563,7 @@ msgstr "Impossível renomear mídias de usuário"
 
 #: api/classes/class.cdrule.php:447
 msgid "Cannot save discovery rule without checks."
-msgstr ""
+msgstr "Não foi possível salvar as regras de descoberta sem checar."
 
 #: include/services.inc.php:34 include/services.inc.php:102
 msgid "Cannot save service with trigger when parent service trigger exist."
@@ -1612,7 +1612,7 @@ msgstr "Falha na desassociação do template"
 #: api/classes/class.ctemplate.php:1917
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "Não é possível desvincular a trigger \"%s\", tem itens do template que estão vinculados ao host."
 
 #: actionconf.php:155
 msgid "Cannot update action"
@@ -1642,7 +1642,7 @@ msgstr "Regra de autobusca não foi atualizada"
 
 #: usergrps.php:225
 msgid "Cannot update frontend access"
-msgstr ""
+msgstr "Não é possível atualizar o acesso ao frontend"
 
 #: include/locales/en_gb.inc.php:191
 msgid "Cannot update graph"
@@ -1690,7 +1690,7 @@ msgstr "Não foi possível atualizar macro"
 
 #: api/classes/class.chost.php:1919
 msgid "Cannot update macro."
-msgstr ""
+msgstr "Não é possível atualizar o macro."
 
 #: adm.macros.php:146
 msgid "Cannot update macros"
@@ -1743,7 +1743,7 @@ msgstr "Serviços não foram atualizados"
 
 #: slideconf.php:80
 msgid "Cannot update slide show"
-msgstr ""
+msgstr "Não é possível atualizar a apresentação de slides"
 
 #: actionconf.php:327 trigger_prototypes.php:284 triggers.php:340
 msgid "Cannot update status"
@@ -1824,7 +1824,7 @@ msgstr ""
 
 #: include/views/js/configuration.discovery.edit.js.php:286
 msgid "Check already exists."
-msgstr ""
+msgstr "Verificação já existe."
 
 #: api/classes/class.ctriggerexpression.php:52
 #, php-format
@@ -1833,11 +1833,11 @@ msgstr ""
 
 #: api/classes/class.citemgeneral.php:229
 msgid "Check the key, please. Default example was passed."
-msgstr ""
+msgstr "Verificar a chave, por favor. Exemplo padão foi aprovado."
 
 #: include/views/js/configuration.discovery.edit.js.php:23
 msgid "Check type"
-msgstr ""
+msgstr "Verificar tipo"
 
 #: include/views/configuration.discovery.edit.php:61
 #: include/views/configuration.discovery.list.php:47
@@ -1846,11 +1846,11 @@ msgstr "Checagens"
 
 #: api/classes/class.cdrule.php:559
 msgid "Checks should be unique."
-msgstr ""
+msgstr "As verificações devem ser unicas."
 
 #: include/locales/en_gb.inc.php:81 include/nodes.inc.php:242
 msgid "Child"
-msgstr "Remoto"
+msgstr "Filho"
 
 #: include/locales.inc.php:56
 msgid "Chinese (zh_CN)"

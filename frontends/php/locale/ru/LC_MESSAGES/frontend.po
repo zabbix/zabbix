@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-03 04:19+0200\n"
-"PO-Revision-Date: 2012-01-07 13:17+0200\n"
+"POT-Creation-Date: 2012-03-03 04:24+0200\n"
+"PO-Revision-Date: 2012-02-19 22:22+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -480,7 +480,7 @@ msgstr "Агент"
 
 #: include/views/configuration.host.edit.php:243
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Интерфейсы агента"
 
 #: include/hosts.inc.php:63 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:58 popup.php:834
@@ -548,17 +548,17 @@ msgstr "Группа элементов данных"
 #: api/classes/class.capplication.php:787
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "Группа элементов данных \"%1$s\" уже существует у узла сети \"%2$s\"."
 
 #: api/classes/class.capplication.php:482
 #, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Группа элементов данных \"%1$s\" уже существует."
 
 #: api/classes/class.capplication.php:626
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Группа элементов данных \"%1$s\" используется в сценарии \"%2$s\" и не может быть удалена."
 
 #: applications.php:105
 msgid "Application added"
@@ -875,7 +875,7 @@ msgstr "КОНФИГУРАЦИЯ ГРУПП УЗЛОВ СЕТИ"
 #: include/views/configuration.services.edit.php:26
 #: include/views/configuration.services.list.php:23
 msgid "CONFIGURATION OF IT SERVICES"
-msgstr ""
+msgstr "НАСТРОЙКА УСЛУГ IT"
 
 #: disc_prototypes.php:324
 #: include/views/configuration.item.prototype.list.php:29
@@ -965,7 +965,7 @@ msgstr "НАСТРОЙКА ZABBIX"
 
 #: include/views/configuration.services.edit.php:62
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "Вычислять SLA, допустимый уровень SLA (в %)"
 
 #: include/items.inc.php:92 include/locales/en_gb.inc.php:203
 msgid "Calculated"
@@ -1571,7 +1571,7 @@ msgstr "Невозможно сохранить правило обнаруже�
 
 #: include/services.inc.php:34 include/services.inc.php:102
 msgid "Cannot save service with trigger when parent service trigger exist."
-msgstr ""
+msgstr "Не удалось сохранить услугу с триггером, когда триггер существует и у родительской услуги."
 
 #: api/classes/class.chostinterface.php:500
 msgid "Cannot switch host for interface"
@@ -2076,7 +2076,7 @@ msgstr "Текст подтверждения"
 
 #: popup.php:554
 msgid "Conflict between selected templates."
-msgstr ""
+msgstr "Конфликт между выбранными шаблонами."
 
 #: include/views/administration.proxy.edit.php:95
 #: include/views/configuration.host.edit.php:221
@@ -2660,7 +2660,7 @@ msgstr "Удалить и очистить шаблон? (Внимание: вс
 
 #: include/views/configuration.application.edit.php:67
 msgid "Delete application?"
-msgstr ""
+msgstr "Удалить группу элементов данных?"
 
 #: include/views/configuration.action.edit.php:987
 msgid "Delete current action?"
@@ -2959,7 +2959,7 @@ msgstr ""
 #: api/classes/class.ctriggerprototype.php:1313
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Удалено: Прототип триггера \"%1$s\" из \"%2$s\"."
 
 #: include/forms.inc.php:2262 include/forms.inc.php:2343
 #: include/forms.inc.php:2423
@@ -2985,7 +2985,7 @@ msgstr "Запрещено"
 #: include/views/configuration.triggers.edit.php:322
 #: include/views/configuration.triggers.edit.php:331
 msgid "Dependencies"
-msgstr ""
+msgstr "Зависимости"
 
 #: include/triggers.inc.php:1668 tr_status.php:514
 msgid "Dependent"
@@ -3064,7 +3064,7 @@ msgstr "Деактивировать узел сети?"
 
 #: include/views/configuration.hostgroups.list.php:128
 msgid "Disable hosts in the selected host groups?"
-msgstr ""
+msgstr "Деактивировать узлы сети в выбранных группах узлов сети?"
 
 #: include/locales/en_gb.inc.php:147
 msgid "Disable hosts monitored by selected proxies?"
@@ -3194,7 +3194,7 @@ msgstr ""
 #: api/classes/class.cdiscoveryrule.php:1004
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr ""
+msgstr "У правила обнаружения \"%1$s:%2$s\" некорректное время хранения: \"%3$s\". (мин: %4$d, макс: %5$d, допускается пользовательский макрос)"
 
 #: api/classes/class.cdrule.php:597
 #, php-format
@@ -3326,19 +3326,19 @@ msgstr "Недоступен"
 
 #: include/views/configuration.host.edit.php:288
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
-msgstr ""
+msgstr "Перетащите сюда для изменения типа интерфейса на \"IPMI\"."
 
 #: include/views/configuration.host.edit.php:270
 msgid "Drag here to change the type of the interface to \"JMX\" type."
-msgstr ""
+msgstr "Перетащите сюда для изменения типа интерфейса на \"JMX\"."
 
 #: include/views/configuration.host.edit.php:251
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
-msgstr ""
+msgstr "Перетащите сюда для изменения типа интерфейса на \"SNMP\"."
 
 #: include/views/configuration.host.edit.php:231
 msgid "Drag here to change the type of the interface to \"agent\" type."
-msgstr ""
+msgstr "Перетащите сюда для изменения типа интерфейса на \"агент\"."
 
 #: include/locales/en_gb.inc.php:181
 msgid "Draw style"
@@ -3650,7 +3650,7 @@ msgstr "Ошибка"
 
 #: services.php:185 services.php:192
 msgid "Error adding service time. Should be from 00:00 to 24:00."
-msgstr ""
+msgstr "Ошибка при добавлении интервала времени услуги. Время должно быть от 00:00 до 24:00."
 
 #: api/classes/class.cscript.php:484
 msgid "Error description"
@@ -3779,7 +3779,7 @@ msgstr "Подтверждение выполнения"
 
 #: sysmap.php:196
 msgid "Expand macros"
-msgstr ""
+msgstr "Раскрытие макросов"
 
 #: include/views/configuration.sysmap.edit.php:82
 msgid "Expand single problem"
@@ -4271,7 +4271,7 @@ msgstr "График удален"
 
 #: include/locales.inc.php:61
 msgid "Greek (el_GR)"
-msgstr ""
+msgstr "Greek (el_GR)"
 
 #: include/views/js/configuration.sysmaps.js.php:61 sysmap.php:198
 msgid "Grid"
@@ -4548,7 +4548,7 @@ msgstr "Узел сети добавлен"
 
 #: api/classes/class.chostinterface.php:907
 msgid "Host cannot have more than one default interface of the same type."
-msgstr ""
+msgstr "Узел сети не может иметь более одного интерфейса по умолчанию с одинаковым типом."
 
 #: hostinventoriesoverview.php:87 include/locales/en_gb.inc.php:150
 msgid "Host count"
@@ -4715,7 +4715,7 @@ msgstr "Узлы сети и шаблоны"
 
 #: include/views/configuration.hostgroups.edit.php:57
 msgid "Hosts in"
-msgstr ""
+msgstr "Узлы сети"
 
 #: include/views/configuration.maintenance.edit.php:138
 msgid "Hosts in maintenance"
@@ -4816,7 +4816,7 @@ msgstr "Алгоритм авторизации IPMI"
 
 #: include/views/configuration.host.edit.php:299
 msgid "IPMI interfaces"
-msgstr ""
+msgstr "Интерфейсы IPMI "
 
 #: include/views/configuration.host.massupdate.php:217
 msgid "IPMI password"
@@ -4845,11 +4845,11 @@ msgstr "ОТЧЕТ ДОСТУПНОСТИ УСЛУГ IT"
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT SERVICES: CHILDS"
-msgstr ""
+msgstr "ПОДЧИНЕННЫЕ"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT SERVICES: PARENTS"
-msgstr ""
+msgstr "УСЛУГИ IT: РОДИТЕЛЬСКИЕ"
 
 #: include/audit.inc.php:39
 msgid "IT service"
@@ -5368,7 +5368,7 @@ msgstr "Указан некорректный параметр IP адреса \
 #: api/classes/class.chostinterface.php:557
 #, php-format
 msgid "Incorrect interface port \"%s\" provided"
-msgstr ""
+msgstr "Указан некорректный порт \"%s\" для интерфейса"
 
 #: api/classes/class.chost.php:1312
 #, php-format
@@ -5543,7 +5543,7 @@ msgstr ""
 
 #: api/classes/class.cscreenitem.php:357
 msgid "Incorrect resource type provided for screen item."
-msgstr ""
+msgstr "Указан некорректный тип ресурса для элемента комплексного экрана."
 
 #: api/classes/class.cscreenitem.php:496
 #, php-format
@@ -5627,15 +5627,15 @@ msgstr ""
 
 #: include/perm.inc.php:290
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
-msgstr ""
+msgstr "Некорректные пользовательские данные в \"get_accessible_groups_by_user\"."
 
 #: include/perm.inc.php:181
 msgid "Incorrect user data in \"get_accessible_hosts_by_user\"."
-msgstr ""
+msgstr "Некорректные пользовательские данные в \"get_accessible_hosts_by_user\"."
 
 #: include/perm.inc.php:387
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
-msgstr ""
+msgstr "Некорректные пользовательские данные в \"get_accessible_nodes_by_user\"."
 
 #: include/profiles.inc.php:233
 msgid "Incorrect user group."
@@ -5720,7 +5720,7 @@ msgstr ""
 
 #: include/views/js/configuration.host.edit.js.php:136
 msgid "Interface is used by items that require this type of the interface."
-msgstr ""
+msgstr "Интерфейс используется элементами данных, которым нужен этот тип интерфейса."
 
 #: api/classes/class.chostinterface.php:527
 #, php-format
@@ -5917,12 +5917,12 @@ msgstr ""
 #: api/classes/class.citemgeneral.php:328
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
-msgstr ""
+msgstr "Элемент данны с ключем \"%1$s\" уже существует у \"%2$s\", элемент данных созданный из прототипа элемента данных."
 
 #: api/classes/class.citemgeneral.php:325
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
-msgstr ""
+msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как прототип элемента данных."
 
 #: api/classes/class.citemgeneral.php:319
 #, php-format
@@ -5999,7 +5999,7 @@ msgstr "JMX агент"
 
 #: include/views/configuration.host.edit.php:281
 msgid "JMX interfaces"
-msgstr ""
+msgstr "Интерфейсы JMX"
 
 #: api/rpc/class.cjsonrpc.php:137
 #, php-format
@@ -6074,7 +6074,7 @@ msgstr "Хранить историю (дни)"
 
 #: include/views/configuration.item.edit.php:292
 msgid "Keep lost resources period (in days)"
-msgstr ""
+msgstr "Период сохранения потерянных ресурсов (в днях)"
 
 #: include/forms.inc.php:523
 msgid "Keep trends"
@@ -6098,7 +6098,7 @@ msgstr "Ключ"
 #: api/classes/class.citemgeneral.php:244
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
-msgstr ""
+msgstr "Ключ \"%1$s\" не совпадает с <grpmax|grpmin|grpsum|grpavg>[\"Группы узлов сети\", \"Ключ элемента данных\", \"<last|min|max|avg|sum|count>\", \"параметр\"]."
 
 #: api/classes/class.citemkey.php:50
 msgid "Key cannot be empty."
@@ -7162,7 +7162,7 @@ msgstr "Нет заданных услуг IT."
 
 #: api/classes/class.cscreenitem.php:412
 msgid "No URL provided for screen element."
-msgstr ""
+msgstr "Не указан URL для элемента комплексного экрана."
 
 #: include/forms.inc.php:268
 msgid "No accessible resources"
@@ -7282,7 +7282,7 @@ msgstr ""
 
 #: api/classes/class.cscreenitem.php:386
 msgid "No graph ID provided for screen element."
-msgstr ""
+msgstr "Не указан ID графика для элемента комплексного экрана."
 
 #: include/locales/en_gb.inc.php:654
 msgid "No graph item with"
@@ -7321,7 +7321,7 @@ msgstr ""
 
 #: api/classes/class.cscreenitem.php:375
 msgid "No host group ID provided for screen element."
-msgstr ""
+msgstr "Не указан ID группы узлов сети для элемента комплексного экрана."
 
 #: include/views/configuration.hostgroups.list.php:52 popup.php:615
 #: popup.php:1759 popup.php:1790
@@ -7390,7 +7390,7 @@ msgstr "Интерфейсы для прокси \"%s\" не заданы"
 
 #: api/classes/class.cscreenitem.php:394
 msgid "No item ID provided for screen element."
-msgstr ""
+msgstr "Не указан ID элемента данных для элемента комплексного экрана."
 
 #: popup.php:1127
 msgid "No item prototypes defined."
@@ -7430,7 +7430,7 @@ msgstr "Периоды обслуживания не заданы."
 
 #: api/classes/class.cscreenitem.php:400
 msgid "No map ID provided for screen element."
-msgstr ""
+msgstr "Не указан ID карты сети для элемента комплексного экрана."
 
 #: maps.php:124 popup.php:1483 sysmaps.php:317
 msgid "No maps defined."
@@ -7537,7 +7537,7 @@ msgstr ""
 
 #: api/classes/class.cscreenitem.php:406
 msgid "No screen ID provided for screen element."
-msgstr ""
+msgstr "Не указан ID комплексного экрана для элемента комплексного экрана."
 
 #: host_screen.php:142 include/screens.inc.php:967 popup.php:1670
 #: popup.php:1728 screenconf.php:318 screens.php:168
@@ -7584,7 +7584,7 @@ msgstr "Нет заданных шаблонов."
 
 #: include/views/configuration.services.edit.php:112
 msgid "No times defined. Work 24x7."
-msgstr ""
+msgstr "Интервалы не определены. Работа 24x7."
 
 #: include/locales/en_gb.inc.php:531
 msgid "No trigger"
@@ -8684,7 +8684,7 @@ msgstr "Регулярное выражение"
 #: include/regexp.inc.php:58 include/regexp.inc.php:92
 #, php-format
 msgid "Regular expression \"%s\" already exists."
-msgstr ""
+msgstr "Регулярное выражение \"%s\" уже существует."
 
 #: adm.regexps.php:86
 msgid "Regular expression added"
@@ -9086,7 +9086,7 @@ msgstr "SNMP community"
 
 #: include/views/configuration.host.edit.php:263
 msgid "SNMP interfaces"
-msgstr ""
+msgstr "Интерфейсы SNMP"
 
 #: include/items.inc.php:82
 msgid "SNMP trap"
@@ -9343,7 +9343,7 @@ msgstr "Комплексный экран обновлен"
 #: screens.php:175
 #, php-format
 msgid "Screen with ID \"%s\" does not exist"
-msgstr ""
+msgstr "Комплексный экран с ID \"%s\" не существует"
 
 #: screens.php:174
 #, php-format
@@ -9623,7 +9623,7 @@ msgstr "Порт сервиса"
 
 #: services.php:196
 msgid "Service time \"from\" cannot be bigger than time \"to\"."
-msgstr ""
+msgstr "Время услуги \"от\" не может быть больше времени \"до\"."
 
 #: include/views/configuration.services.edit.php:152
 msgid "Service times"
@@ -9929,7 +9929,7 @@ msgstr ""
 #: api/classes/class.ctrigger.php:549
 #, php-format
 msgid "Sorting by field \"%s\" not allowed."
-msgstr ""
+msgstr "Сортировка по полю \"%s\" не допускается."
 
 #: include/locales/en_gb.inc.php:219
 msgid "Source"
@@ -10931,7 +10931,7 @@ msgstr "Неизвестный узел сети, такого узла сети
 
 #: include/hosts.inc.php:423
 msgid "Unknown interface type."
-msgstr ""
+msgstr "Неизвестный тип интерфейса."
 
 #: include/audit.inc.php:62
 msgid "Unknown resource"
@@ -11346,7 +11346,7 @@ msgstr ""
 
 #: include/valuemap.inc.php:126
 msgid "Value maps are used to create a mapping between numeric values and string representations."
-msgstr ""
+msgstr "Преобразования значений используются для создания карты соответствий между числовыми значениями и их строковыми представлениями."
 
 #: api/classes/class.citemgeneral.php:257
 msgid "Value type must be Float for aggregate items."
@@ -11989,7 +11989,7 @@ msgstr "добавлен"
 
 #: include/hosts.inc.php:411
 msgid "agent"
-msgstr ""
+msgstr "агент"
 
 #: include/classes/class.cchart.php:1631
 #: include/classes/class.cpagefilter.php:444 include/forms.inc.php:407
@@ -12101,7 +12101,7 @@ msgstr "дней"
 #: include/views/configuration.services.edit.php:178
 #: include/views/configuration.services.edit.php:195
 msgid "dd"
-msgstr ""
+msgstr "дд"
 
 #: include/setup.inc.php:295 include/views/configuration.slideconf.edit.php:67
 #: include/views/js/configuration.slideconf.edit.js.php:13
@@ -12157,7 +12157,7 @@ msgstr "ч"
 #: include/views/configuration.services.edit.php:221
 #: include/views/configuration.services.edit.php:227
 msgid "hh"
-msgstr ""
+msgstr "чч"
 
 #: api/classes/class.cmap.php:610
 msgid "host"
@@ -12237,7 +12237,7 @@ msgstr "мин"
 #: include/views/configuration.services.edit.php:224
 #: include/views/configuration.services.edit.php:230
 msgid "mm"
-msgstr ""
+msgstr "мм"
 
 #: include/func.inc.php:402 include/func.inc.php:458
 msgid "ms"
@@ -12410,7 +12410,7 @@ msgstr "используемый в экспортированном компл�
 
 #: include/views/common.macros.php:34
 msgid "value"
-msgstr ""
+msgstr "значение"
 
 #: include/locales/en_gb.inc.php:28
 msgid "w"
@@ -12451,7 +12451,7 @@ msgstr "да"
 #: include/views/configuration.services.edit.php:182
 #: include/views/configuration.services.edit.php:199
 msgid "yyyy"
-msgstr ""
+msgstr "гггг"
 
 #: include/func.inc.php:521
 msgid "µ"

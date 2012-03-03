@@ -2,16 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-03 04:19+0200\n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2012-03-03 04:24+0200\n"
+"PO-Revision-Date: 2012-01-16 16:25+0200\n"
+"Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
-"Language: zh\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Country: TAIWAN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: include/page_header.php:468
@@ -73,7 +73,6 @@ msgstr[0] ""
 msgid "%d device"
 msgid_plural "%d devices"
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/views/configuration.action.edit.php:472
 msgid "(0 - infinitely)"
@@ -2879,7 +2878,6 @@ msgstr ""
 msgid "Delete selected value mapping? It is used for %d item!"
 msgid_plural "Delete selected value mapping? It is used for %d items!"
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/locales/en_gb.inc.php:268
 msgid "Delete selected with linked elements"
@@ -6681,21 +6679,18 @@ msgstr ""
 msgid "Maximum alias length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] ""
-msgstr[1] ""
 
 #: api/classes/class.chost.php:1362
 #, php-format
 msgid "Maximum host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] ""
-msgstr[1] ""
 
 #: api/classes/class.chost.php:1397
 #, php-format
 msgid "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum visible host name length is %2$d characters, \"%3$s\" is %1$d characters."
 msgstr[0] ""
-msgstr[1] ""
 
 #: include/forms.inc.php:1915 include/func.inc.php:95 include/func.inc.php:207
 #: include/func.inc.php:224 include/locales/en_gb.inc.php:244
