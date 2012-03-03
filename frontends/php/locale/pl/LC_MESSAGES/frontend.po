@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-03 04:19+0200\n"
-"PO-Revision-Date: 2012-01-09 15:06+0200\n"
-"Last-Translator: Pawel <pawel.jarosz@gmail.com>\n"
+"POT-Creation-Date: 2012-03-03 04:24+0200\n"
+"PO-Revision-Date: 2012-02-18 21:32+0200\n"
+"Last-Translator: Łukasz <deejay1@srem.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -1114,7 +1114,7 @@ msgstr "Nie można dodać mapy sieci"
 
 #: httpconf.php:217
 msgid "Cannot add new application."
-msgstr ""
+msgstr "Nie można dodać nowego programu"
 
 #: include/locales/en_gb.inc.php:86
 msgid "Cannot add node"
@@ -1146,7 +1146,7 @@ msgstr "Nie można dodać usługi"
 
 #: slideconf.php:88
 msgid "Cannot add slide show"
-msgstr ""
+msgstr "Nie można dodać pokazu slajdów"
 
 #: templates.php:335
 msgid "Cannot add template"
@@ -1203,7 +1203,7 @@ msgstr "Nie można sklonować prototypów wywoływaczy."
 
 #: include/locales/en_gb.inc.php:578
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr ""
+msgstr "Nie można połączyć z portem trappera serwera ZABBIX, jednakże powinien on być dostepny aby uruchomić skrypt."
 
 #: include/locales/en_gb.inc.php:165
 msgid "Cannot copy graphs"
@@ -1371,7 +1371,7 @@ msgstr "Nie można usunąć usługi"
 
 #: slideconf.php:102 slideconf.php:122
 msgid "Cannot delete slide show"
-msgstr ""
+msgstr "Nie można usunąć pokazu slajdów"
 
 #: templates.php:483 templates.php:501 templates.php:526
 msgid "Cannot delete template"
@@ -1392,7 +1392,7 @@ msgstr ""
 #: api/classes/class.ctrigger.php:1307
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr ""
+msgstr "Nie można usunąć szablonu wyzwalacza \"%1$s:%2$s\"."
 
 #: api/classes/class.ctriggerprototype.php:1250
 #, php-format
@@ -1445,7 +1445,7 @@ msgstr "Nie można znaleźć hosta"
 #: include/items.inc.php:375
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć interfejsu hosta \"%1$s\" dla klucza pozycji \"%2$s\"."
 
 #: api/classes/class.cdiscoveryrule.php:1223
 #, php-format
@@ -1545,17 +1545,17 @@ msgstr "Nie można przekazać zduplikowanych identyfikatorów szablonów do poł
 #: include/db.inc.php:1574
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "Nie można wykonać zapytania DELETE na tabeli \"%1$s\" bez warunku WHERE."
 
 #: include/db.inc.php:1486
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr ""
+msgstr "Nie można wykonać zapytania UPDATE na tabeli \"%1$s\" bez podania wartości."
 
 #: include/db.inc.php:1497
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "Nie można wykonać zapytania UPDATE na tabeli \"%1$s\" bez warunku WHERE."
 
 #: adm.macros.php:103 api/classes/class.chost.php:1912
 msgid "Cannot remove macro."
@@ -1747,7 +1747,7 @@ msgstr "Nie można uaktualnić usługi"
 
 #: slideconf.php:80
 msgid "Cannot update slide show"
-msgstr ""
+msgstr "Nie można uaktualnić pokazu slajdów"
 
 #: actionconf.php:327 trigger_prototypes.php:284 triggers.php:340
 msgid "Cannot update status"
@@ -1788,7 +1788,7 @@ msgstr "Rozróżnianie wielkości liter"
 
 #: include/screens.inc.php:929
 msgid "Center"
-msgstr ""
+msgstr "Wyrównanie do środka"
 
 #: include/screens.inc.php:1243 include/screens.inc.php:1316
 #: include/screens.inc.php:1350 include/screens.inc.php:1367
@@ -1833,7 +1833,7 @@ msgstr "Test już istnieje."
 #: api/classes/class.ctriggerexpression.php:52
 #, php-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr ""
+msgstr "Proszę sprawdzić część wyrażenia zaczynającą się od \"%1$s\"."
 
 #: api/classes/class.citemgeneral.php:229
 msgid "Check the key, please. Default example was passed."
@@ -1921,7 +1921,7 @@ msgstr "Zamknąć otwarte szczegóły zdalnych poleceń bez zapisywania?"
 
 #: include/views/configuration.triggers.edit.php:220
 msgid "Close expression constructor"
-msgstr ""
+msgstr "Zamknij generator wyrażeń"
 
 #: include/locales/en_gb.inc.php:167
 #: include/views/administration.general.triggerDisplayingOptions.edit.php:26
@@ -2049,7 +2049,7 @@ msgstr "Konfiguracja ekranów"
 
 #: slideconf.php:28
 msgid "Configuration of slide shows"
-msgstr ""
+msgstr "Konfiguracja pokazów slajdów"
 
 #: report5.php:155
 msgid "Configuration of trigger"
@@ -2246,33 +2246,33 @@ msgstr "Utwórz mapę wartości"
 #: api/classes/class.capplication.php:541
 #, php-format
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Utworzono: Program \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.cdiscoveryrule.php:921
 #, php-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Utworzono: Reguła wykrywania \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.citem.php:909
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Utworzono: Pozycja \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.citemprototype.php:610
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Utworzono: Prototyp pozycji \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.ctrigger.php:1638
 #: api/classes/class.ctriggerprototype.php:1133
 #, php-format
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Utworzono: Wyzwalacz \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.ctriggerprototype.php:1348
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Utworzono: Prototyp wyzwalacza \"%1$s\" w \"%2$s\"."
 
 #: include/validate.inc.php:418
 #, php-format
@@ -2601,7 +2601,7 @@ msgstr "Domyślne uwierzytelnienie"
 
 #: include/views/configuration.slideconf.edit.php:39
 msgid "Default delay (in seconds)"
-msgstr ""
+msgstr "Domyślne opóźnienie (w sekundach)"
 
 #: include/views/configuration.action.edit.php:49
 msgid "Default escalation period (minimum 60 seconds)"
@@ -2862,7 +2862,7 @@ msgstr "Usunąć wybrane usługi?"
 
 #: include/views/configuration.slideconf.list.php:65
 msgid "Delete selected slide shows?"
-msgstr ""
+msgstr "Usunąć wybrane pokazy slajdów?"
 
 #: include/locales/en_gb.inc.php:282
 msgid "Delete selected templates?"
@@ -2902,7 +2902,7 @@ msgstr "Usuń usługę"
 
 #: include/views/configuration.slideconf.edit.php:114
 msgid "Delete slide show?"
-msgstr ""
+msgstr "Usunąć pokaz slajdów?"
 
 #: include/locales/en_gb.inc.php:284
 msgid "Delete template?"
@@ -2919,17 +2919,17 @@ msgstr "Usunięto"
 #: api/classes/class.capplication.php:634
 #, php-format
 msgid "Deleted: Application \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Usunięto: Program \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.cdiscoveryrule.php:678
 #, php-format
 msgid "Deleted: Discovery rule \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Usunięto: Reguła wykrywania \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.cgraph.php:1034
 #, php-format
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Usunięto: Wykres \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.chost.php:2223
 #, php-format
@@ -2939,12 +2939,12 @@ msgstr ""
 #: api/classes/class.citem.php:1115
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Usunięto: Pozycja \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.citemprototype.php:825
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Usunięto: Prototyp pozycji \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.ctemplate.php:1231
 #, php-format
@@ -2955,12 +2955,12 @@ msgstr ""
 #: api/classes/class.ctrigger.php:1881
 #, php-format
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Usunięto: Wyzwalacz \"%1$s\" w \"%2$s\"."
 
 #: api/classes/class.ctriggerprototype.php:1313
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Usunięto: Prototyp wyzwalacza \"%1$s\" w \"%2$s\"."
 
 #: include/forms.inc.php:2262 include/forms.inc.php:2343
 #: include/forms.inc.php:2423
@@ -3190,7 +3190,7 @@ msgstr "Reguła wykrywania"
 #: api/classes/class.cdiscoveryrule.php:1075
 #, php-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Reguła wykrywania \"%1$s\" istnieje w \"%2$s\", odziedziczona z innego szablonu."
 
 #: api/classes/class.cdiscoveryrule.php:1004
 #, php-format
@@ -3200,7 +3200,7 @@ msgstr "Reguła wykrywania \"%1$s:%2$s\" ma nie poprawny czas życia: \"%3$s\". 
 #: api/classes/class.cdrule.php:597
 #, php-format
 msgid "Discovery rule \"%s\" already exists."
-msgstr ""
+msgstr "Reguła wykrywania \"%s\" istnieje."
 
 #: api/classes/class.cdrule.php:665
 #, php-format
@@ -3311,12 +3311,12 @@ msgstr "W dół"
 #: api/classes/class.cwebcheck.php:511
 #, php-format
 msgid "Download speed for scenario \"%s\"."
-msgstr ""
+msgstr "Prędkość pobierania dla scenariusza \"%s\"."
 
 #: api/classes/class.cwebcheck.php:598
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
-msgstr ""
+msgstr "Prędkość pobierania dla kroku \"%1$s\" scenariusza \"%2$s\"."
 
 #: include/views/configuration.services.edit.php:125
 #: include/views/configuration.services.edit.php:239
@@ -3482,11 +3482,11 @@ msgstr "Pusty warunek akcji."
 
 #: api/classes/class.ctriggerexpression.php:21
 msgid "Empty expression."
-msgstr ""
+msgstr "Puste wyrażenie."
 
 #: api/classes/class.ctriggerexpression.php:68
 msgid "Empty host name provided in expression."
-msgstr ""
+msgstr "Podano pustą nazwę hosta w wyrażeniu."
 
 #: api/classes/class.chostgroup.php:621
 msgid "Empty input parameter \"name\"."
@@ -3512,7 +3512,7 @@ msgstr "Puste wejście."
 #: api/classes/class.ctriggerexpression.php:78
 #, php-format
 msgid "Empty item key \"%1$s\" is used in expression."
-msgstr ""
+msgstr "Pusty klucz pozycji \"%1$s\" wykorzystany w wyrażeniu."
 
 #: api/classes/class.cusermacro.php:829
 msgid "Empty macro."
@@ -3525,7 +3525,7 @@ msgstr "Puste parametry"
 #: api/classes/class.cusermacro.php:848
 #, php-format
 msgid "Empty value for macro \"%1$s\"."
-msgstr ""
+msgstr "Pusta wartość dla makra \"%1$s\"."
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
@@ -3887,7 +3887,7 @@ msgstr "Niepowodzenie w"
 #: api/classes/class.cwebcheck.php:518
 #, php-format
 msgid "Failed step of scenario \"%s\"."
-msgstr ""
+msgstr "Nieudany krok scenariusza \"%s\"."
 
 #: api/classes/class.ctemplate.php:1094
 msgid "Failed to update template"
@@ -4053,12 +4053,12 @@ msgstr "Funkcja"
 
 #: api/classes/class.ctriggerexpression.php:99
 msgid "Function does not expect parameters."
-msgstr ""
+msgstr "Funkcja nie przewiduje parametrów."
 
 #: api/classes/class.ctriggerexpression.php:107
 #, php-format
 msgid "Function supports \"%1$s\" parameters."
-msgstr ""
+msgstr "Funkcja obsługuje \"%1$s\" parametry."
 
 #: include/func.inc.php:526
 msgid "G"
