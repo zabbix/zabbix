@@ -31,10 +31,13 @@
 #	include "zbxcassa.h"
 #endif
 
-extern int		CONFIG_HISTSYNCER_FREQUENCY;
-extern int		ZBX_SYNC_MAX;
-extern unsigned char	process_type;
-extern int		process_num;
+extern int			CONFIG_HISTSYNCER_FREQUENCY;
+extern int			ZBX_SYNC_MAX;
+extern unsigned char		process_type;
+extern int			process_num;
+
+extern zbx_cassandra_hosts_t	CONFIG_CASSANDRA_HOSTS;
+extern char			*CONFIG_CASSANDRA_KEYSPACE;
 
 /******************************************************************************
  *                                                                            *
@@ -63,7 +66,7 @@ void	main_dbsyncer_loop()
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 #ifdef HAVE_CASSANDRA
-	zbx_cassandra_connect(CONFIG_CASSANDRA_HOST, CONFIG_CASSANDRA_KEYSPACE, CONFIG_CASSANDRA_PORT);
+	zbx_cassandra_connect(ZBX_CASSANDRA_CONNECT_NORMAL, &CONFIG_CASSANDRA_HOSTS, CONFIG_CASSANDRA_KEYSPACE);
 #endif
 
 	for (;;)

@@ -34,6 +34,8 @@
 #include "zbxalgo.h"
 #include "zbxcassa.h"
 
+#define ZBX_DB_WAIT_DOWN	10
+
 typedef struct
 {
 	ThriftSocket	*socket;
@@ -91,10 +93,45 @@ static void	zbx_cassandra_log_errors(char *description, GError *error,
 	}
 }
 
-int	zbx_cassandra_connect(const char *host, const char *keyspace, int port)
+void	zbx_cassandra_parse_hosts(char *hosts, zbx_cassandra_hosts_t *h)
 {
-	int			ret = ZBX_DB_OK;
-	char			descr[MAX_STRING_LEN];
+	char	*l, *r, *p;
+
+	h->hosts = NULL;
+	h->count = 0;
+
+	for (l = hosts; '\0' != *l; l = r)
+	{
+		if (NULL != (r = strchr(l, ',')))
+			*r = '\0';
+
+		if (NULL != (p = strchr(l, ':')))
+			*p = '\0';
+
+		h->count++;
+		h->hosts = zbx_realloc(h->hosts, sizeof(zbx_cassandra_host_t) * h->count);
+
+		h->hosts[h->count - 1].host = zbx_strdup(NULL, l);
+
+		if (NULL != p)
+		{
+			*p++ = ':';
+			h->hosts[h->count - 1].port = atoi(p);
+		}
+		else
+			h->hosts[h->count - 1].port = 9160;
+
+		if (NULL != r)
+			*r++ = ',';
+		else
+			break;
+	}
+}
+
+int	__zbx_cassandra_connect(const char *host, int port, const char *keyspace)
+{
+	int		ret = ZBX_DB_OK;
+	char		descr[MAX_STRING_LEN];
 
 	InvalidRequestException	*ire = NULL;
 	GError			*error = NULL;
@@ -107,7 +144,7 @@ int	zbx_cassandra_connect(const char *host, const char *keyspace, int port)
 
 	if (TRUE != thrift_framed_transport_open(conn.transport, &error))
 	{
-		ret = ZBX_DB_FAIL;
+		ret = ZBX_DB_DOWN;
 		zbx_snprintf(descr, sizeof(descr), "connecting to '%s':%d", host, port);
 		zbx_cassandra_log_errors(descr, error, NULL, NULL, NULL, NULL);
 		goto exit;
@@ -128,6 +165,40 @@ exit:
 		zbx_cassandra_close();
 
 	return ret;
+}
+
+void	zbx_cassandra_connect(int flag, zbx_cassandra_hosts_t *h, const char *keyspace)
+{
+	static int	n = -1;
+	int		err, retry = 0;
+
+	if (++n == h->count)
+		n = 0;
+
+	while (ZBX_DB_OK != (err = __zbx_cassandra_connect(h->hosts[n].host, h->hosts[n].port, keyspace)))
+	{
+		if (ZBX_DB_FAIL == err)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the CASSANDRA database. Exiting...");
+			exit(EXIT_FAILURE);
+		}
+
+		if (++n == h->count)
+			n = 0;
+
+		if (++retry == h->count)
+		{
+			if (ZBX_CASSANDRA_CONNECT_EXIT == flag)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to the CASSANDRA database. Exiting...");
+				exit(EXIT_FAILURE);
+			}
+
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in %d seconds.", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+			retry = 0;
+		}
+	}
 }
 
 void	zbx_cassandra_close()

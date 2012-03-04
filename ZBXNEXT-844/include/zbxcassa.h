@@ -26,11 +26,25 @@
 
 #include "zbxalgo.h"
 
-extern char	*CONFIG_CASSANDRA_HOST;
-extern int	CONFIG_CASSANDRA_PORT;
-extern char	*CONFIG_CASSANDRA_KEYSPACE;
+#define ZBX_CASSANDRA_CONNECT_NORMAL	0
+#define ZBX_CASSANDRA_CONNECT_EXIT	1
 
-int	zbx_cassandra_connect(const char *host, const char *keyspace, int port);
+typedef struct
+{
+	char	*host;
+	int	port;
+}
+zbx_cassandra_host_t;
+
+typedef struct
+{
+	zbx_cassandra_host_t	*hosts;
+	int			count;
+}
+zbx_cassandra_hosts_t;
+
+void	zbx_cassandra_parse_hosts(char *hosts, zbx_cassandra_hosts_t *h);
+void	zbx_cassandra_connect(int flag, zbx_cassandra_hosts_t *h, const char *keyspace);
 void	zbx_cassandra_close();
 
 void	zbx_cassandra_add_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, const char *value);

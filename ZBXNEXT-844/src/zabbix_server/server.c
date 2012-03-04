@@ -188,9 +188,8 @@ int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600; /* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1; /* 1s */
 
 #ifdef HAVE_CASSANDRA
-char	*CONFIG_CASSANDRA_HOST		= NULL;
-int	CONFIG_CASSANDRA_PORT		= 0;
-char	*CONFIG_CASSANDRA_KEYSPACE	= NULL;
+zbx_cassandra_hosts_t	CONFIG_CASSANDRA_HOSTS;
+char			*CONFIG_CASSANDRA_KEYSPACE	= NULL;
 #endif
 
 /* Mutex for node syncs */
@@ -213,6 +212,10 @@ ZBX_MUTEX	node_sync_access;
  ******************************************************************************/
 static void	zbx_load_config()
 {
+#ifdef HAVE_CASSANDRA
+	static char	*config_cassandra_hosts = NULL;
+#endif
+
 	static struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
@@ -318,10 +321,8 @@ static void	zbx_load_config()
 		{"ProxyDataFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 #ifdef HAVE_CASSANDRA
-		{"CassandraHost",		&CONFIG_CASSANDRA_HOST,			TYPE_STRING,
+		{"CassandraHost",		&config_cassandra_hosts,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"CassandraPort",		&CONFIG_CASSANDRA_PORT,			TYPE_INT,
-			PARM_OPT,	1024,			65535},
 		{"CassandraKeyspace",		&CONFIG_CASSANDRA_KEYSPACE,		TYPE_STRING,
 			PARM_MAND,	0,			0},
 #endif
@@ -382,15 +383,10 @@ static void	zbx_load_config()
 		CONFIG_HOUSEKEEPER_FORKS = 0;
 
 #ifdef HAVE_CASSANDRA
-	if (NULL == CONFIG_CASSANDRA_HOST)
-	{
-		CONFIG_CASSANDRA_HOST = zbx_strdup(CONFIG_CASSANDRA_HOST, "localhost");
-	}
-
-	if (0 == CONFIG_CASSANDRA_PORT)
-	{
-		CONFIG_CASSANDRA_PORT = 9160;
-	}
+	if (NULL == config_cassandra_hosts)
+		config_cassandra_hosts = zbx_strdup(config_cassandra_hosts, "localhost");
+	zbx_cassandra_parse_hosts(config_cassandra_hosts, &CONFIG_CASSANDRA_HOSTS);
+	zbx_free(config_cassandra_hosts);
 #endif
 }
 
@@ -809,7 +805,7 @@ void	zbx_on_exit()
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 #ifdef HAVE_CASSANDRA
-	zbx_cassandra_connect(CONFIG_CASSANDRA_HOST, CONFIG_CASSANDRA_KEYSPACE, CONFIG_CASSANDRA_PORT);
+	zbx_cassandra_connect(ZBX_CASSANDRA_CONNECT_EXIT, &CONFIG_CASSANDRA_HOSTS, CONFIG_CASSANDRA_KEYSPACE);
 #endif
 	free_database_cache();
 	free_configuration_cache();
