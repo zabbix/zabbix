@@ -1199,26 +1199,22 @@ out:
 int	int_in_list(char *list, int value)
 {
 	const char	*__function_name = "int_in_list";
-	char		*start = NULL, *end = NULL;
-	int		i1,i2;
-	int		ret = FAIL;
-	char		c = '\0';
+	char		*start = NULL, *end = NULL, c = '\0';
+	int		i1, i2, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s', value:%d", list, value);
 
-	for (start = list; start[0] != '\0';)
+	for (start = list; '\0' != *start;)
 	{
-		end = strchr(start, ',');
-
-		if (NULL != end)
+		if (NULL != (end = strchr(start, ',')))
 		{
-			c = end[0];
-			end[0] = '\0';
+			c = *end;
+			*end = '\0';
 		}
 
-		if (sscanf(start, "%d-%d", &i1, &i2) == 2)
+		if (2 == sscanf(start, "%d-%d", &i1, &i2))
 		{
-			if (value >= i1 && value <= i2)
+			if (i1 <= value && value <= i2)
 			{
 				ret = SUCCEED;
 				break;
@@ -1235,17 +1231,15 @@ int	int_in_list(char *list, int value)
 
 		if (NULL != end)
 		{
-			end[0] = c;
-			start = end+1;
+			*end = c;
+			start = end + 1;
 		}
 		else
-		{
 			break;
-		}
 	}
 
 	if (NULL != end)
-		end[0] = c;
+		*end = c;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1270,30 +1264,30 @@ int	int_in_list(char *list, int value)
  ******************************************************************************/
 int	is_double_prefix(const char *c)
 {
-	int i;
-	int dot =- 1;
+	int	i, dot = -1;
 
-	for (i = 0; c[i] != 0; i++)
+	for (i = 0; '\0' != c[i]; i++)
 	{
 		/* negative number? */
-		if (c[i] == '-' && 0 == i)
+		if ('-' == c[i] && 0 == i)
 			continue;
 
-		if (c[i] >= '0' && c[i] <= '9')
+		if ('0' <= c[i] && c[i] <= '9')
 			continue;
 
-		if (c[i] == '.' && -1 == dot)
+		if ('.' == c[i] && -1 == dot)
 		{
 			dot = i;
 			continue;
 		}
 
 		/* last character is suffix 'K', 'M', 'G', 'T', 's', 'm', 'h', 'd', 'w' */
-		if (NULL != strchr("KMGTsmhdw", c[i]) && c[i+1] == '\0')
+		if (NULL != strchr("KMGTsmhdw", c[i]) && '\0' == c[i + 1])
 			continue;
 
 		return FAIL;
 	}
+
 	return SUCCEED;
 }
 
@@ -1313,42 +1307,39 @@ int	is_double_prefix(const char *c)
  ******************************************************************************/
 int	is_double(const char *c)
 {
-	int i;
-	int dot = -1;
-	int len;
+	int	i, dot = -1, len;
 
-	for (i = 0; c[i] == ' ' && c[i] != 0; i++);	/* trim left spaces */
+	for (i = 0; ' ' == c[i] && '\0' != c[i]; i++)	/* trim left spaces */
+		;
 
-	for (len = 0; c[i] != 0; i++, len++)
+	for (len = 0; '\0' != c[i]; i++, len++)
 	{
 		/* negative number? */
-		if (c[i] == '-' && i == 0)
+		if ('-' == c[i] && i == 0)
 			continue;
 
-		if (c[i] >= '0' && c[i] <= '9')
+		if ('0' <= c[i] && c[i] <= '9')
 			continue;
 
-		if (c[i] == '.' && dot == -1)
+		if ('.' == c[i] && dot == -1)
 		{
 			dot = i;
 			continue;
 		}
 
-		if (c[i] == ' ')	/* check right spaces */
+		if (' ' == c[i])	/* check right spaces */
 		{
-			for (; c[i] == ' ' && c[i] != 0; i++);	/* trim right spaces */
+			for (; ' ' == c[i] && '\0' == c[i]; i++)	/* trim right spaces */
+				;
 
-			if (c[i] == 0)
+			if ('\0' == c[i])
 				break;	/* SUCCEED */
 		}
 
 		return FAIL;
 	}
 
-	if (len <= 0)
-		return FAIL;
-
-	if (1 == len && -1 != dot)
+	if (0 >= len || (1 == len && -1 != dot))
 		return FAIL;
 
 	return SUCCEED;
@@ -1374,7 +1365,7 @@ int	is_uint_prefix(const char *c)
 {
 	int	i = 0;
 
-	while (c[i] == ' ')	/* trim left spaces */
+	while (' ' == c[i])	/* trim left spaces */
 		i++;
 
 	if (!isdigit(c[i]))
@@ -1384,13 +1375,13 @@ int	is_uint_prefix(const char *c)
 		i++;
 	while (isdigit(c[i]));
 
-	if (c[i] == 's' || c[i] == 'm' || c[i] == 'h' || c[i] == 'd' || c[i] == 'w')	/* check suffix */
+	if ('s' == c[i] || 'm' == c[i] || 'h' == c[i] || 'd' == c[i] || 'w' == c[i])	/* check suffix */
 		i++;
 
-	while (c[i] == ' ')	/* trim right spaces */
+	while (' ' == c[i])	/* trim right spaces */
 		i++;
 
-	return c[i] == '\0' ? SUCCEED : FAIL;
+	return '\0' == c[i] ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -1981,16 +1972,25 @@ int	str2uint(const char *str)
 	int	factor = 1;
 
 	/* trim right spaces */
-	while (str[sz] == ' ' && 0 < sz)
+	while (' ' == str[sz] && 0 < sz)
 		sz--;
 
 	switch (str[sz])
 	{
-		case 's': factor = 1;			break;
-		case 'm': factor = SEC_PER_MIN;		break;
-		case 'h': factor = SEC_PER_HOUR;	break;
-		case 'd': factor = SEC_PER_DAY;		break;
-		case 'w': factor = SEC_PER_WEEK;	break;
+		case 's':
+			break;
+		case 'm':
+			factor = SEC_PER_MIN;
+			break;
+		case 'h':
+			factor = SEC_PER_HOUR;
+			break;
+		case 'd':
+			factor = SEC_PER_DAY;
+			break;
+		case 'w':
+			factor = SEC_PER_WEEK;
+			break;
 	}
 
 	return atoi(str) * factor;
