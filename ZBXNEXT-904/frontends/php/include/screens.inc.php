@@ -1350,36 +1350,36 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 		}
 
 		if ($editmode == 1) {
-			$rmv_icon = new CImg('images/general/opened.gif', null, null, null, 'pointer');
+			$removeIcon = new CImg('images/general/opened.gif', null, null, null, 'pointer');
 			if ($empty_screen_row) {
-				$rmv_row_link = "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&rmv_row=$r';";
+				$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$screen['screenid'].'&rmv_row='.$r.'";';
 			}
 			else {
-				$rmv_row_link = "javascript: if (Confirm('"._('This screen-row is not empty').'. '._('Delete it?')."')) {".
-					" location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&rmv_row=$r';}";
+				$removeRowLink = 'javascript: if (Confirm("'._('This screen-row is not empty. Delete it?').'")) {'.
+					' location.href = "screenedit.php?screenid='.$screen['screenid'].'&rmv_row='.$r.'"; }';
 			}
-			$rmv_icon->addAction('onclick', $rmv_row_link);
-
-			array_push($new_cols, new CCol($rmv_icon));
+			$removeIcon->addAction('onclick', $removeRowLink);
+			array_push($new_cols, new CCol($removeIcon));
 		}
 		$table->addRow(new CRow($new_cols));
 	}
 
 	if ($editmode == 1) {
 		$add_icon = new CImg('images/general/closed.gif', null, null, null, 'pointer');
-		$add_icon->addAction('onclick', "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid'].'&add_row='.$screen['vsize']."';");
+		$add_icon->addAction('onclick', 'javascript: location.href = "screenedit.php?screenid='.$screen['screenid'].'&add_row='.$screen['vsize'].'";');
 		$new_cols = array(new CCol($add_icon));
+
 		for ($c = 0; $c < $screen['hsize']; $c++) {
-			$rmv_icon = new CImg('images/general/opened.gif', null, null, null, 'pointer');
+			$removeIcon = new CImg('images/general/opened.gif', null, null, null, 'pointer');
 			if (isset($empty_screen_col[$c])) {
-				$rmv_col_link = "javascript: if (Confirm('"._('This screen-column is not empty').'. '._('Delete it?')."')) {".
-					" location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&rmv_col=$c';}";
+				$removeColumnLink = 'javascript: if (Confirm("'._('This screen-column is not empty. Delete it?').'")) {'.
+					' location.href = "screenedit.php?screenid='.$screen['screenid'].'&rmv_col='.$c.'"; }';
 			}
 			else {
-				$rmv_col_link = "javascript: location.href = 'screenedit.php?config=1&screenid=".$screen['screenid']."&rmv_col=$c';";
+				$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1&screenid='.$screen['screenid'].'&rmv_col='.$c.'";';
 			}
-			$rmv_icon->addAction('onclick', $rmv_col_link);
-			array_push($new_cols, new CCol($rmv_icon));
+			$removeIcon->addAction('onclick', $removeColumnLink);
+			array_push($new_cols, new CCol($removeIcon));
 		}
 
 		array_push($new_cols, new CCol(new CImg('images/general/zero.gif', 'zero', 1, 1)));

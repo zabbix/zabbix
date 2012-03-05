@@ -115,8 +115,8 @@ if (!empty($_REQUEST['ajaxAction']) && $_REQUEST['ajaxAction'] == 'sw_pos') {
 		if ($fitem) {
 			DBexecute('UPDATE screens_items'.
 						' SET y='.$sw_pos[2].',x='.$sw_pos[3].
-						',colspan='.(isset($sitem['colspan']) ? $sitem['colspan'] : 0).
-						',rowspan='.(isset($sitem['rowspan']) ? $sitem['rowspan'] : 0).
+						',colspan='.(isset($sitem['colspan']) ? $sitem['colspan'] : 1).
+						',rowspan='.(isset($sitem['rowspan']) ? $sitem['rowspan'] : 1).
 						' WHERE y='.$sw_pos[0].
 							' AND x='.$sw_pos[1].
 							' AND screenid='.$screen['screenid'].
@@ -126,8 +126,8 @@ if (!empty($_REQUEST['ajaxAction']) && $_REQUEST['ajaxAction'] == 'sw_pos') {
 		if ($sitem) {
 			DBexecute('UPDATE screens_items '.
 						' SET y='.$sw_pos[0].',x='.$sw_pos[1].
-						',colspan='.(isset($fitem['colspan']) ? $fitem['colspan'] : 0).
-						',rowspan='.(isset($fitem['rowspan']) ? $fitem['rowspan'] : 0).
+						',colspan='.(isset($fitem['colspan']) ? $fitem['colspan'] : 1).
+						',rowspan='.(isset($fitem['rowspan']) ? $fitem['rowspan'] : 1).
 						' WHERE y='.$sw_pos[2].
 							' AND x='.$sw_pos[3].
 							' AND screenid='.$screen['screenid'].
