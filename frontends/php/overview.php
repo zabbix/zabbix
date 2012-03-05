@@ -114,7 +114,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(getSeverityCell($i), S_ENABLED));
 	}
 
-	$help_table->addRow(array(new CCol(SPACE, 'trigger_unknown'), S_UNKNOWN));
+	$help_table->addRow(array(new CCol(SPACE, 'trigger_unknown'), _('Unknown')));
 
 	if($_REQUEST['type']==SHOW_TRIGGERS){
 		// blinking preview in help popup (only if blinking is enabled)
@@ -132,12 +132,12 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 		$help_table->addRow(array(new CCol(SPACE), S_DISABLED.' '.S_OR.' '.S_NO_TRIGGER));
 	}
 
-	$help->setHint($help_table, '', '', true, true);
+	$help->setHint($help_table, '', '', true, false, true);
 
 	$over_wdgt = new CWidget();
 // Header
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, $help));
+	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, SPACE, $help));
 
 // 2nd header
 	$form_l = new CForm('get');

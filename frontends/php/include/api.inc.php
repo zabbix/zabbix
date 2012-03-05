@@ -84,15 +84,25 @@ class API {
 		self::$return = self::RETURN_TYPE_RPC;
 	}
 
-	private static function getAPIObject($className) {
-		$c = 'C'.$className;
-		if (!isset(self::$APIobjects[$className]))
-			self::$APIobjects[$className] = new $c;
+	public static function getApi($className = null) {
+		if ($className) {
+			$c = 'C'.$className;
+			if (!isset(self::$APIobjects[$className])) {
+				self::$APIobjects[$className] = new $c;
+			}
 
-		return self::$APIobjects[$className];
+			return self::$APIobjects[$className];
+		}
+		else {
+			if (!isset(self::$APIobjects[0])) {
+				self::$APIobjects[0] = new CZBXAPI();
+			}
+
+			return self::$APIobjects[0];
+		}
 	}
 
-	private static function getRPCObject($className) {
+	private static function getRpc($className) {
 		if (!isset(self::$RPCobjects[$className]))
 			self::$RPCobjects[$className] = new CAPIObject($className);
 
@@ -100,131 +110,131 @@ class API {
 	}
 
 	public static function getObject($className) {
-		return self::$return == self::RETURN_TYPE_API ? self::getAPIObject($className) : self::getRPCObject($className);
+		return self::$return == self::RETURN_TYPE_API ? self::getApi($className) : self::getRpc($className);
 	}
 
-/**
- * @return CAction
- */
+	/**
+	 * @return CAction
+	 */
 	public static function Action() {
 		return self::getObject('action');
 	}
 
-/**
- * @return CAlert
- */
+	/**
+	 * @return CAlert
+	 */
 	public static function Alert() {
 		return self::getObject('alert');
 	}
 
-/**
- * @return CAPIInfo
- */
+	/**
+	 * @return CAPIInfo
+	 */
 	public static function APIInfo() {
 		return self::getObject('apiinfo');
 	}
 
-/**
- * @return CApplication
- */
+	/**
+	 * @return CApplication
+	 */
 	public static function Application() {
 		return self::getObject('application');
 	}
 
-/**
- * @return CDCheck
- */
+	/**
+	 * @return CDCheck
+	 */
 	public static function DCheck() {
 		return self::getObject('dcheck');
 	}
 
-/**
- * @return CDHost
- */
+	/**
+	 * @return CDHost
+	 */
 	public static function DHost() {
 		return self::getObject('dhost');
 	}
 
-/**
- * @return CDiscoveryRule
- */
+	/**
+	 * @return CDiscoveryRule
+	 */
 	public static function DiscoveryRule() {
 		return self::getObject('discoveryrule');
 	}
 
-/**
- * @return CDRule
- */
+	/**
+	 * @return CDRule
+	 */
 	public static function DRule() {
 		return self::getObject('drule');
 	}
 
-/**
- * @return CDService
- */
+	/**
+	 * @return CDService
+	 */
 	public static function DService() {
 		return self::getObject('dservice');
 	}
 
-/**
- * @return CEvent
- */
+	/**
+	 * @return CEvent
+	 */
 	public static function Event() {
 		return self::getObject('event');
 	}
 
-/**
- * @return CGraph
- */
+	/**
+	 * @return CGraph
+	 */
 	public static function Graph() {
 		return self::getObject('graph');
 	}
 
-/**
- * @return CGraphItem
- */
+	/**
+	 * @return CGraphItem
+	 */
 	public static function GraphItem() {
 		return self::getObject('graphitem');
 	}
 
-/**
- * @return CGraphPrototype
- */
+	/**
+	 * @return CGraphPrototype
+	 */
 	public static function GraphPrototype() {
 		return self::getObject('graphprototype');
 	}
 
-/**
- * @return CHistory
- */
+	/**
+	 * @return CHistory
+	 */
 	public static function History() {
 		return self::getObject('history');
 	}
 
-/**
- * @return CHost
- */
+	/**
+	 * @return CHost
+	 */
 	public static function Host() {
 		return self::getObject('host');
 	}
 
-/**
- * @return CHostGroup
- */
+	/**
+	 * @return CHostGroup
+	 */
 	public static function HostGroup() {
 		return self::getObject('hostgroup');
 	}
 
-/**
- * @return CHostInterface
- */
+	/**
+	 * @return CHostInterface
+	 */
 	public static function HostInterface() {
 		return self::getObject('hostinterface');
 	}
 
-/**
- * @return CImage
- */
+	/**
+	 * @return CImage
+	 */
 	public static function Image() {
 		return self::getObject('image');
 	}
@@ -236,137 +246,137 @@ class API {
 		return self::getObject('iconmap');
 	}
 
-/**
- * @return CItem
- */
+	/**
+	 * @return CItem
+	 */
 	public static function Item() {
 		return self::getObject('item');
 	}
-/**
- * @return CItemPrototype
- */
+
+	/**
+	 * @return CItemPrototype
+	 */
 	public static function ItemPrototype() {
 		return self::getObject('itemprototype');
 	}
 
-/**
- * @return CMaintenance
- */
+	/**
+	 * @return CMaintenance
+	 */
 	public static function Maintenance() {
 		return self::getObject('maintenance');
 	}
 
-/**
- * @return CMap
- */
+	/**
+	 * @return CMap
+	 */
 	public static function Map() {
 		return self::getObject('map');
 	}
 
-/**
- * @return CMediaType
- */
+	/**
+	 * @return CMediaType
+	 */
 	public static function MediaType() {
 		return self::getObject('mediatype');
 	}
 
-/**
- * @return CProxy
- */
+	/**
+	 * @return CProxy
+	 */
 	public static function Proxy() {
 		return self::getObject('proxy');
 	}
 
-/**
- * @return CScreen
- */
+	/**
+	 * @return CScreen
+	 */
 	public static function Screen() {
 		return self::getObject('screen');
 	}
 
-/**
- * @return CScreenItem
- */
+	/**
+	 * @return CScreenItem
+	 */
 	public static function ScreenItem() {
 		return self::getObject('screenitem');
 	}
 
-/**
- * @return CScript
- */
+	/**
+	 * @return CScript
+	 */
 	public static function Script() {
 		return self::getObject('script');
 	}
 
-/**
- * @return CTemplate
- */
+	/**
+	 * @return CTemplate
+	 */
 	public static function Template() {
 		return self::getObject('template');
 	}
 
-/**
- * @return CTemplateScreen
- */
+	/**
+	 * @return CTemplateScreen
+	 */
 	public static function TemplateScreen() {
 		return self::getObject('templatescreen');
 	}
 
-/**
- * @return CTrigger
- */
+	/**
+	 * @return CTrigger
+	 */
 	public static function Trigger() {
 		return self::getObject('trigger');
 	}
 
-/**
- * @return CTriggerExpression
- */
+	/**
+	 * @return CTriggerExpression
+	 */
 	public static function TriggerExpression() {
 		return self::getObject('triggerexpression');
 	}
 
-/**
- * @return CTriggerPrototype
- */
+	/**
+	 * @return CTriggerPrototype
+	 */
 	public static function TriggerPrototype() {
 		return self::getObject('triggerprototype');
 	}
 
-/**
- * @return CUser
- */
+	/**
+	 * @return CUser
+	 */
 	public static function User() {
 		return self::getObject('user');
 	}
 
-/**
- * @return CUserGroup
- */
+	/**
+	 * @return CUserGroup
+	 */
 	public static function UserGroup() {
 		return self::getObject('usergroup');
 	}
 
-/**
- * @return CUserMacro
- */
+	/**
+	 * @return CUserMacro
+	 */
 	public static function UserMacro() {
 		return self::getObject('usermacro');
 	}
 
-/**
- * @return CUserMedia
- */
+	/**
+	 * @return CUserMedia
+	 */
 	public static function UserMedia() {
 		return self::getObject('usermedia');
 	}
 
-/**
- * @return CWebCheck
- */
+	/**
+	 * @return CWebCheck
+	 */
 	public static function WebCheck() {
 		return self::getObject('webcheck');
 	}
 }
-
 ?>

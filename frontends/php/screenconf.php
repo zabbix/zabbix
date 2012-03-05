@@ -25,358 +25,312 @@ require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
 
-if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['screens'])){
-	$EXPORT_DATA = true;
+if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['screens'])) {
+	$isExportData = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_screens_export.xml';
 
 	require_once dirname(__FILE__).'/include/export.inc.php';
 }
-else{
-	$EXPORT_DATA = false;
+else {
+	$isExportData = false;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = 'S_CONFIGURATION_OF_SCREENS';
+	$page['title'] = _('Configuration of screens');
 	$page['file'] = 'screenconf.php';
 	$page['hist_arg'] = array('templateid');
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-?>
-<?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'screens'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'screens' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
+	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+	'templateid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
+	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})'),
+	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})'),
+	'vsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})'),
+	// actions
+	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
+	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
+	// import
+	'rules' =>			array(T_ZBX_STR, O_OPT, null,	DB_ID,			null),
+	'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null)
+);
+check_fields($fields);
+validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
-		'screenid'=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'templateid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
-		'name'=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,		'isset({save})'),
-		'hsize'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'isset({save})'),
-		'vsize'=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'isset({save})'),
+CProfile::update('web.screenconf.config', get_request('config', 0), PROFILE_TYPE_INT);
+$_REQUEST['go'] = get_request('go', 'none');
 
-// actions
-		'go'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),
-		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+/*
+ * Permissions
+ */
+if (isset($_REQUEST['screenid'])) {
+	$options = array(
+		'screenids' => $_REQUEST['screenid'],
+		'editable' => true,
+		'output' => API_OUTPUT_EXTEND,
+		'selectScreenItems' => API_OUTPUT_EXTEND
+	);
+	if (isset($_REQUEST['templateid'])) {
+		$screens = API::TemplateScreen()->get($options);
+	}
+	else {
+		$screens = API::Screen()->get($options);
+	}
 
-// Import
-		'rules' =>			array(T_ZBX_STR, O_OPT,	null,	DB_ID,		null),
-		'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL)
+	if (empty($screens)) {
+		if (empty($screens)) {
+			access_deny();
+		}
+	}
+}
+
+/*
+ * Export/Import
+ */
+if ($isExportData) {
+	$screens = API::Screen()->get(array(
+		'screenids' => get_request('screens', array()),
+		'selectScreenItems' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_EXTEND
+	));
+	prepareScreenExport($screens);
+
+	$xml = zbxXML::arrayToXML(array('screens' => $screens));
+
+	echo $xml;
+	exit();
+}
+
+$rules = get_request('rules', array());
+if (!isset($_FILES['import_file'])) {
+	$rules['screen']['exist'] = 1;
+	$rules['screen']['missed'] = 1;
+}
+if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
+	require_once dirname(__FILE__).'include/export.inc.php';
+
+	DBstart();
+
+	$result = zbxXML::import($_FILES['import_file']['tmp_name']);
+	if ($result) {
+		$result = zbxXML::parseScreen($rules);
+	}
+	$result = DBend($result);
+	show_messages($result, _('Imported successfully'), _('Import failed'));
+}
+
+/*
+ * Actions
+ */
+if (isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])) {
+	unset($_REQUEST['screenid']);
+	$_REQUEST['form'] = 'clone';
+}
+elseif (isset($_REQUEST['save'])) {
+	if (isset($_REQUEST['screenid'])) {
+		$screen = array(
+			'screenid' => $_REQUEST['screenid'],
+			'name' => $_REQUEST['name'],
+			'hsize' => $_REQUEST['hsize'],
+			'vsize' => $_REQUEST['vsize'],
+			'templateid' => get_request('templateid', 0)
+		);
+		if (isset($_REQUEST['templateid'])) {
+			$screenOld = API::TemplateScreen()->get(array(
+				'screenids' => $_REQUEST['screenid'],
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true
+			));
+			$screenOld = reset($screenOld);
+
+			$screenids = API::TemplateScreen()->update($screen);
+		}
+		else {
+			$screenOld = API::Screen()->get(array(
+				'screenids' => $_REQUEST['screenid'],
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true
+			));
+			$screenOld = reset($screenOld);
+
+			$screenids = API::Screen()->update($screen);
+		}
+
+		if (!empty($screenids)) {
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'screens', $screenOld, $screen);
+		}
+		show_messages(!empty($screenids), _('Screen updated'), _('Cannot update screen'));
+	}
+	else {
+		if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
+			access_deny();
+		}
+
+		$screen = array(
+			'name' => $_REQUEST['name'],
+			'hsize' => $_REQUEST['hsize'],
+			'vsize' => $_REQUEST['vsize'],
+			'templateid' => get_request('templateid')
+		);
+		if (isset($_REQUEST['templateid'])) {
+			$screenids = API::TemplateScreen()->create($screen);
+		}
+		else {
+			$screenids = API::Screen()->create($screen);
+		}
+
+		if (!empty($screenids)) {
+			$screenid = reset($screenids);
+			$screenid = reset($screenid);
+			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCREEN, $screenid, $screen['name']);
+		}
+		show_messages(!empty($screenids), _('Screen added'), _('Cannot add screen'));
+	}
+
+	if (!empty($screenids)) {
+		unset($_REQUEST['form'], $_REQUEST['screenid']);
+	}
+}
+elseif (isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || $_REQUEST['go'] == 'delete') {
+	$screenids = get_request('screens', array());
+	if (isset($_REQUEST['screenid'])) {
+		$screenids[] = $_REQUEST['screenid'];
+	}
+
+	$screens = API::Screen()->get(array(
+		'screenids' => $screenids,
+		'output' => API_OUTPUT_EXTEND,
+		'editable' => true
+	));
+
+	if (!empty($screens)) {
+		$go_result = API::Screen()->delete($screenids);
+
+		if ($go_result) {
+			foreach ($screens as $screen) {
+				add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name']);
+			}
+		}
+	}
+	else {
+		$go_result = API::TemplateScreen()->delete($screenids);
+
+		if ($go_result) {
+			$templatedScreens = API::TemplateScreen()->get(array(
+				'screenids' => $screenids,
+				'output' => API_OUTPUT_EXTEND,
+				'editable' => true
+			));
+
+			foreach ($templatedScreens as $screen) {
+				add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name']);
+			}
+		}
+	}
+
+	if ($go_result) {
+		unset($_REQUEST['screenid'], $_REQUEST['form']);
+	}
+
+	show_messages($go_result, _('Screen deleted'), _('Cannot delete screen'));
+}
+if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
+	$url = new CUrl();
+	$path = $url->getPath();
+	insert_js('cookie.eraseArray("'.$path.'")');
+}
+
+/*
+ * Display
+ */
+if (isset($_REQUEST['form'])) {
+	if ($_REQUEST['form'] == _('Import screen')) {
+		$screenWidget = new CWidget();
+		$screenWidget->addPageHeader(_('CONFIGURATION OF SCREENS'));
+		$screenWidget->addItem(import_screen_form($rules));
+		$screenWidget->show();
+	}
+	elseif ($_REQUEST['form'] == _('Create screen') || $_REQUEST['form'] == 'update' || $_REQUEST['form'] == 'clone') {
+		$data = array(
+			'form' => get_request('form', null),
+			'screenid' => get_request('screenid', null),
+			'templateid' => get_request('templateid', null)
+		);
+
+		// screen
+		if (!empty($data['screenid'])) {
+			$options = array(
+				'screenids' => $data['screenid'],
+				'editable' => true,
+				'output' => API_OUTPUT_EXTEND
+			);
+			if (!empty($data['templateid'])) {
+				$screens = API::TemplateScreen()->get($options);
+			}
+			else {
+				$screens = API::Screen()->get($options);
+			}
+			$data['screen'] = reset($screens);
+		}
+
+		if (!empty($data['screenid']) && !isset($_REQUEST['form_refresh'])) {
+			$data['name'] = $data['screen']['name'];
+			$data['hsize'] = $data['screen']['hsize'];
+			$data['vsize'] = $data['screen']['vsize'];
+			$data['templateid'] = !empty($data['screen']['templateid']) ? $data['screen']['templateid'] : null;
+		}
+		else {
+			$data['name'] = get_request('name', '');
+			$data['hsize'] = get_request('hsize', 1);
+			$data['vsize'] = get_request('vsize', 1);
+		}
+
+		// render view
+		$screenView = new CView('configuration.screen.edit', $data);
+		$screenView->render();
+		$screenView->show();
+	}
+}
+else {
+	$data = array(
+		'templateid' => get_request('templateid', null)
 	);
 
-	check_fields($fields);
-	validate_sort_and_sortorder('name', ZBX_SORT_UP);
-
-	$config_scr = $_REQUEST['config'] = get_request('config', 0);
-
-	CProfile::update('web.screenconf.config', $_REQUEST['config'],PROFILE_TYPE_INT);
-
-	if(isset($_REQUEST['screenid'])){
-		$options = array(
-			'screenids' => $_REQUEST['screenid'],
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'selectScreenItems' => API_OUTPUT_EXTEND
-		);
-		if(isset($_REQUEST['templateid']))
-			$screens = API::TemplateScreen()->get($options);
-		else
-			$screens = API::Screen()->get($options);
-
-		if(empty($screens)){
-			if(empty($screens)) access_deny();
-		}
+	$sortfield = getPageSortField('name');
+	$options = array(
+		'editable' => true,
+		'output' => API_OUTPUT_EXTEND,
+		'templateids' => $data['templateid'],
+		'sortfield' => $sortfield,
+		'limit' => $config['search_limit']
+	);
+	if (!empty($data['templateid'])) {
+		$data['screens'] = API::TemplateScreen()->get($options);
 	}
-?>
-<?php
-// EXPORT ///////////////////////////////////
-	if($EXPORT_DATA){
-		$screens = get_request('screens', array());
-
-		$options = array(
-			'screenids' => $screens,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
-		);
-		$screens = API::Screen()->get($options);
-
-		prepareScreenExport($screens);
-
-		$xml = zbxXML::arrayToXML(array('screens' => $screens));
-		print($xml);
-
-		exit();
+	else {
+		$data['screens'] = API::Screen()->get($options);
 	}
+	order_result($data['screens'], $sortfield, getPageSortOrder());
 
-// IMPORT ///////////////////////////////////
-	$rules = get_request('rules', array());
-	if(!isset($_FILES['import_file'])){
-		foreach(array('screen') as $key){
-			$rules[$key]['exist'] = 1;
-			$rules[$key]['missed'] = 1;
-		}
-	}
+	// paging
+	$data['paging'] = getPagingLine($data['screens']);
 
 
-	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
-		require_once dirname(__FILE__).'/include/export.inc.php';
-		DBstart();
-
-		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		if($result) $result = zbxXML::parseScreen($rules);
-
-		$result = DBend($result);
-		show_messages($result, _('Imported successfully'), _('Import failed'));
-	}
-
-?>
-<?php
-	$_REQUEST['go'] = get_request('go', 'none');
-
-	if(isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])){
-		unset($_REQUEST['screenid']);
-		$_REQUEST['form'] = 'clone';
-	}
-	else if(isset($_REQUEST['save'])){
-		if(isset($_REQUEST['screenid'])){
-			$screen = array(
-				'screenid' => $_REQUEST['screenid'],
-				'name' => $_REQUEST['name'],
-				'hsize' => $_REQUEST['hsize'],
-				'vsize' => $_REQUEST['vsize'],
-				'templateid' => get_request('templateid')
-			);
-			if(isset($_REQUEST['templateid']))
-				$result = API::TemplateScreen()->update($screen);
-			else
-				$result = API::Screen()->update($screen);
-
-			$audit_action = AUDIT_ACTION_UPDATE;
-			show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
-		}
-		else{
-			if(!count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_RES_IDS_ARRAY)))
-				access_deny();
-
-			$screen = array(
-				'name' => $_REQUEST['name'],
-				'hsize' => $_REQUEST['hsize'],
-				'vsize' => $_REQUEST['vsize'],
-				'templateid' => get_request('templateid')
-			);
-
-			if(isset($_REQUEST['templateid']))
-				$result = API::TemplateScreen()->create($screen);
-			else
-				$result = API::Screen()->create($screen);
-
-			$audit_action = AUDIT_ACTION_ADD;
-			show_messages($result, S_SCREEN_ADDED, S_CANNOT_ADD_SCREEN);
-		}
-		if($result){
-			add_audit($audit_action,AUDIT_RESOURCE_SCREEN,' Name ['.$_REQUEST['name'].'] ');
-			unset($_REQUEST['form']);
-			unset($_REQUEST['screenid']);
-		}
-	}
-	else if(isset($_REQUEST['delete']) && isset($_REQUEST['screenid']) || ($_REQUEST['go'] == 'delete')){
-		$screenids = get_request('screens', array());
-		if(isset($_REQUEST['screenid'])){
-			$screenids[] = $_REQUEST['screenid'];
-		}
-
-		$options = array(
-			'screenids' => $screenids,
-			'output' => API_OUTPUT_EXTEND,
-			'editable => 1'
-		);
-
-		$screens = API::Screen()->get($options);
-		$templatedScreens = API::TemplateScreen()->get($options);
-
-		if(!empty($screens))
-			$go_result = API::Screen()->delete($screenids);
-		else
-			$go_result = API::TemplateScreen()->delete($screenids);
-
-		if($go_result){
-			unset($_REQUEST['screenid'], $_REQUEST['form']);
-			foreach($screens as $screen){
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCREEN,
-					$screen['screenid'],
-					$screen['name'],
-					null,null,null);
-			}
-		}
-
-		show_messages($go_result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
-	}
-
-	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
-		$url = new CUrl();
-		$path = $url->getPath();
-		insert_js('cookie.eraseArray("'.$path.'")');
-	}
-?>
-<?php
-	$templateid = get_request('templateid', null);
-
-	$form = new CForm('get');
-
-	$form->addItem(new CSubmit('form', S_CREATE_SCREEN));
-	if($templateid){
-		$form->addVar('templateid', $templateid);
-	}
-	else{
-		$form->addItem(new CSubmit('form', S_IMPORT_SCREEN));
-	}
-
-
-	$screen_wdgt = new CWidget();
-	$screen_wdgt->addPageHeader(S_CONFIGURATION_OF_SCREENS_BIG, $form);
-
-	if(isset($_REQUEST['form'])){
-		if($_REQUEST['form'] == S_IMPORT_SCREEN)
-			$screen_wdgt->addItem(import_screen_form($rules));
-		else if(($_REQUEST['form'] == S_CREATE_SCREEN) || ($_REQUEST['form'] == 'update')){
-			$frmScr = new CFormTable();
-
-			if(isset($_REQUEST['screenid'])){
-				$options = array(
-					'screenids' => $_REQUEST['screenid'],
-					'editable' => 1,
-					'output' => API_OUTPUT_EXTEND
-				);
-				if(isset($_REQUEST['templateid']))
-					$screens = API::TemplateScreen()->get($options);
-				else
-					$screens = API::Screen()->get($options);
-
-				$screen = reset($screens);
-
-				$frmScr->setTitle(S_SCREEN.' "'.$screen['name'].'"');
-				$frmScr->addVar('screenid',$_REQUEST['screenid']);
-			}
-			else{
-				$frmScr->setTitle(S_SCREEN);
-			}
-
-
-			if(isset($_REQUEST['screenid']) && !isset($_REQUEST['form_refresh'])){
-				$name = $screen['name'];
-				$hsize = $screen['hsize'];
-				$vsize = $screen['vsize'];
-
-				$templateid = ($screen['templateid'] > 0) ? $screen['templateid'] : null;
-			}
-			else{
-				$name = get_request('name', '');
-				$hsize = get_request('hsize', 1);
-				$vsize = get_request('bsize', 1);
-
-				$templateid = get_request('templateid');
-			}
-
-			$frmScr->addVar('templateid', $templateid);
-
-			$frmScr->addRow(S_NAME, new CTextBox('name', $name, 32));
-			$frmScr->addRow(S_COLUMNS, new CNumericBox('hsize', $hsize, 3));
-			$frmScr->addRow(S_ROWS, new CNumericBox('vsize', $vsize, 3));
-
-
-			$frmScr->addItemToBottomRow(new CSubmit('save', S_SAVE));
-			if(isset($_REQUEST['screenid'])){
-				/* $frmScr->addItemToBottomRow(SPACE);
-				$frmScr->addItemToBottomRow(new CSubmit('clone',S_CLONE)); !!! TODO */
-				$frmScr->addItemToBottomRow(array(SPACE, new CButtonDelete(S_DELETE_SCREEN_Q, url_param('form').url_param('screenid'))));
-			}
-			$frmScr->addItemToBottomRow(array(SPACE, new CButtonCancel(url_param('templateid'))));
-
-			$screen_wdgt->addItem($frmScr);
-		}
-	}
-	else{
-		$form = new CForm();
-		$form->setName('frm_screens');
-
-		$numrows = new CDiv();
-		$numrows->setAttribute('name', 'numrows');
-
-		$screen_wdgt->addHeader(_('SCREENS'));
-		$screen_wdgt->addHeader($numrows);
-
-		if($templateid){
-			$screen_wdgt->addItem(get_header_host_table($templateid, 'screens'));
-		}
-
-		$table = new CTableInfo(_('No screens defined.'));
-		$table->setHeader(array(
-			new CCheckBox('all_screens', NULL, "checkAll('".$form->getName()."','all_screens','screens');"),
-			make_sorting_header(S_NAME, 'name'),
-			S_DIMENSION_COLS_ROWS,
-			S_SCREEN
-		));
-
-		$sortfield = getPageSortField('name');
-		$sortorder = getPageSortOrder();
-		$options = array(
-			'editable' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'templateids' => $templateid,
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
-		);
-		if($templateid)
-			$screens = API::TemplateScreen()->get($options);
-		else
-			$screens = API::Screen()->get($options);
-
-		$paging = getPagingLine($screens);
-
-		foreach($screens as $num => $screen){
-			$table->addRow(array(
-				new CCheckBox('screens['.$screen['screenid'].']', NULL, NULL, $screen['screenid']),
-				new CLink($screen['name'],'screenedit.php?screenid='.$screen['screenid'].url_param('templateid')),
-				$screen['hsize'].' x '.$screen['vsize'],
-				new CLink(S_EDIT,'?form=update&screenid='.$screen['screenid'].url_param('templateid'))
-			));
-		}
-
-//goBox
-		$goBox = new CComboBox('go');
-		if(!$templateid){
-			$goBox->addItem('export', S_EXPORT_SELECTED);
-		}
-
-		$goOption = new CComboItem('delete', _('Delete selected'));
-		$goOption->setAttribute('confirm', _('Delete selected screens?'));
-		$goBox->addItem($goOption);
-
-		// goButton name is necessary!!!
-		$goButton = new CSubmit('goButton', S_GO);
-		$goButton->setAttribute('id', 'goButton');
-
-		zbx_add_post_js('chkbxRange.pageGoName = "screens";');
-//---------
-		$footer = get_table_header(array($goBox, $goButton));
-
-		$table = array($paging, $table, $paging, $footer);
-		$form->addItem($table);
-
-		$screen_wdgt->addItem($form);
-	}
-
-	$screen_wdgt->show();
-?>
-<?php
+	// render view
+	$screenView = new CView('configuration.screen.list', $data);
+	$screenView->render();
+	$screenView->show();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
 ?>

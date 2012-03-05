@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
 $maintenanceWidget = new CWidget();
 
 // create new maintenance button
@@ -81,6 +80,7 @@ $goOption->setAttribute('confirm', _('Delete selected maintenance periods?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
 
 // append table to form
 $maintenanceForm->addItem(array($this->data['paging'], $maintenanceTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

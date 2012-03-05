@@ -109,6 +109,7 @@ function init_nodes() {
 
 function get_current_nodeid($force_all_nodes = null, $perm = null) {
 	global $ZBX_CURRENT_NODEID, $ZBX_AVAILABLE_NODES, $ZBX_VIEWED_NODES;
+
 	if (!isset($ZBX_CURRENT_NODEID)) {
 		init_nodes();
 	}
@@ -210,6 +211,7 @@ function getNodeIdByNodeName($nodeName) {
 
 function is_show_all_nodes() {
 	global $ZBX_VIEWED_NODES;
+
 	return ZBX_DISTRIBUTED && $ZBX_VIEWED_NODES['selected'] == 0;
 }
 
@@ -258,7 +260,7 @@ function add_node($new_nodeid, $name, $ip, $port, $node_type, $masterid) {
 	global $ZBX_LOCMASTERID, $ZBX_LOCALNODEID;
 
 	if (!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name)) {
-		error(_('Incorrect characters used for Node name'));
+		error(_('Incorrect characters used for Node name.'));
 		return false;
 	}
 
@@ -269,17 +271,17 @@ function add_node($new_nodeid, $name, $ip, $port, $node_type, $masterid) {
 		case ZBX_NODE_MASTER:
 			$masterid = 0;
 			if ($ZBX_LOCMASTERID) {
-				error(_('Master node already exists'));
+				error(_('Master node already exists.'));
 				return false;
 			}
 			break;
 		default:
-			error(_('Incorrect node type'));
+			error(_('Incorrect node type.'));
 			return false;
 	}
 
 	if (DBfetch(DBselect('SELECT n.nodeid FROM nodes n WHERE n.nodeid='.$new_nodeid))) {
-		error(_('Node with same ID already exists'));
+		error(_('Node with same ID already exists.'));
 		return false;
 	}
 
@@ -297,7 +299,7 @@ function add_node($new_nodeid, $name, $ip, $port, $node_type, $masterid) {
 
 function update_node($nodeid, $name, $ip, $port) {
 	if (!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name)) {
-		error(_('Incorrect characters used for Node name'));
+		error(_('Incorrect characters used for Node name.'));
 		return false;
 	}
 	return DBexecute('UPDATE nodes SET name='.zbx_dbstr($name).',ip='.zbx_dbstr($ip).',port='.$port.' WHERE nodeid='.$nodeid);
@@ -309,14 +311,14 @@ function delete_node($nodeid) {
 	$node_type = detect_node_type($node_data['nodeid'], $node_data['masterid']);
 
 	if ($node_type == ZBX_NODE_LOCAL) {
-		error(_('Unable to remove local node'));
+		error(_('Unable to remove local node.'));
 	}
 	else {
 		$result = (
 			DBexecute('update nodes set masterid=NULL where masterid='.$nodeid) &&
 			DBexecute('delete from nodes where nodeid='.$nodeid)
 		);
-		error(_('Please be aware that database still contains data related to the deleted node'));
+		error(_('Please be aware that database still contains data related to the deleted node.'));
 	}
 	return $result;
 }
