@@ -490,32 +490,31 @@ class CAlert extends CZBXAPI {
 			return array('alertids'=>$alertids);
 	}
 
-/**
- * Delete alerts
- *
- * @param array $alertids
- * @return boolean
- */
+	/**
+	 * Delete alerts
+	 *
+	 * @param array $alertids
+	 * @return boolean
+	 */
 	public function delete($alertids) {
-
-			$options = array(
+		$delAlerts = $this->get(array(
 			'alertids' => zbx_objectValues($alerts, 'alertid'),
-			'editable' => 1,
+			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1
-			);
-			$delAlerts = $this->get($options);
-			foreach ($alertids as $snum => $alertid) {
-				if (!isset($delAlerts[$alertid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
-				}
+			'preservekeys' => true
+		));
+
+		foreach ($alertids as $alertid) {
+			if (!isset($delAlerts[$alertid])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
+		}
 
-			$sql = 'DELETE FROM alerts WHERE '.DBcondition('alertid', $alertids);
-			if (!DBexecute($sql))
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		if (!DBexecute('DELETE FROM alerts WHERE '.DBcondition('alertid', $alertids))) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		}
 
-			return array('alertids'=> $alertids);
+		return array('alertids' => $alertids);
 	}
 }
 ?>

@@ -129,7 +129,7 @@
 				$status['skip'] = true;
 			}
 			else if($httptest_data['curstep'] < ($httpstep_data['no'])){
-				$status['msg'] = S_UNKNOWN;
+				$status['msg'] = _('Unknown');
 				$status['style'] = 'unknown';
 				$status['skip'] = true;
 			}
@@ -142,14 +142,14 @@
 					//$status['skip'] = true;
 				}
 				else if($httptest_data['lastfailedstep'] < ($httpstep_data['no'])){
-					$status['msg'] = S_UNKNOWN;
+					$status['msg'] = _('Unknown');
 					$status['style'] = 'unknown';
 					$status['skip'] = true;
 				}
 			}
 		}
 		else{
-			$status['msg'] = S_UNKNOWN;
+			$status['msg'] = _('Unknown');
 			$status['style'] = 'unknown';
 			$status['skip'] = true;
 		}
@@ -199,7 +199,7 @@
 		$status['style'] = 'unknown';
 	}
 	else if ( HTTPTEST_STATE_UNKNOWN == $httptest_data['curstate'] ){
-		$status['msg'] = S_UNKNOWN;
+		$status['msg'] = _('Unknown');
 		$status['style'] = 'unknown';
 	}
 	else if($httptest_data['lastfailedstep'] > 0){

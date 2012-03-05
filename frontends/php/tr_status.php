@@ -190,7 +190,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$tr_select = new CComboBox('show_triggers', $show_triggers);
 	$tr_select->addItem(TRIGGERS_OPTION_ALL, S_ANY);
-	$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, S_PROBLEM);
+	$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
 	$filterForm->addRow(S_TRIGGERS_STATUS, $tr_select);
 
 	if($config['event_ack_enable']){

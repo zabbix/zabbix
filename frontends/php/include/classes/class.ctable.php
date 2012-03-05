@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CTable extends CTag {
+
 	public $headerClass;
 	public $footerClass;
 	protected $oddRowClass;

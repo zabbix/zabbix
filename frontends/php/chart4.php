@@ -136,8 +136,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	for($i=1;$i<=$weeks;$i++){
 		$x1=(900/52)*$sizeX*($i-1-$minX)/($maxX-$minX);
 
-//		imagefilledrectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,imagecolorallocate($im,0,0,0)); 	// WHITE
-
 		$yt=$sizeY*$true[$i-1]/100;
 		if($yt > 0) imagefilledrectangle($im, $x1+$shiftX, $shiftYup, $x1+$shiftX+8, $yt+$shiftYup, imagecolorallocate($im, 235, 120, 120));	// RED
 
@@ -157,16 +155,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,imagecolorallocate($im,120,235,120));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
 	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*0+45, $black, S_OK." (%)");
-	//imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+35, S_OK." (%)", $black);
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,imagecolorallocate($im,235,120,120));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
-	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*1+45, $black, S_PROBLEMS." (%)");
-	//imagestring($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, S_PROBLEMS." (%)", $black);
+	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*1+45, $black, _('Problems')." (%)");
 
 	imagefilledrectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,imagecolorallocate($im,220,220,220));
 	imagerectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$black);
-	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*2+45, $black, S_UNKNOWN." (%)");
+	imageText($im, 8, 0, $shiftX+9, $sizeY+$shiftYup+15*2+45, $black, _('Unknown')." (%)");
 
 	imagestringup($im, 0, imagesx($im)-10, imagesy($im)-50, 'http://www.zabbix.com', $gray);
 

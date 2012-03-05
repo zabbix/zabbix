@@ -56,9 +56,7 @@
 	'S_ELEMENT'=>				_('Element'),
 	'S_IMPORT_FILE'=>			_('Import file'),
 	'S_IMPORT'=>				_('Import'),
-	'S_EXPORT_SELECTED'=>		_('Export selected'),
 	'S_PREVIEW'=>				_('Preview'),
-	'S_NO_DATA_SMALL'=>			_('no data'),
 	'S_RULES'=>				_('Rules'),
 
 //	export.inc.php
@@ -86,7 +84,6 @@
 	'S_CANNOT_ADD_NODE'=>			_('Cannot add node'),
 	'S_NODE_DELETED'=>			_('Node deleted'),
 	'S_CANNOT_DELETE_NODE'=>		_('Cannot delete node'),
-	'S_SELECT_NODES'=>			_('Select Nodes'),
 
 //	acknow.php
 	'S_BULK_ACKNOWLEDGE'=>			_('Bulk acknowledge'),
@@ -163,7 +160,6 @@
 //	graph.php
 	'S_GRAPHS_COPIED'=>			_('Graphs copied'),
 	'S_CANNOT_COPY_GRAPHS'=>	_('Cannot copy graphs'),
-	'S_PARAMETER'=>				_('Parameter'),
 	'S_COLOR'=>					_('Colour'),
 	'S_UP'=>					_('Up'),
 	'S_DOWN'=>					_('Down'),
@@ -262,14 +258,10 @@
 	'S_IP'=>					_('IP'),
 	'S_PORT'=>					_('Port'),
 	'S_TEMPLATE'=>					_('Template'),
-	'S_UNKNOWN'=>					_('Unknown'),
 	'S_GROUPS'=>					_('Groups'),
-	'S_ALL_GROUPS'=>				_('All groups'),
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_HOST_GROUP'=>				_('Host group'),
 	'S_UPDATE'=>					_('Update'),
-	'S_AVAILABLE'=>					_('Available'),
-	'S_NOT_AVAILABLE'=>				_('Not available'),
 	'S_PROXIES_BIG'=>				_('PROXIES'),
 	'S_CREATE_PROXY'=>				_('Create proxy'),
 	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
@@ -321,8 +313,6 @@
 	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
 	'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 
-	'S_MAINTENANCE_BIG'=>			_('MAINTENANCE'),
-
 //	sysmaps.php
 	'S_MAP_DELETED'=>			_('Network map deleted'),
 	'S_CANNOT_DELETE_MAP'=>			_('Cannot delete network map'),
@@ -357,7 +347,6 @@
 
 //	map.php
 	'S_ZABBIX_URL'=>		_('http://www.zabbix.com'),
-	'S_UNACKNOWLEDGED' => _('Unacknowledged'),
 	'S_EVENT_ACKNOWLEDGING_DISABLED' => _('Event acknowledging disabled'),
 
 //	maps.php
@@ -410,14 +399,7 @@
 	'S_VALUE'=>				_('Value'),
 	'S_VALUES_STORED'=>			_('Values stored'),
 	'S_TRENDS_STORED'=>			_('Trends stored'),
-	'S_NUMBER_OF_TRIGGERS_SHORT'=>		_('Triggers (e/d)[p/u/o]'),
-	'S_NUMBER_OF_ITEMS_SHORT'=>		_('Items (m/d/n)'),
-	'S_NUMBER_OF_USERS_SHORT'=>		_('Users (online)'),
-	'S_NUMBER_OF_HOSTS_SHORT'=>		_('Hosts (m/n/t)'),
-	'S_YES'=>				_('Yes'),
 	'S_NO'=>				_('No'),
-	'S_RUNNING'=>				_('running'),
-	'S_NOT_RUNNING'=>			_('not running'),
 
 //	report2.php
 	'S_AVAILABILITY_REPORT'=>		_('Availability report'),
@@ -437,8 +419,6 @@
 	'S_FROM'=>					_('From'),
 	'S_TILL'=>					_('Till'),
 	'S_OK'=>					_('Ok'),
-	'S_PROBLEM'=>					_('Problem'),
-	'S_PROBLEMS'=>					_('Problems'),
 	'S_SLA'=>					_('SLA'),
 	'S_DAY'=>					_('Day'),
 	'S_MONTH'=>					_('Month'),
@@ -476,29 +456,12 @@
 	'S_REPORTS_BAR_REPORT_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	screenconf.php
-	'S_SCREEN'=>				_('Screen'),
-	'S_CONFIGURATION_OF_SCREENS_BIG'=>	_('CONFIGURATION OF SCREENS'),
-	'S_CONFIGURATION_OF_SCREENS'=>		_('Configuration of screens'),
-	'S_SCREEN_ADDED'=>			_('Screen added'),
-	'S_CANNOT_ADD_SCREEN'=>			_('Cannot add screen'),
-	'S_SCREEN_UPDATED'=>			_('Screen updated'),
-	'S_CANNOT_UPDATE_SCREEN'=>		_('Cannot update screen'),
-	'S_SCREEN_DELETED'=>			_('Screen deleted'),
-	'S_CANNOT_DELETE_SCREEN'=>		_('Cannot delete screen'),
-	'S_COLUMNS'=>				_('Columns'),
-	'S_ROWS'=>				_('Rows'),
-	'S_DELETE_SCREEN_Q'=>			_('Delete screen?'),
 	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
 	'S_WIDTH'=>						_('Width'),
 	'S_HEIGHT'=>					_('Height'),
-	'S_CREATE_SCREEN'=>				_('Create screen'),
 	'S_EDIT'=>						_('Edit'),
-	'S_DIMENSION_COLS_ROWS'=>		_('Dimension (cols x rows)'),
-
-	'S_IMPORT_SCREEN'=>				_('Import screen'),
-
 	'S_CANNOT_FIND_GRAPH'=>			_('Cannot find graph'),
 	'S_CANNOT_FIND_ITEM'=>			_('Cannot find item'),
 	'S_USED_IN_EXPORTED_SCREEN_SMALL'=>_('used in exported screen'),
@@ -506,14 +469,8 @@
 //	screenedit.php
 	'S_MAP'=>					_('Map'),
 	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
-	'S_HOSTS_INFO'=>			_('Hosts info'),
-	'S_TRIGGERS_INFO'=>			_('Triggers info'),
-	'S_SERVER_INFO'=>			_('Server info'),
-
 	'S_LOCAL_TIME'=>			_('Local time'),
-
 	'S_RIGHT'=>				_('Right'),
-
 	'S_MIDDLE'=>				_('Middle'),
 
 //	screens.php
@@ -532,7 +489,6 @@
 	'S_SEVERITY'=>				_('Severity'),
 	'S_MIN_SEVERITY'=>			_('Min severity'),
 	'S_DISABLED'=>				_('Disabled'),
-	'S_DISABLED_BIG'=>			_('DISABLED'),
 	'S_ENABLED'=>				_('Enabled'),
 	'S_URL'=>				_('URL'),
 	'S_TIME_SHIFT'=>			_('Time shift'),
@@ -578,7 +534,6 @@
 	'S_SCRIPT_ERROR'=>					_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'),
 
 //	audit.php
-	'S_ALREADY_EXISTS_SMALL'=>	_('already exists'),
 
 //	profile.php
 	'S_CLEAR' =>				_('Clear'),
@@ -618,20 +573,6 @@
 
 // main.js
 	'S_NO_ELEMENTS_SELECTED'=>	_('No elements selected!'),
-
-// page_header.php
-
-//	copt.inc.php
-	'S_STATS_FOR'=>			_('Stats for'),
-	'S_TOTAL_TIME'=>		_('Total time'),
-	'S_MEMORY_LIMIT'=>		_('Memory limit'),
-	'S_MEMORY_USAGE'=>		_('Memory usage'),
-	'S_SQL_SELECTS_COUNT'=>		_('SQL selects count'),
-	'S_SQL_EXECUTES_COUNT'=>	_('SQL executes count'),
-	'S_SQL_REQUESTS_COUNT'=>	_('SQL requests count'),
-	'S_TOTAL_TIME_SPENT_ON_SQL'=>	_('Total time spent on SQL'),
-	'S_END_OF'=>			_('End of'),
-	'S_MEMORY_LIMIT_REACHED'=>	_('MEMORY LIMIT REACHED! Profiling was stopped to save memory for script processing.'),
 
 // 	func.inc.php
 	'S_E'=>			_('E'),
@@ -679,7 +620,6 @@
 	'S_REPORTS'=>				_('Reports'),
 
 //	Errors
-	'S_NO_PERMISSION'=>				_('You do not have permission to perform this operation'),
 	'S_NO_PERMISSIONS_FOR_SCREEN'=>	_('No permissions for screen'),
 	'S_NO_PERMISSIONS_FOR_MAP'=>	_('No permissions for map'),
 	'S_XML_FILE_CONTAINS_ERRORS'=>	_('XML file contains errors'),
