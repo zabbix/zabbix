@@ -836,21 +836,17 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
  ******************************************************************************/
 function get_same_applications_for_host($applications, $hostid) {
 	$child_applications = array();
-
-	foreach ($applications as $appid) {
-		$db_apps = DBselect(
-			'SELECT a1.applicationid'.
-			' FROM applications a1,applications a2'.
-			' WHERE a1.name=a2.name'.
+	$db_apps = DBselect(
+		'SELECT a1.applicationid'.
+				' FROM applications a1,applications a2'.
+				' WHERE a1.name=a2.name'.
 				' AND a1.hostid='.$hostid.
-				' AND a2.applicationid='.$appid
-		);
-		$db_app = DBfetch($db_apps);
-		if (!$db_app) {
-			continue;
-		}
-		array_push($child_applications, $db_app['applicationid']);
+				' AND '.DBcondition('a2.applicationid', $applications)
+	);
+	while ($app = DBfetch($db_apps)) {
+		$child_applications[] = $app['applicationid'];
 	}
+
 	return $child_applications;
 }
 
