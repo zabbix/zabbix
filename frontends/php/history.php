@@ -481,7 +481,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		);
 
 		$objData = array(
-			'periodFixed' => CProfile::get('web.history.timelinefixed', 1)
+			'periodFixed' => CProfile::get('web.history.timelinefixed', 1),
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
 		if(isset($dom_graph_id)){

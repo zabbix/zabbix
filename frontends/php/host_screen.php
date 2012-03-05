@@ -208,7 +208,8 @@
 				'loadScroll' => 1,
 				'scrollWidthByImage' => 0,
 				'dynamic' => 0,
-				'mainObject' => 1
+				'mainObject' => 1,
+				'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 			);
 
 			zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');

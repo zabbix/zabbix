@@ -124,7 +124,8 @@ else {
 				'scrollWidthByImage' => 0,
 				'dynamic' => 0,
 				'mainObject' => 1,
-				'periodFixed' => CProfile::get('web.slides.timelinefixed', 1)
+				'periodFixed' => CProfile::get('web.slides.timelinefixed', 1),
+				'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 			);
 			zbx_add_post_js('timeControl.addObject(\'iframe\', '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
 			zbx_add_post_js('timeControl.processObjects();');
