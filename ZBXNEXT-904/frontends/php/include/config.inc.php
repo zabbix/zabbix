@@ -232,16 +232,16 @@ if ((isset($DENY_GUI) || isset($show_setup) || isset($show_warning)) && PAGE_TYP
 
 if (isset($DENY_GUI)) {
 	unset($show_warning);
-	require_once dirname(__FILE__).'/../warning.inc.php';
+	require_once dirname(__FILE__).'/../warning.php';
 }
 
 if (isset($show_setup)) {
 	unset($show_setup);
-	require_once dirname(__FILE__).'/../setup.inc.php';
+	require_once dirname(__FILE__).'/../setup.php';
 }
 elseif (isset($show_warning)) {
 	unset($show_warning);
-	require_once dirname(__FILE__).'/../warning.inc.php';
+	require_once dirname(__FILE__).'/../warning.php';
 }
 
 function access_deny() {
