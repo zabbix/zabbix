@@ -654,7 +654,8 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 					'loadImage' => 1,
 					'loadScroll' => 0,
 					'dynamic' => 0,
-					'periodFixed' => CProfile::get('web.screens.timelinefixed', 1)
+					'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
+					'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 				);
 
 				$default = false;
@@ -739,7 +740,8 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 					'loadImage' => 1,
 					'loadScroll' => 0,
 					'dynamic' => 0,
-					'periodFixed' => CProfile::get('web.screens.timelinefixed', 1)
+					'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
+					'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 				);
 
 				// host feature

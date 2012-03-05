@@ -201,7 +201,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			'loadScroll' => 1,
 			'scrollWidthByImage' => $scrollWidthByImage,
 			'dynamic' => 1,
-			'periodFixed' => CProfile::get('web.charts.timelinefixed', 1)
+			'periodFixed' => CProfile::get('web.charts.timelinefixed', 1),
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
 		zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
