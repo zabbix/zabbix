@@ -19,54 +19,6 @@
 **/
 ?>
 <?php
-
-class CAPIObject {
-	private $_name;
-
-	public function __construct($name) {
-		$this->_name = $name;
-	}
-
-	public function __call($method, $params) {
-		if (!isset(CWebUser::$data['sessionid']))
-			CWebUser::$data['sessionid'] = null;
-
-		$param = empty($params) ? null : reset($params);
-		$result = czbxrpc::call($this->_name.'.'.$method, $param, CWebUser::$data['sessionid']);
-
-		// saving API call for the debug statement
-		COpt::saveApiCall($this->_name, $method, $params, isset($result['result']) ? $result['result'] : '');
-
-		if (isset($result['result'])) {
-			return $result['result'];
-		}
-		else {
-			$trace = $result['data'];
-
-			if (isset($result['debug'])) {
-				$trace .= ' [';
-
-				$chain = array();
-				foreach ($result['debug'] as $bt) {
-					if ($bt['function'] == 'exception') continue;
-					if ($bt['function'] == 'call_user_func') break;
-
-					$chain[] = (isset($bt['class']) ? $bt['class'].'.'.$bt['function'] : $bt['function']);
-					$chain[] = ' -> ';
-				}
-				array_pop($chain);
-				$trace .= implode('', array_reverse($chain));
-
-				$trace .= ']';
-			}
-
-			error($trace);
-
-			return false;
-		}
-	}
-}
-
 class API {
 	const RETURN_TYPE_API = 'api';
 	const RETURN_TYPE_RPC = 'rpc';
@@ -75,6 +27,66 @@ class API {
 	private static $RPCobjects = array();
 	private static $return = self::RETURN_TYPE_RPC;
 
+	/**
+	 * A map of classes that should handle the corresponding API objects requests.
+	 *
+	 * @var array
+	 */
+	protected static $classMap = array(
+		'action' => 'CAction',
+		'alert' => 'CAlert',
+		'apiinfo' => 'CAPIInfo',
+		'application' => 'CApplication',
+		'dcheck' => 'CDCheck',
+		'dhost' => 'CDHost',
+		'discoveryrule' => 'CDiscoveryRule',
+		'drule' => 'CDRule',
+		'dservice' => 'CDService',
+		'event' => 'CEvent',
+		'graph' => 'CGraph',
+		'graphitem' => 'CGraphItem',
+		'graphprototype' => 'CGraphPrototype',
+		'host' => 'CHost',
+		'hostgroup' => 'CHostGroup',
+		'history' => 'CHistory',
+		'host' => 'CHost',
+		'hostgroup' => 'CHostGroup',
+		'hostinterface' => 'CHostInterface',
+		'image' => 'CImage',
+		'iconmap' => 'CIconMap',
+		'item' => 'CItem',
+		'itemprototype' => 'CItemPrototype',
+		'maintenance' => 'CMaintenance',
+		'map' => 'CMap',
+		'mediatype' => 'CMediatype',
+		'proxy' => 'CProxy',
+		'screen' => 'CScreen',
+		'screenitem' => 'CScreenItem',
+		'script' => 'CScript',
+		'template' => 'CTemplate',
+		'templatescreen' => 'CTemplateScreen',
+		'trigger' => 'CTrigger',
+		'triggerexpression' => 'CTriggerExpression',
+		'triggerprototype' => 'CTriggerPrototype',
+		'user' => 'CUser',
+		'usergroup' => 'CUserGroup',
+		'usermacro' => 'CUserMacro',
+		'usermedia' => 'CUserMedia',
+		'webcheck' => 'CWebCheck',
+	);
+
+	/**
+	 * Returns the class name for the given API object.
+	 *
+	 * @static
+	 *
+	 * @param string $object
+	 *
+	 * @return string
+	 */
+	public static function getObjectClassName($object) {
+		return self::$classMap[$object];
+	}
 
 	public static function setReturnAPI() {
 		self::$return = self::RETURN_TYPE_API;
@@ -84,17 +96,29 @@ class API {
 		self::$return = self::RETURN_TYPE_RPC;
 	}
 
-	private static function getAPIObject($className) {
-		$c = 'C'.$className;
-		if (!isset(self::$APIobjects[$className]))
-			self::$APIobjects[$className] = new $c;
+	/**
+	 * Returns an instance of the CZBXAPI class, that's responsible for handling the given
+	 * API objects requests.
+	 *
+	 * @static
+	 *
+	 * @param $object
+	 *
+	 * @return CZBXAPI
+	 */
+	private static function getAPIObject($object) {
+		$className = self::getObjectClassName($object);
+		if (!isset(self::$APIobjects[$object])) {
+			self::$APIobjects[$object] = new $className;
+		}
 
-		return self::$APIobjects[$className];
+		return self::$APIobjects[$object];
 	}
 
 	private static function getRPCObject($className) {
-		if (!isset(self::$RPCobjects[$className]))
+		if (!isset(self::$RPCobjects[$className])) {
 			self::$RPCobjects[$className] = new CAPIObject($className);
+		}
 
 		return self::$RPCobjects[$className];
 	}
@@ -368,5 +392,3 @@ class API {
 		return self::getObject('webcheck');
 	}
 }
-
-?>

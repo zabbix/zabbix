@@ -1636,16 +1636,12 @@ Copt::memoryPick();
 		if (isset($data['macros']) && !empty($data['macros'])) {
 			$data['macros'] = zbx_toArray($data['macros']);
 
-			// add the macros to all hosts
-			$hostMacrosToAdd = array();
-			foreach ($data['macros'] as $hostMacro) {
-				foreach ($data['hosts'] as $host) {
-					$hostMacro['hostid'] = $host['hostid'];
-					$hostMacrosToAdd[] = $hostMacro;
-				}
-			}
+			$options = array(
+				'hosts' => &$data['hosts'],
+				'macros' => &$data['macros']
+			);
 
-			$result = API::UserMacro()->create($hostMacrosToAdd);
+			$result = API::UserMacro()->massAdd($options);
 			if (!$result) self::exception();
 		}
 
@@ -1880,26 +1876,25 @@ Copt::memoryPick();
 
 // UPDATE MACROS {{{
 		if (isset($updateMacros)) {
-			$macrosToAdd = $updateMacros;
-			$hostmacrosIds = zbx_objectValues($macrosToAdd, 'hostmacroid');
+			$macrosToAdd = zbx_toHash($updateMacros, 'macro');
 
 			$hostMacros = API::UserMacro()->get(array(
 				'hostids' => $hostids,
 				'output' => API_OUTPUT_EXTEND,
 			));
-			$hostMacros = zbx_toHash($hostMacros, 'hostmacroid');
+			$hostMacros = zbx_toHash($hostMacros, 'macro');
 
 // Delete
 			$macrosToDelete = array();
-			foreach ($hostMacros as $hmacro) {
-				if (!in_array($hmacro['hostmacroid'], $hostmacrosIds)) {
-					$macrosToDelete[] = $hmacro['hostmacroid'];
+			foreach ($hostMacros as $hmnum => $hmacro) {
+				if (!isset($macrosToAdd[$hmacro['macro']])) {
+					$macrosToDelete[] = $hmacro['macro'];
 				}
 			}
 // Update
 			$macrosToUpdate = array();
 			foreach ($macrosToAdd as $nhmnum => $nhmacro) {
-				if (isset($nhmacro['hostmacroid']) && isset($hostMacros[$nhmacro['hostmacroid']])) {
+				if (isset($hostMacros[$nhmacro['macro']])) {
 					$macrosToUpdate[] = $nhmacro;
 					unset($macrosToAdd[$nhmnum]);
 				}
@@ -1914,7 +1909,7 @@ Copt::memoryPick();
 			}
 
 			if (!empty($macrosToUpdate)) {
-				$result = API::UserMacro()->update($macrosToUpdate);
+				$result = API::UserMacro()->massUpdate(array('hosts' => $hosts, 'macros' => $macrosToUpdate));
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro.'));
 				}
@@ -2066,7 +2061,11 @@ Copt::memoryPick();
 		}
 
 		if (isset($data['macros'])) {
-			$result = API::UserMacro()->delete(zbx_toArray($data['macros']));
+			$options = array(
+				'hostids' => $hostids,
+				'macros' => zbx_toArray($data['macros'])
+			);
+			$result = API::UserMacro()->massRemove($options);
 			if (!$result) self::exception();
 		}
 
