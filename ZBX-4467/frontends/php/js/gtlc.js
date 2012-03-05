@@ -1814,10 +1814,11 @@ endResize: function(){
 
 calcResizeByPX: function(px){
 	this.debug('calcResizeByPX');
-// -px: moveLeft, +px: moveRight
 
 	px = parseInt(px,10);
 	this.flip = 0;
+
+	// resize from the left
 	if(this.sideToMove == 0){
 		this.flip =  this.start.rightSide - (this.start.leftSide + px);
 		if(this.flip < 0){
@@ -1829,6 +1830,7 @@ calcResizeByPX: function(px){
 			this.current.rightSide = this.start.rightSide;
 		}
 	}
+	// resize from the right
 	else if(this.sideToMove == 1){
 		this.flip = (this.start.rightSide + px) - this.start.leftSide;
 		if(this.flip < 0){
@@ -1842,7 +1844,6 @@ calcResizeByPX: function(px){
 	}
 
 	this.current.width = this.current.rightSide - this.current.leftSide;
-//SDI(this.current.width+' = '+this.current.rightSide+' - '+this.current.leftSide);
 },
 
 resizeBox: function(px){
