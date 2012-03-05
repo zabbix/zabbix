@@ -48,7 +48,7 @@ class CTriggerPrototype extends CTriggerGeneral {
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public function get($options = array()) {
+	public function get(array $options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
@@ -1001,7 +1001,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public function exists($object) {
+	public function exists(array $object) {
 		$keyFields = array(array('hostid', 'host'), 'description');
 
 		$result = false;
@@ -1297,7 +1297,7 @@ COpt::memoryPick();
 			return array('triggerids' => $triggerids);
 	}
 
-	protected function createReal(&$triggers) {
+	protected function createReal(array &$triggers) {
 		$triggers = zbx_toArray($triggers);
 
 		$triggerids = DB::insert('triggers', $triggers);
@@ -1322,7 +1322,7 @@ COpt::memoryPick();
 
 	}
 
-	protected function updateReal($triggers) {
+	protected function updateReal(array $triggers) {
 		$triggers = zbx_toArray($triggers);
 
 		$dbTriggers = $this->get(array(

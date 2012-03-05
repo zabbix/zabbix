@@ -26,6 +26,14 @@
 abstract class CItemGeneral extends CZBXAPI {
 
 	protected $fieldRules;
+
+	/**
+	 * @abstract
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
 	abstract public function get($options = array());
 
 	public function __construct() {
@@ -517,11 +525,11 @@ abstract class CItemGeneral extends CZBXAPI {
 	/**
 	 * Prepares and returns an array of child items, inherited from items $itemsToInherit on the given hosts.
 	 *
-	 * @param array $itemsToInherit
+	 * @param array      $itemsToInherit
 	 * @param array|null $hostIds
-	 * @param array $errors         an array of messages to use for errors
+	 * @param array      $errors         an array of messages to use for errors
 	 *
-	 * @return array                an array of unsaved child items
+	 * @return array an array of unsaved child items
 	 */
 	protected function prepareInheritedItems(array $itemsToInherit, array $hostIds = null, array $errors = array()) {
 		$errors = array_merge(array(

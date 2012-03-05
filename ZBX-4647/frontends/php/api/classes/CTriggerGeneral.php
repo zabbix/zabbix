@@ -22,7 +22,43 @@
 /**
  * Class containing common methods for operations with triggers.
  */
-class CTriggerGeneral extends CZBXAPI {
+abstract class CTriggerGeneral extends CZBXAPI {
+
+	/**
+	 * @abstract
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
+	abstract public function get(array $options = array());
+
+	/**
+	 * @abstract
+	 *
+	 * @param array $array
+	 *
+	 * @return bool
+	 */
+	abstract public function exists(array $array);
+
+	/**
+	 * @abstract
+	 *
+	 * @param array $array
+	 *
+	 * @return array
+	 */
+	abstract protected function createReal(array &$array);
+
+	/**
+	 * @abstract
+	 *
+	 * @param array $array
+	 *
+	 * @return array
+	 */
+	abstract protected function updateReal(array $array);
 
 	/**
 	 * Updates the children of the trigger on the given hosts and propagates the inheritance to all child hosts.
@@ -34,7 +70,7 @@ class CTriggerGeneral extends CZBXAPI {
 	 *
 	 * @return bool
 	 */
-	protected function inherit(array $trigger, $hostids = null) {
+	protected function inherit(array $trigger, array $hostids = null) {
 		$triggerTemplates = API::Template()->get(array(
 			'triggerids' => $trigger['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
