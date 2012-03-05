@@ -24,7 +24,7 @@
  */
 
 
-class CTriggerPrototype extends CTriggerGeneral {
+class CTriggerPrototype extends CZBXAPI {
 
 	protected $tableName = 'triggers';
 
@@ -48,7 +48,7 @@ class CTriggerPrototype extends CTriggerGeneral {
  * @param array $options['order']
  * @return array|int item data as array or false if error
  */
-	public function get(array $options = array()) {
+	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
@@ -142,7 +142,36 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 		else{
 			$permission = $options['editable']?PERM_READ_WRITE:PERM_READ_ONLY;
-
+/*/
+			$sqlParts['where'][] = ' EXISTS(  '.
+						' SELECT tt.triggerid  '.
+						' FROM triggers tt,functions ff,items ii,hosts_groups hgg,rights rr,users_groups ugg '.
+						' WHERE t.triggerid=tt.triggerid  '.
+							' AND ff.triggerid=tt.triggerid  '.
+							' AND ff.itemid=ii.itemid  '.
+							' AND hgg.hostid=ii.hostid  '.
+							' AND rr.id=hgg.groupid  '.
+							' AND rr.groupid=ugg.usrgrpid  '.
+							' AND ugg.userid='.$userid.
+							' AND rr.permission>='.$permission.
+							' AND NOT EXISTS(  '.
+								' SELECT fff.triggerid  '.
+								' FROM functions fff, items iii  '.
+								' WHERE fff.triggerid=tt.triggerid '.
+									' AND fff.itemid=iii.itemid '.		'    '.
+									' AND EXISTS( '.
+										' SELECT hggg.groupid '.
+										' FROM hosts_groups hggg, rights rrr, users_groups uggg '.
+										' WHERE hggg.hostid=iii.hostid '.
+											' AND rrr.id=hggg.groupid '.
+											' AND rrr.groupid=uggg.usrgrpid '.
+											' AND uggg.userid='.$userid.
+											' AND rrr.permission<'.$permission.
+										' ) '.
+								' ) '.
+						' ) ';
+//*/
+//*/
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
@@ -1001,7 +1030,7 @@ COpt::memoryPick();
 	return $result;
 	}
 
-	public function exists(array $object) {
+	public function exists($object) {
 		$keyFields = array(array('hostid', 'host'), 'description');
 
 		$result = false;
@@ -1050,12 +1079,12 @@ COpt::memoryPick();
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
 
-		foreach ($triggers as $trigger) {
+		foreach ($triggers as $num => $trigger) {
 			$triggerDbFields = array(
 				'description' => null,
 				'expression' => null,
 				'error' => _('Trigger just added. No status update so far.'),
-				'value'	=> TRIGGER_VALUE_UNKNOWN,
+				'value'	=> 2,
 			);
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger'));
@@ -1080,7 +1109,7 @@ COpt::memoryPick();
 
 		$createdTriggers = $this->get(array(
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
-			'output' => array('description', 'expression', 'flags'),
+			'output' => array('description', 'expression'),
 			'selectItems' => API_OUTPUT_EXTEND,
 			'selectHosts' => array('name')
 		));
@@ -1100,8 +1129,9 @@ COpt::memoryPick();
 		}
 
 		foreach ($createdTriggers as $trigger) {
-			$trigger['expression'] = explode_exp($trigger['expression']);
 			$this->inherit($trigger);
+			info(_s('Created: Trigger "%1$s" on "%2$s".', $trigger['description'],
+					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
 		}
 
 		return array('triggerids' => $triggerids);
@@ -1295,7 +1325,7 @@ COpt::memoryPick();
 			return array('triggerids' => $triggerids);
 	}
 
-	protected function createReal(array &$triggers) {
+	protected function createReal(&$triggers) {
 		$triggers = zbx_toArray($triggers);
 
 		$triggerids = DB::insert('triggers', $triggers);
@@ -1320,7 +1350,7 @@ COpt::memoryPick();
 
 	}
 
-	protected function updateReal(array $triggers) {
+	protected function updateReal($triggers) {
 		$triggers = zbx_toArray($triggers);
 
 		$dbTriggers = $this->get(array(
@@ -1414,6 +1444,124 @@ COpt::memoryPick();
 			info(_s('Updated: Trigger prototype "%1$s" on "%2$s".', $description, implode(', ', $hosts)));
 		}
 		unset($trigger);
+	}
+
+	protected function inherit($trigger, $hostids = null) {
+		$triggerTemplate = API::Template()->get(array(
+			'triggerids' => $trigger['triggerid'],
+			'output' => API_OUTPUT_EXTEND,
+			'nopermissions' => true
+		));
+		$triggerTemplate = reset($triggerTemplate);
+		if (!$triggerTemplate) {
+			return true;
+		}
+
+		if (!isset($trigger['expression']) || !isset($trigger['description'])) {
+			$options = array(
+				'triggerids' => $trigger['triggerid'],
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+				'nopermissions' => true,
+			);
+			$dbTrigger = $this->get($options);
+			$dbTrigger = reset($dbTrigger);
+
+			if (!isset($trigger['description'])) {
+				$trigger['description'] = $dbTrigger['description'];
+			}
+			if (!isset($trigger['expression'])) {
+				$trigger['expression'] = explode_exp($dbTrigger['expression']);
+			}
+		}
+
+		$chdHosts = API::Host()->get(array(
+			'templateids' => $triggerTemplate['templateid'],
+			'output' => array('hostid', 'host'),
+			'preservekeys' => true,
+			'hostids' => $hostids,
+			'nopermissions' => true,
+			'templated_hosts' => true
+		));
+
+		foreach ($chdHosts as $chdHost) {
+			$newTrigger = $trigger;
+
+			$newTrigger['templateid'] = $trigger['triggerid'];
+
+			$newTrigger['expression'] = str_replace('{'.$triggerTemplate['host'].':', '{'.$chdHost['host'].':', $trigger['expression']);
+
+// check if templated trigger exists
+			$childTriggers = $this->get(array(
+				'filter' => array('templateid' => $newTrigger['triggerid']),
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+				'hostids' => $chdHost['hostid']
+			));
+
+			if ($childTrigger = reset($childTriggers)) {
+				$childTrigger['expression'] = explode_exp($childTrigger['expression']);
+
+				if (strcmp($childTrigger['expression'], $newTrigger['expression']) != 0 ||
+						strcmp($childTrigger['description'], $newTrigger['description']) != 0) {
+					$exists = $this->exists(array(
+						'description' => $newTrigger['description'],
+						'expression' => $newTrigger['expression'],
+						'hostids' => $chdHost['hostid']
+					));
+					if ($exists) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							sprintf(_('Trigger "%1$s" already exists on "%2$s".'), $newTrigger['description'], $chdHost['host']));
+					}
+				}
+				elseif ($childTrigger['flags'] != ZBX_FLAG_DISCOVERY_CHILD) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Trigger with same name but other type exists'));
+				}
+
+				$newTrigger['triggerid'] = $childTrigger['triggerid'];
+				$this->updateReal($newTrigger);
+			}
+			else {
+				$options = array(
+					'filter' => array(
+						'description' => $newTrigger['description'],
+						'flags' => null
+					),
+					'output' => API_OUTPUT_EXTEND,
+					'preservekeys' => true,
+					'nopermissions' => true,
+					'hostids' => $chdHost['hostid']
+				);
+				$childTriggers = $this->get($options);
+
+				$childTrigger = false;
+				foreach ($childTriggers as $tr) {
+					$tmpExp = explode_exp($tr['expression']);
+					if (strcmp($tmpExp, $newTrigger['expression']) == 0) {
+						$childTrigger = $tr;
+						break;
+					}
+				}
+
+				if ($childTrigger) {
+					if ($childTrigger['templateid'] != 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Trigger "%1$s" already exists on "%2$s".', $childTrigger['description'], $chdHost['host']));
+					}
+					elseif ($childTrigger['flags'] != $newTrigger['flags']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists'));
+					}
+
+					$newTrigger['triggerid'] = $childTrigger['triggerid'];
+					$this->updateReal($newTrigger);
+				}
+				else {
+					$this->createReal($newTrigger);
+					$newTrigger = reset($newTrigger);
+				}
+			}
+			$this->inherit($newTrigger);
+		}
 	}
 
 	public function syncTemplates($data) {

@@ -486,7 +486,7 @@ class CScreenItem extends CZBXAPI {
 
 		// check screens
 		if ($screens) {
-			$result = $this->get(array(
+			$result = API::Screen()->get(array(
 				'screenids' => $screens,
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => true
