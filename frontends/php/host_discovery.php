@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Configuration of discovery rules');
+$page['title'] = _('CONFIGURATION OF DISCOVERY RULES');
 $page['file'] = 'host_discovery.php';
 $page['scripts'] = array('class.cviewswitcher.js');
 $page['hist_arg'] = array('hostid');
