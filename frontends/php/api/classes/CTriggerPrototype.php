@@ -1050,12 +1050,12 @@ COpt::memoryPick();
 		$triggers = zbx_toArray($triggers);
 		$triggerids = array();
 
-		foreach ($triggers as $num => $trigger) {
+		foreach ($triggers as $trigger) {
 			$triggerDbFields = array(
 				'description' => null,
 				'expression' => null,
 				'error' => _('Trigger just added. No status update so far.'),
-				'value'	=> 2,
+				'value'	=> TRIGGER_VALUE_UNKNOWN,
 			);
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger'));
