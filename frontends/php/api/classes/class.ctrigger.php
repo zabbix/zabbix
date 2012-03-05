@@ -1447,7 +1447,9 @@ class CTrigger extends CZBXAPI {
 	}
 
 	/**
-	 * Update triggers
+	 * Update triggers.
+	 *
+	 * If a trigger expression is passed in any of the triggers, it must be in it's exploded form.
 	 *
 	 * @param array $triggers
 	 *
@@ -1472,6 +1474,10 @@ class CTrigger extends CZBXAPI {
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 			if (isset($trigger['expression'])) {
 				$dbTrigger['expression'] = $trigger['expression'];
+			}
+			// if we use the expression from the database, make sure it's exploded
+			else {
+				$dbTrigger['expression'] = explode_exp($dbTrigger['expression']);
 			}
 
 			$this->inherit($dbTrigger);
