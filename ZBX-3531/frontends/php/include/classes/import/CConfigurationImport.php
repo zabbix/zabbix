@@ -74,7 +74,7 @@ class CConfigurationImport {
 			'hosts' => array('exist' => false, 'missed' => false),
 			'templates' => array('exist' => false, 'missed' => false),
 			'applications' => array('exist' => false, 'missed' => false),
-			'template_linkages' => array('exist' => false, 'missed' => false),
+			'template_linkages' => array('missed' => false),
 			'items' => array('exist' => false, 'missed' => false),
 			'discoveryrules' => array('exist' => false, 'missed' => false),
 			'triggers' => array('exist' => false, 'missed' => false),
@@ -388,6 +388,17 @@ class CConfigurationImport {
 		$templates = zbx_toHash($templates, 'host');
 
 
+		foreach ($templates as &$template) {
+			unset($template['screens']);
+
+			// if we don't need to update linkage, unset templates
+			if (!$this->options['template_linkages']['missed']) {
+				unset($template['templates']);
+			}
+		}
+		unset($template);
+
+
 		$orderedList = array();
 		$templatesInSource = array_keys($templates);
 		$parentTemplateRefs = array();
@@ -467,6 +478,14 @@ class CConfigurationImport {
 		$hosts = $this->formatter->getHosts();
 		if (empty($hosts)) {
 			return;
+		}
+
+		// if we don't need to update linkage, unset templates
+		if (!$this->options['template_linkages']['missed']) {
+			foreach ($hosts as &$host) {
+				unset($host['templates']);
+			}
+			unset($host);
 		}
 
 		// list of hostid which were creted or updated to create interfaces cache for that hosts
@@ -681,19 +700,6 @@ class CConfigurationImport {
 				foreach ($discoveryRules as $item) {
 					$item['hostid'] = $hostid;
 
-					if (isset($item['interface_ref'])) {
-						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
-					}
-
-					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
-					if ($itemsId) {
-						$item['itemid'] = $itemsId;
-						$itemsToUpdate[] = $item;
-					}
-					else {
-						$itemsToCreate[] = $item;
-					}
-
 					// prototypes
 					foreach ($item['item_prototypes'] as $prototype) {
 						$prototype['hostid'] = $hostid;
@@ -717,6 +723,23 @@ class CConfigurationImport {
 						else {
 							$prototypesToCreate[] = $prototype;
 						}
+					}
+
+
+					if (isset($item['interface_ref'])) {
+						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+					}
+					unset($item['item_prototypes']);
+					unset($item['trigger_prototypes']);
+					unset($item['graph_prototypes']);
+
+					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
+					if ($itemsId) {
+						$item['itemid'] = $itemsId;
+						$itemsToUpdate[] = $item;
+					}
+					else {
+						$itemsToCreate[] = $item;
 					}
 				}
 			}
@@ -1376,7 +1399,10 @@ class CConfigurationImport {
 
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$db_items = API::Item()->getObjects($screenitem['resource']);
+							$db_items = API::Item()->getObjects(array(
+								'host' => $screenitem['resource']['host'],
+								'key_' => $screenitem['resource']['key']
+							));
 
 							if (empty($db_items)) {
 								throw new Exception(_s('Cannot find item "%1$s" used in screen "%2$s".',
