@@ -215,7 +215,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 				}
 			}
 			elseif ($childTrigger['flags'] != $newTrigger['flags']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists.'));
 			}
 
 			$newTrigger['triggerid'] = $childTrigger['triggerid'];
@@ -249,7 +249,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 						_s('Trigger "%1$s" already exists on "%2$s".', $childTrigger['description'], $chdHost['host']));
 				}
 				elseif ($childTrigger['flags'] != $newTrigger['flags']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists.'));
 				}
 
 				$newTrigger['triggerid'] = $childTrigger['triggerid'];
