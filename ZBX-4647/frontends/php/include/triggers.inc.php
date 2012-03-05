@@ -246,7 +246,6 @@ function getSeverityCaption($severity = null) {
 		return $severities;
 	}
 	elseif (isset($severities[$severity])) {
-		encodeValues($severities[$severity],false);
 		return $severities[$severity];
 	}
 	else {
