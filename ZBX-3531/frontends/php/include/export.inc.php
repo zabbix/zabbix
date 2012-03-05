@@ -304,10 +304,6 @@ class zbxXML{
 		return $root;
 	}
 
-	protected static function outputXML($doc){
-		return $doc->ownerDocument->saveXML();
-	}
-
 	/**
 	 * Converts Simple key from old format to new.
 	 *
@@ -330,18 +326,6 @@ class zbxXML{
 		}
 
 		return $newKey;
-	}
-
-	private static function space2tab($matches){
-		return str_repeat("\t", zbx_strlen($matches[0]) / 2 );
-	}
-
-	public static function arrayToXML($array){
-		$xml = self::createDOMDocument();
-
-		self::arrayToDOM($xml, $array);
-
-		return self::outputXML($xml);
 	}
 
 	public static function arrayToDOM(&$dom, $array, $parentKey=null){
@@ -472,182 +456,141 @@ class zbxXML{
 		return true;
 	}
 
-	private static function validate($schema){
-		libxml_use_internal_errors(true);
-
-		$result = self::$xml->relaxNGValidate($schema);
-
-		if(!$result){
-			$errors = libxml_get_errors();
-			libxml_clear_errors();
-
-			foreach($errors as $error){
-				$text = '';
-
-				switch($error->level){
-					case LIBXML_ERR_WARNING:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Warning '.$error->code.': ';
-					break;
-					case LIBXML_ERR_ERROR:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Error '.$error->code.': ';
-					break;
-					case LIBXML_ERR_FATAL:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Fatal Error '.$error->code.': ';
-					break;
-				}
-
-				$text .= trim($error->message) . ' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
-				throw new Exception($text);
-			}
-		}
-		return true;
-	}
-
 	public static function parseScreen($rules, $xml=null){
-		try{
-//			self::validate(dirname(__FILE__).'/xmlschemas/screens.rng');
+		$xml = is_null($xml) ? self::$xml : $xml;
+		$importScreens = self::XMLtoArray($xml);
+		if (!isset($importScreens['zabbix_export']['screens'])) {
+			return true;
+		}
+		$importScreens = $importScreens['zabbix_export']['screens'];
 
-			$xml = is_null($xml) ? self::$xml : $xml;
-			$importScreens = self::XMLtoArray($xml);
-			if (!isset($importScreens['zabbix_export']['screens'])) {
-				return true;
+		$result = true;
+		$screens = array();
+
+		foreach($importScreens as $mnum => &$screen){
+			unset($screen['screenid']);
+			$exists = API::Screen()->exists(array('name' => $screen['name']));
+
+			if($exists && isset($rules['screens']['exist'])){
+				$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
+				if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
+
+				$db_screen = reset($db_screens);
+
+				$screen['screenid'] = $db_screen['screenid'];
 			}
-			$importScreens = $importScreens['zabbix_export']['screens'];
+			else if($exists || !isset($rules['screens']['missed'])){
+				info('Screen ['.$screen['name'].'] skipped - user rule');
+				unset($importScreens[$mnum]);
+				continue; // break if not update exist
+			}
 
-			$result = true;
-			$screens = array();
+			if(!isset($screen['screenitems'])) $screen['screenitems'] = array();
 
-			foreach($importScreens as $mnum => &$screen){
-				unset($screen['screenid']);
-				$exists = API::Screen()->exists(array('name' => $screen['name']));
+			foreach($screen['screenitems'] as $snum => &$screenitem){
+				$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
 
-				if($exists && isset($rules['screens']['exist'])){
-					$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
-					if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
-
-					$db_screen = reset($db_screens);
-
-					$screen['screenid'] = $db_screen['screenid'];
-				}
-				else if($exists || !isset($rules['screens']['missed'])){
-					info('Screen ['.$screen['name'].'] skipped - user rule');
-					unset($importScreens[$mnum]);
-					continue; // break if not update exist
-				}
-
-				if(!isset($screen['screenitems'])) $screen['screenitems'] = array();
-
-				foreach($screen['screenitems'] as $snum => &$screenitem){
-					$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
-
-					if(!isset($screenitem['resourceid'])) $screenitem['resourceid'] = 0;
-					if(is_array($screenitem['resourceid'])){
-						switch($screenitem['resourcetype']){
-							case SCREEN_RESOURCE_HOSTS_INFO:
-							case SCREEN_RESOURCE_TRIGGERS_INFO:
-							case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-							case SCREEN_RESOURCE_DATA_OVERVIEW:
-							case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-								if(is_array($screenitem['resourceid'])){
-									$db_hostgroups = API::HostGroup()->getObjects($screenitem['resourceid']);
-									if(empty($db_hostgroups)){
-										$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-										throw new Exception($error);
-									}
-
-									$tmp = reset($db_hostgroups);
-									$screenitem['resourceid'] = $tmp['groupid'];
-								}
-							break;
-							case SCREEN_RESOURCE_HOST_TRIGGERS:
-								$db_hosts = API::Host()->getObjects($screenitem['resourceid']);
-								if(empty($db_hosts)){
-									$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$screenitem['resourceid']['host'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+				if(!isset($screenitem['resourceid'])) $screenitem['resourceid'] = 0;
+				if(is_array($screenitem['resourceid'])){
+					switch($screenitem['resourcetype']){
+						case SCREEN_RESOURCE_HOSTS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+						case SCREEN_RESOURCE_DATA_OVERVIEW:
+						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+							if(is_array($screenitem['resourceid'])){
+								$db_hostgroups = API::HostGroup()->getObjects($screenitem['resourceid']);
+								if(empty($db_hostgroups)){
+									$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
 									throw new Exception($error);
 								}
 
-								$tmp = reset($db_hosts);
-								$screenitem['resourceid'] = $tmp['hostid'];
-							break;
-							case SCREEN_RESOURCE_GRAPH:
-								$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
-								if(empty($db_graphs)){
-									$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-									throw new Exception($error);
-								}
+								$tmp = reset($db_hostgroups);
+								$screenitem['resourceid'] = $tmp['groupid'];
+							}
+						break;
+						case SCREEN_RESOURCE_HOST_TRIGGERS:
+							$db_hosts = API::Host()->getObjects($screenitem['resourceid']);
+							if(empty($db_hosts)){
+								$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$screenitem['resourceid']['host'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								throw new Exception($error);
+							}
 
-								$tmp = reset($db_graphs);
-								$screenitem['resourceid'] = $tmp['graphid'];
-							break;
-							case SCREEN_RESOURCE_SIMPLE_GRAPH:
-							case SCREEN_RESOURCE_PLAIN_TEXT:
-								$db_items = API::Item()->getObjects($screenitem['resourceid']);
+							$tmp = reset($db_hosts);
+							$screenitem['resourceid'] = $tmp['hostid'];
+						break;
+						case SCREEN_RESOURCE_GRAPH:
+							$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
+							if(empty($db_graphs)){
+								$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								throw new Exception($error);
+							}
 
-								if(empty($db_items)){
-									$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-									throw new Exception($error);
-								}
+							$tmp = reset($db_graphs);
+							$screenitem['resourceid'] = $tmp['graphid'];
+						break;
+						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$db_items = API::Item()->getObjects($screenitem['resourceid']);
 
-								$tmp = reset($db_items);
-								$screenitem['resourceid'] = $tmp['itemid'];
-							break;
-							case SCREEN_RESOURCE_MAP:
-								$db_sysmaps = API::Map()->getObjects($screenitem['resourceid']);
-								if(empty($db_sysmaps)){
-									$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-									throw new Exception($error);
-								}
+							if(empty($db_items)){
+								$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								throw new Exception($error);
+							}
 
-								$tmp = reset($db_sysmaps);
-								$screenitem['resourceid'] = $tmp['sysmapid'];
-							break;
-							case SCREEN_RESOURCE_SCREEN:
-								$db_screens = API::Screen()->get(array('screenids' => $screenitem['resourceid']));
-								if(empty($db_screens)){
-									$error = S_CANNOT_FIND_SCREEN.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
-									throw new Exception($error);
-								}
+							$tmp = reset($db_items);
+							$screenitem['resourceid'] = $tmp['itemid'];
+						break;
+						case SCREEN_RESOURCE_MAP:
+							$db_sysmaps = API::Map()->getObjects($screenitem['resourceid']);
+							if(empty($db_sysmaps)){
+								$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								throw new Exception($error);
+							}
 
-								$tmp = reset($db_screens);
-								$screenitem['resourceid'] = $tmp['screenid'];
-							break;
-							default:
-								$screenitem['resourceid'] = 0;
-							break;
-						}
+							$tmp = reset($db_sysmaps);
+							$screenitem['resourceid'] = $tmp['sysmapid'];
+						break;
+						case SCREEN_RESOURCE_SCREEN:
+							$db_screens = API::Screen()->get(array('screenids' => $screenitem['resourceid']));
+							if(empty($db_screens)){
+								$error = S_CANNOT_FIND_SCREEN.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								throw new Exception($error);
+							}
+
+							$tmp = reset($db_screens);
+							$screenitem['resourceid'] = $tmp['screenid'];
+						break;
+						default:
+							$screenitem['resourceid'] = 0;
+						break;
 					}
 				}
-				unset($screenitem);
-
-				$screens[] = $screen;
 			}
-			unset($screen);
+			unset($screenitem);
 
-			$importScreens = $screens;
+			$screens[] = $screen;
+		}
+		unset($screen);
 
-			foreach($importScreens as $mnum => $screen){
-				if(isset($screen['screenid'])){
-					$result = API::Screen()->update($screen);
-				}
-				else{
-					$result = API::Screen()->create($screen);
-				}
+		$importScreens = $screens;
 
-				if(isset($screen['screenid'])){
-					info(S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
-				}
-				else{
-					info(S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
-				}
-
+		foreach($importScreens as $mnum => $screen){
+			if(isset($screen['screenid'])){
+				$result = API::Screen()->update($screen);
 			}
-		}
-		catch(Exception $e){
-			error($e->getMessage());
-			return false;
-		}
+			else{
+				$result = API::Screen()->create($screen);
+			}
 
-		return $result;
+			if(isset($screen['screenid'])){
+				info(S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
+			}
+			else{
+				info(S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+			}
+
+		}
 	}
 
 	public static function parseMap($rules){
@@ -658,240 +601,234 @@ class zbxXML{
 			$importMaps['zabbix_export'] = $importMaps;
 		}
 
-		try{
-			if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN && isset($importMaps['zabbix_export']['images'])){
-				$images = $importMaps['zabbix_export']['images'];
-				$images_to_add = array();
-				$images_to_update = array();
-				foreach($images as $inum => $image){
-					if(API::Image()->exists($image)){
-						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['exist']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['exist']))))
-						{
+		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN && isset($importMaps['zabbix_export']['images'])){
+			$images = $importMaps['zabbix_export']['images'];
+			$images_to_add = array();
+			$images_to_update = array();
+			foreach($images as $inum => $image){
+				if(API::Image()->exists($image)){
+					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['exist']))
+						|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['exist']))))
+					{
 
-							$options = array(
-								'filter' => array('name' => $image['name']),
-								'output' => API_OUTPUT_SHORTEN
-							);
-							$imgs = API::Image()->get($options);
-							$img = reset($imgs);
+						$options = array(
+							'filter' => array('name' => $image['name']),
+							'output' => API_OUTPUT_SHORTEN
+						);
+						$imgs = API::Image()->get($options);
+						$img = reset($imgs);
 
-							$image['imageid'] = $img['imageid'];
+						$image['imageid'] = $img['imageid'];
 
-							// image will be decoded in class.image.php
-							$image['image'] = $image['encodedImage'];
-							unset($image['encodedImage']);
+						// image will be decoded in class.image.php
+						$image['image'] = $image['encodedImage'];
+						unset($image['encodedImage']);
 
-							$images_to_update[] = $image;
-						}
-					}
-					else{
-						if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['missed']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['images']['missed'])))
-						{
-
-							// No need to decode_base64
-							$image['image'] = $image['encodedImage'];
-
-							unset($image['encodedImage']);
-							$images_to_add[] = $image;
-						}
-					}
-				}
-
-				if (!empty($images_to_add)) {
-					$result = API::Image()->create($images_to_add);
-					if (!$result) throw new Exception(_('Cannot add image'));
-				}
-
-				if (!empty($images_to_update)) {
-					$result = API::Image()->update($images_to_update);
-					if (!$result) throw new Exception(_('Cannot update image'));
-				}
-			}
-
-
-			if (!isset($importMaps['zabbix_export']['sysmaps'])) {
-				return true;
-			}
-			$importMaps = $importMaps['zabbix_export']['sysmaps'];
-			foreach($importMaps as $mnum => &$sysmap){
-				unset($sysmap['sysmapid']);
-				$exists = API::Map()->exists(array('name' => $sysmap['name']));
-
-				if(!isset($sysmap['label_format'])){
-					$sysmap['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
-				}
-
-				if($exists && isset($rules['maps']['exist'])){
-					$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
-					if(empty($db_maps)) throw new Exception(S_NO_PERMISSIONS_FOR_MAP.' ['.$sysmap['name'].'] import');
-
-					$db_map = reset($db_maps);
-					$sysmap['sysmapid'] = $db_map['sysmapid'];
-				}
-				else if($exists || !isset($rules['maps']['missed'])){
-					info('Map ['.$sysmap['name'].'] skipped - user rule');
-					unset($importMaps[$mnum]);
-					continue; // break if not update exist
-				}
-
-				// icon map
-				if (isset($sysmap['iconmap'])) {
-					$iconMap = API::IconMap()->get(array(
-						'filter' => array('name' => $sysmap['iconmap']),
-						'output' => API_OUTPUT_SHORTEN,
-						'nopermissions' => true,
-						'preservekeys' => true
-					));
-					$iconMap = reset($iconMap);
-					if (!$iconMap) {
-						$error = _s('Cannot find icon map "%1$s" used in exported map "%2$s".', $sysmap['iconmap'], $sysmap['name']);
-						throw new Exception($error);
-					}
-
-					$sysmap['iconmapid'] = $iconMap['iconmapid'];
-				}
-
-				if(isset($sysmap['backgroundid'])){
-					$image = getImageByIdent($sysmap['backgroundid']);
-
-					if(!$image){
-						error(S_CANNOT_FIND_BACKGROUND_IMAGE.' "'.$sysmap['backgroundid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"');
-						$sysmap['backgroundid'] = 0;
-					}
-					else{
-						$sysmap['backgroundid'] = $image['imageid'];
+						$images_to_update[] = $image;
 					}
 				}
 				else{
+					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['missed']))
+						|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['images']['missed'])))
+					{
+
+						// No need to decode_base64
+						$image['image'] = $image['encodedImage'];
+
+						unset($image['encodedImage']);
+						$images_to_add[] = $image;
+					}
+				}
+			}
+
+			if (!empty($images_to_add)) {
+				$result = API::Image()->create($images_to_add);
+				if (!$result) throw new Exception(_('Cannot add image'));
+			}
+
+			if (!empty($images_to_update)) {
+				$result = API::Image()->update($images_to_update);
+				if (!$result) throw new Exception(_('Cannot update image'));
+			}
+		}
+
+
+		if (!isset($importMaps['zabbix_export']['sysmaps'])) {
+			return true;
+		}
+		$importMaps = $importMaps['zabbix_export']['sysmaps'];
+		foreach($importMaps as $mnum => &$sysmap){
+			unset($sysmap['sysmapid']);
+			$exists = API::Map()->exists(array('name' => $sysmap['name']));
+
+			if(!isset($sysmap['label_format'])){
+				$sysmap['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
+			}
+
+			if($exists && isset($rules['maps']['exist'])){
+				$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
+				if(empty($db_maps)) throw new Exception(S_NO_PERMISSIONS_FOR_MAP.' ['.$sysmap['name'].'] import');
+
+				$db_map = reset($db_maps);
+				$sysmap['sysmapid'] = $db_map['sysmapid'];
+			}
+			else if($exists || !isset($rules['maps']['missed'])){
+				info('Map ['.$sysmap['name'].'] skipped - user rule');
+				unset($importMaps[$mnum]);
+				continue; // break if not update exist
+			}
+
+			// icon map
+			if (isset($sysmap['iconmap'])) {
+				$iconMap = API::IconMap()->get(array(
+					'filter' => array('name' => $sysmap['iconmap']),
+					'output' => API_OUTPUT_SHORTEN,
+					'nopermissions' => true,
+					'preservekeys' => true
+				));
+				$iconMap = reset($iconMap);
+				if (!$iconMap) {
+					$error = _s('Cannot find icon map "%1$s" used in exported map "%2$s".', $sysmap['iconmap'], $sysmap['name']);
+					throw new Exception($error);
+				}
+
+				$sysmap['iconmapid'] = $iconMap['iconmapid'];
+			}
+
+			if(isset($sysmap['backgroundid'])){
+				$image = getImageByIdent($sysmap['backgroundid']);
+
+				if(!$image){
+					error(S_CANNOT_FIND_BACKGROUND_IMAGE.' "'.$sysmap['backgroundid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"');
 					$sysmap['backgroundid'] = 0;
 				}
-
-				if(!isset($sysmap['selements']))
-					$sysmap['selements'] = array();
-				else
-					$sysmap['selements'] = array_values($sysmap['selements']);
-
-				if(!isset($sysmap['links']))
-					$sysmap['links'] = array();
-				else
-					$sysmap['links'] = array_values($sysmap['links']);
-
-				foreach($sysmap['selements'] as &$selement){
-					$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
-
-					if(!isset($selement['elementid'])) $selement['elementid'] = 0;
-					switch($selement['elementtype']){
-						case SYSMAP_ELEMENT_TYPE_MAP:
-							$db_sysmaps = API::Map()->getObjects($selement['elementid']);
-							if(empty($db_sysmaps)){
-								$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-
-							$tmp = reset($db_sysmaps);
-							$selement['elementid'] = $tmp['sysmapid'];
-						break;
-						case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-							$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
-							if(empty($db_hostgroups)){
-								$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-
-							$tmp = reset($db_hostgroups);
-							$selement['elementid'] = $tmp['groupid'];
-						break;
-						case SYSMAP_ELEMENT_TYPE_HOST:
-							$db_hosts = API::Host()->getObjects($selement['elementid']);
-							if(empty($db_hosts)){
-								$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['elementid']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-
-							$tmp = reset($db_hosts);
-							$selement['elementid'] = $tmp['hostid'];
-						break;
-						case SYSMAP_ELEMENT_TYPE_TRIGGER:
-							$db_triggers = API::Trigger()->getObjects($selement['elementid']);
-							if(empty($db_triggers)){
-								$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-
-							$tmp = reset($db_triggers);
-							$selement['elementid'] = $tmp['triggerid'];
-						break;
-						case SYSMAP_ELEMENT_TYPE_IMAGE:
-						default:
-					}
-
-					$icons = array('iconid_off','iconid_on','iconid_disabled','iconid_maintenance');
-					foreach($icons as $icon){
-						if(isset($selement[$icon])){
-							$image = getImageByIdent($selement[$icon]);
-							if(!$image){
-								$error = S_CANNOT_FIND_IMAGE.' "'.$selement[$icon]['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
-								throw new Exception($error);
-							}
-							$selement[$icon] = $image['imageid'];
-						}
-						else{
-							$selement[$icon] = 0;
-						}
-					}
+				else{
+					$sysmap['backgroundid'] = $image['imageid'];
 				}
-				unset($selement);
+			}
+			else{
+				$sysmap['backgroundid'] = 0;
+			}
 
-				foreach($sysmap['links'] as &$link){
-					if(!isset($link['linktriggers'])) continue;
+			if(!isset($sysmap['selements']))
+				$sysmap['selements'] = array();
+			else
+				$sysmap['selements'] = array_values($sysmap['selements']);
 
-					foreach($link['linktriggers'] as &$linktrigger){
-						$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
+			if(!isset($sysmap['links']))
+				$sysmap['links'] = array();
+			else
+				$sysmap['links'] = array_values($sysmap['links']);
+
+			foreach($sysmap['selements'] as &$selement){
+				$nodeCaption = isset($selement['elementid']['node'])?$selement['elementid']['node'].':':'';
+
+				if(!isset($selement['elementid'])) $selement['elementid'] = 0;
+				switch($selement['elementtype']){
+					case SYSMAP_ELEMENT_TYPE_MAP:
+						$db_sysmaps = API::Map()->getObjects($selement['elementid']);
+						if(empty($db_sysmaps)){
+							$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							throw new Exception($error);
+						}
+
+						$tmp = reset($db_sysmaps);
+						$selement['elementid'] = $tmp['sysmapid'];
+					break;
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+						$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
+						if(empty($db_hostgroups)){
+							$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							throw new Exception($error);
+						}
+
+						$tmp = reset($db_hostgroups);
+						$selement['elementid'] = $tmp['groupid'];
+					break;
+					case SYSMAP_ELEMENT_TYPE_HOST:
+						$db_hosts = API::Host()->getObjects($selement['elementid']);
+						if(empty($db_hosts)){
+							$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['elementid']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							throw new Exception($error);
+						}
+
+						$tmp = reset($db_hosts);
+						$selement['elementid'] = $tmp['hostid'];
+					break;
+					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$db_triggers = API::Trigger()->getObjects($selement['elementid']);
 						if(empty($db_triggers)){
-							$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
-							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
 							throw new Exception($error);
 						}
 
 						$tmp = reset($db_triggers);
-						$linktrigger['triggerid'] = $tmp['triggerid'];
-					}
-					unset($linktrigger);
+						$selement['elementid'] = $tmp['triggerid'];
+					break;
+					case SYSMAP_ELEMENT_TYPE_IMAGE:
+					default:
 				}
-				unset($link);
-			}
-			unset($sysmap);
 
-
-			foreach($importMaps as $importMap){
-				if(isset($importMap['sysmapid'])){
-					$result = API::Map()->update($importMap);
-					if($result === false){
-						throw new Exception(_s('Cannot update map "%s".', $importMap['name']));
+				$icons = array('iconid_off','iconid_on','iconid_disabled','iconid_maintenance');
+				foreach($icons as $icon){
+					if(isset($selement[$icon])){
+						$image = getImageByIdent($selement[$icon]);
+						if(!$image){
+							$error = S_CANNOT_FIND_IMAGE.' "'.$selement[$icon]['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							throw new Exception($error);
+						}
+						$selement[$icon] = $image['imageid'];
 					}
 					else{
-						info(_s('Map "%s" updated.', $importMap['name']));
+						$selement[$icon] = 0;
 					}
+				}
+			}
+			unset($selement);
+
+			foreach($sysmap['links'] as &$link){
+				if(!isset($link['linktriggers'])) continue;
+
+				foreach($link['linktriggers'] as &$linktrigger){
+					$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
+					if(empty($db_triggers)){
+						$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
+						$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+						throw new Exception($error);
+					}
+
+					$tmp = reset($db_triggers);
+					$linktrigger['triggerid'] = $tmp['triggerid'];
+				}
+				unset($linktrigger);
+			}
+			unset($link);
+		}
+		unset($sysmap);
+
+
+		foreach($importMaps as $importMap){
+			if(isset($importMap['sysmapid'])){
+				$result = API::Map()->update($importMap);
+				if($result === false){
+					throw new Exception(_s('Cannot update map "%s".', $importMap['name']));
 				}
 				else{
-					$result = API::Map()->create($importMap);
-					if($result === false){
-						throw new Exception(_s('Cannot create map "%s".', $importMap['name']));
-					}
-					else{
-						info(_s('Map "%s" created.', $importMap['name']));
-					}
+					info(_s('Map "%s" updated.', $importMap['name']));
 				}
 			}
+			else{
+				$result = API::Map()->create($importMap);
+				if($result === false){
+					throw new Exception(_s('Cannot create map "%s".', $importMap['name']));
+				}
+				else{
+					info(_s('Map "%s" created.', $importMap['name']));
+				}
+			}
+		}
 
-			return true;
-		}
-		catch(Exception $e){
-			error($e->getMessage());
-			return false;
-		}
+		return true;
 	}
 
 	public static function parseMain($rules){
@@ -948,28 +885,6 @@ class zbxXML{
 						);
 					}
 
-					// did host use ipmi? if so, adding another interface of "ipmi" type
-					if(isset($host_db['useipmi']) && $host_db['useipmi']){
-						// when saving a host in 1.8, it's possible to set useipmi=1 and not to fill an IP address
-						//  we were not really sure what to do with this host, and decided to take host IP address instead and show info message about this
-						if($host_db['ipmi_ip'] == ''){
-							$ipmi_ip = $host_db['ip'];
-							info(_s('Host "%s" has "useipmi" parameter checked, but has no "ipmi_ip" parameter! Using host IP address as an address for IPMI interface.', $host_db['host']));
-						}
-						else{
-							$ipmi_ip = $host_db['ipmi_ip'];
-						}
-						$interfaces[] = array(
-							'main' => INTERFACE_PRIMARY,
-							'type' => INTERFACE_TYPE_IPMI,
-							'useip' => INTERFACE_USE_DNS,
-							'ip' =>  '',
-							'dns' => $ipmi_ip,
-							'port' => $host_db['ipmi_port']
-						);
-					}
-
-
 					// now we need to check if host had SNMP items. If it had, we need and SNMP interface for every different port.
 					$items = $xpath->query('items/item', $host);
 					$snmp_interface_ports_created = array();
@@ -993,6 +908,35 @@ class zbxXML{
 						}
 					}
 					unset($snmp_interface_ports_created); // it was a temporary variable
+
+
+					// we ned to add ipmi interface if at least one ipmi item exists
+					foreach($items as $item){
+						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
+						if($item_db['type'] == ITEM_TYPE_IPMI) {
+							// when saving a host in 1.8, it's possible to set useipmi=1 and not to fill an IP address
+							// we were not really sure what to do with this host,
+							// and decided to take host IP address instead and show info message about this
+							if($host_db['ipmi_ip'] == ''){
+								$ipmi_ip = $host_db['ip'];
+								info(_s('Host "%s" has "useipmi" parameter checked, but has no "ipmi_ip" parameter! Using host IP address as an address for IPMI interface.', $host_db['host']));
+							}
+							else{
+								$ipmi_ip = $host_db['ipmi_ip'];
+							}
+							$interfaces[] = array(
+								'main' => INTERFACE_PRIMARY,
+								'type' => INTERFACE_TYPE_IPMI,
+								'useip' => INTERFACE_USE_DNS,
+								'ip' =>  '',
+								'dns' => $ipmi_ip,
+								'port' => $host_db['ipmi_port']
+							);
+
+							// we need only one ipmi interface
+							break;
+						}
+					}
 				}
 
 				if($current_host){
@@ -1108,7 +1052,7 @@ class zbxXML{
 					$templates = $xpath->query('templates/template', $host);
 
 					$host_db['templates'] = array();
-					foreach($templates as $tnum => $template){
+					foreach($templates as $template){
 
 						$options = array(
 							'filter' => array('host' => $template->nodeValue),
