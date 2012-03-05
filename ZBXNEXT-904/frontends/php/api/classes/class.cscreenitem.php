@@ -317,8 +317,9 @@ class CScreenItem extends CZBXAPI {
 	 * @throws APIException if a validation error occurred.
 	 *
 	 * @param array $screenItems	An array of screen items to validate
-	 * @param array $dbScreenItems	An array of screen items $screenItems should
-	 *								be matched against
+	 * @param array $dbScreenItems	An array of screen items $screenItems should be matched against
+	 * @param array $options		An array of check options:
+	 *		"check_duplicate_resource_in_cell" - defines if will processed validation on duplicate resource in same cell
 	 */
 	protected function checkInput(array $screenItems, array $dbScreenItems = array(), array $options = array()) {
 		$hostgroups = array();
