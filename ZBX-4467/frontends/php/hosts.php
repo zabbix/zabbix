@@ -80,7 +80,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'macro_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	'isset({macro_add})'),
 		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	'isset({macro_add})'),
 		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
-		'macros_del' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 // mass update
 		'massupdate'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'visible'=>			array(T_ZBX_STR, O_OPT,	NULL, 	NULL,	NULL),
@@ -511,32 +510,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			foreach ($macros as $mnum => $macro) {
 				if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 					unset($macros[$mnum]);
-					continue;
 				}
-
-				if ($macro['new'] == 'create') {
-					unset($macros[$mnum]['macroid']);
-				}
-				unset($macros[$mnum]['new']);
 			}
 
 			$duplicatedMacros = array();
 			foreach ($macros as $mnum => $macro) {
 				// transform macros to uppercase {$aaa} => {$AAA}
 				$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
-
-				// search for duplicates items in new macros array
-				foreach ($macros as $duplicateNumber => $duplicateNewMacro) {
-					if ($mnum != $duplicateNumber && $macros[$mnum]['macro'] == $duplicateNewMacro['macro']) {
-						$duplicatedMacros[] = '"'.$macros[$mnum]['macro'].'"';
-					}
-				}
-			}
-
-			// validate duplicates macros
-			if (!empty($duplicatedMacros)) {
-				error(_s('More than one macro with same name found: %1$s .', implode(', ', array_unique($duplicatedMacros))));
-				throw new Exception();
 			}
 
 			// create new group
