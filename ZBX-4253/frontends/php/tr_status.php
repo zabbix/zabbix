@@ -462,7 +462,7 @@ include_once('include/page_header.php');
 		$menu_trigger_url = 'null';
 		if (!zbx_empty($trigger['url'])) {
 			// double htmlentities is required to prevent XSS attacks
-			$menu_trigger_url = "['".S_URL."','".htmlentities(htmlentities(resolveTriggerUrl($trigger), ENT_QUOTES, "UTF"), ENT_QUOTES, "UTF")."',
+			$menu_trigger_url = "['".S_URL."','".zbxSanitizeUrl(resolveTriggerUrl($trigger))."',
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$description->addAction('onclick',
@@ -541,7 +541,7 @@ include_once('include/page_header.php');
 			}
 
 			$menus.= "[".zbx_jsvalue(S_LINKS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			$menus.= "['".S_LATEST_DATA."',\"latest.php?hostid=".$trigger_host['hostid']."\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 
 			$menus = rtrim($menus,',');
 			$menus = 'show_popup_menu(event,['.$menus.'],180);';
