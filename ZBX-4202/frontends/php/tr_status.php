@@ -440,9 +440,12 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$trigger_descriptions = expandTriggersDescriptions($triggerids);
 
-	$sql_dep = 'SELECT triggerid_down,triggerid_up FROM trigger_depends WHERE '.DBcondition('triggerid_up', $triggerids);
-	$dep_res = DBselect($sql_dep);
-	$triggerids_down = Array();
+	$dep_res = DBselect(
+		'SELECT triggerid_down,triggerid_up'.
+		' FROM trigger_depends'.
+		' WHERE '.DBcondition('triggerid_up', $triggerids)
+	);
+	$triggerids_down = array();
 	while ($row = DBfetch($dep_res)) {
 		$triggerids_down[$row['triggerid_up']][] = intval($row['triggerid_down']);
 	}
