@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2001-2011 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,23 +19,19 @@
 **/
 ?>
 <?php
-
-class CJSscript extends CObject {
-
-	public function __construct($item = null) {
-		$this->items = array();
-		$this->addItem($item);
-	}
-
-	public function addItem($value) {
-		if (is_array($value)) {
-			foreach ($value as $item) {
-				array_push($this->items, unpack_object($item));
-			}
-		}
-		elseif (!is_null($value)) {
-			array_push($this->items, unpack_object($value));
-		}
-	}
+$screenWidget = new CWidget();
+$screenWidget->addPageHeader(_('CONFIGURATION OF SCREEN'));
+$screenWidget->addHeader($this->data['screen']['name']);
+$screenWidget->addItem(BR());
+if (!empty($this->data['screen']['templateid'])) {
+	$screenWidget->addItem(get_header_host_table($this->data['screen']['templateid']));
 }
+
+$screenTable = get_screen($this->data['screen'], 1);
+zbx_add_post_js('init_screen("'.$this->data['screenid'].'", "iframe", "'.$this->data['screenid'].'");');
+zbx_add_post_js('timeControl.processObjects();');
+
+// append form to widget
+$screenWidget->addItem($screenTable);
+return $screenWidget;
 ?>

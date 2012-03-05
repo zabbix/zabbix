@@ -303,7 +303,7 @@ class CImage extends CZBXAPI {
 				}
 
 				if ($this->exists(array('name' => $image['name']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '._('already exists'));
 				}
 
 				// Decode BASE64
@@ -413,7 +413,7 @@ class CImage extends CZBXAPI {
 			$imageExists = reset($imageExists);
 
 			if ($imageExists && (bccomp($imageExists['imageid'], $image['imageid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '.S_ALREADY_EXISTS_SMALL);
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '._('already exists'));
 			}
 
 			$values = array();

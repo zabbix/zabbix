@@ -29,7 +29,6 @@
 class CScreenItem extends CZBXAPI {
 
 	protected $tableName = 'screens_items';
-
 	protected $tableAlias = 'si';
 
 	/**
@@ -57,30 +56,25 @@ class CScreenItem extends CZBXAPI {
 		SCREEN_RESOURCE_HOST_TRIGGERS
 	);
 
-
 	protected $sortColumns = array(
 		'screenitemid',
 		'screenid'
 	);
 
-
 	public function __construct() {
 		parent::__construct();
 
 		$this->getOptions = zbx_array_merge($this->globalGetOptions, array(
-			'screenitemids'				=> null,
-			'screenids'					=> null,
-			'editable'					=> null,
-
-			'selectScreen'				=> null,				// not implemented
-
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'preservekeys'				=> null,
-			'countOutput'				=> null,
+			'screenitemids'	=> null,
+			'screenids'		=> null,
+			'editable'		=> null,
+			'selectScreen'	=> null, // not implemented
+			'sortfield'		=> '',
+			'sortorder'		=> '',
+			'preservekeys'	=> null,
+			'countOutput'	=> null
 		));
 	}
-
 
 	/**
 	 * Get ScreemItem data
@@ -95,7 +89,6 @@ class CScreenItem extends CZBXAPI {
 	 * @return array|boolean Host data as array or false if error
 	 */
 	public function get(array $options = array()) {
-		// options
 		$options = zbx_array_merge($this->getOptions, $options);
 
 		// build and execute query
@@ -119,10 +112,8 @@ class CScreenItem extends CZBXAPI {
 				}
 			}
 		}
-
 		return $result;
 	}
-
 
 	/**
 	 * Saves the given screen items.
@@ -132,18 +123,22 @@ class CScreenItem extends CZBXAPI {
 	 *								under the 'screenitemids' key
 	 */
 	public function create(array $screenItems) {
+		$screenItems = zbx_toArray($screenItems);
+
+		$dbScreenItems = $this->get(array(
+			'screenids' => zbx_objectValues($screenItems, 'screenid'),
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
 
 		// validate input
-		$this->checkInput($screenItems);
+		$this->checkInput($screenItems, $dbScreenItems, array('check_duplicate_resource_in_cell' => true));
 
 		// insert items
 		$screenItemids = DB::insert($this->tableName(), $screenItems);
 
-		return array(
-			'screenitemids' => $screenItemids
-		);
+		return array('screenitemids' => $screenItemids);
 	}
-
 
 	/**
 	 * Updates the given screen items.
@@ -153,6 +148,7 @@ class CScreenItem extends CZBXAPI {
 	 *								under the 'screenitemids' key
 	 */
 	public function update(array $screenItems) {
+		$screenItems = zbx_toArray($screenItems);
 
 		// fetch the items we're updating
 		$screenItemids = zbx_objectValues($screenItems, 'screenitemid');
@@ -172,18 +168,13 @@ class CScreenItem extends CZBXAPI {
 			unset($screenItem['screenitemid']);
 			$update[] = array(
 				'values' => $screenItem,
-				'where' => array(
-					'screenitemid' => $screenItemId
-				)
+				'where' => array('screenitemid' => $screenItemId)
 			);
 		}
 		DB::update($this->tableName(), $update);
 
-		return array(
-			'screenitemids' => zbx_objectValues($screenItems, 'screenitemid')
-		);
+		return array('screenitemids' => zbx_objectValues($screenItems, 'screenitemid'));
 	}
-
 
 	/**
 	 * Update screen items using the given 'x' and 'y' parameters.
@@ -194,7 +185,6 @@ class CScreenItem extends CZBXAPI {
 	 *								under the 'screenitemids' key
 	 */
 	public function updateByPosition(array $screenItems) {
-
 		// create a screen-position map
 		$dbScreenItems = $this->get(array(
 			'output' => array('screenitemid', 'x', 'y', 'screenid'),
@@ -236,11 +226,8 @@ class CScreenItem extends CZBXAPI {
 		}
 
 		// return the ids of the affected items
-		return array(
-			'screenitemids' => array_merge($updateItemids, $createItemids)
-		);
+		return array('screenitemids' => array_merge($updateItemids, $createItemids));
 	}
-
 
 	/**
 	 * Deletes the given screen items.
@@ -271,7 +258,6 @@ class CScreenItem extends CZBXAPI {
 		return array('screenitemids' => $screenItemids);
 	}
 
-
 	/**
 	 * Returns true if the given screen items exist and are available for reading.
 	 *
@@ -295,7 +281,6 @@ class CScreenItem extends CZBXAPI {
 
 		return (count($screenItemids) == $count);
 	}
-
 
 	/**
 	 * Returns true if the given screen items exist and are available for writing.
@@ -322,7 +307,6 @@ class CScreenItem extends CZBXAPI {
 		return (count($screenItemids) == $count);
 	}
 
-
 	/**
 	 * Validates the given screen items.
 	 *
@@ -333,11 +317,11 @@ class CScreenItem extends CZBXAPI {
 	 * @throws APIException if a validation error occurred.
 	 *
 	 * @param array $screenItems	An array of screen items to validate
-	 * @param array $dbScreenItems	An array of screen items $screenItems should
-	 *								be matched against
+	 * @param array $dbScreenItems	An array of screen items $screenItems should be matched against
+	 * @param array $options		An array of check options:
+	 *		"check_duplicate_resource_in_cell" - defines if will processed validation on duplicate resource in same cell
 	 */
-	protected function checkInput(array $screenItems, array $dbScreenItems = array()) {
-
+	protected function checkInput(array $screenItems, array $dbScreenItems = array(), array $options = array()) {
 		$hostgroups = array();
 		$hosts = array();
 		$graphs = array();
@@ -346,15 +330,25 @@ class CScreenItem extends CZBXAPI {
 		$screens = array();
 
 		foreach ($screenItems as $screenItem) {
-
 			// check if the item is editable
-			if ($dbScreenItems && !isset($dbScreenItems[$screenItem['screenitemid']])) {
+			if (!empty($screenItem['screenitemid']) && !isset($dbScreenItems[$screenItem['screenitemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 
 			// check resource type
 			if (!$this->isValidResourceType($screenItem['resourcetype'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource type provided for screen item.'));
+			}
+
+			// check duplicate resource in cell
+			if (!empty($options['check_duplicate_resource_in_cell']) && isset($screenItem['x']) && isset($screenItem['y'])) {
+				foreach ($dbScreenItems as $dbScreenItem) {
+					if ($dbScreenItem['screenid'] == $screenItem['screenid']
+							&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
+							&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exist.'));
+					}
+				}
 			}
 
 			// perform resource type specific validation
@@ -368,6 +362,7 @@ class CScreenItem extends CZBXAPI {
 			);
 			if (in_array($screenItem['resourcetype'], $hostGroupResourceTypes)) {
 				$resourceIdRequired = !in_array($screenItem['resourcetype'], array(
+					SCREEN_RESOURCE_HOSTS_INFO,
 					SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
 					SCREEN_RESOURCE_TRIGGERS_INFO
 				));
@@ -389,7 +384,6 @@ class CScreenItem extends CZBXAPI {
 			}
 			elseif (in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))
 					|| $screenItem['resourcetype'] == SCREEN_RESOURCE_CLOCK && $screenItem['style'] == TIME_TYPE_HOST) {
-
 				if (!$screenItem['resourceid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
 				}
@@ -422,8 +416,9 @@ class CScreenItem extends CZBXAPI {
 				'preservekeys' => true
 			));
 			foreach ($hostgroups as $id) {
-				if (!isset($result[$id]))
+				if (!isset($result[$id])) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect host group ID "%s" provided for screen element.', $id));
+				}
 			}
 		}
 
@@ -491,14 +486,11 @@ class CScreenItem extends CZBXAPI {
 				'output' => API_OUTPUT_SHORTEN,
 				'preservekeys' => true
 			));
-			foreach ($screens as $id) {
-				if (!isset($result[$id])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect screen ID "%s" provided for screen element.', $id));
-				}
+			if (empty($result)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect screen ID "%s" provided for screen element.', $id));
 			}
 		}
 	}
-
 
 	/**
 	 * Returns true if the given resource type is supported.
@@ -510,16 +502,14 @@ class CScreenItem extends CZBXAPI {
 		return in_array($resourceType, self::$resourceTypes);
 	}
 
-
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		// only appy the node option if no specific screen ids are given
+		// only apply the node option if no specific screen ids are given
 		if ($options['screenids'] === null) {
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
 
 		return $sqlParts;
 	}
-
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -533,6 +523,5 @@ class CScreenItem extends CZBXAPI {
 
 		return $sqlParts;
 	}
-
 }
 ?>

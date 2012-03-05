@@ -701,12 +701,12 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// check if all hosts exist and are writable
 		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		// check if the given discovery rules exist
 		if (!$this->isReadable($data['discoveryids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		// copy
@@ -724,10 +724,10 @@ class CDiscoveryRule extends CItemGeneral {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 		if (!API::Template()->isReadable($data['templateids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		$selectFields = array();

@@ -265,8 +265,9 @@ function access_deny() {
 				new CButton('login', _('Login'), "javascript: document.location = 'index.php?request=$url';"),
 				new CButton('back', _('Cancel'), 'javascript: window.history.back();')
 			),
-			'left');
-		$table->setFooter($footer,'footer');
+			'left'
+		);
+		$table->setFooter($footer, 'footer');
 		$table->show();
 	}
 	require_once dirname(__FILE__).'/page_footer.php';
@@ -449,6 +450,7 @@ function show_error_message($msg) {
 
 function info($msgs) {
 	global $ZBX_MESSAGES;
+
 	zbx_value2array($msgs);
 	if (is_null($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = array();
@@ -460,6 +462,7 @@ function info($msgs) {
 
 function error($msgs) {
 	global $ZBX_MESSAGES;
+
 	$msgs = zbx_toArray($msgs);
 
 	if (is_null($ZBX_MESSAGES)) {
@@ -476,6 +479,7 @@ function error($msgs) {
 
 function clear_messages($count = null) {
 	global $ZBX_MESSAGES;
+
 	$result = array();
 	if (!is_null($count)) {
 		while ($count-- > 0) {
@@ -516,7 +520,7 @@ function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {
 		$child = $tree[$id];
 		if (bccomp($child[$parent_field],$parentid) == 0) {
 			$result[$id] = $child;
-			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // ATTENTION RECURSION !!!
+			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // attention recursion !!!
 			$result += $childs;
 		}
 	}
@@ -542,7 +546,8 @@ function parse_period($str) {
 					'start_m'	=> $arr[4],
 					'end_h'		=> $arr[5],
 					'end_m'		=> $arr[6]
-				));
+				)
+			);
 		}
 	}
 	return $out;
@@ -550,6 +555,7 @@ function parse_period($str) {
 
 function get_status() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
 	$status = array();
 
 	// server
@@ -608,11 +614,11 @@ function get_status() {
 	$status['items_count_not_supported'] = $row['cnt'];
 
 	// hosts
-	$sql = 'SELECT COUNT(hostid) AS cnt'.
-			' FROM hosts'.
-			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
-
-	$row = DBfetch(DBselect($sql));
+	$row = DBfetch(DBselect(
+		'SELECT COUNT(hostid) AS cnt'.
+		' FROM hosts'.
+		' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
+	));
 	$status['hosts_count'] = $row['cnt'];
 
 	$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_MONITORED));
@@ -627,15 +633,15 @@ function get_status() {
 	// users
 	$row = DBfetch(DBselect('SELECT COUNT(userid) as usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
 	$status['users_count'] = $row['usr_cnt'];
-
 	$status['users_online'] = 0;
 
-	$sql = 'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
-			' FROM sessions s'.
-			' WHERE '.DBin_node('s.userid').
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-			' GROUP BY s.userid,s.status';
-	$db_sessions = DBselect($sql);
+	$db_sessions = DBselect(
+		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
+		' FROM sessions s'.
+		' WHERE '.DBin_node('s.userid').
+			' AND s.status='.ZBX_SESSION_ACTIVE.
+		' GROUP BY s.userid,s.status'
+	);
 	while ($session = DBfetch($db_sessions)) {
 		if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) {
 			$status['users_online']++;
@@ -643,19 +649,22 @@ function get_status() {
 	}
 
 	// comments: !!! Don't forget sync code with C !!!
-	$sql = 'SELECT sum(1.0/i.delay) AS qps'.
-			' FROM items i,hosts h'.
-			' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.hostid=h.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.delay<>0';
-	$row = DBfetch(DBselect($sql));
+	$row = DBfetch(DBselect(
+		'SELECT sum(1.0/i.delay) AS qps'.
+		' FROM items i,hosts h'.
+		' WHERE i.status='.ITEM_STATUS_ACTIVE.
+			' AND i.hostid=h.hostid'.
+			' AND h.status='.HOST_STATUS_MONITORED.
+			' AND i.delay<>0'
+	));
 	$status['qps_total'] = round($row['qps'], 2);
+
 	return $status;
 }
 
 function set_image_header($format = null) {
 	global $IMAGE_FORMAT_DEFAULT;
+
 	if (is_null($format)) {
 		$format = $IMAGE_FORMAT_DEFAULT;
 	}
@@ -670,7 +679,7 @@ function set_image_header($format = null) {
 		header('Content-type:  image/png');
 	}
 
-	header('Expires:  Mon, 17 Aug 1998 12:51:50 GMT');
+	header('Expires: Mon, 17 Aug 1998 12:51:50 GMT');
 }
 
 function imageOut(&$image, $format = null) {
@@ -702,25 +711,22 @@ function imageOut(&$image, $format = null) {
 
 	switch ($page['type']) {
 		case PAGE_TYPE_IMAGE:
-			print($imageSource);
+			echo $imageSource;
 			break;
 		case PAGE_TYPE_JSON:
 			$json = new CJSON();
-			print($json->encode(array('result' => $imageId)));
+			echo $json->encode(array('result' => $imageId));
 			break;
 		case PAGE_TYPE_TEXT:
 		default:
-			print($imageId);
+			echo $imageId;
 	}
 }
 
 function encode_log($data) {
-	if (defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding')) {
-		return mb_convert_encoding($data, _('UTF-8'), ZBX_LOG_ENCODING_DEFAULT);
-	}
-	else {
-		return $data;
-	}
+	return (defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding'))
+		? mb_convert_encoding($data, _('UTF-8'), ZBX_LOG_ENCODING_DEFAULT)
+		: $data;
 }
 
 // function used in defines, so can't move it to func.inc.php

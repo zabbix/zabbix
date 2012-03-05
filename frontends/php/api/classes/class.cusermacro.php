@@ -26,7 +26,6 @@
 class CUserMacro extends CZBXAPI {
 
 	protected $tableName = 'hostmacro';
-
 	protected $tableAlias = 'hm';
 
 	/**
@@ -1015,6 +1014,5 @@ class CUserMacro extends CZBXAPI {
 			}
 		}
 	}
-
 }
 ?>

@@ -1124,10 +1124,10 @@ class CItem extends CItemGeneral {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 		if (!API::Template()->isReadable($data['templateids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
 		$selectFields = array();

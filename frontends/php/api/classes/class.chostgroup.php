@@ -655,7 +655,7 @@ class CHostGroup extends CZBXAPI{
 		$updGroups = $this->get($options);
 		foreach ($groups as $gnum => $group) {
 			if (!isset($updGroups[$group['groupid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
@@ -708,7 +708,7 @@ class CHostGroup extends CZBXAPI{
 			$delGroups = $this->get($options);
 			foreach ($groupids as $groupid) {
 				if (!isset($delGroups[$groupid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 
@@ -858,7 +858,7 @@ class CHostGroup extends CZBXAPI{
 		$updGroups = $this->get($options);
 		foreach ($groups as $group) {
 			if (!isset($updGroups[$group['groupid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
@@ -913,7 +913,7 @@ class CHostGroup extends CZBXAPI{
 		$updGroups = $this->get($options);
 		foreach ($groupids as $groupid) {
 			if (!isset($updGroups[$groupid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 		$hostids = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
@@ -979,7 +979,7 @@ class CHostGroup extends CZBXAPI{
 		$allowedGroups = $this->get($options);
 		foreach ($groups as $group) {
 			if (!isset($allowedGroups[$group['groupid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
@@ -993,7 +993,7 @@ class CHostGroup extends CZBXAPI{
 			$allowedHosts = API::Host()->get($options);
 			foreach ($hostsToCheck as $hostid) {
 				if (!isset($allowedHosts[$hostid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 		}
@@ -1008,7 +1008,7 @@ class CHostGroup extends CZBXAPI{
 			$allowedTemplates = API::Template()->get($options);
 			foreach ($templatesToCheck as $templateid) {
 				if (!isset($allowedTemplates[$templateid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 		}

@@ -2054,7 +2054,7 @@
 		$table = new CTable();
 		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
 
-		$titles = array('screen' => S_SCREEN);
+		$titles = array('screen' => _('Screen'));
 
 		foreach($titles as $key => $title){
 			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
