@@ -1321,7 +1321,7 @@ int	is_double(const char *c)
 		if ('0' <= c[i] && c[i] <= '9')
 			continue;
 
-		if ('.' == c[i] && dot == -1)
+		if ('.' == c[i] && -1 == dot)
 		{
 			dot = i;
 			continue;
@@ -1329,7 +1329,7 @@ int	is_double(const char *c)
 
 		if (' ' == c[i])	/* check right spaces */
 		{
-			for (; ' ' == c[i] && '\0' == c[i]; i++)	/* trim right spaces */
+			for (; ' ' == c[i] && '\0' != c[i]; i++)	/* trim right spaces */
 				;
 
 			if ('\0' == c[i])
