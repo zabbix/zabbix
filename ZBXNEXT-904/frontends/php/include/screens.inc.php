@@ -1338,7 +1338,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 				$item->setAttribute('data-ycoord', $r);
 			}
 
-			$new_col = new CCol($item, $str_halign.'_'.$str_valign);
+			$new_col = new CCol($item, $str_halign.'_'.$str_valign.' screenitem');
 
 			if (!empty($colspan)) {
 				$new_col->setColSpan($colspan);

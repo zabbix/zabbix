@@ -61,7 +61,7 @@ Cscreen.prototype = {
 			}
 		});
 
-		jQuery('.cntr_mdl').droppable({
+		jQuery('.screenitem').droppable({
 			accept: '.draggable',
 			hoverClass: 'ui-sortable-placeholder',
 			drop: this.on_drop,
