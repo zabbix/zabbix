@@ -92,6 +92,9 @@ initialize: function(url){
 
 	if(this.file.indexOf('?')>=0) this.file=this.file.substring(0, this.file.indexOf('?'));
 
+	// necessary if http://domain.com?a=1 is given instead of correct http://domain.com/?a=1
+	if(this.host.indexOf('?')>=0) this.host=this.host.substring(0,this.host.indexOf('?'));
+
 	var refSepIndex=this.file.indexOf('#');
 	if(refSepIndex>=0){
 		this.reference=this.file.substring(refSepIndex+1);

@@ -60,4 +60,23 @@ class CHtml {
 	public static function serialize(array $data) {
 		return self::encode(CJs::encodeJson($data));
 	}
+
+	/**
+	* Sanitizes URL against XSS.
+	*
+	* @static
+	*
+	* @param string $data
+	*
+	* @return string
+	*/
+	public static function sanitizeUrl($data) {
+
+		$data = str_replace(Array("'", "\"", "<", ">"), "", $data);
+
+		$data = strtolower($data);
+		$data = str_replace(Array("javascript:"), "", $data);
+
+		return $data;
+	}
 }
