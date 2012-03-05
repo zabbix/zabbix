@@ -45,14 +45,18 @@ Cscreen.prototype = {
 		this.id = id;
 		this.screen_obj = $(obj_id);
 
+		function wedge() {
+			return false
+		}
+
 		jQuery('.draggable').draggable({
 			revert: 'invalid',
 			opacity: 0.8,
 			zIndex: 999,
 			start: function() {
 				if (IE) {
-					Event.observe(document.body, 'drag', false, false);
-					Event.observe(document.body, 'selectstart', false, false);
+					Event.observe(document.body, 'drag', wedge, false);
+					Event.observe(document.body, 'selectstart', wedge, false);
 				}
 			}
 		});
