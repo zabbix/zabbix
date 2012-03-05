@@ -25,6 +25,7 @@ Z::getInstance()->run();
 
 require_once dirname(__FILE__).'/debug.inc.php';
 
+require_once dirname(__FILE__).'/api.inc.php';
 require_once dirname(__FILE__).'/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/defines.inc.php';
 require_once dirname(__FILE__).'/func.inc.php';

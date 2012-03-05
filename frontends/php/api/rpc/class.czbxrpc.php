@@ -89,7 +89,7 @@ class czbxrpc{
 
 		list($resource, $action) = explode('.', $method);
 
-		$class_name = API::getObjectClassName($resource);
+		$class_name = 'C'.$resource;
 		if (!class_exists($class_name)) {
 			return array('error' => ZBX_API_ERROR_PARAMETERS, 'data' => 'Resource ('.$resource.') does not exist');
 		}

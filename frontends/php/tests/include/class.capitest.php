@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/nodes.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';
+require_once dirname(__FILE__).'/../../include/api.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
 
 // locales
