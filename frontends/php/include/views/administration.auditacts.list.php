@@ -132,7 +132,8 @@ $objData = array(
 	'loadScroll' => 1,
 	'dynamic' => 0,
 	'mainObject' => 1,
-	'periodFixed' => CProfile::get('web.auditacts.timelinefixed', 1)
+	'periodFixed' => CProfile::get('web.auditacts.timelinefixed', 1),
+	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 );
 zbx_add_post_js('timeControl.addObject(\'events\', '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');

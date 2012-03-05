@@ -725,7 +725,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'loadScroll' => 1,
 		'dynamic' => 0,
 		'mainObject' => 1,
-		'periodFixed' => CProfile::get('web.events.timelinefixed', 1)
+		'periodFixed' => CProfile::get('web.events.timelinefixed', 1),
+		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 	);
 
 	zbx_add_post_js('jqBlink.blink();');
