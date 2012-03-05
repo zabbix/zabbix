@@ -123,6 +123,8 @@ class CScreenItem extends CZBXAPI {
 	 *								under the 'screenitemids' key
 	 */
 	public function create(array $screenItems) {
+		$screenItems = zbx_toArray($screenItems);
+
 		$dbScreenItems = $this->get(array(
 			'screenids' => zbx_objectValues($screenItems, 'screenid'),
 			'output' => API_OUTPUT_EXTEND,
@@ -130,7 +132,7 @@ class CScreenItem extends CZBXAPI {
 		));
 
 		// validate input
-		$this->checkInput($screenItems, $dbScreenItems);
+		$this->checkInput($screenItems, $dbScreenItems, array('check_duplicate_resource_in_cell' => true));
 
 		// insert items
 		$screenItemids = DB::insert($this->tableName(), $screenItems);
@@ -146,6 +148,8 @@ class CScreenItem extends CZBXAPI {
 	 *								under the 'screenitemids' key
 	 */
 	public function update(array $screenItems) {
+		$screenItems = zbx_toArray($screenItems);
+
 		// fetch the items we're updating
 		$screenItemids = zbx_objectValues($screenItems, 'screenitemid');
 		$dbScreenItems = $this->get(array(
@@ -316,7 +320,7 @@ class CScreenItem extends CZBXAPI {
 	 * @param array $dbScreenItems	An array of screen items $screenItems should
 	 *								be matched against
 	 */
-	protected function checkInput(array $screenItems, array $dbScreenItems = array()) {
+	protected function checkInput(array $screenItems, array $dbScreenItems = array(), array $options = array()) {
 		$hostgroups = array();
 		$hosts = array();
 		$graphs = array();
@@ -326,7 +330,7 @@ class CScreenItem extends CZBXAPI {
 
 		foreach ($screenItems as $screenItem) {
 			// check if the item is editable
-			if ($dbScreenItems && !empty($screenItem['screenitemid'] ) && !isset($dbScreenItems[$screenItem['screenitemid']])) {
+			if (!empty($screenItem['screenitemid']) && !isset($dbScreenItems[$screenItem['screenitemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 
@@ -335,8 +339,8 @@ class CScreenItem extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect resource type provided for screen item.'));
 			}
 
-			// check duplicates resource in cell
-			if (isset($screenItem['x']) && isset($screenItem['y'])) {
+			// check duplicate resource in cell
+			if (!empty($options['check_duplicate_resource_in_cell']) && isset($screenItem['x']) && isset($screenItem['y'])) {
 				foreach ($dbScreenItems as $dbScreenItem) {
 					if ($dbScreenItem['screenid'] == $screenItem['screenid']
 							&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0

@@ -42,8 +42,8 @@ $fields = array(
 	'templateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
 	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null),
-	'colspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null),
-	'rowspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null),
+	'colspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
+	'rowspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
 	'elements' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 65535), null),
 	'sort_triggers' =>	array(T_ZBX_INT, O_OPT, null,	IN(array(SCREEN_SORT_TRIGGERS_DATE_DESC, SCREEN_SORT_TRIGGERS_SEVERITY_DESC, SCREEN_SORT_TRIGGERS_HOST_NAME_ASC)), null),
 	'valign' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(VALIGN_MIDDLE, VALIGN_BOTTOM), null),
@@ -147,30 +147,40 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	if (!isset($_REQUEST['elements'])) {
-		$_REQUEST['elements'] = 0;
-	}
-	if (!isset($_REQUEST['sort_triggers'])) {
-		$_REQUEST['sort_triggers'] = SCREEN_SORT_TRIGGERS_DATE_DESC;
-	}
+	$screenItem = array(
+		'screenid' => get_request('screenid'),
+		'resourceid' => get_request('resourceid'),
+		'resourcetype' => get_request('resourcetype'),
+		'caption' => get_request('caption'),
+		'style' => get_request('style'),
+		'url' => get_request('url'),
+		'width' => get_request('width'),
+		'height' => get_request('height'),
+		'halign' => get_request('halign'),
+		'valign' => get_request('valign'),
+		'colspan' => get_request('colspan'),
+		'rowspan' => get_request('rowspan'),
+		'dynmic' => get_request('dynmic'),
+		'elements' => get_request('elements', 0),
+		'sort_triggers' => get_request('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC)
+	);
 
 	DBstart();
+	if (!empty($_REQUEST['screenitemid'])) {
+		$screenItem['screenitemid'] = $_REQUEST['screenitemid'];
 
-	if (isset($_REQUEST['screenitemid'])) {
-		$msg_ok = _('Item updated');
-		$msg_err = _('Cannot update item');
-
-		$result = API::ScreenItem()->update(array($_REQUEST));
+		$result = API::ScreenItem()->update($screenItem);
+		show_messages($result, _('Item updated'), _('Cannot update item'));
 	}
 	else {
-		$msg_ok = _('Item added');
-		$msg_err = _('Cannot add item');
+		$screenItem['x'] = get_request('x');
+		$screenItem['y'] = get_request('y');
 
-		$result = API::ScreenItem()->create(array($_REQUEST));
+		$result = API::ScreenItem()->create($screenItem);
+		show_messages($result, _('Item added'), _('Cannot add item'));
 	}
 
 	DBend($result);
-	show_messages($result, $msg_ok, $msg_err);
 
 	if ($result) {
 		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'Cell changed '.
