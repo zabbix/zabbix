@@ -1303,15 +1303,14 @@ function expand_trigger_description($triggerid) {
 }
 
 function expandTriggersDescriptions($triggerids) {
-	$result = Array();
-	$sqlWhereIn = DBcondition('t.triggerid', $triggerids);
+	$result = array();
 	$cursor = DBselect(
 		'SELECT DISTINCT h.host,t.description,t.expression,t.triggerid'.
 		' FROM triggers t,functions f,items i,hosts h'.
 		' WHERE f.triggerid=t.triggerid'.
 			' AND i.itemid=f.itemid'.
 			' AND h.hostid=i.hostid'.
-			' AND '.$sqlWhereIn
+			' AND '.DBcondition('t.triggerid', $triggerids)
 	);
 	while ($row = DBfetch($cursor)) {
 		$result[$row['triggerid']] = htmlspecialchars(expand_trigger_description_by_data($row));

@@ -425,7 +425,6 @@ class CEvent extends CZBXAPI {
 					$result[$event['eventid']] += $event;
 				}
 			}
-
 		}
 
 		/*
