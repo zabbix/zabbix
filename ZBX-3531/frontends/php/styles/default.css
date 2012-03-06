@@ -387,7 +387,7 @@ table.screen_edit tr td.cntr_mdl { text-align: center; vertical-align: middle; }
 table.screen_edit tr td.cntr_bttm { text-align: center; vertical-align: bottom; }
 table.screen_edit tr td.right_top { text-align: right; vertical-align: top; }
 table.screen_edit tr td.right_mdl { text-align: right; vertical-align: middle; }
-table.screen_edit tr td.right_bttm { text-align: right;	vertical-align: bottom; }
+table.screen_edit tr td.right_bttm { text-align: right; vertical-align: bottom; }
 table.screen_view { background-color: #FFFFFF; width: 100%; border: 1px #DDDDDD; }
 table.screen_view td { border: 1px #DDDDDD; text-align: center; vertical-align: middle; }
 table.screen_view tr td.def_def { text-align: center; vertical-align: middle; }
@@ -403,6 +403,7 @@ table.screen_view tr td.cntr_bttm { text-align: center; vertical-align: bottom; 
 table.screen_view tr td.right_top { text-align: right; vertical-align: top; }
 table.screen_view tr td.right_mdl { text-align: right; vertical-align: middle; }
 table.screen_view tr td.right_bttm { text-align: right; vertical-align: bottom; }
+table.screen_edit .draggable, table.screen_view .draggable { padding: 1px 1px 0px 0px; }
 
 /* table info */
 table.tableinfo { empty-cells:show; width: 100%; border-spacing: 2px; }
@@ -661,3 +662,10 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .browserwarningCopyright a:hover { text-decoration: underline; }
 
 .vertical-middle { width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%; }
+
+.flashclock {
+	top: 0px; left:50%; margin-left: -50px;
+	width: 100px; height: 100px;
+	z-index: 10; position: absolute;
+	background: url('../images/general/transparent.png') repeat scroll center top transparent;
+}

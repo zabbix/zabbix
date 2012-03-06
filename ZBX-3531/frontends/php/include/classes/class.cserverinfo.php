@@ -19,52 +19,61 @@
 **/
 ?>
 <?php
-class CServerInfo extends CTable{
+
+class CServerInfo extends CTable {
+
 	public function __construct() {
-		parent::__construct(NULL,'server_info');
+		parent::__construct(null, 'server_info');
 	}
 
 	public function bodyToString() {
+		global $USER_DETAILS;
+
 		$this->cleanItems();
 
 		$status = get_status();
+		$server = ($status['zabbix_server'] == _('Yes'))
+			? new CSpan(_('running'), 'off')
+			: new CSpan(_('not running'), 'on');
+		$serverLink = ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN)
+			? new CLink(_('Zabbix server'), 'report1.php')
+			: _('Zabbix server');
 
-		if ($status['zabbix_server'] == S_YES)
-			$server = new CSpan(S_RUNNING,'off');
-		else
-			$server = new CSpan(S_NOT_RUNNING,'on');
+		$this->addRow(new CCol(_('Zabbix server info'), 'nowrap ui-corner-all ui-widget-header'));
+		$this->addRow(_('Updated').': '.zbx_date2str(_('r'), time())); // GETTEXT: r is date format string as described in http://php.net/date
+		$this->addRow(_('Users (online)').': '.$status['users_count'].'('.$status['users_online'].')');
+		$this->addRow(new CCol(array(_('Logged in as').SPACE, new CLink(CWebUser::$data['alias'], 'profile.php'))));
+		$this->addRow(new CCol(array($serverLink, SPACE._('is').SPACE, $server)), 'status');
+		$this->addRow(new CCol(array(
+			_('Hosts (m/n/t)').': '.$status['hosts_count'].'(',
+			new CSpan($status['hosts_count_monitored'], 'off'),
+			'/',
+			new CSpan($status['hosts_count_not_monitored'], 'on'),
+			'/',
+			new CSpan($status['hosts_count_template'], 'unknown'),
+			')'
+		)));
+		$this->addRow(new CCol(array(
+			_('Items (m/d/n)').': '.$status['items_count'].'(',
+			new CSpan($status['items_count_monitored'], 'off'),
+			'/',
+			new CSpan($status['items_count_disabled'], 'on'),
+			'/',
+			new CSpan($status['items_count_not_supported'], 'unknown'),
+			')'
+		)));
+		$this->addRow(new CCol(array(
+			_('Triggers (e/d)[p/u/o]').': '.$status['triggers_count'].
+			'('.$status['triggers_count_enabled'].'/'.$status['triggers_count_disabled'].')[',
+			new CSpan($status['triggers_count_on'], 'on'),
+			'/',
+			new CSpan($status['triggers_count_unknown'], 'unknown'),
+			'/',
+			new CSpan($status['triggers_count_off'], 'off'),
+			']'
+		)));
 
-		$header = new CCol('Zabbix '.S_SERVER_INFO,'nowrap ui-corner-all ui-widget-header');
-		$this->addRow($header);
-		// GETTEXT: r is date format string as described in http://php.net/date
-		$this->addRow(_('Updated').': '.zbx_date2str(_('r'),time()));
-		$this->addRow(new CCol(array(_s('Refreshed every: %s sec ', CWebUser::$data['refresh']),
-				'(',new CLink(_('refresh now'),'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']),')')));
-		$this->addRow(S_NUMBER_OF_USERS_SHORT.': '.$status['users_count'].'('.$status['users_online'].')');
-		$this->addRow(new CCol(array(_('Logged in as').SPACE, new CLink(CWebUser::$data['alias'],'profile.php'))));
-		$this->addRow(new CCol(array(new CLink(_('Zabbix server'),'report1.php'),' is ',$server)),'status');
-		//$this->addRow(S_VALUES_STORED.': '.$status['history_count']);
-		//$this->addRow(S_TRENDS_STORED.': '.$status['trends_count']);
-		$this->addRow(new CCol(array(S_NUMBER_OF_HOSTS_SHORT.': '.$status['hosts_count'].'(',
-			new CSpan($status['hosts_count_monitored'],'off'),'/',
-			new CSpan($status['hosts_count_not_monitored'],'on'),'/',
-			new CSpan($status['hosts_count_template'],'unknown'),')')));
-		$this->addRow(new CCol(array(S_NUMBER_OF_ITEMS_SHORT.': '.$status['items_count'].'(',
-			new CSpan($status['items_count_monitored'],'off'),'/',
-			new CSpan($status['items_count_disabled'],'on'),'/',
-			new CSpan($status['items_count_not_supported'],'unknown'),')')));
-		$this->addRow(new CCol(array(S_NUMBER_OF_TRIGGERS_SHORT.': '.	$status['triggers_count'].
-			'('.$status['triggers_count_enabled'].'/'.$status['triggers_count_disabled'].')'.'[',
-			new CSpan($status['triggers_count_on'],'on'),'/',
-			new CSpan($status['triggers_count_unknown'],'unknown'),'/',
-			new CSpan($status['triggers_count_off'],'off'),']'
-			)));
-
-//			$this->addRow(S_NUMBER_OF_EVENTS.': '.$status['events_count']);
-//			$this->addRow(S_NUMBER_OF_ALERTS.': '.$status['alerts_count']);
-
-	return parent::bodyToString();
+		return parent::bodyToString();
 	}
 }
-
 ?>
