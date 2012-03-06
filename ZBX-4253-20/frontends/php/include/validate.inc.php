@@ -621,4 +621,14 @@ function validateMaxTime($time) {
 	return $time <= 2147464800; // 2038.01.19 00:00
 }
 
+/*
+ * Validate URL against XSS
+ */
+function validateUrl($url) {
+	if (stripos($url,"javascript:") !== false) {
+		return false;
+	}
+	return true;
+}
+
 ?>

@@ -474,7 +474,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$menu_trigger_url = 'null';
 		if (!zbx_empty($trigger['url'])) {
 			// double CHtml::encode is required to prevent XSS attacks
-			$menu_trigger_url = "['"._('URL')."',".CJs::encodeJson(CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))).",
+			$menu_trigger_url = "['"._('URL')."',".CJs::encodeJson(resolveTriggerUrl($trigger)).",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$description->addAction('onclick',
