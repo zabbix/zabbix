@@ -145,11 +145,11 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 const char	*zbx_result_string(int result);
 
 #define MAX_ID_LEN		21
-#define MAX_UINT64_LEN		21
 #define MAX_STRING_LEN		2048
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
 
+#define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
 
 typedef struct
@@ -782,7 +782,7 @@ int	is_double(const char *c);
 int	is_uint_prefix(const char *c);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-#define is_uint64(src, value)	is_uint64_n(src, MAX_UINT64_LEN, value)
+#define is_uint64(src, value)	is_uint64_n(src, ZBX_MAX_UINT64_LEN, value)
 int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
 int	is_boolean(const char *str, zbx_uint64_t *value);
