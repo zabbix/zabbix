@@ -127,13 +127,13 @@ class CUserMacro extends CZBXAPI {
 			$sqlParts['where'][] = 'ug.userid='.$userid;
 			$sqlParts['where'][] = 'r.permission>='.$permission;
 			$sqlParts['where'][] = 'NOT EXISTS('.
-									' SELECT hgg.groupid'.
-									' FROM hosts_groups hgg,rights rr,users_groups gg'.
-									' WHERE hgg.hostid=hg.hostid'.
-										' AND rr.id=hgg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.')';
+				' SELECT hgg.groupid'.
+				' FROM hosts_groups hgg,rights rr,users_groups gg'.
+				' WHERE hgg.hostid=hg.hostid'.
+				' AND rr.id=hgg.groupid'.
+				' AND rr.groupid=gg.usrgrpid'.
+				' AND gg.userid='.$userid.
+				' AND rr.permission<'.$permission.')';
 		}
 
 		// nodeids
