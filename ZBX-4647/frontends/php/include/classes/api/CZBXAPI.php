@@ -20,6 +20,7 @@
 ?>
 <?php
 class CZBXAPI {
+
 	public static $userData;
 
 	/**
@@ -34,8 +35,7 @@ class CZBXAPI {
 	 *
 	 * @var string
 	 */
-	protected $tableAlias;
-
+	protected $tableAlias = 't';
 
 	/**
 	 * The name of the field used as a private key.
@@ -44,14 +44,12 @@ class CZBXAPI {
 	 */
 	protected $pk;
 
-
 	/**
 	 * An array of field that can be used for sorting.
 	 *
 	 * @var array
 	 */
 	protected $sortColumns = array();
-
 
 	/**
 	 * An array of allowed get() options that are supported by all APIs.
@@ -60,7 +58,6 @@ class CZBXAPI {
 	 */
 	protected $globalGetOptions = array();
 
-
 	/**
 	 * An array containing all of the allowed get() options for the current API.
 	 *
@@ -68,28 +65,25 @@ class CZBXAPI {
 	 */
 	protected $getOptions = array();
 
-
 	public function __construct() {
 		// set the PK of the table
 		$this->pk = $this->pk($this->tableName());
 
 		$this->globalGetOptions = array(
-			'nodeids'					=> null,
-
+			'nodeids'				=> null,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
-			'searchWildcardsEnabled'	=> null,
-
+			'filter'				=> null,
+			'search'				=> null,
+			'searchByAny'			=> null,
+			'startSearch'			=> null,
+			'excludeSearch'			=> null,
+			'searchWildcardsEnabled'=> null,
 			// output
-			'output'					=> API_OUTPUT_REFER,
-			'limit'						=> null
+			'output'				=> API_OUTPUT_REFER,
+			'preservekeys'			=> null,
+			'limit'					=> null
 		);
 	}
-
 
 	/**
 	 * Returns the name of the database table that contains the objects.
@@ -100,7 +94,6 @@ class CZBXAPI {
 		return $this->tableName;
 	}
 
-
 	/**
 	 * Returns the alias of the database table that contains the objects.
 	 *
@@ -109,7 +102,6 @@ class CZBXAPI {
 	protected function tableAlias() {
 		return $this->tableAlias;
 	}
-
 
 	/**
 	 * Returns the table name with the table alias. If the $tableName and $tableAlias
@@ -121,12 +113,11 @@ class CZBXAPI {
 	 * @return string
 	 */
 	protected function tableId($tableName = null, $tableAlias = null) {
-		$tableName = ($tableName) ? $tableName : $this->tableName();
-		$tableAlias = ($tableAlias) ? $tableAlias : $this->tableAlias();
+		$tableName = !empty($tableName) ? $tableName : $this->tableName();
+		$tableAlias = !empty($tableAlias) ? $tableAlias : $this->tableAlias();
 
 		return $tableName.' '.$tableAlias;
 	}
-
 
 	/**
 	 * Prepends the table alias to the given field name. If no $tableAlias is given,
@@ -142,7 +133,6 @@ class CZBXAPI {
 
 		return $tableAlias.'.'.$fieldName;
 	}
-
 
 	/**
 	 * Returns the name of the field that's used as a private key. If the $tableName is not given,
@@ -164,7 +154,6 @@ class CZBXAPI {
 		return $this->pk;
 	}
 
-
 	/**
 	 * Returns the name of the option that refers the PK column. If the $tableName parameter
 	 * is not given, the Pk option of the current table will be returned.
@@ -176,7 +165,6 @@ class CZBXAPI {
 	public function pkOption($tableName = null) {
 		return $this->pk($tableName).'s';
 	}
-
 
 	/**
 	 * Returns an array that describes the schema of the database table. If no $tableName
@@ -192,7 +180,6 @@ class CZBXAPI {
 		return DB::getSchema($tableName);
 	}
 
-
 	/**
 	 * Returns true if the table has the given field. If no $tableName is given,
 	 * the current table will be used.
@@ -207,7 +194,6 @@ class CZBXAPI {
 
 		return isset($schema['fields'][$fieldName]);
 	}
-
 
 	/**
 	 * Adds the given field to the "output" option if it's not already present.
@@ -232,7 +218,6 @@ class CZBXAPI {
 		return $output;
 	}
 
-
 	/**
 	 * Unsets the fields that haven't been explicitly asked for by the user, but
 	 * have been included in the resulting object for whatever reasons.
@@ -248,7 +233,6 @@ class CZBXAPI {
 	 * @return array           The resulting object
 	 */
 	protected function unsetExtraFields($tableName, array $object, $output) {
-
 		// for API_OUTPUT_SHORTEN return only the private key
 		if ($output == API_OUTPUT_SHORTEN) {
 			$pkField = $this->pk($tableName);
@@ -272,11 +256,10 @@ class CZBXAPI {
 		return $object;
 	}
 
-
 	/**
-	 * Constructs an SQL SELECT query from the given options, executes it and returns the result.
+	 * Constructs an SQL SELECT query for a specific table from the given API options, executes it and returns
+	 * the result.
 	 *
-	 * TODO: add global 'preservekeys' support
 	 * TODO: add global 'countOutput' support
 	 *
 	 * @param string $tableName
@@ -284,15 +267,26 @@ class CZBXAPI {
 	 *
 	 * @return array
 	 */
-	public function select($tableName, array $options) {
+	protected function select($tableName, array $options) {
 		$limit = (isset($options['limit'])) ? $options['limit'] : null;
 
 		$sql = $this->createSelectQuery($tableName, $options);
 		$query = DBSelect($sql, $limit);
 
-		return DBfetchArray($query);
-	}
+		$objects = DBfetchArray($query);
 
+		if (isset($options['preservekeys'])) {
+			$rs = array();
+			foreach ($objects as $object) {
+				$rs[$object[$this->pk($tableName)]] = $this->unsetExtraFields($tableName, $object, $options['output']);
+			}
+
+			return $rs;
+		}
+		else {
+			return $objects;
+		}
+	}
 
 	/**
 	 * Creates an SQL SELECT query from the given options.
@@ -303,11 +297,10 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function createSelectQuery($tableName, array $options) {
-		$sqlParts = $this->createSelectQueryParts($tableName, 't', $options);
+		$sqlParts = $this->createSelectQueryParts($tableName, $this->tableAlias(), $options);
 
 		return $this->createSelectQueryFromParts($sqlParts);
 	}
-
 
 	/**
 	 * Builds an SQL parts array from the given options.
@@ -346,7 +339,6 @@ class CZBXAPI {
 		return $sqlParts;
 	}
 
-
 	/**
 	 * Creates a SELECT SQL query from the given SQL parts array.
 	 *
@@ -358,18 +350,17 @@ class CZBXAPI {
 		// build query
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
-		$sqlWhere = $sqlParts['where'] ? implode(' AND ', $sqlParts['where']) : '';
-		$sqlGroup = $sqlParts['group'] ? ' GROUP BY '.implode(',', $sqlParts['group']) : '';
-		$sqlOrder = $sqlParts['order'] ? ' ORDER BY '.implode(',', $sqlParts['order']) : '';
+		$sqlWhere = (!empty($sqlParts['where'])) ? ' WHERE '.implode(' AND ', array_unique($sqlParts['where'])) : '';
+		$sqlGroup = (!empty($sqlParts['group'])) ? ' GROUP BY '.implode(',', array_unique($sqlParts['group'])) : '';
+		$sqlOrder = (!empty($sqlParts['order'])) ? ' ORDER BY '.implode(',', array_unique($sqlParts['order'])) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 			' FROM '.$sqlFrom.
-			' WHERE '.$sqlWhere.
+			$sqlWhere.
 			$sqlGroup.
 			$sqlOrder;
 
 		return $sql;
 	}
-
 
 	/**
 	 * Modifies the SQL parts to implement all of the ouput related options.
@@ -410,7 +401,6 @@ class CZBXAPI {
 		return $sqlParts;
 	}
 
-
 	/**
 	 * Modifies the SQL parts to implement all of the filter related options.
 	 *
@@ -444,7 +434,6 @@ class CZBXAPI {
 		return $sqlParts;
 	}
 
-
 	/**
 	 * Modifies the SQL parts to implement all of the node related options.
 	 *
@@ -468,7 +457,6 @@ class CZBXAPI {
 		return $sqlParts;
 	}
 
-
 	/**
 	 * Modifies the SQL parts to implement all of the sorting related options.
 	 * Soring is currently only supported for CZBXAPI::get() methods.
@@ -487,7 +475,6 @@ class CZBXAPI {
 
 		return $sqlParts;
 	}
-
 
 	/**
 	 * Adds the given field to the SELECT part of the $sqlParts array if it's not already present.
@@ -517,7 +504,6 @@ class CZBXAPI {
 		return $sqlParts;
 	}
 
-
 	/**
 	 * Adds the related objects requested by "select*" options to the resulting object set.
 	 *
@@ -530,7 +516,6 @@ class CZBXAPI {
 
 		return $result;
 	}
-
 
 	/**
 	 * Deletes the object with the given PKs with respect to relative objects.
@@ -545,6 +530,48 @@ class CZBXAPI {
 		));
 	}
 
+	/**
+	 * Fetches the fields given in $fields from the database and extends the objects with the loaded data.
+	 *
+	 * @param $tableName
+	 * @param array $objects
+	 * @param array $fields
+	 *
+	 * @return array
+	 */
+	protected function extendObjects($tableName, array $objects, array $fields) {
+		$dbObjects = $this->select($tableName, array(
+			'output' => $fields,
+			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
+			'preservekeys' => true
+		));
+
+		foreach ($objects as &$object) {
+			$pk = $object[$this->pk($tableName)];
+			if (isset($dbObjects[$pk])) {
+				check_db_fields($dbObjects[$pk], $object);
+			}
+		}
+
+		return $objects;
+	}
+
+	/**
+	 * Checks if the object has any fields, that are not defined in the schema.
+	 *
+	 * @param $tableName
+	 * @param array $object
+	 * @param $error
+	 *
+	 * @throws APIException
+	 */
+	protected function checkUnsupportedFields($tableName, array $object, $error) {
+		foreach ($object as $field => $value) {
+			if (!DB::hasField($tableName, $field)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+	}
 
 	/**
 	 * Throws an API exception.

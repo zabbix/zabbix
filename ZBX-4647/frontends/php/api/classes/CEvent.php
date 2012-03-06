@@ -657,7 +657,7 @@ class CEvent extends CZBXAPI {
 			$delEvents = $this->get($options);
 			foreach ($eventids as $enum => $eventid) {
 				if (!isset($delEvents[$eventid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 
