@@ -1352,7 +1352,8 @@ int	is_double(const char *str)
  *                                                                            *
  * Purpose: check if the string is unsigned integer                           *
  *                                                                            *
- * Parameters: str - string to check                                          *
+ * Parameters: str   - string to check                                        *
+ *             value - a pointer to converted value (optional)                *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *
@@ -1362,27 +1363,61 @@ int	is_double(const char *str)
  * Comments: the function supports suffixes 's', 'm', 'h', 'd', and 'w'       *
  *                                                                            *
  ******************************************************************************/
-int	is_uint_suffix(const char *str)
+int	is_uint_suffix(const char *str, unsigned int *value)
 {
-	int	i = 0;
+	register unsigned int	max_uint = ~0U;
+	register unsigned int	value_uint = 0, c;
+	int			factor = 1;
 
-	while (' ' == str[i])	/* trim left spaces */
-		i++;
-
-	if (0 == isdigit(str[i]))
+	if ('\0' == *str)
 		return FAIL;
 
-	do
-		i++;
-	while (isdigit(str[i]));
+	while ('\0' != *str || 0 != isdigit(*str))
+	{
+		c = (unsigned int)(unsigned char)(*str - '0');
+		if ((max_uint - c) / 10 < value_uint)
+			return FAIL;	/* overflow */
 
-	if ('s' == str[i] || 'm' == str[i] || 'h' == str[i] || 'd' == str[i] || 'w' == str[i])	/* check suffix */
-		i++;
+		value_uint = value_uint * 10 + c;
 
-	while (' ' == str[i])	/* trim right spaces */
-		i++;
+		str++;
+	}
 
-	return '\0' == str[i] ? SUCCEED : FAIL;
+	if (NULL != strchr("smhdw", *str))
+	{
+		switch (*str)
+		{
+			case 's':
+				break;
+			case 'm':
+				factor = SEC_PER_MIN;
+				break;
+			case 'h':
+				factor = SEC_PER_HOUR;
+				break;
+			case 'd':
+				factor = SEC_PER_DAY;
+				break;
+			case 'w':
+				factor = SEC_PER_WEEK;
+				break;
+		}
+
+		str++;
+	}
+
+	if ('\0' != *str)
+		return FAIL;
+
+	if (max_uint / factor < value_uint)
+		return FAIL;	/* overflow */
+
+	value_uint *= factor;
+
+	if (NULL != value)
+		*value = value_uint;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1487,8 +1522,9 @@ int	is_int_suffix(const char *str)
  *                                                                            *
  * Purpose: check if the string is 64bit unsigned integer                     *
  *                                                                            *
- * Parameters: str - [IN] string to check                                     *
- *             n   - [IN] string length or ZBX_MAX_UINT64_LEN                 *
+ * Parameters: str   - [IN] string to check                                   *
+ *             n     - [IN] string length or ZBX_MAX_UINT64_LEN               *
+ *             value - [OUT] a pointer to converted value (optional)          *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not a number or overflow               *
@@ -1531,7 +1567,8 @@ int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
  *                                                                            *
  * Purpose: check if the string is 16bit unsigned integer                     *
  *                                                                            *
- * Parameters: str - string to check                                          *
+ * Parameters: str   - string to check                                        *
+ *             value - a pointer to converted value (optional)                *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not number or overflow                 *
@@ -2014,8 +2051,8 @@ int	str2uint(const char *str)
  *                                                                            *
  * Purpose: convert string to 64bit unsigned integer                          *
  *                                                                            *
- * Parameters: str - string to convert                                        *
- *             value - pointer to returned value                              *
+ * Parameters: str   - string to convert                                      *
+ *             value - a pointer to converted value                           *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *

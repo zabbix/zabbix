@@ -779,7 +779,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 
 int	is_double_suffix(const char *str);
 int	is_double(const char *c);
-int	is_uint_suffix(const char *c);
+int	is_uint_suffix(const char *c, unsigned int *value);
 int	is_uint(const char *c);
 int	is_int_suffix(const char *c);
 #define is_uint64(src, value)	is_uint64_n(src, ZBX_MAX_UINT64_LEN, value)
