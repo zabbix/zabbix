@@ -165,17 +165,6 @@ class CEvent extends CZBXAPI {
 		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts = $this->extendQuerySelect('e.*', $sqlParts);
-		}
-
-		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT e.eventid) AS rowscount');
-		}
-
 		// eventids
 		if (!is_null($options['eventids'])) {
 			zbx_value2array($options['eventids']);
@@ -191,6 +180,10 @@ class CEvent extends CZBXAPI {
 		if (!is_null($options['triggerids']) && $options['object'] == EVENT_OBJECT_TRIGGER) {
 			zbx_value2array($options['triggerids']);
 			$sqlParts['where'][] = DBcondition('e.objectid', $options['triggerids']);
+
+			if (!is_null($options['groupCount'])) {
+				$sqlParts['group']['objectid'] = 'e.objectid';
+			}
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;
@@ -232,6 +225,24 @@ class CEvent extends CZBXAPI {
 		if (!$nodeCheck) {
 			$nodeCheck = true;
 			$sqlParts['where'][] = DBin_node('e.eventid', $nodeids);
+		}
+
+		// output
+		if ($options['output'] == API_OUTPUT_EXTEND) {
+			$sqlParts = $this->extendQuerySelect('e.*', $sqlParts);
+		}
+
+		// countOutput
+		if (!is_null($options['countOutput'])) {
+			$options['sortfield'] = '';
+			$sqlParts['select'] = array('COUNT(DISTINCT e.eventid) AS rowscount');
+
+			// groupCount
+			if (!is_null($options['groupCount'])) {
+				foreach ($sqlParts['group'] as $key => $fields) {
+					$sqlParts['select'][$key] = $fields;
+				}
+			}
 		}
 
 		// object
@@ -315,11 +326,13 @@ class CEvent extends CZBXAPI {
 		$sqlParts['from'] = array_unique($sqlParts['from']);
 		$sqlParts['where'] = array_unique($sqlParts['where']);
 		$sqlParts['order'] = array_unique($sqlParts['order']);
+		$sqlParts['group'] = array_unique($sqlParts['group']);
 
 		$sqlSelect = '';
 		$sqlFrom = '';
 		$sqlWhere = '';
 		$sqlOrder = '';
+		$sqlGroup = '';
 		if (!empty($sqlParts['select'])) {
 			$sqlSelect .= implode(',', $sqlParts['select']);
 		}
@@ -332,17 +345,27 @@ class CEvent extends CZBXAPI {
 		if (!empty($sqlParts['order'])) {
 			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
 		}
+		if (!empty($sqlParts['group'])) {
+			$sqlGroup .= ' GROUP BY '.implode(',', $sqlParts['group']);
+		}
 		$sqlLimit = $sqlParts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
 				' WHERE '.
 					$sqlWhere.
+					$sqlGroup.
 					$sqlOrder;
 		$dbRes = DBselect($sql, $sqlLimit);
+
 		while ($event = DBfetch($dbRes)) {
-			if ($options['countOutput']) {
-				$result = $event['rowscount'];
+			if (!is_null($options['countOutput'])) {
+				if (!is_null($options['groupCount'])) {
+					$result[] = $event;
+				}
+				else {
+					$result = $event['rowscount'];
+				}
 			}
 			else {
 				$eventids[$event['eventid']] = $event['eventid'];
