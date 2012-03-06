@@ -1358,7 +1358,7 @@ int	is_double(const char *str)
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
+ * Author: Aleksandrs Saveljevs, Vladimir Levijev                             *
  *                                                                            *
  * Comments: the function supports suffixes 's', 'm', 'h', 'd', and 'w'       *
  *                                                                            *
@@ -1998,51 +1998,6 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 		memmove(&rm_values[rindex], &rm_values[rindex + 1], sizeof(zbx_uint64_t) * ((*rm_num) - rindex - 1));
 		(*rm_num)--; rindex--;
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: str2uint                                                         *
- *                                                                            *
- * Purpose: convert string to unsigned integer (currently 31bit uint)         *
- *                                                                            *
- * Parameters: str - string to convert                                        *
- *                                                                            *
- * Return value: converted unsigned integer                                   *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments: the function automatically processes suffixes s, m, h, d, w      *
- *                                                                            *
- ******************************************************************************/
-int	str2uint(const char *str)
-{
-	size_t	sz = strlen(str) - 1;
-	int	factor = 1;
-
-	/* trim right spaces */
-	while (' ' == str[sz] && 0 < sz)
-		sz--;
-
-	switch (str[sz])
-	{
-		case 's':
-			break;
-		case 'm':
-			factor = SEC_PER_MIN;
-			break;
-		case 'h':
-			factor = SEC_PER_HOUR;
-			break;
-		case 'd':
-			factor = SEC_PER_DAY;
-			break;
-		case 'w':
-			factor = SEC_PER_WEEK;
-			break;
-	}
-
-	return atoi(str) * factor;
 }
 
 /******************************************************************************
