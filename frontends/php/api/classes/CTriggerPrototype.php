@@ -618,7 +618,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 		}
 
-Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -992,7 +991,6 @@ Copt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -1297,6 +1295,11 @@ COpt::memoryPick();
 
 	protected function createReal(array &$triggers) {
 		$triggers = zbx_toArray($triggers);
+
+		foreach ($triggers as &$trigger) {
+			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		}
+		unset($trigger);
 
 		$triggerids = DB::insert('triggers', $triggers);
 

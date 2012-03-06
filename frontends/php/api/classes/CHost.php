@@ -737,7 +737,6 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}

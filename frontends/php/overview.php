@@ -156,14 +156,10 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 //-------------
 
 	if($_REQUEST['type']==SHOW_DATA){
-//COpt::profiling_start('get_items_data_overview');
 		$table = get_items_data_overview(array_keys($pageFilter->hosts),$_REQUEST['view_style']);
-//COpt::profiling_stop('get_items_data_overview');
 	}
 	else if($_REQUEST['type']==SHOW_TRIGGERS){
-//COpt::profiling_start('get_triggers_overview');
 		$table = get_triggers_overview(array_keys($pageFilter->hosts),$_REQUEST['view_style']);
-//COpt::profiling_stop('get_triggers_overview');
 	}
 
 	$over_wdgt->addItem($table);

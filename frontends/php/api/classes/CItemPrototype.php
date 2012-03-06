@@ -353,7 +353,6 @@ class CItemPrototype extends CItemGeneral{
 			}
 		}
 
-COpt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -499,7 +498,6 @@ COpt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
@@ -555,20 +553,6 @@ COpt::memoryPick();
 	}
 
 	protected function createReal(&$items) {
-		foreach ($items as $key => $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => 1
-			));
-			foreach ($itemsExists as $inum => $itemExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item ['.$item['key_'].'] already exists');
-			}
-		}
-
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = $insertItemDiscovery = array();
@@ -616,20 +600,6 @@ COpt::memoryPick();
 
 		$data = array();
 		foreach ($items as $inum => $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => 1
-			));
-			foreach ($itemsExists as $inum => $itemExists) {
-				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
-				}
-			}
-
 			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
 		}
 

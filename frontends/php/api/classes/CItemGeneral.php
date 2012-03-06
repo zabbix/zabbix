@@ -297,6 +297,13 @@ abstract class CItemGeneral extends CZBXAPI {
 			$this->checkSpecificFields($fullItem);
 		}
 		unset($item);
+
+		if ($update) {
+			$this->checkExistingItemsOnUpdate($items);
+		}
+		else {
+			$this->checkExistingItemsOnCreate($items);
+		}
 	}
 
 	protected function checkSpecificFields(array $item) {
@@ -631,6 +638,60 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 
 		return $newItems;
+	}
+
+	/**
+	 * Check if any item from list already exists.
+	 *
+	 * @throw APIException
+	 *
+	 * @param array $items
+	 */
+	protected function checkExistingItemsOnCreate(array $items) {
+		$itemKeysByHostId = array();
+		foreach ($items as $item) {
+			if (!isset($itemKeysByHostId[$item['hostid']])) {
+				$itemKeysByHostId[$item['hostid']] = array();
+			}
+			$itemKeysByHostId[$item['hostid']][] = $item['key_'];
+		}
+
+		$sqlWhere = array();
+		foreach ($itemKeysByHostId as $hostId => $keys) {
+			$sqlWhere[] = '(i.hostid='.$hostId.' AND '.DBcondition('i.key_', $keys).')';
+		}
+
+		if ($sqlWhere) {
+			$dbItems = DBselect('SELECT i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere), 1);
+			while ($dbItem = DBfetch($dbItems)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on given host.', $dbItem['key_']));
+			}
+		}
+	}
+
+	/**
+	 * Check if any item from list already exists.
+	 *
+	 * @throw APIException
+	 *
+	 * @param array $items
+	 */
+	protected function checkExistingItemsOnUpdate(array $items) {
+		foreach ($items as $item) {
+			$itemsExists = API::Item()->get(array(
+				'output' => API_OUTPUT_SHORTEN,
+				'filter' => array(
+					'hostid' => $item['hostid'],
+					'key_' => $item['key_']
+				),
+				'nopermissions' => true
+			));
+			foreach ($itemsExists as $itemExists) {
+				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with item "%1$s" already exists.', $item['key_']));
+				}
+			}
+		}
 	}
 }
 ?>
