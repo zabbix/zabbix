@@ -14,6 +14,7 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4641] fixed errors in a "Discovery checks" popup (Sasha)
 A.F....... [ZBX-4202] fixed SQL performance in tr_status.php - combined similar queries, user data SQL access only once, triggerids retrieval optimization (Toms)
 A.F....... [ZBX-4647] fixed trigger and item prototype inheritance (Pavels)
 ..F....... [ZBX-4467] fixed the ZBX_MAX_PERIOD constant not affecting the timebar control (Pavels)
