@@ -415,7 +415,6 @@ class CGraphPrototype extends CZBXAPI{
 			}
 		}
 
-COpt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -555,7 +554,6 @@ COpt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -727,14 +725,16 @@ COpt::memoryPick();
 	}
 
 	protected function createReal($graph) {
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
 
-		foreach ($graph['gitems'] as $gitem) {
+		foreach ($graph['gitems'] as &$gitem) {
 			$gitem['graphid'] = $graphid;
-
-			DB::insert('graphs_items', array($gitem));
 		}
+		unset($gitem);
+
+		DB::insert('graphs_items', $graph['gitems']);
 
 		return $graphid;
 	}
