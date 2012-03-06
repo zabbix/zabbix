@@ -237,10 +237,18 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 	}
 	else
 	{
-		int	clock_from;
-		char	**h_value;
+		int		clock_from;
+		unsigned int	period;
+		char		**h_value;
 
-		clock_from = time(NULL) - str2uint(param);
+		if (FAIL == is_uint_suffix(param, &period))
+		{
+			SET_MSG_RESULT(res, zbx_dsprintf(NULL, "Invalid item parameter [%s]", param));
+			goto clean;
+		}
+
+
+		clock_from = time(NULL) - period;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select itemid,value_type"
