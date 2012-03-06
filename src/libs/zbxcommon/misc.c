@@ -723,9 +723,10 @@ int	is_ip4(const char *ip)
 
 	nums = 0;
 	dots = 0;
+
 	while ('\0' != *p)
 	{
-		if ('0' <= *p && *p <= '9')
+		if (0 != isdigit(*p))
 		{
 			nums++;
 		}
@@ -778,7 +779,7 @@ static int	is_ip6(const char *ip)
 
 	while ('\0' != *p)
 	{
-		if ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'f') || (*p >= 'A' && *p <= 'F'))
+		if (0 != isxdigit(*p))
 		{
 			nums++;
 			is_nums = 1;
@@ -879,7 +880,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 	len = 0;
 	for (j = 0; j<ip_len; j++)
 	{
-		if ((ip[j] >= '0' && ip[j] <= '9') || (ip[j] >= 'A' && ip[j] <= 'F') || (ip[j] >= 'a' && ip[j] <= 'f'))
+		if (0 != isxdigit(ip[j]))
 		{
 			if (len > 3)
 				return FAIL;
@@ -1272,7 +1273,7 @@ int	is_double_suffix(const char *str)
 		if ('-' == str[i] && 0 == i)
 			continue;
 
-		if ('0' <= str[i] && str[i] <= '9')
+		if (0 != isdigit(str[i]))
 			continue;
 
 		if ('.' == str[i] && -1 == dot)
@@ -1318,7 +1319,7 @@ int	is_double(const char *str)
 		if ('-' == str[i] && i == 0)
 			continue;
 
-		if ('0' <= str[i] && str[i] <= '9')
+		if (0 != isdigit(str[i]))
 			continue;
 
 		if ('.' == str[i] && -1 == dot)
@@ -1408,7 +1409,7 @@ int	is_uint(const char *str)
 
 	for (len = 0; '\0' != str[i]; i++, len++)
 	{
-		if ('0' <= str[i] && str[i] <= '9')
+		if (0 != isdigit(str[i]))
 			continue;
 
 		if (' ' == str[i])	/* check right spaces */
@@ -1505,7 +1506,7 @@ int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
 
 	while ('\0' != *str && 0 < n--)
 	{
-		if ('0' > *str || *str > '9')
+		if (0 == isdigit(*str))
 			return FAIL;	/* not a digit */
 
 		c = (zbx_uint64_t)(unsigned char)(*str - '0');
@@ -1548,7 +1549,7 @@ int	is_ushort(const char *str, unsigned short *value)
 
 	while ('\0' != *str)
 	{
-		if ('0' > *str || *str > '9')
+		if (0 == isdigit(*str))
 			return FAIL;	/* not a digit */
 
 		c = (unsigned short)(unsigned char)(*str - '0');
@@ -1665,7 +1666,7 @@ int	is_uhex(const char *str)
 
 	for (; '\0' != *str; str++)
 	{
-		if ((*str < '0' || *str > '9') && (*str < 'a' || *str > 'f') && (*str < 'A' || *str > 'F'))
+		if (0 == isxdigit(*str))
 			break;
 
 		res = SUCCEED;
@@ -2138,16 +2139,10 @@ double	str2double(const char *str)
  ******************************************************************************/
 int	is_hostname_char(char c)
 {
-	if (c >= 'a' && c <= 'z')
-		return SUCCEED;
-
-	if (c >= 'A' && c <= 'Z')
+	if (0 != isalnum(c))
 		return SUCCEED;
 
 	if (c == '.' || c == ' ' || c == '_' || c == '-')
-		return SUCCEED;
-
-	if (c >= '0' && c <= '9')
 		return SUCCEED;
 
 	return FAIL;
@@ -2168,16 +2163,10 @@ int	is_hostname_char(char c)
  ******************************************************************************/
 int	is_key_char(char c)
 {
-	if (c >= 'a' && c <= 'z')
+	if (0 != isalnum(c))
 		return SUCCEED;
 
 	if (c == '.' || c == '_' || c == '-')
-		return SUCCEED;
-
-	if (c >= 'A' && c <= 'Z')
-		return SUCCEED;
-
-	if (c >= '0' && c <= '9')
 		return SUCCEED;
 
 	return FAIL;
@@ -2225,7 +2214,7 @@ int	is_macro_char(char c)
 	if ('.' == c || '_' == c)
 		return SUCCEED;
 
-	if ('0' <= c && c <= '9')
+	if (0 != isdigit(c))
 		return SUCCEED;
 
 	return FAIL;
