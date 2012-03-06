@@ -109,11 +109,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			if (0 != get_param(params, 2, tmp, sizeof(tmp)))
 				goto notsupported;
 
-			if ('\0' == *tmp)
-			{
-				from = 6;
-			}
-			else if (FAIL == is_uint_suffix(tmp, &from))
+			if ('\0' != *tmp && FAIL == is_uint_suffix(tmp, (unsigned int *)&from))
 			{
 				error = zbx_strdup(error, "second parameter is badly formatted");
 				goto notsupported;
@@ -125,11 +121,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			if (0 != get_param(params, 3, tmp, sizeof(tmp)))
 				goto notsupported;
 
-			if ('\0' == *tmp)
-			{
-				to = -1;
-			}
-			else if (FAIL == is_uint_suffix(tmp, &to))
+			if ('\0' != *tmp && FAIL == is_uint_suffix(tmp, (unsigned int *)&to))
 			{
 				error = zbx_strdup(error, "third parameter is badly formatted");
 				goto notsupported;
