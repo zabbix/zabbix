@@ -35,7 +35,7 @@
 		else if(isset($types[$type]))
 			return $types[$type];
 		else
-			return S_UNKNOWN;
+			return _('Unknown');
 	}
 
 	function graph_item_type2str($type) {

@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CRow extends CTag {
+
 	public function __construct($item = null, $class = null, $id = null) {
 		parent::__construct('tr', 'yes');
 		$this->addItem($item);

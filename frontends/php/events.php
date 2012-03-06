@@ -460,8 +460,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 							$event_data['object_data'] = $dhosts[$event_data['objectid']];
 						}
 						else{
-							$event_data['object_data']['ip'] = S_UNKNOWN;
-							$event_data['object_data']['dns'] = S_UNKNOWN;
+							$event_data['object_data']['ip'] = _('Unknown');
+							$event_data['object_data']['dns'] = _('Unknown');
 						}
 						$event_data['description'] = S_HOST;
 						break;
@@ -470,10 +470,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 							$event_data['object_data'] = $dservices[$event_data['objectid']];
 						}
 						else{
-							$event_data['object_data']['ip'] = S_UNKNOWN;
-							$event_data['object_data']['dns'] = S_UNKNOWN;
-							$event_data['object_data']['type'] = S_UNKNOWN;
-							$event_data['object_data']['port'] = S_UNKNOWN;
+							$event_data['object_data']['ip'] = _('Unknown');
+							$event_data['object_data']['dns'] = _('Unknown');
+							$event_data['object_data']['type'] = _('Unknown');
+							$event_data['object_data']['port'] = _('Unknown');
 						}
 
 						$event_data['description'] = _('Service').': '.
@@ -688,7 +688,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 							trigger_value2str($event['value']),
 							getSeverityCaption($trigger['priority']),
 							$event['duration'],
-							($config['event_ack_enable'])? ($event['acknowledges']?S_YES:S_NO) :NULL, // ($config['event_ack_enable'])? $ack :NULL,
+							($config['event_ack_enable']) ? ($event['acknowledges'] ? _('Yes') : _('No')) : null, // ($config['event_ack_enable'])? $ack :NULL,
 							strip_tags( (string)$actions )
 						);
 					}

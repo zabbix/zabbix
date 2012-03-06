@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-class CArea extends CTag{
-	public function __construct($coords,$href,$alt,$shape) {
-		parent::__construct('area','no');
+class CArea extends CTag {
+	public function __construct($coords, $href, $alt, $shape) {
+		parent::__construct('area', 'no');
 		$this->setCoords($coords);
 		$this->setShape($shape);
 		$this->setHref($href);
@@ -29,39 +29,42 @@ class CArea extends CTag{
 	}
 
 	public function setCoords($value) {
-		if (!is_array($value))
+		if (!is_array($value)) {
 			return $this->error('Incorrect value for setCoords ['.$value.']');
-		if (count($value)<3)
+		}
+		if (count($value) < 3) {
 			return $this->error('Incorrect values count for setCoords ['.count($value).']');
+		}
 
 		$str_val = '';
 		foreach ($value as $val) {
-			if (!is_numeric($val))
+			if (!is_numeric($val)) {
 				return $this->error('Incorrect value for setCoords ['.$val.']');
-
+			}
 			$str_val .= $val.',';
 		}
-		$this->setAttribute('coords',trim($str_val,','));
+		$this->setAttribute('coords', trim($str_val, ','));
 	}
 
 	public function setShape($value) {
-		if (!is_string($value))
+		if (!is_string($value)) {
 			return $this->error('Incorrect value for setShape ['.$value.']');
-
-		$this->setAttribute('shape',$value);
+		}
+		$this->setAttribute('shape', $value);
 	}
 
 	public function setHref($value) {
-
-		if (!is_string($value)) return $this->error('Incorrect value for setHref ['.$value.']');
-		$this->setAttribute('href',$value);
+		if (!is_string($value)) {
+			return $this->error('Incorrect value for setHref ['.$value.']');
+		}
+		$this->setAttribute('href', $value);
 	}
 
 	public function setAlt($value) {
-		if (!is_string($value))
+		if (!is_string($value)) {
 			return $this->error('Incorrect value for setAlt ['.$value.']');
-
-		$this->setAttribute('alt',$value);
+		}
+		$this->setAttribute('alt', $value);
 	}
 }
 ?>

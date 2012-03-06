@@ -2,6 +2,7 @@
 Changes for 1.9.10
 
 New features:
+..F....... [ZBXNEXT-904] redesign Configuration->Screens (Eduard)
 ..F....... [ZBX-4600] trigger dependencies will now be deleted when executing a mass update with no dependencies selected (Pavels)
 A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces (Pavels)
 ..F....... [ZBX-4563] improved SQL query debug log design (Pavels)
