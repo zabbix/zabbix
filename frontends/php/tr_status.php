@@ -298,7 +298,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		'nodeids' => get_current_nodeid(),
 		'filter' => array(),
 		'monitored' => 1,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => API_OUTPUT_SHORTEN,
 		'skipDependent' => 1,
 		'sortfield' => $sortfield,
 		'sortorder' => $sortorder,
@@ -451,7 +451,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	}
 
 	foreach ($triggers as $tnum => $trigger) {
-		$trigger['desc'] = $trigger_descriptions[$tnum];
 		$items = array();
 
 		$used_hosts = array();
@@ -478,7 +477,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 //----
 
-		$description = new CSpan($description, 'link_menu');
+		$description = new CSpan($trigger_descriptions[$tnum], 'link_menu');
 
 		// trigger js menu
 		$menu_trigger_conf = 'null';
