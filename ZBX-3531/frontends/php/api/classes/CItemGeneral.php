@@ -298,12 +298,7 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 		unset($item);
 
-		if ($update) {
-			$this->checkExistingItemsOnUpdate($items);
-		}
-		else {
-			$this->checkExistingItemsOnCreate($items);
-		}
+		$this->checkExistingItems($items);
 	}
 
 	protected function checkSpecificFields(array $item) {
@@ -642,18 +637,24 @@ abstract class CItemGeneral extends CZBXAPI {
 
 	/**
 	 * Check if any item from list already exists.
+	 * If items have item ids it will check for existing item with different itemid.
 	 *
 	 * @throw APIException
 	 *
 	 * @param array $items
 	 */
-	protected function checkExistingItemsOnCreate(array $items) {
+	protected function checkExistingItems(array $items) {
 		$itemKeysByHostId = array();
+		$itemIds = array();
 		foreach ($items as $item) {
 			if (!isset($itemKeysByHostId[$item['hostid']])) {
 				$itemKeysByHostId[$item['hostid']] = array();
 			}
 			$itemKeysByHostId[$item['hostid']][] = $item['key_'];
+
+			if (isset($item['itemid'])) {
+				$itemIds[] = $item['itemid'];
+			}
 		}
 
 		$sqlWhere = array();
@@ -662,34 +663,17 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 
 		if ($sqlWhere) {
-			$dbItems = DBselect('SELECT i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere), 1);
+			$sql = 'SELECT i.key_'.
+				' FROM items i'.
+				' WHERE '.implode(' OR ', $sqlWhere);
+
+			// if we update existing items we need to exclude them from result.
+			if ($itemIds) {
+				$sql .= ' AND '.DBcondition('i.itemid', $itemIds, true);
+			}
+			$dbItems = DBselect($sql, 1);
 			while ($dbItem = DBfetch($dbItems)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on given host.', $dbItem['key_']));
-			}
-		}
-	}
-
-	/**
-	 * Check if any item from list already exists.
-	 *
-	 * @throw APIException
-	 *
-	 * @param array $items
-	 */
-	protected function checkExistingItemsOnUpdate(array $items) {
-		foreach ($items as $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => true
-			));
-			foreach ($itemsExists as $itemExists) {
-				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with item "%1$s" already exists.', $item['key_']));
-				}
 			}
 		}
 	}
