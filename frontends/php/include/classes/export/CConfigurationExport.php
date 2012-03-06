@@ -343,11 +343,12 @@ class CConfigurationExport {
 			$valueMaps[$valueMap['valuemapid']] = array('name' => $valueMap['name']);
 		}
 
-		foreach ($items as $item) {
+		foreach ($items as &$item) {
 			if ($item['valuemapid']) {
-				$item['valuemapid'] = $valueMaps[$item['valuemapid']];
+				$item['valuemap'] = $valueMaps[$item['valuemapid']];
 			}
 		}
+		unset($item);
 
 		return $items;
 	}
@@ -439,7 +440,7 @@ class CConfigurationExport {
 			}
 
 			if ($prototype['valuemapid']) {
-				$prototype['valuemapid'] = $valueMaps[$prototype['valuemapid']];
+				$prototype['valuemap'] = $valueMaps[$prototype['valuemapid']];
 			}
 
 			$items[$prototype['parent_itemid']]['itemPrototypes'][] = $prototype;

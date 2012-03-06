@@ -108,6 +108,7 @@ class CConfigurationImport {
 	public function import() {
 		try {
 			// hack to make api throw exceptions
+			// this made to not check all api calls results for false return
 			czbxrpc::$useExceptions = true;
 			DBstart();
 
@@ -183,6 +184,7 @@ class CConfigurationImport {
 				}
 			}
 
+			// make api not throw exception
 			czbxrpc::$useExceptions = false;
 			return DBend(true);
 		}
@@ -200,44 +202,48 @@ class CConfigurationImport {
 	 * Collected references are resolved in separate referencer object.
 	 */
 	protected function gatherReferences() {
+		$groupsRefs = array();
+		$templatesRefs = array();
+		$hostsRefs = array();
+		$applicationsRefs = array();
+		$itemsRefs = array();
+		$valueMapsRefs = array();
+		$triggersRefs = array();
+
 		if ($this->options['groups']['missed']) {
 			$groups = $this->formatter->getGroups();
-			$this->referencer->addGroups(zbx_objectValues($groups, 'name'));
+			foreach ($groups as $group) {
+				$groupsRefs[$group['name']] = $group['name'];
+			}
 		}
 
 		if ($this->options['templates']['exist'] || $this->options['templates']['missed']) {
 			$templates = $this->formatter->getTemplates();
 
-			$templatesRefs = array();
-			$groupsRefs = array();
 			foreach ($templates as $template) {
-				$templatesRefs[] = $template['host'];
-				$groupsRefs = zbx_objectValues($template['groups'], 'name');
-				if (!empty($template['templates'])) {
-					$templatesRefs = array_merge($templatesRefs, zbx_objectValues($template['templates'], 'name'));
+				$templatesRefs[$template['host']] = $template['host'];
+
+				foreach ($template['groups'] as $group) {
+					$groupsRefs[$group['name']] = $group['name'];
+				}
+				foreach ($template['templates'] as $linkedTemplate) {
+					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
 				}
 			}
-			$this->referencer->addTemplates($templatesRefs);
-			$this->referencer->addGroups($groupsRefs);
 		}
 
 		if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
 			$hosts = $this->formatter->getHosts();
 
-			$hostsRefs = array();
-			$groupsRefs = array();
-			$templatesRefs = array();
 			foreach ($hosts as $host) {
 				$hostsRefs[$host['host']] = $host['host'];
-				$groupsRefs = array_merge($groupsRefs, zbx_objectValues($host['groups'], 'name'));
-				if (isset($host['templates'])) {
-					$templatesRefs = array_merge($templatesRefs, zbx_objectValues($host['templates'], 'name'));
+				foreach ($host['groups'] as $group) {
+					$groupsRefs[$group['name']] = $group['name'];
+				}
+				foreach ($host['templates'] as $linkedTemplate) {
+					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
 				}
 			}
-
-
-			$this->referencer->addTemplates($templatesRefs);
-			$this->referencer->addGroups($groupsRefs);
 		}
 
 		if ($this->options['templates']['exist']
@@ -245,48 +251,49 @@ class CConfigurationImport {
 				|| $this->options['hosts']['exist']
 				|| $this->options['hosts']['missed']) {
 
-			$applicationsRefs = array();
 			$allApplications = $this->formatter->getApplications();
 			foreach ($allApplications as $host => $applications) {
-				$applicationsRefs[$host] = zbx_objectValues($applications, 'name');
+				foreach ($applications as $app) {
+					$applicationsRefs[$host][$app['name']] = $app['name'];
+				}
 			}
-			$this->referencer->addApplications($applicationsRefs);
 		}
 
 		if ($this->options['items']['exist'] || $this->options['items']['missed']) {
 			$allItems = $this->formatter->getItems();
 
-			$itemsRefs = array();
-			$applicationsRefs = array();
-			$valueMapsRefs = array();
-
 			foreach ($allItems as $host => $items) {
 				foreach ($items as $item) {
-					$applicationsRefs[$host] = zbx_objectValues($item['applications'], 'name');
-					$valueMapsRefs = zbx_objectValues($item['valuemap'], 'name');
+					$itemsRefs[$host][$item['key_']] = $item['key_'];
+
+					foreach ($item['applications'] as $app) {
+						$applicationsRefs[$host][$app['name']] = $app['name'];
+					}
+
+					if (!empty($item['valuemap'])) {
+						$valueMapsRefs[$item['valuemap']['name']] = $item['valuemap']['name'];
+					}
 				}
-				$itemsRefs[$host] = zbx_objectValues($items, 'key_');
 			}
-			$this->referencer->addItems($itemsRefs);
-			$this->referencer->addApplications($applicationsRefs);
-			$this->referencer->addValueMaps($valueMapsRefs);
 		}
 
 		if ($this->options['discoveryrules']['exist'] || $this->options['discoveryrules']['missed']) {
 			$allDiscoveryRules = $this->formatter->getDiscoveryRules();
 
-			$itemsRefs = array();
-			$triggersRefs = array();
-			$applicationsRefs = array();
 			foreach ($allDiscoveryRules as $host => $discoveryRules) {
-				if (!isset($itemsRefs[$host])) {
-					$itemsRefs[$host] = array();
-				}
-				$itemsRefs[$host] = array_merge($itemsRefs[$host], zbx_objectValues($discoveryRules, 'key_'));
-
 				foreach ($discoveryRules as $discoveryRule) {
+					$itemsRefs[$host][$discoveryRule['key_']] = $discoveryRule['key_'];
+
 					foreach ($discoveryRule['item_prototypes'] as $itemp) {
-						$applicationsRefs[$host] = zbx_objectValues($itemp['applications'], 'name');
+						$itemsRefs[$host][$itemp['key_']] = $itemp['key_'];
+
+						foreach ($itemp['applications'] as $app) {
+							$applicationsRefs[$host][$app['name']] = $app['name'];
+						}
+
+						if (!empty($itemp['valuemap'])) {
+							$valueMapsRefs[$itemp['valuemap']['name']] = $itemp['valuemap']['name'];
+						}
 					}
 					foreach ($discoveryRule['trigger_prototypes'] as $trigerp) {
 						$triggersRefs[$trigerp['description']][$trigerp['expression']] = $trigerp['expression'];
@@ -303,20 +310,13 @@ class CConfigurationImport {
 							$itemsRefs[$gitem['item']['host']][$gitem['item']['key']] = $gitem['item']['key'];
 						}
 					}
-
-					$itemsRefs[$host] = array_merge($itemsRefs[$host], zbx_objectValues($discoveryRule['item_prototypes'], 'key_'));
 				}
 			}
-			$this->referencer->addItems($itemsRefs);
-			$this->referencer->addApplications($applicationsRefs);
-			$this->referencer->addTriggers($triggersRefs);
 		}
 
 		if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
 			$allGraphs = $this->formatter->getGraphs();
 
-			$hostsRefs = array();
-			$itemsRefs = array();
 			foreach ($allGraphs as $graph) {
 				if ($graph['ymin_item_1']) {
 					$hostsRefs[$graph['ymin_item_1']['host']] = $graph['ymin_item_1']['host'];
@@ -331,15 +331,11 @@ class CConfigurationImport {
 					$itemsRefs[$gitem['item']['host']][$gitem['item']['key']] = $gitem['item']['key'];
 				}
 			}
-
-			$this->referencer->addHosts($hostsRefs);
-			$this->referencer->addItems($itemsRefs);
 		}
 
 		if ($this->options['triggers']['exist'] || $this->options['triggers']['missed']) {
 			$allTriggers = $this->formatter->getTriggers();
 
-			$triggersRefs = array();
 			foreach ($allTriggers as $trigger) {
 				$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
 
@@ -347,9 +343,15 @@ class CConfigurationImport {
 					$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
 				}
 			}
-
-			$this->referencer->addTriggers($triggersRefs);
 		}
+
+		$this->referencer->addGroups($groupsRefs);
+		$this->referencer->addTemplates($templatesRefs);
+		$this->referencer->addHosts($hostsRefs);
+		$this->referencer->addApplications($applicationsRefs);
+		$this->referencer->addItems($itemsRefs);
+		$this->referencer->addValueMaps($valueMapsRefs);
+		$this->referencer->addTriggers($triggersRefs);
 	}
 
 	/**
@@ -654,6 +656,10 @@ class CConfigurationImport {
 						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
 					}
 
+					if (!empty($item['valuemap'])) {
+						$item['valuemapid'] = $this->referencer->resolveValueMap($item['valuemap']['name']);
+					}
+
 					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
 					if ($itemsId) {
 						$item['itemid'] = $itemsId;
@@ -712,6 +718,10 @@ class CConfigurationImport {
 
 						if (isset($prototype['interface_ref'])) {
 							$prototype['interfaceid'] = $this->interfacesCache[$hostid][$prototype['interface_ref']];
+						}
+
+						if (!empty($prototype['valuemap'])) {
+							$prototype['valuemapid'] = $this->referencer->resolveValueMap($item['valuemap']['name']);
 						}
 
 						$prototypeId = $this->referencer->resolveItem($hostid, $prototype['key_']);
