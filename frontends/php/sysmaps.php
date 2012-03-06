@@ -205,7 +205,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$form->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'));
 
 	$map_wdgt = new CWidget();
-	$map_wdgt->addPageHeader(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
+	$map_wdgt->addPageHeader(_('Configuration of network maps'), $form);
 
 
 	if(isset($_REQUEST['form'])){
@@ -303,7 +303,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO);
+		$goButton = new CSubmit('goButton',_('Go'));
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "maps";');

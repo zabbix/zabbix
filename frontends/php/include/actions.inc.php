@@ -643,13 +643,13 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Nodes'), 'a.alertid') : null,
-		make_sorting_header(S_TIME,'clock'),
-		make_sorting_header(S_TYPE,'description'),
-		make_sorting_header(S_STATUS,'status'),
+		make_sorting_header(_('Time'),'clock'),
+		make_sorting_header(_('Type'),'description'),
+		make_sorting_header(_('Status'),'status'),
 		make_sorting_header(_('Retries left'), 'retries'),
 		make_sorting_header(_('Recipient(s)'), 'sendto'),
 		_('Message'),
-		S_ERROR
+		_('Error')
 	));
 
 	$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
@@ -719,13 +719,13 @@ function get_action_msgs_for_event($event){
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Nodes') : null,
-		S_TIME,
-		S_TYPE,
-		S_STATUS,
+		_('Time'),
+		_('Type'),
+		_('Status'),
 		_('Retries left'),
 		_('Recipient(s)'),
 		_('Message'),
-		S_ERROR
+		_('Error')
 	));
 
 
@@ -738,7 +738,7 @@ function get_action_msgs_for_event($event){
 
 		$time=zbx_date2str(S_EVENT_ACTION_MESSAGES_DATE_FORMAT,$alert["clock"]);
 		if($alert['esc_step'] > 0){
-			$time = array(bold(S_STEP.': '),$alert["esc_step"],br(),bold(S_TIME.': '),br(),$time);
+			$time = array(bold(_('Step').': '),$alert["esc_step"],br(),bold(_('Time').': '),br(),$time);
 		}
 
 		if ($alert['status'] == ALERT_STATUS_SENT) {
@@ -785,10 +785,10 @@ function get_action_cmds_for_event($event){
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Nodes') : null,
-		S_TIME,
-		S_STATUS,
+		_('Time'),
+		_('Status'),
 		_('Command'),
-		S_ERROR
+		_('Error')
 	));
 
 	$alerts = $event['alerts'];
@@ -797,7 +797,7 @@ function get_action_cmds_for_event($event){
 
 		$time = zbx_date2str(S_EVENT_ACTION_CMDS_DATE_FORMAT, $alert['clock']);
 		if($alert['esc_step'] > 0){
-			$time = array(bold(S_STEP.': '), $alert['esc_step'], br(), bold(S_TIME.': '), br(), $time);
+			$time = array(bold(_('Step').': '), $alert['esc_step'], br(), bold(_('Time').': '), br(), $time);
 		}
 
 		switch($alert['status']){

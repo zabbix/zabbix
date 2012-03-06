@@ -23,7 +23,7 @@ require_once 'include/config.inc.php';
 require_once 'include/hosts.inc.php';
 require_once 'include/forms.inc.php';
 
-$page['title'] = 'S_SCRIPTS';
+$page['title'] = _('Scripts');
 $page['file'] = 'scripts_exec.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
@@ -50,13 +50,13 @@ if (isset($_REQUEST['execute'])) {
 
 	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
 	if ($result === false) {
-		show_messages(false, '', S_SCRIPT_ERROR);
+		show_messages(false, '', _('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
 	}
 	else {
 		$message = $result['value'];
 		if ($result['response'] == 'failed') {
 			error($message);
-			show_messages(false, '', S_SCRIPT_ERROR);
+			show_messages(false, '', _('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
 			$message = '';
 		}
 		$frmResult = new CFormTable($script_info['name']);
