@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = 'S_CONFIGURATION_OF_NETWORK_MAPS';
+$page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
 $page['hist_arg'] = array('sysmapid');
 $page['scripts'] = array('class.cmap.js', 'class.cviewswitcher.js');

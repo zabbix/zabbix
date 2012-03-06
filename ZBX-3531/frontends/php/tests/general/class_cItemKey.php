@@ -22,7 +22,7 @@
 require_once 'PHPUnit/Framework.php';
 
 require_once dirname(__FILE__).'/../../include/func.inc.php';
-require_once dirname(__FILE__).'/../../api/classes/class.citemkey.php';
+require_once dirname(__FILE__).'/../../api/classes/class_cItemKey.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/locales.inc.php';
 require_once dirname(__FILE__).'/../../include/items.inc.php';

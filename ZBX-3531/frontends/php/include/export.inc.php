@@ -427,13 +427,13 @@ class zbxXML{
 
 				switch($error->level){
 					case LIBXML_ERR_WARNING:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Warning '.$error->code.': ';
+						$text .= _('XML file contains errors').'. Warning '.$error->code.': ';
 						break;
 					case LIBXML_ERR_ERROR:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Error '.$error->code.': ';
+						$text .= _('XML file contains errors').'. Error '.$error->code.': ';
 						break;
 					case LIBXML_ERR_FATAL:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Fatal Error '.$error->code.': ';
+						$text .= _('XML file contains errors').'. Fatal Error '.$error->code.': ';
 						break;
 				}
 
@@ -473,7 +473,7 @@ class zbxXML{
 
 			if($exists && isset($rules['screens']['exist'])){
 				$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
-				if(empty($db_screens)) throw new Exception(S_NO_PERMISSIONS_FOR_SCREEN.' "'.$screen['name'].'" import');
+				if(empty($db_screens)) throw new Exception(_('No permissions for screen').' "'.$screen['name'].'" import');
 
 				$db_screen = reset($db_screens);
 
@@ -584,10 +584,10 @@ class zbxXML{
 			}
 
 			if(isset($screen['screenid'])){
-				info(S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
+				info(_s('Screen "%1$s" updated.', $screen['name']));
 			}
 			else{
-				info(S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+				info(_s('Screen "%1$s" added.', $screen['name']));
 			}
 
 		}
@@ -667,7 +667,7 @@ class zbxXML{
 
 			if($exists && isset($rules['maps']['exist'])){
 				$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
-				if(empty($db_maps)) throw new Exception(S_NO_PERMISSIONS_FOR_MAP.' ['.$sysmap['name'].'] import');
+				if(empty($db_maps)) throw new Exception(_('No permissions for map').' ['.$sysmap['name'].'] import');
 
 				$db_map = reset($db_maps);
 				$sysmap['sysmapid'] = $db_map['sysmapid'];
@@ -1684,13 +1684,13 @@ class zbxXML{
 								$result = API::TemplateScreen()->update($screen);
 								if(!$result) throw new Exception('Cannot update screen');
 
-								info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
+								info('['.$current_hostname.'] '._s('Screen "%1$s" updated.', $screen['name']));
 							}
 							else{
 								$result = API::TemplateScreen()->create($screen);
 								if(!$result) throw new Exception('Cannot create screen');
 
-								info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+								info('['.$current_hostname.'] '._s('Screen "%1$s" added.', $screen['name']));
 							}
 						}
 					}

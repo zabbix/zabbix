@@ -42,13 +42,13 @@ class CXmlImportReader extends CImportReader {
 
 				switch ($error->level) {
 					case LIBXML_ERR_WARNING:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Warning '.$error->code.': ';
+						$text .= _s('XML file contains warning %1$s:', $error->code);
 						break;
 					case LIBXML_ERR_ERROR:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Error '.$error->code.': ';
+						$text .= _s('XML file contains error %1$s:', $error->code);
 						break;
 					case LIBXML_ERR_FATAL:
-						$text .= S_XML_FILE_CONTAINS_ERRORS.'. Fatal Error '.$error->code.': ';
+						$text .= _s('XML file contains fatal error %1$s:', $error->code);
 						break;
 				}
 

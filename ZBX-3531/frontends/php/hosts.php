@@ -583,7 +583,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // removes form_refresh variable
 		$frmForm->cleanItems();
 		$buttons = new CDiv(array(
-			new CSubmit('form', S_CREATE),
+			new CSubmit('form', _('Create')),
 			new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
 		));
 		$buttons->useJQueryStyle();
@@ -635,7 +635,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$filter_table->addRow(array(
 			array(array(bold(S_NAME), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
 			array(array(bold(S_DNS), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
-			array(array(bold(S_IP), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
+			array(array(bold(_('IP')), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
 			array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 		));
 

@@ -717,7 +717,7 @@ class CHostGroup extends CZBXAPI{
 				foreach ($groupids as $num => $groupid) {
 					if ($delGroups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-								S_GROUP.' ['.$delGroups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
+								_('Group').' ['.$delGroups[$groupid]['name'].'] '.S_INTERNAL_AND_CANNOT_DELETED_SMALL);
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS,

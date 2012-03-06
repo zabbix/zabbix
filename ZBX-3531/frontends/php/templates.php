@@ -592,7 +592,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$goOption->setAttribute('confirm', S_DELETE_SELECTED_TEMPLATES_Q);
 		$goBox->addItem($goOption);
 
-		$goOption = new CComboItem('delete_and_clear', S_DELETE_SELECTED_WITH_LINKED_ELEMENTS);
+		$goOption = new CComboItem('delete_and_clear', _('Delete selected with linked elements'));
 		$goOption->setAttribute('confirm', S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR);
 		$goBox->addItem($goOption);
 

@@ -82,7 +82,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$res = DBselect($sql);
 		while($rows = DBfetch($res)){
 			if(isset($rows['items']) && ($rows['items'] > 0)){
-				show_messages(false, null, S_ANOTHER_ITEM_SUM);
+				show_messages(false, null, _('Cannot add more than one item with type "Graph sum"'));
 				if(isset($_REQUEST['save'])) unset($_REQUEST['save']);
 				$_REQUEST['type'] = GRAPH_ITEM_SIMPLE;
 			}
@@ -133,7 +133,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$only_hostid	= get_request('only_hostid',	null);
 		$monitored_hosts = get_request('monitored_hosts', null);
 
-        $caption = ($itemid) ? S_UPD_ITEM_FOR_THE_GRAPH : S_NEW_ITEM_FOR_THE_GRAPH;
+		$caption = ($itemid) ? _('Update item for the graph') : _('New item for the graph');
 		$frmGItem = new CFormTable($caption);
 
 		$frmGItem->setName('graph_item');
@@ -188,9 +188,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		if ($graphtype == GRAPH_TYPE_PIE || $graphtype == GRAPH_TYPE_EXPLODED) {
 			$cmbType = new CComboBox('type', $type, 'submit()');
-			$cmbType->addItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
-			$cmbType->addItem(GRAPH_ITEM_SUM, S_GRAPH_SUM);
-			$frmGItem->addRow(S_TYPE, $cmbType);
+			$cmbType->addItem(GRAPH_ITEM_SIMPLE, _('Simple'));
+			$cmbType->addItem(GRAPH_ITEM_SUM, _('Graph sum'));
+			$frmGItem->addRow(_('Type'), $cmbType);
 		}
 		else {
 			$frmGItem->addVar('type', GRAPH_ITEM_SIMPLE);
@@ -200,21 +200,21 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		if ($graphtype == GRAPH_TYPE_PIE || $graphtype == GRAPH_TYPE_EXPLODED) {
 
-			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
-			$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
-			$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
-			$cmbFnc->addItem(CALC_FNC_LST, S_LST_SMALL);
-			$frmGItem->addRow(S_FUNCTION, $cmbFnc);
+			$cmbFnc->addItem(CALC_FNC_MIN, _('min'));
+			$cmbFnc->addItem(CALC_FNC_AVG, _('avg'));
+			$cmbFnc->addItem(CALC_FNC_MAX, _('max'));
+			$cmbFnc->addItem(CALC_FNC_LST, _('last'));
+			$frmGItem->addRow(_('Function'), $cmbFnc);
 		}
 		else {
 			if ($graphtype == GRAPH_TYPE_NORMAL) {
 				$cmbFnc->addItem(CALC_FNC_ALL, _('all'));
 			}
 
-			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
-			$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
-			$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
-			$frmGItem->addRow(S_FUNCTION, $cmbFnc);
+			$cmbFnc->addItem(CALC_FNC_MIN, _('min'));
+			$cmbFnc->addItem(CALC_FNC_AVG, _('avg'));
+			$cmbFnc->addItem(CALC_FNC_MAX, _('max'));
+			$frmGItem->addRow(_('Function'), $cmbFnc);
 
 			if ($graphtype == GRAPH_TYPE_NORMAL) {
 				$cmbType = new CComboBox('drawtype', $drawtype);
@@ -224,24 +224,24 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					$cmbType->addItem($i, graph_item_drawtype2str($i));
 				}
 
-				$frmGItem->addRow(S_DRAW_STYLE, $cmbType);
+				$frmGItem->addRow(_('Draw style'), $cmbType);
 			}
 			else {
 				$frmGItem->addVar('drawtype', 1);
 			}
 		}
 
-		$frmGItem->addRow(S_COLOR, new CColor('color', $color));
+		$frmGItem->addRow(_('Colour'), new CColor('color', $color));
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
 			$cmbYax = new CComboBox('yaxisside',$yaxisside);
-			$cmbYax->addItem(GRAPH_YAXIS_SIDE_LEFT,	S_LEFT);
+			$cmbYax->addItem(GRAPH_YAXIS_SIDE_LEFT,	_('Left'));
 			$cmbYax->addItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
-			$frmGItem->addRow(S_YAXIS_SIDE, $cmbYax);
+			$frmGItem->addRow(_('Y axis side'), $cmbYax);
 		}
 
 		if($type != GRAPH_ITEM_SUM){
-			$frmGItem->addRow(S_SORT_ORDER_0_100, new CTextBox('sortorder',$sortorder,3));
+			$frmGItem->addRow(_('Sort order (0->100)'), new CTextBox('sortorder',$sortorder,3));
 		}
 
 		$frmGItem->addItemToBottomRow(new CSubmit('save', isset($gid) ? S_SAVE : S_ADD));

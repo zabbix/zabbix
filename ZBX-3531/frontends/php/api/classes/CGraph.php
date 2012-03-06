@@ -658,7 +658,7 @@ class CGraph extends CZBXAPI {
 					}
 				}
 				if ($templatedGraph && (count($graphHosts) > 1)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
 				}
 
 // check ymin, ymax items
@@ -728,7 +728,7 @@ class CGraph extends CZBXAPI {
 					}
 				}
 				if ($templatedGraph && (count($graphHosts) > 1)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
 				}
 // }}} EXCEPTION: MESS TEMPLATED ITEMS
 
@@ -1051,7 +1051,7 @@ class CGraph extends CZBXAPI {
 
 // EXCEPTION: NO ITEMS {{{
 			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_MISSING_ITEMS_FOR_GRAPH.' [ '.$graph['name'].' ]');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
 			}
 // }}} EXCEPTION: NO ITEMS
 
@@ -1070,7 +1070,7 @@ class CGraph extends CZBXAPI {
 				foreach ($graph['gitems'] as $gitem) {
 					if ($gitem['type'] == GRAPH_ITEM_SUM) $sumItems++;
 				}
-				if ($sumItems > 1) self::exception(ZBX_API_ERROR_PARAMETERS, S_ANOTHER_ITEM_SUM.' [ '.$graph['name'].' ]');
+				if ($sumItems > 1) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
 			}
 // }}} EXCEPTION
 
