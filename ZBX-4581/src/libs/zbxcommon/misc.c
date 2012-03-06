@@ -1248,7 +1248,7 @@ int	int_in_list(char *list, int value)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_double_prefix                                                 *
+ * Function: is_double_suffix                                                 *
  *                                                                            *
  * Purpose: check if the string is double                                     *
  *                                                                            *
@@ -1262,7 +1262,7 @@ int	int_in_list(char *list, int value)
  * Comments: the function supports suffixes K,M,G,T,s,m,h,d,w                 *
  *                                                                            *
  ******************************************************************************/
-int	is_double_prefix(const char *str)
+int	is_double_suffix(const char *str)
 {
 	int	i, dot = -1;
 
@@ -1347,7 +1347,7 @@ int	is_double(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uint_prefix                                                   *
+ * Function: is_uint_suffix                                                   *
  *                                                                            *
  * Purpose: check if the string is unsigned integer                           *
  *                                                                            *
@@ -1361,7 +1361,7 @@ int	is_double(const char *str)
  * Comments: the function supports suffixes 's', 'm', 'h', 'd', and 'w'       *
  *                                                                            *
  ******************************************************************************/
-int	is_uint_prefix(const char *str)
+int	is_uint_suffix(const char *str)
 {
 	int	i = 0;
 
@@ -1452,7 +1452,7 @@ int	_wis_uint(const wchar_t *wide_string)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_int_prefix                                                    *
+ * Function: is_int_suffix                                                    *
  *                                                                            *
  * Purpose: check if the beginning of string is a signed integer              *
  *                                                                            *
@@ -1464,7 +1464,7 @@ int	_wis_uint(const wchar_t *wide_string)
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
-int	is_int_prefix(const char *str)
+int	is_int_suffix(const char *str)
 {
 	int	i = 0;
 
