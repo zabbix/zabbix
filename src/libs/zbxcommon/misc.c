@@ -1500,7 +1500,7 @@ int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
 	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
 	register zbx_uint64_t	value_uint64 = 0, c;
 
-	if ('\0' == *str || 0 == n || ZBX_IS_UINT64_MAX_LEN < n)
+	if ('\0' == *str || 0 == n)
 		return FAIL;
 
 	while ('\0' != *str && 0 < n--)
