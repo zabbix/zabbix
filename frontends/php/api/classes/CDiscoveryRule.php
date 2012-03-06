@@ -701,12 +701,12 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// check if all hosts exist and are writable
 		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		// check if the given discovery rules exist
 		if (!$this->isReadable($data['discoveryids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		// copy
@@ -724,13 +724,13 @@ class CDiscoveryRule extends CItemGeneral {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		if (!API::Host()->isWritable($data['hostids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 		if (!API::Template()->isReadable($data['templateids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$selectFields = array();
+		$selectFields = array('flags');
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;
@@ -1007,115 +1007,37 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 	}
 
-	/**
-	 * Inherit discovery rules to child hosts/templates.
-	 * @param array $items
-	 * @param null|array $hostids array of hostids which discovery rules should be inherited to
-	 * @return bool
-	 */
-	protected function inherit(array $items, $hostids = null) {
+	protected function inherit(array $items, array $hostids = null) {
 		if (empty($items)) {
 			return true;
 		}
 
-		$chdHosts = API::Host()->get(array(
-			'templateids' => zbx_objectValues($items, 'hostid'),
-			'hostids' => $hostids,
-			'output' => array('hostid', 'name', 'status'),
-			'selectInterfaces' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'templated_hosts' => true
+		// prepare the child items
+		$newItems = $this->prepareInheritedItems($items, $hostids, array(
+			'exists' => _('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.')
 		));
-		if (empty($chdHosts)) {
+		if (!$newItems) {
 			return true;
 		}
 
 		$insertItems = array();
 		$updateItems = array();
-		$inheritedItems = array();
-		foreach ($chdHosts as $hostid => $host) {
-			$templateids = zbx_toHash($host['templates'], 'templateid');
-
-			// skip items not from parent templates of current host
-			$parentItems = array();
-			foreach ($items as $itemid => $item) {
-				if (isset($templateids[$item['hostid']])) {
-					$parentItems[$itemid] = $item;
-				}
+		foreach ($newItems as $newItem) {
+			if (isset($newItem['itemid'])) {
+				$updateItems[] = $newItem;
 			}
-
-			// check existing items to decide insert or update
-			$exItems = $this->get(array(
-				'output' => array('itemid', 'key_', 'type', 'flags', 'templateid'),
-				'hostids' => $hostid,
-				'filter' => array('flags' => null),
-				'preservekeys' => true,
-				'nopermissions' => true
-			));
-			$exItemsKeys = zbx_toHash($exItems, 'key_');
-			$exItemsTpl = zbx_toHash($exItems, 'templateid');
-
-			foreach ($parentItems as $item) {
-				$exItem = null;
-
-				// update by tempalteid
-				if (isset($exItemsTpl[$item['itemid']])) {
-					$exItem = $exItemsTpl[$item['itemid']];
-				}
-
-				// update by key
-				if (isset($exItemsKeys[$item['key_']])) {
-					$exItem = $exItemsKeys[$item['key_']];
-
-					if ($exItem['flags'] != ZBX_FLAG_DISCOVERY) {
-						$this->errorInheritFlags($exItem['flags'], $exItem['key_'], $host['name']);
-					}
-					elseif ($exItem['templateid'] > 0 && bccomp($exItem['templateid'], $item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.', $item['key_'], $host['name']));
-					}
-				}
-
-				if ($host['status'] == HOST_STATUS_TEMPLATE || !isset($item['type'])) {
-					unset($item['interfaceid']);
-				}
-				elseif (isset($item['type']) && $item['type'] != $exItem['type']) {
-					// find a matching interface
-					$interface = self::findInterfaceForItem($item, $host['interfaces']);
-					if ($interface) {
-						$item['interfaceid'] = $interface['interfaceid'];
-					}
-					// no matching interface found, throw an error
-					elseif ($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $host['name'], $item['key_']));
-					}
-				}
-
-				// coping item
-				$newItem = $item;
-				$newItem['hostid'] = $host['hostid'];
-				$newItem['templateid'] = $item['itemid'];
-
-				// setting item application
-				if (isset($item['applications'])) {
-					$newItem['applications'] = get_same_applications_for_host($item['applications'], $host['hostid']);
-				}
-
-				if ($exItem) {
-					$newItem['itemid'] = $exItem['itemid'];
-					$inheritedItems[] = $newItem;
-					$updateItems[] = $newItem;
-				}
-				else {
-					$inheritedItems[] = $newItem;
-					$newItem['flags'] = ZBX_FLAG_DISCOVERY;
-					$insertItems[] = $newItem;
-				}
+			else {
+				$newItem['flags'] = ZBX_FLAG_DISCOVERY;
+				$insertItems[] = $newItem;
 			}
 		}
+
+		// save the new items
 		$this->createReal($insertItems);
 		$this->updateReal($updateItems);
-		$this->inherit($inheritedItems);
+
+		// propagate the inheritance to the children
+		return $this->inherit(array_merge($updateItems, $insertItems));
 	}
 
 	/**

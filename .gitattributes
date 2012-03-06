@@ -13,6 +13,7 @@ build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
 create/src/data.tmpl -text
+frontends/php/api/classes/CTriggerGeneral.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text

@@ -438,7 +438,7 @@ class CMaintenance extends CZBXAPI {
 	public function create(array $maintenances) {
 		$maintenances = zbx_toArray($maintenances);
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation'));
 		}
 
 		$hostids = array();
