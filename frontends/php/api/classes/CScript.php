@@ -157,8 +157,8 @@ class CScript extends CZBXAPI {
 			}
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where'][] = '(('.DBcondition('hg.hostid', $options['hostids']).' AND hg.groupid=s.groupid)'.
-									' OR '.
-									'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).'))';
+				' OR '.
+				'(s.groupid IS NULL AND '.DBin_node('scriptid', $hostNodeIds).'))';
 		}
 
 		// scriptids
@@ -258,8 +258,8 @@ class CScript extends CZBXAPI {
 
 		$dbScripts = DBselect(
 			'SELECT s.scriptid'.
-			' FROM scripts s'.
-			' WHERE '.DBin_node('s.scriptid').
+				' FROM scripts s'.
+				' WHERE '.DBin_node('s.scriptid').
 				' AND s.name='.$script['name']
 		);
 		while ($script = DBfetch($dbScripts)) {

@@ -143,13 +143,13 @@ class CTemplateScreen extends CScreen {
 				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
 				$sqlParts['where'][] = 'r.permission>='.$permission;
 				$sqlParts['where'][] = 'NOT EXISTS ('.
-									' SELECT hgg.groupid'.
-									' FROM hosts_groups hgg,rights rr,users_groups gg'.
-									' WHERE hgg.hostid=hg.hostid'.
-										' AND rr.id=hgg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.self::$userData['userid'].
-										' AND rr.permission<'.$permission.')';
+					' SELECT hgg.groupid'.
+					' FROM hosts_groups hgg,rights rr,users_groups gg'.
+					' WHERE hgg.hostid=hg.hostid'.
+					' AND rr.id=hgg.groupid'.
+					' AND rr.groupid=gg.usrgrpid'.
+					' AND gg.userid='.self::$userData['userid'].
+					' AND rr.permission<'.$permission.')';
 			}
 		}
 
@@ -197,8 +197,8 @@ class CTemplateScreen extends CScreen {
 
 			while (is_null($options['noInheritance']) && !empty($childTemplateids)) {
 				$sql = 'SELECT ht.*'.
-						' FROM hosts_templates ht'.
-						' WHERE '.DBcondition('hostid', $childTemplateids);
+					' FROM hosts_templates ht'.
+					' WHERE '.DBcondition('hostid', $childTemplateids);
 				$dbTemplates = DBselect($sql);
 
 				$childTemplateids = array();
@@ -288,9 +288,9 @@ class CTemplateScreen extends CScreen {
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
 					FROM '.$sqlFrom.'
 					WHERE '.DBin_node('s.screenid', $nodeids).
-						$sqlWhere.
-						$sqlGroup.
-						$sqlOrder;
+			$sqlWhere.
+			$sqlGroup.
+			$sqlOrder;
 
 		$res = DBselect($sql, $sqlLimit);
 		while ($screen = DBfetch($res)) {

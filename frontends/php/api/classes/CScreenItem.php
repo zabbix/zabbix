@@ -344,8 +344,8 @@ class CScreenItem extends CZBXAPI {
 			if (!empty($options['check_duplicate_resource_in_cell']) && isset($screenItem['x']) && isset($screenItem['y'])) {
 				foreach ($dbScreenItems as $dbScreenItem) {
 					if ($dbScreenItem['screenid'] == $screenItem['screenid']
-							&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
-							&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
+						&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
+						&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exist.'));
 					}
 				}
@@ -383,7 +383,7 @@ class CScreenItem extends CZBXAPI {
 				$graphs[] = $screenItem['resourceid'];
 			}
 			elseif (in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))
-					|| $screenItem['resourcetype'] == SCREEN_RESOURCE_CLOCK && $screenItem['style'] == TIME_TYPE_HOST) {
+				|| $screenItem['resourcetype'] == SCREEN_RESOURCE_CLOCK && $screenItem['style'] == TIME_TYPE_HOST) {
 				if (!$screenItem['resourceid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No item ID provided for screen element.'));
 				}

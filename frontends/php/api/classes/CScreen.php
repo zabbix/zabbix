@@ -189,9 +189,9 @@ class CScreen extends CZBXAPI {
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
 				FROM '.$sqlFrom.'
 				WHERE '.DBin_node('s.screenid', $nodeids).
-					$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
+			$sqlWhere.
+			$sqlGroup.
+			$sqlOrder;
 		$res = DBselect($sql, $sqlLimit);
 		while ($screen = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
@@ -340,7 +340,7 @@ class CScreen extends CZBXAPI {
 			foreach ($restrGroups as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-							&& uint_in_array($screenItem['resourcetype'], array(
+						&& uint_in_array($screenItem['resourcetype'], array(
 							SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO, SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
 							SCREEN_RESOURCE_DATA_OVERVIEW, SCREEN_RESOURCE_HOSTGROUP_TRIGGERS))) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
@@ -352,7 +352,7 @@ class CScreen extends CZBXAPI {
 			foreach ($restrHosts as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-							&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_HOST_TRIGGERS))) {
+						&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_HOST_TRIGGERS))) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
 					}
 				}
@@ -371,7 +371,7 @@ class CScreen extends CZBXAPI {
 			foreach ($restrItems as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-							&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
+						&& uint_in_array($screenItem['resourcetype'], array(SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT))) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
 					}
 				}
@@ -381,7 +381,7 @@ class CScreen extends CZBXAPI {
 			foreach ($restrMaps as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-							&& $screenItem['resourcetype'] == SCREEN_RESOURCE_MAP) {
+						&& $screenItem['resourcetype'] == SCREEN_RESOURCE_MAP) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
 					}
 				}
@@ -391,7 +391,7 @@ class CScreen extends CZBXAPI {
 			foreach ($restrScreens as $resourceid) {
 				foreach ($screensItems as $screenItemid => $screenItem) {
 					if (bccomp($screenItem['resourceid'], $resourceid) == 0
-							&& $screenItem['resourcetype'] == SCREEN_RESOURCE_SCREEN) {
+						&& $screenItem['resourcetype'] == SCREEN_RESOURCE_SCREEN) {
 						unset($result[$screenItem['screenid']], $screensItems[$screenItemid]);
 					}
 				}
