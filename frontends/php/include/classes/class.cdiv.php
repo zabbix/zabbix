@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CDiv extends CTag {
+
 	public function __construct($items = null, $class = null, $id = null) {
 		parent::__construct('div', 'yes');
 		$this->attr('class', $class);

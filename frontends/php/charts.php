@@ -176,7 +176,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 		$rst_icon = get_icon('reset', array('id' => $_REQUEST['graphid']));
-		array_push($icons, $icon, $rst_icon, $fs_icon);
+		array_push($icons, $icon, SPACE, $rst_icon, SPACE, $fs_icon);
 
 // NAV BAR
 		$utime = zbxDateToTime($_REQUEST['stime']);

@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CCol extends CTag {
+
 	public function __construct($item = null, $class = null, $colspan = null, $width = null) {
 		parent::__construct('td', 'yes');
 		$this->addItem($item);

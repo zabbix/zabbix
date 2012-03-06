@@ -19,8 +19,6 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
-
 $usersWidget = new CWidget();
 
 // append page header to widget
@@ -147,6 +145,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go'));
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
 
 // append table to form
 $usersForm->addItem(array($this->data['paging'], $usersTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

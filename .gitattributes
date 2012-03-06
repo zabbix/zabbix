@@ -14,6 +14,7 @@ build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
 create/src/data.tmpl -text
 frontends/php/api/classes/CImport.php -text
+frontends/php/api/classes/CTriggerGeneral.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -108,6 +109,7 @@ frontends/php/images/general/tr_space.gif -text
 frontends/php/images/general/tr_top_bottom.gif -text
 frontends/php/images/general/tr_top_right.gif -text
 frontends/php/images/general/tr_top_right_bottom.gif -text
+frontends/php/images/general/transparent.png -text
 frontends/php/images/general/tree/minus.gif -text
 frontends/php/images/general/tree/plus.gif -text
 frontends/php/images/general/tree/point.gif -text
@@ -176,6 +178,11 @@ frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/views/conf.import.php -text
+frontends/php/include/views/configuration.screen.constructor.edit.php -text
+frontends/php/include/views/configuration.screen.constructor.list.php -text
+frontends/php/include/views/configuration.screen.edit.php -text
+frontends/php/include/views/configuration.screen.list.php -text
+frontends/php/include/views/monitoring.screen.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
