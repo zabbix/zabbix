@@ -1,6 +1,7 @@
 usr/bin
 usr/sbin
 etc/zabbix
+etc/zabbix/zabbix_agentd.d
 etc/logrotate.d
 usr/share/zabbix-agent
-var/log/zabbix-agent
+var/log/zabbix

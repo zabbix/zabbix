@@ -22,9 +22,9 @@ case "$1" in
     ;;
     purge)
         if [ -x /usr/bin/ucf ]; then
-            ucf --purge /etc/zabbix/dbconfig.php
+            ucf --purge /etc/zabbix/web/zabbix.conf.php
         fi
-        rm -f /etc/zabbix/dbconfig.php
+        rm -f /etc/zabbix/web/zabbix.conf.php
     ;;
 
     *)

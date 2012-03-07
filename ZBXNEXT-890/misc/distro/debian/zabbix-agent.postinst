@@ -20,7 +20,7 @@ if [ "$1" = "configure" ]; then
         zabbix_server="localhost"
     fi
 
-    sed "s/^[# ]*Server=.*/Server=$zabbix_server/g" < $CONFFILE1 > $CONFFILE_DEST1.new 
+    sed "s/^Server=.*/Server=$zabbix_server/g" < $CONFFILE1 > $CONFFILE_DEST1.new 
     ucf --debconf-ok $CONFFILE_DEST1.new $CONFFILE_DEST1
     rm -f $CONFFILE_DEST1.new
 
@@ -78,7 +78,7 @@ if [ "$1" = "configure" ]; then
         rm -rf /var/run/zabbix-agent
     fi
 
-    chown zabbix:zabbix /var/log/zabbix-agent -R
+    chown zabbix:zabbix /var/log/zabbix -R
 fi
 
 db_stop

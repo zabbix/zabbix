@@ -1,2 +1,3 @@
 debian/tmp-build-SQLITE3/src/zabbix_proxy/zabbix_proxy usr/sbin
-create/schema/sqlite.sql usr/share/zabbix-proxy
+create/schema/sqlite.sql usr/share/zabbix-proxy-sqlite3
+

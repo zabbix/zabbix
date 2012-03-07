@@ -1,4 +1,4 @@
-/var/log/zabbix-server/zabbix_server.log {
+/var/log/zabbix/zabbix_server.log {
     daily
     rotate 7
     compress

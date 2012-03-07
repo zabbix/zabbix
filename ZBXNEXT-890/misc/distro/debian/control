@@ -105,9 +105,9 @@ Description: network monitoring solution - server (using PostgreSQL)
 
 Package: zabbix-server-sqlite3
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
+Depends: ${shlibs:Depends}, ${misc:Depends}, sqlite3, fping, adduser, dbconfig-common (>= 1.8.19), lsb-base
 Pre-Depends: debconf
-Recommends: sqlite3, snmpd
+Recommends: snmpd
 Suggests: zabbix-frontend-php, logrotate
 Conflicts: zabbix-server-mysql, zabbix-server-pgsql, zabbix-proxy-mysql, zabbix-proxy-pgsql, zabbix-proxy-sqlite3
 Description: network monitoring solution - server (using SQLite3)

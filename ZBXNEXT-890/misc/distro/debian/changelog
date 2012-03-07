@@ -12,7 +12,15 @@ zabbix (1:1.8.10-1) unstable; urgency=low
   * Use original man pages
   * Add upgrade sql to proxy
   * Move zabbix_agent to /usr/sbin
-  * Create zabbix-get and zabbix-sender sub-packages
+  * Add zabbix-get and zabbix-sender packages
+  * Use original conf files
+  * Change log directory to /var/log/zabbix
+  * Add zabbix_agent.conf
+  * Add images sql to server packages
+  * Add userparameter*.conf to agent package
+  * Move alertscripts and externalscripts to /var/lib/zabbix
+  * Don't delete /var/run/zabbix and /var/log/zabbix directory forcible
+  * Fix double Server setting on zabbix_agentd.conf
 
  -- Kodai Terashima <kodai.terashima@zabbix.com> Fri, 02 Mar 2012 12:00:18 +0200
 

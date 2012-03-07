@@ -72,7 +72,7 @@ if [ "$1" = "configure" ]; then
         rm -rf /var/run/zabbix-proxy
     fi
 
-    chown zabbix:zabbix /var/log/zabbix-proxy -R
+    chown zabbix:zabbix /var/log/zabbix -R
 fi
 
 db_stop

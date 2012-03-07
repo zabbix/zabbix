@@ -1,7 +1,9 @@
 etc/zabbix
 usr/sbin
 usr/share/zabbix-proxy
-var/log/zabbix-proxy
+var/lib/zabbix
+var/lib/zabbix/externalscripts
+var/log/zabbix
 usr/share/doc/zabbix-proxy-pgsql
 usr/share/dbconfig-common/data/zabbix-proxy-pgsql/install
 usr/share/dbconfig-common/data/zabbix-proxy-pgsql/upgrade/pgsql

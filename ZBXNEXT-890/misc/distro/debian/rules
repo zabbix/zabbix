@@ -99,7 +99,7 @@ CONFFLAGS_COMMON  = --host=$(DEB_HOST_GNU_TYPE) \
                     --with-openipmi \
                     --with-ssh2 \
                     --with-libcurl \
-                    --with-iodbc
+					--with-iodbc
 
 CONFFLAGS_SERVER_MYSQL = $(CONFFLAGS_COMMON) --with-mysql
 CONFFLAGS_SERVER_PGSQL = $(CONFFLAGS_COMMON) --with-pgsql
@@ -113,16 +113,16 @@ BUILDDIR := $(CURDIR)/debian/tmp-build
 # and reconfigure the autoconf magic to have the "-lcrypto" linking removed.
 prepare: patch prepare-stamp
 prepare-stamp:
-	if test -e /usr/share/misc/config.guess ; then 
-		if ! test -e config.guess.orig; then
-			mv config.guess config.guess.orig ;
-			cp --remove-destination /usr/share/misc/config.guess config.guess ;
-		fi ;
+	if test -e /usr/share/misc/config.guess ; then \
+		if ! test -e config.guess.orig; then \
+			mv config.guess config.guess.orig ; \
+			cp --remove-destination /usr/share/misc/config.guess config.guess ; \
+		fi ; \
 	fi
-	if test -e /usr/share/misc/config.sub ; then
-		if ! test -e config.sub.orig; then
-			mv config.sub config.sub.orig ;
-			cp --remove-destination /usr/share/misc/config.sub config.sub ;
+	if test -e /usr/share/misc/config.sub ; then \
+		if ! test -e config.sub.orig; then \
+			mv config.sub config.sub.orig ; \
+			cp --remove-destination /usr/share/misc/config.sub config.sub ; \
 		fi ; \
 	fi
 	touch prepare-stamp
@@ -169,12 +169,14 @@ clean: unpatch
 	[ ! -f src/zabbix_sender/Makefile ] || $(MAKE) -C src/zabbix_sender/ clean
 	[ ! -f src/zabbix_proxy/Makefile ] || $(MAKE) -C src/zabbix_proxy/ clean
 	debconf-updatepo
-	if test -e config.guess.orig ; then
-		mv config.guess.orig config.guess ;
+
+	if test -e config.guess.orig ; then \
+		mv config.guess.orig config.guess ; \
 	fi ; 
-	if test -e config.sub.orig ; then
-		mv config.sub.orig config.sub ;
-	fi ;
+	if test -e config.sub.orig ; then \
+		mv config.sub.orig config.sub ; \
+	fi ; \
+
 	@echo Removing build directories in $(BUILDDIR)
 	$(RM) -r debian/tmp*
 	dh_clean
@@ -190,11 +192,12 @@ binary-indep: build
 	# Rename during install
 	# zabbix-frontend-php
 	cp debian/conf/apache.conf $(TMP_FRONTEND)/etc/zabbix/apache.conf
+	# delete unnecessary .htaccess. the configuration is in apache.conf
 	find $(TMP_FRONTEND)/usr/share/zabbix -name .htaccess | xargs rm -rf
 	# --------------------------------
 	# zabbix-frontend-php
 	# fonts come from the respective Debian packages.
-	# it get linked later with dh_link.
+	# it gets linked later with dh_link.
 	rm -r $(TMP_FRONTEND)/usr/share/zabbix/fonts/DejaVuSans.ttf
 	rm -f $(TMP_FRONTEND)/usr/share/zabbix/conf/COPYING
 	# --------------------------------
@@ -225,26 +228,60 @@ binary-arch: build
 	dh_prep -a
 	dh_installdirs -a
 	dh_install -a
-	# Rename during install
+	# create temporary config files
+	mkdir debian/templates
+	# zabbix-agentd.conf
+	cat misc/conf/zabbix_agentd.conf | sed \
+		-e '/^# PidFile=/a \\nPidFile=/var/run/zabbix/zabbix_agentd.pid' \
+		-e 's|^LogFile=.*|LogFile=/var/log/zabbix/zabbix_agentd.log|g' \
+		-e '/^# LogFileSize=.*/a \\nLogFileSize=0' \
+		-e '/^# Include=$$/a \\nInclude=/etc/zabbix/zabbix_agentd.d/' \
+		> debian/templates/zabbix_agentd.conf
+	# zabbix-server.conf
+	cat misc/conf/zabbix_server.conf |sed \
+		-e '/^# PidFile=/a \\nPidFile=/var/run/zabbix/zabbix_server.pid' \
+		-e 's|^LogFile=.*|LogFile=/var/log/zabbix/zabbix_server.log|g' \
+		-e '/^# LogFileSize=/a \\nLogFileSize=0' \
+		-e '/^# AlertScriptsPath=/a \\nAlertScriptsPath=/var/lib/zabbix/alertscripts' \
+		-e '/^# ExternalScripts=/a \\nExternalScripts=/var/lib/zabbix/externalscripts' \
+		-e '/^# DBHost=/a \\nDBHost=_DBC_DBSERVER_' \
+		-e 's|^DBName=zabbix|DBName=_DBC_DBNAME_|g' \
+		-e 's|^DBUser=root|DBUser=_DBC_DBUSER_|g' \
+		-e '/^# DBPassword/a \\nDBPassword=_DBC_DBPASS_' \
+		-e '/^# DBSocket=/a \\nDBSocket=/var/run/mysqld/mysqld.sock' \
+		> debian/templates/zabbix_server.conf
+	# zabbix-proxy.conf
+	cat misc/conf/zabbix_proxy.conf | sed \
+		-e '/^# PidFile=/a \\nPidFile=/var/run/zabbix/zabbix_proxy.pid' \
+		-e 's|^LogFile=.*|LogFile=/var/log/zabbix/zabbix_proxy.log|g' \
+		-e '/^# LogFileSize=/a \\nLogFileSize=0' \
+		-e '/^# ExternalScripts=/a \\nExternalScripts=/var/lib/zabbix/externalscripts' \
+		-e '/^# DBHost=/a \\nDBHost=_DBC_DBSERVER_' \
+		-e 's|^DBName=zabbix|DBName=_DBC_DBNAME_|g' \
+		-e 's|^DBUser=root|DBUser=zabbix|g' \
+		-e '/^# DBPassword/a \\nDBPassword=_DBC_DBPASS_' \
+		-e '/^# DBSocket=/a \\nDBSocket=/var/run/mysqld/mysqld.sock' \
+		> debian/templates/zabbix_proxy.conf
+	# install config files
 	# zabbix-agent
-	cp debian/templates/zabbix_agentd.conf.in $(TMP_AGENT)/usr/share/$(PKG_AGENT)/zabbix_agentd.conf
+	cp debian/templates/zabbix_agentd.conf $(TMP_AGENT)/usr/share/$(PKG_AGENT)/zabbix_agentd.conf
 	# zabbix-server-mysql
-	cp debian/templates/zabbix_server.conf.in $(TMP_SERVER_MYSQL)/usr/share/$(PKG_SERVER_MYSQL)/zabbix_server.conf
+	cp debian/templates/zabbix_server.conf $(TMP_SERVER_MYSQL)/usr/share/$(PKG_SERVER_MYSQL)/zabbix_server.conf
 	cat create/schema/mysql.sql create/data/data.sql create/data/images_mysql.sql > $(TMP_SERVER_MYSQL)/usr/share/dbconfig-common/data/$(PKG_SERVER_MYSQL)/install/mysql
 	# zabbix-server-pgsql
-	cp debian/templates/zabbix_server.conf.in $(TMP_SERVER_PGSQL)/usr/share/$(PKG_SERVER_PGSQL)/zabbix_server.conf
+	cp debian/templates/zabbix_server.conf $(TMP_SERVER_PGSQL)/usr/share/$(PKG_SERVER_PGSQL)/zabbix_server.conf
 	cat create/schema/postgresql.sql create/data/data.sql create/data/images_pgsql.sql > $(TMP_SERVER_PGSQL)/usr/share/dbconfig-common/data/$(PKG_SERVER_PGSQL)/install/pgsql
 	# zabbix-server-sqlite3
-	cp debian/templates/zabbix_server_sqlite3.conf.in $(TMP_SERVER_SQLITE3)/usr/share/$(PKG_SERVER_SQLITE3)/zabbix_server.conf
+	cat debian/templates/zabbix_server.conf | sed -e 's|^DBName=_DBC_DBNAME_|DBName=_DBC_BASEPATH_/_DBC_DBNAME_|g' > $(TMP_SERVER_SQLITE3)/usr/share/$(PKG_SERVER_SQLITE3)/zabbix_server.conf
 	cat create/schema/sqlite.sql create/data/data.sql create/data/images_sqlite3.sql > $(TMP_SERVER_SQLITE3)/usr/share/dbconfig-common/data/$(PKG_SERVER_SQLITE3)/install/sqlite3
 	# zabbix-proxy-mysql
-	cp debian/templates/zabbix_proxy.conf.in $(TMP_PROXY_MYSQL)/usr/share/zabbix-proxy/zabbix_proxy.conf
+	cp debian/templates/zabbix_proxy.conf $(TMP_PROXY_MYSQL)/usr/share/zabbix-proxy/zabbix_proxy.conf
 	cp create/schema/mysql.sql $(TMP_PROXY_MYSQL)/usr/share/dbconfig-common/data/$(PKG_PROXY_MYSQL)/install/mysql
 	# zabbix-proxy-pgsql
-	cp debian/templates/zabbix_proxy.conf.in $(TMP_PROXY_PGSQL)/usr/share/zabbix-proxy/zabbix_proxy.conf
+	cp debian/templates/zabbix_proxy.conf $(TMP_PROXY_PGSQL)/usr/share/zabbix-proxy/zabbix_proxy.conf
 	cp create/schema/postgresql.sql $(TMP_PROXY_PGSQL)/usr/share/dbconfig-common/data/$(PKG_PROXY_PGSQL)/install/pgsql
 	# zabbix-proxy-sqlite3
-	cp debian/templates/zabbix_proxy_sqlite3.conf.in $(TMP_PROXY_SQLITE3)/usr/share/zabbix-proxy/zabbix_proxy.conf
+	cat debian/templates/zabbix_proxy.conf | sed -e 's|^DBName=_DBC_DBNAME_|DBName=_DBC_BASEPATH_/_DBC_DBNAME_|g' > $(TMP_PROXY_SQLITE3)/usr/share/zabbix-proxy/zabbix_proxy.conf
 	cp create/schema/sqlite.sql $(TMP_PROXY_SQLITE3)/usr/share/dbconfig-common/data/$(PKG_PROXY_SQLITE3)/install/sqlite3
 	# --------------------------------
 	dh_installdocs -a
@@ -260,6 +297,9 @@ binary-arch: build
 	dh_installinit -p $(PKG_PROXY_PGSQL) --name zabbix-proxy
 	dh_installinit -p $(PKG_PROXY_SQLITE3) --name zabbix-proxy
 	dh_installinit -p $(PKG_AGENT)
+	dh_installinit -p $(PKG_GET)
+	dh_installinit -p $(PKG_SENDER)
+
 	dh_installlogrotate -a
 	dh_link -a
 	dh_compress -a

@@ -1,3 +1,5 @@
 debian/tmp-build-MYSQL/src/zabbix_server/zabbix_server usr/sbin
-create/schema/mysql.sql usr/share/zabbix-server
-create/data/data.sql usr/share/zabbix-server
+create/schema/mysql.sql usr/share/zabbix-server-mysql
+create/data/data.sql usr/share/zabbix-server-mysql
+create/data/images_mysql.sql usr/share/zabbix-server-mysql
+

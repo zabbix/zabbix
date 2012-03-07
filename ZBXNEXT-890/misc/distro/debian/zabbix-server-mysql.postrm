@@ -16,8 +16,8 @@ case "$1" in
     remove)
     ;;
     purge)
-        rm -fr /var/log/zabbix-server
-        rm -fr /var/run/zabbix
+        rm -f /var/log/zabbix/zabbix_server.log*
+        rm -f /var/run/zabbix/zabbix_server.pid
         rm -f /etc/zabbix/zabbix_server.conf
         ucf --purge /etc/zabbix/zabbix_server.conf || true
     ;;

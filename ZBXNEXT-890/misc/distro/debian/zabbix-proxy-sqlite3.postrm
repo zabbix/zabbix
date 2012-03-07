@@ -16,8 +16,8 @@ case "$1" in
     remove)
     ;;
     purge)
-        rm -fr /var/log/zabbix-proxy
-        rm -fr /var/run/zabbix
+        rm -f /var/log/zabbix/zabbix_proxy.log*
+        rm -f /var/run/zabbix/zabbix_proxy.pid
         rm -f /etc/zabbix/zabbix_proxy.conf
         ucf --purge /etc/zabbix/zabbix_proxy.conf || true
     ;;

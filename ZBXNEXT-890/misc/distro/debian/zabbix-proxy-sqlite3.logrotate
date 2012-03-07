@@ -1,4 +1,4 @@
-/var/log/zabbix-proxy/zabbix_proxy.log {
+/var/log/zabbix/zabbix_proxy.log {
     daily
     rotate 7
     compress

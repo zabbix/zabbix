@@ -1,8 +1,9 @@
 etc/zabbix
 usr/sbin
 usr/share/zabbix-proxy
-var/log/zabbix-proxy
 var/lib/zabbix
+var/lib/zabbix/externalscripts
+var/log/zabbix
 usr/share/doc/zabbix-proxy-sqlite3
 usr/share/dbconfig-common/data/zabbix-proxy-sqlite3/install
 

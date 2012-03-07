@@ -27,7 +27,7 @@ if [ "$1" = "configure" ]; then
             zabbix
     fi
 
-    chown zabbix:zabbix /var/log/zabbix-server -R
+    chown zabbix:zabbix /var/log/zabbix -R
     chown -R zabbix:www-data /var/lib/zabbix
 
     # dbconfig-common configuration to set up database
