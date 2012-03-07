@@ -811,11 +811,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!is_null($options['selectDiscoveryRule'])) {
 			$ruleids = $ruleMap = array();
 
-			$sql = 'SELECT id.parent_itemid, td.triggerid'.
-					' FROM trigger_discovery td, item_discovery id, functions f'.
-					' WHERE '.DBcondition('td.triggerid', $triggerids).
-						' AND td.parent_triggerid=f.triggerid'.
-						' AND f.itemid=id.itemid';
+			$sql = 'SELECT id.parent_itemid, f.triggerid'.
+					' FROM item_discovery id, functions f'.
+					' WHERE '.DBcondition('f.triggerid', $triggerids).
+					' AND f.itemid=id.itemid';
 			$dbRules = DBselect($sql);
 			while ($rule = DBfetch($dbRules)) {
 				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
