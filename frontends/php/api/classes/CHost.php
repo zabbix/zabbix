@@ -1756,7 +1756,7 @@ class CHost extends CZBXAPI {
 			unset($data['macros']);
 		}
 
-		if (isset($data['inventory'])) {
+		if (!empty($data['inventory'])) {
 			$updateInventory = $data['inventory'];
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 			unset($data['inventory']);
