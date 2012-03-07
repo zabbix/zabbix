@@ -35,46 +35,46 @@ check_fields($fields);
 
 
 $data['rules'] = array(
-	'groups' => array('missed' => false),
-	'hosts' => array('exist' => false, 'missed' => false),
-	'templates' => array('exist' => false, 'missed' => false),
-	'template_linkages' => array('missed' => false),
-	'items' => array('exist' => false, 'missed' => false),
-	'discoveryrules' => array('exist' => false, 'missed' => false),
-	'triggers' => array('exist' => false, 'missed' => false),
-	'graphs' => array('exist' => false, 'missed' => false),
-	'screens' => array('exist' => false, 'missed' => false),
-	'maps' => array('exist' => false, 'missed' => false),
-	'images' => array('exist' => false, 'missed' => false)
+	'groups' => array('createMissing' => false),
+	'hosts' => array('updateExisting' => false, 'createMissing' => false),
+	'templates' => array('updateExisting' => false, 'createMissing' => false),
+	'template_linkages' => array('createMissing' => false),
+	'items' => array('updateExisting' => false, 'createMissing' => false),
+	'discoveryrules' => array('updateExisting' => false, 'createMissing' => false),
+	'triggers' => array('updateExisting' => false, 'createMissing' => false),
+	'graphs' => array('updateExisting' => false, 'createMissing' => false),
+	'screens' => array('updateExisting' => false, 'createMissing' => false),
+	'maps' => array('updateExisting' => false, 'createMissing' => false),
+	'images' => array('updateExisting' => false, 'createMissing' => false)
 );
 if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 	switch ($_REQUEST['rules_preset']) {
 		case 'host':
-			$data['rules']['groups'] = array('missed' => true);
-			$data['rules']['hosts'] = array('exist' => true, 'missed' => true);
-			$data['rules']['items'] = array('exist' => true, 'missed' => true);
-			$data['rules']['discoveryrules'] = array('exist' => true, 'missed' => true);
-			$data['rules']['triggers'] = array('exist' => true, 'missed' => true);
-			$data['rules']['graphs'] = array('exist' => true, 'missed' => true);
-			$data['rules']['template_linkages'] = array('missed' => true);
+			$data['rules']['groups'] = array('createMissing' => true);
+			$data['rules']['hosts'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['items'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['discoveryrules'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['triggers'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['graphs'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['template_linkages'] = array('createMissing' => true);
 			break;
 
 		case 'template':
-			$data['rules']['groups'] = array('missed' => true);
-			$data['rules']['templates'] = array('exist' => true, 'missed' => true);
-			$data['rules']['items'] = array('exist' => true, 'missed' => true);
-			$data['rules']['discoveryrules'] = array('exist' => true, 'missed' => true);
-			$data['rules']['triggers'] = array('exist' => true, 'missed' => true);
-			$data['rules']['graphs'] = array('exist' => true, 'missed' => true);
-			$data['rules']['template_linkages'] = array('missed' => true);
+			$data['rules']['groups'] = array('createMissing' => true);
+			$data['rules']['templates'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['items'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['discoveryrules'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['triggers'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['graphs'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['template_linkages'] = array('createMissing' => true);
 			break;
 
 		case 'map':
-			$data['rules']['maps'] = array('exist' => true, 'missed' => true);
+			$data['rules']['maps'] = array('updateExisting' => true, 'createMissing' => true);
 			break;
 
 		case 'screen':
-			$data['rules']['screens'] = array('exist' => true, 'missed' => true);
+			$data['rules']['screens'] = array('updateExisting' => true, 'createMissing' => true);
 			break;
 
 	}
@@ -86,18 +86,18 @@ if (isset($_REQUEST['rules'])) {
 	foreach ($data['rules'] as $ruleName => $rule) {
 
 		if (!isset($requestRules[$ruleName])) {
-			if (isset($rule['exist'])) {
-				$requestRules[$ruleName]['exist'] = false;
+			if (isset($rule['updateExisting'])) {
+				$requestRules[$ruleName]['updateExisting'] = false;
 			}
-			if (isset($rule['missed'])) {
-				$requestRules[$ruleName]['missed'] = false;
+			if (isset($rule['createMissing'])) {
+				$requestRules[$ruleName]['createMissing'] = false;
 			}
 		}
-		elseif (!isset($requestRules[$ruleName]['exist']) && isset($rule['exist'])){
-			$requestRules[$ruleName]['exist'] = false;
+		elseif (!isset($requestRules[$ruleName]['updateExisting']) && isset($rule['updateExisting'])){
+			$requestRules[$ruleName]['updateExisting'] = false;
 		}
-		elseif (!isset($requestRules[$ruleName]['missed']) && isset($rule['missed'])){
-			$requestRules[$ruleName]['missed'] = false;
+		elseif (!isset($requestRules[$ruleName]['createMissing']) && isset($rule['createMissing'])){
+			$requestRules[$ruleName]['createMissing'] = false;
 		}
 	}
 	$data['rules'] = $requestRules;

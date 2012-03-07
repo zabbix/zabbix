@@ -28,12 +28,11 @@ class CExportWriterFactory {
 	 * Get the writer object for specified type.
 	 *
 	 * @static
+	 * @throws Exception
 	 *
 	 * @param string $type
 	 *
 	 * @return CExportWriter
-	 *
-	 * @throws Exception
 	 */
 	public static function getWriter($type) {
 		switch ($type) {

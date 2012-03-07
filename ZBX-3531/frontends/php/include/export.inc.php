@@ -471,7 +471,7 @@ class zbxXML{
 			unset($screen['screenid']);
 			$exists = API::Screen()->exists(array('name' => $screen['name']));
 
-			if($exists && isset($rules['screens']['exist'])){
+			if($exists && isset($rules['screens']['updateExisting'])){
 				$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
 				if(empty($db_screens)) throw new Exception(_('No permissions for screen').' "'.$screen['name'].'" import');
 
@@ -479,7 +479,7 @@ class zbxXML{
 
 				$screen['screenid'] = $db_screen['screenid'];
 			}
-			else if($exists || !isset($rules['screens']['missed'])){
+			else if($exists || !isset($rules['screens']['createMissing'])){
 				info('Screen ['.$screen['name'].'] skipped - user rule');
 				unset($importScreens[$mnum]);
 				continue; // break if not update exist
@@ -607,8 +607,8 @@ class zbxXML{
 			$images_to_update = array();
 			foreach($images as $inum => $image){
 				if(API::Image()->exists($image)){
-					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['exist']))
-						|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['exist']))))
+					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['updateExisting']))
+						|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['updateExisting']))))
 					{
 
 						$options = array(
@@ -628,8 +628,8 @@ class zbxXML{
 					}
 				}
 				else{
-					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['missed']))
-						|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['images']['missed'])))
+					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['createMissing']))
+						|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['images']['createMissing'])))
 					{
 
 						// No need to decode_base64
@@ -665,17 +665,17 @@ class zbxXML{
 				$sysmap['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
 			}
 
-			if($exists && isset($rules['maps']['exist'])){
+			if($exists && isset($rules['maps']['updateExisting'])){
 				$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
 				if(empty($db_maps)) throw new Exception(_('No permissions for map').' ['.$sysmap['name'].'] import');
 
 				$db_map = reset($db_maps);
 				$sysmap['sysmapid'] = $db_map['sysmapid'];
 			}
-			else if($exists || !isset($rules['maps']['missed'])){
+			else if($exists || !isset($rules['maps']['createMissing'])){
 				info('Map ['.$sysmap['name'].'] skipped - user rule');
 				unset($importMaps[$mnum]);
-				continue; // break if not update exist
+				continue; // break if not update updateExisting
 			}
 
 			// icon map
@@ -834,7 +834,7 @@ class zbxXML{
 	public static function parseMain($rules){
 		$triggers_for_dependencies = array();
 
-		if(isset($rules['hosts']['exist']) || isset($rules['hosts']['missed'])){
+		if(isset($rules['hosts']['updateExisting']) || isset($rules['hosts']['createMissing'])){
 			$xpath = new DOMXPath(self::$xml);
 
 			$hosts = $xpath->query('hosts/host');
@@ -847,13 +847,13 @@ class zbxXML{
 						? API::Template()->exists($host_db)
 						: API::Host()->exists($host_db);
 
-				if(!$current_host && !isset($rules['hosts']['missed'])){
+				if(!$current_host && !isset($rules['hosts']['createMissing'])){
 					info('Host ['.$host_db['host'].'] skipped - user rule');
 					continue; // break if update nonexist
 				}
-				if($current_host && !isset($rules['hosts']['exist'])){
+				if($current_host && !isset($rules['hosts']['updateExisting'])){
 					info('Host ['.$host_db['host'].'] skipped - user rule');
-					continue; // break if not update exist
+					continue; // break if not update updateExisting
 				}
 
 				// there were no host visible names in 1.8
@@ -1048,7 +1048,7 @@ class zbxXML{
 
 
 // TEMPLATES {{{
-				if(isset($rules['templates']['exist'])){
+				if(isset($rules['templates']['updateExisting'])){
 					$templates = $xpath->query('templates/template', $host);
 
 					$host_db['templates'] = array();
@@ -1068,11 +1068,11 @@ class zbxXML{
 						$current_template = reset($current_template);
 
 
-						if(!$current_template && !isset($rules['templates']['missed'])){
+						if(!$current_template && !isset($rules['templates']['createMissing'])){
 							info('Template ['.$template->nodeValue.'] skipped - user rule');
 							continue;
 						}
-						if($current_template && !isset($rules['templates']['exist'])){
+						if($current_template && !isset($rules['templates']['updateExisting'])){
 							info('Template ['.$template->nodeValue.'] skipped - user rule');
 							continue;
 						}
@@ -1124,7 +1124,7 @@ class zbxXML{
 					}
 				}
 
-				if ($current_host && isset($rules['hosts']['exist'])) {
+				if ($current_host && isset($rules['hosts']['updateExisting'])) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$host_db['templateid'] = $current_host['hostid'];
 						$result = API::Template()->update($host_db);
@@ -1139,7 +1139,7 @@ class zbxXML{
 					$current_hostid = $current_host['hostid'];
 				}
 
-				if (!$current_host && isset($rules['hosts']['missed'])) {
+				if (!$current_host && isset($rules['hosts']['createMissing'])) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$result = API::Template()->create($host_db);
 						if (!$result) {
@@ -1158,7 +1158,7 @@ class zbxXML{
 				$current_hostname = $host_db['host'];
 
 // ITEMS {{{
-				if(isset($rules['items']['exist']) || isset($rules['items']['missed'])){
+				if(isset($rules['items']['updateExisting']) || isset($rules['items']['createMissing'])){
 					$items = $xpath->query('items/item', $host);
 
 					// if this is an export from 1.8, we need to make some adjustments to items
@@ -1267,13 +1267,13 @@ class zbxXML{
 						$current_item = API::Item()->get($options);
 						$current_item = reset($current_item);
 
-						if(!$current_item && !isset($rules['items']['missed'])){
+						if(!$current_item && !isset($rules['items']['createMissing'])){
 							info('Item ['.$item_db['key_'].'] skipped - user rule');
-							continue; // break if not update exist
+							continue; // break if not update updateExisting
 						}
-						if($current_item && !isset($rules['items']['exist'])){
+						if($current_item && !isset($rules['items']['updateExisting'])){
 							info('Item ['.$item_db['key_'].'] skipped - user rule');
-							continue; // break if not update exist
+							continue; // break if not update updateExisting
 						}
 
 
@@ -1318,7 +1318,7 @@ class zbxXML{
 						}
 // }}} ITEM APPLICATIONS
 
-						if($current_item && isset($rules['items']['exist'])){
+						if($current_item && isset($rules['items']['updateExisting'])){
 							$item_db['itemid'] = $current_item['itemid'];
 							$result = API::Item()->update($item_db);
 							if(!$result){
@@ -1334,7 +1334,7 @@ class zbxXML{
 						}
 
 
-						if(!$current_item && isset($rules['items']['missed'])){
+						if(!$current_item && isset($rules['items']['createMissing'])){
 							$result = API::Item()->create($item_db);
 							if(!$result){
 								throw new Exception();
@@ -1363,7 +1363,7 @@ class zbxXML{
 
 
 // TRIGGERS {{{
-				if(isset($rules['triggers']['exist']) || isset($rules['triggers']['missed'])){
+				if(isset($rules['triggers']['updateExisting']) || isset($rules['triggers']['createMissing'])){
 					$triggers = $xpath->query('triggers/trigger', $host);
 
 					$triggers_to_add = array();
@@ -1416,20 +1416,20 @@ class zbxXML{
 						unset($trigger_db['hostid']);
 
 
-						if(!$current_trigger && !isset($rules['triggers']['missed'])){
+						if(!$current_trigger && !isset($rules['triggers']['createMissing'])){
 							info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
-							continue; // break if not update exist
+							continue; // break if not update updateExisting
 						}
-						if($current_trigger && !isset($rules['triggers']['exist'])){
+						if($current_trigger && !isset($rules['triggers']['updateExisting'])){
 							info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
-							continue; // break if not update exist
+							continue; // break if not update updateExisting
 						}
 
-						if($current_trigger && isset($rules['triggers']['exist'])){
+						if($current_trigger && isset($rules['triggers']['updateExisting'])){
 							$trigger_db['triggerid'] = $current_trigger['triggerid'];
 							$triggers_to_upd[] = $trigger_db;
 						}
-						if(!$current_trigger && isset($rules['triggers']['missed'])){
+						if(!$current_trigger && isset($rules['triggers']['createMissing'])){
 							$triggers_to_add[] = $trigger_db;
 						}
 					}
@@ -1466,7 +1466,7 @@ class zbxXML{
 
 
 // GRAPHS {{{
-				if(isset($rules['graphs']['exist']) || isset($rules['graphs']['missed'])){
+				if(isset($rules['graphs']['updateExisting']) || isset($rules['graphs']['createMissing'])){
 					$graphs = $xpath->query('graphs/graph', $host);
 
 					$graphs_to_add = array();
@@ -1511,7 +1511,7 @@ class zbxXML{
 								$graph_items[] = $gitem_db;
 							}
 							else{
-								throw new Exception('Item ['.$gitem_db['host_key_'].'] does not exist');
+								throw new Exception('Item ['.$gitem_db['host_key_'].'] does not updateExisting');
 							}
 						}
 // }}} GRAPH ITEMS
@@ -1543,13 +1543,13 @@ class zbxXML{
 							$current_graph = reset($current_graph);
 						}
 
-						if(!$current_graph && !isset($rules['graphs']['missed'])){
+						if(!$current_graph && !isset($rules['graphs']['createMissing'])){
 							info('Graph ['.$graph_db['name'].'] skipped - user rule');
-							continue; // break if not update exist
+							continue; // break if not update updateExisting
 						}
-						if($current_graph && !isset($rules['graphs']['exist'])){
+						if($current_graph && !isset($rules['graphs']['updateExisting'])){
 							info('Graph ['.$graph_db['name'].'] skipped - user rule');
-							continue; // break if not update exist
+							continue; // break if not update updateExisting
 						}
 
 						if(!isset($graph_db['ymin_type'])) {
@@ -1612,7 +1612,7 @@ class zbxXML{
 				}
 
 // SCREENS
-				if(isset($rules['screens']['exist']) || isset($rules['screens']['missed'])){
+				if(isset($rules['screens']['updateExisting']) || isset($rules['screens']['createMissing'])){
 					$screens_node = $xpath->query('screens', $host);
 
 					if($screens_node->length > 0){
@@ -1628,11 +1628,11 @@ class zbxXML{
 							));
 							$current_screen = reset($current_screen);
 
-							if(!$current_screen && !isset($rules['screens']['missed'])){
+							if(!$current_screen && !isset($rules['screens']['createMissing'])){
 								info('Screen ['.$screen['name'].'] skipped - user rule');
 								continue;
 							}
-							if($current_screen && !isset($rules['screens']['exist'])){
+							if($current_screen && !isset($rules['screens']['updateExisting'])){
 								info('Screen ['.$screen['name'].'] skipped - user rule');
 								continue;
 							}

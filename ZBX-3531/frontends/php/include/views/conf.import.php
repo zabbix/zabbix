@@ -42,8 +42,8 @@ $rules = $this->get('rules');
 foreach ($titles as $key => $title) {
 	$cbExist = $cbMissed = SPACE;
 
-	if (isset($rules[$key]['exist'])) {
-		$cbExist = new CCheckBox('rules['.$key.'][exist]', $rules[$key]['exist'], null, 1);
+	if (isset($rules[$key]['updateExisting'])) {
+		$cbExist = new CCheckBox('rules['.$key.'][updateExisting]', $rules[$key]['updateExisting'], null, 1);
 
 		if ($key == 'images') {
 			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
@@ -54,8 +54,8 @@ foreach ($titles as $key => $title) {
 		}
 	}
 
-	if (isset($rules[$key]['missed'])) {
-		$cbMissed = new CCheckBox('rules['.$key.'][missed]', $rules[$key]['missed'], null, 1);
+	if (isset($rules[$key]['createMissing'])) {
+		$cbMissed = new CCheckBox('rules['.$key.'][createMissing]', $rules[$key]['createMissing'], null, 1);
 	}
 
 	$table->addRow(array($title, $cbExist, $cbMissed));
