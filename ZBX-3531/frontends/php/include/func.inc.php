@@ -1001,7 +1001,7 @@ class ArrayHelper {
 	}
 
 	/**
-	 * Get the values under the given keys from $array.
+	 * Get values with the $keys from $array.
 	 * If the requested key is not in the given array it is skipped.
 	 *
 	 * @static

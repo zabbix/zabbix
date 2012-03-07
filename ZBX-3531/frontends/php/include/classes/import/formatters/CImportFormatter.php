@@ -59,68 +59,101 @@ abstract class CImportFormatter {
 	}
 
 	/**
+	 * Get formatted groups data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getGroups();
 
 	/**
+	 * Get formatted templates data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getTemplates();
 
 	/**
+	 * Get formatted hosts data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getHosts();
 
 	/**
+	 * Get formatted applications data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getApplications();
 
 	/**
+	 * Get formatted items data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getItems();
 
 	/**
+	 * Get formatted discovery rules data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getDiscoveryRules();
 
 	/**
+	 * Get formatted graphs data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getGraphs();
 
 	/**
+	 * Get formatted triggers data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getTriggers();
 
 	/**
+	 * Get formatted images data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getImages();
 
 	/**
+	 * Get formatted maps data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getMaps();
 
 	/**
+	 * Get formatted screens data.
+	 *
 	 * @abstract
 	 * @return array
 	 */
 	abstract public function getScreens();
+
+	/**
+	 * Rename items, discovery rules, item prototypes fields.
+	 *
+	 * @param array $item
+	 *
+	 * @return array
+	 */
+	protected function renameItemFields(array $item) {
+		return $this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+	}
 }

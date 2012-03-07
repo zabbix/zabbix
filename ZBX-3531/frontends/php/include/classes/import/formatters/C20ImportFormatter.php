@@ -24,11 +24,6 @@
  */
 class C20ImportFormatter extends CImportFormatter {
 
-	/**
-	 * Get ormatted groups data.
-	 *
-	 * @return array
-	 */
 	public function getGroups() {
 		if (!isset($this->data['groups'])) {
 			return array();
@@ -36,13 +31,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $this->data['groups'];
 	}
 
-	/**
-	 * Get formatted templates data.
-	 *
-	 * TODO: comment: the comments for get*() methods should go to the parent class.
-	 *
-	 * @return array
-	 */
 	public function getTemplates() {
 		if (!isset($this->data['templates'])) {
 			return array();
@@ -79,11 +67,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $hostsData;
 	}
 
-	/**
-	 * Get formatted hosts data.
-	 *
-	 * @return array
-	 */
 	public function getHosts() {
 		if (!isset($this->data['hosts'])) {
 			return array();
@@ -116,11 +99,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $hostsData;
 	}
 
-	/**
-	 * Get formatted applications data.
-	 *
-	 * @return array
-	 */
 	public function getApplications() {
 		$applicationsData = array();
 
@@ -142,11 +120,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $applicationsData;
 	}
 
-	/**
-	 * Get formatted items data.
-	 *
-	 * @return array
-	 */
 	public function getItems() {
 		$itemsData = array();
 
@@ -170,11 +143,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $itemsData;
 	}
 
-	/**
-	 * Get formatted discovery rules data.
-	 *
-	 * @return array
-	 */
 	public function getDiscoveryRules() {
 		$discoveryRulesData = array();
 
@@ -247,11 +215,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $discoveryRulesData;
 	}
 
-	/**
-	 * Get formatted graphs data.
-	 *
-	 * @return array
-	 */
 	public function getGraphs() {
 		if (!isset($this->data['graphs'])) {
 			return array();
@@ -274,11 +237,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $graphsData;
 	}
 
-	/**
-	 * Get formatted triggers data.
-	 *
-	 * @return array
-	 */
 	public function getTriggers() {
 		if (!isset($this->data['triggers'])) {
 			return array();
@@ -298,11 +256,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $triggersData;
 	}
 
-	/**
-	 * Get formatted images data.
-	 *
-	 * @return array
-	 */
 	public function getImages() {
 		if (!isset($this->data['images'])) {
 			return array();
@@ -314,11 +267,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $this->data['images'];
 	}
 
-	/**
-	 * Get formatted maps data.
-	 *
-	 * @return array
-	 */
 	public function getMaps() {
 		if (!isset($this->data['maps'])) {
 			return array();
@@ -326,11 +274,6 @@ class C20ImportFormatter extends CImportFormatter {
 		return $this->data['maps'];
 	}
 
-	/**
-	 * Get formatted screens data.
-	 *
-	 * @return array
-	 */
 	public function getScreens() {
 		if (!isset($this->data['screens'])) {
 			return array();
@@ -342,16 +285,5 @@ class C20ImportFormatter extends CImportFormatter {
 			$screensData[] = $screen;
 		}
 		return $screensData;
-	}
-
-	/**
-	 * Rename items, discovery rules, item prototypes fields.
-	 *
-	 * @param array $item
-	 *
-	 * @return array
-	 */
-	protected function renameItemFields(array $item) {
-		return $this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
 	}
 }
