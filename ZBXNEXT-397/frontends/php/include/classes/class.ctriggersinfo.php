@@ -21,29 +21,28 @@
 <?php
 require_once dirname(__FILE__).'/../triggers.inc.php';
 
-class CTriggersInfo extends CTable{
+class CTriggersInfo extends CTable {
 
- public $style;
- public $show_header;
- private $nodeid;
- private $groupid;
- private $hostid;
+	public $style;
+	public $show_header;
+	private $nodeid;
+	private $groupid;
+	private $hostid;
 
-	public function __construct($groupid=null, $hostid=null, $style = STYLE_HORISONTAL) {
+	public function __construct($groupid = null, $hostid = null, $style = STYLE_HORISONTAL) {
 		$this->style = null;
 
-		parent::__construct(NULL,'triggers_info');
+		parent::__construct(null, 'triggers_info');
 		$this->setOrientation($style);
 		$this->show_header = true;
-
 		$this->groupid = is_null($groupid) ? 0 : $groupid;
 		$this->hostid = is_null($hostid) ? 0 : $hostid;
 	}
 
 	public function setOrientation($value) {
-		if ($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL)
+		if ($value != STYLE_HORISONTAL && $value != STYLE_VERTICAL) {
 			return $this->error('Incorrect value for SetOrientation ['.$value.']');
-
+		}
 		$this->style = $value;
 	}
 
@@ -57,67 +56,82 @@ class CTriggersInfo extends CTable{
 		$ok = $uncl = $info = $warn = $avg = $high = $dis = 0;
 
 		$options = array(
-			'monitored' => 1,
-			'skipDependent' => 1,
+			'monitored' => true,
+			'skipDependent' => true,
 			'output' => API_OUTPUT_SHORTEN
 		);
 
-		if ($this->hostid > 0)
+		if ($this->hostid > 0) {
 			$options['hostids'] = $this->hostid;
-		else if ($this->groupid > 0)
+		}
+		elseif ($this->groupid > 0) {
 			$options['groupids'] = $this->groupid;
-
-
+		}
 		$triggers = API::Trigger()->get($options);
 		$triggers = zbx_objectValues($triggers, 'triggerid');
 
-		$sql = 'SELECT t.priority,t.value,count(DISTINCT t.triggerid) as cnt '.
-				' FROM triggers t '.
-				' WHERE '.DBcondition('t.triggerid',$triggers).
-				' GROUP BY t.priority,t.value';
-
-		$db_priority = DBselect($sql);
+		$db_priority = DBselect(
+			'SELECT t.priority,t.value,count(DISTINCT t.triggerid) AS cnt'.
+			' FROM triggers t'.
+			' WHERE '.DBcondition('t.triggerid', $triggers).
+			' GROUP BY t.priority,t.value'
+		);
 		while ($row = DBfetch($db_priority)) {
 			switch ($row['value']) {
 				case TRIGGER_VALUE_TRUE:
 					switch ($row['priority']) {
-						case TRIGGER_SEVERITY_NOT_CLASSIFIED:	$uncl	+= $row['cnt'];	break;
-						case TRIGGER_SEVERITY_INFORMATION:	$info	+= $row['cnt'];	break;
-						case TRIGGER_SEVERITY_WARNING:		$warn	+= $row['cnt'];	break;
-						case TRIGGER_SEVERITY_AVERAGE:		$avg	+= $row['cnt'];	break;
-						case TRIGGER_SEVERITY_HIGH:			$high	+= $row['cnt'];	break;
-						case TRIGGER_SEVERITY_DISASTER:		$dis	+= $row['cnt'];	break;
+						case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+							$uncl += $row['cnt'];
+							break;
+						case TRIGGER_SEVERITY_INFORMATION:
+							$info += $row['cnt'];
+							break;
+						case TRIGGER_SEVERITY_WARNING:
+							$warn += $row['cnt'];
+							break;
+						case TRIGGER_SEVERITY_AVERAGE:
+							$avg += $row['cnt'];
+							break;
+						case TRIGGER_SEVERITY_HIGH:
+							$high += $row['cnt'];
+							break;
+						case TRIGGER_SEVERITY_DISASTER:
+							$dis += $row['cnt'];
+							break;
 					}
-				break;
+					break;
 				case TRIGGER_VALUE_FALSE:
-					$ok	+= $row['cnt'];
-				break;
+					$ok += $row['cnt'];
+					break;
 			}
 		}
 
 		if ($this->show_header) {
-			$header_str = S_TRIGGERS_INFO.SPACE;
+			$header_str = _('Triggers info').SPACE;
 
 			if (!is_null($this->nodeid)) {
 				$node = get_node_by_nodeid($this->nodeid);
-				if ($node > 0) $header_str.= '('.$node['name'].')'.SPACE;
+				if ($node > 0) {
+					$header_str .= '('.$node['name'].')'.SPACE;
+				}
 			}
 
-			if (remove_nodes_from_id($this->groupid)>0) {
+			if (remove_nodes_from_id($this->groupid) > 0) {
 				$group = get_hostgroup_by_groupid($this->groupid);
-				$header_str.= S_GROUP.SPACE.'&quot;'.$group['name'].'&quot;';
+				$header_str .= _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
 			}
-			else{
-				$header_str.= S_ALL_GROUPS;
+			else {
+				$header_str .= _('All groups');
 			}
 
-			$header = new CCol($header_str,'header');
-			if ($this->style == STYLE_HORISONTAL)
-				$header->SetColspan(8);
+			$header = new CCol($header_str, 'header');
+			if ($this->style == STYLE_HORISONTAL) {
+				$header->setColspan(8);
+			}
 			$this->addRow($header);
 		}
 
-		$trok = getSeverityCell(null, $ok.SPACE.S_OK, true);
+		$trok = getSeverityCell(null, $ok.SPACE._('Ok'), true);
 		$uncl = getSeverityCell(TRIGGER_SEVERITY_NOT_CLASSIFIED, $uncl.SPACE.getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED), !$uncl);
 		$info = getSeverityCell(TRIGGER_SEVERITY_INFORMATION, $info.SPACE.getSeverityCaption(TRIGGER_SEVERITY_INFORMATION), !$info);
 		$warn = getSeverityCell(TRIGGER_SEVERITY_WARNING, $warn.SPACE.getSeverityCaption(TRIGGER_SEVERITY_WARNING), !$warn);
@@ -125,11 +139,10 @@ class CTriggersInfo extends CTable{
 		$high = getSeverityCell(TRIGGER_SEVERITY_HIGH, $high.SPACE.getSeverityCaption(TRIGGER_SEVERITY_HIGH), !$high);
 		$dis = getSeverityCell(TRIGGER_SEVERITY_DISASTER, $dis.SPACE.getSeverityCaption(TRIGGER_SEVERITY_DISASTER), !$dis);
 
-
 		if (STYLE_HORISONTAL == $this->style) {
 			$this->addRow(array($trok, $uncl, $info, $warn, $avg, $high, $dis));
 		}
-		else{
+		else {
 			$this->addRow($trok);
 			$this->addRow($uncl);
 			$this->addRow($info);
@@ -138,7 +151,8 @@ class CTriggersInfo extends CTable{
 			$this->addRow($high);
 			$this->addRow($dis);
 		}
-		return parent::BodyToString();
+
+		return parent::bodyToString();
 	}
 }
 ?>

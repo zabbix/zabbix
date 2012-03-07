@@ -20,6 +20,7 @@
 ?>
 <?php
 class CButtonCancel extends CButton {
+
 	public function __construct($vars = null, $action = null, $class = null) {
 		parent::__construct('cancel', _('Cancel'), $action, $class);
 		if (is_null($action)) {

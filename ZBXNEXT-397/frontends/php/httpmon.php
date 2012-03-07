@@ -270,8 +270,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$status['style'] = 'disabled';
 		}
 		else{
-			$status['msg'] = _('OK');
-			$status['style'] = 'enabled';
+			$state = S_IDLE_TILL.' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
+			$status['msg'] = _('Unknown');
+			$status['style'] = 'unknown';
 		}
 
 		array_push($app_rows, new CRow(array(

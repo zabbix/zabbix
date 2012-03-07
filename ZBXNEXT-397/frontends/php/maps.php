@@ -176,7 +176,7 @@ if (!empty($maps)) {
 }
 
 $map_wdgt->addItem($table);
-$map_wdgt->addPageHeader(_('NETWORK MAPS'), array($icon, $fs_icon));
+$map_wdgt->addPageHeader(_('NETWORK MAPS'), array($icon, SPACE, $fs_icon));
 $map_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

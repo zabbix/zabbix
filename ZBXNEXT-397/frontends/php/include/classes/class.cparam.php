@@ -19,9 +19,11 @@
 **/
 ?>
 <?php
-class CParam extends CTag{
-	function __construct($name,$value) {
-		parent::__construct('param','no');
+
+class CParam extends CTag {
+
+	function __construct($name, $value) {
+		parent::__construct('param', 'no');
 		$this->attributes['name'] = $name;
 		$this->attributes['value'] = $value;
 	}
