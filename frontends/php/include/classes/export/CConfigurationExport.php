@@ -41,9 +41,8 @@ class CConfigurationExport {
 
 	/**
 	 * Constructor.
-	 * $options array contains ids of elements that should be exported.
 	 *
-	 * @param array $options
+	 * @param array $options    ids of elements that should be exported.
 	 */
 	public function __construct(array $options) {
 		$this->options = array(
@@ -89,9 +88,9 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Export elements which ids were passed to constructor.
-	 * Resulting export format depends on export writter that was set,
-	 * export structure depends on builder that was set.	 *
+	 * Export elements whose ids were passed to constructor.
+	 * The resulting export format depends on the export writer that was set,
+	 * the export structure depends on the builder that was set.
 	 *
 	 * @return string
 	 */
@@ -190,7 +189,6 @@ class CConfigurationExport {
 		unset($template);
 		$this->data['groups'] += $templateGroups;
 
-
 		// applications
 		$applications = API::Application()->get(array(
 			'hostids' => $this->options['templates'],
@@ -251,7 +249,6 @@ class CConfigurationExport {
 			$hostGroups += zbx_toHash($host['groups'], 'groupid');
 		}
 		$this->data['groups'] += $hostGroups;
-
 
 		// applications
 		$applications = API::Application()->get(array(
@@ -478,7 +475,7 @@ class CConfigurationExport {
 		foreach ($graphs as $gnum => $graph) {
 			if ($graph['ymin_itemid']) {
 				$axisItem = $graphItems[$graph['ymin_itemid']];
-				// unset lld dependeent graphs
+				// unset lld dependent graphs
 				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
@@ -492,7 +489,7 @@ class CConfigurationExport {
 			}
 			if ($graph['ymax_itemid']) {
 				$axisItem = $graphItems[$graph['ymax_itemid']];
-				// unset lld dependeent graphs
+				// unset lld dependent graphs
 				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
@@ -520,7 +517,7 @@ class CConfigurationExport {
 			$items[$graph['discoveryRule']['itemid']]['graphPrototypes'][] = $graph;
 		}
 
-		// gather trigger prortotypes
+		// gather trigger prototypes
 		$triggers = API::TriggerPrototype()->get(array(
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => API_OUTPUT_EXTEND,
@@ -567,7 +564,6 @@ class CConfigurationExport {
 			}
 		}
 
-
 		$graphItems = API::Item()->get(array(
 			'itemids' => $graphItemIds,
 			'output' => array('key_', 'flags'),
@@ -578,7 +574,7 @@ class CConfigurationExport {
 		foreach ($graphs as $gnum => $graph) {
 			if ($graph['ymin_itemid']) {
 				$axisItem = $graphItems[$graph['ymin_itemid']];
-				// unset lld dependeent graphs
+				// unset lld dependent graphs
 				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
@@ -592,7 +588,7 @@ class CConfigurationExport {
 			}
 			if ($graph['ymax_itemid']) {
 				$axisItem = $graphItems[$graph['ymax_itemid']];
-				// unset lld dependeent graphs
+				// unset lld dependent graphs
 				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($graphs[$gnum]);
 					continue;
@@ -652,7 +648,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get maps for export dfrom database.
+	 * Get maps for export from database.
 	 */
 	protected function gatherMaps() {
 		$sysmaps = API::Map()->get(array(
@@ -699,7 +695,10 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Format screens data for export.
+	 * Format screen data for export.
+	 *
+	 * TODO: comment: what exactly does it do?
+	 *
 	 * @todo It's copy of old prepareScreenExport function, should be refactored
 	 *
 	 * @param array $exportScreens
@@ -770,7 +769,10 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Format maps data for export.
+	 * Format map data for export.
+	 *
+	 * TODO: comment: what exactly does it do?
+	 *
 	 * @todo It's copy of old prepareMapExport function, should be refactored
 	 *
 	 * @param array $exportMaps

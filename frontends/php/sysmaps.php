@@ -42,7 +42,6 @@ else {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'maps'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
@@ -99,7 +98,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 	}
 
-
 	if($EXPORT_DATA){
 		$maps = get_request('maps', array());
 		$export = new CConfigurationExport(array('maps' => $maps));
@@ -108,7 +106,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		print($export->export());
 		exit();
 	}
-
 
 	$_REQUEST['go'] = get_request('go', 'none');
 

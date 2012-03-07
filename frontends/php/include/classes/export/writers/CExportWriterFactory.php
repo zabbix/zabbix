@@ -25,14 +25,15 @@ class CExportWriterFactory {
 	const JSON = 'json';
 
 	/**
-	 * Get writer class for specified type.
+	 * Get the writer object for specified type.
 	 *
 	 * @static
-	 * @throws Exception
 	 *
 	 * @param string $type
 	 *
 	 * @return CExportWriter
+	 *
+	 * @throws Exception
 	 */
 	public static function getWriter($type) {
 		switch ($type) {

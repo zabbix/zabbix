@@ -35,6 +35,7 @@ class CConfigurationExportBuilder {
 
 	/**
 	 * Get array with formatted export data.
+	 *
 	 * @return array
 	 */
 	public function getExport() {
@@ -280,6 +281,13 @@ class CConfigurationExportBuilder {
 		return $inventory;
 	}
 
+	/**
+	 * Format graphs.
+	 *
+	 * @param array $graphs
+	 *
+	 * @return array
+	 */
 	protected function formatGraphs(array $graphs) {
 		$result = array();
 		order_result($graphs, 'name');
