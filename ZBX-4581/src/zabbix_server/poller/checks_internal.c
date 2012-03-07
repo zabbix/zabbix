@@ -99,7 +99,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(tmp, "queue"))			/* zabbix["queue",<from>,<to>] */
 	{
-		int	from = 6, to = (-1);
+		unsigned int	from = 6, to = (unsigned int)-1;
 
 		if (3 < nparams)
 			goto notsupported;
@@ -109,7 +109,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			if (0 != get_param(params, 2, tmp, sizeof(tmp)))
 				goto notsupported;
 
-			if ('\0' != *tmp && FAIL == is_uint_suffix(tmp, (unsigned int *)&from))
+			if ('\0' != *tmp && FAIL == is_uint_suffix(tmp, &from))
 			{
 				error = zbx_strdup(error, "second parameter is badly formatted");
 				goto notsupported;
@@ -121,20 +121,20 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			if (0 != get_param(params, 3, tmp, sizeof(tmp)))
 				goto notsupported;
 
-			if ('\0' != *tmp && FAIL == is_uint_suffix(tmp, (unsigned int *)&to))
+			if ('\0' != *tmp && FAIL == is_uint_suffix(tmp, &to))
 			{
 				error = zbx_strdup(error, "third parameter is badly formatted");
 				goto notsupported;
 			}
 		}
 
-		if (from > to && -1 != to)
+		if (from > to && (unsigned int)-1 != to)
 		{
 			error = zbx_strdup(error, "parameters represent an invalid interval");
 			goto notsupported;
 		}
 
-		SET_UI64_RESULT(result, DBget_queue_count(from, to));
+		SET_UI64_RESULT(result, DBget_queue_count((int)from, (int)to));
 	}
 	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
 	{
