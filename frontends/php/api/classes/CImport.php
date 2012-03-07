@@ -21,6 +21,22 @@
 
 class CImport extends CZBXAPI {
 
+	/**
+	 * Export configuration data.
+	 * $params structure:
+	 * array(
+	 * 	'options' => array(
+	 * 		'hosts' => array with host ids,
+	 * 		'templates' => array with templateids,
+	 *		 ...
+	 * 	),
+	 * 	'format' => 'json'|'xml'
+	 * )
+	 *
+	 * @param array $params
+	 *
+	 * @return string
+	 */
 	public function export(array $params) {
 		$export = new CConfigurationExport($params['options']);
 		$export->setBuilder(new CConfigurationExportBuilder());
@@ -29,6 +45,24 @@ class CImport extends CZBXAPI {
 		return $export->export();
 	}
 
+
+	/**
+	 * Import configuration data.
+	 * $params structure:
+	 * array(
+	 * 	'format' => 'json'|'xml'
+	 * 	'source' => configuration data in specified format,
+	 * 	'rules' => array(
+	 * 		'hosts' => array('createMissing' => true, 'updateExisitng' => false),
+	 * 		'templates' => array('createMissing' => true, 'updateExisitng' => true),
+	 * 		...
+	 * 	)
+	 * )
+	 *
+	 * @param $params
+	 *
+	 * @return bool
+	 */
 	public function import($params) {
 		$importReader = CImportReaderFactory::getReader($params['format']);
 		$configurationImport = new CConfigurationImport($params['source'], $params['rules']);

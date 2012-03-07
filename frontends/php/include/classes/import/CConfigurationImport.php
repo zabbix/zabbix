@@ -70,18 +70,18 @@ class CConfigurationImport {
 	 */
 	public function __construct($source, array $options = array()) {
 		$this->options = array(
-			'groups' => array('missed' => false),
-			'hosts' => array('exist' => false, 'missed' => false),
-			'templates' => array('exist' => false, 'missed' => false),
-			'applications' => array('exist' => false, 'missed' => false),
-			'template_linkages' => array('missed' => false),
-			'items' => array('exist' => false, 'missed' => false),
-			'discoveryrules' => array('exist' => false, 'missed' => false),
-			'triggers' => array('exist' => false, 'missed' => false),
-			'graphs' => array('exist' => false, 'missed' => false),
-			'screens' => array('exist' => false, 'missed' => false),
-			'maps' => array('exist' => false, 'missed' => false),
-			'images' => array('exist' => false, 'missed' => false),
+			'groups' => array('createMissing' => false),
+			'hosts' => array('updateExisting' => false, 'createMissing' => false),
+			'templates' => array('updateExisting' => false, 'createMissing' => false),
+			'applications' => array('updateExisting' => false, 'createMissing' => false),
+			'template_linkages' => array('createMissing' => false),
+			'items' => array('updateExisting' => false, 'createMissing' => false),
+			'discoveryrules' => array('updateExisting' => false, 'createMissing' => false),
+			'triggers' => array('updateExisting' => false, 'createMissing' => false),
+			'graphs' => array('updateExisting' => false, 'createMissing' => false),
+			'screens' => array('updateExisting' => false, 'createMissing' => false),
+			'maps' => array('updateExisting' => false, 'createMissing' => false),
+			'images' => array('updateExisting' => false, 'createMissing' => false),
 		);
 		$this->options = array_merge($this->options, $options);
 
@@ -122,13 +122,13 @@ class CConfigurationImport {
 			// old import class process hosts, maps and screens separately.
 			if ($version == '1.8') {
 				zbxXML::import($this->source);
-				if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
+				if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
 					zbxXML::parseMap($this->options);
 				}
-				if ($this->options['screens']['exist'] || $this->options['screens']['missed']) {
+				if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
 					zbxXML::parseScreen($this->options);
 				}
-				if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
+				if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
 					zbxXML::parseMain($this->options);
 				}
 			}
@@ -310,7 +310,7 @@ class CConfigurationImport {
 			return;
 		}
 
-		// skip the groups that already exist
+		// skip the groups that already updateExisting
 		foreach ($groups as $gnum => $group) {
 			if ($this->referencer->resolveGroup($group['name'])) {
 				unset($groups[$gnum]);
@@ -343,7 +343,7 @@ class CConfigurationImport {
 			unset($template['screens']);
 
 			// if we don't need to update linkage, unset templates
-			if (!$this->options['template_linkages']['missed']) {
+			if (!$this->options['template_linkages']['createMissing']) {
 				unset($template['templates']);
 			}
 		}
@@ -365,7 +365,7 @@ class CConfigurationImport {
 					else {
 						// if the template is not in the system and not in the imported data, throw an error
 						if (!in_array($ref['name'], $templatesInSource)) {
-							throw new Exception(_s('Template "%1$s" does not exist.', $ref['name']));
+							throw new Exception(_s('Template "%1$s" does not updateExisting.', $ref['name']));
 						}
 						$parentTemplateRefs[$template['host']][$ref['name']] = $ref['name'];
 					}
@@ -399,7 +399,7 @@ class CConfigurationImport {
 			$template = $templates[$name];
 			foreach ($template['groups'] as $gnum => $group) {
 				if (!$this->referencer->resolveGroup($group['name'])) {
-					throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
+					throw new Exception(_s('Group "%1$s" does not updateExisting.', $group['name']));
 				}
 				$template['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
 			}
@@ -435,7 +435,7 @@ class CConfigurationImport {
 		}
 
 		// if we don't need to update linkage, unset templates
-		if (!$this->options['template_linkages']['missed']) {
+		if (!$this->options['template_linkages']['createMissing']) {
 			foreach ($hosts as &$host) {
 				unset($host['templates']);
 			}
@@ -457,14 +457,14 @@ class CConfigurationImport {
 		foreach ($hosts as $host) {
 			foreach ($host['groups'] as $gnum => $group) {
 				if (!$this->referencer->resolveGroup($group['name'])) {
-					throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
+					throw new Exception(_s('Group "%1$s" does not updateExisting.', $group['name']));
 				}
 				$host['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
 			}
 			if (isset($host['templates'])) {
 				foreach ($host['templates'] as $tnum => $template) {
 					if (!$this->referencer->resolveTemplate($template['name'])) {
-						throw new Exception(_s('Template "%1$s" does not exist.', $template['name']));
+						throw new Exception(_s('Template "%1$s" does not updateExisting.', $template['name']));
 					}
 					$host['templates'][$tnum] = array(
 						'templateid' => $this->referencer->resolveHostOrTemplate($template['name'])
@@ -509,14 +509,14 @@ class CConfigurationImport {
 		}
 
 		// create/update hosts and create hash host->hostid
-		if ($this->options['hosts']['missed'] && $hostsToCreate) {
+		if ($this->options['hosts']['createMissing'] && $hostsToCreate) {
 			$newHostIds = API::Host()->create($hostsToCreate);
 			foreach ($newHostIds['hostids'] as $hnum => $hostid) {
 				$processedHosts[$hostsToCreate[$hnum]['host']] = $hostid;
 				$this->referencer->addHostRef($hostsToCreate[$hnum]['host'], $hostid);
 			}
 		}
-		if ($this->options['hosts']['exist'] && $hostsToUpdate) {
+		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
 			API::Host()->update($hostsToUpdate);
 		}
 
@@ -626,14 +626,14 @@ class CConfigurationImport {
 		}
 
 		// create/update the items and create a hash hostid->key_->itemid
-		if ($this->options['items']['missed'] && $itemsToCreate) {
+		if ($this->options['items']['createMissing'] && $itemsToCreate) {
 			$newItemsIds = API::Item()->create($itemsToCreate);
 			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
 				$item = $itemsToCreate[$inum];
 				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
 			}
 		}
-		if ($this->options['items']['exist'] && $itemsToUpdate) {
+		if ($this->options['items']['updateExisting'] && $itemsToUpdate) {
 			API::Item()->update($itemsToUpdate);
 		}
 	}
@@ -709,14 +709,14 @@ class CConfigurationImport {
 		}
 
 		// create/update items and create hash hostid->key_->itemid
-		if ($this->options['items']['missed'] && $itemsToCreate) {
+		if ($this->options['items']['createMissing'] && $itemsToCreate) {
 			$newItemsIds = API::DiscoveryRule()->create($itemsToCreate);
 			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
 				$item = $itemsToCreate[$inum];
 				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
 			}
 		}
-		if ($this->options['items']['exist'] && $itemsToUpdate) {
+		if ($this->options['items']['updateExisting'] && $itemsToUpdate) {
 			API::DiscoveryRule()->update($itemsToUpdate);
 		}
 
@@ -892,10 +892,10 @@ class CConfigurationImport {
 		}
 
 		// create/update items and create hash hostid->key_->itemid
-		if ($this->options['graphs']['missed'] && $graphsToCreate) {
+		if ($this->options['graphs']['createMissing'] && $graphsToCreate) {
 			API::Graph()->create($graphsToCreate);
 		}
-		if ($this->options['graphs']['exist'] && $graphsToUpdate) {
+		if ($this->options['graphs']['updateExisting'] && $graphsToUpdate) {
 			API::Graph()->update($graphsToUpdate);
 		}
 	}
@@ -933,7 +933,7 @@ class CConfigurationImport {
 		}
 
 		$triggerDependencies = array();
-		if ($this->options['triggers']['missed'] && $triggersToCreate) {
+		if ($this->options['triggers']['createMissing'] && $triggersToCreate) {
 			$newTriggerIds = API::Trigger()->create($triggersToCreate);
 			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
 				$trigger = $triggersToCreate[$tnum];
@@ -958,7 +958,7 @@ class CConfigurationImport {
 		}
 
 
-		if ($this->options['triggers']['exist'] && $triggersToUpdate) {
+		if ($this->options['triggers']['updateExisting'] && $triggersToUpdate) {
 			API::Trigger()->update($triggersToUpdate);
 		}
 
@@ -989,12 +989,12 @@ class CConfigurationImport {
 			unset($allImages[$dbImage['name']]);
 		}
 
-		if ($this->options['images']['missed']) {
+		if ($this->options['images']['createMissing']) {
 			$allImages = array_values($allImages);
 			API::Image()->create($allImages);
 		}
 
-		if ($this->options['images']['exist']) {
+		if ($this->options['images']['updateExisting']) {
 			API::Image()->update($imagesToUpdate);
 		}
 	}
@@ -1021,7 +1021,7 @@ class CConfigurationImport {
 		}
 
 		// if we are going to update maps, check for permissions
-		if ($existingMaps && $this->options['maps']['exist']) {
+		if ($existingMaps && $this->options['maps']['updateExisting']) {
 			$allowedMaps = API::Map()->get(array(
 				'sysmapids' => array_keys($existingMaps),
 				'output' => API_OUTPUT_SHORTEN,
@@ -1168,10 +1168,10 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($this->options['maps']['missed'] && $mapsToCreate) {
+		if ($this->options['maps']['createMissing'] && $mapsToCreate) {
 			API::Map()->create($mapsToCreate);
 		}
-		if ($this->options['maps']['exist'] && $mapsToUpdate) {
+		if ($this->options['maps']['updateExisting'] && $mapsToUpdate) {
 			API::Map()->update($mapsToUpdate);
 		}
 	}
@@ -1197,7 +1197,7 @@ class CConfigurationImport {
 		}
 
 		// if we are going to update screens, check for permissions
-		if ($existingScreens && $this->options['screens']['exist']) {
+		if ($existingScreens && $this->options['screens']['updateExisting']) {
 			$allowedScreens = API::Screen()->get(array(
 				'screenids' => array_keys($existingScreens),
 				'output' => API_OUTPUT_SHORTEN,
@@ -1224,10 +1224,10 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($this->options['screens']['missed'] && $screensToCreate) {
+		if ($this->options['screens']['createMissing'] && $screensToCreate) {
 			API::Screen()->create($screensToCreate);
 		}
-		if ($this->options['screens']['exist'] && $screensToUpdate) {
+		if ($this->options['screens']['updateExisting'] && $screensToUpdate) {
 			API::Screen()->update($screensToUpdate);
 		}
 	}
@@ -1257,7 +1257,7 @@ class CConfigurationImport {
 				}
 
 				// if we are going to update screens, check for permissions
-				if ($existingScreens && $this->options['screens']['exist']) {
+				if ($existingScreens && $this->options['screens']['updateExisting']) {
 					$allowedTplScreens = API::TemplateScreen()->get(array(
 						'screenids' => array_keys($existingScreens),
 						'output' => API_OUTPUT_SHORTEN,
@@ -1444,7 +1444,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted groups, if either "addMissing" groups option is true.
+	 * Get formatted groups, if either "createMissing" groups option is true.
 	 *
 	 * @return array
 	 */
@@ -1453,7 +1453,7 @@ class CConfigurationImport {
 
 		if ($groups === null) {
 			$groups = array();
-			if ($this->options['groups']['missed']) {
+			if ($this->options['groups']['createMissing']) {
 				$groups = $this->formatter->getGroups();
 			}
 		}
@@ -1462,7 +1462,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted templates, if either "addMissing" or "updateExisting" templates option is true.
+	 * Get formatted templates, if either "createMissing" or "updateExisting" templates option is true.
 	 *
 	 * @return array
 	 */
@@ -1471,7 +1471,7 @@ class CConfigurationImport {
 
 		if ($templates === null) {
 			$templates = array();
-			if ($this->options['templates']['exist'] || $this->options['templates']['missed']) {
+			if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
 				$templates = $this->formatter->getTemplates();
 			}
 		}
@@ -1480,7 +1480,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted hosts, if either "addMissing" or "updateExisting" hosts option is true.
+	 * Get formatted hosts, if either "createMissing" or "updateExisting" hosts option is true.
 	 *
 	 * @return array
 	 */
@@ -1489,7 +1489,7 @@ class CConfigurationImport {
 
 		if ($hosts === null) {
 			$hosts = array();
-			if ($this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
+			if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
 				$hosts = $this->formatter->getHosts();
 			}
 		}
@@ -1498,7 +1498,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted applications, if either "addMissing" or "updateExisting" applications option is true.
+	 * Get formatted applications, if either "createMissing" or "updateExisting" applications option is true.
 	 *
 	 * @return array
 	 */
@@ -1507,10 +1507,10 @@ class CConfigurationImport {
 
 		if ($applications === null) {
 			$applications = array();
-			if ($this->options['templates']['exist']
-					|| $this->options['templates']['missed']
-					|| $this->options['hosts']['exist']
-					|| $this->options['hosts']['missed']) {
+			if ($this->options['templates']['updateExisting']
+					|| $this->options['templates']['createMissing']
+					|| $this->options['hosts']['updateExisting']
+					|| $this->options['hosts']['createMissing']) {
 				$applications = $this->formatter->getApplications();
 			}
 		}
@@ -1519,7 +1519,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted items, if either "addMissing" or "updateExisting" items option is true.
+	 * Get formatted items, if either "createMissing" or "updateExisting" items option is true.
 	 *
 	 * @return array
 	 */
@@ -1528,7 +1528,7 @@ class CConfigurationImport {
 
 		if ($items === null) {
 			$items = array();
-			if ($this->options['items']['exist'] || $this->options['items']['missed']) {
+			if ($this->options['items']['updateExisting'] || $this->options['items']['createMissing']) {
 				$items = $this->formatter->getItems();
 			}
 		}
@@ -1537,7 +1537,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted discovery rules, if either "addMissing" or "updateExisting" discovery rules option is true.
+	 * Get formatted discovery rules, if either "createMissing" or "updateExisting" discovery rules option is true.
 	 *
 	 * @return array
 	 */
@@ -1546,7 +1546,7 @@ class CConfigurationImport {
 
 		if ($discoveryRules === null) {
 			$discoveryRules = array();
-			if ($this->options['discoveryrules']['exist'] || $this->options['discoveryrules']['missed']) {
+			if ($this->options['discoveryrules']['updateExisting'] || $this->options['discoveryrules']['createMissing']) {
 				$discoveryRules = $this->formatter->getDiscoveryRules();
 			}
 		}
@@ -1555,7 +1555,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted triggers, if either "addMissing" or "updateExisting" triggers option is true.
+	 * Get formatted triggers, if either "createMissing" or "updateExisting" triggers option is true.
 	 *
 	 * @return array
 	 */
@@ -1564,7 +1564,7 @@ class CConfigurationImport {
 
 		if ($triggers === null) {
 			$triggers = array();
-			if ($this->options['triggers']['exist'] || $this->options['triggers']['missed']) {
+			if ($this->options['triggers']['updateExisting'] || $this->options['triggers']['createMissing']) {
 				$triggers = $this->formatter->getTriggers();
 			}
 		}
@@ -1573,7 +1573,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted graphs, if either "addMissing" or "updateExisting" graphs option is true.
+	 * Get formatted graphs, if either "createMissing" or "updateExisting" graphs option is true.
 	 *
 	 * @return array
 	 */
@@ -1582,7 +1582,7 @@ class CConfigurationImport {
 
 		if ($graphs === null) {
 			$graphs = array();
-			if ($this->options['graphs']['exist'] || $this->options['graphs']['missed']) {
+			if ($this->options['graphs']['updateExisting'] || $this->options['graphs']['createMissing']) {
 				$graphs = $this->formatter->getGraphs();
 			}
 		}
@@ -1591,7 +1591,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted images, if user is super admin and either "addMissing" or "updateExisting" images option is true.
+	 * Get formatted images, if user is super admin and either "createMissing" or "updateExisting" images option is true.
 	 *
 	 * @return array
 	 */
@@ -1601,7 +1601,7 @@ class CConfigurationImport {
 		if ($images === null) {
 			$images = array();
 			if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN
-					&& $this->options['images']['exist'] || $this->options['images']['missed']) {
+					&& $this->options['images']['updateExisting'] || $this->options['images']['createMissing']) {
 				$images = $this->formatter->getImages();
 			}
 		}
@@ -1610,7 +1610,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted maps, if either "addMissing" or "updateExisting" maps option is true.
+	 * Get formatted maps, if either "createMissing" or "updateExisting" maps option is true.
 	 *
 	 * @return array
 	 */
@@ -1619,7 +1619,7 @@ class CConfigurationImport {
 
 		if ($maps === null) {
 			$maps = array();
-			if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
+			if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
 				$maps = $this->formatter->getMaps();
 			}
 		}
@@ -1628,7 +1628,7 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Get formatted screens, if either "addMissing" or "updateExisting" screens option is true.
+	 * Get formatted screens, if either "createMissing" or "updateExisting" screens option is true.
 	 *
 	 * @return array
 	 */
@@ -1637,7 +1637,7 @@ class CConfigurationImport {
 
 		if ($screens === null) {
 			$screens = array();
-			if ($this->options['screens']['exist'] || $this->options['screens']['missed']) {
+			if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
 				$screens = $this->formatter->getScreens();
 			}
 		}
