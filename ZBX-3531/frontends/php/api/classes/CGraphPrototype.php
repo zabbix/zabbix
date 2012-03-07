@@ -524,11 +524,10 @@ class CGraphPrototype extends CZBXAPI{
 		if (!is_null($options['selectDiscoveryRule'])) {
 			$ruleids = $ruleMap = array();
 
-			$sql = 'SELECT id.parent_itemid, gd.graphid'.
-					' FROM graph_discovery gd, item_discovery id,  graphs_items gi'.
-					' WHERE '.DBcondition('gd.graphid', $graphids).
-						' AND gd.parent_graphid=gi.graphid'.
-						' AND gi.itemid=id.itemid';
+			$sql = 'SELECT id.parent_itemid, gi.graphid'.
+					' FROM item_discovery id,  graphs_items gi'.
+					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' AND gi.itemid=id.itemid';
 			$dbRules = DBselect($sql);
 			while ($rule = DBfetch($dbRules)) {
 				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
