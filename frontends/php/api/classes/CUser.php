@@ -907,7 +907,7 @@ class CUser extends CZBXAPI {
 
 		$sql = 'SELECT u.userid,u.attempt_failed,u.attempt_clock,u.attempt_ip'.
 				' FROM users u'.
-				' WHERE u.alias='.zbx_dbstr($name);
+				' WHERE u.alias='.zbx_dbstr($name).
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 		$userInfo = DBfetch(DBselect($sql));
