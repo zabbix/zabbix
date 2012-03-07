@@ -765,7 +765,7 @@
 		$db_tmp_item['templateid'] = $copy_mode?0:$db_tmp_item['itemid'];
 
 		$result = add_item($db_tmp_item);
-	return $result;
+		return $result;
 	}
 
 	/*
@@ -858,6 +858,18 @@
 			$item = $item;
 		}
 	return $item;
+	}
+
+	function getItemByKeyHostid($key,$hostid){
+		$sql = 'SELECT DISTINCT * '.
+				' FROM items i '.
+				' WHERE i.key_ = '.zbx_dbstr($key).' AND i.hostid = '.zbx_dbstr($hostid);
+		if ($item = DBfetch(DBselect($sql))) {
+			return $item;
+		}
+		else {
+			return false;
+		}
 	}
 
 	function get_item_by_itemid($itemid){
