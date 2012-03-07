@@ -328,30 +328,6 @@ class zbxXML{
 		return $newKey;
 	}
 
-	public static function arrayToDOM(&$dom, $array, $parentKey=null){
-		if(!is_null($parentKey)){
-			$parentNode = $dom->appendChild(new DOMElement($parentKey));
-		}
-		else{
-			$parentNode = $dom;
-		}
-
-		foreach($array as $key => $value){
-			if(is_numeric($key)) $key = rtrim($parentKey, 's');
-
-			if(is_array($value)){
-				$child = self::arrayToDOM($dom, $value, $key);
-				$parentNode->appendChild($child);
-			}
-			else if(!zbx_empty($value)){
-				$n = $parentNode->appendChild(new DOMElement($key));
-				$n->appendChild(new DOMText($value));
-			}
-		}
-
-		return $parentNode;
-	}
-
 	public static function XMLtoArray($parentNode){
 		$array = array();
 
@@ -370,22 +346,6 @@ class zbxXML{
 		}
 
 	return $array;
-	}
-
-	private static function addChildData($node, $child_name, $data){
-		$child_node = $node->appendChild(new DOMElement($child_name));
-
-		foreach(self::$ZBX_EXPORT_MAP[$child_name]['attributes'] as $attr => $name){
-			if($name == '') $name = $attr;
-			$child_node->setAttributeNode(new DOMAttr($name, $data[$attr]));
-		}
-		foreach(self::$ZBX_EXPORT_MAP[$child_name]['elements'] as $el => $name){
-			if($name == '') $name = $el;
-			$n = $child_node->appendChild(new DOMElement($name));
-			$n->appendChild(new DOMText($data[$el]));
-		}
-
-	return $child_node;
 	}
 
 	private static function mapXML2arr($xml, $tag){
