@@ -39,6 +39,8 @@ class C20ImportFormatter extends CImportFormatter {
 	/**
 	 * Get formatted templates data.
 	 *
+	 * TODO: comment: the comments for get*() methods should go to the parent class.
+	 *
 	 * @return array
 	 */
 	public function getTemplates() {
@@ -69,7 +71,9 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 			unset($screen);
 
-			$hostsData[] = ArrayHelper::getByKeys($host, array('groups', 'macros', 'screens', 'templates', 'host', 'status', 'name'));
+			$hostsData[] = ArrayHelper::getByKeys($host, array(
+				'groups', 'macros', 'screens', 'templates', 'host', 'status', 'name'
+			));
 		}
 
 		return $hostsData;
@@ -103,8 +107,10 @@ class C20ImportFormatter extends CImportFormatter {
 				unset($host['inventory']['inventory_mode']);
 			}
 
-			$hostsData[] = ArrayHelper::getByKeys($host, array('inventory', 'proxy_hostid', 'groups', 'templates', 'macros', 'interfaces',
-				'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'inventory_mode'));
+			$hostsData[] = ArrayHelper::getByKeys($host, array(
+				'inventory', 'proxy_hostid', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
+				'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'inventory_mode'
+			));
 		}
 
 		return $hostsData;
@@ -339,14 +345,13 @@ class C20ImportFormatter extends CImportFormatter {
 	}
 
 	/**
-	 * Rename items, discovery rules, item prototypes fileds.
+	 * Rename items, discovery rules, item prototypes fields.
 	 *
 	 * @param array $item
 	 *
 	 * @return array
 	 */
 	protected function renameItemFields(array $item) {
-		$item = $this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
-		return $item;
+		return $this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
 	}
 }

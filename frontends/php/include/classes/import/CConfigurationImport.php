@@ -102,8 +102,9 @@ class CConfigurationImport {
 	 *
 	 * @todo   for 1.8 version import old class zbxXML is used
 	 *
-	 * @throws Exception
 	 * @return bool
+	 *
+	 * @throws Exception
 	 */
 	public function import() {
 		try {
@@ -119,6 +120,7 @@ class CConfigurationImport {
 
 			$version = $this->getImportVersion();
 
+			// TODO: comment: what's this?
 			if ($version == '1.8') {
 				zbxXML::import($this->source);
 				if ($this->options['maps']['exist'] || $this->options['maps']['missed']) {
@@ -131,13 +133,12 @@ class CConfigurationImport {
 					zbxXML::parseMain($this->options);
 				}
 			}
+			// TODO: comment: how is this different from 1.8?
 			else {
 				$this->formatter = $this->getFormatter($version);
-
-				$this->referencer = new CImportReferencer();
-
 				$this->formatter->setData($this->data['zabbix_export']);
 
+				$this->referencer = new CImportReferencer();
 				$this->gatherReferences();
 
 				if ($this->options['groups']['missed']) {
@@ -184,7 +185,7 @@ class CConfigurationImport {
 				}
 			}
 
-			// make api not throw exception
+			// prevent api from throwing exception
 			czbxrpc::$useExceptions = false;
 			return DBend(true);
 		}
@@ -197,9 +198,11 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Parse all import data and collect references to objcets.
-	 * For host objects it collects host names, for items it's host name and item key, etc.
-	 * Collected references are resolved in separate referencer object.
+	 * Parse all imported data and collect references to objects.
+	 * For host objects it collects host names, for items - host name and item key, etc.
+	 * Collected references are added and resolved via the $this->referencer object.
+	 *
+	 * @see CImportReferencer
 	 */
 	protected function gatherReferences() {
 		$groupsRefs = array();
@@ -246,10 +249,8 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($this->options['templates']['exist']
-				|| $this->options['templates']['missed']
-				|| $this->options['hosts']['exist']
-				|| $this->options['hosts']['missed']) {
+		if ($this->options['templates']['exist'] || $this->options['templates']['missed']
+				|| $this->options['hosts']['exist'] || $this->options['hosts']['missed']) {
 
 			$allApplications = $this->formatter->getApplications();
 			foreach ($allApplications as $host => $applications) {
@@ -301,13 +302,16 @@ class CConfigurationImport {
 
 					foreach ($discoveryRule['graph_prototypes'] as $graph) {
 						if ($graph['ymin_item_1']) {
-							$itemsRefs[$graph['ymin_item_1']['host']][$graph['ymin_item_1']['key']] = $graph['ymin_item_1']['key'];
+							$yMinItem = $graph['ymin_item_1'];
+							$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
 						}
 						if ($graph['ymax_item_1']) {
-							$itemsRefs[$graph['ymax_item_1']['host']][$graph['ymax_item_1']['key']] = $graph['ymax_item_1']['key'];
+							$yMaxItem = $graph['ymax_item_1'];
+							$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
 						}
 						foreach ($graph['gitems'] as $gitem) {
-							$itemsRefs[$gitem['item']['host']][$gitem['item']['key']] = $gitem['item']['key'];
+							$gitemItem = $gitem['item'];
+							$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
 						}
 					}
 				}
@@ -319,16 +323,19 @@ class CConfigurationImport {
 
 			foreach ($allGraphs as $graph) {
 				if ($graph['ymin_item_1']) {
-					$hostsRefs[$graph['ymin_item_1']['host']] = $graph['ymin_item_1']['host'];
-					$itemsRefs[$graph['ymin_item_1']['host']][$graph['ymin_item_1']['key']] = $graph['ymin_item_1']['key'];
+					$yMinItem = $graph['ymin_item_1'];
+					$hostsRefs[$yMinItem['host']] = $yMinItem['host'];
+					$itemsRefs[$yMinItem['host']][$yMinItem['key']] = $yMinItem['key'];
 				}
 				if ($graph['ymax_item_1']) {
-					$hostsRefs[$graph['ymax_item_1']['host']] = $graph['ymax_item_1']['host'];
-					$itemsRefs[$graph['ymax_item_1']['host']][$graph['ymax_item_1']['key']] = $graph['ymax_item_1']['key'];
+					$yMaxItem = $graph['ymax_item_1'];
+					$hostsRefs[$yMaxItem['host']] = $yMaxItem['host'];
+					$itemsRefs[$yMaxItem['host']][$yMaxItem['key']] = $yMaxItem['key'];
 				}
 				foreach ($graph['gitems'] as $gitem) {
-					$hostsRefs[$gitem['item']['host']] = $gitem['item']['host'];
-					$itemsRefs[$gitem['item']['host']][$gitem['item']['key']] = $gitem['item']['key'];
+					$gitemItem = $gitem['item'];
+					$hostsRefs[$gitemItem['host']] = $gitemItem['host'];
+					$itemsRefs[$gitemItem['host']][$gitemItem['key']] = $gitemItem['key'];
 				}
 			}
 		}
@@ -363,6 +370,7 @@ class CConfigurationImport {
 			return;
 		}
 
+		// skip the groups that already exist
 		foreach ($groups as $gnum => $group) {
 			if ($this->referencer->resolveGroup($group['name'])) {
 				unset($groups[$gnum]);
@@ -409,12 +417,12 @@ class CConfigurationImport {
 
 			if (!empty($template['templates'])) {
 				foreach ($template['templates'] as $ref) {
-					// if template already exists in system, we skip it
+					// if the template already exists in the system, we skip it
 					if ($this->referencer->resolveTemplate($ref['name'])) {
 						continue;
 					}
 					else {
-						// if template is not in system and not in import, throw error
+						// if the template is not in the system and not in the imported data, throw an error
 						if (!in_array($ref['name'], $templatesInSource)) {
 							throw new Exception(_s('Template "%1$s" does not exist.', $ref['name']));
 						}
@@ -424,8 +432,9 @@ class CConfigurationImport {
 			}
 		}
 
-		// we go in cycle through all templates looking for one without parent templates
-		// when one fount it's pushed to ordered list and removed from list parent templates of all other templates
+		// we loop through all templates looking for any without parent templates
+		// when one is found it's pushed to ordered list and removed from the list of parent templates of all
+		// other templates
 		while (!empty($parentTemplateRefs)) {
 			$templateWithoutParents = false;
 			foreach ($parentTemplateRefs as $template => $refs) {
@@ -455,7 +464,9 @@ class CConfigurationImport {
 			}
 			if (isset($template['templates'])) {
 				foreach ($template['templates'] as $tnum => $parentTemplate) {
-					$template['templates'][$tnum] = array('templateid' => $this->referencer->resolveTemplate($parentTemplate['name']));
+					$template['templates'][$tnum] = array(
+						'templateid' => $this->referencer->resolveTemplate($parentTemplate['name'])
+					);
 				}
 			}
 
@@ -490,9 +501,9 @@ class CConfigurationImport {
 			unset($host);
 		}
 
-		// list of hostid which were creted or updated to create interfaces cache for that hosts
+		// a list of hostids which were created or updated to create an interface cache for those hosts
 		$processedHosts = array();
-		// create interfaces references
+		// create interface references
 		$hostInterfacesRefsByName = array();
 		foreach ($hosts as $host) {
 			$hostInterfacesRefsByName[$host['host']] = array();
@@ -514,7 +525,9 @@ class CConfigurationImport {
 					if (!$this->referencer->resolveTemplate($template['name'])) {
 						throw new Exception(_s('Template "%1$s" does not exist.', $template['name']));
 					}
-					$host['templates'][$tnum] = array('templateid' => $this->referencer->resolveHostOrTemplate($template['name']));
+					$host['templates'][$tnum] = array(
+						'templateid' => $this->referencer->resolveHostOrTemplate($template['name'])
+					);
 				}
 			}
 
@@ -528,8 +541,7 @@ class CConfigurationImport {
 			}
 		}
 
-
-		// for exisitng hosts need to set interfaceid for existing interfaces or they will be added
+		// for existing hosts we need to set an interfaceid for existing interfaces or they will be added
 		$dbInterfaces = API::HostInterface()->get(array(
 			'hostids' => zbx_objectValues($hostsToUpdate, 'hostid'),
 			'output' => API_OUTPUT_EXTEND,
@@ -619,7 +631,7 @@ class CConfigurationImport {
 			}
 		}
 
-		// create applications and create hash hostid->name->applicationid
+		// create the applications and create a hash hostid->name->applicationid
 		$newApplicationsIds = API::Application()->create($applicationsToCreate);
 		foreach ($newApplicationsIds['applicationids'] as $anum => $applicationId) {
 			$application = $applicationsToCreate[$anum];
@@ -672,7 +684,7 @@ class CConfigurationImport {
 			}
 		}
 
-		// create/update items and create hash hostid->key_->itemid
+		// create/update the items and create a hash hostid->key_->itemid
 		if ($this->options['items']['missed'] && $itemsToCreate) {
 			$newItemsIds = API::Item()->create($itemsToCreate);
 			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
@@ -912,7 +924,6 @@ class CConfigurationImport {
 			}
 			unset($gitem);
 
-
 			// TODO: do this for all graphs at once
 			$sql = 'SELECT g.graphid
 			FROM graphs g, graphs_items gi, items i
@@ -1110,19 +1121,8 @@ class CConfigurationImport {
 				$map['backgroundid'] = $image['imageid'];
 			}
 
-			if (!isset($map['selements'])) {
-				$map['selements'] = array();
-			}
-			else {
-				$map['selements'] = array_values($map['selements']);
-			}
-
-			if (!isset($map['links'])) {
-				$map['links'] = array();
-			}
-			else {
-				$map['links'] = array_values($map['links']);
-			}
+			$map['selements'] = (isset($map['selements'])) ? array_values($map['selements']) : array();
+			$map['links'] = (isset($map['links'])) ? array_values($map['links']) : array();
 
 			foreach ($map['selements'] as &$selement) {
 				$nodeCaption = isset($selement['elementid']['node']) ? $selement['elementid']['node'].':' : '';
@@ -1169,13 +1169,13 @@ class CConfigurationImport {
 						break;
 
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						$db_triggers = API::Trigger()->getObjects($selement['element']);
-						if (empty($db_triggers)) {
+						$dbTriggers = API::Trigger()->getObjects($selement['element']);
+						if (empty($dbTriggers)) {
 							throw new Exception(_s('Cannot find trigger "%1$s" used in map "$2%s".',
 									$nodeCaption.$selement['element']['host'], $map['name']));
 						}
 
-						$tmp = reset($db_triggers);
+						$tmp = reset($dbTriggers);
 						$selement['elementid'] = $tmp['triggerid'];
 						break;
 					case SYSMAP_ELEMENT_TYPE_IMAGE:
@@ -1207,13 +1207,13 @@ class CConfigurationImport {
 				}
 
 				foreach ($link['linktriggers'] as &$linktrigger) {
-					$db_triggers = API::Trigger()->getObjects($linktrigger['trigger']);
-					if (empty($db_triggers)) {
+					$dbTriggers = API::Trigger()->getObjects($linktrigger['trigger']);
+					if (empty($dbTriggers)) {
 						throw new Exception(_s('Cannot find trigger "%1$s" for map "%2$s".',
 							$linktrigger['trigger']['description'], $map['name']));
 					}
 
-					$tmp = reset($db_triggers);
+					$tmp = reset($dbTriggers);
 					$linktrigger['triggerid'] = $tmp['triggerid'];
 				}
 				unset($linktrigger);
@@ -1241,9 +1241,9 @@ class CConfigurationImport {
 	 */
 	protected function processScreens() {
 		$allScreens = $this->formatter->getScreens();
+		$allScreens = zbx_toHash($allScreens, 'name');
 
 		$existingScreens = array();
-		$allScreens = zbx_toHash($allScreens, 'name');
 		$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE'.
 			' s.templateid IS NULL '.
 			' AND '.DBcondition('s.name', array_keys($allScreens)));
@@ -1266,7 +1266,6 @@ class CConfigurationImport {
 				}
 			}
 		}
-
 
 		$allScreens = $this->prepareScreenImport($allScreens);
 		$screensToCreate = array();
@@ -1349,12 +1348,15 @@ class CConfigurationImport {
 	/**
 	 * Prepare screen data for import.
 	 *
+	 * TODO: comment: what exactly does it do?
+	 *
 	 * @todo: it's copy of old frontend function, should be refactored
-	 * @throws Exception
 	 *
 	 * @param array $allScreens
 	 *
 	 * @return array
+	 *
+	 * @throws Exception
 	 */
 	protected function prepareScreenImport(array $allScreens) {
 		foreach ($allScreens as &$screen) {
@@ -1464,13 +1466,13 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Method for creating import formatter for specified import version.
-	 *
-	 * @throws InvalidArgumentException
+	 * Method for creating an import formatter for the specified import version.
 	 *
 	 * @param string $version
 	 *
-	 * @return C20ImportFormatter
+	 * @return CImportFormatter
+	 *
+	 * @throws InvalidArgumentException
 	 */
 	protected function getFormatter($version) {
 		switch ($version) {
