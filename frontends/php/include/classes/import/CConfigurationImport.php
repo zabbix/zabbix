@@ -1047,17 +1047,11 @@ class CConfigurationImport {
 
 		if ($this->options['images']['missed']) {
 			$allImages = array_values($allImages);
-			$result = API::Image()->create($allImages);
-			if (!$result) {
-				throw new Exception(_('Cannot add image.'));
-			}
+			API::Image()->create($allImages);
 		}
 
 		if ($this->options['images']['exist']) {
-			$result = API::Image()->update($imagesToUpdate);
-			if (!$result) {
-				throw new Exception(_('Cannot update image.'));
-			}
+			API::Image()->update($imagesToUpdate);
 		}
 	}
 
@@ -1178,7 +1172,6 @@ class CConfigurationImport {
 						$tmp = reset($dbTriggers);
 						$selement['elementid'] = $tmp['triggerid'];
 						break;
-					case SYSMAP_ELEMENT_TYPE_IMAGE:
 				}
 
 				$icons = array(
