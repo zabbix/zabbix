@@ -431,7 +431,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
 			array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
 		);
-		ArrayHelper::sort($events, $sortFields);
+		CArrayHelper::sort($events, $sortFields);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;

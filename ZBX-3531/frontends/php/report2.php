@@ -224,7 +224,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		$triggers = API::Trigger()->get($options);
-		ArrayHelper::sort($triggers, array('host', 'description'));
+		CArrayHelper::sort($triggers, array('host', 'description'));
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
