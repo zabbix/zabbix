@@ -332,7 +332,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // }}} FILTER
 
 
-	$table = new CTableInfo(S_NO_EVENTS_FOUND);
+	$table = new CTableInfo(_('No events defined.'));
 
 // CHECK IF EVENTS EXISTS {{{
 	$options = array(

@@ -139,17 +139,6 @@
 	'S_NEW_NODE'=>				_('New node'),
 	'S_DELETE_SELECTED_NODE_Q'=>		_('Delete selected node?'),
 
-// proxies.php
-	'S_ENABLE_SELECTED_PROXIES' =>	_('Enable hosts monitored by selected proxies?'),
-	'S_DISABLE_SELECTED_PROXIES' =>	_('Disable hosts monitored by selected proxies?'),
-	'S_DELETE_SELECTED_PROXIES' =>	_('Delete selected proxies?'),
-	'S_CONFIGURATION_OF_PROXIES'=>	_('CONFIGURATION OF PROXIES'),
-	'S_HOST_COUNT' => _('Host count'),
-	'S_ITEM_COUNT' => _('Item count'),
-	'S_REQUIRED_PERFORMANCE' => _('Required performance (vps)'),
-	'S_PROXY_PASSIVE' => _('Passive'),
-	'S_PROXY_ACTIVE' => _('Active'),
-
 //	Latest values
 	'S_ALL_S'=>						_('All'),
 	'S_GRAPH'=>						_('Graph'),
@@ -192,7 +181,6 @@
 	'S_CANNOT_ADD_GRAPH'=>			_('Cannot add graph'),
 	'S_ANOTHER_ITEM_SUM'=>			_('Cannot add more than one item with type "Graph sum"'),
 	'S_ID'=>				_('ID'),
-	'S_NO_GRAPHS_DEFINED'=>			_('No graphs defined.'),
 	'S_DELETE_GRAPH_Q'=>			_('Delete graph?'),
 	'S_YAXIS_MIN_VALUE'=>			_('Y axis MIN value'),
 	'S_YAXIS_MAX_VALUE'=>			_('Y axis MAX value'),
@@ -262,9 +250,6 @@
 	'S_DELETE_SELECTED_WITH_LINKED_ELEMENTS'=>	_('Delete selected with linked elements'),
 	'S_HOST_GROUP'=>				_('Host group'),
 	'S_UPDATE'=>					_('Update'),
-	'S_PROXIES_BIG'=>				_('PROXIES'),
-	'S_CREATE_PROXY'=>				_('Create proxy'),
-	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
 	'S_INTERFACES' =>				_('Interfaces'),
 
 // templates.php
@@ -288,7 +273,6 @@
 	'S_HISTORY'=>						_('History'),
 	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
 	'S_ITEM'=>						_('Item'),
-	'S_MODE'=>						_('Mode'),
 
 // disc_prototypes.php
 	'S_ADD_PROTOTYPE' => _('Add prototype'),
@@ -299,7 +283,6 @@
 	'S_GRAPH_PROTOTYPES_OF_BIG' => _('GRAPH PROTOTYPES OF'),
 
 //	events.php
-	'S_NO_EVENTS_FOUND'=>			_('No events found'),
 	'S_EVENTS_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	_('d M Y H:i:s'),
 	'S_EVENTS_ACTION_TIME_FORMAT'=>		_('d M Y H:i:s'),
@@ -456,7 +439,6 @@
 	'S_REPORTS_BAR_REPORT_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	screenconf.php
-	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
 	'S_WIDTH'=>						_('Width'),
@@ -516,12 +498,6 @@
 	'S_SELECT' => _('Select'),
 
 //	users.php
-	'S_PROXY_ADDED'=>			_('Proxy added'),
-	'S_CANNOT_ADD_PROXY'=>		_('Cannot add proxy'),
-	'S_PROXY_UPDATED'=>			_('Proxy updated'),
-	'S_CANNOT_UPDATE_PROXY'=>	_('Cannot update proxy'),
-	'S_PROXY_DELETED'=>			_('Proxy deleted'),
-	'S_CANNOT_DELETE_PROXY'=>	_('Cannot delete proxy'),
 	'S_NAME'=>					_('Name'),
 	'S_HIDE'=>					_('Hide'),
 	'S_ADD_TO'=>				_('Add to'),

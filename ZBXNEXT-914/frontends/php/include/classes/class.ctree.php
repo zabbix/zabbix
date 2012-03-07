@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CTree {
+
 	public $tree;
 	public $fields;
 	public $treename;

@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CProfile {
 
 	private static $userDetails = array();

@@ -187,7 +187,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$cmbConf->addItem(1, S_BY_TRIGGER_TEMPLATE);
 		$r_form->addItem($cmbConf);
 
-		$rep2_wdgt->addHeader(S_REPORT_BIG, array(S_MODE . SPACE, $r_form));
+		$rep2_wdgt->addHeader(S_REPORT_BIG, array(_('Mode').SPACE, $r_form));
 // FILTER
 		$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS);
 		$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));

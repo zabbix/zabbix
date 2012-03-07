@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CUIWidget extends CDiv {
+
 	public $domid;
 	public $state;
 	public $css_class;

@@ -105,7 +105,7 @@
 //-------------
 
 // TABLE
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No steps defined.'));
 	$table->setHeader(array(S_STEP, S_SPEED, S_RESPONSE_TIME, S_RESPONSE_CODE, S_STATUS));
 
 	$sql = 'SELECT * FROM httpstep WHERE httptestid='.$httptest_data['httptestid'].' ORDER BY no';

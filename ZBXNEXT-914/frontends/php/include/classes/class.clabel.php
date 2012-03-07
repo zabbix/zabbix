@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CLabel extends CTag {
+
 	public function __construct($label, $for = null, $id = null) {
 		parent::__construct('label', 'yes', $label);
 		if (!is_null($id)) {

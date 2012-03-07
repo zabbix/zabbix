@@ -416,7 +416,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$form->setName('graphs');
 		$form->addVar('hostid',$_REQUEST['hostid']);
 
-		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
+		$table = new CTableInfo(_('No graphs defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_graphs',NULL,"checkAll('".$form->getName()."','all_graphs','group_graphid');"),
 			$_REQUEST['hostid'] != 0 ? NULL : S_HOSTS,

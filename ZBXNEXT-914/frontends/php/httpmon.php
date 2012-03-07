@@ -152,7 +152,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	else
 		$link = new CLink(new CImg('images/general/closed.gif'),'?open=1'.url_param('groupid').url_param('hostid'));
 
-	$table  = new CTableInfo();
+	$table = new CTableInfo(_('No web checks defined.'));
 	$table->SetHeader(array(
 		is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
 		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.name') : NULL,

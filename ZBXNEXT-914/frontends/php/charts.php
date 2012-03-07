@@ -140,7 +140,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$icons = array();
 	$charts_wdgt = new CWidget('hat_charts');
-	$table = new CTableInfo('...','chart');
+	$table = new CTableInfo(_('No charts defined.'), 'chart');
 	$header = null;
 
 	if($pageFilter->graphsSelected){
