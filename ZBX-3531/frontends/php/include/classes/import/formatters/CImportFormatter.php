@@ -21,8 +21,8 @@
 
 /**
  * Abstract class to extend for all import formatters.
- * For each different version of configuration import new formatter should be defined. All forammetters must return
- * data in one format, so that forther processing is independent from configuration omport version.
+ * For each different version of configuration import new formatter should be defined. All formatters must return
+ * data in one format, so that further processing is independent from configuration import version.
  */
 abstract class CImportFormatter {
 

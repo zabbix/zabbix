@@ -20,8 +20,8 @@
 
 
 /**
- * Class that handles associations for zabbix elements unique fields and their database id.
- * Purpose is to gather all elements that need id from databse and resolve them with one query.
+ * Class that handles associations for zabbix elements unique fields and their database ids.
+ * The purpose is to gather all elements that need ids from database and resolve them with one query.
  */
 class CImportReferencer {
 
@@ -174,7 +174,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add group names that need association with databse group id.
+	 * Add group names that need association with a database group id.
 	 *
 	 * @param array $groups
 	 */
@@ -193,7 +193,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add templates names that need association with databse template id.
+	 * Add templates names that need association with a database template id.
 	 *
 	 * @param array $templates
 	 */
@@ -212,7 +212,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add hosts names that need association with databse host id.
+	 * Add hosts names that need association with a database host id.
 	 *
 	 * @param array $hosts
 	 */
@@ -231,7 +231,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add application names that need association with databse application id.
+	 * Add application names that need association with a database application id.
 	 * Input array has format:
 	 * array('hostname1' => array('appname1', 'appname2'), 'hostname2' => array('appname1'), ...)
 	 *
@@ -258,7 +258,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add item keys that need association with databse item id.
+	 * Add item keys that need association with a database item id.
 	 * Input array has format:
 	 * array('hostname1' => array('itemkey1', 'itemkey2'), 'hostname2' => array('itemkey1'), ...)
 	 *
@@ -285,7 +285,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add value map names that need association with databse value map id.
+	 * Add value map names that need association with a database value map id.
 	 *
 	 * @param array $valueMaps
 	 */
@@ -294,7 +294,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add trigger name/expression that need association with databse trigger id.
+	 * Add trigger names/expressions that need association with a database trigger id.
 	 * Input array has format:
 	 * array('triggername1' => array('expr1', 'expr2'), 'triggername2' => array('expr1'), ...)
 	 *
