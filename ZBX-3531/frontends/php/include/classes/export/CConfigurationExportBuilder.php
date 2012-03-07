@@ -489,7 +489,7 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatMacros(array $macros) {
 		$result = array();
-		order_result($macros, 'macro');
+		$macros = order_macros($macros, 'macro');
 
 		foreach ($macros as $macro) {
 			$result[] = array(

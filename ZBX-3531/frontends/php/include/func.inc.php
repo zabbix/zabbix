@@ -1148,7 +1148,7 @@ function order_by($def, $allways = '') {
  *
  * @return array
  */
-function order_macros(array $macros, $sortfield = null, $order = ZBX_SORT_UP) {
+function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
 	$temp = array();
 	foreach ($macros as $key => $macro) {
 		$temp[$key] = preg_replace(ZBX_PREG_EXPRESSION_USER_MACROS, '$1', $macro[$sortfield]);
