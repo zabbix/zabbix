@@ -742,6 +742,7 @@ int	is_ip4(const char *ip)
 			nums = 0;
 			break;
 		}
+
 		p++;
 	}
 	if (dots == 3 && 1 <= nums && nums <= 3)
@@ -798,6 +799,7 @@ static int	is_ip6(const char *ip)
 			is_nums = 0;
 			break;
 		}
+
 		p++;
 	}
 
@@ -1355,8 +1357,8 @@ int	is_double(const char *str)
  * Parameters: str   - string to check                                        *
  *             value - a pointer to converted value (optional)                *
  *                                                                            *
- * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - otherwise                                            *
+ * Return value: SUCCEED - the string is unsigned integer                     *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  * Author: Aleksandrs Saveljevs, Vladimir Levijev                             *
  *                                                                            *
@@ -1367,12 +1369,12 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 {
 	register unsigned int	max_uint = ~0U;
 	register unsigned int	value_uint = 0, c;
-	int			factor = 1;
+	unsigned int		factor = 1;
 
-	if ('\0' == *str)
+	if ('\0' == *str || '1' > *str || *str > '9')
 		return FAIL;
 
-	while ('\0' != *str || 0 != isdigit(*str))
+	while ('\0' != *str && 0 != isdigit(*str))
 	{
 		c = (unsigned int)(unsigned char)(*str - '0');
 		if ((max_uint - c) / 10 < value_uint)
@@ -1383,7 +1385,7 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 		str++;
 	}
 
-	if (NULL != strchr("smhdw", *str))
+	if ('\0' != *str)
 	{
 		switch (*str)
 		{
@@ -1401,6 +1403,8 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 			case 'w':
 				factor = SEC_PER_WEEK;
 				break;
+			default:
+				return FAIL;
 		}
 
 		str++;
