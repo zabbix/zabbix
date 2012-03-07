@@ -184,7 +184,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			);
 		}
 
-		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
+		$frmGItem->addRow(_('Parameter') ,array($txtCondVal,$btnSelect));
 
 		if ($graphtype == GRAPH_TYPE_PIE || $graphtype == GRAPH_TYPE_EXPLODED) {
 			$cmbType = new CComboBox('type', $type, 'submit()');

@@ -1006,6 +1006,11 @@ class CUser extends CZBXAPI {
 	public function checkAuthentication($sessionid) {
 		global $ZBX_LOCALNODEID;
 
+		// access DB only once per page load
+		if (!is_null(self::$userData)) {
+			return self::$userData;
+		}
+
 		$time = time();
 		$sql = 'SELECT u.userid,u.autologout,s.lastaccess'.
 				' FROM sessions s,users u'.

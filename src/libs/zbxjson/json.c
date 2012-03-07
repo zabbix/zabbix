@@ -705,7 +705,7 @@ static const char	*zbx_json_decodestring(const char *p, char *string, size_t len
 						*o++ = '\t';
 						break;
 					case 'u':
-						p += 2; /* "00" */
+						p += 3; /* "u00" */
 						c = zbx_hex2num(*p++) << 4;
 						c += zbx_hex2num(*p);
 						*o++ = (char)c;

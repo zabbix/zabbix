@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "shows";');
 $slideWidget = new CWidget();
 
 // create new hostgroup button
@@ -66,6 +65,7 @@ $goOption->setAttribute('confirm', _('Delete selected slide shows?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "shows";');
 
 // append table to form
 $slideForm->addItem(array($this->data['paging'], $slidesTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

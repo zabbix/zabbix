@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CLink extends CTag {
+
 	protected $sid = null;
 
 	public function __construct($item = null, $url = null, $class = null, $action = null, $nosid = null) {
@@ -67,12 +69,7 @@ class CLink extends CTag {
 	}
 
 	public function getUrl() {
-		if (isset($this->attributes['href'])) {
-			return $this->attributes['href'];
-		}
-		else {
-			return null;
-		}
+		return (isset($this->attributes['href'])) ? $this->attributes['href'] : null;
 	}
 
 	public function setTarget($value = null) {

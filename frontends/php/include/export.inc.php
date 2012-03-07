@@ -637,10 +637,10 @@ class zbxXML{
 				}
 
 				if(isset($screen['screenid'])){
-					info(S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
+					info(_('Screen').' ['.$screen['name'].'] '.S_UPDATED_SMALL);
 				}
 				else{
-					info(S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+					info(_('Screen').' ['.$screen['name'].'] '.S_ADDED_SMALL);
 				}
 
 			}
@@ -1741,13 +1741,13 @@ class zbxXML{
 									$result = API::TemplateScreen()->update($screen);
 									if(!$result) throw new Exception('Cannot update screen');
 
-									info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_UPDATED_SMALL);
+									info('['.$current_hostname.'] '._('Screen').' ['.$screen['name'].'] '.S_UPDATED_SMALL);
 								}
 								else{
 									$result = API::TemplateScreen()->create($screen);
 									if(!$result) throw new Exception('Cannot create screen');
 
-									info('['.$current_hostname.'] '.S_SCREEN.' ['.$screen['name'].'] '.S_ADDED_SMALL);
+									info('['.$current_hostname.'] '._('Screen').' ['.$screen['name'].'] '.S_ADDED_SMALL);
 								}
 							}
 						}
