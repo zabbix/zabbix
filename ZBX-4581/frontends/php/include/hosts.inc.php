@@ -1030,7 +1030,6 @@ function validate_group_with_host(&$PAGE_GROUPS, &$PAGE_HOSTS, $reset_host = tru
 	global $page;
 
 	$config = select_config();
-
 	$dd_first_entry = $config['dropdown_first_entry'];
 
 	$group_var = 'web.latest.groupid';

@@ -19,8 +19,6 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
-
 $triggersWidget = new CWidget();
 
 // append host summary to widget header
@@ -242,6 +240,7 @@ $goOption->setAttribute('confirm', _('Delete selected triggers?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 
 // append table to form
 $triggersForm->addItem(array($this->data['paging'], $triggersTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

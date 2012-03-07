@@ -19,10 +19,9 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "groups";');
-$hostgroupWidget = new CWidget();
-
 global $USER_DETAILS;
+
+$hostgroupWidget = new CWidget();
 
 // create new hostgroup button
 $createForm = new CForm('get');
@@ -132,6 +131,7 @@ $goOption->setAttribute('confirm', _('Delete selected host groups?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "groups";');
 
 // append table to form
 $hostgroupForm->addItem(array($this->data['paging'], $hostgroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

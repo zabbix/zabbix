@@ -308,8 +308,8 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 				" var pos = getPosition('button_show_tree');".
 				" ShowHide('div_node_tree', 'table');".
 				' pos.top += 20;'.
-				" \$('div_node_tree').setStyle({top: pos.top+'px'});";
-			$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript);
+				" \$('div_node_tree').setStyle({top: pos.top + 'px'});";
+			$button_show_tree = new CButton('show_node_tree', _('Select Nodes'), $jscript);
 			$button_show_tree->setAttribute('id', 'button_show_tree');
 
 			// create node tree
@@ -318,7 +318,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$node_tree = array();
 			$node_tree[0] = array('id' => 0, 'caption' => _('All'), 'combo_select_node' => $combo_check_all, 'parentid' => 0); // root
 
-			foreach ($available_nodes as $num => $node) {
+			foreach ($available_nodes as $node) {
 				$checked = isset($ZBX_VIEWED_NODES['nodeids'][$node['nodeid']]);
 				$combo_select_node = new CCheckbox('selected_nodes['.$node['nodeid'].']', $checked, null, $node['nodeid']);
 				$combo_select_node->setAttribute('style', 'margin: 1px 4px 2px 4px;');

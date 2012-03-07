@@ -747,7 +747,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // GO{
 		$goBox = new CComboBox('go');
-		$goBox->addItem('export', S_EXPORT_SELECTED);
+		$goBox->addItem('export', _('Export selected'));
 
 		$goOption = new CComboItem('delete', _('Delete selected'));
 		$goOption->setAttribute('confirm', S_DELETE_SELECTED_TEMPLATES_Q);

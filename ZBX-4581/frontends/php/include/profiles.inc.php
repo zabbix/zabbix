@@ -20,6 +20,7 @@
 ?>
 <?php
 class CProfile {
+
 	private static $userDetails = array();
 	private static $profiles = null;
 	private static $update = array();
@@ -315,13 +316,12 @@ function update_config($configs) {
 	}
 
 	if (count($update) == 0) {
-		error(_('Nothing to do'));
+		error(_('Nothing to do.'));
 		return null;
 	}
 
 	return DBexecute('UPDATE config SET '.implode(',', $update).' WHERE '.DBin_node('configid', false));
 }
-/************ END CONFIG **************/
 
 /************ HISTORY **************/
 function get_user_history() {
@@ -414,7 +414,6 @@ function add_user_history($page) {
 	}
 	return DBexecute($sql);
 }
-/********* END USER HISTORY **********/
 
 /********** USER FAVORITES ***********/
 function get_favorites($idx) {
@@ -436,7 +435,7 @@ function get_favorites($idx) {
 function add2favorites($favobj, $favid, $source = null) {
 	$favorites = get_favorites($favobj);
 
-	foreach ($favorites as $id => $favorite) {
+	foreach ($favorites as $favorite) {
 		if ($favorite['source'] == $source && $favorite['value'] == $favid) {
 			return true;
 		}
@@ -468,7 +467,7 @@ function rm4favorites($favobj, $favid = 0, $source = null) {
 
 function infavorites($favobj, $favid, $source = null) {
 	$favorites = get_favorites($favobj);
-	foreach ($favorites as $id => $favorite) {
+	foreach ($favorites as $favorite) {
 		if (bccomp($favid, $favorite['value']) == 0) {
 			if (is_null($source) || ($favorite['source'] == $source)) {
 				return true;
