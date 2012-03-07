@@ -296,16 +296,13 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$sortorder = getPageSortOrder();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'filter' => array(),
-		'monitored' => 1,
-		'output' => API_OUTPUT_SHORTEN,
-		'skipDependent' => 1,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
-		'limit' => ($config['search_limit']+1)
+		'monitored' => true,
+		'output' => array('triggerid', $sortfield),
+		'skipDependent' => true,
+		'limit' => $config['search_limit'] + 1
 	);
 
-// Filtering
+	// filtering
 	if($pageFilter->hostsSelected){
 		if($pageFilter->hostid > 0)
 			$options['hostids'] = $pageFilter->hostid;
