@@ -51,7 +51,7 @@ class CXmlExportWriter extends CExportWriter {
 	}
 
 	/**
-	 * Recursive function for processiong nested arrays.
+	 * Recursive function for processing nested arrays.
 	 *
 	 * @param array $array
 	 * @param null  $parentName name of parent node

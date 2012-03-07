@@ -371,13 +371,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 					unset($macros[$mnum]);
 				}
-				}
+			}
 
 			$duplicatedMacros = array();
 			foreach ($macros as $mnum => $macro) {
 				// transform macros to uppercase {$aaa} => {$AAA}
 				$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
-					}
+			}
 
 			// create new group
 			if (!zbx_empty($_REQUEST['newgroup'])) {
