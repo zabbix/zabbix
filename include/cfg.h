@@ -37,7 +37,7 @@
 extern int	CONFIG_ZABBIX_FORKS;	/* contains the number of listeners for processing passive checks */
 extern char	*CONFIG_FILE;
 extern char	*CONFIG_LOG_FILE;
-extern char	CONFIG_ALLOW_ROOT;
+extern int	CONFIG_ALLOW_ROOT;
 extern int	CONFIG_TIMEOUT;
 
 struct cfg_line
