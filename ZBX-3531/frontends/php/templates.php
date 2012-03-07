@@ -434,7 +434,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$table->setHeader(array(
 			new CCheckBox('all_templates', NULL, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
 			make_sorting_header(S_TEMPLATES, 'name'),
-			S_APPLICATIONS,
+			_('Applications'),
 			S_ITEMS,
 			S_TRIGGERS,
 			S_GRAPHS,
