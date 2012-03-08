@@ -288,4 +288,19 @@ class C20ImportFormatter extends CImportFormatter {
 		}
 		return $screensData;
 	}
+
+	public function getTemplateScreens() {
+		$screensData = array();
+
+		if (isset($this->data['templates'])) {
+			foreach ($this->data['templates'] as $template) {
+				foreach ($template['screens'] as $screen) {
+					$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+					$screensData[$template['template']][$screen['name']] = $screen;
+				}
+			}
+		}
+
+		return $screensData;
+	}
 }

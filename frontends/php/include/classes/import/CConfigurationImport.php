@@ -1241,58 +1241,55 @@ class CConfigurationImport {
 	 * Import template screens.
 	 */
 	protected function processTemplateScreens() {
-		$templates = $this->getFormattedTemplates();
-		if (empty($templates)) {
+		$allScreens = $this->getFormattedTemplateScreens();
+		if (empty($allScreens)) {
 			return;
 		}
 
 		$screensToCreate = array();
 		$screensToUpdate = array();
-		foreach ($templates as $template) {
-			if (!empty($template['screens'])) {
-				$allScreens = zbx_toHash($template['screens'], 'name');
+		foreach ($allScreens as $template => $screens) {
+			$existingScreens = array();
+			$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE '.
+					' s.templateid='.zbx_dbstr($this->referencer->resolveTemplate($template)).
+					' AND '.DBcondition('s.name', array_keys($screens)));
+			while ($dbScreen = DBfetch($dbScreens)) {
+				$existingScreens[$dbScreen['screenid']] = $dbScreen['name'];
+				$screens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
+			}
 
-				$existingScreens = array();
-				$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE '.
-						' s.templateid='.zbx_dbstr($this->referencer->resolveTemplate($template['host'])).
-						' AND '.DBcondition('s.name', array_keys($allScreens)));
-				while ($dbScreen = DBfetch($dbScreens)) {
-					$existingScreens[$dbScreen['screenid']] = $dbScreen['name'];
-					$allScreens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
-				}
-
-				// if we are going to update screens, check for permissions
-				if ($existingScreens && $this->options['screens']['updateExisting']) {
-					$allowedTplScreens = API::TemplateScreen()->get(array(
-						'screenids' => array_keys($existingScreens),
-						'output' => API_OUTPUT_SHORTEN,
-						'editable' => true,
-						'preservekeys' => true
-					));
-					foreach ($existingScreens as $existingScreenId => $existingScreenName) {
-						if (!isset($allowedTplScreens[$existingScreenId])) {
-							throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
-						}
+			// if we are going to update screens, check for permissions
+			if ($existingScreens && $this->options['screens']['updateExisting']) {
+				$allowedTplScreens = API::TemplateScreen()->get(array(
+					'screenids' => array_keys($existingScreens),
+					'output' => API_OUTPUT_SHORTEN,
+					'editable' => true,
+					'preservekeys' => true
+				));
+				foreach ($existingScreens as $existingScreenId => $existingScreenName) {
+					if (!isset($allowedTplScreens[$existingScreenId])) {
+						throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
 					}
 				}
+			}
 
-				$screens = $this->prepareScreenImport($allScreens);
-				foreach ($screens as $screen) {
-					$screen['templateid'] = $this->referencer->resolveTemplate($template['host']);
-					if (isset($screen['screenid'])) {
-						$screensToUpdate[] = $screen;
-					}
-					else {
-						$screensToCreate[] = $screen;
-					}
+			$screens = $this->prepareScreenImport($screens);
+			foreach ($screens as $screen) {
+				$screen['templateid'] = $this->referencer->resolveTemplate($template);
+				if (isset($screen['screenid'])) {
+					$screensToUpdate[] = $screen;
+				}
+				else {
+					$screensToCreate[] = $screen;
 				}
 			}
 		}
 
-		if ($screensToCreate) {
+
+		if ($this->options['template_screens']['createMissing'] && $screensToCreate) {
 			API::TemplateScreen()->create($screensToCreate);
 		}
-		if ($screensToUpdate) {
+		if ($this->options['template_screens']['updateExisting'] && $screensToUpdate) {
 			API::TemplateScreen()->update($screensToUpdate);
 		}
 	}
@@ -1644,6 +1641,24 @@ class CConfigurationImport {
 			$screens = array();
 			if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
 				$screens = $this->formatter->getScreens();
+			}
+		}
+
+		return $screens;
+	}
+
+	/**
+	 * Get formatted template screens, if either "createMissing" or "updateExisting" template screens option is true.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedTemplateScreens() {
+		static $screens;
+
+		if ($screens === null) {
+			$screens = array();
+			if ($this->options['template_screens']['updateExisting'] || $this->options['template_screens']['createMissing']) {
+				$screens = $this->formatter->getTemplateScreens();
 			}
 		}
 
