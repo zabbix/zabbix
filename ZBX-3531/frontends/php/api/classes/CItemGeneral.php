@@ -84,7 +84,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			'privatekey'			=> array(),
 			'mtime'					=> array('system' => 1),
 			'lastns'				=> array('system' => 1),
-			'flags'					=> array('system' => 1),
+			'flags'					=> array(),
 			'filter'				=> array(),
 			'interfaceid'			=> array('host' => 1),
 			'port'					=> array(),

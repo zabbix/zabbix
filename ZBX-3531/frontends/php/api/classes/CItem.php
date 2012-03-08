@@ -848,6 +848,7 @@ class CItem extends CItemGeneral {
 		$this->checkInput($items);
 		$this->createReal($items);
 		$this->inherit($items);
+
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
@@ -954,11 +955,8 @@ class CItem extends CItemGeneral {
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
-
 		$this->checkInput($items, true);
-
 		$this->updateReal($items);
-
 		$this->inherit($items);
 
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
