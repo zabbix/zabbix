@@ -147,6 +147,14 @@ abstract class CImportFormatter {
 	abstract public function getScreens();
 
 	/**
+	 * Get formatted template screens data.
+	 *
+	 * @abstract
+	 * @return array
+	 */
+	abstract public function getTemplateScreens();
+
+	/**
 	 * Rename items, discovery rules, item prototypes fields.
 	 *
 	 * @param array $item
