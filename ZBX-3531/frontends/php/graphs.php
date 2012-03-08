@@ -402,7 +402,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$graphs_wdgt->addHeader(S_GRAPHS_BIG, $r_form);
+		$graphs_wdgt->addHeader(_('GRAPHS'), $r_form);
 		$graphs_wdgt->addHeader($numrows);
 
 // Header Host
