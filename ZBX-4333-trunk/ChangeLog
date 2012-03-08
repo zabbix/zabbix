@@ -479,6 +479,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
 ..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
 ..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)
 ...G...PS. [ZBX-4721] fixed handling of \u0000 by JSON parser; thanks to Rick Alm (Sasha)
