@@ -185,6 +185,7 @@ class CConfigurationImport {
 		$itemsRefs = array();
 		$valueMapsRefs = array();
 		$triggersRefs = array();
+		$iconMaps = array();
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -297,6 +298,12 @@ class CConfigurationImport {
 			}
 		}
 
+		foreach ($this->getFormattedMaps() as $map) {
+			if (!empty($map['iconmap'])) {
+				$iconMaps[$map['iconmap']['name']] = $map['iconmap']['name'];
+			}
+		}
+
 		$this->referencer->addGroups($groupsRefs);
 		$this->referencer->addTemplates($templatesRefs);
 		$this->referencer->addHosts($hostsRefs);
@@ -304,6 +311,7 @@ class CConfigurationImport {
 		$this->referencer->addItems($itemsRefs);
 		$this->referencer->addValueMaps($valueMapsRefs);
 		$this->referencer->addTriggers($triggersRefs);
+		$this->referencer->addIconMaps($iconMaps);
 	}
 
 	/**
@@ -1042,19 +1050,16 @@ class CConfigurationImport {
 
 		foreach ($allMaps as $map) {
 			// resolve icon map
-			if (!empty($map['iconmap'])) {
-				$iconMap = API::IconMap()->get(array(
-					'filter' => array('name' => $map['iconmap']),
-					'output' => API_OUTPUT_SHORTEN,
-					'nopermissions' => true,
-					'preservekeys' => true
-				));
-				$iconMap = reset($iconMap);
-				if (!$iconMap) {
-					throw new Exception(_s('Cannot find icon map "%1$s" for map "%2$s".', $map['iconmap'], $map['name']));
+			if (isset($map['iconmap'])) {
+				if (empty($map['iconmap'])) {
+					$map['iconmapid'] = 0;
 				}
-
-				$map['iconmapid'] = $iconMap['iconmapid'];
+				else {
+					$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
+					if (!$map['iconmapid']) {
+						throw new Exception(_s('Cannot find icon map "%1$s" for map "%2$s".', $map['iconmap']['name'], $map['name']));
+					}
+				}
 			}
 
 
