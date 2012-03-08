@@ -2,6 +2,8 @@
 Changes for 1.9.10
 
 New features:
+A.F....... [ZBX-4333] implemented dependency validation in trigger::adddependencies (Pavels)
+A.F....... [ZBX-4333] implemented dependency inheritance in the trigger.adddependencies and trigger.deletedependencies methods (Pavels)
 ..F....... [ZBXNEXT-904] redesign Configuration->Screens (Eduard)
 ..F....... [ZBX-4600] trigger dependencies will now be deleted when executing a mass update with no dependencies selected (Pavels)
 A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces (Pavels)
@@ -14,6 +16,9 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+A.F....... [ZBX-4333] fixed trigger inheritance when calling trigger.update whithout a trigger expression (Pavels)
+..F....... [ZBX-4333] fixed host trigger mass update (Pavels)
+..F....... [ZBX-4333] fixed trigger dependency copying (Pavels)
 .......S.. [ZBX-4629] fixed processing Y axis min/max values for graph prototypes (Sasha)
 ..F....... [ZBX-4641] fixed errors in a "Discovery checks" popup (Sasha)
 A.F....... [ZBX-4202] fixed SQL performance in tr_status.php - combined similar queries, user data SQL access only once, triggerids retrieval optimization (Toms)
@@ -480,6 +485,8 @@ New features:
 Changes for 1.8.11rc1
 
 A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
+..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
+..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)
 ...G...PS. [ZBX-4721] fixed handling of \u0000 by JSON parser; thanks to Rick Alm (Sasha)
 ........S. [ZBX-4549] fixed nested db transaction error when stopping server (dimir)
 ........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
