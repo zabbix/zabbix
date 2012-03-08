@@ -169,6 +169,8 @@ else{
 		make_sorting_header(_('MAC address A'), 'pr_macaddress_a'))
 	);
 
+	$paging = null;
+
 	if($pageFilter->groupsSelected){
 		// which inventory fields we will need for displaying
 		$requiredInventoryFields = array(
