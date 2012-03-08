@@ -30,8 +30,8 @@ require_once dirname(__FILE__).'/../../../include/validate.inc.php';
 require_once dirname(__FILE__).'/../../../include/func.inc.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../../include/triggers.inc.php';
-require_once dirname(__FILE__).'/../../../api/classes/class.ctriggerexpression.php';
-require_once dirname(__FILE__).'/../../../api/classes/class.citemkey.php';
+require_once dirname(__FILE__).'/../../../api/classes/CTriggerExpression.php';
+require_once dirname(__FILE__).'/../../../api/classes/CItemKey.php';
 
 class class_triggerexpressionTest extends PHPUnit_Framework_TestCase {
 	public static function provider() {
