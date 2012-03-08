@@ -881,15 +881,11 @@
 
 		// retrieve actual ymax_itemid and ymin_itemid
 		if ($db_graph['ymax_itemid']) {
-			$item = get_item_by_itemid($db_graph['ymax_itemid']);
-			$item = getItemByKeyHostid($item['key_'], $hostid);
-			$db_graph['ymax_itemid'] = $item['itemid'];
+			$db_graph['ymax_itemid'] = get_same_item_for_host($db_graph['ymax_itemid'], $hostid);
 		}
 
 		if ($db_graph['ymin_itemid']) {
-			$item = get_item_by_itemid($db_graph['ymin_itemid']);
-			$item = getItemByKeyHostid($item['key_'], $hostid);
-			$db_graph['ymin_itemid'] = $item['itemid'];
+			$db_graph['ymin_itemid'] = get_same_item_for_host($db_graph['ymin_itemid'], $hostid);
 		}
 
 		if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){

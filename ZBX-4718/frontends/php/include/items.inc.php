@@ -860,18 +860,6 @@
 	return $item;
 	}
 
-	function getItemByKeyHostid($key,$hostid){
-		$sql = 'SELECT DISTINCT * '.
-				' FROM items i '.
-				' WHERE i.key_ = '.zbx_dbstr($key).' AND i.hostid = '.zbx_dbstr($hostid);
-		if ($item = DBfetch(DBselect($sql))) {
-			return $item;
-		}
-		else {
-			return false;
-		}
-	}
-
 	function get_item_by_itemid($itemid){
 		$row = DBfetch(DBselect('select * from items where itemid='.$itemid));
 		if($row){
