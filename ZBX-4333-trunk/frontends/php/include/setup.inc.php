@@ -84,7 +84,7 @@
 		return false;
 		}
 
-		function BodyToString($destroy=true){
+		function bodyToString($destroy = true) {
 			$table = new CTable(null, 'setup_wizard');
 			$table->setAlign('center');
 			$table->setHeader(array(
@@ -108,7 +108,7 @@
 					) , 'right')
 				),'footer');
 
-			return parent::BodyToString($destroy).$table->ToString();
+			return parent::bodyToString($destroy).$table->ToString();
 		}
 
 		function getList(){

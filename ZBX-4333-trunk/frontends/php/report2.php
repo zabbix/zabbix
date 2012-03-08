@@ -231,9 +231,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			is_show_all_nodes() ? S_NODE : null,
 			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? S_HOST : NULL,
 			S_NAME,
-			S_PROBLEMS,
+			_('Problems'),
 			S_OK,
-			S_UNKNOWN,
+			_('Unknown'),
 			S_GRAPH
 		));
 

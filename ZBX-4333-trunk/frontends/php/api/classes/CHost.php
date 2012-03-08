@@ -1684,7 +1684,7 @@ Copt::memoryPick();
 		$updHosts = $this->get($options);
 		foreach ($hosts as $hnum => $host) {
 			if (!isset($updHosts[$host['hostid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
@@ -1723,12 +1723,12 @@ Copt::memoryPick();
 			$hostExists = $this->get($options);
 			$hostExist = reset($hostExists);
 			if ($hostExist && (bccomp($hostExist['hostid'], $curHost['hostid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '._('already exists'));
 			}
 
 			// can't add host with the same name as existing template
 			if (API::Template()->exists(array('host' => $curHost['host'])))
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$curHost['host'].' ] '.S_ALREADY_EXISTS_SMALL);
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$curHost['host'].' ] '._('already exists'));
 		}
 
 
@@ -1889,14 +1889,14 @@ Copt::memoryPick();
 			));
 			$hostMacros = zbx_toHash($hostMacros, 'hostmacroid');
 
-// Delete
+			// Delete
 			$macrosToDelete = array();
 			foreach ($hostMacros as $hmacro) {
 				if (!in_array($hmacro['hostmacroid'], $hostmacrosIds)) {
 					$macrosToDelete[] = $hmacro['hostmacroid'];
 				}
 			}
-// Update
+			// Update
 			$macrosToUpdate = array();
 			foreach ($macrosToAdd as $nhmnum => $nhmacro) {
 				if (isset($nhmacro['hostmacroid']) && isset($hostMacros[$nhmacro['hostmacroid']])) {
@@ -1904,7 +1904,7 @@ Copt::memoryPick();
 					unset($macrosToAdd[$nhmnum]);
 				}
 			}
-//----
+			//----
 
 			if (!empty($macrosToDelete)) {
 				$result = $this->massRemove(array('hostids' => $hostids, 'macros' => $macrosToDelete));
@@ -2034,7 +2034,7 @@ Copt::memoryPick();
 		$updHosts = $this->get($options);
 		foreach ($hostids as $hostid) {
 			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
