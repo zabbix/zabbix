@@ -89,16 +89,6 @@ if(isset($_REQUEST['save_trigger'])){
 			$triggersData = API::Trigger()->get($options);
 			$triggerData = reset($triggersData);
 
-// Saving dependencies
-// TODO: add dependencies to API::Trigger()->update
-			$deps = array();
-			foreach($triggerData['dependencies'] as $dnum => $depTrigger){
-				$deps[] = array(
-					'triggerid' => $triggerData['triggerid'],
-					'dependsOnTriggerid' => $depTrigger['triggerid']
-				);
-			}
-//---
 			if($triggerData['templateid']){
 				$_REQUEST['description'] = $triggerData['description'];
 				$expression = explode_exp($triggerData['expression']);
@@ -116,8 +106,6 @@ if(isset($_REQUEST['save_trigger'])){
 
 			DBstart();
 			$result = API::Trigger()->update($trigger);
-
-			$result &= API::Trigger()->addDependencies($deps);
 //REVERT
 			$result = DBend($result);
 

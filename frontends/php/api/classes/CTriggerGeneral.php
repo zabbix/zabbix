@@ -166,7 +166,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 	 *
 	 * @return array|mixed  the updated child trigger
 	 */
-	public function inheritOnHost(array $trigger, array $chdHost, array $triggerTemplates) {
+	protected function inheritOnHost(array $trigger, array $chdHost, array $triggerTemplates) {
 		$newTrigger = $trigger;
 		$newTrigger['templateid'] = $trigger['triggerid'];
 
