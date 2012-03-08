@@ -98,22 +98,23 @@ class CConfigurationImport {
 	}
 
 	/**
-	 * Import configuration data.	 *
+	 * Import configuration data.
 	 * @todo   for 1.8 version import old class zbxXML is used
 	 *
 	 * @throws Exception
 	 * @return bool
 	 */
 	public function import() {
+		if (empty($this->reader)) {
+			throw new UnexpectedValueException('Reader is not set.');
+		}
+
 		try {
 			// hack to make api throw exceptions
 			// this made to not check all api calls results for false return
 			czbxrpc::$useExceptions = true;
 			DBstart();
 
-			if (empty($this->reader)) {
-				throw new UnexpectedValueException('Reader is not set.');
-			}
 			$this->data = $this->reader->read($this->source);
 
 			$version = $this->getImportVersion();
