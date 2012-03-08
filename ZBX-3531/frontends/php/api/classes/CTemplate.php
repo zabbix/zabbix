@@ -1302,8 +1302,6 @@ class CTemplate extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function massUpdate($data) {
-		$transaction = false;
-
 		$templates = zbx_toArray($data['templates']);
 		$templateids = zbx_objectValues($templates, 'templateid');
 

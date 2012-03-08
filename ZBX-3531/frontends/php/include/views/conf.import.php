@@ -29,6 +29,7 @@ $titles = array(
 	'groups' => _('Groups'),
 	'hosts' => _('Hosts'),
 	'templates' => _('Templates'),
+	'template_screens' => _('Template screens'),
 	'template_linkages' => _('Template linkages'),
 	'items' => _('Items'),
 	'discoveryrules' => _('Discovery rules'),
