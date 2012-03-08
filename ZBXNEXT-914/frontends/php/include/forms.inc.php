@@ -1183,6 +1183,17 @@
 			'priority' => get_request('priority', 0),
 			'config' => select_config()
 		);
+
+		// get hostid
+		$pageFilter = new CPageFilter(array(
+			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
+			'hosts' => array('templated_hosts' => true, 'editable' => true),
+			'groupid' => get_request('groupid', null),
+			'hostid' => get_request('hostid', null)
+		));
+		$data['hostid'] = $pageFilter->hostid;
+
+		// get dependencies
 		$data['dependencies'] = API::Trigger()->get(array(
 			'triggerids' => $data['dependencies'],
 			'output' => array('triggerid', 'description'),
@@ -1196,6 +1207,7 @@
 			unset($dependency['hosts']);
 		}
 		order_result($data['dependencies'], 'description');
+
 		return $data;
 	}
 
@@ -1221,6 +1233,15 @@
 			'templates' => array(),
 			'config' => select_config()
 		);
+
+		// get hostid
+		$pageFilter = new CPageFilter(array(
+			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
+			'hosts' => array('templated_hosts' => true, 'editable' => true),
+			'groupid' => get_request('groupid', null),
+			'hostid' => get_request('hostid', null)
+		));
+		$data['hostid'] = $pageFilter->hostid;
 
 		if (!empty($data['triggerid'])) {
 			// get trigger

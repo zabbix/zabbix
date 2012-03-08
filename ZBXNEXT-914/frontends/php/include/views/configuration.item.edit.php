@@ -20,20 +20,23 @@
 ?>
 <?php
 $itemWidget = new CWidget('item-edit');
+
+if (!empty($this->data['hostid'])) {
+	$itemWidget->addItem(get_header_host_table($this->data['hostid'], 'items'));
+}
+
 $itemWidget->addPageHeader($this->data['page_header']);
 
 // create form
 $itemForm = new CForm();
 $itemForm->setName('itemForm');
 $itemForm->addVar('form', $this->data['form']);
+$itemForm->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['parent_discoveryid'])) {
 	$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }
 if (!empty($this->data['itemid'])) {
 	$itemForm->addVar('itemid', $this->data['itemid']);
-}
-if ($this->data['is_discovery_rule']) {
-	$itemForm->addVar('hostid', $this->data['hostid']);
 }
 
 // create form list

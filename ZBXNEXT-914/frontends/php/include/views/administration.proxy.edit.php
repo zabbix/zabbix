@@ -20,6 +20,7 @@
 ?>
 <?php
 $proxyWidget = new CWidget();
+$proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
 
 // create form
 $proxyForm = new CForm();

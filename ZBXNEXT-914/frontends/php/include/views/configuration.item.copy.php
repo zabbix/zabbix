@@ -20,6 +20,11 @@
 ?>
 <?php
 $itemWidget = new CWidget();
+
+if (!empty($this->data['hostid'])) {
+	$itemWidget->addItem(get_header_host_table($this->data['hostid'], 'items'));
+}
+
 $itemWidget->addPageHeader(_('CONFIGURATION OF ITEMS'));
 
 // create form
