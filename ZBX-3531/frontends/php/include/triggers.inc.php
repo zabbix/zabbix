@@ -559,7 +559,7 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 		'templated_hosts' => true
 	));
 
-	$hash = array();
+	$newTriggerIds = array();
 	foreach ($db_dstHosts as $dstHost) {
 		foreach ($db_srcTriggers as $srcTrigger) {
 			if (httpItemExists($srcTrigger['items'])) {
@@ -577,29 +577,44 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 				$host = $srcTrigger['hosts'][0]['host'];
 			}
 			$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $host, $dstHost['host']);
-			$srcTrigger['dependencies'] = array();
+
+			// the dependencies must be added after all triggers are created
+			unset($srcTrigger['dependencies']);
+
 			if (!$result = API::Trigger()->create($srcTrigger)) {
 				return false;
 			}
-			$hash[$srcTrigger['triggerid']] = reset($result['triggerids']);
-		}
-
-		$deps = array();
-		foreach ($db_srcTriggers as $srcTrigger) {
-			if (httpItemExists($srcTrigger['items'])) {
-				continue;
-			}
-			foreach ($srcTrigger['dependencies'] as $dep) {
-				$deps[] = array(
-					'triggerid' => $hash[$srcTrigger['triggerid']],
-					'dependsOnTriggerid' => isset($hash[$dep['triggerid']]) ? $hash[$dep['triggerid']] : $dep['triggerid']
-				);
-			}
-		}
-		if (!API::Trigger()->addDependencies($deps)) {
-			return false;
+			$newTriggerIds[$srcTrigger['triggerid']] = reset($result['triggerids']);
 		}
 	}
+
+	// map dependencies to the new trigger IDs and save
+	if ($newTriggerIds) {
+		$dependencies = array();
+		foreach ($db_srcTriggers as $trigger) {
+			$triggerId = $trigger['triggerid'];
+			$triggerId = (isset($newTriggerIds[$triggerId])) ? $newTriggerIds[$triggerId] : $triggerId;
+
+			if ($trigger['dependencies']) {
+				foreach ($trigger['dependencies'] as $depTrigger) {
+					$depTriggerId = $depTrigger['triggerid'];
+					$depTriggerId = (isset($newTriggerIds[$depTriggerId])) ? $newTriggerIds[$depTriggerId] : $depTriggerId;
+
+					$dependencies[] = array(
+						'triggerid' => $triggerId,
+						'dependsOnTriggerid' => $depTriggerId
+					);
+				}
+			}
+		}
+
+		if ($dependencies) {
+			if (!API::Trigger()->addDependencies($dependencies)) {
+				return false;
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -1392,17 +1407,6 @@ function check_right_on_trigger_by_expression($permission, $expression) {
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
-function insert_dependency($triggerid_down, $triggerid_up) {
-	$triggerdepid = get_dbid('trigger_depends', 'triggerdepid');
-	return DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up)'.
-						' VALUES ('.$triggerdepid.','.$triggerid_down.','.$triggerid_up.')');
-}
-
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
 function replace_template_dependencies($deps, $hostid) {
 	foreach ($deps as $id => $val) {
 		$sql = 'SELECT t.triggerid'.
@@ -1423,10 +1427,6 @@ function replace_template_dependencies($deps, $hostid) {
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
-function delete_dependencies_by_triggerid($triggerids) {
-	zbx_value2array($triggerids);
-	return DBexecute('DELETE FROM trigger_depends WHERE '.DBcondition('triggerid_down', $triggerids));
-}
 
 function delete_function_by_triggerid($triggerids) {
 	zbx_value2array($triggerids);
@@ -2651,7 +2651,6 @@ function copyTriggers($srcHostId, $dstHostId) {
 			continue;
 		}
 		$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
-		$srcTrigger['dependencies'] = array();
 
 		if (!$result = API::Trigger()->create($srcTrigger)) {
 			return false;
@@ -2659,22 +2658,6 @@ function copyTriggers($srcHostId, $dstHostId) {
 		$hash[$srcTrigger['triggerid']] = reset($result['triggerids']);
 	}
 
-	$deps = array();
-	foreach ($srcTriggers as $srcTrigger) {
-		if (httpItemExists($srcTrigger['items'])) {
-			continue;
-		}
-		foreach ($srcTrigger['dependencies'] as $dep) {
-			$deps[] = array(
-				'triggerid' => $hash[$srcTrigger['triggerid']],
-				'dependsOnTriggerid' => isset($hash[$dep['triggerid']]) ? $hash[$dep['triggerid']] : $dep['triggerid']
-			);
-		}
-	}
-
-	if (!API::Trigger()->addDependencies($deps)) {
-		return false;
-	}
 	return true;
 }
 
