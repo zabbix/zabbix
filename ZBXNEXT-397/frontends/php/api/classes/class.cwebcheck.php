@@ -223,7 +223,6 @@ class CWebCheck extends CZBXAPI {
 			}
 			else {
 				$webcheck['webcheckid'] = $webcheck['httptestid'];
-				unset($webcheck['httptestid']);
 				$webcheckids[$webcheck['webcheckid']] = $webcheck['webcheckid'];
 
 				if ($options['output'] == API_OUTPUT_SHORTEN) {

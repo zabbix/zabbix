@@ -988,12 +988,21 @@ function make_latest_issues(array $filter = array()) {
 }
 
 function make_webmon_overview($filter) {
-	$available_hosts = API::Host()->get(array(
+	$groups = API::HostGroup()->get(array(
 		'groupids' => $filter['groupids'],
 		'monitored_hosts' => true,
-		'filter' => array('maintenance_status' => $filter['maintenance'])
+		'with_monitored_httptests' => true,
+		'output' => array('groupid', 'name'),
+		'preservekeys' => true
 	));
-	$available_hosts = zbx_objectValues($available_hosts, 'hostid');
+	$availableHosts = API::Host()->get(array(
+		'groupids' => array_keys($groups),
+		'monitored_hosts' => true,
+		'filter' => array('maintenance_status' => $filter['maintenance']),
+		'output' => API_OUTPUT_SHORTEN,
+		'preservekeys' => true
+	));
+	$availableHostIds = array_keys($availableHosts);
 
 	$table  = new CTableInfo();
 	$table->setHeader(array(
@@ -1004,16 +1013,12 @@ function make_webmon_overview($filter) {
 		_('Unknown')
 	));
 
-	$groups = API::HostGroup()->get(array(
-		'monitored_hosts' => true,
-		'with_monitored_httptests' => true,
-		'output' => array('groupid', 'name')
-	));
+
 	foreach ($groups as $group) {
 		$showGroup = false;
-		$apps['ok'] = 0;
-		$apps['failed'] = 0;
-		$apps['unknown'] = 0;
+		$okCount = 0;
+		$failedCount = 0;
+		$unknownCount = 0;
 
 		$result = DBselect(
 			'SELECT DISTINCT ht.httptestid,i.lastclock,i.lastvalue'.
@@ -1024,34 +1029,35 @@ function make_webmon_overview($filter) {
 				' AND a.hostid=hg.hostid'.
 				' AND hti.type='.HTTPSTEP_ITEM_TYPE_LASTSTEP.
 				' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-				' AND '.DBcondition('hg.hostid', $available_hosts).
+				' AND '.DBcondition('hg.hostid', $availableHostIds).
 				' AND hg.groupid='.$group['groupid']
 		);
 		while ($row = DBfetch($result)) {
 			$showGroup = true;
 
 			if (!$row['lastclock']) {
-				$apps['unknown']++;
+				$unknownCount++;
 			}
 			elseif ($row['lastvalue'] != 0) {
-				$apps['failed']++;
+				$failedCount++;
 			}
 			else {
-				$apps['ok']++;
+				$okCount++;
 			}
 		}
-		if (!$showGroup) {
-			continue;
+
+		if ($showGroup) {
+			$table->addRow(array(
+				is_show_all_nodes() ? get_node_name_by_elid($group['groupid']) : null,
+				$group['name'],
+				new CSpan($okCount, 'off'),
+				new CSpan($failedCount, $failedCount ? 'on' : 'off'),
+				new CSpan($unknownCount, 'unknown')
+			));
 		}
-		$table->addRow(array(
-			is_show_all_nodes() ? get_node_name_by_elid($group['groupid']) : null,
-			$group['name'],
-			new CSpan($apps['ok'], 'off'),
-			new CSpan($apps['failed'], $apps['failed'] ? 'on' : 'off'),
-			new CSpan($apps['unknown'], 'unknown')
-		));
 	}
 	$script = new CJSScript(get_js("jQuery('#hat_webovr_footer').html('"._s('Updated: %s', zbx_date2str(_('H:i:s')))."')"));
+
 	return new CDiv(array($table, $script));
 }
 

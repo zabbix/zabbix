@@ -78,14 +78,13 @@
 	}
 ?>
 <?php
-
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
-	$sql = 'SELECT ht.* '.
-		' FROM httptest ht, applications a '.
-		' WHERE '.DBcondition('a.hostid', $available_hosts).
-			' AND a.applicationid=ht.applicationid '.
-			' AND ht.httptestid='.$_REQUEST['httptestid'];
-	if(!$httptest_data = DBfetch(DBselect($sql))){
+	$httptest_data = API::WebCheck()->get(array(
+		'httptestids' => $_REQUEST['httptestid'],
+		'output' => API_OUTPUT_EXTEND,
+		'preservekeys' => true
+	));
+	$httptest_data = reset($httptest_data);
+	if (!$httptest_data) {
 		access_deny();
 	}
 
@@ -119,7 +118,7 @@
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$rst_icon = get_icon('reset', array('id' => $_REQUEST['httptestid']));
 
-	$lastcheck = NULL;
+	$lastcheck = null;
 	if (isset($httptest_data['lastcheck'])) {
 		$lastcheck = ' ['.zbx_date2str(_('d M Y H:i:s'), $httptest_data['lastcheck']).']';
 	}
