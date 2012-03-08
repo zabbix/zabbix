@@ -32,6 +32,7 @@ class CImportReferencer {
 	protected $items = array();
 	protected $valueMaps = array();
 	protected $triggers = array();
+	protected $iconMaps = array();
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
@@ -39,6 +40,7 @@ class CImportReferencer {
 	protected $itemsRefs;
 	protected $valueMapsRefs;
 	protected $triggersRefs;
+	protected $iconMapsRefs;
 
 	/**
 	 * Get group id by name.
@@ -171,6 +173,21 @@ class CImportReferencer {
 		}
 
 		return isset($this->triggersRefs[$name][$expression]) ? $this->triggersRefs[$name][$expression] : false;
+	}
+
+	/**
+	 * Get icon mpa id by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveIconMap($name) {
+		if ($this->iconMapsRefs === null) {
+			$this->selectIconMaps();
+		}
+
+		return isset($this->iconMapsRefs[$name]) ? $this->iconMapsRefs[$name] : false;;
 	}
 
 	/**
@@ -318,6 +335,15 @@ class CImportReferencer {
 	 */
 	public function addTriggerRef($name, $expression, $triggerId) {
 		$this->triggersRefs[$name][$expression] = $triggerId;
+	}
+
+	/**
+	 * Add icon map names that need association with a database icon map id.
+	 *
+	 * @param array $iconMaps
+	 */
+	public function addIconMaps(array $iconMaps) {
+		$this->iconMaps = array_unique(array_merge($this->iconMaps, $iconMaps));
 	}
 
 	/**
@@ -490,6 +516,25 @@ class CImportReferencer {
 			}
 
 			$this->triggers = array();
+		}
+	}
+
+	/**
+	 * Select icon map ids for previously added icon maps names.
+	 */
+	protected function selectIconMaps() {
+		if (!empty($this->iconMaps)) {
+			$this->iconMapsRefs = array();
+			$dbIconMaps = API::IconMap()->get(array(
+				'filter' => array('name' => $this->iconMaps),
+				'output' => array('iconmapid', 'name'),
+				'preservekeys' => true,
+			));
+			foreach ($dbIconMaps as $iconMap) {
+				$this->iconMapsRefs[$iconMap['name']] = $iconMap['iconmapid'];
+			}
+
+			$this->iconMaps = array();
 		}
 	}
 }
