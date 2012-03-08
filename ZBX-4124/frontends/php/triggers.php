@@ -262,42 +262,31 @@ include_once('include/page_header.php');
 			}
 		}
 	}
-// ------- GO ---------
-	else if(($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])){
+	// ------- GO ---------
+	elseif (($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])) {
 		show_messages();
 
 		$result = false;
 
-		$visible = get_request('visible',array());
-		$_REQUEST['dependencies'] = get_request('dependencies',array());
+		$triggerIds = get_request('g_triggerid');
+		$visible = get_request('visible', array());
 
-		$options = array(
-			'triggerids' => $_REQUEST['g_triggerid'],
-			'select_dependencies' => 1,
-			'output' => API_OUTPUT_EXTEND,
-			'editable' => 1
-		);
-		$triggers = CTrigger::get($options);
+		// new values
+		$newPriority = (isset($visible['priority'])) ? get_request('priority') : null;
+		$newDependencies = (isset($visible['dependencies'])) ? get_request('dependencies', array()) : null;
 
 		DBstart();
-		foreach($triggers as $tnum => $db_trig){
-			foreach($db_trig as $key => $value){
-				if(isset($visible[$key])){
-					$db_trig[$key] = $_REQUEST[$key];
-				}
+		foreach ($triggerIds as $triggerId) {
+			$result = update_trigger($triggerId, null, null, null, $newPriority, null, null, null, $newDependencies, null);
+
+			if (!$result) {
+				break;
 			}
-
-			$result = update_trigger($db_trig['triggerid'],
-				null,null,null,
-				$db_trig['priority'],null,null,null,
-				$db_trig['dependencies'],null);
-
-			if(!$result) break;
 		}
 		$result = DBend($result);
 
 		show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
-		if($result){
+		if ($result) {
 			unset($_REQUEST['massupdate']);
 			unset($_REQUEST['form']);
 			$url = new CUrl();

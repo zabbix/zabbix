@@ -1745,9 +1745,9 @@
 
 	'S_EVENT_GENERATION'=>			'Event generation',
 
-	'S_TRIGGERS_MASSUPDATE'=>		'Triggers massupdate',
-	'S_TRIGGER_DEPENDENCIES'=>		'Trigger dependencies',
-	'S_INCORRECT_DEPENDENCY'=>		'Incorrect dependency',
+	'S_TRIGGERS_MASSUPDATE'=>		    'Triggers massupdate',
+	'S_REPLACE_TRIGGER_DEPENDENCIES'=>	'Replace trigger dependencies',
+	'S_INCORRECT_DEPENDENCY'=>		    'Incorrect dependency',
 
 	'S_TOGGLE_INPUT_METHOD'=>		'Toggle input method',
 	'S_INSERT_MACRO'=>			'Insert macro',
