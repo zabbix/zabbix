@@ -21,6 +21,7 @@ zabbix (1:1.8.10-1) unstable; urgency=low
   * Move alertscripts and externalscripts to /var/lib/zabbix
   * Don't delete /var/run/zabbix and /var/log/zabbix directory forcible
   * Fix double Server setting on zabbix_agentd.conf
+  * Add japanese font to alternatives
 
  -- Kodai Terashima <kodai.terashima@zabbix.com> Fri, 02 Mar 2012 12:00:18 +0200
 

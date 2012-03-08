@@ -128,7 +128,7 @@ Description: network monitoring solution - server (using SQLite3)
 
 Package: zabbix-frontend-php
 Architecture: all
-Depends: ${misc:Depends}, apache2 | httpd, php5, php5-mysql | php5-pgsql, php5-gd, ucf, dbconfig-common (>= 1.8.19), ttf-dejavu-core | ttf-vlgothic
+Depends: ${misc:Depends}, apache2 | httpd, php5, php5-mysql | php5-pgsql, php5-gd, ucf, dbconfig-common (>= 1.8.19), ttf-dejavu-core | ttf-japanese-gothic
 Description: network monitoring solution - PHP front-end
  Zabbix is a server/client network monitoring system with many features.
  It can be used for:

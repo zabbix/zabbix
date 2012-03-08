@@ -1,0 +1,18 @@
+#!/bin/sh -e
+
+case "$1" in
+    failed-upgrade|abort-install|abort-upgrade|disappear|upgrade)
+    ;;
+    remove|purge)
+        if [ -e /etc/alternatives/zabbix-frontend-font ]; then
+            update-alternatives --remove-all zabbix-frontend-font
+        fi
+    ;;
+    *)
+        echo "prerm called with unknown argument \`$1'" >&2
+        exit 1
+esac
+
+#DEBHELPER#
+
+exit 0

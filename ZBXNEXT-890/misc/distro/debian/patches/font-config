@@ -1,0 +1,11 @@
+--- zabbix-1.8.8/frontends/php/include/defines.inc.php.orig	2011-11-23 18:11:56.000000000 +0900
++++ zabbix-1.8.8/frontends/php/include/defines.inc.php	2011-11-23 18:13:21.000000000 +0900
+@@ -36,7 +36,7 @@
+ 	define('ZBX_WIDGET_ROWS',				20);
+ 
+ 	define('ZBX_FONTPATH',					realpath('fonts'));	// where to search for font (GD > 2.0.18)
+-	define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans');		// font file name
++	define('ZBX_GRAPH_FONT_NAME',			'graphfont');		// font file name
+ 	define('ZBX_GRAPH_LEGEND_HEIGHT',120); // when graph height is less then this value, some legend will not show up
+ 
+ 	define('ZBX_SCRIPT_TIMEOUT',			60); // in seconds

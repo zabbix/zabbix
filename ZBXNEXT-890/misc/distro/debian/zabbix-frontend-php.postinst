@@ -30,6 +30,14 @@ if [ "$1" = "configure" ]; then
        chown www-data.root /etc/zabbix/web
        chmod 755 /etc/zabbix/web
     fi
+
+    if [ -e /usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf ]; then
+        update-alternatives --install /usr/share/zabbix/fonts/graphfont.ttf zabbix-frontend-font /usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf 10 
+    fi
+
+    if [ -e /etc/alternatives/ttf-japanese-gothic.ttf ]; then
+        update-alternatives --install /usr/share/zabbix/fonts/graphfont.ttf zabbix-frontend-font /etc/alternatives/ttf-japanese-gothic.ttf 20
+    fi
 fi
 
 #DEBHELPER#
