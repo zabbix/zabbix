@@ -1,5 +1,6 @@
 Changes for 1.8.11rc1
 
+A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
 A......... [ZBX-4562] Fixed meditype.update returning wrong formatted result
 ...G...PS. [ZBX-4721] fixed handling of \u0000 by JSON parser; thanks to Rick Alm (Sasha)
 ..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)

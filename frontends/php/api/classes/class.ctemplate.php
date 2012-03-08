@@ -686,7 +686,6 @@ Copt::memoryPick();
 				if(!is_null($options['limitSelects'])) order_result($items, 'description');
 				foreach($items as $itemid => $item){
 					unset($items[$itemid]['hosts']);
-
 					foreach($item['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
 							if(!isset($count[$host['hostid']])) $count[$host['hostid']] = 0;
@@ -729,7 +728,7 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($triggers, 'description');
 				foreach($triggers as $triggerid => $trigger){
-					unset($trigger[$triggerid]['hosts']);
+					unset($triggers[$triggerid]['hosts']);
 
 					foreach($trigger['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
@@ -739,7 +738,7 @@ Copt::memoryPick();
 							if($count[$host['hostid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$host['hostid']]['triggers'][] = &$trigger[$triggerid];
+						$result[$host['hostid']]['triggers'][] = &$triggers[$triggerid];
 					}
 				}
 			}
@@ -773,7 +772,7 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($graphs, 'name');
 				foreach($graphs as $graphid => $graph){
-					unset($graph[$graphid]['hosts']);
+					unset($graphs[$graphid]['hosts']);
 
 					foreach($graph['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
@@ -783,7 +782,7 @@ Copt::memoryPick();
 							if($count[$host['hostid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$host['hostid']]['graphs'][] = &$graph[$graphid];
+						$result[$host['hostid']]['graphs'][] = &$graphs[$graphid];
 					}
 				}
 			}
@@ -817,7 +816,7 @@ Copt::memoryPick();
 
 				if(!is_null($options['limitSelects'])) order_result($applications, 'name');
 				foreach($applications as $applicationid => $application){
-					unset($application[$applicationid]['hosts']);
+					unset($applications[$applicationid]['hosts']);
 
 					foreach($application['hosts'] as $hnum => $host){
 						if(!is_null($options['limitSelects'])){
@@ -827,7 +826,7 @@ Copt::memoryPick();
 							if($count[$host['hostid']] > $options['limitSelects']) continue;
 						}
 
-						$result[$host['hostid']]['applications'][] = &$application[$applicationid];
+						$result[$host['hostid']]['applications'][] = &$applications[$applicationid];
 					}
 				}
 			}
