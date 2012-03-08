@@ -717,12 +717,9 @@ int	is_ip4(const char *ip)
 {
 	const char	*__function_name = "is_ip4";
 	const char	*p = ip;
-	int		nums, dots, res = FAIL;
+	int		nums = 0, dots = 0, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
-
-	nums = 0;
-	dots = 0;
 
 	while ('\0' != *p)
 	{
@@ -1205,7 +1202,7 @@ int	int_in_list(char *list, int value)
 	char		*start = NULL, *end = NULL, c = '\0';
 	int		i1, i2, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s', value:%d", list, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' value:%d", list, value);
 
 	for (start = list; '\0' != *start;)
 	{
@@ -1262,12 +1259,14 @@ int	int_in_list(char *list, int value)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: the function supports suffixes K,M,G,T,s,m,h,d,w                 *
+ * Comments: the function automatically processes suffixes K, M, G, T and     *
+ *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
 int	is_double_suffix(const char *str)
 {
-	int	i, dot = -1;
+	size_t	i;
+	int	dot = -1;
 
 	for (i = 0; '\0' != str[i]; i++)
 	{
@@ -1284,7 +1283,7 @@ int	is_double_suffix(const char *str)
 			continue;
 		}
 
-		/* last character is suffix 'K', 'M', 'G', 'T', 's', 'm', 'h', 'd', 'w' */
+		/* last character is suffix */
 		if (NULL != strchr("KMGTsmhdw", str[i]) && '\0' == str[i + 1])
 			continue;
 
@@ -1310,7 +1309,8 @@ int	is_double_suffix(const char *str)
  ******************************************************************************/
 int	is_double(const char *str)
 {
-	int	i, dot = -1, len;
+	size_t	i, len;
+	int	dot = -1;
 
 	for (i = 0; ' ' == str[i] && '\0' != str[i]; i++)	/* trim left spaces */
 		;
@@ -1318,7 +1318,7 @@ int	is_double(const char *str)
 	for (len = 0; '\0' != str[i]; i++, len++)
 	{
 		/* negative number? */
-		if ('-' == str[i] && i == 0)
+		if ('-' == str[i] && 0 == i)
 			continue;
 
 		if (0 != isdigit(str[i]))
@@ -1342,7 +1342,7 @@ int	is_double(const char *str)
 		return FAIL;
 	}
 
-	if (0 >= len || (1 == len && -1 != dot))
+	if (0 == len || (1 == len && -1 != dot))
 		return FAIL;
 
 	return SUCCEED;
@@ -1362,14 +1362,13 @@ int	is_double(const char *str)
  *                                                                            *
  * Author: Aleksandrs Saveljevs, Vladimir Levijev                             *
  *                                                                            *
- * Comments: the function supports suffixes 's', 'm', 'h', 'd', and 'w'       *
+ * Comments: the function automatically processes suffixes s, m, h, d, w      *
  *                                                                            *
  ******************************************************************************/
 int	is_uint_suffix(const char *str, unsigned int *value)
 {
-	register unsigned int	max_uint = ~0U;
-	register unsigned int	value_uint = 0, c;
-	unsigned int		factor = 1;
+	const unsigned int	max_uint = ~0U;
+	unsigned int		value_uint = 0, c, factor = 1;
 
 	if ('\0' == *str || '1' > *str || *str > '9')
 		return FAIL;
@@ -1377,6 +1376,7 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 	while ('\0' != *str && 0 != isdigit(*str))
 	{
 		c = (unsigned int)(unsigned char)(*str - '0');
+
 		if ((max_uint - c) / 10 < value_uint)
 			return FAIL;	/* overflow */
 
@@ -1416,10 +1416,8 @@ int	is_uint_suffix(const char *str, unsigned int *value)
 	if (max_uint / factor < value_uint)
 		return FAIL;	/* overflow */
 
-	value_uint *= factor;
-
 	if (NULL != value)
-		*value = value_uint;
+		*value = value_uint * factor;
 
 	return SUCCEED;
 }
@@ -1440,8 +1438,7 @@ int	is_uint_suffix(const char *str, unsigned int *value)
  ******************************************************************************/
 int	is_uint(const char *str)
 {
-	int	i;
-	int	len;
+	size_t	i, len;
 
 	for (i = 0; ' ' == str[i] && '\0' != str[i]; i++)	/* trim left spaces */
 		;
@@ -1462,7 +1459,7 @@ int	is_uint(const char *str)
 		return FAIL;
 	}
 
-	if (0 >= len)
+	if (0 == len)
 		return FAIL;
 
 	return SUCCEED;
@@ -1492,7 +1489,7 @@ int	_wis_uint(const wchar_t *wide_string)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_int_suffix                                                    *
+ * Function: is_int_prefix                                                    *
  *                                                                            *
  * Purpose: check if the beginning of string is a signed integer              *
  *                                                                            *
@@ -1504,9 +1501,9 @@ int	_wis_uint(const wchar_t *wide_string)
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
-int	is_int_suffix(const char *str)
+int	is_int_prefix(const char *str)
 {
-	int	i = 0;
+	size_t	i = 0;
 
 	while (' ' == str[i])	/* trim left spaces */
 		i++;
@@ -1538,8 +1535,8 @@ int	is_int_suffix(const char *str)
  ******************************************************************************/
 int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
 {
-	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
-	register zbx_uint64_t	value_uint64 = 0, c;
+	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	zbx_uint64_t		value_uint64 = 0, c;
 
 	if ('\0' == *str || 0 == n)
 		return FAIL;
@@ -1582,8 +1579,8 @@ int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
  ******************************************************************************/
 int	is_ushort(const char *str, unsigned short *value)
 {
-	register unsigned short	max_ushort = 0xffff;
-	register unsigned short	value_ushort = 0, c;
+	const unsigned short	max_ushort = 0xffff;
+	unsigned short		value_ushort = 0, c;
 
 	if ('\0' == *str)
 		return FAIL;
@@ -1594,6 +1591,7 @@ int	is_ushort(const char *str, unsigned short *value)
 			return FAIL;	/* not a digit */
 
 		c = (unsigned short)(unsigned char)(*str - '0');
+
 		if ((max_ushort - c) / 10 < value_ushort)
 			return FAIL;	/* overflow */
 
@@ -1859,7 +1857,7 @@ int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
 	{
 		index = first_index + (last_index - first_index) / 2;
 
-		if ((element_id = *(zbx_uint64_t *)((char *)p + index * sz)) == id)
+		if (id == (element_id = *(zbx_uint64_t *)((char *)p + index * sz)))
 			return index;
 
 		if (last_index == first_index)
@@ -2018,7 +2016,7 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: the function automatically processes suffixes 'K','M','G','T'    *
+ * Comments: the function automatically processes suffixes K, M, G, T         *
  *                                                                            *
  ******************************************************************************/
 int	str2uint64(char *str, zbx_uint64_t *value)
@@ -2033,23 +2031,23 @@ int	str2uint64(char *str, zbx_uint64_t *value)
 	if (str[sz] == 'K')
 	{
 		c = str[sz];
-		factor = 1024;
+		factor = ZBX_KIBIBYTE;
 	}
 	else if (str[sz] == 'M')
 	{
 		c = str[sz];
-		factor = 1024 * 1024;
+		factor = ZBX_MEBIBYTE;
 	}
 	else if (str[sz] == 'G')
 	{
 		c = str[sz];
-		factor = 1024 * 1024 * 1024;
+		factor = ZBX_GIBIBYTE;
 	}
 	else if (str[sz] == 'T')
 	{
 		c = str[sz];
-		factor = 1024 * 1024 * 1024;
-		factor *= 1024;
+		factor = ZBX_GIBIBYTE;
+		factor *= ZBX_KIBIBYTE;
 	}
 
 	if ('\0' != c)
@@ -2076,8 +2074,8 @@ int	str2uint64(char *str, zbx_uint64_t *value)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: the function automatically processes suffixes 'K','M','G','T'    *
- *           and 's','m','h','d','w'                                          *
+ * Comments: the function automatically processes suffixes K, M, G, T and     *
+ *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
 double	str2double(const char *str)
@@ -2088,16 +2086,16 @@ double	str2double(const char *str)
 	switch (str[sz])
 	{
 		case 'K':
-			factor = 1024;
+			factor = ZBX_KIBIBYTE;
 			break;
 		case 'M':
-			factor = 1024*1024;
+			factor = ZBX_MEBIBYTE;
 			break;
 		case 'G':
-			factor = 1024*1024*1024;
+			factor = ZBX_GIBIBYTE;
 			break;
 		case 'T':
-			factor = 1024*1024*1024*(double)1024;
+			factor = ZBX_GIBIBYTE * (double)1024;
 			break;
 		case 's':
 			break;
@@ -2204,7 +2202,7 @@ int	is_function_char(char c)
  ******************************************************************************/
 int	is_macro_char(char c)
 {
-	if ('A' <= c && c <= 'Z')
+	if (0 != isupper(c))
 		return SUCCEED;
 
 	if ('.' == c || '_' == c)
