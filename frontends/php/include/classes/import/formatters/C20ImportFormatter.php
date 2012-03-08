@@ -38,20 +38,16 @@ class C20ImportFormatter extends CImportFormatter {
 		$hostsData = array();
 
 		foreach ($this->data['templates'] as $host) {
+			$host = $this->renameData($host, array('template' => 'host'));
+
 			if (empty($host['templates'])) {
 				unset($host['templates']);
 			}
 			else {
-				foreach ($host['templates'] as $tnum => $template) {
-					$host['templates'][$tnum] = $this->renameData($template, array('template' => 'host'));
-				}
 				$host['templates'] = array_values($host['templates']);
 			}
 
 			$host['macros'] = array_values($host['macros']);
-
-			$host = $this->renameData($host, array('template' => 'host'));
-
 			$host['groups'] = array_values($host['groups']);
 
 			foreach ($host['screens'] as &$screen) {
@@ -81,7 +77,13 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 			$host['interfaces'] = array_values($host['interfaces']);
 
-			$host['templates'] = array_values($host['templates']);
+			if (empty($host['templates'])) {
+				unset($host['templates']);
+			}
+			else {
+				$host['templates'] = array_values($host['templates']);
+			}
+
 			$host['macros'] = array_values($host['macros']);
 			$host['groups'] = array_values($host['groups']);
 

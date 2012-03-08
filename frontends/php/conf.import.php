@@ -38,6 +38,7 @@ $data['rules'] = array(
 	'groups' => array('createMissing' => false),
 	'hosts' => array('updateExisting' => false, 'createMissing' => false),
 	'templates' => array('updateExisting' => false, 'createMissing' => false),
+	'template_screens' => array('updateExisting' => false, 'createMissing' => false),
 	'template_linkages' => array('createMissing' => false),
 	'items' => array('updateExisting' => false, 'createMissing' => false),
 	'discoveryrules' => array('updateExisting' => false, 'createMissing' => false),
@@ -62,6 +63,7 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 		case 'template':
 			$data['rules']['groups'] = array('createMissing' => true);
 			$data['rules']['templates'] = array('updateExisting' => true, 'createMissing' => true);
+			$data['rules']['template_screens'] = array('updateExisting' => true, 'createMissing' => true);
 			$data['rules']['items'] = array('updateExisting' => true, 'createMissing' => true);
 			$data['rules']['discoveryrules'] = array('updateExisting' => true, 'createMissing' => true);
 			$data['rules']['triggers'] = array('updateExisting' => true, 'createMissing' => true);

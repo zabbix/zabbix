@@ -20,10 +20,6 @@
 ?>
 <?php
 /**
- * File containing CAlert class for API.
- * @package API
- */
-/**
  * Class containing methods for operations with Alerts
  *
  */

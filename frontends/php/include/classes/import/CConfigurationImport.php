@@ -195,8 +195,10 @@ class CConfigurationImport {
 			foreach ($template['groups'] as $group) {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
-			foreach ($template['templates'] as $linkedTemplate) {
-				$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
+			if (!empty($template['templates'])) {
+				foreach ($template['templates'] as $linkedTemplate) {
+					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
+				}
 			}
 		}
 
@@ -205,8 +207,10 @@ class CConfigurationImport {
 			foreach ($host['groups'] as $group) {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
-			foreach ($host['templates'] as $linkedTemplate) {
-				$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
+			if (!empty($host['templates'])) {
+				foreach ($host['templates'] as $linkedTemplate) {
+					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
+				}
 			}
 		}
 
