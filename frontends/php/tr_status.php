@@ -190,7 +190,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$tr_select = new CComboBox('show_triggers', $show_triggers);
 	$tr_select->addItem(TRIGGERS_OPTION_ALL, S_ANY);
-	$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, S_PROBLEM);
+	$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
 	$filterForm->addRow(S_TRIGGERS_STATUS, $tr_select);
 
 	if($config['event_ack_enable']){
@@ -296,16 +296,13 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$sortorder = getPageSortOrder();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'filter' => array(),
-		'monitored' => 1,
-		'output' => API_OUTPUT_EXTEND,
-		'skipDependent' => 1,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
-		'limit' => ($config['search_limit']+1)
+		'monitored' => true,
+		'output' => array('triggerid', $sortfield),
+		'skipDependent' => true,
+		'limit' => $config['search_limit'] + 1
 	);
 
-// Filtering
+	// filtering
 	if($pageFilter->hostsSelected){
 		if($pageFilter->hostid > 0)
 			$options['hostids'] = $pageFilter->hostid;
@@ -357,30 +354,36 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
+	$triggerids = zbx_objectValues($triggers, 'triggerid');
+
 	if($config['event_ack_enable']){
-		foreach($triggers as $tnum => $trigger){
-			$options = array(
-				'countOutput' => true,
-				'triggerids' => $trigger['triggerid'],
-				'filter' => array(
-					'object' => EVENT_OBJECT_TRIGGER,
-					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
-					'acknowledged' => 0,
-					'value' => TRIGGER_VALUE_TRUE,
-				),
-				'nopermissions' => true
-			);
-			$triggers[$tnum]['event_count'] = API::Event()->get($options);
+		$options = array(
+			'countOutput' => true,
+			'groupCount' => true,
+			'triggerids' => $triggerids,
+			'filter' => array(
+				'object' => EVENT_OBJECT_TRIGGER,
+				'value_changed' => TRIGGER_VALUE_CHANGED_YES,
+				'acknowledged' => 0,
+				'value' => TRIGGER_VALUE_TRUE
+			),
+			'nopermissions' => true
+		);
+		$event_counts = API::Event()->get($options);
+		foreach ($triggers as $tnum => $trigger) {
+			$triggers[$tnum]['event_count'] = 0;
+		}
+		foreach ($event_counts as $event_count) {
+			$triggers[$event_count['objectid']]['event_count'] = $event_count['rowscount'];
 		}
 	}
 
-
 	$tr_hostids = array();
-	foreach($triggers as $tnum => $trigger){
+	foreach ($triggers as $tnum => $trigger) {
 		$triggers[$tnum]['events'] = array();
 
 		//getting all host ids and names
-		foreach($trigger['hosts'] as $tr_hosts){
+		foreach ($trigger['hosts'] as $tr_hosts) {
 			$tr_hostids[$tr_hosts['hostid']] = $tr_hosts['hostid'];
 		}
 	}
@@ -432,19 +435,28 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 	}
 
-	foreach($triggers as $tnum => $trigger){
+	$trigger_descriptions = expandTriggersDescriptions($triggerids);
 
-		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
+	$dep_res = DBselect(
+		'SELECT triggerid_down,triggerid_up'.
+		' FROM trigger_depends'.
+		' WHERE '.DBcondition('triggerid_up', $triggerids)
+	);
+	$triggerids_down = array();
+	while ($row = DBfetch($dep_res)) {
+		$triggerids_down[$row['triggerid_up']][] = intval($row['triggerid_down']);
+	}
 
+	foreach ($triggers as $tnum => $trigger) {
 		$items = array();
 
 		$used_hosts = array();
-		foreach($trigger['hosts'] as $th){
+		foreach ($trigger['hosts'] as $th) {
 			$used_hosts[$th['hostid']] = $th['name'];
 		}
 		$used_host_count = count($used_hosts);
 
-		foreach($trigger['items'] as $inum => $item){
+		foreach ($trigger['items'] as $inum => $item) {
 			$item_name = itemName($item);
 
 			//if we have items from different hosts, we must prefix a host name
@@ -462,7 +474,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 //----
 
-		$description = new CSpan($description, 'link_menu');
+		$description = new CSpan($trigger_descriptions[$tnum], 'link_menu');
 
 		// trigger js menu
 		$menu_trigger_conf = 'null';
@@ -512,12 +524,12 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
-
-		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$trigger['triggerid'];
-		$dep_res = DBselect($sql_dep);
-		while($dep_row = DBfetch($dep_res)){
-			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
-			$dependency = true;
+		if (!empty($triggerids_down[$trigger['triggerid']])) {
+			$dep_rows = expandTriggersDescriptions($triggerids_down[$trigger['triggerid']]);
+			foreach ($dep_rows as $dep_row) {
+				$dep_table->addRow(SPACE.'-'.SPACE.$dep_row);
+				$dependency = true;
+			}
 		}
 
 		if($dependency){
@@ -707,7 +719,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			}
 		}
 	}
-
 
 //----- GO ------
 	$footer = null;

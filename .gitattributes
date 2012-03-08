@@ -13,6 +13,7 @@ build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
 create/src/data.tmpl -text
+frontends/php/api/classes/CTriggerGeneral.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -106,6 +107,7 @@ frontends/php/images/general/tr_space.gif -text
 frontends/php/images/general/tr_top_bottom.gif -text
 frontends/php/images/general/tr_top_right.gif -text
 frontends/php/images/general/tr_top_right_bottom.gif -text
+frontends/php/images/general/transparent.png -text
 frontends/php/images/general/tree/minus.gif -text
 frontends/php/images/general/tree/plus.gif -text
 frontends/php/images/general/tree/point.gif -text
@@ -173,20 +175,11 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/core/CAutoloader.php -text
-frontends/php/include/classes/core/Z.php -text
-frontends/php/include/classes/core/ZBase.php -text
-frontends/php/include/views/administration.auditacts.list.php -text
-frontends/php/include/views/administration.auditlogs.list.php -text
-frontends/php/include/views/configuration.discovery.list.php -text
-frontends/php/include/views/configuration.host.discovery.list.php -text
-frontends/php/include/views/configuration.item.copy.php -text
-frontends/php/include/views/configuration.item.edit.php -text
-frontends/php/include/views/configuration.item.list.php -text
-frontends/php/include/views/configuration.item.massupdate.php -text
-frontends/php/include/views/configuration.item.prototype.list.php -text
-frontends/php/include/views/js/configuration.item.edit.js.php -text
-frontends/php/include/views/monitoring.discovery.php -text
+frontends/php/include/views/configuration.screen.constructor.edit.php -text
+frontends/php/include/views/configuration.screen.constructor.list.php -text
+frontends/php/include/views/configuration.screen.edit.php -text
+frontends/php/include/views/configuration.screen.list.php -text
+frontends/php/include/views/monitoring.screen.php -text
 frontends/php/js/browsers.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
@@ -248,8 +241,6 @@ frontends/php/styles/originalblue/images/ui-icons_5481ab_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_d40000_256x240.png -text
 frontends/php/styles/originalblue/images/ui-icons_ffffff_256x240.png -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/selenium/testFormAdministrationGeneralTriggerSeverities.php -text
-frontends/php/tests/selenium/testFormItem.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text

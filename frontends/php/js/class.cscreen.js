@@ -17,16 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-var ZBX_SCREENS = [];			// screens obj reference
+var ZBX_SCREENS = []; // screens obj reference
 Position.includeScrollOffsets = true;
 
-// screenid ALWAYS must be a STRING (js doesn't support uint64) !!!!
+// screenid always must be a string (js doesn't support uint64) !
 function init_screen(screenid, obj_id, id) {
 	if (typeof(id) == 'undefined') {
 		id = ZBX_SCREENS.length;
 	}
 
-	if (is_number(screenid) && (screenid > 100000000000000)) {
+	if (is_number(screenid) && screenid > 100000000000000) {
 		throw('Error: Wrong type of arguments passed to function [init_screen]');
 	}
 
@@ -36,14 +36,13 @@ function init_screen(screenid, obj_id, id) {
 
 var Cscreen = Class.create();
 Cscreen.prototype = {
-	id: 0, // inner js class id
+	id: 0,
 	screenid: 0,
 	screen_obj: null, // DOM ref to screen obj
 
 	initialize: function(screenid, obj_id, id) {
 		this.screenid = screenid;
 		this.id = id;
-
 		this.screen_obj = $(obj_id);
 
 		function wedge() {
@@ -56,13 +55,13 @@ Cscreen.prototype = {
 			zIndex: 999,
 			start: function() {
 				if (IE) {
-					Event.observe(document.body, "drag", wedge, false);
-					Event.observe(document.body, "selectstart", wedge, false);
+					Event.observe(document.body, 'drag', wedge, false);
+					Event.observe(document.body, 'selectstart', wedge, false);
 				}
 			}
 		});
 
-		jQuery(".cntr_mdl").droppable({
+		jQuery('.screenitem').droppable({
 			accept: '.draggable',
 			hoverClass: 'ui-sortable-placeholder',
 			drop: this.on_drop,
@@ -83,15 +82,15 @@ Cscreen.prototype = {
 		var params = {
 			ajaxAction: 'sw_pos',
 			output: 'ajax',
-			"sw_pos[0]": y1,
-			"sw_pos[1]": x1,
-			"sw_pos[2]": y2,
-			"sw_pos[3]": x2,
+			'sw_pos[0]': y1,
+			'sw_pos[1]': x1,
+			'sw_pos[2]': y2,
+			'sw_pos[3]': x2,
 			screenid: url.getArgument('screenid'),
 			sid: url.getArgument('sid')
 		};
 
-		jQuery.post("screenedit.php", params, function(data) {
+		jQuery.post('screenedit.php', params, function(data) {
 			if (!isset('result', data) || !data.result) {
 				jQuery('<p>Ajax request error</p>').dialog({
 					modal: true,
