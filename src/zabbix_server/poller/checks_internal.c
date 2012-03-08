@@ -128,7 +128,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			}
 		}
 
-		if (from > to && (unsigned int)-1 != to)
+		if ((unsigned int)-1 != to && from > to)
 		{
 			error = zbx_strdup(error, "parameters represent an invalid interval");
 			goto notsupported;

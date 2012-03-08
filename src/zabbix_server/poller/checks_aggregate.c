@@ -243,7 +243,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 
 		if (FAIL == is_uint_suffix(param, &period))
 		{
-			SET_MSG_RESULT(res, zbx_dsprintf(NULL, "Invalid item parameter: \"%s\"", param));
+			SET_MSG_RESULT(res, zbx_strdup(NULL, "fourth parameter is badly formatted"));
 			goto clean;
 		}
 
