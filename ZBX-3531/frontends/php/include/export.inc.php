@@ -1471,7 +1471,7 @@ class zbxXML{
 								$graph_items[] = $gitem_db;
 							}
 							else{
-								throw new Exception('Item ['.$gitem_db['host_key_'].'] does not updateExisting');
+								throw new Exception('Item ['.$gitem_db['host_key_'].'] does not exists.');
 							}
 						}
 // }}} GRAPH ITEMS

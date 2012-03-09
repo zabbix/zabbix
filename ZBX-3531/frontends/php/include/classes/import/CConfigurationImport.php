@@ -379,7 +379,7 @@ class CConfigurationImport {
 					else {
 						// if the template is not in the system and not in the imported data, throw an error
 						if (!in_array($ref['name'], $templatesInSource)) {
-							throw new Exception(_s('Template "%1$s" does not updateExisting.', $ref['name']));
+							throw new Exception(_s('Template "%1$s" does not exists.', $ref['name']));
 						}
 						$parentTemplateRefs[$template['host']][$ref['name']] = $ref['name'];
 					}
@@ -413,7 +413,7 @@ class CConfigurationImport {
 			$template = $templates[$name];
 			foreach ($template['groups'] as $gnum => $group) {
 				if (!$this->referencer->resolveGroup($group['name'])) {
-					throw new Exception(_s('Group "%1$s" does not updateExisting.', $group['name']));
+					throw new Exception(_s('Group "%1$s" does not exists.', $group['name']));
 				}
 				$template['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
 			}
@@ -471,14 +471,14 @@ class CConfigurationImport {
 		foreach ($hosts as $host) {
 			foreach ($host['groups'] as $gnum => $group) {
 				if (!$this->referencer->resolveGroup($group['name'])) {
-					throw new Exception(_s('Group "%1$s" does not updateExisting.', $group['name']));
+					throw new Exception(_s('Group "%1$s" does not exists.', $group['name']));
 				}
 				$host['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
 			}
 			if (isset($host['templates'])) {
 				foreach ($host['templates'] as $tnum => $template) {
 					if (!$this->referencer->resolveTemplate($template['name'])) {
-						throw new Exception(_s('Template "%1$s" does not updateExisting.', $template['name']));
+						throw new Exception(_s('Template "%1$s" does not exists.', $template['name']));
 					}
 					$host['templates'][$tnum] = array(
 						'templateid' => $this->referencer->resolveHostOrTemplate($template['name'])
