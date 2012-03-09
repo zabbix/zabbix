@@ -1735,4 +1735,35 @@ function bcround($number, $precision = 0) {
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
 }
 
+/**
+ * Converts number to letter representation.
+ * From A to Z, then from AA to ZZ etc.
+ * Example: 0 => A, 25 => Z, 26 => AA, 27 => AB, 52 => BA, ...
+ *
+ * @param int $number
+ *
+ * @return string
+ */
+function num2letter($number) {
+	$start = ord('A');
+	$end = ord('Z');
+	$range = $end - $start + 1;
+	$str = '';
+
+	while (($mul = floor($number / $range)) > 0) {
+		if ($mul > $range) {
+			$str .= chr($start + $range - 1);
+			$number -= $range;
+		}
+		else {
+			$str .= chr($start + $mul - 1);
+			$number -= $number - ($number % $range);
+		}
+
+	}
+
+	$str .= chr($start + $number);
+
+	return $str;
+}
 ?>
