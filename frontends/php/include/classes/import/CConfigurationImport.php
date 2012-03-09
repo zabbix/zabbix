@@ -173,7 +173,6 @@ class CConfigurationImport {
 			DBend(false);
 			throw new Exception($e->getMessage(), $e->getCode());
 		}
-
 	}
 
 	/**
@@ -1320,8 +1319,9 @@ class CConfigurationImport {
 	protected function prepareScreenImport(array $allScreens) {
 		foreach ($allScreens as &$screen) {
 			if (!isset($screen['screenitems'])) {
-				$screen['screenitems'] = array();
+				continue;
 			}
+
 			foreach ($screen['screenitems'] as &$screenitem) {
 				$nodeCaption = isset($screenitem['resource']['node']) ? $screenitem['resource']['node'] . ':' : '';
 
