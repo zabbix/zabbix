@@ -57,7 +57,7 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 			$data['rules']['discoveryrules'] = array('updateExisting' => true, 'createMissing' => true);
 			$data['rules']['triggers'] = array('updateExisting' => true, 'createMissing' => true);
 			$data['rules']['graphs'] = array('updateExisting' => true, 'createMissing' => true);
-			$data['rules']['template_linkages'] = array('createMissing' => true);
+			$data['rules']['template_linkage'] = array('createMissing' => true);
 			break;
 
 		case 'template':
@@ -68,7 +68,7 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 			$data['rules']['discoveryrules'] = array('updateExisting' => true, 'createMissing' => true);
 			$data['rules']['triggers'] = array('updateExisting' => true, 'createMissing' => true);
 			$data['rules']['graphs'] = array('updateExisting' => true, 'createMissing' => true);
-			$data['rules']['template_linkages'] = array('createMissing' => true);
+			$data['rules']['template_linkage'] = array('createMissing' => true);
 			break;
 
 		case 'map':

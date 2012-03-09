@@ -284,7 +284,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
 		$go_result = API::Graph()->delete($_REQUEST['group_graphid']);
-		show_messages($go_result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
+		show_messages($go_result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
 	else if(($_REQUEST['go'] == 'copy_to') && isset($_REQUEST['copy'])&&isset($_REQUEST['group_graphid'])){
 		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type'])){

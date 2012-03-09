@@ -74,7 +74,7 @@ class CConfigurationImport {
 			'hosts' => array('updateExisting' => false, 'createMissing' => false),
 			'templates' => array('updateExisting' => false, 'createMissing' => false),
 			'applications' => array('updateExisting' => false, 'createMissing' => false),
-			'template_linkages' => array('createMissing' => false),
+			'template_linkage' => array('createMissing' => false),
 			'items' => array('updateExisting' => false, 'createMissing' => false),
 			'discoveryrules' => array('updateExisting' => false, 'createMissing' => false),
 			'triggers' => array('updateExisting' => false, 'createMissing' => false),
@@ -356,7 +356,7 @@ class CConfigurationImport {
 			unset($template['screens']);
 
 			// if we don't need to update linkage, unset templates
-			if (!$this->options['template_linkages']['createMissing']) {
+			if (!$this->options['template_linkage']['createMissing']) {
 				unset($template['templates']);
 			}
 		}
@@ -448,7 +448,7 @@ class CConfigurationImport {
 		}
 
 		// if we don't need to update linkage, unset templates
-		if (!$this->options['template_linkages']['createMissing']) {
+		if (!$this->options['template_linkage']['createMissing']) {
 			foreach ($hosts as &$host) {
 				unset($host['templates']);
 			}
