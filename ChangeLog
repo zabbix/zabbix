@@ -17,6 +17,7 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
 A.F....... [ZBX-4333] fixed trigger inheritance when calling trigger.update whithout a trigger expression (Pavels)
 ..F....... [ZBX-4333] fixed host trigger mass update (Pavels)
 ..F....... [ZBX-4333] fixed trigger dependency copying (Pavels)
@@ -485,6 +486,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.11rc1
 
+..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
 A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
 ..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
 ..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)
