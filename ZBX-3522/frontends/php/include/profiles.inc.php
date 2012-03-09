@@ -301,7 +301,7 @@ function add_user_history($page){
 
 	// if url length is greater than db field size, skip history update
 	$historyTableSchema = DB::getSchema('user_history');
-	if (zbx_strlen($url) > $historyTableSchema['fields']['url1']['length']) {
+	if (zbx_strlen($url) > $historyTableSchema['fields']['url5']['length']) {
 		return false;
 	}
 
