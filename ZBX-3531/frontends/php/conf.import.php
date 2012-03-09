@@ -111,7 +111,8 @@ if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])
 
 	try {
 		$fileExtension = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
-		$importReader = CImportReaderFactory::getReader($fileExtension);
+		$importFormat = CImportReader::fileExt2ImportFormat($fileExtension);
+		$importReader = CImportReaderFactory::getReader($importFormat);
 		$fileContent = file_get_contents($_FILES['import_file']['tmp_name']);
 
 		$configurationImport = new CConfigurationImport($fileContent, $data['rules']);

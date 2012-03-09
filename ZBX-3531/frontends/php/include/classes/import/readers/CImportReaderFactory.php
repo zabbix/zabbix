@@ -30,18 +30,18 @@ class CImportReaderFactory {
 	 * @static
 	 * @throws Exception
 	 *
-	 * @param $type
+	 * @param string $format
 	 *
 	 * @return CImportReader
 	 */
-	public static function getReader($type) {
-		switch ($type) {
+	public static function getReader($format) {
+		switch ($format) {
 			case 'xml':
 				return new CXmlImportReader();
 			case 'json':
 				return new CJsonImportReader();
 			default:
-				throw new Exception('Incorrect import reader type.');
+				throw new Exception(_s('Unsupported import format "%1$s".', $format));
 		}
 	}
 }
