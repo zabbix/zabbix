@@ -111,7 +111,7 @@ if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])
 
 	try {
 		$fileExtension = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
-		$importFormat = CImportReader::fileExt2ImportFormat($fileExtension);
+		$importFormat = CImportReaderFactory::fileExt2ImportFormat($fileExtension);
 		$importReader = CImportReaderFactory::getReader($importFormat);
 		$fileContent = file_get_contents($_FILES['import_file']['tmp_name']);
 
