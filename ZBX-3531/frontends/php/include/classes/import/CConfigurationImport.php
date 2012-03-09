@@ -105,7 +105,7 @@ class CConfigurationImport {
 
 	/**
 	 * Import configuration data.
-	 * @todo   for 1.8 version import old class zbxXML is used
+	 * @todo   for 1.8 version import old class CXmlImport18 is used
 	 *
 	 * @throws Exception
 	 * @return bool
@@ -128,15 +128,15 @@ class CConfigurationImport {
 			// if import version is 1.8 we use old class that support it.
 			// old import class process hosts, maps and screens separately.
 			if ($version == '1.8') {
-				zbxXML::import($this->source);
+				CXmlImport18::import($this->source);
 				if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
-					zbxXML::parseMap($this->options);
+					CXmlImport18::parseMap($this->options);
 				}
 				if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
-					zbxXML::parseScreen($this->options);
+					CXmlImport18::parseScreen($this->options);
 				}
 				if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
-					zbxXML::parseMain($this->options);
+					CXmlImport18::parseMain($this->options);
 				}
 			}
 			else {

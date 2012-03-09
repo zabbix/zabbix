@@ -106,9 +106,6 @@ if (isset($_REQUEST['rules'])) {
 }
 
 if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
-	// required for version 1.8 import
-	require_once dirname(__FILE__).'/include/export.inc.php';
-
 	try {
 		$fileExtension = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
 		$importFormat = CImportReaderFactory::fileExt2ImportFormat($fileExtension);
