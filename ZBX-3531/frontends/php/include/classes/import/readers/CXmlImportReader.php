@@ -67,11 +67,11 @@ class CXmlImportReader extends CImportReader {
 	/**
 	 * Method for recursive processing of xml dom nodes.
 	 *
-	 * @param string $xml
+	 * @param XMLReader $xml
 	 *
 	 * @return array|string
 	 */
-	protected function xmlToArray($xml) {
+	protected function xmlToArray(XMLReader $xml) {
 		$array = '';
 		while ($xml->read()) {
 			switch ($xml->nodeType) {

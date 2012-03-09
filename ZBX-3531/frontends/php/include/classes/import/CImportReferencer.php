@@ -54,7 +54,7 @@ class CImportReferencer {
 			$this->selectGroups();
 		}
 
-		return isset($this->groupsRefs[$name]) ? $this->groupsRefs[$name] : false;;
+		return isset($this->groupsRefs[$name]) ? $this->groupsRefs[$name] : false;
 	}
 
 	/**

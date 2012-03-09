@@ -1536,7 +1536,7 @@ class CHost extends CZBXAPI {
 /**
  * Update Host
  *
- * @param _array $hosts multidimensional array with Hosts data
+ * @param array $hosts multidimensional array with Hosts data
  * @param string $hosts['host'] Host name.
  * @param int $hosts['port'] Port. OPTIONAL
  * @param int $hosts['status'] Host Status. OPTIONAL

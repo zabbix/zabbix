@@ -769,11 +769,11 @@ class CItem extends CItemGeneral {
 	/**
 	 * Get itemid by host.name and item.key.
 	 *
-	 * @param array $item_data
-	 * @param array $item_data['key_']
-	 * @param array $item_data['hostid']
+	 * @param array $itemData
+	 * @param array $itemData['key_']
+	 * @param array $itemData['hostid']
 	 *
-	 * @return int|bool
+	 * @return array
 	 */
 	public function getObjects($itemData) {
 		$options = array(
@@ -789,7 +789,7 @@ class CItem extends CItemGeneral {
 
 		$result = $this->get($options);
 
-	return $result;
+		return $result;
 	}
 
 	/**
