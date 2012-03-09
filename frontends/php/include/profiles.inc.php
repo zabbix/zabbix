@@ -26,11 +26,15 @@ class CProfile{
 	private static $profiles = null;
 	private static $update = array();
 	private static $insert = array();
+	private static $stringProfileMaxLength;
 
 	public static function init(){
 		global $USER_DETAILS;
 
 		self::$profiles = array();
+
+		$profilesTableSchema = DB::getSchema('profiles');
+		self::$stringProfileMaxLength = $profilesTableSchema['fields']['value_str']['length'];
 
 		$sql = 'SELECT * '.
 				' FROM profiles '.
@@ -55,7 +59,7 @@ class CProfile{
 			DBstart();
 			foreach(self::$insert as $idx => $profile){
 				foreach($profile as $idx2 => $data){
-					$result = self::insertDB($idx, $data['value'], $data['type'], $idx2);
+					self::insertDB($idx, $data['value'], $data['type'], $idx2);
 				}
 			}
 
@@ -87,8 +91,6 @@ class CProfile{
 	}
 
 	public static function update($idx, $value, $type, $idx2=0){
-		global $USER_DETAILS;
-
 		if(is_null(self::$profiles)){
 			self::init();
 		}
@@ -187,6 +189,9 @@ class CProfile{
 				break;
 			case PROFILE_TYPE_INT:
 				$result = zbx_is_int($value);
+				break;
+			case PROFILE_TYPE_STR:
+				$result = zbx_strlen($value) <= self::$stringProfileMaxLength;
 				break;
 			default:
 				$result = true;
@@ -294,6 +299,12 @@ function add_user_history($page){
 		$url = $page['file'];
 	}
 
+	// if url length is greater than db field size, skip history update
+	$historyTableSchema = DB::getSchema('user_history');
+	if (zbx_strlen($url) > $historyTableSchema['fields']['url5']['length']) {
+		return false;
+	}
+
 	$sql = 'SELECT title5, url5
 			FROM user_history WHERE userid='.$userid;
 	$history5 = DBfetch(DBSelect($sql));
@@ -305,7 +316,7 @@ function add_user_history($page){
 					' WHERE userid='.$userid;
 		}
 		else
-			return; // no need to change anything;
+			return true; // no need to change anything;
 	}
 	else{ // new page with new title is added
 		if($history5 === false){
@@ -330,7 +341,7 @@ function add_user_history($page){
 	}
 	$result = DBexecute($sql);
 
-return $result;
+	return $result;
 }
 /********* END USER HISTORY **********/
 
