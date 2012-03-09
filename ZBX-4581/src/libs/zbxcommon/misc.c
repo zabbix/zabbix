@@ -2095,7 +2095,7 @@ double	str2double(const char *str)
 			factor = ZBX_GIBIBYTE;
 			break;
 		case 'T':
-			factor = ZBX_GIBIBYTE * (double)1024;
+			factor = ZBX_GIBIBYTE * (double)ZBX_KIBIBYTE;
 			break;
 		case 's':
 			break;
@@ -2181,7 +2181,7 @@ int	is_key_char(char c)
  ******************************************************************************/
 int	is_function_char(char c)
 {
-	if (c >= 'a' && c <= 'z')
+	if (0 != islower(c))
 		return SUCCEED;
 
 	return FAIL;

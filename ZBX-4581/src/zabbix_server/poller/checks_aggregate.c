@@ -181,10 +181,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 	else if (0 == strcmp(grpfunc, "grpsum"))
 		grp_func = ZBX_GRP_FUNC_SUM;
 	else
-	{
-		SET_MSG_RESULT(res, zbx_strdup(NULL, "unsupported group function"));
 		goto clean;
-	}
 
 	if (0 == strcmp(itemfunc, "min"))
 		item_func = ZBX_DB_GET_HIST_MIN;
@@ -200,7 +197,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 		item_func = ZBX_DB_GET_HIST_VALUE;
 	else
 	{
-		SET_MSG_RESULT(res, zbx_strdup(NULL, "unsupported item function"));
+		SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid third parameter"));
 		goto clean;
 	}
 
@@ -243,7 +240,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 
 		if (FAIL == is_uint_suffix(param, &period))
 		{
-			SET_MSG_RESULT(res, zbx_strdup(NULL, "fourth parameter is badly formatted"));
+			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter"));
 			goto clean;
 		}
 
@@ -328,7 +325,10 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 
 	if (num_param(params) != 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters"));
 		return NOTSUPPORTED;
+	}
 
 	if (0 != get_param(params, 1, groups, sizeof(groups)))
 		return NOTSUPPORTED;
