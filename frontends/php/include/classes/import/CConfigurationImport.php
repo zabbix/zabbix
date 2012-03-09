@@ -55,6 +55,11 @@ class CConfigurationImport {
 	protected $data;
 
 	/**
+	 * @var array with formatted data recieved from formatter
+	 */
+	protected $formattedData = array();
+
+	/**
 	 * @var array with references to interfaceid (hostid -> reference_name -> interfaceid)
 	 */
 	protected $interfacesCache = array();
@@ -1456,16 +1461,14 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedGroups() {
-		static $groups;
-
-		if ($groups === null) {
-			$groups = array();
+		if (!isset($this->formattedData['groups'])) {
+			$this->formattedData['groups'] = array();
 			if ($this->options['groups']['createMissing']) {
-				$groups = $this->formatter->getGroups();
+				$this->formattedData['groups'] = $this->formatter->getGroups();
 			}
 		}
 
-		return $groups;
+		return $this->formattedData['groups'];
 	}
 
 	/**
@@ -1474,16 +1477,14 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedTemplates() {
-		static $templates;
-
-		if ($templates === null) {
-			$templates = array();
+		if (!isset($this->formattedData['templates'])) {
+			$this->formattedData['templates'] = array();
 			if ($this->options['templates']['updateExisting'] || $this->options['templates']['createMissing']) {
-				$templates = $this->formatter->getTemplates();
+				$this->formattedData['templates'] = $this->formatter->getTemplates();
 			}
 		}
 
-		return $templates;
+		return $this->formattedData['templates'];
 	}
 
 	/**
@@ -1492,16 +1493,14 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedHosts() {
-		static $hosts;
-
-		if ($hosts === null) {
-			$hosts = array();
+		if (!isset($this->formattedData['hosts'])) {
+			$this->formattedData['hosts'] = array();
 			if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
-				$hosts = $this->formatter->getHosts();
+				$this->formattedData['hosts'] = $this->formatter->getHosts();
 			}
 		}
 
-		return $hosts;
+		return $this->formattedData['hosts'];
 	}
 
 	/**
@@ -1510,19 +1509,17 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedApplications() {
-		static $applications;
-
-		if ($applications === null) {
-			$applications = array();
+		if (!isset($this->formattedData['applications'])) {
+			$this->formattedData['applications'] = array();
 			if ($this->options['templates']['updateExisting']
 					|| $this->options['templates']['createMissing']
 					|| $this->options['hosts']['updateExisting']
 					|| $this->options['hosts']['createMissing']) {
-				$applications = $this->formatter->getApplications();
+				$this->formattedData['applications'] = $this->formatter->getApplications();
 			}
 		}
 
-		return $applications;
+		return $this->formattedData['applications'];
 	}
 
 	/**
@@ -1531,16 +1528,14 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedItems() {
-		static $items;
-
-		if ($items === null) {
-			$items = array();
+		if (!isset($this->formattedData['items'])) {
+			$this->formattedData['items'] = array();
 			if ($this->options['items']['updateExisting'] || $this->options['items']['createMissing']) {
-				$items = $this->formatter->getItems();
+				$this->formattedData['items'] = $this->formatter->getItems();
 			}
 		}
 
-		return $items;
+		return $this->formattedData['items'];
 	}
 
 	/**
@@ -1549,16 +1544,14 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedDiscoveryRules() {
-		static $discoveryRules;
-
-		if ($discoveryRules === null) {
-			$discoveryRules = array();
+		if (!isset($this->formattedData['discoveryRules'])) {
+			$this->formattedData['discoveryRules'] = array();
 			if ($this->options['discoveryRules']['updateExisting'] || $this->options['discoveryRules']['createMissing']) {
-				$discoveryRules = $this->formatter->getDiscoveryRules();
+				$this->formattedData['discoveryRules'] = $this->formatter->getDiscoveryRules();
 			}
 		}
 
-		return $discoveryRules;
+		return $this->formattedData['discoveryRules'];
 	}
 
 	/**
@@ -1567,16 +1560,14 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedTriggers() {
-		static $triggers;
-
-		if ($triggers === null) {
-			$triggers = array();
+		if (!isset($this->formattedData['triggers'])) {
+			$this->formattedData['triggers'] = array();
 			if ($this->options['triggers']['updateExisting'] || $this->options['triggers']['createMissing']) {
-				$triggers = $this->formatter->getTriggers();
+				$this->formattedData['triggers'] = $this->formatter->getTriggers();
 			}
 		}
 
-		return $triggers;
+		return $this->formattedData['triggers'];
 	}
 
 	/**
@@ -1585,16 +1576,14 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedGraphs() {
-		static $graphs;
-
-		if ($graphs === null) {
-			$graphs = array();
+		if (!isset($this->formattedData['graphs'])) {
+			$this->formattedData['graphs'] = array();
 			if ($this->options['graphs']['updateExisting'] || $this->options['graphs']['createMissing']) {
-				$graphs = $this->formatter->getGraphs();
+				$this->formattedData['graphs'] = $this->formatter->getGraphs();
 			}
 		}
 
-		return $graphs;
+		return $this->formattedData['graphs'];
 	}
 
 	/**
@@ -1603,17 +1592,15 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedImages() {
-		static $images;
-
-		if ($images === null) {
-			$images = array();
+		if (!isset($this->formattedData['images'])) {
+			$this->formattedData['images'] = array();
 			if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN
 					&& $this->options['images']['updateExisting'] || $this->options['images']['createMissing']) {
-				$images = $this->formatter->getImages();
+				$this->formattedData['images'] = $this->formatter->getImages();
 			}
 		}
 
-		return $images;
+		return $this->formattedData['images'];
 	}
 
 	/**
@@ -1622,16 +1609,14 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedMaps() {
-		static $maps;
-
-		if ($maps === null) {
-			$maps = array();
+		if (!isset($this->formattedData['maps'])) {
+			$this->formattedData['maps'] = array();
 			if ($this->options['maps']['updateExisting'] || $this->options['maps']['createMissing']) {
-				$maps = $this->formatter->getMaps();
+				$this->formattedData['maps'] = $this->formatter->getMaps();
 			}
 		}
 
-		return $maps;
+		return $this->formattedData['maps'];
 	}
 
 	/**
@@ -1640,16 +1625,14 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedScreens() {
-		static $screens;
-
-		if ($screens === null) {
-			$screens = array();
+		if (!isset($this->formattedData['screens'])) {
+			$this->formattedData['screens'] = array();
 			if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
-				$screens = $this->formatter->getScreens();
+				$this->formattedData['screens'] = $this->formatter->getScreens();
 			}
 		}
 
-		return $screens;
+		return $this->formattedData['screens'];
 	}
 
 	/**
@@ -1658,15 +1641,13 @@ class CConfigurationImport {
 	 * @return array
 	 */
 	protected function getFormattedTemplateScreens() {
-		static $screens;
-
-		if ($screens === null) {
-			$screens = array();
+		if (!isset($this->formattedData['templateScreens'])) {
+			$this->formattedData['templateScreens'] = array();
 			if ($this->options['templateScreens']['updateExisting'] || $this->options['templateScreens']['createMissing']) {
-				$screens = $this->formatter->getTemplateScreens();
+				$this->formattedData['templateScreens'] = $this->formatter->getTemplateScreens();
 			}
 		}
 
-		return $screens;
+		return $this->formattedData['templateScreens'];
 	}
 }
