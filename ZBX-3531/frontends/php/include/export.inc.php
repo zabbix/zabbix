@@ -1462,7 +1462,7 @@ class zbxXML{
 									'editable' => 1
 								));
 								if(empty($current_item)){
-									throw new Exception('No permission for Item ['.$gitem_db['key_'].']');
+									throw new Exception(_s('No permission for item "%1$s".', $gitem_db['key_']));
 								}
 								$current_item = reset($current_item);
 
@@ -1471,7 +1471,7 @@ class zbxXML{
 								$graph_items[] = $gitem_db;
 							}
 							else{
-								throw new Exception('Item ['.$gitem_db['host_key_'].'] does not exists.');
+								throw new Exception(_s('Item "%1$s" does not exists.', $gitem_db['host_key_']));
 							}
 						}
 // }}} GRAPH ITEMS
