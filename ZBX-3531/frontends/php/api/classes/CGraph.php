@@ -1045,7 +1045,7 @@ class CGraph extends CZBXAPI {
 // EXCEPTION: GRAPH FIELDS {{{
 			$fields = array('name' => null);
 			if (!$update && !check_db_fields($fields, $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for graph'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for graph.'));
 			}
 // }}} EXCEPTION: GRAPH FIELDS
 
@@ -1057,9 +1057,9 @@ class CGraph extends CZBXAPI {
 
 // EXCEPTION: ITEMS FIELDS {{{
 			$fields = array('itemid' => null);
-			foreach ($graph['gitems'] as $ginum => $gitem) {
+			foreach ($graph['gitems'] as $gitem) {
 				if (!check_db_fields($fields, $gitem)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for items'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for items.'));
 				}
 			}
 // }}} EXCEPTION: ITEMS FIELDS

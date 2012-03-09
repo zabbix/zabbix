@@ -73,10 +73,11 @@ class CConfigurationImport {
 			'groups' => array('createMissing' => false),
 			'hosts' => array('updateExisting' => false, 'createMissing' => false),
 			'templates' => array('updateExisting' => false, 'createMissing' => false),
+			'templateScreens' => array('updateExisting' => false, 'createMissing' => false),
 			'applications' => array('updateExisting' => false, 'createMissing' => false),
-			'template_linkage' => array('createMissing' => false),
+			'templateLinkage' => array('createMissing' => false),
 			'items' => array('updateExisting' => false, 'createMissing' => false),
-			'discoveryrules' => array('updateExisting' => false, 'createMissing' => false),
+			'discoveryRules' => array('updateExisting' => false, 'createMissing' => false),
 			'triggers' => array('updateExisting' => false, 'createMissing' => false),
 			'graphs' => array('updateExisting' => false, 'createMissing' => false),
 			'screens' => array('updateExisting' => false, 'createMissing' => false),
@@ -356,7 +357,7 @@ class CConfigurationImport {
 			unset($template['screens']);
 
 			// if we don't need to update linkage, unset templates
-			if (!$this->options['template_linkage']['createMissing']) {
+			if (!$this->options['templateLinkage']['createMissing']) {
 				unset($template['templates']);
 			}
 		}
@@ -448,7 +449,7 @@ class CConfigurationImport {
 		}
 
 		// if we don't need to update linkage, unset templates
-		if (!$this->options['template_linkage']['createMissing']) {
+		if (!$this->options['templateLinkage']['createMissing']) {
 			foreach ($hosts as &$host) {
 				unset($host['templates']);
 			}
@@ -1291,10 +1292,10 @@ class CConfigurationImport {
 		}
 
 
-		if ($this->options['template_screens']['createMissing'] && $screensToCreate) {
+		if ($this->options['templateScreens']['createMissing'] && $screensToCreate) {
 			API::TemplateScreen()->create($screensToCreate);
 		}
-		if ($this->options['template_screens']['updateExisting'] && $screensToUpdate) {
+		if ($this->options['templateScreens']['updateExisting'] && $screensToUpdate) {
 			API::TemplateScreen()->update($screensToUpdate);
 		}
 	}
@@ -1553,7 +1554,7 @@ class CConfigurationImport {
 
 		if ($discoveryRules === null) {
 			$discoveryRules = array();
-			if ($this->options['discoveryrules']['updateExisting'] || $this->options['discoveryrules']['createMissing']) {
+			if ($this->options['discoveryRules']['updateExisting'] || $this->options['discoveryRules']['createMissing']) {
 				$discoveryRules = $this->formatter->getDiscoveryRules();
 			}
 		}
@@ -1662,7 +1663,7 @@ class CConfigurationImport {
 
 		if ($screens === null) {
 			$screens = array();
-			if ($this->options['template_screens']['updateExisting'] || $this->options['template_screens']['createMissing']) {
+			if ($this->options['templateScreens']['updateExisting'] || $this->options['templateScreens']['createMissing']) {
 				$screens = $this->formatter->getTemplateScreens();
 			}
 		}
