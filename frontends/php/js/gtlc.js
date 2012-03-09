@@ -47,7 +47,7 @@ addObject: function(domid, time, objData){
 		'loadScroll': 1,
 		'scrollWidthByImage': 0,
 		'mainObject': 0,						// object on changing will reflect on all others
-		'sliderMaximumTimePeriod': 63072000		// maximal allowed period - count of seconds in maximal allowed years count
+		'sliderMaximumTimePeriod': null 		// max period in seconds
 	};
 
 	for(var key in this.objectList[domid]){
@@ -407,7 +407,7 @@ _period: null,					// selected period
 _now: false,					// state if time is set to NOW
 
 minperiod: 3600,				// minimal allowed period
-maxperiod: 63072000,			// maximal allowed period - count of seconds in maximal allowed years count
+maxperiod: null,			    // max period in seconds
 
 initialize: function($super,id, period, starttime, usertime, endtime, maximumperiod) {
 	this.timelineid = id;
@@ -609,7 +609,7 @@ arrow: '',					// pressed arrow (l/r)
 changed: 0,					// switches to 1, when scrollbar been moved or period changed
 fixedperiod: 1,				// fixes period on bar changes
 disabled: 1,				// activates/disables scrollbars
-maxperiod: 63072000,		// maximal allowed period - count of seconds in maximal allowed years count
+maxperiod: null,		    // max period in seconds
 
 initialize: function($super,sbid, timelineid, width, fixedperiod, maximalperiod) { // where to put bar on start(time on graph)
 	this.scrollbarid = sbid;
@@ -1814,10 +1814,11 @@ endResize: function(){
 
 calcResizeByPX: function(px){
 	this.debug('calcResizeByPX');
-// -px: moveLeft, +px: moveRight
 
 	px = parseInt(px,10);
 	this.flip = 0;
+
+	// resize from the left
 	if(this.sideToMove == 0){
 		this.flip =  this.start.rightSide - (this.start.leftSide + px);
 		if(this.flip < 0){
@@ -1829,6 +1830,7 @@ calcResizeByPX: function(px){
 			this.current.rightSide = this.start.rightSide;
 		}
 	}
+	// resize from the right
 	else if(this.sideToMove == 1){
 		this.flip = (this.start.rightSide + px) - this.start.leftSide;
 		if(this.flip < 0){
@@ -1842,7 +1844,6 @@ calcResizeByPX: function(px){
 	}
 
 	this.current.width = this.current.rightSide - this.current.leftSide;
-//SDI(this.current.width+' = '+this.current.rightSide+' - '+this.current.leftSide);
 },
 
 resizeBox: function(px){

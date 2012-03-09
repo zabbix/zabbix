@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CComboBox extends CTag {
+
 	public $value;
 
 	public function __construct($name = 'combobox', $value = null, $action = null, $items = null) {
@@ -94,6 +96,7 @@ class CComboBox extends CTag {
 }
 
 class COptGroup extends CTag {
+
 	public function __construct($label) {
 		parent::__construct('optgroup', 'yes');
 		$this->setAttribute('label', $label);

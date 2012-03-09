@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "applications";');
 $applicationWidget = new CWidget();
 
 // append host summary to widget header
@@ -94,6 +93,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "applications";');
 
 // append table to form
 $applicationForm->addItem(array($this->data['paging'], $applicationTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

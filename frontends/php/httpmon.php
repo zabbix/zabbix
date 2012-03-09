@@ -269,7 +269,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				SPACE.S_ERROR.': '.$httptest_data['error'];
 			$status['style'] = 'disabled';
 		}
-		else{
+		else {
 			$status['msg'] = _('OK');
 			$status['style'] = 'enabled';
 		}

@@ -157,7 +157,7 @@
 				$status['style'] = 'disabled';
 			}
 			elseif ($httptest_data['lastfailedstep'] < $httpstep_data['no']) {
-				$status['msg'] = S_UNKNOWN;
+				$status['msg'] = _('Unknown');
 				$status['style'] = 'unknown';
 				$status['skip'] = true;
 			}
@@ -281,7 +281,8 @@
 		'loadScroll' => 0,
 		'dynamic' => 1,
 		'mainObject' => 1,
-		'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1)
+		'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
+		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 	);
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 
@@ -306,7 +307,8 @@
 		'loadScroll' => 0,
 		'dynamic' => 1,
 		'mainObject' => 1,
-		'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1)
+		'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
+		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 	);
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 //-------------
@@ -321,7 +323,8 @@
 		'scrollWidthByImage' => 0,
 		'dynamic' => 1,
 		'mainObject' => 1,
-		'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1)
+		'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
+		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 	);
 
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
