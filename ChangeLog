@@ -2,6 +2,7 @@
 Changes for 1.9.10
 
 New features:
+...G...PS. [ZBX-4581] added time unit symbols support to aggregate items (dimir)
 A.F....... [ZBX-4333] implemented dependency validation in trigger::adddependencies (Pavels)
 A.F....... [ZBX-4333] implemented dependency inheritance in the trigger.adddependencies and trigger.deletedependencies methods (Pavels)
 ..F....... [ZBXNEXT-904] redesign Configuration->Screens (Eduard)
