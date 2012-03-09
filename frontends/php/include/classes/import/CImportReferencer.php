@@ -187,7 +187,7 @@ class CImportReferencer {
 			$this->selectIconMaps();
 		}
 
-		return isset($this->iconMapsRefs[$name]) ? $this->iconMapsRefs[$name] : false;;
+		return isset($this->iconMapsRefs[$name]) ? $this->iconMapsRefs[$name] : false;
 	}
 
 	/**

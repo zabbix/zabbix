@@ -1004,8 +1004,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['images']['createMissing']) {
-			$allImages = array_values($allImages);
-			API::Image()->create($allImages);
+			API::Image()->create(array_values($allImages));
 		}
 
 		if ($this->options['images']['updateExisting']) {

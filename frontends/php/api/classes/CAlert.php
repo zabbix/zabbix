@@ -21,7 +21,6 @@
 <?php
 /**
  * Class containing methods for operations with Alerts
- *
  */
 class CAlert extends CZBXAPI {
 
