@@ -279,7 +279,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
 		$go_result = API::GraphPrototype()->delete($_REQUEST['group_graphid']);
-		show_messages($go_result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
+		show_messages($go_result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
