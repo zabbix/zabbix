@@ -52,7 +52,7 @@ if (ZBX_DISTRIBUTED) {
 		$nodeTable->addRow(array(
 			$node['nodeid'],
 			array(
-				et_node_path($node['masterid']),
+				get_node_path($node['masterid']),
 				new CLink($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name'], '?&form=update&nodeid='.$node['nodeid'])
 			),
 			new CSpan($node['ip'].':'.$node['port'], $node['nodetype'] ? 'bold' : null)
