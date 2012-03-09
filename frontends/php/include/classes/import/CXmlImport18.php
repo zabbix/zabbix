@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class zbxXML{
+
+class CXmlImport18 {
+
 	private static $xml = null;
 	private static $ZBX_EXPORT_MAP = array(
 		XML_TAG_HOST => array(
@@ -345,7 +347,7 @@ class zbxXML{
 			}
 		}
 
-	return $array;
+		return $array;
 	}
 
 	private static function mapXML2arr($xml, $tag){
@@ -468,7 +470,7 @@ class zbxXML{
 								$tmp = reset($db_hostgroups);
 								$screenitem['resourceid'] = $tmp['groupid'];
 							}
-						break;
+							break;
 						case SCREEN_RESOURCE_HOST_TRIGGERS:
 							$db_hosts = API::Host()->getObjects($screenitem['resourceid']);
 							if(empty($db_hosts)){
@@ -478,7 +480,7 @@ class zbxXML{
 
 							$tmp = reset($db_hosts);
 							$screenitem['resourceid'] = $tmp['hostid'];
-						break;
+							break;
 						case SCREEN_RESOURCE_GRAPH:
 							$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
 							if(empty($db_graphs)){
@@ -488,7 +490,7 @@ class zbxXML{
 
 							$tmp = reset($db_graphs);
 							$screenitem['resourceid'] = $tmp['graphid'];
-						break;
+							break;
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$db_items = API::Item()->getObjects($screenitem['resourceid']);
@@ -500,7 +502,7 @@ class zbxXML{
 
 							$tmp = reset($db_items);
 							$screenitem['resourceid'] = $tmp['itemid'];
-						break;
+							break;
 						case SCREEN_RESOURCE_MAP:
 							$db_sysmaps = API::Map()->getObjects($screenitem['resourceid']);
 							if(empty($db_sysmaps)){
@@ -510,7 +512,7 @@ class zbxXML{
 
 							$tmp = reset($db_sysmaps);
 							$screenitem['resourceid'] = $tmp['sysmapid'];
-						break;
+							break;
 						case SCREEN_RESOURCE_SCREEN:
 							$db_screens = API::Screen()->get(array('screenids' => $screenitem['resourceid']));
 							if(empty($db_screens)){
@@ -520,10 +522,10 @@ class zbxXML{
 
 							$tmp = reset($db_screens);
 							$screenitem['resourceid'] = $tmp['screenid'];
-						break;
+							break;
 						default:
 							$screenitem['resourceid'] = 0;
-						break;
+							break;
 					}
 				}
 			}
@@ -568,7 +570,7 @@ class zbxXML{
 			foreach($images as $inum => $image){
 				if(API::Image()->exists($image)){
 					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['updateExisting']))
-						|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['updateExisting']))))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['updateExisting']))))
 					{
 
 						$options = array(
@@ -589,7 +591,7 @@ class zbxXML{
 				}
 				else{
 					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['createMissing']))
-						|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['images']['createMissing'])))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['images']['createMissing'])))
 					{
 
 						// No need to decode_base64
@@ -694,7 +696,7 @@ class zbxXML{
 
 						$tmp = reset($db_sysmaps);
 						$selement['elementid'] = $tmp['sysmapid'];
-					break;
+						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
 						if(empty($db_hostgroups)){
@@ -704,7 +706,7 @@ class zbxXML{
 
 						$tmp = reset($db_hostgroups);
 						$selement['elementid'] = $tmp['groupid'];
-					break;
+						break;
 					case SYSMAP_ELEMENT_TYPE_HOST:
 						$db_hosts = API::Host()->getObjects($selement['elementid']);
 						if(empty($db_hosts)){
@@ -714,7 +716,7 @@ class zbxXML{
 
 						$tmp = reset($db_hosts);
 						$selement['elementid'] = $tmp['hostid'];
-					break;
+						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$db_triggers = API::Trigger()->getObjects($selement['elementid']);
 						if(empty($db_triggers)){
@@ -724,7 +726,7 @@ class zbxXML{
 
 						$tmp = reset($db_triggers);
 						$selement['elementid'] = $tmp['triggerid'];
-					break;
+						break;
 					case SYSMAP_ELEMENT_TYPE_IMAGE:
 					default:
 				}
@@ -851,9 +853,9 @@ class zbxXML{
 					foreach($items as $item){
 						$item_db = self::mapXML2arr($item, XML_TAG_ITEM);
 						if(($item_db['type'] == ITEM_TYPE_SNMPV1
-							|| $item_db['type'] == ITEM_TYPE_SNMPV2C
-							|| $item_db['type'] == ITEM_TYPE_SNMPV3)
-							&& !isset($snmp_interface_ports_created[$item_db['snmp_port']])
+								|| $item_db['type'] == ITEM_TYPE_SNMPV2C
+								|| $item_db['type'] == ITEM_TYPE_SNMPV3)
+								&& !isset($snmp_interface_ports_created[$item_db['snmp_port']])
 						){
 
 							$interfaces[] = array(
@@ -1155,13 +1157,13 @@ class zbxXML{
 							switch ($interface['type']) {
 								case INTERFACE_TYPE_AGENT:
 									$agent_interface_id = $interface['interfaceid'];
-								break;
+									break;
 								case INTERFACE_TYPE_IPMI:
 									$ipmi_interface_id = $interface['interfaceid'];
-								break;
+									break;
 								case INTERFACE_TYPE_SNMP:
 									$snmp_interfaces[$interface['port']] = $interface['interfaceid'];
-								break;
+									break;
 							}
 						}
 					}
@@ -1616,7 +1618,7 @@ class zbxXML{
 
 												$tmp = reset($db_graphs);
 												$screenitem['resourceid'] = $tmp['graphid'];
-											break;
+												break;
 											case SCREEN_RESOURCE_SIMPLE_GRAPH:
 											case SCREEN_RESOURCE_PLAIN_TEXT:
 												$db_items = API::Item()->getObjects($screenitem['resourceid']);
@@ -1628,10 +1630,10 @@ class zbxXML{
 
 												$tmp = reset($db_items);
 												$screenitem['resourceid'] = $tmp['itemid'];
-											break;
+												break;
 											default:
 												$screenitem['resourceid'] = 0;
-											break;
+												break;
 										}
 									}
 								}

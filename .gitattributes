@@ -178,6 +178,7 @@ frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/helpers/CArrayHelper.php -text
+frontends/php/include/classes/import/CXmlImport18.php -text
 frontends/php/include/views/conf.import.php -text
 frontends/php/include/views/configuration.screen.constructor.edit.php -text
 frontends/php/include/views/configuration.screen.constructor.list.php -text

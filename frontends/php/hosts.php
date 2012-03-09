@@ -26,9 +26,7 @@ if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['h
 	$EXPORT_DATA = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	$page['file'] = 'zbx_hosts_export.xml';
-
-	require_once dirname(__FILE__).'/include/export.inc.php';
+	$page['file'] = 'zbx_export.xml';
 }
 else{
 	$EXPORT_DATA = false;
