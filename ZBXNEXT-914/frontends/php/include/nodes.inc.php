@@ -25,7 +25,8 @@ function update_node_profile($nodeids) {
 
 	foreach ($nodeids as $nodeid) {
 		DBexecute('INSERT INTO profiles (profileid,userid,idx,value_id,type)'.
-					' VALUES ('.get_dbid('profiles', 'profileid').','.CWebUser::$data['userid'].','.zbx_dbstr('web.nodes.selected').','.$nodeid.',4)');
+					' VALUES ('.get_dbid('profiles', 'profileid').','.CWebUser::$data['userid'].','
+						.zbx_dbstr('web.nodes.selected').','.$nodeid.',4)');
 	}
 	DBend();
 }
@@ -33,7 +34,12 @@ function update_node_profile($nodeids) {
 function get_node_profile($default = null) {
 	$result = array();
 
-	$db_profiles = DBselect('SELECT p.value_id FROM profiles p WHERE p.userid='.CWebUser::$data['userid'].' AND p.idx='.zbx_dbstr('web.nodes.selected'));
+	$db_profiles = DBselect(
+		'SELECT p.value_id'.
+		' FROM profiles p'.
+		' WHERE p.userid='.CWebUser::$data['userid'].
+			' AND p.idx='.zbx_dbstr('web.nodes.selected')
+	);
 	while ($profile = DBfetch($db_profiles)) {
 		$result[] = $profile['value_id'];
 	}
@@ -57,13 +63,13 @@ function init_nodes() {
 
 	if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && ZBX_DISTRIBUTED) {
 		if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-			$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n ';
+			$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n';
 		}
 		else {
 			$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid'.
 					' FROM nodes n,groups hg,rights r,users_groups g'.
 					' WHERE r.id=hg.groupid'.
-						' AND r.groupid=g.usrgrpid '.
+						' AND r.groupid=g.usrgrpid'.
 						' AND g.userid='.CWebUser::$data['userid'].
 						' AND n.nodeid='.DBid2nodeid('hg.groupid');
 		}
@@ -315,8 +321,8 @@ function delete_node($nodeid) {
 	}
 	else {
 		$result = (
-			DBexecute('update nodes set masterid=NULL where masterid='.$nodeid) &&
-			DBexecute('delete from nodes where nodeid='.$nodeid)
+			DBexecute('UPDATE nodes SET masterid=NULL WHERE masterid='.$nodeid) &&
+			DBexecute('DELETE FROM nodes WHERE nodeid='.$nodeid)
 		);
 		error(_('Please be aware that database still contains data related to the deleted node.'));
 	}

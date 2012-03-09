@@ -90,8 +90,8 @@ if($_REQUEST['hostid'] > 0){
 // list of hosts
 else{
 	$r_form = new CForm('get');
-	$r_form->addItem(array(_('Group'), $pageFilter->getGroupsCB(true)));
-	$hostinvent_wdgt->addHeader(_('HOSTS'), $r_form);
+	$r_form->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(true)));
+	$hostinvent_wdgt->addHeader(_('Hosts'), $r_form);
 
 	// HOST INVENTORY FILTER {{{
 	if(isset($_REQUEST['filter_set'])){

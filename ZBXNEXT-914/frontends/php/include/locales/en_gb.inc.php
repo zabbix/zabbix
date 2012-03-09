@@ -89,7 +89,6 @@
 	'S_BULK_ACKNOWLEDGE'=>			_('Bulk acknowledge'),
 
 //	actionconf.php
-	'S_CONFIGURATION_OF_ACTIONS'=>		_('Configuration of actions'),
 	'S_FILTER'=>				_('Filter'),
 
 //	actions.php
@@ -271,7 +270,6 @@
 //	items.php
 	'S_DESCRIPTION'=>					_('Description'),
 	'S_HISTORY'=>						_('History'),
-	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
 	'S_ITEM'=>						_('Item'),
 
 // disc_prototypes.php
@@ -293,13 +291,11 @@
 	'S_URLS'=>				_('URLs'),
 	'S_LABEL'=>				_('Label'),
 	'S_X'=>					_('X'),
-	'S_CONFIGURATION_OF_NETWORK_MAPS'=>	_('Configuration of network maps'),
 	'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 
 //	sysmaps.php
 	'S_MAP_DELETED'=>			_('Network map deleted'),
 	'S_CANNOT_DELETE_MAP'=>			_('Cannot delete network map'),
-	'S_MAPS_BIG'=>					_('MAPS'),
 	'S_CREATE_MAP'=>				_('Create map'),
 	'S_IMPORT_MAP'=>				_('Import map'),
 	'S_DELETE_SELECTED_MAPS_Q'=>		_('Delete selected maps?'),
@@ -333,7 +329,6 @@
 	'S_EVENT_ACKNOWLEDGING_DISABLED' => _('Event acknowledging disabled'),
 
 //	maps.php
-	'S_NETWORK_MAPS'=>		_('Network maps'),
 	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 
 //	media.php
@@ -364,7 +359,6 @@
 	'S_PROBLEM_DISPLAY' => _('Problem display'),
 
 //	overview.php
-	'S_OVERVIEW'=>				_('Overview'),
 	'S_OVERVIEW_BIG'=>			_('OVERVIEW'),
 	'S_HOSTS_LOCATION'=>			_('Hosts location'),
 	'S_DATA'=>				_('Data'),
@@ -376,9 +370,6 @@
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
 //	report1.php
-	'S_REPORT_BIG'=>			_('REPORT'),
-	'S_STATUS_OF_ZABBIX'=>			_('Status of Zabbix'),
-	'S_STATUS_OF_ZABBIX_BIG'=>		_('STATUS OF ZABBIX'),
 	'S_VALUE'=>				_('Value'),
 	'S_VALUES_STORED'=>			_('Values stored'),
 	'S_TRENDS_STORED'=>			_('Trends stored'),
@@ -504,10 +495,7 @@
 	'S_REMOVE_FROM'=>			_('Remove from'),
 
 //scripts.php
-	'S_SCRIPTS'=>				_('Scripts'),
 	'S_CLOSE'=>					_('Close'),
-	'S_SCRIPT_ERROR'=>					_('SCRIPT ERROR'),
-	'S_SCRIPT_ERROR'=>					_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'),
 
 //	audit.php
 

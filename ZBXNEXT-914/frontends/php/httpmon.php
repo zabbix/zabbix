@@ -139,7 +139,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
 
-	$httpmon_wdgt->addHeader(S_WEB_CHECKS_BIG, $r_form);
+	$httpmon_wdgt->addHeader(_('Web checks'), $r_form);
 	$httpmon_wdgt->addItem(SPACE);
 
 // TABLE

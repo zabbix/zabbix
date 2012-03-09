@@ -54,10 +54,10 @@ $form->addItem($cmbPeriod);
 
 $rprt_wdgt->addPageHeader(_('MOST BUSY TRIGGERS TOP 100'));
 
-$rprt_wdgt->addHeader(_('REPORT'), $form);
+$rprt_wdgt->addHeader(_('Report'), $form);
 $rprt_wdgt->addItem(BR());
 
-$table = new CTableInfo();
+$table = new CTableInfo(_('No hosts defined.'));
 $table->setHeader(array(
 	is_show_all_nodes() ? _('Node') : null,
 	_('Host'),

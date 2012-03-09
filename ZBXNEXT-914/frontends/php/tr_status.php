@@ -174,7 +174,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$numrows = new CDiv();
 	$numrows->setAttribute('name', 'numrows');
-	$trigg_wdgt->addHeader(_('TRIGGERS'), $r_form);
+	$trigg_wdgt->addHeader(_('Triggers'), $r_form);
 	$trigg_wdgt->addHeader($numrows);
 
 /************************* FILTER **************************/

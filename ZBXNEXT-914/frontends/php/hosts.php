@@ -22,21 +22,21 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['hosts'])){
-	$EXPORT_DATA = true;
-
+if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['hosts'])) {
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 	$page['file'] = 'zbx_hosts_export.xml';
 
+	$EXPORT_DATA = true;
+
 	require_once dirname(__FILE__).'/include/export.inc.php';
 }
-else{
-	$EXPORT_DATA = false;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = 'S_HOSTS';
+else {
+	$page['title'] = _('Hosts');
 	$page['file'] = 'hosts.php';
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['hist_arg'] = array('groupid');
+
+	$EXPORT_DATA = false;
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -719,14 +719,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 	$frmForm = new CForm();
-	if(!isset($_REQUEST['form'])){
-// removes form_refresh variable
+	if (!isset($_REQUEST['form'])) {
 		$frmForm->cleanItems();
 		$buttons = new CDiv(array(
-			new CSubmit('form', S_CREATE),
+			new CSubmit('form', _('Create host')),
 			new CSubmit('form', S_IMPORT)
 		));
-		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);
 	}
 
@@ -735,7 +733,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$options = array(
 		'groups' => array(
 			'real_hosts' => 1,
-			'editable' => 1,
+			'editable' => true
 		),
 		'groupid' => get_request('groupid', null),
 	);
@@ -747,10 +745,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 	if (($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])) {
+		$hosts_wdgt->addPageHeader(_('CONFIGURATION OF HOSTS'));
+
 		$hostForm = new CView('configuration.host.massupdate');
 		$hosts_wdgt->addItem($hostForm->render());
 	}
 	elseif (isset($_REQUEST['form'])) {
+		$hosts_wdgt->addPageHeader(_('CONFIGURATION OF HOSTS'));
+
 		if ($_REQUEST['form'] == S_IMPORT)
 			$hosts_wdgt->addItem(import_host_form());
 		else {
@@ -763,16 +765,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 	}
 	else {
+		$hosts_wdgt->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
+
 		$frmGroup = new CForm();
 		$frmGroup->setMethod('get');
 
 		$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
-		$numrows = new CDiv();
-		$numrows->setAttribute('name', 'numrows');
-
-		$hosts_wdgt->addHeader(_('HOSTS'), $frmGroup);
-		$hosts_wdgt->addHeader($numrows, $frmForm);
+		$hosts_wdgt->addHeader(_('Hosts'), $frmGroup);
+		$hosts_wdgt->addHeaderRowNumber();
 
 // HOSTS FILTER {{{
 		$filter_table = new CTable('', 'filter_config');
