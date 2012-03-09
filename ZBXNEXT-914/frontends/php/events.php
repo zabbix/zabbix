@@ -510,7 +510,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		else{
 			$table->setHeader(array(
 				S_TIME,
-				is_show_all_nodes()?S_NODE:null,
+				is_show_all_nodes() ? _('Node') : null,
 				($_REQUEST['hostid'] == 0)?S_HOST:null,
 				_('Description'),
 				S_STATUS,
@@ -523,7 +523,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			if($CSV_EXPORT){
 				$csvRows[] = array(
 					S_TIME,
-					is_show_all_nodes()?S_NODE:null,
+					is_show_all_nodes() ? _('Node') : null,
 					($_REQUEST['hostid'] == 0)?S_HOST:null,
 					_('Description'),
 					S_STATUS,

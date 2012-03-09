@@ -63,7 +63,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	// if no media types were defined, we have nothing to show
 	if (zbx_empty($media_types)){
-		show_table_header(S_NOTIFICATIONS_BIG);
+		show_table_header(_('Notifications'));
 		$table = new CTableInfo(_('No media types defined.'));
 		$table->Show();
 	}
@@ -111,7 +111,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$form->addItem($cmbYear);
 		}
 
-		show_table_header(S_NOTIFICATIONS_BIG, $form);
+		show_table_header(_('Notifications'), $form);
 
 		$header = array();
 		$db_users = DBselect('select * from users where '.DBin_node('userid').' order by alias,userid');

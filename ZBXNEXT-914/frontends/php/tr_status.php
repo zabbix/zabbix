@@ -285,7 +285,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		S_AGE,
 		$show_event_col ? _('Duration') : null,
 		$config['event_ack_enable'] ? _('Acknowledged') : null,
-		is_show_all_nodes() ? S_NODE : null,
+		is_show_all_nodes() ? _('Node') : null,
 		S_HOST,
 		make_sorting_header(S_NAME, 'description'),
 		_('Comments')

@@ -81,14 +81,13 @@ while ($host = DBfetch($this->data['dbHosts'])) {
 }
 $proxyFormList->addRow(_('Hosts'), $hostsTweenBox->get(_('Proxy hosts'), _('Other hosts')));
 
-
 // append tabs to form
 $proxyTab = new CTabView();
 $proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
 $proxyForm->addItem($proxyTab);
 
 // append buttons to form
-if (!empty($this->data['applicationid'])) {
+if (!empty($this->data['proxyid'])) {
 	$proxyForm->addItem(makeFormFooter(
 		new CSubmit('save', _('Save')),
 		array(

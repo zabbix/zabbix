@@ -154,7 +154,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$table = new CTableInfo(_('No web checks defined.'));
 	$table->SetHeader(array(
-		is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
+		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
 		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.name') : NULL,
 		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
 		_('Number of steps'),

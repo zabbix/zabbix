@@ -134,7 +134,7 @@ if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !i
 			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 
 			// init LOCAL NODE ID
-			if ($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 ORDER BY nodeid'))) {
+			if ($local_node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodetype=1 ORDER BY n.nodeid'))) {
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
 				$ZBX_LOCMASTERID = $local_node_data['masterid'];
 				$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;

@@ -400,10 +400,14 @@ function get_header_host_table($hostid, $current = null) {
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');
 }
 
-function makeFormFooter($main, $others = array()) {
+function makeFormFooter($main, $others = null) {
 	if (!is_array($main)) {
 		$main = array($main);
 	}
+	if (!is_array($others)) {
+		$others = array($others);
+	}
+
 	$mainButtons = new CDiv();
 	foreach ($main as $button) {
 		$button->useJQueryStyle('main');

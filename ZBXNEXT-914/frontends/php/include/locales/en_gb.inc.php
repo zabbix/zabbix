@@ -74,17 +74,6 @@
 	'S_EVENT_ACTION_MESSAGES_DATE_FORMAT'=>	_('d M Y H:i:s'),
 	'S_EVENT_ACTION_CMDS_DATE_FORMAT'=>	_('Y.M.d H:i:s'),
 
-//	node.php
-	'S_MASTER_NODE'=>			_('Master node'),
-	'S_CHILD'=>				_('Child'),
-	'S_MASTER'=>				_('Master'),
-	'S_NODE_UPDATED'=>			_('Node updated'),
-	'S_CANNOT_UPDATE_NODE'=>		_('Cannot update node'),
-	'S_NODE_ADDED'=>			_('Node added'),
-	'S_CANNOT_ADD_NODE'=>			_('Cannot add node'),
-	'S_NODE_DELETED'=>			_('Node deleted'),
-	'S_CANNOT_DELETE_NODE'=>		_('Cannot delete node'),
-
 //	acknow.php
 	'S_BULK_ACKNOWLEDGE'=>			_('Bulk acknowledge'),
 
@@ -129,14 +118,6 @@
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGE'=>					_('Image'),
 	'S_OTHER'=>					_('Other'),
-
-//	nodes.php
-	'S_NOT_DM_SETUP'=>			_('Your setup is not configured for distributed monitoring'),
-	'S_CONFIGURATION_OF_NODES'=>		_('CONFIGURATION OF NODES'),
-	'S_NODE'=>				_('Node'),
-	'S_NODES_BIG'=>				_('NODES'),
-	'S_NEW_NODE'=>				_('New node'),
-	'S_DELETE_SELECTED_NODE_Q'=>		_('Delete selected node?'),
 
 //	Latest values
 	'S_ALL_S'=>						_('All'),
@@ -407,7 +388,6 @@
 	'S_CREATE'=>				_('Create'),
 
 //	report4.php
-	'S_NOTIFICATIONS_BIG'=>			_('NOTIFICATIONS'),
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),
 	'S_REPORT4_ANNUALLY_DATE_FORMAT'=>	_('Y'),
 	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	_('M Y'),
