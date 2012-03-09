@@ -960,7 +960,8 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($triggersToCreateDependencies) {
+		// if we have new triggers with dependencies and they were created, create their dependencies
+		if ($triggersToCreateDependencies && isset($newTriggerIds)) {
 			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
 				$deps = array();
 				foreach ($triggersToCreateDependencies[$tnum] as $dependency) {

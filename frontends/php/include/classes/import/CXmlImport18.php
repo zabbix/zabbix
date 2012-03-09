@@ -384,9 +384,8 @@ class CXmlImport18 {
 
 		$xml = new DOMDocument();
 		if(!$xml->loadXML($file)){
+			$text = '';
 			foreach(libxml_get_errors() as $error){
-				$text = '';
-
 				switch($error->level){
 					case LIBXML_ERR_WARNING:
 						$text .= _('XML file contains errors').'. Warning '.$error->code.': ';
@@ -449,7 +448,7 @@ class CXmlImport18 {
 
 			if(!isset($screen['screenitems'])) $screen['screenitems'] = array();
 
-			foreach($screen['screenitems'] as $snum => &$screenitem){
+			foreach($screen['screenitems'] as &$screenitem){
 				$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
 
 				if(!isset($screenitem['resourceid'])) $screenitem['resourceid'] = 0;
@@ -537,12 +536,12 @@ class CXmlImport18 {
 
 		$importScreens = $screens;
 
-		foreach($importScreens as $mnum => $screen){
+		foreach($importScreens as $screen){
 			if(isset($screen['screenid'])){
-				$result = API::Screen()->update($screen);
+				API::Screen()->update($screen);
 			}
 			else{
-				$result = API::Screen()->create($screen);
+				API::Screen()->create($screen);
 			}
 
 			if(isset($screen['screenid'])){
@@ -567,7 +566,7 @@ class CXmlImport18 {
 			$images = $importMaps['zabbix_export']['images'];
 			$images_to_add = array();
 			$images_to_update = array();
-			foreach($images as $inum => $image){
+			foreach($images as $image){
 				if(API::Image()->exists($image)){
 					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['updateExisting']))
 							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['updateExisting']))))
@@ -957,7 +956,7 @@ class CXmlImport18 {
 
 				$host_db['groups'] = array();
 				$groups_to_parse = array();
-				foreach($groups as $gnum => $group){
+				foreach($groups as $group){
 					$groups_to_parse[] = array('name' => $group->nodeValue);
 				}
 				if(empty($groups_to_parse)){
@@ -1364,7 +1363,7 @@ class CXmlImport18 {
 							));
 
 							$current_trigger = false;
-							foreach($ctriggers as $tnum => $ct){
+							foreach($ctriggers as $ct){
 								$tmp_exp = explode_exp($ct['expression']);
 								if(strcmp($trigger_db['expression'], $tmp_exp) == 0){
 									$current_trigger = $ct;
@@ -1433,13 +1432,13 @@ class CXmlImport18 {
 
 					$graphs_to_add = array();
 					$graphs_to_upd = array();
-					foreach($graphs as $gnum => $graph){
+					foreach($graphs as $graph){
 // GRAPH ITEMS {{{
 						$gitems = $xpath->query('graph_elements/graph_element', $graph);
 
 						$graph_hostids = array();
 						$graph_items = array();
-						foreach($gitems as $ginum => $gitem){
+						foreach($gitems as $gitem){
 							$gitem_db = self::mapXML2arr($gitem, XML_TAG_GRAPH_ELEMENT);
 
 							$data = explode(':', $gitem_db['host_key_']);
@@ -1580,7 +1579,7 @@ class CXmlImport18 {
 					if($screens_node->length > 0){
 						$importScreens = self::XMLtoArray($screens_node->item(0));
 
-						foreach($importScreens as $mnum => $screen){
+						foreach($importScreens as $screen){
 
 							$current_screen = API::TemplateScreen()->get(array(
 								'filter' => array('name' => $screen['name']),
@@ -1600,7 +1599,7 @@ class CXmlImport18 {
 							}
 
 							if(isset($screen['screenitems'])){
-								foreach($screen['screenitems'] as $snum => &$screenitem){
+								foreach($screen['screenitems'] as &$screenitem){
 									$nodeCaption = isset($screenitem['resourceid']['node'])?$screenitem['resourceid']['node'].':':'';
 
 									if(!isset($screenitem['resourceid']))
