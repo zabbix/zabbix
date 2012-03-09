@@ -1235,8 +1235,20 @@ function zbx_toHash(&$value, $field = null) {
 	return $result;
 }
 
-// Value or Array to Object or Array of objects
-function zbx_toObject(&$value, $field) {
+/**
+ * Transforms a single or an array of values to an array of objects, where the values are stored under the $field
+ * key.
+ *
+ * E.g:
+ * zbx_toObject(array(1, 2), 'hostid')  // returns array(array('hostid' => 1), array('hostid' => 2))
+ * zbx_toObject(3, 'hostid')            // returns array(array('hostid' => 3))
+ *
+ * @param $value
+ * @param $field
+ *
+ * @return array
+ */
+function zbx_toObject($value, $field) {
 	if (is_null($value)) {
 		return $value;
 	}

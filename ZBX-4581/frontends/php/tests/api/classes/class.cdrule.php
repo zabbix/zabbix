@@ -31,7 +31,8 @@ require_once dirname(__FILE__).'/../../../include/db.inc.php';
 require_once dirname(__FILE__).'/../../../include/copt.lib.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../../include/triggers.inc.php';
-require_once dirname(__FILE__).'/../../../api/classes/class.apiexception.php';
+require_once dirname(__FILE__).'/../../../include/classes/api/APIException.php';
+require_once dirname(__FILE__).'/../../../include/classes/core/Z.php';
 
 
 if (!function_exists('error')) {
@@ -51,17 +52,10 @@ class CDRuleTest extends PHPUnit_Framework_TestCase {
 	private static $drule;
 	private static $createdRules = array();
 
-	public static function autoloadRegister($name) {
-		if (is_file(dirname(__FILE__).'/../../../api/classes/class.'.strtolower($name).'.php'))
-			require_once dirname(__FILE__).'/../../../api/classes/class.'.strtolower($name).'.php';
-		elseif (is_file(dirname(__FILE__).'/../../../include/classes/class.'.strtolower($name).'.php'))
-			require_once dirname(__FILE__).'/../../../include/classes/class.'.strtolower($name).'.php';
-		else
-			require_once dirname(__FILE__).'/../../../api/rpc/class.'.strtolower($name).'.php';
-	}
-
 	public static function setUpBeforeClass() {
-		spl_autoload_register('self::autoloadRegister');
+		$a = new Z;
+		$a->run();
+
 		self::$drule = new CDRule();
 
 		// some variable defines not to include config.inc.php
@@ -76,7 +70,6 @@ class CDRuleTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public static function tearDownAfterClass() {
-		spl_autoload_unregister('self::autoloadRegister');
 		API::setReturnRPC();
 	}
 
