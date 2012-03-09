@@ -904,7 +904,7 @@ COpt::memoryPick();
 			$allowedHosts = API::Host()->get($options);
 			foreach ($data['hostids'] as $hostid) {
 				if (!isset($allowedHosts[$hostid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 			$options = array(
@@ -915,7 +915,7 @@ COpt::memoryPick();
 			$allowedTemplates = API::Template()->get($options);
 			foreach ($data['templateids'] as $templateid) {
 				if (!isset($allowedTemplates[$templateid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 				}
 			}
 
@@ -975,9 +975,9 @@ COpt::memoryPick();
 			if (!$nopermissions) {
 				foreach ($graphids as $graphid) {
 					if (!isset($delGraphs[$graphid]))
-						self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 					if ($delGraphs[$graphid]['templateid'] != 0) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated graphs'));
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated graphs.'));
 					}
 				}
 			}
@@ -1001,7 +1001,7 @@ COpt::memoryPick();
 			}
 			if (!empty($createdGraphs)) {
 				$result = API::Graph()->delete($createdGraphs, true);
-				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype'));
+				if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete graph prototype.'));
 			}
 
 

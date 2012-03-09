@@ -176,7 +176,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 		$rst_icon = get_icon('reset', array('id' => $_REQUEST['graphid']));
-		array_push($icons, $icon, $rst_icon, $fs_icon);
+		array_push($icons, $icon, SPACE, $rst_icon, SPACE, $fs_icon);
 
 // NAV BAR
 		$utime = zbxDateToTime($_REQUEST['stime']);
@@ -201,7 +201,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			'loadScroll' => 1,
 			'scrollWidthByImage' => $scrollWidthByImage,
 			'dynamic' => 1,
-			'periodFixed' => CProfile::get('web.charts.timelinefixed', 1)
+			'periodFixed' => CProfile::get('web.charts.timelinefixed', 1),
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
 		zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');

@@ -84,7 +84,8 @@ $severityDiv = new CDiv(
 		$labelHigh,
 		new CRadioButton('priority', TRIGGER_SEVERITY_DISASTER, null, 'severity_'.TRIGGER_SEVERITY_DISASTER, $this->data['priority'] == TRIGGER_SEVERITY_DISASTER),
 		$labelDisaster
-	)
+	),
+	'jqueryinputset'
 );
 $severityDiv->setAttribute('id', 'priority_div');
 

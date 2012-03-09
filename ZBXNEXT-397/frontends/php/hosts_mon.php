@@ -168,7 +168,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		S_ITEMS,
 		S_TRIGGERS,
 		S_GRAPHS,
-		S_SCREENS,
+		_('Screens'),
 		S_AVAILABILITY
 	));
 
@@ -228,7 +228,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			' ('.$host['triggers'].')');
 		$graphs = array(new CLink(S_GRAPHS, 'charts.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['graphs'].')');
-		$screens = array(new CLink(S_SCREENS, 'host_screen.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
+		$screens = array(new CLink(_('Screens'), 'host_screen.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['screens'].')');
 
 		$description = array();

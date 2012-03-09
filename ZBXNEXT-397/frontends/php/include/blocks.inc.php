@@ -961,7 +961,7 @@ function make_latest_issues(array $filter = array()) {
 			}
 
 			$description = new CCol($description, getSeverityStyle($trigger['priority']));
-			$description->setHint(make_popup_eventlist($event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false, true);
+			$description->setHint(make_popup_eventlist($event['eventid'], $trigger['type'], $trigger['triggerid']), '', '', false);
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['triggerid']),

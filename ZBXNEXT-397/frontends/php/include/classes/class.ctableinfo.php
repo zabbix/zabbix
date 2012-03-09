@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CTableInfo extends CTable {
+
 	public function __construct($message = '...', $class = 'tableinfo') {
 		parent::__construct($message, $class);
 		$this->setOddRowClass('odd_row');
