@@ -717,15 +717,13 @@ int	is_ip4(const char *ip)
 {
 	const char	*__function_name = "is_ip4";
 	const char	*p = ip;
-	int		nums, dots, res = FAIL;
+	int		nums = 0, dots = 0, res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __function_name, ip);
 
-	nums = 0;
-	dots = 0;
 	while ('\0' != *p)
 	{
-		if ('0' <= *p && *p <= '9')
+		if (0 != isdigit(*p))
 		{
 			nums++;
 		}
@@ -741,6 +739,7 @@ int	is_ip4(const char *ip)
 			nums = 0;
 			break;
 		}
+
 		p++;
 	}
 	if (dots == 3 && 1 <= nums && nums <= 3)
@@ -778,7 +777,7 @@ static int	is_ip6(const char *ip)
 
 	while ('\0' != *p)
 	{
-		if ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'f') || (*p >= 'A' && *p <= 'F'))
+		if (0 != isxdigit(*p))
 		{
 			nums++;
 			is_nums = 1;
@@ -797,6 +796,7 @@ static int	is_ip6(const char *ip)
 			is_nums = 0;
 			break;
 		}
+
 		p++;
 	}
 
@@ -879,7 +879,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 	len = 0;
 	for (j = 0; j<ip_len; j++)
 	{
-		if ((ip[j] >= '0' && ip[j] <= '9') || (ip[j] >= 'A' && ip[j] <= 'F') || (ip[j] >= 'a' && ip[j] <= 'f'))
+		if (0 != isxdigit(ip[j]))
 		{
 			if (len > 3)
 				return FAIL;
@@ -1198,26 +1198,23 @@ out:
  ******************************************************************************/
 int	int_in_list(char *list, int value)
 {
-	char	*start = NULL, *end = NULL;
-	int	i1,i2;
-	int	ret = FAIL;
-	char	c = '\0';
+	const char	*__function_name = "int_in_list";
+	char		*start = NULL, *end = NULL, c = '\0';
+	int		i1, i2, ret = FAIL;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:%d)", list, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' value:%d", list, value);
 
-	for (start = list; start[0] != '\0';)
+	for (start = list; '\0' != *start;)
 	{
-		end=strchr(start, ',');
-
-		if (end != NULL)
+		if (NULL != (end = strchr(start, ',')))
 		{
-			c=end[0];
-			end[0]='\0';
+			c = *end;
+			*end = '\0';
 		}
 
-		if (sscanf(start,"%d-%d",&i1,&i2) == 2)
+		if (2 == sscanf(start, "%d-%d", &i1, &i2))
 		{
-			if (value>=i1 && value<=i2)
+			if (i1 <= value && value <= i2)
 			{
 				ret = SUCCEED;
 				break;
@@ -1225,82 +1222,74 @@ int	int_in_list(char *list, int value)
 		}
 		else
 		{
-			if (atoi(start) == value)
+			if (value == atoi(start))
 			{
 				ret = SUCCEED;
 				break;
 			}
 		}
 
-		if (end != NULL)
+		if (NULL != end)
 		{
-			end[0]=c;
-			start=end+1;
+			*end = c;
+			start = end + 1;
 		}
 		else
-		{
 			break;
-		}
 	}
 
-	if (end != NULL)
-	{
-		end[0]=c;
-	}
+	if (NULL != end)
+		*end = c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of int_in_list():%s",
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: is_double_prefix                                                 *
+ * Function: is_double_suffix                                                 *
  *                                                                            *
  * Purpose: check if the string is double                                     *
  *                                                                            *
- * Parameters: c - string to check                                            *
+ * Parameters: str - string to check                                          *
  *                                                                            *
  * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: the function supports suffixes K,M,G,T,s,m,h,d,w                 *
+ * Comments: the function automatically processes suffixes K, M, G, T and     *
+ *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
-int	is_double_prefix(const char *c)
+int	is_double_suffix(const char *str)
 {
-	int i;
-	int dot=-1;
+	size_t	i;
+	int	dot = -1;
 
-	for (i=0;c[i]!=0;i++)
+	for (i = 0; '\0' != str[i]; i++)
 	{
-		/* Negative number? */
-		if (c[i]=='-' && i==0)
+		/* negative number? */
+		if ('-' == str[i] && 0 == i)
+			continue;
+
+		if (0 != isdigit(str[i]))
+			continue;
+
+		if ('.' == str[i] && -1 == dot)
 		{
+			dot = i;
 			continue;
 		}
 
-		if ((c[i]>='0')&&(c[i]<='9'))
-		{
+		/* last character is suffix */
+		if (NULL != strchr("KMGTsmhdw", str[i]) && '\0' == str[i + 1])
 			continue;
-		}
-
-		if ((c[i]=='.')&&(dot==-1))
-		{
-			dot=i;
-			continue;
-		}
-		/* Last character is suffix 'K', 'M', 'G', 'T', 's', 'm', 'h', 'd', 'w' */
-		if (strchr("KMGTsmhdw", c[i])!=NULL && c[i+1]=='\0')
-		{
-			continue;
-		}
 
 		return FAIL;
 	}
+
 	return SUCCEED;
 }
 
@@ -1310,7 +1299,7 @@ int	is_double_prefix(const char *c)
  *                                                                            *
  * Purpose: check if the string is double                                     *
  *                                                                            *
- * Parameters: c - string to check                                            *
+ * Parameters: str - string to check                                          *
  *                                                                            *
  * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
@@ -1318,87 +1307,119 @@ int	is_double_prefix(const char *c)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	is_double(const char *c)
+int	is_double(const char *str)
 {
-	int i;
-	int dot=-1;
-	int len;
+	size_t	i, len;
+	int	dot = -1;
 
-	for (i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
+	for (i = 0; ' ' == str[i] && '\0' != str[i]; i++)	/* trim left spaces */
+		;
 
-	for (len=0; c[i]!=0; i++, len++)
+	for (len = 0; '\0' != str[i]; i++, len++)
 	{
-		/* Negative number? */
-		if (c[i]=='-' && i==0)
+		/* negative number? */
+		if ('-' == str[i] && 0 == i)
+			continue;
+
+		if (0 != isdigit(str[i]))
+			continue;
+
+		if ('.' == str[i] && -1 == dot)
 		{
+			dot = i;
 			continue;
 		}
 
-		if ((c[i]>='0')&&(c[i]<='9'))
+		if (' ' == str[i])	/* check right spaces */
 		{
-			continue;
-		}
+			for (; ' ' == str[i] && '\0' != str[i]; i++)	/* trim right spaces */
+				;
 
-		if ((c[i]=='.')&&(dot==-1))
-		{
-			dot=i;
-			continue;
-		}
-
-		if (c[i]==' ') /* check right spaces */
-		{
-			for ( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
-
-			if (c[i]==0) break; /* SUCCEED */
+			if ('\0' == str[i])
+				break;	/* SUCCEED */
 		}
 
 		return FAIL;
 	}
 
-	if (len <= 0) return FAIL;
-
-	if (len == 1 && dot!=-1) return FAIL;
+	if (0 == len || (1 == len && -1 != dot))
+		return FAIL;
 
 	return SUCCEED;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uint_prefix                                                   *
+ * Function: is_uint_suffix                                                   *
  *                                                                            *
  * Purpose: check if the string is unsigned integer                           *
  *                                                                            *
- * Parameters: c - string to check                                            *
+ * Parameters: str   - string to check                                        *
+ *             value - a pointer to converted value (optional)                *
  *                                                                            *
- * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - otherwise                                            *
+ * Return value: SUCCEED - the string is unsigned integer                     *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
+ * Author: Aleksandrs Saveljevs, Vladimir Levijev                             *
  *                                                                            *
- * Comments: the function supports suffixes 's', 'm', 'h', 'd', and 'w'       *
+ * Comments: the function automatically processes suffixes s, m, h, d, w      *
  *                                                                            *
  ******************************************************************************/
-int	is_uint_prefix(const char *c)
+int	is_uint_suffix(const char *str, unsigned int *value)
 {
-	int	i = 0;
+	const unsigned int	max_uint = ~0U;
+	unsigned int		value_uint = 0, c, factor = 1;
 
-	while (c[i]==' ') /* trim left spaces */
-		i++;
-
-	if (!isdigit(c[i]))
+	if ('\0' == *str || '1' > *str || *str > '9')
 		return FAIL;
-	else
-		do
-			i++;
-		while (isdigit(c[i]));
 
-	if (c[i]=='s' || c[i]=='m' || c[i]=='h' || c[i]=='d' || c[i]=='w') /* check suffix */
-		i++;
+	while ('\0' != *str && 0 != isdigit(*str))
+	{
+		c = (unsigned int)(unsigned char)(*str - '0');
 
-	while (c[i]==' ') /* trim right spaces */
-		i++;
+		if ((max_uint - c) / 10 < value_uint)
+			return FAIL;	/* overflow */
 
-	return c[i]=='\0' ? SUCCEED : FAIL;
+		value_uint = value_uint * 10 + c;
+
+		str++;
+	}
+
+	if ('\0' != *str)
+	{
+		switch (*str)
+		{
+			case 's':
+				break;
+			case 'm':
+				factor = SEC_PER_MIN;
+				break;
+			case 'h':
+				factor = SEC_PER_HOUR;
+				break;
+			case 'd':
+				factor = SEC_PER_DAY;
+				break;
+			case 'w':
+				factor = SEC_PER_WEEK;
+				break;
+			default:
+				return FAIL;
+		}
+
+		str++;
+	}
+
+	if ('\0' != *str)
+		return FAIL;
+
+	if (max_uint / factor < value_uint)
+		return FAIL;	/* overflow */
+
+	if (NULL != value)
+		*value = value_uint * factor;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1407,7 +1428,7 @@ int	is_uint_prefix(const char *c)
  *                                                                            *
  * Purpose: check if the string is unsigned integer                           *
  *                                                                            *
- * Parameters: c - string to check                                            *
+ * Parameters: str - string to check                                          *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *
@@ -1415,30 +1436,31 @@ int	is_uint_prefix(const char *c)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	is_uint(const char *c)
+int	is_uint(const char *str)
 {
-	int	i;
-	int	len;
+	size_t	i, len;
 
-	for (i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
+	for (i = 0; ' ' == str[i] && '\0' != str[i]; i++)	/* trim left spaces */
+		;
 
-	for (len=0; c[i]!=0; i++,len++)
+	for (len = 0; '\0' != str[i]; i++, len++)
 	{
-		if ((c[i]>='0')&&(c[i]<='9'))
-		{
+		if (0 != isdigit(str[i]))
 			continue;
-		}
 
-		if (c[i]==' ') /* check right spaces */
+		if (' ' == str[i])	/* check right spaces */
 		{
-			for ( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
+			for (; ' ' == str[i] && '\0' != str[i]; i++)	/* trim right spaces */
+				;
 
-			if (c[i]==0) break; /* SUCCEED */
+			if ('\0' == str[i])	/* SUCCEED */
+				break;
 		}
 		return FAIL;
 	}
 
-	if (len <= 0) return FAIL;
+	if (0 == len)
+		return FAIL;
 
 	return SUCCEED;
 }
@@ -1471,7 +1493,7 @@ int	_wis_uint(const wchar_t *wide_string)
  *                                                                            *
  * Purpose: check if the beginning of string is a signed integer              *
  *                                                                            *
- * Parameters: c - string to check                                            *
+ * Parameters: str - string to check                                          *
  *                                                                            *
  * Return value:  SUCCEED - the beginning of string is a signed integer       *
  *                FAIL - otherwise                                            *
@@ -1479,17 +1501,17 @@ int	_wis_uint(const wchar_t *wide_string)
  * Author: Aleksandrs Saveljevs                                               *
  *                                                                            *
  ******************************************************************************/
-int	is_int_prefix(const char *c)
+int	is_int_prefix(const char *str)
 {
-	int	i = 0;
+	size_t	i = 0;
 
-	while (c[i]==' ') /* trim left spaces */
+	while (' ' == str[i])	/* trim left spaces */
 		i++;
 
-	if (c[i]=='-' || c[i]=='+')
+	if ('-' == str[i] || '+' == str[i])
 		i++;
 
-	if (!isdigit(c[i]))
+	if (0 == isdigit(str[i]))
 		return FAIL;
 
 	return SUCCEED;
@@ -1501,8 +1523,9 @@ int	is_int_prefix(const char *c)
  *                                                                            *
  * Purpose: check if the string is 64bit unsigned integer                     *
  *                                                                            *
- * Parameters: str - [IN] string to check                                     *
- *             n   - [IN] string length or ZBX_IS_UINT64_MAX_LEN              *
+ * Parameters: str   - [IN] string to check                                   *
+ *             n     - [IN] string length or ZBX_MAX_UINT64_LEN               *
+ *             value - [OUT] a pointer to converted value (optional)          *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not a number or overflow               *
@@ -1512,25 +1535,25 @@ int	is_int_prefix(const char *c)
  ******************************************************************************/
 int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
 {
-	register zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
-	register zbx_uint64_t	value_uint64 = 0, c;
+	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	zbx_uint64_t		value_uint64 = 0, c;
 
 	if ('\0' == *str || 0 == n)
 		return FAIL;
 
-	while ('\0' != *str && (ZBX_IS_UINT64_MAX_LEN == n || 0 < n--))
+	while ('\0' != *str && 0 < n--)
 	{
-		if (*str >= '0' && *str <= '9')
-		{
-			c = (zbx_uint64_t)(unsigned char)(*str - '0');
-			if ((max_uint64 - c) / 10 >= value_uint64)
-				value_uint64 = value_uint64 * 10 + c;
-			else
-				return FAIL;	/* overflow */
-			str++;
-		}
-		else
+		if (0 == isdigit(*str))
 			return FAIL;	/* not a digit */
+
+		c = (zbx_uint64_t)(unsigned char)(*str - '0');
+
+		if ((max_uint64 - c) / 10 < value_uint64)
+			return FAIL;	/* overflow */
+
+		value_uint64 = value_uint64 * 10 + c;
+
+		str++;
 	}
 
 	if (NULL != value)
@@ -1545,7 +1568,8 @@ int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
  *                                                                            *
  * Purpose: check if the string is 16bit unsigned integer                     *
  *                                                                            *
- * Parameters: str - string to check                                          *
+ * Parameters: str   - string to check                                        *
+ *             value - a pointer to converted value (optional)                *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - the string is not number or overflow                 *
@@ -1555,25 +1579,25 @@ int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value)
  ******************************************************************************/
 int	is_ushort(const char *str, unsigned short *value)
 {
-	register unsigned short	max_ushort = 0xffff;
-	register unsigned short	value_ushort = 0, c;
+	const unsigned short	max_ushort = 0xffff;
+	unsigned short		value_ushort = 0, c;
 
 	if ('\0' == *str)
 		return FAIL;
 
 	while ('\0' != *str)
 	{
-		if (*str >= '0' && *str <= '9')
-		{
-			c = (unsigned short)(unsigned char)(*str - '0');
-			if ((max_ushort - c) / 10 >= value_ushort)
-				value_ushort = value_ushort * 10 + c;
-			else
-				return FAIL;	/* overflow */
-			str++;
-		}
-		else
+		if (0 == isdigit(*str))
 			return FAIL;	/* not a digit */
+
+		c = (unsigned short)(unsigned char)(*str - '0');
+
+		if ((max_ushort - c) / 10 < value_ushort)
+			return FAIL;	/* overflow */
+
+		value_ushort = value_ushort * 10 + c;
+
+		str++;
 	}
 
 	if (NULL != value)
@@ -1681,7 +1705,7 @@ int	is_uhex(const char *str)
 
 	for (; '\0' != *str; str++)
 	{
-		if ((*str < '0' || *str > '9') && (*str < 'a' || *str > 'f') && (*str < 'A' || *str > 'F'))
+		if (0 == isxdigit(*str))
 			break;
 
 		res = SUCCEED;
@@ -1718,14 +1742,18 @@ int	is_hex_string(const char *str)
 
 	while ('\0' != *str)
 	{
-		if (!isxdigit(*str))
+		if (0 == isxdigit(*str))
 			return FAIL;
-		if (!isxdigit(*(str + 1)))
+
+		if (0 == isxdigit(*(str + 1)))
 			return FAIL;
+
 		if ('\0' == *(str + 2))
 			break;
+
 		if (' ' != *(str + 2) && '\n' != *(str + 2))
 			return FAIL;
+
 		str += 3;
 	}
 
@@ -1738,8 +1766,8 @@ int	is_hex_string(const char *str)
  *                                                                            *
  * Purpose: check if uin64 integer matches a list of integers                 *
  *                                                                            *
- * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699)         *
- *             value-  value                                                  *
+ * Parameters: list  - integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699)         *
+ *             value - value                                                  *
  *                                                                            *
  * Return value: FAIL - out of period, SUCCEED - within the list              *
  *                                                                            *
@@ -1748,18 +1776,17 @@ int	is_hex_string(const char *str)
  ******************************************************************************/
 int	uint64_in_list(char *list, zbx_uint64_t value)
 {
+	const char	*__function_name = "uint64_in_list";
 	char		*start = NULL, *end = NULL;
-	zbx_uint64_t	i1,i2,tmp_uint64;
+	zbx_uint64_t	i1, i2, tmp_uint64;
 	int		ret = FAIL;
 	char		c = '\0';
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:" ZBX_FS_UI64 ")", list, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' value:" ZBX_FS_UI64, __function_name, list, value);
 
 	for (start = list; start[0] != '\0';)
 	{
-		end=strchr(start, ',');
-
-		if (end != NULL)
+		if (NULL != (end = strchr(start, ',')))
 		{
 			c=end[0];
 			end[0]='\0';
@@ -1767,7 +1794,7 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 
 		if (sscanf(start,ZBX_FS_UI64 "-" ZBX_FS_UI64,&i1,&i2) == 2)
 		{
-			if (value>=i1 && value<=i2)
+			if (i1 <= value && value <= i2)
 			{
 				ret = SUCCEED;
 				break;
@@ -1785,56 +1812,62 @@ int	uint64_in_list(char *list, zbx_uint64_t value)
 
 		if (end != NULL)
 		{
-			end[0]=c;
-			start=end+1;
+			*end = c;
+			start = end + 1;
 		}
 		else
-		{
 			break;
-		}
 	}
 
-	if (end != NULL)
-	{
-		end[0]=c;
-	}
+	if (NULL != end)
+		*end = c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of int_in_list():%s",
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
 
-/*
- * Get nearest index of sorted elements in array.
- *     p - pointer to array of elements
- *     sz - size of one element in array
- *     num - number of elements
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: get_nearestindex                                                 *
+ *                                                                            *
+ * Purpose: get nearest index position of sorted elements in array            *
+ *                                                                            *
+ * Parameters: p   - pointer to array of elements                             *
+ *             sz  - element size                                             *
+ *             num - number of elements                                       *
+ *             id  - index to look for                                        *
+ *                                                                            *
+ * Return value: nearest index position                                       *
+ *               0 - otherwise                                                *
+ *                                                                            *
+ ******************************************************************************/
 int	get_nearestindex(void *p, size_t sz, int num, zbx_uint64_t id)
 {
 	int		first_index, last_index, index;
 	zbx_uint64_t	element_id;
 
-	if (num == 0)
+	if (0 == num)
 		return 0;
 
 	first_index = 0;
 	last_index = num - 1;
+
 	while (1)
 	{
 		index = first_index + (last_index - first_index) / 2;
 
-		element_id = *(zbx_uint64_t *)((char *)p + index * sz);
-		if (element_id == id)
+		if (id == (element_id = *(zbx_uint64_t *)((char *)p + index * sz)))
 			return index;
-		else if (last_index == first_index)
+
+		if (last_index == first_index)
 		{
 			if (element_id < id)
 				index++;
 			return index;
 		}
-		else if (element_id < id)
+
+		if (element_id < id)
 			first_index = index + 1;
 		else
 			last_index = index;
@@ -1865,6 +1898,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 			zbx_error("Unable to reallocate buffer");
 			assert(0);
 		}
+
 		*alloc += alloc_step;
 		*values = zbx_realloc(*values, *alloc * sizeof(zbx_uint64_t));
 	}
@@ -1970,51 +2004,19 @@ void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_v
 
 /******************************************************************************
  *                                                                            *
- * Function: str2uint                                                         *
- *                                                                            *
- * Purpose: convert string to unsigned integer (currently 31bit uint)         *
- *                                                                            *
- * Parameters: str - string to convert                                        *
- *                                                                            *
- * Return value: converted unsigned integer                                   *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
- *                                                                            *
- * Comments: the function automatically processes suffixes s, m, h, d, w      *
- *                                                                            *
- ******************************************************************************/
-int	str2uint(const char *str)
-{
-	size_t	sz = strlen(str) - 1;
-	int	factor = 1;
-
-	switch (str[sz])
-	{
-		case 's': factor = 1;			break;
-		case 'm': factor = SEC_PER_MIN;		break;
-		case 'h': factor = SEC_PER_HOUR;	break;
-		case 'd': factor = SEC_PER_DAY;		break;
-		case 'w': factor = SEC_PER_WEEK;	break;
-	}
-
-	return atoi(str) * factor;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: str2uint64                                                       *
  *                                                                            *
  * Purpose: convert string to 64bit unsigned integer                          *
  *                                                                            *
- * Parameters: str - string to convert                                        *
- *             value - pointer to returned value                              *
+ * Parameters: str   - string to convert                                      *
+ *             value - a pointer to converted value                           *
  *                                                                            *
  * Return value:  SUCCEED - the string is unsigned integer                    *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments: the function automatically processes suffixes 'K','M','G','T'    *
+ * Comments: the function automatically processes suffixes K, M, G, T         *
  *                                                                            *
  ******************************************************************************/
 int	str2uint64(char *str, zbx_uint64_t *value)
@@ -2029,23 +2031,23 @@ int	str2uint64(char *str, zbx_uint64_t *value)
 	if (str[sz] == 'K')
 	{
 		c = str[sz];
-		factor = 1024;
+		factor = ZBX_KIBIBYTE;
 	}
 	else if (str[sz] == 'M')
 	{
 		c = str[sz];
-		factor = 1024 * 1024;
+		factor = ZBX_MEBIBYTE;
 	}
 	else if (str[sz] == 'G')
 	{
 		c = str[sz];
-		factor = 1024 * 1024 * 1024;
+		factor = ZBX_GIBIBYTE;
 	}
 	else if (str[sz] == 'T')
 	{
 		c = str[sz];
-		factor = 1024 * 1024 * 1024;
-		factor *= 1024;
+		factor = ZBX_GIBIBYTE;
+		factor *= ZBX_KIBIBYTE;
 	}
 
 	if ('\0' != c)
@@ -2072,8 +2074,8 @@ int	str2uint64(char *str, zbx_uint64_t *value)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: the function automatically processes suffixes 'K','M','G','T'    *
- *           and 's','m','h','d','w'                                          *
+ * Comments: the function automatically processes suffixes K, M, G, T and     *
+ *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
 double	str2double(const char *str)
@@ -2083,15 +2085,34 @@ double	str2double(const char *str)
 
 	switch (str[sz])
 	{
-		case 'K': factor = 1024;			break;
-		case 'M': factor = 1024*1024;			break;
-		case 'G': factor = 1024*1024*1024;		break;
-		case 'T': factor = 1024*1024*1024*(double)1024;	break;
-		case 's': factor = 1;				break;
-		case 'm': factor = SEC_PER_MIN;			break;
-		case 'h': factor = SEC_PER_HOUR;		break;
-		case 'd': factor = SEC_PER_DAY;			break;
-		case 'w': factor = SEC_PER_WEEK;		break;
+		case 'K':
+			factor = ZBX_KIBIBYTE;
+			break;
+		case 'M':
+			factor = ZBX_MEBIBYTE;
+			break;
+		case 'G':
+			factor = ZBX_GIBIBYTE;
+			break;
+		case 'T':
+			factor = ZBX_GIBIBYTE * (double)ZBX_KIBIBYTE;
+			break;
+		case 's':
+			break;
+		case 'm':
+			factor = SEC_PER_MIN;
+			break;
+		case 'h':
+			factor = SEC_PER_HOUR;
+			break;
+		case 'd':
+			factor = SEC_PER_DAY;
+			break;
+		case 'w':
+			factor = SEC_PER_WEEK;
+			break;
+		default:
+			;
 	}
 
 	return atof(str) * factor;
@@ -2112,16 +2133,10 @@ double	str2double(const char *str)
  ******************************************************************************/
 int	is_hostname_char(char c)
 {
-	if (c >= 'a' && c <= 'z')
-		return SUCCEED;
-
-	if (c >= 'A' && c <= 'Z')
+	if (0 != isalnum(c))
 		return SUCCEED;
 
 	if (c == '.' || c == ' ' || c == '_' || c == '-')
-		return SUCCEED;
-
-	if (c >= '0' && c <= '9')
 		return SUCCEED;
 
 	return FAIL;
@@ -2142,16 +2157,10 @@ int	is_hostname_char(char c)
  ******************************************************************************/
 int	is_key_char(char c)
 {
-	if (c >= 'a' && c <= 'z')
+	if (0 != isalnum(c))
 		return SUCCEED;
 
 	if (c == '.' || c == '_' || c == '-')
-		return SUCCEED;
-
-	if (c >= 'A' && c <= 'Z')
-		return SUCCEED;
-
-	if (c >= '0' && c <= '9')
 		return SUCCEED;
 
 	return FAIL;
@@ -2172,7 +2181,7 @@ int	is_key_char(char c)
  ******************************************************************************/
 int	is_function_char(char c)
 {
-	if (c >= 'a' && c <= 'z')
+	if (0 != islower(c))
 		return SUCCEED;
 
 	return FAIL;
@@ -2193,13 +2202,13 @@ int	is_function_char(char c)
  ******************************************************************************/
 int	is_macro_char(char c)
 {
-	if ('A' <= c && c <= 'Z')
+	if (0 != isupper(c))
 		return SUCCEED;
 
 	if ('.' == c || '_' == c)
 		return SUCCEED;
 
-	if ('0' <= c && c <= '9')
+	if (0 != isdigit(c))
 		return SUCCEED;
 
 	return FAIL;
