@@ -1297,8 +1297,6 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 					));
 				}
 
-				zbx_add_post_js('jqBlink.init();');
-
 				$item = array($item);
 				if ($editmode == 1) {
 					array_push($item, new CLink(_('Change'), $action));
