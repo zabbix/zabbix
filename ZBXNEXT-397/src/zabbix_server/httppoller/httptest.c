@@ -394,9 +394,9 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				if ('\0' != *httpstep.required &&
 						NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() page did not match \"%s\"",
-							__function_name, httpstep.required);
-					err_str = zbx_strdup(err_str, "Page did not match");
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() required pattern \"%s\" not found on %s",
+							__function_name, httpstep.required, httpstep.url);
+					err_str = zbx_strdup(err_str, "Required pattern not found");
 				}
 
 				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))

@@ -37,19 +37,18 @@
 ?>
 <?php
 
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-		'reset'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'httptestid'=>	array(T_ZBX_INT, O_MAND,	null,	DB_ID,		'isset({favobj})'),
-
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+//		VAR			TYPE		OPTIONAL	FLAGS		VALIDATION	EXCEPTION
+	$fields = array(
+		'period' =>	array(T_ZBX_INT,	O_OPT,		null,		null,		null),
+		'stime' =>	array(T_ZBX_STR,	O_OPT,		null,		null,		null),
+		'reset' =>	array(T_ZBX_STR,	O_OPT,		P_SYS|P_ACT,	null,		null),
+		'httptestid' =>	array(T_ZBX_INT,	O_MAND,		null,		DB_ID,		'isset({favobj})'),
+		'fullscreen' =>	array(T_ZBX_INT,	O_OPT,		P_SYS,		IN('0,1'),	null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
-		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
-		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj' =>	array(T_ZBX_STR,	O_OPT,		P_ACT,		null,		null),
+		'favref' =>	array(T_ZBX_STR,	O_OPT,		P_ACT,  	NOT_EMPTY,	null),
+		'favid' =>	array(T_ZBX_INT,	O_OPT,		P_ACT,  	null,		null),
+		'favstate' =>	array(T_ZBX_INT,	O_OPT,		P_ACT,  	NOT_EMPTY,	null),
 	);
 
 	if(!check_fields($fields)) exit();
@@ -153,7 +152,7 @@
 		}
 		elseif ($httptest_data['lastfailedstep'] != 0) {
 			if ($httptest_data['lastfailedstep'] == $httpstep_data['no']) {
-				$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
+				$status['msg'] = S_ERROR.': '.$httptest_data['error'];
 				$status['style'] = 'disabled';
 			}
 			elseif ($httptest_data['lastfailedstep'] < $httpstep_data['no']) {
@@ -205,7 +204,7 @@
 		$status['style'] = 'unknown';
 	}
 	elseif ($httptest_data['lastfailedstep'] != 0) {
-		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
+		$status['msg'] = S_ERROR.': '.$httptest_data['error'];
 		$status['style'] = 'disabled';
 	}
 	else {

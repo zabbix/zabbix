@@ -264,9 +264,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		elseif ($httptest_data['lastfailedstep'] != 0) {
 			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
-			$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
-				'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].'] '.
-				SPACE.S_ERROR.': '.$httptest_data['error'];
+			$status['msg'] = _s('Step "%1$s" [%2$s of %3$s] failed: %4$s', $step_data['name'],
+				$httptest_data['lastfailedstep'], $httptest_data['step_count'], $httptest_data['error']);
 			$status['style'] = 'disabled';
 		}
 		else {

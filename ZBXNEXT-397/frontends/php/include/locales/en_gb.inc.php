@@ -37,8 +37,6 @@
 	'S_RESPONSE_CODE'=>			_('Response code'),
 	'S_TOTAL_BIG'=>				_('TOTAL'),
 	'S_RESPONSE_TIME'=>			_('Response time'),
-	'S_OF_SMALL'=>				_('of'),
-	'S_FAILED_ON'=>				_('Failed on'),
 
 //	httpmon.php
 	'S_STATUS_OF_WEB_MONITORING'=>		_('Status of Web monitoring'),
