@@ -625,10 +625,7 @@ function validateMaxTime($time) {
  * Validate URL against XSS
  */
 function validateUrl($url) {
-	if (stripos($url,"javascript:") !== false) {
-		return false;
-	}
-	return true;
+	return (stripos($url,"javascript:") === false);
 }
 
 ?>
