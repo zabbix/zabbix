@@ -152,7 +152,7 @@
 		}
 		elseif ($httptest_data['lastfailedstep'] != 0) {
 			if ($httptest_data['lastfailedstep'] == $httpstep_data['no']) {
-				$status['msg'] = S_ERROR.': '.$httptest_data['error'];
+				$status['msg'] = _s('Error: %1$s', $httptest_data['error']);
 				$status['style'] = 'disabled';
 			}
 			elseif ($httptest_data['lastfailedstep'] < $httpstep_data['no']) {
@@ -204,7 +204,7 @@
 		$status['style'] = 'unknown';
 	}
 	elseif ($httptest_data['lastfailedstep'] != 0) {
-		$status['msg'] = S_ERROR.': '.$httptest_data['error'];
+		$status['msg'] = _s('Error: %1$s', $httptest_data['error']);
 		$status['style'] = 'disabled';
 	}
 	else {
