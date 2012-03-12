@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-?>
-<?php
+
 require_once dirname(__FILE__).'/events.inc.php';
 require_once dirname(__FILE__).'/actions.inc.php';
 require_once dirname(__FILE__).'/js.inc.php';
@@ -1389,47 +1388,4 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 	}
 
 	return $table;
-}
-
-function separateScreenElements($screen) {
-	$elements = array(
-		'sysmaps' => array(),
-		'screens' => array(),
-		'hostgroups' => array(),
-		'hosts' => array(),
-		'graphs' => array(),
-		'items' => array()
-	);
-
-	foreach ($screen['screenitems'] as $screenItem) {
-		if ($screenItem['resourceid'] == 0) {
-			continue;
-		}
-		switch ($screenItem['resourcetype']) {
-			case SCREEN_RESOURCE_HOSTS_INFO:
-			case SCREEN_RESOURCE_TRIGGERS_INFO:
-			case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-			case SCREEN_RESOURCE_DATA_OVERVIEW:
-			case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-				$elements['hostgroups'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_HOST_TRIGGERS:
-				$elements['hosts'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_GRAPH:
-				$elements['graphs'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_SIMPLE_GRAPH:
-			case SCREEN_RESOURCE_PLAIN_TEXT:
-				$elements['items'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_MAP:
-				$elements['sysmaps'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_SCREEN:
-				$elements['screens'][] = $screenItem['resourceid'];
-				break;
-		}
-	}
-	return $elements;
 }
