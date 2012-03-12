@@ -60,7 +60,6 @@
 	'S_PREVIOUS'=>				_('Previous'),
 	'S_NEXT'=>				_('Next'),
 	'S_FINISH'=>				_('Finish'),
-	'S_FAIL'=>				_('Fail'),
 
 //	actions.inc.php
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -381,7 +380,6 @@
 	'S_VALUES'=>				_('Values'),
 
 //	queue.php
-	'S_TOTAL'=>				_('Total'),
 	'S_COUNT'=>				_('Count'),
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
@@ -390,9 +388,6 @@
 	'S_STATUS_OF_ZABBIX'=>			_('Status of Zabbix'),
 	'S_STATUS_OF_ZABBIX_BIG'=>		_('STATUS OF ZABBIX'),
 	'S_VALUE'=>				_('Value'),
-	'S_VALUES_STORED'=>			_('Values stored'),
-	'S_TRENDS_STORED'=>			_('Trends stored'),
-	'S_NO'=>				_('No'),
 
 //	report2.php
 	'S_AVAILABILITY_REPORT'=>		_('Availability report'),

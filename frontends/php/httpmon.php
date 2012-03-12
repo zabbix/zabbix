@@ -59,7 +59,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 	}
 
-	if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
+	if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
@@ -77,7 +77,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$_REQUEST['applications'] = array();
 			$show_all_apps = 1;
 		}
-		elseif (!uint_in_array($_REQUEST['applicationid'],$_REQUEST['applications'])) {
+		elseif (!uint_in_array($_REQUEST['applicationid'], $_REQUEST['applications'])) {
 			array_push($_REQUEST['applications'],$_REQUEST['applicationid']);
 		}
 
@@ -86,15 +86,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		if (!isset($_REQUEST['applicationid'])) {
 			$_REQUEST['applications'] = array();
 		}
-		elseif (($i=array_search($_REQUEST['applicationid'], $_REQUEST['applications'])) !== FALSE) {
+		elseif (($i = array_search($_REQUEST['applicationid'], $_REQUEST['applications'])) !== FALSE) {
 			unset($_REQUEST['applications'][$i]);
 		}
 	}
-
-	/* limit opened application count */
-	// while (count($_REQUEST['applications']) > 25) {
-		// array_shift($_REQUEST['applications']);
-	// }
 
 	if (count($_REQUEST['applications']) > 25) {
 		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
@@ -146,16 +141,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$form->setName('scenarios');
 	$form->addVar('hostid', $_REQUEST['hostid']);
 
-	if (isset($show_all_apps))
+	if (isset($show_all_apps)) {
 		$link = new CLink(new CImg('images/general/opened.gif'),'?close=1'.url_param('groupid').url_param('hostid'));
-	else
+	}
+	else {
 		$link = new CLink(new CImg('images/general/closed.gif'),'?open=1'.url_param('groupid').url_param('hostid'));
+	}
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
-		is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
-		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.name') : null,
-		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
+		is_show_all_nodes() ? make_sorting_header(S_NODE, 'h.hostid') : null,
+		$_REQUEST['hostid'] == 0 ? make_sorting_header(S_HOST, 'h.name') : null,
+		make_sorting_header(array($link, SPACE, S_NAME), 'wt.name'),
 		_('Number of steps'),
 		_('Last check'),
 		S_STATUS
@@ -239,15 +236,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	}
 
 	$tab_rows = array();
-	foreach ($db_httptests as $httptestid => $httptest_data) {
+	foreach ($db_httptests as $httptest_data) {
 		$db_app = &$db_apps[$httptest_data['applicationid']];
 
-		if (!isset($tab_rows[$db_app['applicationid']]))
+		if (!isset($tab_rows[$db_app['applicationid']])) {
 			$tab_rows[$db_app['applicationid']] = array();
+		}
 		$app_rows = &$tab_rows[$db_app['applicationid']];
 
-		if (!uint_in_array($db_app['applicationid'],$_REQUEST['applications']) && !isset($show_all_apps))
+		if (!uint_in_array($db_app['applicationid'], $_REQUEST['applications']) && !isset($show_all_apps)) {
 			continue;
+		}
 
 		$name = array();
 		array_push($name, new CLink($httptest_data['name'],'httpdetails.php?httptestid='.$httptest_data['httptestid']));
@@ -275,8 +274,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		array_push($app_rows, new CRow(array(
-			is_show_all_nodes()?SPACE:null,
-			($_REQUEST['hostid']>0)?null:SPACE,
+			is_show_all_nodes() ? SPACE : null,
+			($_REQUEST['hostid'] > 0) ? null : SPACE,
 			array(str_repeat(SPACE,6), $name),
 			$httptest_data['step_count'],
 			$lastcheck,
@@ -289,16 +288,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	foreach ($tab_rows as $appid => $app_rows) {
 		$db_app = &$db_apps[$appid];
 
-		if (uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps))
+		if (uint_in_array($db_app['applicationid'], $_REQUEST['applications']) || isset($show_all_apps)) {
 			$link = new CLink(new CImg('images/general/opened.gif'),
 				'?close=1&applicationid='.$db_app['applicationid'].
 				url_param('groupid').url_param('hostid').url_param('applications').
 				url_param('select'));
-		else
+		}
+		else {
 			$link = new CLink(new CImg('images/general/closed.gif'),
 				'?open=1&applicationid='.$db_app['applicationid'].
 				url_param('groupid').url_param('hostid').url_param('applications').
 				url_param('select'));
+		}
 
 		$col = new CCol(array(
 			$link,
@@ -310,14 +311,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		$table->addRow(array(
 				get_node_name_by_elid($db_app['applicationid']),
-				($_REQUEST['hostid'] > 0)?null:$db_app['hostname'],
+				($_REQUEST['hostid'] > 0) ? null : $db_app['hostname'],
 				$col
 			));
 
 		$any_app_exist = true;
 
-		foreach ($app_rows as $row)
+		foreach ($app_rows as $row) {
 			$table->addRow($row);
+		}
 	}
 
 	$form->addItem($table);
