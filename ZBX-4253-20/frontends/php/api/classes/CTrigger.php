@@ -1288,16 +1288,16 @@ class CTrigger extends CTriggerGeneral {
 
 		foreach ($triggers as $tnum => &$trigger) {
 
-			if (!validateUrl($trigger['url'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('URL invalid.'));
-			}
-
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
 			}
 
 			if (($update || $delete) && !isset($dbTriggers[$trigger['triggerid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+
+			if (isset($trigger['url']) && !validateUrl($trigger['url'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('URL invalid.'));
 			}
 
 			if ($update) {
