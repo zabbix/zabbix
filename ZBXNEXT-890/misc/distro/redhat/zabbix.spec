@@ -1,5 +1,5 @@
 Name		: zabbix
-Version		: __TMPL_ZABBIX_VERSION__
+Version		: 1.8.10
 Release		: 1%{?dist}
 Summary		: Enterprise-class open source distributed monitoring solution.
 
@@ -166,7 +166,6 @@ Requires	: php-xml
 %if 0%{?fedora} || 0%{?rhel} >= 6
 Requires	: dejavu-sans-fonts
 %endif
-Requires	: zabbix = %{version}-%{release}
 Requires	: zabbix-web-database = %{version}-%{release}
 Requires(post)	: %{_sbindir}/update-alternatives
 Requires(preun)	: %{_sbindir}/update-alternatives
@@ -320,7 +319,7 @@ cp -a frontends/php $RPM_BUILD_ROOT%{_datadir}/%{name}
 touch $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/web/zabbix.conf.php
 
 # drop config files in place
-install -m 0644 -p misc/conf/zabbix_agent.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
+#install -m 0644 -p misc/conf/zabbix_agent.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 install -m 0644 -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/%{name}.conf
 cp -a misc/conf/zabbix_agentd $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/zabbix_agentd.d
 
@@ -373,6 +372,10 @@ install -m 0755 -p src/zabbix_proxy/zabbix_proxy_* $RPM_BUILD_ROOT%{_sbindir}/
 
 # nuke static libs and empty oracle upgrade sql
 rm -rf $RPM_BUILD_ROOT%{_libdir}/libzbx*.a
+
+# copy zabbix_agent.conf
+install -dm 755 $RPM_BUILD_ROOT%{_docdir}/%{name}-agent-%{version}
+install -m 0644 misc/conf/zabbix_agent.conf $RPM_BUILD_ROOT%{_docdir}/%{name}-agent-%{version}
 
 # copy sql files to appropriate per package locations
 for pkg in proxy server ; do
@@ -591,7 +594,6 @@ fi
 
 %files agent
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/zabbix/zabbix_agent.conf
 %config(noreplace) %{_sysconfdir}/zabbix/zabbix_agentd.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-agent
 %dir %{_sysconfdir}/zabbix/zabbix_agentd.d
@@ -681,6 +683,8 @@ fi
 - add web-japanese subpackage
 - move alertscripts and externalscripts to /usr/lib/zabbix
 - improve default parameter of config files
+- delete dependency for zabbix from web package
+- move zabbix_agent.conf to docdir
 
 * Tue Aug  9 2011 Dan Horák <dan[at]danny.cz> - 1.8.6-1
 - updated to 1.8.6 (#729164, #729165)
