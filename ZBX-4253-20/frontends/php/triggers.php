@@ -151,11 +151,6 @@ elseif (isset($_REQUEST['save'])) {
 		'dependencies' => get_request('dependencies', array())
 	);
 
-	if (!validateUrl($trigger['url'])) {
-		$trigger['url'] = "";
-		show_error_message(_('URL invalid'));
-	}
-
 	if (isset($_REQUEST['triggerid'])) {
 		$trigger['triggerid'] = $_REQUEST['triggerid'];
 		$result = API::Trigger()->update($trigger);

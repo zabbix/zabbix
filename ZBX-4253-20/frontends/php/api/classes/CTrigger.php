@@ -1287,7 +1287,10 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		foreach ($triggers as $tnum => &$trigger) {
-			$currentTrigger = $triggers[$tnum];
+
+			if (!validateUrl($trigger['url'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('URL invalid.'));
+			}
 
 			if (!check_db_fields($triggerDbFields, $trigger)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
@@ -1299,7 +1302,6 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($update) {
 				$dbTrigger = $dbTriggers[$trigger['triggerid']];
-				$currentTrigger['description'] = $dbTrigger['description'];
 			}
 			elseif ($delete) {
 				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
