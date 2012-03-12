@@ -324,7 +324,7 @@ function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
 			continue;
 		}
 
-		$result[$gitem['key_']] = $gitem;
+		$result[] = $gitem;
 	}
 
 	return $result;
@@ -332,10 +332,8 @@ function get_same_graphitems_for_host($gitems, $dest_hostid, $error = true) {
 
 /**
  * Copy specified graph to specified host.
- *
  * @param $graphid
  * @param $hostid
- *
  * @return array|bool
  */
 function copy_graph_to_host($graphid, $hostid) {
@@ -346,48 +344,15 @@ function copy_graph_to_host($graphid, $hostid) {
 	));
 	$graph = reset($graphs);
 
-	// fetch the Y axis items to map them to the items on the new host
-	$ySrcItemIds = array();
-	$ySrcItems = array();
-	if ($graph['ymin_itemid']) {
-		$ySrcItemIds[] = $graph['ymin_itemid'];
-	}
-	if ($graph['ymin_itemid']) {
-		$ySrcItemIds[] = $graph['ymax_itemid'];
-	}
-	if ($ySrcItemIds) {
-		$ySrcItems = API::Item()->get(array(
-			'output' => array('hostid', 'key_'),
-			'itemids' => $ySrcItemIds,
-			'preservekeys' => true
-		));
-	}
+	$new_gitems = get_same_graphitems_for_host($graph['gitems'], $hostid);
 
-	$srcItems = array_merge($graph['gitems'], $ySrcItems);
-	$newGitems = get_same_graphitems_for_host($srcItems, $hostid);
-
-	if (!$newGitems) {
+	if (!$new_gitems) {
 		$host = get_host_by_hostid($hostid);
 		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
 		return false;
 	}
 
-	$graph['gitems'] = $newGitems;
-
-	// replace Y axis items
-	if ($graph['ymin_itemid']) {
-		$yMinSrcItem = $ySrcItems[$graph['ymin_itemid']];
-		if (isset($newGitems[$yMinSrcItem['key_']])) {
-			$graph['ymin_itemid'] = $newGitems[$yMinSrcItem['key_']]['itemid'];
-		}
-	}
-	if ($graph['ymax_itemid']) {
-		$yMaxSrcItem = $ySrcItems[$graph['ymax_itemid']];
-		if (isset($srcItems[$yMaxSrcItem['key_']])) {
-			$graph['ymax_itemid'] = $newGitems[$yMaxSrcItem['key_']]['itemid'];
-		}
-	}
-
+	$graph['gitems'] = $new_gitems;
 	$result = API::Graph()->create($graph);
 
 	return $result;
