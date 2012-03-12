@@ -55,7 +55,7 @@ class CConfigurationImport {
 	protected $data;
 
 	/**
-	 * @var array with formatted data recieved from formatter
+	 * @var array with formatted data received from formatter
 	 */
 	protected $formattedData = array();
 
