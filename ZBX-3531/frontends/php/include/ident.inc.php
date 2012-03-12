@@ -114,8 +114,6 @@ function triggerIdents($triggerids) {
 		'nodeids' => get_current_nodeid(true)
 	));
 	foreach ($triggers as $trigger) {
-		$host = reset($trigger['hosts']);
-
 		$idents[$trigger['triggerid']] = array(
 			'description' => $trigger['description'],
 			'expression' => explode_exp($trigger['expression'])
