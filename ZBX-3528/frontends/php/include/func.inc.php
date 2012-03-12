@@ -1746,23 +1746,18 @@ function bcround($number, $precision = 0) {
  */
 function num2letter($number) {
 	$start = ord('A');
-	$end = ord('Z');
-	$range = $end - $start + 1;
+	$base = 26;
 	$str = '';
+	$level = 0;
 
-	while (($mul = floor($number / $range)) > 0) {
-		if ($mul > $range) {
-			$str .= chr($start + $range - 1);
-			$number -= $range;
+	do {
+		if ($level++ > 0) {
+			$number--;
 		}
-		else {
-			$str .= chr($start + $mul - 1);
-			$number -= $number - ($number % $range);
-		}
-
-	}
-
-	$str .= chr($start + $number);
+		$remainder = $number % $base;
+		$number = ($number - $remainder) / $base;
+		$str = chr($start + $remainder).$str;
+	} while (0 != $number);
 
 	return $str;
 }
