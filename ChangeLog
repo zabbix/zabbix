@@ -491,6 +491,7 @@ A......... [ZBX-4124] fixed template.get to correctly select applications, graph
 ..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
 ..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)
 ...G...PS. [ZBX-4721] fixed handling of \u0000 by JSON parser; thanks to Rick Alm (Sasha)
+A......... [ZBX-4562] Fixed meditype.update returning wrong formatted result (Toms)
 ........S. [ZBX-4549] fixed nested db transaction error when stopping server (dimir)
 ........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
 ..F....... [ZBX-4579] fixed incorrect "unknown" values in availability report if no events present (Alexei)
