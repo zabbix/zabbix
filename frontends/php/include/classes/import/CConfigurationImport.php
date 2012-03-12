@@ -692,7 +692,7 @@ class CConfigurationImport {
 						}
 
 						if (!empty($prototype['valuemap'])) {
-							$prototype['valuemapid'] = $this->referencer->resolveValueMap($item['valuemap']['name']);
+							$prototype['valuemapid'] = $this->referencer->resolveValueMap($prototype['valuemap']['name']);
 						}
 
 						$prototypeId = $this->referencer->resolveItem($hostid, $prototype['key_']);
@@ -964,7 +964,7 @@ class CConfigurationImport {
 			foreach ($newTriggerIds['triggerids'] as $tnum => $triggerId) {
 				$deps = array();
 				foreach ($triggersToCreateDependencies[$tnum] as $dependency) {
-					$deps[] = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+					$deps[] = array('triggerid' => $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']));
 				}
 
 				if (!empty($deps)) {
