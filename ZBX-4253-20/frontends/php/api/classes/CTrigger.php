@@ -1297,7 +1297,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			if (isset($trigger['url']) && !validateUrl($trigger['url'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('URL invalid.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect URL.'));
 			}
 
 			if ($update) {

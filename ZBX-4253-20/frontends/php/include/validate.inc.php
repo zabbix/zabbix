@@ -621,11 +621,15 @@ function validateMaxTime($time) {
 	return $time <= 2147464800; // 2038.01.19 00:00
 }
 
-/*
- * Validate URL against XSS
+/**
+ * Validate URL against XSS. Returns true if the URL is valid.
+ *
+ * @param string $url
+ *
+ * @return bool
  */
 function validateUrl($url) {
-	return (stripos($url,"javascript:") === false);
+	return (stripos($url, "javascript:") === false);
 }
 
 ?>
