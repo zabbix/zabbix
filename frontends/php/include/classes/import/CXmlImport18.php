@@ -1472,7 +1472,7 @@ class CXmlImport18 {
 								$graph_items[] = $gitem_db;
 							}
 							else{
-								throw new Exception(_s('Item "%1$s" does not exists.', $gitem_db['host_key_']));
+								throw new Exception(_s('Item "%1$s" does not exist.', $gitem_db['host_key_']));
 							}
 						}
 // }}} GRAPH ITEMS
