@@ -878,11 +878,24 @@
 		}
 
 		$db_graph = get_graph_by_graphid($graphid);
+
+		// retrieve actual ymax_itemid and ymin_itemid
+		if ($db_graph['ymax_itemid']) {
+			if ($itemid = get_same_item_for_host($db_graph['ymax_itemid'], $hostid)) {
+				$db_graph['ymax_itemid'] = $itemid;
+			};
+		}
+
+		if ($db_graph['ymin_itemid']) {
+			if ($itemid = get_same_item_for_host($db_graph['ymin_itemid'], $hostid)) {
+				$db_graph['ymin_itemid'] = $itemid;
+			}
+		}
+
 		if($new_gitems = get_same_graphitems_for_host($gitems, $hostid)){
-			unset($chd_graphid);
 
 			$chd_graphs = get_graphs_by_hostid($hostid);
-			while( !isset($chd_graphid) && $chd_graph = DBfetch($chd_graphs)){
+			while($chd_graph = DBfetch($chd_graphs)){
 /* compare graphs */
 				if ( $chd_graph['templateid'] != 0 ) continue;
 
