@@ -970,7 +970,7 @@ class CConfigurationExport {
 		$idents = array();
 		$screens = API::Screen()->get(array(
 			'screenids' => $screenIds,
-			'output' => array('name'),
+			'output' => API_OUTPUT_EXTEND,
 			'nodeids' => get_current_nodeid(true),
 			'preservekeys' => true
 		));
@@ -1048,7 +1048,7 @@ class CConfigurationExport {
 			'preservekeys' => true
 		));
 		foreach ($items as $id => $item) {
-			$host = reset($items['hosts']);
+			$host = reset($item['hosts']);
 			$idents[$id] = array(
 				'key' => $item['key_'],
 				'host' => $host['host']
