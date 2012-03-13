@@ -466,7 +466,7 @@ if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 			'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
 			$failedAttempts,
 			$attempip,
-			zbx_date2str(_('d.m.Y H:i'),$attempdate)
+			zbx_date2str(_('d.m.Y H:i'), $attempdate)
 	);
 	error($error_msg);
 
