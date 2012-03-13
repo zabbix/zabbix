@@ -29,7 +29,7 @@ if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['t
 	$EXPORT_DATA = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	$page['file'] = 'zbx_export.xml';
+	$page['file'] = 'zbx_export_templates.xml';
 }
 else{
 	$EXPORT_DATA = false;
