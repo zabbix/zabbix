@@ -3282,36 +3282,37 @@ unlock:
  *                                                                            *
  * Purpose: Get item with specified ID                                        *
  *                                                                            *
- * Parameters: item - [OUT] pointer to DC_ITEM structure                      *
- *             itemid - [IN] item ID                                          *
- *                                                                            *
- * Return value: SUCCEED if item found, otherwise FAIL                        *
+ * Parameters: item     - [OUT] pointer to DC_ITEM structure                  *
+ *             itemids  - [IN] array of item IDs                              *
+ *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
+ *             num      - [IN] number of elements                             *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid)
+void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num)
 {
-	int			res = FAIL;
+	size_t			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemid)))
-		goto unlock;
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) ||
+				NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
 
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-		goto unlock;
+		DCget_host(&items[i].host, dc_host);
+		DCget_item(&items[i], dc_item);
+		errcodes[i] = SUCCEED;
+	}
 
-	DCget_host(&item->host, dc_host);
-	DCget_item(item, dc_item);
-
-	res = SUCCEED;
-unlock:
 	UNLOCK_CACHE;
-
-	return res;
 }
 
 /******************************************************************************

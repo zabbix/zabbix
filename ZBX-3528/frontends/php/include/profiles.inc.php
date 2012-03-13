@@ -348,15 +348,17 @@ function get_user_history() {
 	}
 
 	for ($i = 1; $i < 6; $i++) {
-		if (defined($history['title'.$i])) {
-			$title = constant($history['title'.$i]);
+		if (!zbx_empty($history['title'.$i])) {
+			if (defined($history['title'.$i])) {
+				$title = constant($history['title'.$i]);
+			}
+			else {
+				$title = $history['title'.$i];
+			}
+			$url = new CLink($title, $history['url'.$i], 'history');
+			array_push($result, array(SPACE, $url, SPACE));
+			array_push($result, $delimiter);
 		}
-		else {
-			$title = $history['title'.$i];
-		}
-		$url = new CLink($title, $history['url'.$i], 'history');
-		array_push($result, array(SPACE, $url, SPACE));
-		array_push($result, $delimiter);
 	}
 	array_pop($result);
 	return $result;

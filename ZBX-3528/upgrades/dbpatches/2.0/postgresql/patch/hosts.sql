@@ -10,7 +10,7 @@ CREATE TABLE interface (
 	dns                      varchar(64)     DEFAULT ''                NOT NULL,
 	port                     varchar(64)     DEFAULT '10050'           NOT NULL,
 	PRIMARY KEY (interfaceid)
-) with OIDS;
+);
 CREATE INDEX interface_1 on interface (hostid,type);
 CREATE INDEX interface_2 on interface (ip,dns);
 ALTER TABLE ONLY interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
@@ -172,6 +172,39 @@ UPDATE items SET key_ = zbx_convert_simple_checks(itemid, hostid, key_)
 DROP FUNCTION zbx_convert_simple_checks(v_itemid bigint, v_hostid bigint, v_key varchar(255));
 
 DROP LANGUAGE 'plpgsql';
+
+-- adding web.test.error[<web check>] items
+
+CREATE SEQUENCE items_seq;
+CREATE SEQUENCE httptestitem_seq;
+CREATE SEQUENCE items_applications_seq;
+
+SELECT setval('items_seq', max(itemid)) FROM items;
+SELECT setval('httptestitem_seq', max(httptestitemid)) FROM httptestitem;
+SELECT setval('items_applications_seq', max(itemappid)) FROM items_applications;
+
+INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+	SELECT NEXTVAL('items_seq'), hostid, type, 'Last error message of scenario ''$1''', 'web.test.error' || SUBSTR(key_, STRPOS(key_, '[')), 1, '', delay, history, 0, status
+	FROM items
+	WHERE type = 9
+		AND key_ LIKE 'web.test.fail%';
+
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+	SELECT NEXTVAL('httptestitem_seq'), ht.httptestid, i.itemid, 4
+	FROM httptest ht,applications a,items i
+	WHERE ht.applicationid=a.applicationid
+		AND a.hostid=i.hostid
+		AND 'web.test.error[' || ht.name || ']' = i.key_;
+
+INSERT INTO items_applications (itemappid, applicationid, itemid)
+	SELECT NEXTVAL('items_applications_seq'), ht.applicationid, hti.itemid
+	FROM httptest ht, httptestitem hti
+	WHERE ht.httptestid = hti.httptestid
+		AND hti.type = 4;
+
+DROP SEQUENCE items_applications_seq;
+DROP SEQUENCE httptestitem_seq;
+DROP SEQUENCE items_seq;
 
 ---- Patching table `hosts`
 
