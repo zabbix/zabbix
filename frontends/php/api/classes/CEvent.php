@@ -589,7 +589,7 @@ class CEvent extends CZBXAPI {
 /**
  * Add events ( without alerts )
  *
- * @param _array $events multidimensional array with events data
+ * @param array $events multidimensional array with events data
  * @param array $events[0,...]['source']
  * @param array $events[0,...]['object']
  * @param array $events[0,...]['objectid']
@@ -623,7 +623,7 @@ class CEvent extends CZBXAPI {
 				unset($events[$num]);
 			}
 
-			foreach ($events as $num => $event) {
+			foreach ($events as $event) {
 				$eventDbFields = array(
 					'source'		=> null,
 					'object'		=> null,

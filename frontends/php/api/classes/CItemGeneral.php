@@ -84,7 +84,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			'privatekey'			=> array(),
 			'mtime'					=> array('system' => 1),
 			'lastns'				=> array('system' => 1),
-			'flags'					=> array('system' => 1),
+			'flags'					=> array(),
 			'filter'				=> array(),
 			'interfaceid'			=> array('host' => 1),
 			'port'					=> array(),
@@ -297,6 +297,8 @@ abstract class CItemGeneral extends CZBXAPI {
 			$this->checkSpecificFields($fullItem);
 		}
 		unset($item);
+
+		$this->checkExistingItems($items);
 	}
 
 	protected function checkSpecificFields(array $item) {
@@ -631,6 +633,49 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 
 		return $newItems;
+	}
+
+	/**
+	 * Check if any item from list already exists.
+	 * If items have item ids it will check for existing item with different itemid.
+	 *
+	 * @throw APIException
+	 *
+	 * @param array $items
+	 */
+	protected function checkExistingItems(array $items) {
+		$itemKeysByHostId = array();
+		$itemIds = array();
+		foreach ($items as $item) {
+			if (!isset($itemKeysByHostId[$item['hostid']])) {
+				$itemKeysByHostId[$item['hostid']] = array();
+			}
+			$itemKeysByHostId[$item['hostid']][] = $item['key_'];
+
+			if (isset($item['itemid'])) {
+				$itemIds[] = $item['itemid'];
+			}
+		}
+
+		$sqlWhere = array();
+		foreach ($itemKeysByHostId as $hostId => $keys) {
+			$sqlWhere[] = '(i.hostid='.$hostId.' AND '.DBcondition('i.key_', $keys).')';
+		}
+
+		if ($sqlWhere) {
+			$sql = 'SELECT i.key_'.
+				' FROM items i'.
+				' WHERE ('.implode(' OR ', $sqlWhere).')';
+
+			// if we update existing items we need to exclude them from result.
+			if ($itemIds) {
+				$sql .= ' AND '.DBcondition('i.itemid', $itemIds, true);
+			}
+			$dbItems = DBselect($sql, 1);
+			while ($dbItem = DBfetch($dbItems)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on given host.', $dbItem['key_']));
+			}
+		}
 	}
 }
 ?>

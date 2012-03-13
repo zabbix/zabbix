@@ -870,20 +870,6 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	protected function createReal(&$items) {
-		foreach ($items as $key => $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => true
-			));
-			foreach ($itemsExists as $inum => $itemExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with item "%1$s" already exists.', $item['key_']));
-			}
-		}
-
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = array();
@@ -927,20 +913,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$data = array();
 		foreach ($items as $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => true
-			));
-			foreach ($itemsExists as $itemExists) {
-				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host with item "%1$s" already exists.', $item['key_']));
-				}
-			}
-
 			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
 		}
 		$result = DB::update('items', $data);

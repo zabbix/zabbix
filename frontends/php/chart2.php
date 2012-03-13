@@ -44,7 +44,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 	if(!DBfetch(DBselect('SELECT graphid FROM graphs WHERE graphid='.$_REQUEST['graphid']))){
-		show_error_message(S_NO_GRAPHS_DEFINED);
+		show_error_message(_('No graphs defined.'));
 	}
 
 	$options = array(

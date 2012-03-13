@@ -173,7 +173,7 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addarray(&j, cmd);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	/* opening the mounted filesystems file */
 	if (NULL != (f = fopen("/etc/mnttab", "r")))

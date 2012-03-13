@@ -102,7 +102,7 @@ class CHost extends CZBXAPI {
 			'applicationids'			=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
-			'webcheckids'				=> null,
+			'httptestids'				=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts'			=> null,
 			'proxy_hosts'				=> null,
@@ -308,16 +308,16 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// webcheckids
-		if (!is_null($options['webcheckids'])) {
-			zbx_value2array($options['webcheckids']);
+// httptestids
+		if (!is_null($options['httptestids'])) {
+			zbx_value2array($options['httptestids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['webcheckid'] = 'ht.httptestid';
+				$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			}
 
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['from']['httptest'] = 'httptest ht';
-			$sqlParts['where'][] = DBcondition('ht.httptestid', $options['webcheckids']);
+			$sqlParts['where'][] = DBcondition('ht.httptestid', $options['httptestids']);
 			$sqlParts['where']['aht'] = 'a.applicationid=ht.applicationid';
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
 
@@ -697,12 +697,12 @@ class CHost extends CZBXAPI {
 						$result[$host['hostid']]['applications'][] = array('applicationid' => $host['applicationid']);
 						unset($host['applicationid']);
 					}
-// webcheckids
+// httptestids
 					if (isset($host['httptestid'])) {
-						if (!isset($result[$host['hostid']]['webchecks']))
-							$result[$host['hostid']]['webchecks'] = array();
+						if (!isset($result[$host['hostid']]['httptests']))
+							$result[$host['hostid']]['httptests'] = array();
 
-						$result[$host['hostid']]['webchecks'][] = array('webcheckid' => $host['httptestid']);
+						$result[$host['hostid']]['httptests'][] = array('httptestid' => $host['httptestid']);
 						unset($host['httptestid']);
 					}
 
@@ -737,7 +737,6 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -1537,7 +1536,7 @@ Copt::memoryPick();
 /**
  * Update Host
  *
- * @param _array $hosts multidimensional array with Hosts data
+ * @param array $hosts multidimensional array with Hosts data
  * @param string $hosts['host'] Host name.
  * @param int $hosts['port'] Port. OPTIONAL
  * @param int $hosts['status'] Host Status. OPTIONAL
@@ -1757,7 +1756,7 @@ Copt::memoryPick();
 			unset($data['macros']);
 		}
 
-		if (isset($data['inventory'])) {
+		if (!empty($data['inventory'])) {
 			$updateInventory = $data['inventory'];
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 			unset($data['inventory']);
