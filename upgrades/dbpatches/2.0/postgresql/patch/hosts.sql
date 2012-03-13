@@ -10,7 +10,7 @@ CREATE TABLE interface (
 	dns                      varchar(64)     DEFAULT ''                NOT NULL,
 	port                     varchar(64)     DEFAULT '10050'           NOT NULL,
 	PRIMARY KEY (interfaceid)
-) with OIDS;
+);
 CREATE INDEX interface_1 on interface (hostid,type);
 CREATE INDEX interface_2 on interface (ip,dns);
 ALTER TABLE ONLY interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
