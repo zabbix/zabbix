@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
-Changes for 1.9.10
+Changes for 2.0.0rc1
 
 New features:
 ....I...S. [ZBX-4751] removed "WITH OIDS" option from PostgreSQL database scheme (Sasha)
