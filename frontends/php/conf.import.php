@@ -19,10 +19,13 @@
 **/
 
 
+require_once 'include/config.inc.php';
+
 $page['file'] = 'conf.import.php';
 $page['title'] = _('Configuration import');
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['hist_arg'] = array();
 
-require_once 'include/config.inc.php';
 require_once 'include/page_header.php';
 
 $fields = array(
