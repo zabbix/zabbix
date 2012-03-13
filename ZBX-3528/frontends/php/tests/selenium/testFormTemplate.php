@@ -88,7 +88,7 @@ class testFormTemplate extends CWebTest {
 		$this->tab_switch('Macros');
 		$this->type("name=macros[0][macro]", '{$TEST_MACRO}');
 		$this->type("name=macros[0][value]", "1");
-		$this->click("//table[@id='userMacros']//input[@id='add']");
+		$this->click("//table[@id='tbl_macros']//input[@id='macro_add']");
 		$this->verifyElementPresent("name=macros[1][macro]");
 		$this->type("name=macros[1][macro]", '{$TEST_MACRO2}');
 		$this->type("name=macros[1][value]", "2");

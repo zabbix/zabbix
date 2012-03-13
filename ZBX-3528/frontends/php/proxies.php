@@ -182,7 +182,7 @@
 	if(!isset($_REQUEST['form'])){
 		$frmForm->addItem(new CSubmit('form',S_CREATE_PROXY));
 	}
-	$proxies_wdgt->addPageHeader(S_CONFIGURATION_OF_PROXIES, $frmForm);
+	$proxies_wdgt->addPageHeader(_('CONFIGURATION OF PROXIES'), $frmForm);
 
 
 	if(isset($_REQUEST['form'])){
@@ -205,9 +205,9 @@
 			make_sorting_header(S_NAME, 'host'),
 			S_MODE,
 			S_LASTSEEN_AGE,
-			S_HOST_COUNT,
-			S_ITEM_COUNT,
-			S_REQUIRED_PERFORMANCE,
+			_('Host count'),
+			_('Item count'),
+			_('Required performance (vps)'),
 			S_HOSTS,
 		));
 
@@ -276,7 +276,7 @@
 			$table->addRow(array(
 				new CCheckBox('hosts['.$proxy['proxyid'].']', NULL, NULL, $proxy['proxyid']),
 				new CLink($proxy['host'], 'proxies.php?form=update&hostid='.$proxy['proxyid']),
-				$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? S_PROXY_ACTIVE : S_PROXY_PASSIVE,
+				$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _x('Active', 'proxy') : _x('Passive', 'proxy'),
 				($proxy['lastaccess'] == 0) ? '-' : zbx_date2age($proxy['lastaccess']),
 				count($proxy['hosts']),
 				isset($proxy['item_count']) ? $proxy['item_count'] : 0,
@@ -290,19 +290,19 @@
 		$goBox = new CComboBox('go');
 
 		$goOption = new CComboItem('activate', _('Enable selected'));
-		$goOption->setAttribute('confirm',S_ENABLE_SELECTED_PROXIES);
+		$goOption->setAttribute('confirm',_('Enable hosts monitored by selected proxies?'));
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('disable', _('Disable selected'));
-		$goOption->setAttribute('confirm',S_DISABLE_SELECTED_PROXIES);
+		$goOption->setAttribute('confirm',_('Disable hosts monitored by selected proxies?'));
 		$goBox->addItem($goOption);
 
 		$goOption = new CComboItem('delete', _('Delete selected'));
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_PROXIES);
+		$goOption->setAttribute('confirm',_('Delete selected proxies?'));
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton', S_GO.' (0)');
+		$goButton = new CSubmit('goButton', _('Go'));
 		$goButton->setAttribute('id', 'goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "hosts";');

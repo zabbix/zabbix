@@ -1202,7 +1202,7 @@ int	int_in_list(char *list, int value)
 	char		*start = NULL, *end = NULL, c = '\0';
 	int		i1, i2, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' value:%d", list, value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' value:%d", __function_name, list, value);
 
 	for (start = list; '\0' != *start;)
 	{

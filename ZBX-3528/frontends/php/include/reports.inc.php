@@ -167,12 +167,12 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 					'addListener($("filter_icon"),"click",CLNDR[\'avail_report_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_till\'].clndr));'
 					);
 
-	$filterForm->addRow(S_PERIOD, $filtertimetab);
+	$filterForm->addRow(_('Period'), $filtertimetab);
 
 //*/
-	$filterForm->addItemToBottomRow(new CSubmit('filter_set',S_FILTER));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_set',_('Filter')));
 
-	$reset = new CButton("filter_rst", S_RESET, 'javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
+	$reset = new CButton("filter_rst", _('Reset'), 'javascript: var url = new Curl(location.href); url.setArgument("filter_rst",1); location.href = url.getUrl();');
 
 	$filterForm->addItemToBottomRow($reset);
 
@@ -184,7 +184,7 @@ function bar_report_form(){
 	$items = get_request('items',array());
 	$scaletype = get_request('scaletype',TIMEPERIOD_TYPE_WEEKLY);
 
-	$title = get_request('title',S_REPORT.' 1');
+	$title = get_request('title',_('Report 1'));
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 	$showlegend = get_request('showlegend',0);
@@ -284,7 +284,7 @@ function bar_report_form(){
 						'CLNDR[\'avail_report_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_till\'].clndr));'
 					);
 
-	$reportForm->addRow(S_PERIOD, $reporttimetab);
+	$reportForm->addRow(_('Period'), $reporttimetab);
 //*/
 
 	if(count($items)){
@@ -311,7 +311,7 @@ function bar_report_form(){
 					$caption,
 					$description,
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
-					($gitem['axisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
+					($gitem['axisside']==GRAPH_YAXIS_SIDE_LEFT)?_('Left'):S_RIGHT,
 					$color,
 				));
 		}
@@ -333,7 +333,7 @@ function bar_report_form(){
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
 
-	$reset = new CButton('reset',S_RESET);
+	$reset = new CButton('reset',_('Reset'));
 	$reset->setType('reset');
 	$reportForm->addItemToBottomRow($reset);
 
@@ -343,7 +343,7 @@ return $reportForm;
 function bar_report_form2(){
 	$config = get_request('config',1);
 
-	$title = get_request('title',S_REPORT.' 2');
+	$title = get_request('title',_('Report 2'));
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 
@@ -417,7 +417,7 @@ function bar_report_form2(){
 
 	$reportForm->addVar('periods',$periods);
 
-	$reportForm->addRow(S_PERIOD,
+	$reportForm->addRow(_('Period'),
 				array(
 					$periods_table,
 					new CButton('add_period',S_ADD,
@@ -471,7 +471,7 @@ function bar_report_form2(){
 
 	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
 
-	$reset = new CButton('reset',S_RESET);
+	$reset = new CButton('reset',_('Reset'));
 	$reset->setType('reset');
 	$reportForm->addItemToBottomRow($reset);
 
@@ -481,7 +481,7 @@ return $reportForm;
 function bar_report_form3(){
 	$config = get_request('config',1);
 
-	$title = get_request('title',S_REPORT.' 3');
+	$title = get_request('title',_('Report 3'));
 	$xlabel = get_request('xlabel','');
 	$ylabel = get_request('ylabel','');
 
@@ -551,7 +551,7 @@ function bar_report_form3(){
 		$cmbGroups->addItem($group['groupid'],$group['name']);
 	}
 
-	$td_groups = new CCol(array(S_GROUP,SPACE,$cmbGroups));
+	$td_groups = new CCol(array(_('Group'),SPACE,$cmbGroups));
 	$td_groups->setAttribute('style','text-align: right;');
 
 	$host_tb = new CTweenBox($reportForm,'hostids',$hostids,10);
@@ -653,7 +653,7 @@ function bar_report_form3(){
 						'CLNDR[\'avail_report_till\'].clndr.clndrhide.bindAsEventListener(CLNDR[\'avail_report_till\'].clndr));'
 					);
 
-	$reportForm->addRow(S_PERIOD, $reporttimetab);
+	$reportForm->addRow(_('Period'), $reporttimetab);
 
 	$scale = new CComboBox('scaletype', $scaletype);
 		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, S_HOURLY);
@@ -709,7 +709,7 @@ function bar_report_form3(){
 	$reportForm->addRow(S_PALETTE , array($paletteCmb,$paletteTypeCmb));
 	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
 
-	$reset = new CButton('reset', S_RESET);
+	$reset = new CButton('reset', _('Reset'));
 	$reset->setType('reset');
 	$reportForm->addItemToBottomRow($reset);
 

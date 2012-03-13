@@ -303,7 +303,7 @@ class CImage extends CZBXAPI {
 				}
 
 				if ($this->exists(array('name' => $image['name']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '._('already exists'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Image').' [ '.$image['name'].' ] '._('already exists'));
 				}
 
 				// Decode BASE64
@@ -330,13 +330,13 @@ class CImage extends CZBXAPI {
 						$stmt = oci_parse($DB['DB'], $sql);
 						if (!$stmt) {
 							$e = oci_error($DB['DB']);
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_PARSE_SQL_ERROR.' ['.$e['message'].'] '._('in').' ['.$e['sqltext'].']');
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Parse SQL error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
 						}
 
 						oci_bind_by_name($stmt, ':imgdata', $lob, -1, OCI_B_BLOB);
 						if (!oci_execute($stmt)) {
 							$e = oci_error($stid);
-							self::exception(ZBX_API_ERROR_PARAMETERS, S_EXECUTE_SQL_ERROR.' ['.$e['message'].'] '._('in').' ['.$e['sqltext'].']');
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Execute SQL error [%1$s] in [%2$s].', $e['message'], $e['sqltext']));
 						}
 						oci_free_statement($stmt);
 					break;
@@ -413,7 +413,7 @@ class CImage extends CZBXAPI {
 			$imageExists = reset($imageExists);
 
 			if ($imageExists && (bccomp($imageExists['imageid'], $image['imageid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_IMAGE.' [ '.$image['name'].' ] '._('already exists'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Image').' [ '.$image['name'].' ] '._('already exists'));
 			}
 
 			$values = array();
@@ -482,7 +482,7 @@ class CImage extends CZBXAPI {
 			$result = DBexecute($sql);
 
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_COULD_NOT_SAVE_IMAGE);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Could not save image!'));
 			}
 		}
 
@@ -541,8 +541,7 @@ class CImage extends CZBXAPI {
 					' OR '.DBCondition('se.iconid_on', $imageids).
 					' OR '.DBCondition('se.iconid_disabled', $imageids).
 					' OR '.DBCondition('se.iconid_maintenance', $imageids).
-					' OR '.DBCondition('sm.backgroundid', $imageids).
-				')';
+				') OR '.DBCondition('sm.backgroundid', $imageids);
 		$dbSysmaps = DBselect($sql);
 
 		$usedInMaps = array();
