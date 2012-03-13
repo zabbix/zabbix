@@ -460,12 +460,12 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 }
 
 // if a user logges in after several unsuccessful attempts, display a warning
-if ($failedAttempt = CProfile::get('web.login.attempt.failed', 0)) {
+if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	$attempip = CProfile::get('web.login.attempt.ip', '');
 	$attempdate = CProfile::get('web.login.attempt.clock', 0);
 
 	$error_msg = array(
-		new CSpan($failedAttempt, 'bold'),
+		new CSpan($failedAttempts, 'bold'),
 		_n(' failed login attempt logged. Last failed attempt was from ', ' failed login attempts logged. Last failed attempt was from ', $failedAttempts),
 		new CSpan($attempip, 'bold'),
 		_(' on '),
