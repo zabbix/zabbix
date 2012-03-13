@@ -20,6 +20,7 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+...G.J.PS. [ZBX-4725] fixed processing lld rules with macros in a key (Sasha)
 ..F....... [ZBX-4730] removed incorrect JS function call in the event history screen (Pavels)
 ..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
 A.F....... [ZBX-4333] fixed trigger inheritance when calling trigger.update whithout a trigger expression (Pavels)
