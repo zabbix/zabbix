@@ -39,21 +39,21 @@ static int	http_get_macro_value(const char *macros, const char *macro, char **re
 		pv = pm + sz_macro;
 
 		/* skip white spaces */
-		while (' ' == *pv || '\t' == *pv)
+		while (0 != isspace(*pv))
 			pv++;
 
 		if ('=' != *pv++)
 			continue;
 
 		/* skip white spaces */
-		while (' ' == *pv || '\t' == *pv)
+		while (0 != isspace(*pv))
 			pv++;
 
 		for (p = pv; '\0' != *p && '\r' != *p && '\n' != *p; p++)
 			;
 
 		/* trim white spaces */
-		while (p > pv && (' ' == *(p - 1) || '\t' == *(p - 1)))
+		while (p > pv && 0 != isspace(*(p - 1)))
 			p--;
 
 		zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pv, p - pv);
