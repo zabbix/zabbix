@@ -33,7 +33,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 	*/
 	public function testFormAdministrationGeneralTrigDisplOptions_Layout($allValues) {
 
-		$this->login('adm.triggerdisplayingoptions.php');
+		$this->login('adm.triggerdisplayoptions.php');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger displaying options', 'Colour', 'Blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged OK events', 'Acknowledged OK events', 'Display OK triggers for', 'On status change triggers blink for'));
 
 		$sql = 'SELECT problem_unack_color, problem_unack_style, problem_ack_color, problem_ack_style, ok_unack_color, ok_unack_style,'.
@@ -79,7 +79,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 
 	public function testFormAdministrationGeneralTrigDisplOptions_UpdateTrigDisplOptions() {
 
-		$this->login('adm.triggerdisplayingoptions.php');
+		$this->login('adm.triggerdisplayoptions.php');
 		$this->dropdown_select_wait('configDropDown', 'Trigger displaying options');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger displaying options', 'Colour', 'Blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged OK events', 'Acknowledged OK events', 'Display OK triggers for', 'On status change triggers blink for'));
@@ -144,7 +144,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 
 	public function testFormAdministrationGeneralTrigDisplOptions_ResetTrigDisplOptions() {
 
-		$this->login('adm.triggerdisplayingoptions.php');
+		$this->login('adm.triggerdisplayoptions.php');
 		$this->dropdown_select_wait('configDropDown', 'Trigger displaying options');
 		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger displaying options'));
