@@ -20,6 +20,6 @@
 #ifndef ZABBIX_HTTPMACRO_H
 #define ZABBIX_HTTPMACRO_H
 
-void	http_substitute_macros(char *macros, char *data, size_t data_max_len);
+void	http_substitute_macros(const char *macros, char **data);
 
 #endif

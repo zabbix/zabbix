@@ -23,6 +23,48 @@
 
 #include "httpmacro.h"
 
+static int	http_get_macro_value(const char *macros, const char *macro, char **replace_to, size_t *replace_to_alloc)
+{
+	size_t		sz_macro, replace_to_offset = 0;
+	const char	*pm, *pv, *p;
+	int		res = FAIL;
+
+	sz_macro = strlen(macro);
+
+	for (pm = macros; NULL != (pm = strstr(pm, macro)); pm += sz_macro)
+	{
+		if (pm != macros && '\r' != *(pm - 1) && '\n' != *(pm - 1))
+			continue;
+
+		pv = pm + sz_macro;
+
+		/* skip white spaces */
+		while (' ' == *pv || '\t' == *pv)
+			pv++;
+
+		if ('=' != *pv++)
+			continue;
+
+		/* skip white spaces */
+		while (' ' == *pv || '\t' == *pv)
+			pv++;
+
+		for (p = pv; '\0' != *p && '\r' != *p && '\n' != *p; p++)
+			;
+
+		/* trim white spaces */
+		while (p > pv && (' ' == *(p - 1) || '\t' == *(p - 1)))
+			p--;
+
+		zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pv, p - pv);
+
+		res = SUCCEED;
+		break;
+	}
+
+	return res;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: http_substitute_macros                                           *
@@ -35,68 +77,46 @@
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	http_substitute_macros(char *macros, char *data, size_t data_max_len)
+void	http_substitute_macros(const char *macros, char **data)
 {
 	const char	*__function_name = "http_substitute_macros";
 
-	char		*pl = NULL, *pr = NULL, str_out[MAX_STRING_LEN], replace_to[MAX_STRING_LEN],
-			*c, *c2, save, *replacement, save2;
-	int		outlen, var_len;
+	char		c, *replace_to = NULL;
+	size_t		l, r, replace_to_alloc = 64;
+	int		rc;
 
-	assert(data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, data);
-
-	*str_out = '\0';
-	outlen = sizeof(str_out) - 1;
-	pl = data;
-	while (NULL != (pr = strchr(pl, '{')) && 0 < outlen)
+	for (l = 0; '\0' != (*data)[l]; l++)
 	{
-		*pr = '\0';
-		zbx_strlcat(str_out, pl, outlen);
-		outlen -= MIN(strlen(pl), outlen);
-		*pr = '{';
+		if ('{' != (*data)[l])
+			continue;
 
-		zbx_snprintf(replace_to, sizeof(replace_to), "{");
-		var_len = 1;
+		for (r = l + 1; '\0' != (*data)[r] && '}' != (*data)[r]; r++)
+			;
 
-		if (NULL != (c = strchr(pr, '}')))
-		{
-			/* macro in pr */
-			save = c[1]; c[1] = 0;
+		if ('}' != (*data)[r])
+			break;
 
-			if (NULL != (c2 = strstr(macros, pr)))
-			{
-				if (NULL != (replacement = strchr(c2, '=')))
-				{
-					replacement++;
-					if (NULL != (c2 = strchr(replacement, '\r')))
-					{
-						save2 = *c2; *c2 = 0;
-						var_len = strlen(pr);
-						strscpy(replace_to, replacement);
-						*c2 = save2;
-					}
-					else
-					{
-						var_len = strlen(pr);
-						strscpy(replace_to, replacement);
-					}
-				}
+		if (NULL == replace_to)
+			replace_to = zbx_malloc(replace_to, replace_to_alloc);
 
-			}
-			/* restore pr */
-			c[1] = save;
-		}
+		c = (*data)[r + 1];
+		(*data)[r + 1] = '\0';
 
-		zbx_strlcat(str_out, replace_to, outlen);
-		outlen -= MIN(strlen(replace_to), outlen);
-		pl = pr + var_len;
+		rc = http_get_macro_value(macros, &(*data)[l], &replace_to, &replace_to_alloc);
+
+		(*data)[r + 1] = c;
+
+		if (SUCCEED != rc)
+			continue;
+
+		zbx_replace_string(data, l, &r, replace_to);
+
+		l = r;
 	}
-	zbx_strlcat(str_out, pl, outlen);
-	outlen -= MIN(strlen(pl), outlen);
 
-	zbx_strlcpy(data, str_out, data_max_len);
+	zbx_free(replace_to);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
 }
