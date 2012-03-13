@@ -70,7 +70,7 @@ $fields = array(
 	'ajaxAction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null)
 );
 check_fields($fields);
-$_REQUEST['dynmic'] = get_request('dynamic', SCREEN_SIMPLE_ITEM);
+$_REQUEST['dynamic'] = get_request('dynamic', SCREEN_SIMPLE_ITEM);
 
 /*
  * Permissions
@@ -160,7 +160,7 @@ if (isset($_REQUEST['save'])) {
 		'valign' => get_request('valign'),
 		'colspan' => get_request('colspan'),
 		'rowspan' => get_request('rowspan'),
-		'dynmic' => get_request('dynmic'),
+		'dynamic' => get_request('dynamic'),
 		'elements' => get_request('elements', 0),
 		'sort_triggers' => get_request('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC)
 	);
