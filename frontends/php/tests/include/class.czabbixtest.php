@@ -24,6 +24,9 @@
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
 
+// Z
+require_once dirname(__FILE__).'/../../include/classes/core/Z.php';
+
 class CZabbixTest extends PHPUnit_Framework_TestCase {
 	public $ID = 0;
 
@@ -120,6 +123,10 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 		return $decoded;
 	}
 
+	public static function setUpBeforeClass() {
+		$a = new Z;
+		$a->run();
+	}
 
 	protected function setUp() {
 		global $DB, $URL;

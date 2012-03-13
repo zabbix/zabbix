@@ -32,22 +32,8 @@ require_once dirname(__FILE__).'/../../include/locales/en_gb.inc.php';
 require_once dirname(__FILE__).'/../../include/locales.inc.php';
 process_locales();
 
-// classes
-require_once dirname(__FILE__).'/../../include/classes/class.cwebuser.php';
-
-// APIs
-require_once dirname(__FILE__).'/../../include/classes/api/APIException.php';
-require_once dirname(__FILE__).'/../../include/classes/api/CZBXAPI.php';
-require_once dirname(__FILE__).'/../../api/classes/CItemGeneral.php';
-require_once dirname(__FILE__).'/../../api/classes/CItemKey.php';
-require_once dirname(__FILE__).'/../../api/classes/CItem.php';
-require_once dirname(__FILE__).'/../../api/classes/CHost.php';
-require_once dirname(__FILE__).'/../../api/classes/CHostGroup.php';
-require_once dirname(__FILE__).'/../../api/classes/CTemplate.php';
-require_once dirname(__FILE__).'/../../api/classes/CHostInterface.php';
-require_once dirname(__FILE__).'/../../api/classes/CProxy.php';
-require_once dirname(__FILE__).'/../../api/classes/CGraph.php';
-require_once dirname(__FILE__).'/../../api/classes/CTrigger.php';
+// Z
+require_once dirname(__FILE__).'/../../include/classes/core/Z.php';
 
 if (!function_exists('info')) {
 	function info($data) {
@@ -100,6 +86,8 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 	 * @static
 	 */
 	public static function setUpBeforeClass() {
+		$a = new Z;
+		$a->run();
 
 		// some variable defines not to include config.inc.php
 		global $ZBX_CURRENT_NODEID;
