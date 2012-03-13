@@ -715,7 +715,7 @@ static int	snmp_walk(struct snmp_session *ss, DC_ITEM *item, const char *OID, AG
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addarray(&j, item->key_orig);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	/* create OID from string */
 	snmp_parse_oid(OID, rootOID, &rootOID_len);

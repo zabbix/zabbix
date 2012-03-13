@@ -30,12 +30,12 @@
 	'S_HOUR_SHORT' =>			_('h'),
 	'S_MINUTE_SHORT' =>			_('m'),
 
-//	httpmon.php
-	'S_WEB_SCENARIO_DATE_FORMAT'=>		_('d M Y H:i:s'),
-	'S_WEB_SCENARIO_IDLE_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
 //	exp_imp.php
 	'S_ELEMENT'=>				_('Element'),
+
+//	export.inc.php
+	'S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT'=>	_('d.m.y'),
+	'S_EXPORT_TIME_ATTRIBUTE_DATE_FORMAT'=>	_('H.i'),
 
 //	actions.inc.php
 	'S_HISTORY_OF_ACTIONS_DATE_FORMAT'=>	_('d M Y H:i:s'),
@@ -74,8 +74,6 @@
 //	graph.php
 	'S_COLOR'=>					_('Colour'),
 	'S_LEFT'=>					_('Left'),
-	'S_SIMPLE'=>				_('Simple'),
-
 
 	'S_HISTORY_LOG_ITEM_DATE_FORMAT'=>	_('[Y.M.d H:i:s]'),
 	'S_HISTORY_LOG_LOCALTIME_DATE_FORMAT'=>	_('Y.M.d H:i:s'),
@@ -122,7 +120,6 @@
 	'S_DELETE_TEMPLATE_Q' => _('Delete template?'),
 	'S_DELETE_AND_CLEAR_TEMPLATE_Q' => _('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
 
-	'S_TEMPLATE_LINKAGE'=>			_('Template linkage'),
 	'S_TEMPLATES'=>				_('Templates'),
 	'S_UNLINK'=>				_('Unlink'),
 	'S_CANNOT_UNLINK_TEMPLATE'=>	_('Cannot unlink template'),
@@ -147,7 +144,6 @@
 	'S_SHOWN'=>				_('Shown'),
 	'S_URLS'=>				_('URLs'),
 	'S_LABEL'=>				_('Label'),
-	'S_X'=>					_('X'),
 	'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 
 //	sysmaps.php
@@ -155,7 +151,6 @@
 	'S_CANNOT_DELETE_MAP'=>			_('Cannot delete network map'),
 	'S_MAPS_BIG'=>					_('MAPS'),
 	'S_CREATE_MAP'=>				_('Create map'),
-	'S_IMPORT_MAP'=>				_('Import map'),
 	'S_DELETE_SELECTED_MAPS_Q'=>		_('Delete selected maps?'),
 	'S_MAP_ADDED'=>					_('Network map added'),
 	'S_CANNOT_ADD_MAP'=>			_('Cannot add network map'),
@@ -218,7 +213,6 @@
 	'S_VALUES'=>				_('Values'),
 
 //	queue.php
-	'S_TOTAL'=>				_('Total'),
 	'S_COUNT'=>				_('Count'),
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
@@ -227,9 +221,6 @@
 	'S_STATUS_OF_ZABBIX'=>			_('Status of Zabbix'),
 	'S_STATUS_OF_ZABBIX_BIG'=>		_('STATUS OF ZABBIX'),
 	'S_VALUE'=>				_('Value'),
-	'S_VALUES_STORED'=>			_('Values stored'),
-	'S_TRENDS_STORED'=>			_('Trends stored'),
-	'S_NO'=>				_('No'),
 
 //	report2.php
 	'S_AVAILABILITY_REPORT'=>		_('Availability report'),
@@ -354,8 +345,6 @@
 	'S_CANNOT_DELETE_PROXY'=>	_('Cannot delete proxy'),
 	'S_NAME'=>					_('Name'),
 	'S_HIDE'=>					_('Hide'),
-	'S_ADD_TO'=>				_('Add to'),
-	'S_REMOVE_FROM'=>			_('Remove from'),
 
 //scripts.php
 	'S_CLOSE'=>					_('Close'),

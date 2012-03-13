@@ -188,7 +188,7 @@ elseif (isset($_REQUEST['save'])) {
 			}
 		}
 
-		$webcheck = array(
+		$httpTest = array(
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
@@ -206,7 +206,7 @@ elseif (isset($_REQUEST['save'])) {
 				' AND a.hostid='.$_REQUEST['hostid']
 		);
 		if ($applicationid = DBfetch($db_app_result)) {
-			$webcheck['applicationid'] = $applicationid['applicationid'];
+			$httpTest['applicationid'] = $applicationid['applicationid'];
 		}
 		else {
 			$result = API::Application()->create(array(
@@ -217,32 +217,32 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception(_('Cannot add new application.').' [ '.$application.' ]');
 			}
 			else {
-				$webcheck['applicationid'] = reset($result['applicationids']);
+				$httpTest['applicationid'] = reset($result['applicationids']);
 			}
 		}
 
 		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE) {
-			$webcheck['http_user'] = htmlspecialchars($_REQUEST['http_user']);
-			$webcheck['http_password'] = htmlspecialchars($_REQUEST['http_password']);
+			$httpTest['http_user'] = htmlspecialchars($_REQUEST['http_user']);
+			$httpTest['http_password'] = htmlspecialchars($_REQUEST['http_password']);
 		}
 		else {
-			$webcheck['http_user'] = '';
-			$webcheck['http_password'] = '';
+			$httpTest['http_user'] = '';
+			$httpTest['http_password'] = '';
 		}
 
 		if (isset($_REQUEST['httptestid'])) {
-			$webcheck['webcheckid'] = $httptestid = $_REQUEST['httptestid'];
-			$result = API::WebCheck()->update($webcheck);
+			$httpTest['httptestid'] = $httptestid = $_REQUEST['httptestid'];
+			$result = API::WebCheck()->update($httpTest);
 			if (!$result) {
 				throw new Exception();
 			}
 		}
 		else {
-			$result = API::WebCheck()->create($webcheck);
+			$result = API::WebCheck()->create($httpTest);
 			if (!$result) {
 				throw new Exception();
 			}
-			$httptestid = reset($result['webcheckids']);
+			$httptestid = reset($result['httptestids']);
 		}
 
 		$host = get_host_by_hostid($_REQUEST['hostid']);
