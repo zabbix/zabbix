@@ -1960,38 +1960,41 @@ class CTrigger extends CTriggerGeneral {
 			),
 			'selectDependencies' => API_OUTPUT_REFER
 		));
-		$childTriggers = $this->get(array(
-			'hostids' => ($hostIds) ? $hostIds : null,
-			'filter' => array('templateid' => array_keys($parentTriggers)),
-			'nopermissions' => true,
-			'preservekeys' => true,
-			'output' => array('triggerid', 'templateid'),
-			'selectDependencies' => API_OUTPUT_REFER,
-			'selectHosts' => array('hostid')
-		));
-		if ($childTriggers) {
-			$newDependencies = array();
-			foreach ($childTriggers as $childTrigger) {
-				$parentDependencies = $parentTriggers[$childTrigger['templateid']]['dependencies'];
-				if ($parentDependencies) {
-					$dependencies = array();
-					foreach ($parentDependencies as $depTrigger) {
-						$dependencies[$childTrigger['triggerid']] = $depTrigger['triggerid'];
-					}
-					$host = reset($childTrigger['hosts']);
-					$dependencies = replace_template_dependencies($dependencies, $host['hostid']);
-					foreach ($dependencies as $triggerId => $depTriggerId) {
-						$newDependencies[] = array(
-							'triggerid' => $triggerId,
-							'dependsOnTriggerid' => $depTriggerId
-						);
+		if ($parentTriggers) {
+			$childTriggers = $this->get(array(
+				'hostids' => ($hostIds) ? $hostIds : null,
+				'filter' => array('templateid' => array_keys($parentTriggers)),
+				'nopermissions' => true,
+				'preservekeys' => true,
+				'output' => array('triggerid', 'templateid'),
+				'selectDependencies' => API_OUTPUT_REFER,
+				'selectHosts' => array('hostid')
+			));
+
+			if ($childTriggers) {
+				$newDependencies = array();
+				foreach ($childTriggers as $childTrigger) {
+					$parentDependencies = $parentTriggers[$childTrigger['templateid']]['dependencies'];
+					if ($parentDependencies) {
+						$dependencies = array();
+						foreach ($parentDependencies as $depTrigger) {
+							$dependencies[$childTrigger['triggerid']] = $depTrigger['triggerid'];
+						}
+						$host = reset($childTrigger['hosts']);
+						$dependencies = replace_template_dependencies($dependencies, $host['hostid']);
+						foreach ($dependencies as $triggerId => $depTriggerId) {
+							$newDependencies[] = array(
+								'triggerid' => $triggerId,
+								'dependsOnTriggerid' => $depTriggerId
+							);
+						}
 					}
 				}
-			}
-			$this->deleteDependencies($childTriggers);
+				$this->deleteDependencies($childTriggers);
 
-			if ($newDependencies) {
-				$this->addDependencies($newDependencies);
+				if ($newDependencies) {
+					$this->addDependencies($newDependencies);
+				}
 			}
 		}
 	}

@@ -131,7 +131,7 @@ else{
 		),
 	));
 
-	$filter = new CButton('filter', S_FILTER, "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+	$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 	$filter->useJQueryStyle('main');
 
 	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");

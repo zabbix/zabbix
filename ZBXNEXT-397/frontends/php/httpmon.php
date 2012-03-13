@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/httptest.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = 'S_STATUS_OF_WEB_MONITORING';
+$page['title'] = _('Status of Web monitoring');
 $page['file'] = 'httpmon.php';
 $page['hist_arg'] = array('open','groupid','hostid');
 
@@ -106,7 +106,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // Table HEADER
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$httpmon_wdgt->addPageHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
+	$httpmon_wdgt->addPageHeader(_('STATUS OF WEB MONITORING'), $fs_icon);
 
 // 2nd header
 	$options = array(
@@ -130,7 +130,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
-	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
+	$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
 
 	$httpmon_wdgt->addHeader(S_WEB_CHECKS_BIG, $r_form);
@@ -150,12 +150,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
-		is_show_all_nodes() ? make_sorting_header(S_NODE, 'h.hostid') : null,
+		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
 		$_REQUEST['hostid'] == 0 ? make_sorting_header(S_HOST, 'h.name') : null,
 		make_sorting_header(array($link, SPACE, S_NAME), 'wt.name'),
 		_('Number of steps'),
 		_('Last check'),
-		S_STATUS
+		_('Status')
 	));
 
 	$any_app_exist = false;

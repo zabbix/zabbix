@@ -618,7 +618,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 		}
 
-Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -812,11 +811,10 @@ Copt::memoryPick();
 		if (!is_null($options['selectDiscoveryRule'])) {
 			$ruleids = $ruleMap = array();
 
-			$sql = 'SELECT id.parent_itemid, td.triggerid'.
-					' FROM trigger_discovery td, item_discovery id, functions f'.
-					' WHERE '.DBcondition('td.triggerid', $triggerids).
-						' AND td.parent_triggerid=f.triggerid'.
-						' AND f.itemid=id.itemid';
+			$sql = 'SELECT id.parent_itemid, f.triggerid'.
+					' FROM item_discovery id, functions f'.
+					' WHERE '.DBcondition('f.triggerid', $triggerids).
+					' AND f.itemid=id.itemid';
 			$dbRules = DBselect($sql);
 			while ($rule = DBfetch($dbRules)) {
 				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
@@ -992,7 +990,6 @@ Copt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -1184,6 +1181,7 @@ COpt::memoryPick();
 		}
 
 		foreach ($triggers as $trigger) {
+			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 			$this->inherit($trigger);
 		}
 
@@ -1297,6 +1295,11 @@ COpt::memoryPick();
 
 	protected function createReal(array &$triggers) {
 		$triggers = zbx_toArray($triggers);
+
+		foreach ($triggers as &$trigger) {
+			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		}
+		unset($trigger);
 
 		$triggerids = DB::insert('triggers', $triggers);
 

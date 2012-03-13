@@ -29,9 +29,7 @@ if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['sc
 	$isExportData = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	$page['file'] = 'zbx_screens_export.xml';
-
-	require_once dirname(__FILE__).'/include/export.inc.php';
+	$page['file'] = 'zbx_export.xml';
 }
 else {
 	$isExportData = false;
@@ -95,39 +93,17 @@ if (isset($_REQUEST['screenid'])) {
 }
 
 /*
- * Export/Import
+ * Export
  */
 if ($isExportData) {
-	$screens = API::Screen()->get(array(
-		'screenids' => get_request('screens', array()),
-		'selectScreenItems' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
-	));
-	prepareScreenExport($screens);
-
-	$xml = zbxXML::arrayToXML(array('screens' => $screens));
-
-	echo $xml;
+	$screens = get_request('screens', array());
+	$export = new CConfigurationExport(array('screens' => $screens));
+	$export->setBuilder(new CConfigurationExportBuilder());
+	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
+	print($export->export());
 	exit();
 }
 
-$rules = get_request('rules', array());
-if (!isset($_FILES['import_file'])) {
-	$rules['screen']['exist'] = 1;
-	$rules['screen']['missed'] = 1;
-}
-if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
-	require_once dirname(__FILE__).'include/export.inc.php';
-
-	DBstart();
-
-	$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-	if ($result) {
-		$result = zbxXML::parseScreen($rules);
-	}
-	$result = DBend($result);
-	show_messages($result, _('Imported successfully'), _('Import failed'));
-}
 
 /*
  * Actions
@@ -254,52 +230,44 @@ if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	if ($_REQUEST['form'] == _('Import screen')) {
-		$screenWidget = new CWidget();
-		$screenWidget->addPageHeader(_('CONFIGURATION OF SCREENS'));
-		$screenWidget->addItem(import_screen_form($rules));
-		$screenWidget->show();
-	}
-	elseif ($_REQUEST['form'] == _('Create screen') || $_REQUEST['form'] == 'update' || $_REQUEST['form'] == 'clone') {
-		$data = array(
-			'form' => get_request('form', null),
-			'screenid' => get_request('screenid', null),
-			'templateid' => get_request('templateid', null)
+	$data = array(
+		'form' => get_request('form', null),
+		'screenid' => get_request('screenid', null),
+		'templateid' => get_request('templateid', null)
+	);
+
+	// screen
+	if (!empty($data['screenid'])) {
+		$options = array(
+			'screenids' => $data['screenid'],
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND
 		);
-
-		// screen
-		if (!empty($data['screenid'])) {
-			$options = array(
-				'screenids' => $data['screenid'],
-				'editable' => true,
-				'output' => API_OUTPUT_EXTEND
-			);
-			if (!empty($data['templateid'])) {
-				$screens = API::TemplateScreen()->get($options);
-			}
-			else {
-				$screens = API::Screen()->get($options);
-			}
-			$data['screen'] = reset($screens);
-		}
-
-		if (!empty($data['screenid']) && !isset($_REQUEST['form_refresh'])) {
-			$data['name'] = $data['screen']['name'];
-			$data['hsize'] = $data['screen']['hsize'];
-			$data['vsize'] = $data['screen']['vsize'];
-			$data['templateid'] = !empty($data['screen']['templateid']) ? $data['screen']['templateid'] : null;
+		if (!empty($data['templateid'])) {
+			$screens = API::TemplateScreen()->get($options);
 		}
 		else {
-			$data['name'] = get_request('name', '');
-			$data['hsize'] = get_request('hsize', 1);
-			$data['vsize'] = get_request('vsize', 1);
+			$screens = API::Screen()->get($options);
 		}
-
-		// render view
-		$screenView = new CView('configuration.screen.edit', $data);
-		$screenView->render();
-		$screenView->show();
+		$data['screen'] = reset($screens);
 	}
+
+	if (!empty($data['screenid']) && !isset($_REQUEST['form_refresh'])) {
+		$data['name'] = $data['screen']['name'];
+		$data['hsize'] = $data['screen']['hsize'];
+		$data['vsize'] = $data['screen']['vsize'];
+		$data['templateid'] = !empty($data['screen']['templateid']) ? $data['screen']['templateid'] : null;
+	}
+	else {
+		$data['name'] = get_request('name', '');
+		$data['hsize'] = get_request('hsize', 1);
+		$data['vsize'] = get_request('vsize', 1);
+	}
+
+	// render view
+	$screenView = new CView('configuration.screen.edit', $data);
+	$screenView->render();
+	$screenView->show();
 }
 else {
 	$data = array(

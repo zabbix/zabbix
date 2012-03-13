@@ -196,14 +196,12 @@ class CPageFilter {
 			'triggerids' => $options['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_REFER,
-			'selectTemplates' => API_OUTPUT_REFER,
 			'selectGroups' => API_OUTPUT_REFER
 		));
 
 		if ($trigger = reset($triggers)) {
 			$groups = zbx_toHash($trigger['groups'], 'groupid');
 			$hosts = zbx_toHash($trigger['hosts'], 'hostid');
-			$templates = zbx_toHash($trigger['templates'], 'templateid');
 
 			if (isset($groups[$this->_profileIds['groupid']])) {
 				$options['groupid'] = $this->_profileIds['groupid'];
@@ -219,16 +217,6 @@ class CPageFilter {
 			else{
 				$hostids = array_keys($hosts);
 				$options['hostid'] = reset($hostids);
-			}
-
-			if (is_null($options['hostid'])) {
-				if (isset($templates[$this->_profileIds['hostid']])) {
-					$options['hostid'] = $this->_profileIds['hostid'];
-				}
-				else {
-					$templateids = array_keys($templates);
-					$options['hostid'] = reset($templateids);
-				}
 			}
 		}
 	}

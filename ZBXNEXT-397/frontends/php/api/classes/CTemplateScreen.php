@@ -505,7 +505,7 @@ class CTemplateScreen extends CScreen {
 	/**
 	 * Create Screen
 	 *
-	 * @param _array $screens
+	 * @param array $screens
 	 * @param string $screens['name']
 	 * @param array $screens['hsize']
 	 * @param int $screens['vsize']
@@ -556,7 +556,7 @@ class CTemplateScreen extends CScreen {
 	/**
 	 * Update Screen
 	 *
-	 * @param _array $screens multidimensional array with Hosts data
+	 * @param array $screens multidimensional array with Hosts data
 	 * @param string $screens['screenid']
 	 * @param int $screens['name']
 	 * @param int $screens['hsize']

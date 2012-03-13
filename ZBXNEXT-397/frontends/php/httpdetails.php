@@ -24,7 +24,7 @@
 	require_once dirname(__FILE__).'/include/httptest.inc.php';
 	require_once dirname(__FILE__).'/include/forms.inc.php';
 
-	$page['title'] = 'S_DETAILS_OF_SCENARIO';
+	$page['title'] = _('Details of scenario');
 	$page['file'] = 'httpdetails.php';
 	$page['hist_arg'] = array('httptestid');
 	$page['scripts'] = array('class.calendar.js','gtlc.js');
@@ -123,14 +123,14 @@
 	}
 
 	$details_wdgt->addPageHeader(
-		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']), $lastcheck),
+		array(_('DETAILS OF SCENARIO').SPACE, bold($httptest_data['name']), $lastcheck),
 		array($rst_icon, $fs_icon)
 	);
 //-------------
 
 // TABLE
 	$table = new CTableInfo();
-	$table->setHeader(array(S_STEP, S_SPEED, S_RESPONSE_TIME, S_RESPONSE_CODE, S_STATUS));
+	$table->setHeader(array(_('Step'), _('Speed'), _('Response time'), _('Response code'), _('Status')));
 
 	$sql = 'SELECT * FROM httpstep WHERE httptestid='.$httptest_data['httptestid'].' ORDER BY no';
 	$db_httpsteps = DBselect($sql);
@@ -213,7 +213,7 @@
 	}
 
 	$table->addRow(array(
-		bold(S_TOTAL_BIG),
+		bold(_('TOTAL')),
 		SPACE,
 		bold(format_lastvalue($totalTime)),
 		SPACE,
@@ -237,11 +237,11 @@
 
 	$graph_cont = new CCol();
 	$graph_cont->setAttribute('id', 'graph_1');
-	$graphTable->addRow(array(bold(S_SPEED), $graph_cont));
+	$graphTable->addRow(array(bold(_('Speed')), $graph_cont));
 
 	$graph_cont = new CCol();
 	$graph_cont->setAttribute('id', 'graph_2');
-	$graphTable->addRow(array(bold(S_RESPONSE_TIME), $graph_cont));
+	$graphTable->addRow(array(bold(_('Response time')), $graph_cont));
 
 	$graphsWidget->addItem($graphTable);
 
