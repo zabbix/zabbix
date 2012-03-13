@@ -3,7 +3,7 @@ Section: net
 Priority: optional
 Maintainer: Christoph Haas <haas@debian.org>
 Uploaders: Fabio Tranchitella <kobold@debian.org>, Michael Ablassmeier <abi@debian.org>
-Build-Depends: debhelper (>= 7), libsnmp9-dev | libsnmp-dev, libmysqlclient15-dev, automake1.9, po-debconf, libpq-dev, libsqlite3-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev, libldap2-dev,libiksemel-dev, libopenipmi-dev, quilt (>=0.40), autotools-dev, libssh2-1-dev (>= 1.0.0)
+Build-Depends: debhelper (>= 7), libsnmp9-dev | libsnmp-dev, libmysqlclient15-dev, automake1.9, po-debconf, libpq-dev, libsqlite3-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev, libldap2-dev,libiksemel-dev, libopenipmi-dev, quilt (>=0.40), autotools-dev, libssh2-1-dev (>= 1.0.0), libiodbc2-dev
 Standards-Version: 3.9.2
 Vcs-Git: git://git.debian.org/git/collab-maint/zabbix.git
 Vcs-Browser: http://git.debian.org/?p=collab-maint/zabbix.git
