@@ -35,32 +35,31 @@ require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'applications'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		'applicationid'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-		'close'=>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
-		'open'=>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	NULL),
-
-		'groupid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	null),
-		'hostid'=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,	null),
+//		VAR				TYPE		OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+	$fields = array(
+		'applications' =>	array(T_ZBX_INT,	O_OPT,		null,	DB_ID,		null),
+		'applicationid' =>	array(T_ZBX_INT,	O_OPT,		null,	DB_ID,		null),
+		'close' =>		array(T_ZBX_INT,	O_OPT,		null,	IN('1'),	null),
+		'open' =>		array(T_ZBX_INT,	O_OPT,		null,	IN('1'),	null),
+		'fullscreen' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	IN('0,1'),	null),
+		'groupid' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
+		'hostid' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})')
+		'favobj' =>		array(T_ZBX_STR,	O_OPT,		P_ACT,	null,		null),
+		'favref' =>		array(T_ZBX_STR,	O_OPT,		P_ACT,	NOT_EMPTY,	'isset({favobj})'),
+		'favstate' =>		array(T_ZBX_INT,	O_OPT,		P_ACT,	NOT_EMPTY,	'isset({favobj})')
 	);
 
 	check_fields($fields);
 
 /* AJAX	*/
-	if(isset($_REQUEST['favobj'])){
-		if('hat' == $_REQUEST['favobj']){
+	if (isset($_REQUEST['favobj'])) {
+		if ('hat' == $_REQUEST['favobj']) {
 			CProfile::update('web.httpmon.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 
-	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
+	if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
@@ -73,35 +72,30 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpmon.applications'));
 	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
 
-	if(isset($_REQUEST['open'])){
-		if(!isset($_REQUEST['applicationid'])){
+	if (isset($_REQUEST['open'])) {
+		if (!isset($_REQUEST['applicationid'])) {
 			$_REQUEST['applications'] = array();
 			$show_all_apps = 1;
 		}
-		else if(!uint_in_array($_REQUEST['applicationid'],$_REQUEST['applications'])){
+		elseif (!uint_in_array($_REQUEST['applicationid'], $_REQUEST['applications'])) {
 			array_push($_REQUEST['applications'],$_REQUEST['applicationid']);
 		}
 
 	}
-	else if(isset($_REQUEST['close'])){
-		if(!isset($_REQUEST['applicationid'])){
+	elseif (isset($_REQUEST['close'])) {
+		if (!isset($_REQUEST['applicationid'])) {
 			$_REQUEST['applications'] = array();
 		}
-		else if(($i=array_search($_REQUEST['applicationid'], $_REQUEST['applications'])) !== FALSE){
+		elseif (($i = array_search($_REQUEST['applicationid'], $_REQUEST['applications'])) !== FALSE) {
 			unset($_REQUEST['applications'][$i]);
 		}
 	}
 
-	/* limit opened application count */
-	// while(count($_REQUEST['applications']) > 25){
-		// array_shift($_REQUEST['applications']);
-	// }
-
-	if(count($_REQUEST['applications']) > 25){
+	if (count($_REQUEST['applications']) > 25) {
 		$_REQUEST['applications'] = array_slice($_REQUEST['applications'], -25);
 	}
 	rm4favorites('web.httpmon.applications');
-	foreach($_REQUEST['applications'] as $application){
+	foreach ($_REQUEST['applications'] as $application) {
 		add2favorites('web.httpmon.applications', $application);
 	}
 	// CProfile::update('web.httpmon.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
@@ -147,18 +141,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$form->setName('scenarios');
 	$form->addVar('hostid', $_REQUEST['hostid']);
 
-	if(isset($show_all_apps))
+	if (isset($show_all_apps)) {
 		$link = new CLink(new CImg('images/general/opened.gif'),'?close=1'.url_param('groupid').url_param('hostid'));
-	else
+	}
+	else {
 		$link = new CLink(new CImg('images/general/closed.gif'),'?open=1'.url_param('groupid').url_param('hostid'));
+	}
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
-		is_show_all_nodes() ? make_sorting_header(_('Node'),'h.hostid') : null,
-		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.name') : NULL,
-		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
+		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
+		$_REQUEST['hostid'] == 0 ? make_sorting_header(S_HOST, 'h.name') : null,
+		make_sorting_header(array($link, SPACE, S_NAME), 'wt.name'),
 		_('Number of steps'),
-		_('State'),
 		_('Last check'),
 		_('Status')
 	));
@@ -169,107 +164,120 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$db_appids = array();
 
 	$sql_where = '';
-	if($_REQUEST['hostid']>0){
+	if ($_REQUEST['hostid'] > 0) {
 		$sql_where = ' AND h.hostid='.$_REQUEST['hostid'];
 	}
 
-	$sql = 'SELECT DISTINCT h.name as hostname,h.hostid,a.* '.
-			' FROM applications a,hosts h '.
-			' WHERE a.hostid=h.hostid '.
+	$result = DBselect(
+			'SELECT DISTINCT h.name as hostname,h.hostid,a.*'.
+			' FROM applications a,hosts h'.
+			' WHERE a.hostid=h.hostid'.
 				$sql_where.
 				' AND '.DBcondition('h.hostid',$available_hosts).
-			order_by('a.applicationid,h.name,h.hostid','a.name');
-//SDI($sql);
-	$db_app_res = DBselect($sql);
-	while($db_app = DBfetch($db_app_res)){
-		$db_app['scenarios_cnt'] = 0;
+			order_by('a.applicationid,h.name,h.hostid','a.name')
+	);
+	while ($row = DBfetch($result)) {
+		$row['scenarios_cnt'] = 0;
 
-		$db_apps[$db_app['applicationid']] = $db_app;
-		$db_appids[$db_app['applicationid']] = $db_app['applicationid'];
+		$db_apps[$row['applicationid']] = $row;
+		$db_appids[$row['applicationid']] = $row['applicationid'];
 	}
-
 
 	$db_httptests = array();
 	$db_httptestids = array();
 
-	$sql = 'SELECT wt.*,a.name as application,h.name as hostname,h.hostid'.
+	$result = DBselect(
+			'SELECT wt.*,a.name as application,h.name as hostname,h.hostid'.
 			' FROM httptest wt,applications a,hosts h'.
 			' WHERE wt.applicationid=a.applicationid'.
 				' AND a.hostid=h.hostid'.
 				' AND '.DBcondition('a.applicationid', $db_appids).
 				' AND wt.status<>1'.
-			order_by('wt.name', 'h.host');
+			order_by('wt.name', 'h.host')
+	);
+	while ($row = DBfetch($result)) {
+		$row['step_count'] = null;
+		$row['lastfailedstep'] = 0;
+		$row['error'] = '';
+		$db_apps[$row['applicationid']]['scenarios_cnt']++;
 
-	$db_httptests_res = DBselect($sql);
-	while ($httptest_data = DBfetch($db_httptests_res)) {
-		$httptest_data['step_count'] = null;
-		$db_apps[$httptest_data['applicationid']]['scenarios_cnt']++;
-
-		$db_httptests[$httptest_data['httptestid']] = $httptest_data;
-		$db_httptestids[$httptest_data['httptestid']] = $httptest_data['httptestid'];
+		$db_httptests[$row['httptestid']] = $row;
+		$db_httptestids[$row['httptestid']] = $row['httptestid'];
 	}
 
-	$sql = 'SELECT hs.httptestid, COUNT(hs.httpstepid) as cnt '.
+	$result = DBselect(
+			'SELECT hs.httptestid,COUNT(hs.httpstepid) AS cnt'.
 			' FROM httpstep hs'.
-			' WHERE '.DBcondition('hs.httptestid',$db_httptestids).
-			' GROUP BY hs.httptestid';
+			' WHERE '.DBcondition('hs.httptestid', $db_httptestids).
+			' GROUP BY hs.httptestid'
+	);
+	while ($row = DBfetch($result)) {
+		$db_httptests[$row['httptestid']]['step_count'] = $row['cnt'];
+	}
 
-	$httpstep_res = DBselect($sql);
-	while($step_cout = DBfetch($httpstep_res)){
-		$db_httptests[$step_cout['httptestid']]['step_count'] = $step_cout['cnt'];
+	$result = DBselect(
+			'SELECT hti.httptestid,hti.type,i.lastvalue,i.lastclock'.
+			' FROM httptestitem hti,items i'.
+			' WHERE hti.itemid=i.itemid'.
+				' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
+				' AND i.lastclock IS NOT NULL'.
+				' AND '.DBcondition('hti.httptestid', $db_httptestids)
+	);
+	while ($row = DBfetch($result)) {
+		if ($row['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
+			if (!isset($db_httptests[$row['httptestid']]['lastcheck'])) {
+				$db_httptests[$row['httptestid']]['lastcheck'] = $row['lastclock'];
+			}
+			$db_httptests[$row['httptestid']]['lastfailedstep'] = $row['lastvalue'];
+		}
+		else {
+			$db_httptests[$row['httptestid']]['error'] = $row['lastvalue'];
+		}
 	}
 
 	$tab_rows = array();
-	foreach($db_httptests as $httptestid => $httptest_data){
+	foreach ($db_httptests as $httptest_data) {
 		$db_app = &$db_apps[$httptest_data['applicationid']];
 
-		if(!isset($tab_rows[$db_app['applicationid']])) $tab_rows[$db_app['applicationid']] = array();
+		if (!isset($tab_rows[$db_app['applicationid']])) {
+			$tab_rows[$db_app['applicationid']] = array();
+		}
 		$app_rows = &$tab_rows[$db_app['applicationid']];
 
-		if(!uint_in_array($db_app['applicationid'],$_REQUEST['applications']) && !isset($show_all_apps)) continue;
+		if (!uint_in_array($db_app['applicationid'], $_REQUEST['applications']) && !isset($show_all_apps)) {
+			continue;
+		}
 
 		$name = array();
 		array_push($name, new CLink($httptest_data['name'],'httpdetails.php?httptestid='.$httptest_data['httptestid']));
 
-		if(isset($httptest_data['lastcheck']))
-			$lastcheck = zbx_date2str(S_WEB_SCENARIO_DATE_FORMAT,$httptest_data['lastcheck']);
-		else
-			$lastcheck = new CCol('-', 'center');
-
-		if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
-			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
-			$state = _('In check').' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '._('of').' '.$httptest_data['step_count'].']';
-
-			$status['msg'] = _('In progress');
-			$status['style'] = 'orange';
+		if (isset($httptest_data['lastcheck'])) {
+			$lastcheck = zbx_date2str(_('d M Y H:i:s'), $httptest_data['lastcheck']);
 		}
-		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
-			$state = _('Idle till').' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
-
-			if($httptest_data['lastfailedstep'] > 0){
-				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
-				$status['msg'] = _('Failed on').' "'.$step_data['name'].'" '.
-					'['.$httptest_data['lastfailedstep'].' '._('of').' '.$httptest_data['step_count'].'] '.
-					SPACE._('Error').': '.$httptest_data['error'];
-				$status['style'] = 'disabled';
-			}
-			else{
-				$status['msg'] = _('OK');
-				$status['style'] = 'enabled';
-			}
+		else {
+			$lastcheck = new CCol(_('Never'));
 		}
-		else{
-			$state = _('Idle till').' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
+
+		if (!isset($httptest_data['lastcheck'])) {
 			$status['msg'] = _('Unknown');
 			$status['style'] = 'unknown';
 		}
+		elseif ($httptest_data['lastfailedstep'] != 0) {
+			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
+			$status['msg'] = _s('Step "%1$s" [%2$s of %3$s] failed: %4$s', $step_data['name'],
+				$httptest_data['lastfailedstep'], $httptest_data['step_count'], $httptest_data['error']);
+			$status['style'] = 'disabled';
+		}
+		else {
+			$status['msg'] = _('OK');
+			$status['style'] = 'enabled';
+		}
 
 		array_push($app_rows, new CRow(array(
-			is_show_all_nodes()?SPACE:NULL,
-			($_REQUEST['hostid']>0)?NULL:SPACE,
+			is_show_all_nodes() ? SPACE : null,
+			($_REQUEST['hostid'] > 0) ? null : SPACE,
 			array(str_repeat(SPACE,6), $name),
 			$httptest_data['step_count'],
-			$state,
 			$lastcheck,
 			new CSpan($status['msg'], $status['style'])
 			)));
@@ -277,19 +285,21 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	unset($app_rows);
 	unset($db_app);
 
-	foreach($tab_rows as $appid => $app_rows){
+	foreach ($tab_rows as $appid => $app_rows) {
 		$db_app = &$db_apps[$appid];
 
-		if(uint_in_array($db_app['applicationid'],$_REQUEST['applications']) || isset($show_all_apps))
+		if (uint_in_array($db_app['applicationid'], $_REQUEST['applications']) || isset($show_all_apps)) {
 			$link = new CLink(new CImg('images/general/opened.gif'),
 				'?close=1&applicationid='.$db_app['applicationid'].
 				url_param('groupid').url_param('hostid').url_param('applications').
 				url_param('select'));
-		else
+		}
+		else {
 			$link = new CLink(new CImg('images/general/closed.gif'),
 				'?open=1&applicationid='.$db_app['applicationid'].
 				url_param('groupid').url_param('hostid').url_param('applications').
 				url_param('select'));
+		}
 
 		$col = new CCol(array(
 			$link,
@@ -301,14 +311,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		$table->addRow(array(
 				get_node_name_by_elid($db_app['applicationid']),
-				($_REQUEST['hostid'] > 0)?NULL:$db_app['hostname'],
+				($_REQUEST['hostid'] > 0) ? null : $db_app['hostname'],
 				$col
 			));
 
 		$any_app_exist = true;
 
-		foreach($app_rows as $row)
+		foreach ($app_rows as $row) {
 			$table->addRow($row);
+		}
 	}
 
 	$form->addItem($table);
