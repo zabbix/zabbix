@@ -1,6 +1,6 @@
 Changes for 1.8.11rc1
 
-A.F....... [ZBX-4718] Fixed Graph axis item cloning in host Full Clone
+A.F....... [ZBX-4718] Fixed Graph axis item cloning in host Full Clone (Toms)
 ..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
 A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
 A......... [ZBX-4562] fixed meditype.update returning wrong formatted result (Toms)
