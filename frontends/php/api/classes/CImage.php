@@ -541,8 +541,7 @@ class CImage extends CZBXAPI {
 					' OR '.DBCondition('se.iconid_on', $imageids).
 					' OR '.DBCondition('se.iconid_disabled', $imageids).
 					' OR '.DBCondition('se.iconid_maintenance', $imageids).
-					' OR '.DBCondition('sm.backgroundid', $imageids).
-				')';
+				') OR '.DBCondition('sm.backgroundid', $imageids);
 		$dbSysmaps = DBselect($sql);
 
 		$usedInMaps = array();
