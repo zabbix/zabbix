@@ -457,19 +457,18 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	zbx_add_post_js('var msglistid = initMessages({});');
 }
 
-// if a user logges in after several unsuccessful attempts, display a warning
+// if a user logs in after several unsuccessful attempts, display a warning
 if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	$attempip = CProfile::get('web.login.attempt.ip', '');
 	$attempdate = CProfile::get('web.login.attempt.clock', 0);
 
-	$error_msg = array(
-		new CSpan($failedAttempts, 'bold'),
-		_n(' failed login attempt logged. Last failed attempt was from ', ' failed login attempts logged. Last failed attempt was from ', $failedAttempts),
-		new CSpan($attempip, 'bold'),
-		_(' on '),
-		new CSpan(zbx_date2str(_('d.m.Y H:i'), $attempdate), 'bold'),
+	$error_msg = _n('%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s.',
+			'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s.',
+			$failedAttempts,
+			$attempip,
+			zbx_date2str(_('d.m.Y H:i'),$attempdate)
 	);
-	error(new CSpan($error_msg));
+	error($error_msg);
 
 	CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
 }
