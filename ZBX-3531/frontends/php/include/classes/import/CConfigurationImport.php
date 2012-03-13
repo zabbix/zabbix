@@ -1003,7 +1003,7 @@ class CConfigurationImport {
 			if ($triggerId) {
 				$deps = array();
 				foreach ($trigger['dependencies'] as $dependency) {
-					$deps[] = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+					$deps[] = array('triggerid' => $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']));
 				}
 
 				$trigger['dependencies'] = $deps;
