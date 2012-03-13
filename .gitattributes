@@ -13,6 +13,7 @@ build/win32/project/Makefile_get_x64 -text
 build/win32/project/Makefile_sender -text
 build/win32/project/Makefile_sender_x64 -text
 create/src/data.tmpl -text
+frontends/php/api/classes/CImport.php -text
 frontends/php/api/classes/CTriggerGeneral.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
@@ -21,6 +22,7 @@ frontends/php/audio/alarm_information.wav -text
 frontends/php/audio/alarm_ok.wav -text
 frontends/php/audio/alarm_warning.wav -text
 frontends/php/audio/no_sound.wav -text
+frontends/php/conf.import.php -text
 frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrowdown.gif -text
@@ -175,6 +177,9 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/helpers/CArrayHelper.php -text
+frontends/php/include/classes/import/CXmlImport18.php -text
+frontends/php/include/views/conf.import.php -text
 frontends/php/include/views/configuration.screen.constructor.edit.php -text
 frontends/php/include/views/configuration.screen.constructor.list.php -text
 frontends/php/include/views/configuration.screen.edit.php -text

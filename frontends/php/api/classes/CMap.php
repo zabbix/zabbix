@@ -1013,5 +1013,40 @@ class CMap extends CMapElement {
 			$url['url'] = str_replace($macro, $selement['elementid'], $url['url']);
 		return $url;
 	}
+
+	public function isReadable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'sysmapids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
+
+	public function isWritable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'sysmapids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'countOutput' => true
+		));
+
+		return (count($ids) == $count);
+	}
 }
 ?>

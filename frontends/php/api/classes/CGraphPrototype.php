@@ -415,7 +415,6 @@ class CGraphPrototype extends CZBXAPI{
 			}
 		}
 
-COpt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -525,11 +524,10 @@ COpt::memoryPick();
 		if (!is_null($options['selectDiscoveryRule'])) {
 			$ruleids = $ruleMap = array();
 
-			$sql = 'SELECT id.parent_itemid, gd.graphid'.
-					' FROM graph_discovery gd, item_discovery id,  graphs_items gi'.
-					' WHERE '.DBcondition('gd.graphid', $graphids).
-						' AND gd.parent_graphid=gi.graphid'.
-						' AND gi.itemid=id.itemid';
+			$sql = 'SELECT id.parent_itemid, gi.graphid'.
+					' FROM item_discovery id,  graphs_items gi'.
+					' WHERE '.DBcondition('gi.graphid', $graphids).
+					' AND gi.itemid=id.itemid';
 			$dbRules = DBselect($sql);
 			while ($rule = DBfetch($dbRules)) {
 				$ruleids[$rule['parent_itemid']] = $rule['parent_itemid'];
@@ -555,7 +553,6 @@ COpt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -641,7 +638,7 @@ COpt::memoryPick();
 					}
 				}
 				if ($templatedGraph && (count($graphHosts) > 1)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph').' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
 				}
 
 // check ymin, ymax items
@@ -711,7 +708,7 @@ COpt::memoryPick();
 					}
 				}
 				if ($templatedGraph && (count($graphHosts) > 1)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph').' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
 				}
 // }}} EXCEPTION: MESS TEMPLATED ITEMS
 
@@ -727,14 +724,16 @@ COpt::memoryPick();
 	}
 
 	protected function createReal($graph) {
+		$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
 
-		foreach ($graph['gitems'] as $gitem) {
+		foreach ($graph['gitems'] as &$gitem) {
 			$gitem['graphid'] = $graphid;
-
-			DB::insert('graphs_items', array($gitem));
 		}
+		unset($gitem);
+
+		DB::insert('graphs_items', $graph['gitems']);
 
 		return $graphid;
 	}
@@ -1040,7 +1039,7 @@ COpt::memoryPick();
 
 // EXCEPTION: NO ITEMS {{{
 			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_MISSING_ITEMS_FOR_GRAPH.' [ '.$graph['name'].' ]');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing items for graph "%1$s".', $graph['name']));
 			}
 // }}} EXCEPTION: NO ITEMS
 
@@ -1059,7 +1058,7 @@ COpt::memoryPick();
 				foreach ($graph['gitems'] as $gitem) {
 					if ($gitem['type'] == GRAPH_ITEM_SUM) $sumItems++;
 				}
-				if ($sumItems > 1) self::exception(ZBX_API_ERROR_PARAMETERS, S_ANOTHER_ITEM_SUM.' [ '.$graph['name'].' ]');
+				if ($sumItems > 1) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
 			}
 // }}} EXCEPTION
 

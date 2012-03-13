@@ -621,7 +621,17 @@ function zbx_is_int($var) {
 	return preg_match("/^\-?\d{1,20}+$/", $var);
 }
 
-function zbx_array_diff($primary, $secondary, $field) {
+/**
+ * Look for two arrays field value and create 3 array lists, one with arrays where field value exists only in first array
+ * second with arrays where field values are only in second array and both where fiel values are in both arrays.
+ *
+ * @param array  $primary
+ * @param array  $secondary
+ * @param string $field field that is searched in arrays
+ *
+ * @return array
+ */
+function zbx_array_diff(array $primary, array $secondary, $field) {
 	$fields1 = zbx_objectValues($primary, $field);
 	$fields2 = zbx_objectValues($secondary, $field);
 
@@ -958,58 +968,6 @@ function zbx_rksort(&$array, $flags = null) {
 }
 
 /**
- * Class for sorting array by multiple fields.
- * When PHP 5.3+ arraives to Zabbix should be changed to function with closure.
- */
-class ArraySorter {
-	protected static $fields;
-
-	private function __construct() {}
-
-	/**
-	 * Sort array by multiple fields
-	 * @static
-	 * @param array $array array to sort passed by reference
-	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
-	 */
-	public static function sort(array &$array, array $fields) {
-		foreach ($fields as $fid => $field) {
-			if (!is_array($field)) {
-				$fields[$fid] = array('field' => $field, 'order' => ZBX_SORT_UP);
-			}
-		}
-		self::$fields = $fields;
-		uasort($array, array('self', 'compare'));
-	}
-
-	/**
-	 * Method to be used as callback for uasort function in sort method.
-	 *
-	 * @static
-	 * @param $a
-	 * @param $b
-	 * @return int
-	 */
-	protected static function compare($a, $b) {
-		foreach (self::$fields as $field) {
-			if (!(isset($a[$field['field']]) && isset($b[$field['field']]))) {
-				return 0;
-			}
-
-			if ($a[$field['field']] != $b[$field['field']]) {
-				if ($field['order'] == ZBX_SORT_UP) {
-					return strnatcasecmp($a[$field['field']], $b[$field['field']]);
-				}
-				else {
-					return strnatcasecmp($b[$field['field']], $a[$field['field']]);
-				}
-			}
-		}
-		return 0;
-	}
-}
-
-/**
  * Sorts the data using a natural sort algorithm.
  *
  * Not suitable for sorting macros, use order_macros() instead.
@@ -1092,7 +1050,7 @@ function order_by($def, $allways = '') {
  *
  * @return array
  */
-function order_macros(array $macros, $sortfield = null, $order = ZBX_SORT_UP) {
+function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
 	$temp = array();
 	foreach ($macros as $key => $macro) {
 		$temp[$key] = preg_replace(ZBX_PREG_EXPRESSION_USER_MACROS, '$1', $macro[$sortfield]);
@@ -1210,7 +1168,7 @@ function createParentToChildRelation(&$chain, $link, $parentField, $childField) 
 }
 
 // object or array of objects to hash
-function zbx_toHash(&$value, $field = null) {
+function zbx_toHash($value, $field = null) {
 	if (is_null($value)) {
 		return $value;
 	}
@@ -1223,7 +1181,7 @@ function zbx_toHash(&$value, $field = null) {
 		$result[$value[$field]] = $value;
 	}
 	else {
-		foreach ($value as $key => $val) {
+		foreach ($value as $val) {
 			if (!is_array($val)) {
 				$result[$val] = $val;
 			}
@@ -1259,7 +1217,7 @@ function zbx_toObject($value, $field) {
 		$result = array(array($field => $value));
 	}
 	elseif (!isset($value[$field])) {
-		foreach ($value as $key => $val) {
+		foreach ($value as $val) {
 			if (!is_array($val)) {
 				$result[] = array($field => $val);
 			}
@@ -1292,7 +1250,7 @@ function zbx_toArray($value) {
 }
 
 // value OR object OR array of objects TO an array
-function zbx_objectValues(&$value, $field) {
+function zbx_objectValues($value, $field) {
 	if (is_null($value)) {
 		return $value;
 	}
@@ -1305,7 +1263,7 @@ function zbx_objectValues(&$value, $field) {
 		$result = array($value[$field]);
 	}
 	else {
-		foreach ($value as $key => $val) {
+		foreach ($value as $val) {
 			if (!is_array($val)) {
 				$result[] = $val;
 			}
