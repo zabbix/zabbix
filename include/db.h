@@ -430,8 +430,8 @@ typedef struct
 	zbx_uint64_t	httpstepid;
 	zbx_uint64_t	httptestid;
 	char		*name;
-	char		url[MAX_STRING_LEN];	/* excessive length is required to support macros */
-	char		posts[MAX_STRING_LEN];
+	char		*url;
+	char		*posts;
 	char		*required;
 	char		*status_codes;
 	int		no;

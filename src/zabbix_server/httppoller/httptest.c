@@ -290,10 +290,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, WRITEFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, HEADERFUNCTION2)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
-			/* The pointed data are not copied by the library. As a consequence, the data */
-			/* must be preserved by the calling application until the transfer finishes. */
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s\" error: could not set cURL option [%d]: %s",
@@ -310,26 +307,40 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		httpstep.httptestid = httptest->httptestid;
 		httpstep.no = atoi(row[1]);
 		httpstep.name = row[2];
-		strscpy(httpstep.url, row[3]);
+		httpstep.url = zbx_strdup(NULL, row[3]);
 		httpstep.timeout = atoi(row[4]);
-		strscpy(httpstep.posts, row[5]);
+		httpstep.posts = zbx_strdup(NULL, row[5]);
 		httpstep.required = row[6];
 		httpstep.status_codes = row[7];
 
 		memset(&stat, 0, sizeof(stat));
 
-		http_substitute_macros(httptest->macros, httpstep.url, sizeof(httpstep.url));
-		http_substitute_macros(httptest->macros, httpstep.posts, sizeof(httpstep.posts));
+		http_substitute_macros(httptest->macros, &httpstep.url);
+		http_substitute_macros(httptest->macros, &httpstep.posts);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() use step \"%s\"", __function_name, httpstep.name);
 
-		if ('\0' != *httpstep.posts)
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POSTFIELDS, httpstep.posts)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() use post \"%s\"", __function_name, httpstep.posts);
-			curl_easy_setopt(easyhandle, CURLOPT_POST, 1L);
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s:%s\" error:"
+					" could not set cURL option [%d]: %s",
+					httptest->name, httpstep.name, opt, err_str);
+			goto httpstep_error;
 		}
-		else
-			curl_easy_setopt(easyhandle, CURLOPT_POST, 0L);
+
+		if ('\0' != *httpstep.posts)
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() use post \"%s\"", __function_name, httpstep.posts);
+
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST,
+				'\0' != *httpstep.posts ? 1L : 0L)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			zabbix_log(LOG_LEVEL_ERR, "web scenario \"%s:%s\" error:"
+					" could not set cURL option [%d]: %s",
+					httptest->name, httpstep.name, opt, err_str);
+			goto httpstep_error;
+		}
 
 		if (HTTPTEST_AUTH_NONE != httptest->authentication)
 		{
@@ -361,87 +372,86 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
 						" could not set cURL option [%d]: %s",
 						httptest->name, httpstep.name, opt, err_str);
+				goto httpstep_error;
 			}
 		}
 
-		if (NULL == err_str)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() go to URL \"%s\"", __function_name, httpstep.url);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() go to URL \"%s\"", __function_name, httpstep.url);
 
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, httpstep.url)) ||
-					CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)httpstep.timeout)))
-			{
-				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
-						" could not set cURL option [%d]: %s",
-						httptest->name, httpstep.name, opt, err_str);
-			}
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, httpstep.url)) ||
+				CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT, (long)httpstep.timeout)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+					" could not set cURL option [%d]: %s",
+					httptest->name, httpstep.name, opt, err_str);
+			goto httpstep_error;
 		}
 
-		if (NULL == err_str)
-		{
-			memset(&page, 0, sizeof(page));
+		memset(&page, 0, sizeof(page));
 
-			if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		{
+			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+					" error doing curl_easy_perform: %s",
+					httptest->name, httpstep.name, err_str);
+		}
+		else
+		{
+			if ('\0' != *httpstep.required &&
+					NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
 			{
-				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() required pattern \"%s\" not found on %s",
+						__function_name, httpstep.required, httpstep.url);
+				err_str = zbx_strdup(err_str, "Required pattern not found");
+			}
+
+			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
+			{
 				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
-						" error doing curl_easy_perform: %s",
-						httptest->name, httpstep.name, err_str);
+						" error getting CURLINFO_RESPONSE_CODE: %s",
+						httptest->name, httpstep.name, curl_easy_strerror(err));
+				if (NULL == err_str)
+					err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			}
+			else if ('\0' != *httpstep.status_codes &&
+					FAIL == int_in_list(httpstep.status_codes, stat.rspcode))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() status code did not match [%s]",
+						__function_name, httpstep.status_codes);
+				if (NULL == err_str)
+					err_str = zbx_strdup(err_str, "Status code did not match");
+			}
+
+			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+						" error getting CURLINFO_TOTAL_TIME: %s",
+						httptest->name, httpstep.name, curl_easy_strerror(err));
+				if (NULL == err_str)
+					err_str = zbx_strdup(err_str, curl_easy_strerror(err));
+			}
+
+			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD, &stat.speed_download)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
+						" error getting CURLINFO_SPEED_DOWNLOAD: %s",
+						httptest->name, httpstep.name, curl_easy_strerror(err));
+				if (NULL == err_str)
+					err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 			else
 			{
-				if ('\0' != *httpstep.required &&
-						NULL == zbx_regexp_match(page.data, httpstep.required, NULL))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() required pattern \"%s\" not found on %s",
-							__function_name, httpstep.required, httpstep.url);
-					err_str = zbx_strdup(err_str, "Required pattern not found");
-				}
-
-				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
-				{
-					zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
-							" error getting CURLINFO_RESPONSE_CODE: %s",
-							httptest->name, httpstep.name, curl_easy_strerror(err));
-					if (NULL == err_str)
-						err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-				}
-				else if ('\0' != *httpstep.status_codes &&
-						FAIL == int_in_list(httpstep.status_codes, stat.rspcode))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() status code did not match [%s]",
-							__function_name, httpstep.status_codes);
-					if (NULL == err_str)
-						err_str = zbx_strdup(err_str, "Status code did not match");
-				}
-
-				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &stat.total_time)))
-				{
-					zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
-							" error getting CURLINFO_TOTAL_TIME: %s",
-							httptest->name, httpstep.name, curl_easy_strerror(err));
-					if (NULL == err_str)
-						err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-				}
-
-				if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD, &stat.speed_download)))
-				{
-					zabbix_log(LOG_LEVEL_ERR, "web scenario step \"%s:%s\" error:"
-							" error getting CURLINFO_SPEED_DOWNLOAD: %s",
-							httptest->name, httpstep.name, curl_easy_strerror(err));
-					if (NULL == err_str)
-						err_str = zbx_strdup(err_str, curl_easy_strerror(err));
-				}
-				else
-				{
-					speed_download += stat.speed_download;
-					speed_download_num++;
-				}
+				speed_download += stat.speed_download;
+				speed_download_num++;
 			}
-
-			zbx_free(page.data);
 		}
+
+		zbx_free(page.data);
+httpstep_error:
+		zbx_free(httpstep.posts);
+		zbx_free(httpstep.url);
 
 		zbx_timespec(&ts);
 		process_step_data(httpstep.httpstepid, &stat, &ts);
