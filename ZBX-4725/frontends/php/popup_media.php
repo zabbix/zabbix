@@ -62,7 +62,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	if(isset($_REQUEST['add'])){
 		if( !validate_period($_REQUEST['period']) ){
-			error(S_INCORRECT_TIME_PERIOD);
+			error(_('Incorrect time period'));
 		}
 		else{
 			$severity = 0;
@@ -121,7 +121,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				get_node_name_by_elid($type['mediatypeid'], null, ': ').$type['description']
 				);
 	}
-	$frmMedia->addRow(S_TYPE,$cmbType);
+	$frmMedia->addRow(_('Type'),$cmbType);
 
 	$frmMedia->addRow(S_SEND_TO, new CTextBox('sendto',$sendto,20));
 	$frmMedia->addRow(S_WHEN_ACTIVE, new CTextBox('period',$period,48));
@@ -144,7 +144,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$cmbStat = new CComboBox('active',$active);
 	$cmbStat->addItem(0,S_ENABLED);
 	$cmbStat->addItem(1,S_DISABLED);
-	$frmMedia->addRow(S_STATUS,$cmbStat);
+	$frmMedia->addRow(_('Status'),$cmbStat);
 
 	$frmMedia->addItemToBottomRow(new CSubmit('add', ($media > -1)?S_SAVE:S_ADD));
 	$frmMedia->addItemToBottomRow(SPACE);

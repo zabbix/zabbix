@@ -102,7 +102,7 @@ class CHost extends CZBXAPI {
 			'applicationids'			=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
-			'webcheckids'				=> null,
+			'httptestids'				=> null,
 			'monitored_hosts'			=> null,
 			'templated_hosts'			=> null,
 			'proxy_hosts'				=> null,
@@ -308,16 +308,16 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// webcheckids
-		if (!is_null($options['webcheckids'])) {
-			zbx_value2array($options['webcheckids']);
+// httptestids
+		if (!is_null($options['httptestids'])) {
+			zbx_value2array($options['httptestids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts['select']['webcheckid'] = 'ht.httptestid';
+				$sqlParts['select']['httptestid'] = 'ht.httptestid';
 			}
 
 			$sqlParts['from']['applications'] = 'applications a';
 			$sqlParts['from']['httptest'] = 'httptest ht';
-			$sqlParts['where'][] = DBcondition('ht.httptestid', $options['webcheckids']);
+			$sqlParts['where'][] = DBcondition('ht.httptestid', $options['httptestids']);
 			$sqlParts['where']['aht'] = 'a.applicationid=ht.applicationid';
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
 
@@ -697,12 +697,12 @@ class CHost extends CZBXAPI {
 						$result[$host['hostid']]['applications'][] = array('applicationid' => $host['applicationid']);
 						unset($host['applicationid']);
 					}
-// webcheckids
+// httptestids
 					if (isset($host['httptestid'])) {
-						if (!isset($result[$host['hostid']]['webchecks']))
-							$result[$host['hostid']]['webchecks'] = array();
+						if (!isset($result[$host['hostid']]['httptests']))
+							$result[$host['hostid']]['httptests'] = array();
 
-						$result[$host['hostid']]['webchecks'][] = array('webcheckid' => $host['httptestid']);
+						$result[$host['hostid']]['httptests'][] = array('httptestid' => $host['httptestid']);
 						unset($host['httptestid']);
 					}
 
@@ -1684,7 +1684,7 @@ Copt::memoryPick();
 		$updHosts = $this->get($options);
 		foreach ($hosts as $hnum => $host) {
 			if (!isset($updHosts[$host['hostid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 		}
 
@@ -1723,12 +1723,12 @@ Copt::memoryPick();
 			$hostExists = $this->get($options);
 			$hostExist = reset($hostExists);
 			if ($hostExist && (bccomp($hostExist['hostid'], $curHost['hostid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '._('already exists'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
 			// can't add host with the same name as existing template
 			if (API::Template()->exists(array('host' => $curHost['host'])))
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$curHost['host'].' ] '._('already exists'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$curHost['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 		}
 
 
@@ -2034,7 +2034,7 @@ Copt::memoryPick();
 		$updHosts = $this->get($options);
 		foreach ($hostids as $hostid) {
 			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 		}
 

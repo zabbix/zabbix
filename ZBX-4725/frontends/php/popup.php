@@ -180,7 +180,7 @@ $allowedSrcFields = array(
 	'host_templates'		=> '"hostid", "host", "templateid", "name"',
 	'nodes'					=> '"nodeid", "name"',
 	'drules'				=> '"druleid", "name"',
-	'dcheckes'				=> '"dcheckid", "name"',
+	'dchecks'				=> '"dcheckid", "name"',
 	'proxies'				=> '"hostid", "host"',
 	'usrgrp'				=> '"usrgrpid", "name"',
 	'templates'				=> '"hostid", "host"',
@@ -1226,7 +1226,7 @@ elseif ($srctbl == 'applications') {
 		$options['templated'] = $templated;
 	}
 	$apps = API::Application()->get($options);
-	ArraySorter::sort($apps, array('host', 'name'));
+	CArrayHelper::sort($apps, array('host', 'name'));
 
 	foreach ($apps as $app) {
 		$action = get_window_opener($dstfrm, $dstfld1, $app[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $app[$srcfld2]) : '');
