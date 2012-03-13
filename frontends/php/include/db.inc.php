@@ -1025,7 +1025,7 @@ function DBcondition($fieldname, $array, $notin = false) {
 	$concat = $notin ? ' AND ':' OR ';
 
 	$items = array_chunk($array, 950);
-	foreach ($items as $id => $values) {
+	foreach ($items as $values) {
 		$condition .= !empty($condition) ? ')'.$concat.$fieldname.$in.'(' : '';
 		$condition .= implode(',', zbx_dbstr($values));
 	}
