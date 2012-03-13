@@ -401,7 +401,7 @@ class CUser extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete himself.'));
 
 				if ($dbUsers[$user['userid']]['alias'] == ZBX_GUEST_USER)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete %1$s internal user "%2$s", try disabling that user.', S_ZABBIX, ZBX_GUEST_USER));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER));
 
 				continue;
 			}
@@ -410,7 +410,7 @@ class CUser extends CZBXAPI {
 			if (isset($user['alias'])) {
 // check if we change guest user
 				if (($dbUser['alias'] == ZBX_GUEST_USER) && ($user['alias'] != ZBX_GUEST_USER))
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_RENAME_GUEST_USER);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot rename guest user'));
 
 				if (!isset($alias[$user['alias']])) {
 					$alias[$user['alias']] = $update?$user['userid']:1;
@@ -698,7 +698,7 @@ class CUser extends CZBXAPI {
 		$userids = array();
 
 			if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_ONLY_ADMIN_CAN_ADD_USER_MEDIAS);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user Medias'));
 			}
 
 			foreach ($users as $unum => $user) {
@@ -706,7 +706,7 @@ class CUser extends CZBXAPI {
 
 				foreach ($medias as $mnum => $media) {
 					if (!validate_period($media['period'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_INCORRECT_TIME_PERIOD);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect time period'));
 					}
 
 					$mediaid = get_dbid('media', 'mediaid');
@@ -736,7 +736,7 @@ class CUser extends CZBXAPI {
 			$mediaids = zbx_toArray($mediaids);
 
 			if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_ONLY_ADMIN_CAN_REMOVE_USER_MEDIAS);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user Medias'));
 			}
 
 			$sql = 'DELETE FROM media WHERE '.DBcondition('mediaid', $mediaids);
@@ -766,7 +766,7 @@ class CUser extends CZBXAPI {
 		$users = zbx_toArray($mediaData['users']);
 
 			if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, S_CUSER_ERROR_ONLY_ADMIN_CAN_CHANGE_USER_MEDIAS);
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user Medias'));
 			}
 
 			$updMedias = array();
@@ -797,14 +797,14 @@ class CUser extends CZBXAPI {
 				$mediaids = zbx_objectValues($delMedias, 'mediaid');
 				$result = $this->deleteMedia($mediaids);
 				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_DELETE_USER_MEDIAS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete user medias'));
 				}
 			}
 
 // UPDATE
 			foreach ($updMedias as $mnum => $media) {
 				if (!validate_period($media['period'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_WRONG_PERIOD_PART1.' '.$media['period'].' '.S_CUSER_ERROR_WRONG_PERIOD_PART2);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect time period "%1$s".', $media['period']));
 				}
 
 				$sql = 'UPDATE media'.
@@ -816,7 +816,7 @@ class CUser extends CZBXAPI {
 						' WHERE mediaid='.$media['mediaid'];
 				$result = DBexecute($sql);
 				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_UPDATE_USER_MEDIAS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update user medias'));
 				}
 			}
 
@@ -824,7 +824,7 @@ class CUser extends CZBXAPI {
 			if (!empty($newMedias)) {
 				$result = $this->addMedia(array('users' => $users, 'medias' => $newMedias));
 				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_CANT_INSERT_USER_MEDIAS);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot insert user medias'));
 				}
 			}
 
@@ -907,7 +907,7 @@ class CUser extends CZBXAPI {
 
 		$sql = 'SELECT u.userid,u.attempt_failed,u.attempt_clock,u.attempt_ip'.
 				' FROM users u'.
-				' WHERE u.alias='.zbx_dbstr($name);
+				' WHERE u.alias='.zbx_dbstr($name).
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 		$userInfo = DBfetch(DBselect($sql));

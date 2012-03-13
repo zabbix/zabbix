@@ -26,9 +26,7 @@ if(isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['h
 	$EXPORT_DATA = true;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	$page['file'] = 'zbx_hosts_export.xml';
-
-	require_once dirname(__FILE__).'/include/export.inc.php';
+	$page['file'] = 'zbx_export.xml';
 }
 else{
 	$EXPORT_DATA = false;
@@ -99,9 +97,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // other
 		'form'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		'form_refresh'=>		array(T_ZBX_STR, O_OPT, null,	null,	null),
-// Import
-		'rules' =>				array(T_ZBX_STR, O_OPT,	null,			DB_ID,	null),
-		'import' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // Filter
 		'filter_set' =>			array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
 
@@ -148,150 +143,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$hostids = get_request('hosts', array());
 
-	if($EXPORT_DATA){
-// SELECT HOSTS
-		$params = array(
-			'hostids' => $hostids,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
-			'selectInventory' => true
-		);
-		$hosts = API::Host()->get($params);
-		order_result($hosts, 'name');
+	if ($EXPORT_DATA) {
+		$export = new CConfigurationExport(array('hosts' => $hostids));
+		$export->setBuilder(new CConfigurationExportBuilder());
+		$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
-// SELECT HOST GROUPS
-		$params = array(
-			'hostids' => $hostids,
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-		$groups = API::HostGroup()->get($params);
-
-// SELECT GRAPHS
-		$params = array(
-			'hostids' => $hostids,
-			'preservekeys' => 1,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-			'output' => API_OUTPUT_EXTEND
-		);
-		$graphs = API::Graph()->get($params);
-
-// SELECT GRAPH ITEMS
-		$graphids = zbx_objectValues($graphs, 'graphid');
-		$params = array(
-			'graphids' => $graphids,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => 1,
-			'expandData' => 1
-		);
-		$gitems = API::GraphItem()->get($params);
-
-		foreach($gitems as $gnum => $gitem){
-			$gitems[$gitem['gitemid']]['host_key_'] = $gitem['host'].':'.$gitem['key_'];
-		}
-// SELECT TEMPLATES
-		$params = array(
-			'hostids' => $hostids,
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-		$templates = API::Template()->get($params);
-
-// SELECT MACROS
-		$params = array(
-			'hostids' => $hostids,
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-		$macros = API::UserMacro()->get($params);
-
-// SELECT ITEMS
-		$params = array(
-			'hostids' => $hostids,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-		$items = API::Item()->get($params);
-
-// SELECT APPLICATIONS
-		$itemids = zbx_objectValues($items, 'itemid');
-		$params = array(
-			'itemids' => $itemids,
-			'preservekeys' => 1,
-			'output' => API_OUTPUT_EXTEND
-		);
-		$applications = API::Application()->get($params);
-
-// SELECT TRIGGERS
-		$params = array(
-			'hostids' => $hostids,
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-			'preservekeys' => 1,
-			'selectDependencies' => API_OUTPUT_EXTEND,
-			'expandData' => 1
-		);
-		$triggers = API::Trigger()->get($params);
-		foreach($triggers as $tnum => $trigger){
-			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression']);
-		}
-
-// SELECT TRIGGER DEPENDENCIES
-		$dependencies = array();
-		foreach($triggers as $tnum => $trigger){
-			if(!empty($trigger['dependencies'])){
-				if(!isset($dependencies[$trigger['triggerid']])) $dependencies[$trigger['triggerid']] = array();
-
-				$dependencies[$trigger['triggerid']]['trigger'] = $trigger;
-				$dependencies[$trigger['triggerid']]['depends_on'] = $trigger['dependencies'];
-			}
-		}
-
-// we do custom fields for export
-		foreach($dependencies as $triggerid => $dep_data){
-			$dependencies[$triggerid]['trigger']['host_description'] = $triggers[$triggerid]['host'].':'.$triggers[$triggerid]['description'];
-			foreach($dep_data['depends_on'] as $dep_triggerid => $dep_trigger){
-				$dependencies[$triggerid]['depends_on'][$dep_triggerid]['host_description'] = $dep_trigger['host'].':'.$dep_trigger['description'];
-			}
-		}
-
-
-		$data = array(
-			'hosts' => $hosts,
-			'items' => $items,
-			'items_applications' => $applications,
-			'graphs' => $graphs,
-			'graphs_items' => $gitems,
-			'templates' => $templates,
-			'macros' => $macros,
-			'hosts_groups' => $groups,
-			'triggers' => $triggers,
-			'dependencies' => $dependencies
-		);
-
-		$xml = zbxXML::export($data);
-
-		print($xml);
+		print($export->export());
 		exit();
-	}
-
-// IMPORT ///////////////////////////////////
-	$rules = get_request('rules', array());
-	if(!isset($_REQUEST['form_refresh'])){
-		foreach(array('host', 'template', 'item', 'trigger', 'graph') as $key){
-			$rules[$key]['exist'] = 1;
-			$rules[$key]['missed'] = 1;
-		}
-	}
-
-	if(isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])){
-		require_once dirname(__FILE__).'/include/export.inc.php';
-		DBstart();
-		$result = zbxXML::import($_FILES['import_file']['tmp_name']);
-		if($result) $result = zbxXML::parseMain($rules);
-		$result = DBend($result);
-		show_messages($result, _('Imported successfully'), _('Import failed'));
 	}
 
 /* FILTER */
@@ -723,8 +581,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // removes form_refresh variable
 		$frmForm->cleanItems();
 		$buttons = new CDiv(array(
-			new CSubmit('form', S_CREATE),
-			new CSubmit('form', S_IMPORT)
+			new CSubmit('form', _('Create')),
+			new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
 		));
 		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);
@@ -751,16 +609,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$hosts_wdgt->addItem($hostForm->render());
 	}
 	elseif (isset($_REQUEST['form'])) {
-		if ($_REQUEST['form'] == S_IMPORT)
-			$hosts_wdgt->addItem(import_host_form());
-		else {
-			if ($hostid = get_request('hostid', 0)) {
-				$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
-			}
-
-			$hostForm = new CView('configuration.host.edit');
-			$hosts_wdgt->addItem($hostForm->render());
+		if ($hostid = get_request('hostid', 0)) {
+			$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
 		}
+
+		$hostForm = new CView('configuration.host.edit');
+		$hosts_wdgt->addItem($hostForm->render());
 	}
 	else {
 		$frmGroup = new CForm();
@@ -779,7 +633,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$filter_table->addRow(array(
 			array(array(bold(S_NAME), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
 			array(array(bold(S_DNS), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
-			array(array(bold(S_IP), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
+			array(array(bold(_('IP')), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
 			array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 		));
 
