@@ -173,6 +173,39 @@ DROP FUNCTION zbx_convert_simple_checks(v_itemid bigint, v_hostid bigint, v_key 
 
 DROP LANGUAGE 'plpgsql';
 
+-- adding web.test.error[<web check>] items
+
+CREATE SEQUENCE items_seq;
+CREATE SEQUENCE httptestitem_seq;
+CREATE SEQUENCE items_applications_seq;
+
+SELECT setval('items_seq', max(itemid)) FROM items;
+SELECT setval('httptestitem_seq', max(httptestitemid)) FROM httptestitem;
+SELECT setval('items_applications_seq', max(itemappid)) FROM items_applications;
+
+INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+	SELECT NEXTVAL('items_seq'), hostid, type, 'Last error message of scenario ''$1''', 'web.test.error' || SUBSTR(key_, STRPOS(key_, '[')), 1, '', delay, history, 0, status
+	FROM items
+	WHERE type = 9
+		AND key_ LIKE 'web.test.fail%';
+
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+	SELECT NEXTVAL('httptestitem_seq'), ht.httptestid, i.itemid, 4
+	FROM httptest ht,applications a,items i
+	WHERE ht.applicationid=a.applicationid
+		AND a.hostid=i.hostid
+		AND 'web.test.error[' || ht.name || ']' = i.key_;
+
+INSERT INTO items_applications (itemappid, applicationid, itemid)
+	SELECT NEXTVAL('items_applications_seq'), ht.applicationid, hti.itemid
+	FROM httptest ht, httptestitem hti
+	WHERE ht.httptestid = hti.httptestid
+		AND hti.type = 4;
+
+DROP SEQUENCE items_applications_seq;
+DROP SEQUENCE httptestitem_seq;
+DROP SEQUENCE items_seq;
+
 ---- Patching table `hosts`
 
 ALTER TABLE ONLY hosts ALTER hostid DROP DEFAULT,
