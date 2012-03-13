@@ -194,6 +194,45 @@ END;
 
 DROP FUNCTION zbx_key_exists;
 
+-- adding web.test.error[<web check>] items
+
+VARIABLE item_maxid number;
+VARIABLE httptestitem_maxid number;
+VARIABLE itemapp_maxid number;
+BEGIN
+SELECT MAX(itemid) INTO :item_maxid FROM items;
+SELECT MAX(httptestitemid) INTO :httptestitem_maxid FROM httptestitem;
+SELECT MAX(itemappid) INTO :itemapp_maxid FROM items_applications;
+END;
+/
+
+CREATE SEQUENCE items_seq;
+CREATE SEQUENCE httptestitem_seq;
+CREATE SEQUENCE items_applications_seq;
+
+INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+	SELECT :item_maxid + items_seq.NEXTVAL, hostid, type, 'Last error message of scenario ''$1''', 'web.test.error' || SUBSTR(key_, INSTR(key_, '[')), 1, '', delay, history, 0, status
+	FROM items
+	WHERE type = 9
+		AND key_ LIKE 'web.test.fail%';
+
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+	SELECT :httptestitem_maxid + httptestitem_seq.NEXTVAL, ht.httptestid, i.itemid, 4
+	FROM httptest ht,applications a,items i
+	WHERE ht.applicationid=a.applicationid
+		AND a.hostid=i.hostid
+		AND 'web.test.error[' || ht.name || ']' = i.key_;
+
+INSERT INTO items_applications (itemappid, applicationid, itemid)
+	SELECT :itemapp_maxid + items_applications_seq.NEXTVAL, ht.applicationid, hti.itemid
+	FROM httptest ht, httptestitem hti
+	WHERE ht.httptestid = hti.httptestid
+		AND hti.type = 4;
+
+DROP SEQUENCE items_applications_seq;
+DROP SEQUENCE httptestitem_seq;
+DROP SEQUENCE items_seq;
+
 ---- Patching table `hosts`
 
 ALTER TABLE hosts MODIFY hostid DEFAULT NULL;
