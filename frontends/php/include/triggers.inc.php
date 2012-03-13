@@ -1992,8 +1992,8 @@ function analyze_expression($expression) {
 	}
 	$pasedData = parseTriggerExpressions($expression, true);
 	$next = array();
-	$nextletter = 0;
-	return build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $nextletter);
+	$letterNum = 0;
+	return build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $letterNum);
 }
 
 function make_expression_tree(&$node, &$nodeid) {
