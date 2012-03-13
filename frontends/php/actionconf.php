@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title']		= 'S_CONFIGURATION_OF_ACTIONS';
+$page['title']		= _('Configuration of actions');
 $page['file']		= 'actionconf.php';
 $page['hist_arg']	= array();
 

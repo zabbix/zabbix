@@ -836,21 +836,17 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
  ******************************************************************************/
 function get_same_applications_for_host($applications, $hostid) {
 	$child_applications = array();
-
-	foreach ($applications as $appid) {
-		$db_apps = DBselect(
-			'SELECT a1.applicationid'.
-			' FROM applications a1,applications a2'.
-			' WHERE a1.name=a2.name'.
+	$db_apps = DBselect(
+		'SELECT a1.applicationid'.
+				' FROM applications a1,applications a2'.
+				' WHERE a1.name=a2.name'.
 				' AND a1.hostid='.$hostid.
-				' AND a2.applicationid='.$appid
-		);
-		$db_app = DBfetch($db_apps);
-		if (!$db_app) {
-			continue;
-		}
-		array_push($child_applications, $db_app['applicationid']);
+				' AND '.DBcondition('a2.applicationid', $applications)
+	);
+	while ($app = DBfetch($db_apps)) {
+		$child_applications[] = $app['applicationid'];
 	}
+
 	return $child_applications;
 }
 
@@ -874,66 +870,40 @@ function get_applications_by_itemid($itemids, $field = 'applicationid') {
 	return $result;
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
-function delete_history_by_itemid($itemids, $use_housekeeper = 0) {
-	zbx_value2array($itemids);
-	$result = delete_trends_by_itemid($itemids, $use_housekeeper);
+/**
+ * Clear items history and trends.
+ *
+ * @param $itemIds
+ *
+ * @return bool
+ */
+function delete_history_by_itemid($itemIds) {
+	zbx_value2array($itemIds);
+	$result = delete_trends_by_itemid($itemIds);
 	if (!$result) {
 		return $result;
 	}
-	if ($use_housekeeper) {
-		foreach ($itemids as $id => $itemid) {
-			$housekeeperid = get_dbid('housekeeper', 'housekeeperid');
-			DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value) VALUES ('.$housekeeperid.',\'history_text\',\'itemid\','.$itemid.')');
+	DBexecute('DELETE FROM history_text WHERE '.DBcondition('itemid', $itemIds));
+	DBexecute('DELETE FROM history_log WHERE '.DBcondition('itemid', $itemIds));
+	DBexecute('DELETE FROM history_uint WHERE '.DBcondition('itemid', $itemIds));
+	DBexecute('DELETE FROM history_str WHERE '.DBcondition('itemid', $itemIds));
+	DBexecute('DELETE FROM history WHERE '.DBcondition('itemid', $itemIds));
 
-			$housekeeperid = get_dbid('housekeeper', 'housekeeperid');
-			DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value) VALUES ('.$housekeeperid.',\'history_log\',\'itemid\','.$itemid.')');
-
-			$housekeeperid = get_dbid('housekeeper', 'housekeeperid');
-			DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value) VALUES ('.$housekeeperid.',\'history_uint\',\'itemid\','.$itemid.')');
-
-			$housekeeperid = get_dbid('housekeeper', 'housekeeperid');
-			DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value) VALUES ('.$housekeeperid.',\'history_str\',\'itemid\','.$itemid.')');
-
-			$housekeeperid = get_dbid('housekeeper', 'housekeeperid');
-			DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value) VALUES ('.$housekeeperid.',\'history\',\'itemid\','.$itemid.')');
-		}
-		return true;
-	}
-	DBexecute('DELETE FROM history_text WHERE '.DBcondition('itemid', $itemids));
-	DBexecute('DELETE FROM history_log WHERE '.DBcondition('itemid', $itemids));
-	DBexecute('DELETE FROM history_uint WHERE '.DBcondition('itemid', $itemids));
-	DBexecute('DELETE FROM history_str WHERE '.DBcondition('itemid', $itemids));
-	DBexecute('DELETE FROM history WHERE '.DBcondition('itemid', $itemids));
 	return true;
 }
 
 /**
- * Clear trends history for provided itemIDs or schedule this work for housekeeper
+ * Clear trends history for provided item ids.
  *
  * @param mixed $itemIds IDs of items for which history should be cleared
- * @param bool $useHousekeeper schedule deletion for housekeeper instead of deleting now
+ *
  * @return bool
  */
-function delete_trends_by_itemid($itemIds, $useHousekeeper = false) {
+function delete_trends_by_itemid($itemIds) {
 	zbx_value2array($itemIds);
-
-	if ($useHousekeeper) {
-		foreach ($itemIds as $itemId) {
-			$housekeeperid = get_dbid('housekeeper', 'housekeeperid');
-			DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value) VALUES ('.$housekeeperid.',\'trends\',\'itemid\','.$itemid.')');
-
-			$housekeeperid = get_dbid('housekeeper', 'housekeeperid');
-			DBexecute('INSERT INTO housekeeper (housekeeperid,tablename,field,value) VALUES ('.$housekeeperid.',\'trends_uint\',\'itemid\','.$itemid.')');
-		}
-		return true;
-	}
 	$r1 = DBexecute('DELETE FROM trends WHERE '.DBcondition('itemid', $itemIds));
 	$r2 = DBexecute('DELETE FROM trends_uint WHERE '.DBcondition('itemid', $itemIds));
+
 	return $r1 && $r2;
 }
 
