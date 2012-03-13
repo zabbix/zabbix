@@ -665,7 +665,7 @@ abstract class CItemGeneral extends CZBXAPI {
 		if ($sqlWhere) {
 			$sql = 'SELECT i.key_'.
 				' FROM items i'.
-				' WHERE '.implode(' OR ', $sqlWhere);
+				' WHERE ('.implode(' OR ', $sqlWhere).')';
 
 			// if we update existing items we need to exclude them from result.
 			if ($itemIds) {
