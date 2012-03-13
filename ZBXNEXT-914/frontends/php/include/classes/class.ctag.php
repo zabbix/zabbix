@@ -116,10 +116,7 @@ class CTag extends CObject {
 	}
 
 	public function attr($name, $value = null) {
-		if (is_null($value)) {
-			$this->getAttribute($name);
-		}
-		else {
+		if (!is_null($value)) {
 			$this->setAttribute($name, $value);
 		}
 	}
