@@ -64,6 +64,14 @@ class CConfigurationImport {
 	 */
 	protected $interfacesCache = array();
 
+	/**
+	 * Array of hosts/templates that were created or updated,
+	 * so it's related items and discovery rules should be processed too.
+	 *
+	 * @var array
+	 */
+	protected $processedHosts = array();
+
 
 	/**
 	 * Constructor.
@@ -355,7 +363,6 @@ class CConfigurationImport {
 		}
 		$templates = zbx_toHash($templates, 'host');
 
-
 		foreach ($templates as &$template) {
 			// screens are not needed in this method
 			unset($template['screens']);
@@ -430,13 +437,17 @@ class CConfigurationImport {
 			}
 
 			if ($this->referencer->resolveTemplate($template['host'])) {
-				$template['templateid'] = $this->referencer->resolveTemplate($template['host']);
-				API::Template()->update($template);
+				if ($this->options['templates']['updateExisting']) {
+					$template['templateid'] = $this->referencer->resolveTemplate($template['host']);
+					API::Template()->update($template);
+					$this->processedHosts[$template['host']] = $template['host'];
+				}
 			}
-			else {
+			elseif ($this->options['templates']['createMissing']) {
 				$newHostIds = API::Template()->create($template);
 				$templateid = reset($newHostIds['templateids']);
 				$this->referencer->addTemplateRef($template['host'], $templateid);
+				$this->processedHosts[$template['host']] = $template['host'];
 			}
 		}
 	}
@@ -533,9 +544,15 @@ class CConfigurationImport {
 				$processedHosts[$hostsToCreate[$hnum]['host']] = $hostid;
 				$this->referencer->addHostRef($hostsToCreate[$hnum]['host'], $hostid);
 			}
+			foreach ($hostsToCreate as $host) {
+				$this->processedHosts[$host['host']] = $host['host'];
+			}
 		}
 		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
 			API::Host()->update($hostsToUpdate);
+			foreach ($hostsToUpdate as $host) {
+				$this->processedHosts[$host['host']] = $host['host'];
+			}
 		}
 
 		// create interface hash interface_ref->interfaceid
@@ -578,14 +595,16 @@ class CConfigurationImport {
 
 		$applicationsToCreate = array();
 		foreach ($allApplciations as $host => $applications) {
+			if (!isset($this->processedHosts[$host])) {
+				continue;
+			}
+
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
-			if (isset($hostid)) {
-				foreach ($applications as $application) {
-					$application['hostid'] = $hostid;
-					$appId = $this->referencer->resolveApplication($hostid, $application['name']);
-					if (!$appId) {
-						$applicationsToCreate[] = $application;
-					}
+			foreach ($applications as $application) {
+				$application['hostid'] = $hostid;
+				$appId = $this->referencer->resolveApplication($hostid, $application['name']);
+				if (!$appId) {
+					$applicationsToCreate[] = $application;
 				}
 			}
 		}
@@ -610,35 +629,37 @@ class CConfigurationImport {
 		$itemsToCreate = array();
 		$itemsToUpdate = array();
 		foreach ($allItems as $host => $items) {
+			if (!isset($this->processedHosts[$host])) {
+				continue;
+			}
+
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
-			if ($hostid) {
-				foreach ($items as $item) {
-					$item['hostid'] = $hostid;
+			foreach ($items as $item) {
+				$item['hostid'] = $hostid;
 
-					if (!empty($item['applications'])) {
-						$applicationsIds = array();
-						foreach ($item['applications'] as $application) {
-							$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
-						}
-						$item['applications'] = $applicationsIds;
+				if (!empty($item['applications'])) {
+					$applicationsIds = array();
+					foreach ($item['applications'] as $application) {
+						$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
 					}
+					$item['applications'] = $applicationsIds;
+				}
 
-					if (isset($item['interface_ref'])) {
-						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
-					}
+				if (isset($item['interface_ref'])) {
+					$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+				}
 
-					if (!empty($item['valuemap'])) {
-						$item['valuemapid'] = $this->referencer->resolveValueMap($item['valuemap']['name']);
-					}
+				if (!empty($item['valuemap'])) {
+					$item['valuemapid'] = $this->referencer->resolveValueMap($item['valuemap']['name']);
+				}
 
-					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
-					if ($itemsId) {
-						$item['itemid'] = $itemsId;
-						$itemsToUpdate[] = $item;
-					}
-					else {
-						$itemsToCreate[] = $item;
-					}
+				$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
+				if ($itemsId) {
+					$item['itemid'] = $itemsId;
+					$itemsToUpdate[] = $item;
+				}
+				else {
+					$itemsToCreate[] = $item;
 				}
 			}
 		}
@@ -662,80 +683,123 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processDiscoveryRules() {
-		$allDiscoveryRules = $this->formatter->getDiscoveryRules();
+		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
 		if (empty($allDiscoveryRules)) {
 			return;
 		}
 
+		// unset rules that are related to hosts we did not process
+		foreach ($allDiscoveryRules as $host => $discoveryRules) {
+			if (!isset($this->processedHosts[$host])) {
+				unset($allDiscoveryRules[$host]);
+			}
+		}
+
 		$itemsToCreate = array();
 		$itemsToUpdate = array();
-		$prototypesToUpdate = array();
-		$prototypesToCreate = array();
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
-			if ($hostid) {
-				foreach ($discoveryRules as $item) {
-					$item['hostid'] = $hostid;
+			foreach ($discoveryRules as $item) {
+				$item['hostid'] = $hostid;
 
-					// prototypes
-					foreach ($item['item_prototypes'] as $prototype) {
-						$prototype['hostid'] = $hostid;
+				if (isset($item['interface_ref'])) {
+					$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+				}
+				unset($item['item_prototypes']);
+				unset($item['trigger_prototypes']);
+				unset($item['graph_prototypes']);
 
-						$applicationsIds = array();
-						foreach ($prototype['applications'] as $application) {
-							$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
-						}
-						$prototype['applications'] = $applicationsIds;
-
-						if (isset($prototype['interface_ref'])) {
-							$prototype['interfaceid'] = $this->interfacesCache[$hostid][$prototype['interface_ref']];
-						}
-
-						if (!empty($prototype['valuemap'])) {
-							$prototype['valuemapid'] = $this->referencer->resolveValueMap($prototype['valuemap']['name']);
-						}
-
-						$prototypeId = $this->referencer->resolveItem($hostid, $prototype['key_']);
-						$prototype['rule'] = array('hostid' => $hostid, 'key' => $item['key_']);
-						if ($prototypeId) {
-							$prototype['itemid'] = $prototypeId;
-							$prototypesToUpdate[] = $prototype;
-						}
-						else {
-							$prototypesToCreate[] = $prototype;
-						}
-					}
-
-
-					if (isset($item['interface_ref'])) {
-						$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
-					}
-					unset($item['item_prototypes']);
-					unset($item['trigger_prototypes']);
-					unset($item['graph_prototypes']);
-
-					$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
-					if ($itemsId) {
-						$item['itemid'] = $itemsId;
-						$itemsToUpdate[] = $item;
-					}
-					else {
-						$itemsToCreate[] = $item;
-					}
+				$itemId = $this->referencer->resolveItem($hostid, $item['key_']);
+				if ($itemId) {
+					$item['itemid'] = $itemId;
+					$itemsToUpdate[] = $item;
+				}
+				else {
+					$itemsToCreate[] = $item;
 				}
 			}
 		}
 
-		// create/update items and create hash hostid->key_->itemid
-		if ($this->options['items']['createMissing'] && $itemsToCreate) {
+		// create/update discovery rules and add processed rules to array $processedRules
+		$processedRules = array();
+		if ($this->options['discoveryRules']['createMissing'] && $itemsToCreate) {
 			$newItemsIds = API::DiscoveryRule()->create($itemsToCreate);
 			foreach ($newItemsIds['itemids'] as $inum => $itemid) {
 				$item = $itemsToCreate[$inum];
 				$this->referencer->addItemRef($item['hostid'], $item['key_'], $itemid);
 			}
+			foreach ($itemsToCreate as $item) {
+				$processedRules[$item['hostid']][$item['key_']] = 1;
+			}
+
 		}
-		if ($this->options['items']['updateExisting'] && $itemsToUpdate) {
+		if ($this->options['discoveryRules']['updateExisting'] && $itemsToUpdate) {
 			API::DiscoveryRule()->update($itemsToUpdate);
+			foreach ($itemsToUpdate as $item) {
+				$processedRules[$item['hostid']][$item['key_']] = 1;
+			}
+		}
+
+
+		// process prototypes
+		$prototypesToUpdate = array();
+		$prototypesToCreate = array();
+		foreach ($allDiscoveryRules as $host => $discoveryRules) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+			foreach ($discoveryRules as $item) {
+				// if rule was not processed we should not create/upadate any of it's prototypes
+				if (!isset($processedRules[$hostid][$item['key_']])) {
+					continue;
+				}
+
+				$item['hostid'] = $hostid;
+
+				// prototypes
+				foreach ($item['item_prototypes'] as $prototype) {
+					$prototype['hostid'] = $hostid;
+
+					$applicationsIds = array();
+					foreach ($prototype['applications'] as $application) {
+						$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
+					}
+					$prototype['applications'] = $applicationsIds;
+
+					if (isset($prototype['interface_ref'])) {
+						$prototype['interfaceid'] = $this->interfacesCache[$hostid][$prototype['interface_ref']];
+					}
+
+					if (!empty($prototype['valuemap'])) {
+						$prototype['valuemapid'] = $this->referencer->resolveValueMap($prototype['valuemap']['name']);
+					}
+
+					$prototypeId = $this->referencer->resolveItem($hostid, $prototype['key_']);
+					$prototype['rule'] = array('hostid' => $hostid, 'key' => $item['key_']);
+					if ($prototypeId) {
+						$prototype['itemid'] = $prototypeId;
+						$prototypesToUpdate[] = $prototype;
+					}
+					else {
+						$prototypesToCreate[] = $prototype;
+					}
+				}
+
+
+				if (isset($item['interface_ref'])) {
+					$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+				}
+				unset($item['item_prototypes']);
+				unset($item['trigger_prototypes']);
+				unset($item['graph_prototypes']);
+
+				$itemsId = $this->referencer->resolveItem($hostid, $item['key_']);
+				if ($itemsId) {
+					$item['itemid'] = $itemsId;
+					$itemsToUpdate[] = $item;
+				}
+				else {
+					$itemsToCreate[] = $item;
+				}
+			}
 		}
 
 
@@ -767,68 +831,71 @@ class CConfigurationImport {
 		$graphsToUpdate = array();
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostid = $this->referencer->resolveHostOrTemplate($host);
-			if ($hostid) {
-				foreach ($discoveryRules as $item) {
-					// trigger prototypes
-					foreach ($item['trigger_prototypes'] as $trigger) {
-						$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+			foreach ($discoveryRules as $item) {
+				// if rule was not processed we should not create/upadate any of it's prototypes
+				if (!isset($processedRules[$hostid][$item['key_']])) {
+					continue;
+				}
 
-						if ($triggerId) {
-							$trigger['triggerid'] = $triggerId;
-							$triggersToUpdate[] = $trigger;
-						}
-						else {
-							$triggersToCreate[] = $trigger;
-						}
+				// trigger prototypes
+				foreach ($item['trigger_prototypes'] as $trigger) {
+					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+
+					if ($triggerId) {
+						$trigger['triggerid'] = $triggerId;
+						$triggersToUpdate[] = $trigger;
+					}
+					else {
+						$triggersToCreate[] = $trigger;
+					}
+				}
+
+				// graph prototypes
+				foreach ($item['graph_prototypes'] as $graph) {
+					$graphHostIds = array();
+					if (!empty($graph['ymin_item_1'])) {
+						$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
+						$graph['ymin_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key']);
+					}
+					if (!empty($graph['ymax_item_1'])) {
+						$hostId = $this->referencer->resolveHostOrTemplate($graph['ymax_item_1']['host']);
+						$graph['ymax_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key']);
 					}
 
-					// graph prototypes
-					foreach ($item['graph_prototypes'] as $graph) {
-						$graphHostIds = array();
-						if (!empty($graph['ymin_item_1'])) {
-							$hostId = $this->referencer->resolveHostOrTemplate($graph['ymin_item_1']['host']);
-							$graph['ymin_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymin_item_1']['key']);
+
+					foreach ($graph['gitems'] as &$gitem) {
+						$gitemhostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+
+						$gitem['itemid'] = $this->referencer->resolveItem($gitemhostId, $gitem['item']['key']);
+
+						$graphHostIds[$gitemhostId] = $gitemhostId;
+					}
+					unset($gitem);
+
+
+					// TODO: do this for all graphs at once
+					$sql = 'SELECT g.graphid
+					FROM graphs g, graphs_items gi, items i
+					WHERE g.graphid=gi.graphid
+						AND gi.itemid=i.itemid
+						AND g.name='.zbx_dbstr($graph['name']).'
+						AND '.DBcondition('i.hostid', $graphHostIds);
+					$graphExists = DBfetch(DBselect($sql));
+
+					if ($graphExists) {
+						$dbGraph = API::GraphPrototype()->get(array(
+							'graphids' => $graphExists['graphid'],
+							'output' => API_OUTPUT_SHORTEN,
+							'editable' => true
+						));
+						if (empty($dbGraph)) {
+							throw new Exception(_s('No permission for Graph "%1$s".', $graph['name']));
 						}
-						if (!empty($graph['ymax_item_1'])) {
-							$hostId = $this->referencer->resolveHostOrTemplate($graph['ymax_item_1']['host']);
-							$graph['ymax_itemid'] = $this->referencer->resolveItem($hostId, $graph['ymax_item_1']['key']);
-						}
-
-
-						foreach ($graph['gitems'] as &$gitem) {
-							$gitemhostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
-
-							$gitem['itemid'] = $this->referencer->resolveItem($gitemhostId, $gitem['item']['key']);
-
-							$graphHostIds[$gitemhostId] = $gitemhostId;
-						}
-						unset($gitem);
-
-
-						// TODO: do this for all graphs at once
-						$sql = 'SELECT g.graphid
-						FROM graphs g, graphs_items gi, items i
-						WHERE g.graphid=gi.graphid
-							AND gi.itemid=i.itemid
-							AND g.name='.zbx_dbstr($graph['name']).'
-							AND '.DBcondition('i.hostid', $graphHostIds);
-						$graphExists = DBfetch(DBselect($sql));
-
-						if ($graphExists) {
-							$dbGraph = API::GraphPrototype()->get(array(
-								'graphids' => $graphExists['graphid'],
-								'output' => API_OUTPUT_SHORTEN,
-								'editable' => true
-							));
-							if (empty($dbGraph)) {
-								throw new Exception(_s('No permission for Graph "%1$s".', $graph['name']));
-							}
-							$graph['graphid'] = $graphExists['graphid'];
-							$graphsToUpdate[] = $graph;
-						}
-						else {
-							$graphsToCreate[] = $graph;
-						}
+						$graph['graphid'] = $graphExists['graphid'];
+						$graphsToUpdate[] = $graph;
+					}
+					else {
+						$graphsToCreate[] = $graph;
 					}
 				}
 			}
