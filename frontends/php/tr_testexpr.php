@@ -53,7 +53,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$data_table = new CTable(null, 'tableinfo');
 	$data_table->setAttribute('id', 'data_list');
 
-	$data_table->setHeader(array(S_EXPRESSION_VARIABLE_ELEMENTS, S_RESULT_TYPE, S_VALUE));
+	$data_table->setHeader(array(_('Expression Variable Elements'), _('Result type'), S_VALUE));
 
 	$octet = false;
 	$datas = array();
@@ -119,7 +119,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$frm_test->addVar('expression', urlencode($expression));
 
 /* test data */
-	$frm_test->addRow(S_TEST_DATA, $data_table);
+	$frm_test->addRow(_('Test data'), $data_table);
 
 /* result */
 	$res_table = new CTable(null, 'tableinfo');

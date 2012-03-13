@@ -172,6 +172,31 @@ UPDATE items SET key_ = zbx_convert_simple_checks(itemid, hostid, key_)
 
 DROP FUNCTION zbx_convert_simple_checks;
 
+-- adding web.test.error[<web check>] items
+
+SET @itemid = (SELECT MAX(itemid) FROM items);
+SET @httptestitemid = (SELECT MAX(httptestitemid) FROM httptestitem);
+SET @itemappid = (SELECT MAX(itemappid) FROM items_applications);
+
+INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+	SELECT @itemid := @itemid + 1, hostid, type, 'Last error message of scenario \'$1\'', CONCAT('web.test.error', SUBSTR(key_, LOCATE('[', key_))), 1, '', delay, history, 0, status
+	FROM items
+	WHERE type = 9
+		AND key_ LIKE 'web.test.fail%';
+
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+	SELECT @httptestitemid := @httptestitemid + 1, ht.httptestid, i.itemid, 4
+	FROM httptest ht,applications a,items i
+	WHERE ht.applicationid=a.applicationid
+		AND a.hostid=i.hostid
+		AND CONCAT('web.test.error[', ht.name, ']') = i.key_;
+
+INSERT INTO items_applications (itemappid, applicationid, itemid)
+	SELECT @itemappid := @itemappid + 1, ht.applicationid, hti.itemid
+	FROM httptest ht, httptestitem hti
+	WHERE ht.httptestid = hti.httptestid
+		AND hti.type = 4;
+
 -- Patching table `hosts`
 
 ALTER TABLE hosts MODIFY hostid bigint unsigned NOT NULL,

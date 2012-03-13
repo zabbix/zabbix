@@ -167,7 +167,7 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid)
  *                                                                            *
  ******************************************************************************/
 static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, const ZBX_TABLE *table,
-		zbx_uint64_t *hostids, int hostids_num)
+		zbx_vector_uint64_t *hosts, zbx_vector_uint64_t *httptests)
 {
 	const char	*__function_name = "get_proxyconfig_table";
 	char		*sql = NULL;
@@ -215,11 +215,11 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 	}
 	else if (SUCCEED == str_in_list("hosts,interface,hosts_templates,hostmacro", table->table, ','))
 	{
-		if (0 == hostids_num)
+		if (0 == hosts->values_num)
 			goto skip_data;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hostids, hostids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.hostid", hosts->values, hosts->values_num);
 	}
 	else if (0 == strcmp(table->table, "items"))
 	{
@@ -228,14 +228,14 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 					" and r.proxy_hostid=" ZBX_FS_UI64
 					" and r.status in (%d,%d)"
 					" and t.status in (%d,%d,%d)"
-					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
+					" and t.type in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",
 				proxy_hostid,
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
 				ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED,
 				ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SNMPv1, ITEM_TYPE_SNMPv2c,
 				ITEM_TYPE_SNMPv3, ITEM_TYPE_IPMI, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
-				ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-				ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP);
+				ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP);
 	}
 	else if (0 == strcmp(table->table, "drules"))
 	{
@@ -257,6 +257,41 @@ static void	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j,
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				",config r where t.groupid=r.discovery_groupid" DB_NODE,
 				DBnode_local("r.configid"));
+	}
+	else if (0 == strcmp(table->table, "applications"))
+	{
+		if (0 == httptests->values_num)
+			goto skip_data;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" where exists ("
+					"select *"
+					" from httptest r"
+					" where t.applicationid=r.applicationid"
+						" and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.httptestid",
+				httptests->values, httptests->values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")");
+	}
+	else if (SUCCEED == str_in_list("httptest,httptestitem,httpstep", table->table, ','))
+	{
+		if (0 == httptests->values_num)
+			goto skip_data;
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.httptestid",
+				httptests->values, httptests->values_num);
+	}
+	else if (0 == strcmp(table->table, "httpstepitem"))
+	{
+		if (0 == httptests->values_num)
+			goto skip_data;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				",httpstep r where t.httpstepid=r.httpstepid"
+					" and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.httptestid",
+				httptests->values, httptests->values_num);
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " order by t.%s", table->recid);
@@ -303,8 +338,7 @@ skip_data:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid,
-		zbx_uint64_t **hostids, int *hostids_alloc, int *hostids_num)
+static void	get_proxy_monitored_hosts(zbx_uint64_t proxy_hostid, zbx_vector_uint64_t *hosts)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -327,7 +361,7 @@ static void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid,
 	{
 		ZBX_STR2UINT64(hostid, row[0]);
 
-		uint64_array_add(hostids, hostids_alloc, hostids_num, hostid, 64);
+		zbx_vector_uint64_append(hosts, hostid);
 		uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 64);
 	}
 	DBfree_result(result);
@@ -336,7 +370,7 @@ static void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid,
 	{
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select templateid"
+				"select distinct templateid"
 				" from hosts_templates"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", ids, ids_num);
@@ -349,7 +383,7 @@ static void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid,
 		{
 			ZBX_STR2UINT64(hostid, row[0]);
 
-			uint64_array_add(hostids, hostids_alloc, hostids_num, hostid, 64);
+			zbx_vector_uint64_append(hosts, hostid);
 			uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 64);
 		}
 		DBfree_result(result);
@@ -357,6 +391,35 @@ static void	get_proxy_monitored_hostids(zbx_uint64_t proxy_hostid,
 
 	zbx_free(ids);
 	zbx_free(sql);
+
+	zbx_vector_uint64_sort(hosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_uint64_t *httptests)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	httptestid;
+
+	result = DBselect(
+			"select httptestid"
+			" from httptest t,applications a,hosts h"
+			" where t.applicationid=a.applicationid"
+				" and a.hostid=h.hostid"
+				" and t.status=%d"
+				" and h.proxy_hostid=" ZBX_FS_UI64
+				" and h.status=%d",
+			HTTPTEST_STATUS_MONITORED, proxy_hostid, HOST_STATUS_MONITORED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(httptestid, row[0]);
+
+		zbx_vector_uint64_append(httptests, httptestid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(httptests, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -390,29 +453,39 @@ void	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j)
 		{"expressions"},
 		{"groups"},
 		{"config"},
+		{"applications"},
+		{"httptest"},
+		{"httptestitem"},
+		{"httpstep"},
+		{"httpstepitem"},
 		{NULL}
 	};
 
-	const char	*__function_name = "get_proxyconfig_data";
-	int		i;
-	const ZBX_TABLE	*table;
-	zbx_uint64_t	*hostids = NULL;
-	int		hostids_alloc = 0, hostids_num = 0;
+	const char		*__function_name = "get_proxyconfig_data";
+
+	int			i;
+	const ZBX_TABLE		*table;
+	zbx_vector_uint64_t	hosts, httptests;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __function_name, proxy_hostid);
 
 	assert(proxy_hostid);
 
-	get_proxy_monitored_hostids(proxy_hostid, &hostids, &hostids_alloc, &hostids_num);
+	zbx_vector_uint64_create(&hosts);
+	zbx_vector_uint64_create(&httptests);
+
+	get_proxy_monitored_hosts(proxy_hostid, &hosts);
+	get_proxy_monitored_httptests(proxy_hostid, &httptests);
 
 	for (i = 0; NULL != pt[i].table; i++)
 	{
 		assert(NULL != (table = DBget_table(pt[i].table)));
 
-		get_proxyconfig_table(proxy_hostid, j, table, hostids, hostids_num);
+		get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests);
 	}
 
-	zbx_free(hostids);
+	zbx_vector_uint64_destroy(&httptests);
+	zbx_vector_uint64_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

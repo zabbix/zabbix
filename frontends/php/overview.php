@@ -95,12 +95,12 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 
 	$form = new CForm('get');
-	$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
+	$form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
 
 	$cmbType = new CComboBox('type', $_REQUEST['type'], 'submit()');
 	$cmbType->addItem(SHOW_TRIGGERS, S_TRIGGERS);
 	$cmbType->addItem(SHOW_DATA, S_DATA);
-	$form->addItem(array(SPACE.S_TYPE.SPACE, $cmbType));
+	$form->addItem(array(SPACE._('Type').SPACE, $cmbType));
 
 	$help = new CHelp('web.view.php', 'right');
 	$help_table = new CTableInfo();
@@ -145,7 +145,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	$cmbStyle = new CComboBox('view_style',$_REQUEST['view_style'],'submit()');
 	$cmbStyle->addItem(STYLE_TOP,S_TOP);
-	$cmbStyle->addItem(STYLE_LEFT,S_LEFT);
+	$cmbStyle->addItem(STYLE_LEFT,_('Left'));
 
 	$form_l->additem(array(S_HOSTS_LOCATION.SPACE,$cmbStyle));
 
@@ -156,14 +156,10 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 //-------------
 
 	if($_REQUEST['type']==SHOW_DATA){
-//COpt::profiling_start('get_items_data_overview');
 		$table = get_items_data_overview(array_keys($pageFilter->hosts),$_REQUEST['view_style']);
-//COpt::profiling_stop('get_items_data_overview');
 	}
 	else if($_REQUEST['type']==SHOW_TRIGGERS){
-//COpt::profiling_start('get_triggers_overview');
 		$table = get_triggers_overview(array_keys($pageFilter->hosts),$_REQUEST['view_style']);
-//COpt::profiling_stop('get_triggers_overview');
 	}
 
 	$over_wdgt->addItem($table);

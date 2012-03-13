@@ -78,7 +78,7 @@ $sortFields = array(
 	array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
 	array('field' => 'operator', 'order' => ZBX_SORT_DOWN)
 );
-ArraySorter::sort($data['conditions'], $sortFields);
+CArrayHelper::sort($data['conditions'], $sortFields);
 
 // group conditions by type
 $condElements = new CTable(_('No conditions defined.'), 'formElementTable');

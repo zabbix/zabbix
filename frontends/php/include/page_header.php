@@ -232,8 +232,6 @@ if (isset($_REQUEST['print'])) {
 }
 
 if (!defined('ZBX_PAGE_NO_MENU')) {
-	COpt::compare_files_with_menu($ZBX_MENU);
-
 	$help = new CLink(_('Help'), 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
 	$help->setTarget('_blank');
 	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');

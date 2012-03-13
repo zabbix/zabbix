@@ -837,7 +837,7 @@ ZABBIX.apps.map = (function() {
 
 				// if image element, set elementName to image name
 				if (this.data.elementtype === '4') {
-					for (i = 0, ln = this.sysmap.iconList.length; i < ln; i++) {
+					for (i in this.sysmap.iconList) {
 						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
 							this.data.elementName = this.sysmap.iconList[i].name;
 						}
