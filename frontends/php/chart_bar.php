@@ -63,8 +63,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$config = get_request('config', 1);
 	$title = get_request('title', _('Report'));
-	$xlabel = get_request('xlabel', S_X);
-	$ylabel = get_request('ylabel', S_Y);
+	$xlabel = get_request('xlabel', 'X');
+	$ylabel = get_request('ylabel', 'Y');
 
 	$showlegend = get_request('showlegend', 0);
 	$sorttype = get_request('sorttype', 0);

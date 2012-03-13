@@ -24,7 +24,7 @@
 
 	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
-	$page['title'] = "S_PERIOD";
+	$page['title'] = _('Period');
 	$page['file'] = 'popup_period.php';
 	$page['scripts'] = array('class.calendar.js');
 
@@ -89,7 +89,7 @@ require_once 'include/page_header.php';
 	else{
 		echo SBR;
 
-		$frmPd = new CFormTable(S_PERIOD);
+		$frmPd = new CFormTable(_('Period'));
 		$frmPd->setName('period');
 
 		$frmPd->addVar('dstfrm',$_REQUEST['dstfrm']);
@@ -110,12 +110,9 @@ require_once 'include/page_header.php';
 			$frmPd->addVar('period_id',$_REQUEST['period_id']);
 
 
-		$frmPd->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT),
-			S_CAPTION), new CTextBox('caption',$caption,42));
+		$frmPd->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
+			_('Caption')), new CTextBox('caption',$caption,42));
 
-//		$frmPd->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
-
-//*
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 		$clndr_icon->addAction('onclick','javascript: '.
 											'var pos = getPosition(this); '.
@@ -175,10 +172,10 @@ require_once 'include/page_header.php';
 						);
 
 
-		$frmPd->addRow(S_PERIOD, $reporttimetab);
+		$frmPd->addRow(_('Period'), $reporttimetab);
 //*/
 		if($config != 1)
-			$frmPd->addRow(S_COLOR, new CColor('color',$color));
+			$frmPd->addRow(_('Colour'), new CColor('color',$color));
 		else
 			$frmPd->addVar('color',$color);
 

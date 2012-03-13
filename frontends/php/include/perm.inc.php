@@ -190,9 +190,6 @@ function get_accessible_hosts_by_user(&$user_data, $perm, $perm_res = null, $nod
 		return $available_hosts[$userid][$perm][$perm_res][$nodeid_str];
 	}
 
-	COpt::counter_up('perm_host['.$userid.','.$perm.','.$perm_res.','.$nodeid.']');
-	COpt::counter_up('perm');
-
 	$where = array();
 
 	if (!is_null($nodeid)) {
@@ -290,9 +287,6 @@ function get_accessible_groups_by_user($user_data, $perm, $perm_res = null, $nod
 		fatal_error(_('Incorrect user data in "get_accessible_groups_by_user".'));
 	}
 	$user_type =& $user_data['type'];
-
-	COpt::counter_up('perm_group['.$userid.','.$perm.','.$perm_res.','.$nodeid.']');
-	COpt::counter_up('perm');
 
 	$processed = array();
 	$where = array();

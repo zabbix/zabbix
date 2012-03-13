@@ -30,7 +30,7 @@ if (!empty($this->data['templateid'])) {
 	$screenWidget->addItem(get_header_host_table($this->data['templateid'], 'screens'));
 }
 else {
-	$createForm->addItem(new CSubmit('form', _('Import screen')));
+	$createForm->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=screen")'));
 }
 $screenWidget->addPageHeader(_('CONFIGURATION OF SCREENS'), $createForm);
 

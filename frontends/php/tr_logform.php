@@ -89,16 +89,6 @@ if(isset($_REQUEST['save_trigger'])){
 			$triggersData = API::Trigger()->get($options);
 			$triggerData = reset($triggersData);
 
-// Saving dependencies
-// TODO: add dependencies to API::Trigger()->update
-			$deps = array();
-			foreach($triggerData['dependencies'] as $dnum => $depTrigger){
-				$deps[] = array(
-					'triggerid' => $triggerData['triggerid'],
-					'dependsOnTriggerid' => $depTrigger['triggerid']
-				);
-			}
-//---
 			if($triggerData['templateid']){
 				$_REQUEST['description'] = $triggerData['description'];
 				$expression = explode_exp($triggerData['expression']);
@@ -116,8 +106,6 @@ if(isset($_REQUEST['save_trigger'])){
 
 			DBstart();
 			$result = API::Trigger()->update($trigger);
-
-			$result &= API::Trigger()->addDependencies($deps);
 //REVERT
 			$result = DBend($result);
 
@@ -294,8 +282,8 @@ if(isset($_REQUEST['sform'])){
 
 	$exp_select = new CComboBox('expr_type');
 	$exp_select->setAttribute('id','expr_type');
-		$exp_select->addItem(REGEXP_INCLUDE,S_INCLUDE_S);
-		$exp_select->addItem(REGEXP_EXCLUDE,S_EXCLUDE);
+		$exp_select->addItem(REGEXP_INCLUDE,_('Include'));
+		$exp_select->addItem(REGEXP_EXCLUDE,_('Exclude'));
 
 
 	$ctb = new CTextBox('expression','',80);
@@ -311,11 +299,11 @@ if(isset($_REQUEST['sform'])){
 
 	$keyTable = new CTableInfo(null);
 	$keyTable->setAttribute('id','key_list');
-	$keyTable->setHeader(array(S_KEYWORD, S_TYPE, _('Action')));
+	$keyTable->setHeader(array(_('Keyword'), _('Type'), _('Action')));
 
 	$table = new CTableInfo(null);
 	$table->setAttribute('id','exp_list');
-	$table->setHeader(array(_('Expression'), S_TYPE, S_POSITION, _('Action')));
+	$table->setHeader(array(_('Expression'), _('Type'), _('Position'), _('Action')));
 
 	$maxid=0;
 
@@ -348,7 +336,7 @@ if(isset($_REQUEST['sform'])){
 		$del_url = new CSpan(S_DELETE,'link');
 		$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) remove_expression("logtr'.$id.'"); return false;');
 
-		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?S_INCLUDE_S:S_EXCLUDE),array($imgup,SPACE,$imgdn),$del_url));
+		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?_('Include'):_('Exclude')),array($imgup,SPACE,$imgdn),$del_url));
 		$row->setAttribute('id','logtr'.$id);
 		$table->addRow($row);
 
@@ -362,16 +350,15 @@ if(isset($_REQUEST['sform'])){
 
 	$maxid=0;
 	foreach($keys as $id => $val){
+		$del_url = new CLink(S_DELETE,'#','action','javascript: if(confirm("'._('Delete keyword?').'")) remove_keyword("keytr'.$id.'"); return false;');
+		$row = new CRow(array(htmlspecialchars($val['value']),$val['type'],$del_url));
+		$row->setAttribute('id','keytr'.$id);
+		$keyTable->addRow($row);
 
-	  $del_url = new CLink(S_DELETE,'#','action','javascript: if(confirm("'.S_DELETE_KEYWORD_Q.'")) remove_keyword("keytr'.$id.'"); return false;');
-	  $row = new CRow(array(htmlspecialchars($val['value']),$val['type'],$del_url));
-	  $row->setAttribute('id','keytr'.$id);
-	  $keyTable->addRow($row);
+		$frmTRLog->addVar('keys['.$id.'][value]',$val['value']);
+		$frmTRLog->addVar('keys['.$id.'][type]',$val['type']);
 
-	  $frmTRLog->addVar('keys['.$id.'][value]',$val['value']);
-	  $frmTRLog->addVar('keys['.$id.'][type]',$val['type']);
-
-	  $maxid = ($maxid<$id)?$id:$maxid;
+		$maxid = ($maxid<$id)?$id:$maxid;
 	}
 	zbx_add_post_js('key_count='.($maxid+1));
 

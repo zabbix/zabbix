@@ -78,7 +78,7 @@ $sortFields = array(
 	array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
 	array('field' => 'operator', 'order' => ZBX_SORT_DOWN)
 );
-ArraySorter::sort($data['conditions'], $sortFields);
+CArrayHelper::sort($data['conditions'], $sortFields);
 
 // group conditions by type
 $condElements = new CTable(_('No conditions defined.'), 'formElementTable');
@@ -410,10 +410,11 @@ foreach ($data['operations'] as $opid => $operation) {
 	}
 	$tblOper->addRow($operationRow);
 
-	$operation['opmessage_grp'] = zbx_toHash($operation['opmessage_grp'], 'usrgrpid');
-	$operation['opmessage_usr'] = zbx_toHash($operation['opmessage_usr'], 'userid');
-	$operation['opcommand_grp'] = zbx_toHash($operation['opcommand_grp'], 'groupid');
-	$operation['opcommand_hst'] = zbx_toHash($operation['opcommand_hst'], 'hostid');
+
+	$operation['opmessage_grp'] = isset($operation['opmessage_grp']) ? zbx_toHash($operation['opmessage_grp'], 'usrgrpid') : null;
+	$operation['opmessage_usr'] = isset($operation['opmessage_usr']) ? zbx_toHash($operation['opmessage_usr'], 'userid') : null;
+	$operation['opcommand_grp'] = isset($operation['opcommand_grp']) ? zbx_toHash($operation['opcommand_grp'], 'groupid') : null;
+	$operation['opcommand_hst'] = isset($operation['opcommand_hst']) ? zbx_toHash($operation['opcommand_hst'], 'hostid') : null;
 
 	$tblOper->addItem(new CVar('operations['.$opid.']', $operation));
 }
