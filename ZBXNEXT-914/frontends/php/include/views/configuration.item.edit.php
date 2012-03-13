@@ -22,7 +22,12 @@
 $itemWidget = new CWidget('item-edit');
 
 if (!empty($this->data['hostid'])) {
-	$itemWidget->addItem(get_header_host_table($this->data['hostid'], 'items'));
+	if (!empty($this->data['parent_discoveryid'])) {
+		$itemWidget->addItem(get_header_host_table($this->data['hostid'], 'items', $this->data['parent_discoveryid']));
+	}
+	else {
+		$itemWidget->addItem(get_header_host_table($this->data['hostid'], 'items'));
+	}
 }
 
 $itemWidget->addPageHeader($this->data['page_header']);

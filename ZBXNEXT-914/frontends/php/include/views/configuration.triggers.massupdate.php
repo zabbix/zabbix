@@ -25,10 +25,20 @@ $triggersWidget = new CWidget();
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$triggersWidget->addItem(get_header_host_table($this->data['hostid'], 'triggers'));
+	if (!empty($this->data['parent_discoveryid'])) {
+		$triggersWidget->addItem(get_header_host_table($this->data['hostid'], 'triggers', $this->data['parent_discoveryid']));
+	}
+	else {
+		$triggersWidget->addItem(get_header_host_table($this->data['hostid'], 'triggers'));
+	}
 }
 
-$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
+if (!empty($this->data['parent_discoveryid'])) {
+	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'));
+}
+else {
+	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
+}
 
 // create form
 $triggersForm = new CForm();

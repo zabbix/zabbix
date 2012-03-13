@@ -29,7 +29,7 @@ $createForm->addItem(new CSubmit('form', _('Create item')));
 $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEMS'), $createForm);
 
 // header
-$itemsWidget->addHeader(_('Items'), SPACE);
+$itemsWidget->addHeader(_('Items'));
 $itemsWidget->addHeaderRowNumber();
 
 if (!empty($this->data['hostid'])) {

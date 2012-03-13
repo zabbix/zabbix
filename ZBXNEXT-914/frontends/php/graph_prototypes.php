@@ -331,11 +331,16 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$graphs_wdgt->addHeader(array(S_GRAPH_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['name'], 'gold')));
+		$graphs_wdgt->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($discovery_rule['name'], 'gold')));
 		$graphs_wdgt->addHeader($numrows);
 
 // Header Host
-		$graphs_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
+		if (!empty($_REQUEST['parent_discoveryid'])) {
+			$graphs_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'graphs', $_REQUEST['parent_discoveryid']));
+		}
+		else {
+			$graphs_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'graphs'));
+		}
 
 /* TABLE */
 		$form = new CForm();

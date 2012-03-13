@@ -1082,9 +1082,7 @@
 			' FROM applications a'.
 			' WHERE a.hostid='.$data['hostid']
 		));
-		if (!empty($data['db_applications'])) {
-			order_result($data['db_applications'], 'name');
-		}
+		order_result($data['db_applications'], 'name');
 
 		// interfaces
 		$data['interfaces'] = API::HostInterface()->get(array(
