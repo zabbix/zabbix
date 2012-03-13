@@ -70,7 +70,7 @@
 				$_REQUEST['name'], $_REQUEST['ip'], $_REQUEST['port']);
 			$result = DBend($result);
 			$nodeid = $_REQUEST['nodeid'];
-			show_messages($result, S_NODE_UPDATED, S_CANNOT_UPDATE_NODE);
+			show_messages($result, _('Node updated'), _('Cannot update node'));
 		}
 		else{
 			$audit_action = AUDIT_ACTION_ADD;
@@ -81,7 +81,7 @@
 				$_REQUEST['name'], $_REQUEST['ip'], $_REQUEST['port'],
 				$_REQUEST['node_type'], $_REQUEST['masterid']);
 			$result = DBend($nodeid);
-			show_messages($result, S_NODE_ADDED, S_CANNOT_ADD_NODE);
+			show_messages($result, _('Node added'), _('Cannot add node'));
 		}
 		add_audit_if($result,$audit_action,AUDIT_RESOURCE_NODE,'Node ['.$_REQUEST['name'].'] id ['.$nodeid.']');
 		if($result){
@@ -94,7 +94,7 @@
 		DBstart();
 		$result = delete_node($_REQUEST['nodeid']);
 		$result = DBend($result);
-		show_messages($result, S_NODE_DELETED, S_CANNOT_DELETE_NODE);
+		show_messages($result, _('Node deleted'), _('Cannot delete node'));
 
 		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_NODE,'Node ['.$node_data['name'].'] id ['.$node_data['nodeid'].']');
 		if($result){
@@ -115,16 +115,16 @@
 	$frmForm->addItem($cmbConf);
 
 	if(!isset($_REQUEST['form']) && ZBX_DISTRIBUTED){
-		$frmForm->addItem(new CSubmit('form', S_NEW_NODE));
+		$frmForm->addItem(new CSubmit('form', _('New node')));
 	}
 
-	$nodes_wdgt->addPageHeader(S_CONFIGURATION_OF_NODES, $frmForm);
+	$nodes_wdgt->addPageHeader(_('CONFIGURATION OF NODES'), $frmForm);
 
 	if(ZBX_DISTRIBUTED){
 		global $ZBX_NODES, $ZBX_LOCMASTERID;
 
 		if(isset($_REQUEST['form'])){
-			$frm_title = S_NODE;
+			$frm_title = _('Node');
 			if(isset($_REQUEST['nodeid'])){
 				$node_data = get_node_by_nodeid($_REQUEST['nodeid']);
 				$frm_title .= ' "'.$node_data['name'].'"';
@@ -161,10 +161,10 @@
 
 			$frmNode->addRow(S_NAME, new CTextBox('name', $name, 40));
 			if(isset($_REQUEST['nodeid'])){
-				$frmNode->addRow(S_ID, new CNumericBox('new_nodeid', $new_nodeid, 10, 'yes'));
+				$frmNode->addRow(_('ID'), new CNumericBox('new_nodeid', $new_nodeid, 10, 'yes'));
 			}
 			else{
-				$frmNode->addRow(S_ID, new CNumericBox('new_nodeid', $new_nodeid, 10));
+				$frmNode->addRow(_('ID'), new CNumericBox('new_nodeid', $new_nodeid, 10));
 			}
 
 			if(isset($_REQUEST['nodeid'])){
@@ -172,12 +172,12 @@
 			}
 			else{
 				$cmbNodeType = new CComboBox('node_type', $node_type, 'submit()');
-				$cmbNodeType->addItem(ZBX_NODE_CHILD, S_CHILD);
+				$cmbNodeType->addItem(ZBX_NODE_CHILD, _('Child'));
 				if(!$has_master){
-					$cmbNodeType->addItem(ZBX_NODE_MASTER, S_MASTER);
+					$cmbNodeType->addItem(ZBX_NODE_MASTER, _('Master'));
 				}
 			}
-			$frmNode->addRow(S_TYPE, $cmbNodeType);
+			$frmNode->addRow(_('Type'), $cmbNodeType);
 
 			if($node_type == ZBX_NODE_CHILD){
 				if(isset($_REQUEST['nodeid'])){
@@ -190,17 +190,17 @@
 						$master_cb->addItem($node['nodeid'], $node['name']);
 					}
 				}
-				$frmNode->addRow(S_MASTER_NODE, $master_cb);
+				$frmNode->addRow(_('Master node'), $master_cb);
 			}
 
-			$frmNode->addRow(S_IP, new CTextBox('ip', $ip, 15));
+			$frmNode->addRow(_('IP'), new CTextBox('ip', $ip, 15));
 			$frmNode->addRow(S_PORT, new CNumericBox('port', $port, 5));
 
 
 			$frmNode->addItemToBottomRow(new CSubmit('save', S_SAVE));
 			if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL){
 				$frmNode->addItemToBottomRow(SPACE);
-				$frmNode->addItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_NODE_Q, url_param('form').url_param('nodeid')));
+				$frmNode->addItemToBottomRow(new CButtonDelete(_('Delete selected node?'), url_param('form').url_param('nodeid')));
 			}
 			$frmNode->addItemToBottomRow(SPACE);
 			$frmNode->addItemToBottomRow(new CButtonCancel());
@@ -208,14 +208,14 @@
 			$nodes_wdgt->addItem($frmNode);
 		}
 		else{
-			$nodes_wdgt->addHeader(S_NODES_BIG);
+			$nodes_wdgt->addHeader(_('NODES'));
 			$nodes_wdgt->addItem(BR());
 
 			$table = new CTableInfo(_('No nodes defined.'));
 			$table->setHeader(array(
-				make_sorting_header(S_ID, 'n.nodeid'),
+				make_sorting_header(_('ID'), 'n.nodeid'),
 				make_sorting_header(S_NAME, 'n.name'),
-				make_sorting_header(S_IP.':'.S_PORT, 'n.ip')
+				make_sorting_header(_('IP').':'.S_PORT, 'n.ip')
 			));
 
 			$sql = 'SELECT n.* '.
@@ -238,7 +238,7 @@
 		}
 	}
 	else{
-		$nodes_wdgt->addItem(new CTable(new CCol(S_NOT_DM_SETUP, 'center')));
+		$nodes_wdgt->addItem(new CTable(new CCol(_('Your setup is not configured for distributed monitoring'), 'center')));
 	}
 
 	$nodes_wdgt->show();

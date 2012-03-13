@@ -95,7 +95,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		$form->addItem($cmbMedia);
 
-		$form->addItem(SPACE.S_PERIOD.SPACE);
+		$form->addItem(SPACE._('Period').SPACE);
 		$cmbPeriod = new CComboBox('period', $period, 'submit();');
 		$cmbPeriod->addItem('daily',	S_DAILY);
 		$cmbPeriod->addItem('weekly',	S_WEEKLY);

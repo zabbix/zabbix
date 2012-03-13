@@ -241,7 +241,6 @@ abstract class CMapElement extends CZBXAPI {
 		}
 // ---
 
-COpt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -294,7 +293,6 @@ COpt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -475,7 +473,6 @@ COpt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -515,7 +512,7 @@ COpt::memoryPick();
 
 		foreach ($selements as &$selement) {
 			if (!check_db_fields($selementDbFields, $selement))
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for element'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for element.'));
 
 			if ($update || $delete) {
 				if (!isset($dbSelements[$selement['selementid']])) {
@@ -529,7 +526,7 @@ COpt::memoryPick();
 			}
 
 			if (isset($selement['iconid_off']) && ($selement['iconid_off'] == 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No icon for map element "%s"', $selement['label']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No icon for map element "%s".', $selement['label']));
 			}
 
 			if ($this->checkCircleSelementsLink($dbSelement['sysmapid'], $dbSelement['elementid'], $dbSelement['elementtype'])) {

@@ -263,6 +263,143 @@ DROP FUNCTION zbx_convert_simple_checks
 ROLLBACK
 /
 
+-- adding web.test.error[<web check>] items
+
+CREATE SEQUENCE items_seq AS bigint
+/
+CREATE SEQUENCE httptestitem_seq AS bigint
+/
+CREATE SEQUENCE items_applications_seq AS bigint
+/
+
+CREATE PROCEDURE zbx_add_web_test_error()
+LANGUAGE SQL
+BEGIN
+	DECLARE max_itemid bigint;
+	DECLARE max_httptestitemid bigint;
+	DECLARE max_itemappid bigint;
+
+	BEGIN
+		DECLARE m_done integer DEFAULT 0;
+		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
+		DECLARE m_cur CURSOR FOR (SELECT MAX(itemid) FROM items);
+		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+
+		OPEN m_cur;
+
+		m_loop: LOOP
+			FETCH m_cur INTO max_itemid;
+
+			IF m_done = 1 THEN
+				LEAVE m_loop;
+			END IF;
+		END LOOP m_loop;
+
+		CLOSE m_cur;
+	END;
+
+	BEGIN
+		DECLARE m_done integer DEFAULT 0;
+		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
+		DECLARE m_cur CURSOR FOR (SELECT MAX(httptestitemid) FROM httptestitem);
+		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+
+		OPEN m_cur;
+
+		m_loop: LOOP
+			FETCH m_cur INTO max_httptestitemid;
+
+			IF m_done = 1 THEN
+				LEAVE m_loop;
+			END IF;
+		END LOOP m_loop;
+
+		CLOSE m_cur;
+	END;
+
+	BEGIN
+		DECLARE m_done integer DEFAULT 0;
+		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
+		DECLARE m_cur CURSOR FOR (SELECT MAX(itemappid) FROM items_applications);
+		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+
+		OPEN m_cur;
+
+		m_loop: LOOP
+			FETCH m_cur INTO max_itemappid;
+
+			IF m_done = 1 THEN
+				LEAVE m_loop;
+			END IF;
+		END LOOP m_loop;
+
+		CLOSE m_cur;
+	END;
+
+	IF max_itemid IS NULL OR max_httptestitemid IS NULL OR max_itemappid IS NULL THEN
+		RETURN;
+	END IF;
+
+	BEGIN
+		DECLARE v_httptestid bigint;
+		DECLARE v_name varchar(64);
+		DECLARE v_delay integer;
+		DECLARE v_status integer;
+		DECLARE v_applicationid bigint;
+		DECLARE v_hostid bigint;
+		DECLARE v_itemid bigint;
+		DECLARE v_httptestitemid bigint;
+		DECLARE v_itemappid bigint;
+		DECLARE m_done integer DEFAULT 0;
+		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
+		DECLARE m_cur CURSOR FOR (
+			SELECT ht.httptestid, ht.name, ht.delay, ht.status, a.applicationid, a.hostid
+				FROM httptest ht,applications a
+				WHERE ht.applicationid = a.applicationid
+		);
+		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+
+		OPEN m_cur;
+
+		m_loop: LOOP
+			FETCH m_cur INTO v_httptestid, v_name, v_delay, v_status, v_applicationid, v_hostid;
+
+			IF m_done = 1 THEN
+				LEAVE m_loop;
+			END IF;
+
+			SET v_itemid = max_itemid + (NEXTVAL FOR items_seq);
+			SET v_httptestitemid = max_httptestitemid + (NEXTVAL FOR httptestitem_seq);
+			SET v_itemappid = max_itemappid + (NEXTVAL FOR items_applications_seq);
+
+			INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+				VALUES (v_itemid, v_hostid, 9, 'Last error message of scenario ''$1''', 'web.test.error[' || v_name || ']', 1, '', v_delay, 30, 0, v_status);
+
+			INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+				VALUES (v_httptestitemid, v_httptestid, v_itemid, 4);
+
+			INSERT INTO items_applications (itemappid, applicationid, itemid)
+				VALUES (v_itemappid, v_applicationid, v_itemid);
+		END LOOP m_loop;
+
+		CLOSE m_cur;
+	END;
+END
+/
+
+CALL zbx_add_web_test_error
+/
+
+DROP PROCEDURE zbx_add_web_test_error
+/
+
+DROP SEQUENCE items_applications_seq
+/
+DROP SEQUENCE httptestitem_seq
+/
+DROP SEQUENCE items_seq
+/
+
 ---- Patching table `hosts`
 
 ALTER TABLE hosts ALTER COLUMN hostid SET WITH DEFAULT NULL

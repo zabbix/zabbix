@@ -658,7 +658,7 @@ class CGraph extends CZBXAPI {
 					}
 				}
 				if ($templatedGraph && (count($graphHosts) > 1)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
 				}
 
 // check ymin, ymax items
@@ -728,7 +728,7 @@ class CGraph extends CZBXAPI {
 					}
 				}
 				if ($templatedGraph && (count($graphHosts) > 1)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, S_GRAPH.' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
 				}
 // }}} EXCEPTION: MESS TEMPLATED ITEMS
 
@@ -747,11 +747,12 @@ class CGraph extends CZBXAPI {
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
 
-		foreach ($graph['gitems'] as $gitem) {
+		foreach ($graph['gitems'] as &$gitem) {
 			$gitem['graphid'] = $graphid;
-
-			DB::insert('graphs_items', array($gitem));
 		}
+		unset($gitem);
+
+		DB::insert('graphs_items', $graph['gitems']);
 
 		return $graphid;
 	}
@@ -1044,21 +1045,21 @@ class CGraph extends CZBXAPI {
 // EXCEPTION: GRAPH FIELDS {{{
 			$fields = array('name' => null);
 			if (!$update && !check_db_fields($fields, $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for graph'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for graph.'));
 			}
 // }}} EXCEPTION: GRAPH FIELDS
 
 // EXCEPTION: NO ITEMS {{{
 			if (!isset($graph['gitems']) || !is_array($graph['gitems']) || empty($graph['gitems'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_MISSING_ITEMS_FOR_GRAPH.' [ '.$graph['name'].' ]');
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing items for graph "%1$s".', $graph['name']));
 			}
 // }}} EXCEPTION: NO ITEMS
 
 // EXCEPTION: ITEMS FIELDS {{{
 			$fields = array('itemid' => null);
-			foreach ($graph['gitems'] as $ginum => $gitem) {
+			foreach ($graph['gitems'] as $gitem) {
 				if (!check_db_fields($fields, $gitem)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for items'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for items.'));
 				}
 			}
 // }}} EXCEPTION: ITEMS FIELDS
@@ -1069,7 +1070,7 @@ class CGraph extends CZBXAPI {
 				foreach ($graph['gitems'] as $gitem) {
 					if ($gitem['type'] == GRAPH_ITEM_SUM) $sumItems++;
 				}
-				if ($sumItems > 1) self::exception(ZBX_API_ERROR_PARAMETERS, S_ANOTHER_ITEM_SUM.' [ '.$graph['name'].' ]');
+				if ($sumItems > 1) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
 			}
 // }}} EXCEPTION
 

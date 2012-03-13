@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 require_once dirname(__FILE__).'/CAutoloader.php';
 
@@ -97,6 +96,13 @@ class ZBase {
 		return array(
 			$this->rootDir.'/include/classes',
 			$this->rootDir.'/include/classes/api',
+			$this->rootDir.'/include/classes/debug',
+			$this->rootDir.'/include/classes/export',
+			$this->rootDir.'/include/classes/export/writers',
+			$this->rootDir.'/include/classes/export/elements',
+			$this->rootDir.'/include/classes/import',
+			$this->rootDir.'/include/classes/import/readers',
+			$this->rootDir.'/include/classes/import/formatters',
 			$this->rootDir.'/include/classes/sysmaps',
 			$this->rootDir.'/include/classes/helpers',
 			$this->rootDir.'/api/classes',
