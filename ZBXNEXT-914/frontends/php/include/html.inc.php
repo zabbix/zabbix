@@ -295,9 +295,6 @@ function get_header_host_table($hostid, $current = null, $discoveryid = null) {
 		'screens' => 'screens',
 		'discoveries' => 'discoveries'
 	);
-	if (!empty($current)) {
-		unset($elements[$current]);
-	}
 	if (!empty($discoveryid)) {
 		unset($elements['applications'], $elements['screens'], $elements['discoveries']);
 	}
@@ -412,7 +409,7 @@ function get_header_host_table($hostid, $current = null, $discoveryid = null) {
 	if (isset($elements['items'])) {
 		if (!empty($dbDiscovery)) {
 			$list->addItem(array(
-				new CLink(_('Items'), 'disc_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+				new CLink(_('Item prototypes'), 'disc_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
 				' ('.$dbDiscovery['items'].')'
 			));
 		}
@@ -427,7 +424,7 @@ function get_header_host_table($hostid, $current = null, $discoveryid = null) {
 	if (isset($elements['triggers'])) {
 		if (!empty($dbDiscovery)) {
 			$list->addItem(array(
-				new CLink(_('Triggers'), 'trigger_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+				new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
 				' ('.$dbDiscovery['triggers'].')'
 			));
 		}
@@ -442,7 +439,7 @@ function get_header_host_table($hostid, $current = null, $discoveryid = null) {
 	if (isset($elements['graphs'])) {
 		if (!empty($dbDiscovery)) {
 			$list->addItem(array(
-				new CLink(_('Graphs'), 'graph_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+				new CLink(_('Graph prototypes'), 'graph_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
 				' ('.$dbDiscovery['graphs'].')'
 			));
 		}
@@ -463,7 +460,7 @@ function get_header_host_table($hostid, $current = null, $discoveryid = null) {
 
 	if (isset($elements['discoveries'])) {
 		$list->addItem(array(
-			new CLink(_('Discovery'), 'host_discovery.php?hostid='.$dbHost['hostid']),
+			new CLink(_('Discovery rules'), 'host_discovery.php?hostid='.$dbHost['hostid']),
 			' ('.$dbHost['discoveries'].')'
 		));
 	}
