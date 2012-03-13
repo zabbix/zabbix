@@ -1068,8 +1068,8 @@ class CConfigurationImport {
 			}
 
 
-			if (isset($map['backgroundid'])) {
-				$image = getImageByIdent($map['backgroundid']);
+			if (isset($map['background'])) {
+				$image = getImageByIdent($map['background']);
 
 				if (!$image) {
 					throw new Exception(_s('Cannot find background image for map "%1$s.', $map['name']));

@@ -213,6 +213,7 @@ class CConfigurationExportBuilder {
 				'label_string_map' => $map['label_string_map'],
 				'label_string_image' => $map['label_string_image'],
 				'expand_macros' => $map['expand_macros'],
+				'background' => $map['backgroundid'],
 				'iconmap' => $map['iconmap'],
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $this->formatMapElements($map['selements']),
