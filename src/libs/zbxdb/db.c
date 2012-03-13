@@ -37,7 +37,7 @@ static zbx_oracle_db_handle_t	oracle;
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
 static int			ZBX_PG_BYTEAOID = 0;
-int				ZBX_PG_SVERSION = 0;
+static int			ZBX_PG_SVERSION = 0;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
