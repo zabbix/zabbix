@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 
-$page['title'] = 'S_CUSTOM_GRAPHS';
+$page['title'] = _('Custom graphs');
 $page['file'] = 'charts.php';
 $page['hist_arg'] = array('hostid','groupid','graphid');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js');
@@ -80,7 +80,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			if ('add' == $_REQUEST['favaction']) {
 				$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 				if($result){
-					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
+					print('$("addrm_fav").title = "'._('Remove from favourites.').'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("graphid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
@@ -88,7 +88,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
-					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
+					print('$("addrm_fav").title = "'._('Add to favourites.').'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("graphid","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}
@@ -131,9 +131,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-	$r_form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
+	$r_form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE, $pageFilter->getHostsCB(true)));
-	$r_form->addItem(array(SPACE.S_GRAPH.SPACE, $pageFilter->getGraphsCB(true)));
+	$r_form->addItem(array(SPACE._('Graph').SPACE, $pageFilter->getGraphsCB(true)));
 
 ?>
 <?php
@@ -209,7 +209,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		zbx_add_post_js('timeControl.processObjects();');
 	}
 
-	$charts_wdgt->addPageHeader(S_GRAPHS_BIG, $icons);
+	$charts_wdgt->addPageHeader(_('GRAPHS'), $icons);
 	$charts_wdgt->addHeader($header, $r_form);
 	$charts_wdgt->addItem(BR());
 	$charts_wdgt->addItem($table);

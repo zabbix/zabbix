@@ -475,7 +475,7 @@ function &DBselect($query, $limit = null, $offset = 0) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}
 
-	COpt::savesqlrequest(microtime(true) - $time_start, $query);
+	CProfiler::getInstance()->profileSql(microtime(true) - $time_start, $query);
 	return $result;
 }
 
@@ -543,7 +543,7 @@ function DBexecute($query, $skip_error_messages = 0) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}
 
-	COpt::savesqlrequest(microtime(true) - $time_start, $query);
+	CProfiler::getInstance()->profileSql(microtime(true) - $time_start, $query);
 	return (bool) $result;
 }
 
@@ -1025,7 +1025,7 @@ function DBcondition($fieldname, $array, $notin = false) {
 	$concat = $notin ? ' AND ':' OR ';
 
 	$items = array_chunk($array, 950);
-	foreach ($items as $id => $values) {
+	foreach ($items as $values) {
 		$condition .= !empty($condition) ? ')'.$concat.$fieldname.$in.'(' : '';
 		$condition .= implode(',', zbx_dbstr($values));
 	}

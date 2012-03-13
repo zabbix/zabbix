@@ -183,7 +183,7 @@
 		$host_tb->addItem($db_host['hostid'], $db_host['name']);
 	}
 
-	$templateList->addRow(S_HOSTS.' / '.S_TEMPLATES, $host_tb->Get(S_IN, array(S_OTHER.SPACE.'|'.SPACE.S_GROUP.SPACE,$cmbGroups)));
+	$templateList->addRow(S_HOSTS.' / '.S_TEMPLATES, $host_tb->Get(_('In'), array(_('Other').SPACE.'|'.SPACE._('Group').SPACE,$cmbGroups)));
 
 // FULL CLONE {
 	if($_REQUEST['form'] == 'full_clone'){

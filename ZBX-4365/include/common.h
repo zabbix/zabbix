@@ -258,13 +258,6 @@ typedef enum
 } zbx_item_data_type_t;
 const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type);
 
-/* HTTP test states */
-typedef enum
-{
-	HTTPTEST_STATE_IDLE = 0,
-	HTTPTEST_STATE_BUSY
-} zbx_httptest_state_type_t;
-
 /* service supported by discoverer */
 typedef enum
 {
@@ -629,13 +622,11 @@ const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 #define	NODE_CONFIGLOG_OP_DELETE	2
 
 /* HTTP item types */
-typedef enum
-{
-	ZBX_HTTPITEM_TYPE_RSPCODE = 0,
-	ZBX_HTTPITEM_TYPE_TIME,
-	ZBX_HTTPITEM_TYPE_SPEED,
-	ZBX_HTTPITEM_TYPE_LASTSTEP
-} zbx_httpitem_type_t;
+#define ZBX_HTTPITEM_TYPE_RSPCODE	0
+#define ZBX_HTTPITEM_TYPE_TIME		1
+#define ZBX_HTTPITEM_TYPE_SPEED		2
+#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
+#define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
 /* user permissions */
 typedef enum
