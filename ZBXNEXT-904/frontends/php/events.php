@@ -239,7 +239,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$_REQUEST['triggerid'] = $pageFilter->triggerid;
 		}
 
-		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
+		$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
 		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
 	}
 
@@ -247,7 +247,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$cmbSource = new CComboBox('source', $source, 'submit()');
 		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, S_TRIGGER);
 		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-		$r_form->addItem(array(SPACE.S_SOURCE.SPACE, $cmbSource));
+		$r_form->addItem(array(SPACE._('Source').SPACE, $cmbSource));
 	}
 
 	$events_wdgt->addHeader(_('EVENTS'), $r_form);
@@ -315,11 +315,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			'javascript: create_var("'.$filterForm->GetName().'", "showUnknown", (this.checked?1:0), 0); ',
 			'1');
 
-		$filterForm->addRow(S_SHOW_UNKNOWN_EVENTS,$unkcbx);
+		$filterForm->addRow(_('Show unknown events'),$unkcbx);
 
-		$reset = new CButton('filter_rst',S_RESET,'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+		$reset = new CButton('filter_rst',_('Reset'),'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-		$filterForm->addItemToBottomRow(new CSubmit('filter_set',S_FILTER));
+		$filterForm->addItemToBottomRow(new CSubmit('filter_set',_('Filter')));
 		$filterForm->addItemToBottomRow($reset);
 	}
 
@@ -436,20 +436,20 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // TABLE
 			$table->setHeader(array(
-				S_TIME,
-				S_IP,
+				_('Time'),
+				_('IP'),
 				S_DNS,
 				_('Description'),
-				S_STATUS
+				_('Status')
 			));
 
 			if($CSV_EXPORT){
 				$csvRows[] = array(
-					S_TIME,
-					S_IP,
+					_('Time'),
+					_('IP'),
 					S_DNS,
 					_('Description'),
-					S_STATUS
+					_('Status')
 				);
 			}
 
@@ -509,11 +509,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		else{
 			$table->setHeader(array(
-				S_TIME,
-				is_show_all_nodes()?S_NODE:null,
+				_('Time'),
+				is_show_all_nodes()?_('Node'):null,
 				($_REQUEST['hostid'] == 0)?S_HOST:null,
 				_('Description'),
-				S_STATUS,
+				_('Status'),
 				S_SEVERITY,
 				_('Duration'),
 				($config['event_ack_enable'])?S_ACK:NULL,
@@ -522,11 +522,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 			if($CSV_EXPORT){
 				$csvRows[] = array(
-					S_TIME,
-					is_show_all_nodes()?S_NODE:null,
+					_('Time'),
+					is_show_all_nodes()?_('Node'):null,
 					($_REQUEST['hostid'] == 0)?S_HOST:null,
 					_('Description'),
-					S_STATUS,
+					_('Status'),
 					S_SEVERITY,
 					_('Duration'),
 					($config['event_ack_enable'])?S_ACK:NULL,

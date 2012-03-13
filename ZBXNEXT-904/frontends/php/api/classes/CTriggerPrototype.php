@@ -828,10 +828,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$ruleids = $ruleMap = array();
 
 			$dbRules = DBselect(
-				'SELECT id.parent_itemid,td.triggerid'.
-				' FROM trigger_discovery td,item_discovery id,functions f'.
-				' WHERE '.DBcondition('td.triggerid', $triggerids).
-					' AND td.parent_triggerid=f.triggerid'.
+				'SELECT id.parent_itemid,f.triggerid'.
+				' FROM item_discovery id,functions f'.
+				' WHERE '.DBcondition('f.triggerid', $triggerids).
 					' AND f.itemid=id.itemid'
 			);
 			while ($rule = DBfetch($dbRules)) {
@@ -1200,6 +1199,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		}
 
 		foreach ($triggers as $trigger) {
+			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 			$this->inherit($trigger);
 		}
 
@@ -1311,6 +1311,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 	protected function createReal(array &$triggers) {
 		$triggers = zbx_toArray($triggers);
+
+		foreach ($triggers as &$trigger) {
+			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		}
+		unset($trigger);
 
 		$triggerids = DB::insert('triggers', $triggers);
 

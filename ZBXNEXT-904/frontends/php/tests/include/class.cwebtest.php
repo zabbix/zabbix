@@ -25,6 +25,9 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
 
+// Z
+require_once dirname(__FILE__).'/../../include/classes/core/Z.php';
+
 class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	protected $captureScreenshotOnFailure = TRUE;
 	protected $screenshotPath = '/home/hudson/public_html/screenshots';
@@ -63,6 +66,11 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		"Connected",
 		"Admin"
 	);
+
+	public static function setUpBeforeClass() {
+		$a = new Z;
+		$a->run();
+	}
 
 	protected function setUp() {
 		global $DB;

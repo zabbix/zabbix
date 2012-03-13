@@ -288,7 +288,7 @@
 		if($row){
 			return	$row;
 		}
-		error(S_NO_GRAPH_WITH." graphid=[$graphid]");
+		error(_('No graph item with')." graphid=[$graphid]");
 		return	false;
 	}
 
