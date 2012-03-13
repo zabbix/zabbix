@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/httptest.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = 'S_STATUS_OF_WEB_MONITORING';
+$page['title'] = _('Status of Web monitoring');
 $page['file'] = 'httpmon.php';
 $page['hist_arg'] = array('open','groupid','hostid');
 
@@ -112,7 +112,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // Table HEADER
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$httpmon_wdgt->addPageHeader(S_STATUS_OF_WEB_MONITORING_BIG, $fs_icon);
+	$httpmon_wdgt->addPageHeader(_('STATUS OF WEB MONITORING'), $fs_icon);
 
 // 2nd header
 	$options = array(
@@ -136,7 +136,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
-	$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
+	$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
 
 	$httpmon_wdgt->addHeader(S_WEB_CHECKS_BIG, $r_form);
@@ -154,13 +154,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
-		is_show_all_nodes() ? make_sorting_header(S_NODE,'h.hostid') : null,
+		is_show_all_nodes() ? make_sorting_header(_('Node'),'h.hostid') : null,
 		$_REQUEST['hostid'] ==0 ? make_sorting_header(S_HOST,'h.name') : NULL,
 		make_sorting_header(array($link, SPACE, S_NAME),'wt.name'),
 		_('Number of steps'),
-		S_STATE,
+		_('State'),
 		_('Last check'),
-		S_STATUS
+		_('Status')
 	));
 
 	$any_app_exist = false;
@@ -238,19 +238,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
 			$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
-			$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].']';
+			$state = _('In check').' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '._('of').' '.$httptest_data['step_count'].']';
 
 			$status['msg'] = _('In progress');
 			$status['style'] = 'orange';
 		}
 		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
-			$state = S_IDLE_TILL.' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
+			$state = _('Idle till').' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
 
 			if($httptest_data['lastfailedstep'] > 0){
 				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
-				$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
-					'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$httptest_data['step_count'].'] '.
-					SPACE.S_ERROR.': '.$httptest_data['error'];
+				$status['msg'] = _('Failed on').' "'.$step_data['name'].'" '.
+					'['.$httptest_data['lastfailedstep'].' '._('of').' '.$httptest_data['step_count'].'] '.
+					SPACE._('Error').': '.$httptest_data['error'];
 				$status['style'] = 'disabled';
 			}
 			else{
@@ -259,7 +259,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			}
 		}
 		else{
-			$state = S_IDLE_TILL.' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
+			$state = _('Idle till').' '.zbx_date2str(S_WEB_SCENARIO_IDLE_DATE_FORMAT,$httptest_data['nextcheck']);
 			$status['msg'] = _('Unknown');
 			$status['style'] = 'unknown';
 		}

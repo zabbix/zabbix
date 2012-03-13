@@ -63,7 +63,7 @@ check_fields($fields);
 			$cmbResourceNode->addItem($node['nodeid'], $node['name']);
 		}
 
-		$frmTitle->addItem(array(S_NODE, SPACE, $cmbResourceNode));
+		$frmTitle->addItem(array(_('Node'), SPACE, $cmbResourceNode));
 	}
 
 	show_table_header(permission2str($permission),$frmTitle);

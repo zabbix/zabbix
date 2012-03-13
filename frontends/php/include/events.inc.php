@@ -151,7 +151,7 @@ function make_small_eventlist($startEvent) {
 		array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
 		array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
 	);
-	ArraySorter::sort($events, $sortFields);
+	CArrayHelper::sort($events, $sortFields);
 
 	foreach ($events as $event) {
 		$lclock = $clock;

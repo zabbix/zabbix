@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = 'S_CONFIGURATION_OF_GRAPHS';
+$page['title'] = _('Configuration of graphs');
 $page['file'] = 'graph_prototypes.php';
 $page['hist_arg'] = array('parent_discoveryid');
 $page['scripts'] = array();
@@ -152,7 +152,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		if(empty($items)){
-			info(S_REQUIRED_ITEMS_FOR_GRAPH);
+			info(_('Items required for graph'));
 			$result = false;
 		}
 		else{
@@ -222,10 +222,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			}
 		}
 		if(isset($_REQUEST['graphid'])){
-			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
+			show_messages($result, _('Graph updated'), _('Cannot update graph'));
 		}
 		else{
-			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
+			show_messages($result, _('Graph added'), _('Cannot add graph'));
 		}
 	}
 	else if(isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])){
@@ -233,7 +233,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		if($result){
 			unset($_REQUEST['form']);
 		}
-		show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
+		show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
 	}
 	else if(isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])){
 
@@ -279,7 +279,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //------ GO -------
 	else if(($_REQUEST['go'] == 'delete') && isset($_REQUEST['group_graphid'])){
 		$go_result = API::GraphPrototype()->delete($_REQUEST['group_graphid']);
-		show_messages($go_result, S_GRAPHS_DELETED, S_CANNOT_DELETE_GRAPHS);
+		show_messages($go_result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
 
 	if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
@@ -292,13 +292,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm('get');
 		$form->cleanItems();
-		$form->addItem(new CSubmit('form', S_CREATE_GRAPH));
+		$form->addItem(new CSubmit('form', _('Create graph')));
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 	}
 	else
 		$form = null;
 
-	show_table_header(S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG, $form);
+	show_table_header(_('CONFIGURATION OF GRAPH PROTOTYPES'), $form);
 
 
 	if(isset($_REQUEST['form'])){
@@ -331,7 +331,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$graphs_wdgt->addHeader(array(S_GRAPH_PROTOTYPES_OF_BIG.SPACE, new CSpan($discovery_rule['name'], 'gold')));
+		$graphs_wdgt->addHeader(array(_('GRAPH PROTOTYPES OF').SPACE, new CSpan($discovery_rule['name'], 'gold')));
 		$graphs_wdgt->addHeader($numrows);
 
 // Header Host
@@ -342,13 +342,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$form->setName('graphs');
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 
-		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
+		$table = new CTableInfo(_('No graphs defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_graphs',NULL,"checkAll('".$form->getName()."','all_graphs','group_graphid');"),
 			make_sorting_header(S_NAME, 'name'),
 			S_WIDTH,
 			S_HEIGHT,
-			make_sorting_header(S_GRAPH_TYPE, 'graphtype')
+			make_sorting_header(_('Graph type'), 'graphtype')
 		));
 
 // get Graphs
@@ -405,11 +405,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$goBox = new CComboBox('go');
 
 		$goOption = new CComboItem('delete', _('Delete selected'));
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_GRAPHS);
+		$goOption->setAttribute('confirm',_('Delete selected graphs?'));
 		$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton',S_GO);
+		$goButton = new CSubmit('goButton',_('Go'));
 		$goButton->setAttribute('id','goButton');
 
 		zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');

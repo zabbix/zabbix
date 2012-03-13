@@ -769,11 +769,11 @@ class CItem extends CItemGeneral {
 	/**
 	 * Get itemid by host.name and item.key.
 	 *
-	 * @param array $item_data
-	 * @param array $item_data['key_']
-	 * @param array $item_data['hostid']
+	 * @param array $itemData
+	 * @param array $itemData['key_']
+	 * @param array $itemData['hostid']
 	 *
-	 * @return int|bool
+	 * @return array
 	 */
 	public function getObjects($itemData) {
 		$options = array(
@@ -789,7 +789,7 @@ class CItem extends CItemGeneral {
 
 		$result = $this->get($options);
 
-	return $result;
+		return $result;
 	}
 
 	/**
@@ -848,6 +848,7 @@ class CItem extends CItemGeneral {
 		$this->checkInput($items);
 		$this->createReal($items);
 		$this->inherit($items);
+
 		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
@@ -857,20 +858,6 @@ class CItem extends CItemGeneral {
 	 * @param array $items
 	 */
 	protected function createReal(array &$items) {
-		foreach ($items as $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => true
-			));
-			if (!empty($itemsExists)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%s" already exists on given host.', $item['key_']));
-			}
-		}
-
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = array();
@@ -923,20 +910,6 @@ class CItem extends CItemGeneral {
 		$itemids = array();
 		$data = array();
 		foreach ($items as $inum => $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => 1
-			));
-			foreach ($itemsExists as $inum => $itemExists) {
-				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
-				}
-			}
-
 			$data[] = array('values' => $item, 'where'=> array('itemid'=>$item['itemid']));
 			$itemids[] = $item['itemid'];
 		}
@@ -982,11 +955,8 @@ class CItem extends CItemGeneral {
 	 */
 	public function update($items) {
 		$items = zbx_toArray($items);
-
 		$this->checkInput($items, true);
-
 		$this->updateReal($items);
-
 		$this->inherit($items);
 
 		return array('itemids' => zbx_objectValues($items, 'itemid'));

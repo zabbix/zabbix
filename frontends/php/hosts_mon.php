@@ -121,7 +121,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 
 	$frmForm = new CForm();
-	$frmForm->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB()));
+	$frmForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 	$hosts_wdgt->addHeader(_('HOSTS'), $frmForm);
 
 	$numrows = new CDiv();
@@ -134,7 +134,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$filter_table->addRow(array(
 		array(array(bold(S_HOST), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
 		array(array(bold(S_DNS), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
-		array(array(bold(S_IP), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
+		array(array(bold(_('IP')), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
 		array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 	));
 
@@ -164,7 +164,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(
 		make_sorting_header(S_NAME, 'name'),
-		S_APPLICATIONS,
+		_('Applications'),
 		S_ITEMS,
 		S_TRIGGERS,
 		S_GRAPHS,
@@ -220,7 +220,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	order_result($hosts, $sortfield, $sortorder);
 
 	foreach($hosts as $num => $host){
-		$applications = array(new CLink(S_APPLICATIONS, 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
+		$applications = array(new CLink(_('Applications'), 'applications.php?groupid='.$_REQUEST['groupid'].'&hostid='.$host['hostid']),
 			' ('.$host['applications'].')');
 		$items = array(new CLink(S_ITEMS, 'latest.php?filter_rst=1&hostid='.$host['hostid']),
 			' ('.$host['items'].')');
