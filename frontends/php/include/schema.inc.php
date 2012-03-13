@@ -626,31 +626,7 @@ return array(
 				'ref_table' => 'applications',
 				'ref_field' => 'applicationid',
 			),
-			'lastcheck' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
 			'nextcheck' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-			'curstate' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-			'curstep' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			),
-			'lastfailedstep' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -674,18 +650,6 @@ return array(
 				'default' => '',
 			),
 			'agent' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			),
-			'time' => array(
-				'null' => false,
-				'type' => DB::FIELD_TYPE_FLOAT,
-				'length' => 16,
-				'default' => '0',
-			),
-			'error' => array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,

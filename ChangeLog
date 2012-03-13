@@ -2,6 +2,7 @@
 Changes for 1.9.10
 
 New features:
+....I..PS. [ZBXNEXT-397] added support of web monitoring by Zabbix proxy (Sasha)
 ..F....... [ZBX-3531] configuration export/import (Vedmak)
 ...G...PS. [ZBX-4581] added time unit symbols support to aggregate items (dimir)
 A.F....... [ZBX-4333] implemented dependency validation in trigger::adddependencies (Pavels)

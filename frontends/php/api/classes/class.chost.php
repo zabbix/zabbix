@@ -737,6 +737,7 @@ class CHost extends CZBXAPI {
 			}
 		}
 
+Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -1536,7 +1537,7 @@ class CHost extends CZBXAPI {
 /**
  * Update Host
  *
- * @param array $hosts multidimensional array with Hosts data
+ * @param _array $hosts multidimensional array with Hosts data
  * @param string $hosts['host'] Host name.
  * @param int $hosts['port'] Port. OPTIONAL
  * @param int $hosts['status'] Host Status. OPTIONAL
@@ -1683,7 +1684,7 @@ class CHost extends CZBXAPI {
 		$updHosts = $this->get($options);
 		foreach ($hosts as $hnum => $host) {
 			if (!isset($updHosts[$host['hostid']])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 		}
 
@@ -1722,12 +1723,12 @@ class CHost extends CZBXAPI {
 			$hostExists = $this->get($options);
 			$hostExist = reset($hostExists);
 			if ($hostExist && (bccomp($hostExist['hostid'], $curHost['hostid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '._('already exists'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_HOST.' [ '.$data['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 			}
 
 			// can't add host with the same name as existing template
 			if (API::Template()->exists(array('host' => $curHost['host'])))
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$curHost['host'].' ] '._('already exists'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, S_TEMPLATE.' [ '.$curHost['host'].' ] '.S_ALREADY_EXISTS_SMALL);
 		}
 
 
@@ -1756,7 +1757,7 @@ class CHost extends CZBXAPI {
 			unset($data['macros']);
 		}
 
-		if (!empty($data['inventory'])) {
+		if (isset($data['inventory'])) {
 			$updateInventory = $data['inventory'];
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 			unset($data['inventory']);
@@ -1888,14 +1889,14 @@ class CHost extends CZBXAPI {
 			));
 			$hostMacros = zbx_toHash($hostMacros, 'hostmacroid');
 
-			// Delete
+// Delete
 			$macrosToDelete = array();
 			foreach ($hostMacros as $hmacro) {
 				if (!in_array($hmacro['hostmacroid'], $hostmacrosIds)) {
 					$macrosToDelete[] = $hmacro['hostmacroid'];
 				}
 			}
-			// Update
+// Update
 			$macrosToUpdate = array();
 			foreach ($macrosToAdd as $nhmnum => $nhmacro) {
 				if (isset($nhmacro['hostmacroid']) && isset($hostMacros[$nhmacro['hostmacroid']])) {
@@ -1903,7 +1904,7 @@ class CHost extends CZBXAPI {
 					unset($macrosToAdd[$nhmnum]);
 				}
 			}
-			//----
+//----
 
 			if (!empty($macrosToDelete)) {
 				$result = $this->massRemove(array('hostids' => $hostids, 'macros' => $macrosToDelete));
@@ -2033,7 +2034,7 @@ class CHost extends CZBXAPI {
 		$updHosts = $this->get($options);
 		foreach ($hostids as $hostid) {
 			if (!isset($updHosts[$hostid])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS, S_NO_PERMISSION);
 			}
 		}
 
