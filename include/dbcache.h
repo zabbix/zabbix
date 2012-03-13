@@ -207,7 +207,7 @@ void	DCload_config();
 
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key);
-int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
+void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
 int	DCconfig_get_function_by_functionid(DC_FUNCTION *function, zbx_uint64_t functionid);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num);

@@ -3327,7 +3327,7 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
 		sz_data += sz_value - sz_block;
 
 		if (sz_value > sz_block)
-			*data = realloc(*data, sz_data + 1);
+			*data = zbx_realloc(*data, sz_data + 1);
 
 		src = *data + l + sz_block;
 		dst = *data + l + sz_value;
