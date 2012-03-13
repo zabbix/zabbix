@@ -1338,7 +1338,7 @@
 	}
 
 	function insert_graph_form(){
-		$frmGraph = new CFormTable(S_GRAPH);
+		$frmGraph = new CFormTable(_('Graph'));
 		$frmGraph->setName('frm_graph');
 
 		$parent_discoveryid = get_request('parent_discoveryid');
@@ -1356,7 +1356,7 @@
 			$graphs = API::Graph()->get($options);
 			$graph = reset($graphs);
 
-			$frmGraph->setTitle(S_GRAPH.' "'.$graph['name'].'"');
+			$frmGraph->setTitle(_('Graph').' "'.$graph['name'].'"');
 		}
 
 		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
@@ -1477,7 +1477,7 @@
 
 		$cmbGType = new CComboBox('graphtype', $graphtype, 'graphs.submit(this)');
 		$cmbGType->addItems(graphType());
-		$frmGraph->addRow(S_GRAPH_TYPE, $cmbGType);
+		$frmGraph->addRow(_('Graph type'), $cmbGType);
 
 
 // items beforehead, to get only_hostid for miny maxy items
@@ -1507,7 +1507,7 @@
 					$do_up = null;
 				}
 				else{
-					$do_up = new CSpan(S_UP,'link');
+					$do_up = new CSpan(_('Up'),'link');
 					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
 				}
 
@@ -1515,7 +1515,7 @@
 					$do_down = null;
 				}
 				else{
-					$do_down = new CSpan(S_DOWN,'link');
+					$do_down = new CSpan(_('Down'),'link');
 					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
 				}
 
@@ -1548,7 +1548,7 @@
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type']),
-							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?S_LEFT:S_RIGHT,
+							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?_('Left'):S_RIGHT,
 							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
 							$color,
 							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
@@ -1561,11 +1561,11 @@
 			$items_table = $dedlete_button = null;
 		}
 
-		$frmGraph->addRow(S_SHOW_LEGEND, new CCheckBox('legend',$legend, null, 1));
+		$frmGraph->addRow(_('Show legend'), new CCheckBox('legend',$legend, null, 1));
 
 		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
-			$frmGraph->addRow(S_SHOW_WORKING_TIME,new CCheckBox('showworkperiod',$showworkperiod,null,1));
-			$frmGraph->addRow(S_SHOW_TRIGGERS,new CCheckBox('showtriggers',$showtriggers,null,1));
+			$frmGraph->addRow(_('Show working time'),new CCheckBox('showworkperiod',$showworkperiod,null,1));
+			$frmGraph->addRow(_('Show triggers'),new CCheckBox('showtriggers',$showtriggers,null,1));
 
 
 			if($graphtype == GRAPH_TYPE_NORMAL){
@@ -1586,15 +1586,15 @@
 					$pr_right_chkbx->setChecked(0);
 				}
 
-				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_LEFT.')',array($pr_left_chkbx, $pr_left_input));
-				$frmGraph->addRow(S_PERCENTILE_LINE.' ('.S_RIGHT.')',array($pr_right_chkbx, $pr_right_input));
+				$frmGraph->addRow(_('Percentile line (left)'), array($pr_left_chkbx, $pr_left_input));
+				$frmGraph->addRow(_('Percentile line (right)'), array($pr_right_chkbx, $pr_right_input));
 			}
 
 			$yaxis_min = array();
 
 			$cmbYType = new CComboBox('ymin_type',$ymin_type,'javascript: submit();');
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,S_FIXED);
+			$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,_('Calculated'));
+			$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,_('Fixed'));
 			$cmbYType->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE,S_ITEM);
 
 			$yaxis_min[] = $cmbYType;
@@ -1637,20 +1637,20 @@
 					}
 				}
 				else {
-					$yaxis_min[] = S_ADD_GRAPH_ITEMS;
+					$yaxis_min[] = _('add graph items first');
 				}
 			}
 			else{
 				$frmGraph->addVar('yaxismin', $yaxismin);
 			}
 
-			$frmGraph->addRow(S_YAXIS_MIN_VALUE, $yaxis_min);
+			$frmGraph->addRow(_('Y axis MIN value'), $yaxis_min);
 
 			$yaxis_max = array();
 
 			$cmbYType = new CComboBox("ymax_type",$ymax_type,"submit()");
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,S_FIXED);
+			$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,_('Calculated'));
+			$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,_('Fixed'));
 			$cmbYType->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE,S_ITEM);
 
 			$yaxis_max[] = $cmbYType;
@@ -1694,22 +1694,22 @@
 					}
 				}
 				else {
-					$yaxis_max[] = S_ADD_GRAPH_ITEMS;
+					$yaxis_max[] = _('add graph items first');
 				}
 			}
 			else{
 				$frmGraph->addVar('yaxismax', $yaxismax);
 			}
 
-			$frmGraph->addRow(S_YAXIS_MAX_VALUE, $yaxis_max);
+			$frmGraph->addRow(_('Y axis MAX value'), $yaxis_max);
 		}
 		else{
-			$frmGraph->addRow(S_3D_VIEW,new CCheckBox('graph3d',$graph3d,null,1));
+			$frmGraph->addRow(_('3D view'),new CCheckBox('graph3d',$graph3d,null,1));
 		}
 
 		$addProtoBtn = null;
 		if($parent_discoveryid){
-			$addProtoBtn = new CButton('add_protoitem', S_ADD_PROTOTYPE,
+			$addProtoBtn = new CButton('add_protoitem', _('Add prototype'),
 				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
 				url_param($graphtype, false, 'graphtype').
 				url_param('parent_discoveryid').
@@ -1731,12 +1731,12 @@
 		));
 
 		$footer = array(
-			new CSubmit('preview', S_PREVIEW),
+			new CSubmit('preview', _('Preview')),
 			new CSubmit('save', S_SAVE),
 		);
 		if(isset($_REQUEST['graphid'])){
 			$footer[] = new CSubmit('clone', S_CLONE);
-			$footer[] = new CButtonDelete(S_DELETE_GRAPH_Q,url_param('graphid').url_param('parent_discoveryid'));
+			$footer[] = new CButtonDelete(_('Delete graph?'),url_param('graphid').url_param('parent_discoveryid'));
 		}
 		$footer[] = new CButtonCancel(url_param('parent_discoveryid'));
 		$frmGraph->addItemToBottomRow($footer);
@@ -2046,69 +2046,6 @@
 		return $tblPeriod;
 	}
 
-	function import_screen_form($rules){
-
-		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
-		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
-
-		$table = new CTable();
-		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
-
-		$titles = array('screen' => _('Screen'));
-
-		foreach($titles as $key => $title){
-			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
-
-			if($key == 'template')
-				$cbMissed = null;
-			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
-
-			$table->addRow(array($title, $cbExist, $cbMissed));
-		}
-
-		$form->addRow(S_RULES, $table);
-
-		$form->addItemToBottomRow(new CSubmit('import', S_IMPORT));
-		return $form;
-	}
-
-// HOSTS
-
-// Host import form
-	function import_host_form($template=false){
-		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
-		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
-
-		$table = new CTable();
-		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
-
-		$titles = array(
-			'host' => $template?S_TEMPLATE:S_HOST,
-			'template' => S_TEMPLATE_LINKAGE,
-			'item' => S_ITEM,
-			'trigger' => S_TRIGGER,
-			'graph' => S_GRAPH,
-			'screens' => _('Screens'),
-		);
-		foreach($titles as $key => $title){
-			$cbExist = new CCheckBox('rules['.$key.'][exist]', true);
-
-			if($key == 'template')
-				$cbMissed = null;
-			else
-				$cbMissed = new CCheckBox('rules['.$key.'][missed]', true);
-
-			$table->addRow(array($title, $cbExist, $cbMissed));
-		}
-
-		$form->addRow(S_RULES, $table);
-
-		$form->addItemToBottomRow(new CSubmit('import', S_IMPORT));
-
-	return $form;
-	}
-
 	function insert_host_inventory_form(){
 		$frmHostP = new CFormTable(_('Host Inventory'));
 
@@ -2129,37 +2066,6 @@
 		$frmHostP->addItemToBottomRow(new CButtonCancel(url_param('groupid')));
 
 		return $frmHostP;
-	}
-
-	function import_map_form($rules){
-		global $USER_DETAILS;
-
-		$form = new CFormTable(S_IMPORT, null, 'post', 'multipart/form-data');
-		$form->addRow(S_IMPORT_FILE, new CFile('import_file'));
-
-		$table = new CTable();
-		$table->setHeader(array(_('Element'), _('Update existing'), _('Add missing')), 'bold');
-
-		$titles = array('maps' => S_MAP);
-		if($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN){
-			$titles += array('icons' => _('Icon'), 'background' => _('Background'));
-		}
-
-		foreach($titles as $key => $title){
-			$cbExist = new CCheckBox('rules['.$key.'][exist]', isset($rules[$key]['exist']));
-
-			if($key != 'maps')
-				$cbExist->setAttribute('onclick', 'javascript: if(this.checked) return confirm(\'Images for all maps will be updated\')');
-
-			$cbMissed = new CCheckBox('rules['.$key.'][missed]', isset($rules[$key]['missed']));
-
-			$table->addRow(array($title, $cbExist, $cbMissed));
-		}
-
-		$form->addRow(S_RULES, $table);
-
-		$form->addItemToBottomRow(new CSubmit('import', S_IMPORT));
-		return $form;
 	}
 
 	function get_regexp_form(){

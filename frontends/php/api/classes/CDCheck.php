@@ -291,7 +291,7 @@ class CDCheck extends CZBXAPI {
 			}
 		}
 
-Copt::memoryPick();
+
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -426,7 +426,7 @@ Copt::memoryPick();
 			}
 		}
 
-Copt::memoryPick();
+
 // removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);

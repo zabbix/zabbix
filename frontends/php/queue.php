@@ -22,7 +22,7 @@
 require_once 'include/config.inc.php';
 require_once 'include/items.inc.php';
 
-$page['title'] = 'S_QUEUE';
+$page['title'] = _('Queue');
 $page['file'] = 'queue.php';
 $page['hist_arg'] = array('config');
 

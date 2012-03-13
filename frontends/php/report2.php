@@ -224,17 +224,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		$triggers = API::Trigger()->get($options);
-		ArraySorter::sort($triggers, array('host', 'description'));
+		CArrayHelper::sort($triggers, array('host', 'description'));
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
-			is_show_all_nodes() ? S_NODE : null,
+			is_show_all_nodes() ? _('Node') : null,
 			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? S_HOST : NULL,
 			S_NAME,
 			_('Problems'),
 			S_OK,
 			_('Unknown'),
-			S_GRAPH
+			_('Graph')
 		));
 
 		foreach($triggers as $trigger){

@@ -460,7 +460,6 @@ class CTemplate extends CZBXAPI {
 
 		}
 
-		Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -893,7 +892,6 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
-		COpt::memoryPick();
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -1304,8 +1302,6 @@ class CTemplate extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function massUpdate($data) {
-		$transaction = false;
-
 		$templates = zbx_toArray($data['templates']);
 		$templateids = zbx_objectValues($templates, 'templateid');
 

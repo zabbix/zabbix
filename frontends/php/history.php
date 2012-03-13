@@ -87,7 +87,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			if('add' == $_REQUEST['favaction']){
 				$result = add2favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 				if($result){
-					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
+					print('$("addrm_fav").title = "'._('Remove from favourites.').'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("itemid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
@@ -95,7 +95,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
-					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
+					print('$("addrm_fav").title = "'._('Add to favourites.').'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("itemid","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}
@@ -219,7 +219,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$cmbAction = new CComboBox('action',$_REQUEST['action'],'submit()');
 
-	if(isset($iv_numeric[$item['value_type']])) $cmbAction->addItem('showgraph',S_GRAPH);
+	if(isset($iv_numeric[$item['value_type']])) $cmbAction->addItem('showgraph',_('Graph'));
 	$cmbAction->addItem('showvalues',S_VALUES);
 	$cmbAction->addItem('showlatest', _('500 latest values'));
 
@@ -265,26 +265,26 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 			if(count($items) > 1){
 				insert_js_function('removeSelectedItems');
-				$delItemBttn = new CSubmit('remove_log',S_REMOVE_SELECTED, "javascript: removeSelectedItems('cmbitemlist_', 'itemid')");
+				$delItemBttn = new CSubmit('remove_log',_('Remove selected'), "javascript: removeSelectedItems('cmbitemlist_', 'itemid')");
 			}
 
-			$filterForm->addRow(S_ITEMS_LIST, array($cmbitemlist, BR(), $addItemBttn, $delItemBttn));
+			$filterForm->addRow(_('Items list'), array($cmbitemlist, BR(), $addItemBttn, $delItemBttn));
 
-			$filterForm->addRow(S_SELECT_ROWS_WITH_VALUE_LIKE, new CTextBox('filter',$filter,25));
+			$filterForm->addRow(_('Select rows with value like'), new CTextBox('filter',$filter,25));
 
 			$cmbFTask = new CComboBox('filter_task',$filter_task,'submit()');
-			$cmbFTask->addItem(FILTER_TASK_SHOW,S_SHOW_SELECTED);
-			$cmbFTask->addItem(FILTER_TASK_HIDE,S_HIDE_SELECTED);
-			$cmbFTask->addItem(FILTER_TASK_MARK,S_MARK_SELECTED);
-			$cmbFTask->addItem(FILTER_TASK_INVERT_MARK,S_MARK_OTHERS);
+			$cmbFTask->addItem(FILTER_TASK_SHOW,_('Show selected'));
+			$cmbFTask->addItem(FILTER_TASK_HIDE,_('Hide selected'));
+			$cmbFTask->addItem(FILTER_TASK_MARK,_('Mark selected'));
+			$cmbFTask->addItem(FILTER_TASK_INVERT_MARK,_('Mark others'));
 
 			$tmp = array($cmbFTask);
 
 			if(str_in_array($filter_task,array(FILTER_TASK_MARK,FILTER_TASK_INVERT_MARK))){
 				$cmbColor = new CComboBox('mark_color',$mark_color);
-				$cmbColor->addItem(MARK_COLOR_RED,S_AS_RED);
-				$cmbColor->addItem(MARK_COLOR_GREEN,S_AS_GREEN);
-				$cmbColor->addItem(MARK_COLOR_BLUE,S_AS_BLUE);
+				$cmbColor->addItem(MARK_COLOR_RED,_('as Red'));
+				$cmbColor->addItem(MARK_COLOR_GREEN,_('as Green'));
+				$cmbColor->addItem(MARK_COLOR_BLUE,_('as Blue'));
 
 				$tmp[] = SPACE;
 				$tmp[] = $cmbColor;
@@ -292,7 +292,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 			$filterForm->addRow(S_SELECTED, $tmp);
 
-			$filterForm->addItemToBottomRow(new CSubmit('select',S_FILTER));
+			$filterForm->addItemToBottomRow(new CSubmit('select',_('Filter')));
 		}
 // ------
 
@@ -324,12 +324,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 			$table = new CTableInfo('...');
 			$table->setHeader(array(
-				S_TIMESTAMP,
+				_('Timestamp'),
 				$fewItems ? S_ITEM : null,
 				$logItem ? S_LOCAL_TIME : null,
-				(($eventLogItem && $logItem) ? S_SOURCE : null),
+				(($eventLogItem && $logItem) ? _('Source') : null),
 				(($eventLogItem && $logItem) ? S_SEVERITY : null),
-				(($eventLogItem && $logItem) ? S_EVENT_ID : null),
+				(($eventLogItem && $logItem) ? _('Event ID') : null),
 				S_VALUE
 			), 'header');
 
@@ -414,7 +414,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		else{
 // NUMERIC, FLOAT
 			$table = new CTableInfo();
-			$table->setHeader(array(S_TIMESTAMP, S_VALUE));
+			$table->setHeader(array(_('Timestamp'), S_VALUE));
 
 			$options['sortfield'] = array('itemid', 'clock');
 			$hData = API::History()->get($options);

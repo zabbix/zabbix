@@ -737,7 +737,6 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -1537,7 +1536,7 @@ Copt::memoryPick();
 /**
  * Update Host
  *
- * @param _array $hosts multidimensional array with Hosts data
+ * @param array $hosts multidimensional array with Hosts data
  * @param string $hosts['host'] Host name.
  * @param int $hosts['port'] Port. OPTIONAL
  * @param int $hosts['status'] Host Status. OPTIONAL
@@ -1757,7 +1756,7 @@ Copt::memoryPick();
 			unset($data['macros']);
 		}
 
-		if (isset($data['inventory'])) {
+		if (!empty($data['inventory'])) {
 			$updateInventory = $data['inventory'];
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 			unset($data['inventory']);
