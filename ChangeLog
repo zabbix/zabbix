@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------
-Changes for 1.9.10
+Changes for 2.0.0rc1
 
 New features:
+....I...S. [ZBX-4751] removed "WITH OIDS" option from PostgreSQL database scheme (Sasha)
 ....I..PS. [ZBXNEXT-397] added support of web monitoring by Zabbix proxy (Sasha)
 ..F....... [ZBX-3531] configuration export/import (Vedmak)
 ...G...PS. [ZBX-4581] added time unit symbols support to aggregate items (dimir)
@@ -19,6 +20,8 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
+..F....... [ZBX-3528] fixed letter numbering of long lists (Vedmak)
+...G.J.PS. [ZBX-4725] fixed processing lld rules with macros in a key (Sasha)
 ..F....... [ZBX-4730] removed incorrect JS function call in the event history screen (Pavels)
 ..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
 A.F....... [ZBX-4333] fixed trigger inheritance when calling trigger.update whithout a trigger expression (Pavels)

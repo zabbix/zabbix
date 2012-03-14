@@ -172,7 +172,7 @@ class JMXItemChecker extends ItemChecker
 			}
 
 			JSONObject mapping = new JSONObject();
-			mapping.put(item.getKey(), counters);
+			mapping.put(ItemChecker.JSON_TAG_DATA, counters);
 			return mapping.toString(2);
 		}
 		else
