@@ -5,7 +5,7 @@ CREATE TABLE help_items (
 	key_		varchar(255)	DEFAULT ''	NOT NULL,
 	description	varchar(255)	DEFAULT ''	NOT NULL,
 	PRIMARY KEY (itemtype,key_)
-) with OIDS;
+);
 
 INSERT INTO help_items (itemtype,key_,description) values ('0','agent.ping','Check the agent usability. Always return 1. Can be used as a TCP ping.');
 INSERT INTO help_items (itemtype,key_,description) values ('0','agent.version','Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1');

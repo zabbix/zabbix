@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 if (isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])) {
 	$EXPORT_DATA = true;
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
-	$page['file'] = 'zbx_export.xml';
+	$page['file'] = 'zbx_export_maps.xml';
 }
 else {
 	$EXPORT_DATA = false;

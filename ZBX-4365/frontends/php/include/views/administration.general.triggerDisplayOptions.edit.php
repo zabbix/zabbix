@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-include('include/views/js/administration.general.triggerDisplayingOptions.js.php');
+include('include/views/js/administration.general.triggerDisplayOptions.js.php');
 
 $triggerDOFormList = new CFormList('scriptsTab');
 
@@ -114,7 +114,7 @@ $severityView = new CTabView();
 $severityView->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList);
 
 $severityForm = new CForm();
-$severityForm->setName('triggerDisplayingOptions');
+$severityForm->setName('triggerDisplayOptions');
 $severityForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
 $severityForm->addItem($severityView);
 $severityForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButton('resetDefaults', _('Reset defaults'))));
