@@ -31,7 +31,7 @@ $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEM PROTOTYPES'), $createForm);
 // header
 $itemsWidget->addHeader(array(_('Item prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
 $itemsWidget->addHeaderRowNumber();
-$itemsWidget->addItem(get_header_host_table($this->data['hostid'], $this->data['parent_discoveryid']));
+$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
 $itemForm = new CForm('get');

@@ -268,7 +268,7 @@ function access_deny() {
 			new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist'),
 			new CButton('back', _('Cancel'), 'javascript: window.history.back();', 'formlist')
 		));
-		$warning->render();
+		$warning->show();
 	}
 	require_once dirname(__FILE__).'/page_footer.php';
 }

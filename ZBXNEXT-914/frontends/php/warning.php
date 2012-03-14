@@ -58,7 +58,7 @@ $warning->setAlignment('center');
 $warning->setAttribute('style', 'margin-top: 100px;');
 $warning->setPaddings(SPACE);
 $warning->setButtons(new CButton('retry', _('Retry'), 'javascript: document.location.reload();', 'formlist'));
-$warning->render();
+$warning->show();
 
 zbx_add_post_js('setTimeout("document.location.reload();", '.($refresh_rate * 1000).');');
 echo SBR;

@@ -272,7 +272,7 @@ else {
 		'hostids' => $data['hostid'],
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
-		'selectPrototypes' => API_OUTPUT_COUNT,
+		'selectItems' => API_OUTPUT_COUNT,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
 		'sortfield' => $sortfield,

@@ -26,10 +26,10 @@ $triggersWidget = new CWidget();
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
 	if (!empty($this->data['parent_discoveryid'])) {
-		$triggersWidget->addItem(get_header_host_table($this->data['hostid'], $this->data['parent_discoveryid']));
+		$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 	}
 	else {
-		$triggersWidget->addItem(get_header_host_table($this->data['hostid']));
+		$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid']));
 	}
 }
 

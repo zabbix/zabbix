@@ -50,7 +50,7 @@ class CWarning extends CTable {
 		$this->buttons = is_array($buttons) ? $buttons : array($buttons);
 	}
 
-	public function render() {
+	public function show($destroy = true) {
 		$this->setHeader($this->header, 'header');
 
 		$cssClass = 'content';
@@ -68,7 +68,8 @@ class CWarning extends CTable {
 		}
 
 		$this->setFooter(new CDiv($this->buttons, 'buttons'), 'footer');
-		parent::show();
+
+		parent::show($destroy);
 	}
 }
 ?>

@@ -23,10 +23,10 @@ $itemWidget = new CWidget('item-edit');
 
 if (!empty($this->data['hostid'])) {
 	if (!empty($this->data['parent_discoveryid'])) {
-		$itemWidget->addItem(get_header_host_table($this->data['hostid'], $this->data['parent_discoveryid']));
+		$itemWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 	}
 	else {
-		$itemWidget->addItem(get_header_host_table($this->data['hostid']));
+		$itemWidget->addItem(get_header_host_table('items', $this->data['hostid']));
 	}
 }
 

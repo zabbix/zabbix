@@ -757,7 +757,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$hosts_wdgt->addItem(import_host_form());
 		else {
 			if ($hostid = get_request('hostid', 0)) {
-				$hosts_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
+				$hosts_wdgt->addItem(get_header_host_table('', $_REQUEST['hostid']));
 			}
 
 			$hostForm = new CView('configuration.host.edit');

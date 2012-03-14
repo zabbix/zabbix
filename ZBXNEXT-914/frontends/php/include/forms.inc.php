@@ -859,7 +859,7 @@
 			'form' => get_request('form'),
 			'form_refresh' => get_request('form_refresh'),
 			'is_discovery_rule' => !empty($options['is_discovery_rule']),
-			'parent_discoveryid' => get_request('parent_discoveryid'),
+			'parent_discoveryid' => get_request('parent_discoveryid', !empty($options['is_discovery_rule']) ? get_request('itemid', null) : null),
 			'itemid' => get_request('itemid', null),
 			'limited' => false,
 			'interfaceid' => get_request('interfaceid', 0),

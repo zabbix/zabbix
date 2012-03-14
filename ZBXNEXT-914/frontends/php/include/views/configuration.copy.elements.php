@@ -23,7 +23,8 @@ $triggersWidget = new CWidget();
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$triggersWidget->addItem(get_header_host_table($this->data['hostid']));
+	$hostTableElement = ($this->data['elements_field'] == 'group_graphid') ? 'graphs' : 'trigger';
+	$triggersWidget->addItem(get_header_host_table($hostTableElement, $this->data['hostid']));
 }
 
 if (!empty($this->data['title'])) {

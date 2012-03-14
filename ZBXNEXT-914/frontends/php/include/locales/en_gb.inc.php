@@ -102,7 +102,6 @@
 
 //	charts.php
 	'S_CUSTOM_GRAPHS'=>			_('Custom graphs'),
-	'S_GRAPHS_BIG'=>			_('GRAPHS'),
 	'S_PERIOD'=>				_('Period'),
 
 //	class.cchart.php

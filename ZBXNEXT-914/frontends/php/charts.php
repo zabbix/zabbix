@@ -209,7 +209,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		zbx_add_post_js('timeControl.processObjects();');
 	}
 
-	$charts_wdgt->addPageHeader(S_GRAPHS_BIG, $icons);
+	$charts_wdgt->addPageHeader(_('Graphs'), $icons);
 	$charts_wdgt->addHeader($header, $r_form);
 	$charts_wdgt->addItem(BR());
 	$charts_wdgt->addItem($table);

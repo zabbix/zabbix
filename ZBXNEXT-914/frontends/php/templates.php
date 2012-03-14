@@ -567,7 +567,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		else {
 			if ($templateid = get_request('templateid', 0)) {
-				$template_wdgt->addItem(get_header_host_table($templateid));
+				$template_wdgt->addItem(get_header_host_table('', $templateid));
 			}
 
 			$templateForm = new CView('configuration.template.edit');

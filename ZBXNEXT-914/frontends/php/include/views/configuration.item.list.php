@@ -33,7 +33,7 @@ $itemsWidget->addHeader(_('Items'));
 $itemsWidget->addHeaderRowNumber();
 
 if (!empty($this->data['hostid'])) {
-	$itemsWidget->addItem(get_header_host_table($this->data['hostid']));
+	$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
 $itemsWidget->addFlicker($this->data['flicker'], CProfile::get('web.items.filter.state', 0));
 
