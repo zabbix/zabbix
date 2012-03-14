@@ -1125,6 +1125,17 @@ class CTemplate extends CZBXAPI {
 
 		API::Template()->unlink($templateids, null, true);
 
+		// delete the discovery rules first
+		$delRules = API::DiscoveryRule()->get(array(
+			'hostids' => $templateids,
+			'nopermissions' => true,
+			'preservekeys' => true
+		));
+		if ($delRules) {
+			API::DiscoveryRule()->delete(array_keys($delRules), true);
+		}
+
+		// delete the items
 		$delItems = API::Item()->get(array(
 			'templateids' => $templateids,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -1132,11 +1143,9 @@ class CTemplate extends CZBXAPI {
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-
-		if (!empty($delItems)) {
+		if ($delItems) {
 			API::Item()->delete(array_keys($delItems), true);
 		}
-
 
 		// delete screen items
 		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
