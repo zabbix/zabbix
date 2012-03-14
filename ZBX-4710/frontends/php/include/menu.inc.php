@@ -239,7 +239,7 @@ $ZBX_MENU = array(
 					'adm.valuemapping.php',
 					'adm.workingtime.php',
 					'adm.triggerseverities.php',
-					'adm.triggerdisplayingoptions.php',
+					'adm.triggerdisplayoptions.php',
 					'adm.other.php'
 				)
 			),

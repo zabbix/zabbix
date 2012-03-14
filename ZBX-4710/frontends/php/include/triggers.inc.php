@@ -1992,8 +1992,8 @@ function analyze_expression($expression) {
 	}
 	$pasedData = parseTriggerExpressions($expression, true);
 	$next = array();
-	$nextletter = 'A';
-	return build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $nextletter);
+	$letterNum = 0;
+	return build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $letterNum);
 }
 
 function make_expression_tree(&$node, &$nodeid) {
@@ -2096,7 +2096,7 @@ function create_node_list($node, &$arr, $depth = 0, $parent_expr = null) {
 }
 
 // build trigger expression html (with zabbix html classes) tree
-function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$nextletter, &$secondLetters = null) {
+function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$letterNum) {
 	$treeList = array();
 	$outline = '';
 	$expr = array();
@@ -2120,7 +2120,7 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 
 		if (count($parts) == 1 && $sStart == $fPart['openSymbolNum'] && $sEnd == $fPart['closeSymbolNum']) {
 			$next[$level] = false;
-			list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $nextletter, $secondLetters);
+			list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $letterNum);
 			$outline = (isset($treeLevel['openSymbol']) && $treeLevel['levelType'] == 'grouping' ? $treeLevel['openSymbol'].' ' : '')
 				.$outline.(isset($treeLevel['closeSymbol']) && $treeLevel['levelType'] == 'grouping' ? ' '.$treeLevel['closeSymbol'] : '');
 			return array($outline, $treeList);
@@ -2191,7 +2191,7 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 				$prev = is_int($opPos) && $opPos < $sEnd ? $opPos : $sEnd;
 				$opPos = find_next_operand($expression, $prev + zbx_strlen($operand), $sEnd, $parts, $bParts, $operand);
 				$next[$level] = is_int($prev) && $prev < $sEnd ? true : false;
-				list($outln, $treeLst) = build_expression_html_tree($expression, $newTreeLevel, $level + 1, $next, $nextletter, $secondLetters);
+				list($outln, $treeLst) = build_expression_html_tree($expression, $newTreeLevel, $level + 1, $next, $letterNum);
 				$treeList = array_merge($treeList, $treeLst);
 				$levelOutline .= trim($outln).(is_int($prev) && $prev < $sEnd ? ' '.$operand.' ':'');
 			}
@@ -2201,28 +2201,7 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 	}
 
 	if ($letterLevel) {
-		if (!$nextletter) {
-			$nextletter = 'A';
-		}
-
-		if ($nextletter > 'Z') {
-			if (!$secondLetters) {
-				$secondLetters = 'AA';
-			}
-			if ($secondLetters[1] > 'Z') {
-				$secondLetters[1] = 'A';
-				$secondLetters[0] = chr(ord($secondLetters[0]) + 1);
-			}
-			if ($secondLetters[0] > 'Z') {
-				$secondLetters[0] = 'A';
-			}
-			$newch = $secondLetters;
-		}
-		else {
-			$newch = $nextletter;
-		}
-
-		array_push($expr, SPACE, bold($newch), SPACE);
+		array_push($expr, SPACE, bold(num2letter($letterNum)), SPACE);
 		$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum'] - $treeLevel['openSymbolNum'] + 1));
 		if (!defined('NO_LINK_IN_TESTING')) {
 			$url =  new CSpan($expValue, 'link');
@@ -2234,14 +2213,9 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 		}
 		$expr[] = $url;
 		$glue = '';
-		if (isset($secondLetters[1])) {
-			$glue = ($secondLetters[1] == 'A' ? "&nbsp;\r\n" : ' ');
-			$secondLetters[1] = chr(ord($secondLetters[1]) + 1);
-		}
-		else {
-			$nextletter = chr(ord($nextletter) + 1);
-		}
-		$outline = $glue.$newch.' ';
+
+		$outline = $glue.num2letter($letterNum).' ';
+		$letterNum++;
 
 		$levelDetails = array(
 			'start' => $treeLevel['openSymbolNum'],
