@@ -2,6 +2,7 @@
 Changes for 2.0.0rc2
 
 Bug fixes:
+..F....... [ZBX-4702] fixed dynamic item saving in Screens (Eduard)
 A.F....... [ZBX-4257] fixed updating templated items (Pavels)
 A.F....... [ZBX-4710] fixed replacing graph Y axis item prototypes when cloning a discovery rule (Pavels)
 A.F....... [ZBX-4710] fixed deleting hosts when a graph ptototype uses a normal item for it's Y scale (Pavels)
