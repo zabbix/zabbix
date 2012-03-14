@@ -998,11 +998,13 @@ class CUser extends CZBXAPI {
 	return isset($user['userData']) ? $userData : $userData['sessionid'];
 	}
 
-/**
- * Check if session ID is authenticated
- *
- * @param array $sessionid Session ID
- */
+	/**
+	 * Check if session ID is authenticated
+	 *
+	 * @param string $sessionid     session ID
+	 *
+	 * @return array    an array of user data
+	 */
 	public function checkAuthentication($sessionid) {
 		global $ZBX_LOCALNODEID;
 
@@ -1024,7 +1026,7 @@ class CUser extends CZBXAPI {
 		if (!$userInfo)
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 
-// dont check permissions on the same second
+		// don't check permissions on the same second
 		if ($time != $userInfo['lastaccess']) {
 			if (!check_perm2system($userInfo['userid']))
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
