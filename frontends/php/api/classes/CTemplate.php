@@ -1148,7 +1148,7 @@ class CTemplate extends CZBXAPI {
 		}
 
 		// delete screen items
-		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
+		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
 
 		// delete host from maps
 		if (!empty($templateids)) {

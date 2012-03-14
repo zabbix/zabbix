@@ -527,11 +527,13 @@ class CItemPrototype extends CItemGeneral{
 	}
 
 	protected function checkInput(array &$items, $update=false) {
-		foreach ($items as $inum => $item) {
-			$items[$inum]['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
-		}
-
 		parent::checkInput($items, $update);
+
+		// add the values that cannot be changed, but are required for further processing
+		// they must be added after calling parent::checkInput() because it will unset any existing system field
+		foreach ($items as &$item) {
+			$item['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		}
 	}
 
 /**
@@ -805,7 +807,7 @@ class CItemPrototype extends CItemGeneral{
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$selectFields = array('flags');
+		$selectFields = array();
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;
