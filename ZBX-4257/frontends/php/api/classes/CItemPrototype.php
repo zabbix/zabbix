@@ -807,7 +807,7 @@ class CItemPrototype extends CItemGeneral{
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$selectFields = array('flags');
+		$selectFields = array();
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;
