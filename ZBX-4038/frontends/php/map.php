@@ -28,20 +28,18 @@ $page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION		EXCEPTION
 $fields = array(
-	'sysmapid' =>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,				null),
-
-	'selements' =>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,				null),
-	'links' =>			array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,				null),
-	'noselements' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
-	'nolinks' =>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
-	'nocalculations' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
-	'expand_macros' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
-
+	'sysmapid' =>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,			null),
+	'selements' =>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,			null),
+	'links' =>		array(T_ZBX_STR, O_OPT,	P_SYS,	DB_ID,			null),
+	'noselements' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		null),
+	'nolinks' =>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		null),
+	'nocalculations' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		null),
+	'expand_macros' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		null),
 	'show_triggers' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		null),
-	'grid' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 500),	null),
-	'base64image' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),			null),
+	'grid' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 500),	null),
+	'base64image' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),		null),
 );
 check_fields($fields);
 ?>

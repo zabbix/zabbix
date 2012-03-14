@@ -37,29 +37,31 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'dstfrm'=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
-
-		'parent_discoveryid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
+		'parent_discoveryid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		null),
 		'normal_only'=>	array(T_ZBX_INT, O_OPT,	 null,	null,			null),
 		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
-		'gid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
+		'gid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,3'),		'isset({save})'),
-		'list_name'=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
-		'itemid'=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
-		'color'=>		array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
-		'drawtype'=>	array(T_ZBX_INT, O_OPT,  null,	IN(graph_item_drawtypes()),'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		'sortorder'=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
-		'yaxisside'=>	array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),			'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'list_name'=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,		'isset({save})&&isset({gid})'),
+		'itemid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)', 'isset({save})', _("Parameter")),
+		'color'=>	array(T_ZBX_CLR, O_OPT,  null,	null,			'isset({save})', _("Colour")),
+		'drawtype'=>	array(T_ZBX_INT, O_OPT,  null,	IN(graph_item_drawtypes()),
+			'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		'sortorder'=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(ZBX_MIN, ZBX_MER),
+			'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))', _("Sortorder"),
+			_s('must be between %1$s and %2$s', ZBX_MIN, ZBX_MER)),
+		'yaxisside'=>	array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),
+			'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
 		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('1,2,4,7,9'),	'isset({save})'),
-		'type'=>		array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2'),		'isset({save})'),
-
+		'type'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2'),		'isset({save})'),
 		'only_hostid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
-		'monitored_hosts'=>array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
+		'monitored_hosts'=> array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
 /* actions */
-		'add'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+		'save'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 /* other */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh'=>array(T_ZBX_STR, O_OPT, null,	null,	null)
+		'form'=>	array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+		'form_refresh'=>array(T_ZBX_STR, O_OPT, null,		null,		null)
 	);
 
 	check_fields($fields);

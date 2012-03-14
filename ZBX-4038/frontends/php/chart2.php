@@ -30,14 +30,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//		VAR			TYPE	 OPTIONAL FLAGS	  VALIDATION	EXCEPTION
 	$fields=array(
-		'graphid'=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
-		'period'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD),	null),
-		'stime'=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
-		'border'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
-		'width'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
-		'height'=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
+		'graphid'=>	array(T_ZBX_INT, O_MAND, P_SYS,	  DB_ID,	null),
+		'period'=>	array(T_ZBX_INT, O_OPT,	 P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
+		'stime'=>	array(T_ZBX_STR, O_OPT,	 P_SYS,   null,		null),
+		'border'=>	array(T_ZBX_INT, O_OPT,	 P_NZERO, IN('0,1'),	null),
+		'width'=>	array(T_ZBX_INT, O_OPT,	 P_NZERO, '{}>0',	null),
+		'height'=>	array(T_ZBX_INT, O_OPT,	 P_NZERO, '{}>0',	null),
 	);
 
 	check_fields($fields);

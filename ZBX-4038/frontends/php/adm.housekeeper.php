@@ -28,12 +28,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 $fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'alert_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0, 65535),	'isset({save})'),
-	'event_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0, 65535),	'isset({save})'),
+	// VAR				TYPE	OPTIONAL FLAGS		VALIDATION		EXCEPTION
+	'alert_history'=>	array(T_ZBX_INT, O_NO,	null,	BETWEEN(ZBX_MIN, ZBX_MER), 'isset({save})',
+		_("Do not keep actions older than (in days)"), _s('must be between %1$s and %2$s', ZBX_MIN, ZBX_MER)),
+	'event_history'=>	array(T_ZBX_INT, O_NO,	null,	BETWEEN(ZBX_MIN, ZBX_MER), 'isset({save})',
+		_("Do not keep events older than (in days)"), _s('must be between %1$s and %2$s', ZBX_MIN, ZBX_MER)),
 
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,		null,	null)
 );
 ?>
 <?php

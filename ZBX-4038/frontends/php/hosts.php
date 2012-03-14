@@ -42,77 +42,73 @@ else{
 require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 //ARRAYS
-		'hosts'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groups'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'hostids'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'groupids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
-		'applications'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		'hosts'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'groups'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'hostids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'groupids'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		'applications'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
 // host
-		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS, 	DB_ID,				NULL),
-		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
-		'host'=>			array(T_ZBX_STR, O_OPT,	null,   NOT_EMPTY,		'isset({save})'),
-		'visiblename'=>		array(T_ZBX_STR, O_OPT,	null,   null,			'isset({save})'),
-		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({save})'),
-		'status'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1,3'),		'isset({save})'),
-
+		'groupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS, 	DB_ID,		NULL),
+		'hostid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'isset({form})&&({form}=="update")'),
+		'host'=>		array(T_ZBX_STR, O_OPT,	null,   NOT_EMPTY,	'isset({save})', _("Host name")),
+		'visiblename'=>		array(T_ZBX_STR, O_OPT,	null,   null,		'isset({save})'),
+		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({save})'),
+		'status'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1,3'),	'isset({save})'),
 		'newgroup'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
-		'interfaces'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-		'mainInterfaces' => array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
+		'interfaces'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})',
+			_("Agent or SNMP or JMX or IPMI interface")),
+		'mainInterfaces' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		'templates'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'templates_rem'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
 		'clear_templates'=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
-
-		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(-1,6),	NULL),
-		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL, BETWEEN(0,5),		NULL),
-		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
-		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL, NULL,				NULL),
-
-		'mass_clear_tpls'=>		array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
-
-		'inventory_mode'=>		array(T_ZBX_INT, O_OPT, NULL, IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC),	NULL),
+		'ipmi_authtype'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-1,6),	NULL),
+		'ipmi_privilege'=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,5),	NULL),
+		'ipmi_username'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
+		'ipmi_password'=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		NULL),
+		'mass_clear_tpls'=>	array(T_ZBX_STR, O_OPT, NULL, 			NULL,	NULL),
+		'inventory_mode'=>	array(T_ZBX_INT, O_OPT, NULL,
+			IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC),	NULL),
 		'host_inventory'=> 	array(T_ZBX_STR, O_OPT, P_UNSET_EMPTY,	NULL,   NULL),
-
-		'macros_rem'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
-		'macros'=>				array(T_ZBX_STR, O_OPT, P_SYS,   null,	null),
-		'macro_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	'isset({macro_add})'),
-		'value_new'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	'isset({macro_add})'),
-		'macro_add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),
+		'macros_rem'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'macros'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+		'macro_new'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+		'value_new'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
+		'macro_add' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // mass update
-		'massupdate'=>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'visible'=>			array(T_ZBX_STR, O_OPT,	NULL, 	NULL,	NULL),
+		'massupdate'=>		array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+		'visible'=>		array(T_ZBX_STR, O_OPT,	NULL,		NULL,	NULL),
 // actions
-		'go'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'go'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // form
-		'add_to_group'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,	null),
+		'add_to_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,	null),
 		'delete_from_group'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	DB_ID,	null),
-		'unlink'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'unlink'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'unlink_and_clear'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'save'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'masssave'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'clone'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'full_clone'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'delete'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'masssave'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'full_clone'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 // other
-		'form'=>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh'=>		array(T_ZBX_STR, O_OPT, null,	null,	null),
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+		'form_refresh'=>	array(T_ZBX_STR, O_OPT, null,		null,	null),
 // Import
-		'rules' =>				array(T_ZBX_STR, O_OPT,	null,			DB_ID,	null),
-		'import' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'rules' =>		array(T_ZBX_STR, O_OPT,	null,		DB_ID,	null),
+		'import' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 // Filter
-		'filter_set' =>			array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
-
+		'filter_set' =>		array(T_ZBX_STR, O_OPT,	P_ACT,	null,	null),
 		'filter_host'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
 		'filter_ip'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
 		'filter_dns'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
 		'filter_port'=>		array(T_ZBX_STR, O_OPT,  null,	null,	null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
+		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,	   NULL),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY, 'isset({favobj})'),
+		'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY, 'isset({favobj})&&("filter"=={favobj})')
 	);
 
 // OUTER DATA

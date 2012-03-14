@@ -44,25 +44,27 @@ else {
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+//		VAR			TYPE	OPTIONALFLAGS		VALIDATION	EXCEPTION
 $fields = array(
-	'screens' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-	'templateid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})'),
-	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})'),
-	'vsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})'),
+	'screens' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,		'(isset({form})&&({form}=="update"))'),
+	'templateid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'name' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _("Name")),
+	'hsize' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, 100), 'isset({save})', _("Columns"),
+		_s('must be between %1$s and %2$s', 1, 100)),
+	'vsize' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, 100), 'isset({save})', _("Rows"),
+		_s('must be between %1$s and %2$s', 1, 100)),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
+	'go' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'clone' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'save' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+	'form' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,		null),
 	// import
-	'rules' =>			array(T_ZBX_STR, O_OPT, null,	DB_ID,			null),
-	'import' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null)
+	'rules' =>		array(T_ZBX_STR, O_OPT, null,		DB_ID,		null),
+	'import' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);

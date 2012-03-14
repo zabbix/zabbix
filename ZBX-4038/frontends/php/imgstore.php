@@ -33,11 +33,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 <?php
 //	VAR		TYPE	OPTIONAL 	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'css' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,				null),
-	'imageid' =>	array(T_ZBX_STR, O_OPT, P_SYS, null,				null),
-	'iconid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null),
-	'width' =>		array(T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null),
-	'height' =>		array(T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null),
+	'css' =>	array(T_ZBX_INT, O_OPT, P_SYS, null,			null),
+	'imageid' =>	array(T_ZBX_STR, O_OPT, P_SYS, null,			null),
+	'iconid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,			null),
+	'width' =>	array(T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null),
+	'height' =>	array(T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null),
 );
 check_fields($fields);
 

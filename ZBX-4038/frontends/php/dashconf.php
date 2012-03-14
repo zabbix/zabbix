@@ -34,19 +34,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array(
-		'filterEnable'=>array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-		'del_groups'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-		'groupids'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-		'new_right'=>	array(T_ZBX_STR, O_OPT,	null,	null,				null),
-		'trgSeverity'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-		'grpswitch'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),		NULL),
+		'filterEnable'=> array(T_ZBX_INT, O_OPT, P_SYS,	NULL,		NULL),
+		'del_groups'=>	 array(T_ZBX_INT, O_OPT, P_SYS,	NULL,		NULL),
+		'groupids'=>	 array(T_ZBX_INT, O_OPT, P_SYS,	NULL,		NULL),
+		'new_right'=>	 array(T_ZBX_STR, O_OPT, null,	null,		null),
+		'trgSeverity'=>	 array(T_ZBX_INT, O_OPT, P_SYS,	NULL,		NULL),
+		'grpswitch'=>	 array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	NULL),
 
-		'maintenance'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),		NULL),
-		'extAck'=>	array(T_ZBX_INT, O_OPT, P_SYS,	null,		NULL),
+		'maintenance'=>	 array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),	NULL),
+		'extAck'=>	 array(T_ZBX_INT, O_OPT, P_SYS,	null,		NULL),
 
-		'form_refresh'=>array(T_ZBX_INT, O_OPT, P_SYS,	null,				NULL),
-		'save'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,				NULL),
-		'delete'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,				NULL)
+		'form_refresh'=> array(T_ZBX_INT, O_OPT, P_SYS,	null,		NULL),
+		'save'=>	 array(T_ZBX_STR, O_OPT, P_SYS,	null,		NULL),
+		'delete'=>	 array(T_ZBX_STR, O_OPT, P_SYS,	null,		NULL)
 	);
 
 	check_fields($fields);

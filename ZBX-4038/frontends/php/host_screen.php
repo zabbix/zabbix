@@ -39,28 +39,24 @@
 
 ?>
 <?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//		VAR			TYPE	OPTIONAL FLAGS		VALIDATION		EXCEPTION
 	$fields=array(
-		'hostid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
-
+		'hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 // STATUS OF TRIGGER
-		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-
+		'tr_groupid'=>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
+		'tr_hostid'=>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 		'screenid'=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
-		'step'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
-
-		'period'=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	null,NULL),
-		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
-
-		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
+		'step'=>	array(T_ZBX_INT, O_OPT, P_SYS,		BETWEEN(0,65535),	NULL),
+		'period'=>	array(T_ZBX_INT, O_OPT, P_SYS,		null,NULL),
+		'stime'=>	array(T_ZBX_STR, O_OPT, P_SYS,		NULL,NULL),
+		'reset'=>	array(T_ZBX_STR, O_OPT, P_SYS,		IN("'reset'"),		NULL),
 		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN('0,1,2'),		NULL),
 		// ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
-		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NULL,			NULL),
-		'favaction'=>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','flop'"), null),
-		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL)
+		'favobj'=>	array(T_ZBX_STR, O_OPT, P_ACT,		NULL,			NULL),
+		'favref'=>	array(T_ZBX_STR, O_OPT, P_ACT,		NOT_EMPTY,		NULL),
+		'favid'=>	array(T_ZBX_INT, O_OPT, P_ACT,		NULL,			NULL),
+		'favaction'=>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','flop'"),	null),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,		NOT_EMPTY,		NULL)
 	);
 
 	check_fields($fields);

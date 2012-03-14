@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'period'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD),	null),
+		'period'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
 		'stime'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
 
 		'httptestid'=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
@@ -48,14 +48,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'ymin_itemid'=>	array(T_ZBX_INT, O_OPT,	NULL,		DB_ID,	null),
 		'ymax_itemid'=>	array(T_ZBX_INT, O_OPT,	NULL,		DB_ID,	null),
 
-		'legend'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1'),	NULL),
-		'showworkperiod'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1'),	NULL),
-		'showtriggers'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1'),	NULL),
+		'legend'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1'),		NULL),
+		'showworkperiod'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1'),		NULL),
+		'showtriggers'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1'),		NULL),
 
 		'graphtype'=>	array(T_ZBX_INT, O_OPT,	NULL,		IN('0,1'),		null),
 
-		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
-		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
+		'yaxismin'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,			null),
+		'yaxismax'=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,			null),
 
 		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0, 100),	null),
 		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0, 100),	null),

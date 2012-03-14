@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields=array(
 	'text' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'font' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 5),	null),
+	'font' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 5),		null),
 	'theme' =>	array(T_ZBX_STR, O_OPT, null,	null,			null)
 );
 check_fields($fields);

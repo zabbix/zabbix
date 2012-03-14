@@ -29,21 +29,22 @@ define('ZBX_PAGE_NO_MENU', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//	VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'dstfrm' =>			array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,			null),
-	'stepid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0,65535),	null),
-	'list_name' =>		array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,			'isset({save})&&isset({stepid})'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY.KEY_PARAM(), 'isset({save})'),
-	'url' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			'isset({save})'),
-	'posts' =>			array(T_ZBX_STR, O_OPT, null,	null,				'isset({save})'),
-	'timeout' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0,65535),	'isset({save})'),
-	'required' =>		array(T_ZBX_STR, O_OPT, null,	null,				'isset({save})'),
-	'status_codes' =>	array(T_ZBX_INT_RANGE, O_OPT, null, null,			'isset({save})'),
+	'dstfrm' =>		array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,		null),
+	'stepid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0,65535),	null),
+	'list_name' =>		array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,		'isset({save})&&isset({stepid})'),
+	'name' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _("Name")),
+	'url' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _("URL")),
+	'posts' =>		array(T_ZBX_STR, O_OPT, null,	null,			'isset({save})'),
+	'timeout' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, ZBX_MER),	'isset({save})', _("Timeout"),
+		_s('must be between %1$s and %2$s', ZBX_MIN, ZBX_MER)),
+	'required' =>		array(T_ZBX_STR, O_OPT, null,	null,			'isset({save})'),
+	'status_codes' =>	array(T_ZBX_INT_RANGE, O_OPT, null, null,		'isset({save})'),
 	// actions
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,	null,	null)
+	'save' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+	'form' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
+	'form_refresh' =>	array(T_ZBX_STR, O_OPT, null,	null,			null)
 );
 check_fields($fields);
 ?>

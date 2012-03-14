@@ -38,23 +38,23 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'tr_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'tr_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'elementid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null),
-	'screenname' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'step' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
-	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
-	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), null),
+	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
+	'hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
+	'tr_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
+	'tr_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
+	'elementid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO,	DB_ID,				null),
+	'screenname' =>	array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
+	'step' =>	array(T_ZBX_INT, O_OPT, P_SYS,		BETWEEN(0, 65535),		null),
+	'period' =>	array(T_ZBX_INT, O_OPT, P_SYS,		null,				null),
+	'stime' =>	array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
+	'reset' =>	array(T_ZBX_STR, O_OPT, P_SYS,		IN("'reset'"),			null),
+	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,		IN('0,1,2'),			null),
 	// ajax
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	null),
-	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
-	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,	IN("'add','remove','flop'"), null),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	null)
+	'favobj' =>	array(T_ZBX_STR, O_OPT, P_ACT,		null,				null),
+	'favref' =>	array(T_ZBX_STR, O_OPT, P_ACT,		NOT_EMPTY,			null),
+	'favid' =>	array(T_ZBX_INT, O_OPT, P_ACT,		null,				null),
+	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT,		IN("'add','remove','flop'"),	null),
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,		NOT_EMPTY,			null)
 );
 check_fields($fields);
 

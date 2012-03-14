@@ -937,7 +937,7 @@ class CDiscoveryRule extends CItemGeneral {
 			));
 			foreach ($itemsExists as $itemExists) {
 				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host with item "%1$s" already exists.', $item['key_']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with item "%1$s" already exists.', $item['key_']));
 				}
 			}
 

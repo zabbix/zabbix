@@ -34,18 +34,19 @@ require_once dirname(__FILE__).'/include/page_header.php';
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'shows' =>			array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null),
+	'shows' =>		array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null),
 	'slideshowid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'(isset({form})&&({form}=="update"))'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})'),
-	'delay' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, SEC_PER_DAY), 'isset({save})'),
-	'slides' =>			array(null,		 O_OPT, null,		null,	null),
+	'name' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _("Name")),
+	'delay' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, SEC_PER_DAY), 'isset({save})',
+		_("Default delay (in seconds)"), _s('must be between %1$s and %2$s', 1, SEC_PER_DAY)),
+	'slides' =>		array(null,	 O_OPT, null,		null,	null),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+	'go' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'clone' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'save' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
+	'form' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,	null)
 );
 check_fields($fields);

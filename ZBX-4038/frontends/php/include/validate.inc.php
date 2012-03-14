@@ -329,7 +329,10 @@ function unset_all() {
 	}
 }
 
-function check_type(&$field, $flags, &$var, $type) {
+function check_type(&$field, $flags, &$var, $type, $caption = null) {
+	if (is_null($caption)) {
+		$caption = $field;
+	}
 	if (is_array($var) && $type != T_ZBX_IP) {
 		$err = ZBX_VALID_OK;
 		foreach ($var as $el) {
@@ -431,7 +434,7 @@ function check_type(&$field, $flags, &$var, $type) {
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not a colour.', $field));
+			info(_s('Warning. Field "%1$s" is not a colour.', $caption));
 			return ZBX_VALID_WARNING;
 		}
 	}
@@ -453,7 +456,10 @@ function check_field(&$fields, &$field, $checks) {
 	if (!isset($checks[5])) {
 		$checks[5] = $field;
 	}
-	list($type, $opt, $flags, $validation, $exception, $caption) = $checks;
+	if (!isset($checks[6])) {
+		$checks[6] = null;
+	}
+	list($type, $opt, $flags, $validation, $exception, $caption, $caption2) = $checks;
 
 	if ($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field] == '') {
 		unset_request($field);
@@ -506,11 +512,9 @@ function check_field(&$fields, &$field, $checks) {
 			return ZBX_VALID_OK;
 		}
 		elseif ($flags&P_ACT) {
-			if (!isset($_REQUEST['sid'])) {
-				info(_('Operation cannot be performed due to unauthorized request.'));
-				return ZBX_VALID_ERROR;
-			}
-			elseif (isset($_COOKIE['zbx_sessionid']) && ($_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'], 16, 16))) {
+			if (!isset($_REQUEST['sid'])
+					|| (isset($_COOKIE['zbx_sessionid'])
+					&& ($_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'], 16, 16)))) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
 				return ZBX_VALID_ERROR;
 			}
@@ -521,7 +525,7 @@ function check_field(&$fields, &$field, $checks) {
 		check_trim($_REQUEST[$field]);
 	}
 
-	$err = check_type($field, $flags, $_REQUEST[$field], $type);
+	$err = check_type($field, $flags, $_REQUEST[$field], $type, $caption);
 
 	if ($err != ZBX_VALID_OK) {
 		return $err;
@@ -535,7 +539,13 @@ function check_field(&$fields, &$field, $checks) {
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				info(_s('Warning. Incorrect value for field "%s".', $caption));
+				if ($validation == NOT_EMPTY && is_null($caption2)) {
+					$caption2 = _("cannot be empty");
+				}
+				if (!is_null($caption2)) {
+					$caption2 = ": ".$caption2;
+				}
+				info(_s('Warning. Incorrect value for field "%1$s"%2$s.', $caption, $caption2));
 				return ZBX_VALID_WARNING;
 			}
 		}
@@ -556,13 +566,13 @@ function invalid_url($msg = null) {
 function check_fields(&$fields, $show_messages = true) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = array(
-		'sid' =>			array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
-		'switch_node' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
-		'triggers_hash' =>	array(T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null),
-		'print' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
-		'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-		'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-		'start' =>			array(T_ZBX_INT, O_OPT, P_SYS, null,		null) // paging
+		'sid' =>		array(T_ZBX_STR, O_OPT, P_SYS, HEX(), null),
+		'switch_node' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, null),
+		'triggers_hash' =>	array(T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY, null),
+		'print' =>		array(T_ZBX_INT, O_OPT, P_SYS, IN('1'), null),
+		'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, null, null),
+		'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, null, null),
+		'start' =>		array(T_ZBX_INT, O_OPT, P_SYS, null, null) // paging
 	);
 	$fields = zbx_array_merge($system_fields, $fields);
 

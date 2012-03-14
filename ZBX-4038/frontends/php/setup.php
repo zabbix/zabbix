@@ -36,33 +36,33 @@ if(!defined('PAGE_HEADER_LOADED'))
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 		'distributed'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'trouble'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
-
-		'type'=>		array(T_ZBX_STR, O_OPT,	null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'),	null),
+		'type'=>		array(T_ZBX_STR, O_OPT,	null,
+			IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.
+			ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'), null),
 		'server'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
-		'port'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 65535),	null),
-		'database'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
+		'port'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(ZBX_MIN, ZBX_MER), null, _("Port"),
+			_s('must be between %1$s and %2$s', ZBX_MIN, ZBX_MER)),
+		'database'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null, _("Database name")),
 		'user'=>		array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		'password'=>		array(T_ZBX_STR, O_OPT,	null,	null, 			null),
 		'schema'=>		array(T_ZBX_STR, O_OPT,	null,	null, 			null),
-
 		'zbx_server'=>		array(T_ZBX_STR, O_OPT, null,   null,                   null),
-		'zbx_server_name'=>		array(T_ZBX_STR, O_OPT, null,   null,                   null),
-		'zbx_server_port'=>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null),
-
+		'zbx_server_name'=>	array(T_ZBX_STR, O_OPT, null,   null,                   null),
+		'zbx_server_port'=>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, ZBX_MER), null, _("Port"),
+			_s('must be between %1$s and %2$s', ZBX_MIN, ZBX_MER)),
 		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,			NULL),
-
 		'nodename'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
 		'nodeid'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 999),	null),
 /* actions */
-		'save_config'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'retry'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'finish'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'next'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'back'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		'save_config'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
+		'retry'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
+		'finish'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
+		'next'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
+		'back'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
 /* other */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,			NULL),
+		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,			NULL)
 	);
 
 	check_fields($fields, false);

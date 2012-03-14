@@ -36,24 +36,22 @@ require_once 'include/page_header.php';
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'dstfrm'=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
-
+		'dstfrm'=>		array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
 		'config'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1,2,3'),		NULL),
 		'gid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
-
-		'list_name'=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
+		'list_name'=>		array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,	'isset({save})&&isset({gid})'),
 		'caption'=>		array(T_ZBX_STR, O_OPT,  null,	null,			null),
-		'itemid'=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
-		'color'=>		array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
-		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({save})'),
-		'axisside'=>	array(T_ZBX_INT, O_OPT,	 null,	IN(GRAPH_YAXIS_SIDE_LEFT.','.GRAPH_YAXIS_SIDE_RIGHT),	null),
-
+		'itemid'=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)', 'isset({save})', _("Parameter")),
+		'color'=>		array(T_ZBX_CLR, O_OPT,  null,	null,		'isset({save})', _("Colour")),
+		'calc_fnc'=>		array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({save})'),
+		'axisside'=>		array(T_ZBX_INT, O_OPT,	 null,
+			IN(GRAPH_YAXIS_SIDE_LEFT.','.GRAPH_YAXIS_SIDE_RIGHT),	null),
 /* actions */
-		'add'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		'add'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
+		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 /* other */
-		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		'form_refresh'=>array(T_ZBX_STR, O_OPT, null,	null,	null)
+		'form'=>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+		'form_refresh'=>	array(T_ZBX_STR, O_OPT, null,		null,		null)
 	);
 
 	check_fields($fields);

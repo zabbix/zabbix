@@ -28,23 +28,25 @@ require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 $fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'default_theme'=>			array(T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,			'isset({save})'),
-	'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
-	'event_expire'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 99999),	'isset({save})'),
-	'event_show_max'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 99999),	'isset({save})'),
-	'dropdown_first_entry'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1,2'),		'isset({save})'),
-	'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
-	'max_in_table' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 99999),	'isset({save})'),
-	'search_limit' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 999999),	'isset({save})'),
-
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	// VAR					TYPE	OPTIONAL FLAGS	VALIDATION		EXCEPTION
+	'default_theme'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({save})'),
+	'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, null,	IN('1'),		null),
+	'event_expire'=> 		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, ZBX_MAX),	'isset({save})',
+		_("Show events not older than (in days)"), _s('must be between %1$s and %2$s',1, ZBX_MAX)),
+	'event_show_max'=> 		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, ZBX_MAX),	'isset({save})',
+		_("Max count of events per trigger to show"), _s('must be between %1$s and %2$s',1, ZBX_MAX)),
+	'dropdown_first_entry'=>	array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),		'isset({save})'),
+	'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, null,	IN('1'),		null),
+	'max_in_table' => 		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, ZBX_MAX),	'isset({save})',
+		_("Max count of elements to show inside table cell"), _s('must be between %1$s and %2$s',1, ZBX_MAX)),
+	'search_limit' => 		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 999999),	'isset({save})',
+		_("Search/Filter elements limit"), _s('must be between %1$s and %2$s',1, 999999)),
+	'save'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT,	null,		null,			null)
 );
 ?>
 <?php
 check_fields($fields);
-
 
 if (isset($_REQUEST['save'])) {
 	$configs = array(
