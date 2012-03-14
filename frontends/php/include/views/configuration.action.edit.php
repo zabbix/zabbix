@@ -99,7 +99,7 @@ foreach ($data['conditions'] as $id => $condition) {
 		continue;
 	}
 
-	$label = chr(ord('A') + $i);
+	$label = num2letter($i);
 	$condElements->addRow(array('('.$label.')', array(
 		new CCheckBox('g_conditionid[]', 'no', null, $i), SPACE,
 		get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))
@@ -853,7 +853,7 @@ if (isset($_REQUEST['new_operation'])) {
 				continue;
 			}
 
-			$label = chr(ord('A') + $i);
+			$label = num2letter($i);
 			$cond_el->addRow(array('(' . $label . ')', array(
 				new CCheckBox('g_opconditionid[]', 'no', null, $i),
 				get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))
