@@ -126,7 +126,7 @@ function delete_history_by_httptestid($httptestid) {
 			' AND s.httptestid='.$httptestid
 	);
 	while ($item_data = DBfetch($db_items)) {
-		if (!delete_history_by_itemid($item_data['itemid'], 0)) {
+		if (!delete_history_by_itemid($item_data['itemid'])) {
 			return false;
 		}
 	}

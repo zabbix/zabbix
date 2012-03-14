@@ -1608,10 +1608,10 @@ class CChart extends CGraphDraw{
 		$row = array(
 				array('text' => ''),
 				array('text' => ''),
-				array('text' => S_LST_SMALL, 'align'=> 1, 'fontsize' => 9),
-				array('text' => S_MIN_SMALL, 'align'=> 1, 'fontsize' => 9),
-				array('text' => S_AVG_SMALL, 'align'=> 1, 'fontsize' => 9),
-				array('text' => S_MAX_SMALL, 'align'=> 1, 'fontsize' => 9)
+				array('text' => _('last'), 'align'=> 1, 'fontsize' => 9),
+				array('text' => _('min'), 'align'=> 1, 'fontsize' => 9),
+				array('text' => _('avg'), 'align'=> 1, 'fontsize' => 9),
+				array('text' => _('max'), 'align'=> 1, 'fontsize' => 9)
 			);
 
 		$legend->addRow($row);
@@ -1622,17 +1622,17 @@ class CChart extends CGraphDraw{
 			$color = $this->getColor($this->items[$i]['color'], GRAPH_STACKED_ALFA);
 			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
-					$fnc_name = S_MIN_SMALL;
+					$fnc_name = _('min');
 					break;
 				case CALC_FNC_MAX:
-					$fnc_name = S_MAX_SMALL;
+					$fnc_name = _('max');
 					break;
 				case CALC_FNC_ALL:
 					$fnc_name = _('all');
 					break;
 				case CALC_FNC_AVG:
 				default:
-					$fnc_name = S_AVG_SMALL;
+					$fnc_name = _('avg');
 			}
 
 			$data = &$this->data[$this->items[$i]['itemid']][$this->items[$i]['calc_type']];

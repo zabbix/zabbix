@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of Zabbix');
-$page['file'] = 'adm.triggerdisplayingoptions.php';
+$page['file'] = 'adm.triggerdisplayoptions.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
 ?>
@@ -71,7 +71,7 @@ if (isset($_REQUEST['save'])) {
 
 $form = new CForm();
 $form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayingoptions.php', 'redirect(this.options[this.selectedIndex].value);');
+$cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayoptions.php', 'redirect(this.options[this.selectedIndex].value);');
 $cmbConf->addItems(array(
 	'adm.gui.php' => _('GUI'),
 	'adm.housekeeper.php' => _('Housekeeper'),
@@ -82,7 +82,7 @@ $cmbConf->addItems(array(
 	'adm.valuemapping.php' => _('Value mapping'),
 	'adm.workingtime.php' => _('Working time'),
 	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayingoptions.php' => _('Trigger displaying options'),
+	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 	'adm.other.php' => _('Other')
 ));
 $form->addItem($cmbConf);
@@ -121,7 +121,7 @@ else {
 	$data['ok_ack_style'] = $config['ok_ack_style'];
 }
 
-$triggerDisplayingForm = new CView('administration.general.triggerDisplayingOptions.edit', $data);
+$triggerDisplayingForm = new CView('administration.general.triggerDisplayOptions.edit', $data);
 $cnf_wdgt->addItem($triggerDisplayingForm->render());
 $cnf_wdgt->show();
 
