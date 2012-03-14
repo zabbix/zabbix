@@ -2097,26 +2097,26 @@ class CHost extends CZBXAPI {
 
 		$this->checkInput($hosts, __FUNCTION__);
 
-// delete items -> triggers -> graphs
-		$delItems = API::Item()->get(array(
+		// delete the discovery rules first
+		$delRules = API::DiscoveryRule()->get(array(
 			'hostids' => $hostids,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-		if (!empty($delItems)) {
-			$delItemids = zbx_objectValues($delItems, 'itemid');
-			API::Item()->delete($delItemids, true);
+		if ($delRules) {
+			API::DiscoveryRule()->delete(array_keys($delRules), true);
 		}
 
-		$delRules = API::DiscoveryRule()->get(array(
-			'hostids' => $hostids,
-			'nopermissions' => 1,
-			'preservekeys' => 1
+		// delete the items
+		$delItems = API::Item()->get(array(
+			'templateids' => $hostids,
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
+			'output' => API_OUTPUT_SHORTEN,
+			'nopermissions' => true,
+			'preservekeys' => true
 		));
-		if (!empty($delRules)) {
-			$delRulesids = zbx_objectValues($delRules, 'itemid');
-			API::DiscoveryRule()->delete($delRulesids, true);
+		if ($delItems) {
+			API::Item()->delete(array_keys($delItems), true);
 		}
 
 // delete web tests
