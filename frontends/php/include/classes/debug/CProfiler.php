@@ -121,7 +121,7 @@ class CProfiler {
 	public function show() {
 		global $DB;
 
-		$debug_str = '';
+		$debug_str = '<a name="debug"></a>';
 		$debug_str .= '******************** '._('Script profiler').' ********************'.'<br>';
 
 		$totalScriptTime = $this->stopTime - $this->startTime;
