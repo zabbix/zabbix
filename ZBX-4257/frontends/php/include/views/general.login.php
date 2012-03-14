@@ -22,9 +22,6 @@
 define('ZBX_PAGE_NO_HEADER', 1);
 define('ZBX_PAGE_NO_FOOTER', 1);
 
-$sessionid = get_cookie('zbx_sessionid');
-CWebUser::checkAuthentication($sessionid);
-
 $request = CHtml::encode(get_request('request', ''));
 $message = CHtml::encode(get_request('message', '')) ;
 

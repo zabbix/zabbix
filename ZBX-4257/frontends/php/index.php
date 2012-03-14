@@ -19,9 +19,10 @@
 **/
 ?>
 <?php
-define('ZBX_PAGE_NO_AUTHORIZATION', 1);
-define('ZBX_NOT_ALLOW_ALL_NODES', 1);
-define('ZBX_HIDE_NODE_SELECTION', 1);
+define('ZBX_PAGE_NO_AUTHORIZATION', true);
+define('ZBX_NOT_ALLOW_ALL_NODES', true);
+define('ZBX_HIDE_NODE_SELECTION', true);
+define('ZBX_PAGE_NO_MENU', true);
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -68,13 +69,14 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 	}
 }
 
+// login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 	$name = get_request('name', '');
 	$passwd = get_request('password', '');
 	$login = CWebUser::login($name, $passwd);
 
 	if ($login) {
-		// save remember login preferance
+		// save remember login preference
 		$user = array('autologin' => get_request('autologin', 0));
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
 			$result = API::User()->updateProfile($user);
@@ -90,12 +92,12 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		exit();
 	}
 }
-
-if ($sessionid) {
+// login via session data
+elseif ($sessionid) {
 	CWebUser::checkAuthentication($sessionid);
 }
 
-if (CWebUser::$data['alias'] == ZBX_GUEST_USER) {
+if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	switch ($config['authentication_type']) {
 		case ZBX_AUTH_HTTP:
 			break;

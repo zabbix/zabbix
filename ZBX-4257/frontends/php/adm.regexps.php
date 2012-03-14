@@ -189,7 +189,7 @@ $cmbConf->addItems(array(
 	'adm.valuemapping.php' => _('Value mapping'),
 	'adm.workingtime.php' => _('Working time'),
 	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayingoptions.php' => _('Trigger displaying options'),
+	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 	'adm.other.php' => _('Other')
 ));
 $form->addItem($cmbConf);

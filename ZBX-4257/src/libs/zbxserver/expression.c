@@ -171,13 +171,13 @@ static int	evaluate_simple(double *result, char *exp, char *error, int maxerrlen
 	compress_signs(exp);
 
 	/* we should process negative prefix, i.e. N123 == -123 */
-	if ('N' == *exp && SUCCEED == is_double_prefix(exp + 1))
+	if ('N' == *exp && SUCCEED == is_double_suffix(exp + 1))
 	{
 		/* str2double supports suffixes */
 		*result = -str2double(exp + 1);
 		return SUCCEED;
 	}
-	else if ('N' != *exp && SUCCEED == is_double_prefix(exp))
+	else if ('N' != *exp && SUCCEED == is_double_suffix(exp))
 	{
 		/* str2double supports suffixes */
 		*result = str2double(exp);
@@ -2372,7 +2372,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
 					DBget_macro_value_by_triggerid(event->objectid, m, &replace_to);
-					if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
+					if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) && NULL != error)
 						zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 				}
 			}
@@ -2428,7 +2428,7 @@ int	substitute_simple_macros(DB_EVENT *event, zbx_uint64_t *hostid, DC_HOST *dc_
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
-				if (NULL != replace_to && FAIL == (res = is_double_prefix(replace_to)) && NULL != error)
+				if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) && NULL != error)
 					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 			}
 		}
