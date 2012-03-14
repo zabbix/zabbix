@@ -730,7 +730,7 @@ class CDiscoveryRule extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$selectFields = array('flags');
+		$selectFields = array();
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;
@@ -963,11 +963,14 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
+		parent::checkInput($items, $update);
+
+		// add the values that cannot be changed, but are required for further processing
+		// they must be added after calling parent::checkInput() because it will unset any existing system field
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 		}
-		parent::checkInput($items, $update);
 	}
 
 	protected function checkSpecificFields(array $item) {
@@ -1152,8 +1155,7 @@ class CDiscoveryRule extends CItemGeneral {
 			return array();
 		}
 
-		$srcItemids = array();
-		$itemKeys = array();
+		$srcItemIds = array();
 		foreach ($srcGraphs as $key => $graph) {
 			// skip graphs with items from multiple hosts
 			if (count($graph['hosts']) > 1) {
@@ -1167,14 +1169,21 @@ class CDiscoveryRule extends CItemGeneral {
 				continue;
 			}
 
+			// save all used item ids to map them to the new items
 			foreach ($graph['gitems'] as $item) {
-				$srcItemids[] = $item['itemid'];
+				$srcItemIds[] = $item['itemid'];
+			}
+			if ($graph['ymin_itemid']) {
+				$srcItemIds[] = $graph['ymin_itemid'];
+			}
+			if ($graph['ymax_itemid']) {
+				$srcItemIds[] = $graph['ymax_itemid'];
 			}
 		}
 
 		// fetch source items
 		$items = API::Item()->get(array(
-			'itemids' => $srcItemids,
+			'itemids' => $srcItemIds,
 			'output' => API_OUTPUT_EXTEND
 		));
 		$srcItems = array();
@@ -1202,12 +1211,22 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($dstGraphs as &$graph) {
 			unset($graph['graphid']);
 
-			foreach ($graph['gitems'] as $key => &$gitem) {
+			foreach ($graph['gitems'] as &$gitem) {
 				// replace the old item with the new one with the same key
 				$item = $srcItems[$gitem['itemid']];
 				$gitem['itemid'] = $dstItems[$item['key_']]['itemid'];
 
 				unset($gitem['gitemid'], $gitem['graphid']);
+			}
+
+			// replace the old axis items with the new one with the same key
+			if ($graph['ymin_itemid']) {
+				$yMinSrcItem = $srcItems[$graph['ymin_itemid']];
+				$graph['ymin_itemid'] = $dstItems[$yMinSrcItem['key_']]['itemid'];
+			}
+			if ($graph['ymax_itemid']) {
+				$yMaxSrcItem = $srcItems[$graph['ymax_itemid']];
+				$graph['ymax_itemid'] = $dstItems[$yMaxSrcItem['key_']]['itemid'];
 			}
 		}
 

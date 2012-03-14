@@ -2243,10 +2243,10 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                     ^-------------------------------------------^
- */	if (SUCCEED != zbx_json_brackets_by_name(&jp, discovery_key, &jp_data))
+ */	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		error = zbx_dsprintf(error, "Cannot find the \"%s\" key in received JSON object",
-				discovery_key);
+		error = zbx_dsprintf(error, "Cannot find the \"%s\" array in the received JSON object",
+				ZBX_PROTO_TAG_DATA);
 		goto error;
 	}
 

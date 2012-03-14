@@ -205,7 +205,7 @@ int	NET_IF_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addarray(&j, cmd);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	if (NULL != (f = fopen("/proc/net/dev", "r")))
 	{
