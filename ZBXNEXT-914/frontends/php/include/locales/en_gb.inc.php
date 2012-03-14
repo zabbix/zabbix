@@ -258,7 +258,6 @@
 	'S_CONFIGURATION_OF_GRAPHS_PROTOTYPES_BIG' => _('CONFIGURATION OF GRAPH PROTOTYPES'),
 
 //	events.php
-	'S_EVENTS_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	_('d M Y H:i:s'),
 	'S_EVENTS_ACTION_TIME_FORMAT'=>		_('d M Y H:i:s'),
 
@@ -452,7 +451,6 @@
 	'S_ADD'=>						_('Add'),
 
 //	tr_status.php
-	'S_STATUS_OF_TRIGGERS_BIG'=>		_('STATUS OF TRIGGERS'),
 	'S_SHOW_DETAILS'=>			_('Show details'),
 	'S_FILTER_BY_NAME'=>				_('Filter by name'),
 	'S_ACK'=>				_('Ack'),

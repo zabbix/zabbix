@@ -230,7 +230,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
 	$events_wdgt->addPageHeader(
-		array(_('HISTORY OF EVENTS ON '), zbx_date2str(S_EVENTS_DATE_FORMAT, time())),
+		_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(_('d M Y H:i:s'), time()).']',
 		array($frmForm, SPACE, get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
 	);
 
