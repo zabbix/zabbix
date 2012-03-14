@@ -1,4 +1,14 @@
 --------------------------------------------------------------------------------
+Changes for 2.0.0rc2
+
+Bug fixes:
+A.F....... [ZBX-4257] fixed updating templated items (Pavels)
+A.F....... [ZBX-4710] fixed replacing graph Y axis item prototypes when cloning a discovery rule (Pavels)
+A.F....... [ZBX-4710] fixed deleting hosts when a graph ptototype uses a normal item for it's Y scale (Pavels)
+..F....... [ZBX-4365] added plural translation support for the failed login attempt message (Pavels)
+..F....... [ZBX-4365] fixed user being redirected to the dashboard after trying to login with an incorrect password (Pavels)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.0rc1
 
 New features:
@@ -20,11 +30,6 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
-A.F....... [ZBX-4257] fixed updating templated items (Pavels)
-A.F....... [ZBX-4710] fixed replacing graph Y axis item prototypes when cloning a discovery rule (Pavels)
-A.F....... [ZBX-4710] fixed deleting hosts when a graph ptototype uses a normal item for it's Y scale (Pavels)
-..F....... [ZBX-4365] added plural translation support for the failed login attempt message (Pavels)
-..F....... [ZBX-4365] fixed user being redirected to the dashboard after trying to login with an incorrect password (Pavels)
 ..F....... [ZBX-3528] fixed letter numbering of long lists (Vedmak)
 ...G.J.PS. [ZBX-4725] fixed processing lld rules with macros in a key (Sasha)
 ..F....... [ZBX-4730] removed incorrect JS function call in the event history screen (Pavels)
