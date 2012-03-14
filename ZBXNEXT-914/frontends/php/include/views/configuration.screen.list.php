@@ -27,7 +27,7 @@ $createForm->cleanItems();
 $createForm->addItem(new CSubmit('form', _('Create screen')));
 if (!empty($this->data['templateid'])) {
 	$createForm->addVar('templateid', $this->data['templateid']);
-	$screenWidget->addItem(get_header_host_table($this->data['templateid'], 'screens'));
+	$screenWidget->addItem(get_header_host_table($this->data['templateid']));
 }
 else {
 	$createForm->addItem(new CSubmit('form', _('Import screen')));

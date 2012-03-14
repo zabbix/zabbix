@@ -31,7 +31,7 @@ $discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULES'), $createFo
 // header
 $discoveryWidget->addHeader(_('Discovery rules'));
 $discoveryWidget->addHeaderRowNumber();
-$discoveryWidget->addItem(get_header_host_table($this->data['hostid'], 'discoveries'));
+$discoveryWidget->addItem(get_header_host_table($this->data['hostid']));
 
 // create form
 $discoveryForm = new CForm('get');

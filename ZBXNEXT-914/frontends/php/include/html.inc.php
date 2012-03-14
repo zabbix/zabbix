@@ -283,10 +283,11 @@ function get_icon($name, $params = array()) {
  * Create CDiv with host/template information and references to it's elements
  *
  * @param string $hostid
- * @param string $current elements that reference should not be added to
+ * @param string $discoveryid
+ *
  * @return object
  */
-function get_header_host_table($hostid, $current = null, $discoveryid = null) {
+function get_header_host_table($hostid, $discoveryid = null) {
 	$elements = array(
 		'items' => 'items',
 		'triggers' => 'triggers',

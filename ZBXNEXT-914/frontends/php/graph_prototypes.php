@@ -336,10 +336,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // Header Host
 		if (!empty($_REQUEST['parent_discoveryid'])) {
-			$graphs_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'graphs', $_REQUEST['parent_discoveryid']));
+			$graphs_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], $_REQUEST['parent_discoveryid']));
 		}
 		else {
-			$graphs_wdgt->addItem(get_header_host_table($_REQUEST['hostid'], 'graphs'));
+			$graphs_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
 		}
 
 /* TABLE */

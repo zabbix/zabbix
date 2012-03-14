@@ -52,7 +52,8 @@ else {
 
 if ($this->data['node_type'] == ZBX_NODE_CHILD) {
 	if (isset($_REQUEST['nodeid'])) {
-		$nodeFormList->addRow(_('Name'), new CTextBox('master_name', $ZBX_NODES[$ZBX_NODES[$this->data['nodeid']]['masterid']]['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'));
+		$masterNode = $ZBX_NODES[$ZBX_NODES[$this->data['nodeid']]['masterid']];
+		$nodeFormList->addRow(_('Name'), new CTextBox('master_name', $masterNode['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'));
 	}
 	else {
 		$masterComboBox = new CComboBox('masterid', $this->data['masterid']);

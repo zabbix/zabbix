@@ -23,7 +23,7 @@ $applicationWidget = new CWidget();
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$applicationWidget->addItem(get_header_host_table($this->data['hostid'], 'applications'));
+	$applicationWidget->addItem(get_header_host_table($this->data['hostid']));
 }
 
 // create new application button

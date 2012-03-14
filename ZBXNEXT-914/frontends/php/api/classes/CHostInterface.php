@@ -524,7 +524,7 @@ Copt::memoryPick();
 			}
 
 			if (($interface['useip'] == INTERFACE_USE_IP) && zbx_empty($interface['ip'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS " %1$s " cannot have empty IP address.', $interface['dns']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS "%1$s" cannot have empty IP address.', $interface['dns']));
 			}
 
 			if (($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])) {
