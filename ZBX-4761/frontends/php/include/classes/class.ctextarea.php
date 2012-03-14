@@ -20,6 +20,14 @@
 ?>
 <?php
 class CTextArea extends CTag{
+
+	/**
+	 * The "&" symbol in the textarea should be encoded.
+	 *
+	 * @var int
+	 */
+	protected $encStrategy = self::ENC_ALL;
+
 /* public */
 	public function __construct($name='textarea',$value='',$cols=77,$rows=7,$readonly='no'){
 		parent::__construct('textarea','yes');

@@ -19,20 +19,32 @@
 **/
 ?>
 <?php
-class CTag extends CObject{
-/* private *//*
-	var $tagname;
-	var $attributes = array();
-	var $paired;*/
-/* protected *//*
-	var $items = array();
+class CTag extends CObject {
 
-	var $tag_body_start;
-	var $tag_body_end;
-	var $tag_start;
-	var $tag_end;*/
+	/**
+	 * Encodes the '<', '>', '"' and '&' symbols.
+	 */
+	const ENC_ALL = 1;
 
-/* public */
+	/**
+	 * Encodes all symbols in ENC_ALL except for '&'.
+	 */
+	const ENC_NOAMP = 2;
+
+	/**
+	 * The HTML encoding strategy to use for the contents of the tag.
+	 *
+	 * @var int
+	 */
+	protected $encStrategy = self::ENC_NOAMP;
+
+	/**
+	 * The HTML encoding strategy for the "value" attribute.
+	 *
+	 * @var int
+	 */
+	protected $valueEncStrategy = self::ENC_ALL;
+
 	public function __construct($tagname=NULL, $paired='no', $body=NULL, $class=null){
 		parent::__construct();
 
@@ -65,8 +77,11 @@ class CTag extends CObject{
 	// it adds spaces in unwanted places
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
+
 		foreach ($this->attributes as $key => $value) {
-			$res .= ' '.$key.'="'.$this->sanitize($value).'"';
+			// a special encoding strategy should be used for the "value" attribute
+			$value = $this->encode($value, ($key == 'value') ? $this->valueEncStrategy : self::ENC_NOAMP);
+			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= ($this->paired === 'yes') ? '>' : ' />';
 
@@ -96,6 +111,15 @@ class CTag extends CObject{
 		if($destroy) $this->destroy();
 
 	return $res;
+	}
+
+	public function addItem($value) {
+		// the string contents of an HTML tag should be properly encoded
+		if (is_string($value)) {
+			$value = $this->encode($value, $this->getEncStrategy());
+		}
+
+		parent::addItem($value);
 	}
 
 	public function setName($value){
@@ -188,6 +212,32 @@ class CTag extends CObject{
 	public function error($value){
 		error('class('.get_class($this).') - '.$value);
 		return 1;
+	}
+
+	/**
+	 * Sanitizes a string according to the given strategy before outputting it to the browser.
+	 *
+	 * @param string $value
+	 * @param int $strategy
+	 *
+	 * @return string
+	 */
+	protected function encode($value, $strategy = self::ENC_NOAMP) {
+		return ($strategy == self::ENC_NOAMP) ? zbx_htmlstr($value) : htmlspecialchars($value);
+	}
+
+	/**
+	 * @param int $encStrategy
+	 */
+	public function setEncStrategy($encStrategy) {
+		$this->encStrategy = $encStrategy;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getEncStrategy() {
+		return $this->encStrategy;
 	}
 }
 ?>
