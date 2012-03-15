@@ -335,7 +335,7 @@ function get_user_history() {
 		' WHERE uh.userid='.CWebUser::$data['userid'])
 	);
 
-	if ($history && !zbx_empty($history['url4'])) {
+	if (!empty($history) && !zbx_empty($history['url4'])) {
 		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	}
 	else {
@@ -344,7 +344,14 @@ function get_user_history() {
 
 	for ($i = 1; $i < 6; $i++) {
 		if (defined($history['title'.$i])) {
-			$url = new CLink(constant($history['title'.$i]), $history['url'.$i], 'history');
+			$title = constant($history['title'.$i]);
+		}
+		else {
+			$title = $history['title'.$i];
+		}
+
+		if (!empty($title)) {
+			$url = new CLink($title, $history['url'.$i], 'history');
 			array_push($result, array(SPACE, $url, SPACE));
 			array_push($result, $delimiter);
 		}

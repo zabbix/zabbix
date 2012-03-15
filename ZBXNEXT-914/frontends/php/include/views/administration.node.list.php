@@ -41,11 +41,12 @@ if (ZBX_DISTRIBUTED) {
 	$nodeWidget->addHeader(_('Nodes'));
 
 	// create table
-	$nodeTable = new CTableInfo(_('No node defined.'));
+	$nodeTable = new CTableInfo(_('No nodes defined.'));
 	$nodeTable->setHeader(array(
 		make_sorting_header(_('ID'), 'n.nodeid'),
 		make_sorting_header(_('Name'), 'n.name'),
-		make_sorting_header(_('IP').':'._('Port'), 'n.ip')
+		_('Type'),
+		make_sorting_header(_('IP').SPACE.':'.SPACE._('Port'), 'n.ip')
 	));
 
 	while ($node = DBfetch($this->data['nodes'])) {
@@ -55,7 +56,8 @@ if (ZBX_DISTRIBUTED) {
 				get_node_path($node['masterid']),
 				new CLink($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name'], '?&form=update&nodeid='.$node['nodeid'])
 			),
-			new CSpan($node['ip'].':'.$node['port'], $node['nodetype'] ? 'bold' : null)
+			node_type2str($node['nodetype']),
+			new CSpan($node['ip'].SPACE.':'.SPACE.$node['port'], $node['nodetype'] ? 'bold' : null)
 		));
 	}
 	$nodeForm->addItem($nodeTable);

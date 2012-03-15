@@ -514,7 +514,7 @@ function makeFormFooter($main, $others = null) {
 	if (!is_array($main)) {
 		$main = array($main);
 	}
-	if (!is_array($others)) {
+	if (!empty($others) && !is_array($others)) {
 		$others = array($others);
 	}
 

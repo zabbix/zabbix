@@ -38,35 +38,27 @@ $nodeFormList = new CFormList('nodeFormList');
 $nodeFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 $nodeFormList->addRow(_('ID'), new CNumericBox('new_nodeid', $this->data['new_nodeid'], 10, isset($_REQUEST['nodeid']) ? 'yes' : 'no'));
 
-if (isset($_REQUEST['nodeid'])) {
-	$nodeFormList->addRow(_('Name'), new CTextBox('node_type_name', node_type2str($this->data['node_type']), ZBX_TEXTBOX_STANDARD_SIZE, 'yes'));
-}
-else {
-	$nodeTypeComboBox = new CComboBox('node_type', $this->data['node_type'], 'submit()');
-	$nodeTypeComboBox->addItem(ZBX_NODE_CHILD, _('Child'));
-	if (!$this->data['has_master']) {
-		$nodeTypeComboBox->addItem(ZBX_NODE_MASTER, _('Master'));
-	}
-	$nodeFormList->addRow(_('Type'), $nodeTypeComboBox);
-}
+// append nodetype to form list, type always will be child!
+$nodeForm->addVar('nodetype', $this->data['nodetype']);
+$nodeTypeComboBox = new CComboBox('nodetype', $this->data['nodetype'], 'submit()');
+$nodeTypeComboBox->addItem(ZBX_NODE_CHILD, _('Child'));
+$nodeTypeComboBox->addItem(ZBX_NODE_MASTER, _('Master'));
+$nodeTypeComboBox->setEnabled('disabled');
+$nodeFormList->addRow(_('Type'), $nodeTypeComboBox);
 
-if ($this->data['node_type'] == ZBX_NODE_CHILD) {
-	if (isset($_REQUEST['nodeid'])) {
-		$masterNode = $ZBX_NODES[$ZBX_NODES[$this->data['nodeid']]['masterid']];
-		$nodeFormList->addRow(_('Name'), new CTextBox('master_name', $masterNode['name'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'));
+// append master node to form list
+$masterComboBox = new CComboBox('masterid', $this->data['masterid']);
+foreach ($ZBX_NODES as $node) {
+	if ($node['nodeid'] == $ZBX_LOCMASTERID) {
+		continue;
 	}
-	else {
-		$masterComboBox = new CComboBox('masterid', $this->data['masterid']);
-		foreach ($ZBX_NODES as $node) {
-			if ($node['nodeid'] == $ZBX_LOCMASTERID) {
-				continue;
-			}
-			$masterComboBox->addItem($node['nodeid'], $node['name']);
-		}
-	}
-	$nodeFormList->addRow(_('Master node'), $masterComboBox);
+	$masterComboBox->addItem($node['nodeid'], $node['name']);
 }
-
+if (!empty($this->data['nodeid'])) {
+	$masterComboBox->setEnabled('disabled');
+	$nodeForm->addVar('masterid', $this->data['masterid']);
+}
+$nodeFormList->addRow(_('Master node'), $masterComboBox);
 $nodeFormList->addRow(_('IP'), new CTextBox('ip', $this->data['ip'], ZBX_TEXTBOX_SMALL_SIZE));
 $nodeFormList->addRow(_('Port'), new CNumericBox('port', $this->data['port'], 5));
 
@@ -76,7 +68,7 @@ $nodeTab->addTab('nodeTab', _('Node'), $nodeFormList);
 $nodeForm->addItem($nodeTab);
 
 // append buttons to form
-if (isset($_REQUEST['nodeid']) && $this->data['node_type'] != ZBX_NODE_LOCAL) {
+if (isset($_REQUEST['nodeid']) && $this->data['nodetype'] != ZBX_NODE_LOCAL) {
 	$nodeForm->addItem(makeFormFooter(
 		new CSubmit('save', _('Save')),
 		array(

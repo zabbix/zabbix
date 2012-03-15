@@ -34,7 +34,7 @@ $fields = array(
 	'new_nodeid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			'isset({save})'),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})'),
 	'ip' =>				array(T_ZBX_IP,	 O_OPT, null,	null,			'isset({save})'),
-	'node_type' =>		array(T_ZBX_INT, O_OPT, null,	IN(ZBX_NODE_CHILD.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),
+	'nodetype' =>		array(T_ZBX_INT, O_OPT, null,	IN(ZBX_NODE_CHILD.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),
 		'isset({save})&&!isset({nodeid})'),
 	'masterid' => 		array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
 	'port' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 65535), 'isset({save})'),
@@ -51,7 +51,7 @@ validate_sort_and_sortorder();
 /*
  * Permissions
  */
-$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
 if (count($available_nodes) == 0) {
 	access_deny();
 }
@@ -78,7 +78,7 @@ if (isset($_REQUEST['save'])) {
 		$_REQUEST['masterid'] = isset($_REQUEST['masterid']) ? $_REQUEST['masterid'] : null;
 
 		DBstart();
-		$nodeid = add_node($_REQUEST['new_nodeid'], $_REQUEST['name'], $_REQUEST['ip'], $_REQUEST['port'], $_REQUEST['node_type'], $_REQUEST['masterid']);
+		$nodeid = add_node($_REQUEST['new_nodeid'], $_REQUEST['name'], $_REQUEST['ip'], $_REQUEST['port'], $_REQUEST['nodetype'], $_REQUEST['masterid']);
 		$result = DBend($nodeid);
 
 		show_messages($result, _('Node added'), _('Cannot add node'));
@@ -113,7 +113,7 @@ if (isset($_REQUEST['form'])) {
 	$data = array(
 		'form' => get_request('form', 1),
 		'form_refresh' => get_request('form_refresh', 0) + 1,
-		'nodeid' => get_request('nodeid', 0)
+		'nodeid' => get_request('nodeid')
 	);
 
 	if (isset($_REQUEST['nodeid']) && !isset($_REQUEST['form_refresh'])) {
@@ -124,19 +124,16 @@ if (isset($_REQUEST['form'])) {
 		$data['ip'] = $node['ip'];
 		$data['port'] = $node['port'];
 		$data['masterid'] = $node['masterid'];
-		$data['node_type'] = detect_node_type($node['nodeid'], $node['masterid']);
+		$data['nodetype'] = detect_node_type($node['nodeid'], $node['masterid']);
 	}
 	else {
-		$data['new_nodeid'] = get_request('new_nodeid', 0);
+		$data['new_nodeid'] = get_request('new_nodeid');
 		$data['name'] = get_request('name', '');
 		$data['ip'] = get_request('ip', '127.0.0.1');
 		$data['port'] = get_request('port', 10051);
-		$data['node_type'] = get_request('node_type', ZBX_NODE_CHILD);
+		$data['nodetype'] = get_request('nodetype', ZBX_NODE_CHILD);
 		$data['masterid'] = get_request('masterid', get_current_nodeid(false));
 	}
-
-	$master_node = DBfetch(DBselect('SELECT n.name FROM nodes n WHERE n.masterid IS NULL AND n.nodetype='.ZBX_NODE_LOCAL));
-	$data['has_master'] = !empty($master_node);
 
 	// render view
 	$nodeView = new CView('administration.node.edit', $data);
@@ -147,7 +144,7 @@ else {
 	$data = array();
 
 	if (ZBX_DISTRIBUTED) {
-		$data['nodes'] = DBselect('SELECT n.* FROM nodes n '.order_by('n.nodeid,n.name,n.ip','n.masterid'));
+		$data['nodes'] = DBselect('SELECT n.* FROM nodes n '.order_by('n.nodeid,n.name,n.ip', 'n.masterid'));
 	}
 
 	// render view
