@@ -84,7 +84,7 @@ class testPageScreens extends CWebTest {
 
 		$this->assertTitle('CONFIGURATION OF SCREENS');
 		$this->ok($name);
-		$this->ok('Screens');
+		$this->ok('Screen');
 		$this->ok('Name');
 		$this->ok('Columns');
 		$this->ok('Rows');
