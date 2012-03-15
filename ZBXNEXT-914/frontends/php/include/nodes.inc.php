@@ -274,11 +274,16 @@ function add_node($nodeid, $name, $ip, $port, $nodetype, $masterid) {
 		case ZBX_NODE_CHILD:
 			break;
 		case ZBX_NODE_MASTER:
-			$masterid = 0;
+			if (!empty($masterid)) {
+				error(_('Master node "ID" must be empty.'));
+				return false;
+			}
+
 			if ($ZBX_LOCMASTERID) {
 				error(_('Master node already exists.'));
 				return false;
 			}
+			$masterid = 'NULL';
 			break;
 		default:
 			error(_('Incorrect node type.'));
@@ -291,7 +296,7 @@ function add_node($nodeid, $name, $ip, $port, $nodetype, $masterid) {
 	}
 
 	$result = DBexecute('INSERT INTO nodes (nodeid,name,ip,port,nodetype,masterid)'.
-		' VALUES ('.$nodeid.','.zbx_dbstr($name).','.zbx_dbstr($ip).','.$port.','.$nodetype.','.zero2null($masterid).')');
+		' VALUES ('.$nodeid.','.zbx_dbstr($name).','.zbx_dbstr($ip).','.$port.','.$nodetype.','.$masterid.')');
 
 	if ($result && $nodetype == ZBX_NODE_MASTER) {
 		DBexecute('UPDATE nodes SET masterid='.$nodeid.' WHERE nodeid='.$ZBX_LOCALNODEID);
