@@ -77,7 +77,7 @@ table.tableinfo tr.header td.hover_grey { background-color:#BFCBD5; }
 table.tableinfo tr.header td.hover_grey:hover { color: #000000; background-color:#B3BCD7; }
 table.tableinfo tr.vertical_header td { background-color: #CED7DF; }
 table.tableinfo tr.vertical_header td.hover_grey:hover { color: #EEEEEE; background-color:#999999; }
-table.tableinfo tr.footer td { color: #FFFFFF; background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; }
+table.tableinfo tr.footer td { color: #FFFFFF; background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; }
 table.tableinfo tr.odd_row > td { background-color: #E1E7EC; }
 table.tableinfo tr.odd_row:hover > td { background-color: #BBCCFF; }
 table.tableinfo tr.even_row > td { background-color: #F2F7FA; }
