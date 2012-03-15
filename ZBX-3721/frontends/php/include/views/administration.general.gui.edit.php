@@ -20,9 +20,9 @@
 ?>
 <?php
 $comboTheme = new CComboBox('default_theme', $this->data['config']['default_theme']);
-$comboTheme->addItem('css_ob.css', _('Original blue'));
-$comboTheme->addItem('css_bb.css', _('Black & Blue'));
-$comboTheme->addItem('css_od.css', _('Dark orange'));
+$comboTheme->addItem(THEME_ORIGINAL_BLUE, _('Original blue'));
+$comboTheme->addItem(THEME_DARK_BLUE, _('Black & Blue'));
+$comboTheme->addItem(THEME_DARK_ORANGE, _('Dark orange'));
 
 $comboDdFirstEntry = new CComboBox('dropdown_first_entry', $this->data['config']['dropdown_first_entry']);
 $comboDdFirstEntry->addItem(ZBX_DROPDOWN_FIRST_NONE, _('None'));
