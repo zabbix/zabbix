@@ -877,7 +877,7 @@ class CConfigurationExport {
 				unset($sysmap['urls'][$unum]['sysmapurlid']);
 			}
 
-			$sysmap['backgroundid'] = ($sysmap['backgroundid'] > 0) ? $images[$sysmap['backgroundid']] : '';
+			$sysmap['backgroundid'] = ($sysmap['backgroundid'] > 0) ? $images[$sysmap['backgroundid']] : array();
 
 			foreach ($sysmap['selements'] as &$selement) {
 				switch ($selement['elementtype']) {
