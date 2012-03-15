@@ -45,12 +45,6 @@ class CComboItem extends CTag{
 		$this->addItem(nbsp($value));
 	}
 
-	public function addItem($value) {
-		$value = $this->encode($value, $this->getEncStrategy());
-
-		parent::addItem($value);
-	}
-
 	public function setSelected($value='yes'){
 		if((is_string($value) && ($value == 'yes' || $value == 'selected' || $value=='on')) || (is_int($value) && $value<>0)){
 			return $this->attributes['selected'] = 'selected';
