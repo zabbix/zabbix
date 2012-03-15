@@ -18,7 +18,7 @@
 **/
 
 /* Black and Blue Theme by Aly*/
-@import "jquery-ui.css";
+@import "darkblue/jquery-ui.css";
 
 @media print {
 	body{
@@ -49,7 +49,7 @@ div #div_node_tree { background-color:#1D4161; }
 }
 
 .pum_oheader {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 .pum_o_item, .pum_o_submenu {
@@ -99,7 +99,7 @@ table{
 }
 
 table.page_footer{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 	margin-top:20px;
 	border:1px solid #77B7DA;
 }
@@ -116,10 +116,10 @@ table.formtable tr td {
 }
 
 table.formtable tr td.form_row_first{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 table.formtable tr td.form_row_last {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.formtable tr.new td{
@@ -145,12 +145,12 @@ td.form_row_r_simple { /* right cell simple */
 }
 
 table.formlongtable tr td.form_row_first{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 	border-color: #77B7DA;
 }
 
 table.formlongtable tr td.form_row_last {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 	border-color: #77B7DA;
 }
 
@@ -165,7 +165,7 @@ table.formlongtable tr td.form_row_r { /* right cell */
 }
 
 table.tabletree tr.footer td {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.itemfilter{
@@ -192,23 +192,23 @@ table.tableinfo{
 	background-color: #001C31;
 }
 table.tableinfo caption {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.tableinfo tr td {
 }
 
 table.tableinfo tr.header td {
-	background: #3C759B url('../../../images/gradients/header_footer_blue.png') repeat-x top left;
+	background: #3C759B url('../images/gradients/header_footer_blue.png') repeat-x top left;
 }
 
 table.tableinfo tr.header td.hover_grey {
-	background: #3C759B url('../../../images/gradients/header_link_blue.png') repeat-x top left;
+	background: #3C759B url('../images/gradients/header_link_blue.png') repeat-x top left;
 }
 
 table.tableinfo tr.header td.hover_grey:hover {
 	color: #B0D5EC;
-	background: #245078 url('../../../images/gradients/header_footer_blue.png') repeat-x top left;
+	background: #245078 url('../images/gradients/header_footer_blue.png') repeat-x top left;
 }
 
 table.tableinfo tr.vertical_header td {
@@ -244,7 +244,7 @@ table.tableinfo tr.blue 					{	background-color: #BBBBFF; border: 1px #BBBBFF so
 table.tableinfo tr.blue:hover 				{	background-color: #AAAAEE; border: 1px #AAAAEE solid; }
 
 table.tableinfo tr.footer td{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 /**************************************************/
 /**************************************************/
@@ -265,12 +265,12 @@ table.tablestripped tr.form_even_row td{
 }
 
 table.tablestripped tr.footer td {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 
 table.header{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 	border: 1px solid #77B7DA;
 }
 
@@ -284,15 +284,15 @@ table.header tr td.header_r{
 }
 
 table.flicker{
-	background: #5989AA url('../../../images/gradients/menu_not_active_blue.png') repeat-x bottom left;
+	background: #5989AA url('../images/gradients/menu_not_active_blue.png') repeat-x bottom left;
 }
 
 table.ack_msgs tr.title {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.menu tr{
-	background: #5889AA url('../../../images/gradients/menu_not_active_blue.png') repeat-x top left;
+	background: #5889AA url('../images/gradients/menu_not_active_blue.png') repeat-x top left;
 }
 
 table.menu tr td{
@@ -302,7 +302,7 @@ table.menu tr td{
 table.menu tr td.active{
 	color: #FFFFFF;
 	border-color: #022744;
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.sub_menu {
@@ -310,7 +310,7 @@ table.sub_menu {
 }
 
 table.sub_menu tr{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.sub_menu tr td span.active a.highlight{
@@ -318,11 +318,11 @@ table.sub_menu tr td span.active a.highlight{
 }
 
 table.triggers_info tr td.header {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.hosts_info tr td.header {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.server_info{
@@ -330,11 +330,11 @@ table.server_info{
 }
 
 table.server_info tr td.header {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.server_info tr.footer td {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
 table.history td.caption{
@@ -490,21 +490,21 @@ div.messagecontainer .message .messagebox{
 }
 
 div.formElement_header{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 div.formElement_body{
 	border: 1px solid #245078;
 }
-div.formElement_footer{ background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x; }
-div.thin_header{ background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x; }
-div.zabbix_logo{ background-image:url('../../../images/general/zabbix_bb.png'); }
-.iconzbxavailable{ background-image: url('../../../images/general/zabbix_available_bb.png'); }
-.iconsnmpavailable{ background-image: url('../../../images/general/snmp_available_bb.png'); }
-.iconjmxavailable{ background-image: url('../../../images/general/jmx_available_bb.png'); }
-.iconipmiavailable{ background-image: url('../../../images/general/ipmi_available_bb.png'); }
-.sla_green{ background-image: url('../../../images/gradients/sla_blue15.png'); }
-.icon_sortup{ background-image: url('../../../images/general/sort_up_blue.gif'); }
-.icon_sortdown{ background-image: url('../../../images/general/sort_down_blue.gif'); }
+div.formElement_footer{ background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x; }
+div.thin_header{ background: #3C759B url(darkblue/images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x; }
+div.zabbix_logo{ background-image:url('../images/general/zabbix_bb.png'); }
+.iconzbxavailable{ background-image: url('../images/general/zabbix_available_bb.png'); }
+.iconsnmpavailable{ background-image: url('../images/general/snmp_available_bb.png'); }
+.iconjmxavailable{ background-image: url('../images/general/jmx_available_bb.png'); }
+.iconipmiavailable{ background-image: url('../images/general/ipmi_available_bb.png'); }
+.sla_green{ background-image: url('../images/gradients/sla_blue15.png'); }
+.icon_sortup{ background-image: url('../images/general/sort_up_blue.gif'); }
+.icon_sortdown{ background-image: url('../images/general/sort_down_blue.gif'); }
 
 .menu_icon:hover{ background-color: #77B7DA; }
 div.iconmenu_b{ background-color: transparent; }
@@ -583,7 +583,7 @@ div.suggest{ border: 1px #77B7DA solid; }
 }
 
 .column .widget .header{ border: 1px solid #77B7DA;}
-.column .widget .footer{ border: 0; background: #245078 url('../../../images/gradients/header_footer_blue.png') repeat-x top left;}
+.column .widget .footer{ border: 0; background: #245078 url('../images/gradients/header_footer_blue.png') repeat-x top left;}
 
 /*////////////////	INSTALLATION	////////////////////*/
 table.setup_wizard{
