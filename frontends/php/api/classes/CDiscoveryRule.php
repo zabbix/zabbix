@@ -963,14 +963,13 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
-		parent::checkInput($items, $update);
-
 		// add the values that cannot be changed, but are required for further processing
-		// they must be added after calling parent::checkInput() because it will unset any existing system field
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 		}
+
+		parent::checkInput($items, $update);
 	}
 
 	protected function checkSpecificFields(array $item) {
