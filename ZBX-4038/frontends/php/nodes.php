@@ -34,12 +34,12 @@
 // media form
 		'nodeid'=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 		'new_nodeid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,		'isset({save})'),
-		'name'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _("Name")),
+		'name'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Name')),
 		'ip'=>			array(T_ZBX_IP,	 O_OPT,	null,	null,		'isset({save})'),
 		'node_type'=>		array(T_ZBX_INT, O_OPT,	null,
 			IN(ZBX_NODE_CHILD.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),	'isset({save})&&!isset({nodeid})'),
 		'masterid' =>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
-		'port'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1, ZBX_MER), 'isset({save})', _("Port"),
+		'port'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1, ZBX_MER), 'isset({save})', _('Port'),
 			_s('must be between %1$s and %2$s', 1, ZBX_MER)),
 /* actions */
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),

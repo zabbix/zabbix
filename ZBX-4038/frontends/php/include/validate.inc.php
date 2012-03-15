@@ -540,7 +540,7 @@ function check_field(&$fields, &$field, $checks) {
 			}
 			else {
 				if ($validation == NOT_EMPTY && is_null($caption2)) {
-					$caption2 = _("cannot be empty");
+					$caption2 = _('cannot be empty');
 				}
 				if (!is_null($caption2)) {
 					$caption2 = ": ".$caption2;

@@ -85,7 +85,7 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 //ajax
 		'favobj'=>	array(T_ZBX_STR, O_OPT, P_ACT,	NULL, NULL),
 		'favref'=>	array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favobj})'),
-		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favobj}) && ("filter"=={favobj})'),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY, 'isset({favobj})&&("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
