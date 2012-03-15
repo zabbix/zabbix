@@ -1135,7 +1135,7 @@ class CConfigurationImport {
 			}
 
 
-			if (isset($map['background'])) {
+			if (!empty($map['background'])) {
 				$image = getImageByIdent($map['background']);
 
 				if (!$image) {
