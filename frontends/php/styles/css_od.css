@@ -18,14 +18,14 @@
 **/
 
 /* Dark Orange Theme by Aly */
-@import "jquery-ui.css";
+@import "darkorange/jquery-ui.css";
 @media print { body{ background-color:#A5A5A5; } }
 @media screen { body{ background-color:#1A1A1A; color: #FF5500; } }
 
 .delimiter { color:#AAF; }
 .textcolorstyles { color: #FF5500; }
 .textblackwhite{ color: #EAEAEA; }
-.pum_oheader { background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left; }
+.pum_oheader { background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
 .right_header { border-color: #222222; }
 .unknown { color: #999999; }
 .normal	{ background-color: #AADDDD; }
@@ -66,7 +66,7 @@ table{
 }
 
 table.page_footer{
-	background: #1A1A1A url('../../../images/gradients/table_head_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head_bb.gif') repeat-x top left;
 	border-color: #1A1A1A;
 	border-top: 17px solid;
 }
@@ -83,10 +83,10 @@ table.formtable tr td {
 }
 
 table.formtable tr td.form_row_first{
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 table.formtable tr td.form_row_last {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.formtable tr.new td{
@@ -112,12 +112,12 @@ td.form_row_r_simple { /* right cell simple */
 }
 
 table.formlongtable tr td.form_row_first{
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 	border-color: #222222;
 }
 
 table.formlongtable tr td.form_row_last {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 	border-color: #222222;
 }
 
@@ -132,7 +132,7 @@ table.formlongtable tr td.form_row_r { /* right cell */
 }
 
 table.tabletree tr.footer td {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.itemfilter{
@@ -159,7 +159,7 @@ table.tableinfo{
 	background-color: #1F1F1F;
 }
 table.tableinfo caption {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.tableinfo tr td {
@@ -208,7 +208,7 @@ table.tableinfo tr.blue 					{	background-color: #BBBBFF; border: 1px #BBBBFF so
 table.tableinfo tr.blue:hover 				{	background-color: #AAAAEE; border: 1px #AAAAEE solid; }
 
 table.tableinfo tr.footer td{
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 /**************************************************/
 /**************************************************/
@@ -229,12 +229,12 @@ table.tablestripped tr.form_even_row td{
 }
 
 table.tablestripped tr.footer td {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 
 table.header{
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 	border: 1px solid #5A5A5A;
 }
 
@@ -248,15 +248,15 @@ table.header tr td.header_r{
 }
 
 table.flicker{
-	background: #1A1A1A url('../../../images/gradients/menu_not_active_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/menu_not_active_bb.gif') repeat-x top left;
 }
 
 table.ack_msgs tr.title {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.menu tr{
-	background: #AAAAAA url('../../../images/gradients/menu_not_active_bb.gif') repeat-x top left;
+	background: #AAAAAA url('../images/gradients/menu_not_active_bb.gif') repeat-x top left;
 }
 
 table.menu tr td{
@@ -266,11 +266,11 @@ table.menu tr td{
 table.menu tr td.active{
 	color: #FF5500;
 	border-color: #FF5500;
-	background: #333333 url('../../../images/gradients/table_head_bb.gif') repeat-x top left;
+	background: #333333 url('../images/gradients/table_head_bb.gif') repeat-x top left;
 }
 
 table.sub_menu tr{
-	background: #1A1A1A url('../../../images/gradients/table_head_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head_bb.gif') repeat-x top left;
 }
 
 table.sub_menu tr td span.active a.highlight{
@@ -278,11 +278,11 @@ table.sub_menu tr td span.active a.highlight{
 }
 
 table.triggers_info tr td.header {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.hosts_info tr td.header {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.server_info{
@@ -290,11 +290,11 @@ table.server_info{
 }
 
 table.server_info tr td.header {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.server_info tr.footer td {
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
 table.history td.caption{
@@ -449,21 +449,21 @@ div.messagecontainer .message .messagebox{
 }
 
 div.formElement_header{
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
+	background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 div.formElement_body{
 	border: 1px solid #222222;
 }
-div.formElement_footer{ background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left; }
-div.thin_header{ background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left; }
-div.zabbix_logo{ background-image:url('../../../images/general/zabbix_od.png'); }
-.iconzbxavailable{ background-image: url('../../../images/general/zabbix_available_bb.png'); }
-.iconsnmpavailable{ background-image: url('../../../images/general/snmp_available_bb.png'); }
-.iconjmxavailable{ background-image: url('../../../images/general/jmx_available_bb.png'); }
-.iconipmiavailable{ background-image: url('../../../images/general/ipmi_available_bb.png'); }
-.sla_green{ background-image: url('../../../images/gradients/sla_blue15.png'); }
-.icon_sortup{ background-image: url('../../../images/general/sort_up_od.gif'); }
-.icon_sortdown{ background-image: url('../../../images/general/sort_down_od.gif'); }
+div.formElement_footer{ background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
+div.thin_header{ background: #1A1A1A url('../images/gradients/table_head2_bb.gif') repeat-x top left; }
+div.zabbix_logo{ background-image:url('../images/general/zabbix_od.png'); }
+.iconzbxavailable{ background-image: url('../images/general/zabbix_available_bb.png'); }
+.iconsnmpavailable{ background-image: url('../images/general/snmp_available_bb.png'); }
+.iconjmxavailable{ background-image: url('../images/general/jmx_available_bb.png'); }
+.iconipmiavailable{ background-image: url('../images/general/ipmi_available_bb.png'); }
+.sla_green{ background-image: url('../images/gradients/sla_blue15.png'); }
+.icon_sortup{ background-image: url('../images/general/sort_up_od.gif'); }
+.icon_sortdown{ background-image: url('../images/general/sort_down_od.gif'); }
 
 .menu_icon:hover{ background-color: #FF5500; }
 div.iconmenu_b{ background-color: transparent; }
