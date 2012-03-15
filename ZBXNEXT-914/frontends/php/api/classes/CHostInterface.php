@@ -523,18 +523,28 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP and DNS cannot be empty for host interface.'));
 			}
 
-			if (($interface['useip'] == INTERFACE_USE_IP) && zbx_empty($interface['ip'])) {
+			if ($interface['useip'] == INTERFACE_USE_IP && zbx_empty($interface['ip'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with DNS "%1$s" cannot have empty IP address.', $interface['dns']));
 			}
 
-			if (($interface['useip'] == INTERFACE_USE_DNS) && zbx_empty($interface['dns'])) {
+			if ($interface['useip'] == INTERFACE_USE_DNS && zbx_empty($interface['dns'])) {
 				$dbHosts = API::Host()->get(array(
 					'output' => array('host'),
 					'hostids' => $interface['hostid'],
 					'nopermissions' => true,
 					'preservekeys' => true
 				));
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".', $interface['ip'], $dbHosts[$interface['hostid']]['host']));
+
+				if (!empty($dbHosts) && !empty($dbHosts[$interface['hostid']]['host'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Interface with IP "%1$s" cannot have empty DNS name while having "Use DNS" property on "%2$s".',
+						$interface['ip'],
+						$dbHosts[$interface['hostid']]['host']
+					));
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Interface with IP "%1$s" cannot have empty DNS name.', $interface['ip']));
+				}
 			}
 
 			if (isset($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])) {
@@ -544,8 +554,7 @@ Copt::memoryPick();
 			if (isset($interface['ip']) && !zbx_empty($interface['ip'])) {
 				if (!validate_ip($interface['ip'], $arr)
 						&& !preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/i', $interface['ip'])
-						&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip'])
-				) {
+						&& !preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/i', $interface['ip'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface IP parameter "%s" provided.', $interface['ip']));
 				}
 			}
