@@ -1964,7 +1964,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
-				'default' => 'css_ob.css',
+				'default' => 'originalblue',
 			),
 			'authentication_type' => array(
 				'null' => false,

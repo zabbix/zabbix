@@ -107,10 +107,10 @@ $userFormList->addRow(_('Language'), array($languageComboBox, new CSpan($lang_hi
 
 // append themes to form list
 $themeComboBox = new CComboBox('theme', $this->data['theme']);
-$themeComboBox->addItem(ZBX_DEFAULT_CSS, _('System default'));
-$themeComboBox->addItem('css_ob.css', _('Original blue'));
-$themeComboBox->addItem('css_bb.css', _('Black & Blue'));
-$themeComboBox->addItem('css_od.css', _('Dark orange'));
+$themeComboBox->addItem(THEME_DEFAULT, _('System default'));
+$themeComboBox->addItem(THEME_ORIGINAL_BLUE, _('Original blue'));
+$themeComboBox->addItem(THEME_DARK_BLUE, _('Black & Blue'));
+$themeComboBox->addItem(THEME_DARK_ORANGE, _('Dark orange'));
 $userFormList->addRow(_('Theme'), $themeComboBox);
 
 // append auto-login & auto-logout to form list
