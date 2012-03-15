@@ -563,7 +563,7 @@ Copt::memoryPick();
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Port cannot be empty for host interface.'));
 			}
 			elseif (!validatePortNumberOrMacro($interface['port'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface port "%s" provided', $interface['port']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface port "%s" provided.', $interface['port']));
 			}
 
 			if ($update) {

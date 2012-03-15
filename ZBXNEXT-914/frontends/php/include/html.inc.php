@@ -392,6 +392,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	}
 
 	if (!empty($dbDiscovery)) {
+		$list->addItem(array('&laquo; ', new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$dbHost['hostid'].url_param('groupid'))));
 		$list->addItem(array(
 			bold(_('Discovery').': '),
 			new CLink($dbDiscovery['name'], 'host_discovery.php?form=update&itemid='.$dbDiscovery['itemid'])
