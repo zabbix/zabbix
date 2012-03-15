@@ -669,3 +669,5 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	z-index: 10; position: absolute;
 	background: url('../images/general/transparent.png') repeat scroll center top transparent;
 }
+
+.disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal { color: #222; }
