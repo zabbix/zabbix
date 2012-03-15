@@ -273,7 +273,19 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!isset($this->data['maps'])) {
 			return array();
 		}
-		return $this->data['maps'];
+
+		$mapsData = array();
+		foreach ($this->data['maps'] as $map) {
+			if (isset($map['selements'])) {
+				$map['selements'] = array_values($map['selements']);
+			}
+			if (isset($map['links'])) {
+				$map['links'] = array_values($map['links']);
+			}
+			$mapsData[] = $map;
+		}
+
+		return $mapsData;
 	}
 
 	public function getScreens() {
