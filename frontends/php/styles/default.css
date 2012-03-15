@@ -291,12 +291,12 @@ div #div_node_tree {
 	right: 0;
 	z-index: 200;
 }
-div.thin_header { width: 100%; color: #FFFFFF;  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; border: 0 #000000 solid; text-align: center; }
+div.thin_header { width: 100%; color: #FFFFFF;  background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; border: 0 #000000 solid; text-align: center; }
 
 /* form element */
 div.formElement_header {
 	color: #FFFFFF;
-	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
+	background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
 	border: 0;
 	text-align: left;
 	height: 20px;
@@ -307,7 +307,7 @@ div.formElement_body { border: 1px solid #AAAAAA; background-color: #E5E5E5; }
 .formElementTable tr td { vertical-align: top; padding-left: 5px; padding-right: 5px; height: 24px; }
 div.formElement_footer {
 	color: #FFFFFF;
-	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
+	background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
 	border: 0;
 	text-align: right;
 	height: 20px;
@@ -343,14 +343,14 @@ table.formtable tr.edit { background-color: #F0F0E0; }
 table.formtable tr.form_odd_row { background-color: #D8D8D8; }
 table.formtable tr.form_even_row { background-color: #DFDFDF; }
 table.formtable tr td.form_row_first {
-	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
+	background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
 	color: #FFFFFF;
 	font-size:11px;
 	font-weight: bold;
 }
 table.formtable tr td.form_row_last {
 	color: #FFFFFF;
-	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
+	background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
 	text-align: right;
 }
 table.formtable tr td.form_row_l { width: 30%; }
@@ -420,7 +420,7 @@ table.tableinfo tr td.message { text-align: center; }
 table.tableinfo tr td.pre { white-space: pre; }
 table.tableinfo tr > td.center { vertical-align: middle; text-align: center; }
 table.tableinfo caption {
-	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
+	background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
 	color: #FFFFFF;
 	font-size: 11px;
 	font-weight: bold;
@@ -436,7 +436,7 @@ table.tableinfo caption {
 .header .header_r { padding-right: 5px; }
 
 /* flicker */
-table.flicker { background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;  border: 0; }
+table.flicker { background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;  border: 0; }
 table.flicker tr td.flicker_c { height: 16px; padding-left: 4px; padding-right: 4px; line-height: 12px; }
 table.flicker tr td.flicker_l { text-align: left; height: 16px; padding-left: 4px; line-height: 12px; }
 table.flicker tr td.flicker_r {text-align: right; height: 16px; padding-right: 4px; line-height: 12px; }
@@ -445,7 +445,7 @@ table.itemfilter { border: 1px solid #777777; width: 100%; background-color: whi
 
 /* acknowledgements */
 table.ack_msgs { width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid; }
-table.ack_msgs tr.title { height: 14px; vertical-align: middle; color: #FFFFFF;  background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; }
+table.ack_msgs tr.title { height: 14px; vertical-align: middle; color: #FFFFFF;  background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; }
 table.ack_msgs tr td.user { padding-left: 10px; padding-right: 10px; text-align: left; }
 table.ack_msgs tr td.time { padding-left: 10px; padding-right: 10px; text-align: center; width: 150px; }
 table.ack_msgs tr.msg { height: 25px; background-color: #F8F8F8; }
@@ -468,7 +468,7 @@ table.graph { width: 100%; text-align: center; }
 table.menu { height: 2.8em; }
 table.menu tr { background: #AAAAAA url('../images/gradients/menu_not_active.gif') repeat-x top left; }
 table.menu td { padding: 2px 5px 2px 5px; font-weight: bold; border: 1px solid #aaaaaa; margin: 0; }
-table.menu tr td.active { background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; border-color: #4c8cbc; }
+table.menu tr td.active { background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; border-color: #4c8cbc; }
 
 /* sub menu */
 table.sub_menu {height: 1.8em; }
@@ -488,7 +488,7 @@ table.triggers_info tr td {
 	font-size: 1.1em;
 	height: 18px;
 }
-table.triggers_info tr td.header { background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF; }
+table.triggers_info tr td.header { background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF; }
 table.triggers_info tr td { background-color: #CCCCCC; }
 
 /* hosts information module */
@@ -504,7 +504,7 @@ table.hosts_info tr td {
 	text-align: left;
 	font-size: 1.1em;
 }
-table.hosts_info tr td.header { background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF; }
+table.hosts_info tr td.header { background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF; }
 table.hosts_info tr td.avail { background-color: #99F099; }
 table.hosts_info tr td.notav { background-color: #F09999; }
 table.hosts_info tr td.uncn { background-color: #CCCCCC; }
@@ -512,7 +512,7 @@ table.hosts_info tr td.uncn { background-color: #CCCCCC; }
 /* server information module */
 table.server_info { width: 100%; background-color: #EFEFEF; border: 1px gray dotted; }
 table.server_info tr td { border: 0; padding-left: 5px; padding-right: 5px; text-align: left; font-size: 1.1em; background-color: #EFEFEF; white-space: nowrap;word-spacing: 0; }
-table.server_info tr td.header { background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF; }
+table.server_info tr td.header { background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #FFFFFF; }
 table.server_info tr.status td { white-space: nowrap; word-spacing: 0; }
 
 /* warning */
