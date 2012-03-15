@@ -2,11 +2,12 @@
 Changes for 2.0.0rc2
 
 Bug fixes:
+..F....... [ZBX-4713] Fixed ACK status for triggers visible in Dashboard and Screens (Toms)
 ..F....... [ZBX-4752] fixed creating snmpv1 item prototypes with data type "boolean" (Vedmak)
 ..F....... [ZBX-4702] fixed dynamic item saving in Screens (Eduard)
 A.F....... [ZBX-4257] fixed updating templated items (Pavels)
 A.F....... [ZBX-4710] fixed replacing graph Y axis item prototypes when cloning a discovery rule (Pavels)
-A.F....... [ZBX-4710] fixed deleting hosts when a graph ptototype uses a normal item for it's Y scale (Pavels)
+A.F....... [ZBX-4710] fixed deleting hosts when a graph prototype uses a normal item for it's Y scale (Pavels)
 ..F....... [ZBX-4365] added plural translation support for the failed login attempt message (Pavels)
 ..F....... [ZBX-4365] fixed user being redirected to the dashboard after trying to login with an incorrect password (Pavels)
 
