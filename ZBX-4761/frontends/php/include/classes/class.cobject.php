@@ -22,32 +22,35 @@
 class CObject {
 	public $items;
 
-	public function __construct($items=null){
+	public function __construct($items = null) {
 		$this->items = array();
-		if(isset($items)){
+		if (isset($items)) {
 			$this->addItem($items);
 		}
 	}
 
-	public function toString($destroy=true){
-		$res = implode('',$this->items);
-		if($destroy) $this->destroy();
-	return $res;
+	public function toString($destroy = true) {
+		$res = implode('', $this->items);
+		if ($destroy) {
+			$this->destroy();
+		}
+
+		return $res;
 	}
 
-	public function show($destroy=true){
+	public function show($destroy = true) {
 		echo $this->toString($destroy);
 	}
 
-	public function destroy(){
+	public function destroy() {
 		$this->cleanItems();
 	}
 
-	public function cleanItems(){
+	public function cleanItems() {
 		$this->items = array();
 	}
 
-	public function itemsCount(){
+	public function itemsCount() {
 		return count($this->items);
 	}
 
@@ -69,19 +72,20 @@ class CObject {
 	}
 }
 
-function unpack_object(&$item){
+function unpack_object(&$item) {
 	$res = '';
 
-	if(is_object($item)){
+	if (is_object($item)) {
 		$res = $item->toString(false);
 	}
-	else if(is_array($item)){
-		foreach($item as $id => $dat)
+	else if (is_array($item)) {
+		foreach ($item as $id => $dat) {
 			$res .= unpack_object($item[$id]); // Attention, recursion !!!
+		}
 	}
-	else if(!is_null($item)){
+	else if (!is_null($item)) {
 		$res = strval($item);
 		unset($item);
 	}
-return $res;
+	return $res;
 }
