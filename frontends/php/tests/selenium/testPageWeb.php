@@ -28,7 +28,7 @@ class testPageWeb extends CWebTest {
 		$this->ok('STATUS OF WEB MONITORING');
 		$this->ok('WEB CHECKS');
 		$this->ok(array('Group', 'Host'));
-		$this->ok(array('Host', 'Name', 'Number of steps', 'State', 'Last check', 'Status'));
+		$this->ok(array('Host', 'Name', 'Number of steps', 'Last check', 'Status'));
 	}
 
 // Check that no real host or template names displayed
