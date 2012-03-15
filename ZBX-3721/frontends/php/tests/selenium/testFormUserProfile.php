@@ -131,7 +131,7 @@ class testFormUserProfile extends CWebTest {
 		$this->ok('Copyright');
 
 		$row=DBfetch(DBselect("select theme from users where alias='Admin'"));
-		$this->assertEquals(THEME_ORIGINAL_BLUE, $row['theme']);
+		$this->assertEquals('css_ob.css', $row['theme']);
 
 		$this->assertEquals($this->oldHash, $this->hashUsersExcept('Admin'));
 	}

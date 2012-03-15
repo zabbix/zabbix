@@ -24,11 +24,11 @@ function getUserTheme($user) {
 	if (isset($config['default_theme'])) {
 		$css = $config['default_theme'];
 	}
-	if (isset($user['theme']) && $user['theme'] != THEME_DEFAULT && $user['alias'] != ZBX_GUEST_USER) {
+	if (isset($user['theme']) && $user['theme'] != ZBX_DEFAULT_CSS && $user['alias'] != ZBX_GUEST_USER) {
 		$css = $user['theme'];
 	}
 	if (!isset($css)) {
-		$css = ZBX_DEFAULT_THEME;
+		$css = 'css_ob.css';
 	}
 	return $css;
 }

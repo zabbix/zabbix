@@ -151,11 +151,22 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		<link rel="shortcut icon" href="images/general/zabbix.ico" />
 		<link rel="stylesheet" type="text/css" href="css.css" />
 <?php
-	$css = ZBX_DEFAULT_THEME;
+	$css = 'css_ob.css';
+	$bodyCSS = 'originalblue';
 	if (!empty($DB['DB'])) {
 		$config = select_config();
 
 		$css = getUserTheme(CWebUser::$data);
+		switch ($css) {
+			case 'css_od.css':
+				$bodyCSS = 'darkorange';
+				break;
+			case 'css_bb.css':
+				$bodyCSS = 'darkblue';
+				break;
+			default:
+				$bodyCSS = 'originalblue';
+		}
 		echo '<style type="text/css">'."\n".
 				'.disaster { background-color: #'.$config['severity_color_5'].' !important; }'."\n".
 				'.high { background-color: #'.$config['severity_color_4'].' !important; }'."\n".
@@ -166,7 +177,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				'.trigger_unknown { background-color: #DBDBDB !important; }'."\n".
 			'</style>';
 	}
-	echo '<link rel="stylesheet" type="text/css" href="styles/themes/'.$css.'/main.css" />'."\n";
+	echo '<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n";
 
 	if ($page['file'] == 'sysmap.php') {
 		echo '<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&amp;output=css" />';
@@ -194,7 +205,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	}
 </script>
 </head>
-<body class="<?php echo $css; ?>">
+<body class="<?php echo $bodyCSS; ?>">
 <?php
 }
 
