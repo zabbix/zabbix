@@ -828,15 +828,14 @@ class CItem extends CItemGeneral {
 	 * @param bool $update checks for updating items
 	 */
 	protected function checkInput(array &$items, $update=false) {
-		// validate if everything is ok with 'item->inventory fields' linkage
-		self::validateInventoryLinks($items, $update);
-		parent::checkInput($items, $update);
-
 		// add the values that cannot be changed, but are required for further processing
-		// they must be added after calling parent::checkInput() because it will unset any existing system field
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
+
+		// validate if everything is ok with 'item->inventory fields' linkage
+		self::validateInventoryLinks($items, $update);
+		parent::checkInput($items, $update);
 	}
 
 	/**
