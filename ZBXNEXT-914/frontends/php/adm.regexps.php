@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/include/regexp.inc.php';
 
 $page['title'] = _('Configuration of Zabbix');
 $page['file'] = 'adm.regexps.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 ?>
