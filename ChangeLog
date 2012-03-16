@@ -2,6 +2,7 @@
 Changes for 2.0.0rc2
 
 Bug fixes:
+..F....... [ZBX-4753] properly pluralized "Last n issues" message in dashboard (Vedmak)
 ..F....... [ZBX-3613] Updated notification sounds. Fixed sound playback in profile (Toms)
 ..F....... [ZBX-4713] Fixed ACK status for triggers visible in Dashboard and Screens (Toms)
 ..F....... [ZBX-4752] fixed creating snmpv1 item prototypes with data type "boolean" (Vedmak)
