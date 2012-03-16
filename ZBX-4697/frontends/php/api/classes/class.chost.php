@@ -1402,16 +1402,12 @@ Copt::memoryPick();
 				$host_groupids = zbx_objectValues($host_groups, 'groupid');
 				$new_groupids = zbx_objectValues($data['groups'], 'groupid');
 
-				$groups_to_add = array_diff($new_groupids, $host_groupids);
-
-				if(!empty($groups_to_add)){
-					$result = self::massAdd(array(
-						'hosts' => $hosts,
-						'groups' => zbx_toObject($groups_to_add, 'groupid')
-					));
-					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
-					}
+				$result = self::massAdd(array(
+					'hosts' => $hosts,
+					'groups' => $data['groups']
+				));
+				if(!$result){
+					self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
 				}
 
 				$groupids_to_del = array_diff($host_groupids, $new_groupids);
