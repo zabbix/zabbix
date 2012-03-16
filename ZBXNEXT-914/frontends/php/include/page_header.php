@@ -289,9 +289,12 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
 		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); // remove parent nodes
-		if (!empty($available_nodes[0])) {
-			$node_form = new CForm();
-			$node_form->setMethod('get');
+		if (empty($available_nodes[0])) {
+			unset($available_nodes[0]);
+		}
+
+		if (!empty($available_nodes)) {
+			$node_form = new CForm('get');
 			$node_form->setAttribute('id', 'node_form');
 
 			// create ComboBox with selected nodes
@@ -343,7 +346,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 			$div_node_tree = new CDiv();
 			$div_node_tree->addItem($node_tree->getHTML());
-			$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display:'none'});"));
+			$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display: 'none'});"));
 			$div_node_tree->setAttribute('id', 'div_node_tree');
 			$div_node_tree->addStyle('display: none');
 
