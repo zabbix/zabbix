@@ -29,7 +29,7 @@ $nodeForm = new CForm();
 $nodeForm->setName('nodeForm');
 $nodeForm->addVar('form', $this->data['form']);
 $nodeForm->addVar('form_refresh', $this->data['form_refresh']);
-if (isset($_REQUEST['nodeid'])) {
+if (!empty($this->data['nodeid'])) {
 	$nodeForm->addVar('nodeid', $this->data['nodeid']);
 }
 
@@ -42,7 +42,10 @@ $nodeFormList->addRow(_('ID'), new CNumericBox('new_nodeid', $this->data['new_no
 $nodeTypeComboBox = new CComboBox('nodetype', $this->data['nodetype'], 'submit()');
 $nodeTypeComboBox->addItem(ZBX_NODE_CHILD, _('Child'));
 $nodeTypeComboBox->addItem(ZBX_NODE_MASTER, _('Master'));
-if (!empty($this->data['masterNode'])) {
+if ($this->data['nodetype'] == ZBX_NODE_LOCAL) {
+	$nodeTypeComboBox->addItem(ZBX_NODE_LOCAL, _('Local'));
+}
+if (!empty($this->data['masterNode']) || !empty($this->data['nodeid'])) {
 	$nodeTypeComboBox->setEnabled('disabled');
 	$nodeForm->addVar('nodetype', $this->data['nodetype']);
 }
