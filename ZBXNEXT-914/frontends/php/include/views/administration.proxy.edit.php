@@ -71,7 +71,7 @@ if ($this->data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 
 // append hosts to form list
 $hostsTweenBox = new CTweenBox($proxyForm, 'hosts', $this->data['hosts']);
-while ($host = DBfetch($this->data['dbHosts'])) {
+foreach ($this->data['dbHosts'] as $host) {
 	$hostsTweenBox->addItem(
 		$host['hostid'],
 		$host['name'],

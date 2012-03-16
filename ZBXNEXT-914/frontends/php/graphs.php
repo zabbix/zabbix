@@ -359,7 +359,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	if (!isset($_REQUEST['form'])) {
 		$form->cleanItems();
-		$form->addItem(new CSubmit('form', S_CREATE_GRAPH));
+		$form->addItem(new CSubmit('form', _('Create graph')));
 	}
 
 	show_table_header(_('CONFIGURATION OF GRAPHS'), $form);

@@ -25,7 +25,7 @@ $itemsWidget = new CWidget();
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$createForm->addItem(new CSubmit('form', _('Create item')));
+$createForm->addItem(new CSubmit('form', _('Create item prototype')));
 $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEM PROTOTYPES'), $createForm);
 
 // header

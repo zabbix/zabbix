@@ -34,13 +34,14 @@ if (!empty($this->data['hostid'])) {
 // create new application button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create trigger')));
 $createForm->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['parent_discoveryid'])) {
+	$createForm->addItem(new CSubmit('form', _('Create trigger prototype')));
 	$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'), $createForm);
 }
 else {
+	$createForm->addItem(new CSubmit('form', _('Create trigger')));
 	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'), $createForm);
 }
 

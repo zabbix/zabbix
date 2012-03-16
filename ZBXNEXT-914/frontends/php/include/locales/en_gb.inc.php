@@ -165,7 +165,6 @@
 	'S_YAXIS_MAX_VALUE'=>			_('Y axis MAX value'),
 	'S_CALCULATED'=>			_('Calculated'),
 	'S_FIXED'=>				_('Fixed'),
-	'S_CREATE_GRAPH'=>			_('Create graph'),
 	'S_SHOW_WORKING_TIME'=>			_('Show working time'),
 	'S_SHOW_TRIGGERS'=>			_('Show triggers'),
 	'S_3D_VIEW'=>				_('3D view'),

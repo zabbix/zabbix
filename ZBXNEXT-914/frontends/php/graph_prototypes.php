@@ -292,7 +292,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm('get');
 		$form->cleanItems();
-		$form->addItem(new CSubmit('form', S_CREATE_GRAPH));
+		$form->addItem(new CSubmit('form', _('Create graph prototype')));
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 	}
 	else
