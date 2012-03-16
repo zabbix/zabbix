@@ -76,7 +76,7 @@ foreach ($this->data['dbHosts'] as $host) {
 		$host['hostid'],
 		$host['name'],
 		null,
-		$host['proxy_hostid'] == 0 || ($this->data['proxyid'] > 0 && bccomp($host['proxy_hostid'], $this->data['proxyid']) == 0)
+		empty($host['proxy_hostid']) || (!empty($this->data['proxyid']) && bccomp($host['proxy_hostid'], $this->data['proxyid']) == 0)
 	);
 }
 $proxyFormList->addRow(_('Hosts'), $hostsTweenBox->get(_('Proxy hosts'), _('Other hosts')));
