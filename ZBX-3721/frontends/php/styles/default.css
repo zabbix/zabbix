@@ -117,7 +117,6 @@ ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
 ul.formlist li.top-aligned { margin: -1px 0 0 0; padding-top: 0; }
-ul.formlist li.new { background: #EEFFEE; }
 ul.formlist li .floatleft { padding-top: 2px; }
 
 /* any object list inline */
