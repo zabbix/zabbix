@@ -122,8 +122,6 @@
 
 	'S_TEMPLATES'=>				_('Templates'),
 	'S_UNLINK'=>				_('Unlink'),
-	'S_CANNOT_UNLINK_TEMPLATE'=>	_('Cannot unlink template'),
-	'S_CANNOT_LINK_TEMPLATE'=>	_('Cannot link template'),
 	'S_UNLINK_AND_CLEAR'=>			_('Unlink and clear'),
 
 //	items.php
