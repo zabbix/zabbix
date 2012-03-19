@@ -855,6 +855,9 @@
 	}
 
 	function getItemFormData($options = array()) {
+		$ifm = get_request('filter_macro');
+		$ifv = get_request('filter_value');
+
 		$data = array(
 			'form' => get_request('form'),
 			'form_refresh' => get_request('form_refresh'),
@@ -904,7 +907,7 @@
 			'possibleHostInventories' => null,
 			'alreadyPopulated' => null,
 			'lifetime' => get_request('lifetime', 30),
-			'filter' => get_request('filter', '')
+			'filter' => isset($ifm, $ifv) ? $ifm.':'.$ifv : ''
 		);
 
 		// hostid
