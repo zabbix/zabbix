@@ -375,16 +375,16 @@ class CDiscoveryRule extends CItemGeneral {
 				'discoveryids' => $itemids,
 				'nopermissions' => true,
 				'preservekeys' => true,
-				'selectDiscoveryRule' => API_OUTPUT_EXTEND
+				'selectDiscoveryRule' => API_OUTPUT_SHORTEN
 			);
 
 			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectItems'];
-				$items = API::Item()->get($objParams);
+				$items = API::ItemPrototype()->get($objParams);
 
 				$count = array();
 				foreach ($items as $item) {
-					$discoveryId = $item['discoveryRule']['itemid'];
+					$discoveryId = $item['parent_itemid'];
 					if (!isset($count[$discoveryId])) {
 						$count[$discoveryId] = 0;
 					}
@@ -394,14 +394,14 @@ class CDiscoveryRule extends CItemGeneral {
 						continue;
 					}
 
-					unset($item['discoveryRule']);
-					$result[$discoveryId]['prototypes'][] = $item;
+					unset($item['parent_itemid']);
+					$result[$discoveryId]['items'][] = $item;
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectItems']) {
 				$objParams['countOutput'] = 1;
 				$objParams['groupCount'] = 1;
-				$items = API::Item()->get($objParams);
+				$items = API::ItemPrototype()->get($objParams);
 
 				$items = zbx_toHash($items, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -1075,7 +1075,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'itemids' => $newPrototypes['itemids'],
 				'output' => API_OUTPUT_EXTEND
 			));
-			$dstDiscovery['prototypes'] = $newPrototypes;
+			$dstDiscovery['items'] = $newPrototypes;
 
 			// copy graphs
 			$this->copyDiscoveryGraphs($srcDiscovery, $dstDiscovery);
@@ -1191,7 +1191,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$itemKeys = array_unique($itemKeys);
 
 		// fetch newly cloned items
-		$items = array_merge($dstDiscovery['prototypes'], API::Item()->get(array(
+		$items = array_merge($dstDiscovery['items'], API::Item()->get(array(
 			'hostids' => $dstDiscovery['hostid'],
 			'filter' => array(
 				'key_' => $itemKeys
