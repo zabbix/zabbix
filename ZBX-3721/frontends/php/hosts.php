@@ -629,7 +629,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$hosts_wdgt->addHeader($numrows, $frmForm);
 
 // HOSTS FILTER {{{
-		$filter_table = new CTable('', 'filter_config');
+		$filter_table = new CTable('', 'filter');
 		$filter_table->addRow(array(
 			array(array(bold(S_NAME), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
 			array(array(bold(S_DNS), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),

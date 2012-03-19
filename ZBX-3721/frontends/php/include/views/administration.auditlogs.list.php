@@ -36,7 +36,7 @@ $auditWidget->addHeaderRowNumber();
 $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
-$filterTable = new CTable('', 'filter_config');
+$filterTable = new CTable('', 'filter');
 
 $actionComboBox = new CComboBox('action', $this->data['action']);
 $actionComboBox->addItem(-1, _('All'));
@@ -69,7 +69,7 @@ $resetButton->useJQueryStyle();
 $buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
 $buttonsDiv->setAttribute('style', 'padding: 4px 0px;');
 
-$filterTable->addRow(new CCol($buttonsDiv, 'center', 3));
+$filterTable->addRow(new CCol($buttonsDiv, 'controls', 3));
 $filterForm->addItem($filterTable);
 
 $auditWidget->addFlicker($filterForm, CProfile::get('web.auditlogs.filter.state', 1));
