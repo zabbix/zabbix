@@ -158,14 +158,7 @@ table.tabletree tr.footer td {
 	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 }
 
-table.itemfilter{
-	border: 1px solid #245078;
-	background-color: #0F0F0F;
-}
-
-table.filter{
-	background-color: #0F0F0F;
-}
+table.filter tr td { border: 1px dotted #444; }
 
 table.filter .subfilter_disabled{
 	color: #FF3333;
@@ -174,6 +167,9 @@ table.filter .subfilter_disabled{
 table.filter .subfilter_active{
 	color: #77B7DA;
 }
+
+table.filter-item { border: 1px solid #245078; background-color: #0F0F0F; }
+
 /*****************************************/
 /*************** Table Info **************/
 
@@ -427,11 +423,6 @@ table.suggest tr.highlight td{
 
 table.suggest tr td{
 	color: #77B7DA;
-}
-/*----------*/
-
-table.filter_config{
-	background-color: #022744;
 }
 
 /*////////////////	DIVS	////////////////////*/

@@ -440,7 +440,6 @@ table.flicker tr td.flicker_c { height: 16px; padding-left: 4px; padding-right: 
 table.flicker tr td.flicker_l { text-align: left; height: 16px; padding-left: 4px; line-height: 12px; }
 table.flicker tr td.flicker_r {text-align: right; height: 16px; padding-right: 4px; line-height: 12px; }
 table.flicker a { color: #0BF; }
-table.itemfilter { border: 1px solid #777777; width: 100%; background-color: white; }
 
 /* acknowledgements */
 table.ack_msgs { width: 70%; background-color: #EEEEEE; padding: 0; border: 0 solid; }
@@ -603,12 +602,21 @@ table.requirements tr td.header { font-weight: bold; }
 table.requirements tr td { white-space: nowrap; padding-left: 5px; padding-right: 15px; background-color: #FFFFFF; }
 
 /* filter */
-table.filter { width: 100%; background-color: #FFFFFF; border-collapse: collapse; }
-table.filter tr > td:first-child { width: 1%; white-space: nowrap; }
-table.filter tr > td:first-child { width: 1px; }
-table.filter tr td { line-height: 20px; height: 26px; vertical-align: bottom; border: 1px dotted silver; padding-left: 6px; padding-right: 4px; }
-table.filter_config { width: 100%; background-color: #FFFFFF; border-collapse: collapse; }
-table.filter_config tr td { white-space: nowrap; line-height: 20px; height: 26px; vertical-align: bottom; text-align: center; border: 1px dotted silver; padding-left: 6px; padding-right: 4px; }
+table.filter { width: 100%; border-collapse: collapse; min-width: 1024px; text-align: center; table-layout: fixed;  }
+table.filter tr td { line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important;
+	padding: 0 2px 0 6px; }
+table.filter tr td.label { white-space: nowrap; border-right: 0 !important; }
+table.filter tr td.controls { text-align: center; }
+
+table.filter-item { border: 1px solid #777777; }
+table.filter-item tr td { text-align: left; }
+table.filter-item tr td.label { text-align: right; }
+table.filter-item tr td.col1 { width: 16%; }
+table.filter-item tr td.label.col1 { width: 8%; }
+table.filter-item tr td.label.col4 { width: 8%; }
+
+table.filter.sub-filter tr td { text-align: left; }
+table.filter.sub-filter tr td:first-child { width: 8%; }
 
 /* invisible */
 table.invisible { border: 0px; margin: 0px; padding: 0px; }

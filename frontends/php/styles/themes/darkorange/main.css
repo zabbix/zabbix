@@ -133,11 +133,6 @@ table.tabletree tr.footer td {
 	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
 }
 
-table.itemfilter{
-	border: 1px solid #777777;
-	background-color: #0F0F0F;
-}
-
 table.filter{
 	background-color: #0F0F0F;
 }
@@ -149,6 +144,9 @@ table.filter .subfilter_disabled{
 table.filter .subfilter_active{
 	color: #AAAAAA;
 }
+
+table.filter-item { border: 1px solid #777777; background-color: #0F0F0F; }
+
 /*****************************************/
 /*************** Table Info **************/
 
@@ -395,11 +393,6 @@ table.suggest tr.highlight td{
 
 table.suggest tr td{
 	color: #FF5500;
-}
-/*----------*/
-
-table.filter_config{
-	background-color: #2F2F2F;
 }
 
 /*////////////////	DIVS	////////////////////*/
