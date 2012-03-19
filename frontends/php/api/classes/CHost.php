@@ -555,11 +555,21 @@ class CHost extends CZBXAPI {
 		$sqlWhere = '';
 		$sqlGroup = '';
 		$sqlOrder = '';
-		if (!empty($sqlParts['select']))	$sqlSelect .= implode(',', $sqlParts['select']);
-		if (!empty($sqlParts['from']))		$sqlFrom .= implode(',', $sqlParts['from']);
-		if (!empty($sqlParts['where']))	$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		if (!empty($sqlParts['group']))	$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		if (!empty($sqlParts['order']))	$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
+		if (!empty($sqlParts['select'])) {
+			$sqlSelect .= implode(',', $sqlParts['select']);
+		}
+		if (!empty($sqlParts['from'])) {
+			$sqlFrom .= implode(',', $sqlParts['from']);
+		}
+		if (!empty($sqlParts['where']))	{
+			$sqlWhere .= implode(' AND ', $sqlParts['where']);
+		}
+		if (!empty($sqlParts['group']))	{
+			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
+		}
+		if (!empty($sqlParts['order']))	{
+			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
+		}
 		$sqlLimit = $sqlParts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
@@ -1986,64 +1996,15 @@ class CHost extends CZBXAPI {
 // }}} UPDATE TEMPLATE LINKAGE
 
 
-// UPDATE MACROS {{{
+		//  macros
 		if (isset($updateMacros)) {
-			$macrosToAdd = $updateMacros;
-			$hostmacrosIds = zbx_objectValues($macrosToAdd, 'hostmacroid');
+			DB::delete('macros', array('hostid' => $hostids));
 
-			$hostMacros = API::UserMacro()->get(array(
-				'hostids' => $hostids,
-				'output' => API_OUTPUT_EXTEND,
+			$this->massAdd(array(
+				'hosts' => $hosts,
+				'macros' => $updateMacros
 			));
-			$hostMacros = zbx_toHash($hostMacros, 'hostmacroid');
-
-			// Delete
-			$macrosToDelete = array();
-			foreach ($hostMacros as $hmacro) {
-				if (!in_array($hmacro['hostmacroid'], $hostmacrosIds)) {
-					$macrosToDelete[] = $hmacro['hostmacroid'];
-				}
-			}
-			// Update
-			$macrosToUpdate = array();
-			foreach ($macrosToAdd as $nhmnum => $nhmacro) {
-				if (isset($nhmacro['hostmacroid']) && isset($hostMacros[$nhmacro['hostmacroid']])) {
-					$macrosToUpdate[] = $nhmacro;
-					unset($macrosToAdd[$nhmnum]);
-				}
-			}
-			//----
-
-			if (!empty($macrosToDelete)) {
-				$result = $this->massRemove(array(
-					'hostids' => $hostids,
-					'macros' => $macrosToDelete
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot remove macro.'));
-				}
-			}
-
-			if (!empty($macrosToUpdate)) {
-				$result = API::UserMacro()->update($macrosToUpdate);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro.'));
-				}
-			}
-
-			if (!empty($macrosToAdd)) {
-				$macrosToAdd = array_values($macrosToAdd);
-
-				$result = $this->massAdd(array(
-					'hosts' => $hosts,
-					'macros' => $macrosToAdd
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add macro.'));
-				}
-			}
 		}
-// }}} UPDATE MACROS
 
 		if (isset($updateInventory)) {
 			if ($updateInventory['inventory_mode'] == HOST_INVENTORY_DISABLED) {
@@ -2417,6 +2378,4 @@ class CHost extends CZBXAPI {
 
 		return (count($ids) == $count);
 	}
-
-
 }

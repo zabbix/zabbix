@@ -823,11 +823,16 @@ class CUserMacro extends CZBXAPI {
 	 * @return void
 	 */
 	public function replaceMacros(array $macros) {
+		$hostIds = array_keys($macros);
+		if (!API::Host()->isWritable($hostIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		$dbMacros = API::Host()->get(array(
-			'hostids' => array_keys($macros),
+			'hostids' => $hostIds,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'templated_hosts' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => API_OUTPUT_REFER,
 			'preservekeys' => true
 		));
 
@@ -836,12 +841,13 @@ class CUserMacro extends CZBXAPI {
 		$macrosToAdd = array();
 
 		foreach ($macros as $hostid => $hostMacros) {
-			$dbHostMacros = $dbMacros[$hostid];
+			$dbHostMacros = $dbMacros[$hostid]['macros'];
 
 			// look for db macros which hostmacroids are not in list of new macros
 			// if there are any, they should be deleted
 			$hostMacroIds = zbx_toHash($hostMacros, 'hostmacroid');
 			foreach ($dbHostMacros as $dbHostMacro) {
+
 				if (!isset($hostMacroIds[$dbHostMacro['hostmacroid']])) {
 					$macroIdsToDelete[] = $dbHostMacro['hostmacroid'];
 				}
@@ -853,6 +859,7 @@ class CUserMacro extends CZBXAPI {
 					$macrosToUpdate[] = $hostMacro;
 				}
 				else {
+					$hostMacro['hostid'] = $hostid;
 					$macrosToAdd[] = $hostMacro;
 				}
 			}
