@@ -495,6 +495,9 @@ class CItem extends CItemGeneral {
 					if (!is_null($options['selectDiscoveryRule']) && !isset($result[$item['itemid']]['discoveryRule'])) {
 						$result[$item['itemid']]['discoveryRule'] = array();
 					}
+					if (!is_null($options['selectInterfaces']) && !isset($result[$item['itemid']]['interfaces'])) {
+						$result[$item['itemid']]['interfaces'] = array();
+					}
 
 					// triggerids
 					if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
