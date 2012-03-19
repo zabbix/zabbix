@@ -2,6 +2,7 @@
 Changes for 2.0.0rc2
 
 Bug fixes:
+A.F....... [ZBX-4257] fixed creating discovery rules, items and item prototypes (Pavels)
 ..F....... [ZBX-4765] fixed filter fields being unset when saving of discovery rule fails (Vedmak)
 ..F....... [ZBX-4736] fixed undefined variable in Inventory Hosts (Toms)
 ..F....... [ZBX-4764] fixed critical error in Administration->Notifications (Toms)
