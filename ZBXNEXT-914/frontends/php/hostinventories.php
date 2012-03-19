@@ -156,7 +156,7 @@ else{
 	$numrows->setAttribute('name', 'numrows');
 	$hostinvent_wdgt->addHeader($numrows);
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'hostid') : null,
 		make_sorting_header(_('Host'), 'name'),

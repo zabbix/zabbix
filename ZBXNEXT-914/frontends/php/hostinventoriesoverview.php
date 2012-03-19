@@ -79,6 +79,7 @@ $r_form = new CForm('get');
 $r_form->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(true), SPACE));
 $r_form->addItem(array(_('Grouping by'), SPACE, $inventoryFieldsComboBox));
 $hostinvent_wdgt->addHeader(_('Hosts'), $r_form);
+$hostinvent_wdgt->addItem(BR());
 
 $table = new CTableInfo(_('No hosts defined.'));
 $table->setHeader(
