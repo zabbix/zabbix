@@ -526,14 +526,22 @@ class CItemPrototype extends CItemGeneral{
 		return !empty($objs);
 	}
 
-	protected function checkInput(array &$items, $update=false) {
-		parent::checkInput($items, $update);
-
+	/**
+	 * Check item prototype data and set flags field.
+	 *
+	 * @param array $items passed by reference
+	 * @param bool  $update
+	 *
+	 * @return void
+	 */
+	protected function checkInput(array &$items, $update = false) {
 		// add the values that cannot be changed, but are required for further processing
-		// they must be added after calling parent::checkInput() because it will unset any existing system field
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 		}
+		unset($item);
+
+		parent::checkInput($items, $update);
 	}
 
 /**
