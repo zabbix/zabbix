@@ -2,6 +2,7 @@
 Changes for 2.0.0rc2
 
 Bug fixes:
+..F....... [ZBX-4736] fixed undefined variable in Inventory Hosts (Toms)
 ..F....... [ZBX-4764] fixed critical error in Administration->Notifications (Toms)
 ..F....... [ZBX-4753] properly pluralized "Last n issues" message in dashboard (Vedmak)
 ..F....... [ZBX-3613] updated notification sounds; fixed sound playback in profile (Toms, Vedmak)
