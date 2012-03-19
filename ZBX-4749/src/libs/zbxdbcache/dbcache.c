@@ -2811,10 +2811,13 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, AGENT_RESULT 
 
 ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
 
-static void init_trend_cache()
+static void	init_trend_cache()
 {
+	const char	*__function_name = "init_trend_cache";
 	key_t		trend_shm_key;
 	size_t		sz;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
 	{
@@ -2833,13 +2836,15 @@ static void init_trend_cache()
 
 	cache->trends_num = 0;
 
-#define	INIT_HASHSET_SIZE	1000 /* should be calculated dynamically based on trends size? */
+#define INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
 			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
 
-#undef	INIT_HASHSET_SIZE
+#undef INIT_HASHSET_SIZE
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -2928,10 +2933,7 @@ void	init_database_cache()
 
 	/* trend cache */
 	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() initialize trend cache", __function_name);
 		init_trend_cache();
-	}
 
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_allocated);
