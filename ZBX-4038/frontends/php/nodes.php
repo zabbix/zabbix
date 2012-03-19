@@ -39,8 +39,8 @@
 		'node_type'=>		array(T_ZBX_INT, O_OPT,	null,
 			IN(ZBX_NODE_CHILD.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),	'isset({save})&&!isset({nodeid})'),
 		'masterid' =>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
-		'port'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1, ZBX_MER), 'isset({save})', _('Port'),
-			_s('must be between %1$s and %2$s', 1, ZBX_MER)),
+		'port'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(ZBX_MIN_PORT, ZBX_MAX_PORT), 'isset({save})',
+			_('Port')),
 /* actions */
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),

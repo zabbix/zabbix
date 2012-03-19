@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	// VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	'refresh_unsupported'=>	array(T_ZBX_INT, O_NO,	null,		BETWEEN(ZBX_MIN, ZBX_MER),	'isset({save})',
-		_('Refresh unsupported items (in sec)'), _s('must be between %1$s and %2$s', ZBX_MIN, ZBX_MER)),
+		_('Refresh unsupported items (in sec)')),
 	'alert_usrgrpid'=>	array(T_ZBX_INT, O_NO,	null,		DB_ID,				'isset({save})'),
 	'discovery_groupid'=>	array(T_ZBX_INT, O_NO,	null,		DB_ID,				'isset({save})'),
 	'snmptrap_logging'=>	array(T_ZBX_INT, O_OPT,	null,		IN('1'),			null),

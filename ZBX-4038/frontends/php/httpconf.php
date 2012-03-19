@@ -43,7 +43,7 @@ $fields = array(
 	'application' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Application')),
 	'name' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'delay' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, SEC_PER_DAY), 'isset({save})',
-		_('Update interval (in sec)'), _s('must be between %1$s and %2$s', 0, SEC_PER_DAY)),
+		_('Update interval (in sec)')),
 	'status' =>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'isset({save})'),
 	'agent' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'macros' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),

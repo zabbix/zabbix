@@ -532,18 +532,19 @@ function check_field(&$fields, &$field, $checks) {
 	}
 
 	if (is_null($exception) || $except) {
-		$valid = $validation ? calc_exp($fields, $field, $validation) : true;
-		if (!$valid) {
+		if ($validation && !calc_exp($fields, $field, $validation)) {
 			if ($flags&P_SYS) {
 				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
 				return ZBX_VALID_ERROR;
 			}
 			else {
-				if ($validation == NOT_EMPTY && is_null($caption2)) {
-					$caption2 = _('cannot be empty');
-				}
-				if (!is_null($caption2)) {
-					$caption2 = ": ".$caption2;
+				if ($validation == NOT_EMPTY) {
+					$caption2 = _(': cannot be empty');
+				// elseif will check for BETWEEN() function pattern and extract numbers e.g. ({}>=0&&{}<=999)&&
+				} elseif (preg_match('/^\(\{\}\>=[0-9]*\&\&\{\}\<=[0-9]*\)\&\&$/', $validation)) {
+					$between = array();
+					preg_match_all('/[0-9]+/', $validation, $between);
+					$caption2 = _s(': must be between %1$s and %2$s', $between[0][0], $between[0][1]);
 				}
 				info(_s('Warning. Incorrect value for field "%1$s"%2$s.', $caption, $caption2));
 				return ZBX_VALID_WARNING;

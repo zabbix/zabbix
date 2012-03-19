@@ -37,8 +37,7 @@ $fields = array(
 	'name' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('Name')),
 	'url' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})', _('URL')),
 	'posts' =>		array(T_ZBX_STR, O_OPT, null,	null,			'isset({save})'),
-	'timeout' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, ZBX_MER),	'isset({save})', _('Timeout'),
-		_s('must be between %1$s and %2$s', ZBX_MIN, ZBX_MER)),
+	'timeout' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, ZBX_MER),	'isset({save})', _('Timeout')),
 	'required' =>		array(T_ZBX_STR, O_OPT, null,	null,			'isset({save})'),
 	'status_codes' =>	array(T_ZBX_INT_RANGE, O_OPT, null, null,		'isset({save})'),
 	// actions

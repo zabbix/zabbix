@@ -36,9 +36,8 @@ $fields = array(
 	// LDAP
 	'ldap_host'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))', _('LDAP host')),
-	'ldap_port'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(ZBX_MIN, ZBX_MER),
-		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))', _('Port'),
-		_s('must be between %1$s and %2$s',ZBX_MIN, ZBX_MER)),
+	'ldap_port'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(ZBX_MIN_PORT, ZBX_MAX_PORT),
+		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))', _('Port')),
 	'ldap_base_dn'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
 		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))', _('Base DN')),
 	'ldap_bind_dn'=>		array(T_ZBX_STR, O_OPT,	null,	null,

@@ -860,11 +860,13 @@ define('NOT_ZERO', "({}!=0)&&");
 define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
-define('ZBX_MIN', 0);	    // minimal number
-define('ZBX_MER', 65535);   // Mersenne number
-define('ZBX_MAX', 999999);  // maximal number
-define('ZBX_MIN_WIDTH', 50);  // graph min width
-define('ZBX_MIN_HEIGHT', 50);  // graph min width
+define('ZBX_MIN_PORT', 0);	// minimal port number
+define('ZBX_MAX_PORT', 65535);	// maximal port number
+define('ZBX_MIN', 0);		// minimal number
+define('ZBX_MER', 65535);	// Mersenne number
+define('ZBX_MAX', 999999);	// maximal number
+define('ZBX_MIN_WIDTH', 50);	// graph min width
+define('ZBX_MIN_HEIGHT', 50);	// graph min width
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
