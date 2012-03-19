@@ -955,8 +955,6 @@ class CDiscoveryRule extends CItemGeneral {
 	/**
 	 * Check item data and set missing default values.
 	 *
-	 * @throws APIException
-	 *
 	 * @param array $items passed by reference
 	 * @param bool  $update
 	 *
@@ -968,6 +966,7 @@ class CDiscoveryRule extends CItemGeneral {
 			$item['flags'] = ZBX_FLAG_DISCOVERY;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 		}
+		unset($item);
 
 		parent::checkInput($items, $update);
 	}

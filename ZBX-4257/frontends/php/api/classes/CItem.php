@@ -822,16 +822,19 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Items data validation.
+	 * Check item data and set flags field.
 	 *
-	 * @param array $items
-	 * @param bool $update checks for updating items
+	 * @param array $items passed by reference
+	 * @param bool  $update
+	 *
+	 * @return void
 	 */
-	protected function checkInput(array &$items, $update=false) {
+	protected function checkInput(array &$items, $update = false) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
+		unset($item);
 
 		// validate if everything is ok with 'item->inventory fields' linkage
 		self::validateInventoryLinks($items, $update);
