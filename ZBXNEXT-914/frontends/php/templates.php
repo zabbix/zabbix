@@ -37,7 +37,7 @@ else{
 	$EXPORT_DATA = false;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = 'S_TEMPLATES';
+	$page['title'] = _('Configuration of templates');
 	$page['file'] = 'templates.php';
 	$page['hist_arg'] = array('groupid');
 }

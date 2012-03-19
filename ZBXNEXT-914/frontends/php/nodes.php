@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/nodes.inc.php';
 
-$page['title'] = _('Nodes');
+$page['title'] = _('Configuration of nodes');
 $page['file'] = 'nodes.php';
 $page['hist_arg'] = array();
 

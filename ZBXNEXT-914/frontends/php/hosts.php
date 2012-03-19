@@ -31,7 +31,7 @@ if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['ho
 	require_once dirname(__FILE__).'/include/export.inc.php';
 }
 else {
-	$page['title'] = _('Hosts');
+	$page['title'] = _('Configuration of hosts');
 	$page['file'] = 'hosts.php';
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['hist_arg'] = array('groupid');
