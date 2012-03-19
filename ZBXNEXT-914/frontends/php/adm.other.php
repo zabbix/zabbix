@@ -21,7 +21,7 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Others configuration');
+$page['title'] = _('Other configuration parameters');
 $page['file'] = 'adm.other.php';
 $page['hist_arg'] = array();
 
@@ -111,7 +111,7 @@ $cmbConf->addItems(array(
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('OTHERS CONFIGURATION'), $form);
+$cnf_wdgt->addPageHeader(_('OTHER CONFIGURATION PARAMETERS'), $form);
 
 $data = array();
 $data['form_refresh'] = get_request('form_refresh', 0);
