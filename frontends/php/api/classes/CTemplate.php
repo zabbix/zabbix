@@ -1538,7 +1538,7 @@ class CTemplate extends CZBXAPI {
 
 		// macros
 		if (isset($data['macros'])) {
-			DB::delete('macros', array('hostid' => $templateids));
+			DB::delete('hostmacro', array('hostid' => $templateids));
 
 			$this->massAdd(array(
 				'hosts' => $templates,

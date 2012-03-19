@@ -1998,7 +1998,7 @@ class CHost extends CZBXAPI {
 
 		//  macros
 		if (isset($updateMacros)) {
-			DB::delete('macros', array('hostid' => $hostids));
+			DB::delete('hostmacro', array('hostid' => $hostids));
 
 			$this->massAdd(array(
 				'hosts' => $hosts,

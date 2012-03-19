@@ -945,18 +945,22 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Checks if the given macros contain duplicates. Assumes the "macro" field is valid.
 	 *
+	 * @throws APIException if the given macros contain duplicates
+	 *
 	 * @param array $macros
 	 *
-	 * @throws APIException if the given macros contain duplicates
+	 * @return void
 	 */
 	protected function checkDuplicateMacros(array $macros) {
 		$existingMacros = array();
 		foreach ($macros as $macro) {
-			if (isset($existingMacros[$macro['macro']])) {
+			// global macros don't have hostid
+			$hostid = isset($macro['hostid']) ? $macro['hostid'] : 1;
+			if (isset($existingMacros[$hostid][$macro['macro']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
 			}
 
-			$existingMacros[$macro['macro']] = 1;
+			$existingMacros[$hostid][$macro['macro']] = 1;
 		}
 	}
 
