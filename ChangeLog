@@ -49,7 +49,7 @@ A.F....... [ZBX-4333] fixed trigger inheritance when calling trigger.update whit
 A.F....... [ZBX-4202] fixed SQL performance in tr_status.php - combined similar queries, user data SQL access only once, triggerids retrieval optimization (Toms)
 A.F....... [ZBX-4647] fixed trigger and item prototype inheritance (Pavels)
 ..F....... [ZBX-4467] fixed the ZBX_MAX_PERIOD constant not affecting the timebar control (Pavels)
-A......... [ZBX-4562] Fixed meditype.update returning wrong formatted result (Toms)
+A......... [ZBX-4562] fixed meditype.update returning wrong formatted result (Toms)
 ..F....... [ZBX-4187] fixed dashbord fonts on popup. fixed js error on last 20 issues (Toms)
 A.F....... [ZBX-4607] fixed the script.getscriptbyhosts method returning scripts from nodes defferent from hosts (Pavels)
 A.F....... [ZBX-4607] fixed the script "Host groups" parameter (Pavels)
@@ -511,7 +511,7 @@ Changes for 1.8.11rc1
 
 ..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
 A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
-A......... [ZBX-4562] Fixed meditype.update returning wrong formatted result (Toms)
+A......... [ZBX-4562] fixed meditype.update returning wrong formatted result (Toms)
 ...G...PS. [ZBX-4721] fixed handling of \u0000 by JSON parser; thanks to Rick Alm (Sasha)
 ..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
 ..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)
