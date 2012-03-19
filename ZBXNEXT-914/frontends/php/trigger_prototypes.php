@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Configuration of triggers');
+$page['title'] = _('Configuration of trigger prototypes');
 $page['file'] = 'trigger_prototypes.php';
 $page['hist_arg'] = array('parent_discoveryid');
 

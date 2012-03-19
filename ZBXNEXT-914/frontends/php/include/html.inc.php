@@ -503,10 +503,15 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	}
 
 	if (isset($elements['discoveries'])) {
-		$list->addItem(array(
-			new CLink(_('Discovery rules'), 'host_discovery.php?hostid='.$dbHost['hostid']),
-			' ('.$dbHost['discoveries'].')'
-		));
+		if ($currentElement == 'discoveries') {
+			$list->addItem(_('Discovery rules').' ('.$dbHost['discoveries'].')');
+		}
+		else {
+			$list->addItem(array(
+				new CLink(_('Discovery rules'), 'host_discovery.php?hostid='.$dbHost['hostid']),
+				' ('.$dbHost['discoveries'].')'
+			));
+		}
 	}
 
 	return new CDiv($list, 'objectgroup top ui-widget-content ui-corner-all');

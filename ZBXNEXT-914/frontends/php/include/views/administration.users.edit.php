@@ -103,7 +103,7 @@ foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
 }
 setlocale(LC_MESSAGES, zbx_locale_variants($USER_DETAILS['lang'])); // restoring original locale
 $lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
-$userFormList->addRow(_('Language'), array($languageComboBox, new CSpan($lang_hint, 'red wrap')));
+$userFormList->addRow(_('Language'), array($languageComboBox, SPACE, new CSpan($lang_hint, 'red wrap')));
 
 // append themes to form list
 $themeComboBox = new CComboBox('theme', $this->data['theme']);

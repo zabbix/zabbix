@@ -307,7 +307,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 				}
 			}
 
-			$jscript = 'javascript : '.
+			$jscript = 'javascript: '.
 				" var pos = getPosition('button_show_tree');".
 				" ShowHide('div_node_tree', 'table');".
 				' pos.top += 20;'.

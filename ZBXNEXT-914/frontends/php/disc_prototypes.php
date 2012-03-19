@@ -24,14 +24,13 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Configuration of items');
+$page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
 $page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
 $page['hist_arg'] = array('parent_discoveryid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

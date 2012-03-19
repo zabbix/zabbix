@@ -20,7 +20,7 @@
 ?>
 <?php
 $authenticationWidget = new CWidget();
-$authenticationWidget->addPageHeader(_('AUTHENTICATION TO ZABBIX'));
+$authenticationWidget->addPageHeader(_('CONFIGURATION OF AUTHENTICATION'));
 
 // create form
 $authenticationForm = new CForm();
