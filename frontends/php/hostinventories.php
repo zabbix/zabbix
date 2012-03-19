@@ -169,6 +169,9 @@ else{
 		make_sorting_header(_('MAC address A'), 'pr_macaddress_a'))
 	);
 
+	$hosts = array();
+	$paging = getPagingLine($hosts);
+
 	if($pageFilter->groupsSelected){
 		// which inventory fields we will need for displaying
 		$requiredInventoryFields = array(
@@ -183,10 +186,10 @@ else{
 		// checking if correct inventory field is specified for filter
 		$possibleInventoryFields = getHostInventories();
 		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
-		if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value']) && !isset($possibleInventoryFields[$_REQUEST['filter_field']])){
+		if(!empty($_REQUEST['filter_field'])
+				&& !empty($_REQUEST['filter_field_value'])
+				&& !isset($possibleInventoryFields[$_REQUEST['filter_field']])){
 			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $_REQUEST['filter_field']));
-			$hosts = array();
-			$paging = getPagingLine($hosts);
 		}
 		else{
 			// if we are filtering by field, this field is also required
@@ -219,11 +222,11 @@ else{
 				if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
 					// must we filter exactly or using a substring (both are case insensitive)
 					$match = $_REQUEST['filter_exact']
-							? zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
-							: zbx_strpos(
-								zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]),
-								zbx_strtolower($_REQUEST['filter_field_value'])
-							) !== false;
+						? zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
+						: zbx_strpos(
+							zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]),
+							zbx_strtolower($_REQUEST['filter_field_value'])
+						) !== false;
 					if(!$match){
 						unset($hosts[$num]);
 					}
