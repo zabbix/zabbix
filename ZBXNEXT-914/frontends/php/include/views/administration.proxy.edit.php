@@ -92,7 +92,7 @@ if (!empty($this->data['proxyid'])) {
 		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete proxy?'), url_param('form')),
+			new CButtonDelete(_('Delete proxy?'), url_param('form').url_param('proxyid')),
 			new CButtonCancel()
 		)
 	));

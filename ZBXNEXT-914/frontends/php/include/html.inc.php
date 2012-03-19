@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 function italic($str) {
 	if (is_array($str)) {
 		foreach ($str as $key => $val) {
