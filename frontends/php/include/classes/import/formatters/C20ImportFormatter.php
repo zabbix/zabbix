@@ -28,7 +28,7 @@ class C20ImportFormatter extends CImportFormatter {
 		if (!isset($this->data['groups'])) {
 			return array();
 		}
-		return $this->data['groups'];
+		return array_values($this->data['groups']);
 	}
 
 	public function getTemplates() {
