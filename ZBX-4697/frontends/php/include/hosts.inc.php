@@ -1725,15 +1725,16 @@ return $result;
 			$sql_where = ' AND '.DBcondition('hg.hostid', $hostids);
 		}
 
-		$sql = 'SELECT hg.hostid, count(hg.groupid) as grp_count '.
-				' FROM hosts_groups hg '.
+		$result = DBselect(
+				'SELECT hg.hostid,COUNT(hg.groupid) AS grp_count'.
+				' FROM hosts_groups hg'.
 				' WHERE '.DBcondition('hg.groupid', $groupids, true).
 				$sql_where.
-				' GROUP BY hg.hostid '.
-				' HAVING count(hg.groupid) > 0';
-		$res = DBselect($sql);
-		while ($host = DBfetch($res)) {
-			$unlinkableHostIds[$host['hostid']] = $host['hostid'];
+				' GROUP BY hg.hostid'.
+				' HAVING COUNT(hg.groupid)>0'
+		);
+		while ($row = DBfetch($result)) {
+			$unlinkableHostIds[] = $row['hostid'];
 		}
 
 		return $unlinkableHostIds;

@@ -1406,8 +1406,8 @@ Copt::memoryPick();
 					'hosts' => $hosts,
 					'groups' => $data['groups']
 				));
-				if(!$result){
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t add group');
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_ADD_GROUP);
 				}
 
 				$groupids_to_del = array_diff($host_groupids, $new_groupids);
@@ -1415,7 +1415,7 @@ Copt::memoryPick();
 				if(!empty($groupids_to_del)){
 					$result = self::massRemove(array('hostids' => $hostids, 'groupids' => $groupids_to_del));
 					if(!$result){
-						self::exception(ZBX_API_ERROR_PARAMETERS, 'Can\'t remove group');
+						self::exception(ZBX_API_ERROR_PARAMETERS, S_CANNOT_DELETE_GROUP);
 					}
 				}
 			}
