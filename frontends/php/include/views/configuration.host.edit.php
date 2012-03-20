@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-include('include/views/js/configuration.host.edit.js.php');
+require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
 $divTabs = new CTabView(array('remember' => 1));
 if (!isset($_REQUEST['form_refresh'])) {

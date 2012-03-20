@@ -14,9 +14,8 @@
 	<td style="width: 10em; white-space: nowrap;">
 		<div class="jqueryinputset">
 			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
-			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label>
 			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns} />
-			<label for="radio_dns_#{iface.interfaceid}"><?php echo _('DNS'); ?></label>
+			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label><label for="radio_dns_#{iface.interfaceid}"><?php echo _('DNS'); ?></label>
 		</div>
 	</td>
 	<td style="width: 10em;">
