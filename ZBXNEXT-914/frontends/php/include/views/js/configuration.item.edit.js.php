@@ -9,14 +9,12 @@
 
 	function displayNewDeleyFlexInterval() {
 		if (jQuery('#delay_flex_visible').is(':checked')) {
-			jQuery('#row_new_delay_flex').css('display', 'block');
-		}
-		else {
-			jQuery('#row_new_delay_flex').css('display', 'none');
-		}
-
-		if (jQuery('#delayFlexTable tr').length <= 7) {
-			jQuery('#row_new_delay_flex').css('display', 'block');
+			if (jQuery('#delayFlexTable tr').length <= 7) {
+				jQuery('#row_new_delay_flex').css('display', 'block');
+			}
+			else {
+				jQuery('#row_new_delay_flex').css('display', 'none');
+			}
 		}
 		else {
 			jQuery('#row_new_delay_flex').css('display', 'none');
