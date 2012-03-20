@@ -537,10 +537,8 @@ function resolveItemKeyMacros(array $item) {
 	$macros = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}', '{HOST.NAME}');
 
 	foreach ($macros as $macro) {
-		$pos = 0;
-		while ($pos = zbx_strpos($key, $macro, $pos)) {
-			$pos++;
-			$macStack[$macro] = $macro;
+		if (zbx_strpos($key, $macro) !== false) {
+			$macStack[] = $macro;
 		}
 	}
 
@@ -556,9 +554,13 @@ function resolveItemKeyMacros(array $item) {
 		$host = reset($dbItem['hosts']);
 		$interface = reset($dbItem['interfaces']);
 
-		// if template item (without interface) don't resolve macros related to interface
+		// if item without interface or template item, resolve interface related macros to *UNKNOWN*
 		if (!$interface) {
-			unset($macStack['{HOST.IP}'], $macStack['{IPADDRESS}'], $macStack['{HOST.DNS}'], $macStack['{HOST.CONN}']);
+			$interface = array(
+				'ip' => _('*UNKNOWN*'),
+				'dns' => _('*UNKNOWN*'),
+				'useip' => false,
+			);
 		}
 
 		foreach ($macStack as $macro) {
