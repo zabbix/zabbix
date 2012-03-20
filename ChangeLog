@@ -2,7 +2,7 @@
 Changes for 2.0.0rc2
 
 Bug fixes:
-..F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
+A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
 A.F....... [ZBX-4257] fixed creating discovery rules, items and item prototypes (Pavels)
 ..F....... [ZBX-4765] fixed filter fields being unset when saving of discovery rule fails (Vedmak)
 ..F....... [ZBX-4736] fixed undefined variable in Inventory Hosts (Toms)
@@ -512,7 +512,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
-..F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
+A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
 .D........ [ZBX-4777] added information in the Zabbix sender manpage about values being sent in a sequential manner and the need to have ordered timestamps (Richlv)
 
 Changes for 1.8.11
