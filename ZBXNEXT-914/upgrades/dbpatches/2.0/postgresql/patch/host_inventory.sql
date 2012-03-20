@@ -75,7 +75,7 @@ CREATE TABLE host_inventory (
 	poc_2_screen             varchar(64)     DEFAULT ''                NOT NULL,
 	poc_2_notes              text            DEFAULT ''                NOT NULL,
 	PRIMARY KEY (hostid)
-) with OIDS;
+);
 ALTER TABLE ONLY host_inventory ADD CONSTRAINT c_host_inventory_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
 
 -- create temporary t_host_inventory table

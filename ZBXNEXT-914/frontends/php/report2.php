@@ -225,7 +225,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		$triggers = API::Trigger()->get($options);
-		ArraySorter::sort($triggers, array('host', 'description'));
+		CArrayHelper::sort($triggers, array('host', 'description'));
 
 		$table = new CTableInfo(_('No hosts defined.'));
 		$table->setHeader(array(
@@ -235,7 +235,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			_('Problems'),
 			S_OK,
 			_('Unknown'),
-			S_GRAPH
+			_('Graph')
 		));
 
 		foreach($triggers as $trigger){

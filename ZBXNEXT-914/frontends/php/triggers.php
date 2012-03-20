@@ -50,7 +50,6 @@ $fields = array(
 	'expr_target_single' => array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression})||isset({or_expression})||isset({replace_expression}))'),
 	'dependencies' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'new_dependency' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependency})'),
-	'rem_dependency' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'g_triggerid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
@@ -67,7 +66,6 @@ $fields = array(
 	'remove_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'test_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_dependency' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'del_dependency' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'group_enable' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'group_disable' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'group_delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -148,7 +146,7 @@ elseif (isset($_REQUEST['save'])) {
 		'type' => $_REQUEST['type'],
 		'comments' => $_REQUEST['comments'],
 		'url' => $_REQUEST['url'],
-		'dependencies' => get_request('dependencies', array())
+		'dependencies' => zbx_toObject(get_request('dependencies', array()), 'triggerid')
 	);
 
 	if (isset($_REQUEST['triggerid'])) {
@@ -184,18 +182,9 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 		}
 	}
 }
-elseif (isset($_REQUEST['del_dependency']) && isset($_REQUEST['rem_dependency'])) {
-	if (isset($_REQUEST['dependencies'])) {
-		foreach ($_REQUEST['dependencies'] as $key => $val) {
-			if (!uint_in_array($val, $_REQUEST['rem_dependency'])) {
-				continue;
-			}
-			unset($_REQUEST['dependencies'][$key]);
-		}
-	}
-}
 elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])) {
 	$visible = get_request('visible', array());
+	$dependencies = zbx_toObject(get_request('dependencies', array()), 'triggerid');
 
 	// get triggers
 	$db_triggers = API::Trigger()->get(array(
@@ -211,7 +200,7 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 		$result = API::Trigger()->update(array(
 			'triggerid' => $trigger['triggerid'],
 			'priority' => (isset($visible['priority'])) ? get_request('priority') : null,
-			'dependencies' => (isset($visible['dependencies'])) ? get_request('dependencies', array()) : null
+			'dependencies' => (isset($visible['dependencies'])) ? $dependencies : null
 		));
 		if (!$result) {
 			break;

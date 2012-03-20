@@ -559,7 +559,7 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 		'templated_hosts' => true
 	));
 
-	$hash = array();
+	$newTriggerIds = array();
 	foreach ($db_dstHosts as $dstHost) {
 		foreach ($db_srcTriggers as $srcTrigger) {
 			if (httpItemExists($srcTrigger['items'])) {
@@ -577,29 +577,44 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 				$host = $srcTrigger['hosts'][0]['host'];
 			}
 			$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $host, $dstHost['host']);
-			$srcTrigger['dependencies'] = array();
+
+			// the dependencies must be added after all triggers are created
+			unset($srcTrigger['dependencies']);
+
 			if (!$result = API::Trigger()->create($srcTrigger)) {
 				return false;
 			}
-			$hash[$srcTrigger['triggerid']] = reset($result['triggerids']);
-		}
-
-		$deps = array();
-		foreach ($db_srcTriggers as $srcTrigger) {
-			if (httpItemExists($srcTrigger['items'])) {
-				continue;
-			}
-			foreach ($srcTrigger['dependencies'] as $dep) {
-				$deps[] = array(
-					'triggerid' => $hash[$srcTrigger['triggerid']],
-					'dependsOnTriggerid' => isset($hash[$dep['triggerid']]) ? $hash[$dep['triggerid']] : $dep['triggerid']
-				);
-			}
-		}
-		if (!API::Trigger()->addDependencies($deps)) {
-			return false;
+			$newTriggerIds[$srcTrigger['triggerid']] = reset($result['triggerids']);
 		}
 	}
+
+	// map dependencies to the new trigger IDs and save
+	if ($newTriggerIds) {
+		$dependencies = array();
+		foreach ($db_srcTriggers as $trigger) {
+			$triggerId = $trigger['triggerid'];
+			$triggerId = (isset($newTriggerIds[$triggerId])) ? $newTriggerIds[$triggerId] : $triggerId;
+
+			if ($trigger['dependencies']) {
+				foreach ($trigger['dependencies'] as $depTrigger) {
+					$depTriggerId = $depTrigger['triggerid'];
+					$depTriggerId = (isset($newTriggerIds[$depTriggerId])) ? $newTriggerIds[$depTriggerId] : $depTriggerId;
+
+					$dependencies[] = array(
+						'triggerid' => $triggerId,
+						'dependsOnTriggerid' => $depTriggerId
+					);
+				}
+			}
+		}
+
+		if ($dependencies) {
+			if (!API::Trigger()->addDependencies($dependencies)) {
+				return false;
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -1392,17 +1407,6 @@ function check_right_on_trigger_by_expression($permission, $expression) {
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
-function insert_dependency($triggerid_down, $triggerid_up) {
-	$triggerdepid = get_dbid('trigger_depends', 'triggerdepid');
-	return DBexecute('INSERT INTO trigger_depends (triggerdepid,triggerid_down,triggerid_up)'.
-						' VALUES ('.$triggerdepid.','.$triggerid_down.','.$triggerid_up.')');
-}
-
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
 function replace_template_dependencies($deps, $hostid) {
 	foreach ($deps as $id => $val) {
 		$sql = 'SELECT t.triggerid'.
@@ -1423,10 +1427,6 @@ function replace_template_dependencies($deps, $hostid) {
  * Comments: !!! Don't forget sync code with C !!!							*
  *																			*
  ******************************************************************************/
-function delete_dependencies_by_triggerid($triggerids) {
-	zbx_value2array($triggerids);
-	return DBexecute('DELETE FROM trigger_depends WHERE '.DBcondition('triggerid_down', $triggerids));
-}
 
 function delete_function_by_triggerid($triggerids) {
 	zbx_value2array($triggerids);
@@ -1992,8 +1992,8 @@ function analyze_expression($expression) {
 	}
 	$pasedData = parseTriggerExpressions($expression, true);
 	$next = array();
-	$nextletter = 'A';
-	return build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $nextletter);
+	$letterNum = 0;
+	return build_expression_html_tree($expression, $pasedData[$expression]['tree'], 0, $next, $letterNum);
 }
 
 function make_expression_tree(&$node, &$nodeid) {
@@ -2096,7 +2096,7 @@ function create_node_list($node, &$arr, $depth = 0, $parent_expr = null) {
 }
 
 // build trigger expression html (with zabbix html classes) tree
-function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$nextletter, &$secondLetters = null) {
+function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$letterNum) {
 	$treeList = array();
 	$outline = '';
 	$expr = array();
@@ -2120,7 +2120,7 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 
 		if (count($parts) == 1 && $sStart == $fPart['openSymbolNum'] && $sEnd == $fPart['closeSymbolNum']) {
 			$next[$level] = false;
-			list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $nextletter, $secondLetters);
+			list($outline, $treeList) = build_expression_html_tree($expression, $fPart, $level, $next, $letterNum);
 			$outline = (isset($treeLevel['openSymbol']) && $treeLevel['levelType'] == 'grouping' ? $treeLevel['openSymbol'].' ' : '')
 				.$outline.(isset($treeLevel['closeSymbol']) && $treeLevel['levelType'] == 'grouping' ? ' '.$treeLevel['closeSymbol'] : '');
 			return array($outline, $treeList);
@@ -2191,7 +2191,7 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 				$prev = is_int($opPos) && $opPos < $sEnd ? $opPos : $sEnd;
 				$opPos = find_next_operand($expression, $prev + zbx_strlen($operand), $sEnd, $parts, $bParts, $operand);
 				$next[$level] = is_int($prev) && $prev < $sEnd ? true : false;
-				list($outln, $treeLst) = build_expression_html_tree($expression, $newTreeLevel, $level + 1, $next, $nextletter, $secondLetters);
+				list($outln, $treeLst) = build_expression_html_tree($expression, $newTreeLevel, $level + 1, $next, $letterNum);
 				$treeList = array_merge($treeList, $treeLst);
 				$levelOutline .= trim($outln).(is_int($prev) && $prev < $sEnd ? ' '.$operand.' ':'');
 			}
@@ -2201,28 +2201,7 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 	}
 
 	if ($letterLevel) {
-		if (!$nextletter) {
-			$nextletter = 'A';
-		}
-
-		if ($nextletter > 'Z') {
-			if (!$secondLetters) {
-				$secondLetters = 'AA';
-			}
-			if ($secondLetters[1] > 'Z') {
-				$secondLetters[1] = 'A';
-				$secondLetters[0] = chr(ord($secondLetters[0]) + 1);
-			}
-			if ($secondLetters[0] > 'Z') {
-				$secondLetters[0] = 'A';
-			}
-			$newch = $secondLetters;
-		}
-		else {
-			$newch = $nextletter;
-		}
-
-		array_push($expr, SPACE, bold($newch), SPACE);
+		array_push($expr, SPACE, bold(num2letter($letterNum)), SPACE);
 		$expValue = trim(zbx_substr($expression, $treeLevel['openSymbolNum'], $treeLevel['closeSymbolNum'] - $treeLevel['openSymbolNum'] + 1));
 		if (!defined('NO_LINK_IN_TESTING')) {
 			$url =  new CSpan($expValue, 'link');
@@ -2234,14 +2213,9 @@ function build_expression_html_tree($expression, &$treeLevel, $level, &$next, &$
 		}
 		$expr[] = $url;
 		$glue = '';
-		if (isset($secondLetters[1])) {
-			$glue = ($secondLetters[1] == 'A' ? "&nbsp;\r\n" : ' ');
-			$secondLetters[1] = chr(ord($secondLetters[1]) + 1);
-		}
-		else {
-			$nextletter = chr(ord($nextletter) + 1);
-		}
-		$outline = $glue.$newch.' ';
+
+		$outline = $glue.num2letter($letterNum).' ';
+		$letterNum++;
 
 		$levelDetails = array(
 			'start' => $treeLevel['openSymbolNum'],
@@ -2651,7 +2625,6 @@ function copyTriggers($srcHostId, $dstHostId) {
 			continue;
 		}
 		$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
-		$srcTrigger['dependencies'] = array();
 
 		if (!$result = API::Trigger()->create($srcTrigger)) {
 			return false;
@@ -2659,22 +2632,6 @@ function copyTriggers($srcHostId, $dstHostId) {
 		$hash[$srcTrigger['triggerid']] = reset($result['triggerids']);
 	}
 
-	$deps = array();
-	foreach ($srcTriggers as $srcTrigger) {
-		if (httpItemExists($srcTrigger['items'])) {
-			continue;
-		}
-		foreach ($srcTrigger['dependencies'] as $dep) {
-			$deps[] = array(
-				'triggerid' => $hash[$srcTrigger['triggerid']],
-				'dependsOnTriggerid' => isset($hash[$dep['triggerid']]) ? $hash[$dep['triggerid']] : $dep['triggerid']
-			);
-		}
-	}
-
-	if (!API::Trigger()->addDependencies($deps)) {
-		return false;
-	}
 	return true;
 }
 

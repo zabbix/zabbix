@@ -460,7 +460,6 @@ class CTemplate extends CZBXAPI {
 
 		}
 
-		Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -893,7 +892,6 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
-		COpt::memoryPick();
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -1127,6 +1125,17 @@ class CTemplate extends CZBXAPI {
 
 		API::Template()->unlink($templateids, null, true);
 
+		// delete the discovery rules first
+		$delRules = API::DiscoveryRule()->get(array(
+			'hostids' => $templateids,
+			'nopermissions' => true,
+			'preservekeys' => true
+		));
+		if ($delRules) {
+			API::DiscoveryRule()->delete(array_keys($delRules), true);
+		}
+
+		// delete the items
 		$delItems = API::Item()->get(array(
 			'templateids' => $templateids,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -1134,14 +1143,12 @@ class CTemplate extends CZBXAPI {
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-
-		if (!empty($delItems)) {
+		if ($delItems) {
 			API::Item()->delete(array_keys($delItems), true);
 		}
 
-
 		// delete screen items
-		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
+		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
 
 		// delete host from maps
 		if (!empty($templateids)) {
@@ -1304,8 +1311,6 @@ class CTemplate extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function massUpdate($data) {
-		$transaction = false;
-
 		$templates = zbx_toArray($data['templates']);
 		$templateids = zbx_objectValues($templates, 'templateid');
 
@@ -1853,34 +1858,34 @@ class CTemplate extends CZBXAPI {
 				));
 			}
 
+			// sync triggers
+			API::Trigger()->syncTemplates(array(
+				'hostids' => $targetid,
+				'templateids' => $templateids
+			));
+
 			// we do linkage in two separate loops because for triggers you need all items already created on host
-			for ($i = 1; $i <= 2; $i++) {
-				foreach ($templateids as $templateid) {
-					foreach ($linked as $link) {
-						if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
-							continue 2;
-						}
+			foreach ($templateids as $templateid) {
+				foreach ($linked as $link) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
+						continue 2;
 					}
-					API::Trigger()->syncTemplates(array(
-						'hostids' => $targetid,
-						'templateids' => $templateid
-					));
-
-					API::TriggerPrototype()->syncTemplates(array(
-						'hostids' => $targetid,
-						'templateids' => $templateid
-					));
-
-					API::GraphPrototype()->syncTemplates(array(
-						'hostids' => $targetid,
-						'templateids' => $templateid
-					));
-
-					API::Graph()->syncTemplates(array(
-						'hostids' => $targetid,
-						'templateids' => $templateid
-					));
 				}
+
+				API::TriggerPrototype()->syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+
+				API::GraphPrototype()->syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+
+				API::Graph()->syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
 			}
 		}
 

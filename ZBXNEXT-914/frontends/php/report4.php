@@ -95,7 +95,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		$form->addItem($cmbMedia);
 
-		$form->addItem(SPACE.S_PERIOD.SPACE);
+		$form->addItem(SPACE._('Period').SPACE);
 		$cmbPeriod = new CComboBox('period', $period, 'submit();');
 		$cmbPeriod->addItem('daily',	S_DAILY);
 		$cmbPeriod->addItem('weekly',	S_WEEKLY);
@@ -226,7 +226,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 			$links = array();
 			foreach($media_types as $id => $description){
-				$links[] = new CLink($description, 'media_types.php?form=update&mediatypeid=' . $id);
+				$links[] = new CLink($description, 'media_types.php?form=edit&mediatypeid=' . $id);
 				$links[] = SPACE . '/' . SPACE;
 			}
 			array_pop($links);

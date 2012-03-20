@@ -26,10 +26,14 @@ class CProfile {
 	private static $profiles = null;
 	private static $update = array();
 	private static $insert = array();
+	private static $stringProfileMaxLength;
 
 	public static function init() {
 		self::$userDetails = CWebUser::$data;
 		self::$profiles = array();
+
+		$profilesTableSchema = DB::getSchema('profiles');
+		self::$stringProfileMaxLength = $profilesTableSchema['fields']['value_str']['length'];
 
 		$db_profiles = DBselect(
 			'SELECT p.*'.
@@ -192,6 +196,8 @@ class CProfile {
 				return zbx_ctype_digit($value);
 			case PROFILE_TYPE_INT:
 				return zbx_is_int($value);
+			case PROFILE_TYPE_STR:
+				return zbx_strlen($value) <= self::$stringProfileMaxLength;
 			default:
 				return true;
 		}
@@ -343,14 +349,8 @@ function get_user_history() {
 	}
 
 	for ($i = 1; $i < 6; $i++) {
-		if (defined($history['title'.$i])) {
-			$title = constant($history['title'.$i]);
-		}
-		else {
-			$title = $history['title'.$i];
-		}
-
-		if (!empty($title)) {
+		if (!zbx_empty($history['title'.$i])) {
+			$title = defined($history['title'.$i]) ? constant($history['title'.$i]) : $history['title'.$i];
 			$url = new CLink($title, $history['url'.$i], 'history');
 			array_push($result, array(SPACE, $url, SPACE));
 			array_push($result, $delimiter);
@@ -378,6 +378,12 @@ function add_user_history($page) {
 	}
 	else {
 		$url = $page['file'];
+	}
+
+	// if url length is greater than db field size, skip history update
+	$historyTableSchema = DB::getSchema('user_history');
+	if (zbx_strlen($url) > $historyTableSchema['fields']['url5']['length']) {
+		return false;
 	}
 
 	$history5 = DBfetch(DBSelect(

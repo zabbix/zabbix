@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/defines.inc.php';
 require_once dirname(__FILE__).'/func.inc.php';
 require_once dirname(__FILE__).'/html.inc.php';
-require_once dirname(__FILE__).'/copt.lib.php';
+CProfiler::getInstance()->start();
 require_once dirname(__FILE__).'/profiles.inc.php';
 require_once dirname(__FILE__).'/../conf/maintenance.inc.php';
 // abc sorting

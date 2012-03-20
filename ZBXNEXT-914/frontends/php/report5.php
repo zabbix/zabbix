@@ -132,7 +132,7 @@ foreach ($triggers as $tid => $trigger) {
 	$triggers[$tid] = $trigger;
 }
 
-ArraySorter::sort($triggers, array(array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN), 'host', 'description', 'priority'));
+CArrayHelper::sort($triggers, array(array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN), 'host', 'description', 'priority'));
 foreach ($triggers as $trigger) {
 	$menus = '';
 	$host_nodeid = id2nodeid($trigger['hostid']);

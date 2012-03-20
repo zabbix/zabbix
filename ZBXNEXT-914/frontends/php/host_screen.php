@@ -86,7 +86,7 @@
 			if('add' == $_REQUEST['favaction']){
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 				if($result){
-					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
+					print('$("addrm_fav").title = "'._('Remove from favourites.').'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
@@ -94,7 +94,7 @@
 				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
-					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
+					print('$("addrm_fav").title = "'._('Add to favourites.').'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}
@@ -163,7 +163,6 @@
 // HEADER {{{
 		$form = new CForm('get');
 		$form->addVar('fullscreen', $_REQUEST['fullscreen']);
-		//$form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
 
 		$screens_wdgt->addHeader($screen['name'], $form);
 // }}} HEADER

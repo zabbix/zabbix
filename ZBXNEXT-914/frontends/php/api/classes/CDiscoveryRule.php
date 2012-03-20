@@ -706,7 +706,7 @@ class CDiscoveryRule extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$selectFields = array('flags');
+		$selectFields = array();
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;
@@ -846,20 +846,6 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	protected function createReal(&$items) {
-		foreach ($items as $key => $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => true
-			));
-			foreach ($itemsExists as $inum => $itemExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host with item "%1$s" already exists.', $item['key_']));
-			}
-		}
-
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = array();
@@ -903,20 +889,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$data = array();
 		foreach ($items as $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => true
-			));
-			foreach ($itemsExists as $itemExists) {
-				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Host with item "%1$s" already exists.', $item['key_']));
-				}
-			}
-
 			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
 		}
 		$result = DB::update('items', $data);
@@ -959,18 +931,19 @@ class CDiscoveryRule extends CItemGeneral {
 	/**
 	 * Check item data and set missing default values.
 	 *
-	 * @throws APIException
-	 *
 	 * @param array $items passed by reference
 	 * @param bool  $update
 	 *
 	 * @return void
 	 */
 	protected function checkInput(array &$items, $update = false) {
+		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 		}
+		unset($item);
+
 		parent::checkInput($items, $update);
 	}
 
@@ -1156,8 +1129,7 @@ class CDiscoveryRule extends CItemGeneral {
 			return array();
 		}
 
-		$srcItemids = array();
-		$itemKeys = array();
+		$srcItemIds = array();
 		foreach ($srcGraphs as $key => $graph) {
 			// skip graphs with items from multiple hosts
 			if (count($graph['hosts']) > 1) {
@@ -1171,14 +1143,21 @@ class CDiscoveryRule extends CItemGeneral {
 				continue;
 			}
 
+			// save all used item ids to map them to the new items
 			foreach ($graph['gitems'] as $item) {
-				$srcItemids[] = $item['itemid'];
+				$srcItemIds[] = $item['itemid'];
+			}
+			if ($graph['ymin_itemid']) {
+				$srcItemIds[] = $graph['ymin_itemid'];
+			}
+			if ($graph['ymax_itemid']) {
+				$srcItemIds[] = $graph['ymax_itemid'];
 			}
 		}
 
 		// fetch source items
 		$items = API::Item()->get(array(
-			'itemids' => $srcItemids,
+			'itemids' => $srcItemIds,
 			'output' => API_OUTPUT_EXTEND
 		));
 		$srcItems = array();
@@ -1206,12 +1185,22 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($dstGraphs as &$graph) {
 			unset($graph['graphid']);
 
-			foreach ($graph['gitems'] as $key => &$gitem) {
+			foreach ($graph['gitems'] as &$gitem) {
 				// replace the old item with the new one with the same key
 				$item = $srcItems[$gitem['itemid']];
 				$gitem['itemid'] = $dstItems[$item['key_']]['itemid'];
 
 				unset($gitem['gitemid'], $gitem['graphid']);
+			}
+
+			// replace the old axis items with the new one with the same key
+			if ($graph['ymin_itemid']) {
+				$yMinSrcItem = $srcItems[$graph['ymin_itemid']];
+				$graph['ymin_itemid'] = $dstItems[$yMinSrcItem['key_']]['itemid'];
+			}
+			if ($graph['ymax_itemid']) {
+				$yMaxSrcItem = $srcItems[$graph['ymax_itemid']];
+				$graph['ymax_itemid'] = $dstItems[$yMaxSrcItem['key_']]['itemid'];
 			}
 		}
 

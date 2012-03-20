@@ -88,7 +88,7 @@
 			$table = new CTable(null, 'setup_wizard');
 			$table->setAlign('center');
 			$table->setHeader(array(
-				new CCol(S_ZABBIX.SPACE.ZABBIX_VERSION, 'left'),
+				new CCol('Zabbix'.SPACE.ZABBIX_VERSION, 'left'),
 				SPACE
 				),'header');
 			$table->addRow(array(SPACE, new CCol($this->stage[$this->getStep()]['title'], 'right')),'title');
@@ -97,14 +97,14 @@
 				new CCol($this->getState(), 'right')
 				), 'center');
 
-			$next = new CSubmit('next['.$this->getStep().']', S_NEXT.' >>');
+			$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>');
 			if($this->DISABLE_NEXT_BUTTON) $next->setEnabled(false);
 
 			$table->setFooter(array(
 				new CCol(new CSubmit('cancel',S_CANCEL),'left'),
 				new CCol(array(
-					isset($this->stage[$this->getStep()-1]) ? new CSubmit('back['.$this->getStep().']', '<< '.S_PREVIOUS) : null,
-					isset($this->stage[$this->getStep()+1]) ? $next: new CSubmit('finish', S_FINISH)
+					isset($this->stage[$this->getStep()-1]) ? new CSubmit('back['.$this->getStep().']', '<< '._('Previous')) : null,
+					isset($this->stage[$this->getStep()+1]) ? $next: new CSubmit('finish', _('Finish'))
 					) , 'right')
 				),'footer');
 

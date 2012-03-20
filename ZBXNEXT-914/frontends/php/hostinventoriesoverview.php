@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = 'S_HOST_INVENTORY_OVERVIEW';
+$page['title'] = _('Host inventory overview');
 $page['file'] = 'hostinventoriesoverview.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 

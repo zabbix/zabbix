@@ -2032,14 +2032,16 @@ static void	DBlld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t discovery_item
 		show_3d = (unsigned char)atoi(row[10]);
 		percent_left = atof(row[11]);
 		percent_right = atof(row[12]);
-		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == (unsigned char)atoi(row[13]) && SUCCEED != DBis_null(row[14]))
+		ymin_type = (unsigned char)atoi(row[13]);
+		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == ymin_type && SUCCEED != DBis_null(row[14]))
 		{
 			ymin_type = GRAPH_YAXIS_TYPE_ITEM_VALUE;
 			ZBX_STR2UINT64(ymin_itemid, row[14]);
 			ymin_flags = (unsigned char)atoi(row[15]);
 			ymin_key_proto = row[16];
 		}
-		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == (unsigned char)atoi(row[17]) && SUCCEED != DBis_null(row[18]))
+		ymax_type = (unsigned char)atoi(row[17]);
+		if (GRAPH_YAXIS_TYPE_ITEM_VALUE == ymax_type && SUCCEED != DBis_null(row[18]))
 		{
 			ymax_type = GRAPH_YAXIS_TYPE_ITEM_VALUE;
 			ZBX_STR2UINT64(ymax_itemid, row[18]);
@@ -2241,10 +2243,10 @@ void	DBlld_process_discovery_rule(zbx_uint64_t discovery_itemid, char *value, zb
 
 /* {"net.if.discovery":[{"{#IFNAME}":"eth0"},{"{#IFNAME}":"lo"},...]}
  *                     ^-------------------------------------------^
- */	if (SUCCEED != zbx_json_brackets_by_name(&jp, discovery_key, &jp_data))
+ */	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		error = zbx_dsprintf(error, "Cannot find the \"%s\" key in received JSON object",
-				discovery_key);
+		error = zbx_dsprintf(error, "Cannot find the \"%s\" array in the received JSON object",
+				ZBX_PROTO_TAG_DATA);
 		goto error;
 	}
 

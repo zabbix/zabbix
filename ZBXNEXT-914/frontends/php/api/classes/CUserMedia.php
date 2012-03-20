@@ -411,14 +411,14 @@ class CUserMedia extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete himself.'));
 
 				if ($dbMedias[$media['mediaid']]['alias'] == ZBX_GUEST_USER)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete %1$s internal user "%2$s", try disabling that user.', S_ZABBIX, ZBX_GUEST_USER));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER));
 
 				continue;
 			}
 
 
 			if (isset($media['period']) && !validate_period($media['period']))
-				self::exception(ZBX_API_ERROR_PARAMETERS, S_CUSER_ERROR_INCORRECT_TIME_PERIOD);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect time period'));
 
 		}
 		unset($media);

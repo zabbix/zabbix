@@ -1,7 +1,33 @@
 --------------------------------------------------------------------------------
-Changes for 1.9.10
+Changes for 2.0.0rc2
+
+Bug fixes:
+A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
+A.F....... [ZBX-4257] fixed creating discovery rules, items and item prototypes (Pavels)
+..F....... [ZBX-4765] fixed filter fields being unset when saving of discovery rule fails (Vedmak)
+..F....... [ZBX-4736] fixed undefined variable in Inventory Hosts (Toms)
+..F....... [ZBX-4764] fixed critical error in Administration->Notifications (Toms)
+..F....... [ZBX-4753] properly pluralized "Last n issues" message in dashboard (Vedmak)
+..F....... [ZBX-3613] updated notification sounds; fixed sound playback in profile (Toms, Vedmak)
+..F....... [ZBX-4713] fixed ACK status for triggers visible in Dashboard and Screens (Toms)
+..F....... [ZBX-4752] fixed creating SNMPv1 item prototypes with data type "boolean" (Vedmak)
+..F....... [ZBX-4702] fixed dynamic item saving in Screens (Eduard)
+A.F....... [ZBX-4257] fixed updating templated items (Pavels)
+A.F....... [ZBX-4710] fixed replacing graph Y axis item prototypes when cloning a discovery rule (Pavels)
+A.F....... [ZBX-4710] fixed deleting hosts when a graph prototype uses a normal item for it's Y scale (Pavels)
+..F....... [ZBX-4365] added plural translation support for the failed login attempt message (Pavels)
+..F....... [ZBX-4365] fixed user being redirected to the dashboard after trying to login with an incorrect password (Pavels)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.0rc1
 
 New features:
+....I...S. [ZBX-4751] removed "WITH OIDS" option from PostgreSQL database scheme (Sasha)
+....I..PS. [ZBXNEXT-397] added support of web monitoring by Zabbix proxy (Sasha)
+..F....... [ZBX-3531] configuration export/import (Vedmak)
+...G...PS. [ZBX-4581] added time unit symbols support to aggregate items (dimir)
+A.F....... [ZBX-4333] implemented dependency validation in trigger::adddependencies (Pavels)
+A.F....... [ZBX-4333] implemented dependency inheritance in the trigger.adddependencies and trigger.deletedependencies methods (Pavels)
 ..F....... [ZBXNEXT-904] redesign Configuration->Screens (Eduard)
 ..F....... [ZBX-4600] trigger dependencies will now be deleted when executing a mass update with no dependencies selected (Pavels)
 A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces (Pavels)
@@ -14,10 +40,19 @@ A......... [ZBX-4563] changed the hostmacro related UserMacro method interfaces 
 ..F....... [ZBXNEXT-909] redesign Configuration->Discovery (Eduard)
 
 Bug fixes:
-..F....... [ZBX-4202] Fixed SQL performance in tr_status.php - combined similar queries, user data SQL access only once, triggerids retrieval optimization (Toms)
+..F....... [ZBX-3528] fixed letter numbering of long lists (Vedmak)
+...G.J.PS. [ZBX-4725] fixed processing lld rules with macros in a key (Sasha)
+..F....... [ZBX-4730] removed incorrect JS function call in the event history screen (Pavels)
+..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
+A.F....... [ZBX-4333] fixed trigger inheritance when calling trigger.update whithout a trigger expression (Pavels)
+..F....... [ZBX-4333] fixed host trigger mass update (Pavels)
+..F....... [ZBX-4333] fixed trigger dependency copying (Pavels)
+.......S.. [ZBX-4629] fixed processing Y axis min/max values for graph prototypes (Sasha)
+..F....... [ZBX-4641] fixed errors in a "Discovery checks" popup (Sasha)
+A.F....... [ZBX-4202] fixed SQL performance in tr_status.php - combined similar queries, user data SQL access only once, triggerids retrieval optimization (Toms)
 A.F....... [ZBX-4647] fixed trigger and item prototype inheritance (Pavels)
 ..F....... [ZBX-4467] fixed the ZBX_MAX_PERIOD constant not affecting the timebar control (Pavels)
-A......... [ZBX-4562] Fixed meditype.update returning wrong formatted result (Toms)
+A......... [ZBX-4562] fixed meditype.update returning wrong formatted result (Toms)
 ..F....... [ZBX-4187] fixed dashbord fonts on popup. fixed js error on last 20 issues (Toms)
 A.F....... [ZBX-4607] fixed the script.getscriptbyhosts method returning scripts from nodes defferent from hosts (Pavels)
 A.F....... [ZBX-4607] fixed the script "Host groups" parameter (Pavels)
@@ -475,9 +510,23 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.12rc1
+
+A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
+.D........ [ZBX-4777] added information in the Zabbix sender manpage about values being sent in a sequential manner and the need to have ordered timestamps (Richlv)
+
+Changes for 1.8.11
+
+1.8.11rc1 was released as 1.8.11 without any changes
+
 Changes for 1.8.11rc1
 
+..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
+A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
+A......... [ZBX-4562] fixed meditype.update returning wrong formatted result (Toms)
 ...G...PS. [ZBX-4721] fixed handling of \u0000 by JSON parser; thanks to Rick Alm (Sasha)
+..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
+..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)
 ........S. [ZBX-4549] fixed nested db transaction error when stopping server (dimir)
 ........S. [ZBX-4694] fixed possible SQL errors or server crash while processing trends by history syncer (Sasha)
 ..F....... [ZBX-4579] fixed incorrect "unknown" values in availability report if no events present (Alexei)
