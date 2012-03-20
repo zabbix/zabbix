@@ -22,6 +22,13 @@
 
 class CTextArea extends CTag {
 
+	/**
+	 * The "&" symbol in the textarea should be encoded.
+	 *
+	 * @var int
+	 */
+	protected $encStrategy = self::ENC_ALL;
+
 	public function __construct($name = 'textarea', $value = '', $rows = ZBX_TEXTAREA_STANDARD_ROWS, $width = ZBX_TEXTAREA_STANDARD_WIDTH, $readonly = false) {
 		parent::__construct('textarea', 'yes');
 		$this->attr('class', 'input');
