@@ -21,32 +21,31 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of icon mapping');
 $page['file'] = 'adm.iconmapping.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-$fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'iconmapid' => 				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))||isset({delete})'),
-	'iconmap' =>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'delete'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'clone'=>					array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'iconmapid' =>		array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'(isset({form})&&({form}=="update"))||isset({delete})'),
+	'iconmap' =>		array(T_ZBX_STR, O_OPT, null,			null,	'isset({save})'),
+	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'clone' =>			array(T_ZBX_STR, O_OPT, null,			null,	null),
+	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,			null,	null)
 );
-?>
-<?php
 check_fields($fields);
 
-
+/*
+ * Actions
+ */
 if (isset($_REQUEST['save'])) {
 	$_REQUEST['iconmap']['mappings'] = isset($_REQUEST['iconmap']['mappings'])
-			? $_REQUEST['iconmap']['mappings']
-			: array();
+		? $_REQUEST['iconmap']['mappings']
+		: array();
 
 	$i = 0;
 	foreach ($_REQUEST['iconmap']['mappings'] as $iconmappingid => &$mapping) {
@@ -84,7 +83,9 @@ elseif (isset($_REQUEST['clone'])) {
 	$_REQUEST['form'] = 'clone';
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.iconmapping.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -106,10 +107,8 @@ if (!isset($_REQUEST['form'])) {
 	$form->addItem(new CSubmit('form', _('Create icon map')));
 }
 
-
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
-
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ICON MAPPING'), $form);
 
 $data = array();
 $data['form_refresh'] = get_request('form_refresh', 0);

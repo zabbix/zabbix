@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CTextArea extends CTag {
 
 	/**

@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CButton extends CInput {
 
 	/**

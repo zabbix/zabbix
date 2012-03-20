@@ -37,8 +37,8 @@ $goButton->setAttribute('id', 'goButton');
 
 zbx_add_post_js('chkbxRange.pageGoName = "regexpids";');
 
-$regExpTable = new CTableInfo();
-$regExpTable->setHeader(array(new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm','all_regexps','regexpids');"), _('Name'), _('Expressions')));
+$regExpTable = new CTableInfo(_('No regular expressions defined.'));
+$regExpTable->setHeader(array(new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');"), _('Name'), _('Expressions')));
 $regExpTable->setFooter(new CCol(array($goBox, $goButton)));
 
 $expressions = array();

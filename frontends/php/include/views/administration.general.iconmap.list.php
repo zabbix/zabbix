@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-$table = new CTableInfo();
+$table = new CTableInfo(_('No icon map defined.'));
 $table->setHeader(array(_('Name'), _('Icon map')));
 $table->addItem(BR());
 

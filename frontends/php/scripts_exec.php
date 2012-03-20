@@ -30,11 +30,11 @@ define('ZBX_PAGE_NO_MENU', 1);
 
 require_once ('include/page_header.php');
 
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({execute})'),
-	'scriptid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({execute})'),
-	'execute' =>	array(T_ZBX_INT, O_OPT, P_ACT,	IN('0,1'),	null),
+	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		'isset({execute})'),
+	'scriptid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		'isset({execute})'),
+	'execute' =>	array(T_ZBX_INT, O_OPT, P_ACT, IN('0,1'),	null)
 );
 check_fields($fields);
 
@@ -49,22 +49,22 @@ if (isset($_REQUEST['execute'])) {
 	));
 
 	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
-	if ($result === false) {
-		show_messages(false, '', _('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
+	if (!$result) {
+		show_error_message(_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
 	}
 	else {
 		$message = $result['value'];
 		if ($result['response'] == 'failed') {
 			error($message);
-			show_messages(false, '', _('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
+			show_error_message(_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
 			$message = '';
 		}
 		$frmResult = new CFormTable($script_info['name']);
 		$frmResult->addRow(_('Result'), new CTextArea('message', $message, 25, ZBX_TEXTAREA_BIG_WIDTH, 'yes'));
-		$frmResult->addItemToBottomRow(new CButton('close', S_CLOSE, 'window.close();'));
+		$frmResult->addItemToBottomRow(new CButton('close', _('Close'), 'window.close();'));
 		$frmResult->show();
 	}
 }
 
-require_once "include/page_footer.php";
+require_once 'include/page_footer.php';
 ?>

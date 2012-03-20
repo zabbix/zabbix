@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CVar {
+
 	public $var_container;
 	public $var_name;
 	public $element_id;

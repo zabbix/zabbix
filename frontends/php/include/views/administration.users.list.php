@@ -40,10 +40,8 @@ foreach ($this->data['userGroups'] as $userGroup) {
 }
 $userGroupListForm->addItem(array(_('User group').SPACE, $userGroupComboBox));
 
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $usersWidget->addHeader(_('Users'), $userGroupListForm);
-$usersWidget->addHeader($numRows);
+$usersWidget->addHeaderRowNumber();
 
 // create form
 $usersForm = new CForm();

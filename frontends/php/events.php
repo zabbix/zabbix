@@ -205,12 +205,35 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$events_wdgt = new CWidget();
 
-// PAGE HEADER {{{
-	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$events_wdgt->addPageHeader(array(_('HISTORY OF EVENTS ON '), zbx_date2str(S_EVENTS_DATE_FORMAT, time())), $fs_icon);
-// }}}PAGE HEADER
+	// header
+	// allow CSV export button
+	$frmForm = new CForm();
+	$frmForm->cleanItems();
+	if (isset($_REQUEST['groupid'])) {
+		$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
+	}
+	if (isset($_REQUEST['hostid'])) {
+		$frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
+	}
+	if (isset($_REQUEST['source'])) {
+		$frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
+	}
+	if (isset($_REQUEST['start'])) {
+		$frmForm->addVar('start', $_REQUEST['start'], 'start_csv');
+	}
+	if (isset($_REQUEST['stime'])) {
+		$frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
+	}
+	if (isset($_REQUEST['period'])) {
+		$frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
+	}
+	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
-// HEADER {{{
+	$events_wdgt->addPageHeader(
+		_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(_('d M Y H:i:s'), time()).']',
+		array($frmForm, SPACE, get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
+	);
+
 	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 	$r_form->addVar('stime', get_request('stime'));
@@ -250,31 +273,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$r_form->addItem(array(SPACE._('Source').SPACE, $cmbSource));
 	}
 
-	$events_wdgt->addHeader(_('EVENTS'), $r_form);
-
-
-
-	// allow CSV export button
-	$frmForm = new CForm();
-	$frmForm->cleanItems();
-	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
-	if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
-	if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
-	if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start'], 'start_csv');
-	if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
-	if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
-	$buttons = new CDiv(array(
-		new CSubmit('csv_export', _('Export to CSV')),
-	));
-	$buttons->useJQueryStyle();
-	$frmForm->addItem($buttons);
-
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
-	$events_wdgt->addHeader($numrows, $frmForm);
-
-// }}} HEADER
-
+	$events_wdgt->addHeader(_('Events'), $r_form);
+	$events_wdgt->addHeaderRowNumber();
 
 // FILTER {{{
 	$filterForm = null;
@@ -332,7 +332,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // }}} FILTER
 
 
-	$table = new CTableInfo(S_NO_EVENTS_FOUND);
+	$table = new CTableInfo(_('No events defined.'));
 
 // CHECK IF EVENTS EXISTS {{{
 	$options = array(
@@ -510,26 +510,26 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		else{
 			$table->setHeader(array(
 				_('Time'),
-				is_show_all_nodes()?_('Node'):null,
-				($_REQUEST['hostid'] == 0)?S_HOST:null,
+				is_show_all_nodes() ? _('Node') : null,
+				($_REQUEST['hostid'] == 0) ? _('Host') : null,
 				_('Description'),
 				_('Status'),
 				S_SEVERITY,
 				_('Duration'),
-				($config['event_ack_enable'])?S_ACK:NULL,
+				($config['event_ack_enable']) ? S_ACK : null,
 				_('Actions')
 			));
 
 			if($CSV_EXPORT){
 				$csvRows[] = array(
 					_('Time'),
-					is_show_all_nodes()?_('Node'):null,
-					($_REQUEST['hostid'] == 0)?S_HOST:null,
+					is_show_all_nodes() ? _('Node') : null,
+					($_REQUEST['hostid'] == 0) ? _('Host') : null,
 					_('Description'),
 					_('Status'),
 					S_SEVERITY,
 					_('Duration'),
-					($config['event_ack_enable'])?S_ACK:NULL,
+					($config['event_ack_enable']) ? S_ACK : null,
 					_('Actions')
 				);
 			}
