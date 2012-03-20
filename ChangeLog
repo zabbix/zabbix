@@ -509,6 +509,14 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.12rc1
+
+.D........ [ZBX-4777] added information in the Zabbix sender manpage about values being sent in a sequential manner and the need to have ordered timestamps (Richlv)
+
+Changes for 1.8.11
+
+1.8.11rc1 was released as 1.8.11 without any changes
+
 Changes for 1.8.11rc1
 
 ..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
