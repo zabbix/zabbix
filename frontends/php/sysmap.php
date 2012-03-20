@@ -183,23 +183,23 @@ $gridAlignAll->setAttribute('id', 'gridalignall');
 $gridForm = new CDiv(array($gridSize, $gridAlignAll));
 $gridForm->setAttribute('id', 'gridalignblock');
 
-$save_btn = new CSubmit('save', _('Save'));
-$save_btn->setAttribute('id', 'sysmap_save');
+$saveButton = new CSubmit('save', _('Save'));
+$saveButton->setAttribute('id', 'sysmap_save');
 
 $menuRow = array(
 	_s('Map "%s"', $sysmap['name']),
 	SPACE.SPACE,
-	_('Icon').' [', $el_add, $el_rmv, ']',
+	_('Icon'), SPACE, $el_add, SPACE, $el_rmv,
 	SPACE.SPACE,
-	_('Link').' [',$cn_add,$cn_rmv,']',
+	_('Link'), SPACE, $cn_add, SPACE, $cn_rmv,
 	SPACE.SPACE,
-	_('Expand macros').' [', $expandMacros, ']',
+	_('Expand macros').' [ ', $expandMacros, ' ]',
 	SPACE.SPACE,
-	_('Grid').' [', $gridShow, '|', $gridAutoAlign, ']',
+	_('Grid').SPACE.'[', $gridShow, '|', $gridAutoAlign, ']',
 	SPACE,
 	$gridForm,
 	SPACE.'|'.SPACE,
-	$save_btn,
+	$saveButton
 );
 
 $elcn_tab = new CTable(null, 'textwhite');

@@ -106,9 +106,6 @@
 	'S_GROUPS'=>					_('Groups'),
 	'S_HOST_GROUP'=>				_('Host group'),
 	'S_UPDATE'=>					_('Update'),
-	'S_PROXIES_BIG'=>				_('PROXIES'),
-	'S_CREATE_PROXY'=>				_('Create proxy'),
-	'S_LASTSEEN_AGE'=>				_('Last seen (age)'),
 	'S_INTERFACES' =>				_('Interfaces'),
 
 // templates.php
@@ -129,13 +126,9 @@
 //	items.php
 	'S_DESCRIPTION'=>					_('Description'),
 	'S_HISTORY'=>						_('History'),
-	'S_WEB_CHECKS_BIG'=>					_('WEB CHECKS'),
 	'S_ITEM'=>						_('Item'),
-	'S_MODE'=>						_('Mode'),
 
 //	events.php
-	'S_NO_EVENTS_FOUND'=>			_('No events found'),
-	'S_EVENTS_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_EVENTS_DISCOVERY_TIME_FORMAT'=>	_('d M Y H:i:s'),
 	'S_EVENTS_ACTION_TIME_FORMAT'=>		_('d M Y H:i:s'),
 
@@ -149,7 +142,6 @@
 //	sysmaps.php
 	'S_MAP_DELETED'=>			_('Network map deleted'),
 	'S_CANNOT_DELETE_MAP'=>			_('Cannot delete network map'),
-	'S_MAPS_BIG'=>					_('MAPS'),
 	'S_CREATE_MAP'=>				_('Create map'),
 	'S_DELETE_SELECTED_MAPS_Q'=>		_('Delete selected maps?'),
 	'S_MAP_ADDED'=>					_('Network map added'),
@@ -182,7 +174,6 @@
 	'S_EVENT_ACKNOWLEDGING_DISABLED' => _('Event acknowledging disabled'),
 
 //	maps.php
-	'S_NETWORK_MAPS'=>		_('Network maps'),
 	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 
 //	media.php
@@ -206,7 +197,6 @@
 	'S_PROBLEM_DISPLAY' => _('Problem display'),
 
 //	overview.php
-	'S_OVERVIEW'=>				_('Overview'),
 	'S_OVERVIEW_BIG'=>			_('OVERVIEW'),
 	'S_HOSTS_LOCATION'=>			_('Hosts location'),
 	'S_DATA'=>				_('Data'),
@@ -217,9 +207,6 @@
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 
 //	report1.php
-	'S_REPORT_BIG'=>			_('REPORT'),
-	'S_STATUS_OF_ZABBIX'=>			_('Status of Zabbix'),
-	'S_STATUS_OF_ZABBIX_BIG'=>		_('STATUS OF ZABBIX'),
 	'S_VALUE'=>				_('Value'),
 
 //	report2.php
@@ -254,7 +241,6 @@
 	'S_CREATE'=>				_('Create'),
 
 //	report4.php
-	'S_NOTIFICATIONS_BIG'=>			_('NOTIFICATIONS'),
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),
 	'S_REPORT4_ANNUALLY_DATE_FORMAT'=>	_('Y'),
 	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	_('M Y'),
@@ -277,7 +263,6 @@
 	'S_REPORTS_BAR_REPORT_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
 //	screenconf.php
-	'S_NO_RESOURCES_DEFINED'=>		_('No resources defined.'),
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
 	'S_WIDTH'=>						_('Width'),
@@ -324,7 +309,6 @@
 	'S_ADD'=>						_('Add'),
 
 //	tr_status.php
-	'S_STATUS_OF_TRIGGERS_BIG'=>		_('STATUS OF TRIGGERS'),
 	'S_SHOW_DETAILS'=>			_('Show details'),
 	'S_FILTER_BY_NAME'=>				_('Filter by name'),
 	'S_ACK'=>				_('Ack'),
@@ -337,12 +321,6 @@
 	'S_SELECT' => _('Select'),
 
 //	users.php
-	'S_PROXY_ADDED'=>			_('Proxy added'),
-	'S_CANNOT_ADD_PROXY'=>		_('Cannot add proxy'),
-	'S_PROXY_UPDATED'=>			_('Proxy updated'),
-	'S_CANNOT_UPDATE_PROXY'=>	_('Cannot update proxy'),
-	'S_PROXY_DELETED'=>			_('Proxy deleted'),
-	'S_CANNOT_DELETE_PROXY'=>	_('Cannot delete proxy'),
 	'S_NAME'=>					_('Name'),
 	'S_HIDE'=>					_('Hide'),
 

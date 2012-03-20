@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CComboItem extends CTag {
 
 	public function __construct($value, $caption = null, $selected = null, $enabled = null) {

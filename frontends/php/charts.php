@@ -140,7 +140,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$icons = array();
 	$charts_wdgt = new CWidget('hat_charts');
-	$table = new CTableInfo('...','chart');
+	$table = new CTableInfo(_('No charts defined.'), 'chart');
 	$header = null;
 
 	if($pageFilter->graphsSelected){
@@ -209,7 +209,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		zbx_add_post_js('timeControl.processObjects();');
 	}
 
-	$charts_wdgt->addPageHeader(_('GRAPHS'), $icons);
+	$charts_wdgt->addPageHeader(_('Graphs'), $icons);
 	$charts_wdgt->addHeader($header, $r_form);
 	$charts_wdgt->addItem(BR());
 	$charts_wdgt->addItem($table);

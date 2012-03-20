@@ -76,11 +76,12 @@ foreach($inventoryFields as $inventoryField){
 }
 
 $r_form = new CForm('get');
-$r_form->addItem(array(_('Group'), $pageFilter->getGroupsCB(true)));
-$r_form->addItem(array(_('Grouping by'), $inventoryFieldsComboBox));
-$hostinvent_wdgt->addHeader(_('HOSTS'), $r_form);
+$r_form->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(true), SPACE));
+$r_form->addItem(array(_('Grouping by'), SPACE, $inventoryFieldsComboBox));
+$hostinvent_wdgt->addHeader(_('Hosts'), $r_form);
+$hostinvent_wdgt->addItem(BR());
 
-$table = new CTableInfo();
+$table = new CTableInfo(_('No hosts defined.'));
 $table->setHeader(
 	array(
 		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field'),

@@ -25,7 +25,8 @@ function update_node_profile($nodeids) {
 
 	foreach ($nodeids as $nodeid) {
 		DBexecute('INSERT INTO profiles (profileid,userid,idx,value_id,type)'.
-					' VALUES ('.get_dbid('profiles', 'profileid').','.CWebUser::$data['userid'].','.zbx_dbstr('web.nodes.selected').','.$nodeid.',4)');
+					' VALUES ('.get_dbid('profiles', 'profileid').','.CWebUser::$data['userid'].','
+						.zbx_dbstr('web.nodes.selected').','.$nodeid.',4)');
 	}
 	DBend();
 }
@@ -33,7 +34,12 @@ function update_node_profile($nodeids) {
 function get_node_profile($default = null) {
 	$result = array();
 
-	$db_profiles = DBselect('SELECT p.value_id FROM profiles p WHERE p.userid='.CWebUser::$data['userid'].' AND p.idx='.zbx_dbstr('web.nodes.selected'));
+	$db_profiles = DBselect(
+		'SELECT p.value_id'.
+		' FROM profiles p'.
+		' WHERE p.userid='.CWebUser::$data['userid'].
+			' AND p.idx='.zbx_dbstr('web.nodes.selected')
+	);
 	while ($profile = DBfetch($db_profiles)) {
 		$result[] = $profile['value_id'];
 	}
@@ -57,13 +63,13 @@ function init_nodes() {
 
 	if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && ZBX_DISTRIBUTED) {
 		if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-			$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n ';
+			$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid FROM nodes n';
 		}
 		else {
 			$sql = 'SELECT DISTINCT n.nodeid,n.name,n.masterid'.
 					' FROM nodes n,groups hg,rights r,users_groups g'.
 					' WHERE r.id=hg.groupid'.
-						' AND r.groupid=g.usrgrpid '.
+						' AND r.groupid=g.usrgrpid'.
 						' AND g.userid='.CWebUser::$data['userid'].
 						' AND n.nodeid='.DBid2nodeid('hg.groupid');
 		}
@@ -219,27 +225,27 @@ function detect_node_type($nodeid, $masterid) {
 	global $ZBX_CURMASTERID, $ZBX_LOCALNODEID;
 
 	if (bccomp($nodeid, $ZBX_LOCALNODEID) == 0) {
-		$node_type = ZBX_NODE_LOCAL;
+		$nodetype = ZBX_NODE_LOCAL;
 	}
 	elseif (bccomp($nodeid, get_current_nodeid(false)) == 0) {
-		$node_type = ZBX_NODE_LOCAL;
+		$nodetype = ZBX_NODE_LOCAL;
 	}
 	elseif (bccomp($nodeid, $ZBX_CURMASTERID) == 0) {
-		$node_type = ZBX_NODE_MASTER;
+		$nodetype = ZBX_NODE_MASTER;
 	}
 	elseif (bccomp($masterid, get_current_nodeid(false)) == 0) {
-		$node_type = ZBX_NODE_CHILD;
+		$nodetype = ZBX_NODE_CHILD;
 	}
 	else {
-		$node_type = -1;
+		$nodetype = -1;
 	}
 
-	return $node_type;
+	return $nodetype;
 }
 
-function node_type2str($node_type) {
+function node_type2str($nodetype) {
 	$result = '';
-	switch ($node_type) {
+	switch ($nodetype) {
 		case ZBX_NODE_CHILD:
 			$result = _('Child');
 			break;
@@ -256,7 +262,7 @@ function node_type2str($node_type) {
 	return $result;
 }
 
-function add_node($new_nodeid, $name, $ip, $port, $node_type, $masterid) {
+function add_node($nodeid, $name, $ip, $port, $nodetype, $masterid) {
 	global $ZBX_LOCMASTERID, $ZBX_LOCALNODEID;
 
 	if (!preg_match('/^'.ZBX_PREG_NODE_FORMAT.'$/i', $name)) {
@@ -264,37 +270,40 @@ function add_node($new_nodeid, $name, $ip, $port, $node_type, $masterid) {
 		return false;
 	}
 
-	switch ($node_type) {
+	switch ($nodetype) {
 		case ZBX_NODE_CHILD:
-			$masterid = $masterid;
 			break;
 		case ZBX_NODE_MASTER:
-			$masterid = 0;
+			if (!empty($masterid)) {
+				error(_('Master node "ID" must be empty.'));
+				return false;
+			}
+
 			if ($ZBX_LOCMASTERID) {
 				error(_('Master node already exists.'));
 				return false;
 			}
+			$masterid = 'NULL';
 			break;
 		default:
 			error(_('Incorrect node type.'));
 			return false;
 	}
 
-	if (DBfetch(DBselect('SELECT n.nodeid FROM nodes n WHERE n.nodeid='.$new_nodeid))) {
+	if (DBfetch(DBselect('SELECT n.nodeid FROM nodes n WHERE n.nodeid='.$nodeid))) {
 		error(_('Node with same ID already exists.'));
 		return false;
 	}
 
-	$nodetype = 0;
-	$sql = 'INSERT INTO nodes (nodeid,name,ip,port,nodetype,masterid)'.
-			' VALUES ('.$new_nodeid.','.zbx_dbstr($name).','.zbx_dbstr($ip).','.$port.','.$nodetype.','.zero2null($masterid).')';
-	$result = DBexecute($sql);
-	if ($result && $node_type == ZBX_NODE_MASTER) {
-		DBexecute('UPDATE nodes SET masterid='.$new_nodeid.' WHERE nodeid='.$ZBX_LOCALNODEID);
-		$ZBX_CURMASTERID = $new_nodeid; // apply master node for this script
+	$result = DBexecute('INSERT INTO nodes (nodeid,name,ip,port,nodetype,masterid)'.
+		' VALUES ('.$nodeid.','.zbx_dbstr($name).','.zbx_dbstr($ip).','.$port.','.$nodetype.','.$masterid.')');
+
+	if ($result && $nodetype == ZBX_NODE_MASTER) {
+		DBexecute('UPDATE nodes SET masterid='.$nodeid.' WHERE nodeid='.$ZBX_LOCALNODEID);
+		$ZBX_CURMASTERID = $nodeid; // apply master node for this script
 	}
 
-	return ($result ? $new_nodeid : $result);
+	return $result ? $nodeid : $result;
 }
 
 function update_node($nodeid, $name, $ip, $port) {
@@ -307,16 +316,16 @@ function update_node($nodeid, $name, $ip, $port) {
 
 function delete_node($nodeid) {
 	$result = false;
-	$node_data = DBfetch(DBselect('SELECT n.nodeid,n.masterid FROM nodes n WHERE n.nodeid='.$nodeid));
-	$node_type = detect_node_type($node_data['nodeid'], $node_data['masterid']);
+	$node = DBfetch(DBselect('SELECT n.nodeid,n.masterid FROM nodes n WHERE n.nodeid='.$nodeid));
+	$nodetype = detect_node_type($node['nodeid'], $node['masterid']);
 
-	if ($node_type == ZBX_NODE_LOCAL) {
+	if ($nodetype == ZBX_NODE_LOCAL) {
 		error(_('Unable to remove local node.'));
 	}
 	else {
 		$result = (
-			DBexecute('update nodes set masterid=NULL where masterid='.$nodeid) &&
-			DBexecute('delete from nodes where nodeid='.$nodeid)
+			DBexecute('UPDATE nodes SET masterid=NULL WHERE masterid='.$nodeid) &&
+			DBexecute('DELETE FROM nodes WHERE nodeid='.$nodeid)
 		);
 		error(_('Please be aware that database still contains data related to the deleted node.'));
 	}

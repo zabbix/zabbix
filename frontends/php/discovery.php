@@ -22,9 +22,9 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/discovery.inc.php';
 
-$page['hist_arg'] = array('druleid');
-$page['file'] = 'discovery.php';
 $page['title'] = _('Status of discovery');
+$page['file'] = 'discovery.php';
+$page['hist_arg'] = array('druleid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

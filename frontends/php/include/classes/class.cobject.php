@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CObject {
+
 	public $items;
 
 	public function __construct($items = null) {
@@ -83,7 +85,7 @@ function unpack_object(&$item) {
 	}
 	elseif (is_array($item)) {
 		foreach ($item as $id => $dat) {
-			$res .= unpack_object($item[$id]); // Attention, recursion !!!
+			$res .= unpack_object($item[$id]); // attention, recursion !!!
 		}
 	}
 	elseif (!is_null($item)) {

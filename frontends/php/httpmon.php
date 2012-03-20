@@ -133,7 +133,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
 
-	$httpmon_wdgt->addHeader(S_WEB_CHECKS_BIG, $r_form);
+	$httpmon_wdgt->addHeader(_('Web checks'), $r_form);
 	$httpmon_wdgt->addItem(SPACE);
 
 // TABLE
@@ -148,7 +148,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$link = new CLink(new CImg('images/general/closed.gif'),'?open=1'.url_param('groupid').url_param('hostid'));
 	}
 
-	$table  = new CTableInfo();
+	$table = new CTableInfo(_('No web checks defined.'));
 	$table->SetHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
 		$_REQUEST['hostid'] == 0 ? make_sorting_header(S_HOST, 'h.name') : null,

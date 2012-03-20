@@ -22,26 +22,26 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/images.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of images');
 $page['file'] = 'adm.images.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-$fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'imageid'=>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({form})&&({form}=="update")'),
-	'name'=>					array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,		'isset({save})'),
-	'imagetype'=>				array(T_ZBX_INT, O_OPT,	null,	IN('1,2'),		'isset({save})'),
 
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'delete'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'imageid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
+	'name' =>		array(T_ZBX_STR, O_NO,	null,		NOT_EMPTY,	'isset({save})'),
+	'imagetype' =>	array(T_ZBX_INT, O_OPT,	null,		IN('1,2'),	'isset({save})'),
+	'save' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'form' =>		array(T_ZBX_STR, O_OPT, P_SYS,		null,		null)
 );
-?>
-<?php
 check_fields($fields);
 
+/*
+ * Actions
+ */
 if (isset($_REQUEST['save'])) {
 	if (isset($_REQUEST['imageid'])) {
 		$msg_ok = _('Image updated');
@@ -122,7 +122,9 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
 	}
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.images.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -144,9 +146,8 @@ if (!isset($_REQUEST['form'])) {
 	$form->addItem(new CSubmit('form', _('Create image')));
 }
 
-
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF IMAGES'), $form);
 
 $data = array();
 $data['form'] = get_request('form');
@@ -154,7 +155,7 @@ $data['widget'] = &$cnf_wdgt;
 
 if (!empty($data['form'])) {
 	if (!empty($_REQUEST['imageid'])) {
-		$image = DBfetch(DBselect('SELECT i.imagetype, i.name FROM images i WHERE i.imageid = '.$_REQUEST['imageid']));
+		$image = DBfetch(DBselect('SELECT i.imagetype,i.name FROM images i WHERE i.imageid = '.$_REQUEST['imageid']));
 
 		$data['imageid'] = $_REQUEST['imageid'];
 		$data['imagename'] = $image['name'];

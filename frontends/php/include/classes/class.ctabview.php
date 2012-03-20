@@ -19,10 +19,9 @@
 **/
 ?>
 <?php
-/**
- * Produces Zabbix object for more comfortable usage of jQuery tabbed view
- */
+
 class CTabView extends CDiv {
+
 	protected $id = 'tabs';
 	protected $tabs = array();
 	protected $headers = array();
@@ -89,7 +88,7 @@ class CTabView extends CDiv {
 			if ($this->rememberTab) {
 				$options['cookie'] = array();
 			}
-			zbx_add_post_js('jQuery( "#'.$this->id.'" ).tabs('.zbx_jsvalue($options, true).').show();');
+			zbx_add_post_js('jQuery("#'.$this->id.'").tabs('.zbx_jsvalue($options, true).').show();');
 		}
 		return parent::toString($destroy);
 	}

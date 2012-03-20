@@ -24,7 +24,7 @@ $screenWidget->addPageHeader(_('CONFIGURATION OF SCREEN'));
 $screenWidget->addHeader($this->data['screen']['name']);
 $screenWidget->addItem(BR());
 if (!empty($this->data['screen']['templateid'])) {
-	$screenWidget->addItem(get_header_host_table($this->data['screen']['templateid']));
+	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
 }
 
 $screenTable = get_screen($this->data['screen'], 1);
