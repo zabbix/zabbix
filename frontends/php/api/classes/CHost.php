@@ -1791,17 +1791,12 @@ class CHost extends CZBXAPI {
 			$hostGroupids = zbx_objectValues($hostGroups, 'groupid');
 			$newGroupids = zbx_objectValues($updateGroups, 'groupid');
 
-			$groupsToAdd = array_diff($newGroupids, $hostGroupids);
-
-			if (!empty($groupsToAdd)) {
-				$result = $this->massAdd(array(
-					'hosts' => $hosts,
-					'groups' => zbx_toObject($groupsToAdd, 'groupid')
-				));
-
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add host group.'));
-				}
+			$result = $this->massAdd(array(
+				'hosts' => $hosts,
+				'groups' => $updateGroups
+			));
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create host group.'));
 			}
 
 			$groupidsToDel = array_diff($hostGroupids, $newGroupids);
