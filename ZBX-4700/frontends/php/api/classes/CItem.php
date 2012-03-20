@@ -574,8 +574,8 @@ class CItem extends CItemGeneral {
 					'nodeids' => $nodeids,
 					'itemids' => $itemids,
 					'output' => $options['selectInterfaces'],
-					'nopermissions' => 1,
-					'preservekeys' => 1
+					'nopermissions' => true,
+					'preservekeys' => true
 				);
 				$interfaces = API::HostInterface()->get($objParams);
 				foreach ($interfaces as $interface) {
