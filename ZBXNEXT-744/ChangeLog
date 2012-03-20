@@ -1,3 +1,7 @@
+Changes for 1.8.12rc1
+
+........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
+
 Changes for 1.8.11
 
 1.8.11rc1 was released as 1.8.11 without any changes
