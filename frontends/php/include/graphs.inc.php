@@ -352,6 +352,19 @@ function copy_graph_to_host($graphid, $hostid) {
 		return false;
 	}
 
+	// retrieve actual ymax_itemid and ymin_itemid
+	if ($graph['ymax_itemid']) {
+		if ($itemid = get_same_item_for_host($graph['ymax_itemid'], $hostid)) {
+			$graph['ymax_itemid'] = $itemid;
+		};
+	}
+
+	if ($graph['ymin_itemid']) {
+		if ($itemid = get_same_item_for_host($graph['ymin_itemid'], $hostid)) {
+			$graph['ymin_itemid'] = $itemid;
+		}
+	}
+
 	$graph['gitems'] = $new_gitems;
 	$result = API::Graph()->create($graph);
 
