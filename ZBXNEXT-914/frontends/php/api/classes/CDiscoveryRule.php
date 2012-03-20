@@ -374,8 +374,7 @@ class CDiscoveryRule extends CItemGeneral {
 				'nodeids' => $nodeids,
 				'discoveryids' => $itemids,
 				'nopermissions' => true,
-				'preservekeys' => true,
-				'selectDiscoveryRule' => API_OUTPUT_SHORTEN
+				'preservekeys' => true
 			);
 
 			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
