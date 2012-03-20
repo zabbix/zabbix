@@ -21,31 +21,30 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of GUI');
 $page['file'] = 'adm.gui.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-$fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'default_theme'=>			array(T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,			'isset({save})'),
-	'event_ack_enable'=>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
-	'event_expire'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 99999),	'isset({save})'),
-	'event_show_max'=> 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 99999),	'isset({save})'),
-	'dropdown_first_entry'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1,2'),		'isset({save})'),
-	'dropdown_first_remember'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),	null),
-	'max_in_table' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 99999),	'isset({save})'),
-	'search_limit' => 			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 999999),	'isset({save})'),
 
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'default_theme' =>				array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,			'isset({save})'),
+	'event_ack_enable' =>			array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),			null),
+	'event_expire' =>				array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 99999),	'isset({save})'),
+	'event_show_max' =>				array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 99999),	'isset({save})'),
+	'dropdown_first_entry' =>		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('0,1,2'),		'isset({save})'),
+	'dropdown_first_remember' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN('1'),			null),
+	'max_in_table' => 				array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 99999),	'isset({save})'),
+	'search_limit' => 				array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1, 999999),	'isset({save})'),
+	'save' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,				null),
+	'form_refresh' =>				array(T_ZBX_INT, O_OPT, null,			null,				null)
 );
-?>
-<?php
 check_fields($fields);
 
-
+/*
+ * Actions
+ */
 if (isset($_REQUEST['save'])) {
 	$configs = array(
 		'default_theme' => get_request('default_theme'),
@@ -55,7 +54,7 @@ if (isset($_REQUEST['save'])) {
 		'dropdown_first_entry' => get_request('dropdown_first_entry'),
 		'dropdown_first_remember' => (is_null(get_request('dropdown_first_remember')) ? 0 : 1),
 		'max_in_table' => get_request('max_in_table'),
-		'search_limit' => get_request('search_limit'),
+		'search_limit' => get_request('search_limit')
 	);
 
 	$result = update_config($configs);
@@ -64,19 +63,21 @@ if (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		$msg = array();
-		$msg[] = _s('Default theme [%1$s]', get_request('default_theme'));
-		$msg[] = _s('Event acknowledges [%1$s]', get_request('event_ack_enable'));
-		$msg[] = _s('Show events not older than (in days) [%1$s]', get_request('event_expire'));
-		$msg[] = _s('Show events max [%1$s]', get_request('event_show_max'));
-		$msg[] = _s('Dropdown first entry [%1$s]', get_request('dropdown_first_entry'));
-		$msg[] = _s('Dropdown remember selected [%1$s]', get_request('dropdown_first_remember'));
-		$msg[] = _s('Max count of elements to show inside table cell [%1$s]', get_request('max_in_table'));
+		$msg[] = _s('Default theme "%1$s".', get_request('default_theme'));
+		$msg[] = _s('Event acknowledges "%1$s".', get_request('event_ack_enable'));
+		$msg[] = _s('Show events not older than (in days) "%1$s".', get_request('event_expire'));
+		$msg[] = _s('Show events max "%1$s".', get_request('event_show_max'));
+		$msg[] = _s('Dropdown first entry "%1$s".', get_request('dropdown_first_entry'));
+		$msg[] = _s('Dropdown remember selected "%1$s".', get_request('dropdown_first_remember'));
+		$msg[] = _s('Max count of elements to show inside table cell "%1$s".', get_request('max_in_table'));
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
 	}
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.gui.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -96,8 +97,7 @@ $cmbConf->addItems(array(
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
-
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF GUI'), $form);
 
 $data = array();
 $data['form_refresh'] = get_request('form_refresh', 0);

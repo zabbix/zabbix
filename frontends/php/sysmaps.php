@@ -24,18 +24,21 @@ require_once dirname(__FILE__).'/include/maps.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-if (isset($_REQUEST['go']) && ($_REQUEST['go'] == 'export') && isset($_REQUEST['maps'])) {
-	$EXPORT_DATA = true;
-	$page['type'] = detect_page_type(PAGE_TYPE_XML);
+if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['maps'])) {
 	$page['file'] = 'zbx_export_maps.xml';
+	$page['type'] = detect_page_type(PAGE_TYPE_XML);
+
+	$EXPORT_DATA = true;
+
+	require_once dirname(__FILE__).'/include/export.inc.php';
 }
 else {
-	$EXPORT_DATA = false;
-
-	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = 'S_NETWORK_MAPS';
+	$page['title'] = _('Configuration of network maps');
 	$page['file'] = 'sysmaps.php';
+	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 	$page['hist_arg'] = array();
+
+	$EXPORT_DATA = false;
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -200,7 +203,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$form->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'));
 
 	$map_wdgt = new CWidget();
-	$map_wdgt->addPageHeader(_('Configuration of network maps'), $form);
+	$map_wdgt->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'), $form);
 
 
 	if(isset($_REQUEST['form'])){
@@ -249,11 +252,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$form = new CForm();
 		$form->setName('frm_maps');
 
-		$numrows = new CDiv();
-		$numrows->setAttribute('name','numrows');
-
-		$map_wdgt->addHeader(S_MAPS_BIG);
-		$map_wdgt->addHeader($numrows);
+		$map_wdgt->addHeader(_('Maps'));
+		$map_wdgt->addHeaderRowNumber();
 
 		$table = new CTableInfo(_('No maps defined.'));
 		$table->setHeader(array(

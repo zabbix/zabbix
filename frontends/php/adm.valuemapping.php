@@ -21,28 +21,28 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of value mapping');
 $page['file'] = 'adm.valuemapping.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-$fields = array(
-//							TYPE		OPTIONAL FLAGS			VALIDATION		EXCEPTION
-	'valuemapid' => array(	T_ZBX_INT,	O_NO,	P_SYS,			DB_ID,			'(isset({form})&&({form}=="update"))||isset({delete})'),
-	'mapname' => array(		T_ZBX_STR,	O_OPT,	null,			NOT_EMPTY, 		'isset({save})'),
-	'mappings' => array(	T_ZBX_STR,	O_OPT,	null,			null,	null),
 
-	'save' => array(		T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null),
-	'delete' => array(		T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null),
-	'form' => array(		T_ZBX_STR,	O_OPT,	P_SYS,			null,	null),
-	'form_refresh' => array(T_ZBX_INT,	O_OPT,	null,			null,	null)
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'valuemapid' =>		array(T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'(isset({form})&&({form}=="update"))||isset({delete})'),
+	'mapname' =>		array(T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,	'isset({save})'),
+	'mappings' =>		array(T_ZBX_STR, O_OPT,	null,			null,		null),
+	'save' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'delete' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
+	'form' =>			array(T_ZBX_STR, O_OPT,	P_SYS,			null,		null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,			null,		null)
 );
-?>
-<?php
 check_fields($fields);
 
-try{
+/*
+ * Actions
+ */
+try {
 	if (isset($_REQUEST['save'])) {
 		DBstart();
 
@@ -57,7 +57,7 @@ try{
 			$valueMap['valuemapid'] = get_request('valuemapid');
 			updateValueMap($valueMap, $mappings);
 		}
-		else{
+		else {
 			$msg_ok = _('Value map added');
 			$msg_fail = _('Cannot add value map');
 			$audit_action = AUDIT_ACTION_ADD;
@@ -65,10 +65,8 @@ try{
 			addValueMap($valueMap, $mappings);
 		}
 
-		add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _s('Value map [%1$s]', $valueMap['name']));
-
+		add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP, _s('Value map "%1$s".', $valueMap['name']));
 		show_messages(true, $msg_ok);
-
 		unset($_REQUEST['form']);
 
 		DBend(true);
@@ -92,11 +90,9 @@ try{
 		add_audit(
 			AUDIT_ACTION_DELETE,
 			AUDIT_RESOURCE_VALUE_MAP,
-			_s('Value map [%1$s] [%2$s]', $valueMapToDelete['name'], $valueMapToDelete['valuemapid'])
+			_s('Value map "%1$s" "%2$s".', $valueMapToDelete['name'], $valueMapToDelete['valuemapid'])
 		);
-
 		show_messages(true, $msg_ok);
-
 		unset($_REQUEST['form']);
 
 		DBend(true);
@@ -109,7 +105,9 @@ catch (Exception $e) {
 	show_messages(false, null, $msg_fail);
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.valuemapping.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -131,9 +129,8 @@ if (!isset($_REQUEST['form'])) {
 	$form->addItem(new CSubmit('form', _('Create value map')));
 }
 
-
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF VALUE MAPPING'), $form);
 
 $data = array();
 if (isset($_REQUEST['form'])) {
@@ -158,7 +155,7 @@ if (isset($_REQUEST['form'])) {
 			$data['mappings'] = get_request('mappings', array());
 		}
 
-		$valuemap_count = DBfetch(DBselect('SELECT COUNT(i.itemid) as cnt FROM items i WHERE i.valuemapid='.$data['valuemapid']));
+		$valuemap_count = DBfetch(DBselect('SELECT COUNT(i.itemid) AS cnt FROM items i WHERE i.valuemapid='.$data['valuemapid']));
 		if ($valuemap_count['cnt']) {
 			$data['confirmMessage'] = _n('Delete selected value mapping? It is used for %d item!', 'Delete selected value mapping? It is used for %d items!', $valuemap_count['cnt']);
 		}
@@ -181,14 +178,14 @@ else {
 	$cnf_wdgt->addItem(BR());
 
 	$data['valuemaps'] = array();
-	$db_valuemaps = DBselect('SELECT v.valuemapid, v.name FROM valuemaps v WHERE '.DBin_node('valuemapid'));
+	$db_valuemaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v WHERE '.DBin_node('valuemapid'));
 	while ($db_valuemap = DBfetch($db_valuemaps)) {
 		$data['valuemaps'][$db_valuemap['valuemapid']] = $db_valuemap;
 		$data['valuemaps'][$db_valuemap['valuemapid']]['maps'] = array();
 	}
 	order_result($data['valuemaps'], 'name');
 
-	$db_maps = DBselect('SELECT m.valuemapid, m.value, m.newvalue FROM mappings m WHERE '.DBin_node('mappingid'));
+	$db_maps = DBselect('SELECT m.valuemapid,m.value,m.newvalue FROM mappings m WHERE '.DBin_node('mappingid'));
 	while ($db_map = DBfetch($db_maps)) {
 		$data['valuemaps'][$db_map['valuemapid']]['maps'][] = array(
 			'value' => $db_map['value'],

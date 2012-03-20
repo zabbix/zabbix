@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CProfile {
 
 	private static $userDetails = array();
@@ -340,7 +341,7 @@ function get_user_history() {
 		' WHERE uh.userid='.CWebUser::$data['userid'])
 	);
 
-	if ($history && !zbx_empty($history['url4'])) {
+	if (!empty($history) && !zbx_empty($history['url4'])) {
 		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
 	}
 	else {
@@ -349,12 +350,7 @@ function get_user_history() {
 
 	for ($i = 1; $i < 6; $i++) {
 		if (!zbx_empty($history['title'.$i])) {
-			if (defined($history['title'.$i])) {
-				$title = constant($history['title'.$i]);
-			}
-			else {
-				$title = $history['title'.$i];
-			}
+			$title = defined($history['title'.$i]) ? constant($history['title'.$i]) : $history['title'.$i];
 			$url = new CLink($title, $history['url'.$i], 'history');
 			array_push($result, array(SPACE, $url, SPACE));
 			array_push($result, $delimiter);

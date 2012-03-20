@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------
 Changes for 2.0.0rc2
 
+New features:
+A.F....... [ZBXNEXT-914] redesign Administration->DM (Eduard)
+
 Bug fixes:
 A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
 A.F....... [ZBX-4257] fixed creating discovery rules, items and item prototypes (Pavels)

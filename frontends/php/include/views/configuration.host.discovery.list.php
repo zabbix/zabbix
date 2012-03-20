@@ -29,11 +29,9 @@ $createForm->addItem(new CSubmit('form', _('Create discovery rule')));
 $discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULES'), $createForm);
 
 // header
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $discoveryWidget->addHeader(_('Discovery rules'));
-$discoveryWidget->addHeader($numRows);
-$discoveryWidget->addItem(get_header_host_table($this->data['hostid'], 'discoveries'));
+$discoveryWidget->addHeaderRowNumber();
+$discoveryWidget->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 
 // create form
 $discoveryForm = new CForm('get');
@@ -86,7 +84,7 @@ foreach ($data['discoveries'] as $discovery) {
 	$discoveryTable->addRow(array(
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', null, null, $discovery['itemid']),
 		$description,
-		array(new CLink(_('Items'), 'disc_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['prototypes'].')'),
+		array(new CLink(_('Items'), 'disc_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['items'].')'),
 		array(new CLink(_('Triggers'), 'trigger_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['triggers'].')'),
 		array(new CLink(_('Graphs'), 'graph_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['graphs'].')'),
 		$discovery['key_'],

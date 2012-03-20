@@ -27,10 +27,10 @@ $hostgroupWidget = new CWidget();
 $createForm = new CForm('get');
 $createForm->cleanItems();
 if ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
-	$tmp_item = new CSubmit('form', _('Create group'));
+	$tmp_item = new CSubmit('form', _('Create host group'));
 }
 else {
-	$tmp_item = new CSubmit('form', _('Create group').SPACE._('(Only superadmins can create group)'));
+	$tmp_item = new CSubmit('form', _('Create host group').SPACE._('(Only Super Admins can create group)'));
 	$tmp_item->setEnabled(false);
 }
 $createForm->addItem($tmp_item);
@@ -38,10 +38,8 @@ $createForm->addItem($tmp_item);
 $hostgroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'), $createForm);
 
 // header
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $hostgroupWidget->addHeader(_('Host groups'));
-$hostgroupWidget->addHeader($numRows);
+$hostgroupWidget->addHeaderRowNumber();
 
 // create form
 $hostgroupForm = new CForm();
