@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBXNEXT-914] redesign Administration->DM (Eduard)
 
 Bug fixes:
+A......... [ZBX-4621] fixed macro update using host.massupdate (Vedmak)
 A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
 A.F....... [ZBX-4257] fixed creating discovery rules, items and item prototypes (Pavels)
 ..F....... [ZBX-4765] fixed filter fields being unset when saving of discovery rule fails (Vedmak)
