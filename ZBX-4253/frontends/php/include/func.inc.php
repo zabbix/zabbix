@@ -1186,21 +1186,6 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
 	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
 }
 
-/**
-* Sanitizes URL against XSS.
-*
-* @param string $data
-*
-* @return string
-*/
-function zbxSanitizeUrl($data) {
-	$data = str_replace(Array("'", "\"", "<", ">"), "", $data);
-
-	$data = strtolower($data);
-	$data = str_replace(Array("javascript:"), "", $data);
-
-	return $data;
-}
 /************* END ZBX MISC *************/
 
 /*************** PAGE SORTING ******************/
