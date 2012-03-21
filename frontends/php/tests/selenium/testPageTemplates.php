@@ -34,7 +34,7 @@ class testPageTemplates extends CWebTest {
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid', 'Templates');
 //		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('TEMPLATES');
 		$this->ok('Displaying');
 		// Header
@@ -65,14 +65,14 @@ class testPageTemplates extends CWebTest {
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid', 'all');
 
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 
 		$this->ok($name); //link is present on the screen?
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template updated');
 		$this->ok("$name");
 		$this->ok('TEMPLATES');
