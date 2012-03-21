@@ -2,6 +2,7 @@
 Changes for 2.0.0rc2
 
 New features:
+........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
 A.F....... [ZBXNEXT-914] redesign Administration->DM (Eduard)
 
 Bug fixes:
@@ -519,6 +520,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
+........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
 ..F....... [ZBX-4761] fixed "&" encoding in input fields (Pavels)
 .......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
