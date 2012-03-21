@@ -1,5 +1,6 @@
 Changes for 1.8.12rc1
 
+.......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
 ..F....... [ZBX-4761] fixed "&" encoding in input fields (Pavels)
 A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
