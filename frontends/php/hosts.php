@@ -632,7 +632,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // HOSTS FILTER {{{
 		$filter_table = new CTable('', 'filter_config');
 		$filter_table->addRow(array(
-			array(array(bold(S_NAME), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
+			array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
 			array(array(bold(S_DNS), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),
 			array(array(bold(_('IP')), SPACE._('like').': '), new CTextBox('filter_ip', $_REQUEST['filter_ip'], 20)),
 			array(bold(S_PORT.': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))

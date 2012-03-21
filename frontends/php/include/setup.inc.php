@@ -101,7 +101,7 @@
 			if($this->DISABLE_NEXT_BUTTON) $next->setEnabled(false);
 
 			$table->setFooter(array(
-				new CCol(new CSubmit('cancel',S_CANCEL),'left'),
+				new CCol(new CSubmit('cancel',_('Cancel')),'left'),
 				new CCol(array(
 					isset($this->stage[$this->getStep()-1]) ? new CSubmit('back['.$this->getStep().']', '<< '._('Previous')) : null,
 					isset($this->stage[$this->getStep()+1]) ? $next: new CSubmit('finish', _('Finish'))
@@ -266,7 +266,7 @@ JS;
 
 			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('zbx_server',		$this->getConfig('ZBX_SERVER',		'localhost'))));
 			$table->addRow(array(new CCol(S_PORT,'header'), new CNumericBox('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051'),5)));
-			$table->addRow(array(new CCol(S_NAME,'header'), new CTextBox('zbx_server_name',	$this->getConfig('ZBX_SERVER_NAME',	''))));
+			$table->addRow(array(new CCol(_('Name'),'header'), new CTextBox('zbx_server_name',	$this->getConfig('ZBX_SERVER_NAME',	''))));
 
 			return array(
 				'Please enter host name or host IP address', BR(),

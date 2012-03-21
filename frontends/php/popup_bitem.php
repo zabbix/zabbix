@@ -123,7 +123,7 @@ require_once 'include/page_header.php';
 
 		$txtCondVal = new CTextBox('name',$description,50,'yes');
 
-		$btnSelect = new CSubmit('btn1',S_SELECT,
+		$btnSelect = new CSubmit('btn1',_('Select'),
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
 				'&dstfld1=itemid&dstfld2=name&srctbl=items'.
 				"&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
@@ -135,14 +135,14 @@ require_once 'include/page_header.php';
 			$cmbFnc->addItem(CALC_FNC_MIN, _('min'));
 			$cmbFnc->addItem(CALC_FNC_AVG, _('avg'));
 			$cmbFnc->addItem(CALC_FNC_MAX, _('max'));
-			$cmbFnc->addItem(0, S_COUNT);
+			$cmbFnc->addItem(0, _('Count'));
 
 		$frmGItem->addRow(_('Function'), $cmbFnc);
 
 		if($config == 1){
 			$cmbAxis = new CComboBox('axisside',$axisside);
 				$cmbAxis->addItem(GRAPH_YAXIS_SIDE_LEFT, _('Left'));
-				$cmbAxis->addItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
+				$cmbAxis->addItem(GRAPH_YAXIS_SIDE_RIGHT, _('Right'));
 
 			$frmGItem->addRow(_('Axis side'), $cmbAxis);
 		}
@@ -154,7 +154,7 @@ require_once 'include/page_header.php';
 			$frmGItem->addVar('color',$color);
 
 
-		$frmGItem->addItemToBottomRow(new CSubmit('save', isset($gid)?S_SAVE:S_ADD));
+		$frmGItem->addItemToBottomRow(new CSubmit('save', isset($gid)?_('Save'):_('Add')));
 
 		$frmGItem->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmGItem->Show();

@@ -89,7 +89,7 @@ if(form){
 	$table = new CTableInfo(_('No user groups defined.'));
 	$table->setHeader(array(
 		new CCheckBox("all_groups",NULL,"checkAll('".$form->getName()."','all_groups','new_groups');"),
-		S_NAME
+		_('Name')
 		));
 
 	$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
@@ -99,7 +99,7 @@ if(form){
 			$row['name']
 		));
 	}
-	$table->setFooter(new CCol(new CSubmit('select', S_SELECT)));
+	$table->setFooter(new CCol(new CSubmit('select', _('Select'))));
 
 	$form->addItem($table);
 	$form->show();
