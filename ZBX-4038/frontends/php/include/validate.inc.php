@@ -456,10 +456,7 @@ function check_field(&$fields, &$field, $checks) {
 	if (!isset($checks[5])) {
 		$checks[5] = $field;
 	}
-	if (!isset($checks[6])) {
-		$checks[6] = null;
-	}
-	list($type, $opt, $flags, $validation, $exception, $caption, $caption2) = $checks;
+	list($type, $opt, $flags, $validation, $exception, $caption) = $checks;
 
 	if ($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field] == '') {
 		unset_request($field);
@@ -531,25 +528,36 @@ function check_field(&$fields, &$field, $checks) {
 		return $err;
 	}
 
-	if (is_null($exception) || $except) {
-		if ($validation && !calc_exp($fields, $field, $validation)) {
+	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)){
+		if ($validation == NOT_EMPTY) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
-				return ZBX_VALID_ERROR;
+				info(_s('Critical error. Incorrect value for field "%1$s": cannot be empty.', $caption));
 			}
 			else {
-				if ($validation == NOT_EMPTY) {
-					$caption2 = _(': cannot be empty');
-				// elseif will check for BETWEEN() function pattern and extract numbers e.g. ({}>=0&&{}<=999)&&
-				} elseif (preg_match('/^\(\{\}\>=[0-9]*\&\&\{\}\<=[0-9]*\)\&\&$/', $validation)) {
-					$between = array();
-					preg_match_all('/[0-9]+/', $validation, $between);
-					$caption2 = _s(': must be between %1$s and %2$s', $between[0][0], $between[0][1]);
-				}
-				info(_s('Warning. Incorrect value for field "%1$s"%2$s.', $caption, $caption2));
-				return ZBX_VALID_WARNING;
+				info(_s('Warning. Incorrect value for field "%1$s": cannot be empty.', $caption));
 			}
 		}
+		// check for BETWEEN() function pattern and extract numbers e.g. ({}>=0&&{}<=999)&&
+		elseif (preg_match('/\(\{\}\>=([0-9]*)\&\&\{\}\<=([0-9]*)\)\&\&/', $validation, $result)) {
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+					$_REQUEST[$field], $caption, $result[1], $result[2]));
+			}
+			else {
+				info(_s('Warning. Incorrect value for field "%1$s": must be between %2$s and %3$s.',
+					$caption, $result[1], $result[2]));
+			}
+		}
+		else {
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
+			}
+			else {
+				info(_s('Warning. Incorrect value for field "%1$s"%2$s.', $caption));
+			}
+		}
+
+		return ($flags&P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
 	return ZBX_VALID_OK;
 }

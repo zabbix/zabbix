@@ -44,7 +44,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			_('Name')),
 		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(ZBX_MIN_WIDTH, ZBX_MER),
 			'isset({save}) || isset({preview})', _('Width')),
-		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(ZBX_MIN_WIDTH, ZBX_MER),
+		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(ZBX_MIN_HEIGHT, ZBX_MER),
 			'isset({save}) || isset({preview})', _('Height')),
 		'ymin_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
 		'ymax_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
