@@ -21,6 +21,14 @@
 <?php
 
 class CButton extends CInput {
+
+	/**
+	 * For inputs of type "button", the "&" symbol should not be encoded.
+	 *
+	 * @var int
+	 */
+	protected $valueEncStrategy = self::ENC_NOAMP;
+
 	public function __construct($name = 'button', $caption = '', $action = null, $class = null) {
 		parent::__construct('button', $name, $caption, $class);
 		$this->addAction('onclick', $action);
