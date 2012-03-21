@@ -26,7 +26,7 @@
 
 	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
-	$page['title'] = "S_MEDIA";
+	$page['title'] = _('Media');
 	$page['file'] = 'popup_media.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
@@ -103,7 +103,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$period		= get_request('period',ZBX_DEFAULT_INTERVAL);
 
 
-	$frmMedia = new CFormTable(S_NEW_MEDIA);
+	$frmMedia = new CFormTable(_('New media'));
 	$frmMedia->SetHelp('web.media.php');
 
 	$frmMedia->addVar('media',$media);
@@ -123,8 +123,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	}
 	$frmMedia->addRow(_('Type'),$cmbType);
 
-	$frmMedia->addRow(S_SEND_TO, new CTextBox('sendto',$sendto,20));
-	$frmMedia->addRow(S_WHEN_ACTIVE, new CTextBox('period',$period,48));
+	$frmMedia->addRow(_('Send to'), new CTextBox('sendto',$sendto,20));
+	$frmMedia->addRow(_('When active'), new CTextBox('period',$period,48));
 
 	$frm_row = array();
 	for($i=0; $i<=5; $i++){
@@ -139,14 +139,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			),
 			BR());
 	}
-	$frmMedia->addRow(S_USE_IF_SEVERITY,$frm_row);
+	$frmMedia->addRow(_('Use if severity'),$frm_row);
 
 	$cmbStat = new CComboBox('active',$active);
-	$cmbStat->addItem(0,S_ENABLED);
-	$cmbStat->addItem(1,S_DISABLED);
+	$cmbStat->addItem(0,_('Enabled'));
+	$cmbStat->addItem(1,_('Disabled'));
 	$frmMedia->addRow(_('Status'),$cmbStat);
 
-	$frmMedia->addItemToBottomRow(new CSubmit('add', ($media > -1)?S_SAVE:S_ADD));
+	$frmMedia->addItemToBottomRow(new CSubmit('add', ($media > -1)?_('Save'):_('Add')));
 	$frmMedia->addItemToBottomRow(SPACE);
 	$frmMedia->addItemToBottomRow(new CButtonCancel(null, 'close_window();'));
 	$frmMedia->Show();

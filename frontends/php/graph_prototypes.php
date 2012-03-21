@@ -38,7 +38,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'parent_discoveryid'=>	array(T_ZBX_INT, O_MAND,	 P_SYS,	DB_ID,	NULL),
 
 		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save}) || isset({preview})', S_NAME),
+		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save}) || isset({preview})', _('Name')),
 		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(20,65535),	'isset({save}) || isset({preview})', S_WIDTH.' (min:20, max:65535)'),
 		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(20,65535),	'isset({save}) || isset({preview})', S_HEIGHT.' (min:20, max:65535)'),
 
@@ -350,7 +350,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$table = new CTableInfo(_('No graphs defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_graphs',NULL,"checkAll('".$form->getName()."','all_graphs','group_graphid');"),
-			make_sorting_header(S_NAME, 'name'),
+			make_sorting_header(_('Name'), 'name'),
 			S_WIDTH,
 			S_HEIGHT,
 			make_sorting_header(_('Graph type'), 'graphtype')

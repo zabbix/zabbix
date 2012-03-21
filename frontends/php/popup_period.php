@@ -127,18 +127,18 @@ require_once 'include/page_header.php';
 		$reporttimetab->setCellSpacing(0);
 
 		$reporttimetab->addRow(array(
-								S_FROM,
-								new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
-								'/',
-								new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
-								'/',
-								new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
-								SPACE,
-								new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
-								':',
-								new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
-								$clndr_icon
-						));
+			_('From'),
+			new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
+			'/',
+			new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
+			'/',
+			new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
+			SPACE,
+			new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
+			':',
+			new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
+			$clndr_icon
+		));
 
 		zbx_add_post_js('create_calendar(null,'.
 						'["report_since_day","report_since_month","report_since_year","report_since_hour","report_since_minute"],'.
@@ -152,18 +152,18 @@ require_once 'include/page_header.php';
 											"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
 
 		$reporttimetab->addRow(array(
-								S_TILL,
-								new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
-								'/',
-								new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
-								'/',
-								new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
-								SPACE,
-								new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
-								':',
-								new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
-								$clndr_icon
-						));
+			_('Till'),
+			new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
+			'/',
+			new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
+			'/',
+			new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
+			SPACE,
+			new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
+			':',
+			new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
+			$clndr_icon
+		));
 
 		zbx_add_post_js('create_calendar(null,'.
 						'["report_till_day","report_till_month","report_till_year","report_till_hour","report_till_minute"],'.
@@ -180,7 +180,7 @@ require_once 'include/page_header.php';
 			$frmPd->addVar('color',$color);
 
 
-		$frmPd->addItemToBottomRow(new CSubmit('save', isset($_REQUEST['period_id'])?S_UPDATE:S_ADD));
+		$frmPd->addItemToBottomRow(new CSubmit('save', isset($_REQUEST['period_id'])?S_UPDATE:_('Add')));
 
 		$frmPd->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmPd->Show();

@@ -95,7 +95,6 @@
 	'S_DECEMBER'=>				_('December'),
 
 //	hosts.php
-	'S_HOSTS'=>					_('Hosts'),
 	'S_ITEMS'=>					_('Items'),
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
@@ -169,98 +168,19 @@
 
 //	map.php
 	'S_ZABBIX_URL'=>		_('http://www.zabbix.com'),
-	'S_EVENT_ACKNOWLEDGING_DISABLED' => _('Event acknowledging disabled'),
-
-//	maps.php
 	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
-
-//	media.php
-	'S_MEDIA'=>				_('Media'),
-	'S_SEND_TO'=>				_('Send to'),
-	'S_WHEN_ACTIVE'=>			_('When active'),
-	'S_NEW_MEDIA'=>				_('New media'),
-	'S_USE_IF_SEVERITY'=>			_('Use if severity'),
-	'S_SAVE'=>				_('Save'),
-	'S_CANCEL'=>				_('Cancel'),
-
-// dashconf.php
-	'S_DASHBOARD_CONFIGURATION' =>	_('Dashboard configuration'),
-	'S_DASHBOARD_CONFIGURATION_BIG' =>	_('DASHBOARD CONFIGURATION'),
-	'S_SELECTED' => _('Selected'),
-	'S_SHOW_HOSTS_IN_MAINTENANCE' => _('Show hosts in maintenance'),
-	'S_TRIGGERS_WITH_SEVERITY' => _('Triggers with severity'),
-	'S_DASHBOARD_FILTER' => _('Dashboard filter'),
-	'S_O_UNACKNOWLEDGED_ONLY' => _('Unacknowledged only'),
-	'S_O_SEPARATED' => _('Separated'),
-	'S_PROBLEM_DISPLAY' => _('Problem display'),
-
-//	overview.php
-	'S_OVERVIEW_BIG'=>			_('OVERVIEW'),
-	'S_HOSTS_LOCATION'=>			_('Hosts location'),
-	'S_DATA'=>				_('Data'),
-	'S_VALUES'=>				_('Values'),
-
-//	queue.php
-	'S_COUNT'=>				_('Count'),
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
-
-//	report1.php
-	'S_VALUE'=>				_('Value'),
-
-//	report2.php
-	'S_AVAILABILITY_REPORT'=>		_('Availability report'),
-	'S_AVAILABILITY_REPORT_BIG'=>		_('AVAILABILITY REPORT'),
 	'S_SHOW'=>				_('Show'),
-	'S_BY_HOST'=>				_('By host'),
-	'S_BY_TRIGGER_TEMPLATE'=>		_('By trigger template'),
-
-//	chart4.php
 	'S_CHART4_TIMELINE_DATE_FORMAT'=>	_('d.M'),
-
-//	chart_bar.php
 	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		_('Y.m.d H:i'),
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
-
-//	report3.php
-	'S_FROM'=>					_('From'),
-	'S_TILL'=>					_('Till'),
-	'S_OK'=>					_('Ok'),
-	'S_SLA'=>					_('SLA'),
-	'S_DAY'=>					_('Day'),
-	'S_MONTH'=>					_('Month'),
-	'S_YEAR'=>					_('Year'),
-	'S_HOURLY'=>					_('Hourly'),
-	'S_DAILY'=>					_('Daily'),
-	'S_WEEKLY'=>					_('Weekly'),
-	'S_MONTHLY'=>					_('Monthly'),
-	'S_YEARLY'=>					_('Yearly'),
-
-//	locales.php
-	'S_CREATE'=>				_('Create'),
-
-//	report4.php
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),
 	'S_REPORT4_ANNUALLY_DATE_FORMAT'=>	_('Y'),
 	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	_('M Y'),
 	'S_REPORT4_DAILY_DATE_FORMAT'=>		_('d M Y'),
 	'S_REPORT4_WEEKLY_DATE_FORMAT'=>	_('d M Y H:i'),
-
-//	report6.php
-	'S_BAR_REPORTS'=>			_('Bar reports'),
-	'S_BAR_REPORT_1'=>			_('Distribution of values for multiple periods'),
-	'S_BAR_REPORT_2'=>			_('Distribution of values for multiple items'),
-	'S_BAR_REPORT_3'=>			_('Compare values for multiple periods'),
-
-	'S_SCALE'=>				_('Scale'),
-	'S_AVERAGE_BY'=>			_('Average by'),
-	'S_PALETTE'=>				_('Palette'),
-	'S_DARKEN'=>				_('Darken'),
-	'S_BRIGHTEN'=>				_('Brighten'),
-
-//	reports.inc.php
 	'S_REPORTS_BAR_REPORT_DATE_FORMAT'=>	_('d M Y H:i:s'),
 
-//	screenconf.php
 	'S_SIMPLE_GRAPHS'=>				_('Simple graphs'),
 	'S_HISTORY_AND_SIMPLE_GRAPHS'=> _('History and simple graphs'),
 	'S_WIDTH'=>						_('Width'),
@@ -272,57 +192,16 @@
 
 //	screenedit.php
 	'S_MAP'=>					_('Map'),
-	'S_AS_PLAIN_TEXT'=>			_('As plain text'),
-	'S_LOCAL_TIME'=>			_('Local time'),
 	'S_RIGHT'=>				_('Right'),
-	'S_MIDDLE'=>				_('Middle'),
-
-//	screens.php
-	'S_HOST_SCREENS'=>				_('Host screens'),
-
-//	services.php
-	'S_NO_IT_SERVICE_DEFINED'=>		_('No IT services defined.'),
 	'S_TRIGGER'=>				_('Trigger'),
 	'S_DELETE'=>				_('Delete'),
-	'S_CLONE'=>				_('Clone'),
-	'S_FULL_CLONE'=>			_('Full clone'),
 	'S_REMOVE'=>				_('Remove'),
-
-//	triggers.php
-	'S_NO_TRIGGER'=>			_('No trigger'),
-	'S_SEVERITY'=>				_('Severity'),
-	'S_MIN_SEVERITY'=>			_('Min severity'),
-	'S_DISABLED'=>				_('Disabled'),
-	'S_ENABLED'=>				_('Enabled'),
 	'S_URL'=>				_('URL'),
-	'S_TIME_SHIFT'=>			_('Time shift'),
 	'S_INSERT_MACRO'=>			_('Insert macro'),
-	'S_TRIGGER_LOG_FORM'=>	_('Trigger form'),
-
-//	tr_comments.php
-	'S_TRIGGER_COMMENTS'=>			_('Trigger comments'),
-	'S_TRIGGER_COMMENTS_BIG'=>		_('TRIGGER COMMENTS'),
-	'S_COMMENT_UPDATED'=>			_('Comment updated'),
-	'S_CANNOT_UPDATE_COMMENT'=>		_('Cannot update comment'),
 	'S_ADD'=>						_('Add'),
-
-//	tr_status.php
-	'S_SHOW_DETAILS'=>			_('Show details'),
-	'S_FILTER_BY_NAME'=>				_('Filter by name'),
-	'S_ACK'=>				_('Ack'),
-	'S_ACKNOWLEDGE_STATUS' => _('Acknowledge status'),
-	'S_ANY' => _('Any'),
-	'S_WITH_UNACKNOWLEDGED_EVENTS' => _('With unacknowledged events'),
-	'S_WITH_LAST_EVENT_UNACKNOWLEDGED' => _('With last event unacknowledged'),
-	'S_TRIGGERS_STATUS' => _('Triggers status'),
-	'S_AGE_LESS_THAN' => _('Age less than'),
 	'S_SELECT' => _('Select'),
-
-//	users.php
 	'S_NAME'=>					_('Name'),
 	'S_HIDE'=>					_('Hide'),
-
-//scripts.php
 	'S_CLOSE'=>					_('Close'),
 	'S_CLEAR' =>				_('Clear'),
 	'S_MOVE'=>					_('Move'),
@@ -333,20 +212,11 @@
 
 //	popup_period.php
 	'S_POPUP_PERIOD_CAPTION_DATE_FORMAT'=>	_('d M Y H:i:s'),
-
-//	tr_logform.php
 	'S_DELETE_EXPRESSION_Q'=>	_('Delete expression?'),
 	'S_DELETE_KEYWORD_Q'=>		_('Delete keyword?'),
 
 // main.js
 	'S_NO_ELEMENTS_SELECTED'=>	_('No elements selected!'),
-
-//	hosts.inc.php
-	'S_INTERNAL_AND_CANNOT_DELETED_SMALL'=>		_('is internal and can not be deleted'),
-	'S_NO_APPLICATION_WITH'=>			_('No application with'),
-	'S_TEMPLATE_WITH_ITEM_KEY'=>			_('Template with item key'),
-	'S_TEMPLATE_WITH_APPLICATION'=>			_('Template with application'),
-	'S_ALREADY_LINKED_TO_HOST_SMALL'=>		_('already linked to host'),
 
 //	class.calendar.js
 	'S_MONDAY_SHORT_BIG'=>		_('M'),
@@ -375,6 +245,5 @@
 
 // class.cookie.js
 	'S_MAX_COOKIE_SIZE_REACHED'=>		_('We are sorry, the maximum possible number of elements to remember has been reached.'),
-
 	'S_ICONMAP_IS_NOT_ENABLED' => _('Iconmap is not enabled'),
 );
