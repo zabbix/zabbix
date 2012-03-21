@@ -53,7 +53,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'type'=>		array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2'),		'isset({save})'),
 
 		'only_hostid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
-		'monitored_hosts'=>array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
+		'real_hosts'=>array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
 /* actions */
 		'add'=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -131,7 +131,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$calc_fnc	= get_request('calc_fnc',		2);
 		$type		= get_request('type',			0);
 		$only_hostid	= get_request('only_hostid',	null);
-		$monitored_hosts = get_request('monitored_hosts', null);
+		$real_hosts = get_request('real_hosts', null);
 
 		$caption = ($itemid) ? _('Update item for the graph') : _('New item for the graph');
 		$frmGItem = new CFormTable($caption);
@@ -160,7 +160,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		if(isset($only_hostid)){// graph for template must use only one host
 			$host_condition = "&only_hostid=".$only_hostid;
 		}
-		else if(isset($monitored_hosts)){
+		else if(isset($real_hosts)){
 			$host_condition = "&real_hosts=1";
 		}
 

@@ -1504,7 +1504,7 @@
 
 // items beforehead, to get only_hostid for miny maxy items
 		$only_hostid = null;
-		$monitored_hosts = null;
+		$real_hosts = null;
 
 		if(count($items)){
 			$frmGraph->addVar('items', $items);
@@ -1521,7 +1521,7 @@
 				if($host['status'] == HOST_STATUS_TEMPLATE)
 					$only_hostid = $host['hostid'];
 				else
-					$monitored_hosts = 1;
+					$real_hosts = 1;
 
 				$color = new CColorCell(null, $gitem['color']);
 
@@ -1545,12 +1545,12 @@
 				$description->onClick(
 					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
 					url_param($only_hostid, false, 'only_hostid').
-					url_param($monitored_hosts, false, 'monitored_hosts').
+					url_param($real_hosts, false, 'real_hosts').
 					url_param($graphtype, false, 'graphtype').
 					url_param($gitem, false).
 					url_param($gid,false,'gid').
 					url_param(get_request('graphid',0),false,'graphid').
-					'",550,400,"graph_item_form");'
+					'",800,400,"graph_item_form");'
 				);
 
 				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
@@ -1639,7 +1639,7 @@
 					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
 						"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
 						url_param($only_hostid, false, 'only_hostid').
-						url_param($monitored_hosts, false, 'monitored_hosts').
+						url_param($real_hosts, false, 'real_hosts').
 							"&dstfld1=ymin_itemid".
 							"&dstfld2=ymin_name".
 							"&srctbl=items".
@@ -1695,7 +1695,7 @@
 					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
 							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
 							url_param($only_hostid, false, 'only_hostid').
-							url_param($monitored_hosts, false, 'monitored_hosts').
+							url_param($real_hosts, false, 'real_hosts').
 							"&dstfld1=ymax_itemid".
 							"&dstfld2=ymax_name".
 							"&srctbl=items".
@@ -1735,7 +1735,7 @@
 				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
 				url_param($graphtype, false, 'graphtype').
 				url_param('parent_discoveryid').
-				"',700,400,'graph_item_form');");
+				"',800,400,'graph_item_form');");
 		}
 
 		$normal_only = $parent_discoveryid ? '&normal_only=1' : '';
@@ -1744,10 +1744,10 @@
 			new CButton('add_item',S_ADD,
 				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
 				url_param($only_hostid, false, 'only_hostid').
-				url_param($monitored_hosts, false, 'monitored_hosts').
+				url_param($real_hosts, false, 'real_hosts').
 				url_param($graphtype, false, 'graphtype').
 				$normal_only.
-				"',700,400,'graph_item_form');"),
+				"',800,400,'graph_item_form');"),
 			$addProtoBtn,
 			$dedlete_button
 		));
