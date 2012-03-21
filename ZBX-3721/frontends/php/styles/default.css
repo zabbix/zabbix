@@ -527,7 +527,7 @@ table.server_info tr.status td { white-space: nowrap; word-spacing: 0; }
 /* warning */
 table.warningTable {
 	margin: 30px auto; width: 500px; border: 5px solid #CC3333; background-color: #FFFFFF;
-	-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+	-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; color: #2F2F2F;
 }
 table.warningTable td { padding: 10px; line-height: 20px; }
 table.warningTable tr.header { height: 24px; color: #FFFFFF; font-weight: bold; background-color: #CC3333; }
