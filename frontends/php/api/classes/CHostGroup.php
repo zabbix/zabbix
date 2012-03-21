@@ -616,9 +616,9 @@ class CHostGroup extends CZBXAPI{
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
 		}
 
-		foreach ($groups as $num => $group) {
+		foreach ($groups as $group) {
 			if (!is_array($group) || !isset($group['name']) || empty($group['name'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter "name".'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create group without name.'));
 			}
 			if ($this->exists(array('name' => $group['name']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%s" already exists.', $group['name']));
