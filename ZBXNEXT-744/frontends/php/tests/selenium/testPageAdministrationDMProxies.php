@@ -58,7 +58,7 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$oldHashHosts=DBhash($sqlHosts);
 
 		$this->login('proxies.php');
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');

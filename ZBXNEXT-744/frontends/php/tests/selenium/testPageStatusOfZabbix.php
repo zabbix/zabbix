@@ -27,7 +27,7 @@ class testPageStatusOfZabbix extends CWebTest {
 		$this->assertTitle('Status of Zabbix');
 		$this->ok('Status of Zabbix');
 		$this->ok('STATUS OF ZABBIX');
-		$this->ok('REPORT');
+		$this->ok('Report');
 		// Header
 		$this->ok(array('Parameter', 'Value', 'Details'));
 		// Data
