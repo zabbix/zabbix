@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
-$page['title'] = "S_OVERVIEW";
+$page['title'] = _('Overview');
 $page['file'] = 'overview.php';
 $page['hist_arg'] = array('groupid','type');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -149,11 +149,9 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	$form_l->additem(array(S_HOSTS_LOCATION.SPACE,$cmbStyle));
 
-	$over_wdgt->addHeader(S_OVERVIEW_BIG, $form);
+	$over_wdgt->addHeader(_('Overview'), $form);
 	$over_wdgt->addHeader($form_l);
 
-//	show_table_header(S_OVERVIEW_BIG,$form);
-//-------------
 
 	if($_REQUEST['type']==SHOW_DATA){
 		$table = get_items_data_overview(array_keys($pageFilter->hosts),$_REQUEST['view_style']);

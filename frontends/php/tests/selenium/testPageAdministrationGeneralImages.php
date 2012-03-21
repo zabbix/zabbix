@@ -39,7 +39,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->login('adm.images.php');
 		$this->assertElementPresent('configDropDown');
 		$this->assertElementPresent('form');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of images');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
 		$this->assertElementPresent('imagetype');
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");

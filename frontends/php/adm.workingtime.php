@@ -21,38 +21,39 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of working time');
 $page['file'] = 'adm.workingtime.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-$fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'work_period'=>				array(T_ZBX_STR, O_NO,	null,	null,	'isset({save})'),
 
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'work_period' =>	array(T_ZBX_STR, O_NO,	null,			null,	'isset({save})'),
+	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,			null,	null)
 );
-?>
-<?php
 check_fields($fields);
 
-
+/*
+ * Actions
+ */
 if (isset($_REQUEST['save'])) {
 	$configs = array(
-		'work_period' => get_request('work_period'),
+		'work_period' => get_request('work_period')
 	);
 	$result = update_config($configs);
 
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
 
 	if ($result) {
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _s('Working time [%1$s]', get_request('work_period')));
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _s('Working time "%1$s".', get_request('work_period')));
 	}
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.workingtime.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -71,9 +72,8 @@ $cmbConf->addItems(array(
 ));
 $form->addItem($cmbConf);
 
-
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF WORKING TIME'), $form);
 
 $data = array();
 $data['form_refresh'] = get_request('form_refresh', 0);

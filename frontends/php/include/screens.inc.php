@@ -1258,7 +1258,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 					$options['value'] = array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
 				}
 
-				$item = new CTableInfo(_('No events found.'));
+				$item = new CTableInfo(_('No events defined.'));
 				$item->setHeader(array(
 					_('Time'),
 					is_show_all_nodes() ? _('Node') : null,

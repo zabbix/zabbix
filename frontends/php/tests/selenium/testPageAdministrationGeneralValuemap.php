@@ -33,8 +33,8 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 	public function testPageAdministrationGeneralValuemap_CheckLayout($valuemap) {
 
 		$this->login('adm.valuemapping.php');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->assertTitle('Configuration of value mapping');
+		$this->ok('CONFIGURATION OF VALUE MAPPING');
 		$this->ok('Value mapping');
 		$this->ok(array('Name', 'Value map'));
 		$this->assertElementPresent('form');

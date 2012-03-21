@@ -402,12 +402,12 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$graphs_wdgt->addHeader(_('GRAPHS'), $r_form);
+		$graphs_wdgt->addHeader(_('Graphs'), $r_form);
 		$graphs_wdgt->addHeader($numrows);
 
 // Header Host
 		if($_REQUEST['hostid'] > 0){
-			$tbl_header_host = get_header_host_table($_REQUEST['hostid'], 'graphs');
+			$tbl_header_host = get_header_host_table('graphs', $_REQUEST['hostid']);
 			$graphs_wdgt->addItem($tbl_header_host);
 		}
 

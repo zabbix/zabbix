@@ -939,7 +939,8 @@ function make_latest_issues(array $filter = array()) {
 			'triggerids' => $trigger['triggerid'],
 			'filter' => array(
 				'object' => EVENT_OBJECT_TRIGGER,
-				'value' => TRIGGER_VALUE_TRUE
+				'value' => TRIGGER_VALUE_TRUE,
+				'value_changed' => TRIGGER_VALUE_CHANGED_YES
 			),
 			'sortfield' => array('object', 'objectid', 'eventid'),
 			'sortorder' => ZBX_SORT_DOWN,

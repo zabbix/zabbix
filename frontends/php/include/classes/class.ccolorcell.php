@@ -19,14 +19,15 @@
 **/
 ?>
 <?php
+
 class CColorCell extends CDiv{
-	public function __construct($name, $value, $action=null) {
+
+	public function __construct($name, $value, $action = null) {
 		parent::__construct(SPACE.SPACE.SPACE, 'pointer');
 		$this->setName($name);
 		$this->attr('id', zbx_formatDomId($name));
 		$this->attr('title', '#'.$value);
 		$this->attr('style', 'display: inline; width: 10px; height: 10px; text-decoration: none; border: 1px solid black; background-color: #'.$value);
-
 		$this->attr('onclick', $action);
 	}
 }

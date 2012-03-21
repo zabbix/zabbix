@@ -21,7 +21,7 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Scripts');
+$page['title'] = _('Configuration of scripts');
 $page['file'] = 'scripts.php';
 $page['hist_arg'] = array('scriptid');
 

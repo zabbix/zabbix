@@ -35,7 +35,7 @@ else{
 	$EXPORT_DATA = false;
 
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
-	$page['title'] = 'S_TEMPLATES';
+	$page['title'] = _('Configuration of templates');
 	$page['file'] = 'templates.php';
 	$page['hist_arg'] = array('groupid');
 }
@@ -379,10 +379,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	if(!isset($_REQUEST['form'])){
 		$frmForm->cleanItems();
 		$buttons = new CDiv(array(
-			new CSubmit('form', S_CREATE),
+			new CSubmit('form', _('Create template')),
 			new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")')
 		));
-		$buttons->useJQueryStyle();
 		$frmForm->addItem($buttons);
 	}
 
@@ -403,26 +402,23 @@ require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 	if (isset($_REQUEST['form'])) {
+		$template_wdgt->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
+
 		if ($templateid = get_request('templateid', 0)) {
-			$template_wdgt->addItem(get_header_host_table($templateid));
+			$template_wdgt->addItem(get_header_host_table('', $templateid));
 		}
 
 		$templateForm = new CView('configuration.template.edit');
 		$template_wdgt->addItem($templateForm->render());
 	}
 	else {
-// TABLE WITH TEMPLATES
+		$template_wdgt->addPageHeader(_('CONFIGURATION OF TEMPLATES'), $frmForm);
 
 		$frmGroup = new CForm('get');
 		$frmGroup->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 
-// table header
-		$numrows = new CDiv();
-		$numrows->setAttribute('name', 'numrows');
-
-		$template_wdgt->addHeader(_('TEMPLATES'), $frmGroup);
-		$template_wdgt->addHeader($numrows, $frmForm);
-//------
+		$template_wdgt->addHeader(_('Templates'), $frmGroup);
+		$template_wdgt->addHeaderRowNumber();
 
 		$form = new CForm();
 		$form->setName('templates');

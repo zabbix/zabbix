@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CFormList extends CDiv {
+
 	protected $formList = null;
 	protected $editable = true;
 	protected $formInputs = array('ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox');
