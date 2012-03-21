@@ -1493,7 +1493,7 @@
 		$frmGraph->addVar('ymin_itemid', $ymin_itemid);
 		$frmGraph->addVar('ymax_itemid', $ymax_itemid);
 
-		$frmGraph->addRow(S_NAME, new CTextBox('name', $name, 32));
+		$frmGraph->addRow(_('Name'), new CTextBox('name', $name, 32));
 		$frmGraph->addRow(S_WIDTH, new CNumericBox('width', $width, 5));
 		$frmGraph->addRow(S_HEIGHT, new CNumericBox('height', $height, 5));
 
@@ -1504,7 +1504,7 @@
 
 // items beforehead, to get only_hostid for miny maxy items
 		$only_hostid = null;
-		$monitored_hosts = null;
+		$real_hosts = null;
 
 		if(count($items)){
 			$frmGraph->addVar('items', $items);
@@ -1521,7 +1521,7 @@
 				if($host['status'] == HOST_STATUS_TEMPLATE)
 					$only_hostid = $host['hostid'];
 				else
-					$monitored_hosts = 1;
+					$real_hosts = 1;
 
 				$color = new CColorCell(null, $gitem['color']);
 
@@ -1545,12 +1545,12 @@
 				$description->onClick(
 					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
 					url_param($only_hostid, false, 'only_hostid').
-					url_param($monitored_hosts, false, 'monitored_hosts').
+					url_param($real_hosts, false, 'real_hosts').
 					url_param($graphtype, false, 'graphtype').
 					url_param($gitem, false).
 					url_param($gid,false,'gid').
 					url_param(get_request('graphid',0),false,'graphid').
-					'",550,400,"graph_item_form");'
+					'",800,400,"graph_item_form");'
 				);
 
 				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
@@ -1570,7 +1570,7 @@
 							$description,
 							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
 							graph_item_type2str($gitem['type']),
-							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?_('Left'):S_RIGHT,
+							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?_('Left'):_('Right'),
 							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
 							$color,
 							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
@@ -1636,10 +1636,10 @@
 
 				if (count($items)) {
 					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
-					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
+					$yaxis_min[] = new CButton('yaxis_min',_('Select'),'javascript: '.
 						"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
 						url_param($only_hostid, false, 'only_hostid').
-						url_param($monitored_hosts, false, 'monitored_hosts').
+						url_param($real_hosts, false, 'real_hosts').
 							"&dstfld1=ymin_itemid".
 							"&dstfld2=ymin_name".
 							"&srctbl=items".
@@ -1692,10 +1692,10 @@
 
 				if (count($items)) {
 					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
-					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
+					$yaxis_max[] = new CButton('yaxis_max',_('Select'),'javascript: '.
 							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
 							url_param($only_hostid, false, 'only_hostid').
-							url_param($monitored_hosts, false, 'monitored_hosts').
+							url_param($real_hosts, false, 'real_hosts').
 							"&dstfld1=ymax_itemid".
 							"&dstfld2=ymax_name".
 							"&srctbl=items".
@@ -1735,29 +1735,29 @@
 				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
 				url_param($graphtype, false, 'graphtype').
 				url_param('parent_discoveryid').
-				"',700,400,'graph_item_form');");
+				"',800,400,'graph_item_form');");
 		}
 
 		$normal_only = $parent_discoveryid ? '&normal_only=1' : '';
 		$frmGraph->addRow(S_ITEMS, array(
 			$items_table,
-			new CButton('add_item',S_ADD,
+			new CButton('add_item',_('Add'),
 				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
 				url_param($only_hostid, false, 'only_hostid').
-				url_param($monitored_hosts, false, 'monitored_hosts').
+				url_param($real_hosts, false, 'real_hosts').
 				url_param($graphtype, false, 'graphtype').
 				$normal_only.
-				"',700,400,'graph_item_form');"),
+				"',800,400,'graph_item_form');"),
 			$addProtoBtn,
 			$dedlete_button
 		));
 
 		$footer = array(
 			new CSubmit('preview', _('Preview')),
-			new CSubmit('save', S_SAVE),
+			new CSubmit('save', _('Save')),
 		);
 		if(isset($_REQUEST['graphid'])){
-			$footer[] = new CSubmit('clone', S_CLONE);
+			$footer[] = new CSubmit('clone', _('Clone'));
 			$footer[] = new CButtonDelete(_('Delete graph?'),url_param('graphid').url_param('parent_discoveryid'));
 		}
 		$footer[] = new CButtonCancel(url_param('parent_discoveryid'));

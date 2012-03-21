@@ -467,7 +467,7 @@ class CChart extends CGraphDraw{
 					'skipdraw' => ($val <= $minY || $val >= $maxY),
 					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
 					'color' => getSeverityColor($trigger['priority']),
-					'description' => S_TRIGGER.': '.expand_trigger_description_by_data($trigger),
+					'description' => _('Trigger').': '.expand_trigger_description_by_data($trigger),
 					'constant' => '['.$arr[2].' '.$arr[3].$arr[4].']'
 				));
 				++$cnt;

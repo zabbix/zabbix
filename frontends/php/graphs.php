@@ -42,7 +42,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
 
 		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save}) || isset({preview})', S_NAME),
+		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save}) || isset({preview})', _('Name')),
 		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(20,65535),	'isset({save}) || isset({preview})', S_WIDTH.' (min:20, max:65535)'),
 		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(20,65535),	'isset({save}) || isset({preview})', S_HEIGHT.' (min:20, max:65535)'),
 
@@ -396,8 +396,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		$r_form = new CForm('get');
-		$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB()));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
+		$r_form->addItem(array(_('Group'),$pageFilter->getGroupsCB()));
+		$r_form->addItem(array(_('Host'),$pageFilter->getHostsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
@@ -419,8 +419,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$table = new CTableInfo(_('No graphs defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_graphs',NULL,"checkAll('".$form->getName()."','all_graphs','group_graphid');"),
-			$_REQUEST['hostid'] != 0 ? NULL : S_HOSTS,
-			make_sorting_header(S_NAME,'name'),
+			$_REQUEST['hostid'] != 0 ? NULL : _('Hosts'),
+			make_sorting_header(_('Name'),'name'),
 			S_WIDTH,
 			S_HEIGHT,
 			make_sorting_header(_('Graph type'),'graphtype')));

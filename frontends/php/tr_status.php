@@ -186,16 +186,16 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$filterForm->addVar('hostid', $_REQUEST['hostid']);
 
 	$tr_select = new CComboBox('show_triggers', $show_triggers);
-	$tr_select->addItem(TRIGGERS_OPTION_ALL, S_ANY);
+	$tr_select->addItem(TRIGGERS_OPTION_ALL, _('Any'));
 	$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
-	$filterForm->addRow(S_TRIGGERS_STATUS, $tr_select);
+	$filterForm->addRow(_('Triggers status'), $tr_select);
 
 	if($config['event_ack_enable']){
 		$cb_ack_status = new CComboBox('ack_status', $ack_status);
-		$cb_ack_status->addItem(ZBX_ACK_STS_ANY, S_ANY);
-		$cb_ack_status->additem(ZBX_ACK_STS_WITH_UNACK, S_WITH_UNACKNOWLEDGED_EVENTS);
-		$cb_ack_status->additem(ZBX_ACK_STS_WITH_LAST_UNACK, S_WITH_LAST_EVENT_UNACKNOWLEDGED);
-		$filterForm->addRow(S_ACKNOWLEDGE_STATUS, $cb_ack_status);
+		$cb_ack_status->addItem(ZBX_ACK_STS_ANY, _('Any'));
+		$cb_ack_status->additem(ZBX_ACK_STS_WITH_UNACK, _('With unacknowledged events'));
+		$cb_ack_status->additem(ZBX_ACK_STS_WITH_LAST_UNACK, _('With last event unacknowledged'));
+		$filterForm->addRow(_('Acknowledge status'), $cb_ack_status);
 	}
 
 	$ev_select = new CComboBox('show_events', $_REQUEST['show_events']);
@@ -217,7 +217,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER),
 	);
 	$severity_select->addItems($cb_items);
-	$filterForm->addRow(S_MIN_SEVERITY, $severity_select);
+	$filterForm->addRow(_('Min severity'), $severity_select);
 
 	$action = 'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()';
 	$sts_change_days_cb = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
@@ -229,15 +229,15 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$spand = new CSpan(_('days'));
 	$spand->addStyle('vertical-align: middle;');
-	$filterForm->addRow(S_AGE_LESS_THAN, array(
+	$filterForm->addRow(_('Age less than'), array(
 		$cbd,
 		$sts_change_days_cb,
 		$spand,
 	));
 
-	$filterForm->addRow(S_SHOW_DETAILS, new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
+	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
 
-	$filterForm->addRow(S_FILTER_BY_NAME, new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
+	$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
 
 	$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
 	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
@@ -284,7 +284,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$config['event_ack_enable'] ? _('Acknowledged') : null,
 		is_show_all_nodes() ? _('Node') : null,
 		S_HOST,
-		make_sorting_header(S_NAME, 'description'),
+		make_sorting_header(_('Name'), 'description'),
 		_('Comments')
 	));
 
@@ -658,7 +658,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			get_node_name_by_elid($trigger['triggerid']),
 			$host,
 			$tr_desc,
-			new CLink(zbx_empty($trigger['comments']) ? S_ADD : S_SHOW, 'tr_comments.php?triggerid='.$trigger['triggerid'])
+			new CLink(zbx_empty($trigger['comments']) ? _('Add') : _('Show'), 'tr_comments.php?triggerid='.$trigger['triggerid'])
 		), 'even_row');
 
 

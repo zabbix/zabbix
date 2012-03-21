@@ -97,14 +97,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		$form->addItem(SPACE._('Period').SPACE);
 		$cmbPeriod = new CComboBox('period', $period, 'submit();');
-		$cmbPeriod->addItem('daily',	S_DAILY);
-		$cmbPeriod->addItem('weekly',	S_WEEKLY);
-		$cmbPeriod->addItem('monthly',	S_MONTHLY);
-		$cmbPeriod->addItem('yearly',	S_YEARLY);
+		$cmbPeriod->addItem('daily',	_('Daily'));
+		$cmbPeriod->addItem('weekly',	_('Weekly'));
+		$cmbPeriod->addItem('monthly',	_('Monthly'));
+		$cmbPeriod->addItem('yearly',	_('Yearly'));
 		$form->addItem($cmbPeriod);
 
 		if($period != 'yearly'){
-			$form->addItem(SPACE.S_YEAR.SPACE);
+			$form->addItem(SPACE._('Year').SPACE);
 			$cmbYear = new CComboBox('year', $year, 'submit();');
 			for($y = $MIN_YEAR; $y <= date('Y'); $y++)
 				$cmbYear->addItem($y, $y);
@@ -124,7 +124,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			case 'yearly':
 				$from	= $MIN_YEAR;
 				$to	= date('Y');
-				array_unshift($header, new CCol(S_YEAR,'center'));
+				array_unshift($header, new CCol(_('Year'),'center'));
 				function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
 				function format_time($t){	return zbx_date2str(S_REPORT4_ANNUALLY_DATE_FORMAT, $t);}
 				function format_time2($t){	return null; }
@@ -132,7 +132,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			case 'monthly':
 				$from	= 1;
 				$to	= 12;
-				array_unshift($header, new CCol(S_MONTH,'center'));
+				array_unshift($header, new CCol(_('Month'),'center'));
 				function get_time($m)	{	global $year;	return mktime(0,0,0,$m,1,$year);	}
 				function format_time($t){	return zbx_date2str(S_REPORT4_MONTHLY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return null; }
@@ -140,7 +140,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			case 'daily':
 				$from = 1;
 				$to = DAY_IN_YEAR;
-				array_unshift($header, new CCol(S_DAY,'center'));
+				array_unshift($header, new CCol(_('Day'),'center'));
 				function get_time($d)	{	global $year;	return mktime(0,0,0,1,$d,$year);	}
 				function format_time($t){	return zbx_date2str(S_REPORT4_DAILY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return null; }
@@ -149,7 +149,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			default:
 				$from	= 0;
 				$to	= 52;
-				array_unshift($header,new CCol(S_FROM,'center'),new CCol(S_TILL,'center'));
+				array_unshift($header,new CCol(_('From'),'center'),new CCol(_('Till'),'center'));
 				function get_time($w)	{
 					global $year;
 
