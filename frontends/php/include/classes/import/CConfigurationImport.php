@@ -336,7 +336,7 @@ class CConfigurationImport {
 			return;
 		}
 
-		// skip the groups that already updateExisting
+		// skip the groups that already exist
 		foreach ($groups as $gnum => $group) {
 			if ($this->referencer->resolveGroup($group['name'])) {
 				unset($groups[$gnum]);
