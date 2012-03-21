@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBXNEXT-914] redesign Administration->DM (Eduard)
 
 Bug fixes:
+.......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 ..F....... [ZBX-4778] fixed port field validation in creating discovery rule (Toms)
 A......... [ZBX-4621] fixed macro update using host.massupdate (Vedmak)
 A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
@@ -517,6 +518,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
+.......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
 .D........ [ZBX-4777] added information in the Zabbix sender manpage about values being sent in a sequential manner and the need to have ordered timestamps (Richlv)
 
