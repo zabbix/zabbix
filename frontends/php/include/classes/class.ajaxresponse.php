@@ -23,6 +23,7 @@
  * Class for standard ajax response generation.
  */
 class AjaxResponse {
+
 	private $_result = true;
 	private $_data = array();
 	private $_errors = array();

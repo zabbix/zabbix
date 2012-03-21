@@ -19,16 +19,17 @@
 **/
 ?>
 <?php
+
 function get_last_event_by_triggerid($triggerid) {
-	$event_data = DBfetch(DBselect('SELECT e.*'.
-									' FROM events e'.
-									' WHERE e.objectid='.$triggerid.
-										' AND e.object='.EVENT_OBJECT_TRIGGER.
-									' ORDER BY e.objectid DESC,e.object DESC,e.eventid DESC', 1));
-	if (!$event_data) {
-		return false;
-	}
-	return $event_data;
+	$dbEvents = DBfetch(DBselect(
+		'SELECT e.*'.
+		' FROM events e'.
+		' WHERE e.objectid='.$triggerid.
+			' AND e.object='.EVENT_OBJECT_TRIGGER.
+		' ORDER BY e.objectid DESC,e.object DESC,e.eventid DESC',
+		1
+	));
+	return !empty($dbEvents) ? $dbEvents : false;
 }
 
 function get_acknowledges_by_eventid($eventid) {
@@ -37,7 +38,7 @@ function get_acknowledges_by_eventid($eventid) {
 
 function make_acktab_by_eventid($event) {
 	if (!empty($event['acknowledges']) && is_array($event['acknowledges'])) {
-		$table = new CTableInfo();
+		$table = new CTableInfo(_('No acknowledges defined.'));
 		$table->setHeader(array(_('Time'), _('User'), _('Comments')));
 
 		foreach ($event['acknowledges'] as $ack) {

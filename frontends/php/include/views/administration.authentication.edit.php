@@ -20,7 +20,7 @@
 ?>
 <?php
 $authenticationWidget = new CWidget();
-$authenticationWidget->addPageHeader(_('AUTHENTICATION TO ZABBIX'));
+$authenticationWidget->addPageHeader(_('CONFIGURATION OF AUTHENTICATION'));
 
 // create form
 $authenticationForm = new CForm();
@@ -85,10 +85,10 @@ else {
 
 // append buttons to form
 if ($this->data['config'] == ZBX_AUTH_LDAP) {
-	$authenticationForm->addItem(makeFormFooter(array($saveButton), array(new CSubmit('test', _('Test')))));
+	$authenticationForm->addItem(makeFormFooter($saveButton, new CSubmit('test', _('Test'))));
 }
 else {
-	$authenticationForm->addItem(makeFormFooter(array($saveButton)));
+	$authenticationForm->addItem(makeFormFooter($saveButton));
 }
 
 // append form to widget

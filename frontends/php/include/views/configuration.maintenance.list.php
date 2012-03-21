@@ -30,17 +30,15 @@ $maintenanceWidget->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $cr
 // header
 $filterForm = new CForm('get');
 $filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $maintenanceWidget->addHeader(_('Maintenance periods'), $filterForm);
-$maintenanceWidget->addHeader($numRows);
+$maintenanceWidget->addHeaderRowNumber();
 
 // create form
 $maintenanceForm = new CForm();
 $maintenanceForm->setName('maintenanceForm');
 
 // create table
-$maintenanceTable = new CTableInfo(_('No maintenance defined'));
+$maintenanceTable = new CTableInfo(_('No maintenance defined.'));
 $maintenanceTable->setHeader(array(
 	new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
 	make_sorting_header(_('Name'), 'name'),
@@ -87,6 +85,5 @@ $maintenanceForm->addItem(array($this->data['paging'], $maintenanceTable, $this-
 
 // append form to widget
 $maintenanceWidget->addItem($maintenanceForm);
-
 return $maintenanceWidget;
 ?>

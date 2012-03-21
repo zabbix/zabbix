@@ -26,12 +26,12 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
-$page['hist_arg'] = array('hostid','groupid');
+$page['hist_arg'] = array('hostid', 'groupid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),

@@ -68,8 +68,7 @@ class CTag extends CObject {
 	}
 
 	public function bodyToString() {
-		$res = $this->tag_body_start;
-		return $res.parent::toString(false);
+		return $this->tag_body_start.parent::toString(false);
 	}
 
 	public function endToString() {
@@ -79,7 +78,7 @@ class CTag extends CObject {
 	}
 
 	public function toString($destroy = true) {
-		$res  = $this->startToString();
+		$res = $this->startToString();
 		$res .= $this->bodyToString();
 		$res .= $this->endToString();
 		if ($destroy) {
@@ -115,22 +114,14 @@ class CTag extends CObject {
 		return $this->attributes['class'];
 	}
 
-	public function attr($name, $value = null) {
-		if (is_null($value)) {
-			$this->getAttribute($name);
-		}
-		else {
+	public function attr($name, $value) {
+		if (!is_null($value)) {
 			$this->setAttribute($name, $value);
 		}
 	}
 
 	public function getAttribute($name) {
-		if (isset($this->attributes[$name])) {
-			return $this->attributes[$name];
-		}
-		else {
-			return null;
-		}
+		return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
 	}
 
 	public function setAttribute($name, $value) {
