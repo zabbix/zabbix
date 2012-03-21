@@ -1081,7 +1081,7 @@ function get_application_by_applicationid($applicationid,$no_error_message=0) {
 		return $row;
 	}
 	if ($no_error_message == 0) {
-		error(S_NO_APPLICATION_WITH." id=[$applicationid]");
+		error(_s('No application with ID "%1$s".', $applicationid));
 	}
 
 	return false;
@@ -1143,7 +1143,7 @@ function validate_templates($templateid_list) {
 	while ($db_cnt = DBfetch($res)) {
 		if ($db_cnt['cnt'] > 1) {
 			$result &= false;
-			error(S_TEMPLATE_WITH_ITEM_KEY.SPACE.'['.htmlspecialchars($db_cnt['key_']).']'.SPACE.S_ALREADY_LINKED_TO_HOST_SMALL);
+			error(_s('Template with item key "%1$s" already linked to host.', htmlspecialchars($db_cnt['key_'])));
 		}
 	}
 
@@ -1157,7 +1157,7 @@ function validate_templates($templateid_list) {
 	while ($db_cnt = DBfetch($res)) {
 		if ($db_cnt['cnt'] > 1) {
 			$result &= false;
-			error(S_TEMPLATE_WITH_APPLICATION.SPACE.'['.htmlspecialchars($db_cnt['name']).']'.SPACE.S_ALREADY_LINKED_TO_HOST_SMALL);
+			error(_s('Template with application "%1$s" already linked to host.', htmlspecialchars($db_cnt['name'])));
 		}
 	}
 
