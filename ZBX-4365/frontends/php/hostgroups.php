@@ -22,14 +22,13 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 
-$page['title'] = _('Host groups');
+$page['title'] = _('Configuration of host groups');
 $page['file'] = 'hostgroups.php';
 $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groups' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -38,7 +37,7 @@ $fields = array(
 	// group
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
-	'twb_groupid' => 	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+	'twb_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -51,8 +50,7 @@ $fields = array(
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
-?>
-<?php
+
 $_REQUEST['go'] = get_request('go', 'none');
 
 // validate permissions
@@ -66,12 +64,10 @@ if (get_request('groupid', 0) > 0) {
 /*
  * Actions
  */
-// clone
 if (isset($_REQUEST['clone']) && isset($_REQUEST['groupid'])) {
 	unset($_REQUEST['groupid']);
 	$_REQUEST['form'] = 'clone';
 }
-// save
 elseif (isset($_REQUEST['save'])) {
 	$objects = get_request('hosts', array());
 	$hosts = API::Host()->get(array(
@@ -154,7 +150,6 @@ elseif (isset($_REQUEST['save'])) {
 	}
 	unset($_REQUEST['save']);
 }
-// delete
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])) {
 	DBstart();
 	$result = API::HostGroup()->delete($_REQUEST['groupid']);
@@ -167,14 +162,12 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['groupid'])) {
 	}
 	unset($_REQUEST['delete']);
 }
-// go: delete
 elseif ($_REQUEST['go'] == 'delete') {
 	$groups = get_request('groups', array());
 	$go_result = API::HostGroup()->delete($groups);
 
 	show_messages($go_result, _('Group deleted'), _('Cannot delete group'));
 }
-// go: status
 elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 	$status = $_REQUEST['go'] == 'activate' ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 	$groups = get_request('groups', array());
@@ -206,7 +199,6 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable'))) {
 		show_messages($go_result, _('Host status updated'), _('Cannot update host'));
 	}
 }
-// go: none
 if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 	$url = new CUrl();
 	$path = $url->getPath();

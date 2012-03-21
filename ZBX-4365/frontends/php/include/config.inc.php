@@ -134,7 +134,7 @@ if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !i
 			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 
 			// init LOCAL NODE ID
-			if ($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 ORDER BY nodeid'))) {
+			if ($local_node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodetype=1 ORDER BY n.nodeid'))) {
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
 				$ZBX_LOCMASTERID = $local_node_data['masterid'];
 				$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
@@ -199,6 +199,7 @@ if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	else {
 		error('Your PHP has no gettext support. Zabbix translations are not available.');
 	}
+
 	// numeric Locale to default
 	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
@@ -250,24 +251,24 @@ function access_deny() {
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 	}
 	else {
-		$req = new Curl($_SERVER['REQUEST_URI']);
-		$req->setArgument('sid', null);
+		$url = new CUrl($_SERVER['REQUEST_URI']);
+		$url->setArgument('sid', null);
+		$url = urlencode($url->toString());
 
-		$table = new CTable(null, 'warningTable');
-		$table->setAlign('center');
-		$table->setHeader(new CCol(_('You are not logged in.'), 'left'), 'header');
-		$table->addRow(new CCol(array(_('You cannot view this URL as a'), SPACE, bold(ZBX_GUEST_USER), '. ', _('You must login to view this page.'), BR(), _('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')), 'center'));
-
-		$url = urlencode($req->toString());
-		$footer = new CCol(
-			array(
-				new CButton('login', _('Login'), "javascript: document.location = 'index.php?request=$url';"),
-				new CButton('back', _('Cancel'), 'javascript: window.history.back();')
-			),
-			'left'
-		);
-		$table->setFooter($footer, 'footer');
-		$table->show();
+		$warning = new CWarning(_('You are not logged in.'), array(
+			_('You cannot view this URL as a'),
+			SPACE,
+			bold(ZBX_GUEST_USER),
+			'. ',
+			_('You must login to view this page.'),
+			BR(),
+			_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+		));
+		$warning->setButtons(array(
+			new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist'),
+			new CButton('back', _('Cancel'), 'javascript: window.history.back();', 'formlist')
+		));
+		$warning->show();
 	}
 	require_once dirname(__FILE__).'/page_footer.php';
 }
@@ -332,7 +333,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 					'color' => (!$bool) ? array('R' => 255, 'G' => 0, 'B' => 0) : array('R' => 34, 'G' => 51, 'B' => 68),
 					'font' => 2
 				));
-				$width = max($width, ImageFontWidth(2) * zbx_strlen($msg) + 1);
+				$width = max($width, imagefontwidth(2) * zbx_strlen($msg) + 1);
 				$height += imagefontheight(2) + 1;
 				break;
 			case PAGE_TYPE_XML:
@@ -352,7 +353,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 
 				if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
 					$msg_details = new CDiv(_('Details'), 'blacklink');
-					$msg_details->setAttribute('onclick', "javascript: ShowHide('msg_messages', IE?'block':'table');");
+					$msg_details->setAttribute('onclick', "javascript: ShowHide('msg_messages', IE ? 'block' : 'table');");
 					$msg_details->setAttribute('title', _('Maximize').'/'._('Minimize'));
 					array_unshift($row, new CCol($msg_details, 'clr'));
 				}
@@ -397,8 +398,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 			$msg_show = 6;
 			$msg_count = count($ZBX_MESSAGES);
 			if ($msg_count > $msg_show) {
-				$msg_count = $msg_show;
-				$msg_count = ($msg_count * 16);
+				$msg_count = $msg_show * 16;
 				$lst_error->setAttribute('style', 'height: '.$msg_count.'px;');
 			}
 			$tab = new CTable(null, ($bool ? 'msgok' : 'msgerr'));
@@ -462,12 +462,11 @@ function info($msgs) {
 function error($msgs) {
 	global $ZBX_MESSAGES;
 
-	$msgs = zbx_toArray($msgs);
-
 	if (is_null($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = array();
 	}
 
+	$msgs = zbx_toArray($msgs);
 	foreach ($msgs as $msg) {
 		if (isset(CWebUser::$data['debug_mode']) && !is_object($msg) && !CWebUser::$data['debug_mode']) {
 			$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
@@ -620,17 +619,17 @@ function get_status() {
 	));
 	$status['hosts_count'] = $row['cnt'];
 
-	$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_MONITORED));
+	$row = DBfetch(DBselect('SELECT COUNT(hostid) AS cnt FROM hosts WHERE status='.HOST_STATUS_MONITORED));
 	$status['hosts_count_monitored'] = $row['cnt'];
 
-	$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED));
+	$row = DBfetch(DBselect('SELECT COUNT(hostid) AS cnt FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED));
 	$status['hosts_count_not_monitored'] = $row['cnt'];
 
-	$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_TEMPLATE));
+	$row = DBfetch(DBselect('SELECT COUNT(hostid) AS cnt FROM hosts WHERE status='.HOST_STATUS_TEMPLATE));
 	$status['hosts_count_template'] = $row['cnt'];
 
 	// users
-	$row = DBfetch(DBselect('SELECT COUNT(userid) as usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
+	$row = DBfetch(DBselect('SELECT COUNT(userid) AS usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
 	$status['users_count'] = $row['usr_cnt'];
 	$status['users_online'] = 0;
 
@@ -649,7 +648,7 @@ function get_status() {
 
 	// comments: !!! Don't forget sync code with C !!!
 	$row = DBfetch(DBselect(
-		'SELECT sum(1.0/i.delay) AS qps'.
+		'SELECT SUM(1.0/i.delay) AS qps'.
 		' FROM items i,hosts h'.
 		' WHERE i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.hostid=h.hostid'.

@@ -29,13 +29,11 @@ $createForm->addItem(new CSubmit('form', _('Create item')));
 $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEMS'), $createForm);
 
 // header
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
-$itemsWidget->addHeader(_('Items'), SPACE);
-$itemsWidget->addHeader($numRows, SPACE);
+$itemsWidget->addHeader(_('Items'));
+$itemsWidget->addHeaderRowNumber();
 
 if (!empty($this->data['hostid'])) {
-	$itemsWidget->addItem(get_header_host_table($this->data['hostid'], 'items'));
+	$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
 $itemsWidget->addFlicker($this->data['flicker'], CProfile::get('web.items.filter.state', 0));
 
@@ -74,11 +72,11 @@ foreach ($this->data['items'] as $item) {
 		$description[] = ':'.$item['name_expanded'];
 	}
 	else {
-		$description[] = new CLink($item['name_expanded'], '?form=update&itemid='.$item['itemid']);
+		$description[] = new CLink($item['name_expanded'], '?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']);
 	}
 
 	// status
-	$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&go='.
+	$status = new CCol(new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&hostid='.$item['hostid'].'&go='.
 		($item['status'] ? 'activate' : 'disable'), item_status2style($item['status']))
 	);
 
@@ -113,10 +111,7 @@ foreach ($this->data['items'] as $item) {
 	// triggers info
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
-
-		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
-		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
+		$trigger['hosts'] = reset($trigger['hosts']);
 
 		$triggerDescription = array();
 		if ($trigger['templateid'] > 0) {
@@ -135,7 +130,7 @@ foreach ($this->data['items'] as $item) {
 			$triggerDescription[] = new CSpan($trigger['description']);
 		}
 		else {
-			$triggerDescription[] = new CLink($trigger['description'], 'triggers.php?form=update&triggerid='.$trigger['triggerid']);
+			$triggerDescription[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.$trigger['hosts']['hostid'].'&triggerid='.$trigger['triggerid']);
 		}
 
 		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
@@ -175,7 +170,7 @@ foreach ($this->data['items'] as $item) {
 	// if item type is 'Log' we must show log menu
 	if (in_array($item['value_type'], array(ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT))) {
 		$triggersFlag = false;
-		$triggers = 'Array(\''._('Edit trigger').'\', null, null, {\'outer\' : \'pum_o_submenu\', \'inner\' : [\'pum_i_submenu\']}'."\n";
+		$triggers = 'Array("'._('Edit trigger').'", null, null, {"outer" : "pum_o_submenu", "inner" : ["pum_i_submenu"]}'."\n";
 
 		foreach ($item['triggers'] as $trigger) {
 			foreach ($trigger['functions'] as $function) {

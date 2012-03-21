@@ -22,9 +22,9 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title']		= _('Configuration of actions');
-$page['file']		= 'actionconf.php';
-$page['hist_arg']	= array();
+$page['title'] = _('Configuration of actions');
+$page['file'] = 'actionconf.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -346,16 +346,11 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 <?php
 	$action_wdgt = new CWidget();
 
-/* header */
 	if (!isset($_REQUEST['form'])) {
 		$formActions = new CForm('get');
 		$formActions->cleanItems();
 		$formActions->addVar('eventsource', $_REQUEST['eventsource']);
-		$buttons = new CDiv(array(
-			new CSubmit('form', _('Create action'))
-		));
-		$buttons->useJQueryStyle();
-		$formActions->addItem($buttons);
+		$formActions->addItem(new CSubmit('form', _('Create action')));
 	}
 
 
@@ -372,7 +367,7 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 			$actions = API::Action()->get($options);
 			$action = reset($actions);
 		}
-		else{
+		else {
 			$eventsource = get_request('eventsource');
 			$evaltype = get_request('evaltype');
 			$esc_period	= get_request('esc_period');
@@ -433,11 +428,13 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 		}
 
 		$actionForm = new CView('configuration.action.edit', $action);
+
+		$action_wdgt->addPageHeader(_('CONFIGURATION OF ACTIONS'));
 		$action_wdgt->addItem($actionForm->render());
 
 		show_messages();
 	}
-	else{
+	else {
 		$form = new CForm('get');
 
 		$cmbSource = new CComboBox('eventsource', $_REQUEST['eventsource'], 'submit()');
@@ -446,11 +443,9 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 		$cmbSource->addItem(EVENT_SOURCE_AUTO_REGISTRATION, _('Auto registration'));
 		$form->addItem(array(_('Event source'), SPACE, $cmbSource));
 
-		$numrows = new CDiv();
-		$numrows->setAttribute('name', 'numrows');
-
-		$action_wdgt->addHeader(_('ACTIONS'), $form);
-		$action_wdgt->addHeader($numrows, $formActions);
+		$action_wdgt->addPageHeader(_('CONFIGURATION OF ACTIONS'), $formActions);
+		$action_wdgt->addHeader(_('Actions'), $form);
+		$action_wdgt->addHeaderRowNumber();
 
 // table
 		$form = new CForm();

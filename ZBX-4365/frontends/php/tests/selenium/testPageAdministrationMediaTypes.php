@@ -33,7 +33,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	public function testPageAdministrationMediaTypes_CheckLayout($mediatype) {
 
 		$this->login('media_types.php');
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 
 		$this->ok(array('Media types', 'CONFIGURATION OF MEDIA TYPES', 'Displaying'));
 		$this->ok(array('Description', 'Type', 'Details'));
@@ -61,7 +61,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$oldHashMediaTypes2 = DBhash($sql2);
 
 		$this->login('media_types.php');
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
@@ -81,7 +81,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->login('media_types.php');
 
 		$mediatypeid = $mediatype['mediatypeid'];
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 
 		$sql = 'SELECT mediatypeid FROM media_type WHERE mediatypeid = '.$mediatypeid;
 		$result = DBfetch(DBselect($sql));
@@ -106,7 +106,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->login('media_types.php');
 
 		$name = $mediatype['description'];
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 
 		$sql = 'SELECT mediatypeid FROM media_type WHERE description = '.zbx_dbstr($name);
 		$result = DBfetch(DBselect($sql));
@@ -134,7 +134,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->login('media_types.php');
 
 		$mediatypeid = $mediatype['mediatypeid'];
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 
 		$sql = 'SELECT mediatypeid FROM media_type WHERE mediatypeid = '.$mediatypeid;
 		$result = DBfetch(DBselect($sql));
@@ -214,7 +214,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('media_types.php');
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		$this->checkbox_select("mediatypeids[$id]");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
