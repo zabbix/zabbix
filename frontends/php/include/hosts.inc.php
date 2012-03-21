@@ -1081,7 +1081,7 @@ function get_application_by_applicationid($applicationid,$no_error_message=0) {
 		return $row;
 	}
 	if ($no_error_message == 0) {
-		error(_s('No application with id "%1$s".', $applicationid));
+		error(_s('No application with ID "%1$s".', $applicationid));
 	}
 
 	return false;
