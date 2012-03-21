@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBXNEXT-914] redesign Administration->DM (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4779] fixed new groups import (Vedmak)
 ..F....... [ZBX-4775] fixed discovery rules import (Vedmak)
 ..F....... [ZBX-4700] fixed errors in item list when using interface related macro in template item key (Vedmak)
 ..F....... [ZBX-4761] fixed "&" escaping in form inputs (Pavels)
