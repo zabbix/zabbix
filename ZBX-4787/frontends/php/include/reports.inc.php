@@ -696,10 +696,10 @@ function bar_report_form3(){
 
 
 	$paletteCmb = new CComboBox('palette', $palette);
-		$paletteCmb->addItem(0, _('Palette #1'));
-		$paletteCmb->addItem(1, _('Palette #2'));
-		$paletteCmb->addItem(2, _('Palette #3'));
-		$paletteCmb->addItem(3, _('Palette #4'));
+		$paletteCmb->addItem(0, _s('Palette #%1$s', 1));
+		$paletteCmb->addItem(1, _s('Palette #%1$s', 2));
+		$paletteCmb->addItem(2, _s('Palette #%1$s', 3));
+		$paletteCmb->addItem(3, _s('Palette #%1$s', 4));
 
 	$paletteTypeCmb = new CComboBox('palettetype', $palettetype);
 		$paletteTypeCmb->addItem(0, _('Middle'));
