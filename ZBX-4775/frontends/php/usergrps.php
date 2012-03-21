@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 
-$page['title'] = _('User groups');
+$page['title'] = _('Configuration of user groups');
 $page['file'] = 'usergrps.php';
 $page['hist_arg'] = array('config');
 $page['scripts'] = array();

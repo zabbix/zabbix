@@ -235,8 +235,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-$hostid = get_request('hostid', 0);
-if (!empty($hostid)) {
+if (!empty($hosts)) {
 	$_REQUEST['filter_hostname'] = reset($hosts);
 	$_REQUEST['filter_hostname'] = $_REQUEST['filter_hostname']['name'];
 }

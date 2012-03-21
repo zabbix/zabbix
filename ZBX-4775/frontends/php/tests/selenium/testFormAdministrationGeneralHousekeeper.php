@@ -34,7 +34,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of housekeeper');
 		$this->ok(array('Housekeeper', 'Do not keep actions older than (in days)', 'Do not keep events older than (in days)'));
 		$this->assertElementPresent('configDropDown');
 		$this->assertElementPresent('alert_history');
@@ -55,7 +55,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->input_type('alert_history', '0');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'Housekeeper', 'Do not keep actions older than (in days)'));
+		$this->ok(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
 
 		$sqlHash = 'SELECT configid,event_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash = DBhash($sqlHash);
@@ -101,7 +101,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->input_type('event_history', '0');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'Housekeeper', 'Do not keep events older than (in days)'));
+		$this->ok(array('Configuration updated', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
 
 		$sqlHash = 'select configid,alert_history,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging from config order by configid';
 		$oldHash = DBhash($sqlHash);

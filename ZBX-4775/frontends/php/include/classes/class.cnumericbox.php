@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CNumericBox extends CInput {
+
 	public function __construct($name = 'number', $value = '0', $size = 20, $readonly = 'no', $allowempty = false, $allownegative = true) {
 		parent::__construct('text', $name, $value);
 		$this->setReadonly($readonly);

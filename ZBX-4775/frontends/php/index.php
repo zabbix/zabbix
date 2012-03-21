@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('ZABBIX');
 $page['file'] = 'index.php';
 
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'name' =>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,	'isset({enter})', _('Username')),
 	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({enter})'),
@@ -41,25 +41,19 @@ $fields = array(
 	'request' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
 );
 check_fields($fields);
-?>
-<?php
-$sessionid = get_cookie('zbx_sessionid');
 
-if (isset($_REQUEST['reconnect']) && isset($sessionid)) {
+// logout
+if (isset($_REQUEST['reconnect'])) {
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
 
-	CWebUser::logout($sessionid);
+	CWebUser::logout(get_cookie('zbx_sessionid'));
 	clear_messages(1);
-
-	$loginForm = new CView('general.login');
-	$loginForm->render();
-	exit();
 }
 
 $config = select_config();
 
 if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
-	if (isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])) {
+	if (!empty($_SERVER['PHP_AUTH_USER'])) {
 		$_REQUEST['enter'] = _('Sign in');
 		$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 		$_REQUEST['password'] = 'zabbix';
@@ -71,11 +65,8 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 
 // login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
-	$name = get_request('name', '');
-	$passwd = get_request('password', '');
-	$login = CWebUser::login($name, $passwd);
-
-	if ($login) {
+	// try to login
+	if (CWebUser::login(get_request('name', ''), get_request('password', ''))) {
 		// save remember login preference
 		$user = array('autologin' => get_request('autologin', 0));
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
@@ -91,12 +82,17 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		redirect($url);
 		exit();
 	}
+	// login failed, fall back to a guest account
+	else {
+		CWebUser::checkAuthentication(null);
+	}
 }
-// login via session data
-elseif ($sessionid) {
-	CWebUser::checkAuthentication($sessionid);
+else {
+	// login the user from the session, if the session id is empty - login as a guest
+	CWebUser::checkAuthentication(get_cookie('zbx_sessionid'));
 }
 
+// the user is not logged in, display the login form
 if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	switch ($config['authentication_type']) {
 		case ZBX_AUTH_HTTP:

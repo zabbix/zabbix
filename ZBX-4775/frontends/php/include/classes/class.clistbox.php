@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CListBox extends CComboBox {
+
 	public function __construct($name = 'listbox', $value = null, $size = 5, $action = null) {
 		parent::__construct($name, null, $action);
 		$this->attr('multiple', 'multiple');

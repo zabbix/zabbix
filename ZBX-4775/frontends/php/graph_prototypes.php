@@ -292,7 +292,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	if(!isset($_REQUEST['form'])){
 		$form = new CForm('get');
 		$form->cleanItems();
-		$form->addItem(new CSubmit('form', _('Create graph')));
+		$form->addItem(new CSubmit('form', _('Create graph prototype')));
 		$form->addVar('parent_discoveryid', $_REQUEST['parent_discoveryid']);
 	}
 	else
@@ -331,11 +331,16 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
 
-		$graphs_wdgt->addHeader(array(_('GRAPH PROTOTYPES OF').SPACE, new CSpan($discovery_rule['name'], 'gold')));
+		$graphs_wdgt->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($discovery_rule['name'], 'gold')));
 		$graphs_wdgt->addHeader($numrows);
 
 // Header Host
-		$graphs_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
+		if (!empty($_REQUEST['parent_discoveryid'])) {
+			$graphs_wdgt->addItem(get_header_host_table('graphs', $_REQUEST['hostid'], $_REQUEST['parent_discoveryid']));
+		}
+		else {
+			$graphs_wdgt->addItem(get_header_host_table('graphs', $_REQUEST['hostid']));
+		}
 
 /* TABLE */
 		$form = new CForm();

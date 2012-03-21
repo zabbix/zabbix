@@ -1164,37 +1164,39 @@ function validate_templates($templateid_list) {
 	return $result;
 }
 
-function getUnlinkableHosts($groupids = null, $hostids = null) {
+/**
+ * Get host ids of hosts which $groupids can be unlinked from.
+ * if $hostids is passed, function will check only these hosts.
+ *
+ * @param array $groupids
+ * @param array $hostids
+ *
+ * @return array
+ */
+function getUnlinkableHosts($groupids, $hostids = null) {
 	zbx_value2array($groupids);
 	zbx_value2array($hostids);
 
-	$unlnk_hostids = array();
+	$unlinkableHostIds = array();
 
 	$sql_where = '';
-	if (!is_null($hostids)) {
-		$sql_where.= ' AND '.DBcondition('hg.hostid', $hostids);
+	if ($hostids !== null) {
+		$sql_where = ' AND '.DBcondition('hg.hostid', $hostids);
 	}
 
-	if (!is_null($groupids)) {
-		$sql_where.= ' AND EXISTS ('.
-						' SELECT hostid'.
-						' FROM hosts_groups hgg'.
-						' WHERE hgg.hostid = hg.hostid'.
-							' AND '.DBcondition('hgg.groupid', $groupids).')';
+	$result = DBselect(
+		'SELECT hg.hostid,COUNT(hg.groupid) AS grp_count'.
+				' FROM hosts_groups hg'.
+				' WHERE '.DBcondition('hg.groupid', $groupids, true).
+				$sql_where.
+				' GROUP BY hg.hostid'.
+				' HAVING COUNT(hg.groupid)>0'
+	);
+	while ($row = DBfetch($result)) {
+		$unlinkableHostIds[] = $row['hostid'];
 	}
 
-	$sql = 'SELECT hg.hostid, count(hg.groupid) as grp_count'.
-			' FROM hosts_groups hg'.
-			' WHERE hostgroupid>0'.
-			$sql_where.
-			' GROUP BY hg.hostid'.
-			' HAVING count(hg.groupid) > 1';
-	$res = DBselect($sql);
-	while ($host = DBfetch($res)) {
-		$unlnk_hostids[$host['hostid']] = $host['hostid'];
-	}
-
-	return $unlnk_hostids;
+	return $unlinkableHostIds;
 }
 
 function getDeletableHostGroups($groupids = null) {

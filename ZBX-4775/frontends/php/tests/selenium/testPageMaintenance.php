@@ -33,7 +33,7 @@ class testPageMaintenance extends CWebTest {
 	public function testPageMaintenance_CheckLayout($maintenance) {
 		$this->login('maintenance.php');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->assertTitle('Maintenance');
+		$this->assertTitle('Configuration of maintenance');
 
 		$this->ok('Maintenance');
 		$this->ok('CONFIGURATION OF MAINTENANCE PERIODS');
@@ -69,12 +69,12 @@ class testPageMaintenance extends CWebTest {
 
 		$this->login('maintenance.php');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->assertTitle('Maintenance');
+		$this->assertTitle('Configuration of maintenance');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Maintenance');
+		$this->assertTitle('Configuration of maintenance');
 		$this->ok('Maintenance updated');
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MAINTENANCE PERIODS');
@@ -103,14 +103,14 @@ class testPageMaintenance extends CWebTest {
 
 		$this->login('maintenance.php');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->assertTitle('Maintenance');
+		$this->assertTitle('Configuration of maintenance');
 		$this->checkbox_select("maintenanceids[$maintenanceid]");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->assertTitle('Maintenance');
+		$this->assertTitle('Configuration of maintenance');
 		$this->ok('Maintenance deleted');
 
 		$sql = "select * from maintenances where maintenanceid=$maintenanceid";

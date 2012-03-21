@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CTweenBox {
+
 	public function __construct(&$form, $name, $value = null, $size = 10) {
 		insert_javascript_for_tweenbox();
 
@@ -29,8 +31,8 @@ class CTweenBox {
 		$this->value = zbx_toHash($value);
 		$this->id_l = $this->varname.'_left';
 		$this->id_r = $this->varname.'_right';
-		$this->lbox = new ClistBox($this->id_l, null, $size);
-		$this->rbox = new ClistBox($this->id_r, null, $size);
+		$this->lbox = new CListBox($this->id_l, null, $size);
+		$this->rbox = new CListBox($this->id_r, null, $size);
 		$this->lbox->setAttribute('style', 'width: 280px;');
 		$this->rbox->setAttribute('style', 'width: 280px;');
 	}
@@ -41,7 +43,7 @@ class CTweenBox {
 		}
 	}
 
-	public function getName($name = null) {
+	public function getName() {
 		return $this->name;
 	}
 

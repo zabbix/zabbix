@@ -96,6 +96,8 @@ abstract class CItemGeneral extends CZBXAPI {
 	/**
 	 * Check items data.
 	 *
+	 * Any system field passed to the function will be unset.
+	 *
 	 * @throw APIException
 	 *
 	 * @param array $items passed by reference
