@@ -1,6 +1,17 @@
+Changes for 1.8.12rc1
+
+........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
+..F....... [ZBX-4761] fixed "&" encoding in input fields (Pavels)
+A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
+.D........ [ZBX-4777] added information in the Zabbix sender manpage about values being sent in a sequential manner and the need to have ordered timestamps (Richlv)
+
+Changes for 1.8.11
+
+1.8.11rc1 was released as 1.8.11 without any changes
+
 Changes for 1.8.11rc1
 
-A.F....... [ZBX-4718] Fixed Graph axis item cloning in host Full Clone (Toms)
+A.F....... [ZBX-4718] fixed Graph axis item cloning in host Full Clone (Toms)
 ..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
 A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
 A......... [ZBX-4562] fixed meditype.update returning wrong formatted result (Toms)

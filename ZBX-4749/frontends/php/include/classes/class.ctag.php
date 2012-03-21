@@ -19,26 +19,39 @@
 **/
 ?>
 <?php
-class CTag extends CObject{
-/* private *//*
-	var $tagname;
-	var $attributes = array();
-	var $paired;*/
-/* protected *//*
-	var $items = array();
+class CTag extends CObject {
 
-	var $tag_body_start;
-	var $tag_body_end;
-	var $tag_start;
-	var $tag_end;*/
+	/**
+	 * Encodes the '<', '>', '"' and '&' symbols.
+	 */
+	const ENC_ALL = 1;
 
-/* public */
-	public function __construct($tagname=NULL, $paired='no', $body=NULL, $class=null){
+	/**
+	 * Encodes all symbols in ENC_ALL except for '&'.
+	 */
+	const ENC_NOAMP = 2;
+
+	/**
+	 * The HTML encoding strategy to use for the contents of the tag.
+	 *
+	 * @var int
+	 */
+	protected $encStrategy = self::ENC_NOAMP;
+
+	/**
+	 * The HTML encoding strategy for the "value" attribute.
+	 *
+	 * @var int
+	 */
+	protected $valueEncStrategy = self::ENC_ALL;
+
+
+	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
 		parent::__construct();
 
 		$this->attributes = array();
 
-		if(!is_string($tagname)){
+		if (!is_string($tagname)) {
 			return $this->error('Incorrect tagname for CTag ['.$tagname.']');
 		}
 
@@ -47,97 +60,118 @@ class CTag extends CObject{
 
 		$this->tag_start = $this->tag_end = $this->tag_body_start = $this->tag_body_end = '';
 
-		if(is_null($body)){
+		if (is_null($body)) {
 			$this->tag_end = $this->tag_body_start = '';
 		}
-		else{
+		else {
 			$this->addItem($body);
 		}
 
 		$this->setClass($class);
 	}
 
-	public function showStart(){	echo $this->startToString();}
-	public function showBody(){	echo $this->bodyToString();	}
-	public function showEnd(){		echo $this->endToString();	}
+	public function showStart() {
+		echo $this->startToString();
+	}
+
+	public function showBody() {
+		echo $this->bodyToString();
+	}
+
+	public function showEnd() {
+		echo $this->endToString();
+	}
 
 	// Do not put new line symbol (\n) before or after html tags,
 	// it adds spaces in unwanted places
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
+
 		foreach ($this->attributes as $key => $value) {
-			$res .= ' '.$key.'="'.$this->sanitize($value).'"';
+			// a special encoding strategy should be used for the "value" attribute
+			$value = $this->encode($value, ($key == 'value') ? $this->valueEncStrategy : self::ENC_NOAMP);
+			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= ($this->paired === 'yes') ? '>' : ' />';
 
 		return $res;
 	}
 
-	public function bodyToString(){
-		$res = $this->tag_body_start;
-	return $res.parent::toString(false);
-
-		/*foreach($this->items as $item)
-			$res .= $item;
-		return $res;*/
+	public function bodyToString() {
+		return $this->tag_body_start.parent::toString(false);
 	}
 
-	public function endToString(){
-		$res = ($this->paired==='yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
+	public function endToString() {
+		$res = ($this->paired === 'yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
 		$res .= $this->tag_end;
-	return $res;
+
+		return $res;
 	}
 
-	public function toString($destroy=true){
-		$res  = $this->startToString();
+	public function toString($destroy = true) {
+		$res = $this->startToString();
 		$res .= $this->bodyToString();
 		$res .= $this->endToString();
 
-		if($destroy) $this->destroy();
+		if ($destroy) {
+			$this->destroy();
+		}
 
-	return $res;
+		return $res;
 	}
 
-	public function setName($value){
-		if(is_null($value)) return $value;
+	public function addItem($value) {
+		// the string contents of an HTML tag should be properly encoded
+		if (is_string($value)) {
+			$value = $this->encode($value, $this->getEncStrategy());
+		}
 
-		if(!is_string($value)){
+		parent::addItem($value);
+	}
+
+	public function setName($value) {
+		if (is_null($value)) return $value;
+
+		if (!is_string($value)) {
 			return $this->error("Incorrect value for SetName [$value]");
 		}
-	return $this->setAttribute("name",$value);
+		return $this->setAttribute("name", $value);
 	}
 
-	public function getName(){
-		if(isset($this->attributes['name']))
-			return $this->attributes['name'];
-	return NULL;
+	public function getName() {
+		return (isset($this->attributes['name'])) ? $this->attributes['name'] : null;
 	}
 
-	public function setClass($value){
-		if(isset($value))
+	public function setClass($value) {
+		if (isset($value)) {
 			$this->attributes['class'] = $value;
-		else
+		}
+		else {
 			unset($this->attributes['class']);
+		}
 
-	return $value;
+		return $value;
 	}
 
-	public function getAttribute($name){
-		$ret = NULL;
-		if(isset($this->attributes[$name]))
+	public function getAttribute($name) {
+		$ret = null;
+		if (isset($this->attributes[$name])) {
 			$ret = $this->attributes[$name];
+		}
 
-	return $ret;
+		return $ret;
 	}
 
-	public function setAttribute($name, $value){
-		if(is_object($value)){
+	public function setAttribute($name, $value) {
+		if (is_object($value)) {
 			$this->attributes[$name] = unpack_object($value);
 		}
-		else if(isset($value))
+		else if (isset($value)) {
 			$this->attributes[$name] = $value;
-		else
+		}
+		else {
 			unset($this->attributes[$name]);
+		}
 	}
 
 	public function removeAttribute($name){
@@ -151,43 +185,75 @@ class CTag extends CObject{
 		$this->setAttribute($name, $value);
 	}
 
-	public function setHint($text, $width='', $class='', $byclick=true){
-		if(empty($text)) return false;
+	public function setHint($text, $width = '', $class = '', $byclick = true) {
+		if (empty($text)) {
+			return false;
+		}
 
 		$text = unpack_object($text);
 
-		$this->addAction('onmouseover',	"javascript: hintBox.showOver(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');");
-		$this->addAction('onmouseout',	"javascript: hintBox.hideOut(event,this);");
-		if($byclick){
-			$this->addAction('onclick',	"javascript: hintBox.onClick(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');");
+		$this->addAction('onmouseover', "javascript: hintBox.showOver(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');");
+		$this->addAction('onmouseout', "javascript: hintBox.hideOut(event,this);");
+		if ($byclick) {
+			$this->addAction('onclick', "javascript: hintBox.onClick(event,this,".zbx_jsvalue($text).",'".$width."','".$class."');");
 		}
 	}
 
-	public function onClick($handle_code){
+	public function onClick($handle_code) {
 		$this->addAction('onclick', $handle_code);
 	}
 
-	public function addStyle($value){
-		if(!isset($this->attributes['style'])) $this->attributes['style'] = '';
+	public function addStyle($value) {
+		if (!isset($this->attributes['style'])) {
+			$this->attributes['style'] = '';
+		}
 
-		if(isset($value))
-			$this->attributes['style'].= htmlspecialchars(strval($value));
-		else
+		if (isset($value)) {
+			$this->attributes['style'] .= htmlspecialchars(strval($value));
+		}
+		else {
 			unset($this->attributes['style']);
+		}
 	}
 
-	public function setEnabled($value='yes'){
-		if((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value=='on') || $value=='1') || (is_int($value) && $value<>0)){
+	public function setEnabled($value = 'yes') {
+		if ((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value == 'on') || $value == '1') || (is_int($value) && $value != 0)) {
 			unset($this->attributes['disabled']);
 		}
-		else if((is_string($value) && ($value == 'no' || $value == 'disabled' || $value=='off') || $value=='0') || (is_int($value) && $value==0)){
+		else if ((is_string($value) && ($value == 'no' || $value == 'disabled' || $value == 'off') || $value == '0') || (is_int($value) && $value == 0)) {
 			$this->attributes['disabled'] = 'disabled';
 		}
 	}
 
-	public function error($value){
+	public function error($value) {
 		error('class('.get_class($this).') - '.$value);
 		return 1;
+	}
+
+	/**
+	 * Sanitizes a string according to the given strategy before outputting it to the browser.
+	 *
+	 * @param string $value
+	 * @param int $strategy
+	 *
+	 * @return string
+	 */
+	protected function encode($value, $strategy = self::ENC_NOAMP) {
+		return ($strategy == self::ENC_NOAMP) ? zbx_htmlstr($value) : htmlspecialchars($value);
+	}
+
+	/**
+	 * @param int $encStrategy
+	 */
+	public function setEncStrategy($encStrategy) {
+		$this->encStrategy = $encStrategy;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getEncStrategy() {
+		return $this->encStrategy;
 	}
 }
 ?>
