@@ -473,14 +473,15 @@ span.darklink{ color: #AA5500; }span.darklink:hover{ color: #FF5500; }
 div.suggest{ border: 1px #FF5500 solid; }
 
 /*////////////////	FORMS	////////////////////*/
-.input, .input[disabled]:hover, input.formlist[type="button"]{
+.input, .input[disabled]:hover, input.formlist[type="button"],
+div.calendar input[type="button"] {
 	border: 1px solid #DFDFDF;
 	background-color: #2F2F2F;
 	color: #DFDFDF;
 }
 
-.input:focus, input.formlist[type="button"]:focus,
-.input:hover, input.formlist[type="button"]:hover {
+.input:focus, input.formlist[type="button"]:focus, div.calendar input[type="button"]:focus
+.input:hover, input.formlist[type="button"]:hover, div.calendar input[type="button"]:hover {
 	border-color: #FF5500; color: #FF5500;
 }
 
