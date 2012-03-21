@@ -37,7 +37,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	public function testFormAdministrationDMProxies_CheckLayout() {
 
 		$this->login('proxies.php');
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 
 		$this->button_click('form');
@@ -191,7 +191,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	public function testFormAdministrationDMProxies_Create($expected, $name, $mode, $hosts, $ip, $dns, $connect_to, $port, $errormsgs) {
 
 		$this->login('proxies.php');
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('PROXIES');
 		$this->ok('Name');
@@ -205,7 +205,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		// create proxy
 		$this->button_click('form');
 		$this->wait();
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('Proxy');
 
@@ -238,7 +238,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		switch ($expected) {
 			case PROXY_GOOD:
 				$this->ok('Proxy added');
-				$this->assertTitle('Proxies');
+				$this->assertTitle('Configuration of proxies');
 				$this->ok('CONFIGURATION OF PROXIES');
 				$this->ok('PROXIES');
 				$this->ok(array('Mode', 'Name', 'Last seen (age)', 'Host count', 'Required performance (vps)', 'Hosts'));
@@ -261,7 +261,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				break;
 
 			case PROXY_BAD:
-				$this->assertTitle('Proxies');
+				$this->assertTitle('Configuration of proxies');
 				$this->ok('CONFIGURATION OF PROXIES');
 				$this->ok('PROXIES');
 				$this->ok('Proxy name');
@@ -297,7 +297,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	public function testFormAdministrationDMProxies_UpdateProxyName($name, $newname) {
 
 		$this->login('proxies.php');
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('PROXIES');
 		$this->click('link='.$name);
@@ -317,7 +317,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Proxy updated');
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('PROXIES');
 		$this->ok($newname);
@@ -346,7 +346,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	public function testFormAdministrationDMProxies_Clone($name, $newname) {
 
 		$this->login('proxies.php');
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('PROXIES');
 		$this->click('link='.$name);
@@ -369,7 +369,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Proxy added');
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('PROXIES');
 		$this->ok($newname);
@@ -394,7 +394,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('proxies.php');
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('PROXIES');
 
@@ -410,14 +410,14 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->waitForConfirmation();
 		$this->wait();
 
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('Proxy deleted');
 
 		$sql = "SELECT * FROM hosts WHERE host='$name'";
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Proxy has not been deleted');
 
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('PROXIES');
 
