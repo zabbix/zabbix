@@ -497,8 +497,8 @@ div#selection_box{ filter:alpha(opacity=60); opacity:.60; background-color:#6666
 div.formElement{ border: 1px solid #77B7DA;}
 div.formElement_body{ background-color: #001C31; }
 
-
-div.objectgroup{ border-color: #77B7DA; background-color: #022744; }
+div.objectgroup { border-color: #4B7489; }
+div.border_dotted { border: 1px dotted #4B7489; }
 
 .footer .dt input.main{ border-color: #77B7DA; }
 .footer .dt input.main:hover{ border-color: #77B7DA; }
@@ -506,7 +506,6 @@ div.objectgroup{ border-color: #77B7DA; background-color: #022744; }
 
 ul.objectlist li{ color: #FFFFFF; }
 
-div.border_dotted{ border: 1px dotted #77B7DA; }
 
 .formElementTable tr td{ color: #FFFFFF; }
 

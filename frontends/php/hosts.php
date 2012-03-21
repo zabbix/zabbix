@@ -615,6 +615,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		$hostForm = new CView('configuration.host.edit');
 		$hosts_wdgt->addItem($hostForm->render());
+		$hosts_wdgt->setRootClass('host-edit');
 	}
 	else {
 		$frmGroup = new CForm();
