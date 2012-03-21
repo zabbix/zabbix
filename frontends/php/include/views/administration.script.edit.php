@@ -25,6 +25,7 @@
 ?>
 <?php
 	$scripts_wdgt = new CWidget();
+	$scripts_wdgt->addPageHeader(_('CONFIGURATION OF SCRIPTS'));
 
 	$scriptTab = new CFormList('scriptsTab');
 	$frmScr = new CForm();

@@ -287,22 +287,25 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
 		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); // remove parent nodes
+		if (empty($available_nodes[0])) {
+			unset($available_nodes[0]);
+		}
+
 		if (!empty($available_nodes)) {
-			$node_form = new CForm();
-			$node_form->setMethod('get');
+			$node_form = new CForm('get');
 			$node_form->setAttribute('id', 'node_form');
 
 			// create ComboBox with selected nodes
-			$combo_node_list = null;
+			$nodesComboBox = null;
 			if (count($ZBX_VIEWED_NODES['nodes']) > 0) {
-				$combo_node_list = new CComboBox('switch_node', $ZBX_VIEWED_NODES['selected'], 'submit()');
+				$nodesComboBox = new CComboBox('switch_node', $ZBX_VIEWED_NODES['selected'], 'submit()');
 
 				foreach ($ZBX_VIEWED_NODES['nodes'] as $nodeid => $nodedata) {
-					$combo_node_list->addItem($nodeid, $nodedata['name']);
+					$nodesComboBox->addItem($nodeid, $nodedata['name']);
 				}
 			}
 
-			$jscript = 'javascript : '.
+			$jscript = 'javascript: '.
 				" var pos = getPosition('button_show_tree');".
 				" ShowHide('div_node_tree', 'table');".
 				' pos.top += 20;'.
@@ -311,10 +314,13 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$button_show_tree->setAttribute('id', 'button_show_tree');
 
 			// create node tree
-			$combo_check_all = new CCheckbox('check_all_nodes', null, "javascript : check_all('node_form', this.checked);");
-
 			$node_tree = array();
-			$node_tree[0] = array('id' => 0, 'caption' => _('All'), 'combo_select_node' => $combo_check_all, 'parentid' => 0); // root
+			$node_tree[0] = array(
+				'id' => 0,
+				'caption' => _('All'),
+				'combo_select_node' => new CCheckbox('check_all_nodes', null, "javascript : check_all('node_form', this.checked);"),
+				'parentid' => 0 // master
+			);
 
 			foreach ($available_nodes as $node) {
 				$checked = isset($ZBX_VIEWED_NODES['nodeids'][$node['nodeid']]);
@@ -338,16 +344,16 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 			$div_node_tree = new CDiv();
 			$div_node_tree->addItem($node_tree->getHTML());
-			$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display:'none'});"));
+			$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display: 'none'});"));
 			$div_node_tree->setAttribute('id', 'div_node_tree');
 			$div_node_tree->addStyle('display: none');
 
-			if (!is_null($combo_node_list)) {
-				$node_form->addItem(array(new CSpan(_('Current node').SPACE, 'textcolorstyles'), $combo_node_list));
+			if (!is_null($nodesComboBox)) {
+				$node_form->addItem(array(new CSpan(_('Current node').SPACE, 'textcolorstyles'), $nodesComboBox));
 			}
 			$node_form->addItem($button_show_tree);
 			$node_form->addItem($div_node_tree);
-			unset($combo_node_list);
+			unset($nodesComboBox);
 		}
 	}
 
@@ -432,14 +438,10 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 // create history
 if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 	$table = new CTable(null, 'history left');
-	$table->setCellSpacing(0);
-	$table->setCellPadding(0);
-
-	$history = get_user_history();
-	$tr = new CRow(new CCol(_('History').':', 'caption'));
-	$tr->addItem($history);
-
-	$table->addRow($tr);
+	$table->addRow(new CRow(array(
+		new CCol(_('History').':', 'caption'),
+		get_user_history()
+	)));
 	$table->show();
 }
 elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {

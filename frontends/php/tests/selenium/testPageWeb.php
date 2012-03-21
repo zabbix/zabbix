@@ -26,7 +26,7 @@ class testPageWeb extends CWebTest {
 		$this->login('httpmon.php');
 		$this->assertTitle('Status of Web monitoring');
 		$this->ok('STATUS OF WEB MONITORING');
-		$this->ok('WEB CHECKS');
+		$this->ok('Web checks');
 		$this->ok(array('Group', 'Host'));
 		$this->ok(array('Host', 'Name', 'Number of steps', 'Last check', 'Status'));
 	}

@@ -495,6 +495,9 @@ class CItem extends CItemGeneral {
 					if (!is_null($options['selectDiscoveryRule']) && !isset($result[$item['itemid']]['discoveryRule'])) {
 						$result[$item['itemid']]['discoveryRule'] = array();
 					}
+					if (!is_null($options['selectInterfaces']) && !isset($result[$item['itemid']]['interfaces'])) {
+						$result[$item['itemid']]['interfaces'] = array();
+					}
 
 					// triggerids
 					if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
@@ -571,8 +574,8 @@ class CItem extends CItemGeneral {
 					'nodeids' => $nodeids,
 					'itemids' => $itemids,
 					'output' => $options['selectInterfaces'],
-					'nopermissions' => 1,
-					'preservekeys' => 1
+					'nopermissions' => true,
+					'preservekeys' => true
 				);
 				$interfaces = API::HostInterface()->get($objParams);
 				foreach ($interfaces as $interface) {
@@ -822,21 +825,23 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * Items data validation.
+	 * Check item data and set flags field.
 	 *
-	 * @param array $items
-	 * @param bool $update checks for updating items
+	 * @param array $items passed by reference
+	 * @param bool  $update
+	 *
+	 * @return void
 	 */
-	protected function checkInput(array &$items, $update=false) {
-		// validate if everything is ok with 'item->inventory fields' linkage
-		self::validateInventoryLinks($items, $update);
-		parent::checkInput($items, $update);
-
+	protected function checkInput(array &$items, $update = false) {
 		// add the values that cannot be changed, but are required for further processing
-		// they must be added after calling parent::checkInput() because it will unset any existing system field
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 		}
+		unset($item);
+
+		// validate if everything is ok with 'item->inventory fields' linkage
+		self::validateInventoryLinks($items, $update);
+		parent::checkInput($items, $update);
 	}
 
 	/**

@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
 
-$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of slide shows');
 $page['file'] = 'slideconf.php';
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';

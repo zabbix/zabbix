@@ -1,7 +1,19 @@
 --------------------------------------------------------------------------------
 Changes for 2.0.0rc2
 
+New features:
+........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
+A.F....... [ZBXNEXT-914] redesign Administration->DM (Eduard)
+
 Bug fixes:
+..F....... [ZBX-4700] fixed errors in item list when using interface related macro in template item key (Vedmak)
+..F....... [ZBX-4761] fixed "&" escaping in form inputs (Pavels)
+.......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
+..F....... [ZBX-4778] fixed port field validation in creating discovery rule (Toms)
+A......... [ZBX-4621] fixed macro update using host.massupdate (Vedmak)
+A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
+A.F....... [ZBX-4257] fixed creating discovery rules, items and item prototypes (Pavels)
+..F....... [ZBX-4765] fixed filter fields being unset when saving of discovery rule fails (Vedmak)
 ..F....... [ZBX-4736] fixed undefined variable in Inventory Hosts (Toms)
 ..F....... [ZBX-4764] fixed critical error in Administration->Notifications (Toms)
 ..F....... [ZBX-4753] properly pluralized "Last n issues" message in dashboard (Vedmak)
@@ -49,7 +61,7 @@ A.F....... [ZBX-4333] fixed trigger inheritance when calling trigger.update whit
 A.F....... [ZBX-4202] fixed SQL performance in tr_status.php - combined similar queries, user data SQL access only once, triggerids retrieval optimization (Toms)
 A.F....... [ZBX-4647] fixed trigger and item prototype inheritance (Pavels)
 ..F....... [ZBX-4467] fixed the ZBX_MAX_PERIOD constant not affecting the timebar control (Pavels)
-A......... [ZBX-4562] Fixed meditype.update returning wrong formatted result (Toms)
+A......... [ZBX-4562] fixed meditype.update returning wrong formatted result (Toms)
 ..F....... [ZBX-4187] fixed dashbord fonts on popup. fixed js error on last 20 issues (Toms)
 A.F....... [ZBX-4607] fixed the script.getscriptbyhosts method returning scripts from nodes defferent from hosts (Pavels)
 A.F....... [ZBX-4607] fixed the script "Host groups" parameter (Pavels)
@@ -507,11 +519,24 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.12rc1
+
+........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
+..F....... [ZBX-4761] fixed "&" encoding in input fields (Pavels)
+.......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
+A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
+.D........ [ZBX-4777] added information in the Zabbix sender manpage about values being sent in a sequential manner and the need to have ordered timestamps (Richlv)
+
+Changes for 1.8.11
+
+1.8.11rc1 was released as 1.8.11 without any changes
+
 Changes for 1.8.11rc1
 
+A.F....... [ZBX-4718] Fixed incorrect graph y axis itemids in Full host cloning (Toms)
 ..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
 A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
-A......... [ZBX-4562] Fixed meditype.update returning wrong formatted result (Toms)
+A......... [ZBX-4562] fixed mediatype.update returning wrong formatted result (Toms)
 ...G...PS. [ZBX-4721] fixed handling of \u0000 by JSON parser; thanks to Rick Alm (Sasha)
 ..F....... [ZBX-4604] added the "change" link for clocks in screen configuration (Pavels)
 ..F....... [ZBX-4604] fixed the "change" link not being accessible for graph type screen items in embeded screens (Pavels)

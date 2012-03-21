@@ -886,7 +886,7 @@ elseif ($srctbl == 'users') {
  * Help items
  */
 elseif ($srctbl == 'help_items') {
-	$table = new CTableInfo(_('No items'));
+	$table = new CTableInfo(_('No items defined.'));
 	$table->setHeader(array(_('Key'), _('Name')));
 
 	$result = DBselect('SELECT hi.* FROM help_items hi WHERE hi.itemtype='.$itemtype.' ORDER BY hi.key_');
@@ -1774,7 +1774,7 @@ elseif ($srctbl == 'overview') {
 		$hostGroup['node_name'] = get_node_name_by_elid($hostGroup['groupid']);
 		$name = new CSpan($hostGroup['name'], 'link');
 
-		$hostGroup['node_name'] = isset($hostGroup['node_name']) ? '('.$$hostGroup['node_name'].') ' : '';
+		$hostGroup['node_name'] = isset($hostGroup['node_name']) ? '('.$hostGroup['node_name'].') ' : '';
 		$hostGroup['name'] = $hostGroup['node_name'].$hostGroup['name'];
 
 		$action = get_window_opener($dstfrm, $dstfld1, $hostGroup[$srcfld1]).(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $hostGroup[$srcfld2]) : '');

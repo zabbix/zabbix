@@ -25,15 +25,13 @@ $itemsWidget = new CWidget();
 $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$createForm->addItem(new CSubmit('form', _('Create item')));
+$createForm->addItem(new CSubmit('form', _('Create item prototype')));
 $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEM PROTOTYPES'), $createForm);
 
 // header
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $itemsWidget->addHeader(array(_('Item prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
-$itemsWidget->addHeader($numRows, SPACE);
-$itemsWidget->addItem(get_header_host_table($this->data['hostid']));
+$itemsWidget->addHeaderRowNumber();
+$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
 $itemForm = new CForm('get');
@@ -44,7 +42,7 @@ $itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 // create table
 $itemTable = new CTableInfo(_('No items prototypes defined.'));
 
-$sortLink = new Curl();
+$sortLink = new CUrl();
 $sortLink->setArgument('parent_discoveryid', $this->data['parent_discoveryid']);
 $sortLink = $sortLink->getUrl();
 

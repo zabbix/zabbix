@@ -21,29 +21,28 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of housekeeper');
 $page['file'] = 'adm.housekeeper.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-$fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'alert_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0, 65535),	'isset({save})'),
-	'event_history'=>			array(T_ZBX_INT, O_NO,	null,	BETWEEN(0, 65535),	'isset({save})'),
 
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'alert_history' =>	array(T_ZBX_INT, O_NO,	null,			BETWEEN(0, 65535), 'isset({save})'),
+	'event_history' =>	array(T_ZBX_INT, O_NO,	null,			BETWEEN(0, 65535), 'isset({save})'),
+	'save' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,	null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,			null,	null)
 );
-?>
-<?php
 check_fields($fields);
 
-
+/*
+ * Actions
+ */
 if (isset($_REQUEST['save'])) {
 	$configs = array(
 		'event_history' => get_request('event_history'),
-		'alert_history' => get_request('alert_history'),
+		'alert_history' => get_request('alert_history')
 	);
 	$result = update_config($configs);
 
@@ -51,8 +50,8 @@ if (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		$msg = array();
-		$msg[] = _s('Do not keep events older than (in days) [%1$s]', get_request('event_history'));
-		$msg[] = _s('Do not keep actions older than (in days) [%1$s]', get_request('alert_history'));
+		$msg[] = _s('Do not keep events older than (in days) "%1$s".', get_request('event_history'));
+		$msg[] = _s('Do not keep actions older than (in days) "%1$s".', get_request('alert_history'));
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
 	}
@@ -78,7 +77,7 @@ $cmbConf->addItems(array(
 $form->addItem($cmbConf);
 
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF HOUSEKEEPER'), $form);
 
 
 $data = array();

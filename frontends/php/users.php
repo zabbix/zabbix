@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
 
-$page['title'] = _('Users');
+$page['title'] = _('Configuration of users');
 $page['file'] = 'users.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array();
