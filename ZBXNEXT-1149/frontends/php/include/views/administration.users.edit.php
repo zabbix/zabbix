@@ -103,7 +103,7 @@ foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
 }
 setlocale(LC_MESSAGES, zbx_locale_variants($USER_DETAILS['lang'])); // restoring original locale
 $lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of the languages, because locales for them are not installed on the web server.') : '';
-$userFormList->addRow(_('Language'), array($languageComboBox, new CSpan($lang_hint, 'red wrap')));
+$userFormList->addRow(_('Language'), array($languageComboBox, SPACE, new CSpan($lang_hint, 'red wrap')));
 
 // append themes to form list
 $themeComboBox = new CComboBox('theme', $this->data['theme']);
@@ -179,7 +179,6 @@ if ($this->data['is_profile']) {
 	$userMessagingFormList->addRow(_('Message timeout (seconds)'), new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5), false, 'timeout_row');
 
 	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'], 'javascript: if (IE) { submit(); }');
-	$repeatSound->setAttribute('id', 'messages[sounds.repeat]');
 	$repeatSound->addItem(1, _('Once'));
 	$repeatSound->addItem(10, '10 '._('Seconds'));
 	$repeatSound->addItem(-1, _('Message timeout'));
@@ -196,7 +195,7 @@ if ($this->data['is_profile']) {
 		_('Recovery'),
 		SPACE,
 		$soundList,
-		new CButton('start', _('Play'), "javascript: testUserSound('messages[sounds.recovery]');", 'formlist'),
+		new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.recovery');", 'formlist'),
 		new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
 	);
 
@@ -232,7 +231,7 @@ if ($this->data['is_profile']) {
 			getSeverityCaption($severity),
 			SPACE,
 			$soundList,
-			new CButton('start', _('Play'), "javascript: testUserSound('messages[sounds.".$severity."]');", 'formlist'),
+			new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.".$severity."');", 'formlist'),
 			new CButton('stop', _('Stop'), 'javascript: AudioList.stopAll();', 'formlist')
 		));
 

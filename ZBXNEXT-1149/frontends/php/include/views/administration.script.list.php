@@ -23,12 +23,10 @@
 
 	$frmForm = new CForm('get');
 	$frmForm->addItem(new CSubmit('form', _('Create script')));
-	$scripts_wdgt->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $frmForm);
 
-	$scripts_wdgt->addHeader(_('SCRIPTS'));
-	$numrows = new CDiv();
-	$numrows->setAttribute('name','numrows');
-	$scripts_wdgt->addHeader($numrows);
+	$scripts_wdgt->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $frmForm);
+	$scripts_wdgt->addHeader(_('Scripts'));
+	$scripts_wdgt->addHeaderRowNumber();
 
 	$form = new CForm();
 	$form->setName('frm_scripts');

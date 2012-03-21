@@ -19,8 +19,11 @@
 **/
 ?>
 <?php
+
 class CInput extends CTag {
+
 	protected $jQuery;
+
 	public function __construct($type = 'text', $name = 'textbox', $value = '', $class = null, $id = null) {
 		parent::__construct('input', 'no');
 		$this->jQuery = false;

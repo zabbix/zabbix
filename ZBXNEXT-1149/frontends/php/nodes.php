@@ -19,230 +19,138 @@
 **/
 ?>
 <?php
-	require_once dirname(__FILE__).'/include/config.inc.php';
-	require_once dirname(__FILE__).'/include/nodes.inc.php';
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/nodes.inc.php';
 
-	$page['title'] = _('Nodes');
-	$page['file'] = 'nodes.php';
-	$page['hist_arg'] = array();
+$page['title'] = _('Configuration of nodes');
+$page['file'] = 'nodes.php';
+$page['hist_arg'] = array();
 
-	require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-	$fields=array(
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-// media form
-		'nodeid'=>			array(T_ZBX_INT, O_NO,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+require_once dirname(__FILE__).'/include/page_header.php';
 
-		'new_nodeid'=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,			'isset({save})'),
-		'name'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({save})'),
-		'ip'=>				array(T_ZBX_IP,	 O_OPT,	null,	null,			'isset({save})'),
-		'node_type'=>		array(T_ZBX_INT, O_OPT,	null,
-			IN(ZBX_NODE_CHILD.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),		'isset({save})&&!isset({nodeid})'),
-		'masterid' => 		array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
-		'port'=>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,65535),	'isset({save})'),
-/* actions */
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'delete'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-/* other */
-		'form'=>			array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		'form_refresh'=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
-	);
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'nodeid' =>			array(T_ZBX_INT, O_NO,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+	'new_nodeid' =>		array(T_ZBX_STR, O_OPT, null,	DB_ID.NOT_ZERO,	'isset({save})', _('ID')),
+	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})'),
+	'ip' =>				array(T_ZBX_IP,	 O_OPT, null,	null,			'isset({save})'),
+	'nodetype' =>		array(T_ZBX_INT, O_OPT, null,	IN(ZBX_NODE_CHILD.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),
+		'isset({save})&&!isset({nodeid})'),
+	'masterid' => 		array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
+	'port' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 65535), 'isset({save})'),
+	// actions
+	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,	null)
+);
+check_fields($fields);
+validate_sort_and_sortorder();
 
-	check_fields($fields);
-	validate_sort_and_sortorder();
+/*
+ * Permissions
+ */
+$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST);
+if (count($available_nodes) == 0) {
+	access_deny();
+}
 
-	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+/*
+ * Actions
+ */
+if (isset($_REQUEST['save'])) {
+	$result = false;
 
-	if (0 == count($available_nodes) ){
-		access_deny();
-	}
-
-?>
-<?php
-	if(isset($_REQUEST['save'])){
-		$result = false;
-		if(isset($_REQUEST['nodeid'])){
-			$audit_action = AUDIT_ACTION_UPDATE;
-			DBstart();
-			$result = update_node($_REQUEST['nodeid'],
-				$_REQUEST['name'], $_REQUEST['ip'], $_REQUEST['port']);
-			$result = DBend($result);
-			$nodeid = $_REQUEST['nodeid'];
-			show_messages($result, _('Node updated'), _('Cannot update node'));
-		}
-		else{
-			$audit_action = AUDIT_ACTION_ADD;
-
-			$_REQUEST['masterid'] = isset($_REQUEST['masterid']) ? $_REQUEST['masterid'] : null;
-			DBstart();
-			$nodeid = add_node($_REQUEST['new_nodeid'],
-				$_REQUEST['name'], $_REQUEST['ip'], $_REQUEST['port'],
-				$_REQUEST['node_type'], $_REQUEST['masterid']);
-			$result = DBend($nodeid);
-			show_messages($result, _('Node added'), _('Cannot add node'));
-		}
-		add_audit_if($result,$audit_action,AUDIT_RESOURCE_NODE,'Node ['.$_REQUEST['name'].'] id ['.$nodeid.']');
-		if($result){
-			unset($_REQUEST['form']);
-		}
-	}
-	else if(isset($_REQUEST['delete'])){
-		$node_data = get_node_by_nodeid($_REQUEST['nodeid']);
+	if (isset($_REQUEST['nodeid'])) {
+		$nodeid = get_request('nodeid');
 
 		DBstart();
-		$result = delete_node($_REQUEST['nodeid']);
+		$result = update_node($nodeid, get_request('name'), get_request('ip'), get_request('port'));
 		$result = DBend($result);
-		show_messages($result, _('Node deleted'), _('Cannot delete node'));
 
-		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_NODE,'Node ['.$node_data['name'].'] id ['.$node_data['nodeid'].']');
-		if($result){
-			unset($_REQUEST['form'],$node_data);
-		}
+		show_messages($result, _('Node updated'), _('Cannot update node'));
+		$audit_action = AUDIT_ACTION_UPDATE;
 	}
-?>
-<?php
+	else {
+		DBstart();
+		$nodeid = add_node(get_request('new_nodeid'), get_request('name'), get_request('ip'), get_request('port'), get_request('nodetype'), get_request('masterid'));
+		$result = DBend($nodeid);
 
-	$nodes_wdgt = new CWidget();
-
-	$available_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST, null, null, false);
-
-	$frmForm = new CForm('get');
-	$cmbConf = new CComboBox('config', 'nodes.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
-		$cmbConf->addItem('nodes.php', _('Nodes'));
-		$cmbConf->addItem('proxies.php', _('Proxies'));
-	$frmForm->addItem($cmbConf);
-
-	if(!isset($_REQUEST['form']) && ZBX_DISTRIBUTED){
-		$frmForm->addItem(new CSubmit('form', _('New node')));
+		show_messages($result, _('Node added'), _('Cannot add node'));
+		$audit_action = AUDIT_ACTION_ADD;
 	}
 
-	$nodes_wdgt->addPageHeader(_('CONFIGURATION OF NODES'), $frmForm);
+	add_audit_if($result, $audit_action, AUDIT_RESOURCE_NODE, 'Node ['.$_REQUEST['name'].'] id ['.$nodeid.']');
 
-	if(ZBX_DISTRIBUTED){
-		global $ZBX_NODES, $ZBX_LOCMASTERID;
-
-		if(isset($_REQUEST['form'])){
-			$frm_title = _('Node');
-			if(isset($_REQUEST['nodeid'])){
-				$node_data = get_node_by_nodeid($_REQUEST['nodeid']);
-				$frm_title .= ' "'.$node_data['name'].'"';
-			}
-
-			$master_node = DBfetch(DBselect('SELECT name FROM nodes WHERE masterid IS NULL AND nodetype='.ZBX_NODE_LOCAL));
-			$has_master = (!$master_node) ? true : false;
-
-
-			$frmNode= new CFormTable($frm_title);
-			$frmNode->setHelp('node.php');
-
-			if(isset($_REQUEST['nodeid'])){
-				$frmNode->addVar('nodeid', $_REQUEST['nodeid']);
-			}
-
-			if(isset($_REQUEST['nodeid']) && !isset($_REQUEST['form_refresh'])){
-				$new_nodeid = $node_data['nodeid'];
-				$name = $node_data['name'];
-				$ip = $node_data['ip'];
-				$port = $node_data['port'];
-				$masterid = $node_data['masterid'];
-				$node_type = detect_node_type($node_data['nodeid'], $node_data['masterid']);
-			}
-			else{
-				$new_nodeid = get_request('new_nodeid', 0);
-				$name = get_request('name', '');
-				$ip = get_request('ip', '127.0.0.1');
-				$port = get_request('port', 10051);
-				$node_type = get_request('node_type', ZBX_NODE_CHILD);
-				$masterid = get_request('masterid', get_current_nodeid(false));
-			}
-
-
-			$frmNode->addRow(S_NAME, new CTextBox('name', $name, 40));
-			if(isset($_REQUEST['nodeid'])){
-				$frmNode->addRow(_('ID'), new CNumericBox('new_nodeid', $new_nodeid, 10, 'yes'));
-			}
-			else{
-				$frmNode->addRow(_('ID'), new CNumericBox('new_nodeid', $new_nodeid, 10));
-			}
-
-			if(isset($_REQUEST['nodeid'])){
-				$cmbNodeType = new CTextBox('node_type_name', node_type2str($node_type), null, 'yes');
-			}
-			else{
-				$cmbNodeType = new CComboBox('node_type', $node_type, 'submit()');
-				$cmbNodeType->addItem(ZBX_NODE_CHILD, _('Child'));
-				if(!$has_master){
-					$cmbNodeType->addItem(ZBX_NODE_MASTER, _('Master'));
-				}
-			}
-			$frmNode->addRow(_('Type'), $cmbNodeType);
-
-			if($node_type == ZBX_NODE_CHILD){
-				if(isset($_REQUEST['nodeid'])){
-					$master_cb = new CTextBox('master_name', $ZBX_NODES[$ZBX_NODES[$_REQUEST['nodeid']]['masterid']]['name'], null, 'yes');
-				}
-				else{
-					$master_cb = new CComboBox('masterid', $masterid);
-					foreach($ZBX_NODES as $node){
-						if($node['nodeid'] == $ZBX_LOCMASTERID) continue;
-						$master_cb->addItem($node['nodeid'], $node['name']);
-					}
-				}
-				$frmNode->addRow(_('Master node'), $master_cb);
-			}
-
-			$frmNode->addRow(_('IP'), new CTextBox('ip', $ip, 15));
-			$frmNode->addRow(S_PORT, new CNumericBox('port', $port, 5));
-
-
-			$frmNode->addItemToBottomRow(new CSubmit('save', S_SAVE));
-			if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL){
-				$frmNode->addItemToBottomRow(SPACE);
-				$frmNode->addItemToBottomRow(new CButtonDelete(_('Delete selected node?'), url_param('form').url_param('nodeid')));
-			}
-			$frmNode->addItemToBottomRow(SPACE);
-			$frmNode->addItemToBottomRow(new CButtonCancel());
-
-			$nodes_wdgt->addItem($frmNode);
-		}
-		else{
-			$nodes_wdgt->addHeader(_('NODES'));
-			$nodes_wdgt->addItem(BR());
-
-			$table = new CTableInfo(_('No nodes defined.'));
-			$table->setHeader(array(
-				make_sorting_header(_('ID'), 'n.nodeid'),
-				make_sorting_header(S_NAME, 'n.name'),
-				make_sorting_header(_('IP').':'.S_PORT, 'n.ip')
-			));
-
-			$sql = 'SELECT n.* '.
-					' FROM nodes n'.
-					order_by('n.nodeid,n.name,n.ip','n.masterid');
-			$db_nodes = DBselect($sql);
-
-			while($node = DBfetch($db_nodes)){
-				$table->addRow(array(
-					$node['nodeid'],
-					array(
-						get_node_path($node['masterid']),
-						new CLink(($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name']), '?&form=update&nodeid='.$node['nodeid'])),
-					new CSpan($node['ip'].':'.$node['port'],
-					$node['nodetype'] ? 'bold' : null)
-				));
-			}
-
-			$nodes_wdgt->addItem($table);
-		}
+	if ($result) {
+		unset($_REQUEST['form']);
 	}
-	else{
-		$nodes_wdgt->addItem(new CTable(new CCol(_('Your setup is not configured for distributed monitoring'), 'center')));
+}
+elseif (isset($_REQUEST['delete'])) {
+	$node = get_node_by_nodeid($_REQUEST['nodeid']);
+
+	DBstart();
+	$result = delete_node($_REQUEST['nodeid']);
+	$result = DBend($result);
+
+	show_messages($result, _('Node deleted'), _('Cannot delete node'));
+
+	add_audit_if($result, AUDIT_ACTION_DELETE, AUDIT_RESOURCE_NODE, 'Node ['.$node['name'].'] id ['.$node['nodeid'].']');
+
+	if ($result) {
+		unset($_REQUEST['form'], $node);
+	}
+}
+
+/*
+ * Display
+ */
+if (isset($_REQUEST['form'])) {
+	$data = array(
+		'form' => get_request('form', 1),
+		'form_refresh' => get_request('form_refresh', 0) + 1,
+		'nodeid' => get_request('nodeid')
+	);
+
+	if (isset($_REQUEST['nodeid']) && !isset($_REQUEST['form_refresh'])) {
+		$node = get_node_by_nodeid($data['nodeid']);
+
+		$data['new_nodeid'] = $node['nodeid'];
+		$data['name'] = $node['name'];
+		$data['ip'] = $node['ip'];
+		$data['port'] = $node['port'];
+		$data['masterid'] = $node['masterid'];
+		$data['nodetype'] = detect_node_type($node['nodeid'], $node['masterid']);
+	}
+	else {
+		$data['new_nodeid'] = get_request('new_nodeid');
+		$data['name'] = get_request('name', '');
+		$data['ip'] = get_request('ip', '127.0.0.1');
+		$data['port'] = get_request('port', 10051);
+		$data['nodetype'] = get_request('nodetype', ZBX_NODE_CHILD);
+		$data['masterid'] = get_request('masterid', get_current_nodeid(false));
 	}
 
-	$nodes_wdgt->show();
+	$data['masterNode'] = DBfetch(DBselect('SELECT n.name FROM nodes n WHERE n.masterid IS NULL AND n.nodetype='.ZBX_NODE_MASTER));
 
+	// render view
+	$nodeView = new CView('administration.node.edit', $data);
+	$nodeView->render();
+	$nodeView->show();
+}
+else {
+	$data = array();
+
+	if (ZBX_DISTRIBUTED) {
+		$data['nodes'] = DBselect('SELECT n.* FROM nodes n '.order_by('n.nodeid,n.name,n.ip', 'n.masterid'));
+	}
+
+	// render view
+	$nodeView = new CView('administration.node.list', $data);
+	$nodeView->render();
+	$nodeView->show();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

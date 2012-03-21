@@ -21,6 +21,9 @@
 <?php
 $screenWidget = new CWidget();
 $screenWidget->addPageHeader(_('CONFIGURATION OF SCREENS'));
+if (!empty($this->data['templateid'])) {
+	$screenWidget->addItem(get_header_host_table('screens', $this->data['templateid']));
+}
 
 // create form
 $screenForm = new CForm();

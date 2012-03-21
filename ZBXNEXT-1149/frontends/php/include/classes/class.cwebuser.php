@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CWebUser {
+
 	public static $data = null;
 
 	public static function login($login, $password) {
@@ -119,6 +121,7 @@ class CWebUser {
 
 	private static function makeGlobal() {
 		global $USER_DETAILS;
+
 		$USER_DETAILS = self::$data;
 	}
 }

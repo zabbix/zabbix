@@ -33,7 +33,7 @@ td, tr { color: inherit; text-decoration: none; padding: 0; }
 a { text-decoration: underline; color:#3C3089; }
 a:hover { color:#6C80B9; }
 ul { margin-left: 0; padding-left: 1em; }
-form { margin: 0 }
+form { margin: 0; }
 
 /* media */
 @media print {
@@ -132,7 +132,7 @@ ul.favorites li.empty { list-style: none; line-height: 18px; vertical-align: top
 ul.favorites li a { line-height: 18px; vertical-align: top; }
 
 /* frondend messages */
-ul.messages { overflow:auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align:left; }
+ul.messages { overflow:auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
 ul.messages li { font-size: 1.1em; line-height: 18px; }
 ul.messages li.info { color:#000000; list-style: url("../images/general/warning_small.gif") inside; }
 ul.messages li.error { color:#D40000; list-style: url("../images/general/error_small.gif") inside; }
@@ -199,7 +199,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 
 /* object list */
 .objectgroup { padding: 4px; }
-.objectgroup.top { margin: 2px 0px; }
+.objectgroup.top { margin: 2px 0; }
 .objectgroup.footer { margin-top: 2px; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
@@ -345,7 +345,7 @@ table.formtable tr.form_even_row { background-color: #DFDFDF; }
 table.formtable tr td.form_row_first {
 	background: #5c9ccc url(originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
 	color: #FFFFFF;
-	font-size:11px;
+	font-size: 11px;
 	font-weight: bold;
 }
 table.formtable tr td.form_row_last {
@@ -370,7 +370,7 @@ table.log_history_table tr.header td { padding-right: 5px; padding-left: 5px; wh
 table.log_history_table tr td.message { text-align: center; }
 
 /* chart table */
-table.chart { width: 100%;background-color: #DDDDDD;text-align: center; }
+table.chart { width: 100%; background-color: #DDDDDD; text-align: center; }
 
 /* screen table */
 table.screen_edit { background-color: #FFFFFF; width: 100%; border: 1px outset #DDDDDD; }
@@ -403,14 +403,14 @@ table.screen_view tr td.cntr_bttm { text-align: center; vertical-align: bottom; 
 table.screen_view tr td.right_top { text-align: right; vertical-align: top; }
 table.screen_view tr td.right_mdl { text-align: right; vertical-align: middle; }
 table.screen_view tr td.right_bttm { text-align: right; vertical-align: bottom; }
-table.screen_edit .draggable, table.screen_view .draggable { padding: 1px 1px 0px 0px; }
+table.screen_edit .draggable, table.screen_view .draggable { padding: 1px 1px 0 0; }
 
 /* table info */
 table.tableinfo { empty-cells:show; width: 100%; border-spacing: 2px; }
 table.tableinfo tr td { padding: 1px 3px; white-space: nowrap; font-weight: normal; text-align: left; border: 0; height: 22px; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; }
 table.tableinfo tr.header td { white-space: nowrap; font-weight: bold; border: 0; }
 table.tableinfo tr.header td.hover_grey { white-space: nowrap; word-spacing: 0; font-weight: bold; border-width: 0; cursor: pointer; }
-table.tableinfo tr.vertical_header td { padding: 5px 0 5px 5px; margin: 0; white-space: nowrap; word-spacing: 0;font-weight: bold; width: 20px; text-align: center; }
+table.tableinfo tr.vertical_header td { padding: 5px 0 5px 5px; margin: 0; white-space: nowrap; word-spacing: 0; font-weight: bold; width: 20px; text-align: center; }
 table.tableinfo tr.vertical_header td.left { text-align: left; }
 table.tableinfo tr.vertical_header td.hover_grey:hover { cursor: pointer; }
 table.tableinfo tr.footer td { vertical-align: middle; padding-right: 5px; padding-left: 5px; }
@@ -496,7 +496,7 @@ table.hosts_info { width: 100%; background-color: #FFFFFF; border: 1px gray dott
 table.hosts_info tr td {
 	border: 0;
 	white-space: nowrap;
-	word-spacing:	0;
+	word-spacing: 0;
 	padding-left: 5px;
 	padding-right: 5px;
 	font-weight: bold;
@@ -517,29 +517,16 @@ table.server_info tr.status td { white-space: nowrap; word-spacing: 0; }
 
 /* warning */
 table.warningTable {
-	border-spacing: 0;
-	border-collapse: collapse;
-	border: 2px solid gray;
-	border-right-color: #3F3F3F;
-	border-bottom-color: #3F3F3F;
-	background-color: #EAEAEA;
+	margin: 30px auto; width: 500px; border: 5px solid #CC3333; background-color: #FFFFFF;
+	-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
 }
 table.warningTable td { padding: 10px; line-height: 20px; }
-table.warningTable tr.header { height: 24px; border: 1px black solid; background-color: #F00000; color: white; font-weight: bold; }
-table.warningTable tr.header td { padding: 2px; }
-table.warningTable tr.footer { height: 34px; border-top: 1px black dotted; }
-table.warningTable tr.footer td { padding: 2px; }
-table.warningTable tr td.left { padding-left: 10px; padding-right: 5px; white-space: nowrap; word-spacing: 0; text-align: left; }
-table.warningTable tr td.right { width: 100%; padding-left: 5px; padding-right: 10px; text-align: right; vertical-align: text-top; }
-table.warningTable tr.center td.left { vertical-align: text-top; padding-top: 0; }
-table.warningTable tr.center td.right {
-	padding: 5px;
-	vertical-align: middle;
-	text-align: center;
-	border-top: 2px gray inset;
-	border-left: 2px gray inset;
-	background-color: white;
-}
+table.warningTable tr.header { height: 24px; color: #FFFFFF; font-weight: bold; background-color: #CC3333; }
+table.warningTable tr.header td { padding: 0 2px 4px 10px; }
+table.warningTable tr.footer td { padding: 0; text-align: right; }
+table.warningTable tr.footer .buttons { margin: 0 10px 5px; padding-top: 5px; border-top: 1px dotted #1F1F1F; }
+table.warningTable tr.content { vertical-align: text-top; text-align: justify; font-size: 10px; }
+table.warningTable tr.content.center { text-align: center; }
 
 /* setup wizard */
 table.setup_wizard {
@@ -560,7 +547,7 @@ table.setup_wizard tr.title { height: 28px; }
 table.setup_wizard tr.title td { font-size: 24px; font-weight: normal; }
 table.setup_wizard tr td.left { padding-left: 10px; padding-right: 5px; white-space: nowrap; word-spacing: 0; text-align: left; }
 table.setup_wizard tr td.right { width: 100%; padding-left: 5px; padding-right: 10px; text-align: right; vertical-align: text-top; }
-table.setup_wizard tr.center td.left { vertical-align:	text-top; padding-top: 0; }
+table.setup_wizard tr.center td.left { vertical-align: text-top; padding-top: 0; }
 table.setup_wizard tr.center td.right {
 	padding: 5px;
 	vertical-align: middle;
@@ -587,16 +574,16 @@ table.history { color:#448; margin: 0 0 0 2px; }
 table.history td.caption { width: 48px; font-weight:bold; }
 
 /* message */
-table.msgok {width: 100%; border: 1px #44CC44 solid; }
+table.msgok { width: 100%; border: 1px #44CC44 solid; }
 table.msgok tr td {color:#333; text-align:center; }
 table.msgok tr td.clr {width: 60px; background-color:#44CC44; font-weight: bold; }
 table.msgok tr td.msg_main {height: 26px; font-size: 1.1em; }
-table.msgok tr td.msg {background-color:#BBFFBB; }
+table.msgok tr td.msg {background-color: #BBFFBB; }
 table.msgerr { width: 100%; border: 1px #CC4444 solid; }
-table.msgerr tr td {color:#333; text-align:center; }
+table.msgerr tr td {color:#333; text-align: center; }
 table.msgerr tr td.clr { width: 60px; background-color:#CC4444; font-weight: bold; }
 table.msgerr tr td.msg_main { height: 26px; font-size: 1.1em; }
-table.msgerr tr td.msg { background-color:#FFBBBB; }
+table.msgerr tr td.msg { background-color: #FFBBBB; }
 
 /* requirements */
 table.requirements { text-align: left; border-spacing: 1px; }
@@ -612,8 +599,8 @@ table.filter_config { width: 100%; background-color: #FFFFFF; border-collapse: c
 table.filter_config tr td { white-space: nowrap; line-height: 20px; height: 26px; vertical-align: bottom; text-align: center; border: 1px dotted silver; padding-left: 6px; padding-right: 4px; }
 
 /* invisible */
-table.invisible { border: 0px; margin: 0px; padding: 0px; }
-table.invisible tr > td { border: 0px; margin: 0px; padding: 0px; }
+table.invisible { border: 0; margin: 0; padding: 0; }
+table.invisible tr > td { border: 0; margin: 0; padding: 0; }
 
 /* paging */
 table.paging { width: 100%; padding: 2px; }
@@ -664,7 +651,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .vertical-middle { width: 100%; display: table-cell; vertical-align: middle; *position: absolute; *top: 50%; }
 
 .flashclock {
-	top: 0px; left:50%; margin-left: -50px;
+	top: 0; left: 50%; margin-left: -50px;
 	width: 100px; height: 100px;
 	z-index: 10; position: absolute;
 	background: url('../images/general/transparent.png') repeat scroll center top transparent;

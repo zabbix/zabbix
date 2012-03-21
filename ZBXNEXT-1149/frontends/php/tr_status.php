@@ -170,12 +170,9 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG . ' [' . date(_('d M Y H:i:s')) . ']', array($fs_icon));
-
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
-	$trigg_wdgt->addHeader(_('TRIGGERS'), $r_form);
-	$trigg_wdgt->addHeader($numrows);
+	$trigg_wdgt->addPageHeader(_('STATUS OF TRIGGERS').SPACE.'['.date(_('d M Y H:i:s')).']', $fs_icon);
+	$trigg_wdgt->addHeader(_('Triggers'), $r_form);
+	$trigg_wdgt->addHeaderRowNumber();
 
 /************************* FILTER **************************/
 /***********************************************************/
@@ -261,7 +258,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No triggers defined.'));
 	$switcherName = 'trigger_switchers';
 
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")

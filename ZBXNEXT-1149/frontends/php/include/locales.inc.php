@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 function init_mbstrings() {
 	$res = true;
 	$res &= mbstrings_available();
@@ -39,6 +40,7 @@ function mbstrings_available() {
 // translate global array $TRANSLATION into constants
 function process_locales() {
 	global $TRANSLATION;
+
 	if (isset($TRANSLATION) && is_array($TRANSLATION)) {
 		foreach ($TRANSLATION as $const => $label) {
 			if (!defined($const)) {
@@ -51,27 +53,28 @@ function process_locales() {
 
 function set_zbx_locales() {
 	global $ZBX_LOCALES;
+
 	$ZBX_LOCALES = array(
-		'en_GB'=>  _('English (en_GB)'),
-		'zh_CN'=>  _('Chinese (zh_CN)'),
-		'cs_CZ'=>  _('Czech (cs_CZ)'),
-		'nl_NL'=>  _('Dutch (nl_NL)'),
-		'fr_FR'=>  _('French (fr_FR)'),
-		'de_DE'=>  _('German (de_DE)'),
-		'el_GR'=>  _('Greek (el_GR)'),
-		'hu_HU'=>  _('Hungarian (hu_HU)'),
-		'it_IT'=>  _('Italian (it_IT)'),
-		'ko_KR'=>  _('Korean (ko_KR)'),
-		'ja_JP'=>  _('Japanese (ja_JP)'),
-		'lv_LV'=>  _('Latvian (lv_LV)'),
-		'pl_PL'=>  _('Polish (pl_PL)'),
-		'pt_BR'=>  _('Portuguese (pt_BR)'),
-		'ru_RU'=>  _('Russian (ru_RU)'),
-		'sk_SK'=>  _('Slovak (sk_SK)'),
-		'es_ES'=>  _('Spanish (es_ES)'),
-		'sv_SE'=>  _('Swedish (sv_SE)'),
-//		'tr_TR'=>  _('Turkish (tr_TR)'),
-		'uk_UA'=>  _('Ukrainian (uk_UA)'),
+		'en_GB' => _('English (en_GB)'),
+		'zh_CN' => _('Chinese (zh_CN)'),
+		'cs_CZ' => _('Czech (cs_CZ)'),
+		'nl_NL' => _('Dutch (nl_NL)'),
+		'fr_FR' => _('French (fr_FR)'),
+		'de_DE' => _('German (de_DE)'),
+		'el_GR' => _('Greek (el_GR)'),
+		'hu_HU' => _('Hungarian (hu_HU)'),
+		'it_IT' => _('Italian (it_IT)'),
+		'ko_KR' => _('Korean (ko_KR)'),
+		'ja_JP' => _('Japanese (ja_JP)'),
+		'lv_LV' => _('Latvian (lv_LV)'),
+		'pl_PL' => _('Polish (pl_PL)'),
+		'pt_BR' => _('Portuguese (pt_BR)'),
+		'ru_RU' => _('Russian (ru_RU)'),
+		'sk_SK' => _('Slovak (sk_SK)'),
+		'es_ES' => _('Spanish (es_ES)'),
+		'sv_SE' => _('Swedish (sv_SE)'),
+//		'tr_TR' => _('Turkish (tr_TR)'),
+		'uk_UA' => _('Ukrainian (uk_UA)')
 	);
 }
 

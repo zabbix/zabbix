@@ -790,7 +790,6 @@ class CUserMacro extends CZBXAPI {
 		return $triggers;
 	}
 
-
 	public function resolveItem($items) {
 		$single = false;
 		if (isset($items['itemid'])) {
@@ -813,6 +812,69 @@ class CUserMacro extends CZBXAPI {
 		if ($single) $items = $items[0];
 
 		return $items;
+	}
+
+	/**
+	 * Replace macros on hosts/templates.
+	 * $macros input array has hostid as key and array of that host macros as value.
+	 *
+	 * @param array $macros
+	 *
+	 * @return void
+	 */
+	public function replaceMacros(array $macros) {
+		$hostIds = array_keys($macros);
+		if (!API::Host()->isWritable($hostIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$dbMacros = API::Host()->get(array(
+			'hostids' => $hostIds,
+			'selectMacros' => API_OUTPUT_EXTEND,
+			'templated_hosts' => true,
+			'output' => API_OUTPUT_REFER,
+			'preservekeys' => true
+		));
+
+		$macroIdsToDelete = array();
+		$macrosToUpdate = array();
+		$macrosToAdd = array();
+
+		foreach ($macros as $hostid => $hostMacros) {
+			$dbHostMacros = $dbMacros[$hostid]['macros'];
+
+			// look for db macros which hostmacroids are not in list of new macros
+			// if there are any, they should be deleted
+			$hostMacroIds = zbx_toHash($hostMacros, 'hostmacroid');
+			foreach ($dbHostMacros as $dbHostMacro) {
+
+				if (!isset($hostMacroIds[$dbHostMacro['hostmacroid']])) {
+					$macroIdsToDelete[] = $dbHostMacro['hostmacroid'];
+				}
+			}
+
+			// if macro has hostmacrid it should be updated otherwise created as new
+			foreach ($hostMacros as $hostMacro) {
+				if (isset($hostMacro['hostmacroid']) && isset($dbHostMacros[$hostMacro['hostmacroid']])) {
+					$macrosToUpdate[] = $hostMacro;
+				}
+				else {
+					$hostMacro['hostid'] = $hostid;
+					$macrosToAdd[] = $hostMacro;
+				}
+			}
+		}
+
+
+		if ($macrosToAdd) {
+			$this->create($macrosToAdd);
+		}
+		if ($macroIdsToDelete) {
+			$this->delete($macroIdsToDelete);
+		}
+		if ($macrosToUpdate) {
+			$this->update($macrosToUpdate);
+		}
 	}
 
 	/**
@@ -883,18 +945,22 @@ class CUserMacro extends CZBXAPI {
 	/**
 	 * Checks if the given macros contain duplicates. Assumes the "macro" field is valid.
 	 *
+	 * @throws APIException if the given macros contain duplicates
+	 *
 	 * @param array $macros
 	 *
-	 * @throws APIException if the given macros contain duplicates
+	 * @return void
 	 */
 	protected function checkDuplicateMacros(array $macros) {
 		$existingMacros = array();
 		foreach ($macros as $macro) {
-			if (isset($existingMacros[$macro['macro']])) {
+			// global macros don't have hostid
+			$hostid = isset($macro['hostid']) ? $macro['hostid'] : 1;
+			if (isset($existingMacros[$hostid][$macro['macro']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
 			}
 
-			$existingMacros[$macro['macro']] = 1;
+			$existingMacros[$hostid][$macro['macro']] = 1;
 		}
 	}
 

@@ -25,9 +25,11 @@ Specify item key to send value to.
 .IP "-o, --value \fI<value>\fR"
 Specify value.
 .IP "-i, --input-file \fI<inputfile>\fR"
-Load values from input file. Specify \fB-\fR for standard input. Each line of file contains whitespace delimited: \fB<hostname> <key> <value>\fR. Specify \fB-\fR in \fB<hostname>\fR to use hostname from configuration file or \fB--host\fR argument.
+Load values from input file. Specify \fB-\fR for standard input. Each line of file contains whitespace delimited: \fB<hostname> <key> <value>\fR. \
+Specify \fB-\fR in \fB<hostname>\fR to use hostname from configuration file or \fB--host\fR argument. All entries are sent in a sequential order top-down.
 .IP "-T, --with-timestamps"
-Each line of file contains whitespace delimited: \fB<hostname> <key> <timestamp> <value>\fR. This can be used with \fB--input-file\fR option. Timestamp should be specified in Unix timestamp format.
+Each line of file contains whitespace delimited: \fB<hostname> <key> <timestamp> <value>\fR. This can be used with \fB--input-file\fR option. Timestamp should be specified in Unix timestamp format. \
+If target item has triggers referencing it, all timestamps must be in an increasing order, otherwise event calculation will not be correct.
 .IP "-r, --real-time"
 Send values one by one as soon as they are received. This can be used when reading from standard input.
 .IP "-v, --verbose"

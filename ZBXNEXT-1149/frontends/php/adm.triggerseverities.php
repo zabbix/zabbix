@@ -21,35 +21,34 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of trigger severities');
 $page['file'] = 'adm.triggerseverities.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-$fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'severity_name_0' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_0' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_1' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_1' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_2' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_2' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_3' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_3' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_4' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_4' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_name_5' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'severity_color_5' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'severity_name_0' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_color_0' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_name_1' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_color_1' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_name_2' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_color_2' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_name_3' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_color_3' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_name_4' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_color_4' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_name_5' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'severity_color_5' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'save' =>				array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT, null,	null),
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT,	null,	null,		null)
 );
-?>
-<?php
 check_fields($fields);
 
-
+/*
+ * Actions
+ */
 if (isset($_REQUEST['save'])) {
 	$configs = array(
 		'severity_name_0' => get_request('severity_name_0', _('Not classified')),
@@ -63,15 +62,16 @@ if (isset($_REQUEST['save'])) {
 		'severity_name_4' => get_request('severity_name_4', _('High')),
 		'severity_color_4' => get_request('severity_color_4', ''),
 		'severity_name_5' => get_request('severity_name_5', _('Disaster')),
-		'severity_color_5' => get_request('severity_color_5', ''),
+		'severity_color_5' => get_request('severity_color_5', '')
 	);
-
 	$result = update_config($configs);
 
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.triggerseverities.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -90,9 +90,8 @@ $cmbConf->addItems(array(
 ));
 $form->addItem($cmbConf);
 
-
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF TRIGGER SEVERITIES'), $form);
 
 $data = array();
 $data['form_refresh'] = get_request('form_refresh', 0);

@@ -19,35 +19,21 @@
 **/
 ?>
 <?php
-	require_once dirname(__FILE__).'/include/config.inc.php';
-	require_once dirname(__FILE__).'/include/blocks.inc.php';
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/blocks.inc.php';
 
-	$page['title'] = "S_STATUS_OF_ZABBIX";
-	$page['file'] = 'report1.php';
-	$page['hist_arg'] = array();
+$page['title'] = _('Status of Zabbix');
+$page['file'] = 'report1.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-?>
-<?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array();
-
-	check_fields($fields);
-?>
-<?php
-	$rprt_wdgt = new CWidget();
-	$rprt_wdgt->addPageHeader(S_STATUS_OF_ZABBIX_BIG);
-
-	$rprt_wdgt->addHeader(S_REPORT_BIG);
-	$rprt_wdgt->addItem(BR());
-
-	$rprt_wdgt->addItem(make_status_of_zbx());
-
-	$rprt_wdgt->show();
-?>
-<?php
+$reportWidget = new CWidget();
+$reportWidget->addPageHeader(_('STATUS OF ZABBIX'));
+$reportWidget->addHeader(_('Report'));
+$reportWidget->addItem(BR());
+$reportWidget->addItem(make_status_of_zbx());
+$reportWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
 ?>

@@ -30,47 +30,37 @@ if (!defined('PAGE_HEADER_LOADED')) {
 }
 
 $refresh_rate = 30; // seconds
-?>
-<?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'warning_msg' =>	array(T_ZBX_STR, O_OPT, null,		 null, null),
-	'message' =>		array(T_ZBX_STR, O_OPT, null,		 null, null),
-	'retry' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null)
+	'warning_msg' =>	array(T_ZBX_STR, O_OPT, null,			null, null),
+	'message' =>		array(T_ZBX_STR, O_OPT, null,			null, null),
+	'retry' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null),
+	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null)
 );
 check_fields($fields, false);
-?>
-<?php
+
 if (isset($_REQUEST['cancel'])) {
 	zbx_unsetcookie('ZBX_CONFIG');
 	redirect('index.php');
 }
-// clear_messages();
+
 CWebUser::$data['refresh'] = $refresh_rate;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 unset($USER_DETAILS);
 
-$table = new CTable(null, 'warningTable');
-$table->setAlign('center');
-$table->setAttribute('style', 'width: 480px; margin-top: 100px;');
-$table->setHeader(array(new CCol(_('Zabbix').SPACE.ZABBIX_VERSION, 'left')),'header');
-$table->addRow(SPACE);
+$msg = isset($_REQUEST['warning_msg']) ? $_REQUEST['warning_msg'] : _('Zabbix is temporarily unavailable!');
 
-$img = new CImg('./images/general/warning16r.gif', 'warning', 16, 16, 'img');
-$img->setAttribute('style', 'border-width: 0px; vertical-align: bottom;');
+$warning = new CWarning(_('Zabbix').SPACE.ZABBIX_VERSION, $msg);
+$warning->setAlignment('center');
+$warning->setAttribute('style', 'margin-top: 100px;');
+$warning->setPaddings(SPACE);
+$warning->setButtons(new CButton('retry', _('Retry'), 'javascript: document.location.reload();', 'formlist'));
+$warning->show();
 
-$msg = new CSpan(bold(SPACE.(isset($_REQUEST['warning_msg']) ? $_REQUEST['warning_msg'] : _('Zabbix is temporarily unavailable').'!')));
-$msg->setAttribute('style', 'line-height: 20px; vertical-align: top;');
-
-$table->addRow(new CCol(array($img, $msg), 'center'));
-$table->addRow(SPACE);
-$table->setFooter(new CCol(new CButton('retry', _('Retry'), 'javascript: document.location.reload();'), 'left'), 'footer');
-$table->show();
-
-zbx_add_post_js('setTimeout("document.location.reload();",'.($refresh_rate * 1000).');');
+zbx_add_post_js('setTimeout("document.location.reload();", '.($refresh_rate * 1000).');');
 echo SBR;
 
 require_once dirname(__FILE__).'/include/page_footer.php';

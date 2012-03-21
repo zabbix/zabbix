@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CFormTable extends CForm {
+
 	private $align;
 	private $help;
 	private $title;
