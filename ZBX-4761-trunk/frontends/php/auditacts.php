@@ -24,15 +24,14 @@ require_once dirname(__FILE__).'/include/audit.inc.php';
 require_once dirname(__FILE__).'/include/actions.inc.php';
 require_once dirname(__FILE__).'/include/users.inc.php';
 
-$page['title'] = _('Audit');
+$page['title'] = _('Audit actions');
 $page['file'] = 'auditacts.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array('class.calendar.js','gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	// filter

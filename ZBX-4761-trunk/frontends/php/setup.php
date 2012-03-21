@@ -90,6 +90,7 @@ if(!defined('PAGE_HEADER_LOADED'))
 	}
 
 // POSTGRESQL
+// POSTGRESQL
 	if(zbx_is_callable(array('pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'))){
 		$ZBX_CONFIG['allowed_db']['POSTGRESQL'] = 'PostgreSQL';
 	}

@@ -26,7 +26,7 @@ class testPageLatestData extends CWebTest {
 		$this->login('latest.php');
 		$this->assertTitle('Latest data \[refreshed every 30 sec\]');
 		$this->ok('LATEST DATA');
-		$this->ok('ITEMS');
+		$this->ok('Items');
 		$this->ok(array('Host', 'Group'));
 		$this->ok('Filter');
 		$this->ok(array('Host', 'Name', 'Last check', 'Last value', 'Change', 'History'));

@@ -162,7 +162,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$r_form->addItem(array(_('Reports').SPACE,$cnfCmb));
 
 	$rep6_wdgt->addPageHeader(S_BAR_REPORTS);
-	$rep6_wdgt->addHeader(S_REPORT_BIG, $r_form);
+	$rep6_wdgt->addHeader(_('Report'), $r_form);
 	$rep6_wdgt->addItem(BR());
 //-------------
 

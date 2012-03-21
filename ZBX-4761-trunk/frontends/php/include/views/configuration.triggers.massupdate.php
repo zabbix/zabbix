@@ -22,12 +22,29 @@
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $triggersWidget = new CWidget();
-$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
+
+// append host summary to widget header
+if (!empty($this->data['hostid'])) {
+	if (!empty($this->data['parent_discoveryid'])) {
+		$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
+	}
+	else {
+		$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid']));
+	}
+}
+
+if (!empty($this->data['parent_discoveryid'])) {
+	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGER PROTOTYPES'));
+}
+else {
+	$triggersWidget->addPageHeader(_('CONFIGURATION OF TRIGGERS'));
+}
 
 // create form
 $triggersForm = new CForm();
 $triggersForm->setName('triggersForm');
 $triggersForm->addVar('massupdate', $this->data['massupdate']);
+$triggersForm->addVar('hostid', $this->data['hostid']);
 $triggersForm->addVar('go', $this->data['go']);
 if ($this->data['parent_discoveryid']) {
 	$triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);

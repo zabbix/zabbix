@@ -21,14 +21,14 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of macros');
 $page['file'] = 'adm.macros.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	'macros_rem'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'macros'=>					array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
 	'macro_new'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	'isset({macro_add})'),
@@ -38,10 +38,11 @@ $fields = array(
 	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
 );
-?>
-<?php
 check_fields($fields);
 
+/*
+ * Actions
+ */
 $result = true;
 if (isset($_REQUEST['save'])) {
 	try {
@@ -147,7 +148,9 @@ if (isset($_REQUEST['save'])) {
 	}
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.macros.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -166,9 +169,8 @@ $cmbConf->addItems(array(
 ));
 $form->addItem($cmbConf);
 
-
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF MACROS'), $form);
 
 $data = array();
 $data['form_refresh'] = get_request('form_refresh', 0);
@@ -196,7 +198,6 @@ if ($result) {
 }
 $macrosForm = new CView('administration.general.macros.edit', $data);
 $cnf_wdgt->addItem($macrosForm->render());
-
 
 $cnf_wdgt->show();
 

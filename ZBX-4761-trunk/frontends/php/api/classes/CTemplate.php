@@ -1067,13 +1067,14 @@ class CTemplate extends CZBXAPI {
 			'preservekeys' => 1
 		));
 
-		foreach ($templates as $tnum => $template) {
+		foreach ($templates as $template) {
 			if (!isset($updTemplates[$template['templateid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
-		foreach ($templates as $tnum => $template) {
+		$macros = array();
+		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
 			if (!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
 			{
@@ -1083,6 +1084,11 @@ class CTemplate extends CZBXAPI {
 
 			$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
 
+			if (isset($template['macros'])) {
+				$macros[$template['templateid']] = $template['macros'];
+				unset($template['macros']);
+			}
+
 			unset($template['templates']);
 			unset($template['templateid']);
 			unset($tplTmp['templates']);
@@ -1090,6 +1096,10 @@ class CTemplate extends CZBXAPI {
 			$template['templates'] = array($tplTmp);
 			$result = $this->massUpdate($template);
 			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
+		}
+
+		if ($macros) {
+			API::UserMacro()->replaceMacros($macros);
 		}
 
 		return array('templateids' => $templateids);
@@ -1241,7 +1251,6 @@ class CTemplate extends CZBXAPI {
 
 		return array('templateids' => $templateids);
 	}
-
 
 	/**
 	 * Link Template to Hosts
@@ -1527,62 +1536,15 @@ class CTemplate extends CZBXAPI {
 		}
 		// }}} UPDATE TEMPLATE LINKAGE
 
+		// macros
+		if (isset($data['macros'])) {
+			DB::delete('hostmacro', array('hostid' => $templateids));
 
-		// UPDATE MACROS {{{
-		if (isset($data['macros']) && !is_null($data['macros'])) {
-			$macrosToAdd = $data['macros'];
-			$hostmacrosIds = zbx_objectValues($macrosToAdd, 'hostmacroid');
-
-			$templateMacros = API::UserMacro()->get(array(
-				'hostids' => $templateids,
-				'output' => API_OUTPUT_EXTEND
+			$this->massAdd(array(
+				'hosts' => $templates,
+				'macros' => $data['macros']
 			));
-			$templateMacros = zbx_toHash($templateMacros, 'hostmacroid');
-
-			// Delete
-			$macrosToDelete = array();
-			foreach ($templateMacros as $hmacro) {
-				if (!in_array($hmacro['hostmacroid'], $hostmacrosIds)) {
-					$macrosToDelete[] = $hmacro['hostmacroid'];
-				}
-			}
-
-			// Update
-			$macrosToUpdate = array();
-			foreach ($macrosToAdd as $nhmnum => $nhmacro) {
-				if (isset($nhmacro['hostmacroid']) && isset($templateMacros[$nhmacro['hostmacroid']])) {
-					$macrosToUpdate[] = $nhmacro;
-					unset($macrosToAdd[$nhmnum]);
-				}
-			}
-			//----
-			if (!empty($macrosToDelete)) {
-				$result = $this->massRemove(array(
-					'templateids' => $templateids,
-					'macros' => $macrosToDelete
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove macro"));
-				}
-			}
-
-			if (!empty($macrosToUpdate)) {
-				$result = API::UserMacro()->update($macrosToUpdate);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro'));
-				}
-			}
-
-			if (!empty($macrosToAdd)) {
-				$macrosToAdd = array_values($macrosToAdd);
-
-				$result = $this->massAdd(array('templates' => $templates, 'macros' => $macrosToAdd));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add macro'));
-				}
-			}
 		}
-		// }}} UPDATE MACROS
 
 		return array('templateids' => $templateids);
 	}
@@ -1644,7 +1606,6 @@ class CTemplate extends CZBXAPI {
 
 		return array('templateids' => $templateids);
 	}
-
 
 	private function link($templateids, $targetids) {
 		if (empty($templateids)) return true;

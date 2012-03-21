@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CEditableComboBox extends CComboBox {
+
 	public function __construct($name = 'editablecombobox', $value = null, $size = 0, $action = null) {
 		insert_javascript_for_editable_combobox();
 		parent::__construct($name, $value, $action);

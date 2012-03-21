@@ -280,13 +280,13 @@ else {
 
 		$srv_wdgt = new CWidget('hat_services');
 		$srv_wdgt->addPageHeader(_('IT SERVICES'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
-		$srv_wdgt->addHeader(_('IT SERVICES'), $r_form);
+		$srv_wdgt->addHeader(_('IT services'), $r_form);
 		$srv_wdgt->addItem(BR());
 		$srv_wdgt->addItem($tree->getHTML());
 		$srv_wdgt->show();
 	}
 	else {
-		error(_('Cannot format Tree. Check logic structure in service links'));
+		error(_('Cannot format Tree. Check logic structure in service links.'));
 	}
 }
 include_once('include/page_footer.php');

@@ -715,7 +715,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 
 	UNLOCK_TRENDS;
 
-	while (trends_num > 0)
+	while (0 < trends_num)
 		DCflush_trends(trends, &trends_num, 1);
 
 	zbx_free(trends);
@@ -739,8 +739,7 @@ static void	DCsync_trends()
 	ZBX_DC_TREND		*trends = NULL, *trend;
 	int			trends_alloc = 0, trends_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d",
-			__function_name, cache->trends_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __function_name, cache->trends_num);
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data...");
 
@@ -2631,6 +2630,56 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 /******************************************************************************
  *                                                                            *
+ * Function: init_trend_cache                                                 *
+ *                                                                            *
+ * Purpose: Allocate shared memory for trend cache (part of database cache)   *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: Is optionally called from init_database_cache()                  *
+ *                                                                            *
+ ******************************************************************************/
+
+ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
+
+static void	init_trend_cache()
+{
+	const char	*__function_name = "init_trend_cache";
+	key_t		trend_shm_key;
+	size_t		sz;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for trend cache");
+		exit(FAIL);
+	}
+
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
+	{
+		zbx_error("cannot create mutex for trend cache");
+		exit(FAIL);
+	}
+
+	sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
+	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
+
+	cache->trends_num = 0;
+
+#define INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
+
+	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
+
+#undef INIT_HASHSET_SIZE
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: init_database_cache                                              *
  *                                                                            *
  * Purpose: Allocate shared memory for database cache                         *
@@ -2641,21 +2690,19 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 ZBX_MEM_FUNC1_IMPL_MALLOC(__history, history_mem);
 ZBX_MEM_FUNC1_IMPL_MALLOC(__history_text, history_text_mem);
-ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
 
 void	init_database_cache()
 {
 	const char	*__function_name = "init_database_cache";
-	key_t		history_shm_key, history_text_shm_key, trend_shm_key;
+	key_t		history_shm_key, history_text_shm_key;
 	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (-1 == (history_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_ID)) ||
-			-1 == (history_text_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_TEXT_ID)) ||
-			-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
+			-1 == (history_text_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_TEXT_ID)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history and trend caches");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history cache");
 		exit(FAIL);
 	}
 
@@ -2665,15 +2712,9 @@ void	init_database_cache()
 		exit(FAIL);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
-	{
-		zbx_error("cannot create mutex for trend cache");
-		exit(FAIL);
-	}
-
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
-		zbx_error("cannot create mutex for id cache");
+		zbx_error("cannot create mutex for IDs cache");
 		exit(FAIL);
 	}
 
@@ -2716,23 +2757,8 @@ void	init_database_cache()
 	cache->text_free = CONFIG_TEXT_CACHE_SIZE;
 
 	/* trend cache */
-
-	if (0 < CONFIG_TRENDS_CACHE_SIZE)
-	{
-		sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
-
-		zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
-
-		cache->trends_num = 0;
-
-#define	INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
-
-		zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
-				ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-				__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
-
-#undef	INIT_HASHSET_SIZE
-	}
+	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		init_trend_cache();
 
 	cache->last_ts.sec = 0;
 	cache->last_ts.ns = 0;
@@ -2757,7 +2783,8 @@ static void	DCsync_all()
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
 	DCsync_history(ZBX_SYNC_FULL);
-	DCsync_trends();
+	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		DCsync_trends();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_all()");
 }
@@ -2779,22 +2806,16 @@ void	free_database_cache()
 
 	DCsync_all();
 
-	LOCK_CACHE;
-	LOCK_TRENDS;
-	LOCK_CACHE_IDS;
-
 	cache = NULL;
 	zbx_mem_destroy(history_mem);
 	zbx_mem_destroy(history_text_mem);
-	zbx_mem_destroy(trend_mem);
-
-	UNLOCK_CACHE_IDS;
-	UNLOCK_TRENDS;
-	UNLOCK_CACHE;
+	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		zbx_mem_destroy(trend_mem);
 
 	zbx_mutex_destroy(&cache_lock);
-	zbx_mutex_destroy(&trends_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
+	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		zbx_mutex_destroy(&trends_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
