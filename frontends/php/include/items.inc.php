@@ -522,30 +522,46 @@ function get_same_item_for_host($item, $dest_hostids) {
 	return false;
 }
 
-function expand_item_key_by_data($item) {
+/**
+ * Resolve macros in item key.
+ * Resolve {HOSTNAME}, {IPADDRESS}, {HOST.IP}, {HOST.DNS}, {HOST.CONN}, {HOST.HOST}, {HOST.NAME} and user macros.
+ * Macros related to interface resolved only for host items.
+ *
+ * @param array $item
+ *
+ * @return string
+ */
+function resolveItemKeyMacros(array $item) {
 	$key =& $item['key_'];
 	$macStack = array();
 	$macros = array('{HOSTNAME}', '{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}', '{HOST.NAME}');
 
 	foreach ($macros as $macro) {
-		$pos = 0;
-		while ($pos = zbx_strpos($key, $macro, $pos)) {
-			$pos++;
+		if (zbx_strpos($key, $macro) !== false) {
 			$macStack[] = $macro;
 		}
 	}
 
 	if (!empty($macStack)) {
-		$db_items = API::Item()->get(array(
+		$dbItem = API::Item()->get(array(
 			'itemids' => $item['itemid'],
 			'selectInterfaces' => array('ip', 'dns', 'useip'),
 			'selectHosts' => array('host', 'name'),
 			'output' => API_OUTPUT_REFER
 		));
-		$db_item = reset($db_items);
+		$dbItem = reset($dbItem);
 
-		$host = reset($db_item['hosts']);
-		$interface = reset($db_item['interfaces']);
+		$host = reset($dbItem['hosts']);
+		$interface = reset($dbItem['interfaces']);
+
+		// if item without interface or template item, resolve interface related macros to *UNKNOWN*
+		if (!$interface) {
+			$interface = array(
+				'ip' => _('*UNKNOWN*'),
+				'dns' => _('*UNKNOWN*'),
+				'useip' => false,
+			);
+		}
 
 		foreach ($macStack as $macro) {
 			switch ($macro) {
@@ -573,9 +589,11 @@ function expand_item_key_by_data($item) {
 			}
 		}
 	}
+
 	if (preg_match('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $key)) {
 		$item = API::UserMacro()->resolveItem($item);
 	}
+
 	return $item['key_'];
 }
 
@@ -594,7 +612,7 @@ function itemName($item) {
 
 	// if item name contains $1..$9 macros, we need to expand them
 	if (preg_match('/\$[1-9]/', $name)) {
-		$key = expand_item_key_by_data($item);
+		$key = resolveItemKeyMacros($item);
 
 		// parsing key to get the parameters out of it
 		$ItemKey = new CItemKey($key);
