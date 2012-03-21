@@ -152,7 +152,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$table->SetHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
 		$_REQUEST['hostid'] == 0 ? make_sorting_header(S_HOST, 'h.name') : null,
-		make_sorting_header(array($link, SPACE, S_NAME), 'wt.name'),
+		make_sorting_header(array($link, SPACE, _('Name')), 'wt.name'),
 		_('Number of steps'),
 		_('Last check'),
 		_('Status')

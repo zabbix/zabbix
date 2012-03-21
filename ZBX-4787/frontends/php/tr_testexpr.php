@@ -53,7 +53,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$data_table = new CTable(null, 'tableinfo');
 	$data_table->setAttribute('id', 'data_list');
 
-	$data_table->setHeader(array(_('Expression Variable Elements'), _('Result type'), S_VALUE));
+	$data_table->setHeader(array(_('Expression Variable Elements'), _('Result type'), _('Value')));
 
 	$octet = false;
 	$datas = array();

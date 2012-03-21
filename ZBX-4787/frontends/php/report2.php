@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/reports.inc.php';
 
-$page['title'] = 'S_AVAILABILITY_REPORT';
+$page['title'] = _('Availability report');
 $page['file'] = 'report2.php';
 $page['hist_arg'] = array('config', 'groupid', 'hostid', 'tpl_triggerid');
 $page['scripts'] = array('class.calendar.js');
@@ -139,7 +139,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$available_hosts = $PAGE_HOSTS['hostids'];
 	}
 
-	$rep2_wdgt->addPageHeader(S_AVAILABILITY_REPORT_BIG);
+	$rep2_wdgt->addPageHeader(_('AVAILABILITY REPORT'));
 //	show_report2_header($config, $PAGE_GROUPS, $PAGE_HOSTS);
 
 	if(isset($_REQUEST['triggerid'])){
@@ -184,8 +184,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$r_form->setMethod('get');
 
 		$cmbConf = new CComboBox('config', $config, 'submit()');
-		$cmbConf->addItem(0, S_BY_HOST);
-		$cmbConf->addItem(1, S_BY_TRIGGER_TEMPLATE);
+		$cmbConf->addItem(0, _('By host'));
+		$cmbConf->addItem(1, _('By trigger template'));
 		$r_form->addItem($cmbConf);
 
 		$rep2_wdgt->addHeader(_('Report'), array(_('Mode').SPACE, $r_form));
@@ -231,9 +231,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$table->setHeader(array(
 			is_show_all_nodes() ? _('Node') : null,
 			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? S_HOST : NULL,
-			S_NAME,
+			_('Name'),
 			_('Problems'),
-			S_OK,
+			_('Ok'),
 			_('Unknown'),
 			_('Graph')
 		));
@@ -244,7 +244,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$true = new CSpan(sprintf('%.4f%%', $availability['true']), 'on');
 			$false = new CSpan(sprintf('%.4f%%', $availability['false']), 'off');
 			$unknown = new CSpan(sprintf('%.4f%%', $availability['unknown']), 'unknown');
-			$actions = new CLink(S_SHOW, 'report2.php?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $_REQUEST['hostid'] . '&triggerid=' . $trigger['triggerid']);
+			$actions = new CLink(_('Show'), 'report2.php?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $_REQUEST['hostid'] . '&triggerid=' . $trigger['triggerid']);
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['hostid']),

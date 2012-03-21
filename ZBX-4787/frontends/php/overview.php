@@ -99,7 +99,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 
 	$cmbType = new CComboBox('type', $_REQUEST['type'], 'submit()');
 	$cmbType->addItem(SHOW_TRIGGERS, S_TRIGGERS);
-	$cmbType->addItem(SHOW_DATA, S_DATA);
+	$cmbType->addItem(SHOW_DATA, _('Data'));
 	$form->addItem(array(SPACE._('Type').SPACE, $cmbType));
 
 	$help = new CHelp('web.view.php', 'right');
@@ -107,11 +107,11 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$help_table->setAttribute('style', 'width: 200px');
 
 	if($_REQUEST['type'] == SHOW_TRIGGERS){
-		$help_table->addRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
+		$help_table->addRow(array(new CCol(SPACE, 'normal'), _('Disabled')));
 	}
 
 	for($i=0; $i<TRIGGER_SEVERITY_COUNT; $i++){
-		$help_table->addRow(array(getSeverityCell($i), S_ENABLED));
+		$help_table->addRow(array(getSeverityCell($i), _('Enabled')));
 	}
 
 	$help_table->addRow(array(new CCol(SPACE, 'trigger_unknown'), _('Unknown')));
@@ -126,10 +126,10 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 			$help_table->addRow(array($col, _s("Age less than %s", convertUnitsS($config['blink_period']))));
 		}
 
-		$help_table->addRow(array(new CCol(SPACE), S_NO_TRIGGER));
+		$help_table->addRow(array(new CCol(SPACE), _('No trigger')));
 	}
 	else{
-		$help_table->addRow(array(new CCol(SPACE), S_DISABLED.' '.S_OR.' '.S_NO_TRIGGER));
+		$help_table->addRow(array(new CCol(SPACE), _('Disabled or no trigger')));
 	}
 
 	$help->setHint($help_table, '', '', true, false, true);
@@ -137,7 +137,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$over_wdgt = new CWidget();
 // Header
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$over_wdgt->addPageHeader(S_OVERVIEW_BIG, array($fs_icon, SPACE, $help));
+	$over_wdgt->addPageHeader(_('OVERVIEW'), array($fs_icon, SPACE, $help));
 
 // 2nd header
 	$form_l = new CForm('get');
@@ -147,7 +147,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$cmbStyle->addItem(STYLE_TOP,S_TOP);
 	$cmbStyle->addItem(STYLE_LEFT,_('Left'));
 
-	$form_l->additem(array(S_HOSTS_LOCATION.SPACE,$cmbStyle));
+	$form_l->additem(array(_('Hosts location'),$cmbStyle));
 
 	$over_wdgt->addHeader(_('Overview'), $form);
 	$over_wdgt->addHeader($form_l);
