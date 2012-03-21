@@ -116,7 +116,6 @@ ul.itservices { margin: 0 0 0 5px; }
 ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
-ul.formlist li.top-aligned { margin: -1px 0 0 0; padding-top: 0; }
 ul.formlist li .floatleft { padding-top: 2px; }
 
 /* any object list inline */
@@ -200,6 +199,18 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .objectgroup { padding: 4px; }
 .objectgroup.top { margin: 2px 0px; }
 .objectgroup.footer { margin-top: 2px; }
+
+/* host interfaces */
+.host-edit .interface-row { margin-top: -3px; }
+.host-edit .interface-row .formElementTable { table-layout: fixed; }
+.host-edit .interface-row .objectgroup { border-top-width: 0; padding-top: 4px; }
+.host-edit .interface-row-first { margin-top: 0; }
+.host-edit .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
+.host-edit .interface-row .interface-drag-control { width: 20px; }
+.host-edit .interface-row .interface-ip { width: 165px; }
+.host-edit .interface-row .interface-dns { width: 200px; }
+.host-edit .interface-row .interface-connect-to { width: 80px; white-space: nowrap; }
+.host-edit .interface-row .interface-port { width: 110px; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
 .border_none { border: 0; }

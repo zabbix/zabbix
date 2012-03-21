@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-$itemWidget = new CWidget('item-edit');
+$itemWidget = new CWidget();
 $itemWidget->addPageHeader($this->data['page_header']);
 
 // create form
