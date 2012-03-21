@@ -22,6 +22,31 @@
 
 class CTag extends CObject {
 
+	/**
+	 * Encodes the '<', '>', '"' and '&' symbols.
+	 */
+	const ENC_ALL = 1;
+
+	/**
+	 * Encodes all symbols in ENC_ALL except for '&'.
+	 */
+	const ENC_NOAMP = 2;
+
+	/**
+	 * The HTML encoding strategy to use for the contents of the tag.
+	 *
+	 * @var int
+	 */
+	protected $encStrategy = self::ENC_NOAMP;
+
+	/**
+	 * The HTML encoding strategy for the "value" attribute.
+	 *
+	 * @var int
+	 */
+	protected $valueEncStrategy = self::ENC_ALL;
+
+
 	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
 		parent::__construct();
 		$this->attributes = array();
@@ -60,7 +85,9 @@ class CTag extends CObject {
 	public function startToString() {
 		$res = $this->tag_start.'<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
-			$res .= ' '.$key.'="'.$this->sanitize($value).'"';
+			// a special encoding strategy should be used for the "value" attribute
+			$value = $this->encode($value, ($key == 'value') ? $this->valueEncStrategy : self::ENC_NOAMP);
+			$res .= ' '.$key.'="'.$value.'"';
 		}
 		$res .= ($this->paired === 'yes') ? '>' : ' />';
 
@@ -85,6 +112,15 @@ class CTag extends CObject {
 			$this->destroy();
 		}
 		return $res;
+	}
+
+	public function addItem($value) {
+		// the string contents of an HTML tag should be properly encoded
+		if (is_string($value)) {
+			$value = $this->encode($value, $this->getEncStrategy());
+		}
+
+		parent::addItem($value);
 	}
 
 	public function setName($value) {
@@ -204,6 +240,39 @@ class CTag extends CObject {
 
 	public function setTitle($value = 'title') {
 		$this->setAttribute('title', $value);
+	}
+
+	/**
+	 * Sanitizes a string according to the given strategy before outputting it to the browser.
+	 *
+	 * @param string $value
+	 * @param int $strategy
+	 *
+	 * @return string
+	 */
+	protected function encode($value, $strategy = self::ENC_NOAMP) {
+		if ($strategy == self::ENC_NOAMP) {
+			$value = str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $value);
+		}
+		else {
+			$value = CHtml::encode($value);
+		}
+
+		return $value;
+	}
+
+	/**
+	 * @param int $encStrategy
+	 */
+	public function setEncStrategy($encStrategy) {
+		$this->encStrategy = $encStrategy;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getEncStrategy() {
+		return $this->encStrategy;
 	}
 }
 ?>
