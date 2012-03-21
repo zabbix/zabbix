@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"01 February 2012"
-#define	ZABBIX_VERSION		"1.9.10"
+#define	ZABBIX_REVDATE		"13 March 2012"
+#define	ZABBIX_VERSION		"2.0.0rc2"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -149,6 +149,7 @@ const char	*zbx_result_string(int result);
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
 
+#define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
 
 typedef struct
@@ -256,13 +257,6 @@ typedef enum
 	ITEM_DATA_TYPE_BOOLEAN
 } zbx_item_data_type_t;
 const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type);
-
-/* HTTP test states */
-typedef enum
-{
-	HTTPTEST_STATE_IDLE = 0,
-	HTTPTEST_STATE_BUSY
-} zbx_httptest_state_type_t;
 
 /* service supported by discoverer */
 typedef enum
@@ -628,13 +622,11 @@ const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 #define	NODE_CONFIGLOG_OP_DELETE	2
 
 /* HTTP item types */
-typedef enum
-{
-	ZBX_HTTPITEM_TYPE_RSPCODE = 0,
-	ZBX_HTTPITEM_TYPE_TIME,
-	ZBX_HTTPITEM_TYPE_SPEED,
-	ZBX_HTTPITEM_TYPE_LASTSTEP
-} zbx_httpitem_type_t;
+#define ZBX_HTTPITEM_TYPE_RSPCODE	0
+#define ZBX_HTTPITEM_TYPE_TIME		1
+#define ZBX_HTTPITEM_TYPE_SPEED		2
+#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
+#define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
 /* user permissions */
 typedef enum
@@ -776,13 +768,12 @@ ZBX_TASK_EX;
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
-int	is_double_prefix(const char *str);
+int	is_double_suffix(const char *str);
 int	is_double(const char *c);
-int	is_uint_prefix(const char *c);
+int	is_uint_suffix(const char *c, unsigned int *value);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-#define ZBX_IS_UINT64_MAX_LEN	0xff
-#define is_uint64(src, value)	is_uint64_n(src, ZBX_IS_UINT64_MAX_LEN, value)
+#define is_uint64(src, value)	is_uint64_n(src, ZBX_MAX_UINT64_LEN, value)
 int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
 int	is_boolean(const char *str, zbx_uint64_t *value);
@@ -975,7 +966,6 @@ char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
 void	dos2unix(char *str);
-int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
 double	str2double(const char *str);
 

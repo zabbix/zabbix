@@ -24,14 +24,13 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/httptest.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Configuration of Web monitoring');
+$page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
-$page['hist_arg'] = array('groupid','hostid');
+$page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-//	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'applications' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 	'applicationid' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
@@ -42,7 +41,7 @@ $fields = array(
 	'httptestid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
 	'application' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Application')),
 	'name' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'delay' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, SEC_PER_DAY), 'isset({save})',
+	'delay' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 86400), 'isset({save})',
 		_('Update interval (in sec)')),
 	'status' =>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'isset({save})'),
 	'agent' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
@@ -56,9 +55,9 @@ $fields = array(
 		'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
 	'new_httpstep' =>	array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'move_up' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0,65534), null),
-	'move_down' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0,65534), null),
-	'sel_step' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65534), null),
+	'move_up' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0, 65534), null),
+	'move_down' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0, 65534), null),
+	'sel_step' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 65534), null),
 	'group_httptestid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'showdisabled' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
 	// actions
@@ -190,7 +189,7 @@ elseif (isset($_REQUEST['save'])) {
 			}
 		}
 
-		$webcheck = array(
+		$httpTest = array(
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
@@ -208,7 +207,7 @@ elseif (isset($_REQUEST['save'])) {
 				' AND a.hostid='.$_REQUEST['hostid']
 		);
 		if ($applicationid = DBfetch($db_app_result)) {
-			$webcheck['applicationid'] = $applicationid['applicationid'];
+			$httpTest['applicationid'] = $applicationid['applicationid'];
 		}
 		else {
 			$result = API::Application()->create(array(
@@ -219,32 +218,32 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception(_('Cannot add new application.').' [ '.$application.' ]');
 			}
 			else {
-				$webcheck['applicationid'] = reset($result['applicationids']);
+				$httpTest['applicationid'] = reset($result['applicationids']);
 			}
 		}
 
 		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE) {
-			$webcheck['http_user'] = htmlspecialchars($_REQUEST['http_user']);
-			$webcheck['http_password'] = htmlspecialchars($_REQUEST['http_password']);
+			$httpTest['http_user'] = htmlspecialchars($_REQUEST['http_user']);
+			$httpTest['http_password'] = htmlspecialchars($_REQUEST['http_password']);
 		}
 		else {
-			$webcheck['http_user'] = '';
-			$webcheck['http_password'] = '';
+			$httpTest['http_user'] = '';
+			$httpTest['http_password'] = '';
 		}
 
 		if (isset($_REQUEST['httptestid'])) {
-			$webcheck['webcheckid'] = $httptestid = $_REQUEST['httptestid'];
-			$result = API::WebCheck()->update($webcheck);
+			$httpTest['httptestid'] = $httptestid = $_REQUEST['httptestid'];
+			$result = API::WebCheck()->update($httpTest);
 			if (!$result) {
 				throw new Exception();
 			}
 		}
 		else {
-			$result = API::WebCheck()->create($webcheck);
+			$result = API::WebCheck()->create($httpTest);
 			if (!$result) {
 				throw new Exception();
 			}
-			$httptestid = reset($result['webcheckids']);
+			$httptestid = reset($result['httptestids']);
 		}
 
 		$host = get_host_by_hostid($_REQUEST['hostid']);
@@ -260,9 +259,6 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages(false, null, $message_false);
 	}
 }
-/*
- * Go buttons
- */
 elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_httptestid'])) {
 	$go_result = false;
 	$group_httptestid = $_REQUEST['group_httptestid'];
@@ -329,8 +325,7 @@ if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 	$path = $url->getPath();
 	insert_js('cookie.eraseArray("'.$path.'")');
 }
-?>
-<?php
+
 /*
  * Display
  */

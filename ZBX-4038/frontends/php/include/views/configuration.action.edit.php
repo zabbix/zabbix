@@ -78,7 +78,7 @@ $sortFields = array(
 	array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
 	array('field' => 'operator', 'order' => ZBX_SORT_DOWN)
 );
-ArraySorter::sort($data['conditions'], $sortFields);
+CArrayHelper::sort($data['conditions'], $sortFields);
 
 // group conditions by type
 $condElements = new CTable(_('No conditions defined.'), 'formElementTable');
@@ -99,7 +99,7 @@ foreach ($data['conditions'] as $id => $condition) {
 		continue;
 	}
 
-	$label = chr(ord('A') + $i);
+	$label = num2letter($i);
 	$condElements->addRow(array('('.$label.')', array(
 		new CCheckBox('g_conditionid[]', 'no', null, $i), SPACE,
 		get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))
@@ -410,10 +410,11 @@ foreach ($data['operations'] as $opid => $operation) {
 	}
 	$tblOper->addRow($operationRow);
 
-	$operation['opmessage_grp'] = zbx_toHash($operation['opmessage_grp'], 'usrgrpid');
-	$operation['opmessage_usr'] = zbx_toHash($operation['opmessage_usr'], 'userid');
-	$operation['opcommand_grp'] = zbx_toHash($operation['opcommand_grp'], 'groupid');
-	$operation['opcommand_hst'] = zbx_toHash($operation['opcommand_hst'], 'hostid');
+
+	$operation['opmessage_grp'] = isset($operation['opmessage_grp']) ? zbx_toHash($operation['opmessage_grp'], 'usrgrpid') : null;
+	$operation['opmessage_usr'] = isset($operation['opmessage_usr']) ? zbx_toHash($operation['opmessage_usr'], 'userid') : null;
+	$operation['opcommand_grp'] = isset($operation['opcommand_grp']) ? zbx_toHash($operation['opcommand_grp'], 'groupid') : null;
+	$operation['opcommand_hst'] = isset($operation['opcommand_hst']) ? zbx_toHash($operation['opcommand_hst'], 'hostid') : null;
 
 	$tblOper->addItem(new CVar('operations['.$opid.']', $operation));
 }
@@ -852,7 +853,7 @@ if (isset($_REQUEST['new_operation'])) {
 				continue;
 			}
 
-			$label = chr(ord('A') + $i);
+			$label = num2letter($i);
 			$cond_el->addRow(array('(' . $label . ')', array(
 				new CCheckBox('g_opconditionid[]', 'no', null, $i),
 				get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']))

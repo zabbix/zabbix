@@ -21,34 +21,33 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of trigger displaying options');
 $page['file'] = 'adm.triggerdisplayingoptions.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	'problem_unack_color' =>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'problem_ack_color' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'ok_unack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'ok_ack_color' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'problem_unack_style' =>	array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'problem_ack_style' =>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'ok_unack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
-	'ok_ack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	 null),
+	'problem_unack_style' =>	array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+	'problem_ack_style' =>		array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+	'ok_unack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
+	'ok_ack_style' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
 	'ok_period' =>				array(T_ZBX_INT, O_OPT,	null,	null,		'isset({save})'),
 	'blink_period' =>			array(T_ZBX_INT, O_OPT,	null,	null,		'isset({save})'),
-
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
+	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,		null)
 );
-?>
-<?php
 check_fields($fields);
 
-
+/*
+ * Actions
+ */
 if (isset($_REQUEST['save'])) {
 	$configs = array(
 		'ok_period' => get_request('ok_period'),
@@ -62,13 +61,14 @@ if (isset($_REQUEST['save'])) {
 		'ok_unack_style' => get_request('ok_unack_style', 0),
 		'ok_ack_style' => get_request('ok_ack_style', 0)
 	);
-
 	$result = update_config($configs);
 
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.triggerdisplayingoptions.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -87,9 +87,8 @@ $cmbConf->addItems(array(
 ));
 $form->addItem($cmbConf);
 
-
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF TRIGGER DISPLAYING OPTIONS'), $form);
 
 $data = array();
 $data['form_refresh'] = get_request('form_refresh', 0);

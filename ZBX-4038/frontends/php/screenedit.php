@@ -40,11 +40,11 @@ $fields = array(
 	'caption' =>		array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'resourceid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})'),
 	'templateid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
-	'width' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(ZBX_MIN, ZBX_MER), null, _('Width')),
-	'height' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(ZBX_MIN, ZBX_MER), null, _('Height')),
+	'width' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535), null, _('Width')),
+	'height' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535), null, _('Height')),
 	'colspan' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 100),	null, _('Column span')),
 	'rowspan' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 100),	null, _('Row span')),
-	'elements' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, ZBX_MER),	null, _('Show lines')),
+	'elements' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, 65535),	null, _('Show lines')),
 	'sort_triggers' =>	array(T_ZBX_INT, O_OPT, null,
 		IN(array(SCREEN_SORT_TRIGGERS_DATE_DESC, SCREEN_SORT_TRIGGERS_SEVERITY_DESC, SCREEN_SORT_TRIGGERS_HOST_NAME_ASC)), null),
 	'valign' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(VALIGN_MIDDLE, VALIGN_BOTTOM),	null),
@@ -73,7 +73,7 @@ $fields = array(
 	'ajaxAction' =>		array(T_ZBX_STR, O_OPT, P_ACT,		null,			null)
 );
 check_fields($fields);
-$_REQUEST['dynmic'] = get_request('dynamic', SCREEN_SIMPLE_ITEM);
+$_REQUEST['dynamic'] = get_request('dynamic', SCREEN_SIMPLE_ITEM);
 
 /*
  * Permissions
@@ -163,7 +163,7 @@ if (isset($_REQUEST['save'])) {
 		'valign' => get_request('valign'),
 		'colspan' => get_request('colspan'),
 		'rowspan' => get_request('rowspan'),
-		'dynmic' => get_request('dynmic'),
+		'dynamic' => get_request('dynamic'),
 		'elements' => get_request('elements', 0),
 		'sort_triggers' => get_request('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC)
 	);

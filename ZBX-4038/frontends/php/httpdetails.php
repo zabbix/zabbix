@@ -24,7 +24,7 @@
 	require_once dirname(__FILE__).'/include/httptest.inc.php';
 	require_once dirname(__FILE__).'/include/forms.inc.php';
 
-	$page['title'] = 'S_DETAILS_OF_SCENARIO';
+	$page['title'] = _('Details of scenario');
 	$page['file'] = 'httpdetails.php';
 	$page['hist_arg'] = array('httptestid');
 	$page['scripts'] = array('class.calendar.js','gtlc.js');
@@ -37,19 +37,18 @@
 ?>
 <?php
 
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'period'=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
-		'stime'=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-		'reset'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'httptestid'=>	array(T_ZBX_INT, O_MAND,	null,	DB_ID,		'isset({favobj})'),
-
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+//		VAR			TYPE		OPTIONAL	FLAGS		VALIDATION	EXCEPTION
+	$fields = array(
+		'period' =>	array(T_ZBX_INT,	O_OPT,		null,		null,		null),
+		'stime' =>	array(T_ZBX_STR,	O_OPT,		null,		null,		null),
+		'reset' =>	array(T_ZBX_STR,	O_OPT,		P_SYS|P_ACT,	null,		null),
+		'httptestid' =>	array(T_ZBX_INT,	O_MAND,		null,		DB_ID,		'isset({favobj})'),
+		'fullscreen' =>	array(T_ZBX_INT,	O_OPT,		P_SYS,		IN('0,1'),	null),
 //ajax
-		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
-		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
-		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		NULL),
+		'favobj' =>	array(T_ZBX_STR,	O_OPT,		P_ACT,		null,		null),
+		'favref' =>	array(T_ZBX_STR,	O_OPT,		P_ACT,  	NOT_EMPTY,	null),
+		'favid' =>	array(T_ZBX_INT,	O_OPT,		P_ACT,  	null,		null),
+		'favstate' =>	array(T_ZBX_INT,	O_OPT,		P_ACT,  	NOT_EMPTY,	null),
 	);
 
 	if(!check_fields($fields)) exit();
@@ -78,15 +77,35 @@
 	}
 ?>
 <?php
-
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
-	$sql = 'SELECT ht.* '.
-		' FROM httptest ht, applications a '.
-		' WHERE '.DBcondition('a.hostid', $available_hosts).
-			' AND a.applicationid=ht.applicationid '.
-			' AND ht.httptestid='.$_REQUEST['httptestid'];
-	if(!$httptest_data = DBfetch(DBselect($sql))){
+	$httptest_data = API::WebCheck()->get(array(
+		'httptestids' => $_REQUEST['httptestid'],
+		'output' => API_OUTPUT_EXTEND,
+		'preservekeys' => true
+	));
+	$httptest_data = reset($httptest_data);
+	if (!$httptest_data) {
 		access_deny();
+	}
+
+	$httptest_data['lastfailedstep'] = 0;
+	$httptest_data['error'] = '';
+
+	$result = DBselect(
+			'SELECT hti.httptestid,hti.type,i.lastvalue,i.lastclock'.
+			' FROM httptestitem hti,items i'.
+			' WHERE hti.itemid=i.itemid'.
+				' AND hti.type IN ('.HTTPSTEP_ITEM_TYPE_LASTSTEP.','.HTTPSTEP_ITEM_TYPE_LASTERROR.')'.
+				' AND i.lastclock IS NOT NULL'.
+				' AND hti.httptestid='.$httptest_data['httptestid']
+	);
+	while ($row = DBfetch($result)) {
+		if ($row['type'] == HTTPSTEP_ITEM_TYPE_LASTSTEP) {
+			$httptest_data['lastcheck'] = $row['lastclock'];
+			$httptest_data['lastfailedstep'] = $row['lastvalue'];
+		}
+		else {
+			$httptest_data['error'] = $row['lastvalue'];
+		}
 	}
 
 	navigation_bar_calc('web.httptest', $_REQUEST['httptestid'], true);
@@ -98,15 +117,20 @@
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$rst_icon = get_icon('reset', array('id' => $_REQUEST['httptestid']));
 
+	$lastcheck = null;
+	if (isset($httptest_data['lastcheck'])) {
+		$lastcheck = ' ['.zbx_date2str(_('d M Y H:i:s'), $httptest_data['lastcheck']).']';
+	}
+
 	$details_wdgt->addPageHeader(
-		array(S_DETAILS_OF_SCENARIO_BIG.SPACE, bold($httptest_data['name']),' ['.date(_('d M Y H:i:s'), $httptest_data['lastcheck']).']'),
+		array(_('DETAILS OF SCENARIO').SPACE, bold($httptest_data['name']), $lastcheck),
 		array($rst_icon, $fs_icon)
 	);
 //-------------
 
 // TABLE
-	$table = new CTableInfo();
-	$table->setHeader(array(S_STEP, S_SPEED, S_RESPONSE_TIME, S_RESPONSE_CODE, S_STATUS));
+	$table = new CTableInfo(_('No steps defined.'));
+	$table->setHeader(array(_('Step'), _('Speed'), _('Response time'), _('Response code'), _('Status')));
 
 	$sql = 'SELECT * FROM httpstep WHERE httptestid='.$httptest_data['httptestid'].' ORDER BY no';
 	$db_httpsteps = DBselect($sql);
@@ -122,36 +146,20 @@
 		$status['msg'] = _('OK');
 		$status['style'] = 'enabled';
 
-		if(HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
-			if($httptest_data['curstep'] == ($httpstep_data['no'])){
-				$status['msg'] = _('In progress');
-				$status['style'] = 'unknown';
-				$status['skip'] = true;
+		if (!isset($httptest_data['lastcheck'])) {
+			$status['msg'] = _('Never executed');
+			$status['style'] = 'unknown';
+		}
+		elseif ($httptest_data['lastfailedstep'] != 0) {
+			if ($httptest_data['lastfailedstep'] == $httpstep_data['no']) {
+				$status['msg'] = _s('Error: %1$s', $httptest_data['error']);
+				$status['style'] = 'disabled';
 			}
-			else if($httptest_data['curstep'] < ($httpstep_data['no'])){
+			elseif ($httptest_data['lastfailedstep'] < $httpstep_data['no']) {
 				$status['msg'] = _('Unknown');
 				$status['style'] = 'unknown';
 				$status['skip'] = true;
 			}
-		}
-		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] ){
-			if($httptest_data['lastfailedstep'] != 0){
-				if($httptest_data['lastfailedstep'] == ($httpstep_data['no'])){
-					$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
-					$status['style'] = 'disabled';
-					//$status['skip'] = true;
-				}
-				else if($httptest_data['lastfailedstep'] < ($httpstep_data['no'])){
-					$status['msg'] = _('Unknown');
-					$status['style'] = 'unknown';
-					$status['skip'] = true;
-				}
-			}
-		}
-		else{
-			$status['msg'] = _('Unknown');
-			$status['style'] = 'unknown';
-			$status['skip'] = true;
 		}
 
 		$itemids = array();
@@ -191,24 +199,21 @@
 		));
 	}
 
-	$status['msg'] = _('OK');
-	$status['style'] = 'enabled';
-
-	if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] ){
-		$status['msg'] = _('In progress');
+	if (!isset($httptest_data['lastcheck'])) {
+		$status['msg'] = _('Never executed');;
 		$status['style'] = 'unknown';
 	}
-	else if ( HTTPTEST_STATE_UNKNOWN == $httptest_data['curstate'] ){
-		$status['msg'] = _('Unknown');
-		$status['style'] = 'unknown';
-	}
-	else if($httptest_data['lastfailedstep'] > 0){
-		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
+	elseif ($httptest_data['lastfailedstep'] != 0) {
+		$status['msg'] = _s('Error: %1$s', $httptest_data['error']);
 		$status['style'] = 'disabled';
+	}
+	else {
+		$status['msg'] = _('OK');
+		$status['style'] = 'enabled';
 	}
 
 	$table->addRow(array(
-		bold(S_TOTAL_BIG),
+		bold(_('TOTAL')),
 		SPACE,
 		bold(format_lastvalue($totalTime)),
 		SPACE,
@@ -232,11 +237,11 @@
 
 	$graph_cont = new CCol();
 	$graph_cont->setAttribute('id', 'graph_1');
-	$graphTable->addRow(array(bold(S_SPEED), $graph_cont));
+	$graphTable->addRow(array(bold(_('Speed')), $graph_cont));
 
 	$graph_cont = new CCol();
 	$graph_cont->setAttribute('id', 'graph_2');
-	$graphTable->addRow(array(bold(S_RESPONSE_TIME), $graph_cont));
+	$graphTable->addRow(array(bold(_('Response time')), $graph_cont));
 
 	$graphsWidget->addItem($graphTable);
 

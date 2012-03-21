@@ -68,21 +68,21 @@ $fields = array(
 	'name' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'key' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Key')),
-	'delay' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, SEC_PER_DAY),
+	'delay' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 86400),
 		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.'&&{type}!='.ITEM_TYPE_SNMPTRAP.'))',
 		_('Update interval (in sec)')),
 	'new_delay_flex' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({add_delay_flex})&&(isset({type})&&({type}!=2))', _('New flexible interval')),
 	'delay_flex' =>		array(T_ZBX_STR, O_OPT, null,	'',			null),
-	'history' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, ZBX_MER), 'isset({save})',
+	'history' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})',
 		_('Keep history (in days)')),
-	'status' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, ZBX_MER), 'isset({save})'),
+	'status' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
 	'type' =>		array(T_ZBX_INT, O_OPT, null,
 		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 		ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 		ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED,
 		ITEM_TYPE_SNMPTRAP)), 'isset({save})'),
-	'trends' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, ZBX_MER),
+	'trends' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),
 		'isset({save})&&isset({value_type})&&'.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 		_('Keep trends (in days)')),
 	'value_type' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({save})'),
@@ -112,7 +112,7 @@ $fields = array(
 	'snmp_oid' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type'),
 		_('SNMP OID')),
-	'port' =>		array(T_ZBX_STR, O_OPT, null,	BETWEEN(ZBX_MIN_PORT, ZBX_MAX_PORT),
+	'port' =>		array(T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535),
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type'),
 		_('Port')),
 	'snmpv3_securitylevel' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
@@ -170,15 +170,15 @@ $fields = array(
 	'filter_snmp_community' =>	array(T_ZBX_STR, O_OPT, null,		null,				null),
 	'filter_snmpv3_securityname' => array(T_ZBX_STR, O_OPT, null,		null,				null),
 	'filter_snmp_oid' =>		array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'filter_port' =>		array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY,	BETWEEN(ZBX_MIN_PORT, ZBX_MAX_PORT),	null,
+	'filter_port' =>		array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY,	BETWEEN(0, 65535),	null,
 		_('Port')),
 	'filter_value_type' =>		array(T_ZBX_INT, O_OPT, null,		IN('-1,0,1,2,3,4'),		null),
 	'filter_data_type' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(-1, ITEM_DATA_TYPE_BOOLEAN), null),
-	'filter_delay' =>		array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY,	BETWEEN(0, SEC_PER_DAY),	null,
+	'filter_delay' =>		array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY,	BETWEEN(0, 86400),	null,
 		_('Update interval')),
-	'filter_history' =>		array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY,	BETWEEN(ZBX_MIN, ZBX_MER),		null,
+	'filter_history' =>		array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY,	BETWEEN(0, 65535),		null,
 		_('Keep history (in days)')),
-	'filter_trends' =>		array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY,	BETWEEN(ZBX_MIN, ZBX_MER),		null,
+	'filter_trends' =>		array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY,	BETWEEN(0, 65535),		null,
 		_('Keep trends (in days)')),
 	'filter_status' =>		array(T_ZBX_INT, O_OPT, null,		IN('-1,0,1,3'),			null),
 	'filter_templated_items' =>	array(T_ZBX_INT, O_OPT, null,		IN('-1,0,1'),			null),
@@ -243,8 +243,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit();
 }
 
-$hostid = get_request('hostid', 0);
-if (!empty($hostid)) {
+if (!empty($hosts)) {
 	$_REQUEST['filter_hostname'] = reset($hosts);
 	$_REQUEST['filter_hostname'] = $_REQUEST['filter_hostname']['name'];
 }

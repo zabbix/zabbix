@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		VAR			TYPE	 OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'itemid'=>	array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
-		'period'=>	array(T_ZBX_INT, O_OPT,		null,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
+		'period'=>	array(T_ZBX_INT, O_OPT,		null,	BETWEEN(_PERIOD, ZBX_MAX_PERIOD), null),
 		'from'=>	array(T_ZBX_INT, O_OPT,		null,	'{}>=0',	null),
 		'width'=>	array(T_ZBX_INT, O_OPT,		null,	'{}>0',		null),
 		'height'=>	array(T_ZBX_INT, O_OPT,		null,	'{}>0',		null),

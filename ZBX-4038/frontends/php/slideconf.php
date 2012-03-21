@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
 
-$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['title'] = _('Configuration of slide shows');
 $page['file'] = 'slideconf.php';
+$page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -37,7 +37,7 @@ $fields = array(
 	'shows' =>		array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null),
 	'slideshowid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'(isset({form})&&({form}=="update"))'),
 	'name' =>		array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({save})', _('Name')),
-	'delay' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, SEC_PER_DAY), 'isset({save})',
+	'delay' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, 86400), 'isset({save})',
 		_('Default delay (in seconds)')),
 	'slides' =>		array(null,	 O_OPT, null,		null,	null),
 	// actions

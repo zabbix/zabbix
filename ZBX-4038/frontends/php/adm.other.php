@@ -21,15 +21,16 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Other configuration parameters');
 $page['file'] = 'adm.other.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	// VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'refresh_unsupported'=>	array(T_ZBX_INT, O_NO,	null,		BETWEEN(ZBX_MIN, ZBX_MER),	'isset({save})',
+	'refresh_unsupported'=>	array(T_ZBX_INT, O_NO,	null,		BETWEEN(0, 65535),	'isset({save})',
 		_('Refresh unsupported items (in sec)')),
 	'alert_usrgrpid'=>	array(T_ZBX_INT, O_NO,	null,		DB_ID,				'isset({save})'),
 	'discovery_groupid'=>	array(T_ZBX_INT, O_NO,	null,		DB_ID,				'isset({save})'),
@@ -37,10 +38,11 @@ $fields = array(
 	'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,				null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,		null,				null)
 );
-?>
-<?php
 check_fields($fields);
 
+/*
+ * Actions
+ */
 if (isset($_REQUEST['save'])) {
 	$orig_config = select_config(false);
 
@@ -48,14 +50,14 @@ if (isset($_REQUEST['save'])) {
 		'refresh_unsupported' => get_request('refresh_unsupported'),
 		'alert_usrgrpid' => get_request('alert_usrgrpid'),
 		'discovery_groupid' => get_request('discovery_groupid'),
-		'snmptrap_logging' => (get_request('snmptrap_logging') ? 1 : 0),
+		'snmptrap_logging' => get_request('snmptrap_logging') ? 1 : 0
 	);
 	$result = update_config($configs);
 
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
 	if ($result) {
 		$msg = array();
-		$msg[] = _s('Refresh unsupported items (in sec) [%1$s]', get_request('refresh_unsupported'));
+		$msg[] = _s('Refresh unsupported items (in sec) "%1$s".', get_request('refresh_unsupported'));
 		if (!is_null($val = get_request('discovery_groupid'))) {
 			$val = API::HostGroup()->get(array(
 				'groupids' => $val,
@@ -65,7 +67,7 @@ if (isset($_REQUEST['save'])) {
 
 			if (!empty($val)) {
 				$val = array_pop($val);
-				$msg[] = _('Group for discovered hosts').' ['.$val['name'].']';
+				$msg[] = _('Group for discovered hosts.').' ['.$val['name'].']';
 
 				if (bccomp($val['groupid'], $orig_config['discovery_groupid']) != 0) {
 					setHostGroupInternal($orig_config['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
@@ -78,18 +80,20 @@ if (isset($_REQUEST['save'])) {
 				$val = _('None');
 			}
 			else {
-				$val = DBfetch(DBselect('SELECT name FROM usrgrp WHERE usrgrpid='.$val));
+				$val = DBfetch(DBselect('SELECT u.name FROM usrgrp u WHERE u.usrgrpid='.$val));
 				$val = $val['name'];
 			}
 
-			$msg[] = _('User group for database down message').' ['.$val.']';
+			$msg[] = _('User group for database down message.').' ['.$val.']';
 		}
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
 	}
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.other.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -103,14 +107,13 @@ $cmbConf->addItems(array(
 	'adm.valuemapping.php' => _('Value mapping'),
 	'adm.workingtime.php' => _('Working time'),
 	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayingoptions.php' => _('Trigger displaying options'),
+	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 	'adm.other.php' => _('Other')
 ));
 $form->addItem($cmbConf);
 
-
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->addPageHeader(_('OTHER CONFIGURATION PARAMETERS'), $form);
 
 $data = array();
 $data['form_refresh'] = get_request('form_refresh', 0);
@@ -130,7 +133,7 @@ $data['discovery_groups'] = API::HostGroup()->get(array(
 	'editable' => true,
 	'output' => API_OUTPUT_EXTEND
 ));
-$data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT usrgrpid, name FROM usrgrp WHERE '.DBin_node('usrgrpid').' ORDER BY name'));
+$data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT u.usrgrpid,u.name FROM usrgrp u WHERE '.DBin_node('u.usrgrpid').' ORDER BY u.name'));
 
 $otherForm = new CView('administration.general.other.edit', $data);
 $cnf_wdgt->addItem($otherForm->render());

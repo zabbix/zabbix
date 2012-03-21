@@ -613,7 +613,7 @@ function validatePortNumberOrMacro($port) {
 }
 
 function validatePortNumber($port) {
-	return validateNumber($port, ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER);
+	return validateNumber($port, _PORT_NUMBER, ZBX_MAX_PORT_NUMBER);
 }
 
 function validateNumber($value, $min = null, $max = null) {

@@ -248,7 +248,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$dashList->addRow(S_PROBLEM_DISPLAY, $cb);
 //-----
 
-	$divTabs->addTab('dashFilterTab', S_FILTER, $dashList);
+	$divTabs->addTab('dashFilterTab', _('Filter'), $dashList);
 
 	$dashForm->addItem($divTabs);
 

@@ -165,17 +165,14 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$trigg_wdgt = new CWidget();
 
 	$r_form = new CForm('get');
-	$r_form->addItem(array(S_GROUP . SPACE, $pageFilter->getGroupsCB(true)));
+	$r_form->addItem(array(_('Group') . SPACE, $pageFilter->getGroupsCB(true)));
 	$r_form->addItem(array(SPACE . S_HOST . SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG . ' [' . date(_('d M Y H:i:s')) . ']', array($fs_icon));
-
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
-	$trigg_wdgt->addHeader(_('TRIGGERS'), $r_form);
-	$trigg_wdgt->addHeader($numrows);
+	$trigg_wdgt->addPageHeader(_('STATUS OF TRIGGERS').SPACE.'['.date(_('d M Y H:i:s')).']', $fs_icon);
+	$trigg_wdgt->addHeader(_('Triggers'), $r_form);
+	$trigg_wdgt->addHeaderRowNumber();
 
 /************************* FILTER **************************/
 /***********************************************************/
@@ -242,8 +239,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$filterForm->addRow(S_FILTER_BY_NAME, new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
 
-	$filterForm->addItemToBottomRow(new CSubmit('filter_set', S_FILTER));
-	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', S_RESET));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
 	$trigg_wdgt->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 /*************** FILTER END ******************/
@@ -261,7 +258,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No triggers defined.'));
 	$switcherName = 'trigger_switchers';
 
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
@@ -280,12 +277,12 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$config['event_ack_enable'] ? $header_cb : null,
 		make_sorting_header(_('Severity'), 'priority'),
 		_('Status'),
-		S_INFO,
+		_('Info'),
 		make_sorting_header(_('Last change'), 'lastchange'),
-		S_AGE,
+		_('Age'),
 		$show_event_col ? _('Duration') : null,
 		$config['event_ack_enable'] ? _('Acknowledged') : null,
-		is_show_all_nodes() ? S_NODE : null,
+		is_show_all_nodes() ? _('Node') : null,
 		S_HOST,
 		make_sorting_header(S_NAME, 'description'),
 		_('Comments')
@@ -428,7 +425,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
 			array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
 		);
-		ArraySorter::sort($events, $sortFields);
+		CArrayHelper::sort($events, $sortFields);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
@@ -724,10 +721,10 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$footer = null;
 	if($config['event_ack_enable']){
 		$goBox = new CComboBox('go');
-		$goBox->addItem('bulkacknowledge', S_BULK_ACKNOWLEDGE);
+		$goBox->addItem('bulkacknowledge', _('Bulk acknowledge'));
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton', S_GO.' (0)');
+		$goButton = new CSubmit('goButton', _('Go'));
 		$goButton->setAttribute('id', 'goButton');
 
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');

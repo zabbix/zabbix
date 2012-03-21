@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-define('ZABBIX_VERSION',		'1.9.10');
+define('ZABBIX_VERSION',		'2.0.0rc2');
 define('ZABBIX_API_VERSION',	'1.4');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -60,10 +60,10 @@ define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT', 	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER', 	1);
 
-define('ZBX_FLAG_DISCOVERY_NORMAL', 	0x0);
-define('ZBX_FLAG_DISCOVERY', 			0x1);
-define('ZBX_FLAG_DISCOVERY_CHILD', 		0x2);
-define('ZBX_FLAG_DISCOVERY_CREATED', 	0x4);
+define('ZBX_FLAG_DISCOVERY_NORMAL', 	0x0);   // a normal item
+define('ZBX_FLAG_DISCOVERY', 			0x1);   // a low level discovery rule
+define('ZBX_FLAG_DISCOVERY_CHILD', 		0x2);   // an item prototype
+define('ZBX_FLAG_DISCOVERY_CREATED', 	0x4);   // an item created via a discovery rule
 
 define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
@@ -613,14 +613,11 @@ define('HTTPTEST_AUTH_NTLM',	2);
 define('HTTPTEST_STATUS_ACTIVE',	0);
 define('HTTPTEST_STATUS_DISABLED',	1);
 
-define('HTTPTEST_STATE_IDLE',	0);
-define('HTTPTEST_STATE_BUSY',	1);
-define('HTTPTEST_STATE_UNKNOWN',3);
-
 define('HTTPSTEP_ITEM_TYPE_RSPCODE',	0);
 define('HTTPSTEP_ITEM_TYPE_TIME',		1);
 define('HTTPSTEP_ITEM_TYPE_IN',			2);
 define('HTTPSTEP_ITEM_TYPE_LASTSTEP',	3);
+define('HTTPSTEP_ITEM_TYPE_LASTERROR',	4);
 
 define('EVENT_ACK_DISABLED',	'0');
 define('EVENT_ACK_ENABLED',		'1');
@@ -860,13 +857,6 @@ define('NOT_ZERO', "({}!=0)&&");
 define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
-define('ZBX_MIN_PORT', 0);	// minimal port number
-define('ZBX_MAX_PORT', 65535);	// maximal port number
-define('ZBX_MIN', 0);		// minimal number
-define('ZBX_MER', 65535);	// Mersenne number
-define('ZBX_MAX', 999999);	// maximal number
-define('ZBX_MIN_WIDTH', 50);	// graph min width
-define('ZBX_MIN_HEIGHT', 50);	// graph min width
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

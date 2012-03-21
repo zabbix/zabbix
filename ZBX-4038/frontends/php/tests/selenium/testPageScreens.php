@@ -82,9 +82,9 @@ class testPageScreens extends CWebTest {
 		$this->href_click("?form=update&screenid=$screenid&sid=");
 		$this->wait();
 
-		$this->assertTitle('Configuration of screens');
+		$this->ok('CONFIGURATION OF SCREENS');
 		$this->ok($name);
-		$this->ok('Screens');
+		$this->ok('Screen');
 		$this->ok('Name');
 		$this->ok('Columns');
 		$this->ok('Rows');

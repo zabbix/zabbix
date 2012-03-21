@@ -288,7 +288,7 @@
 		if($row){
 			return	$row;
 		}
-		error(S_NO_GRAPH_WITH." graphid=[$graphid]");
+		error(_('No graph item with')." graphid=[$graphid]");
 		return	false;
 	}
 
@@ -352,6 +352,19 @@ function copy_graph_to_host($graphid, $hostid) {
 		return false;
 	}
 
+	// retrieve actual ymax_itemid and ymin_itemid
+	if ($graph['ymax_itemid']) {
+		if ($itemid = get_same_item_for_host($graph['ymax_itemid'], $hostid)) {
+			$graph['ymax_itemid'] = $itemid;
+		};
+	}
+
+	if ($graph['ymin_itemid']) {
+		if ($itemid = get_same_item_for_host($graph['ymin_itemid'], $hostid)) {
+			$graph['ymin_itemid'] = $itemid;
+		}
+	}
+
 	$graph['gitems'] = $new_gitems;
 	$result = API::Graph()->create($graph);
 
@@ -361,7 +374,7 @@ function copy_graph_to_host($graphid, $hostid) {
 function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	if (!is_null($idx)) {
 		if ($update) {
-			if (isset($_REQUEST['period']) && $_REQUEST['period'] >= ZBX_MIN_PERIOD) {
+			if (isset($_REQUEST['period']) && $_REQUEST['period'] >= _PERIOD) {
 				CProfile::update($idx.'.period', $_REQUEST['period'], PROFILE_TYPE_INT, $idx2);
 			}
 			if (isset($_REQUEST['stime'])) {
@@ -374,12 +387,12 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	$_REQUEST['period'] = get_request('period', ZBX_PERIOD_DEFAULT);
 	$_REQUEST['stime'] = get_request('stime', null);
 
-	if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
+	if ($_REQUEST['period'] < _PERIOD) {
 		show_message(_n('Warning. Minimum time period to display is %1$s hour.',
 			'Warning. Minimum time period to display is %1$s hours.',
-			(int) ZBX_MIN_PERIOD / SEC_PER_HOUR
+			(int) _PERIOD / SEC_PER_HOUR
 		));
-		$_REQUEST['period'] = ZBX_MIN_PERIOD;
+		$_REQUEST['period'] = _PERIOD;
 	}
 	elseif ($_REQUEST['period'] > ZBX_MAX_PERIOD) {
 		show_message(_n('Warning. Maximum time period to display is %1$s day.',

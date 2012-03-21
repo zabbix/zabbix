@@ -353,7 +353,6 @@ class CItemPrototype extends CItemGeneral{
 			}
 		}
 
-COpt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -499,7 +498,6 @@ COpt::memoryPick();
 			}
 		}
 
-COpt::memoryPick();
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
@@ -528,10 +526,20 @@ COpt::memoryPick();
 		return !empty($objs);
 	}
 
-	protected function checkInput(array &$items, $update=false) {
-		foreach ($items as $inum => $item) {
-			$items[$inum]['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+	/**
+	 * Check item prototype data and set flags field.
+	 *
+	 * @param array $items passed by reference
+	 * @param bool  $update
+	 *
+	 * @return void
+	 */
+	protected function checkInput(array &$items, $update = false) {
+		// add the values that cannot be changed, but are required for further processing
+		foreach ($items as &$item) {
+			$item['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 		}
+		unset($item);
 
 		parent::checkInput($items, $update);
 	}
@@ -544,31 +552,14 @@ COpt::memoryPick();
  */
 	public function create($items) {
 		$items = zbx_toArray($items);
+		$this->checkInput($items);
+		$this->createReal($items);
+		$this->inherit($items);
 
-			$this->checkInput($items);
-
-			$this->createReal($items);
-
-			$this->inherit($items);
-
-			return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
 	protected function createReal(&$items) {
-		foreach ($items as $key => $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => 1
-			));
-			foreach ($itemsExists as $inum => $itemExists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item ['.$item['key_'].'] already exists');
-			}
-		}
-
 		$itemids = DB::insert('items', $items);
 
 		$itemApplications = $insertItemDiscovery = array();
@@ -616,20 +607,6 @@ COpt::memoryPick();
 
 		$data = array();
 		foreach ($items as $inum => $item) {
-			$itemsExists = API::Item()->get(array(
-				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array(
-					'hostid' => $item['hostid'],
-					'key_' => $item['key_']
-				),
-				'nopermissions' => 1
-			));
-			foreach ($itemsExists as $inum => $itemExists) {
-				if (bccomp($itemExists['itemid'], $item['itemid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, 'Host with item [ '.$item['key_'].' ] already exists');
-				}
-			}
-
 			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
 		}
 
@@ -683,12 +660,11 @@ COpt::memoryPick();
  */
 	public function update($items) {
 		$items = zbx_toArray($items);
+		$this->checkInput($items, true);
+		$this->updateReal($items);
+		$this->inherit($items);
 
-			$this->checkInput($items, true);
-			$this->updateReal($items);
-			$this->inherit($items);
-
-			return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return array('itemids' => zbx_objectValues($items, 'itemid'));
 	}
 
 /**
@@ -839,7 +815,7 @@ COpt::memoryPick();
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$selectFields = array('flags');
+		$selectFields = array();
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;

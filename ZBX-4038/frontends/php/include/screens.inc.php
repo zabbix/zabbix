@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-?>
-<?php
+
 require_once dirname(__FILE__).'/events.inc.php';
 require_once dirname(__FILE__).'/actions.inc.php';
 require_once dirname(__FILE__).'/js.inc.php';
@@ -425,7 +424,7 @@ function templated_screen($screenid) {
 // editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
 function get_screen($screen, $editmode, $effectiveperiod = null) {
 	if (is_null($effectiveperiod)) {
-		$effectiveperiod = ZBX_MIN_PERIOD;
+		$effectiveperiod = _PERIOD;
 	}
 
 	if (!$screen) {
@@ -1259,7 +1258,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 					$options['value'] = array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
 				}
 
-				$item = new CTableInfo(_('No events found.'));
+				$item = new CTableInfo(_('No events defined.'));
 				$item->setHeader(array(
 					_('Time'),
 					is_show_all_nodes() ? _('Node') : null,
@@ -1296,8 +1295,6 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 						getSeverityCell($trigger['priority'])
 					));
 				}
-
-				zbx_add_post_js('jqBlink.init();');
 
 				$item = array($item);
 				if ($editmode == 1) {
@@ -1390,119 +1387,3 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 
 	return $table;
 }
-
-function separateScreenElements($screen) {
-	$elements = array(
-		'sysmaps' => array(),
-		'screens' => array(),
-		'hostgroups' => array(),
-		'hosts' => array(),
-		'graphs' => array(),
-		'items' => array()
-	);
-
-	foreach ($screen['screenitems'] as $screenItem) {
-		if ($screenItem['resourceid'] == 0) {
-			continue;
-		}
-		switch ($screenItem['resourcetype']) {
-			case SCREEN_RESOURCE_HOSTS_INFO:
-			case SCREEN_RESOURCE_TRIGGERS_INFO:
-			case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-			case SCREEN_RESOURCE_DATA_OVERVIEW:
-			case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-				$elements['hostgroups'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_HOST_TRIGGERS:
-				$elements['hosts'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_GRAPH:
-				$elements['graphs'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_SIMPLE_GRAPH:
-			case SCREEN_RESOURCE_PLAIN_TEXT:
-				$elements['items'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_MAP:
-				$elements['sysmaps'][] = $screenItem['resourceid'];
-				break;
-			case SCREEN_RESOURCE_SCREEN:
-				$elements['screens'][] = $screenItem['resourceid'];
-				break;
-		}
-	}
-	return $elements;
-}
-
-function prepareScreenExport(&$exportScreens) {
-	$screens = array();
-	$sysmaps = array();
-	$hostgroups = array();
-	$hosts = array();
-	$graphs = array();
-	$items = array();
-
-	foreach ($exportScreens as $screen) {
-		$screenItems = separateScreenElements($screen);
-
-		$screens = array_merge($screens, zbx_objectValues($screenItems['screens'], 'resourceid'));
-		$sysmaps = array_merge($sysmaps, zbx_objectValues($screenItems['sysmaps'], 'resourceid'));
-		$hostgroups = array_merge($hostgroups, zbx_objectValues($screenItems['hostgroups'], 'resourceid'));
-		$hosts = array_merge($hosts, zbx_objectValues($screenItems['hosts'], 'resourceid'));
-		$graphs = array_merge($graphs, zbx_objectValues($screenItems['graphs'], 'resourceid'));
-		$items = array_merge($items, zbx_objectValues($screenItems['items'], 'resourceid'));
-	}
-
-	$screens = screenIdents($screens);
-	$sysmaps = sysmapIdents($sysmaps);
-	$hostgroups = hostgroupIdents($hostgroups);
-	$hosts = hostIdents($hosts);
-	$graphs = graphIdents($graphs);
-	$items = itemIdents($items);
-
-	try {
-		foreach ($exportScreens as &$screen) {
-			unset($screen['screenid'], $screen['hostid']);
-
-			foreach ($screen['screenitems'] as &$screenItem) {
-				unset($screenItem['screenid'], $screenItem['screenitemid'], $screenItem['dynamic']);
-
-				if ($screenItem['resourceid'] == 0) {
-					continue;
-				}
-
-				switch ($screenItem['resourcetype']) {
-					case SCREEN_RESOURCE_HOSTS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_INFO:
-					case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-					case SCREEN_RESOURCE_DATA_OVERVIEW:
-					case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-						$screenItem['resourceid'] = $hostgroups[$screenItem['resourceid']];
-						break;
-					case SCREEN_RESOURCE_HOST_TRIGGERS:
-						$screenItem['resourceid'] = $hosts[$screenItem['resourceid']];
-						break;
-					case SCREEN_RESOURCE_GRAPH:
-						$screenItem['resourceid'] = $graphs[$screenItem['resourceid']];
-						break;
-					case SCREEN_RESOURCE_SIMPLE_GRAPH:
-					case SCREEN_RESOURCE_PLAIN_TEXT:
-						$screenItem['resourceid'] = $items[$screenItem['resourceid']];
-						break;
-					case SCREEN_RESOURCE_MAP:
-						$screenItem['resourceid'] = $sysmaps[$screenItem['resourceid']];
-						break;
-					case SCREEN_RESOURCE_SCREEN:
-						$screenItem['resourceid'] = $screens[$screenItem['resourceid']];
-						break;
-				}
-			}
-			unset($screenItem);
-		}
-		unset($screen);
-	}
-	catch (Exception $e) {
-		throw new exception($e->getMessage());
-	}
-}
-?>

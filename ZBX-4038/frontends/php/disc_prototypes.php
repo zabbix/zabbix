@@ -24,14 +24,13 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Configuration of items');
+$page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
 $page['scripts'] = array('effects.js', 'class.cviewswitcher.js');
 $page['hist_arg'] = array('parent_discoveryid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 
 //	VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -43,7 +42,7 @@ $fields = array(
 	'name' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Name')),
 	'description' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'key' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})', _('Key')),
-	'delay' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
+	'delay' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 86400),
 		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.'&&{type}!='.ITEM_TYPE_SNMPTRAP.'))',
 		_('Update interval (in sec)')),
 	'new_delay_flex' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -79,7 +78,7 @@ $fields = array(
 	'snmp_oid' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type'),
 		_('SNMP OID')),
-	'port' =>		array(T_ZBX_STR, O_OPT, null,	BETWEEN(ZBX_MIN_PORT, ZBX_MAX_PORT),
+	'port' =>		array(T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535),
 		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type'),
 		_('Port')),
 	'snmpv3_securitylevel' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
@@ -96,10 +95,10 @@ $fields = array(
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_IPMI.'))', _('IPMI sensor')),
 	'trapper_hosts' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})&&isset({type})&&({type}==2)'),
 	'units' =>		array(T_ZBX_STR, O_OPT, null,	null,
-		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type').'(isset({data_type})&&({data_type}!='.ITEM_DATA_TYPE_BOOLEAN.'))'),
 	'multiplier' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'delta' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
-		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type')),
+		'isset({save})&&isset({value_type})&&'.IN('0,3','value_type').'(isset({data_type})&&({data_type}!='.ITEM_DATA_TYPE_BOOLEAN.'))'),
 	'formula' =>		array(T_ZBX_DBL, O_OPT, null,	NOT_ZERO,
 		'isset({save})&&isset({multiplier})&&({multiplier}==1)&&'.IN('0,3','value_type'), _('Custom multiplier')),
 	'logtimefmt' =>		array(T_ZBX_STR, O_OPT, null,	null,
@@ -107,9 +106,9 @@ $fields = array(
 	'group_itemid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'new_application' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'applications' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'history' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, ZBX_MER), 'isset({save})',
+	'history' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 65535), 'isset({save})',
 		_('Keep history (in days)')),
-	'trends' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN, ZBX_MER),
+	'trends' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 65535),
 		'isset({save})&&isset({value_type})&&'.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 		_('Keep history (in days)')),
 	'add_delay_flex' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),

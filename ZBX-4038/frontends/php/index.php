@@ -19,9 +19,10 @@
 **/
 ?>
 <?php
-define('ZBX_PAGE_NO_AUTHORIZATION', 1);
-define('ZBX_NOT_ALLOW_ALL_NODES', 1);
-define('ZBX_HIDE_NODE_SELECTION', 1);
+define('ZBX_PAGE_NO_AUTHORIZATION', true);
+define('ZBX_NOT_ALLOW_ALL_NODES', true);
+define('ZBX_HIDE_NODE_SELECTION', true);
+define('ZBX_PAGE_NO_MENU', true);
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
@@ -29,7 +30,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('ZABBIX');
 $page['file'] = 'index.php';
 
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'name' =>	array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,	'isset({enter})', _('Username')),
 	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({enter})'),
@@ -40,8 +41,7 @@ $fields = array(
 	'request' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
 );
 check_fields($fields);
-?>
-<?php
+
 $sessionid = get_cookie('zbx_sessionid');
 
 if (isset($_REQUEST['reconnect']) && isset($sessionid)) {
@@ -58,7 +58,7 @@ if (isset($_REQUEST['reconnect']) && isset($sessionid)) {
 $config = select_config();
 
 if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
-	if (isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])) {
+	if (!empty($_SERVER['PHP_AUTH_USER'])) {
 		$_REQUEST['enter'] = _('Sign in');
 		$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 		$_REQUEST['password'] = 'zabbix';
@@ -68,13 +68,10 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 	}
 }
 
+// login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
-	$name = get_request('name', '');
-	$passwd = get_request('password', '');
-	$login = CWebUser::login($name, $passwd);
-
-	if ($login) {
-		// save remember login preferance
+	if (CWebUser::login(get_request('name'), get_request('password'))) {
+		// save remember login preference
 		$user = array('autologin' => get_request('autologin', 0));
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
 			$result = API::User()->updateProfile($user);
@@ -90,12 +87,12 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		exit();
 	}
 }
-
-if ($sessionid) {
+// login via session data
+elseif ($sessionid) {
 	CWebUser::checkAuthentication($sessionid);
 }
 
-if (CWebUser::$data['alias'] == ZBX_GUEST_USER) {
+if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	switch ($config['authentication_type']) {
 		case ZBX_AUTH_HTTP:
 			break;

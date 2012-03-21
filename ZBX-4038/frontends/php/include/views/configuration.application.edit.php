@@ -22,6 +22,11 @@
 $applicationWidget = new CWidget();
 $applicationWidget->addPageHeader(_('CONFIGURATION OF APPLICATIONS'));
 
+// append host summary to widget header
+if (!empty($this->data['hostid'])) {
+	$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
+}
+
 // create form
 $applicationForm = new CForm();
 $applicationForm->setName('applicationForm');

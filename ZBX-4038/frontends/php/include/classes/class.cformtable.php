@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CFormTable extends CForm {
+
 	private $align;
 	private $help;
 	private $title;
@@ -33,7 +35,6 @@ class CFormTable extends CForm {
 		parent::__construct($method, $action, $enctype);
 
 		$this->setTitle($title);
-		$this->setHelp();
 
 		$form_variable = is_null($form_variable) ? 'form' : $form_variable;
 		$this->addVar($form_variable, get_request($form_variable, 1));

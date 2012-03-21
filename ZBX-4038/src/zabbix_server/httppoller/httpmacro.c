@@ -18,11 +18,52 @@
 **/
 
 #include "common.h"
-
 #include "db.h"
 #include "log.h"
 
 #include "httpmacro.h"
+
+static int	http_get_macro_value(const char *macros, const char *macro, char **replace_to, size_t *replace_to_alloc)
+{
+	size_t		sz_macro, replace_to_offset = 0;
+	const char	*pm, *pv, *p;
+	int		res = FAIL;
+
+	sz_macro = strlen(macro);
+
+	for (pm = macros; NULL != (pm = strstr(pm, macro)); pm += sz_macro)
+	{
+		if (pm != macros && '\r' != *(pm - 1) && '\n' != *(pm - 1))
+			continue;
+
+		pv = pm + sz_macro;
+
+		/* skip white spaces */
+		while (' ' == *pv || '\t' == *pv)
+			pv++;
+
+		if ('=' != *pv++)
+			continue;
+
+		/* skip white spaces */
+		while (' ' == *pv || '\t' == *pv)
+			pv++;
+
+		for (p = pv; '\0' != *p && '\r' != *p && '\n' != *p; p++)
+			;
+
+		/* trim white spaces */
+		while (p > pv && (' ' == *(p - 1) || '\t' == *(p - 1)))
+			p--;
+
+		zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pv, p - pv);
+
+		res = SUCCEED;
+		break;
+	}
+
+	return res;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -30,101 +71,52 @@
  *                                                                            *
  * Purpose: substitute macros in input string by value from http test config  *
  *                                                                            *
- * Parameters: httptest - http test data, data - string to substitute macros  *
- *                                                                            *
- * Return value: -                                                            *
+ * Parameters: macros - [IN]     macros from httptest                         *
+ *             data   - [IN\OUT] string to substitute macros                  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-void	http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
+void	http_substitute_macros(const char *macros, char **data)
 {
-	char
-		*pl = NULL,
-		*pr = NULL,
-		str_out[MAX_STRING_LEN],
-		replace_to[MAX_STRING_LEN],
-		*c,*c2, save,*replacement,save2;
-	int
-		outlen,
-		var_len;
+	const char	*__function_name = "http_substitute_macros";
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In http_substitute_macros(httptestid:" ZBX_FS_UI64 ", data:%s)",
-		httptest->httptestid,
-		data);
+	char		c, *replace_to = NULL;
+	size_t		l, r, replace_to_alloc = 64;
+	int		rc;
 
-	assert(data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
-	*str_out = '\0';
-	outlen = sizeof(str_out) - 1;
-	pl = data;
-	while((pr = strchr(pl, '{')) && outlen > 0)
+	for (l = 0; '\0' != (*data)[l]; l++)
 	{
-		pr[0] = '\0';
-		zbx_strlcat(str_out, pl, outlen);
-		outlen -= MIN(strlen(pl), outlen);
-		pr[0] = '{';
+		if ('{' != (*data)[l])
+			continue;
 
-		zbx_snprintf(replace_to, sizeof(replace_to), "{");
-		var_len = 1;
+		for (r = l + 1; '\0' != (*data)[r] && '}' != (*data)[r]; r++)
+			;
 
+		if ('}' != (*data)[r])
+			break;
 
-		if(NULL!=(c=strchr(pr,'}')))
-		{
-			/* Macro in pr */
-			save = c[1]; c[1]=0;
+		if (NULL == replace_to)
+			replace_to = zbx_malloc(replace_to, replace_to_alloc);
 
-			if(NULL != (c2 = strstr(httptest->macros,pr)))
-			{
-				if(NULL != (replacement = strchr(c2,'=')))
-				{
-					replacement++;
-					if(NULL != (c2 = strchr(replacement,'\r')))
-					{
-						save2 = c2[0]; c2[0]=0;
-						var_len = strlen(pr);
-						zbx_snprintf(replace_to, sizeof(replace_to), "%s", replacement);
-						c2[0] = save2;
-					}
-					else
-					{
-						var_len = strlen(pr);
-						zbx_snprintf(replace_to, sizeof(replace_to), "%s", replacement);
-					}
-				}
+		c = (*data)[r + 1];
+		(*data)[r + 1] = '\0';
 
-			}
-/*			result = DBselect("select value from httpmacro where macro='%s' and httptestid=" ZBX_FS_UI64,
-				pr, httptest->httptestid);
-			row = DBfetch(result);
-			if(row)
-			{
-				var_len = strlen(pr);
-				zbx_snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
-			}
-			DBfree_result(result);*/
-			/* Restore pr */
-			c[1]=save;
-		}
+		rc = http_get_macro_value(macros, &(*data)[l], &replace_to, &replace_to_alloc);
 
-/*		if(strncmp(pr, "TRIGGER.NAME", strlen("TRIGGER.NAME")) == 0)
-		{
-			var_len = strlen("TRIGGER.NAME");
+		(*data)[r + 1] = c;
 
-			zbx_snprintf(replace_to, sizeof(replace_to), "%s", event->trigger_description);
-			substitute_simple_macros(event, action, replace_to, sizeof(replace_to), MACRO_TYPE_TRIGGER_DESCRIPTION);
-		}*/
-		zbx_strlcat(str_out, replace_to, outlen);
-		outlen -= MIN(strlen(replace_to), outlen);
-		pl = pr + var_len;
+		if (SUCCEED != rc)
+			continue;
+
+		zbx_replace_string(data, l, &r, replace_to);
+
+		l = r;
 	}
-	zbx_strlcat(str_out, pl, outlen);
-	outlen -= MIN(strlen(pl), outlen);
 
-	zbx_snprintf(data, data_max_len, "%s", str_out);
+	zbx_free(replace_to);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]",
-		data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __function_name, *data);
 }

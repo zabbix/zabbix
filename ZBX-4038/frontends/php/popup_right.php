@@ -63,7 +63,7 @@ check_fields($fields);
 			$cmbResourceNode->addItem($node['nodeid'], $node['name']);
 		}
 
-		$frmTitle->addItem(array(S_NODE, SPACE, $cmbResourceNode));
+		$frmTitle->addItem(array(_('Node'), SPACE, $cmbResourceNode));
 	}
 
 	show_table_header(permission2str($permission),$frmTitle);
@@ -71,7 +71,7 @@ check_fields($fields);
 	$form = new CForm();
 	$form->setAttribute('id', 'groups');
 
-	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
+	$table = new CTableInfo(_('No resources defined.'));
 	$table->setHeader(new CCol(array(new CCheckBox('all_groups', NULL, 'check_all(this.checked)'),S_NAME)));
 
 // NODES

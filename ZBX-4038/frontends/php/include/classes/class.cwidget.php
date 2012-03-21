@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CWidget {
 
 	public $domid;

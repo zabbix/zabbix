@@ -460,7 +460,6 @@ class CTemplate extends CZBXAPI {
 
 		}
 
-		Copt::memoryPick();
 		if (!is_null($options['countOutput'])) {
 			return $result;
 		}
@@ -893,7 +892,6 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
-		COpt::memoryPick();
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
@@ -1069,13 +1067,14 @@ class CTemplate extends CZBXAPI {
 			'preservekeys' => 1
 		));
 
-		foreach ($templates as $tnum => $template) {
+		foreach ($templates as $template) {
 			if (!isset($updTemplates[$template['templateid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
 		}
 
-		foreach ($templates as $tnum => $template) {
+		$macros = array();
+		foreach ($templates as $template) {
 			// if visible name is not given or empty it should be set to host name
 			if (!isset($template['name']) || (isset($template['name']) && zbx_empty(trim($template['name']))))
 			{
@@ -1085,6 +1084,11 @@ class CTemplate extends CZBXAPI {
 
 			$template['templates_link'] = isset($template['templates']) ? $template['templates'] : null;
 
+			if (isset($template['macros'])) {
+				$macros[$template['templateid']] = $template['macros'];
+				unset($template['macros']);
+			}
+
 			unset($template['templates']);
 			unset($template['templateid']);
 			unset($tplTmp['templates']);
@@ -1092,6 +1096,10 @@ class CTemplate extends CZBXAPI {
 			$template['templates'] = array($tplTmp);
 			$result = $this->massUpdate($template);
 			if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, _('Failed to update template'));
+		}
+
+		if ($macros) {
+			API::UserMacro()->replaceMacros($macros);
 		}
 
 		return array('templateids' => $templateids);
@@ -1127,6 +1135,17 @@ class CTemplate extends CZBXAPI {
 
 		API::Template()->unlink($templateids, null, true);
 
+		// delete the discovery rules first
+		$delRules = API::DiscoveryRule()->get(array(
+			'hostids' => $templateids,
+			'nopermissions' => true,
+			'preservekeys' => true
+		));
+		if ($delRules) {
+			API::DiscoveryRule()->delete(array_keys($delRules), true);
+		}
+
+		// delete the items
 		$delItems = API::Item()->get(array(
 			'templateids' => $templateids,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
@@ -1134,14 +1153,12 @@ class CTemplate extends CZBXAPI {
 			'nopermissions' => true,
 			'preservekeys' => true
 		));
-
-		if (!empty($delItems)) {
+		if ($delItems) {
 			API::Item()->delete(array_keys($delItems), true);
 		}
 
-
 		// delete screen items
-		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids)).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS;
+		DBexecute('DELETE FROM screens_items WHERE '.DBcondition('resourceid', $templateids).' AND resourcetype='.SCREEN_RESOURCE_HOST_TRIGGERS);
 
 		// delete host from maps
 		if (!empty($templateids)) {
@@ -1235,7 +1252,6 @@ class CTemplate extends CZBXAPI {
 		return array('templateids' => $templateids);
 	}
 
-
 	/**
 	 * Link Template to Hosts
 	 *
@@ -1304,8 +1320,6 @@ class CTemplate extends CZBXAPI {
 	 * @return boolean
 	 */
 	public function massUpdate($data) {
-		$transaction = false;
-
 		$templates = zbx_toArray($data['templates']);
 		$templateids = zbx_objectValues($templates, 'templateid');
 
@@ -1522,62 +1536,15 @@ class CTemplate extends CZBXAPI {
 		}
 		// }}} UPDATE TEMPLATE LINKAGE
 
+		// macros
+		if (isset($data['macros'])) {
+			DB::delete('hostmacro', array('hostid' => $templateids));
 
-		// UPDATE MACROS {{{
-		if (isset($data['macros']) && !is_null($data['macros'])) {
-			$macrosToAdd = $data['macros'];
-			$hostmacrosIds = zbx_objectValues($macrosToAdd, 'hostmacroid');
-
-			$templateMacros = API::UserMacro()->get(array(
-				'hostids' => $templateids,
-				'output' => API_OUTPUT_EXTEND
+			$this->massAdd(array(
+				'hosts' => $templates,
+				'macros' => $data['macros']
 			));
-			$templateMacros = zbx_toHash($templateMacros, 'hostmacroid');
-
-			// Delete
-			$macrosToDelete = array();
-			foreach ($templateMacros as $hmacro) {
-				if (!in_array($hmacro['hostmacroid'], $hostmacrosIds)) {
-					$macrosToDelete[] = $hmacro['hostmacroid'];
-				}
-			}
-
-			// Update
-			$macrosToUpdate = array();
-			foreach ($macrosToAdd as $nhmnum => $nhmacro) {
-				if (isset($nhmacro['hostmacroid']) && isset($templateMacros[$nhmacro['hostmacroid']])) {
-					$macrosToUpdate[] = $nhmacro;
-					unset($macrosToAdd[$nhmnum]);
-				}
-			}
-			//----
-			if (!empty($macrosToDelete)) {
-				$result = $this->massRemove(array(
-					'templateids' => $templateids,
-					'macros' => $macrosToDelete
-				));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _("Can't remove macro"));
-				}
-			}
-
-			if (!empty($macrosToUpdate)) {
-				$result = API::UserMacro()->update($macrosToUpdate);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update macro'));
-				}
-			}
-
-			if (!empty($macrosToAdd)) {
-				$macrosToAdd = array_values($macrosToAdd);
-
-				$result = $this->massAdd(array('templates' => $templates, 'macros' => $macrosToAdd));
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add macro'));
-				}
-			}
 		}
-		// }}} UPDATE MACROS
 
 		return array('templateids' => $templateids);
 	}
@@ -1639,7 +1606,6 @@ class CTemplate extends CZBXAPI {
 
 		return array('templateids' => $templateids);
 	}
-
 
 	private function link($templateids, $targetids) {
 		if (empty($templateids)) return true;
@@ -1853,34 +1819,34 @@ class CTemplate extends CZBXAPI {
 				));
 			}
 
+			// sync triggers
+			API::Trigger()->syncTemplates(array(
+				'hostids' => $targetid,
+				'templateids' => $templateids
+			));
+
 			// we do linkage in two separate loops because for triggers you need all items already created on host
-			for ($i = 1; $i <= 2; $i++) {
-				foreach ($templateids as $templateid) {
-					foreach ($linked as $link) {
-						if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
-							continue 2;
-						}
+			foreach ($templateids as $templateid) {
+				foreach ($linked as $link) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
+						continue 2;
 					}
-					API::Trigger()->syncTemplates(array(
-						'hostids' => $targetid,
-						'templateids' => $templateid
-					));
-
-					API::TriggerPrototype()->syncTemplates(array(
-						'hostids' => $targetid,
-						'templateids' => $templateid
-					));
-
-					API::GraphPrototype()->syncTemplates(array(
-						'hostids' => $targetid,
-						'templateids' => $templateid
-					));
-
-					API::Graph()->syncTemplates(array(
-						'hostids' => $targetid,
-						'templateids' => $templateid
-					));
 				}
+
+				API::TriggerPrototype()->syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+
+				API::GraphPrototype()->syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
+
+				API::Graph()->syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
 			}
 		}
 

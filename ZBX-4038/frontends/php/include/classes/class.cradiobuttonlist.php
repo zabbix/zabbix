@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
-class CRadioButtonList extends CDiv{
+
+class CRadioButtonList extends CDiv {
+
 	const ORIENTATION_HORIZONTAL = 'horizontal';
 	const ORIENTATION_VERTICAL = 'vertical';
 
@@ -28,17 +30,16 @@ class CRadioButtonList extends CDiv{
 	protected $value;
 	protected $orientation;
 
-	public function __construct($name='radio', $value='yes') {
+	public function __construct($name = 'radio', $value = 'yes') {
 		$this->count = 0;
 		$this->name = $name;
 		$this->value = $value;
 		$this->orientation = self::ORIENTATION_HORIZONTAL;
-
 		parent::__construct(null, null, $name);
 	}
 
 
-	public function addValue($name, $value, $checked=null) {
+	public function addValue($name, $value, $checked = null) {
 		$this->count++;
 
 		$id = str_replace(array('[', ']'), array('_'), $this->name).'_'.$this->count;

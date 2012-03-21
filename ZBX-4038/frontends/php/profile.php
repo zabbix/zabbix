@@ -50,7 +50,7 @@ $fields = array(
 	'autologout' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(90, 10000), null,
 		_('Auto-logout (min 90 seconds)')),
 	'url' =>		array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
-	'refresh' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, SEC_PER_HOUR), 'isset({save})',
+	'refresh' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 3600), 'isset({save})',
 		_('Refresh (in seconds)')),
 	'rows_per_page' =>	array(T_ZBX_INT, O_OPT, null,		BETWEEN(1, 999999), 'isset({save})',
 		_('Rows per page')),
