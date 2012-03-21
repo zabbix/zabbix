@@ -23,41 +23,38 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/regexp.inc.php';
 
-$page['title'] = _('Configuration of Zabbix');
+$page['title'] = _('Configuration of regular expressions');
 $page['file'] = 'adm.regexps.php';
+$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	// VAR					        TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'regexpids'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-	'regexpid'=>				array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
-	'rename'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Name')),
-	'test_string'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Test string')),
-	'delete_regexp'=>			array(T_ZBX_STR, O_OPT,	null,	null,		null),
-
-	'g_expressionid'=>			array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
-	'expressions'=>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'new_expression'=>			array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'cancel_new_expression'=>	array(T_ZBX_STR, O_OPT,	null,	null,		null),
-
-	'add_expression'=>			array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'edit_expressionid'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'delete_expression'=>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
-
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'delete'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'clone'=>					array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'go'=>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
+	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
+	'rename' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Name')),
+	'test_string' =>			array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Test string')),
+	'delete_regexp' =>			array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'g_expressionid' =>			array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
+	'expressions' =>			array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
+	'new_expression' =>			array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'cancel_new_expression' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'add_expression' =>			array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'edit_expressionid' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'delete_expression' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'clone' =>					array(T_ZBX_STR, O_OPT, null,		null,		null),
+	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
+	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,		null,		null)
 );
-?>
-<?php
 check_fields($fields);
 
-
+/*
+ * Actions
+ */
 if (isset($_REQUEST['clone']) && isset($_REQUEST['regexpid'])) {
 	unset($_REQUEST['regexpid']);
 	$_REQUEST['form'] = 'clone';
@@ -175,7 +172,9 @@ elseif (isset($_REQUEST['edit_expressionid'])) {
 	}
 }
 
-
+/*
+ * Display
+ */
 $form = new CForm();
 $form->cleanItems();
 $cmbConf = new CComboBox('configDropDown', 'adm.regexps.php', 'redirect(this.options[this.selectedIndex].value);');
@@ -197,9 +196,8 @@ if (!isset($_REQUEST['form'])) {
 	$form->addItem(new CSubmit('form', _('New regular expression')));
 }
 
-
 $cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF ZABBIX'), $form);
+$cnf_wdgt->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $form);
 
 $data = array();
 

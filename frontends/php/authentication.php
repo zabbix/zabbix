@@ -21,33 +21,30 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Authentication to Zabbix');
+$page['title'] = _('Configuration of authentication');
 $page['file'] = 'authentication.php';
 $page['hist_arg'] = array('config');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-?>
-<?php
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	//	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	'config'=>					array(T_ZBX_INT, O_OPT,	null,	IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP),	null),
+	'config' =>					array(T_ZBX_INT, O_OPT, null,	IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP),	null),
 	// LDAP
-	'ldap_host'=>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_port'=>				array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 65535), 'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_base_dn'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_bind_dn'=>			array(T_ZBX_STR, O_OPT,	null,	null,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_bind_password'=>		array(T_ZBX_STR, O_OPT,	null,	null,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'ldap_search_attribute'=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
-	'user'=>					array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
-	'user_password'=>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
+	'ldap_host' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_port' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_base_dn' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_bind_dn' =>			array(T_ZBX_STR, O_OPT, null,	null,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_bind_password' =>		array(T_ZBX_STR, O_OPT, null,	null,			'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'ldap_search_attribute' =>	array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({save})||isset({test}))'),
+	'user' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
+	'user_password' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({config})&&({config}==1)&&(isset({test}))'),
 	// actions
-	'save'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'test'=>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null)
+	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'test' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null)
 );
 check_fields($fields);
-?>
-<?php
+
 if (!isset($_REQUEST['config'])) {
 	$_REQUEST['config'] = CProfile::get('web.authentication.config', ZBX_AUTH_INTERNAL);
 }
@@ -61,6 +58,9 @@ foreach ($config as $id => $value) {
 	}
 }
 
+/*
+ * Actions
+ */
 if ($_REQUEST['config'] == ZBX_AUTH_INTERNAL) {
 	if (isset($_REQUEST['save'])) {
 		$config['authentication_type'] = $_REQUEST['config'];
@@ -78,7 +78,7 @@ if ($_REQUEST['config'] == ZBX_AUTH_INTERNAL) {
 			$isAuthenticationTypeChanged = false;
 		}
 		else {
-			show_error_message(_('Cannot change authentication method to Zabbix internal'));
+			show_error_message(_('Cannot change authentication method to Zabbix internal.'));
 		}
 	}
 }
@@ -114,11 +114,11 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 			}
 			CProfile::update('web.authentication.config', $_REQUEST['config'], PROFILE_TYPE_INT);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed to LDAP'));
-			show_message(_('Authentication method changed to LDAP'));
+			show_message(_('Authentication method changed to LDAP.'));
 			$isAuthenticationTypeChanged = false;
 		}
 		catch (Exception $e) {
-			show_error_message(_('Cannot change authentication method to LDAP'));
+			show_error_message(_('Cannot change authentication method to LDAP.'));
 		}
 	}
 	elseif (isset($_REQUEST['test'])) {
@@ -139,7 +139,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
 		// get groups wich use this authentication method
 		$result = DBfetch(DBselect('SELECT COUNT(g.usrgrpid) AS cnt_usrgrp FROM usrgrp g WHERE g.gui_access='.GROUP_GUI_ACCESS_INTERNAL));
 		if ($result['cnt_usrgrp'] > 0) {
-			info(_n('There is %1$d group with Internal GUI access.', 'There are %1$d groups with Internal GUI access.', $result['cnt_usrgrp']));
+			info(_n('There is "%1$d" group with Internal GUI access.', 'There are "%1$d" groups with Internal GUI access.', $result['cnt_usrgrp']));
 		}
 
 		// reset all sessions
@@ -150,18 +150,18 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
 		// update config
 		if (update_config($config)) {
 			CProfile::update('web.authentication.config', $_REQUEST['config'], PROFILE_TYPE_INT);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed to HTTP'));
-			show_message(_('Authentication method changed to HTTP'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed to HTTP.'));
+			show_message(_('Authentication method changed to HTTP.'));
 			$isAuthenticationTypeChanged = false;
 		}
 		else {
-			show_error_message(_('Cannot changed authentication method to HTTP'));
+			show_error_message(_('Cannot changed authentication method to HTTP.'));
 		}
 	}
 }
 show_messages();
 
-/**
+/*
  * Display
  */
 $data['config'] = $_REQUEST['config'];

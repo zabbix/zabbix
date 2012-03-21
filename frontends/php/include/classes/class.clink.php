@@ -53,12 +53,9 @@ class CLink extends CTag {
 				$this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'], 16, 16) : null;
 			}
 			if (!is_null($this->sid)) {
-				if (zbx_strstr($value, '&') !== false || zbx_strstr($value, '?') !== false) {
-					$value .= '&sid='.$this->sid;
-				}
-				else {
-					$value .= '?sid='.$this->sid;
-				}
+				$value .= (zbx_strstr($value, '&') !== false || zbx_strstr($value, '?') !== false)
+					? '&sid='.$this->sid
+					: '?sid='.$this->sid;
 			}
 			$url = $value;
 		}
@@ -69,7 +66,7 @@ class CLink extends CTag {
 	}
 
 	public function getUrl() {
-		return (isset($this->attributes['href'])) ? $this->attributes['href'] : null;
+		return isset($this->attributes['href']) ? $this->attributes['href'] : null;
 	}
 
 	public function setTarget($value = null) {

@@ -169,7 +169,7 @@
 
 // Header Host
 		if($_REQUEST['hostid'] > 0){
-			$screens_wdgt->addItem(get_header_host_table($_REQUEST['hostid']));
+			$screens_wdgt->addItem(get_header_host_table('screens', $_REQUEST['hostid']));
 			$show_host = false;
 		}
 

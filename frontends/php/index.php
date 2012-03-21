@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('ZABBIX');
 $page['file'] = 'index.php';
 
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'name' =>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,	'isset({enter})', _('Username')),
 	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({enter})'),
@@ -41,8 +41,6 @@ $fields = array(
 	'request' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
 );
 check_fields($fields);
-?>
-<?php
 
 // logout
 if (isset($_REQUEST['reconnect'])) {
@@ -55,7 +53,7 @@ if (isset($_REQUEST['reconnect'])) {
 $config = select_config();
 
 if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
-	if (isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])) {
+	if (!empty($_SERVER['PHP_AUTH_USER'])) {
 		$_REQUEST['enter'] = _('Sign in');
 		$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 		$_REQUEST['password'] = 'zabbix';

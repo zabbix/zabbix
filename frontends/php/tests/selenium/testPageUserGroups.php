@@ -32,7 +32,7 @@ class testPageUserGroups extends CWebTest {
 	*/
 	public function testPageUserGroups_CheckLayout($group) {
 		$this->login('usergrps.php');
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
 		$this->ok('Displaying');
 		// Header
@@ -59,12 +59,12 @@ class testPageUserGroups extends CWebTest {
 		$oldHashUsersGroups = DBhash($sqlHashUsersGroups);
 
 		$this->login('usergrps.php');
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 		$this->ok('Group updated');
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
@@ -89,7 +89,7 @@ class testPageUserGroups extends CWebTest {
 		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->login('usergrps.php');
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 
 		$this->checkbox_select("group_groupid[$usrgrpid]");
 		$this->dropdown_select('go', 'Enable selected');
@@ -97,7 +97,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 		$this->ok('Users status updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
@@ -124,7 +124,7 @@ class testPageUserGroups extends CWebTest {
 		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->login('usergrps.php');
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 
 		$this->checkbox_select("group_groupid[$usrgrpid]");
 		$this->dropdown_select('go', 'Disable selected');
@@ -132,7 +132,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 		if ($cannotDisable) {
 			$this->ok('Cannot update users status');
 		}
@@ -167,7 +167,7 @@ class testPageUserGroups extends CWebTest {
 		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->login('usergrps.php');
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 
 		$this->checkbox_select("group_groupid[$usrgrpid]");
 		$this->dropdown_select('go', 'Enable DEBUG');
@@ -175,7 +175,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 		$this->ok('Debug mode updated');
 
 		$sql="select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_ENABLED;
@@ -200,7 +200,7 @@ class testPageUserGroups extends CWebTest {
 		$oldHashGroups = DBhash($sqlHashGroups);
 
 		$this->login('usergrps.php');
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 
 		$this->checkbox_select("group_groupid[$usrgrpid]");
 		$this->dropdown_select('go', 'Disable DEBUG');
@@ -208,7 +208,7 @@ class testPageUserGroups extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->assertTitle('User groups');
+		$this->assertTitle('Configuration of user groups');
 		$this->ok('Debug mode updated');
 
 		$sql = "select * from usrgrp where usrgrpid=$usrgrpid and debug_mode=".GROUP_DEBUG_MODE_DISABLED;
