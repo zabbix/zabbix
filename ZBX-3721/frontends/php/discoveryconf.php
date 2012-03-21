@@ -30,9 +30,8 @@ $page['scripts'] = array();
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-//	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'druleid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),

@@ -322,7 +322,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			// is this an eventlog item? If so, we must show some additional columns
 			$eventLogItem = (strpos($item['key_'], 'eventlog[') === 0);
 
-			$table = new CTableInfo('...');
+			$table = new CTableInfo(_('No history defined.'));
 			$table->setHeader(array(
 				_('Timestamp'),
 				$fewItems ? S_ITEM : null,
@@ -413,7 +413,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 		else{
 // NUMERIC, FLOAT
-			$table = new CTableInfo();
+			$table = new CTableInfo(_('No history defined.'));
 			$table->setHeader(array(_('Timestamp'), S_VALUE));
 
 			$options['sortfield'] = array('itemid', 'clock');
@@ -458,7 +458,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$containerid = 'graph_cont1';
 		$src = 'chart.php?itemid='.$item['itemid'];
 
-		$table = new CTableInfo('...','chart');
+		$table = new CTableInfo(_('No charts defined.'), 'chart');
 		$graph_cont = new CCol();
 		$graph_cont->setAttribute('id', $containerid);
 

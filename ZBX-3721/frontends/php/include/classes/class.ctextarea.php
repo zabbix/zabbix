@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 class CTextArea extends CTag {
 	public function __construct($name = 'textarea', $value = '', $rows = ZBX_TEXTAREA_STANDARD_ROWS, $width = ZBX_TEXTAREA_STANDARD_WIDTH, $readonly = false) {
 		parent::__construct('textarea', 'yes');

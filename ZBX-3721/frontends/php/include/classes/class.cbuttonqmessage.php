@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CButtonQMessage extends CSubmit {
+
 	public $vars;
 	public $msg;
 	public $name;
@@ -36,7 +38,7 @@ class CButtonQMessage extends CSubmit {
 
 	public function setVars($value = null) {
 		if (!is_string($value) && !is_null($value)) {
-			return $this->error('Incorrect value for setVars ['.$value.']');
+			return $this->error('Incorrect value for setVars "'.$value.'".');
 		}
 		$this->vars = $value;
 		$this->setAction(null);

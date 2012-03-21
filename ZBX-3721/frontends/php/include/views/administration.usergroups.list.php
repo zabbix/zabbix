@@ -27,14 +27,12 @@ $createForm->cleanItems();
 $configurationComboBox = new CComboBox('config', 'usergrps.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 $configurationComboBox->addItem('usergrps.php', _('User groups'));
 $configurationComboBox->addItem('users.php', _('Users'));
-$createForm->addItem(array($configurationComboBox, new CSubmit('form', _('Create group'))));
+$createForm->addItem(array($configurationComboBox, new CSubmit('form', _('Create user group'))));
 $userGroupsWidget->addPageHeader(_('CONFIGURATION OF USERS AND USER GROUPS'), $createForm);
 
 // append header to widget
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $userGroupsWidget->addHeader(_('User groups'));
-$userGroupsWidget->addHeader($numRows);
+$userGroupsWidget->addHeaderRowNumber();
 
 // create form
 $userGroupsForm = new CForm();

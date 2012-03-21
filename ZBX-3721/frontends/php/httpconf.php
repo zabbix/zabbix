@@ -24,14 +24,13 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/httptest.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Configuration of Web monitoring');
+$page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
-$page['hist_arg'] = array('groupid','hostid');
+$page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
-//	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'applications' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 	'applicationid' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
@@ -49,15 +48,15 @@ $fields = array(
 	'steps' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'authentication' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),'isset({save})'),
 	'http_user' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+		'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 			'||{authentication}=='.HTTPTEST_AUTH_NTLM.')'),
 	'http_password' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
-		'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.
+		'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
 			'||{authentication}=='.HTTPTEST_AUTH_NTLM.')'),
 	'new_httpstep' =>	array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'move_up' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0,65534), null),
-	'move_down' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0,65534), null),
-	'sel_step' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65534), null),
+	'move_up' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0, 65534), null),
+	'move_down' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0, 65534), null),
+	'sel_step' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 65534), null),
 	'group_httptestid' => array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'showdisabled' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
 	// actions
@@ -258,9 +257,6 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages(false, null, $message_false);
 	}
 }
-/*
- * Go buttons
- */
 elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_httptestid'])) {
 	$go_result = false;
 	$group_httptestid = $_REQUEST['group_httptestid'];
@@ -327,8 +323,7 @@ if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 	$path = $url->getPath();
 	insert_js('cookie.eraseArray("'.$path.'")');
 }
-?>
-<?php
+
 /*
  * Display
  */

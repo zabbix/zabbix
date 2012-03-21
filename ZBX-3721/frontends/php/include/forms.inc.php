@@ -858,11 +858,14 @@
 	}
 
 	function getItemFormData($options = array()) {
+		$ifm = get_request('filter_macro');
+		$ifv = get_request('filter_value');
+
 		$data = array(
 			'form' => get_request('form'),
 			'form_refresh' => get_request('form_refresh'),
 			'is_discovery_rule' => !empty($options['is_discovery_rule']),
-			'parent_discoveryid' => get_request('parent_discoveryid'),
+			'parent_discoveryid' => get_request('parent_discoveryid', !empty($options['is_discovery_rule']) ? get_request('itemid', null) : null),
 			'itemid' => get_request('itemid', null),
 			'limited' => false,
 			'interfaceid' => get_request('interfaceid', 0),
@@ -907,7 +910,7 @@
 			'possibleHostInventories' => null,
 			'alreadyPopulated' => null,
 			'lifetime' => get_request('lifetime', 30),
-			'filter' => get_request('filter', '')
+			'filter' => isset($ifm, $ifv) ? $ifm.':'.$ifv : ''
 		);
 
 		// hostid
@@ -1085,9 +1088,7 @@
 			' FROM applications a'.
 			' WHERE a.hostid='.$data['hostid']
 		));
-		if (!empty($data['db_applications'])) {
-			order_result($data['db_applications'], 'name');
-		}
+		order_result($data['db_applications'], 'name');
 
 		// interfaces
 		$data['interfaces'] = API::HostInterface()->get(array(
@@ -1186,6 +1187,17 @@
 			'priority' => get_request('priority', 0),
 			'config' => select_config()
 		);
+
+		// get hostid
+		$pageFilter = new CPageFilter(array(
+			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
+			'hosts' => array('templated_hosts' => true, 'editable' => true),
+			'groupid' => get_request('groupid', null),
+			'hostid' => get_request('hostid', null)
+		));
+		$data['hostid'] = $pageFilter->hostid;
+
+		// get dependencies
 		$data['dependencies'] = API::Trigger()->get(array(
 			'triggerids' => $data['dependencies'],
 			'output' => array('triggerid', 'description'),
@@ -1199,6 +1211,7 @@
 			unset($dependency['hosts']);
 		}
 		order_result($data['dependencies'], 'description');
+
 		return $data;
 	}
 
@@ -1224,6 +1237,15 @@
 			'templates' => array(),
 			'config' => select_config()
 		);
+
+		// get hostid
+		$pageFilter = new CPageFilter(array(
+			'groups' => array('not_proxy_hosts' => true, 'editable' => true),
+			'hosts' => array('templated_hosts' => true, 'editable' => true),
+			'groupid' => get_request('groupid', null),
+			'hostid' => get_request('hostid', null)
+		));
+		$data['hostid'] = $pageFilter->hostid;
 
 		if (!empty($data['triggerid'])) {
 			// get trigger

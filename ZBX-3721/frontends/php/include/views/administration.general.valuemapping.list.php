@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-$valueMappingTable = new CTableInfo();
+$valueMappingTable = new CTableInfo(_('No value map defined.'));
 $valueMappingTable->setHeader(array(_('Name'), _('Value map')));
 
 foreach ($this->data['valuemaps'] as $valuemap) {
