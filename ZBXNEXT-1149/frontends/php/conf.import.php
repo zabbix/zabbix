@@ -26,15 +26,25 @@ $page['title'] = _('Configuration import');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['hist_arg'] = array();
 
+ob_start();
+
 require_once 'include/page_header.php';
 
 $fields = array(
 	'rules' => array(T_ZBX_STR, O_OPT, null, null,	null),
 	'import' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'rules_preset' => array(T_ZBX_STR, O_OPT, null, null, null),
+	'cancel' => array(T_ZBX_STR, O_OPT, P_SYS, null, null),
 	'form_refresh' => array(T_ZBX_INT, O_OPT, null, null, null)
 );
 check_fields($fields);
+
+
+if (isset($_REQUEST['cancel'])) {
+	ob_end_clean();
+	redirect(CWebUser::$data['last_page']['url']);
+}
+ob_end_flush();
 
 
 $data['rules'] = array(
@@ -51,6 +61,7 @@ $data['rules'] = array(
 	'maps' => array('updateExisting' => false, 'createMissing' => false),
 	'images' => array('updateExisting' => false, 'createMissing' => false)
 );
+// rules presets
 if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 	switch ($_REQUEST['rules_preset']) {
 		case 'host':

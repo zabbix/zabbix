@@ -84,7 +84,7 @@ class CMapImporter extends CImporter {
 	 */
 	protected function checkCircularMapReferences(array $maps) {
 		foreach ($maps as $mapName => $map) {
-			if (!isset($map['selements'])) {
+			if (empty($map['selements'])) {
 				continue;
 			}
 
@@ -132,7 +132,7 @@ class CMapImporter extends CImporter {
 
 		// we need to find map that current element reference to
 		// and if it has selements check all them recursively
-		if (isset($maps[$elementMapName]['selements'])) {
+		if (!empty($maps[$elementMapName]['selements'])) {
 			foreach ($maps[$elementMapName]['selements'] as $selement) {
 				return $this->checkCircularRecursive($selement, $maps, $checked);
 			}
@@ -151,7 +151,7 @@ class CMapImporter extends CImporter {
 	 */
 	protected function getIndependentMaps(array $maps) {
 		foreach ($maps as $num => $map) {
-			if (!isset($map['selements'])) {
+			if (empty($map['selements'])) {
 				continue;
 			}
 

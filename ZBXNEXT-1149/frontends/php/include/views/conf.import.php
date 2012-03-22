@@ -62,7 +62,7 @@ foreach ($titles as $key => $title) {
 // form list
 $importFormList = new CFormList('proxyFormList');
 $importFormList->addRow(_('Import file'), new CFile('import_file'));
-$importFormList->addRow(_('Rules'), $rulesTable);
+$importFormList->addRow(_('Rules'), new CDiv($rulesTable, 'border_dotted objectgroup inlineblock'));
 
 // tab
 $importTab = new CTabView();
@@ -71,7 +71,7 @@ $importTab->addTab('importTab', _('Import'), $importFormList);
 // form
 $importForm = new CForm('post', null, 'multipart/form-data');
 $importForm->addItem($importTab);
-$importForm->addItem(makeFormFooter(new CSubmit('import', _('Import'))));
+$importForm->addItem(makeFormFooter(new CSubmit('import', _('Import')), new CButtonCancel()));
 
 // widget
 $importWidget = new CWidget();
