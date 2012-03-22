@@ -81,8 +81,7 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 	exit();
 }
 
-// get hosts and triggers
-$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
+// get triggers and check permissions
 $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 if (!empty($_REQUEST['serviceid'])) {
 	$db_services = DBselect(
