@@ -535,15 +535,6 @@
 		return $row;
 	}
 
-	function get_services_links_by_linkid($linkid) {
-		$row = DBfetch(DBselect('SELECT sl.* FROM services_links sl WHERE sl.linkid='.$linkid));
-		if (!$row) {
-			error(S_NO_SERVICE_LINKAGE_WITH.' linkid=['.$linkid.']');
-			return false;
-		}
-		return $row;
-	}
-
 	function algorithm2str($algorithm) {
 		if ($algorithm == SERVICE_ALGORITHM_NONE) {
 			return S_DO_NOT_CALCULATE;
