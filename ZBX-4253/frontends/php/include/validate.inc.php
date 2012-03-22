@@ -628,10 +628,6 @@
 		if (stripos($url, "livescript:") !== false) {
 			return false;
 		}
-		// escapes ' " and \ which break up page
-		if (strpbrk($url, "'\"\\") !== false) {
-			return false;
-		}
 		return true;
 	}
 ?>

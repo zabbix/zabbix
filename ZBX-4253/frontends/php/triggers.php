@@ -183,10 +183,6 @@ include_once('include/page_header.php');
 				$priority = get_request('priority');
 				$comments = get_request('comments');
 				$url = get_request('url');
-				if (!validateUrl($url)) {
-					$url = "";
-					show_error_message(_('Incorrect URL'));
-				}
 				if($triggerData['type'] == $_REQUEST['type']) $type = null;
 				if($triggerData['priority'] == $_REQUEST['priority']) $priority = null;
 				if(strcmp($triggerData['comments'], $_REQUEST['comments']) == 0) $comments = null;

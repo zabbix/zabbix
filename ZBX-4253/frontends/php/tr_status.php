@@ -461,7 +461,7 @@ include_once('include/page_header.php');
 		}
 		$menu_trigger_url = 'null';
 		if (!zbx_empty($trigger['url'])) {
-			$menu_trigger_url = "['".S_URL."','".resolveTriggerUrl($trigger)."',
+			$menu_trigger_url = "['".S_URL."',".zbx_jsvalue(resolveTriggerUrl($trigger)).",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$description->addAction('onclick',
