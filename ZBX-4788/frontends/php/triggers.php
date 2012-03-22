@@ -184,7 +184,6 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 }
 elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])) {
 	$visible = get_request('visible', array());
-	$dependencies = zbx_toObject(get_request('dependencies', array()), 'triggerid');
 
 	// get triggers
 	$db_triggers = API::Trigger()->get(array(
@@ -197,11 +196,18 @@ elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isse
 	// update triggers
 	DBstart();
 	foreach ($db_triggers as $trigger) {
-		$result = API::Trigger()->update(array(
-			'triggerid' => $trigger['triggerid'],
-			'priority' => (isset($visible['priority'])) ? get_request('priority') : null,
-			'dependencies' => (isset($visible['dependencies'])) ? $dependencies : null
-		));
+		$update = array(
+			'triggerid' => $trigger['triggerid']
+		);
+
+		if (isset($visible['priority'])) {
+			$update['priority'] = get_request('priority');
+		}
+		if (isset($visible['dependencies'])) {
+			$update['dependencies'] = zbx_toObject(get_request('dependencies', array()), 'triggerid');
+		}
+
+		$result = API::Trigger()->update($update);
 		if (!$result) {
 			break;
 		}
