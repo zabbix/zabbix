@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBXNEXT-914] redesign Administration->DM (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4788] fixed trigger severity being reset when changing dependencies via mass update (Sasha)
 ..F....... [ZBX-4787] fixed graph axis item selection popup shows only monitored hosts (Vedmak)
 ..F....... [ZBX-4779] fixed new groups import (Vedmak)
 ..F....... [ZBX-4775] fixed discovery rules import (Vedmak)
