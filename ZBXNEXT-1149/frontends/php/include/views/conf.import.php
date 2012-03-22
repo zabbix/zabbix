@@ -56,7 +56,7 @@ foreach ($titles as $key => $title) {
 		$cbMissed = new CCheckBox('rules['.$key.'][createMissing]', $rules[$key]['createMissing'], null, 1);
 	}
 
-	$rulesTable->addRow(array($title, $cbExist, $cbMissed));
+	$rulesTable->addRow(array($title, new CCol($cbExist, 'center'), new CCol($cbMissed, 'center')));
 }
 
 // form list
