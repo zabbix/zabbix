@@ -344,31 +344,26 @@ if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 /*
  * Display
  */
-$options = array(
-	'groups' => array('not_proxy_hosts' => 1, 'editable' => 1),
-	'hosts' => array('editable' => 1, 'templated_hosts' => 1),
+$pageFilter = new CPageFilter(array(
+	'groups' => array(
+		'not_proxy_hosts' => true,
+		'editable' => true
+	),
+	'hosts' => array(
+		'editable' => true,
+		'templated_hosts' => true
+	),
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null),
-);
-
-$pageFilter = new CPageFilter($options);
+));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
 
-$form = new CForm('get');
-
-if (!isset($_REQUEST['form'])) {
-	$form->cleanItems();
-	$form->addItem(new CSubmit('form', _('Create graph')));
-}
-
-show_table_header(_('CONFIGURATION OF GRAPHS'), $form);
-
 if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
-	$triggersView = new CView('configuration.copy.elements', getCopyElementsFormData('group_graphid'));
-	$triggersView->render();
-	$triggersView->show();
+	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_graphid'));
+	$graphView->render();
+	$graphView->show();
 }
 elseif (isset($_REQUEST['form'])) {
 	insert_graph_form();
@@ -388,160 +383,59 @@ elseif (isset($_REQUEST['form'])) {
 	}
 	$table->show();
 }
-else{
-	$graphs_wdgt = new CWidget();
-
-	if(isset($_REQUEST['graphid']) && ($_REQUEST['graphid']==0)){
+else {
+	if (isset($_REQUEST['graphid']) && $_REQUEST['graphid'] == 0) {
 		unset($_REQUEST['graphid']);
 	}
 
-	$r_form = new CForm('get');
-	$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB()));
-	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
-
-	$numrows = new CDiv();
-	$numrows->setAttribute('name','numrows');
-
-	$graphs_wdgt->addHeader(_('Graphs'), $r_form);
-	$graphs_wdgt->addHeader($numrows);
-
-
-	if($_REQUEST['hostid'] > 0){
-		$tbl_header_host = get_header_host_table('graphs', $_REQUEST['hostid']);
-		$graphs_wdgt->addItem($tbl_header_host);
-	}
-
-
-	$form = new CForm();
-	$form->setName('graphs');
-	$form->addVar('hostid',$_REQUEST['hostid']);
-
-	$table = new CTableInfo(_('No graphs defined.'));
-	$table->setHeader(array(
-		new CCheckBox('all_graphs',NULL,"checkAll('".$form->getName()."','all_graphs','group_graphid');"),
-		$_REQUEST['hostid'] != 0 ? NULL : S_HOSTS,
-		make_sorting_header(S_NAME,'name'),
-		S_WIDTH,
-		S_HEIGHT,
-		make_sorting_header(_('Graph type'),'graphtype')));
-
-
-	$graphs = array();
+	$data = array(
+		'pageFilter' => $pageFilter,
+		'hostid' => get_request('hostid'),
+		'graphs' => array()
+	);
 
 	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
 
-	if($pageFilter->hostsSelected){
+	if ($pageFilter->hostsSelected) {
 		$options = array(
-			'editable' => 1,
+			'editable' => true,
 			'output' => array('graphid', 'name', 'graphtype'),
 			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => ($config['search_limit']+1)
+			'limit' => $config['search_limit'] + 1
 		);
-
-		if($pageFilter->hostid > 0)
+		if ($pageFilter->hostid > 0) {
 			$options['hostids'] = $pageFilter->hostid;
-		else if($pageFilter->groupid > 0)
+		}
+		elseif ($pageFilter->groupid > 0) {
 			$options['groupids'] = $pageFilter->groupid;
-
-		$graphs = API::Graph()->get($options);
+		}
+		$data['graphs'] = API::Graph()->get($options);
 	}
 
-	// Change graphtype from numbers to names, for correct sorting
-	if($sortfield == 'graphtype'){
-		foreach($graphs as $gnum => $graph){
-			$graphs[$gnum]['graphtype'] = graphType($graph['graphtype']);
+	if ($sortfield == 'graphtype') {
+		foreach ($data['graphs'] as $gnum => $graph) {
+			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 		}
 	}
-	// sorting && paging
-	order_result($graphs, $sortfield, $sortorder);
-	$paging = getPagingLine($graphs);
+	$data['paging'] = getPagingLine($data['graphs']);
 
-	$graphids = zbx_objectValues($graphs, 'graphid');
-	$options = array(
-		'graphids' => $graphids,
+	$data['graphs'] = API::Graph()->get(array(
+		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectTemplates' => API_OUTPUT_EXTEND,
-		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-	);
-	$graphs = API::Graph()->get($options);
+		'selectDiscoveryRule' => API_OUTPUT_EXTEND
+	));
 
-	// Change graphtype from numbers to names, for correct sorting
-	foreach($graphs as $gnum => $graph){
-		$graphs[$gnum]['graphtype'] = graphType($graph['graphtype']);
+	foreach ($data['graphs'] as $gnum => $graph) {
+		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
-	order_result($graphs, $sortfield, $sortorder);
-
-	foreach($graphs as $gnum => $graph){
-		$graphid = $graph['graphid'];
-
-		$host_list = NULL;
-		if($_REQUEST['hostid'] == 0){
-			$host_list = array();
-			foreach($graph['hosts'] as $host){
-				$host_list[$host['host']] = $host['host'];
-			}
-
-			foreach($graph['templates'] as $template){
-				$host_list[$template['host']] = $template['host'];
-			}
-			$host_list = implode(', ', $host_list);
-		}
-
-		$name = array();
-		if($graph['templateid'] != 0){
-			$real_hosts = get_realhosts_by_graphid($graph['templateid']);
-			$real_host = DBfetch($real_hosts);
-			$name[] = new CLink($real_host['name'], 'graphs.php?'.'hostid='.$real_host['hostid'], 'unknown');
-			$name[] = ':'.$graph['name'];
-		}
-		else if(!empty($graph['discoveryRule'])){
-			$name[] = new CLink($graph['discoveryRule']['name'], 'graph_prototypes.php?parent_discoveryid='.
-					$graph['discoveryRule']['itemid'],'gold');
-			$name[] = ':'.$graph['name'];
-		}
-		else{
-			$name[] = new CLink($graph['name'], 'graphs.php?graphid='.$graphid.'&form=update');
-		}
+	order_result($data['graphs'], $sortfield, getPageSortOrder());
 
 
-		$chkBox = new CCheckBox('group_graphid['.$graphid.']', NULL, NULL, $graphid);
-		if(($graph['templateid'] > 0) || !empty($graph['discoveryRule']))
-			$chkBox->setEnabled(false);
-
-		$table->addRow(array(
-			$chkBox,
-			$host_list,
-			$name,
-			$graph['width'],
-			$graph['height'],
-			$graph['graphtype']
-		));
-	}
-
-	$goBox = new CComboBox('go');
-	$goBox->addItem('copy_to', _('Copy selected to ...'));
-
-	$goOption = new CComboItem('delete', _('Delete selected'));
-	$goOption->setAttribute('confirm',_('Delete selected graphs?'));
-	$goBox->addItem($goOption);
-
-	// goButton name is necessary!!!
-	$goButton = new CSubmit('goButton',_('Go'));
-	$goButton->setAttribute('id','goButton');
-
-	zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
-
-	$footer = get_table_header(array($goBox, $goButton));
-
-	// PAGING FOOTER
-	$table = array($paging, $table, $paging, $footer);
-
-	$form->addItem($table);
-	$graphs_wdgt->addItem($form);
-	$graphs_wdgt->show();
+	$graphView = new CView('configuration.graph.list', $data);
+	$graphView->render();
+	$graphView->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

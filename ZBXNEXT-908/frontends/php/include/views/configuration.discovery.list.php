@@ -26,12 +26,8 @@ $createForm = new CForm('get');
 $createForm->cleanItems();
 $createForm->addItem(new CSubmit('form', _('Create discovery rule')));
 $discoveryWidget->addPageHeader(_('CONFIGURATION OF DISCOVERY RULE'), $createForm);
-
-// header
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $discoveryWidget->addHeader(_('Discovery rule'));
-$discoveryWidget->addHeader($numRows);
+$discoveryWidget->addHeaderRowNumber();
 
 // create form
 $discoveryForm = new CForm('get');
