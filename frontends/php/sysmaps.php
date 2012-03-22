@@ -29,8 +29,6 @@ if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['ma
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 
 	$EXPORT_DATA = true;
-
-	require_once dirname(__FILE__).'/include/export.inc.php';
 }
 else {
 	$page['title'] = _('Configuration of network maps');
