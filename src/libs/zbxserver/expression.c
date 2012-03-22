@@ -2733,6 +2733,8 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 	zbx_free(errcodes);
 	zbx_free(functions);
 
+	zbx_vector_ptr_sort(ifuncs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
 	for (i = 0; i < ifuncs->values_num; i++)
 	{
 		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
