@@ -60,6 +60,7 @@ class API {
 		'map' => 'CMap',
 		'mediatype' => 'CMediatype',
 		'proxy' => 'CProxy',
+		'service' => 'CService',
 		'screen' => 'CScreen',
 		'screenitem' => 'CScreenItem',
 		'script' => 'CScript',
@@ -309,6 +310,13 @@ class API {
 	 */
 	public static function Proxy() {
 		return self::getObject('proxy');
+	}
+
+	/**
+	 * @return CService
+	 */
+	public static function Service() {
+		return self::getObject('service');
 	}
 
 	/**
