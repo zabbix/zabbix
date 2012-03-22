@@ -185,41 +185,25 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 elseif ($_REQUEST['go'] == 'massupdate' && isset($_REQUEST['mass_save']) && isset($_REQUEST['g_triggerid'])) {
 	$visible = get_request('visible', array());
 
-	// get triggers
-	$db_triggers = API::Trigger()->get(array(
-		'triggerids' => $_REQUEST['g_triggerid'],
-		'selectDependencies' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'editable' => true
-	));
-
 	// update triggers
-	DBstart();
-	foreach ($db_triggers as $trigger) {
-		$update = array(
-			'triggerid' => $trigger['triggerid']
-		);
+	$triggersToUpdate = array();
+	foreach ($_REQUEST['g_triggerid'] as $triggerid) {
+		$trigger = array('triggerid' => $triggerid);
 
 		if (isset($visible['priority'])) {
-			$update['priority'] = get_request('priority');
+			$trigger['priority'] = get_request('priority');
 		}
 		if (isset($visible['dependencies'])) {
-			$update['dependencies'] = zbx_toObject(get_request('dependencies', array()), 'triggerid');
+			$trigger['dependencies'] = zbx_toObject(get_request('dependencies', array()), 'triggerid');
 		}
 
-		$result = API::Trigger()->update($update);
-		if (!$result) {
-			break;
-		}
+		$triggersToUpdate[] = $trigger;
 	}
-	if (isset($result)) {
-		$result = DBend($result);
-		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
-	}
-	else {
-		DBend();
-		$result = true;
-	}
+
+	DBstart();
+	$result = API::Trigger()->update($triggersToUpdate);
+	$result = DBend($result);
+	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 
 	if ($result) {
 		unset($_REQUEST['massupdate'], $_REQUEST['form']);
