@@ -119,11 +119,11 @@ for ($i = 0; $i < 52; $i++) {
 }
 
 for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
-	DashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gray);
+	dashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gray);
 }
 
 for ($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX / 52) {
-	DashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
+	dashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
 	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 35, $black, zbx_date2str(_('d.M'), $period_start));
 	$period_start += 7 * 24 * 3600;
 }

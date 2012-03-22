@@ -1685,7 +1685,7 @@ function drawMapLinkLabels(&$im, $map, $map_info, $resolveMacros = true) {
 		switch ($drawtype) {
 			case MAP_LINK_DRAWTYPE_DASHED_LINE:
 			case MAP_LINK_DRAWTYPE_DOT:
-				dashedrectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);
+				dashedRectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);
 				break;
 			case MAP_LINK_DRAWTYPE_BOLD_LINE:
 				imagerectangle($im, $boxX_left - 1, $boxY_top - 1, $boxX_right + 1, $boxY_bottom + 1, $color);

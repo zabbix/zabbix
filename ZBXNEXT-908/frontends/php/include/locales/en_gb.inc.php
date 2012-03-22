@@ -57,13 +57,6 @@
 	'S_DOT'=>				_('Dot'),
 	'S_DASHED_LINE'=>			_('Dashed line'),
 
-//	class.cchart.php
-	'S_CCHARTS_TIMELINE_START_DATE_FORMAT'=>		_('d.m H:i'),
-	'S_CCHARTS_TIMELINE_END_DATE_FORMAT'=>			_('d.m H:i'),
-	'S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT'=>		_('H:i'),
-	'S_CCHARTS_TIMELINE_MAINPERIOD_FULL_DAY_TIME_FORMAT'=>	_('d.m H:i'),
-	'S_CCHARTS_TIMELINE_MAINPERIOD_MONTHDAYS_FORMAT'=>	_('d.m'),
-
 //	config.php
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGE'=>					_('Image'),

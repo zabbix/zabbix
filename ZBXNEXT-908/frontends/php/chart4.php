@@ -112,16 +112,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$false[$i]=$stat['false'];
 		$unknown[$i]=$stat['unknown'];
 		$count_now[$i]=1;
-//SDI($false[$i]);
 	}
 
 	for ($i=0; $i<=$sizeY; $i+=$sizeY/10) {
-		DashedLine($im, $shiftX, $i+$shiftYup, $sizeX+$shiftX, $i+$shiftYup, $gray);
+		dashedLine($im, $shiftX, $i+$shiftYup, $sizeX+$shiftX, $i+$shiftYup, $gray);
 	}
 
 
 	for ($i=0, $period_start = $start; $i <= $sizeX; $i += $sizeX/52) {
-		DashedLine($im, $i+$shiftX, $shiftYup, $i+$shiftX, $sizeY+$shiftYup, $gray);
+		dashedLine($im, $i+$shiftX, $shiftYup, $i+$shiftX, $sizeY+$shiftYup, $gray);
 		imageText($im, 6, 90, $i+$shiftX+4, $sizeY+$shiftYup+30, $black, zbx_date2str(S_CHART4_TIMELINE_DATE_FORMAT, $period_start));
 
 		$period_start += SEC_PER_WEEK;
