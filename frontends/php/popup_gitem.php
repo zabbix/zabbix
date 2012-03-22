@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 
 $dstfrm	= get_request('dstfrm',	0);	// destination form
 
-$page['title'] = 'S_GRAPH_ITEM';
+$page['title'] = _('Graph item');
 $page['file'] = 'popup_gitem.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
