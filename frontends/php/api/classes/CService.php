@@ -56,6 +56,9 @@ class CService extends CZBXAPI {
 
 
 	protected function validateCreate(array $services) {
+		foreach ($services as $service) {
+			$this->checkParentId($service);
+		}
 		$this->checkServicePermissions($services);
 
 		foreach ($services as $service) {
@@ -64,7 +67,8 @@ class CService extends CZBXAPI {
 			$this->checkShowSla($service);
 			$this->checkGoodSla($service);
 			$this->checkSortOrder($service);
-			// TODO: check triggerid
+			$this->checkTriggerId($service);
+			// TODO: validate parent ids
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
@@ -81,6 +85,63 @@ class CService extends CZBXAPI {
 	public function create(array $services) {
 		$services = zbx_toArray($services);
 		$this->validateCreate($services);
+
+		$serviceIds = DB::insert($this->tableName(), $services);
+
+		return array('serviceids' => $serviceIds);
+	}
+
+	public function validateUpdate(array $services) {
+		foreach ($services as $service) {
+			if (empty($service['serviceid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
+			if (isset($service['parentid'])) {
+				$this->checkParentId($service);
+			}
+		}
+
+		$this->checkServicePermissions($services);
+
+		$services = $this->extendObjects($this->tableName(), $services, array('name'));
+		foreach ($services as $service) {
+			$this->checkName($service);
+
+			if (isset($service['algorithm'])) {
+				$this->checkAlgorithm($service);
+			}
+			if (isset($service['showsla'])) {
+				$this->checkShowSla($service);
+			}
+			if (isset($service['goodsla'])) {
+				$this->checkGoodSla($service);
+			}
+			if (isset($service['sortorder'])) {
+				$this->checkSortOrder($service);
+			}
+			if (isset($service['triggerid'])) {
+				$this->checkTriggerId($service);
+			}
+
+			$error = _s('Wrong fields for service "%1$s".', $service['name']);
+			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
+				'parentid'
+			));
+		}
+
+		$this->checkTriggerPermissions($services);
+		$this->checkIfParentsHaveTriggers($services);
+	}
+
+	public function update(array $services) {
+		$services = zbx_toArray($services);
+		$this->validateUpdate($services);
+
+		foreach ($services as $service) {
+			DB::updateByPk($this->tableName(), $service['serviceid'], $service);
+		}
+
+		return array('serviceids' => zbx_objectValues($services, 'serviceid'));
 	}
 
 	/**
@@ -193,10 +254,45 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkSortOrder(array $service) {
-		if (empty($service['sortorder']) || !is_numeric($service['sortorder'])
-				|| $service['sortorder'] < 0 || $service['sortorder'] > 999) {
+		if (empty($service['sortorder']) || !zbx_is_int($service['sortorder'])
+			|| $service['sortorder'] < 0 || $service['sortorder'] > 999) {
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect sorder order for service "%1$s".', $service['name']));
+		}
+	}
+
+	/**
+	 * Validates the "triggerid" field. Assumes the "name" field is valid.
+	 *
+	 * @throws APIException if the value is incorrect
+	 *
+	 * @param array $service
+	 *
+	 * @return void
+	 */
+	protected function checkTriggerId(array $service) {
+		if (!empty($service['triggerid']) && !zbx_is_int($service['triggerid'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect trigger ID for service "%1$s".', $service['name']));
+		}
+	}
+
+	/**
+	 * Validates the "parentid" field. Assumes the "name" field is valid.
+	 *
+	 * @throws APIException if the value is incorrect
+	 *
+	 * @param array $service
+	 *
+	 * @return void
+	 */
+	protected function checkParentId(array $service) {
+		if (!empty($service['parentid']) && !zbx_is_int($service['parentid'])) {
+			if (isset($service['name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect parent for service "%1$s".', $service['name']));
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parent service.'));
+			}
 		}
 	}
 
