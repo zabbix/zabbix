@@ -676,8 +676,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			$dbItems = DBselect($sql, 1);
 			while ($dbItem = DBfetch($dbItems)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Item with key "%1$s" already exists on "%2$s".',
-						$dbItem['key_'], $dbItem['host']));
+					_s('Item with key "%1$s" already exists on "%2$s".', $dbItem['key_'], $dbItem['host']));
 			}
 		}
 	}
