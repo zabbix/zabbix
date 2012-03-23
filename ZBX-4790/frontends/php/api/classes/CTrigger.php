@@ -901,7 +901,7 @@ class CTrigger extends CTriggerGeneral {
 								continue;
 							}
 						}
-						$result[$trigger['triggerid']]['hosts'][] = &$hosts[$hostid];
+						$result[$trigger['triggerid']]['hosts'][$hostid] = &$hosts[$hostid];
 					}
 				}
 			}
@@ -942,7 +942,7 @@ class CTrigger extends CTriggerGeneral {
 				$triggerid = $function['triggerid'];
 				unset($function['triggerid']);
 
-				$result[$triggerid]['functions'][] = $function;
+				$result[$triggerid]['functions'][$function['functionid']] = $function;
 			}
 		}
 
@@ -962,7 +962,7 @@ class CTrigger extends CTriggerGeneral {
 				unset($item['triggers']);
 
 				foreach ($itriggers as $trigger) {
-					$result[$trigger['triggerid']]['items'][] = $item;
+					$result[$trigger['triggerid']]['items'][$item['itemid']] = $item;
 				}
 			}
 		}

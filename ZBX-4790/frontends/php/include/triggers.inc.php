@@ -852,16 +852,16 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
  * Don't forget sync code with C.
  *
  * @param $trigger
- * @param $html
+ * @param bool $html
  * @param bool $template
  * @param bool $resolve_macro
  * @return array|string
  */
-function triggerExpression($trigger, $html, $template = false, $resolve_macro = false) {
+function triggerExpression($trigger, $html = false, $template = false, $resolve_macro = false) {
 	$expression = $trigger['expression'];
 	$functionid = '';
 	$macros = '';
-	$exp = empty($html) ? '' : array();
+	$exp = $html ? array() : '';
 	$state = '';
 
 	for ($i = 0, $max = zbx_strlen($expression); $i < $max; $i++) {
@@ -886,7 +886,7 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
 					$macros = $function_data['expression'];
 				}
 
-				if (!empty($html)) {
+				if ($html) {
 					array_push($exp,$macros);
 				}
 				else {
@@ -901,7 +901,7 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
 			$state = '';
 
 			if ($functionid == 'TRIGGER.VALUE') {
-				if (empty($html)) {
+				if (!$html) {
 					$exp .= '{'.$functionid.'}';
 				}
 				else {
@@ -924,7 +924,7 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
 					$function_data['parameter'] = $function_data['expression'];
 				}
 
-				if (empty($html)) {
+				if (!$html) {
 					$exp .= '{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 				}
 				else {
@@ -949,7 +949,7 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
 				}
 			}
 			else {
-				if (!empty($html)) {
+				if ($html) {
 					array_push($exp, new CSpan('*ERROR*', 'on'));
 				}
 				else {
@@ -968,7 +968,7 @@ function triggerExpression($trigger, $html, $template = false, $resolve_macro = 
 			continue;
 		}
 
-		if (!empty($html)) {
+		if ($html) {
 			array_push($exp, $expression[$i]);
 		}
 		else {
