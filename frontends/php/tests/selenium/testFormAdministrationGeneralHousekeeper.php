@@ -64,7 +64,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "alert_history"');
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('alert_history', '65535');
 		$this->button_click('save');
@@ -75,7 +75,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "alert_history"');
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('alert_history', '-1');
 		$this->button_click('save');
@@ -83,7 +83,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "alert_history".', 'CONFIGURATION OF ZABBIX', 'Housekeeper', 'Do not keep actions older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('alert_history', '65536');
 		$this->button_click('save');
@@ -110,7 +110,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_history"');
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('event_history', '65535');
 		$this->button_click('save');
@@ -121,7 +121,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_history"');
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('event_history', '-1');
 		$this->button_click('save');
@@ -129,7 +129,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "event_history".', 'CONFIGURATION OF ZABBIX', 'Housekeeper', 'Do not keep events older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('event_history', '65536');
 		$this->button_click('save');
