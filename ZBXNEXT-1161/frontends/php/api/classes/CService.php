@@ -59,7 +59,7 @@ class CService extends CZBXAPI {
 		foreach ($services as $service) {
 			$this->checkParentId($service);
 		}
-		$this->checkServicePermissions($services);
+		$this->checkAffectedServicePermissions($services);
 
 		foreach ($services as $service) {
 			$this->checkName($service);
@@ -68,6 +68,7 @@ class CService extends CZBXAPI {
 			$this->checkGoodSla($service);
 			$this->checkSortOrder($service);
 			$this->checkTriggerId($service);
+			$this->checkStatus($service);
 			// TODO: validate parent ids
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
@@ -101,7 +102,7 @@ class CService extends CZBXAPI {
 			}
 		}
 
-		$this->checkServicePermissions($services);
+		$this->checkAffectedServicePermissions($services);
 
 		$services = $this->extendObjects($this->tableName(), $services, array('name'));
 		foreach ($services as $service) {
@@ -121,6 +122,9 @@ class CService extends CZBXAPI {
 			}
 			if (isset($service['triggerid'])) {
 				$this->checkTriggerId($service);
+			}
+			if (isset($service['status'])) {
+				$this->checkStatus($service);
 			}
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
@@ -142,6 +146,25 @@ class CService extends CZBXAPI {
 		}
 
 		return array('serviceids' => zbx_objectValues($services, 'serviceid'));
+	}
+
+	public function validateDelete($serviceIds) {
+		if (!$serviceIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$this->checkServicePermissions($serviceIds);
+
+		// TODO: forbid deleting services with children
+	}
+
+	public function delete($serviceIds) {
+		$serviceIds = zbx_toArray($serviceIds);
+		$this->validateDelete($serviceIds);
+
+		DB::delete($this->tableName(), array('serviceid' => $serviceIds));
+
+		return array('serviceids' => $serviceIds);
 	}
 
 	/**
@@ -297,6 +320,21 @@ class CService extends CZBXAPI {
 	}
 
 	/**
+	 * Validates the "status" field. Assumes the "name" field is valid.
+	 *
+	 * @throws APIException if the value is incorrect
+	 *
+	 * @param array $service
+	 *
+	 * @return void
+	 */
+	protected function checkStatus(array $service) {
+		if (!empty($service['status']) && !zbx_is_int($service['status'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect status for service "%1$s".', $service['name']));
+		}
+	}
+
+	/**
 	 * Checks if the user has read access to the given triggers.
 	 *
 	 * @throws APIException if the user doesn't have permission to access any of the triggers
@@ -342,7 +380,7 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Checks if all affected services (updated, used as parents or linked) actually exist.
+	 * Checks if all affected services (updated, used as parents or linked) are readable.
 	 *
 	 * @throws APIException if at least one of the services doesn't exist
 	 *
@@ -350,7 +388,7 @@ class CService extends CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function checkServicePermissions(array $services) {
+	protected function checkAffectedServicePermissions(array $services) {
 		// check user permissions
 		if (CWebUser::$data['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -359,14 +397,28 @@ class CService extends CZBXAPI {
 		// check if the affected services exist
 		$serviceIds = zbx_objectValues($services, 'parentid');
 		if ($serviceIds) {
-			if (!$this->isReadable($serviceIds)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
+			$this->checkServicePermissions($serviceIds);
 		}
 
 		// TODO: check serviceid
 		// TODO: check parentid
 		// TODO: check links
+	}
+
+
+	/**
+	 * Checks if all of the given services are readable.
+	 *
+	 * @throws APIException if at least one of the services doesn't exist
+	 *
+	 * @param array $serviceIds
+	 *
+	 * @return void
+	 */
+	protected function checkServicePermissions(array $serviceIds) {
+		if (!$this->isReadable($serviceIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 	}
 
 }
