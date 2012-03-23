@@ -83,6 +83,7 @@ class CZBXAPI {
 			'preservekeys'			=> null,
 			'limit'					=> null
 		);
+		$this->getOptions = $this->globalGetOptions;
 	}
 
 	/**
@@ -557,17 +558,21 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Checks if the object has any fields, that are not defined in the schema.
+	 * Checks if the object has any fields, that are not defined in the schema or in $additionalFields.
 	 *
 	 * @param $tableName
 	 * @param array $object
 	 * @param $error
+	 * @param array $extraFields    an array of field names, that are not present in the schema, but may be
+	 *                              used in requests
 	 *
 	 * @throws APIException
 	 */
-	protected function checkUnsupportedFields($tableName, array $object, $error) {
+	protected function checkUnsupportedFields($tableName, array $object, $error, array $extraFields = array()) {
+		$extraFields = array_flip($extraFields);
+
 		foreach ($object as $field => $value) {
-			if (!DB::hasField($tableName, $field)) {
+			if (!DB::hasField($tableName, $field) && !isset($extraFields[$field])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}

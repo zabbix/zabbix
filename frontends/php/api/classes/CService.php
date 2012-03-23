@@ -27,26 +27,92 @@ class CService extends CZBXAPI {
 	protected $tableAlias = 's';
 
 
+	public function get(array $options) {
+		$options = zbx_array_merge($this->getOptions, $options);
+
+		// build and execute query
+		$sql = $this->createSelectQuery($this->tableName(), $options);
+		$res = DBselect($sql, $options['limit']);
+
+		// fetch results
+		$result = array();
+		while ($row = DBfetch($res)) {
+			// a count query, return a single result
+			if ($options['countOutput'] !== null) {
+				$result = $row['rowscount'];
+			}
+			// a normal select query
+			else {
+				if ($options['preservekeys'] !== null) {
+					$result[$row['scriptid']] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
+				}
+				else {
+					$result[] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
+				}
+			}
+		}
+		return $result;
+	}
+
+
 	protected function validateCreate(array $services) {
+		$this->checkServicePermissions($services);
+
 		foreach ($services as $service) {
 			$this->checkName($service);
 			$this->checkAlgorithm($service);
 			$this->checkShowSla($service);
 			$this->checkGoodSla($service);
 			$this->checkSortOrder($service);
+			// TODO: check triggerid
 
-			$this->checkUnsupportedFields($this->tableName(), $service,
-				_s('Wrong fields for servuce "%1$s".', $service['name']));
+			$error = _s('Wrong fields for service "%1$s".', $service['name']);
+			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
+				'parentid'
+			));
 		}
 
-		// TODO: validate parent trigger
-		// TODO: validate that parent services don't have triggers
-		// TODO: validate trigger
+		$this->checkTriggerPermissions($services);
+
+		// TODO: check that parent services and linked services exist
+		$this->checkIfParentsHaveTriggers($services);
 	}
 
 	public function create(array $services) {
 		$services = zbx_toArray($services);
 		$this->validateCreate($services);
+	}
+
+	/**
+	 * Returns true if all of the given objects are available for reading.
+	 *
+	 * @param $ids
+	 *
+	 * @return bool
+	 */
+	public function isReadable(array $ids) {
+		if (empty($ids)) {
+			return true;
+		}
+		$ids = array_unique($ids);
+
+		$count = $this->get(array(
+			'serviceids' => $ids,
+			'output' => API_OUTPUT_SHORTEN,
+			'countOutput' => true
+		));
+		return count($ids) == $count;
+	}
+
+	/**
+	 * Returns true if all of the given objects are available for writing.
+	 *
+	 * @param $ids
+	 *
+	 * @return bool
+	 */
+	public function isWritable(array $ids) {
+		return $this->isReadable($ids);
 	}
 
 	/**
@@ -132,6 +198,79 @@ class CService extends CZBXAPI {
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect sorder order for service "%1$s".', $service['name']));
 		}
+	}
+
+	/**
+	 * Checks if the user has read access to the given triggers.
+	 *
+	 * @throws APIException if the user doesn't have permission to access any of the triggers
+	 *
+	 * @param array $services
+	 *
+	 * @return void
+	 */
+	protected function checkTriggerPermissions(array $services) {
+		$affectedTriggerIds = array_merge(zbx_objectValues($services, 'triggerid'), array());
+		if ($affectedTriggerIds) {
+			if (!API::Trigger()->isReadable($affectedTriggerIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+	}
+
+	/**
+	 * Checks that none of the parent services are linked to a trigger.
+	 *
+	 * @throws APIException if at least one of the parent services is linked to a trigger
+	 *
+	 * @param array $services
+	 *
+	 * @return void
+	 */
+	protected function checkIfParentsHaveTriggers(array $services) {
+		// TODO: check linked parent services
+
+		$parentServiceIds = zbx_objectValues($services, 'parentid');
+		$parentServiceIds = array_unique($parentServiceIds);
+		if ($parentServiceIds) {
+			$query = DBselect(
+				'SELECT s.triggerid,s.name'.
+				' FROM services s '.
+				' WHERE '.DBcondition('s.serviceid', $parentServiceIds).
+					' AND s.triggerid IS NOT NULL', 1);
+			if ($parentService = DBfetch($query)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Service "%1$s" cannot be linked to a trigger and have children at the same time.', $parentService['name']));
+			}
+		}
+	}
+
+	/**
+	 * Checks if all affected services (updated, used as parents or linked) actually exist.
+	 *
+	 * @throws APIException if at least one of the services doesn't exist
+	 *
+	 * @param array $services
+	 *
+	 * @return void
+	 */
+	protected function checkServicePermissions(array $services) {
+		// check user permissions
+		if (CWebUser::$data['type'] == USER_TYPE_ZABBIX_USER) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		// check if the affected services exist
+		$serviceIds = zbx_objectValues($services, 'parentid');
+		if ($serviceIds) {
+			if (!$this->isReadable($serviceIds)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		// TODO: check serviceid
+		// TODO: check parentid
+		// TODO: check links
 	}
 
 }
