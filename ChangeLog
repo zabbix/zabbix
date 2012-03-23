@@ -1,6 +1,6 @@
 Changes for 1.8.12rc1
 
-..F....... [ZBX-4253] fixed menu link inconsistency in tr_status.php
+..F....... [ZBX-4253] fixed menu link inconsistency in tr_status.php (Toms)
 .......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
 ..F....... [ZBX-4761] fixed "&" encoding in input fields (Pavels)
