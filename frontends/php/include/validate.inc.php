@@ -612,4 +612,22 @@
 
 	return ($err==ZBX_VALID_OK ? 1 : 0);
 	}
+
+	/*
+	* Validate URL against XSS
+	*/
+	function validateUrl($url) {
+		if (stripos($url, "javascript:") !== false) {
+			return false;
+		}
+		// for IE
+		if (stripos($url, "vbscript:") !== false) {
+			return false;
+		}
+		// for Netscape
+		if (stripos($url, "livescript:") !== false) {
+			return false;
+		}
+		return true;
+	}
 ?>
