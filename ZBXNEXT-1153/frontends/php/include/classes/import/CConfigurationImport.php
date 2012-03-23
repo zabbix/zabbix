@@ -1221,7 +1221,7 @@ class CConfigurationImport {
 
 							if (empty($db_items)) {
 								throw new Exception(_s('Cannot find item "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['host'].':'.$screenitem['resource']['key_'], $screen['name']));
+										$nodeCaption.$screenitem['resource']['host'].':'.$screenitem['resource']['key'], $screen['name']));
 							}
 
 							$tmp = reset($db_items);
