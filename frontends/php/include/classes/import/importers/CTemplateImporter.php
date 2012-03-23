@@ -57,7 +57,7 @@ class CTemplateImporter extends CImporter {
 				$template = $this->resolveTemplateReferences($template);
 
 				if ($templateId = $this->referencer->resolveTemplate($template['name'])) {
-					$template['hostid'] = $templateId;
+					$template['templateid'] = $templateId;
 					$templatesToUpdate[] = $template;
 				}
 				else {
@@ -73,7 +73,7 @@ class CTemplateImporter extends CImporter {
 					$this->referencer->addProcessedHost($createdTemplate['host']);
 				}
 			}
-			if ($this->options['maps']['updateExisting'] && $templatesToUpdate) {
+			if ($this->options['templates']['updateExisting'] && $templatesToUpdate) {
 				API::Template()->update($templatesToUpdate);
 				foreach ($templatesToUpdate as $updatedTemplate) {
 					$this->referencer->addProcessedHost($updatedTemplate['host']);
