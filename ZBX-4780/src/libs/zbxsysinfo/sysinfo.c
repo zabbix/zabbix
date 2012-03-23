@@ -643,6 +643,7 @@ static char	**get_result_text_value(AGENT_RESULT *result)
 	if (ISSET_TEXT(result))
 	{
 		/* nothing to do */
+		return &result->text;
 	}
 	else if (ISSET_STR(result))
 	{
