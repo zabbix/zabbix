@@ -34,7 +34,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->login('adm.regexps.php');
 		$this->assertTitle('Configuration of regular expressions');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->ok('Regular expressions');
 		$this->ok(array('Name', 'Expressions'));
 		// checking that all elements exists
