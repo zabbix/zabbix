@@ -37,7 +37,7 @@ class testPageApplications extends CWebTest {
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid', 'all');
 
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('HOSTS');
 		// Go to the list of applications
 		$this->href_click("applications.php?groupid=0&hostid=$hostid&sid=");
