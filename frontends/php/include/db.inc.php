@@ -1085,6 +1085,18 @@ function unlock_sqlite3_access() {
 	sem_release($DB['SEM_ID']);
 }
 
+/**
+ * Returns true if both IDs are equal.
+ *
+ * @param $id1
+ * @param $id2
+ *
+ * @return bool
+ */
+function idcmp($id1, $id2) {
+	return $id1 === $id2;
+}
+
 class DB {
 	const SCHEMA_FILE = 'schema.inc.php';
 

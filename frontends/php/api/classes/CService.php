@@ -26,7 +26,13 @@ class CService extends CZBXAPI {
 	protected $tableName = 'services';
 	protected $tableAlias = 's';
 
-
+	/**
+	 * Get services.
+	 *
+	 * @param array $options
+	 *
+	 * @return array
+	 */
 	public function get(array $options) {
 		$options = zbx_array_merge($this->getOptions, $options);
 
@@ -54,7 +60,15 @@ class CService extends CZBXAPI {
 		return $result;
 	}
 
-
+	/**
+	 * Validates the input parameters for the create() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $services
+	 *
+	 * @return void
+	 */
 	protected function validateCreate(array $services) {
 		foreach ($services as $service) {
 			$this->checkParentId($service);
@@ -78,20 +92,39 @@ class CService extends CZBXAPI {
 		}
 
 		$this->checkTriggerPermissions($services);
-
-		// TODO: check that parent services and linked services exist
 		$this->checkIfParentsHaveTriggers($services);
 	}
 
+	/**
+	 * Creates the given services.
+	 *
+	 * @param array $services
+	 *
+	 * @return array
+	 */
 	public function create(array $services) {
 		$services = zbx_toArray($services);
 		$this->validateCreate($services);
 
 		$serviceIds = DB::insert($this->tableName(), $services);
 
+		// TODO: process parent
+		// TODO: process dependencies
+		// TODO: process service times
+		// TODO: update statuses
+
 		return array('serviceids' => $serviceIds);
 	}
 
+	/**
+	 * Validates the input parameters for the update() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $services
+	 *
+	 * @return void
+	 */
 	public function validateUpdate(array $services) {
 		foreach ($services as $service) {
 			if (empty($service['serviceid'])) {
@@ -126,6 +159,7 @@ class CService extends CZBXAPI {
 			if (isset($service['status'])) {
 				$this->checkStatus($service);
 			}
+			// TODO: validate parent ids
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
@@ -137,6 +171,13 @@ class CService extends CZBXAPI {
 		$this->checkIfParentsHaveTriggers($services);
 	}
 
+	/**
+	 * Updates the given services.
+	 *
+	 * @param array $services
+	 *
+	 * @return array
+	 */
 	public function update(array $services) {
 		$services = zbx_toArray($services);
 		$this->validateUpdate($services);
@@ -145,9 +186,23 @@ class CService extends CZBXAPI {
 			DB::updateByPk($this->tableName(), $service['serviceid'], $service);
 		}
 
+		// TODO: process parent
+		// TODO: process dependencies
+		// TODO: process service times
+		// TODO: update statuses
+
 		return array('serviceids' => zbx_objectValues($services, 'serviceid'));
 	}
 
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $serviceIds
+	 *
+	 * @return void
+	 */
 	public function validateDelete($serviceIds) {
 		if (!$serviceIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
@@ -158,11 +213,20 @@ class CService extends CZBXAPI {
 		// TODO: forbid deleting services with children
 	}
 
+	/**
+	 * Delete services.
+	 *
+	 * @param $serviceIds
+	 *
+	 * @return array
+	 */
 	public function delete($serviceIds) {
 		$serviceIds = zbx_toArray($serviceIds);
 		$this->validateDelete($serviceIds);
 
 		DB::delete($this->tableName(), array('serviceid' => $serviceIds));
+
+		// TODO: update statuses
 
 		return array('serviceids' => $serviceIds);
 	}
@@ -317,6 +381,10 @@ class CService extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parent service.'));
 			}
 		}
+
+		if (idcmp($service['serviceid'], $service['parentid'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Service cannot be parent and child at the same time.'));
+		}
 	}
 
 	/**
@@ -396,12 +464,12 @@ class CService extends CZBXAPI {
 
 		// check if the affected services exist
 		$serviceIds = zbx_objectValues($services, 'parentid');
+		$serviceIds = array_merge($serviceIds, zbx_objectValues($services, 'serviceid'));
+		$serviceIds = array_unique($serviceIds);
 		if ($serviceIds) {
 			$this->checkServicePermissions($serviceIds);
 		}
 
-		// TODO: check serviceid
-		// TODO: check parentid
 		// TODO: check links
 	}
 
