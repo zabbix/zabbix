@@ -1541,7 +1541,8 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	const char		*__function_name = "process_hist_data";
 	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p;
-	char			tmp[MAX_BUFFER_LEN];
+	char			*tmp = NULL;
+	size_t			tmp_alloc = 0;
 	int			ret = FAIL, processed = 0, value_num = 0, total_num = 0;
 	double			sec;
 	zbx_timespec_t		ts, proxy_timediff;
@@ -1558,11 +1559,11 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	if (NULL == values)
 		values = zbx_malloc(values, VALUES_MAX * sizeof(AGENT_VALUE));
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
+	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 	{
 		proxy_timediff.sec = ts.sec - atoi(tmp);
 
-		if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 		{
 			proxy_timediff.ns = ts.ns - atoi(tmp);
 
@@ -1592,11 +1593,11 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 
 		memset(av, 0, sizeof(AGENT_VALUE));
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 		{
 			av->ts.sec = atoi(tmp) + proxy_timediff.sec;
 
-			if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_NS, tmp, sizeof(tmp)))
+			if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 			{
 				av->ts.ns = atoi(tmp) + proxy_timediff.ns;
 
@@ -1618,30 +1619,30 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, av->key, sizeof(av->key)))
 			continue;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, tmp, sizeof(tmp)))
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
 			continue;
 
-		av->value = strdup(tmp);
+		av->value = zbx_strdup(av->value, tmp);
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, &tmp, &tmp_alloc))
 			av->lastlogsize = atoi(tmp);
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_MTIME, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
 			av->mtime = atoi(tmp);
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, &tmp, &tmp_alloc))
 			av->timestamp = atoi(tmp);
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGSOURCE, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGSOURCE, &tmp, &tmp_alloc))
 			av->source = strdup(tmp);
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGSEVERITY, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGSEVERITY, &tmp, &tmp_alloc))
 			av->severity = atoi(tmp);
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGEVENTID, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGEVENTID, &tmp, &tmp_alloc))
 			av->logeventid = atoi(tmp);
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp)))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATUS, &tmp, &tmp_alloc))
 			av->status = (unsigned char)atoi(tmp);
 
 		value_num++;
@@ -1655,6 +1656,8 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 			value_num = 0;
 		}
 	}
+
+	zbx_free(tmp);
 
 	if (0 < value_num)
 		process_mass_data(sock, proxy_hostid, values, value_num, &processed);

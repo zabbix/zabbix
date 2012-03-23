@@ -28,7 +28,6 @@
 #include "zbxserver.h"
 #include "proxy.h"
 #include "events.h"
-
 #include "memalloc.h"
 #include "zbxalgo.h"
 
@@ -2502,6 +2501,34 @@ static void	DCadd_history_text(zbx_uint64_t itemid, const char *value_orig, zbx_
 	UNLOCK_CACHE;
 }
 
+/* lld item values should be stored without a limit */
+static void	DCadd_history_lld(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts)
+{
+	ZBX_DC_HISTORY	*history;
+	size_t		len;
+
+	len = strlen(value_orig) + 1;
+
+	LOCK_CACHE;
+
+	DCcheck_ns(ts);
+
+	history = DCget_history_ptr(len);
+
+	history->itemid = itemid;
+	history->clock = ts->sec;
+	history->ns = ts->ns;
+	history->status = ITEM_STATUS_ACTIVE;
+	history->value_type = ITEM_VALUE_TYPE_TEXT;
+	DCadd_text(&history->value_orig.str, value_orig, len);
+	history->value_null = 0;
+
+	cache->stats.history_counter++;
+	cache->stats.history_text_counter++;
+
+	UNLOCK_CACHE;
+}
+
 static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts,
 		int timestamp, const char *source, int severity, int logeventid, int lastlogsize, int mtime)
 {
@@ -2590,10 +2617,19 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		return;
 	}
 
-	/* check for low-level discovery (lld) item */
-	if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type) && 0 != (ZBX_FLAG_DISCOVERY & flags))
+	if (0 != (ZBX_FLAG_DISCOVERY & flags))
 	{
-		DBlld_process_discovery_rule(itemid, value->text, ts);
+		/* server processes low-level discovery (lld) items while proxy stores their values in db */
+		if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type))
+		{
+			DBlld_process_discovery_rule(itemid, value->text, ts);
+		}
+		else
+		{
+			if (GET_TEXT_RESULT(value))
+				DCadd_history_lld(itemid, value->text, ts);
+		}
+
 		return;
 	}
 
