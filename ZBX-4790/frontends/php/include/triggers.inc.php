@@ -848,23 +848,20 @@ function explode_exp($expression, $html = false, $resolve_macro = false, $src_ho
 }
 
 /**
- * Translate {10}>10 to something like localhost:procload.last(0)>10.
- * Don't forget sync code with C.
+ * Translate {10}>10 to something like {localhost:system.cpu.load.last(0)}>10.
  *
  * @param $trigger
  * @param bool $html
- * @param bool $template
- * @param bool $resolve_macro
  * @return array|string
  */
-function triggerExpression($trigger, $html = false, $template = false, $resolve_macro = false) {
+function triggerExpression($trigger, $html = false) {
 	$expression = $trigger['expression'];
 	$functionid = '';
 	$macros = '';
 	$exp = $html ? array() : '';
 	$state = '';
 
-	for ($i = 0, $max = zbx_strlen($expression); $i < $max; $i++) {
+	for ($i = 0; isset($expression[$i]); $i++) {
 		if ($expression[$i] == '{' && $expression[$i+1] == '$') {
 			$functionid = '';
 			$macros = '';
@@ -880,14 +877,8 @@ function triggerExpression($trigger, $html = false, $template = false, $resolve_
 			if ($state == 'MACROS') {
 				$macros .= '}';
 
-				if ($resolve_macro) {
-					$function_data['expression'] = $macros;
-					$function_data = API::UserMacro()->resolveTrigger($function_data);
-					$macros = $function_data['expression'];
-				}
-
 				if ($html) {
-					array_push($exp,$macros);
+					array_push($exp, $macros);
 				}
 				else {
 					$exp .= $macros;
@@ -912,17 +903,6 @@ function triggerExpression($trigger, $html = false, $template = false, $resolve_
 				$function_data = $trigger['functions'][$functionid];
 				$function_data += $trigger['items'][$function_data['itemid']];
 				$function_data += $trigger['hosts'][$function_data['hostid']];
-
-				if ($template) {
-					$function_data['host'] = '{HOST.HOST}';
-				}
-
-				if ($resolve_macro) {
-					$function_data = API::UserMacro()->resolveItem($function_data);
-					$function_data['expression'] = $function_data['parameter'];
-					$function_data = API::UserMacro()->resolveTrigger($function_data);
-					$function_data['parameter'] = $function_data['expression'];
-				}
 
 				if (!$html) {
 					$exp .= '{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';

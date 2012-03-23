@@ -136,7 +136,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'],'hostid');
 			$oldTrigger['items'] = zbx_toHash($oldTrigger['items'],'itemid');
 			$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'],'functionid');
-			$oldExpression = triggerExpression($oldTrigger,false);
+			$oldExpression = triggerExpression($oldTrigger);
 
 			if(isset($oldTrigger['hosts'][$hostid])) break;
 
@@ -178,7 +178,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$newTrigger['hosts'] = $oldTrigger['hosts'];
 				$newTrigger['items'] = $oldTrigger['items'];
 
-				$newExpression = triggerExpression($newTrigger,false);
+				$newExpression = triggerExpression($newTrigger);
 
 				if(strcmp($oldExpression, $newExpression) == 0){
 					$_REQUEST['triggerid'] = $newTrigger['triggerid'];
