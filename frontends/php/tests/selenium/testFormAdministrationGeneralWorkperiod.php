@@ -34,8 +34,8 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->login('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Working time');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Working time', 'Working time'));
+		$this->assertTitle('Configuration of working time');
+		$this->ok(array('CONFIGURATION OF WORKING TIME', 'Working time', 'Working time'));
 		$this->assertElementPresent('work_period');
 		$this->assertAttribute("//input[@id='work_period']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='work_period']/@size", '50');
@@ -48,8 +48,8 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->login('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Working time');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Working time'));
+		$this->assertTitle('Configuration of working time');
+		$this->ok(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 
 		$sqlHash = 'SELECT configid,alert_history,event_history,refresh_unsupported,alert_usrgrpid,'.
 				'event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,'.
@@ -78,8 +78,8 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 		// checking also for the following error: ERROR: Configuration was not updated | Incorrect working time: "1-8,09:00-25:00".
 		$this->dropdown_select_wait('configDropDown', 'Working time');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->assertTitle('Configuration of working time');
+		$this->ok('CONFIGURATION OF WORKING TIME');
 		$this->ok('Working time');
 		$this->input_type('work_period', '1-8,09:00-25:00');
 		$this->button_click('save');
@@ -88,8 +88,8 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 		// trying to save empty work period
 		$this->dropdown_select_wait('configDropDown', 'Working time');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Working time'));
+		$this->assertTitle('Configuration of working time');
+		$this->ok(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 		$this->input_type('work_period', '');
 		$this->button_click('save');
 		$this->wait();
