@@ -861,7 +861,7 @@ function triggerExpression($trigger, $html = false) {
 	$exp = $html ? array() : '';
 	$state = '';
 
-	for ($i = 0; isset($expression[$i]); $i++) {
+	for ($i = 0; strlen($expression) > $i; $i++) {
 		if ($expression[$i] == '{' && $expression[$i+1] == '$') {
 			$functionid = '';
 			$macros = '';

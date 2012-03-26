@@ -44,8 +44,8 @@ function sdi($msg = 'SDI') {
 	echo SBR;
 }
 
-function sdii($msg = 'SDII') {
-	echo 'DEBUG INFO: ';
+function sdii($msg = 'SDII', $for = '') {
+	echo 'DEBUG INFO: '.$for;
 	echo '<pre>'.print_r($msg, true).'</pre>';
 	echo SBR;
 }
