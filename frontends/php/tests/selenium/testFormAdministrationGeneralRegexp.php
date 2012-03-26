@@ -31,16 +31,16 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->assertTitle('Configuration of regular expressions');
+		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->ok(array('Regular expressions', 'Name', 'Expressions'));
 
 		// clicking "New regular expression" button
 		$this->button_click('form');
 		$this->wait();
 
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->assertTitle('Configuration of regular expressions');
+		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->ok('Regular expression');
 		$this->ok('Name');
 		$this->assertElementPresent('rename');
@@ -187,7 +187,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		// Test #1 for the result=True
 		$this->button_click('test');
 		$this->wait();
-		$this->assertTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of regular expressions');
 		$this->ok('TRUE');
 	}
 
@@ -261,7 +261,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->ok(array('Regular expression deleted', 'CONFIGURATION OF ZABBIX', 'Regular expressions', 'Name', 'Expressions'));
+		$this->ok(array('Regular expression deleted', 'CONFIGURATION OF REGULAR EXPRESSIONS', 'Regular expressions', 'Name', 'Expressions'));
 
 		// checking that regexp "test_regexp2" has been deleted from the DB
 		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($name);
