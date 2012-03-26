@@ -665,9 +665,9 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 
 		if ($sqlWhere) {
-			$sql = 'SELECT i.key_'.
-				' FROM items i'.
-				' WHERE ('.implode(' OR ', $sqlWhere).')';
+			$sql = 'SELECT i.key_, h.host'.
+				' FROM items i, hosts h'.
+				' WHERE i.hostid = h.hostid AND ('.implode(' OR ', $sqlWhere).')';
 
 			// if we update existing items we need to exclude them from result.
 			if ($itemIds) {
@@ -675,7 +675,8 @@ abstract class CItemGeneral extends CZBXAPI {
 			}
 			$dbItems = DBselect($sql, 1);
 			while ($dbItem = DBfetch($dbItems)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on given host.', $dbItem['key_']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Item with key "%1$s" already exists on "%2$s".', $dbItem['key_'], $dbItem['host']));
 			}
 		}
 	}
