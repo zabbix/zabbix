@@ -90,7 +90,7 @@
 			$data['autologin']		= get_request('autologin', 0);
 			$data['autologout']		= get_request('autologout', 900);
 			$data['lang']			= get_request('lang', 'en_gb');
-			$data['theme']			= get_request('theme', 'default.css');
+			$data['theme']			= get_request('theme', THEME_DEFAULT);
 			$data['refresh']		= get_request('refresh', 30);
 			$data['rows_per_page']	= get_request('rows_per_page', 50);
 			$data['user_type']		= get_request('user_type', USER_TYPE_ZABBIX_USER);;
