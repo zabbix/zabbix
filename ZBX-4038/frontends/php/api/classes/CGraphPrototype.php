@@ -638,7 +638,7 @@ class CGraphPrototype extends CZBXAPI{
 					}
 				}
 				if ($templatedGraph && (count($graphHosts) > 1)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph').' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph prototype "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
 				}
 
 // check ymin, ymax items
@@ -708,7 +708,7 @@ class CGraphPrototype extends CZBXAPI{
 					}
 				}
 				if ($templatedGraph && (count($graphHosts) > 1)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Graph').' [ '.$graph['name'].' ] '.S_GRAPH_TEMPLATE_HOST_CANNOT_OTHER_ITEMS_HOSTS_SMALL);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph prototype "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
 				}
 // }}} EXCEPTION: MESS TEMPLATED ITEMS
 
@@ -1049,6 +1049,8 @@ class CGraphPrototype extends CZBXAPI{
 				if (!check_db_fields($fields, $gitem)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for items'));
 				}
+
+				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
 // }}} EXCEPTION: ITEMS FIELDS
 
@@ -1061,8 +1063,6 @@ class CGraphPrototype extends CZBXAPI{
 				if ($sumItems > 1) self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
 			}
 // }}} EXCEPTION
-
-			$itemids += zbx_objectValues($graph['gitems'], 'itemid');
 		}
 
 

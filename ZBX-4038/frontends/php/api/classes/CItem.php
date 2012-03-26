@@ -495,6 +495,9 @@ class CItem extends CItemGeneral {
 					if (!is_null($options['selectDiscoveryRule']) && !isset($result[$item['itemid']]['discoveryRule'])) {
 						$result[$item['itemid']]['discoveryRule'] = array();
 					}
+					if (!is_null($options['selectInterfaces']) && !isset($result[$item['itemid']]['interfaces'])) {
+						$result[$item['itemid']]['interfaces'] = array();
+					}
 
 					// triggerids
 					if (isset($item['triggerid']) && is_null($options['selectTriggers'])) {
@@ -571,8 +574,8 @@ class CItem extends CItemGeneral {
 					'nodeids' => $nodeids,
 					'itemids' => $itemids,
 					'output' => $options['selectInterfaces'],
-					'nopermissions' => 1,
-					'preservekeys' => 1
+					'nopermissions' => true,
+					'preservekeys' => true
 				);
 				$interfaces = API::HostInterface()->get($objParams);
 				foreach ($interfaces as $interface) {

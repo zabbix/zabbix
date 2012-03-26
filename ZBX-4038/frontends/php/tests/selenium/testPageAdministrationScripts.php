@@ -59,7 +59,7 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 		$this->ok('Script updated');
 		$this->ok($name);
 		$this->ok('CONFIGURATION OF SCRIPTS');
@@ -80,7 +80,7 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 		$this->ok('Script deleted');
 
 		$sql = 'SELECT * FROM scripts';
@@ -106,7 +106,7 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 		$this->ok('Script deleted');
 
 		$sql = 'SELECT * FROM scripts WHERE scriptid='.zbx_dbstr($scriptid).'';

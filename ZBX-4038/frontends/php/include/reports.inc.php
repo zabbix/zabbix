@@ -122,18 +122,18 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 	$filtertimetab->setCellSpacing(0);
 
 	$filtertimetab->addRow(array(
-							S_FROM,
-							new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
-							'/',
-							new CNumericBox('filter_since_month',(($_REQUEST['filter_timesince']>0)?date('m',$_REQUEST['filter_timesince']):''),2),
-							'/',
-							new CNumericBox('filter_since_year',(($_REQUEST['filter_timesince']>0)?date('Y',$_REQUEST['filter_timesince']):''),4),
-							SPACE,
-							new CNumericBox('filter_since_hour',(($_REQUEST['filter_timesince']>0)?date('H',$_REQUEST['filter_timesince']):''),2),
-							':',
-							new CNumericBox('filter_since_minute',(($_REQUEST['filter_timesince']>0)?date('i',$_REQUEST['filter_timesince']):''),2),
-							$clndr_icon
-					));
+		_('From'),
+		new CNumericBox('filter_since_day',(($_REQUEST['filter_timesince']>0)?date('d',$_REQUEST['filter_timesince']):''),2),
+		'/',
+		new CNumericBox('filter_since_month',(($_REQUEST['filter_timesince']>0)?date('m',$_REQUEST['filter_timesince']):''),2),
+		'/',
+		new CNumericBox('filter_since_year',(($_REQUEST['filter_timesince']>0)?date('Y',$_REQUEST['filter_timesince']):''),4),
+		SPACE,
+		new CNumericBox('filter_since_hour',(($_REQUEST['filter_timesince']>0)?date('H',$_REQUEST['filter_timesince']):''),2),
+		':',
+		new CNumericBox('filter_since_minute',(($_REQUEST['filter_timesince']>0)?date('i',$_REQUEST['filter_timesince']):''),2),
+		$clndr_icon
+	));
 	zbx_add_post_js('create_calendar(null,'.
 					'["filter_since_day","filter_since_month","filter_since_year","filter_since_hour","filter_since_minute"],'.
 					'"avail_report_since",'.
@@ -146,18 +146,18 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 										"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
 
 	$filtertimetab->AddRow(array(
-							S_TILL,
-							new CNumericBox('filter_till_day',(($_REQUEST['filter_timetill']>0)?date('d',$_REQUEST['filter_timetill']):''),2),
-							'/',
-							new CNumericBox('filter_till_month',(($_REQUEST['filter_timetill']>0)?date('m',$_REQUEST['filter_timetill']):''),2),
-							'/',
-							new CNumericBox('filter_till_year',(($_REQUEST['filter_timetill']>0)?date('Y',$_REQUEST['filter_timetill']):''),4),
-							SPACE,
-							new CNumericBox('filter_till_hour',(($_REQUEST['filter_timetill']>0)?date('H',$_REQUEST['filter_timetill']):''),2),
-							':',
-							new CNumericBox('filter_till_minute',(($_REQUEST['filter_timetill']>0)?date('i',$_REQUEST['filter_timetill']):''),2),
-							$clndr_icon
-					));
+		_('Till'),
+		new CNumericBox('filter_till_day',(($_REQUEST['filter_timetill']>0)?date('d',$_REQUEST['filter_timetill']):''),2),
+		'/',
+		new CNumericBox('filter_till_month',(($_REQUEST['filter_timetill']>0)?date('m',$_REQUEST['filter_timetill']):''),2),
+		'/',
+		new CNumericBox('filter_till_year',(($_REQUEST['filter_timetill']>0)?date('Y',$_REQUEST['filter_timetill']):''),4),
+		SPACE,
+		new CNumericBox('filter_till_hour',(($_REQUEST['filter_timetill']>0)?date('H',$_REQUEST['filter_timetill']):''),2),
+		':',
+		new CNumericBox('filter_till_minute',(($_REQUEST['filter_timetill']>0)?date('i',$_REQUEST['filter_timetill']):''),2),
+		$clndr_icon
+	));
 	zbx_add_post_js('create_calendar(null,'.
 			'["filter_till_day","filter_till_month","filter_till_year","filter_till_hour","filter_till_minute"],'.
 			'"avail_report_till",'.
@@ -233,18 +233,18 @@ function bar_report_form(){
 	$reporttimetab->setCellSpacing(0);
 
 	$reporttimetab->addRow(array(
-							S_FROM,
-							new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
-							'/',
-							new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
-							'/',
-							new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
-							SPACE,
-							new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
-							':',
-							new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
-							$clndr_icon
-					));
+		_('From'),
+		new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
+		'/',
+		new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
+		'/',
+		new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
+		SPACE,
+		new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
+		':',
+		new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
+		$clndr_icon
+	));
 	zbx_add_post_js('create_calendar(null,'.
 					'["report_since_day","report_since_month","report_since_year","report_since_hour","report_since_minute"],'.
 					'"avail_report_since",'.
@@ -257,18 +257,18 @@ function bar_report_form(){
 										"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
 
 	$reporttimetab->addRow(array(
-							S_TILL,
-							new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
-							'/',
-							new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
-							'/',
-							new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
-							SPACE,
-							new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
-							':',
-							new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
-							$clndr_icon
-					));
+		_('Till'),
+		new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
+		'/',
+		new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
+		'/',
+		new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
+		SPACE,
+		new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
+		':',
+		new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
+		$clndr_icon
+	));
 
 	zbx_add_post_js('create_calendar(null,'.
 					'["report_till_day","report_till_month","report_till_year","report_till_hour","report_till_minute"],'.
@@ -311,7 +311,7 @@ function bar_report_form(){
 					$caption,
 					$description,
 					graph_item_calc_fnc2str($gitem['calc_fnc'],0),
-					($gitem['axisside']==GRAPH_YAXIS_SIDE_LEFT)?_('Left'):S_RIGHT,
+					($gitem['axisside']==GRAPH_YAXIS_SIDE_LEFT)?_('Left'):_('Right'),
 					$color,
 				));
 		}
@@ -324,14 +324,14 @@ function bar_report_form(){
 	$reportForm->addRow(S_ITEMS,
 				array(
 					$items_table,
-					new CButton('add_item',S_ADD,
+					new CButton('add_item',_('Add'),
 						"return PopUp('popup_bitem.php?config=1&dstfrm=".$reportForm->getName().
 						"',800,400,'graph_item_form');"),
 					$delete_button
 				));
 	unset($items_table, $delete_button);
 
-	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
+	$reportForm->addItemToBottomRow(new CSubmit('report_show',_('Show')));
 
 	$reset = new CButton('reset',_('Reset'));
 	$reset->setType('reset');
@@ -420,7 +420,7 @@ function bar_report_form2(){
 	$reportForm->addRow(_('Period'),
 				array(
 					$periods_table,
-					new CButton('add_period',S_ADD,
+					new CButton('add_period',_('Add'),
 						"return PopUp('popup_period.php?config=2&dstfrm=".$reportForm->getName()."',840,340,'period_form');"),
 					$delete_button
 				));
@@ -460,7 +460,7 @@ function bar_report_form2(){
 	$reportForm->addRow(S_ITEMS,
 				array(
 					$items_table,
-					new CButton('add_item',S_ADD,
+					new CButton('add_item',_('Add'),
 						"return PopUp('popup_bitem.php?config=2&dstfrm=".$reportForm->getName().
 						"',550,400,'graph_item_form');"),
 					$delete_button
@@ -469,7 +469,7 @@ function bar_report_form2(){
 //--------------
 
 
-	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
+	$reportForm->addItemToBottomRow(new CSubmit('report_show',_('Show')));
 
 	$reset = new CButton('reset',_('Reset'));
 	$reset->setType('reset');
@@ -602,18 +602,18 @@ function bar_report_form3(){
 	$reporttimetab->setCellSpacing(0);
 
 	$reporttimetab->addRow(array(
-							S_FROM,
-							new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
-							'/',
-							new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
-							'/',
-							new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
-							SPACE,
-							new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
-							':',
-							new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
-							$clndr_icon
-					));
+		_('From'),
+		new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
+		'/',
+		new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
+		'/',
+		new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
+		SPACE,
+		new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
+		':',
+		new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
+		$clndr_icon
+	));
 	zbx_add_post_js('create_calendar(null,'.
 					'["report_since_day","report_since_month","report_since_year","report_since_hour","report_since_minute"],'.
 					'"avail_report_since",'.
@@ -626,18 +626,18 @@ function bar_report_form3(){
 										"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
 
 	$reporttimetab->addRow(array(
-							S_TILL,
-							new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
-							'/',
-							new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
-							'/',
-							new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
-							SPACE,
-							new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
-							':',
-							new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
-							$clndr_icon
-					));
+		_('Till'),
+		new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
+		'/',
+		new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
+		'/',
+		new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
+		SPACE,
+		new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
+		':',
+		new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
+		$clndr_icon
+	));
 
 	zbx_add_post_js('create_calendar(null,'.
 					'["report_till_day","report_till_month","report_till_year","report_till_hour","report_till_minute"],'.
@@ -656,20 +656,20 @@ function bar_report_form3(){
 	$reportForm->addRow(_('Period'), $reporttimetab);
 
 	$scale = new CComboBox('scaletype', $scaletype);
-		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, S_HOURLY);
-		$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	S_DAILY);
-		$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	S_WEEKLY);
-		$scale->addItem(TIMEPERIOD_TYPE_MONTHLY,S_MONTHLY);
-		$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	S_YEARLY);
-	$reportForm->addRow(S_SCALE, $scale);
+		$scale->addItem(TIMEPERIOD_TYPE_HOURLY, _('Hourly'));
+		$scale->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
+		$scale->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
+		$scale->addItem(TIMEPERIOD_TYPE_MONTHLY,_('Monthly'));
+		$scale->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
+	$reportForm->addRow(_('Scale'), $scale);
 
 	$avgcmb = new CComboBox('avgperiod', $avgperiod);
-		$avgcmb->addItem(TIMEPERIOD_TYPE_HOURLY,	S_HOURLY);
-		$avgcmb->addItem(TIMEPERIOD_TYPE_DAILY, 	S_DAILY);
-		$avgcmb->addItem(TIMEPERIOD_TYPE_WEEKLY,	S_WEEKLY);
-		$avgcmb->addItem(TIMEPERIOD_TYPE_MONTHLY, 	S_MONTHLY);
-		$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY,	S_YEARLY);
-	$reportForm->addRow(S_AVERAGE_BY, $avgcmb);
+		$avgcmb->addItem(TIMEPERIOD_TYPE_HOURLY,	_('Hourly'));
+		$avgcmb->addItem(TIMEPERIOD_TYPE_DAILY, 	_('Daily'));
+		$avgcmb->addItem(TIMEPERIOD_TYPE_WEEKLY,	_('Weekly'));
+		$avgcmb->addItem(TIMEPERIOD_TYPE_MONTHLY, 	_('Monthly'));
+		$avgcmb->addItem(TIMEPERIOD_TYPE_YEARLY,	_('Yearly'));
+	$reportForm->addRow(_('Average by'), $avgcmb);
 
 	// items
 	$itemid = 0;
@@ -686,7 +686,7 @@ function bar_report_form3(){
 	$txtCondVal = new CTextBox('items[0][description]',$description,50,'yes');
 	$txtCondVal->setAttribute('id', 'items_0_description');
 
-	$btnSelect = new CButton('btn1', S_SELECT,
+	$btnSelect = new CButton('btn1', _('Select'),
 			"return PopUp('popup.php?dstfrm=".$reportForm->GetName().
 			"&dstfld1=items_0_itemid&dstfld2=items_0_description&".
 			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
@@ -696,18 +696,18 @@ function bar_report_form3(){
 
 
 	$paletteCmb = new CComboBox('palette', $palette);
-		$paletteCmb->addItem(0, S_PALETTE.' #1');
-		$paletteCmb->addItem(1, S_PALETTE.' #2');
-		$paletteCmb->addItem(2, S_PALETTE.' #3');
-		$paletteCmb->addItem(3, S_PALETTE.' #4');
+		$paletteCmb->addItem(0, _s('Palette #%1$s', 1));
+		$paletteCmb->addItem(1, _s('Palette #%1$s', 2));
+		$paletteCmb->addItem(2, _s('Palette #%1$s', 3));
+		$paletteCmb->addItem(3, _s('Palette #%1$s', 4));
 
 	$paletteTypeCmb = new CComboBox('palettetype', $palettetype);
-		$paletteTypeCmb->addItem(0, S_MIDDLE);
-		$paletteTypeCmb->addItem(1, S_DARKEN);
-		$paletteTypeCmb->addItem(2, S_BRIGHTEN);
+		$paletteTypeCmb->addItem(0, _('Middle'));
+		$paletteTypeCmb->addItem(1, _('Darken'));
+		$paletteTypeCmb->addItem(2, _('Brighten'));
 
-	$reportForm->addRow(S_PALETTE , array($paletteCmb,$paletteTypeCmb));
-	$reportForm->addItemToBottomRow(new CSubmit('report_show',S_SHOW));
+	$reportForm->addRow(_('Palette') , array($paletteCmb,$paletteTypeCmb));
+	$reportForm->addItemToBottomRow(new CSubmit('report_show',_('Show')));
 
 	$reset = new CButton('reset', _('Reset'));
 	$reset->setType('reset');

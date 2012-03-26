@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/ident.inc.php';
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['title'] = 'S_HOSTS';
+$page['title'] = _('Hosts');
 $page['file'] = 'hosts_mon.php';
 $page['hist_arg'] = array('groupid');
 
@@ -163,7 +163,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // table HOSTS
 	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(
-		make_sorting_header(S_NAME, 'name'),
+		make_sorting_header(_('Name'), 'name'),
 		_('Applications'),
 		S_ITEMS,
 		S_TRIGGERS,

@@ -183,7 +183,7 @@
 		$host_tb->addItem($db_host['hostid'], $db_host['name']);
 	}
 
-	$templateList->addRow(S_HOSTS.' / '.S_TEMPLATES, $host_tb->Get(_('In'), array(_('Other').SPACE.'|'.SPACE._('Group').SPACE,$cmbGroups)));
+	$templateList->addRow(_('Hosts / templates'), $host_tb->Get(_('In'), array(_('Other | group').SPACE,$cmbGroups)));
 
 // FULL CLONE {
 	if($_REQUEST['form'] == 'full_clone'){
@@ -353,7 +353,7 @@
 		));
 	}
 
-	$tmplAdd = new CButton('add', S_ADD, 'return PopUp("popup.php?dstfrm='.$frmHost->getName().
+	$tmplAdd = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.$frmHost->getName().
 			'&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host&excludeids['.$templateid.']='.$templateid.
 			url_param($templates,false,"existed_templates").'",450,450)',
 			'link_menu');
@@ -378,11 +378,11 @@
 	$frmHost->addItem($divTabs);
 
 // Footer
-	$main = array(new CSubmit('save', S_SAVE));
+	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
 	if(($templateid > 0) && ($_REQUEST['form'] != 'full_clone')){
-		$others[] = new CSubmit('clone', S_CLONE);
-		$others[] = new CSubmit('full_clone', S_FULL_CLONE);
+		$others[] = new CSubmit('clone', _('Clone'));
+		$others[] = new CSubmit('full_clone', _('Full clone'));
 		$others[] = new CButtonDelete(S_DELETE_TEMPLATE_Q,  url_param('form').url_param('templateid').url_param('groupid'));
 		$others[] = new CButtonQMessage('delete_and_clear', S_DELETE_AND_CLEAR, S_DELETE_AND_CLEAR_TEMPLATE_Q, url_param('form').url_param('templateid').url_param('groupid'));
 	}

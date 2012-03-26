@@ -357,7 +357,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$table = new CTableInfo(_('No graphs defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_graphs',NULL,"checkAll('".$form->getName()."','all_graphs','group_graphid');"),
-			make_sorting_header(S_NAME, 'name'),
+			make_sorting_header(_('Name'), 'name'),
 			S_WIDTH,
 			S_HEIGHT,
 			make_sorting_header(_('Graph type'), 'graphtype')

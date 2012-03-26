@@ -403,8 +403,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		$r_form = new CForm('get');
-		$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB()));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB()));
+		$r_form->addItem(array(_('Group'),$pageFilter->getGroupsCB()));
+		$r_form->addItem(array(_('Host'),$pageFilter->getHostsCB()));
 
 		$numrows = new CDiv();
 		$numrows->setAttribute('name','numrows');
@@ -426,8 +426,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$table = new CTableInfo(_('No graphs defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_graphs',NULL,"checkAll('".$form->getName()."','all_graphs','group_graphid');"),
-			$_REQUEST['hostid'] != 0 ? NULL : S_HOSTS,
-			make_sorting_header(S_NAME,'name'),
+			$_REQUEST['hostid'] != 0 ? NULL : _('Hosts'),
+			make_sorting_header(_('Name'),'name'),
 			S_WIDTH,
 			S_HEIGHT,
 			make_sorting_header(_('Graph type'),'graphtype')));

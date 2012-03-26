@@ -1641,7 +1641,7 @@ class CTemplate extends CZBXAPI {
 			$res = DBselect($sql);
 			if ($dbCnt = DBfetch($res)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					S_TEMPLATE_WITH_ITEM_KEY.' ['.htmlspecialchars($dbCnt['key_']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+					_s('Template with item key "%1$s" already linked to host.', htmlspecialchars($dbCnt['key_'])));
 			}
 
 			$sql = 'SELECT name,count(applicationid) as cnt'.
@@ -1652,7 +1652,7 @@ class CTemplate extends CZBXAPI {
 			$res = DBselect($sql);
 			if ($dbCnt = DBfetch($res)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					S_TEMPLATE_WITH_APPLICATION.' ['.htmlspecialchars($dbCnt['name']).'] '.S_ALREADY_LINKED_TO_HOST_SMALL);
+					_s('Template with application "%1$s" already linked to host.', htmlspecialchars($dbCnt['name'])));
 			}
 		}
 

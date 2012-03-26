@@ -24,7 +24,7 @@
 	require_once dirname(__FILE__).'/include/screens.inc.php';
 	require_once dirname(__FILE__).'/include/blocks.inc.php';
 
-	$page['title'] = 'S_HOST_SCREENS';
+	$page['title'] = _('Host screens');
 	$page['file'] = 'screens.php';
 	$page['hist_arg'] = array('elementid');
 	$page['scripts'] = array('effects.js','dragdrop.js','class.calendar.js','gtlc.js');

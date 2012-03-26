@@ -29,8 +29,6 @@ if (isset($_REQUEST['go']) && $_REQUEST['go'] == 'export' && isset($_REQUEST['ma
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 
 	$EXPORT_DATA = true;
-
-	require_once dirname(__FILE__).'/include/export.inc.php';
 }
 else {
 	$page['title'] = _('Configuration of network maps');
@@ -266,7 +264,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$table = new CTableInfo(_('No maps defined.'));
 		$table->setHeader(array(
 			new CCheckBox('all_maps',NULL,"checkAll('".$form->getName()."','all_maps','maps');"),
-			make_sorting_header(S_NAME,'name'),
+			make_sorting_header(_('Name'),'name'),
 			make_sorting_header(S_WIDTH,'width'),
 			make_sorting_header(S_HEIGHT,'height'),
 			S_EDIT

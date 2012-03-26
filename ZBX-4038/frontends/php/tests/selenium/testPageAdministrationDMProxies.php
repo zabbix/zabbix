@@ -32,7 +32,7 @@ class testPageAdministrationDMProxies extends CWebTest {
 	*/
 	public function testPageAdministrationDMProxies_CheckLayout($proxy) {
 		$this->login('proxies.php');
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('CONFIGURATION OF PROXIES');
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
@@ -63,7 +63,7 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Proxies');
+		$this->assertTitle('Configuration of proxies');
 		$this->ok('Proxy updated');
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF PROXIES');

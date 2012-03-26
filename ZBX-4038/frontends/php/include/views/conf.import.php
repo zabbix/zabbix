@@ -19,11 +19,8 @@
 **/
 
 
-$form = new CFormTable(_('Import'), null, 'post', 'multipart/form-data');
-$form->addRow(_('Import file'), new CFile('import_file'));
-
-$table = new CTable();
-$table->setHeader(array(SPACE, _('Update existing'), _('Add missing')), 'bold');
+$rulesTable = new CTable(null, 'formElementTable');
+$rulesTable->setHeader(array(SPACE, _('Update existing'), _('Add missing')), 'bold');
 
 $titles = array(
 	'groups' => _('Groups'),
@@ -59,14 +56,26 @@ foreach ($titles as $key => $title) {
 		$cbMissed = new CCheckBox('rules['.$key.'][createMissing]', $rules[$key]['createMissing'], null, 1);
 	}
 
-	$table->addRow(array($title, $cbExist, $cbMissed));
+	$rulesTable->addRow(array($title, new CCol($cbExist, 'center'), new CCol($cbMissed, 'center')));
 }
 
-$form->addRow(_('Rules'), $table);
-$form->addItemToBottomRow(new CSubmit('import', _('Import')));
+// form list
+$importFormList = new CFormList('proxyFormList');
+$importFormList->addRow(_('Import file'), new CFile('import_file'));
+$importFormList->addRow(_('Rules'), new CDiv($rulesTable, 'border_dotted objectgroup inlineblock'));
 
+// tab
+$importTab = new CTabView();
+$importTab->addTab('importTab', _('Import'), $importFormList);
 
+// form
+$importForm = new CForm('post', null, 'multipart/form-data');
+$importForm->addItem($importTab);
+$importForm->addItem(makeFormFooter(new CSubmit('import', _('Import')), new CButtonCancel()));
+
+// widget
 $importWidget = new CWidget();
-$importWidget->addItem($form);
+$importWidget->addPageHeader(_('CONFIGURATION IMPORT'));
+$importWidget->addItem($importForm);
 
 return $importWidget;
