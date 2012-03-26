@@ -2150,6 +2150,9 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 				h_value[h_num++] = zbx_strdup(NULL, c_values.values[i]);
 			break;
 	}
+	for (i = 0; i < c_values.values_num; i++)
+		zbx_free(c_values.values[i]);
+
 	zbx_vector_str_destroy(&c_values);
 
 	h_value[h_num] = NULL;
