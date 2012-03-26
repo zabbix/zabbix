@@ -33,7 +33,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Macros');
 		$this->assertTitle('Configuration of macros');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->ok('CONFIGURATION OF MACROS');
 		$this->ok('Macros');
 		$this->ok('Macro');
 		$this->ok('Value');
