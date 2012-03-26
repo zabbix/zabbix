@@ -524,3 +524,6 @@ ul.formlist li.new { background: #2F2F2F; }
 .column .widget .footer{ border: 0;}
 
 #zbx_search input[type="text"] { border: 1px solid #DFDFDF; margin-right: 3px; }
+
+.dropArea { background-color: #555; }
+.dragHelpText { color: #FF5500; }
