@@ -4,6 +4,7 @@ Changes for 2.0.0rc3
 New features:
 
 Bug fixes:
+..F....... [ZBX-4781] fixed error message when copying items to multiple hosts (Toms)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.0rc2
