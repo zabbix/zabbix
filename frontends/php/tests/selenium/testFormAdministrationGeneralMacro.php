@@ -158,7 +158,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->waitForConfirmation();
 		$this->wait();
 		$this->ok('Macros updated');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->ok('CONFIGURATION OF MACROS');
 		$this->ok('Macros');
 		$this->ok('Macro');
 		$this->ok('Value');
