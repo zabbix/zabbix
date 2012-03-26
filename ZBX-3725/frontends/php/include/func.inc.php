@@ -345,10 +345,9 @@ function zbx_num2bitstr($num, $rev = false) {
 
 function str2mem($val) {
 	$val = trim($val);
-	$last = zbx_strtolower(zbx_substr($val, -1, 1));
+	$last = strtolower(substr($val, -1));
 
 	switch ($last) {
-		// The 'G' modifier is available since PHP 5.1.0
 		case 'g':
 			$val *= 1024;
 		case 'm':
@@ -356,6 +355,7 @@ function str2mem($val) {
 		case 'k':
 			$val *= 1024;
 	}
+
 	return $val;
 }
 
