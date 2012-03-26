@@ -53,7 +53,7 @@ $fields = array(
 		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('1,2,4,7,9'),	'isset({save})'),
 		'type'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2'),		'isset({save})'),
 		'only_hostid'=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
-		'monitored_hosts'=> array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
+		'real_hosts'=> array(T_ZBX_INT, O_OPT,  null,	IN('0,1'),	null),
 /* actions */
 		'add'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 		'save'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
