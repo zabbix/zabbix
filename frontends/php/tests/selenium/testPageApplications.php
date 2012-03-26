@@ -43,7 +43,7 @@ class testPageApplications extends CWebTest {
 		$this->href_click("applications.php?groupid=0&hostid=$hostid&sid=");
 		$this->wait();
 		// We are in the list of applications
-		$this->assertTitle('Applications');
+		$this->assertTitle('Configuration of applications');
 		$this->ok('CONFIGURATION OF APPLICATIONS');
 		$this->ok('Displaying');
 		$this->ok('Host list');
