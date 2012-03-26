@@ -22,3 +22,6 @@ table.filter { background: white; border: 1px solid #AAA; }
 table.filter tr td { border: 1px dotted #AAA; }
 
 ul.formlist li.new { background: #EEFFEE; }
+
+.dropArea { background-color: #FFB; }
+.dropHereText { color: #5481AB; }
