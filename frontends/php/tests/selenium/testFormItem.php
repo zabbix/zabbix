@@ -237,11 +237,11 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormItem_Create($expected, $visibleHostname, $name, $type, $key, $errorMsgs) {
 		$this->login('hosts.php');
-		$this->assertTitle('Hosts');
-		$this->ok('HOSTS');
+		$this->assertTitle('Configuration of hosts');
+		$this->ok('CONFIGURATION OF HOSTS');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->assertTitle('Hosts');
-		$this->ok('HOSTS');
+		$this->assertTitle('Configuration of hosts');
+		$this->ok('CONFIGURATION OF HOSTS');
 
 
 		$row = DBfetch(DBselect("select hostid from hosts where name='$visibleHostname'"));
