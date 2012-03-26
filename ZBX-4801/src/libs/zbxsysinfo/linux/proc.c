@@ -70,7 +70,7 @@ static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 	return FAIL;
 }
 
-static int	get_procname(FILE *f_stat, char **line)
+static int	procname_equal(FILE *f_stat, const char *procname)
 {
 	char	tmp[MAX_STRING_LEN];
 
@@ -82,9 +82,9 @@ static int	get_procname(FILE *f_stat, char **line)
 			continue;
 
 		zbx_rtrim(tmp + 6, "\n");
-		*line = zbx_strdup(*line, tmp + 6);
-
-		return SUCCEED;
+		if (0 == strcmp(tmp + 6, procname))
+			return SUCCEED;
+		break;
 	}
 
 	return FAIL;
@@ -99,12 +99,11 @@ static int	check_procname(FILE *f_cmd, FILE *f_stat, const char *procname)
 	if ('\0' == *procname)
 		return SUCCEED;
 
-	if (SUCCEED == get_procname(f_stat, &tmp))
-	{
-		if (0 == strcmp(tmp, procname))
-			goto clean;
-	}
-	else if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
+	/* process name in /proc/[pid]/status contains limited number of characters */
+	if (SUCCEED == procname_equal(f_stat, procname))
+		return SUCCEED;
+
+	if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
 	{
 		if (NULL == (p = strrchr(tmp, '/')))
 			p = tmp;
