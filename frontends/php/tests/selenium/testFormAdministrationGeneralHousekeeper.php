@@ -80,7 +80,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->input_type('alert_history', '-1');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "alert_history".', 'CONFIGURATION OF ZABBIX', 'Housekeeper', 'Do not keep actions older than (in days)'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "alert_history".', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
 		$this->assertTitle('Configuration of housekeeper');
@@ -88,7 +88,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->input_type('alert_history', '65536');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "alert_history".', 'CONFIGURATION OF ZABBIX', 'Housekeeper'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "alert_history".', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
