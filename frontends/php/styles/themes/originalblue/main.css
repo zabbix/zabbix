@@ -18,8 +18,8 @@
 **/
 @import "jquery-ui.css";
 
-table.filter { background: white; border: 1px solid #AAA; }
-table.filter tr td { border: 1px dotted #AAA; }
+table.filter { background: white; border: 1px solid #EEE; }
+table.filter tr td { border: 1px solid #EEE; }
 
 ul.formlist li.new { background: #EEFFEE; }
 
