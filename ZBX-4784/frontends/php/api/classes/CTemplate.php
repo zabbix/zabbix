@@ -1272,7 +1272,7 @@ class CTemplate extends CZBXAPI {
 			'preservekeys' => 1
 		));
 
-		foreach ($templates as $tnum => $template) {
+		foreach ($templates as $template) {
 			if (!isset($updTemplates[$template['templateid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
