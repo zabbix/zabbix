@@ -45,8 +45,8 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		$this->login('adm.other.php');
 		$this->dropdown_select_wait('configDropDown', 'Other');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Other parameters'));
+		$this->assertTitle('Other configuration parameters');
+		$this->ok(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
 		$this->assertAttribute("//input[@id='refresh_unsupported']/@value", $allValues['refresh_unsupported']);
 
 		// checkbox "snmptrap_logging"
@@ -70,8 +70,8 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		$this->login('adm.other.php');
 		$this->dropdown_select_wait('configDropDown', 'Other');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Other parameters'));
+		$this->assertTitle('Other configuration parameters');
+		$this->ok(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
 
 		$sql = 'SELECT groupid FROM groups';
 		$hgroups = DBfetchArray(DBselect($sql));
@@ -85,8 +85,8 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		$this->login('adm.other.php');
 		$this->dropdown_select_wait('configDropDown', 'Other');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Other parameters'));
+		$this->assertTitle('Other configuration parameters');
+		$this->ok(array('OTHER CONFIGURATION PARAMETERS', 'Other parameters'));
 
 		$sql = 'SELECT usrgrpid FROM usrgrp';
 		$usrgrp = DBfetchArray(DBselect($sql));
@@ -105,8 +105,8 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		$this->login('adm.other.php');
 		$this->dropdown_select_wait('configDropDown', 'Other');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->assertTitle('Other configuration parameters');
+		$this->ok('OTHER CONFIGURATION PARAMETERS');
 		$this->ok('Other parameters');
 
 		$this->input_type('refresh_unsupported', '700');
@@ -123,8 +123,8 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "snmptrap_logging"');
 
 		$this->dropdown_select_wait('configDropDown', 'Other');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->assertTitle('Other configuration parameters');
+		$this->ok('OTHER CONFIGURATION PARAMETERS');
 		$this->ok('Other parameters');
 
 		// trying to enter max possible value
@@ -142,8 +142,8 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "snmptrap_logging"');
 
 		// trying to enter value > max_value
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->assertTitle('Other configuration parameters');
+		$this->ok('OTHER CONFIGURATION PARAMETERS');
 		$this->ok('Other parameters');
 		$this->input_type('refresh_unsupported', '65536');
 		$this->button_click('save');
