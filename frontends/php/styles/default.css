@@ -203,7 +203,6 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 
 /* host interfaces */
 .host-edit .interface-row { margin-top: -3px; }
-.host-edit .interface-row .formElementTable { table-layout: fixed; }
 .host-edit .interface-row .objectgroup { border-top-width: 0; padding-top: 4px; }
 .host-edit .interface-row-first { margin-top: 0; }
 .host-edit .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
@@ -215,7 +214,8 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .host-edit .interface-row .interface-dns { width: 20em; }
 .host-edit .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
 .host-edit .interface-row .interface-port { width: 11em; }
-.host-edit .dropArea .interface-add-control { display: none; }
+.host-edit .interface-row .interface-default { width: 4em; }
+.host-edit .dropArea .interface-add-control { visibility: hidden; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
 .border_none { border: 0; }
