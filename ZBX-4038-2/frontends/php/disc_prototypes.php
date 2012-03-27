@@ -113,7 +113,7 @@ $fields = array(
 		'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	'new_application' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'applications' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'history' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 65535), 'isset({save})', _('Keep history (in days)'),
+	'history' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 65535), 'isset({save})', _('Keep history (in days)')),
 	'trends' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 65535),
 		'isset({save})&&isset({value_type})&&'.IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'),
 		_('Keep trends (in days)')),
