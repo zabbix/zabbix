@@ -195,6 +195,7 @@ elseif (isset($_REQUEST['save'])) {
 		'type' => get_request('type'),
 		'snmp_community' => get_request('snmp_community'),
 		'snmp_oid' => get_request('snmp_oid'),
+		'trapper_hosts' => get_request('trapper_hosts'),
 		'port' => get_request('port'),
 		'snmpv3_securityname' => get_request('snmpv3_securityname'),
 		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
