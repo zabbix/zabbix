@@ -209,7 +209,6 @@ zbx_add_post_js($script);
 $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'agentInterfaces');
 $ifTab->setAttribute('data-type', 'agent');
-$ifTab->addStyle('width: 72em;');
 
 // headers with sizes
 $iconLabel = new CCol(SPACE, 'interface-drag-control');
@@ -237,7 +236,6 @@ $hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectg
 $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'SNMPInterfaces');
 $ifTab->setAttribute('data-type', 'snmp');
-$ifTab->addStyle('width: 72em;');
 
 $helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
 $helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
@@ -255,7 +253,6 @@ $hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgr
 $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'JMXInterfaces');
 $ifTab->setAttribute('data-type', 'jmx');
-$ifTab->addStyle('width: 72em;');
 $helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
 $helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
@@ -271,7 +268,6 @@ $hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgro
 $ifTab = new CTable(null, 'formElementTable');
 $ifTab->setAttribute('id', 'IPMIInterfaces');
 $ifTab->setAttribute('data-type', 'ipmi');
-$ifTab->addStyle('width: 72em;');
 $helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
 $helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
 $buttonCol = new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu'), 'interface-add-control');
