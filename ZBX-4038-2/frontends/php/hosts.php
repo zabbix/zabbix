@@ -51,13 +51,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // host
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS, 	DB_ID,				NULL),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,			'isset({form})&&({form}=="update")'),
-		'host'=>			array(T_ZBX_STR, O_OPT,	null,   NOT_EMPTY,		'isset({save})'),
+		'host'=>	array(T_ZBX_STR, O_OPT,	null,   NOT_EMPTY, 'isset({save})', _('Host name')),
 		'visiblename'=>		array(T_ZBX_STR, O_OPT,	null,   null,			'isset({save})'),
 		'proxy_hostid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			'isset({save})'),
 		'status'=>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1,3'),		'isset({save})'),
 
 		'newgroup'=>		array(T_ZBX_STR, O_OPT, null,   null,		null),
-		'interfaces'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
+		'interfaces'=> array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY, 'isset({save})',
+			_('Agent or SNMP or JMX or IPMI interface')),
 		'mainInterfaces' => array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
 		'templates'=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		'templates_rem'=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   null,	null),

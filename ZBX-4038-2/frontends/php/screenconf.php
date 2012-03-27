@@ -47,9 +47,9 @@ $fields = array(
 	'screens' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
 	'screenid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 	'templateid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})'),
-	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})'),
-	'vsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})'),
+	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
+	'hsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Columns')),
+	'vsize' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({save})', _('Rows')),
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
