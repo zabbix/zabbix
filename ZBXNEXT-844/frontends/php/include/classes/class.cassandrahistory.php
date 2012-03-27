@@ -165,7 +165,7 @@ class CassandraHistory {
 			}
 
 			$hi = (int) ($value / 4294967296);
-			$lo = (int) $value;
+			$lo = $value - $hi * 4294967296;
 
 			if($neg){
 				$hi = ~$hi;
