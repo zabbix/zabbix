@@ -209,7 +209,7 @@ class testFormItem extends CWebTest {
 				'Checksum of $1',
 				ITEM_TYPE_ZABBIX,
 				'vfs.file.cksum[/sbin/shutdown]',
-				array('Cannot add item', 'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on given host.')
+				array('ERROR: Cannot add item', 'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on')
 			),
 			// Item name is missing
 			array(
