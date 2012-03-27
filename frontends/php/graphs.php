@@ -42,9 +42,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'copy_mode'	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0'),NULL),
 
 		'graphid'=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))'),
-		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save}) || isset({preview})', _('Name')),
-		'width'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(20,65535),	'isset({save}) || isset({preview})', S_WIDTH.' (min:20, max:65535)'),
-		'height'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(20,65535),	'isset({save}) || isset({preview})', S_HEIGHT.' (min:20, max:65535)'),
+		'name'=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY, 'isset({save}) || isset({preview})', _('Name')),
+		'width'=> array(T_ZBX_INT, O_OPT, NULL,	BETWEEN(20,65535), 'isset({save}) || isset({preview})', _('Width')),
+		'height'=> array(T_ZBX_INT, O_OPT, NULL, BETWEEN(20,65535), 'isset({save}) || isset({preview})', _('Height')),
 
 		'ymin_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
 		'ymax_type'=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN('0,1,2'),		null),
@@ -55,8 +55,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'legend'=>		array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		'ymin_itemid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'(isset({save}) || isset({preview}))&&isset({ymin_type})&&({ymin_type}==3)'),
 		'ymax_itemid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	'(isset({save}) || isset({preview}))&&isset({ymax_type})&&({ymax_type}==3)'),
-		'percent_left'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
-		'percent_right'=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(0,100),	null),
+		'percent_left'=> array(T_ZBX_DBL, O_OPT, NULL, BETWEEN(0,100), null, _('Percentile line (Left)')),
+		'percent_right'=> array(T_ZBX_DBL, O_OPT, NULL, BETWEEN(0,100),	null, _('Percentile line (Right)')),
 		'visible'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),	null),
 		'items'=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		'new_graph_item'=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
