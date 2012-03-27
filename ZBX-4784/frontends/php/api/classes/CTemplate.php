@@ -17,15 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
- * File containing CTemplate class for API.
  * @package API
- */
-/**
- * Class containing methods for operations with Templates
- *
  */
 class CTemplate extends CZBXAPI {
 
@@ -1685,7 +1680,7 @@ class CTemplate extends CZBXAPI {
 				$tmpTpl = reset($tmpTpls);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Trigger in template [ %1$s ] has dependency with trigger in template [ %2$s ]', $tmpTpl['host'], $dbDepHost['host']));
+					_s('Trigger in template "%1$s" has dependency with trigger in template "%2$s".', $tmpTpl['host'], $dbDepHost['host']));
 			}
 		}
 
@@ -1744,7 +1739,7 @@ class CTemplate extends CZBXAPI {
 		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
-				_s('Trigger has items from template "%s" that is not linked to host.', $dbNotLinkedTpl['host'])
+				_s('Trigger has items from template "%1$s" that is not linked to host.', $dbNotLinkedTpl['host'])
 			);
 		}
 
@@ -1793,7 +1788,7 @@ class CTemplate extends CZBXAPI {
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && $link[$targetid] == $templateid) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
 						continue 2;
 					}
 				}
@@ -1822,7 +1817,7 @@ class CTemplate extends CZBXAPI {
 			// we do linkage in two separate loops because for triggers you need all items already created on host
 			foreach ($templateids as $templateid) {
 				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && $link[$targetid] == $templateid) {
+					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
 						continue 2;
 					}
 				}
@@ -2233,4 +2228,3 @@ class CTemplate extends CZBXAPI {
 	}
 
 }
-?>
