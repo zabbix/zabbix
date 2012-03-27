@@ -1793,7 +1793,7 @@ class CTemplate extends CZBXAPI {
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
 				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
+					if (isset($link[$targetid]) && $link[$targetid] == $templateid) {
 						continue 2;
 					}
 				}
@@ -1819,19 +1819,19 @@ class CTemplate extends CZBXAPI {
 				));
 			}
 
-			// sync triggers
-			API::Trigger()->syncTemplates(array(
-				'hostids' => $targetid,
-				'templateids' => $templateids
-			));
-
 			// we do linkage in two separate loops because for triggers you need all items already created on host
 			foreach ($templateids as $templateid) {
 				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
+					if (isset($link[$targetid]) && $link[$targetid] == $templateid) {
 						continue 2;
 					}
 				}
+
+				// sync triggers
+				API::Trigger()->syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
 
 				API::TriggerPrototype()->syncTemplates(array(
 					'hostids' => $targetid,

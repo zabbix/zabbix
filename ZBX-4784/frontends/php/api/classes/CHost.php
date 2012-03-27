@@ -1981,11 +1981,11 @@ class CHost extends CZBXAPI {
 			}
 
 			// get new templates to add
-			$updateTemplatesids = array_diff($newTemplateids, $hostTemplateids);
+			/*$updateTemplatesids = array_diff($newTemplateids, $hostTemplateids);
 			$updateTemplates = array();
 			foreach ($updateTemplatesids as $id) {
 				$updateTemplates[] = array('templateid' => $id);
-			}
+			}*/
 
 			$result = $this->massAdd(array(
 				'hosts' => $hosts,
