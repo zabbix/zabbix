@@ -209,12 +209,12 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .host-edit .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
 .host-edit .interface-row .interface-drag-control,
 .host-edit .interface-row .interface-add-control {
-	width: 20px;
+	width: 2em;
 }
-.host-edit .interface-row .interface-ip { width: 165px; }
-.host-edit .interface-row .interface-dns { width: 200px; }
-.host-edit .interface-row .interface-connect-to { width: 80px; white-space: nowrap; }
-.host-edit .interface-row .interface-port { width: 110px; }
+.host-edit .interface-row .interface-ip { width: 16.5em; }
+.host-edit .interface-row .interface-dns { width: 20em; }
+.host-edit .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
+.host-edit .interface-row .interface-port { width: 11em; }
 .host-edit .dropArea .interface-add-control { display: none; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
