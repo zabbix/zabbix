@@ -40,7 +40,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->assertElementPresent('configDropDown');
 		$this->assertElementPresent('form');
 		$this->assertTitle('Configuration of images');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
+		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
 		$this->assertElementPresent('imagetype');
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
@@ -63,7 +63,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 				$this->dropdown_select_wait('imagetype', 'Background');
 				$this->assertElementPresent('form');
 				$this->assertTitle('Configuration of Zabbix');
-				$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
+				$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
 				$this->assertElementPresent('imagetype');
 				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
