@@ -3329,7 +3329,7 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *e
  *                                                                            *
  * Function: DCconfig_get_functions_by_functionids                            *
  *                                                                            *
- * Purpose: Get function with specified ID                                    *
+ * Purpose: Get functions by IDs                                              *
  *                                                                            *
  * Parameters: functions   - [OUT] pointer to DC_FUNCTION structures          *
  *             functionids - [IN] array of function IDs                       *

@@ -2650,13 +2650,13 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector
 
 typedef struct
 {
-	zbx_uint64_t		functionid;
-	zbx_uint64_t		triggerid;
-	char			function[FUNCTION_FUNCTION_LEN_MAX];
-	char			parameter[FUNCTION_PARAMETER_LEN_MAX];
-	zbx_timespec_t		timespec;
-	char			*value;
-	char			*error;
+	zbx_uint64_t	functionid;
+	zbx_uint64_t	triggerid;
+	char		function[FUNCTION_FUNCTION_LEN_MAX];
+	char		parameter[FUNCTION_PARAMETER_LEN_MAX];
+	zbx_timespec_t	timespec;
+	char		*value;
+	char		*error;
 }
 zbx_func_t;
 
