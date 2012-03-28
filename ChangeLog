@@ -4,6 +4,7 @@ Changes for 2.0.0rc3
 New features:
 
 Bug fixes:
+...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
 A.F....... [ZBX-4784] fixed unnecessary trigger update on host update (Toms)
 ..F....... [ZBX-4792] fixed missing field "Allowed hosts" when item type Zabbix trapper (Toms)
 ..F....... [ZBX-4038] fixed warnings for incorrect input values (Toms)
@@ -537,6 +538,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
+...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
 ..F....... [ZBX-4761] fixed "&" encoding in input fields (Pavels)
 .......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
