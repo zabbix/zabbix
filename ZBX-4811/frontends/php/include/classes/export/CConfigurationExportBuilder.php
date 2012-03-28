@@ -257,6 +257,7 @@ class CConfigurationExportBuilder {
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
 				'port' => $discoveryRule['port'],
+				'filter' => $discoveryRule['filter'],
 				'description' => $discoveryRule['description'],
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),

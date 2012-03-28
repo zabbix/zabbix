@@ -360,7 +360,7 @@ class CConfigurationExport {
 				'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
 				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'valuemapid', 'delay_flex', 'params',
 				'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'interfaceid', 'port', 'description', 'inventory_link', 'flags'),
+				'interfaceid', 'port', 'description', 'inventory_link', 'flags', 'filter'),
 			'inherited' => false,
 			'preservekeys' => true
 		));
@@ -385,7 +385,7 @@ class CConfigurationExport {
 				'status', 'value_type', 'trapper_hosts', 'units', 'delta', 'snmpv3_securityname', 'snmpv3_securitylevel',
 				'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'valuemapid', 'delay_flex', 'params',
 				'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'interfaceid', 'port', 'description', 'inventory_link', 'flags'),
+				'interfaceid', 'port', 'description', 'inventory_link', 'flags', 'filter'),
 			'inherited' => false,
 			'preservekeys' => true
 		));
