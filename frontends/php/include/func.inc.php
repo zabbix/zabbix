@@ -343,7 +343,13 @@ function zbx_num2bitstr($num, $rev = false) {
 	return $strbin;
 }
 
-// converts strings like 2M or 5k to bytes
+/**
+ * Converts strings like 2M or 5k to bytes
+ *
+ * @param string $val
+ *
+ * @return int
+ */
 function str2mem($val) {
 	$val = trim($val);
 	$last = strtolower(substr($val, -1));
