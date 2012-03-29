@@ -77,7 +77,12 @@ include_once('include/page_header.php');
 			$params = $data['params'];
 // Events
 			$msgsettings = getMessageSettings();
-			
+
+			// if no severity is selected, show nothing
+			if (empty($msgsettings['triggers.severities'])) {
+				break;
+			}
+
 // timeout
 			$timeOut = (time() - $msgsettings['timeout']);
 			$lastMsgTime = 0;
@@ -85,7 +90,7 @@ include_once('include/page_header.php');
 				$lastMsgTime = $params['messageLast']['events']['time'];
 			}
 //---
-			
+
 			$options = array(
 				'nodeids' => get_current_nodeid(true),
 				'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeOut)),
@@ -165,7 +170,7 @@ include_once('include/page_header.php');
 			'result' => $result,
 			'id' => $data['id']
 		);
-		
+
 		print($json->encode($rpcResp));
 	}
 ?>
