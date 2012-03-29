@@ -605,16 +605,18 @@ table.requirements tr td.header { font-weight: bold; }
 table.requirements tr td { white-space: nowrap; padding-left: 5px; padding-right: 15px; background-color: #FFFFFF; }
 
 /* filter */
-table.filter { width: 100%; border-collapse: collapse; min-width: 1024px; text-align: center; table-layout: fixed;  }
+table.filter { width: 100%; border-collapse: collapse; min-width: 1024px; text-align: center; }
 table.filter tr td { line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important;
-	padding: 0 2px 0 6px; }
-table.filter tr td.label { white-space: nowrap; border-right: 0 !important; }
+	padding: 0 2px 0 6px; white-space: nowrap; }
+table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
+
+.host-list table.filter tr td { width: 25%; }
 
 .item-list table.filter { text-align: left; }
 .item-list table.filter tr td.label { text-align: right; }
-.item-list table.filter tr td.col1 { width: 16%; }
-.item-list table.filter tr td.label.col1 { width: 8%; }
+.item-list table.filter tr td.col1 { width: 18%; }
+.item-list table.filter tr td.label.col1 { width: 6%; }
 .item-list table.filter tr td.label.col4 { width: 8%; }
 
 table.filter.sub-filter tr td { text-align: left; }

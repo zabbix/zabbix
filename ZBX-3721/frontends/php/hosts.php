@@ -621,6 +621,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	}
 	else {
 		$hosts_wdgt->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
+		$hosts_wdgt->setRootClass('host-list');
 
 		$frmGroup = new CForm();
 		$frmGroup->setMethod('get');
