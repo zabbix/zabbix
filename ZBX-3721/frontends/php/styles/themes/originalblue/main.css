@@ -28,3 +28,5 @@ ul.formlist li.new { background: #EEFFEE; }
 
 .dropArea { background-color: #FFB; }
 .dropHereText { color: #5481AB; }
+
+table.ack_msgs tr.msg { background-color: #F8F8F8; }

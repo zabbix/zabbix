@@ -519,3 +519,5 @@ ul.formlist li.new { background: #2F2F2F; }
 
 .dropArea { background-color: #555; }
 .dragHelpText { color: #FF5500; }
+
+table.ack_msgs tr.msg { background-color: #3F3F3F; }
