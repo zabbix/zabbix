@@ -219,7 +219,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host updated');
 		// no entities should be deleted, they all should be updated
 		$this->nok('deleted');

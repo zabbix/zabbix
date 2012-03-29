@@ -329,7 +329,10 @@ function unset_all() {
 	}
 }
 
-function check_type(&$field, $flags, &$var, $type) {
+function check_type(&$field, $flags, &$var, $type, $caption = null) {
+	if (is_null($caption)) {
+		$caption = $field;
+	}
 	if (is_array($var) && $type != T_ZBX_IP) {
 		$err = ZBX_VALID_OK;
 		foreach ($var as $el) {
@@ -431,7 +434,7 @@ function check_type(&$field, $flags, &$var, $type) {
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not a colour.', $field));
+			info(_s('Warning. Field "%1$s" is not a colour.', $caption));
 			return ZBX_VALID_WARNING;
 		}
 	}
@@ -506,11 +509,9 @@ function check_field(&$fields, &$field, $checks) {
 			return ZBX_VALID_OK;
 		}
 		elseif ($flags&P_ACT) {
-			if (!isset($_REQUEST['sid'])) {
-				info(_('Operation cannot be performed due to unauthorized request.'));
-				return ZBX_VALID_ERROR;
-			}
-			elseif (isset($_COOKIE['zbx_sessionid']) && ($_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'], 16, 16))) {
+			if (!isset($_REQUEST['sid'])
+					|| (isset($_COOKIE['zbx_sessionid'])
+					&& ($_REQUEST['sid'] != substr($_COOKIE['zbx_sessionid'], 16, 16)))) {
 				info(_('Operation cannot be performed due to unauthorized request.'));
 				return ZBX_VALID_ERROR;
 			}
@@ -521,24 +522,42 @@ function check_field(&$fields, &$field, $checks) {
 		check_trim($_REQUEST[$field]);
 	}
 
-	$err = check_type($field, $flags, $_REQUEST[$field], $type);
+	$err = check_type($field, $flags, $_REQUEST[$field], $type, $caption);
 
 	if ($err != ZBX_VALID_OK) {
 		return $err;
 	}
 
-	if (is_null($exception) || $except) {
-		$valid = $validation ? calc_exp($fields, $field, $validation) : true;
-		if (!$valid) {
+	if ((is_null($exception) || $except) && $validation && !calc_exp($fields, $field, $validation)){
+		if ($validation == NOT_EMPTY) {
 			if ($flags&P_SYS) {
-				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
-				return ZBX_VALID_ERROR;
+				info(_s('Critical error. Incorrect value for field "%1$s": cannot be empty.', $caption));
 			}
 			else {
-				info(_s('Warning. Incorrect value for field "%s".', $caption));
-				return ZBX_VALID_WARNING;
+				info(_s('Warning. Incorrect value for field "%1$s": cannot be empty.', $caption));
 			}
 		}
+		// check for BETWEEN() function pattern and extract numbers e.g. ({}>=0&&{}<=999)&&
+		elseif (preg_match('/\(\{\}\>=([0-9]*)\&\&\{\}\<=([0-9]*)\)\&\&/', $validation, $result)) {
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
+					$_REQUEST[$field], $caption, $result[1], $result[2]));
+			}
+			else {
+				info(_s('Warning. Incorrect value for field "%1$s": must be between %2$s and %3$s.',
+					$caption, $result[1], $result[2]));
+			}
+		}
+		else {
+			if ($flags&P_SYS) {
+				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
+			}
+			else {
+				info(_s('Warning. Incorrect value for field "%1$s"%2$s.', $caption));
+			}
+		}
+
+		return ($flags&P_SYS) ? ZBX_VALID_ERROR : ZBX_VALID_WARNING;
 	}
 	return ZBX_VALID_OK;
 }

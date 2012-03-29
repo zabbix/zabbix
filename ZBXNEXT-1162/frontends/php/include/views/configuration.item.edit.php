@@ -324,6 +324,9 @@ if ($this->data['is_discovery_rule']) {
 			new CTextBox('filter_value', $filter_value, 20)
 		)
 	);
+	$itemFormList->addRow(_('Allowed hosts'),
+		new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE),
+		false, 'row_trapper_hosts');
 }
 else {
 	// append keep history to form list
@@ -357,8 +360,8 @@ else {
 	$link->setAttribute('target', '_blank');
 	$itemFormList->addRow(_('Show value'), array($valuemapComboBox, SPACE, $link), null, 'row_valuemap');
 	$itemFormList->addRow(_('Allowed hosts'),
-		new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE), false, 'row_trapper_hosts'
-	);
+		new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE),
+		false, 'row_trapper_hosts');
 
 	// append applications to form list
 	$itemFormList->addRow(_('New application'),

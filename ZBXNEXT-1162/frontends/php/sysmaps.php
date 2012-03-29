@@ -45,9 +45,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$fields=array(
 		'maps'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		'sysmapid'=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
-		'name'=>			array(T_ZBX_STR, O_OPT,	 NULL,	NOT_EMPTY,			'isset({save})'),
-		'width'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		'height'=>			array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
+		'name'=>			array(T_ZBX_STR, O_OPT,	 NULL,	NOT_EMPTY, 'isset({save})', _('Name')),
+		'width'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535), 'isset({save})', _('Width')),
+		'height'=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535), 'isset({save})', _('Height')),
 		'backgroundid'=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
 		'iconmapid'=>		array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,				'isset({save})'),
 		'expandproblem'=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,1),		null),
