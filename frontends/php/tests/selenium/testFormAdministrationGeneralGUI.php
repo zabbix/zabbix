@@ -187,7 +187,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
 		$this->assertTitle('Configuration of GUI');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'GUI'));
+		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('search_limit', '1');
 		$this->button_click('save');
 		$this->wait();

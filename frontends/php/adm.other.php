@@ -29,7 +29,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'refresh_unsupported' =>	array(T_ZBX_INT, O_NO,	null,		BETWEEN(0, 65535),	'isset({save})'),
+	'refresh_unsupported' => array(T_ZBX_INT, O_NO,	null, BETWEEN(0, 65535), 'isset({save})',
+		_('Refresh unsupported items (in sec)')),
 	'alert_usrgrpid' =>			array(T_ZBX_INT, O_NO,	null,		DB_ID,				'isset({save})'),
 	'discovery_groupid' =>		array(T_ZBX_INT, O_NO,	null,		DB_ID,				'isset({save})'),
 	'snmptrap_logging' =>		array(T_ZBX_INT, O_OPT,	null,		IN('1'),			null),
