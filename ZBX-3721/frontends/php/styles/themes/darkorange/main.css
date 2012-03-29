@@ -26,7 +26,6 @@
 .textcolorstyles { color: #FF5500; }
 .textblackwhite{ color: #EAEAEA; }
 .right_header { border-color: #222222; }
-.unknown { color: #999999; }
 .normal	{ background-color: #AADDDD; }
 
 .pum_oheader { background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left; }
@@ -51,6 +50,9 @@ a.disabled:hover { color: #CC4444; }
 
 a.on:link, a.on:visited, a.on:active { color: #EE0000; }
 a.on:hover { color: #CC4444; }
+
+.unknown, a.unknown { color: #999999; }
+a.unknown:hover { color: #BBB; }
 /*////////////////	TABLES	////////////////////*/
 table{
 	color: #DFDFDF;

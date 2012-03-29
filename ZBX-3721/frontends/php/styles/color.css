@@ -23,7 +23,6 @@
 .footer 	{ color: #CCCCCC; }
 .enabled	{ color: #00AA00; }
 .disabled	{ color: #DC0000; }
-.unknown	{ color: #AAAAAA; }
 .on			{ color: #DC0000; }
 .off		{ color: #00AA00; }
 .hidden		{ display: none; }
@@ -54,11 +53,6 @@ a.orange:link		{ color:#EE7000; }
 a.orange:visited 	{ color:#EE7000; }
 a.orange:hover 		{ color:#FF9444; }
 a.orange:active 	{ color:#EE7000; }
-
-a.unknown:link		{ color:#777777; }
-a.unknown:visited 	{ color:#777777; }
-a.unknown:hover 	{ color:#999999; }
-a.unknown:active 	{ color:#777777; }
 
 a.off:link		{ color:#00AA00; }
 a.off:visited 	{ color:#00AA00; }
