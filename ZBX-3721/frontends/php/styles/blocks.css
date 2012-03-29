@@ -26,19 +26,6 @@
 #sysmap_cnt .ui-selecting { border: 3px #FFCC00 solid; margin: -3px; }
 .floatWindow { box-shadow: 0 0 5px 5px rgba(204, 204, 204, 0.5); }
 fieldset { margin: 0; padding: 0; }
-table.gridTable {
-	empty-cells: show;
-	padding: 1px 3px;
-	white-space: nowrap;
-	text-align: left;
-	height: 22px;
-	border-collapse: collapse;
-	width: 100%
-}
-table.gridTable thead tr td { font-weight: bold; background-color: #CED7DF; }
-table.gridTable tfoot tr td { text-align: right; background-color: #CED7DF; }
-table.gridTable tbody tr td { background-color: #F2F7FA; }
-table.gridTable tr td { border: 2px solid white; }
 .colorpickerLabel { border: 1px solid black; display: inline; width: 10px; height: 10px; }
 fieldset { border: 1px solid gray; margin-bottom: 2px; padding: 2px; }
 fieldset legend { margin: 0.2em 0.5em; }

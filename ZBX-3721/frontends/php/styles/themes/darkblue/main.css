@@ -116,16 +116,6 @@ table.formtable tr.new td{
 	background-color: #245078;
 }
 
-table.gridTable thead tr td{
-	background-color: #022744;
-}
-table.gridTable tfoot tr td{
-	background-color: #022744;
-}
-table.gridTable tbody tr td{
-	background-color: #022744;
-}
-
 td.form_row_l_simple { /* left cell simple */
 	border-color: #77B7DA;
 }
