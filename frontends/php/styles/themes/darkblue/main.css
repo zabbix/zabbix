@@ -573,3 +573,5 @@ table.setup_wizard div.licence {
 ul.formlist li.new { background: #022744; }
 
 .dropArea { background-color: #005089; }
+
+table.ack_msgs tr.msg { background-color: #022744; }
