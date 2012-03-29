@@ -5,7 +5,6 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
-A.F....... [ZBX-4784] fixed unnecessary trigger update on host update (Toms)
 ..F....... [ZBX-4792] fixed missing field "Allowed hosts" when item type Zabbix trapper (Toms)
 ..F....... [ZBX-4038] fixed warnings for incorrect input values (Toms)
 ..F....... [ZBX-4781] fixed error message when copying items to multiple hosts (Toms)
