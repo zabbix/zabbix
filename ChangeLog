@@ -4,6 +4,7 @@ Changes for 2.0.0rc3
 New features:
 
 Bug fixes:
+....I..... [ZBXNEXT-397] removed records from "ids" table to prevent SQL errors while adding a new item (Sasha)
 ..F....... [ZBX-4811] added 'filter' and 'lifetime' fields to discovery rules export (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
 ..F....... [ZBX-4792] fixed missing field "Allowed hosts" when item type Zabbix trapper (Toms)
