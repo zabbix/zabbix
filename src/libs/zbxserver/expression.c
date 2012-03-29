@@ -496,7 +496,9 @@ static void	DCexpand_trigger_expression(char **expression)
 
 		if (SUCCEED == is_uint64(&(*expression)[l + 1], &functionid))
 		{
-			if (SUCCEED == (rc = DCconfig_get_function_by_functionid(&function, functionid)))
+			DCconfig_get_functions_by_functionids(&function, &functionid, &rc, 1);
+
+			if (SUCCEED == rc)
 			{
 				DCconfig_get_items_by_itemids(&item, &function.itemid, &rc, 1);
 
@@ -512,10 +514,9 @@ static void	DCexpand_trigger_expression(char **expression)
 					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, function.parameter);
 					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ")}");
 				}
-
-				zbx_free(function.function);
-				zbx_free(function.parameter);
 			}
+
+			DCconfig_clean_functions(&function, &rc, 1);
 
 			if (SUCCEED != rc)
 				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "*ERROR*");
@@ -2641,18 +2642,21 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector
 		}
 	}
 
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() functionids_num:%d", __function_name, functionids->values_num);
 }
 
 typedef struct
 {
-	zbx_uint64_t		triggerid;
-	char			function[FUNCTION_FUNCTION_LEN_MAX];
-	char			parameter[FUNCTION_PARAMETER_LEN_MAX];
-	zbx_timespec_t		timespec;
-	char			*value;
-	char			*error;
-	zbx_vector_uint64_t	functionids;
+	zbx_uint64_t	functionid;
+	zbx_uint64_t	triggerid;
+	char		function[FUNCTION_FUNCTION_LEN_MAX];
+	char		parameter[FUNCTION_PARAMETER_LEN_MAX];
+	zbx_timespec_t	timespec;
+	char		*value;
+	char		*error;
 }
 zbx_func_t;
 
@@ -2668,79 +2672,74 @@ static void	zbx_populate_function_items(zbx_vector_uint64_t *functionids, zbx_ve
 {
 	const char	*__function_name = "zbx_populate_function_items";
 
-	DB_RESULT	result;
-	DB_ROW		row;
+	int		i, j;
 	DC_TRIGGER	*tr;
-	char		*sql = NULL;
-	size_t		sql_alloc = 2 * ZBX_KIBIBYTE, sql_offset = 0;
-	int		i;
-	zbx_uint64_t	itemid, triggerid, functionid;
+	DC_FUNCTION	*functions = NULL;
+	int		*errcodes = NULL;
 	zbx_ifunc_t	*ifunc = NULL;
 	zbx_func_t	*func = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __function_name, functionids->values_num);
 
-	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	functions = zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids->values_num);
+	errcodes = zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
 
-	sql = zbx_malloc(sql, sql_alloc);
+	DCconfig_get_functions_by_functionids(functions, functionids->values, errcodes, functionids->values_num);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select itemid,triggerid,function,parameter,functionid"
-			" from functions"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "functionid",
-			functionids->values, functionids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			" order by itemid,triggerid,function,parameter,functionid");
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
+	for (i = 0; i < functionids->values_num; i++)
 	{
-		ZBX_STR2UINT64(itemid, row[0]);
-		ZBX_STR2UINT64(triggerid, row[1]);
-		ZBX_STR2UINT64(functionid, row[4]);
+		if (SUCCEED != errcodes[i])
+			continue;
 
-		if (NULL == ifunc || ifunc->itemid != itemid)
+		for (j = 0; j < ifuncs->values_num; j++)
+		{
+			ifunc = (zbx_ifunc_t *)ifuncs->values[j];
+
+			if (ifunc->itemid == functions[i].itemid)
+				break;
+		}
+
+		if (j == ifuncs->values_num)
 		{
 			ifunc = zbx_malloc(NULL, sizeof(zbx_ifunc_t));
-			ifunc->itemid = itemid;
+			ifunc->itemid = functions[i].itemid;
 			zbx_vector_ptr_create(&ifunc->functions);
 
 			zbx_vector_ptr_append(ifuncs, ifunc);
-
-			func = NULL;
 		}
 
-		if (NULL == func || triggerid != func->triggerid ||
-				0 != strcmp(func->function, row[2]) || 0 != strcmp(func->parameter, row[3]))
+		func = zbx_malloc(NULL, sizeof(zbx_func_t));
+		func->functionid = functions[i].functionid;
+		func->triggerid = functions[i].triggerid;
+		strscpy(func->function, functions[i].function);
+		strscpy(func->parameter, functions[i].parameter);
+		func->timespec.sec = 0;
+		func->timespec.ns = 0;
+		func->value = NULL;
+		func->error = NULL;
+
+		if (FAIL != (j = zbx_vector_ptr_bsearch(triggers, &func->triggerid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
-			func = zbx_malloc(NULL, sizeof(zbx_func_t));
-			func->triggerid = triggerid;
-			strscpy(func->function, row[2]);
-			strscpy(func->parameter, row[3]);
-			func->timespec.sec = 0;
-			func->timespec.ns = 0;
-			func->value = NULL;
-			func->error = NULL;
-			zbx_vector_uint64_create(&func->functionids);
-
-			if (FAIL != (i = zbx_vector_ptr_bsearch(triggers, &triggerid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-			{
-				tr = (DC_TRIGGER *)triggers->values[i];
-
-				func->timespec = tr->timespec;
-			}
-
-			zbx_vector_ptr_append(&ifunc->functions, func);
+			tr = (DC_TRIGGER *)triggers->values[j];
+			func->timespec = tr->timespec;
 		}
 
-		zbx_vector_uint64_append(&func->functionids, functionid);
+		zbx_vector_ptr_append(&ifunc->functions, func);
 	}
-	DBfree_result(result);
 
-	zbx_free(sql);
+	DCconfig_clean_functions(functions, errcodes, functionids->values_num);
+
+	zbx_free(errcodes);
+	zbx_free(functions);
+
+	zbx_vector_ptr_sort(ifuncs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	for (i = 0; i < ifuncs->values_num; i++)
+	{
+		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
+		zbx_vector_ptr_sort(&ifunc->functions, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __function_name, ifuncs->values_num);
 }
@@ -2837,22 +2836,16 @@ static void	zbx_evaluate_item_functions(zbx_vector_ptr_t *ifuncs)
 static zbx_func_t	*zbx_get_func_by_functionid(zbx_vector_ptr_t *ifuncs, zbx_uint64_t functionid)
 {
 	zbx_ifunc_t	*ifunc;
-	zbx_func_t	*func;
 	int		i, j;
 
 	for (i = 0; i < ifuncs->values_num; i++)
 	{
 		ifunc = (zbx_ifunc_t *)ifuncs->values[i];
 
-		for (j = 0; j < ifunc->functions.values_num; j++)
+		if (FAIL != (j = zbx_vector_ptr_bsearch(&ifunc->functions, &functionid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
-			func = (zbx_func_t *)ifunc->functions.values[j];
-
-			if (FAIL != zbx_vector_uint64_bsearch(&func->functionids, functionid,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			{
-				return func;
-			}
+			return (zbx_func_t *)ifunc->functions.values[j];
 		}
 	}
 
@@ -2964,7 +2957,6 @@ static void	zbx_free_item_functions(zbx_vector_ptr_t *ifuncs)
 
 			zbx_free(func->value);
 			zbx_free(func->error);
-			zbx_vector_uint64_destroy(&func->functionids);
 			zbx_free(func);
 		}
 		zbx_vector_ptr_destroy(&ifunc->functions);
@@ -3051,7 +3043,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		event.objectid = tr->triggerid;
 		event.value = tr->value;
 
-		zbx_remove_spaces(tr->expression);
+		zbx_remove_whitespace(tr->expression);
 
 		if (SUCCEED != substitute_simple_macros(&event, NULL, NULL, NULL, &tr->expression,
 				MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))

@@ -15,6 +15,7 @@ Bug fixes:
 Changes for 2.0.0rc2
 
 New features:
+........S. [ZBXNEXT-1162] improved performance of processing of triggers by history syncers and timer processes (Sasha)
 A.F....... [ZBXNEXT-1149] import of nested maps, import form redesign (Vedmak)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
 A.F....... [ZBXNEXT-914] redesign Administration->DM (Eduard)
