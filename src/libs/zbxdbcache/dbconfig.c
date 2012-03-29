@@ -62,6 +62,7 @@ ZBX_DC_TRIGGER_DEPLIST;
 typedef struct
 {
 	zbx_uint64_t	functionid;
+	zbx_uint64_t	triggerid;
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
@@ -1475,6 +1476,7 @@ static void	DCsync_functions(DB_RESULT result)
 
 		function = DCfind_id(&config->functions, functionid, sizeof(ZBX_DC_FUNCTION), &found);
 
+		function->triggerid = triggerid;
 		function->itemid = itemid;
 		DCstrpool_replace(found, &function->function, row[2]);
 		DCstrpool_replace(found, &function->parameter, row[3]);
@@ -3216,10 +3218,18 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 
 static void	DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src_function)
 {
+	size_t	sz_function, sz_parameter;
+
 	dst_function->functionid = src_function->functionid;
+	dst_function->triggerid = src_function->triggerid;
 	dst_function->itemid = src_function->itemid;
-	dst_function->function = zbx_strdup(NULL, src_function->function);
-	dst_function->parameter = zbx_strdup(NULL, src_function->parameter);
+
+	sz_function = strlen(src_function->function) + 1;
+	sz_parameter = strlen(src_function->parameter) + 1;
+	dst_function->function = zbx_malloc(NULL, sz_function + sz_parameter);
+	dst_function->parameter = dst_function->function + sz_function;
+	memcpy(dst_function->function, src_function->function, sz_function);
+	memcpy(dst_function->parameter, src_function->parameter, sz_parameter);
 }
 
 static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger)
@@ -3282,7 +3292,7 @@ unlock:
  *                                                                            *
  * Purpose: Get item with specified ID                                        *
  *                                                                            *
- * Parameters: item     - [OUT] pointer to DC_ITEM structure                  *
+ * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
  *             itemids  - [IN] array of item IDs                              *
  *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
  *             num      - [IN] number of elements                             *
@@ -3317,35 +3327,58 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *e
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_get_function_by_functionid                              *
+ * Function: DCconfig_get_functions_by_functionids                            *
  *                                                                            *
- * Purpose: Get function with specified ID                                    *
+ * Purpose: Get functions by IDs                                              *
  *                                                                            *
- * Parameters: function - [OUT] pointer to DC_FUNCTION structure              *
- *             functionid - [IN] item ID                                      *
+ * Parameters: functions   - [OUT] pointer to DC_FUNCTION structures          *
+ *             functionids - [IN] array of function IDs                       *
+ *             errcodes    - [OUT] SUCCEED if item found, otherwise FAIL      *
+ *             num         - [IN] number of elements                          *
  *                                                                            *
- * Return value: SUCCEED if function found, otherwise FAIL                    *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
+ * Author: Aleksandrs Saveljevs, Alexander Vladishev                          *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_function_by_functionid(DC_FUNCTION *function, zbx_uint64_t functionid)
+void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes, size_t num)
 {
-	int			res = FAIL;
+	size_t			i;
 	const ZBX_DC_FUNCTION	*dc_function;
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionid)))
-		goto unlock;
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_function = zbx_hashset_search(&config->functions, &functionids[i])))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
 
-	DCget_function(function, dc_function);
+		DCget_function(&functions[i], dc_function);
+		errcodes[i] = SUCCEED;
+	}
 
-	res = SUCCEED;
-unlock:
 	UNLOCK_CACHE;
+}
 
-	return res;
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_clean_functions                                         *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
+{
+	size_t	i;
+
+	for (i = 0; i < num; i++)
+	{
+		if (SUCCEED != errcodes)
+			continue;
+
+		zbx_free(functions[i].function);
+	}
 }
 
 /******************************************************************************
