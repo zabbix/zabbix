@@ -237,7 +237,6 @@ class CConfigurationExportBuilder {
 			$data = array(
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
-				'multiplier' => $discoveryRule['multiplier'],
 				'snmp_community' => $discoveryRule['snmp_community'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
 				'key' => $discoveryRule['key_'],
