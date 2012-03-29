@@ -4,6 +4,7 @@ Changes for 2.0.0rc3
 New features:
 
 Bug fixes:
+..F....... [ZBX-4811] added 'filter' and 'lifetime' fields to discovery rules export (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
 ..F....... [ZBX-4792] fixed missing field "Allowed hosts" when item type Zabbix trapper (Toms)
 ..F....... [ZBX-4038] fixed warnings for incorrect input values (Toms)
