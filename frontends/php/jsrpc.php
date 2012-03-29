@@ -74,6 +74,11 @@ switch ($data['method']) {
 		$params = $data['params'];
 		$msgsettings = getMessageSettings();
 
+		// if no severity is selected, show nothing
+		if (empty($msgsettings['triggers.severities'])) {
+			break;
+		}
+
 		// timeout
 		$timeOut = (time() - $msgsettings['timeout']);
 		$lastMsgTime = 0;

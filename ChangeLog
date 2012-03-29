@@ -4,6 +4,7 @@ Changes for 2.0.0rc3
 New features:
 
 Bug fixes:
+..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
 ....I..... [ZBXNEXT-397] removed records from "ids" table to prevent SQL errors while adding a new item (Sasha)
 ..F....... [ZBX-4811] added 'filter' and 'lifetime' fields to discovery rules export (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
@@ -540,6 +541,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
+..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
 ..F....... [ZBX-4761] fixed "&" encoding in input fields (Pavels)
