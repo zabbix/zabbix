@@ -62,7 +62,6 @@ div #div_node_tree { background-color:#1D4161; }
 
 .right_header { border-color: #77B7DA; }
 
-.unknown	{ color: #999999; }
 .normal		{ background-color: #AADDDD; }
 
 a, a:link, a:visited { color: #99C7E4; }
@@ -83,6 +82,8 @@ a.disabled:hover { color: #CC4444; }
 a.on:link, a.on:visited, a.on:active { color: #EE0000; }
 a.on:hover { color: #CC4444; }
 
+.unknown, a.unknown { color: #999999; }
+a.unknown:hover { color: #BBB; }
 /*////////////////	TABLES	////////////////////*/
 table{
 	color: #FFFFFF;
