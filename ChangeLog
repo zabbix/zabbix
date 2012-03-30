@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBX-1357] updated French, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3725] added check for xml file size exceeds upload_max_filesize php setting (Vedmak)
 A.F....... [ZBX-3991] forbid passive proxy interfaces with ip 0.0.0.0 (Vedmak)
 ..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
 ....I..... [ZBXNEXT-397] removed records from "ids" table to prevent SQL errors while adding a new item (Sasha)
