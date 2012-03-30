@@ -115,6 +115,16 @@ class CService extends CZBXAPI {
 				$dependencies = array_merge($dependencies, $service['dependencies']);
 			}
 		}
+		// add parent dependencies
+		foreach ($services as $key => $service) {
+			if (isset($service['parentid'])) {
+				$dependencies[] = array(
+					'serviceid' => $service['parentid'],
+					'dependsOnServiceid' => $serviceIds[$key],
+					'soft' => 0
+				);
+			}
+		}
 		if ($dependencies) {
 			$this->addDependencies($dependencies);
 		}
@@ -198,6 +208,30 @@ class CService extends CZBXAPI {
 
 		// replace dependencies
 		$dependencies = array();
+
+		// process parents
+		$deleteParentsFromServiceIds = array();
+		foreach ($services as $service) {
+			if (isset($service['parentid'])) {
+				// unset a parent
+				if ($service['parentid'] === 0) {
+					$deleteParentsFromServiceIds[] = $service['serviceid'];
+				}
+				// set a new parent
+				else {
+					$dependencies[] = array(
+						'serviceid' => $service['parentid'],
+						'dependsOnServiceid' => $service['serviceid'],
+						'soft' => 0
+					);
+				}
+			}
+		}
+		// unset parents
+		if ($deleteParentsFromServiceIds) {
+			$this->deleteParentDependencies($deleteParentsFromServiceIds);
+		}
+		// replace dependencies
 		foreach ($services as $service) {
 			if (!empty($service['dependencies'])) {
 				$dependencies = array_merge($dependencies, $service['dependencies']);
@@ -207,8 +241,6 @@ class CService extends CZBXAPI {
 			$this->deleteDependencies(array_unique(zbx_objectValues($dependencies, 'serviceid')));
 			$this->addDependencies($dependencies);
 		}
-		// TODO: process parent
-		// TODO: process dependencies
 		// TODO: process service times
 		// TODO: update statuses
 
@@ -262,7 +294,6 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function validateAddDependencies(array $dependencies) {
-		var_dump($dependencies);
 		if (!$dependencies) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -374,6 +405,20 @@ class CService extends CZBXAPI {
 	 */
 	public function isWritable(array $ids) {
 		return $this->isReadable($ids);
+	}
+
+	/**
+	 * Deletes the the dependencies of the parent services on the given services.
+	 *
+	 * @param $serviceIds
+	 *
+	 * @return void
+	 */
+	protected function deleteParentDependencies($serviceIds) {
+		DB::delete('services_links', array(
+			'servicedownid' => $serviceIds,
+			'soft' => 0
+		));
 	}
 
 	/**
@@ -576,8 +621,12 @@ class CService extends CZBXAPI {
 		}
 
 		// check if the affected services exist
-		$serviceIds = zbx_objectValues($services, 'parentid');
-		$serviceIds = array_merge($serviceIds, zbx_objectValues($services, 'serviceid'));
+		$serviceIds = zbx_objectValues($services, 'serviceid');
+		foreach ($services as $service) {
+			if (!empty($service['parentid'])) {
+				$serviceIds[] = $service['parentid'];
+			}
+		}
 		$serviceIds = array_unique($serviceIds);
 		if ($serviceIds) {
 			$this->checkServicePermissions($serviceIds);
