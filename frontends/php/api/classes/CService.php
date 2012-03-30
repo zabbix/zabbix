@@ -86,7 +86,7 @@ class CService extends CZBXAPI {
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
-				'parentid'
+				'parentid', 'dependencies'
 			));
 		}
 
@@ -105,10 +105,21 @@ class CService extends CZBXAPI {
 		$services = zbx_toArray($services);
 		$this->validateCreate($services);
 
+		// save the services
 		$serviceIds = DB::insert($this->tableName(), $services);
 
+		// save dependencies
+		$dependencies = array();
+		foreach ($services as $service) {
+			if (!empty($service['dependencies'])) {
+				$dependencies = array_merge($dependencies, $service['dependencies']);
+			}
+		}
+		if ($dependencies) {
+			$this->addDependencies($dependencies);
+		}
+
 		// TODO: process parent
-		// TODO: process dependencies
 		// TODO: process service times
 		// TODO: update statuses
 
@@ -161,7 +172,7 @@ class CService extends CZBXAPI {
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
-				'parentid'
+				'parentid', 'dependencies'
 			));
 		}
 
@@ -180,10 +191,22 @@ class CService extends CZBXAPI {
 		$services = zbx_toArray($services);
 		$this->validateUpdate($services);
 
+		// save the services
 		foreach ($services as $service) {
 			DB::updateByPk($this->tableName(), $service['serviceid'], $service);
 		}
 
+		// replace dependencies
+		$dependencies = array();
+		foreach ($services as $service) {
+			if (!empty($service['dependencies'])) {
+				$dependencies = array_merge($dependencies, $service['dependencies']);
+			}
+		}
+		if ($dependencies) {
+			$this->deleteDependencies(array_unique(zbx_objectValues($dependencies, 'serviceid')));
+			$this->addDependencies($dependencies);
+		}
 		// TODO: process parent
 		// TODO: process dependencies
 		// TODO: process service times
@@ -286,6 +309,39 @@ class CService extends CZBXAPI {
 		DB::insert('services_links', $data);
 
 		return array('serviceids' => zbx_objectValues($dependencies, 'serviceid'));
+	}
+
+	/**
+	 * Validates the input for the deleteDependencies() method.
+	 *
+	 * @throws APIException if the given input is invalid
+	 *
+	 * @param array $serviceIds
+	 *
+	 * @return void
+	 */
+	protected function validateDeleteDependencies(array $serviceIds) {
+		if (!$serviceIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+	}
+
+	/**
+	 * Deletes all dependencies for the given services.
+	 *
+	 * @param array $serviceIds
+	 *
+	 * @return boolean
+	 */
+	public function deleteDependencies($serviceIds) {
+		$serviceIds = zbx_toArray($serviceIds);
+		$this->validateDeleteDependencies($serviceIds);
+
+		DB::delete('services_links', array(
+			'serviceupid' =>  $serviceIds
+		));
+
+		return array('serviceids' => $serviceIds);
 	}
 
 	/**
