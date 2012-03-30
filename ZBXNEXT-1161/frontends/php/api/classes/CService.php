@@ -83,7 +83,6 @@ class CService extends CZBXAPI {
 			$this->checkSortOrder($service);
 			$this->checkTriggerId($service);
 			$this->checkStatus($service);
-			// TODO: validate parent ids
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
@@ -159,7 +158,6 @@ class CService extends CZBXAPI {
 			if (isset($service['status'])) {
 				$this->checkStatus($service);
 			}
-			// TODO: validate parent ids
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
@@ -229,6 +227,65 @@ class CService extends CZBXAPI {
 		// TODO: update statuses
 
 		return array('serviceids' => $serviceIds);
+	}
+
+	/**
+	 * Validates the input parameters for the addDependencies() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $dependencies
+	 *
+	 * @return void
+	 */
+	protected function validateAddDependencies(array $dependencies) {
+		var_dump($dependencies);
+		if (!$dependencies) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		foreach ($dependencies as $dependency) {
+			$this->checkDependency($dependency);
+
+			$this->checkUnsupportedFields('services_links', $dependency,
+				_s('Wrong fields for dependency for service "%1$s".', $dependency['serviceid']),
+				array('dependsOnServiceid', 'serviceid')
+			);
+		}
+
+		$serviceIds = array_merge(
+			zbx_objectValues($dependencies, 'serviceid'),
+			zbx_objectValues($dependencies, 'dependsOnServiceid')
+		);
+		$serviceIds = array_unique($serviceIds);
+		$this->checkServicePermissions($serviceIds);
+
+		$this->checkForHardlinkedDependencies($dependencies);
+	}
+
+	/**
+	 * Add the given service dependencies.
+	 *
+	 * @param array $dependencies   an array of service dependencies, each pair in the form of
+	 *                              array('serviceid' => 1, 'dependsOnServiceid' => 2, 'soft' => 0)
+	 *
+	 * @return array
+	 */
+	public function addDependencies(array $dependencies) {
+		$dependencies = zbx_toArray($dependencies);
+		$this->validateAddDependencies($dependencies);
+
+		$data = array();
+		foreach ($dependencies as $dependency) {
+			$data[] = array(
+				'serviceupid' => $dependency['serviceid'],
+				'servicedownid' => $dependency['dependsOnServiceid'],
+				'soft' => $dependency['soft']
+			);
+		}
+		DB::insert('services_links', $data);
+
+		return array('serviceids' => zbx_objectValues($dependencies, 'serviceid'));
 	}
 
 	/**
@@ -382,7 +439,7 @@ class CService extends CZBXAPI {
 			}
 		}
 
-		if (idcmp($service['serviceid'], $service['parentid'])) {
+		if (isset($service['serviceid']) && idcmp($service['serviceid'], $service['parentid'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Service cannot be parent and child at the same time.'));
 		}
 	}
@@ -412,7 +469,7 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkTriggerPermissions(array $services) {
-		$affectedTriggerIds = array_merge(zbx_objectValues($services, 'triggerid'), array());
+		$affectedTriggerIds = zbx_objectValues($services, 'triggerid');
 		if ($affectedTriggerIds) {
 			if (!API::Trigger()->isReadable($affectedTriggerIds)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -473,7 +530,6 @@ class CService extends CZBXAPI {
 		// TODO: check links
 	}
 
-
 	/**
 	 * Checks if all of the given services are readable.
 	 *
@@ -488,5 +544,70 @@ class CService extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
+
+	/**
+	 * Checks if the given dependency is valid.
+	 *
+	 * @throws APIException if the dependency is invalid
+	 *
+	 * @param array $dependency
+	 *
+	 * @return void
+	 */
+	protected function checkDependency(array $dependency) {
+		if (empty($dependency['serviceid']) || empty($dependency['dependsOnServiceid'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+		}
+
+		if (idcmp($dependency['serviceid'], $dependency['dependsOnServiceid'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Service with ID "%1$s" cannot be dependent on itself.', $dependency['serviceid']));
+		}
+
+		// check 'soft' field value
+		if (!isset($dependency['soft']) || !in_array($dependency['soft'], array(0, 1), true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect "soft" field value for dependency for service with ID "%1$s".', $dependency['serviceid'])
+			);
+		}
+	}
+
+	/**
+	 * Checks any of the services is hard linked to a different service. Assumes the dependencies are valid.
+	 *
+	 * @throws APIException if at a least one service is hard linked to another service
+	 *
+	 * @param array $dependencies
+	 *
+	 * @return void
+	 */
+	protected function checkForHardlinkedDependencies(array $dependencies) {
+		// only check hard dependencies
+		$softDepServiceIds = array();
+		foreach ($dependencies as $dependency) {
+			if (!$dependency['soft']) {
+				$softDepServiceIds[] = $dependency['dependsOnServiceid'];
+			}
+		}
+
+		if ($softDepServiceIds) {
+			// look for at least one hardlinked service among the given
+			$softDepServiceIds = array_unique($softDepServiceIds);
+			$dep = API::getApi()->select('services_links', array(
+				'filter' => array(
+					'soft' => 0,
+					'servicedownid' => $softDepServiceIds
+				),
+				'limit' => 1
+			));
+
+			if ($dep) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Service with ID "%1$s" is already hardlinked to a different service.', $dependency['dependsOnServiceid'])
+				);
+			}
+		}
+	}
+
+
 
 }
