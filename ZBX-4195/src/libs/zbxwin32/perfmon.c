@@ -66,13 +66,24 @@ PDH_STATUS	zbx_PdhOpenQuery(const char *function, PDH_HQUERY query)
 PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTER_DATA *counter, PDH_HQUERY query,
 		const char *counterpath, PDH_HCOUNTER *handle)
 {
-	PDH_STATUS	pdh_status;
+	PDH_STATUS	pdh_status = ERROR_SUCCESS;
 	LPTSTR		wcounterPath;
 
 	wcounterPath = zbx_utf8_to_unicode(counterpath);
 
-	if (ERROR_SUCCESS == (pdh_status = PdhAddCounter(query, wcounterPath, 0, handle)) &&
-		ERROR_SUCCESS == (pdh_status = PdhValidatePath(wcounterPath)))
+	if (NULL == *handle)
+		pdh_status = PdhAddCounter(query, wcounterPath, 0, handle);
+
+	if (ERROR_SUCCESS == pdh_status)
+		pdh_status = PdhValidatePath(wcounterPath);
+
+	if (ERROR_SUCCESS != pdh_status && NULL != *handle)
+	{
+		if (ERROR_SUCCESS == PdhRemoveCounter(*handle))
+			*handle = NULL;
+	}
+
+	if (ERROR_SUCCESS == pdh_status)
 	{
 		if (NULL != counter)
 			counter->status = PERF_COUNTER_INITIALIZED;
@@ -85,7 +96,7 @@ PDH_STATUS	zbx_PdhAddCounter(const char *function, PERF_COUNTER_DATA *counter, P
 			counter->status = PERF_COUNTER_NOTSUPPORTED;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): unable to add PerfCounter '%s': %s",
-			function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
+				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
 	zbx_free(wcounterPath);
@@ -132,7 +143,7 @@ PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpa
 PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, double *value)
 {
 	PDH_HQUERY		query;
-	PDH_HCOUNTER		counter;
+	PDH_HCOUNTER		handle = NULL;
 	PDH_STATUS		pdh_status;
 	PDH_RAW_COUNTER		rawData, rawData2;
 	PDH_FMT_COUNTERVALUE	counterValue;
@@ -140,16 +151,16 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 	if (ERROR_SUCCESS != (pdh_status = zbx_PdhOpenQuery(function, &query)))
 		return pdh_status;
 
-	if (ERROR_SUCCESS != (pdh_status = zbx_PdhAddCounter(function, NULL, query, counterpath, &counter)))
+	if (ERROR_SUCCESS != (pdh_status = zbx_PdhAddCounter(function, NULL, query, counterpath, &handle)))
 		goto close_query;
 
 	if (ERROR_SUCCESS != (pdh_status = zbx_PdhCollectQueryData(function, counterpath, query)))
 		goto remove_counter;
 
-	if (ERROR_SUCCESS != (pdh_status = zbx_PdhGetRawCounterValue(function, counterpath, counter, &rawData)))
+	if (ERROR_SUCCESS != (pdh_status = zbx_PdhGetRawCounterValue(function, counterpath, handle, &rawData)))
 		goto remove_counter;
 
-	if (PDH_CSTATUS_INVALID_DATA == (pdh_status = PdhCalculateCounterFromRawValue(counter, PDH_FMT_DOUBLE, &rawData, NULL, &counterValue)))
+	if (PDH_CSTATUS_INVALID_DATA == (pdh_status = PdhCalculateCounterFromRawValue(handle, PDH_FMT_DOUBLE, &rawData, NULL, &counterValue)))
 	{
 		/* some (e.g., rate) counters require two raw values, MSDN lacks documentation */
 		/* about what happens but tests show that PDH_CSTATUS_INVALID_DATA is returned */
@@ -157,9 +168,9 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 		zbx_sleep(1);
 
 		if (ERROR_SUCCESS == (pdh_status = zbx_PdhCollectQueryData(function, counterpath, query)) &&
-				ERROR_SUCCESS == (pdh_status = zbx_PdhGetRawCounterValue(function, counterpath, counter, &rawData2)))
+				ERROR_SUCCESS == (pdh_status = zbx_PdhGetRawCounterValue(function, counterpath, handle, &rawData2)))
 		{
-			pdh_status = PdhCalculateCounterFromRawValue(counter, PDH_FMT_DOUBLE, &rawData2, &rawData, &counterValue);
+			pdh_status = PdhCalculateCounterFromRawValue(handle, PDH_FMT_DOUBLE, &rawData2, &rawData, &counterValue);
 		}
 	}
 
@@ -176,7 +187,7 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 		*value = counterValue.doubleValue;
 	}
 remove_counter:
-	PdhRemoveCounter(&counter);
+	PdhRemoveCounter(handle);
 close_query:
 	PdhCloseQuery(query);
 
