@@ -1,5 +1,6 @@
 <script type="text/x-jquery-tmpl" id="itemTpl">
 <tr id="items_#{number}" class="sortable">
+	<!-- icon + hidden -->
 	<td>
 		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<input type="hidden" id="items_#{number}_graphs_0_graphid" name="items[#{number}][graphs][0][graphid]" value="">
@@ -9,6 +10,8 @@
 		<input type="hidden" id="items_#{number}_periods_cnt" name="items[#{number}][periods_cnt]" value="#{periods_cnt}">
 		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
 	</td>
+
+	<!-- row number -->
 	<td>
 		<span id="items_#{number}_number" class="items_number">#{number_nr}:</span>
 	</td>
@@ -97,6 +100,7 @@
 			onclick="javascript: show_color_picker('items_#{number}_color');">&nbsp;&nbsp;&nbsp;</div>
 	</td>
 
+	<!-- remove button -->
 	<td>
 		<input type="button" class="input link_menu" id="items_#{number}_remove" data-remove="#{number}" value="<?php echo _('Remove'); ?>" onclick="removeItem(this);" />
 	</td>
@@ -104,7 +108,7 @@
 </script>
 <script type="text/javascript">
 
-	function addItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, periods_cnt) {
+	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, periods_cnt) {
 		var item = [];
 		item['number'] = number;
 		item['number_nr'] = number + 1;
@@ -133,27 +137,33 @@
 		activateSortable();
 	}
 
-	function addNewItem(graphid) {
-		var item = [];
-		item['number'] = jQuery('#itemsTable tr.sortable').length;
-		item['number_nr'] = item['number'] + 1;
-		item['gitemid'] = 0;
-		item['graphid'] = graphid;
-		item['itemid'] = 0;
-		item['name'] = '<?php echo _('Select'); ?>';
-		item['type'] = null;
-		item['calc_fnc'] = null;
-		item['drawtype'] = null;
-		item['yaxisside'] = null;
-		item['color'] = '009900';
-		item['periods_cnt'] = 0;
-		item['sortorder'] = item['number'];
+	function addPopupValues(list) {
+		if (!isset('object', list) || list.object != 'itemid') {
+			return false;
+		}
 
-		var itemTpl = new Template(jQuery('#itemTpl').html());
-		jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
-		jQuery('#items_' + item['number'] + '_color').val(item['color']);
-		jQuery('#lbl_items_' + item['number'] + '_color').attr('title', '#' + item['color']);
-		jQuery('#lbl_items_' + item['number'] + '_color').css('background-color', '#' + item['color']);
+		for (var i = 0; i < list.values.length; i++) {
+			var item = [];
+			item['number'] = jQuery('#itemsTable tr.sortable').length;
+			item['number_nr'] = item['number'] + 1;
+			item['gitemid'] = 0;
+			item['graphid'] = <?php echo $this->data['graphid']; ?>;
+			item['itemid'] = list.values[i].itemid;
+			item['name'] = list.values[i].name;
+			item['type'] = null;
+			item['calc_fnc'] = null;
+			item['drawtype'] = null;
+			item['yaxisside'] = null;
+			item['color'] = '009900';
+			item['periods_cnt'] = 0;
+			item['sortorder'] = item['number'];
+
+			var itemTpl = new Template(jQuery('#itemTpl').html());
+			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
+			jQuery('#items_' + item['number'] + '_color').val(item['color']);
+			jQuery('#lbl_items_' + item['number'] + '_color').attr('title', '#' + item['color']);
+			jQuery('#lbl_items_' + item['number'] + '_color').css('background-color', '#' + item['color']);
+		}
 
 		activateSortable();
 	}
@@ -201,7 +211,7 @@
 					jQuery(this).attr('onchange', 'javascript: set_color_by_name("items_' + i + '_color", this.value);');
 				}
 			});
-			i++
+			i++;
 		});
 		i = 0;
 		jQuery('#itemsTable tr.sortable').each(function() {
@@ -209,14 +219,14 @@
 			var part1 = id.substring(0, id.indexOf('items_') + 5);
 
 			jQuery(this).attr('id', part1 + '_' + i);
-			i++
+			i++;
 		});
 
 		// set row number
-		i = 0
+		i = 0;
 		jQuery('#itemsTable tr.sortable').each(function() {
 			jQuery('.items_number', this).text((i + 1) + ':');
-			i++
+			i++;
 		});
 	}
 
@@ -246,4 +256,42 @@
 	}
 
 	initSortable();
+
+	<?php if ($this->data['isDataValid']) { ?>
+		jQuery(document).ready(function() {
+			jQuery('#tab_previewTab').click(function() {
+				var name = 'chart3.php';
+				var src = '&name=' + jQuery('#name').val()
+							+ '&width=' + jQuery('#width').val()
+							+ '&height=' + jQuery('#height').val()
+							+ '&graphtype=' + jQuery('#graphtype').val()
+							+ '&legend=' + (jQuery('#legend').is(':checked') ? 1 : 0);
+
+				<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED) { ?>
+					name = 'chart7.php';
+					src = src + '&graph3d=' + (jQuery('#graph3d').is(':checked') ? 1 : 0);
+
+				<?php } else { ?>
+					src = src + '&ymin_type=' + jQuery('#ymin_type').val()
+								+ '&ymax_type=' + jQuery('#ymax_type').val()
+								+ '&yaxismin=' + jQuery('#yaxismin').val()
+								+ '&yaxismax=' + jQuery('#yaxismax').val()
+								+ '&ymin_itemid=' + jQuery('#ymin_itemid').val()
+								+ '&ymax_itemid=' + jQuery('#ymax_itemid').val()
+								+ '&showworkperiod=' + (jQuery('#showworkperiod').is(':checked') ? 1 : 0)
+								+ '&showtriggers=' + (jQuery('#showtriggers').is(':checked') ? 1 : 0)
+								+ '&percent_left=' + jQuery('#percent_left').val()
+								+ '&percent_right=' + jQuery('#percent_right').val();
+				<?php } ?>
+
+				jQuery('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
+					if (!jQuery.isEmptyObject(value) && value.name != null) {
+						src = src + '&' + value.name + '=' + value.value;
+					}
+				});
+
+				jQuery('#previewTab img[name="image"]').attr('src', name + '?period=3600' + src);
+			});
+		});
+	<?php } ?>
 </script>

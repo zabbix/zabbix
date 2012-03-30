@@ -59,12 +59,12 @@ $itemsTable->setHeader(array(
 	new CCol(SPACE, null, null, '15'),
 	new CCol(_('Name'), null, null, '200'),
 	($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
-		? new CCol(_('Type'), null, null, '50') : null,
-	new CCol(_('Function'), null, null, '70'),
-	($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? new CCol(_('Draw style'), 'nowrap', null, '50') : null,
+		? new CCol(_('Type'), null, null, '80') : null,
+	new CCol(_('Function'), null, null, '80'),
+	($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? new CCol(_('Draw style'), 'nowrap', null, '80') : null,
 	($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED)
-		? new CCol(_('Y axis side'), 'nowrap', null, '50') : null,
-	new CCol(_('Colour'), null, null, '90'),
+		? new CCol(_('Y axis side'), 'nowrap', null, '80') : null,
+	new CCol(_('Colour'), null, null, '100'),
 	new CCol(_('Action'), null, null, '50')
 ));
 
@@ -88,15 +88,27 @@ if (!empty($this->data['items'])) {
 			$name = _('Select');
 		}
 
-		insert_js('addItem('.$rowNumber.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.CJs::encodeJson($name).', '.
-			$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.$item['yaxisside'].', \''.$item['color'].'\', '.
-			$item['periods_cnt'].');',
+		insert_js('loadItem('.$rowNumber.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
+			CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
+			$item['yaxisside'].', \''.$item['color'].'\', '.$item['periods_cnt'].');',
 			true
 		);
 	}
 }
 
-$addButton = new CButton('add_item', _('Add'), 'addNewItem('.$this->data['graphid'].');', 'link_menu');
+//$addButton = new CButton('add_item', _('Add'), 'addNewItem('.$this->data['graphid'].');', 'link_menu');
+$addButton = new CButton('add_item', _('Add'),
+	'return PopUp(\'popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
+		(!empty($this->data['parent_discoveryid'])
+			? '&srctbl=prototypes&parent_discoveryid='.$this->data['parent_discoveryid']
+			: '&srctbl=items').
+		(!empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : '').
+		(!empty($this->data['monitored_hosts']) ? '&real_hosts=1' : '').
+		(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
+		(!empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : '').
+		'&srcfld1=itemid&srcfld2=name\', 800, 600);',
+	'link_menu'
+);
 
 $addPrototypeButton = null;
 if (!empty($this->data['parent_discoveryid'])) {
@@ -278,13 +290,13 @@ $graphTab->addTab('graphTab', _('Graph'), $graphFormList);
 $graphPreviewTable = new CTable(null, 'graph');
 if (($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED) && $this->data['isDataValid']) {
 	$graphPreviewTable->addRow(new CImg('chart7.php?period=3600'.url_params(array(
-		'name', 'legend', 'graph3d', 'width', 'height', 'graphtype', 'items'
+		'name', 'width', 'height', 'graphtype', 'items', 'legend', 'graph3d'
 	))));
 }
 elseif ($this->data['isDataValid']){
 	$graphPreviewTable->addRow(new CImg('chart3.php?period=3600'.url_params(array(
-		'name', 'width', 'height', 'ymin_type', 'ymax_type', 'yaxismin', 'yaxismax', 'ymin_itemid', 'ymax_itemid',
-		'showworkperiod', 'legend', 'showtriggers', 'graphtype', 'percent_left', 'percent_right', 'items'
+		'name', 'width', 'height', 'graphtype', 'items', 'ymin_type', 'ymax_type', 'yaxismin', 'yaxismax', 'ymin_itemid', 'ymax_itemid',
+		'showworkperiod', 'legend', 'showtriggers', 'percent_left', 'percent_right'
 	))));
 }
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
@@ -308,8 +320,8 @@ else {
 	));
 }
 
+// insert js
 insert_show_color_picker_javascript();
-
 require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
 
 // append form to widget
