@@ -360,8 +360,8 @@ class CProxy extends CZBXAPI {
 				}
 
 				$interface = reset($proxy['interfaces']);
-				if (preg_match('/^(0{1,3}\.){3,3}0{1,3}$/', $interface['ip'], $match)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP for passive proxy "%1$s".', $match[0]));
+				if (preg_match('/^(0{1,3}\.){3,3}0{1,3}$/', $interface['ip'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP for passive proxy "%1$s".', $interface['ip']));
 				}
 
 				// mark the interface as main to pass host interface validation
