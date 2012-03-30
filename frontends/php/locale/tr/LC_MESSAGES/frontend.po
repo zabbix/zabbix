@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-30 13:51+0300\n"
-"PO-Revision-Date: 2011-06-07 11:42+0200\n"
+"POT-Creation-Date: 2012-03-30 13:56+0300\n"
+"PO-Revision-Date: 2012-03-21 08:20+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n>1);\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
@@ -19,7 +19,7 @@ msgstr ""
 #: maintenance.php:116 maintenance.php:120
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18"
-msgstr ""
+msgstr "\"%s\" 1970.01.01 ile 2038.01.18 arasında olmak zorunda"
 
 #: include/profiles.inc.php:281
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -33,15 +33,15 @@ msgstr ""
 #, php-format
 msgid "%1$d day, "
 msgid_plural "%1$d days, "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d gün,"
+msgstr[1] "%1$d gün,"
 
 #: httpmon.php:308 include/views/configuration.httpconf.list.php:112
 #, php-format
 msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d senaryo"
+msgstr[1] "%1$d senaryo"
 
 #: chart4.php:87 chart5.php:85
 #, php-format
@@ -87,15 +87,15 @@ msgstr ""
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:140
 msgid "(Only superadmins can create group)"
-msgstr ""
+msgstr "(Yalnızca superadmin'ler grup yaratabilir)"
 
 #: include/forms.inc.php:522 include/forms.inc.php:523
 msgid "(in days)"
-msgstr ""
+msgstr "(gün)"
 
 #: include/forms.inc.php:451
 msgid "(in sec)"
-msgstr ""
+msgstr "(saniye)"
 
 #: include/views/configuration.action.edit.php:482
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -157,7 +157,7 @@ msgstr "son 500 değer"
 
 #: include/views/configuration.sysmap.edit.php:67
 msgid "<manual>"
-msgstr ""
+msgstr "<elle>"
 
 #: acknow.php:148
 msgid "ALARM ACKNOWLEDGES"
@@ -218,7 +218,7 @@ msgstr "Alarmın onaylandığı"
 
 #: acknow.php:153 acknow.php:182
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Onayla ve dön"
 
 #: tr_status.php:198
 msgid "Acknowledge status"
@@ -230,11 +230,11 @@ msgstr "Onaylandı"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Onaylanmış OK olayları"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Onaylanmış PROBLEM olayları"
 
 #: acknow.php:27 tr_events.php:125
 msgid "Acknowledges"
@@ -266,7 +266,7 @@ msgstr "Eylem"
 
 #: api/classes/CAction.php:817
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2%s seconds)."
-msgstr ""
+msgstr "\"%1$s\" eylemi \"esc_period\"  için yanlış değere sahip (minimum %2%s saniye olmalı) "
 
 #: api/classes/CAction.php:820 api/classes/CAction.php:835
 #: api/classes/CAction.php:925 api/classes/CAction.php:945
@@ -416,7 +416,7 @@ msgstr "e ekle"
 
 #: maps.php:73
 msgid "Add to Favourites"
-msgstr ""
+msgstr "Favorilere ekle"
 
 #: include/html.inc.php:257 screens.php:91
 msgid "Add to favourites"
@@ -428,7 +428,7 @@ msgstr ""
 
 #: include/actions.inc.php:479
 msgid "Add to host group"
-msgstr ""
+msgstr "Konak grubuna ekle"
 
 #: include/actions.inc.php:294 include/views/configuration.action.edit.php:784
 msgid "Add to host groups"
@@ -477,7 +477,7 @@ msgstr "Aracı"
 
 #: include/views/configuration.host.edit.php:243
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Aracı arabilirimleri"
 
 #: hosts.php:61
 msgid "Agent or SNMP or JMX or IPMI interface"
@@ -551,7 +551,7 @@ msgstr "Uygulama"
 #: api/classes/CApplication.php:787
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" konağı için \"%1$s\" uygulaması zaten var."
 
 #: api/classes/CApplication.php:482
 #, php-format

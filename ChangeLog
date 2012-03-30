@@ -3,6 +3,8 @@ Changes for 2.0.0rc3
 
 New features:
 
+..F....... [ZBX-1357] updated French, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
+
 Bug fixes:
 A.F....... [ZBX-3991] forbid passive proxy interfaces with ip 0.0.0.0 (Vedmak)
 ..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
