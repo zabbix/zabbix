@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-30 13:51+0300\n"
-"PO-Revision-Date: 2012-02-18 21:32+0200\n"
+"POT-Creation-Date: 2012-03-30 13:56+0300\n"
+"PO-Revision-Date: 2012-03-04 08:37+0200\n"
 "Last-Translator: Łukasz <deejay1@srem.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -54,9 +54,9 @@ msgstr "%1$s (rok %2$s)"
 #, php-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s pozycja"
+msgstr[1] "%1$s pozycje"
+msgstr[2] "%1$s pozycji"
 
 #: include/page_header.php:467
 #, php-format
@@ -93,15 +93,15 @@ msgstr ""
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:140
 msgid "(Only superadmins can create group)"
-msgstr ""
+msgstr "(Wyłącznie super administratorze mogą tworzyć grupy)"
 
 #: include/forms.inc.php:522 include/forms.inc.php:523
 msgid "(in days)"
-msgstr ""
+msgstr "(w dniach)"
 
 #: include/forms.inc.php:451
 msgid "(in sec)"
-msgstr ""
+msgstr "(w sekundach)"
 
 #: include/views/configuration.action.edit.php:482
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -406,7 +406,7 @@ msgstr "Dodaj link"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Dodaj brakujące"
 
 #: include/forms.inc.php:1734
 msgid "Add prototype"
@@ -588,7 +588,7 @@ msgstr "Program został zaktualizowany"
 #: api/classes/CItemGeneral.php:294
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "Program o ID \"%1$s\" nie jest dostępny na \"%2$s\"."
 
 #: hosts_mon.php:167 hosts_mon.php:223 hosts.php:672 hosts.php:753
 #: include/forms.inc.php:809 include/html.inc.php:408 include/html.inc.php:412
@@ -882,7 +882,7 @@ msgstr ""
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr ""
+msgstr "KONFIGURACJA REGUŁY WYKRYWANIA"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:29
@@ -1123,7 +1123,7 @@ msgstr "Nie można dodać programu"
 
 #: api/classes/CTrigger.php:2028
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "Nie można utworzyć zależności szablonu od hosta."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1432,7 +1432,7 @@ msgstr "Nie można usunąć skryptu"
 
 #: api/classes/CScript.php:409
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr ""
+msgstr "Nie można usunąć skryptów. Pusty parametr wejściowy \"scriptids\"."
 
 #: api/classes/CScript.php:433
 #, php-format
@@ -1470,11 +1470,11 @@ msgstr ""
 
 #: api/classes/CItem.php:1002
 msgid "Cannot delete templated item."
-msgstr ""
+msgstr "Nie można usunąć pozycji z szablonu."
 
 #: api/classes/CDiscoveryRule.php:583
 msgid "Cannot delete templated items."
-msgstr ""
+msgstr "Nie można usunąć pozycji z szablonu."
 
 #: api/classes/CTrigger.php:1307 api/classes/CTriggerPrototype.php:1238
 #, php-format
@@ -1507,11 +1507,11 @@ msgstr "Nie można usunąć mapy wartości"
 
 #: media_types.php:136
 msgid "Cannot disable media type"
-msgstr ""
+msgstr "Nie można wyłączyć typu mediów"
 
 #: media_types.php:120
 msgid "Cannot enable media type"
-msgstr ""
+msgstr "Nie można włączyć typu mediów"
 
 #: include/locales/en_gb.inc.php:158
 msgid "Cannot find background image"
@@ -1792,7 +1792,7 @@ msgstr "Nie można uaktualnić komentarza"
 #: adm.triggerdisplayingoptions.php:66 adm.triggerdisplayoptions.php:68
 #: adm.triggerseverities.php:69 adm.workingtime.php:47
 msgid "Cannot update configuration"
-msgstr ""
+msgstr "Nie można uaktualnić konfiguracji"
 
 #: usergrps.php:254
 msgid "Cannot update debug mode"
@@ -1844,7 +1844,7 @@ msgstr "Nie można uaktualnić elementu"
 
 #: items.php:526
 msgid "Cannot update items"
-msgstr ""
+msgstr "Nie można uaktualnić pozycji"
 
 #: adm.macros.php:93
 msgid "Cannot update macro"
@@ -2038,7 +2038,7 @@ msgstr "Wyczyść"
 
 #: include/views/configuration.item.edit.php:428
 msgid "Clear history and trends"
-msgstr ""
+msgstr "Wyczyść historię i trendy"
 
 #: include/views/configuration.httpconf.list.php:133
 #: include/views/configuration.item.list.php:243
