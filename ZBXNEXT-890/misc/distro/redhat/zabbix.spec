@@ -305,8 +305,8 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/web
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/init.d
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/alertscripts
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/%{name}/externalscripts
+mkdir -p $RPM_BUILD_ROOT/usr/lib/%{name}/alertscripts
+mkdir -p $RPM_BUILD_ROOT/usr/lib/%{name}/externalscripts
 mkdir -p $RPM_BUILD_ROOT%{_datadir}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/%{name}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/%{name}
@@ -335,8 +335,8 @@ cat misc/conf/zabbix_server.conf | sed \
     -e '/^# PidFile=/a \\nPidFile=%{_localstatedir}/run/zabbix/zabbix_server.pid' \
     -e 's|^LogFile=.*|LogFile=%{_localstatedir}/log/%{name}/zabbix_server.log|g' \
     -e '/^# LogFileSize=/a \\nLogFileSize=0' \
-    -e '/^# AlertScriptsPath=/a \\nAlertScriptsPath=%{_sharedstatedir}/%{name}/alertscripts' \
-    -e '/^# ExternalScripts=/a \\nExternalScripts=%{_sharedstatedir}/%{name}/externalscripts' \
+    -e '/^# AlertScriptsPath=/a \\nAlertScriptsPath=/usr/lib/%{name}/alertscripts' \
+    -e '/^# ExternalScripts=/a \\nExternalScripts=/usr/lib/%{name}/externalscripts' \
     -e 's|^DBUser=root|DBUser=zabbix|g' \
     -e '/^# DBSocket=/a \\nDBSocket=%{_localstatedir}/lib/mysql/mysql.sock' \
     > $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/zabbix_server.conf
@@ -345,7 +345,7 @@ cat misc/conf/zabbix_proxy.conf | sed \
     -e '/^# PidFile=/a \\nPidFile=%{_localstatedir}/run/zabbix/zabbix_proxy.pid' \
     -e 's|^LogFile=.*|LogFile=%{_localstatedir}/log/%{name}/zabbix_proxy.log|g' \
     -e '/^# LogFileSize=/a \\nLogFileSize=0' \
-    -e '/^# ExternalScripts=/a \\nExternalScripts=%{_sharedstatedir}/%{name}/externalscripts' \
+    -e '/^# ExternalScripts=/a \\nExternalScripts=/usr/lib/%{name}/externalscripts' \
     -e 's|^DBUser=root|DBUser=zabbix|g' \
     -e '/^# DBSocket=/a \\nDBSocket=%{_localstatedir}/lib/mysql/mysql.sock' \
     > $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/zabbix_proxy.conf
@@ -617,8 +617,8 @@ fi
 %files server
 %defattr(-,root,root,-)
 %attr(0640,root,zabbix) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_server.conf
-%dir %{_libdir}/%{name}/alertscripts
-%dir %{_libdir}/%{name}/externalscripts
+%dir /usr/lib/%{name}/alertscripts
+%dir /usr/lib/%{name}/externalscripts
 %config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-server
 %{_sysconfdir}/init.d/zabbix-server
 %{_mandir}/man8/zabbix_server.8*
@@ -636,7 +636,7 @@ fi
 %files proxy
 %defattr(-,root,root,-)
 %attr(0640,root,zabbix) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_proxy.conf
-%attr(0755,zabbix,zabbix) %dir %{_libdir}/zabbix/externalscripts
+%attr(0755,zabbix,zabbix) %dir /usr/lib/zabbix/externalscripts
 %config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-proxy
 %{_sysconfdir}/init.d/zabbix-proxy
 %{_mandir}/man8/zabbix_proxy.8*
