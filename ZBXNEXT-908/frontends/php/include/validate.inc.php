@@ -586,7 +586,8 @@ function check_fields(&$fields, $show_messages = true) {
 	if ($show_messages && $err != ZBX_VALID_OK) {
 		show_messages($err == ZBX_VALID_OK, null, _('Page received incorrect data.'));
 	}
-	return $err == ZBX_VALID_OK ? 1 : 0;
+
+	return $err == ZBX_VALID_OK;
 }
 
 function validatePortNumberOrMacro($port) {

@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 /**
  * Convert PHP variable to string version of JavaScript style
  *
@@ -418,48 +419,6 @@ function insert_js_function($fnct_name) {
 					return true;
 				}');
 			break;
-		case 'add_graph_item':
-			insert_js('
-				function add_graph_item(formname, itemid, color, drawtype, sortorder, yaxisside, calc_fnc, type) {
-					var form = window.opener.document.forms[formname];
-					if (!form) {
-						close_window();
-						return false;
-					}
-					window.opener.create_var(form, "new_graph_item[itemid]", itemid);
-					window.opener.create_var(form, "new_graph_item[color]", color);
-					window.opener.create_var(form, "new_graph_item[drawtype]", drawtype);
-					window.opener.create_var(form, "new_graph_item[sortorder]", sortorder);
-					window.opener.create_var(form, "new_graph_item[yaxisside]", yaxisside);
-					window.opener.create_var(form, "new_graph_item[calc_fnc]", calc_fnc);
-					window.opener.create_var(form, "new_graph_item[type]", type);
-
-					form.submit();
-					close_window();
-					return true;
-				}');
-			break;
-		case 'update_graph_item':
-			insert_js('
-				function update_graph_item(formname, list_name, gid, itemid, color, drawtype, sortorder, yaxisside, calc_fnc, type) {
-					var form = window.opener.document.forms[formname];
-					if (!form) {
-						close_window();
-						return false;
-					}
-					window.opener.create_var(form, list_name + "[" + gid + "][itemid]", itemid);
-					window.opener.create_var(form, list_name + "[" + gid + "][color]", color);
-					window.opener.create_var(form, list_name + "[" + gid + "][drawtype]", drawtype);
-					window.opener.create_var(form, list_name + "[" + gid + "][sortorder]", sortorder);
-					window.opener.create_var(form, list_name + "[" + gid + "][yaxisside]", yaxisside);
-					window.opener.create_var(form, list_name + "[" + gid + "][calc_fnc]", calc_fnc);
-					window.opener.create_var(form, list_name + "[" + gid + "][type]", type);
-
-					form.submit();
-					close_window();
-					return true;
-				}');
-			break;
 		case 'add_bitem':
 			insert_js('
 				function add_bitem(formname, caption, itemid, color, calc_fnc, axisside) {
@@ -592,17 +551,25 @@ function insert_js_function($fnct_name) {
 					var parentDocumentForms = $(parentDocument.body).select("form[name=" + frame + "]");
 					var submitParent = submitParent || false;
 					var frmStorage = null;
+
 					for (var key in values) {
 						if (is_null(values[key])) {
 							continue;
 						}
+
 						if (parentDocumentForms.length > 0) {
 							frmStorage = jQuery(parentDocumentForms[0]).find("#" + key).get(0);
 						}
 						if (typeof(frmStorage) == "undefined" || is_null(frmStorage)) {
 							frmStorage = parentDocument.getElementById(key);
 						}
-						frmStorage.value = values[key];
+
+						if (jQuery(frmStorage).is("span")) {
+							jQuery(frmStorage).html(values[key]);
+						}
+						else {
+							frmStorage.value = values[key];
+						}
 					}
 					if (!is_null(frmStorage) && submitParent) {
 						frmStorage.form.submit();
@@ -645,12 +612,14 @@ function insert_js_function($fnct_name) {
 	}
 };
 
-function insert_js($script) {
-	echo get_js($script);
+function insert_js($script, $jQueryDocumentReady = false) {
+	echo get_js($script, $jQueryDocumentReady);
 }
 
-function get_js($script) {
-	return '<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>';
+function get_js($script, $jQueryDocumentReady = false) {
+	return $jQueryDocumentReady
+		? '<script type="text/javascript">// <![CDATA['."\n".'jQuery(document).ready(function() { '.$script.' });'."\n".'// ]]></script>'
+		: '<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>';
 }
 
 function include_js($script) {

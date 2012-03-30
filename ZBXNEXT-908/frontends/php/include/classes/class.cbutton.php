@@ -21,6 +21,7 @@
 <?php
 
 class CButton extends CInput {
+
 	public function __construct($name = 'button', $caption = '', $action = null, $class = null) {
 		parent::__construct('button', $name, $caption, $class);
 		$this->addAction('onclick', $action);

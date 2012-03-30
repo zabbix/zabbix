@@ -176,7 +176,6 @@ $ZBX_MENU = array(
 					'tr_logform.php',
 					'tr_testexpr.php',
 					'popup_trexpr.php',
-					'popup_gitem.php',
 					'host_discovery.php',
 					'disc_prototypes.php',
 					'graph_prototypes.php',

@@ -328,11 +328,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			unset($_REQUEST['graphid']);
 		}
 
-		$numrows = new CDiv();
-		$numrows->setAttribute('name','numrows');
-
 		$graphs_wdgt->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($discovery_rule['name'], 'gold')));
-		$graphs_wdgt->addHeader($numrows);
+		$graphs_wdgt->addHeaderRowNumber();
 
 // Header Host
 		if (!empty($_REQUEST['parent_discoveryid'])) {

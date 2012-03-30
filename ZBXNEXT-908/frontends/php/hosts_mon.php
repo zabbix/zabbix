@@ -123,11 +123,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$frmForm = new CForm();
 	$frmForm->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB()));
 	$hosts_wdgt->addHeader(_('HOSTS'), $frmForm);
-
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
-
-	$hosts_wdgt->addHeader($numrows);
+	$hosts_wdgt->addHeaderRowNumber();
 
 // HOSTS FILTER {{{
 	$filter_table = new CTable('', 'filter_config');

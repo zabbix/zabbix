@@ -54,10 +54,6 @@ $fields = array(
 	'percent_right' =>	array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null),
 	'visible' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),		null),
 	'items' =>			array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'new_graph_item' =>	array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'group_gid' =>		array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'move_up' =>		array(T_ZBX_INT, O_OPT, null,		null,				null),
-	'move_down' =>		array(T_ZBX_INT, O_OPT, null,		null,				null),
 	'showworkperiod' =>	array(T_ZBX_INT, O_OPT, null,		IN('1'),			null),
 	'showtriggers' =>	array(T_ZBX_INT, O_OPT, null,		IN('1'),			null),
 	'group_graphid' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,				null),
@@ -66,7 +62,6 @@ $fields = array(
 	// actions
 	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
 	'add_item' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'delete_item' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
 	'preview' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
 	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
 	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
@@ -76,12 +71,11 @@ $fields = array(
 	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,				null)
 );
-$dataValid = check_fields($fields);
+$isDataValid = check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
 $_REQUEST['items'] = get_request('items', array());
-$_REQUEST['group_gid'] = get_request('group_gid', array());
 $_REQUEST['graph3d'] = get_request('graph3d', 0);
 $_REQUEST['legend'] = get_request('legend', 0);
 
@@ -123,13 +117,23 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (isset($_REQUEST['save'])) {
+	$result = true;
+
 	$items = get_request('items', array());
 	$itemids = array();
-	foreach ($items as $gitem) {
-		$itemids[$gitem['itemid']] = $gitem['itemid'];
+	foreach ($items as $item) {
+		if (!empty($item['itemid'])) {
+			$itemids[$item['itemid']] = $item['itemid'];
+		}
+		else {
+			$result = false;
+		}
+	}
+	if (!$result) {
+		info(_('Items required for graph.'));
 	}
 
-	if (!empty($itemids)) {
+	if (!empty($itemids) && $result) {
 		$dbItems = API::Item()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemids,
@@ -144,13 +148,7 @@ elseif (isset($_REQUEST['save'])) {
 				access_deny();
 			}
 		}
-	}
 
-	if (empty($items)) {
-		info(_('Items required for graph.'));
-		$result = false;
-	}
-	else {
 		if (!isset($_REQUEST['ymin_type'])) {
 			$_REQUEST['ymin_type'] = 0;
 		}
@@ -219,10 +217,12 @@ elseif (isset($_REQUEST['save'])) {
 				add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.$_REQUEST['name'].']');
 			}
 		}
+
 		if ($result) {
 			unset($_REQUEST['form']);
 		}
 	}
+
 	if (isset($_REQUEST['graphid'])) {
 		show_messages($result, _('Graph updated'), _('Cannot update graph'));
 	}
@@ -236,48 +236,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])) {
 		unset($_REQUEST['form']);
 	}
 	show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
-}
-elseif (isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid'])) {
-	foreach ($_REQUEST['items'] as $gid => $data) {
-		if (!isset($_REQUEST['group_gid'][$gid])) {
-			continue;
-		}
-		unset($_REQUEST['items'][$gid]);
-	}
-	unset($_REQUEST['delete_item'], $_REQUEST['group_gid']);
-}
-elseif (isset($_REQUEST['new_graph_item'])) {
-	$new_gitem = get_request('new_graph_item', array());
-
-	foreach ($_REQUEST['items'] as $data) {
-		if (bccomp($new_gitem['itemid'], $data['itemid']) == 0
-				&& $new_gitem['yaxisside'] == $data['yaxisside']
-				&& $new_gitem['calc_fnc'] == $data['calc_fnc']
-				&& $new_gitem['type'] == $data['type']) {
-			$already_exist = true;
-			break;
-		}
-	}
-
-	if (!isset($already_exist)) {
-		array_push($_REQUEST['items'], $new_gitem);
-	}
-}
-elseif (isset($_REQUEST['move_up']) && isset($_REQUEST['items'])) {
-	if (isset($_REQUEST['items'][$_REQUEST['move_up']])) {
-		$tmp = $_REQUEST['items'][$_REQUEST['move_up']];
-
-		$_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] = $_REQUEST['items'][$_REQUEST['move_up'] - 1]['sortorder'];
-		$_REQUEST['items'][$_REQUEST['move_up'] - 1]['sortorder'] = $tmp['sortorder'];
-	}
-}
-elseif (isset($_REQUEST['move_down']) && isset($_REQUEST['items'])) {
-	if (isset($_REQUEST['items'][$_REQUEST['move_down']])) {
-		$tmp = $_REQUEST['items'][$_REQUEST['move_down']];
-
-		$_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] = $_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'];
-		$_REQUEST['items'][$_REQUEST['move_down'] + 1]['sortorder'] = $tmp['sortorder'];
-	}
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_graphid'])) {
 	$go_result = API::Graph()->delete($_REQUEST['group_graphid']);
@@ -359,29 +317,18 @@ $pageFilter = new CPageFilter(array(
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-
 if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
 	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_graphid'));
 	$graphView->render();
 	$graphView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	insert_graph_form();
-	echo SBR;
-	$table = new CTable(NULL,'graph');
-	if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE || $_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED) && $dataValid){
-		$table->addRow(new CImg('chart7.php?period=3600'.url_param('name').
-				url_param('legend').url_param('graph3d').url_param('width').
-				url_param('height').url_param('graphtype').url_param('items')));
-	}
-	else if($dataValid){
-		$table->addRow(new CImg('chart3.php?period=3600'.url_param('name').url_param('width').url_param('height').
-			url_param('ymin_type').url_param('ymax_type').url_param('yaxismin').url_param('yaxismax').
-			url_param('ymin_itemid').url_param('ymax_itemid').
-			url_param('showworkperiod').url_param('legend').url_param('showtriggers').url_param('graphtype').
-			url_param('percent_left').url_param('percent_right').url_param('items')));
-	}
-	$table->show();
+	$data = getGraphFormData();
+	$data['isDataValid'] = $isDataValid;
+
+	$graphView = new CView('configuration.graph.edit', $data);
+	$graphView->render();
+	$graphView->show();
 }
 else {
 	if (isset($_REQUEST['graphid']) && $_REQUEST['graphid'] == 0) {

@@ -94,7 +94,7 @@ function url_param($param, $request = true, $name = null) {
 	if (!is_array($param)) {
 		if (is_null($name)) {
 			if (!$request) {
-				fatal_error('not request variable require url name [url_param]');
+				fatal_error(_('Not request variable require.'));
 			}
 			$name = $param;
 		}

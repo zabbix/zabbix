@@ -20,7 +20,7 @@
 ?>
 <?php
 
-class CColorCell extends CDiv{
+class CColorCell extends CDiv {
 
 	public function __construct($name, $value, $action = null) {
 		parent::__construct(SPACE.SPACE.SPACE, 'pointer');

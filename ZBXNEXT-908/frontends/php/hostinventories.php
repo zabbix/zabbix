@@ -150,11 +150,7 @@ else{
 	$filter_form->setAttribute('id','zbx_filter');
 	$filter_form->addItem($filter_table);
 	$hostinvent_wdgt->addFlicker($filter_form, CProfile::get('web.hostinventories.filter.state', 0));
-	// }}} HOST INVENTORY FILTER
-
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
-	$hostinvent_wdgt->addHeader($numrows);
+	$hostinvent_wdgt->addHeaderRowNumber();
 
 	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(

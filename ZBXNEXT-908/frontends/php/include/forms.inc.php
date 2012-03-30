@@ -1359,411 +1359,130 @@
 		return $data;
 	}
 
-	function insert_graph_form(){
-		$frmGraph = new CFormTable(_('Graph'));
-		$frmGraph->setName('frm_graph');
+	function getGraphFormData() {
+		$data = array(
+			'form' => get_request('form'),
+			'form_refresh' => get_request('form_refresh', 0),
+			'graphid' => get_request('graphid', 0),
+			'parent_discoveryid' => get_request('parent_discoveryid'),
+			'group_gid' => get_request('group_gid', array()),
+			'hostid' => get_request('hostid', array()),
+			'normal_only' => get_request('normal_only')
+		);
 
-		$parent_discoveryid = get_request('parent_discoveryid');
-		if($parent_discoveryid) $frmGraph->addVar('parent_discoveryid', $parent_discoveryid);
+		if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
+			$graph = API::Graph()->get(array(
+				'graphids' => $data['graphid'],
+				'output' => API_OUTPUT_EXTEND
+			));
+			$graph = reset($graph);
 
+			$data['name'] = $graph['name'];
+			$data['width'] = $graph['width'];
+			$data['height'] = $graph['height'];
+			$data['ymin_type'] = $graph['ymin_type'];
+			$data['ymax_type'] = $graph['ymax_type'];
+			$data['yaxismin'] = $graph['yaxismin'];
+			$data['yaxismax'] = $graph['yaxismax'];
+			$data['ymin_itemid'] = $graph['ymin_itemid'];
+			$data['ymax_itemid'] = $graph['ymax_itemid'];
+			$data['showworkperiod'] = $graph['show_work_period'];
+			$data['showtriggers'] = $graph['show_triggers'];
+			$data['graphtype'] = $graph['graphtype'];
+			$data['legend'] = $graph['show_legend'];
+			$data['graph3d'] = $graph['show_3d'];
+			$data['percent_left'] = $graph['percent_left'];
+			$data['percent_right'] = $graph['percent_right'];
 
-		if(isset($_REQUEST['graphid'])){
-			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
-
-			$options = array(
-				'graphids' => $_REQUEST['graphid'],
-				'filter' => array('flags' => null),
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$graphs = API::Graph()->get($options);
-			$graph = reset($graphs);
-
-			$frmGraph->setTitle(_('Graph').' "'.$graph['name'].'"');
-		}
-
-		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
-			$name = $graph['name'];
-			$width = $graph['width'];
-			$height = $graph['height'];
-			$ymin_type = $graph['ymin_type'];
-			$ymax_type = $graph['ymax_type'];
-			$yaxismin = $graph['yaxismin'];
-			$yaxismax = $graph['yaxismax'];
-			$ymin_itemid = $graph['ymin_itemid'];
-			$ymax_itemid = $graph['ymax_itemid'];
-			$showworkperiod = $graph['show_work_period'];
-			$showtriggers = $graph['show_triggers'];
-			$graphtype = $graph['graphtype'];
-			$legend = $graph['show_legend'];
-			$graph3d = $graph['show_3d'];
-			$percent_left = $graph['percent_left'];
-			$percent_right = $graph['percent_right'];
-
-			$options = array(
-				'graphids' => $_REQUEST['graphid'],
+			// items
+			$data['items'] = API::GraphItem()->get(array(
+				'graphids' => $data['graphid'],
 				'sortfield' => 'gitemid',
 				'output' => API_OUTPUT_EXTEND
-			);
-			$items = API::GraphItem()->get($options);
+			));
 		}
-		else{
-			$name = get_request('name', '');
-			$graphtype = get_request('graphtype', GRAPH_TYPE_NORMAL);
+		else {
+			$data['name'] = get_request('name', '');
+			$data['graphtype'] = get_request('graphtype', GRAPH_TYPE_NORMAL);
 
-			if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-				$width = get_request('width', 400);
-				$height = get_request('height', 300);
+			if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
+				$data['width'] = get_request('width', 400);
+				$data['height'] = get_request('height', 300);
 			}
-			else{
-				$width = get_request('width', 900);
-				$height = get_request('height', 200);
+			else {
+				$data['width'] = get_request('width', 900);
+				$data['height'] = get_request('height', 200);
 			}
 
-			$ymin_type = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
-			$ymax_type = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
-			$yaxismin = get_request('yaxismin', 0.00);
-			$yaxismax = get_request('yaxismax', 100.00);
-			$ymin_itemid = get_request('ymin_itemid', 0);
-			$ymax_itemid	= get_request('ymax_itemid', 0);
-			$showworkperiod = get_request('showworkperiod', 0);
-			$showtriggers	= get_request('showtriggers', 0);
-			$legend = get_request('legend', 0);
-			$graph3d	= get_request('graph3d', 0);
-			$visible = get_request('visible');
-			$percent_left  = 0;
-			$percent_right = 0;
+			$data['ymin_type'] = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$data['ymax_type'] = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
+			$data['yaxismin'] = get_request('yaxismin', 0.00);
+			$data['yaxismax'] = get_request('yaxismax', 100.00);
+			$data['ymin_itemid'] = get_request('ymin_itemid', 0);
+			$data['ymax_itemid'] = get_request('ymax_itemid', 0);
+			$data['showworkperiod'] = get_request('showworkperiod', 0);
+			$data['showtriggers'] = get_request('showtriggers', 0);
+			$data['legend'] = get_request('legend', 0);
+			$data['graph3d'] = get_request('graph3d', 0);
+			$data['visible'] = get_request('visible');
+			$data['percent_left'] = 0;
+			$data['percent_right'] = 0;
+			$data['visible'] = get_request('visible');
+			$data['items'] = get_request('items', array());
 
-			if(isset($visible['percent_left'])) $percent_left = get_request('percent_left', 0);
-			if(isset($visible['percent_right'])) $percent_right = get_request('percent_right', 0);
-
-			$items = get_request('items', array());
+			if (isset($data['visible']['percent_left'])) {
+				$data['percent_left'] = get_request('percent_left', 0);
+			}
+			if (isset($data['visible']['percent_right'])) {
+				$data['percent_right'] = get_request('percent_right', 0);
+			}
 		}
 
-
-		if(!isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
-			$legend = $_REQUEST['legend'] = 1;
+		if (empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
+			$data['legend'] = $_REQUEST['legend'] = 1;
 		}
 
+		$_REQUEST['items'] = $data['items'];
+		$_REQUEST['name'] = $data['name'];
+		$_REQUEST['width'] = $data['width'];
+		$_REQUEST['height'] = $data['height'];
+		$_REQUEST['ymin_type'] = $data['ymin_type'];
+		$_REQUEST['ymax_type'] = $data['ymax_type'];
+		$_REQUEST['yaxismin'] = $data['yaxismin'];
+		$_REQUEST['yaxismax'] = $data['yaxismax'];
+		$_REQUEST['ymin_itemid'] = $data['ymin_itemid'];
+		$_REQUEST['ymax_itemid'] = $data['ymax_itemid'];
+		$_REQUEST['showworkperiod'] = $data['showworkperiod'];
+		$_REQUEST['showtriggers'] = $data['showtriggers'];
+		$_REQUEST['graphtype'] = $data['graphtype'];
+		$_REQUEST['legend'] = $data['legend'];
+		$_REQUEST['graph3d'] = $data['graph3d'];
+		$_REQUEST['percent_left'] = $data['percent_left'];
+		$_REQUEST['percent_right'] = $data['percent_right'];
 
+		$data['items'] = array_values($data['items']);
+		$itemCount = count($data['items']);
+		for ($i = 0; $i < $itemCount - 1;) {
+			// check if we delete an item
+			$next = $i + 1;
+			while (!isset($data['items'][$next]) && $next < ($itemCount - 1)) {
+				$next++;
+			}
 
-/* reinit $_REQUEST */
-		$_REQUEST['items'] = $items;
-		$_REQUEST['name'] = $name;
-		$_REQUEST['width'] = $width;
-		$_REQUEST['height'] = $height;
-
-		$_REQUEST['ymin_type'] = $ymin_type;
-		$_REQUEST['ymax_type'] = $ymax_type;
-
-		$_REQUEST['yaxismin'] = $yaxismin;
-		$_REQUEST['yaxismax'] = $yaxismax;
-
-		$_REQUEST['ymin_itemid'] = $ymin_itemid;
-		$_REQUEST['ymax_itemid'] = $ymax_itemid;
-
-		$_REQUEST['showworkperiod'] = $showworkperiod;
-		$_REQUEST['showtriggers'] = $showtriggers;
-		$_REQUEST['graphtype'] = $graphtype;
-		$_REQUEST['legend'] = $legend;
-		$_REQUEST['graph3d'] = $graph3d;
-		$_REQUEST['percent_left'] = $percent_left;
-		$_REQUEST['percent_right'] = $percent_right;
-/********************/
-
-		$items = array_values($items);
-		$icount = count($items);
-		for($i=0; $i < $icount-1;){
-// check if we deletd an item
-			$next = $i+1;
-			while(!isset($items[$next]) && ($next < ($icount-1))) $next++;
-
-			if(isset($items[$next]) && ($items[$i]['sortorder'] == $items[$next]['sortorder']))
-				for($j=$next; $j < $icount; $j++)
-					if($items[$j-1]['sortorder'] >= $items[$j]['sortorder']) $items[$j]['sortorder']++;
+			if (isset($data['items'][$next]) && $data['items'][$i]['sortorder'] == $data['items'][$next]['sortorder']) {
+				for ($j = $next; $j < $itemCount; $j++) {
+					if ($data['items'][$j - 1]['sortorder'] >= $data['items'][$j]['sortorder']) {
+						$data['items'][$j]['sortorder']++;
+					}
+				}
+			}
 
 			$i = $next;
 		}
+		asort_by_key($data['items'], 'sortorder');
+		$data['items'] = array_values($data['items']);
 
-		asort_by_key($items, 'sortorder');
-
-		$items = array_values($items);
-
-		$group_gid = get_request('group_gid', array());
-
-		$frmGraph->addVar('ymin_itemid', $ymin_itemid);
-		$frmGraph->addVar('ymax_itemid', $ymax_itemid);
-
-		$frmGraph->addRow(S_NAME, new CTextBox('name', $name, 32));
-		$frmGraph->addRow(S_WIDTH, new CNumericBox('width', $width, 5));
-		$frmGraph->addRow(S_HEIGHT, new CNumericBox('height', $height, 5));
-
-		$cmbGType = new CComboBox('graphtype', $graphtype, 'graphs.submit(this)');
-		$cmbGType->addItems(graphType());
-		$frmGraph->addRow(_('Graph type'), $cmbGType);
-
-
-// items beforehead, to get only_hostid for miny maxy items
-		$only_hostid = null;
-		$monitored_hosts = null;
-
-		if(count($items)){
-			$frmGraph->addVar('items', $items);
-
-			$keys = array_keys($items);
-			$first = reset($keys);
-			$last = end($keys);
-
-			$items_table = new CTableInfo();
-			foreach($items as $gid => $gitem){
-				$host = get_host_by_itemid($gitem['itemid']);
-				$item = get_item_by_itemid($gitem['itemid']);
-
-				if($host['status'] == HOST_STATUS_TEMPLATE)
-					$only_hostid = $host['hostid'];
-				else
-					$monitored_hosts = 1;
-
-				$color = new CColorCell(null, $gitem['color']);
-
-				if($gid == $first){
-					$do_up = null;
-				}
-				else{
-					$do_up = new CSpan(_('Up'),'link');
-					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
-				}
-
-				if($gid == $last){
-					$do_down = null;
-				}
-				else{
-					$do_down = new CSpan(_('Down'),'link');
-					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
-				}
-
-				$description = new CSpan($host['name'].': '.itemName($item),'link');
-				$description->onClick(
-					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
-					url_param($only_hostid, false, 'only_hostid').
-					url_param($monitored_hosts, false, 'monitored_hosts').
-					url_param($graphtype, false, 'graphtype').
-					url_param($gitem, false).
-					url_param($gid,false,'gid').
-					url_param(get_request('graphid',0),false,'graphid').
-					'",550,400,"graph_item_form");'
-				);
-
-				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type']),
-							$color,
-							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
-						));
-				}
-				else{
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-//							$gitem['sortorder'],
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type']),
-							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?_('Left'):S_RIGHT,
-							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
-							$color,
-							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
-						));
-				}
-			}
-			$dedlete_button = new CSubmit('delete_item', _('Delete selected'));
-		}
-		else{
-			$items_table = $dedlete_button = null;
-		}
-
-		$frmGraph->addRow(_('Show legend'), new CCheckBox('legend',$legend, null, 1));
-
-		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
-			$frmGraph->addRow(_('Show working time'),new CCheckBox('showworkperiod',$showworkperiod,null,1));
-			$frmGraph->addRow(_('Show triggers'),new CCheckBox('showtriggers',$showtriggers,null,1));
-
-
-			if($graphtype == GRAPH_TYPE_NORMAL){
-				$percent_left = sprintf('%2.2f', $percent_left);
-				$percent_right = sprintf('%2.2f', $percent_right);
-
-				$pr_left_input = new CTextBox('percent_left', $percent_left, '5');
-				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);
-				if($percent_left == 0){
-					$pr_left_input->setAttribute('style','display: none;');
-					$pr_left_chkbx->setChecked(0);
-				}
-
-				$pr_right_input = new CTextBox('percent_right',$percent_right,'5');
-				$pr_right_chkbx = new CCheckBox('visible[percent_right]',1,"javascript: ShowHide('percent_right');",1);
-				if($percent_right == 0){
-					$pr_right_input->setAttribute('style','display: none;');
-					$pr_right_chkbx->setChecked(0);
-				}
-
-				$frmGraph->addRow(_('Percentile line (left)'), array($pr_left_chkbx, $pr_left_input));
-				$frmGraph->addRow(_('Percentile line (right)'), array($pr_right_chkbx, $pr_right_input));
-			}
-
-			$yaxis_min = array();
-
-			$cmbYType = new CComboBox('ymin_type',$ymin_type,'javascript: submit();');
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,_('Calculated'));
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,_('Fixed'));
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE,S_ITEM);
-
-			$yaxis_min[] = $cmbYType;
-
-			if($ymin_type == GRAPH_YAXIS_TYPE_FIXED){
-				$yaxis_min[] = new CTextBox("yaxismin",$yaxismin,9);
-			}
-			else if($ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
-				$frmGraph->addVar('yaxismin',$yaxismin);
-
-				$ymin_name = '';
-				if($ymin_itemid > 0){
-					$min_host = get_host_by_itemid($ymin_itemid);
-					$min_item = get_item_by_itemid($ymin_itemid);
-					$ymin_name = $min_host['host'].':'.itemName($min_item);
-				}
-
-				if (count($items)) {
-					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
-					$yaxis_min[] = new CButton('yaxis_min',S_SELECT,'javascript: '.
-						"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-						url_param($only_hostid, false, 'only_hostid').
-						url_param($monitored_hosts, false, 'monitored_hosts').
-							"&dstfld1=ymin_itemid".
-							"&dstfld2=ymin_name".
-							"&srctbl=items".
-							"&srcfld1=itemid".
-							"&srcfld2=name',0,0,'zbx_popup_item');");
-
-					// select prototype button
-					if ($parent_discoveryid) {
-						$yaxis_min[] = new CButton('yaxis_min', _('Select prototype'),'javascript: '.
-							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-								"&parent_discoveryid=".$parent_discoveryid.
-								"&dstfld1=ymin_itemid".
-								"&dstfld2=ymin_name".
-								"&srctbl=prototypes".
-								"&srcfld1=itemid".
-								"&srcfld2=name',0,0,'zbx_popup_item');");
-					}
-				}
-				else {
-					$yaxis_min[] = _('add graph items first');
-				}
-			}
-			else{
-				$frmGraph->addVar('yaxismin', $yaxismin);
-			}
-
-			$frmGraph->addRow(_('Y axis MIN value'), $yaxis_min);
-
-			$yaxis_max = array();
-
-			$cmbYType = new CComboBox("ymax_type",$ymax_type,"submit()");
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,_('Calculated'));
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,_('Fixed'));
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE,S_ITEM);
-
-			$yaxis_max[] = $cmbYType;
-
-			if($ymax_type == GRAPH_YAXIS_TYPE_FIXED){
-				$yaxis_max[] = new CTextBox('yaxismax',$yaxismax,9);
-			}
-			else if($ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
-				$frmGraph->addVar('yaxismax',$yaxismax);
-
-				$ymax_name = '';
-				if($ymax_itemid > 0){
-					$max_host = get_host_by_itemid($ymax_itemid);
-					$max_item = get_item_by_itemid($ymax_itemid);
-					$ymax_name = $max_host['host'].':'.itemName($max_item);
-				}
-
-				if (count($items)) {
-					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
-					$yaxis_max[] = new CButton('yaxis_max',S_SELECT,'javascript: '.
-							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-							url_param($only_hostid, false, 'only_hostid').
-							url_param($monitored_hosts, false, 'monitored_hosts').
-							"&dstfld1=ymax_itemid".
-							"&dstfld2=ymax_name".
-							"&srctbl=items".
-							"&srcfld1=itemid".
-							"&srcfld2=name',0,0,'zbx_popup_item');"
-					);
-
-					// select prototype button
-					if ($parent_discoveryid) {
-						$yaxis_max[] = new CButton('yaxis_min', _('Select prototype'),'javascript: '.
-							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-								"&parent_discoveryid=".$parent_discoveryid.
-								"&dstfld1=ymax_itemid".
-								"&dstfld2=ymax_name".
-								"&srctbl=prototypes".
-								"&srcfld1=itemid".
-								"&srcfld2=name',0,0,'zbx_popup_item');");
-					}
-				}
-				else {
-					$yaxis_max[] = _('add graph items first');
-				}
-			}
-			else{
-				$frmGraph->addVar('yaxismax', $yaxismax);
-			}
-
-			$frmGraph->addRow(_('Y axis MAX value'), $yaxis_max);
-		}
-		else{
-			$frmGraph->addRow(_('3D view'),new CCheckBox('graph3d',$graph3d,null,1));
-		}
-
-		$addProtoBtn = null;
-		if($parent_discoveryid){
-			$addProtoBtn = new CButton('add_protoitem', _('Add prototype'),
-				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
-				url_param($graphtype, false, 'graphtype').
-				url_param('parent_discoveryid').
-				"',700,400,'graph_item_form');");
-		}
-
-		$normal_only = $parent_discoveryid ? '&normal_only=1' : '';
-		$frmGraph->addRow(S_ITEMS, array(
-			$items_table,
-			new CButton('add_item',S_ADD,
-				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
-				url_param($only_hostid, false, 'only_hostid').
-				url_param($monitored_hosts, false, 'monitored_hosts').
-				url_param($graphtype, false, 'graphtype').
-				$normal_only.
-				"',700,400,'graph_item_form');"),
-			$addProtoBtn,
-			$dedlete_button
-		));
-
-		$footer = array(
-			new CSubmit('preview', _('Preview')),
-			new CSubmit('save', S_SAVE),
-		);
-		if(isset($_REQUEST['graphid'])){
-			$footer[] = new CSubmit('clone', S_CLONE);
-			$footer[] = new CButtonDelete(_('Delete graph?'),url_param('graphid').url_param('parent_discoveryid'));
-		}
-		$footer[] = new CButtonCancel(url_param('parent_discoveryid'));
-		$frmGraph->addItemToBottomRow($footer);
-
-		$frmGraph->show();
+		return $data;
 	}
 
 	function get_timeperiod_form() {
