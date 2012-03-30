@@ -1,5 +1,6 @@
 Changes for 1.8.12rc1
 
+..F....... [ZBX-2873] fixed colors in dark theme (Vedmak)
 ..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
 ..F....... [ZBX-4253] fixed menu link inconsistency in tr_status.php (Toms)
