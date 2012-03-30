@@ -359,6 +359,11 @@ class CProxy extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Too many interfaces provided for proxy "%s".', $proxy['host']));
 				}
 
+				$interface = reset($proxy['interfaces']);
+				if (preg_match('/^(0{1,3}\.){3,3}0{1,3}$/', $interface['ip'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP for passive proxy "%1$s".', $interface['ip']));
+				}
+
 				// mark the interface as main to pass host interface validation
 				$proxy['interfaces'][0]['main'] = INTERFACE_PRIMARY;
 			}
