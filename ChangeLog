@@ -3,7 +3,7 @@ Changes for 2.0.0rc3
 
 New features:
 
-..F....... [ZBX-1357] updated French, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBX-1357] updated French, German, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ..F....... [ZBX-3725] added check for xml file size exceeds upload_max_filesize php setting (Vedmak)
