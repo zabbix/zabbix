@@ -691,3 +691,5 @@ div.suggest{
 	border-color: #FF5500;
 	color: #FF5500;
 }
+
+table.ack_msgs tr.msg { background-color: #3F3F3F; }
