@@ -71,11 +71,6 @@ class CService extends CZBXAPI {
 	 */
 	protected function validateCreate(array $services) {
 		foreach ($services as $service) {
-			$this->checkParentId($service);
-		}
-		$this->checkAffectedServicePermissions($services);
-
-		foreach ($services as $service) {
 			$this->checkName($service);
 			$this->checkAlgorithm($service);
 			$this->checkShowSla($service);
@@ -83,6 +78,7 @@ class CService extends CZBXAPI {
 			$this->checkSortOrder($service);
 			$this->checkTriggerId($service);
 			$this->checkStatus($service);
+			$this->checkParentId($service);
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
@@ -150,12 +146,9 @@ class CService extends CZBXAPI {
 			if (empty($service['serviceid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
-			if (isset($service['parentid'])) {
-				$this->checkParentId($service);
-			}
 		}
 
-		$this->checkAffectedServicePermissions($services);
+		$this->checkServicePermissions(zbx_objectValues($services, 'serviceid'));
 
 		$services = $this->extendObjects($this->tableName(), $services, array('name'));
 		foreach ($services as $service) {
@@ -178,6 +171,9 @@ class CService extends CZBXAPI {
 			}
 			if (isset($service['status'])) {
 				$this->checkStatus($service);
+			}
+			if (isset($service['parentid'])) {
+				$this->checkParentId($service);
 			}
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
@@ -603,36 +599,6 @@ class CService extends CZBXAPI {
 					_s('Service "%1$s" cannot be linked to a trigger and have children at the same time.', $parentService['name']));
 			}
 		}
-	}
-
-	/**
-	 * Checks if all affected services (updated, used as parents or linked) are readable.
-	 *
-	 * @throws APIException if at least one of the services doesn't exist
-	 *
-	 * @param array $services
-	 *
-	 * @return void
-	 */
-	protected function checkAffectedServicePermissions(array $services) {
-		// check user permissions
-		if (CWebUser::$data['type'] == USER_TYPE_ZABBIX_USER) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		// check if the affected services exist
-		$serviceIds = zbx_objectValues($services, 'serviceid');
-		foreach ($services as $service) {
-			if (!empty($service['parentid'])) {
-				$serviceIds[] = $service['parentid'];
-			}
-		}
-		$serviceIds = array_unique($serviceIds);
-		if ($serviceIds) {
-			$this->checkServicePermissions($serviceIds);
-		}
-
-		// TODO: check links
 	}
 
 	/**
