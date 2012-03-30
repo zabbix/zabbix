@@ -218,7 +218,7 @@ class testFormItem extends CWebTest {
 				'',
 				ITEM_TYPE_ZABBIX,
 				'agent.ping123',
-				array('Page received incorrect data.', 'Warning. Incorrect value for field "name": cannot be empty.')
+				array('Page received incorrect data.', 'Warning. Incorrect value for field "Name": cannot be empty.')
 			),
 			// Item key is missing
 			array(
@@ -227,7 +227,7 @@ class testFormItem extends CWebTest {
 				ITEM_TYPE_ZABBIX,
 				'Item name',
 				'',
-				array('Page received incorrect data.', 'Warning. Incorrect value for field "key": cannot be empty.')
+				array('Page received incorrect data.', 'Warning. Incorrect value for field "Key": cannot be empty.')
 			)
 		);
 	}
