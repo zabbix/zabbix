@@ -107,7 +107,7 @@ class API {
 	 *
 	 * @return CZBXAPI
 	 */
-	private static function getApi($object = null) {
+	public static function getApi($object = null) {
 		if ($object) {
 			$className = self::getObjectClassName($object);
 			if (!isset(self::$APIobjects[$object])) {
