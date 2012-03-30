@@ -9,13 +9,9 @@
 
 	function displayNewDeleyFlexInterval() {
 		// delay_flex_visible is in massupdate, no delay_flex_visible in items
-		if (jQuery('#delay_flex_visible').length == 0 || jQuery('#delay_flex_visible').is(':checked')) {
-			if (jQuery('#delayFlexTable tr').length <= 7) {
-				jQuery('#row_new_delay_flex').css('display', 'block');
-			}
-			else {
-				jQuery('#row_new_delay_flex').css('display', 'none');
-			}
+		if ((jQuery('#delay_flex_visible').length == 0 || jQuery('#delay_flex_visible').is(':checked'))
+				&& jQuery('#delayFlexTable tr').length <= 7) {
+			jQuery('#row_new_delay_flex').css('display', 'block');
 		}
 		else {
 			jQuery('#row_new_delay_flex').css('display', 'none');
