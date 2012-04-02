@@ -52,13 +52,6 @@ class CZBXAPI {
 	protected $sortColumns = array();
 
 	/**
-	 * An array of allowed get() options that are supported by all APIs.
-	 *
-	 * @var array
-	 */
-	protected $globalGetOptions = array();
-
-	/**
 	 * An array containing all of the allowed get() options for the current API.
 	 *
 	 * @var array
@@ -69,7 +62,7 @@ class CZBXAPI {
 		// set the PK of the table
 		$this->pk = $this->pk($this->tableName());
 
-		$this->globalGetOptions = array(
+		$this->getOptions = array(
 			'nodeids'				=> null,
 			// filter
 			'filter'				=> null,
@@ -83,7 +76,6 @@ class CZBXAPI {
 			'preservekeys'			=> null,
 			'limit'					=> null
 		);
-		$this->getOptions = $this->globalGetOptions;
 	}
 
 	/**
@@ -314,7 +306,7 @@ class CZBXAPI {
 	 */
 	protected function createSelectQueryParts($tableName, $tableAlias, array $options) {
 		// extend default options
-		$options = zbx_array_merge($this->globalGetOptions, $options);
+		$options = zbx_array_merge($this->getOptions, $options);
 
 		$sqlParts = array(
 			'select' => array($this->fieldId($this->pk($tableName), $tableAlias)),

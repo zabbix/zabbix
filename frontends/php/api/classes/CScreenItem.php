@@ -64,7 +64,7 @@ class CScreenItem extends CZBXAPI {
 	public function __construct() {
 		parent::__construct();
 
-		$this->getOptions = zbx_array_merge($this->globalGetOptions, array(
+		$this->getOptions = zbx_array_merge($this->getOptions, array(
 			'screenitemids'	=> null,
 			'screenids'		=> null,
 			'editable'		=> null,

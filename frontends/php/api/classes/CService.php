@@ -26,8 +26,19 @@ class CService extends CZBXAPI {
 	protected $tableName = 'services';
 	protected $tableAlias = 's';
 
+	public function __construct() {
+		parent::__construct();
+
+		$this->getOptions = array_merge($this->getOptions, array(
+			'parentids' => null
+		));
+	}
+
 	/**
 	 * Get services.
+	 *
+	 * Allowed options:
+	 * - parentids - fetch the services that are hardlinked to the given parent services.
 	 *
 	 * @param array $options
 	 *
@@ -255,8 +266,7 @@ class CService extends CZBXAPI {
 		}
 
 		$this->checkServicePermissions($serviceIds);
-
-		// TODO: forbid deleting services with children
+		$this->checkThatServicesDontHaveChildren($serviceIds);
 	}
 
 	/**
@@ -308,7 +318,7 @@ class CService extends CZBXAPI {
 		$this->checkServicePermissions($serviceIds);
 
 		$this->checkForHardlinkedDependencies($dependencies);
-		$this->checkIfParentsHaveTriggers($dependencies);
+		$this->checkThatParentsDontHaveTriggers($dependencies);
 	}
 
 	/**
@@ -555,7 +565,7 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Checks if the user has read access to the given triggers.
+	 * Checks that the user has read access to the given triggers.
 	 *
 	 * @throws APIException if the user doesn't have permission to access any of the triggers
 	 *
@@ -573,7 +583,7 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Checks if all of the given services are readable.
+	 * Checks that all of the given services are readable.
 	 *
 	 * @throws APIException if at least one of the services doesn't exist
 	 *
@@ -588,7 +598,39 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Checks if the given dependency is valid.
+	 * Checks that none of the given services have any children.
+	 *
+	 * @throws APIException if at least one of the services has a child service
+	 *
+	 * @param array $serviceIds
+	 *
+	 * @return void
+	 */
+	protected function checkThatServicesDontHaveChildren(array $serviceIds) {
+		$child = $this->select('services_links', array(
+			'output' => array('serviceupid'),
+			'filter' => array(
+				'serviceupid' => $serviceIds,
+				'soft' => 0
+			),
+			'limit' => 1
+		));
+		$child = reset($child);
+		if ($child) {
+			$service = $this->select($this->tableName(), array(
+				'output' => array('name'),
+				'serviceids' => $child['serviceupid'],
+				'limit' => 1
+			));
+			$service = reset($service);
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_s('Service "%1$s" cannot be deleted, because it is dependent on another service.', $service['name'])
+			);
+		}
+	}
+
+	/**
+	 * Checks that the given dependency is valid.
 	 *
 	 * @throws APIException if the dependency is invalid
 	 *
@@ -614,7 +656,8 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Checks any of the services is hard linked to a different service. Assumes the dependencies are valid.
+	 * Checks that that none of the given services are hard linked to a different service.
+	 * Assumes the dependencies are valid.
 	 *
 	 * @throws APIException if at a least one service is hard linked to another service
 	 *
@@ -659,7 +702,7 @@ class CService extends CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function checkIfParentsHaveTriggers(array $dependencies) {
+	protected function checkThatParentsDontHaveTriggers(array $dependencies) {
 		$parentServiceIds = array_unique(zbx_objectValues($dependencies, 'serviceid'));
 		if ($parentServiceIds) {
 			$query = DBselect(
@@ -674,6 +717,19 @@ class CService extends CZBXAPI {
 		}
 	}
 
+	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		// parentids
+		if ($options['parentids'] !== null) {
+			$sqlParts['from'][] = 'services_links sl';
+			$sqlParts['where'][] = 's.serviceid=sl.servicedownid';
+			$sqlParts['where'][] = DBcondition('sl.serviceupid', (array) $options['parentids']);
+			$sqlParts['where'][] = 'sl.soft=0';
+		}
+
+		return $sqlParts;
+	}
 
 
 }
