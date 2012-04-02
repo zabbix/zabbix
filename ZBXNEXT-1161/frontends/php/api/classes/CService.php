@@ -87,7 +87,6 @@ class CService extends CZBXAPI {
 		}
 
 		$this->checkTriggerPermissions($services);
-		$this->checkIfParentsHaveTriggers($services);
 	}
 
 	/**
@@ -125,7 +124,6 @@ class CService extends CZBXAPI {
 			$this->addDependencies($dependencies);
 		}
 
-		// TODO: process parent
 		// TODO: process service times
 		// TODO: update statuses
 
@@ -183,7 +181,6 @@ class CService extends CZBXAPI {
 		}
 
 		$this->checkTriggerPermissions($services);
-		$this->checkIfParentsHaveTriggers($services);
 	}
 
 	/**
@@ -311,6 +308,7 @@ class CService extends CZBXAPI {
 		$this->checkServicePermissions($serviceIds);
 
 		$this->checkForHardlinkedDependencies($dependencies);
+		$this->checkIfParentsHaveTriggers($dependencies);
 	}
 
 	/**
@@ -575,33 +573,6 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Checks that none of the parent services are linked to a trigger.
-	 *
-	 * @throws APIException if at least one of the parent services is linked to a trigger
-	 *
-	 * @param array $services
-	 *
-	 * @return void
-	 */
-	protected function checkIfParentsHaveTriggers(array $services) {
-		// TODO: check linked parent services
-
-		$parentServiceIds = zbx_objectValues($services, 'parentid');
-		$parentServiceIds = array_unique($parentServiceIds);
-		if ($parentServiceIds) {
-			$query = DBselect(
-				'SELECT s.triggerid,s.name'.
-				' FROM services s '.
-				' WHERE '.DBcondition('s.serviceid', $parentServiceIds).
-					' AND s.triggerid IS NOT NULL', 1);
-			if ($parentService = DBfetch($query)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Service "%1$s" cannot be linked to a trigger and have children at the same time.', $parentService['name']));
-			}
-		}
-	}
-
-	/**
 	 * Checks if all of the given services are readable.
 	 *
 	 * @throws APIException if at least one of the services doesn't exist
@@ -675,6 +646,30 @@ class CService extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Service with ID "%1$s" is already hardlinked to a different service.', $dependency['dependsOnServiceid'])
 				);
+			}
+		}
+	}
+
+	/**
+	 * Checks that none of the parent services are linked to a trigger. Assumes the dependencies are valid.
+	 *
+	 * @throws APIException if at least one of the parent services is linked to a trigger
+	 *
+	 * @param array $dependencies
+	 *
+	 * @return void
+	 */
+	protected function checkIfParentsHaveTriggers(array $dependencies) {
+		$parentServiceIds = array_unique(zbx_objectValues($dependencies, 'serviceid'));
+		if ($parentServiceIds) {
+			$query = DBselect(
+				'SELECT s.triggerid,s.name'.
+					' FROM services s '.
+					' WHERE '.DBcondition('s.serviceid', $parentServiceIds).
+					' AND s.triggerid IS NOT NULL', 1);
+			if ($parentService = DBfetch($query)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Service "%1$s" cannot be linked to a trigger and have children at the same time.', $parentService['name']));
 			}
 		}
 	}
