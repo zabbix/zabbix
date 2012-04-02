@@ -97,12 +97,7 @@ static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packag
 		zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 		for (i = 0; i < packages->values_num; i++)
-		{
 			offset += zbx_snprintf(buffer + offset, size - offset, "%s, ", packages->values[i]);
-			zbx_free(packages->values[i]);
-		}
-
-		packages->values_num = 0;
 
 		offset -= 2;
 	}
@@ -199,6 +194,9 @@ next:
 		offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
 	else if (0 != offset)
 		buffer[--offset] = '\0';
+
+	for (i = 0; i < packages.values_num; i++)
+		zbx_free(packages.values[i]);
 
 	zbx_vector_str_destroy(&packages);
 
