@@ -743,4 +743,48 @@ function add_service_alarm($serviceid, $status, $clock) {
 	}
 	return DBexecute('INSERT INTO service_alarms (servicealarmid,serviceid,clock,value) VALUES ('.get_dbid('service_alarms', 'servicealarmid').','.$serviceid.','.$clock.','.$status.')');
 }
-?>
+
+/**
+ * Validate the new service time. Validation is implemented as a separate function to be available directly from the
+ * frontend.
+ *
+ * @throws APIException if the given service time is invalid
+ *
+ * @param array $serviceTime
+ *
+ * @return void
+ */
+function checkServiceTime(array $serviceTime) {
+	// type validation
+	$serviceTypes = array(
+		SERVICE_TIME_TYPE_DOWNTIME,
+		SERVICE_TIME_TYPE_ONETIME_DOWNTIME,
+		SERVICE_TIME_TYPE_UPTIME
+	);
+	if (!isset($serviceTime['type']) || !in_array($serviceTime['type'], $serviceTypes)) {
+		throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service time type.'));
+	}
+
+	// one-time downtime validation
+	if ($serviceTime['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
+		if (!isset($serviceTime['ts_from']) || !validateMaxTime($serviceTime['ts_from'])) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service start time.'));
+		}
+		if (!isset($serviceTime['ts_to']) || !validateMaxTime($serviceTime['ts_to'])) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service end time.'));
+		}
+	}
+	// recurring downtime validation
+	else {
+		if (!isset($serviceTime['ts_from']) || $serviceTime['ts_from'] < 0 || $serviceTime['ts_from'] > SEC_PER_WEEK) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service start time.'));
+		}
+		if (!isset($serviceTime['ts_to']) || $serviceTime['ts_to'] < 0 || $serviceTime['ts_to'] > SEC_PER_WEEK) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Incorrect service end time.'));
+		}
+	}
+
+	if ($serviceTime['ts_from'] >= $serviceTime['ts_to']) {
+		throw new APIException(ZBX_API_ERROR_PARAMETERS, _('Service start time must be less than end time.'));
+	}
+}
