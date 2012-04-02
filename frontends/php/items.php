@@ -845,13 +845,17 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 	$itemView->render();
 	$itemView->show();
 }
+// list of items
 else {
 	$data = array(
 		'form' => get_request('form', null),
-		'form_hostid' => get_request('form_hostid', $hostid),
-		'hostid' => $hostid,
 		'sortfield' => getPageSortField('name')
 	);
+
+	if (isset($hostid)) {
+		$data['form_hostid'] = get_request('form_hostid', $hostid);
+		$data['hostid'] = $hostid;
+	}
 
 	// items
 	$options = array(

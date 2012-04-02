@@ -213,7 +213,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', null, null, $triggerid);
 	$checkBox->setEnabled(empty($trigger['discoveryRule']));
 
-	$expressionColumn = new CCol(triggerExpression($trigger, 1));
+	$expressionColumn = new CCol(triggerExpression($trigger, true));
 	$expressionColumn->setAttribute('style', 'white-space: normal;');
 
 	$triggersTable->addRow(array(
