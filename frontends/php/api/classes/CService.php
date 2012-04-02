@@ -136,7 +136,8 @@ class CService extends CZBXAPI {
 		}
 
 		// TODO: process service times
-		// TODO: update statuses
+
+		update_services_status_all();
 
 		return array('serviceids' => $serviceIds);
 	}
@@ -246,7 +247,8 @@ class CService extends CZBXAPI {
 			$this->addDependencies($dependencies);
 		}
 		// TODO: process service times
-		// TODO: update statuses
+
+		update_services_status_all();
 
 		return array('serviceids' => zbx_objectValues($services, 'serviceid'));
 	}
@@ -282,7 +284,7 @@ class CService extends CZBXAPI {
 
 		DB::delete($this->tableName(), array('serviceid' => $serviceIds));
 
-		// TODO: update statuses
+		update_services_status_all();
 
 		return array('serviceids' => $serviceIds);
 	}
