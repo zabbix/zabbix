@@ -143,11 +143,11 @@
 
 	jQuery(document).ready(function() {
 		<?php //sdii ($this->data);
-		if (0&&!empty($this->data['valueTypeVisibility'])) { ?>
+		if (!empty($this->data['valueTypeVisibility'])) { ?>
 			var valueTypeSwitcher = new CViewSwitcher('value_type', 'change',
 				<?php echo zbx_jsvalue($this->data['valueTypeVisibility'], true); ?>);
 		<?php }
-		if (0&&!empty($this->data['authTypeVisibility'])) { ?>
+		if (!empty($this->data['authTypeVisibility'])) { ?>
 			var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
 				<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>);
 		<?php }
@@ -155,11 +155,11 @@
 			var typeSwitcher = new CViewSwitcher('type', 'change',
 				<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>);
 		<?php }
-		if (0&&!empty($this->data['securityLevelVisibility'])) { ?>
+		if (!empty($this->data['securityLevelVisibility'])) { ?>
 			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
 				<?php echo zbx_jsvalue($this->data['securityLevelVisibility'], true); ?>);
 		<?php }
-		if (0&&!empty($this->data['dataTypeVisibility'])) { ?>
+		if (!empty($this->data['dataTypeVisibility'])) { ?>
 			var dataTypeSwitcher = new CViewSwitcher('data_type', 'change',
 				<?php echo zbx_jsvalue($this->data['dataTypeVisibility'], true); ?>);
 		<?php } ?>
