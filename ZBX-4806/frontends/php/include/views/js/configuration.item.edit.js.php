@@ -142,7 +142,7 @@
 	}
 
 	jQuery(document).ready(function() {
-		<?php //sdii ($this->data);
+		<?php
 		if (!empty($this->data['valueTypeVisibility'])) { ?>
 			var valueTypeSwitcher = new CViewSwitcher('value_type', 'change',
 				<?php echo zbx_jsvalue($this->data['valueTypeVisibility'], true); ?>);
