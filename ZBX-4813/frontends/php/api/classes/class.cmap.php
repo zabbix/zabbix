@@ -893,7 +893,7 @@ COpt::memoryPick();
 				}
 
 				if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
-					self::exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
+					throw new Exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
 				}
 
 				$selementid = get_dbid('sysmaps_elements','selementid');
@@ -1003,7 +1003,6 @@ COpt::memoryPick();
 
 				if(check_circle_elements_link($selement['sysmapid'],$selement['elementid'],$selement['elementtype'])){
 					throw new Exception(S_CIRCULAR_LINK_CANNOT_BE_CREATED.' "'.$selement['label'].'"');
-					return false;
 				}
 
 				$result = DBexecute('UPDATE sysmaps_elements '.
