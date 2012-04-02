@@ -366,6 +366,8 @@ class CService extends CZBXAPI {
 		if (!$serviceIds) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
+
+		$this->checkServicePermissions($serviceIds);
 	}
 
 	/**
@@ -381,6 +383,78 @@ class CService extends CZBXAPI {
 
 		DB::delete('services_links', array(
 			'serviceupid' =>  $serviceIds
+		));
+
+		return array('serviceids' => $serviceIds);
+	}
+
+	/**
+	 * Validates the input for the addTimes() method.
+	 *
+	 * @throws APIException if the given input is invalid
+	 *
+	 * @param array $serviceTimes
+	 *
+	 * @return void
+	 */
+	public function validateAddTimes(array $serviceTimes) {
+		foreach ($serviceTimes as $serviceTime) {
+			$this->checkTime($serviceTime);
+
+			$this->checkUnsupportedFields('services_times', $serviceTime,
+				_s('Wrong fields for time for service "%1$s".', $serviceTime['serviceid'])
+			);
+		}
+
+		$this->checkServicePermissions(array_unique(zbx_objectValues($serviceTimes, 'serviceid')));
+	}
+
+	/**
+	 * Adds the given service times.
+	 *
+	 * @param array $serviceTimes an array of service times
+	 *
+	 * @return array
+	 */
+	public function addTimes(array $serviceTimes) {
+		$serviceTimes = zbx_toArray($serviceTimes);
+		$this->validateAddTimes($serviceTimes);
+
+		DB::insert('services_times', $serviceTimes);
+
+		return array('serviceids' => zbx_objectValues($serviceTimes, 'serviceid'));
+	}
+
+	/**
+	 * Validates the input for the deleteTimes() method.
+	 *
+	 * @throws APIException if the given input is invalid
+	 *
+	 * @param array $serviceIds
+	 *
+	 * @return void
+	 */
+	protected function validateDeleteTimes(array $serviceIds) {
+		if (!$serviceIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$this->checkServicePermissions($serviceIds);
+	}
+
+	/**
+	 * Deletes all service times for the given services.
+	 *
+	 * @param array $serviceIds
+	 *
+	 * @return boolean
+	 */
+	public function deleteTimes($serviceIds) {
+		$serviceIds = zbx_toArray($serviceIds);
+		$this->validatedeleteTimes($serviceIds);
+
+		DB::delete('services_times', array(
+			'serviceid' =>  $serviceIds
 		));
 
 		return array('serviceids' => $serviceIds);
@@ -722,6 +796,23 @@ class CService extends CZBXAPI {
 					_s('Service "%1$s" cannot be linked to a trigger and have children at the same time.', $parentService['name']));
 			}
 		}
+	}
+
+	/**
+	 * Checks that the given service time is valid.
+	 *
+	 * @throws APIException if the service time is invalid
+	 *
+	 * @param array $serviceTime
+	 *
+	 * @return void
+	 */
+	protected function checkTime(array $serviceTime) {
+		if (empty($serviceTime['serviceid'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+		}
+
+		checkServiceTime($serviceTime);
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {

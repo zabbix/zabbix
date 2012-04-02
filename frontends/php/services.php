@@ -176,34 +176,27 @@ if (isset($_REQUEST['form'])) {
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
 
-		// validating service times that were entered, time 'from' has a wrong format
-		if ($new_service_time['from'] === false) {
-			if (!isset($_REQUEST['new_service_time']['from'])) {
-				$_REQUEST['new_service_time']['from'] = $_REQUEST['new_service_time']['from_hour'].':'.$_REQUEST['new_service_time']['from_minute'];
-			}
-			error(_('Error adding service time. Should be from 00:00 to 24:00.'));
-		}
-		// validate time 'to' has a wrong format
-		elseif ($new_service_time['to'] === false) {
-			if (!isset($_REQUEST['new_service_time']['to'])) {
-				$_REQUEST['new_service_time']['to'] = $_REQUEST['new_service_time']['to_hour'].':'.$_REQUEST['new_service_time']['to_minute'];
-			}
-			error(_('Error adding service time. Should be from 00:00 to 24:00.'));
-		}
-		// validate time 'from' is bigger than time 'to'
-		elseif ($new_service_time['from'] > $new_service_time['to']) {
-			error(_('Service time "from" cannot be bigger than time "to".'));
-		}
-		// if this time is not already there, adding it for insertation
-		elseif (!str_in_array($_REQUEST['service_times'], $new_service_time)) {
-			array_push($_REQUEST['service_times'], $new_service_time);
+		try {
+			checkServiceTime(array(
+				'type' => $new_service_time['type'],
+				'ts_from' => $new_service_time['from'],
+				'ts_to' => $new_service_time['to'],
+			));
 
-			unset($_REQUEST['new_service_time']['from_week']);
-			unset($_REQUEST['new_service_time']['to_week']);
-			unset($_REQUEST['new_service_time']['from_hour']);
-			unset($_REQUEST['new_service_time']['to_hour']);
-			unset($_REQUEST['new_service_time']['from_minute']);
-			unset($_REQUEST['new_service_time']['to_minute']);
+			// if this time is not already there, adding it for inserting
+			if (!str_in_array($_REQUEST['service_times'], $new_service_time)) {
+				array_push($_REQUEST['service_times'], $new_service_time);
+
+				unset($_REQUEST['new_service_time']['from_week']);
+				unset($_REQUEST['new_service_time']['to_week']);
+				unset($_REQUEST['new_service_time']['from_hour']);
+				unset($_REQUEST['new_service_time']['to_hour']);
+				unset($_REQUEST['new_service_time']['from_minute']);
+				unset($_REQUEST['new_service_time']['to_minute']);
+			}
+		}
+		catch (APIException $e) {
+			error($e->getMessage());
 		}
 
 		show_messages();
