@@ -93,7 +93,7 @@ class CService extends CZBXAPI {
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
-				'parentid', 'dependencies'
+				'parentid', 'dependencies', 'times'
 			));
 		}
 
@@ -114,11 +114,12 @@ class CService extends CZBXAPI {
 		// save the services
 		$serviceIds = DB::insert($this->tableName(), $services);
 
-		// save dependencies
 		$dependencies = array();
+		$serviceTimes = array();
 		foreach ($services as $key => $service) {
 			$serviceId = $serviceIds[$key];
 
+			// save dependencies
 			if (!empty($service['dependencies'])) {
 				foreach ($service['dependencies'] as $dependency) {
 					$dependency['serviceid'] = $serviceId;
@@ -134,12 +135,23 @@ class CService extends CZBXAPI {
 					'soft' => 0
 				);
 			}
+
+			// save service times
+			if (isset($service['times'])) {
+				foreach ($service['times'] as $serviceTime) {
+					$serviceTime['serviceid'] = $serviceId;
+					$serviceTimes[] = $serviceTime;
+				}
+			}
 		}
+
 		if ($dependencies) {
 			$this->addDependencies($dependencies);
 		}
 
-		// TODO: process service times
+		if ($serviceTimes) {
+			$this->addTimes($serviceTimes);
+		}
 
 		update_services_status_all();
 
@@ -192,7 +204,7 @@ class CService extends CZBXAPI {
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
 			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
-				'parentid', 'dependencies'
+				'parentid', 'dependencies', 'times'
 			));
 		}
 
@@ -217,6 +229,7 @@ class CService extends CZBXAPI {
 
 		// update dependencies
 		$dependencies = array();
+		$serviceTimes = array();
 		$deleteParentsFromServiceIds = array();
 		foreach ($services as $service) {
 			if (!empty($service['dependencies'])) {
@@ -241,17 +254,32 @@ class CService extends CZBXAPI {
 					);
 				}
 			}
+
+			// save service times
+			if (isset($service['times'])) {
+				foreach ($service['times'] as $serviceTime) {
+					$serviceTime['serviceid'] = $service['serviceid'];
+					$serviceTimes[] = $serviceTime;
+				}
+			}
 		}
+
 		// unset parents
 		if ($deleteParentsFromServiceIds) {
 			$this->deleteParentDependencies($deleteParentsFromServiceIds);
 		}
+
 		// replace dependencies
 		if ($dependencies) {
 			$this->deleteDependencies(array_unique(zbx_objectValues($dependencies, 'serviceid')));
 			$this->addDependencies($dependencies);
 		}
-		// TODO: process service times
+
+		// replace service times
+		if ($serviceTimes) {
+			$this->deleteTimes(array_unique(zbx_objectValues($serviceTimes, 'serviceid')));
+			$this->addTimes($serviceTimes);
+		}
 
 		update_services_status_all();
 
