@@ -129,7 +129,7 @@ foreach ($this->data['items'] as $item) {
 			}
 		}
 
-		$trigger['hosts'] = zbx_toHash($trigger['hosts'],'hostid');
+		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$triggerDescription[] = new CSpan($trigger['description']);
