@@ -448,17 +448,25 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
-	$delay_flex = get_request('delay_flex');
-	if (!is_null($delay_flex) && get_request('delay_flex_visible')) {
-		$db_delay_flex = '';
-		foreach ($delay_flex as $val) {
-			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+
+	if (get_request('delay_flex_visible')) {
+		$delay_flex = get_request('delay_flex');
+		if (!is_null($delay_flex)) {
+			$db_delay_flex = '';
+			foreach ($delay_flex as $val) {
+				$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+			}
+			$db_delay_flex = trim($db_delay_flex, ';');
 		}
-		$db_delay_flex = trim($db_delay_flex, ';');
+		else {
+			$db_delay_flex = '';
+		}
 	}
 	else {
 		$db_delay_flex = null;
 	}
+
+
 
 	if (!is_null(get_request('formula', null))) {
 		$_REQUEST['multiplier'] = 1;
