@@ -54,7 +54,7 @@ class CView {
 	 * @example $scriptForm = new CView('administration.script.edit');
 	 */
 	public function __construct($view, $data = array()) {
-		$this->assign($view, $data);
+		$this->assign($view);
 		$this->data = $data;
 	}
 

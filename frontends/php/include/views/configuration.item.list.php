@@ -24,7 +24,9 @@ $itemsWidget = new CWidget();
 // create new item button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addVar('form_hostid', $this->data['form_hostid']);
+if (!empty($this->data['form_hostid'])) {
+	$createForm->addVar('form_hostid', $this->data['form_hostid']);
+}
 $createForm->addItem(new CSubmit('form', _('Create item')));
 $itemsWidget->addPageHeader(_('CONFIGURATION OF ITEMS'), $createForm);
 
@@ -40,7 +42,9 @@ $itemsWidget->addFlicker($this->data['flicker'], CProfile::get('web.items.filter
 // create form
 $itemForm = new CForm('get');
 $itemForm->setName('items');
-$itemForm->addVar('hostid', $this->data['hostid']);
+if (!empty($this->data['hostid'])) {
+	$itemForm->addVar('hostid', $this->data['hostid']);
+}
 
 // create table
 $itemTable = new CTableInfo(_('No items defined.'));
@@ -111,8 +115,6 @@ foreach ($this->data['items'] as $item) {
 	// triggers info
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];
-		$trigger['hosts'] = reset($trigger['hosts']);
-
 		$triggerDescription = array();
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
@@ -121,16 +123,20 @@ foreach ($this->data['items'] as $item) {
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-				$triggerDescription[] = new CLink($realHost['name'], 'triggers.php?&hostid='.$realHost['hostid'], 'unknown');
+				$triggerDescription[] = new CLink($realHost['name'], 'triggers.php?&hostid='.
+					$realHost['hostid'], 'unknown');
 				$triggerDescription[] = ':';
 			}
 		}
+
+		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$triggerDescription[] = new CSpan($trigger['description']);
 		}
 		else {
-			$triggerDescription[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.$trigger['hosts']['hostid'].'&triggerid='.$trigger['triggerid']);
+			$triggerDescription[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.
+				key($trigger['hosts']).'&triggerid='.$trigger['triggerid']);
 		}
 
 		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
@@ -144,10 +150,13 @@ foreach ($this->data['items'] as $item) {
 			$triggerStatus = new CSpan(_('Enabled'), 'enabled');
 		}
 
+		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
+		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
+
 		$triggerHintTable->addRow(array(
 			getSeverityCell($trigger['priority']),
 			$triggerDescription,
-			triggerExpression($trigger, 1),
+			triggerExpression($trigger, true),
 			$triggerStatus,
 		));
 
