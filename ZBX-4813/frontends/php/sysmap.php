@@ -173,7 +173,7 @@ include_once('include/page_header.php');
 
 						$transaction = DBstart();
 
-						foreach($selements as $id => $selement){
+						foreach($selements as $selement){
 							if($selement['elementid'] == 0){
 								$selement['elementtype'] = SYSMAP_ELEMENT_TYPE_IMAGE;
 							}
@@ -184,6 +184,10 @@ include_once('include/page_header.php');
 							if(isset($selement['new'])){
 								$selement['sysmapid'] = $sysmapid;
 								$selementids = CMap::addElements($selement);
+								if (!$selementids) {
+									$errors = implode("\r\n", CMap::resetErrors());
+									throw new Exception($errors);
+								}
 								$selementid = reset($selementids);
 
 								foreach($links as $id => $link){
@@ -195,6 +199,10 @@ include_once('include/page_header.php');
 //SDII($selement);
 								$selement['sysmapid'] = $sysmapid;
 								$result = CMap::updateElements($selement);
+								if (!$result) {
+									$errors = implode("\r\n", CMap::resetErrors());
+									throw new Exception($errors);
+								}
 								unset($db_selementids[$selement['selementid']]);
 							}
 						}
