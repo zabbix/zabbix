@@ -150,8 +150,8 @@ foreach ($this->data['items'] as $item) {
 			$triggerStatus = new CSpan(_('Enabled'), 'enabled');
 		}
 
-		$trigger['items'] = zbx_toHash($trigger['items'],'itemid');
-		$trigger['functions'] = zbx_toHash($trigger['functions'],'functionid');
+		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
+		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 		$triggerHintTable->addRow(array(
 			getSeverityCell($trigger['priority']),
