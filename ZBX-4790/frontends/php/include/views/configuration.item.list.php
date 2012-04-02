@@ -129,6 +129,8 @@ foreach ($this->data['items'] as $item) {
 			}
 		}
 
+		$trigger['hosts'] = zbx_toHash($trigger['hosts'],'hostid');
+
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$triggerDescription[] = new CSpan($trigger['description']);
 		}
@@ -148,7 +150,6 @@ foreach ($this->data['items'] as $item) {
 			$triggerStatus = new CSpan(_('Enabled'), 'enabled');
 		}
 
-		$trigger['hosts'] = zbx_toHash($trigger['hosts'],'hostid');
 		$trigger['items'] = zbx_toHash($trigger['items'],'itemid');
 		$trigger['functions'] = zbx_toHash($trigger['functions'],'functionid');
 

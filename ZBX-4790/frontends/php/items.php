@@ -869,8 +869,7 @@ else {
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 		'selectItemDiscovery' => array('ts_delete'),
 		'sortfield' => $data['sortfield'],
-		'limit' => $config['search_limit'] + 1,
-		'preservekeys' => true
+		'limit' => $config['search_limit'] + 1
 	);
 	$preFilter = count($options, COUNT_RECURSIVE);
 	if (!empty($data['hostid'])) {
