@@ -116,17 +116,21 @@ class CService extends CZBXAPI {
 
 		// save dependencies
 		$dependencies = array();
-		foreach ($services as $service) {
-			if (!empty($service['dependencies'])) {
-				$dependencies = array_merge($dependencies, $service['dependencies']);
-			}
-		}
-		// add parent dependencies
 		foreach ($services as $key => $service) {
+			$serviceId = $serviceIds[$key];
+
+			if (!empty($service['dependencies'])) {
+				foreach ($service['dependencies'] as $dependency) {
+					$dependency['serviceid'] = $serviceId;
+					$dependencies[] = $dependency;
+				}
+			}
+
+			// save parent service
 			if (isset($service['parentid'])) {
 				$dependencies[] = array(
 					'serviceid' => $service['parentid'],
-					'dependsOnServiceid' => $serviceIds[$key],
+					'dependsOnServiceid' => $serviceId,
 					'soft' => 0
 				);
 			}
@@ -211,12 +215,18 @@ class CService extends CZBXAPI {
 			DB::updateByPk($this->tableName(), $service['serviceid'], $service);
 		}
 
-		// replace dependencies
+		// update dependencies
 		$dependencies = array();
-
-		// process parents
 		$deleteParentsFromServiceIds = array();
 		foreach ($services as $service) {
+			if (!empty($service['dependencies'])) {
+				foreach ($service['dependencies'] as $dependency) {
+					$dependency['serviceid'] = $service['serviceid'];
+					$dependencies[] = $dependency;
+				}
+			}
+
+			// update parent
 			if (isset($service['parentid'])) {
 				// unset a parent
 				if ($service['parentid'] === 0) {
@@ -237,11 +247,6 @@ class CService extends CZBXAPI {
 			$this->deleteParentDependencies($deleteParentsFromServiceIds);
 		}
 		// replace dependencies
-		foreach ($services as $service) {
-			if (!empty($service['dependencies'])) {
-				$dependencies = array_merge($dependencies, $service['dependencies']);
-			}
-		}
 		if ($dependencies) {
 			$this->deleteDependencies(array_unique(zbx_objectValues($dependencies, 'serviceid')));
 			$this->addDependencies($dependencies);
