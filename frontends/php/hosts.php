@@ -518,7 +518,6 @@ elseif (isset($_REQUEST['save'])) {
 
 	unset($_REQUEST['save']);
 }
-
 // DELETE HOST
 else if(isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])){
 	DBstart();
@@ -577,16 +576,6 @@ if(($_REQUEST['go'] != 'none') && isset($go_result) && $go_result){
 }
 
 
-$frmForm = new CForm();
-if (!isset($_REQUEST['form'])) {
-	$frmForm->cleanItems();
-	$buttons = new CDiv(array(
-		new CSubmit('form', _('Create')),
-		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
-	));
-	$frmForm->addItem($buttons);
-}
-
 $hosts_wdgt = new CWidget();
 
 $options = array(
@@ -601,6 +590,17 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = get_request('hostid', 0);
 
+
+$frmForm = new CForm();
+if (!isset($_REQUEST['form'])) {
+	$frmForm->cleanItems();
+	$buttons = new CDiv(array(
+		new CSubmit('form', _('Create')),
+		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
+	));
+	$frmForm->addItem($buttons);
+	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid']));
+}
 
 if (($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])) {
 	$hosts_wdgt->addPageHeader(_('CONFIGURATION OF HOSTS'));
