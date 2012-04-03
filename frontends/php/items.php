@@ -146,6 +146,7 @@ $fields = array(
 	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'massupdate' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'filter_group' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
