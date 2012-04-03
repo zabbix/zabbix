@@ -897,13 +897,13 @@ class CService extends CZBXAPI {
 				'output' => $dependencyOutput,
 				'filter' => array('serviceupid' => $serviceIds)
 			));
+			foreach ($result as &$service) {
+				$service['dependencies'] = array();
+			}
+			unset($service);
 			foreach ($dependencies as $dependency) {
 				$refId = $dependency['serviceupid'];
 				$dependency = $this->unsetExtraFields('services_links', $dependency, $options['selectDependencies']);
-
-				if (!isset($result[$refId]['dependencies'])) {
-					$result[$refId]['dependencies'] = array();
-				}
 				$result[$refId]['dependencies'][] = $dependency;
 			}
 		}
@@ -915,6 +915,10 @@ class CService extends CZBXAPI {
 				'childrenids' => $serviceIds,
 				'selectDependencies' => array('servicedownid', 'soft')
 			));
+			foreach ($result as &$service) {
+				$service['parent'] = array();
+			}
+			unset($service);
 
 			// map the parents to their children, look for the first hard linked dependency
 			foreach ($parents as $parent) {
