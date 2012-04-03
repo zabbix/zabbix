@@ -242,6 +242,7 @@ void	DCflush_nextchecks()
 			}
 
 			zbx_free(trigger->expression);
+			zbx_free(trigger->new_error);
 		}
 
 		if (0 != events_num)
