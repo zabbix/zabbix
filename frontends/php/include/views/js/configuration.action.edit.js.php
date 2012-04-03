@@ -326,8 +326,7 @@ function showOpTypeForm(){
 		'class_authentication_method': [ZBX_SCRIPT_TYPES.ssh],
 		'class_authentication_username': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet],
 		'class_authentication_publickey': [],
-		'class_authentication_privatekey': [],
-		'class_authentication_password': [ZBX_SCRIPT_TYPES.ssh,ZBX_SCRIPT_TYPES.telnet]
+		'class_authentication_privatekey': []
 	}
 
 	var showFields = [];
@@ -344,20 +343,24 @@ function showOpTypeForm(){
 	}
 }
 
-function showOpTypeAuth(){
+function showOpTypeAuth() {
 	var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
 
-	if(currentOpTypeAuth === <?php echo(ITEM_AUTHTYPE_PASSWORD); ?>){
+	if (currentOpTypeAuth === <?php echo(ITEM_AUTHTYPE_PASSWORD); ?>) {
 		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", true);
-		jQuery('#new_operation_opcommand_publickey').attr("disabled", "disabled");
+		jQuery('#new_operation_opcommand_publickey').prop("disabled", true);
 		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", true);
-		jQuery('#new_operation_opcommand_privatekey').attr("disabled", "disabled");
+		jQuery('#new_operation_opcommand_privatekey').prop("disabled", true);
+		jQuery('.class_authentication_password').prop("disabled", false).toggleClass("hidden", false);
+		jQuery('.class_authentication_passphrase').prop("disabled", true).toggleClass("hidden", true);
 	}
-	else{
-		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", false).removeAttr("disabled");
-		jQuery('#new_operation_opcommand_publickey').removeAttr("disabled");
-		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", false).removeAttr("disabled");
-		jQuery('#new_operation_opcommand_privatekey').removeAttr("disabled");
+	else {
+		jQuery('#operationlist .class_authentication_publickey').toggleClass("hidden", false).prop("disabled", false);
+		jQuery('#new_operation_opcommand_publickey').prop("disabled", false);
+		jQuery('#operationlist .class_authentication_privatekey').toggleClass("hidden", false).prop("disabled", false);
+		jQuery('#new_operation_opcommand_privatekey').prop("disabled", false);
+		jQuery('.class_authentication_password').prop("disabled", true).toggleClass("hidden", true);
+		jQuery('.class_authentication_passphrase').prop("disabled", false).toggleClass("hidden", false);
 	}
 }
 

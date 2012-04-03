@@ -727,6 +727,10 @@ if (isset($_REQUEST['new_operation'])) {
 			$tblOper->addRow(array(_('Public key file'), new CTextBox('new_operation[opcommand][publickey]', $new_operation['opcommand']['publickey'])), 'class_authentication_publickey hidden');
 			$tblOper->addRow(array(_('Private key file'), new CTextBox('new_operation[opcommand][privatekey]', $new_operation['opcommand']['privatekey'])), 'class_authentication_privatekey hidden');
 			$tblOper->addRow(array(_('Password'), new CTextBox('new_operation[opcommand][password]', $new_operation['opcommand']['password'])), 'class_authentication_password hidden');
+			// set custom id becuese otherwise their are set based on name (sick!) and produce duplicate ids
+			$passphraseCB = new CTextBox('new_operation[opcommand][password]', $new_operation['opcommand']['password']);
+			$passphraseCB->attr('id', 'new_operation_opcommand_password');
+			$tblOper->addRow(array(_('Key passphrase'), $passphraseCB), 'class_authentication_passphrase hidden');
 
 			// ssh && telnet
 			$tblOper->addRow(array(_('Port'), new CTextBox('new_operation[opcommand][port]', $new_operation['opcommand']['port'])), 'class_opcommand_port hidden');
