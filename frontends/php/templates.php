@@ -429,15 +429,15 @@ else {
 
 	$table->setHeader(array(
 		new CCheckBox('all_templates', NULL, "checkAll('".$form->getName()."', 'all_templates', 'templates');"),
-		make_sorting_header(S_TEMPLATES, 'name'),
+		make_sorting_header(_('Templates'), 'name'),
 		_('Applications'),
-		S_ITEMS,
-		S_TRIGGERS,
-		S_GRAPHS,
+		_('Items'),
+		_('Triggers'),
+		_('Graphs'),
 		_('Screens'),
 		_('Discovery'),
-		S_LINKED_TEMPLATES,
-		S_LINKED_TO
+		_('Linked templates'),
+		_('Linked to')
 	));
 
 
@@ -585,11 +585,11 @@ else {
 	$goBox->addItem('export', _('Export selected'));
 
 	$goOption = new CComboItem('delete', _('Delete selected'));
-	$goOption->setAttribute('confirm', S_DELETE_SELECTED_TEMPLATES_Q);
+	$goOption->setAttribute('confirm', _('Delete selected templates?'));
 	$goBox->addItem($goOption);
 
 	$goOption = new CComboItem('delete_and_clear', _('Delete selected with linked elements'));
-	$goOption->setAttribute('confirm', S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR);
+	$goOption->setAttribute('confirm', _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'));
 	$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
