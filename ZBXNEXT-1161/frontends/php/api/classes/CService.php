@@ -30,7 +30,12 @@ class CService extends CZBXAPI {
 		parent::__construct();
 
 		$this->getOptions = array_merge($this->getOptions, array(
-			'parentids' => null
+			'parentids' => null,
+			'childrenids' => null,
+			'countOutput' => null,
+			'selectParent' => null,
+			'selectDependencies' => null,
+			'selectTimes' => null,
 		));
 	}
 
@@ -38,7 +43,11 @@ class CService extends CZBXAPI {
 	 * Get services.
 	 *
 	 * Allowed options:
-	 * - parentids - fetch the services that are hardlinked to the given parent services.
+	 * - parentids          - fetch the services that are hardlinked to the given parent services;
+	 * - childrenids        - fetch the services that are hardlinked to the given child services;
+	 * - selectParent       - include the parent service in the result;
+	 * - selectDependencies - include service dependencies in the result;
+	 * - selectTimes        - include service times in the result.
 	 *
 	 * @param array $options
 	 *
@@ -60,14 +69,18 @@ class CService extends CZBXAPI {
 			}
 			// a normal select query
 			else {
-				if ($options['preservekeys'] !== null) {
-					$result[$row['scriptid']] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
-				}
-				else {
-					$result[] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
-				}
+				$result[$row[$this->pk()]] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
 			}
 		}
+
+		if ($result) {
+			$result = $this->addRelatedObjects($options, $result);
+		}
+
+		if ($options['preservekeys'] === null) {
+			$result = zbx_cleanHashes($result);
+		}
+
 		return $result;
 	}
 
@@ -844,17 +857,78 @@ class CService extends CZBXAPI {
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$accessibleTriggers = get_accessible_triggers(PERM_READ_ONLY);
+		// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
+		if ($options['filter']['triggerid']) {
+			$options['filter']['triggerid'] = array_intersect($accessibleTriggers, $options['filter']['triggerid']);
+		}
+		// otherwise return services with either no triggers, or any trigger accessible to the current user
+		else {
+			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), $accessibleTriggers).')';
+		}
+
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		// parentids
 		if ($options['parentids'] !== null) {
-			$sqlParts['from'][] = 'services_links sl';
-			$sqlParts['where'][] = 's.serviceid=sl.servicedownid';
-			$sqlParts['where'][] = DBcondition('sl.serviceupid', (array) $options['parentids']);
-			$sqlParts['where'][] = 'sl.soft=0';
+			$sqlParts['from'][] = 'services_links slp';
+			$sqlParts['where'][] = $this->fieldId('serviceid').'=slp.servicedownid AND slp.soft=0';
+			$sqlParts['where'][] = DBcondition('slp.serviceupid', (array) $options['parentids']);
+		}
+		// childrenids
+		if ($options['childrenids'] !== null) {
+			$sqlParts['from'][] = 'services_links slc';
+			$sqlParts['where'][] = $this->fieldId('serviceid').'=slc.serviceupid AND slc.soft=0';
+			$sqlParts['where'][] = DBcondition('slc.servicedownid', (array) $options['childrenids']);
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$serviceIds = array_keys($result);
+
+		// selectDependencies
+		if ($options['selectDependencies'] !== null) {
+			$dependencyOutput = $this->extendOutputOption('services_links', 'serviceupid', $options['selectDependencies']);
+			$dependencies = API::getApi()->select('services_links', array(
+				'output' => $dependencyOutput,
+				'filter' => array('serviceupid' => $serviceIds)
+			));
+			foreach ($dependencies as $dependency) {
+				$refId = $dependency['serviceupid'];
+				$dependency = $this->unsetExtraFields('services_links', $dependency, $options['selectDependencies']);
+
+				if (!isset($result[$refId]['dependencies'])) {
+					$result[$refId]['dependencies'] = array();
+				}
+				$result[$refId]['dependencies'][] = $dependency;
+			}
+		}
+
+		// selectParent
+		if ($options['selectParent'] !== null) {
+			$parents = $this->get(array(
+				'output' => $options['selectParent'],
+				'childrenids' => $serviceIds,
+				'selectDependencies' => array('servicedownid', 'soft')
+			));
+
+			// map the parents to their children, look for the first hard linked dependency
+			foreach ($parents as $parent) {
+				foreach ($parent['dependencies'] as $dependency) {
+					if (!$dependency['soft']) {
+						unset($parent['dependencies']);
+						$result[$dependency['servicedownid']]['parent'] = $parent;
+						continue 2;
+					}
+				}
+			}
+		}
+
+		return $result;
 	}
 
 
