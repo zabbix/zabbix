@@ -243,7 +243,7 @@ function make_system_status($filter) {
 			$trigger['event'] = array(
 				'value_changed' => 0,
 				'value' => $trigger['value'],
-				'acknowledged' => 1,
+				'acknowledged' => true,
 				'clock' => $trigger['lastchange']
 			);
 		}
@@ -281,41 +281,36 @@ function make_system_status($filter) {
 				continue;
 			}
 
+			$allTriggersNum = $data['count'];
+			if ($allTriggersNum) {
+				$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
+				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams));
+			}
+
+			$unackTriggersNum = $data['count_unack'];
+			if ($unackTriggersNum) {
+				$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
+				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
+			}
+
 			switch ($filter['extAck']) {
 				case EXTACK_OPTION_ALL:
-					$trigger_count = new CSpan($data['count'], 'pointer');
-					if ($data['count']) {
-						$trigger_count->setHint(makeTriggersPopup($data['triggers'], $ackParams));
-					}
-
-					$group_row->addItem(getSeverityCell($severity, $trigger_count, !$data['count']));
+					$group_row->addItem(getSeverityCell($severity, $allTriggersNum, !$allTriggersNum));
 					break;
 
 				case EXTACK_OPTION_UNACK:
-					$trigger_count = $data['count_unack'];
-					if ($trigger_count) {
-						$trigger_count = new CSpan($data['count_unack'], 'pointer red bold');
-						$trigger_count->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
-					}
-					$group_row->addItem(getSeverityCell($severity, $trigger_count, !$data['count_unack']));
+					$group_row->addItem(getSeverityCell($severity, $unackTriggersNum, !$unackTriggersNum));
 					break;
 
 				case EXTACK_OPTION_BOTH:
-					if ($data['count_unack']) {
-						$unack_count = new CSpan($data['count_unack'], 'bold red pointer');
-						$unack_count->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
-						$unack_count = new CSpan(array($unack_count, SPACE._('of').SPACE));
+					if ($unackTriggersNum) {
+						$unackTriggersNum = new CSpan(array($unackTriggersNum, SPACE._('of').SPACE));
 					}
 					else {
-						$unack_count = null;
+						$unackTriggersNum = null;
 					}
 
-					$trigger_count = new CSpan($data['count'], 'pointer');
-					if ($data['count']) {
-						$trigger_count->setHint(makeTriggersPopup($data['triggers'], $ackParams));
-					}
-
-					$group_row->addItem(getSeverityCell($severity, array($unack_count, $trigger_count), !$data['count']));
+					$group_row->addItem(getSeverityCell($severity, array($unackTriggersNum, $allTriggersNum), !$allTriggersNum));
 					break;
 			}
 		}
