@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBX-1357] updated French, German, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
 ....I..P.. [ZBX-4780] removed vfs.fs.discovery returned value limit in case of proxy with MySQL (dimir)
 ...G...... [ZBX-4802] improved memory de-allocation code clarity (Andris)
 ..F....... [ZBX-4739] fixed mass update failing with many items selected (Toms)
@@ -550,6 +551,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
+...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
 ..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
