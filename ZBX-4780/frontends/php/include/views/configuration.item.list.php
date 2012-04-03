@@ -40,7 +40,7 @@ if (!empty($this->data['hostid'])) {
 $itemsWidget->addFlicker($this->data['flicker'], CProfile::get('web.items.filter.state', 0));
 
 // create form
-$itemForm = new CForm('get');
+$itemForm = new CForm();
 $itemForm->setName('items');
 if (!empty($this->data['hostid'])) {
 	$itemForm->addVar('hostid', $this->data['hostid']);
