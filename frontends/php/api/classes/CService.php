@@ -25,6 +25,7 @@
 class CService extends CZBXAPI {
 	protected $tableName = 'services';
 	protected $tableAlias = 's';
+	protected $sortColumns = array('sortorder', 'name');
 
 	public function __construct() {
 		parent::__construct();
@@ -36,6 +37,8 @@ class CService extends CZBXAPI {
 			'selectParent' => null,
 			'selectDependencies' => null,
 			'selectTimes' => null,
+			'sortfield'		=> '',
+			'sortorder'		=> '',
 		));
 	}
 

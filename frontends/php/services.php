@@ -220,7 +220,8 @@ if (isset($_REQUEST['form'])) {
 if (isset($_REQUEST['pservices'])) {
 	$parentServices = API::Service()->get(array(
 		'output' => API_OUTPUT_EXTEND,
-		'preservekeys' => true
+		'preservekeys' => true,
+		'sortfield' => array('sortorder', 'name')
 	));
 
 	// unset unavailable parents
@@ -250,7 +251,8 @@ if (isset($_REQUEST['pservices'])) {
 if (isset($_REQUEST['cservices'])) {
 	$childServices = API::Service()->get(array(
 		'output' => API_OUTPUT_EXTEND,
-		'preservekeys' => true
+		'preservekeys' => true,
+		'sortfield' => array('sortorder', 'name')
 	));
 
 	// unset unavailable parents
