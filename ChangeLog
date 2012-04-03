@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBX-1357] updated French, German, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-4821] fixed flexible interval update using item mass update form (Vedmak)
 ..F....... [ZBX-4806] fixed "New flexible interval" not shown in item form (Toms)
 A.F....... [ZBX-4790] fixed *EROR*s in trigger expressions in items.php; fixed undefined variables when filtering without host (Toms)
 ..F....... [ZBX-3725] added check for xml file size exceeds upload_max_filesize php setting (Vedmak)

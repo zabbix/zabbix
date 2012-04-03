@@ -62,8 +62,6 @@ $fields = array(
 	'hostid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'form_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({save})', _('Host')),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
-	'add_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({register})&&({register}=="go"))'),
-	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'(isset({register})&&({register}=="go"))'),
 	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
 	'itemid' =>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
@@ -140,17 +138,14 @@ $fields = array(
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
 	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'register' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'update' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'copy' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'select' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'massupdate' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	// filter
 	'filter_set' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'filter_group' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -451,17 +446,25 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
-	$delay_flex = get_request('delay_flex');
-	if (!is_null($delay_flex)) {
-		$db_delay_flex = '';
-		foreach ($delay_flex as $val) {
-			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+
+	if (get_request('delay_flex_visible')) {
+		$delay_flex = get_request('delay_flex');
+		if (!is_null($delay_flex)) {
+			$db_delay_flex = '';
+			foreach ($delay_flex as $val) {
+				$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+			}
+			$db_delay_flex = trim($db_delay_flex, ';');
 		}
-		$db_delay_flex = trim($db_delay_flex, ';');
+		else {
+			$db_delay_flex = '';
+		}
 	}
 	else {
 		$db_delay_flex = null;
 	}
+
+
 
 	if (!is_null(get_request('formula', null))) {
 		$_REQUEST['multiplier'] = 1;
@@ -527,86 +530,6 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 
 	if ($result) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
-	}
-}
-elseif (isset($_REQUEST['register'])) {
-	// getting data about how item should look after update or creation
-	$item = array(
-		'name' => get_request('name'),
-		'description' => get_request('description'),
-		'key_' => get_request('key'),
-		'hostid' => get_request('hostid'),
-		'delay' => get_request('delay'),
-		'history' => get_request('history'),
-		'status' => get_request('status'),
-		'type' => get_request('type'),
-		'snmp_community' => get_request('snmp_community'),
-		'snmp_oid' => get_request('snmp_oid'),
-		'value_type' => get_request('value_type'),
-		'trapper_hosts' => get_request('trapper_hosts'),
-		'port' => get_request('port'),
-		'units' => get_request('units'),
-		'multiplier' => get_request('multiplier'),
-		'delta' => get_request('delta'),
-		'snmpv3_securityname' => get_request('snmpv3_securityname'),
-		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
-		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
-		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
-		'formula' => get_request('formula'),
-		'trends' => get_request('trends'),
-		'logtimefmt' => get_request('logtimefmt'),
-		'valuemapid' => get_request('valuemapid'),
-		'authtype' => get_request('authtype'),
-		'username' => get_request('username'),
-		'password' => get_request('password'),
-		'publickey' => get_request('publickey'),
-		'privatekey' => get_request('privatekey'),
-		'params' => get_request('params'),
-		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'data_type' => get_request('data_type'),
-		'inventory_link' => get_request('inventory_link'),
-		'applications' => get_request('applications', array())
-	);
-	$delay_flex = get_request('delay_flex', array());
-	$db_delay_flex = '';
-	foreach ($delay_flex as $val) {
-		$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
-	}
-	$db_delay_flex = trim($db_delay_flex, ';');
-	$item['delay_flex'] = $db_delay_flex;
-
-	// what exactly user wants us to do?
-	switch ($_REQUEST['action']) {
-		// create item on all hosts inside selected group
-		case 'add to group':
-			DBstart();
-			$result = add_item_to_group($_REQUEST['add_groupid'], $item);
-			$result = DBend($result);
-			show_messages($result, _('Item added'), _('Cannot add item'));
-			if ($result) {
-				unset($_REQUEST['form'], $_REQUEST['itemid']);
-			}
-			break;
-		// update item on all hosts inside selected group
-		case 'update in group':
-			DBstart();
-			$result = update_item_in_group($_REQUEST['add_groupid'], $_REQUEST['itemid'], $item);
-			$result = DBend($result);
-			show_messages($result, _('Item updated'), _('Cannot update item'));
-			if ($result) {
-				unset($_REQUEST['form'], $_REQUEST['itemid']);
-			}
-			break;
-		// delete item from all hosts inside selected group
-		case 'delete from group':
-			DBstart();
-			$result = delete_item_from_group($_REQUEST['add_groupid'], $_REQUEST['itemid']);
-			$result = DBend($result);
-			show_messages($result, _('Item deleted'), _('Cannot delete item'));
-			if ($result) {
-				unset($_REQUEST['form'], $_REQUEST['itemid']);
-			}
-			break;
 	}
 }
 elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
