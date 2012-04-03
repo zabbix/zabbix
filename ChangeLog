@@ -2,10 +2,10 @@
 Changes for 2.0.0rc3
 
 New features:
-
 ..F....... [ZBX-1357] updated French, German, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-4802] improved memory de-allocation code clarity (Andris)
 ..F....... [ZBX-4739] fixed mass update failing with many items selected (Toms)
 ..F....... [ZBX-4821] fixed flexible interval update using item mass update form (Vedmak)
 ..F....... [ZBX-4806] fixed "New flexible interval" not shown in item form (Toms)
