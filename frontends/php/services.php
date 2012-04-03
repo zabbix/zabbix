@@ -218,36 +218,27 @@ if (isset($_REQUEST['form'])) {
  * Display parent services list
  */
 if (isset($_REQUEST['pservices'])) {
-	$data = array();
-	if (!empty($service)) {
-		$data['service'] = $service;
+	$parentServices = API::Service()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'preservekeys' => true
+	));
+
+	// unset unavailable parents
+	$childServicesIds = get_service_childs($service['serviceid']);
+	$childServicesIds[] = $service['serviceid'];
+	foreach ($childServicesIds as $childServiceId) {
+		unset($parentServices[$childServiceId]);
 	}
-	if (!empty($data['service'])) {
-		$childs_str = implode(',', get_service_childs($data['service']['serviceid'], 1));
-		if (!empty($childs_str)) {
-			$childs_str .= ',';
-		}
-		$sql = 'SELECT DISTINCT s.*'.
-				' FROM services s'.
-				' WHERE '.DBin_node('s.serviceid').
-					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).') '.
-					' AND s.serviceid NOT IN ('.$childs_str.$data['service']['serviceid'].') '.
-				' ORDER BY s.sortorder,s.name';
-	}
-	else {
-		$sql = 'SELECT DISTINCT s.*'.
-				' FROM services s'.
-				' WHERE '.DBin_node('s.serviceid').
-					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).')'.
-				' ORDER BY s.sortorder,s.name';
-	}
-	$data['db_pservices'] = DBfetchArray(DBselect($sql));
-	foreach ($data['db_pservices'] as $key => $db_service) {
-		$data['db_pservices'][$key]['trigger'] = !empty($db_service['triggerid']) ? expand_trigger_description($db_service['triggerid']) : '-';
+
+	foreach ($parentServices as $key => $childService) {
+		$parentServices[$key]['trigger'] = !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-';
 	}
 
 	// render view
-	$servicesView = new CView('configuration.services.parent.list', $data);
+	$servicesView = new CView('configuration.services.parent.list', array(
+		'service' => $service,
+		'db_pservices' => $parentServices
+	));
 	$servicesView->render();
 	$servicesView->show();
 	include_once('include/page_footer.php');
@@ -257,37 +248,27 @@ if (isset($_REQUEST['pservices'])) {
  * Display child services list
  */
 if (isset($_REQUEST['cservices'])) {
-	$data = array();
-	if (!empty($service)) {
-		$data['service'] = $service;
-	}
-	if (!empty($data['service'])) {
-		$childs_str = implode(',', get_service_childs($data['service']['serviceid'], 1));
-		if (!empty($childs_str)) {
-			$childs_str .= ',';
-		}
-		$sql = 'SELECT DISTINCT s.*'.
-				' FROM services s'.
-				' WHERE '.DBin_node('s.serviceid').
-					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).')'.
-					' AND s.serviceid NOT IN ('.$childs_str.$data['service']['serviceid'].')'.
-				' ORDER BY s.sortorder,s.name';
+	$childServices = API::Service()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'preservekeys' => true
+	));
 
+	// unset unavailable parents
+	$childServicesIds = get_service_childs($service['serviceid']);
+	$childServicesIds[] = $service['serviceid'];
+	foreach ($childServicesIds as $childServiceId) {
+		unset($childServices[$childServiceId]);
 	}
-	else {
-		$sql = 'SELECT DISTINCT s.*'.
-				' FROM services s'.
-				' WHERE '.DBin_node('s.serviceid').
-					' AND (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).')'.
-				' ORDER BY s.sortorder,s.name';
-	}
-	$data['db_cservices'] = DBfetchArray(DBselect($sql));
-	foreach ($data['db_cservices'] as $key => $db_service) {
-		$data['db_cservices'][$key]['trigger'] = !empty($db_service['triggerid']) ? expand_trigger_description($db_service['triggerid']) : '-';
+
+	foreach ($childServices as $key => $childService) {
+		$childServices[$key]['trigger'] = !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-';
 	}
 
 	// render view
-	$servicesView = new CView('configuration.services.child.list', $data);
+	$servicesView = new CView('configuration.services.child.list', array(
+		'service' => $service,
+		'db_cservices' => $childServices
+	));
 	$servicesView->render();
 	$servicesView->show();
 	include_once('include/page_footer.php');
