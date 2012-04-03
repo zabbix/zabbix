@@ -20,28 +20,28 @@
 	});
 
 	function add_child_service(name, serviceid, trigger, triggerid) {
-		if (jQuery('#childs_' + serviceid + '_serviceid').attr('id') == null) {
+		if (jQuery('#children_' + serviceid + '_serviceid').attr('id') == null) {
 			var tr = document.createElement('tr');
-			tr.setAttribute('id', 'childs_' + serviceid);
+			tr.setAttribute('id', 'children_' + serviceid);
 
 			// column "name"
 			var td = document.createElement('td');
 			var inputServiceId = document.createElement('input');
 			inputServiceId.setAttribute('type', 'hidden');
 			inputServiceId.setAttribute('value', serviceid);
-			inputServiceId.setAttribute('name', 'childs[' + serviceid + '][serviceid]');
-			inputServiceId.setAttribute('id', 'childs_' + serviceid + '_serviceid');
+			inputServiceId.setAttribute('name', 'children[' + serviceid + '][serviceid]');
+			inputServiceId.setAttribute('id', 'children_' + serviceid + '_serviceid');
 
 			var inputName = document.createElement('input');
 			inputName.setAttribute('type', 'hidden');
 			inputName.setAttribute('value', name);
-			inputName.setAttribute('name', 'childs[' + serviceid + '][name]');
-			inputName.setAttribute('id', 'childs_' + serviceid + '_name');
+			inputName.setAttribute('name', 'children[' + serviceid + '][name]');
+			inputName.setAttribute('id', 'children_' + serviceid + '_name');
 
 			var inputTrigger = document.createElement('input');
 			inputTrigger.setAttribute('type', 'hidden');
 			inputTrigger.setAttribute('value', triggerid);
-			inputTrigger.setAttribute('name', 'childs[' + serviceid + '][triggerid]');
+			inputTrigger.setAttribute('name', 'children[' + serviceid + '][triggerid]');
 
 			var url = document.createElement('a');
 			url.setAttribute('href', 'services.php?form=1&serviceid=' + serviceid);
@@ -58,7 +58,7 @@
 			var softCheckbox = document.createElement('input');
 			softCheckbox.setAttribute('type', 'checkbox');
 			softCheckbox.setAttribute('value', '1');
-			softCheckbox.setAttribute('name', 'childs[' + serviceid + '][soft]');
+			softCheckbox.setAttribute('name', 'children[' + serviceid + '][soft]');
 			softCheckbox.setAttribute('class', 'input checkbox pointer')
 
 			td.appendChild(softCheckbox);
@@ -79,23 +79,23 @@
 
 			td.appendChild(inputRemove);
 			tr.appendChild(td);
-			document.getElementById('service_childs').firstChild.appendChild(tr);
-			jQuery('#service_childs .message').css('display', 'none');
+			document.getElementById('service_children').firstChild.appendChild(tr);
+			jQuery('#service_children .message').css('display', 'none');
 		}
 	}
 
 	function removeDependentChild(serviceid) {
-		removeObjectById('childs_' + serviceid);
-		removeObjectById('childs_' + serviceid + '_name');
-		removeObjectById('childs_' + serviceid + '_serviceid');
-		removeObjectById('childs_' + serviceid + '_triggerid');
+		removeObjectById('children_' + serviceid);
+		removeObjectById('children_' + serviceid + '_name');
+		removeObjectById('children_' + serviceid + '_serviceid');
+		removeObjectById('children_' + serviceid + '_triggerid');
 	}
 
 	function removeTime(id) {
-		removeObjectById('service_times_' + id);
-		removeObjectById('service_times_' + id + '_type');
-		removeObjectById('service_times_' + id + '_from');
-		removeObjectById('service_times_' + id + '_to');
-		removeObjectById('service_times_' + id + '_note');
+		removeObjectById('times_' + id);
+		removeObjectById('times_' + id + '_type');
+		removeObjectById('times_' + id + '_from');
+		removeObjectById('times_' + id + '_to');
+		removeObjectById('times_' + id + '_note');
 	}
 </script>

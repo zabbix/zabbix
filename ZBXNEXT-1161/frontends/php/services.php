@@ -45,11 +45,11 @@ $fields = array(
 	'showsla' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'goodsla' =>			array(T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null),
 	'sortorder' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null),
-	'service_times' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'times' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'trigger' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'new_service_time' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'childs' =>				array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
+	'children' =>				array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
 	'parentid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'parentname' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
@@ -84,13 +84,16 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 // get triggers and check permissions
 $available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 if (!empty($_REQUEST['serviceid'])) {
-	$db_services = DBselect(
-		'SELECT s.*'.
-		' FROM services s'.
-		' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).')'.
-			' AND s.serviceid='.$_REQUEST['serviceid']
-	);
-	if (!$service = DBfetch($db_services)) {
+	$service = API::Service()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'selectParent' => array('serviceid', 'name'),
+		'selectDependencies' => API_OUTPUT_EXTEND,
+		'selectTimes' => API_OUTPUT_EXTEND,
+		'serviceids' => $_REQUEST['serviceid'],
+		'limit' => 1
+	));
+	$service = reset($service);
+	if (!$service) {
 		access_deny();
 	}
 }
@@ -124,9 +127,9 @@ if (isset($_REQUEST['form'])) {
 				get_request('showsla', 0),
 				get_request('goodsla', null),
 				get_request('sortorder', null),
-				get_request('service_times', array()),
+				get_request('times', array()),
 				get_request('parentid', null),
-				get_request('childs', array())
+				get_request('children', array())
 			);
 		}
 		else {
@@ -137,9 +140,9 @@ if (isset($_REQUEST['form'])) {
 				get_request('showsla', 0),
 				get_request('goodsla', SERVICE_SLA),
 				get_request('sortorder', 0),
-				get_request('service_times', array()),
+				get_request('times', array()),
 				get_request('parentid', null),
-				get_request('childs', array())
+				get_request('children', array())
 			);
 		}
 		$result = DBend() ? $result : false;
@@ -162,7 +165,7 @@ if (isset($_REQUEST['form'])) {
 	}
 	// validate and get service times
 	elseif (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
-		$_REQUEST['service_times'] = get_request('service_times', array());
+		$_REQUEST['times'] = get_request('times', array());
 		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
 
 		if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
@@ -179,13 +182,13 @@ if (isset($_REQUEST['form'])) {
 		try {
 			checkServiceTime(array(
 				'type' => $new_service_time['type'],
-				'ts_from' => $new_service_time['from'],
-				'ts_to' => $new_service_time['to'],
+				'ts_from' => ($new_service_time['from']) ? $new_service_time['from'] : null,
+				'ts_to' => ($new_service_time['to']) ? $new_service_time['to'] : null,
 			));
 
 			// if this time is not already there, adding it for inserting
-			if (!str_in_array($_REQUEST['service_times'], $new_service_time)) {
-				array_push($_REQUEST['service_times'], $new_service_time);
+			if (!str_in_array($_REQUEST['times'], $new_service_time)) {
+				array_push($_REQUEST['times'], $new_service_time);
 
 				unset($_REQUEST['new_service_time']['from_week']);
 				unset($_REQUEST['new_service_time']['to_week']);
@@ -299,10 +302,10 @@ if (isset($_REQUEST['form'])) {
 	$data['form_refresh'] = get_request('form_refresh', 0);
 	$data['service'] = !empty($service) ? $service : null;
 
-	$data['service_times'] = get_request('service_times', array());
+	$data['times'] = get_request('times', array());
 	$data['new_service_time'] = get_request('new_service_time', array('type' => SERVICE_TIME_TYPE_UPTIME));
 
-	// get general data
+	// populate the form from the object from the database
 	if (isset($data['service']['serviceid']) && !isset($_REQUEST['form_refresh'])) {
 		$data['name'] = $data['service']['name'];
 		$data['algorithm'] = $data['service']['algorithm'];
@@ -312,67 +315,44 @@ if (isset($_REQUEST['form'])) {
 		$data['triggerid'] = isset($data['service']['triggerid']) ? $data['service']['triggerid'] : 0;
 
 		// get services times
-		$db_services_times = DBselect('SELECT st.type,st.ts_from,st.ts_to,st.note FROM services_times st WHERE st.serviceid='.$data['service']['serviceid']);
-		while ($db_stime = DBfetch($db_services_times)) {
-			$stime = array(
-				'type' => $db_stime['type'],
-				'from' => $db_stime['ts_from'],
-				'to' => $db_stime['ts_to'],
-				'note' => $db_stime['note']
+		foreach ($service['times'] as $serviceTime) {
+			$data['times'][] = array(
+				'type' => $serviceTime['type'],
+				'from' => $serviceTime['ts_from'],
+				'to' => $serviceTime['ts_to'],
+				'note' => $serviceTime['note']
 			);
-			if (str_in_array($stime, $data['service_times'])) {
-				continue;
-			}
-			array_push($data['service_times'], $stime);
 		}
 
-		// get links
-		$db_links = DBSelect(
-			'SELECT DISTINCT sl.serviceupid,s1.name AS serviceupname'.
-			' FROM services s1,services s2,services_links sl'.
-			' WHERE sl.serviceupid=s1.serviceid'.
-				' AND sl.servicedownid=s2.serviceid'.
-				' AND sl.soft=0'.
-				' AND sl.servicedownid='.$data['service']['serviceid']
-		);
-		if ($link = DBFetch($db_links)) {
-			$data['parentid'] = $link['serviceupid'];
-			$data['parentname'] = $link['serviceupname'];
+		// parent
+		if ($parent = $service['parent']) {
+			$data['parentid'] = $parent['serviceid'];
+			$data['parentname'] = $parent['name'];
 		}
 		else {
 			$data['parentid'] = 0;
 			$data['parentname'] = 'root';
 		}
 
-		// get childs
-		$db_services = DBselect(
-			'SELECT DISTINCT s.name,s.serviceid,s.triggerid,sl.soft'.
-			' FROM services s1,services s2,services_links sl,services s'.
-			' WHERE (s.triggerid IS NULL OR '.DBcondition('s.triggerid', $available_triggers).') '.
-				' AND '.DBin_node('s.serviceid').
-				' AND sl.serviceupid=s1.serviceid'.
-				' AND sl.servicedownid=s2.serviceid'.
-				' AND sl.serviceupid='.$data['service']['serviceid'].
-				' AND s.serviceid=sl.servicedownid'
-		);
-		$data['childs'] = array();
-		while ($db_service_data = DBfetch($db_services)) {
-			$child = array(
-				'name' => $db_service_data['name'],
-				'serviceid' => $db_service_data['serviceid'],
-				'triggerid' => $db_service_data['triggerid'],
-				'soft' => $db_service_data['soft'],
-				'trigger' => '-'
+		// get children
+		$childServices = API::Service()->get(array(
+			'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
+			'output' => array('name', 'triggerid'),
+			'preservekeys' => true,
+		));
+		$data['children'] = array();
+		foreach ($service['dependencies'] as $dependency) {
+			$childService = $childServices[$dependency['servicedownid']];
+			$data['children'][] = array(
+				'name' => $childService['name'],
+				'triggerid' => $childService['triggerid'],
+				'trigger' => !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-',
+				'serviceid' => $dependency['servicedownid'],
+				'soft' => $dependency['soft'],
 			);
-			if (str_in_array($child, $data['childs'])) {
-				continue;
-			}
-			array_push($data['childs'], $child);
-		}
-		foreach ($data['childs'] as $id => $child) {
-			$data['childs'][$id]['trigger'] = !empty($child['triggerid']) ? expand_trigger_description($child['triggerid']) : '-';
 		}
 	}
+	// populate the form from a submitted request
 	else {
 		$data['name'] = get_request('name', '');
 		$data['algorithm'] = get_request('algorithm', SERVICE_ALGORITHM_MAX);
@@ -382,8 +362,10 @@ if (isset($_REQUEST['form'])) {
 		$data['triggerid'] = get_request('triggerid', 0);
 		$data['parentid'] = get_request('parentid', 0);
 		$data['parentname'] = get_request('parentname', '');
-		$data['childs'] = get_request('childs', array());
+		$data['children'] = get_request('children', array());
 	}
+
+	// get trigger
 	if ($data['triggerid'] > 0) {
 		$trigger = API::Trigger()->get(array(
 			'triggerids' => $data['triggerid'],
