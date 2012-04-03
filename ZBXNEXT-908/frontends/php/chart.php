@@ -21,58 +21,65 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['file']	= 'chart.php';
-// $page['title']	= "S_CHART";
-$page['type']	= PAGE_TYPE_IMAGE;
+$page['file'] = 'chart.php';
+$page['type'] = PAGE_TYPE_IMAGE;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-?>
-<?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'itemid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		null),
-		'period'=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD),	null),
-		'from'=>		array(T_ZBX_INT, O_OPT,	null,	'{}>=0',	null),
-		'width'=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
-		'height'=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
-		'border'=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
-		'stime'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null)
-	);
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'itemid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+	'period' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
+	'from' =>	array(T_ZBX_INT, O_OPT, null,	'{}>=0',	null),
+	'width' =>	array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
+	'height' =>	array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
+	'border' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'stime' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null)
+);
+check_fields($fields);
 
-	check_fields($fields);
-?>
-<?php
-	if(!DBfetch(DBselect('select itemid from items where itemid='.$_REQUEST['itemid']))){
-		show_error_message(_('No items defined.'));
-	}
+/*
+ * Permissions
+ */
+if (!DBfetch(DBselect('SELECT i.itemid FROM items i WHERE i.itemid='.$_REQUEST['itemid']))) {
+	show_error_message(_('No items defined.'));
+}
 
-	$options = array(
-		'itemids' => $_REQUEST['itemid'],
-		'webitems' => 1,
-		'nodeids' => get_current_nodeid(true)
-	);
+$dbItems = API::Item()->get(array(
+	'itemids' => $_REQUEST['itemid'],
+	'webitems' => true,
+	'nodeids' => get_current_nodeid(true)
+));
+if (empty($dbItems)) {
+	access_deny();
+}
 
-	$db_data = API::Item()->get($options);
-	if(empty($db_data)) access_deny();
+/*
+ * Display
+ */
+navigation_bar_calc('web.item.graph', $_REQUEST['itemid']);
 
-	$graph = new CChart();
-
-	$effectiveperiod = navigation_bar_calc('web.item.graph', $_REQUEST['itemid']);
-
-	if(isset($_REQUEST['period']))		$graph->setPeriod($_REQUEST['period']);
-	if(isset($_REQUEST['from']))		$graph->setFrom($_REQUEST['from']);
-	if(isset($_REQUEST['width']))		$graph->setWidth($_REQUEST['width']);
-	if(isset($_REQUEST['height']))		$graph->setHeight($_REQUEST['height']);
-	if(isset($_REQUEST['border']))		$graph->setBorder(0);
-	if(isset($_REQUEST['stime']))		$graph->setSTime($_REQUEST['stime']);
-
-	$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
-	$graph->draw();
-
-?>
-<?php
+$graph = new CChart();
+if (isset($_REQUEST['period'])) {
+	$graph->setPeriod($_REQUEST['period']);
+}
+if (isset($_REQUEST['from'])) {
+	$graph->setFrom($_REQUEST['from']);
+}
+if (isset($_REQUEST['width'])) {
+	$graph->setWidth($_REQUEST['width']);
+}
+if (isset($_REQUEST['height'])) {
+	$graph->setHeight($_REQUEST['height']);
+}
+if (isset($_REQUEST['border'])) {
+	$graph->setBorder(0);
+}
+if (isset($_REQUEST['stime'])) {
+	$graph->setSTime($_REQUEST['stime']);
+}
+$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
 ?>

@@ -287,18 +287,11 @@ $graphTab->addTab('graphTab', _('Graph'), $graphFormList);
 /*
  * Preview tab
  */
+$chartImage = new CImg('chart3.php?period=3600');
+$chartImage->preload();
+
 $graphPreviewTable = new CTable(null, 'graph');
-if (($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED) && $this->data['isDataValid']) {
-	$graphPreviewTable->addRow(new CImg('chart7.php?period=3600'.url_params(array(
-		'name', 'width', 'height', 'graphtype', 'items', 'legend', 'graph3d'
-	))));
-}
-elseif ($this->data['isDataValid']){
-	$graphPreviewTable->addRow(new CImg('chart3.php?period=3600'.url_params(array(
-		'name', 'width', 'height', 'graphtype', 'items', 'ymin_type', 'ymax_type', 'yaxismin', 'yaxismax', 'ymin_itemid', 'ymax_itemid',
-		'showworkperiod', 'legend', 'showtriggers', 'percent_left', 'percent_right'
-	))));
-}
+$graphPreviewTable->addRow(new CDiv($chartImage, null, 'previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 $graphForm->addItem($graphTab);
 

@@ -304,6 +304,7 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 
 function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
+
 	if (!defined('PAGE_HEADER_LOADED')) {
 		return null;
 	}

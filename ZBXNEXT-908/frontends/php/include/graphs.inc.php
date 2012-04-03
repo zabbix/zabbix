@@ -537,10 +537,10 @@ function imageDiagonalMarks($im,$x, $y, $offset, $color) {
 	global $colors;
 
 	$gims = array(
-		'lt' => array(0, 0, -9,0, -9,-3, -3,-9, 0,-9),
-		'rt' => array(0, 0, 9,0, 9,-3, 3,-9, 0,-9),
-		'lb' => array(0, 0, -9,0, -9,3, -3,9, 0,9),
-		'rb' => array(0, 0, 9,0, 9,3, 3,9, 0,9)
+		'lt' => array(0, 0, -9, 0, -9, -3, -3, -9, 0, -9),
+		'rt' => array(0, 0, 9, 0, 9, -3, 3,-9, 0, -9),
+		'lb' => array(0, 0, -9, 0, -9, 3, -3, 9, 0, 9),
+		'rb' => array(0, 0, 9, 0, 9, 3, 3, 9, 0, 9)
 	);
 
 	foreach ($gims['lt'] as $num => $px) {
@@ -597,7 +597,7 @@ function imageVerticalMarks($im, $x, $y, $offset, $color, $marks = 'tlbr') {
 
 	$polygons = 5;
 	$gims = array(
-		't' => array(0, 0, -6, -6, -3,-9, 3, -9, 6, -6),
+		't' => array(0, 0, -6, -6, -3, -9, 3, -9, 6, -6),
 		'l' => array(0, 0, -6, 6, -9, 3, -9, -3, -6, -6),
 		'b' => array(0, 0, 6, 6, 3, 9, -3, 9, -6, 6),
 		'r' => array(0, 0, 6, -6, 9, -3, 9, 3, 6, 6)
@@ -811,7 +811,7 @@ function imageTextSize($fontsize, $angle, $string) {
 	return $result;
 }
 
-function dashedLine($image,$x1,$y1,$x2,$y2,$color){
+function dashedLine($image, $x1, $y1, $x2, $y2, $color) {
 	// style for dashed lines
 	if (!is_array($color)) {
 		$style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
@@ -861,7 +861,7 @@ function find_period_start($periods, $time) {
 		}
 	}
 
-	for ($days=1; $days < 7 ; ++$days) {
+	for ($days = 1; $days < 7 ; ++$days) {
 		$new_wday = ($wday + $days - 1) % 7 + 1;
 		if (isset($periods[$new_wday ])) {
 			$next_h = -1;

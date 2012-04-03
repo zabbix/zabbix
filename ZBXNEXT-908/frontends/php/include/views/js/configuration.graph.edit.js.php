@@ -107,7 +107,6 @@
 </tr>
 </script>
 <script type="text/javascript">
-
 	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, periods_cnt) {
 		var item = [];
 		item['number'] = number;
@@ -154,9 +153,9 @@
 			item['calc_fnc'] = null;
 			item['drawtype'] = null;
 			item['yaxisside'] = null;
-			item['color'] = '009900';
 			item['periods_cnt'] = 0;
 			item['sortorder'] = item['number'];
+			item['color'] = getRandomColorHex();
 
 			var itemTpl = new Template(jQuery('#itemTpl').html());
 			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
@@ -290,7 +289,11 @@
 					}
 				});
 
-				jQuery('#previewTab img[name="image"]').attr('src', name + '?period=3600' + src);
+				jQuery('#previewTab img').attr('src', 'styles/<?php echo getUserThemeName(); ?>/images/preloader.gif');
+				jQuery('<img />').attr('src', name + '?period=3600' + src).load(function() {
+					jQuery('#previewChar img').remove();
+					jQuery('#previewChar').append(jQuery(this));
+				});
 			});
 		});
 	<?php } ?>

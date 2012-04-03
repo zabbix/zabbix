@@ -312,7 +312,7 @@ $pageFilter = new CPageFilter(array(
 		'templated_hosts' => true
 	),
 	'groupid' => get_request('groupid', null),
-	'hostid' => get_request('hostid', null),
+	'hostid' => get_request('hostid', null)
 ));
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;

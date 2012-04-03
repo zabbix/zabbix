@@ -207,9 +207,6 @@
 	'S_BY_HOST'=>				_('By host'),
 	'S_BY_TRIGGER_TEMPLATE'=>		_('By trigger template'),
 
-//	chart4.php
-	'S_CHART4_TIMELINE_DATE_FORMAT'=>	_('d.M'),
-
 //	chart_bar.php
 	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		_('Y.m.d H:i'),
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
