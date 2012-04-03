@@ -932,6 +932,24 @@ class CService extends CZBXAPI {
 			}
 		}
 
+		// selectTimes
+		if ($options['selectTimes'] !== null) {
+			$timesOutput = $this->extendOutputOption('services_times', 'serviceid', $options['selectTimes']);
+			$serviceTimes = API::getApi()->select('services_times', array(
+				'output' => $timesOutput,
+				'filter' => array('serviceupid' => $serviceIds)
+			));
+			foreach ($result as &$service) {
+				$service['times'] = array();
+			}
+			unset($service);
+			foreach ($serviceTimes as $serviceTime) {
+				$refId = $serviceTime['serviceid'];
+				$serviceTime = $this->unsetExtraFields('services_times', $serviceTime, $options['selectTimes']);
+				$result[$refId]['times'][] = $serviceTime;
+			}
+		}
+
 		return $result;
 	}
 
