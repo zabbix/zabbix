@@ -35,7 +35,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	return FAIL;
 }
 
-static int	get_kstat_io(const char *name)
+static int	get_kstat_io(const char *name, zbx_kstat_t *zk)
 {
 	int		result = SYSINFO_RET_FAIL;
 	kstat_ctl_t	*kc;
@@ -55,17 +55,17 @@ static int	get_kstat_io(const char *name)
 
 		if (-1 != kstat_read(kc, kt, &kio))
 		{
-			zbx_kstat.nread = kio.nread;
-			zbx_kstat.nwritten = kio.nwritten;
-			zbx_kstat.reads = kio.reads;
-			zbx_kstat.writes = kio.writes;
+			zk->nread = kio.nread;
+			zk->nwritten = kio.nwritten;
+			zk->reads = kio.reads;
+			zk->writes = kio.writes;
 
 			result = SYSINFO_RET_OK;
 		}
 	}
 	else
 	{
-		memset(&zbx_kstat, 0, sizeof(zbx_kstat));
+		memset(zk, 0, sizeof(*zk));
 
 		for (kt = kc->kc_chain; NULL != kt; kt = kt->ks_next)
 		{
@@ -73,10 +73,10 @@ static int	get_kstat_io(const char *name)
 			{
 				kstat_read(kc, kt, &kio);
 
-				zbx_kstat.nread += kio.nread;
-				zbx_kstat.nwritten += kio.nwritten;
-				zbx_kstat.reads += kio.reads;
-				zbx_kstat.writes += kio.writes;
+				zk->nread += kio.nread;
+				zk->nwritten += kio.nwritten;
+				zk->reads += kio.reads;
+				zk->writes += kio.writes;
 			}
 		}
 
@@ -92,7 +92,7 @@ static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags
 {
 	int	ret;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(param)))
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(param, &zbx_kstat)))
 		SET_UI64_RESULT(result, zbx_kstat.nread);
 
 	return ret;
@@ -102,7 +102,7 @@ static int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, unsigned 
 {
 	int	ret;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(param)))
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(param, &zbx_kstat)))
 		SET_UI64_RESULT(result, zbx_kstat.reads);
 
 	return ret;
@@ -112,7 +112,7 @@ static int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, unsigned flag
 {
 	int	ret;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(param)))
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(param, &zbx_kstat)))
 		SET_UI64_RESULT(result, zbx_kstat.nwritten);
 
 	return ret;
@@ -122,7 +122,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned
 {
 	int	ret;
 
-	if (SYSINFO_RET_OK == (ret = get_kstat_io(param)))
+	if (SYSINFO_RET_OK == (ret = get_kstat_io(param, &zbx_kstat)))
 		SET_UI64_RESULT(result, zbx_kstat.writes);
 
 	return ret;
