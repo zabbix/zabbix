@@ -52,6 +52,13 @@ class CZBXAPI {
 	protected $sortColumns = array();
 
 	/**
+	 * An array of allowed get() options that are supported by all APIs.
+	 *
+	 * @var array
+	 */
+	protected $globalGetOptions = array();
+
+	/**
 	 * An array containing all of the allowed get() options for the current API.
 	 *
 	 * @var array
@@ -62,7 +69,7 @@ class CZBXAPI {
 		// set the PK of the table
 		$this->pk = $this->pk($this->tableName());
 
-		$this->getOptions = array(
+		$this->globalGetOptions = array(
 			'nodeids'				=> null,
 			// filter
 			'filter'				=> null,
@@ -76,6 +83,7 @@ class CZBXAPI {
 			'preservekeys'			=> null,
 			'limit'					=> null
 		);
+		$this->getOptions = $this->globalGetOptions;
 	}
 
 	/**
@@ -306,7 +314,7 @@ class CZBXAPI {
 	 */
 	protected function createSelectQueryParts($tableName, $tableAlias, array $options) {
 		// extend default options
-		$options = zbx_array_merge($this->getOptions, $options);
+		$options = zbx_array_merge($this->globalGetOptions, $options);
 
 		$sqlParts = array(
 			'select' => array($this->fieldId($this->pk($tableName), $tableAlias)),
@@ -374,16 +382,12 @@ class CZBXAPI {
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
-			$sqlParts['select'] = array();
+			// the pk field must always be included for the API to work properly
+			$sqlParts['select'] = array($pkFieldId);
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
 					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);
 				}
-			}
-
-			// make sure the id is included if the 'preservekeys' option is enabled
-			if (isset($options['preservekeys'])) {
-				$sqlParts['select'][] = $pkFieldId;
 			}
 		}
 		// extended output
@@ -501,7 +505,7 @@ class CZBXAPI {
 	 * Adds the related objects requested by "select*" options to the resulting object set.
 	 *
 	 * @param array $options
-	 * @param array $result
+	 * @param array $result     an object hash with PKs as keys
 	 * @return array mixed
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
