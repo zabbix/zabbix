@@ -618,7 +618,6 @@ static char	**get_result_str_value(AGENT_RESULT *result)
 		*p = '\0'; /* replace to NUL */
 		SET_STR_RESULT(result, zbx_strdup(NULL, result->text)); /* copy line */
 		*p = tmp; /* restore result->text character */
-
 	}
 	else if (ISSET_UI64(result))
 	{
@@ -643,7 +642,6 @@ static char	**get_result_text_value(AGENT_RESULT *result)
 	if (ISSET_TEXT(result))
 	{
 		/* nothing to do */
-		return &result->text;
 	}
 	else if (ISSET_STR(result))
 	{
