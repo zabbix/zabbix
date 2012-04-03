@@ -1,5 +1,5 @@
 Name		: zabbix
-Version		: 1.8.10
+Version		: 1.8.11
 Release		: 1%{?dist}
 Summary		: Enterprise-class open source distributed monitoring solution.
 
@@ -317,6 +317,9 @@ cp -a frontends/php $RPM_BUILD_ROOT%{_datadir}/%{name}
 
 # prepare ghosted config file
 touch $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/web/zabbix.conf.php
+
+# move maintenance.inc.php
+mv $RPM_BUILD_ROOT%{_datadir}/%{name}/conf/maintenance.inc.php $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/web/
 
 # drop config files in place
 #install -m 0644 -p misc/conf/zabbix_agent.conf $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
@@ -674,6 +677,10 @@ fi
 
 
 %changelog
+* Tue Apr 3 2012 Kodai Terashima <kodai.terashima@zabbix.com> - 1.8.11-1
+- update to 1.8.11
+- move maintenance.inc.php to /etc/zabbix/web
+
 * Wed Feb 8 2012 Kodai Terashima <kodai.terashima@zabbix.com> - 1.8.10-1
 - update to 1.8.10
 - remove snmptrap related files

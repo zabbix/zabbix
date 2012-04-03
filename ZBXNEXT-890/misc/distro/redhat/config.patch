@@ -1,7 +1,16 @@
-diff -up zabbix-1.8.4/frontends/php/include/config.inc.php.orig zabbix-1.8.4/frontends/php/include/config.inc.php
---- zabbix-1.8.4/frontends/php/include/config.inc.php.orig	2011-01-04 14:57:51.000000000 +0100
-+++ zabbix-1.8.4/frontends/php/include/config.inc.php	2011-01-04 14:57:52.000000000 +0100
-@@ -116,8 +116,7 @@ function __autoload($class_name){
+diff -Nru zabbix-1.8.11.orig/frontends/php/include/config.inc.php zabbix-1.8.11/frontends/php/include/config.inc.php
+--- zabbix-1.8.11.orig/frontends/php/include/config.inc.php	2012-03-20 11:15:17.000000000 +0200
++++ zabbix-1.8.11/frontends/php/include/config.inc.php	2012-04-03 15:55:34.000000000 +0300
+@@ -80,7 +80,7 @@
+ 	require_once('include/html.inc.php');
+ 	require_once('include/copt.lib.php');
+ 	require_once('include/profiles.inc.php');
+-	require_once('conf/maintenance.inc.php');
++	require_once('/etc/zabbix/web/maintenance.inc.php');
+ 
+ 	require_once('include/nodes.inc.php');
+ 	require_once('include/hosts.inc.php');
+@@ -119,8 +119,7 @@
  	$ZBX_LOCALNODEID = 0;
  	$ZBX_LOCMASTERID = 0;
  
