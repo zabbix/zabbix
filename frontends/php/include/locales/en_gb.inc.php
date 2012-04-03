@@ -99,8 +99,6 @@
 	'S_TRIGGERS'=>					_('Triggers'),
 	'S_GRAPHS'=>					_('Graphs'),
 	'S_HOST'=>					_('Host'),
-	'S_DNS'=>					_('DNS'),
-	'S_PORT'=>					_('Port'),
 	'S_TEMPLATE'=>					_('Template'),
 	'S_GROUPS'=>					_('Groups'),
 	'S_HOST_GROUP'=>				_('Host group'),
