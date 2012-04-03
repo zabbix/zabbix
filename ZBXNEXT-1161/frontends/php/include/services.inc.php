@@ -528,7 +528,7 @@ function get_service_childs($serviceid, $soft = 0) {
 	);
 	while ($row = DBfetch($result)) {
 		$childs[] = $row['servicedownid'];
-		$childs = zbx_array_merge($childs, get_service_childs($row['servicedownid']));
+		$childs = array_merge($childs, get_service_childs($row['servicedownid']));
 	}
 	return $childs;
 }
