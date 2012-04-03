@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBX-1357] updated French, German, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-4824] fixed memory leak while switching item to not supported status (Sasha)
 ....I..P.. [ZBX-4780] removed vfs.fs.discovery returned value limit in case of proxy with MySQL (dimir)
 ...G...... [ZBX-4802] improved memory de-allocation code clarity (Andris)
 ..F....... [ZBX-4739] fixed mass update failing with many items selected (Toms)
