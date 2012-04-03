@@ -55,6 +55,8 @@
 #endif
 
 #ifdef HAVE_WINDOWS_H
+/* to speed build process and reduce size of the Win32 header files */
+#define WIN32_LEAN_AND_MEAN	1
 #	include <windows.h>
 #endif
 

@@ -119,14 +119,13 @@ if (isset($_REQUEST['rules'])) {
 	$data['rules'] = $requestRules;
 }
 
-if (isset($_FILES['import_file']) && is_file($_FILES['import_file']['tmp_name'])) {
+if (isset($_FILES['import_file'])) {
 	try {
-		$fileExtension = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
-		$importFormat = CImportReaderFactory::fileExt2ImportFormat($fileExtension);
+		$file = new CUploadFile($_FILES['import_file']);
+		$importFormat = CImportReaderFactory::fileExt2ImportFormat($file->getExtension());
 		$importReader = CImportReaderFactory::getReader($importFormat);
-		$fileContent = file_get_contents($_FILES['import_file']['tmp_name']);
 
-		$configurationImport = new CConfigurationImport($fileContent, $data['rules']);
+		$configurationImport = new CConfigurationImport($file->getContent(), $data['rules']);
 		$configurationImport->setReader($importReader);
 
 		$configurationImport->import();
