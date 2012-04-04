@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBX-1357] updated French, German, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-4568] fixed new host groups not populated with selected group when 'remember selected' is disabled in GUI settings (Vedmak)
 ..F....... [ZBX-4583] fixed possible processing of null as object in CUIwidget (Vedmak)
 ..F....... [ZBX-4740] fixed host filter when switch to 'configuration of items' from other host configuration page (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
