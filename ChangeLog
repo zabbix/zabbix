@@ -558,14 +558,15 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
-..F....... [ZBX-2873] fixed colors in dark theme (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
+A.F....... [ZBX-4813] fixed incorrect exception handling in maps when checking for circularity (Toms, Vedmak)
+..F....... [ZBX-2873] fixed colors in dark theme (Vedmak)
 ..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
 ..F....... [ZBX-4253] fixed menu link inconsistency in tr_status.php (Toms)
+.......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
 ..F....... [ZBX-4761] fixed "&" encoding in input fields (Pavels)
-.......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
 .D........ [ZBX-4777] added information in the Zabbix sender manpage about values being sent in a sequential manner and the need to have ordered timestamps (Richlv)
 
