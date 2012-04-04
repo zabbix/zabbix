@@ -183,6 +183,7 @@ function make_system_status($filter) {
 		'preservekeys' => true
 	);
 	$groups = API::HostGroup()->get($options);
+	// we need natural sort
 	order_result($groups, 'name');
 
 	$groupids = array();
@@ -281,38 +282,37 @@ function make_system_status($filter) {
 				continue;
 			}
 
-			$allTriggersNum = $data['count'];
-			if ($allTriggersNum) {
-				$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
-				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams));
+			$force = false;
+			$allTriggersNum = null;
+			if ($filter['extAck']==EXTACK_OPTION_ALL || $filter['extAck']==EXTACK_OPTION_BOTH) {
+				if ($allTriggersNum = $data['count']) {
+					$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
+					$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams));
+				} else {
+					$force = true;
+				}
 			}
 
-			$unackTriggersNum = $data['count_unack'];
-			if ($unackTriggersNum) {
-				$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
-				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
+			$unackTriggersNum = null;
+			if ($filter['extAck']==EXTACK_OPTION_UNACK || $filter['extAck']==EXTACK_OPTION_BOTH) {
+				if ($unackTriggersNum = $data['count_unack']) {
+					$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
+					$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
+				} else {
+					$force = true;
+				}
 			}
 
-			switch ($filter['extAck']) {
-				case EXTACK_OPTION_ALL:
-					$group_row->addItem(getSeverityCell($severity, $allTriggersNum, !$allTriggersNum));
-					break;
-
-				case EXTACK_OPTION_UNACK:
-					$group_row->addItem(getSeverityCell($severity, $unackTriggersNum, !$unackTriggersNum));
-					break;
-
-				case EXTACK_OPTION_BOTH:
-					if ($unackTriggersNum) {
-						$unackTriggersNum = new CSpan(array($unackTriggersNum, SPACE._('of').SPACE));
-					}
-					else {
-						$unackTriggersNum = null;
-					}
-
-					$group_row->addItem(getSeverityCell($severity, array($unackTriggersNum, $allTriggersNum), !$allTriggersNum));
-					break;
+			$sp = null;
+			if ($filter['extAck']==EXTACK_OPTION_BOTH) {
+				if ($unackTriggersNum) {
+					$sp = new CSpan(SPACE._('of').SPACE);
+				} else {
+					$unackTriggersNum = null;
+				}
 			}
+
+			$group_row->addItem(getSeverityCell($severity, array($unackTriggersNum, $sp, $allTriggersNum), $force));
 		}
 		$table->addRow($group_row);
 	}
