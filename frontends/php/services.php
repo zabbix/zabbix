@@ -431,11 +431,6 @@ else {
 		error(_('Can\'t format Tree'));
 	}
 
-	$trigerMenu[] = array('test1', null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader')));
-	$trigerMenu[] = array('test2', null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader')));
-
-	$jsmenu = new CPUMenu($trigerMenu, 170);
-
 	$data = array('tree' => $tree);
 
 	// render view
