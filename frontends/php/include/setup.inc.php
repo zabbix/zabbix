@@ -265,7 +265,7 @@ JS;
 			$table->setAlign('center');
 
 			$table->addRow(array(new CCol(S_HOST,'header'), new CTextBox('zbx_server',		$this->getConfig('ZBX_SERVER',		'localhost'))));
-			$table->addRow(array(new CCol(S_PORT,'header'), new CNumericBox('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051'),5)));
+			$table->addRow(array(new CCol(_('Port'),'header'), new CNumericBox('zbx_server_port',	$this->getConfig('ZBX_SERVER_PORT',	'10051'),5)));
 			$table->addRow(array(new CCol(_('Name'),'header'), new CTextBox('zbx_server_name',	$this->getConfig('ZBX_SERVER_NAME',	''))));
 
 			return array(
