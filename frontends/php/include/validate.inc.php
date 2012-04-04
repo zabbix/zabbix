@@ -553,7 +553,7 @@ function check_field(&$fields, &$field, $checks) {
 				info(_s('Critical error. Incorrect value "%1$s" for "%2$s" field.', $_REQUEST[$field], $caption));
 			}
 			else {
-				info(_s('Warning. Incorrect value for field "%1$s"%2$s.', $caption));
+				info(_s('Warning. Incorrect value for field "%1$s".', $caption));
 			}
 		}
 
