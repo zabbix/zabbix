@@ -29,32 +29,32 @@ class testClicks extends CWebTest {
 			// Configuration
 			array('hostgroups.php',
 				array('link=Discovered hosts','save'),
-				'Host groups',
+				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
 				array('link=Zabbix servers','save'),
-				'Host groups',
+				'Configuration of host groups',
 				'Group updated'
 			),
 			array('hostgroups.php',
 				array('link=ЗАББИКС Сервер','save'),
-				'Hosts',
+				'Configuration of hosts',
 				'Host updated'
 			),
 			array('hostgroups.php',
 				array('link=Template_Linux','save'),
-				'Templates',
+				'Configuration of templates',
 				'Template updated'
 			),
 			array('templates.php',
 				array('link=Template_Linux','save'),
-				'Templates',
+				'Configuration of templates',
 				'Template updated'
 			),
 			array('templates.php',
 				array('link=ЗАББИКС Сервер','save'),
-				'Hosts',
+				'Configuration of hosts',
 				'Host updated'
 			),
 			array('sysmaps.php',
@@ -70,37 +70,37 @@ class testClicks extends CWebTest {
 			// Administration
 			array('usergrps.php',
 				array('link=Guests', 'save'),
-				'User groups',
+				'Configuration of user groups',
 				'Group updated'
 			),
 			array('usergrps.php',
 				array('link=Zabbix administrators', 'save'),
-				'User groups',
+				'Configuration of user groups',
 				'Group updated'
 			),
 			array('users.php',
 				array('link=Admin', 'save'),
-				'Users',
+				'Configuration of users',
 				'User updated'
 			),
 			array('media_types.php',
 				array('link=Email', 'save'),
-				'Media types',
+				'Configuration of media types',
 				'Media type updated'
 			),
 			array('media_types.php',
 				array('link=Jabber', 'save'),
-				'Media types',
+				'Configuration of media types',
 				'Media type updated'
 			),
 			array('media_types.php',
 				array('link=SMS', 'save'),
-				'Media types',
+				'Configuration of media types',
 				'Media type updated'
 			),
 			array('scripts.php',
 				array('link=Ping', 'save'),
-				'Scripts',
+				'Configuration of scripts',
 				'Script updated'
 			)
 		);

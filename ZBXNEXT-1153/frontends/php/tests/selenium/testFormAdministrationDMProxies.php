@@ -160,7 +160,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				0,
 				0,
 				0,
-				array('Cannot add proxy', 'Host "New active proxy 1" already exists.')
+				array('Cannot add proxy', 'Proxy "New active proxy 1" already exists.')
 			),
 			array(PROXY_BAD,
 				'New passive proxy with wrong port macro',
