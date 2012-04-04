@@ -314,7 +314,7 @@ function menu_onclick (n_id) {
 		o_item.e_oelement.className = o_item.getstyle(0, 0);
 		o_item.e_ielement.className = o_item.getstyle(1, 0);
 
-		this.o_hidetimer = setTimeout('A_MENUS[' + this.n_id + '].collapse();', 100);
+		this.o_hidetimer = setTimeout('if (typeof(A_MENUS[' + this.n_id + ']) != "undefined") { A_MENUS['+ this.n_id +'].collapse(); }', 100);
 		return true;
 	}
 	return false;
