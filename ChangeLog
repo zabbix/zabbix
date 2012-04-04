@@ -7,7 +7,7 @@ New features:
 Bug fixes:
 ..F....... [ZBX-4740] fixed host filter when switch to 'configuration of items' from other host configuration page (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
-....I..P.. [ZBX-4780] removed vfs.fs.discovery returned value limit in case of proxy with MySQL (dimir)
+....I..P.. [ZBX-4780] removed vfs.fs.discovery returned value limit in case of proxy (dimir)
 ...G...... [ZBX-4802] improved memory de-allocation code clarity (Andris)
 ..F....... [ZBX-4739] fixed mass update failing with many items selected (Toms)
 ..F....... [ZBX-4821] fixed flexible interval update using item mass update form (Vedmak)
