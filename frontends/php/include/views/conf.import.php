@@ -75,7 +75,6 @@ $importForm->addItem(makeFormFooter(new CSubmit('import', _('Import')), new CBut
 
 // widget
 $importWidget = new CWidget();
-$importWidget->addPageHeader(_('CONFIGURATION IMPORT'));
 $importWidget->addItem($importForm);
 
 return $importWidget;

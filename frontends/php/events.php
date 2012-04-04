@@ -438,7 +438,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$table->setHeader(array(
 				_('Time'),
 				_('IP'),
-				S_DNS,
+				_('DNS'),
 				_('Description'),
 				_('Status')
 			));
@@ -447,7 +447,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$csvRows[] = array(
 					_('Time'),
 					_('IP'),
-					S_DNS,
+					_('DNS'),
 					_('Description'),
 					_('Status')
 				);

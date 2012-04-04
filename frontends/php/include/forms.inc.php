@@ -1739,7 +1739,7 @@
 		}
 
 		$normal_only = $parent_discoveryid ? '&normal_only=1' : '';
-		$frmGraph->addRow(S_ITEMS, array(
+		$frmGraph->addRow(_('Items'), array(
 			$items_table,
 			new CButton('add_item',_('Add'),
 				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().

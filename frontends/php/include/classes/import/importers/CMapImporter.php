@@ -91,7 +91,7 @@ class CMapImporter extends CImporter {
 			foreach ($map['selements'] as $selement) {
 				$checked = array($mapName);
 				if ($circMaps = $this->checkCircularRecursive($selement, $maps, $checked)) {
-					throw new Exception(_s('Circular reference in maps: "%1$s".', implode('->', $circMaps)));
+					throw new Exception(_s('Circular reference in maps: %1$s.', implode(' - ', $circMaps)));
 				}
 			}
 		}
