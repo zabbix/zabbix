@@ -118,50 +118,50 @@ if (isset($_REQUEST['form'])) {
 	// save
 	elseif (isset($_REQUEST['save_service'])) {
 		DBstart();
-		if (isset($service['serviceid'])) {
-			$result = update_service(
-				$service['serviceid'],
-				get_request('name', null),
-				get_request('triggerid', null),
-				get_request('algorithm', null),
-				get_request('showsla', 0),
-				get_request('goodsla', null),
-				get_request('sortorder', null),
-				get_request('times', array()),
-				get_request('parentid', null),
-				get_request('children', array())
+
+		$children = get_request('children', array());
+		$dependencies = array();
+		foreach ($children as $child) {
+			$dependencies[] = array(
+				'dependsOnServiceid' => $child['serviceid'],
+				'soft' => (isset($child['soft'])) ? $child['soft'] : 0
 			);
 		}
-		else {
-			$result = add_service(
-				get_request('name', null),
-				get_request('triggerid', null),
-				get_request('algorithm', SERVICE_ALGORITHM_MAX),
-				get_request('showsla', 0),
-				get_request('goodsla', SERVICE_SLA),
-				get_request('sortorder', 0),
-				get_request('times', array()),
-				get_request('parentid', null),
-				get_request('children', array())
-			);
-		}
-		$result = DBend() ? $result : false;
+
+		$serviceRequest = array(
+			'name' => get_request('name'),
+			'triggerid' => get_request('triggerid'),
+			'algorithm' => get_request('algorithm'),
+			'showsla' => get_request('showsla', 0),
+			'goodsla' => get_request('goodsla'),
+			'sortorder' => get_request('sortorder'),
+			'times' => get_request('times', array()),
+			'parentid' => get_request('parentid'),
+			'dependencies' => $dependencies
+		);
 
 		if (isset($service['serviceid'])) {
+			$serviceRequest['serviceid'] = $service['serviceid'];
+			$result = API::Service()->update($serviceRequest);
+
 			show_messages($result, _('Service updated'), _('Cannot update service'));
 			$serviceid = $service['serviceid'];
 			$audit_acrion = AUDIT_ACTION_UPDATE;
 		}
 		else {
-			show_messages($result, _('Service added'), _('Cannot add service'));
+			$result = API::Service()->create($serviceRequest);
+
+			show_messages($result, _('Service updated'), _('Cannot add service'));
 			$serviceid = $result;
 			$audit_acrion = AUDIT_ACTION_ADD;
 		}
 
-		add_audit_if($result, $audit_acrion, AUDIT_RESOURCE_IT_SERVICE, ' Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
 		if ($result) {
+			add_audit($audit_acrion, AUDIT_RESOURCE_IT_SERVICE, ' Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
 			unset($_REQUEST['form']);
 		}
+
+		DBend($result);
 	}
 	// validate and get service times
 	elseif (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
@@ -169,22 +169,18 @@ if (isset($_REQUEST['form'])) {
 		$new_service_time['type'] = $_REQUEST['new_service_time']['type'];
 
 		if ($_REQUEST['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
-			$new_service_time['from'] = zbxDateToTime($_REQUEST['new_service_time']['from']);
-			$new_service_time['to'] = zbxDateToTime($_REQUEST['new_service_time']['to']);
+			$new_service_time['ts_from'] = zbxDateToTime($_REQUEST['new_service_time']['from']);
+			$new_service_time['ts_to'] = zbxDateToTime($_REQUEST['new_service_time']['to']);
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
 		else {
-			$new_service_time['from'] = dowHrMinToSec($_REQUEST['new_service_time']['from_week'], $_REQUEST['new_service_time']['from_hour'], $_REQUEST['new_service_time']['from_minute']);
-			$new_service_time['to'] = dowHrMinToSec($_REQUEST['new_service_time']['to_week'], $_REQUEST['new_service_time']['to_hour'], $_REQUEST['new_service_time']['to_minute']);
+			$new_service_time['ts_from'] = dowHrMinToSec($_REQUEST['new_service_time']['from_week'], $_REQUEST['new_service_time']['from_hour'], $_REQUEST['new_service_time']['from_minute']);
+			$new_service_time['ts_to'] = dowHrMinToSec($_REQUEST['new_service_time']['to_week'], $_REQUEST['new_service_time']['to_hour'], $_REQUEST['new_service_time']['to_minute']);
 			$new_service_time['note'] = $_REQUEST['new_service_time']['note'];
 		}
 
 		try {
-			checkServiceTime(array(
-				'type' => $new_service_time['type'],
-				'ts_from' => ($new_service_time['from']) ? $new_service_time['from'] : null,
-				'ts_to' => ($new_service_time['to']) ? $new_service_time['to'] : null,
-			));
+			checkServiceTime($new_service_time);
 
 			// if this time is not already there, adding it for inserting
 			if (!str_in_array($_REQUEST['times'], $new_service_time)) {
@@ -224,22 +220,28 @@ if (isset($_REQUEST['pservices'])) {
 		'sortfield' => array('sortorder', 'name')
 	));
 
-	// unset unavailable parents
-	$childServicesIds = get_service_childs($service['serviceid']);
-	$childServicesIds[] = $service['serviceid'];
-	foreach ($childServicesIds as $childServiceId) {
-		unset($parentServices[$childServiceId]);
+	if (isset($service)) {
+		// unset unavailable parents
+		$childServicesIds = get_service_childs($service['serviceid']);
+		$childServicesIds[] = $service['serviceid'];
+		foreach ($childServicesIds as $childServiceId) {
+			unset($parentServices[$childServiceId]);
+		}
+
+		$data = array('service' => $service);
+	}
+	else {
+		$data = array();
 	}
 
 	foreach ($parentServices as $key => $childService) {
 		$parentServices[$key]['trigger'] = !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-';
 	}
 
+	$data['db_pservices'] = $parentServices;
+
 	// render view
-	$servicesView = new CView('configuration.services.parent.list', array(
-		'service' => $service,
-		'db_pservices' => $parentServices
-	));
+	$servicesView = new CView('configuration.services.parent.list', $data);
 	$servicesView->render();
 	$servicesView->show();
 	include_once('include/page_footer.php');
@@ -255,22 +257,28 @@ if (isset($_REQUEST['cservices'])) {
 		'sortfield' => array('sortorder', 'name')
 	));
 
-	// unset unavailable parents
-	$childServicesIds = get_service_childs($service['serviceid']);
-	$childServicesIds[] = $service['serviceid'];
-	foreach ($childServicesIds as $childServiceId) {
-		unset($childServices[$childServiceId]);
+	if (isset($service)) {
+		// unset unavailable parents
+		$childServicesIds = get_service_childs($service['serviceid']);
+		$childServicesIds[] = $service['serviceid'];
+		foreach ($childServicesIds as $childServiceId) {
+			unset($childServices[$childServiceId]);
+		}
+
+		$data = array('service' => $service);
+	}
+	else {
+		$data = array();
 	}
 
 	foreach ($childServices as $key => $childService) {
 		$childServices[$key]['trigger'] = !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-';
 	}
 
+	$data['db_cservices'] = $childServices;
+
 	// render view
-	$servicesView = new CView('configuration.services.child.list', array(
-		'service' => $service,
-		'db_cservices' => $childServices
-	));
+	$servicesView = new CView('configuration.services.child.list', $data);
 	$servicesView->render();
 	$servicesView->show();
 	include_once('include/page_footer.php');
@@ -296,16 +304,7 @@ if (isset($_REQUEST['form'])) {
 		$data['goodsla'] = $data['service']['goodsla'];
 		$data['sortorder'] = $data['service']['sortorder'];
 		$data['triggerid'] = isset($data['service']['triggerid']) ? $data['service']['triggerid'] : 0;
-
-		// get services times
-		foreach ($service['times'] as $serviceTime) {
-			$data['times'][] = array(
-				'type' => $serviceTime['type'],
-				'from' => $serviceTime['ts_from'],
-				'to' => $serviceTime['ts_to'],
-				'note' => $serviceTime['note']
-			);
-		}
+		$data['times'] = $service['times'];
 
 		// parent
 		if ($parent = $service['parent']) {

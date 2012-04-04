@@ -537,7 +537,7 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function extendObjects($tableName, array $objects, array $fields) {
-		$dbObjects = $this->select($tableName, array(
+		$dbObjects = API::getApi()->select($tableName, array(
 			'output' => $fields,
 			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
 			'preservekeys' => true

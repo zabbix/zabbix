@@ -118,26 +118,26 @@ foreach ($this->data['times'] as $serviceTime) {
 	switch ($serviceTime['type']) {
 		case SERVICE_TIME_TYPE_UPTIME:
 			$type = new CSpan(_('Uptime'), 'enabled');
-			$from = dowHrMinToStr($serviceTime['from']);
-			$to = dowHrMinToStr($serviceTime['to'], true);
+			$from = dowHrMinToStr($serviceTime['ts_from']);
+			$to = dowHrMinToStr($serviceTime['ts_to'], true);
 			break;
 		case SERVICE_TIME_TYPE_DOWNTIME:
 			$type = new CSpan(_('Downtime'), 'disabled');
-			$from = dowHrMinToStr($serviceTime['from']);
-			$to = dowHrMinToStr($serviceTime['to'], true);
+			$from = dowHrMinToStr($serviceTime['ts_from']);
+			$to = dowHrMinToStr($serviceTime['ts_to'], true);
 			break;
 		case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
 			$type = new CSpan(_('One-time downtime'), 'disabled');
-			$from = zbx_date2str(_('d M Y H:i'), $serviceTime['from']);
-			$to = zbx_date2str(_('d M Y H:i'), $serviceTime['to']);
+			$from = zbx_date2str(_('d M Y H:i'), $serviceTime['ts_from']);
+			$to = zbx_date2str(_('d M Y H:i'), $serviceTime['ts_to']);
 			break;
 	}
 	$row = new CRow(array(
 		array(
 			$type,
 			new CVar('times['.$i.'][type]', $serviceTime['type']),
-			new CVar('times['.$i.'][from]', $serviceTime['from']),
-			new CVar('times['.$i.'][to]', $serviceTime['to']),
+			new CVar('times['.$i.'][ts_from]', $serviceTime['ts_from']),
+			new CVar('times['.$i.'][ts_to]', $serviceTime['ts_to']),
 			new CVar('times['.$i.'][note]', $serviceTime['note'])
 		),
 		$from.' - '.$to,
