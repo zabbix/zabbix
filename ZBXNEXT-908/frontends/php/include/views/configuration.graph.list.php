@@ -31,7 +31,10 @@ if (!empty($this->data['parent_discoveryid'])) {
 
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPH PROTOTYPES'), $createForm);
 	$graphWidget->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
-	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
+
+	if (!empty($this->data['hostid'])) {
+		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
+	}
 }
 else {
 	$createForm->addItem(new CSubmit('form', _('Create graph')));
@@ -43,7 +46,10 @@ else {
 	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 	$graphWidget->addHeader(_('Graphs'), $filterForm);
-	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
+
+	if (!empty($this->data['hostid'])) {
+		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
+	}
 }
 $graphWidget->addHeaderRowNumber();
 
@@ -136,4 +142,3 @@ $graphForm->addItem(array($this->data['paging'], $graphTable, $this->data['pagin
 // append form to widget
 $graphWidget->addItem($graphForm);
 return $graphWidget;
-?>

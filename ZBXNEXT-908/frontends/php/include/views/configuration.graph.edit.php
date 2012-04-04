@@ -101,6 +101,10 @@ if (!empty($this->data['items'])) {
 			$item['yaxisside'] = 0;
 		}
 
+		if (empty($item['periods_cnt'])) {
+			$item['periods_cnt'] = 0;
+		}
+
 		insert_js('loadItem('.$rowNumber.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
 			CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
 			$item['yaxisside'].', \''.$item['color'].'\', '.$item['periods_cnt'].');',
@@ -331,4 +335,3 @@ require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
 // append form to widget
 $graphWidget->addItem($graphForm);
 return $graphWidget;
-?>
