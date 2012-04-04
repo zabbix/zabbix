@@ -46,6 +46,7 @@ Bug fixes:
 ..F....... [ZBX-4761] fixed "&" escaping in form inputs (Pavels)
 .......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 ..F....... [ZBX-4778] fixed port field validation in creating discovery rule (Toms)
+A.F....... [ZBX-4718] fixed Graph axis item cloning in host Full Clone (Toms)
 A......... [ZBX-4621] fixed macro update using host.massupdate (Vedmak)
 A.F....... [ZBX-4697] fixed error when massupdate group for hosts that belongs to different groups (Vedmak)
 A.F....... [ZBX-4257] fixed creating discovery rules, items and item prototypes (Pavels)
@@ -574,7 +575,7 @@ Changes for 1.8.11
 
 Changes for 1.8.11rc1
 
-A.F....... [ZBX-4718] Fixed incorrect graph y axis itemids in Full host cloning (Toms)
+A.F....... [ZBX-4718] fixed Graph axis item cloning in host Full Clone (Toms)
 ..F....... [ZBX-3522] fixed errors when insert too long values to user_history and profiles tables (Vedmak)
 A......... [ZBX-4124] fixed template.get to correctly select applications, graphs and triggers; thanks to gescheit (Alexei)
 A......... [ZBX-4562] fixed mediatype.update returning wrong formatted result (Toms)
