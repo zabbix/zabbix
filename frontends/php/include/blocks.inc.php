@@ -284,7 +284,7 @@ function make_system_status($filter) {
 
 			$force = false;
 			$allTriggersNum = null;
-			if ($filter['extAck']==EXTACK_OPTION_ALL || $filter['extAck']==EXTACK_OPTION_BOTH) {
+			if ($filter['extAck'] == EXTACK_OPTION_ALL || $filter['extAck'] == EXTACK_OPTION_BOTH) {
 				if ($allTriggersNum = $data['count']) {
 					$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
 					$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams));
@@ -294,7 +294,7 @@ function make_system_status($filter) {
 			}
 
 			$unackTriggersNum = null;
-			if ($filter['extAck']==EXTACK_OPTION_UNACK || $filter['extAck']==EXTACK_OPTION_BOTH) {
+			if ($filter['extAck'] == EXTACK_OPTION_UNACK || $filter['extAck'] == EXTACK_OPTION_BOTH) {
 				if ($unackTriggersNum = $data['count_unack']) {
 					$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
 					$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
@@ -304,7 +304,7 @@ function make_system_status($filter) {
 			}
 
 			$sp = null;
-			if ($filter['extAck']==EXTACK_OPTION_BOTH) {
+			if ($filter['extAck'] == EXTACK_OPTION_BOTH) {
 				if ($unackTriggersNum) {
 					$sp = new CSpan(SPACE._('of').SPACE);
 				} else {
