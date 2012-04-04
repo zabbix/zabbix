@@ -62,28 +62,26 @@ $fields = array(
 	'hostid' =>					array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'form_hostid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({save})', _('Host')),
 	'interfaceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')),
-	'add_groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({register})&&({register}=="go"))'),
-	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,	'(isset({register})&&({register}=="go"))'),
 	'copy_type' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	'isset({copy})'),
 	'copy_mode' =>				array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
 	'itemid' =>					array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'name' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
+	'name' => array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Name')),
 	'description' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
-	'key' =>					array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})'),
-	'delay' =>					array(T_ZBX_INT, O_OPT, null,	'(('.BETWEEN(1, SEC_PER_DAY).
-		'(!isset({delay_flex})||!({delay_flex})||is_array({delay_flex})&&!count({delay_flex})))||'.
-		'('.BETWEEN(0, SEC_PER_DAY).'isset({delay_flex})&&is_array({delay_flex})&&count({delay_flex})>0))&&',
-		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.'&&{type}!='.ITEM_TYPE_SNMPTRAP.'))'),
-	'new_delay_flex' =>			array(T_ZBX_STR, O_OPT, NOT_EMPTY, '',		'isset({add_delay_flex})&&(isset({type})&&({type}!=2))'),
+	'key' => array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save})', _('Key')),
+	'delay' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY),
+		'isset({save})&&(isset({type})&&({type}!='.ITEM_TYPE_TRAPPER.'&&{type}!='.ITEM_TYPE_SNMPTRAP.'))',
+		_('Update interval (in sec)')),
+	'new_delay_flex' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add_delay_flex})&&(isset({type})&&({type}!=2))',
+		_('New flexible interval')),
 	'delay_flex' =>				array(T_ZBX_STR, O_OPT, null,	'',			null),
-	'history' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
+	'history' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 65535), 'isset({save})', _('Keep history (in days)')),
 	'status' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
 	'type' =>					array(T_ZBX_INT, O_OPT, null,
 		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
 			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_SNMPTRAP)), 'isset({save})'),
-	'trends' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})&&isset({value_type})&&'.
-		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type')),
+	'trends' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 65535), 'isset({save})&&isset({value_type})&&'.
+		IN(ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64, 'value_type'), _('Keep trends (in days)')),
 	'value_type' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4'), 'isset({save})'),
 	'data_type' =>				array(T_ZBX_INT, O_OPT, null,
 		IN(ITEM_DATA_TYPE_DECIMAL.','.ITEM_DATA_TYPE_OCTAL.','.ITEM_DATA_TYPE_HEXADECIMAL.','.ITEM_DATA_TYPE_BOOLEAN),
@@ -104,12 +102,12 @@ $fields = array(
 		IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'),
 		getParamFieldLabelByType(get_request('type', 0))),
 	'inventory_link' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})&&{value_type}!='.ITEM_VALUE_TYPE_LOG),
-	'snmp_community' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C,'type')),
-	'snmp_oid' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({save})&&isset({type})&&'.IN(
-		ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type')),
-	'port' =>					array(T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})&&isset({type})&&'.IN(
-		ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type')),
+	'snmp_community' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY,
+		'isset({save})&&isset({type})&&'.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C,'type'), _('SNMP community')),
+	'snmp_oid' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})&&isset({type})&&'.IN(
+		ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type'), _('SNMP OID')),
+	'port' => array(T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})&&isset({type})&&'.IN(
+		ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3,'type'), _('Port')),
 	'snmpv3_securitylevel' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
 		'isset({save})&&(isset({type})&&({type}=='.ITEM_TYPE_SNMPV3.'))'),
 	'snmpv3_securityname' =>	array(T_ZBX_STR, O_OPT, null,	null,
@@ -140,12 +138,10 @@ $fields = array(
 	'add_delay_flex' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	// actions
 	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'register' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'update' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'copy' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'select' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
@@ -166,12 +162,12 @@ $fields = array(
 	'filter_snmp_community' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'filter_snmpv3_securityname' => array(T_ZBX_STR, O_OPT, null, null,		null),
 	'filter_snmp_oid' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'filter_port' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null),
+	'filter_port' => array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Port')),
 	'filter_value_type' =>		array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1,2,3,4'), null),
 	'filter_data_type' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(-1, ITEM_DATA_TYPE_BOOLEAN), null),
-	'filter_delay' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, SEC_PER_DAY), null),
-	'filter_history' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null),
-	'filter_trends' =>			array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null),
+	'filter_delay' => array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, SEC_PER_DAY), null, _('Update interval')),
+	'filter_history' => array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Keep history (in days)')),
+	'filter_trends' => array(T_ZBX_INT, O_OPT, P_UNSET_EMPTY, BETWEEN(0, 65535), null, _('Keep trends (in days)')),
 	'filter_status' =>			array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1,3'), null),
 	'filter_templated_items' => array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null),
 	'filter_with_triggers' =>	array(T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null),
@@ -451,17 +447,25 @@ elseif (isset($_REQUEST['del_history']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_REQUEST['group_itemid'])) {
-	$delay_flex = get_request('delay_flex');
-	if (!is_null($delay_flex)) {
-		$db_delay_flex = '';
-		foreach ($delay_flex as $val) {
-			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+
+	if (get_request('delay_flex_visible')) {
+		$delay_flex = get_request('delay_flex');
+		if (!is_null($delay_flex)) {
+			$db_delay_flex = '';
+			foreach ($delay_flex as $val) {
+				$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+			}
+			$db_delay_flex = trim($db_delay_flex, ';');
 		}
-		$db_delay_flex = trim($db_delay_flex, ';');
+		else {
+			$db_delay_flex = '';
+		}
 	}
 	else {
 		$db_delay_flex = null;
 	}
+
+
 
 	if (!is_null(get_request('formula', null))) {
 		$_REQUEST['multiplier'] = 1;
@@ -527,86 +531,6 @@ elseif (isset($_REQUEST['update']) && isset($_REQUEST['massupdate']) && isset($_
 
 	if ($result) {
 		unset($_REQUEST['group_itemid'], $_REQUEST['massupdate'], $_REQUEST['update'], $_REQUEST['form']);
-	}
-}
-elseif (isset($_REQUEST['register'])) {
-	// getting data about how item should look after update or creation
-	$item = array(
-		'name' => get_request('name'),
-		'description' => get_request('description'),
-		'key_' => get_request('key'),
-		'hostid' => get_request('hostid'),
-		'delay' => get_request('delay'),
-		'history' => get_request('history'),
-		'status' => get_request('status'),
-		'type' => get_request('type'),
-		'snmp_community' => get_request('snmp_community'),
-		'snmp_oid' => get_request('snmp_oid'),
-		'value_type' => get_request('value_type'),
-		'trapper_hosts' => get_request('trapper_hosts'),
-		'port' => get_request('port'),
-		'units' => get_request('units'),
-		'multiplier' => get_request('multiplier'),
-		'delta' => get_request('delta'),
-		'snmpv3_securityname' => get_request('snmpv3_securityname'),
-		'snmpv3_securitylevel' => get_request('snmpv3_securitylevel'),
-		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase'),
-		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase'),
-		'formula' => get_request('formula'),
-		'trends' => get_request('trends'),
-		'logtimefmt' => get_request('logtimefmt'),
-		'valuemapid' => get_request('valuemapid'),
-		'authtype' => get_request('authtype'),
-		'username' => get_request('username'),
-		'password' => get_request('password'),
-		'publickey' => get_request('publickey'),
-		'privatekey' => get_request('privatekey'),
-		'params' => get_request('params'),
-		'ipmi_sensor' => get_request('ipmi_sensor'),
-		'data_type' => get_request('data_type'),
-		'inventory_link' => get_request('inventory_link'),
-		'applications' => get_request('applications', array())
-	);
-	$delay_flex = get_request('delay_flex', array());
-	$db_delay_flex = '';
-	foreach ($delay_flex as $val) {
-		$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
-	}
-	$db_delay_flex = trim($db_delay_flex, ';');
-	$item['delay_flex'] = $db_delay_flex;
-
-	// what exactly user wants us to do?
-	switch ($_REQUEST['action']) {
-		// create item on all hosts inside selected group
-		case 'add to group':
-			DBstart();
-			$result = add_item_to_group($_REQUEST['add_groupid'], $item);
-			$result = DBend($result);
-			show_messages($result, _('Item added'), _('Cannot add item'));
-			if ($result) {
-				unset($_REQUEST['form'], $_REQUEST['itemid']);
-			}
-			break;
-		// update item on all hosts inside selected group
-		case 'update in group':
-			DBstart();
-			$result = update_item_in_group($_REQUEST['add_groupid'], $_REQUEST['itemid'], $item);
-			$result = DBend($result);
-			show_messages($result, _('Item updated'), _('Cannot update item'));
-			if ($result) {
-				unset($_REQUEST['form'], $_REQUEST['itemid']);
-			}
-			break;
-		// delete item from all hosts inside selected group
-		case 'delete from group':
-			DBstart();
-			$result = delete_item_from_group($_REQUEST['add_groupid'], $_REQUEST['itemid']);
-			$result = DBend($result);
-			show_messages($result, _('Item deleted'), _('Cannot delete item'));
-			if ($result) {
-				unset($_REQUEST['form'], $_REQUEST['itemid']);
-			}
-			break;
 	}
 }
 elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_itemid'])) {
@@ -845,13 +769,17 @@ elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_itemid'])) {
 	$itemView->render();
 	$itemView->show();
 }
+// list of items
 else {
 	$data = array(
 		'form' => get_request('form', null),
-		'form_hostid' => get_request('form_hostid', $hostid),
-		'hostid' => $hostid,
 		'sortfield' => getPageSortField('name')
 	);
+
+	if (isset($hostid)) {
+		$data['form_hostid'] = get_request('form_hostid', $hostid);
+		$data['hostid'] = $hostid;
+	}
 
 	// items
 	$options = array(

@@ -70,7 +70,7 @@ static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 	return FAIL;
 }
 
-static int	get_procname(FILE *f_stat, char **line)
+static int	cmp_status(FILE *f_stat, const char *procname)
 {
 	char	tmp[MAX_STRING_LEN];
 
@@ -82,9 +82,9 @@ static int	get_procname(FILE *f_stat, char **line)
 			continue;
 
 		zbx_rtrim(tmp + 6, "\n");
-		*line = zbx_strdup(*line, tmp + 6);
-
-		return SUCCEED;
+		if (0 == strcmp(tmp + 6, procname))
+			return SUCCEED;
+		break;
 	}
 
 	return FAIL;
@@ -99,12 +99,11 @@ static int	check_procname(FILE *f_cmd, FILE *f_stat, const char *procname)
 	if ('\0' == *procname)
 		return SUCCEED;
 
-	if (SUCCEED == get_procname(f_stat, &tmp))
-	{
-		if (0 == strcmp(tmp, procname))
-			goto clean;
-	}
-	else if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
+	/* process name in /proc/[pid]/status contains limited number of characters */
+	if (SUCCEED == cmp_status(f_stat, procname))
+		return SUCCEED;
+
+	if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
 	{
 		if (NULL == (p = strrchr(tmp, '/')))
 			p = tmp;
@@ -182,7 +181,7 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 {
 	char	tmp[MAX_STRING_LEN], *p;
 
-	if (zbx_proc_stat == ZBX_PROC_STAT_ALL)
+	if (ZBX_PROC_STAT_ALL == zbx_proc_stat)
 		return SUCCEED;
 
 	rewind(f_stat);
@@ -197,11 +196,11 @@ static int	check_procstate(FILE *f_stat, int zbx_proc_stat)
 		switch (zbx_proc_stat)
 		{
 			case ZBX_PROC_STAT_RUN:
-				return (*p == 'R') ? SUCCEED : FAIL;
+				return ('R' == *p) ? SUCCEED : FAIL;
 			case ZBX_PROC_STAT_SLEEP:
-				return (*p == 'S') ? SUCCEED : FAIL;
+				return ('S' == *p) ? SUCCEED : FAIL;
 			case ZBX_PROC_STAT_ZOMB:
-				return (*p == 'Z') ? SUCCEED : FAIL;
+				return ('Z' == *p) ? SUCCEED : FAIL;
 			default:
 				return FAIL;
 		}
@@ -220,11 +219,10 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	struct passwd	*usrinfo;
 	FILE		*f_cmd = NULL, *f_stat = NULL;
 	zbx_uint64_t	value = 0;
-	int		do_task;
+	int		do_task, proccount = 0;
 	double		memsize = 0;
-	int		proccount = 0;
 
-	if (num_param(param) > 4)
+	if (4 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
 	if (0 != get_param(param, 1, procname, sizeof(procname)))
@@ -233,10 +231,10 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	if (0 != get_param(param, 2, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if (*tmp != '\0')
+	if ('\0' != *tmp)
 	{
 		usrinfo = getpwnam(tmp);
-		if (usrinfo == NULL)	/* incorrect user name */
+		if (NULL == usrinfo)	/* incorrect user name */
 			return SYSINFO_RET_FAIL;
 	}
 	else
@@ -245,7 +243,7 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	if (0 != get_param(param, 3, tmp, sizeof(tmp)))
 		*tmp = '\0';
 
-	if (*tmp != '\0')
+	if ('\0' != *tmp)
 	{
 		if (0 == strcmp(tmp, "avg"))
 			do_task = DO_AVG;
@@ -272,8 +270,8 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 		zbx_fclose(f_cmd);
 		zbx_fclose(f_stat);
 
-		/* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd] */
-		/* Better approach: check if /proc/x/ is symbolic link */
+		/* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd]. */
+		/* Better approach: check if /proc/x/ is symbolic link. */
 		if (0 == strncmp(entries->d_name, "self", MAX_STRING_LEN))
 			continue;
 
@@ -327,9 +325,9 @@ int	PROC_MEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 				memsize = value;
 			else
 			{
-				if (do_task == DO_MAX)
+				if (DO_MAX == do_task)
 					memsize = MAX(memsize, value);
-				else if (do_task == DO_MIN)
+				else if (DO_MIN == do_task)
 					memsize = MIN(memsize, value);
 				else
 					memsize += value;

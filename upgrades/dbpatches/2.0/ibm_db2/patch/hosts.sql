@@ -400,6 +400,9 @@ DROP SEQUENCE httptestitem_seq
 DROP SEQUENCE items_seq
 /
 
+DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications')
+/
+
 ---- Patching table `hosts`
 
 ALTER TABLE hosts ALTER COLUMN hostid SET WITH DEFAULT NULL
