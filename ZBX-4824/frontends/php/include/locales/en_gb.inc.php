@@ -95,30 +95,11 @@
 	'S_DECEMBER'=>				_('December'),
 
 //	hosts.php
-	'S_ITEMS'=>					_('Items'),
 	'S_TRIGGERS'=>					_('Triggers'),
-	'S_GRAPHS'=>					_('Graphs'),
 	'S_HOST'=>					_('Host'),
-	'S_DNS'=>					_('DNS'),
-	'S_PORT'=>					_('Port'),
-	'S_TEMPLATE'=>					_('Template'),
-	'S_GROUPS'=>					_('Groups'),
 	'S_HOST_GROUP'=>				_('Host group'),
 	'S_UPDATE'=>					_('Update'),
 	'S_INTERFACES' =>				_('Interfaces'),
-
-// templates.php
-	'S_LINKED_TEMPLATES'=>			_('Linked templates'),
-	'S_LINKED_TO'=>				_('Linked to'),
-	'S_DELETE_AND_CLEAR'=>			_('Delete and clear'),
-	'S_DELETE_SELECTED_TEMPLATES_Q'=>	_('Delete selected templates?'),
-	'S_WARNING_THIS_DELETE_TEMPLATES_AND_CLEAR'=>_('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
-	'S_DELETE_TEMPLATE_Q' => _('Delete template?'),
-	'S_DELETE_AND_CLEAR_TEMPLATE_Q' => _('Delete and clear template? (Warning: all linked hosts will be cleared!)'),
-
-	'S_TEMPLATES'=>				_('Templates'),
-	'S_UNLINK'=>				_('Unlink'),
-	'S_UNLINK_AND_CLEAR'=>			_('Unlink and clear'),
 
 //	items.php
 	'S_DESCRIPTION'=>					_('Description'),

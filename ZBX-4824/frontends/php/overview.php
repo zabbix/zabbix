@@ -98,7 +98,7 @@ if(isset($_REQUEST['select']) && ($_REQUEST['select']!='')){
 	$form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
 
 	$cmbType = new CComboBox('type', $_REQUEST['type'], 'submit()');
-	$cmbType->addItem(SHOW_TRIGGERS, S_TRIGGERS);
+	$cmbType->addItem(SHOW_TRIGGERS, _('Triggers'));
 	$cmbType->addItem(SHOW_DATA, _('Data'));
 	$form->addItem(array(SPACE._('Type').SPACE, $cmbType));
 
