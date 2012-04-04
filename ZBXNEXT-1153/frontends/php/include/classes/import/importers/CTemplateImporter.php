@@ -81,6 +81,19 @@ class CTemplateImporter extends CImporter {
 
 			}
 		} while (!empty($independentTemplates));
+
+		// if there are templates left in $templates, then they have unresolved references
+		foreach ($templates as $template) {
+			$unresolvedReferences = array();
+			foreach ($template['templates'] as $linkedTemplate) {
+				if (!$this->referencer->resolveTemplate($linkedTemplate['name'])) {
+					$unresolvedReferences[] = $linkedTemplate['name'];
+				}
+			}
+			throw new Exception(_n('Cannot import template "%2$s", linked template "%3$s" does not exist.',
+				'Cannot import template "%2$s", linked templates "%3$s" does not exist.',
+				count($unresolvedReferences), $template['host'], implode(', ', $unresolvedReferences)));
+		}
 	}
 
 	/**
