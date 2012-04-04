@@ -64,14 +64,6 @@ class CConfigurationImport {
 	 */
 	protected $interfacesCache = array();
 
-	/**
-	 * Array of hosts/templates that were created or updated,
-	 * so it's related items and discovery rules should be processed too.
-	 *
-	 * @var array
-	 */
-	protected $processedHosts = array();
-
 
 	/**
 	 * Constructor.
@@ -393,98 +385,9 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processTemplates() {
-		$templates = $this->getFormattedTemplates();
-		if (empty($templates)) {
-			return;
-		}
-		$templates = zbx_toHash($templates, 'host');
-
-		foreach ($templates as &$template) {
-			// screens are not needed in this method
-			unset($template['screens']);
-
-			// if we don't need to update linkage, unset templates
-			if (!$this->options['templateLinkage']['createMissing']) {
-				unset($template['templates']);
-			}
-		}
-		unset($template);
-
-
-		$orderedList = array();
-		$templatesInSource = array_keys($templates);
-		$parentTemplateRefs = array();
-		foreach ($templates as $template) {
-			$parentTemplateRefs[$template['host']] = array();
-
-			if (!empty($template['templates'])) {
-				foreach ($template['templates'] as $ref) {
-					// if the template already exists in the system, we skip it
-					if ($this->referencer->resolveTemplate($ref['name'])) {
-						continue;
-					}
-					else {
-						// if the template is not in the system and not in the imported data, throw an error
-						if (!in_array($ref['name'], $templatesInSource)) {
-							throw new Exception(_s('Template "%1$s" does not exist.', $ref['name']));
-						}
-						$parentTemplateRefs[$template['host']][$ref['name']] = $ref['name'];
-					}
-				}
-			}
-		}
-
-		// we loop through all templates looking for any without parent templates
-		// when one is found it's pushed to ordered list and removed from the list of parent templates of all
-		// other templates
-		while (!empty($parentTemplateRefs)) {
-			$templateWithoutParents = false;
-			foreach ($parentTemplateRefs as $template => $refs) {
-				if (empty($refs)) {
-					$templateWithoutParents = $template;
-					$orderedList[] = $template;
-					unset($parentTemplateRefs[$template]);
-					break;
-				}
-			}
-			if (!$templateWithoutParents) {
-				throw new Exception('Circular template reference.');
-			}
-
-			foreach ($parentTemplateRefs as $template => $refs) {
-				unset($parentTemplateRefs[$template][$templateWithoutParents]);
-			}
-		}
-
-		foreach ($orderedList as $name) {
-			$template = $templates[$name];
-			foreach ($template['groups'] as $gnum => $group) {
-				if (!$this->referencer->resolveGroup($group['name'])) {
-					throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
-				}
-				$template['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
-			}
-			if (isset($template['templates'])) {
-				foreach ($template['templates'] as $tnum => $parentTemplate) {
-					$template['templates'][$tnum] = array(
-						'templateid' => $this->referencer->resolveTemplate($parentTemplate['name'])
-					);
-				}
-			}
-
-			if ($this->referencer->resolveTemplate($template['host'])) {
-				if ($this->options['templates']['updateExisting']) {
-					$template['templateid'] = $this->referencer->resolveTemplate($template['host']);
-					API::Template()->update($template);
-					$this->processedHosts[$template['host']] = $template['host'];
-				}
-			}
-			elseif ($this->options['templates']['createMissing']) {
-				$newHostIds = API::Template()->create($template);
-				$templateid = reset($newHostIds['templateids']);
-				$this->referencer->addTemplateRef($template['host'], $templateid);
-				$this->processedHosts[$template['host']] = $template['host'];
-			}
+		if ($templates = $this->getFormattedTemplates()) {
+			$mapImporter = new CTemplateImporter($this->options, $this->referencer);
+			$mapImporter->import($templates);
 		}
 	}
 
@@ -581,13 +484,13 @@ class CConfigurationImport {
 				$this->referencer->addHostRef($hostsToCreate[$hnum]['host'], $hostid);
 			}
 			foreach ($hostsToCreate as $host) {
-				$this->processedHosts[$host['host']] = $host['host'];
+				$this->referencer->addProcessedHost($host['host']);
 			}
 		}
 		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
 			API::Host()->update($hostsToUpdate);
 			foreach ($hostsToUpdate as $host) {
-				$this->processedHosts[$host['host']] = $host['host'];
+				$this->referencer->addProcessedHost($host['host']);
 			}
 		}
 
@@ -631,7 +534,7 @@ class CConfigurationImport {
 
 		$applicationsToCreate = array();
 		foreach ($allApplciations as $host => $applications) {
-			if (!isset($this->processedHosts[$host])) {
+			if (!$this->referencer->isProcessedHost($host)) {
 				continue;
 			}
 
@@ -665,7 +568,7 @@ class CConfigurationImport {
 		$itemsToCreate = array();
 		$itemsToUpdate = array();
 		foreach ($allItems as $host => $items) {
-			if (!isset($this->processedHosts[$host])) {
+			if (!$this->referencer->isProcessedHost($host)) {
 				continue;
 			}
 
@@ -726,7 +629,7 @@ class CConfigurationImport {
 
 		// unset rules that are related to hosts we did not process
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
-			if (!isset($this->processedHosts[$host])) {
+			if (!$this->referencer->isProcessedHost($host)) {
 				unset($allDiscoveryRules[$host]);
 			}
 		}
@@ -1318,7 +1221,7 @@ class CConfigurationImport {
 
 							if (empty($db_items)) {
 								throw new Exception(_s('Cannot find item "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['host'].':'.$screenitem['resource']['key_'], $screen['name']));
+										$nodeCaption.$screenitem['resource']['host'].':'.$screenitem['resource']['key'], $screen['name']));
 							}
 
 							$tmp = reset($db_items);
