@@ -115,7 +115,7 @@ class CTemplateImporter extends CImporter {
 			foreach ($template['templates'] as $linkedTemplate) {
 				$checked = array($name);
 				if ($circTemplates = $this->checkCircularRecursive($linkedTemplate, $templates, $checked)) {
-					throw new Exception(_s('Circular reference in templates: "%1$s".', implode('->', $circTemplates)));
+					throw new Exception(_s('Circular references in templates: %1$s.', implode(' - ', $circTemplates)));
 				}
 			}
 		}
