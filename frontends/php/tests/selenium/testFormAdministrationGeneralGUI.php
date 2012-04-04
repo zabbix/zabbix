@@ -218,7 +218,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		// this test will fail as there is no GUI conf form after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "0" for "search_limit" field.'));
+		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "0" for "Search/Filter elements limit" field: must be between 1 and 999999.'));
 
 		// Check to enter -1 value
 		$this->dropdown_select_wait('configDropDown', 'GUI');
@@ -230,7 +230,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		// this test will fail as there is no GUI conf form after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "-1" for "search_limit" field.'));
+		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "-1" for "Search/Filter elements limit" field: must be between 1 and 999999.'));
 
 		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
