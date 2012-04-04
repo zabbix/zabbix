@@ -7,7 +7,6 @@
 		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
 		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
-		<input type="hidden" id="items_#{number}_periods_cnt" name="items[#{number}][periods_cnt]" value="#{periods_cnt}">
 		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
 	</td>
 
@@ -20,11 +19,11 @@
 	<td>
 		<span id="items_#{number}_name" class="link"
 			onclick="PopUp('popup.php?writeonly=1&dstfrm=graphForm&dstfld1=items_#{number}_itemid&dstfld2=items_#{number}_name'
-				<?php if (!empty($this->data['parent_discoveryid'])) { ?>
+				<?php if (!empty($this->data['parent_discoveryid'])): ?>
 				+ '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
-				<?php } else { ?>
+				<?php else: ?>
 				+ '&srctbl=items'
-				<?php } ?>
+				<?php endif; ?>
 				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
 				+ '<?php echo !empty($this->data['monitored_hosts']) ? '&real_hosts=1' : ''; ?>'
 				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
@@ -34,63 +33,63 @@
 	</td>
 
 	<!-- type -->
-	<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED) { ?>
+	<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
 	<td>
 		<select id="items_#{number}_type" name="items[#{number}][type]" class="input select">
 			<option value="<?php echo GRAPH_ITEM_SIMPLE; ?>"><?php echo _('Simple'); ?></option>
 			<option value="<?php echo GRAPH_ITEM_SUM; ?>"><?php echo _('Graph sum'); ?></option>
 		</select>
 	</td>
-	<?php } else { ?>
+	<?php else: ?>
 	<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?php echo GRAPH_ITEM_SIMPLE; ?>">
-	<?php } ?>
+	<?php endif; ?>
 
 	<!-- function -->
 	<td>
 		<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]" class="input select">
-		<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED) { ?>
+		<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
 				<option value="<?php echo CALC_FNC_MIN; ?>"><?php echo _('min'); ?></option>
 				<option value="<?php echo CALC_FNC_AVG; ?>"><?php echo _('avg'); ?></option>
 				<option value="<?php echo CALC_FNC_MAX; ?>"><?php echo _('max'); ?></option>
 				<option value="<?php echo CALC_FNC_LST; ?>"><?php echo _('last'); ?></option>
-		<?php }
-			else {
-				if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) { ?>
+		<?php else:
+				if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
 					<option value="<?php echo CALC_FNC_ALL; ?>"><?php echo _('all'); ?></option>
-		<?php } ?>
+		<?php endif; ?>
 				<option value="<?php echo CALC_FNC_MIN; ?>"><?php echo _('min'); ?></option>
 				<option value="<?php echo CALC_FNC_AVG; ?>"><?php echo _('avg'); ?></option>
 				<option value="<?php echo CALC_FNC_MAX; ?>"><?php echo _('max'); ?></option>
-		<?php } ?>
+		<?php endif; ?>
 		</select>
 	</td>
 
 	<!-- drawtype -->
-	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) { ?>
+	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
 	<td>
 		<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]" class="input select">
-		<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
+		<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL):
 				$drawtypes = graph_item_drawtypes();
-				foreach ($drawtypes as $drawtype) { ?>
+				foreach ($drawtypes as $drawtype): ?>
 					<option value="<?php echo $drawtype; ?>"><?php echo graph_item_drawtype2str($drawtype); ?></option>
-		<?php }} ?>
+				<?php endforeach; ?>
+		<?php endif; ?>
 		</select>
 	</td>
-	<?php } else { ?>
+	<?php else: ?>
 	<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
-	<?php } ?>
+	<?php endif; ?>
 
 	<!-- yaxisside -->
-	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED) { ?>
+	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED): ?>
 	<td>
 		<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" class="input select">
 			<option value="<?php echo GRAPH_YAXIS_SIDE_LEFT; ?>"><?php echo _('Left'); ?></option>
 			<option value="<?php echo GRAPH_YAXIS_SIDE_RIGHT; ?>"><?php echo _('Right'); ?></option>
 		</select>
 	</td>
-	<?php } else { ?>
+	<?php else: ?>
 	<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
-	<?php } ?>
+	<?php endif; ?>
 
 	<!-- color -->
 	<td>
@@ -107,7 +106,7 @@
 </tr>
 </script>
 <script type="text/javascript">
-	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, periods_cnt) {
+	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color) {
 		var item = [];
 		item['number'] = number;
 		item['number_nr'] = number + 1;
@@ -120,7 +119,6 @@
 		item['drawtype'] = drawtype;
 		item['yaxisside'] = yaxisside;
 		item['color'] = color;
-		item['periods_cnt'] = periods_cnt;
 		item['sortorder'] = number;
 
 		var itemTpl = new Template(jQuery('#itemTpl').html());
@@ -153,7 +151,6 @@
 			item['calc_fnc'] = null;
 			item['drawtype'] = null;
 			item['yaxisside'] = null;
-			item['periods_cnt'] = 0;
 			item['sortorder'] = item['number'];
 			item['color'] = getRandomColorHex();
 
@@ -256,45 +253,46 @@
 
 	initSortable();
 
-	<?php if ($this->data['isDataValid']) { ?>
-		jQuery(document).ready(function() {
-			jQuery('#tab_previewTab').click(function() {
-				var name = 'chart3.php';
-				var src = '&name=' + jQuery('#name').val()
-							+ '&width=' + jQuery('#width').val()
-							+ '&height=' + jQuery('#height').val()
-							+ '&graphtype=' + jQuery('#graphtype').val()
-							+ '&legend=' + (jQuery('#legend').is(':checked') ? 1 : 0);
+	jQuery(document).ready(function() {
+		jQuery('#tab_previewTab').click(function() {
+			var name = 'chart3.php';
+			var src = '&name=' + jQuery('#name').val()
+						+ '&width=' + jQuery('#width').val()
+						+ '&height=' + jQuery('#height').val()
+						+ '&graphtype=' + jQuery('#graphtype').val()
+						+ '&legend=' + (jQuery('#legend').is(':checked') ? 1 : 0);
 
-				<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED) { ?>
-					name = 'chart7.php';
-					src += '&graph3d=' + (jQuery('#graph3d').is(':checked') ? 1 : 0);
+			<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
+				name = 'chart7.php';
+				src += '&graph3d=' + (jQuery('#graph3d').is(':checked') ? 1 : 0);
 
-				<?php } else { ?>
-					src += '&ymin_type=' + jQuery('#ymin_type').val()
-								+ '&ymax_type=' + jQuery('#ymax_type').val()
-								+ '&yaxismin=' + jQuery('#yaxismin').val()
-								+ '&yaxismax=' + jQuery('#yaxismax').val()
-								+ '&ymin_itemid=' + jQuery('#ymin_itemid').val()
-								+ '&ymax_itemid=' + jQuery('#ymax_itemid').val()
-								+ '&showworkperiod=' + (jQuery('#showworkperiod').is(':checked') ? 1 : 0)
-								+ '&showtriggers=' + (jQuery('#showtriggers').is(':checked') ? 1 : 0)
-								+ '&percent_left=' + jQuery('#percent_left').val()
-								+ '&percent_right=' + jQuery('#percent_right').val();
-				<?php } ?>
+			<?php else: ?>
+				<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
+					src += '&percent_left=' + jQuery('#percent_left').val()
+							+ '&percent_right=' + jQuery('#percent_right').val();
+				<?php endif; ?>
 
-				jQuery('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
-					if (!jQuery.isEmptyObject(value) && value.name != null) {
-						src += '&' + value.name + '=' + value.value;
-					}
-				});
+				src += '&ymin_type=' + jQuery('#ymin_type').val()
+							+ '&ymax_type=' + jQuery('#ymax_type').val()
+							+ '&yaxismin=' + jQuery('#yaxismin').val()
+							+ '&yaxismax=' + jQuery('#yaxismax').val()
+							+ '&ymin_itemid=' + jQuery('#ymin_itemid').val()
+							+ '&ymax_itemid=' + jQuery('#ymax_itemid').val()
+							+ '&showworkperiod=' + (jQuery('#showworkperiod').is(':checked') ? 1 : 0)
+							+ '&showtriggers=' + (jQuery('#showtriggers').is(':checked') ? 1 : 0);
+			<?php endif; ?>
 
-				jQuery('#previewTab img').attr('src', 'styles/<?php echo getUserThemeName(); ?>/images/preloader.gif');
-				jQuery('<img />').attr('src', name + '?period=3600' + src).load(function() {
-					jQuery('#previewChar img').remove();
-					jQuery('#previewChar').append(jQuery(this));
-				});
+			jQuery('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
+				if (!jQuery.isEmptyObject(value) && value.name != null) {
+					src += '&' + value.name + '=' + value.value;
+				}
+			});
+
+			jQuery('#previewTab img').attr('src', 'styles/<?php echo getUserThemeName(); ?>/images/preloader.gif');
+			jQuery('<img />').attr('src', name + '?period=3600' + src).load(function() {
+				jQuery('#previewChar img').remove();
+				jQuery('#previewChar').append(jQuery(this));
 			});
 		});
-	<?php } ?>
+	});
 </script>

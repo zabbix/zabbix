@@ -43,7 +43,7 @@ class CGraphPrototype extends CZBXAPI {
 		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
-		$sortColumns = array('graphid', 'name');
+		$sortColumns = array('graphid', 'name', 'graphtype');
 
 		// allowed output options for [ select_* ] params
 		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);

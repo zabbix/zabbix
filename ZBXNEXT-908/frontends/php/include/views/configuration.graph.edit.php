@@ -24,11 +24,17 @@ $graphWidget = new CWidget();
 
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPH PROTOTYPES'));
-	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
+
+	if (!empty($this->data['hostid'])) {
+		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
+	}
 }
 else {
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPHS'));
-	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
+
+	if (!empty($this->data['hostid'])) {
+		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
+	}
 }
 
 // create form
@@ -36,6 +42,9 @@ $graphForm = new CForm();
 $graphForm->setName('graphForm');
 $graphForm->addVar('form', $this->data['form']);
 $graphForm->addVar('form_refresh', $this->data['form_refresh']);
+if (!empty($this->data['hostid'])) {
+	$graphForm->addVar('hostid', $this->data['hostid']);
+}
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }
@@ -101,13 +110,9 @@ if (!empty($this->data['items'])) {
 			$item['yaxisside'] = 0;
 		}
 
-		if (empty($item['periods_cnt'])) {
-			$item['periods_cnt'] = 0;
-		}
-
 		insert_js('loadItem('.$rowNumber.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
 			CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
-			$item['yaxisside'].', \''.$item['color'].'\', '.$item['periods_cnt'].');',
+			$item['yaxisside'].', \''.$item['color'].'\');',
 			true
 		);
 	}
