@@ -19,135 +19,6 @@
 **/
 ?>
 <?php
-function add_service($name, $triggerid, $algorithm, $showsla, $goodsla, $sortorder, $service_times = array(), $parentid, $childs) {
-	foreach ($childs as $child) {
-		if (bccomp($parentid, $child['serviceid']) == 0) {
-			error(_('Service cannot be parent and child at the same time.'));
-			return false;
-		}
-	}
-
-	// check if parent have trigger
-	if (!empty($triggerid) && !empty($parentid)) {
-		$parentTrigger = DBfetch(DBselect('SELECT s.triggerid FROM services s WHERE s.serviceid='.$parentid));
-		if (!empty($parentTrigger['triggerid'])) {
-			error(_('Cannot save service with trigger when parent service trigger exist.'));
-			return false;
-		}
-	}
-
-	if (is_null($triggerid) || $triggerid == 0) {
-		$triggerid = 'NULL';
-	}
-
-	$serviceid = get_dbid('services', 'serviceid');
-
-	$result = DBexecute(
-		'INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
-		' VALUES ('.$serviceid.','.zbx_dbstr($name).',0,'.$triggerid.','.$algorithm.','.$showsla.','.$goodsla.','.$sortorder.')'
-	);
-	if (!$result) {
-		return false;
-	}
-
-	// removes all links with current serviceid
-	remove_service_links($serviceid);
-
-	// add parent
-	$result = ($parentid != 0) ? add_service_link($serviceid, $parentid, 0) : true;
-
-	// add childs
-	foreach ($childs as $child) {
-		if (!isset($child['soft']) || empty($child['soft'])) {
-			$child['soft'] = 0;
-		}
-		$result = add_service_link($child['serviceid'], $serviceid, $child['soft']);
-	}
-
-	if (!$result) {
-		return false;
-	}
-
-	// updating status to all services by the dependency
-	update_services_status_all();
-
-	DBExecute('DELETE FROM services_times WHERE serviceid='.$serviceid);
-
-	foreach ($service_times as $val) {
-		$timeid = get_dbid('services_times', 'timeid');
-		$result = DBexecute(
-			'INSERT INTO services_times (timeid,serviceid,type,ts_from,ts_to,note)'.
-			' VALUES ('.$timeid.','.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')'
-		);
-		if (!$result) {
-			delete_service($serviceid);
-			return false;
-		}
-	}
-	return $serviceid;
-}
-
-function update_service($serviceid, $name, $triggerid, $algorithm, $showsla, $goodsla, $sortorder, $service_times = array(), $parentid, $childs) {
-	foreach ($childs as $child) {
-		if (bccomp($parentid, $child['serviceid']) == 0) {
-			error(_('Service cannot be parent and child at the same time.'));
-			return false;
-		}
-	}
-
-	// check if parent have trigger
-	if (!empty($triggerid) && !empty($parentid)) {
-		$parentTrigger = DBfetch(DBselect('SELECT s.triggerid FROM services s WHERE s.serviceid='.$parentid));
-		if (!empty($parentTrigger['triggerid'])) {
-			error(_('Cannot save service with trigger when parent service trigger exist.'));
-			return false;
-		}
-	}
-
-	// removes all links with current serviceid
-	remove_service_links($serviceid);
-
-	// add parent
-	$result = ($parentid != 0) ? add_service_link($serviceid, $parentid, 0) : true;
-
-	// add childs
-	foreach ($childs as $child) {
-		if (empty($child['soft']) || !isset($child['soft'])) {
-			$child['soft'] = 0;
-		}
-		$result = add_service_link($child['serviceid'], $serviceid, $child['soft']);
-	}
-
-	if (!$result) {
-		return false;
-	}
-
-	if (is_null($triggerid) || $triggerid == 0) {
-		$triggerid = 'NULL';
-	}
-
-	$result = DBexecute(
-		'UPDATE services'.
-		' SET name='.zbx_dbstr($name).',triggerid='.$triggerid.',status=0,algorithm='.$algorithm.',sortorder='.$sortorder.',showsla='.$showsla
-			.(!empty($goodsla) ? ',goodsla='.$goodsla : '').
-		' WHERE serviceid='.$serviceid
-	);
-
-	// updating status to all services by the dependency
-	update_services_status_all();
-
-	DBexecute('DELETE FROM services_times WHERE serviceid='.$serviceid);
-
-	foreach ($service_times as $val) {
-		$timeid = get_dbid('services_times', 'timeid');
-		DBexecute(
-			'INSERT INTO services_times (timeid,serviceid,type,ts_from,ts_to,note)'.
-			' VALUES ('.$timeid.','.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')'
-		);
-	}
-
-	return $result;
-}
 
 function is_service_hardlinked($serviceid) {
 	$result = DBselect(
@@ -199,16 +70,6 @@ function get_service_status($serviceid, $algorithm, $triggerid = null, $status =
  * Comments: !!! Don't forget sync code with C !!!                            *
  *                                                                            *
  ******************************************************************************/
-function delete_service($serviceid) {
-	$sql = 'DELETE FROM services WHERE serviceid='.$serviceid;
-	if (!$result = DBexecute($sql)) {
-		return $result;
-	}
-
-	update_services_status_all();
-
-	return $result;
-}
 
 // Return TRUE if triggerid is a reason why the service is not OK
 // Warning: recursive function
@@ -235,32 +96,6 @@ function does_service_depend_on_the_service($serviceid, $serviceid2) {
 		}
 	}
 	return false;
-}
-
-function add_service_link($servicedownid, $serviceupid, $softlink) {
-	if ($softlink == 0 && is_service_hardlinked($servicedownid)) {
-		error(_('Cannot link hardlinked service.'));
-		return false;
-	}
-
-	if (bccomp($servicedownid, $serviceupid) == 0) {
-		error(_('Cannot link service to itself.'));
-		return false;
-	}
-
-	$linkid = get_dbid('services_links', 'linkid');
-
-	$result = DBexecute('INSERT INTO services_links (linkid,servicedownid,serviceupid,soft) values ('.$linkid.','.$servicedownid.','.$serviceupid.','.$softlink.')');
-
-	if (!$result) {
-		return $result;
-	}
-
-	return $linkid;
-}
-
-function remove_service_links($serviceid) {
-	DBExecute('DELETE FROM services_links WHERE serviceupid='.$serviceid.' OR (servicedownid='.$serviceid.' AND soft=0)');
 }
 
 function get_last_service_value($serviceid, $clock) {
