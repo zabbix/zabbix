@@ -101,22 +101,24 @@ if (!empty($_REQUEST['serviceid'])) {
 /*
  * Actions
  */
+
+// delete
+if (isset($_REQUEST['delete']) && isset($_REQUEST['serviceid'])) {
+	$result = API::Service()->delete($service['serviceid']);
+	show_messages($result, _('Service deleted'), _('Cannot delete service'));
+	add_audit_if($result, AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$service['name'].'] id ['.$service['serviceid'].']');
+	unset($service);
+	if ($result) {
+		unset($_REQUEST['form']);
+	}
+}
+
 if (isset($_REQUEST['form'])) {
 	$_REQUEST['showsla'] = get_request('showsla', 0);
 	$result = false;
 
-	// delete
-	if (isset($_REQUEST['delete']) && isset($_REQUEST['serviceid'])) {
-		$result = delete_service($service['serviceid']);
-		show_messages($result, _('Service deleted'), _('Cannot delete service'));
-		add_audit_if($result, AUDIT_ACTION_DELETE, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$service['name'].'] id ['.$service['serviceid'].']');
-		unset($service);
-		if ($result) {
-			unset($_REQUEST['form']);
-		}
-	}
 	// save
-	elseif (isset($_REQUEST['save_service'])) {
+	if (isset($_REQUEST['save_service'])) {
 		DBstart();
 
 		$children = get_request('children', array());
