@@ -433,7 +433,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			}
 			else {
 				$list->addItem(array(
-					new CLink(_('Items'), 'items.php?hostid='.$dbHost['hostid']),
+					new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$dbHost['hostid']),
 					' ('.$dbHost['items'].')'
 				));
 			}

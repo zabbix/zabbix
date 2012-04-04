@@ -33,7 +33,7 @@ class testFormTemplate extends CWebTest {
 		$this->input_type('template_name', $this->template);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template added');
 		$this->ok($this->template);
 	}
@@ -48,7 +48,7 @@ class testFormTemplate extends CWebTest {
 		$this->input_type('template_name', $template);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template added');
 		$this->ok($template);
 	}
@@ -60,7 +60,7 @@ class testFormTemplate extends CWebTest {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template updated');
 		$this->ok($this->template);
 	}
@@ -74,7 +74,7 @@ class testFormTemplate extends CWebTest {
 		$this->input_type('template_name', $this->template_tmp);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template updated');
 	}
 
@@ -107,7 +107,7 @@ class testFormTemplate extends CWebTest {
 		$this->input_type('template_name', 'Template_Linux');
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('No groups for template');
 		$this->assertEquals(1, DBcount("select * from hosts where host='Template_Linux'"));
 	}
@@ -126,7 +126,7 @@ class testFormTemplate extends CWebTest {
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template deleted');
 
 		// check if the macros have been deleted
@@ -145,7 +145,7 @@ class testFormTemplate extends CWebTest {
 		$this->input_type('template_name', $this->template_tmp);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template added');
 	}
 
@@ -160,7 +160,7 @@ class testFormTemplate extends CWebTest {
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template deleted');
 	}
 
@@ -175,7 +175,7 @@ class testFormTemplate extends CWebTest {
 		$this->input_type('template_name', $this->template.'_fullclone');
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template added');
 	}
 
@@ -190,7 +190,7 @@ class testFormTemplate extends CWebTest {
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
-		$this->assertTitle('Templates');
+		$this->assertTitle('Configuration of templates');
 		$this->ok('Template deleted');
 	}
 }

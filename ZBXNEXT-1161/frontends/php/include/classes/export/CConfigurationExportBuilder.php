@@ -237,7 +237,6 @@ class CConfigurationExportBuilder {
 			$data = array(
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
-				'multiplier' => $discoveryRule['multiplier'],
 				'snmp_community' => $discoveryRule['snmp_community'],
 				'snmp_oid' => $discoveryRule['snmp_oid'],
 				'key' => $discoveryRule['key_'],
@@ -257,6 +256,8 @@ class CConfigurationExportBuilder {
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
 				'port' => $discoveryRule['port'],
+				'filter' => $discoveryRule['filter'],
+				'lifetime' => $discoveryRule['lifetime'],
 				'description' => $discoveryRule['description'],
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),

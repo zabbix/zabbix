@@ -157,8 +157,6 @@ function make_favorite_maps() {
 }
 
 function make_system_status($filter) {
-	$config = select_config();
-
 	$ackParams = array();
 	if (!empty($filter['screenid'])) {
 		$ackParams['screenid'] = $filter['screenid'];
@@ -181,10 +179,11 @@ function make_system_status($filter) {
 		'nodeids' => get_current_nodeid(),
 		'monitored_hosts' => 1,
 		'groupids' => $filter['groupids'],
-		'output' => API_OUTPUT_EXTEND
+		'output' => array('groupid', 'name'),
+		'preservekeys' => true
 	);
 	$groups = API::HostGroup()->get($options);
-	$groups = zbx_toHash($groups, 'groupid');
+	// we need natural sort
 	order_result($groups, 'name');
 
 	$groupids = array();
@@ -204,22 +203,24 @@ function make_system_status($filter) {
 	$options = array(
 		'nodeids' => get_current_nodeid(),
 		'groupids' => $groupids,
-		'monitored' => 1,
+		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'skipDependent' => 1,
-		'expandDescription' => 1,
+		'skipDependent' => true,
+		'expandDescription' => true,
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		),
+		'sortfield' => 'lastchange',
+		'sortorder' => ZBX_SORT_DOWN,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('name')
+		'selectHosts' => array('name'),
+		'preservekeys' => true
 	);
 	if ($filter['extAck'] == EXTACK_OPTION_UNACK) {
 		$options['withLastEventUnacknowledged'] = 1;
 	}
 	$triggers = API::Trigger()->get($options);
-	order_result($triggers, 'lastchange', ZBX_SORT_DOWN);
 
 	foreach ($triggers as $trigger) {
 		$options = array(
@@ -231,10 +232,11 @@ function make_system_status($filter) {
 				'value_changed' => TRIGGER_VALUE_CHANGED_YES
 			),
 			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => 1,
+			'nopermissions' => true,
 			'select_acknowledges' => API_OUTPUT_COUNT,
 			'sortfield' => 'eventid',
 			'sortorder' => ZBX_SORT_DOWN,
+			'preservekeys' => true,
 			'limit' => 1
 		);
 		$events = API::Event()->get($options);
@@ -242,7 +244,7 @@ function make_system_status($filter) {
 			$trigger['event'] = array(
 				'value_changed' => 0,
 				'value' => $trigger['value'],
-				'acknowledged' => 1,
+				'acknowledged' => true,
 				'clock' => $trigger['lastchange']
 			);
 		}
@@ -251,21 +253,25 @@ function make_system_status($filter) {
 		}
 
 		foreach ($trigger['groups'] as $group) {
-			if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
-			}
-			if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30 && !$trigger['event']['acknowledged']) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers_unack'][] = $trigger;
+			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
+				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
+
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30) {
+					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
+				}
 			}
 
-			$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
-			if (!$trigger['event']['acknowledged']) {
+			if (in_array($filter['extAck'], array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))
+					&& !$trigger['event']['acknowledged']) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
+
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30) {
+					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers_unack'][] = $trigger;
+				}
 			}
 		}
 	}
 	unset($triggers);
-	order_result($groups, 'name');
 
 	foreach ($groups as $group) {
 		$group_row = new CRow();
@@ -273,134 +279,46 @@ function make_system_status($filter) {
 			$group_row->addItem(get_node_name_by_elid($group['groupid']));
 		}
 
-		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
+		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
 		$group_row->addItem($name);
 
 		foreach ($group['tab_priority'] as $severity => $data) {
 			if (!is_null($filter['severity']) && !isset($filter['severity'][$severity])) {
 				continue;
 			}
-			if ($data['count'] && in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
-				$table_inf = new CTableInfo();
-				$table_inf->setAttribute('style', 'width: 400px;');
-				$table_inf->setHeader(array(
-					is_show_all_nodes() ? _('Node') : null,
-					_('Host'),
-					_('Issue'),
-					_('Age'),
-					_('Info'),
-					$config['event_ack_enable'] ? _('Ack') : null,
-					_('Actions')
-				));
 
-				foreach ($data['triggers'] as $trigger) {
-					$event = $trigger['event'];
-					$ack = getEventAckState($event, true, true, $ackParams);
-
-					if (isset($event['eventid'])) {
-						$actions = get_event_actions_status($event['eventid']);
-					}
-					else {
-						$actions = _('no data');
-					}
-
-					// unknown triggers
-					$unknown = SPACE;
-					if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
-						$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-						$unknown->setHint($trigger['error'], '', 'on');
-					}
-
-					$trigger['hostname'] = $trigger['hosts'][0]['name'];
-					$table_inf->addRow(array(
-						get_node_name_by_elid($trigger['triggerid']),
-						$trigger['hostname'],
-						new CCol($trigger['description'], getSeverityStyle($trigger['priority'])),
-						zbx_date2age($event['clock']),
-						$unknown,
-						$config['event_ack_enable'] ? $ack : null,
-						$actions
-					));
-				}
+			$allTriggersNum = $data['count'];
+			if ($allTriggersNum) {
+				$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
+				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams));
 			}
 
-			if ($data['count_unack'] && in_array($filter['extAck'], array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))) {
-				$table_inf_unack = new CTableInfo();
-				$table_inf_unack->setAttribute('style', 'width: 400px;');
-				$table_inf_unack->setHeader(array(
-					is_show_all_nodes() ? _('Node') : null,
-					_('Host'),
-					_('Issue'),
-					_('Age'),
-					_('Info'),
-					$config['event_ack_enable'] ? _('Ack') : null,
-					_('Actions')
-				));
-
-				foreach ($data['triggers_unack'] as $trigger) {
-					$event = $trigger['event'];
-					$ack = getEventAckState($event, true, true, $ackParams);
-
-					if (isset($event['eventid'])) {
-						$actions = get_event_actions_status($event['eventid']);
-					}
-					else {
-						$actions = _('no data');
-					}
-
-					// unknown triggers
-					$unknown = SPACE;
-					if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
-						$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-						$unknown->setHint($trigger['error'], '', 'on');
-					}
-
-					$trigger['hostname'] = $trigger['hosts'][0]['name'];
-					$table_inf_unack->addRow(array(
-						get_node_name_by_elid($trigger['triggerid']),
-						$trigger['hostname'],
-						new CCol($trigger['description'], getSeverityStyle($trigger['priority'])),
-						zbx_date2age($event['clock']),
-						$unknown,
-						$config['event_ack_enable'] ? $ack : null,
-						$actions
-					));
-				}
+			$unackTriggersNum = $data['count_unack'];
+			if ($unackTriggersNum) {
+				$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
+				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
 			}
 
 			switch ($filter['extAck']) {
 				case EXTACK_OPTION_ALL:
-					$trigger_count = new CSpan($data['count'], 'pointer');
-					if ($data['count']) {
-						$trigger_count->setHint($table_inf);
-					}
+					$group_row->addItem(getSeverityCell($severity, $allTriggersNum, !$allTriggersNum));
+					break;
 
-					$group_row->addItem(new CCol($trigger_count, getSeverityStyle($severity, $data['count'])));
-					break;
 				case EXTACK_OPTION_UNACK:
-					$trigger_count = $data['count_unack'];
-					if ($trigger_count) {
-						$trigger_count = new CSpan($data['count_unack'], 'pointer red bold');
-						$trigger_count->setHint($table_inf_unack);
-					}
-					$group_row->addItem(new CCol($trigger_count, getSeverityStyle($severity, $data['count_unack'])));
+					$group_row->addItem(getSeverityCell($severity, $unackTriggersNum, !$unackTriggersNum));
 					break;
+
 				case EXTACK_OPTION_BOTH:
-					if ($data['count_unack']) {
-						$unack_count = new CSpan($data['count_unack'], 'bold red pointer');
-						$unack_count->setHint($table_inf_unack);
-						$unack_count = new CSpan(array($unack_count, SPACE._('of').SPACE));
+					if ($unackTriggersNum) {
+						$span = new Cspan(SPACE._('of').SPACE);
+						$unackTriggersNum = new CSpan($unackTriggersNum);
 					}
 					else {
-						$unack_count = null;
+						$span = null;
+						$unackTriggersNum = null;
 					}
 
-					$trigger_count = new CSpan($data['count'], 'pointer');
-					if ($data['count']) {
-						$trigger_count->setHint($table_inf);
-					}
-
-					$group_row->addItem(new CCol(array($unack_count, $trigger_count), getSeverityStyle($severity, $data['count'])));
+					$group_row->addItem(getSeverityCell($severity, array($unackTriggersNum, $span, $allTriggersNum), !$allTriggersNum));
 					break;
 			}
 		}
@@ -1355,4 +1273,61 @@ function make_screen_submenu() {
 	}
 	return $favScreens;
 }
-?>
+
+/**
+ * Generate table for dashboard triggers popup.
+ *
+ * @see make_system_status
+ *
+ * @param array $triggers
+ * @param array $ackParams
+ *
+ * @return CTableInfo
+ */
+function makeTriggersPopup(array $triggers, array $ackParams) {
+	$config = select_config();
+
+	$popupTable = new CTableInfo();
+	$popupTable->setAttribute('style', 'width: 400px;');
+	$popupTable->setHeader(array(
+		is_show_all_nodes() ? _('Node') : null,
+		_('Host'),
+		_('Issue'),
+		_('Age'),
+		_('Info'),
+		$config['event_ack_enable'] ? _('Ack') : null,
+		_('Actions')
+	));
+
+	foreach ($triggers as $trigger) {
+		$event = $trigger['event'];
+		$ack = getEventAckState($event, true, true, $ackParams);
+
+		if (isset($event['eventid'])) {
+			$actions = get_event_actions_status($event['eventid']);
+		}
+		else {
+			$actions = _('no data');
+		}
+
+		// unknown triggers
+		$unknown = SPACE;
+		if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN) {
+			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
+			$unknown->setHint($trigger['error'], '', 'on');
+		}
+
+		$trigger['hostname'] = $trigger['hosts'][0]['name'];
+		$popupTable->addRow(array(
+			get_node_name_by_elid($trigger['triggerid']),
+			$trigger['hostname'],
+			getSeverityCell($trigger['priority'], $trigger['description']),
+			zbx_date2age($event['clock']),
+			$unknown,
+			$config['event_ack_enable'] ? $ack : null,
+			$actions
+		));
+	}
+
+	return $popupTable;
+}
