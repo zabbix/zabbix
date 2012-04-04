@@ -390,19 +390,6 @@ $options = array(
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 
-
-$frmForm = new CForm();
-if(!isset($_REQUEST['form'])){
-	$frmForm->cleanItems();
-	$buttons = new CDiv(array(
-		new CSubmit('form', _('Create template')),
-		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")')
-	));
-	$frmForm->addItem($buttons);
-	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid']));
-}
-
-
 if (isset($_REQUEST['form'])) {
 	$template_wdgt->addPageHeader(_('CONFIGURATION OF TEMPLATES'));
 
@@ -414,6 +401,16 @@ if (isset($_REQUEST['form'])) {
 	$template_wdgt->addItem($templateForm->render());
 }
 else {
+	$frmForm = new CForm();
+
+	$frmForm->cleanItems();
+	$buttons = new CDiv(array(
+		new CSubmit('form', _('Create template')),
+		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=template")')
+	));
+	$frmForm->addItem($buttons);
+	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid']));
+
 	$template_wdgt->addPageHeader(_('CONFIGURATION OF TEMPLATES'), $frmForm);
 
 	$frmGroup = new CForm('get');

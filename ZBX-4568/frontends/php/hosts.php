@@ -590,18 +590,6 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = get_request('hostid', 0);
 
-
-$frmForm = new CForm();
-if (!isset($_REQUEST['form'])) {
-	$frmForm->cleanItems();
-	$buttons = new CDiv(array(
-		new CSubmit('form', _('Create')),
-		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
-	));
-	$frmForm->addItem($buttons);
-	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid']));
-}
-
 if (($_REQUEST['go'] == 'massupdate') && isset($_REQUEST['hosts'])) {
 	$hosts_wdgt->addPageHeader(_('CONFIGURATION OF HOSTS'));
 
@@ -619,6 +607,16 @@ elseif (isset($_REQUEST['form'])) {
 	$hosts_wdgt->addItem($hostForm->render());
 }
 else {
+	$frmForm = new CForm();
+	$frmForm->cleanItems();
+	$buttons = new CDiv(array(
+		new CSubmit('form', _('Create')),
+		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
+	));
+	$frmForm->addItem($buttons);
+	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid']));
+
+
 	$hosts_wdgt->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
 
 	$frmGroup = new CForm();
