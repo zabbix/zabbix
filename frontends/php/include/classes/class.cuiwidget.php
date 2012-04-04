@@ -100,7 +100,9 @@ class CUIWidget extends CDiv {
 
 		if (!$this->state) {
 			$div->setAttribute('style', 'display: none;');
-			$this->_footer->setAttribute('style', 'display: none;');
+			if ($this->_footer) {
+				$this->_footer->setAttribute('style', 'display: none;');
+			}
 		}
 
 		parent::addItem($div);
