@@ -136,7 +136,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'],'hostid');
 			$oldTrigger['items'] = zbx_toHash($oldTrigger['items'],'itemid');
 			$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'],'functionid');
-			$oldExpression = triggerExpression($oldTrigger,false);
+			$oldExpression = triggerExpression($oldTrigger);
 
 			if(isset($oldTrigger['hosts'][$hostid])) break;
 
@@ -178,7 +178,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$newTrigger['hosts'] = $oldTrigger['hosts'];
 				$newTrigger['items'] = $oldTrigger['items'];
 
-				$newExpression = triggerExpression($newTrigger,false);
+				$newExpression = triggerExpression($newTrigger);
 
 				if(strcmp($oldExpression, $newExpression) == 0){
 					$_REQUEST['triggerid'] = $newTrigger['triggerid'];
@@ -268,7 +268,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	if($allow_discovery){
 		$cmbSource = new CComboBox('source', $source, 'submit()');
-		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, S_TRIGGER);
+		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
 		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
 		$r_form->addItem(array(SPACE._('Source').SPACE, $cmbSource));
 	}
@@ -301,10 +301,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		$row = new CRow(array(
-			new CCol(S_TRIGGER,'form_row_l'),
+			new CCol(_('Trigger'),'form_row_l'),
 			new CCol(array(
 				new CTextBox('trigger',$trigger,96,'yes'),
-				new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
+				new CButton("btn1",_('Select'),"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
 			),'form_row_r')
 		));
 		$filterForm->addRow($row);
@@ -438,7 +438,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$table->setHeader(array(
 				_('Time'),
 				_('IP'),
-				S_DNS,
+				_('DNS'),
 				_('Description'),
 				_('Status')
 			));
@@ -447,7 +447,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$csvRows[] = array(
 					_('Time'),
 					_('IP'),
-					S_DNS,
+					_('DNS'),
 					_('Description'),
 					_('Status')
 				);
@@ -514,9 +514,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				($_REQUEST['hostid'] == 0) ? _('Host') : null,
 				_('Description'),
 				_('Status'),
-				S_SEVERITY,
+				_('Severity'),
 				_('Duration'),
-				($config['event_ack_enable']) ? S_ACK : null,
+				($config['event_ack_enable']) ? _('Ack') : null,
 				_('Actions')
 			));
 
@@ -527,9 +527,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					($_REQUEST['hostid'] == 0) ? _('Host') : null,
 					_('Description'),
 					_('Status'),
-					S_SEVERITY,
+					_('Severity'),
 					_('Duration'),
-					($config['event_ack_enable']) ? S_ACK : null,
+					($config['event_ack_enable']) ? _('Ack') : null,
 					_('Actions')
 				);
 			}

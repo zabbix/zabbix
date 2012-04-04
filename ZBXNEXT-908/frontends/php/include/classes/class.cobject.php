@@ -64,7 +64,7 @@ class CObject {
 			array_push($this->items, unpack_object($value));
 		}
 		elseif (is_string($value)) {
-			array_push($this->items, $this->sanitize($value));
+			array_push($this->items, $value);
 		}
 		elseif (is_array($value)) {
 			foreach ($value as $item) {
@@ -75,29 +75,6 @@ class CObject {
 			array_push($this->items, unpack_object($value));
 		}
 		return $this;
-	}
-
-	/**
-	 * Sanitizes a string before outputting it to the browser.
-	 *
-	 * @param mixed $value
-	 *
-	 * @return mixed
-	 */
-	protected function sanitize($value) {
-		// avoid encoding the ampersand character
-		return str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $value);
-	}
-}
-
-function destroy_objects() {
-	if (isset($GLOBALS)) {
-		foreach ($GLOBALS as $name => $value) {
-			if (!is_object($GLOBALS[$name])) {
-				continue;
-			}
-			unset($GLOBALS[$name]);
-		}
 	}
 }
 
@@ -118,13 +95,4 @@ function unpack_object(&$item) {
 	return $res;
 }
 
-function implode_objects($glue, &$pieces) {
-	if (!is_array($pieces)) {
-		return unpack_object($pieces);
-	}
-	foreach ($pieces as $id => $piece) {
-		$pieces[$id] = unpack_object($piece);
-	}
-	return implode($glue, $pieces);
-}
 ?>

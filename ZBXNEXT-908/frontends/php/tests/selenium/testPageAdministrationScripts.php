@@ -32,7 +32,7 @@ class testPageAdministrationScripts extends CWebTest {
 	*/
 	public function testPageAdministrationScripts_CheckLayout($script) {
 		$this->login('scripts.php');
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 
 		$this->ok('Scripts');
 		$this->ok('CONFIGURATION OF SCRIPTS');
@@ -54,12 +54,12 @@ class testPageAdministrationScripts extends CWebTest {
 		$oldHash = DBhash($sql);
 
 		$this->login('scripts.php');
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 		$this->ok('Script updated');
 		$this->ok($name);
 		$this->ok('CONFIGURATION OF SCRIPTS');
@@ -73,14 +73,14 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('scripts.php');
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 		$this->checkbox_select("all_scripts");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 		$this->ok('Script deleted');
 
 		$sql = 'SELECT * FROM scripts';
@@ -99,14 +99,14 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('scripts.php');
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 		$this->checkbox_select("scripts[$scriptid]");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->assertTitle('Scripts');
+		$this->assertTitle('Configuration of scripts');
 		$this->ok('Script deleted');
 
 		$sql = 'SELECT * FROM scripts WHERE scriptid='.zbx_dbstr($scriptid).'';

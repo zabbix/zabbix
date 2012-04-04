@@ -32,11 +32,11 @@ class testPageMaps extends CWebTest {
 	*/
 	public function testPageMaps_CheckLayout($map) {
 		$this->login('sysmaps.php');
-		$this->assertTitle('Network maps');
+		$this->assertTitle('Configuration of network maps');
 
 		$this->ok('Maps');
 
-		$this->ok('Configuration of network maps');
+		$this->ok('CONFIGURATION OF NETWORK MAPS');
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
 		$this->ok(array('Name', 'Width', 'Height', 'Edit'));
@@ -64,7 +64,7 @@ class testPageMaps extends CWebTest {
 		$oldHashLinkTriggers = DBhash($sqlLinkTriggers);
 
 		$this->login('sysmaps.php');
-		$this->assertTitle('Network maps');
+		$this->assertTitle('Configuration of network maps');
 		$this->click("link=$name");
 		$this->wait();
 
@@ -78,7 +78,7 @@ class testPageMaps extends CWebTest {
 		$txt = $this->getConfirmation();
 
 //		$this->wait();
-		$this->assertTitle('Network maps');
+		$this->assertTitle('Configuration of network maps');
 		$this->ok("$name");
 		$this->ok('Configuration of network maps');
 
@@ -107,12 +107,12 @@ class testPageMaps extends CWebTest {
 		$oldHashLinkTriggers = DBhash($sqlLinkTriggers);
 
 		$this->login('sysmaps.php');
-		$this->assertTitle('Network maps');
+		$this->assertTitle('Configuration of network maps');
 		$this->href_click("sysmaps.php?form=update&sysmapid=$sysmapid#form&sid=");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Network maps');
+		$this->assertTitle('Configuration of network maps');
 		$this->ok("Network map updated");
 		$this->ok("$name");
 		$this->ok('Configuration of network maps');
@@ -134,14 +134,14 @@ class testPageMaps extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('sysmaps.php');
-		$this->assertTitle('Network maps');
+		$this->assertTitle('Configuration of network maps');
 		$this->checkbox_select("maps[$sysmapid]");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->assertTitle('Network maps');
+		$this->assertTitle('Configuration of network maps');
 		$this->ok('Network map deleted');
 
 		$sql = "select * from sysmaps where sysmapid=$sysmapid";
@@ -160,13 +160,13 @@ class testPageMaps extends CWebTest {
 
 	public function testPageMaps_Create() {
 		$this->login('sysmaps.php');
-		$this->assertTitle('Network maps');
+		$this->assertTitle('Configuration of network maps');
 		$this->button_click('form');
 		$this->wait();
 		$this->ok('Map');
 		$this->button_click('cancel');
 		$this->wait();
-		$this->assertTitle('Network maps');
+		$this->assertTitle('Configuration of network maps');
 		$this->ok('Configuration of network maps');
 	}
 

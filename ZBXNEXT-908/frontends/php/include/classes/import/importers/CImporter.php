@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,26 +17,35 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageLatestData extends CWebTest {
-	public function testPageLatestData_CheckLayout() {
-		$this->login('latest.php');
-		$this->assertTitle('Latest data \[refreshed every 30 sec\]');
-		$this->ok('LATEST DATA');
-		$this->ok('Items');
-		$this->ok(array('Host', 'Group'));
-		$this->ok('Filter');
-		$this->ok(array('Host', 'Name', 'Last check', 'Last value', 'Change', 'History'));
+
+abstract class CImporter {
+
+	/**
+	 * @var CImportReferencer
+	 */
+	protected $referencer;
+
+	/**
+	 * @var array
+	 */
+	protected $options = array();
+
+	/**
+	 * @param array             $options
+	 * @param CImportReferencer $referencer
+	 */
+	public function __construct(array $options, CImportReferencer $referencer) {
+		$this->options = $options;
+		$this->referencer = $referencer;
 	}
 
-// Check that no real host or template names displayed
-	public function testPageLatestData_NoHostNames() {
-		$this->login('latest.php');
-		$this->assertTitle('Latest data \[refreshed every 30 sec\]');
-		$this->checkNoRealHostnames();
-	}
+	/**
+	 * @abstract
+	 *
+	 * @param array $elements
+	 *
+	 * @return mixed
+	 */
+	abstract public function import(array $elements);
 }
-?>

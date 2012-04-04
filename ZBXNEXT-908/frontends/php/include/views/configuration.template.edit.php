@@ -36,7 +36,7 @@
 	$clear_templates= get_request('clear_templates', array());
 	$macros			= get_request('macros',array());
 
-	$frm_title = S_TEMPLATE;
+	$frm_title = _('Template');
 
 	if($templateid > 0){
 		$dbTemplates = API::Template()->get(array(
@@ -183,7 +183,7 @@
 		$host_tb->addItem($db_host['hostid'], $db_host['name']);
 	}
 
-	$templateList->addRow(S_HOSTS.' / '.S_TEMPLATES, $host_tb->Get(_('In'), array(_('Other').SPACE.'|'.SPACE._('Group').SPACE,$cmbGroups)));
+	$templateList->addRow(_('Hosts / templates'), $host_tb->Get(_('In'), array(_('Other | group').SPACE,$cmbGroups)));
 
 // FULL CLONE {
 	if($_REQUEST['form'] == 'full_clone'){
@@ -337,7 +337,7 @@
 		}
 	}
 
-	$divTabs->addTab('templateTab', S_TEMPLATE, $templateList);
+	$divTabs->addTab('templateTab', _('Template'), $templateList);
 // FULL CLONE }
 
 // } TEMPLATE WIDGET
@@ -347,20 +347,20 @@
 	foreach($templates as $tid => $temp_name){
 		$frmHost->addVar('templates['.$tid.']', $temp_name);
 		$tmplList->addRow($temp_name, array(
-				new CSubmit('unlink['.$tid.']', S_UNLINK, null, 'link_menu'),
+				new CSubmit('unlink['.$tid.']', _('Unlink'), null, 'link_menu'),
 				SPACE, SPACE,
-				isset($original_templates[$tid]) ? new CSubmit('unlink_and_clear['.$tid.']', S_UNLINK_AND_CLEAR, null, 'link_menu') : SPACE
+				isset($original_templates[$tid]) ? new CSubmit('unlink_and_clear['.$tid.']', _('Unlink and clear'), null, 'link_menu') : SPACE
 		));
 	}
 
-	$tmplAdd = new CButton('add', S_ADD, 'return PopUp("popup.php?dstfrm='.$frmHost->getName().
+	$tmplAdd = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.$frmHost->getName().
 			'&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host&excludeids['.$templateid.']='.$templateid.
 			url_param($templates,false,"existed_templates").'",450,450)',
 			'link_menu');
 
 	$tmplList->addRow($tmplAdd, SPACE);
 
-	$divTabs->addTab('tmplTab', S_LINKED_TEMPLATES, $tmplList);
+	$divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES
 
 	// macros
@@ -378,13 +378,13 @@
 	$frmHost->addItem($divTabs);
 
 // Footer
-	$main = array(new CSubmit('save', S_SAVE));
+	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
 	if(($templateid > 0) && ($_REQUEST['form'] != 'full_clone')){
-		$others[] = new CSubmit('clone', S_CLONE);
-		$others[] = new CSubmit('full_clone', S_FULL_CLONE);
-		$others[] = new CButtonDelete(S_DELETE_TEMPLATE_Q,  url_param('form').url_param('templateid').url_param('groupid'));
-		$others[] = new CButtonQMessage('delete_and_clear', S_DELETE_AND_CLEAR, S_DELETE_AND_CLEAR_TEMPLATE_Q, url_param('form').url_param('templateid').url_param('groupid'));
+		$others[] = new CSubmit('clone', _('Clone'));
+		$others[] = new CSubmit('full_clone', _('Full clone'));
+		$others[] = new CButtonDelete(_('Delete template?'),  url_param('form').url_param('templateid').url_param('groupid'));
+		$others[] = new CButtonQMessage('delete_and_clear', _('Delete and clear'), _('Delete and clear template? (Warning: all linked hosts will be cleared!)'), url_param('form').url_param('templateid').url_param('groupid'));
 	}
 	$others[] = new CButtonCancel(url_param('groupid'));
 

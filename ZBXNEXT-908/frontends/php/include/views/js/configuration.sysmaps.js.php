@@ -112,7 +112,7 @@
 							<table>
 								<tbody>
 								<tr id="useIconMapRow">
-									<td colspan="4">
+									<td colspan="2">
 										<label for="use_iconmap" id=use_iconmapLabel><?php echo _('Automatic icon selection'); ?></label>
 										<input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox" value="1">
 									</td>
@@ -128,6 +128,8 @@
 										<br />
 										<select class="input" name="iconid_on" id="iconid_on"></select>
 									</td>
+								</tr>
+								<tr>
 									<td id="iconMainetnanceRow">
 										<label for="iconid_maintenance"><?php echo _('Maintenance'); ?></label>
 										<br />
@@ -146,12 +148,13 @@
 				</tr>
 
 				<tr>
-					<td><label for="x"><?php echo _('Coordinate X'); ?></label></td>
-					<td><input id="x" maxlength="5" value="0" size="5" name="x" class="input"></td>
-				</tr>
-				<tr>
-					<td><label for="y"><?php echo _('Coordinate Y'); ?></label></td>
-					<td><input maxlength="5" value="0" size="5" id="y" name="y" class="input"></td>
+					<td><?php echo _('Coordinates'); ?></td>
+					<td>
+						<label for="x"><?php echo _('X'); ?></label>:
+						<input id="x" maxlength="5" value="0" size="5" name="x" class="input">
+						<label for="y"><?php echo _('Y'); ?></label>:
+						<input maxlength="5" value="0" size="5" id="y" name="y" class="input">
+					</td>
 				</tr>
 
 				<tr>

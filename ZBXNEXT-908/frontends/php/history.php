@@ -220,13 +220,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$cmbAction = new CComboBox('action',$_REQUEST['action'],'submit()');
 
 	if(isset($iv_numeric[$item['value_type']])) $cmbAction->addItem('showgraph',_('Graph'));
-	$cmbAction->addItem('showvalues',S_VALUES);
+	$cmbAction->addItem('showvalues',_('Values'));
 	$cmbAction->addItem('showlatest', _('500 latest values'));
 
 	$form->addItem($cmbAction);
 
 	if($_REQUEST['action'] != 'showgraph')
-		$form->addItem(array(SPACE, new CSubmit('plaintext',S_AS_PLAIN_TEXT)));
+		$form->addItem(array(SPACE, new CSubmit('plaintext',_('As plain text'))));
 
 	array_unshift($header['right'], $form, SPACE);
 //--
@@ -260,7 +260,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$cmbitemlist->addItem($itemid,$host['name'].': '.itemName($item));
 			}
 
-			$addItemBttn = new CButton('add_log',S_ADD,"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
+			$addItemBttn = new CButton('add_log',_('Add'),"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
 			$delItemBttn = null;
 
 			if(count($items) > 1){
@@ -290,7 +290,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$tmp[] = $cmbColor;
 			}
 
-			$filterForm->addRow(S_SELECTED, $tmp);
+			$filterForm->addRow(_('Selected'), $tmp);
 
 			$filterForm->addItemToBottomRow(new CSubmit('select',_('Filter')));
 		}
@@ -326,11 +326,11 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$table->setHeader(array(
 				_('Timestamp'),
 				$fewItems ? S_ITEM : null,
-				$logItem ? S_LOCAL_TIME : null,
+				$logItem ? _('Local time') : null,
 				(($eventLogItem && $logItem) ? _('Source') : null),
-				(($eventLogItem && $logItem) ? S_SEVERITY : null),
+				(($eventLogItem && $logItem) ? _('Severity') : null),
 				(($eventLogItem && $logItem) ? _('Event ID') : null),
-				S_VALUE
+				_('Value')
 			), 'header');
 
 			if(isset($_REQUEST['filter']) && !zbx_empty($_REQUEST['filter']) && in_array($_REQUEST['filter_task'], array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))){
@@ -414,7 +414,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		else{
 // NUMERIC, FLOAT
 			$table = new CTableInfo(_('No history defined.'));
-			$table->setHeader(array(_('Timestamp'), S_VALUE));
+			$table->setHeader(array(_('Timestamp'), _('Value')));
 
 			$options['sortfield'] = array('itemid', 'clock');
 			$hData = API::History()->get($options);

@@ -25,7 +25,7 @@
 				+ '&srctbl=items'
 				<?php endif; ?>
 				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
-				+ '<?php echo !empty($this->data['monitored_hosts']) ? '&real_hosts=1' : ''; ?>'
+				+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
 				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
 				+ '&srcfld1=itemid&srcfld2=name', 800, 600)">
 			#{name}

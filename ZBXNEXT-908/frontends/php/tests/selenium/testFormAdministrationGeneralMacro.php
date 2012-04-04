@@ -32,8 +32,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Macros');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->assertTitle('Configuration of macros');
+		$this->ok('CONFIGURATION OF MACROS');
 		$this->ok('Macros');
 		$this->ok('Macro');
 		$this->ok('Value');
@@ -61,7 +61,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Macros updated');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->ok('CONFIGURATION OF MACROS');
 		$this->ok('Macros');
 
 		$sql = "SELECT * FROM globalmacro WHERE macro='".$this->newmacro."' and value='".$this->newmacrovalue."'";
@@ -158,7 +158,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->waitForConfirmation();
 		$this->wait();
 		$this->ok('Macros updated');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->ok('CONFIGURATION OF MACROS');
 		$this->ok('Macros');
 		$this->ok('Macro');
 		$this->ok('Value');

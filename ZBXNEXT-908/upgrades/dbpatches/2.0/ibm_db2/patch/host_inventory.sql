@@ -353,3 +353,6 @@ DROP TABLE hosts_profiles
 /
 DROP TABLE hosts_profiles_ext
 /
+
+DELETE FROM ids WHERE table_name IN ('hosts_profiles', 'hosts_profiles_ext')
+/

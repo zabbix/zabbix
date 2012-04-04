@@ -22,7 +22,7 @@
 	require_once dirname(__FILE__).'/include/config.inc.php';
 	require_once dirname(__FILE__).'/include/users.inc.php';
 
-	$page['title'] = "S_GROUPS";
+	$page['title'] = _('Groups');
 	$page['file'] = 'popup_usrgrp.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
@@ -46,7 +46,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$new_groups = get_request('new_groups', array());
 ?>
 <?php
-	show_table_header(S_GROUPS);
+	show_table_header(_('Groups'));
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -89,7 +89,7 @@ if(form){
 	$table = new CTableInfo(_('No user groups defined.'));
 	$table->setHeader(array(
 		new CCheckBox("all_groups",NULL,"checkAll('".$form->getName()."','all_groups','new_groups');"),
-		S_NAME
+		_('Name')
 		));
 
 	$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
@@ -99,7 +99,7 @@ if(form){
 			$row['name']
 		));
 	}
-	$table->setFooter(new CCol(new CSubmit('select', S_SELECT)));
+	$table->setFooter(new CCol(new CSubmit('select', _('Select'))));
 
 	$form->addItem($table);
 	$form->show();

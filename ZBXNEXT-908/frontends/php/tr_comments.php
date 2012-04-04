@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = 'S_TRIGGER_COMMENTS';
+$page['title'] = _('Trigger comments');
 $page['file'] = 'tr_comments.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -60,7 +60,7 @@ if (isset($_REQUEST['save'])) {
 		' SET comments='.zbx_dbstr($_REQUEST['comments']).
 		' WHERE triggerid='.$_REQUEST['triggerid']
 	);
-	show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
+	show_messages($result, _('Comment updated'), _('Cannot update comment'));
 
 	$trigger['comments'] = $_REQUEST['comments'];
 
@@ -75,7 +75,7 @@ elseif (isset($_REQUEST['cancel'])) {
 	exit();
 }
 
-show_table_header(S_TRIGGER_COMMENTS_BIG);
+show_table_header(_('TRIGGER COMMENTS'));
 
 // if user has no permissions to edit comments, no "save" button for him
 $triggerEditable = API::Trigger()->get(array(

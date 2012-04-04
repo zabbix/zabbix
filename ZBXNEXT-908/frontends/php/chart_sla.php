@@ -41,7 +41,7 @@ require_once 'include/page_header.php';
 <?php
 	$sql = 'SELECT s.* FROM services s  WHERE s.serviceid='.$_REQUEST['serviceid'];
 	if(!$service = DBfetch(DBselect($sql,1))){
-		fatal_error(S_NO_IT_SERVICE_DEFINED);
+		fatal_error(_('No IT services defined.'));
 	}
 
 	if(!is_null($service['triggerid'])){

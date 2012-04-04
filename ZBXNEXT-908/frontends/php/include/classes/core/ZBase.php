@@ -101,6 +101,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/export/writers',
 			$this->rootDir.'/include/classes/export/elements',
 			$this->rootDir.'/include/classes/import',
+			$this->rootDir.'/include/classes/import/importers',
 			$this->rootDir.'/include/classes/import/readers',
 			$this->rootDir.'/include/classes/import/formatters',
 			$this->rootDir.'/include/classes/sysmaps',

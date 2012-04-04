@@ -83,7 +83,7 @@ $itemsTable->setHeader(array(
 ));
 
 $this->data['only_hostid'] = null;
-$this->data['monitored_hosts'] = null;
+$this->data['real_hosts'] = null;
 
 if (!empty($this->data['items'])) {
 	foreach ($this->data['items'] as $rowNumber => $item) {
@@ -93,7 +93,7 @@ if (!empty($this->data['items'])) {
 				$this->data['only_hostid'] = $host['hostid'];
 			}
 			else {
-				$this->data['monitored_hosts'] = 1;
+				$this->data['real_hosts'] = 1;
 			}
 
 			$name = $host['name'].': '.itemName(get_item_by_itemid($item['itemid']));
@@ -121,7 +121,7 @@ if (!empty($this->data['items'])) {
 $addButton = new CButton('add_item', _('Add'),
 	'return PopUp(\'popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 		(!empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : '').
-		(!empty($this->data['monitored_hosts']) ? '&real_hosts=1' : '').
+		(!empty($this->data['real_hosts']) ? '&real_hosts=1' : '').
 		(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
 		'&srctbl=items&srcfld1=itemid&srcfld2=name\', 800, 600);',
 	'link_menu'
@@ -134,7 +134,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 			url_param($this->data['graphtype'], false, 'graphtype').
 			url_param('parent_discoveryid').
 			(!empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : '').
-			(!empty($this->data['monitored_hosts']) ? '&real_hosts=1' : '').
+			(!empty($this->data['real_hosts']) ? '&real_hosts=1' : '').
 			(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
 			'&srctbl=prototypes&srcfld1=itemid&srcfld2=name\', 800, 600);',
 		'link_menu'
@@ -199,7 +199,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMinData[] = new CButton('yaxis_min', _('Select'), 'javascript: '.
 				'return PopUp(\'popup.php?dstfrm='.$graphForm->getName().
 					url_param($this->data['only_hostid'], false, 'only_hostid').
-					url_param($this->data['monitored_hosts'], false, 'monitored_hosts').
+					url_param($this->data['real_hosts'], false, 'real_hosts').
 					'&dstfld1=ymin_itemid'.
 					'&dstfld2=ymin_name'.
 					'&srctbl=items'.
@@ -258,7 +258,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$yaxisMaxData[] = new CButton('yaxis_max', _('Select'), 'javascript: '.
 				'return PopUp(\'popup.php?dstfrm='.$graphForm->getName().
 					url_param($this->data['only_hostid'], false, 'only_hostid').
-					url_param($this->data['monitored_hosts'], false, 'monitored_hosts').
+					url_param($this->data['real_hosts'], false, 'real_hosts').
 					'&dstfld1=ymax_itemid'.
 					'&dstfld2=ymax_name'.
 					'&srctbl=items'.

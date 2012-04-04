@@ -197,6 +197,8 @@ INSERT INTO items_applications (itemappid, applicationid, itemid)
 	WHERE ht.httptestid = hti.httptestid
 		AND hti.type = 4;
 
+DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications');
+
 -- Patching table `hosts`
 
 ALTER TABLE hosts MODIFY hostid bigint unsigned NOT NULL,

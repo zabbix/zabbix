@@ -110,13 +110,13 @@ class testFormConfigTriggerSeverity extends CWebTest {
 
 
 	public function testFormTriggerSeverity_Layout() {
-		$this->login('adm.gui.php');
-		$this->assertTitle('Configuration of Zabbix');
+		$this->login('adm.triggerseverities.php');
+		$this->assertTitle('Configuration of trigger severities');
 
 		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
 
 		$this->ok('Trigger severities');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->ok('CONFIGURATION OF TRIGGER SEVERITIES');
 
 		$this->ok(array('Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'));
 		$this->assertElementPresent('severity_name_0');

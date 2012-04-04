@@ -1053,6 +1053,8 @@ class CGraph extends CZBXAPI {
 				if (!check_db_fields($fields, $gitem)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for items.'));
 				}
+
+				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
 
 			// more than one sum type item for pie graph
@@ -1067,8 +1069,6 @@ class CGraph extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
 				}
 			}
-
-			$itemids += zbx_objectValues($graph['gitems'], 'itemid');
 		}
 
 		if (!empty($itemids)) {

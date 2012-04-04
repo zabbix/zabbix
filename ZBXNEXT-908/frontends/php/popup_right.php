@@ -72,7 +72,7 @@ check_fields($fields);
 	$form->setAttribute('id', 'groups');
 
 	$table = new CTableInfo(_('No resources defined.'));
-	$table->setHeader(new CCol(array(new CCheckBox('all_groups', NULL, 'check_all(this.checked)'),S_NAME)));
+	$table->setHeader(new CCol(array(new CCheckBox('all_groups', NULL, 'check_all(this.checked)'),_('Name'))));
 
 // NODES
 	if($nodeid == 0) $nodeids = get_current_nodeid(true);
@@ -106,7 +106,7 @@ check_fields($fields);
 
 	insert_js('var grouplist = '.zbx_jsvalue($grouplist).';');
 
-	$button = new CButton('select', S_SELECT, 'add_groups("'.$dstfrm.'")');
+	$button = new CButton('select', _('Select'), 'add_groups("'.$dstfrm.'")');
 	$table->setFooter(new CCol($button,'right'));
 
 	$form->addItem($table);

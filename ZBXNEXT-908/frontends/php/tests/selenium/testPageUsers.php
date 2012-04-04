@@ -32,7 +32,7 @@ class testPageUsers extends CWebTest {
 	*/
 	public function testPageUsers_CheckLayout($user) {
 		$this->login('users.php');
-		$this->assertTitle('Users');
+		$this->assertTitle('Configuration of users');
 
 		$this->dropdown_select_wait('filter_usrgrpid', 'All');
 
@@ -68,14 +68,14 @@ class testPageUsers extends CWebTest {
 		$oldHashMedia = DBhash($sqlHashMedia);
 
 		$this->login('users.php');
-		$this->assertTitle('Users');
+		$this->assertTitle('Configuration of users');
 		$this->dropdown_select_wait('filter_usrgrpid', 'All');
 
 		$this->click("link=$alias");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Users');
+		$this->assertTitle('Configuration of users');
 		$this->ok('User updated');
 		$this->ok("$alias");
 		$this->ok('CONFIGURATION OF USERS AND USER GROUPS');
@@ -101,7 +101,7 @@ class testPageUsers extends CWebTest {
 			$id = $user['userid'];
 
 			$this->login('users.php');
-			$this->assertTitle('Users');
+			$this->assertTitle('Configuration of users');
 			$this->dropdown_select_wait('filter_usrgrpid', 'All');
 
 			$this->checkbox_select("group_userid[$id]");
@@ -110,7 +110,7 @@ class testPageUsers extends CWebTest {
 			$this->wait();
 
 			$this->getConfirmation();
-			$this->assertTitle('Users');
+			$this->assertTitle('Configuration of users');
 			$this->ok('User deleted');
 
 			$sql = "select * from users where userid=$id";
@@ -135,7 +135,7 @@ class testPageUsers extends CWebTest {
 			$id = $user['userid'];
 
 			$this->login('users.php');
-			$this->assertTitle('Users');
+			$this->assertTitle('Configuration of users');
 			$this->dropdown_select_wait('filter_usrgrpid', 'All');
 
 			$this->checkbox_select("group_userid[$id]");
@@ -144,7 +144,7 @@ class testPageUsers extends CWebTest {
 			$this->wait();
 
 			$this->getConfirmation();
-			$this->assertTitle('Users');
+			$this->assertTitle('Configuration of users');
 			$this->ok('Cannot delete user');
 
 			$sql = "select * from users where userid=$id";

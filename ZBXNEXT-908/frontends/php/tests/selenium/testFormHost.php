@@ -51,7 +51,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', $this->host);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host added');
 		$this->ok($this->host);
 	}
@@ -66,7 +66,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', $host);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host added');
 		$this->ok($host);
 	}
@@ -78,7 +78,7 @@ class testFormHost extends CWebTest {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host updated');
 		$this->ok($this->host);
 	}
@@ -93,13 +93,14 @@ class testFormHost extends CWebTest {
 		$this->tab_switch('Macros');
 		$this->type("name=macros[0][macro]", '{$TEST_MACRO}');
 		$this->type("name=macros[0][value]", "1");
-		$this->click("//table[@id='userMacros']//input[@id='add']");
+		$this->click("//table[@id='tbl_macros']//input[@id='macro_add']");
 		$this->verifyElementPresent("name=macros[1][macro]");
 		$this->type("name=macros[1][macro]", '{$TEST_MACRO2}');
 		$this->type("name=macros[1][value]", "2");
 		$this->click("id=save");
 		$this->waitForPageToLoad("30000");
 		$this->ok("Host updated");
+
 	}
 
 	public function testFormHost_CreateExistingHostNoGroups() {
@@ -112,7 +113,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', 'Test host');
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('No groups for host');
 		$this->assertEquals(0, DBcount("select * from hosts where host='Test host'"));
 	}
@@ -129,7 +130,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('visiblename', $this->host_cloned_visible);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host added');
 	}
 
@@ -144,7 +145,7 @@ class testFormHost extends CWebTest {
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host deleted');
 	}
 
@@ -160,7 +161,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('visiblename', $this->host_fullcloned_visible);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host added');
 	}
 
@@ -175,7 +176,7 @@ class testFormHost extends CWebTest {
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host deleted');
 	}
 
@@ -188,7 +189,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', $this->host_tmp);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host updated');
 	}
 
@@ -207,7 +208,7 @@ class testFormHost extends CWebTest {
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host deleted');
 
 		// check if all records have been deleted
@@ -246,7 +247,7 @@ class testFormHost extends CWebTest {
 		$this->nok("$template");
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host updated');
 
 		// this should be a separate test
@@ -289,7 +290,7 @@ class testFormHost extends CWebTest {
 		$this->nok("$template");
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('Host updated');
 	}
 

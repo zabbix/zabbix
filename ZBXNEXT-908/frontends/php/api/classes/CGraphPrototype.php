@@ -644,7 +644,7 @@ class CGraphPrototype extends CZBXAPI {
 				}
 			}
 			if ($templatedGraph && count($graphHosts) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%s" with template host can not contain items from other hosts.', $graph['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph prototype "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
 			}
 
 			// check ymin, ymax items
@@ -711,7 +711,7 @@ class CGraphPrototype extends CZBXAPI {
 				}
 			}
 			if ($templatedGraph && count($graphHosts) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%s" with template host can not contain items from other hosts.', $graph['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph prototype "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
 			}
 
 			// check ymin, ymax items
@@ -1052,6 +1052,8 @@ class CGraphPrototype extends CZBXAPI {
 				if (!check_db_fields($fields, $gitem)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for items.'));
 				}
+
+				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
 
 			// more than one sum type item for pie graph
@@ -1066,8 +1068,6 @@ class CGraphPrototype extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
 				}
 			}
-
-			$itemids += zbx_objectValues($graph['gitems'], 'itemid');
 		}
 
 		if (!empty($itemids)) {

@@ -52,7 +52,7 @@ class CVar {
 			return null;
 		}
 		if (strpos($value, "\n") === false) {
-			$hiddenVar = new CInput('hidden', $name, CHtml::encode($value), null, $this->element_id);
+			$hiddenVar = new CInput('hidden', $name, $value, null, $this->element_id);
 			$hiddenVar->removeAttribute('class');
 		}
 		else {

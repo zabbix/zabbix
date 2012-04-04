@@ -32,7 +32,7 @@ class testPageNodes extends CWebTest {
 	public function testPageNodes_StandaloneSetup() {
 
 		$this->login('nodes.php');
-		$this->assertTitle('Nodes');
+		$this->assertTitle('Configuration of nodes');
 		$this->ok('DM');
 		$this->ok('CONFIGURATION OF NODES');
 		if (0 == DBcount("select * from nodes order by nodeid")) {
@@ -46,7 +46,7 @@ class testPageNodes extends CWebTest {
 	public function testPageNodes_CheckLayout($node) {
 
 		$this->login('nodes.php');
-		$this->assertTitle('Nodes');
+		$this->assertTitle('Configuration of nodes');
 		$this->ok(array('CONFIGURATION OF NODES', 'NODES', 'ID', 'Name', 'IP:Port'));
 		$this->assertElementPresent('config');
 		$this->assertElementPresent('form');

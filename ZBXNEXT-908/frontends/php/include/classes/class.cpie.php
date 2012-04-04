@@ -316,7 +316,7 @@ class CPie extends CGraphDraw {
 				);
 			}
 			else {
-				$strvalue = sprintf(_('Value').': '._('no data'));
+				$strvalue = sprintf(_('Value: no data'));
 				$str = sprintf('%s: %s [ '._('no data').' ]',
 					str_pad($this->items[$i]['host'], $max_host_len,' '),
 					str_pad($this->items[$i]['name'], $max_name_len,' ')
