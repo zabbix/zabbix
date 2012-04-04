@@ -47,8 +47,8 @@ class CImportReferencer {
 
 
 	/**
-	 * Add host/template that was updated or created, i.e. all items, discovery rules, etc,
-	 * related to these host/template should be created or updated too.
+	 * Add host/template that has been updated or created, i.e. all items, discovery rules, etc,
+	 * related to these hosts/templates should be created or updated too.
 	 *
 	 * @param $host
 	 */
@@ -57,7 +57,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Checks if host/template was create or updated during current import.
+	 * Checks if host/template has been created or updated during the current import.
 	 *
 	 * @param $host
 	 *
