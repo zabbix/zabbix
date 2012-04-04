@@ -25,6 +25,7 @@
  */
 class CImportReferencer {
 
+	protected $processedHosts = array();
 	protected $groups = array();
 	protected $templates = array();
 	protected $hosts = array();
@@ -33,6 +34,7 @@ class CImportReferencer {
 	protected $valueMaps = array();
 	protected $triggers = array();
 	protected $iconMaps = array();
+	protected $maps = array();
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
@@ -41,6 +43,29 @@ class CImportReferencer {
 	protected $valueMapsRefs;
 	protected $triggersRefs;
 	protected $iconMapsRefs;
+	protected $mapsRefs;
+
+
+	/**
+	 * Add host/template that has been updated or created, i.e. all items, discovery rules, etc,
+	 * related to these hosts/templates should be created or updated too.
+	 *
+	 * @param $host
+	 */
+	public function addProcessedHost($host) {
+		$this->processedHosts[$host] = $host;
+	}
+
+	/**
+	 * Checks if host/template has been created or updated during the current import.
+	 *
+	 * @param $host
+	 *
+	 * @return bool
+	 */
+	public function isProcessedHost($host) {
+		return isset($this->processedHosts[$host]);
+	}
 
 	/**
 	 * Get group id by name.
@@ -176,7 +201,7 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Get icon mpa id by name.
+	 * Get icon map id by name.
 	 *
 	 * @param string $name
 	 *
@@ -188,6 +213,21 @@ class CImportReferencer {
 		}
 
 		return isset($this->iconMapsRefs[$name]) ? $this->iconMapsRefs[$name] : false;
+	}
+
+	/**
+	 * Get map id by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveMap($name) {
+		if ($this->mapsRefs === null) {
+			$this->selectMaps();
+		}
+
+		return isset($this->mapsRefs[$name]) ? $this->mapsRefs[$name] : false;
 	}
 
 	/**
@@ -344,6 +384,25 @@ class CImportReferencer {
 	 */
 	public function addIconMaps(array $iconMaps) {
 		$this->iconMaps = array_unique(array_merge($this->iconMaps, $iconMaps));
+	}
+
+	/**
+	 * Add map names that need association with a database map id.
+	 *
+	 * @param array $maps
+	 */
+	public function addMaps(array $maps) {
+		$this->maps = array_unique(array_merge($this->maps, $maps));
+	}
+
+	/**
+	 * Add map name association with map id.
+	 *
+	 * @param string $name
+	 * @param string $mapId
+	 */
+	public function addMapRef($name, $mapId) {
+		$this->mapsRefs[$name] = $mapId;
 	}
 
 	/**
@@ -535,6 +594,25 @@ class CImportReferencer {
 			}
 
 			$this->iconMaps = array();
+		}
+	}
+
+	/**
+	 * Select map ids for previously added maps names.
+	 */
+	protected function selectMaps() {
+		if (!empty($this->maps)) {
+			$this->mapsRefs = array();
+			$dbMaps = API::Map()->get(array(
+				'filter' => array('name' => $this->maps),
+				'output' => array('sysmapid', 'name'),
+				'preservekeys' => true,
+			));
+			foreach ($dbMaps as $dbMap) {
+				$this->mapsRefs[$dbMap['name']] = $dbMap['sysmapid'];
+			}
+
+			$this->maps = array();
 		}
 	}
 }

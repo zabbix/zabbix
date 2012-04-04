@@ -8,13 +8,10 @@
 	}
 
 	function displayNewDeleyFlexInterval() {
-		if (jQuery('#delay_flex_visible').is(':checked')) {
-			if (jQuery('#delayFlexTable tr').length <= 7) {
-				jQuery('#row_new_delay_flex').css('display', 'block');
-			}
-			else {
-				jQuery('#row_new_delay_flex').css('display', 'none');
-			}
+		// delay_flex_visible is in massupdate, no delay_flex_visible in items
+		if ((jQuery('#delay_flex_visible').length == 0 || jQuery('#delay_flex_visible').is(':checked'))
+				&& jQuery('#delayFlexTable tr').length <= 7) {
+			jQuery('#row_new_delay_flex').css('display', 'block');
 		}
 		else {
 			jQuery('#row_new_delay_flex').css('display', 'none');
@@ -156,7 +153,7 @@
 		<?php }
 		if (!empty($this->data['typeVisibility'])) { ?>
 			var typeSwitcher = new CViewSwitcher('type', 'change',
-				<?php echo zbx_jsvalue($this->data['typeVisibility'], true).(!empty($this->data['itemid']) ? ', true' : ''); ?>);
+				<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>);
 		<?php }
 		if (!empty($this->data['securityLevelVisibility'])) { ?>
 			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',
@@ -195,7 +192,7 @@
 		setAuthTypeLabel();
 
 		// mass update page
-		if (jQuery('#delay_flex_visible')) {
+		if (jQuery('#delay_flex_visible').length != 0) {
 			displayNewDeleyFlexInterval();
 
 			jQuery('#delay_flex_visible').click(function() {

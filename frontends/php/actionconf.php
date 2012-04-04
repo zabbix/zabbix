@@ -21,6 +21,114 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
+//
+//API::Service()->create(array(
+//	'name' => 'service 10',
+//	'algorithm' => SERVICE_ALGORITHM_MAX,
+//	'showsla' => 0,
+//	'sortorder' => 1,
+//	'times' => array(array(
+//		'type' => SERVICE_TIME_TYPE_DOWNTIME,
+//		'ts_from' => 5,
+//		'ts_to' => 123,
+//	)),
+//));
+//API::Service()->update(array(
+//	'serviceid' => 10,
+//	'times' => array(
+//		array(
+//			'type' => SERVICE_TIME_TYPE_UPTIME,
+//			'ts_from' => 5,
+//			'ts_to' => 123,
+//			'note' => 'my downtime'
+//		),
+//		array(
+//			'type' => SERVICE_TIME_TYPE_UPTIME,
+//			'ts_from' => 5,
+//			'ts_to' => 5555,
+//			'note' => 'my downtime'
+//		),
+//	),
+//));
+//var_dump(API::Service()->get(array(
+////	'parentids' => 5,
+//'serviceids' => 17,
+////	'childrenids' => 2,
+//	'output' => array('name'),
+//	'selectParent' => API_OUTPUT_EXTEND,
+//	'selectDependencies' => array('servicedownid', 'soft'),
+//	'preservekeys' => true
+//)));
+//API::Service()->deleteTimes(array(12, 14));
+//API::Service()->delete(array(8));
+//var_dump(API::Service()->get(array(
+//	'parentids' => array(7, 11, 3),
+//	'output' => API_OUTPUT_SHORTEN
+//)));
+//die;
+
+//API::Service()->create(array(
+//	'name' => 'service 10',
+//	'showsla' => 0,
+//	'algorithm' => SERVICE_ALGORITHM_MAX,
+//	'parentid' => 3,
+//	'sortorder' => 9,
+//	'dependencies' => array(
+//		array(
+//			'dependsOnServiceid' => 5,
+//			'soft' => 0
+//		)
+//	)
+//));
+
+//API::Service()->update(array(
+////	array(
+////		'name' => 'service 5',
+////		'showsla' => 0,
+////		'algorithm' => SERVICE_ALGORITHM_MAX,
+////		'parentid' => 5,
+////		'sortorder' => 9
+////	),
+//	array(
+//		'serviceid' => 16,
+//		'parentid' => 0,
+//		'dependencies' => array(
+//			array(
+//				'dependsOnServiceid' => 15,
+//				'soft' => 0
+//			),
+////			array(
+////				'dependsOnServiceid' => 10,
+////				'soft' => 1
+////			),
+//		)
+//	)
+//));
+//API::Service()->update(array(
+//	'serviceid' => 7,
+////	'name' => 'service 2-new',
+//	'dependencies' => array(
+//		array(
+//			'serviceid' => 7,
+//			'dependsOnServiceid' => 10,
+//			'soft' => 1
+//		),
+////		array(
+////			'serviceid' => 2,
+////			'dependsOnServiceid' => 9,
+////			'soft' => 0
+////		),
+//	)
+//));
+//API::Service()->addDependencies(array(
+//	array(
+//		'serviceid' => 8,
+////		'dependsOnServiceid' => 222,
+//		'dependsOnServiceid' => 5,
+//		'soft' => 0,
+//	)
+//));
+//API::Service()->deleteDependencies(array(7));
 
 $page['title'] = _('Configuration of actions');
 $page['file'] = 'actionconf.php';
@@ -34,17 +142,20 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'actionid'=>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID, null),
-		'name'=>			array(T_ZBX_STR, O_OPT,	 null, NOT_EMPTY, 'isset({save})'),
+		'name'=>			array(T_ZBX_STR, O_OPT,	 null, NOT_EMPTY, 'isset({save})', _('Name')),
 		'eventsource'=>		array(T_ZBX_INT, O_MAND, null, IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTO_REGISTRATION)),	null),
 		'evaltype'=>		array(T_ZBX_INT, O_OPT, null, IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)),	'isset({save})'),
-		'esc_period'=>		array(T_ZBX_INT, O_OPT, null, BETWEEN(60, 999999), 'isset({save})&&isset({escalation})'),
+		'esc_period'=>		array(T_ZBX_INT, O_OPT, null, BETWEEN(60, 999999),
+			'isset({save})&&isset({escalation})', _('Default escalation period')),
 		'escalation'=>		array(T_ZBX_INT, O_OPT, null, IN("0,1"), null),
 		'status'=>			array(T_ZBX_INT, O_OPT, null, IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)), null),
 		'def_shortdata'=>	array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})'),
 		'def_longdata'=>	array(T_ZBX_STR, O_OPT,	null, null, 'isset({save})'),
 		'recovery_msg'=>	array(T_ZBX_INT, O_OPT,	null, null, null),
-		'r_shortdata'=>		array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({recovery_msg})&&isset({save})'),
-		'r_longdata'=>		array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({recovery_msg})&&isset({save})'),
+		'r_shortdata'=>		array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({recovery_msg})&&isset({save})',
+			_('Recovery subject')),
+		'r_longdata'=>		array(T_ZBX_STR, O_OPT,	null, NOT_EMPTY, 'isset({recovery_msg})&&isset({save})',
+			_('Recovery message')),
 		'g_actionid'=>		array(T_ZBX_INT, O_OPT,	null, DB_ID, null),
 		'conditions'=>		array(null, O_OPT, null, null, null),
 		'g_conditionid'=>	array(null, O_OPT, null, null, null),

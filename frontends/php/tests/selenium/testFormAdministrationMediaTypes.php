@@ -58,7 +58,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	*/
 	public function testFormAdministrationMediaTypes_CheckLayout($allMediaTypes) {
 		$this->login('media_types.php');
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 
 		$this->click('form');
 		$this->wait();
@@ -106,7 +106,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->click('cancel');
 		$this->wait();
 
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 	}
 
 	/**
@@ -114,7 +114,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	*/
 	public function testFormAdministrationMediaTypes_Create($type, $data) {
 		$this->login('media_types.php');
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		$this->button_click('form');
 		$this->wait();
 
@@ -157,7 +157,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->click('save');
 		$this->wait();
 
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		$this->nok('ERROR');
 		$this->ok($data['Description']);
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
@@ -173,12 +173,12 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$oldHashMediaType = DBhash($sql);
 
 		$this->login('media_types.php');
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		$this->click('link='.$name);
 		$this->wait();
 		$this->button_click('cancel');
 		$this->wait();
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 
@@ -195,7 +195,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$oldHashMediaType=DBhash($sqlMediaType);
 
 		$this->login('media_types.php');
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		$this->ok('CONFIGURATION OF MEDIA TYPES');
 		$this->click('link='.$name);
 		$this->wait();
@@ -222,7 +222,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		DBsave_tables('media_type');
 
 		$this->login('media_types.php');
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		$this->click('link='.$name);
 		$this->chooseOkOnNextConfirmation();
 		$this->wait();
@@ -231,7 +231,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		if ($used_by_operations) {
 				$this->nok('Media type deleted');
 				$this->ok('Cannot delete media type');

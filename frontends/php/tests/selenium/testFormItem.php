@@ -71,9 +71,9 @@ class testFormItem extends CWebTest {
 		$this->ok('Interval');
 		$this->ok('Period');
 		$this->ok('Action');
-		$this->ok('No flexible intervals defined');
-		$this->ok('New flexible interval');
-		$this->ok('Interval (in sec)');
+		$this->ok('No flexible intervals defined.');
+		// $this->ok('New flexible interval');
+		$this->ok('Update interval (in sec)');
 		$this->ok('Period');
 		$this->ok('Keep history (in days)');
 		$this->ok('Keep trends (in days)');
@@ -209,7 +209,7 @@ class testFormItem extends CWebTest {
 				'Checksum of $1',
 				ITEM_TYPE_ZABBIX,
 				'vfs.file.cksum[/sbin/shutdown]',
-				array('Cannot add item', 'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on given host.')
+				array('ERROR: Cannot add item', 'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on')
 			),
 			// Item name is missing
 			array(
@@ -218,7 +218,7 @@ class testFormItem extends CWebTest {
 				'',
 				ITEM_TYPE_ZABBIX,
 				'agent.ping123',
-				array('Page received incorrect data.', 'Warning. Incorrect value for field "name".')
+				array('Page received incorrect data.', 'Warning. Incorrect value for field "Name": cannot be empty.')
 			),
 			// Item key is missing
 			array(
@@ -227,7 +227,7 @@ class testFormItem extends CWebTest {
 				ITEM_TYPE_ZABBIX,
 				'Item name',
 				'',
-				array('Page received incorrect data.', 'Warning. Incorrect value for field "key".')
+				array('Page received incorrect data.', 'Warning. Incorrect value for field "Key": cannot be empty.')
 			)
 		);
 	}
@@ -237,11 +237,11 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormItem_Create($expected, $visibleHostname, $name, $type, $key, $errorMsgs) {
 		$this->login('hosts.php');
-		$this->assertTitle('Hosts');
-		$this->ok('HOSTS');
+		$this->assertTitle('Configuration of hosts');
+		$this->ok('CONFIGURATION OF HOSTS');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->assertTitle('Hosts');
-		$this->ok('HOSTS');
+		$this->assertTitle('Configuration of hosts');
+		$this->ok('CONFIGURATION OF HOSTS');
 
 
 		$row = DBfetch(DBselect("select hostid from hosts where name='$visibleHostname'"));

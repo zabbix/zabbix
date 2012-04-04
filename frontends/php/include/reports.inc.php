@@ -321,7 +321,7 @@ function bar_report_form(){
 		$items_table = $delete_button = null;
 	}
 
-	$reportForm->addRow(S_ITEMS,
+	$reportForm->addRow(_('Items'),
 				array(
 					$items_table,
 					new CButton('add_item',_('Add'),
@@ -457,7 +457,7 @@ function bar_report_form2(){
 		$items_table = $delete_button = null;
 	}
 
-	$reportForm->addRow(S_ITEMS,
+	$reportForm->addRow(_('Items'),
 				array(
 					$items_table,
 					new CButton('add_item',_('Add'),

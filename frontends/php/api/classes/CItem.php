@@ -908,28 +908,30 @@ class CItem extends CItemGeneral {
 	/**
 	 * Update items.
 	 *
-	 * @param $items
+	 * @param array $items
 	 *
 	 * @return void
 	 */
-	protected function updateReal($items) {
+	protected function updateReal(array $items) {
 		$items = zbx_toArray($items);
 
 		$itemids = array();
 		$data = array();
-		foreach ($items as $inum => $item) {
-			$data[] = array('values' => $item, 'where'=> array('itemid'=>$item['itemid']));
+		foreach ($items as $item) {
+			$data[] = array('values' => $item, 'where' => array('itemid' => $item['itemid']));
 			$itemids[] = $item['itemid'];
 		}
-		$result = DB::update('items', $data);
-		if (!$result) self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
+		DB::update('items', $data);
 
-		$itemApplications = $aids = array();
-		foreach ($items as $key => $item) {
-			if (!isset($item['applications'])) continue;
+		$itemApplications = array();
+		$aids = array();
+		foreach ($items as $item) {
+			if (!isset($item['applications'])) {
+				continue;
+			}
 			$aids[] = $item['itemid'];
 
-			foreach ($item['applications'] as $anum => $appid) {
+			foreach ($item['applications'] as $appid) {
 				$itemApplications[] = array(
 					'applicationid' => $appid,
 					'itemid' => $item['itemid']
