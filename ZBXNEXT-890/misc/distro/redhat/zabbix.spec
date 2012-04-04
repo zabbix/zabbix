@@ -79,6 +79,12 @@ Requires	: zabbix = %{version}-%{release}
 Requires	: zabbix-server-implementation = %{version}-%{release}
 Requires	: fping
 Requires	: net-snmp
+Requires	: iksemel
+Requires	: unixODBC
+Requires	: libssh2 >= 1.0.0
+Requires	: curl >= 7.13.1
+Requires	: OpenIPMI >= 2.0.14
+Conflict	: zabbix-proxy
 Requires(post)	: /sbin/chkconfig
 Requires(preun)	: /sbin/chkconfig
 Requires(preun)	: /sbin/service
@@ -91,6 +97,7 @@ Summary		: Zabbix server compiled to use MySQL database
 Group		: Applications/Internet
 Requires	: zabbix = %{version}-%{release}
 Requires	: zabbix-server = %{version}-%{release}
+Requires	: mysql
 Provides	: zabbix-server-implementation = %{version}-%{release}
 Obsoletes	: zabbix <= 1.5.3-0.1
 Conflicts	: zabbix-server-pgsql
@@ -103,6 +110,7 @@ Summary		: Zabbix server compiled to use PostgresSQL database
 Group		: Applications/Internet
 Requires	: zabbix = %{version}-%{release}
 Requires	: zabbix-server = %{version}-%{release}
+Requires	: postgresql
 Provides	: zabbix-server-implementation = %{version}-%{release}
 Conflicts	: zabbix-server-mysql
 
@@ -118,8 +126,13 @@ Requires(post)	: /sbin/chkconfig
 Requires(preun)	: /sbin/chkconfig
 Requires(preun)	: /sbin/service
 Requires	: fping
-Conflicts	: %{name}-server
-Conflicts	: %{name}-web
+Requires	: net-snmp
+Requires	: unixODBC
+Requires	: libssh2 >= 1.0.0
+Requires	: curl >= 7.13.1
+Requires	: OpenIPMI-libs >= 2.0.14
+Conflicts	: zabbix-server
+Conflicts	: zabbix-web
 
 %description proxy
 The Zabbix proxy common files
@@ -128,7 +141,10 @@ The Zabbix proxy common files
 Summary		: Zabbix proxy compiled to use MySQL
 Group		: Applications/Internet
 Requires	: zabbix-proxy = %{version}-%{release}
+Requires	: mysql
 Provides	: zabbix-proxy-implementation = %{version}-%{release}
+Conflicts	: zabbix-proxy-pgsql
+Conflicts	: zabbix-proxy-sqlite3
 
 %description proxy-mysql
 The Zabbix proxy compiled to use MySQL
@@ -137,7 +153,10 @@ The Zabbix proxy compiled to use MySQL
 Summary		: Zabbix proxy compiled to use PostgreSQL
 Group		: Applications/Internet
 Requires	: zabbix-proxy = %{version}-%{release}
+Requires	: postgresql
 Provides	: zabbix-proxy-implementation = %{version}-%{release}
+Conflicts	: zabbix-proxy-mysql
+Conflicts	: zabbix-proxy-sqlite3
 
 %description proxy-pgsql
 The Zabbix proxy compiled to use PostgreSQL
@@ -146,7 +165,10 @@ The Zabbix proxy compiled to use PostgreSQL
 Summary		: Zabbix proxy compiled to use SQLite3
 Group		: Applications/Internet
 Requires	: zabbix-proxy = %{version}-%{release}
+Requires	: sqlite
 Provides	: zabbix-proxy-implementation = %{version}-%{release}
+Conflicts	: zabbix-proxy-mysql
+Conflicts	: zabbix-proxy-pgsql
 
 %description proxy-sqlite3
 The Zabbix proxy compiled to use SQLite3
@@ -157,7 +179,7 @@ Group		: Applications/Internet
 %if 0%{?fedora} > 9 || 0%{?rhel} >= 6
 BuildArch	: noarch
 %endif
-Requires	: php
+Requires	: php >= 5.0
 Requires	: php-gd
 Requires	: php-bcmath
 Requires	: php-mbstring
@@ -169,6 +191,7 @@ Requires	: dejavu-sans-fonts
 Requires	: zabbix-web-database = %{version}-%{release}
 Requires(post)	: %{_sbindir}/update-alternatives
 Requires(preun)	: %{_sbindir}/update-alternatives
+Conflicts	: zabbix-proxy
 
 %description web
 The php frontend to display the zabbix web interface.
@@ -663,6 +686,7 @@ fi
 %defattr(-,root,root,-)
 %dir %attr(0750,apache,apache) %{_sysconfdir}/zabbix/web
 %ghost %attr(0644,apache,apache) %config(noreplace) %{_sysconfdir}/zabbix/web/zabbix.conf.php
+%config(noreplace) %{_sysconfdir}/zabbix/web/maintenance.inc.php
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/zabbix.conf
 %{_datadir}/zabbix
 
