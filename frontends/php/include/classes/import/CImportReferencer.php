@@ -25,6 +25,7 @@
  */
 class CImportReferencer {
 
+	protected $processedHosts = array();
 	protected $groups = array();
 	protected $templates = array();
 	protected $hosts = array();
@@ -43,6 +44,28 @@ class CImportReferencer {
 	protected $triggersRefs;
 	protected $iconMapsRefs;
 	protected $mapsRefs;
+
+
+	/**
+	 * Add host/template that has been updated or created, i.e. all items, discovery rules, etc,
+	 * related to these hosts/templates should be created or updated too.
+	 *
+	 * @param $host
+	 */
+	public function addProcessedHost($host) {
+		$this->processedHosts[$host] = $host;
+	}
+
+	/**
+	 * Checks if host/template has been created or updated during the current import.
+	 *
+	 * @param $host
+	 *
+	 * @return bool
+	 */
+	public function isProcessedHost($host) {
+		return isset($this->processedHosts[$host]);
+	}
 
 	/**
 	 * Get group id by name.
