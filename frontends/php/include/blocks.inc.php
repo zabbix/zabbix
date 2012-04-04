@@ -253,16 +253,21 @@ function make_system_status($filter) {
 		}
 
 		foreach ($trigger['groups'] as $group) {
-			if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
-			}
-			if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30 && !$trigger['event']['acknowledged']) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers_unack'][] = $trigger;
+			if (in_array($filter['extAck'], array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))) {
+				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
+
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30) {
+					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
+				}
 			}
 
-			$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
-			if (!$trigger['event']['acknowledged']) {
+			if (in_array($filter['extAck'], array(EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH))
+					&& !$trigger['event']['acknowledged']) {
 				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
+
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30) {
+					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers_unack'][] = $trigger;
+				}
 			}
 		}
 	}
@@ -282,37 +287,40 @@ function make_system_status($filter) {
 				continue;
 			}
 
-			$force = false;
-			$allTriggersNum = null;
-			if ($filter['extAck'] == EXTACK_OPTION_ALL || $filter['extAck'] == EXTACK_OPTION_BOTH) {
-				if ($allTriggersNum = $data['count']) {
-					$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
-					$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams));
-				} else {
-					$force = true;
-				}
+			$allTriggersNum = $data['count'];
+			if ($allTriggersNum) {
+				$allTriggersNum = new CSpan($allTriggersNum, 'pointer');
+				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams));
 			}
 
-			$unackTriggersNum = null;
-			if ($filter['extAck'] == EXTACK_OPTION_UNACK || $filter['extAck'] == EXTACK_OPTION_BOTH) {
-				if ($unackTriggersNum = $data['count_unack']) {
-					$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
-					$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
-				} else {
-					$force = true;
-				}
+			$unackTriggersNum = $data['count_unack'];
+			if ($unackTriggersNum) {
+				$unackTriggersNum = new CSpan($unackTriggersNum, 'pointer red bold');
+				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams));
 			}
 
-			$sp = null;
-			if ($filter['extAck'] == EXTACK_OPTION_BOTH) {
-				if ($unackTriggersNum) {
-					$sp = new CSpan(SPACE._('of').SPACE);
-				} else {
-					$unackTriggersNum = null;
-				}
-			}
+			switch ($filter['extAck']) {
+				case EXTACK_OPTION_ALL:
+					$group_row->addItem(getSeverityCell($severity, $allTriggersNum, !$allTriggersNum));
+					break;
 
-			$group_row->addItem(getSeverityCell($severity, array($unackTriggersNum, $sp, $allTriggersNum), $force));
+				case EXTACK_OPTION_UNACK:
+					$group_row->addItem(getSeverityCell($severity, $unackTriggersNum, !$unackTriggersNum));
+					break;
+
+				case EXTACK_OPTION_BOTH:
+					if ($unackTriggersNum) {
+						$span = new Cspan(SPACE._('of').SPACE);
+						$unackTriggersNum = new CSpan($unackTriggersNum);
+					}
+					else {
+						$span = null;
+						$unackTriggersNum = null;
+					}
+
+					$group_row->addItem(getSeverityCell($severity, array($unackTriggersNum, $span, $allTriggersNum), !$allTriggersNum));
+					break;
+			}
 		}
 		$table->addRow($group_row);
 	}
