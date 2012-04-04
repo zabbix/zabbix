@@ -136,7 +136,7 @@ static int	process_mode_function(const char *cmd, const char *param, unsigned fl
 	if (2 < num_param(param))
 		return SYSINFO_RET_FAIL;
 
-	if (0 != get_param(param, 1, devname, sizeof(mode)))
+	if (0 != get_param(param, 1, devname, sizeof(mode)) || 0 == strcmp("all", devname))
 		*devname = '\0';
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
