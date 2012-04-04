@@ -51,7 +51,7 @@ $param1_sec_count = array(
 		'M' => $metrics // metrcis
 	),
 	array(
-		'C' => S_TIME_SHIFT.' ', // caption
+		'C' => _('Time shift').' ', // caption
 		'T' => T_ZBX_INT // type
 	)
 );

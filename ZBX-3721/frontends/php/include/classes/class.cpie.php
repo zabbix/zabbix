@@ -308,7 +308,7 @@ class CPie extends CGraphDraw{
 
 //			convert_units($datavalue,$this->items[$i]["units"]),
 			if (isset($data) && isset($datavalue)) {
-				$strvalue = sprintf(S_VALUE.': %s ('.(round($proc)!=$proc? '%0.2f':'%s').'%%)',convert_units($datavalue,$this->items[$i]['units']),$proc);
+				$strvalue = sprintf(_('Value').': %s ('.(round($proc)!=$proc? '%0.2f':'%s').'%%)',convert_units($datavalue,$this->items[$i]['units']),$proc);
 
 				$str = sprintf('%s: %s [%s] ',
 						str_pad($this->items[$i]['host'],$max_host_len,' '),
@@ -316,7 +316,7 @@ class CPie extends CGraphDraw{
 						$fnc_name);
 			}
 			else{
-				$strvalue = sprintf(S_VALUE.': '._('no data'));
+				$strvalue = sprintf(_('Value: no data'));
 				$str = sprintf('%s: %s [ '._('no data').' ]',
 					str_pad($this->items[$i]['host'],$max_host_len,' '),
 					str_pad($this->items[$i]['name'],$max_name_len,' '));

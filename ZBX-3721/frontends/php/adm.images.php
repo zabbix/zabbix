@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/images.inc.php';
 
@@ -54,19 +54,18 @@ if (isset($_REQUEST['save'])) {
 
 	try {
 		DBstart();
-		$file = isset($_FILES['image']) && $_FILES['image']['name'] != '' ? $_FILES['image'] : null;
-		if (!is_null($file)) {
-			if ($file['error'] != 0 || $file['size'] == 0) {
-				throw new Exception(_('Incorrect image'));
-			}
-			if ($file['size'] < ZBX_MAX_IMAGE_SIZE) {
-				$image = fread(fopen($file['tmp_name'], 'r'), filesize($file['tmp_name']));
+		if (isset($_FILES['image'])) {
+			$file = new CUploadFile($_FILES['image']);
+
+			if (isset($_REQUEST['imageid']) && !$file->wasUploaded()) {
+				$image = null;
 			}
 			else {
-				throw new Exception(_('Image size must be less than 1MB'));
+				if ($file->getSize() > ZBX_MAX_IMAGE_SIZE) {
+					throw new Exception(_('Image size must be less than 1MB'));
+				}
+				$image = base64_encode($file->getContent());
 			}
-
-			$image = base64_encode($image);
 		}
 
 		if (isset($_REQUEST['imageid'])) {
@@ -74,17 +73,13 @@ if (isset($_REQUEST['save'])) {
 				'imageid' => $_REQUEST['imageid'],
 				'name' => $_REQUEST['name'],
 				'imagetype' => $_REQUEST['imagetype'],
-				'image' => is_null($file) ? null : $image
+				'image' => $image
 			);
 			$result = API::Image()->update($val);
 
 			$audit_action = 'Image ['.$_REQUEST['name'].'] updated';
 		}
 		else {
-			if (is_null($file)) {
-				throw new Exception(_('Select image to download'));
-			}
-
 			$val = array(
 				'name' => $_REQUEST['name'],
 				'imagetype' => $_REQUEST['imagetype'],
@@ -185,4 +180,3 @@ $cnf_wdgt->addItem($imageForm->render());
 $cnf_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

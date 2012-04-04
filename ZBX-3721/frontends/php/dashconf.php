@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/html.inc.php';
 
-$page['title'] = 'S_DASHBOARD_CONFIGURATION';
+$page['title'] = _('Dashboard configuration');
 $page['file'] = 'dashconf.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array();
@@ -107,7 +107,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // Header
 	$dashboard_wdgt->setClass('header');
-	$dashboard_wdgt->addPageHeader(S_DASHBOARD_CONFIGURATION_BIG, SPACE);
+	$dashboard_wdgt->addPageHeader(_('DASHBOARD CONFIGURATION'), SPACE);
 
 //-------------
 // GROUPS
@@ -154,21 +154,21 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$dashForm->addVar('filterEnable', $filterEnable);
 
 	if($filterEnable){
-		$cbFilter = new CSpan(S_ENABLED, 'green underline pointer');
+		$cbFilter = new CSpan(_('Enabled'), 'green underline pointer');
 		$cbFilter->setAttribute('onclick', "create_var('" . $dashForm->getName() . "', 'filterEnable', 0, true);");
 	}
 	else{
-		$cbFilter = new CSpan(S_DISABLED, 'red underline pointer');
+		$cbFilter = new CSpan(_('Disabled'), 'red underline pointer');
 		$cbFilter->setAttribute('onclick', "$('dashform').enable(); create_var('" . $dashForm->getName() . "', 'filterEnable', 1, true);");
 	}
 
-	$dashList->addRow(S_DASHBOARD_FILTER, $cbFilter);
+	$dashList->addRow(_('Dashboard filter'), $cbFilter);
 
 	$dashForm->addVar('groupids', $groupids);
 
 	$cmbGroups = new CComboBox('grpswitch', $grpswitch, 'submit();');
 	$cmbGroups->addItem(0, _('All'));
-	$cmbGroups->addItem(1, S_SELECTED);
+	$cmbGroups->addItem(1, _('Selected'));
 
 	if(!$filterEnable) $cmbGroups->setAttribute('disabled', 'disabled');
 
@@ -210,7 +210,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$cbMain = new CCheckBox('maintenance', $maintenance, null, '1');
 	if(!$filterEnable) $cbMain->setAttribute('disabled', 'disabled');
 
-	$dashList->addRow(S_HOSTS, array($cbMain, S_SHOW_HOSTS_IN_MAINTENANCE));
+	$dashList->addRow(_('Hosts'), array($cbMain, _('Show hosts in maintenance')));
 
 // Trigger
 	$severity = zbx_toHash($severity);
@@ -232,20 +232,20 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	}
 	array_pop($trgSeverities);
 
-	$dashList->addRow(S_TRIGGERS_WITH_SEVERITY, $trgSeverities);
+	$dashList->addRow(_('Triggers with severity'), $trgSeverities);
 
 	$config = select_config();
 	$cb = new CComboBox('extAck', $extAck);
 	$cb->addItems(array(
 		EXTACK_OPTION_ALL => _('All'),
-		EXTACK_OPTION_BOTH => S_O_SEPARATED,
-		EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
+		EXTACK_OPTION_BOTH => _('Separated'),
+		EXTACK_OPTION_UNACK => _('Unacknowledged only'),
 	));
 	$cb->setEnabled($filterEnable && $config['event_ack_enable']);
 	if(!$config['event_ack_enable']){
-		$cb->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
+		$cb->setAttribute('title', _('Event acknowledging disabled'));
 	}
-	$dashList->addRow(S_PROBLEM_DISPLAY, $cb);
+	$dashList->addRow(_('Problem display'), $cb);
 //-----
 
 	$divTabs->addTab('dashFilterTab', _('Filter'), $dashList);
@@ -253,7 +253,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$dashForm->addItem($divTabs);
 
 // Footer
-	$main = array(new CSubmit('save', S_SAVE));
+	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
 
 	$dashForm->addItem(makeFormFooter($main, $others));
