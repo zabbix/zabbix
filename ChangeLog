@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBX-1357] updated French, German, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-4824] fixed memory leak while switching item to not supported status (Sasha)
 ..F....... [ZBX-4830] fixed error when try to create item without host (Vedmak)
 ..F....... [ZBX-4676] fixed link to triggers from dashboard 'system status' widget not reset host filter (Vedmak)
 ..F....... [ZBX-4568] fixed new host groups not populated with selected group when 'remember selected' is disabled in GUI settings (Vedmak)
