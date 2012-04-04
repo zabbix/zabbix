@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/maps.inc.php';
 
-$page['title'] = 'S_MAP';
+$page['title'] = _('Map');
 $page['file'] = 'map.php';
 $page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 

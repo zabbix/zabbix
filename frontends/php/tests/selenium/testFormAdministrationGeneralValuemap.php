@@ -31,8 +31,8 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Value mapping');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->assertTitle('Configuration of value mapping');
+		$this->ok('CONFIGURATION OF VALUE MAPPING');
 		$this->ok('Value mapping');
 		$this->assertElementPresent('form');
 		$this->button_click('form');
@@ -93,7 +93,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->click("id=save");
 		$this->wait();
 		$this->ok('Value map added');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->ok('CONFIGURATION OF VALUE MAPPING');
 		$this->ok('Value mapping');
 		$this->ok('Name');
 		$this->ok('Value map');
@@ -141,7 +141,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->click("id=save");
 		$this->wait();
 		$this->ok('Value map added');
-		$this->ok('CONFIGURATION OF ZABBIX');
+		$this->ok('CONFIGURATION OF VALUE MAPPING');
 		$this->ok('Value mapping');
 		$this->ok('Name');
 		$this->ok('Value map');

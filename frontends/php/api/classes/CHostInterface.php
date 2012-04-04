@@ -171,7 +171,7 @@ class CHostInterface extends CZBXAPI {
 
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['where'][] = DBcondition('i.itemid', $options['itemids']);
-			$sqlParts['where']['hi'] = 'hi.hostid=i.hostid';
+			$sqlParts['where']['hi'] = 'hi.interfaceid=i.interfaceid';
 
 			if (!$nodeCheck) {
 				$nodeCheck = true;

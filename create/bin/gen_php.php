@@ -61,6 +61,7 @@ function parse_schema($path) {
 					case 't_history_log':
 					case 't_history_text':
 					case 't_item_param':
+					case 't_longtext':
 					case 't_cksum_text':
 						$type = 'DB::FIELD_TYPE_TEXT';
 						$length = false;

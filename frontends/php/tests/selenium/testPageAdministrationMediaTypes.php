@@ -66,7 +66,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		$this->ok(array('Media type updated', "$name", 'CONFIGURATION OF MEDIA TYPES'));
 
 		$this->assertEquals($oldHashMediaTypes, DBhash($sql));
@@ -221,7 +221,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		$this->getConfirmation();
 		$this->wait();
-		$this->assertTitle('Media types');
+		$this->assertTitle('Configuration of media types');
 		if ($used_in_operations) {
 			$this->nok('Media type deleted');
 			$this->ok('Cannot delete media type');

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
 $divTabs = new CTabView(array('remember' => 1));
@@ -625,5 +625,5 @@ if ($_REQUEST['hostid'] > 0 && $_REQUEST['form'] != 'full_clone') {
 $others[] = new CButtonCancel(url_param('groupid'));
 
 $frmHost->addItem(makeFormFooter($main, $others));
+
 return $frmHost;
-?>

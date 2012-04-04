@@ -32,8 +32,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Images');
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type'));
+		$this->assertTitle('Configuration of images');
+		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
 		$this->assertElementPresent('form');
@@ -63,8 +63,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/UPS.png');
 		$this->click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type', 'Image added'));
+		$this->assertTitle('Configuration of images');
+		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type', 'Image added'));
 
 		// $sql = 'SELECT * FROM images WHERE name=\''.$this->icon_image_name.'\'';
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name.'\'';
@@ -98,8 +98,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Notebook.png');
 		$this->click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Image updated'));
+		$this->assertTitle('Configuration of images');
+		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Image updated'));
 
 		// SELECT * FROM images WHERE name='...' AND imagetype=1;
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
@@ -115,8 +115,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Image deleted'));
+		$this->assertTitle('Configuration of images');
+		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Image deleted'));
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Image with such name still exist in the DB');
@@ -132,8 +132,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Printer.png');
 		$this->click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Type', 'Image added'));
+		$this->assertTitle('Configuration of images');
+		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type', 'Image added'));
 
 		// SELECT * FROM images WHERE name='...' AND imagetype=2;
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name.'\'';
@@ -151,8 +151,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->type('image', '/home/hudson/igor/trunk/frontends/php/images/sysmaps/Satellite.png');
 		$this->click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Image updated'));
+		$this->assertTitle('Configuration of images');
+		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Image updated'));
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name2.'\'';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Image with such name does not exist in the DB');
@@ -168,8 +168,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->assertTitle('Configuration of Zabbix');
-		$this->ok(array('CONFIGURATION OF ZABBIX', 'Images', 'Image deleted'));
+		$this->assertTitle('Configuration of images');
+		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Image deleted'));
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name2.'\'';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Image with such name still exist in the DB');

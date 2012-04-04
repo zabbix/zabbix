@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,31 +17,35 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
 
-class CButton extends CInput {
+
+abstract class CImporter {
 
 	/**
-	 * For inputs of type "button", the "&" symbol should not be encoded.
-	 *
-	 * @var int
+	 * @var CImportReferencer
 	 */
-	protected $valueEncStrategy = self::ENC_NOAMP;
+	protected $referencer;
 
-	public function __construct($name = 'button', $caption = '', $action = null, $class = null) {
-		parent::__construct('button', $name, $caption, $class);
-		$this->addAction('onclick', $action);
-		return $this;
+	/**
+	 * @var array
+	 */
+	protected $options = array();
+
+	/**
+	 * @param array             $options
+	 * @param CImportReferencer $referencer
+	 */
+	public function __construct(array $options, CImportReferencer $referencer) {
+		$this->options = $options;
+		$this->referencer = $referencer;
 	}
 
-	public function setAccessKey($value = 'B') {
-		if (isset($value)) {
-			if (!isset($this->attributes['title'])) {
-				$this->setTitle($this->attributes['value'].' [Alt+'.$value.']');
-			}
-		}
-		return $this->setAttribute('accessKey', $value);
-	}
+	/**
+	 * @abstract
+	 *
+	 * @param array $elements
+	 *
+	 * @return mixed
+	 */
+	abstract public function import(array $elements);
 }
-?>

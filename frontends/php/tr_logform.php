@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
-$page['title'] = 'S_TRIGGER_LOG_FORM';
+$page['title'] = _('Trigger form');
 $page['file'] = 'tr_logform.php';
 $page['scripts'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -151,7 +151,7 @@ if(isset($_REQUEST['save_trigger'])){
 		}
 
 		if($result){
-			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ");
+			add_audit($audit_action, AUDIT_RESOURCE_TRIGGER, _('Trigger')." [".$triggerid."] [".expand_trigger_description($triggerid)."] ");
 			unset($_REQUEST["sform"]);
 
 			zbx_add_post_js('closeForm("items.php");');
@@ -164,7 +164,7 @@ if(isset($_REQUEST['save_trigger'])){
 //------------------------ <FORM> ---------------------------
 
 if(isset($_REQUEST['sform'])){
-	$frmTRLog = new CFormTable(S_TRIGGER,'tr_logform.php','POST',null,'sform');
+	$frmTRLog = new CFormTable(_('Trigger'),'tr_logform.php','POST',null,'sform');
 	$frmTRLog->setHelp('web.triggerlog.service.php');
 	$frmTRLog->setTableClass('formlongtable formtable');
 	$frmTRLog->addVar('form_refresh',get_request('form_refresh',1));
@@ -274,7 +274,7 @@ if(isset($_REQUEST['sform'])){
 	$ctb->setAttribute('disabled','disabled');
 
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
-	$cbtn = new CSubmit('select_item',S_SELECT,$script);
+	$cbtn = new CSubmit('select_item',_('Select'),$script);
 
 	$frmTRLog->addRow(S_ITEM,array($ctb, $cbtn));
 	$frmTRLog->addVar('itemid',$itemid);
@@ -289,7 +289,7 @@ if(isset($_REQUEST['sform'])){
 	$ctb = new CTextBox('expression','',80);
 	$ctb->setAttribute('id','logexpr');
 
-	$cb = new CButton('add_exp',S_ADD,'javascript: add_logexpr();');
+	$cb = new CButton('add_exp',_('Add'),'javascript: add_logexpr();');
 	$cbAdd = new CButton('add_key_and', _('AND'), 'javascript: add_keyword_and();');
 	$cbOr = new CButton('add_key_or', _('OR'), 'javascript: add_keyword_or();');
 	$cbIregexp = new CCheckBox('iregexp', 'no', null,1);
@@ -333,7 +333,7 @@ if(isset($_REQUEST['sform'])){
 		$imgdn->setAttribute('onclick','javascript:  element_down("logtr'.$id.'");');
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
-		$del_url = new CSpan(S_DELETE,'link');
+		$del_url = new CSpan(_('Delete'),'link');
 		$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) remove_expression("logtr'.$id.'"); return false;');
 
 		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?_('Include'):_('Exclude')),array($imgup,SPACE,$imgdn),$del_url));
@@ -350,7 +350,7 @@ if(isset($_REQUEST['sform'])){
 
 	$maxid=0;
 	foreach($keys as $id => $val){
-		$del_url = new CLink(S_DELETE,'#','action','javascript: if(confirm("'._('Delete keyword?').'")) remove_keyword("keytr'.$id.'"); return false;');
+		$del_url = new CLink(_('Delete'),'#','action','javascript: if(confirm("'._('Delete keyword?').'")) remove_keyword("keytr'.$id.'"); return false;');
 		$row = new CRow(array(htmlspecialchars($val['value']),$val['type'],$del_url));
 		$row->setAttribute('id','keytr'.$id);
 		$keyTable->addRow($row);
