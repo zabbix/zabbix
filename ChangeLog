@@ -1,7 +1,7 @@
 Changes for 1.8.12rc1
 
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
-A.F....... [ZBX-4813] Fixed incorrect exception handling in maps when checking for circularity (Toms, Vedmak)
+A.F....... [ZBX-4813] fixed incorrect exception handling in maps when checking for circularity (Toms, Vedmak)
 ..F....... [ZBX-2873] fixed colors in dark theme (Vedmak)
 ..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
 ...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes more than 15 characters (Sasha)
