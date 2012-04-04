@@ -268,10 +268,10 @@
 
 				<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED) { ?>
 					name = 'chart7.php';
-					src = src + '&graph3d=' + (jQuery('#graph3d').is(':checked') ? 1 : 0);
+					src += '&graph3d=' + (jQuery('#graph3d').is(':checked') ? 1 : 0);
 
 				<?php } else { ?>
-					src = src + '&ymin_type=' + jQuery('#ymin_type').val()
+					src += '&ymin_type=' + jQuery('#ymin_type').val()
 								+ '&ymax_type=' + jQuery('#ymax_type').val()
 								+ '&yaxismin=' + jQuery('#yaxismin').val()
 								+ '&yaxismax=' + jQuery('#yaxismax').val()
@@ -285,7 +285,7 @@
 
 				jQuery('#itemsTable tr.sortable').find('*[name]').each(function(index, value) {
 					if (!jQuery.isEmptyObject(value) && value.name != null) {
-						src = src + '&' + value.name + '=' + value.value;
+						src += '&' + value.name + '=' + value.value;
 					}
 				});
 

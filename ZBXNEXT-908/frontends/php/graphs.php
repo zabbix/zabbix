@@ -33,43 +33,42 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
-	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
-	'copy_type' =>		array(T_ZBX_INT, O_OPT, P_SYS,		IN('0,1'),			'isset({copy})'),
-	'copy_mode' =>		array(T_ZBX_INT, O_OPT, P_SYS,		IN('0'),			null),
-	'graphid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				'(isset({form})&&({form}=="update"))'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,			'isset({save})||isset({preview})', _('Name')),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	'isset({save})||isset({preview})', _('Width').' (min:20, max:65535)'),
-	'height' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	'isset({save})||isset({preview})', _('Height').' (min:20, max:65535)'),
-	'ymin_type' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
-	'ymax_type' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
-	'graphtype' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),		'isset({save})||isset({preview})'),
-	'yaxismin' =>		array(T_ZBX_DBL, O_OPT, null,		null,				'(isset({save})||isset({preview}))&&(({graphtype}==0)||({graphtype}==1))'),
-	'yaxismax' =>		array(T_ZBX_DBL, O_OPT, null,		null,				'(isset({save})||isset({preview}))&&(({graphtype}==0)||({graphtype}==1))'),
-	'graph3d' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null),
-	'legend' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null),
-	'ymin_itemid' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,				'(isset({save})||isset({preview}))&&isset({ymin_type})&&({ymin_type}==3)'),
-	'ymax_itemid' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,				'(isset({save})||isset({preview}))&&isset({ymax_type})&&({ymax_type}==3)'),
-	'percent_left' =>	array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null),
-	'percent_right' =>	array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null),
-	'visible' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),		null),
-	'items' =>			array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'showworkperiod' =>	array(T_ZBX_INT, O_OPT, null,		IN('1'),			null),
-	'showtriggers' =>	array(T_ZBX_INT, O_OPT, null,		IN('1'),			null),
-	'group_graphid' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,				null),
-	'copy_targetid' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,				null),
-	'filter_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
+	'parent_discoveryid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
+	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null),
+	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0,1'),			'isset({copy})'),
+	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0'),			null),
+	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				'(isset({form})&&({form}=="update"))'),
+	'name' =>				array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,			'isset({save})', _('Name')),
+	'width' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	'isset({save})', _('Width').' (min:20, max:65535)'),
+	'height' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	'isset({save})', _('Height').' (min:20, max:65535)'),
+	'ymin_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
+	'ymax_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
+	'graphtype' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),		'isset({save})'),
+	'yaxismin' =>			array(T_ZBX_DBL, O_OPT, null,		null,				'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
+	'yaxismax' =>			array(T_ZBX_DBL, O_OPT, null,		null,				'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
+	'graph3d' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null),
+	'legend' =>				array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null),
+	'ymin_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,				'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
+	'ymax_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,				'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
+	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null),
+	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null),
+	'visible' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),		null),
+	'items' =>				array(T_ZBX_STR, O_OPT, null,		null,				null),
+	'showworkperiod' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),			null),
+	'showtriggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),			null),
+	'group_graphid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,				null),
+	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,				null),
+	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'add_item' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'preview' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'copy' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,				null)
+	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
+	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
+	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
+	'copy' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
+	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,				null),
+	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
+	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
+	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,				null)
 );
 $isDataValid = check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
@@ -82,7 +81,32 @@ $_REQUEST['legend'] = get_request('legend', 0);
 /*
  * Permissions
  */
-if (!empty($_REQUEST['graphid'])) {
+if (!empty($_REQUEST['parent_discoveryid'])) {
+	$discovery_rule = API::DiscoveryRule()->get(array(
+		'itemids' => $_REQUEST['parent_discoveryid'],
+		'output' => API_OUTPUT_EXTEND,
+		'editable' => true
+	));
+	$discovery_rule = reset($discovery_rule);
+	if (!$discovery_rule) {
+		access_deny();
+	}
+
+	$_REQUEST['hostid'] = $discovery_rule['hostid'];
+
+	if (isset($_REQUEST['graphid'])) {
+		$graphPrototype = API::GraphPrototype()->get(array(
+			'graphids' => $_REQUEST['graphid'],
+			'output' => API_OUTPUT_SHORTEN,
+			'editable' => true,
+			'preservekeys' => true
+		));
+		if (empty($graphPrototype)) {
+			access_deny();
+		}
+	}
+}
+elseif (!empty($_REQUEST['graphid'])) {
 	$options = array(
 		'nodeids' => get_current_nodeid(true),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
@@ -120,15 +144,21 @@ elseif (isset($_REQUEST['save'])) {
 	$result = true;
 
 	$items = get_request('items', array());
-	$itemids = array();
-	foreach ($items as $item) {
-		if (!empty($item['itemid'])) {
-			$itemids[$item['itemid']] = $item['itemid'];
-		}
-		else {
-			$result = false;
+	if (!empty($items)) {
+		$itemids = array();
+		foreach ($items as $item) {
+			if (!empty($item['itemid'])) {
+				$itemids[$item['itemid']] = $item['itemid'];
+			}
+			else {
+				$result = false;
+			}
 		}
 	}
+	else {
+		$result = false;
+	}
+
 	if (!$result) {
 		info(_('Items required for graph.'));
 	}
@@ -137,7 +167,6 @@ elseif (isset($_REQUEST['save'])) {
 		$dbItems = API::Item()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => $itemids,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 			'webitems' => true,
 			'editable' => true
 		));
@@ -166,12 +195,13 @@ elseif (isset($_REQUEST['save'])) {
 		$showtriggers = isset($_REQUEST['showtriggers']) ? 1 : 0;
 
 		$visible = get_request('visible');
-		$percent_left = 0;
-		$percent_right = 0;
 
+		$percent_left = 0;
 		if (isset($visible['percent_left'])) {
 			$percent_left = get_request('percent_left', 0);
 		}
+
+		$percent_right = 0;
 		if (isset($visible['percent_right'])) {
 			$percent_right = get_request('percent_right', 0);
 		}
@@ -203,16 +233,26 @@ elseif (isset($_REQUEST['save'])) {
 			'gitems' => $items
 		);
 
+		if (!empty($_REQUEST['parent_discoveryid'])) {
+			$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+		}
+
 		if (isset($_REQUEST['graphid'])) {
 			$graph['graphid'] = $_REQUEST['graphid'];
 
-			$result = API::Graph()->update($graph);
+			$result = !empty($_REQUEST['parent_discoveryid'])
+				? API::GraphPrototype()->update($graph)
+				: API::Graph()->update($graph);
+
 			if ($result) {
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH, 'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
+				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH, 'Graph ID ['.$_REQUEST['graphid'].'] Graph ['.$_REQUEST['name'].']');
 			}
 		}
 		else {
-			$result = API::Graph()->create($graph);
+			$result = !empty($_REQUEST['parent_discoveryid'])
+				? API::GraphPrototype()->create($graph)
+				: API::Graph()->create($graph);
+
 			if ($result) {
 				add_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, 'Graph ['.$_REQUEST['name'].']');
 			}
@@ -231,14 +271,20 @@ elseif (isset($_REQUEST['save'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['graphid'])) {
-	$result = API::Graph()->delete($_REQUEST['graphid']);
+	$result = !empty($_REQUEST['parent_discoveryid'])
+		? API::GraphPrototype()->delete($_REQUEST['graphid'])
+		: API::Graph()->delete($_REQUEST['graphid']);
+
 	if ($result) {
 		unset($_REQUEST['form']);
 	}
 	show_messages($result, _('Graph deleted'), _('Cannot delete graph'));
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_graphid'])) {
-	$go_result = API::Graph()->delete($_REQUEST['group_graphid']);
+	$go_result = !empty($_REQUEST['parent_discoveryid'])
+		? API::GraphPrototype()->delete($_REQUEST['group_graphid'])
+		: API::Graph()->delete($_REQUEST['group_graphid']);
+
 	show_messages($go_result, _('Graphs deleted'), _('Cannot delete graphs'));
 }
 elseif ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['copy']) && isset($_REQUEST['group_graphid'])) {
@@ -318,14 +364,140 @@ $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
 if ($_REQUEST['go'] == 'copy_to' && isset($_REQUEST['group_graphid'])) {
+	// render view
 	$graphView = new CView('configuration.copy.elements', getCopyElementsFormData('group_graphid'));
 	$graphView->render();
 	$graphView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$data = getGraphFormData();
-	$data['isDataValid'] = $isDataValid;
+	$data = array(
+		'form' => get_request('form'),
+		'form_refresh' => get_request('form_refresh', 0),
+		'graphid' => get_request('graphid', 0),
+		'parent_discoveryid' => get_request('parent_discoveryid'),
+		'group_gid' => get_request('group_gid', array()),
+		'hostid' => get_request('hostid', array()),
+		'normal_only' => get_request('normal_only'),
+		'isDataValid' => $isDataValid
+	);
 
+	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
+		$options = array(
+			'graphids' => $data['graphid'],
+			'output' => API_OUTPUT_EXTEND
+		);
+		$graph = !empty($data['parent_discoveryid'])
+			? API::GraphPrototype()->get($options)
+			: API::Graph()->get($options);
+
+		$graph = reset($graph);
+
+		$data['name'] = $graph['name'];
+		$data['width'] = $graph['width'];
+		$data['height'] = $graph['height'];
+		$data['ymin_type'] = $graph['ymin_type'];
+		$data['ymax_type'] = $graph['ymax_type'];
+		$data['yaxismin'] = $graph['yaxismin'];
+		$data['yaxismax'] = $graph['yaxismax'];
+		$data['ymin_itemid'] = $graph['ymin_itemid'];
+		$data['ymax_itemid'] = $graph['ymax_itemid'];
+		$data['showworkperiod'] = $graph['show_work_period'];
+		$data['showtriggers'] = $graph['show_triggers'];
+		$data['graphtype'] = $graph['graphtype'];
+		$data['legend'] = $graph['show_legend'];
+		$data['graph3d'] = $graph['show_3d'];
+		$data['percent_left'] = $graph['percent_left'];
+		$data['percent_right'] = $graph['percent_right'];
+
+		// items
+		$data['items'] = API::GraphItem()->get(array(
+			'graphids' => $data['graphid'],
+			'sortfield' => 'gitemid',
+			'output' => API_OUTPUT_EXTEND
+		));
+	}
+	else {
+		$data['name'] = get_request('name', '');
+		$data['graphtype'] = get_request('graphtype', GRAPH_TYPE_NORMAL);
+
+		if ($data['graphtype'] == GRAPH_TYPE_PIE || $data['graphtype'] == GRAPH_TYPE_EXPLODED) {
+			$data['width'] = get_request('width', 400);
+			$data['height'] = get_request('height', 300);
+		}
+		else {
+			$data['width'] = get_request('width', 900);
+			$data['height'] = get_request('height', 200);
+		}
+
+		$data['ymin_type'] = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
+		$data['ymax_type'] = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
+		$data['yaxismin'] = get_request('yaxismin', 0.00);
+		$data['yaxismax'] = get_request('yaxismax', 100.00);
+		$data['ymin_itemid'] = get_request('ymin_itemid', 0);
+		$data['ymax_itemid'] = get_request('ymax_itemid', 0);
+		$data['showworkperiod'] = get_request('showworkperiod', 0);
+		$data['showtriggers'] = get_request('showtriggers', 0);
+		$data['legend'] = get_request('legend', 0);
+		$data['graph3d'] = get_request('graph3d', 0);
+		$data['visible'] = get_request('visible');
+		$data['percent_left'] = 0;
+		$data['percent_right'] = 0;
+		$data['visible'] = get_request('visible');
+		$data['items'] = get_request('items', array());
+
+		if (isset($data['visible']['percent_left'])) {
+			$data['percent_left'] = get_request('percent_left', 0);
+		}
+		if (isset($data['visible']['percent_right'])) {
+			$data['percent_right'] = get_request('percent_right', 0);
+		}
+	}
+
+	if (empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
+		$data['legend'] = $_REQUEST['legend'] = 1;
+	}
+
+	$_REQUEST['items'] = $data['items'];
+	$_REQUEST['name'] = $data['name'];
+	$_REQUEST['width'] = $data['width'];
+	$_REQUEST['height'] = $data['height'];
+	$_REQUEST['ymin_type'] = $data['ymin_type'];
+	$_REQUEST['ymax_type'] = $data['ymax_type'];
+	$_REQUEST['yaxismin'] = $data['yaxismin'];
+	$_REQUEST['yaxismax'] = $data['yaxismax'];
+	$_REQUEST['ymin_itemid'] = $data['ymin_itemid'];
+	$_REQUEST['ymax_itemid'] = $data['ymax_itemid'];
+	$_REQUEST['showworkperiod'] = $data['showworkperiod'];
+	$_REQUEST['showtriggers'] = $data['showtriggers'];
+	$_REQUEST['graphtype'] = $data['graphtype'];
+	$_REQUEST['legend'] = $data['legend'];
+	$_REQUEST['graph3d'] = $data['graph3d'];
+	$_REQUEST['percent_left'] = $data['percent_left'];
+	$_REQUEST['percent_right'] = $data['percent_right'];
+
+	$data['items'] = array_values($data['items']);
+	$itemCount = count($data['items']);
+	for ($i = 0; $i < $itemCount - 1;) {
+		// check if we delete an item
+		$next = $i + 1;
+		while (!isset($data['items'][$next]) && $next < ($itemCount - 1)) {
+			$next++;
+		}
+
+		if (isset($data['items'][$next]) && $data['items'][$i]['sortorder'] == $data['items'][$next]['sortorder']) {
+			for ($j = $next; $j < $itemCount; $j++) {
+				if ($data['items'][$j - 1]['sortorder'] >= $data['items'][$j]['sortorder']) {
+					$data['items'][$j]['sortorder']++;
+				}
+			}
+		}
+
+		$i = $next;
+	}
+	asort_by_key($data['items'], 'sortorder');
+	$data['items'] = array_values($data['items']);
+
+	// render view
 	$graphView = new CView('configuration.graph.edit', $data);
 	$graphView->render();
 	$graphView->show();
@@ -338,8 +510,12 @@ else {
 	$data = array(
 		'pageFilter' => $pageFilter,
 		'hostid' => get_request('hostid'),
+		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'graphs' => array()
 	);
+	if (!empty($_REQUEST['parent_discoveryid'])) {
+		$data['discovery_rule'] = $discovery_rule;
+	}
 
 	$sortfield = getPageSortField('name');
 
@@ -356,7 +532,12 @@ else {
 		elseif ($pageFilter->groupid > 0) {
 			$options['groupids'] = $pageFilter->groupid;
 		}
-		$data['graphs'] = API::Graph()->get($options);
+		if (!empty($_REQUEST['parent_discoveryid'])) {
+			$options['discoveryids'] = $_REQUEST['parent_discoveryid'];
+		}
+		$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
+			? API::GraphPrototype()->get($options)
+			: API::Graph()->get($options);
 	}
 
 	if ($sortfield == 'graphtype') {
@@ -366,20 +547,23 @@ else {
 	}
 	$data['paging'] = getPagingLine($data['graphs']);
 
-	$data['graphs'] = API::Graph()->get(array(
+	$options = array(
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => API_OUTPUT_EXTEND,
 		'selectTemplates' => API_OUTPUT_EXTEND,
 		'selectDiscoveryRule' => API_OUTPUT_EXTEND
-	));
+	);
+	$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
+		? API::GraphPrototype()->get($options)
+		: API::Graph()->get($options);
 
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
 	order_result($data['graphs'], $sortfield, getPageSortOrder());
 
-
+	// render view
 	$graphView = new CView('configuration.graph.list', $data);
 	$graphView->render();
 	$graphView->show();

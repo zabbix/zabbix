@@ -21,8 +21,13 @@
 <?php
 
 $graphWidget = new CWidget();
-$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPHS'));
-if (!empty($this->data['hostid'])) {
+
+if (!empty($this->data['parent_discoveryid'])) {
+	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPH PROTOTYPES'));
+	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
+}
+else {
+	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPHS'));
 	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
 }
 
@@ -88,6 +93,14 @@ if (!empty($this->data['items'])) {
 			$name = _('Select');
 		}
 
+		if (empty($item['drawtype'])) {
+			$item['drawtype'] = 0;
+		}
+
+		if (empty($item['yaxisside'])) {
+			$item['yaxisside'] = 0;
+		}
+
 		insert_js('loadItem('.$rowNumber.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
 			CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
 			$item['yaxisside'].', \''.$item['color'].'\', '.$item['periods_cnt'].');',
@@ -96,28 +109,26 @@ if (!empty($this->data['items'])) {
 	}
 }
 
-//$addButton = new CButton('add_item', _('Add'), 'addNewItem('.$this->data['graphid'].');', 'link_menu');
 $addButton = new CButton('add_item', _('Add'),
 	'return PopUp(\'popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
-		(!empty($this->data['parent_discoveryid'])
-			? '&srctbl=prototypes&parent_discoveryid='.$this->data['parent_discoveryid']
-			: '&srctbl=items').
 		(!empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : '').
 		(!empty($this->data['monitored_hosts']) ? '&real_hosts=1' : '').
 		(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
-		(!empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : '').
-		'&srcfld1=itemid&srcfld2=name\', 800, 600);',
+		'&srctbl=items&srcfld1=itemid&srcfld2=name\', 800, 600);',
 	'link_menu'
 );
 
 $addPrototypeButton = null;
 if (!empty($this->data['parent_discoveryid'])) {
 	$addPrototypeButton = new CButton('add_protoitem', _('Add prototype'),
-		'return PopUp(\'popup_gitem.php?dstfrm='.$graphForm->getName().
+		'return PopUp(\'popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 			url_param($this->data['graphtype'], false, 'graphtype').
 			url_param('parent_discoveryid').
-			'\', 700, 400, \'graph_item_form\');',
-		'formlist'
+			(!empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : '').
+			(!empty($this->data['monitored_hosts']) ? '&real_hosts=1' : '').
+			(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
+			'&srctbl=prototypes&srcfld1=itemid&srcfld2=name\', 800, 600);',
+		'link_menu'
 	);
 }
 $itemsTable->addRow(new CRow(array($addButton, $addPrototypeButton), null, 'itemButtonsRow'));

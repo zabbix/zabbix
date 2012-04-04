@@ -89,18 +89,18 @@ function prepare_url(&$var, $varname = null) {
 	return $result;
 }
 
-function url_param($param, $request = true, $name = null) {
+function url_param($param, $isRequest = true, $name = null) {
 	$result = '';
 	if (!is_array($param)) {
 		if (is_null($name)) {
-			if (!$request) {
+			if (!$isRequest) {
 				fatal_error(_('Not request variable require.'));
 			}
 			$name = $param;
 		}
 	}
 
-	if ($request) {
+	if ($isRequest) {
 		$var =& $_REQUEST[$param];
 	}
 	else {
@@ -472,7 +472,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			}
 			else {
 				$list->addItem(array(
-					new CLink(_('Graph prototypes'), 'graph_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+					new CLink(_('Graph prototypes'), 'graphs.php?parent_discoveryid='.$dbDiscovery['itemid']),
 					' ('.$dbDiscovery['graphs'].')'
 				));
 			}

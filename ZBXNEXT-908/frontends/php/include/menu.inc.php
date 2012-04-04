@@ -178,7 +178,6 @@ $ZBX_MENU = array(
 					'popup_trexpr.php',
 					'host_discovery.php',
 					'disc_prototypes.php',
-					'graph_prototypes.php',
 					'trigger_prototypes.php'
 				)
 			),

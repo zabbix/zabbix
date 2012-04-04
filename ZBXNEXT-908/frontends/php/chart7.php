@@ -92,12 +92,7 @@ $graph->setWidth(get_request('width', 400));
 $graph->setHeight(get_request('height', 300));
 
 foreach ($items as $item) {
-	$graph->addItem(
-		$gitem['itemid'],
-		$gitem['calc_fnc'],
-		$gitem['color'],
-		$gitem['type']
-	);
+	$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
 }
 $graph->draw();
 
