@@ -76,6 +76,10 @@ class CService extends CZBXAPI {
 			}
 		}
 
+		if ($options['countOutput'] !== null) {
+			return $result;
+		}
+
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 		}
@@ -258,7 +262,7 @@ class CService extends CZBXAPI {
 			// update parent
 			if (isset($service['parentid'])) {
 				// unset a parent
-				if ($service['parentid'] === 0) {
+				if (!$service['parentid']) {
 					$deleteParentsFromServiceIds[] = $service['serviceid'];
 				}
 				// set a new parent
@@ -580,7 +584,7 @@ class CService extends CZBXAPI {
 			SERVICE_ALGORITHM_MIN,
 			SERVICE_ALGORITHM_NONE
 		);
-		if (!isset($service['algorithm']) || !in_array($service['algorithm'], $algorithms, true)) {
+		if (!isset($service['algorithm']) || !in_array((int) $service['algorithm'], $algorithms, true)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect algorithm for service "%1$s".', $service['name']));
 		}
 	}
@@ -595,7 +599,7 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkShowSla(array $service) {
-		if (!isset($service['showsla']) || !in_array($service['showsla'], array(0, 1), true)) {
+		if (!isset($service['showsla']) || !in_array((int) $service['showsla'], array(0, 1), true)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect calculate SLA value for service "%1$s".', $service['name']));
 		}
 	}
@@ -628,7 +632,7 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkSortOrder(array $service) {
-		if (empty($service['sortorder']) || !zbx_is_int($service['sortorder'])
+		if (!isset($service['sortorder']) || !zbx_is_int($service['sortorder'])
 			|| $service['sortorder'] < 0 || $service['sortorder'] > 999) {
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect sorder order for service "%1$s".', $service['name']));
@@ -699,9 +703,14 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkTriggerPermissions(array $services) {
-		$affectedTriggerIds = zbx_objectValues($services, 'triggerid');
-		if ($affectedTriggerIds) {
-			if (!API::Trigger()->isReadable($affectedTriggerIds)) {
+		$triggerIds = array();
+		foreach ($services as $service) {
+			if (!empty($service['triggerid'])) {
+				$triggerIds[] = $service['triggerid'];
+			}
+		}
+		if ($triggerIds) {
+			if (!API::Trigger()->isReadable($triggerIds)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
@@ -732,7 +741,7 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkThatServicesDontHaveChildren(array $serviceIds) {
-		$child = $this->select('services_links', array(
+		$child = API::getApi()->select('services_links', array(
 			'output' => array('serviceupid'),
 			'filter' => array(
 				'serviceupid' => $serviceIds,
@@ -742,7 +751,7 @@ class CService extends CZBXAPI {
 		));
 		$child = reset($child);
 		if ($child) {
-			$service = $this->select($this->tableName(), array(
+			$service = API::getApi()->select($this->tableName(), array(
 				'output' => array('name'),
 				'serviceids' => $child['serviceupid'],
 				'limit' => 1
@@ -773,7 +782,7 @@ class CService extends CZBXAPI {
 		}
 
 		// check 'soft' field value
-		if (!isset($dependency['soft']) || !in_array($dependency['soft'], array(0, 1), true)) {
+		if (!isset($dependency['soft']) || !in_array((int) $dependency['soft'], array(0, 1), true)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect "soft" field value for dependency for service with ID "%1$s".', $dependency['serviceid'])
 			);

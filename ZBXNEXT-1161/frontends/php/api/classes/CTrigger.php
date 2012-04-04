@@ -1643,7 +1643,7 @@ class CTrigger extends CTriggerGeneral {
 				)));
 
 				// propagate the dependencies to the child triggers
-				$childTriggers = $this->select($this->tableName(), array(
+				$childTriggers = API::getApi()->select($this->tableName(), array(
 					'output' => array('triggerid'),
 					'filter' => array(
 						'templateid' => $triggerId
@@ -1710,7 +1710,7 @@ class CTrigger extends CTriggerGeneral {
 
 		try {
 			// delete the dependencies from the child triggers
-			$childTriggers = $this->select($this->tableName(), array(
+			$childTriggers = API::getApi()->select($this->tableName(), array(
 				'output' => array('triggerid'),
 				'filter' => array(
 					'templateid' => $triggerids
