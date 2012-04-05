@@ -89,7 +89,7 @@ foreach ($data['graphs'] as $graph) {
 	}
 
 	$name = array();
-	if ($graph['templateid'] != 0) {
+	if (!empty($graph['templateid'])) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
 		$realHosts = DBfetch($realHosts);
 		$name[] = new CLink($realHosts['name'], 'templates.php?form=update&templateid='.$realHosts['hostid'], 'unknown');
@@ -108,7 +108,7 @@ foreach ($data['graphs'] as $graph) {
 	}
 
 	$checkBox = new CCheckBox('group_graphid['.$graphid.']', null, null, $graphid);
-	if ($graph['templateid'] > 0 || !empty($graph['discoveryRule'])) {
+	if (!empty($graph['templateid']) || !empty($graph['discoveryRule'])) {
 		$checkBox->setEnabled(false);
 	}
 
@@ -129,11 +129,11 @@ if (empty($this->data['parent_discoveryid'])) {
 }
 
 $goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm',_('Delete selected graphs?'));
+$goOption->setAttribute('confirm', _('Delete selected graphs?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id','goButton');
+$goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
 
 // append table to form

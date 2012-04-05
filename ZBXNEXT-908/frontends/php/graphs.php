@@ -518,6 +518,7 @@ else {
 	}
 
 	$sortfield = getPageSortField('name');
+	$sortorder = getPageSortOrder();
 
 	if ($pageFilter->hostsSelected) {
 		$options = array(
@@ -545,6 +546,7 @@ else {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 		}
 	}
+	order_result($data['graphs'], $sortfield, $sortorder);
 	$data['paging'] = getPagingLine($data['graphs']);
 
 	$options = array(
@@ -561,7 +563,7 @@ else {
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
-	order_result($data['graphs'], $sortfield, getPageSortOrder());
+	order_result($data['graphs'], $sortfield, $sortorder);
 
 	// render view
 	$graphView = new CView('configuration.graph.list', $data);
