@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 $graphWidget = new CWidget();
 
@@ -54,7 +53,7 @@ else {
 $graphWidget->addHeaderRowNumber();
 
 // create form
-$graphForm = new CForm('get');
+$graphForm = new CForm();
 $graphForm->setName('graphForm');
 $graphForm->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['parent_discoveryid'])) {
@@ -133,7 +132,7 @@ $goOption->setAttribute('confirm', _('Delete selected graphs?'));
 $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
-$goButton->setAttribute('id', 'goButton');
+$goButton->attr('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "group_graphid";');
 
 // append table to form
@@ -141,4 +140,5 @@ $graphForm->addItem(array($this->data['paging'], $graphTable, $this->data['pagin
 
 // append form to widget
 $graphWidget->addItem($graphForm);
+
 return $graphWidget;

@@ -34,28 +34,28 @@
 
 	<!-- type -->
 	<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-	<td>
-		<select id="items_#{number}_type" name="items[#{number}][type]" class="input select">
-			<option value="<?php echo GRAPH_ITEM_SIMPLE; ?>"><?php echo _('Simple'); ?></option>
-			<option value="<?php echo GRAPH_ITEM_SUM; ?>"><?php echo _('Graph sum'); ?></option>
-		</select>
-	</td>
+		<td>
+			<select id="items_#{number}_type" name="items[#{number}][type]" class="input select">
+				<option value="<?php echo GRAPH_ITEM_SIMPLE; ?>"><?php echo _('Simple'); ?></option>
+				<option value="<?php echo GRAPH_ITEM_SUM; ?>"><?php echo _('Graph sum'); ?></option>
+			</select>
+		</td>
 	<?php else: ?>
-	<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?php echo GRAPH_ITEM_SIMPLE; ?>">
+		<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?php echo GRAPH_ITEM_SIMPLE; ?>">
 	<?php endif; ?>
 
 	<!-- function -->
 	<td>
 		<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]" class="input select">
 		<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
-				<option value="<?php echo CALC_FNC_MIN; ?>"><?php echo _('min'); ?></option>
-				<option value="<?php echo CALC_FNC_AVG; ?>"><?php echo _('avg'); ?></option>
-				<option value="<?php echo CALC_FNC_MAX; ?>"><?php echo _('max'); ?></option>
-				<option value="<?php echo CALC_FNC_LST; ?>"><?php echo _('last'); ?></option>
-		<?php else:
-				if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-					<option value="<?php echo CALC_FNC_ALL; ?>"><?php echo _('all'); ?></option>
-		<?php endif; ?>
+			<option value="<?php echo CALC_FNC_MIN; ?>"><?php echo _('min'); ?></option>
+			<option value="<?php echo CALC_FNC_AVG; ?>"><?php echo _('avg'); ?></option>
+			<option value="<?php echo CALC_FNC_MAX; ?>"><?php echo _('max'); ?></option>
+			<option value="<?php echo CALC_FNC_LST; ?>"><?php echo _('last'); ?></option>
+		<?php else: ?>
+			<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
+				<option value="<?php echo CALC_FNC_ALL; ?>"><?php echo _('all'); ?></option>
+			<?php endif; ?>
 				<option value="<?php echo CALC_FNC_MIN; ?>"><?php echo _('min'); ?></option>
 				<option value="<?php echo CALC_FNC_AVG; ?>"><?php echo _('avg'); ?></option>
 				<option value="<?php echo CALC_FNC_MAX; ?>"><?php echo _('max'); ?></option>
@@ -65,30 +65,27 @@
 
 	<!-- drawtype -->
 	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
-	<td>
-		<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]" class="input select">
-		<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL):
-				$drawtypes = graph_item_drawtypes();
-				foreach ($drawtypes as $drawtype): ?>
-					<option value="<?php echo $drawtype; ?>"><?php echo graph_item_drawtype2str($drawtype); ?></option>
-				<?php endforeach; ?>
-		<?php endif; ?>
-		</select>
-	</td>
+		<td>
+			<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]" class="input select">
+			<?php foreach (graph_item_drawtypes() as $drawtype): ?>
+				<option value="<?php echo $drawtype; ?>"><?php echo graph_item_drawtype2str($drawtype); ?></option>
+			<?php endforeach; ?>
+			</select>
+		</td>
 	<?php else: ?>
-	<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
+		<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
 	<?php endif; ?>
 
 	<!-- yaxisside -->
 	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED): ?>
-	<td>
-		<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" class="input select">
-			<option value="<?php echo GRAPH_YAXIS_SIDE_LEFT; ?>"><?php echo _('Left'); ?></option>
-			<option value="<?php echo GRAPH_YAXIS_SIDE_RIGHT; ?>"><?php echo _('Right'); ?></option>
-		</select>
-	</td>
+		<td>
+			<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" class="input select">
+				<option value="<?php echo GRAPH_YAXIS_SIDE_LEFT; ?>"><?php echo _('Left'); ?></option>
+				<option value="<?php echo GRAPH_YAXIS_SIDE_RIGHT; ?>"><?php echo _('Right'); ?></option>
+			</select>
+		</td>
 	<?php else: ?>
-	<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif; ?>
 
 	<!-- color -->

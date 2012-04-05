@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 $graphWidget = new CWidget();
 
@@ -157,14 +156,14 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$pr_left_chkbx = new CCheckBox('visible[percent_left]', 1, 'javascript: ShowHide("percent_left");', 1);
 
 		if ($this->data['percent_left'] == 0) {
-			$pr_left_input->setAttribute('style', 'display: none;');
+			$pr_left_input->attr('style', 'display: none;');
 			$pr_left_chkbx->setChecked(0);
 		}
 		$pr_right_input = new CTextBox('percent_right', $this->data['percent_right'], 7);
 		$pr_right_chkbx = new CCheckBox('visible[percent_right]', 1, 'javascript: ShowHide("percent_right");', 1);
 
 		if ($this->data['percent_right'] == 0) {
-			$pr_right_input->setAttribute('style', 'display: none;');
+			$pr_right_input->attr('style', 'display: none;');
 			$pr_right_chkbx->setChecked(0);
 		}
 
@@ -339,4 +338,5 @@ require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
 
 // append form to widget
 $graphWidget->addItem($graphForm);
+
 return $graphWidget;
