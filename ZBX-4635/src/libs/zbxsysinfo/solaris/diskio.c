@@ -130,7 +130,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned
 
 static int	process_mode_function(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result, MODE_FUNCTION *fl)
 {
-	char	devname[MAX_STRING_LEN], mode[MAX_STRING_LEN];
+	char	devname[MAX_STRING_LEN], mode[16];
 	int	i;
 
 	if (2 < num_param(param))
@@ -142,15 +142,17 @@ static int	process_mode_function(const char *cmd, const char *param, unsigned fl
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
-	if ('\0' == mode[0])
+	if ('\0' == *mode)
 	{
 		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "bytes");
+		strscpy(mode, "bytes");
 	}
 
 	for (i = 0; NULL != fl[i].mode; i++)
-		if (0 == strncmp(mode, fl[i].mode, MAX_STRING_LEN))
+	{
+		if (0 == strcmp(mode, fl[i].mode))
 			return (fl[i].function)(cmd, devname, flags, result);
+	}
 
 	return SYSINFO_RET_FAIL;
 }
