@@ -1072,8 +1072,16 @@ else {
 		 * @return string
 		 */
 		protected static function reserveIds($table, $count) {
+			global $ZBX_LOCALNODEID;
+
 			$tableSchema = self::getSchema($table);
 			$id_name = $tableSchema['key'];
+
+			if(is_null(self::$nodeId)){
+				self::$nodeId = get_current_nodeid(false);
+				self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+				self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
+			}
 
 			$sql = 'SELECT nextid'.
 				' FROM ids'.
@@ -1157,16 +1165,8 @@ else {
 		}
 
 		public static function getSchema($table=null){
-			global $ZBX_LOCALNODEID;
-
 			if(is_null(self::$schema)){
 				self::$schema = include(self::SCHEMA_FILE);
-			}
-
-			if(is_null(self::$nodeId)){
-				self::$nodeId = get_current_nodeid(false);
-				self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-				self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 			}
 
 			if(is_null($table))
