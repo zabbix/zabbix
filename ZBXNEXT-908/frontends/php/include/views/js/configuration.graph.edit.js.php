@@ -152,7 +152,7 @@
 			item['drawtype'] = null;
 			item['yaxisside'] = null;
 			item['sortorder'] = item['number'];
-			item['color'] = getRandomColorHex();
+			item['color'] = getNextColor(0);
 
 			var itemTpl = new Template(jQuery('#itemTpl').html());
 			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));

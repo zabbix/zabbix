@@ -455,6 +455,8 @@ elseif (isset($_REQUEST['form'])) {
 
 	if (empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
 		$data['legend'] = $_REQUEST['legend'] = 1;
+		$data['showworkperiod'] = $_REQUEST['showworkperiod'] = 1;
+		$data['showtriggers'] = $_REQUEST['showtriggers'] = 1;
 	}
 
 	$_REQUEST['items'] = $data['items'];

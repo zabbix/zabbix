@@ -154,14 +154,14 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$this->data['percent_left'] = sprintf('%2.2f', $this->data['percent_left']);
 		$this->data['percent_right'] = sprintf('%2.2f', $this->data['percent_right']);
 		$pr_left_input = new CTextBox('percent_left', $this->data['percent_left'], 7);
-		$pr_left_chkbx = new CCheckBox('visible[percent_left]', 1, "javascript: ShowHide('percent_left');", 1);
+		$pr_left_chkbx = new CCheckBox('visible[percent_left]', 1, 'javascript: ShowHide("percent_left");', 1);
 
 		if ($this->data['percent_left'] == 0) {
 			$pr_left_input->setAttribute('style', 'display: none;');
 			$pr_left_chkbx->setChecked(0);
 		}
 		$pr_right_input = new CTextBox('percent_right', $this->data['percent_right'], 7);
-		$pr_right_chkbx = new CCheckBox('visible[percent_right]', 1, "javascript: ShowHide('percent_right');", 1);
+		$pr_right_chkbx = new CCheckBox('visible[percent_right]', 1, 'javascript: ShowHide("percent_right");', 1);
 
 		if ($this->data['percent_right'] == 0) {
 			$pr_right_input->setAttribute('style', 'display: none;');

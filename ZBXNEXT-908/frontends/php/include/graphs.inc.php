@@ -462,7 +462,7 @@ function get_next_color($palettetype = 0) {
 			break;
 	}
 
-	$prev_color['dark'] = $prev_color['dark'] ? false : true;
+	$prev_color['dark'] = !$prev_color['dark'];
 	if ($prev_color['color'] == 6) {
 		$prev_color['grad'] = ($prev_color['grad'] + 1) % 6;
 	}

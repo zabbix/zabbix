@@ -514,7 +514,7 @@ function set_macro(v) {
  * Graph related stuff
  */
 var graphs = {
-		graphtype : 0,
+	graphtype : 0,
 
 	submit : function(obj) {
 		if (obj.name == 'graphtype') {
@@ -566,7 +566,7 @@ function cloneRow(elementid, count) {
 	$(newEntry).descendants().each(function(e) {
 		e.removeAttribute('disabled');
 	});
-	newEntry.setAttribute('id', 'entry_'+cloneRow.count);
+	newEntry.setAttribute('id', 'entry_' + cloneRow.count);
 	newEntry.style.display = '';
 }
 
@@ -730,3 +730,74 @@ function validateNumericBox(obj, allowempty, allownegative) {
 function t(str) {
 	return (!!locale[str]) ? locale[str] : str;
 }
+
+/**
+ * Color palette, (implementation from PHP)
+ */
+var prevColor = {'color': 0, 'gradient': 0};
+
+function getNextColor(paletteType) {
+	var palette = null;
+	switch (paletteType) {
+		case 1:
+			palette = new Array(200, 150, 255, 100, 50, 0);
+			break;
+		case 2:
+			palette = new Array(100, 50, 200, 150, 250, 0);
+			break;
+		case 0:
+		default:
+			palette = new Array(255, 200, 150, 100, 50, 0);
+			break;
+	}
+
+	var gradient = palette[prevColor['gradient']];
+	var r = (100 < gradient) ? 0 : 255;
+	var g = r, b = r;
+
+	switch (prevColor['color']) {
+		case 0:
+			r = gradient;
+			break;
+		case 1:
+			g = gradient;
+			break;
+		case 2:
+			b = gradient;
+			break;
+		case 3:
+			b = gradient;
+			r = b;
+			break;
+		case 4:
+			b = gradient;
+			g = b;
+			break;
+		case 5:
+			g = gradient;
+			r = g;
+			break;
+		case 6:
+			b = gradient;
+			g = b;
+			r = b;
+			break;
+	}
+
+	prevColor['color']++;
+	if (prevColor['color'] == 7) {
+		prevColor['color'] = 0;
+
+		prevColor['gradient']++;
+		if (prevColor['gradient'] == 3) {
+			prevColor['gradient'] = 0;
+		}
+	}
+
+	hexColor = ('0' + parseInt(r, 10).toString(16)).slice(-2)
+				+ ('0' + parseInt(g, 10).toString(16)).slice(-2)
+				+ ('0' + parseInt(b, 10).toString(16)).slice(-2);
+
+	return hexColor.toUpperCase();
+}
+
