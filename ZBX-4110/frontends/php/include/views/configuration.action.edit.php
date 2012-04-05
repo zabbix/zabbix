@@ -729,7 +729,7 @@ if (isset($_REQUEST['new_operation'])) {
 			$tblOper->addRow(array(_('Password'), new CTextBox('new_operation[opcommand][password]', $new_operation['opcommand']['password'])), 'class_authentication_password hidden');
 			// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
 			$passphraseCB = new CTextBox('new_operation[opcommand][password]', $new_operation['opcommand']['password']);
-			$passphraseCB->attr('id', 'new_operation_opcommand_password');
+			$passphraseCB->attr('id', 'new_operation_opcommand_passphrase');
 			$tblOper->addRow(array(_('Key passphrase'), $passphraseCB), 'class_authentication_passphrase hidden');
 
 			// ssh && telnet
