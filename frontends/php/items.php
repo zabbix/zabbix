@@ -689,7 +689,8 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),
 		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase', ''),
 		'formula' => get_request('formula', '1'),
-		'logtimefmt' => get_request('logtimefmt', '')
+		'logtimefmt' => get_request('logtimefmt', ''),
+		'initial_interface_type' => null
 	);
 
 	// hosts
@@ -700,6 +701,17 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 	$data['is_multiple_hosts'] = count($data['hosts']) > 1;
 	if (!$data['is_multiple_hosts']) {
 		$data['hosts'] = reset($data['hosts']);
+
+		// set the initial chosen interface to one of the interfaces the items use
+		$items = API::Item()->get(array(
+			'itemids' => zbx_objectValues($data['hosts']['items'], 'itemid'),
+			'output' => array('itemid', 'type')
+		));
+		$usedInterfacesTypes = array();
+		foreach ($items as $item) {
+			$usedInterfacesTypes[] = itemTypeInterface($item['type']);
+		}
+		$data['initial_interface_type'] = $usedInterfacesTypes[0];
 	}
 
 	// application

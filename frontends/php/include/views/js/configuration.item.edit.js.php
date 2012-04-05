@@ -30,8 +30,7 @@
 		return result;
 	}
 
-	function organizeInterfaces() {
-		var interfaceType = itemTypeInterface(parseInt(jQuery('#type').val()));
+	function organizeInterfaces(interfaceType) {
 		var selectedInterfaceId = jQuery('#selectedInterfaceId').val();
 		var isSelected = false;
 		var isInterfaceExist = false;
@@ -169,21 +168,17 @@
 			multpStat.onclick();
 		}
 
-		var mnFrmTbl = document.getElementById('web.items.item.php');
-		if (mnFrmTbl) {
-			mnFrmTbl.style.visibility = 'visible';
-		}
-
 		var maxReached = <?php echo $this->data['maxReached'] ? 'true' : 'false'; ?>;
 		if (maxReached) {
 			jQuery('#row_new_delay_flex').css('display', 'none');
 		}
 
 		jQuery('#type').bind('change', function() {
-			organizeInterfaces();
+			organizeInterfaces(itemTypeInterface(parseInt(jQuery('#type').val())));
 			displayKeyButton();
 		});
-		organizeInterfaces();
+		var initialInterfaceType = <?php echo CJs::encodeJson($data['initial_interface_type']) ?>;
+		organizeInterfaces(initialInterfaceType || itemTypeInterface(parseInt(jQuery('#type').val())));
 		displayKeyButton();
 
 		jQuery('#authtype').bind('change', function() {
