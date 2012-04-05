@@ -2,6 +2,7 @@
 Changes for 2.0.0rc3
 
 New features:
+...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBXNEXT-1153] support for nested templates in import (Vedmak)
 ..F....... [ZBX-1357] updated French, German, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
@@ -561,6 +562,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
+...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBX-4795] fixed group creation for child nodes (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
 A.F....... [ZBX-4813] fixed incorrect exception handling in maps when checking for circularity (Toms, Vedmak)
