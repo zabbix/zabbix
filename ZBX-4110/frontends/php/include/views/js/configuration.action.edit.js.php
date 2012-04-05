@@ -359,7 +359,7 @@ function showOpTypeForm() {
 		class_authentication_username: [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
 		class_authentication_publickey: [],
 		class_authentication_privatekey: [],
-		class_authentication_password: [ZBX_SCRIPT_TYPES.ssh],
+		class_authentication_password: [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
 		class_authentication_passphrase: [ZBX_SCRIPT_TYPES.ssh]
 	};
 
@@ -376,7 +376,8 @@ function showOpTypeForm() {
 	for (f = 0; f < showFields.length; f++) {
 		jQuery("#operationlist ." + showFields[f]).toggleClass("hidden", false).find(':input').prop("disabled", false);
 	}
-	if (typeof showFields['class_authentication_method'] !== void(0)) {
+
+	if (jQuery.inArray('class_authentication_method', showFields) !== -1) {
 		showOpTypeAuth();
 	}
 }
