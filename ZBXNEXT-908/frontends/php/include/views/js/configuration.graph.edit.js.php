@@ -132,6 +132,7 @@
 		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
 		activateSortable();
+		incrementNextColor();
 	}
 
 	function addPopupValues(list) {

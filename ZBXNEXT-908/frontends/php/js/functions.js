@@ -736,8 +736,22 @@ function t(str) {
  */
 var prevColor = {'color': 0, 'gradient': 0};
 
+function incrementNextColor() {
+	prevColor['color']++;
+	if (prevColor['color'] == 7) {
+		prevColor['color'] = 0;
+
+		prevColor['gradient']++;
+		if (prevColor['gradient'] == 3) {
+			prevColor['gradient'] = 0;
+		}
+	}
+}
+
 function getNextColor(paletteType) {
-	var palette = null;
+	var palette, gradient, hexColor,
+		r, g, b;
+
 	switch (paletteType) {
 		case 1:
 			palette = new Array(200, 150, 255, 100, 50, 0);
@@ -751,9 +765,10 @@ function getNextColor(paletteType) {
 			break;
 	}
 
-	var gradient = palette[prevColor['gradient']];
-	var r = (100 < gradient) ? 0 : 255;
-	var g = r, b = r;
+	gradient = palette[prevColor['gradient']];
+	r = (100 < gradient) ? 0 : 255;
+	g = r;
+	b = r;
 
 	switch (prevColor['color']) {
 		case 0:
@@ -784,15 +799,7 @@ function getNextColor(paletteType) {
 			break;
 	}
 
-	prevColor['color']++;
-	if (prevColor['color'] == 7) {
-		prevColor['color'] = 0;
-
-		prevColor['gradient']++;
-		if (prevColor['gradient'] == 3) {
-			prevColor['gradient'] = 0;
-		}
-	}
+	incrementNextColor();
 
 	hexColor = ('0' + parseInt(r, 10).toString(16)).slice(-2)
 				+ ('0' + parseInt(g, 10).toString(16)).slice(-2)
