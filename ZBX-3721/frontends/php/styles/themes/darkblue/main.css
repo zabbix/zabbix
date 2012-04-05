@@ -510,20 +510,17 @@ span.darklink{ color: #3C759B; }span.darklink:hover{ color: #77B7DA; }
 div.suggest{ border: 1px #77B7DA solid; }
 
 /*////////////////	FORMS	////////////////////*/
-.input, .input[disabled]:hover{
-	border: 1px solid #7F9DB9;
-	background-color: #FFFFFF;
-	color: #000E19;
+.input, .input[disabled]:hover, input.formlist[type="button"],
+div.calendar input[type="button"] {
+	border: 1px solid #B3C9D6;
+	background: #2F6487;
+	color: #FFF;
 }
-
-.input:focus { border-color: #77B7DA; }
-.input:hover { border-color: #77B7DA; color: #000E19;}
-
-.input[readonly], .input[readonly]:hover{
+.input:focus, .input:hover { border-color: #77B7DA; }
+.input[readonly], .input[readonly]:hover {
 /* NOTE: Ignored by IE */
-	border-color: #FFFFFF;
-	background-color: #3C759B;
-	color: #FFFFFF;
+	border-color: #4E738C;
+	background: #2B495E;
 }
 
 .shadow {}
@@ -575,3 +572,6 @@ ul.formlist li.new { background: #022744; }
 .dropArea { background-color: #005089; }
 
 table.ack_msgs tr.msg { background-color: #022744; }
+
+#zbx_search input[type="text"], #zbx_search input { border-color: #EFEFEF; }
+#zbx_search input.button { color: #FBFBFB; }
