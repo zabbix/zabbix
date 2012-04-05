@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-05 18:26+0300\n"
-"PO-Revision-Date: 2012-03-04 08:37+0200\n"
+"POT-Creation-Date: 2012-04-05 18:29+0300\n"
+"PO-Revision-Date: 2012-03-31 20:15+0200\n"
 "Last-Translator: Łukasz <deejay1@srem.org>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -88,12 +88,12 @@ msgstr "(0 - nieskończenie)"
 
 #: include/views/configuration.hostgroups.list.php:33
 msgid "(Only Super Admins can create group)"
-msgstr ""
+msgstr "(Wyłącznie super administratorzy mogą tworzyć grupy)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:140
 msgid "(Only superadmins can create group)"
-msgstr "(Wyłącznie super administratorze mogą tworzyć grupy)"
+msgstr "(Wyłącznie super administratorzy mogą tworzyć grupy)"
 
 #: include/forms.inc.php:522 include/forms.inc.php:523
 msgid "(in days)"
@@ -114,7 +114,7 @@ msgstr "(brak proxy)"
 
 #: include/items.inc.php:560 include/items.inc.php:561
 msgid "*UNKNOWN*"
-msgstr ""
+msgstr "*NIEZNANE*"
 
 #: include/views/configuration.screen.constructor.edit.php:438 popup.php:1808
 #: popup.php:1809
@@ -429,7 +429,7 @@ msgstr "Dodaj do ulubionych"
 
 #: charts.php:91 history.php:98 host_screen.php:97
 msgid "Add to favourites."
-msgstr ""
+msgstr "Dodaj do ulubionych."
 
 #: include/actions.inc.php:479
 msgid "Add to host group"
@@ -486,7 +486,7 @@ msgstr "Interfejsy agenta"
 
 #: hosts.php:61
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Interfejs agenta, SNMP, JMX lub IPMI"
 
 #: include/hosts.inc.php:63 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:834 users.php:43
@@ -678,11 +678,11 @@ msgstr "Audyt"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Akcje audytowe"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Logi audytu"
 
 #: include/func.inc.php:210
 msgid "Aug"
@@ -709,7 +709,7 @@ msgstr "Metoda uwierzytelniania"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP."
-msgstr ""
+msgstr "Metoda uwierzytelniania zmieniona na HTTP."
 
 #: authentication.php:121
 msgid "Authentication method changed to LDAP"
@@ -717,7 +717,7 @@ msgstr "Metoda uwierzytelniania zmieniona na LDAP"
 
 #: authentication.php:122
 msgid "Authentication method changed to LDAP."
-msgstr ""
+msgstr "Metoda uwierzytelniania zmieniona na LDAP."
 
 #: authentication.php:81 authentication.php:82
 msgid "Authentication method changed to Zabbix internal"
@@ -863,7 +863,7 @@ msgstr "Wg wzorca wyzwalacza"
 
 #: actionconf.php:435 actionconf.php:449
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "KONFIGURACJA CZYNNOŚCI"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
@@ -872,7 +872,7 @@ msgstr "KONFIGURACJA PROGRAMÓW"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "KONFIGURACJA UWIERZYTELNIANIA"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
@@ -894,7 +894,7 @@ msgstr "KONFIGURACJA WYKRESÓW"
 
 #: adm.gui.php:104
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "KONFIGURACJA INTERFEJSU UŻYTKOWNIKA"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:38
@@ -903,24 +903,24 @@ msgstr "KONFIGURACJA GRUPY HOSTÓW"
 
 #: hosts.php:594 hosts.php:600 hosts.php:620
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "KONFIGURACJA HOSTÓW"
 
 #: adm.housekeeper.php:82
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr ""
+msgstr "KONFIGURACJA SPRZĄTACZA"
 
 #: adm.iconmapping.php:111
 msgid "CONFIGURATION OF ICON MAPPING"
-msgstr ""
+msgstr "KONFIGURACJA MAPOWANIA IKON"
 
 #: adm.images.php:145
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "KONFIGURACJA OBRAZÓW"
 
 #: include/views/configuration.services.edit.php:26
 #: include/views/configuration.services.list.php:23
 msgid "CONFIGURATION OF IT SERVICES"
-msgstr "KONFIGURACJA USŁUG it"
+msgstr "KONFIGURACJA USŁUG IT"
 
 #: disc_prototypes.php:318
 #: include/views/configuration.item.prototype.list.php:29
@@ -935,7 +935,7 @@ msgstr "KONFIGURACJA ELEMENTÓW"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "KONFIGURACJA MAKR"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
@@ -954,7 +954,7 @@ msgstr "KONFIGURACJA MAP SIECI"
 #: include/views/administration.node.edit.php:25
 #: include/views/administration.node.list.php:33
 msgid "CONFIGURATION OF NODES"
-msgstr "KONFIGURACJA SOND"
+msgstr "KONFIGURACJA WĘZŁÓW"
 
 #: include/views/administration.proxy.edit.php:23
 #: include/views/administration.proxy.list.php:33
@@ -963,7 +963,7 @@ msgstr "KONFIGURACJA PROXY"
 
 #: adm.regexps.php:200
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "KONFIGURACJA WYRAŻEŃ REGULARNYCH"
 
 #: include/views/configuration.screen.constructor.list.php:23
 msgid "CONFIGURATION OF SCREEN"
@@ -986,11 +986,11 @@ msgstr "KONFIGURACJA POKAZÓW SLAJDÓW"
 
 #: templates.php:394 templates.php:414
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "KONFIGURACJA SZABLONÓW"
 
 #: adm.triggerdisplayingoptions.php:91
 msgid "CONFIGURATION OF TRIGGER DISPLAYING OPTIONS"
-msgstr ""
+msgstr "KONFIGURACJA WYŚWIETLANIA WYZWALACZY"
 
 #: include/views/configuration.triggers.edit.php:37
 #: include/views/configuration.triggers.list.php:41
@@ -1000,7 +1000,7 @@ msgstr "KONFIGURACJA PROTOTYPÓW WYZWALACZY"
 
 #: adm.triggerseverities.php:94
 msgid "CONFIGURATION OF TRIGGER SEVERITIES"
-msgstr ""
+msgstr "KONFIGURACJA POZIOMÓW WYZWALACZY"
 
 #: include/views/configuration.triggers.edit.php:40
 #: include/views/configuration.triggers.list.php:45
@@ -1023,7 +1023,7 @@ msgstr "KONFIGURACJA UŻYTKOWNIKÓW I GRUP UŻYTKOWNIKÓW"
 
 #: adm.valuemapping.php:133
 msgid "CONFIGURATION OF VALUE MAPPING"
-msgstr ""
+msgstr "KONFIGURACJA MAPOWAŃ WARTOŚCI"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:36
@@ -1032,7 +1032,7 @@ msgstr "KONFIGURACJA MONITORINGU WWW"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "KONFIGURACJA CZASU PRACY"
 
 #: adm.triggerdisplayoptions.php:92
 msgid "CONFIGURATION OF ZABBIX"
@@ -1163,7 +1163,7 @@ msgstr "Nie można dodać kolejnego elementu o typie \"Suma wykresu\""
 #: api/classes/CGraph.php:1075 api/classes/CGraphPrototype.php:1063
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Nie można dodać więcej niż jednej pozycji typu \"Graph sum\" na wykresie \"%1$s\"."
 
 #: include/locales/en_gb.inc.php:126
 msgid "Cannot add network map"
@@ -1232,20 +1232,20 @@ msgstr "Nie można dodać mapy wartości"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP."
-msgstr ""
+msgstr "Nie można zmienić metody uwierzytelniania na LDAP."
 
 #: authentication.php:86
 msgid "Cannot change authentication method to Zabbix internal."
-msgstr ""
+msgstr "Nie można zmienić metody uwierzytelniania na Zabbix internal."
 
 #: api/classes/CTemplateScreen.php:591
 #, php-format
 msgid "Cannot change template for Screen \"%s\"."
-msgstr ""
+msgstr "Nie można zmienić szablonu dla ekranu \"%s\"."
 
 #: authentication.php:163
 msgid "Cannot changed authentication method to HTTP."
-msgstr ""
+msgstr "Nie można zmienić metody uwierzytelniania na HTTP."
 
 #: items.php:447
 msgid "Cannot clear history"
@@ -1282,11 +1282,11 @@ msgstr "Nie można skopiować wyzwalacza \"%1$s:%2$s\", ponieważ jego wyrażani
 
 #: include/db.inc.php:53
 msgid "Cannot create another database connection."
-msgstr "Nie można utworzyć kolejngo połączenia do bazy."
+msgstr "Nie można utworzyć kolejnego połączenia do bazy."
 
 #: api/classes/CTrigger.php:1678
 msgid "Cannot create dependency"
-msgstr ""
+msgstr "Nie można utworzyć zależności"
 
 #: discoveryconf.php:122
 msgid "Cannot create discovery rule"
@@ -1294,11 +1294,11 @@ msgstr "Nie można utworzyć zasady wykrywania"
 
 #: api/classes/CHostGroup.php:621
 msgid "Cannot create group without name."
-msgstr ""
+msgstr "Nie można utworzyć grupy bez nazwy."
 
 #: api/classes/CHost.php:1903
 msgid "Cannot create host group."
-msgstr ""
+msgstr "Nie można utworzyć grupy hostów."
 
 #: adm.iconmapping.php:66
 msgid "Cannot create icon map"
@@ -1321,7 +1321,7 @@ msgstr "Nie można utworzyć nowego elementu"
 #: api/classes/CUserMedia.php:414 api/classes/CUser.php:404
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "Nie można usunąć wewnętrznego użytkownika Zabbix \"%1$s\", proszę spróbować wyłączyć tego użytkownika."
 
 #: actionconf.php:181
 msgid "Cannot delete action"
@@ -1333,7 +1333,7 @@ msgstr "Nie można usunąć programu"
 
 #: api/classes/CTrigger.php:1728
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "Nie można usunąć zależności"
 
 #: api/classes/CDiscoveryRule.php:624 discoveryconf.php:135
 #: host_discovery.php:166 host_discovery.php:250
@@ -1346,7 +1346,7 @@ msgstr "Nie można usunąć wykresu"
 
 #: api/classes/CGraphPrototype.php:1003
 msgid "Cannot delete graph prototype."
-msgstr ""
+msgstr "Nie można usunąć prototypu wykresu."
 
 #: api/classes/CItem.php:1040
 msgid "Cannot delete graph."
@@ -1461,7 +1461,7 @@ msgstr "Nie można usunąć wykresów z szablonu"
 
 #: api/classes/CGraphPrototype.php:979
 msgid "Cannot delete templated graphs."
-msgstr ""
+msgstr "Nie można usunąć wykresów z szablonu."
 
 #: api/classes/CItem.php:1004
 msgid "Cannot delete templated item."
@@ -1494,7 +1494,7 @@ msgstr "Nie można usunąć użytkownika"
 
 #: api/classes/CUser.php:800
 msgid "Cannot delete user medias"
-msgstr ""
+msgstr "Nie można usunąć mediów użytkowników"
 
 #: adm.valuemapping.php:78
 msgid "Cannot delete value map"
@@ -1510,12 +1510,12 @@ msgstr "Nie można włączyć typu mediów"
 
 #: include/locales/en_gb.inc.php:139
 msgid "Cannot find background image"
-msgstr "Nie możesz znaleźć tła"
+msgstr "Nie można znaleźć obrazu tła"
 
 #: include/classes/import/importers/CMapImporter.php:219
 #, php-format
 msgid "Cannot find background image for map \"%1$s."
-msgstr ""
+msgstr "Nie można odnaleźć obrazu tła dla mapy \"%1$s\"."
 
 #: include/locales/en_gb.inc.php:170
 msgid "Cannot find graph"
