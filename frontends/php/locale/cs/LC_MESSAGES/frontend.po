@@ -2,15 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-05 18:26+0300\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"POT-Creation-Date: 2012-04-05 18:49+0300\n"
+"PO-Revision-Date: 2012-04-05 17:46+0200\n"
+"Last-Translator: Jakub <lauda.jakub@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Pootle 2.1.4\n"
 "X-Poedit-Basepath: ../../\n"
 
 #: api/classes/CMaintenance.php:508 api/classes/CMaintenance.php:513
@@ -18,7 +19,7 @@ msgstr ""
 #: maintenance.php:116 maintenance.php:120
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18"
-msgstr ""
+msgstr "\"%s\" musí být mezi 1970.01.01 a 2038.01.18"
 
 #: include/profiles.inc.php:281
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -77,9 +78,9 @@ msgstr[2] ""
 #, php-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d zařízení"
+msgstr[1] "%d zařízení"
+msgstr[2] "%d zařízení"
 
 #: include/views/configuration.action.edit.php:473
 msgid "(0 - infinitely)"
@@ -87,12 +88,12 @@ msgstr ""
 
 #: include/views/configuration.hostgroups.list.php:33
 msgid "(Only Super Admins can create group)"
-msgstr ""
+msgstr "(Pouze Superadministrátoři mohou vytvářet skupiny)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:140
 msgid "(Only superadmins can create group)"
-msgstr ""
+msgstr "(Pouze Superadministrátoři mohou vytvářet skupiny)"
 
 #: include/forms.inc.php:522 include/forms.inc.php:523
 msgid "(in days)"
@@ -100,11 +101,11 @@ msgstr ""
 
 #: include/forms.inc.php:451
 msgid "(in sec)"
-msgstr ""
+msgstr "(v sek)"
 
 #: include/views/configuration.action.edit.php:482
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(minimum 60 sekund, 0 - použij defaultní nastavení akce)"
 
 #: include/views/configuration.host.edit.php:303
 #: include/views/configuration.host.massupdate.php:72
@@ -118,7 +119,7 @@ msgstr ""
 #: include/views/configuration.screen.constructor.edit.php:438 popup.php:1808
 #: popup.php:1809
 msgid "- all groups -"
-msgstr ""
+msgstr "- všechny skupiny -"
 
 #: acknow.php:98
 msgid "----[BULK ACKNOWLEDGE]----"
@@ -194,12 +195,12 @@ msgstr "PROTOKOL DOSTUPNOSTI"
 
 #: sysmap.php:85
 msgid "Access denied!"
-msgstr ""
+msgstr "Přístup odepřen!"
 
 #: api/classes/CUser.php:922
 #, php-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "Účet zablokován na %s sekund"
 
 #: events.php:519 events.php:532 include/actions.inc.php:180
 #: include/blocks.inc.php:811 include/blocks.inc.php:1298
@@ -223,7 +224,7 @@ msgstr "Potvrdit alarm -"
 
 #: acknow.php:153 acknow.php:182
 msgid "Acknowledge and return"
-msgstr ""
+msgstr "Potvrdit a zpět"
 
 #: tr_status.php:198
 msgid "Acknowledge status"
@@ -247,7 +248,7 @@ msgstr "Potvrzení"
 
 #: include/views/configuration.sysmap.edit.php:144
 msgid "Acknowledging disabled"
-msgstr ""
+msgstr "Potvrzování deaktivováno"
 
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
@@ -271,18 +272,18 @@ msgstr "Akce"
 
 #: api/classes/CAction.php:817
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2%s seconds)."
-msgstr ""
+msgstr "Akce \"%1$s\" obsahuje nesprávnou hodnotu \"esc_period\" (minimum %2%s sekundy)."
 
 #: api/classes/CAction.php:820 api/classes/CAction.php:835
 #: api/classes/CAction.php:925 api/classes/CAction.php:945
 #, php-format
 msgid "Action \"%s\" already exists."
-msgstr ""
+msgstr "Akce \"%s\" již existuje."
 
 #: api/classes/CAction.php:916
 #, php-format
 msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
-msgstr ""
+msgstr "Akce \"%s\" obsahuje nesprávnou hodnotu \"esc_period\" (minimum 60 sekund)."
 
 #: api/classes/CAction.php:972
 #, php-format
@@ -315,7 +316,7 @@ msgstr "Akce"
 
 #: include/views/configuration.item.prototype.list.php:114
 msgid "Activate selected"
-msgstr "Povolit vybrané"
+msgstr "Aktivovat vybrané"
 
 #: include/views/administration.proxy.edit.php:40
 #: include/views/administration.proxy.list.php:76
@@ -404,7 +405,7 @@ msgstr "Přidat odkaz"
 
 #: include/views/conf.import.php:23
 msgid "Add missing"
-msgstr ""
+msgstr "Přidat chybějící"
 
 #: include/forms.inc.php:1734
 msgid "Add prototype"
@@ -420,23 +421,23 @@ msgstr "Přidat do"
 
 #: maps.php:73
 msgid "Add to Favourites"
-msgstr ""
+msgstr "Přidat do oblíbených"
 
 #: include/html.inc.php:257 screens.php:91
 msgid "Add to favourites"
-msgstr ""
+msgstr "Přidat do oblíbených"
 
 #: charts.php:91 history.php:98 host_screen.php:97
 msgid "Add to favourites."
-msgstr ""
+msgstr "Přidat do oblíbených"
 
 #: include/actions.inc.php:479
 msgid "Add to host group"
-msgstr ""
+msgstr "Přidat hostitele do skupiny"
 
 #: include/actions.inc.php:294 include/views/configuration.action.edit.php:784
 msgid "Add to host groups"
-msgstr ""
+msgstr "Přidat hostitele do skupin"
 
 #: auditlogs.php:134
 msgid "Added"
@@ -449,7 +450,7 @@ msgstr "Další parametry"
 #: include/views/configuration.host.edit.php:537
 #: include/views/configuration.host.massupdate.php:204
 msgid "Admin"
-msgstr "admin"
+msgstr "Admin"
 
 #: include/menu.inc.php:224
 msgid "Administration"
@@ -457,7 +458,7 @@ msgstr "Administrace"
 
 #: include/views/configuration.sysmap.edit.php:84
 msgid "Advanced labels"
-msgstr ""
+msgstr "Rozšířený popis"
 
 #: include/blocks.inc.php:809 include/blocks.inc.php:1296
 #: include/events.inc.php:133 include/events.inc.php:204
@@ -472,7 +473,7 @@ msgstr "Stáří méně než"
 #: overview.php:126
 #, php-format
 msgid "Age less than %s"
-msgstr ""
+msgstr "Stáří méně než %s"
 
 #: include/views/administration.script.list.php:74
 #: include/views/configuration.httpconf.edit.php:112 popup.php:1947
@@ -485,7 +486,7 @@ msgstr ""
 
 #: hosts.php:61
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Agent nebo SNMP nebo JMX nebo IPMI rozhraní"
 
 #: include/hosts.inc.php:63 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:834 users.php:43
@@ -524,7 +525,7 @@ msgstr "Všechny skupiny"
 
 #: include/locales/en_gb.inc.php:147
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr ""
+msgstr "Veškeré odkazy by měly mít zadáno \"Jméno\" a \"URL\""
 
 #: include/page_header.php:124
 msgid "All nodes"
@@ -542,7 +543,7 @@ msgstr "Jakýkoliv"
 
 #: include/regexp.inc.php:181
 msgid "Any character string included"
-msgstr "Obsahuje alespoň jeden z řetězců"
+msgstr "Obsahuje libovolný řetězec"
 
 #: applications.php:111 httpconf.php:42 include/actions.inc.php:59
 #: include/audit.inc.php:32 include/forms.inc.php:389
@@ -555,12 +556,12 @@ msgstr "Aplikace"
 #: api/classes/CApplication.php:787
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "Aplikace \"%1$s\" pro hosta \"%2$s\" již existuje."
 
 #: api/classes/CApplication.php:482
 #, php-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Aplikace \"%1$s\" již existuje."
 
 #: api/classes/CApplication.php:626
 #, php-format
@@ -657,15 +658,15 @@ msgstr "V"
 
 #: include/forms.inc.php:2037
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "V (hodina:minuta)"
 
 #: api/classes/CMaintenance.php:453 api/classes/CMaintenance.php:645
 msgid "At least one host or group should be selected"
-msgstr ""
+msgstr "Vyberte alespoň jednoho hostitele nebo skupinu"
 
 #: api/classes/CMaintenance.php:523 api/classes/CMaintenance.php:636
 msgid "At least one maintenance period must be created"
-msgstr ""
+msgstr "Vytvořte alespoň jeden servisní interval"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
@@ -677,20 +678,20 @@ msgstr "Audit"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Akce auditu"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Logy auditu"
 
 #: include/func.inc.php:210
 msgid "Aug"
-msgstr "srp"
+msgstr "Srp"
 
 #: include/forms.inc.php:1924 include/func.inc.php:98 include/func.inc.php:227
 #: include/locales/en_gb.inc.php:91
 msgid "August"
-msgstr "srpen"
+msgstr "Srpen"
 
 #: include/menu.inc.php:253 include/views/configuration.httpconf.edit.php:57
 msgid "Authentication"
@@ -698,7 +699,7 @@ msgstr "Autentizace"
 
 #: include/views/configuration.host.edit.php:531
 msgid "Authentication algorithm"
-msgstr ""
+msgstr "Autentizační algoritmus"
 
 #: include/views/configuration.action.edit.php:725
 #: include/views/configuration.item.edit.php:153
@@ -708,19 +709,19 @@ msgstr "Autentizační metoda"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP."
-msgstr ""
+msgstr "Autentizační metoda změněna na HTTP"
 
 #: authentication.php:121
 msgid "Authentication method changed to LDAP"
-msgstr ""
+msgstr "Autentizační metoda změněna na LDAP"
 
 #: authentication.php:122
 msgid "Authentication method changed to LDAP."
-msgstr ""
+msgstr "Autentizační metoda změněna na LDAP"
 
 #: authentication.php:81 authentication.php:82
 msgid "Authentication method changed to Zabbix internal"
-msgstr ""
+msgstr "Autentizační metoda změněna na Zabbix-interní"
 
 #: actionconf.php:446
 msgid "Auto registration"
@@ -728,7 +729,7 @@ msgstr "Auto registrace"
 
 #: include/views/administration.users.edit.php:122
 msgid "Auto-login"
-msgstr ""
+msgstr "Auto-login"
 
 #: include/views/administration.users.edit.php:123 profile.php:48 users.php:60
 msgid "Auto-logout (min 90 seconds)"
@@ -737,16 +738,16 @@ msgstr "Automatické odhlášení (min 90 sekund)"
 #: include/views/configuration.host.edit.php:575
 #: include/views/configuration.host.massupdate.php:224
 msgid "Automatic"
-msgstr ""
+msgstr "Automaticky"
 
 #: include/views/configuration.sysmap.edit.php:78
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Automatické přiřazení ikony"
 
 #: include/views/js/configuration.sysmaps.js.php:116
 #: include/views/js/configuration.sysmaps.js.php:322
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "Automatický výběr ikony"
 
 #: hosts.php:677 include/html.inc.php:392 popup.php:481
 msgid "Availability"
@@ -772,7 +773,7 @@ msgstr "Průměry"
 
 #: popup_bitem.php:147
 msgid "Axis side"
-msgstr "Strana osy"
+msgstr "Poloha osy"
 
 #: include/func.inc.php:372
 msgid "B"
@@ -802,7 +803,7 @@ msgstr "Base DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic authentication"
-msgstr "Basic authentication"
+msgstr "Základní autentifikace"
 
 #: include/views/administration.authentication.edit.php:61
 msgid "Bind DN"
@@ -811,7 +812,7 @@ msgstr "Bind DN"
 #: authentication.php:46
 #: include/views/administration.authentication.edit.php:62
 msgid "Bind password"
-msgstr ""
+msgstr "Bind heslo"
 
 #: include/views/administration.general.gui.edit.php:24
 #: include/views/administration.users.edit.php:112
@@ -834,7 +835,7 @@ msgstr "Tučná čára"
 
 #: include/items.inc.php:128
 msgid "Boolean"
-msgstr ""
+msgstr "Logická hodnota"
 
 #: include/locales/en_gb.inc.php:135
 #: include/views/configuration.screen.constructor.edit.php:564
@@ -842,11 +843,11 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:73
 #: include/views/js/configuration.sysmaps.js.php:312
 msgid "Bottom"
-msgstr "dole"
+msgstr "Dole"
 
 #: include/reports.inc.php:707
 msgid "Brighten"
-msgstr "Světlejší"
+msgstr "Zesvětlit"
 
 #: tr_status.php:724
 msgid "Bulk acknowledge"
@@ -862,7 +863,7 @@ msgstr "Podle šablony spouštěče"
 
 #: actionconf.php:435 actionconf.php:449
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "NASTAVENÍ AKCÍ"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
@@ -871,7 +872,7 @@ msgstr "NASTAVENÍ APLIKACÍ"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "NASTAVENÍ AUTENTIFIKACE"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
@@ -893,7 +894,7 @@ msgstr "NASTAVENÍ GRAFŮ"
 
 #: adm.gui.php:104
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "NASTAVENÍ GUI"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:38
@@ -902,11 +903,11 @@ msgstr "NASTAVENÍ SKUPIN HOSTITELŮ"
 
 #: hosts.php:594 hosts.php:600 hosts.php:620
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "NASTAVENÍ HOSTITELŮ"
 
 #: adm.housekeeper.php:82
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr ""
+msgstr "NASTAVENÍ HOUSEKEEPERA"
 
 #: adm.iconmapping.php:111
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -914,17 +915,17 @@ msgstr ""
 
 #: adm.images.php:145
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "NASTAVENÍ OBRÁZKŮ"
 
 #: include/views/configuration.services.edit.php:26
 #: include/views/configuration.services.list.php:23
 msgid "CONFIGURATION OF IT SERVICES"
-msgstr ""
+msgstr "NASTAVENÍ IT-SLUŽEB"
 
 #: disc_prototypes.php:318
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
-msgstr ""
+msgstr "NASTAVENÍ PŘEDLOH PRO POLOŽKY"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:31
