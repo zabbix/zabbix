@@ -1944,12 +1944,14 @@ class CTrigger extends CTriggerGeneral {
 	 * one level lower, then for each lower trigger look if it's parent has dependencies, if so
 	 * find this dependency trigger child on dependent trigger host and add new dependency.
 	 *
-	 * @param array $templateIds
-	 * @param array $hostIds
+	 * @param array $data
 	 *
 	 * @return void
 	 */
-	public function syncTemplateDependencies(array $templateIds, array $hostIds = array()) {
+	public function syncTemplateDependencies(array $data) {
+		$templateIds = zbx_toArray($data['templateids']);
+		$hostIds = zbx_toArray($data['hostids']);
+
 		$parentTriggers = $this->get(array(
 			'hostids' => $templateIds,
 			'preservekeys' => true,
