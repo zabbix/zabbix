@@ -857,14 +857,11 @@ define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
 
-// themes
-define('THEME_ORIGINAL_BLUE', 'originalblue');
-define('THEME_DARK_BLUE', 'darkblue');
-define('THEME_DARK_ORANGE', 'darkorange');
+// user default theme
 define('THEME_DEFAULT', 'default');
 
 // the default theme
-define('ZBX_DEFAULT_THEME', THEME_ORIGINAL_BLUE);
+define('ZBX_DEFAULT_THEME', 'originalblue');
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {

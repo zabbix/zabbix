@@ -106,11 +106,8 @@ $lang_hint = $languages_unable_set > 0 ? _('You are not able to choose some of t
 $userFormList->addRow(_('Language'), array($languageComboBox, SPACE, new CSpan($lang_hint, 'red wrap')));
 
 // append themes to form list
-$themeComboBox = new CComboBox('theme', $this->data['theme']);
-$themeComboBox->addItem(THEME_DEFAULT, _('System default'));
-$themeComboBox->addItem(THEME_ORIGINAL_BLUE, _('Original blue'));
-$themeComboBox->addItem(THEME_DARK_BLUE, _('Black & Blue'));
-$themeComboBox->addItem(THEME_DARK_ORANGE, _('Dark orange'));
+$themes = array_merge(array(THEME_DEFAULT => _('System default')), Z::getThemes());
+$themeComboBox = new CComboBox('theme', $this->data['theme'], null, $themes);
 $userFormList->addRow(_('Theme'), $themeComboBox);
 
 // append auto-login & auto-logout to form list
