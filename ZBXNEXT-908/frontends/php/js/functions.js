@@ -754,14 +754,14 @@ function getNextColor(paletteType) {
 
 	switch (paletteType) {
 		case 1:
-			palette = new Array(200, 150, 255, 100, 50, 0);
+			palette = [200, 150, 255, 100, 50, 0];
 			break;
 		case 2:
-			palette = new Array(100, 50, 200, 150, 250, 0);
+			palette = [100, 50, 200, 150, 250, 0];
 			break;
 		case 0:
 		default:
-			palette = new Array(255, 200, 150, 100, 50, 0);
+			palette = [255, 200, 150, 100, 50, 0];
 			break;
 	}
 

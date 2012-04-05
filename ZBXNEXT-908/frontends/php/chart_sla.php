@@ -69,7 +69,7 @@ $white		= imagecolorallocate($im, 255, 255, 255);
 
 imagefilledrectangle($im, 0, 0, $sizeX, $sizeY, imagecolorallocate($im, 120, 200, 120));
 
-$now = time(null);
+$now = time();
 $period_start = $now - SEC_PER_WEEK;
 $period_end = $now;
 $stat = calculateServiceAvailability($_REQUEST['serviceid'], $period_start, $period_end);

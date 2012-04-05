@@ -526,7 +526,6 @@ else {
 		$options = array(
 			'editable' => true,
 			'output' => array('graphid', 'name', 'graphtype'),
-			'sortfield' => $sortfield,
 			'limit' => $config['search_limit'] + 1
 		);
 		if ($pageFilter->hostid > 0) {
