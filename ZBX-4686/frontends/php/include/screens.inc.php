@@ -692,7 +692,9 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 						if (isset($_REQUEST['stime'])) {
 							$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 						}
-						$objData['loadSBox'] = 1;
+						if ($editmode == 0) {
+							$objData['loadSBox'] = 1;
+						}
 					}
 					$objData['src'] = $src;
 				}
@@ -766,7 +768,9 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 					if (isset($_REQUEST['stime'])) {
 						$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
 					}
-					$objData['loadSBox'] = 1;
+					if ($editmode == 0) {
+						$objData['loadSBox'] = 1;
+					}
 				}
 
 				$objData['src'] = zbx_empty($resourceid) ? 'chart3.php?' : 'chart.php?itemid='.$resourceid.'&'.$url.'width='.$width.'&height='.$height;
@@ -1190,7 +1194,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 					'selectScreenItems' => API_OUTPUT_EXTEND
 				));
 				$subScreen = reset($subScreens);
-				$item = array(get_screen($subScreen, 2, $effectiveperiod));
+				$item = array(get_screen($subScreen, ($editmode == 1 || $editmode == 2) ? 2 : 0, $effectiveperiod));
 				if ($editmode == 1) {
 					array_push($item, new CLink(_('Change'), $action));
 				}
