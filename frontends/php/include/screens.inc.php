@@ -80,7 +80,7 @@ function check_screen_recursion($mother_screenid, $child_screenid) {
 	return false;
 }
 
-function get_slideshow($slideshowid, $step, $effectiveperiod = null) {
+function get_slideshow($slideshowid, $step) {
 	$db_slides = DBfetch(DBselect(
 		'SELECT MIN(s.step) AS min_step,MAX(s.step) AS max_step'.
 		' FROM slides s'.
@@ -381,7 +381,7 @@ function check_dynamic_items($elid, $config = 0) {
 	return false;
 }
 
-function templated_screen($screenid) {
+function templated_screen() {
 	$result = false;
 
 	$db_sitems = DBSelect(
