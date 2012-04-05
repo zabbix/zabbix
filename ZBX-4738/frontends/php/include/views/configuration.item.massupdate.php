@@ -51,8 +51,8 @@ $itemFormList->addRow(
 
 // append hosts to form list
 if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) && !$this->data['is_multiple_hosts']) {
-	$intereacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
-	$intereacesComboBox->addItem(new CComboItem(0, '', null, 'no'));
+	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
+	$interfacesComboBox->addItem(new CComboItem(0, '', null, 'no'));
 	foreach ($this->data['hosts']['interfaces'] as $interface) {
 		$option = new CComboItem(
 			$interface['interfaceid'],
@@ -60,7 +60,7 @@ if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) &
 			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
-		$intereacesComboBox->addItem($option);
+		$interfacesComboBox->addItem($option);
 	}
 
 	$span = new CSpan(_('No interface found'), 'red');
@@ -73,7 +73,7 @@ if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) &
 			SPACE,
 			new CVisibilityBox('interface_visible', get_request('interface_visible'), 'interfaceDiv', _('Original'))
 		),
-		new CDiv(array($intereacesComboBox, $span), null, 'interfaceDiv'),
+		new CDiv(array($interfacesComboBox, $span), null, 'interfaceDiv'),
 		false,
 		'interface_row'
 	);
