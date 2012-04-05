@@ -1814,12 +1814,6 @@ class CTemplate extends CZBXAPI {
 				));
 			}
 
-			// sync triggers
-			API::Trigger()->syncTemplates(array(
-				'hostids' => $targetid,
-				'templateids' => $templateids
-			));
-
 			// we do linkage in two separate loops because for triggers you need all items already created on host
 			foreach ($templateids as $templateid) {
 				foreach ($linked as $link) {
@@ -1827,6 +1821,12 @@ class CTemplate extends CZBXAPI {
 						continue 2;
 					}
 				}
+
+				// sync triggers
+				API::Trigger()->syncTemplates(array(
+					'hostids' => $targetid,
+					'templateids' => $templateid
+				));
 
 				API::TriggerPrototype()->syncTemplates(array(
 					'hostids' => $targetid,
@@ -1844,6 +1844,10 @@ class CTemplate extends CZBXAPI {
 				));
 			}
 		}
+		API::Trigger()->syncTemplateDependencies(array(
+			'templateids' => $templateids,
+			'hostids' => $targetids,
+		));
 
 		return true;
 	}
