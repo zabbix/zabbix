@@ -678,7 +678,7 @@ class CGraphPrototype extends CZBXAPI {
 			'editable' => true,
 			'preservekeys' => true,
 			'output' => API_OUTPUT_SHORTEN,
-			'selectGraphItems'=> API_OUTPUT_EXTEND
+			'selectGraphItems' => API_OUTPUT_EXTEND
 		));
 
 		foreach ($graphs as $gnum => $graph) {
@@ -743,7 +743,7 @@ class CGraphPrototype extends CZBXAPI {
 	}
 
 	protected function updateReal($graph) {
-		$data = array(array('values' => $graph, 'where'=> array('graphid' => $graph['graphid'])));
+		$data = array(array('values' => $graph, 'where' => array('graphid' => $graph['graphid'])));
 		DB::update('graphs', $data);
 
 		if (isset($graph['gitems'])) {
@@ -959,7 +959,7 @@ class CGraphPrototype extends CZBXAPI {
 	 *
 	 * @param array $graphs
 	 * @param array $graphs['graphids']
-	 * @return boolean
+	 * @return array
 	 */
 	public function delete($graphids, $nopermissions = false) {
 		if (empty($graphids)) {

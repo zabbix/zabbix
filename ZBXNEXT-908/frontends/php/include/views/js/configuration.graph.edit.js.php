@@ -172,6 +172,8 @@
 	}
 
 	function recalculateSortOrder() {
+		var i = 0;
+
 		// rewrite ids, set "tmp" prefix
 		jQuery('#itemsTable tr.sortable').find('*[id]').each(function() {
 			jQuery(this).attr('id', 'tmp' + jQuery(this).attr('id'));
@@ -181,8 +183,8 @@
 		});
 
 		// rewrite ids to new order
-		var i = 0;
 		jQuery('#itemsTable tr.sortable').each(function() {
+			// rewrite ids in input fields
 			jQuery(this).find('*[id]').each(function() {
 				var id = jQuery(this).attr('id').substring(3);
 				var part1 = id.substring(0, id.indexOf('items_') + 5);
@@ -205,21 +207,23 @@
 					jQuery(this).attr('onchange', 'javascript: set_color_by_name("items_' + i + '_color", this.value);');
 				}
 			});
-			i++;
-		});
-		i = 0;
-		jQuery('#itemsTable tr.sortable').each(function() {
+
+			// rewrite ids in <tr>
 			var id = jQuery(this).attr('id').substring(3);
 			var part1 = id.substring(0, id.indexOf('items_') + 5);
-
 			jQuery(this).attr('id', part1 + '_' + i);
+
 			i++;
 		});
 
-		// set row number
 		i = 0;
 		jQuery('#itemsTable tr.sortable').each(function() {
+			// set row number
 			jQuery('.items_number', this).text((i + 1) + ':');
+
+			// set remove number
+			jQuery('#items_' + i + '_remove').data('remove', i);
+
 			i++;
 		});
 	}

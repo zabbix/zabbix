@@ -32,11 +32,11 @@ class CGraphItem extends CZBXAPI {
 	protected $tableAlias = 'gi';
 
 	/**
-	* Get GraphItems data
-	*
-	* @param array $options
-	* @return array|boolean
-	*/
+	 * Get GraphItems data
+	 *
+	 * @param array $options
+	 * @return array|boolean
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
