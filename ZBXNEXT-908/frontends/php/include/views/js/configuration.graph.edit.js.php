@@ -8,6 +8,7 @@
 		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
 		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
 		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
+		<input type="hidden" id="items_#{number}_host_templateid" value="#{host_templateid}">
 	</td>
 
 	<!-- row number -->
@@ -18,16 +19,17 @@
 	<!-- name -->
 	<td>
 		<span id="items_#{number}_name" class="link"
-			onclick="PopUp('popup.php?writeonly=1&dstfrm=graphForm&dstfld1=items_#{number}_itemid&dstfld2=items_#{number}_name'
+			onclick="PopUp('popup.php?writeonly=1&dstfrm=graphForm&dstfld1=items_#{number}_itemid&dstfld2=items_#{number}_name&dstfld3=items_#{number}_host_templateid'
 				<?php if (!empty($this->data['parent_discoveryid'])): ?>
 				+ '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
 				<?php else: ?>
 				+ '&srctbl=items'
 				<?php endif; ?>
 				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
+				+ (hostTemplateId() > 0 ? '&only_hostid=' + hostTemplateId() : '')
 				+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
 				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
-				+ '&srcfld1=itemid&srcfld2=name', 800, 600)">
+				+ '&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid', 800, 600)">
 			#{name}
 		</span>
 	</td>
@@ -150,6 +152,7 @@
 			item['drawtype'] = null;
 			item['yaxisside'] = null;
 			item['sortorder'] = item['number'];
+			item['host_templateid'] = list.values[i].host_templateid;
 			item['color'] = getNextColor(0);
 
 			var itemTpl = new Template(jQuery('#itemTpl').html());
@@ -160,6 +163,21 @@
 		}
 
 		activateSortable();
+	}
+
+	function hostTemplateId() {
+		var hostTemplateId = 0;
+		jQuery(document).ready(function() {
+			var i = 0;
+			jQuery('#itemsTable tr.sortable').each(function() {
+				hostTemplateId = jQuery('#items_' + i + '_host_templateid').val();
+				if (hostTemplateId > 0) {
+					return hostTemplateId;
+				}
+				i++;
+			});
+		});
+		return hostTemplateId;
 	}
 
 	function removeItem(obj) {
