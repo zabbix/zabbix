@@ -84,7 +84,7 @@ Requires	: unixODBC
 Requires	: libssh2 >= 1.0.0
 Requires	: curl >= 7.13.1
 Requires	: OpenIPMI >= 2.0.14
-Conflict	: zabbix-proxy
+Conflicts	: zabbix-proxy
 Requires(post)	: /sbin/chkconfig
 Requires(preun)	: /sbin/chkconfig
 Requires(preun)	: /sbin/service
@@ -620,6 +620,7 @@ fi
 
 %files agent
 %defattr(-,root,root,-)
+%{_docdir}/%{name}-agent-%{version}/
 %config(noreplace) %{_sysconfdir}/zabbix/zabbix_agentd.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/zabbix-agent
 %dir %{_sysconfdir}/zabbix/zabbix_agentd.d
