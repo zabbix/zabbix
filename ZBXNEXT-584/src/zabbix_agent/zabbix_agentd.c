@@ -300,7 +300,7 @@ static void	add_activechk_host(const char *host, unsigned short port)
  ******************************************************************************/
 static void	parse_active_hosts(char *active_hosts)
 {
-	char		*l = active_hosts, *r, *r2, *r3;
+	char		*l = active_hosts, *r, *r2;
 	unsigned short	port;
 
 	do
@@ -314,31 +314,35 @@ static void	parse_active_hosts(char *active_hosts)
 		{
 			l++;
 
-			if (NULL != (r2 = strrchr(l, ':')))
+			for (r2 = strchr(l, '\0'); r2 > l; r2--)
 			{
-				if (SUCCEED != is_ushort(r2 + 1, &port))
-				{
-					zbx_error("Cannot parse ServerActive option");
-					exit(EXIT_FAILURE);
-				}
+				if (0 != isdigit(*r2))
+					continue;
 
-				*r2 = '\0';
+				if (':' == *r2)
+				{
+					if (SUCCEED != is_ushort(r2 + 1, &port))
+					{
+						zbx_error("Cannot parse ServerActive option");
+						exit(EXIT_FAILURE);
+					}
+				}
+				else if (']' == *r2)
+				{
+					*r2 = '\0';
+					add_activechk_host(l, port);
+					*r2 = ']';
+					break;
+				}
 			}
 
-			if (NULL == (r3 = strrchr(l, ']')) || '\0' != r3[1])
+			if (r2 == l)
 			{
 				zbx_error("Cannot parse ServerActive option");
 				exit(EXIT_FAILURE);
 			}
-
-			*r3 = '\0';
-			add_activechk_host(l, port);
-			*r3 = ']';
-
-			if (NULL != r2)
-				*r2 = ':';
 		}
-		else if (is_ip6(l))
+		else if (SUCCEED == is_ip6(l))
 		{
 			add_activechk_host(l, port);
 		}
