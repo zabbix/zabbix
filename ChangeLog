@@ -7,6 +7,7 @@ New features:
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-4836] fixed undefined variables in actionconf.php when trying add Maintenance status; fixed some random ordering for conditions (Toms)
 ..F....... [ZBX-4829] fixed incorrect redirect in 'insert trigger' popup in trigger expression builder (Vedmak)
 A......... [ZBX-4784] fixed inherited triggers are updated on any host update (Vedmak)
 ........S. [ZBX-4824] fixed memory leak while switching item to not supported status (Sasha)
