@@ -134,11 +134,11 @@ unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
 
 unsigned char	process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 
-int				CONFIG_DISABLE_PASSIVE = 0;
-int				CONFIG_DISABLE_ACTIVE = 0;
 ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
 int				CONFIG_ACTIVE_FORKS = 0;
+int				CONFIG_ACTIVE_DISABLE = 0;
 int				CONFIG_PASSIVE_FORKS = 3;	/* number of listeners for processing passive checks */
+int				CONFIG_PASSIVE_DISABLE = 0;
 
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
@@ -276,7 +276,7 @@ static void	zbx_validate_config()
 	}
 
 	/* make sure active or passive check is enabled */
-	if (1 == CONFIG_DISABLE_ACTIVE && 1 == CONFIG_DISABLE_PASSIVE)
+	if (1 == CONFIG_ACTIVE_DISABLE && 1 == CONFIG_PASSIVE_DISABLE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
 		exit(FAIL);
@@ -422,9 +422,9 @@ static void	zbx_load_config(int optional)
 			PARM_OPT,	0,			0},
 		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			TYPE_INT,
 			PARM_OPT,	0,			1024},
-		{"DisableActive",		&CONFIG_DISABLE_ACTIVE,			TYPE_INT,
+		{"DisableActive",		&CONFIG_ACTIVE_DISABLE,			TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"DisablePassive",		&CONFIG_DISABLE_PASSIVE,		TYPE_INT,
+		{"DisablePassive",		&CONFIG_PASSIVE_DISABLE,		TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			30},
@@ -477,10 +477,10 @@ static void	zbx_load_config(int optional)
 	if (ZBX_CFG_FILE_REQUIRED == optional)
 		zbx_validate_config();
 
-	if (0 != CONFIG_DISABLE_PASSIVE)
+	if (0 != CONFIG_PASSIVE_DISABLE)
 		CONFIG_PASSIVE_FORKS = 0;	/* listeners are not needed for passive checks */
 
-	if (0 == CONFIG_DISABLE_ACTIVE)
+	if (0 == CONFIG_ACTIVE_DISABLE)
 	{
 		if (NULL == active_hosts || '\0' == *active_hosts)
 		{
@@ -562,7 +562,7 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
-	if (0 == CONFIG_DISABLE_PASSIVE)
+	if (0 == CONFIG_PASSIVE_DISABLE)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
