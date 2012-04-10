@@ -387,8 +387,6 @@ if(isset($_REQUEST['sform'])){
 	$frmTRLog->addRow(SPACE,$keyTable);
 	$frmTRLog->addRow(SPACE,$table);
 
-//	$frmTRLog->addRow(S_MULTIPLE_EVENTS,new CCheckBox('type', (($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'), null,1));
-
 	$sev_select = new CComboBox('priority',null);
 		$sev_select->addItem(TRIGGER_SEVERITY_NOT_CLASSIFIED,S_NOT_CLASSIFIED,(($priority == TRIGGER_SEVERITY_NOT_CLASSIFIED)?'on':'off'));
 		$sev_select->addItem(TRIGGER_SEVERITY_INFORMATION,S_INFORMATION,(($priority == TRIGGER_SEVERITY_INFORMATION)?'on':'off'));
