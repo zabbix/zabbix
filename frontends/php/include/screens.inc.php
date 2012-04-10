@@ -381,46 +381,6 @@ function check_dynamic_items($elid, $config = 0) {
 	return false;
 }
 
-function templated_screen() {
-	$result = false;
-
-	$db_sitems = DBSelect(
-		'SELECT si.resourceid,si.resourcetype'.
-		' FROM screens_items si'.
-		' WHERE si.screenid='.$_REQUEST['screenid']
-	);
-	while ($sitem = DBfetch($db_sitems)) {
-		if (in_array($sitem['resourcetype'], array(SCREEN_RESOURCE_DATA_OVERVIEW, SCREEN_RESOURCE_ACTIONS,
-			SCREEN_RESOURCE_EVENTS, SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_MAP, SCREEN_RESOURCE_SCREEN,
-			SCREEN_RESOURCE_SERVER_INFO, SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS,
-			SCREEN_RESOURCE_SYSTEM_STATUS, SCREEN_RESOURCE_TRIGGERS_INFO, SCREEN_RESOURCE_TRIGGERS_OVERVIEW))) {
-			$result = false;
-			break;
-		}
-		elseif ($sitem['resourcetype'] == SCREEN_RESOURCE_GRAPH) {
-			$tpl = API::Template()->get(array(
-				'graphids' => $sitem['resourceid'],
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true
-			));
-			$tpl = reset($tpl);
-			$result = $tpl ? $tpl['templateid'] : false;
-			break;
-		}
-		elseif ($sitem['resourcetype'] == SCREEN_RESOURCE_SIMPLE_GRAPH) {
-			$tpl = API::Template()->get(array(
-				'itemids' => $sitem['resourceid'],
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true
-			));
-			$tpl = reset($tpl);
-			$result = $tpl ? $tpl['templateid'] : false;
-			break;
-		}
-	}
-	return $result;
-}
-
 // editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
 function get_screen($screen, $editmode, $effectiveperiod = null) {
 	if (is_null($effectiveperiod)) {
