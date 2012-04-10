@@ -146,9 +146,10 @@ elseif (isset($_REQUEST['save'])) {
 	$items = get_request('items', array());
 	if (!empty($items)) {
 		$itemids = array();
-		foreach ($items as $item) {
+		foreach ($items as $number => $item) {
 			if (!empty($item['itemid'])) {
 				$itemids[$item['itemid']] = $item['itemid'];
+				$items[$number]['color'] = strtoupper($item['color']);
 			}
 			else {
 				$result = false;

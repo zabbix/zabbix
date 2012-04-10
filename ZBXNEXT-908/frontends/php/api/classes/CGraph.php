@@ -1054,6 +1054,11 @@ class CGraph extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for items.'));
 				}
 
+				// check color
+				if (!preg_match('/^#[A-F0-9]{6}$/i', $gitem['color'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect colour "%1$s".', $gitem['color']));
+				}
+
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
 
