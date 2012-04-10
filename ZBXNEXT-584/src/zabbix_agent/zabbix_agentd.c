@@ -134,6 +134,12 @@ unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
 
 unsigned char	process_type = 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 
+int				CONFIG_DISABLE_PASSIVE = 0;
+int				CONFIG_DISABLE_ACTIVE = 0;
+ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
+int				CONFIG_ACTIVE_FORKS = 0;
+int				CONFIG_PASSIVE_FORKS = 3;	/* number of listeners for processing passive checks */
+
 static void	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	char	ch = '\0';
@@ -277,6 +283,93 @@ static void	zbx_validate_config()
 	}
 }
 
+static void	add_activechk_host(const char *host, unsigned short port)
+{
+	CONFIG_ACTIVE_FORKS++;
+	CONFIG_ACTIVE_ARGS = zbx_realloc(CONFIG_ACTIVE_ARGS, sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * CONFIG_ACTIVE_FORKS);
+	CONFIG_ACTIVE_ARGS[CONFIG_ACTIVE_FORKS - 1].host = zbx_strdup(NULL, host);
+	CONFIG_ACTIVE_ARGS[CONFIG_ACTIVE_FORKS - 1].port = port;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_active_hosts                                               *
+ *                                                                            *
+ * Purpose: parse string like IP<:port>,[IPv6]<:port>                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	parse_active_hosts(char *active_hosts)
+{
+	char		*l = active_hosts, *r, *r2, *r3;
+	unsigned short	port;
+
+	do
+	{
+		if (NULL != (r = strchr(l, ',')))
+			*r = '\0';
+
+		port = (unsigned short)CONFIG_SERVER_PORT;
+
+		if ('[' == *l)
+		{
+			l++;
+
+			if (NULL != (r2 = strrchr(l, ':')))
+			{
+				if (SUCCEED != is_ushort(r2 + 1, &port))
+				{
+					zbx_error("Cannot parse ServerActive option");
+					exit(EXIT_FAILURE);
+				}
+
+				*r2 = '\0';
+			}
+
+			if (NULL == (r3 = strrchr(l, ']')) || '\0' != r3[1])
+			{
+				zbx_error("Cannot parse ServerActive option");
+				exit(EXIT_FAILURE);
+			}
+
+			*r3 = '\0';
+			add_activechk_host(l, port);
+			*r3 = ']';
+
+			if (NULL != r2)
+				*r2 = ':';
+		}
+		else if (is_ip6(l))
+		{
+			add_activechk_host(l, port);
+		}
+		else
+		{
+			if (NULL != (r2 = strrchr(l, ':')))
+			{
+				if (SUCCEED != is_ushort(r2 + 1, &port))
+				{
+					zbx_error("Cannot parse ServerActive option");
+					exit(EXIT_FAILURE);
+				}
+
+				*r2 = '\0';
+			}
+
+			add_activechk_host(l, port);
+
+			if (NULL != r2)
+				*r2 = ':';
+		}
+
+		if (NULL != r)
+		{
+			*r = ',';
+			l = r + 1;
+		}
+	}
+	while (NULL != r);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_load_config                                                  *
@@ -288,12 +381,16 @@ static void	zbx_validate_config()
  ******************************************************************************/
 static void	zbx_load_config(int optional)
 {
+	char	*p, *active_hosts = NULL;
+
 	struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
 		{"Server",			&CONFIG_HOSTS_ALLOWED,			TYPE_STRING,
 			PARM_MAND,	0,			0},
+		{"ServerActive",		&active_hosts,				TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
@@ -326,7 +423,7 @@ static void	zbx_load_config(int optional)
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
 			PARM_OPT,	0,			4},
-		{"StartAgents",			&CONFIG_ZABBIX_FORKS,			TYPE_INT,
+		{"StartAgents",			&CONFIG_PASSIVE_FORKS,			TYPE_INT,
 			PARM_OPT,	1,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
 			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
@@ -364,6 +461,27 @@ static void	zbx_load_config(int optional)
 
 	if (ZBX_CFG_FILE_REQUIRED == optional)
 		zbx_validate_config();
+
+	if (0 != CONFIG_DISABLE_PASSIVE)
+		CONFIG_PASSIVE_FORKS = 0;	/* listeners are not needed for passive checks */
+
+	if (0 == CONFIG_DISABLE_ACTIVE)
+	{
+		if (NULL == active_hosts)
+		{
+			if (NULL != (p = strchr(CONFIG_HOSTS_ALLOWED, ',')))
+				*p = '\0';
+
+			add_activechk_host(CONFIG_HOSTS_ALLOWED, (unsigned short)CONFIG_SERVER_PORT);
+
+			if (NULL != p)
+				*p = ',';
+		}
+		else
+			parse_active_hosts(active_hosts);
+	}
+
+	zbx_free(active_hosts);
 }
 
 /******************************************************************************
@@ -414,12 +532,11 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	zbx_thread_args_t		*thread_args;
-	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
-	zbx_sock_t			listen_sock;
-	int				i, thread_num = 0;
+	zbx_thread_args_t	*thread_args;
+	zbx_sock_t		listen_sock;
+	int			i, thread_num = 0;
 #ifdef _WINDOWS
-	DWORD				res;
+	DWORD			res;
 #endif
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
@@ -452,14 +569,8 @@ int	MAIN_ZABBIX_ENTRY()
 
 	/* --- START THREADS ---*/
 
-	if (1 == CONFIG_DISABLE_PASSIVE)
-	{
-		/* only main process and active checks will be started */
-		CONFIG_ZABBIX_FORKS = 0;	/* listeners are not needed for passive checks */
-	}
-
 	/* allocate memory for a collector, all listeners and an active check */
-	threads_num = 1 + CONFIG_ZABBIX_FORKS + (0 == CONFIG_DISABLE_ACTIVE ? 1 : 0);
+	threads_num = 1 + CONFIG_PASSIVE_FORKS + CONFIG_ACTIVE_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
 
 	/* start the collector thread */
@@ -469,7 +580,7 @@ int	MAIN_ZABBIX_ENTRY()
 	threads[thread_num++] = zbx_thread_start(collector_thread, thread_args);
 
 	/* start listeners */
-	for (i = 0; i < CONFIG_ZABBIX_FORKS; i++)
+	for (i = 0; i < CONFIG_PASSIVE_FORKS; i++)
 	{
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_args->thread_num = thread_num;
@@ -478,14 +589,11 @@ int	MAIN_ZABBIX_ENTRY()
 	}
 
 	/* start active check */
-	if (0 == CONFIG_DISABLE_ACTIVE)
+	for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
 	{
-		activechk_args.host = CONFIG_HOSTS_ALLOWED;
-		activechk_args.port = (unsigned short)CONFIG_SERVER_PORT;
-
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_args->thread_num = thread_num;
-		thread_args->args = &activechk_args;
+		thread_args->args = &CONFIG_ACTIVE_ARGS[i];
 		threads[thread_num++] = zbx_thread_start(active_checks_thread, thread_args);
 	}
 
