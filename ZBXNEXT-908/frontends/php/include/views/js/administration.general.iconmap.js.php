@@ -33,24 +33,21 @@
 			recalculateSortOrder();
 		});
 
-		jQuery("#iconMapTable tbody").delegate('select.mappingIcon, select#iconmap_default_iconid', 'change', function() {
+		jQuery('#iconMapTable tbody').delegate('select.mappingIcon, select#iconmap_default_iconid', 'change', function() {
 			jQuery(this).closest('tr').find('.preview')
-				.attr('src', 'imgstore.php?&width=<?php echo ZBX_ICON_PREVIEW_WIDTH ?>&height=<?php echo ZBX_ICON_PREVIEW_HEIGHT ?>&iconid=' + jQuery(this).val())
+				.attr('src', 'imgstore.php?&width=<?php echo ZBX_ICON_PREVIEW_WIDTH; ?>&height=<?php echo ZBX_ICON_PREVIEW_HEIGHT; ?>&iconid=' + jQuery(this).val())
 				.data('imageFull', 'imgstore.php?iconid=' + jQuery(this).val());
 		});
 
-		jQuery("#iconMapTable tbody").delegate('img.preview', 'click', function() {
-			hintBox.onClick(this, "<img src=" + jQuery(this).data('imageFull') + " >");
+		jQuery('#iconMapTable tbody').delegate('img.preview', 'click', function() {
+			hintBox.onClick(this, '<img src=' + jQuery(this).data('imageFull') + ' >');
 		});
 
 		jQuery('#addMapping').click(function() {
 			var tpl = new Template(jQuery('#rowTpl').html()),
-				iconmappingid = Math.floor(Math.random() * 10000000).toString(),
+				iconmappingid = getRandomId(),
 				mapping = {};
 
-			while (jQuery('#iconmapidRow_' + iconmappingid).length) {
-				iconmappingid++;
-			}
 			mapping.iconmappingid = iconmappingid;
 			jQuery('<tr id="iconmapidRow_' + iconmappingid + '" class="sortable">' + tpl.evaluate(mapping) + '</tr>').insertBefore('#rowTpl');
 			jQuery('#iconmapidRow_' + iconmappingid + ' :input').prop('disabled', false);
@@ -66,6 +63,5 @@
 		if (jQuery('#iconMapTable tr.sortable').length === 0) {
 			jQuery('#addMapping').click();
 		}
-
 	});
 </script>

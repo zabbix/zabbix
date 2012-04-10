@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $graphWidget = new CWidget();
 
 if (!empty($this->data['parent_discoveryid'])) {
@@ -65,8 +64,8 @@ $graphFormList->addRow(_('Graph type'), $graphTypeComboBox);
 
 // append items to form list
 $itemsTable = new CTable(_('No items defined.'), 'formElementTable');
-$itemsTable->setAttribute('style', 'min-width: 700px;');
-$itemsTable->setAttribute('id', 'itemsTable');
+$itemsTable->attr('style', 'min-width: 700px;');
+$itemsTable->attr('id', 'itemsTable');
 $itemsTable->setHeader(array(
 	new CCol(SPACE, null, null, '15'),
 	new CCol(SPACE, null, null, '15'),
@@ -332,7 +331,7 @@ else {
 	));
 }
 
-// insert js
+// insert js (depended from some variables inside the file)
 insert_show_color_picker_javascript();
 require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
 

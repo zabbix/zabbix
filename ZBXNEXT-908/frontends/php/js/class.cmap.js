@@ -633,7 +633,7 @@ ZABBIX.apps.map = (function() {
 		 * @param {Object} [linkData] link data from db
 		 */
 		function Link(sysmap, linkData) {
-			var linkid, selementid, lnktrigger;
+			var selementid, lnktrigger;
 			this.sysmap = sysmap;
 
 			if (!linkData) {
@@ -656,10 +656,7 @@ ZABBIX.apps.map = (function() {
 				}
 
 				// generate unique linkid
-				do {
-					linkid = Math.floor(Math.random() * 10000000).toString();
-				} while (typeof this.sysmap.data.links[linkid] !== 'undefined');
-				linkData.linkid = linkid;
+				linkData.linkid = getRandomId();
 			}
 			else {
 				if (jQuery.isArray(linkData.linktriggers)) {
@@ -722,7 +719,6 @@ ZABBIX.apps.map = (function() {
 		 * @param {Object} selementData element db values
 		 */
 		function Selement(sysmap, selementData) {
-			var selementid;
 			this.sysmap = sysmap;
 			this.selected = false;
 
@@ -741,10 +737,7 @@ ZABBIX.apps.map = (function() {
 				};
 
 				// generate unique selementid
-				do {
-					selementid = Math.floor(Math.random() * 10000000).toString();
-				} while (typeof this.sysmap.data.selements[selementid] !== 'undefined');
-				selementData.selementid = selementid;
+				selementData.selementid = getRandomId();
 			}
 			else {
 				if (jQuery.isArray(selementData.urls)) {
@@ -1720,9 +1713,7 @@ ZABBIX.apps.map = (function() {
 						continue;
 					}
 
-					do {
-						linktriggerid = Math.floor(Math.random() * 10000000).toString();
-					} while (typeof this.sysmap.allLinkTriggerIds[linktriggerid] !== 'undefined');
+					linktriggerid = getRandomId();
 
 					// store linktriggerid to generate every time unique one
 					this.sysmap.allLinkTriggerIds[linktriggerid] = true;

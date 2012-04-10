@@ -95,7 +95,7 @@ class CImg extends CTag {
 	public function preload() {
 		$id = $this->getAttribute('id');
 		if (empty($id)) {
-			$id = 'img'.rand(1, 9999999);
+			$id = 'img'.uniqid();
 			$this->setAttribute('id', $id);
 		}
 

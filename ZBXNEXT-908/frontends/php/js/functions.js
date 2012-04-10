@@ -731,6 +731,24 @@ function t(str) {
 	return (!!locale[str]) ? locale[str] : str;
 }
 
+function getRandomId(remember) {
+	var id;
+
+	if (typeof this.generated === 'undefined') {
+		this.generated = [];
+	}
+	id = Math.floor(Math.random() * 10000000);
+
+	if (this.generated.indexOf(id) > -1) {
+		id = getRandomId(false);
+	}
+
+	if (typeof remember === 'undefined') {
+		this.generated.push(id);
+	}
+	return id;
+}
+
 /**
  * Color palette, (implementation from PHP)
  */
