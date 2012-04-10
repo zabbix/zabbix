@@ -285,6 +285,17 @@ static void	zbx_validate_config()
 
 static void	add_activechk_host(const char *host, unsigned short port)
 {
+	int	i;
+
+	for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
+	{
+		if (0 == strcmp(CONFIG_ACTIVE_ARGS[i].host, host) && CONFIG_ACTIVE_ARGS[i].port == port)
+		{
+			zbx_error("duplicate entry in ServerActive option");
+			exit(EXIT_FAILURE);
+		}
+	}
+
 	CONFIG_ACTIVE_FORKS++;
 	CONFIG_ACTIVE_ARGS = zbx_realloc(CONFIG_ACTIVE_ARGS, sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * CONFIG_ACTIVE_FORKS);
 	CONFIG_ACTIVE_ARGS[CONFIG_ACTIVE_FORKS - 1].host = zbx_strdup(NULL, host);
@@ -322,14 +333,15 @@ static void	parse_active_hosts(char *active_hosts)
 				if (':' == *r2)
 				{
 					if (SUCCEED != is_ushort(r2 + 1, &port))
-					{
-						zbx_error("Cannot parse ServerActive option");
-						exit(EXIT_FAILURE);
-					}
+						goto fail;
 				}
 				else if (']' == *r2)
 				{
 					*r2 = '\0';
+
+					if (SUCCEED != is_ip6(l))
+						goto fail;
+
 					add_activechk_host(l, port);
 					*r2 = ']';
 					break;
@@ -337,10 +349,7 @@ static void	parse_active_hosts(char *active_hosts)
 			}
 
 			if (r2 == l)
-			{
-				zbx_error("Cannot parse ServerActive option");
-				exit(EXIT_FAILURE);
-			}
+				goto fail;
 		}
 		else if (SUCCEED == is_ip6(l))
 		{
@@ -351,10 +360,7 @@ static void	parse_active_hosts(char *active_hosts)
 			if (NULL != (r2 = strrchr(l, ':')))
 			{
 				if (SUCCEED != is_ushort(r2 + 1, &port))
-				{
-					zbx_error("Cannot parse ServerActive option");
-					exit(EXIT_FAILURE);
-				}
+					goto fail;
 
 				*r2 = '\0';
 			}
@@ -372,6 +378,11 @@ static void	parse_active_hosts(char *active_hosts)
 		}
 	}
 	while (NULL != r);
+
+	return;
+fail:
+	zbx_error("cannot parse ServerActive option");
+	exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -471,7 +482,7 @@ static void	zbx_load_config(int optional)
 
 	if (0 == CONFIG_DISABLE_ACTIVE)
 	{
-		if (NULL == active_hosts)
+		if (NULL == active_hosts || '\0' == *active_hosts)
 		{
 			if (NULL != (p = strchr(CONFIG_HOSTS_ALLOWED, ',')))
 				*p = '\0';
