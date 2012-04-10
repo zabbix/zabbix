@@ -29,7 +29,7 @@
 //debugger;
 
 // Getting CSS style property
-function get_style(el,styleProp) {
+function get_style(el, styleProp) {
 	if (el.currentStyle) {
 		var y = el.currentStyle[styleProp];
 	}
@@ -148,15 +148,12 @@ function popup_menu (a_items, a_tpl, x, y) {
 		return null;
 	}
 	this.n_scroll_left = get_scroll_pos()[0];
-	this.n_scroll_top = get_scroll_pos()[1];
 
 	if (document.body.clientWidth) {
 		this.n_scr_width = document.body.clientWidth;
-		this.n_scr_height = document.body.clientHeight;
 	}
 	else {
 		this.n_scr_width = document.width;
-		this.n_scr_height = document.height;
 	}
 
 	// store items structure
@@ -317,10 +314,7 @@ function menu_onclick (n_id) {
 		o_item.e_oelement.className = o_item.getstyle(0, 0);
 		o_item.e_ielement.className = o_item.getstyle(1, 0);
 
-		// update status line
-		o_item.upstatus(7);
-
-		this.o_hidetimer = setTimeout('A_MENUS[' + this.n_id + '].collapse();', 100);
+		this.o_hidetimer = setTimeout('if (typeof(A_MENUS[' + this.n_id + ']) != "undefined") { A_MENUS['+ this.n_id +'].collapse(); }', 100);
 		return true;
 	}
 	return false;
@@ -334,9 +328,6 @@ function menu_onmouseout (n_id) {
 	o_item.e_oelement.className = o_item.getstyle(0, 0);
 	o_item.e_ielement.className = o_item.getstyle(1, 0);
 
-	// update status line
-	o_item.upstatus(7);
-
 	// run mouseover timer
 	this.o_hidetimer = setTimeout('if (typeof(A_MENUS[' + this.n_id + ']) != "undefined") { A_MENUS['+ this.n_id +'].collapse(); }', o_item.getprop('hide_delay'));
 }
@@ -349,9 +340,6 @@ function menu_onmouseover (n_id) {
 
 	// lookup new item's object
 	var o_item = this.a_index[n_id];
-
-	// update status line
-	o_item.upstatus();
 
 	// apply rollover
 	o_item.e_oelement.className = o_item.getstyle(0, 1);
@@ -411,7 +399,6 @@ function menu_item (o_parent, n_order) {
 	// assign methods
 	this.getprop  = mitem_getprop;
 	this.getstyle = mitem_getstyle;
-	this.upstatus = mitem_upstatus;
 
 	this.set_x_direction = mitem_set_x_direction;
 	this.get_x_direction = mitem_get_x_direction;
@@ -455,7 +442,7 @@ function menu_item (o_parent, n_order) {
 
 	// js callback action
 	if (jQuery.isFunction(this.a_config[1])) {
-		jQuery(document).on('click', '#' + menuItemId, this.a_config[1]);
+		jQuery(el).click(this.a_config[1]);
 	}
 	// url action
 	else {
@@ -593,16 +580,4 @@ function mitem_getstyle (n_pos, n_state) {
 			return a_oclass[n_currst];
 		}
 	}
-}
-
-// updates status bar message of the browser
-function mitem_upstatus (b_clear) {
-	window.setTimeout("window.status=unescape('" + (b_clear
-		? ''
-		: (this.a_config[2] && this.a_config[2]['sb']
-			? escape(this.a_config[2]['sb'])
-			: escape(this.a_config[0]) + (this.a_config[1]
-				? ' ('+ escape(this.a_config[1]) + ')'
-				: ''))) + "')", 10
-	);
 }

@@ -76,7 +76,8 @@ $allowedConditions = get_conditions_by_eventsource($data['eventsource']);
 
 $sortFields = array(
 	array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
-	array('field' => 'operator', 'order' => ZBX_SORT_DOWN)
+	array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
+	array('field' => 'value', 'order' => ZBX_SORT_DOWN)
 );
 CArrayHelper::sort($data['conditions'], $sortFields);
 

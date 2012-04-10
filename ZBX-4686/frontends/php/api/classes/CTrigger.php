@@ -1933,24 +1933,25 @@ class CTrigger extends CTriggerGeneral {
 			$this->inherit($trigger, $data['hostids']);
 		}
 
-		// updated dependencies
-		$this->syncTemplateDependencies($data['templateids'], $data['hostids']);
-
 		return true;
 	}
 
 	/**
 	 * Synchronizes the templated trigger dependencies on the given hosts inherited from the given
 	 * templates.
+	 * Update dependencies, do it after all triggers that can be dependent were created/updated on
+	 * all child hosts/templates. Starting from highest level template triggers select triggers from
+	 * one level lower, then for each lower trigger look if it's parent has dependencies, if so
+	 * find this dependency trigger child on dependent trigger host and add new dependency.
 	 *
-	 * @param array $templateIds
-	 * @param array $hostIds
+	 * @param array $data
+	 *
+	 * @return void
 	 */
-	protected function syncTemplateDependencies(array $templateIds, array $hostIds = array()) {
-		// Update dependencies, do it after all triggers that can be dependent were created/updated on
-		// all child hosts/templates. Starting from highest level template triggers select triggers from
-		// one level lower, then for each lower trigger look if it's parent has dependencies, if so
-		// find this dependency trigger child on dependent trigger host and add new dependency.
+	public function syncTemplateDependencies(array $data) {
+		$templateIds = zbx_toArray($data['templateids']);
+		$hostIds = zbx_toArray($data['hostids']);
+
 		$parentTriggers = $this->get(array(
 			'hostids' => $templateIds,
 			'preservekeys' => true,

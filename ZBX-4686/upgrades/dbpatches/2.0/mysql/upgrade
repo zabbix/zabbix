@@ -80,7 +80,7 @@ echo "Dropping indexes that might need re-creation..."
 
 timer start dropping of indexes
 for i in\
- "node_cksum   node_cksum_cksum_1"; do
+ "node_cksum_1 node_cksum_cksum_1"; do
 	drop_index $i
 done
 echo -n " ... "

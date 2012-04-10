@@ -2,10 +2,14 @@
 Changes for 2.0.0rc3
 
 New features:
+...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBXNEXT-1153] support for nested templates in import (Vedmak)
-..F....... [ZBX-1357] updated French, German, Greek, Japanese, Polish, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-4836] fixed undefined variables in actionconf.php when trying add Maintenance status; fixed some random ordering for conditions (Toms)
+..F....... [ZBX-4829] fixed incorrect redirect in 'insert trigger' popup in trigger expression builder (Vedmak)
+A......... [ZBX-4784] fixed inherited triggers are updated on any host update (Vedmak)
 ........S. [ZBX-4824] fixed memory leak while switching item to not supported status (Sasha)
 ..F....... [ZBX-4830] fixed error when try to create item without host (Vedmak)
 ..F....... [ZBX-4676] fixed link to triggers from dashboard 'system status' widget not reset host filter (Vedmak)
@@ -559,6 +563,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
+...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBX-4795] fixed group creation for child nodes (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
 A.F....... [ZBX-4813] fixed incorrect exception handling in maps when checking for circularity (Toms, Vedmak)
