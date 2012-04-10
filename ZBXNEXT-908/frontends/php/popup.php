@@ -165,7 +165,6 @@ $allowedSrcFields = array(
 	'prototypes'			=> '"itemid", "name"',
 	'graphs'				=> '"graphid", "name"',
 	'sysmaps'				=> '"sysmapid", "name"',
-	'screens'				=> '"screenid"',
 	'slides'				=> '"slideshowid"',
 	'host_group'			=> '"groupid", "name"',
 	'hosts_and_templates'	=> '"name", "hostid", "group"',
