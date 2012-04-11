@@ -138,6 +138,7 @@ class CGraphItem extends CZBXAPI {
 		if (!is_null($options['expandData'])) {
 			$sqlParts['select']['key'] = 'i.key_';
 			$sqlParts['select']['hostid'] = 'i.hostid';
+			$sqlParts['select']['flags'] = 'i.flags';
 			$sqlParts['select']['host'] = 'h.host';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';

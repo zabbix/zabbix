@@ -8,7 +8,8 @@
 		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
 		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
 		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-		<input type="hidden" id="items_#{number}_host_templateid" value="#{host_templateid}">
+		<input type="hidden" id="items_#{number}_host_templateid" name="items[#{number}][host_templateid]" value="#{host_templateid}">
+		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
 	</td>
 
 	<!-- row number -->
@@ -18,20 +19,7 @@
 
 	<!-- name -->
 	<td>
-		<span id="items_#{number}_name" class="link"
-			onclick="PopUp('popup.php?writeonly=1&dstfrm=graphForm&dstfld1=items_#{number}_itemid&dstfld2=items_#{number}_name&dstfld3=items_#{number}_host_templateid'
-				<?php if (!empty($this->data['parent_discoveryid'])): ?>
-				+ '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
-				<?php else: ?>
-				+ '&srctbl=items'
-				<?php endif; ?>
-				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
-				+ (hostTemplateId() > 0 ? '&only_hostid=' + hostTemplateId() : '')
-				+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
-				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
-				+ '&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid', 800, 600)">
-			#{name}
-		</span>
+		<span id="items_#{number}_name" class="link" onclick="#{nameLink}">#{name}</span>
 	</td>
 
 	<!-- type -->
@@ -105,20 +93,33 @@
 </tr>
 </script>
 <script type="text/javascript">
-	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color) {
+	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
 		var item = [];
 		item['number'] = number;
 		item['number_nr'] = number + 1;
 		item['gitemid'] = gitemid;
 		item['graphid'] = graphid;
 		item['itemid'] = itemid;
-		item['name'] = name;
 		item['type'] = type;
 		item['calc_fnc'] = calc_fnc;
 		item['drawtype'] = drawtype;
 		item['yaxisside'] = yaxisside;
 		item['color'] = color;
 		item['sortorder'] = number;
+		item['host_templateid'] = 0;
+		item['flags'] = flags;
+		item['name'] = name;
+		item['nameLink'] = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid'
+				+ '&dstfld1=items_' + number + '_itemid&dstfld2=items_' + number + '_name&dstfld3=items_' + number + '_host_templateid'
+				+ (item['flags'] > 0
+					? '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
+						+ '&srcfld4=flags&dstfld4=items_' + number + '_flags'
+					: '&srctbl=items')
+				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
+				+ (hostTemplateId() > 0 ? '&only_hostid=' + hostTemplateId() : '')
+				+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
+				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
+				+ '", 800, 600)';
 
 		var itemTpl = new Template(jQuery('#itemTpl').html());
 		jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
@@ -146,14 +147,26 @@
 			item['gitemid'] = 0;
 			item['graphid'] = <?php echo $this->data['graphid']; ?>;
 			item['itemid'] = list.values[i].itemid;
-			item['name'] = list.values[i].name;
 			item['type'] = null;
 			item['calc_fnc'] = null;
 			item['drawtype'] = 0;
 			item['yaxisside'] = 0;
 			item['sortorder'] = item['number'];
 			item['host_templateid'] = list.values[i].host_templateid;
+			item['flags'] = 0;
 			item['color'] = getNextColor(1);
+			item['name'] = list.values[i].name;
+			item['nameLink'] = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid'
+				+ '&dstfld1=items_' + item['number'] + '_itemid&dstfld2=items_' + item['number'] + '_name&dstfld3=items_' + item['number'] + '_host_templateid'
+				+ (list.values[i].flags > 0
+					? '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
+						+ '&srcfld4=flags&dstfld4=items_' + item['number'] + '_flags'
+					: '&srctbl=items')
+				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
+				+ (hostTemplateId() > 0 ? '&only_hostid=' + hostTemplateId() : '')
+				+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
+				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
+				+ '", 800, 600)';
 
 			var itemTpl = new Template(jQuery('#itemTpl').html());
 			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
@@ -232,18 +245,18 @@
 			jQuery(this).attr('id', part1 + '_' + i);
 
 			// rewrite name link
-			jQuery('#items_' + i + '_name', this).attr('onclick', 'PopUp("popup.php?writeonly=1&dstfrm=graphForm'
-					+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name&dstfld3=items_' + i + '_host_templateid'
-					<?php if (!empty($this->data['parent_discoveryid'])): ?>
-					+ '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
-					<?php else: ?>
-					+ '&srctbl=items'
-					<?php endif; ?>
-					+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
-					+ (hostTemplateId() > 0 ? '&only_hostid=' + hostTemplateId() : '')
-					+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
-					+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
-					+ '&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid", 800, 600)');
+			var nameLink = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm'
+				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name&dstfld3=items_' + i + '_host_templateid'
+				+ (jQuery('#items_' + i + '_flags').val() > 0
+					? '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
+						+ '&srcfld4=flags&dstfld4=items_' + i + '_flags'
+					: '&srctbl=items')
+				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
+				+ (hostTemplateId() > 0 ? '&only_hostid=' + hostTemplateId() : '')
+				+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
+				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
+				+ '&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid", 800, 600)';
+			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 
 			i++;
 		});

@@ -84,7 +84,7 @@ $this->data['only_hostid'] = null;
 $this->data['real_hosts'] = null;
 
 if (!empty($this->data['items'])) {
-	foreach ($this->data['items'] as $rowNumber => $item) {
+	foreach ($this->data['items'] as $number => $item) {
 		if (!empty($item['itemid'])) {
 			$host = get_host_by_itemid($item['itemid']);
 			if ($host['status'] == HOST_STATUS_TEMPLATE) {
@@ -108,9 +108,9 @@ if (!empty($this->data['items'])) {
 			$item['yaxisside'] = 0;
 		}
 
-		insert_js('loadItem('.$rowNumber.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
+		insert_js('loadItem('.$number.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
 			CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
-			$item['yaxisside'].', \''.$item['color'].'\');',
+			$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
 			true
 		);
 	}
@@ -140,7 +140,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 		'link_menu'
 	);
 }
-$itemsTable->addRow(new CRow(array($addButton, $addPrototypeButton), null, 'itemButtonsRow'));
+$itemsTable->addRow(new CRow(new CCol(array($addButton, SPACE, SPACE, SPACE, $addPrototypeButton), null, 8), null, 'itemButtonsRow'));
 
 // append legend to form list
 $graphFormList->addRow(_('Show legend'), new CCheckBox('legend', $this->data['legend'], null, 1));

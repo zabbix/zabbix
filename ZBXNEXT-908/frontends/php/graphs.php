@@ -413,7 +413,8 @@ elseif (isset($_REQUEST['form'])) {
 		$data['items'] = API::GraphItem()->get(array(
 			'graphids' => $data['graphid'],
 			'sortfield' => 'gitemid',
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'expandData' => true
 		));
 	}
 	else {
