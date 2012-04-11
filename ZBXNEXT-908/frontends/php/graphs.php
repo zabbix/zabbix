@@ -70,7 +70,7 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,				null)
 );
-$isDataValid = check_fields($fields);
+check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 $_REQUEST['go'] = get_request('go', 'none');
@@ -378,8 +378,7 @@ elseif (isset($_REQUEST['form'])) {
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'group_gid' => get_request('group_gid', array()),
 		'hostid' => get_request('hostid', array()),
-		'normal_only' => get_request('normal_only'),
-		'isDataValid' => $isDataValid
+		'normal_only' => get_request('normal_only')
 	);
 
 	if (!empty($data['graphid']) && !isset($_REQUEST['form_refresh'])) {
