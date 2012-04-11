@@ -87,32 +87,32 @@ if ($httptestid = get_request('httptestid', false)) {
 	}
 
 	$httptest = get_httptest_by_httptestid($httptestid);
-	$graph_name = $httptest['name'];
+	$name = $httptest['name'];
 }
 else {
 	$items = get_request('items', array());
 	asort_by_key($items, 'sortorder');
 
-	$dbItem = API::Item()->get(array(
+	$dbItems = API::Item()->get(array(
 		'webitems' => true,
 		'itemids' => zbx_objectValues($items, 'itemid'),
 		'nodeids' => get_current_nodeid(true),
 		'output' => API_OUTPUT_SHORTEN
 	));
-	$dbItem = zbx_toHash($dbItem, 'itemid');
+	$dbItems = zbx_toHash($dbItems, 'itemid');
 	foreach ($items as $item) {
-		if (!isset($dbItem[$item['itemid']])) {
+		if (!isset($dbItems[$item['itemid']])) {
 			access_deny();
 		}
 	}
-	$graph_name = get_request('name', '');
+	$name = get_request('name', '');
 }
 
 /*
  * Display
  */
 $graph = new CChart(get_request('graphtype', GRAPH_TYPE_NORMAL));
-$graph->setHeader($graph_name);
+$graph->setHeader($name);
 
 navigation_bar_calc();
 
@@ -132,7 +132,7 @@ $graph->setYMaxItemId(get_request('ymax_itemid', 0));
 $graph->setLeftPercentage(get_request('percent_left', 0));
 $graph->setRightPercentage(get_request('percent_right', 0));
 
-foreach ($items as $gnum => $item) {
+foreach ($items as $inum => $item) {
 	$graph->addItem(
 		$item['itemid'],
 		isset($item['yaxisside']) ? $item['yaxisside'] : null,
@@ -141,7 +141,7 @@ foreach ($items as $gnum => $item) {
 		isset($item['drawtype']) ? $item['drawtype'] : null,
 		isset($item['type']) ? $item['type'] : null
 	);
-	unset($items[$gnum]);
+	unset($items[$inum]);
 }
 $graph->draw();
 
