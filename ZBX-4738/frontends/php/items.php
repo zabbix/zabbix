@@ -691,7 +691,7 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase', ''),
 		'formula' => get_request('formula', '1'),
 		'logtimefmt' => get_request('logtimefmt', ''),
-		'initial_interface_type' => null,
+		'initial_item_type' => null,
 		'multiple_interface_types' => false,
 	);
 
@@ -711,10 +711,12 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		));
 		$usedInterfacesTypes = array();
 		foreach ($items as $item) {
-			$usedInterfacesTypes[] = itemTypeInterface($item['type']);
+			$usedInterfacesTypes[$item['type']] = itemTypeInterface($item['type']);
 		}
-		$data['initial_interface_type'] = $usedInterfacesTypes[0];
-		$data['multiple_interface_types'] = (count($usedInterfacesTypes) > 1);
+		$initialItemType = min(array_keys($usedInterfacesTypes));
+		$data['type'] = (get_request('type') !== null) ? ($data['type']) : $initialItemType;
+		$data['initial_item_type'] = $initialItemType;
+		$data['multiple_interface_types'] = (count(array_unique($usedInterfacesTypes)) > 1);
 	}
 
 	// application
