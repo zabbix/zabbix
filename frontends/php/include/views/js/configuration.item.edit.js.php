@@ -179,16 +179,24 @@
 			jQuery('#row_new_delay_flex').css('display', 'none');
 		}
 
-		jQuery('#type').bind('change', function() {
-			organizeInterfaces(itemTypeInterface(parseInt(jQuery('#type').val())));
+		jQuery('#type')
+			.change(function() {
+				// update the interface select with each item type change
+				organizeInterfaces(itemTypeInterface(parseInt(jQuery(this).val())));
+				displayKeyButton();
+			})
+			.trigger('change');
+		jQuery('#type_visible, #interface_visible').click(function() {
+			// if no item type is selected, reset the interfaces to default
+			if (!jQuery('#type_visible').is(':checked')) {
+				organizeInterfaces(itemTypeInterface(<?php echo CJs::encodeJson($data['initial_item_type']) ?>));
+				displayKeyButton();
+			}
+			else {
+				jQuery('#type').trigger('change');
+			}
 			displayKeyButton();
 		});
-		jQuery('#interface_visible, #type_visible').click(function() {
-			organizeInterfaces(itemTypeInterface(parseInt(jQuery('#type').val())));
-		});
-		var initialInterfaceType = <?php echo CJs::encodeJson($data['initial_interface_type']) ?>;
-		organizeInterfaces(initialInterfaceType || itemTypeInterface(parseInt(jQuery('#type').val())));
-		displayKeyButton();
 
 		jQuery('#authtype').bind('change', function() {
 			setAuthTypeLabel();

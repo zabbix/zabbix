@@ -908,7 +908,7 @@
 			'alreadyPopulated' => null,
 			'lifetime' => get_request('lifetime', 30),
 			'filter' => isset($ifm, $ifv) ? $ifm.':'.$ifv : '',
-			'initial_interface_type' => null
+			'initial_item_type' => null
 		);
 
 		// hostid
