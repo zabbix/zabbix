@@ -78,11 +78,11 @@ foreach ($data['graphs'] as $graph) {
 	if (empty($this->data['hostid'])) {
 		$hostList = array();
 		foreach ($graph['hosts'] as $host) {
-			$hostList[$host['host']] = $host['host'];
+			$hostList[$host['name']] = $host['name'];
 		}
 
 		foreach ($graph['templates'] as $template) {
-			$hostList[$template['host']] = $template['host'];
+			$hostList[$template['name']] = $template['name'];
 		}
 		$hostList = implode(', ', $hostList);
 	}

@@ -553,11 +553,14 @@ else {
 
 	$options = array(
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectTemplates' => API_OUTPUT_EXTEND,
-		'selectDiscoveryRule' => API_OUTPUT_EXTEND
+		'output' => array('graphid', 'name', 'templateid', 'graphtype', 'width', 'height'),
+		'selectDiscoveryRule' => array('itemid', 'name'),
 	);
+	if ($pageFilter->hostid == 0) {
+		$options['selectHosts'] = array('name');
+		$options['selectTemplates'] = array('name');
+	}
+
 	$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
 		? API::GraphPrototype()->get($options)
 		: API::Graph()->get($options);
