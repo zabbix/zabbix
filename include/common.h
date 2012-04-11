@@ -121,7 +121,7 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"10 April 2012"
+#define	ZABBIX_REVDATE		"11 April 2012"
 #define	ZABBIX_VERSION		"1.8.12rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
@@ -850,6 +850,7 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 		zbx_case_sensitive_t cs);
 
 /* misc functions */
+int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
 
 void	zbx_on_exit(); /* calls exit() at the end! */
