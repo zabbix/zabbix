@@ -83,7 +83,7 @@ Requires	: iksemel
 Requires	: unixODBC
 Requires	: libssh2 >= 1.0.0
 Requires	: curl >= 7.13.1
-Requires	: OpenIPMI >= 2.0.14
+Requires	: OpenIPMI-libs >= 2.0.14
 Conflicts	: zabbix-proxy
 Requires(post)	: /sbin/chkconfig
 Requires(preun)	: /sbin/chkconfig
