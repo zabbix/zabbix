@@ -283,21 +283,14 @@ static void	zbx_validate_config()
 	}
 }
 
-static int	add_activechk_host(const char *host, unsigned short port, char *error, size_t maxerrlen)
+static int	add_activechk_host(const char *host, unsigned short port)
 {
 	int	i;
 
 	for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
 	{
 		if (0 == strcmp(CONFIG_ACTIVE_ARGS[i].host, host) && CONFIG_ACTIVE_ARGS[i].port == port)
-		{
-			if (NULL != error)
-			{
-				zbx_snprintf(error, maxerrlen, "address \"%s:%hu\" specified more than once",
-						host, port);
-			}
 			return FAIL;
-		}
 	}
 
 	CONFIG_ACTIVE_FORKS++;
@@ -317,10 +310,9 @@ static int	add_activechk_host(const char *host, unsigned short port, char *error
  ******************************************************************************/
 static void	parse_active_hosts(char *active_hosts)
 {
-	char		*l = active_hosts, *r, *r2, *pos, error[128];
+	char		*l = active_hosts, *r = NULL, *r2 = NULL, *r3 = NULL, *pos;
 	unsigned short	port;
-
-	*error = '\0';
+	int		rc = SUCCEED;
 
 	do
 	{
@@ -329,64 +321,51 @@ static void	parse_active_hosts(char *active_hosts)
 
 		port = (unsigned short)CONFIG_SERVER_PORT;
 		pos = l;
+		r2 = r3 = NULL;
 
 		if ('[' == *l)
 		{
 			l++;
 
-			for (r2 = strchr(l, '\0'); r2 > l; r2--)
-			{
-				if (0 != isdigit(*r2))
-					continue;
-
-				if (':' == *r2)
-				{
-					if (SUCCEED != is_ushort(r2 + 1, &port))
-					{
-						strscpy(error, "incorrect port number");
-						goto fail;
-					}
-				}
-				else if (']' == *r2)
-				{
-					*r2 = '\0';
-
-					if (SUCCEED != is_ip6(l))
-						goto fail;
-
-					if (SUCCEED != add_activechk_host(l, port, error, sizeof(error)))
-						goto fail;
-					*r2 = ']';
-					break;
-				}
-			}
-
-			if (r2 == l)
+			if (NULL == (r2 = strchr(l, ']')))
 				goto fail;
+
+			if (':' != r2[1] && '\0' != r2[1])
+				goto fail;
+
+			if (':' == r2[1] && SUCCEED != is_ushort(r2 + 2, &port))
+				goto fail;
+
+			*r2 = '\0';
+
+			if (SUCCEED != is_ip6(l))
+				goto fail;
+
+			if (SUCCEED != (rc = add_activechk_host(l, port)))
+				goto fail;
+
+			*r2 = ']';
 		}
 		else if (SUCCEED == is_ip6(l))
 		{
-			if (SUCCEED != add_activechk_host(l, port, error, sizeof(error)))
+			if (SUCCEED != (rc = add_activechk_host(l, port)))
 				goto fail;
 		}
 		else
 		{
-			if (NULL != (r2 = strrchr(l, ':')))
+			if (NULL != (r3 = strchr(l, ':')))
 			{
-				if (SUCCEED != is_ushort(r2 + 1, &port))
-				{
-					strscpy(error, "incorrect port number");
+				if (SUCCEED != is_ushort(r3 + 1, &port))
 					goto fail;
-				}
 
-				*r2 = '\0';
+				*r3 = '\0';
 			}
 
-			if (SUCCEED != add_activechk_host(l, port, error, sizeof(error)))
+			if (SUCCEED != (rc = add_activechk_host(l, port)))
 				goto fail;
 
-			if (NULL != r2)
-				*r2 = ':';
+			if (NULL != r3)
+				*r3 = ':';
 		}
 
 		if (NULL != r)
@@ -399,10 +378,18 @@ static void	parse_active_hosts(char *active_hosts)
 
 	return;
 fail:
-	if ('\0' != *error)
-		zbx_error("error in ServerActive option at position %d: %s", (int)(pos - active_hosts + 1), error);
+	if (NULL != r2)
+		*r2 = ']';
+	if (NULL != r3)
+		*r3 = ':';
+
+	if (SUCCEED != rc)
+		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" specified more than once", pos);
 	else
-		zbx_error("error in ServerActive option at position %d", (int)(pos - active_hosts + 1));
+		zbx_error("error parsing a \"ServerActive\" option: address \"%s\" is invalid", pos);
+
+	if (NULL != r)
+		*r = ',';
 
 	exit(EXIT_FAILURE);
 }
@@ -509,7 +496,7 @@ static void	zbx_load_config(int optional)
 			if (NULL != (p = strchr(CONFIG_HOSTS_ALLOWED, ',')))
 				*p = '\0';
 
-			add_activechk_host(CONFIG_HOSTS_ALLOWED, (unsigned short)CONFIG_SERVER_PORT, NULL, 0);
+			add_activechk_host(CONFIG_HOSTS_ALLOWED, (unsigned short)CONFIG_SERVER_PORT);
 
 			if (NULL != p)
 				*p = ',';
