@@ -33,18 +33,18 @@
 	function organizeInterfaces(interfaceType) {
 		var selectedInterfaceId = jQuery('#selectedInterfaceId').val();
 		var isSelected = false;
-		var isInterfaceExist = false;
+		var interfaceExists = false;
 
 		if (interfaceType > 0) {
 			jQuery('#interface_row option').each(function() {
 				if (jQuery(this).data('interfacetype') == interfaceType) {
-					isInterfaceExist = true;
+					interfaceExists = true;
 				}
 			});
 
-			if (isInterfaceExist) {
-				jQuery('#interfaceid').css('display', 'inline');
-				jQuery('#interface_not_defined').css('display', 'none');
+			if (interfaceExists) {
+				jQuery('#interfaceid').show();
+				jQuery('#interface_not_defined').hide();
 
 				jQuery('#interface_row option').each(function() {
 					if (jQuery(this).is('[selected]')) {
@@ -84,7 +84,7 @@
 			}
 			else {
 				// hide combobox and display warning text
-				jQuery('#interfaceid').css('display', 'none');
+				jQuery('#interfaceid').hide();
 				jQuery('#interface_row option').each(function() {
 					if (jQuery(this).is('[selected]')) {
 						jQuery(this).removeAttr('selected');
@@ -92,13 +92,13 @@
 				});
 				jQuery('#interfaceid').append('<option value="0" selected="selected" data-empty="1"></option>');
 				jQuery('#interfaceid').val(0);
-				jQuery('#interface_not_defined').css('display', 'inline');
+				jQuery('#interface_not_defined').html('<?php echo _('No interface found') ?>').show();
 			}
 		}
 		else {
 			// display all interfaces for ANY
-			jQuery('#interfaceid').css('display', 'inline');
-			jQuery('#interface_not_defined').css('display', 'none');
+			jQuery('#interfaceid').show();
+			jQuery('#interface_not_defined').hide();
 
 			jQuery('#interface_row option').each(function() {
 				if (jQuery(this).data('empty') == 1) {
@@ -194,5 +194,17 @@
 				displayNewDeleyFlexInterval();
 			});
 		}
+
+		// if the updated items have different interface types, display the interface select only if an item type is selected
+		jQuery('#interface_visible, #type_visible').click(function() {
+			if (jQuery('#interface_visible').data('multipleInterfaceTypes') && !jQuery('#type_visible').is(':checked')) {
+				jQuery('#interface_not_defined').html('<?php echo _('To set a host interface select a single item type for all items') ?>').show();
+				jQuery('#interfaceid').hide();
+			}
+			else {
+				jQuery('#interface_not_defined').hide();
+				jQuery('#type').trigger('change');
+			}
+		});
 	});
 </script>

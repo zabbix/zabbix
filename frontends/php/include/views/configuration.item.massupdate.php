@@ -67,12 +67,10 @@ if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) &
 	$span->setAttribute('id', 'interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
+	$interfaceVisBox = new CVisibilityBox('interface_visible', get_request('interface_visible'), 'interfaceDiv', _('Original'));
+	$interfaceVisBox->setAttribute('data-multiple-interface-types', $this->data['multiple_interface_types']);
 	$itemFormList->addRow(
-		array(
-			_('Host interface'),
-			SPACE,
-			new CVisibilityBox('interface_visible', get_request('interface_visible'), 'interfaceDiv', _('Original'))
-		),
+		array(_('Host interface'), SPACE, $interfaceVisBox),
 		new CDiv(array($interfacesComboBox, $span), null, 'interfaceDiv'),
 		false,
 		'interface_row'
