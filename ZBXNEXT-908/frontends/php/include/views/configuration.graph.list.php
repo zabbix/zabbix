@@ -93,7 +93,7 @@ foreach ($data['graphs'] as $graph) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
 		$realHosts = DBfetch($realHosts);
 		$name[] = new CLink($realHosts['name'], 'templates.php?form=update&templateid='.$realHosts['hostid'], 'unknown');
-		$name[] = ': ';
+		$name[] = ':'.SPACE;
 		$name[] = new CLink($graph['name'],
 			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').url_param('hostid'));
 
@@ -101,9 +101,8 @@ foreach ($data['graphs'] as $graph) {
 	}
 	elseif (!empty($graph['discoveryRule']) && empty($this->data['parent_discoveryid'])) {
 		$name[] = new CLink($graph['discoveryRule']['name'], 'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'], 'gold');
-		$name[] = ': ';
-		$name[] = new CLink($graph['name'],
-			'graphs.php?form=update&parent_discoveryid='.$graph['discoveryRule']['itemid'].'&graphid='.$graphid.url_param('hostid'));
+		$name[] = ':'.SPACE;
+		$name[] = new CSpan($graph['name']);
 
 		$isCheckboxEnabled = false;
 	}

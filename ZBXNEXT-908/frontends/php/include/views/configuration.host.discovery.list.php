@@ -85,9 +85,9 @@ foreach ($data['discoveries'] as $discovery) {
 	$discoveryTable->addRow(array(
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', null, null, $discovery['itemid']),
 		$description,
-		array(new CLink(_('Items'), 'disc_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['items'].')'),
-		array(new CLink(_('Triggers'), 'trigger_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['triggers'].')'),
-		array(new CLink(_('Graphs'), 'graphs.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['graphs'].')'),
+		array(new CLink(_('Item prototypes'), 'disc_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['items'].')'),
+		array(new CLink(_('Trigger prototypes'), 'trigger_prototypes.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['triggers'].')'),
+		array(new CLink(_('Graph prototypes'), 'graphs.php?&parent_discoveryid='.$discovery['itemid']), ' ('.$discovery['graphs'].')'),
 		$discovery['key_'],
 		$discovery['delay'],
 		item_type2str($discovery['type']),
