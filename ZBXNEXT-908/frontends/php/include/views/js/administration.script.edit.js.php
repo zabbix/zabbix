@@ -41,10 +41,10 @@ jQuery(document).ready(function(){
 // Confirmation text input
 	jQuery("#confirmation").keyup(function(){
 		if(this.value != ''){
-			jQuery("#testConfirmation, #confirmationLabel").removeAttr("disabled");
+			jQuery("#testConfirmation, #confirmationLabel").prop("disabled", false);
 		}
 		else{
-			jQuery("#testConfirmation, #confirmationLabel").attr("disabled", "disabled");
+			jQuery("#testConfirmation, #confirmationLabel").prop("disabled", true);
 		}
 	}).keyup();
 
@@ -54,7 +54,7 @@ jQuery(document).ready(function(){
 			jQuery("#confirmation").removeAttr("disabled").keyup();
 		}
 		else{
-			jQuery("#confirmation, #testConfirmation, #confirmationLabel").attr("disabled", "disabled");
+			jQuery("#confirmation, #testConfirmation, #confirmationLabel").prop("disabled", true);
 		}
 	}).change();
 
@@ -71,7 +71,7 @@ jQuery(document).ready(function(){
 		];
 
 		var d = showScriptDialog(confirmation, buttons);
-		jQuery(d).find('button:first').attr('disabled', 'disabled').addClass('ui-state-disabled');
+		jQuery(d).find('button:first').prop('disabled', true).addClass('ui-state-disabled');
 		jQuery(d).find('button:last').focus();
 	});
 
