@@ -614,7 +614,7 @@ else {
 		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
 	));
 	$frmForm->addItem($buttons);
-	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid']));
+	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid'], 'filter_groupid_id'));
 
 
 	$hosts_wdgt->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
