@@ -150,13 +150,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'itemids' => $_REQUEST['itemid'],
 		'webitems' => 1,
 		'selectHosts' => array('hostid','name'),
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'preservekeys' => true
 	);
 
 	$items = API::Item()->get($options);
-	$items = zbx_toHash($items, 'itemid');
 
-	foreach($_REQUEST['itemid'] as $inum =>  $itemid){
+	foreach($_REQUEST['itemid'] as $itemid){
 		if(!isset($items[$itemid])) access_deny();
 	}
 
