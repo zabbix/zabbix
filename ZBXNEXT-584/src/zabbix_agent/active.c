@@ -47,7 +47,8 @@ __declspec(thread) static int			regexps_num = 0;
 static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
 static ZBX_ACTIVE_BUFFER	buffer;
 static ZBX_REGEXP		*regexps = NULL;
-static int			regexps_alloc = 0, regexps_num = 0;
+static int			regexps_alloc = 0;
+static int			regexps_num = 0;
 #endif
 
 static void	init_active_metrics()

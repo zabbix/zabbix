@@ -307,10 +307,13 @@ static int	add_activechk_host(const char *host, unsigned short port)
  *                                                                            *
  * Purpose: parse string like IP<:port>,[IPv6]<:port>                         *
  *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
  ******************************************************************************/
-static void	parse_active_hosts(char *active_hosts)
+static void	parse_active_hosts(const char *active_hosts)
 {
-	char		*l = active_hosts, *r = NULL, *r2 = NULL, *r3 = NULL, *pos;
+	const char	*l = active_hosts, *pos;
+	char		*r, *r2, *r3;
 	unsigned short	port;
 	int		rc = SUCCEED;
 
