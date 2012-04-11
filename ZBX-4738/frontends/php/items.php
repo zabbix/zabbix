@@ -38,6 +38,7 @@ $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 $fields = array(
 	'description_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'type_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'interface_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'community_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'securityname_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'securitylevel_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
