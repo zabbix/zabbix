@@ -87,6 +87,7 @@ foreach ($data['graphs'] as $graph) {
 		$hostList = implode(', ', $hostList);
 	}
 
+	$isCheckboxEnabled = true;
 	$name = array();
 	if (!empty($graph['templateid'])) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
@@ -95,21 +96,23 @@ foreach ($data['graphs'] as $graph) {
 		$name[] = ': ';
 		$name[] = new CLink($graph['name'],
 			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').url_param('hostid'));
+
+		$isCheckboxEnabled = false;
 	}
-	elseif (!empty($graph['discoveryRule'])) {
+	elseif (!empty($graph['discoveryRule']) && empty($this->data['parent_discoveryid'])) {
 		$name[] = new CLink($graph['discoveryRule']['name'], 'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'], 'gold');
 		$name[] = ': ';
 		$name[] = new CLink($graph['name'],
 			'graphs.php?form=update&parent_discoveryid='.$graph['discoveryRule']['itemid'].'&graphid='.$graphid.url_param('hostid'));
+
+		$isCheckboxEnabled = false;
 	}
 	else {
 		$name[] = new CLink($graph['name'], 'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').url_param('hostid'));
 	}
 
 	$checkBox = new CCheckBox('group_graphid['.$graphid.']', null, null, $graphid);
-	if (!empty($graph['templateid']) || !empty($graph['discoveryRule'])) {
-		$checkBox->setEnabled(false);
-	}
+	$checkBox->setEnabled($isCheckboxEnabled);
 
 	$graphTable->addRow(array(
 		$checkBox,

@@ -149,8 +149,8 @@
 			item['name'] = list.values[i].name;
 			item['type'] = null;
 			item['calc_fnc'] = null;
-			item['drawtype'] = null;
-			item['yaxisside'] = null;
+			item['drawtype'] = 0;
+			item['yaxisside'] = 0;
 			item['sortorder'] = item['number'];
 			item['host_templateid'] = list.values[i].host_templateid;
 			item['color'] = getNextColor(0);
