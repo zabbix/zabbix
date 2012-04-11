@@ -310,10 +310,9 @@ static int	add_activechk_host(const char *host, unsigned short port)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-static void	parse_active_hosts(const char *active_hosts)
+static void	parse_active_hosts(char *active_hosts)
 {
-	const char	*l = active_hosts, *pos;
-	char		*r, *r2, *r3;
+	char		*l = active_hosts, *r, *r2, *r3, *pos;
 	unsigned short	port;
 	int		rc = SUCCEED;
 
