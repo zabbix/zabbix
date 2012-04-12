@@ -32,91 +32,75 @@
 
 	function organizeInterfaces(interfaceType) {
 		var selectedInterfaceId = jQuery('#selectedInterfaceId').val();
-		var isSelected = false;
-		var interfaceExists = false;
+		var matchingInterfaces = jQuery('#interfaceid option[data-interfacetype="' + interfaceType + '"]');
+
+		var selectedInterfaceOption;
+		if (selectedInterfaceId) {
+			selectedInterfaceOption = jQuery('#interfaceid option[value="' + selectedInterfaceId + '"]');
+		}
 
 		if (jQuery('#interface_visible').data('multipleInterfaceTypes') && !jQuery('#type_visible').is(':checked')) {
 			jQuery('#interface_not_defined').html('<?php echo _('To set a host interface select a single item type for all items') ?>').show();
 			jQuery('#interfaceid').hide();
 		}
 		else {
+			// a specific interface is required
 			if (interfaceType > 0) {
-				jQuery('#interface_row option').each(function() {
-					if (jQuery(this).data('interfacetype') == interfaceType) {
-						interfaceExists = true;
-					}
-				});
+				// we have some matching interfaces available
+				if (matchingInterfaces.length) {
+					jQuery('#interfaceid option')
+						.prop('selected', false)
+						.prop('disabled', true)
+						.filter('[value="0"]').remove();
+					matchingInterfaces.prop('disabled', false);
 
-				if (interfaceExists) {
+					// select the interface by interfaceid, if it's available
+					if (selectedInterfaceId && !selectedInterfaceOption.prop('disabled')) {
+						jQuery('#interfaceid').val(selectedInterfaceId);
+					}
+					// if no interfaceid is given, select the first suitable interface
+					else {
+						matchingInterfaces.first().prop('selected', true);
+					}
+
 					jQuery('#interfaceid').show();
 					jQuery('#interface_not_defined').hide();
-
-					jQuery('#interface_row option').each(function() {
-						if (jQuery(this).is('[selected]')) {
-							jQuery(this).removeAttr('selected');
-						}
-						if (jQuery(this).data('empty') == 1) {
-							jQuery(this).remove();
-						}
-					});
-
-					jQuery('#interface_row option').each(function() {
-						if (jQuery(this).data('interfacetype') == interfaceType) {
-							jQuery(this).prop('disabled', false);
-							if (!isSelected) {
-								if (jQuery(this).val() == selectedInterfaceId) {
-									jQuery(this).attr('selected', 'selected');
-									isSelected = true;
-								}
-							}
-						}
-						else {
-							jQuery(this).prop('disabled', true);
-						}
-					});
-
-					// select first available option if we previously don't selected it by interfaceid
-					if (!isSelected) {
-						jQuery('#interface_row option').each(function() {
-							if (jQuery(this).data('interfacetype') == interfaceType) {
-								if (!isSelected) {
-									jQuery(this).attr('selected', 'selected');
-									isSelected = true;
-								}
-							}
-						});
-					}
 				}
+				// no matching interfaces available
 				else {
 					// hide combobox and display warning text
-					jQuery('#interfaceid').hide();
-					jQuery('#interface_row option').each(function() {
-						if (jQuery(this).is('[selected]')) {
-							jQuery(this).removeAttr('selected');
-						}
-					});
-					jQuery('#interfaceid').append('<option value="0" selected="selected" data-empty="1"></option>');
-					jQuery('#interfaceid').val(0);
+					if (!jQuery('#interfaceid option[value="0"]').length) {
+						jQuery('#interfaceid').prepend('<option value="0"></option>');
+					}
+					jQuery('#interfaceid').hide().val(0);
 					jQuery('#interface_not_defined').html('<?php echo _('No interface found') ?>').show();
 				}
 			}
+			// any interface or no interface
 			else {
-				// display all interfaces for ANY
+				// no interface required
+				if (interfaceType === null) {
+					if (!jQuery('#interfaceid option[value="0"]').length) {
+						jQuery('#interfaceid').prepend('<option value="0"></option>');
+					}
+
+					jQuery('#interfaceid option')
+						.prop('disabled', true)
+						.filter('[value="0"]').prop('disabled', false);
+					jQuery('#interfaceid').val(0);
+				}
+				// any interface
+				else {
+					jQuery('#interfaceid option')
+						.prop('disabled', false)
+						.filter('[value="0"]').remove();
+					if (selectedInterfaceId) {
+						selectedInterfaceOption.prop('selected', true);
+					}
+				}
+
 				jQuery('#interfaceid').show();
 				jQuery('#interface_not_defined').hide();
-
-				jQuery('#interface_row option').each(function() {
-					if (jQuery(this).data('empty') == 1) {
-						jQuery(this).remove();
-					}
-					else {
-						jQuery(this).prop('disabled', false);
-						if (!isSelected) {
-							jQuery(this).attr('selected', 'selected');
-							isSelected = true;
-						}
-					}
-				});
 			}
 		}
 	}
