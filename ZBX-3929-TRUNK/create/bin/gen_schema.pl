@@ -16,7 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-use Switch;
 use File::Basename;
 
 $file = dirname($0)."/../src/schema.tmpl";	# name the file
@@ -529,13 +528,10 @@ sub process
 
 		($type, $line) = split(/\|/, $line, 2);
 
-		switch ($type)
-		{
-			case "TABLE"	{ process_table($line); }
-			case "INDEX"	{ process_index($line, 0); }
-			case "UNIQUE"	{ process_index($line, 1); }
-			case "FIELD"	{ process_field($line); }
-		}
+		if ($type eq 'FIELD')		{ process_field($line); }
+		elsif ($type eq 'INDEX')	{ process_index($line, 0); }
+		elsif ($type eq 'TABLE')	{ process_table($line); }
+		elsif ($type eq 'UNIQUE')	{ process_index($line, 1); }
 	}
 
 	newstate("table");
@@ -566,16 +562,13 @@ sub main
 	$fkeys_suffix = "";
 	$fkeys_drop_prefix = "";
 
-	switch ($format)
-	{
-		case "c"		{ %output = %c; }
-		case "ibm_db2"		{ %output = %ibm_db2; }
-		case "mysql"		{ %output = %mysql; }
-		case "oracle"		{ %output = %oracle; }
-		case "postgresql"	{ %output = %postgresql; }
-		case "sqlite3"		{ %output = %sqlite3; }
-		else			{ usage(); }
-	}
+	if ($format eq 'c')		{ %output = %c; }
+	elsif ($format eq 'ibm_db2')	{ %output = %ibm_db2; }
+	elsif ($format eq 'mysql')	{ %output = %mysql; }
+	elsif ($format eq 'oracle')	{ %output = %oracle; }
+	elsif ($format eq 'postgresql')	{ %output = %postgresql; }
+	elsif ($format eq 'sqlite3')	{ %output = %sqlite3; }
+	else				{ usage(); }
 
 	process();
 
