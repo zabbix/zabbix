@@ -22,10 +22,9 @@
 
 class CHelp extends CIcon {
 
-	public function __construct($url = 'index.php', $side = 'right') {
+	public function __construct() {
 		parent::__construct('http://www.zabbix.com/documentation', 'iconhelp');
 		parent::onClick('window.open("http://www.zabbix.com/documentation/");');
-		$this->attributes['style'] = 'float: '.($side == 'right' ? 'right' : 'left').'; text-decoration: none;';
 	}
 }
 ?>

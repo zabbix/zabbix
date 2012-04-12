@@ -37,7 +37,7 @@ a, a:link, a:visited {	color:#FF5500;  }
 a:hover, a:active { color:#FF8800; }
 
 a.highlight { font-size: 10px; font-weight: bold; }
-a.highlight:link, a.highlight:visited { color: #DFDFDF; text-decoration: none; }
+a.highlight:link, a.highlight:visited { color: #DFDFDF; }
 a.highlight:hover, a.highlight:active { color: #FF5500; }
 
 a.footer { color: #CCCCCC; }
@@ -208,15 +208,6 @@ table.tablestripped tr.footer td {
 table.header{
 	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
 	border: 1px solid #5A5A5A;
-}
-
-table.header tr td.header_l{
-	color: #EAEAEA;
-	height: 24px;
-}
-table.header tr td.header_r{
-	color: #EAEAEA;
-	height: 24px;
 }
 
 table.flicker{
@@ -489,7 +480,7 @@ ul.formlist li.new { background: #2F2F2F; }
 .shadow {}
 .shadow:hover{ -webkit-box-shadow: 0 0 6px #FF5500; -moz-box-shadow: 0 0 6px #FF5500; box-shadow: 0 0 6px #FF5500; }
 
-.select{ cursor: pointer; margin: 1px 4px 1px 2px; }
+.select { cursor: pointer; margin: 1px 4px 1px 1px; }
 .button{  border-color: #FF5500; background: #2f2f2f; color: #FF5500; }
 .button:hover { border-color: #2f2f2f; color: #2f2f2f; background: #FF5500; text-decoration: none; }
 

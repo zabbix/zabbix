@@ -68,7 +68,7 @@ a, a:link, a:visited { color: #99C7E4; }
 a:hover, a:active { color: #B0D5EC; }
 
 a.highlight { font-size: 10px; font-weight: bold; }
-a.highlight:link, a.highlight:visited { color: #FFFFFF; text-decoration: none; }
+a.highlight:link, a.highlight:visited { color: #FFFFFF; }
 a.highlight:hover, a.highlight:active { color: #FFCC00; }
 
 a.footer { color: #77B7DA; }
@@ -248,15 +248,6 @@ table.tablestripped tr.footer td {
 table.header{
 	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
 	border: 1px solid #77B7DA;
-}
-
-table.header tr td.header_l{
-	color: #FFFFFF;
-	height: 24px;
-}
-table.header tr td.header_r{
-	color: #FFFFFF;
-	height: 24px;
 }
 
 table.flicker{
@@ -526,7 +517,7 @@ div.calendar input[type="button"] {
 .shadow {}
 .shadow:hover{ -webkit-box-shadow: 0 0 6px #77B7DA; -moz-box-shadow: 0 0 6px #77B7DA; box-shadow: 0 0 6px #77B7DA; }
 
-.select{ cursor: pointer; margin: 1px 4px 1px 2px; }
+.select { cursor: pointer; margin: 1px 4px 1px 0; }
 .button{  border-color: #77B7DA; background: #022744; color: #77B7DA; }
 .button:hover { border-color: #022744; color: #022744; background: #77B7DA; text-decoration: none; }
 
