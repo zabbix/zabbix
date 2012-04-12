@@ -171,6 +171,24 @@ function item_status2style($status) {
 	}
 }
 
+/**
+ * Returns the name of the given interface type.
+ *
+ * @param int $type
+ *
+ * @return null
+ */
+function interfaceType2str($type) {
+	$interfaceGroupLabels = array(
+		INTERFACE_TYPE_AGENT => _('Agent'),
+		INTERFACE_TYPE_SNMP => _('SNMP'),
+		INTERFACE_TYPE_JMX => _('JMX'),
+		INTERFACE_TYPE_IPMI => _('IPMI'),
+	);
+
+	return isset($interfaceGroupLabels[$type]) ? $interfaceGroupLabels[$type] : null;
+}
+
 function itemTypeInterface($type = null) {
 	$types = array(
 		ITEM_TYPE_SNMPV1 => INTERFACE_TYPE_SNMP,

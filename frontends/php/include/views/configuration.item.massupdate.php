@@ -53,6 +53,14 @@ $itemFormList->addRow(
 if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) && !$this->data['is_multiple_hosts']) {
 	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
 	$interfacesComboBox->addItem(new CComboItem(0, '', null, 'no'));
+
+	// set up interface groups
+	$interfaceGroups = array();
+	foreach (zbx_objectValues($this->data['hosts']['interfaces'], 'type') as $interfaceType) {
+		$interfaceGroups[$interfaceType] = new COptGroup(interfaceType2str($interfaceType));
+	}
+
+	// add interfaces to groups
 	foreach ($this->data['hosts']['interfaces'] as $interface) {
 		$option = new CComboItem(
 			$interface['interfaceid'],
@@ -60,7 +68,10 @@ if (!empty($this->data['hosts']) && !empty($this->data['hosts']['interfaces']) &
 			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
-		$interfacesComboBox->addItem($option);
+		$interfaceGroups[$interface['type']]->addItem($option);
+	}
+	foreach ($interfaceGroups as $interfaceGroup) {
+		$interfacesComboBox->addItem($interfaceGroup);
 	}
 
 	$span = new CSpan(_('No interface found'), 'red');
