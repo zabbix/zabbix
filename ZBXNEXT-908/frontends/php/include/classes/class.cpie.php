@@ -33,7 +33,7 @@ class CPie extends CGraphDraw {
 	}
 
 	/********************************************************************************************************/
-	// PRE CONFIG: ADD / SET / APPLY
+	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
 		$this->items[$this->num] = get_item_by_itemid($itemid);
@@ -318,8 +318,8 @@ class CPie extends CGraphDraw {
 			else {
 				$strvalue = sprintf(_('Value: no data'));
 				$str = sprintf('%s: %s [ '._('no data').' ]',
-					str_pad($this->items[$i]['host'], $max_host_len,' '),
-					str_pad($this->items[$i]['name'], $max_name_len,' ')
+					str_pad($this->items[$i]['host'], $max_host_len, ' '),
+					str_pad($this->items[$i]['name'], $max_name_len, ' ')
 				);
 			}
 
@@ -413,8 +413,8 @@ class CPie extends CGraphDraw {
 			list($sizeX, $sizeY) = $this->calcExplodedRadius($sizeX, $sizeY, count($values));
 		}
 		else {
-			$sizeX =(int) $sizeX * 0.95;
-			$sizeY =(int) $sizeY * 0.95;
+			$sizeX = (int) $sizeX * 0.95;
+			$sizeY = (int) $sizeY * 0.95;
 		}
 
 		$xc = $x = (int) $this->sizeX / 2 + $this->shiftXleft;
@@ -567,7 +567,7 @@ class CPie extends CGraphDraw {
 		$anglestart = 0;
 		$angleend = 0;
 		foreach ($values as $item => $value) {
-			$angleend += (int)(360 * $value / $sum) + 1;
+			$angleend += (int) (360 * $value / $sum) + 1;
 			$angleend = ($angleend > 360) ? 360 : $angleend;
 			if (($angleend - $anglestart) < 1) {
 				continue;
@@ -693,7 +693,7 @@ class CPie extends CGraphDraw {
 		}
 
 		$str = sprintf('%0.2f', microtime(true) - $start_time);
-		$str = _s('Data from %1$s. Generated in %2$s sec', $this->dataFrom, $str);
+		$str = _s('Data from %1$s. Generated in %2$s sec.', $this->dataFrom, $str);
 		$strSize = imageTextSize(6, 0, $str);
 		imageText(
 			$this->im,

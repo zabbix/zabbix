@@ -396,11 +396,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 	if ($type == T_ZBX_DBL && !is_numeric($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" is not double.', $field));
+			info(_s('Critical error. Field "%1$s" is not decimal number.', $field));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not double.', $field));
+			info(_s('Warning. Field "%1$s" is not decimal number.', $field));
 			return ZBX_VALID_WARNING;
 		}
 	}

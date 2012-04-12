@@ -62,6 +62,20 @@ foreach ($items as $item) {
 }
 
 /*
+ * Validation
+ */
+$types = array();
+foreach ($items as $item) {
+	if (!in_array($item['type'], $types)) {
+		array_push($types, $item['type']);
+	}
+	else {
+		show_error_message(_('Warning. Cannot display more than one item with type "Graph sum".'));
+		break;
+	}
+}
+
+/*
  * Display
  */
 navigation_bar_calc();
