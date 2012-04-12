@@ -7,6 +7,7 @@ New features:
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBX-3929] removed deprecated Switch module from gen_schema.pl and get_data.pl scripts (Sasha)
 ..F....... [ZBX-4572] fixed incorrect value input in gui configuration form raise critical error (Vedmak)
 ..F....... [ZBX-4841] fixed possible to select only first Discovery check for Discovery rule in popup.php (Toms)
 ..F....... [ZBX-4110] renamed 'password' to 'Key passphrase' in action form (Vedmak)
@@ -565,6 +566,10 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.13rc1
+
+....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
+
 Changes for 1.8.12rc1
 
 ...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)

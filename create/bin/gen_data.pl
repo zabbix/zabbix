@@ -16,7 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-use Switch;
 use File::Basename;
 
 $file = dirname($0)."/../src/data.tmpl";	# name the file
@@ -120,22 +119,19 @@ sub process_row
 		$_ =~ s/\s+$//;
 
 		# escape single quotes
-		switch ($output{'database'})
+		if ($output{'database'} eq 'postgresql')
 		{
-			case 'postgresql'
-			{
-				$_ =~ s/\\/\\\\/g;
-				$_ =~ s/'/''/g;
-			}
-			case 'mysql'
-			{
-				$_ =~ s/\\/\\\\/g;
-				$_ =~ s/'/\\'/g;
-			}
-			else
-			{
-				$_ =~ s/'/''/g;
-			}
+			$_ =~ s/\\/\\\\/g;
+			$_ =~ s/'/''/g;
+		}
+		elsif ($output{'database'} eq 'mysql')
+		{
+			$_ =~ s/\\/\\\\/g;
+			$_ =~ s/'/\\'/g;
+		}
+		else
+		{
+			$_ =~ s/'/''/g;
 		}
 
 		if ($_ eq 'NULL')
@@ -167,15 +163,12 @@ sub main
 		usage();
 	}
 
-	switch ($ARGV[0])
-	{
-		case "ibm_db2"		{ %output = %ibm_db2; }
-		case "mysql"		{ %output = %mysql; }
-		case "oracle"		{ %output = %oracle; }
-		case "postgresql"	{ %output = %postgresql; }
-		case "sqlite3"		{ %output = %sqlite3; }
-		else			{ usage(); }
-	}
+	if ($ARGV[0] eq 'ibm_db2')		{ %output = %ibm_db2; }
+	elsif ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
+	elsif ($ARGV[0] eq 'oracle')		{ %output = %oracle; }
+	elsif ($ARGV[0] eq 'postgresql')	{ %output = %postgresql; }
+	elsif ($ARGV[0] eq 'sqlite3')		{ %output = %sqlite3; }
+	else					{ usage(); }
 
 	print $output{"before"};
 
@@ -188,12 +181,9 @@ sub main
 
 		$type =~ s/\s+$//; # remove trailing spaces
 
-		switch ($type)
-		{
-			case "TABLE"	{ process_table($line); }
-			case "FIELDS"	{ process_fields($line); }
-			case "ROW"	{ process_row($line); }
-		}
+		if ($type eq 'FIELDS')		{ process_fields($line); }
+		elsif ($type eq 'TABLE')	{ process_table($line); }
+		elsif ($type eq 'ROW')		{ process_row($line); }
 	}
 
 	print $output{"after"};
