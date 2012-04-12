@@ -2060,7 +2060,7 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		**h_value = NULL;
-	int		h_alloc = 1, h_num = 0, retry = 0;
+	int		h_alloc = 1, h_num = 0, retry = 0, sec = 0, ns = 0;
 	const char	*func[] = {"min", "avg", "max", "sum", "count"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2105,12 +2105,14 @@ retry:
 		if (0 != clock_to)
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<=%d", clock_to);
 	}
-	else if (0 == retry)
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns=%d", ts->sec, ts->ns);
 	else if (1 == retry)
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns<%d", ts->sec, ts->ns);
+	{
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d", sec);
+		if (-1 != ns)
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and ns<%d", ns);
+	}
 	else
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<%d", ts->sec);
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns=%d", ts->sec, ts->ns);
 
 	if (0 != last_n)
 	{
@@ -2122,7 +2124,7 @@ retry:
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_STR:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" order by itemid,clock desc");
+							" order by itemid desc,clock desc");
 					break;
 				default:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
@@ -2130,10 +2132,10 @@ retry:
 					break;
 			}
 		}
-		else if (0 != retry)
+		else if (1 == retry)
 		{
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					" order by itemid,clock desc,ns desc");
+					" order by ns desc");
 		}
 
 		result = DBselectN(sql, last_n);
@@ -2153,10 +2155,27 @@ retry:
 	}
 	DBfree_result(result);
 
-	if (NULL != ts && 0 == h_num && 2 > retry)
+	if (NULL != ts && 0 == h_num && 0 == retry)
 	{
-		retry++;
-		goto retry;
+		result = DBselect(
+				"select max(clock)"
+				" from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d",
+				get_table_by_value_type(value_type), itemid, ts->sec);
+
+		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+		{
+			if (ts->sec == (sec = atoi(row[0])))
+				ns = ts->ns;
+			else
+				ns = -1;
+			retry = 1;
+		}
+		DBfree_result(result);
+
+		if (1 == retry)
+			goto retry;
 	}
 
 	h_value[h_num] = NULL;
