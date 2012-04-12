@@ -118,11 +118,8 @@ if (!empty($this->data['items'])) {
 
 $addButton = new CButton('add_item', _('Add'),
 	'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
-		(!empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : '').
-		'" + (hostTemplateId() > 0 ? "&only_hostid=" + hostTemplateId() : "") + "'.
-		(!empty($this->data['real_hosts']) ? '&real_hosts=1' : '').
 		(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name", 800, 600);',
+		'&srctbl=items&srcfld1=itemid&srcfld2=name" + getOnlyHostParam(), 800, 600);',
 	'link_menu'
 );
 
@@ -132,9 +129,6 @@ if (!empty($this->data['parent_discoveryid'])) {
 		'return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 			url_param($this->data['graphtype'], false, 'graphtype').
 			url_param('parent_discoveryid').
-			(!empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : '').
-			'" + (hostTemplateId() > 0 ? "&only_hostid=" + hostTemplateId() : "") + "'.
-			(!empty($this->data['real_hosts']) ? '&real_hosts=1' : '').
 			(!empty($this->data['normal_only']) ? '&normal_only=1' : '').
 			'&srctbl=prototypes&srcfld1=itemid&srcfld2=name", 800, 600);',
 		'link_menu'

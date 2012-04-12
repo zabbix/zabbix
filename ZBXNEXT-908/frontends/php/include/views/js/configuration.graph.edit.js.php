@@ -19,7 +19,7 @@
 
 	<!-- name -->
 	<td>
-		<span id="items_#{number}_name" class="link" onclick="#{nameLink}">#{name}</span>
+		<span id="items_#{number}_name" class="link" onclick="">#{name}</span>
 	</td>
 
 	<!-- type -->
@@ -109,17 +109,6 @@
 		item['host_templateid'] = 0;
 		item['flags'] = flags;
 		item['name'] = name;
-		item['nameLink'] = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid'
-				+ '&dstfld1=items_' + number + '_itemid&dstfld2=items_' + number + '_name&dstfld3=items_' + number + '_host_templateid'
-				+ (item['flags'] > 0
-					? '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
-						+ '&srcfld4=flags&dstfld4=items_' + number + '_flags'
-					: '&srctbl=items')
-				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
-				+ (hostTemplateId() > 0 ? '&only_hostid=' + hostTemplateId() : '')
-				+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
-				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
-				+ '", 800, 600)';
 
 		var itemTpl = new Template(jQuery('#itemTpl').html());
 		jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
@@ -133,6 +122,7 @@
 
 		activateSortable();
 		incrementNextColor();
+		rewriteNameLinks();
 	}
 
 	function addPopupValues(list) {
@@ -153,20 +143,9 @@
 			item['yaxisside'] = 0;
 			item['sortorder'] = item['number'];
 			item['host_templateid'] = list.values[i].host_templateid;
-			item['flags'] = 0;
+			item['flags'] = typeof(list.values[i].flags) != 'undefined' ? list.values[i].flags : 0;
 			item['color'] = getNextColor(1);
 			item['name'] = list.values[i].name;
-			item['nameLink'] = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid'
-				+ '&dstfld1=items_' + item['number'] + '_itemid&dstfld2=items_' + item['number'] + '_name&dstfld3=items_' + item['number'] + '_host_templateid'
-				+ (list.values[i].flags > 0
-					? '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
-						+ '&srcfld4=flags&dstfld4=items_' + item['number'] + '_flags'
-					: '&srctbl=items')
-				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
-				+ (hostTemplateId() > 0 ? '&only_hostid=' + hostTemplateId() : '')
-				+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
-				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
-				+ '", 800, 600)';
 
 			var itemTpl = new Template(jQuery('#itemTpl').html());
 			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
@@ -176,21 +155,52 @@
 		}
 
 		activateSortable();
+		rewriteNameLinks();
 	}
 
-	function hostTemplateId() {
-		var hostTemplateId = 0;
+	function getOnlyHostParam(onlyHostId) {
+		var param = '';
+
 		jQuery(document).ready(function() {
-			var i = 0;
+			var i = 0, hostTemplateId = 0;
 			jQuery('#itemsTable tr.sortable').each(function() {
-				hostTemplateId = jQuery('#items_' + i + '_host_templateid').val();
-				if (hostTemplateId > 0) {
-					return hostTemplateId;
+				if (hostTemplateId == 0) {
+					hostTemplateId = jQuery('#items_' + i + '_host_templateid').val();
 				}
 				i++;
 			});
+
+			if (hostTemplateId > 0) {
+				param = '&only_hostid=' + hostTemplateId;
+			}
+			else if (typeof(onlyHostId) != 'undefined' && onlyHostId > 0) {
+				param = '&only_hostid=' + onlyHostId;
+			}
+			else if (jQuery('#itemsTable tr.sortable').length > 0) {
+				param = '&real_hosts=1';
+			}
+			else {
+				param = '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>';
+						+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>';
+			}
 		});
-		return hostTemplateId;
+
+		return param;
+	}
+
+	function rewriteNameLinks() {
+		var size = jQuery('#itemsTable tr.sortable').length;
+		for (var i = 0; i < size; i++) {
+			var nameLink = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm'
+				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name&dstfld3=items_' + i + '_host_templateid'
+				+ (jQuery('#items_' + i + '_flags').val() > 0
+					? '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
+						+ '&srcfld4=flags&dstfld4=items_' + i + '_flags'
+					: '&srctbl=items')
+				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
+				+ '&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid" + getOnlyHostParam(), 800, 600)';
+			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
+		}
 	}
 
 	function removeItem(obj) {
@@ -244,20 +254,6 @@
 			var part1 = id.substring(0, id.indexOf('items_') + 5);
 			jQuery(this).attr('id', part1 + '_' + i);
 
-			// rewrite name link
-			var nameLink = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm'
-				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name&dstfld3=items_' + i + '_host_templateid'
-				+ (jQuery('#items_' + i + '_flags').val() > 0
-					? '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
-						+ '&srcfld4=flags&dstfld4=items_' + i + '_flags'
-					: '&srctbl=items')
-				+ '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>'
-				+ (hostTemplateId() > 0 ? '&only_hostid=' + hostTemplateId() : '')
-				+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>'
-				+ '<?php echo !empty($this->data['normal_only']) ? '&normal_only=1' : ''; ?>'
-				+ '&srcfld1=itemid&srcfld2=name&srcfld3=host_templateid", 800, 600)';
-			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
-
 			i++;
 		});
 
@@ -271,6 +267,8 @@
 
 			i++;
 		});
+
+		rewriteNameLinks();
 	}
 
 	function activateSortable() {
