@@ -26,7 +26,7 @@ A......... [ZBX-4784] fixed inherited triggers are updated on any host update (V
 ..F....... [ZBX-4739] fixed mass update failing with many items selected (Toms)
 ..F....... [ZBX-4821] fixed flexible interval update using item mass update form (Vedmak)
 ..F....... [ZBX-4806] fixed "New flexible interval" not shown in item form (Toms)
-A.F....... [ZBX-4790] fixed *EROR*s in trigger expressions in items.php; fixed undefined variables when filtering without host (Toms)
+A.F....... [ZBX-4790] fixed *ERROR*s in trigger expressions in items.php; fixed undefined variables when filtering without host (Toms)
 ..F....... [ZBX-3725] added check for xml file size exceeds upload_max_filesize php setting (Vedmak)
 A.F....... [ZBX-3991] forbid passive proxy interfaces with ip 0.0.0.0 (Vedmak)
 ..F....... [ZBX-3152] fixed messages are shown even if all severities are unchecked (Vedmak)
