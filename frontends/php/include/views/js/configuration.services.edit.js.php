@@ -2,10 +2,10 @@
 	jQuery(document).ready(function() {
 		jQuery('#showsla').bind('click', function() {
 			if (this.checked) {
-				jQuery('#goodsla').removeAttr('disabled');
+				jQuery('#goodsla').prop('disabled', false);
 			}
 			else {
-				jQuery('#goodsla').attr('disabled', 'disabled');
+				jQuery('#goodsla').prop('disabled', true);
 			}
 		});
 

@@ -58,7 +58,7 @@
 
 				jQuery('#interface_row option').each(function() {
 					if (jQuery(this).data('interfacetype') == interfaceType) {
-						jQuery(this).removeAttr('disabled');
+						jQuery(this).prop('disabled', false);
 						if (!isSelected) {
 							if (jQuery(this).val() == selectedInterfaceId) {
 								jQuery(this).attr('selected', 'selected');
@@ -67,7 +67,7 @@
 						}
 					}
 					else {
-						jQuery(this).attr('disabled', 'disabled');
+						jQuery(this).prop('disabled', true);
 					}
 				});
 
@@ -106,7 +106,7 @@
 					jQuery(this).remove();
 				}
 				else {
-					jQuery(this).removeAttr('disabled');
+					jQuery(this).prop('disabled', false);
 					if (!isSelected) {
 						jQuery(this).attr('selected', 'selected');
 						isSelected = true;
@@ -125,10 +125,10 @@
 		var type = parseInt(jQuery('#type').val());
 
 		if (type == 0 || type == 7 || type == 3 || type == 5 || type == 8 || type == 17) {
-			jQuery('#keyButton').removeAttr('disabled');
+			jQuery('#keyButton').prop('disabled', false);
 		}
 		else {
-			jQuery('#keyButton').attr('disabled', 'disabled');
+			jQuery('#keyButton').prop('disabled', true);
 		}
 	}
 

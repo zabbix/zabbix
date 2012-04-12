@@ -3414,22 +3414,14 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 					zbx_vector_ptr_append(trigger_order, trigger);
 				}
 
-				if (NULL != timespecs)
+				if (trigger->timespec.sec < timespecs[i].sec ||
+						(trigger->timespec.sec == timespecs[i].sec &&
+						trigger->timespec.ns < timespecs[i].ns))
 				{
-					if (trigger->timespec.sec < timespecs[i].sec ||
-							(trigger->timespec.sec == timespecs[i].sec &&
-							trigger->timespec.ns < timespecs[i].ns))
-					{
-						trigger->timespec.sec = timespecs[i].sec;
-						trigger->timespec.ns = timespecs[i].ns;
+					trigger->timespec = timespecs[i];
 
-						if (NULL != errors)
-							trigger->new_error = zbx_strdup(NULL, errors[i]);
-					}
-				}
-				else if (NULL != errors)
-				{
-					trigger->new_error = errors[i];
+					if (NULL != errors)
+						trigger->new_error = zbx_strdup(trigger->new_error, errors[i]);
 				}
 			}
 		}

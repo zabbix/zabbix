@@ -195,7 +195,7 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 			foreach ($_REQUEST['conditions'] as $condition) {
 				if (($new_condition['conditiontype'] === $condition['conditiontype'])
 					&& ($new_condition['operator'] === $condition['operator'])
-					&& ($new_condition['value'] === $condition['value'])
+					&& (!isset($new_condition['value']) || $new_condition['value'] === $condition['value'])
 				) {
 					$exists = true;
 					break;

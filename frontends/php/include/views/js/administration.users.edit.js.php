@@ -2,16 +2,16 @@
 	jQuery(document).ready(function() {
 		jQuery('#autologout_visible').bind('click', function() {
 			if (this.checked) {
-				jQuery('#autologout').removeAttr('disabled');
+				jQuery('#autologout').prop('disabled', false);
 				jQuery('#autologin').attr('checked', false);
 			}
 			else {
-				jQuery('#autologout').attr('disabled', 'disabled');
+				jQuery('#autologout').prop('disabled', true);
 			}
 		});
 		jQuery('#autologin').bind('click', function() {
 			if (this.checked) {
-				jQuery('#autologout').attr('disabled', 'disabled');
+				jQuery('#autologout').prop('disabled', true);
 				jQuery('#autologout_visible').attr('checked', false);
 			}
 		});
