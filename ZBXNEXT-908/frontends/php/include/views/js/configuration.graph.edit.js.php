@@ -176,12 +176,13 @@
 			else if (typeof(onlyHostId) != 'undefined' && onlyHostId > 0) {
 				param = '&only_hostid=' + onlyHostId;
 			}
-			else if (jQuery('#itemsTable tr.sortable').length > 0) {
-				param = '&real_hosts=1';
-			}
 			else {
 				param = '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>';
 						+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>';
+			}
+
+			if (param == '' && jQuery('#itemsTable tr.sortable').length > 0) {
+				param = '&real_hosts=1';
 			}
 		});
 
