@@ -401,9 +401,12 @@ class CPie extends CGraphDraw {
 		}
 
 		if ($sum <= 0) {
-			$this->items[0]['color'] = 'FFFFFF';
 			$values = array(0 => 1);
 			$sum = 1;
+			$isEmptyData = true;
+		}
+		else {
+			$isEmptyData = false;
 		}
 
 		$sizeX = $this->sizeX;
@@ -441,7 +444,7 @@ class CPie extends CGraphDraw {
 				$sizeY,
 				$anglestart,
 				$angleend,
-				$this->getColor($this->items[$item]['color'], 0),
+				$this->getColor((!$isEmptyData ? $this->items[$item]['color'] : 'FFFFFF'), 0),
 				IMG_ARC_PIE
 			);
 			imagefilledarc(
@@ -473,9 +476,12 @@ class CPie extends CGraphDraw {
 		}
 
 		if ($sum <= 0) {
-			$this->items[0]['color'] = 'FFFFFF';
 			$values = array(0 => 1);
 			$sum = 1;
+			$isEmptyData = true;
+		}
+		else {
+			$isEmptyData = false;
 		}
 
 		$sizeX = $this->sizeX;
@@ -513,7 +519,7 @@ class CPie extends CGraphDraw {
 				$sizeY,
 				$anglestart,
 				$angleend,
-				$this->getShadow($this->items[$item]['color'], 0),
+				$this->getShadow((!$isEmptyData ? $this->items[$item]['color'] : 'FFFFFF'), 0),
 				IMG_ARC_PIE
 			);
 			imagefilledarc(
@@ -557,7 +563,7 @@ class CPie extends CGraphDraw {
 					$sizeY,
 					$anglestart,
 					$angleend,
-					$this->getShadow($this->items[$item]['color'], 0),
+					$this->getShadow((!$isEmptyData ? $this->items[$item]['color'] : 'FFFFFF'), 0),
 					IMG_ARC_PIE
 				);
 				$anglestart = $angleend;
@@ -585,7 +591,7 @@ class CPie extends CGraphDraw {
 				$sizeY,
 				$anglestart,
 				$angleend,
-				$this->getColor($this->items[$item]['color'], 0),
+				$this->getColor((!$isEmptyData ? $this->items[$item]['color'] : 'FFFFFF'), 0),
 				IMG_ARC_PIE
 			);
 			imagefilledarc(

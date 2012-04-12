@@ -943,7 +943,7 @@ function change_flicker_state(divid) {
 		switchElementsClass($('flicker_icon_r'), 'dbl_arrow_up', 'dbl_arrow_down');
 	};
 
-	var filter_state = ShowHide(divid);
+	var filter_state = showHide(divid);
 	switchArrows();
 
 	if (false === filter_state) {
@@ -998,7 +998,7 @@ function change_hat_state(icon, divid) {
 		switchElementsClass(icon, 'arrowup', 'arrowdown');
 	};
 
-	var hat_state = ShowHide(divid);
+	var hat_state = showHide(divid);
 	switchIcon();
 
 	if (false === hat_state) {

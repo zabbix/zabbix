@@ -354,7 +354,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 
 				if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
 					$msg_details = new CDiv(_('Details'), 'blacklink');
-					$msg_details->setAttribute('onclick', "javascript: ShowHide('msg_messages', IE ? 'block' : 'table');");
+					$msg_details->setAttribute('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
 					$msg_details->setAttribute('title', _('Maximize').'/'._('Minimize'));
 					array_unshift($row, new CCol($msg_details, 'clr'));
 				}

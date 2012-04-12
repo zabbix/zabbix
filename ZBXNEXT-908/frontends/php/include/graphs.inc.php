@@ -22,14 +22,13 @@
 
 function graphType($type = null) {
 	$types = array(
+		GRAPH_TYPE_NORMAL => _('Normal'),
 		GRAPH_TYPE_STACKED => _('Stacked'),
 		GRAPH_TYPE_PIE => _('Pie'),
-		GRAPH_TYPE_EXPLODED => _('Exploded'),
-		GRAPH_TYPE_NORMAL => _('Normal')
+		GRAPH_TYPE_EXPLODED => _('Exploded')
 	);
 
 	if (is_null($type)) {
-		order_result($types);
 		return $types;
 	}
 	elseif (isset($types[$type])) {

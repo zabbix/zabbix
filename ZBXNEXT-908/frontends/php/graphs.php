@@ -70,6 +70,14 @@ $fields = array(
 	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,				null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,				null)
 );
+$percentVisible = get_request('visible');
+if (!isset($percentVisible['percent_left'])) {
+	unset($_REQUEST['percent_left']);
+}
+if (!isset($percentVisible['percent_right'])) {
+	unset($_REQUEST['percent_right']);
+}
+
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
 

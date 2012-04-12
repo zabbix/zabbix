@@ -155,10 +155,10 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$this->data['percent_left'] = sprintf('%2.2f', $this->data['percent_left']);
 		}
 		$percentLeftTextBox = new CTextBox('percent_left', $this->data['percent_left'], 5, 'no', 6);
-		$percentLeftCheckbox = new CCheckBox('visible[percent_left]', 1, 'javascript: ShowHide("percent_left");', 1);
+		$percentLeftCheckbox = new CCheckBox('visible[percent_left]', 1, 'javascript: showHideVisible("percent_left");', 1);
 
 		if (strcmp($this->data['percent_left'], '0.00') == 0) {
-			$percentLeftTextBox->attr('style', 'display: none;');
+			$percentLeftTextBox->attr('style', 'visibility: hidden;');
 			$percentLeftCheckbox->setChecked(0);
 		}
 		$graphFormList->addRow(_('Percentile line (left)'), array($percentLeftCheckbox, SPACE, $percentLeftTextBox));
@@ -167,10 +167,10 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$this->data['percent_right'] = sprintf('%2.2f', $this->data['percent_right']);
 		}
 		$percentRightTextBox = new CTextBox('percent_right', $this->data['percent_right'], 5, 'no', 6);
-		$percentRightCheckbox = new CCheckBox('visible[percent_right]', 1, 'javascript: ShowHide("percent_right");', 1);
+		$percentRightCheckbox = new CCheckBox('visible[percent_right]', 1, 'javascript: showHideVisible("percent_right");', 1);
 
 		if (strcmp($this->data['percent_right'], '0.00') == 0) {
-			$percentRightTextBox->attr('style', 'display: none;');
+			$percentRightTextBox->attr('style', 'visibility: hidden;');
 			$percentRightCheckbox->setChecked(0);
 		}
 		$graphFormList->addRow(_('Percentile line (right)'), array($percentRightCheckbox, SPACE, $percentRightTextBox));
