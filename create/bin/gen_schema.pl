@@ -16,21 +16,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+use strict;
 use File::Basename;
 
-$file = dirname($0)."/../src/schema.tmpl";	# name the file
+my $file = dirname($0)."/../src/schema.tmpl";	# name the file
 
-my $state;
-my $output;
-my $eol, $fk_bol, $fk_eol;
-my $ltab, $szcol1, $szcol2, $szcol3, $szcol4;
-my $sequences;
-my $sql_suffix;
-my $fkeys, $fkeys_prefix, $fkeys_suffix;
-my $fkeys_drop;
-my $uniq;
+my ($state, %output, $eol, $fk_bol, $fk_eol, $ltab, $pkey, $table_name);
+my ($szcol1, $szcol2, $szcol3, $szcol4, $sequences, $sql_suffix);
+my ($fkeys, $fkeys_prefix, $fkeys_suffix, $fkeys_drop, $uniq);
 
-%c = (
+my %c = (
 	"type"		=>	"code",
 	"database"	=>	"",
 	"after"		=>	"\t{0}\n};\n",
@@ -76,7 +71,7 @@ $c{"before"} = "/*
 const ZBX_TABLE\ttables[] = {
 ";
 
-%ibm_db2 = (
+my %ibm_db2 = (
 	"type"		=>	"sql",
 	"database"	=>	"ibm_db2",
 	"before"	=>	"",
@@ -98,7 +93,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_varchar"	=>	"varchar"
 );
 
-%mysql = (
+my %mysql = (
 	"type"		=>	"sql",
 	"database"	=>	"mysql",
 	"before"	=>	"",
@@ -121,7 +116,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_varchar"	=>	"varchar"
 );
 
-%oracle = (
+my %oracle = (
 	"type"		=>	"sql",
 	"database"	=>	"oracle",
 	"before"	=>	"",
@@ -143,7 +138,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_varchar"	=>	"nvarchar2"
 );
 
-%postgresql = (
+my %postgresql = (
 	"type"		=>	"sql",
 	"database"	=>	"postgresql",
 	"before"	=>	"",
@@ -166,7 +161,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_varchar"	=>	"varchar"
 );
 
-%sqlite3 = (
+my %sqlite3 = (
 	"type"		=>	"sql",
 	"database"	=>	"sqlite3",
 	"before"	=>	"",
@@ -217,6 +212,7 @@ sub newstate
 sub process_table
 {
 	my $line = $_[0];
+	my $flags;
 
 	newstate("table");
 
@@ -255,11 +251,12 @@ sub process_table
 sub process_field
 {
 	my $line = $_[0];
+	my ($type, $type_2);
 
 	newstate("field");
 
-	($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
-	($type_short, $length) = split(/\(/, $type, 2);
+	my ($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
+	my ($type_short, $length) = split(/\(/, $type, 2);
 
 	if ($output{"type"} eq "code")
 	{
@@ -312,7 +309,7 @@ sub process_field
 		{
 			if ($fk_field eq "")
 			{
-				$fk_field = "${name}";
+				$fk_field = $name;
 			}
 
 			$fk_table = "\"${fk_table}\"";
@@ -338,6 +335,7 @@ sub process_field
 	}
 	else
 	{
+		my @text_fields;
 		$a = $output{$type_short};
 		$_ = $type;
 		s/$type_short/$a/g;
@@ -379,12 +377,8 @@ sub process_field
 		{
 			$null = "";
 		}
-		else
-		{
-			$null = "${null}";
-		}
 
-		$row = "${null}";
+		my $row = $null;
 
 		if ($type eq "t_serial")
 		{
@@ -416,11 +410,15 @@ sub process_field
 			}
 		}
 
+		my $references = "";
+
 		if ($relN ne "" and $relN ne "-")
 		{
+			my $only = "";
+
 			if ($fk_field eq "")
 			{
-				$fk_field = "${name}";
+				$fk_field = $name;
 			}
 
 # RESTRICT may contains new line chars we need to clean them out
@@ -439,12 +437,8 @@ sub process_field
 			{
 				$only = " ONLY";
 			}
-			else
-			{
-				$only = "";
-			}
 
-			$cname = "c_${table_name}_${relN}";
+			my $cname = "c_${table_name}_${relN}";
 
 			if ($output{"database"} eq "sqlite3")
 			{
@@ -466,10 +460,6 @@ sub process_field
 				}
 			}
 		}
-		else
-		{
-			$references = "";
-		}
 
 		printf "${ltab}%-*s %-*s %-*s ${row}${references}", $szcol1, $name, $szcol2, $type_2, $szcol3, $default;
 	}
@@ -482,7 +472,7 @@ sub process_index
 
 	newstate("index");
 
-	($name, $fields) = split(/\|/, $line, 2);
+	my ($name, $fields) = split(/\|/, $line, 2);
 
 	if ($output{"type"} eq "code")
 	{
@@ -516,9 +506,10 @@ sub process
 	$fkeys_drop = "";
 	$sequences = "";
 	$uniq = "";
+	my ($type, $line);
 
 	open(INFO, $file);	# open the file
-	@lines = <INFO>;	# read it into an array
+	my @lines = <INFO>;	# read it into an array
 	close(INFO);		# close the file
 
 	foreach $line (@lines)
@@ -548,7 +539,7 @@ sub main
 		usage();
 	}
 
-	$format = $ARGV[0];
+	my $format = $ARGV[0];
 	$eol = "";
 	$fk_bol = "";
 	$fk_eol = ";";
@@ -560,7 +551,7 @@ sub main
 	$sql_suffix="";
 	$fkeys_prefix = "";
 	$fkeys_suffix = "";
-	$fkeys_drop_prefix = "";
+	my $fkeys_drop_prefix = "";
 
 	if ($format eq 'c')		{ %output = %c; }
 	elsif ($format eq 'ibm_db2')	{ %output = %ibm_db2; }
