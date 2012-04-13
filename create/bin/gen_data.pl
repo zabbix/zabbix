@@ -16,44 +16,45 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+use strict;
 use File::Basename;
 
-$file = dirname($0)."/../src/data.tmpl";	# name the file
+my $file = dirname($0)."/../src/data.tmpl";	# name the file
 open(INFO, $file);				# open the file
-@lines = <INFO>;				# read it into an array
+my @lines = <INFO>;				# read it into an array
 close(INFO);					# close the file
 
-my $output;
+my (%output, $insert_into, $fields);
 
-%ibm_db2 = (
+my %ibm_db2 = (
 	"database"	=>	"ibm_db2",
 	"before"	=>	"",
 	"after"		=>	"",
 	"exec_cmd"	=>	";\n"
 );
 
-%mysql = (
+my %mysql = (
 	"database"	=>	"mysql",
 	"before"	=>	"START TRANSACTION;\n",
 	"after"		=>	"COMMIT;\n",
 	"exec_cmd"	=>	";\n"
 );
 
-%oracle = (
+my %oracle = (
 	"database"	=>	"oracle",
 	"before"	=>	"SET DEFINE OFF\n",
 	"after"		=>	"",
 	"exec_cmd"	=>	"\n/\n\n"
 );
 
-%postgresql = (
+my %postgresql = (
 	"database"	=>	"postgresql",
 	"before"	=>	"START TRANSACTION;\n",
 	"after"		=>	"COMMIT;\n",
 	"exec_cmd"	=>	";\n"
 );
 
-%sqlite3 = (
+my %sqlite3 = (
 	"database"	=>	"sqlite3",
 	"before"	=>	"BEGIN TRANSACTION;\n",
 	"after"		=>	"COMMIT;\n",
@@ -71,9 +72,9 @@ sub process_fields
 {
 	my $line = $_[0];
 
-	@array = split(/\|/, $line);
+	my @array = split(/\|/, $line);
 
-	$first = 1;
+	my $first = 1;
 	$fields = "(";
 
 	foreach (@array)
@@ -96,15 +97,15 @@ sub process_row
 {
 	my $line = $_[0];
 
-	@array = split(/\|/, $line);
+	my @array = split(/\|/, $line);
 
 	foreach (@array)
 	{
 		$_ =~ s/&pipe;/|/;
 	}
 
-	$first = 1;
-	$values = "(";
+	my $first = 1;
+	my $values = "(";
 
 	foreach (@array)
 	{
@@ -172,6 +173,7 @@ sub main
 
 	print $output{"before"};
 
+	my ($line, $type);
 	foreach $line (@lines)
 	{
 		$line =~ tr/\t//d;
