@@ -8,9 +8,10 @@ A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-4862] fixed Error when trying to remove additional templates in the host mass update form (Toms)
 ....I..... [ZBX-3929] removed deprecated Switch module from gen_schema.pl and get_data.pl scripts (Sasha)
 ..F....... [ZBX-4738] improved the host interface select in the item mass update form (Pavels)
-..F....... [ZBX-4738] fixed several checkboxes state not being saved after an unsuccessfull item mass update (Pavels)
+..F....... [ZBX-4738] fixed several checkboxes state not being saved after an unsuccessful item mass update (Pavels)
 ..F....... [ZBX-4865] fixed error bar in case of error with words longer than screen (Toms, Pavels)
 ........S. [ZBX-4840] improved slow SQL queries in processing of {ITEM.VALUE} and {ITEM.LOG.*} macros (Sasha)
 ..F....... [ZBX-4572] fixed incorrect value input in GUI configuration form raising critical error (Vedmak)

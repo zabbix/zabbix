@@ -178,8 +178,15 @@ else{
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
+	$unlink_templates = array();
 	if (isset($_REQUEST['unlink'])) {
-		$unlink_templates = array_keys($_REQUEST['unlink']);
+		// templates_rem for old style removal in massupdate form
+		if (isset($_REQUEST['templates_rem'])) {
+			$unlink_templates = array_keys($_REQUEST['templates_rem']);
+		}
+		elseif (is_array($_REQUEST['unlink'])) {
+			$unlink_templates = array_keys($_REQUEST['unlink']);
+		}
 	}
 	else {
 		$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
