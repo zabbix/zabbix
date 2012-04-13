@@ -181,11 +181,14 @@ sub main
 
 		($type, $line) = split(/\|/, $line, 2);
 
-		$type =~ s/\s+$//; # remove trailing spaces
+		if ($type)
+		{
+			$type =~ s/\s+$//; # remove trailing spaces
 
-		if ($type eq 'FIELDS')		{ process_fields($line); }
-		elsif ($type eq 'TABLE')	{ process_table($line); }
-		elsif ($type eq 'ROW')		{ process_row($line); }
+			if ($type eq 'FIELDS')		{ process_fields($line); }
+			elsif ($type eq 'TABLE')	{ process_table($line); }
+			elsif ($type eq 'ROW')		{ process_row($line); }
+		}
 	}
 
 	print $output{"after"};
