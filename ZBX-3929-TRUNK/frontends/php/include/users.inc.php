@@ -19,13 +19,14 @@
 **/
 ?>
 <?php
-function getUserTheme($user) {
+
+function getUserTheme($userData) {
 	$config = select_config();
 	if (isset($config['default_theme'])) {
 		$css = $config['default_theme'];
 	}
-	if (isset($user['theme']) && $user['theme'] != ZBX_DEFAULT_CSS && $user['alias'] != ZBX_GUEST_USER) {
-		$css = $user['theme'];
+	if (isset($userData['theme']) && $userData['theme'] != ZBX_DEFAULT_CSS && $userData['alias'] != ZBX_GUEST_USER) {
+		$css = $userData['theme'];
 	}
 	if (!isset($css)) {
 		$css = 'css_ob.css';
@@ -33,11 +34,25 @@ function getUserTheme($user) {
 	return $css;
 }
 
+function getUserThemeName($css = null) {
+	if (empty($css)) {
+		$css = getUserTheme(CWebUser::$data);
+	}
+	switch ($css) {
+		case 'css_od.css':
+			return 'darkorange';
+		case 'css_bb.css':
+			return 'darkblue';
+		default:
+			return 'originalblue';
+	}
+}
+
 function user_type2str($user_type = null) {
 	$user_types = array(
 		USER_TYPE_ZABBIX_USER => _('Zabbix User'),
 		USER_TYPE_ZABBIX_ADMIN => _('Zabbix Admin'),
-		USER_TYPE_SUPER_ADMIN => _('Zabbix Super Admin'),
+		USER_TYPE_SUPER_ADMIN => _('Zabbix Super Admin')
 	);
 	if (is_null($user_type)) {
 		return $user_types;
@@ -72,12 +87,14 @@ function unblock_user_login($userids) {
 function get_userid_by_usrgrpid($usrgrpids) {
 	zbx_value2array($usrgrpids);
 	$userids = array();
-	$sql = 'SELECT DISTINCT u.userid '.
-			' FROM users u,users_groups ug '.
-			' WHERE u.userid=ug.userid '.
-				' AND '.DBcondition('ug.usrgrpid', $usrgrpids).
-				' AND '.DBin_node('ug.usrgrpid', false);
-	$db_users = DBselect($sql);
+
+	$db_users = DBselect(
+		'SELECT DISTINCT u.userid'.
+		' FROM users u,users_groups ug'.
+		' WHERE u.userid=ug.userid'.
+			' AND '.DBcondition('ug.usrgrpid', $usrgrpids).
+			' AND '.DBin_node('ug.usrgrpid', false)
+	);
 	while($user = DBFetch($db_users)){
 		$userids[$user['userid']] = $user['userid'];
 	}
@@ -92,7 +109,7 @@ function add_user_to_group($userid, $usrgrpid) {
 		$result = DBexecute('INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.$users_groups_id.','.$usrgrpid.','.$userid.')');
 	}
 	else{
-		error(_('User cannot change status of himself'));
+		error(_('User cannot change status of himself.'));
 	}
 	return $result;
 }
@@ -103,7 +120,7 @@ function remove_user_from_group($userid, $usrgrpid) {
 		$result = DBexecute('DELETE FROM users_groups WHERE userid='.$userid.' AND usrgrpid='.$usrgrpid);
 	}
 	else {
-		error(_('User cannot change status of himself'));
+		error(_('User cannot change status of himself.'));
 	}
 	return $result;
 }
@@ -133,11 +150,12 @@ function change_group_status($usrgrpids, $users_status) {
 	if ($users_status == GROUP_STATUS_DISABLED) {
 		$grant = granted2update_group($usrgrpids);
 	}
+
 	if ($grant) {
 		$result = DBexecute('UPDATE usrgrp SET users_status='.$users_status.' WHERE '.DBcondition('usrgrpid', $usrgrpids));
 	}
 	else {
-		error(_('User cannot change status of himself'));
+		error(_('User cannot change status of himself.'));
 	}
 	return $result;
 }
@@ -153,7 +171,7 @@ function change_group_gui_access($usrgrpids, $gui_access) {
 		$result = DBexecute('UPDATE usrgrp SET gui_access='.$gui_access.' WHERE '.DBcondition('usrgrpid',$usrgrpids));
 	}
 	else {
-		error(_('User cannot change GUI access for himself'));
+		error(_('User cannot change GUI access for himself.'));
 	}
 	return $result;
 }
