@@ -839,7 +839,6 @@ else {
 		$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
 		$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 
-		DBstart();
 		do{
 			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 			if(!is_resource($db_select)) return false;
@@ -874,7 +873,6 @@ else {
 					$ret2 = $row["nextid"];
 					if(bccomp(bcadd($ret1, 1, 0), $ret2, 0) == 0){
 						$found = true;
-						DBend();
 					}
 				}
 			}
