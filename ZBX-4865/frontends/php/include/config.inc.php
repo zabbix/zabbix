@@ -358,7 +358,6 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 					array_unshift($row, new CCol($msg_details, 'clr'));
 				}
 				$msg_tab->addRow($row);
-				$msg_tab = new CDiv($msg_tab,'msgerr_wraper');
 				$msg_tab->show();
 				break;
 		}
@@ -411,7 +410,6 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 				$tab->setAttribute('style', 'display: none;');
 			}
 			$tab->addRow(new CCol($lst_error, 'msg'));
-			$tab = new CDiv($tab,'msgerr_wraper');
 			$tab->show();
 		}
 		$ZBX_MESSAGES = null;
