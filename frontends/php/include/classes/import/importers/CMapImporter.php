@@ -33,9 +33,6 @@ class CMapImporter extends CImporter {
 
 		$this->checkCircularMapReferences($maps);
 
-		$existingMaps = $this->findExistingMaps(array_keys($maps));
-		$this->checkUpdatePermissions($existingMaps);
-
 		do {
 			$im = $this->getIndependentMaps($maps);
 
@@ -47,8 +44,8 @@ class CMapImporter extends CImporter {
 
 				$map = $this->resolveMapReferences($map);
 
-				if (isset($existingMaps[$map['name']])) {
-					$map['sysmapid'] = $existingMaps[$map['name']];
+				if ($mapId = $this->referencer->resolveMap($map['name'])) {
+					$map['sysmapid'] = $mapId;
 					$mapsToUpdate[] = $map;
 				}
 				else {
@@ -66,8 +63,6 @@ class CMapImporter extends CImporter {
 			if ($this->options['maps']['updateExisting'] && $mapsToUpdate) {
 				API::Map()->update($mapsToUpdate);
 			}
-
-
 		} while (!empty($im));
 	}
 
@@ -166,32 +161,6 @@ class CMapImporter extends CImporter {
 		}
 
 		return zbx_objectValues($maps, 'name');
-	}
-
-	/**
-	 * Check if user has permissions for maps that already exist in database.
-	 * Permissions are checked only if import updates existing maps.
-	 *
-	 * @throws Exception
-	 *
-	 * @param array $existingMaps hash with name as key and sysmapid as value
-	 *
-	 * @return void
-	 */
-	protected function checkUpdatePermissions(array $existingMaps) {
-		if ($existingMaps && $this->options['maps']['updateExisting']) {
-			$allowedMaps = API::Map()->get(array(
-				'sysmapids' => $existingMaps,
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($existingMaps as $existingMapName => $existingMapId ) {
-				if (!isset($allowedMaps[$existingMapId])) {
-					throw new Exception(_s('No permissions for map "%1$s".', $existingMapName));
-				}
-			}
-		}
 	}
 
 	/**
@@ -307,23 +276,5 @@ class CMapImporter extends CImporter {
 		}
 
 		return $map;
-	}
-
-	/**
-	 * Get maps that exist in database.
-	 * Return array with name as key and sysmapid as value.
-	 *
-	 * @param array $mapNames
-	 *
-	 * @return array
-	 */
-	protected function findExistingMaps(array $mapNames) {
-		$existingMaps = array();
-		$dbMaps = DBselect('SELECT s.sysmapid, s.name FROM sysmaps s WHERE '.DBcondition('s.name', $mapNames));
-		while ($dbMap = DBfetch($dbMaps)) {
-			$existingMaps[$dbMap['name']] = $dbMap['sysmapid'];
-		}
-
-		return $existingMaps;
 	}
 }

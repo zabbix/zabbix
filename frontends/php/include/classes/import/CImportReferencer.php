@@ -35,6 +35,7 @@ class CImportReferencer {
 	protected $triggers = array();
 	protected $iconMaps = array();
 	protected $maps = array();
+	protected $screens = array();
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
@@ -44,6 +45,7 @@ class CImportReferencer {
 	protected $triggersRefs;
 	protected $iconMapsRefs;
 	protected $mapsRefs;
+	protected $screensRefs;
 
 
 	/**
@@ -231,6 +233,21 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get screen id by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveScreen($name) {
+		if ($this->screensRefs === null) {
+			$this->selectScreens();
+		}
+
+		return isset($this->screensRefs[$name]) ? $this->screensRefs[$name] : false;
+	}
+
+	/**
 	 * Add group names that need association with a database group id.
 	 *
 	 * @param array $groups
@@ -403,6 +420,25 @@ class CImportReferencer {
 	 */
 	public function addMapRef($name, $mapId) {
 		$this->mapsRefs[$name] = $mapId;
+	}
+
+	/**
+	 * Add screens names that need association with a database screen id.
+	 *
+	 * @param array $screens
+	 */
+	public function addScreens(array $screens) {
+		$this->screens = array_unique(array_merge($this->screens, $screens));
+	}
+
+	/**
+	 * Add screen name association with screen id.
+	 *
+	 * @param string $name
+	 * @param string $screenId
+	 */
+	public function addScreenRef($name, $screenId) {
+		$this->screensRefs[$name] = $screenId;
 	}
 
 	/**
@@ -613,6 +649,24 @@ class CImportReferencer {
 			}
 
 			$this->maps = array();
+		}
+	}
+
+	/**
+	 * Select screen ids for previously added screen names.
+	 */
+	protected function selectScreens() {
+		if (!empty($this->screens)) {
+			$this->screensRefs = array();
+
+			$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE'.
+					' s.templateid IS NULL '.
+					' AND '.DBcondition('s.name', $this->screens));
+			while ($dbScreen = DBfetch($dbScreens)) {
+				$this->screensRefs[$dbScreen['name']] = $dbScreen['screenid'];
+			}
+
+			$this->screens = array();
 		}
 	}
 }
