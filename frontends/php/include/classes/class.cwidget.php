@@ -68,10 +68,10 @@ class CWidget {
 		$this->headers[] = array('left' => $header, 'right' => $headerright);
 	}
 
-	public function addHeaderRowNumber($name = 'numrows') {
+	public function addHeaderRowNumber($headerright = SPACE) {
 		$numRows = new CDiv();
-		$numRows->setAttribute('name', $name);
-		$this->addHeader($numRows);
+		$numRows->setAttribute('name', 'numrows');
+		$this->addHeader($numRows, $headerright);
 	}
 
 	public function addFlicker($items = null, $state = 0) {

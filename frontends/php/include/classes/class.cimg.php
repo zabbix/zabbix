@@ -22,6 +22,8 @@
 
 class CImg extends CTag {
 
+	public $preloader;
+
 	public function __construct($src, $name = null, $width = null, $height = null, $class = null) {
 		if (is_null($name)) {
 			$name = 'image';
@@ -33,13 +35,12 @@ class CImg extends CTag {
 		$this->tag_body_start = '';
 		$this->tag_body_end = '';
 		$this->setAttribute('border', 0);
-		$this->setAttribute('alt', $name);
 		$this->setName($name);
 		$this->setAltText($name);
 		$this->setSrc($src);
 		$this->setWidth($width);
 		$this->setHeight($height);
-		$this->setAttribute('class', $class);
+		$this->attr('class', $class);
 	}
 
 	public function setSrc($value) {
@@ -89,6 +90,27 @@ class CImg extends CTag {
 		else {
 			return $this->error('Incorrect value for SetHeight "'.$value.'".');
 		}
+	}
+
+	public function preload() {
+		$id = $this->getAttribute('id');
+		if (empty($id)) {
+			$id = 'img'.uniqid();
+			$this->setAttribute('id', $id);
+		}
+
+		insert_js(
+			'jQuery(\''.$this->toString().'\').load(function() {
+				var parent = jQuery("#'.$id.'preloader").parent();
+				jQuery("#'.$id.'preloader").remove();
+				jQuery(parent).append(jQuery(this));
+			});',
+			true
+		);
+
+		$this->addClass('preloader');
+		$this->setAttribute('id', $id.'preloader');
+		$this->setAttribute('src', 'styles/'.getUserThemeName().'/images/preloader.gif');
 	}
 }
 ?>

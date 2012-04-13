@@ -25,15 +25,14 @@ class CColor extends CObject {
 	public function __construct($name, $value) {
 		parent::__construct();
 
-		$lbl = new CColorCell('lbl_'.$name, $value, "javascript: show_color_picker('".$name."')");
-
 		$txt = new CTextBox($name, $value);
 		$txt->addStyle('width: 6em;');
 		$txt->attr('maxlength', 6);
 		$txt->attr('id', zbx_formatDomId($name));
-
-		$txt->addAction('onchange', "set_color_by_name('".$name."',this.value)");
+		$txt->addAction('onchange', 'set_color_by_name("'.$name.'", this.value)');
 		$txt->addStyle('style', 'margin-top: 0px; margin-bottom: 0px;');
+
+		$lbl = new CColorCell('lbl_'.$name, $value, 'javascript: show_color_picker("'.$name.'")');
 
 		$this->addItem(array($txt, $lbl));
 

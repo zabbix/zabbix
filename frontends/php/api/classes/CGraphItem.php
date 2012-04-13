@@ -29,15 +29,14 @@
 class CGraphItem extends CZBXAPI {
 
 	protected $tableName = 'graphs_items';
-
 	protected $tableAlias = 'gi';
 
 	/**
-	* Get GraphItems data
-	*
-	* @param array $options
-	* @return array|boolean
-	*/
+	 * Get GraphItems data
+	 *
+	 * @param array $options
+	 * @return array|boolean
+	 */
 	public function get($options = array()) {
 		$result = array();
 		$userType = self::$userData['type'];
@@ -93,13 +92,13 @@ class CGraphItem extends CZBXAPI {
 			$sqlParts['where'][] = 'ug.userid='.$userid;
 			$sqlParts['where'][] = 'r.permission>='.$permission;
 			$sqlParts['where'][] = 'NOT EXISTS ('.
-										' SELECT hgg.groupid'.
-										' FROM hosts_groups hgg,rights rr,users_groups ugg'.
-										' WHERE i.hostid=hgg.hostid'.
-											' AND rr.id=hgg.groupid'.
-											' AND rr.groupid=ugg.usrgrpid'.
-											' AND ugg.userid='.$userid.
-											' AND rr.permission<'.$permission.')';
+				' SELECT hgg.groupid'.
+				' FROM hosts_groups hgg,rights rr,users_groups ugg'.
+				' WHERE i.hostid=hgg.hostid'.
+					' AND rr.id=hgg.groupid'.
+					' AND rr.groupid=ugg.usrgrpid'.
+					' AND ugg.userid='.$userid.
+					' AND rr.permission<'.$permission.')';
 		}
 
 		// nodeids
@@ -139,6 +138,7 @@ class CGraphItem extends CZBXAPI {
 		if (!is_null($options['expandData'])) {
 			$sqlParts['select']['key'] = 'i.key_';
 			$sqlParts['select']['hostid'] = 'i.hostid';
+			$sqlParts['select']['flags'] = 'i.flags';
 			$sqlParts['select']['host'] = 'h.host';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
@@ -224,14 +224,13 @@ class CGraphItem extends CZBXAPI {
 
 		// adding graphs
 		if (!is_null($options['selectGraphs']) && str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
-			$objParams = array(
+			$graphs = API::Graph()->get(array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectGraphs'],
 				'gitemids' => $gitemids,
 				'preservekeys' => true
-			);
-			$graphs = API::Graph()->get($objParams);
-			foreach ($graphs as $graphid => $graph) {
+			));
+			foreach ($graphs as $graph) {
 				$gitems = $graph['gitems'];
 				unset($graph['gitems']);
 				foreach ($gitems as $item) {
