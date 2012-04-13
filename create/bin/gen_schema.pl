@@ -76,6 +76,7 @@ my %ibm_db2 = (
 	"database"	=>	"ibm_db2",
 	"before"	=>	"",
 	"after"		=>	"",
+	"table_options"	=>	"",
 	"t_bigint"	=>	"bigint",
 	"t_char"	=>	"varchar",
 	"t_cksum_text"	=>	"varchar(2048)",
@@ -121,6 +122,7 @@ my %oracle = (
 	"database"	=>	"oracle",
 	"before"	=>	"",
 	"after"		=>	"",
+	"table_options"	=>	"",
 	"t_bigint"	=>	"number(20)",
 	"t_char"	=>	"nvarchar2",
 	"t_cksum_text"	=>	"nclob",
@@ -166,6 +168,7 @@ my %sqlite3 = (
 	"database"	=>	"sqlite3",
 	"before"	=>	"",
 	"after"		=>	"",
+	"table_options"	=>	"",
 	"t_bigint"	=>	"bigint",
 	"t_char"	=>	"char",
 	"t_cksum_text"	=>	"text",
@@ -186,7 +189,7 @@ my %sqlite3 = (
 sub rtrim($)
 {
 	my $string = shift;
-	$string =~ s/(\r|\n)+$//;
+	$string =~ s/(\r|\n)+$// if ($string);
 	return $string;
 }
 
@@ -255,7 +258,17 @@ sub process_field
 
 	newstate("field");
 
-	my ($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
+	my $name = "";
+	my $type = "";
+	my $default = "";
+	my $null = "";
+	my $flags = "";
+	my $relN = "";
+	my $fk_table = "";
+	my $fk_field = "";
+	my $fk_flags = "";
+
+	($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
 	my ($type_short, $length) = split(/\(/, $type, 2);
 
 	if ($output{"type"} eq "code")
@@ -307,7 +320,7 @@ sub process_field
 
 		if ($fk_table)
 		{
-			if ($fk_field eq "")
+			if (not $fk_field or $fk_field eq "")
 			{
 				$fk_field = $name;
 			}
@@ -315,7 +328,7 @@ sub process_field
 			$fk_table = "\"${fk_table}\"";
 			$fk_field = "\"${fk_field}\"";
 
-			if ($fk_flags eq "")
+			if (not $fk_flags or $fk_flags eq "")
 			{
 				$fk_flags = "ZBX_FK_CASCADE_DELETE";
 			}
@@ -412,19 +425,19 @@ sub process_field
 
 		my $references = "";
 
-		if ($relN ne "" and $relN ne "-")
+		if ($relN and $relN ne "" and $relN ne "-")
 		{
 			my $only = "";
 
-			if ($fk_field eq "")
+			if (not $fk_field or $fk_field eq "")
 			{
 				$fk_field = $name;
 			}
 
 # RESTRICT may contains new line chars we need to clean them out
-			$fk_flags = rtrim ($fk_flags);
+			$fk_flags = rtrim($fk_flags);
 
-			if ($fk_flags eq "")
+			if (not $fk_flags or $fk_flags eq "")
 			{
 				$fk_flags = " ON DELETE CASCADE";
 			}
@@ -519,10 +532,13 @@ sub process
 
 		($type, $line) = split(/\|/, $line, 2);
 
-		if ($type eq 'FIELD')		{ process_field($line); }
-		elsif ($type eq 'INDEX')	{ process_index($line, 0); }
-		elsif ($type eq 'TABLE')	{ process_table($line); }
-		elsif ($type eq 'UNIQUE')	{ process_index($line, 1); }
+		if ($type)
+		{
+			if ($type eq 'FIELD')		{ process_field($line); }
+			elsif ($type eq 'INDEX')	{ process_index($line, 0); }
+			elsif ($type eq 'TABLE')	{ process_table($line); }
+			elsif ($type eq 'UNIQUE')	{ process_index($line, 1); }
+		}
 	}
 
 	newstate("table");
