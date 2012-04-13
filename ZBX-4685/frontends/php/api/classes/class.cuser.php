@@ -1114,18 +1114,21 @@ Copt::memoryPick();
 	public static function logout($sessionid){
 		global $ZBX_LOCALNODEID;
 
-		$sql = 'SELECT s.* '.
-			' FROM sessions s '.
-			' WHERE s.sessionid='.zbx_dbstr($sessionid).
+		$sql = 'SELECT s.*, u.alias '.
+			' FROM sessions s, users u '.
+			' WHERE s.userid=u.userid AND s.sessionid='.zbx_dbstr($sessionid).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID);
 
 		$session = DBfetch(DBselect($sql));
 		if(!$session) return false;
 
+		DBstart();
 		zbx_unsetcookie('zbx_sessionid');
 		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
 		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
+		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,'Manual Logout ['.$session['alias'].']');
+		DBend();
 
 	return true;
 	}
@@ -1144,6 +1147,7 @@ Copt::memoryPick();
  * @return string session ID
  */
 	public static function authenticate($user){
+		DBStart();
 		global $USER_DETAILS, $ZBX_LOCALNODEID;
 
 		$name = $user['user'];
@@ -1251,6 +1255,7 @@ Copt::memoryPick();
 				DBexecute($sql);
 			}
 		}
+		DBend();
 
 	return $login;
 	}
