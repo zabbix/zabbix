@@ -37,6 +37,7 @@ class API {
 		'alert' => 'CAlert',
 		'apiinfo' => 'CAPIInfo',
 		'application' => 'CApplication',
+		'configuration' => 'CConfiguration',
 		'dcheck' => 'CDCheck',
 		'dhost' => 'CDHost',
 		'discoveryrule' => 'CDiscoveryRule',
@@ -49,8 +50,6 @@ class API {
 		'host' => 'CHost',
 		'hostgroup' => 'CHostGroup',
 		'history' => 'CHistory',
-		'host' => 'CHost',
-		'hostgroup' => 'CHostGroup',
 		'hostinterface' => 'CHostInterface',
 		'image' => 'CImage',
 		'iconmap' => 'CIconMap',
@@ -162,6 +161,13 @@ class API {
 	 */
 	public static function Application() {
 		return self::getObject('application');
+	}
+
+	/**
+	 * @return CConfiguration
+	 */
+	public static function Configuration() {
+		return self::getObject('configuration');
 	}
 
 	/**
