@@ -8,7 +8,7 @@
 		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
 		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
 		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-		<input type="hidden" id="items_#{number}_host_templateid" name="items[#{number}][host_templateid]" value="#{host_templateid}">
+		<input type="hidden" id="items_#{number}_only_hostid" name="items[#{number}][only_hostid]" value="#{only_hostid}">
 		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
 	</td>
 
@@ -93,7 +93,7 @@
 </tr>
 </script>
 <script type="text/javascript">
-	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, flags) {
+	function loadItem(number, gitemid, graphid, itemid, name, type, calc_fnc, drawtype, yaxisside, color, only_hostid, flags) {
 		var item = [];
 		item['number'] = number;
 		item['number_nr'] = number + 1;
@@ -106,7 +106,7 @@
 		item['yaxisside'] = yaxisside;
 		item['color'] = color;
 		item['sortorder'] = number;
-		item['host_templateid'] = 0;
+		item['only_hostid'] = only_hostid;
 		item['flags'] = flags;
 		item['name'] = name;
 
@@ -142,7 +142,7 @@
 			item['drawtype'] = 0;
 			item['yaxisside'] = 0;
 			item['sortorder'] = item['number'];
-			item['host_templateid'] = list.values[i].host_templateid;
+			item['only_hostid'] = list.values[i].host_templateid;
 			item['flags'] = typeof(list.values[i].flags) != 'undefined' ? list.values[i].flags : 0;
 			item['color'] = getNextColor(1);
 			item['name'] = list.values[i].name;
@@ -158,27 +158,26 @@
 		rewriteNameLinks();
 	}
 
-	function getOnlyHostParam(onlyHostId) {
+	function getOnlyHostParam(templateId) {
 		var param = '';
 
 		jQuery(document).ready(function() {
-			var i = 0, hostTemplateId = 0;
+			var i = 0, onlyHostId = 0;
 			jQuery('#itemsTable tr.sortable').each(function() {
-				if (hostTemplateId == 0) {
-					hostTemplateId = jQuery('#items_' + i + '_host_templateid').val();
+				if (onlyHostId == 0) {
+					onlyHostId = jQuery('#items_' + i + '_only_hostid').val();
 				}
 				i++;
 			});
 
-			if (hostTemplateId > 0) {
-				param = '&only_hostid=' + hostTemplateId;
-			}
-			else if (typeof(onlyHostId) != 'undefined' && onlyHostId > 0) {
+			if (onlyHostId > 0) {
 				param = '&only_hostid=' + onlyHostId;
 			}
-			else {
-				param = '<?php echo !empty($this->data['only_hostid']) ? '&only_hostid='.$this->data['only_hostid'] : ''; ?>';
-						+ '<?php echo !empty($this->data['real_hosts']) ? '&real_hosts=1' : ''; ?>';
+			else if (onlyHostId < 0) {
+				param = '&real_hosts=1';
+			}
+			else if (typeof(templateId) != 'undefined' && templateId > 0) {
+				param = '&only_hostid=' + templateId;
 			}
 
 			if (param == '' && jQuery('#itemsTable tr.sortable').length > 0) {
@@ -193,7 +192,7 @@
 		var size = jQuery('#itemsTable tr.sortable').length;
 		for (var i = 0; i < size; i++) {
 			var nameLink = 'PopUp("popup.php?writeonly=1&dstfrm=graphForm'
-				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name&dstfld3=items_' + i + '_host_templateid'
+				+ '&dstfld1=items_' + i + '_itemid&dstfld2=items_' + i + '_name&dstfld3=items_' + i + '_only_hostid'
 				+ (jQuery('#items_' + i + '_flags').val() > 0
 					? '&srctbl=prototypes&parent_discoveryid=<?php echo $this->data['parent_discoveryid']; ?>'
 						+ '&srcfld4=flags&dstfld4=items_' + i + '_flags'

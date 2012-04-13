@@ -80,21 +80,14 @@ $itemsTable->setHeader(array(
 	new CCol(_('Action'), null, null, 50)
 ));
 
-$this->data['only_hostid'] = null;
-$this->data['real_hosts'] = null;
-
 if (!empty($this->data['items'])) {
 	foreach ($this->data['items'] as $number => $item) {
+		$only_hostid = 0;
 		if (!empty($item['itemid'])) {
 			$host = get_host_by_itemid($item['itemid']);
-			if ($host['status'] == HOST_STATUS_TEMPLATE) {
-				$this->data['only_hostid'] = $host['hostid'];
-			}
-			else {
-				$this->data['real_hosts'] = 1;
-			}
-
 			$name = $host['name'].': '.itemName(get_item_by_itemid($item['itemid']));
+
+			$only_hostid = ($host['status'] == HOST_STATUS_TEMPLATE) ? $host['hostid'] : -1;
 		}
 		else {
 			$name = _('Select');
@@ -110,7 +103,7 @@ if (!empty($this->data['items'])) {
 
 		insert_js('loadItem('.$number.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
 			CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
-			$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
+			$item['yaxisside'].', \''.$item['color'].'\', '.$only_hostid.', '.$item['flags'].');',
 			true
 		);
 	}
@@ -190,38 +183,37 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			if (!empty($this->data['ymin_itemid'])) {
 				$min_host = get_host_by_itemid($this->data['ymin_itemid']);
 				$min_item = get_item_by_itemid($this->data['ymin_itemid']);
-				$ymin_name = $min_host['host'].':'.itemName($min_item);
+				$ymin_name = $min_host['host'].': '.itemName($min_item);
 			}
 
 			$yaxisMinData[] = new CTextBox('ymin_name', $ymin_name, 36, 'yes');
 			$yaxisMinData[] = new CButton('yaxis_min', _('Select'), 'javascript: '.
-				'return PopUp(\'popup.php?dstfrm='.$graphForm->getName().
-					url_param($this->data['only_hostid'], false, 'only_hostid').
-					url_param($this->data['real_hosts'], false, 'real_hosts').
+				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&dstfld1=ymin_itemid'.
 					'&dstfld2=ymin_name'.
 					'&srctbl=items'.
 					'&srcfld1=itemid'.
-					'&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
+					'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
 				'formlist'
 			);
 
 			// select prototype button
 			if (!empty($this->data['parent_discoveryid'])) {
 				$yaxisMinData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
-					'return PopUp(\'popup.php?dstfrm='.$graphForm->getName().
+					'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 						'&parent_discoveryid='.$this->data['parent_discoveryid'].
 						'&dstfld1=ymin_itemid'.
 						'&dstfld2=ymin_name'.
 						'&srctbl=prototypes'.
 						'&srcfld1=itemid'.
-						'&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
+						'&srcfld2=name", 0, 0, "zbx_popup_item");',
 					'formlist'
 				);
 			}
 		}
 		else {
-			$yaxisMinData[] = _('add graph items first');
+			$yaxisMinData[] = SPACE;
+			$yaxisMinData[] = new CSpan(_('Add graph items first'), 'red');
 		}
 	}
 	else {
@@ -248,39 +240,38 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		if (!empty($this->data['ymax_itemid'])) {
 			$max_host = get_host_by_itemid($this->data['ymax_itemid']);
 			$max_item = get_item_by_itemid($this->data['ymax_itemid']);
-			$ymax_name = $max_host['host'].':'.itemName($max_item);
+			$ymax_name = $max_host['host'].': '.itemName($max_item);
 		}
 
 		if (!empty($this->data['items'])) {
 			$yaxisMaxData[] = new CTextBox('ymax_name', $ymax_name, 36, 'yes');
 			$yaxisMaxData[] = new CButton('yaxis_max', _('Select'), 'javascript: '.
-				'return PopUp(\'popup.php?dstfrm='.$graphForm->getName().
-					url_param($this->data['only_hostid'], false, 'only_hostid').
-					url_param($this->data['real_hosts'], false, 'real_hosts').
+				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&dstfld1=ymax_itemid'.
 					'&dstfld2=ymax_name'.
 					'&srctbl=items'.
 					'&srcfld1=itemid'.
-					'&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
+					'&srcfld2=name" + getOnlyHostParam(), 0, 0, "zbx_popup_item");',
 				'formlist'
 			);
 
 			// select prototype button
 			if (!empty($this->data['parent_discoveryid'])) {
 				$yaxisMaxData[] = new CButton('yaxis_min', _('Select prototype'), 'javascript: '.
-					'return PopUp(\'popup.php?dstfrm='.$graphForm->getName().
+					'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 						'&parent_discoveryid='.$this->data['parent_discoveryid'].
 						'&dstfld1=ymax_itemid'.
 						'&dstfld2=ymax_name'.
 						'&srctbl=prototypes'.
 						'&srcfld1=itemid'.
-						'&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
+						'&srcfld2=name", 0, 0, "zbx_popup_item");',
 					'formlist'
 				);
 			}
 		}
 		else {
-			$yaxisMaxData[] = _('add graph items first');
+			$yaxisMaxData[] = SPACE;
+			$yaxisMaxData[] = new CSpan(_('Add graph items first'), 'red');
 		}
 	}
 	else {
