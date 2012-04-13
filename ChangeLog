@@ -7,6 +7,7 @@ New features:
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-4865] fixed error bar in case of error with words longer than screen (Toms, Pavels)
 ........S. [ZBX-4840] improved slow SQL queries in processing of {ITEM.VALUE} and {ITEM.LOG.*} macros (Sasha)
 ..F....... [ZBX-4572] fixed incorrect value input in GUI configuration form raising critical error (Vedmak)
 ..F....... [ZBX-4841] fixed inability to select other but the first of the discovery checks for a discovery rule in popup.php (Toms)
