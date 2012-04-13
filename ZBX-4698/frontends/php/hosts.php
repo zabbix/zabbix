@@ -583,7 +583,7 @@ $options = array(
 		'real_hosts' => 1,
 		'editable' => true
 	),
-	'groupid' => get_request('groupid', null),
+	'groupid' => get_request('groupid', null)
 );
 $pageFilter = new CPageFilter($options);
 
@@ -636,9 +636,7 @@ else {
 		array(bold(_('Port').': '), new CTextBox('filter_port', $_REQUEST['filter_port'], 20))
 	));
 
-	$filter = new CButton('filter', _('Filter'),
-		"javascript: create_var('zbx_filter', 'groupid',".$_REQUEST['groupid'].");
-		create_var('zbx_filter', 'filter_set', '1', true);");
+	$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
 	$filter->useJQueryStyle('main');
 
 	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
