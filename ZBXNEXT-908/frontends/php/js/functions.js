@@ -76,7 +76,7 @@ function call_triggerlog_menu(evnt, id, name, menu_options) {
 			[
 				[name, null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],
 				[tname, "javascript: openWinCentered('tr_logform.php?sform=1&itemid=" + id + "', 'ServiceForm', 760, 540, 'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}]
-			],140);
+			], 140);
 	}
 	return false;
 }
@@ -205,7 +205,7 @@ function add_logexpr() {
 	tr.appendChild(td);
 
 	var url = document.createElement('a');
-	url.setAttribute('href', 'javascript: if (confirm("' + locale['S_DELETE_EXPRESSION_Q'] + '")) { remove_expression("logtr'+logexpr_count+'"); }');
+	url.setAttribute('href', 'javascript: if (confirm("' + locale['S_DELETE_EXPRESSION_Q'] + '")) { remove_expression("logtr' + logexpr_count + '"); }');
 	url.setAttribute(classattr, 'action');
 	url.appendChild(document.createTextNode(locale['S_DELETE']));
 
@@ -244,7 +244,7 @@ function remove_expression(expr_id) {
 function getIdFromNodeId(id) {
 	if (typeof(id) == 'string') {
 		var reg = /logtr([0-9])/i;
-		id = parseInt(id.replace(reg, "$1"));
+		id = parseInt(id.replace(reg, '$1'));
 	}
 	if (typeof(id) == 'number') {
 		return id;
@@ -308,8 +308,8 @@ function swapNodesNames(n1, n2) {
 	var id2 = n2.id;
 	if (is_string(id1) && is_string(id2)) {
 		var reg = /logtr([0-9])/i;
-		id1 = parseInt(id1.replace(reg, "$1"));
-		id2 = parseInt(id2.replace(reg, "$1"));
+		id1 = parseInt(id1.replace(reg, '$1'));
+		id2 = parseInt(id2.replace(reg, '$1'));
 	}
 
 	if (is_number(id1) && is_number(id2)) {
@@ -425,7 +425,7 @@ function add_keyword_or() {
 function getIdFromNodeKeyId(id) {
 	if (typeof(id) == 'string') {
 		var reg = /keytr([0-9])/i;
-		id = parseInt(id.replace(reg, "$1"));
+		id = parseInt(id.replace(reg, '$1'));
 	}
 	if (typeof(id) == 'number') {
 		return id;
@@ -770,8 +770,7 @@ function incrementNextColor() {
 }
 
 function getNextColor(paletteType) {
-	var palette, gradient, hexColor,
-		r, g, b;
+	var palette, gradient, hexColor, r, g, b;
 
 	switch (paletteType) {
 		case 1:
@@ -828,4 +827,3 @@ function getNextColor(paletteType) {
 
 	return hexColor.toUpperCase();
 }
-

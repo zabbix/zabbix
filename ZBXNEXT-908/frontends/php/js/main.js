@@ -862,7 +862,7 @@ function show_color_picker(id) {
 	var pos = getPosition(curr_lbl);
 	color_picker.x = pos.left;
 	color_picker.y = pos.top;
-	color_picker.style.left = color_picker.x + 'px';
+	color_picker.style.left = (color_picker.x + 20) + 'px';
 	color_picker.style.top = color_picker.y + 'px';
 	color_picker.style.visibility = 'visible';
 }
