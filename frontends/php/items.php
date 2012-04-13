@@ -697,7 +697,7 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'formula' => get_request('formula', '1'),
 		'logtimefmt' => get_request('logtimefmt', ''),
 		'initial_item_type' => null,
-		'multiple_interface_types' => false,
+		'multiple_interface_types' => false
 	);
 
 	// hosts
