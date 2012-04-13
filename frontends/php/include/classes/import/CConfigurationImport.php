@@ -391,20 +391,22 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedTemplateScreens() as $screen) {
-			if (!empty($screen['screenitems'])) {
-				foreach ($screen['screenitems'] as $screenItem) {
-					$resource = $screenItem['resource'];
+		foreach ($this->getFormattedTemplateScreens() as $screens) {
+			foreach ($screens as $screen) {
+				if (!empty($screen['screenitems'])) {
+					foreach ($screen['screenitems'] as $screenItem) {
+						$resource = $screenItem['resource'];
 
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_GRAPH:
-							// TODO: gather graphs too
-							break;
+						switch ($screenItem['resourcetype']) {
+							case SCREEN_RESOURCE_GRAPH:
+								// TODO: gather graphs too
+								break;
 
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$itemsRefs[$resource['host']][$resource['key']] = $resource['name'];
-							break;
+							case SCREEN_RESOURCE_SIMPLE_GRAPH:
+							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
+								break;
+						}
 					}
 				}
 			}

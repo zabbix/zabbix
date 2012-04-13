@@ -76,7 +76,7 @@ abstract class CAbstractScreenImporter extends CImporter {
 
 					case SCREEN_RESOURCE_SIMPLE_GRAPH:
 					case SCREEN_RESOURCE_PLAIN_TEXT:
-						$hostId = $this->referencer->resolveHost($resource['host']);
+						$hostId = $this->referencer->resolveHostOrTemplate($resource['host']);
 						$screenItem['resourceid'] = $this->referencer->resolveItem($hostId, $resource['key']);
 						if (!$screenItem['resourceid']) {
 							throw new Exception(_s('Cannot find item "%1$s" used in screen "%2$s".',
