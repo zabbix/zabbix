@@ -69,11 +69,11 @@ foreach ($this->data['items'] as $item) {
 	$description = array();
 	if (!empty($item['template_host'])) {
 		$description[] = new CLink($item['template_host']['name'], '?hostid='.$item['template_host']['hostid'].'&filter_set=1', 'unknown');
-		$description[] = ':';
+		$description[] = ':'.SPACE;
 	}
 	if (!empty($item['discoveryRule'])) {
 		$description[] = new CLink($item['discoveryRule']['name'], 'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'], 'gold');
-		$description[] = ':'.$item['name_expanded'];
+		$description[] = ':'.SPACE.$item['name_expanded'];
 	}
 	else {
 		$description[] = new CLink($item['name_expanded'], '?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']);
@@ -123,8 +123,7 @@ foreach ($this->data['items'] as $item) {
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-				$triggerDescription[] = new CLink($realHost['name'], 'triggers.php?&hostid='.
-					$realHost['hostid'], 'unknown');
+				$triggerDescription[] = new CLink($realHost['name'], 'triggers.php?&hostid='.$realHost['hostid'], 'unknown');
 				$triggerDescription[] = ':';
 			}
 		}

@@ -658,3 +658,5 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	z-index: 10; position: absolute;
 	background: url('../images/general/transparent.png') repeat scroll center top transparent;
 }
+
+.preloader { width: 80px; height: 12px; }

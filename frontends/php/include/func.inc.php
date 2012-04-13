@@ -33,7 +33,7 @@ function jsRedirect($url, $timeout = null) {
 
 	$script = '';
 	if (is_numeric($timeout)) {
-		$script .= 'setTimeout(\'window.location="'.$url.'"\','.($timeout * 1000).')';
+		$script .= 'setTimeout(\'window.location="'.$url.'"\', '.($timeout * 1000).')';
 	}
 	else {
 		$script .= 'window.location.replace("'.$url.'");';
@@ -43,6 +43,21 @@ function jsRedirect($url, $timeout = null) {
 
 function get_request($name, $def = null) {
 	return isset($_REQUEST[$name]) ? $_REQUEST[$name] : $def;
+}
+
+function countRequest($str = null) {
+	if (!empty($str)) {
+		$count = 0;
+		foreach ($_REQUEST as $name => $value) {
+			if (strstr($name, $str)) {
+				$count++;
+			}
+		}
+		return $count;
+	}
+	else {
+		return count($_REQUEST);
+	}
 }
 
 /************ COOKIES ************/
@@ -1411,7 +1426,7 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 	$url = $link->getUrl();
 
 	if ($page['type'] != PAGE_TYPE_HTML && defined('ZBX_PAGE_MAIN_HAT')) {
-		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');";
+		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."', '".$url."');";
 	}
 	else {
 		$script = "javascript: redirect('".$url."');";
@@ -1600,7 +1615,7 @@ function add_doll_objects($ref_tab, $pmid = 'mainpage') {
 	foreach ($ref_tab as $id => $doll) {
 		$upd_script[$doll['id']] = format_doll_init($doll);
 	}
-	zbx_add_post_js('initPMaster('.zbx_jsvalue($pmid).','.zbx_jsvalue($upd_script).');');
+	zbx_add_post_js('initPMaster('.zbx_jsvalue($pmid).', '.zbx_jsvalue($upd_script).');');
 }
 
 function format_doll_init($doll) {
@@ -1645,7 +1660,7 @@ function make_refresh_menu($pmid, $dollid, $cur_interval, $params = null, &$menu
 	foreach ($intervals as $key => $value) {
 		$menu['menu_'.$dollid][] = array(
 			$key,
-			'javascript: setRefreshRate('.zbx_jsvalue($pmid).','.zbx_jsvalue($dollid).','.$value.','.zbx_jsvalue($params).');'.
+			'javascript: setRefreshRate('.zbx_jsvalue($pmid).', '.zbx_jsvalue($dollid).', '.$value.', '.zbx_jsvalue($params).');'.
 			'void(0);',
 			null,
 			array('outer' => ($value == $cur_interval) ? 'pum_b_submenu' : 'pum_o_submenu', 'inner' => array('pum_i_submenu')
