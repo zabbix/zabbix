@@ -749,7 +749,7 @@ function getRandomId(remember) {
 	if (typeof remember === 'undefined') {
 		this.generated.push(id);
 	}
-	return id;
+	return id.toString();
 }
 
 /**

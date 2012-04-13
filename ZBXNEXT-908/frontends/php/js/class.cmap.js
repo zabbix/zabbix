@@ -789,7 +789,7 @@ ZABBIX.apps.map = (function() {
 			 * @param {Boolean} unsetUndefined if true, all fields that are not in data parameter will be removed from element
 			 */
 			update: function(data, unsetUndefined) {
-				var	fieldName,
+				var fieldName,
 					dataFelds = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',

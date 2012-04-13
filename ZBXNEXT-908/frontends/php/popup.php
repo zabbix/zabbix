@@ -1166,18 +1166,17 @@ elseif ($srctbl == 'prototypes') {
 	}
 	$table->setHeader($header);
 
-	$options = array(
+	$items = API::Item()->get(array(
 		'nodeids' => $nodeid,
 		'selectHosts' => array('host'),
 		'discoveryids' => get_request('parent_discoveryid'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
-	);
-	$items = API::Item()->get($options);
+	));
 	order_result($items, 'name');
 
-	foreach ($items as $item) {
+	foreach ($items as &$item) {
 		$host = reset($item['hosts']);
 
 		$description = new CSpan(itemName($item), 'link');
@@ -1221,6 +1220,8 @@ elseif ($srctbl == 'prototypes') {
 
 		insert_js('var popupReference = '.zbx_jsvalue($items, true).';');
 	}
+	unset($items);
+
 	zbx_add_post_js('chkbxRange.pageGoName = "items";');
 
 	$form->addItem($table);
