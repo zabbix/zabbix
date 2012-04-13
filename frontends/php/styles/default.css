@@ -579,11 +579,13 @@ table.msgok tr td {color:#333; text-align:center; }
 table.msgok tr td.clr {width: 60px; background-color:#44CC44; font-weight: bold; }
 table.msgok tr td.msg_main {height: 26px; font-size: 1.1em; }
 table.msgok tr td.msg {background-color: #BBFFBB; }
-table.msgerr { width: 100%; border: 1px #CC4444 solid; }
+table.msgerr { width: 100%; border: 1px #CC4444 solid; table-layout: fixed; }
 table.msgerr tr td {color:#333; text-align: center; }
 table.msgerr tr td.clr { width: 60px; background-color:#CC4444; font-weight: bold; }
 table.msgerr tr td.msg_main { height: 26px; font-size: 1.1em; }
 table.msgerr tr td.msg { background-color: #FFBBBB; }
+table.msgerr tr td.msg ul.messages { padding-right: 1em; }
+table.msgerr tr td.msg ul.messages li { word-wrap: break-word; }
 
 /* requirements */
 table.requirements { text-align: left; border-spacing: 1px; }
