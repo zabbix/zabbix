@@ -174,7 +174,6 @@
 			// if no item type is selected, reset the interfaces to default
 			if (!jQuery('#type_visible').is(':checked')) {
 				organizeInterfaces(itemTypeInterface(<?php echo CJs::encodeJson($data['initial_item_type']) ?>));
-				displayKeyButton();
 			}
 			else {
 				jQuery('#type').trigger('change');
