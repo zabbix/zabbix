@@ -404,7 +404,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_show_max', '100000');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
 
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
 
