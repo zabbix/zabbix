@@ -171,6 +171,24 @@ function item_status2style($status) {
 	}
 }
 
+/**
+ * Returns the name of the given interface type.
+ *
+ * @param int $type
+ *
+ * @return null
+ */
+function interfaceType2str($type) {
+	$interfaceGroupLabels = array(
+		INTERFACE_TYPE_AGENT => _('Agent'),
+		INTERFACE_TYPE_SNMP => _('SNMP'),
+		INTERFACE_TYPE_JMX => _('JMX'),
+		INTERFACE_TYPE_IPMI => _('IPMI'),
+	);
+
+	return isset($interfaceGroupLabels[$type]) ? $interfaceGroupLabels[$type] : null;
+}
+
 function itemTypeInterface($type = null) {
 	$types = array(
 		ITEM_TYPE_SNMPV1 => INTERFACE_TYPE_SNMP,
@@ -194,57 +212,6 @@ function itemTypeInterface($type = null) {
 	else {
 		return false;
 	}
-}
-
-function update_item_in_group($groupid, $itemid, $item) {
-	$db_items = DBSelect(
-		'SELECT i.itemid,i.hostid'.
-		' FROM hosts_groups hg,items i'.
-		' WHERE hg.groupid='.$groupid.
-			' and i.key_='.zbx_dbstr($item['key_']).
-			' and hg.hostid=i.hostid'
-	);
-	while ($row = DBfetch($db_items)) {
-		$item['hostid'] = $row['hostid'];
-		API::Item()->update($row['itemid'], $item);
-	}
-	return true;
-}
-
-function delete_item_from_group($groupid, $itemid) {
-	if (!isset($itemid)) {
-		return false;
-	}
-
-	$item = get_item_by_itemid($itemid);
-	if (!$item) {
-		return false;
-	}
-
-	$del_items = array();
-	$db_items = DBSelect(
-		'SELECT i.itemid'.
-		' FROM hosts_groups hg,items i'.
-		' WHERE hg.groupid='.$groupid.
-			' AND i.key_='.zbx_dbstr($item['key_']).
-			' AND hg.hostid=i.hostid'
-	);
-	while ($row = DBfetch($db_items)) {
-		$del_items[$row['itemid']] = $row['itemid'];
-	}
-	if (!empty($del_items)) {
-		API::Item()->delete($del_items);
-	}
-	return true;
-}
-
-function add_item_to_group($groupid, $item) {
-	$db_hostgroups = DBSelect('SELECT hg.hostid FROM hosts_groups hg WHERE hg.groupid='.$groupid);
-	while ($row = DBfetch($db_hostgroups)) {
-		$item['hostid'] = $row['hostid'];
-		API::Item()->create($item);
-	}
-	return true;
 }
 
 function update_item_status($itemids, $status) {
