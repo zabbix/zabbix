@@ -26,30 +26,34 @@ $page['file'] = 'chart5.php';
 $page['type'] = PAGE_TYPE_IMAGE;
 
 include_once('include/page_header.php');
-?>
-<?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'serviceid' => array(T_ZBX_INT, O_MAND,P_SYS, DB_ID, null)
+	'serviceid' => array(T_ZBX_INT, O_MAND, P_SYS, DB_ID, null)
 );
 check_fields($fields);
 
+/*
+ * Permissions
+ */
 if (!$service = DBfetch(DBselect('SELECT s.* FROM services s WHERE s.serviceid='.$_REQUEST['serviceid'], 1))) {
 	fatal_error(_('No IT services defined.'));
 }
 
 if ($service['triggerid']) {
-	$options = array(
+	$db_data = API::Trigger()->get(array(
 		'triggerids' => $service['triggerid'],
 		'output' => API_OUTPUT_SHORTEN,
 		'nodeids' => get_current_nodeid(true)
-	);
-	$db_data = API::Trigger()->get($options);
+	));
 	if (empty($db_data)) {
 		access_deny();
 	}
 }
 
+/*
+ * Display
+ */
 $start_time = microtime(true);
 
 $sizeX = 900;
@@ -119,11 +123,11 @@ for ($i = 0; $i < 52; $i++) {
 }
 
 for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
-	DashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gray);
+	dashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gray);
 }
 
 for ($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX / 52) {
-	DashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
+	dashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
 	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 35, $black, zbx_date2str(_('d.M'), $period_start));
 	$period_start += 7 * 24 * 3600;
 }
@@ -190,7 +194,7 @@ $str = sprintf('%0.2f', microtime(true) - $start_time);
 $str = _s('Generated in %s sec', $str);
 $strSize = imageTextSize(6, 0, $str);
 imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $gray, $str);
-ImageOut($im);
+imageOut($im);
 imagedestroy($im);
 
 include_once('include/page_footer.php');

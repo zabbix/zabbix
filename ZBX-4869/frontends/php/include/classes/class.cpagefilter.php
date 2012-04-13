@@ -1,5 +1,27 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2001-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+?>
+<?php
+
 class CPageFilter {
+
 	protected $data = array(); // groups, hosts, ...
 	protected $ids = array(); // groupid, hostid, ...
 	protected $isSelected = array(); // hostsSelected, groupsSelected, ...
@@ -268,7 +290,7 @@ class CPageFilter {
 			$def_options = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('hostid', 'name'),
-				'groupids' => $this->groupid > 0 ? $this->groupid : null
+				'groupids' => ($this->groupid > 0) ? $this->groupid : null
 			);
 			$options = zbx_array_merge($def_options, $options);
 			$hosts = API::Host()->get($options);
@@ -312,8 +334,8 @@ class CPageFilter {
 			$def_ptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $this->groupid > 0 && $this->hostid == 0 ? $this->groupid : null,
-				'hostids' => $this->hostid > 0 ? $this->hostid : null
+				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
+				'hostids' => ($this->hostid > 0) ? $this->hostid : null
 			);
 			$options = zbx_array_merge($def_ptions, $options);
 			$graphs = API::Graph()->get($options);
@@ -368,8 +390,8 @@ class CPageFilter {
 			$def_ptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $this->groupid > 0 && $this->hostid == 0 ? $this->groupid : null,
-				'hostids' => $this->hostid > 0 ? $this->hostid : null
+				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
+				'hostids' => ($this->hostid > 0) ? $this->hostid : null
 			);
 			$options = zbx_array_merge($def_ptions, $options);
 			$triggers = API::Trigger()->get($options);

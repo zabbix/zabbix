@@ -89,18 +89,18 @@ function prepare_url(&$var, $varname = null) {
 	return $result;
 }
 
-function url_param($param, $request = true, $name = null) {
+function url_param($param, $isRequest = true, $name = null) {
 	$result = '';
 	if (!is_array($param)) {
 		if (is_null($name)) {
-			if (!$request) {
-				fatal_error('not request variable require url name [url_param]');
+			if (!$isRequest) {
+				fatal_error(_('Not request variable require.'));
 			}
 			$name = $param;
 		}
 	}
 
-	if ($request) {
+	if ($isRequest) {
 		$var =& $_REQUEST[$param];
 	}
 	else {
@@ -357,7 +357,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$description = '';
 	if ($dbHost['proxy_hostid']) {
 		$proxy = get_host_by_hostid($dbHost['proxy_hostid']);
-		$description .= $proxy['host'].':';
+		$description .= $proxy['host'].': ';
 	}
 	$description .= $dbHost['name'];
 
@@ -472,7 +472,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 			}
 			else {
 				$list->addItem(array(
-					new CLink(_('Graph prototypes'), 'graph_prototypes.php?parent_discoveryid='.$dbDiscovery['itemid']),
+					new CLink(_('Graph prototypes'), 'graphs.php?parent_discoveryid='.$dbDiscovery['itemid']),
 					' ('.$dbDiscovery['graphs'].')'
 				));
 			}

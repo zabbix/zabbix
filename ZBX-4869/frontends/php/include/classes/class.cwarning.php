@@ -34,15 +34,15 @@ class CWarning extends CTable {
 		$this->header = $header;
 		$this->message = $message;
 		$this->alignment = null;
-		$this->paddings = false;
+		$this->paddings = null;
 		$this->buttons = array();
 	}
 
-	public function setAlignment($alignment = null) {
+	public function setAlignment($alignment) {
 		$this->alignment = $alignment;
 	}
 
-	public function setPaddings($padding = '') {
+	public function setPaddings($padding) {
 		$this->paddings = $padding;
 	}
 
