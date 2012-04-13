@@ -57,13 +57,6 @@
 	'S_DOT'=>				_('Dot'),
 	'S_DASHED_LINE'=>			_('Dashed line'),
 
-//	class.cchart.php
-	'S_CCHARTS_TIMELINE_START_DATE_FORMAT'=>		_('d.m H:i'),
-	'S_CCHARTS_TIMELINE_END_DATE_FORMAT'=>			_('d.m H:i'),
-	'S_CCHARTS_TIMELINE_MAINPERIOD_HOURS_FORMAT'=>		_('H:i'),
-	'S_CCHARTS_TIMELINE_MAINPERIOD_FULL_DAY_TIME_FORMAT'=>	_('d.m H:i'),
-	'S_CCHARTS_TIMELINE_MAINPERIOD_MONTHDAYS_FORMAT'=>	_('d.m'),
-
 //	config.php
 	'S_DEFAULT'=>					_('Default'),
 	'S_IMAGE'=>					_('Image'),
@@ -152,7 +145,8 @@
 	'S_MAPS_DATE_FORMAT'=>	_('Y.m.d H:i:s'),
 	'S_QUEUE_NODES_DATE_FORMAT'=>		_('d M Y H:i:s'),
 	'S_SHOW'=>				_('Show'),
-	'S_CHART4_TIMELINE_DATE_FORMAT'=>	_('d.M'),
+
+//	chart_bar.php
 	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		_('Y.m.d H:i'),
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),

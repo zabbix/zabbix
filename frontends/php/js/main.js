@@ -853,16 +853,16 @@ function hide_color_picker() {
 	curr_txt = null;
 }
 
-function show_color_picker(name) {
+function show_color_picker(id) {
 	if (!color_picker) {
 		return;
 	}
-	curr_lbl = document.getElementById('lbl_' + name);
-	curr_txt = document.getElementById(name);
+	curr_lbl = document.getElementById('lbl_' + id);
+	curr_txt = document.getElementById(id);
 	var pos = getPosition(curr_lbl);
 	color_picker.x = pos.left;
 	color_picker.y = pos.top;
-	color_picker.style.left = color_picker.x + 'px';
+	color_picker.style.left = (color_picker.x + 20) + 'px';
 	color_picker.style.top = color_picker.y + 'px';
 	color_picker.style.visibility = 'visible';
 }
@@ -889,9 +889,9 @@ function set_color(color) {
 	hide_color_picker();
 }
 
-function set_color_by_name(name, color) {
-	curr_lbl = document.getElementById('lbl_' + name);
-	curr_txt = document.getElementById(name);
+function set_color_by_name(id, color) {
+	curr_lbl = document.getElementById('lbl_' + id);
+	curr_txt = document.getElementById(id);
 	set_color(color);
 }
 
@@ -943,7 +943,7 @@ function change_flicker_state(divid) {
 		switchElementsClass($('flicker_icon_r'), 'dbl_arrow_up', 'dbl_arrow_down');
 	};
 
-	var filter_state = ShowHide(divid);
+	var filter_state = showHide(divid);
 	switchArrows();
 
 	if (false === filter_state) {
@@ -998,7 +998,7 @@ function change_hat_state(icon, divid) {
 		switchElementsClass(icon, 'arrowup', 'arrowdown');
 	};
 
-	var hat_state = ShowHide(divid);
+	var hat_state = showHide(divid);
 	switchIcon();
 
 	if (false === hat_state) {

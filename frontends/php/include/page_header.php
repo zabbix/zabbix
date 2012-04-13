@@ -157,16 +157,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		$config = select_config();
 
 		$css = getUserTheme(CWebUser::$data);
-		switch ($css) {
-			case 'css_od.css':
-				$bodyCSS = 'darkorange';
-				break;
-			case 'css_bb.css':
-				$bodyCSS = 'darkblue';
-				break;
-			default:
-				$bodyCSS = 'originalblue';
-		}
+		$bodyCSS = getUserThemeName($css);
+
 		echo '<style type="text/css">'."\n".
 				'.disaster { background-color: #'.$config['severity_color_5'].' !important; }'."\n".
 				'.high { background-color: #'.$config['severity_color_4'].' !important; }'."\n".
@@ -307,7 +299,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 			$jscript = 'javascript: '.
 				" var pos = getPosition('button_show_tree');".
-				" ShowHide('div_node_tree', 'table');".
+				" showHide('div_node_tree', 'table');".
 				' pos.top += 20;'.
 				" \$('div_node_tree').setStyle({top: pos.top + 'px'});";
 			$button_show_tree = new CButton('show_node_tree', _('Select Nodes'), $jscript);
