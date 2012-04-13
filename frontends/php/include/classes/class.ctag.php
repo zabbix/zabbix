@@ -161,13 +161,13 @@ class CTag extends CObject {
 	}
 
 	public function setAttribute($name, $value) {
-		if (is_object($value)) {
-			$value = unpack_object($value);
-		}
-		elseif (is_array($value)) {
-			$value = CHtml::serialize($value);
-		}
 		if (!is_null($value)) {
+			if (is_object($value)) {
+				$value = unpack_object($value);
+			}
+			elseif (is_array($value)) {
+				$value = CHtml::serialize($value);
+			}
 			$this->attributes[$name] = $value;
 		}
 		else {
