@@ -385,7 +385,8 @@ elseif (isset($_REQUEST['form'])) {
 		'graphid' => get_request('graphid', 0),
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'group_gid' => get_request('group_gid', array()),
-		'hostid' => get_request('hostid', array()),
+		'hostid' => get_request('hostid', 0),
+		'is_template' => isTemplatedHost(get_request('hostid', 0)),
 		'normal_only' => get_request('normal_only')
 	);
 
@@ -568,7 +569,6 @@ else {
 		$options['selectHosts'] = array('name');
 		$options['selectTemplates'] = array('name');
 	}
-
 	$data['graphs'] = !empty($_REQUEST['parent_discoveryid'])
 		? API::GraphPrototype()->get($options)
 		: API::Graph()->get($options);

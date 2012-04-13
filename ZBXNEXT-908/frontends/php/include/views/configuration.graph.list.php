@@ -25,8 +25,8 @@ $graphWidget = new CWidget();
 $createForm = new CForm('get');
 $createForm->cleanItems();
 if (!empty($this->data['parent_discoveryid'])) {
-	$createForm->addItem(new CSubmit('form', _('Create graph prototype')));
 	$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
+	$createForm->addItem(new CSubmit('form', _('Create graph prototype')));
 
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPH PROTOTYPES'), $createForm);
 	$graphWidget->addHeader(array(_('Graph prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
@@ -36,7 +36,14 @@ if (!empty($this->data['parent_discoveryid'])) {
 	}
 }
 else {
-	$createForm->addItem(new CSubmit('form', _('Create graph')));
+	if (!empty($this->data['hostid'])) {
+		$createForm->addItem(new CSubmit('form', _('Create graph')));
+	}
+	else {
+		$createGraphButton = new CSubmit('form', _('Create graph (select host first)'));
+		$createGraphButton->setEnabled(false);
+		$createForm->addItem($createGraphButton);
+	}
 
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPHS'), $createForm);
 
@@ -71,20 +78,25 @@ $graphTable->setHeader(array(
 	make_sorting_header(_('Graph type'), 'graphtype')
 ));
 
-foreach ($data['graphs'] as $graph) {
+foreach ($this->data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
+	$hostidParam = '';
 	$hostList = null;
 	if (empty($this->data['hostid'])) {
 		$hostList = array();
 		foreach ($graph['hosts'] as $host) {
 			$hostList[$host['name']] = $host['name'];
+			$hostidParam = '&hostid='.$host['hostid'];
 		}
 
 		foreach ($graph['templates'] as $template) {
 			$hostList[$template['name']] = $template['name'];
 		}
 		$hostList = implode(', ', $hostList);
+	}
+	else {
+		$hostidParam = url_param('hostid');
 	}
 
 	$isCheckboxEnabled = true;
@@ -95,7 +107,7 @@ foreach ($data['graphs'] as $graph) {
 		$name[] = new CLink($realHosts['name'], 'templates.php?form=update&templateid='.$realHosts['hostid'], 'unknown');
 		$name[] = ':'.SPACE;
 		$name[] = new CLink($graph['name'],
-			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').url_param('hostid'));
+			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').$hostidParam);
 
 		$isCheckboxEnabled = false;
 	}
@@ -107,7 +119,7 @@ foreach ($data['graphs'] as $graph) {
 		$isCheckboxEnabled = false;
 	}
 	else {
-		$name[] = new CLink($graph['name'], 'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').url_param('hostid'));
+		$name[] = new CLink($graph['name'], 'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').$hostidParam);
 	}
 
 	$checkBox = new CCheckBox('group_graphid['.$graphid.']', null, null, $graphid);

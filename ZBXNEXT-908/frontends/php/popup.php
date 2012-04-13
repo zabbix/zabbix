@@ -164,8 +164,8 @@ if (isset($error)) {
 $allowedSrcFields = array(
 	'users'					=> '"usergrpid", "alias", "userid"',
 	'triggers'				=> '"description", "triggerid"',
-	'items'					=> '"itemid", "name", "host_templateid"',
-	'prototypes'			=> '"itemid", "name", "host_templateid", "flags"',
+	'items'					=> '"itemid", "name"',
+	'prototypes'			=> '"itemid", "name", "flags"',
 	'graphs'				=> '"graphid", "name"',
 	'sysmaps'				=> '"sysmapid", "name"',
 	'slides'				=> '"slideshowid"',
@@ -1077,7 +1077,6 @@ elseif ($srctbl == 'items') {
 
 	foreach ($items as $item) {
 		$host = reset($item['hosts']);
-		$item['host_templateid'] = isTemplateInHost($item['hosts']);
 		$item['hostname'] = $host['name'];
 
 		$item['name'] = itemName($item);
@@ -1121,8 +1120,7 @@ elseif ($srctbl == 'items') {
 				'key_' => $item['key_'],
 				'type' => $item['type'],
 				'value_type' => $item['value_type'],
-				'host' => $item['hostname'],
-				'host_templateid' => $item['host_templateid']
+				'host' => $item['hostname']
 			);
 		}
 	}
@@ -1181,7 +1179,6 @@ elseif ($srctbl == 'prototypes') {
 
 	foreach ($items as $item) {
 		$host = reset($item['hosts']);
-		$item['host_templateid'] = isTemplateInHost($item['hosts']);
 
 		$description = new CSpan(itemName($item), 'link');
 		$item['name'] = $host['host'].': '.$item['name'];

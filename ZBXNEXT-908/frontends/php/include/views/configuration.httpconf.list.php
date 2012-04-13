@@ -31,7 +31,7 @@ if ($this->data['hostid'] > 0) {
 }
 else {
 	$createScenarioButton = new CSubmit('form', _('Create scenario (select host first)'));
-	$createScenarioButton->setEnabled('no');
+	$createScenarioButton->setEnabled(false);
 }
 $createForm->addItem($createScenarioButton);
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);

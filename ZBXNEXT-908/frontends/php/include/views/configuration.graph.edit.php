@@ -22,17 +22,11 @@ $graphWidget = new CWidget();
 
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPH PROTOTYPES'));
-
-	if (!empty($this->data['hostid'])) {
-		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
-	}
+	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
 	$graphWidget->addPageHeader(_('CONFIGURATION OF GRAPHS'));
-
-	if (!empty($this->data['hostid'])) {
-		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
-	}
+	$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
 }
 
 // create form
@@ -40,9 +34,7 @@ $graphForm = new CForm();
 $graphForm->setName('graphForm');
 $graphForm->addVar('form', $this->data['form']);
 $graphForm->addVar('form_refresh', $this->data['form_refresh']);
-if (!empty($this->data['hostid'])) {
-	$graphForm->addVar('hostid', $this->data['hostid']);
-}
+$graphForm->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }
@@ -82,12 +74,9 @@ $itemsTable->setHeader(array(
 
 if (!empty($this->data['items'])) {
 	foreach ($this->data['items'] as $number => $item) {
-		$only_hostid = 0;
 		if (!empty($item['itemid'])) {
 			$host = get_host_by_itemid($item['itemid']);
 			$name = $host['name'].': '.itemName(get_item_by_itemid($item['itemid']));
-
-			$only_hostid = ($host['status'] == HOST_STATUS_TEMPLATE) ? $host['hostid'] : -1;
 		}
 		else {
 			$name = _('Select');
@@ -103,7 +92,7 @@ if (!empty($this->data['items'])) {
 
 		insert_js('loadItem('.$number.', '.$item['gitemid'].', '.$this->data['graphid'].', '.$item['itemid'].', '.
 			CJs::encodeJson($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
-			$item['yaxisside'].', \''.$item['color'].'\', '.$only_hostid.', '.$item['flags'].');',
+			$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
 			true
 		);
 	}

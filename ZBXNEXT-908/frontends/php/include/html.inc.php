@@ -357,7 +357,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 	$description = '';
 	if ($dbHost['proxy_hostid']) {
 		$proxy = get_host_by_hostid($dbHost['proxy_hostid']);
-		$description .= $proxy['host'].':';
+		$description .= $proxy['host'].': ';
 	}
 	$description .= $dbHost['name'];
 
