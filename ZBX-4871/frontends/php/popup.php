@@ -321,7 +321,7 @@ if ($monitored_hosts) {
 elseif ($real_hosts) {
 	$options['groups']['real_hosts'] = true;
 }
-elseif ($templated_hosts) {
+else {
 	$options['hosts']['templated_hosts'] = true;
 }
 
