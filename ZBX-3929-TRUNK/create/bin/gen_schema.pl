@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 #
 # Zabbix
 # Copyright (C) 2000-2011 Zabbix SIA
@@ -251,7 +251,7 @@ sub process_table
 sub process_field
 {
 	my $line = $_[0];
-	my ($type, $type_2);
+	my $type_2;
 
 	newstate("field");
 
