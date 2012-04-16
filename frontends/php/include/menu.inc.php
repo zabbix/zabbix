@@ -329,7 +329,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 
 		$menu_class = 'horizontal_menu_n';
 		$sub_menus[$label] = array();
-		foreach ($menu['pages'] as $id => $sub_page) {
+		foreach ($menu['pages'] as $sub_page) {
 			$show_sub_menu = true;
 
 			// show check
@@ -400,7 +400,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page) {
 }
 
 function zbx_define_menu_restrictions($page, $ZBX_MENU) {
-	foreach ($ZBX_MENU as $sid => $section) {
+	foreach ($ZBX_MENU as $section) {
 		foreach ($section['pages'] as $pid => $menu_page) {
 			if ($menu_page['url'] == $page['file'] || (isset($menu_page['sub_pages']) && str_in_array($page['file'], $menu_page['sub_pages']))) {
 				if (isset($section['force_disable_all_nodes']) && !defined('ZBX_NOT_ALLOW_ALL_NODES')) {
