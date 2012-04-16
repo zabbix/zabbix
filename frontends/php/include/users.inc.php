@@ -34,20 +34,6 @@ function getUserTheme($userData) {
 	return $css;
 }
 
-function getUserThemeName($css = null) {
-	if (empty($css)) {
-		$css = getUserTheme(CWebUser::$data);
-	}
-	switch ($css) {
-		case 'css_od.css':
-			return 'darkorange';
-		case 'css_bb.css':
-			return 'darkblue';
-		default:
-			return 'originalblue';
-	}
-}
-
 function user_type2str($user_type = null) {
 	$user_types = array(
 		USER_TYPE_ZABBIX_USER => _('Zabbix User'),
