@@ -148,7 +148,7 @@ class CService extends CZBXAPI {
 			}
 
 			// save parent service
-			if (isset($service['parentid'])) {
+			if (!empty($service['parentid'])) {
 				$dependencies[] = array(
 					'serviceid' => $service['parentid'],
 					'dependsOnServiceid' => $serviceId,
