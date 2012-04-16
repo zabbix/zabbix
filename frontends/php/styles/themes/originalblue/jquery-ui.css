@@ -11,7 +11,7 @@
 /* Layout helpers
 ----------------------------------*/
 .originalblue .ui-helper-hidden { display: none; }
-.originalblue .ui-helper-hidden-accessible { position: absolute !important; clip: rect(1px 1px 1px 1px); clip: rect(1px,1px,1px,1px); }
+.originalblue .ui-helper-hidden-accessible { position: absolute !important; clip: rect(1px 1px 1px 1px); }
 .originalblue .ui-helper-reset { margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }
 .originalblue .ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 .originalblue .ui-helper-clearfix { display: inline-block; }
@@ -425,7 +425,7 @@ input.ui-button { padding: .3em 1em; }
 .originalblue .ui-button-text-icons .ui-button-icon-secondary, .originalblue .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
 
 /*button sets*/
-.originalblue .ui-buttonset .ui-button { margin-left: 0; margin-right: -.4em; }
+.originalblue .ui-buttonset .ui-button { margin-left: 0; margin-right: 0; }
 
 /* workarounds */
 button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */

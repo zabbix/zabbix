@@ -608,10 +608,13 @@ elseif (isset($_REQUEST['form'])) {
 
 	if ($hostid = get_request('hostid', 0)) {
 		$hosts_wdgt->addItem(get_header_host_table('', $_REQUEST['hostid']));
+		$hosts_wdgt->setRootClass('host-edit');
 	}
+		$hosts_wdgt->setRootClass('host-list');
 
 	$hostForm = new CView('configuration.host.edit');
 	$hosts_wdgt->addItem($hostForm->render());
+	$hosts_wdgt->setRootClass('host-edit');
 }
 else {
 	$frmForm = new CForm();
@@ -633,9 +636,10 @@ else {
 
 	$hosts_wdgt->addHeader(_('Hosts'), $frmGroup);
 	$hosts_wdgt->addHeaderRowNumber();
+	$hosts_wdgt->setRootClass('host-list');
 
 // HOSTS FILTER {{{
-	$filter_table = new CTable('', 'filter_config');
+	$filter_table = new CTable('', 'filter');
 	$filter_table->addRow(array(
 		array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
 		array(array(bold(_('DNS')), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),

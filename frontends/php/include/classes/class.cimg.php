@@ -110,7 +110,7 @@ class CImg extends CTag {
 
 		$this->addClass('preloader');
 		$this->setAttribute('id', $id.'preloader');
-		$this->setAttribute('src', 'styles/'.getUserThemeName().'/images/preloader.gif');
+		$this->setAttribute('src', 'styles/themes/'.getUserTheme(CWebUser::$data).'/images/preloader.gif');
 	}
 }
 ?>

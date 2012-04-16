@@ -36,6 +36,10 @@ require_once dirname(__FILE__).'/menu.inc.php';
 
 zbx_define_menu_restrictions($page, $ZBX_MENU);
 
+if (!defined('ZBX_PAGE_NO_THEME')) {
+	define('ZBX_PAGE_NO_THEME', false);
+}
+
 // init CURRENT NODE ID
 init_nodes();
 switch ($page['type']) {
@@ -151,25 +155,25 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		<link rel="shortcut icon" href="images/general/zabbix.ico" />
 		<link rel="stylesheet" type="text/css" href="css.css" />
 <?php
-	$css = 'css_ob.css';
-	$bodyCSS = 'originalblue';
-	if (!empty($DB['DB'])) {
-		$config = select_config();
+	$css = false;
+	if (!ZBX_PAGE_NO_THEME) {
+		$css = ZBX_DEFAULT_THEME;
+		if (!empty($DB['DB'])) {
+			$config = select_config();
 
-		$css = getUserTheme(CWebUser::$data);
-		$bodyCSS = getUserThemeName($css);
-
-		echo '<style type="text/css">'."\n".
-				'.disaster { background-color: #'.$config['severity_color_5'].' !important; }'."\n".
-				'.high { background-color: #'.$config['severity_color_4'].' !important; }'."\n".
-				'.average { background-color: #'.$config['severity_color_3'].' !important; }'."\n".
-				'.warning { background-color: #'.$config['severity_color_2'].' !important; }'."\n".
-				'.information { background-color: #'.$config['severity_color_1'].' !important; }'."\n".
-				'.not_classified { background-color: #'.$config['severity_color_0'].' !important; }'."\n".
-				'.trigger_unknown { background-color: #DBDBDB !important; }'."\n".
-			'</style>';
+			$css = getUserTheme(CWebUser::$data);
+			echo '<style type="text/css">'."\n".
+					'.disaster { background-color: #'.$config['severity_color_5'].' !important; }'."\n".
+					'.high { background-color: #'.$config['severity_color_4'].' !important; }'."\n".
+					'.average { background-color: #'.$config['severity_color_3'].' !important; }'."\n".
+					'.warning { background-color: #'.$config['severity_color_2'].' !important; }'."\n".
+					'.information { background-color: #'.$config['severity_color_1'].' !important; }'."\n".
+					'.not_classified { background-color: #'.$config['severity_color_0'].' !important; }'."\n".
+					'.trigger_unknown { background-color: #DBDBDB !important; }'."\n".
+				'</style>';
+		}
+		echo '<link rel="stylesheet" type="text/css" href="styles/themes/'.$css.'/main.css" />'."\n";
 	}
-	echo '<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n";
 
 	if ($page['file'] == 'sysmap.php') {
 		echo '<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&amp;output=css" />';
@@ -197,7 +201,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	}
 </script>
 </head>
-<body class="<?php echo $bodyCSS; ?>">
+<body <?php if($css) echo 'class="'.$css.'"' ?>>
 <?php
 }
 

@@ -22,28 +22,43 @@
 
 class CWidget {
 
-	public $domid;
 	public $state;
 	public $flicker_state;
 	private $css_class;
 	private $pageHeaders;
 	private $headers;
-	private $flicker;
+	private $flicker = array();
 
-	public function __construct($id = null, $body = null, $state = null) {
-		if (is_null($id)) {
+	/**
+	 * The contents of the body of the widget.
+	 *
+	 * @var array
+	 */
+	protected $body = array();
+
+	/**
+	 * The class of the root div element.
+	 *
+	 * @var string
+	 */
+	protected $rootClass;
+
+	/**
+	 * The ID of the div, containing the body of the widget.
+	 *
+	 * @var string
+	 */
+	protected $bodyId;
+
+	public function __construct($bodyId = null, $rootClass = null) {
+		if (is_null($bodyId)) {
 			list($usec, $sec) = explode(' ', microtime());
-			$id = 'widget_'.(int)($sec % 10).(int)($usec * 1000);
+			$bodyId = 'widget_'.(int)($sec % 10).(int)($usec * 1000);
 		}
-		$this->domid = $id;
-		$this->state = $state; // 0 - closed, 1 - opened
+		$this->bodyId = $bodyId;
 		$this->flicker_state = 1; // 0 - closed, 1 - opened
 		$this->css_class = is_null($this->state) ? 'header_wide' : 'header';
-		$this->pageHeaders = null;
-		$this->headers = null;
-		$this->flicker = array();
-		$this->body = array();
-		$this->addItem($body);
+		$this->setRootClass($rootClass);
 	}
 
 	public function setClass($class = null) {
@@ -99,7 +114,7 @@ class CWidget {
 			$this->state = true;
 		}
 		if (!empty($this->flicker)) {
-			$flicker_domid = 'flicker_'.$this->domid;
+			$flicker_domid = 'flicker_'.$this->bodyId;
 			$flicker_tab = new CTable();
 			$flicker_tab->setAttribute('width', '100%');
 			$flicker_tab->setCellPadding(0);
@@ -129,12 +144,13 @@ class CWidget {
 			$widget[] = $flicker_tab;
 		}
 		$div = new CDiv($this->body, 'w');
-		$div->setAttribute('id', $this->domid);
+		$div->setAttribute('id', $this->bodyId);
 		if (!$this->state) {
 			$div->setAttribute('style', 'display: none;');
 		}
 		$widget[] = $div;
-		return $widget;
+
+		return new CDiv($widget, $this->getRootClass());
 	}
 
 	public function show() {
@@ -204,8 +220,8 @@ class CWidget {
 			}
 		}
 		if (!is_null($this->state)) {
-			$icon = new CIcon(_('Show').'/'._('Hide'), ($this->state ? 'arrowup' : 'arrowdown'), "change_hat_state(this, '".$this->domid."');");
-			$icon->setAttribute('id', $this->domid.'_icon');
+			$icon = new CIcon(_('Show').'/'._('Hide'), ($this->state ? 'arrowup' : 'arrowdown'), "change_hat_state(this, '".$this->bodyId."');");
+			$icon->setAttribute('id', $this->bodyId.'_icon');
 			$right_row[] = new CCol($icon);
 		}
 
@@ -261,6 +277,14 @@ class CWidget {
 			$table->addRow($td_c);
 		}
 		return $table;
+	}
+
+	public function setRootClass($rootClass) {
+		$this->rootClass = $rootClass;
+	}
+
+	public function getRootClass() {
+		return $this->rootClass;
 	}
 }
 ?>

@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-$itemsWidget = new CWidget();
+$itemsWidget = new CWidget(null, 'item-list');
 
 // create new item button
 $createForm = new CForm('get');
