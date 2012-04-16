@@ -20,6 +20,7 @@
 ?>
 <?php
 class API {
+
 	const RETURN_TYPE_API = 'api';
 	const RETURN_TYPE_RPC = 'rpc';
 
@@ -73,7 +74,7 @@ class API {
 		'usergroup' => 'CUserGroup',
 		'usermacro' => 'CUserMacro',
 		'usermedia' => 'CUserMedia',
-		'webcheck' => 'CWebCheck',
+		'webcheck' => 'CWebCheck'
 	);
 
 	/**

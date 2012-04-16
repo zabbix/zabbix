@@ -195,6 +195,7 @@ frontends/php/locale/tr/LC_MESSAGES/frontend.po -text
 frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
+frontends/php/styles/darkblue/images/preloader.gif -text
 frontends/php/styles/darkblue/images/ui-bg_flat_0_aaaaaa_40x100.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-bg_flat_100_1d92cd_40x100.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-bg_flat_10_aaaaaa_40x100.png -text svneol=unset#image/png
@@ -208,6 +209,7 @@ frontends/php/styles/darkblue/images/ui-icons_4b8e0b_256x240.png -text
 frontends/php/styles/darkblue/images/ui-icons_77b7da_256x240.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-icons_a83300_256x240.png -text svneol=unset#image/png
 frontends/php/styles/darkblue/images/ui-icons_ffffff_256x240.png -text
+frontends/php/styles/darkorange/images/preloader.gif -text
 frontends/php/styles/darkorange/images/ui-bg_flat_25_1f1f1f_40x100.png -text
 frontends/php/styles/darkorange/images/ui-bg_flat_30_cccccc_40x100.png -text
 frontends/php/styles/darkorange/images/ui-bg_flat_50_5c5c5c_40x100.png -text
@@ -220,6 +222,7 @@ frontends/php/styles/darkorange/images/ui-icons_000000_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_a83300_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_dfdfdf_256x240.png -text
 frontends/php/styles/darkorange/images/ui-icons_ff5500_256x240.png -text
+frontends/php/styles/originalblue/images/preloader.gif -text
 frontends/php/styles/originalblue/images/ui-bg_flat_0_999999_40x100.png -text
 frontends/php/styles/originalblue/images/ui-bg_flat_0_c9c9c9_40x100.png -text
 frontends/php/styles/originalblue/images/ui-bg_flat_100_fef1ec_40x100.png -text

@@ -38,12 +38,18 @@ $paramsFieldName = getParamFieldNameByType(get_request('type', 0));
 $fields = array(
 	'description_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'type_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'interface_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'community_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'securityname_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'securitylevel_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'authpassphrase_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'privpassphras_visible' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'port_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'authtype_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'username_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'publickey_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'privatekey_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'password_visible' =>	    array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'value_type_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'data_type_visible' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'units_visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -689,7 +695,9 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 		'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),
 		'snmpv3_privpassphrase' => get_request('snmpv3_privpassphrase', ''),
 		'formula' => get_request('formula', '1'),
-		'logtimefmt' => get_request('logtimefmt', '')
+		'logtimefmt' => get_request('logtimefmt', ''),
+		'initial_item_type' => null,
+		'multiple_interface_types' => false
 	);
 
 	// hosts
@@ -700,6 +708,20 @@ elseif ($_REQUEST['go'] == 'massupdate' || isset($_REQUEST['massupdate']) && iss
 	$data['is_multiple_hosts'] = count($data['hosts']) > 1;
 	if (!$data['is_multiple_hosts']) {
 		$data['hosts'] = reset($data['hosts']);
+
+		// set the initial chosen interface to one of the interfaces the items use
+		$items = API::Item()->get(array(
+			'itemids' => zbx_objectValues($data['hosts']['items'], 'itemid'),
+			'output' => array('itemid', 'type')
+		));
+		$usedInterfacesTypes = array();
+		foreach ($items as $item) {
+			$usedInterfacesTypes[$item['type']] = itemTypeInterface($item['type']);
+		}
+		$initialItemType = min(array_keys($usedInterfacesTypes));
+		$data['type'] = (get_request('type') !== null) ? ($data['type']) : $initialItemType;
+		$data['initial_item_type'] = $initialItemType;
+		$data['multiple_interface_types'] = (count(array_unique($usedInterfacesTypes)) > 1);
 	}
 
 	// application
