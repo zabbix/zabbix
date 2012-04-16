@@ -30,6 +30,9 @@ $page['file'] = 'setup.php';
 if(!defined('PAGE_HEADER_LOADED'))
 	define('ZBX_PAGE_NO_MENU', 1);
 
+// don't load any themes for this page
+define('ZBX_PAGE_NO_THEME', true);
+
 ?>
 <?php
 	$fields=array(

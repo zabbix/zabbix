@@ -240,7 +240,7 @@
 					<td colspan="2">
 						<fieldset>
 							<legend><?php echo _('Link indicators'); ?></legend>
-							<table class="gridTable">
+							<table>
 								<thead>
 								<tr>
 									<td><?php echo _('Triggers'); ?></td>
@@ -253,7 +253,7 @@
 								<tfoot>
 								<tr>
 									<td colspan="4">
-										<input type="button" name="Add" value="<?php echo _('Add'); ?>" class="input button link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1');">
+										<span class="link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1');"><?php echo _('Add'); ?></span>
 									</td>
 								</tr>
 								</tfoot>

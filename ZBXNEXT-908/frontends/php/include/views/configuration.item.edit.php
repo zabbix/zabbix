@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-$itemWidget = new CWidget('item-edit');
+$itemWidget = new CWidget();
 
 if (!empty($this->data['hostid'])) {
 	if (!empty($this->data['parent_discoveryid'])) {

@@ -2,6 +2,7 @@
 Changes for 2.0.0rc3
 
 New features:
+..F.I..... [ZBX-3721] design improvements (Pavels)
 A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
 ...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBXNEXT-1153] added support for nested templates in import (Vedmak)
