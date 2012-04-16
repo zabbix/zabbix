@@ -57,7 +57,7 @@ foreach ($this->data['db_pservices'] as $db_service) {
 		self.close();
 		return false;'
 	);
-	$servicesParentTable->addRow(array(array($prefix, $description), algorithm2str($db_service['algorithm']), $db_service['trigger']));
+	$servicesParentTable->addRow(array(array($prefix, $description), serviceAlgorythm($db_service['algorithm']), $db_service['trigger']));
 }
 $column = new CCol(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 $column->setAttribute('style', 'text-align:right;');

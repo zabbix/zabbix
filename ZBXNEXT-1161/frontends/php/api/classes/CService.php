@@ -499,7 +499,7 @@ class CService extends CZBXAPI {
 	 */
 	public function deleteTimes($serviceIds) {
 		$serviceIds = zbx_toArray($serviceIds);
-		$this->validatedeleteTimes($serviceIds);
+		$this->validateDeleteTimes($serviceIds);
 
 		DB::delete('services_times', array(
 			'serviceid' =>  $serviceIds
@@ -579,12 +579,7 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkAlgorithm(array $service) {
-		$algorithms = array(
-			SERVICE_ALGORITHM_MAX,
-			SERVICE_ALGORITHM_MIN,
-			SERVICE_ALGORITHM_NONE
-		);
-		if (!isset($service['algorithm']) || !in_array((int) $service['algorithm'], $algorithms, true)) {
+		if (!isset($service['algorithm']) || !serviceAlgorythm($service['algorithm'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect algorithm for service "%1$s".', $service['name']));
 		}
 	}
@@ -599,7 +594,11 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkShowSla(array $service) {
-		if (!isset($service['showsla']) || !in_array((int) $service['showsla'], array(0, 1), true)) {
+		$showSlaValues = array(
+			SERVICE_SHOW_SLA_OFF => true,
+			SERVICE_SHOW_SLA_ON => true,
+		);
+		if (!isset($service['showsla']) || !isset($showSlaValues[$service['showsla']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect calculate SLA value for service "%1$s".', $service['name']));
 		}
 	}
@@ -709,10 +708,8 @@ class CService extends CZBXAPI {
 				$triggerIds[] = $service['triggerid'];
 			}
 		}
-		if ($triggerIds) {
-			if (!API::Trigger()->isReadable($triggerIds)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-			}
+		if (!API::Trigger()->isReadable($triggerIds)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
@@ -964,6 +961,4 @@ class CService extends CZBXAPI {
 
 		return $result;
 	}
-
-
 }
