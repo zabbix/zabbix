@@ -48,9 +48,7 @@ $servicesFormList->addRow(_('Parent service'), array(
 
 // append algorithm to form list
 $algorithmComboBox = new CComboBox('algorithm', $this->data['algorithm']);
-foreach (array(SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE) as $value) {
-	$algorithmComboBox->addItem($value, algorithm2str($value));
-}
+$algorithmComboBox->addItems(serviceAlgorythm());
 $servicesFormList->addRow(_('Status calculation algorithm'), $algorithmComboBox);
 
 // append SLA to form list

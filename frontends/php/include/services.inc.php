@@ -340,16 +340,22 @@ function get_service_by_serviceid($serviceid) {
 	return $row;
 }
 
-function algorithm2str($algorithm) {
-	switch ($algorithm) {
-		case SERVICE_ALGORITHM_NONE:
-			return _('Do not calculate');
-		case SERVICE_ALGORITHM_MAX:
-			return _('Problem, if at least one child has a problem');
-		case SERVICE_ALGORITHM_MIN:
-			return _('Problem, if all children have problems');
+function serviceAlgorythm($algorythm = null) {
+	$algorythms = array(
+		SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
+		SERVICE_ALGORITHM_MIN => _('Problem, if all children have problems'),
+		SERVICE_ALGORITHM_NONE => _('Do not calculate')
+	);
+
+	if ($algorythm === null) {
+		return $algorythms;
 	}
-	return _('Unknown');
+	elseif (isset($algorythms[$algorythm])) {
+		return $algorythms[$algorythm];
+	}
+	else {
+		return false;
+	}
 }
 
 function get_service_childs($serviceid, $soft = 0) {
@@ -371,7 +377,7 @@ function get_service_childs($serviceid, $soft = 0) {
 function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $parentid = 0, $soft = 0, $linkid = '') {
 	$rows = $services[$id];
 	if ($rows['serviceid'] > 0 && $rows['caption'] != 'root') {
-		$rows['algorithm'] = algorithm2str($rows['algorithm']);
+		$rows['algorithm'] = serviceAlgorythm($rows['algorithm']);
 	}
 
 	$rows['parentid'] = $parentid;
