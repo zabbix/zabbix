@@ -63,7 +63,7 @@ class CComboBox extends CTag {
 	}
 
 	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes') {
-		if (is_object($value) && zbx_strtolower(get_class($value)) == 'ccomboitem') {
+		if ($value instanceof CComboItem || $value instanceof COptGroup) {
 			parent::addItem($value);
 		}
 		else {

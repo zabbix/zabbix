@@ -76,7 +76,7 @@ function call_triggerlog_menu(evnt, id, name, menu_options) {
 			[
 				[name, null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],
 				[tname, "javascript: openWinCentered('tr_logform.php?sform=1&itemid=" + id + "', 'ServiceForm', 760, 540, 'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}]
-			],140);
+			], 140);
 	}
 	return false;
 }
@@ -205,7 +205,7 @@ function add_logexpr() {
 	tr.appendChild(td);
 
 	var url = document.createElement('a');
-	url.setAttribute('href', 'javascript: if (confirm("' + locale['S_DELETE_EXPRESSION_Q'] + '")) { remove_expression("logtr'+logexpr_count+'"); }');
+	url.setAttribute('href', 'javascript: if (confirm("' + locale['S_DELETE_EXPRESSION_Q'] + '")) { remove_expression("logtr' + logexpr_count + '"); }');
 	url.setAttribute(classattr, 'action');
 	url.appendChild(document.createTextNode(locale['S_DELETE']));
 
@@ -244,7 +244,7 @@ function remove_expression(expr_id) {
 function getIdFromNodeId(id) {
 	if (typeof(id) == 'string') {
 		var reg = /logtr([0-9])/i;
-		id = parseInt(id.replace(reg, "$1"));
+		id = parseInt(id.replace(reg, '$1'));
 	}
 	if (typeof(id) == 'number') {
 		return id;
@@ -308,8 +308,8 @@ function swapNodesNames(n1, n2) {
 	var id2 = n2.id;
 	if (is_string(id1) && is_string(id2)) {
 		var reg = /logtr([0-9])/i;
-		id1 = parseInt(id1.replace(reg, "$1"));
-		id2 = parseInt(id2.replace(reg, "$1"));
+		id1 = parseInt(id1.replace(reg, '$1'));
+		id2 = parseInt(id2.replace(reg, '$1'));
 	}
 
 	if (is_number(id1) && is_number(id2)) {
@@ -425,7 +425,7 @@ function add_keyword_or() {
 function getIdFromNodeKeyId(id) {
 	if (typeof(id) == 'string') {
 		var reg = /keytr([0-9])/i;
-		id = parseInt(id.replace(reg, "$1"));
+		id = parseInt(id.replace(reg, '$1'));
 	}
 	if (typeof(id) == 'number') {
 		return id;
@@ -517,7 +517,7 @@ function set_macro(v) {
  * Graph related stuff
  */
 var graphs = {
-		graphtype : 0,
+	graphtype : 0,
 
 	submit : function(obj) {
 		if (obj.name == 'graphtype') {
@@ -569,7 +569,7 @@ function cloneRow(elementid, count) {
 	$(newEntry).descendants().each(function(e) {
 		e.removeAttribute('disabled');
 	});
-	newEntry.setAttribute('id', 'entry_'+cloneRow.count);
+	newEntry.setAttribute('id', 'entry_' + cloneRow.count);
 	newEntry.style.display = '';
 }
 
@@ -732,4 +732,98 @@ function validateNumericBox(obj, allowempty, allownegative) {
  */
 function t(str) {
 	return (!!locale[str]) ? locale[str] : str;
+}
+
+function getRandomId(remember) {
+	var id;
+
+	if (typeof this.generated === 'undefined') {
+		this.generated = [];
+	}
+	id = Math.floor(Math.random() * 10000000);
+
+	if (this.generated.indexOf(id) > -1) {
+		id = getRandomId(false);
+	}
+
+	if (typeof remember === 'undefined') {
+		this.generated.push(id);
+	}
+	return id.toString();
+}
+
+/**
+ * Color palette, (implementation from PHP)
+ */
+var prevColor = {'color': 0, 'gradient': 0};
+
+function incrementNextColor() {
+	prevColor['color']++;
+	if (prevColor['color'] == 7) {
+		prevColor['color'] = 0;
+
+		prevColor['gradient']++;
+		if (prevColor['gradient'] == 3) {
+			prevColor['gradient'] = 0;
+		}
+	}
+}
+
+function getNextColor(paletteType) {
+	var palette, gradient, hexColor, r, g, b;
+
+	switch (paletteType) {
+		case 1:
+			palette = [200, 150, 255, 100, 50, 0];
+			break;
+		case 2:
+			palette = [100, 50, 200, 150, 250, 0];
+			break;
+		case 0:
+		default:
+			palette = [255, 200, 150, 100, 50, 0];
+			break;
+	}
+
+	gradient = palette[prevColor['gradient']];
+	r = (100 < gradient) ? 0 : 255;
+	g = r;
+	b = r;
+
+	switch (prevColor['color']) {
+		case 0:
+			r = gradient;
+			break;
+		case 1:
+			g = gradient;
+			break;
+		case 2:
+			b = gradient;
+			break;
+		case 3:
+			b = gradient;
+			r = b;
+			break;
+		case 4:
+			b = gradient;
+			g = b;
+			break;
+		case 5:
+			g = gradient;
+			r = g;
+			break;
+		case 6:
+			b = gradient;
+			g = b;
+			r = b;
+			break;
+	}
+
+	incrementNextColor();
+
+	hexColor = ('0' + parseInt(r, 10).toString(16)).slice(-2)
+				+ ('0' + parseInt(g, 10).toString(16)).slice(-2)
+				+ ('0' + parseInt(b, 10).toString(16)).slice(-2);
+
+	return hexColor.toUpperCase();
 }

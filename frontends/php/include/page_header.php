@@ -303,7 +303,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 			$jscript = 'javascript: '.
 				" var pos = getPosition('button_show_tree');".
-				" ShowHide('div_node_tree', 'table');".
+				" showHide('div_node_tree', 'table');".
 				' pos.top += 20;'.
 				" \$('div_node_tree').setStyle({top: pos.top + 'px'});";
 			$button_show_tree = new CButton('show_node_tree', _('Select Nodes'), $jscript);
@@ -388,6 +388,8 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			if (empty($sub_page['menu_text'])) {
 				$sub_page['menu_text'] = SPACE;
 			}
+
+			$sub_page['menu_url'] .= '?ddreset=1';
 
 			$sub_menu_item = new CLink($sub_page['menu_text'], $sub_page['menu_url'], $sub_page['class'].' nowrap');
 			if ($sub_page['selected']) {

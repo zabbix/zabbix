@@ -565,7 +565,7 @@ class CHost extends CZBXAPI {
 			$sqlWhere .= implode(' AND ', $sqlParts['where']);
 		}
 		if (!empty($sqlParts['group']))	{
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
+			$sqlGroup .= ' GROUP BY '.implode(',', $sqlParts['group']);
 		}
 		if (!empty($sqlParts['order']))	{
 			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
