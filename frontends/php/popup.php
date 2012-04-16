@@ -334,12 +334,10 @@ if ($monitored_hosts) {
 elseif ($real_hosts) {
 	$options['groups']['real_hosts'] = true;
 }
-elseif ($templated_hosts) {
-	$options['hosts']['templated_hosts'] = true;
-}
 else {
 	$options['hosts']['templated_hosts'] = true;
 }
+
 $pageFilter = new CPageFilter($options);
 
 // get groupid
