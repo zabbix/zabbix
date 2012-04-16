@@ -119,7 +119,8 @@ class CHistory extends CZBXAPI {
 			$itemOptions = array(
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
 				'editable' => $options['editable'],
-				'preservekeys' => true
+				'preservekeys' => true,
+				'webitems' => true
 			);
 			if (!is_null($options['itemids'])) {
 				$itemOptions['itemids'] = $options['itemids'];
