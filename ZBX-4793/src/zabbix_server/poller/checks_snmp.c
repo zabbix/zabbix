@@ -399,6 +399,43 @@ static void	snmp_close_session(struct snmp_session *session)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+static char	*snmp_get_octet_string(struct variable_list *vars)
+{
+	char	*strval_dyn = NULL;
+	size_t	i, sz, offset;
+
+	for (i = 0; i < vars->val_len; i++)
+	{
+		/* check for printable characters */
+		if (0 == isprint(vars->val.string[i]) && 0 == isspace(vars->val.string[i]))
+			break;
+	}
+
+	if (i == vars->val_len)	/* all characters are printable or string is empty */
+	{
+		strval_dyn = zbx_malloc(strval_dyn, vars->val_len + 1);
+		memcpy(strval_dyn, vars->val.string, vars->val_len);
+		strval_dyn[vars->val_len] = '\0';
+
+		zabbix_log(LOG_LEVEL_DEBUG, "STRING: %s", strval_dyn);
+	}
+	else
+	{
+		sz = vars->val_len * 3;
+		strval_dyn = zbx_malloc(strval_dyn, sz);
+		offset = zbx_snprintf(strval_dyn, sz, "%02X", vars->val.string[0]);
+		for (i = 1; i < vars->val_len; i++)
+		{
+			offset += zbx_snprintf(strval_dyn + offset, sz - offset,
+					" %02X", vars->val.string[i]);
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Hex-STRING: %s", strval_dyn);
+	}
+
+	return strval_dyn;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: snmp_get_index                                                   *
@@ -426,7 +463,7 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 	const char		*__function_name = "snmp_get_index";
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN;
-	char			temp[MAX_STRING_LEN], strval[MAX_STRING_LEN], *conn, snmp_oid[MAX_STRING_LEN], *error;
+	char			strval[MAX_STRING_LEN], *strval_dyn, *conn, snmp_oid[MAX_STRING_LEN], *error;
 	int			status, running, ret = NOTSUPPORTED;
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*vars;
@@ -481,23 +518,11 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 							running = 0;
 						}
 
-						memset(temp, '\0', sizeof(temp));
-						snprint_value(temp, sizeof(temp) - 1,
-								vars->name, vars->name_length, vars);
-						memset(snmp_oid, '\0', sizeof(snmp_oid));
-						snprint_objid(snmp_oid, sizeof(snmp_oid) - 1,
-								vars->name, vars->name_length);
-						zabbix_log(LOG_LEVEL_DEBUG, "AV loop OID:'%s' value:'%s' type:0x%02X",
-								snmp_oid, temp, vars->type);
-
 						if (ASN_OCTET_STR == vars->type)
 						{
-							if (0 == strncmp(temp, "STRING: ", 8))
-								strscpy(strval, temp + 8);
-							else if (0 == strncmp(temp, "Hex-STRING: ", 12))
-								strscpy(strval, temp + 12);
-							else
-								strscpy(strval, temp);
+							strval_dyn = snmp_get_octet_string(vars);
+							strscpy(strval, strval_dyn);
+							zbx_free(strval_dyn);
 						}
 #ifdef OPAQUE_SPECIAL_TYPES
 						else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type ||
@@ -536,6 +561,9 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 						else
 						{
 							error = zbx_get_snmp_type_error(vars->type);
+							memset(snmp_oid, '\0', sizeof(snmp_oid));
+							snprint_objid(snmp_oid, sizeof(snmp_oid) - 1,
+									vars->name, vars->name_length);
 							zabbix_log(LOG_LEVEL_DEBUG, "OID \"%s\": %s", snmp_oid, error);
 							zbx_free(error);
 						}
@@ -604,7 +632,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 {
 	const char		*__function_name = "get_snmp";
 	struct snmp_pdu		*pdu, *response;
-	char			temp[MAX_STRING_LEN], *ptemp, *conn;
+	char			*conn, *strval_dyn;
 	oid			anOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN;
 	struct variable_list	*vars;
@@ -626,21 +654,14 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 	{
 		for (vars = response->variables; vars; vars = vars->next_variable)
 		{
-			memset(temp, '\0', sizeof(temp));
-			snprint_value(temp, sizeof(temp) - 1, vars->name, vars->name_length, vars);
-			zabbix_log(LOG_LEVEL_DEBUG, "AV loop OID:'%s' value:'%s' type:0x%02X",
-					snmp_oid, temp, vars->type);
-
 			if (ASN_OCTET_STR == vars->type)
 			{
-				if (0 == strncmp(temp, "STRING: ", 8))
-					ptemp = temp + 8;
-				else if (0 == strncmp(temp, "Hex-STRING: ", 12))
-					ptemp = temp + 12;
-				else
-					ptemp = temp;
-				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, ptemp))
+				strval_dyn = snmp_get_octet_string(vars);
+
+				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, strval_dyn))
 					ret = NOTSUPPORTED;
+
+				zbx_free(strval_dyn);
 			}
 #ifdef OPAQUE_SPECIAL_TYPES
 			else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type ||
