@@ -590,7 +590,7 @@ $options = array(
 		'real_hosts' => 1,
 		'editable' => true
 	),
-	'groupid' => get_request('groupid', null),
+	'groupid' => get_request('groupid', null)
 );
 $pageFilter = new CPageFilter($options);
 
