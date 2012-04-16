@@ -32,7 +32,7 @@ class CService extends CZBXAPI {
 
 		$this->getOptions = array_merge($this->getOptions, array(
 			'parentids' => null,
-			'childrenids' => null,
+			'childids' => null,
 			'countOutput' => null,
 			'selectParent' => null,
 			'selectDependencies' => null,
@@ -47,7 +47,7 @@ class CService extends CZBXAPI {
 	 *
 	 * Allowed options:
 	 * - parentids          - fetch the services that are hardlinked to the given parent services;
-	 * - childrenids        - fetch the services that are hardlinked to the given child services;
+	 * - childids        - fetch the services that are hardlinked to the given child services;
 	 * - selectParent       - include the parent service in the result;
 	 * - selectDependencies - include service dependencies in the result;
 	 * - selectTimes        - include service times in the result.
@@ -357,12 +357,9 @@ class CService extends CZBXAPI {
 		}
 
 		foreach ($dependencies as $dependency) {
-			$this->checkDependency($dependency);
-
-			$this->checkUnsupportedFields('services_links', $dependency,
-				_s('Wrong fields for dependency for service "%1$s".', $dependency['serviceid']),
-				array('dependsOnServiceid', 'serviceid')
-			);
+			if (empty($dependency['serviceid']) || empty($dependency['dependsOnServiceid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			}
 		}
 
 		$serviceIds = array_merge(
@@ -371,6 +368,15 @@ class CService extends CZBXAPI {
 		);
 		$serviceIds = array_unique($serviceIds);
 		$this->checkServicePermissions($serviceIds);
+
+		foreach ($dependencies as $dependency) {
+			$this->checkDependency($dependency);
+
+			$this->checkUnsupportedFields('services_links', $dependency,
+				_s('Wrong fields for dependency for service "%1$s".', $dependency['serviceid']),
+				array('dependsOnServiceid', 'serviceid')
+			);
+		}
 
 		$this->checkForHardlinkedDependencies($dependencies);
 		$this->checkThatParentsDontHaveTriggers($dependencies);
@@ -770,18 +776,24 @@ class CService extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkDependency(array $dependency) {
-		if (empty($dependency['serviceid']) || empty($dependency['dependsOnServiceid'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
-		}
-
 		if (idcmp($dependency['serviceid'], $dependency['dependsOnServiceid'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Service with ID "%1$s" cannot be dependent on itself.', $dependency['serviceid']));
+			$service = API::getApi()->select($this->tableName(), array(
+				'output' => array('name'),
+				'serviceids' => $dependency['serviceid']
+			));
+			$service = reset($service);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Service "%1$s" cannot be dependent on itself.', $service['name']));
 		}
 
 		// check 'soft' field value
 		if (!isset($dependency['soft']) || !in_array((int) $dependency['soft'], array(0, 1), true)) {
+			$service = API::getApi()->select($this->tableName(), array(
+				'output' => array('name'),
+				'serviceids' => $dependency['serviceid']
+			));
+			$service = reset($service);
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect "soft" field value for dependency for service with ID "%1$s".', $dependency['serviceid'])
+				_s('Incorrect "soft" field value for dependency for service "%1$s".', $service['name'])
 			);
 		}
 	}
@@ -809,16 +821,22 @@ class CService extends CZBXAPI {
 			// look for at least one hardlinked service among the given
 			$softDepServiceIds = array_unique($softDepServiceIds);
 			$dep = API::getApi()->select('services_links', array(
+				'output' => array('serviceupid'),
 				'filter' => array(
 					'soft' => 0,
 					'servicedownid' => $softDepServiceIds
 				),
 				'limit' => 1
 			));
-
 			if ($dep) {
+				$dep = reset($dep);
+				$service = API::getApi()->select($this->tableName(), array(
+					'output' => array('name'),
+					'serviceids' => $dep['serviceupid']
+				));
+				$service = reset($service);
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Service with ID "%1$s" is already hardlinked to a different service.', $dependency['dependsOnServiceid'])
+					_s('Service "%1$s" is already hardlinked to a different service.', $service['name'])
 				);
 			}
 		}
@@ -884,11 +902,11 @@ class CService extends CZBXAPI {
 			$sqlParts['where'][] = $this->fieldId('serviceid').'=slp.servicedownid AND slp.soft=0';
 			$sqlParts['where'][] = DBcondition('slp.serviceupid', (array) $options['parentids']);
 		}
-		// childrenids
-		if ($options['childrenids'] !== null) {
+		// childids
+		if ($options['childids'] !== null) {
 			$sqlParts['from'][] = 'services_links slc';
 			$sqlParts['where'][] = $this->fieldId('serviceid').'=slc.serviceupid AND slc.soft=0';
-			$sqlParts['where'][] = DBcondition('slc.servicedownid', (array) $options['childrenids']);
+			$sqlParts['where'][] = DBcondition('slc.servicedownid', (array) $options['childids']);
 		}
 
 		return $sqlParts;
@@ -921,7 +939,7 @@ class CService extends CZBXAPI {
 		if ($options['selectParent'] !== null) {
 			$parents = $this->get(array(
 				'output' => $options['selectParent'],
-				'childrenids' => $serviceIds,
+				'childids' => $serviceIds,
 				'selectDependencies' => array('servicedownid', 'soft')
 			));
 			foreach ($result as &$service) {
