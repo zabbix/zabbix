@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
@@ -386,7 +387,7 @@ elseif (isset($_REQUEST['form'])) {
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'group_gid' => get_request('group_gid', array()),
 		'hostid' => get_request('hostid', 0),
-		'is_template' => isTemplatedHost(get_request('hostid', 0)),
+		'is_template' => isTemplate(get_request('hostid', 0)),
 		'normal_only' => get_request('normal_only')
 	);
 
@@ -417,6 +418,13 @@ elseif (isset($_REQUEST['form'])) {
 		$data['graph3d'] = $graph['show_3d'];
 		$data['percent_left'] = $graph['percent_left'];
 		$data['percent_right'] = $graph['percent_right'];
+		$data['templateid'] = $graph['templateid'];
+
+		// template
+		if (!empty($data['templateid'])) {
+			$data['template'] = get_realhosts_by_graphid($graph['templateid']);
+			$data['template'] = DBfetch($data['template']);
+		}
 
 		// items
 		$data['items'] = API::GraphItem()->get(array(

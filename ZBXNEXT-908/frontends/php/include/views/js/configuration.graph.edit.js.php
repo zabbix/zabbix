@@ -322,4 +322,22 @@
 			});
 		});
 	});
+
+	<?php if (!empty($this->data['template'])): ?>
+		jQuery(document).ready(function() {
+			'use strict';
+
+			jQuery('#graphTab input, #graphTab select').each(function() {
+				jQuery(this).attr('disabled', 'disabled');
+				jQuery('#itemsTable').sortable({disabled: true});
+			});
+
+			var size = jQuery('#itemsTable tr.sortable').length;
+			for (var i = 0; i < size; i++) {
+				jQuery('#items_' + i + '_name').removeAttr('onclick');
+				jQuery('#items_' + i + '_color').removeAttr('onchange');
+				jQuery('#lbl_items_' + i + '_color').removeAttr('onclick');
+			}
+		});
+	<?php endif; ?>
 </script>
