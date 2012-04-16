@@ -16,3 +16,8 @@ UPDATE users SET lang = 'pt_BR' WHERE lang = 'pt_br';
 UPDATE users SET lang = 'ru_RU' WHERE lang = 'ru_ru';
 UPDATE users SET lang = 'sv_SE' WHERE lang = 'sv_se';
 UPDATE users SET lang = 'uk_UA' WHERE lang = 'ua_ua';
+
+UPDATE users SET theme = 'darkblue' WHERE theme = 'css_bb.css';
+UPDATE users SET theme = 'originalblue' WHERE theme = 'css_ob.css';
+UPDATE users SET theme = 'darkorange' WHERE theme = 'css_od.css';
+UPDATE users SET theme = 'default' WHERE theme = 'default.css';

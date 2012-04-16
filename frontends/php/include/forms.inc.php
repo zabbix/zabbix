@@ -90,7 +90,7 @@
 			$data['autologin']		= get_request('autologin', 0);
 			$data['autologout']		= get_request('autologout', 900);
 			$data['lang']			= get_request('lang', 'en_gb');
-			$data['theme']			= get_request('theme', 'default.css');
+			$data['theme']			= get_request('theme', THEME_DEFAULT);
 			$data['refresh']		= get_request('refresh', 30);
 			$data['rows_per_page']	= get_request('rows_per_page', 50);
 			$data['user_type']		= get_request('user_type', USER_TYPE_ZABBIX_USER);;
@@ -319,7 +319,6 @@
 	}
 
 	function getItemFilterForm(&$items) {
-		$filter_groupid				= $_REQUEST['filter_groupid'];
 		$filter_group				= $_REQUEST['filter_group'];
 		$filter_hostname			= $_REQUEST['filter_hostname'];
 		$filter_application			= $_REQUEST['filter_application'];
@@ -364,44 +363,8 @@
 		$form->addVar('subfilter_trends', $subfilter_trends);
 		$form->addVar('subfilter_interval', $subfilter_interval);
 
-		$table = new CTable('', 'itemfilter');
-		$table->setCellPadding(0);
-		$table->setCellSpacing(0);
-
-		// 1st column
-		$col_table1 = new CTable(null, 'filter');
-		$col_table1->addRow(array(bold(_('Host group').': '),
-			array(
-				new CTextBox('filter_group', $filter_group, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_group', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_group&srctbl=host_group&srcfld1=name", 450, 450);', 'G'
-				)
-			)
-		));
-		$col_table1->addRow(array(bold(_('Host').': '),
-			array(
-				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_host', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
-				)
-			)
-		));
-		$col_table1->addRow(array(bold(_('Application').': '),
-			array(
-				new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_app', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&host=" + jQuery("#filter_hostname").val(), 400, 300, "application");', 'A'
-				)
-			)
-		));
-		$col_table1->addRow(array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE)));
-		$col_table1->addRow(array(array(bold(_('Key')), SPACE._('like').': '), new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE)));
-
-		// 2nd column
-		$col_table2 = new CTable(null, 'filter');
+		// type select
 		$fTypeVisibility = array();
-
-		// first row
 		$cmbType = new CComboBox('filter_type', $filter_type);
 		$cmbType->setAttribute('id', 'filter_type');
 		$cmbType->addItem(-1, _('all'));
@@ -442,55 +405,8 @@
 		}
 
 		zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
-		$col21 = new CCol(bold(_('Type').': '));
-		$col21->setAttribute('style', 'width: 170px');
 
-		$col_table2->addRow(array($col21, $cmbType));
-
-		// second row
-		$label221 = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').': '));
-		$label221->setAttribute('id', 'filter_delay_label');
-
-		$field221 = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
-		$field221->setEnabled('no');
-
-		$col_table2->addRow(array(array($label221, SPACE), array($field221, SPACE)));
-
-		// third row
-		$label231 = new CSpan(array(bold(_('SNMP community')), SPACE._('like').': '));
-		$label231->setAttribute('id', 'filter_snmp_community_label');
-
-		$field231 = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
-		$field231->setEnabled('no');
-
-		$label232 = new CSpan(array(bold(_('SNMPv3 security name')), SPACE._('like').': '));
-		$label232->setAttribute('id', 'filter_snmpv3_securityname_label');
-
-		$field232 = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
-		$field232->setEnabled('no');
-
-		$col_table2->addRow(array(array($label231, $label232, SPACE), array($field231, $field232, SPACE)));
-
-		// fourth row
-		$label241 = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').': '));
-		$label241->setAttribute('id', 'filter_snmp_oid_label');
-
-		$field241 = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
-		$field241->setEnabled('no');
-
-		$col_table2->addRow(array(array($label241, SPACE), array($field241, SPACE)));
-
-		// fifth row
-		$label251 = new CSpan(array(bold(_('Port')), SPACE._('like').': '));
-		$label251->setAttribute('id', 'filter_port_label');
-
-		$field251 = new CNumericBox('filter_port', $filter_port, 5, null, true);
-		$field251->setEnabled('no');
-
-		$col_table2->addRow(array(array($label251, SPACE), array($field251, SPACE)));
-
-		// 3rd column
-		$col_table3 = new CTable(null, 'filter');
+		// type of information select
 		$fVTypeVisibility = array();
 
 		$cmbValType = new CComboBox('filter_value_type', $filter_value_type);
@@ -505,55 +421,142 @@
 			zbx_subarray_push($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, $vItem);
 		}
 
-		$col_table3->addRow(array(bold(_('Type of information').': '), $cmbValType));
-
 		zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', 'change', ".zbx_jsvalue($fVTypeVisibility, true).');');
 
-		// second row
-		$label321 = new CSpan(bold(_('Data type').': '));
-		$label321->setAttribute('id', 'filter_data_type_label');
-
-		$field321 = new CComboBox('filter_data_type', $filter_data_type);;
-		$field321->addItem(-1, _('all'));
-		$field321->addItems(item_data_type2str());
-		$field321->setEnabled('no');
-
-		$col_table3->addRow(array(array($label321, SPACE), array($field321, SPACE)));
-		$col_table3->addRow(array(array(bold(_('Keep history')), SPACE._('(in days)').': '), new CNumericBox('filter_history', $filter_history, 8, null, true)));
-		$col_table3->addRow(array(array(bold(_('Keep trends')), SPACE._('(in days)').': '), new CNumericBox('filter_trends', $filter_trends, 8, null, true)));
-
-		// 4th column
-		$col_table4 = new CTable(null, 'filter');
-
+		// status select
 		$cmbStatus = new CComboBox('filter_status', $filter_status);
 		$cmbStatus->addItem(-1, _('all'));
 		foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $status) {
 			$cmbStatus->addItem($status, item_status2str($status));
 		}
 
-		$cmbBelongs = new CComboBox('filter_templated_items', $filter_templated_items);
-		$cmbBelongs->addItem(-1, _('all'));
-		$cmbBelongs->addItem(1, _('Templated items'));
-		$cmbBelongs->addItem(0, _('Not Templated items'));
+		// update interval
+		$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').': '));
+		$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
 
-		$cmbWithTriggers = new CComboBox('filter_with_triggers', $filter_with_triggers);
-		$cmbWithTriggers->addItem(-1, _('all'));
-		$cmbWithTriggers->addItem(1, _('With triggers'));
-		$cmbWithTriggers->addItem(0, _('Without triggers'));
+		$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
+		$updateIntervalInput->setEnabled('no');
 
-		$col_table4->addRow(array(bold(_('Status').': '), $cmbStatus));
-		$col_table4->addRow(array(bold(_('Triggers').': '), $cmbWithTriggers));
-		$col_table4->addRow(array(bold(_('Template').': '), $cmbBelongs));
+		// data type
+		$dataTypeLabel = new CSpan(bold(_('Data type').': '));
+		$dataTypeLabel->setAttribute('id', 'filter_data_type_label');
 
-		// adding all columns tables to main table
-		$col1 = new CCol($col_table1, 'top');
-		$col1->setAttribute('style', 'width: 280px');
-		$col2 = new CCol($col_table2, 'top');
-		$col2->setAttribute('style', 'width: 410px');
-		$col3 = new CCol($col_table3, 'top');
-		$col3->setAttribute('style', 'width: 160px');
-		$col4 = new CCol($col_table4, 'top');
-		$table->addRow(array($col1, $col2, $col3, $col4));
+		$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);;
+		$dataTypeInput->addItem(-1, _('all'));
+		$dataTypeInput->addItems(item_data_type2str());
+		$dataTypeInput->setEnabled('no');
+
+		// filter table
+		$table = new CTable('', 'filter filter-item');
+		$table->setCellPadding(0);
+		$table->setCellSpacing(0);
+
+		// SNMP community
+		$snmpCommunityLabel = new CSpan(array(bold(_('SNMP community')), SPACE._('like').': '));
+		$snmpCommunityLabel->setAttribute('id', 'filter_snmp_community_label');
+
+		$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
+		$snmpCommunityField->setEnabled('no');
+
+		// SNMPv3 security name
+		$snmpSecurityLabel = new CSpan(array(bold(_('SNMPv3 security name')), SPACE._('like').': '));
+		$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
+
+		$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
+		$snmpSecurityField->setEnabled('no');
+
+		// SNMP OID
+		$snmpOidLabel = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').': '));
+		$snmpOidLabel->setAttribute('id', 'filter_snmp_oid_label');
+
+		$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
+		$snmpOidField->setEnabled('no');
+
+		// port
+		$portLabel = new CSpan(array(bold(_('Port')), SPACE._('like').': '));
+		$portLabel->setAttribute('id', 'filter_port_label');
+
+		$portField = new CNumericBox('filter_port', $filter_port, 5, null, true);
+		$portField->setEnabled('no');
+
+		// row 1
+		$table->addRow(array(
+			new CCol(bold(_('Host group').': '), 'label col1'),
+			new CCol(array(
+				new CTextBox('filter_group', $filter_group, ZBX_TEXTBOX_FILTER_SIZE),
+				new CButton('btn_group', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
+					'&dstfld1=filter_group&srctbl=host_group&srcfld1=name", 450, 450);', 'G'
+				)
+			), 'col1'),
+			new CCol(bold(_('Type').': '), 'label col2'),
+			new CCol($cmbType, 'col2'),
+			new CCol(bold(_('Type of information').': '), 'label col3'),
+			new CCol($cmbValType, 'col3'),
+			new CCol(bold(_('Status').': '), 'label col4'),
+			new CCol($cmbStatus, 'col4'),
+		));
+		// row 2
+		$table->addRow(array(
+			new CCol(bold(_('Host').': '), 'label'),
+			new CCol(array(
+				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
+				new CButton('btn_host', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
+					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
+				)
+			)),
+			new CCol($updateIntervalLabel, 'label'),
+			new CCol($updateIntervalInput),
+			new CCol($dataTypeLabel, 'label'),
+			new CCol($dataTypeInput),
+			new CCol(bold(_('Triggers').': '), 'label'),
+			new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
+				-1 => _('all'),
+				1 => _('With triggers'),
+				0 => _('Without triggers')
+			))),
+		));
+		// row 3
+		$table->addRow(array(
+			new CCol(bold(_('Application').': '), 'label'),
+			new CCol(array(
+				new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
+				new CButton('btn_app', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
+					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&host=" + jQuery("#filter_hostname").val(), 400, 300, "application");', 'A'
+				)
+			)),
+			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
+			new CCol(array($snmpCommunityField, $snmpSecurityField)),
+			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').': '), 'label'),
+			new CCol(new CNumericBox('filter_history', $filter_history, 8, null, true)),
+			new CCol(bold(_('Template').': '), 'label'),
+			new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
+				-1 => _('all'),
+				1 => _('Templated items'),
+				0 => _('Not Templated items'),
+			))),
+		));
+		// row 4
+		$table->addRow(array(
+			new CCol(array(bold(_('Name')), SPACE._('like').': '), 'label'),
+			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol($snmpOidLabel, 'label'),
+			new CCol($snmpOidField),
+			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').': '), 'label'),
+			new CCol(new CNumericBox('filter_trends', $filter_trends, 8, null, true)),
+			new CCol(null, 'label'),
+			new CCol(),
+		));
+		// row 5
+		$table->addRow(array(
+			new CCol(array(bold(_('Key')), SPACE._('like').': '), 'label'),
+			new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol($portLabel, 'label'),
+			new CCol($portField),
+			new CCol(null, 'label'),
+			new CCol(),
+			new CCol(null, 'label'),
+			new CCol(),
+		));
 
 		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
 		$reset->useJQueryStyle();
@@ -564,13 +567,13 @@
 		$div_buttons = new CDiv(array($filter, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0px;');
 
-		$footer = new CCol($div_buttons, 'center', 4);
+		$footer = new CCol($div_buttons, 'controls', 8);
 
 		$table->addRow($footer);
 		$form->addItem($table);
 
 		// subfilters
-		$table_subfilter = new CTable(null, 'filter');
+		$table_subfilter = new CTable(null, 'filter sub-filter');
 
 		// array contains subfilters and number of items in each
 		$item_params = array(
