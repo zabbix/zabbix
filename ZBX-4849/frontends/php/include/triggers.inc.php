@@ -900,6 +900,23 @@ function utf8RawUrlDecode($source){
 			return false;
 		}
 
+		// check that templated and host items are not used together
+		$hosts = CHost::get(array(
+			'filter' => array('host' => $expr->data['hosts']),
+			'editable' => true,
+			'output' => array('status'),
+			'templated_hosts' => true,
+			'preservekeys' => true
+		));
+		$hostsAndTemplates = 0;
+		foreach ($hosts as $host) {
+			$hostsAndTemplates |= ($host['status'] == HOST_STATUS_TEMPLATE) ? 0x2 : 0x1;
+			if ($hostsAndTemplates == 0x3) {
+				error(S_TRIGGER_EXPRESSION_CANT_MIX_TEMPLATES_HOSTS);
+				return false;
+			}
+		}
+
 		$triggerid = get_dbid('triggers','triggerid');
 
 		$result = DBexecute('INSERT INTO triggers '.
@@ -1820,6 +1837,23 @@ function utf8RawUrlDecode($source){
 		if(!is_null($deps) && !validate_trigger_dependency($expression, $deps)) {
 			error(S_WRONG_DEPENDENCY_ERROR);
 			return false;
+		}
+
+		// check that templated and host items are not used together
+		$hosts = CHost::get(array(
+			'filter' => array('host' => $expr->data['hosts']),
+			'editable' => true,
+			'output' => array('status'),
+			'templated_hosts' => true,
+			'preservekeys' => true
+		));
+		$hostsAndTemplates = 0;
+		foreach ($hosts as $host) {
+			$hostsAndTemplates |= ($host['status'] == HOST_STATUS_TEMPLATE) ? 0x2 : 0x1;
+			if ($hostsAndTemplates == 0x3) {
+				error(S_TRIGGER_EXPRESSION_CANT_MIX_TEMPLATES_HOSTS);
+				return false;
+			}
 		}
 
 		if(is_null($description)){
