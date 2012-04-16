@@ -489,7 +489,7 @@ static void	zbx_load_config(int optional)
 
 	if (NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
 	{
-		zbx_error("StartAgents is not 0, parameter Server must be defined");
+		zbx_error("StartAgents is not empty, parameter Server must be defined");
 		exit(EXIT_FAILURE);
 	}
 
