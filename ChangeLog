@@ -8,6 +8,7 @@ A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-4871] fixed templates listed when adding log items in history (Toms)
 ..F....... [ZBX-4862] fixed Error when trying to remove additional templates in the host mass update form (Toms)
 ....I..... [ZBX-3929] removed deprecated Switch module from gen_schema.pl and get_data.pl scripts (Sasha)
 ..F....... [ZBX-4738] improved the host interface select in the item mass update form (Pavels)

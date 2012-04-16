@@ -122,7 +122,7 @@ if ($resourcetype == SCREEN_RESOURCE_GRAPH) {
 	if ($this->data['screen']['templateid']) {
 		$selectButton = new CButton('select', _('Select'),
 			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].'&dstfld1=resourceid&'.
+				'&only_hostid='.$this->data['screen']['templateid'].'&dstfld1=resourceid&'.
 				"dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name&simpleName=1', 800, 450);", 'formlist'
 		);
 	}
@@ -171,7 +171,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 	if ($this->data['screen']['templateid']) {
 		$selectButton = new CButton('select', _('Select'),
 			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].'&dstfld1=resourceid&'.
+				'&only_hostid='.$this->data['screen']['templateid'].'&dstfld1=resourceid&'.
 				"dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=name&simpleName=1', 800, 450);", 'formlist'
 		);
 	}
@@ -248,7 +248,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT) {
 	if ($this->data['screen']['templateid']) {
 		$selectButton = new CButton('select', _('Select'),
 			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].'&dstfld1=resourceid'.
+				'&only_hostid='.$this->data['screen']['templateid'].'&dstfld1=resourceid'.
 				"&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=name', 800, 450);", 'formlist'
 		);
 	}
@@ -479,7 +479,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_CLOCK) {
 		if ($this->data['screen']['templateid']) {
 			$selectButton = new CButton('select', _('Select'),
 				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-					'&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&templated_hosts=1'.
+					'&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name'.
 					'&only_hostid='.$this->data['screen']['templateid']."', 800, 450);", 'formlist'
 			);
 		}
