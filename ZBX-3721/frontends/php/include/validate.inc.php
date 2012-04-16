@@ -396,11 +396,11 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 
 	if ($type == T_ZBX_DBL && !is_numeric($var)) {
 		if ($flags&P_SYS) {
-			info(_s('Critical error. Field "%1$s" is not double.', $field));
+			info(_s('Critical error. Field "%1$s" is not decimal number.', $field));
 			return ZBX_VALID_ERROR;
 		}
 		else {
-			info(_s('Warning. Field "%1$s" is not double.', $field));
+			info(_s('Warning. Field "%1$s" is not decimal number.', $field));
 			return ZBX_VALID_WARNING;
 		}
 	}
@@ -575,13 +575,14 @@ function invalid_url($msg = null) {
 function check_fields(&$fields, $show_messages = true) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$system_fields = array(
-		'sid' =>			array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
+		'sid' =>		array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
 		'switch_node' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
 		'triggers_hash' =>	array(T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null),
-		'print' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
-		'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
+		'print' =>		array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
+		'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
 		'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-		'start' =>			array(T_ZBX_INT, O_OPT, P_SYS, null,		null) // paging
+		'start' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
+		'ddreset' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null)
 	);
 	$fields = zbx_array_merge($system_fields, $fields);
 
@@ -605,7 +606,8 @@ function check_fields(&$fields, $show_messages = true) {
 	if ($show_messages && $err != ZBX_VALID_OK) {
 		show_messages($err == ZBX_VALID_OK, null, _('Page received incorrect data.'));
 	}
-	return $err == ZBX_VALID_OK ? 1 : 0;
+
+	return $err == ZBX_VALID_OK;
 }
 
 function validatePortNumberOrMacro($port) {

@@ -93,7 +93,15 @@ $itemFormList->addRow(_('Key'), array(
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
-	$intereacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
+	$interfacesComboBox = new CComboBox('interfaceid', $this->data['interfaceid']);
+
+	// set up interface groups
+	$interfaceGroups = array();
+	foreach (zbx_objectValues($this->data['interfaces'], 'type') as $interfaceType) {
+		$interfaceGroups[$interfaceType] = new COptGroup(interfaceType2str($interfaceType));
+	}
+
+	// add interfaces to groups
 	foreach ($this->data['interfaces'] as $interface) {
 		$option = new CComboItem(
 			$interface['interfaceid'],
@@ -101,14 +109,17 @@ if (!empty($this->data['interfaces'])) {
 			$interface['interfaceid'] == $this->data['interfaceid'] ? 'yes' : 'no'
 		);
 		$option->setAttribute('data-interfacetype', $interface['type']);
-		$intereacesComboBox->addItem($option);
+		$interfaceGroups[$interface['type']]->addItem($option);
+	}
+	foreach ($interfaceGroups as $interfaceGroup) {
+		$interfacesComboBox->addItem($interfaceGroup);
 	}
 
 	$span = new CSpan(_('No interface found'), 'red');
 	$span->setAttribute('id', 'interface_not_defined');
 	$span->setAttribute('style', 'display: none;');
 
-	$itemFormList->addRow(_('Host interface'), array($intereacesComboBox, $span), false, 'interface_row');
+	$itemFormList->addRow(_('Host interface'), array($interfacesComboBox, $span), false, 'interface_row');
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),

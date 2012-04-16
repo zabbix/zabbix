@@ -60,23 +60,23 @@ foreach ($this->data['slides'] as $step => $slides) {
 		}
 	}
 
-	$numSpan = new CSpan($i++.':', 'rowNum');
-	$numSpan->setAttribute('id', 'current_slide_'.$step);
-
 	$delay = new CNumericBox('slides['.$step.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, 'no', true, false);
 	$delay->setAttribute('placeholder', _('default'));
 
 	$removeButton = new CButton('remove_'.$step, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
 	$removeButton->setAttribute('remove_slide', $step);
 
-	$row = new CRow(array(
-		new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
-		$numSpan,
-		$name,
-		$delay,
-		$removeButton
-	), 'sortable');
-	$row->setAttribute('id', 'slides_'.$step);
+	$row = new CRow(
+		array(
+			new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move'),
+			new CSpan($i++.':', 'rowNum', 'current_slide_'.$step),
+			$name,
+			$delay,
+			$removeButton
+		),
+		'sortable',
+		'slides_'.$step
+	);
 	$slideTable->addRow($row);
 }
 
@@ -88,9 +88,7 @@ $addButtonColumn = new CCol(
 	5
 );
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
-$addButtonRow = new CRow($addButtonColumn);
-$addButtonRow->setAttribute('id', 'screenListFooter');
-$slideTable->addRow($addButtonRow);
+$slideTable->addRow(new CRow($addButtonColumn, null, 'screenListFooter'));
 
 $slideFormList->addRow(_('Slides'), new CDiv($slideTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
@@ -102,13 +100,13 @@ $slideForm->addItem($slideTab);
 // append buttons to form
 if (empty($this->data['slideshowid'])) {
 	$slideForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
-		array(new CButtonCancel())
+		new CSubmit('save', _('Save')),
+		new CButtonCancel()
 	));
 }
 else {
 	$slideForm->addItem(makeFormFooter(
-		array(new CSubmit('save', _('Save'))),
+		new CSubmit('save', _('Save')),
 		array(
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete slide show?'), url_param('form').url_param('slideshowid').url_param('config')),

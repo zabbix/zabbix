@@ -68,7 +68,7 @@ class CObject {
 		}
 		elseif (is_array($value)) {
 			foreach ($value as $item) {
-				$this->addItem($item); // Attention, recursion !!!
+				$this->addItem($item); // attention, recursion !!!
 			}
 		}
 		elseif (!is_null($value)) {
