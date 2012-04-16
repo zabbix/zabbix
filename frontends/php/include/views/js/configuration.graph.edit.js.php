@@ -315,7 +315,7 @@
 				}
 			});
 
-			jQuery('#previewTab img').attr('src', 'styles/<?php echo getUserThemeName(); ?>/images/preloader.gif');
+			jQuery('#previewTab img').attr('src', 'styles/themes/<?php echo getUserTheme(CWebUser::$data); ?>/images/preloader.gif');
 			jQuery('<img />').attr('src', name + '?period=3600' + src).load(function() {
 				jQuery('#previewChar img').remove();
 				jQuery('#previewChar').append(jQuery(this));
