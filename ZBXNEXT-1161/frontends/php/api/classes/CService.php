@@ -251,21 +251,31 @@ class CService extends CZBXAPI {
 		$dependencies = array();
 		$parentDependencies = array();
 		$serviceTimes = array();
+		$deleteParentsForServiceIds = array();
+		$deleteDependenciesForServiceIds = array();
 		foreach ($services as $service) {
-			if (!empty($service['dependencies'])) {
-				foreach ($service['dependencies'] as $dependency) {
-					$dependency['serviceid'] = $service['serviceid'];
-					$dependencies[] = $dependency;
+			if (isset($service['dependencies'])) {
+				$deleteDependenciesForServiceIds[] = $service['serviceid'];
+
+				if ($service['dependencies']) {
+					foreach ($service['dependencies'] as $dependency) {
+						$dependency['serviceid'] = $service['serviceid'];
+						$dependencies[] = $dependency;
+					}
 				}
 			}
 
 			// update parent
-			if (!empty($service['parentid'])) {
-				$parentDependencies[] = array(
-					'serviceid' => $service['parentid'],
-					'dependsOnServiceid' => $service['serviceid'],
-					'soft' => 0
-				);
+			if (isset($service['parentid'])) {
+				$deleteParentsForServiceIds[] = $service['serviceid'];
+
+				if ($service['parentid']) {
+					$parentDependencies[] = array(
+						'serviceid' => $service['parentid'],
+						'dependsOnServiceid' => $service['serviceid'],
+						'soft' => 0
+					);
+				}
 			}
 
 			// save service times
@@ -278,9 +288,11 @@ class CService extends CZBXAPI {
 		}
 
 		// replace dependencies
-		$this->deleteParentDependencies(zbx_objectValues($services, 'serviceid'));
-		if ($dependencies) {
-			$this->deleteDependencies(array_unique(zbx_objectValues($dependencies, 'serviceid')));
+		if ($deleteParentsForServiceIds) {
+			$this->deleteParentDependencies(zbx_objectValues($services, 'serviceid'));
+		}
+		if ($deleteDependenciesForServiceIds) {
+			$this->deleteDependencies(array_unique($deleteDependenciesForServiceIds));
 		}
 		if ($parentDependencies || $dependencies) {
 			$this->addDependencies(array_merge($parentDependencies, $dependencies));
