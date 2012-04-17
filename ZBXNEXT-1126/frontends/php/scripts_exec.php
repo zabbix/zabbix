@@ -41,19 +41,27 @@ if (isset($_REQUEST['execute'])) {
 	$scriptid = get_request('scriptid');
 	$hostid = get_request('hostid');
 
-	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
-	if (empty($result) || $result['response'] == 'failed') {
-		show_error_message(_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
-	}
-
 	$data = array(
-		'message' => $result['value'],
+		'message' => '',
 		'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.$scriptid))
 	);
 
-	if ($result['response'] == 'failed') {
-		error($data['message']);
-		$data['message'] = '';
+	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
+
+	$isErrorExist = false;
+	if (empty($result)) {
+		$isErrorExist = true;
+	}
+	elseif ($result['response'] == 'failed') {
+		error($result['value']);
+		$isErrorExist = true;
+	}
+	else {
+		$data['message'] = $result['value'];
+	}
+
+	if ($isErrorExist) {
+		show_error_message(_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
 	}
 
 	// render view
