@@ -743,7 +743,7 @@ function getRandomId(remember) {
 	id = Math.floor(Math.random() * 10000000);
 
 	if (this.generated.indexOf(id) > -1) {
-		id = getRandomId(false);
+		id = getRandomId(false); // attention recursion !!!
 	}
 
 	if (typeof remember === 'undefined') {

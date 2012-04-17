@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $triggersWidget = new CWidget();
@@ -75,9 +74,9 @@ if ($this->data['expression_field_readonly'] == 'yes') {
 $addExpressionButton = new CButton(
 	'insert',
 	$this->data['input_method'] == IM_TREE ? _('Edit') : _('Add'),
-	'return PopUp(\'popup_trexpr.php?dstfrm='.$triggersForm->getName().
+	'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 		'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
-		'&srcfld1=expression&expression=\' + escape('.$this->data['expression_field_params'].'), 800, 240);',
+		'&srcfld1=expression&expression=" + escape('.$this->data['expression_field_params'].'), 800, 240);',
 	'formlist'
 );
 if ($this->data['limited'] == 'yes') {
@@ -123,9 +122,9 @@ if ($this->data['input_method'] == IM_TREE) {
 elseif ($this->data['input_method'] != IM_FORCED) {
 	$inputMethodToggle = new CSpan(_('Expression constructor'), 'link');
 	$inputMethodToggle->setAttribute('onclick', 'javascript: '.
-		'document.getElementById(\'toggle_input_method\').value=1;'.
-		'document.getElementById(\'input_method\').value='.($this->data['input_method'] == IM_TREE ? IM_ESTABLISHED : IM_TREE).';'.
-		'document.forms[\''.$triggersForm->getName().'\'].submit();'
+		'document.getElementById("toggle_input_method").value=1;'.
+		'document.getElementById("input_method").value='.($this->data['input_method'] == IM_TREE ? IM_ESTABLISHED : IM_TREE).';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();'
 	);
 	$expressionRow[] = array(BR(), $inputMethodToggle);
 }
@@ -134,7 +133,7 @@ $triggersFormList->addRow(_('Expression'), $expressionRow);
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable = new CTable(null, 'formElementTable');
-	$expressionTable->setAttribute('style', 'min-width:500px;');
+	$expressionTable->setAttribute('style', 'min-width: 500px;');
 	$expressionTable->setAttribute('id', 'exp_list');
 	$expressionTable->setOddRowClass('even_row');
 	$expressionTable->setEvenRowClass('even_row');
@@ -151,9 +150,9 @@ if ($this->data['input_method'] == IM_TREE) {
 			if ($this->data['limited'] != 'yes') {
 				$deleteUrl = new CSpan(_('Delete'), 'link');
 				$deleteUrl->setAttribute('onclick', 'javascript:'.
-					' if (Confirm(\''._('Delete expression?').'\')) {'.
-						' delete_expression(\''.$e['id'] .'\');'.
-						' document.forms[\''.$triggersForm->getName().'\'].submit();'.
+					' if (Confirm("'._('Delete expression?').'")) {'.
+						' delete_expression("'.$e['id'] .'");'.
+						' document.forms["'.$triggersForm->getName().'"].submit();'.
 					' }'
 				);
 				$triggerCheckbox = new CCheckbox('expr_target_single', $i == 0 ? 'yes' : 'no', 'check_target(this);', $e['id']);
@@ -209,8 +208,8 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 
 	$testButton = new CButton('test_expression', _('Test'),
-		'openWinCentered(\'tr_testexpr.php?expression=\' + encodeURIComponent(this.form.elements[\'expression\'].value),'.
-		'\'ExpressionTest\', 850, 400, \'titlebar=no, resizable=yes, scrollbars=yes\'); return false;',
+		'openWinCentered("tr_testexpr.php?expression=" + encodeURIComponent(this.form.elements["expression"].value),'.
+		'"ExpressionTest", 850, 400, "titlebar=no, resizable=yes, scrollbars=yes"); return false;',
 		'link_menu'
 	);
 	if (!$allowedTesting) {
@@ -231,9 +230,9 @@ if ($this->data['input_method'] == IM_TREE) {
 
 	$inputMethodToggle = new CSpan(_('Close expression constructor'), 'link');
 	$inputMethodToggle->setAttribute('onclick', 'javascript: '.
-		'document.getElementById(\'toggle_input_method\').value=1;'.
-		'document.getElementById(\'input_method\').value='.IM_ESTABLISHED.';'.
-		'document.forms[\''.$triggersForm->getName().'\'].submit();'
+		'document.getElementById("toggle_input_method").value=1;'.
+		'document.getElementById("input_method").value='.IM_ESTABLISHED.';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();'
 	);
 	$triggersFormList->addRow(SPACE, array($inputMethodToggle, BR()));
 }
@@ -315,17 +314,14 @@ if (empty($this->data['parent_discoveryid'])) {
 	$dependenciesTable = new CTable(_('No dependencies defined.'), 'formElementTable');
 	$dependenciesTable->setAttribute('style', 'min-width: 500px;');
 	$dependenciesTable->setAttribute('id', 'dependenciesTable');
-	$dependenciesTable->setHeader(array(
-		_('Name'),
-		_('Action')
-	));
+	$dependenciesTable->setHeader(array(_('Name'), _('Action')));
 
 	foreach ($this->data['db_dependencies'] as $dependency) {
 		$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
 		$row = new CRow(array(
 			$dependency['host'].': '.$dependency['description'],
-			new CButton('remove', _('Remove'), 'javascript: removeDependency(\''.$dependency['triggerid'].'\');', 'link_menu')
+			new CButton('remove', _('Remove'), 'javascript: removeDependency("'.$dependency['triggerid'].'");', 'link_menu')
 		));
 		$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
 		$dependenciesTable->addRow($row);
@@ -335,7 +331,7 @@ if (empty($this->data['parent_discoveryid'])) {
 		new CDiv(
 			array(
 				$dependenciesTable,
-				new CButton('bnt1', _('Add'), 'return PopUp(\'popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1\', 1000, 700);', 'link_menu')
+				new CButton('bnt1', _('Add'), 'return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1", 1000, 700);', 'link_menu')
 			),
 			'objectgroup inlineblock border_dotted ui-corner-all'
 		)
@@ -365,4 +361,3 @@ $triggersForm->addItem(makeFormFooter(
 
 $triggersWidget->addItem($triggersForm);
 return $triggersWidget;
-?>
