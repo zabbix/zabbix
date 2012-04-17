@@ -24,10 +24,6 @@ $scriptWidget = new CWidget();
 $scriptForm = new CForm();
 $scriptForm->setName('scriptForm');
 
-for ($i = 0; $i < 10; $i++) {
-	$this->data['message'] .= $this->data['message'];
-}
-
 // append tabs to form
 $scriptTab = new CTabView();
 $scriptTab->addTab('scriptTab', _s('Result of "%s"', $this->data['info']['name']), new CSpan($this->data['message'], 'pre'));
