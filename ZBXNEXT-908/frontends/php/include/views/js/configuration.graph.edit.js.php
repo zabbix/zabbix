@@ -323,7 +323,7 @@
 		});
 	});
 
-	<?php if (!empty($this->data['template'])): ?>
+	<?php if (!empty($this->data['templates'])): ?>
 		jQuery(document).ready(function() {
 			'use strict';
 
@@ -334,9 +334,12 @@
 
 			var size = jQuery('#itemsTable tr.sortable').length;
 			for (var i = 0; i < size; i++) {
+				jQuery('.ui-icon').attr('class', 'ui-icon ui-icon-arrowthick-2-n-s state-disabled');
 				jQuery('#items_' + i + '_name').removeAttr('onclick');
+				jQuery('#items_' + i + '_name').removeAttr('class');
 				jQuery('#items_' + i + '_color').removeAttr('onchange');
 				jQuery('#lbl_items_' + i + '_color').removeAttr('onclick');
+				jQuery('#lbl_items_' + i + '_color').attr('class', 'colorpickerLabel');
 			}
 		});
 	<?php endif; ?>

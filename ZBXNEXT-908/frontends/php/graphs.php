@@ -419,11 +419,24 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_left'] = $graph['percent_left'];
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
+		$data['templates'] = array();
 
-		// template
+		// templates
 		if (!empty($data['templateid'])) {
-			$data['template'] = get_realhosts_by_graphid($graph['templateid']);
-			$data['template'] = DBfetch($data['template']);
+			$parentGraphid = $data['templateid'];
+			do {
+				$parentGraph = get_graph_by_graphid($parentGraphid);
+				$parentTemplate = get_hosts_by_graphid($parentGraph['graphid']);
+				$parentTemplate = DBfetch($parentTemplate);
+
+				$data['templates'][] = new CLink($parentTemplate['host'],
+					'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid'].url_param('parent_discoveryid'));
+				$data['templates'][] = SPACE.RARR.SPACE;
+
+				$parentGraphid = $parentGraph['templateid'];
+			} while ($parentGraphid != 0);
+			$data['templates'] = array_reverse($data['templates']);
+			array_shift($data['templates']);
 		}
 
 		// items

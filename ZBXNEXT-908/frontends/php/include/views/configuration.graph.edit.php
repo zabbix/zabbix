@@ -46,9 +46,8 @@ $graphForm->addVar('ymax_itemid', $this->data['ymax_itemid']);
 
 // create form list
 $graphFormList = new CFormList('graphFormList');
-if (!empty($this->data['template'])) {
-	$graphFormList->addRow(_('Parent graph'), new CLink($this->data['template']['host'],
-		'graphs.php?form=update&graphid='.$this->data['templateid'].'&hostid='.$this->data['template']['hostid']));
+if (!empty($this->data['templates'])) {
+	$graphFormList->addRow(_('Parent graph'), $this->data['templates']);
 }
 $graphFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 $graphFormList->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5));
@@ -304,7 +303,7 @@ if (!empty($this->data['graphid'])) {
 	$deleteButton = new CButtonDelete(_('Delete graph?'), url_param('graphid').url_param('parent_discoveryid'));
 	$cloneButton = new CSubmit('clone', _('Clone'));
 
-	if (!empty($this->data['template'])) {
+	if (!empty($this->data['templates'])) {
 		$saveButton->setEnabled(false);
 		$deleteButton->setEnabled(false);
 		$cloneButton->setEnabled(false);
