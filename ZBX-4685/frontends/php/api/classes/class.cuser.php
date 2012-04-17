@@ -1176,9 +1176,7 @@ Copt::memoryPick();
 			if($login){
 				if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
 					if((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK){
-						$_REQUEST['message'] = S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.' '.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).' '.S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART;
-						self::EndTransaction(false, __METHOD__);
-						return false;
+						throw new APIException(ZBX_API_ERROR_INTERNAL, S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.' '.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).' '.S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART);
 					}
 					else{
 						DBexecute('UPDATE users SET attempt_clock='.time().' WHERE alias='.zbx_dbstr($name));
@@ -1265,7 +1263,7 @@ Copt::memoryPick();
 			self::EndTransaction(false, __METHOD__);
 			$error = $e->getErrors();
 			$error = reset($error);
-			self::setError(__METHOD__, $e->getCode(), $error);
+			$_REQUEST['message'] = $error;
 			return false;
 		}
 	}
