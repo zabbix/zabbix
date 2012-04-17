@@ -2,6 +2,7 @@
 Changes for 2.0.0rc3
 
 New features:
+A.F....... [ZBXNEXT-1126] redesign Script execution (Eduard)
 ...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
 ..F.I..... [ZBX-3721] design improvements (Pavels)
 A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)

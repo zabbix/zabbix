@@ -152,4 +152,3 @@ $httpForm->addItem(array($this->data['paging'], $httpTable, $this->data['paging'
 // append form to widget
 $httpWidget->addItem($httpForm);
 return $httpWidget;
-?>
