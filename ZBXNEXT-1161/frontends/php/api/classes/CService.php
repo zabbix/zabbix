@@ -812,7 +812,7 @@ class CService extends CZBXAPI {
 			// look for at least one hardlinked service among the given
 			$softDepServiceIds = array_unique($softDepServiceIds);
 			$dep = API::getApi()->select('services_links', array(
-				'output' => array('serviceupid'),
+				'output' => array('servicedownid'),
 				'filter' => array(
 					'soft' => 0,
 					'servicedownid' => $softDepServiceIds
@@ -823,7 +823,7 @@ class CService extends CZBXAPI {
 				$dep = reset($dep);
 				$service = API::getApi()->select($this->tableName(), array(
 					'output' => array('name'),
-					'serviceids' => $dep['serviceupid']
+					'serviceids' => $dep['servicedownid']
 				));
 				$service = reset($service);
 				self::exception(ZBX_API_ERROR_PARAMETERS,
