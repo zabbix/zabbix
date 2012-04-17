@@ -1114,9 +1114,9 @@ Copt::memoryPick();
 	public static function logout($sessionid){
 		global $ZBX_LOCALNODEID;
 
-		$sql = 'SELECT s.*, u.alias '.
-			' FROM sessions s, users u '.
-			' WHERE s.userid=u.userid AND s.sessionid='.zbx_dbstr($sessionid).
+		$sql = 'SELECT s.* '.
+			' FROM sessions s '.
+			' WHERE s.sessionid='.zbx_dbstr($sessionid).
 				' AND s.status='.ZBX_SESSION_ACTIVE.
 				' AND '.DBin_node('s.userid', $ZBX_LOCALNODEID);
 
