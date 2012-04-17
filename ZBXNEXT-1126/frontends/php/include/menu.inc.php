@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 global $ZBX_MENU;
+
 $ZBX_MENU = array(
 	'view' => array(
 		'label'				=> _('Monitoring'),
