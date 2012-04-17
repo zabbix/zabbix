@@ -110,4 +110,17 @@ class ZBase {
 			$this->rootDir.'/api/rpc'
 		);
 	}
+
+	/**
+	 * An array of available themes.
+	 *
+	 * @return array
+	 */
+	public static function getThemes() {
+		return array(
+			'originalblue' => _('Original blue'),
+			'darkblue' => _('Black & Blue'),
+			'darkorange' => _('Dark orange')
+		);
+	}
 }

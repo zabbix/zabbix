@@ -30,6 +30,8 @@ if (!defined('PAGE_HEADER_LOADED') && !defined('ZBX_PAGE_NO_MENU')) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 
+define('ZBX_PAGE_NO_THEME', true); // don't load any themes for this page
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'distributed' =>		array(T_ZBX_STR, O_OPT, null,	null,				null),

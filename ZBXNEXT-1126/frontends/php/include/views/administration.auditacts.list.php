@@ -36,7 +36,7 @@ $auditWidget->addHeaderRowNumber();
 $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
-$filterTable = new CTable('', 'filter_config');
+$filterTable = new CTable('', 'filter');
 $filterTable->addRow(array(
 	array(
 		bold(_('Recipient')),
@@ -53,7 +53,7 @@ $resetButton->useJQueryStyle();
 $buttonsDiv = new CDiv(array($filterButton, SPACE, $resetButton));
 $buttonsDiv->setAttribute('style', 'padding: 4px 0px;');
 
-$filterTable->addRow(new CCol($buttonsDiv, 'center', 3));
+$filterTable->addRow(new CCol($buttonsDiv, 'controls'));
 $filterForm->addItem($filterTable);
 
 $auditWidget->addFlicker($filterForm, CProfile::get('web.auditacts.filter.state', 1));

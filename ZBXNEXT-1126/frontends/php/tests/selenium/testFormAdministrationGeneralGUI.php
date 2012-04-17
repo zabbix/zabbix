@@ -99,7 +99,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Default theme'));
-		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('css_bb.css');
+		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('darkblue');
 
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Black and Blue" theme can not be selected as default theme: it does not exist in the DB');
 
@@ -107,14 +107,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Default theme'));
-		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('css_od.css');
+		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('darkorange');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Dark orange" theme can not be selected as default theme: it does not exist in the DB');
 
 		$this->dropdown_select('default_theme', 'Original blue');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Configuration updated');
-		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('css_ob.css');
+		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('originalblue');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Original blue" theme can not be selected as default theme: it does not exist in the DB');
 
 		$newHash = DBhash($sqlHash);
