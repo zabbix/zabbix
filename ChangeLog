@@ -1,3 +1,8 @@
+Changes for 1.8.12rc2
+
+.......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
+.......PS. [ZBX-4709] fixed processing of quoted strings in SNMP items (Sasha)
+
 Changes for 1.8.12rc1
 
 ...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
