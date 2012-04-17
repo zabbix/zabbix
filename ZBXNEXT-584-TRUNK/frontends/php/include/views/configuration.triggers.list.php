@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 $triggersWidget = new CWidget();
 
 // append host summary to widget header
@@ -46,21 +47,16 @@ else {
 }
 
 // create widget header
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 if (!empty($this->data['parent_discoveryid'])) {
 	$triggersWidget->addHeader(array(_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'gold')));
-	$triggersWidget->addHeader(
-		$numRows,
-		array(
-			'[ ',
-			new CLink(
-				$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
-				'trigger_prototypes.php?showdisabled='.($this->data['showdisabled'] ? 0 : 1).'&hostid='.$this->data['hostid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
-			),
-			' ]'
-		)
-	);
+	$triggersWidget->addHeaderRowNumber(array(
+		'[ ',
+		new CLink(
+			$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
+			'trigger_prototypes.php?showdisabled='.($this->data['showdisabled'] ? 0 : 1).'&hostid='.$this->data['hostid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
+		),
+		' ]'
+	));
 }
 else {
 	$filterForm = new CForm('get');
@@ -68,17 +64,14 @@ else {
 	$filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
 
 	$triggersWidget->addHeader(_('Triggers'), $filterForm);
-	$triggersWidget->addHeader(
-		$numRows,
-		array(
-			'[ ',
-			new CLink(
-				$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
-				'triggers.php?hostid='.$this->data['hostid'].'&showdisabled='.($this->data['showdisabled'] ? 0 : 1)
-			),
-			' ]'
-		)
-	);
+	$triggersWidget->addHeaderRowNumber(array(
+		'[ ',
+		new CLink(
+			$this->data['showdisabled'] ? _('Hide disabled triggers') : _('Show disabled triggers'),
+			'triggers.php?hostid='.$this->data['hostid'].'&showdisabled='.($this->data['showdisabled'] ? 0 : 1)
+		),
+		' ]'
+	));
 }
 
 // create form
@@ -117,7 +110,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
 			$description[] = new CSpan(empty($this->data['parent_discoveryid']) ? _('Host') : _('Template'), 'unknown');
-			$description[] = ':';
+			$description[] = ':'.SPACE;
 		}
 		else {
 			$real_hosts = $this->data['realHosts'][$triggerid];
@@ -130,14 +123,14 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			else {
 				$description[] = new CLink($real_host['name'], 'triggers.php?&hostid='.$real_host['hostid'], 'unknown');
 			}
-			$description[] = ':';
+			$description[] = ':'.SPACE;
 		}
 	}
 
 	if (empty($this->data['parent_discoveryid'])) {
 		if (!empty($trigger['discoveryRule'])) {
 			$description[] = new CLink($trigger['discoveryRule']['name'], 'trigger_prototypes.php?hostid='.$this->data['hostid'].'&parent_discoveryid='.$trigger['discoveryRule']['itemid'], 'gold');
-			$description[] = ':'.$trigger['description'];
+			$description[] = ':'.SPACE.$trigger['description'];
 		}
 		else {
 			$description[] = new CLink($trigger['description'], 'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid);
@@ -254,5 +247,6 @@ $triggersForm->addItem(array($this->data['paging'], $triggersTable, $this->data[
 
 // append form to widget
 $triggersWidget->addItem($triggersForm);
+
 return $triggersWidget;
 ?>

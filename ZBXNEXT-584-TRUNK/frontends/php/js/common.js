@@ -590,7 +590,7 @@ function remove_element(elmnt, tag) {
 	return true;
 }
 
-function ShowHide(obj,style) {
+function showHide(obj, style) {
 	if (typeof(style) == 'undefined') {
 		style = 'inline';
 	}
@@ -598,8 +598,9 @@ function ShowHide(obj,style) {
 		obj = document.getElementById(obj);
 	}
 	if (!obj) {
-		throw 'ShowHide(): Object not found.';
+		throw 'showHide(): Object not found.';
 	}
+
 	if (obj.style.display != 'none') {
 		obj.style.display = 'none';
 		return 0;
@@ -610,15 +611,31 @@ function ShowHide(obj,style) {
 	}
 }
 
+function showHideVisible(obj) {
+	if (is_string(obj)) {
+		obj = document.getElementById(obj);
+	}
+	if (!obj) {
+		throw 'showHideVisible(): Object not found.';
+	}
+
+	if (obj.style.visibility != 'hidden') {
+		obj.style.visibility = 'hidden';
+	}
+	else {
+		obj.style.visibility = 'visible';
+	}
+}
+
 function showHideByName(name, style) {
 	if (typeof(style) == 'undefined') {
 		style = 'none';
 	}
 
-	var objs = $$('[name='+name+']');
+	var objs = $$('[name=' + name + ']');
 
 	if (empty(objs)) {
-		throw 'ShowHide(): Object not found.';
+		throw 'showHideByName(): Object not found.';
 	}
 
 	for (var i = 0; i < objs.length; i++) {

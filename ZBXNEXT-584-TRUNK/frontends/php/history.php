@@ -150,13 +150,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		'itemids' => $_REQUEST['itemid'],
 		'webitems' => 1,
 		'selectHosts' => array('hostid','name'),
-		'output' => API_OUTPUT_EXTEND
+		'output' => API_OUTPUT_EXTEND,
+		'preservekeys' => true
 	);
 
 	$items = API::Item()->get($options);
-	$items = zbx_toHash($items, 'itemid');
 
-	foreach($_REQUEST['itemid'] as $inum =>  $itemid){
+	foreach($_REQUEST['itemid'] as $itemid){
 		if(!isset($items[$itemid])) access_deny();
 	}
 
@@ -260,7 +260,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$cmbitemlist->addItem($itemid,$host['name'].': '.itemName($item));
 			}
 
-			$addItemBttn = new CButton('add_log',_('Add'),"return PopUp('popup.php?multiselect=1".'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
+			$addItemBttn = new CButton('add_log',_('Add'),"return PopUp('popup.php?multiselect=1&real_hosts=1".
+				'&reference=itemid&srctbl=items&value_types[]='.$item['value_type']."&srcfld1=itemid');");
 			$delItemBttn = null;
 
 			if(count($items) > 1){

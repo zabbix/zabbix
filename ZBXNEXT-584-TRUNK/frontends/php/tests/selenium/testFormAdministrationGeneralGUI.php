@@ -99,7 +99,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Default theme'));
-		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('css_bb.css');
+		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('darkblue');
 
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Black and Blue" theme can not be selected as default theme: it does not exist in the DB');
 
@@ -107,14 +107,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Default theme'));
-		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('css_od.css');
+		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('darkorange');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Dark orange" theme can not be selected as default theme: it does not exist in the DB');
 
 		$this->dropdown_select('default_theme', 'Original blue');
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('Configuration updated');
-		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('css_ob.css');
+		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('originalblue');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Original blue" theme can not be selected as default theme: it does not exist in the DB');
 
 		$newHash = DBhash($sqlHash);
@@ -216,9 +216,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 
-		// this test will fail as there is no GUI conf form after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "0" for "Search/Filter elements limit" field: must be between 1 and 999999.'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
 
 		// Check to enter -1 value
 		$this->dropdown_select_wait('configDropDown', 'GUI');
@@ -228,9 +227,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 
-		// this test will fail as there is no GUI conf form after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "-1" for "Search/Filter elements limit" field: must be between 1 and 999999.'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
 
 		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
@@ -278,9 +276,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('max_in_table', '-1');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Zabbix has received an incorrect request', 'Critical error. Incorrect value "-1" for "Max count of elements to show inside table cell" field: must be between 1 and 99999.'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Max count of elements to show inside table cell": must be between 1 and 99999.'));
 
-		// this test will fail as there is no GUI conf form after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Max count of elements to show inside table cell'));
 
 		$newHash = DBhash($sqlHash);
@@ -358,9 +355,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_expire', '100000');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "100000" for "Show events not older than (in days)" field: must be between 1 and 99999.'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
 
-		// this test will fail as there is no GUI conf form on the screen after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
@@ -369,9 +365,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_expire', '0');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "0" for "event_expire" field.'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
 
-		// this test will fail as there is no GUI conf form on the screen after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
 
 		$newHash = DBhash($sqlHash);
@@ -409,9 +404,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_show_max', '100000');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "100000" for "Show events not older than (in days)" field: must be between 1 and 99999.'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
 
-		// this test part will fail as there are no GUI conf form on the screen after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
@@ -420,9 +414,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_show_max', '0');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Zabbix has received an incorrect request.', 'Critical error. Incorrect value "0" for "event_show_max" field.'));
+		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
 
-		// this test part will fail as there are no GUI conf form on the screen after this critical error "Zabbix has received an incorrect request"
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
 
 		$newHash = DBhash($sqlHash);

@@ -304,6 +304,7 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 
 function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
+
 	if (!defined('PAGE_HEADER_LOADED')) {
 		return null;
 	}
@@ -353,7 +354,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 
 				if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
 					$msg_details = new CDiv(_('Details'), 'blacklink');
-					$msg_details->setAttribute('onclick', "javascript: ShowHide('msg_messages', IE ? 'block' : 'table');");
+					$msg_details->setAttribute('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
 					$msg_details->setAttribute('title', _('Maximize').'/'._('Minimize'));
 					array_unshift($row, new CCol($msg_details, 'clr'));
 				}
