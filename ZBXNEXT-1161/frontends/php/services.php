@@ -395,13 +395,15 @@ else {
 			' LEFT JOIN services_links sl ON s.serviceid=sl.serviceupid AND sl.soft=1'.
 			' LEFT JOIN services_links sl_p ON s.serviceid=sl_p.servicedownid AND sl_p.soft=0'.
 		' WHERE '.DBin_node('s.serviceid').
-			' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY, array())).')'.
+			' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY)).')'.
 		' ORDER BY s.sortorder,sl_p.serviceupid,s.serviceid'
 	);
 	while ($row = DBFetch($db_services)) {
 		$row['id'] = $row['serviceid'];
 		$row['description'] = empty($row['triggerid']) ? _('None') : expand_trigger_description($row['triggerid']);
-		empty($row['serviceupid']) ? $row['serviceupid'] = '0' : '';
+		if (empty($row['serviceupid'])) {
+			$row['serviceupid'] = '0';
+		}
 
 		if (isset($services[$row['serviceid']])) {
 			$services[$row['serviceid']] = zbx_array_merge($services[$row['serviceid']], $row);
@@ -428,7 +430,7 @@ else {
 		'description' => _('Trigger')
 	));
 	if (empty($tree)) {
-		error(_('Can\'t format Tree'));
+		error(_('Cannot format tree.'));
 	}
 
 	$data = array('tree' => $tree);
