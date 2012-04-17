@@ -249,8 +249,8 @@ class CService extends CZBXAPI {
 
 		// update dependencies
 		$dependencies = array();
+		$parentDependencies = array();
 		$serviceTimes = array();
-		$deleteParentsFromServiceIds = array();
 		foreach ($services as $service) {
 			if (!empty($service['dependencies'])) {
 				foreach ($service['dependencies'] as $dependency) {
@@ -260,19 +260,12 @@ class CService extends CZBXAPI {
 			}
 
 			// update parent
-			if (isset($service['parentid'])) {
-				// unset a parent
-				if (!$service['parentid']) {
-					$deleteParentsFromServiceIds[] = $service['serviceid'];
-				}
-				// set a new parent
-				else {
-					$dependencies[] = array(
-						'serviceid' => $service['parentid'],
-						'dependsOnServiceid' => $service['serviceid'],
-						'soft' => 0
-					);
-				}
+			if (!empty($service['parentid'])) {
+				$parentDependencies[] = array(
+					'serviceid' => $service['parentid'],
+					'dependsOnServiceid' => $service['serviceid'],
+					'soft' => 0
+				);
 			}
 
 			// save service times
@@ -284,15 +277,13 @@ class CService extends CZBXAPI {
 			}
 		}
 
-		// unset parents
-		if ($deleteParentsFromServiceIds) {
-			$this->deleteParentDependencies($deleteParentsFromServiceIds);
-		}
-
 		// replace dependencies
+		$this->deleteParentDependencies(zbx_objectValues($services, 'serviceid'));
 		if ($dependencies) {
 			$this->deleteDependencies(array_unique(zbx_objectValues($dependencies, 'serviceid')));
-			$this->addDependencies($dependencies);
+		}
+		if ($parentDependencies || $dependencies) {
+			$this->addDependencies(array_merge($parentDependencies, $dependencies));
 		}
 
 		// replace service times
@@ -952,8 +943,9 @@ class CService extends CZBXAPI {
 				foreach ($parent['dependencies'] as $dependency) {
 					if (!$dependency['soft']) {
 						unset($parent['dependencies']);
-						$result[$dependency['servicedownid']]['parent'] = $parent;
-						continue 2;
+						if (isset($result[$dependency['servicedownid']])) {
+							$result[$dependency['servicedownid']]['parent'] = $parent;
+						}
 					}
 				}
 			}
