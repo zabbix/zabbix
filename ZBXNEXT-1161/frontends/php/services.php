@@ -40,16 +40,16 @@ include_once('include/page_header.php');
 $fields = array(
 	'serviceid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'group_serviceid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'name' => array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save_service})', _('Name')),
+	'name' => 				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({save_service})', _('Name')),
 	'algorithm' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({save_service})'),
 	'showsla' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'goodsla' => array(T_ZBX_DBL, O_OPT, null, BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')),
-	'sortorder' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, 999), null, _('Sort order (0->999)')),
-	'times' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'goodsla' => 			array(T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')),
+	'sortorder' => 			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')),
+	'times' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'trigger' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'new_service_time' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'children' =>				array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
+	'children' =>			array(T_ZBX_STR, O_OPT, P_SYS,	DB_ID,		null),
 	'parentid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'parentname' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
 	// actions
@@ -159,7 +159,7 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		if ($result) {
-			add_audit($audit_acrion, AUDIT_RESOURCE_IT_SERVICE, ' Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
+			add_audit($audit_acrion, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
 			unset($_REQUEST['form']);
 		}
 
