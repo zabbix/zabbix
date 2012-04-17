@@ -467,16 +467,16 @@ class CScript extends CZBXAPI {
 
 			switch ($errorMsg) {
 				case 'Connection refused':
-					$dErrorMsg = _s('Connection to Zabbix server "%s" refused. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Security environment (for example, SELinux) is blocking the connection; 3. Zabbix server daemon not running; 4. Firewall is blocking TCP connection.', $ZBX_SERVER).SPACE;
+					$dErrorMsg = _s("Connection to Zabbix server \"%s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $ZBX_SERVER);
 					break;
 				case 'No route to host':
-					$dErrorMsg = _s('Zabbix server "%s" can not be reached. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect network configuration.', $ZBX_SERVER).SPACE;
+					$dErrorMsg = _s("Zabbix server \"%s\" can not be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $ZBX_SERVER);
 					break;
 				case 'Connection timed out':
-					$dErrorMsg = _s('Connection to Zabbix server "%s" timed out. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Firewall is blocking TCP connection.', $ZBX_SERVER).SPACE;
+					$dErrorMsg = _s("Connection to Zabbix server \"%s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $ZBX_SERVER);
 					break;
 				case 'php_network_getaddresses: getaddrinfo failed: Name or service not known':
-					$dErrorMsg = _s('Connection to Zabbix server "%s" failed. Possible reasons: 1. Incorrect server IP/DNS in the "zabbix.conf.php"; 2. Incorrect DNS server configuration.', $ZBX_SERVER).SPACE;
+					$dErrorMsg = _s("Connection to Zabbix server \"%s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $ZBX_SERVER);
 					break;
 				default:
 					$dErrorMsg = '';

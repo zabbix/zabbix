@@ -9,6 +9,7 @@ A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3219] added newlines to script execution error messages (Vedmak)
 ..F....... [ZBX-4348] fixed graph values not displayed for regular user (Toms)
 ..F....... [ZBX-4698] fixed selected host group forgotten if "remember selected" is disabled (Toms)
 ..F....... [ZBX-4871] fixed templates listed when adding log items in history (Toms)
