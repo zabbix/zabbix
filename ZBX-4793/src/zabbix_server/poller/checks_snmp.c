@@ -402,7 +402,7 @@ static void	snmp_close_session(struct snmp_session *session)
 static char	*snmp_get_octet_string(struct variable_list *vars)
 {
 	char	*strval_dyn = NULL;
-	size_t	i, sz, offset;
+	size_t	i;
 
 	for (i = 0; i < vars->val_len; i++)
 	{
@@ -421,6 +421,8 @@ static char	*snmp_get_octet_string(struct variable_list *vars)
 	}
 	else
 	{
+		size_t sz, offset;
+
 		sz = vars->val_len * 3;
 		strval_dyn = zbx_malloc(strval_dyn, sz);
 		offset = zbx_snprintf(strval_dyn, sz, "%02X", vars->val.string[0]);
