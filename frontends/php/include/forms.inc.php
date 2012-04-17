@@ -1267,7 +1267,11 @@
 						' AND f.triggerid=t.triggerid'
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
-					$data['templates'][] = new CLink($db_triggers['name'], 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'], 'highlight underline weight_normal');
+					$link = empty($data['parent_discoveryid'])
+						? 'triggers.php?form=update&triggerid='.$db_triggers['triggerid']
+						: 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$data['parent_discoveryid'];
+
+					$data['templates'][] = new CLink($db_triggers['name'], $link, 'highlight underline weight_normal');
 					$data['templates'][] = SPACE.RARR.SPACE;
 				}
 				$tmp_triggerid = $db_triggers['templateid'];
@@ -1327,7 +1331,7 @@
 				$data['expression_field_name'] = 'expr_temp';
 				$data['expression_field_value'] = $data['expr_temp'];
 				$data['expression_field_readonly'] = 'yes';
-				$data['expression_field_params'] = 'this.form.elements[\''.$data['expression_field_name'].'\'].value';
+				$data['expression_field_params'] = 'this.form.elements["'.$data['expression_field_name'].'"].value';
 				$data['expression_macro_button'] = new CButton('insert_macro', _('Insert macro'), 'return call_ins_macro_menu(event);', 'formlist');
 				if ($data['limited'] == 'yes') {
 					$data['expression_macro_button']->setAttribute('disabled', 'disabled');
@@ -1342,7 +1346,7 @@
 			$data['expression_field_name'] = 'expression';
 			$data['expression_field_value'] = $data['expression'];
 			$data['expression_field_readonly'] = $data['limited'];
-			$data['expression_field_params'] = 'getSelectedText(this.form.elements[\''.$data['expression_field_name'].'\'])';
+			$data['expression_field_params'] = 'getSelectedText(this.form.elements["'.$data['expression_field_name'].'"])';
 		}
 
 		if (empty($data['parent_discoveryid'])) {
