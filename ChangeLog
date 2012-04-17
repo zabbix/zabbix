@@ -11,6 +11,9 @@ A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
+.......PS. [ZBX-4709] fixed processing of quoted strings in SNMP items (Sasha)
+........S. [ZBX-4882] fixed processing of quoted strings in SNMP lld rules (Sasha)
 ..F....... [ZBX-3219] added newlines to script execution error messages (Vedmak)
 ..F....... [ZBX-4348] fixed graph values not displayed for regular user (Toms)
 ..F....... [ZBX-4698] fixed selected host group forgotten if "remember selected" is disabled (Toms)
@@ -579,6 +582,11 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.12rc2
+
+.......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
+.......PS. [ZBX-4709] fixed processing of quoted strings in SNMP items (Sasha)
+
 Changes for 1.8.12rc1
 
 ...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
