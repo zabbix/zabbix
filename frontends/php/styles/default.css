@@ -133,7 +133,11 @@ ul.favorites li a { line-height: 18px; vertical-align: top; }
 ul.messages { overflow:auto; vertical-align: top; background-color: #FFFFFF; margin: 1px; text-align: left; }
 ul.messages li { font-size: 1.1em; line-height: 18px; }
 ul.messages li.info { color:#000000; list-style: url("../images/general/warning_small.gif") inside; }
-ul.messages li.error { color:#D40000; list-style: url("../images/general/error_small.gif") inside; }
+ul.messages li.error {
+	color:#D40000;
+	list-style: url("../images/general/error_small.gif") inside;
+	white-space: pre;
+}
 
 /* form */
 form .thin .input { height: 14px; }
