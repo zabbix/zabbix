@@ -272,14 +272,14 @@ if(!isset($DB)){
 
 	function DBstart($strict=true){
 		global $DB;
-//SDI('DBStart(): '.$DB['TRANSACTIONS']);
+
 		$DB['STRICT'] = $strict;
 
 		$DB['TRANSACTIONS']++;
 
 		if($DB['TRANSACTIONS']>1){
 			info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
-		return $DB['TRANSACTION_STATE'];
+			return $DB['TRANSACTION_STATE'];
 		}
 
 		$DB['TRANSACTION_STATE'] = true;
@@ -307,7 +307,8 @@ if(!isset($DB)){
 				}
 				break;
 		}
-	return $result;
+
+		return $result;
 	}
 
 
@@ -827,7 +828,7 @@ else {
 	return uint_in_array(id2nodeid($id_var), $nodes);
 	}
 
-	function get_dbid($table,$field){
+	function get_dbid($table, $field){
 // PGSQL on transaction failure on all queries returns false..
 		global $DB, $ZBX_LOCALNODEID;
 		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 0;
