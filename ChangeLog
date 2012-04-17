@@ -2,6 +2,7 @@
 Changes for 2.0.0rc3
 
 New features:
+...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
 ..F.I..... [ZBX-3721] design improvements (Pavels)
 A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
 ...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
@@ -579,6 +580,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.12rc1
 
+...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
 ...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBX-4795] fixed group creation for child nodes (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
