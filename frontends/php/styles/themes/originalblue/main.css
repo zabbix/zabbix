@@ -16,4 +16,17 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-@import "originalblue/jquery-ui.css";
+@import "jquery-ui.css";
+
+.unknown, a.unknown { color: #777; }
+a.unknown:hover { color: #999; }
+
+table.filter { background: white; border: 1px solid #EEE; }
+table.filter tr td { border: 1px solid #EEE; }
+
+ul.formlist li.new { background: #EEFFEE; }
+
+.dropArea { background-color: #FFB; }
+.dropHereText { color: #5481AB; }
+
+table.ack_msgs tr.msg { background-color: #F8F8F8; }

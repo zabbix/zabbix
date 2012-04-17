@@ -1,32 +1,31 @@
 <script type="text/x-jquery-tmpl" id="hostInterfaceRow">
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
-	<td style="width: 2em;">
+	<td class="interface-drag-control">
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
 	</td>
-	<td style="width: 16em;">
+	<td class="interface-ip">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" size="24" value="#{iface.ip}" />
 	</td>
-	<td style="width: 19em;">
+	<td class="interface-dns">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" size="30" value="#{iface.dns}" />
 	</td>
-	<td style="width: 10em; white-space: nowrap;">
+	<td class="interface-connect-to">
 		<div class="jqueryinputset">
 			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
-			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label>
 			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns} />
-			<label for="radio_dns_#{iface.interfaceid}"><?php echo _('DNS'); ?></label>
+			<label for="radio_ip_#{iface.interfaceid}"><?php echo _('IP'); ?></label><label for="radio_dns_#{iface.interfaceid}"><?php echo _('DNS'); ?></label>
 		</div>
 	</td>
-	<td style="width: 10em;">
+	<td class="interface-port">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" size="15" value="#{iface.port}" />
 	</td>
-	<td style="width: 4em;">
+	<td class="interface-default">
 		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}" />
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
-	<td  style="width: 4em;">
+	<td class="interface-control">
 		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="link_menu remove" #{*attrs.disabled} ><?php echo _('Remove'); ?></button>
 	</td>
 </tr>

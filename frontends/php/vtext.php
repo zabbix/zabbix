@@ -38,15 +38,15 @@ check_fields($fields);
 
 $text = get_request('text', ' ');
 $font = get_request('font', 9);
-$theme = get_request('theme', 'css_ob.css');
+$theme = get_request('theme', ZBX_DEFAULT_THEME);
 
 switch ($theme) {
-	case 'css_bb.css':
-	case 'css_od.css':
+	case 'darkblue':
+	case 'darkorange':
 		$color = array('red' => 255, 'green' => 255, 'blue' => 255);
 		$shadow = array('red' => 105, 'green' => 105, 'blue' => 105);
 		break;
-	case 'css_ob.css':
+	case 'originalblue':
 	default:
 		$color = array('red' => 0, 'green' => 0, 'blue' => 0);
 		$shadow = array('red' => 175, 'green' => 175, 'blue' => 175);
