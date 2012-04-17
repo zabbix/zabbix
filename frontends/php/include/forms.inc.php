@@ -90,7 +90,7 @@
 			$data['autologin']		= get_request('autologin', 0);
 			$data['autologout']		= get_request('autologout', 900);
 			$data['lang']			= get_request('lang', 'en_gb');
-			$data['theme']			= get_request('theme', 'default.css');
+			$data['theme']			= get_request('theme', THEME_DEFAULT);
 			$data['refresh']		= get_request('refresh', 30);
 			$data['rows_per_page']	= get_request('rows_per_page', 50);
 			$data['user_type']		= get_request('user_type', USER_TYPE_ZABBIX_USER);;
@@ -319,7 +319,6 @@
 	}
 
 	function getItemFilterForm(&$items) {
-		$filter_groupid				= $_REQUEST['filter_groupid'];
 		$filter_group				= $_REQUEST['filter_group'];
 		$filter_hostname			= $_REQUEST['filter_hostname'];
 		$filter_application			= $_REQUEST['filter_application'];
@@ -364,44 +363,8 @@
 		$form->addVar('subfilter_trends', $subfilter_trends);
 		$form->addVar('subfilter_interval', $subfilter_interval);
 
-		$table = new CTable('', 'itemfilter');
-		$table->setCellPadding(0);
-		$table->setCellSpacing(0);
-
-		// 1st column
-		$col_table1 = new CTable(null, 'filter');
-		$col_table1->addRow(array(bold(_('Host group').': '),
-			array(
-				new CTextBox('filter_group', $filter_group, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_group', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_group&srctbl=host_group&srcfld1=name", 450, 450);', 'G'
-				)
-			)
-		));
-		$col_table1->addRow(array(bold(_('Host').': '),
-			array(
-				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_host', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
-				)
-			)
-		));
-		$col_table1->addRow(array(bold(_('Application').': '),
-			array(
-				new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_app', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&host=" + jQuery("#filter_hostname").val(), 400, 300, "application");', 'A'
-				)
-			)
-		));
-		$col_table1->addRow(array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE)));
-		$col_table1->addRow(array(array(bold(_('Key')), SPACE._('like').': '), new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE)));
-
-		// 2nd column
-		$col_table2 = new CTable(null, 'filter');
+		// type select
 		$fTypeVisibility = array();
-
-		// first row
 		$cmbType = new CComboBox('filter_type', $filter_type);
 		$cmbType->setAttribute('id', 'filter_type');
 		$cmbType->addItem(-1, _('all'));
@@ -442,55 +405,8 @@
 		}
 
 		zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
-		$col21 = new CCol(bold(_('Type').': '));
-		$col21->setAttribute('style', 'width: 170px');
 
-		$col_table2->addRow(array($col21, $cmbType));
-
-		// second row
-		$label221 = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').': '));
-		$label221->setAttribute('id', 'filter_delay_label');
-
-		$field221 = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
-		$field221->setEnabled('no');
-
-		$col_table2->addRow(array(array($label221, SPACE), array($field221, SPACE)));
-
-		// third row
-		$label231 = new CSpan(array(bold(_('SNMP community')), SPACE._('like').': '));
-		$label231->setAttribute('id', 'filter_snmp_community_label');
-
-		$field231 = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
-		$field231->setEnabled('no');
-
-		$label232 = new CSpan(array(bold(_('SNMPv3 security name')), SPACE._('like').': '));
-		$label232->setAttribute('id', 'filter_snmpv3_securityname_label');
-
-		$field232 = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
-		$field232->setEnabled('no');
-
-		$col_table2->addRow(array(array($label231, $label232, SPACE), array($field231, $field232, SPACE)));
-
-		// fourth row
-		$label241 = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').': '));
-		$label241->setAttribute('id', 'filter_snmp_oid_label');
-
-		$field241 = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
-		$field241->setEnabled('no');
-
-		$col_table2->addRow(array(array($label241, SPACE), array($field241, SPACE)));
-
-		// fifth row
-		$label251 = new CSpan(array(bold(_('Port')), SPACE._('like').': '));
-		$label251->setAttribute('id', 'filter_port_label');
-
-		$field251 = new CNumericBox('filter_port', $filter_port, 5, null, true);
-		$field251->setEnabled('no');
-
-		$col_table2->addRow(array(array($label251, SPACE), array($field251, SPACE)));
-
-		// 3rd column
-		$col_table3 = new CTable(null, 'filter');
+		// type of information select
 		$fVTypeVisibility = array();
 
 		$cmbValType = new CComboBox('filter_value_type', $filter_value_type);
@@ -505,55 +421,142 @@
 			zbx_subarray_push($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, $vItem);
 		}
 
-		$col_table3->addRow(array(bold(_('Type of information').': '), $cmbValType));
-
 		zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', 'change', ".zbx_jsvalue($fVTypeVisibility, true).');');
 
-		// second row
-		$label321 = new CSpan(bold(_('Data type').': '));
-		$label321->setAttribute('id', 'filter_data_type_label');
-
-		$field321 = new CComboBox('filter_data_type', $filter_data_type);;
-		$field321->addItem(-1, _('all'));
-		$field321->addItems(item_data_type2str());
-		$field321->setEnabled('no');
-
-		$col_table3->addRow(array(array($label321, SPACE), array($field321, SPACE)));
-		$col_table3->addRow(array(array(bold(_('Keep history')), SPACE._('(in days)').': '), new CNumericBox('filter_history', $filter_history, 8, null, true)));
-		$col_table3->addRow(array(array(bold(_('Keep trends')), SPACE._('(in days)').': '), new CNumericBox('filter_trends', $filter_trends, 8, null, true)));
-
-		// 4th column
-		$col_table4 = new CTable(null, 'filter');
-
+		// status select
 		$cmbStatus = new CComboBox('filter_status', $filter_status);
 		$cmbStatus->addItem(-1, _('all'));
 		foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $status) {
 			$cmbStatus->addItem($status, item_status2str($status));
 		}
 
-		$cmbBelongs = new CComboBox('filter_templated_items', $filter_templated_items);
-		$cmbBelongs->addItem(-1, _('all'));
-		$cmbBelongs->addItem(1, _('Templated items'));
-		$cmbBelongs->addItem(0, _('Not Templated items'));
+		// update interval
+		$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), SPACE._('(in sec)').': '));
+		$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
 
-		$cmbWithTriggers = new CComboBox('filter_with_triggers', $filter_with_triggers);
-		$cmbWithTriggers->addItem(-1, _('all'));
-		$cmbWithTriggers->addItem(1, _('With triggers'));
-		$cmbWithTriggers->addItem(0, _('Without triggers'));
+		$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, null, true);
+		$updateIntervalInput->setEnabled('no');
 
-		$col_table4->addRow(array(bold(_('Status').': '), $cmbStatus));
-		$col_table4->addRow(array(bold(_('Triggers').': '), $cmbWithTriggers));
-		$col_table4->addRow(array(bold(_('Template').': '), $cmbBelongs));
+		// data type
+		$dataTypeLabel = new CSpan(bold(_('Data type').': '));
+		$dataTypeLabel->setAttribute('id', 'filter_data_type_label');
 
-		// adding all columns tables to main table
-		$col1 = new CCol($col_table1, 'top');
-		$col1->setAttribute('style', 'width: 280px');
-		$col2 = new CCol($col_table2, 'top');
-		$col2->setAttribute('style', 'width: 410px');
-		$col3 = new CCol($col_table3, 'top');
-		$col3->setAttribute('style', 'width: 160px');
-		$col4 = new CCol($col_table4, 'top');
-		$table->addRow(array($col1, $col2, $col3, $col4));
+		$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);;
+		$dataTypeInput->addItem(-1, _('all'));
+		$dataTypeInput->addItems(item_data_type2str());
+		$dataTypeInput->setEnabled('no');
+
+		// filter table
+		$table = new CTable('', 'filter filter-item');
+		$table->setCellPadding(0);
+		$table->setCellSpacing(0);
+
+		// SNMP community
+		$snmpCommunityLabel = new CSpan(array(bold(_('SNMP community')), SPACE._('like').': '));
+		$snmpCommunityLabel->setAttribute('id', 'filter_snmp_community_label');
+
+		$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
+		$snmpCommunityField->setEnabled('no');
+
+		// SNMPv3 security name
+		$snmpSecurityLabel = new CSpan(array(bold(_('SNMPv3 security name')), SPACE._('like').': '));
+		$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
+
+		$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
+		$snmpSecurityField->setEnabled('no');
+
+		// SNMP OID
+		$snmpOidLabel = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').': '));
+		$snmpOidLabel->setAttribute('id', 'filter_snmp_oid_label');
+
+		$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
+		$snmpOidField->setEnabled('no');
+
+		// port
+		$portLabel = new CSpan(array(bold(_('Port')), SPACE._('like').': '));
+		$portLabel->setAttribute('id', 'filter_port_label');
+
+		$portField = new CNumericBox('filter_port', $filter_port, 5, null, true);
+		$portField->setEnabled('no');
+
+		// row 1
+		$table->addRow(array(
+			new CCol(bold(_('Host group').': '), 'label col1'),
+			new CCol(array(
+				new CTextBox('filter_group', $filter_group, ZBX_TEXTBOX_FILTER_SIZE),
+				new CButton('btn_group', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
+					'&dstfld1=filter_group&srctbl=host_group&srcfld1=name", 450, 450);', 'G'
+				)
+			), 'col1'),
+			new CCol(bold(_('Type').': '), 'label col2'),
+			new CCol($cmbType, 'col2'),
+			new CCol(bold(_('Type of information').': '), 'label col3'),
+			new CCol($cmbValType, 'col3'),
+			new CCol(bold(_('Status').': '), 'label col4'),
+			new CCol($cmbStatus, 'col4'),
+		));
+		// row 2
+		$table->addRow(array(
+			new CCol(bold(_('Host').': '), 'label'),
+			new CCol(array(
+				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
+				new CButton('btn_host', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
+					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
+				)
+			)),
+			new CCol($updateIntervalLabel, 'label'),
+			new CCol($updateIntervalInput),
+			new CCol($dataTypeLabel, 'label'),
+			new CCol($dataTypeInput),
+			new CCol(bold(_('Triggers').': '), 'label'),
+			new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
+				-1 => _('all'),
+				1 => _('With triggers'),
+				0 => _('Without triggers')
+			))),
+		));
+		// row 3
+		$table->addRow(array(
+			new CCol(bold(_('Application').': '), 'label'),
+			new CCol(array(
+				new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
+				new CButton('btn_app', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
+					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&host=" + jQuery("#filter_hostname").val(), 400, 300, "application");', 'A'
+				)
+			)),
+			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
+			new CCol(array($snmpCommunityField, $snmpSecurityField)),
+			new CCol(array(bold(_('Keep history')), SPACE._('(in days)').': '), 'label'),
+			new CCol(new CNumericBox('filter_history', $filter_history, 8, null, true)),
+			new CCol(bold(_('Template').': '), 'label'),
+			new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
+				-1 => _('all'),
+				1 => _('Templated items'),
+				0 => _('Not Templated items'),
+			))),
+		));
+		// row 4
+		$table->addRow(array(
+			new CCol(array(bold(_('Name')), SPACE._('like').': '), 'label'),
+			new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol($snmpOidLabel, 'label'),
+			new CCol($snmpOidField),
+			new CCol(array(bold(_('Keep trends')), SPACE._('(in days)').': '), 'label'),
+			new CCol(new CNumericBox('filter_trends', $filter_trends, 8, null, true)),
+			new CCol(null, 'label'),
+			new CCol(),
+		));
+		// row 5
+		$table->addRow(array(
+			new CCol(array(bold(_('Key')), SPACE._('like').': '), 'label'),
+			new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE)),
+			new CCol($portLabel, 'label'),
+			new CCol($portField),
+			new CCol(null, 'label'),
+			new CCol(),
+			new CCol(null, 'label'),
+			new CCol(),
+		));
 
 		$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
 		$reset->useJQueryStyle();
@@ -564,13 +567,13 @@
 		$div_buttons = new CDiv(array($filter, SPACE, $reset));
 		$div_buttons->setAttribute('style', 'padding: 4px 0px;');
 
-		$footer = new CCol($div_buttons, 'center', 4);
+		$footer = new CCol($div_buttons, 'controls', 8);
 
 		$table->addRow($footer);
 		$form->addItem($table);
 
 		// subfilters
-		$table_subfilter = new CTable(null, 'filter');
+		$table_subfilter = new CTable(null, 'filter sub-filter');
 
 		// array contains subfilters and number of items in each
 		$item_params = array(
@@ -907,7 +910,8 @@
 			'possibleHostInventories' => null,
 			'alreadyPopulated' => null,
 			'lifetime' => get_request('lifetime', 30),
-			'filter' => isset($ifm, $ifv) ? $ifm.':'.$ifv : ''
+			'filter' => isset($ifm, $ifv) ? $ifm.':'.$ifv : '',
+			'initial_item_type' => null
 		);
 
 		// hostid
@@ -1357,413 +1361,6 @@
 			order_result($data['db_dependencies'], 'description');
 		}
 		return $data;
-	}
-
-	function insert_graph_form(){
-		$frmGraph = new CFormTable(_('Graph'));
-		$frmGraph->setName('frm_graph');
-
-		$parent_discoveryid = get_request('parent_discoveryid');
-		if($parent_discoveryid) $frmGraph->addVar('parent_discoveryid', $parent_discoveryid);
-
-
-		if(isset($_REQUEST['graphid'])){
-			$frmGraph->addVar('graphid', $_REQUEST['graphid']);
-
-			$options = array(
-				'graphids' => $_REQUEST['graphid'],
-				'filter' => array('flags' => null),
-				'output' => API_OUTPUT_EXTEND,
-			);
-			$graphs = API::Graph()->get($options);
-			$graph = reset($graphs);
-
-			$frmGraph->setTitle(_('Graph').' "'.$graph['name'].'"');
-		}
-
-		if(isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
-			$name = $graph['name'];
-			$width = $graph['width'];
-			$height = $graph['height'];
-			$ymin_type = $graph['ymin_type'];
-			$ymax_type = $graph['ymax_type'];
-			$yaxismin = $graph['yaxismin'];
-			$yaxismax = $graph['yaxismax'];
-			$ymin_itemid = $graph['ymin_itemid'];
-			$ymax_itemid = $graph['ymax_itemid'];
-			$showworkperiod = $graph['show_work_period'];
-			$showtriggers = $graph['show_triggers'];
-			$graphtype = $graph['graphtype'];
-			$legend = $graph['show_legend'];
-			$graph3d = $graph['show_3d'];
-			$percent_left = $graph['percent_left'];
-			$percent_right = $graph['percent_right'];
-
-			$options = array(
-				'graphids' => $_REQUEST['graphid'],
-				'sortfield' => 'gitemid',
-				'output' => API_OUTPUT_EXTEND
-			);
-			$items = API::GraphItem()->get($options);
-		}
-		else{
-			$name = get_request('name', '');
-			$graphtype = get_request('graphtype', GRAPH_TYPE_NORMAL);
-
-			if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-				$width = get_request('width', 400);
-				$height = get_request('height', 300);
-			}
-			else{
-				$width = get_request('width', 900);
-				$height = get_request('height', 200);
-			}
-
-			$ymin_type = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
-			$ymax_type = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
-			$yaxismin = get_request('yaxismin', 0.00);
-			$yaxismax = get_request('yaxismax', 100.00);
-			$ymin_itemid = get_request('ymin_itemid', 0);
-			$ymax_itemid	= get_request('ymax_itemid', 0);
-			$showworkperiod = get_request('showworkperiod', 0);
-			$showtriggers	= get_request('showtriggers', 0);
-			$legend = get_request('legend', 0);
-			$graph3d	= get_request('graph3d', 0);
-			$visible = get_request('visible');
-			$percent_left  = 0;
-			$percent_right = 0;
-
-			if(isset($visible['percent_left'])) $percent_left = get_request('percent_left', 0);
-			if(isset($visible['percent_right'])) $percent_right = get_request('percent_right', 0);
-
-			$items = get_request('items', array());
-		}
-
-
-		if(!isset($_REQUEST['graphid']) && !isset($_REQUEST['form_refresh'])){
-			$legend = $_REQUEST['legend'] = 1;
-		}
-
-
-
-/* reinit $_REQUEST */
-		$_REQUEST['items'] = $items;
-		$_REQUEST['name'] = $name;
-		$_REQUEST['width'] = $width;
-		$_REQUEST['height'] = $height;
-
-		$_REQUEST['ymin_type'] = $ymin_type;
-		$_REQUEST['ymax_type'] = $ymax_type;
-
-		$_REQUEST['yaxismin'] = $yaxismin;
-		$_REQUEST['yaxismax'] = $yaxismax;
-
-		$_REQUEST['ymin_itemid'] = $ymin_itemid;
-		$_REQUEST['ymax_itemid'] = $ymax_itemid;
-
-		$_REQUEST['showworkperiod'] = $showworkperiod;
-		$_REQUEST['showtriggers'] = $showtriggers;
-		$_REQUEST['graphtype'] = $graphtype;
-		$_REQUEST['legend'] = $legend;
-		$_REQUEST['graph3d'] = $graph3d;
-		$_REQUEST['percent_left'] = $percent_left;
-		$_REQUEST['percent_right'] = $percent_right;
-/********************/
-
-		$items = array_values($items);
-		$icount = count($items);
-		for($i=0; $i < $icount-1;){
-// check if we deletd an item
-			$next = $i+1;
-			while(!isset($items[$next]) && ($next < ($icount-1))) $next++;
-
-			if(isset($items[$next]) && ($items[$i]['sortorder'] == $items[$next]['sortorder']))
-				for($j=$next; $j < $icount; $j++)
-					if($items[$j-1]['sortorder'] >= $items[$j]['sortorder']) $items[$j]['sortorder']++;
-
-			$i = $next;
-		}
-
-		asort_by_key($items, 'sortorder');
-
-		$items = array_values($items);
-
-		$group_gid = get_request('group_gid', array());
-
-		$frmGraph->addVar('ymin_itemid', $ymin_itemid);
-		$frmGraph->addVar('ymax_itemid', $ymax_itemid);
-
-		$frmGraph->addRow(_('Name'), new CTextBox('name', $name, 32));
-		$frmGraph->addRow(S_WIDTH, new CNumericBox('width', $width, 5));
-		$frmGraph->addRow(S_HEIGHT, new CNumericBox('height', $height, 5));
-
-		$cmbGType = new CComboBox('graphtype', $graphtype, 'graphs.submit(this)');
-		$cmbGType->addItems(graphType());
-		$frmGraph->addRow(_('Graph type'), $cmbGType);
-
-
-// items beforehead, to get only_hostid for miny maxy items
-		$only_hostid = null;
-		$real_hosts = null;
-
-		if(count($items)){
-			$frmGraph->addVar('items', $items);
-
-			$keys = array_keys($items);
-			$first = reset($keys);
-			$last = end($keys);
-
-			$items_table = new CTableInfo();
-			foreach($items as $gid => $gitem){
-				$host = get_host_by_itemid($gitem['itemid']);
-				$item = get_item_by_itemid($gitem['itemid']);
-
-				if($host['status'] == HOST_STATUS_TEMPLATE)
-					$only_hostid = $host['hostid'];
-				else
-					$real_hosts = 1;
-
-				$color = new CColorCell(null, $gitem['color']);
-
-				if($gid == $first){
-					$do_up = null;
-				}
-				else{
-					$do_up = new CSpan(_('Up'),'link');
-					$do_up->onClick("return create_var('".$frmGraph->getName()."','move_up',".$gid.", true);");
-				}
-
-				if($gid == $last){
-					$do_down = null;
-				}
-				else{
-					$do_down = new CSpan(_('Down'),'link');
-					$do_down->onClick("return create_var('".$frmGraph->getName()."','move_down',".$gid.", true);");
-				}
-
-				$description = new CSpan($host['name'].': '.itemName($item),'link');
-				$description->onClick(
-					'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->getName().
-					url_param($only_hostid, false, 'only_hostid').
-					url_param($real_hosts, false, 'real_hosts').
-					url_param($graphtype, false, 'graphtype').
-					url_param($gitem, false).
-					url_param($gid,false,'gid').
-					url_param(get_request('graphid',0),false,'graphid').
-					'",800,400,"graph_item_form");'
-				);
-
-				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type']),
-							$color,
-							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
-						));
-				}
-				else{
-					$items_table->addRow(array(
-							new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
-//							$gitem['sortorder'],
-							$description,
-							graph_item_calc_fnc2str($gitem["calc_fnc"],$gitem["type"]),
-							graph_item_type2str($gitem['type']),
-							($gitem['yaxisside']==GRAPH_YAXIS_SIDE_LEFT)?_('Left'):_('Right'),
-							graph_item_drawtype2str($gitem["drawtype"],$gitem["type"]),
-							$color,
-							array( $do_up, ((!is_null($do_up) && !is_null($do_down)) ? SPACE."|".SPACE : ''), $do_down )
-						));
-				}
-			}
-			$dedlete_button = new CSubmit('delete_item', _('Delete selected'));
-		}
-		else{
-			$items_table = $dedlete_button = null;
-		}
-
-		$frmGraph->addRow(_('Show legend'), new CCheckBox('legend',$legend, null, 1));
-
-		if(($graphtype == GRAPH_TYPE_NORMAL) || ($graphtype == GRAPH_TYPE_STACKED)){
-			$frmGraph->addRow(_('Show working time'),new CCheckBox('showworkperiod',$showworkperiod,null,1));
-			$frmGraph->addRow(_('Show triggers'),new CCheckBox('showtriggers',$showtriggers,null,1));
-
-
-			if($graphtype == GRAPH_TYPE_NORMAL){
-				$percent_left = sprintf('%2.2f', $percent_left);
-				$percent_right = sprintf('%2.2f', $percent_right);
-
-				$pr_left_input = new CTextBox('percent_left', $percent_left, '5');
-				$pr_left_chkbx = new CCheckBox('visible[percent_left]',1,"javascript: ShowHide('percent_left');",1);
-				if($percent_left == 0){
-					$pr_left_input->setAttribute('style','display: none;');
-					$pr_left_chkbx->setChecked(0);
-				}
-
-				$pr_right_input = new CTextBox('percent_right',$percent_right,'5');
-				$pr_right_chkbx = new CCheckBox('visible[percent_right]',1,"javascript: ShowHide('percent_right');",1);
-				if($percent_right == 0){
-					$pr_right_input->setAttribute('style','display: none;');
-					$pr_right_chkbx->setChecked(0);
-				}
-
-				$frmGraph->addRow(_('Percentile line (left)'), array($pr_left_chkbx, $pr_left_input));
-				$frmGraph->addRow(_('Percentile line (right)'), array($pr_right_chkbx, $pr_right_input));
-			}
-
-			$yaxis_min = array();
-
-			$cmbYType = new CComboBox('ymin_type',$ymin_type,'javascript: submit();');
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,_('Calculated'));
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,_('Fixed'));
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE,S_ITEM);
-
-			$yaxis_min[] = $cmbYType;
-
-			if($ymin_type == GRAPH_YAXIS_TYPE_FIXED){
-				$yaxis_min[] = new CTextBox("yaxismin",$yaxismin,9);
-			}
-			else if($ymin_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
-				$frmGraph->addVar('yaxismin',$yaxismin);
-
-				$ymin_name = '';
-				if($ymin_itemid > 0){
-					$min_host = get_host_by_itemid($ymin_itemid);
-					$min_item = get_item_by_itemid($ymin_itemid);
-					$ymin_name = $min_host['host'].':'.itemName($min_item);
-				}
-
-				if (count($items)) {
-					$yaxis_min[] = new CTextBox("ymin_name",$ymin_name,80,'yes');
-					$yaxis_min[] = new CButton('yaxis_min',_('Select'),'javascript: '.
-						"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-						url_param($only_hostid, false, 'only_hostid').
-						url_param($real_hosts, false, 'real_hosts').
-							"&dstfld1=ymin_itemid".
-							"&dstfld2=ymin_name".
-							"&srctbl=items".
-							"&srcfld1=itemid".
-							"&srcfld2=name',0,0,'zbx_popup_item');");
-
-					// select prototype button
-					if ($parent_discoveryid) {
-						$yaxis_min[] = new CButton('yaxis_min', _('Select prototype'),'javascript: '.
-							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-								"&parent_discoveryid=".$parent_discoveryid.
-								"&dstfld1=ymin_itemid".
-								"&dstfld2=ymin_name".
-								"&srctbl=prototypes".
-								"&srcfld1=itemid".
-								"&srcfld2=name',0,0,'zbx_popup_item');");
-					}
-				}
-				else {
-					$yaxis_min[] = _('add graph items first');
-				}
-			}
-			else{
-				$frmGraph->addVar('yaxismin', $yaxismin);
-			}
-
-			$frmGraph->addRow(_('Y axis MIN value'), $yaxis_min);
-
-			$yaxis_max = array();
-
-			$cmbYType = new CComboBox("ymax_type",$ymax_type,"submit()");
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_CALCULATED,_('Calculated'));
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_FIXED,_('Fixed'));
-			$cmbYType->addItem(GRAPH_YAXIS_TYPE_ITEM_VALUE,S_ITEM);
-
-			$yaxis_max[] = $cmbYType;
-
-			if($ymax_type == GRAPH_YAXIS_TYPE_FIXED){
-				$yaxis_max[] = new CTextBox('yaxismax',$yaxismax,9);
-			}
-			else if($ymax_type == GRAPH_YAXIS_TYPE_ITEM_VALUE){
-				$frmGraph->addVar('yaxismax',$yaxismax);
-
-				$ymax_name = '';
-				if($ymax_itemid > 0){
-					$max_host = get_host_by_itemid($ymax_itemid);
-					$max_item = get_item_by_itemid($ymax_itemid);
-					$ymax_name = $max_host['host'].':'.itemName($max_item);
-				}
-
-				if (count($items)) {
-					$yaxis_max[] = new CTextBox("ymax_name",$ymax_name,80,'yes');
-					$yaxis_max[] = new CButton('yaxis_max',_('Select'),'javascript: '.
-							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-							url_param($only_hostid, false, 'only_hostid').
-							url_param($real_hosts, false, 'real_hosts').
-							"&dstfld1=ymax_itemid".
-							"&dstfld2=ymax_name".
-							"&srctbl=items".
-							"&srcfld1=itemid".
-							"&srcfld2=name',0,0,'zbx_popup_item');"
-					);
-
-					// select prototype button
-					if ($parent_discoveryid) {
-						$yaxis_max[] = new CButton('yaxis_min', _('Select prototype'),'javascript: '.
-							"return PopUp('popup.php?dstfrm=".$frmGraph->getName().
-								"&parent_discoveryid=".$parent_discoveryid.
-								"&dstfld1=ymax_itemid".
-								"&dstfld2=ymax_name".
-								"&srctbl=prototypes".
-								"&srcfld1=itemid".
-								"&srcfld2=name',0,0,'zbx_popup_item');");
-					}
-				}
-				else {
-					$yaxis_max[] = _('add graph items first');
-				}
-			}
-			else{
-				$frmGraph->addVar('yaxismax', $yaxismax);
-			}
-
-			$frmGraph->addRow(_('Y axis MAX value'), $yaxis_max);
-		}
-		else{
-			$frmGraph->addRow(_('3D view'),new CCheckBox('graph3d',$graph3d,null,1));
-		}
-
-		$addProtoBtn = null;
-		if($parent_discoveryid){
-			$addProtoBtn = new CButton('add_protoitem', _('Add prototype'),
-				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
-				url_param($graphtype, false, 'graphtype').
-				url_param('parent_discoveryid').
-				"',800,400,'graph_item_form');");
-		}
-
-		$normal_only = $parent_discoveryid ? '&normal_only=1' : '';
-		$frmGraph->addRow(_('Items'), array(
-			$items_table,
-			new CButton('add_item',_('Add'),
-				"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->getName().
-				url_param($only_hostid, false, 'only_hostid').
-				url_param($real_hosts, false, 'real_hosts').
-				url_param($graphtype, false, 'graphtype').
-				$normal_only.
-				"',800,400,'graph_item_form');"),
-			$addProtoBtn,
-			$dedlete_button
-		));
-
-		$footer = array(
-			new CSubmit('preview', _('Preview')),
-			new CSubmit('save', _('Save')),
-		);
-		if(isset($_REQUEST['graphid'])){
-			$footer[] = new CSubmit('clone', _('Clone'));
-			$footer[] = new CButtonDelete(_('Delete graph?'),url_param('graphid').url_param('parent_discoveryid'));
-		}
-		$footer[] = new CButtonCancel(url_param('parent_discoveryid'));
-		$frmGraph->addItemToBottomRow($footer);
-
-		$frmGraph->show();
 	}
 
 	function get_timeperiod_form() {

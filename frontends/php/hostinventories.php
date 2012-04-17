@@ -108,7 +108,7 @@ else{
 		$_REQUEST['filter_exact'] = CProfile::get('web.hostinventories.filter_exact');
 	}
 
-	$filter_table = new CTable('', 'filter_config');
+	$filter_table = new CTable('', 'filter');
 	// getting inventory fields to make a drop down
 	$inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
 	$inventoryFieldsComboBox = new CComboBox('filter_field', $_REQUEST['filter_field']);
@@ -140,8 +140,7 @@ else{
 	$div_buttons = new CDiv(array($filter, SPACE, $reset));
 	$div_buttons->setAttribute('style', 'padding: 4px 0px;');
 
-	$footer_col = new CCol($div_buttons, 'center');
-	$footer_col->setColSpan(4);
+	$footer_col = new CCol($div_buttons, 'controls');
 
 	$filter_table->addRow($footer_col);
 
@@ -150,11 +149,7 @@ else{
 	$filter_form->setAttribute('id','zbx_filter');
 	$filter_form->addItem($filter_table);
 	$hostinvent_wdgt->addFlicker($filter_form, CProfile::get('web.hostinventories.filter.state', 0));
-	// }}} HOST INVENTORY FILTER
-
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
-	$hostinvent_wdgt->addHeader($numrows);
+	$hostinvent_wdgt->addHeaderRowNumber();
 
 	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(

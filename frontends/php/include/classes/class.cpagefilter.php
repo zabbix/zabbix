@@ -1,5 +1,27 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2001-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+?>
+<?php
+
 class CPageFilter {
+
 	protected $data = array(); // groups, hosts, ...
 	protected $ids = array(); // groupid, hostid, ...
 	protected $isSelected = array(); // hostsSelected, groupsSelected, ...
@@ -33,6 +55,7 @@ class CPageFilter {
 
 		$this->config['all_nodes'] = $ZBX_WITH_ALL_NODES;
 		$this->config['select_latest'] = isset($options['config']['select_latest']);
+		$this->config['DDReset'] = get_request('ddreset', null);
 
 		$config = select_config();
 
@@ -103,25 +126,26 @@ class CPageFilter {
 		$this->_profileIdx['hosts'] = 'web.'.$profileSection.'.hostid';
 		$this->_profileIdx['graphs'] = 'web.'.$profileSection.'.graphid';
 		$this->_profileIdx['triggers'] = 'web.'.$profileSection.'.triggerid';
-		$this->_profileIds['groupid'] = 0;
-		$this->_profileIds['hostid'] = 0;
-		$this->_profileIds['graphid'] = 0;
-		$this->_profileIds['triggerid'] = 0;
 
-		if ($this->config['DDRemember']) {
-			if ($this->config['select_latest']) {
-				$this->_profileIds['groupid'] = CProfile::get(self::GROUP_LATEST_IDX);
-				$this->_profileIds['hostid'] = CProfile::get(self::HOST_LATEST_IDX);
-				$this->_profileIds['graphid'] = CProfile::get(self::GRAPH_LATEST_IDX);
-				$this->_profileIds['triggerid'] = null;
-			}
-			else {
-				$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
-				$this->_profileIds['hostid'] = CProfile::get($this->_profileIdx['hosts']);
-				$this->_profileIds['graphid'] = CProfile::get($this->_profileIdx['graphs']);
-				$this->_profileIds['triggerid'] = null;
-			}
+		if ($this->config['select_latest']) {
+			$this->_profileIds['groupid'] = CProfile::get(self::GROUP_LATEST_IDX);
+			$this->_profileIds['hostid'] = CProfile::get(self::HOST_LATEST_IDX);
+			$this->_profileIds['graphid'] = CProfile::get(self::GRAPH_LATEST_IDX);
+			$this->_profileIds['triggerid'] = null;
 		}
+		elseif ($this->config['DDReset'] && !$this->config['DDRemember']) {
+			$this->_profileIds['groupid'] = 0;
+			$this->_profileIds['hostid'] = 0;
+			$this->_profileIds['graphid'] = 0;
+			$this->_profileIds['triggerid'] = 0;
+		}
+		else {
+			$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
+			$this->_profileIds['hostid'] = CProfile::get($this->_profileIdx['hosts']);
+			$this->_profileIds['graphid'] = CProfile::get($this->_profileIdx['graphs']);
+			$this->_profileIds['triggerid'] = null;
+		}
+
 		$this->_requestIds['groupid'] = isset($options['groupid']) ? $options['groupid'] : null;
 		$this->_requestIds['hostid'] = isset($options['hostid']) ? $options['hostid'] : null;
 		$this->_requestIds['graphid'] = isset($options['graphid']) ? $options['graphid'] : null;
@@ -249,10 +273,9 @@ class CPageFilter {
 			}
 		}
 
-		if (!is_null($this->_requestIds['groupid'])) {
-			CProfile::update($this->_profileIdx['groups'], $groupid, PROFILE_TYPE_ID);
-			CProfile::update(self::GROUP_LATEST_IDX, $groupid, PROFILE_TYPE_ID);
-		}
+		CProfile::update($this->_profileIdx['groups'], $groupid, PROFILE_TYPE_ID);
+		CProfile::update(self::GROUP_LATEST_IDX, $groupid, PROFILE_TYPE_ID);
+
 		$this->isSelected['groupsSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups'])) || $groupid > 0;
 		$this->isSelected['groupsAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['groups']) && $groupid == 0;
 		$this->ids['groupid'] = $groupid;
@@ -268,7 +291,7 @@ class CPageFilter {
 			$def_options = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => array('hostid', 'name'),
-				'groupids' => $this->groupid > 0 ? $this->groupid : null
+				'groupids' => ($this->groupid > 0) ? $this->groupid : null
 			);
 			$options = zbx_array_merge($def_options, $options);
 			$hosts = API::Host()->get($options);
@@ -312,8 +335,8 @@ class CPageFilter {
 			$def_ptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $this->groupid > 0 && $this->hostid == 0 ? $this->groupid : null,
-				'hostids' => $this->hostid > 0 ? $this->hostid : null
+				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
+				'hostids' => ($this->hostid > 0) ? $this->hostid : null
 			);
 			$options = zbx_array_merge($def_ptions, $options);
 			$graphs = API::Graph()->get($options);
@@ -368,8 +391,8 @@ class CPageFilter {
 			$def_ptions = array(
 				'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 				'output' => API_OUTPUT_EXTEND,
-				'groupids' => $this->groupid > 0 && $this->hostid == 0 ? $this->groupid : null,
-				'hostids' => $this->hostid > 0 ? $this->hostid : null
+				'groupids' => ($this->groupid > 0 && $this->hostid == 0) ? $this->groupid : null,
+				'hostids' => ($this->hostid > 0) ? $this->hostid : null
 			);
 			$options = zbx_array_merge($def_ptions, $options);
 			$triggers = API::Trigger()->get($options);

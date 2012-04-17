@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 $httpWidget = new CWidget();
 
 // create new scenario button
@@ -30,7 +31,7 @@ if ($this->data['hostid'] > 0) {
 }
 else {
 	$createScenarioButton = new CSubmit('form', _('Create scenario (select host first)'));
-	$createScenarioButton->setEnabled('no');
+	$createScenarioButton->setEnabled(false);
 }
 $createForm->addItem($createScenarioButton);
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
@@ -39,10 +40,13 @@ $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
 $filterForm = new CForm('get');
 $filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
 $filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
+
 $httpWidget->addHeader(_('Scenarios'), $filterForm);
-$httpWidget->addHeader($numRows, array('[ ', new CLink($this->data['showDisabled'] ? _('Hide disabled scenarios') : _('Show disabled scenarios'), '?showdisabled='.($this->data['showDisabled'] ? 0 : 1), null), ' ]'));
+$httpWidget->addHeaderRowNumber(array(
+	'[ ',
+	new CLink($this->data['showDisabled'] ? _('Hide disabled scenarios') : _('Show disabled scenarios'),
+	'?showdisabled='.($this->data['showDisabled'] ? 0 : 1), null), ' ]'
+));
 
 // create form
 $httpForm = new CForm('get');
