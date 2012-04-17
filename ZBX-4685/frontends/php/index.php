@@ -47,7 +47,7 @@ $page['file']	= 'index.php';
 
 	if(isset($_REQUEST['reconnect']) && isset($sessionid)){
 
-		CUser::logout($sessionid, $name);
+		CUser::logout($sessionid);
 
 		redirect('index.php');
 		exit();
