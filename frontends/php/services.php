@@ -319,21 +319,23 @@ if (isset($_REQUEST['form'])) {
 		}
 
 		// get children
-		$childServices = API::Service()->get(array(
-			'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
-			'output' => array('name', 'triggerid'),
-			'preservekeys' => true,
-		));
 		$data['children'] = array();
-		foreach ($service['dependencies'] as $dependency) {
-			$childService = $childServices[$dependency['servicedownid']];
-			$data['children'][] = array(
-				'name' => $childService['name'],
-				'triggerid' => $childService['triggerid'],
-				'trigger' => !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-',
-				'serviceid' => $dependency['servicedownid'],
-				'soft' => $dependency['soft'],
-			);
+		if ($service['dependencies']) {
+			$childServices = API::Service()->get(array(
+				'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
+				'output' => array('name', 'triggerid'),
+				'preservekeys' => true,
+			));
+			foreach ($service['dependencies'] as $dependency) {
+				$childService = $childServices[$dependency['servicedownid']];
+				$data['children'][] = array(
+					'name' => $childService['name'],
+					'triggerid' => $childService['triggerid'],
+					'trigger' => !empty($childService['triggerid']) ? expand_trigger_description($childService['triggerid']) : '-',
+					'serviceid' => $dependency['servicedownid'],
+					'soft' => $dependency['soft'],
+				);
+			}
 		}
 	}
 	// populate the form from a submitted request

@@ -887,14 +887,16 @@ class CService extends CZBXAPI {
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$accessibleTriggers = get_accessible_triggers(PERM_READ_ONLY);
-		// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
-		if ($options['filter']['triggerid']) {
-			$options['filter']['triggerid'] = array_intersect($accessibleTriggers, $options['filter']['triggerid']);
-		}
-		// otherwise return services with either no triggers, or any trigger accessible to the current user
-		else {
-			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), $accessibleTriggers).')';
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			$accessibleTriggers = get_accessible_triggers(PERM_READ_ONLY);
+			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
+			if ($options['filter']['triggerid']) {
+				$options['filter']['triggerid'] = array_intersect($accessibleTriggers, $options['filter']['triggerid']);
+			}
+			// otherwise return services with either no triggers, or any trigger accessible to the current user
+			else {
+				$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), $accessibleTriggers).')';
+			}
 		}
 
 		$sqlParts = parent::applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
