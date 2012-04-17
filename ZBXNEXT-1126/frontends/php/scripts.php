@@ -246,13 +246,10 @@ if (isset($_REQUEST['form'])) {
 else {
 	$data = array();
 
-	$sortfield = getPageSortField('name');
-
 	// list of scripts
 	$data['scripts'] = API::Script()->get(array(
 		'output' => array('scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type', 'execute_on'),
 		'editable' => true,
-		'sortfield' => $sortfield,
 		'selectGroups' => API_OUTPUT_EXTEND
 	));
 
@@ -278,7 +275,7 @@ else {
 			$data['scripts'][$snum]['hostGroupName'] = ''; // all host groups
 		}
 	}
-	order_result($data['scripts'], $sortfield, getPageSortOrder());
+	order_result($data['scripts'], getPageSortField('name'), getPageSortOrder());
 
 	$data['paging'] = getPagingLine($data['scripts']);
 
