@@ -120,3 +120,13 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 
 	return i;
 }
+
+int zbx_is_regular_file(const char *path)
+{
+	struct stat st;
+
+	if (NULL != path && '\0' != *path && 0 == zbx_stat(path, &st) && 0 != S_ISREG(st.st_mode))
+		return 1;
+
+	return 0;
+}
