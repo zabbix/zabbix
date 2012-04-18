@@ -31,7 +31,7 @@
 	}
 
 	function organizeInterfaces(interfaceType) {
-		var selectedInterfaceId = jQuery('#selectedInterfaceId').val();
+		var selectedInterfaceId = +jQuery('#selectedInterfaceId').val();
 		var matchingInterfaces = jQuery('#interfaceid option[data-interfacetype="' + interfaceType + '"]');
 
 		var selectedInterfaceOption;
