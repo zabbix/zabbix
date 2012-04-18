@@ -24,7 +24,7 @@
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles.h"
-#if defined (_WINDOWS)
+#ifdef _WINDOWS
 #	include "eventlog.h"
 #endif
 #include "comms.h"
@@ -37,10 +37,19 @@
 #	include "daemon.h"
 #endif
 
+#ifdef _WINDOWS
+__declspec(thread) static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
+__declspec(thread) static ZBX_ACTIVE_BUFFER	buffer;
+__declspec(thread) static ZBX_REGEXP		*regexps = NULL;
+__declspec(thread) static int			regexps_alloc = 0;
+__declspec(thread) static int			regexps_num = 0;
+#else
 static ZBX_ACTIVE_METRIC	*active_metrics = NULL;
 static ZBX_ACTIVE_BUFFER	buffer;
 static ZBX_REGEXP		*regexps = NULL;
-static int			regexps_alloc = 0, regexps_num = 0;
+static int			regexps_alloc = 0;
+static int			regexps_num = 0;
+#endif
 
 static void	init_active_metrics()
 {
@@ -721,7 +730,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		key_severity[MAX_STRING_LEN], str_severity[32] /* for `regex_match_ex' */;
 	char		key_source[MAX_STRING_LEN], *source = NULL;
 	char		key_logeventid[MAX_STRING_LEN], str_logeventid[8] /* for `regex_match_ex' */;
-#endif	/* _WINDOWS */
+#endif
 	char		encoding[32];
 	char		tmp[16];
 
@@ -1111,7 +1120,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
 	int	nextcheck = 0, nextrefresh = 0, nextsend = 0;
-	char	*p = NULL;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1122,9 +1130,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
 
 	zbx_free(args);
-
-	if (NULL != (p = strchr(activechk_args.host, ',')))
-		*p = '\0';
 
 	init_active_metrics();
 

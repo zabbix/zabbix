@@ -28,6 +28,19 @@ $page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+API::Service()->update(array(
+	'serviceid' => 9,
+//	'name' => 'Service 21',
+//	'parentid' => 9,
+	'dependencies' => array(
+		array(
+			'dependsOnServiceid' => 21,
+			'soft' => 0
+		)
+	)
+));
+require_once dirname(__FILE__).'/include/page_footer.php';
+
 $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
 ?>
 <?php
