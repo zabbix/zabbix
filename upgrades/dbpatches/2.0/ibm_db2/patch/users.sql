@@ -6,6 +6,10 @@ ALTER TABLE users ALTER COLUMN lang SET WITH DEFAULT 'en_GB'
 /
 REORG TABLE users
 /
+ALTER TABLE users ALTER COLUMN theme SET WITH DEFAULT 'default'
+/
+REORG TABLE users
+/
 UPDATE users SET lang = 'zh_CN' WHERE lang = 'cn_zh'
 /
 UPDATE users SET lang = 'es_ES' WHERE lang = 'sp_sp'
