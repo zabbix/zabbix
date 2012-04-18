@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once 'include/config.inc.php';
 require_once 'include/hosts.inc.php';
 require_once 'include/forms.inc.php';
@@ -39,32 +38,36 @@ $fields = array(
 check_fields($fields);
 
 if (isset($_REQUEST['execute'])) {
-	$scriptid = $_REQUEST['scriptid'];
-	$hostid = $_REQUEST['hostid'];
+	$scriptid = get_request('scriptid');
+	$hostid = get_request('hostid');
 
-	$script_info = DBfetch(DBselect(
-		'SELECT s.name'.
-		' FROM scripts s'.
-		' WHERE s.scriptid='.$scriptid
-	));
+	$data = array(
+		'message' => '',
+		'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.$scriptid))
+	);
 
 	$result = API::Script()->execute(array('hostid' => $hostid, 'scriptid' => $scriptid));
-	if (!$result) {
-		show_error_message(_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
+
+	$isErrorExist = false;
+	if (empty($result)) {
+		$isErrorExist = true;
+	}
+	elseif ($result['response'] == 'failed') {
+		error($result['value']);
+		$isErrorExist = true;
 	}
 	else {
-		$message = $result['value'];
-		if ($result['response'] == 'failed') {
-			error($message);
-			show_error_message(_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
-			$message = '';
-		}
-		$frmResult = new CFormTable($script_info['name']);
-		$frmResult->addRow(_('Result'), new CTextArea('message', $message, 25, ZBX_TEXTAREA_BIG_WIDTH, 'yes'));
-		$frmResult->addItemToBottomRow(new CButton('close', _('Close'), 'window.close();'));
-		$frmResult->show();
+		$data['message'] = $result['value'];
 	}
+
+	if ($isErrorExist) {
+		show_error_message(_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.'));
+	}
+
+	// render view
+	$scriptView = new CView('general.script.execute', $data);
+	$scriptView->render();
+	$scriptView->show();
 }
 
 require_once 'include/page_footer.php';
-?>

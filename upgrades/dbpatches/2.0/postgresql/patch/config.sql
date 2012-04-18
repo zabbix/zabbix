@@ -3,7 +3,7 @@ ALTER TABLE ONLY config
 	ALTER alert_usrgrpid DROP DEFAULT,
 	ALTER alert_usrgrpid DROP NOT NULL,
 	ALTER discovery_groupid DROP DEFAULT,
-	ALTER default_theme SET DEFAULT 'css_ob.css',
+	ALTER default_theme SET DEFAULT 'originalblue',
 	ADD severity_color_0 varchar(6) DEFAULT 'DBDBDB' NOT NULL,
 	ADD severity_color_1 varchar(6) DEFAULT 'D6F6FF' NOT NULL,
 	ADD severity_color_2 varchar(6) DEFAULT 'FFF6A5' NOT NULL,
@@ -30,7 +30,10 @@ ALTER TABLE ONLY config
 
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT EXISTS (SELECT 1 FROM usrgrp WHERE usrgrp.usrgrpid=config.alert_usrgrpid);
 UPDATE config SET discovery_groupid=NULL WHERE NOT EXISTS (SELECT 1 FROM groups WHERE groups.groupid=config.discovery_groupid);
-UPDATE config SET default_theme='css_ob.css' WHERE default_theme='default.css';
+
+UPDATE config SET default_theme='darkblue' WHERE default_theme='css_bb.css';
+UPDATE config SET default_theme='originalblue' WHERE default_theme IN ('css_ob.css', 'default.css');
+UPDATE config SET default_theme='darkorange' WHERE default_theme='css_od.css';
 
 ALTER TABLE ONLY config ADD CONSTRAINT c_config_1 FOREIGN KEY (alert_usrgrpid) REFERENCES usrgrp (usrgrpid);
 ALTER TABLE ONLY config ADD CONSTRAINT c_config_2 FOREIGN KEY (discovery_groupid) REFERENCES groups (groupid);

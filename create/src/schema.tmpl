@@ -281,7 +281,7 @@ FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|ZBX_SYNC
 FIELD		|lang		|t_varchar(5)	|'en_GB'|NOT NULL	|ZBX_SYNC
 FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|theme		|t_varchar(128)	|'default.css'|NOT NULL	|ZBX_SYNC
+FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|ZBX_SYNC
 FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
@@ -420,7 +420,7 @@ FIELD		|alert_usrgrpid	|t_id		|	|NULL		|ZBX_SYNC		|1|usrgrp	|usrgrpid	|RESTRICT
 FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|event_expire	|t_integer	|'7'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|event_show_max	|t_integer	|'100'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
-FIELD		|default_theme	|t_varchar(128)	|'css_ob.css'|NOT NULL	|ZBX_SYNC,ZBX_NODATA
+FIELD		|default_theme	|t_varchar(128)	|'originalblue'|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|authentication_type|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|ldap_host	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_NODATA
 FIELD		|ldap_port	|t_integer	|389	|NOT NULL	|ZBX_SYNC,ZBX_NODATA

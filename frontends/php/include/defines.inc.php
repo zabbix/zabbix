@@ -387,6 +387,9 @@ define('SERVICE_ALGORITHM_MIN',		2);
 
 define('SERVICE_SLA', 99.05);
 
+define('SERVICE_SHOW_SLA_OFF', 0);
+define('SERVICE_SHOW_SLA_ON',  1);
+
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
 
@@ -761,7 +764,6 @@ define('ZBX_HISTORY_COUNT', 5);
 
 define('ZBX_USER_ONLINE_TIME', 600); // 10min
 define('ZBX_GUEST_USER','guest');
-define('ZBX_DEFAULT_CSS','default.css');
 
 define('ZBX_FAVORITES_ALL', -1);
 
@@ -857,6 +859,12 @@ define('NOT_ZERO', "({}!=0)&&");
 define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
+
+// user default theme
+define('THEME_DEFAULT', 'default');
+
+// the default theme
+define('ZBX_DEFAULT_THEME', 'originalblue');
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
