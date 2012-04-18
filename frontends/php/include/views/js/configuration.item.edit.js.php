@@ -55,7 +55,7 @@
 					matchingInterfaces.prop('disabled', false);
 
 					// select the interface by interfaceid, if it's available
-					if (!!selectedInterfaceId && !selectedInterfaceOption.prop('disabled')) {
+					if (selectedInterfaceId && !selectedInterfaceOption.prop('disabled')) {
 						jQuery('#interfaceid').val(selectedInterfaceId);
 					}
 					// if no interfaceid is given, select the first suitable interface
