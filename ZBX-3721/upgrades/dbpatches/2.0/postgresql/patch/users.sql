@@ -1,4 +1,4 @@
-ALTER TABLE users ALTER userid DROP DEFAULT,
+ALTER TABLE ONLY users ALTER userid DROP DEFAULT,
 	ALTER COLUMN lang SET DEFAULT 'en_GB',
 	ALTER COLUMN theme SET DEFAULT 'default';
 UPDATE users SET lang = 'zh_CN' WHERE lang = 'cn_zh';
