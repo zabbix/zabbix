@@ -187,7 +187,7 @@ class CScript extends CZBXAPI {
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 
-			$sqlParts['select'] = array('count(DISTINCT s.scriptid) as rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT s.scriptid) AS rowscount');
 		}
 
 		// sorting
@@ -258,8 +258,8 @@ class CScript extends CZBXAPI {
 
 		$dbScripts = DBselect(
 			'SELECT s.scriptid'.
-				' FROM scripts s'.
-				' WHERE '.DBin_node('s.scriptid').
+			' FROM scripts s'.
+			' WHERE '.DBin_node('s.scriptid').
 				' AND s.name='.$script['name']
 		);
 		while ($script = DBfetch($dbScripts)) {
@@ -297,12 +297,10 @@ class CScript extends CZBXAPI {
 
 		$scriptNames = array();
 		foreach ($scripts as $script) {
-			$scriptDbFields = array(
-				'name' => null,
-				'command' => null
-			);
+			$scriptDbFields = array('name' => null, 'command' => null);
+
 			if (!check_db_fields($scriptDbFields, $script)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script.'));
 			}
 
 			if (isset($scriptNames[$script['name']])) {
@@ -370,7 +368,7 @@ class CScript extends CZBXAPI {
 				'filter' => array('name' => $scriptNames)
 			));
 			foreach ($dbScripts as $exScript) {
-				if (!isset($scripts[$exScript['scriptid']]) || (bccomp($scripts[$exScript['scriptid']]['scriptid'], $exScript['scriptid']) != 0)) {
+				if (!isset($scripts[$exScript['scriptid']]) || bccomp($scripts[$exScript['scriptid']]['scriptid'], $exScript['scriptid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%s" already exists.', $exScript['name']));
 				}
 			}
@@ -381,9 +379,10 @@ class CScript extends CZBXAPI {
 		foreach ($scripts as $script) {
 			$scriptid = $script['scriptid'];
 			unset($script['scriptid']);
+
 			$update[] = array(
 				'values' => $script,
-				'where' => array('scriptid'=>$scriptid),
+				'where' => array('scriptid' => $scriptid)
 			);
 		}
 		DB::update('scripts', $update);
@@ -426,7 +425,7 @@ class CScript extends CZBXAPI {
 			'scriptids' => $scriptids,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'output' => array('actionid','name')
+			'output' => array('actionid', 'name')
 		));
 
 		foreach ($scriptActions as $action) {
@@ -445,13 +444,12 @@ class CScript extends CZBXAPI {
 		$scriptid = $data['scriptid'];
 		$hostid = $data['hostid'];
 
-		$options = array(
+		$alowedScripts = $this->get(array(
 			'hostids' => $hostid,
 			'scriptids' => $scriptid,
 			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true
-		);
-		$alowedScripts = $this->get($options);
+		));
 		if (!isset($alowedScripts[$scriptid])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
@@ -530,6 +528,7 @@ class CScript extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_INTERNAL, _('Error description: empty response received.'));
 		}
 		fclose($socket);
+
 		return $rcv;
 	}
 

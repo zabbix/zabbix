@@ -620,7 +620,7 @@ else {
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$buttons = new CDiv(array(
-		new CSubmit('form', _('Create')),
+		new CSubmit('form', _('Create host')),
 		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
 	));
 	$frmForm->addItem($buttons);

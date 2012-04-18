@@ -2,20 +2,25 @@
 Changes for 2.0.0rc3
 
 New features:
+A.F....... [ZBXNEXT-1126] redesign Script execution (Eduard)
+...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
 ..F.I..... [ZBX-3721] design improvements (Pavels)
 A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
+..F....... [ZBX-4738] improved the host interface select in the item mass update form (Pavels)
 ...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBXNEXT-1153] added support for nested templates in import (Vedmak)
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
+.......PS. [ZBX-4709] fixed processing of quoted strings in SNMP items (Sasha)
+........S. [ZBX-4882] fixed processing of quoted strings in SNMP lld rules (Sasha)
 ..F....... [ZBX-3219] added newlines to script execution error messages (Vedmak)
 ..F....... [ZBX-4348] fixed graph values not displayed for regular user (Toms)
 ..F....... [ZBX-4698] fixed selected host group forgotten if "remember selected" is disabled (Toms)
 ..F....... [ZBX-4871] fixed templates listed when adding log items in history (Toms)
 ..F....... [ZBX-4862] fixed Error when trying to remove additional templates in the host mass update form (Toms)
 ....I..... [ZBX-3929] removed deprecated Switch module from gen_schema.pl and get_data.pl scripts (Sasha)
-..F....... [ZBX-4738] improved the host interface select in the item mass update form (Pavels)
 ..F....... [ZBX-4738] fixed several checkboxes state not being saved after an unsuccessful item mass update (Pavels)
 ..F....... [ZBX-4865] fixed error bar in case of error with words longer than screen (Toms, Pavels)
 ........S. [ZBX-4840] improved slow SQL queries in processing of {ITEM.VALUE} and {ITEM.LOG.*} macros (Sasha)
@@ -577,8 +582,14 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.12rc2
+
+.......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
+.......PS. [ZBX-4709] fixed processing of quoted strings in SNMP items (Sasha)
+
 Changes for 1.8.12rc1
 
+...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
 ...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBX-4795] fixed group creation for child nodes (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
