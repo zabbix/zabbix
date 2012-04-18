@@ -42,7 +42,7 @@ foreach ($this->data['db_cservices'] as $db_service) {
 		'window.opener.add_child_service('.zbx_jsvalue($db_service['name']).','.zbx_jsvalue($db_service['serviceid'])
 			.','.zbx_jsvalue($db_service['trigger']).','.zbx_jsvalue($db_service['triggerid']).'); self.close(); return false;'
 	);
-	$servicesChildTable->addRow(array(array($prefix, $description), algorithm2str($db_service['algorithm']), $db_service['trigger']));
+	$servicesChildTable->addRow(array(array($prefix, $description), serviceAlgorythm($db_service['algorithm']), $db_service['trigger']));
 }
 $column = new CCol(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
 $column->setAttribute('style', 'text-align:right;');

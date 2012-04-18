@@ -2,6 +2,7 @@
 Changes for 2.0.0rc3
 
 New features:
+A.F...... [ZBXNEXT-1161] implemented the service API (Pavels)
 A.F....... [ZBXNEXT-1126] redesign Script execution (Eduard)
 ...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
 ..F.I..... [ZBX-3721] design improvements (Pavels)
@@ -12,6 +13,7 @@ A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F...... [ZBXNEXT-1161] fixed multiple IT service validation issues (Pavels)
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
 .......PS. [ZBX-4709] fixed processing of quoted strings in SNMP items (Sasha)
 ........S. [ZBX-4882] fixed processing of quoted strings in SNMP lld rules (Sasha)
