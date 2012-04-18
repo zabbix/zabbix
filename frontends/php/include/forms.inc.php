@@ -1131,7 +1131,7 @@
 		order_result($data['hostGroups'], 'name');
 
 		// template
-		$data['is_template'] = isTemplatedHost($data['hostid']);
+		$data['is_template'] = isTemplate($data['hostid']);
 
 		return $data;
 	}
