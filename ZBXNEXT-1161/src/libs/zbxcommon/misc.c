@@ -767,7 +767,7 @@ int	is_ip4(const char *ip)
  * Comments: could be improved (not supported x:x:x:x:x:x:d.d.d.d addresses)  *
  *                                                                            *
  ******************************************************************************/
-static int	is_ip6(const char *ip)
+int	is_ip6(const char *ip)
 {
 	const char	*__function_name = "is_ip6";
 	const char	*p = ip;

@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -17,38 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CFG_H
-#define ZABBIX_CFG_H
+$scriptWidget = new CWidget();
 
-#define	TYPE_INT		0
-#define	TYPE_STRING		1
-#define	TYPE_MULTISTRING	2
+// create form
+$scriptForm = new CForm();
+$scriptForm->setName('scriptForm');
 
-#define	PARM_OPT	0
-#define	PARM_MAND	1
+// append tabs to form
+$scriptTab = new CTabView();
+$scriptTab->addTab('scriptTab', _s('Result of "%s"', $this->data['info']['name']), new CSpan($this->data['message'], 'pre'));
+$scriptForm->addItem($scriptTab);
 
-/* config file parsing options */
-#define	ZBX_CFG_FILE_REQUIRED	0
-#define	ZBX_CFG_FILE_OPTIONAL	1
-
-#define	ZBX_CFG_NOT_STRICT	0
-#define	ZBX_CFG_STRICT		1
-
-extern char	*CONFIG_FILE;
-extern char	*CONFIG_LOG_FILE;
-extern int	CONFIG_ALLOW_ROOT;
-extern int	CONFIG_TIMEOUT;
-
-struct cfg_line
-{
-	char	*parameter;
-	void	*variable;
-	int	type;
-	int	mandatory;
-	int	min;
-	int	max;
-};
-
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict);
-
-#endif
+$scriptWidget->addItem($scriptForm);
+return $scriptWidget;

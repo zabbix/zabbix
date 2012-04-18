@@ -912,6 +912,9 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 		zbx_case_sensitive_t cs);
 
 /* misc functions */
+#ifdef HAVE_IPV6
+int	is_ip6(const char *ip);
+#endif
 int	is_ip4(const char *ip);
 
 void	zbx_on_exit(); /* calls exit() at the end! */
