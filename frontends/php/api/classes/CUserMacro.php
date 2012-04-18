@@ -658,7 +658,7 @@ class CUserMacro extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$dbHostMacros = $this->select('hostmacro', array(
+		$dbHostMacros = API::getApi()->select('hostmacro', array(
 			'output' => array('hostid', 'hostmacroid'),
 			'hostmacroids' => $hostMacroIds
 		));
@@ -974,7 +974,7 @@ class CUserMacro extends CZBXAPI {
 	 * @throws APIException if any of the given macros already exist
 	 */
 	protected function checkIfHostMacrosDontRepeat(array $hostMacros) {
-		$dbHostMacros = $this->select($this->tableName(), array(
+		$dbHostMacros = API::getApi()->select($this->tableName(), array(
 			'output' => array('hostmacroid', 'hostid', 'macro'),
 			'filter' => array(
 				'macro' => zbx_objectValues($hostMacros, 'macro'),
@@ -991,7 +991,7 @@ class CUserMacro extends CZBXAPI {
 				if ($hostMacro['macro'] == $dbHostMacro['macro'] && bccomp($hostMacro['hostid'], $dbHostMacro['hostid']) == 0
 					&& $differentMacros) {
 
-					$hosts = $this->select('hosts', array(
+					$hosts = API::getApi()->select('hosts', array(
 						'output' => array('name'),
 						'hostids' => $hostMacro['hostid']
 					));
@@ -1034,7 +1034,7 @@ class CUserMacro extends CZBXAPI {
 		$nameMacro = zbx_toHash($globalMacros, 'macro');
 		$macroNames = zbx_objectValues($globalMacros, 'macro');
 		if ($macroNames) {
-			$dbMacros = $this->select('globalmacro', array(
+			$dbMacros = API::getApi()->select('globalmacro', array(
 				'filter' => array('macro' => $macroNames),
 				'output' => array('globalmacroid', 'macro')
 			));
@@ -1069,7 +1069,7 @@ class CUserMacro extends CZBXAPI {
 	 * @throws APIException if any of the host macros is not present in $globalMacros
 	 */
 	protected function checkIfGlobalMacrosExist(array $globalMacroIds) {
-		$globalMacros = $this->select('globalmacro', array(
+		$globalMacros = API::getApi()->select('globalmacro', array(
 			'output' => API_OUTPUT_SHORTEN,
 			'globalmacroids' => $globalMacroIds
 		));

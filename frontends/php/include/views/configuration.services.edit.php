@@ -48,9 +48,7 @@ $servicesFormList->addRow(_('Parent service'), array(
 
 // append algorithm to form list
 $algorithmComboBox = new CComboBox('algorithm', $this->data['algorithm']);
-foreach (array(SERVICE_ALGORITHM_MAX, SERVICE_ALGORITHM_MIN, SERVICE_ALGORITHM_NONE) as $value) {
-	$algorithmComboBox->addItem($value, algorithm2str($value));
-}
+$algorithmComboBox->addItems(serviceAlgorythm());
 $servicesFormList->addRow(_('Status calculation algorithm'), $algorithmComboBox);
 
 // append SLA to form list
@@ -73,18 +71,18 @@ $servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $t
  */
 $servicesChildTable = new CTable(_('No dependencies defined.'), 'formElementTable');
 $servicesChildTable->setAttribute('style', 'min-width:500px;');
-$servicesChildTable->setAttribute('id', 'service_childs');
+$servicesChildTable->setAttribute('id', 'service_children');
 $servicesChildTable->setHeader(array(_('Services'), _('Soft'), _('Trigger'), _('Action')));
-foreach ($this->data['childs'] as $child) {
+foreach ($this->data['children'] as $child) {
 	$row = new CRow(array(
 		array(
 			new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']),
-			new CVar('childs['.$child['serviceid'].'][name]', $child['name']),
-			new CVar('childs['.$child['serviceid'].'][serviceid]', $child['serviceid']),
-			new CVar('childs['.$child['serviceid'].'][triggerid]', isset($child['triggerid']) ? $child['triggerid'] : '')
+			new CVar('children['.$child['serviceid'].'][name]', $child['name']),
+			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid']),
+			new CVar('children['.$child['serviceid'].'][triggerid]', isset($child['triggerid']) ? $child['triggerid'] : '')
 		),
 		new CCheckBox(
-			'childs['.$child['serviceid'].'][soft]',
+			'children['.$child['serviceid'].'][soft]',
 			isset($child['soft']) && !empty($child['soft']) ? 'checked' : 'no',
 			null,
 			1
@@ -92,7 +90,7 @@ foreach ($this->data['childs'] as $child) {
 		!empty($child['trigger']) ? $child['trigger'] : '-',
 		new CButton('remove', _('Remove'), 'javascript: removeDependentChild(\''.$child['serviceid'].'\');', 'link_menu')
 	));
-	$row->setAttribute('id', 'childs_'.$child['serviceid']);
+	$row->setAttribute('id', 'children_'.$child['serviceid']);
 	$servicesChildTable->addRow($row);
 }
 $servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
@@ -114,37 +112,37 @@ $servicesTimeTable->setAttribute('style', 'min-width:500px;');
 $servicesTimeTable->setHeader(array(_('Type'), _('Interval'), _('Note'), _('Action')));
 
 $i = 0;
-foreach ($this->data['service_times'] as $serviceTime) {
+foreach ($this->data['times'] as $serviceTime) {
 	switch ($serviceTime['type']) {
 		case SERVICE_TIME_TYPE_UPTIME:
 			$type = new CSpan(_('Uptime'), 'enabled');
-			$from = dowHrMinToStr($serviceTime['from']);
-			$to = dowHrMinToStr($serviceTime['to'], true);
+			$from = dowHrMinToStr($serviceTime['ts_from']);
+			$to = dowHrMinToStr($serviceTime['ts_to'], true);
 			break;
 		case SERVICE_TIME_TYPE_DOWNTIME:
 			$type = new CSpan(_('Downtime'), 'disabled');
-			$from = dowHrMinToStr($serviceTime['from']);
-			$to = dowHrMinToStr($serviceTime['to'], true);
+			$from = dowHrMinToStr($serviceTime['ts_from']);
+			$to = dowHrMinToStr($serviceTime['ts_to'], true);
 			break;
 		case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
 			$type = new CSpan(_('One-time downtime'), 'disabled');
-			$from = zbx_date2str(_('d M Y H:i'), $serviceTime['from']);
-			$to = zbx_date2str(_('d M Y H:i'), $serviceTime['to']);
+			$from = zbx_date2str(_('d M Y H:i'), $serviceTime['ts_from']);
+			$to = zbx_date2str(_('d M Y H:i'), $serviceTime['ts_to']);
 			break;
 	}
 	$row = new CRow(array(
 		array(
 			$type,
-			new CVar('service_times['.$i.'][type]', $serviceTime['type']),
-			new CVar('service_times['.$i.'][from]', $serviceTime['from']),
-			new CVar('service_times['.$i.'][to]', $serviceTime['to']),
-			new CVar('service_times['.$i.'][note]', $serviceTime['note'])
+			new CVar('times['.$i.'][type]', $serviceTime['type']),
+			new CVar('times['.$i.'][ts_from]', $serviceTime['ts_from']),
+			new CVar('times['.$i.'][ts_to]', $serviceTime['ts_to']),
+			new CVar('times['.$i.'][note]', $serviceTime['note'])
 		),
 		$from.' - '.$to,
 		htmlspecialchars($serviceTime['note']),
 		new CButton('remove', _('Remove'), 'javascript: removeTime(\''.$i.'\');', 'link_menu')
 	));
-	$row->setAttribute('id', 'service_times_'.$i);
+	$row->setAttribute('id', 'times_'.$i);
 	$servicesTimeTable->addRow($row);
 	$i++;
 }
