@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
@@ -386,7 +387,7 @@ elseif (isset($_REQUEST['form'])) {
 		'parent_discoveryid' => get_request('parent_discoveryid'),
 		'group_gid' => get_request('group_gid', array()),
 		'hostid' => get_request('hostid', 0),
-		'is_template' => isTemplatedHost(get_request('hostid', 0)),
+		'is_template' => isTemplate(get_request('hostid', 0)),
 		'normal_only' => get_request('normal_only')
 	);
 
@@ -417,6 +418,26 @@ elseif (isset($_REQUEST['form'])) {
 		$data['graph3d'] = $graph['show_3d'];
 		$data['percent_left'] = $graph['percent_left'];
 		$data['percent_right'] = $graph['percent_right'];
+		$data['templateid'] = $graph['templateid'];
+		$data['templates'] = array();
+
+		// templates
+		if (!empty($data['templateid'])) {
+			$parentGraphid = $data['templateid'];
+			do {
+				$parentGraph = get_graph_by_graphid($parentGraphid);
+				$parentTemplate = get_hosts_by_graphid($parentGraph['graphid']);
+				$parentTemplate = DBfetch($parentTemplate);
+
+				$data['templates'][] = new CLink($parentTemplate['host'],
+					'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid'].url_param('parent_discoveryid'));
+				$data['templates'][] = SPACE.RARR.SPACE;
+
+				$parentGraphid = $parentGraph['templateid'];
+			} while ($parentGraphid != 0);
+			$data['templates'] = array_reverse($data['templates']);
+			array_shift($data['templates']);
+		}
 
 		// items
 		$data['items'] = API::GraphItem()->get(array(

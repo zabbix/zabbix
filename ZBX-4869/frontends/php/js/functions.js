@@ -539,7 +539,7 @@ function call_menu(evnt, id, name) {
 				[name, null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],
 				['Add Service', "javascript: window.location.href = 'services.php?form=1&parentid=" + id + "&parentname=" + name + "';", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
 				['Edit Service', "javascript: window.location.href = 'services.php?form=1&serviceid=" + id + "';", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
-				['Delete Service', "javascript: if (Confirm('Delete selected services?')) { window.location.href = 'services.php?form=1&delete=1&serviceid=" + id + "'; }", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}]
+				['Delete Service', "javascript: if (Confirm('Delete selected services?')) { window.location.href = 'services.php?delete=1&serviceid=" + id + "'; }", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}]
 			],
 			120
 		);
@@ -743,7 +743,7 @@ function getRandomId(remember) {
 	id = Math.floor(Math.random() * 10000000);
 
 	if (this.generated.indexOf(id) > -1) {
-		id = getRandomId(false);
+		id = getRandomId(false); // attention recursion !!!
 	}
 
 	if (typeof remember === 'undefined') {

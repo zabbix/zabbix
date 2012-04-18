@@ -116,7 +116,7 @@ class testGeneric extends CWebTest {
 			array('queue.php?config=2',	'Queue \[refreshed every 30 sec\]'),
 
 			array('report4.php',	'Notification report'),
-			array('instal.php',	'Installation'),
+			array('setup.php',	'Installation'),
 
 			// Misc
 			array('search.php?search=server',	'Search'),

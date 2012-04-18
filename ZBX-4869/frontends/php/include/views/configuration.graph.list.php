@@ -104,7 +104,7 @@ foreach ($this->data['graphs'] as $graph) {
 	if (!empty($graph['templateid'])) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
 		$realHosts = DBfetch($realHosts);
-		$name[] = new CLink($realHosts['name'], 'templates.php?form=update&templateid='.$realHosts['hostid'], 'unknown');
+		$name[] = new CLink($realHosts['name'], 'graphs.php?hostid='.$realHosts['hostid'], 'unknown');
 		$name[] = ':'.SPACE;
 		$name[] = new CLink($graph['name'],
 			'graphs.php?form=update&graphid='.$graphid.url_param('parent_discoveryid').$hostidParam);

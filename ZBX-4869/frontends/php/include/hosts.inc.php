@@ -783,10 +783,10 @@ function get_viewed_hosts($perm, $groupid = 0, $options = array(), $nodeid = nul
 
 	$def_sql = array(
 		// hostname to avoid confusion with node name
-		'select' =>	array('h.hostid','h.name as hostname'),
-		'from' =>	array('hosts h'),
-		'where' =>	array(),
-		'order' =>	array(),
+		'select' => array('h.hostid','h.name as hostname'),
+		'from' => array('hosts h'),
+		'where' => array(),
+		'order' => array()
 	);
 
 	$def_options = array(
@@ -1272,7 +1272,7 @@ function hostMenuData(array $host, array $scripts = array()) {
 	);
 }
 
-function isTemplatedHost($hostid) {
+function isTemplate($hostid) {
 	$dbHost = DBfetch(DBselect('SELECT h.status FROM hosts h WHERE h.hostid='.$hostid));
 
 	return !empty($dbHost) && $dbHost['status'] == HOST_STATUS_TEMPLATE;

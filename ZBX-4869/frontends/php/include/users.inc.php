@@ -25,27 +25,13 @@ function getUserTheme($userData) {
 	if (isset($config['default_theme'])) {
 		$css = $config['default_theme'];
 	}
-	if (isset($userData['theme']) && $userData['theme'] != ZBX_DEFAULT_CSS && $userData['alias'] != ZBX_GUEST_USER) {
+	if (isset($userData['theme']) && $userData['theme'] != THEME_DEFAULT && $userData['alias'] != ZBX_GUEST_USER) {
 		$css = $userData['theme'];
 	}
 	if (!isset($css)) {
-		$css = 'css_ob.css';
+		$css = ZBX_DEFAULT_THEME;
 	}
 	return $css;
-}
-
-function getUserThemeName($css = null) {
-	if (empty($css)) {
-		$css = getUserTheme(CWebUser::$data);
-	}
-	switch ($css) {
-		case 'css_od.css':
-			return 'darkorange';
-		case 'css_bb.css':
-			return 'darkblue';
-		default:
-			return 'originalblue';
-	}
 }
 
 function user_type2str($user_type = null) {
