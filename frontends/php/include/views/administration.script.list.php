@@ -17,46 +17,36 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-	$scripts_wdgt = new CWidget();
 
-	$frmForm = new CForm('get');
-	$frmForm->addItem(new CSubmit('form', _('Create script')));
+$scriptsWidget = new CWidget();
 
-	$scripts_wdgt->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $frmForm);
-	$scripts_wdgt->addHeader(_('Scripts'));
-	$scripts_wdgt->addHeaderRowNumber();
+$createForm = new CForm('get');
+$createForm->addItem(new CSubmit('form', _('Create script')));
 
-	$form = new CForm();
-	$form->setName('frm_scripts');
-	$form->setAttribute('id', 'scripts');
+$scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $createForm);
+$scriptsWidget->addHeader(_('Scripts'));
+$scriptsWidget->addHeaderRowNumber();
 
-	$table = new CTableInfo(_('No scripts defined.'));
-	$table->setHeader(array(
-		new CCheckBox('all_scripts', null, "checkAll('".$form->getName()."','all_scripts','scripts');"),
-		make_sorting_header(_('Name'), 'name'),
-		_('Type'),
-		_('Execute on'),
-		make_sorting_header(_('Commands'), 'command'),
-		_('User group'),
-		_('Host group'),
-		_('Host access')
-	));
+$scriptsForm = new CForm();
+$scriptsForm->setName('scriptsForm');
+$scriptsForm->setAttribute('id', 'scripts');
 
-	$sortfield = getPageSortField('name');
-	$sortorder = getPageSortOrder();
+$scriptsTable = new CTableInfo(_('No scripts defined.'));
+$scriptsTable->setHeader(array(
+	new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scripts');"),
+	make_sorting_header(_('Name'), 'name'),
+	_('Type'),
+	_('Execute on'),
+	make_sorting_header(_('Commands'), 'command'),
+	_('User group'),
+	_('Host group'),
+	_('Host access')
+));
 
-	$scripts = $this->getArray('scripts');
+foreach ($this->data['scripts'] as $script) {
+	$scriptid = $script['scriptid'];
 
-// sorting
-	order_result($scripts, $sortfield, $sortorder);
-	$paging = getPagingLine($scripts);
-
-	foreach($scripts as $snum => $script){
-		$scriptid = $script['scriptid'];
-
-		switch($script['type']){
+	switch ($script['type']) {
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			$scriptType = _('Script');
 			break;
@@ -66,52 +56,47 @@
 		default:
 			$scriptType = '';
 			break;
-		}
-
-		if($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT){
-			switch($script['execute_on']){
-				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
-					$scriptExecuteOn = _('Agent');
-					break;
-				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
-					$scriptExecuteOn = _('Server');
-					break;
-			}
-		}
-		else{
-			$scriptExecuteOn = '';
-		}
-
-		$table->addRow(array(
-			new CCheckBox('scripts['.$script['scriptid'].']', 'no', NULL, $script['scriptid']),
-			new CLink($script['name'], 'scripts.php?form=1'.'&scriptid='.$script['scriptid']),
-			$scriptType,
-			$scriptExecuteOn,
-			zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
-			('' == $script['userGroupName']) ? _('All') : $script['userGroupName'],
-			('' == $script['hostGroupName']) ? _('All') : $script['hostGroupName'],
-			((PERM_READ_WRITE == $script['host_access']) ? _('Write') : _('Read'))
-		));
 	}
 
+	if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {
+		switch ($script['execute_on']) {
+			case ZBX_SCRIPT_EXECUTE_ON_AGENT:
+				$scriptExecuteOn = _('Agent');
+				break;
+			case ZBX_SCRIPT_EXECUTE_ON_SERVER:
+				$scriptExecuteOn = _('Server');
+				break;
+		}
+	}
+	else {
+		$scriptExecuteOn = '';
+	}
 
-//----- GO ------
-	$goBox = new CComboBox('go');
-	$goOption = new CComboItem('delete', _('Delete selected'));
-	$goOption->setAttribute('confirm', _('Delete selected scripts?'));
-	$goBox->addItem($goOption);
+	$scriptsTable->addRow(array(
+		new CCheckBox('scripts['.$script['scriptid'].']', 'no', null, $script['scriptid']),
+		new CLink($script['name'], 'scripts.php?form=1&scriptid='.$script['scriptid']),
+		$scriptType,
+		$scriptExecuteOn,
+		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
+		('' == $script['userGroupName']) ? _('All') : $script['userGroupName'],
+		('' == $script['hostGroupName']) ? _('All') : $script['hostGroupName'],
+		((PERM_READ_WRITE == $script['host_access']) ? _('Write') : _('Read'))
+	));
+}
 
-// goButton name is necessary!!!
-	$goButton = new CSubmit('goButton', _('Go'));
-	$goButton->setAttribute('id','goButton');
+// create go buttons
+$goComboBox = new CComboBox('go');
+$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption->setAttribute('confirm', _('Delete selected scripts?'));
+$goComboBox->addItem($goOption);
 
-	zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
+$goButton = new CSubmit('goButton', _('Go').' (0)');
+$goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "scripts";');
 
-	$footer = get_table_header(array($goBox, $goButton));
-//----
+// append table to form
+$scriptsForm->addItem(array($this->data['paging'], $scriptsTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
-	$form->addItem(array($paging,$table,$paging,$footer));
-	$scripts_wdgt->addItem($form);
-
-	return $scripts_wdgt;
-?>
+// append form to widget
+$scriptsWidget->addItem($scriptsForm);
+return $scriptsWidget;

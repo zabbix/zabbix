@@ -24,14 +24,16 @@ require_once dirname(__FILE__).'/classes/core/Z.php';
 Z::getInstance()->run();
 
 require_once dirname(__FILE__).'/debug.inc.php';
-
 require_once dirname(__FILE__).'/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/defines.inc.php';
 require_once dirname(__FILE__).'/func.inc.php';
 require_once dirname(__FILE__).'/html.inc.php';
+
 CProfiler::getInstance()->start();
+
 require_once dirname(__FILE__).'/profiles.inc.php';
 require_once dirname(__FILE__).'/../conf/maintenance.inc.php';
+
 // abc sorting
 require_once dirname(__FILE__).'/acknow.inc.php';
 require_once dirname(__FILE__).'/actions.inc.php';
@@ -66,19 +68,18 @@ $ZBX_LOCMASTERID = 0;
 $ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
 $ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
-// include Tactical Overview modules
+// include tactical overview modules
 require_once dirname(__FILE__).'/locales.inc.php';
 require_once dirname(__FILE__).'/perm.inc.php';
 require_once dirname(__FILE__).'/audit.inc.php';
 require_once dirname(__FILE__).'/js.inc.php';
 
-// include Validation
+// include validation
 require_once dirname(__FILE__).'/validate.inc.php';
 
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	$pathLength = strlen(__FILE__);
 
-	// strlen(include/config.inc.php) = 22
 	$pathLength -= 22;
 	$errfile = substr($errfile, $pathLength);
 
@@ -93,8 +94,8 @@ unset($show_setup);
 
 if (defined('ZBX_DENY_GUI_ACCESS')) {
 	if (isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)) {
-		$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? ($_SERVER['HTTP_X_FORWARDED_FOR']) : ($_SERVER['REMOTE_ADDR']);
-		if (!str_in_array($user_ip,$ZBX_GUI_ACCESS_IP_RANGE)) {
+		$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+		if (!str_in_array($user_ip, $ZBX_GUI_ACCESS_IP_RANGE)) {
 			$DENY_GUI = true;
 		}
 	}
@@ -206,13 +207,14 @@ if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 else {
 	CWebUser::$data = array(
 		'alias' => ZBX_GUEST_USER,
-		'userid'=> 0,
-		'lang'  => 'en_gb',
-		'type'  => '0',
-		'node'  => array(
-			'name'  => '- unknown -',
-			'nodeid'=> 0)
-		);
+		'userid' => 0,
+		'lang' => 'en_gb',
+		'type' => '0',
+		'node' => array(
+			'name' => '- unknown -',
+			'nodeid' => 0
+		)
+	);
 
 	$USER_DETAILS = CWebUser::$data;
 }
@@ -224,7 +226,7 @@ set_zbx_locales();
 // init mb strings if it's available
 init_mbstrings();
 
-// Ajax - do not need warnings or Errors
+// ajax - do not need warnings or errors
 if ((isset($DENY_GUI) || isset($show_setup) || isset($show_warning)) && PAGE_TYPE_HTML <> detect_page_type()) {
 	header('Ajax-response: false');
 	exit();
@@ -379,7 +381,8 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 					array_push($message, array(
 						'text' => $msg['message'],
 						'color' => array('R' => 155, 'G' => 155, 'B' => 55),
-						'font' => $msg_font));
+						'font' => $msg_font
+					));
 				}
 				$width = max($width, imagefontwidth($msg_font) * zbx_strlen($msg['message']) + 1);
 				$height += imagefontheight($msg_font) + 1;
@@ -394,7 +397,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 			$lst_error = new CList(null,'messages');
 			foreach ($ZBX_MESSAGES as $msg) {
 				$lst_error->addItem($msg['message'], $msg['type']);
-				$bool = ($bool && ('error' != zbx_strtolower($msg['type'])));
+				$bool = ($bool && 'error' != zbx_strtolower($msg['type']));
 			}
 			$msg_show = 6;
 			$msg_count = count($ZBX_MESSAGES);
@@ -517,7 +520,7 @@ function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {
 
 	foreach ($tree_ids as $key => $id) {
 		$child = $tree[$id];
-		if (bccomp($child[$parent_field],$parentid) == 0) {
+		if (bccomp($child[$parent_field], $parentid) == 0) {
 			$result[$id] = $child;
 			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // attention recursion !!!
 			$result += $childs;
@@ -539,14 +542,12 @@ function parse_period($str) {
 			if (!isset($out[$i])) {
 				$out[$i] = array();
 			}
-			array_push($out[$i],
-				array(
-					'start_h'	=> $arr[3],
-					'start_m'	=> $arr[4],
-					'end_h'		=> $arr[5],
-					'end_m'		=> $arr[6]
-				)
-			);
+			array_push($out[$i], array(
+				'start_h' => $arr[3],
+				'start_m' => $arr[4],
+				'end_h' => $arr[5],
+				'end_m' => $arr[6]
+			));
 		}
 	}
 	return $out;
