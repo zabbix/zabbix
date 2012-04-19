@@ -19,7 +19,7 @@
 **/
 
 
-class CImport extends CZBXAPI {
+class CConfiguration extends CZBXAPI {
 
 	/**
 	 * Export configuration data.
