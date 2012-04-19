@@ -1147,13 +1147,13 @@ FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|image		|t_image	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|imagetype,name
 
-TABLE|item_discovery|itemdiscoveryid|ZBX_SYNC
+TABLE|item_discovery|itemdiscoveryid|ZBX_SYNC,ZBX_DATA
 FIELD		|itemdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_SYNC		|1|items
 FIELD		|parent_itemid	|t_id		|	|NOT NULL	|ZBX_SYNC		|2|items	|itemid
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|0
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|itemid,parent_itemid
 
 TABLE|profiles|profileid|0
