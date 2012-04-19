@@ -24,6 +24,8 @@ class CTemplateImporter extends CImporter {
 	/**
 	 * Import templates.
 	 *
+	 * @throws Exception
+	 *
 	 * @param array $templates
 	 *
 	 * @return void
@@ -31,7 +33,7 @@ class CTemplateImporter extends CImporter {
 	public function import(array $templates) {
 		$templates = zbx_toHash($templates, 'host');
 
-		$this->checkCirculartemplateReferences($templates);
+		$this->checkCircularTemplateReferences($templates);
 
 		foreach ($templates as &$template) {
 			// screens are imported separately
@@ -106,7 +108,7 @@ class CTemplateImporter extends CImporter {
 	 *
 	 * @return void
 	 */
-	protected function checkCirculartemplateReferences(array $templates) {
+	protected function checkCircularTemplateReferences(array $templates) {
 		foreach ($templates as $name => $template) {
 			if (empty($template['templates'])) {
 				continue;

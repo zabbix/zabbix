@@ -566,7 +566,6 @@ class CConfigurationExportBuilder {
 				'valign'=> $screenItem['valign'],
 				'halign'=> $screenItem['halign'],
 				'style'=> $screenItem['style'],
-				'colspan'=> $screenItem['colspan'],
 				'url'=> $screenItem['url'],
 				'dynamic'=> $screenItem['dynamic'],
 				'sort_triggers'=> $screenItem['sort_triggers'],
