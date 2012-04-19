@@ -33,7 +33,7 @@ class CTemplateScreenImporter extends CAbstractScreenImporter {
 		$screensToUpdate = array();
 		foreach ($allScreens as $template => $screens) {
 			// TODO: select all at once out of loop
-			$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE '.
+			$dbScreens = DBselect('SELECT s.screenid,s.name FROM screens s WHERE'.
 					' s.templateid='.zbx_dbstr($this->referencer->resolveTemplate($template)).
 					' AND '.DBcondition('s.name', array_keys($screens)));
 			while ($dbScreen = DBfetch($dbScreens)) {
