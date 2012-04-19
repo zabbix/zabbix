@@ -74,8 +74,9 @@ class CScreenImporter extends CAbstractScreenImporter {
 					$unresolvedReferences[] = $screenItem['resource']['name'];
 				}
 			}
-			throw new Exception(_n('Cannot import screen "%2$s", subscreen "%3$s" does not exist.',
-				'Cannot import screen "%2$s", subscreens "%3$s" does not exist.',
+			$unresolvedReferences = array_unique($unresolvedReferences);
+			throw new Exception(_n('Cannot import screen "%2$s": subscreen "%3$s" does not exist.',
+				'Cannot import screen "%2$s": subscreens "%3$s" do not exist.',
 				count($unresolvedReferences), $screen['name'], implode(', ', $unresolvedReferences)));
 		}
 	}
