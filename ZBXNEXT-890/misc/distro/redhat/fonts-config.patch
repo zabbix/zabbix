@@ -1,5 +1,6 @@
---- zabbix-1.8.8/frontends/php/include/defines.inc.php.orig	2011-11-23 18:11:56.000000000 +0900
-+++ zabbix-1.8.8/frontends/php/include/defines.inc.php	2011-11-23 18:13:21.000000000 +0900
+diff -Nru zabbix-1.8.11.orig/frontends/php/include/defines.inc.php zabbix-1.8.11/frontends/php/include/defines.inc.php
+--- zabbix-1.8.11.orig/frontends/php/include/defines.inc.php	2012-03-20 11:15:17.000000000 +0200
++++ zabbix-1.8.11/frontends/php/include/defines.inc.php	2012-04-18 09:45:52.000000000 +0300
 @@ -36,7 +36,7 @@
  	define('ZBX_WIDGET_ROWS',				20);
  
@@ -9,3 +10,12 @@
  	define('ZBX_GRAPH_LEGEND_HEIGHT',120); // when graph height is less then this value, some legend will not show up
  
  	define('ZBX_SCRIPT_TIMEOUT',			60); // in seconds
+@@ -76,7 +76,7 @@
+ 	define('EVENTS_OPTION_ALL',		2);
+ 	define('EVENTS_OPTION_NOT_ACK', 3);
+ 
+-	define('ZBX_FONT_NAME',			'DejaVuSans');
++	define('ZBX_FONT_NAME',			'graphfont');
+ 
+ 	define('ZBX_AUTH_INTERNAL',	0);
+ 	define('ZBX_AUTH_LDAP',		1);

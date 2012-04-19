@@ -439,7 +439,7 @@ rm -rf $RPM_BUILD_ROOT
 %pre
 getent group zabbix > /dev/null || groupadd -r zabbix
 getent passwd zabbix > /dev/null || \
-    useradd -r -g zabbix -d %{_localstatedir}/lib/%{srcname} -s /sbin/nologin \
+    useradd -r -g zabbix -d %{_localstatedir}/lib/%{name} -s /sbin/nologin \
     -c "Zabbix Monitoring System" zabbix
 :
 
