@@ -702,9 +702,8 @@ ROW   |17      |snmptrap.fallback                                               
 ROW   |17      |snmptrap[&lt;regex&gt;]                                                                                        |Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string.                                                                                                                                                |
 
 TABLE |globalmacro
-FIELDS|globalmacroid|macro                |value |
-ROW   |1            |{$CPU_LOAD_THRESHOLD}|5     |
-ROW   |2            |{$SNMP_COMMUNITY}    |public|
+FIELDS|globalmacroid|macro            |value |
+ROW   |2            |{$SNMP_COMMUNITY}|public|
 
 TABLE |hosts_groups
 FIELDS|hostgroupid|hostid|groupid|
