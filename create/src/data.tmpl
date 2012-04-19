@@ -483,7 +483,7 @@ TABLE |graphs
 FIELDS|graphid|name                                |width|height|yaxismin|yaxismax|templateid|show_work_period|show_triggers|graphtype|show_legend|show_3d|percent_left|percent_right|ymin_type|ymax_type|ymin_itemid|ymax_itemid|flags|
 ROW   |387    |CPU utilization                     |900  |200   |0.0000  |100.0000|NULL      |1               |0            |1        |1          |0      |0.0000      |0.0000       |1        |1        |NULL       |NULL       |0    |
 ROW   |445    |Traffic on interface {#SNMPVALUE}   |900  |200   |0.0000  |100.0000|NULL      |1               |1            |0        |1          |0      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |2    |
-ROW   |442    |Disk space usage                    |400  |340   |0.0000  |0.0000  |NULL      |0               |0            |2        |1          |1      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |2    |
+ROW   |442    |Disk space usage {#FSNAME}          |400  |340   |0.0000  |0.0000  |NULL      |0               |0            |2        |1          |1      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |2    |
 ROW   |439    |CPU jumps                           |900  |200   |0.0000  |100.0000|NULL      |1               |1            |0        |1          |0      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |0    |
 ROW   |436    |Swap usage                          |400  |340   |0.0000  |0.0000  |NULL      |0               |0            |2        |1          |1      |0.0000      |0.0000       |0        |0        |NULL       |NULL       |0    |
 ROW   |433    |CPU load                            |900  |200   |0.0000  |100.0000|NULL      |1               |1            |0        |1          |0      |0.0000      |0.0000       |1        |0        |NULL       |NULL       |0    |
@@ -511,8 +511,6 @@ ROW   |1291   |439    |22683 |0       |2        |000099|0        |2       |0   |
 ROW   |1296   |433    |10010 |0       |0        |009900|0        |2       |0   |
 ROW   |1297   |433    |22674 |0       |1        |000099|0        |2       |0   |
 ROW   |1298   |433    |22677 |0       |2        |990000|0        |2       |0   |
-ROW   |1317   |442    |22456 |0       |0        |AA0000|0        |2       |2   |
-ROW   |1318   |442    |22452 |0       |1        |00AA00|0        |2       |0   |
 ROW   |1323   |436    |10030 |0       |0        |AA0000|0        |2       |2   |
 ROW   |1324   |436    |10014 |0       |1        |00AA00|0        |2       |0   |
 ROW   |1353   |420    |22446 |5       |0        |00AA00|0        |2       |0   |
@@ -548,6 +546,8 @@ ROW   |1455   |447    |22740 |5       |0        |00AA00|0        |2       |0   |
 ROW   |1456   |447    |22743 |5       |1        |3333FF|0        |2       |0   |
 ROW   |1457   |449    |22784 |5       |0        |00AA00|0        |2       |0   |
 ROW   |1458   |449    |22787 |5       |1        |3333FF|0        |2       |0   |
+ROW   |1459   |442    |22456 |0       |0        |AA0000|0        |2       |2   |
+ROW   |1460   |442    |22452 |0       |1        |00AA00|0        |2       |0   |
 
 TABLE |graph_theme
 FIELDS|graphthemeid|description  |theme     |backgroundcolor|graphcolor|graphbordercolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|gridview|legendview|
