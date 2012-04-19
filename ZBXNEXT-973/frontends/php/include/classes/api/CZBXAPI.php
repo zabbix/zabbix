@@ -83,6 +83,7 @@ class CZBXAPI {
 			'preservekeys'			=> null,
 			'limit'					=> null
 		);
+		$this->getOptions = $this->globalGetOptions;
 	}
 
 	/**
@@ -381,16 +382,12 @@ class CZBXAPI {
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
-			$sqlParts['select'] = array();
+			// the pk field must always be included for the API to work properly
+			$sqlParts['select'] = array($pkFieldId);
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
 					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);
 				}
-			}
-
-			// make sure the id is included if the 'preservekeys' option is enabled
-			if (isset($options['preservekeys'])) {
-				$sqlParts['select'][] = $pkFieldId;
 			}
 		}
 		// extended output
@@ -508,7 +505,7 @@ class CZBXAPI {
 	 * Adds the related objects requested by "select*" options to the resulting object set.
 	 *
 	 * @param array $options
-	 * @param array $result
+	 * @param array $result     an object hash with PKs as keys
 	 * @return array mixed
 	 */
 	protected function addRelatedObjects(array $options, array $result) {
@@ -540,7 +537,7 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function extendObjects($tableName, array $objects, array $fields) {
-		$dbObjects = $this->select($tableName, array(
+		$dbObjects = API::getApi()->select($tableName, array(
 			'output' => $fields,
 			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
 			'preservekeys' => true
@@ -557,17 +554,21 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Checks if the object has any fields, that are not defined in the schema.
+	 * Checks if the object has any fields, that are not defined in the schema or in $additionalFields.
 	 *
 	 * @param $tableName
 	 * @param array $object
 	 * @param $error
+	 * @param array $extraFields    an array of field names, that are not present in the schema, but may be
+	 *                              used in requests
 	 *
 	 * @throws APIException
 	 */
-	protected function checkUnsupportedFields($tableName, array $object, $error) {
+	protected function checkUnsupportedFields($tableName, array $object, $error, array $extraFields = array()) {
+		$extraFields = array_flip($extraFields);
+
 		foreach ($object as $field => $value) {
-			if (!DB::hasField($tableName, $field)) {
+			if (!DB::hasField($tableName, $field) && !isset($extraFields[$field])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}

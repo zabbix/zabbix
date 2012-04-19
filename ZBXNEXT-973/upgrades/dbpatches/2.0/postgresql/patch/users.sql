@@ -1,5 +1,6 @@
-ALTER TABLE ONLY users ALTER userid DROP DEFAULT;
-ALTER TABLE ONLY users ALTER COLUMN lang SET DEFAULT 'en_GB';
+ALTER TABLE ONLY users ALTER userid DROP DEFAULT,
+	ALTER COLUMN lang SET DEFAULT 'en_GB',
+	ALTER COLUMN theme SET DEFAULT 'default';
 UPDATE users SET lang = 'zh_CN' WHERE lang = 'cn_zh';
 UPDATE users SET lang = 'es_ES' WHERE lang = 'sp_sp';
 UPDATE users SET lang = 'en_GB' WHERE lang = 'en_gb';
@@ -16,3 +17,8 @@ UPDATE users SET lang = 'pt_BR' WHERE lang = 'pt_br';
 UPDATE users SET lang = 'ru_RU' WHERE lang = 'ru_ru';
 UPDATE users SET lang = 'sv_SE' WHERE lang = 'sv_se';
 UPDATE users SET lang = 'uk_UA' WHERE lang = 'ua_ua';
+
+UPDATE users SET theme = 'darkblue' WHERE theme = 'css_bb.css';
+UPDATE users SET theme = 'originalblue' WHERE theme = 'css_ob.css';
+UPDATE users SET theme = 'darkorange' WHERE theme = 'css_od.css';
+UPDATE users SET theme = 'default' WHERE theme = 'default.css';

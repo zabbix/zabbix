@@ -20,6 +20,7 @@
 ?>
 <?php
 class API {
+
 	const RETURN_TYPE_API = 'api';
 	const RETURN_TYPE_RPC = 'rpc';
 
@@ -37,6 +38,7 @@ class API {
 		'alert' => 'CAlert',
 		'apiinfo' => 'CAPIInfo',
 		'application' => 'CApplication',
+		'configuration' => 'CConfiguration',
 		'dcheck' => 'CDCheck',
 		'dhost' => 'CDHost',
 		'discoveryrule' => 'CDiscoveryRule',
@@ -49,8 +51,6 @@ class API {
 		'host' => 'CHost',
 		'hostgroup' => 'CHostGroup',
 		'history' => 'CHistory',
-		'host' => 'CHost',
-		'hostgroup' => 'CHostGroup',
 		'hostinterface' => 'CHostInterface',
 		'image' => 'CImage',
 		'iconmap' => 'CIconMap',
@@ -60,6 +60,7 @@ class API {
 		'map' => 'CMap',
 		'mediatype' => 'CMediatype',
 		'proxy' => 'CProxy',
+		'service' => 'CService',
 		'screen' => 'CScreen',
 		'screenitem' => 'CScreenItem',
 		'script' => 'CScript',
@@ -72,7 +73,7 @@ class API {
 		'usergroup' => 'CUserGroup',
 		'usermacro' => 'CUserMacro',
 		'usermedia' => 'CUserMedia',
-		'webcheck' => 'CWebCheck',
+		'webcheck' => 'CWebCheck'
 	);
 
 	/**
@@ -106,7 +107,7 @@ class API {
 	 *
 	 * @return CZBXAPI
 	 */
-	private static function getApi($object = null) {
+	public static function getApi($object = null) {
 		if ($object) {
 			$className = self::getObjectClassName($object);
 			if (!isset(self::$APIobjects[$object])) {
@@ -162,6 +163,13 @@ class API {
 	 */
 	public static function Application() {
 		return self::getObject('application');
+	}
+
+	/**
+	 * @return CConfiguration
+	 */
+	public static function Configuration() {
+		return self::getObject('configuration');
 	}
 
 	/**
@@ -309,6 +317,13 @@ class API {
 	 */
 	public static function Proxy() {
 		return self::getObject('proxy');
+	}
+
+	/**
+	 * @return CService
+	 */
+	public static function Service() {
+		return self::getObject('service');
 	}
 
 	/**
