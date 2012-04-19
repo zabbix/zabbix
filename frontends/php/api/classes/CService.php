@@ -253,6 +253,7 @@ class CService extends CZBXAPI {
 		$serviceTimes = array();
 		$deleteParentsForServiceIds = array();
 		$deleteDependenciesForServiceIds = array();
+		$deleteTimesForServiceIds = array();
 		foreach ($services as $service) {
 			if (isset($service['dependencies'])) {
 				$deleteDependenciesForServiceIds[] = $service['serviceid'];
@@ -280,6 +281,8 @@ class CService extends CZBXAPI {
 
 			// save service times
 			if (isset($service['times'])) {
+				$deleteTimesForServiceIds[] = $service['serviceid'];
+
 				foreach ($service['times'] as $serviceTime) {
 					$serviceTime['serviceid'] = $service['serviceid'];
 					$serviceTimes[] = $serviceTime;
@@ -299,8 +302,10 @@ class CService extends CZBXAPI {
 		}
 
 		// replace service times
+		if ($deleteTimesForServiceIds) {
+			$this->deleteTimes($deleteTimesForServiceIds);
+		}
 		if ($serviceTimes) {
-			$this->deleteTimes(array_unique(zbx_objectValues($serviceTimes, 'serviceid')));
 			$this->addTimes($serviceTimes);
 		}
 
