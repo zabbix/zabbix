@@ -1561,20 +1561,22 @@ class CHost extends CZBXAPI {
 
 		$this->checkInput($hosts, __FUNCTION__);
 
-		$groupsToAdd = array();
-
 		foreach ($hosts as $host) {
 			$hostid = DB::insert('hosts', array($host));
 			$hostids[] = $hostid = reset($hostid);
 
 			$host['hostid'] = $hostid;
 
+			// save groups
+			// groups must be added before calling massAdd() for permission validation to work
+			$groupsToAdd = array();
 			foreach ($host['groups'] as $group) {
 				$groupsToAdd[] = array(
 					'hostid' => $hostid,
 					'groupid' => $group['groupid']
 				);
 			}
+			DB::insert('hosts_groups', $groupsToAdd);
 
 			$options = array();
 			$options['hosts'] = $host;
@@ -1608,8 +1610,6 @@ class CHost extends CZBXAPI {
 				DBexecute('INSERT INTO host_inventory (hostid, '.$fields.') VALUES ('.$hostid.', '.$values.')');
 			}
 		}
-
-		DB::insert('hosts_groups', $groupsToAdd);
 
 		return array('hostids' => $hostids);
 	}
