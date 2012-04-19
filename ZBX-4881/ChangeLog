@@ -1,3 +1,7 @@
+Changes for 1.8.13rc1
+
+........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
+
 Changes for 1.8.12rc2
 
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
