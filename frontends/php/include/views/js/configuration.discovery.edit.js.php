@@ -144,10 +144,10 @@
 	function toggleInputs(id, state) {
 		jQuery('#'+id).toggle(state);
 		if (state) {
-			jQuery('#'+id+' :input').removeAttr('disabled');
+			jQuery('#'+id+' :input').prop('disabled', false);
 		}
 		else {
-			jQuery('#'+id+' :input').attr('disabled', 'disabled');
+			jQuery('#'+id+' :input').prop('disabled', true);
 		}
 	}
 
@@ -322,7 +322,7 @@
 
 		function ajaxValidation() {
 			if (ajaxChecks.ajaxdata.length) {
-				jQuery('#add_new_dcheck').attr('disabled', 'disabled');
+				jQuery('#add_new_dcheck').prop('disabled', true);
 				var url = new Curl();
 
 				return jQuery.ajax({
@@ -337,7 +337,7 @@
 					},
 					error: function() {
 						alert('AJAX request error');
-						jQuery('#add_new_dcheck').removeAttr('disabled');
+						jQuery('#add_new_dcheck').prop('disabled', false);
 					},
 					dataType: 'json'
 				});
@@ -350,7 +350,7 @@
 		jQuery.when(ajaxValidation()).done(function() {
 			if (validationErrors.length) {
 				alert(validationErrors.join('\n'));
-				jQuery('#add_new_dcheck').removeAttr('disabled');
+				jQuery('#add_new_dcheck').prop('disabled', false);
 			}
 			else {
 				dCheck.name = jQuery('#type :selected').text();

@@ -192,6 +192,7 @@ class CConfigurationImport {
 		$triggersRefs = array();
 		$iconMapsRefs = array();
 		$mapsRefs = array();
+		$screensRefs = array();
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -305,6 +306,8 @@ class CConfigurationImport {
 		}
 
 		foreach ($this->getFormattedMaps() as $map) {
+			$mapsRefs[$map['name']] = $map['name'];
+
 			if (!empty($map['iconmap'])) {
 				$iconMapsRefs[$map['iconmap']['name']] = $map['iconmap']['name'];
 			}
@@ -344,6 +347,71 @@ class CConfigurationImport {
 			}
 		}
 
+		foreach ($this->getFormattedScreens() as $screen) {
+			$screensRefs[$screen['name']] = $screen['name'];
+
+			if (!empty($screen['screenitems'])) {
+				foreach ($screen['screenitems'] as $screenItem) {
+					$resource = $screenItem['resource'];
+					if (empty($resource)) {
+						continue;
+					}
+
+					switch ($screenItem['resourcetype']) {
+						case SCREEN_RESOURCE_HOSTS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+						case SCREEN_RESOURCE_DATA_OVERVIEW:
+						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+							$groupsRefs[$resource['name']] = $resource['name'];
+							break;
+
+						case SCREEN_RESOURCE_HOST_TRIGGERS:
+							$hostsRefs[$resource['host']] = $resource['host'];
+							break;
+
+						case SCREEN_RESOURCE_GRAPH:
+							// TODO: gather graphs too
+							break;
+
+						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
+							break;
+
+						case SCREEN_RESOURCE_MAP:
+							$mapsRefs[$resource['name']] = $resource['name'];
+							break;
+
+						case SCREEN_RESOURCE_SCREEN:
+							$screensRefs[$resource['name']] = $resource['name'];
+							break;
+					}
+				}
+			}
+		}
+
+		foreach ($this->getFormattedTemplateScreens() as $screens) {
+			foreach ($screens as $screen) {
+				if (!empty($screen['screenitems'])) {
+					foreach ($screen['screenitems'] as $screenItem) {
+						$resource = $screenItem['resource'];
+
+						switch ($screenItem['resourcetype']) {
+							case SCREEN_RESOURCE_GRAPH:
+								// TODO: gather graphs too
+								break;
+
+							case SCREEN_RESOURCE_SIMPLE_GRAPH:
+							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
+								break;
+						}
+					}
+				}
+			}
+		}
+
 		$this->referencer->addGroups($groupsRefs);
 		$this->referencer->addTemplates($templatesRefs);
 		$this->referencer->addHosts($hostsRefs);
@@ -353,6 +421,7 @@ class CConfigurationImport {
 		$this->referencer->addTriggers($triggersRefs);
 		$this->referencer->addIconMaps($iconMapsRefs);
 		$this->referencer->addMaps($mapsRefs);
+		$this->referencer->addScreens($screensRefs);
 	}
 
 	/**
@@ -1025,8 +1094,6 @@ class CConfigurationImport {
 
 	/**
 	 * Import maps.
-	 *
-	 * @throws Exception
 	 */
 	protected function processMaps() {
 		if ($maps = $this->getFormattedMaps()) {
@@ -1039,55 +1106,9 @@ class CConfigurationImport {
 	 * Import screens.
 	 */
 	protected function processScreens() {
-		$allScreens = $this->getFormattedScreens();
-		if (empty($allScreens)) {
-			return;
-		}
-
-		$allScreens = zbx_toHash($allScreens, 'name');
-
-		$existingScreens = array();
-		$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE'.
-			' s.templateid IS NULL '.
-			' AND '.DBcondition('s.name', array_keys($allScreens)));
-		while ($dbScreen = DBfetch($dbScreens)) {
-			$existingScreens[$dbScreen['screenid']] = $dbScreen['name'];
-			$allScreens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
-		}
-
-		// if we are going to update screens, check for permissions
-		if ($existingScreens && $this->options['screens']['updateExisting']) {
-			$allowedScreens = API::Screen()->get(array(
-				'screenids' => array_keys($existingScreens),
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($existingScreens as $existingScreenId => $existingScreenName) {
-				if (!isset($allowedScreens[$existingScreenId])) {
-					throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
-				}
-			}
-		}
-
-		$allScreens = $this->prepareScreenImport($allScreens);
-		$screensToCreate = array();
-		$screensToUpdate = array();
-
-		foreach ($allScreens as $screen) {
-			if (isset($screen['screenid'])) {
-				$screensToUpdate[] = $screen;
-			}
-			else {
-				$screensToCreate[] = $screen;
-			}
-		}
-
-		if ($this->options['screens']['createMissing'] && $screensToCreate) {
-			API::Screen()->create($screensToCreate);
-		}
-		if ($this->options['screens']['updateExisting'] && $screensToUpdate) {
-			API::Screen()->update($screensToUpdate);
+		if ($screens = $this->getFormattedScreens()) {
+			$screenImporter = new CScreenImporter($this->options, $this->referencer);
+			$screenImporter->import($screens);
 		}
 	}
 
@@ -1095,177 +1116,10 @@ class CConfigurationImport {
 	 * Import template screens.
 	 */
 	protected function processTemplateScreens() {
-		$allScreens = $this->getFormattedTemplateScreens();
-		if (empty($allScreens)) {
-			return;
+		if ($screens = $this->getFormattedTemplateScreens()) {
+			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer);
+			$screenImporter->import($screens);
 		}
-
-		$screensToCreate = array();
-		$screensToUpdate = array();
-		foreach ($allScreens as $template => $screens) {
-			$existingScreens = array();
-			$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE '.
-					' s.templateid='.zbx_dbstr($this->referencer->resolveTemplate($template)).
-					' AND '.DBcondition('s.name', array_keys($screens)));
-			while ($dbScreen = DBfetch($dbScreens)) {
-				$existingScreens[$dbScreen['screenid']] = $dbScreen['name'];
-				$screens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
-			}
-
-			// if we are going to update screens, check for permissions
-			if ($existingScreens && $this->options['screens']['updateExisting']) {
-				$allowedTplScreens = API::TemplateScreen()->get(array(
-					'screenids' => array_keys($existingScreens),
-					'output' => API_OUTPUT_SHORTEN,
-					'editable' => true,
-					'preservekeys' => true
-				));
-				foreach ($existingScreens as $existingScreenId => $existingScreenName) {
-					if (!isset($allowedTplScreens[$existingScreenId])) {
-						throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
-					}
-				}
-			}
-
-			$screens = $this->prepareScreenImport($screens);
-			foreach ($screens as $screen) {
-				$screen['templateid'] = $this->referencer->resolveTemplate($template);
-				if (isset($screen['screenid'])) {
-					$screensToUpdate[] = $screen;
-				}
-				else {
-					$screensToCreate[] = $screen;
-				}
-			}
-		}
-
-
-		if ($this->options['templateScreens']['createMissing'] && $screensToCreate) {
-			API::TemplateScreen()->create($screensToCreate);
-		}
-		if ($this->options['templateScreens']['updateExisting'] && $screensToUpdate) {
-			API::TemplateScreen()->update($screensToUpdate);
-		}
-	}
-
-	/**
-	 * Prepare screen data for import.
-	 * Each screen element has reference to resource it represents, reference structure may differ depending on type.
-	 * Referenced database objects ids are stored to 'resourceid' field of screen items.
-	 *
-	 * @todo: it's copy of old frontend function, should be refactored
-	 * @throws Exception if referenced object is not found in database
-	 *
-	 * @param array $allScreens
-	 *
-	 * @return array
-	 */
-	protected function prepareScreenImport(array $allScreens) {
-		foreach ($allScreens as &$screen) {
-			if (!isset($screen['screenitems'])) {
-				continue;
-			}
-
-			foreach ($screen['screenitems'] as &$screenitem) {
-				$nodeCaption = isset($screenitem['resource']['node']) ? $screenitem['resource']['node'] . ':' : '';
-
-				if (empty($screenitem['resource'])) {
-					$screenitem['resourceid'] = 0;
-				}
-
-				if (is_array($screenitem['resource'])) {
-					switch ($screenitem['resourcetype']) {
-						case SCREEN_RESOURCE_HOSTS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$db_hostgroups = API::HostGroup()->getObjects($screenitem['resource']);
-							if (empty($db_hostgroups)) {
-								throw new Exception(_s('Cannot find group "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
-							}
-
-							$tmp = reset($db_hostgroups);
-							$screenitem['resourceid'] = $tmp['groupid'];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$db_hosts = API::Host()->getObjects($screenitem['resource']);
-							if (empty($db_hosts)) {
-								throw new Exception(_s('Cannot find host "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['host'], $screen['name']));
-							}
-
-							$tmp = reset($db_hosts);
-							$screenitem['resourceid'] = $tmp['hostid'];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-							$db_graphs = API::Graph()->getObjects($screenitem['resource']);
-							if (empty($db_graphs)) {
-								throw new Exception(_s('Cannot find graph "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
-							}
-
-							$tmp = reset($db_graphs);
-							$screenitem['resourceid'] = $tmp['graphid'];
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$db_items = API::Item()->getObjects(array(
-								'host' => $screenitem['resource']['host'],
-								'key_' => $screenitem['resource']['key']
-							));
-
-							if (empty($db_items)) {
-								throw new Exception(_s('Cannot find item "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['host'].':'.$screenitem['resource']['key'], $screen['name']));
-							}
-
-							$tmp = reset($db_items);
-							$screenitem['resourceid'] = $tmp['itemid'];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$db_sysmaps = API::Map()->getObjects($screenitem['resource']);
-							if (empty($db_sysmaps)) {
-								throw new Exception(_s('Cannot find map "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
-							}
-
-							$tmp = reset($db_sysmaps);
-							$screenitem['resourceid'] = $tmp['sysmapid'];
-							break;
-
-						case SCREEN_RESOURCE_SCREEN:
-							$db_screens = API::Screen()->get(array(
-								'output' => API_OUTPUT_SHORTEN,
-								'preservekeys' => true,
-								'editable' => true,
-								'filter' => array('name' => $screenitem['resource']['name'])
-							));
-							if (empty($db_screens)) {
-								throw new Exception(_s('Cannot find screen "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
-							}
-
-							$tmp = reset($db_screens);
-							$screenitem['resourceid'] = $tmp['screenid'];
-							break;
-
-						default:
-							$screenitem['resourceid'] = 0;
-							break;
-					}
-				}
-			}
-			unset($screenitem);
-		}
-		unset($screen);
-
-		return $allScreens;
 	}
 
 	/**

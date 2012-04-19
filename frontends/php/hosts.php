@@ -178,8 +178,15 @@ else{
 if (isset($_REQUEST['unlink']) || isset($_REQUEST['unlink_and_clear'])) {
 	$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 
+	$unlink_templates = array();
 	if (isset($_REQUEST['unlink'])) {
-		$unlink_templates = array_keys($_REQUEST['unlink']);
+		// templates_rem for old style removal in massupdate form
+		if (isset($_REQUEST['templates_rem'])) {
+			$unlink_templates = array_keys($_REQUEST['templates_rem']);
+		}
+		elseif (is_array($_REQUEST['unlink'])) {
+			$unlink_templates = array_keys($_REQUEST['unlink']);
+		}
 	}
 	else {
 		$unlink_templates = array_keys($_REQUEST['unlink_and_clear']);
@@ -583,7 +590,7 @@ $options = array(
 		'real_hosts' => 1,
 		'editable' => true
 	),
-	'groupid' => get_request('groupid', null),
+	'groupid' => get_request('groupid', null)
 );
 $pageFilter = new CPageFilter($options);
 
@@ -601,20 +608,23 @@ elseif (isset($_REQUEST['form'])) {
 
 	if ($hostid = get_request('hostid', 0)) {
 		$hosts_wdgt->addItem(get_header_host_table('', $_REQUEST['hostid']));
+		$hosts_wdgt->setRootClass('host-edit');
 	}
+		$hosts_wdgt->setRootClass('host-list');
 
 	$hostForm = new CView('configuration.host.edit');
 	$hosts_wdgt->addItem($hostForm->render());
+	$hosts_wdgt->setRootClass('host-edit');
 }
 else {
 	$frmForm = new CForm();
 	$frmForm->cleanItems();
 	$buttons = new CDiv(array(
-		new CSubmit('form', _('Create')),
+		new CSubmit('form', _('Create host')),
 		new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
 	));
 	$frmForm->addItem($buttons);
-	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid']));
+	$frmForm->addItem(new CVar('groupid', $_REQUEST['groupid'], 'filter_groupid_id'));
 
 
 	$hosts_wdgt->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
@@ -626,9 +636,10 @@ else {
 
 	$hosts_wdgt->addHeader(_('Hosts'), $frmGroup);
 	$hosts_wdgt->addHeaderRowNumber();
+	$hosts_wdgt->setRootClass('host-list');
 
 // HOSTS FILTER {{{
-	$filter_table = new CTable('', 'filter_config');
+	$filter_table = new CTable('', 'filter');
 	$filter_table->addRow(array(
 		array(array(bold(_('Name')), SPACE._('like').': '), new CTextBox('filter_host', $_REQUEST['filter_host'], 20)),
 		array(array(bold(_('DNS')), SPACE._('like').': '), new CTextBox('filter_dns', $_REQUEST['filter_dns'], 20)),

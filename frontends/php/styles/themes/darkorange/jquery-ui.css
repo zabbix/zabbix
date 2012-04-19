@@ -11,7 +11,7 @@
 /* Layout helpers
 ----------------------------------*/
 .darkorange .ui-helper-hidden { display: none; }
-.darkorange .ui-helper-hidden-accessible { position: absolute; left: -99999999px; }
+.darkorange .ui-helper-hidden-accessible { position: absolute !important; clip: rect(1px 1px 1px 1px); }
 .darkorange .ui-helper-reset { margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none; }
 .darkorange .ui-helper-clearfix:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 .darkorange .ui-helper-clearfix { display: inline-block; }
@@ -59,8 +59,8 @@
 .darkorange .ui-widget { font-family: Verdana, Arial, sans-serif; font-size: 1.0em; }
 .darkorange .ui-widget .ui-widget { font-size: 1em; }
 .darkorange .ui-widget input, .darkorange .ui-widget select, .darkorange .ui-widget textarea, .darkorange .ui-widget button { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
-.darkorange .ui-widget-content { border: 1px solid #ff5500; background: #1f1f1f url(images/ui-bg_flat_25_1f1f1f_40x100.png) 50% 50% repeat-x; color: #dfdfdf; }
-.darkorange .ui-widget-header { border: 1px solid #ff5500; background: #4f4f4f url(images/ui-bg_highlight-hard_30_4f4f4f_1x100.png) 50% 50% repeat-x; color: #dfdfdf; font-weight: bold; }
+.darkorange .ui-widget-content { border: 1px solid #444; background: #1f1f1f url(images/ui-bg_flat_25_1f1f1f_40x100.png) 50% 50% repeat-x; color: #dfdfdf; }
+.darkorange .ui-widget-header { border: 1px solid #444; background: #4f4f4f url(images/ui-bg_highlight-hard_30_4f4f4f_1x100.png) 50% 50% repeat-x; color: #dfdfdf; font-weight: bold; }
 .darkorange .ui-widget-header a { color: #dfdfdf; }
 
 /* Interaction states
@@ -425,7 +425,7 @@ input.ui-button { padding: .3em 1em; }
 
 /*button sets*/
 .darkorange .ui-buttonset { margin-right: 7px; }
-.darkorange .ui-buttonset .ui-button { margin-left: 0; margin-right: -.4em; }
+.darkorange .ui-buttonset .ui-button { margin-left: 0; margin-right: 0; }
 
 /* workarounds */
 button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
@@ -484,7 +484,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
  * http://docs.jquery.com/UI/Tabs#theming
  */
 .darkorange .ui-tabs { position: relative; padding: .2em; zoom: 1; } /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
-.darkorange .ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; }
+.darkorange .ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; border: 1px solid #999; }
 .darkorange .ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
 .darkorange .ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; }
 .darkorange .ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; }

@@ -33,7 +33,7 @@ class CView {
 	private $data;
 
 	/**
-	 * @var object - actual template object being shown
+	 * @var CTag - actual template object being shown
 	 */
 	private $template;
 
