@@ -500,23 +500,13 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 $ipmiList = new CFormList('ipmilist');
 
 $cmbIPMIAuthtype = new CComboBox('ipmi_authtype', $ipmi_authtype);
-$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_DEFAULT, _('Default'));
-$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_NONE, _('None'));
-$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD2, _('MD2'));
-$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_MD5, _('MD5'));
-$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_STRAIGHT, _('Straight'));
-$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_OEM, _('OEM'));
-$cmbIPMIAuthtype->addItem(IPMI_AUTHTYPE_RMCP_PLUS, _('RMCP+'));
+$cmbIPMIAuthtype->addItems(ipmiAuthTypes());
 $cmbIPMIAuthtype->setAttribute('size', 7);
 $cmbIPMIAuthtype->addStyle('width: 170px;');
 $ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
 
 $cmbIPMIPrivilege = new CComboBox('ipmi_privilege', $ipmi_privilege);
-$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_CALLBACK, _('Callback'));
-$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_USER, _('User'));
-$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OPERATOR, _('Operator'));
-$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_ADMIN, _('Admin'));
-$cmbIPMIPrivilege->addItem(IPMI_PRIVILEGE_OEM, _('OEM'));
+$cmbIPMIPrivilege->addItems(ipmiPrivileges());
 $cmbIPMIPrivilege->setAttribute('size', 5);
 $cmbIPMIPrivilege->addStyle('width: 170px;');
 $ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);

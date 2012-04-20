@@ -27,6 +27,62 @@ function setHostGroupInternal($groupids, $internal = ZBX_NOT_INTERNAL_GROUP) {
 }
 
 /**
+ * Get ipmi auth type label by it's number.
+ *
+ * @param null|int $type
+ *
+ * @return array|string
+ */
+function ipmiAuthTypes($type = null) {
+	$types = array(
+		IPMI_AUTHTYPE_DEFAULT => _('Default'),
+		IPMI_AUTHTYPE_NONE => _('None'),
+		IPMI_AUTHTYPE_MD2 => _('MD2'),
+		IPMI_AUTHTYPE_MD5 => _('MD5'),
+		IPMI_AUTHTYPE_STRAIGHT => _('Straight'),
+		IPMI_AUTHTYPE_OEM => _('OEM'),
+		IPMI_AUTHTYPE_RMCP_PLUS => _('RMCP+'),
+	);
+
+	if (is_null($type)) {
+		return $types;
+	}
+	elseif (isset($types[$type])) {
+		return $types[$type];
+	}
+	else {
+		return _('Unknown');
+	}
+}
+
+/**
+ * Get ipmi auth privilege label by it's number.
+ *
+ * @param null|int $type
+ *
+ * @return array|string
+ */
+function ipmiPrivileges($type = null) {
+	$types = array(
+		IPMI_PRIVILEGE_CALLBACK => _('Callback'),
+		IPMI_PRIVILEGE_USER => _('User'),
+		IPMI_PRIVILEGE_OPERATOR => _('Operator'),
+		IPMI_PRIVILEGE_ADMIN => _('Admin'),
+		IPMI_PRIVILEGE_OEM => _('OEM'),
+	);
+
+	if (is_null($type)) {
+		return $types;
+	}
+	elseif (isset($types[$type])) {
+		return $types[$type];
+	}
+	else {
+		return _('Unknown');
+	}
+}
+
+/**
  * Get info about what host inventory fields we have, their numbers and names
  * Example of usage:
  *      $inventories = getHostInventories();
@@ -1229,17 +1285,18 @@ function getDeletableHostGroups($groupids = null) {
 		$sql_where .= ' AND '.DBcondition('g.groupid', $groupids);
 	}
 
-	$sql = 'SELECT DISTINCT g.groupid'.
-			' FROM groups g'.
-			' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
-				$sql_where.
-				' AND NOT EXISTS ('.
-					'SELECT hg.groupid'.
-					' FROM hosts_groups hg'.
-					' WHERE g.groupid=hg.groupid'.
-						(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
-				')';
-	$db_groups = DBselect($sql);
+	$db_groups = DBselect(
+		'SELECT DISTINCT g.groupid'.
+		' FROM groups g'.
+		' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
+			$sql_where.
+			' AND NOT EXISTS ('.
+				'SELECT hg.groupid'.
+				' FROM hosts_groups hg'.
+				' WHERE g.groupid=hg.groupid'.
+					(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
+			')'
+	);
 	while ($group = DBfetch($db_groups)) {
 		$deletable_groupids[$group['groupid']] = $group['groupid'];
 	}

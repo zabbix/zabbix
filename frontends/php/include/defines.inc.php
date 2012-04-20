@@ -26,7 +26,7 @@ define('ZBX_LOGIN_ATTEMPTS',			5);
 define('ZBX_LOGIN_BLOCK',				30); // sec
 
 define('ZBX_MIN_PERIOD',				3600); // 1 hour
-define('ZBX_MAX_PERIOD',				63072000); // the maximum period for the time bar control, ~2 years (2*365*86400)
+define('ZBX_MAX_PERIOD',				63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
 define('ZBX_PERIOD_DEFAULT',			3600); // 1 hour
 
 define('ZBX_WIDGET_ROWS',				20);
@@ -40,13 +40,13 @@ define('ZBX_SCRIPT_BYTES_LIMIT',		1048576); // 1048576 is 1MB in bytes
 
 define('GRAPH_YAXIS_SIDE_DEFAULT',		0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
-define('ZBX_MAX_IMAGE_SIZE',			1024*1024);
+define('ZBX_MAX_IMAGE_SIZE',			1048576); // 1024 * 1024
 
-define('ZBX_UNITS_ROUNDOFF_THRESHOLD', 	0.01);
-define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT', 2);
-define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT', 6);
+define('ZBX_UNITS_ROUNDOFF_THRESHOLD',		0.01);
+define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT',	2);
+define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT',	6);
 
-define('ZBX_DEFAULT_INTERVAL',		 	'1-7,00:00-24:00');
+define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
 // for partitioned DB installs!!
 define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
@@ -57,13 +57,13 @@ define('ZBX_SCRIPT_TYPE_SSH',			2);
 define('ZBX_SCRIPT_TYPE_TELNET',		3);
 define('ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT',	4);
 
-define('ZBX_SCRIPT_EXECUTE_ON_AGENT', 	0);
-define('ZBX_SCRIPT_EXECUTE_ON_SERVER', 	1);
+define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
+define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
 
-define('ZBX_FLAG_DISCOVERY_NORMAL', 	0x0);   // a normal item
-define('ZBX_FLAG_DISCOVERY', 			0x1);   // a low level discovery rule
-define('ZBX_FLAG_DISCOVERY_CHILD', 		0x2);   // an item prototype
-define('ZBX_FLAG_DISCOVERY_CREATED', 	0x4);   // an item created via a discovery rule
+define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0); // a normal item
+define('ZBX_FLAG_DISCOVERY',			0x1); // a low level discovery rule
+define('ZBX_FLAG_DISCOVERY_CHILD',		0x2); // an item prototype
+define('ZBX_FLAG_DISCOVERY_CREATED',	0x4); // an item created via a discovery rule
 
 define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
@@ -80,7 +80,7 @@ define('EVENTS_OPTION_NOEVENT', 1);
 define('EVENTS_OPTION_ALL',		2);
 define('EVENTS_OPTION_NOT_ACK', 3);
 
-define('ZBX_FONT_NAME',			'DejaVuSans');
+define('ZBX_FONT_NAME', 'DejaVuSans');
 
 define('ZBX_AUTH_INTERNAL',	0);
 define('ZBX_AUTH_LDAP',		1);
@@ -343,11 +343,11 @@ define('ZBX_DEFAULT_KEY_SSH',			'ssh.run[<unique short description>,<ip>,<port>,
 define('ZBX_DEFAULT_KEY_TELNET',		'telnet.run[<unique short description>,<ip>,<port>,<encoding>]');
 define('ZBX_DEFAULT_KEY_JMX',			'jmx[<object name>,<attribute name>]');
 
-define('SYSMAP_ELEMENT_USE_ICONMAP_ON', 	1);
-define('SYSMAP_ELEMENT_USE_ICONMAP_OFF', 	0);
+define('SYSMAP_ELEMENT_USE_ICONMAP_ON',		1);
+define('SYSMAP_ELEMENT_USE_ICONMAP_OFF',	0);
 
-define('ZBX_ICON_PREVIEW_HEIGHT', 	24);
-define('ZBX_ICON_PREVIEW_WIDTH', 	24);
+define('ZBX_ICON_PREVIEW_HEIGHT',	24);
+define('ZBX_ICON_PREVIEW_WIDTH',	24);
 
 define('ITEM_STATUS_ACTIVE',		0);
 define('ITEM_STATUS_DISABLED',		1);
@@ -515,15 +515,15 @@ define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',	1);
 define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC',	2);
 
 // alignes
-define('HALIGN_DEFAULT',0);
-define('HALIGN_CENTER',	0);
-define('HALIGN_LEFT',	1);
-define('HALIGN_RIGHT',	2);
+define('HALIGN_DEFAULT',	0);
+define('HALIGN_CENTER',		0);
+define('HALIGN_LEFT',		1);
+define('HALIGN_RIGHT',		2);
 
-define('VALIGN_DEFAULT',0);
-define('VALIGN_MIDDLE',	0);
-define('VALIGN_TOP',	1);
-define('VALIGN_BOTTOM',	2);
+define('VALIGN_DEFAULT',	0);
+define('VALIGN_MIDDLE',		0);
+define('VALIGN_TOP',		1);
+define('VALIGN_BOTTOM',		2);
 
 // info module style
 define('STYLE_HORISONTAL',	0);
@@ -628,9 +628,9 @@ define('EVENT_ACK_ENABLED',		'1');
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
 
-define('EVENTS_NOFALSEFORB_STATUS_ALL',		0);	// used with TRIGGERS_OPTION_NOFALSEFORB
-define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1);	// used with TRIGGERS_OPTION_NOFALSEFORB
-define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2);	// used with TRIGGERS_OPTION_NOFALSEFORB
+define('EVENTS_NOFALSEFORB_STATUS_ALL',		0); // used with TRIGGERS_OPTION_NOFALSEFORB
+define('EVENTS_NOFALSEFORB_STATUS_FALSE',	1); // used with TRIGGERS_OPTION_NOFALSEFORB
+define('EVENTS_NOFALSEFORB_STATUS_TRUE',	2); // used with TRIGGERS_OPTION_NOFALSEFORB
 
 define('EVENT_SOURCE_TRIGGERS',			0);
 define('EVENT_SOURCE_DISCOVERY',		1);
@@ -668,7 +668,7 @@ define('GRAPH_STACKED_ALFA',		15); // 0..100 transparency
 define('GRAPH_ZERO_LINE_COLOR_LEFT',	'AAAAAA');
 define('GRAPH_ZERO_LINE_COLOR_RIGHT',	'888888');
 
-define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR',	'000');
+define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR', '000');
 
 define('ZBX_MAX_TREND_DIFF',		3600);
 
@@ -721,7 +721,7 @@ define('HOST_INVENTORY_MANUAL',			0);
 define('HOST_INVENTORY_AUTOMATIC',		1);
 
 define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
-define('EXPRESSION_HOST_UNKNOWN',	'#ERROR_HOST#');
+define('EXPRESSION_HOST_UNKNOWN',		'#ERROR_HOST#');
 define('EXPRESSION_HOST_ITEM_UNKNOWN',	'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',	'#ERROR_MACRO#');
 
@@ -730,6 +730,7 @@ define('AVAILABLE_NOCACHE', 0);	// take available objects not from cache
 define('SBR',	"<br/>\n");
 define('SPACE',	'&nbsp;');
 define('RARR',	'&rArr;');
+define('SQUAREBRACKETS', '%5B%5D');
 
 // affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
 if (in_array(ini_get('mbstring.func_overload'), array(2,3,6,7))) {
@@ -788,11 +789,11 @@ define('IPMI_PRIVILEGE_OEM',		5);
 define('ZBX_HAVE_IPV6', 1);
 
 // XML export|import tags
-define('XML_TAG_MACROS', 			'macros');
-define('XML_TAG_MACRO', 			'macro');
-define('XML_TAG_ZABBIX_EXPORT', 	'zabbix_export');
-define('XML_TAG_HOSTS', 			'hosts');
-define('XML_TAG_HOST', 				'host');
+define('XML_TAG_MACROS',			'macros');
+define('XML_TAG_MACRO',				'macro');
+define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
+define('XML_TAG_HOSTS',				'hosts');
+define('XML_TAG_HOST',				'host');
 define('XML_TAG_HOSTINVENTORY',		'host_inventory');
 define('XML_TAG_GROUPS',			'groups');
 define('XML_TAG_GROUP',				'group');
@@ -821,7 +822,7 @@ define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_PARAMETERS',	100);
-define('ZBX_API_ERROR_PERMISSIONS', 120);
+define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
 
@@ -835,7 +836,7 @@ define('SEC_PER_MIN',	60);
 define('SEC_PER_HOUR',	3600);
 define('SEC_PER_DAY',	86400);
 define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
-define('SEC_PER_MONTH', 2592000); // 30 * SEC_PER_DAY
+define('SEC_PER_MONTH',	2592000); // 30 * SEC_PER_DAY
 define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
 
 define('DAY_IN_YEAR',	365);
@@ -852,10 +853,11 @@ define('ZBX_TEXTAREA_BIG_WIDTH',		524);
 define('ZBX_TEXTAREA_STANDARD_ROWS',	7);
 
 // validation
-define('NOT_EMPTY', "({}!='')&&");
-define('NO_TRIM', 'NO_TRIM');
-define('DB_ID', "({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
-define('NOT_ZERO', "({}!=0)&&");
+define('DB_ID',		"({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
+define('NOT_EMPTY',	"({}!='')&&");
+define('NOT_ZERO',	"({}!=0)&&");
+define('NO_TRIM',	'NO_TRIM');
+
 define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
@@ -882,4 +884,3 @@ ini_set('precision', 14);
 
 // BC Math scale
 bcscale(7);
-?>
