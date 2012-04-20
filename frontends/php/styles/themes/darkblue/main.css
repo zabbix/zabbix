@@ -49,7 +49,7 @@ div #div_node_tree { background-color:#1D4161; }
 }
 
 .pum_oheader {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 .pum_o_item, .pum_o_submenu {
@@ -90,7 +90,7 @@ table{
 }
 
 table.page_footer{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 	margin-top:20px;
 	border:1px solid #77B7DA;
 }
@@ -107,10 +107,10 @@ table.formtable tr td {
 }
 
 table.formtable tr td.form_row_first{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 table.formtable tr td.form_row_last {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.formtable tr.new td{
@@ -126,12 +126,12 @@ td.form_row_r_simple { /* right cell simple */
 }
 
 table.formlongtable tr td.form_row_first{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 	border-color: #77B7DA;
 }
 
 table.formlongtable tr td.form_row_last {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 	border-color: #77B7DA;
 }
 
@@ -146,7 +146,7 @@ table.formlongtable tr td.form_row_r { /* right cell */
 }
 
 table.tabletree tr.footer td {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.filter { border: 1px solid #383838; }
@@ -168,7 +168,7 @@ table.tableinfo{
 	background-color: #001C31;
 }
 table.tableinfo caption {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.tableinfo tr td {
@@ -220,7 +220,7 @@ table.tableinfo tr.blue 					{	background-color: #BBBBFF; border: 1px #BBBBFF so
 table.tableinfo tr.blue:hover 				{	background-color: #AAAAEE; border: 1px #AAAAEE solid; }
 
 table.tableinfo tr.footer td{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 /**************************************************/
 /**************************************************/
@@ -241,12 +241,12 @@ table.tablestripped tr.form_even_row td{
 }
 
 table.tablestripped tr.footer td {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 
 table.header{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 	border: 1px solid #77B7DA;
 }
 
@@ -255,7 +255,7 @@ table.flicker{
 }
 
 table.ack_msgs tr.title {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.menu tr{
@@ -269,7 +269,7 @@ table.menu tr td{
 table.menu tr td.active{
 	color: #FFFFFF;
 	border-color: #022744;
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.sub_menu {
@@ -277,7 +277,7 @@ table.sub_menu {
 }
 
 table.sub_menu tr{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.sub_menu tr td span.active a.highlight{
@@ -285,11 +285,11 @@ table.sub_menu tr td span.active a.highlight{
 }
 
 table.triggers_info tr td.header {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.hosts_info tr td.header {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.server_info{
@@ -297,11 +297,11 @@ table.server_info{
 }
 
 table.server_info tr td.header {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.server_info tr.footer td {
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 
 table.history td.caption{
@@ -452,13 +452,13 @@ div.messagecontainer .message .messagebox{
 }
 
 div.formElement_header{
-	background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x;
+	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
 }
 div.formElement_body{
 	border: 1px solid #245078;
 }
-div.formElement_footer{ background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x; }
-div.thin_header{ background: #3C759B url(images/ui-bg_inset-soft_25_3c759b_1x100.png) 50% 50% repeat-x; }
+div.formElement_footer{ background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
+div.thin_header{ background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
 div.zabbix_logo{ background-image:url('../../../images/general/zabbix_bb.png'); }
 .iconzbxavailable{ background-image: url('../../../images/general/zabbix_available_bb.png'); }
 .iconsnmpavailable{ background-image: url('../../../images/general/snmp_available_bb.png'); }
