@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
@@ -132,13 +133,7 @@ $hostFormList->addRow(
 
 // append ipmi to form list
 $ipmiAuthtypeComboBox = new CComboBox('ipmi_authtype', $this->data['ipmi_authtype']);
-$ipmiAuthtypeComboBox->addItem(IPMI_AUTHTYPE_DEFAULT, _('Default'));
-$ipmiAuthtypeComboBox->addItem(IPMI_AUTHTYPE_NONE, _('None'));
-$ipmiAuthtypeComboBox->addItem(IPMI_AUTHTYPE_MD2, _('MD2'));
-$ipmiAuthtypeComboBox->addItem(IPMI_AUTHTYPE_MD5, _('MD5'));
-$ipmiAuthtypeComboBox->addItem(IPMI_AUTHTYPE_STRAIGHT, _('Straight'));
-$ipmiAuthtypeComboBox->addItem(IPMI_AUTHTYPE_OEM, _('OEM'));
-$ipmiAuthtypeComboBox->addItem(IPMI_AUTHTYPE_RMCP_PLUS, _('RMCP+'));
+$ipmiAuthtypeComboBox->addItems(ipmiAuthTypes());
 $hostFormList->addRow(
 	array(
 		_('IPMI authentication algorithm'),
@@ -149,11 +144,7 @@ $hostFormList->addRow(
 );
 
 $ipmiPrivilegeComboBox = new CComboBox('ipmi_privilege', $this->data['ipmi_privilege']);
-$ipmiPrivilegeComboBox->addItem(IPMI_PRIVILEGE_CALLBACK, _('Callback'));
-$ipmiPrivilegeComboBox->addItem(IPMI_PRIVILEGE_USER, _('User'));
-$ipmiPrivilegeComboBox->addItem(IPMI_PRIVILEGE_OPERATOR, _('Operator'));
-$ipmiPrivilegeComboBox->addItem(IPMI_PRIVILEGE_ADMIN, _('Admin'));
-$ipmiPrivilegeComboBox->addItem(IPMI_PRIVILEGE_OEM, _('OEM'));
+$ipmiPrivilegeComboBox->addItems(ipmiPrivileges());
 $hostFormList->addRow(
 	array(
 		_('IPMI privilege level'),
@@ -219,6 +210,6 @@ $hostTab->addTab('hostTab', _('Mass update'), $hostFormList);
 $hostForm->addItem($hostTab);
 
 // append buttons to form
-$hostForm->addItem(makeFormFooter(new CSubmit('masssave', _('Update')), new CButtonCancel(url_param('config').url_param('groupid'))));
+$hostForm->addItem(makeFormFooter(new CSubmit('masssave', _('Update')), new CButtonCancel(url_param('groupid'))));
 
 return $hostForm;

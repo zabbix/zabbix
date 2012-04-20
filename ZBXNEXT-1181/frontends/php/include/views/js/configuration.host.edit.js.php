@@ -26,7 +26,7 @@
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
 	<td class="interface-control">
-		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="link_menu remove" #{*attrs.disabled} ><?php echo _('Remove'); ?></button>
+		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="link_menu remove" #{*attrs.disabled}><?php echo _('Remove'); ?></button>
 	</td>
 </tr>
 </script>
@@ -387,33 +387,19 @@
 			}
 		});
 		jQuery('#name').focus();
+
+
+		/**
+		 * Mass update
+		 */
+		jQuery('#mass_replace_tpls').on('change', function() {
+			jQuery('#mass_clear_tpls').prop('disabled', !this.checked);
+		}).change();
 	});
 
-	/*
-	 * Mass update
-	 */
 	function removeTemplate(templateid) {
 		jQuery('#templates_' + templateid).remove();
 		jQuery('#template_row_' + templateid).remove();
 	}
-
-	function displayTemplatesCheckboxesTables() {
-		if (jQuery('#mass_replace_tpls').is(':checked')) {
-			jQuery('#mass_clear_tpls').prop('disabled', false);
-		}
-		else {
-			jQuery('#mass_clear_tpls').prop('disabled', true);
-		}
-	}
-
-	jQuery(document).ready(function() {
-		'use strict';
-
-		jQuery('#mass_replace_tpls').on('click', function() {
-			displayTemplatesCheckboxesTables();
-		});
-
-		displayTemplatesCheckboxesTables();
-	});
 
 </script>
