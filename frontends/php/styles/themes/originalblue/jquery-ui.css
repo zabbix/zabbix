@@ -59,26 +59,26 @@
 .originalblue .ui-widget { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
 .originalblue .ui-widget .ui-widget { font-size: 1em; }
 .originalblue .ui-widget input, .originalblue .ui-widget select, .originalblue .ui-widget textarea, .originalblue .ui-widget button { font-family: Verdana,Arial,sans-serif; font-size: 1em; }
-.originalblue .ui-widget-content { border: 1px solid #7e9ab4; background: #ffffff url(images/ui-bg_flat_100_ffffff_40x100.png) 50% 50% repeat-x; color: #000000; }
+.originalblue .ui-widget-content { border: 1px solid #7e9ab4; background: #ffffff url(images/bg_flat_100_ffffff.png) 50% 50% repeat-x; color: #000000; }
 .originalblue .ui-widget-content a { color: #3C3089; }
-.originalblue .ui-widget-header { border: 1px solid #7e9ab4; background: #779dc0 url(images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
+.originalblue .ui-widget-header { border: 1px solid #7e9ab4; background: #779dc0 url(images/bg_h-hard_55.png) 50% 50% repeat-x; color: #ffffff; font-weight: bold; }
 .originalblue .ui-widget-header a { color: #ffffff; }
 
 /* Interaction states
 ----------------------------------*/
-.originalblue .ui-state-default, .originalblue .ui-widget-content .ui-state-default, .originalblue .ui-widget-header .ui-state-default { border: 1px solid #9db2cd; background: #f5f8fa url(images/ui-bg_highlight-hard_85_f5f8fa_1x100.png) 50% 50% repeat-x; font-weight: bold; color: #5481ab; }
+.originalblue .ui-state-default, .originalblue .ui-widget-content .ui-state-default, .originalblue .ui-widget-header .ui-state-default { border: 1px solid #9db2cd; background: #f5f8fa url(images/bg_h-hard_85.png) 50% 50% repeat-x; font-weight: bold; color: #5481ab; }
 .originalblue .ui-state-default a, .originalblue .ui-state-default a:link, .originalblue .ui-state-default a:visited { color: #5481ab; text-decoration: none; }
-.originalblue .ui-state-hover, .originalblue .ui-widget-content .ui-state-hover, .originalblue .ui-widget-header .ui-state-hover, .originalblue .ui-state-focus, .originalblue .ui-widget-content .ui-state-focus, .originalblue .ui-widget-header .ui-state-focus { border: 1px solid #7e9ab4; background: #dae6f1 url(images/ui-bg_highlight-hard_75_dae6f1_1x100.png) 50% 50% repeat-x; font-weight: bold; color: #456582; }
+.originalblue .ui-state-hover, .originalblue .ui-widget-content .ui-state-hover, .originalblue .ui-widget-header .ui-state-hover, .originalblue .ui-state-focus, .originalblue .ui-widget-content .ui-state-focus, .originalblue .ui-widget-header .ui-state-focus { border: 1px solid #7e9ab4; background: #dae6f1 url(images/bg_h-hard_75.png) 50% 50% repeat-x; font-weight: bold; color: #456582; }
 .originalblue .ui-state-hover a, .originalblue .ui-state-hover a:hover { color: #456582; text-decoration: none; }
-.originalblue .ui-state-active, .originalblue .ui-widget-content .ui-state-active, .originalblue .ui-widget-header .ui-state-active { border: 1px solid #7e9ab4; background: #dae6f1 url(images/ui-bg_inset-hard_100_dae6f1_1x100.png) 50% 50% repeat-x; font-weight: bold; color: #456582; }
+.originalblue .ui-state-active, .originalblue .ui-widget-content .ui-state-active, .originalblue .ui-widget-header .ui-state-active { border: 1px solid #7e9ab4; background: #dae6f1 url(images/bg_i-hard_100.png) 50% 50% repeat-x; font-weight: bold; color: #456582; }
 .originalblue .ui-state-active a, .originalblue .ui-state-active a:link, .originalblue .ui-state-active a:visited { color: #456582; text-decoration: none; }
 .originalblue .ui-widget :active { outline: none; }
 
 /* Interaction Cues
 ----------------------------------*/
-.originalblue .ui-state-highlight, .originalblue .ui-widget-content .ui-state-highlight, .originalblue .ui-widget-header .ui-state-highlight  {border: 1px solid #dd9b60; background: #fffce3 url(images/ui-bg_flat_100_fffce3_40x100.png) 50% 50% repeat-x; color: #4a4a4a; }
+.originalblue .ui-state-highlight, .originalblue .ui-widget-content .ui-state-highlight, .originalblue .ui-widget-header .ui-state-highlight  {border: 1px solid #dd9b60; background: #fffce3 url(images/bg_flat_100_fffce3.png) 50% 50% repeat-x; color: #4a4a4a; }
 .originalblue .ui-state-highlight a, .originalblue .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: #4a4a4a; }
-.originalblue .ui-state-error, .originalblue .ui-widget-content .ui-state-error, .originalblue .ui-widget-header .ui-state-error {border: 1px solid #d40000; background: #fef1ec url(images/ui-bg_flat_100_fef1ec_40x100.png) 50% 50% repeat-x; color: #d40000; }
+.originalblue .ui-state-error, .originalblue .ui-widget-content .ui-state-error, .originalblue .ui-widget-header .ui-state-error {border: 1px solid #d40000; background: #fef1ec url(images/bg_flat_100_fef1ec.png) 50% 50% repeat-x; color: #d40000; }
 .originalblue .ui-state-error a, .originalblue .ui-widget-content .ui-state-error a, .originalblue .ui-widget-header .ui-state-error a { color: #d40000; }
 .originalblue .ui-state-error-text, .originalblue .ui-widget-content .ui-state-error-text, .originalblue .ui-widget-header .ui-state-error-text { color: #d40000; }
 .originalblue .ui-priority-primary, .originalblue .ui-widget-content .ui-priority-primary, .originalblue .ui-widget-header .ui-priority-primary { font-weight: bold; }
@@ -89,14 +89,14 @@
 ----------------------------------*/
 
 /* states and images */
-.originalblue .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_5481ab_256x240.png); }
-.originalblue .ui-widget-content .ui-icon {background-image: url(images/ui-icons_5481ab_256x240.png); }
-.originalblue .ui-widget-header .ui-icon {background-image: url(images/ui-icons_ffffff_256x240.png); }
-.originalblue .ui-state-default .ui-icon { background-image: url(images/ui-icons_5481ab_256x240.png); }
-.originalblue .ui-state-hover .ui-icon, .originalblue .ui-state-focus .ui-icon {background-image: url(images/ui-icons_456582_256x240.png); }
-.originalblue .ui-state-active .ui-icon {background-image: url(images/ui-icons_456582_256x240.png); }
-.originalblue .ui-state-highlight .ui-icon {background-image: url(images/ui-icons_469bdd_256x240.png); }
-.originalblue .ui-state-error .ui-icon, .originalblue .ui-state-error-text .ui-icon {background-image: url(images/ui-icons_d40000_256x240.png); }
+.originalblue .ui-icon { width: 16px; height: 16px; background-image: url(images/icons_5481ab.png); }
+.originalblue .ui-widget-content .ui-icon {background-image: url(images/icons_5481ab.png); }
+.originalblue .ui-widget-header .ui-icon {background-image: url(images/icons_ffffff.png); }
+.originalblue .ui-state-default .ui-icon { background-image: url(images/icons_5481ab.png); }
+.originalblue .ui-state-hover .ui-icon, .originalblue .ui-state-focus .ui-icon {background-image: url(images/icons_456582.png); }
+.originalblue .ui-state-active .ui-icon {background-image: url(images/icons_456582.png); }
+.originalblue .ui-state-highlight .ui-icon {background-image: url(images/icons_469bdd.png); }
+.originalblue .ui-state-error .ui-icon, .originalblue .ui-state-error-text .ui-icon {background-image: url(images/icons_d40000.png); }
 
 /* positioning */
 .originalblue .ui-icon-carat-1-n { background-position: 0 0; }
@@ -291,8 +291,8 @@
 .originalblue .ui-corner-all { -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; }
 
 /* Overlays */
-.originalblue .ui-widget-overlay { background: #c9c9c9 url(images/ui-bg_flat_0_c9c9c9_40x100.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); }
-.originalblue .ui-widget-shadow { margin: -5px 0 0 -5px; padding: 5px; background: #999999 url(images/ui-bg_flat_0_999999_40x100.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; }/*
+.originalblue .ui-widget-overlay { background: #c9c9c9 url(images/bg_flat_0_c9c9c9.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); }
+.originalblue .ui-widget-shadow { margin: -5px 0 0 -5px; padding: 5px; background: #999999 url(images/bg_flat_0_999999.png) 50% 50% repeat-x; opacity: .30;filter:Alpha(Opacity=30); -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; }/*
  * jQuery UI Resizable 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
