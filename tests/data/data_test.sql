@@ -68,7 +68,7 @@ INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, 
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, recovery_msg, r_shortdata, r_longdata) VALUES (13,'Trigger action 3',0,0,0,60,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}',1,'Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}','Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}{TRIGGER.URL}');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, recovery_msg, r_shortdata, r_longdata) VALUES (14,'Trigger action 4',0,0,1,60,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}',1,'Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}','Recovery: {TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}{TRIGGER.URL}');
 
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (8,10,5,0,'1');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (82,10,5,0,'1');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (9,11,5,0,'1');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (10,12,5,0,'1');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (11,12,15,0,'MySQL');
