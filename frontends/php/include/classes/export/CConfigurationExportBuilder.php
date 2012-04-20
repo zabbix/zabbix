@@ -90,6 +90,7 @@ class CConfigurationExportBuilder {
 				'refs' => array()
 			);
 
+			// create interface references
 			foreach ($host['interfaces'] as &$interface) {
 				$refNum = $references['num']++;
 				$referenceKey = 'if'.$refNum;
@@ -98,11 +99,13 @@ class CConfigurationExportBuilder {
 			}
 			unset($interface);
 
+			// add interfaces references to items
 			foreach ($host['items'] as &$item) {
 				$item['interface_ref'] = $references['refs'][$item['interfaceid']];
 			}
 			unset($item);
 
+			// add interfaces references to discovery rules and item prototypes
 			foreach ($host['discoveryRules'] as &$discoveryRule) {
 				$discoveryRule['interface_ref'] = $references['refs'][$discoveryRule['interfaceid']];
 
@@ -116,7 +119,7 @@ class CConfigurationExportBuilder {
 			$this->data['hosts'][] = array(
 				'host' => $host['host'],
 				'name' => $host['name'],
-				'proxyid' => $host['proxy_hostid'],
+				'proxy' => $host['proxy'],
 				'status' => $host['status'],
 				'ipmi_authtype' => $host['ipmi_authtype'],
 				'ipmi_privilege' => $host['ipmi_privilege'],
