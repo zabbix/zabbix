@@ -1,8 +1,15 @@
 --------------------------------------------------------------------------------
-Changes for 2.0.0rc3
+Changes for 2.0.0rc4
 
 New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.0rc3
+
+New features:
 ....I..... [ZBXNEXT-973] redesign of existing templates (Alexei, Sasha)
 ..F....... [ZBX-4869] added support for nested screens import (Vedmak)
 A.F....... [ZBXNEXT-1161] implemented the service API (Pavels)
