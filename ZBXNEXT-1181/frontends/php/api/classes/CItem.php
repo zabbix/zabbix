@@ -1369,7 +1369,7 @@ class CItem extends CItemGeneral {
 		// adding item discovery
 		if ($options['selectItemDiscovery']) {
 			$itemDiscoveryOutput = $this->extendOutputOption('item_discovery', 'itemid', $options['selectItemDiscovery']);
-			$itemDiscoveries = $this->select('item_discovery', array(
+			$itemDiscoveries = API::getApi()->select('item_discovery', array(
 				'output' => $itemDiscoveryOutput,
 				'filter' => array(
 					'itemid' => $itemids

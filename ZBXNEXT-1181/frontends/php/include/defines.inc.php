@@ -387,6 +387,9 @@ define('SERVICE_ALGORITHM_MIN',		2);
 
 define('SERVICE_SLA', 99.05);
 
+define('SERVICE_SHOW_SLA_OFF', 0);
+define('SERVICE_SHOW_SLA_ON',  1);
+
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
 

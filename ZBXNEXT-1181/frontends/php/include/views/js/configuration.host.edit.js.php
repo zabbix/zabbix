@@ -100,7 +100,7 @@
 			types[getHostInterfaceNumericType('jmx')] = {main: null, all: []};
 			types[getHostInterfaceNumericType('ipmi')] = {main: null, all: []};
 
-			for (var hostInterfaceId in allHostInterfaces){
+			for (var hostInterfaceId in allHostInterfaces) {
 				hostInterface = allHostInterfaces[hostInterfaceId];
 
 				types[hostInterface.type].all.push(hostInterfaceId);
@@ -415,6 +415,5 @@
 
 		displayTemplatesCheckboxesTables();
 	});
-
 
 </script>
