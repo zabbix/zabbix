@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+........S. [ZBX-4893] fixed linking of item applications by a discovery rule (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.0rc3
