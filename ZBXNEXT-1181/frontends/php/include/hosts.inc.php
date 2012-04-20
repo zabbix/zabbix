@@ -1229,17 +1229,18 @@ function getDeletableHostGroups($groupids = null) {
 		$sql_where .= ' AND '.DBcondition('g.groupid', $groupids);
 	}
 
-	$sql = 'SELECT DISTINCT g.groupid'.
-			' FROM groups g'.
-			' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
-				$sql_where.
-				' AND NOT EXISTS ('.
-					'SELECT hg.groupid'.
-					' FROM hosts_groups hg'.
-					' WHERE g.groupid=hg.groupid'.
-						(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
-				')';
-	$db_groups = DBselect($sql);
+	$db_groups = DBselect(
+		'SELECT DISTINCT g.groupid'.
+		' FROM groups g'.
+		' WHERE g.internal='.ZBX_NOT_INTERNAL_GROUP.
+			$sql_where.
+			' AND NOT EXISTS ('.
+				'SELECT hg.groupid'.
+				' FROM hosts_groups hg'.
+				' WHERE g.groupid=hg.groupid'.
+					(!empty($hostids) ? ' AND '.DBcondition('hg.hostid', $hostids, true) : '').
+			')'
+	);
 	while ($group = DBfetch($db_groups)) {
 		$deletable_groupids[$group['groupid']] = $group['groupid'];
 	}
