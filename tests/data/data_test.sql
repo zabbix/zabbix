@@ -35,7 +35,7 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VA
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10022,10053,1,2,1,'127.0.0.1','','161');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10023,10053,1,3,1,'127.0.0.1','','623');
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (10024,10053,1,4,1,'127.0.0.1','','12345');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (47,10053,4);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (100,10053,4);
 
 -- Add regular expressions
 INSERT INTO regexps (regexpid, name, test_string) VALUES (1,'1_regexp_1','first test string');
