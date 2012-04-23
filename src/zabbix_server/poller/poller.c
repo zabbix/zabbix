@@ -667,8 +667,6 @@ static int	get_values(unsigned char poller_type)
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 			case ITEM_TYPE_DB_MONITOR:
-				ZBX_STRDUP(items[i].params, items[i].params_orig);
-
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
@@ -759,8 +757,6 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_TELNET:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
-			case ITEM_TYPE_DB_MONITOR:
-				zbx_free(items[i].params);
 				break;
 			case ITEM_TYPE_JMX:
 				zbx_free(items[i].username);
@@ -770,6 +766,8 @@ static int	get_values(unsigned char poller_type)
 
 		free_result(&results[i]);
 	}
+
+	DCconfig_clean_items(items, NULL, num);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
 
