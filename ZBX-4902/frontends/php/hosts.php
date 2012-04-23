@@ -147,7 +147,9 @@ if ($EXPORT_DATA) {
 	if (!no_errors()) {
 		show_messages();
 	}
-	print($exportData);
+	else {
+		print($exportData);
+	}
 	exit();
 }
 
