@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+........S. [ZBX-4893] fixed linking of item applications by a discovery rule (Sasha)
 ..F....... [ZBX-4649] fixed Editing screen does not work properly after moving content to other cell (Toms)
 ..F....... [ZBX-4875] fixed graph item with long description cannot be dragged/sorted properly in graph form (Toms)
 

@@ -2902,6 +2902,7 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hi.itemid", itemids, itemids_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 					" join applications ha on ha.templateid=tia.applicationid"
+						" and ha.hostid=hi.hostid"
 						" left join items_applications hia on hia.applicationid=ha.applicationid"
 							" and hia.itemid=hi.itemid"
 				" where hia.itemappid is null");
