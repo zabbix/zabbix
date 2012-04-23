@@ -164,13 +164,13 @@ INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) 
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (14, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (15, 0, 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
 
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (1, 7, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (2, 8, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (3, 9, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (4, 10, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (5, 11, 3);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (6, 13, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (7, 14, 3);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (1, 7, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (2, 8, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (3, 9, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (4, 10, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (5, 11, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (6, 13, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (7, 14, 7);
 
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 12, 1);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 15, 1);
@@ -220,10 +220,10 @@ INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) 
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (24, 0, 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (25, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 4);
 
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (8, 17, 1);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (9, 18, 4);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (10, 24, 1);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (11, 25, 4);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (8, 17, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (9, 18, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (10, 24, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (11, 25, 7);
 
 INSERT INTO opcommand (operationid, type, command) VALUES (19, 0, 'echo TEST');
 INSERT INTO opcommand (operationid, type, command) VALUES (26, 0, 'echo TEST');
