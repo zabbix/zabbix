@@ -93,7 +93,7 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 
 			$hostsData[] = CArrayHelper::getByKeys($host, array(
-				'inventory', 'proxy_hostid', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
+				'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
 				'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'inventory_mode'
 			));
 		}
