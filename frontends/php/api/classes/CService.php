@@ -30,6 +30,7 @@ class CService extends CZBXAPI {
 	public function __construct() {
 		parent::__construct();
 
+		// TODO: implement the selectTrigger option
 		$this->getOptions = array_merge($this->getOptions, array(
 			'parentids' => null,
 			'childids' => null,
@@ -38,8 +39,9 @@ class CService extends CZBXAPI {
 			'selectDependencies' => null,
 			'selectTimes' => null,
 			'selectAlarms' => null,
-			'sortfield'		=> '',
-			'sortorder'		=> '',
+			'selectTrigger' => null,
+			'sortfield' => '',
+			'sortorder' => '',
 		));
 	}
 
@@ -59,6 +61,11 @@ class CService extends CZBXAPI {
 	 */
 	public function get(array $options) {
 		$options = zbx_array_merge($this->getOptions, $options);
+
+		// if the selectTrigger option is used, make sure we select the triggerid to be able to fetch the related triggers
+		if ($options['selectTrigger'] !== null) {
+			$options['output'] = $this->extendOutputOption($this->tableName(), 'triggerid', $options['output']);
+		}
 
 		// build and execute query
 		$sql = $this->createSelectQuery($this->tableName(), $options);
@@ -504,7 +511,7 @@ class CService extends CZBXAPI {
 	// TODO: add interval support
 	// TODO: output
 	public function getSla(array $options) {
-		$serviceIds = zbx_toArray($options['serviceids']);
+		$serviceIds = (isset($options['serviceids'])) ? zbx_toArray($options['serviceids']) : null;
 
 		// fetch services
 		$services = $this->get(array(
@@ -533,7 +540,9 @@ class CService extends CZBXAPI {
 		$rs = array();
 		foreach ($services as $service) {
 			$sla = $this->calculateSla($service['serviceid'], $options['from'], $options['to'], $service['times'], $service['alarms']);
-			$rs[$service['serviceid']] = $sla;
+			$rs[$service['serviceid']] = array(
+				'sla' => $sla['ok'],
+			);
 		}
 
 		return $rs;
@@ -1182,6 +1191,19 @@ class CService extends CZBXAPI {
 				$serviceAlarm = $this->unsetExtraFields('service_alarms', $serviceAlarm, $options['selectAlarms']);
 				$result[$refId]['times'][] = $serviceAlarm;
 			}
+		}
+
+		// selectTrigger
+		if ($options['selectTrigger'] !== null) {
+			$triggers = API::getApi()->select('triggers', array(
+				'output' => $options['selectTrigger'],
+				'triggerids' => zbx_objectValues($result, 'triggerid'),
+				'preservekeys' => true,
+			));
+			foreach ($result as &$service) {
+				$service['trigger'] = ($service['triggerid']) ? $triggers[$service['triggerid']] : array();
+			}
+			unset($service);
 		}
 
 		return $result;
