@@ -422,6 +422,161 @@ static void	expand_trigger_description_constants(char **data, zbx_uint64_t trigg
 	DBfree_result(result);
 }
 
+static void	DBexpand_trigger_expression(char **expression)
+{
+	const char		*__function_name = "DBexpand_trigger_expression";
+
+	typedef struct
+	{
+		zbx_uint64_t	functionid;
+		char		*host;
+		char		*key;
+		char		*function;
+		char		*parameter;
+	}
+	func_t;
+
+	func_t			*funcs = NULL, *func;
+	size_t			l, r, funcs_num = 0;
+	zbx_uint64_t		functionid;
+	zbx_vector_uint64_t	functionids;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL, *tmp = NULL;
+	int			sql_alloc = 256, sql_offset = 0, tmp_alloc = 256, tmp_offset = 0, i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
+
+	zbx_vector_uint64_create(&functionids);
+
+	for (l = 0; '\0' != (*expression)[l]; l++)
+	{
+		if ('{' != (*expression)[l])
+			continue;
+
+		for (r = l + 1; 0 != isdigit((*expression)[r]); r++)
+			;
+
+		if ('}' != (*expression)[r])
+			continue;
+
+		(*expression)[r] = '\0';
+
+		if (SUCCEED == is_uint64(&(*expression)[l + 1], &functionid))
+			zbx_vector_uint64_append(&functionids, functionid);
+
+		(*expression)[r] = '}';
+
+		l = r;
+	}
+
+	zbx_vector_uint64_sort(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	funcs_num = functionids.values_num;
+	funcs = zbx_malloc(funcs, sizeof(func_t) * funcs_num);
+
+	for (i = 0; i < funcs_num; i++)
+	{
+		funcs[i].functionid = functionids.values[i];
+		funcs[i].host = NULL;
+		funcs[i].key = NULL;
+		funcs[i].function = NULL;
+		funcs[i].parameter = NULL;
+	}
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select f.functionid,h.host,i.key_,f.function,f.parameter"
+			" from functions f,items i,hosts h"
+			" where f.itemid=i.itemid"
+				" and i.hostid=h.hostid"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "f.functionid",
+			functionids.values, functionids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(functionid, row[0]);
+
+		if (NULL != (func = bsearch(&functionid, funcs, funcs_num, sizeof(func_t),
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			func->host = zbx_strdup(func->host, row[1]);
+			func->key = zbx_strdup(func->key, row[2]);
+			func->function = zbx_strdup(func->function, row[3]);
+			func->parameter = zbx_strdup(func->parameter, row[4]);
+		}
+	}
+	DBfree_result(result);
+
+	tmp = zbx_malloc(tmp, tmp_alloc);
+
+	for (l = 0; '\0' != (*expression)[l]; l++)
+	{
+		if ('{' != (*expression)[l])
+		{
+			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, (*expression)[l]);
+			continue;
+		}
+
+		for (r = l + 1; 0 != isdigit((*expression)[r]); r++)
+			;
+
+		if ('}' != (*expression)[r])
+		{
+			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, (*expression)[l]);
+			continue;
+		}
+
+		(*expression)[r] = '\0';
+
+		if (SUCCEED == is_uint64(&(*expression)[l + 1], &functionid))
+		{
+			if (NULL != (func = bsearch(&functionid, funcs, funcs_num, sizeof(func_t),
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)) && NULL != func->host)
+			{
+				zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '{');
+				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, func->host);
+				zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ':');
+				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, func->key);
+				zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '.');
+				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, func->function);
+				zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '(');
+				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, func->parameter);
+				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ")}");
+			}
+			else
+				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "*ERROR*");
+
+			l = r;
+		}
+		else
+			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, (*expression)[l]);
+
+		(*expression)[r] = '}';
+	}
+
+	zbx_free(*expression);
+	*expression = tmp;
+	zbx_free(sql);
+
+	for (i = 0; i < funcs_num; i++)
+	{
+		zbx_free(funcs[i].host);
+		zbx_free(funcs[i].key);
+		zbx_free(funcs[i].function);
+		zbx_free(funcs[i].parameter);
+	}
+	zbx_free(funcs);
+	zbx_vector_uint64_destroy(&functionids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() expression:'%s'", __function_name, *expression);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBget_host_profile_value                                         *
@@ -611,10 +766,11 @@ static int	DBget_host_name_by_hostid(zbx_uint64_t hostid, char **replace_to)
 #define ZBX_REQUEST_HOST_IPADDRESS	1
 #define ZBX_REQUEST_HOST_DNS		2
 #define ZBX_REQUEST_HOST_CONN		3
-#define ZBX_REQUEST_ITEM_NAME		4
-#define ZBX_REQUEST_ITEM_KEY		5
-#define ZBX_REQUEST_ITEM_KEY_ORIG	6
-#define ZBX_REQUEST_PROXY_NAME		7
+#define ZBX_REQUEST_ITEM_ID		4
+#define ZBX_REQUEST_ITEM_NAME		5
+#define ZBX_REQUEST_ITEM_KEY		6
+#define ZBX_REQUEST_ITEM_KEY_ORIG	7
+#define ZBX_REQUEST_PROXY_NAME		8
 static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_functionid, int request)
 {
 	const char	*__function_name = "DBget_trigger_value";
@@ -630,7 +786,7 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 		goto fail;
 
 	result = DBselect(
-			"select h.hostid,h.host,h.useip,h.ip,h.dns,h.proxy_hostid,i.description,i.key_"
+			"select h.hostid,h.host,h.useip,h.ip,h.dns,h.proxy_hostid,i.itemid,i.description,i.key_"
 			" from hosts h,items i,functions f"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -644,8 +800,8 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 		item.useip = atoi(row[2]);
 		item.host_ip = row[3];
 		item.host_dns = row[4];
-		item.description = row[6];
-		item.key_orig = row[7];
+		item.description = row[7];
+		item.key_orig = row[8];
 		item.key = NULL;
 
 		switch (request)
@@ -666,8 +822,12 @@ static int	DBget_trigger_value(DB_TRIGGER *trigger, char **replace_to, int N_fun
 				*replace_to = zbx_strdup(*replace_to, item.useip == 1 ? item.host_ip : item.host_dns);
 				ret = SUCCEED;
 				break;
+			case ZBX_REQUEST_ITEM_ID:
+				*replace_to = zbx_strdup(*replace_to, row[6]);
+				ret = SUCCEED;
+				break;
 			case ZBX_REQUEST_ITEM_NAME:
-				item.key = zbx_strdup(item.key, item.key_orig);
+				item.key = zbx_strdup(NULL, item.key_orig);
 				substitute_simple_macros(NULL, &item, NULL, NULL, NULL, &item.key,
 						MACRO_TYPE_ITEM_KEY, NULL, 0);
 
@@ -1475,6 +1635,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_TIME			"{TIME}"
 #define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
 #define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
+#define MVAR_ITEM_ID			"{ITEM.ID}"
 #define MVAR_ITEM_NAME			"{ITEM.NAME}"
 #define MVAR_ITEM_LOG_DATE		"{ITEM.LOG.DATE}"
 #define MVAR_ITEM_LOG_TIME		"{ITEM.LOG.TIME}"
@@ -1487,6 +1648,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
+#define MVAR_TRIGGER_EXPRESSION		"{TRIGGER.EXPRESSION}"
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
@@ -1528,7 +1690,7 @@ static int	get_autoreg_value_by_event(DB_EVENT *event, char **replace_to, const 
 static const char	*ex_macros[] = {MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MVAR_PROFILE_OS, MVAR_PROFILE_SERIALNO,
 				MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
 				MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
-				MVAR_ITEM_NAME,
+				MVAR_ITEM_ID, MVAR_ITEM_NAME,
 				MVAR_HOSTNAME, MVAR_PROXY_NAME,
 				MVAR_TRIGGER_KEY,
 				MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_IPADDRESS,
@@ -1702,6 +1864,16 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 					else
 						ret = FAIL;
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
+				{
+					if (0 != event->trigger.triggerid)
+					{
+						replace_to = zbx_strdup(replace_to, event->trigger.expression);
+						DBexpand_trigger_expression(&replace_to);
+					}
+					else
+						ret = FAIL;
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_COMMENT))
 				{
 					if (0 != event->trigger.triggerid)
@@ -1734,6 +1906,9 @@ int	substitute_simple_macros(DB_EVENT *event, DB_ITEM *item, DC_HOST *dc_host,
 				else if (0 == strcmp(m, MVAR_HOSTNAME))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_NAME);
+				else if (0 == strcmp(m, MVAR_ITEM_ID))
+					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
+							ZBX_REQUEST_ITEM_ID);
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
 					ret = DBget_trigger_value(&event->trigger, &replace_to, N_functionid,
 							ZBX_REQUEST_ITEM_NAME);
@@ -2403,6 +2578,8 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, DB_TRIGGE
 
 			if (NULL == (br = strchr(bl, '}')))
 			{
+				tr[i].new_error = zbx_strdup(tr[i].new_error, "Invalid trigger expression");
+				tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;
 			}

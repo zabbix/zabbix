@@ -183,8 +183,8 @@ table.tableinfo tr.vertical_header td {
 	background-color:#111111;
 }
 
-table.tableinfo tr.selected > td { background-color: #6F6F6F; }
-table.tableinfo tr.selected:hover > td { background-color: #6F6F6F; }
+table.tableinfo tr.selected > td { background-color: #553020; }
+table.tableinfo tr.selected:hover > td { background-color: #553020; }
 
 table.tableinfo tr.odd_row > td { background-color: #1F1F1F; }
 table.tableinfo tr.odd_row:hover > td { background-color: #6F3F00; }
@@ -691,3 +691,5 @@ div.suggest{
 	border-color: #FF5500;
 	color: #FF5500;
 }
+
+table.ack_msgs tr.msg { background-color: #3F3F3F; }

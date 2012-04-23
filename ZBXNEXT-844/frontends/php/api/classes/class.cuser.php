@@ -1123,11 +1123,24 @@ Copt::memoryPick();
 		$session = DBfetch(DBselect($sql));
 		if(!$session) return false;
 
-		zbx_unsetcookie('zbx_sessionid');
-		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
-		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
+		try {
+			self::BeginTransaction(__METHOD__);
 
-	return true;
+			zbx_unsetcookie('zbx_sessionid');
+			DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
+			DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionid));
+			add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, 'Manual Logout');
+
+			self::EndTransaction(true, __METHOD__);
+			return true;
+		}
+		catch (APIException $e) {
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			self::setError(__METHOD__, $e->getCode(), $error);
+			return false;
+		}
 	}
 /**
  * Authenticate user
@@ -1144,115 +1157,115 @@ Copt::memoryPick();
  * @return string session ID
  */
 	public static function authenticate($user){
-		global $USER_DETAILS, $ZBX_LOCALNODEID;
+		try {
+			self::BeginTransaction(__METHOD__);
+			global $USER_DETAILS, $ZBX_LOCALNODEID;
 
-		$name = $user['user'];
-		$passwd = $user['password'];
-		$auth_type = $user['auth_type'];
+			$name = $user['user'];
+			$passwd = $user['password'];
+			$auth_type = $user['auth_type'];
 
-		$password = md5($passwd);
+			$password = md5($passwd);
 
-		$sql = 'SELECT u.userid,u.attempt_failed, u.attempt_clock, u.attempt_ip '.
-				' FROM users u '.
-				' WHERE u.alias='.zbx_dbstr($name);
+			$sql = 'SELECT u.userid,u.attempt_failed, u.attempt_clock, u.attempt_ip '.
+					' FROM users u '.
+					' WHERE u.alias='.zbx_dbstr($name);
 
-//SQL to BLOCK attempts
-//					.' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
-//							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
-//									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
+			$login = $attempt = DBfetch(DBselect($sql));
 
-		$login = $attempt = DBfetch(DBselect($sql));
-
-		if($login){
-			if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
-				if((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK){
-					$_REQUEST['message'] = S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.' '.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).' '.S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART;
-					return false;
+			if($login){
+				if($login['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS){
+					if((time() - $login['attempt_clock']) < ZBX_LOGIN_BLOCK){
+						throw new APIException(ZBX_API_ERROR_INTERNAL, S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_FIRST_PART.' '.(ZBX_LOGIN_BLOCK - (time() - $login['attempt_clock'])).' '.S_CUSER_ERROR_ACCOUNT_IS_BLOCKED_FOR_XX_SECONDS_SECOND_PART);
+					}
+					else{
+						DBexecute('UPDATE users SET attempt_clock='.time().' WHERE alias='.zbx_dbstr($name));
+					}
 				}
-				else{
-					DBexecute('UPDATE users SET attempt_clock='.time().' WHERE alias='.zbx_dbstr($name));
-				}
-			}
 
-			if($auth_type != ZBX_AUTH_HTTP){
-				switch(get_user_auth($login['userid'])){
-					case GROUP_GUI_ACCESS_INTERNAL:
-						$auth_type = ZBX_AUTH_INTERNAL;
+				if($auth_type != ZBX_AUTH_HTTP){
+					switch(get_user_auth($login['userid'])){
+						case GROUP_GUI_ACCESS_INTERNAL:
+							$auth_type = ZBX_AUTH_INTERNAL;
+							break;
+						case GROUP_GUI_ACCESS_SYSTEM:
+						case GROUP_GUI_ACCESS_DISABLED:
+						default:
+							break;
+					}
+				}
+
+				switch($auth_type){
+					case ZBX_AUTH_LDAP:
+						$login = self::ldapLogin($user);
 						break;
-					case GROUP_GUI_ACCESS_SYSTEM:
-					case GROUP_GUI_ACCESS_DISABLED:
+					case ZBX_AUTH_HTTP:
+						$login = true;
+						break;
+					case ZBX_AUTH_INTERNAL:
 					default:
-						break;
+						$login = true;
 				}
 			}
 
-			switch($auth_type){
-				case ZBX_AUTH_LDAP:
-					$login = self::ldapLogin($user);
-					break;
-				case ZBX_AUTH_HTTP:
-					$login = true;
-					break;
-				case ZBX_AUTH_INTERNAL:
-				default:
-					$login = true;
-			}
-		}
+			if($login){
+				$sql = 'SELECT u.* '.
+						' FROM users u'.
+						' WHERE u.alias='.zbx_dbstr($name).
+							((ZBX_AUTH_INTERNAL==$auth_type)? ' AND u.passwd='.zbx_dbstr($password):'').
+							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
-		if($login){
-			$sql = 'SELECT u.* '.
-					' FROM users u'.
-					' WHERE u.alias='.zbx_dbstr($name).
-						((ZBX_AUTH_INTERNAL==$auth_type)? ' AND u.passwd='.zbx_dbstr($password):'').
-						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
-
-			$login = $user = DBfetch(DBselect($sql));
-		}
-
-/* update internal pass if it's different
-	if($login && ($row['passwd']!=$password) && (ZBX_AUTH_INTERNAL!=$auth_type)){
-		DBexecute('UPDATE users SET passwd='.zbx_dbstr(md5($password)).' WHERE userid='.$row['userid']);
-	}
-*/
-		if($login){
-			$login = (check_perm2login($user['userid']) && check_perm2system($user['userid']));
-		}
-
-		if($login){
-			$sessionid = zbx_session_start($user['userid'], $name, $password);
-
-			// we assign $USER_DETAILS first time, so that it could be used in Cprofile::get
-			$USER_DETAILS = $user;
-
-			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER, 'Correct login ['.$name.']');
-			if(empty($user['url'])){
-				$user['url'] = CProfile::get('web.menu.view.last','index.php');
-
-				// we assign $USER_DETAILS second time, to update 'url'
-				$USER_DETAILS['url'] = $user['url'];
+				$login = $user = DBfetch(DBselect($sql));
 			}
 
-			$login = $sessionid;
-		}
-		else{
-			$user = NULL;
-
-			$_REQUEST['message'] = S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT;
-			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Login failed ['.$name.']');
-
-			if($attempt){
-				$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
-				$attempt['attempt_failed']++;
-				$sql = 'UPDATE users '.
-						' SET attempt_failed='.$attempt['attempt_failed'].','.
-							' attempt_clock='.time().','.
-							' attempt_ip='.zbx_dbstr($ip).
-						' WHERE userid='.$attempt['userid'];
-				DBexecute($sql);
+			if($login){
+				$login = (check_perm2login($user['userid']) && check_perm2system($user['userid']));
 			}
-		}
 
-	return $login;
+			if($login){
+				$sessionid = zbx_session_start($user['userid'], $name, $password);
+
+				// we assign $USER_DETAILS first time, so that it could be used in Cprofile::get
+				$USER_DETAILS = $user;
+
+				add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER, 'Correct login ['.$name.']');
+				if(empty($user['url'])){
+					$user['url'] = CProfile::get('web.menu.view.last','index.php');
+
+					// we assign $USER_DETAILS second time, to update 'url'
+					$USER_DETAILS['url'] = $user['url'];
+				}
+
+				$login = $sessionid;
+			}
+			else{
+				$user = NULL;
+
+				$_REQUEST['message'] = S_CUSER_ERROR_LOGIN_OR_PASSWORD_INCORRECT;
+				add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,'Login failed ['.$name.']');
+
+				if($attempt){
+					$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
+					$attempt['attempt_failed']++;
+					$sql = 'UPDATE users '.
+							' SET attempt_failed='.$attempt['attempt_failed'].','.
+								' attempt_clock='.time().','.
+								' attempt_ip='.zbx_dbstr($ip).
+							' WHERE userid='.$attempt['userid'];
+					DBexecute($sql);
+				}
+			}
+
+			self::EndTransaction(true, __METHOD__);
+			return $login;
+		}
+		catch (APIException $e) {
+			self::EndTransaction(false, __METHOD__);
+			$error = $e->getErrors();
+			$error = reset($error);
+			$_REQUEST['message'] = $error;
+			return false;
+		}
 	}
 
 /**

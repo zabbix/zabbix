@@ -874,6 +874,13 @@ function utf8RawUrlDecode($source){
 	}
 
 	function add_trigger($expression, $description, $type, $priority, $status, $comments, $url, $deps=array(), $templateid=0){
+
+		// URL validation against XSS
+		if ($url && !validateUrl($url)) {
+			error(S_INCORRECT_URL);
+			return false;
+		}
+
 		$expr = new CTriggerExpression(array('expression' => $expression));
 
 		if (!empty($expr->errors)) {
@@ -1787,6 +1794,12 @@ function utf8RawUrlDecode($source){
 		$trig_host	= DBfetch($trig_hosts);
 
 		$event_to_unknown = false;
+
+		// URL validation against XSS
+		if ($url && !validateUrl($url)) {
+			error(S_INCORRECT_URL);
+			return false;
+		}
 
 // Restore expression
 		if(is_null($expression)){

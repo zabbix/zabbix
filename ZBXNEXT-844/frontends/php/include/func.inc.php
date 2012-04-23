@@ -1185,6 +1185,7 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
 	if(!isset($mainArray[$sIndex])) $mainArray[$sIndex] = array();
 	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
 }
+
 /************* END ZBX MISC *************/
 
 /*************** PAGE SORTING ******************/

@@ -272,14 +272,14 @@ if(!isset($DB)){
 
 	function DBstart($strict=true){
 		global $DB;
-//SDI('DBStart(): '.$DB['TRANSACTIONS']);
+
 		$DB['STRICT'] = $strict;
 
 		$DB['TRANSACTIONS']++;
 
 		if($DB['TRANSACTIONS']>1){
 			info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
-		return $DB['TRANSACTION_STATE'];
+			return $DB['TRANSACTION_STATE'];
 		}
 
 		$DB['TRANSACTION_STATE'] = true;
@@ -307,7 +307,8 @@ if(!isset($DB)){
 				}
 				break;
 		}
-	return $result;
+
+		return $result;
 	}
 
 
@@ -827,7 +828,7 @@ else {
 	return uint_in_array(id2nodeid($id_var), $nodes);
 	}
 
-	function get_dbid($table,$field){
+	function get_dbid($table, $field){
 // PGSQL on transaction failure on all queries returns false..
 		global $DB, $ZBX_LOCALNODEID;
 		if(($DB['TYPE'] == 'POSTGRESQL') && $DB['TRANSACTIONS'] && !$DB['TRANSACTION_STATE']) return 0;
@@ -835,10 +836,11 @@ else {
 		$nodeid = get_current_nodeid(false);
 
 		$found = false;
-		do{
-			$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-			$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 
+		$min = bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+		$max = bcadd(bcadd(bcmul($nodeid, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
+
+		do{
 			$db_select = DBselect('SELECT nextid FROM ids WHERE nodeid='.$nodeid .' AND table_name='.zbx_dbstr($table).' AND field_name='.zbx_dbstr($field));
 			if(!is_resource($db_select)) return false;
 			$row = DBfetch($db_select);
@@ -849,12 +851,6 @@ else {
 					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',$min)");
 				}
 				else{
-/*					$ret1 = $row["id"];
-					if($ret1 >= $max) {
-						"Maximum number of id's was exceeded"
-					}
-//*/
-
 					DBexecute("INSERT INTO ids (nodeid,table_name,field_name,nextid) VALUES ($nodeid,'$table','$field',".$row['id'].')');
 				}
 				continue;
@@ -1072,8 +1068,16 @@ else {
 		 * @return string
 		 */
 		protected static function reserveIds($table, $count) {
+			global $ZBX_LOCALNODEID;
+
 			$tableSchema = self::getSchema($table);
 			$id_name = $tableSchema['key'];
+
+			if(is_null(self::$nodeId)){
+				self::$nodeId = get_current_nodeid(false);
+				self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
+				self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
+			}
 
 			$sql = 'SELECT nextid'.
 				' FROM ids'.
@@ -1157,16 +1161,8 @@ else {
 		}
 
 		public static function getSchema($table=null){
-			global $ZBX_LOCALNODEID;
-
 			if(is_null(self::$schema)){
 				self::$schema = include(self::SCHEMA_FILE);
-			}
-
-			if(is_null(self::$nodeId)){
-				self::$nodeId = get_current_nodeid(false);
-				self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-				self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
 			}
 
 			if(is_null($table))

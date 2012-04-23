@@ -165,7 +165,7 @@ include_once('include/page_header.php');
 		'screens'               => '"screenid", "name"',
 		'slides'                => '"slideshowid"',
 		'drules'                => '"druleid", "name"',
-		'dcheckes'              => '"dcheckid", "name"',
+		'dchecks'               => '"dcheckid", "name"',
 		'proxies'               => '"hostid", "host"',
 		'nodes'                 => '"nodeid", "name"',
 		'host_templates'        => '"hostid", "host"',

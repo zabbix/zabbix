@@ -765,7 +765,7 @@
 		$db_tmp_item['templateid'] = $copy_mode?0:$db_tmp_item['itemid'];
 
 		$result = add_item($db_tmp_item);
-	return $result;
+		return $result;
 	}
 
 	/*

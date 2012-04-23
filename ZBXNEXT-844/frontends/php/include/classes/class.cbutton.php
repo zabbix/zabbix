@@ -20,6 +20,14 @@
 ?>
 <?php
 class CButton extends CTag{
+
+	/**
+	 * For inputs of type "button", the "&" symbol should not be encoded.
+	 *
+	 * @var int
+	 */
+	protected $valueEncStrategy = self::ENC_NOAMP;
+
 	public function __construct($name='button', $caption='', $action=NULL, $submit=true){
 		parent::__construct('input','no');
 		$this->tag_body_start = '';

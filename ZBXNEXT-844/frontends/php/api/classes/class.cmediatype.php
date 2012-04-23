@@ -395,7 +395,7 @@ Copt::memoryPick();
  * @param string $mediatypes['gsm_modem']
  * @param string $mediatypes['username']
  * @param string $mediatypes['passwd']
- * @return boolean
+ * @return array
  */
 	public static function update($mediatypes){
 		global $USER_DETAILS;
@@ -449,7 +449,8 @@ Copt::memoryPick();
 					);
 				}
 			}
-			$mediatypeids = DB::update('media_type', $update);
+			DB::update('media_type', $update);
+			$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
 
 			self::EndTransaction(true, __METHOD__);
 			return array('mediatypeids' => $mediatypeids);

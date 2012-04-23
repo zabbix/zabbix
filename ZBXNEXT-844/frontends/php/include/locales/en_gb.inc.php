@@ -1727,6 +1727,7 @@
 	'S_CHANGE'=>				'Change',
 	'S_TRIGGER_UPDATED'=>			'Trigger updated',
 	'S_CANNOT_UPDATE_TRIGGER'=>		'Cannot update trigger',
+	'S_INCORRECT_URL'=>			'Incorrect URL.',
 	'S_DEPENDS_ON'=>			'Depends on',
 	'S_DEPENDENT'=>				'Dependent',
 	'S_URL'=>				'URL',
