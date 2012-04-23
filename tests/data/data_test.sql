@@ -143,16 +143,16 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (80,14,16,4,'');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (81,14,16,7,'');
 
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (7, 4, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (8, 5, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (9, 6, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (10, 7, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (11, 7, 0, 3600, 2, 2, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (12, 7, 0, 0, 5, 6, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (13, 8, 0, 0, 1, 1, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (14, 8, 0, 3600, 2, 2, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (15, 8, 0, 0, 5, 6, 0);
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (16, 8, 1, 0, 20, 0, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (7, 10, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (8, 11, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (9, 12, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (10, 13, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (11, 13, 0, 3600, 2, 2, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (12, 13, 0, 0, 5, 6, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (13, 14, 0, 0, 1, 1, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (14, 14, 0, 3600, 2, 2, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (15, 14, 0, 0, 5, 6, 0);
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (16, 14, 1, 0, 20, 0, 0);
 
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (7, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (8, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
@@ -164,13 +164,13 @@ INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) 
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (14, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (15, 0, 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 1);
 
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (1, 7, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (2, 8, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (3, 9, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (4, 10, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (5, 11, 3);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (6, 13, 2);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (7, 14, 3);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (1, 7, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (2, 8, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (3, 9, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (4, 10, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (5, 11, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (6, 13, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (7, 14, 7);
 
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (2, 12, 1);
 INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (3, 15, 1);
@@ -189,9 +189,9 @@ INSERT INTO opconditions (opconditionid, operationid, conditiontype, operator, v
 
 -- Add auto-registration actions
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, recovery_msg, r_shortdata, r_longdata) VALUES (9,'Autoregistration action 1',2,0,0,0,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}',0,'','');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, recovery_msg, r_shortdata, r_longdata) VALUES (10,'Autoregistration action 2',2,0,1,0,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}',0,'','');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period, def_shortdata, def_longdata, recovery_msg, r_shortdata, r_longdata) VALUES (15,'Autoregistration action 2',2,0,1,0,'{TRIGGER.NAME}: {TRIGGER.STATUS}','{TRIGGER.NAME}: {TRIGGER.STATUS}\r\nLast value: {ITEM.LASTVALUE}\r\n\r\n{TRIGGER.URL}',0,'','');
 
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (82,9,22,2,'MySQL');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (90,9,22,2,'MySQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (83,9,22,3,'DB2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (84,9,20,0,'20000');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (85,9,20,1,'20001');
@@ -220,10 +220,10 @@ INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) 
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (24, 0, 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}', 'Special: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', NULL);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (25, 1, '{TRIGGER.NAME}: {TRIGGER.STATUS}', '{TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}', 4);
 
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (8, 17, 1);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (9, 18, 4);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (10, 24, 1);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (11, 25, 4);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (8, 17, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (9, 18, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (10, 24, 7);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (11, 25, 7);
 
 INSERT INTO opcommand (operationid, type, command) VALUES (19, 0, 'echo TEST');
 INSERT INTO opcommand (operationid, type, command) VALUES (26, 0, 'echo TEST');
@@ -234,54 +234,54 @@ INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (3, 26, 
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (3, 22, 5);
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (4, 29, 5);
 
-INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (3, 23, 10002);
-INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (4, 30, 10002);
+INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (3, 23, 10001);
+INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (4, 30, 10001);
 
 
 -- Add more screens
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (3,'Test screen (graph)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (4,'Test screen (clock)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (5,'Test screen (data overview, left align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (6,'Test screen (history of actions)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (7,'Test screen (history of events)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (8,'Test screen (hosts info, horizontal align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (9,'Test screen (hosts info, vertical align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (10,'Test screen (map)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (11,'Test screen (plain text)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (12,'Test screen (screen)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (13,'Test screen (server info)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (14,'Test screen (simple graph)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (15,'Test screen (status of hostgroup triggers)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (16,'Test screen (status of host triggers)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (17,'Test screen (system status)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (18,'Test screen (triggers info, horizontal align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (19,'Test screen (triggers overview, left align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (20,'Test screen (triggers overview, top align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (21,'Test screen (url)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (22,'Test screen (data overview, top align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (23,'Test screen (triggers info, vertical align)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (5,'Test screen (graph)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (6,'Test screen (clock)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (7,'Test screen (data overview, left align)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (8,'Test screen (history of actions)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (9,'Test screen (history of events)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (10,'Test screen (hosts info, horizontal align)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (11,'Test screen (hosts info, vertical align)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (12,'Test screen (map)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (13,'Test screen (plain text)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (14,'Test screen (screen)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (15,'Test screen (server info)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (16,'Test screen (simple graph)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (17,'Test screen (status of hostgroup triggers)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (18,'Test screen (status of host triggers)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (19,'Test screen (system status)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (20,'Test screen (triggers info, horizontal align)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (21,'Test screen (triggers overview, left align)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (22,'Test screen (triggers overview, top align)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (23,'Test screen (url)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (24,'Test screen (data overview, top align)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (25,'Test screen (triggers info, vertical align)',1,1,NULL);
 
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (8,3,0,2,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (9,4,7,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (10,5,10,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (28,23,5,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (11,6,12,0,500,100,0,0,0,0,25,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (12,7,13,0,500,100,0,0,0,0,25,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (13,8,4,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (14,9,4,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (15,10,2,2,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (16,11,3,18484,500,100,0,0,0,0,25,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (17,12,8,3,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (18,13,6,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (19,14,1,18443,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (20,15,14,4,500,100,0,0,0,0,25,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (21,16,16,10017,500,100,0,0,0,0,25,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (22,17,15,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (23,18,5,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (24,19,9,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (25,20,9,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (26,21,11,0,500,500,0,0,0,0,0,0,0,0,'http://www.google.com',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (27,22,10,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (28,5,0,2,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (29,6,7,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (30,7,10,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (31,8,12,0,500,100,0,0,0,0,25,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (32,9,13,0,500,100,0,0,0,0,25,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (33,10,4,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (34,11,4,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (35,12,2,2,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (36,13,3,18484,500,100,0,0,0,0,25,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (37,14,8,3,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (38,15,6,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (39,16,1,18443,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (40,17,14,4,500,100,0,0,0,0,25,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (41,18,16,10017,500,100,0,0,0,0,25,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (42,19,15,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (43,20,5,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (44,21,9,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (45,22,9,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (46,23,11,0,500,500,0,0,0,0,0,0,0,0,'http://www.google.com',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (47,24,10,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (48,25,5,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
 
 -- Add slide shows
 INSERT INTO slideshows (slideshowid, name, delay) VALUES (1,'Test slide show 1',10);
