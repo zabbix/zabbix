@@ -266,7 +266,6 @@
 				items: 'tbody tr.sortable',
 				axis: 'y',
 				cursor: 'move',
-				containment: 'parent',
 				handle: 'span.ui-icon-arrowthick-2-n-s',
 				tolerance: 'pointer',
 				opacity: 0.6,

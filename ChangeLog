@@ -23,6 +23,7 @@ A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-4875] fixed graph item with long description cannot be dragged/sorted properly in graph form (Toms)
 A.F....... [ZBX-4890] fixed creating hosts by administrators (Pavels)
 ..F....... [ZBXNEXT-1161] fixed multiple IT service validation issues (Pavels)
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
