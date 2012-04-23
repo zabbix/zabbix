@@ -741,4 +741,15 @@ function zbx_stripslashes($value) {
 	}
 	return $value;
 }
-?>
+
+function no_errors() {
+	global $ZBX_MESSAGES;
+
+	foreach ($ZBX_MESSAGES as $message) {
+		if ($message['type'] == 'error') {
+			return false;
+		}
+	}
+
+	return true;
+}
