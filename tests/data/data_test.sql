@@ -234,8 +234,8 @@ INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (3, 26, 
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (3, 22, 5);
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (4, 29, 5);
 
-INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (3, 23, 10002);
-INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (4, 30, 10002);
+INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (3, 23, 10001);
+INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (4, 30, 10001);
 
 
 -- Add more screens
