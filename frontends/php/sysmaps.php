@@ -106,7 +106,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		if (!no_errors()) {
 			show_messages();
 		}
-		print($exportData);
+		else {
+			print($exportData);
+		}
 		exit();
 	}
 

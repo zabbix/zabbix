@@ -104,7 +104,9 @@ if ($isExportData) {
 	if (!no_errors()) {
 		show_messages();
 	}
-	print($exportData);
+	else {
+		print($exportData);
+	}
 	exit();
 }
 
