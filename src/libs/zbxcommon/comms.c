@@ -143,7 +143,6 @@ zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)
 {
 	unsigned char	buf[8];
 
-	memset(buf, 0, sizeof(buf));
 	memcpy(buf, &data, sizeof(buf));
 
 	data = 0;
@@ -156,6 +155,78 @@ zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)
 	data |= (zbx_uint64_t)buf[2];	data <<= 8;
 	data |= (zbx_uint64_t)buf[1];	data <<= 8;
 	data |= (zbx_uint64_t)buf[0];
+
+	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_htobe_uint64                                                 *
+ *                                                                            *
+ * Purpose: convert unsigned integer 64 bit                                   *
+ *          from host byte order                                              *
+ *          to big-endian byte order format                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: unsigned integer 64 bit in big-endian byte order format      *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_htobe_uint64(zbx_uint64_t data)
+{
+	unsigned char	buf[8];
+
+	buf[7] = (unsigned char)data;	data >>= 8;
+	buf[6] = (unsigned char)data;	data >>= 8;
+	buf[5] = (unsigned char)data;	data >>= 8;
+	buf[4] = (unsigned char)data;	data >>= 8;
+	buf[3] = (unsigned char)data;	data >>= 8;
+	buf[2] = (unsigned char)data;	data >>= 8;
+	buf[1] = (unsigned char)data;	data >>= 8;
+	buf[0] = (unsigned char)data;
+
+	memcpy(&data, buf, sizeof(buf));
+
+	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_betoh_uint64                                                 *
+ *                                                                            *
+ * Purpose: convert unsigned integer 64 bit                                   *
+ *          from big-endian byte order format                                 *
+ *          to host byte order                                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: unsigned integer 64 bit in host byte order                   *
+ *                                                                            *
+ * Author: Aleksandrs Saveljevs                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_betoh_uint64(zbx_uint64_t data)
+{
+	unsigned char	buf[8];
+
+	memcpy(buf, &data, sizeof(buf));
+
+	data = 0;
+
+	data  = (zbx_uint64_t)buf[0];	data <<= 8;
+	data |= (zbx_uint64_t)buf[1];	data <<= 8;
+	data |= (zbx_uint64_t)buf[2];	data <<= 8;
+	data |= (zbx_uint64_t)buf[3];	data <<= 8;
+	data |= (zbx_uint64_t)buf[4];	data <<= 8;
+	data |= (zbx_uint64_t)buf[5];	data <<= 8;
+	data |= (zbx_uint64_t)buf[6];	data <<= 8;
+	data |= (zbx_uint64_t)buf[7];
 
 	return data;
 }

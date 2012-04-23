@@ -32,6 +32,10 @@
 #include "memalloc.h"
 #include "zbxalgo.h"
 
+#ifdef HAVE_CASSANDRA
+#	include "zbxcassa.h"
+#endif
+
 static zbx_mem_info_t	*history_mem = NULL;
 static zbx_mem_info_t	*history_text_mem = NULL;
 static zbx_mem_info_t	*trend_mem = NULL;
@@ -1388,6 +1392,9 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	char		*value_esc, *source_esc;
 	int		history_text_num, history_log_num;
 	zbx_uint64_t	id;
+#ifdef HAVE_CASSANDRA
+	char		value[MAX_STRING_LEN];
+#endif
 #ifdef HAVE_MULTIROW_INSERT
 	int		tmp_offset;
 #endif
@@ -1401,6 +1408,22 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 /*
  * history
  */
+#ifdef HAVE_CASSANDRA
+	for (i = 0; i < history_num; i++)
+	{
+		if (0 == history[i].keep_history)
+			continue;
+
+		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
+			continue;
+
+		if (0 != history[i].value_null)
+			continue;
+
+		zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, history[i].value.dbl);
+		zbx_cassandra_add_history_value(history[i].itemid, history[i].clock, value);
+	}
+#else	/* HAVE_CASSANDRA */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1443,6 +1466,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	else
 		sql_offset = tmp_offset;
 #endif
+#endif	/* HAVE_CASSANDRA */
 
 	if (CONFIG_NODE_NOHISTORY == 0 && CONFIG_MASTER_NODEID > 0)
 	{
@@ -1495,6 +1519,22 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 /*
  * history_uint
  */
+#ifdef HAVE_CASSANDRA
+	for (i = 0; i < history_num; i++)
+	{
+		if (0 == history[i].keep_history)
+			continue;
+
+		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
+			continue;
+
+		if (0 != history[i].value_null)
+			continue;
+
+		zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, history[i].value.ui64);
+		zbx_cassandra_add_history_value(history[i].itemid, history[i].clock, value);
+	}
+#else	/* HAVE_CASSANDRA */
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
 	zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
@@ -1537,6 +1577,7 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	else
 		sql_offset = tmp_offset;
 #endif
+#endif	/* HAVE_CASSANDRA */
 
 	if (CONFIG_NODE_NOHISTORY == 0 && CONFIG_MASTER_NODEID > 0)
 	{
@@ -1688,10 +1729,12 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	history_log_num = 0;
 
 	for (i = 0; i < history_num; i++)
+	{
 		if (ITEM_VALUE_TYPE_TEXT == history[i].value_type)
 			history_text_num++;
 		else if (ITEM_VALUE_TYPE_LOG == history[i].value_type)
 			history_log_num++;
+	}
 
 /*
  * history_text
@@ -1827,6 +1870,10 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
+
+#ifdef HAVE_CASSANDRA
+	zbx_cassandra_save_history_values();
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

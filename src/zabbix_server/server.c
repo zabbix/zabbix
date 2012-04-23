@@ -51,6 +51,11 @@
 #include "proxypoller/proxypoller.h"
 #include "selfmon/selfmon.h"
 
+#ifdef HAVE_CASSANDRA
+#	include <glib-object.h>
+#	include "zbxcassa.h"
+#endif
+
 #define INIT_SERVER(type, count)								\
 	process_type = type;									\
 	process_num = server_num - server_count + count;					\
@@ -182,6 +187,11 @@ int	CONFIG_PROXYPOLLER_FORKS	= 1;
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600; /* 1h */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1; /* 1s */
 
+#ifdef HAVE_CASSANDRA
+zbx_cassandra_hosts_t	CONFIG_CASSANDRA_HOSTS;
+char			*CONFIG_CASSANDRA_KEYSPACE	= NULL;
+#endif
+
 /* Mutex for node syncs */
 ZBX_MUTEX	node_sync_access;
 
@@ -202,6 +212,10 @@ ZBX_MUTEX	node_sync_access;
  ******************************************************************************/
 static void	zbx_load_config()
 {
+#ifdef HAVE_CASSANDRA
+	static char	*config_cassandra_hosts = NULL;
+#endif
+
 	static struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
@@ -306,6 +320,12 @@ static void	zbx_load_config()
 			PARM_OPT,	1,			SEC_PER_WEEK},
 		{"ProxyDataFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
+#ifdef HAVE_CASSANDRA
+		{"CassandraHost",		&config_cassandra_hosts,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"CassandraKeyspace",		&CONFIG_CASSANDRA_KEYSPACE,		TYPE_STRING,
+			PARM_MAND,	0,			0},
+#endif
 		{NULL}
 	};
 
@@ -361,6 +381,13 @@ static void	zbx_load_config()
 
 	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
 		CONFIG_HOUSEKEEPER_FORKS = 0;
+
+#ifdef HAVE_CASSANDRA
+	if (NULL == config_cassandra_hosts)
+		config_cassandra_hosts = zbx_strdup(config_cassandra_hosts, "localhost");
+	zbx_cassandra_parse_hosts(config_cassandra_hosts, &CONFIG_CASSANDRA_HOSTS);
+	zbx_free(config_cassandra_hosts);
+#endif
 }
 
 #ifdef HAVE_SIGQUEUE
@@ -447,10 +474,6 @@ int	main(int argc, char **argv)
 	if (ZBX_TASK_CONFIG_CACHE_RELOAD == task)
 		exit(SUCCEED == zbx_sigusr_send(ZBX_TASK_CONFIG_CACHE_RELOAD) ? EXIT_SUCCESS : EXIT_FAILURE);
 
-#ifdef HAVE_OPENIPMI
-	init_ipmi_handler();
-#endif
-
 	switch (task)
 	{
 		case ZBX_TASK_CHANGE_NODEID:
@@ -459,6 +482,14 @@ int	main(int argc, char **argv)
 		default:
 			break;
 	}
+
+#ifdef HAVE_CASSANDRA
+	g_type_init();
+#endif
+
+#ifdef HAVE_OPENIPMI
+	init_ipmi_handler();
+#endif
 
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
@@ -773,8 +804,14 @@ void	zbx_on_exit()
 	zbx_sleep(2);	/* wait for all child processes to exit */
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
+#ifdef HAVE_CASSANDRA
+	zbx_cassandra_connect(ZBX_CASSANDRA_CONNECT_EXIT, &CONFIG_CASSANDRA_HOSTS, CONFIG_CASSANDRA_KEYSPACE);
+#endif
 	free_database_cache();
 	free_configuration_cache();
+#ifdef HAVE_CASSANDRA
+	zbx_cassandra_close();
+#endif
 	DBclose();
 
 	zbx_mutex_destroy(&node_sync_access);

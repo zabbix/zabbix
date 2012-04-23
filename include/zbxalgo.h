@@ -257,6 +257,7 @@ void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t s
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t);
+ZBX_VECTOR_DECL(str, char *);
 ZBX_VECTOR_DECL(ptr, void *);
 
 #endif

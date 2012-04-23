@@ -1599,26 +1599,25 @@ function utf8RawUrlDecode($source){
 								' FROM items i, functions f '.
 								' WHERE i.itemid=f.itemid '.
 									' AND f.functionid='.$functionid;
-						$row2=DBfetch(DBselect($sql));
+						$row2 = DBfetch(DBselect($sql));
 						$description = str_replace($macro, format_lastvalue($row2), $description);
 
 					}
 				}
 			}
 
-			for($i=0; $i<10; $i++){
-				$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
+			for($i = 0; $i < 10; $i++){
+				$macro = '{ITEM.VALUE' . ($i ? $i : '') . '}';
 				if(zbx_strstr($description, $macro)){
-					$value=($flag==ZBX_FLAG_TRIGGER)?
-							trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
-							trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $row['clock']);
+					$value = ($flag == ZBX_FLAG_TRIGGER) ?
+						trigger_get_func_value($row['expression'], ZBX_FLAG_TRIGGER, $i ? $i : 1, 1) :
+						trigger_get_func_value($row['expression'], ZBX_FLAG_EVENT, $i ? $i : 1, $row['clock']);
 
 					$description = str_replace($macro, $value, $description);
 				}
-
 			}
 
-			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $arr)){
+			if(preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $arr)){
 				$macros = CUserMacro::getMacros($arr[1], array('triggerid' => $row['triggerid']));
 
 				$search = array_keys($macros);
@@ -1630,7 +1629,8 @@ function utf8RawUrlDecode($source){
 		else{
 			$description = '*ERROR*';
 		}
-	return $description;
+
+		return $description;
 	}
 
 	function expand_trigger_description_simple($triggerid){

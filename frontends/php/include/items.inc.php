@@ -1463,13 +1463,28 @@
 		}
 
 		if($last == 0){
-			$sql = 'select value from '.$table.' where itemid='.$db_item['itemid'].' and clock<='.$clock.
-					' order by itemid,clock desc';
-			$row = DBfetch(DBselect($sql, 1));
-			if($row)
-				$value = $row["value"];
+			// Cassandra
+			if(CassandraHistory::i()->enabled() &&
+					($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT || $db_item["value_type"] == ITEM_VALUE_TYPE_UINT64))
+			{
+
+				$value = CassandraHistory::i()->getData($db_item['itemid'], null, $clock, 1, ZBX_SORT_DOWN);
+				$value = reset($value);
+			}
+			else{
+				$sql = 'select value from '.$table.' where itemid='.$db_item['itemid'].' and clock<='.$clock.
+						' order by itemid,clock desc';
+				$row = DBfetch(DBselect($sql, 1));
+				if($row)
+					$value = $row["value"];
+			}
 		}
 		else{
+			$sql = "select lastvalue from items where itemid=".$db_item["itemid"];
+			$row = DBfetch(DBselect($sql));
+			$value = $row['lastvalue'];
+
+			/*
 			$sql = "select max(clock) as clock from $table where itemid=".$db_item["itemid"];
 			$row = DBfetch(DBselect($sql));
 			if($row && !is_null($row["clock"])){
@@ -1479,6 +1494,7 @@
 				if($row)
 					$value = $row["value"];
 			}
+			//*/
 		}
 	return $value;
 	}

@@ -915,8 +915,10 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 
 int	MAIN_ZABBIX_ENTRY();
 
-zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
+zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
+zbx_uint64_t	zbx_htobe_uint64(zbx_uint64_t data);
+zbx_uint64_t	zbx_betoh_uint64(zbx_uint64_t data);
 
 int	zbx_check_hostname(const char *hostname);
 

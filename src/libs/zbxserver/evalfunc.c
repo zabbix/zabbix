@@ -551,7 +551,7 @@ static int	evaluate_COUNT(char *value, DB_ITEM *item, const char *function, cons
 				now - arg1, now, NULL, 0);
 
 		if (NULL == h_value[0])
-			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
+			zbx_snprintf(value, MAX_BUFFER_LEN, "0");
 		else
 			zbx_snprintf(value, MAX_BUFFER_LEN, "%s", h_value[0]);
 		DBfree_history(h_value);

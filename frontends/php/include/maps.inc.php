@@ -701,21 +701,36 @@
 				}
 			}
 			else if((0 == strcmp($function, 'min')) || (0 == strcmp($function, 'max')) || (0 == strcmp($function, 'avg'))){
-
 				if($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64){
 					$label = str_replace($expr, '???', $label);
 					continue;
 				}
 
-				$sql = 'SELECT '.$function.'(value) as value '.
-						' FROM '.$history_table.
-						' WHERE clock>'.(time() - $parameter).
-						' AND itemid='.$item['itemid'];
-				$result = DBselect($sql);
-				if(null === ($row = DBfetch($result)) || null === $row['value'])
+				// Cassandra
+				if(CassandraHistory::i()->enabled()){
+					$value = CassandraHistory::i()->getAggregate($item['itemid'], (time() - $parameter), $function);
+				}
+				else{
+					$sql = 'SELECT '.$function.'(value) as value '.
+							' FROM '.$history_table.
+							' WHERE clock>'.(time() - $parameter).
+							' AND itemid='.$item['itemid'];
+					$result = DBselect($sql);
+					if(null === ($row = DBfetch($result)) || null === $row['value']){
+						$value = null;
+					}
+					else{
+						$value = $row['value'];
+					}
+				}
+
+
+				if(null === $value){
 					$label = str_replace($expr, '('.S_NO_DATA_SMALL.')', $label);
-				else
-					$label = str_replace($expr, convert_units($row['value'], $item['units']), $label);
+				}
+				else{
+					$label = str_replace($expr, convert_units($value, $item['units']), $label);
+				}
 			}
 		}
 

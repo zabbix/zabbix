@@ -104,6 +104,12 @@ function __autoload($class_name){
 	require_once('include/valuemap.inc.php');
 
 	require_once('include/users.inc.php');
+
+// phpcassa
+	require_once('vendors/phpcassa/connection.php');
+	require_once('vendors/phpcassa/columnfamily.php');
+
+
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS, $page;
 

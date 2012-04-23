@@ -25,6 +25,9 @@
 #include "threads.h"
 #include "zbxserver.h"
 #include "dbcache.h"
+#ifdef HAVE_CASSANDRA
+#	include "zbxcassa.h"
+#endif
 
 #define ZBX_DB_WAIT_DOWN	10
 
@@ -1084,29 +1087,6 @@ int	DBremove_escalation(zbx_uint64_t escalationid)
 	return SUCCEED;
 }
 
-void	DBvacuum()
-{
-#ifdef	HAVE_POSTGRESQL
-	char	*table_for_housekeeping[] = {"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
-			"sysmaps_elements", "sysmaps_link_triggers","sysmaps", "config", "groups", "hosts_groups", "alerts",
-			"actions", "events", "functions", "history", "history_str", "hosts", "trends",
-			"items", "media", "media_type", "triggers", "trigger_depends", "users",
-			"sessions", "rights", "service_alarms", "profiles", "screens", "screens_items",
-			NULL};
-
-	char	*table;
-	int	i;
-
-	zbx_setproctitle("housekeeper [vacuum DB]");
-
-	i = 0;
-	while (NULL != (table = table_for_housekeeping[i++]))
-	{
-		DBexecute("vacuum analyze %s", table);
-	}
-#endif
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: DBget_escape_string_len                                          *
@@ -2001,16 +1981,19 @@ static const char	*get_table_by_value_type(unsigned char value_type)
  *                                                                            *
  * Function: DBget_history                                                    *
  *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
  * Parameters: itemid     - [IN] item identificator from database             *
  *                               required parameter                           *
  *             value_type - [IN] item value type                              *
  *                               required parameter                           *
  *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to,
-		const char *field_name, int last_n)
+char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to, const char *field_name, int last_n)
 {
 	const char	*__function_name = "DBget_history";
 	char		sql[512];
@@ -2020,8 +2003,165 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	char		**h_value = NULL;
 	int		h_alloc = 1, h_num = 0;
 	const char	*func[] = {"min", "avg", "max", "sum", "count"};
+#ifdef HAVE_CASSANDRA
+	zbx_vector_str_t	c_values;
+	int			i;
+	double			f, sum_f = 0, max_f = 0, min_f = 0;
+	zbx_uint64_t		l, sum_l = 0, max_l = 0, min_l = 0;
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+#ifdef HAVE_CASSANDRA
+	if (ITEM_VALUE_TYPE_FLOAT != value_type && ITEM_VALUE_TYPE_UINT64 != value_type)
+		goto from_db;
+
+	zbx_vector_str_create(&c_values);
+	zbx_cassandra_fetch_history_values(&c_values, itemid, clock_from, clock_to, last_n);
+
+	if (ZBX_DB_GET_HIST_VALUE == function)
+		h_alloc = c_values.values_num;
+
+	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
+
+	switch (function)
+	{
+		case ZBX_DB_GET_HIST_MIN:
+			if (0 == c_values.values_num)
+				break;
+
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					f = atof(c_values.values[i]);
+					if (0 == h_num || f < min_f)
+						min_f = f;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, min_f);
+			}
+			else
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					ZBX_STR2UINT64(l, c_values.values[i]);
+					if (0 == h_num || l < min_l)
+						min_l = l;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_UI64, min_l);
+			}
+			break;
+		case ZBX_DB_GET_HIST_AVG:
+			if (0 == c_values.values_num)
+				break;
+
+			for (i = 0; i < c_values.values_num; i++)
+				sum_f += atof(c_values.values[i]);
+
+			h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, sum_f);
+			break;
+		case ZBX_DB_GET_HIST_MAX:
+			if (0 == c_values.values_num)
+				break;
+
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					f = atof(c_values.values[i]);
+					if (0 == h_num || f > max_f)
+						max_f = f;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, max_f);
+			}
+			else
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					ZBX_STR2UINT64(l, c_values.values[i]);
+					if (0 == h_num || l > max_l)
+						max_l = l;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_UI64, max_l);
+			}
+			break;
+		case ZBX_DB_GET_HIST_SUM:
+			if (0 == c_values.values_num)
+				break;
+
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			{
+				for (i = 0; i < c_values.values_num; i++)
+					sum_f += atof(c_values.values[i]);
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, sum_f);
+			}
+			else
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					ZBX_STR2UINT64(l, c_values.values[i]);
+					sum_l += l;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_UI64, sum_l);
+			}
+			break;
+		case ZBX_DB_GET_HIST_DELTA:
+			if (0 == c_values.values_num)
+				break;
+
+			if (ITEM_VALUE_TYPE_FLOAT == value_type)
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					f = atof(c_values.values[i]);
+					if (0 == h_num || f < min_f)
+						min_f = f;
+					if (0 == h_num || f > max_f)
+						max_f = f;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_DBL, max_f - min_f);
+			}
+			else
+			{
+				for (i = 0; i < c_values.values_num; i++)
+				{
+					ZBX_STR2UINT64(l, c_values.values[i]);
+					if (0 == h_num || l < min_l)
+						min_l = l;
+					if (0 == h_num || l > max_l)
+						max_l = l;
+				}
+
+				h_value[h_num++] = zbx_dsprintf(NULL, ZBX_FS_UI64, max_l - min_l);
+			}
+			break;
+		case ZBX_DB_GET_HIST_COUNT:
+			h_value[h_num++] = zbx_dsprintf(NULL, "%d", c_values.values_num);
+			break;
+		case ZBX_DB_GET_HIST_VALUE:
+			for (i = 0; i < c_values.values_num; i++)
+				h_value[h_num++] = zbx_strdup(NULL, c_values.values[i]);
+			break;
+	}
+	for (i = 0; i < c_values.values_num; i++)
+		zbx_free(c_values.values[i]);
+
+	zbx_vector_str_destroy(&c_values);
+
+	h_value[h_num] = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return h_value;
+from_db:
+#endif
 
 	if (NULL == field_name)
 		field_name = "value";

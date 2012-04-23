@@ -192,13 +192,13 @@ class CChart extends CGraphDraw{
 
 		$this->data = array();
 
-		$now = time(NULL);
+		$now = time();
 
 		if(!isset($this->stime)){
-			$this->stime	= $now - $this->period;
+			$this->stime = $now - $this->period;
 		}
 
-		$this->diffTZ = (date('Z',$this->stime) - date('Z',$this->stime + $this->period));
+		$this->diffTZ = (date('Z' ,$this->stime) - date('Z', $this->stime + $this->period));
 
 		$this->from_time	= $this->stime; // + timeZone offset
 		$this->to_time		= $this->stime + $this->period; // + timeZone offset
@@ -211,8 +211,12 @@ class CChart extends CGraphDraw{
 		for($i=0; $i < $this->num; $i++){
 
 			$real_item = get_item_by_itemid($this->items[$i]['itemid']);
-			if(is_null($this->itemsHost)) $this->itemsHost = $real_item['hostid'];
-			else if($this->itemsHost != $real_item['hostid']) $this->itemsHost = false;
+			if(is_null($this->itemsHost)){
+				$this->itemsHost = $real_item['hostid'];
+			}
+			elseif($this->itemsHost != $real_item['hostid']){
+				$this->itemsHost = false;
+			}
 
 
 			if(!isset($this->axis_valuetype[$this->items[$i]['axisside']])){
@@ -241,56 +245,6 @@ class CChart extends CGraphDraw{
 			if(ZBX_HISTORY_DATA_UPKEEP > -1) $real_item['history'] = ZBX_HISTORY_DATA_UPKEEP;
 //---
 
-			if((($real_item['history']*86400) > (time()-($this->from_time+$this->period/2))) &&			// should pick data from history or trends
-				(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
-			{
-				$this->dataFrom = 'history';
-				array_push($sql_arr,
-					'SELECT itemid,'.$calc_field.' as i,'.
-						' count(*) as count,avg(value) as avg,min(value) as min,'.
-						' max(value) as max,max(clock) as clock'.
-					' FROM history '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
-					' GROUP BY itemid,'.$calc_field
-					,
-
-					'SELECT itemid,'.$calc_field.' as i,'.
-						' count(*) as count,avg(value) as avg,min(value) as min,'.
-						' max(value) as max,max(clock) as clock'.
-					' FROM history_uint '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
-					' GROUP BY itemid,'.$calc_field
-					);
-			}
-			else{
-				$this->dataFrom = 'trends';
-				array_push($sql_arr,
-					'SELECT itemid,'.$calc_field.' as i,'.
-						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
-						' max(value_max) as max,max(clock) as clock'.
-					' FROM trends '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
-					' GROUP BY itemid,'.$calc_field
-					,
-
-					'SELECT itemid,'.$calc_field.' as i,'.
-						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
-						' max(value_max) as max,max(clock) as clock'.
-					' FROM trends_uint '.
-					' WHERE itemid='.$this->items[$i]['itemid'].
-						' AND clock>='.$from_time.
-						' AND clock<='.$to_time.
-					' GROUP BY itemid,'.$calc_field
-					);
-
-				$this->items[$i]['delay'] = max($this->items[$i]['delay'],3600);
-			}
 
 			if(!isset($this->data[$this->items[$i]['itemid']]))
 				$this->data[$this->items[$i]['itemid']] = array();
@@ -306,33 +260,103 @@ class CChart extends CGraphDraw{
 			$curr_data['avg'] = NULL;
 			$curr_data['clock'] = NULL;
 
-			foreach($sql_arr as $sql){
-				$result = DBselect($sql);
-				while($row = DBfetch($result)){
-					$idx=$row['i']-1;
-					if($idx<0) continue;
-/* --------------------------------------------------
-	We are taking graph on 1px more than we need,
-	and here we are skiping first px, because of MOD (in SELECT),
-	it combines prelast point (it would be last point if not that 1px in begining)
-	and first point, but we still losing prelast point :(
-	but now we've got the first point.
---------------------------------------------------*/
 
-					$curr_data['count'][$idx]	= $row['count'];
-					$curr_data['min'][$idx]	= $row['min'];
-					$curr_data['max'][$idx]	= $row['max'];
-					$curr_data['avg'][$idx]	= $row['avg'];
-					$curr_data['clock'][$idx]	= $row['clock'];
+			// Cassandra
+			if(CassandraHistory::i()->enabled()){
+				$itemData = CassandraHistory::i()->getDataForGraph($this->items[$i]['itemid'], $from_time, $to_time, $p, $x);
+
+				foreach($itemData as $idx => $pointData){
+					$idx--;
+					$curr_data['count'][$idx]	= $pointData['count'];
+					$curr_data['min'][$idx]	= $pointData['min'];
+					$curr_data['max'][$idx]	= $pointData['max'];
+					$curr_data['avg'][$idx]	= $pointData['avg'];
+					$curr_data['clock'][$idx] = $pointData['clock'];
 					$curr_data['shift_min'][$idx] = 0;
 					$curr_data['shift_max'][$idx] = 0;
 					$curr_data['shift_avg'][$idx] = 0;
 				}
-
-				$loc_min = is_array($curr_data['min'])?min($curr_data['min']):null;
-				$this->setGraphOrientation($loc_min, $this->items[$i]['axisside']);
-				unset($row);
 			}
+			else{
+				if((($real_item['history']*86400) > (time()-($this->from_time+$this->period/2))) &&			// should pick data from history or trends
+						(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)))		// is reasonable to take data from history?
+				{
+					$this->dataFrom = 'history';
+					array_push($sql_arr,
+							'SELECT itemid,'.$calc_field.' as i,'.
+									' count(*) as count,avg(value) as avg,min(value) as min,'.
+									' max(value) as max,max(clock) as clock'.
+									' FROM history '.
+									' WHERE itemid='.$this->items[$i]['itemid'].
+									' AND clock>='.$from_time.
+									' AND clock<='.$to_time.
+									' GROUP BY itemid,'.$calc_field
+						,
+
+							'SELECT itemid,'.$calc_field.' as i,'.
+									' count(*) as count,avg(value) as avg,min(value) as min,'.
+									' max(value) as max,max(clock) as clock'.
+									' FROM history_uint '.
+									' WHERE itemid='.$this->items[$i]['itemid'].
+									' AND clock>='.$from_time.
+									' AND clock<='.$to_time.
+									' GROUP BY itemid,'.$calc_field
+					);
+				}
+				else{
+					$this->dataFrom = 'trends';
+					array_push($sql_arr,
+							'SELECT itemid,'.$calc_field.' as i,'.
+									' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
+									' max(value_max) as max,max(clock) as clock'.
+									' FROM trends '.
+									' WHERE itemid='.$this->items[$i]['itemid'].
+									' AND clock>='.$from_time.
+									' AND clock<='.$to_time.
+									' GROUP BY itemid,'.$calc_field
+						,
+
+							'SELECT itemid,'.$calc_field.' as i,'.
+									' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
+									' max(value_max) as max,max(clock) as clock'.
+									' FROM trends_uint '.
+									' WHERE itemid='.$this->items[$i]['itemid'].
+									' AND clock>='.$from_time.
+									' AND clock<='.$to_time.
+									' GROUP BY itemid,'.$calc_field
+					);
+
+					$this->items[$i]['delay'] = max($this->items[$i]['delay'], 3600);
+				}
+
+				foreach($sql_arr as $sql){
+					$result = DBselect($sql);
+					while($row = DBfetch($result)){
+						$idx=$row['i']-1;
+						if($idx<0) continue;
+/* --------------------------------------------------
+We are taking graph on 1px more than we need,
+and here we are skiping first px, because of MOD (in SELECT),
+it combines prelast point (it would be last point if not that 1px in begining)
+and first point, but we still losing prelast point :(
+but now we've got the first point.
+--------------------------------------------------*/
+
+						$curr_data['count'][$idx]	= $row['count'];
+						$curr_data['min'][$idx]	= $row['min'];
+						$curr_data['max'][$idx]	= $row['max'];
+						$curr_data['avg'][$idx]	= $row['avg'];
+						$curr_data['clock'][$idx]	= $row['clock'];
+						$curr_data['shift_min'][$idx] = 0;
+						$curr_data['shift_max'][$idx] = 0;
+						$curr_data['shift_avg'][$idx] = 0;
+					}
+				}
+			}
+
+			$loc_min = is_array($curr_data['min'])?min($curr_data['min']):null;
+			$this->setGraphOrientation($loc_min, $this->items[$i]['axisside']);
+
 			$curr_data['avg_orig'] = zbx_avg($curr_data['avg']);
 
 // calculate missed points

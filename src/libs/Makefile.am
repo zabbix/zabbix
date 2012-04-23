@@ -4,6 +4,7 @@ DIST_SUBDIRS = \
 	zbxdbcache \
 	zbxdbhigh \
 	zbxdb \
+	zbxcassa \
 	zbxmemory \
 	zbxalgo \
 	zbxmedia \
@@ -40,6 +41,7 @@ SERVER_SUBDIRS = \
 	zbxdb \
 	zbxdbcache \
 	zbxdbhigh \
+	zbxcassa \
 	zbxmemory \
 	zbxserver \
 	zbxicmpping \
