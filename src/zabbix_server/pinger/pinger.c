@@ -60,7 +60,6 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		int ping_result, char *error)
 {
 	const char	*__function_name = "process_value";
-
 	DC_ITEM		item;
 	int		errcode;
 	AGENT_RESULT	value;
