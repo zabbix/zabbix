@@ -1,3 +1,8 @@
+Changes for 1.8.13
+
+...G...... [ZBX-4905] fixed processing of system.swap.in/out[,pages] under Linux 2.6 (Sasha)
+...G...... [ZBX-4907] fixed processing of system.swap.in/out[,sectors/count] under Linux (Sasha)
+
 Changes for 1.8.12rc2
 
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
