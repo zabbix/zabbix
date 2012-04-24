@@ -1,3 +1,15 @@
+Changes for 1.8.13rc1
+
+
+Changes for 1.8.12
+
+1.8.12rc1 was released as 1.8.12 without any changes
+
+Changes for 1.8.12rc2
+
+.......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
+.......PS. [ZBX-4709] fixed processing of quoted strings in SNMP items (Sasha)
+
 Changes for 1.8.12rc1
 
 ....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
