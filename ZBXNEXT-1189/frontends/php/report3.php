@@ -219,15 +219,14 @@ foreach ($sla['sla'] as $intervalSla) {
 
 	$percentage = new CSpan(sprintf('%2.2f%%', $intervalSla['sla']), 'off');
 
-	// TODO: hide SLA value if showsla is disabled
 	$table->addRow(array(
 		format_time($intervalSla['from']),
 		format_time2($intervalSla['to']),
 		$ok,
 		$problems,
 		$downtime,
-		$percentage,
-		$service['showsla'] == 1 ? new CSpan($service['goodsla'], $intervalSla['sla'] >= $service['goodsla'] ? 'off' : 'on') : '-'
+		($service['showsla']) ? $percentage : '-',
+		($service['showsla']) ? new CSpan($service['goodsla'], $intervalSla['sla'] >= $service['goodsla'] ? 'off' : 'on') : '-'
 	));
 }
 $table->show();
