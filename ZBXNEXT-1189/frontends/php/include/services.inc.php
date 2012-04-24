@@ -445,7 +445,7 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 	}
 	// create a not from the given service
 	else {
-		$sla = $slaData[$service['serviceid']];
+		$serviceSla = $slaData[$service['serviceid']];
 
 		// caption
 		$trigger = $service['trigger'];
@@ -462,14 +462,52 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 
 		// reason
 		$problemList = '-';
-		if ($sla['problems']) {
+		if ($serviceSla['problems']) {
 			$problemList = new CList(null, 'itservices');
-			foreach ($sla['problems'] as $problemTrigger) {
+			foreach ($serviceSla['problems'] as $problemTrigger) {
 				$problemList->addItem(new CLink(expand_trigger_description($problemTrigger['triggerid']), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']));
 			}
 		}
 
-		// TODO: sla / sla2
+		// sla
+		if ($service['showsla']) {
+			$slaGood = $serviceSla['sla'];
+			$slaBad = 100 - $serviceSla['sla'];
+
+			$p = min($slaBad, 20);
+
+			$width = 160;
+			$widthRed = $width * $p / 20;
+			$widthGreen = $width - $widthRed;
+
+			$chart1 = null;
+			if ($widthGreen > 0) {
+				$chart1 = new CDiv(null, 'sla-bar sla-green');
+				$chart1->setAttribute('style', 'width: '.$widthGreen.'px;');
+			}
+			$chart2 = null;
+			if ($widthRed > 0) {
+				$chart2 = new CDiv(null, 'sla-bar sla-red');
+				$chart2->setAttribute('style', 'width: '.$widthRed.'px;');
+			}
+
+			$slaBar = new CLink(array($chart1, $chart2, SPACE, new CSpan(sprintf('%.2f', $slaBad), 'underline')),
+				'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y'),
+				'image '.(($service['goodsla'] > $slaGood) ? 'on' : 'off')
+			);
+
+			$sla = new CDiv($slaBar, 'invisible');
+			$sla2 = array(
+				new CSpan(sprintf('%.2f', $service['goodsla']), 'green'),
+				' / ',
+				new CSpan(sprintf('%.2f', $slaGood), ($service['goodsla'] > $slaGood) ? 'red' : 'green')
+			);
+		}
+		else {
+			$sla = '-';
+			$sla2 = '-';
+		}
+
 		// TODO: proper child format
 		// TODO: graph links
 		// TODO: get rid of either "id" or "serviceid"
@@ -481,11 +519,11 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 			'serviceup' => ($service['parent']) ? $service['parent']['serviceid'] : 0,
 			'description' => ($service['trigger']) ? $service['trigger']['description'] : _('None'),
 			'reason' => $problemList,
-			'sla' => 60,
-			'sla2' => 40,
+			'sla' => $sla,
+			'sla2' => $sla2,
 			'childs' => $service['dependencies'],
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
-			'status' => $sla['status']
+			'status' => $serviceSla['status']
 		);
 	}
 
