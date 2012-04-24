@@ -197,6 +197,8 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 			continue;
 		}
 
+		DCconfig_clean_items(&dc_item, NULL, 1);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "Item '%s' was successfully found in the server cache. Sending.", row[0]);
 
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, "%s:%s:%s\n",
@@ -346,6 +348,8 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 		ZBX_STRDUP(key, row[0]);
 		substitute_key_macros(&key, &dc_item.host, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
+
+		DCconfig_clean_items(&dc_item, NULL, 1);
 
 		zbx_json_addobject(&json, NULL);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
