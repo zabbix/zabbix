@@ -1130,10 +1130,10 @@ ZABBIX.apps.map = (function() {
 			if (this.sysmap.data.iconmapid === '0') {
 				jQuery('#use_iconmapLabel')
 					.mouseenter(function() {
-						hintBox.showOver(this, locale['S_ICONMAP_IS_NOT_ENABLED']);
+						hintBox.showHint(this, locale['S_ICONMAP_IS_NOT_ENABLED']);
 					})
 					.mouseleave(function() {
-						hintBox.hideOut(this);
+						hintBox.hideHint(this);
 					});
 			}
 
