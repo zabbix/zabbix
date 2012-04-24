@@ -272,7 +272,7 @@ if(!isset($DB)){
 
 	function DBstart($strict=true){
 		global $DB;
-
+//SDI('DBStart(): '.$DB['TRANSACTIONS']);
 		$DB['STRICT'] = $strict;
 
 		$DB['TRANSACTIONS']++;
