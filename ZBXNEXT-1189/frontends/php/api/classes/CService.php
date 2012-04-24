@@ -37,6 +37,7 @@ class CService extends CZBXAPI {
 			'countOutput' => null,
 			'selectParent' => null,
 			'selectDependencies' => null,
+			'selectDescendantDependencies' => null,
 			'selectTimes' => null,
 			'selectAlarms' => null,
 			'selectTrigger' => null,
@@ -54,6 +55,8 @@ class CService extends CZBXAPI {
 	 * - selectParent       - include the parent service in the result;
 	 * - selectDependencies - include service dependencies in the result;
 	 * - selectTimes        - include service times in the result.
+	 *
+	 * TODO: list all available options in the comments
 	 *
 	 * @param array $options
 	 *
@@ -509,18 +512,24 @@ class CService extends CZBXAPI {
 
 	// TODO: comment
 	// TODO: add interval support
-	// TODO: output
 	public function getSla(array $options) {
 		$serviceIds = (isset($options['serviceids'])) ? zbx_toArray($options['serviceids']) : null;
 
 		// fetch services
 		$services = $this->get(array(
-			'output' => array('serviceid', 'name'),
+			'output' => array('serviceid', 'name', 'status'),
 			'selectTimes' => API_OUTPUT_EXTEND,
+			'selectDescendantDependencies' => array('servicedownid'),
+			'selectTrigger' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
+		$problemServiceIds = array();
 		foreach ($services as &$service) {
 			$service['alarms'] = array();
+
+			if ($service['status'] > 0) {
+				$problemServiceIds[] = $service['serviceid'];
+			}
 		}
 		unset($service);
 
@@ -536,12 +545,31 @@ class CService extends CZBXAPI {
 			$services[$data['serviceid']]['alarms'][] = $data;
 		}
 
+		// fetch problem triggers
+		$problemTriggers = $this->fetchProblemTriggers($problemServiceIds);
+
 		// calculate SLAs
 		$rs = array();
 		foreach ($services as $service) {
+			// sla
 			$sla = $this->calculateSla($service['serviceid'], $options['from'], $options['to'], $service['times'], $service['alarms']);
+
+			// add problem triggers
+			$problems = array();
+			$problemServices = zbx_objectValues($service['descendantDependencies'], 'servicedownid');
+			$problemServices[] = $service['serviceid'];
+			foreach ($problemServices as $serviceId) {
+				if (isset($problemTriggers[$serviceId])) {
+					$trigger = $problemTriggers[$serviceId];
+
+					$problems[$trigger['triggerid']] = $trigger;
+				}
+			}
+
 			$rs[$service['serviceid']] = array(
+				'status' => $service['status'],
 				'sla' => $sla['ok'],
+				'problems' => $problems
 			);
 		}
 
@@ -753,6 +781,101 @@ class CService extends CZBXAPI {
 		}
 
 		return $sla_time;
+	}
+
+	/**
+	 * Returns an array of triggers which are in a problem state and are linked to the given services.
+	 *
+	 * @param array $serviceIds
+	 *
+	 * @return array    in the form of array(serviceId1 => trigger1, serviceId2 => trigger2)
+	 */
+	protected function fetchProblemTriggers(array $serviceIds) {
+		// get service reason
+		$triggers = DBfetchArray(DBSelect(
+			'SELECT s.serviceid,t.*'.
+				' FROM services s,triggers t'.
+				' WHERE s.status>0'.
+				' AND s.triggerid IS NOT NULL'.
+				' AND t.triggerid=s.triggerid'.
+				' AND '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY)).
+				' AND '.DBcondition('s.serviceid', $serviceIds).
+				' ORDER BY s.status DESC,t.description'
+		));
+
+		$rs = array();
+		foreach ($triggers as $trigger) {
+			$serviceId = $trigger['serviceid'];
+			unset($trigger['serviceid']);
+
+			$rs[$serviceId] = $trigger;
+		}
+
+		return $rs;
+	}
+
+	/**
+	 * Returns an array of descendant service dependencies for each service.
+	 *
+	 * @param array $parentServiceIds
+	 * @param $output
+	 *
+	 * @return array    in the form of array(serviceId1 => array(...), serviceId2 => array(...))
+	 */
+	protected function getDescendantDependencies(array $parentServiceIds, $output) {
+		$extendedOutput = $this->extendOutputOption('services_links', array('linkid', 'serviceupid', 'servicedownid'), $output);
+
+		// fetch all descendant dependencies
+		$dependencies = $this->fetchDescendantDependencies($parentServiceIds, $extendedOutput);
+		$dependencies = array_reverse($dependencies);
+
+		// build up the descendant dependency list starting from the bottom
+		$rs = array();
+		foreach ($dependencies as $dependency) {
+			if (!isset($rs[$dependency['serviceupid']])) {
+				$rs[$dependency['serviceupid']] = array();
+			}
+
+			// if the child host has dependencies of it's own, add them too
+			if (isset($rs[$dependency['servicedownid']])) {
+				$rs[$dependency['serviceupid']] = zbx_array_merge($rs[$dependency['serviceupid']], $rs[$dependency['servicedownid']]);
+			}
+
+			$rs[$dependency['serviceupid']][$dependency['linkid']] = $this->unsetExtraFields('services_links', $dependency, $output);
+		}
+
+		// filter the service that have been requested
+		$finalResult = array();
+		foreach ($parentServiceIds as $serviceId) {
+			$finalResult[$serviceId] = (isset($rs[$serviceId])) ? $rs[$serviceId] : array();
+		}
+
+		return $finalResult;
+	}
+
+	/**
+	 * Returns an array of dependencies that are descendants of the given services.
+	 *
+	 * @param array $parentServiceIds
+	 * @param $output
+	 *
+	 * @return array
+	 *
+	 * TODO: permission check
+	 */
+	protected function fetchDescendantDependencies(array $parentServiceIds, $output) {
+		$rs = API::getApi()->select('services_links', array(
+			'output' => $output,
+			'filter' => array(
+				'serviceupid' => $parentServiceIds
+			)
+		));
+
+		if ($rs) {
+			$rs = array_merge($rs, $this->fetchDescendantDependencies(zbx_objectValues($rs, 'servicedownid'), $output));
+		}
+
+		return $rs;
 	}
 
 	/**
@@ -1130,6 +1253,15 @@ class CService extends CZBXAPI {
 				$dependency = $this->unsetExtraFields('services_links', $dependency, $options['selectDependencies']);
 				$result[$refId]['dependencies'][] = $dependency;
 			}
+		}
+
+		// selectDescendantDependencies
+		if ($options['selectDescendantDependencies']) {
+			$dependencies = $this->getDescendantDependencies($serviceIds, $options['selectDescendantDependencies']);
+			foreach ($result as &$service) {
+				$service['descendantDependencies'] = $dependencies[$service['serviceid']];
+			}
+			unset($service);
 		}
 
 		// selectParent

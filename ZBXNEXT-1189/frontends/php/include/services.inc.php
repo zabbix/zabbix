@@ -409,19 +409,24 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
 
 // TODO: comment
 // TODO: check that it works with permissions
-function createShowServiceTree(array $services, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
+// TODO: check sort order
+// TODO: optimize trigger description expansion
+function createShowServiceTree(array $services, array $slaData, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
 	// if no parent service is given, start from the root
 	if (!$service) {
 		$serviceNode = array(
 			'id' => 0,
 			'serviceid' => 0,
 			'parent' => array(),
-			'parentid' => array(),
+			'parentid' => 0,
 			'caption' => _('root'),
-			'status' => 0,
+			'status' => SPACE,
 			'sla' => SPACE,
+			'sla2' => SPACE,
 			'trigger' => array(),
 			'dependencies' => array(),
+			'reason' => SPACE,
+			'graph' => SPACE,
 		);
 
 		// add all top level services as children of "root"
@@ -440,6 +445,8 @@ function createShowServiceTree(array $services, array $parentService = array(), 
 	}
 	// create a not from the given service
 	else {
+		$sla = $slaData[$service['serviceid']];
+
 		// caption
 		$trigger = $service['trigger'];
 		$caption = array(get_node_name_by_elid($service['serviceid'], null, ': '), $service['name']);
@@ -448,24 +455,37 @@ function createShowServiceTree(array $services, array $parentService = array(), 
 				expand_trigger_description($trigger['triggerid']),
 				'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
 			);
-			$caption[] = ' ['.$url.']';
+			$caption[] = ' [';
+			$caption[] = $url;
+			$caption[] = ']';
 		}
 
-		// TODO: reason
+		// reason
+		$problemList = '-';
+		if ($sla['problems']) {
+			$problemList = new CList(null, 'itservices');
+			foreach ($sla['problems'] as $problemTrigger) {
+				$problemList->addItem(new CLink(expand_trigger_description($problemTrigger['triggerid']), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']));
+			}
+		}
+
 		// TODO: sla / sla2
 		// TODO: proper child format
 		// TODO: graph links
+		// TODO: get rid of either "id" or "serviceid"
 		$serviceNode = array(
 			'id' => $service['serviceid'],
+			'serviceid' => $service['serviceid'],
 			'caption' => $caption,
 			'graph' => !empty($service['triggerid']) ? new CLink(_('Show'), 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path')) : '-',
 			'serviceup' => ($service['parent']) ? $service['parent']['serviceid'] : 0,
 			'description' => ($service['trigger']) ? $service['trigger']['description'] : _('None'),
-			'reason' => 'reason',
+			'reason' => $problemList,
 			'sla' => 60,
 			'sla2' => 40,
 			'childs' => $service['dependencies'],
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
+			'status' => $sla['status']
 		);
 	}
 
@@ -475,7 +495,7 @@ function createShowServiceTree(array $services, array $parentService = array(), 
 
 		foreach ($serviceNode['childs'] as $dependency) {
 			$childService = $services[$dependency['servicedownid']];
-			$tree = createShowServiceTree($services, $service, $childService, $dependency, $tree);
+			$tree = createShowServiceTree($services, $slaData, $service, $childService, $dependency, $tree);
 		}
 	}
 	// soft dependencies
