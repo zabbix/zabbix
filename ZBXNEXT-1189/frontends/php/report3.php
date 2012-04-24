@@ -42,8 +42,7 @@ $period = get_request('period', 'weekly');
 $year = get_request('year', date('Y'));
 
 define('YEAR_LEFT_SHIFT', 5);
-?>
-<?php
+
 $service = API::Service()->get(array(
 	'output' => array('serviceid', 'name', 'showsla', 'goodsla'),
 	'selectTimes' => API_OUTPUT_EXTEND,
@@ -220,6 +219,7 @@ foreach ($sla['sla'] as $intervalSla) {
 
 	$percentage = new CSpan(sprintf('%2.2f%%', $intervalSla['sla']), 'off');
 
+	// TODO: hide SLA value if showsla is disabled
 	$table->addRow(array(
 		format_time($intervalSla['from']),
 		format_time2($intervalSla['to']),
