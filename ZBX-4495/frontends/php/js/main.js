@@ -727,18 +727,23 @@ var hintBox = {
 
 	showStaticHintWraper: function(target, hintText, width, className) {
 		jQuery(target).bind('click', function(e){
-			hintBox.showStaticHint(target, hintText, width, className, true);
+			hintBox.showStaticHint(target, hintText, width, className);
 		});
 		jQuery(target).removeAttr('onclick');
 		jQuery(target).trigger('click');
 	},
 
-	showStaticHint: function(target, hintText, width, className) {
+	showStaticHint: function(target, hint, width, className, resizeAfterLoad) {
 		var onClick = target.onClick;
 		hintBox.hideHint(target, true);
 		if (!onClick) {
 			target.onClick = true;
-			hintBox.showHint(target, hintText, width, className, true);
+			hintBox.showHint(target, hint, width, className, true);
+			if (resizeAfterLoad) {
+				hint.one('load', function(){
+					hintBox.positionHint(target);
+				});
+			}
 		}
 	},
 

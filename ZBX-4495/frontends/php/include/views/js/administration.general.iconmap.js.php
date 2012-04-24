@@ -40,16 +40,8 @@
 		});
 
 		jQuery('#iconMapTable tbody').delegate('img.preview', 'click', function() {
-			if (!this.hintBoxItem) {
-				var self = this;
-				var img = jQuery('<img src=' + jQuery(this).data('imageFull') + ' >').one('load',function(){
-					hintBox.positionHint(self);
-				});
-				hintBox.showStaticHint(this, img);
-			}
-			else {
-				hintBox.hideHint(this, true);
-			}
+			var img = jQuery('<img src=' + jQuery(this).data('imageFull') + ' >');
+			hintBox.showStaticHint(this, img, '', '', true);
 		});
 
 		jQuery('#addMapping').click(function() {
