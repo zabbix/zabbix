@@ -471,8 +471,9 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 
 		// sla
 		if ($service['showsla']) {
-			$slaGood = $serviceSla['sla'];
-			$slaBad = 100 - $serviceSla['sla'];
+			$slaValues = reset($serviceSla['sla']);
+			$slaGood = $slaValues['sla'];
+			$slaBad = 100 - $slaValues['sla'];
 
 			$p = min($slaBad, 20);
 

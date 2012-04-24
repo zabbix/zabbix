@@ -127,8 +127,10 @@ else {
 	// fetch sla
 	$slaData = API::Service()->getSla(array(
 		'serviceids' => zbx_objectValues($services, 'serviceid'),
-		'from' => $period_start,
-		'to' => $period_end
+		'intervals' => array(array(
+			'from' => $period_start,
+			'to' => $period_end
+		))
 	));
 
 	$treeServ = createShowServiceTree($services, $slaData);

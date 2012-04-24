@@ -514,6 +514,7 @@ class CService extends CZBXAPI {
 	// TODO: add interval support
 	public function getSla(array $options) {
 		$serviceIds = (isset($options['serviceids'])) ? zbx_toArray($options['serviceids']) : null;
+		$intervals = (isset($options['intervals'])) ? zbx_toArray($options['intervals']) : array();
 
 		// fetch services
 		$services = $this->get(array(
@@ -521,6 +522,7 @@ class CService extends CZBXAPI {
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectDescendantDependencies' => array('servicedownid'),
 			'selectTrigger' => API_OUTPUT_EXTEND,
+			'serviceids' => $serviceIds,
 			'preservekeys' => true
 		));
 		$problemServiceIds = array();
@@ -534,11 +536,15 @@ class CService extends CZBXAPI {
 		unset($service);
 
 		// add service alarms
+		$intervalConditions = array();
+		foreach ($intervals as $interval) {
+			$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
+		}
 		$query = DBselect(
 			'SELECT *'.
 				' FROM service_alarms sa'.
 				' WHERE '.(($serviceIds) ? DBcondition('sa.serviceid', $serviceIds) : '').
-				' AND sa.clock BETWEEN '.$options['from'].' AND '.$options['to'].
+				' AND ('.implode(' OR ', $intervalConditions).')'.
 				' ORDER BY sa.clock,sa.servicealarmid'
 		);
 		while ($data = DBfetch($query)) {
@@ -546,13 +552,27 @@ class CService extends CZBXAPI {
 		}
 
 		// fetch problem triggers
-		$problemTriggers = $this->fetchProblemTriggers($problemServiceIds);
+		if ($problemServiceIds) {
+			$problemTriggers = $this->fetchProblemTriggers($problemServiceIds);
+		}
 
 		// calculate SLAs
 		$rs = array();
 		foreach ($services as $service) {
 			// sla
-			$sla = $this->calculateSla($service['serviceid'], $options['from'], $options['to'], $service['times'], $service['alarms']);
+			$sla = array();
+			foreach ($intervals as $interval) {
+				$intervalSla = $this->calculateSla($service, $interval['from'], $interval['to']);
+
+				$sla[] = array(
+					'from' => $interval['from'],
+					'to' => $interval['to'],
+					'sla' => $intervalSla['ok'],
+					'okTime' => $intervalSla['okTime'],
+					'problemTime' => $intervalSla['problemTime'],
+					'downtimeTime' => $intervalSla['downtimeTime'],
+				);
+			}
 
 			// add problem triggers
 			$problems = array();
@@ -568,7 +588,7 @@ class CService extends CZBXAPI {
 
 			$rs[$service['serviceid']] = array(
 				'status' => $service['status'],
-				'sla' => $sla['ok'],
+				'sla' => $sla,
 				'problems' => $problems
 			);
 		}
@@ -641,7 +661,7 @@ class CService extends CZBXAPI {
 	}
 
 	// TODO: comment
-	protected function calculateSla($serviceid, $period_start, $period_end, array $serviceTimes = array(), array $serviceAlarms = array()) {
+	protected function calculateSla(array $service, $period_start, $period_end) {
 		/* structure of "$data"
 			 *	key	- time stamp
 			 *	alarm	- on/off status (0,1 - off; >1 - on)
@@ -652,15 +672,17 @@ class CService extends CZBXAPI {
 			 */
 
 		// TODO: get the last alarm from $serviceAlarms
-		$data[$period_start]['alarm'] = get_last_service_value($serviceid, $period_start);
+		$data[$period_start]['alarm'] = get_last_service_value($service['serviceid'], $period_start);
 
-		foreach ($serviceAlarms as $alarm) {
-			$data[$alarm['clock']]['alarm'] = $alarm['value'];
+		foreach ($service['alarms'] as $alarm) {
+			if ($alarm['clock'] >= $period_start && $alarm['clock'] <= $period_end) {
+				$data[$alarm['clock']]['alarm'] = $alarm['value'];
+			}
 		}
 
 		$unmarked_period_type = 'ut';
 
-		foreach ($serviceTimes as $time) {
+		foreach ($service['times'] as $time) {
 			if ($time['type'] == SERVICE_TIME_TYPE_UPTIME) {
 				expandPeriodicalServiceTimes($data, $period_start, $period_end, $time['ts_from'], $time['ts_to'], 'ut');
 			}
@@ -705,8 +727,8 @@ class CService extends CZBXAPI {
 		$dt_cnt = 0;
 		$ut_cnt = 0;
 		$sla_time = array(
-			'dt' => array('problem_time' => 0, 'ok_time' => 0),
-			'ut' => array('problem_time' => 0, 'ok_time' => 0)
+			'dt' => array('problemTime' => 0, 'okTime' => 0),
+			'ut' => array('problemTime' => 0, 'okTime' => 0)
 		);
 		$prev_alarm = $data[$period_start]['alarm'];
 		$prev_time = $period_start;
@@ -741,10 +763,10 @@ class CService extends CZBXAPI {
 
 			// state=0,1 [OK] (1 - information severity of trigger), >1 [PROBLEMS] (trigger severity)
 			if ($prev_alarm > 1) {
-				$sla_time[$period_type]['problem_time']	+= $ts - $prev_time;
+				$sla_time[$period_type]['problemTime']	+= $ts - $prev_time;
 			}
 			else {
-				$sla_time[$period_type]['ok_time'] += $ts - $prev_time;
+				$sla_time[$period_type]['okTime'] += $ts - $prev_time;
 			}
 
 			if (isset($val['ut_s'])) {
@@ -766,14 +788,14 @@ class CService extends CZBXAPI {
 			$prev_time = $ts;
 		}
 
-		$sla_time['problem_time'] = &$sla_time['ut']['problem_time'];
-		$sla_time['ok_time'] = &$sla_time['ut']['ok_time'];
-		$sla_time['downtime_time'] = $sla_time['dt']['ok_time'] + $sla_time['dt']['problem_time'];
+		$sla_time['problemTime'] = &$sla_time['ut']['problemTime'];
+		$sla_time['okTime'] = &$sla_time['ut']['okTime'];
+		$sla_time['downtimeTime'] = $sla_time['dt']['okTime'] + $sla_time['dt']['problemTime'];
 
-		$full_time = $sla_time['problem_time'] + $sla_time['ok_time'];
+		$full_time = $sla_time['problemTime'] + $sla_time['okTime'];
 		if ($full_time > 0) {
-			$sla_time['problem'] = 100 * $sla_time['problem_time'] / $full_time;
-			$sla_time['ok'] = 100 * $sla_time['ok_time'] / $full_time;
+			$sla_time['problem'] = 100 * $sla_time['problemTime'] / $full_time;
+			$sla_time['ok'] = 100 * $sla_time['okTime'] / $full_time;
 		}
 		else {
 			$sla_time['problem'] = 100;
@@ -1294,7 +1316,7 @@ class CService extends CZBXAPI {
 			$timesOutput = $this->extendOutputOption('services_times', 'serviceid', $options['selectTimes']);
 			$serviceTimes = API::getApi()->select('services_times', array(
 				'output' => $timesOutput,
-				'filter' => array('serviceupid' => $serviceIds)
+				'filter' => array('serviceid' => $serviceIds)
 			));
 			foreach ($result as &$service) {
 				$service['times'] = array();
@@ -1312,7 +1334,7 @@ class CService extends CZBXAPI {
 			$alarmsOutput = $this->extendOutputOption('service_alarms', 'serviceid', $options['selectAlarms']);
 			$alarmsTimes = API::getApi()->select('service_alarms', array(
 				'output' => $alarmsOutput,
-				'filter' => array('serviceupid' => $serviceIds)
+				'filter' => array('serviceid' => $serviceIds)
 			));
 			foreach ($result as &$service) {
 				$service['times'] = array();
