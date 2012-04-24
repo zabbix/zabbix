@@ -690,3 +690,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal { color: #222; }
 
 .preloader { width: 80px; height: 12px; }
+
+.sla-bar { height: 15px; display: inline-block; margin-bottom: -4px; }
+.sla-green { background: url('../images/gradients/sla_green15.png') repeat-x; }
+.sla-red { background: url('../images/gradients/sla_red15.png') repeat-x; }

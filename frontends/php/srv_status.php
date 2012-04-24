@@ -115,7 +115,7 @@ else {
 
 	// fetch services
 	$services = API::Service()->get(array(
-		'output' => array('name', 'serviceid'),
+		'output' => array('name', 'serviceid', 'showsla', 'goodsla'),
 		'selectParent' => API_OUTPUT_EXTEND,
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
 		'selectTrigger' => array('description', 'triggerid'),
@@ -144,7 +144,7 @@ else {
 			'status' => _('Status'),
 			'reason' => _('Reason'),
 			'sla' => 'SLA ('.$periods[$period].')',
-			'sla2' => nbsp(_('SLA')),
+			'sla2' => nbsp(_('Acceptable SLA').' / '._('SLA')),
 			'graph' => _('Graph')
 		)
 	);
