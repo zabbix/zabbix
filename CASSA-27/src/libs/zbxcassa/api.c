@@ -444,7 +444,7 @@ void	zbx_cassandra_add_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, co
 
 	zbx_cassandra_add_mutation(__key, "metric_by_parameter", __column, __value);
 
-	__key = zbx_cassandra_encode_integer_type(clock - clock % SEC_PER_DAY);
+	__key = zbx_cassandra_encode_long_type(clock - clock % SEC_PER_DAY);
 	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
 	__value = zbx_cassandra_encode_ascii_type("\1");
 
@@ -758,7 +758,7 @@ void	zbx_cassandra_save_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, c
 	g_byte_array_unref(__column);
 	g_byte_array_unref(__key);
 
-	__key = zbx_cassandra_encode_integer_type((clock % SEC_PER_DAY) * 1000);
+	__key = zbx_cassandra_encode_long_type((clock % SEC_PER_DAY) * 1000);
 	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
 	__value = zbx_cassandra_encode_ascii_type("\1");
 
