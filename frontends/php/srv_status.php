@@ -124,7 +124,14 @@ else {
 		'sortorder' => ZBX_SORT_UP
 	));
 
-	$treeServ = createShowServiceTree($services);
+	// fetch sla
+	$slaData = API::Service()->getSla(array(
+		'serviceids' => zbx_objectValues($services, 'serviceid'),
+		'from' => $period_start,
+		'to' => $period_end
+	));
+
+	$treeServ = createShowServiceTree($services, $slaData);
 
 	// permission issue
 	// TODO: check this out
