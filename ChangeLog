@@ -1,3 +1,7 @@
+Changes for 1.8.12
+
+1.8.12rc1 was released as 1.8.12 without any changes
+
 Changes for 1.8.12rc2
 
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
