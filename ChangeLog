@@ -598,6 +598,14 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.13rc1
+
+....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
+
+Changes for 1.8.12
+
+1.8.12rc1 was released as 1.8.12 without any changes
+
 Changes for 1.8.12rc2
 
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
