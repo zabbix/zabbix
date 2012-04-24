@@ -70,18 +70,14 @@
 	function add_audit($action,$resourcetype,$details){
 		global $USER_DETAILS;
 
-		if (!isset($USER_DETAILS['userid'])) {
-			check_authorisation();
-		}
+		if(!isset($USER_DETAILS['userid']))	check_authorisation();
 
 		$auditid = get_dbid('auditlog','auditid');
 
-		if (zbx_strlen($details) > 128) {
+		if(zbx_strlen($details) > 128)
 			$details = zbx_substr($details, 0, 125).'...';
-		}
 
-		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-			?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
+		$ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'];
 
 		if(($result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip) '.
 			' VALUES ('.$auditid.','.$USER_DETAILS['userid'].','.time().','.
