@@ -3124,11 +3124,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->ipmi_sensor = '\0';
 			break;
 		case ITEM_TYPE_DB_MONITOR:
-			if (NULL != (dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid)))
-				strscpy(dst_item->params_orig, dbitem->params);
-			else
-				*dst_item->params_orig = '\0';
-			dst_item->params = NULL;
+			dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid);
+			dst_item->params = zbx_strdup(dst_item->params, NULL != dbitem ? dbitem->params : "");
 			break;
 		case ITEM_TYPE_SSH:
 			if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &src_item->itemid)))
@@ -3138,7 +3135,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				strscpy(dst_item->publickey_orig, sshitem->publickey);
 				strscpy(dst_item->privatekey_orig, sshitem->privatekey);
 				strscpy(dst_item->password_orig, sshitem->password);
-				strscpy(dst_item->params_orig, sshitem->params);
+				dst_item->params = zbx_strdup(dst_item->params, sshitem->params);
 			}
 			else
 			{
@@ -3147,30 +3144,28 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->publickey_orig = '\0';
 				*dst_item->privatekey_orig = '\0';
 				*dst_item->password_orig = '\0';
-				*dst_item->params_orig = '\0';
+				dst_item->params = zbx_strdup(dst_item->params, "");
 			}
 			dst_item->username = NULL;
 			dst_item->publickey = NULL;
 			dst_item->privatekey = NULL;
 			dst_item->password = NULL;
-			dst_item->params = NULL;
 			break;
 		case ITEM_TYPE_TELNET:
 			if (NULL != (telnetitem = zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
 			{
 				strscpy(dst_item->username_orig, telnetitem->username);
 				strscpy(dst_item->password_orig, telnetitem->password);
-				strscpy(dst_item->params_orig, telnetitem->params);
+				dst_item->params = zbx_strdup(dst_item->params, telnetitem->params);
 			}
 			else
 			{
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
-				*dst_item->params_orig = '\0';
+				dst_item->params = zbx_strdup(dst_item->params, "");
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
-			dst_item->params = NULL;
 			break;
 		case ITEM_TYPE_JMX:
 			if (NULL != (jmxitem = zbx_hashset_search(&config->jmxitems, &src_item->itemid)))
@@ -3187,11 +3182,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_CALCULATED:
-			if (NULL != (calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid)))
-				strscpy(dst_item->params_orig, calcitem->params);
-			else
-				*dst_item->params_orig = '\0';
-			dst_item->params = NULL;
+			calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid);
+			dst_item->params = zbx_strdup(dst_item->params, NULL != calcitem ? calcitem->params : "");
 			break;
 		default:
 			/* nothing to do */;
@@ -3212,6 +3204,27 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				break;
 			default:
 				/* nothing to do */;
+		}
+	}
+}
+
+void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
+{
+	size_t	i;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL != errcodes && SUCCEED != errcodes[i])
+			continue;
+
+		switch (items[i].type)
+		{
+			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_SSH:
+			case ITEM_TYPE_TELNET:
+			case ITEM_TYPE_CALCULATED:
+				zbx_free(items[i].params);
+				break;
 		}
 	}
 }
@@ -3811,11 +3824,12 @@ unlock:
  * Author: Rudolfs Kreicbergs                                                 *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
+size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items)
 {
 	const char		*__function_name = "DCconfig_get_snmp_items_by_interface";
 
-	int			items_num = 0, items_alloc = 8, i;
+	size_t			items_num = 0, items_alloc = 8;
+	int			i;
 	ZBX_DC_ITEM		*dc_item;
 	ZBX_DC_INTERFACE_ITEM	*dc_interface_snmpitem;
 	ZBX_DC_INTERFACE	*dc_interface;
@@ -3858,7 +3872,7 @@ int	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **i
 unlock:
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, items_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)items_num);
 
 	return items_num;
 }
