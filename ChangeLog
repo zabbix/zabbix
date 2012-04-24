@@ -6,6 +6,9 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-4671] fixed truncation of the calculated item formula (Sasha)
+........S. [ZBX-4893] fixed linking of item applications by a discovery rule (Sasha)
+..F....... [ZBX-4649] fixed Editing screen does not work properly after moving content to other cell (Toms)
+..F....... [ZBX-4875] fixed graph item with long description cannot be dragged/sorted properly in graph form (Toms)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.0rc3
@@ -596,6 +599,14 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.13rc1
+
+....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
+
+Changes for 1.8.12
+
+1.8.12rc1 was released as 1.8.12 without any changes
+
 Changes for 1.8.12rc2
 
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
