@@ -1,5 +1,6 @@
 Changes for 1.8.13rc1
 
+....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
 
 Changes for 1.8.12
 
