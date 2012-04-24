@@ -92,22 +92,21 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			assert(0);
 	}
 
-	/******************************************************************************
-	 * Set trigger status to UNKNOWN if all are true:                             *
-	 * - trigger's item status ACTIVE                                             *
-	 * - trigger's item type same as failed one                                   *
-	 * - trigger does not reference time-based functions- trigger status ENABLED  *
-	 * - trigger's host same as failed one                                        *
-	 * - trigger's host status MONITORED                                          *
-	 * - trigger does not reference "active" item                                 *
-	 *                                                                            *
-	 * An item is considered "active" if all are true:                            *
-	 * - item status ACTIVE                                                       *
-	 * - item's host status MONITORED                                             *
-	 * - item's trigger references time-based functions                           *
-	 *   OR                                                                       *
-	 *   item is of different type AND it's host is AVAILABLE                     *
-	 ******************************************************************************/
+	/*************************************************************************
+	 * Let's say an item MYITEM returns error. There is a trigger associated *
+	 * with it. We set that trigger status to UNKNOWN if ALL are true:       *
+	 * - MYITEM status is ACTIVE                                             *
+	 * - trigger does not reference time-based function                      *
+	 * - trigger status is ENABLED                                           *
+	 * - trigger and MYITEM reference the same host                          *
+	 * - trigger host status is MONITORED                                    *
+	 * - trigger does NOT reference an item that has ALL true:               *
+	 *   - item status is ACTIVE                                             *
+	 *   - item host status is MONITORED                                     *
+	 *   - item trigger references time-based function                       *
+	 *     OR                                                                *
+	 *     item and MYITEM types differ AND item host status is AVAILABLE    *
+	 *************************************************************************/
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error"
 			" from items i,functions f,triggers t,hosts h"
@@ -667,8 +666,6 @@ static int	get_values(unsigned char poller_type)
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 			case ITEM_TYPE_DB_MONITOR:
-				ZBX_STRDUP(items[i].params, items[i].params_orig);
-
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
@@ -759,8 +756,6 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_TELNET:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
-			case ITEM_TYPE_DB_MONITOR:
-				zbx_free(items[i].params);
 				break;
 			case ITEM_TYPE_JMX:
 				zbx_free(items[i].username);
@@ -770,6 +765,8 @@ static int	get_values(unsigned char poller_type)
 
 		free_result(&results[i]);
 	}
+
+	DCconfig_clean_items(items, NULL, num);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
 
