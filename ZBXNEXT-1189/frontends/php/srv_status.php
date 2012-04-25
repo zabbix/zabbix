@@ -135,10 +135,6 @@ else {
 
 	$treeServ = createShowServiceTree($services, $slaData);
 
-	// permission issue
-	// TODO: check this out
-	$treeServ = del_empty_nodes($treeServ);
-
 	$tree = new CTree('service_status_tree',
 		$treeServ,
 		array(

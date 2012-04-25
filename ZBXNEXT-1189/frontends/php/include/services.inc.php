@@ -54,42 +54,6 @@ function get_service_status($serviceid, $algorithm, $triggerid = null, $status =
 	return $status;
 }
 
-// TODO: move to CService
-function expandPeriodicalServiceTimes(&$data, $period_start, $period_end, $ts_from, $ts_to, $type) {
-	$week = getdate($period_start);
-	$week = $period_start - $week['wday'] * SEC_PER_DAY - $week['hours'] * SEC_PER_HOUR - $week['minutes'] * SEC_PER_MIN - $week['seconds'];
-
-	for (; $week < $period_end; $week += SEC_PER_WEEK) {
-		$_s = $week + $ts_from;
-		$_e = $week + $ts_to;
-
-		if ($period_end < $_s || $period_start >= $_e) {
-			continue;
-		}
-
-		if ($_s < $period_start) {
-			$_s = $period_start;
-		}
-		if ($_e > $period_end) {
-			$_e = $period_end;
-		}
-
-		if (isset($data[$_s][$type.'_s'])) {
-			$data[$_s][$type.'_s']++;
-		}
-		else {
-			$data[$_s][$type.'_s'] = 1;
-		}
-
-		if (isset($data[$_e][$type.'_e'])) {
-			$data[$_e][$type.'_e']++;
-		}
-		else {
-			$data[$_e][$type.'_e'] = 1;
-		}
-	}
-}
-
 function serviceAlgorythm($algorythm = null) {
 	$algorythms = array(
 		SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
@@ -158,7 +122,6 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
 }
 
 // TODO: comment
-// TODO: check that it works with permissions
 // TODO: check sort order
 // TODO: optimize trigger description expansion
 function createShowServiceTree(array $services, array $slaData, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
