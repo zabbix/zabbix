@@ -902,8 +902,11 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 			switch (item->delta)
 			{
 				case ITEM_STORE_AS_IS:
-					if (1 != item->prevorgvalue_null)
+					if (0 == item->prevorgvalue_null)
+					{
 						zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ",prevorgvalue=null");
+						item->prevorgvalue_null = 1;
+					}
 
 					h->value.dbl = DBmultiply_value_float(item, h->value_orig.dbl);
 
@@ -914,9 +917,6 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					break;
 				case ITEM_STORE_SPEED_PER_SECOND:
-					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-							",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
-
 					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl &&
 							(item->lastclock < h->clock ||
 								(item->lastclock == h->clock && item->lastns < h->ns)))
@@ -934,11 +934,15 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					else
 						h->value_null = 1;
+
+					if (ITEM_STATUS_NOTSUPPORTED != h->status)
+					{
+						zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
+						item->prevorgvalue_null = 0;
+					}
 					break;
 				case ITEM_STORE_SIMPLE_CHANGE:
-					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-							",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
-
 					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl)
 					{
 						h->value.dbl = h->value_orig.dbl - item->prevorgvalue.dbl;
@@ -952,10 +956,17 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					else
 						h->value_null = 1;
+
+					if (ITEM_STATUS_NOTSUPPORTED != h->status)
+					{
+						zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
+						item->prevorgvalue_null = 0;
+					}
 					break;
 			}
 
-			if (1 != h->value_null)
+			if (0 == h->value_null)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 						",prevvalue=lastvalue,lastvalue='" ZBX_FS_DBL "'",
@@ -975,15 +986,15 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 			switch (item->delta)
 			{
 				case ITEM_STORE_AS_IS:
-					if (1 != item->prevorgvalue_null)
+					if (0 == item->prevorgvalue_null)
+					{
 						zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ",prevorgvalue=null");
+						item->prevorgvalue_null = 1;
+					}
 
 					h->value.ui64 = DBmultiply_value_uint64(item, h->value_orig.ui64);
 					break;
 				case ITEM_STORE_SPEED_PER_SECOND:
-					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
-
 					if (0 == item->prevorgvalue_null &&
 							item->prevorgvalue.ui64 <= h->value_orig.ui64 &&
 							(item->lastclock < h->clock ||
@@ -996,11 +1007,12 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					else
 						h->value_null = 1;
-					break;
-				case ITEM_STORE_SIMPLE_CHANGE:
+
 					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
-
+					item->prevorgvalue_null = 0;
+					break;
+				case ITEM_STORE_SIMPLE_CHANGE:
 					if (0 == item->prevorgvalue_null && item->prevorgvalue.ui64 <= h->value_orig.ui64)
 					{
 						h->value.ui64 = h->value_orig.ui64 - item->prevorgvalue.ui64;
@@ -1008,10 +1020,14 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					else
 						h->value_null = 1;
+
+					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
+					item->prevorgvalue_null = 0;
 					break;
 			}
 
-			if (1 != h->value_null)
+			if (0 == h->value_null)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 						",prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "'",
@@ -1038,6 +1054,13 @@ notsupported:
 					zbx_host_key_string(h->itemid), h->value_orig.err);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",status=%d", (int)h->status);
+		}
+
+		if (0 == item->prevorgvalue_null)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+					",prevorgvalue=null");
+			item->prevorgvalue_null = 1;
 		}
 
 		if (0 != strcmp(item->error, h->value_orig.err))
