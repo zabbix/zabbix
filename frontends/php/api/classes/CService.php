@@ -723,10 +723,10 @@ class CService extends CZBXAPI {
 
 		foreach ($service['times'] as $time) {
 			if ($time['type'] == SERVICE_TIME_TYPE_UPTIME) {
-				expandPeriodicalServiceTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'ut');
+				$this->expandPeriodicalTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'ut');
 			}
 			elseif ($time['type'] == SERVICE_TIME_TYPE_DOWNTIME) {
-				expandPeriodicalServiceTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'dt');
+				$this->expandPeriodicalTimes($data, $periodStart, $periodEnd, $time['ts_from'], $time['ts_to'], 'dt');
 
 				// if exist any uptime - unmarked time is downtime
 				$unmarkedPeriodType = 'dt';
@@ -841,6 +841,53 @@ class CService extends CZBXAPI {
 		}
 
 		return $slaTime;
+	}
+
+	/**
+	 * @see calculateSla()
+	 *
+	 * @param $data
+	 * @param $period_start
+	 * @param $period_end
+	 * @param $ts_from
+	 * @param $ts_to
+	 * @param $type
+	 *
+	 * @return void
+	 */
+	function expandPeriodicalTimes(&$data, $period_start, $period_end, $ts_from, $ts_to, $type) {
+		$week = getdate($period_start);
+		$week = $period_start - $week['wday'] * SEC_PER_DAY - $week['hours'] * SEC_PER_HOUR - $week['minutes'] * SEC_PER_MIN - $week['seconds'];
+
+		for (; $week < $period_end; $week += SEC_PER_WEEK) {
+			$_s = $week + $ts_from;
+			$_e = $week + $ts_to;
+
+			if ($period_end < $_s || $period_start >= $_e) {
+				continue;
+			}
+
+			if ($_s < $period_start) {
+				$_s = $period_start;
+			}
+			if ($_e > $period_end) {
+				$_e = $period_end;
+			}
+
+			if (isset($data[$_s][$type.'_s'])) {
+				$data[$_s][$type.'_s']++;
+			}
+			else {
+				$data[$_s][$type.'_s'] = 1;
+			}
+
+			if (isset($data[$_e][$type.'_e'])) {
+				$data[$_e][$type.'_e']++;
+			}
+			else {
+				$data[$_e][$type.'_e'] = 1;
+			}
+		}
 	}
 
 	/**
