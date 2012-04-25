@@ -276,7 +276,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('max_in_table', '-1');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data, 'Warning. Incorrect value for field "Max count of elements to show inside table cell": must be between 1 and 99999.'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Max count of elements to show inside table cell": must be between 1 and 99999.'));
 
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Max count of elements to show inside table cell'));
 
