@@ -78,7 +78,7 @@ typedef struct
 }
 swap_stat_t;
 
-#if defined(KERNEL_2_4)
+#ifdef KERNEL_2_4
 #	define INFO_FILE_NAME	"/proc/partitions"
 #	define PARSE(line)	if (6 != sscanf(line, "%d %d %*d %*s " \
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
@@ -174,8 +174,7 @@ static int	get_swap_pages(swap_stat_t *result)
 				ZBX_STR2UINT64(result->rpag, line + 7);
 				st |= 0x01;
 			}
-
-			if (0x00 == (0x02 & st) && 0 == strncmp(line, "pswpout ", 8))
+			else if (0x00 == (0x02 & st) && 0 == strncmp(line, "pswpout ", 8))
 			{
 				ZBX_STR2UINT64(result->wpag, line + 8);
 				st |= 0x02;
