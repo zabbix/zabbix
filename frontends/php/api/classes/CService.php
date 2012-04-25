@@ -575,24 +575,9 @@ class CService extends CZBXAPI {
 			$problemTriggers = $this->fetchProblemTriggers($problemServiceIds);
 		}
 
-		// calculate SLAs
+		// initial data
 		$rs = array();
 		foreach ($services as $service) {
-			// sla
-			$sla = array();
-			foreach ($intervals as $interval) {
-				$intervalSla = $this->calculateSla($service, $interval['from'], $interval['to']);
-
-				$sla[] = array(
-					'from' => $interval['from'],
-					'to' => $interval['to'],
-					'sla' => $intervalSla['ok'],
-					'okTime' => $intervalSla['okTime'],
-					'problemTime' => $intervalSla['problemTime'],
-					'downtimeTime' => $intervalSla['downtimeTime'],
-				);
-			}
-
 			// add problem triggers
 			$problems = array();
 			$problemServices = zbx_objectValues($service['descendantDependencies'], 'servicedownid');
@@ -607,9 +592,28 @@ class CService extends CZBXAPI {
 
 			$rs[$service['serviceid']] = array(
 				'status' => $service['status'],
-				'sla' => $sla,
+				'sla' => array(),
 				'problems' => $problems
 			);
+		}
+
+		// calculate SLAs
+		foreach ($intervals as $interval) {
+			$latestValues = $this->fetchLatestValues($serviceIds, $interval['from']);
+
+			foreach ($services as $service) {
+				$latestValue = (isset($latestValues[$service['serviceid']])) ? $latestValues[$service['serviceid']] : 0;
+				$intervalSla = $this->calculateSla($service, $interval['from'], $interval['to'], $latestValue);
+
+				$rs[$service['serviceid']]['sla'][] = array(
+					'from' => $interval['from'],
+					'to' => $interval['to'],
+					'sla' => $intervalSla['ok'],
+					'okTime' => $intervalSla['okTime'],
+					'problemTime' => $intervalSla['problemTime'],
+					'downtimeTime' => $intervalSla['downtimeTime'],
+				);
+			}
 		}
 
 		return $rs;
@@ -694,10 +698,11 @@ class CService extends CZBXAPI {
 	 * @param array $service
 	 * @param $periodStart
 	 * @param $periodEnd
+	 * @param $prevAlarm        the value of the last service alarm
 	 *
 	 * @return array
 	 */
-	protected function calculateSla(array $service, $periodStart, $periodEnd) {
+	protected function calculateSla(array $service, $periodStart, $periodEnd, $prevAlarm) {
 		/**
 		 * structure of "$data":
 		 * - key	- time stamp
@@ -707,9 +712,6 @@ class CService extends CZBXAPI {
 		 * - ut_s	- count of uptime starts
 		 * - ut_e	- count of uptime ends
 		 */
-
-		// TODO: get the last alarm from $serviceAlarms
-		$data[$periodStart]['alarm'] = get_last_service_value($service['serviceid'], $periodStart);
 
 		foreach ($service['alarms'] as $alarm) {
 			if ($alarm['clock'] >= $periodStart && $alarm['clock'] <= $periodEnd) {
@@ -767,7 +769,6 @@ class CService extends CZBXAPI {
 			'dt' => array('problemTime' => 0, 'okTime' => 0),
 			'ut' => array('problemTime' => 0, 'okTime' => 0)
 		);
-		$prevAlarm = $data[$periodStart]['alarm'];
 		$prevTime = $periodStart;
 
 		if (isset($data[$periodStart]['ut_s'])) {
@@ -868,6 +869,35 @@ class CService extends CZBXAPI {
 			unset($trigger['serviceid']);
 
 			$rs[$serviceId] = $trigger;
+		}
+
+		return $rs;
+	}
+
+	/**
+	 * Returns the value of the latest service alarm before the given time.
+	 *
+	 * @param array $serviceIds
+	 * @param int $beforeTime
+	 *
+	 * @return array
+	 */
+	protected function fetchLatestValues(array $serviceIds, $beforeTime) {
+		// the query will return the alarms with the maximum timestamp for each service
+		// since multiple alarms can have the same timestamp, we only need to save the last one
+		$query = DBSelect(
+			'SELECT sa.serviceid,sa.value
+			FROM service_alarms as sa
+				LEFT OUTER JOIN service_alarms sa2 ON (sa.serviceid=sa2.serviceid AND sa.clock<sa2.clock)
+			WHERE sa2.servicealarmid IS NULL
+				AND sa.clock<'.zbx_dbstr($beforeTime).'
+				AND '.DBcondition('sa.serviceid', $serviceIds).'
+			ORDER BY sa.servicealarmid ASC'
+		);
+
+		$rs = array();
+		while ($alarm = DBfetch($query)) {
+			$rs[$alarm['serviceid']] = $alarm['value'];
 		}
 
 		return $rs;
@@ -1388,7 +1418,7 @@ class CService extends CZBXAPI {
 		if ($options['selectTrigger'] !== null) {
 			$triggers = API::getApi()->select('triggers', array(
 				'output' => $options['selectTrigger'],
-				'triggerids' => zbx_objectValues($result, 'triggerid'),
+				'triggerids' => array_unique(zbx_objectValues($result, 'triggerid')),
 				'preservekeys' => true,
 			));
 			foreach ($result as &$service) {
