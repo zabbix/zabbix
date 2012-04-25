@@ -85,50 +85,59 @@ class CassandraHistory {
 
 		$tzOffset = date('Z');
 
-		if(null === $from){
+		if ($from === null) {
 			$from = 0;
 			$keyFrom = '';
 		}
-		else{
-			$keyFrom = $this->_packCompositeKey($itemid, strtotime('midnight', $from) + $tzOffset);
+		else {
+			$keyFrom = $this->_packCompositeKey($itemid, bcmul(strtotime('midnight', $from) + $tzOffset, 1000));
 		}
 
-		if(null === $to){
+		if ($to === null) {
 			$to = time();
 			$keyTo = '';
 		}
-		else{
-			$keyTo = $this->_packCompositeKey($itemid, $to + $tzOffset);
+		else {
+			$keyTo = $this->_packCompositeKey($itemid, bcmul($to + $tzOffset, 1000));
 		}
 
-		if($order == ZBX_SORT_DOWN){
+		if ($order == ZBX_SORT_DOWN) {
 			$tmp = $keyFrom;
 			$keyFrom = $keyTo;
 			$keyTo = $tmp;
 		}
+
 		try {
 			$keys = $this->itemidIndex->get($itemid, null, $keyFrom, $keyTo, ($order == ZBX_SORT_DOWN));
 		}
 		catch (cassandra_NotFoundException $e) {
-		// No records found
-			$keys=array();
+			// no records found
+			$keys = array();
 		}
 		$keys = array_keys($keys);
 
 		$rows = $this->metric->multiget($keys, null, '', '', ($order == ZBX_SORT_DOWN));
 
 		$count = 0;
-		foreach($rows as $key => $column){
-			$unpackedKey = unpack('x/Cb/N2/x/x/Cb/N/Ntime/x/', $key);
+		foreach ($rows as $key => $column) {
+			/* key format: ..<itemid>...< time >.
+			 * x - skip one byte
+			 * N - uint32 value
+			 */
+			$unpackedKey = unpack('x13/N2/x/', $key);
 
-			foreach($column as $timeOffset => $value){
+			$time = bcmul($unpackedKey['1'], 4294967296);
+			$time = bcadd($time, $unpackedKey['2']);
+			$time = bcdiv($time, 1000, 0);
+
+			foreach ($column as $timeOffset => $value) {
 				// maybe in future we will need to handle milliseconds here.
-				$clock = round($timeOffset / 1000, 0) + $unpackedKey['time'];
+				$clock = round($timeOffset / 1000, 0) + $time;
 
-				if(($clock >= $from) && ($clock <= $to)){
+				if ($clock >= $from && $clock <= $to) {
 					$result[$clock] = $value;
 					$count++;
-					if((null !== $limit) && ($count >= $limit)){
+					if ($limit !== null && $count >= $limit) {
 						break 2;
 					}
 				}
@@ -157,29 +166,29 @@ class CassandraHistory {
 		// If we are on a 32bit architecture we have to explicitly deal with
 		// 64-bit twos-complement arithmetic since PHP wants to treat all ints
 		// as signed and any int over 2^31 - 1 as a float
-		if(PHP_INT_SIZE == 4){
+		if (PHP_INT_SIZE == 4) {
 			$neg = $value < 0;
 
-			if($neg){
+			if ($neg) {
 				$value *= -1;
 			}
 
 			$hi = (int) ($value / 4294967296);
 			$lo = $value - $hi * 4294967296;
 
-			if($neg){
+			if ($neg) {
 				$hi = ~$hi;
 				$lo = ~$lo;
-				if(($lo & (int) 0xffffffff) == (int) 0xffffffff){
+				if (($lo & (int) 0xffffffff) == (int) 0xffffffff) {
 					$lo = 0;
 					$hi++;
 				}
-				else{
+				else {
 					$lo++;
 				}
 			}
 		}
-		else{
+		else {
 			$hi = $value >> 32;
 			$lo = $value & 0xFFFFFFFF;
 		}
