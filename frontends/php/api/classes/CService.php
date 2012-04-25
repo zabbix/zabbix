@@ -843,7 +843,7 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Returns an array of triggersTODO which are in a problem state and are linked to the given services.
+	 * Returns an array of triggers which are in a problem state and are linked to the given services.
 	 *
 	 * @param array $serviceIds
 	 *
