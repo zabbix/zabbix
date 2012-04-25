@@ -1656,6 +1656,11 @@ function utf8RawUrlDecode($source){
 			return false;
 		}
 
+		if(!is_null($deps) && !validate_trigger_dependency($expression, $deps)) {
+			error(S_WRONG_DEPENDENCY_ERROR);
+			return false;
+		}
+
 		if (!validate_trigger_expression($expr)) {
 			return false;
 		}
