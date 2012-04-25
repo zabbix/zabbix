@@ -1010,7 +1010,6 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 					{
 						h->status = ITEM_STATUS_NOTSUPPORTED;
 						h->value_null = 1;
-						goto notsupported;
 					}
 					break;
 				case ITEM_STORE_SPEED_PER_SECOND:
@@ -1025,16 +1024,17 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 						{
 							h->status = ITEM_STATUS_NOTSUPPORTED;
 							h->value_null = 1;
-							goto notsupported;
 						}
 					}
 					else
 						h->value_null = 1;
 
-					zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
-							",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
-					item->prevorgvalue_null = 0;
-
+					if (ITEM_STATUS_NOTSUPPORTED != h->status)
+					{
+						zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
+								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
+						item->prevorgvalue_null = 0;
+					}
 					break;
 				case ITEM_STORE_SIMPLE_CHANGE:
 					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl)
@@ -1046,19 +1046,18 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 						{
 							h->status = ITEM_STATUS_NOTSUPPORTED;
 							h->value_null = 1;
-							goto notsupported;
 						}
 					}
 					else
 						h->value_null = 1;
 
-					zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
-							",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
-					item->prevorgvalue_null = 0;
-
+					if (ITEM_STATUS_NOTSUPPORTED != h->status)
+					{
+						zbx_snprintf_alloc(&sql, &sql_allocated, sql_offset, 512,
+								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
+						item->prevorgvalue_null = 0;
+					}
 					break;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
 			}
 
 			if (0 == h->value_null)
@@ -1119,8 +1118,6 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
 					item->prevorgvalue_null = 0;
 					break;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
 			}
 
 			if (0 == h->value_null)
@@ -1141,8 +1138,6 @@ static void	DCadd_update_item_sql(int *sql_offset, DB_ITEM *item, ZBX_DC_HISTORY
 					value_esc);
 			zbx_free(value_esc);
 			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
 	}
 notsupported:
 	if (ITEM_STATUS_NOTSUPPORTED == h->status)
