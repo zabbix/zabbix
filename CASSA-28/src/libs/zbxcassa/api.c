@@ -422,9 +422,10 @@ static void	zbx_cassandra_add_mutation(GByteArray *key, char *column_family, GBy
 
 void	zbx_cassandra_add_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, const char *value)
 {
-	GByteArray		*__key;
-	GByteArray		*__column;
-	GByteArray		*__value;
+	GByteArray	*__key;
+	GByteArray	*__column;
+	GByteArray	*__value;
+	zbx_uint64_t	day, offset;
 
 	if (NULL == history.mutation_map)
 	{
@@ -432,20 +433,25 @@ void	zbx_cassandra_add_history_value(zbx_uint64_t itemid, zbx_uint64_t clock, co
 				(GDestroyNotify)g_byte_array_unref, (GDestroyNotify)g_hash_table_unref);
 	}
 
-	__key = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
-	__column = zbx_cassandra_encode_integer_type((clock % SEC_PER_DAY) * 1000);
+	offset = clock % SEC_PER_DAY;
+	day = clock - offset;
+	offset *= (zbx_uint64_t)__UINT64_C(1000);
+	day *= (zbx_uint64_t)__UINT64_C(1000);
+
+	__key = zbx_cassandra_encode_composite_type(itemid, day);
+	__column = zbx_cassandra_encode_integer_type(offset);
 	__value = zbx_cassandra_encode_ascii_type(value);
 
 	zbx_cassandra_add_mutation(__key, "metric", __column, __value);
 
 	__key = zbx_cassandra_encode_long_type(itemid);
-	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
+	__column = zbx_cassandra_encode_composite_type(itemid, day);
 	__value = zbx_cassandra_encode_ascii_type("\1");
 
 	zbx_cassandra_add_mutation(__key, "metric_by_parameter", __column, __value);
 
-	__key = zbx_cassandra_encode_long_type(clock - clock % SEC_PER_DAY);
-	__column = zbx_cassandra_encode_composite_type(itemid, clock - clock % SEC_PER_DAY);
+	__key = zbx_cassandra_encode_long_type(day);
+	__column = zbx_cassandra_encode_composite_type(itemid, day);
 	__value = zbx_cassandra_encode_ascii_type("\1");
 
 	zbx_cassandra_add_mutation(__key, "metric_by_date", __column, __value);
