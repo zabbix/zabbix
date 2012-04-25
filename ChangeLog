@@ -601,6 +601,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.13rc1
 
+..F....... [ZBX-4849] implemented a check that a trigger expression doesn't use items from both hosts and templates at the same time (Pavels)
 ....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
 
 Changes for 1.8.12
