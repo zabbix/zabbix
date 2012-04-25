@@ -80,7 +80,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->input_type('alert_history', '-1');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Do not keep actions older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep actions older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
 		$this->assertTitle('Configuration of housekeeper');
@@ -88,7 +88,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->input_type('alert_history', '65536');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Do not keep actions older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep actions older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper'));
 
 		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
@@ -126,7 +126,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->input_type('event_history', '-1');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Do not keep events older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep events older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
 		$this->assertTitle('Configuration of housekeeper');
@@ -134,8 +134,8 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->input_type('event_history', '65536');
 		$this->button_click('save');
 		$this->wait();
-		//$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "event_history".', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Do not keep events older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
+		//$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "event_history".', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep events older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
 
 		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
