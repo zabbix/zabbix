@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
 ........S. [ZBX-4671] fixed truncation of the calculated item formula (Sasha)
 ........S. [ZBX-4893] fixed linking of item applications by a discovery rule (Sasha)
 ..F....... [ZBX-4649] fixed Editing screen does not work properly after moving content to other cell (Toms)
@@ -601,6 +602,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.13rc1
 
+........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
 ..F....... [ZBX-4849] implemented a check that a trigger expression doesn't use items from both hosts and templates at the same time (Pavels)
 ....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
 
