@@ -368,7 +368,7 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Modifies the SQL parts to implement all of the ouput related options.
+	 * Modifies the SQL parts to implement all of the output related options.
 	 *
 	 * @param string $tableName
 	 * @param string $tableAlias

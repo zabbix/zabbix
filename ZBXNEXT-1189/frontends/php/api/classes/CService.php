@@ -943,28 +943,46 @@ class CService extends CZBXAPI {
 	}
 
 	/**
-	 * Returns an array of dependencies that are descendants of the given services.
+	 * Returns an array of dependencies that are descendants of the given services. Performs permission checks.
 	 *
 	 * @param array $parentServiceIds
 	 * @param $output
 	 *
 	 * @return array
-	 *
-	 * TODO: permission check
 	 */
 	protected function fetchDescendantDependencies(array $parentServiceIds, $output) {
-		$rs = API::getApi()->select('services_links', array(
-			'output' => $output,
-			'filter' => array(
-				'serviceupid' => $parentServiceIds
-			)
-		));
-
+		$rs = $this->fetchChildDependencies($parentServiceIds, $output);
 		if ($rs) {
 			$rs = array_merge($rs, $this->fetchDescendantDependencies(zbx_objectValues($rs, 'servicedownid'), $output));
 		}
 
 		return $rs;
+	}
+
+	/**
+	 * Returns an array of dependencies that are children of the given services. Performs permission checks.
+	 *
+	 * @param array $parentServiceIds
+	 * @param $output
+	 *
+	 * @return array an array of service links
+	 */
+	protected function fetchChildDependencies(array $parentServiceIds, $output) {
+		$sqlParts = API::getApi()->createSelectQueryParts('services_links', 'sl', array(
+			'output' => $output,
+			'filter' => array('serviceupid' => $parentServiceIds)
+		));
+
+		// add permission filter
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
+			$sqlParts['where'][] = 'sl.servicedownid='.$this->fieldId('serviceid');
+			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
+		}
+
+		$sql = $this->createSelectQueryFromParts($sqlParts);
+
+		return DBfetchArray(DBselect($sql));
 	}
 
 	/**
@@ -1329,10 +1347,7 @@ class CService extends CZBXAPI {
 		// selectDependencies
 		if ($options['selectDependencies'] !== null) {
 			$dependencyOutput = $this->extendOutputOption('services_links', 'serviceupid', $options['selectDependencies']);
-			$dependencies = API::getApi()->select('services_links', array(
-				'output' => $dependencyOutput,
-				'filter' => array('serviceupid' => $serviceIds)
-			));
+			$dependencies = $this->fetchChildDependencies($serviceIds, $dependencyOutput);
 			foreach ($result as &$service) {
 				$service['dependencies'] = array();
 			}
