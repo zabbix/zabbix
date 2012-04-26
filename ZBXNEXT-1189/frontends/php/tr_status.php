@@ -340,9 +340,10 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_EXTEND,
+		'expandDescription' => true
 	);
 	$triggers = API::Trigger()->get($options);
 
@@ -432,8 +433,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 	}
 
-	$trigger_descriptions = expandTriggersDescriptions($triggerids);
-
 	$dep_res = DBselect(
 		'SELECT triggerid_down,triggerid_up'.
 		' FROM trigger_depends'.
@@ -468,11 +467,6 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 		$trigger['items'] = $items;
 
-
-//----
-
-		$description = new CSpan($trigger_descriptions[$tnum], 'link_menu');
-
 		// trigger js menu
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
@@ -486,6 +480,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			$menu_trigger_url = "['"._('URL')."',".CJs::encodeJson(CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))).",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
+
+		$description = new CSpan($trigger['description'], 'link_menu');
 		$description->addAction('onclick',
 			"javascript: create_mon_trigger_menu(event, [{'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."],".
@@ -522,9 +518,10 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
 		if (!empty($triggerids_down[$trigger['triggerid']])) {
-			$dep_rows = expandTriggersDescriptions($triggerids_down[$trigger['triggerid']]);
-			foreach ($dep_rows as $dep_row) {
-				$dep_table->addRow(SPACE.'-'.SPACE.$dep_row);
+			$depTriggers = zbx_toObject($triggerids_down[$trigger['triggerid']], 'triggerid');
+			$depTriggers = expandTriggerDescriptions($depTriggers);
+			foreach ($depTriggers as $depTrigger) {
+				$dep_table->addRow(SPACE.'-'.SPACE.$depTrigger['description']);
 				$dependency = true;
 			}
 		}

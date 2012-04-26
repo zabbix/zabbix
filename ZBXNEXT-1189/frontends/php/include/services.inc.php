@@ -123,7 +123,6 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
 
 // TODO: comment
 // TODO: check sort order
-// TODO: optimize trigger description expansion
 function createShowServiceTree(array $services, array $slaData, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
 	// if no parent service is given, start from the root
 	if (!$service) {
@@ -164,8 +163,7 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 		$trigger = $service['trigger'];
 		$caption = array(get_node_name_by_elid($service['serviceid'], null, ': '), $service['name']);
 		if ($trigger) {
-			$url = new CLink(
-				expand_trigger_description($trigger['triggerid']),
+			$url = new CLink($trigger['description'],
 				'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
 			);
 			$caption[] = ' [';
@@ -178,7 +176,9 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 		if ($serviceSla['problems']) {
 			$problemList = new CList(null, 'itservices');
 			foreach ($serviceSla['problems'] as $problemTrigger) {
-				$problemList->addItem(new CLink(expand_trigger_description($problemTrigger['triggerid']), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']));
+				$problemList->addItem(new CLink($problemTrigger['description'],
+					'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
+				));
 			}
 		}
 
