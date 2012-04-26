@@ -101,8 +101,6 @@ class CsetupWizard extends CForm {
 	}
 
 	function bodyToString($destroy = true) {
-		$container = new CDiv(null, 'setup_wizard');
-
 		$left = new CDiv(null, 'left');
 		$left->addItem(new CDiv(null, 'setup_logo'));
 		$left->addItem(new CDiv('v'.ZABBIX_VERSION, 'setup_version'));
@@ -112,7 +110,7 @@ class CsetupWizard extends CForm {
 		$right->addItem(new CDiv($this->stage[$this->getStep()]['title'], 'setup_title'));
 		$right->addItem(new CDiv($this->getState(), 'under_title'));
 
-		$container->addItem(array($left, $right), 'center');
+		$container = new CDiv(array($left, $right), 'setup_wizard');
 
 		if (isset($this->stage[$this->getStep() + 1])) {
 			$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>');
