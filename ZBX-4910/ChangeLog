@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+........S. [ZBX-4910] fixed updating of "SNMPv3 priv passphrase" field in low-level discovered SNMPv3 items (Sasha)
 ........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
 ........S. [ZBX-4671] fixed truncation of the calculated item formula (Sasha)
 ........S. [ZBX-4893] fixed linking of item applications by a discovery rule (Sasha)
