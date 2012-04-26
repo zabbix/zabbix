@@ -217,7 +217,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->wait();
 
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
 
 		// Check to enter -1 value
 		$this->dropdown_select_wait('configDropDown', 'GUI');
@@ -228,7 +228,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->wait();
 
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Search/Filter elements limit": must be between 1 and 999999.'));
 
 		$newHash = DBhash($sqlHash);
 		$this->assertEquals($oldHash, $newHash, "Values in some DB fields changed, but shouldn't.");
@@ -355,7 +355,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_expire', '100000');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
 
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
 
@@ -365,7 +365,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_expire', '0');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Show events not older than (in days)": must be between 1 and 99999.'));
 
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
 
@@ -404,7 +404,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_show_max', '100000');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
 
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
 
@@ -414,7 +414,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_show_max', '0');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Max count of events per trigger to show": must be between 1 and 99999.'));
 
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
 

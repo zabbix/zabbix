@@ -148,7 +148,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->input_type('refresh_unsupported', '65536');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Page received incorrect data.', 'Warning. Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.'));
+		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.'));
 		// $this->ok('Warning. Incorrect value for field "Refresh unsupported items (in sec)": must be between 0 and 65535.');
 	}
 

@@ -48,7 +48,7 @@ foreach ($data['drules'] as $drule) {
 
 	$status = new CCol(new CLink(
 		discovery_status2str($drule['status']),
-		'?g_druleid%5B%5D='.$drule['druleid'].($drule['status'] == DRULE_STATUS_ACTIVE ? '&go=disable' : '&go=activate'),
+		'?g_druleid'.SQUAREBRACKETS.'='.$drule['druleid'].($drule['status'] == DRULE_STATUS_ACTIVE ? '&go=disable' : '&go=activate'),
 		discovery_status2style($drule['status'])
 	));
 

@@ -103,11 +103,12 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 {
 	DC_ITEM		*items = NULL;
 	char		cmd[MAX_STRING_LEN], params[MAX_STRING_LEN], regex[MAX_STRING_LEN];
-	int		count, i, ret = FAIL, fallback = -1;
+	size_t		num, i;
+	int		ret = FAIL, fallback = -1;
 
-	count = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
+	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
-	for (i = 0; i < count; i++)
+	for (i = 0; i < num; i++)
 	{
 		if (0 == parse_command(items[i].key_orig, cmd, sizeof(cmd), params, sizeof(params)))
 			continue;
@@ -134,6 +135,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		set_item_value(&items[fallback], trap, ts);
 	}
 
+	DCconfig_clean_items(items, NULL, num);
 	zbx_free(items);
 
 	return ret;

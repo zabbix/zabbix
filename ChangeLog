@@ -1,7 +1,21 @@
 --------------------------------------------------------------------------------
+Changes for 2.0.0rc4
+
+New features:
+..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
+
+Bug fixes:
+........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
+........S. [ZBX-4671] fixed truncation of the calculated item formula (Sasha)
+........S. [ZBX-4893] fixed linking of item applications by a discovery rule (Sasha)
+..F....... [ZBX-4649] fixed Editing screen does not work properly after moving content to other cell (Toms)
+..F....... [ZBX-4875] fixed graph item with long description cannot be dragged/sorted properly in graph form (Toms)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.0rc3
 
 New features:
+....I..... [ZBXNEXT-973] redesign of existing templates (Alexei, Sasha)
 ..F....... [ZBX-4869] added support for nested screens import (Vedmak)
 A.F....... [ZBXNEXT-1161] implemented the service API (Pavels)
 A.F....... [ZBXNEXT-1126] redesign Script execution (Eduard)
@@ -14,6 +28,7 @@ A.F....... [ZBXNEXT-908] redesign Configuration->Host->Graphs (Eduard)
 ..F....... [ZBX-1357] updated Czech, French, German, Greek, Japanese, Polish, Russian, Spanish and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A.F....... [ZBX-4890] fixed creating hosts by administrators (Pavels)
 ..F....... [ZBXNEXT-1161] fixed multiple IT service validation issues (Pavels)
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
 .......PS. [ZBX-4709] fixed processing of quoted strings in SNMP items (Sasha)
@@ -585,6 +600,16 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.13rc1
+
+........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
+..F....... [ZBX-4849] implemented a check that a trigger expression doesn't use items from both hosts and templates at the same time (Pavels)
+....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
+
+Changes for 1.8.12
+
+1.8.12rc1 was released as 1.8.12 without any changes
+
 Changes for 1.8.12rc2
 
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
