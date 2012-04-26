@@ -757,47 +757,65 @@ var hintBox = {
 	},
 
 	positionHint: function(target) {
-		var targetTop = jQuery(target).offset().top,
-			targetHeight = jQuery(target).height(),
-			wWidth = jQuery(window).width(),
+		var wWidth = jQuery(window).width(),
 			wHeight = jQuery(window).height(),
 			scrollTop = jQuery(window).scrollTop(),
 			scrollLeft = jQuery(window).scrollLeft(),
 			top, left;
 
+		// uses stored clientX on afterload positioning when there is no event
 		if (window.event.clientX) {
 			target.clientX = window.event.clientX;
+			target.clientY = window.event.clientY;
 		}
 
-		// align verticaly higher than target
-		if (targetTop + targetHeight/2 - scrollTop > wHeight/2) {
-			// 10px above target
-			if (targetTop + targetHeight/2 - scrollTop - target.hintBoxItem.height() > 10) {
-				top =  targetTop + targetHeight/2 - target.hintBoxItem.height() - 10;
+		// doesn't fit in the screen horizontaly
+		if (target.hintBoxItem.width() + 10 > wWidth) {
+			left = scrollLeft + 2;
+		}
+		// 10px to right if fit
+		else if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+			left = scrollLeft + target.clientX + 10;
+		}
+		// 10px from screen right side
+		else {
+			left = scrollLeft + wWidth - 10 - target.hintBoxItem.width();
+		}
+
+		// 10px below if fit
+		if (wHeight - target.clientY - target.hintBoxItem.height() - 10 > 0) {
+			top = scrollTop + target.clientY + 10;
+		}
+		// 10px above if fit
+		else if (target.clientY - target.hintBoxItem.height() - 10 > 0) {
+			top = scrollTop + target.clientY - target.hintBoxItem.height() - 10;
+		}
+		// 10px below as fallback
+		else {
+			top = scrollTop + target.clientY + 10;
+		}
+
+		// fallback if doesnt't fit verticaly but could fit if aligned to right or left
+		if ((top - scrollTop + target.hintBoxItem.height() > wHeight)
+			&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
+
+			// align to left if fit
+			if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+				left = scrollLeft + target.clientX + 10;
 			}
-			// 10px from screen top
+			// align to right
+			else {
+				left = scrollLeft + target.clientX - target.hintBoxItem.width() - 10;
+			}
+
+			// 10px from bottom if fit
+			if (wHeight - 10 > target.hintBoxItem.height()) {
+				top = scrollTop + wHeight - target.hintBoxItem.height() - 10;
+			}
+			// 10px from top
 			else {
 				top = scrollTop + 10;
 			}
-		}
-		// align verticaly lower than target
-		else {
-			// 10px from screen bottom
-			if (targetTop + targetHeight/2 - scrollTop + target.hintBoxItem.height() + 10 > wHeight) {
-				top = scrollTop + wHeight - target.hintBoxItem.height() - 10;
-			}
-			// 10px below target
-			else {
-				top = targetTop + targetHeight + 10;
-			}
-		}
-
-		// align horizontaly
-		if ((target.clientX - scrollLeft ) > wWidth/2) {
-			left = scrollLeft + target.clientX - target.hintBoxItem.width() - 20;
-		}
-		else {
-			left = scrollLeft + target.clientX + 20;
 		}
 
 		target.hintBoxItem.css({
