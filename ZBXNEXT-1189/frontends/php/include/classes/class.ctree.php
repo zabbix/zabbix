@@ -20,6 +20,11 @@
 ?>
 <?php
 
+/**
+ * A class for rendering service trees.
+ *
+ * @see createShowServiceTree() and createServiceTree() for a way of creating trees from services
+ */
 class CTree {
 
 	public $tree;
@@ -178,7 +183,7 @@ class CTree {
 
 	private function countDepth() {
 		foreach ($this->tree as $id => $rows) {
-			if ($rows['id'] == '0') {
+			if ($rows['serviceid'] == '0') {
 				continue;
 			}
 			$parentid = $this->tree[$id]['parentid'];

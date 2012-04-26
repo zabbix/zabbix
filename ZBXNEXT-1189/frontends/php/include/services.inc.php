@@ -136,15 +136,17 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 			'sla' => SPACE,
 			'sla2' => SPACE,
 			'trigger' => array(),
-			'dependencies' => array(),
 			'reason' => SPACE,
 			'graph' => SPACE,
 		);
 
+		$service = $serviceNode;
+		$service['dependencies'] = array();
+
 		// add all top level services as children of "root"
 		foreach ($services as $topService) {
 			if (!$topService['parent']) {
-				$serviceNode['childs'][] = array(
+				$service['dependencies'][] = array(
 					'servicedownid' => $topService['serviceid'],
 					'soft' => 0,
 					'linkid' => 0
@@ -153,7 +155,6 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 		}
 
 		$tree = array($serviceNode);
-		$service = $serviceNode;
 	}
 	// create a not from the given service
 	else {
@@ -222,20 +223,15 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 			$sla2 = '-';
 		}
 
-		// TODO: proper child format
 		// TODO: graph links
-		// TODO: get rid of either "id" or "serviceid"
 		$serviceNode = array(
-			'id' => $service['serviceid'],
 			'serviceid' => $service['serviceid'],
 			'caption' => $caption,
 			'graph' => !empty($service['triggerid']) ? new CLink(_('Show'), 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path')) : '-',
-			'serviceup' => ($service['parent']) ? $service['parent']['serviceid'] : 0,
 			'description' => ($service['trigger']) ? $service['trigger']['description'] : _('None'),
 			'reason' => $problemList,
 			'sla' => $sla,
 			'sla2' => $sla2,
-			'childs' => $service['dependencies'],
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
 			'status' => $serviceSla['status']
 		);
@@ -243,9 +239,9 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 
 	// hard dependencies and dependencies for the "root" node
 	if (!$dependency || $dependency['soft'] == 0) {
-		$tree[$serviceNode['id']] = $serviceNode;
+		$tree[$serviceNode['serviceid']] = $serviceNode;
 
-		foreach ($serviceNode['childs'] as $dependency) {
+		foreach ($service['dependencies'] as $dependency) {
 			$childService = $services[$dependency['servicedownid']];
 			$tree = createShowServiceTree($services, $slaData, $service, $childService, $dependency, $tree);
 		}
@@ -255,7 +251,7 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 		$serviceNode['caption'] = new CSpan($serviceNode['caption']);
 		$serviceNode['caption']->setAttribute('style', 'color: #888888;');
 
-		$tree[$serviceNode['id'].'.'.$dependency['linkid']] = $serviceNode;
+		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
 	}
 
 	return $tree;
