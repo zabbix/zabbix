@@ -123,6 +123,15 @@ else {
 		'sorfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($services, 'trigger');
+	$triggers = expandTriggerDescriptions(zbx_toHash($triggers, 'triggerid'));
+	foreach ($services as &$service) {
+		if ($service['trigger']) {
+			$service['trigger'] = $triggers[$service['trigger']['triggerid']];
+		}
+	}
+	unset($service);
 
 	// fetch sla
 	$slaData = API::Service()->getSla(array(
@@ -132,6 +141,19 @@ else {
 			'to' => $period_end
 		))
 	));
+	// expand problem trigger descriptions
+	$triggers = array();
+	foreach ($slaData as $serviceSla) {
+		$triggers = array_merge($triggers, $serviceSla['problems']);
+	}
+	$triggers = expandTriggerDescriptions(zbx_toHash($triggers, 'triggerid'));
+	foreach ($slaData as &$serviceSla) {
+		foreach ($serviceSla['problems'] as &$problemTrigger) {
+			$problemTrigger = $triggers[$problemTrigger['triggerid']];
+		}
+		unset($problemTrigger);
+	}
+	unset($serviceSla);
 
 	$treeServ = createShowServiceTree($services, $slaData);
 
