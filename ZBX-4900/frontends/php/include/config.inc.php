@@ -599,7 +599,24 @@ function __autoload($class_name){
 
 	function get_status(){
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-		$status = array();
+		$status = array(
+			'triggers_count' => 0,
+			'triggers_count_enabled' => 0,
+			'triggers_count_disabled' => 0,
+			'triggers_count_off' => 0,
+			'triggers_count_on' => 0,
+			'triggers_count_unknown' => 0,
+			'items_count' => 0,
+			'items_count_monitored' => 0,
+			'items_count_disabled' => 0,
+			'items_count_not_supported' => 0,
+			'hosts_count' => 0,
+			'hosts_count_monitored' => 0,
+			'hosts_count_not_monitored' => 0,
+			'hosts_count_template' => 0,
+			'users_online' => 0,
+			'qps_total' => 0
+		);
 // server
 		$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
 		if(!$checkport) {
@@ -610,7 +627,6 @@ function __autoload($class_name){
 			$status['zabbix_server'] = S_YES;
 		}
 // triggers
-		$status['triggers_count_disabled'] = 0;
 		$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) as cnt,t.status,t.value'.
 				' FROM triggers t, functions f, items i, hosts h'.
 				' WHERE t.triggerid=f.triggerid'.
@@ -677,11 +693,9 @@ function __autoload($class_name){
 				case HOST_STATUS_MONITORED:
 					$status['hosts_count_monitored'] = $dbHost['cnt'];
 					break;
-
 				case HOST_STATUS_NOT_MONITORED:
 					$status['hosts_count_not_monitored'] = $dbHost['cnt'];
 					break;
-
 				case HOST_STATUS_TEMPLATE:
 					$status['hosts_count_template'] = $dbHost['cnt'];
 					break;
@@ -692,14 +706,12 @@ function __autoload($class_name){
 
 
 // users
-		$row=DBfetch(DBselect('SELECT COUNT(userid) as usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
-		$status['users_count']=$row['usr_cnt'];
+		$row = DBfetch(DBselect('SELECT COUNT(userid) as usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
+		$status['users_count'] = $row['usr_cnt'];
 
 
-		$status['users_online'] = 0;
-
-		$sql = 'SELECT s.userid, s.status, MAX(s.lastaccess) as lastaccess '.
-				' FROM sessions s '.
+		$sql = 'SELECT s.userid, s.status, MAX(s.lastaccess) as lastaccess'.
+				' FROM sessions s'.
 				' WHERE '.DBin_node('s.userid').
 					' AND s.status='.ZBX_SESSION_ACTIVE.
 				' GROUP BY s.userid,s.status';
@@ -709,17 +721,17 @@ function __autoload($class_name){
 		}
 
 // Comments: !!! Don't forget sync code with C !!!
-		$sql = 'SELECT sum(1.0/i.delay) as qps '.
-				' FROM items i,hosts h '.
+		$sql = 'SELECT sum(1.0/i.delay) as qps'.
+				' FROM items i,hosts h'.
 				' WHERE i.status='.ITEM_STATUS_ACTIVE.
-					' AND i.hostid=h.hostid '.
+					' AND i.hostid=h.hostid'.
 					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND i.delay<>0';
 		$row = DBfetch(DBselect($sql));
 
 		$status['qps_total'] = round($row['qps'],2);
 
-	return $status;
+		return $status;
 	}
 
 	function set_image_header($format=null){
