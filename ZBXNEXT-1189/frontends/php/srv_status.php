@@ -142,14 +142,9 @@ else {
 		))
 	));
 	// expand problem trigger descriptions
-	$triggers = array();
-	foreach ($slaData as $serviceSla) {
-		$triggers = array_merge($triggers, $serviceSla['problems']);
-	}
-	$triggers = expandTriggerDescriptions(zbx_toHash($triggers, 'triggerid'));
 	foreach ($slaData as &$serviceSla) {
 		foreach ($serviceSla['problems'] as &$problemTrigger) {
-			$problemTrigger = $triggers[$problemTrigger['triggerid']];
+			$problemTrigger['description'] = $triggers[$problemTrigger['triggerid']]['description'];
 		}
 		unset($problemTrigger);
 	}
