@@ -180,11 +180,16 @@ class CConfigurationExport {
 		));
 
 		// merge host groups with all groups
-		$templateGroups = $templateScreenIds = array();
+		$templateGroups = array();
+		$templateScreenIds = array();
 		foreach ($templates as &$template) {
 			$templateGroups += zbx_toHash($template['groups'], 'groupid');
 			$templateScreenIds = array_merge($templateScreenIds, zbx_objectValues($template['screens'], 'screenid'));
-			unset($template['screens']);
+
+			$template['screens'] = array();
+			$template['applications'] = array();
+			$template['discoveryRules'] = array();
+			$template['items'] = array();
 		}
 		unset($template);
 		$this->data['groups'] += $templateGroups;
@@ -211,7 +216,6 @@ class CConfigurationExport {
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		));
-
 		$this->prepareScreenExport($screens);
 
 		foreach ($screens as $screen) {
@@ -245,9 +249,13 @@ class CConfigurationExport {
 
 		// merge host groups with all groups
 		$hostGroups = array();
-		foreach ($hosts as $host) {
+		foreach ($hosts as &$host) {
 			$hostGroups += zbx_toHash($host['groups'], 'groupid');
+			$host['applications'] = array();
+			$host['discoveryRules'] = array();
+			$host['items'] = array();
 		}
+		unset($host);
 		$this->data['groups'] += $hostGroups;
 
 		// applications
@@ -337,12 +345,13 @@ class CConfigurationExport {
 		$DbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
 		$valueMaps = array();
 		while ($valueMap = DBfetch($DbValueMaps)) {
-			$valueMaps[$valueMap['valuemapid']] = array('name' => $valueMap['name']);
+			$valueMaps[$valueMap['valuemapid']] = $valueMap['name'];
 		}
 
 		foreach ($items as &$item) {
+			$item['valuemap'] = array();
 			if ($item['valuemapid']) {
-				$item['valuemap'] = $valueMaps[$item['valuemapid']];
+				$item['valuemap']['name'] = $valueMaps[$item['valuemapid']];
 			}
 		}
 		unset($item);
@@ -408,6 +417,13 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function prepareDiscoveryRules(array $items) {
+		foreach ($items as &$item) {
+			$item['itemPrototypes'] = array();
+			$item['graphPrototypes'] = array();
+			$item['triggerPrototypes'] = array();
+		}
+		unset($item);
+
 		// gather item prototypes
 		$prototypes = API::ItemPrototype()->get(array(
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
@@ -426,18 +442,13 @@ class CConfigurationExport {
 		$DbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
 		$valueMaps = array();
 		while ($valueMap = DBfetch($DbValueMaps)) {
-			$valueMaps[$valueMap['valuemapid']] = array('name' => $valueMap['name']);
+			$valueMaps[$valueMap['valuemapid']] = $valueMap['name'];
 		}
 
 		foreach ($prototypes as $prototype) {
-			if (!isset($hosts[$prototype['hostid']]['items'])) {
-				$hosts[$prototype['hostid']]['items'] = array();
-				$hosts[$prototype['hostid']]['discoveryRules'] = array();
-				$hosts[$prototype['hostid']]['itemPrototypes'] = array();
-			}
-
+			$prototype['valuemap'] = array();
 			if ($prototype['valuemapid']) {
-				$prototype['valuemap'] = $valueMaps[$prototype['valuemapid']];
+				$prototype['valuemap']['name'] = $valueMaps[$prototype['valuemapid']];
 			}
 
 			$items[$prototype['parent_itemid']]['itemPrototypes'][] = $prototype;
@@ -893,8 +904,6 @@ class CConfigurationExport {
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$selement['elementid'] = $triggers[$selement['elementid']];
 						break;
-					case SYSMAP_ELEMENT_TYPE_IMAGE:
-						$selement['elementid'] = $images[$selement['elementid']];
 				}
 
 				$selement['iconid_off'] = $selement['iconid_off'] > 0 ? $images[$selement['iconid_off']] : '';
