@@ -1017,7 +1017,7 @@ class CService extends CZBXAPI {
 	 * @param array $parentServiceIds
 	 * @param $output
 	 *
-	 * @return array an array of service links
+	 * @return array    an array of service links sorted by "sortorder" in ascending order
 	 */
 	protected function fetchChildDependencies(array $parentServiceIds, $output) {
 		$sqlParts = API::getApi()->createSelectQueryParts('services_links', 'sl', array(
@@ -1025,10 +1025,13 @@ class CService extends CZBXAPI {
 			'filter' => array('serviceupid' => $parentServiceIds)
 		));
 
+		// sort by sortorder
+		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
+		$sqlParts['where'][] = 'sl.servicedownid='.$this->fieldId('serviceid');
+		$sqlParts['order'][] = $this->fieldId('sortorder').' '.ZBX_SORT_UP;
+
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
-			$sqlParts['where'][] = 'sl.servicedownid='.$this->fieldId('serviceid');
 			$sqlParts['where'][] = '('.$this->fieldId('triggerid').' IS NULL OR '.DBcondition($this->fieldId('triggerid'), get_accessible_triggers(PERM_READ_ONLY)).')';
 		}
 

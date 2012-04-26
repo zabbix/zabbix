@@ -127,9 +127,7 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 	// if no parent service is given, start from the root
 	if (!$service) {
 		$serviceNode = array(
-			'id' => 0,
 			'serviceid' => 0,
-			'parent' => array(),
 			'parentid' => 0,
 			'caption' => _('root'),
 			'status' => SPACE,
@@ -142,6 +140,8 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 
 		$service = $serviceNode;
 		$service['dependencies'] = array();
+		$service['trigger'] = array();
+		$service['parent'] = array();
 
 		// add all top level services as children of "root"
 		foreach ($services as $topService) {

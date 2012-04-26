@@ -120,7 +120,7 @@ else {
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
 		'selectTrigger' => array('description', 'triggerid'),
 		'preservekeys' => true,
-		'sorfield' => 'sortorder',
+		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
 	// expand trigger descriptions
