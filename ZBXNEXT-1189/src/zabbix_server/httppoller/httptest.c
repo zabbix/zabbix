@@ -152,6 +152,8 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		free_result(&value);
 	}
 
+	DCconfig_clean_items(items, errcodes, num);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -226,6 +228,8 @@ static void	process_step_data(zbx_uint64_t httpstepid, ZBX_HTTPSTAT *stat, zbx_t
 
 		free_result(&value);
 	}
+
+	DCconfig_clean_items(items, errcodes, num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

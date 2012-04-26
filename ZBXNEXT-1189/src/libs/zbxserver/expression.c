@@ -469,7 +469,7 @@ static void	DCexpand_trigger_expression(char **expression)
 	DC_FUNCTION	function;
 	DC_ITEM		item;
 	zbx_uint64_t	functionid;
-	int		rc;
+	int		errcode[2];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, *expression);
 
@@ -496,13 +496,13 @@ static void	DCexpand_trigger_expression(char **expression)
 
 		if (SUCCEED == is_uint64(&(*expression)[l + 1], &functionid))
 		{
-			DCconfig_get_functions_by_functionids(&function, &functionid, &rc, 1);
+			DCconfig_get_functions_by_functionids(&function, &functionid, &errcode[0], 1);
 
-			if (SUCCEED == rc)
+			if (SUCCEED == errcode[0])
 			{
-				DCconfig_get_items_by_itemids(&item, &function.itemid, &rc, 1);
+				DCconfig_get_items_by_itemids(&item, &function.itemid, &errcode[1], 1);
 
-				if (SUCCEED == rc)
+				if (SUCCEED == errcode[1])
 				{
 					zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '{');
 					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, item.host.host);
@@ -514,11 +514,13 @@ static void	DCexpand_trigger_expression(char **expression)
 					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, function.parameter);
 					zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, ")}");
 				}
+
+				DCconfig_clean_items(&item, &errcode[1], 1);
 			}
 
-			DCconfig_clean_functions(&function, &rc, 1);
+			DCconfig_clean_functions(&function, &errcode[0], 1);
 
-			if (SUCCEED != rc)
+			if (SUCCEED != errcode[0] || SUCCEED != errcode[1])
 				zbx_strcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, "*ERROR*");
 
 			l = r;
