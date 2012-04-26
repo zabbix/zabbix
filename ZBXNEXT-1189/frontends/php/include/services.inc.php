@@ -121,8 +121,20 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
 	return null;
 }
 
-// TODO: comment
-// TODO: check sort order
+/**
+ * Creates nodes that can be used to display the SLA report tree using the CTree class.
+ *
+ * @see CTree
+ *
+ * @param array $services       an array of services to display in the tree
+ * @param array $slaData        sla report data, see CService::getSla()
+ * @param array $parentService
+ * @param array $service
+ * @param array $dependency
+ * @param array $tree
+ *
+ * @return array    an array of SLA tree nodes
+ */
 function createShowServiceTree(array $services, array $slaData, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
 	// if no parent service is given, start from the root
 	if (!$service) {
@@ -223,11 +235,10 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 			$sla2 = '-';
 		}
 
-		// TODO: graph links
 		$serviceNode = array(
 			'serviceid' => $service['serviceid'],
 			'caption' => $caption,
-			'graph' => !empty($service['triggerid']) ? new CLink(_('Show'), 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path')) : '-',
+			'graph' => ($service['showsla']) ? new CLink(_('Show'), 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path')) : '-',
 			'description' => ($service['trigger']) ? $service['trigger']['description'] : _('None'),
 			'reason' => $problemList,
 			'sla' => $sla,
