@@ -578,8 +578,6 @@ div.setup_wizard div.left_menu ul {
 div.setup_wizard div.left_menu li {
 	padding: 5px;
 	margin: 1px 0 0;
-	border-top-left-radius: 6px;
-	border-bottom-left-radius: 6px;
 }
 div.setup_wizard div.left_menu li.current {
 	color: #fff;
@@ -600,8 +598,6 @@ div.setup_wizard div.right div.setup_title {
 	background: #608CB6;
 	color: #FFF;
 	padding: 10px;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
 	text-align: left;
 }
 div.setup_wizard div.under_title {
