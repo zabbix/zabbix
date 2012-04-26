@@ -39,9 +39,9 @@
 				.data('imageFull', 'imgstore.php?iconid=' + jQuery(this).val());
 		});
 
-		jQuery('#iconMapTable tbody').delegate('img.preview', 'click', function() {
+		jQuery('#iconMapTable tbody').delegate('img.preview', 'click', function(e) {
 			var img = jQuery('<img src=' + jQuery(this).data('imageFull') + ' >');
-			hintBox.showStaticHint(this, img, '', '', true);
+			hintBox.showStaticHint(e, this, img, '', '', true);
 		});
 
 		jQuery('#addMapping').click(function() {

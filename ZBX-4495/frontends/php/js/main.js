@@ -678,7 +678,7 @@ var jqBlink = {
  */
 var hintBox = {
 
-	createBox: function(target, hintText, width, className, byClick) {
+	createBox: function(e, target, hintText, width, className, byClick) {
 		var box = jQuery('<div></div>').addClass('hintbox');
 
 		if (!empty(className)) {
@@ -699,7 +699,7 @@ var hintBox = {
 					'text-align': 'right',
 					'border-bottom': '1px #333 solid'
 				}).click(function() {
-					hintBox.hideHint(target, true);
+					hintBox.hideHint(e, target, true);
 				});
 			box.prepend(close_link);
 		}
@@ -709,54 +709,55 @@ var hintBox = {
 		return box;
 	},
 
-	showHintWraper: function(target, hintText, width, className) {
-		jQuery(target).bind('mouseenter', function(e){
-			hintBox.showHint(target, hintText, width, className, false);
+	showHintWraper: function(e, target, hintText, width, className) {
+		jQuery(target).bind('mouseenter', function(e, d){
+			if (d) e = d;
+			hintBox.showHint(e, target, hintText, width, className, false);
 		});
 		jQuery(target).removeAttr('onmouseover');
-		jQuery(target).trigger('mouseenter');
+		jQuery(target).trigger('mouseenter', e);
 	},
 
-	hideHintWraper: function(target) {
+	hideHintWraper: function(e, target) {
 		jQuery(target).bind('mouseleave', function(e){
-			hintBox.hideHint(target);
+			hintBox.hideHint(e, target);
 		});
 		jQuery(target).removeAttr('onmouseout');
 		jQuery(target).trigger('mouseleave');
 	},
 
-	showStaticHintWraper: function(target, hintText, width, className) {
+	showStaticHintWraper: function(e, target, hintText, width, className) {
 		jQuery(target).bind('click', function(e){
-			hintBox.showStaticHint(target, hintText, width, className);
+			hintBox.showStaticHint(e, target, hintText, width, className);
 		});
 		jQuery(target).removeAttr('onclick');
-		jQuery(target).trigger('click');
+		jQuery(target).trigger('click', e);
 	},
 
-	showStaticHint: function(target, hint, width, className, resizeAfterLoad) {
+	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
 		var onClick = target.onClick;
-		hintBox.hideHint(target, true);
+		hintBox.hideHint(e, target, true);
 		if (!onClick) {
 			target.onClick = true;
-			hintBox.showHint(target, hint, width, className, true);
+			hintBox.showHint(e, target, hint, width, className, true);
 			if (resizeAfterLoad) {
-				hint.one('load', function(){
-					hintBox.positionHint(target);
+				hint.one('load', function(e){
+					hintBox.positionHint(e, target);
 				});
 			}
 		}
 	},
 
-	showHint: function(target, hintText, width, className, onClick) {
+	showHint: function(e, target, hintText, width, className, onClick) {
 		if (target.hintBoxItem) return;
-		target.hintBoxItem = hintBox.createBox(target, hintText, width, className, onClick);
+		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, onClick);
 
-		hintBox.positionHint(target);
+		hintBox.positionHint(e, target);
 
 		target.hintBoxItem.show();
 	},
 
-	positionHint: function(target) {
+	positionHint: function(e, target) {
 		var wWidth = jQuery(window).width(),
 			wHeight = jQuery(window).height(),
 			scrollTop = jQuery(window).scrollTop(),
@@ -764,9 +765,9 @@ var hintBox = {
 			top, left;
 
 		// uses stored clientX on afterload positioning when there is no event
-		if (window.event.clientX) {
-			target.clientX = window.event.clientX;
-			target.clientY = window.event.clientY;
+		if (e.clientX) {
+			target.clientX = e.clientX;
+			target.clientY = e.clientY;
 		}
 
 		// doesn't fit in the screen horizontaly
@@ -825,9 +826,8 @@ var hintBox = {
 		});
 	},
 
-	hideHint: function(target, hideStatic) {
+	hideHint: function(e, target, hideStatic) {
 		if (target.onClick && !hideStatic) return;
-
 		if (target.hintBoxItem) {
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;

@@ -1129,11 +1129,11 @@ ZABBIX.apps.map = (function() {
 
 			if (this.sysmap.data.iconmapid === '0') {
 				jQuery('#use_iconmapLabel')
-					.mouseenter(function() {
-						hintBox.showHint(this, locale['S_ICONMAP_IS_NOT_ENABLED']);
+					.mouseenter(function(e) {
+						hintBox.showHint(e, this, locale['S_ICONMAP_IS_NOT_ENABLED']);
 					})
-					.mouseleave(function() {
-						hintBox.hideHint(this);
+					.mouseleave(function(e) {
+						hintBox.hideHint(e, this);
 					});
 			}
 
