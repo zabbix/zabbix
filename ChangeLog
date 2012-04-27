@@ -609,16 +609,16 @@ New features:
 Changes for 1.8.13rc1
 
 A.F....... [ZBX-4877] updated French translation; thanks to Joseph Bueno (Richlv)
-..F....... [ZBX-4900] improved performance of 'Status of Zabbix' dashboard widget (Vedmak)
+..F....... [ZBX-4900] improved performance of the 'Status of Zabbix' dashboard widget (Vedmak)
 ...G...... [ZBX-4905] fixed processing of system.swap.in/out[,pages] under Linux 2.6 (Sasha)
 ...G...... [ZBX-4907] fixed processing of system.swap.in/out[,sectors/count] under Linux (Sasha)
 ........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
 ..F....... [ZBX-4849] implemented a check that a trigger expression doesn't use items from both hosts and templates at the same time (Pavels)
-....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
+....I..... [ZBX-3929] removed deprecated Switch module from the gen.pl script (Sasha)
 
 Changes for 1.8.12
 
-1.8.12rc1 was released as 1.8.12 without any changes
+1.8.12rc2 was released as 1.8.12 without any changes
 
 Changes for 1.8.12rc2
 
@@ -627,14 +627,14 @@ Changes for 1.8.12rc2
 
 Changes for 1.8.12rc1
 
-...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
+...GI..... [ZBXNEXT-584] added support of multiple servers in active check mode; thanks to Takanori Suzuki (Sasha)
 ...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBX-4795] fixed group creation for child nodes (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
 A.F....... [ZBX-4813] fixed incorrect exception handling in maps when checking for circularity (Toms, Vedmak)
 ..F....... [ZBX-2873] fixed colors in dark theme (Vedmak)
 ..F....... [ZBX-3152] fixed global messages being shown even if all severities are unchecked (Vedmak)
-...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes longer than 15 characters (Sasha)
+...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with process names longer than 15 characters (Sasha)
 ..F....... [ZBX-4253] fixed menu link inconsistency in tr_status.php (Toms)
 .......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)
