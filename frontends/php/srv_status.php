@@ -150,7 +150,7 @@ else {
 	}
 	unset($serviceSla);
 
-	$treeServ = createShowServiceTree($services, $slaData);
+	$treeServ = createShowServiceTree($services, $slaData, $period);
 
 	$tree = new CTree('service_status_tree',
 		$treeServ,
