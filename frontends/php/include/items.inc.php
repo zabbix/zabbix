@@ -710,7 +710,7 @@ function get_items_data_overview($hostids, $view_style) {
 		return $table;
 	}
 
-	natsort($hostNames);
+	order_result($hostNames);
 
 	$css = getUserTheme($USER_DETAILS);
 	if ($view_style == STYLE_TOP) {
