@@ -56,7 +56,7 @@ msgstr[0] "%1$sアイテム"
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] ""
+msgstr[0] "%1$s回のログイン失敗がログに記録されています。最後のログイン失敗はホスト%2$sから%3$sの%4$sに行われています。"
 
 #: include/blocks.inc.php:903
 #, php-format
@@ -76,7 +76,7 @@ msgstr "(0 - 無限)"
 
 #: include/views/configuration.hostgroups.list.php:33
 msgid "(Only Super Admins can create group)"
-msgstr ""
+msgstr "(Zabbix特権管理者のみがOnly Super Admins can create group)"
 
 #: include/views/configuration.host.edit.php:193
 #: include/views/configuration.template.edit.php:140
@@ -423,7 +423,7 @@ msgstr "お気に入りに追加"
 
 #: charts.php:91 history.php:98 host_screen.php:97
 msgid "Add to favourites."
-msgstr ""
+msgstr "お気に入りに追加。"
 
 #: include/actions.inc.php:479
 msgid "Add to host group"
@@ -479,7 +479,7 @@ msgstr "エージェントのインターフェース"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "エージェント、SNMP、JMX、IPMIインターフェース"
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:848 users.php:43
@@ -580,7 +580,7 @@ msgstr "アプリケーションを更新しました"
 #: api/classes/CItemGeneral.php:294
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\"にID\"%1$s\"を持つアプリケーションは利用できません。"
 
 #: hosts.php:690 hosts.php:766 include/forms.inc.php:812
 #: include/html.inc.php:408 include/html.inc.php:412
@@ -651,7 +651,7 @@ msgstr "開始時刻"
 
 #: include/forms.inc.php:1638
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "開始時刻 (時:分)"
 
 #: api/classes/CMaintenance.php:453 api/classes/CMaintenance.php:645
 msgid "At least one host or group should be selected"
@@ -671,11 +671,11 @@ msgstr "監査"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "監査アクション"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "監査ログ"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -702,7 +702,7 @@ msgstr "認証方式"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP."
-msgstr ""
+msgstr "認証方式をHTTPに変更。"
 
 #: authentication.php:121
 msgid "Authentication method changed to LDAP"
@@ -710,7 +710,7 @@ msgstr "認証方式をLDAPに変更"
 
 #: authentication.php:122
 msgid "Authentication method changed to LDAP."
-msgstr ""
+msgstr "認証方式をLDAPに変更。"
 
 #: authentication.php:81 authentication.php:82
 msgid "Authentication method changed to Zabbix internal"
@@ -809,7 +809,7 @@ msgstr ""
 
 #: include/classes/core/ZBase.php:122
 msgid "Black & Blue"
-msgstr "Black & Blue"
+msgstr ""
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
@@ -855,7 +855,7 @@ msgstr "トリガーテンプレートごと"
 
 #: actionconf.php:435 actionconf.php:449
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "アクションの設定"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
@@ -864,7 +864,7 @@ msgstr "アプリケーションの設定"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "認証の設定"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
@@ -879,7 +879,7 @@ msgstr "ディスカバリルールの設定"
 #: include/views/configuration.graph.edit.php:24
 #: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
-msgstr "グラフプロトタイプの設定"
+msgstr "グラフのプロトタイプの設定"
 
 #: include/views/configuration.graph.edit.php:28
 #: include/views/configuration.graph.list.php:48
@@ -888,7 +888,7 @@ msgstr "グラフの設定"
 
 #: adm.gui.php:104
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "GUIの設定"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:38
@@ -897,19 +897,19 @@ msgstr "ホストグループの設定"
 
 #: hosts.php:575 hosts.php:624 hosts.php:646
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "ホストの設定"
 
 #: adm.housekeeper.php:82
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr ""
+msgstr "Housekeeperの設定"
 
 #: adm.iconmapping.php:111
 msgid "CONFIGURATION OF ICON MAPPING"
-msgstr ""
+msgstr "アイコンマッピングの設定"
 
 #: adm.images.php:145
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "イメージの設定"
 
 #: include/views/configuration.services.edit.php:26
 #: include/views/configuration.services.list.php:23
@@ -919,7 +919,7 @@ msgstr "ITサービスの設定"
 #: disc_prototypes.php:313
 #: include/views/configuration.item.prototype.list.php:29
 msgid "CONFIGURATION OF ITEM PROTOTYPES"
-msgstr "アイテムプロトタイプの設定"
+msgstr "アイテムのプロトタイプの設定"
 
 #: include/views/configuration.item.copy.php:28
 #: include/views/configuration.item.list.php:31
@@ -929,7 +929,7 @@ msgstr "アイテムの設定"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "マクロの設定"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
@@ -957,7 +957,7 @@ msgstr "プロキシの設定"
 
 #: adm.regexps.php:200
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "正規表現の設定"
 
 #: include/views/configuration.screen.constructor.list.php:23
 msgid "CONFIGURATION OF SCREEN"
@@ -980,21 +980,21 @@ msgstr "スライドショーの設定"
 
 #: templates.php:400 templates.php:420
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "テンプレートの設定"
 
 #: adm.triggerdisplayingoptions.php:91
 msgid "CONFIGURATION OF TRIGGER DISPLAYING OPTIONS"
-msgstr ""
+msgstr "トリガー表示オプションの設定"
 
 #: include/views/configuration.triggers.edit.php:36
 #: include/views/configuration.triggers.list.php:42
 #: include/views/configuration.triggers.massupdate.php:37
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
-msgstr "トリガープロトタイプの設定"
+msgstr "トリガーのプロトタイプの設定"
 
 #: adm.triggerseverities.php:94
 msgid "CONFIGURATION OF TRIGGER SEVERITIES"
-msgstr ""
+msgstr "トリガー深刻度の設定"
 
 #: include/views/configuration.triggers.edit.php:39
 #: include/views/configuration.triggers.list.php:46
@@ -1017,7 +1017,7 @@ msgstr "ユーザーとユーザーグループの設定"
 
 #: adm.valuemapping.php:133
 msgid "CONFIGURATION OF VALUE MAPPING"
-msgstr ""
+msgstr "値のマッピングの設定"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
@@ -1026,7 +1026,7 @@ msgstr "ウェブ監視の設定"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "ワーキングタイムの設定"
 
 #: adm.triggerdisplayoptions.php:92
 msgid "CONFIGURATION OF ZABBIX"
@@ -1034,7 +1034,7 @@ msgstr "Zabbixの設定"
 
 #: include/views/configuration.services.edit.php:60 services.php:46
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "SLAの計算、SLAの許容値(%)"
 
 #: include/items.inc.php:92 include/views/configuration.graph.edit.php:161
 #: include/views/configuration.graph.edit.php:219
@@ -1043,7 +1043,7 @@ msgstr "計算"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "有効な権限"
 
 #: include/hosts.inc.php:67
 msgid "Callback"
@@ -1148,7 +1148,7 @@ msgstr "メディアタイプを追加できません"
 #: api/classes/CGraph.php:1074 api/classes/CGraphPrototype.php:1068
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "グラフ\"%1$s\"にグラフの合計値は2つ以上設定できません。"
 
 #: include/locales/en_gb.inc.php:119
 msgid "Cannot add network map"
@@ -1217,20 +1217,20 @@ msgstr "値のマッピングを追加できません"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP."
-msgstr ""
+msgstr "認証方式をLDAPに変更できません。"
 
 #: authentication.php:86
 msgid "Cannot change authentication method to Zabbix internal."
-msgstr ""
+msgstr "認証方式をZabbix内部データベースに変更できません。"
 
 #: api/classes/CTemplateScreen.php:591
 #, php-format
 msgid "Cannot change template for Screen \"%s\"."
-msgstr ""
+msgstr "スクリーン\"%s\"のテンプレートを変更できません。"
 
 #: authentication.php:163
 msgid "Cannot changed authentication method to HTTP."
-msgstr ""
+msgstr "認証方式をHTTPに変更できません。"
 
 #: items.php:453
 msgid "Cannot clear history"
@@ -1271,7 +1271,7 @@ msgstr "データベースへのコネクションを作成できません。"
 
 #: api/classes/CTrigger.php:1678
 msgid "Cannot create dependency"
-msgstr ""
+msgstr "依存関係を作成できません"
 
 #: discoveryconf.php:122
 msgid "Cannot create discovery rule"
@@ -1279,20 +1279,20 @@ msgstr "ディスカバリルールを作成できません"
 
 #: api/classes/CHostGroup.php:621
 msgid "Cannot create group without name."
-msgstr ""
+msgstr "名前がないグループは作成できません。"
 
 #: api/classes/CHost.php:1903
 msgid "Cannot create host group."
-msgstr ""
+msgstr "ホストグループを作成できません。"
 
 #: adm.iconmapping.php:66
 msgid "Cannot create icon map"
-msgstr "アイコンマップを作成できません"
+msgstr "アイコンマッピングを作成できません"
 
 #: api/classes/CIconMap.php:259 api/classes/CIconMap.php:319
 #, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
-msgstr "\"%s\"と同名のアイコンマップは作成できません。"
+msgstr "\"%s\"と同名のアイコンマッピングは作成できません。"
 
 #: include/classes/import/CXmlImport18.php:784
 #, php-format
@@ -1306,7 +1306,7 @@ msgstr "新しい要素を作成できません"
 #: api/classes/CUserMedia.php:414 api/classes/CUser.php:404
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "Zabbixユーザ\"%1$s\"を削除できません。ユーザを無効に設定してください。"
 
 #: actionconf.php:181
 msgid "Cannot delete action"
@@ -1318,7 +1318,7 @@ msgstr "アプリケーションを削除できません"
 
 #: api/classes/CTrigger.php:1728
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "依存関係を削除できません"
 
 #: api/classes/CDiscoveryRule.php:624 discoveryconf.php:135
 #: host_discovery.php:166 host_discovery.php:250
@@ -1331,7 +1331,7 @@ msgstr "グラフを削除できません"
 
 #: api/classes/CGraphPrototype.php:1008
 msgid "Cannot delete graph prototype."
-msgstr ""
+msgstr "グラフのプロトタイプを削除できません。"
 
 #: api/classes/CItem.php:1040
 msgid "Cannot delete graph."
@@ -1355,7 +1355,7 @@ msgstr "ホストグループを削除できません"
 
 #: adm.iconmapping.php:79
 msgid "Cannot delete icon map"
-msgstr "アイコンマップを削除できません"
+msgstr "アイコンマッピングを削除できません"
 
 #: adm.images.php:112
 msgid "Cannot delete image"
@@ -1442,7 +1442,7 @@ msgstr "テンプレートを削除できません"
 
 #: api/classes/CGraph.php:997 api/classes/CGraphPrototype.php:984
 msgid "Cannot delete templated graphs."
-msgstr ""
+msgstr "テンプレートのグラフを削除できません。"
 
 #: api/classes/CItem.php:1004
 msgid "Cannot delete templated item."
@@ -1475,7 +1475,7 @@ msgstr "ユーザーを削除できません"
 
 #: api/classes/CUser.php:800
 msgid "Cannot delete user medias"
-msgstr ""
+msgstr "ユーザのメディアを削除できません"
 
 #: adm.valuemapping.php:78
 msgid "Cannot delete value map"
@@ -1496,7 +1496,7 @@ msgstr "背景イメージが見つかりません"
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image for map \"%1$s."
-msgstr ""
+msgstr "マップ\"%1$sの背景イメージが見つかりません。"
 
 #: include/locales/en_gb.inc.php:164
 msgid "Cannot find graph"
@@ -1505,17 +1505,17 @@ msgstr "グラフが見つかりません"
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"で利用されているグラフ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:208
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているグループ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"で利用されているグループ\"%1$s\"が見つかりません。"
 
 #: include/locales/en_gb.inc.php:134
 msgid "Cannot find host"
@@ -1524,12 +1524,12 @@ msgstr "ホストが見つかりません"
 #: include/classes/import/importers/CMapImporter.php:216
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているホスト\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"で利用されているホスト\"%1$s\"が見つかりません。"
 
 #: api/classes/CDiscoveryRule.php:1032 api/classes/CItemGeneral.php:541
 #: include/items.inc.php:286 include/items.inc.php:342
@@ -1549,17 +1549,17 @@ msgstr "ホストグループが見つかりません"
 #: include/classes/import/importers/CMapImporter.php:245
 #, php-format
 msgid "Cannot find icon \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のアイコン\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のアイコンマッピング\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:652
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in exported map \"%2$s\"."
-msgstr "エクスポートされたマップ\"%2$s\"で利用されているアイコンマップ\"%1$s\"が見つかりません。"
+msgstr "エクスポートされたマップ\"%2$s\"で利用されているアイコンマッピング\"%1$s\"が見つかりません。"
 
 #: include/locales/en_gb.inc.php:131
 msgid "Cannot find image"
@@ -1572,7 +1572,7 @@ msgstr "アイテムが見つかりません"
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"で利用されているアイテム\"%1$s\"が見つかりません。"
 
 #: include/locales/en_gb.inc.php:136
 msgid "Cannot find map"
@@ -1581,12 +1581,12 @@ msgstr "マップが見つかりません"
 #: include/classes/import/importers/CMapImporter.php:200
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているマップ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"で利用されているマップ\"%1$s\"が見つかりません。"
 
 #: include/js.inc.php:326
 msgid "Cannot find objects with name"
@@ -1599,7 +1599,7 @@ msgstr "スクリーンが見つかりません"
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"で利王されているスクリーン\"%1$s\"が見つかりません。"
 
 #: include/locales/en_gb.inc.php:133
 msgid "Cannot find trigger"
@@ -1608,16 +1608,16 @@ msgstr "トリガーが見つかりません"
 #: include/classes/import/importers/CMapImporter.php:266
 #, php-format
 msgid "Cannot find trigger \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のトリガー\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:225
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているトリガー\"%1$s\"が見つかりません。"
 
 #: srv_status.php:289
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr ""
+msgstr "ツリーをフォーマットできません。サービスのリンクのロジック構造を確認してください。"
 
 #: services.php:435
 msgid "Cannot format tree."
@@ -1644,7 +1644,7 @@ msgstr[0] ""
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
-msgstr[0] ""
+msgstr[0] "テンプレート\"%2$s\"をインポートできません。リンクされているテンプレート\"%3$s\"が存在しません。"
 
 #: include/classes/class.cview.php:114
 #, php-format
@@ -1653,7 +1653,7 @@ msgstr "ビューファイル\"%s\"を読み込めません。"
 
 #: api/classes/CUser.php:827
 msgid "Cannot insert user medias"
-msgstr ""
+msgstr "ユーザのメディアを追加できません"
 
 #: api/classes/CHost.php:1988
 msgid "Cannot link template"
@@ -1729,7 +1729,7 @@ msgstr "ディスカバリルールのリンク削除と削除が行えません
 
 #: api/classes/CTemplate.php:2079
 msgid "Cannot unlink and clear graph prototypes"
-msgstr "グラフプロトタイプのリンク削除と削除が行えません"
+msgstr "グラフのプロトタイプのリンク削除と削除が行えません"
 
 #: api/classes/CTemplate.php:2097
 msgid "Cannot unlink and clear graphs."
@@ -1737,7 +1737,7 @@ msgstr "グラフのリンク削除と削除が行えません"
 
 #: api/classes/CTemplate.php:2026
 msgid "Cannot unlink and clear item prototypes"
-msgstr "アイテムプロトタイプのリンク削除と削除が行えません"
+msgstr "アイテムのプロトタイプのリンク削除と削除が行えません"
 
 #: api/classes/CTemplate.php:2008
 msgid "Cannot unlink and clear items"
@@ -1812,7 +1812,7 @@ msgstr "ホストを更新できません"
 
 #: adm.iconmapping.php:61
 msgid "Cannot update icon map"
-msgstr "アイコンマップを更新できません"
+msgstr "アイコンマッピングを更新できません"
 
 #: adm.images.php:48 include/classes/import/CXmlImport18.php:612
 msgid "Cannot update image"
@@ -1902,7 +1902,7 @@ msgstr "ユーザーを更新できません"
 
 #: api/classes/CUser.php:819
 msgid "Cannot update user medias"
-msgstr ""
+msgstr "ユーザのメディアを更新できません"
 
 #: profile.php:112 users.php:125
 msgid "Cannot update user. Both passwords must be equal."
@@ -1971,7 +1971,7 @@ msgstr "すでに存在します。"
 #: api/classes/CTriggerExpression.php:52
 #, php-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr ""
+msgstr "条件式の%1$s\"から始まる部分を確認してください。"
 
 #: api/classes/CItemGeneral.php:239
 msgid "Check the key, please. Default example was passed."
@@ -2010,7 +2010,7 @@ msgstr "マップのアイコン\"%s\"に循環するリンクは作成できま
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
 msgid "Circular reference in maps: %1$s."
-msgstr ""
+msgstr "マップ%1$sに循環参照が存在します。"
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
@@ -2020,7 +2020,7 @@ msgstr ""
 #: include/classes/import/importers/CTemplateImporter.php:120
 #, php-format
 msgid "Circular reference in templates: %1$s."
-msgstr ""
+msgstr "テンプレート%1$sに循環参照が存在します。"
 
 #: include/locales/en_gb.inc.php:181
 msgid "Clear"
@@ -2165,11 +2165,11 @@ msgstr "設定"
 
 #: conf.import.php:25
 msgid "Configuration import"
-msgstr ""
+msgstr "設定のインポート"
 
 #: adm.gui.php:24
 msgid "Configuration of GUI"
-msgstr ""
+msgstr "GUIの設定"
 
 #: services.php:27
 msgid "Configuration of IT services"
@@ -2185,11 +2185,11 @@ msgstr "アクションの設定"
 
 #: applications.php:26
 msgid "Configuration of applications"
-msgstr ""
+msgstr "アプリケーションの設定"
 
 #: authentication.php:24
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "認証の設定"
 
 #: discoveryconf.php:26
 msgid "Configuration of discovery"
@@ -2197,7 +2197,7 @@ msgstr "ディスカバリの設定"
 
 #: host_discovery.php:27
 msgid "Configuration of discovery rules"
-msgstr ""
+msgstr "ディスカバリルールの設定"
 
 #: graphs.php:28
 msgid "Configuration of graphs"
@@ -2205,27 +2205,27 @@ msgstr "グラフの設定"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
-msgstr ""
+msgstr "ホストグループの設定"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
-msgstr ""
+msgstr "ホストの設定"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeper"
-msgstr ""
+msgstr "housekeeperの設定"
 
 #: adm.iconmapping.php:24
 msgid "Configuration of icon mapping"
-msgstr ""
+msgstr "アイコンマッピングの設定"
 
 #: adm.images.php:25
 msgid "Configuration of images"
-msgstr ""
+msgstr "イメージの設定"
 
 #: disc_prototypes.php:27
 msgid "Configuration of item prototypes"
-msgstr ""
+msgstr "アイテムのプロトタイプの設定"
 
 #: items.php:27
 msgid "Configuration of items"
@@ -2233,15 +2233,15 @@ msgstr "アイテムの設定"
 
 #: adm.macros.php:24
 msgid "Configuration of macros"
-msgstr ""
+msgstr "マクロの設定"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance"
-msgstr ""
+msgstr "メンテナンスの設定"
 
 #: media_types.php:26
 msgid "Configuration of media types"
-msgstr ""
+msgstr "メディアタイプの設定"
 
 #: sysmap.php:26 sysmaps.php:34
 msgid "Configuration of network maps"
@@ -2249,15 +2249,15 @@ msgstr "ネットワークマップの設定"
 
 #: nodes.php:25
 msgid "Configuration of nodes"
-msgstr ""
+msgstr "ノードの設定"
 
 #: proxies.php:25
 msgid "Configuration of proxies"
-msgstr ""
+msgstr "プロキシの設定"
 
 #: adm.regexps.php:26
 msgid "Configuration of regular expressions"
-msgstr ""
+msgstr "正規表現の設定"
 
 #: screenconf.php:38 screenedit.php:27
 msgid "Configuration of screens"
@@ -2265,7 +2265,7 @@ msgstr "スクリーンの設定"
 
 #: scripts.php:23
 msgid "Configuration of scripts"
-msgstr ""
+msgstr "スクリプトの設定"
 
 #: slideconf.php:27
 msgid "Configuration of slide shows"
@@ -2273,7 +2273,7 @@ msgstr "スライドショーの設定"
 
 #: templates.php:38
 msgid "Configuration of templates"
-msgstr ""
+msgstr "テンプレートの設定"
 
 #: report5.php:155
 msgid "Configuration of trigger"
@@ -2281,15 +2281,15 @@ msgstr "トリガーの設定"
 
 #: adm.triggerdisplayingoptions.php:24
 msgid "Configuration of trigger displaying options"
-msgstr ""
+msgstr "トリガー表示オプションの設定"
 
 #: trigger_prototypes.php:27
 msgid "Configuration of trigger prototypes"
-msgstr ""
+msgstr "トリガーのプロトタイプの設定"
 
 #: adm.triggerseverities.php:24
 msgid "Configuration of trigger severities"
-msgstr ""
+msgstr "トリガー深刻度の設定"
 
 #: triggers.php:27 tr_status.php:480
 msgid "Configuration of triggers"
@@ -2297,23 +2297,23 @@ msgstr "トリガーの設定"
 
 #: usergrps.php:29
 msgid "Configuration of user groups"
-msgstr ""
+msgstr "ユーザグループの設定"
 
 #: users.php:29
 msgid "Configuration of users"
-msgstr ""
+msgstr "ユーザの設定"
 
 #: adm.valuemapping.php:24
 msgid "Configuration of value mapping"
-msgstr ""
+msgstr "値のマッピングの設定"
 
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
-msgstr ""
+msgstr "ウェブ監視の設定"
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
-msgstr ""
+msgstr "ワーキングタイムの設定"
 
 #: adm.gui.php:66 adm.housekeeper.php:51 adm.other.php:56
 #: adm.triggerdisplayingoptions.php:66 adm.triggerdisplayoptions.php:68
@@ -2386,7 +2386,7 @@ msgstr "契約番号"
 
 #: include/views/js/configuration.sysmaps.js.php:151
 msgid "Coordinates"
-msgstr ""
+msgstr "座標"
 
 #: include/views/configuration.copy.elements.php:102
 #: include/views/configuration.item.copy.php:82
@@ -2441,7 +2441,7 @@ msgstr ""
 
 #: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
-msgstr ""
+msgstr "グラフのプロトタイプの作成"
 
 #: hosts.php:640
 msgid "Create host"
@@ -2450,11 +2450,11 @@ msgstr ""
 #: include/views/configuration.hostgroups.list.php:30
 #: include/views/configuration.hostgroups.list.php:33
 msgid "Create host group"
-msgstr ""
+msgstr "ホストグループの作成"
 
 #: adm.iconmapping.php:107
 msgid "Create icon map"
-msgstr "アイコンマップの作成"
+msgstr "アイコンマッピングの作成"
 
 #: adm.images.php:141
 msgid "Create image"
@@ -2466,7 +2466,7 @@ msgstr "アイテムの作成"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
-msgstr ""
+msgstr "アイテムのプロトタイプの作成"
 
 #: include/views/configuration.maintenance.list.php:27
 msgid "Create maintenance period"
@@ -2482,7 +2482,7 @@ msgstr "メディアタイプの作成"
 
 #: include/views/administration.node.list.php:32
 msgid "Create node"
-msgstr ""
+msgstr "ノードの作成"
 
 #: include/views/administration.proxy.list.php:32
 msgid "Create proxy"
@@ -2510,7 +2510,7 @@ msgstr "スライドショーの作成"
 
 #: templates.php:414
 msgid "Create template"
-msgstr ""
+msgstr "テンプレートの作成"
 
 #: include/locales/en_gb.inc.php:214
 #: include/views/configuration.triggers.list.php:45
@@ -2519,7 +2519,7 @@ msgstr "ログ用のトリガーを作成"
 
 #: include/views/configuration.triggers.list.php:40
 msgid "Create trigger prototype"
-msgstr ""
+msgstr "トリガーのプロトタイプの作成"
 
 #: include/views/administration.users.list.php:30
 msgid "Create user"
@@ -2527,7 +2527,7 @@ msgstr "ユーザーの作成"
 
 #: include/views/administration.usergroups.list.php:30
 msgid "Create user group"
-msgstr ""
+msgstr "ユーザグループの作成"
 
 #: adm.valuemapping.php:129
 msgid "Create value map"
@@ -2551,7 +2551,7 @@ msgstr "作成: \"%2$s\"のアイテム\"%1$s\"。"
 #: api/classes/CItemPrototype.php:601
 #, php-format
 msgid "Created: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr "作成: \"%2$s\"のアイテムプロトタイプ\"%1$s\"。"
+msgstr "作成: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 
 #: api/classes/CTrigger.php:1766
 #, php-format
@@ -2561,7 +2561,7 @@ msgstr "作成: \"%2$s\"のトリガー\"%1$s\"。"
 #: api/classes/CTriggerPrototype.php:1337
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr "作成: \"%2$s\"のトリガープロトタイプ\"%1$s\"。"
+msgstr "作成: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 
 #: include/validate.inc.php:421
 #, php-format
@@ -2621,12 +2621,12 @@ msgstr "クリティカルエラー。\"%2$s\"フィールドの値\"%1$s\"が�
 #: include/validate.inc.php:543
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
-msgstr ""
+msgstr "クリティカルエラー。\"%2$s\"フィールドの値\"%1$s\"が正しくありません: %3$sから%4$sの間で設定してください。"
 
 #: include/validate.inc.php:534
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "クリティカルエラー。フィールド\"%1$s\"の値が正しくありません: 空の値を設定することはできません。"
 
 #: include/views/js/configuration.action.edit.js.php:85
 #: include/views/js/configuration.action.edit.js.php:202
@@ -2736,7 +2736,7 @@ msgstr "毎日"
 
 #: include/classes/core/ZBase.php:123
 msgid "Dark orange"
-msgstr "Dark orange"
+msgstr ""
 
 #: include/reports.inc.php:706
 msgid "Darken"
@@ -2905,11 +2905,11 @@ msgstr "デフォルトの更新間隔 (秒)"
 
 #: actionconf.php:41
 msgid "Default escalation period"
-msgstr ""
+msgstr "デフォルトのエスカレーション間隔"
 
 #: include/views/configuration.action.edit.php:49
 msgid "Default escalation period (minimum 60 seconds)"
-msgstr "デフォルトのエスカレーション期間 (最小60秒)"
+msgstr "デフォルトのエスカレーション間隔 (最小60秒)"
 
 #: include/views/configuration.action.edit.php:56
 #: include/views/configuration.action.edit.php:593
@@ -2927,7 +2927,7 @@ msgstr "デフォルトのテーマ"
 #: adm.gui.php:70
 #, php-format
 msgid "Default theme \"%1$s\"."
-msgstr ""
+msgstr "デフォルトのテーマ\"%1$s\"。"
 
 #: include/views/configuration.action.edit.php:353
 #: include/views/configuration.discovery.list.php:42
@@ -2995,7 +2995,7 @@ msgstr "選択したアイテムのヒストリを削除しますか？"
 
 #: include/views/administration.general.iconmap.edit.php:142
 msgid "Delete icon map?"
-msgstr "アイコンマップを削除しますか？"
+msgstr "アイコンマッピングを削除しますか？"
 
 #: include/locales/en_gb.inc.php:191 tr_logform.php:353
 msgid "Delete keyword?"
@@ -3015,7 +3015,7 @@ msgstr "ネットワークマップを削除しますか？"
 
 #: include/views/administration.proxy.edit.php:95
 msgid "Delete proxy?"
-msgstr ""
+msgstr "プロキシを削除しますか？"
 
 #: include/forms.inc.php:1830
 msgid "Delete regular expression?"
@@ -3246,7 +3246,7 @@ msgstr "削除: \"%2$s\"のアイテム\"%1$s\"。"
 #: api/classes/CItemPrototype.php:801
 #, php-format
 msgid "Deleted: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr "削除: \"%2$s\"のアイテムプロトタイプ\"%1$s\"。"
+msgstr "削除: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 
 #: api/classes/CProxy.php:552
 #, php-format
@@ -3267,7 +3267,7 @@ msgstr "削除: \"%2$s\"のトリガー\"%1$s\"。"
 #: api/classes/CTriggerPrototype.php:1298
 #, php-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr "削除: \"%2$s\"のトリガープロトタイプ\"%1$s\"。"
+msgstr "削除: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 
 #: include/forms.inc.php:1791 include/forms.inc.php:1872
 #: include/forms.inc.php:1952
@@ -3454,7 +3454,7 @@ msgstr "無効"
 
 #: overview.php:112
 msgid "Disabled or no trigger"
-msgstr ""
+msgstr "無効に設定されているかトリガーが存在しません"
 
 #: adm.triggerseverities.php:64
 #: include/views/administration.general.triggerSeverity.edit.php:64
@@ -3489,7 +3489,7 @@ msgstr "ディスカバリチェック"
 
 #: include/html.inc.php:396
 msgid "Discovery list"
-msgstr ""
+msgstr "ディスカバリリスト"
 
 #: include/actions.inc.php:51
 msgid "Discovery object"
@@ -3571,7 +3571,7 @@ msgstr "復旧トリガーの表示期間"
 
 #: include/func.inc.php:1593
 msgid "Displaying"
-msgstr "Displaying"
+msgstr ""
 
 #: search.php:214 search.php:296 search.php:391
 #, php-format
@@ -3598,7 +3598,7 @@ msgstr "アクションの保存期間(日)"
 #: adm.housekeeper.php:56
 #, php-format
 msgid "Do not keep actions older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "アクションの保存期間 (日) \"%1$s\""
 
 #: adm.housekeeper.php:35
 #: include/views/administration.general.housekeeper.edit.php:25
@@ -3608,7 +3608,7 @@ msgstr "イベントの保存期間(日)"
 #: adm.housekeeper.php:55
 #, php-format
 msgid "Do not keep events older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "イベントの保存期間 (日) \"%1$s\""
 
 #: include/locales/en_gb.inc.php:215
 msgid "Do you wish to replace the conditional expression?"
@@ -3626,7 +3626,7 @@ msgstr "点線"
 
 #: include/blocks.inc.php:1010 include/discovery.inc.php:150
 msgid "Down"
-msgstr "Down"
+msgstr ""
 
 #: api/classes/CWebCheck.php:512
 #, php-format
@@ -3647,19 +3647,19 @@ msgstr "ダウンタイム"
 
 #: include/views/configuration.host.edit.php:271
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
-msgstr ""
+msgstr "ここにドラッグしてインターフェースのタイプをIPMIに変更。"
 
 #: include/views/configuration.host.edit.php:256
 msgid "Drag here to change the type of the interface to \"JMX\" type."
-msgstr ""
+msgstr "ここにドラッグしてインターフェースのタイプをJMXに変更。"
 
 #: include/views/configuration.host.edit.php:240
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
-msgstr ""
+msgstr "ここにドラッグしてインターフェースのタイプをSNMPに変更。"
 
 #: include/views/configuration.host.edit.php:223
 msgid "Drag here to change the type of the interface to \"agent\" type."
-msgstr ""
+msgstr "ここにドラッグしてインターフェースのタイプをエージェントに変更。"
 
 #: include/views/configuration.graph.edit.php:71
 msgid "Draw style"
@@ -3672,12 +3672,12 @@ msgstr "ドロップダウンの1つ目の項目"
 #: adm.gui.php:74
 #, php-format
 msgid "Dropdown first entry \"%1$s\"."
-msgstr ""
+msgstr "ドロプダウンの1つ目の項目 \"%1$s\""
 
 #: adm.gui.php:75
 #, php-format
 msgid "Dropdown remember selected \"%1$s\"."
-msgstr ""
+msgstr "ドロップダウンの選択を記憶する \"%1$s\""
 
 #: api/classes/CHost.php:1441
 #, php-format
@@ -4009,7 +4009,7 @@ msgstr "テーブル\"%1$s\"の検索リクエストに失敗しました。"
 #: httpdetails.php:155 httpdetails.php:207
 #, php-format
 msgid "Error: %1$s"
-msgstr ""
+msgstr "エラー: %1$s"
 
 #: include/views/configuration.action.edit.php:480
 msgid "Escalation period"
@@ -4030,7 +4030,7 @@ msgstr "障害対応済"
 #: adm.gui.php:71
 #, php-format
 msgid "Event acknowledges \"%1$s\"."
-msgstr ""
+msgstr "イベントの障害対応コメント\"%1$s\"."
 
 #: dashconf.php:246
 msgid "Event acknowledging disabled"
@@ -4267,7 +4267,7 @@ msgstr "フィールド:"
 #: include/classes/helpers/CUploadFile.php:143
 #, php-format
 msgid "File is too big, max upload size is %1$s bytes."
-msgstr ""
+msgstr "ファイルサイズが大きすぎます。アップロードファイルサイズの最大値は%1$sバイトです。"
 
 #: include/classes/class.cview.php:69
 #, php-format
@@ -4438,7 +4438,7 @@ msgstr "設定した条件式はマクロではありません"
 
 #: include/classes/class.globalregexp.php:72
 msgid "Global expression does not exist."
-msgstr ""
+msgstr "グローバル条件式が存在しません。"
 
 #: include/views/configuration.action.edit.php:704
 msgid "Global script"
@@ -4524,7 +4524,7 @@ msgstr ""
 #: api/classes/CGraph.php:657 api/classes/CGraph.php:724
 #, php-format
 msgid "Graph \"%1$s\" with template host cannot contain items from other hosts."
-msgstr ""
+msgstr "テンプレートのホストを含むグラフ\"%1$s\"に他のホストのアイテムを含めることはできません。"
 
 #: graphs.php:280
 msgid "Graph added"
@@ -4549,7 +4549,7 @@ msgstr "グラフ名"
 #: api/classes/CGraphPrototype.php:647 api/classes/CGraphPrototype.php:714
 #, php-format
 msgid "Graph prototype \"%1$s\" with template host cannot contain items from other hosts."
-msgstr ""
+msgstr "テンプレートのホストを含むグラフのプロトタイプ\"%1$s\"に他のホストのアイテムを含めることはできません。"
 
 #: api/classes/CGraphPrototype.php:1028
 #, php-format
@@ -4565,11 +4565,11 @@ msgstr ""
 #: include/views/configuration.host.edit.php:468
 #: include/views/configuration.template.edit.php:335
 msgid "Graph prototypes"
-msgstr "グラフプロトタイプ"
+msgstr "グラフのプロトタイプ"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
-msgstr ""
+msgstr "グラフのプロトタイプ:"
 
 #: include/graphs.inc.php:45
 #: include/views/js/configuration.graph.edit.js.php:29
@@ -4651,12 +4651,12 @@ msgstr "グループ"
 #: include/classes/import/importers/CTemplateImporter.php:202
 #, php-format
 msgid "Group \"%1$s\" does not exist."
-msgstr ""
+msgstr "グループ\"%1$s\"は存在しません。"
 
 #: api/classes/CHostGroup.php:720
 #, php-format
 msgid "Group \"%1$s\" is internal and can not be deleted."
-msgstr ""
+msgstr "グループ\"%1$s\"は内部的に使用されているため削除できません。"
 
 #: api/classes/CHostGroup.php:740
 #, php-format
@@ -4682,7 +4682,7 @@ msgstr "ディスカバリで発見されたホストのグループ"
 
 #: adm.other.php:69
 msgid "Group for discovered hosts."
-msgstr ""
+msgstr "ディスカバリで発見されたホストのグループ"
 
 #: include/views/administration.usergroups.edit.php:39
 #: include/views/configuration.hostgroups.edit.php:35
@@ -4708,27 +4708,27 @@ msgstr "グループ"
 
 #: include/views/configuration.maintenance.edit.php:147
 msgid "Groups in maintenance"
-msgstr "メンテナンス中のホストグループ"
+msgstr "メンテナンス対象のホストグループ"
 
 #: include/locales/en_gb.inc.php:38
 msgid "H.i"
-msgstr "H.i"
+msgstr ""
 
 #: include/classes/class.cchart.php:1243 include/classes/class.cchart.php:1302
 #: include/page_header.php:470
 msgid "H:i"
-msgstr "H:i"
+msgstr ""
 
 #: include/blocks.inc.php:327 include/blocks.inc.php:653
 #: include/blocks.inc.php:721 include/blocks.inc.php:901
 #: include/blocks.inc.php:978 include/blocks.inc.php:1024
 #: include/screens.inc.php:1036 include/views/configuration.item.list.php:102
 msgid "H:i:s"
-msgstr "H:i:s"
+msgstr ""
 
 #: events.php:233
 msgid "HISTORY OF EVENTS"
-msgstr ""
+msgstr "イベント履歴"
 
 #: hostinventories.php:84
 msgid "HOST INVENTORIES"
@@ -4742,7 +4742,7 @@ msgstr "ホストインベントリの概要"
 #: include/views/administration.authentication.edit.php:39
 #: include/views/js/configuration.discovery.edit.js.php:121
 msgid "HTTP"
-msgstr "HTTP"
+msgstr ""
 
 #: authentication.php:188
 msgid "HTTP authentication"
@@ -4892,12 +4892,12 @@ msgstr "ホスト"
 #: api/classes/CHost.php:1828
 #, php-format
 msgid "Host \"%1$s\" already exists."
-msgstr ""
+msgstr "ホスト\"%1$s\"はすでに存在しています。"
 
 #: api/classes/CTemplate.php:1005
 #, php-format
 msgid "Host \"%s\" already exists."
-msgstr "ホスト\"%s\"はすでに存在しています"
+msgstr "ホスト\"%s\"はすでに存在しています。"
 
 #: include/classes/import/CXmlImport18.php:883
 #, php-format
@@ -5083,7 +5083,7 @@ msgstr "ホスト数 (有効/無効/テンプレート)"
 
 #: include/views/configuration.template.edit.php:186
 msgid "Hosts / templates"
-msgstr ""
+msgstr "ホスト / テンプレート"
 
 #: popup.php:43
 msgid "Hosts and templates"
@@ -5091,11 +5091,11 @@ msgstr "ホストとテンプレート"
 
 #: include/views/configuration.hostgroups.edit.php:57
 msgid "Hosts in"
-msgstr ""
+msgstr "グループに含まれるホスト"
 
 #: include/views/configuration.maintenance.edit.php:138
 msgid "Hosts in maintenance"
-msgstr "メンテナンス中のホスト"
+msgstr "メンテナンス対象のホスト"
 
 #: include/classes/class.chostsinfo.php:99 include/screens.inc.php:33
 msgid "Hosts info"
@@ -5228,11 +5228,11 @@ msgstr "ITサービス稼働レポート"
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT SERVICES: CHILDS"
-msgstr ""
+msgstr "ITサービス: 子"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT SERVICES: PARENTS"
-msgstr ""
+msgstr "ITサービス: 親"
 
 #: include/audit.inc.php:39
 msgid "IT service"
@@ -5289,68 +5289,68 @@ msgstr "アイコンラベルのタイプ"
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.iconmap.list.php:23
 msgid "Icon map"
-msgstr "アイコンマップ"
+msgstr "アイコンマッピング"
 
 #: api/classes/CIconMap.php:421
 #, php-format
 msgid "Icon map \"%1$s\" cannot be deleted. Used in map \"%2$s\"."
-msgstr ""
+msgstr "アイコンマッピング\"%1$s\"を削除できません。マップ\"%2$s\"に利用されています。"
 
 #: api/classes/CIconMap.php:528
 #, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect iconid \"%2$s\"."
-msgstr "アイコンマップ\"%1$s\"は正しくないアイコンID\"%2$s\"と関連づけられています。"
+msgstr "アイコンマッピング\"%1$s\"は正しくないアイコンID\"%2$s\"と関連づけられています。"
 
 #: api/classes/CIconMap.php:524
 #, php-format
 msgid "Icon map \"%1$s\" has mapping with incorrect inventory link \"%2$s\"."
-msgstr "アイコンマップ\"%1$s\"は正しくないインベントリリンク\"%2$s\"と関連づけられています。"
+msgstr "アイコンマッピング\"%1$s\"は正しくないインベントリリンク\"%2$s\"と関連づけられています。"
 
 #: api/classes/CIconMap.php:276 api/classes/CIconMap.php:353
 #, php-format
 msgid "Icon map \"%s\" already exists."
-msgstr "アイコンマップ\"%s\"はすでに存在します。"
+msgstr "アイコンマッピング\"%s\"はすでに存在します。"
 
 #: api/classes/CIconMap.php:538
 #, php-format
 msgid "Icon map \"%s\" cannot have mapping with empty expression."
-msgstr "アイコンマップ\"%s\"は空白の条件式と関連づけることはできません。"
+msgstr "アイコンマッピング\"%s\"は空白の条件式と関連づけることはできません。"
 
 #: api/classes/CIconMap.php:542
 #, php-format
 msgid "Icon map \"%s\" cannot have mapping with global expression that does not exist."
-msgstr "アイコンマップ\"%s\"は存在しないグローバル条件式と関連づけることはできません。"
+msgstr "アイコンマッピング\"%s\"は存在しないグローバル条件式と関連づけることはできません。"
 
 #: api/classes/CIconMap.php:546
 #, php-format
 msgid "Icon map \"%s\" has incorrect expression."
-msgstr "アイコンマップ\"%s\"の条件式が正しくありません。"
+msgstr "アイコンマッピング\"%s\"の条件式が正しくありません。"
 
 #: api/classes/CIconMap.php:499 api/classes/CIconMap.php:504
 #, php-format
 msgid "Icon map \"%s\" must have at least one mapping."
-msgstr "アイコンマップ\"%s\"は少なくとも1つ以上の項目と関連づける必要があります。"
+msgstr "アイコンマッピング\"%s\"は少なくとも1つ以上の項目と関連づける必要があります。"
 
 #: adm.iconmapping.php:65
 msgid "Icon map created"
-msgstr "アイコンマップを作成しました"
+msgstr "アイコンマッピングを作成しました"
 
 #: adm.iconmapping.php:79
 msgid "Icon map deleted"
-msgstr "アイコンマップを削除しました"
+msgstr "アイコンマッピングを削除しました"
 
 #: api/classes/CIconMap.php:256 api/classes/CIconMap.php:316
 msgid "Icon map name cannot be empty."
-msgstr "アイコンマップ名を設定してください。"
+msgstr "アイコンマッピング名を設定してください。"
 
 #: adm.iconmapping.php:60
 msgid "Icon map updated"
-msgstr "アイコンマップを更新しました"
+msgstr "アイコンマッピングを更新しました"
 
 #: api/classes/CIconMap.php:340
 #, php-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
-msgstr "アイコンマップID\"%s\"を持つアイコンマップは存在しません。"
+msgstr "アイコンマッピングID\"%s\"を持つアイコンマッピングは存在しません。"
 
 #: adm.gui.php:92 adm.housekeeper.php:70 adm.iconmapping.php:96
 #: adm.iconmapping.php:159 adm.images.php:130 adm.macros.php:161
@@ -5358,7 +5358,7 @@ msgstr "アイコンマップID\"%s\"を持つアイコンマップは存在し�
 #: adm.triggerdisplayoptions.php:79 adm.triggerseverities.php:82
 #: adm.valuemapping.php:118 adm.workingtime.php:64
 msgid "Icon mapping"
-msgstr "アイコンのマッピング"
+msgstr "アイコンマッピング"
 
 #: api/classes/CIconMap.php:552
 #, php-format
@@ -5367,7 +5367,7 @@ msgstr "\"%2$s\"に対するアイコンのマッピング\"%1$s\"はすでに�
 
 #: include/locales/en_gb.inc.php:223
 msgid "Iconmap is not enabled"
-msgstr "アイコンマップが無効です"
+msgstr "アイコンマッピングが無効です"
 
 #: include/views/js/configuration.sysmaps.js.php:111
 msgid "Icons"
@@ -5419,7 +5419,7 @@ msgstr "イメージ"
 
 #: include/views/conf.import.php:51
 msgid "Images for all maps will be updated!"
-msgstr ""
+msgstr "すべてのマップのイメージがアップデートされます！"
 
 #: include/views/configuration.action.edit.php:393
 msgid "Immediately"
@@ -5450,13 +5450,13 @@ msgstr "インベントリフィールド\"%s\"が存在しないためフィル
 
 #: screenedit.php:237 screenedit.php:252
 msgid "Impossible to remove last row and column."
-msgstr ""
+msgstr "最後の行と列は削除できません。"
 
 #: include/classes/class.ctweenbox.php:74
 #: include/classes/class.ctweenbox.php:101
 #: include/views/configuration.template.edit.php:186
 msgid "In"
-msgstr "In"
+msgstr ""
 
 #: include/views/administration.usergroups.edit.php:53
 msgid "In group"
@@ -5498,7 +5498,7 @@ msgstr "マップ\"%2$s\"のラベルタイプの値%1$sが正しくありませ
 #: api/classes/CProxy.php:364
 #, php-format
 msgid "Incorrect IP for passive proxy \"%1$s\"."
-msgstr ""
+msgstr "パッシブプロキシ\"%1$s\"のIPアドレスが正しくありません。"
 
 #: api/classes/CDRule.php:433
 #, php-format
@@ -5654,7 +5654,7 @@ msgstr ""
 
 #: include/nodes.inc.php:269 include/nodes.inc.php:311
 msgid "Incorrect characters used for Node name."
-msgstr ""
+msgstr "ノード名に不正な文字列が利用されています。"
 
 #: api/classes/CProxy.php:373
 #, php-format
@@ -5678,11 +5678,11 @@ msgstr "テンプレート名\"%s\"に不正な文字列が使用されていま
 
 #: api/classes/CTriggerExpression.php:631
 msgid "Incorrect closing curly braces in trigger expression."
-msgstr ""
+msgstr "トリガー条件式に不正な閉じ括弧\"}\"が存在します。"
 
 #: api/classes/CTriggerExpression.php:635
 msgid "Incorrect closing parenthesis in trigger expression."
-msgstr ""
+msgstr "トリガー条件式に不正な閉じ括弧\")\"が存在します。"
 
 #: api/classes/CGraph.php:1059
 #, php-format
@@ -5691,11 +5691,11 @@ msgstr ""
 
 #: api/classes/CTriggerExpression.php:206
 msgid "Incorrect count of quotes in expression."
-msgstr ""
+msgstr "条件式のクォートの数が正しくありません。"
 
 #: api/classes/CTriggerExpression.php:214
 msgid "Incorrect curly braces count in expression."
-msgstr ""
+msgstr "条件式の括弧\"{}\"の数が正しくありません。"
 
 #: api/classes/CDRule.php:437
 msgid "Incorrect delay."
@@ -5724,7 +5724,7 @@ msgstr "トリガーの設定が正しくありません。"
 
 #: include/classes/helpers/CUploadFile.php:149
 msgid "Incorrect file upload."
-msgstr ""
+msgstr "アップロードされたファイルが正しくありません。"
 
 #: api/classes/CTriggerExpression.php:94
 msgid "Incorrect function format."
@@ -5775,7 +5775,7 @@ msgstr "インターフェースのIPパラメータ\"%s\"が正しくありま�
 #: api/classes/CHostInterface.php:582
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
-msgstr ""
+msgstr "インターフェースのポート\"%s\"が正しくありません。"
 
 #: api/classes/CHost.php:1371
 #, php-format
@@ -5887,7 +5887,7 @@ msgstr "マップ\"%s\"の幅の値が正しくありません。"
 
 #: include/nodes.inc.php:289
 msgid "Incorrect node type."
-msgstr ""
+msgstr "ノードタイプが正しくありません。"
 
 #: api/classes/CAction.php:814 api/classes/CAction.php:850
 #, php-format
@@ -5901,7 +5901,7 @@ msgstr "実行するアクションのパラメータが正しくありません
 #: api/classes/CIconMap.php:253
 #, php-format
 msgid "Incorrect parameter is used for icon map \"%s\"."
-msgstr "アイコンマップ\"%s\"のパラメータが正しくありません。"
+msgstr "アイコンマッピング\"%s\"のパラメータが正しくありません。"
 
 #: api/classes/CAction.php:907
 #, php-format
@@ -5915,7 +5915,7 @@ msgstr "アクションの実行条件のパラメータが正しくありませ
 #: api/classes/CIconMap.php:311
 #, php-format
 msgid "Incorrect parameters for icon map update method \"%s\"."
-msgstr "アイコンマップの更新メソッド\"%s\"のパラメータが正しくありません。"
+msgstr "アイコンマッピングの更新メソッド\"%s\"のパラメータが正しくありません。"
 
 #: api/classes/CMaintenance.php:498 api/classes/CMaintenance.php:686
 msgid "Incorrect parameters for maintenance."
@@ -5936,7 +5936,7 @@ msgstr ""
 
 #: api/classes/CTriggerExpression.php:210
 msgid "Incorrect parenthesis count in expression."
-msgstr ""
+msgstr "条件式の括弧\"()\"の数が正しくありません。"
 
 #: api/classes/CDRule.php:476 discoveryconf.php:74
 msgid "Incorrect port range."
@@ -5997,12 +5997,12 @@ msgstr ""
 #: api/classes/CItemKey.php:218
 #, php-format
 msgid "Incorrect syntax near \"%1$s\" at position \"%2$s\""
-msgstr ""
+msgstr "間違った書式\"%1$s\"が\"%2$s\"付近に見つかりました"
 
 #: api/classes/CItemKey.php:162
 #, php-format
 msgid "Incorrect syntax near \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\"付近の書式が正しくありません。"
 
 #: api/classes/CUserMedia.php:421 api/classes/CUser.php:709 popup_media.php:65
 msgid "Incorrect time period"
@@ -6011,7 +6011,7 @@ msgstr "期間が間違っています"
 #: api/classes/CUser.php:807
 #, php-format
 msgid "Incorrect time period \"%1$s\"."
-msgstr ""
+msgstr "期間\"%1$s\"が正しくありません。"
 
 #: api/classes/CService.php:666
 #, php-format
@@ -6069,19 +6069,19 @@ msgstr "ブラケットの使用方法が正しくありません。最後のブ
 
 #: api/classes/CTriggerExpression.php:200
 msgid "Incorrect usage of expression logic linking symbols."
-msgstr ""
+msgstr "条件式の論理演算式の使い方が正しくありません。"
 
 #: include/perm.inc.php:287
 msgid "Incorrect user data in \"get_accessible_groups_by_user\"."
-msgstr ""
+msgstr "\"get_accessible_groups_by_user\"中のユーザーデータが正しくありません。"
 
 #: include/perm.inc.php:181
 msgid "Incorrect user data in \"get_accessible_hosts_by_user\"."
-msgstr ""
+msgstr "\"get_accessible_hosts_by_user\"中のユーザーデータが正しくありません。"
 
 #: include/perm.inc.php:381
 msgid "Incorrect user data in \"get_accessible_nodes_by_user\"."
-msgstr ""
+msgstr "\"get_accessible_nodes_by_user\"中のユーザーデータが正しくありません。"
 
 #: include/profiles.inc.php:241
 msgid "Incorrect user group."
@@ -6110,7 +6110,7 @@ msgstr "符号なし整数フィールド\"%2$s\"の値\"%1$s\"が正しくあ�
 #: include/db.inc.php:1360
 #, php-format
 msgid "Incorrect value \"NULL\" for NOT NULL field \"%1$s\"."
-msgstr ""
+msgstr "NOT NULLフィールド\"%1$s\"への\"NULL\"値は正しくありません。"
 
 #: include/classes/class.cbuttonqmessage.php:52
 #, php-format
@@ -6156,26 +6156,26 @@ msgstr "インターフェース"
 #: api/classes/CHostInterface.php:952
 #, php-format
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "インターフェースは\"%2$s\"のアイテム\"%1$s\"にリンクされています。"
 
 #: include/views/js/configuration.host.edit.js.php:135
 msgid "Interface is used by items that require this type of the interface."
-msgstr ""
+msgstr "インターフェースはこのタイプのインターフェースを利用するアイテムで利用されています"
 
 #: api/classes/CHostInterface.php:543
 #, php-format
 msgid "Interface with DNS \"%1$s\" cannot have empty IP address."
-msgstr ""
+msgstr "DNS \"%1$s\"が設定されたインターフェースにIPアドレスを設定してください。"
 
 #: api/classes/CHostInterface.php:549 api/classes/CHostInterface.php:556
 #, php-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\"の\"DNSを使用\"にチェックが入っている場合、IPアドレス\"%1$s\"のインターフェースのDNS名は必須項目です。"
 
 #: api/classes/CHostInterface.php:562
 #, php-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
-msgstr ""
+msgstr "IPアドレス\"%1$s\"が設定されたインターフェースにDNS名を設定してください。"
 
 #: include/locales/en_gb.inc.php:95
 msgid "Interfaces"
@@ -6224,7 +6224,7 @@ msgstr "リクエストが正しくありません。"
 #: api/classes/CUserMacro.php:928
 #, php-format
 msgid "Invalid hostid for macro \"%1$s\"."
-msgstr ""
+msgstr "マクロ\"%1$s\"のhostidが正しくありません。"
 
 #: api/classes/CItemKey.php:76 api/classes/CItemKey.php:95
 #: api/classes/CItemKey.php:266
@@ -6300,12 +6300,12 @@ msgstr "アイテム\"%1$s\"は\"%2$s\"にすでに存在します (他のテン
 #: api/classes/CItem.php:1282
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
-msgstr ""
+msgstr "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". 0 (自動設定しない)から%3$dの間で設定してください。"
 
 #: include/classes/import/CXmlImport18.php:1475
 #, php-format
 msgid "Item \"%1$s\" does not exist."
-msgstr ""
+msgstr "アイテム\"%1$s\"は存在しません。"
 
 #: api/classes/CItemGeneral.php:286
 #, php-format
@@ -6346,7 +6346,7 @@ msgstr "アイテムのプロトタイプ"
 
 #: include/views/configuration.item.prototype.list.php:32
 msgid "Item prototypes of"
-msgstr ""
+msgstr "アイテムのプロトタイプ:"
 
 #: disc_prototypes.php:273 items.php:426 screenedit.php:173
 msgid "Item updated"
@@ -6358,7 +6358,7 @@ msgstr ""
 
 #: api/classes/CItemGeneral.php:226
 msgid "Item uses incorrect interface type."
-msgstr ""
+msgstr "アイテムに正しくないインターフェースタイプが設定されています。"
 
 #: api/classes/CItemGeneral.php:279
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -6372,27 +6372,27 @@ msgstr "キー\"%1$s\"が設定されたアイテムは\"%2$s\"にディスカ�
 #: api/classes/CItemGeneral.php:340
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
-msgstr ""
+msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"にプロトタイプから生成されたアイテムとしてすでに存在します。"
 
 #: api/classes/CItemGeneral.php:337
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
-msgstr ""
+msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"にプロトタイプとしてすでに存在します。"
 
 #: api/classes/CItemGeneral.php:331
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
-msgstr ""
+msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"にすでに存在します。"
 
 #: api/classes/CItemGeneral.php:343
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
-msgstr ""
+msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"に不明なアイテムとしてすでに存在します。"
 
 #: api/classes/CItemGeneral.php:679
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2$s\"にすでに存在します。"
 
 #: api/classes/CWebCheck.php:540
 #, php-format
@@ -6532,7 +6532,7 @@ msgstr "ヒストリの保存期間(日)"
 
 #: include/views/configuration.item.edit.php:313
 msgid "Keep lost resources period (in days)"
-msgstr ""
+msgstr "存在しなくなったリソースの保持期間(日)"
 
 #: include/forms.inc.php:544
 msgid "Keep trends"
@@ -6557,7 +6557,7 @@ msgstr "キー"
 #: api/classes/CItemGeneral.php:254
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
-msgstr ""
+msgstr "キー\"%1$s\"が<grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]とマッチしません。"
 
 #: api/classes/CItemKey.php:50
 msgid "Key cannot be empty."
@@ -6673,7 +6673,7 @@ msgstr "最新のチェック"
 #: api/classes/CWebCheck.php:526
 #, php-format
 msgid "Last error message of scenario \"%s\"."
-msgstr ""
+msgstr "シナリオ\"%s\"の最新エラーメッセージ。"
 
 #: include/items.inc.php:788
 msgid "Last hour graph"
@@ -6830,7 +6830,7 @@ msgstr "ログの時間の形式"
 
 #: include/views/administration.general.other.edit.php:39
 msgid "Log unmatched SNMP traps"
-msgstr ""
+msgstr "マッチしないSNMPトラップをログに記録"
 
 #: include/classes/class.cserverinfo.php:45
 msgid "Logged in as"
@@ -6876,11 +6876,11 @@ msgstr "不明"
 #: include/func.inc.php:390 include/func.inc.php:549
 #: include/locales/en_gb.inc.php:197
 msgid "M"
-msgstr "M"
+msgstr ""
 
 #: include/locales/en_gb.inc.php:154 report3.php:130
 msgid "M Y"
-msgstr "Y M"
+msgstr "Y/m"
 
 #: hostinventories.php:164 include/hosts.inc.php:160
 msgid "MAC address A"
@@ -6924,7 +6924,7 @@ msgstr "マクロ\"%1$s\"はすでに存在します。"
 #: api/classes/CUserMacro.php:960
 #, php-format
 msgid "Macro \"%1$s\" is not unique."
-msgstr ""
+msgstr "マクロ\"%1$s\"がユニークではありません。"
 
 #: api/classes/CUserMacro.php:912
 #, php-format
@@ -6939,7 +6939,7 @@ msgstr "マクロ名\"%1$s\"が長すぎます。64文字以下で設定して�
 #: api/classes/CUserMacro.php:1019 api/classes/CUserMacro.php:1079
 #, php-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
-msgstr ""
+msgstr "hostmacroid \"%1$s\"を持つマクロが存在しません"
 
 #: adm.gui.php:94 adm.housekeeper.php:72 adm.iconmapping.php:98
 #: adm.images.php:132 adm.macros.php:163 adm.other.php:105 adm.regexps.php:187
@@ -7128,11 +7128,11 @@ msgstr "マスターノード"
 
 #: include/nodes.inc.php:278
 msgid "Master node \"ID\" must be empty."
-msgstr ""
+msgstr "マスターノードの\"ID\"は空白に設定してください。"
 
 #: include/nodes.inc.php:283
 msgid "Master node already exists."
-msgstr ""
+msgstr "マスターノードがすでに存在します。"
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:32
 msgid "Max count of elements to show inside table cell"
@@ -7338,7 +7338,7 @@ msgstr "分"
 #: api/classes/CGraph.php:1047 api/classes/CGraphPrototype.php:1046
 #, php-format
 msgid "Missing items for graph \"%1$s\"."
-msgstr ""
+msgstr "グラフ\"%1$s\"のアイテムが存在しません。"
 
 #: include/graphs.inc.php:323
 #, php-format
@@ -7623,7 +7623,7 @@ msgstr "スクリーンの要素にURLが設定されていません。"
 
 #: include/views/configuration.sysmap.edit.php:149
 msgid "No URLs defined."
-msgstr ""
+msgstr "URLが設定されていません。"
 
 #: include/forms.inc.php:268
 msgid "No accessible resources"
@@ -7631,7 +7631,7 @@ msgstr "アクセスできるリソースがありません"
 
 #: include/acknow.inc.php:41
 msgid "No acknowledges defined."
-msgstr ""
+msgstr "障害対応コメントが設定されていません。"
 
 #: actionconf.php:457 include/views/administration.auditacts.list.php:67
 msgid "No actions defined."
@@ -7645,7 +7645,7 @@ msgstr "アクションが設定されていません。"
 #: include/hosts.inc.php:1160
 #, php-format
 msgid "No application with ID \"%1$s\"."
-msgstr ""
+msgstr "ID\"%1$s\"を持つアプリケーションが設定されていません。"
 
 #: include/views/configuration.application.list.php:50 popup.php:1232
 msgid "No applications defined."
@@ -7653,7 +7653,7 @@ msgstr "アプリケーションが設定されていません。"
 
 #: include/views/administration.auditlogs.list.php:83
 msgid "No audit defined."
-msgstr ""
+msgstr "監査ログが設定されていません。"
 
 #: api/classes/CAction.php:1555
 #, php-format
@@ -7667,7 +7667,7 @@ msgstr "実行するアクションのコマンド\"%s\"に認証ユーザー名
 
 #: charts.php:143 history.php:462
 msgid "No charts defined."
-msgstr ""
+msgstr "グラフが設定されていません。"
 
 #: api/classes/CAction.php:1542
 msgid "No command specified for action operation."
@@ -7730,7 +7730,7 @@ msgstr "エラーはありません。"
 
 #: events.php:335 include/screens.inc.php:1225
 msgid "No events defined."
-msgstr ""
+msgstr "イベントが設定されていません。"
 
 #: acknow.php:75
 msgid "No events to acknowledge"
@@ -7743,7 +7743,7 @@ msgstr "実行するアクションのコマンド\"%s\"に実行する対象が
 
 #: include/classes/helpers/CUploadFile.php:146
 msgid "No file was uploaded."
-msgstr ""
+msgstr "ファイルがアップロードされていません。"
 
 #: include/views/configuration.item.edit.php:261
 #: include/views/configuration.item.massupdate.php:268
@@ -7752,7 +7752,7 @@ msgstr "例外の更新間隔は設定されていません。"
 
 #: api/classes/CScreenItem.php:381
 msgid "No graph ID provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素にグラフIDが設定されていません。"
 
 #: include/graphs.inc.php:291
 #, php-format
@@ -7788,11 +7788,11 @@ msgstr "テンプレート[ %s ]にグループが設定されていません"
 
 #: history.php:326 history.php:417
 msgid "No history defined."
-msgstr ""
+msgstr "ヒストリが設定されていません。"
 
 #: api/classes/CDiscoveryRule.php:675
 msgid "No host IDs given."
-msgstr ""
+msgstr "ホストIDが存在しません。"
 
 #: api/classes/CUserMacro.php:925
 #, php-format
@@ -7801,7 +7801,7 @@ msgstr ""
 
 #: api/classes/CScreenItem.php:370
 msgid "No host group ID provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素にホストグループIDが設定されていません。"
 
 #: include/views/configuration.hostgroups.list.php:49 popup.php:629
 #: popup.php:1784 popup.php:1815
@@ -7831,11 +7831,11 @@ msgstr "ホストが設定されていません。"
 #: api/classes/CMapElement.php:529
 #, php-format
 msgid "No icon for map element \"%s\"."
-msgstr ""
+msgstr "マップの要素\"%s\"にアイコンが存在しません。"
 
 #: include/views/administration.general.iconmap.list.php:22
 msgid "No icon map defined."
-msgstr ""
+msgstr "アイコンマッピングが設定されていません。"
 
 #: include/views/configuration.sysmap.edit.php:51
 msgid "No image"
@@ -7849,15 +7849,15 @@ msgstr "イメージが設定されていません。"
 #: include/views/configuration.item.massupdate.php:77
 #: include/views/js/configuration.item.edit.js.php:76
 msgid "No interface found"
-msgstr ""
+msgstr "インターフェースが見つかりません。"
 
 #: api/classes/CItemGeneral.php:220
 msgid "No interface found."
-msgstr ""
+msgstr "インターフェースが見つかりません。"
 
 #: include/views/administration.proxy.edit.php:50
 msgid "No interfaces defined."
-msgstr ""
+msgstr "インターフェースが設定されていません。"
 
 #: api/classes/CHost.php:1395 api/classes/CHost.php:1417
 #, php-format
@@ -7867,7 +7867,7 @@ msgstr "ホスト\"%s\"にインターフェースが設定されていません
 #: api/classes/CProxy.php:356
 #, php-format
 msgid "No interfaces for proxy \"%s\"."
-msgstr ""
+msgstr "プロキシ\"%s\"にインターフェースが設定されていません。"
 
 #: api/classes/CProxy.php:332 api/classes/CProxy.php:346
 #, php-format
@@ -7876,7 +7876,7 @@ msgstr "プロキシ\"%s\"にインターフェースが設定されていませ
 
 #: api/classes/CScreenItem.php:388
 msgid "No item ID provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素にアイテムIDが設定されていません。"
 
 #: popup.php:1145
 msgid "No item prototypes defined."
@@ -7885,12 +7885,12 @@ msgstr "アイテムのプロトタイプが設定されていません。"
 #: include/items.inc.php:439
 #, php-format
 msgid "No item with itemid \"%1$s\"."
-msgstr ""
+msgstr "アイテムID\"%1$s\"を持つアイテムは存在しません。"
 
 #: include/items.inc.php:423
 #, php-format
 msgid "No item with itemid=\"%1$s\"."
-msgstr ""
+msgstr "アイテムID\"%1$s\"を持つアイテムは存在しません。"
 
 #: chart.php:45 include/items.inc.php:653
 #: include/views/configuration.graph.edit.php:61
@@ -7901,15 +7901,15 @@ msgstr "アイテムが設定されていません。"
 
 #: include/views/configuration.item.prototype.list.php:43
 msgid "No items prototypes defined."
-msgstr ""
+msgstr "アイテムのプロトタイプが設定されていません。No items prototypes defined."
 
 #: latest.php:192
 msgid "No latest data defined."
-msgstr ""
+msgstr "最新データが存在しません。"
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance defined."
-msgstr ""
+msgstr "メンテナンスが設定されていません。"
 
 #: include/views/configuration.maintenance.edit.php:82
 msgid "No maintenance period defined."
@@ -7917,7 +7917,7 @@ msgstr "メンテナンス期間が設定されていません"
 
 #: api/classes/CScreenItem.php:394
 msgid "No map ID provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素にマップIDが設定されていません。"
 
 #: maps.php:124 popup.php:1508 sysmaps.php:262
 msgid "No maps defined."
@@ -7943,12 +7943,12 @@ msgstr "実行するアクションが設定されていません。"
 #: include/classes/import/CConfigurationImport.php:977
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
-msgstr ""
+msgstr "グラフ\"%1$s\"への権限がありません。"
 
 #: include/classes/import/CXmlImport18.php:1466
 #, php-format
 msgid "No permission for item \"%1$s\"."
-msgstr ""
+msgstr "アイテム\"%1$s\"への権限がありません。"
 
 #: include/classes/import/CXmlImport18.php:1374
 #, php-format
@@ -8027,7 +8027,7 @@ msgstr "実行するアクションのメッセージに送信先が設定され
 
 #: include/views/administration.general.regularexpressions.list.php:40
 msgid "No regular expressions defined."
-msgstr ""
+msgstr "正規表現が設定されていません。"
 
 #: popup_right.php:74
 msgid "No resources defined."
@@ -8035,11 +8035,11 @@ msgstr "リソースが設定されていません。"
 
 #: include/screens.inc.php:412
 msgid "No rows in screen."
-msgstr ""
+msgstr "スクリーンに行がありません。"
 
 #: api/classes/CScreenItem.php:400
 msgid "No screen ID provided for screen element."
-msgstr ""
+msgstr "スクリーンの要素にスクリーンIDが設定されていません。"
 
 #: host_screen.php:142 include/screens.inc.php:391
 #: include/views/configuration.screen.list.php:46
@@ -8071,7 +8071,7 @@ msgstr "スライドが設定されていません。"
 
 #: httpdetails.php:132 include/views/configuration.httpconf.edit.php:122
 msgid "No steps defined."
-msgstr ""
+msgstr "ステップが設定されていません。"
 
 #: triggers.php:349
 msgid "No target selected"
@@ -8079,7 +8079,7 @@ msgstr "何も選択されていません"
 
 #: graphs.php:348 items.php:590
 msgid "No target selected."
-msgstr ""
+msgstr "何も選択されていません。"
 
 #: include/views/configuration.host.massupdate.php:87 popup.php:583
 #: popup.php:690 popup.php:744 templates.php:431
@@ -8088,7 +8088,7 @@ msgstr "テンプレートが設定されていません。"
 
 #: include/views/configuration.services.edit.php:110
 msgid "No times defined. Work 24x7."
-msgstr "時間が設定されていません。Work 24x7."
+msgstr "時間が設定されていません。24x7として動作します。"
 
 #: overview.php:109
 msgid "No trigger"
@@ -8097,7 +8097,7 @@ msgstr "トリガーがありません"
 #: include/triggers.inc.php:458
 #, php-format
 msgid "No trigger with triggerid \"%1$s\"."
-msgstr ""
+msgstr "トリガーID\"%1$s\"を持つトリガーは存在しません。"
 
 #: chart4.php:40 include/triggers.inc.php:1482
 #: include/views/configuration.triggers.list.php:91 popup.php:923
@@ -8116,15 +8116,15 @@ msgstr "ユーザーが設定されていません。"
 
 #: include/views/administration.general.valuemapping.list.php:22
 msgid "No value map defined."
-msgstr ""
+msgstr "値のマッピングが設定されていません。"
 
 #: httpmon.php:151
 msgid "No web checks defined."
-msgstr ""
+msgstr "ウェブ監視が設定されていません。"
 
 #: include/views/configuration.httpconf.list.php:63
 msgid "No web scenarios defined."
-msgstr "Webシナリオが設定されていません。"
+msgstr "シナリオが設定されていません。"
 
 #: events.php:513 events.php:526 hostinventories.php:156 httpmon.php:153
 #: include/actions.inc.php:48 include/audit.inc.php:42
@@ -8154,7 +8154,7 @@ msgstr "ノードを更新しました"
 
 #: include/nodes.inc.php:294
 msgid "Node with same ID already exists."
-msgstr ""
+msgstr "同じIDを持つノードがすでに存在します。"
 
 #: include/actions.inc.php:645 include/actions.inc.php:721
 #: include/actions.inc.php:787 include/actions.inc.php:848
@@ -8249,7 +8249,7 @@ msgstr "なし"
 
 #: include/profiles.inc.php:326
 msgid "Nothing to do."
-msgstr ""
+msgstr "実行するものがありません"
 
 #: include/locales/en_gb.inc.php:152
 msgid "Notification report"
@@ -8361,7 +8361,7 @@ msgstr "OS (簡易説明)"
 
 #: adm.other.php:115
 msgid "OTHER CONFIGURATION PARAMETERS"
-msgstr ""
+msgstr "その他の設定パラメータ"
 
 #: overview.php:120
 msgid "OVERVIEW"
@@ -8426,7 +8426,7 @@ msgstr "特権管理者のみがホストグループを作成できます。"
 
 #: api/classes/CIconMap.php:244
 msgid "Only Super Admins can create icon maps."
-msgstr ""
+msgstr "特権管理者のみがアイコンのマッピングを作成できます。"
 
 #: api/classes/CMediatype.php:322
 msgid "Only Super Admins can create media types."
@@ -8455,7 +8455,7 @@ msgstr "特権管理者のみがグローバルマクロを更新できます。
 
 #: api/classes/CIconMap.php:300
 msgid "Only Super Admins can update icon maps."
-msgstr ""
+msgstr "特権管理者のみがアイコンのマッピングを更新できます。"
 
 #: api/classes/CUserGroup.php:379 api/classes/CUserGroup.php:483
 msgid "Only Super Admins can update user groups."
@@ -8508,11 +8508,11 @@ msgstr "認証されていないリクエストのため操作を実行できま
 
 #: include/views/configuration.action.edit.php:981
 msgid "Operation condition"
-msgstr "実行条件の状態"
+msgstr "アクションの実行条件"
 
 #: include/views/configuration.action.edit.php:928
 msgid "Operation details"
-msgstr "実行条件の詳細"
+msgstr "実行内容の詳細"
 
 #: api/classes/CAction.php:1638
 msgid "Operation has no group to operate."
@@ -8528,7 +8528,7 @@ msgstr "実行内容のタイプ"
 
 #: actionconf.php:462 include/views/configuration.action.edit.php:985
 msgid "Operations"
-msgstr "実行内容"
+msgstr "アクションの実行内容"
 
 #: include/hosts.inc.php:69
 msgid "Operator"
@@ -8580,7 +8580,7 @@ msgstr "変更なし"
 
 #: include/classes/core/ZBase.php:121
 msgid "Original blue"
-msgstr "Original blue"
+msgstr ""
 
 #: adm.gui.php:99 adm.housekeeper.php:77 adm.iconmapping.php:103
 #: adm.images.php:137 adm.macros.php:168 adm.other.php:110 adm.regexps.php:192
@@ -8593,7 +8593,7 @@ msgstr "その他"
 
 #: adm.other.php:24
 msgid "Other configuration parameters"
-msgstr ""
+msgstr "その他の設定パラメータ"
 
 #: include/reports.inc.php:541
 #: include/views/administration.usergroups.edit.php:53
@@ -8620,7 +8620,7 @@ msgstr "その他のパラメータ"
 
 #: include/views/configuration.template.edit.php:186
 msgid "Other | group"
-msgstr ""
+msgstr "その他 | グループ"
 
 #: include/views/configuration.httpconf.edit.php:103
 msgid "Others"
@@ -8637,7 +8637,7 @@ msgstr "プロキシごとの概要"
 
 #: include/func.inc.php:552
 msgid "P"
-msgstr "P"
+msgstr ""
 
 #: dashboard.php:225
 msgid "PERSONAL DASHBOARD"
@@ -8697,11 +8697,11 @@ msgstr "PHP libxmlモジュールが存在しません"
 
 #: include/classes/class.frontendsetup.php:169
 msgid "PHP max execution time"
-msgstr "PHP max execution time"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:188
 msgid "PHP max input time"
-msgstr "PHP max input time"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:330
 msgid "PHP mbstring"
@@ -8713,11 +8713,11 @@ msgstr "PHP mbstringモジュールが存在しません (PHPのconfigure時の�
 
 #: include/classes/class.frontendsetup.php:112
 msgid "PHP memory limit"
-msgstr "PHP memory limit"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:131
 msgid "PHP post max size"
-msgstr "PHP post max size"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:468
 msgid "PHP session"
@@ -8741,7 +8741,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:150
 msgid "PHP upload max filesize"
-msgstr "PHP upload max filesize"
+msgstr ""
 
 #: include/classes/class.frontendsetup.php:93
 msgid "PHP version"
@@ -8750,7 +8750,7 @@ msgstr "PHPバージョン"
 #: include/discovery.inc.php:62
 #: include/views/js/configuration.discovery.edit.js.php:128
 msgid "POP"
-msgstr "POP"
+msgstr ""
 
 #: chart5.php:190 include/maps.inc.php:627 include/triggers.inc.php:361
 msgid "PROBLEM"
@@ -8768,7 +8768,7 @@ msgstr "パレット"
 #: include/reports.inc.php:701 include/reports.inc.php:702
 #, php-format
 msgid "Palette #%1$s"
-msgstr ""
+msgstr "パレット #%1$s"
 
 #: include/blocks.inc.php:663
 #: include/views/configuration.screen.constructor.edit.php:187
@@ -8859,7 +8859,7 @@ msgstr "パスワードを設定してください"
 #: include/classes/debug/CProfiler.php:145
 #, php-format
 msgid "Peak memory usage: %s"
-msgstr ""
+msgstr "ピークのメモリ使用量: %s"
 
 #: report3.php:99
 msgid "Percentage"
@@ -8867,19 +8867,19 @@ msgstr "パーセント"
 
 #: graphs.php:55
 msgid "Percentile line (Left)"
-msgstr ""
+msgstr "パーセンタイルライン (左)"
 
 #: graphs.php:56
 msgid "Percentile line (Right)"
-msgstr ""
+msgstr "パーセンタイルライン (右)"
 
 #: include/views/configuration.graph.edit.php:143
 msgid "Percentile line (left)"
-msgstr ""
+msgstr "パーセンタイルライン (左)"
 
 #: include/views/configuration.graph.edit.php:155
 msgid "Percentile line (right)"
-msgstr ""
+msgstr "パーセンタイルライン (右)"
 
 #: include/reports.inc.php:170 include/reports.inc.php:287
 #: include/reports.inc.php:420 include/reports.inc.php:656
@@ -8943,11 +8943,11 @@ msgstr "サウンド再生"
 
 #: include/nodes.inc.php:330
 msgid "Please be aware that database still contains data related to the deleted node."
-msgstr ""
+msgstr "データベースにはまだ削除したノードに関するデータが残っていることに注意してください。"
 
 #: include/setup.inc.php:233
 msgid "Please correct all issues and press \"Retry\" button"
-msgstr ""
+msgstr "すべての問題を解決して\"Retry\"ボタンを押してください"
 
 #: scripts.php:86
 msgid "Please enter confirmation text."
@@ -8963,7 +8963,7 @@ msgstr "ポーランド語 (pl_PL)"
 
 #: include/views/configuration.item.edit.php:411
 msgid "Populates host inventory field"
-msgstr ""
+msgstr "ホストインベントリフィールドの自動設定"
 
 #: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:661 include/forms.inc.php:476 include/setup.inc.php:319
@@ -9104,7 +9104,7 @@ msgstr "プロキシ"
 #: api/classes/CProxy.php:381
 #, php-format
 msgid "Proxy \"%s\" already exists."
-msgstr ""
+msgstr "プロキシ\"%s\"はすでに存在します。"
 
 #: proxies.php:80
 msgid "Proxy added"
@@ -9120,11 +9120,11 @@ msgstr "プロキシホスト"
 
 #: api/classes/CProxy.php:416
 msgid "Proxy interface creation failed."
-msgstr ""
+msgstr "プロキシのインターフェース作成に失敗しました。"
 
 #: api/classes/CProxy.php:480
 msgid "Proxy interface update failed."
-msgstr ""
+msgstr "プロキシのインターフェース更新に失敗しました。"
 
 #: include/views/administration.proxy.edit.php:42
 msgid "Proxy mode"
@@ -9160,7 +9160,7 @@ msgstr "キュー"
 
 #: include/hosts.inc.php:44
 msgid "RMCP+"
-msgstr "RMCP+"
+msgstr ""
 
 #: include/views/administration.script.edit.php:95
 #: include/views/administration.script.list.php:83
@@ -9226,7 +9226,7 @@ msgstr "取得不可アイテムの更新間隔(秒)"
 #: adm.other.php:59
 #, php-format
 msgid "Refresh unsupported items (in sec) \"%1$s\"."
-msgstr ""
+msgstr "取得不可アイテムの更新間隔(秒) \"%1$s\"."
 
 #: include/views/configuration.item.edit.php:333
 msgid "Regexp"
@@ -9334,7 +9334,7 @@ msgstr "お気に入りから削除"
 
 #: charts.php:83 history.php:90 host_screen.php:89
 msgid "Remove from favourites."
-msgstr ""
+msgstr "お気に入りから削除"
 
 #: include/actions.inc.php:480
 msgid "Remove from host group"
@@ -9377,15 +9377,15 @@ msgstr "レポート"
 
 #: include/reports.inc.php:187
 msgid "Report 1"
-msgstr ""
+msgstr "レポート1"
 
 #: include/reports.inc.php:346
 msgid "Report 2"
-msgstr ""
+msgstr "レポート2"
 
 #: include/reports.inc.php:484
 msgid "Report 3"
-msgstr ""
+msgstr "レポート3"
 
 #: include/menu.inc.php:121 report6.php:162
 msgid "Reports"
@@ -9894,7 +9894,7 @@ msgstr "スクリーン"
 #: include/classes/import/CXmlImport18.php:1654
 #, php-format
 msgid "Screen \"%1$s\" added."
-msgstr ""
+msgstr "スクリーン\"%1$s\"を追加しました。"
 
 #: api/classes/CScreen.php:474 api/classes/CScreen.php:536
 #, php-format
@@ -9905,7 +9905,7 @@ msgstr "スクリーン\"%1$s\"はすでに存在します。"
 #: include/classes/import/CXmlImport18.php:1648
 #, php-format
 msgid "Screen \"%1$s\" updated."
-msgstr ""
+msgstr "スクリーン\"%1$s\"を更新しました。"
 
 #: screenconf.php:179
 msgid "Screen added"
@@ -9921,11 +9921,11 @@ msgstr "スクリーンを削除しました"
 
 #: api/classes/CScreenItem.php:349
 msgid "Screen item in same cell already exist."
-msgstr ""
+msgstr "同じセルにスクリーンの要素がすでに存在します。"
 
 #: screenedit.php:236 screenedit.php:251
 msgid "Screen should contain at least one row and column."
-msgstr ""
+msgstr "スクリーンは少なくとも1つ以上の行か列を設定する必要があります。"
 
 #: screenconf.php:154
 msgid "Screen updated"
@@ -9934,12 +9934,12 @@ msgstr "スクリーンを更新しました"
 #: include/views/monitoring.screen.php:46
 #, php-format
 msgid "Screen with ID \"%s\" does not exist."
-msgstr ""
+msgstr "ID \"%s\"を持つスクリーンは存在しません。"
 
 #: include/views/monitoring.screen.php:45
 #, php-format
 msgid "Screen with name \"%s\" does not exist."
-msgstr ""
+msgstr "スクリーン\"%s\"は存在しません。"
 
 #: dashboard.php:267 host_screen.php:128 include/blocks.inc.php:1259
 #: include/html.inc.php:495 include/html.inc.php:499 include/menu.inc.php:68
@@ -9981,7 +9981,7 @@ msgstr "スクリプト名"
 
 #: include/classes/debug/CProfiler.php:125
 msgid "Script profiler"
-msgstr ""
+msgstr "スクリプトプロファイラ"
 
 #: scripts.php:110
 msgid "Script updated"
@@ -10314,7 +10314,7 @@ msgstr "無効なトリガーを表示"
 #: adm.gui.php:73
 #, php-format
 msgid "Show events max \"%1$s\"."
-msgstr ""
+msgstr "イベントの最大表示期間 \"%1$s\""
 
 #: adm.gui.php:35 include/views/administration.general.gui.edit.php:34
 msgid "Show events not older than (in days)"
@@ -10323,7 +10323,7 @@ msgstr "イベントの表示期間(日)"
 #: adm.gui.php:72
 #, php-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "イベントの表示期間(日) \"%1$s\""
 
 #: include/triggers.inc.php:1603
 msgid "Show graph of item"
@@ -10791,7 +10791,7 @@ msgstr "テーブル\"%1$s\"は存在しません。"
 #: include/db.inc.php:1426
 #, php-format
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
-msgstr ""
+msgstr "テーブル\"%1$s\"にフィールド名\"%2$s\"が存在しません。"
 
 #: include/db.inc.php:1555
 #, php-format
@@ -10841,12 +10841,12 @@ msgstr "テンプレート"
 #: api/classes/CHost.php:1833
 #, php-format
 msgid "Template \"%1$s\" already exists."
-msgstr ""
+msgstr "テンプレート\"%1$s\"はそでに存在します。"
 
 #: include/classes/import/CConfigurationImport.php:504
 #, php-format
 msgid "Template \"%1$s\" does not exist."
-msgstr ""
+msgstr "テンプレート\"%1$s\"は存在しません。"
 
 #: api/classes/CTemplate.php:1001
 #, php-format
@@ -10879,7 +10879,7 @@ msgstr "テンプレート名"
 
 #: include/views/conf.import.php:29
 msgid "Template screens"
-msgstr ""
+msgstr "テンプレートスクリーン"
 
 #: include/reports.inc.php:106
 msgid "Template trigger"
@@ -10892,12 +10892,12 @@ msgstr "テンプレートを更新しました"
 #: api/classes/CTemplate.php:1650 include/hosts.inc.php:1235
 #, php-format
 msgid "Template with application \"%1$s\" already linked to host."
-msgstr ""
+msgstr "アプリケーション\"%1$s\"を持つテンプレートがすでにホストにリンクされています。"
 
 #: api/classes/CTemplate.php:1639 include/hosts.inc.php:1221
 #, php-format
 msgid "Template with item key \"%1$s\" already linked to host."
-msgstr ""
+msgstr "キー\"%1$s\"を持つアイテムを含むテンプレートがすでにホストにリンクされています。"
 
 #: api/classes/CHost.php:1523 api/classes/CTemplate.php:1387
 #, php-format
@@ -10968,7 +10968,7 @@ msgstr "テキスト"
 #, php-format
 msgid "The image is used in icon map %2$s."
 msgid_plural "The image is used in icon maps %2$s."
-msgstr[0] "イメージはアイコンマップ%2$sに利用されています。"
+msgstr[0] "イメージはアイコンマッピング%2$sに利用されています。"
 
 #: api/classes/CImage.php:554
 #, php-format
@@ -11018,11 +11018,11 @@ msgstr "今月"
 
 #: include/screens.inc.php:1338
 msgid "This screen-column is not empty. Delete it?"
-msgstr ""
+msgstr "This screen-column is not empty. 削除しますか？"
 
 #: include/screens.inc.php:1321
 msgid "This screen-row is not empty. Delete it?"
-msgstr ""
+msgstr "This screen-row is not empty. 削除しますか？"
 
 #: srv_status.php:84
 msgid "This week"
@@ -11172,7 +11172,7 @@ msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 #: api/classes/CTriggerPrototype.php:1393
 #, php-format
 msgid "Trigger \"%1$s\" already exists."
-msgstr ""
+msgstr "トリガー\"%1$s\"はすでに存在します。"
 
 #: api/classes/CTriggerPrototype.php:1197
 #, php-format
@@ -11257,7 +11257,7 @@ msgstr "トリガー名"
 
 #: include/audit.inc.php:34
 msgid "Trigger prototype"
-msgstr "トリガープロトタイプ"
+msgstr "トリガーのプロトタイプ"
 
 #: include/html.inc.php:446 include/html.inc.php:450
 #: include/views/configuration.host.discovery.list.php:89
@@ -11268,7 +11268,7 @@ msgstr "トリガーのプロトタイプ"
 
 #: include/views/configuration.triggers.list.php:51
 msgid "Trigger prototypes of"
-msgstr ""
+msgstr "トリガーのプロトタイプ:"
 
 #: adm.gui.php:97 adm.housekeeper.php:75 adm.iconmapping.php:101
 #: adm.images.php:135 adm.macros.php:166 adm.other.php:108 adm.regexps.php:190
@@ -11298,7 +11298,7 @@ msgstr "トリガーの値"
 
 #: api/classes/CTriggerGeneral.php:218 api/classes/CTriggerGeneral.php:252
 msgid "Trigger with same name but other type exists."
-msgstr ""
+msgstr "同じ名前で異なるタイプのトリガーが存在します。"
 
 #: actionconf.php:444 hosts.php:692 hosts.php:770 include/events.inc.php:25
 #: include/forms.inc.php:511 include/html.inc.php:457 include/html.inc.php:461
@@ -11489,7 +11489,7 @@ msgstr "ウクライナ語 (uk_UA)"
 
 #: include/nodes.inc.php:323
 msgid "Unable to remove local node."
-msgstr ""
+msgstr "ローカルノードは削除できません。"
 
 #: include/profiles.inc.php:225
 msgid "Unable to select configuration."
@@ -11497,7 +11497,7 @@ msgstr "選択した設定は行えません"
 
 #: include/classes/helpers/CUploadFile.php:58
 msgid "Unable to uploade file because \"file_uploads\" is disabled."
-msgstr ""
+msgstr "file_uploads\"が無効のためファイルをアップロードできません。"
 
 #: include/maps.inc.php:693 include/maps.inc.php:774 include/maps.inc.php:862
 msgid "Unacknowledged"
@@ -11634,7 +11634,7 @@ msgstr "リンク削除: \"%2$s\"のグラフ\"%1$s\"。"
 #: api/classes/CTemplate.php:2088
 #, php-format
 msgid "Unlinked: Graph prototype \"%1$s\" on \"%2$s\"."
-msgstr "リンク削除: \"%2$s\"のグラフプロトタイプ\"%1$s\"。"
+msgstr "リンク削除: \"%2$s\"のグラフのプロトタイプ\"%1$s\"。"
 
 #: api/classes/CTemplate.php:2017
 #, php-format
@@ -11644,7 +11644,7 @@ msgstr "リンク削除: \"%2$s\"のアイテム\"%1$s\"。"
 #: api/classes/CTemplate.php:2035
 #, php-format
 msgid "Unlinked: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr "リンク削除: \"%2$s\"のアイテムプロトタイプ\"%1$s\"。"
+msgstr "リンク削除: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 
 #: api/classes/CTemplate.php:1937
 #, php-format
@@ -11654,7 +11654,7 @@ msgstr "リンク削除: \"%2$s\"のトリガー\"%1$s\"。"
 #: api/classes/CTemplate.php:1954
 #, php-format
 msgid "Unlinked: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr "リンク削除: \"%2$s\"のトリガープロトタイプ\"%1$s\"。"
+msgstr "リンク削除: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 
 #: include/locales/en_gb.inc.php:183
 msgid "Unmute"
@@ -11672,7 +11672,7 @@ msgstr ""
 
 #: include/blocks.inc.php:1009 include/discovery.inc.php:149
 msgid "Up"
-msgstr ""
+msgstr "Up"
 
 #: include/locales/en_gb.inc.php:94
 #: include/views/administration.auditlogs.list.php:46
@@ -11733,7 +11733,7 @@ msgstr "更新: \"%2$s\"のアイテム\"%1$s\"。"
 #: api/classes/CItemPrototype.php:651
 #, php-format
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
-msgstr "更新: \"%2$s\"のアイテムプロトタイプ\"%1$s\"。"
+msgstr "更新: \"%2$s\"のアイテムのプロトタイプ\"%1$s\"。"
 
 #: api/classes/CTrigger.php:1880
 #, php-format
@@ -11743,7 +11743,7 @@ msgstr "更新: \"%2$s\"のトリガー\"%1$s\"。"
 #: api/classes/CTriggerPrototype.php:1429
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
-msgstr "更新: \"%2$s\"のトリガープロトタイプ\"%1$s\"。"
+msgstr "更新: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 
 #: include/views/administration.general.image.edit.php:35
 msgid "Upload"
@@ -11844,7 +11844,7 @@ msgstr "データベース停止メッセージの送信先グループ"
 
 #: adm.other.php:86
 msgid "User group for database down message."
-msgstr ""
+msgstr "データベース停止メッセージの送信先グループ"
 
 #: include/views/administration.script.edit.php:82
 #: include/views/administration.usergroups.list.php:28
@@ -11865,7 +11865,7 @@ msgstr "ユーザはグループ\"%s\"のメンバーになることにより自
 #: api/classes/CUser.php:453
 #, php-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
-msgstr ""
+msgstr "ユーザはグループ\"%s\"のメンバーになることにより自分自身のシステムステータスを変更することはできません。"
 
 #: include/views/configuration.action.edit.php:727
 #: include/views/configuration.item.edit.php:165
@@ -11971,7 +11971,7 @@ msgstr "値のマッピング"
 #: adm.valuemapping.php:93
 #, php-format
 msgid "Value map \"%1$s\" \"%2$s\"."
-msgstr ""
+msgstr "値のマッピング \"%1$s\" \"%2$s\"."
 
 #: include/valuemap.inc.php:37 include/valuemap.inc.php:70
 #, php-format
@@ -11981,7 +11981,7 @@ msgstr "値のマッピング\"%1$s\"はすでに存在します。"
 #: adm.valuemapping.php:68
 #, php-format
 msgid "Value map \"%1$s\"."
-msgstr ""
+msgstr "値のマッピング\"%1$s\"."
 
 #: adm.valuemapping.php:61
 msgid "Value map added"
@@ -12015,7 +12015,7 @@ msgstr "値のマッピングは少なくとも1つ以上のマッピング設�
 
 #: include/valuemap.inc.php:126
 msgid "Value maps are used to create a mapping between numeric values and string representations."
-msgstr ""
+msgstr "値のマッピングは数値の値と文字表記をマッピングするために利用されます。"
 
 #: api/classes/CItemGeneral.php:267
 msgid "Value type must be Float for aggregate items."
@@ -12024,7 +12024,7 @@ msgstr "アグリゲートアイテムのデータ型は浮動小数を選択し
 #: include/classes/class.cpie.php:319
 #, php-format
 msgid "Value: no data"
-msgstr ""
+msgstr "値: データなし"
 
 #: history.php:223 include/items.inc.php:776 include/triggers.inc.php:1637
 msgid "Values"
@@ -12061,7 +12061,7 @@ msgstr "ホスト名を設定しない場合、表示名は必須項目です。
 
 #: include/locales/en_gb.inc.php:199
 msgid "W"
-msgstr ""
+msgstr "W"
 
 #: adm.triggerseverities.php:58 include/items.inc.php:33
 #: include/views/administration.general.triggerSeverity.edit.php:46
@@ -12126,17 +12126,17 @@ msgstr "警告。フィールド\"%1$s\"が入力されていません。"
 #: include/validate.inc.php:556
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
-msgstr ""
+msgstr "警告。フィールド\"%1$s\"の値が正しくありません。"
 
 #: include/validate.inc.php:537
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "警告。フィールド\"%1$s\"の値が正しくありません: 空の値を設定することはできません。"
 
 #: include/validate.inc.php:547
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
-msgstr ""
+msgstr "警告。フィールド\"%1$s\"の値が正しくありません: %2$sから%3$sの間で設定してください。"
 
 #: include/graphs.inc.php:401
 #, php-format
@@ -12160,7 +12160,7 @@ msgstr "ウェブ"
 
 #: httpmon.php:136
 msgid "Web checks"
-msgstr ""
+msgstr "ウェブ監視"
 
 #: items.php:635
 msgid "Web item"
@@ -12264,7 +12264,7 @@ msgstr "ワーキングタイム"
 #: adm.workingtime.php:50
 #, php-format
 msgid "Working time \"%1$s\"."
-msgstr ""
+msgstr "ワーキングタイム\"%1$s\"。"
 
 #: include/views/administration.script.edit.php:96
 #: include/views/administration.script.list.php:83
@@ -12278,20 +12278,20 @@ msgstr ""
 
 #: api/classes/CMapElement.php:515
 msgid "Wrong fields for element."
-msgstr ""
+msgstr "要素の設定が正しくありません。"
 
 #: api/classes/CGraph.php:1042 api/classes/CGraphPrototype.php:1041
 msgid "Wrong fields for graph."
-msgstr ""
+msgstr "グラフの設定が正しくありません。"
 
 #: api/classes/CHost.php:1364
 #, php-format
 msgid "Wrong fields for host \"%s\"."
-msgstr "ホスト\"%s\"の設定が正しくありません"
+msgstr "ホスト\"%s\"の設定が正しくありません。"
 
 #: api/classes/CGraph.php:1054 api/classes/CGraphPrototype.php:1053
 msgid "Wrong fields for items."
-msgstr ""
+msgstr "アイテムの設定が正しくありません。"
 
 #: api/classes/CMapElement.php:792
 msgid "Wrong fields for linktrigger"
@@ -12322,7 +12322,7 @@ msgstr "メディアタイプの設定が正しくありません。"
 #: api/classes/CProxy.php:319
 #, php-format
 msgid "Wrong fields for proxy \"%s\"."
-msgstr ""
+msgstr "プロキシ\"%s\"の設定が正しくありません。"
 
 #: api/classes/CScreen.php:480
 #, php-format
@@ -12332,7 +12332,7 @@ msgstr "スクリーン\"%1$s\"の設定が正しくありません。"
 #: api/classes/CTemplateScreen.php:532 api/classes/CTemplateScreen.php:586
 #, php-format
 msgid "Wrong fields for screen \"%s\"."
-msgstr ""
+msgstr "スクリーン\"%s\"の設定が正しくありません。"
 
 #: api/classes/CScript.php:303
 msgid "Wrong fields for script."
@@ -12351,7 +12351,7 @@ msgstr ""
 #: api/classes/CTriggerPrototype.php:1079
 #: api/classes/CTriggerPrototype.php:1147
 msgid "Wrong fields for trigger."
-msgstr ""
+msgstr "トリガーの設定が正しくありません。"
 
 #: api/classes/CUser.php:371
 #, php-format
@@ -12375,12 +12375,12 @@ msgstr ""
 #: include/reports.inc.php:208 include/reports.inc.php:370
 #: include/reports.inc.php:519
 msgid "X label"
-msgstr ""
+msgstr "Xラベル"
 
 #: include/classes/import/readers/CXmlImportReader.php:48
 #, php-format
 msgid "XML file contains error %1$s:"
-msgstr ""
+msgstr "XMLファイルにエラーが含まれています %1$s"
 
 #: include/classes/import/CXmlImport18.php:391
 #: include/classes/import/CXmlImport18.php:394
@@ -12391,12 +12391,12 @@ msgstr "XMLファイルにエラーが含まれています"
 #: include/classes/import/readers/CXmlImportReader.php:51
 #, php-format
 msgid "XML file contains fatal error %1$s:"
-msgstr ""
+msgstr "XMLファイルに致命的なエラーが含まれています %1$s"
 
 #: include/classes/import/readers/CXmlImportReader.php:45
 #, php-format
 msgid "XML file contains warning %1$s:"
-msgstr ""
+msgstr "XMLファイルにワーニングが含まれています %1$s"
 
 #: include/func.inc.php:555 include/locales/en_gb.inc.php:153
 #: include/views/js/configuration.sysmaps.js.php:155 report3.php:112
@@ -12418,28 +12418,28 @@ msgstr "Y軸"
 #: include/reports.inc.php:209 include/reports.inc.php:371
 #: include/reports.inc.php:520
 msgid "Y label"
-msgstr ""
+msgstr "Yラベル"
 
 #: include/locales/en_gb.inc.php:73 include/locales/en_gb.inc.php:74
 msgid "Y-m-d H:i:s"
-msgstr ""
+msgstr "Y/m/d H:i:s"
 
 #: include/locales/en_gb.inc.php:43 include/locales/en_gb.inc.php:72
 #: include/locales/en_gb.inc.php:75
 msgid "Y.M.d H:i:s"
-msgstr ""
+msgstr "Y/m/d H:i:s"
 
 #: include/locales/en_gb.inc.php:151
 msgid "Y.m.d"
-msgstr ""
+msgstr "Y/m/d"
 
 #: include/locales/en_gb.inc.php:150
 msgid "Y.m.d H:i"
-msgstr ""
+msgstr "Y/m/d H:i"
 
 #: include/func.inc.php:491 include/locales/en_gb.inc.php:145
 msgid "Y.m.d H:i:s"
-msgstr ""
+msgstr "Y/m/d H:i:s"
 
 #: report3.php:86 report3.php:105 report4.php:107 report4.php:127
 #: report5.php:51
@@ -12577,7 +12577,7 @@ msgstr "このページを表示するためにはログインする必要があ
 
 #: include/views/administration.node.list.php:66
 msgid "Your setup is not configured for distributed monitoring."
-msgstr ""
+msgstr "分散監視用に設定されていません。"
 
 #: include/func.inc.php:554
 msgid "Z"
@@ -12589,7 +12589,7 @@ msgstr "Zabbix"
 
 #: include/page_header.php:123 warning.php:56
 msgid "Zabbix"
-msgstr ""
+msgstr "Zabbix"
 
 #: include/page_footer.php:103 include/views/general.login.php:47
 #, php-format
@@ -12638,7 +12638,7 @@ msgstr "Zabbix内部データベースのユーザー情報による認証"
 
 #: warning.php:54
 msgid "Zabbix is temporarily unavailable!"
-msgstr ""
+msgstr "Zabbixは一時的に利用できません"
 
 #: include/classes/class.cserverinfo.php:39
 #: include/classes/class.cserverinfo.php:40 include/setup.inc.php:372
@@ -12662,7 +12662,7 @@ msgstr "Zabbix serverのIPアドレスまたはポート番号が設定されて
 
 #: include/classes/class.cserverinfo.php:42
 msgid "Zabbix server info"
-msgstr ""
+msgstr "Zabbixサーバの情報"
 
 #: include/blocks.inc.php:672
 msgid "Zabbix server is running"
@@ -12670,11 +12670,11 @@ msgstr "Zabbixサーバの起動"
 
 #: include/setup.inc.php:374
 msgid "Zabbix server name"
-msgstr "Zabbixサーバname"
+msgstr "Zabbixサーバ名"
 
 #: include/setup.inc.php:373
 msgid "Zabbix server port"
-msgstr "Zabbixサーバport"
+msgstr "Zabbixサーバのポート"
 
 #: include/items.inc.php:84
 msgid "Zabbix trapper"
@@ -12704,7 +12704,7 @@ msgstr "[月の値が正しくありません: \"%s\" ]"
 
 #: include/locales/en_gb.inc.php:71
 msgid "[Y.M.d H:i:s]"
-msgstr ""
+msgstr "[Y/m/d H:i:s]"
 
 #: include/hosts.inc.php:468
 msgid "agent"
@@ -12764,13 +12764,13 @@ msgstr ""
 #: include/page_header.php:469 include/views/configuration.item.list.php:101
 #: report3.php:148
 msgid "d M Y"
-msgstr "Y M d"
+msgstr "Y/m/d"
 
 #: include/locales/en_gb.inc.php:156
 #: include/views/configuration.services.edit.php:129
 #: include/views/configuration.services.edit.php:130 report3.php:177
 msgid "d M Y H:i"
-msgstr "Y M d H:i"
+msgstr "Y/m/d H:i"
 
 #: acknow.php:164 events.php:233 httpdetails.php:122 httpmon.php:255
 #: include/acknow.inc.php:46 include/blocks.inc.php:873
@@ -12785,24 +12785,24 @@ msgstr "Y M d H:i"
 #: latest.php:292 latest.php:457 tr_status.php:173 tr_status.php:607
 #: tr_status.php:692
 msgid "d M Y H:i:s"
-msgstr "Y M d H:i:s"
+msgstr "Y/m/d H:i:s"
 
 #: chart4.php:129 chart5.php:131
 msgid "d.M"
-msgstr "M.d"
+msgstr "m/d"
 
 #: include/classes/class.cchart.php:1240 include/classes/class.cchart.php:1293
 msgid "d.m"
-msgstr "m.d"
+msgstr "m/d"
 
 #: include/classes/class.cchart.php:1262 include/classes/class.cchart.php:1277
 #: include/classes/class.cchart.php:1296
 msgid "d.m H:i"
-msgstr "m.d H:i"
+msgstr "m/d H:i"
 
 #: include/locales/en_gb.inc.php:37
 msgid "d.m.y"
-msgstr "y.m.d"
+msgstr "y/m/d"
 
 #: include/maintenances.inc.php:60 include/maintenances.inc.php:112
 msgid "day"
@@ -13086,7 +13086,7 @@ msgstr "送信済み"
 
 #: include/views/configuration.services.edit.php:174
 msgid "short description"
-msgstr ""
+msgstr "短い説明"
 
 #: include/views/configuration.sysmap.edit.php:76
 msgid "show icon mappings"
@@ -13124,7 +13124,7 @@ msgstr "はエクスポートされたスクリーンに含まれています"
 
 #: include/views/common.macros.php:34
 msgid "value"
-msgstr ""
+msgstr "値"
 
 #: include/locales/en_gb.inc.php:28
 msgid "w"
