@@ -647,12 +647,8 @@ function get_realrule_by_itemid_and_hostid($itemid, $hostid) {
  * @param null $view_style
  * @return CTableInfo
  */
-function get_items_data_overview($hostids, $view_style = null) {
+function get_items_data_overview($hostids, $view_style) {
 	global $USER_DETAILS;
-
-	if (is_null($view_style)) {
-		$view_style = CProfile::get('web.overview.view.style', STYLE_TOP);
-	}
 
 	$table = new CTableInfo(_('No items defined.'));
 
@@ -674,7 +670,6 @@ function get_items_data_overview($hostids, $view_style = null) {
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
 		'monitored_hosts' => true,
-		'selectAppllications' => API_OUTPUT_EXTEND,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => true,
 		'preservekeys' => true
@@ -715,7 +710,7 @@ function get_items_data_overview($hostids, $view_style = null) {
 		return $table;
 	}
 
-	ksort($hostNames, SORT_STRING);
+	order_result($hostNames);
 
 	$css = getUserTheme($USER_DETAILS);
 	if ($view_style == STYLE_TOP) {

@@ -20,6 +20,12 @@
 ?>
 <?php
 
+/**
+ * @property string $groupid
+ * @property string $hostid
+ * @property array $groups
+ * @property array $hosts
+ */
 class CPageFilter {
 
 	protected $data = array(); // groups, hosts, ...
@@ -47,6 +53,7 @@ class CPageFilter {
 		}
 		else {
 			trigger_error('Try to read inaccessible property: '.get_class($this).'->'.$name, E_USER_WARNING);
+			return false;
 		}
 	}
 
