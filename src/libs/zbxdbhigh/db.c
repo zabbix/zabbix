@@ -2018,7 +2018,7 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		**h_value = NULL;
-	int		h_alloc = 1, h_num = 0;
+	int		h_alloc = 1, h_num = 0, retry = 0;
 	const char	*func[] = {"min", "avg", "max", "sum", "count"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2026,6 +2026,11 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	if (NULL == field_name)
 		field_name = "value";
 
+	if (ZBX_DB_GET_HIST_VALUE == function)
+		h_alloc = (0 == last_n ? 128 : last_n);
+
+	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
+retry:
 	switch (function)
 	{
 		case ZBX_DB_GET_HIST_MIN:
@@ -2041,16 +2046,26 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 			offset = zbx_snprintf(sql, sizeof(sql), "select max(%s)-min(%s)", field_name, field_name);
 			break;
 		case ZBX_DB_GET_HIST_VALUE:
-			h_alloc = (0 == last_n ? 128 : last_n);
 			offset = zbx_snprintf(sql, sizeof(sql), "select %s", field_name);
 			break;
 		default:
 			assert(0);
-			break;
 	}
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
 			get_table_by_value_type(value_type), itemid);
+	if (0 != last_n && 0 == clock_from && 0 != clock_to)
+	{
+		const int	steps[] = {SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH};
+
+		if (0 != retry)
+			clock_to -= steps[retry - 1];
+		if (4 != retry)
+		{
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+					" and clock>%d", clock_to - steps[retry]);
+		}
+	}
 	if (0 != clock_from)
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock>%d", clock_from);
 	if (0 != clock_to)
@@ -2064,19 +2079,17 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 			case ITEM_VALUE_TYPE_UINT64:
 			case ITEM_VALUE_TYPE_STR:
 				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-						" order by itemid,clock desc");
+						" order by clock desc");
 				break;
 			default:
 				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 						" order by id desc");
 				break;
 		}
-		result = DBselectN(sql, last_n);
+		result = DBselectN(sql, last_n - h_num);
 	}
 	else
 		result = DBselect("%s", sql);
-
-	h_value = zbx_malloc(h_value, (h_alloc + 1) * sizeof(char *));
 
 	while (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 	{
@@ -2089,6 +2102,12 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 		h_value[h_num++] = zbx_strdup(NULL, row[0]);
 	}
 	DBfree_result(result);
+
+	if (0 != last_n && 0 == clock_from && 0 != clock_to && h_num != last_n && 4 != retry)
+	{
+		retry++;
+		goto retry;
+	}
 
 	h_value[h_num] = NULL;
 
