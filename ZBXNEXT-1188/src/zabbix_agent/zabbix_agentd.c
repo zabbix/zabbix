@@ -491,7 +491,7 @@ static void	zbx_load_config(int optional)
 	if (0 != CONFIG_PASSIVE_DISABLE)
 		CONFIG_PASSIVE_FORKS = 0;	/* listeners are not needed for passive checks */
 
-	if (0 == CONFIG_ACTIVE_DISABLE)
+	if (0 == CONFIG_ACTIVE_DISABLE && ZBX_CFG_FILE_REQUIRED == optional)
 	{
 		if (NULL == active_hosts || '\0' == *active_hosts)
 		{

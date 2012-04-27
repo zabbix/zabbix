@@ -36,8 +36,10 @@
 #	define VFS_TEST_REGEXP "fonts"
 #endif
 
+extern char	*CONFIG_HOSTNAME;
 extern int	CONFIG_TIMEOUT;
 
+static int	AGENT_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
@@ -46,6 +48,7 @@ static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_
 ZBX_METRIC	parameters_common[] =
 /*      KEY                     FLAG		FUNCTION        ADD_PARAM       TEST_PARAM */
 {
+	{"agent.hostname",	0,		AGENT_HOSTNAME,		0,	0},
 	{"agent.ping",		0,		AGENT_PING, 		0,	0},
 	{"agent.version",	0,		AGENT_VERSION,		0,	0},
 
@@ -122,6 +125,13 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 #else
 	return SYSINFO_RET_FAIL;
 #endif /* HAVE_PROC */
+}
+
+static int	AGENT_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOSTNAME));
+
+	return SYSINFO_RET_OK;
 }
 
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
