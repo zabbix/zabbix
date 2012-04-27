@@ -607,6 +607,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.13rc1
 
+A.F....... [ZBX-4877] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-4900] improved performance of 'Status of Zabbix' dashboard widget (Vedmak)
 ...G...... [ZBX-4905] fixed processing of system.swap.in/out[,pages] under Linux 2.6 (Sasha)
 ...G...... [ZBX-4907] fixed processing of system.swap.in/out[,sectors/count] under Linux (Sasha)
