@@ -18,7 +18,6 @@
 
 use utf8;
 
-use Switch;
 use File::Basename;
 
 $file = dirname($0)."/schema.sql";	# Name the file
@@ -70,7 +69,7 @@ local $output;
 	"t_history_text"=>	"ZBX_TYPE_TEXT",
 	"t_blob"	=>	"ZBX_TYPE_BLOB",
 	"t_item_param"	=>	"ZBX_TYPE_TEXT",
-	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"  
+	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"
 );
 
 $c{"before"}="/* 
@@ -116,7 +115,7 @@ ZBX_TABLE	tables[]={
 	"t_history_text"=>	"nclob",
 	"t_blob"	=>	"nvarchar2(2048)",
 	"t_item_param"	=>	"nvarchar2(2048)",
-	"t_cksum_text"	=>	"nclob"  
+	"t_cksum_text"	=>	"nclob"
 );
 
 %ibm_db2=(
@@ -160,7 +159,7 @@ ZBX_TABLE	tables[]={
 	"t_time"	=>	"integer",
 	"t_blob"	=>	"text",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"  
+	"t_cksum_text"	=>	"text"
 );
 
 %sqlite=("t_bigint"	=>	"bigint",
@@ -181,31 +180,31 @@ ZBX_TABLE	tables[]={
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
 	"t_item_param"	=>	"text",
-	"t_cksum_text"	=>	"text"  
+	"t_cksum_text"	=>	"text"
 );
 
 sub newstate
 {
-	local $new=$_[0];
+	local $new = $_[0];
 
-	switch ($state)
+	if ($state eq "field")
 	{
-		case "field"	{
-			if($output{"type"} eq "sql" && $new eq "index") { print "$pkey\n)$output{'table_options'}$output{'exec_cmd'}"; }
-			if($output{"type"} eq "sql" && $new eq "table") { print "$pkey\n)$output{'table_options'}$output{'exec_cmd'}"; }
-			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
-			if($new eq "field") { print ",\n" }
-		}
-		case "index"	{
-			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
-			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
-		}
-	 	case "table"	{
-			if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
-			print "";
-		}
+		if($output{"type"} eq "sql" && $new eq "index") { print "$pkey\n)$output{'table_options'}$output{'exec_cmd'}"; }
+		if($output{"type"} eq "sql" && $new eq "table") { print "$pkey\n)$output{'table_options'}$output{'exec_cmd'}"; }
+		if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
+		if($new eq "field") { print ",\n" }
 	}
-	$state=$new;
+	elsif ($state eq "index")
+	{
+		if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
+		if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},$output{'exec_cmd'}"; }
+	}
+	elsif ($state eq "table")
+	{
+		if($output{"type"} eq "sql" && $new eq "table") { print "${statements}"; }
+		print "";
+	}
+	$state = $new;
 }
 
 sub process_table
@@ -279,20 +278,20 @@ sub process_field
 		$type_2=$_;
 
 		if($default ne ""){
-			$default="DEFAULT $default"; 
+			$default="DEFAULT $default";
 		}
-		
+
 		if($output{"database"} eq "mysql"){
 			@text_fields = ('blob','longblob','text','longtext');
-			if(grep /$output{$type_short}/, @text_fields){ 
-				$default=""; 
+			if(grep /$output{$type_short}/, @text_fields){
+				$default="";
 			}
 		}
 
 		if($output{"database"} eq "ibm_db2"){
 			@text_fields = ('blob');
-			if(grep /$output{$type_short}/, @text_fields){ 
-				$default=""; 
+			if(grep /$output{$type_short}/, @text_fields){
+				$default="";
 			}
 		}
 
@@ -367,29 +366,26 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: $0 [c|ibm_db2|mysql|oracle|php|postgresql|sqlite]\n";
+	printf "Usage: $0 [c|ibm_db2|mysql|oracle|postgresql|sqlite]\n";
 	printf "The script generates ZABBIX SQL schemas and C/PHP code for different database engines.\n";
 	exit;
 }
 
 sub main
 {
-	if($#ARGV!=0)
+	if ($#ARGV != 0)
 	{
 		usage();
-	};
-
-	$format=$ARGV[0];
-	switch ($format) {
-		case "c"		{ %output=%c; }
-		case "ibm_db2"		{ %output=%ibm_db2; }
-		case "mysql"		{ %output=%mysql; }
-		case "oracle"		{ %output=%oracle; }
-		case "php"		{ %output=%php; }
-		case "postgresql"	{ %output=%postgresql; }
-		case "sqlite"		{ %output=%sqlite; }
-		else			{ usage(); }
 	}
+
+	$format = $ARGV[0];
+	if ($format eq "c")		{ %output = %c; }
+	elsif ($format eq "ibm_db2")	{ %output = %ibm_db2; }
+	elsif ($format eq "mysql")	{ %output = %mysql; }
+	elsif ($format eq "oracle")	{ %output = %oracle; }
+	elsif ($format eq "postgresql")	{ %output = %postgresql; }
+	elsif ($format eq "sqlite")	{ %output = %sqlite; }
+	else				{ usage(); }
 
 	print $output{"before"};
 
@@ -398,19 +394,17 @@ sub main
 		$_ = $line;
 		$line = tr/\t//d;
 		$line=$_;
-	
+
 		chop($line);
-	
+
 		($type,$line)=split(/\|/, $line,2);
 
 		utf8::decode($type);
-	
-		switch ($type) {
-			case "TABLE"	{ process_table($line); }
-			case "INDEX"	{ process_index($line,0); }
-			case "UNIQUE"	{ process_index($line,1); }
-			case "FIELD"	{ process_field($line); }
-		}
+
+		if ($type eq "TABLE")		{ process_table($line); }
+		elsif ($type eq "INDEX")	{ process_index($line, 0); }
+		elsif ($type eq "UNIQUE")	{ process_index($line, 1); }
+		elsif ($type eq "FIELD")	{ process_field($line); }
 	}
 }
 

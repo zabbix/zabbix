@@ -1156,6 +1156,11 @@ Copt::memoryPick();
 				' FROM users u '.
 				' WHERE u.alias='.zbx_dbstr($name);
 
+//SQL to BLOCK attempts
+//					.' AND ( attempt_failed<'.ZBX_LOGIN_ATTEMPTS.
+//							' OR (attempt_failed>'.(ZBX_LOGIN_ATTEMPTS-1).
+//									' AND ('.time().'-attempt_clock)>'.ZBX_LOGIN_BLOCK.'))';
+
 		$login = $attempt = DBfetch(DBselect($sql));
 
 		if($login){

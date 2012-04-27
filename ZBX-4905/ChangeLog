@@ -1,7 +1,14 @@
-Changes for 1.8.13
+Changes for 1.8.13rc1
 
 ...G...... [ZBX-4905] fixed processing of system.swap.in/out[,pages] under Linux 2.6 (Sasha)
 ...G...... [ZBX-4907] fixed processing of system.swap.in/out[,sectors/count] under Linux (Sasha)
+........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
+..F....... [ZBX-4849] implemented a check that a trigger expression doesn't use items from both hosts and templates at the same time (Pavels)
+....I..... [ZBX-3929] removed deprecated Switch module from a gen.pl script (Sasha)
+
+Changes for 1.8.12
+
+1.8.12rc1 was released as 1.8.12 without any changes
 
 Changes for 1.8.12rc2
 
