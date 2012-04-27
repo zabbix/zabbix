@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+#       /etc/rc.d/init.d/zabbix_agentd
+#
+# Starts the zabbix_agentd daemon
+#
+# chkconfig: - 95 5
+# description: Zabbix Monitoring Agent
+# processname: zabbix_agentd
+# pidfile: /var/tmp/zabbix_agentd.pid
+
+# Source function library.
+
+. /etc/init.d/functions
+
+RETVAL=0
+prog="Zabbix Agent"
+CONFIG_FILE="/etc/zabbix/zabbix_agentd.conf"
+ZABBIX_BIN="/usr/sbin/zabbix_agentd"
+
+test -x $ZABBIX_BIN || exit 0
+
+if [ ! -f ${CONFIG_FILE} ]; then
+                echo -n "${NAME}configuration file ${CONFIG_FILE} does not exist. "
+                # Tell the user this has skipped
+                exit 6
+fi
+
+if [ ! -x ${ZABBIX_BIN} ] ; then
+        echo -n "${ZABBIX_BIN} not installed! "
+        # Tell the user this has skipped
+        exit 5
+fi
+
+start() {
+        echo -n $"Starting $prog: "
+        daemon $ZABBIX_BIN -c $CONFIG_FILE
+        RETVAL=$?
+        [ $RETVAL -eq 0 ] && touch /var/lock/subsys/zabbix_agentd
+        echo
+}
+
+stop() {
+        echo -n $"Stopping $prog: "
+        killproc $ZABBIX_BIN
+        RETVAL=$?
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/zabbix_agentd
+        echo
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  reload|restart)
+        stop
+        start
+        RETVAL=$?
+        ;;
+  condrestart)
+        if [ -f /var/lock/subsys/zabbix_agentd ]; then
+            stop
+            start
+        fi
+        ;;
+  status)
+        status $ZABBIX_BIN
+        RETVAL=$?
+        ;;
+  *)
+        echo $"Usage: $0 {condrestart|start|stop|restart|reload|status}"
+        exit 1
+esac
+
+exit $RETVAL
