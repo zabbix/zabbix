@@ -1483,7 +1483,7 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 	if (empty($hostNames)) {
 		return $triggerTable;
 	}
-	natsort($hostNames);
+	order_result($hostNames);
 
 	$css = getUserTheme(CWebUser::$data);
 	if ($view_style == STYLE_TOP) {
