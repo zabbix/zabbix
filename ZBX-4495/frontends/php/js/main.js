@@ -678,7 +678,7 @@ var jqBlink = {
  */
 var hintBox = {
 
-	createBox: function(e, target, hintText, width, className, byClick) {
+	createBox: function(e, target, hintText, width, className, isStatic) {
 		var box = jQuery('<div></div>').addClass('hintbox');
 
 		if (!empty(className)) {
@@ -692,7 +692,7 @@ var hintBox = {
 			box.css('width', width + 'px');
 		}
 
-		if (byClick) {
+		if (isStatic) {
 			var close_link = jQuery('<div>' + locale['S_CLOSE'] + '</div>')
 				.addClass('link')
 				.css({
@@ -709,36 +709,23 @@ var hintBox = {
 		return box;
 	},
 
-	showHintWraper: function(e, target, hintText, width, className) {
+	HintWraper: function(e, target, hintText, width, className) {
+		target.isStatic = false;
 		jQuery(target).bind('mouseenter', function(e, d){
 			if (d) e = d;
 			hintBox.showHint(e, target, hintText, width, className, false);
+		}).bind('mouseleave', function(e){
+			hintBox.hideHint(e, target);
 		});
 		jQuery(target).removeAttr('onmouseover');
 		jQuery(target).trigger('mouseenter', e);
 	},
 
-	hideHintWraper: function(e, target) {
-		jQuery(target).bind('mouseleave', function(e){
-			hintBox.hideHint(e, target);
-		});
-		jQuery(target).removeAttr('onmouseout');
-		jQuery(target).trigger('mouseleave');
-	},
-
-	showStaticHintWraper: function(e, target, hintText, width, className) {
-		jQuery(target).bind('click', function(e){
-			hintBox.showStaticHint(e, target, hintText, width, className);
-		});
-		jQuery(target).removeAttr('onclick');
-		jQuery(target).trigger('click', e);
-	},
-
 	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
-		var onClick = target.onClick;
+		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
-		if (!onClick) {
-			target.onClick = true;
+		if (!isStatic) {
+			target.isStatic = true;
 			hintBox.showHint(e, target, hint, width, className, true);
 			if (resizeAfterLoad) {
 				hint.one('load', function(e){
@@ -748,9 +735,9 @@ var hintBox = {
 		}
 	},
 
-	showHint: function(e, target, hintText, width, className, onClick) {
+	showHint: function(e, target, hintText, width, className, isStatic) {
 		if (target.hintBoxItem) return;
-		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, onClick);
+		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, isStatic);
 
 		hintBox.positionHint(e, target);
 
@@ -827,11 +814,13 @@ var hintBox = {
 	},
 
 	hideHint: function(e, target, hideStatic) {
-		if (target.onClick && !hideStatic) return;
+		if (target.isStatic && !hideStatic) return;
 		if (target.hintBoxItem) {
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;
-			delete target.onClick;
+			if (target.isStatic) {
+				delete target.isStatic;
+			}
 		}
 	}
 };
