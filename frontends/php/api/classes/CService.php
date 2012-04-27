@@ -549,75 +549,78 @@ class CService extends CZBXAPI {
 			'serviceids' => $serviceIds,
 			'preservekeys' => true
 		));
-		$problemServiceIds = array();
-		foreach ($services as &$service) {
-			$service['alarms'] = array();
 
-			if ($service['status'] > 0) {
-				$problemServiceIds[] = $service['serviceid'];
-			}
-		}
-		unset($service);
-
-		// add service alarms
-		$intervalConditions = array();
-		foreach ($intervals as $interval) {
-			$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
-		}
-		$query = DBselect(
-			'SELECT *'.
-				' FROM service_alarms sa'.
-				' WHERE '.(($serviceIds) ? DBcondition('sa.serviceid', $serviceIds) : '').
-				' AND ('.implode(' OR ', $intervalConditions).')'.
-				' ORDER BY sa.clock,sa.servicealarmid'
-		);
-		while ($data = DBfetch($query)) {
-			$services[$data['serviceid']]['alarms'][] = $data;
-		}
-
-		// fetch problem triggers
-		if ($problemServiceIds) {
-			$problemTriggers = $this->fetchProblemTriggers($problemServiceIds);
-		}
-
-		// initial data
 		$rs = array();
-		foreach ($services as $service) {
-			// add problem triggers
-			$problems = array();
-			$problemServices = zbx_objectValues($service['descendantDependencies'], 'servicedownid');
-			$problemServices[] = $service['serviceid'];
-			foreach ($problemServices as $serviceId) {
-				if (isset($problemTriggers[$serviceId])) {
-					$trigger = $problemTriggers[$serviceId];
+		if ($services) {
+			$problemServiceIds = array();
+			foreach ($services as &$service) {
+				$service['alarms'] = array();
 
-					$problems[$trigger['triggerid']] = $trigger;
+				if ($service['status'] > 0) {
+					$problemServiceIds[] = $service['serviceid'];
 				}
 			}
+			unset($service);
 
-			$rs[$service['serviceid']] = array(
-				'status' => $service['status'],
-				'sla' => array(),
-				'problems' => $problems
+			// add service alarms
+			$intervalConditions = array();
+			foreach ($intervals as $interval) {
+				$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
+			}
+			$query = DBselect(
+				'SELECT *'.
+					' FROM service_alarms sa'.
+					' WHERE '.DBcondition('sa.serviceid', $serviceIds).
+					' AND ('.implode(' OR ', $intervalConditions).')'.
+					' ORDER BY sa.clock,sa.servicealarmid'
 			);
-		}
+			while ($data = DBfetch($query)) {
+				$services[$data['serviceid']]['alarms'][] = $data;
+			}
 
-		// calculate SLAs
-		foreach ($intervals as $interval) {
-			$latestValues = $this->fetchLatestValues($serviceIds, $interval['from']);
+			// fetch problem triggers
+			if ($problemServiceIds) {
+				$problemTriggers = $this->fetchProblemTriggers($problemServiceIds);
+			}
 
+			// initial data
 			foreach ($services as $service) {
-				$latestValue = (isset($latestValues[$service['serviceid']])) ? $latestValues[$service['serviceid']] : 0;
-				$intervalSla = $this->calculateSla($service, $interval['from'], $interval['to'], $latestValue);
+				// add problem triggers
+				$problems = array();
+				$problemServices = zbx_objectValues($service['descendantDependencies'], 'servicedownid');
+				$problemServices[] = $service['serviceid'];
+				foreach ($problemServices as $serviceId) {
+					if (isset($problemTriggers[$serviceId])) {
+						$trigger = $problemTriggers[$serviceId];
 
-				$rs[$service['serviceid']]['sla'][] = array(
-					'from' => $interval['from'],
-					'to' => $interval['to'],
-					'sla' => $intervalSla['ok'],
-					'okTime' => $intervalSla['okTime'],
-					'problemTime' => $intervalSla['problemTime'],
-					'downtimeTime' => $intervalSla['downtimeTime'],
+						$problems[$trigger['triggerid']] = $trigger;
+					}
+				}
+
+				$rs[$service['serviceid']] = array(
+					'status' => $service['status'],
+					'sla' => array(),
+					'problems' => $problems
 				);
+			}
+
+			// calculate SLAs
+			foreach ($intervals as $interval) {
+				$latestValues = $this->fetchLatestValues($serviceIds, $interval['from']);
+
+				foreach ($services as $service) {
+					$latestValue = (isset($latestValues[$service['serviceid']])) ? $latestValues[$service['serviceid']] : 0;
+					$intervalSla = $this->calculateSla($service, $interval['from'], $interval['to'], $latestValue);
+
+					$rs[$service['serviceid']]['sla'][] = array(
+						'from' => $interval['from'],
+						'to' => $interval['to'],
+						'sla' => $intervalSla['ok'],
+						'okTime' => $intervalSla['okTime'],
+						'problemTime' => $intervalSla['problemTime'],
+						'downtimeTime' => $intervalSla['downtimeTime'],
+					);
+				}
 			}
 		}
 
