@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-04-27 17:38+0300\n"
-"PO-Revision-Date: 2012-04-05 17:46+0200\n"
+"PO-Revision-Date: 2012-04-05 23:44+0200\n"
 "Last-Translator: Jakub <lauda.jakub@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -163,7 +163,7 @@ msgstr "500 posledních hodnot"
 
 #: include/views/configuration.sysmap.edit.php:67
 msgid "<manual>"
-msgstr ""
+msgstr "<manuálně>"
 
 #: acknow.php:148
 msgid "ALARM ACKNOWLEDGES"
@@ -212,43 +212,43 @@ msgstr "Potvrzeno"
 #: acknow.php:181 include/triggers.inc.php:1550 include/triggers.inc.php:1553
 #: tr_status.php:612
 msgid "Acknowledge"
-msgstr "Potvrdit"
+msgstr "Přijmout"
 
 #: acknow.php:123
 msgid "Acknowledge added"
-msgstr "Potvrzení bylo přidáno"
+msgstr "Přijetí bylo potvrzeno"
 
 #: acknow.php:152 acknow.php:180
 msgid "Acknowledge alarm by"
-msgstr "Potvrdit alarm -"
+msgstr "Alarm přijat - "
 
 #: acknow.php:153 acknow.php:182
 msgid "Acknowledge and return"
-msgstr "Potvrdit a zpět"
+msgstr "Přijmout a zpět"
 
 #: tr_status.php:198
 msgid "Acknowledge status"
-msgstr "Stav potvrzení"
+msgstr "Stav přijetí"
 
 #: include/events.inc.php:120 tr_status.php:284 tr_status.php:615
 msgid "Acknowledged"
-msgstr "Potvrzený"
+msgstr "Přijato"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Přijaté OK události"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Přijaté PROBLÉMy"
 
 #: acknow.php:27 tr_events.php:125
 msgid "Acknowledges"
-msgstr "Potvrzení"
+msgstr "Přijato"
 
 #: include/views/configuration.sysmap.edit.php:144
 msgid "Acknowledging disabled"
-msgstr "Potvrzování deaktivováno"
+msgstr "Potvrzování přijetí deaktivováno"
 
 #: include/audit.inc.php:28 include/views/administration.auditlogs.list.php:62
 #: include/views/administration.auditlogs.list.php:89
@@ -290,7 +290,7 @@ msgstr "Akce \"%s\" obsahuje nesprávnou hodnotu \"esc_period\" (minimum 60 seku
 #: api/classes/CAction.php:972
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr ""
+msgstr "Akce  \"%s\" nemá definovány žádné operace."
 
 #: actionconf.php:162
 msgid "Action added"
@@ -419,7 +419,7 @@ msgstr ""
 
 #: include/locales/en_gb.inc.php:216
 msgid "Add service"
-msgstr ""
+msgstr "Přidat službu"
 
 #: slides.php:87
 msgid "Add to"
@@ -487,7 +487,7 @@ msgstr "Agent"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Agentova rozhraní"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
@@ -571,7 +571,7 @@ msgstr "Aplikace \"%1$s\" již existuje."
 #: api/classes/CApplication.php:626
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr ""
+msgstr "Aplikace \"%1$s\" je užívána scénářem \"%2$s\" a nemůže být vymazána."
 
 #: applications.php:103
 msgid "Application added"
@@ -583,7 +583,7 @@ msgstr "Aplikace byla smazána"
 
 #: api/rpc/class.cjsonrpc.php:185
 msgid "Application error."
-msgstr ""
+msgstr "Chyba aplikace."
 
 #: applications.php:96
 msgid "Application updated"
@@ -592,7 +592,7 @@ msgstr "Aplikace byla aktualizována"
 #: api/classes/CItemGeneral.php:294
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "Aplikace s ID  \"%1$s\" není na \"%2$s\" dostupná."
 
 #: hosts.php:690 hosts.php:766 include/forms.inc.php:812
 #: include/html.inc.php:408 include/html.inc.php:412
@@ -618,28 +618,28 @@ msgstr "Blíží se"
 
 #: include/func.inc.php:221
 msgid "Apr"
-msgstr "dub"
+msgstr "Dub"
 
 #: include/forms.inc.php:1533 include/func.inc.php:109
 #: include/func.inc.php:238 include/locales/en_gb.inc.php:80
 msgid "April"
-msgstr "duben"
+msgstr "Duben"
 
 #: include/classes/class.cbuttonqmessage.php:49
 msgid "Are you sure you want perform this action?"
-msgstr ""
+msgstr "Chcete opravdu provést tuto akci?"
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "Opravdu chcete smazat"
 
 #: include/views/js/configuration.sysmaps.js.php:49
 msgid "Area size"
-msgstr ""
+msgstr "Velikost oblasti"
 
 #: include/views/js/configuration.sysmaps.js.php:37
 msgid "Area type"
-msgstr ""
+msgstr "Typ oblasti"
 
 #: include/views/configuration.item.edit.php:353
 #: include/views/configuration.item.edit.php:361
@@ -655,7 +655,7 @@ msgstr "Jako prostý text"
 
 #: include/hosts.inc.php:155
 msgid "Asset tag"
-msgstr ""
+msgstr "Inventární číslo"
 
 #: include/maintenances.inc.php:54 include/maintenances.inc.php:57
 msgid "At"
@@ -675,7 +675,7 @@ msgstr "Vytvořte alespoň jeden servisní interval"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr ""
+msgstr "Alespoň jedna databáze MySQL, Oracle, SQLite3 nebo IBM DB2 by měla být podporovaná"
 
 #: include/menu.inc.php:270
 msgid "Audit"
@@ -774,7 +774,7 @@ msgstr "Střední"
 
 #: include/reports.inc.php:672
 msgid "Average by"
-msgstr "Průměry"
+msgstr "Průměr za"
 
 #: popup_bitem.php:147
 msgid "Axis side"
@@ -825,7 +825,7 @@ msgstr "Černá & Modrá"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
-msgstr ""
+msgstr "Blikání"
 
 #: include/views/administration.users.list.php:83
 msgid "Blocked"
@@ -891,7 +891,7 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:24
 #: include/views/configuration.graph.list.php:31
 msgid "CONFIGURATION OF GRAPH PROTOTYPES"
-msgstr ""
+msgstr "KONFIGURACE PŘEDLOH PRO GRAFY"
 
 #: include/views/configuration.graph.edit.php:28
 #: include/views/configuration.graph.list.php:48
@@ -941,7 +941,7 @@ msgstr "NASTAVENÍ POLOŽEK"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "NASTAVENÍ MAKER"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
@@ -969,7 +969,7 @@ msgstr "NASTAVENÍ PROXY"
 
 #: adm.regexps.php:200
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "NASTAVENÍ PRO REGULAR EXPRESSIONS"
 
 #: include/views/configuration.screen.constructor.list.php:23
 msgid "CONFIGURATION OF SCREEN"
@@ -992,21 +992,21 @@ msgstr "NASTAVENÍ PREZENTACÍ"
 
 #: templates.php:400 templates.php:420
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "NASTAVENÍ ŠABLON"
 
 #: adm.triggerdisplayingoptions.php:91
 msgid "CONFIGURATION OF TRIGGER DISPLAYING OPTIONS"
-msgstr ""
+msgstr "NASTAVENÍ MOŽNOSTÍ PRO ZOBRAZENÍ SPOUŠTĚČŮ"
 
 #: include/views/configuration.triggers.edit.php:36
 #: include/views/configuration.triggers.list.php:42
 #: include/views/configuration.triggers.massupdate.php:37
 msgid "CONFIGURATION OF TRIGGER PROTOTYPES"
-msgstr ""
+msgstr "NASTAVENÍ PŘEDLOH PRO SPUŠTĚČE"
 
 #: adm.triggerseverities.php:94
 msgid "CONFIGURATION OF TRIGGER SEVERITIES"
-msgstr ""
+msgstr "NASTAVENÍ PRIORIT SPOUŠTĚČŮ"
 
 #: include/views/configuration.triggers.edit.php:39
 #: include/views/configuration.triggers.list.php:46
@@ -1016,11 +1016,11 @@ msgstr "NASTAVENÍ SPOUŠTĚČŮ"
 
 #: include/views/administration.users.edit.php:30
 msgid "CONFIGURATION OF USER"
-msgstr ""
+msgstr "NASTAVENÍ UŽIVATELŮ"
 
 #: include/views/administration.usergroups.edit.php:23
 msgid "CONFIGURATION OF USER GROUP"
-msgstr ""
+msgstr "NASTAVENÍ UŽIVATELSKÝCH SKUPIN"
 
 #: include/views/administration.usergroups.list.php:31
 #: include/views/administration.users.list.php:31
@@ -1029,24 +1029,24 @@ msgstr "NASTAVENÍ UŽIVATELŮ A SKUPIN UŽIVATELŮ"
 
 #: adm.valuemapping.php:133
 msgid "CONFIGURATION OF VALUE MAPPING"
-msgstr ""
+msgstr "NASTAVENÍ PRO MAPOVÁNÍ HODNOT"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr "NASTAVENÍ SLEDOVÁNÍ WEBŮ"
+msgstr "NASTAVENÍ MONITORINGU WEBOVÝCH SLUŽEB"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "NASTAVENÍ PRACOVNÍ DOBY"
 
 #: adm.triggerdisplayoptions.php:92
 msgid "CONFIGURATION OF ZABBIX"
-msgstr "NASTAVENÍ ZABBIXE"
+msgstr "NASTAVENÍ PRO ZABBIX"
 
 #: include/views/configuration.services.edit.php:60 services.php:46
 msgid "Calculate SLA, acceptable SLA (in %)"
-msgstr ""
+msgstr "Výpočet SLA, akceptovatelné SLA (v %)"
 
 #: include/items.inc.php:92 include/views/configuration.graph.edit.php:161
 #: include/views/configuration.graph.edit.php:219
@@ -1055,39 +1055,39 @@ msgstr "Vypočítaná"
 
 #: include/views/administration.usergroups.edit.php:114
 msgid "Calculated permissions"
-msgstr ""
+msgstr "Vypočtená práva"
 
 #: include/hosts.inc.php:67
 msgid "Callback"
-msgstr "callback"
+msgstr "Odvolat"
 
 #: api/classes/CTemplate.php:1442
 msgid "Can't add group"
-msgstr ""
+msgstr "Nelze přidat skupinu"
 
 #: api/classes/CTemplate.php:1518 api/classes/CTemplate.php:1528
 msgid "Can't link template"
-msgstr ""
+msgstr "Nelze propojit se šablonou"
 
 #: api/classes/CTemplate.php:1453
 msgid "Can't remove group"
-msgstr ""
+msgstr "Nelze odebrat skupinu"
 
 #: api/classes/CTemplate.php:1599
 msgid "Can't remove macros"
-msgstr ""
+msgstr "Nelze odebrat makra"
 
 #: api/classes/CTemplate.php:1579
 msgid "Can't unlink groups"
-msgstr ""
+msgstr "Nelze zrušit propojení se skupinou"
 
 #: api/classes/CTemplate.php:1489 api/classes/CTemplate.php:1507
 msgid "Can't unlink template"
-msgstr ""
+msgstr "Nelze zrušit propojení se šablonou"
 
 #: include/views/administration.mediatypes.edit.php:88
 msgid "Canada (136 characters)"
-msgstr ""
+msgstr "Kanada (136 znaků)"
 
 #: include/classes/class.cbuttoncancel.php:26 include/config.inc.php:271
 #: include/forms.inc.php:1663 include/forms.inc.php:1966
@@ -1119,7 +1119,7 @@ msgstr "Nelze přidat aplikaci"
 
 #: api/classes/CTrigger.php:2029
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "Šablona nemůže záviset na hostiteli."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1155,12 +1155,12 @@ msgstr "Nelze přidat servisní okno"
 
 #: media_types.php:91
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Nelze přidat typ média"
 
 #: api/classes/CGraph.php:1074 api/classes/CGraphPrototype.php:1068
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Nelze přidat více než jednu položku typu \"Souhrn grafu\" pro graf \"%1$s\"."
 
 #: include/locales/en_gb.inc.php:119
 msgid "Cannot add network map"
@@ -1168,7 +1168,7 @@ msgstr "Nelze přidat síťovou mapu"
 
 #: httpconf.php:216
 msgid "Cannot add new application."
-msgstr ""
+msgstr "Nelze přidat novou aplikaci."
 
 #: nodes.php:80
 msgid "Cannot add node"
@@ -1200,7 +1200,7 @@ msgstr "Nelze přidat službu"
 
 #: slideconf.php:88
 msgid "Cannot add slide show"
-msgstr ""
+msgstr "Nelze přidat slide-show"
 
 #: templates.php:183
 msgid "Cannot add template"
@@ -1221,7 +1221,7 @@ msgstr "Nelze přidat uživatele. Obě hesla musí být stejná."
 
 #: api/classes/CUserGroup.php:363
 msgid "Cannot add users."
-msgstr ""
+msgstr "Nelze přidat uživatele."
 
 #: adm.valuemapping.php:62
 msgid "Cannot add value map"
@@ -1229,44 +1229,44 @@ msgstr "Nelze přidat mapu hodnot"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP."
-msgstr ""
+msgstr "Nelze změnit metodu autentifikace na LDAP"
 
 #: authentication.php:86
 msgid "Cannot change authentication method to Zabbix internal."
-msgstr ""
+msgstr "Nelze změnit metodu autentifikace na Zabbix-interní."
 
 #: api/classes/CTemplateScreen.php:591
 #, php-format
 msgid "Cannot change template for Screen \"%s\"."
-msgstr ""
+msgstr "Nelze změnit šablonu pro Obrazovku \"%s\"."
 
 #: authentication.php:163
 msgid "Cannot changed authentication method to HTTP."
-msgstr ""
+msgstr "Nelze změnit metodu autentifikace na HTTP."
 
 #: items.php:453
 msgid "Cannot clear history"
-msgstr "Nelze pročistit historii"
+msgstr "Nelze smazat historii"
 
 #: api/classes/CDiscoveryRule.php:1210
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "Nelze klonovat předlohy pro grafy."
 
 #: api/classes/CDiscoveryRule.php:1103
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Nelze klonovat předlohy položek."
 
 #: api/classes/CDiscoveryRule.php:842
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "Nelze klonovat předlohy spouštěčů."
 
 #: scripts_exec.php:64
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr ""
+msgstr "Připojení na Trapper port daemona Zabbix serveru selhalo, pro spuštění skriptu, ale musí být port dostupný."
 
 #: graphs.php:344
 msgid "Cannot copy graphs"
-msgstr "Nelze zkopírovat grafy"
+msgstr "Nelze kopírovat grafy"
 
 #: items.php:586
 msgid "Cannot copy items"
@@ -1275,27 +1275,27 @@ msgstr "Nelze zkopírovat položky"
 #: include/triggers.inc.php:582
 #, php-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Spouštěč \"%1$s:%2$s\" nelze zkopírovat, protože jeho definice zahrnuje více hostitelů."
 
 #: include/db.inc.php:53
 msgid "Cannot create another database connection."
-msgstr ""
+msgstr "Nelze otevřít další připojení k databázi."
 
 #: api/classes/CTrigger.php:1678
 msgid "Cannot create dependency"
-msgstr ""
+msgstr "Nelze vytvořit závislosti"
 
 #: discoveryconf.php:122
 msgid "Cannot create discovery rule"
-msgstr ""
+msgstr "Nelze vytvořit pravidlo pro Discovery"
 
 #: api/classes/CHostGroup.php:621
 msgid "Cannot create group without name."
-msgstr ""
+msgstr "Nelze vytvořit bezejmennou skupinu."
 
 #: api/classes/CHost.php:1903
 msgid "Cannot create host group."
-msgstr ""
+msgstr "Nelze vytvořit skupinu hostitelů."
 
 #: adm.iconmapping.php:66
 msgid "Cannot create icon map"

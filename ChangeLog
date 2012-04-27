@@ -2,6 +2,7 @@
 Changes for 2.0.0rc4
 
 New features:
+..F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Greek, Japanese, Russian and Spanish translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
