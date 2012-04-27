@@ -135,7 +135,7 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
  *
  * @return array    an array of SLA tree nodes
  */
-function createShowServiceTree(array $services, array $slaData, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
+function createShowServiceTree(array $services, array $slaData, $period, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
 	// if no parent service is given, start from the root
 	if (!$service) {
 		$serviceNode = array(
@@ -218,8 +218,19 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 				$chart2->setAttribute('style', 'width: '.$widthRed.'px;');
 			}
 
+			// remember the selected time period when following the bar link
+			$periods = array(
+				'today' => 'daily',
+				'week' => 'weekly',
+				'month' => 'monthly',
+				'year' => 'yearly',
+				24 => 'daily',
+				24 * 7 => 'weekly',
+				24 * 30 => 'monthly',
+				24 * DAY_IN_YEAR => 'yearly'
+			);
 			$slaBar = new CLink(array($chart1, $chart2, SPACE, new CSpan(sprintf('%.2f', $slaBad), 'underline')),
-				'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y'),
+				'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period],
 				'image '.(($service['goodsla'] > $slaGood) ? 'on' : 'off')
 			);
 
@@ -254,7 +265,7 @@ function createShowServiceTree(array $services, array $slaData, array $parentSer
 
 		foreach ($service['dependencies'] as $dependency) {
 			$childService = $services[$dependency['servicedownid']];
-			$tree = createShowServiceTree($services, $slaData, $service, $childService, $dependency, $tree);
+			$tree = createShowServiceTree($services, $slaData, $period, $service, $childService, $dependency, $tree);
 		}
 	}
 	// soft dependencies
