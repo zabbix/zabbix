@@ -148,7 +148,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				goto session_close;
 			}
 			else
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() Password authentication succeeded.", __function_name);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() password authentication succeeded", __function_name);
 		}
 		else if (auth_pw & 2)
 		{
@@ -162,7 +162,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				goto session_close;
 			}
 			else
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() keyboard-interactive authentication succeeded.",
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() keyboard-interactive authentication succeeded",
 						__function_name);
 		}
 		else
@@ -186,12 +186,12 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			publickey = zbx_dsprintf(publickey, "%s/%s", CONFIG_SSH_KEY_LOCATION, item->publickey);
 			privatekey = zbx_dsprintf(privatekey, "%s/%s", CONFIG_SSH_KEY_LOCATION, item->privatekey);
 
-			if (1 != zbx_is_regular_file(publickey)) {
+			if (SUCCEED != zbx_is_regular_file(publickey)) {
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot access public key file %s", publickey));
 				goto session_close;
 			}
 
-			if (1 != zbx_is_regular_file(privatekey)) {
+			if (SUCCEED != zbx_is_regular_file(privatekey)) {
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot access private key file %s", privatekey));
 				goto session_close;
 			}
@@ -209,7 +209,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				goto session_close;
 			}
 			else
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() Authentication by public key succeeded.",
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() authentication by public key succeeded",
 						__function_name);
 		}
 		else
