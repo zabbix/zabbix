@@ -402,10 +402,10 @@ fail:
  *                                                                            *
  * Purpose: load configuration from config file                               *
  *                                                                            *
- * Parameters: optional - do not produce error if config file missing         *
+ * Parameters: requirement - produce error if config file missing or not      *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config(int optional)
+static void	zbx_load_config(int requirement)
 {
 	char	*p, *active_hosts = NULL;
 
@@ -481,17 +481,17 @@ static void	zbx_load_config(int optional)
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 #endif
 
-	parse_cfg_file(CONFIG_FILE, cfg, optional, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
 	set_defaults();
 
-	if (ZBX_CFG_FILE_REQUIRED == optional)
+	if (ZBX_CFG_FILE_REQUIRED == requirement)
 		zbx_validate_config();
 
 	if (0 != CONFIG_PASSIVE_DISABLE)
 		CONFIG_PASSIVE_FORKS = 0;	/* listeners are not needed for passive checks */
 
-	if (0 == CONFIG_ACTIVE_DISABLE)
+	if (0 == CONFIG_ACTIVE_DISABLE && ZBX_CFG_FILE_REQUIRED == requirement)
 	{
 		if (NULL == active_hosts || '\0' == *active_hosts)
 		{
