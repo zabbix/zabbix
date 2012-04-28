@@ -20,8 +20,6 @@
 #include "common.h"
 #include "sysinfo.h"
 
-#include "log.h"
-
 extern char	*CONFIG_HOSTNAME;
 
 static int	AGENT_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
