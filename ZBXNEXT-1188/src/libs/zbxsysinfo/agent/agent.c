@@ -27,7 +27,7 @@ static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_
 static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_agent[] =
-/*      KEY                     FLAG		FUNCTION        ADD_PARAM       TEST_PARAM */
+/*	KEY			FLAG		FUNCTION	ADD_PARAM	TEST_PARAM */
 {
 	{"agent.hostname",	0,		AGENT_HOSTNAME,		0,	0},
 	{"agent.ping",		0,		AGENT_PING, 		0,	0},
