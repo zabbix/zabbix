@@ -2,6 +2,7 @@
 Changes for 2.0.0rc4
 
 New features:
+...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
 ..F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Greek, Japanese, Russian and Spanish translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
@@ -614,6 +615,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.13rc1
 
+...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
 ........S. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
 ........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
 A.F....... [ZBX-4877] updated French translation; thanks to Joseph Bueno (Richlv)
