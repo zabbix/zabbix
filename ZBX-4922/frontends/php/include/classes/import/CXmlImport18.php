@@ -425,7 +425,6 @@ class CXmlImport18 {
 		}
 		$importScreens = $importScreens['zabbix_export']['screens'];
 
-		$result = true;
 		$screens = array();
 
 		foreach($importScreens as $mnum => &$screen){
