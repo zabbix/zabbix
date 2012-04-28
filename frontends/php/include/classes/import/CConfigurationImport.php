@@ -542,7 +542,7 @@ class CConfigurationImport {
 		));
 		foreach ($dbInterfaces as $dbInterface) {
 			foreach ($hostsToUpdate as $hnum => $host) {
-				if (idcmp($host['hostid'], $dbInterface['hostid'])) {
+				if (!empty($host['interfaces']) && idcmp($host['hostid'], $dbInterface['hostid'])) {
 					foreach ($host['interfaces'] as $inum => $interface) {
 						if ($dbInterface['ip'] == $interface['ip']
 								&& $dbInterface['dns'] == $interface['dns']
@@ -550,7 +550,8 @@ class CConfigurationImport {
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
 								&& $dbInterface['main'] == $interface['main']) {
-							unset($hostsToUpdate[$hnum]['interfaces'][$inum]);
+							$hostsToUpdate[$hnum]['interfaces'][$inum]['interfaceid'] = $dbInterface['interfaceid'];
+							break;
 						}
 					}
 				}
