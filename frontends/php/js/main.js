@@ -677,163 +677,149 @@ var jqBlink = {
  * ZABBIX HintBoxes
  */
 var hintBox = {
-	boxes: {}, // array of dom Hint Boxes
-	boxesCount: 0, // unique box id
 
-	createBox: function(obj, hint_text, width, className, byClick) {
-		var boxid = 'hintbox_' + this.boxesCount;
-		var box = document.createElement('div');
-		var obj_tag = obj.nodeName.toLowerCase();
-
-		if (obj_tag == 'td' || obj_tag == 'body') {
-			obj.appendChild(box);
-		}
-		else {
-			obj.parentNode.appendChild(box);
-		}
-
-		box.setAttribute('id', boxid);
-		box.style.display = 'none';
-		box.className = 'hintbox';
+	createBox: function(e, target, hintText, width, className, isStatic) {
+		var box = jQuery('<div></div>').addClass('hintbox');
 
 		if (!empty(className)) {
-			hint_text = "<span class=\"" + className + "\">" + hint_text + "</span>";
+			box.append(jQuery('<span></span>').addClass(className).html(hintText));
+		}
+		else {
+			box.html(hintText);
 		}
 
 		if (!empty(width)) {
-			box.style.width = width + 'px';
+			box.css('width', width + 'px');
 		}
 
-		var close_link = '';
-		if (byClick) {
-			close_link = '<div class="link" '+
-							'style="text-align: right; border-bottom: 1px #333 solid;" '+
-							'onclick="javascript: hintBox.hide(\'' + boxid + '\');">' + locale['S_CLOSE'] + '</div>';
+		if (isStatic) {
+			var close_link = jQuery('<div>' + locale['S_CLOSE'] + '</div>')
+				.addClass('link')
+				.css({
+					'text-align': 'right',
+					'border-bottom': '1px #333 solid'
+				}).click(function() {
+					hintBox.hideHint(e, target, true);
+				});
+			box.prepend(close_link);
 		}
 
-		box.innerHTML = close_link + hint_text;
-		this.boxes[boxid] = box;
-		this.boxesCount++;
+		jQuery('body').append(box);
+
 		return box;
 	},
 
-	showOver: function(obj, hint_text, width, className) {
-		var hintid = obj.getAttribute('hintid');
-		var hintbox = $(hintid);
-
-		if (!empty(hintbox)) {
-			var byClick = hintbox.getAttribute('byclick');
-		}
-		else {
-			var byClick = null;
-		}
-
-		if (!empty(byClick)) {
-			return;
-		}
-
-		hintbox = this.createBox(obj, hint_text, width, className, false);
-		obj.setAttribute('hintid', hintbox.id);
-		this.show(obj, hintbox);
+	HintWraper: function(e, target, hintText, width, className) {
+		target.isStatic = false;
+		jQuery(target).bind('mouseenter', function(e, d){
+			if (d) e = d;
+			hintBox.showHint(e, target, hintText, width, className, false);
+		}).bind('mouseleave', function(e){
+			hintBox.hideHint(e, target);
+		});
+		jQuery(target).removeAttr('onmouseover');
+		jQuery(target).trigger('mouseenter', e);
 	},
 
-	hideOut: function(obj) {
-		var hintid = obj.getAttribute('hintid');
-		var hintbox = $(hintid);
-
-		if (!empty(hintbox)) {
-			var byClick = hintbox.getAttribute('byclick');
-		}
-		else {
-			var byClick = null;
-		}
-
-		if (!empty(byClick)) {
-			return;
-		}
-
-		if (!empty(hintid)) {
-			obj.removeAttribute('hintid');
-			obj.removeAttribute('byclick');
-			this.hide(hintid);
-		}
-	},
-
-	onClick: function(obj, hint_text, width, className) {
-		var hintid = obj.getAttribute('hintid');
-		var hintbox = $(hintid);
-
-		if (!empty(hintbox)) {
-			var byClick = hintbox.getAttribute('byclick');
-		}
-		else {
-			var byClick = null;
-		}
-
-		if (!empty(hintid) && empty(byClick)) {
-			obj.removeAttribute('hintid');
-			this.hide(hintid);
-			hintbox = this.createBox(obj, hint_text, width, className, true);
-			hintbox.setAttribute('byclick', 'true');
-			obj.setAttribute('hintid', hintbox.id);
-			this.show(obj, hintbox);
-		}
-		else if (!empty(hintid)) {
-			obj.removeAttribute('hintid');
-			hintbox.removeAttribute('byclick');
-			this.hide(hintid);
-		}
-		else {
-			hintbox = this.createBox(obj, hint_text, width, className, true);
-			hintbox.setAttribute('byclick', 'true');
-			obj.setAttribute('hintid', hintbox.id);
-			this.show(obj, hintbox);
-		}
-	},
-
-	show: function(obj, hintbox) {
-		var body_width = document.viewport.getDimensions().width;
-		hintbox.style.visibility = 'hidden';
-		hintbox.style.display = 'block';
-		var posit = $(obj).positionedOffset();
-		var cumoff = $(obj).cumulativeOffset();
-
-		if (parseInt(cumoff.left + 10 + hintbox.offsetWidth) > body_width) {
-			posit.left = posit.left - parseInt((cumoff.left + 10 + hintbox.offsetWidth) - body_width) + document.viewport.getScrollOffsets().left;
-			posit.left -= 10;
-			posit.left = (posit.left < 0) ? 0 : posit.left;
-		}
-		else {
-			posit.left += 10;
-		}
-		hintbox.x = posit.left;
-		hintbox.y = posit.top;
-		hintbox.style.left = hintbox.x + 'px';
-		hintbox.style.top = hintbox.y + 10 + parseInt(obj.offsetHeight / 2) + 'px';
-		hintbox.style.visibility = 'visible';
-		hintbox.style.zIndex = '999';
-	},
-
-	hide: function(boxid) {
-		var hint = $(boxid);
-		if (!is_null(hint)) {
-			delete(this.boxes[boxid]);
-
-			// Opera browser refresh bug!
-			hint.style.display = 'none';
-			if (OP) {
-				setTimeout(function(){ hint.remove(); }, 200);
+	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
+		var isStatic = target.isStatic;
+		hintBox.hideHint(e, target, true);
+		if (!isStatic) {
+			target.isStatic = true;
+			hintBox.showHint(e, target, hint, width, className, true);
+			if (resizeAfterLoad) {
+				hint.one('load', function(e){
+					hintBox.positionHint(e, target);
+				});
 			}
+		}
+	},
+
+	showHint: function(e, target, hintText, width, className, isStatic) {
+		if (target.hintBoxItem) return;
+		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, isStatic);
+
+		hintBox.positionHint(e, target);
+
+		target.hintBoxItem.show();
+	},
+
+	positionHint: function(e, target) {
+		var wWidth = jQuery(window).width(),
+			wHeight = jQuery(window).height(),
+			scrollTop = jQuery(window).scrollTop(),
+			scrollLeft = jQuery(window).scrollLeft(),
+			top, left;
+
+		// uses stored clientX on afterload positioning when there is no event
+		if (e.clientX) {
+			target.clientX = e.clientX;
+			target.clientY = e.clientY;
+		}
+
+		// doesn't fit in the screen horizontaly
+		if (target.hintBoxItem.width() + 10 > wWidth) {
+			left = scrollLeft + 2;
+		}
+		// 10px to right if fit
+		else if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+			left = scrollLeft + target.clientX + 10;
+		}
+		// 10px from screen right side
+		else {
+			left = scrollLeft + wWidth - 10 - target.hintBoxItem.width();
+		}
+
+		// 10px below if fit
+		if (wHeight - target.clientY - target.hintBoxItem.height() - 10 > 0) {
+			top = scrollTop + target.clientY + 10;
+		}
+		// 10px above if fit
+		else if (target.clientY - target.hintBoxItem.height() - 10 > 0) {
+			top = scrollTop + target.clientY - target.hintBoxItem.height() - 10;
+		}
+		// 10px below as fallback
+		else {
+			top = scrollTop + target.clientY + 10;
+		}
+
+		// fallback if doesnt't fit verticaly but could fit if aligned to right or left
+		if ((top - scrollTop + target.hintBoxItem.height() > wHeight)
+			&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
+
+			// align to left if fit
+			if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+				left = scrollLeft + target.clientX + 10;
+			}
+			// align to right
 			else {
-				hint.remove();
+				left = scrollLeft + target.clientX - target.hintBoxItem.width() - 10;
+			}
+
+			// 10px from bottom if fit
+			if (wHeight - 10 > target.hintBoxItem.height()) {
+				top = scrollTop + wHeight - target.hintBoxItem.height() - 10;
+			}
+			// 10px from top
+			else {
+				top = scrollTop + 10;
 			}
 		}
+
+		target.hintBoxItem.css({
+			'top': top + 'px',
+			'left': left + 'px',
+			'zIndex': '999'
+		});
 	},
 
-	hideAll: function() {
-		for (var id in this.boxes) {
-			if (typeof(this.boxes[id]) != 'undefined' && !empty(this.boxes[id])) {
-				this.hide(id);
+	hideHint: function(e, target, hideStatic) {
+		if (target.isStatic && !hideStatic) return;
+		if (target.hintBoxItem) {
+			target.hintBoxItem.remove();
+			delete target.hintBoxItem;
+			if (target.isStatic) {
+				delete target.isStatic;
 			}
 		}
 	}

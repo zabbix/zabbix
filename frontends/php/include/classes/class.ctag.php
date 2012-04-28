@@ -194,10 +194,9 @@ class CTag extends CObject {
 		encodeValues($text);
 		$text = unpack_object($text);
 
-		$this->addAction('onmouseover', 'javascript: hintBox.showOver(this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');');
-		$this->addAction('onmouseout', 'javascript: hintBox.hideOut(this);');
+		$this->addAction('onmouseover', 'hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');');
 		if ($byClick) {
-			$this->addAction('onclick', 'javascript: hintBox.onClick(this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');');
+			$this->addAction('onclick', 'hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', \''.$width.'\', \''.$class.'\');');
 		}
 		return true;
 	}

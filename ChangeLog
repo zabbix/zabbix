@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4495] fixed hintbox positioning (Toms)
 ..F....... [ZBX-4903] fixed sorting in 'Overview' screen (Vedmak)
 A......... [ZBX-4927] fix proxy deletion message and remove excess space from the audit record (Richlv)
 ..F....... [ZBX-4900] improved performance of 'Status of Zabbix' dashboard widget (Vedmak)
