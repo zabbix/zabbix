@@ -36,6 +36,7 @@ class CImportReferencer {
 	protected $iconMaps = array();
 	protected $maps = array();
 	protected $screens = array();
+	protected $macros = array();
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
@@ -46,6 +47,7 @@ class CImportReferencer {
 	protected $iconMapsRefs;
 	protected $mapsRefs;
 	protected $screensRefs;
+	protected $macrosRefs;
 
 
 	/**
@@ -248,6 +250,22 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get macro id by host id and macro name.
+	 *
+	 * @param string $hostid
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveMacro($hostid, $name) {
+		if ($this->macrosRefs === null) {
+			$this->selectMacros();
+		}
+
+		return isset($this->macrosRefs[$hostid][$name]) ? $this->macrosRefs[$hostid][$name] : false;
+	}
+
+	/**
 	 * Add group names that need association with a database group id.
 	 *
 	 * @param array $groups
@@ -442,6 +460,31 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Add macros names that need association with a database macro id.
+	 *
+	 * @param array $macros
+	 */
+	public function addMacros(array $macros) {
+		foreach ($macros as $host => $ms) {
+			if (!isset($this->macros[$host])) {
+				$this->macros[$host] = array();
+			}
+			$this->macros[$host] = array_unique(array_merge($this->macros[$host], $ms));
+		}
+	}
+
+	/**
+	 * Add macro name association with macro id.
+	 *
+	 * @param string $hostId
+	 * @param string $macro
+	 * @param string $macroId
+	 */
+	public function addMacroRef($hostId, $macro, $macroId) {
+		$this->macrosRefs[$hostId][$macro] = $macroId;
+	}
+
+	/**
 	 * Select group ids for previously added group names.
 	 */
 	protected function selectGroups() {
@@ -522,9 +565,14 @@ class CImportReferencer {
 					$this->applicationsRefs[$dbApplication['hostid']][$dbApplication['name']] = $dbApplication['applicationid'];
 				}
 			}
-
-			$this->applications = array();
 		}
+	}
+
+	/**
+	 * Unset application refs to make referencer select them from db again.
+	 */
+	public function refreshApplications() {
+		$this->applicationsRefs = null;
 	}
 
 	/**
@@ -538,19 +586,24 @@ class CImportReferencer {
 			foreach ($this->items as $host => $keys) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
-					$sqlWhere[] = '(hostid='.$hostId.' AND '.DBcondition('key_', $keys).')';
+					$sqlWhere[] = '(i.hostid='.$hostId.' AND '.DBcondition('i.key_', $keys).')';
 				}
 			}
 
 			if ($sqlWhere) {
-				$dbitems = DBselect('SELECT itemid, hostid, key_ FROM items WHERE '.implode(' OR ', $sqlWhere));
+				$dbitems = DBselect('SELECT i.itemid,i.hostid,i.key_ FROM items i WHERE '.implode(' OR ', $sqlWhere));
 				while ($dbItem = DBfetch($dbitems)) {
 					$this->itemsRefs[$dbItem['hostid']][$dbItem['key_']] = $dbItem['itemid'];
 				}
 			}
-
-			$this->items = array();
 		}
+	}
+
+	/**
+	 * Unset item refs to make referencer select them from db again.
+	 */
+	public function refreshItems() {
+		$this->itemsRefs = null;
 	}
 
 	/**
@@ -560,7 +613,7 @@ class CImportReferencer {
 		if (!empty($this->valueMaps)) {
 			$this->valueMapsRefs = array();
 
-			$dbitems = DBselect('SELECT v.name, v.valuemapid FROM valuemaps v WHERE '.DBcondition('v.name', $this->valueMaps));
+			$dbitems = DBselect('SELECT v.name,v.valuemapid FROM valuemaps v WHERE '.DBcondition('v.name', $this->valueMaps));
 			while ($dbItem = DBfetch($dbitems)) {
 				$this->valueMapsRefs[$dbItem['name']] = $dbItem['valuemapid'];
 			}
@@ -577,7 +630,7 @@ class CImportReferencer {
 			$this->triggersRefs = array();
 
 			$triggerIds = array();
-			$sql = 'SELECT t.triggerid, t.expression, t.description
+			$sql = 'SELECT t.triggerid,t.expression,t.description
 				FROM triggers t
 				WHERE '.DBcondition('t.description', array_keys($this->triggers));
 			$dbTriggers = DBselect($sql);
@@ -609,9 +662,14 @@ class CImportReferencer {
 					}
 				}
 			}
-
-			$this->triggers = array();
 		}
+	}
+
+	/**
+	 * Unset trigger refs to make referencer select them from db again.
+	 */
+	public function refreshTriggers() {
+		$this->triggersRefs = null;
 	}
 
 	/**
@@ -659,7 +717,7 @@ class CImportReferencer {
 		if (!empty($this->screens)) {
 			$this->screensRefs = array();
 
-			$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE'.
+			$dbScreens = DBselect('SELECT s.screenid,s.name FROM screens s WHERE'.
 					' s.templateid IS NULL '.
 					' AND '.DBcondition('s.name', $this->screens));
 			while ($dbScreen = DBfetch($dbScreens)) {
@@ -667,6 +725,31 @@ class CImportReferencer {
 			}
 
 			$this->screens = array();
+		}
+	}
+
+	/**
+	 * Select macro ids for previously added macro names.
+	 */
+	protected function selectMacros() {
+		if (!empty($this->macros)) {
+			$this->macrosRefs = array();
+			$sqlWhere = array();
+			foreach ($this->macros as $host => $macros) {
+				$hostId = $this->resolveHostOrTemplate($host);
+				if ($hostId) {
+					$sqlWhere[] = '(hm.hostid='.$hostId.' AND '.DBcondition('hm.macro', $macros).')';
+				}
+			}
+
+			if ($sqlWhere) {
+				$dbMacros = DBselect('SELECT hm.hostmacroid, hm.hostid, hm.macro FROM hostmacro hm WHERE '.implode(' OR ', $sqlWhere));
+				while ($dbMacro = DBfetch($dbMacros)) {
+					$this->macrosRefs[$dbMacro['hostid']][$dbMacro['macro']] = $dbMacro['hostmacroid'];
+				}
+			}
+
+			$this->macros = array();
 		}
 	}
 }

@@ -193,6 +193,7 @@ class CConfigurationImport {
 		$iconMapsRefs = array();
 		$mapsRefs = array();
 		$screensRefs = array();
+		$macrosRefs = array();
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -204,6 +205,11 @@ class CConfigurationImport {
 			foreach ($template['groups'] as $group) {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
+
+			foreach ($template['macros'] as $macro) {
+				$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
+			}
+
 			if (!empty($template['templates'])) {
 				foreach ($template['templates'] as $linkedTemplate) {
 					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
@@ -213,9 +219,15 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedHosts() as $host) {
 			$hostsRefs[$host['host']] = $host['host'];
+
 			foreach ($host['groups'] as $group) {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
+
+			foreach ($host['macros'] as $macro) {
+				$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+			}
+
 			if (!empty($host['templates'])) {
 				foreach ($host['templates'] as $linkedTemplate) {
 					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
@@ -422,6 +434,7 @@ class CConfigurationImport {
 		$this->referencer->addIconMaps($iconMapsRefs);
 		$this->referencer->addMaps($mapsRefs);
 		$this->referencer->addScreens($screensRefs);
+		$this->referencer->addMacros($macrosRefs);
 	}
 
 	/**
@@ -509,9 +522,16 @@ class CConfigurationImport {
 				}
 			}
 
-			if ($this->referencer->resolveHost($host['host'])) {
-				$host['hostid'] = $this->referencer->resolveHost($host['host']);
-				$processedHosts[$host['host']] = $host['hostid'];
+			if ($hostId = $this->referencer->resolveHost($host['host'])) {
+				$host['hostid'] = $hostId;
+				foreach ($host['macros'] as &$macro) {
+					if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
+						$macro['hostmacroid'] = $hostMacroId;
+					}
+				}
+				unset($macro);
+
+				$processedHosts[$host['host']] = $hostId;
 				$hostsToUpdate[] = $host;
 			}
 			else {
@@ -623,6 +643,9 @@ class CConfigurationImport {
 			$application = $applicationsToCreate[$anum];
 			$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
 		}
+
+		// refresh applications beacuse templated ones can be inherited to host and used in items
+		$this->referencer->refreshApplications();
 	}
 
 	/**
@@ -683,6 +706,9 @@ class CConfigurationImport {
 		if ($this->options['items']['updateExisting'] && $itemsToUpdate) {
 			API::Item()->update($itemsToUpdate);
 		}
+
+		// refresh items because templated ones can be inherited to host and used in triggers, grahs, etc.
+		$this->referencer->refreshItems();
 	}
 
 	/**
@@ -748,6 +774,8 @@ class CConfigurationImport {
 			}
 		}
 
+		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
+		$this->referencer->refreshItems();
 
 		// process prototypes
 		$prototypesToUpdate = array();
@@ -831,6 +859,8 @@ class CConfigurationImport {
 			API::ItemPrototype()->update($prototypesToUpdate);
 		}
 
+		// refresh prototypes because templated ones can be inherited to host and used in triggers prototypes or graph prototypes
+		$this->referencer->refreshItems();
 
 		// first we need to create item prototypes and only then graph prototypes
 		$triggersToCreate = array();
@@ -1060,6 +1090,8 @@ class CConfigurationImport {
 			API::Trigger()->update($triggerDependencies);
 		}
 
+		// refresh triggers because template triggers can be inherited to host and used in maps
+		$this->referencer->refreshTriggers();
 	}
 
 	/**
