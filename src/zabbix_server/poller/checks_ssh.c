@@ -40,7 +40,7 @@ static void	kbd_callback(const char *name, int name_len, const char *instruction
 
 	if (num_prompts == 1)
 	{
-		responses[0].text = strdup(password);
+		responses[0].text = zbx_strdup(NULL, password);
 		responses[0].length = strlen(password);
 	}
 
@@ -74,7 +74,7 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 	return rc;
 }
 
-/* Example ssh.run["ls /"] */
+/* example ssh.run["ls /"] */
 static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
 	const char	*__function_name = "ssh_run";
@@ -84,7 +84,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	int		auth_pw = 0, rc, ret = NOTSUPPORTED,
 			exitcode, bytecount = 0;
 	char		buffer[MAX_BUFFER_LEN], buf[16], *userauthlist,
-			*publickey = NULL, *privatekey = NULL;
+			*publickey = NULL, *privatekey = NULL, *ssherr;
 	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -96,23 +96,22 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		goto close;
 	}
 
-	/* initializes an SSH session object
-	 */
+	/* initializes an SSH session object */
 	if (NULL == (session = libssh2_session_init()))
 	{
-		SET_MSG_RESULT(result, strdup("Failure initializing SSH session"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize SSH session"));
 		goto tcp_close;
 	}
 
 	/* set blocking mode on session */
 	libssh2_session_set_blocking(session, 1);
 
-	/* Create a session instance and start it up. This will trade welcome
-	 * banners, exchange keys, and setup crypto, compression, and MAC layers
-	 */
+	/* Create a session instance and start it up. This will trade welcome */
+	/* banners, exchange keys, and setup crypto, compression, and MAC layers */
 	if (0 != libssh2_session_startup(session, s.socket))
 	{
-		SET_MSG_RESULT(result, strdup("Failure establishing SSH session"));
+		libssh2_session_last_error(session, &ssherr, NULL, 0);
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot establish SSH session: %s", ssherr));
 		goto session_free;
 	}
 
@@ -128,93 +127,118 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	}
 	else
 	{
-		SET_MSG_RESULT(result, strdup("Failure obtaining authentication methods"));
+		libssh2_session_last_error(session, &ssherr, NULL, 0);
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain authentication methods: %s", ssherr));
 		goto session_close;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() Supported authentication methods:'%s'", __function_name, userauthlist);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() supported authentication methods:'%s'", __function_name, userauthlist);
 
-	switch (item->authtype) {
-	case ITEM_AUTHTYPE_PASSWORD:
-		if (auth_pw & 1)
-		{
-			/* We could authenticate via password */
-			if (0 != libssh2_userauth_password(session, item->username, item->password))
+	switch (item->authtype)
+	{
+		case ITEM_AUTHTYPE_PASSWORD:
+			if (auth_pw & 1)
 			{
-				SET_MSG_RESULT(result, strdup("Authentication by password failed"));
-				goto session_close;
+				/* we could authenticate via password */
+				if (0 != libssh2_userauth_password(session, item->username, item->password))
+				{
+					libssh2_session_last_error(session, &ssherr, NULL, 0);
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Password authentication failed: %s",
+							ssherr));
+					goto session_close;
+				}
+				else
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() password authentication succeeded",
+							__function_name);
+			}
+			else if (auth_pw & 2)
+			{
+				/* or via keyboard-interactive */
+				password = item->password;
+				if (0 != libssh2_userauth_keyboard_interactive(session, item->username, &kbd_callback))
+				{
+					libssh2_session_last_error(session, &ssherr, NULL, 0);
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Keyboard-interactive authentication"
+							" failed: %s", ssherr));
+					goto session_close;
+				}
+				else
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() keyboard-interactive authentication succeeded",
+							__function_name);
 			}
 			else
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() Authentication by password succeeded.",
-						__function_name);
-		}
-		else if (auth_pw & 2)
-		{
-			/* Or via keyboard-interactive */
-			password = item->password;
-			if (0 != libssh2_userauth_keyboard_interactive(session, item->username, &kbd_callback))
 			{
-				SET_MSG_RESULT(result, strdup("Authentication by keyboard-interactive failed"));
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
+						" Supported methods: %s", userauthlist));
 				goto session_close;
+			}
+			break;
+		case ITEM_AUTHTYPE_PUBLICKEY:
+			if (auth_pw & 4)
+			{
+				if (NULL == CONFIG_SSH_KEY_LOCATION)
+				{
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Authentication by public key failed."
+							" SSHKeyLocation option is not set"));
+					goto session_close;
+				}
+
+				/* or by public key */
+				publickey = zbx_dsprintf(publickey, "%s/%s", CONFIG_SSH_KEY_LOCATION, item->publickey);
+				privatekey = zbx_dsprintf(privatekey, "%s/%s", CONFIG_SSH_KEY_LOCATION,
+						item->privatekey);
+
+				if (SUCCEED != zbx_is_regular_file(publickey))
+				{
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot access public key file %s",
+							publickey));
+					goto session_close;
+				}
+
+				if (SUCCEED != zbx_is_regular_file(privatekey))
+				{
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot access private key file %s",
+							privatekey));
+					goto session_close;
+				}
+
+				rc = libssh2_userauth_publickey_fromfile(session, item->username, publickey,
+						privatekey, item->password);
+				zbx_free(publickey);
+				zbx_free(privatekey);
+
+				if (0 != rc)
+				{
+					libssh2_session_last_error(session, &ssherr, NULL, 0);
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Public key authentication failed:"
+							" %s", ssherr));
+					goto session_close;
+				}
+				else
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() authentication by public key succeeded",
+							__function_name);
 			}
 			else
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() Authentication by keyboard-interactive succeeded.",
-						__function_name);
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
-					" Supported methods: %s", userauthlist));
-			goto session_close;
-		}
-		break;
-	case ITEM_AUTHTYPE_PUBLICKEY:
-		if (auth_pw & 4)
-		{
-			if (NULL == CONFIG_SSH_KEY_LOCATION)
 			{
-				SET_MSG_RESULT(result, strdup("Authentication by public key failed."
-						" SSHKeyLocation option is not set"));
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
+						" Supported methods: %s", userauthlist));
 				goto session_close;
 			}
-
-			/* Or by public key */
-			publickey = zbx_dsprintf(publickey, "%s/%s", CONFIG_SSH_KEY_LOCATION, item->publickey);
-			privatekey = zbx_dsprintf(privatekey, "%s/%s", CONFIG_SSH_KEY_LOCATION, item->privatekey);
-			rc = libssh2_userauth_publickey_fromfile(session, item->username, publickey,
-					privatekey, item->password);
-			zbx_free(publickey);
-			zbx_free(privatekey);
-
-			if (0 != rc)
-			{
-				SET_MSG_RESULT(result, strdup("Authentication by public key failed"));
-				goto session_close;
-			}
-			else
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() Authentication by public key succeeded.",
-						__function_name);
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
-					" Supported methods: %s", userauthlist));
-			goto session_close;
-		}
-		break;
+			break;
 	}
 
-	/* Exec non-blocking on the remove host */
+	/* exec non-blocking on the remove host */
 	while (NULL == (channel = libssh2_channel_open_session(session)))
 	{
-		switch (libssh2_session_last_error(session, NULL, NULL, 0)) {
-		/* Marked for non-blocking I/O but the call would block. */
-		case LIBSSH2_ERROR_EAGAIN:
-			waitsocket(s.socket, session);
-			continue;
-		default:
-			SET_MSG_RESULT(result, strdup("Failure establishing a generic session channel"));
-			goto session_close;
+		switch (libssh2_session_last_error(session, NULL, NULL, 0))
+		{
+			/* marked for non-blocking I/O but the call would block. */
+			case LIBSSH2_ERROR_EAGAIN:
+				waitsocket(s.socket, session);
+				continue;
+			default:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot establish generic session channel"));
+				goto session_close;
 		}
 	}
 
@@ -222,13 +246,14 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	/* request a shell on a channel and execute command */
 	while (0 != (rc = libssh2_channel_exec(channel, item->params)))
 	{
-		switch (rc) {
-		case LIBSSH2_ERROR_EAGAIN:
-			waitsocket(s.socket, session);
-			continue;
-		default:
-			SET_MSG_RESULT(result, strdup("Failure requesting a shell"));
-			goto channel_close;
+		switch (rc)
+		{
+			case LIBSSH2_ERROR_EAGAIN:
+				waitsocket(s.socket, session);
+				continue;
+			default:
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot request a shell"));
+				goto channel_close;
 		}
 	}
 
@@ -258,7 +283,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			waitsocket(s.socket, session);
 		else if (rc < 0)
 		{
-			SET_MSG_RESULT(result, strdup("Failure reading data from SSH server"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read data from SSH server"));
 			goto channel_close;
 		}
 		else
@@ -271,19 +296,20 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	ret = SYSINFO_RET_OK;
 
 channel_close:
-	/* Close an active data channel
-	 */
+	/* close an active data channel */
 	exitcode = 127;
 	while (0 != (rc = libssh2_channel_close(channel)))
 	{
-		switch (rc) {
-		case LIBSSH2_ERROR_EAGAIN:
-			waitsocket(s.socket, session);
-			continue;
-		default:
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() Failure closing a generic session channel",
-					__function_name);
-			break;
+		switch (rc)
+		{
+			case LIBSSH2_ERROR_EAGAIN:
+				waitsocket(s.socket, session);
+				continue;
+			default:
+				libssh2_session_last_error(session, &ssherr, NULL, 0);
+				zabbix_log(LOG_LEVEL_WARNING, "%s() cannot close generic session channel: %s",
+						__function_name, ssherr);
+				break;
 		}
 	}
 
