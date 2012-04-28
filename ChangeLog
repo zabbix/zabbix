@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
 ..F....... [ZBX-4495] fixed hintbox positioning (Toms)
 ..F....... [ZBX-4903] fixed sorting in 'Overview' screen (Vedmak)
 A......... [ZBX-4927] fix proxy deletion message and remove excess space from the audit record (Richlv)
@@ -611,6 +612,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.13rc1
 
+........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
 A.F....... [ZBX-4877] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-4900] improved performance of the 'Status of Zabbix' dashboard widget (Vedmak)
 ...G...... [ZBX-4905] fixed processing of system.swap.in/out[,pages] under Linux 2.6 (Sasha)
