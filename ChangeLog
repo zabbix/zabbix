@@ -7,6 +7,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+A......... [ZBX-4880] fixed error 'JSON-rpc error generation failed. No such error' in API (Vedmak)
 ..F....... [ZBX-4922] fixed importing of linked templates (Vedmak)
 ..F....... [ZBX-4895] fixed host proxy exported as id (Vedmak)
 .......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
