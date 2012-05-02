@@ -86,7 +86,7 @@
 			if('add' == $_REQUEST['favaction']){
 				$result = add2favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 				if($result){
-					print('$("addrm_fav").title = "'._('Remove from favourites.').'";'."\n");
+					print('$("addrm_fav").title = "'._('Remove from favourites').'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
@@ -94,7 +94,7 @@
 				$result = rm4favorites('web.favorite.screenids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
-					print('$("addrm_fav").title = "'._('Add to favourites.').'";'."\n");
+					print('$("addrm_fav").title = "'._('Add to favourites').'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("'.$_REQUEST['favobj'].'","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}

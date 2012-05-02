@@ -1444,7 +1444,6 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
 		'hotids' => $hostids,
-		'selectAppllications' => API_OUTPUT_EXTEND,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => true,
 		'preservekeys' => true
@@ -1484,7 +1483,7 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 	if (empty($hostNames)) {
 		return $triggerTable;
 	}
-	ksort($hostNames);
+	order_result($hostNames);
 
 	$css = getUserTheme(CWebUser::$data);
 	if ($view_style == STYLE_TOP) {
