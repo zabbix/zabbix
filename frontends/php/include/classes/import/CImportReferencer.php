@@ -36,6 +36,7 @@ class CImportReferencer {
 	protected $iconMaps = array();
 	protected $maps = array();
 	protected $screens = array();
+	protected $proxies = array();
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
@@ -46,6 +47,7 @@ class CImportReferencer {
 	protected $iconMapsRefs;
 	protected $mapsRefs;
 	protected $screensRefs;
+	protected $proxiesRefs;
 
 
 	/**
@@ -248,6 +250,21 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get proxy id by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveProxy($name) {
+		if ($this->proxiesRefs === null) {
+			$this->selectProxyes();
+		}
+
+		return isset($this->proxiesRefs[$name]) ? $this->proxiesRefs[$name] : false;
+	}
+
+	/**
 	 * Add group names that need association with a database group id.
 	 *
 	 * @param array $groups
@@ -439,6 +456,25 @@ class CImportReferencer {
 	 */
 	public function addScreenRef($name, $screenId) {
 		$this->screensRefs[$name] = $screenId;
+	}
+
+	/**
+	 * Add proxy names that need association with a database proxy id.
+	 *
+	 * @param array $proxies
+	 */
+	public function addProxies(array $proxies) {
+		$this->proxies = array_unique(array_merge($this->proxies, $proxies));
+	}
+
+	/**
+	 * Add proxy name association with proxy id.
+	 *
+	 * @param string $name
+	 * @param string $proxyId
+	 */
+	public function addProxyRef($name, $proxyId) {
+		$this->proxiesRefs[$name] = $proxyId;
 	}
 
 	/**
@@ -667,6 +703,26 @@ class CImportReferencer {
 			}
 
 			$this->screens = array();
+		}
+	}
+
+	/**
+	 * Select proxy ids for previously added proxy names.
+	 */
+	protected function selectProxyes() {
+		if (!empty($this->proxies)) {
+			$this->proxiesRefs = array();
+			$dbProxy = API::Proxy()->get(array(
+				'filter' => array('host' => $this->proxies),
+				'output' => array('hostid', 'host'),
+				'preservekeys' => true,
+				'editable' => true
+			));
+			foreach ($dbProxy as $proxy) {
+				$this->proxiesRefs[$proxy['host']] = $proxy['proxyid'];
+			}
+
+			$this->proxies = array();
 		}
 	}
 }

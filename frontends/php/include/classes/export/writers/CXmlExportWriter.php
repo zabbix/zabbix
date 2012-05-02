@@ -39,7 +39,7 @@ class CXmlExportWriter extends CExportWriter {
 	 */
 	public function write(array $array) {
 		$this->xmlWriter->openMemory();
-		$this->xmlWriter->setIndent(true);
+		$this->xmlWriter->setIndent($this->formatOutput);
 		$this->xmlWriter->setIndentString('    ');
 		$this->xmlWriter->startDocument('1.0', 'UTF-8');
 
