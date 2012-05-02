@@ -779,7 +779,7 @@ class CImportReferencer {
 			}
 
 			if ($sqlWhere) {
-				$dbMacros = DBselect('SELECT hm.hostmacroid, hm.hostid, hm.macro FROM hostmacro hm WHERE '.implode(' OR ', $sqlWhere));
+				$dbMacros = DBselect('SELECT hm.hostmacroid,hm.hostid,hm.macro FROM hostmacro hm WHERE '.implode(' OR ', $sqlWhere));
 				while ($dbMacro = DBfetch($dbMacros)) {
 					$this->macrosRefs[$dbMacro['hostid']][$dbMacro['macro']] = $dbMacro['hostmacroid'];
 				}
