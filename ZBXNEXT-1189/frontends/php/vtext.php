@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 define('ZBX_PAGE_NO_AUTHORIZATION', 1);
 require_once dirname(__FILE__).'/include/config.inc.php';
 
@@ -26,10 +26,10 @@ $page['file'] = 'vtext.php';
 $page['type'] = PAGE_TYPE_IMAGE;
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields=array(
+$fields = array(
 	'text' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
 	'font' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 5),	null),
 	'theme' =>	array(T_ZBX_STR, O_OPT, null,	null,			null)
@@ -52,7 +52,7 @@ switch ($theme) {
 		$shadow = array('red' => 175, 'green' => 175, 'blue' => 175);
 }
 
-$size = imageTextSize($font, $angle, $text);
+$size = imageTextSize($font, 0, $text);
 
 $im = imagecreatetruecolor($size['width'] + 4, $size['height'] + 4);
 
@@ -79,5 +79,5 @@ imageOut($newImage);
 imagedestroy($newImage);
 imagedestroy($im);
 
+
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

@@ -2092,7 +2092,6 @@ retry:
 			break;
 		default:
 			assert(0);
-			break;
 	}
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
@@ -2100,6 +2099,18 @@ retry:
 
 	if (NULL == ts)
 	{
+		if (0 != last_n && 0 == clock_from && 0 != clock_to)
+		{
+			const int	steps[] = {SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH};
+
+			if (0 != retry)
+				clock_to -= steps[retry - 1];
+			if (4 != retry)
+			{
+				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+						" and clock>%d", clock_to - steps[retry]);
+			}
+		}
 		if (0 != clock_from)
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock>%d", clock_from);
 		if (0 != clock_to)
@@ -2124,7 +2135,7 @@ retry:
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_STR:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" order by itemid desc,clock desc");
+							" order by clock desc");
 					break;
 				default:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
@@ -2138,7 +2149,7 @@ retry:
 					" order by ns desc");
 		}
 
-		result = DBselectN(sql, last_n);
+		result = DBselectN(sql, last_n - h_num);
 	}
 	else
 		result = DBselect("%s", sql);
@@ -2176,6 +2187,12 @@ retry:
 
 		if (1 == retry)
 			goto retry;
+	}
+
+	if (NULL == ts && 0 != last_n && 0 == clock_from && 0 != clock_to && h_num != last_n && 4 != retry)
+	{
+		retry++;
+		goto retry;
 	}
 
 	h_value[h_num] = NULL;
