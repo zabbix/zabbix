@@ -105,9 +105,11 @@ class CConfigurationImport {
 
 	/**
 	 * Import configuration data.
+	 *
 	 * @todo   for 1.8 version import old class CXmlImport18 is used
 	 *
 	 * @throws Exception
+	 * @throws UnexpectedValueException
 	 * @return bool
 	 */
 	public function import() {
@@ -193,6 +195,7 @@ class CConfigurationImport {
 		$iconMapsRefs = array();
 		$mapsRefs = array();
 		$screensRefs = array();
+		$proxyRefs = array();
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -220,6 +223,9 @@ class CConfigurationImport {
 				foreach ($host['templates'] as $linkedTemplate) {
 					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
 				}
+			}
+			if (!empty($host['proxy'])) {
+				$proxyRefs[$host['proxy']['name']] = $host['proxy']['name'];
 			}
 		}
 
@@ -422,6 +428,7 @@ class CConfigurationImport {
 		$this->referencer->addIconMaps($iconMapsRefs);
 		$this->referencer->addMaps($mapsRefs);
 		$this->referencer->addScreens($screensRefs);
+		$this->referencer->addProxies($proxyRefs);
 	}
 
 	/**
@@ -493,25 +500,39 @@ class CConfigurationImport {
 		$hostsToCreate = $hostsToUpdate = array();
 		foreach ($hosts as $host) {
 			foreach ($host['groups'] as $gnum => $group) {
-				if (!$this->referencer->resolveGroup($group['name'])) {
-					throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
+				$groupId = $this->referencer->resolveGroup($group['name']);
+				if (!$groupId) {
+					throw new Exception(_s('Group "%1$s" for host "%2$s" does not exist.', $group['name'], $host['host']));
 				}
-				$host['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
+				$host['groups'][$gnum] = array('groupid' => $groupId);
 			}
-			if (isset($host['templates'])) {
+
+			if (!empty($host['templates'])) {
 				foreach ($host['templates'] as $tnum => $template) {
-					if (!$this->referencer->resolveTemplate($template['name'])) {
-						throw new Exception(_s('Template "%1$s" does not exist.', $template['name']));
+					$templateId = $this->referencer->resolveTemplate($template['name']);
+					if (!$templateId) {
+						throw new Exception(_s('Template "%1$s" for host "%2$s" does not exist.', $template['name'], $host['host']));
 					}
-					$host['templates'][$tnum] = array(
-						'templateid' => $this->referencer->resolveHostOrTemplate($template['name'])
-					);
+					$host['templates'][$tnum] = array('templateid' => $templateId);
 				}
 			}
 
-			if ($this->referencer->resolveHost($host['host'])) {
-				$host['hostid'] = $this->referencer->resolveHost($host['host']);
-				$processedHosts[$host['host']] = $host['hostid'];
+			if (isset($host['proxy'])) {
+				if (empty($host['proxy'])) {
+					$proxyId = 0;
+				}
+				else {
+					$proxyId = $this->referencer->resolveProxy($host['proxy']['name']);
+					if (!$proxyId) {
+						throw new Exception(_s('Proxy "%1$s" for host "%2$s" does not exist.', $host['proxy']['name'], $host['host']));
+					}
+				}
+
+				$host['proxy_hostid'] = $proxyId;
+			}
+
+			if ($hostId = $this->referencer->resolveHost($host['host'])) {
+				$host['hostid'] = $hostId;
 				$hostsToUpdate[] = $host;
 			}
 			else {
@@ -527,7 +548,7 @@ class CConfigurationImport {
 		));
 		foreach ($dbInterfaces as $dbInterface) {
 			foreach ($hostsToUpdate as $hnum => $host) {
-				if (bccomp($host['hostid'], $dbInterface['hostid']) == 0) {
+				if (!empty($host['interfaces']) && idcmp($host['hostid'], $dbInterface['hostid'])) {
 					foreach ($host['interfaces'] as $inum => $interface) {
 						if ($dbInterface['ip'] == $interface['ip']
 								&& $dbInterface['dns'] == $interface['dns']
@@ -535,7 +556,8 @@ class CConfigurationImport {
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
 								&& $dbInterface['main'] == $interface['main']) {
-							unset($hostsToUpdate[$hnum]['interfaces'][$inum]);
+							$hostsToUpdate[$hnum]['interfaces'][$inum]['interfaceid'] = $dbInterface['interfaceid'];
+							break;
 						}
 					}
 				}
@@ -545,25 +567,25 @@ class CConfigurationImport {
 			}
 		}
 
-		// create/update hosts and create hash host->hostid
+		// create/update hosts
 		if ($this->options['hosts']['createMissing'] && $hostsToCreate) {
 			$newHostIds = API::Host()->create($hostsToCreate);
 			foreach ($newHostIds['hostids'] as $hnum => $hostid) {
-				$processedHosts[$hostsToCreate[$hnum]['host']] = $hostid;
-				$this->referencer->addHostRef($hostsToCreate[$hnum]['host'], $hostid);
-			}
-			foreach ($hostsToCreate as $host) {
-				$this->referencer->addProcessedHost($host['host']);
+				$host = $hostsToCreate[$hnum]['host'];
+				$processedHosts[$host] = $hostid;
+				$this->referencer->addHostRef($host, $hostid);
+				$this->referencer->addProcessedHost($host);
 			}
 		}
 		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
 			API::Host()->update($hostsToUpdate);
 			foreach ($hostsToUpdate as $host) {
 				$this->referencer->addProcessedHost($host['host']);
+				$processedHosts[$host['host']] = $host['hostid'];
 			}
 		}
 
-		// create interface hash interface_ref->interfaceid
+		// create interfaces cache interface_ref->interfaceid
 		$dbInterfaces = API::HostInterface()->get(array(
 			'hostids' => $processedHosts,
 			'output' => API_OUTPUT_EXTEND,
