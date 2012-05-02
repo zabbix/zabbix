@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-27 17:38+0300\n"
+"POT-Creation-Date: 2012-05-02 17:38+0300\n"
 "PO-Revision-Date: 2012-04-27 16:04+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -273,8 +273,9 @@ msgid "Action"
 msgstr "Действие"
 
 #: api/classes/CAction.php:817
-msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2%s seconds)."
-msgstr "В действии \"%1$s\" задано некорректное значение для \"esc_period\" (минимально %2%s секунд)."
+#, php-format
+msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
+msgstr ""
 
 #: api/classes/CAction.php:820 api/classes/CAction.php:835
 #: api/classes/CAction.php:925 api/classes/CAction.php:945
@@ -425,17 +426,10 @@ msgstr "Добавить услугу"
 msgid "Add to"
 msgstr "Добавить в"
 
-#: maps.php:73
-msgid "Add to Favourites"
-msgstr "Добавить в Избранное"
-
-#: include/html.inc.php:257 screens.php:91
+#: charts.php:91 history.php:98 host_screen.php:97 include/html.inc.php:257
+#: maps.php:73 screens.php:91
 msgid "Add to favourites"
 msgstr "Добавить в избранное"
-
-#: charts.php:91 history.php:98 host_screen.php:97
-msgid "Add to favourites."
-msgstr "Добавить в избранное."
 
 #: include/actions.inc.php:479
 msgid "Add to host group"
@@ -819,7 +813,7 @@ msgstr "Имя для подключения (BindDN)"
 msgid "Bind password"
 msgstr "Пароль подключения (Bind password)"
 
-#: include/classes/core/ZBase.php:122
+#: include/classes/core/ZBase.php:123
 msgid "Black & Blue"
 msgstr "Черный & Синий"
 
@@ -1137,7 +1131,7 @@ msgstr "Не удалось добавить группу"
 msgid "Cannot add host"
 msgstr "Не удалось добавить узел сети"
 
-#: adm.images.php:52 include/classes/import/CXmlImport18.php:607
+#: adm.images.php:52 include/classes/import/CXmlImport18.php:606
 msgid "Cannot add image"
 msgstr "Не удалось добавить изображение"
 
@@ -1306,7 +1300,7 @@ msgstr "Не удалось создать соответствие иконок
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "Не удалось создать соответствие иконок с таким же именем \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:784
+#: include/classes/import/CXmlImport18.php:783
 #, php-format
 msgid "Cannot create map \"%s\"."
 msgstr "Не удалось создать карту сети \"%s\"."
@@ -1521,8 +1515,8 @@ msgstr "Не удалось найти \"%1$s\" график используе�
 
 #: include/classes/import/importers/CMapImporter.php:208
 #, php-format
-msgid "Cannot find group \"%1$s\" used in map %2$s\"."
-msgstr "Не удалось найти \"%1$s\" группу используемую на \"%2$s\" карте сети."
+msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
@@ -1535,8 +1529,8 @@ msgstr "Не удалось найти узел сети"
 
 #: include/classes/import/importers/CMapImporter.php:216
 #, php-format
-msgid "Cannot find host \"%1$s\" used in map %2$s\"."
-msgstr "Не удалось найти \"%1$s\" узел сети используемый на \"%2$s\" карте сети."
+msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
@@ -1568,7 +1562,7 @@ msgstr "Не удалось найти \"%1$s\" иконку для \"%2$s\" к�
 msgid "Cannot find icon map \"%1$s\" for map \"%2$s\"."
 msgstr "Не удалось найти \"%1$s\" соответствие иконок для \"%2$s\" карты."
 
-#: include/classes/import/CXmlImport18.php:652
+#: include/classes/import/CXmlImport18.php:651
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in exported map \"%2$s\"."
 msgstr "Не удалось найти соответствие иконок \"%1$s\" используемое в экспортируемой карте сети \"%2$s\"."
@@ -1640,8 +1634,8 @@ msgid "Cannot have empty visible template name"
 msgstr "Невозможно иметь пустое видимое имя шаблона"
 
 #: api/classes/CTrigger.php:1756 api/classes/CTrigger.php:1847
-#: api/classes/CTriggerPrototype.php:1330
-#: api/classes/CTriggerPrototype.php:1402
+#: api/classes/CTriggerPrototype.php:1336
+#: api/classes/CTriggerPrototype.php:1408
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "Не удалось раскрыть выражение \"%s\"."
@@ -1654,7 +1648,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/classes/import/importers/CTemplateImporter.php:95
+#: include/classes/import/importers/CTemplateImporter.php:94
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
@@ -1700,17 +1694,17 @@ msgstr "Не удалось массово обновить видимое им�
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr "Невозможно передать одинаковые ID шаблонов для присоединения: %s."
 
-#: include/db.inc.php:1584
+#: include/classes/db/DB.php:511
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr "Не удалось выполнить запрос удаления из таблицы \"%1$s\" без выражения where."
 
-#: include/db.inc.php:1497
+#: include/classes/db/DB.php:422
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr "Не удалось выполнить запрос обновления таблицы \"%1$s\" без значений."
 
-#: include/db.inc.php:1508
+#: include/classes/db/DB.php:433
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr "Не удалось выполнить запрос обновления таблицы \"%1$s\" без выражения where."
@@ -1830,7 +1824,7 @@ msgstr "Не удалось обновить узлы сети"
 msgid "Cannot update icon map"
 msgstr "Не удалось обновить соответствие иконок"
 
-#: adm.images.php:48 include/classes/import/CXmlImport18.php:612
+#: adm.images.php:48 include/classes/import/CXmlImport18.php:611
 msgid "Cannot update image"
 msgstr "Не удалось обновить изображение"
 
@@ -1854,7 +1848,7 @@ msgstr "Не удалось обновить макросы"
 msgid "Cannot update maintenance"
 msgstr "Не удалось обновить обслуживание"
 
-#: include/classes/import/CXmlImport18.php:775
+#: include/classes/import/CXmlImport18.php:774
 #, php-format
 msgid "Cannot update map \"%s\"."
 msgstr "Не удалось обновить карту сети \"%s\"."
@@ -2033,7 +2027,7 @@ msgstr "Закольцованная ссылка в карте сети: %1$s."
 msgid "Circular reference in screens: %1$s."
 msgstr ""
 
-#: include/classes/import/importers/CTemplateImporter.php:120
+#: include/classes/import/importers/CTemplateImporter.php:119
 #, php-format
 msgid "Circular reference in templates: %1$s."
 msgstr "Закольцованная ссылка в шаблонах: %1$s."
@@ -2574,7 +2568,7 @@ msgstr "Создано: Прототип элемента данных \"%1$s\" 
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Триггер \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1337
+#: api/classes/CTriggerPrototype.php:1343
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Прототип триггера \"%1$s\" в \"%2$s\"."
@@ -2750,7 +2744,7 @@ msgstr "НЕДОСТУПЕН"
 msgid "Daily"
 msgstr "Ежедневно"
 
-#: include/classes/core/ZBase.php:123
+#: include/classes/core/ZBase.php:124
 msgid "Dark orange"
 msgstr "Темно-оранжевая"
 
@@ -4665,11 +4659,15 @@ msgstr "Сетка"
 msgid "Group"
 msgstr "Группа"
 
-#: include/classes/import/CConfigurationImport.php:497
-#: include/classes/import/importers/CTemplateImporter.php:202
+#: include/classes/import/importers/CTemplateImporter.php:213
 #, php-format
 msgid "Group \"%1$s\" does not exist."
 msgstr "Группа \"%1$s\" не существует."
+
+#: include/classes/import/CConfigurationImport.php:520
+#, php-format
+msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
+msgstr ""
 
 #: api/classes/CHostGroup.php:720
 #, php-format
@@ -4917,7 +4915,7 @@ msgstr "Узел сети \"%1$s\" уже существует."
 msgid "Host \"%s\" already exists."
 msgstr "Узел сети \"%s\" уже существует."
 
-#: include/classes/import/CXmlImport18.php:883
+#: include/classes/import/CXmlImport18.php:882
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr "У узла сети \"%s\" выбран параметр \"useipmi\", но не указан параметр \"ipmi_ip\"! Будет использоваться IP адрес узла сети, как адрес для IPMI интерфейса."
@@ -5727,7 +5725,7 @@ msgstr "Некорректная зависимость."
 msgid "Incorrect expression"
 msgstr "Некорректное выражение"
 
-#: include/db.inc.php:1515 include/db.inc.php:1591
+#: include/classes/db/DB.php:440 include/classes/db/DB.php:518
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Некорректное имя или значение поля \"%1$s\" в выражении where для таблицы \"%2$s\"."
@@ -5960,7 +5958,7 @@ msgstr "Некорректное количество скобок в выраж
 msgid "Incorrect port range."
 msgstr "Некорректный диапазон портов."
 
-#: include/db.inc.php:1550
+#: include/classes/db/DB.php:475
 #, php-format
 msgid "Incorrect primary keys for table \"%1$s\"."
 msgstr "Некорректные первичные ключи для таблицы \"%1$s\"."
@@ -6110,22 +6108,22 @@ msgstr "Некорректная группа пользователей."
 msgid "Incorrect user macro \"%1$s\" format is used in expression."
 msgstr "В выражении используется некорректный формат пользовательского макроса \"%1$s\"."
 
-#: include/db.inc.php:1389
+#: include/classes/db/DB.php:312
 #, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr "Некорректное значение \"%1$s\" для поля с плавающей точкой \"%2$s\"."
 
-#: include/db.inc.php:1383
+#: include/classes/db/DB.php:306
 #, php-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr "Некорректное значение \"%1$s\" для поля целого числа \"%2$s\"."
 
-#: include/db.inc.php:1377
+#: include/classes/db/DB.php:300
 #, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr "Некорректное значение \"%1$s\" для поля целого положительного числа \"%2$s\"."
 
-#: include/db.inc.php:1360
+#: include/classes/db/DB.php:283
 #, php-format
 msgid "Incorrect value \"NULL\" for NOT NULL field \"%1$s\"."
 msgstr "Некорректное значение \"NULL\" для NOT NULL поля \"%1$s\"."
@@ -6320,10 +6318,15 @@ msgstr "Элемент данных \"%1$s\" уже существует у \"%2
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Элемент данных \"%1$s\" не может заполнять отсутствующее поле под номером \"%2$d\" инвентарных данных узла сети. Выберите из: от 0 (не заполнять) до %3$d."
 
-#: include/classes/import/CXmlImport18.php:1475
+#: include/classes/import/CXmlImport18.php:1474
 #, php-format
 msgid "Item \"%1$s\" does not exist."
 msgstr "Элемент данных \"%1$s\" не существует."
+
+#: include/classes/import/CConfigurationImport.php:703
+#, php-format
+msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s does not exist\"."
+msgstr ""
 
 #: api/classes/CItemGeneral.php:286
 #, php-format
@@ -7029,7 +7032,7 @@ msgstr "Обслуживание со сбором данных"
 msgid "Maintenance without data collection"
 msgstr "Обслуживание без сбора данных"
 
-#: include/db.inc.php:1348
+#: include/classes/db/DB.php:271
 #, php-format
 msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
 msgstr "Пропущено обязательное поле \"%1$s\" для таблицы \"%2$s\"."
@@ -7060,12 +7063,12 @@ msgstr "Карта сети"
 msgid "Map \"%s\""
 msgstr "Карта сети \"%s\""
 
-#: include/classes/import/CXmlImport18.php:787
+#: include/classes/import/CXmlImport18.php:786
 #, php-format
 msgid "Map \"%s\" created."
 msgstr "Карта сети \"%s\" создана."
 
-#: include/classes/import/CXmlImport18.php:778
+#: include/classes/import/CXmlImport18.php:777
 #, php-format
 msgid "Map \"%s\" updated."
 msgstr "Карта сети \"%s\" обновлена."
@@ -7630,12 +7633,12 @@ msgstr "Следующая проверка"
 msgid "No"
 msgstr "Нет"
 
-#: include/classes/import/CXmlImport18.php:1521
+#: include/classes/import/CXmlImport18.php:1520
 #, php-format
 msgid "No \"ymax_type\" field for graph \"%s\""
 msgstr "Нет поля \"ymax_type\" для графика \"%s\""
 
-#: include/classes/import/CXmlImport18.php:1517
+#: include/classes/import/CXmlImport18.php:1516
 #, php-format
 msgid "No \"ymin_type\" field for graph \"%s\""
 msgstr "Нет поля \"ymin_type\" для графика \"%s\""
@@ -7966,18 +7969,18 @@ msgstr "Нет заданных нод."
 msgid "No operations defined."
 msgstr "Нет заданных операций."
 
-#: include/classes/import/CConfigurationImport.php:900
-#: include/classes/import/CConfigurationImport.php:977
+#: include/classes/import/CConfigurationImport.php:961
+#: include/classes/import/CConfigurationImport.php:1038
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr "Нет прав доступа к графику \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1466
+#: include/classes/import/CXmlImport18.php:1465
 #, php-format
 msgid "No permission for item \"%1$s\"."
 msgstr "Нет прав доступа к элементу данных \"%1$s\"."
 
-#: include/classes/import/CXmlImport18.php:1374
+#: include/classes/import/CXmlImport18.php:1373
 #, php-format
 msgid "No permission for trigger \"%s\""
 msgstr "Нет прав доступа к триггеру \"%s\""
@@ -7986,11 +7989,11 @@ msgstr "Нет прав доступа к триггеру \"%s\""
 msgid "No permissions defined."
 msgstr "Нет заданных прав доступа."
 
-#: include/classes/import/CXmlImport18.php:631
+#: include/classes/import/CXmlImport18.php:630
 msgid "No permissions for map"
 msgstr "Нет прав доступа к карте"
 
-#: include/classes/import/CXmlImport18.php:437
+#: include/classes/import/CXmlImport18.php:436
 msgid "No permissions for screen"
 msgstr "Нет прав доступа к комплексному экрану"
 
@@ -8023,8 +8026,8 @@ msgstr "Нет прав доступа к системе."
 #: api/classes/CTrigger.php:1909 api/classes/CTrigger.php:1921
 #: api/classes/CTriggerPrototype.php:1143
 #: api/classes/CTriggerPrototype.php:1233
-#: api/classes/CTriggerPrototype.php:1447
-#: api/classes/CTriggerPrototype.php:1459 api/classes/CUserMacro.php:828
+#: api/classes/CTriggerPrototype.php:1453
+#: api/classes/CTriggerPrototype.php:1465 api/classes/CUserMacro.php:828
 #: api/classes/CUserMacro.php:941 api/classes/CWebCheck.php:464
 #: include/config.inc.php:253
 msgid "No permissions to referred object or it does not exist!"
@@ -8605,7 +8608,7 @@ msgstr "Оператор"
 msgid "Original"
 msgstr "Оригинальное"
 
-#: include/classes/core/ZBase.php:121
+#: include/classes/core/ZBase.php:122
 msgid "Original blue"
 msgstr "Оригинальная синяя"
 
@@ -9128,6 +9131,11 @@ msgstr "Прокси"
 msgid "Proxy"
 msgstr "Прокси"
 
+#: include/classes/import/CConfigurationImport.php:542
+#, php-format
+msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
+msgstr ""
+
 #: api/classes/CProxy.php:381
 #, php-format
 msgid "Proxy \"%s\" already exists."
@@ -9352,17 +9360,10 @@ msgstr "Удалить элемент"
 msgid "Remove from"
 msgstr "Удалить из"
 
-#: maps.php:66
-msgid "Remove from Favourites"
-msgstr "Удалить из Избранного"
-
-#: include/html.inc.php:250 screens.php:84
+#: charts.php:83 history.php:90 host_screen.php:89 include/html.inc.php:250
+#: maps.php:66 screens.php:84
 msgid "Remove from favourites"
 msgstr "Удалить из избранного"
-
-#: charts.php:83 history.php:90 host_screen.php:89
-msgid "Remove from favourites."
-msgstr "Удалить из избранного."
 
 #: include/actions.inc.php:480
 msgid "Remove from host group"
@@ -9744,12 +9745,12 @@ msgstr "SNMPv3 security name"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "Количество SQL: %s (selects: %s | executes: %s)"
 
-#: include/db.inc.php:1598
+#: include/classes/db/DB.php:525
 #, php-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr "Ошибка при выполнении SQL запроса \"%1$s\""
 
-#: include/db.inc.php:1471 include/db.inc.php:1523
+#: include/classes/db/DB.php:396 include/classes/db/DB.php:448
 #, php-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "Ошибка при выполнении SQL запроса \"%1$s\"."
@@ -9918,8 +9919,8 @@ msgstr "Запланировано"
 msgid "Screen"
 msgstr "Комплексный экран"
 
-#: include/classes/import/CXmlImport18.php:551
-#: include/classes/import/CXmlImport18.php:1654
+#: include/classes/import/CXmlImport18.php:550
+#: include/classes/import/CXmlImport18.php:1653
 #, php-format
 msgid "Screen \"%1$s\" added."
 msgstr "Комплексный экран \"%1$s\" добавлен."
@@ -9929,8 +9930,8 @@ msgstr "Комплексный экран \"%1$s\" добавлен."
 msgid "Screen \"%1$s\" already exists."
 msgstr "Комплексный экран \"%1$s\" уже существует."
 
-#: include/classes/import/CXmlImport18.php:548
-#: include/classes/import/CXmlImport18.php:1648
+#: include/classes/import/CXmlImport18.php:547
+#: include/classes/import/CXmlImport18.php:1647
 #, php-format
 msgid "Screen \"%1$s\" updated."
 msgstr "Комплексный экран \"%1$s\" обновлен."
@@ -10811,22 +10812,22 @@ msgstr "КОММЕНТАРИИ К ТРИГГЕРУ"
 msgid "TRUE"
 msgstr "ИСТИНА"
 
-#: include/db.inc.php:1277
+#: include/classes/db/DB.php:200
 #, php-format
 msgid "Table \"%1$s\" does not exist."
 msgstr "Таблица \"%1$s\" не существует."
 
-#: include/db.inc.php:1426
+#: include/classes/db/DB.php:349
 #, php-format
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr "У таблицы \"%1$s\" нет поля с именем \"%2$s\"."
 
-#: include/db.inc.php:1555
+#: include/classes/db/DB.php:480
 #, php-format
 msgid "Table \"%1$s\" has a composite primary key, simple is given."
 msgstr "У таблицы \"%1$s\" составной первичный ключ, указан простой."
 
-#: include/db.inc.php:1546
+#: include/classes/db/DB.php:471
 #, php-format
 msgid "Table \"%1$s\" has a simple primary key, composite is given."
 msgstr "У таблицы \"%1$s\" простой первичный ключ, указан составной."
@@ -10871,10 +10872,10 @@ msgstr "Шаблон"
 msgid "Template \"%1$s\" already exists."
 msgstr "Шаблон \"%1$s\" уже существует."
 
-#: include/classes/import/CConfigurationImport.php:504
+#: include/classes/import/CConfigurationImport.php:529
 #, php-format
-msgid "Template \"%1$s\" does not exist."
-msgstr "Шаблон \"%1$s\" не существует."
+msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
+msgstr ""
 
 #: api/classes/CTemplate.php:1001
 #, php-format
@@ -11203,7 +11204,7 @@ msgstr "Триггер"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Триггер \"%1$s\" уже существует у \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1393
+#: api/classes/CTriggerPrototype.php:1399
 #, php-format
 msgid "Trigger \"%1$s\" already exists."
 msgstr "Триггер \"%1$s\" уже существует."
@@ -11774,7 +11775,7 @@ msgstr "Обновлено: Прототип элемента данных \"%1$
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Триггер \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1429
+#: api/classes/CTriggerPrototype.php:1435
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Прототип триггера \"%1$s\" в \"%2$s\"."
@@ -11983,12 +11984,12 @@ msgstr "Значение \"%1$s\" является недопустимым дл
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Значение \"%1$s\" является недопустимым для параметра \"grid_show\". Варианты: \"%2$s\" и \"%3$s\""
 
-#: include/db.inc.php:1370
+#: include/classes/db/DB.php:293
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Значение \"%1$s\" является чересчур длинным для поля \"%2$s\" - %3$d символов. Допустимая длина %4$d символов."
 
-#: include/db.inc.php:1399
+#: include/classes/db/DB.php:322
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr "Значение \"%1$s\" слишком длинное для поля \"%2$s\" - %3$d символов. Допустимая длина 2048 символов."
