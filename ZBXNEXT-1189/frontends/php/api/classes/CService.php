@@ -900,7 +900,6 @@ class CService extends CZBXAPI {
 			'SELECT s.serviceid,t.*'.
 				' FROM services s,triggers t'.
 				' WHERE s.status>0'.
-				' AND s.triggerid IS NOT NULL'.
 				' AND t.triggerid=s.triggerid'.
 				' AND '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY)).
 				' AND '.DBcondition('s.serviceid', $serviceIds).
@@ -940,10 +939,12 @@ class CService extends CZBXAPI {
 			foreach ($service['parentDependencies'] as $dependency) {
 				$parentServiceId = $dependency['serviceupid'];
 
-				if (!isset($parentProblems[$parentServiceId])) {
-					$parentProblems[$parentServiceId] = array();
+				if (isset($services[$parentServiceId])) {
+					if (!isset($parentProblems[$parentServiceId])) {
+						$parentProblems[$parentServiceId] = array();
+					}
+					$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId], $problemTriggers);
 				}
-				$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId], $problemTriggers);
 			}
 		}
 
