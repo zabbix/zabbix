@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-02 17:38+0300\n"
-"PO-Revision-Date: 2012-04-08 22:20+0200\n"
+"POT-Creation-Date: 2012-05-02 17:39+0300\n"
+"PO-Revision-Date: 2012-05-01 22:15+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
 "Language: el\n"
@@ -398,7 +398,7 @@ msgstr "Προσθήκη στοιχείου"
 #: include/views/configuration.graph.edit.php:208
 #: include/views/configuration.graph.edit.php:266
 msgid "Add graph items first"
-msgstr ""
+msgstr "Προσθήκη συλλεκτών γραφήματος πρώτα"
 
 #: include/actions.inc.php:270 include/actions.inc.php:475
 msgid "Add host"
@@ -1625,7 +1625,7 @@ msgstr "Αδύνατον ο μορφότυπος Δένδρου. Έλεγξε τ
 
 #: services.php:435
 msgid "Cannot format tree."
-msgstr ""
+msgstr "Αδύνατον ο μορφότυπος δένδρου."
 
 #: api/classes/CTemplate.php:1412
 msgid "Cannot have empty visible template name"
@@ -1642,8 +1642,8 @@ msgstr "Δεν μπορώ να συμπτύξω την έκφραση \"%s\"."
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Αδύνατη η εισαγωγή οθόνης \"%2$s\": υποοθόνη \"%3$s\" δεν υπάρχει."
+msgstr[1] "Αδύνατη η εισαγωγή οθόνης \"%2$s\": υποοθόνες \"%3$s\" δεν υπάρχουν."
 
 #: include/classes/import/importers/CTemplateImporter.php:94
 #, php-format
@@ -2021,7 +2021,7 @@ msgstr "Κυκλική αναφορά σε χάρτες: %1$s."
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
 msgid "Circular reference in screens: %1$s."
-msgstr ""
+msgstr "Κυκλική αναφορά σε οθόνες: %1$s."
 
 #: include/classes/import/importers/CTemplateImporter.php:119
 #, php-format
@@ -2363,6 +2363,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"Αποτυχία σύνδεσης με εξυπηρετητή Zabbix \"%s\". Πιθανά αίτια:\n"
+"1. Λανθασμένος εξυπηρετητής IP/DNS στο \"zabbix.conf.php\";\n"
+"2. Λανθασμένη ρύθμιση εξυπηρετητή DNS.\n"
 
 #: api/classes/CScript.php:468
 #, php-format
@@ -2373,6 +2376,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Άρνηση σύνδεσης με εξυπηρετητή Zabbix \"%s\". Πιθανά αίτια:\n"
+"1. Λανθασμένος εξυπηρετητής IP/DNS στο \"zabbix.conf.php\";\n"
+"2. Περιβάλλον ασφάλειας (παράδειγμα, SELinux) αποτρέπει τη σύνδεση;\n"
+"3. Δαίμονας εξυπηρετητή Zabbix δεν εκτελείται;\n"
+"4. Τείχος προστασίας αποτρέπει TCP σύνδεση.\n"
 
 #: api/classes/CScript.php:474
 #, php-format
@@ -2381,6 +2389,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Τέλος χρόνου σύνδεσης με εξυπηρετητή Zabbix \"%s\". Πιθανά αίτια:\n"
+"1. Λανθασμένος εξυπηρετητής IP/DNS στο \"zabbix.conf.php\";\n"
+"2. Τείχος προστασίας αποτρέπει TCP σύνδεση.\n"
 
 #: include/hosts.inc.php:215
 msgid "Contact"
@@ -2443,7 +2454,7 @@ msgstr "Δημιουργία γραφήματος"
 
 #: include/views/configuration.graph.list.php:43
 msgid "Create graph (select host first)"
-msgstr ""
+msgstr "Δημιουργία γραφήματος (επιλογή ξενιστή πρώτα)"
 
 #: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
@@ -2451,7 +2462,7 @@ msgstr "Δημιουργία πρωτότυπου γραφήματος"
 
 #: hosts.php:640
 msgid "Create host"
-msgstr ""
+msgstr "Δημιουργία ξενιστή"
 
 #: include/views/configuration.hostgroups.list.php:30
 #: include/views/configuration.hostgroups.list.php:33
@@ -2597,7 +2608,7 @@ msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" δεν είναι 
 #: include/validate.inc.php:399
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" δεν είναι δεκαδικός αριθμός."
 
 #: include/validate.inc.php:375
 #, php-format
@@ -2774,7 +2785,7 @@ msgstr "Δεδομένα"
 #: include/classes/class.cchart.php:2307 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
-msgstr ""
+msgstr "Δεδομένα από %1$s. Παραγόμενα σε %2$s δευτ."
 
 #: include/screens.inc.php:29
 msgid "Data overview"
@@ -3259,7 +3270,7 @@ msgstr "Διεγράφη: Πρωτότυπος συλλέκτης \"%1$s\" σε 
 #: api/classes/CProxy.php:552
 #, php-format
 msgid "Deleted: Proxy \"%1$s\"."
-msgstr ""
+msgstr "Διεγράφη: Διαμεσολαβητής \"%1$s\"."
 
 #: api/classes/CTemplate.php:1243
 #, php-format
@@ -3847,7 +3858,7 @@ msgstr "Κενή μακροεντολή."
 
 #: api/classes/CService.php:582
 msgid "Empty name."
-msgstr ""
+msgstr "Κενό όνομα."
 
 #: api/classes/CImage.php:502 api/rpc/class.czbxrpc.php:45
 msgid "Empty parameters"
@@ -4502,33 +4513,33 @@ msgstr "Γράφημα"
 #: api/classes/CGraph.php:862 api/classes/CGraphPrototype.php:849
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr ""
+msgstr "Γράφημα \"%1$s\" υπάρχει ήδη σε \"%2$s\" (εξαρτώμενο από άλλο σχεδιότυπο)."
 
 #: api/classes/CGraph.php:883 api/classes/CGraph.php:890
 #: api/classes/CGraphPrototype.php:871 api/classes/CGraphPrototype.php:878
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr ""
+msgstr "Γράφημα \"%1$s\" υπάρχει ήδη σε \"%2$s\" (συλλέκτες όχι πανομοιότυποι)."
 
 #: api/classes/CGraph.php:842 api/classes/CGraphPrototype.php:829
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Γράφημα \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
 
 #: api/classes/CGraph.php:817 api/classes/CGraphPrototype.php:804
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr ""
+msgstr "Γράφημα \"%1$s\" δεν κληρονομείται. Δεν χρειάζονται συλλέκτες σε \"%2$s\" (Ymax τιμή συλλέκτη)."
 
 #: api/classes/CGraph.php:825 api/classes/CGraphPrototype.php:812
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr ""
+msgstr "Γράφημα \"%1$s\" δεν κληρονομείται. Δεν χρειάζονται συλλέκτες σε \"%2$s\" (Ymin τιμή συλλέκτη)."
 
 #: api/classes/CGraph.php:811 api/classes/CGraphPrototype.php:798
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr ""
+msgstr "Γράφημα \"%1$s\" δεν κληρονομείται. Δεν χρειάζονται συλλέκτες σε \"%2$s\"."
 
 #: api/classes/CGraph.php:657 api/classes/CGraph.php:724
 #, php-format
@@ -4563,11 +4574,11 @@ msgstr "Το πρωτότυπο γράφημα \"%1$s\" με σχεδιότυπ�
 #: api/classes/CGraphPrototype.php:1028
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
-msgstr ""
+msgstr "Το πρωτότυπο γράφημα \"%s\" διεγράφη."
 
 #: api/classes/CGraphPrototype.php:1100
 msgid "Graph prototype must have at least one prototype."
-msgstr ""
+msgstr "Το πρωτότυπο γράφημα πρέπει να έχει τουλάχιστον ένα πρωτότυπο."
 
 #: include/html.inc.php:471 include/html.inc.php:475
 #: include/views/configuration.host.discovery.list.php:90
@@ -4597,12 +4608,12 @@ msgstr "Γράφημα ενημερώθηκε"
 #: api/classes/CGraph.php:1119 api/classes/CGraphPrototype.php:1120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists."
-msgstr ""
+msgstr "Γράφημα με όνομα \"%1$s\" υπάρχει ήδη."
 
 #: api/classes/CGraph.php:845 api/classes/CGraph.php:865
 #: api/classes/CGraphPrototype.php:832 api/classes/CGraphPrototype.php:852
 msgid "Graph with same name but other type exist."
-msgstr ""
+msgstr "Υπάρχει γράφημα με ίδιο όνομα αλλά άλλο τύπο."
 
 #: charts.php:212 dashboard.php:260 hosts.php:693 hosts.php:772
 #: include/blocks.inc.php:1127 include/html.inc.php:482
@@ -5500,7 +5511,7 @@ msgstr "Συμπεριλαμβάνω"
 #: api/classes/CService.php:804
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένη \"soft\" τιμή πεδίου για εξάρτηση με υπηρεσία \"%1$s\"."
 
 #: api/classes/CMap.php:620 api/classes/CMap.php:624 api/classes/CMap.php:631
 #: api/classes/CMap.php:636
@@ -5531,7 +5542,7 @@ msgstr "Λανθασμένο SNMP community."
 #: api/classes/CService.php:634
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένη αποδοχή SLA για υπηρεσία \"%1$s\"."
 
 #: api/classes/CAction.php:1741
 msgid "Incorrect action condition discovery check."
@@ -5645,7 +5656,7 @@ msgstr "Λανθασμένο id εργασίας ενέργειας"
 #: api/classes/CService.php:597
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένος αλγόριθμος για υπηρεσία \"%1$s\"."
 
 #: api/classes/CApplication.php:439 include/regexp.inc.php:52
 #: include/regexp.inc.php:85 include/regexp.inc.php:150
@@ -5664,7 +5675,7 @@ msgstr "Λανθασμένα ορίσματα πέρασαν στη μέθοδο
 #: api/classes/CService.php:616
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένη τιμή υπολογισμού SLA για υπηρεσία \"%1$s\"."
 
 #: include/nodes.inc.php:269 include/nodes.inc.php:311
 msgid "Incorrect characters used for Node name."
@@ -5701,7 +5712,7 @@ msgstr "Λανθασμένο κλείσιμο παρένθεσης στην έκ
 #: api/classes/CGraph.php:1059
 #, php-format
 msgid "Incorrect colour \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένο χρώμα \"%1$s\"."
 
 #: api/classes/CTriggerExpression.php:206
 msgid "Incorrect count of quotes in expression."
@@ -5803,7 +5814,7 @@ msgstr "Λανθασμένο ID συλλέκτη \"%s\" παρέχεται γι�
 
 #: api/classes/CGraph.php:1151 api/classes/CGraphPrototype.php:1153
 msgid "Incorrect item for axis value."
-msgstr ""
+msgstr "Λανθασμένος συλλέκτης για τιμή άξονα."
 
 #: api/classes/CTriggerExpression.php:83
 #, php-format
@@ -5942,11 +5953,11 @@ msgstr "Λανθασμένες παράμετροι για ομάδα χρηστ
 #: api/classes/CService.php:682
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένος γονέας για υπηρεσία \"%1$s\"."
 
 #: api/classes/CService.php:685
 msgid "Incorrect parent service."
-msgstr ""
+msgstr "Λανθασμένη γονική υπηρεσία."
 
 #: api/classes/CTriggerExpression.php:210
 msgid "Incorrect parenthesis count in expression."

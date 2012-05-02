@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-02 17:38+0300\n"
-"PO-Revision-Date: 2011-12-28 00:42+0200\n"
+"POT-Creation-Date: 2012-05-02 17:39+0300\n"
+"PO-Revision-Date: 2012-04-28 12:31+0200\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -97,11 +97,11 @@ msgstr ""
 
 #: include/forms.inc.php:529 include/forms.inc.php:544
 msgid "(in days)"
-msgstr ""
+msgstr "(dienas)"
 
 #: include/forms.inc.php:434
 msgid "(in sec)"
-msgstr ""
+msgstr "(sekundes)"
 
 #: include/views/configuration.action.edit.php:483
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -119,7 +119,7 @@ msgstr ""
 #: include/views/configuration.screen.constructor.edit.php:438 popup.php:1833
 #: popup.php:1834
 msgid "- all groups -"
-msgstr ""
+msgstr "- visas grupas -"
 
 #: acknow.php:98
 msgid "----[BULK ACKNOWLEDGE]----"
