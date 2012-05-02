@@ -158,7 +158,7 @@ else {
 			'caption' => _('Service'),
 			'status' => _('Status'),
 			'reason' => _('Reason'),
-			'sla' => 'SLA ('.$periods[$period].')',
+			'sla' => _('Problem time'),
 			'sla2' => nbsp(_('Acceptable SLA').' / '._('SLA')),
 			'graph' => _('Graph')
 		)
