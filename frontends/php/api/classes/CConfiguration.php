@@ -40,7 +40,9 @@ class CConfiguration extends CZBXAPI {
 	public function export(array $params) {
 		$export = new CConfigurationExport($params['options']);
 		$export->setBuilder(new CConfigurationExportBuilder());
-		$export->setWriter(CExportWriterFactory::getWriter($params['format']));
+		$writer = CExportWriterFactory::getWriter($params['format']);
+		$writer->formatOutput(false);
+		$export->setWriter($writer);
 
 		return $export->export();
 	}

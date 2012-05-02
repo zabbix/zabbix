@@ -67,47 +67,47 @@ typedef struct
 }
 swap_stat_t;
 
-#if defined(KERNEL_2_4)
+#ifdef KERNEL_2_4
 #	define INFO_FILE_NAME	"/proc/partitions"
 #	define PARSE(line)								\
 											\
-		if (sscanf(line, "%d %d %*d %*s "					\
+		if (6 != sscanf(line, "%d %d %*d %*s "					\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
 				&rdev_major, 		/* major */			\
 				&rdev_minor, 		/* minor */			\
-				&(result->rio),		/* rio */			\
-				&(result->rsect),	/* rsect */			\
-				&(result->wio),		/* wio */			\
-				&(result->wsect)	/* wsect */			\
-				) != 6) continue
+				&result->rio,		/* rio */			\
+				&result->rsect,		/* rsect */			\
+				&result->wio,		/* wio */			\
+				&result->wsect		/* wsect */			\
+				)) continue
 #else
 #	define INFO_FILE_NAME	"/proc/diskstats"
 #	define PARSE(line)								\
 											\
-		if (sscanf(line, "%d %d %*s "						\
+		if (6 != sscanf(line, "%d %d %*s "					\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
 				ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
 				&rdev_major, 		/* major */			\
 				&rdev_minor, 		/* minor */			\
-				&(result->rio),		/* rio */			\
-				&(result->rsect),	/* rsect */			\
-				&(result->wio),		/* wio */			\
-				&(result->wsect)	/* wsect */			\
-				) != 6)							\
-			if (sscanf(line, "%d %d %*s "					\
+				&result->rio,		/* rio */			\
+				&result->rsect,		/* rsect */			\
+				&result->wio,		/* wio */			\
+				&result->wsect		/* wsect */			\
+				))							\
+			if (6 != sscanf(line, "%d %d %*s "				\
 					ZBX_FS_UI64 " " ZBX_FS_UI64 " "			\
 					ZBX_FS_UI64 " " ZBX_FS_UI64,			\
 					&rdev_major, 		/* major */		\
 					&rdev_minor, 		/* minor */		\
-					&(result->rio),		/* rio */		\
-					&(result->rsect),	/* rsect */		\
-					&(result->wio),		/* wio */		\
-					&(result->wsect)	/* wsect */		\
-					) != 6) continue
+					&result->rio,		/* rio */		\
+					&result->rsect,		/* rsect */		\
+					&result->wio,		/* wio */		\
+					&result->wsect		/* wsect */		\
+					)) continue
 #endif
 
-static int	get_swap_dev_stat(const char *interface, swap_stat_t *result)
+static int	get_swap_dev_stat(const char *swapdev, swap_stat_t *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		line[MAX_STRING_LEN];
@@ -117,7 +117,7 @@ static int	get_swap_dev_stat(const char *interface, swap_stat_t *result)
 
 	assert(result);
 
-	if (-1 == stat(interface, &dev_st))
+	if (-1 == stat(swapdev, &dev_st))
 		return ret;
 
 	if (NULL == (f = fopen(INFO_FILE_NAME, "r")))
@@ -140,25 +140,41 @@ static int	get_swap_dev_stat(const char *interface, swap_stat_t *result)
 
 static int	get_swap_pages(swap_stat_t *result)
 {
-	int		ret = SYSINFO_RET_FAIL;
-	char		line[MAX_STRING_LEN];
-	char		name[MAX_STRING_LEN];
-	zbx_uint64_t	value1, value2;
-	FILE		*f;
+	int	ret = SYSINFO_RET_FAIL;
+	char	line[MAX_STRING_LEN];
+#ifndef KERNEL_2_4
+	char	st = 0;
+#endif
+	FILE	*f;
 
+#ifdef KERNEL_2_4
 	if (NULL != (f = fopen("/proc/stat", "r")))
+#else
+	if (NULL != (f = fopen("/proc/vmstat", "r")))
+#endif
 	{
 		while (NULL != fgets(line, sizeof(line), f))
 		{
-			if (3 != sscanf(line, "%10s " ZBX_FS_UI64 " " ZBX_FS_UI64, name, &value1, &value2))
+#ifdef KERNEL_2_4
+			if (0 != strncmp(line, "swap ", 5))
+
+			if (2 != sscanf(line + 5, ZBX_FS_UI64 " " ZBX_FS_UI64, &result->rpag, &result->wpag))
 				continue;
+#else
+			if (0x00 == (0x01 & st) && 0 == strncmp(line, "pswpin ", 7))
+			{
+				ZBX_STR2UINT64(result->rpag, line + 7);
+				st |= 0x01;
+			}
+			else if (0x00 == (0x02 & st) && 0 == strncmp(line, "pswpout ", 8))
+			{
+				ZBX_STR2UINT64(result->wpag, line + 8);
+				st |= 0x02;
+			}
 
-			if (0 != strcmp(name, "swap"))
+			if (0x03 != st)
 				continue;
-
-			result->wpag = value1;
-			result->rpag = value2;
-
+#endif
 			ret = SYSINFO_RET_OK;
 			break;
 		};
@@ -168,14 +184,14 @@ static int	get_swap_pages(swap_stat_t *result)
 
 	if (SYSINFO_RET_OK != ret)
 	{
-		result->wpag = 0;
 		result->rpag = 0;
+		result->wpag = 0;
 	}
 
 	return ret;
 }
 
-static int	get_swap_stat(const char *interface, swap_stat_t *result)
+static int	get_swap_stat(const char *swapdev, swap_stat_t *result)
 {
 	int		offset = 0, ret = SYSINFO_RET_FAIL;
 	swap_stat_t	curr;
@@ -184,12 +200,12 @@ static int	get_swap_stat(const char *interface, swap_stat_t *result)
 
 	memset(result, 0, sizeof(swap_stat_t));
 
-	if (0 == strcmp(interface, "all"))
+	if (0 == strcmp(swapdev, "all"))
 	{
 		ret = get_swap_pages(result);
-		interface = NULL;
+		swapdev = NULL;
 	}
-	else if (0 != strncmp(interface, "/dev/", 5))
+	else if (0 != strncmp(swapdev, "/dev/", 5))
 		offset = 5;
 
 	if (NULL == (f = fopen("/proc/swaps", "r")))
@@ -205,7 +221,7 @@ static int	get_swap_stat(const char *interface, swap_stat_t *result)
 
 		*s = '\0';
 
-		if (NULL != interface && 0 != strcmp(interface, line + offset))
+		if (NULL != swapdev && 0 != strcmp(swapdev, line + offset))
 			continue;
 
 		if (SYSINFO_RET_OK == get_swap_dev_stat(line, &curr))
@@ -235,7 +251,7 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		*swapdev = '\0';
 
 	if ('\0' == *swapdev)	/* default parameter */
-		zbx_snprintf(swapdev, sizeof(swapdev), "all");
+		strscpy(swapdev, "all");
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
@@ -244,11 +260,11 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		return SYSINFO_RET_FAIL;
 
 	if (('\0' == *mode || 0 == strcmp(mode, "pages")) && 0 == strcmp(swapdev, "all"))	/* default parameter */
-		SET_UI64_RESULT(result, ss.wpag);
+		SET_UI64_RESULT(result, ss.rpag);
 	else if (0 == strcmp(mode, "sectors"))
-		SET_UI64_RESULT(result, ss.wsect);
+		SET_UI64_RESULT(result, ss.rsect);
 	else if (0 == strcmp(mode, "count"))
-		SET_UI64_RESULT(result, ss.wio);
+		SET_UI64_RESULT(result, ss.rio);
 	else
 		return SYSINFO_RET_FAIL;
 
@@ -267,7 +283,7 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		*swapdev = '\0';
 
 	if ('\0' == *swapdev)	/* default parameter */
-		zbx_snprintf(swapdev, sizeof(swapdev), "all");
+		strscpy(swapdev, "all");
 
 	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
@@ -276,11 +292,11 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 
 	if (('\0' == *mode || 0 == strcmp(mode, "pages")) && 0 == strcmp(swapdev, "all"))	/* default parameter */
-		SET_UI64_RESULT(result, ss.rpag);
+		SET_UI64_RESULT(result, ss.wpag);
 	else if (0 == strcmp(mode, "sectors"))
-		SET_UI64_RESULT(result, ss.rsect);
+		SET_UI64_RESULT(result, ss.wsect);
 	else if (0 == strcmp(mode, "count"))
-		SET_UI64_RESULT(result, ss.rio);
+		SET_UI64_RESULT(result, ss.wio);
 	else
 		return SYSINFO_RET_FAIL;
 
