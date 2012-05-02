@@ -99,7 +99,10 @@ class CConfigurationExportBuilder {
 			unset($interface);
 
 			foreach ($host['items'] as &$item) {
-				$item['interface_ref'] = $references['refs'][$item['interfaceid']];
+				// only for items that require interface
+				if ($item['interfaceid']) {
+					$item['interface_ref'] = $references['refs'][$item['interfaceid']];
+				}
 			}
 			unset($item);
 

@@ -454,6 +454,8 @@ class CConfigurationImport {
 		}
 
 		if ($groups) {
+			// reset indexing because ids from api does not preserve input array keys
+			$groups = array_values($groups);
 			$newGroups = API::HostGroup()->create($groups);
 			foreach ($newGroups['groupids'] as $gnum => $groupid) {
 				$this->referencer->addGroupRef($groups[$gnum]['name'], $groupid);
@@ -671,7 +673,13 @@ class CConfigurationImport {
 				if (!empty($item['applications'])) {
 					$applicationsIds = array();
 					foreach ($item['applications'] as $application) {
-						$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
+						if ($applicationId = $this->referencer->resolveApplication($hostid, $application['name'])) {
+							$applicationsIds[] = $applicationId;
+						}
+						else {
+							throw new Exception(_s('Item "%1$s" on host "%2$s": application "%3$s does not exist".',
+								$item['name'], $host, $application['name']));
+						}
 					}
 					$item['applications'] = $applicationsIds;
 				}
