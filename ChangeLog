@@ -7,7 +7,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
-........S. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
+.......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
 ..F....... [ZBX-4914] fixed graph name encoding in form preview (Vedmak)
 ........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
 ..F....... [ZBX-4495] fixed hintbox positioning (Toms)
