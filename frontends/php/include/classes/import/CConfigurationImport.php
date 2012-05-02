@@ -517,11 +517,17 @@ class CConfigurationImport {
 				}
 			}
 
-			if (!empty($host['proxy'])) {
-				$proxyId = $this->referencer->resolveProxy($host['proxy']['name']);
-				if (!$proxyId) {
-					throw new Exception(_s('Proxy "%1$s" for host "%2$s" does not exist.', $host['proxy']['name'], $host['host']));
+			if (isset($host['proxy'])) {
+				if (empty($host['proxy'])) {
+					$proxyId = 0;
 				}
+				else {
+					$proxyId = $this->referencer->resolveProxy($host['proxy']['name']);
+					if (!$proxyId) {
+						throw new Exception(_s('Proxy "%1$s" for host "%2$s" does not exist.', $host['proxy']['name'], $host['host']));
+					}
+				}
+
 				$host['proxy_hostid'] = $proxyId;
 			}
 
