@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-02 17:38+0300\n"
-"PO-Revision-Date: 2012-03-31 20:15+0200\n"
-"Last-Translator: Łukasz <deejay1@srem.org>\n"
+"POT-Creation-Date: 2012-05-02 17:39+0300\n"
+"PO-Revision-Date: 2012-05-01 13:23+0200\n"
+"Last-Translator: Lukasz <lucas.urbaniak@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -400,7 +400,7 @@ msgstr "Dodaj element"
 #: include/views/configuration.graph.edit.php:208
 #: include/views/configuration.graph.edit.php:266
 msgid "Add graph items first"
-msgstr ""
+msgstr "Dodaj element graficzny"
 
 #: include/actions.inc.php:270 include/actions.inc.php:475
 msgid "Add host"
@@ -1521,7 +1521,7 @@ msgstr ""
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Nie mogę znaleźć \"%1$s\" używaną w ekranie \"%2$s\"."
 
 #: include/locales/en_gb.inc.php:134
 msgid "Cannot find host"

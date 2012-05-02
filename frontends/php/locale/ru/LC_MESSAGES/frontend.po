@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-02 17:38+0300\n"
-"PO-Revision-Date: 2012-04-27 16:04+0200\n"
+"POT-Creation-Date: 2012-05-02 17:39+0300\n"
+"PO-Revision-Date: 2012-04-30 19:00+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -62,9 +62,9 @@ msgstr[2] "%1$s элементов данных"
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] "Зафиксирована %1$s неудачная попытка входа. Последняя неудачная попытка с %2$s %3$s в %4$s."
-msgstr[1] "Зафиксировано %1$s неудачных попыток входа. Последняя неудачная попытка с %2$s %3$s в %4$s."
-msgstr[2] "Зафиксированы %1$s неудачных попыток входа. Последняя неудачная попытка с %2$s %3$s в %4$s."
+msgstr[0] "Зафиксирована %1$s неудачная попытка входа в систему. Последняя неудачная попытка с %2$s %3$s в %4$s."
+msgstr[1] "Зафиксировано %1$s неудачных попыток входа в систему. Последняя неудачная попытка с %2$s %3$s в %4$s."
+msgstr[2] "Зафиксированы %1$s неудачных попыток входа в систему. Последняя неудачная попытка с %2$s %3$s в %4$s."
 
 #: include/blocks.inc.php:903
 #, php-format
@@ -105,7 +105,7 @@ msgstr "(в сек)"
 
 #: include/views/configuration.action.edit.php:483
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr "(минимум 60 секунд, 0 - использовать умолчание со свойств действия)"
+msgstr "(минимум 60 секунд, 0 - использовать из настроек действия)"
 
 #: include/views/configuration.host.edit.php:284
 #: include/views/configuration.host.massupdate.php:60
@@ -286,12 +286,12 @@ msgstr "Действие \"%s\" уже существует."
 #: api/classes/CAction.php:916
 #, php-format
 msgid "Action \"%s\" has incorrect value for \"esc_period\" (minimum 60 seconds)."
-msgstr "В действии \"%s\" некорректное значение для \"esc_period\" (минимум 60 секунд)."
+msgstr "В действии \"%s\" задано некорректное значение для \"esc_period\" (минимум 60 секунд)."
 
 #: api/classes/CAction.php:972
 #, php-format
 msgid "Action \"%s\" no operations defined."
-msgstr "Действие \"%s\" не имеет настроенных операций."
+msgstr "В действии \"%s\" не заданы операции."
 
 #: actionconf.php:162
 msgid "Action added"
@@ -400,7 +400,7 @@ msgstr "Добавить элемент"
 #: include/views/configuration.graph.edit.php:208
 #: include/views/configuration.graph.edit.php:266
 msgid "Add graph items first"
-msgstr ""
+msgstr "Сначала добавьте элементы данных в график"
 
 #: include/actions.inc.php:270 include/actions.inc.php:475
 msgid "Add host"
@@ -485,7 +485,7 @@ msgstr "Интерфейсы агента"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr "Интерфейс агента или SNMP или JMX или IPMI"
+msgstr "Интерфейс Агента или SNMP или JMX или IPMI"
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:848 users.php:43
@@ -524,7 +524,7 @@ msgstr "Все группы"
 
 #: include/locales/en_gb.inc.php:140
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr "Все ссылки должны иметь указанные \"Имя\" и \"URL\""
+msgstr "У всех ссылок должны быть указаны \"Имя\" и \"URL\""
 
 #: include/page_header.php:128
 msgid "All nodes"
@@ -565,7 +565,7 @@ msgstr "Группа элементов данных \"%1$s\" уже сущес�
 #: api/classes/CApplication.php:626
 #, php-format
 msgid "Application \"%1$s\" used by scenario \"%2$s\" and can't be deleted."
-msgstr "Группа элементов данных \"%1$s\" используется в сценарии \"%2$s\" и не может быть удалена."
+msgstr "Группа элементов данных \"%1$s\" используется сценарием \"%2$s\" и не может быть удалена."
 
 #: applications.php:103
 msgid "Application added"
@@ -669,7 +669,7 @@ msgstr "Должен быть создан по крайней мере один
 
 #: include/classes/class.frontendsetup.php:287
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported"
-msgstr "По крайней мере один из MySQL, PostgreSQL, Oracle, SQLite3 или IBM DB2 должен поддерживаться"
+msgstr "Должна поддерживаться по крайней мере одна из баз данных MySQL, PostgreSQL, Oracle, SQLite3 или IBM DB2"
 
 #: include/menu.inc.php:270
 msgid "Audit"
@@ -681,7 +681,7 @@ msgstr "Аудит действий"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr "Аудит журналов"
+msgstr "Журнал аудита"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -720,7 +720,7 @@ msgstr "Метод аутентификации изменен на LDAP."
 
 #: authentication.php:81 authentication.php:82
 msgid "Authentication method changed to Zabbix internal"
-msgstr "Метод аутентификации изменен на внутренний Zabbix"
+msgstr "Метод аутентификации изменен на Zabbix внутренний"
 
 #: actionconf.php:446
 msgid "Auto registration"
@@ -785,7 +785,7 @@ msgstr "НАЗАД"
 #: include/views/administration.general.image.edit.php:29
 #: include/views/administration.general.image.list.php:25
 msgid "Background"
-msgstr "Фоновое изображение"
+msgstr "Фон"
 
 #: include/views/configuration.sysmap.edit.php:63
 msgid "Background image"
@@ -806,7 +806,7 @@ msgstr "Простая аутентификация"
 
 #: include/views/administration.authentication.edit.php:61
 msgid "Bind DN"
-msgstr "Имя для подключения (BindDN)"
+msgstr "Имя для подключения (Bind DN)"
 
 #: authentication.php:46
 #: include/views/administration.authentication.edit.php:62
@@ -815,7 +815,7 @@ msgstr "Пароль подключения (Bind password)"
 
 #: include/classes/core/ZBase.php:123
 msgid "Black & Blue"
-msgstr "Черный & Синий"
+msgstr "Черная & Синяя"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:28
 msgid "Blinking"
@@ -833,7 +833,7 @@ msgstr "Жирная линия"
 
 #: include/items.inc.php:128
 msgid "Boolean"
-msgstr "Boolean"
+msgstr "Логический"
 
 #: include/locales/en_gb.inc.php:128
 #: include/views/configuration.screen.constructor.edit.php:564
@@ -866,7 +866,7 @@ msgstr "НАСТРОЙКА ДЕЙСТВИЙ"
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
 msgid "CONFIGURATION OF APPLICATIONS"
-msgstr "КОНФИГУРАЦИЯ ГРУПП ЭЛЕМЕНТОВ ДАННЫХ"
+msgstr "НАСТРОЙКА ГРУПП ЭЛЕМЕНТОВ ДАННЫХ"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
@@ -899,7 +899,7 @@ msgstr "НАСТРОЙКА ВЕБ-ИНТЕРФЕЙСА"
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:38
 msgid "CONFIGURATION OF HOST GROUPS"
-msgstr "КОНФИГУРАЦИЯ ГРУПП УЗЛОВ СЕТИ"
+msgstr "НАСТРОЙКА ГРУПП УЗЛОВ СЕТИ"
 
 #: hosts.php:575 hosts.php:624 hosts.php:646
 msgid "CONFIGURATION OF HOSTS"
@@ -1023,7 +1023,7 @@ msgstr "НАСТРОЙКА ПОЛЬЗОВАТЕЛЕЙ И ГРУПП ПОЛЬЗО
 
 #: adm.valuemapping.php:133
 msgid "CONFIGURATION OF VALUE MAPPING"
-msgstr "НАСТРОЙКА ПРЕОБРАЗОВАНИЙ ЗНАЧЕНИЙ"
+msgstr "НАСТРОЙКА ПРЕОБРАЗОВАНИЯ ЗНАЧЕНИЙ"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
@@ -1097,7 +1097,7 @@ msgstr "Канада (136 символов)"
 #: include/views/js/configuration.discovery.edit.js.php:69
 #: include/views/js/general.script.confirm.js.php:41 tr_logform.php:376
 msgid "Cancel"
-msgstr "Отменить"
+msgstr "Отмена"
 
 #: acknow.php:120
 msgid "Cannot acknowledge event"
@@ -1154,7 +1154,7 @@ msgstr "Не удалось добавить способ оповещения"
 #: api/classes/CGraph.php:1074 api/classes/CGraphPrototype.php:1068
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr "Невозможно добавить более одного элемента данных с типом \"Суммарный график\" в график \"%1$s\"."
+msgstr "Невозможно добавить более одного элемента данных с типом \"Сумма графика\" в график \"%1$s\"."
 
 #: include/locales/en_gb.inc.php:119
 msgid "Cannot add network map"
@@ -1240,7 +1240,7 @@ msgstr "Не удалось изменить метод аутентификац
 
 #: items.php:453
 msgid "Cannot clear history"
-msgstr "Невозможно очистить историю"
+msgstr "Не удалось очистить историю"
 
 #: api/classes/CDiscoveryRule.php:1210
 msgid "Cannot clone graph prototypes."
@@ -1264,7 +1264,7 @@ msgstr "Не удалось скопировать графики"
 
 #: items.php:586
 msgid "Cannot copy items"
-msgstr "Не удалось скопировать элементы"
+msgstr "Не удалось скопировать элементы данных"
 
 #: include/triggers.inc.php:582
 #, php-format
@@ -1285,7 +1285,7 @@ msgstr "Не удалось создать правило обнаружения
 
 #: api/classes/CHostGroup.php:621
 msgid "Cannot create group without name."
-msgstr "Не удалось создать группу без имени."
+msgstr "Невозможно создать группу без имени."
 
 #: api/classes/CHost.php:1903
 msgid "Cannot create host group."
@@ -1298,7 +1298,7 @@ msgstr "Не удалось создать соответствие иконок
 #: api/classes/CIconMap.php:259 api/classes/CIconMap.php:319
 #, php-format
 msgid "Cannot create icon maps with identical name \"%s\"."
-msgstr "Не удалось создать соответствие иконок с таким же именем \"%s\"."
+msgstr "Невозможно создать соответствие иконок с таким же именем \"%s\"."
 
 #: include/classes/import/CXmlImport18.php:783
 #, php-format
@@ -1436,7 +1436,7 @@ msgstr "Не удалось удалить выбранные действия"
 
 #: services.php:108
 msgid "Cannot delete service"
-msgstr "Невозможно удалить услугу"
+msgstr "Не удалось удалить услугу"
 
 #: slideconf.php:102 slideconf.php:122
 msgid "Cannot delete slide show"
@@ -1481,7 +1481,7 @@ msgstr "Не удалось удалить пользователя"
 
 #: api/classes/CUser.php:800
 msgid "Cannot delete user medias"
-msgstr "Не удалось удалить типы оповещения пользователя"
+msgstr "Не удалось удалить способы оповещения у пользователя"
 
 #: adm.valuemapping.php:78
 msgid "Cannot delete value map"
@@ -1489,20 +1489,20 @@ msgstr "Не удалось удалить преобразование знач
 
 #: media_types.php:136
 msgid "Cannot disable media type"
-msgstr "Не удалось отключить тип оповещения"
+msgstr "Не удалось отключить способ оповещения"
 
 #: media_types.php:120
 msgid "Cannot enable media type"
-msgstr "Не удалось включить тип оповещения"
+msgstr "Не удалось включить способ оповещения"
 
 #: include/locales/en_gb.inc.php:132
 msgid "Cannot find background image"
-msgstr "Не удалось найти фоновый рисунок"
+msgstr "Не удалось найти фоновое изображение"
 
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image for map \"%1$s."
-msgstr "Не удалось найти фоновое изображение для \"%1$s карты."
+msgstr "Не удалось найти фоновое изображение для карты сети \"%1$s."
 
 #: include/locales/en_gb.inc.php:164
 msgid "Cannot find graph"
@@ -1511,7 +1511,7 @@ msgstr "Не удалось найти график"
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr "Не удалось найти \"%1$s\" график используемый в \"%2$s\" комплексном экране."
+msgstr "Не удалось найти график \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:208
 #, php-format
@@ -1521,7 +1521,7 @@ msgstr ""
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr "Не удалось найти \"%1$s\" группу используемую в \"%2$s\" комплексном экране."
+msgstr "Не удалось найти группу \"%1$s\" используемую в комплексном экране \"%2$s\"."
 
 #: include/locales/en_gb.inc.php:134
 msgid "Cannot find host"
@@ -1535,13 +1535,13 @@ msgstr ""
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr "Не удалось найти \"%1$s\" узел сети используемый в \"%2$s\" комплексном экране."
+msgstr "Не удалось найти узел сети \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:1032 api/classes/CItemGeneral.php:541
 #: include/items.inc.php:286 include/items.inc.php:342
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr "Не удалось найти интерфейс узла на \"%1$s\" для ключа элемента данных \"%2$s\"."
+msgstr "Не удалось найти интерфейс у узла сети \"%1$s\" для ключа элемента данных \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:1094
 #, php-format
@@ -1555,12 +1555,12 @@ msgstr "Не удалось найти группу узлов сети"
 #: include/classes/import/importers/CMapImporter.php:245
 #, php-format
 msgid "Cannot find icon \"%1$s\" for map \"%2$s\"."
-msgstr "Не удалось найти \"%1$s\" иконку для \"%2$s\" карты сети."
+msgstr "Не удалось найти иконку \"%1$s\" для карты сети \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" for map \"%2$s\"."
-msgstr "Не удалось найти \"%1$s\" соответствие иконок для \"%2$s\" карты."
+msgstr "Не удалось найти соответствие иконок \"%1$s\" для карты сети \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:651
 #, php-format
@@ -1578,7 +1578,7 @@ msgstr "Не удалось найти элемент данных"
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr "Не удалось найти \"%1$s\" элемент данных используемый в \"%2$s\" комплексном экране."
+msgstr "Не удалось найти элемент данных \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
 #: include/locales/en_gb.inc.php:136
 msgid "Cannot find map"
@@ -1587,12 +1587,12 @@ msgstr "Не удалось найти карту сети"
 #: include/classes/import/importers/CMapImporter.php:200
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map %2$s\"."
-msgstr "Не удалось найти \"%1$s\" карту сети используемую на \"%2$s\" карте сети."
+msgstr "Не удалось найти карту сети \"%1$s\" используемую на карте сети \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr "Не удалось найти \"%1$s\" карту сети используемую в \"%2$s\" комплексном экране."
+msgstr "Не удалось найти карту сети \"%1$s\" используемую в комплексном экране \"%2$s\"."
 
 #: include/js.inc.php:326
 msgid "Cannot find objects with name"
@@ -1605,7 +1605,7 @@ msgstr "Не удалось найти комплексный экран"
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr "Не удалось найти \"%1$s\" комплексный экран используемый в \"%2$s\" комплексном экране."
+msgstr "Не удалось найти комплексный экран \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
 #: include/locales/en_gb.inc.php:133
 msgid "Cannot find trigger"
@@ -1614,24 +1614,24 @@ msgstr "Не удалось найти триггер"
 #: include/classes/import/importers/CMapImporter.php:266
 #, php-format
 msgid "Cannot find trigger \"%1$s\" for map \"%2$s\"."
-msgstr "Не удалось найти \"%1$s\" триггер для \"%2$s\" карты сети."
+msgstr "Не удалось найти триггер \"%1$s\" для карты сети \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:225
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
-msgstr "Не удалось найти \"%1$s\" триггер используемый на \"%2$s\" карте сети."
+msgstr "Не удалось найти триггер \"%1$s\" используемый на карте сети \"%2$s\"."
 
 #: srv_status.php:289
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr "Неизвестный формат Дерева. Проверьте логическую структуру в соединениях между услугами."
+msgstr "Не удалось построить дерево. Проверьте логическую структуру в соединениях между услугами."
 
 #: services.php:435
 msgid "Cannot format tree."
-msgstr ""
+msgstr "Не удалось построить дерево."
 
 #: api/classes/CTemplate.php:1412
 msgid "Cannot have empty visible template name"
-msgstr "Невозможно иметь пустое видимое имя шаблона"
+msgstr "Видимое имя шаблона не может быть пустым"
 
 #: api/classes/CTrigger.php:1756 api/classes/CTrigger.php:1847
 #: api/classes/CTriggerPrototype.php:1336
@@ -1644,9 +1644,9 @@ msgstr "Не удалось раскрыть выражение \"%s\"."
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось импортировать комплексный экран \"%2$s\": подчиненный комплексный экран \"%3$s\" не существует."
+msgstr[1] "Не удалось импортировать комплексный экран \"%2$s\": подчиненные комплексные экраны \"%3$s\" не существуют."
+msgstr[2] "Не удалось импортировать комплексный экран \"%2$s\": подчиненные комплексные экраны \"%3$s\" не существуют."
 
 #: include/classes/import/importers/CTemplateImporter.php:94
 #, php-format
@@ -1663,7 +1663,7 @@ msgstr "Не удалось подключить \"view file\" \"%s\"."
 
 #: api/classes/CUser.php:827
 msgid "Cannot insert user medias"
-msgstr "Не удалось вставить типы оповещения пользователя"
+msgstr "Не удалось вставить способы оповещения пользователя"
 
 #: api/classes/CHost.php:1988
 msgid "Cannot link template"
@@ -1675,19 +1675,19 @@ msgstr "Не удалось выполнить выход."
 
 #: api/classes/CHost.php:1812
 msgid "Cannot mass update host name."
-msgstr "Не удалось массово обновить имя узла сети."
+msgstr "Невозможно массово обновить имя узла сети."
 
 #: api/classes/CTemplate.php:1371
 msgid "Cannot mass update template name"
-msgstr "Не удалось произвести массовое обновление имени шаблона"
+msgstr "Невозможно массово обновить имя шаблона"
 
 #: api/classes/CHost.php:1802
 msgid "Cannot mass update visible host name."
-msgstr "Не удалось массово обновить видимое имя узла сети."
+msgstr "Невозможно массово обновить видимое имя узла сети."
 
 #: api/classes/CTemplate.php:1344
 msgid "Cannot mass update visible template name"
-msgstr "Не удалось массово обновить видимое имя шаблона"
+msgstr "Невозможно массово обновить видимое имя шаблона"
 
 #: api/classes/CTemplate.php:1617
 #, php-format
@@ -1697,17 +1697,17 @@ msgstr "Невозможно передать одинаковые ID шабло
 #: include/classes/db/DB.php:511
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr "Не удалось выполнить запрос удаления из таблицы \"%1$s\" без выражения where."
+msgstr "Невозможно выполнить запрос удаления из таблицы \"%1$s\" без выражения where."
 
 #: include/classes/db/DB.php:422
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr "Не удалось выполнить запрос обновления таблицы \"%1$s\" без значений."
+msgstr "Невозможно выполнить запрос обновления таблицы \"%1$s\" без значений."
 
 #: include/classes/db/DB.php:433
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr "Не удалось выполнить запрос обновления таблицы \"%1$s\" без выражения where."
+msgstr "Невозможно выполнить запрос обновления таблицы \"%1$s\" без выражения where."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
@@ -1912,7 +1912,7 @@ msgstr "Не удалось обновить данные пользовател
 
 #: api/classes/CUser.php:819
 msgid "Cannot update user medias"
-msgstr "Не удалось обновить типы оповещений пользователя"
+msgstr "Не удалось обновить способы оповещений пользователя"
 
 #: profile.php:112 users.php:125
 msgid "Cannot update user. Both passwords must be equal."
@@ -2020,12 +2020,12 @@ msgstr "Закольцовывающая связь не может быть с�
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
 msgid "Circular reference in maps: %1$s."
-msgstr "Закольцованная ссылка в карте сети: %1$s."
+msgstr "Закольцованная ссылка в картах сети: %1$s."
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
 msgid "Circular reference in screens: %1$s."
-msgstr ""
+msgstr "Закольцованная ссылка в комплексных экранах: %1$s."
 
 #: include/classes/import/importers/CTemplateImporter.php:119
 #, php-format
@@ -2038,7 +2038,7 @@ msgstr "Очистить"
 
 #: include/views/configuration.item.edit.php:439
 msgid "Clear history and trends"
-msgstr "Очистить историю и тенденции"
+msgstr "Очистить историю и динамику изменений"
 
 #: include/views/configuration.httpconf.list.php:137
 #: include/views/configuration.item.list.php:251
@@ -2105,7 +2105,7 @@ msgstr "Цвет не корректный: ожидается шестнадц�
 #: include/views/configuration.screen.constructor.edit.php:567
 #: screenedit.php:45
 msgid "Column span"
-msgstr "Объединить столбцы"
+msgstr "Объединение столбцов"
 
 #: include/views/configuration.screen.edit.php:40 screenconf.php:51
 msgid "Columns"
@@ -2251,7 +2251,7 @@ msgstr "Настройка обслуживания"
 
 #: media_types.php:26
 msgid "Configuration of media types"
-msgstr "Настройка типов оповещения"
+msgstr "Настройка способов оповещения"
 
 #: sysmap.php:26 sysmaps.php:34
 msgid "Configuration of network maps"
@@ -2319,7 +2319,7 @@ msgstr "Настройка преобразования значений"
 
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
-msgstr "Настройка веб мониторинга"
+msgstr "Настройка веб-мониторинга"
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
@@ -2367,6 +2367,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"Не удалось подключиться к Zabbix серверу \"%s\". Возможные причины:\n"
+"1. Некорректные IP/DNS сервера в \"zabbix.conf.php\";\n"
+"2. Некорректная настройка DNS сервера.\n"
 
 #: api/classes/CScript.php:468
 #, php-format
@@ -2377,6 +2380,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Подключение к Zabbix серверу \"%s\" отклонено. Возможные причины:\n"
+"1. Некорректные IP/DNS сервера в \"zabbix.conf.php\";\n"
+"2. Среда безопасности (например, SELinux) блокирует подключение;\n"
+"3. Демон Zabbix сервера не запущен;\n"
+"4. Фаервол блокирует TCP подключение.\n"
 
 #: api/classes/CScript.php:474
 #, php-format
@@ -2385,6 +2393,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Превышено время ожидания при подключении к Zabbix серверу \"%s\". Возможные причины:\n"
+"1. Некорректные IP/DNS сервера в \"zabbix.conf.php\";\n"
+"2. Фаервол блокирует TCP подключение.\n"
 
 #: include/hosts.inc.php:215
 msgid "Contact"
@@ -2447,7 +2458,7 @@ msgstr "Создать график"
 
 #: include/views/configuration.graph.list.php:43
 msgid "Create graph (select host first)"
-msgstr ""
+msgstr "Создать график (сначала выберите узел сети)"
 
 #: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
@@ -2455,7 +2466,7 @@ msgstr "Создать прототип графика"
 
 #: hosts.php:640
 msgid "Create host"
-msgstr ""
+msgstr "Создать узел сети"
 
 #: include/views/configuration.hostgroups.list.php:30
 #: include/views/configuration.hostgroups.list.php:33
@@ -2576,12 +2587,12 @@ msgstr "Создано: Прототип триггера \"%1$s\" в \"%2$s\"."
 #: include/validate.inc.php:421
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
-msgstr "Критическая ошибка. Поле \"%1$s\" содержит Multibyte символы."
+msgstr "Критическая ошибка. Поле \"%1$s\" содержит многобайтовые символы."
 
 #: include/validate.inc.php:482
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
-msgstr "Критическая ошибка. Поле \"%1$s\" обязательно."
+msgstr "Критическая ошибка. Поле \"%1$s\" является обязательным."
 
 #: include/validate.inc.php:361
 #, php-format
@@ -2601,7 +2612,7 @@ msgstr "Критическая ошибка. Поле \"%1$s\" не являет
 #: include/validate.inc.php:399
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Критическая ошибка. Поле \"%1$s\" не является десятичным числом."
 
 #: include/validate.inc.php:375
 #, php-format
@@ -2621,7 +2632,7 @@ msgstr "Критическая ошибка. Поле \"%1$s\" не являет
 #: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
-msgstr "Критическая ошибка. Поле \"%1$s\" должно быть опущенно."
+msgstr "Критическая ошибка. Поле \"%1$s\" должно быть пропущено."
 
 #: include/validate.inc.php:553
 #, php-format
@@ -2712,11 +2723,11 @@ msgstr "ДЕТАЛИ СЦЕНАРИЯ"
 #: include/maps.inc.php:636 include/maps.inc.php:719 include/maps.inc.php:805
 #: include/maps.inc.php:893
 msgid "DISABLED"
-msgstr "ОТКЛЮЧЕН"
+msgstr "ОТКЛЮЧЕНО"
 
 #: include/triggers.inc.php:374
 msgid "DISCOVERED"
-msgstr "ОБНАРУЖЕН"
+msgstr "ОБНАРУЖЕНО"
 
 #: include/menu.inc.php:248
 msgid "DM"
@@ -2736,7 +2747,7 @@ msgstr "DNS имя"
 
 #: include/triggers.inc.php:373
 msgid "DOWN"
-msgstr "НЕДОСТУПЕН"
+msgstr "НЕДОСТУПНО"
 
 #: include/forms.inc.php:1482 include/maintenances.inc.php:35
 #: include/reports.inc.php:214 include/reports.inc.php:660
@@ -2777,7 +2788,7 @@ msgstr "Данные"
 #: include/classes/class.cchart.php:2307 include/classes/class.cpie.php:702
 #, php-format
 msgid "Data from %1$s. Generated in %2$s sec."
-msgstr ""
+msgstr "Данные из %1$s. Сгенерированы за %2$s сек."
 
 #: include/screens.inc.php:29
 msgid "Data overview"
@@ -2972,7 +2983,7 @@ msgstr "Удалить и очистить выбранные шаблоны? (�
 
 #: include/views/configuration.template.edit.php:387
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr "Удалить и очистить шаблон? (Внимание: все присоединенные узлы сети будут очищены!)"
+msgstr "Удалить и очистить шаблон? (Внимание: все присоединенные к нему узлы сети будут очищены!)"
 
 #: include/views/configuration.application.edit.php:72
 msgid "Delete application?"
@@ -2997,7 +3008,7 @@ msgstr "Удалить график?"
 
 #: include/views/configuration.httpconf.list.php:138
 msgid "Delete history of selected WEB scenarios?"
-msgstr "Удалить историю у выбранных Веб сценариев?"
+msgstr "Удалить историю у выбранных веб-сценариев?"
 
 #: include/views/configuration.item.list.php:252
 msgid "Delete history of selected items?"
@@ -3077,7 +3088,7 @@ msgstr "Удалить выбранное"
 
 #: include/views/configuration.httpconf.list.php:142
 msgid "Delete selected WEB scenarios?"
-msgstr "Удалить выбранные Веб сценарии?"
+msgstr "Удалить выбранные веб-сценарии?"
 
 #: actionconf.php:536
 msgid "Delete selected actions?"
@@ -3263,7 +3274,7 @@ msgstr "Удалено: Прототип элемента данных \"%1$s\" 
 #: api/classes/CProxy.php:552
 #, php-format
 msgid "Deleted: Proxy \"%1$s\"."
-msgstr ""
+msgstr "Удалено: Прокси \"%1$s\"."
 
 #: api/classes/CTemplate.php:1243
 #, php-format
@@ -3407,7 +3418,7 @@ msgstr "Деактивировать выбранное"
 
 #: include/views/configuration.httpconf.list.php:134
 msgid "Disable selected WEB scenarios?"
-msgstr "Отключить выбранные Веб сценарии?"
+msgstr "Деактивировать выбранные веб-сценарии?"
 
 #: actionconf.php:532
 msgid "Disable selected actions?"
@@ -3415,15 +3426,15 @@ msgstr "Деактивировать выбранные действия?"
 
 #: include/views/configuration.application.list.php:86
 msgid "Disable selected applications?"
-msgstr "Отключить выбранные группы элементов данных?"
+msgstr "Деактивировать выбранные группы элементов данных?"
 
 #: include/views/configuration.discovery.list.php:72
 msgid "Disable selected discovery rules?"
-msgstr "Отключить выбранные правила обнаружения?"
+msgstr "Деактивировать выбранные правила обнаружения?"
 
 #: include/views/administration.usergroups.list.php:134
 msgid "Disable selected groups?"
-msgstr "Отключить выбранные группы?"
+msgstr "Деактивировать выбранные группы?"
 
 #: hosts.php:934
 msgid "Disable selected hosts?"
@@ -3462,7 +3473,7 @@ msgstr "Деактивировать выбранные триггеры?"
 #: include/views/js/configuration.sysmaps.js.php:139 overview.php:87
 #: popup_media.php:146 popup.php:990 tr_logform.php:373
 msgid "Disabled"
-msgstr "Деактивирован"
+msgstr "Деактивировано"
 
 #: overview.php:112
 msgid "Disabled or no trigger"
@@ -3524,7 +3535,7 @@ msgstr "Правило обнаружения \"%1$s\" уже существуе
 #: api/classes/CDiscoveryRule.php:953
 #, php-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
-msgstr "У правила обнаружения \"%1$s:%2$s\" некорректное время хранения: \"%3$s\". (мин: %4$d, макс: %5$d, допускается пользовательский макрос)"
+msgstr "У правила обнаружения \"%1$s:%2$s\" некорректное время жизни: \"%3$s\". (мин: %4$d, макс: %5$d, допускается пользовательский макрос)"
 
 #: api/classes/CDRule.php:595
 #, php-format
@@ -3567,7 +3578,7 @@ msgstr "Правила обнаружения удалены"
 
 #: host_discovery.php:246
 msgid "Discovery rules disabled"
-msgstr "Правила обнаружения отключены"
+msgstr "Правила обнаружения деактивированы"
 
 #: discoveryconf.php:153
 msgid "Discovery rules updated"
@@ -3600,7 +3611,7 @@ msgstr "Распределение значений для нескольких 
 
 #: include/services.inc.php:347
 msgid "Do not calculate"
-msgstr "Без подсчета"
+msgstr "Без вычисления"
 
 #: adm.housekeeper.php:33
 #: include/views/administration.general.housekeeper.edit.php:24
@@ -3659,19 +3670,19 @@ msgstr "Недоступен"
 
 #: include/views/configuration.host.edit.php:271
 msgid "Drag here to change the type of the interface to \"IPMI\" type."
-msgstr "Перетащите сюда для изменения типа интерфейса на \"IPMI\"."
+msgstr "Перетащите сюда для изменения типа интерфейса на \"IPMI\" тип."
 
 #: include/views/configuration.host.edit.php:256
 msgid "Drag here to change the type of the interface to \"JMX\" type."
-msgstr "Перетащите сюда для изменения типа интерфейса на \"JMX\"."
+msgstr "Перетащите сюда для изменения типа интерфейса на \"JMX\" тип."
 
 #: include/views/configuration.host.edit.php:240
 msgid "Drag here to change the type of the interface to \"SNMP\" type."
-msgstr "Перетащите сюда для изменения типа интерфейса на \"SNMP\"."
+msgstr "Перетащите сюда для изменения типа интерфейса на \"SNMP\" тип."
 
 #: include/views/configuration.host.edit.php:223
 msgid "Drag here to change the type of the interface to \"agent\" type."
-msgstr "Перетащите сюда для изменения типа интерфейса на \"агент\"."
+msgstr "Перетащите сюда для изменения типа интерфейса на \"агент\" тип."
 
 #: include/views/configuration.graph.edit.php:71
 msgid "Draw style"
@@ -3748,7 +3759,7 @@ msgstr "СОБЫТИЯ"
 
 #: include/locales/en_gb.inc.php:141
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
-msgstr "Каждый URL должен иметь уникальное имя. Пожалуйста, удостоверьтесь, что есть только один URL с таким именем."
+msgstr "У каждого URL должно быть уникальное имя. Пожалуйста, удостоверьтесь, что есть только один URL с этим именем."
 
 #: include/forms.inc.php:1865 include/forms.inc.php:1879
 #: include/locales/en_gb.inc.php:163
@@ -3768,7 +3779,7 @@ msgstr "Изменить связи элемента"
 
 #: search.php:257 search.php:271 search.php:275
 msgid "Edit hosts"
-msgstr "Изменить узлы сети"
+msgstr "Изменить узел сети"
 
 #: include/views/configuration.maintenance.edit.php:120
 msgid "Edit maintenance period"
@@ -3776,7 +3787,7 @@ msgstr "Изменение периода обслуживания"
 
 #: include/views/js/configuration.sysmaps.js.php:8
 msgid "Edit map element"
-msgstr "Изменить элемент карты"
+msgstr "Изменение элемента карты сети"
 
 #: include/locales/en_gb.inc.php:217
 msgid "Edit service"
@@ -3834,7 +3845,7 @@ msgstr "В выражении указано пустое имя узла сет
 #: api/classes/CUserGroup.php:641 api/classes/CUserMacro.php:504
 #: api/classes/CUserMacro.php:658
 msgid "Empty input parameter."
-msgstr "Входной параметр пустой."
+msgstr "Пустой входной параметр."
 
 #: api/classes/CDRule.php:418
 msgid "Empty input."
@@ -3851,7 +3862,7 @@ msgstr "Пустой макрос."
 
 #: api/classes/CService.php:582
 msgid "Empty name."
-msgstr ""
+msgstr "Пустое имя."
 
 #: api/classes/CImage.php:502 api/rpc/class.czbxrpc.php:45
 msgid "Empty parameters"
@@ -3876,11 +3887,11 @@ msgstr "Включить подтверждение"
 
 #: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
-msgstr "Включить режим отладки для выбранных групп?"
+msgstr "Активировать режим отладки для выбранных групп?"
 
 #: include/views/administration.general.gui.edit.php:33
 msgid "Enable event acknowledges"
-msgstr "Активировать подтверждение событий"
+msgstr "Активировать подтверждения событий"
 
 #: include/actions.inc.php:276 include/actions.inc.php:477
 msgid "Enable host"
@@ -3910,7 +3921,7 @@ msgstr "Активировать выбранное"
 
 #: include/views/configuration.httpconf.list.php:130
 msgid "Enable selected WEB scenarios?"
-msgstr "Активировать выбранные ВЕБ сценарии?"
+msgstr "Активировать выбранные веб-сценарии?"
 
 #: actionconf.php:528
 msgid "Enable selected actions?"
@@ -3940,7 +3951,7 @@ msgstr "Активировать выбранные элементы данны�
 
 #: include/views/administration.mediatypes.list.php:110
 msgid "Enable selected media types?"
-msgstr "Активировать выбранные типы оповещения?"
+msgstr "Активировать выбранные способы оповещения?"
 
 #: include/views/configuration.triggers.list.php:227
 msgid "Enable selected triggers?"
@@ -3966,7 +3977,7 @@ msgstr "Активировать выбранные триггеры?"
 #: include/views/configuration.triggers.list.php:193 overview.php:91
 #: popup_media.php:145 popup.php:993
 msgid "Enabled"
-msgstr "Активирован"
+msgstr "Активировано"
 
 #: include/locales.inc.php:58
 msgid "English (en_GB)"
@@ -3994,11 +4005,11 @@ msgstr "Описание ошибки: не удалось прочитать о
 
 #: api/classes/CScript.php:497
 msgid "Error description: can't send command, check connection."
-msgstr "Описание ошибки: не удалось отправить команду, проверьте подключение."
+msgstr "Описание ошибки: не удалось отправить команду, проверьте соединение."
 
 #: api/classes/CScript.php:513
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_BYTES_LIMIT read bytes limit is reached. You can try to increase this value."
-msgstr "Описание ошибки: константа ZBX_SCRIPT_BYTES_LIMIT установленная в \"include/defines.inc.php\"  превышает допустимый предел. Вы можете попытаться увеличить это значение."
+msgstr "Описание ошибки: константа ZBX_SCRIPT_BYTES_LIMIT установленная в \"include/defines.inc.php\" превышает допустимый предел. Вы можете попытаться увеличить это значение."
 
 #: api/classes/CScript.php:509
 msgid "Error description: defined in \"include/defines.inc.php\" constant ZBX_SCRIPT_TIMEOUT timeout is reached. You can try to increase this value."
@@ -4042,7 +4053,7 @@ msgstr "Событие подтверждено"
 #: adm.gui.php:71
 #, php-format
 msgid "Event acknowledges \"%1$s\"."
-msgstr "Подтверждение \"%1$s\" событий."
+msgstr "Подтверждение событий \"%1$s\"."
 
 #: dashconf.php:246
 msgid "Event acknowledging disabled"
@@ -4050,7 +4061,7 @@ msgstr "Подтверждение событий отключено"
 
 #: tr_events.php:30 tr_events.php:117
 msgid "Event details"
-msgstr "Подробности события"
+msgstr "Детали события"
 
 #: include/triggers.inc.php:1962
 msgid "Event generation"
@@ -4062,7 +4073,7 @@ msgstr "Список событий [20 предыдущих]"
 
 #: actionconf.php:447
 msgid "Event source"
-msgstr "Событие"
+msgstr "Исходное событие"
 
 #: tr_events.php:112
 msgid "Event source details"
@@ -4131,7 +4142,7 @@ msgstr "Ожидаемый результат"
 #: api/rpc/class.cjsonrpc.php:81
 #, php-format
 msgid "Expecting JSON-rpc version 2.0, \"%s\" is given."
-msgstr "Ожидался JSON-rpc версии 2.0, а получено \"%s\"."
+msgstr "Ожидался JSON-rpc версии 2.0, а получена \"%s\"."
 
 #: include/views/configuration.maintenance.list.php:55
 msgid "Expired"
@@ -4216,12 +4227,12 @@ msgstr "Ошибка"
 
 #: include/actions.inc.php:955 include/blocks.inc.php:931
 msgid "Failed"
-msgstr "Ошибочный"
+msgstr "Неудачный"
 
 #: api/classes/CWebCheck.php:519
 #, php-format
 msgid "Failed step of scenario \"%s\"."
-msgstr "Ошибочный шаг в сценарии \"%s\"."
+msgstr "Неудачный шаг в сценарии \"%s\"."
 
 #: api/classes/CTemplate.php:1093
 msgid "Failed to update template"
@@ -4229,7 +4240,7 @@ msgstr "Ошибка обновления шаблона"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
-msgstr "Ошибочный аудит"
+msgstr "Аудит успеха"
 
 #: dashboard.php:259 include/blocks.inc.php:1030
 msgid "Favourite graphs"
@@ -4266,7 +4277,7 @@ msgstr "Поле \"druleid\" является обязательным."
 
 #: api/classes/CTemplate.php:992
 msgid "Field \"host\" is mandatory"
-msgstr "Поле \"host\" обязательно"
+msgstr "Поле \"host\" является обязательным"
 
 #: api/classes/CDRule.php:534
 msgid "Field \"name\" is required."
@@ -4505,38 +4516,38 @@ msgstr "График"
 #: api/classes/CGraph.php:862 api/classes/CGraphPrototype.php:849
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr ""
+msgstr "График \"%1$s\" уже существует в \"%2$s\" (унаследован из другого шаблона)."
 
 #: api/classes/CGraph.php:883 api/classes/CGraph.php:890
 #: api/classes/CGraphPrototype.php:871 api/classes/CGraphPrototype.php:878
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr ""
+msgstr "График \"%1$s\" уже существует в \"%2$s\" (элементы данных не идентичны)."
 
 #: api/classes/CGraph.php:842 api/classes/CGraphPrototype.php:829
 #, php-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "График \"%1$s\" уже существует в \"%2$s\"."
 
 #: api/classes/CGraph.php:817 api/classes/CGraphPrototype.php:804
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymax value item)."
-msgstr ""
+msgstr "График \"%1$s\" не может быть унаследован. Не хватает обязательных элементов данных у \"%2$s\" (элемента данных макс значения Y)."
 
 #: api/classes/CGraph.php:825 api/classes/CGraphPrototype.php:812
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\" (Ymin value item)."
-msgstr ""
+msgstr "График \"%1$s\" не может быть унаследован. Не хватает обязательных элементов данных у \"%2$s\" (элемента данных мин значения Y)."
 
 #: api/classes/CGraph.php:811 api/classes/CGraphPrototype.php:798
 #, php-format
 msgid "Graph \"%1$s\" cannot inherit. No required items on \"%2$s\"."
-msgstr ""
+msgstr "График \"%1$s\" не может быть унаследован. Не хватает обязательных элементов данных у \"%2$s\"."
 
 #: api/classes/CGraph.php:657 api/classes/CGraph.php:724
 #, php-format
 msgid "Graph \"%1$s\" with template host cannot contain items from other hosts."
-msgstr ""
+msgstr "График \"%1$s\" с шаблонным узлом сети не может содержать элементы данных из других узлов сети."
 
 #: graphs.php:280
 msgid "Graph added"
@@ -4556,21 +4567,21 @@ msgstr "Элемент графика"
 
 #: include/views/configuration.screen.constructor.edit.php:138
 msgid "Graph name"
-msgstr "Название графика"
+msgstr "Имя графика"
 
 #: api/classes/CGraphPrototype.php:647 api/classes/CGraphPrototype.php:714
 #, php-format
 msgid "Graph prototype \"%1$s\" with template host cannot contain items from other hosts."
-msgstr ""
+msgstr "Прототип графика \"%1$s\" с шаблонным узлом сети не может содержать элементы данных из других узлов сети."
 
 #: api/classes/CGraphPrototype.php:1028
 #, php-format
 msgid "Graph prototype \"%s\" deleted."
-msgstr ""
+msgstr "Прототип графика \"%s\" удален."
 
 #: api/classes/CGraphPrototype.php:1100
 msgid "Graph prototype must have at least one prototype."
-msgstr ""
+msgstr "Прототип графика должен иметь как минимум один прототип."
 
 #: include/html.inc.php:471 include/html.inc.php:475
 #: include/views/configuration.host.discovery.list.php:90
@@ -4581,12 +4592,12 @@ msgstr "Прототипы графиков"
 
 #: include/views/configuration.graph.list.php:32
 msgid "Graph prototypes of"
-msgstr "Прототипы графиков"
+msgstr "Прототипы графиков для"
 
 #: include/graphs.inc.php:45
 #: include/views/js/configuration.graph.edit.js.php:29
 msgid "Graph sum"
-msgstr "Сумма графика"
+msgstr "Суммарный график"
 
 #: include/views/configuration.graph.edit.php:58
 #: include/views/configuration.graph.list.php:78 popup.php:1294 popup.php:1300
@@ -4600,12 +4611,12 @@ msgstr "График обновлен"
 #: api/classes/CGraph.php:1119 api/classes/CGraphPrototype.php:1120
 #, php-format
 msgid "Graph with name \"%1$s\" already exists."
-msgstr ""
+msgstr "График с именем \"%1$s\" уже существует."
 
 #: api/classes/CGraph.php:845 api/classes/CGraph.php:865
 #: api/classes/CGraphPrototype.php:832 api/classes/CGraphPrototype.php:852
 msgid "Graph with same name but other type exist."
-msgstr ""
+msgstr "График с таким же именем, но с другим типом, уже существует."
 
 #: charts.php:212 dashboard.php:260 hosts.php:693 hosts.php:772
 #: include/blocks.inc.php:1127 include/html.inc.php:482
@@ -4672,7 +4683,7 @@ msgstr ""
 #: api/classes/CHostGroup.php:720
 #, php-format
 msgid "Group \"%1$s\" is internal and can not be deleted."
-msgstr "Внутренняя группа \"%1$s\" и не может быть удалена."
+msgstr "Группа \"%1$s\" внутренняя и не может быть удалена."
 
 #: api/classes/CHostGroup.php:740
 #, php-format
@@ -4703,7 +4714,7 @@ msgstr "Группа для обнаруженных узлов сети."
 #: include/views/administration.usergroups.edit.php:39
 #: include/views/configuration.hostgroups.edit.php:35
 msgid "Group name"
-msgstr "Название группы"
+msgstr "Имя группы"
 
 #: hostgroups.php:114 usergrps.php:146
 msgid "Group updated"
@@ -4815,16 +4826,16 @@ msgstr "Скрыть все"
 
 #: include/views/configuration.httpconf.list.php:47
 msgid "Hide disabled scenarios"
-msgstr "Скрыть отключенные сценарии"
+msgstr "Скрывать деактивированные сценарии"
 
 #: include/views/configuration.triggers.list.php:55
 #: include/views/configuration.triggers.list.php:70
 msgid "Hide disabled triggers"
-msgstr "Скрыть деактивированные триггеры"
+msgstr "Скрывать деактивированные триггеры"
 
 #: history.php:278
 msgid "Hide selected"
-msgstr "Скрыть  выбранное"
+msgstr "Скрыть выбранное"
 
 #: adm.triggerseverities.php:62
 #: include/views/administration.general.triggerSeverity.edit.php:58
@@ -5054,7 +5065,7 @@ msgstr "Шаблон узла сети"
 
 #: include/views/configuration.screen.constructor.edit.php:475
 msgid "Host time"
-msgstr "Время узла сети"
+msgstr "Время на узле сети"
 
 #: api/classes/CHost.php:1657
 msgid "Host update failed."
@@ -5292,15 +5303,15 @@ msgstr "Иконка (проблема)"
 
 #: include/views/configuration.sysmap.edit.php:81
 msgid "Icon highlight"
-msgstr "Выделение иконки"
+msgstr "Подсветка иконок"
 
 #: include/views/configuration.sysmap.edit.php:133
 msgid "Icon label location"
-msgstr "Расположение подписи иконки"
+msgstr "Расположение подписи к иконке"
 
 #: include/views/configuration.sysmap.edit.php:128
 msgid "Icon label type"
-msgstr "Тип подписи иконки"
+msgstr "Тип подписи к иконке"
 
 #: include/views/administration.general.iconmap.edit.php:134
 #: include/views/administration.general.iconmap.list.php:23
@@ -5345,7 +5356,7 @@ msgstr "Соответствие иконок \"%s\" имеет некоррек
 #: api/classes/CIconMap.php:499 api/classes/CIconMap.php:504
 #, php-format
 msgid "Icon map \"%s\" must have at least one mapping."
-msgstr "Соответсвие иконок \"%s\" должно иметь по крайней мере одно соответствие."
+msgstr "У соответствия иконок \"%s\" должно быть по крайней мере одно соответствие."
 
 #: adm.iconmapping.php:65
 msgid "Icon map created"
@@ -5366,7 +5377,7 @@ msgstr "Соответствие иконок обновлено"
 #: api/classes/CIconMap.php:340
 #, php-format
 msgid "Icon map with iconmapid \"%s\" does not exist."
-msgstr "Соответствие иконок с iconmapid \"%s\" не существует."
+msgstr "Соответствия иконок с iconmapid \"%s\" не существует."
 
 #: adm.gui.php:92 adm.housekeeper.php:70 adm.iconmapping.php:96
 #: adm.iconmapping.php:159 adm.images.php:130 adm.macros.php:161
@@ -5413,11 +5424,11 @@ msgstr "Изображение удалено"
 
 #: include/views/configuration.sysmap.edit.php:124
 msgid "Image label type"
-msgstr "Тип подписи к рисунку"
+msgstr "Тип подписи к изображению"
 
 #: adm.images.php:65 api/classes/CImage.php:312
 msgid "Image size must be less than 1MB"
-msgstr "Размер рисунка должен быть меньше 1МБ"
+msgstr "Размер изображения должен быть меньше 1МБ"
 
 #: adm.images.php:47
 msgid "Image updated"
@@ -5503,7 +5514,7 @@ msgstr "Включено"
 #: api/classes/CService.php:804
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
-msgstr ""
+msgstr "Некорректное значение поля \"нежесткая\" для зависимости у услуги \"%1$s\"."
 
 #: api/classes/CMap.php:620 api/classes/CMap.php:624 api/classes/CMap.php:631
 #: api/classes/CMap.php:636
@@ -5534,7 +5545,7 @@ msgstr "Некорректное SNMP community."
 #: api/classes/CService.php:634
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
-msgstr ""
+msgstr "Некорректное допустимое SLA для услуги \"%1$s\"."
 
 #: api/classes/CAction.php:1741
 msgid "Incorrect action condition discovery check."
@@ -5647,7 +5658,7 @@ msgstr "Некорректный id операции для действия"
 #: api/classes/CService.php:597
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
-msgstr ""
+msgstr "Некорректный алгоритм для услуги \"%1$s\"."
 
 #: api/classes/CApplication.php:439 include/regexp.inc.php:52
 #: include/regexp.inc.php:85 include/regexp.inc.php:150
@@ -5666,7 +5677,7 @@ msgstr "Для метода предоставлены некорректные 
 #: api/classes/CService.php:616
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
-msgstr ""
+msgstr "Некорректное вычисляемое значение SLA для услуги \"%1$s\"."
 
 #: include/nodes.inc.php:269 include/nodes.inc.php:311
 msgid "Incorrect characters used for Node name."
@@ -5675,12 +5686,12 @@ msgstr "Использованы некорректные символы в им
 #: api/classes/CProxy.php:373
 #, php-format
 msgid "Incorrect characters used for Proxy name \"%s\"."
-msgstr "Использованы недопустимые символы в имени прокси \"%s\"."
+msgstr "Использованы некорректные символы в имени прокси \"%s\"."
 
 #: api/classes/CTemplate.php:996
 #, php-format
 msgid "Incorrect characters used for Template name [ %1$s ]"
-msgstr "Использованы недопустимые символы в имени шаблона [ %1$s ]"
+msgstr "Использованы некорректные символы в имени шаблона [ %1$s ]"
 
 #: api/classes/CHost.php:1437 api/classes/CHost.php:1808
 #, php-format
@@ -5703,7 +5714,7 @@ msgstr "Некорректная закрывающая скобка в выра
 #: api/classes/CGraph.php:1059
 #, php-format
 msgid "Incorrect colour \"%1$s\"."
-msgstr ""
+msgstr "Некорректный цвет \"%1$s\"."
 
 #: api/classes/CTriggerExpression.php:206
 msgid "Incorrect count of quotes in expression."
@@ -5728,7 +5739,7 @@ msgstr "Некорректное выражение"
 #: include/classes/db/DB.php:440 include/classes/db/DB.php:518
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
-msgstr "Некорректное имя или значение поля \"%1$s\" в выражении where для таблицы \"%2$s\"."
+msgstr "Некорректное имя поля \"%1$s\" или значение в выражении where для таблицы \"%2$s\"."
 
 #: api/classes/CMap.php:580
 msgid "Incorrect fields for sysmap"
@@ -5781,7 +5792,7 @@ msgstr "Некорректный номер изображения."
 #: api/classes/CHostInterface.php:567
 #, php-format
 msgid "Incorrect interface DNS parameter \"%s\" provided."
-msgstr "Указан некорректный параметр DNS \"%s\" для интерфейса."
+msgstr "Для интерфейса указан некорректный параметр DNS \"%s\"."
 
 #: api/classes/CHostInterface.php:574
 #, php-format
@@ -5791,12 +5802,12 @@ msgstr "Указан некорректный параметр IP адреса \
 #: api/classes/CHostInterface.php:582
 #, php-format
 msgid "Incorrect interface port \"%s\" provided."
-msgstr "Указан некорректный \"%s\" порт интерфейса."
+msgstr "Для интерфейса указан некорректный порт \"%s\"."
 
 #: api/classes/CHost.php:1371
 #, php-format
 msgid "Incorrect inventory field \"%s\"."
-msgstr "Некорректное поле \"%s\" в инвентарных данных."
+msgstr "Некорректное поле \"%s\" инвентарных данных."
 
 #: api/classes/CScreenItem.php:463
 #, php-format
@@ -5805,7 +5816,7 @@ msgstr "Указан некорректный ID элемент данных \"%
 
 #: api/classes/CGraph.php:1151 api/classes/CGraphPrototype.php:1153
 msgid "Incorrect item for axis value."
-msgstr ""
+msgstr "Некорректный элемент данных для значения оси X."
 
 #: api/classes/CTriggerExpression.php:83
 #, php-format
@@ -5894,12 +5905,12 @@ msgstr "Указан некорректный ID карты сети \"%s\" дл
 #: api/classes/CMap.php:604
 #, php-format
 msgid "Incorrect map height value for map \"%s\"."
-msgstr "Некорректное значение высоты для карты \"%s\"."
+msgstr "Некорректное значение высоты для карты сети \"%s\"."
 
 #: api/classes/CMap.php:601
 #, php-format
 msgid "Incorrect map width value for map \"%s\"."
-msgstr "Некорректное значение ширины для карты \"%s\"."
+msgstr "Некорректное значение ширины для карты сети \"%s\"."
 
 #: include/nodes.inc.php:289
 msgid "Incorrect node type."
@@ -5926,7 +5937,7 @@ msgstr "Некорректные параметры для метода обно
 
 #: api/classes/CAction.php:1029
 msgid "Incorrect parameters for condition."
-msgstr "Некорректные параметры в условии."
+msgstr "Некорректные параметры для условии."
 
 #: api/classes/CIconMap.php:311
 #, php-format
@@ -5944,11 +5955,11 @@ msgstr "Некорректные параметры для группы поль
 #: api/classes/CService.php:682
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
-msgstr ""
+msgstr "Некорректный родитель для услуги \"%1$s\"."
 
 #: api/classes/CService.php:685
 msgid "Incorrect parent service."
-msgstr ""
+msgstr "Некорректная родительская услуга."
 
 #: api/classes/CTriggerExpression.php:210
 msgid "Incorrect parenthesis count in expression."
@@ -5982,29 +5993,29 @@ msgstr "Указан некорректный ID комплексного экр
 
 #: include/services.inc.php:615 include/services.inc.php:624
 msgid "Incorrect service end time."
-msgstr ""
+msgstr "Некорректное время завершения услуги."
 
 #: include/services.inc.php:612 include/services.inc.php:621
 msgid "Incorrect service start time."
-msgstr ""
+msgstr "Некорректное время начала услуги."
 
 #: include/services.inc.php:606
 msgid "Incorrect service time type."
-msgstr ""
+msgstr "Некорректный тип времени услуги."
 
 #: api/classes/CService.php:651
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
-msgstr ""
+msgstr "Некорректный порядок сортировки для услуги \"%1$s\"."
 
 #: api/classes/CService.php:705
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
-msgstr ""
+msgstr "Некорректное состояние для услуги \"%1$s\"."
 
 #: api/classes/CDRule.php:441
 msgid "Incorrect status."
-msgstr "Некорректный статус."
+msgstr "Некорректное состояние."
 
 #: api/classes/CTriggerExpression.php:640
 msgid "Incorrect symbol sequence in trigger expression."
@@ -6032,7 +6043,7 @@ msgstr "Некорректный период времени \"%1$s\"."
 #: api/classes/CService.php:666
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
-msgstr ""
+msgstr "Некорректный ID триггера для услуги \"%1$s\"."
 
 #: include/triggers.inc.php:694
 msgid "Incorrect trigger expression"
@@ -6044,7 +6055,7 @@ msgstr "Некорректное выражение триггера"
 #: api/classes/CTriggerExpression.php:195
 #, php-format
 msgid "Incorrect trigger expression format \"%1$s\"."
-msgstr "Некорректный формат \"%1$s\" выражения триггера."
+msgstr "Некорректный формат выражения триггера \"%1$s\"."
 
 #: api/classes/CTriggerExpression.php:27
 msgid "Incorrect trigger expression."
@@ -6176,22 +6187,22 @@ msgstr "Интерфейс связан с элементом данных \"%1$
 
 #: include/views/js/configuration.host.edit.js.php:135
 msgid "Interface is used by items that require this type of the interface."
-msgstr "Интерфейс используется элементами данных, которым нужен этот тип интерфейса."
+msgstr "Интерфейс используется элементами данных, которые требуют этот тип интерфейса."
 
 #: api/classes/CHostInterface.php:543
 #, php-format
 msgid "Interface with DNS \"%1$s\" cannot have empty IP address."
-msgstr "Интерфейс с DNS именем \"%1$s\" не может быть с пустым IP адресом."
+msgstr "У интерфейса с DNS именем \"%1$s\" не может быть пустого IP адреса."
 
 #: api/classes/CHostInterface.php:549 api/classes/CHostInterface.php:556
 #, php-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name while having \"Use DNS\" property on \"%2$s\"."
-msgstr "Интерфейс с IP адресом \"%1$s\" не может быть с пустым DNS именем, при наличии свойства \"Использовать DNS\" у \"%2$s\"."
+msgstr "У интерфейса с IP адресом \"%1$s\" не может быть пустого DNS имени, при наличии свойства \"Использовать DNS\" у \"%2$s\"."
 
 #: api/classes/CHostInterface.php:562
 #, php-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
-msgstr "Интерфейс с IP адресом \"%1$s\" не может быть с пустым DNS именем."
+msgstr "У интерфейса с IP адресом \"%1$s\" не может быть пустого DNS имени."
 
 #: include/locales/en_gb.inc.php:95
 msgid "Interfaces"
@@ -6264,7 +6275,7 @@ msgstr "Найден ошибочный комплексный экран."
 #: include/classes/class.cview.php:63
 #, php-format
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
-msgstr "Получено \"%s\" неправильное представление имени. Разрешенные символы : \"a-z\" и \".\"."
+msgstr "Получено ошибочное представление имени \"%s\". Разрешенные символы : \"a-z\" и \".\"."
 
 #: include/menu.inc.php:105
 msgid "Inventory"
@@ -6388,12 +6399,12 @@ msgstr "Элемент данных не обновлен. Пожалуйста,
 #: api/classes/CItemGeneral.php:334
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
-msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как правильно обнаружения."
+msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как правило обнаружения."
 
 #: api/classes/CItemGeneral.php:340
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
-msgstr "Элемент данны с ключем \"%1$s\" уже существует у \"%2$s\", элемент данных созданный из прототипа элемента данных."
+msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных созданный из прототипа элемента данных."
 
 #: api/classes/CItemGeneral.php:337
 #, php-format
@@ -6461,7 +6472,7 @@ msgstr "Список элементов данных"
 
 #: graphs.php:173
 msgid "Items required for graph."
-msgstr ""
+msgstr "Графику требуются элементы данных."
 
 #: items.php:536
 msgid "Items updated"
@@ -6486,11 +6497,11 @@ msgstr "Не удалось сгенерировать JSON-rpc ошибку. Н
 
 #: api/rpc/class.cjsonrpc.php:86
 msgid "JSON-rpc method is not defined."
-msgstr "JSON-rpc метод не определен."
+msgstr "Метож JSON-rpc не задан."
 
 #: api/rpc/class.cjsonrpc.php:91
 msgid "JSON-rpc params is not an Array."
-msgstr "JSON-rpc параметры не являются массивом."
+msgstr "Параметры JSON-rpc не являются массивом."
 
 #: api/rpc/class.cjsonrpc.php:76
 msgid "JSON-rpc version is not specified."
@@ -6549,21 +6560,21 @@ msgstr "Хранить историю"
 #: include/views/configuration.item.massupdate.php:331 items.php:83
 #: items.php:175
 msgid "Keep history (in days)"
-msgstr "Хранить историю (дни)"
+msgstr "Хранение истории (дней)"
 
 #: include/views/configuration.item.edit.php:313
 msgid "Keep lost resources period (in days)"
-msgstr "Период сохранения потерянных ресурсов (в днях)"
+msgstr "Период сохранения потерянных ресурсов (дней)"
 
 #: include/forms.inc.php:544
 msgid "Keep trends"
-msgstr "Хранить тенденции"
+msgstr "Хранение динамики изменений"
 
 #: disc_prototypes.php:112 include/views/configuration.item.edit.php:345
 #: include/views/configuration.item.massupdate.php:341 items.php:90
 #: items.php:176
 msgid "Keep trends (in days)"
-msgstr "Хранить динамику изменений (дни)"
+msgstr "Хранение динамики изменений (дней)"
 
 #: disc_prototypes.php:45 include/forms.inc.php:551
 #: include/views/configuration.host.discovery.list.php:55
@@ -6662,9 +6673,9 @@ msgstr "Последний"
 #, php-format
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Последнее %1$d событие"
+msgstr[1] "Последние %1$d события"
+msgstr[2] "Последние %1$d событий"
 
 #: srv_status.php:87
 msgid "Last 24 hours"
@@ -6714,7 +6725,7 @@ msgstr "За последние"
 
 #: include/views/administration.proxy.list.php:47
 msgid "Last seen (age)"
-msgstr "Виден последний раз (возраст)"
+msgstr "Последний раз был доступен (возраст)"
 
 #: latest.php:199
 msgid "Last value"
@@ -6790,7 +6801,7 @@ msgstr "У связи должны быть заполнены оба поля \
 
 #: include/views/configuration.host.massupdate.php:127
 msgid "Link templates"
-msgstr ""
+msgstr "Присоединить шаблоны"
 
 #: include/actions.inc.php:481
 msgid "Link to template"
@@ -6880,7 +6891,7 @@ msgstr "Ошибка при входе в систему [%s]"
 #: api/classes/CUser.php:858 api/classes/CUser.php:873
 #: api/classes/CUser.php:915
 msgid "Login name or password is incorrect"
-msgstr "Имя пользователя или пароль неверные"
+msgstr "Имя пользователя или пароль некорректные"
 
 #: auditlogs.php:146 include/page_header.php:255
 #: include/views/administration.auditlogs.list.php:44
@@ -6916,7 +6927,7 @@ msgstr "MAC адрес B"
 
 #: include/maps.inc.php:711
 msgid "MAINTENANCE"
-msgstr "В ОБСЛУЖИВАНИИ"
+msgstr "ОБСЛУЖИВАНИЕ"
 
 #: include/hosts.inc.php:40
 msgid "MD2"
@@ -6994,7 +7005,7 @@ msgstr "Обслуживание \"%s\" уже существует."
 
 #: api/classes/CMaintenance.php:518 api/classes/CMaintenance.php:631
 msgid "Maintenance active since cannot be bigger than active till."
-msgstr "Начало обслуживания не может быть старше чем его завершение."
+msgstr "Время начала обслуживания не может быть больше, чем время завершения."
 
 #: maintenance.php:107
 msgid "Maintenance added"
@@ -7079,11 +7090,11 @@ msgstr "Карта сети сохранена! Завершить редакт�
 
 #: include/views/configuration.sysmap.edit.php:116
 msgid "Map label type"
-msgstr "Тип подписи карты сети"
+msgstr "Тип подписи к карте сети"
 
 #: sysmap.php:95
 msgid "Map save operation failed."
-msgstr "Ошибка при операции сохранения карты."
+msgstr "Не удалось выполнить операцию сохранения карты сети."
 
 #: api/classes/CMap.php:696
 #, php-format
@@ -7092,7 +7103,7 @@ msgstr "Карта сети с именем \"%s\" уже существует"
 
 #: include/views/administration.general.valuemapping.edit.php:39
 msgid "Mapped to"
-msgstr "Соответствие для"
+msgstr "Сопоставление с"
 
 #: include/valuemap.inc.php:136
 #, php-format
@@ -7121,11 +7132,11 @@ msgstr "Март"
 
 #: include/views/configuration.sysmap.edit.php:82
 msgid "Mark elements on trigger status change"
-msgstr "Отмечать элементы при изменении состояния триггера"
+msgstr "Помечать элементы при изменении состояния триггера"
 
 #: history.php:280
 msgid "Mark others"
-msgstr "Пометить невыбранное"
+msgstr "Пометить остальное"
 
 #: history.php:279
 msgid "Mark selected"
@@ -7160,16 +7171,16 @@ msgstr "Мастер нода уже существует."
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:32
 msgid "Max count of elements to show inside table cell"
-msgstr "Макс. количество элементов в таблице"
+msgstr "Макс. количество элементов в ячейке таблицы"
 
 #: adm.gui.php:76
 #, php-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
-msgstr "Макс. количество элементов в таблице \"%1$s\"."
+msgstr "Макс. количество элементов в ячейке таблицы \"%1$s\"."
 
 #: adm.gui.php:37 include/views/administration.general.gui.edit.php:35
 msgid "Max count of events per trigger to show"
-msgstr "Макс количество отображаемых событий у триггера"
+msgstr "Макс. количество отображаемых событий у триггера"
 
 #: include/classes/class.cwidget.php:129 include/classes/class.cwidget.php:132
 #: include/config.inc.php:360
@@ -7210,16 +7221,16 @@ msgstr "Май"
 #: include/views/administration.users.edit.php:161
 #: include/views/administration.users.edit.php:287 popup_media.php:29
 msgid "Media"
-msgstr "Способ оповещения"
+msgstr "Оповещения"
 
 #: include/audit.inc.php:26 report4.php:85
 msgid "Media type"
-msgstr "Тип способа оповещений"
+msgstr "Способ оповещений"
 
 #: api/classes/CMediatype.php:347 api/classes/CMediatype.php:399
 #, php-format
 msgid "Media type \"%s\" already exists."
-msgstr "Тип оповещения \"%s\" уже существует."
+msgstr "Способ оповещения \"%s\" уже существует."
 
 #: media_types.php:91
 msgid "Media type added"
@@ -7231,11 +7242,11 @@ msgstr "Способ оповещения удален"
 
 #: media_types.php:136
 msgid "Media type disabled"
-msgstr "Тип опорвещения деактивирован"
+msgstr "Способ оповещения деактивирован"
 
 #: media_types.php:120
 msgid "Media type enabled"
-msgstr "Тип оповещения активирован"
+msgstr "Способ оповещения активирован"
 
 #: media_types.php:86
 msgid "Media type updated"
@@ -7283,7 +7294,7 @@ msgstr "Сообщение"
 
 #: tr_events.php:131
 msgid "Message actions"
-msgstr "Сообщение действий"
+msgstr "Сообщения действий"
 
 #: include/views/administration.mediatypes.edit.php:90
 msgid "Message text limit"
@@ -7349,7 +7360,7 @@ msgstr "Минимальный лимит времени выполнения с
 #: include/classes/class.frontendsetup.php:192
 #, php-format
 msgid "Minimum limit on input parse time for PHP scripts is %s (configuration parameter \"max_input_time\")"
-msgstr "Минимальное временя выполнения скриптов в PHP %s (конфигурационный параметр \"max_input_time\")"
+msgstr "Минимальное время выполнения скриптов в PHP %s (конфигурационный параметр \"max_input_time\")"
 
 #: include/classes/class.frontendsetup.php:97
 #, php-format
@@ -7401,7 +7412,7 @@ msgstr "Под наблюдением"
 #: include/views/configuration.host.edit.php:292
 #: include/views/configuration.host.massupdate.php:66
 msgid "Monitored by proxy"
-msgstr "Мониторится через прокси"
+msgstr "Наблюдение через прокси"
 
 #: include/views/monitoring.discovery.php:46
 msgid "Monitored host"
@@ -7607,7 +7618,7 @@ msgstr "Новый период обслуживания"
 
 #: popup_media.php:106
 msgid "New media"
-msgstr "Новый способ оповещения"
+msgstr "Новое оповещение"
 
 #: adm.regexps.php:196
 msgid "New regular expression"
@@ -7645,15 +7656,15 @@ msgstr "Нет поля \"ymin_type\" для графика \"%s\""
 
 #: chart5.php:40 chart_sla.php:40 report3.php:49 report3.php:66
 msgid "No IT services defined."
-msgstr "Нет заданных услуг IT."
+msgstr "Услуги IT не заданы."
 
 #: api/classes/CScreenItem.php:406
 msgid "No URL provided for screen element."
-msgstr "Не указан URL для элемента комплексного экрана."
+msgstr "Для элемента комплексного экрана не указан URL."
 
 #: include/views/configuration.sysmap.edit.php:149
 msgid "No URLs defined."
-msgstr "Нет заданных URL."
+msgstr "URL'ы не заданы."
 
 #: include/forms.inc.php:268
 msgid "No accessible resources"
@@ -7661,11 +7672,11 @@ msgstr "Нет доступных ресурсов"
 
 #: include/acknow.inc.php:41
 msgid "No acknowledges defined."
-msgstr "Нет заданных подтверждений."
+msgstr "Подтверждения не заданы."
 
 #: actionconf.php:457 include/views/administration.auditacts.list.php:67
 msgid "No actions defined."
-msgstr "Нет заданных действий."
+msgstr "Действия не заданы."
 
 #: include/actions.inc.php:643 include/actions.inc.php:719
 #: include/actions.inc.php:785 include/actions.inc.php:845
@@ -7679,38 +7690,38 @@ msgstr "Нет групп элементов данных с ID \"%1$s\"."
 
 #: include/views/configuration.application.list.php:50 popup.php:1232
 msgid "No applications defined."
-msgstr "Нет заданных групп элементов данных."
+msgstr "Группы элементов данных не заданы."
 
 #: include/views/administration.auditlogs.list.php:83
 msgid "No audit defined."
-msgstr "Записи аудита не определены."
+msgstr "Записи в аудите не найдены."
 
 #: api/classes/CAction.php:1555
 #, php-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Тип аутентификации не указан для команды \"%s\" в операции действия."
+msgstr "В операции действия для команды \"%s\" не указан тип аутентификации."
 
 #: api/classes/CAction.php:1559 api/classes/CAction.php:1573
 #, php-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Имя пользователя для аутентификации не указано для команды \"%s\" в операции действия."
+msgstr "В операции действия для команды \"%s\" не указано имя пользователя для аутентификации."
 
 #: charts.php:143 history.php:462
 msgid "No charts defined."
-msgstr "Нет заданных графиков."
+msgstr "Графики не заданы."
 
 #: api/classes/CAction.php:1542
 msgid "No command specified for action operation."
-msgstr "Не указана команда для операции действия."
+msgstr "Для операции действия не указана команда."
 
 #: api/classes/CAction.php:1537
 msgid "No command type specified for action operation."
-msgstr "Не указан тип команды для операции действия."
+msgstr "Для операции действия не указан тип команды."
 
 #: include/views/configuration.action.edit.php:85
 #: include/views/configuration.action.edit.php:844
 msgid "No conditions defined."
-msgstr "Нет заданных условий."
+msgstr "Условия не заданы."
 
 #: include/views/configuration.maintenance.edit.php:40
 #: include/views/configuration.maintenance.list.php:68
@@ -7726,7 +7737,7 @@ msgstr "Нет интерфейса по умолчанию для \"%1$s\" ти
 #: include/views/configuration.triggers.edit.php:314
 #: include/views/configuration.triggers.massupdate.php:120
 msgid "No dependencies defined."
-msgstr "Нет заданных зависимостей."
+msgstr "Зависимости не заданы."
 
 #: api/rpc/class.cjsonrpc.php:186 api/rpc/class.cjsonrpc.php:190
 #: api/rpc/class.cjsonrpc.php:194
@@ -7739,20 +7750,20 @@ msgstr "Обнаружения не заданы."
 
 #: popup.php:1871
 msgid "No discovery checks defined."
-msgstr "Нет заданных проверок обнаружения."
+msgstr "Проверки обнаружения не заданы."
 
 #: api/classes/CDiscoveryRule.php:672
 msgid "No discovery rule IDs given."
-msgstr "Не было предоставлено IDs правила обнаружения."
+msgstr "ID правил обнаружения не определены."
 
 #: include/views/configuration.discovery.list.php:37
 #: include/views/configuration.host.discovery.list.php:43 popup.php:1855
 msgid "No discovery rules defined."
-msgstr "Нет заданных правил обнаружения."
+msgstr "Правила обнаружения не заданы."
 
 #: include/locales/en_gb.inc.php:194
 msgid "No elements selected!"
-msgstr "Нет выбранных элементов!"
+msgstr "Элементы не выбраны!"
 
 #: include/views/configuration.triggers.edit.php:167
 msgid "No errors found."
@@ -7760,7 +7771,7 @@ msgstr "Ошибки не найдены."
 
 #: events.php:335 include/screens.inc.php:1225
 msgid "No events defined."
-msgstr "Нет заданных событий."
+msgstr "События не заданы."
 
 #: acknow.php:75
 msgid "No events to acknowledge"
@@ -7778,25 +7789,25 @@ msgstr "Файл не был загружен."
 #: include/views/configuration.item.edit.php:261
 #: include/views/configuration.item.massupdate.php:268
 msgid "No flexible intervals defined."
-msgstr "Переменные интервалы не определены."
+msgstr "Переменные интервалы не заданы."
 
 #: api/classes/CScreenItem.php:381
 msgid "No graph ID provided for screen element."
-msgstr "Не указан ID графика для элемента комплексного экрана."
+msgstr "Для элемента комплексного экрана не указан ID графика."
 
 #: include/graphs.inc.php:291
 #, php-format
 msgid "No graph item with graphid \"%s\"."
-msgstr ""
+msgstr "Нет элемента графика с graphid \"%s\"."
 
 #: include/views/configuration.graph.list.php:71
 msgid "No graph prototypes defined."
-msgstr ""
+msgstr "Прототипы графиков не заданы."
 
 #: chart2.php:45 chart6.php:47 include/views/configuration.graph.list.php:71
 #: popup.php:1289
 msgid "No graphs defined."
-msgstr "Нет заданных графиков."
+msgstr "Графики не заданы."
 
 #: api/classes/CHost.php:1391 api/classes/CHost.php:1405
 #, php-format
@@ -7818,11 +7829,11 @@ msgstr "Группы для шаблона [ %s ] не заданы"
 
 #: history.php:326 history.php:417
 msgid "No history defined."
-msgstr "Нет заданной истории."
+msgstr "История не найдена."
 
 #: api/classes/CDiscoveryRule.php:675
 msgid "No host IDs given."
-msgstr "Не было предоставлено IDs узла сети."
+msgstr "ID узлов сети не определены."
 
 #: api/classes/CUserMacro.php:925
 #, php-format
@@ -7836,7 +7847,7 @@ msgstr "Не указан ID группы узлов сети для элеме�
 #: include/views/configuration.hostgroups.list.php:49 popup.php:629
 #: popup.php:1784 popup.php:1815
 msgid "No host groups defined."
-msgstr "Нет заданных групп узлов сети."
+msgstr "Группы узлов сети не заданы."
 
 #: include/actions.inc.php:90 include/hosts.inc.php:491
 #, php-format
@@ -7846,7 +7857,7 @@ msgstr "Нет групп узлов сети с groupid \"%s\"."
 #: include/hosts.inc.php:1183
 #, php-format
 msgid "No host with applicationid \"%1$s\"."
-msgstr ""
+msgstr "Нет узла сети с applicationid \"%1$s\"."
 
 #: include/hosts.inc.php:531
 #, php-format
@@ -7856,7 +7867,7 @@ msgstr "Нет узла сети с hostid \"%s\"."
 #: hostinventoriesoverview.php:84 hostinventories.php:154 hosts.php:686
 #: popup.php:494 report2.php:230 report5.php:60
 msgid "No hosts defined."
-msgstr "Нет заданных узлов сети."
+msgstr "Узлы сети не заданы."
 
 #: api/classes/CMapElement.php:529
 #, php-format
@@ -7865,15 +7876,15 @@ msgstr "Нет иконки для элемента карты сети \"%s\"."
 
 #: include/views/administration.general.iconmap.list.php:22
 msgid "No icon map defined."
-msgstr "Нет заданных соответствий иконок."
+msgstr "Соответствия иконок не заданы."
 
 #: include/views/configuration.sysmap.edit.php:51
 msgid "No image"
-msgstr "Нет рисунка"
+msgstr "Нет изображения"
 
 #: include/views/administration.general.image.list.php:36
 msgid "No images defined."
-msgstr "Нет заданных изображений."
+msgstr "Изображения не заданы."
 
 #: include/views/configuration.item.edit.php:118
 #: include/views/configuration.item.massupdate.php:77
@@ -7887,12 +7898,12 @@ msgstr "Интерфейс не найден."
 
 #: include/views/administration.proxy.edit.php:50
 msgid "No interfaces defined."
-msgstr "Нет заданных интерфейсов."
+msgstr "Интерфейсы не заданы."
 
 #: api/classes/CHost.php:1395 api/classes/CHost.php:1417
 #, php-format
 msgid "No interfaces for host \"%s\"."
-msgstr "Нет заданных интерфейсов для узла сети \"%s\"."
+msgstr "Для узла сети \"%s\" не заданы интерфейсы."
 
 #: api/classes/CProxy.php:356
 #, php-format
@@ -7902,7 +7913,7 @@ msgstr "Нет интерфейсов для прокси \"%s\"."
 #: api/classes/CProxy.php:332 api/classes/CProxy.php:346
 #, php-format
 msgid "No interfaces provided for proxy \"%s\"."
-msgstr "Интерфейсы для прокси \"%s\" не заданы"
+msgstr "Интерфейсы для прокси \"%s\" не указаны."
 
 #: api/classes/CScreenItem.php:388
 msgid "No item ID provided for screen element."
@@ -7910,7 +7921,7 @@ msgstr "Не указан ID элемента данных для элемент
 
 #: popup.php:1145
 msgid "No item prototypes defined."
-msgstr "Нет заданных прототипов элементов данных."
+msgstr "Прототипы элементов данных не заданы."
 
 #: include/items.inc.php:439
 #, php-format
@@ -7927,23 +7938,23 @@ msgstr "Нет элемента данных с itemid=\"%1$s\"."
 #: include/views/configuration.item.list.php:50 popup.php:903 popup.php:1035
 #: popup.php:1400 popup.php:1575
 msgid "No items defined."
-msgstr "Нет заданных элементов данных."
+msgstr "Элементы данных не заданы."
 
 #: include/views/configuration.item.prototype.list.php:43
 msgid "No items prototypes defined."
-msgstr "Прототипы элементов данных не определены."
+msgstr "Прототипы элементов данных не заданы."
 
 #: latest.php:192
 msgid "No latest data defined."
-msgstr "Нет заданных последних данных."
+msgstr "Последние данные не найдены."
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance defined."
-msgstr "Нет заданных обслуживаний."
+msgstr "Обслуживания не заданы."
 
 #: include/views/configuration.maintenance.edit.php:82
 msgid "No maintenance period defined."
-msgstr "Периоды обслуживания не заданы."
+msgstr "Период обслуживания не задан."
 
 #: api/classes/CScreenItem.php:394
 msgid "No map ID provided for screen element."
@@ -7951,23 +7962,23 @@ msgstr "Не указан ID карты сети для элемента ком�
 
 #: maps.php:124 popup.php:1508 sysmaps.php:262
 msgid "No maps defined."
-msgstr "Нет заданных карт сетей."
+msgstr "Карты сети не заданы."
 
 #: include/views/administration.users.edit.php:132
 msgid "No media defined."
-msgstr "Нет заданных способов оповещений."
+msgstr "Оповещения не заданы."
 
 #: include/views/administration.mediatypes.list.php:36 report4.php:67
 msgid "No media types defined."
-msgstr "Не определены типы способов оповещений."
+msgstr "Способы оповещений не заданы."
 
 #: include/views/administration.node.list.php:44 popup.php:1269
 msgid "No nodes defined."
-msgstr "Нет заданных нод."
+msgstr "Ноды не заданы."
 
 #: include/views/configuration.action.edit.php:360
 msgid "No operations defined."
-msgstr "Нет заданных операций."
+msgstr "Операции не заданы."
 
 #: include/classes/import/CConfigurationImport.php:961
 #: include/classes/import/CConfigurationImport.php:1038
@@ -7987,11 +7998,11 @@ msgstr "Нет прав доступа к триггеру \"%s\""
 
 #: include/views/administration.usergroups.edit.php:79
 msgid "No permissions defined."
-msgstr "Нет заданных прав доступа."
+msgstr "Права доступа не заданы."
 
 #: include/classes/import/CXmlImport18.php:630
 msgid "No permissions for map"
-msgstr "Нет прав доступа к карте"
+msgstr "Нет прав доступа к карте сети"
 
 #: include/classes/import/CXmlImport18.php:436
 msgid "No permissions for screen"
@@ -7999,7 +8010,7 @@ msgstr "Нет прав доступа к комплексному экрану"
 
 #: api/classes/CUser.php:929 api/classes/CUser.php:1032
 msgid "No permissions for system access."
-msgstr "Нет прав доступа к системе."
+msgstr "Нет прав доступа в систему."
 
 #: api/classes/CAction.php:899 api/classes/CAction.php:1489
 #: api/classes/CApplication.php:446 api/classes/CApplication.php:453
@@ -8040,7 +8051,7 @@ msgstr "Не указан файл приватного ключа для ком
 
 #: include/views/administration.proxy.list.php:42 popup.php:1894
 msgid "No proxies defined."
-msgstr "Нет заданных прокси."
+msgstr "Прокси не заданы."
 
 #: include/views/configuration.discovery.edit.php:42
 msgid "No proxy"
@@ -8057,11 +8068,11 @@ msgstr "Нет получателей сообщения в операции д�
 
 #: include/views/administration.general.regularexpressions.list.php:40
 msgid "No regular expressions defined."
-msgstr "Нет заданных регулярных выражений."
+msgstr "Регулярные выражения не заданы."
 
 #: popup_right.php:74
 msgid "No resources defined."
-msgstr "Нет заданных ресурсов."
+msgstr "Ресурсы не заданы."
 
 #: include/screens.inc.php:412
 msgid "No rows in screen."
@@ -8075,7 +8086,7 @@ msgstr "Не указан ID комплексного экрана для эле
 #: include/views/configuration.screen.list.php:46
 #: include/views/monitoring.screen.php:40 popup.php:1695 popup.php:1753
 msgid "No screens defined."
-msgstr "Нет заданных комплексных экранов."
+msgstr "Комплексные экраны не заданы."
 
 #: api/classes/CAction.php:1578
 msgid "No script specified for action operation command."
@@ -8083,29 +8094,29 @@ msgstr "Не указан скрипт для команды в операции
 
 #: include/views/administration.script.list.php:34 popup.php:1920
 msgid "No scripts defined."
-msgstr "Нет заданных скриптов."
+msgstr "Скрипты не заданы."
 
 #: include/services.inc.php:337
 msgid "No service with"
-msgstr "Нет сервиса с"
+msgstr "Нет услуги с"
 
 #: include/views/configuration.slideconf.list.php:37
 #: include/views/monitoring.slides.php:36 slides.php:139
 msgid "No slide shows defined."
-msgstr "Нет заданных слайд шоу."
+msgstr "Слайд-шоу не заданы."
 
 #: include/views/configuration.slideconf.edit.php:42
 #: include/views/monitoring.slides.php:136 popup.php:1636
 msgid "No slides defined."
-msgstr "Нет заданных слайдов."
+msgstr "Слайды не заданы."
 
 #: httpdetails.php:132 include/views/configuration.httpconf.edit.php:122
 msgid "No steps defined."
-msgstr "Нет заданных шагов."
+msgstr "Шаги не заданы."
 
 #: triggers.php:349
 msgid "No target selected"
-msgstr "Цели не выбраны"
+msgstr "Цель не выбрана"
 
 #: graphs.php:348 items.php:590
 msgid "No target selected."
@@ -8114,7 +8125,7 @@ msgstr "Цель не выбрана."
 #: include/views/configuration.host.massupdate.php:87 popup.php:583
 #: popup.php:690 popup.php:744 templates.php:431
 msgid "No templates defined."
-msgstr "Нет заданных шаблонов."
+msgstr "Шаблоны не заданы."
 
 #: include/views/configuration.services.edit.php:110
 msgid "No times defined. Work 24x7."
@@ -8133,28 +8144,28 @@ msgstr "Нет триггера с triggerid \"%1$s\"."
 #: include/views/configuration.triggers.list.php:91 popup.php:923
 #: tr_comments.php:43 tr_status.php:261
 msgid "No triggers defined."
-msgstr "Нет заданных триггеров."
+msgstr "Триггеры не заданы."
 
 #: include/views/administration.usergroups.list.php:42 popup.php:787
 #: popup_usrgrp.php:89
 msgid "No user groups defined."
-msgstr "Нет заданных групп пользователей."
+msgstr "Группы пользователей не заданы."
 
 #: include/views/administration.users.list.php:51 popup.php:845
 msgid "No users defined."
-msgstr "Нет заданных пользователей."
+msgstr "Пользователи не заданы."
 
 #: include/views/administration.general.valuemapping.list.php:22
 msgid "No value map defined."
-msgstr "Нет заданных преобразований значений."
+msgstr "Преобразования значений не заданы."
 
 #: httpmon.php:151
 msgid "No web checks defined."
-msgstr "Нет заданных веб проверок."
+msgstr "Веб-проверки не заданы."
 
 #: include/views/configuration.httpconf.list.php:63
 msgid "No web scenarios defined."
-msgstr "Веб сценарии не определены."
+msgstr "Веб-сценарии не заданы."
 
 #: events.php:513 events.php:526 hostinventories.php:156 httpmon.php:153
 #: include/actions.inc.php:48 include/audit.inc.php:42
@@ -8257,7 +8268,7 @@ msgstr "Без наблюдения"
 
 #: include/html.inc.php:97
 msgid "Not request variable require."
-msgstr ""
+msgstr "Нет требуемой запрошенной переменной."
 
 #: include/items.inc.php:148
 msgid "Not supported"
@@ -8283,7 +8294,7 @@ msgstr "Нечего делать."
 
 #: include/locales/en_gb.inc.php:152
 msgid "Notification report"
-msgstr "Отчет об уведомлениях"
+msgstr "Отчет об оповещениях"
 
 #: include/menu.inc.php:279 report4.php:66 report4.php:114
 msgid "Notifications"
@@ -8324,7 +8335,7 @@ msgstr "Количество триггеров (активированных/д
 
 #: include/blocks.inc.php:705
 msgid "Number of users (online)"
-msgstr "Количество пользователей (подключенных в данный момент)"
+msgstr "Количество пользователей (в сети)"
 
 #: include/forms.inc.php:415 include/items.inc.php:109
 #: include/triggers.inc.php:2458 include/triggers.inc.php:2520
@@ -8460,7 +8471,7 @@ msgstr "Только Супер-Администраторы могут созд
 
 #: api/classes/CMediatype.php:322
 msgid "Only Super Admins can create media types."
-msgstr "Только Супер-Администраторы могут создавать типы оповещения."
+msgstr "Только Супер-Администраторы могут создавать способы оповещения."
 
 #: api/classes/CUserMacro.php:507
 msgid "Only Super Admins can delete global macros."
@@ -8468,7 +8479,7 @@ msgstr "Только Супер-Администраторы могут удал
 
 #: api/classes/CMediatype.php:436
 msgid "Only Super Admins can delete media types."
-msgstr "Только Супер-Администраторы могут удалять типы оповещения."
+msgstr "Только Супер-Администраторы могут удалять способы оповещения."
 
 #. GETTEXT: API exception
 #: api/classes/CUserGroup.php:645
@@ -8477,7 +8488,7 @@ msgstr "Только Супер-Администраторы могут удал
 
 #: api/classes/CMediatype.php:375
 msgid "Only Super Admins can edit media types."
-msgstr "Только Супер-Администраторы могут изменять типы оповещения."
+msgstr "Только Супер-Администраторы могут менять способы оповещения."
 
 #: api/classes/CUserMacro.php:443
 msgid "Only Super Admins can update global macros."
@@ -8493,15 +8504,15 @@ msgstr "Только Супер-Администраторы могут обно
 
 #: api/classes/CUser.php:701
 msgid "Only Zabbix Admins can add user Medias"
-msgstr "Только Администраторы Zabbix могут добавлять способы оповещений к пользователю"
+msgstr "Только Администраторы Zabbix могут добавлять оповещения пользователю"
 
 #: api/classes/CUser.php:769
 msgid "Only Zabbix Admins can change user Medias"
-msgstr "Только Администраторы Zabbix могут изменять способы оповещений у пользователя"
+msgstr "Только Администраторы Zabbix могут изменять оповещения пользователя"
 
 #: api/classes/CUser.php:739
 msgid "Only Zabbix Admins can remove user Medias"
-msgstr "Только Администраторы Zabbix могут удалять способы оповещений у пользователя"
+msgstr "Только Администраторы Zabbix могут удалять оповещения пользователя"
 
 #: api/classes/CWebCheck.php:303 api/classes/CWebCheck.php:353
 msgid "Only characters are allowed."
@@ -8667,7 +8678,7 @@ msgstr "Обзор по прокси"
 
 #: include/func.inc.php:552
 msgid "P"
-msgstr "P"
+msgstr "П"
 
 #: dashboard.php:225
 msgid "PERSONAL DASHBOARD"
@@ -8788,7 +8799,7 @@ msgstr "ПРОБЛЕМА"
 
 #: include/validate.inc.php:607
 msgid "Page received incorrect data"
-msgstr ""
+msgstr "Страница вернула некорректные данные"
 
 #: include/reports.inc.php:709
 msgid "Palette"
@@ -8832,7 +8843,7 @@ msgstr "Ожидался параметр сек или пользователь
 
 #: include/views/configuration.graph.edit.php:50
 msgid "Parent graph"
-msgstr ""
+msgstr "Родительский график"
 
 #: include/views/configuration.services.edit.php:44
 msgid "Parent service"
@@ -8880,7 +8891,7 @@ msgstr "Пароль (подтверждение)"
 
 #: api/classes/CMediatype.php:338 api/classes/CMediatype.php:403
 msgid "Password required for media type."
-msgstr "Для типа оповещения требуется пароль."
+msgstr "Для способа оповещения требуется пароль."
 
 #: profile.php:118 users.php:135
 msgid "Password should not be empty"
@@ -8960,7 +8971,7 @@ msgstr "Алгоритм размещения"
 
 #: include/screens.inc.php:35 popup.php:107
 msgid "Plain text"
-msgstr "Текст"
+msgstr "Простой текст"
 
 #: include/views/administration.users.edit.php:195
 #: include/views/administration.users.edit.php:231
@@ -8993,7 +9004,7 @@ msgstr "Polish (pl_PL)"
 
 #: include/views/configuration.item.edit.php:411
 msgid "Populates host inventory field"
-msgstr "Заполняет поле инвентаря узла сети"
+msgstr "Заполнение поля инвентаря узла сети"
 
 #: authentication.php:37 disc_prototypes.php:83 host_discovery.php:79
 #: hosts.php:661 include/forms.inc.php:476 include/setup.inc.php:319
@@ -9244,7 +9255,7 @@ msgstr "Тема восстановления"
 
 #: include/views/administration.users.edit.php:121 profile.php:50 users.php:62
 msgid "Refresh (in seconds)"
-msgstr "Обновлять экран (секунды)"
+msgstr "Обновление (в секундах)"
 
 #: include/func.inc.php:1651
 msgid "Refresh time in seconds"
@@ -9257,7 +9268,7 @@ msgstr "Множитель интервала обновления"
 
 #: adm.other.php:33 include/views/administration.general.other.edit.php:36
 msgid "Refresh unsupported items (in sec)"
-msgstr "Обновлять неподдерживаемые элементы данных (секунды)"
+msgstr "Обновление неподдерживаемых элементов данных (в сек)"
 
 #: adm.other.php:59
 #, php-format
@@ -9379,12 +9390,12 @@ msgstr "Удалить узел сети"
 
 #: sysmap.php:157
 msgid "Remove link"
-msgstr "Удалить соединитель"
+msgstr "Удалить связь"
 
 #: history.php:269 include/views/configuration.action.edit.php:429
 #: include/views/configuration.action.edit.php:880
 msgid "Remove selected"
-msgstr "Удалить выбранные"
+msgstr "Удалить выбранное"
 
 #: include/views/configuration.host.massupdate.php:115
 #: include/views/configuration.triggers.edit.php:115
@@ -9426,19 +9437,19 @@ msgstr "Требуется"
 
 #: api/classes/CIconMap.php:514
 msgid "Required field \"expression\" is missing in icon mapping."
-msgstr "Требуемое поле \"expression\" пропущено в соответствии иконок."
+msgstr "В соответствии иконок пропущено требуемое поле \"expression\"."
 
 #: api/classes/CIconMap.php:520
 msgid "Required field \"iconid\" is missing in icon mapping."
-msgstr "Требуемое поле \"iconid\" пропущено в соответствии иконок."
+msgstr "В соответствии иконок пропущено требуемое поле \"iconid\"."
 
 #: api/classes/CIconMap.php:517
 msgid "Required field \"inventory_link\" is missing in icon mapping."
-msgstr "Требуемое поле \"inventory_link\" пропущено в соответствии иконок."
+msgstr "В соответствии иконок пропущено требуемое поле \"inventory_link\"."
 
 #: include/views/administration.script.edit.php:97
 msgid "Required host permissions"
-msgstr "Требуются права доступа к узлу сети"
+msgstr "Требуемые права доступа к узлу сети"
 
 #: include/views/administration.proxy.list.php:50
 msgid "Required performance (vps)"
@@ -9472,7 +9483,7 @@ msgstr "Сбросить все поля в значения по умолчан
 
 #: include/views/js/administration.general.triggerSeverity.js.php:12
 msgid "Reset all names and colours to default values?"
-msgstr "Сбросить все имена и цвета на значения по умолчанию?"
+msgstr "Сбросить все имена и цвета в значения по умолчанию?"
 
 #: include/views/js/administration.general.triggerDisplayOptions.js.php:65
 #: include/views/js/administration.general.triggerSeverity.js.php:48
@@ -9488,7 +9499,7 @@ msgstr "Сбросить по умолчанию"
 
 #: jsrpc.php:109
 msgid "Resolved"
-msgstr "Решена"
+msgstr "Решено"
 
 #: include/views/administration.auditlogs.list.php:63
 #: include/views/administration.auditlogs.list.php:88
@@ -9531,7 +9542,7 @@ msgstr "Результат ИСТИНА"
 #: include/views/general.script.execute.php:29
 #, php-format
 msgid "Result of \"%s\""
-msgstr ""
+msgstr "Результат для \"%s\""
 
 #: tr_testexpr.php:56
 msgid "Result type"
@@ -9558,7 +9569,7 @@ msgstr "По правой стороне"
 #: include/views/configuration.screen.constructor.edit.php:568
 #: screenedit.php:46
 msgid "Row span"
-msgstr "Объединить строки"
+msgstr "Объединение строк"
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -9574,43 +9585,43 @@ msgstr "Правила"
 
 #: include/actions.inc.php:352
 msgid "Run IPMI command"
-msgstr "Выполнить IPMI команду"
+msgstr "Выполнять IPMI команду"
 
 #: include/actions.inc.php:355
 msgid "Run SSH commands"
-msgstr "Выполнить SSH команды"
+msgstr "Выполнять SSH команды"
 
 #: include/actions.inc.php:358
 msgid "Run TELNET commands"
-msgstr "Выполнить TELNET команды"
+msgstr "Выполнять TELNET команды"
 
 #: include/actions.inc.php:376
 msgid "Run commands"
-msgstr "Выполнить команды"
+msgstr "Выполнять команды"
 
 #: include/actions.inc.php:362
 msgid "Run custom commands on Zabbix agent"
-msgstr "Выполнить пользовательские команды на Zabbix агенте"
+msgstr "Выполнять пользовательские команды на Zabbix агенте"
 
 #: include/actions.inc.php:364
 msgid "Run custom commands on Zabbix server"
-msgstr "Выполнить пользовательские команды на Zabbix сервере"
+msgstr "Выполнять пользовательские команды на Zabbix сервере"
 
 #: include/actions.inc.php:373
 msgid "Run global script"
-msgstr "Выполнить глобальный скрипт"
+msgstr "Выполнять глобальный скрипт"
 
 #: include/actions.inc.php:246
 msgid "Run remote commands on current host"
-msgstr "Выполнить удаленные команды на текущем узле сети"
+msgstr "Выполнять удаленные команды на текущем узле сети"
 
 #: include/actions.inc.php:265
 msgid "Run remote commands on host groups"
-msgstr "Выполнить удаленные команды в группах узлов сети"
+msgstr "Выполнять удаленные команды в группах узлов сети"
 
 #: include/actions.inc.php:253
 msgid "Run remote commands on hosts"
-msgstr "Выполнить удаленные команды на узлах сети"
+msgstr "Выполнять удаленные команды на узлах сети"
 
 #: include/locales.inc.php:72
 msgid "Russian (ru_RU)"
@@ -9950,7 +9961,7 @@ msgstr "Комплексный экран удален"
 
 #: api/classes/CScreenItem.php:349
 msgid "Screen item in same cell already exist."
-msgstr "Элемент данных в комплексном экране уже существует в такой же ячейке."
+msgstr "Элемент данных в комплексном экране уже существует в этой же ячейке."
 
 #: screenedit.php:236 screenedit.php:251
 msgid "Screen should contain at least one row and column."
@@ -10006,11 +10017,11 @@ msgstr "Скрипт удален"
 #: include/views/administration.mediatypes.edit.php:63
 #: include/views/administration.mediatypes.list.php:54
 msgid "Script name"
-msgstr "Название скрипта"
+msgstr "Имя скрипта"
 
 #: include/classes/debug/CProfiler.php:125
 msgid "Script profiler"
-msgstr ""
+msgstr "Профилировщик сценария"
 
 #: scripts.php:110
 msgid "Script updated"
@@ -10034,11 +10045,11 @@ msgstr "Поиск"
 #: authentication.php:43
 #: include/views/administration.authentication.edit.php:60
 msgid "Search attribute"
-msgstr "Аттрибут поиска"
+msgstr "Атрибут поиска"
 
 #: search.php:78
 msgid "Search pattern is empty"
-msgstr "Пустой шаблон поиска"
+msgstr "Шаблон поиска пустой"
 
 #: adm.gui.php:43 include/views/administration.general.gui.edit.php:31
 msgid "Search/Filter elements limit"
@@ -10168,15 +10179,15 @@ msgstr "Выбранные узлы сети"
 
 #: include/actions.inc.php:473
 msgid "Send message"
-msgstr "Отправить сообщение"
+msgstr "Отправлять сообщение"
 
 #: include/actions.inc.php:230
 msgid "Send message to user groups"
-msgstr "Отправить сообщение группам пользователей"
+msgstr "Отправлять сообщение группам пользователей"
 
 #: include/actions.inc.php:218
 msgid "Send message to users"
-msgstr "Отправить сообщение пользователям"
+msgstr "Отправлять сообщение пользователям"
 
 #: include/views/configuration.action.edit.php:592
 msgid "Send only to"
@@ -10184,7 +10195,7 @@ msgstr "Отправлять только"
 
 #: popup_media.php:126
 msgid "Send to"
-msgstr "Отправлять"
+msgstr "Отправлять на"
 
 #: include/views/configuration.action.edit.php:576
 msgid "Send to User groups"
@@ -10230,7 +10241,7 @@ msgstr "Информация о сервере"
 
 #: include/views/configuration.screen.constructor.edit.php:474
 msgid "Server time"
-msgstr "Серверное время"
+msgstr "Время на сервере"
 
 #: events.php:479 include/actions.inc.php:71
 #: include/views/configuration.services.child.list.php:36
@@ -10243,26 +10254,26 @@ msgstr "Услуга"
 #: api/classes/CService.php:772
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
-msgstr ""
+msgstr "Услуга \"%1$s\" не может быть удалена, потому что другая услуга зависит от неё."
 
 #: api/classes/CService.php:793
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
-msgstr ""
+msgstr "Услуга \"%1$s\" не может зависеть сама от себя."
 
 #: api/classes/CService.php:872
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
-msgstr ""
+msgstr "Услуга \"%1$s\" не может быть связана с триггером и быть подчиненной одновременно."
 
 #: api/classes/CService.php:847
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
-msgstr ""
+msgstr "Услуга \"%1$s\" уже жестко связана с другой услугой."
 
 #: api/classes/CService.php:690
 msgid "Service cannot be parent and child at the same time."
-msgstr "Сервис не может быть родительским и дочерним одновременно."
+msgstr "Услуга не может быть родительской и подчиненной одновременно."
 
 #: services.php:108
 msgid "Service deleted"
@@ -10274,7 +10285,7 @@ msgstr "Порт сервиса"
 
 #: include/services.inc.php:629
 msgid "Service start time must be less than end time."
-msgstr ""
+msgstr "Время начала услуги должно быть меньше чем время окончания."
 
 #: include/views/configuration.services.edit.php:150
 msgid "Service times"
@@ -10294,7 +10305,7 @@ msgstr "Услуги"
 
 #: api/classes/CUser.php:1027
 msgid "Session terminated, re-login, please."
-msgstr "Сессия завершена, пожалуйста, повторно зайдите в систему."
+msgstr "Сессия завершена, пожалуйста, зайдите повторно в систему."
 
 #: events.php:517 events.php:530 history.php:332 include/screens.inc.php:1232
 #: include/triggers.inc.php:1960 include/views/configuration.item.list.php:109
@@ -10333,7 +10344,7 @@ msgstr "Показывать подробности"
 
 #: include/views/configuration.httpconf.list.php:47
 msgid "Show disabled scenarios"
-msgstr "Показать отключенные сценарии"
+msgstr "Показывать деактивированные сценарии"
 
 #: include/views/configuration.triggers.list.php:55
 #: include/views/configuration.triggers.list.php:70
@@ -10343,7 +10354,7 @@ msgstr "Показывать деактивированные триггеры"
 #: adm.gui.php:73
 #, php-format
 msgid "Show events max \"%1$s\"."
-msgstr "Отображается макс \"%1$s\" событий."
+msgstr "Отображаются макс \"%1$s\" событий."
 
 #: adm.gui.php:35 include/views/administration.general.gui.edit.php:34
 msgid "Show events not older than (in days)"
@@ -10352,11 +10363,11 @@ msgstr "Отображать события не старше чем (в дня�
 #: adm.gui.php:72
 #, php-format
 msgid "Show events not older than (in days) \"%1$s\"."
-msgstr "Показывать события не старше чем (в днях) \"%1$s\"."
+msgstr "Отображать события не старше чем (в днях) \"%1$s\"."
 
 #: include/triggers.inc.php:1603
 msgid "Show graph of item"
-msgstr "Показать график элемента"
+msgstr "Показать график элемента данных"
 
 #: dashconf.php:213
 msgid "Show hosts in maintenance"
@@ -10404,11 +10415,11 @@ msgstr "Показать неизвестные события"
 #: include/views/configuration.item.edit.php:372
 #: include/views/configuration.item.massupdate.php:397
 msgid "Show value"
-msgstr "Показывать значение"
+msgstr "Отображение значения"
 
 #: include/triggers.inc.php:1610
 msgid "Show values of item"
-msgstr "Показать значения элемента"
+msgstr "Показать значения элемента данных"
 
 #: include/views/configuration.graph.edit.php:129
 msgid "Show working time"
@@ -10610,7 +10621,7 @@ msgstr "Стандартные элементы данных"
 
 #: include/views/configuration.maintenance.list.php:46
 msgid "State"
-msgstr "Состояние"
+msgstr "Статус"
 
 #: actionconf.php:463 events.php:443 events.php:452 events.php:516
 #: events.php:529 hosts.php:697 httpdetails.php:133 httpmon.php:158
@@ -10642,7 +10653,7 @@ msgstr "Состояние"
 #: include/views/configuration.services.child.list.php:36
 #: include/views/configuration.services.parent.list.php:36 services.php:431
 msgid "Status calculation"
-msgstr "Подсчет состояния"
+msgstr "Вычисление состояния"
 
 #: include/views/configuration.services.edit.php:52
 msgid "Status calculation algorithm"
@@ -10654,7 +10665,7 @@ msgstr "Коды состояний"
 
 #: httpmon.php:27
 msgid "Status of Web monitoring"
-msgstr "Состояние Веб-мониторинга"
+msgstr "Состояние веб-мониторинга"
 
 #: dashboard.php:295 include/menu.inc.php:128 include/screens.inc.php:1035
 #: report1.php:25
@@ -10683,7 +10694,7 @@ msgstr "Только состояние"
 
 #: actionconf.php:330 trigger_prototypes.php:284 triggers.php:319
 msgid "Status updated"
-msgstr "Состояни обновлено"
+msgstr "Состояние обновлено"
 
 #: httpdetails.php:133 include/actions.inc.php:741 include/actions.inc.php:800
 #: include/views/configuration.action.edit.php:488
@@ -10718,7 +10729,7 @@ msgstr "Остановить"
 #: include/views/configuration.item.edit.php:356
 #: include/views/configuration.item.massupdate.php:379
 msgid "Store value"
-msgstr "Хранить значение"
+msgstr "Хранение значения"
 
 #: include/hosts.inc.php:42
 msgid "Straight"
@@ -10726,7 +10737,7 @@ msgstr "Straight"
 
 #: include/views/configuration.screen.constructor.edit.php:512
 msgid "Style"
-msgstr "Способ"
+msgstr "Стиль"
 
 #: include/forms.inc.php:855
 msgid "Subfilter [affects only filtered data!]"
@@ -10746,7 +10757,7 @@ msgstr "Подкарта"
 
 #: include/items.inc.php:39
 msgid "Success Audit"
-msgstr "Успешный аудит"
+msgstr "Аудит успеха"
 
 #: include/func.inc.php:194
 msgid "Sun"
@@ -10896,7 +10907,7 @@ msgstr "Группа шаблона"
 
 #: include/views/conf.import.php:30
 msgid "Template linkage"
-msgstr "Связи с шаблонами"
+msgstr "Соединения с шаблонами"
 
 #: include/html.inc.php:348
 msgid "Template list"
@@ -10941,11 +10952,11 @@ msgstr "Шаблон с таким же видимым именем \"%s\" уж�
 
 #: items.php:629
 msgid "Templated item"
-msgstr "Элемент из шаблона"
+msgstr "Шаблонный элемент данных"
 
 #: include/forms.inc.php:534 include/forms.inc.php:708
 msgid "Templated items"
-msgstr "Элементы данных из шаблона"
+msgstr "Шаблонные элементы данных"
 
 #: hosts.php:696 include/menu.inc.php:168
 #: include/views/configuration.host.edit.php:495
@@ -11136,7 +11147,7 @@ msgstr "К"
 
 #: include/views/js/configuration.item.edit.js.php:43
 msgid "To set a host interface select a single item type for all items"
-msgstr ""
+msgstr "Для установки интерфейса узла сети выберите один тип элемента данных из всех элементов данных"
 
 #: srv_status.php:83
 msgid "Today"
@@ -11182,7 +11193,7 @@ msgstr "Ошибка транспорта."
 #: include/forms.inc.php:847 include/views/configuration.item.list.php:60
 #: include/views/configuration.item.prototype.list.php:55
 msgid "Trends"
-msgstr "Динамика"
+msgstr "Динамика изменений"
 
 #: events.php:271 events.php:304 include/actions.inc.php:41
 #: include/audit.inc.php:33 include/classes/class.cchart.php:476
@@ -11271,12 +11282,12 @@ msgstr "Форма триггера для журнала"
 #: api/classes/CTemplate.php:1742
 #, php-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
-msgstr "У триггера есть элементы данных из шаблона \"%1$s\", который не соединен с узлом сети."
+msgstr "У триггера есть элементы данных из шаблона \"%1$s\", которые не соединены с узлом сети."
 
 #: api/classes/CTemplate.php:1683
 #, php-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
-msgstr "У триггера из шаблона \"%1$s\"  есть зависимость от триггера из шаблона \"%2$s\"."
+msgstr "У триггера из шаблона \"%1$s\" есть зависимость от триггера из шаблона \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:1075
 msgid "Trigger just added. No status update so far."
@@ -11367,7 +11378,7 @@ msgstr "Информация о триггерах"
 
 #: include/views/configuration.triggers.massupdate.php:165
 msgid "Triggers massupdate"
-msgstr "Массовое обновление"
+msgstr "Массовое обновление триггеров"
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"
@@ -11379,7 +11390,7 @@ msgstr "Состояние триггера"
 
 #: include/menu.inc.php:137
 msgid "Triggers top 100"
-msgstr "Наиболее активные 100 триггеров"
+msgstr "100 наиболее активных триггеров"
 
 #: dashconf.php:235
 msgid "Triggers with severity"
@@ -11504,7 +11515,7 @@ msgstr "URL C"
 #: include/views/configuration.sysmap.edit.php:194
 #: include/views/js/configuration.sysmaps.js.php:163 report5.php:146
 msgid "URLs"
-msgstr "URL ссылки"
+msgstr "URL'ы"
 
 #: include/views/administration.mediatypes.edit.php:87
 msgid "USA (160 characters)"
@@ -11603,7 +11614,7 @@ msgstr "Неизвестное действие"
 
 #: include/services.inc.php:484
 msgid "Unknown calculation algorithm of service status"
-msgstr "Неизвестный алгоритм подсчета состояния сервиса"
+msgstr "Неизвестный алгоритм вычисления состояния услуги"
 
 #: api/classes/CTriggerExpression.php:90
 msgid "Unknown function."
@@ -11698,7 +11709,7 @@ msgstr "Включить звук"
 #: include/classes/import/readers/CImportReaderFactory.php:65
 #, php-format
 msgid "Unsupported import file extension \"%1$s\"."
-msgstr "Неподдерживаемое расширение \"%1$s\" файла импорта."
+msgstr "Неподдерживаемое расширение файла импорта \"%1$s\"."
 
 #: include/classes/import/readers/CImportReaderFactory.php:44
 #, php-format
@@ -11732,7 +11743,7 @@ msgstr "Интервал обновления"
 #: include/views/configuration.item.edit.php:258
 #: include/views/configuration.item.massupdate.php:260 items.php:79
 msgid "Update interval (in sec)"
-msgstr "Интервал обновления (секунды)"
+msgstr "Интервал обновления (в сек)"
 
 #: auditlogs.php:137 include/classes/class.cserverinfo.php:43
 msgid "Updated"
@@ -11841,7 +11852,7 @@ msgstr "Пользователь не может изменить тип сам�
 
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
-msgstr ""
+msgstr "Пользователь не может изменить доступ к веб-интерфейсу для себя."
 
 #: api/classes/CUserGroup.php:421 api/classes/CUserGroup.php:526
 msgid "User cannot change status of himself"
@@ -11850,7 +11861,7 @@ msgstr "Пользователь не может изменить статус �
 #: include/users.inc.php:98 include/users.inc.php:109
 #: include/users.inc.php:144
 msgid "User cannot change status of himself."
-msgstr ""
+msgstr "Пользователь не может изменить свое состояние."
 
 #: users.php:212 users.php:300
 msgid "User deleted"
@@ -11875,11 +11886,11 @@ msgstr "Группа пользователей [%s] используется в
 
 #: include/views/administration.general.other.edit.php:38
 msgid "User group for database down message"
-msgstr "Сообщение для группы пользователей при недоступности базы данных"
+msgstr "Группа пользователей для сообщения при недоступности базы данных"
 
 #: adm.other.php:86
 msgid "User group for database down message."
-msgstr "Сообщение для группы пользователей при недоступности базы данных."
+msgstr "Группа пользователей для сообщения при недоступности базы данных."
 
 #: include/views/administration.script.edit.php:82
 #: include/views/administration.usergroups.list.php:28
@@ -11924,7 +11935,7 @@ msgstr "Тип пользователя"
 
 #: profile.php:175 users.php:167 users.php:232 users.php:253
 msgid "User updated"
-msgstr "Данные пользователя обновлены"
+msgstr "Пользователь обновлен"
 
 #: api/classes/CUser.php:488
 #, php-format
@@ -11950,7 +11961,7 @@ msgstr "Пользователи"
 #. GETTEXT: r is date format string as described in http://php.net/date
 #: include/classes/class.cserverinfo.php:44
 msgid "Users (online)"
-msgstr "Пользователи (подключены в данный момент)"
+msgstr "Пользователи (в сети)"
 
 #: usergrps.php:282
 msgid "Users status updated"
@@ -12001,7 +12012,7 @@ msgstr "Значение не может быть преобразовано в 
 #: include/audit.inc.php:38
 #: include/views/administration.general.valuemapping.list.php:23
 msgid "Value map"
-msgstr "Преобразование значения"
+msgstr "Преобразование значений"
 
 #: adm.valuemapping.php:93
 #, php-format
@@ -12020,7 +12031,7 @@ msgstr "Преобразование значений \"%1$s\"."
 
 #: adm.valuemapping.php:61
 msgid "Value map added"
-msgstr "Преобразование значения добавлено"
+msgstr "Преобразование значений добавлено"
 
 #: adm.valuemapping.php:77
 msgid "Value map deleted"
@@ -12028,7 +12039,7 @@ msgstr "Преобразование значение удалено"
 
 #: adm.valuemapping.php:53
 msgid "Value map updated"
-msgstr "Преобразование значения обновлено"
+msgstr "Преобразование значений обновлено"
 
 #: adm.valuemapping.php:87 include/valuemap.inc.php:63
 #, php-format
@@ -12046,7 +12057,7 @@ msgstr "Преобразование значений"
 
 #: include/valuemap.inc.php:121
 msgid "Value mapping must have at least one mapping."
-msgstr "Преобразование значений должно иметь по крайней мере одно преобразование."
+msgstr "У преобразования значений должно быть по крайней мере одно преобразование."
 
 #: include/valuemap.inc.php:126
 msgid "Value maps are used to create a mapping between numeric values and string representations."
@@ -12106,7 +12117,7 @@ msgstr "Предупреждение"
 
 #: chart7.php:74
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "Предупреждение. Невозможно отобразить более чем один элемент с типом \"Суммарный график\"."
 
 #: include/validate.inc.php:486
 #, php-format
@@ -12131,7 +12142,7 @@ msgstr "Предупреждение. Поле \"%1$s\" не является ц
 #: include/validate.inc.php:403
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Предупреждение. Поле \"%1$s\" не является десятичным числом."
 
 #: include/validate.inc.php:379
 #, php-format
@@ -12156,7 +12167,7 @@ msgstr "Предупреждение. В поле \"%1$s\" мультибайт�
 #: include/validate.inc.php:503
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
-msgstr "Предупреждение. Поле \"%1$s\" должно быть пропущенно."
+msgstr "Предупреждение. Поле \"%1$s\" должно быть пропущено."
 
 #: include/validate.inc.php:556
 #, php-format
@@ -12199,11 +12210,11 @@ msgstr "Веб"
 
 #: httpmon.php:136
 msgid "Web checks"
-msgstr "Веб проверки"
+msgstr "Веб-проверки"
 
 #: items.php:635
 msgid "Web item"
-msgstr "Веб элемент"
+msgstr "Веб элемент данных"
 
 #: api/classes/CWebCheck.php:573 api/classes/CWebCheck.php:666
 #, php-format
@@ -12221,7 +12232,7 @@ msgstr "Веб-мониторинг"
 
 #: api/classes/CWebCheck.php:320
 msgid "Webcheck must have at least one step."
-msgstr "Веб проверка должна иметь по крайней мере один шаг."
+msgstr "В веб-проверке должен быть по крайней мере один шаг."
 
 #: include/func.inc.php:197
 msgid "Wed"
@@ -12244,7 +12255,7 @@ msgstr "Еженедельно"
 
 #: popup_media.php:127
 msgid "When active"
-msgstr "Когда активно"
+msgstr "Когда активен"
 
 #: graphs.php:44 include/locales/en_gb.inc.php:161
 #: include/views/configuration.graph.edit.php:53
@@ -12313,7 +12324,7 @@ msgstr "Запись"
 #: api/classes/CService.php:384
 #, php-format
 msgid "Wrong fields for dependency for service \"%1$s\"."
-msgstr ""
+msgstr "Ошибочные поля для зависимости услуги \"%1$s\"."
 
 #: api/classes/CMapElement.php:515
 msgid "Wrong fields for element."
@@ -12356,7 +12367,7 @@ msgstr "Ошибочные поля для связи на карте сети"
 
 #: api/classes/CMediatype.php:333 api/classes/CMediatype.php:386
 msgid "Wrong fields for media type."
-msgstr "Ошибочные поля для типа оповещения."
+msgstr "Ошибочные поля для способа оповещения."
 
 #: api/classes/CProxy.php:319
 #, php-format
@@ -12375,17 +12386,17 @@ msgstr "Ошибочные поля для комплексного экрана
 
 #: api/classes/CScript.php:303
 msgid "Wrong fields for script."
-msgstr ""
+msgstr "Ошибочные поля для скрипта."
 
 #: api/classes/CService.php:114 api/classes/CService.php:225
 #, php-format
 msgid "Wrong fields for service \"%1$s\"."
-msgstr ""
+msgstr "Ошибочные поля для услуги \"%1$s\"."
 
 #: api/classes/CService.php:467
 #, php-format
 msgid "Wrong fields for time for service \"%1$s\"."
-msgstr ""
+msgstr "Ошибочные поля для времени услуги \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:1079
 #: api/classes/CTriggerPrototype.php:1147
@@ -12400,7 +12411,7 @@ msgstr "Ошибочные поля для пользователя \"%s\"."
 #: api/classes/CUserMedia.php:380
 #, php-format
 msgid "Wrong fields for user media \"%s\"."
-msgstr "Ошибочные поля для пользовательского способа оповещений \"%s\"."
+msgstr "Ошибочные поля для оповещения пользователя \"%s\"."
 
 #: api/classes/CUserMacro.php:896
 #, php-format
@@ -12576,11 +12587,11 @@ msgstr "У вас нет полномочий для выполнения это
 
 #: api/classes/CUserMedia.php:408
 msgid "You do not have permissions or user media does not exist."
-msgstr "У вас нет полномочий или пользовательский способ оповещений не существует."
+msgstr "У вас нет полномочий или оповещения пользователя не существует."
 
 #: api/classes/CUserMedia.php:386
 msgid "You do not have permissions to create user medias."
-msgstr "У вас нет полномочий для создания пользовательских способов оповещений."
+msgstr "У вас нет полномочий для создания оповещений пользователю."
 
 #: api/classes/CUser.php:377
 msgid "You do not have permissions to create users."
@@ -12600,11 +12611,11 @@ msgstr "У вас нет полномочий для обновления дру
 
 #: api/classes/CUserMedia.php:392
 msgid "You do not have permissions to update user media or user media does not exist."
-msgstr "У вас нет полномочий для обновления пользовательского способа оповещений или он не существует."
+msgstr "У вас нет полномочий для обновления оповещений пользователя или оповещения пользователя не существует."
 
 #: api/classes/CUserMedia.php:402
 msgid "You do not have permissions to update user medias."
-msgstr "У вас нет полномочий для обновления пользовательских способов оповещений."
+msgstr "У вас нет полномочий для обновления оповещений пользователя."
 
 #: api/classes/CUser.php:383
 msgid "You do not have permissions to update user or user does not exist."
@@ -12612,7 +12623,7 @@ msgstr "У вас нет полномочий для обновления пол
 
 #: include/config.inc.php:265
 msgid "You must login to view this page."
-msgstr "Вы должны войти в систему для просмотра этой страницы."
+msgstr "Для просмотра этой страницы вы должны войти в систему."
 
 #: include/views/administration.node.list.php:66
 msgid "Your setup is not configured for distributed monitoring."
@@ -12694,10 +12705,13 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"Не удалось найти Zabbix сервер \"%s\". Возможные причины:\n"
+"1. Некорректные IP/DNS сервера в \"zabbix.conf.php\";\n"
+"2. Некорректная настройка сети.\n"
 
 #: include/blocks.inc.php:674
 msgid "Zabbix server IP or port is not set!"
-msgstr "IP адрес или порт сервера Zabbix не установлены!"
+msgstr "IP адрес или порт Zabbix сервера не установлены!"
 
 #: include/classes/class.cserverinfo.php:42
 msgid "Zabbix server info"
@@ -12734,12 +12748,12 @@ msgstr "[H:i:s]"
 #: include/func.inc.php:133
 #, php-format
 msgid "[Wrong value for day: \"%s\" ]"
-msgstr "[Ошибочное значение дня: \"%s\" ]"
+msgstr "[Неправильное значение дня: \"%s\" ]"
 
 #: include/func.inc.php:119
 #, php-format
 msgid "[Wrong value for month: \"%s\" ]"
-msgstr "[Ошибочное значение месяца: \"%s\" ]"
+msgstr "[Неправильное значение месяца: \"%s\" ]"
 
 #: include/locales/en_gb.inc.php:71
 msgid "[Y.M.d H:i:s]"
@@ -13042,7 +13056,7 @@ msgstr "не запущен"
 #: include/classes/class.cpagefilter.php:462 include/forms.inc.php:1019
 #: include/hosts.inc.php:623 include/hosts.inc.php:890
 msgid "not selected"
-msgstr "нет выбранного"
+msgstr "не выбрано"
 
 #: include/actions.inc.php:689 include/actions.inc.php:753
 #: include/actions.inc.php:811 include/actions.inc.php:875
@@ -13140,7 +13154,7 @@ msgstr "преобразования значений"
 #: api/classes/CTemplate.php:1613
 #, php-format
 msgid "template ID \"%1$s\" is passed %2$s times"
-msgstr "шаблон з ID \"%1$s\" передан %2$s раз"
+msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 
 #: include/func.inc.php:1596
 msgid "to"
