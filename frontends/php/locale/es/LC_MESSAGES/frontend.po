@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-27 17:38+0300\n"
+"POT-Creation-Date: 2012-05-02 17:38+0300\n"
 "PO-Revision-Date: 2012-04-11 10:35+0200\n"
 "Last-Translator: Javier <jtlopez@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -267,8 +267,9 @@ msgid "Action"
 msgstr "Acción"
 
 #: api/classes/CAction.php:817
-msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2%s seconds)."
-msgstr "Acción \"%1$s\" tiene un valor incorrecto para \"esc_period\" (mínimo %2%s segundos)."
+#, php-format
+msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
+msgstr ""
 
 #: api/classes/CAction.php:820 api/classes/CAction.php:835
 #: api/classes/CAction.php:925 api/classes/CAction.php:945
@@ -419,17 +420,10 @@ msgstr "Añadir servicio"
 msgid "Add to"
 msgstr "Añadir a"
 
-#: maps.php:73
-msgid "Add to Favourites"
-msgstr "Añadir a favoritos"
-
-#: include/html.inc.php:257 screens.php:91
+#: charts.php:91 history.php:98 host_screen.php:97 include/html.inc.php:257
+#: maps.php:73 screens.php:91
 msgid "Add to favourites"
 msgstr "Añadir a favoritos"
-
-#: charts.php:91 history.php:98 host_screen.php:97
-msgid "Add to favourites."
-msgstr "Añadir a favoritos."
 
 #: include/actions.inc.php:479
 msgid "Add to host group"
@@ -813,7 +807,7 @@ msgstr "Bind DN"
 msgid "Bind password"
 msgstr "Bind passwd"
 
-#: include/classes/core/ZBase.php:122
+#: include/classes/core/ZBase.php:123
 msgid "Black & Blue"
 msgstr "Negro & Azul"
 
@@ -1131,7 +1125,7 @@ msgstr "No es posible añadir el grupo"
 msgid "Cannot add host"
 msgstr "No es posible añadir el equipo"
 
-#: adm.images.php:52 include/classes/import/CXmlImport18.php:607
+#: adm.images.php:52 include/classes/import/CXmlImport18.php:606
 msgid "Cannot add image"
 msgstr "No es posible añadir la imágen"
 
@@ -1300,7 +1294,7 @@ msgstr "No se puede crear un mapa de iconos"
 msgid "Cannot create icon maps with identical name \"%s\"."
 msgstr "No se puede crear un mapa de iconos con el mismo nombre \"%s\"."
 
-#: include/classes/import/CXmlImport18.php:784
+#: include/classes/import/CXmlImport18.php:783
 #, php-format
 msgid "Cannot create map \"%s\"."
 msgstr "No se puede crear el mapa \"%s\"."
@@ -1515,8 +1509,8 @@ msgstr "No se puede encontrar el gráfico \"%1$s\" usado en la pantalla \"%2$s\"
 
 #: include/classes/import/importers/CMapImporter.php:208
 #, php-format
-msgid "Cannot find group \"%1$s\" used in map %2$s\"."
-msgstr "No se puede encontrar el grupo \"%1$s\" usado en el mapa %2$s\"."
+msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
@@ -1529,7 +1523,7 @@ msgstr "No se puede encontrar el equipo"
 
 #: include/classes/import/importers/CMapImporter.php:216
 #, php-format
-msgid "Cannot find host \"%1$s\" used in map %2$s\"."
+msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
 msgstr ""
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
@@ -1562,7 +1556,7 @@ msgstr ""
 msgid "Cannot find icon map \"%1$s\" for map \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:652
+#: include/classes/import/CXmlImport18.php:651
 #, php-format
 msgid "Cannot find icon map \"%1$s\" used in exported map \"%2$s\"."
 msgstr ""
@@ -1634,8 +1628,8 @@ msgid "Cannot have empty visible template name"
 msgstr "No se puede tener un nombre de plantilla vacío"
 
 #: api/classes/CTrigger.php:1756 api/classes/CTrigger.php:1847
-#: api/classes/CTriggerPrototype.php:1330
-#: api/classes/CTriggerPrototype.php:1402
+#: api/classes/CTriggerPrototype.php:1336
+#: api/classes/CTriggerPrototype.php:1408
 #, php-format
 msgid "Cannot implode expression \"%s\"."
 msgstr ""
@@ -1647,7 +1641,7 @@ msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/classes/import/importers/CTemplateImporter.php:95
+#: include/classes/import/importers/CTemplateImporter.php:94
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
@@ -1692,17 +1686,17 @@ msgstr ""
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
 msgstr ""
 
-#: include/db.inc.php:1584
+#: include/classes/db/DB.php:511
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
 msgstr ""
 
-#: include/db.inc.php:1497
+#: include/classes/db/DB.php:422
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
 msgstr ""
 
-#: include/db.inc.php:1508
+#: include/classes/db/DB.php:433
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
 msgstr ""
@@ -1822,7 +1816,7 @@ msgstr ""
 msgid "Cannot update icon map"
 msgstr ""
 
-#: adm.images.php:48 include/classes/import/CXmlImport18.php:612
+#: adm.images.php:48 include/classes/import/CXmlImport18.php:611
 msgid "Cannot update image"
 msgstr "No es posible actualizar la imágen"
 
@@ -1846,7 +1840,7 @@ msgstr ""
 msgid "Cannot update maintenance"
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:775
+#: include/classes/import/CXmlImport18.php:774
 #, php-format
 msgid "Cannot update map \"%s\"."
 msgstr ""
@@ -2025,7 +2019,7 @@ msgstr ""
 msgid "Circular reference in screens: %1$s."
 msgstr ""
 
-#: include/classes/import/importers/CTemplateImporter.php:120
+#: include/classes/import/importers/CTemplateImporter.php:119
 #, php-format
 msgid "Circular reference in templates: %1$s."
 msgstr "Referencias circulares en plantillas: %1$s."
@@ -2566,7 +2560,7 @@ msgstr ""
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Creado: Iniciador \"%1$s\" sobre \"%2$s\"."
 
-#: api/classes/CTriggerPrototype.php:1337
+#: api/classes/CTriggerPrototype.php:1343
 #, php-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -2742,7 +2736,7 @@ msgstr "ABAJO"
 msgid "Daily"
 msgstr "Diario"
 
-#: include/classes/core/ZBase.php:123
+#: include/classes/core/ZBase.php:124
 msgid "Dark orange"
 msgstr "Naranja oscuro"
 
@@ -4656,10 +4650,14 @@ msgstr ""
 msgid "Group"
 msgstr "Grupo"
 
-#: include/classes/import/CConfigurationImport.php:497
-#: include/classes/import/importers/CTemplateImporter.php:202
+#: include/classes/import/importers/CTemplateImporter.php:213
 #, php-format
 msgid "Group \"%1$s\" does not exist."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:520
+#, php-format
+msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr ""
 
 #: api/classes/CHostGroup.php:720
@@ -4908,7 +4906,7 @@ msgstr ""
 msgid "Host \"%s\" already exists."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:883
+#: include/classes/import/CXmlImport18.php:882
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
 msgstr ""
@@ -5718,7 +5716,7 @@ msgstr ""
 msgid "Incorrect expression"
 msgstr ""
 
-#: include/db.inc.php:1515 include/db.inc.php:1591
+#: include/classes/db/DB.php:440 include/classes/db/DB.php:518
 #, php-format
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr ""
@@ -5951,7 +5949,7 @@ msgstr ""
 msgid "Incorrect port range."
 msgstr ""
 
-#: include/db.inc.php:1550
+#: include/classes/db/DB.php:475
 #, php-format
 msgid "Incorrect primary keys for table \"%1$s\"."
 msgstr ""
@@ -6101,22 +6099,22 @@ msgstr ""
 msgid "Incorrect user macro \"%1$s\" format is used in expression."
 msgstr ""
 
-#: include/db.inc.php:1389
+#: include/classes/db/DB.php:312
 #, php-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1383
+#: include/classes/db/DB.php:306
 #, php-format
 msgid "Incorrect value \"%1$s\" for int field \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1377
+#: include/classes/db/DB.php:300
 #, php-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1360
+#: include/classes/db/DB.php:283
 #, php-format
 msgid "Incorrect value \"NULL\" for NOT NULL field \"%1$s\"."
 msgstr ""
@@ -6311,9 +6309,14 @@ msgstr ""
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1475
+#: include/classes/import/CXmlImport18.php:1474
 #, php-format
 msgid "Item \"%1$s\" does not exist."
+msgstr ""
+
+#: include/classes/import/CConfigurationImport.php:703
+#, php-format
+msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s does not exist\"."
 msgstr ""
 
 #: api/classes/CItemGeneral.php:286
@@ -7018,7 +7021,7 @@ msgstr ""
 msgid "Maintenance without data collection"
 msgstr ""
 
-#: include/db.inc.php:1348
+#: include/classes/db/DB.php:271
 #, php-format
 msgid "Mandatory field \"%1$s\" is missing in table \"%2$s\"."
 msgstr ""
@@ -7049,12 +7052,12 @@ msgstr "Mapa"
 msgid "Map \"%s\""
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:787
+#: include/classes/import/CXmlImport18.php:786
 #, php-format
 msgid "Map \"%s\" created."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:778
+#: include/classes/import/CXmlImport18.php:777
 #, php-format
 msgid "Map \"%s\" updated."
 msgstr ""
@@ -7616,12 +7619,12 @@ msgstr "Próxima comprobación"
 msgid "No"
 msgstr "No"
 
-#: include/classes/import/CXmlImport18.php:1521
+#: include/classes/import/CXmlImport18.php:1520
 #, php-format
 msgid "No \"ymax_type\" field for graph \"%s\""
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1517
+#: include/classes/import/CXmlImport18.php:1516
 #, php-format
 msgid "No \"ymin_type\" field for graph \"%s\""
 msgstr ""
@@ -7952,18 +7955,18 @@ msgstr "Sin nodos definidos."
 msgid "No operations defined."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:900
-#: include/classes/import/CConfigurationImport.php:977
+#: include/classes/import/CConfigurationImport.php:961
+#: include/classes/import/CConfigurationImport.php:1038
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1466
+#: include/classes/import/CXmlImport18.php:1465
 #, php-format
 msgid "No permission for item \"%1$s\"."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:1374
+#: include/classes/import/CXmlImport18.php:1373
 #, php-format
 msgid "No permission for trigger \"%s\""
 msgstr ""
@@ -7972,11 +7975,11 @@ msgstr ""
 msgid "No permissions defined."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:631
+#: include/classes/import/CXmlImport18.php:630
 msgid "No permissions for map"
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:437
+#: include/classes/import/CXmlImport18.php:436
 msgid "No permissions for screen"
 msgstr ""
 
@@ -8009,8 +8012,8 @@ msgstr ""
 #: api/classes/CTrigger.php:1909 api/classes/CTrigger.php:1921
 #: api/classes/CTriggerPrototype.php:1143
 #: api/classes/CTriggerPrototype.php:1233
-#: api/classes/CTriggerPrototype.php:1447
-#: api/classes/CTriggerPrototype.php:1459 api/classes/CUserMacro.php:828
+#: api/classes/CTriggerPrototype.php:1453
+#: api/classes/CTriggerPrototype.php:1465 api/classes/CUserMacro.php:828
 #: api/classes/CUserMacro.php:941 api/classes/CWebCheck.php:464
 #: include/config.inc.php:253
 msgid "No permissions to referred object or it does not exist!"
@@ -8591,7 +8594,7 @@ msgstr "Operador"
 msgid "Original"
 msgstr "Original"
 
-#: include/classes/core/ZBase.php:121
+#: include/classes/core/ZBase.php:122
 msgid "Original blue"
 msgstr "Azul (Original)"
 
@@ -9114,6 +9117,11 @@ msgstr "Proxys"
 msgid "Proxy"
 msgstr "Proxy"
 
+#: include/classes/import/CConfigurationImport.php:542
+#, php-format
+msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
+msgstr ""
+
 #: api/classes/CProxy.php:381
 #, php-format
 msgid "Proxy \"%s\" already exists."
@@ -9337,17 +9345,10 @@ msgstr "Eliminar elemento"
 msgid "Remove from"
 msgstr "Eliminar de"
 
-#: maps.php:66
-msgid "Remove from Favourites"
-msgstr "Eliminar de favoritos"
-
-#: include/html.inc.php:250 screens.php:84
+#: charts.php:83 history.php:90 host_screen.php:89 include/html.inc.php:250
+#: maps.php:66 screens.php:84
 msgid "Remove from favourites"
 msgstr "Eliminar de favoritos"
-
-#: charts.php:83 history.php:90 host_screen.php:89
-msgid "Remove from favourites."
-msgstr "Eliminar de favotiros."
 
 #: include/actions.inc.php:480
 msgid "Remove from host group"
@@ -9729,12 +9730,12 @@ msgstr "Nombre de seguridad SNMPv3"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr ""
 
-#: include/db.inc.php:1598
+#: include/classes/db/DB.php:525
 #, php-format
 msgid "SQL statement execution has failed \"%1$s\""
 msgstr ""
 
-#: include/db.inc.php:1471 include/db.inc.php:1523
+#: include/classes/db/DB.php:396 include/classes/db/DB.php:448
 #, php-format
 msgid "SQL statement execution has failed \"%1$s\"."
 msgstr ""
@@ -9903,8 +9904,8 @@ msgstr ""
 msgid "Screen"
 msgstr "Pantalla"
 
-#: include/classes/import/CXmlImport18.php:551
-#: include/classes/import/CXmlImport18.php:1654
+#: include/classes/import/CXmlImport18.php:550
+#: include/classes/import/CXmlImport18.php:1653
 #, php-format
 msgid "Screen \"%1$s\" added."
 msgstr ""
@@ -9914,8 +9915,8 @@ msgstr ""
 msgid "Screen \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/import/CXmlImport18.php:548
-#: include/classes/import/CXmlImport18.php:1648
+#: include/classes/import/CXmlImport18.php:547
+#: include/classes/import/CXmlImport18.php:1647
 #, php-format
 msgid "Screen \"%1$s\" updated."
 msgstr ""
@@ -10796,22 +10797,22 @@ msgstr "COMENTARIOS DEL INICIADOR"
 msgid "TRUE"
 msgstr "ACTIVO"
 
-#: include/db.inc.php:1277
+#: include/classes/db/DB.php:200
 #, php-format
 msgid "Table \"%1$s\" does not exist."
 msgstr ""
 
-#: include/db.inc.php:1426
+#: include/classes/db/DB.php:349
 #, php-format
 msgid "Table \"%1$s\" doesn't have a field named \"%2$s\"."
 msgstr ""
 
-#: include/db.inc.php:1555
+#: include/classes/db/DB.php:480
 #, php-format
 msgid "Table \"%1$s\" has a composite primary key, simple is given."
 msgstr ""
 
-#: include/db.inc.php:1546
+#: include/classes/db/DB.php:471
 #, php-format
 msgid "Table \"%1$s\" has a simple primary key, composite is given."
 msgstr ""
@@ -10856,9 +10857,9 @@ msgstr "Plantilla"
 msgid "Template \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:504
+#: include/classes/import/CConfigurationImport.php:529
 #, php-format
-msgid "Template \"%1$s\" does not exist."
+msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
 msgstr ""
 
 #: api/classes/CTemplate.php:1001
@@ -11185,7 +11186,7 @@ msgstr "Iniciadores"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:1393
+#: api/classes/CTriggerPrototype.php:1399
 #, php-format
 msgid "Trigger \"%1$s\" already exists."
 msgstr ""
@@ -11756,7 +11757,7 @@ msgstr ""
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CTriggerPrototype.php:1429
+#: api/classes/CTriggerPrototype.php:1435
 #, php-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -11965,12 +11966,12 @@ msgstr ""
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr ""
 
-#: include/db.inc.php:1370
+#: include/classes/db/DB.php:293
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr ""
 
-#: include/db.inc.php:1399
+#: include/classes/db/DB.php:322
 #, php-format
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is 2048 characters."
 msgstr ""
