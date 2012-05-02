@@ -550,32 +550,30 @@ table.warningTable tr.content.center { text-align: center; }
 .setupBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
 
 div.setup_wizard { margin: 15px auto 0 auto; width: 800px; height: 541px; background: url(../images/general/setup/background.png) no-repeat; }
-div.setup_wizard_licence { text-align:left;  margin-left: 10px; margin-top: 80px;}
+div.setup_wizard_licence { text-align:left;  margin-left: 10px; margin-top: 80px; }
 div.setup_wizard div.left { float:left;	width: 220px; margin: 40px 0 0 20px; }
 div.setup_wizard div.setup_logo { background: url(../images/general/setup/logo.png) no-repeat; height: 53px; margin-left: 10px; }
-div.setup_wizard div.setup_version { margin-left: 20px; color: #608cb6;	font-weight: bold; font-size:16px; }
+div.setup_wizard div.setup_version { margin-left: 20px; color: #608CB6;	font-weight: bold; font-size:16px; }
 div.setup_wizard div.first_page_img {
-	background: url(../images/general/setup/leaf.jpg) no-repeat;  height: 380px; width: 530px; background-size:cover;
-	display: table-cell; vertical-align: middle; font-size:30px; color:#fff; font-weight:bold; letter-spacing:2px;
-	text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	background: url(../images/general/setup/leaf.jpg) no-repeat;  height: 380px; width: 530px;
 }
-div.setup_wizard div.left_menu { margin: 50px 0 0 0; }
+div.setup_wizard div.left_menu { margin: 50px 0 0; }
 div.setup_wizard div.left_menu ul { list-style-type: none; }
 div.setup_wizard div.left_menu li{
-	color: #608cb6; font-weight: bold; font-size:12px; padding: 5px; margin: 1px 0 0 0;
+	color: #608cb6; font-weight: bold; font-size:12px; padding: 5px; margin: 1px 0 0;
 }
-div.setup_wizard div.left_menu li.current{ color: #fff; background: #608cb6; }
-div.setup_wizard div.left_menu li.completed{ color: #dbe5ee; background: #a4bdd5; }
-div.setup_wizard div.right { float:left; width:530px; margin: 40px 0 0 0; }
+div.setup_wizard div.left_menu li.current { color: #fff; background: #608CB6; }
+div.setup_wizard div.left_menu li.completed { color: #BDE5EE; background: #A4BDD5; }
+div.setup_wizard div.right { float:left; width:530px; margin: 40px 0 0; }
 div.setup_wizard div.right div.setup_title {
-	font-size:20px; background:#608cb6; color:white; padding:10px;
+	font-size:20px; background:#608CB6; color:white; padding:10px;
 	text-align:left;
 }
 div.setup_wizard div.right div.blank_title {
 	height: 38px;
 }
 div.setup_wizard div.under_title {
-	border:1px solid #ccc; background: #fff; height: 380px; text-align: center;  width:530px;
+	border:1px solid #CCC; background: #FFF; height: 380px; text-align: center;  width:530px;
 	word-break: break-all; display: table-cell; vertical-align: middle;
 }
 div.setup_wizard div.under_title div.table_wraper {
@@ -585,7 +583,7 @@ div.setup_wizard div.under_title div.table_wraper div.vertical_center {
 	height: 300px; width:530px; display: table-cell; vertical-align: middle;
 }
 div.setup_wizard div.under_title div.info_bar {
-	height: 80px; width:530px; text-align: center; border-top:1px solid #ccc; display: table-cell; vertical-align: middle;
+	height: 80px; width:530px; text-align: center; border-top:1px solid #CCC; display: table-cell; vertical-align: middle;
 }
 div.setup_wizard div.licence_agree {
 	text-align: center;
@@ -597,7 +595,7 @@ div.setup_wizard div.licence {
 div.setup_wizard div.text { text-align: left; padding:10px; }
 div.setup_wizard div.footer { clear: both; }
 div.setup_wizard div.footer div.footer_left { float: left; margin: 15px 0 0 10px; }
-div.setup_wizard div.footer div.footer_right { float: right; margin: 15px 29px 0 0; }
+div.setup_wizard div.footer div.footer_right { float: right; margin: 15px 29px 0; }
 
 div.setup_wizard div.footer {
 	clear: both;
@@ -608,7 +606,7 @@ div.setup_wizard div.footer div.footer_left {
 }
 div.setup_wizard div.footer div.footer_right {
 	float: right;
-	margin: 15px 29px 0 0;
+	margin: 15px 29px 0;
 }
 
 /* history */

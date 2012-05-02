@@ -112,10 +112,10 @@ class CsetupWizard extends CForm {
 		}
 		$right->addItem(new CDiv($this->getState(), 'under_title'));
 
-		$link1 = new CLink('www.zabbix.com', 'http://www.zabbix.com/');
+		$link1 = new CLink('www.zabbix.com', 'http://www.zabbix.com/', null, null, true);
 		$link1->setAttribute('target', '_blank');
 
-		$link2 = new CLink('GPL v2', 'http://www.zabbix.com/license.php');
+		$link2 = new CLink('GPL v2', 'http://www.zabbix.com/license.php', null, null, true);
 		$link2->setAttribute('target', '_blank');
 
 		$licence = new CDiv(array($link1, BR(), ' Licensed under ', $link2), 'setup_wizard_licence');
@@ -173,7 +173,7 @@ class CsetupWizard extends CForm {
 	}
 
 	function stage1() {
-		return new CDiv('Welcome to ZABBIX', 'first_page_img');
+		return new CDiv('', 'first_page_img');
 	}
 
 	function stage2() {
