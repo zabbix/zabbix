@@ -969,7 +969,7 @@ class CService extends CZBXAPI {
 		$query = DBSelect(
 			'SELECT sa.serviceid,sa.value
 			FROM service_alarms as sa
-				LEFT OUTER JOIN service_alarms sa2 ON (sa.serviceid=sa2.serviceid AND sa.clock<sa2.clock)
+				LEFT OUTER JOIN service_alarms sa2 ON (sa.serviceid=sa2.serviceid AND sa.clock<sa2.clock AND sa2.clock<'.zbx_dbstr($beforeTime).')
 			WHERE sa2.servicealarmid IS NULL
 				AND sa.clock<'.zbx_dbstr($beforeTime).'
 				AND '.DBcondition('sa.serviceid', $serviceIds).'
