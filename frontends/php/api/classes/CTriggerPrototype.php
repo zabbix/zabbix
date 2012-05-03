@@ -1328,8 +1328,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		foreach ($triggers as $tnum => $trigger) {
 			$triggerid = $triggers[$tnum]['triggerid'] = $triggerids[$tnum];
 
-			addEvent($triggerid, TRIGGER_VALUE_UNKNOWN);
-
 			$hosts = array();
 			$expression = implode_exp($trigger['expression'], $triggerid, $hosts);
 			if (is_null($expression)) {
@@ -1406,13 +1404,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 				$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
 				if (is_null($trigger['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot implode expression "%s".', $expressionFull));
-				}
-
-				if (isset($trigger['status']) && $trigger['status'] != TRIGGER_STATUS_ENABLED) {
-					if ($trigger['value_flags'] == TRIGGER_VALUE_FLAG_NORMAL) {
-						addEvent($trigger['triggerid'], TRIGGER_VALUE_UNKNOWN);
-						$trigger['value_flags'] = TRIGGER_VALUE_FLAG_UNKNOWN;
-					}
 				}
 			}
 
