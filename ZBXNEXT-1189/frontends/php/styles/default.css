@@ -112,7 +112,6 @@ a.underline:active { text-decoration: underline; }
 a.weight_normal { font-weight: normal; }
 
 /* list */
-ul.itservices { margin: 0 0 0 5px; }
 ul li.linear { float: left; list-style-type: none; margin-right: 2px; }
 ul.formlist { list-style-type: none; margin: 0; padding: 0; }
 ul.formlist li { padding: 2px; height: 100%; vertical-align: middle; clear: both; }
@@ -691,6 +690,17 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 .preloader { width: 80px; height: 12px; }
 
-.sla-bar { height: 15px; display: inline-block; margin-bottom: -4px; }
-.sla-green { background: url('../images/gradients/sla_green15.png') repeat-x; }
-.sla-red { background: url('../images/gradients/sla_red15.png') repeat-x; }
+.service-mon .tableinfo .sla-value { display: inline-block; width: 4.5em; text-align: right; }
+.service-mon .tableinfo .service-caption-soft a { color: #888; }
+.service-mon .tableinfo ul.service-problems { margin: 0; list-style-type: none; padding-left: 0; }
+.service-mon .tableinfo .sla-bar { display: inline-block; position: relative; margin-right: 0.3em; }
+.service-mon .tableinfo .sla-bar .sla-bar-legend {
+	color: #1F1F1F; position: absolute;
+	top: 0; font-size: 0.9em; display: none;
+}
+.service-mon .tableinfo .sla-bar:hover .sla-bar-legend { display: block; }
+.service-mon .tableinfo .sla-bar .sla-bar-legend-start { left: 0.5em; }
+.service-mon .tableinfo .sla-bar .sla-bar-legend-end { right: 0.5em; }
+.service-mon .tableinfo .sla-bar .sla-bar-part { height: 15px; display: inline-block; margin-bottom: -4px; }
+.service-mon .tableinfo .sla-bar .sla-green { background: url('../images/gradients/sla_green15.png') repeat-x; }
+.service-mon .tableinfo .sla-bar .sla-red { background: url('../images/gradients/sla_red15.png') repeat-x; }
