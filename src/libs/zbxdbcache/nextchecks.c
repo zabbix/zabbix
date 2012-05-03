@@ -192,7 +192,7 @@ void	DCflush_nextchecks()
 		typedef struct
 		{
 			zbx_uint64_t	objectid;
-			time_t		clock;
+			zbx_timespec_t	timespec;
 		}
 		objectid_clock_t;
 
@@ -225,17 +225,15 @@ void	DCflush_nextchecks()
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						"update triggers"
 						" set value_flags=%d,"
-							"lastchange=%d,"
 							"error='%s'"
 						" where triggerid=" ZBX_FS_UI64 ";\n",
 						TRIGGER_VALUE_FLAG_UNKNOWN,
-						trigger->timespec.sec,
 						error_esc,
 						trigger->triggerid);
 				zbx_free(error_esc);
 
 				events[events_num].objectid = trigger->triggerid;
-				events[events_num].clock = trigger->timespec.sec;
+				events[events_num].timespec = trigger->timespec;
 				events_num++;
 
 				DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
@@ -254,13 +252,15 @@ void	DCflush_nextchecks()
 			for (i = 0; i < events_num; i++)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"insert into events (eventid,source,object,objectid,clock,value,value_changed)"
-						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d);\n",
+						"insert into events (eventid,source,object,objectid,clock,ns,"
+							"value,value_changed)"
+						" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d,%d,%d);\n",
 						eventid++,
 						EVENT_SOURCE_TRIGGERS,
 						EVENT_OBJECT_TRIGGER,
 						events[i].objectid,
-						events[i].clock,
+						events[i].timespec.sec,
+						events[i].timespec.ns,
 						TRIGGER_VALUE_UNKNOWN,
 						TRIGGER_VALUE_CHANGED_NO);
 

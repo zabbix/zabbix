@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageScreens extends CWebTest {
 	// Returns all screens
 	public static function allScreens() {
-		return DBdata("select * from screens order by screenid");
+		return DBdata("select * from screens where templateid is NULL order by screenid");
 	}
 
 	/**
@@ -39,7 +39,7 @@ class testPageScreens extends CWebTest {
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
 		// Header
-		$this->ok(array('Name', 'Dimension (cols x rows)', 'Screens'));
+		$this->ok(array('Name', 'Dimension (cols x rows)', 'Screen'));
 		// Data
 		$this->ok(array($screen['name']));
 		$this->dropdown_select('go', 'Export selected');

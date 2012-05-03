@@ -977,6 +977,7 @@ int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
+int	zbx_is_regular_file(const char *path);
 
 int	MAIN_ZABBIX_ENTRY();
 
