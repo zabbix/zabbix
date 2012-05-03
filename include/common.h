@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"22 March 2012"
-#define	ZABBIX_VERSION		"2.0.0rc3"
+#define	ZABBIX_REVDATE		"20 April 2012"
+#define	ZABBIX_VERSION		"2.0.0rc4"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -977,6 +977,7 @@ int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
+int	zbx_is_regular_file(const char *path);
 
 int	MAIN_ZABBIX_ENTRY();
 

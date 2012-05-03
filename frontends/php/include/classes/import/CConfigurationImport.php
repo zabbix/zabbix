@@ -105,9 +105,11 @@ class CConfigurationImport {
 
 	/**
 	 * Import configuration data.
+	 *
 	 * @todo   for 1.8 version import old class CXmlImport18 is used
 	 *
 	 * @throws Exception
+	 * @throws UnexpectedValueException
 	 * @return bool
 	 */
 	public function import() {
@@ -192,6 +194,9 @@ class CConfigurationImport {
 		$triggersRefs = array();
 		$iconMapsRefs = array();
 		$mapsRefs = array();
+		$screensRefs = array();
+		$macrosRefs = array();
+		$proxyRefs = array();
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -203,6 +208,11 @@ class CConfigurationImport {
 			foreach ($template['groups'] as $group) {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
+
+			foreach ($template['macros'] as $macro) {
+				$macrosRefs[$template['host']][$macro['macro']] = $macro['macro'];
+			}
+
 			if (!empty($template['templates'])) {
 				foreach ($template['templates'] as $linkedTemplate) {
 					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
@@ -212,13 +222,22 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedHosts() as $host) {
 			$hostsRefs[$host['host']] = $host['host'];
+
 			foreach ($host['groups'] as $group) {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
+
+			foreach ($host['macros'] as $macro) {
+				$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+			}
+
 			if (!empty($host['templates'])) {
 				foreach ($host['templates'] as $linkedTemplate) {
 					$templatesRefs[$linkedTemplate['name']] = $linkedTemplate['name'];
 				}
+			}
+			if (!empty($host['proxy'])) {
+				$proxyRefs[$host['proxy']['name']] = $host['proxy']['name'];
 			}
 		}
 
@@ -305,6 +324,8 @@ class CConfigurationImport {
 		}
 
 		foreach ($this->getFormattedMaps() as $map) {
+			$mapsRefs[$map['name']] = $map['name'];
+
 			if (!empty($map['iconmap'])) {
 				$iconMapsRefs[$map['iconmap']['name']] = $map['iconmap']['name'];
 			}
@@ -344,6 +365,71 @@ class CConfigurationImport {
 			}
 		}
 
+		foreach ($this->getFormattedScreens() as $screen) {
+			$screensRefs[$screen['name']] = $screen['name'];
+
+			if (!empty($screen['screenitems'])) {
+				foreach ($screen['screenitems'] as $screenItem) {
+					$resource = $screenItem['resource'];
+					if (empty($resource)) {
+						continue;
+					}
+
+					switch ($screenItem['resourcetype']) {
+						case SCREEN_RESOURCE_HOSTS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_INFO:
+						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+						case SCREEN_RESOURCE_DATA_OVERVIEW:
+						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+							$groupsRefs[$resource['name']] = $resource['name'];
+							break;
+
+						case SCREEN_RESOURCE_HOST_TRIGGERS:
+							$hostsRefs[$resource['host']] = $resource['host'];
+							break;
+
+						case SCREEN_RESOURCE_GRAPH:
+							// TODO: gather graphs too
+							break;
+
+						case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						case SCREEN_RESOURCE_PLAIN_TEXT:
+							$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
+							break;
+
+						case SCREEN_RESOURCE_MAP:
+							$mapsRefs[$resource['name']] = $resource['name'];
+							break;
+
+						case SCREEN_RESOURCE_SCREEN:
+							$screensRefs[$resource['name']] = $resource['name'];
+							break;
+					}
+				}
+			}
+		}
+
+		foreach ($this->getFormattedTemplateScreens() as $screens) {
+			foreach ($screens as $screen) {
+				if (!empty($screen['screenitems'])) {
+					foreach ($screen['screenitems'] as $screenItem) {
+						$resource = $screenItem['resource'];
+
+						switch ($screenItem['resourcetype']) {
+							case SCREEN_RESOURCE_GRAPH:
+								// TODO: gather graphs too
+								break;
+
+							case SCREEN_RESOURCE_SIMPLE_GRAPH:
+							case SCREEN_RESOURCE_PLAIN_TEXT:
+								$itemsRefs[$resource['host']][$resource['key']] = $resource['key'];
+								break;
+						}
+					}
+				}
+			}
+		}
+
 		$this->referencer->addGroups($groupsRefs);
 		$this->referencer->addTemplates($templatesRefs);
 		$this->referencer->addHosts($hostsRefs);
@@ -353,6 +439,9 @@ class CConfigurationImport {
 		$this->referencer->addTriggers($triggersRefs);
 		$this->referencer->addIconMaps($iconMapsRefs);
 		$this->referencer->addMaps($mapsRefs);
+		$this->referencer->addScreens($screensRefs);
+		$this->referencer->addMacros($macrosRefs);
+		$this->referencer->addProxies($proxyRefs);
 	}
 
 	/**
@@ -372,6 +461,8 @@ class CConfigurationImport {
 		}
 
 		if ($groups) {
+			// reset indexing because ids from api does not preserve input array keys
+			$groups = array_values($groups);
 			$newGroups = API::HostGroup()->create($groups);
 			foreach ($newGroups['groupids'] as $gnum => $groupid) {
 				$this->referencer->addGroupRef($groups[$gnum]['name'], $groupid);
@@ -424,25 +515,47 @@ class CConfigurationImport {
 		$hostsToCreate = $hostsToUpdate = array();
 		foreach ($hosts as $host) {
 			foreach ($host['groups'] as $gnum => $group) {
-				if (!$this->referencer->resolveGroup($group['name'])) {
-					throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
+				$groupId = $this->referencer->resolveGroup($group['name']);
+				if (!$groupId) {
+					throw new Exception(_s('Group "%1$s" for host "%2$s" does not exist.', $group['name'], $host['host']));
 				}
-				$host['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
+				$host['groups'][$gnum] = array('groupid' => $groupId);
 			}
-			if (isset($host['templates'])) {
+
+			if (!empty($host['templates'])) {
 				foreach ($host['templates'] as $tnum => $template) {
-					if (!$this->referencer->resolveTemplate($template['name'])) {
-						throw new Exception(_s('Template "%1$s" does not exist.', $template['name']));
+					$templateId = $this->referencer->resolveTemplate($template['name']);
+					if (!$templateId) {
+						throw new Exception(_s('Template "%1$s" for host "%2$s" does not exist.', $template['name'], $host['host']));
 					}
-					$host['templates'][$tnum] = array(
-						'templateid' => $this->referencer->resolveHostOrTemplate($template['name'])
-					);
+					$host['templates'][$tnum] = array('templateid' => $templateId);
 				}
 			}
 
-			if ($this->referencer->resolveHost($host['host'])) {
-				$host['hostid'] = $this->referencer->resolveHost($host['host']);
-				$processedHosts[$host['host']] = $host['hostid'];
+			if (isset($host['proxy'])) {
+				if (empty($host['proxy'])) {
+					$proxyId = 0;
+				}
+				else {
+					$proxyId = $this->referencer->resolveProxy($host['proxy']['name']);
+					if (!$proxyId) {
+						throw new Exception(_s('Proxy "%1$s" for host "%2$s" does not exist.', $host['proxy']['name'], $host['host']));
+					}
+				}
+
+				$host['proxy_hostid'] = $proxyId;
+			}
+
+			if ($hostId = $this->referencer->resolveHost($host['host'])) {
+				$host['hostid'] = $hostId;
+				foreach ($host['macros'] as &$macro) {
+					if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
+						$macro['hostmacroid'] = $hostMacroId;
+					}
+				}
+				unset($macro);
+
+				$processedHosts[$host['host']] = $hostId;
 				$hostsToUpdate[] = $host;
 			}
 			else {
@@ -458,7 +571,7 @@ class CConfigurationImport {
 		));
 		foreach ($dbInterfaces as $dbInterface) {
 			foreach ($hostsToUpdate as $hnum => $host) {
-				if (bccomp($host['hostid'], $dbInterface['hostid']) == 0) {
+				if (!empty($host['interfaces']) && idcmp($host['hostid'], $dbInterface['hostid'])) {
 					foreach ($host['interfaces'] as $inum => $interface) {
 						if ($dbInterface['ip'] == $interface['ip']
 								&& $dbInterface['dns'] == $interface['dns']
@@ -466,7 +579,8 @@ class CConfigurationImport {
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
 								&& $dbInterface['main'] == $interface['main']) {
-							unset($hostsToUpdate[$hnum]['interfaces'][$inum]);
+							$hostsToUpdate[$hnum]['interfaces'][$inum]['interfaceid'] = $dbInterface['interfaceid'];
+							break;
 						}
 					}
 				}
@@ -476,25 +590,25 @@ class CConfigurationImport {
 			}
 		}
 
-		// create/update hosts and create hash host->hostid
+		// create/update hosts
 		if ($this->options['hosts']['createMissing'] && $hostsToCreate) {
 			$newHostIds = API::Host()->create($hostsToCreate);
 			foreach ($newHostIds['hostids'] as $hnum => $hostid) {
-				$processedHosts[$hostsToCreate[$hnum]['host']] = $hostid;
-				$this->referencer->addHostRef($hostsToCreate[$hnum]['host'], $hostid);
-			}
-			foreach ($hostsToCreate as $host) {
-				$this->referencer->addProcessedHost($host['host']);
+				$host = $hostsToCreate[$hnum]['host'];
+				$processedHosts[$host] = $hostid;
+				$this->referencer->addHostRef($host, $hostid);
+				$this->referencer->addProcessedHost($host);
 			}
 		}
 		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
 			API::Host()->update($hostsToUpdate);
 			foreach ($hostsToUpdate as $host) {
 				$this->referencer->addProcessedHost($host['host']);
+				$processedHosts[$host['host']] = $host['hostid'];
 			}
 		}
 
-		// create interface hash interface_ref->interfaceid
+		// create interfaces cache interface_ref->interfaceid
 		$dbInterfaces = API::HostInterface()->get(array(
 			'hostids' => $processedHosts,
 			'output' => API_OUTPUT_EXTEND,
@@ -554,6 +668,9 @@ class CConfigurationImport {
 			$application = $applicationsToCreate[$anum];
 			$this->referencer->addApplicationRef($application['hostid'], $application['name'], $applicationId);
 		}
+
+		// refresh applications beacuse templated ones can be inherited to host and used in items
+		$this->referencer->refreshApplications();
 	}
 
 	/**
@@ -579,7 +696,13 @@ class CConfigurationImport {
 				if (!empty($item['applications'])) {
 					$applicationsIds = array();
 					foreach ($item['applications'] as $application) {
-						$applicationsIds[] = $this->referencer->resolveApplication($hostid, $application['name']);
+						if ($applicationId = $this->referencer->resolveApplication($hostid, $application['name'])) {
+							$applicationsIds[] = $applicationId;
+						}
+						else {
+							throw new Exception(_s('Item "%1$s" on "%2$s": application "%3$s does not exist".',
+								$item['name'], $host, $application['name']));
+						}
 					}
 					$item['applications'] = $applicationsIds;
 				}
@@ -614,6 +737,9 @@ class CConfigurationImport {
 		if ($this->options['items']['updateExisting'] && $itemsToUpdate) {
 			API::Item()->update($itemsToUpdate);
 		}
+
+		// refresh items because templated ones can be inherited to host and used in triggers, grahs, etc.
+		$this->referencer->refreshItems();
 	}
 
 	/**
@@ -679,6 +805,8 @@ class CConfigurationImport {
 			}
 		}
 
+		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
+		$this->referencer->refreshItems();
 
 		// process prototypes
 		$prototypesToUpdate = array();
@@ -762,6 +890,8 @@ class CConfigurationImport {
 			API::ItemPrototype()->update($prototypesToUpdate);
 		}
 
+		// refresh prototypes because templated ones can be inherited to host and used in triggers prototypes or graph prototypes
+		$this->referencer->refreshItems();
 
 		// first we need to create item prototypes and only then graph prototypes
 		$triggersToCreate = array();
@@ -991,6 +1121,8 @@ class CConfigurationImport {
 			API::Trigger()->update($triggerDependencies);
 		}
 
+		// refresh triggers because template triggers can be inherited to host and used in maps
+		$this->referencer->refreshTriggers();
 	}
 
 	/**
@@ -1025,8 +1157,6 @@ class CConfigurationImport {
 
 	/**
 	 * Import maps.
-	 *
-	 * @throws Exception
 	 */
 	protected function processMaps() {
 		if ($maps = $this->getFormattedMaps()) {
@@ -1039,55 +1169,9 @@ class CConfigurationImport {
 	 * Import screens.
 	 */
 	protected function processScreens() {
-		$allScreens = $this->getFormattedScreens();
-		if (empty($allScreens)) {
-			return;
-		}
-
-		$allScreens = zbx_toHash($allScreens, 'name');
-
-		$existingScreens = array();
-		$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE'.
-			' s.templateid IS NULL '.
-			' AND '.DBcondition('s.name', array_keys($allScreens)));
-		while ($dbScreen = DBfetch($dbScreens)) {
-			$existingScreens[$dbScreen['screenid']] = $dbScreen['name'];
-			$allScreens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
-		}
-
-		// if we are going to update screens, check for permissions
-		if ($existingScreens && $this->options['screens']['updateExisting']) {
-			$allowedScreens = API::Screen()->get(array(
-				'screenids' => array_keys($existingScreens),
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($existingScreens as $existingScreenId => $existingScreenName) {
-				if (!isset($allowedScreens[$existingScreenId])) {
-					throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
-				}
-			}
-		}
-
-		$allScreens = $this->prepareScreenImport($allScreens);
-		$screensToCreate = array();
-		$screensToUpdate = array();
-
-		foreach ($allScreens as $screen) {
-			if (isset($screen['screenid'])) {
-				$screensToUpdate[] = $screen;
-			}
-			else {
-				$screensToCreate[] = $screen;
-			}
-		}
-
-		if ($this->options['screens']['createMissing'] && $screensToCreate) {
-			API::Screen()->create($screensToCreate);
-		}
-		if ($this->options['screens']['updateExisting'] && $screensToUpdate) {
-			API::Screen()->update($screensToUpdate);
+		if ($screens = $this->getFormattedScreens()) {
+			$screenImporter = new CScreenImporter($this->options, $this->referencer);
+			$screenImporter->import($screens);
 		}
 	}
 
@@ -1095,177 +1179,10 @@ class CConfigurationImport {
 	 * Import template screens.
 	 */
 	protected function processTemplateScreens() {
-		$allScreens = $this->getFormattedTemplateScreens();
-		if (empty($allScreens)) {
-			return;
+		if ($screens = $this->getFormattedTemplateScreens()) {
+			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer);
+			$screenImporter->import($screens);
 		}
-
-		$screensToCreate = array();
-		$screensToUpdate = array();
-		foreach ($allScreens as $template => $screens) {
-			$existingScreens = array();
-			$dbScreens = DBselect('SELECT s.screenid, s.name FROM screens s WHERE '.
-					' s.templateid='.zbx_dbstr($this->referencer->resolveTemplate($template)).
-					' AND '.DBcondition('s.name', array_keys($screens)));
-			while ($dbScreen = DBfetch($dbScreens)) {
-				$existingScreens[$dbScreen['screenid']] = $dbScreen['name'];
-				$screens[$dbScreen['name']]['screenid'] = $dbScreen['screenid'];
-			}
-
-			// if we are going to update screens, check for permissions
-			if ($existingScreens && $this->options['screens']['updateExisting']) {
-				$allowedTplScreens = API::TemplateScreen()->get(array(
-					'screenids' => array_keys($existingScreens),
-					'output' => API_OUTPUT_SHORTEN,
-					'editable' => true,
-					'preservekeys' => true
-				));
-				foreach ($existingScreens as $existingScreenId => $existingScreenName) {
-					if (!isset($allowedTplScreens[$existingScreenId])) {
-						throw new Exception(_s('No permissions for screen "%1$s".', $existingScreenName));
-					}
-				}
-			}
-
-			$screens = $this->prepareScreenImport($screens);
-			foreach ($screens as $screen) {
-				$screen['templateid'] = $this->referencer->resolveTemplate($template);
-				if (isset($screen['screenid'])) {
-					$screensToUpdate[] = $screen;
-				}
-				else {
-					$screensToCreate[] = $screen;
-				}
-			}
-		}
-
-
-		if ($this->options['templateScreens']['createMissing'] && $screensToCreate) {
-			API::TemplateScreen()->create($screensToCreate);
-		}
-		if ($this->options['templateScreens']['updateExisting'] && $screensToUpdate) {
-			API::TemplateScreen()->update($screensToUpdate);
-		}
-	}
-
-	/**
-	 * Prepare screen data for import.
-	 * Each screen element has reference to resource it represents, reference structure may differ depending on type.
-	 * Referenced database objects ids are stored to 'resourceid' field of screen items.
-	 *
-	 * @todo: it's copy of old frontend function, should be refactored
-	 * @throws Exception if referenced object is not found in database
-	 *
-	 * @param array $allScreens
-	 *
-	 * @return array
-	 */
-	protected function prepareScreenImport(array $allScreens) {
-		foreach ($allScreens as &$screen) {
-			if (!isset($screen['screenitems'])) {
-				continue;
-			}
-
-			foreach ($screen['screenitems'] as &$screenitem) {
-				$nodeCaption = isset($screenitem['resource']['node']) ? $screenitem['resource']['node'] . ':' : '';
-
-				if (empty($screenitem['resource'])) {
-					$screenitem['resourceid'] = 0;
-				}
-
-				if (is_array($screenitem['resource'])) {
-					switch ($screenitem['resourcetype']) {
-						case SCREEN_RESOURCE_HOSTS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$db_hostgroups = API::HostGroup()->getObjects($screenitem['resource']);
-							if (empty($db_hostgroups)) {
-								throw new Exception(_s('Cannot find group "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
-							}
-
-							$tmp = reset($db_hostgroups);
-							$screenitem['resourceid'] = $tmp['groupid'];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$db_hosts = API::Host()->getObjects($screenitem['resource']);
-							if (empty($db_hosts)) {
-								throw new Exception(_s('Cannot find host "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['host'], $screen['name']));
-							}
-
-							$tmp = reset($db_hosts);
-							$screenitem['resourceid'] = $tmp['hostid'];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-							$db_graphs = API::Graph()->getObjects($screenitem['resource']);
-							if (empty($db_graphs)) {
-								throw new Exception(_s('Cannot find graph "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
-							}
-
-							$tmp = reset($db_graphs);
-							$screenitem['resourceid'] = $tmp['graphid'];
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$db_items = API::Item()->getObjects(array(
-								'host' => $screenitem['resource']['host'],
-								'key_' => $screenitem['resource']['key']
-							));
-
-							if (empty($db_items)) {
-								throw new Exception(_s('Cannot find item "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['host'].':'.$screenitem['resource']['key'], $screen['name']));
-							}
-
-							$tmp = reset($db_items);
-							$screenitem['resourceid'] = $tmp['itemid'];
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$db_sysmaps = API::Map()->getObjects($screenitem['resource']);
-							if (empty($db_sysmaps)) {
-								throw new Exception(_s('Cannot find map "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
-							}
-
-							$tmp = reset($db_sysmaps);
-							$screenitem['resourceid'] = $tmp['sysmapid'];
-							break;
-
-						case SCREEN_RESOURCE_SCREEN:
-							$db_screens = API::Screen()->get(array(
-								'output' => API_OUTPUT_SHORTEN,
-								'preservekeys' => true,
-								'editable' => true,
-								'filter' => array('name' => $screenitem['resource']['name'])
-							));
-							if (empty($db_screens)) {
-								throw new Exception(_s('Cannot find screen "%1$s" used in screen "%2$s".',
-										$nodeCaption.$screenitem['resource']['name'], $screen['name']));
-							}
-
-							$tmp = reset($db_screens);
-							$screenitem['resourceid'] = $tmp['screenid'];
-							break;
-
-						default:
-							$screenitem['resourceid'] = 0;
-							break;
-					}
-				}
-			}
-			unset($screenitem);
-		}
-		unset($screen);
-
-		return $allScreens;
 	}
 
 	/**

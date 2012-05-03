@@ -60,7 +60,6 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		int ping_result, char *error)
 {
 	const char	*__function_name = "process_value";
-
 	DC_ITEM		item;
 	int		errcode;
 	AGENT_RESULT	value;
@@ -72,7 +71,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
 
 	if (SUCCEED != errcode)
-		return;
+		goto clean;
 
 	if (NOTSUPPORTED == ping_result)
 	{
@@ -96,6 +95,8 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 		free_result(&value);
 	}
+clean:
+	DCconfig_clean_items(&item, &errcode, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -416,6 +417,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 		zbx_free(items[i].key);
 	}
+
+	DCconfig_clean_items(items, NULL, num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, *icmp_items_count);
 }

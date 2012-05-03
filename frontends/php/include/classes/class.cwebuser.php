@@ -124,5 +124,16 @@ class CWebUser {
 
 		$USER_DETAILS = self::$data;
 	}
+
+	/**
+	 * Returns the type of the current user.
+	 *
+	 * @static
+	 *
+	 * @return int
+	 */
+	public static function getType() {
+		return self::$data['type'];
+	}
 }
 ?>

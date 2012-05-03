@@ -33,9 +33,6 @@ class CMapImporter extends CImporter {
 
 		$this->checkCircularMapReferences($maps);
 
-		$existingMaps = $this->findExistingMaps(array_keys($maps));
-		$this->checkUpdatePermissions($existingMaps);
-
 		do {
 			$im = $this->getIndependentMaps($maps);
 
@@ -47,8 +44,8 @@ class CMapImporter extends CImporter {
 
 				$map = $this->resolveMapReferences($map);
 
-				if (isset($existingMaps[$map['name']])) {
-					$map['sysmapid'] = $existingMaps[$map['name']];
+				if ($mapId = $this->referencer->resolveMap($map['name'])) {
+					$map['sysmapid'] = $mapId;
 					$mapsToUpdate[] = $map;
 				}
 				else {
@@ -66,8 +63,6 @@ class CMapImporter extends CImporter {
 			if ($this->options['maps']['updateExisting'] && $mapsToUpdate) {
 				API::Map()->update($mapsToUpdate);
 			}
-
-
 		} while (!empty($im));
 	}
 
@@ -169,32 +164,6 @@ class CMapImporter extends CImporter {
 	}
 
 	/**
-	 * Check if user has permissions for maps that already exist in database.
-	 * Permissions are checked only if import updates existing maps.
-	 *
-	 * @throws Exception
-	 *
-	 * @param array $existingMaps hash with name as key and sysmapid as value
-	 *
-	 * @return void
-	 */
-	protected function checkUpdatePermissions(array $existingMaps) {
-		if ($existingMaps && $this->options['maps']['updateExisting']) {
-			$allowedMaps = API::Map()->get(array(
-				'sysmapids' => $existingMaps,
-				'output' => API_OUTPUT_SHORTEN,
-				'editable' => true,
-				'preservekeys' => true
-			));
-			foreach ($existingMaps as $existingMapName => $existingMapId ) {
-				if (!isset($allowedMaps[$existingMapId])) {
-					throw new Exception(_s('No permissions for map "%1$s".', $existingMapName));
-				}
-			}
-		}
-	}
-
-	/**
 	 * Change all references in map to database ids.
 	 *
 	 * @throws Exception
@@ -236,7 +205,7 @@ class CMapImporter extends CImporter {
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$selement['elementid'] = $this->referencer->resolveGroup($selement['element']['name']);
 						if (!$selement['elementid']) {
-							throw new Exception(_s('Cannot find group "%1$s" used in map %2$s".',
+							throw new Exception(_s('Cannot find group "%1$s" used in map "%2$s".',
 								$selement['element']['name'], $map['name']));
 						}
 						break;
@@ -244,7 +213,7 @@ class CMapImporter extends CImporter {
 					case SYSMAP_ELEMENT_TYPE_HOST:
 						$selement['elementid'] = $this->referencer->resolveHost($selement['element']['host']);
 						if (!$selement['elementid']) {
-							throw new Exception(_s('Cannot find host "%1$s" used in map %2$s".',
+							throw new Exception(_s('Cannot find host "%1$s" used in map "%2$s".',
 								$selement['element']['host'], $map['name']));
 						}
 						break;
@@ -307,23 +276,5 @@ class CMapImporter extends CImporter {
 		}
 
 		return $map;
-	}
-
-	/**
-	 * Get maps that exist in database.
-	 * Return array with name as key and sysmapid as value.
-	 *
-	 * @param array $mapNames
-	 *
-	 * @return array
-	 */
-	protected function findExistingMaps(array $mapNames) {
-		$existingMaps = array();
-		$dbMaps = DBselect('SELECT s.sysmapid, s.name FROM sysmaps s WHERE '.DBcondition('s.name', $mapNames));
-		while ($dbMap = DBfetch($dbMaps)) {
-			$existingMaps[$dbMap['name']] = $dbMap['sysmapid'];
-		}
-
-		return $existingMaps;
 	}
 }

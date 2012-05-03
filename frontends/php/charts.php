@@ -80,7 +80,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			if ('add' == $_REQUEST['favaction']) {
 				$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 				if($result){
-					print('$("addrm_fav").title = "'._('Remove from favourites.').'";'."\n");
+					print('$("addrm_fav").title = "'._('Remove from favourites').'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("graphid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
@@ -88,7 +88,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
-					print('$("addrm_fav").title = "'._('Add to favourites.').'";'."\n");
+					print('$("addrm_fav").title = "'._('Add to favourites').'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("graphid","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}

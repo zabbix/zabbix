@@ -24,14 +24,16 @@ require_once dirname(__FILE__).'/classes/core/Z.php';
 Z::getInstance()->run();
 
 require_once dirname(__FILE__).'/debug.inc.php';
-
 require_once dirname(__FILE__).'/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/defines.inc.php';
 require_once dirname(__FILE__).'/func.inc.php';
 require_once dirname(__FILE__).'/html.inc.php';
+
 CProfiler::getInstance()->start();
+
 require_once dirname(__FILE__).'/profiles.inc.php';
 require_once dirname(__FILE__).'/../conf/maintenance.inc.php';
+
 // abc sorting
 require_once dirname(__FILE__).'/acknow.inc.php';
 require_once dirname(__FILE__).'/actions.inc.php';
@@ -66,19 +68,18 @@ $ZBX_LOCMASTERID = 0;
 $ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
 $ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
-// include Tactical Overview modules
+// include tactical overview modules
 require_once dirname(__FILE__).'/locales.inc.php';
 require_once dirname(__FILE__).'/perm.inc.php';
 require_once dirname(__FILE__).'/audit.inc.php';
 require_once dirname(__FILE__).'/js.inc.php';
 
-// include Validation
+// include validation
 require_once dirname(__FILE__).'/validate.inc.php';
 
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	$pathLength = strlen(__FILE__);
 
-	// strlen(include/config.inc.php) = 22
 	$pathLength -= 22;
 	$errfile = substr($errfile, $pathLength);
 
@@ -93,8 +94,8 @@ unset($show_setup);
 
 if (defined('ZBX_DENY_GUI_ACCESS')) {
 	if (isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)) {
-		$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? ($_SERVER['HTTP_X_FORWARDED_FOR']) : ($_SERVER['REMOTE_ADDR']);
-		if (!str_in_array($user_ip,$ZBX_GUI_ACCESS_IP_RANGE)) {
+		$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+		if (!str_in_array($user_ip, $ZBX_GUI_ACCESS_IP_RANGE)) {
 			$DENY_GUI = true;
 		}
 	}
@@ -206,13 +207,14 @@ if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 else {
 	CWebUser::$data = array(
 		'alias' => ZBX_GUEST_USER,
-		'userid'=> 0,
-		'lang'  => 'en_gb',
-		'type'  => '0',
-		'node'  => array(
-			'name'  => '- unknown -',
-			'nodeid'=> 0)
-		);
+		'userid' => 0,
+		'lang' => 'en_gb',
+		'type' => '0',
+		'node' => array(
+			'name' => '- unknown -',
+			'nodeid' => 0
+		)
+	);
 
 	$USER_DETAILS = CWebUser::$data;
 }
@@ -224,7 +226,7 @@ set_zbx_locales();
 // init mb strings if it's available
 init_mbstrings();
 
-// Ajax - do not need warnings or Errors
+// ajax - do not need warnings or errors
 if ((isset($DENY_GUI) || isset($show_setup) || isset($show_warning)) && PAGE_TYPE_HTML <> detect_page_type()) {
 	header('Ajax-response: false');
 	exit();
@@ -379,7 +381,8 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 					array_push($message, array(
 						'text' => $msg['message'],
 						'color' => array('R' => 155, 'G' => 155, 'B' => 55),
-						'font' => $msg_font));
+						'font' => $msg_font
+					));
 				}
 				$width = max($width, imagefontwidth($msg_font) * zbx_strlen($msg['message']) + 1);
 				$height += imagefontheight($msg_font) + 1;
@@ -394,7 +397,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 			$lst_error = new CList(null,'messages');
 			foreach ($ZBX_MESSAGES as $msg) {
 				$lst_error->addItem($msg['message'], $msg['type']);
-				$bool = ($bool && ('error' != zbx_strtolower($msg['type'])));
+				$bool = ($bool && 'error' != zbx_strtolower($msg['type']));
 			}
 			$msg_show = 6;
 			$msg_count = count($ZBX_MESSAGES);
@@ -517,7 +520,7 @@ function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {
 
 	foreach ($tree_ids as $key => $id) {
 		$child = $tree[$id];
-		if (bccomp($child[$parent_field],$parentid) == 0) {
+		if (bccomp($child[$parent_field], $parentid) == 0) {
 			$result[$id] = $child;
 			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // attention recursion !!!
 			$result += $childs;
@@ -539,14 +542,12 @@ function parse_period($str) {
 			if (!isset($out[$i])) {
 				$out[$i] = array();
 			}
-			array_push($out[$i],
-				array(
-					'start_h'	=> $arr[3],
-					'start_m'	=> $arr[4],
-					'end_h'		=> $arr[5],
-					'end_m'		=> $arr[6]
-				)
-			);
+			array_push($out[$i], array(
+				'start_h' => $arr[3],
+				'start_m' => $arr[4],
+				'end_h' => $arr[5],
+				'end_m' => $arr[6]
+			));
 		}
 	}
 	return $out;
@@ -555,7 +556,24 @@ function parse_period($str) {
 function get_status() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	$status = array();
+	$status = array(
+		'triggers_count' => 0,
+		'triggers_count_enabled' => 0,
+		'triggers_count_disabled' => 0,
+		'triggers_count_off' => 0,
+		'triggers_count_on' => 0,
+		'triggers_count_unknown' => 0,
+		'items_count' => 0,
+		'items_count_monitored' => 0,
+		'items_count_disabled' => 0,
+		'items_count_not_supported' => 0,
+		'hosts_count' => 0,
+		'hosts_count_monitored' => 0,
+		'hosts_count_not_monitored' => 0,
+		'hosts_count_template' => 0,
+		'users_online' => 0,
+		'qps_total' => 0
+	);
 
 	// server
 	$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
@@ -568,69 +586,84 @@ function get_status() {
 	}
 
 	// triggers
-	$sql = 'SELECT COUNT(DISTINCT t.triggerid) AS cnt'.
-			' FROM triggers t,functions f,items i,hosts h'.
-			' WHERE t.triggerid=f.triggerid'.
-				' AND f.itemid=i.itemid'.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.hostid=h.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED;
-
-	$row = DBfetch(DBselect($sql));
-	$status['triggers_count'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED));
-	$status['triggers_count_enabled'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_DISABLED));
-	$status['triggers_count_disabled'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED.' AND t.value='.TRIGGER_VALUE_FALSE));
-	$status['triggers_count_off'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED.' AND t.value='.TRIGGER_VALUE_TRUE));
-	$status['triggers_count_on'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED.' AND t.value='.TRIGGER_VALUE_UNKNOWN));
-	$status['triggers_count_unknown'] = $row['cnt'];
+	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) as cnt,t.status,t.value'.
+			' FROM triggers t'.
+				' INNER JOIN functions f ON t.triggerid=f.triggerid'.
+				' INNER JOIN items i ON f.itemid=i.itemid'.
+				' INNER JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE i.status='.ITEM_STATUS_ACTIVE.
+				' AND h.status='.HOST_STATUS_MONITORED.
+			' GROUP BY t.status,t.value');
+	while ($dbTrigger = DBfetch($dbTriggers)) {
+		switch ($dbTrigger['status']) {
+			case TRIGGER_STATUS_ENABLED:
+				switch ($dbTrigger['value']) {
+					case TRIGGER_VALUE_FALSE:
+						$status['triggers_count_off'] = $dbTrigger['cnt'];
+						break;
+					case TRIGGER_VALUE_TRUE:
+						$status['triggers_count_on'] = $dbTrigger['cnt'];
+						break;
+					case TRIGGER_VALUE_UNKNOWN:
+						$status['triggers_count_unknown'] = $dbTrigger['cnt'];
+						break;
+				}
+				break;
+			case TRIGGER_STATUS_DISABLED:
+				$status['triggers_count_disabled'] += $dbTrigger['cnt'];
+				break;
+		}
+	}
+	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on']
+			+ $status['triggers_count_unknown'];
+	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
 
 	// items
-	$sql = 'SELECT COUNT(i.itemid) AS cnt'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED;
-
-	$row = DBfetch(DBselect($sql));
-	$status['items_count'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND i.status='.ITEM_STATUS_ACTIVE));
-	$status['items_count_monitored'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND i.status='.ITEM_STATUS_DISABLED));
-	$status['items_count_disabled'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND i.status='.ITEM_STATUS_NOTSUPPORTED));
-	$status['items_count_not_supported'] = $row['cnt'];
+	$dbItems = DBselect('SELECT COUNT(*) as cnt,i.status'.
+			' FROM items i'.
+				' INNER JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND '.DBcondition('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
+			' GROUP BY i.status');
+	while ($dbItem = DBfetch($dbItems)) {
+		switch ($dbItem['status']) {
+			case ITEM_STATUS_ACTIVE:
+				$status['items_count_monitored'] = $dbItem['cnt'];
+				break;
+			case ITEM_STATUS_DISABLED:
+				$status['items_count_disabled'] = $dbItem['cnt'];
+				break;
+			case ITEM_STATUS_NOTSUPPORTED:
+				$status['items_count_not_supported'] = $dbItem['cnt'];
+				break;
+		}
+	}
+	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']
+			+ $status['items_count_not_supported'];
 
 	// hosts
-	$row = DBfetch(DBselect(
-		'SELECT COUNT(hostid) AS cnt'.
-		' FROM hosts'.
-		' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
-	));
-	$status['hosts_count'] = $row['cnt'];
-
-	$row = DBfetch(DBselect('SELECT COUNT(hostid) AS cnt FROM hosts WHERE status='.HOST_STATUS_MONITORED));
-	$status['hosts_count_monitored'] = $row['cnt'];
-
-	$row = DBfetch(DBselect('SELECT COUNT(hostid) AS cnt FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED));
-	$status['hosts_count_not_monitored'] = $row['cnt'];
-
-	$row = DBfetch(DBselect('SELECT COUNT(hostid) AS cnt FROM hosts WHERE status='.HOST_STATUS_TEMPLATE));
-	$status['hosts_count_template'] = $row['cnt'];
+	$dbHosts = DBselect('SELECT COUNT(*) as cnt,h.status'.
+			' FROM hosts h'.
+			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
+			' GROUP BY h.status');
+	while ($dbHost = DBfetch($dbHosts)) {
+		switch ($dbHost['status']) {
+			case HOST_STATUS_MONITORED:
+				$status['hosts_count_monitored'] = $dbHost['cnt'];
+				break;
+			case HOST_STATUS_NOT_MONITORED:
+				$status['hosts_count_not_monitored'] = $dbHost['cnt'];
+				break;
+			case HOST_STATUS_TEMPLATE:
+				$status['hosts_count_template'] = $dbHost['cnt'];
+				break;
+		}
+	}
+	$status['hosts_count'] = $status['hosts_count_monitored'] + $status['hosts_count_not_monitored']
+			+ $status['hosts_count_template'];
 
 	// users
-	$row = DBfetch(DBselect('SELECT COUNT(userid) AS usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
+	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
 	$status['users_count'] = $row['usr_cnt'];
 	$status['users_online'] = 0;
 
@@ -740,4 +773,15 @@ function zbx_stripslashes($value) {
 	}
 	return $value;
 }
-?>
+
+function no_errors() {
+	global $ZBX_MESSAGES;
+
+	foreach ($ZBX_MESSAGES as $message) {
+		if ($message['type'] == 'error') {
+			return false;
+		}
+	}
+
+	return true;
+}
