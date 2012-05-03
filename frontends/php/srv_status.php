@@ -115,7 +115,7 @@ else {
 
 	// fetch services
 	$services = API::Service()->get(array(
-		'output' => array('name', 'serviceid', 'showsla', 'goodsla'),
+		'output' => array('name', 'serviceid', 'showsla', 'goodsla', 'algorithm'),
 		'selectParent' => API_OUTPUT_EXTEND,
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
 		'selectTrigger' => array('description', 'triggerid'),

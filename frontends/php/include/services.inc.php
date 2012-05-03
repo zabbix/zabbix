@@ -171,6 +171,7 @@ function createShowServiceTree(array $services, array $slaData, $period, array $
 	// create a not from the given service
 	else {
 		$serviceSla = $slaData[$service['serviceid']];
+		$slaValues = reset($serviceSla['sla']);
 
 		// caption
 		$trigger = $service['trigger'];
@@ -196,8 +197,9 @@ function createShowServiceTree(array $services, array $slaData, $period, array $
 		}
 
 		// sla
-		if ($service['showsla']) {
-			$slaValues = reset($serviceSla['sla']);
+		$sla = '-';
+		$sla2 = '-';
+		if ($service['showsla'] && $slaValues['sla'] !== null) {
 			$slaGood = $slaValues['sla'];
 			$slaBad = 100 - $slaValues['sla'];
 
@@ -241,10 +243,6 @@ function createShowServiceTree(array $services, array $slaData, $period, array $
 				new CSpan(sprintf('%.2f', $slaGood), ($service['goodsla'] > $slaGood) ? 'red' : 'green')
 			);
 		}
-		else {
-			$sla = '-';
-			$sla2 = '-';
-		}
 
 		$serviceNode = array(
 			'serviceid' => $service['serviceid'],
@@ -255,7 +253,7 @@ function createShowServiceTree(array $services, array $slaData, $period, array $
 			'sla' => $sla,
 			'sla2' => $sla2,
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
-			'status' => $serviceSla['status']
+			'status' => ($serviceSla['status'] !== null) ? $serviceSla['status'] : '-'
 		);
 	}
 

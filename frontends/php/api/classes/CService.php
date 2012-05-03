@@ -522,15 +522,24 @@ class CService extends CZBXAPI {
 	 * Returns availability-related information about the given services during the given time intervals.
 	 *
 	 * Available options:
-	 * - serviceids     - an array of service IDs;
-	 * - intervals      - an array of time intervals defined as array(array('from' => timestamp1, 'to' => timestamp2), ...).
+	 *  - serviceids    - a single service ID or an array of service IDs;
+	 *  - intervals     - a single time interval or an array of time intervals, each containing:
+	 *      - from          - the beginning of the interval, timestamp;
+	 *      - to            - the end of the interval, timestamp.
 	 *
 	 * Returns the following availability information for each service:
-	 * - sla                - percentage of time the service is in OK state;
-	 * - reasons            - an array of triggers that are in problem state and belong to the given service or it's descendants;
-	 * - okTime             - the time the service was in OK state, in seconds;
-	 * - problemTime        - the time the service was in problem state, in seconds;
-	 * - downtimeTime       - the time the service was down, in seconds.
+	 *  - status            - the current status of the service;
+	 *  - problems          - an array of triggers that are currently in problem state and belong to the given service
+	 *                        or it's descendants;
+	 *  - sla               - an array of requested intervals with SLA information:
+	 *      - from              - the beginning of the interval;
+	 *      - to                - the end of the interval;
+	 *      - okTime            - the time the service was in OK state, in seconds;
+	 *      - problemTime       - the time the service was in problem state, in seconds;
+	 *      - downtimeTime      - the time the service was down, in seconds.
+	 *
+	 * If the service calculation algorithm is set to SERVICE_ALGORITHM_NONE, the method will return an empty 'problems'
+	 * array and null for all of the calculated values.
 	 *
 	 * @param array $options
 	 *
@@ -542,7 +551,7 @@ class CService extends CZBXAPI {
 
 		// fetch services
 		$services = $this->get(array(
-			'output' => array('serviceid', 'name', 'status'),
+			'output' => array('serviceid', 'name', 'status', 'algorithm'),
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectParentDependencies' => array('serviceupid'),
 			'selectTrigger' => API_OUTPUT_EXTEND,
@@ -552,63 +561,85 @@ class CService extends CZBXAPI {
 
 		$rs = array();
 		if ($services) {
+			$usedSeviceIds = array();
+
 			$problemServiceIds = array();
 			foreach ($services as &$service) {
 				$service['alarms'] = array();
 
-				if ($service['status'] > 0) {
-					$problemServiceIds[] = $service['serviceid'];
+				// don't calculate SLA for services with disabled status calculation
+				if ($this->isStatusEnabled($service)) {
+					$usedSeviceIds[$service['serviceid']] = $service['serviceid'];
+
+					if ($service['status'] > 0) {
+						$problemServiceIds[] = $service['serviceid'];
+					}
 				}
 			}
 			unset($service);
 
-			// add service alarms
-			$intervalConditions = array();
-			foreach ($intervals as $interval) {
-				$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
-			}
-			$query = DBselect(
-				'SELECT *'.
-					' FROM service_alarms sa'.
-					' WHERE '.DBcondition('sa.serviceid', $serviceIds).
-					' AND ('.implode(' OR ', $intervalConditions).')'.
-					' ORDER BY sa.clock,sa.servicealarmid'
-			);
-			while ($data = DBfetch($query)) {
-				$services[$data['serviceid']]['alarms'][] = $data;
-			}
-
 			// initial data
 			foreach ($services as $service) {
 				$rs[$service['serviceid']] = array(
-					'status' => $service['status'],
-					'sla' => array(),
-					'problems' => array()
+					'status' => ($this->isStatusEnabled($service)) ? $service['status'] : null,
+					'problems' => array(),
+					'sla' => array()
 				);
 			}
 
-			// add problem triggers
-			if ($problemServiceIds) {
-				$problemTriggers = $this->fetchProblemTriggers($problemServiceIds);
-				$rs = $this->escalateProblems($services, $problemTriggers, $rs);
-			}
+			if ($usedSeviceIds) {
+				// add service alarms
+				$intervalConditions = array();
+				foreach ($intervals as $interval) {
+					$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
+				}
+				$query = DBselect(
+					'SELECT *'.
+						' FROM service_alarms sa'.
+						' WHERE '.DBcondition('sa.serviceid', $usedSeviceIds).
+						' AND ('.implode(' OR ', $intervalConditions).')'.
+						' ORDER BY sa.clock,sa.servicealarmid'
+				);
+				while ($data = DBfetch($query)) {
+					$services[$data['serviceid']]['alarms'][] = $data;
+				}
 
-			// calculate SLAs
-			foreach ($intervals as $interval) {
-				$latestValues = $this->fetchLatestValues($serviceIds, $interval['from']);
+				// add problem triggers
+				if ($problemServiceIds) {
+					$problemTriggers = $this->fetchProblemTriggers($problemServiceIds);
+					$rs = $this->escalateProblems($services, $problemTriggers, $rs);
+				}
 
-				foreach ($services as $service) {
-					$latestValue = (isset($latestValues[$service['serviceid']])) ? $latestValues[$service['serviceid']] : 0;
-					$intervalSla = $this->calculateSla($service, $interval['from'], $interval['to'], $latestValue);
+				// calculate SLAs
+				foreach ($intervals as $interval) {
+					$latestValues = $this->fetchLatestValues($usedSeviceIds, $interval['from']);
 
-					$rs[$service['serviceid']]['sla'][] = array(
-						'from' => $interval['from'],
-						'to' => $interval['to'],
-						'sla' => $intervalSla['ok'],
-						'okTime' => $intervalSla['okTime'],
-						'problemTime' => $intervalSla['problemTime'],
-						'downtimeTime' => $intervalSla['downtimeTime'],
-					);
+					foreach ($services as $service) {
+						$serviceId = $service['serviceid'];
+
+						// only calculate the sla for services which require it
+						if (isset($usedSeviceIds[$serviceId])) {
+							$latestValue = (isset($latestValues[$serviceId])) ? $latestValues[$serviceId] : 0;
+							$intervalSla = $this->calculateSla($service, $interval['from'], $interval['to'], $latestValue);
+						}
+						else {
+							$intervalSla = array(
+								'ok' => null,
+								'okTime' => null,
+								'problemTime' => null,
+								'downtimeTime' => null,
+							);
+						}
+
+						$rs[$service['serviceid']]['sla'][] = array(
+							'from' => $interval['from'],
+							'to' => $interval['to'],
+							'sla' => $intervalSla['ok'],
+							'okTime' => $intervalSla['okTime'],
+							'problemTime' => $intervalSla['problemTime'],
+							'downtimeTime' => $intervalSla['downtimeTime'],
+						);
+					}
 				}
 			}
 		}
@@ -939,7 +970,7 @@ class CService extends CZBXAPI {
 			foreach ($service['parentDependencies'] as $dependency) {
 				$parentServiceId = $dependency['serviceupid'];
 
-				if (isset($services[$parentServiceId])) {
+				if (isset($services[$parentServiceId]) && $this->isStatusEnabled($services[$parentServiceId])) {
 					if (!isset($parentProblems[$parentServiceId])) {
 						$parentProblems[$parentServiceId] = array();
 					}
@@ -1041,6 +1072,17 @@ class CService extends CZBXAPI {
 		$sql = $this->createSelectQueryFromParts($sqlParts);
 
 		return DBfetchArray(DBselect($sql));
+	}
+
+	/**
+	 * Returns true if status calculation is enabled for the given service.
+	 *
+	 * @param array $service
+	 *
+	 * @return bool
+	 */
+	protected function isStatusEnabled(array $service) {
+		return ($service['algorithm'] != SERVICE_ALGORITHM_NONE);
 	}
 
 	/**
