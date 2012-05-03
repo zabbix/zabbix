@@ -1743,4 +1743,3 @@ function num2letter($number) {
 
 	return $str;
 }
-?>
