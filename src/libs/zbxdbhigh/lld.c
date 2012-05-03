@@ -305,10 +305,10 @@ static int	DBlld_get_item(zbx_uint64_t hostid, const char *tmpl_key,
 	{
 		key = zbx_strdup(key, tmpl_key);
 		substitute_key_macros(&key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-		key_esc = DBdyn_escape_string(key);
+		key_esc = DBdyn_escape_string_len(key, ITEM_KEY_LEN);
 	}
 	else
-		key_esc = DBdyn_escape_string(tmpl_key);
+		key_esc = DBdyn_escape_string_len(tmpl_key, ITEM_KEY_LEN);
 
 	result = DBselect(
 			"select itemid"
@@ -458,7 +458,7 @@ static int	DBlld_trigger_exists(zbx_uint64_t hostid, zbx_uint64_t triggerid, con
 	}
 
 	sql = zbx_malloc(sql, sql_alloc);
-	description_esc = DBdyn_escape_string(description);
+	description_esc = DBdyn_escape_string_len(description, TRIGGER_DESCRIPTION_LEN);
 	zbx_vector_ptr_create(&functions);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -530,7 +530,7 @@ static int	DBlld_make_trigger(zbx_uint64_t hostid, zbx_uint64_t parent_triggerid
 	DBlld_get_trigger_functions(parent_triggerid, jp_row, &trigger->functions);
 	trigger->full_expression = DBlld_expand_trigger_expression(expression, &trigger->functions);
 
-	description_esc = DBdyn_escape_string(trigger->description);
+	description_esc = DBdyn_escape_string_len(trigger->description, TRIGGER_DESCRIPTION_LEN);
 
 	result = DBselect(
 			"select distinct t.triggerid,t.expression"
@@ -711,7 +711,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, ins_triggers_sql);
 		zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ins_trigger_discovery_sql);
 #endif
-		error_esc = DBdyn_escape_string("Trigger just added. No status update so far.");
+		error_esc = DBdyn_escape_string_len("Trigger just added. No status update so far.", TRIGGER_ERROR_LEN);
 	}
 
 	if (0 != new_functions)
@@ -753,8 +753,8 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 				trigger->expression = string_replace(old_expression, search, replace);
 				zbx_free(old_expression);
 
-				function_esc = DBdyn_escape_string(function->function);
-				parameter_esc = DBdyn_escape_string(function->parameter);
+				function_esc = DBdyn_escape_string_len(function->function, FUNCTION_FUNCTION_LEN);
+				parameter_esc = DBdyn_escape_string_len(function->parameter, FUNCTION_PARAMETER_LEN);
 
 #ifndef HAVE_MULTIROW_INSERT
 				zbx_strcpy_alloc(&sql3, &sql3_alloc, &sql3_offset, ins_functions_sql);
@@ -772,7 +772,7 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 			}
 		}
 
-		description_esc = DBdyn_escape_string(trigger->description);
+		description_esc = DBdyn_escape_string_len(trigger->description, TRIGGER_DESCRIPTION_LEN);
 
 		if (0 == trigger->triggerid)
 		{
@@ -989,7 +989,7 @@ int	DBlld_item_exists(zbx_uint64_t hostid, zbx_uint64_t itemid, const char *key,
 	}
 
 	sql = zbx_malloc(sql, sql_alloc);
-	key_esc = DBdyn_escape_string(key);
+	key_esc = DBdyn_escape_string_len(key, ITEM_KEY_LEN);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select itemid"
@@ -1031,7 +1031,7 @@ static int	DBlld_make_item(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 	item->key = zbx_strdup(NULL, key_proto);
 	substitute_key_macros(&item->key, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
-	key_esc = DBdyn_escape_string(item->key);
+	key_esc = DBdyn_escape_string_len(item->key, ITEM_KEY_LEN);
 
 	result = DBselect(
 			"select distinct i.itemid"
@@ -1208,10 +1208,10 @@ static void	DBlld_save_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, unsig
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		name_esc = DBdyn_escape_string(item->name);
-		key_esc = DBdyn_escape_string(item->key);
-		snmp_oid_esc = DBdyn_escape_string(item->snmp_oid);
-		params_esc = DBdyn_escape_string(item->params);
+		name_esc = DBdyn_escape_string_len(item->name, ITEM_NAME_LEN);
+		key_esc = DBdyn_escape_string_len(item->key, ITEM_KEY_LEN);
+		snmp_oid_esc = DBdyn_escape_string_len(item->snmp_oid, ITEM_SNMP_OID_LEN);
+		params_esc = DBdyn_escape_string_len(item->params, ITEM_PARAM_LEN);
 
 		if (0 == item->itemid)
 		{
@@ -1524,7 +1524,7 @@ static int	DBlld_graph_exists(zbx_uint64_t hostid, zbx_uint64_t graphid, const c
 	}
 
 	sql = zbx_malloc(sql, sql_alloc);
-	name_esc = DBdyn_escape_string(name);
+	name_esc = DBdyn_escape_string_len(name, GRAPH_NAME_LEN);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct g.graphid"
@@ -1571,7 +1571,7 @@ static int	DBlld_make_graph(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zb
 	graph->name = zbx_strdup(NULL, name_proto);
 	substitute_discovery_macros(&graph->name, jp_row);
 
-	name_esc = DBdyn_escape_string(graph->name);
+	name_esc = DBdyn_escape_string_len(graph->name, GRAPH_NAME_LEN);
 
 	result = DBselect(
 			"select distinct g.graphid"
@@ -1804,7 +1804,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 	{
 		graph = (zbx_lld_graph_t *)graphs->values[i];
 
-		name_esc = DBdyn_escape_string(graph->name);
+		name_esc = DBdyn_escape_string_len(graph->name, GRAPH_NAME_LEN);
 
 		if (0 == graph->graphid)
 		{
@@ -1876,7 +1876,7 @@ static void	DBlld_save_graphs(zbx_vector_ptr_t *graphs, int width, int height, d
 			char		*color_esc;
 
 			gitem = &graph->gitems[j];
-			color_esc = DBdyn_escape_string(gitem->color);
+			color_esc = DBdyn_escape_string_len(gitem->color, GRAPH_ITEM_COLOR_LEN);
 
 			if (0 != gitem->gitemid)
 			{
