@@ -102,7 +102,7 @@ typedef struct
 	unsigned char 	type;
 	unsigned char	data_type;
 	unsigned char	value_type;
-	char		key_orig[ITEM_KEY_LEN_MAX], *key;
+	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	int		delay;
 	int		nextcheck;
 	unsigned char	status;
