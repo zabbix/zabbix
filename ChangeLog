@@ -7,6 +7,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+........S. [ZBX-4921] fixed possible SQL errors while processing LLD data with long values (Sasha)
 ........S. [ZBX-4889] fixed execution of GUI Scripts for disabled hosts (Sasha)
 ..F.....S. [ZBX-4412] fixed updating of trigger last change by significant event (Sasha)
 A......... [ZBX-4880] fixed error 'JSON-rpc error generation failed. No such error' in API (Vedmak)
