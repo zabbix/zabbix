@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 DIST_SUBDIRS = \
+	agent \
 	common \
 	aix \
 	freebsd \
@@ -15,6 +16,7 @@ DIST_SUBDIRS = \
 	unknown
 
 SUBDIRS = \
+	agent \
 	common \
 	simple \
 	@ARCH@
@@ -38,6 +40,7 @@ noinst_LIBRARIES = \
 
 # AGENT version of sysinfo library
 libzbxagentsysinfo_a_CFLAGS = \
+	-DWITH_AGENT_METRICS \
 	-DWITH_COMMON_METRICS \
 	-DWITH_SIMPLE_METRICS \
 	-DWITH_SPECIFIC_METRICS

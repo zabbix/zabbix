@@ -1,4 +1,34 @@
 --------------------------------------------------------------------------------
+Changes for 2.0.0rc4
+
+New features:
+...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
+..F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, Greek, Japanese, Latvian, Polish, Russian, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
+
+Bug fixes:
+..F.....S. [ZBX-4412] fixed updating of trigger last change by significant event (Sasha)
+A......... [ZBX-4880] fixed error 'JSON-rpc error generation failed. No such error' in API (Vedmak)
+..F....... [ZBX-4922] fixed importing of linked templates (Vedmak)
+..F....... [ZBX-4895] fixed host proxy exported as id (Vedmak)
+.......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
+..F....... [ZBX-4914] fixed graph name encoding in form preview (Vedmak)
+........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
+..F....... [ZBX-4495] fixed hintbox positioning (Toms)
+..F....... [ZBX-4903] fixed sorting in 'Overview' screen (Vedmak)
+A......... [ZBX-4927] fix proxy deletion message and remove excess space from the audit record (Richlv)
+..F....... [ZBX-4900] improved performance of 'Status of Zabbix' dashboard widget (Vedmak)
+...G...... [ZBX-4905] fixed processing of system.swap.in/out[,pages] under Linux 2.6 (Sasha)
+...G...... [ZBX-4907] fixed processing of system.swap.in/out[,sectors/count] under Linux (Sasha)
+..F....... [ZBX-4902] fixed errors in configuration export (Vedmak)
+........S. [ZBX-4910] fixed updating of "SNMPv3 priv passphrase" field in low-level discovered SNMPv3 items (Sasha)
+........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
+........S. [ZBX-4671] fixed truncation of the calculated item formula (Sasha)
+........S. [ZBX-4893] fixed linking of item applications by a discovery rule (Sasha)
+..F....... [ZBX-4649] fixed Editing screen does not work properly after moving content to other cell (Toms)
+..F....... [ZBX-4875] fixed graph item with long description cannot be dragged/sorted properly in graph form (Toms)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.0rc3
 
 New features:
@@ -588,6 +618,23 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.13rc1
+
+...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
+........S. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
+........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
+A.F....... [ZBX-4877] updated French translation; thanks to Joseph Bueno (Richlv)
+..F....... [ZBX-4900] improved performance of the 'Status of Zabbix' dashboard widget (Vedmak)
+...G...... [ZBX-4905] fixed processing of system.swap.in/out[,pages] under Linux 2.6 (Sasha)
+...G...... [ZBX-4907] fixed processing of system.swap.in/out[,sectors/count] under Linux (Sasha)
+........S. [ZBX-4884] fixed incorrect calculation of items using option "Delta (speed per second)" after recovery from unsupported state (Sasha)
+..F....... [ZBX-4849] implemented a check that a trigger expression doesn't use items from both hosts and templates at the same time (Pavels)
+....I..... [ZBX-3929] removed deprecated Switch module from the gen.pl script (Sasha)
+
+Changes for 1.8.12
+
+1.8.12rc2 was released as 1.8.12 without any changes
+
 Changes for 1.8.12rc2
 
 .......PS. [ZBX-4793] fixed processing of quoted strings in dynamic SNMP indexes (Sasha)
@@ -595,14 +642,14 @@ Changes for 1.8.12rc2
 
 Changes for 1.8.12rc1
 
-...GI..... [ZBXNEXT-584] added support of multiple server in active check mode; thanks to Takanori Suzuki (Sasha)
+...GI..... [ZBXNEXT-584] added support of multiple servers in active check mode; thanks to Takanori Suzuki (Sasha)
 ...G...... [ZBX-4635] added support for optional first parameter to vfs.dev.* on Solaris (dimir)
 ..F....... [ZBX-4795] fixed group creation for child nodes (Vedmak)
 ...G...... [ZBX-4195] fixed memory leak while processing unsupported performance counters by Windows agent (Sasha)
 A.F....... [ZBX-4813] fixed incorrect exception handling in maps when checking for circularity (Toms, Vedmak)
 ..F....... [ZBX-2873] fixed colors in dark theme (Vedmak)
 ..F....... [ZBX-3152] fixed global messages being shown even if all severities are unchecked (Vedmak)
-...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with name of processes longer than 15 characters (Sasha)
+...G...... [ZBX-4801] fixed processing of proc.num[] and proc.mem[] checks with process names longer than 15 characters (Sasha)
 ..F....... [ZBX-4253] fixed menu link inconsistency in tr_status.php (Toms)
 .......PS. [ZBX-4749] fixed proxy crash on exit when deleting trend cache (dimir)
 ........S. [ZBXNEXT-744] added support of {ITEM.ID} and {TRIGGER.EXPRESSION} macros in notifications and commands (Sasha)

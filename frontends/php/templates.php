@@ -101,7 +101,13 @@ if ($EXPORT_DATA) {
 	$export = new CConfigurationExport(array('templates' => $templateids));
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-	print($export->export());
+	$exportData = $export->export();
+	if (!no_errors()) {
+		show_messages();
+	}
+	else {
+		print($exportData);
+	}
 	exit();
 }
 

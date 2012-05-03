@@ -1470,7 +1470,7 @@ static void	DBlld_update_items(zbx_uint64_t hostid, zbx_uint64_t discovery_itemi
 		DBlld_save_items(hostid, &items, type, value_type, data_type, delay, delay_flex_esc, history, trends,
 				status, trapper_hosts_esc, units_esc, multiplier, delta, formula_esc, logtimefmt_esc,
 				valuemapid, ipmi_sensor_esc, snmp_community_esc, port_esc, snmpv3_securityname_esc,
-				snmpv3_securitylevel, snmpv3_authpassphrase_esc, snmpv3_authpassphrase_esc, authtype,
+				snmpv3_securitylevel, snmpv3_authpassphrase_esc, snmpv3_privpassphrase_esc, authtype,
 				username_esc, password_esc, publickey_esc, privatekey_esc, description_esc,
 				interfaceid, parent_itemid, key_proto_esc, lastcheck);
 

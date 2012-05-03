@@ -115,7 +115,7 @@ typedef struct
 	char		snmpv3_authpassphrase_orig[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX], *snmpv3_authpassphrase;
 	char		snmpv3_privpassphrase_orig[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX], *snmpv3_privpassphrase;
 	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
-	char		params_orig[ITEM_PARAMS_LEN_MAX], *params;
+	char		*params;
 	char		delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
 	unsigned char	authtype;
 	char		username_orig[ITEM_USERNAME_LEN_MAX], *username;
@@ -206,6 +206,7 @@ void	init_configuration_cache();
 void	free_configuration_cache();
 void	DCload_config();
 
+void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
@@ -219,7 +220,7 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
-int	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
+size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
 #define	CONFIG_ALERT_HISTORY		1
 #define	CONFIG_EVENT_HISTORY		2

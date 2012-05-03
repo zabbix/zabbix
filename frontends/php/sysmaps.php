@@ -102,7 +102,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$export = new CConfigurationExport(array('maps' => $maps));
 		$export->setBuilder(new CConfigurationExportBuilder());
 		$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
-		print($export->export());
+		$exportData = $export->export();
+		if (!no_errors()) {
+			show_messages();
+		}
+		else {
+			print($exportData);
+		}
 		exit();
 	}
 

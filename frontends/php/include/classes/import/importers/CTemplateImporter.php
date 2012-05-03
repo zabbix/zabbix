@@ -58,8 +58,7 @@ class CTemplateImporter extends CImporter {
 
 				$template = $this->resolveTemplateReferences($template);
 
-				if ($templateId = $this->referencer->resolveTemplate($template['name'])) {
-					$template['templateid'] = $templateId;
+				if (!empty($template['templateid'])) {
 					$templatesToUpdate[] = $template;
 				}
 				else {
@@ -88,8 +87,8 @@ class CTemplateImporter extends CImporter {
 		foreach ($templates as $template) {
 			$unresolvedReferences = array();
 			foreach ($template['templates'] as $linkedTemplate) {
-				if (!$this->referencer->resolveTemplate($linkedTemplate['name'])) {
-					$unresolvedReferences[] = $linkedTemplate['name'];
+				if (!$this->referencer->resolveTemplate($linkedTemplate['template'])) {
+					$unresolvedReferences[] = $linkedTemplate['template'];
 				}
 			}
 			throw new Exception(_n('Cannot import template "%2$s", linked template "%3$s" does not exist.',
@@ -197,6 +196,18 @@ class CTemplateImporter extends CImporter {
 	 * @return array
 	 */
 	protected function resolveTemplateReferences(array $template) {
+		if ($templateId = $this->referencer->resolveTemplate($template['host'])) {
+			$template['templateid'] = $templateId;
+
+			// if we update template, existing macros should have hostmacroid
+			foreach ($template['macros'] as &$macro) {
+				if ($hostMacroId = $this->referencer->resolveMacro($templateId, $macro['macro'])) {
+					$macro['hostmacroid'] = $hostMacroId;
+				}
+			}
+			unset($macro);
+		}
+
 		foreach ($template['groups'] as $gnum => $group) {
 			if (!$this->referencer->resolveGroup($group['name'])) {
 				throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));

@@ -103,6 +103,23 @@ Cscreen.prototype = {
 				element.parent().get(0).appendChild(dropDiv.get(0));
 				parent.appendChild(element.get(0));
 
+				// replace "change" link href for emtpy cells
+				var link = jQuery(element).find('.empty_change_link')[0];
+				if (link) {
+					var href = jQuery(link).attr('href');
+					href = href.replace(/\&x\=[0-9]+/,"&x="+x2);
+					href = href.replace(/\&y\=[0-9]+/,"&y="+y2);
+					jQuery(link).attr('href',href);
+				}
+
+				var link = jQuery(dropDiv).find('.empty_change_link')[0];
+				if (link) {
+					var href = jQuery(link).attr('href');
+					href = href.replace(/\&x\=[0-9]+/,"&x="+x1);
+					href = href.replace(/\&y\=[0-9]+/,"&y="+y1);
+					jQuery(link).attr('href',href);
+				}
+
 				element.data({ycoord: y2, xcoord: x2});
 				dropDiv.data({ycoord: y1, xcoord: x1});
 			}
