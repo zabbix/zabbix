@@ -128,6 +128,7 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
  *
  * @param array $services       an array of services to display in the tree
  * @param array $slaData        sla report data, see CService::getSla()
+ * @param $period
  * @param array $parentService
  * @param array $service
  * @param array $dependency
@@ -135,7 +136,7 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
  *
  * @return array    an array of SLA tree nodes
  */
-function createShowServiceTree(array $services, array $slaData, $period, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
+function createServiceMonitoringTree(array $services, array $slaData, $period, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
 	// if no parent service is given, start from the root
 	if (!$service) {
 		$serviceNode = array(
@@ -273,7 +274,7 @@ function createShowServiceTree(array $services, array $slaData, $period, array $
 
 		foreach ($service['dependencies'] as $dependency) {
 			$childService = $services[$dependency['servicedownid']];
-			$tree = createShowServiceTree($services, $slaData, $period, $service, $childService, $dependency, $tree);
+			$tree = createServiceMonitoringTree($services, $slaData, $period, $service, $childService, $dependency, $tree);
 		}
 	}
 	// soft dependencies
