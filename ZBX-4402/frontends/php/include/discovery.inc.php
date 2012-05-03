@@ -146,8 +146,8 @@ function discovery_status2style($status) {
 
 function discovery_object_status2str($status = null) {
 	$discoveryStatus = array(
-		DOBJECT_STATUS_UP => _('Up'),
-		DOBJECT_STATUS_DOWN => _('Down'),
+		DOBJECT_STATUS_UP => _x('Up', 'discovery status'),
+		DOBJECT_STATUS_DOWN => _x('Down', 'discovery status'),
 		DOBJECT_STATUS_DISCOVER => _('Discovered'),
 		DOBJECT_STATUS_LOST => _('Lost')
 	);

@@ -23,12 +23,12 @@
 
 	$TRANSLATION = array(
 
-	'S_YEAR_SHORT'=>			_('y'),
-	'S_MONTH_SHORT'=>			_('m'),
-	'S_WEEK_SHORT'=>			_('w'),
-	'S_DAY_SHORT'=>				_('d'),
-	'S_HOUR_SHORT' =>			_('h'),
-	'S_MINUTE_SHORT' =>			_('m'),
+	'S_YEAR_SHORT'=>			_x('y', 'year short'),
+	'S_MONTH_SHORT'=>			_x('m', 'month short'),
+	'S_WEEK_SHORT'=>			_x('w', 'week short'),
+	'S_DAY_SHORT'=>				_x('d', 'day short'),
+	'S_HOUR_SHORT' =>			_x('h', 'hour short'),
+	'S_MINUTE_SHORT' =>			_x('m', 'minute short'),
 
 //	exp_imp.php
 	'S_ELEMENT'=>				_('Element'),
@@ -150,6 +150,7 @@
 	'S_CHARTBAR_HOURLY_DATE_FORMAT'=>		_('Y.m.d H:i'),
 	'S_CHARTBAR_DAILY_DATE_FORMAT'=>		_('Y.m.d'),
 	'S_IT_NOTIFICATIONS'=>			_('Notification report'),
+	// GETTEXT: Date format (year). Do not translate.
 	'S_REPORT4_ANNUALLY_DATE_FORMAT'=>	_('Y'),
 	'S_REPORT4_MONTHLY_DATE_FORMAT'=>	_('M Y'),
 	'S_REPORT4_DAILY_DATE_FORMAT'=>		_('d M Y'),
@@ -194,13 +195,13 @@
 	'S_NO_ELEMENTS_SELECTED'=>	_('No elements selected!'),
 
 //	class.calendar.js
-	'S_MONDAY_SHORT_BIG'=>		_('M'),
-	'S_TUESDAY_SHORT_BIG'=>		_('T'),
-	'S_WEDNESDAY_SHORT_BIG'=>	_('W'),
-	'S_THURSDAY_SHORT_BIG'=>	_('T'),
-	'S_FRIDAY_SHORT_BIG'=>		_('F'),
-	'S_SATURDAY_SHORT_BIG'=>	_('S'),
-	'S_SUNDAY_SHORT_BIG'=>		_('S'),
+	'S_MONDAY_SHORT_BIG'=>		_x('M', 'Monday short'),
+	'S_TUESDAY_SHORT_BIG'=>		_x('T', 'Tuesday short'),
+	'S_WEDNESDAY_SHORT_BIG'=>	_x('W', 'Wednesday short'),
+	'S_THURSDAY_SHORT_BIG'=>	_x('T', 'Thursday short'),
+	'S_FRIDAY_SHORT_BIG'=>		_x('F', 'Friday short'),
+	'S_SATURDAY_SHORT_BIG'=>	_x('S', 'Saturday short'),
+	'S_SUNDAY_SHORT_BIG'=>		_x('S', 'Sunday short'),
 	'S_NOW'=>	_('Now'),
 	'S_DONE'=>	_('Done'),
 
