@@ -30,12 +30,13 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 {
 	const char		*p;
 	struct zbx_json_parse	jp, jp_data, jp_row;
-	char			value[MAX_BUFFER_LEN];
+	char			*value = NULL;
+	size_t			value_alloc = 0;
 	int			i, ret = GATEWAY_ERROR;
 
 	if (SUCCEED == zbx_json_open(response, &jp))
 	{
-		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_RESPONSE, &value, &value_alloc))
 		{
 			zbx_snprintf(error, max_error_len, "No '%s' tag in received JSON", ZBX_PROTO_TAG_RESPONSE);
 			goto exit;
@@ -68,7 +69,7 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 					goto exit;
 				}
 
-				if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value)))
+				if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 				{
 					if (SUCCEED == set_result_type(&results[i],
 								items[i].value_type, items[i].data_type, value))
@@ -76,7 +77,7 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 					else
 						errcodes[i] = NOTSUPPORTED;
 				}
-				else if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, value, sizeof(value)))
+				else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &value, &value_alloc))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, value));
 					errcodes[i] = NOTSUPPORTED;
@@ -112,6 +113,8 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 		goto exit;
 	}
 exit:
+	zbx_free(value);
+
 	return ret;
 }
 
