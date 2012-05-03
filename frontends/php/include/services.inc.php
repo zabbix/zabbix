@@ -174,21 +174,35 @@ function createShowServiceTree(array $services, array $slaData, $period, array $
 		$slaValues = reset($serviceSla['sla']);
 
 		// caption
+		// remember the selected time period when following the bar link
+		$periods = array(
+			'today' => 'daily',
+			'week' => 'weekly',
+			'month' => 'monthly',
+			'year' => 'yearly',
+			24 => 'daily',
+			24 * 7 => 'weekly',
+			24 * 30 => 'monthly',
+			24 * DAY_IN_YEAR => 'yearly'
+		);
+
+		$caption = array(new CLink(
+			array(get_node_name_by_elid($service['serviceid'], null, ': '), $service['name']),
+			'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period]
+		));
 		$trigger = $service['trigger'];
-		$caption = array(get_node_name_by_elid($service['serviceid'], null, ': '), $service['name']);
 		if ($trigger) {
 			$url = new CLink($trigger['description'],
 				'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
 			);
-			$caption[] = ' [';
+			$caption[] = ' - ';
 			$caption[] = $url;
-			$caption[] = ']';
 		}
 
 		// reason
 		$problemList = '-';
 		if ($serviceSla['problems']) {
-			$problemList = new CList(null, 'itservices');
+			$problemList = new CList(null, 'service-problems');
 			foreach ($serviceSla['problems'] as $problemTrigger) {
 				$problemList->addItem(new CLink($problemTrigger['description'],
 					'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
@@ -211,43 +225,39 @@ function createShowServiceTree(array $services, array $slaData, $period, array $
 
 			$chart1 = null;
 			if ($widthGreen > 0) {
-				$chart1 = new CDiv(null, 'sla-bar sla-green');
+				$chart1 = new CDiv(null, 'sla-bar-part sla-green');
 				$chart1->setAttribute('style', 'width: '.$widthGreen.'px;');
 			}
 			$chart2 = null;
 			if ($widthRed > 0) {
-				$chart2 = new CDiv(null, 'sla-bar sla-red');
+				$chart2 = new CDiv(null, 'sla-bar-part sla-red');
 				$chart2->setAttribute('style', 'width: '.$widthRed.'px;');
 			}
+			$bar = new CLink(array(
+				$chart1,
+				$chart2,
+				new CDiv('80%', 'sla-bar-legend sla-bar-legend-start'),
+				new CDiv('100%', 'sla-bar-legend sla-bar-legend-end')
+			), 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'));
+			$bar = new CDiv($bar, 'sla-bar');
+			$bar->setAttribute('title', _('Only the last 20% of the indicator is displayed.'));
 
-			// remember the selected time period when following the bar link
-			$periods = array(
-				'today' => 'daily',
-				'week' => 'weekly',
-				'month' => 'monthly',
-				'year' => 'yearly',
-				24 => 'daily',
-				24 * 7 => 'weekly',
-				24 * 30 => 'monthly',
-				24 * DAY_IN_YEAR => 'yearly'
-			);
-			$slaBar = new CLink(array($chart1, $chart2, SPACE, new CSpan(sprintf('%.2f', $slaBad), 'underline')),
-				'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period],
-				'image '.(($service['goodsla'] > $slaGood) ? 'on' : 'off')
+			$slaBar = array(
+				$bar,
+				new CSpan(sprintf('%.4f', $slaBad), 'sla-value '.(($service['goodsla'] > $slaGood) ? 'red' : 'green'))
 			);
 
 			$sla = new CDiv($slaBar, 'invisible');
 			$sla2 = array(
-				new CSpan(sprintf('%.2f', $service['goodsla']), 'green'),
+				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? 'red' : 'green')),
 				' / ',
-				new CSpan(sprintf('%.2f', $slaGood), ($service['goodsla'] > $slaGood) ? 'red' : 'green')
+				new CSpan(sprintf('%.4f', $service['goodsla']), 'sla-value')
 			);
 		}
 
 		$serviceNode = array(
 			'serviceid' => $service['serviceid'],
 			'caption' => $caption,
-			'graph' => ($service['showsla']) ? new CLink(_('Show'), 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path')) : '-',
 			'description' => ($service['trigger']) ? $service['trigger']['description'] : _('None'),
 			'reason' => $problemList,
 			'sla' => $sla,
@@ -268,8 +278,7 @@ function createShowServiceTree(array $services, array $slaData, $period, array $
 	}
 	// soft dependencies
 	else {
-		$serviceNode['caption'] = new CSpan($serviceNode['caption']);
-		$serviceNode['caption']->setAttribute('style', 'color: #888888;');
+		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'service-caption-soft');
 
 		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
 	}

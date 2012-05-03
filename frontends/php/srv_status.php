@@ -159,8 +159,7 @@ else {
 			'status' => _('Status'),
 			'reason' => _('Reason'),
 			'sla' => _('Problem time'),
-			'sla2' => nbsp(_('Acceptable SLA').' / '._('SLA')),
-			'graph' => _('Graph')
+			'sla2' => nbsp(_('SLA').' / '._('Acceptable SLA'))
 		)
 	);
 
@@ -178,7 +177,7 @@ else {
 		}
 		$r_form->addItem(array(_('Period').SPACE, $period_combo));
 
-		$srv_wdgt = new CWidget('hat_services');
+		$srv_wdgt = new CWidget('hat_services', 'service-mon');
 		$srv_wdgt->addPageHeader(_('IT SERVICES'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 		$srv_wdgt->addHeader(_('IT services'), $r_form);
 		$srv_wdgt->addItem(BR());
