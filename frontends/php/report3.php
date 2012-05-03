@@ -217,7 +217,7 @@ foreach ($sla['sla'] as $intervalSla) {
 		($intervalSla['downtimeTime'] % SEC_PER_HOUR) / SEC_PER_MIN
 	);
 
-	$percentage = new CSpan(sprintf('%2.2f%%', $intervalSla['sla']), 'off');
+	$percentage = new CSpan(sprintf('%2.4f', $intervalSla['sla']), ($intervalSla['sla'] >= $service['goodsla'] ? 'off' : 'on'));
 
 	$table->addRow(array(
 		format_time($intervalSla['from']),
@@ -226,7 +226,7 @@ foreach ($sla['sla'] as $intervalSla) {
 		$problems,
 		$downtime,
 		($service['showsla']) ? $percentage : '-',
-		($service['showsla']) ? new CSpan($service['goodsla'], $intervalSla['sla'] >= $service['goodsla'] ? 'off' : 'on') : '-'
+		($service['showsla']) ? new CSpan($service['goodsla']) : '-'
 	));
 }
 $table->show();
