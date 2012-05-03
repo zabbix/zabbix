@@ -548,58 +548,116 @@ table.warningTable tr.content.center { text-align: center; }
 
 /* setup wizard */
 .setupBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
-
-div.setup_wizard { margin: 15px auto 0 auto; width: 800px; height: 541px; background: url(../images/general/setup/background.png) no-repeat; }
-div.setup_wizard_licence { text-align:left;  margin-left: 10px; margin-top: 80px; }
-div.setup_wizard div.left { float:left;	width: 220px; margin: 40px 0 0 20px; }
-div.setup_wizard div.setup_logo { background: url(../images/general/setup/logo.png) no-repeat; height: 53px; margin-left: 10px; }
-div.setup_wizard div.setup_version { margin-left: 20px; color: #608CB6;	font-weight: bold; font-size:16px; }
+div.setup_wizard {
+	margin: 15px auto 0;
+	width: 800px;
+	height: 541px;
+	background: url(../images/general/setup/background.png) no-repeat;
+}
+div.setup_wizard_licence {
+	margin-top: 80px;
+	margin-left: 10px;
+	text-align: left;
+}
+div.setup_wizard div.left {
+	float: left;
+	margin: 40px 0 0 20px;
+	width: 220px;
+}
+div.setup_wizard div.setup_logo {
+	margin-left: 10px;
+	height: 53px;
+	background: url(../images/general/setup/logo.png) no-repeat;
+}
+div.setup_wizard div.setup_version {
+	margin-left: 20px;
+	color: #608CB6;
+	font-weight: bold;
+	font-size: 16px;
+}
 div.setup_wizard div.first_page_img {
-	background: url(../images/general/setup/leaf.jpg) no-repeat;  height: 380px; width: 530px;
+	width: 530px;
+	height: 380px;
+	background: url(../images/general/setup/leaf.jpg) no-repeat;
 }
-div.setup_wizard div.left_menu { margin: 50px 0 0; }
-div.setup_wizard div.left_menu ul { list-style-type: none; }
-div.setup_wizard div.left_menu li{
-	color: #608cb6; font-weight: bold; font-size:12px; padding: 5px; margin: 1px 0 0;
+div.setup_wizard div.left_menu { margin: 50px 0 0 }
+div.setup_wizard div.left_menu ul { list-style-type: none }
+div.setup_wizard div.left_menu li {
+	margin: 1px 0 0;
+	padding: 5px;
+	color: #608cb6;
+	font-weight: bold;
+	font-size: 12px;
 }
-div.setup_wizard div.left_menu li.current { color: #fff; background: #608CB6; }
-div.setup_wizard div.left_menu li.completed { color: #BDE5EE; background: #A4BDD5; }
-div.setup_wizard div.right { float:left; width:530px; margin: 40px 0 0; }
+div.setup_wizard div.left_menu li.current {
+	background: #608CB6;
+	color: #fff;
+}
+div.setup_wizard div.left_menu li.completed {
+	background: #A4BDD5;
+	color: #BDE5EE;
+}
+div.setup_wizard div.right {
+	float: left;
+	margin: 40px 0 0;
+	width: 530px;
+}
 div.setup_wizard div.right div.setup_title {
-	font-size:20px; background:#608CB6; color:white; padding:10px;
-	text-align:left;
+	padding: 10px;
+	background: #608CB6;
+	color: #FFF;
+	text-align: left;
+	font-size: 20px;
 }
-div.setup_wizard div.right div.blank_title {
-	height: 38px;
-}
+div.setup_wizard div.right div.blank_title { height: 38px }
 div.setup_wizard div.under_title {
-	border:1px solid #CCC; background: #FFF; height: 380px; text-align: center;  width:530px;
-	word-break: break-all; display: table-cell; vertical-align: middle;
+	display: table-cell;
+	width: 530px;
+	height: 380px;
+	border: 1px solid #CCC;
+	background: #FFF;
+	vertical-align: middle;
+	text-align: center;
+	word-break: break-all;
 }
 div.setup_wizard div.under_title div.table_wraper {
-	height: 300px; text-align: center;  width:528px; word-break: break-all; overflow-y:auto;
+	overflow-y: auto;
+	width: 528px;
+	height: 300px;
+	text-align: center;
+	word-break: break-all;
 }
 div.setup_wizard div.under_title div.table_wraper div.vertical_center {
-	height: 300px; width:530px; display: table-cell; vertical-align: middle;
+	display: table-cell;
+	width: 530px;
+	height: 300px;
+	vertical-align: middle;
 }
 div.setup_wizard div.under_title div.info_bar {
-	height: 80px; width:530px; text-align: center; border-top:1px solid #CCC; display: table-cell; vertical-align: middle;
+	display: table-cell;
+	width: 530px;
+	height: 80px;
+	border-top: 1px solid #CCC;
+	vertical-align: middle;
+	text-align: center;
 }
 div.setup_wizard div.licence_agree {
-	text-align: center;
-	background: #EEE;
 	padding: 10px;
+	background: #EEE;
+	text-align: center;
 }
 div.setup_wizard div.licence {
-	text-align: left; height: 332px; padding: 5px; background-color: white; overflow-y: scroll; }
-div.setup_wizard div.text { text-align: left; padding:10px; }
-div.setup_wizard div.footer { clear: both; }
-div.setup_wizard div.footer div.footer_left { float: left; margin: 15px 0 0 10px; }
-div.setup_wizard div.footer div.footer_right { float: right; margin: 15px 29px 0; }
-
-div.setup_wizard div.footer {
-	clear: both;
+	overflow-y: scroll;
+	padding: 5px;
+	height: 332px;
+	background-color: white;
+	text-align: left;
 }
+div.setup_wizard div.text {
+	padding: 10px;
+	text-align: left;
+}
+div.setup_wizard div.footer { clear: both }
 div.setup_wizard div.footer div.footer_left {
 	float: left;
 	margin: 15px 0 0 10px;
