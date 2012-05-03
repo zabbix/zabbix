@@ -4232,8 +4232,7 @@ void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
 
 	if (NULL != (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
 	{
-		zbx_strpool_release(dc_trigger->error);
-		dc_trigger->error = zbx_strpool_intern(error);
+		DCstrpool_replace(1, &dc_trigger->error, error);
 		dc_trigger->value = value;
 		dc_trigger->value_flags = value_flags;
 	}
