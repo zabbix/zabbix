@@ -3,10 +3,12 @@ Changes for 2.0.0rc4
 
 New features:
 ...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
-..F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Greek, Japanese, Russian and Spanish translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, Greek, Japanese, Latvian, Polish, Russian, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+..F.....S. [ZBX-4412] fixed updating of trigger last change by significant event (Sasha)
+A......... [ZBX-4880] fixed error 'JSON-rpc error generation failed. No such error' in API (Vedmak)
 ..F....... [ZBX-4922] fixed importing of linked templates (Vedmak)
 ..F....... [ZBX-4895] fixed host proxy exported as id (Vedmak)
 .......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
