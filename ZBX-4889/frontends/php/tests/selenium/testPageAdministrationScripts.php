@@ -84,7 +84,7 @@ class testPageAdministrationScripts extends CWebTest {
 		$this->ok('Script deleted');
 
 		$sql = 'SELECT * FROM scripts';
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Not all scripts has been deleted from the "scripts" table');
+		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Not all scripts have been deleted from the "scripts" table');
 
 		DBrestore_tables('scripts');
 	}

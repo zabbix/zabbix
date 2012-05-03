@@ -25,6 +25,13 @@
 abstract class CExportWriter {
 
 	/**
+	 * Determines if output should be formatted.
+	 *
+	 * @var bool
+	 */
+	protected  $formatOutput = true;
+
+	/**
 	 * Convert array with export data to required format.
 	 *
 	 * @abstract
@@ -34,4 +41,15 @@ abstract class CExportWriter {
 	 * @return string
 	 */
 	abstract public function write(array $array);
+
+	/**
+	 * Enable or dsable output formatting. Enabled by default.
+	 *
+	 * @param bool $value
+	 *
+	 * @return mixed
+	 */
+	public function formatOutput($value) {
+		$this->formatOutput = $value;
+	}
 }

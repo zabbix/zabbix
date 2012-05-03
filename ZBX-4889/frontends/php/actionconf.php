@@ -502,14 +502,14 @@ $_REQUEST['eventsource'] = get_request('eventsource', CProfile::get('web.actionc
 				$operations[] = get_operation_desc(SHORT_DESCRIPTION, $operation);
 			}
 
-			if($action['status'] == ACTION_STATUS_DISABLED){
+			if ($action['status'] == ACTION_STATUS_DISABLED) {
 				$status= new CLink(_('Disabled'),
-					'actionconf.php?go=activate&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
+					'actionconf.php?go=activate&g_actionid'.SQUAREBRACKETS.'='.$action['actionid'].url_param('eventsource'),
 					'disabled');
 			}
-			else{
+			else {
 				$status= new CLink(_('Enabled'),
-					'actionconf.php?go=disable&g_actionid%5B%5D='.$action['actionid'].url_param('eventsource'),
+					'actionconf.php?go=disable&g_actionid'.SQUAREBRACKETS.'='.$action['actionid'].url_param('eventsource'),
 					'enabled');
 			}
 

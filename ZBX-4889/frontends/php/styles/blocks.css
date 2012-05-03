@@ -349,7 +349,7 @@ div.calendar input.calendar_textbox {
 	cursor: default;
 	text-decoration: none;
 	border: black 1px solid;
-	background: #5c9ccc url(themes/originalblue/images/ui-bg_highlight-hard_55_779dc0_1x100.png) 50% 50% repeat-x;
+	background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;
 	margin: 0;
 }
 .pum_oheader:hover { cursor:pointer; text-decoration: none; }

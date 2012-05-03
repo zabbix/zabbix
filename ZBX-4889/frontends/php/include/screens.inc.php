@@ -492,7 +492,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 				$action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitemid;
 			}
 			elseif ($editmode == 1 && $screenitemid == 0) {
-				$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r.'#form';
+				$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
 			}
 			else {
 				$action = null;
@@ -1268,7 +1268,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 			else {
 				$item = array(SPACE);
 				if ($editmode == 1) {
-					array_push($item, BR(), new CLink(_('Change'), $action));
+					array_push($item, BR(), new CLink(_('Change'), $action, 'empty_change_link'));
 				}
 			}
 
