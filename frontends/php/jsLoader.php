@@ -1,4 +1,24 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2000-2012 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
 // get language translations
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
@@ -64,8 +84,8 @@ $tranStrings = array(
 	'gtlc.js' => array('S_ALL_S', 'S_ZOOM', 'S_FIXED_SMALL', 'S_DYNAMIC_SMALL', 'S_NOW_SMALL', 'S_YEAR_SHORT',
 		'S_MONTH_SHORT', 'S_WEEK_SHORT', 'S_DAY_SHORT', 'S_HOUR_SHORT', 'S_MINUTE_SHORT'
 	),
-	'functions.js' => array('DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q', 'S_INSERT_MACRO', 'S_ADD_SERVICE',
-		'S_EDIT_SERVICE', 'S_DELETE_SERVICE', 'S_DELETE_SELECTED_SERVICES_Q', 'S_CREATE_LOG_TRIGGER', 'S_DELETE',
+	'functions.js' => array('DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q', 'S_INSERT_MACRO',
+		'S_CREATE_LOG_TRIGGER', 'S_DELETE',
 		'S_DELETE_KEYWORD_Q', 'S_DELETE_EXPRESSION_Q', 'S_SIMPLE_GRAPHS', 'S_HISTORY', 'S_HISTORY_AND_SIMPLE_GRAPHS'
 	),
 	'class.calendar.js' => array('S_JANUARY', 'S_FEBRUARY', 'S_MARCH', 'S_APRIL', 'S_MAY', 'S_JUNE',
@@ -73,17 +93,17 @@ $tranStrings = array(
 		'S_TUESDAY_SHORT_BIG', 'S_WEDNESDAY_SHORT_BIG', 'S_THURSDAY_SHORT_BIG', 'S_FRIDAY_SHORT_BIG',
 		'S_SATURDAY_SHORT_BIG', 'S_SUNDAY_SHORT_BIG', 'S_TIME', 'S_NOW', 'S_DONE'
 	),
-	'class.cmap.js' => array('S_ON', 'S_OFF', 'S_HIDDEN', 'S_SHOWN', 'S_ERROR', 'S_TYPE', 'S_LABEL', 'S_SHOW', 'S_HIDE',
-		'S_HOST', 'S_MAP', 'S_TRIGGER', 'S_SELECT', 'S_HOST_GROUP', 'S_IMAGE', 'S_URL', 'S_URLS', 'S_BOTTOM', 'S_TOP',
-		'S_LEFT', 'S_RIGHT', 'S_DEFAULT', 'S_REMOVE', 'S_CLOSE', 'S_PLEASE_SELECT_TWO_ELEMENTS', 'S_ELEMENT', 'S_TRIGGERS',
-		'S_COLOR', 'S_ADD', 'S_DESCRIPTION', 'S_NAME', 'S_LINE', 'S_BOLD_LINE', 'S_DOT', 'S_DASHED_LINE', 'S_TWO_ELEMENTS_SHOULD_BE_SELECTED',
-		'S_DELETE_SELECTED_ELEMENTS_Q', 'S_PLEASE_SELECT_TWO_ELEMENTS', 'S_NEW_ELEMENT', 'S_SELECT', 'S_INCORRECT_ELEMENT_MAP_LINK',
+	'class.cmap.js' => array('S_ON', 'S_OFF', 'S_HIDDEN', 'S_SHOWN',
+		'S_HOST', 'S_MAP', 'S_TRIGGER', 'S_HOST_GROUP', 'S_IMAGE',
+		'S_DEFAULT', 'S_CLOSE', 'S_PLEASE_SELECT_TWO_ELEMENTS',
+		'S_DOT', 'S_TWO_ELEMENTS_SHOULD_BE_SELECTED',
+		'S_DELETE_SELECTED_ELEMENTS_Q', 'S_PLEASE_SELECT_TWO_ELEMENTS', 'S_NEW_ELEMENT', 'S_INCORRECT_ELEMENT_MAP_LINK',
 		'S_EACH_URL_SHOULD_HAVE_UNIQUE', 'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q', 'S_NO_IMAGES', 'S_ICONMAP_IS_NOT_ENABLED'
 	),
 	'class.cmessages.js' => array('S_MUTE', 'S_UNMUTE', 'S_MESSAGES', 'S_CLEAR', 'S_SNOOZE', 'S_MOVE'),
 	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'),
 	'main.js' => array(
-		'S_CLOSE', 'S_NO_ELEMENTS_SELECTED', 'S_INTERFACES', 'Host screens', 'Go to', 'Latest data',
+		'S_CLOSE', 'S_NO_ELEMENTS_SELECTED', 'Host screens', 'Go to', 'Latest data',
 		'Scripts', 'Host inventories'
 	)
 );
@@ -149,4 +169,3 @@ header('Cache-Control: public, must-revalidate');
 header('ETag: '.$ETag);
 
 echo $js;
-?>

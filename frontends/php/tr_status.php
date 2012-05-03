@@ -166,7 +166,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 
 	$r_form = new CForm('get');
 	$r_form->addItem(array(_('Group') . SPACE, $pageFilter->getGroupsCB(true)));
-	$r_form->addItem(array(SPACE . S_HOST . SPACE, $pageFilter->getHostsCB(true)));
+	$r_form->addItem(array(SPACE . _('Host') . SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
