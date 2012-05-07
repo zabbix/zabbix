@@ -807,13 +807,16 @@ class CXmlImport18 {
 						? API::Template()->exists($host_db)
 						: API::Host()->exists($host_db);
 
-				if(!$current_host && !isset($rules['hosts']['createMissing'])){
-					info('Host ['.$host_db['host'].'] skipped - user rule');
-					continue; // break if update nonexist
+				if(!$current_host
+						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && !isset($rules['templates']['createMissing']))
+							|| ($host_db['status'] != HOST_STATUS_TEMPLATE && !isset($rules['hosts']['createMissing'])))) {
+					continue;
 				}
-				if($current_host && !isset($rules['hosts']['updateExisting'])){
-					info('Host ['.$host_db['host'].'] skipped - user rule');
-					continue; // break if not update updateExisting
+
+				if($current_host
+						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && !isset($rules['templates']['updateExisting']))
+								|| ($host_db['status'] != HOST_STATUS_TEMPLATE && !isset($rules['hosts']['updateExisting'])))) {
+					continue;
 				}
 
 				// there were no host visible names in 1.8
@@ -998,9 +1001,9 @@ class CXmlImport18 {
 
 // MACROS
 				$macros = $xpath->query('macros/macro', $host);
-				if($macros->length > 0){
+				if ($macros->length > 0) {
 					$host_db['macros'] = array();
-					foreach($macros as $macro){
+					foreach ($macros as $macro) {
 						$host_db['macros'][] = self::mapXML2arr($macro, XML_TAG_MACRO);
 					}
 				}
@@ -1008,36 +1011,29 @@ class CXmlImport18 {
 
 
 // TEMPLATES {{{
-				if(isset($rules['templates']['updateExisting'])){
+				if (isset($rules['templateLinkage']['createMissing'])) {
 					$templates = $xpath->query('templates/template', $host);
 
-					$host_db['templates'] = array();
-					foreach($templates as $template){
-
+					$templateLinkage = array();
+					foreach ($templates as $template) {
 						$options = array(
 							'filter' => array('host' => $template->nodeValue),
-							'output' => API_OUTPUT_EXTEND,
-							'editable' => 1
+							'output' => API_OUTPUT_SHORTEN,
+							'editable' => true
 						);
 						$current_template = API::Template()->get($options);
 
-						if(empty($current_template)){
-							throw new Exception('No permission for Template ['.$template->nodeValue.']');
+						if (empty($current_template)) {
+							throw new Exception(_s('No permission for template "%1$s".', $template->nodeValue));
 						}
-
 						$current_template = reset($current_template);
 
+						$templateLinkage[] = $current_template;
+					}
 
-						if(!$current_template && !isset($rules['templates']['createMissing'])){
-							info('Template ['.$template->nodeValue.'] skipped - user rule');
-							continue;
-						}
-						if($current_template && !isset($rules['templates']['updateExisting'])){
-							info('Template ['.$template->nodeValue.'] skipped - user rule');
-							continue;
-						}
-
-						$host_db['templates'][] = $current_template;
+					$result = API::Template()->massAdd(array('hosts' => $host_db, 'templates' => $templateLinkage));
+					if (!$result) {
+						throw new Exception();
 					}
 				}
 // }}} TEMPLATES
