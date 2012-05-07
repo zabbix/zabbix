@@ -381,9 +381,9 @@ define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
 define('MAP_LINK_DRAWTYPE_DOT',				3);
 define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
-define('SERVICE_ALGORITHM_NONE',	0);
-define('SERVICE_ALGORITHM_MAX',		1);
-define('SERVICE_ALGORITHM_MIN',		2);
+define('SERVICE_ALGORITHM_NONE',	0); // do not calculate
+define('SERVICE_ALGORITHM_MAX',		1); // problem, if one children has a problem
+define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
 
 define('SERVICE_SLA', 99.05);
 

@@ -554,6 +554,7 @@ class CService extends CZBXAPI {
 			'output' => array('serviceid', 'name', 'status', 'algorithm'),
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectParentDependencies' => array('serviceupid'),
+			'selectDependencies' => array('servicedownid'),
 			'selectTrigger' => API_OUTPUT_EXTEND,
 			'serviceids' => $serviceIds,
 			'preservekeys' => true
@@ -950,6 +951,7 @@ class CService extends CZBXAPI {
 
 	/**
 	 * Escalates the problem triggers from the child services to their parents and adds them to $slaData.
+	 * Status escalation is done according to the chosen service status update algorithm.
 	 *
 	 * @param array $services
 	 * @param array $serviceProblems    an array of service triggers defines as
@@ -979,8 +981,26 @@ class CService extends CZBXAPI {
 			}
 		}
 
+		// propagate the problems to the parents
 		if ($parentProblems) {
 			$slaData = $this->escalateProblems($services, $parentProblems, $slaData);
+		}
+		else {
+			// once we've reached the top, clear the problems from all services that use the SERVICE_ALGORITHM_MIN
+			// algorithm, but don't have all children in problem state
+			foreach ($slaData as $serviceId => &$serviceSla) {
+				$service = $services[$serviceId];
+				if ($service['algorithm'] == SERVICE_ALGORITHM_MIN) {
+					foreach ($service['dependencies'] as $dependency) {
+						$childServiceId = $dependency['servicedownid'];
+
+						if (isset($services[$childServiceId]) && $services[$childServiceId]['status'] == 0) {
+							$serviceSla['problems'] = array();
+						}
+					}
+				}
+			}
+			unset($serviceSla);
 		}
 
 		return $slaData;
