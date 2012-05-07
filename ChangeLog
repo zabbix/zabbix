@@ -2,6 +2,7 @@
 Changes for 2.0.0rc4
 
 New features:
+..F....... [ZBXNEXT-1196] redesigned setup form (Toms)
 ...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
 ..F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, Greek, Japanese, Latvian, Polish, Russian, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
