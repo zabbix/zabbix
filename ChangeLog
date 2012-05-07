@@ -8,6 +8,7 @@ New features:
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4938] fixed constant not used in CAction.php (Toms)
 ..F....... [ZBX-4926] fixed unable to add simple graphs and plain text to screen templates (Toms)
 ........S. [ZBX-4921] fixed possible SQL errors while processing LLD data with long values (Sasha)
 ........S. [ZBX-4889] fixed execution of GUI Scripts for disabled hosts (Sasha)
