@@ -91,6 +91,9 @@ frontends/php/images/general/ok_bb.png -text
 frontends/php/images/general/ok_icon.png -text
 frontends/php/images/general/ok_icon_bb.png -text
 frontends/php/images/general/opened.gif -text svneol=unset#unset
+frontends/php/images/general/setup/background.png -text
+frontends/php/images/general/setup/leaf.jpg -text
+frontends/php/images/general/setup/logo.png -text
 frontends/php/images/general/snmp_available.png -text
 frontends/php/images/general/snmp_available_bb.png -text
 frontends/php/images/general/snmp_unavailable.png -text
@@ -174,11 +177,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/import/importers/CAbstractScreenImporter.php -text
-frontends/php/include/classes/import/importers/CScreenImporter.php -text
-frontends/php/include/classes/import/importers/CTemplateImporter.php -text
-frontends/php/include/classes/import/importers/CTemplateScreenImporter.php -text
-frontends/php/include/views/general.script.execute.php -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
 frontends/php/locale/el/LC_MESSAGES/frontend.po -text
@@ -515,9 +513,6 @@ misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
-src/libs/zbxsysinfo/agent/Makefile.am -text
-src/libs/zbxsysinfo/agent/agent.c -text
-src/libs/zbxsysinfo/agent/agent.h -text
 src/zabbix_java/lib/logback-classic-0.9.27.jar -text
 src/zabbix_java/lib/logback-core-0.9.27.jar -text
 src/zabbix_java/lib/org-json-2010-12-28.jar -text

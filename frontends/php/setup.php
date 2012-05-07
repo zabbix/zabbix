@@ -121,6 +121,8 @@ zbx_set_post_cookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
+include('include/views/js/setup.js.php');
+
 /*
  * Check configuration
  */

@@ -42,7 +42,7 @@ class CConfigurationExport {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $options    ids of elements that should be exported.
+	 * @param array $options ids of elements that should be exported.
 	 */
 	public function __construct(array $options) {
 		$this->options = array(
@@ -272,6 +272,22 @@ class CConfigurationExport {
 			$hosts[$application['hostid']]['applications'][] = $application;
 		}
 
+		// proxies
+		$dbProxies = DBselect('SELECT h.hostid, h.host FROM hosts h WHERE '.
+				DBcondition('h.hostid', zbx_objectValues($hosts, 'proxy_hostid')));
+		$proxies = array();
+		while ($proxy = DBfetch($dbProxies)) {
+			$proxies[$proxy['hostid']] = $proxy['host'];
+		}
+
+		foreach ($hosts as &$host) {
+			if ($host['proxy_hostid']) {
+				$host['proxy'] = array('name' => $proxies[$host['proxy_hostid']]);
+			}
+		}
+		unset($host);
+
+
 		$this->data['hosts'] = $hosts;
 
 		$this->gatherHostItems();
@@ -342,16 +358,16 @@ class CConfigurationExport {
 	protected function prepareItems(array $items) {
 		// gather value maps
 		$valueMapIds = zbx_objectValues($items, 'valuemapid');
-		$DbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
-		$valueMaps = array();
-		while ($valueMap = DBfetch($DbValueMaps)) {
-			$valueMaps[$valueMap['valuemapid']] = $valueMap['name'];
+		$dbValueMaps = DBselect('SELECT vm.valuemapid, vm.name FROM valuemaps vm WHERE '.DBcondition('vm.valuemapid', $valueMapIds));
+		$valueMapNames = array();
+		while ($valueMap = DBfetch($dbValueMaps)) {
+			$valueMapNames[$valueMap['valuemapid']] = $valueMap['name'];
 		}
 
 		foreach ($items as &$item) {
 			$item['valuemap'] = array();
 			if ($item['valuemapid']) {
-				$item['valuemap']['name'] = $valueMaps[$item['valuemapid']];
+				$item['valuemap'] = array('name' => $valueMapNames[$item['valuemapid']]);
 			}
 		}
 		unset($item);

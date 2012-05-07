@@ -28,6 +28,7 @@ require_once dirname(__FILE__).'/../../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../../include/nodes.inc.php';
 require_once dirname(__FILE__).'/../../../conf/zabbix.conf.php';
 require_once dirname(__FILE__).'/../../../include/db.inc.php';
+require_once dirname(__FILE__).'/../../../include/classes/db/DB.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../../include/triggers.inc.php';
 require_once dirname(__FILE__).'/../../../include/classes/api/APIException.php';
