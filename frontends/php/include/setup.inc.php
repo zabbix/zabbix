@@ -38,36 +38,28 @@ class CsetupWizard extends CForm {
 
 		$this->stage = array(
 			0 => array(
-				'title' => '1. Introduction',
-				'fnc' => 'stage0'
-			),
-			1 => array(
-				'title' => '2. Licence agreement',
+				'title' => '1. Welcome',
 				'fnc' => 'stage1'
 			),
-			2 => array(
-				'title' => '3. Check of pre-requisites',
+			1 => array(
+				'title' => '2. Check of pre-requisites',
 				'fnc' => 'stage2'
 			),
-			3 => array(
-				'title' => '4. Configure DB connection',
+			2 => array(
+				'title' => '3. Configure DB connection',
 				'fnc' => 'stage3'
 			),
-			4 => array(
-				'title' => '5. Zabbix server details',
+			3 => array(
+				'title' => '4. Zabbix server details',
 				'fnc' => 'stage4'
 			),
-			5 => array(
-				'title' => '6. Pre-Installation summary',
+			4 => array(
+				'title' => '5. Pre-Installation summary',
 				'fnc' => 'stage5'
 			),
-			6 => array(
-				'title' => '7. Install',
+			5 => array(
+				'title' => '6. Install',
 				'fnc' => 'stage6'
-			),
-			7 => array(
-				'title' => '8. Finish',
-				'fnc' => 'stage7'
 			)
 		);
 
@@ -105,27 +97,56 @@ class CsetupWizard extends CForm {
 	}
 
 	function bodyToString($destroy = true) {
-		$table = new CTable(null, 'setup_wizard');
-		$table->setAlign('center');
-		$table->setHeader(array(new CCol('Zabbix'.SPACE.ZABBIX_VERSION, 'left'), SPACE), 'header');
-		$table->addRow(array(SPACE, new CCol($this->stage[$this->getStep()]['title'], 'right')), 'title');
-		$table->addRow(array(new CCol($this->getList(), 'left'), new CCol($this->getState(), 'right')), 'center');
 
-		$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>');
+		$left = new CDiv(null, 'left');
+		$left->addItem(new CDiv(null, 'setup_logo'));
+		$left->addItem(new CDiv(ZABBIX_VERSION, 'setup_version'));
+		$left->addItem(new CDiv($this->getList(), 'left_menu'));
+
+		$right = new CDiv(null, 'right');
+		if ($this->getStep() ==0 ) {
+			$right->addItem(new CDiv(null, 'blank_title'));
+		}
+		else {
+			$right->addItem(new CDiv($this->stage[$this->getStep()]['title'], 'setup_title'));
+		}
+		$right->addItem(new CDiv($this->getState(), 'under_title'));
+
+		$link1 = new CLink('www.zabbix.com', 'http://www.zabbix.com/', null, null, true);
+		$link1->setAttribute('target', '_blank');
+
+		$link2 = new CLink('GPL v2', 'http://www.zabbix.com/license.php', null, null, true);
+		$link2->setAttribute('target', '_blank');
+
+		$licence = new CDiv(array($link1, BR(), ' Licensed under ', $link2), 'setup_wizard_licence');
+		$left->addItem($licence);
+
+		$container = new CDiv(array($left, $right), 'setup_wizard');
+
+		if (isset($this->stage[$this->getStep() + 1])) {
+			$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>');
+			$cancel = new CDiv(new CSubmit('cancel', _('Cancel')), 'footer_left');
+		}
+		else {
+			$next = new CSubmit('finish', _('Finish'));
+			$cancel = null;
+		}
+
 		if ($this->DISABLE_NEXT_BUTTON) {
 			$next->setEnabled(false);
 		}
 
-		$table->setFooter(array(
-			new CCol(new CSubmit('cancel', _('Cancel')), 'left'),
-			new CCol(array(
-				isset($this->stage[$this->getStep() - 1]) ? new CSubmit('back['.$this->getStep().']', '<< '._('Previous')) : null,
-				isset($this->stage[$this->getStep() + 1]) ? $next: new CSubmit('finish', _('Finish'))
-				), 'right')
-			), 'footer'
-		);
+		$footer = new CDiv(array(
+			$cancel,
+			new CDiv(array(
+				$this->getStep() != 0 ? new CSubmit('back['.$this->getStep().']', '<< '._('Previous')) : null,
+				$next), 'footer_right')
+			), 'footer');
 
-		return parent::bodyToString($destroy).$table->ToString();
+		$container->addItem($footer);
+
+
+		return parent::bodyToString($destroy).$container->ToString();
 	}
 
 	function getList() {
@@ -151,40 +172,8 @@ class CsetupWizard extends CForm {
 		return  $this->$fnc();
 	}
 
-	function stage0() {
-		return new CDiv(array(
-			'Welcome to the Zabbix frontend installation wizard.', BR(), BR(),
-			'This installation wizard will guide you through the installation of Zabbix frontend', BR(), BR(),
-			'Click the "Next" button to proceed to the next screen. If you want to change something '.
-			'on a previous screen, click "Previous" button', BR(), BR(),
-			'You may cancel installation at any time by clicking "Cancel" button'),
-			'text'
-		);
-	}
-
 	function stage1() {
-		$LICENCE_FILE = 'conf/COPYING';
-
-		$this->DISABLE_NEXT_BUTTON = true;
-
-		$licence_contents = 'Missing licence file. See GPL licence.';
-		if (file_exists($LICENCE_FILE)) {
-			$licence_contents = zbx_nl2br(nbsp(file_get_contents($LICENCE_FILE)));
-		}
-
-		$action = <<<JS
-if (this.checked) {
-	$('next_1').writeAttribute('disabled', false);
-}
-else {
-	$('next_1').writeAttribute('disabled', 'disabled');
-}
-JS;
-		return array(
-			new CDiv(new CSpan($licence_contents), 'licence'),
-			BR(),
-			new CDiv(array(new CCheckBox('agree', 'no', $action), new CLabel(_('I agree'), 'agree')), 'maxwidth center')
-		);
+		return new CDiv('', 'first_page_img');
 	}
 
 	function stage2() {
@@ -228,19 +217,16 @@ JS;
 			$this->addVar('trouble', true);
 
 			$final_result = array(
-				new CSpan(_('Fail'), 'fail'),
-				BR(), BR(),
 				_('Please correct all issues and press "Retry" button'),
-				BR(), BR(),
-				new CSubmit('retry', _('Retry'))
-			);
+				BR(),
+				new CSubmit('retry', _('Retry')));
 		}
 		else {
 			$this->DISABLE_NEXT_BUTTON = false;
-			$final_result = new CSpan(_('OK'), 'ok');
+			$final_result = array(new CSpan(_('OK'), 'ok'));
 		}
 
-		return array($table, BR(), $final_result);
+		return array(new CDiv(array(BR(), $table, BR()), 'table_wraper'), new CDiv($final_result, 'info_bar'));
 	}
 
 	function stage3() {
@@ -294,16 +280,20 @@ JS;
 		}
 
 		return array(
-			'Please create database manually,', BR(),
+			new CDiv(new CDiv(array('Please create database manually,', BR(),
 			'and set the configuration parameters for connection to this database.',
 			BR(), BR(),
 			'Press "Test connection" button when done.',
 			BR(), BR(),
-			$table,
-			BR(),
-			!$this->DISABLE_NEXT_BUTTON ? new CSpan(_('OK'), 'ok') :  new CSpan(_('Fail'), 'fail'),
-			BR(),
-			new  CSubmit('retry', 'Test connection')
+			$table), 'vertical_center'), 'table_wraper'),
+			new CDiv(array(
+				isset($_REQUEST['type']) ? !$this->DISABLE_NEXT_BUTTON ?
+					new CSpan(array(_('OK'), BR()), 'ok')
+					: new CSpan(array(_('Fail'), BR()), 'fail')
+					: null,
+				new  CSubmit('retry', 'Test connection')
+			), 'info_bar')
+
 		);
 	}
 
@@ -449,34 +439,27 @@ JS;
 
 		$this->DISABLE_NEXT_BUTTON = !$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false);
 
-		$table = new CTable(null, 'requirements');
-		$table->setAlign('center');
 
-		$table->addRow(array('Configuration file: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
+		$table = array('Configuration file', BR(), '"'.$ZBX_CONFIGURATION_FILE.'"', BR(), 'created: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
 			? new CSpan(_('OK'), 'ok')
 			: new CSpan(_('Fail'), 'fail')
-		));
+		);
 
 		return array(
-			$table, BR(),
+			$table, BR(), BR(),
 			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry')), BR(), BR()) : null,
 			!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
 				? array('Please install configuration file manually, or fix permissions on conf directory.', BR(), BR(),
-					'Press "Save configuration file" button, download configuration file ',
+					'Press "Download configuration file" button, download configuration file ',
 					'and save it as ', BR(),
 					'"'.$ZBX_CONFIGURATION_FILE.'"', BR(), BR(),
-					new CSubmit('save_config', 'Save configuration file'),
+					new CSubmit('save_config', 'Download configuration file'),
 					BR(), BR()
 				)
-				: null,
-			'When done, press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Next"').' button'
-		);
-	}
-
-	function stage7() {
-		return array(
-			'Congratulations on successful instalation of Zabbix frontend.', BR(), BR(),
-			'Press "Finish" button to complete installation'
+				: array(
+					'Congratulations on successful instalation of Zabbix frontend.', BR(), BR()
+				),
+			'When done, press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Finish"').' button'
 		);
 	}
 
@@ -532,12 +515,9 @@ JS;
 			if (isset($_REQUEST['next'][$this->getStep()])) {
 				$this->DoNext();
 			}
-		}
-		elseif ($this->getStep() == 2 && isset($_REQUEST['next'][$this->getStep()]) && !isset($_REQUEST['trouble'])) {
-			$this->DoNext();
 			$this->DISABLE_NEXT_BUTTON = true;
 		}
-		elseif ($this->getStep() == 3) {
+		elseif ($this->getStep() == 2) {
 			$this->setConfig('DB_TYPE', get_request('type', $this->getConfig('DB_TYPE')));
 			$this->setConfig('DB_SERVER', get_request('server', $this->getConfig('DB_SERVER', 'localhost')));
 			$this->setConfig('DB_PORT', get_request('port', $this->getConfig('DB_PORT', '0')));
@@ -561,7 +541,7 @@ JS;
 				$this->DoNext();
 			}
 		}
-		elseif ($this->getStep() == 4) {
+		elseif ($this->getStep() == 3) {
 			$this->setConfig('ZBX_SERVER', get_request('zbx_server', $this->getConfig('ZBX_SERVER', 'localhost')));
 			$this->setConfig('ZBX_SERVER_PORT', get_request('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051')));
 			$this->setConfig('ZBX_SERVER_NAME', get_request('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
@@ -569,10 +549,10 @@ JS;
 				$this->DoNext();
 			}
 		}
-		elseif ($this->getStep() == 5 && isset($_REQUEST['next'][$this->getStep()])) {
+		elseif ($this->getStep() == 4 && isset($_REQUEST['next'][$this->getStep()])) {
 			$this->DoNext();
 		}
-		elseif ($this->getStep() == 6) {
+		elseif ($this->getStep() == 5) {
 			if (isset($_REQUEST['save_config'])) {
 				global $ZBX_CONFIGURATION_FILE;
 
