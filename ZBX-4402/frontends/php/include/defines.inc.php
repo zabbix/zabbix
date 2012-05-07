@@ -868,6 +868,8 @@ define('THEME_DEFAULT', 'default');
 // the default theme
 define('ZBX_DEFAULT_THEME', 'originalblue');
 
+define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
+
 // date formats
 define('HISTORY_OF_ACTIONS_DATE_FORMAT', _('d M Y H:i:s'));
 define('EVENT_ACTION_MESSAGES_DATE_FORMAT', _('d M Y H:i:s'));
@@ -889,6 +891,9 @@ define('REPORT4_WEEKLY_DATE_FORMAT', _('d M Y H:i'));
 define('REPORTS_BAR_REPORT_DATE_FORMAT', _('d M Y H:i:s'));
 define('POPUP_PERIOD_CAPTION_DATE_FORMAT', _('d M Y H:i:s'));
 define('MAPS_DATE_FORMAT', _('Y.m.d H:i:s'));
+define('SERVER_INFO_DATE_FORMAT', _('D, d M Y H:i:s O'));
+define('XML_DATE_DATE_FORMAT', _('d.m.y'));
+define('XML_TIME_DATE_FORMAT', _('H.i'));
 
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
