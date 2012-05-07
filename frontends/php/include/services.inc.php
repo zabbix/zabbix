@@ -88,37 +88,80 @@ function get_service_childs($serviceid, $soft = 0) {
 	return $childs;
 }
 
-function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $parentid = 0, $soft = 0, $linkid = '') {
-	$rows = $services[$id];
-	if ($rows['serviceid'] > 0 && $rows['caption'] != 'root') {
-		$rows['algorithm'] = serviceAlgorythm($rows['algorithm']);
+/**
+ * Creates nodes that can be used to display the service configuration tree using the CTree class.
+ *
+ * @see CTree
+ *
+ * @param array $services
+ * @param array $parentService
+ * @param array $service
+ * @param array $dependency
+ * @param array $tree
+ *
+ * @return array
+ */
+function createServiceConfigurationTree(array $services, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
+	if (!$service) {
+		$serviceNode = array(
+			'serviceid' => 0,
+			'parentid' => 0,
+			'caption' => _('root'),
+			'trigger' => array(),
+			'algorithm' => SPACE,
+			'description' => SPACE
+		);
+
+		$service = $serviceNode;
+		$service['dependencies'] = array();
+		$service['trigger'] = array();
+		$service['parent'] = array();
+
+		// add all top level services as children of "root"
+		foreach ($services as $topService) {
+			if (!$topService['parent']) {
+				$service['dependencies'][] = array(
+					'servicedownid' => $topService['serviceid'],
+					'soft' => 0,
+					'linkid' => 0
+				);
+			}
+		}
+
+		$tree = array($serviceNode);
+	}
+	else {
+		// caption
+		$caption = new CSpan($service['name'], 'link');
+		$caption->setAttribute('onclick', 'javascript: call_menu(event, '.CJs::encodeJson($service['serviceid']).','.CJs::encodeJson($service['name']).');');
+
+		$serviceNode = array(
+			'serviceid' => $service['serviceid'],
+			'caption' => $caption,
+			'description' => ($service['trigger']) ? $service['trigger']['description'] : '-',
+			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
+			'algorithm' => serviceAlgorythm($service['algorithm'])
+		);
 	}
 
-	$rows['parentid'] = $parentid;
-	if ($soft == 0) {
-		$caption_tmp = $rows['caption'];
-		$rows['caption'] = new CSpan($rows['caption'], 'link');
-		$rows['caption']->setAttribute('onclick', 'javascript: call_menu(event, '.zbx_jsvalue($rows['serviceid']).','.zbx_jsvalue($caption_tmp).');');
-		$temp[$rows['serviceid']] = $rows;
+	if (!$dependency || !$dependency['soft']) {
+		$caption_tmp = $serviceNode['caption'];
+		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'link');
+		$serviceNode['caption']->setAttribute('onclick', 'javascript: call_menu(event, '.zbx_jsvalue($serviceNode['serviceid']).','.zbx_jsvalue($caption_tmp).');');
+		$tree[$serviceNode['serviceid']] = $serviceNode;
 
-		if (isset($rows['childs'])) {
-			foreach ($rows['childs'] as $nodeid) {
-				if (!isset($services[$nodeid['id']])) {
-					continue;
-				}
-				if (isset($services[$nodeid['id']]['serviceupid'])) {
-					createServiceTree($services, $temp, $nodeid['id'], $services[$nodeid['id']]['serviceupid'], $rows['serviceid'], $nodeid['soft'], $nodeid['linkid']);
-				}
-			}
+		foreach ($service['dependencies'] as $dependency) {
+			$childService = $services[$dependency['servicedownid']];
+			$tree = createServiceConfigurationTree($services, $service, $childService, $dependency, $tree);
 		}
 	}
 	else {
-		if ($rows['serviceid'] != 0 && $linkid != 0) {
-			$rows['caption'] = new CSpan($rows['caption'], 'unknown');
-			$temp[$rows['serviceid'].'.'.$linkid] = $rows;
-		}
+		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'unknown');
+
+		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
 	}
-	return null;
+
+	return $tree;
 }
 
 /**
@@ -285,20 +328,6 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, a
 	}
 
 	return $tree;
-}
-
-function del_empty_nodes($services) {
-	do {
-		unset($retry);
-		foreach ($services as $id => $data) {
-			if (isset($data['serviceupid']) && !isset($services[$data['serviceupid']])) {
-				unset($services[$id]);
-				$retry = true;
-			}
-		}
-	} while (isset($retry));
-
-	return $services;
 }
 
 /******************************************************************************
