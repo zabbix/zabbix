@@ -300,8 +300,8 @@ class CXmlImport18 {
 
 		$root = $doc->appendChild(new DOMElement('zabbix_export'));
 		$root->setAttributeNode(new DOMAttr('version', '1.0'));
-		$root->setAttributeNode(new DOMAttr('date', zbx_date2str(_('d.m.y'))));
-		$root->setAttributeNode(new DOMAttr('time', zbx_date2str(_('H.i'))));
+		$root->setAttributeNode(new DOMAttr('date', zbx_date2str(XML_DATE_DATE_FORMAT)));
+		$root->setAttributeNode(new DOMAttr('time', zbx_date2str(XML_TIME_DATE_FORMAT)));
 
 		return $root;
 	}

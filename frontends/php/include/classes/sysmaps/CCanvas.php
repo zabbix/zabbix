@@ -70,7 +70,7 @@ class CCanvas{
 	public function getCanvas(){
 		$date = zbx_date2str(MAPS_DATE_FORMAT);
 		imagestring($this->canvas, 0, $this->width - 120, $this->height - 12, $date, $this->getColor('gray'));
-		imagestringup($this->canvas, 0, $this->width - 10, $this->height - 50, 'http://www.zabbix.com', $this->getColor('gray'));
+		imagestringup($this->canvas, 0, $this->width - 10, $this->height - 50, ZABBIX_HOMEPAGE, $this->getColor('gray'));
 
 		return $this->canvas;
 	}
