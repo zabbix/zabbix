@@ -110,7 +110,14 @@ class czbxrpc{
 
 			return array('result' => $result);
 		}
-		catch (APIException $e) {
+		catch (Exception $e) {
+			if ($e instanceof DBException) {
+				$code = ZBX_API_ERROR_INTERNAL;
+			}
+			else {
+				$code = $e->getCode();
+			}
+
 			API::setReturnRPC();
 			$result = ($method === 'user.login');
 			self::transactionEnd($result);
@@ -120,7 +127,7 @@ class czbxrpc{
 			}
 			else {
 				$result = array(
-					'error' => $e->getCode(),
+					'error' => $code,
 					'data' => $e->getMessage(),
 				);
 

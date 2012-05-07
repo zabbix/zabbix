@@ -418,26 +418,40 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	{
 		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
 		{
+			int	new_lastchange = 0;
+
+			*add_event = 1;
+
+			if (value != new_value || (TRIGGER_TYPE_MULTIPLE_TRUE == type &&
+					TRIGGER_VALUE_TRUE == new_value && TRIGGER_VALUE_FLAG_NORMAL == new_value_flags))
+			{
+				*value_changed = TRIGGER_VALUE_CHANGED_YES;
+				new_lastchange = ts->sec;
+			}
+
 			if (NULL == *sql)
 			{
 				*sql_alloc = 2 * ZBX_KIBIBYTE;
 				*sql = zbx_malloc(*sql, *sql_alloc);
 			}
 
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update triggers set lastchange=%d", ts->sec);
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update triggers set ");
+
+			if (0 != new_lastchange)
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
 
 			if (value != new_value)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",value=%d", new_value);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value=%d,", new_value);
 
 			if (value_flags != new_value_flags)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",value_flags=%d", new_value_flags);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value_flags=%d,", new_value_flags);
 
 			if (NULL == new_error)
 			{
 				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, "");
 
 				if ('\0' != *error)
-					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ",error=''");
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "error='',");
 			}
 			else
 			{
@@ -446,20 +460,14 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 				if (0 != strcmp(error, new_error))
 				{
 					new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
-					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",error='%s'", new_error_esc);
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "error='%s',", new_error_esc);
 					zbx_free(new_error_esc);
 				}
 			}
 
+			(*sql_offset)--;
+
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where triggerid=" ZBX_FS_UI64, triggerid);
-
-			*add_event = 1;
-
-			if (value != new_value || (TRIGGER_TYPE_MULTIPLE_TRUE == type &&
-					TRIGGER_VALUE_TRUE == new_value && TRIGGER_VALUE_FLAG_UNKNOWN != new_value_flags))
-			{
-				*value_changed = TRIGGER_VALUE_CHANGED_YES;
-			}
 
 			ret = SUCCEED;
 		}
@@ -2092,7 +2100,6 @@ retry:
 			break;
 		default:
 			assert(0);
-			break;
 	}
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
@@ -2100,6 +2107,18 @@ retry:
 
 	if (NULL == ts)
 	{
+		if (0 != last_n && 0 == clock_from && 0 != clock_to)
+		{
+			const int	steps[] = {SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH};
+
+			if (0 != retry)
+				clock_to -= steps[retry - 1];
+			if (4 != retry)
+			{
+				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+						" and clock>%d", clock_to - steps[retry]);
+			}
+		}
 		if (0 != clock_from)
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock>%d", clock_from);
 		if (0 != clock_to)
@@ -2124,7 +2143,7 @@ retry:
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_STR:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" order by itemid desc,clock desc");
+							" order by clock desc");
 					break;
 				default:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
@@ -2138,7 +2157,7 @@ retry:
 					" order by ns desc");
 		}
 
-		result = DBselectN(sql, last_n);
+		result = DBselectN(sql, last_n - h_num);
 	}
 	else
 		result = DBselect("%s", sql);
@@ -2176,6 +2195,12 @@ retry:
 
 		if (1 == retry)
 			goto retry;
+	}
+
+	if (NULL == ts && 0 != last_n && 0 == clock_from && 0 != clock_to && h_num != last_n && 4 != retry)
+	{
+		retry++;
+		goto retry;
 	}
 
 	h_value[h_num] = NULL;

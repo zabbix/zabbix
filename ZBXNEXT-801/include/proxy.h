@@ -35,7 +35,7 @@ AGENT_VALUE
 {
 	zbx_timespec_t	ts;
 	char		host_name[HOST_HOST_LEN_MAX];
-	char		key[ITEM_KEY_LEN_MAX];
+	char		key[ITEM_KEY_LEN * 4 + 1];
 	char		*value;
 	char		*source;
 	int		lastlogsize;

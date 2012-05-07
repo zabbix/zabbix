@@ -101,7 +101,8 @@ sub process_row
 
 	foreach (@array)
 	{
-		$_ =~ s/&pipe;/|/;
+		$_ =~ s/&pipe;/|/g;
+		$_ =~ s/&eol;/\n/g;
 	}
 
 	my $first = 1;

@@ -1449,19 +1449,19 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (HOST_MAINTENANCE_STATUS_ON == item.host.maintenance_status &&
 				MAINTENANCE_TYPE_NODATA == item.host.maintenance_type &&
 				item.host.maintenance_from <= values[i].ts.sec)
-			continue;
+			goto clean;
 
 		if (ITEM_TYPE_INTERNAL == item.type || ITEM_TYPE_AGGREGATE == item.type || ITEM_TYPE_CALCULATED == item.type)
-			continue;
+			goto clean;
 
 		if (0 == proxy_hostid && ITEM_TYPE_TRAPPER != item.type && ITEM_TYPE_ZABBIX_ACTIVE != item.type)
-			continue;
+			goto clean;
 
 		if (ITEM_TYPE_TRAPPER == item.type && 0 == proxy_hostid &&
 				FAIL == zbx_tcp_check_security(sock, item.trapper_hosts, 1))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "process data failed: %s", zbx_tcp_strerror());
-			continue;
+			goto clean;
 		}
 
 		if (ITEM_STATUS_NOTSUPPORTED == values[i].status || 0 == strcmp(values[i].value, ZBX_NOTSUPPORTED))
@@ -1506,6 +1506,8 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 
 			free_result(&agent);
 		}
+clean:
+		DCconfig_clean_items(&item, NULL, 1);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1697,7 +1699,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 	struct zbx_json_parse	jp_data, jp_row;
 	int			port, status, ret;
 	const char		*p = NULL;
-	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], key_[ITEM_KEY_LEN_MAX],
+	char			last_ip[INTERFACE_IP_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], key_[ITEM_KEY_LEN * 4 + 1],
 				tmp[MAX_STRING_LEN], value[DSERVICE_VALUE_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX];
 	time_t			now, hosttime, itemtime;
 

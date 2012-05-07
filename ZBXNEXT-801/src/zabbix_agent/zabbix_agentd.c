@@ -410,10 +410,10 @@ fail:
  *                                                                            *
  * Purpose: load configuration from config file                               *
  *                                                                            *
- * Parameters: optional - do not produce error if config file missing         *
+ * Parameters: requirement - produce error if config file missing or not      *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config(int optional)
+static void	zbx_load_config(int requirement)
 {
 	char	*active_hosts = NULL;
 
@@ -483,11 +483,11 @@ static void	zbx_load_config(int optional)
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 #endif
 
-	parse_cfg_file(CONFIG_FILE, cfg, optional, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
 	set_defaults();
 
-	if (NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
+	if (ZBX_CFG_FILE_REQUIRED == requirement && NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
 	{
 		zbx_error("StartAgents is not 0, parameter Server must be defined");
 		exit(EXIT_FAILURE);
@@ -498,7 +498,7 @@ static void	zbx_load_config(int optional)
 
 	zbx_free(active_hosts);
 
-	if (ZBX_CFG_FILE_REQUIRED == optional)
+	if (ZBX_CFG_FILE_REQUIRED == requirement)
 		zbx_validate_config();
 }
 

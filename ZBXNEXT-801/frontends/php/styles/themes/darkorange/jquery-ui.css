@@ -59,25 +59,25 @@
 .darkorange .ui-widget { font-family: Verdana, Arial, sans-serif; font-size: 1.0em; }
 .darkorange .ui-widget .ui-widget { font-size: 1em; }
 .darkorange .ui-widget input, .darkorange .ui-widget select, .darkorange .ui-widget textarea, .darkorange .ui-widget button { font-family: Verdana, Arial, sans-serif; font-size: 1em; }
-.darkorange .ui-widget-content { border: 1px solid #444; background: #1f1f1f url(images/ui-bg_flat_25_1f1f1f_40x100.png) 50% 50% repeat-x; color: #dfdfdf; }
-.darkorange .ui-widget-header { border: 1px solid #444; background: #4f4f4f url(images/ui-bg_highlight-hard_30_4f4f4f_1x100.png) 50% 50% repeat-x; color: #dfdfdf; font-weight: bold; }
+.darkorange .ui-widget-content { border: 1px solid #444; background: #1f1f1f url(images/bg_flat_25.png) 50% 50% repeat-x; color: #dfdfdf; }
+.darkorange .ui-widget-header { border: 1px solid #444; background: #4f4f4f url(images/bg_h-hard_30.png) 50% 50% repeat-x; color: #dfdfdf; font-weight: bold; }
 .darkorange .ui-widget-header a { color: #dfdfdf; }
 
 /* Interaction states
 ----------------------------------*/
-.darkorange .ui-state-default, .darkorange .ui-widget-content .ui-state-default, .darkorange .ui-widget-header .ui-state-default { border: 1px solid #dfdfdf; background: #2f2f2f url(images/ui-bg_glass_40_2f2f2f_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #dfdfdf; }
+.darkorange .ui-state-default, .darkorange .ui-widget-content .ui-state-default, .darkorange .ui-widget-header .ui-state-default { border: 1px solid #dfdfdf; background: #2f2f2f url(images/bg_g_40_2f2f2f.png) 50% 50% repeat-x; font-weight: bold; color: #dfdfdf; }
 .darkorange .ui-state-default a, .darkorange .ui-state-default a:link, .darkorange .ui-state-default a:visited { color: #dfdfdf; text-decoration: none; }
-.darkorange .ui-state-hover, .darkorange .ui-widget-content .ui-state-hover, .darkorange .ui-widget-header .ui-state-hover, .darkorange .ui-state-focus, .darkorange .ui-widget-content .ui-state-focus, .darkorange .ui-widget-header .ui-state-focus { border: 1px solid #ff5500; background: #2f2f2f url(images/ui-bg_glass_40_2f2f2f_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #ff5500; }
+.darkorange .ui-state-hover, .darkorange .ui-widget-content .ui-state-hover, .darkorange .ui-widget-header .ui-state-hover, .darkorange .ui-state-focus, .darkorange .ui-widget-content .ui-state-focus, .darkorange .ui-widget-header .ui-state-focus { border: 1px solid #ff5500; background: #2f2f2f url(images/bg_g_40_2f2f2f.png) 50% 50% repeat-x; font-weight: bold; color: #ff5500; }
 .darkorange .ui-state-hover a, .darkorange .ui-state-hover a:hover { color: #ff5500; text-decoration: none; }
-.darkorange .ui-state-active, .darkorange .ui-widget-content .ui-state-active, .darkorange .ui-widget-header .ui-state-active { border: 1px solid #ff5500; background: #ff5500 url(images/ui-bg_glass_40_ff5500_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #000000; }
+.darkorange .ui-state-active, .darkorange .ui-widget-content .ui-state-active, .darkorange .ui-widget-header .ui-state-active { border: 1px solid #ff5500; background: #ff5500 url(images/bg_g_40_ff5500.png) 50% 50% repeat-x; font-weight: bold; color: #000000; }
 .darkorange .ui-state-active a, .darkorange .ui-state-active a:link, .darkorange .ui-state-active a:visited { color: #000000; text-decoration: none; }
 .darkorange .ui-widget :active { outline: none; }
 
 /* Interaction Cues
 ----------------------------------*/
-.darkorange .ui-state-highlight, .darkorange .ui-widget-content .ui-state-highlight, .darkorange .ui-widget-header .ui-state-highlight  {border: 1px solid #ff5500; background: #eeeeee url(images/ui-bg_highlight-soft_80_eeeeee_1x100.png) 50% top repeat-x; color: #ff5500; }
+.darkorange .ui-state-highlight, .darkorange .ui-widget-content .ui-state-highlight, .darkorange .ui-widget-header .ui-state-highlight  {border: 1px solid #ff5500; background: #eeeeee url(images/bg_h-soft_80.png) 50% top repeat-x; color: #ff5500; }
 .darkorange .ui-state-highlight a, .darkorange .ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a { color: #ff5500; }
-.darkorange .ui-state-error, .darkorange .ui-widget-content .ui-state-error, .darkorange .ui-widget-header .ui-state-error {border: 1px solid #ffb73d; background: #ffc73d url(images/ui-bg_glass_40_ffc73d_1x400.png) 50% 50% repeat-x; color: #111111; }
+.darkorange .ui-state-error, .darkorange .ui-widget-content .ui-state-error, .darkorange .ui-widget-header .ui-state-error {border: 1px solid #ffb73d; background: #ffc73d url(images/bg_g_40_ffc73d.png) 50% 50% repeat-x; color: #111111; }
 .darkorange .ui-state-error a, .darkorange .ui-widget-content .ui-state-error a, .darkorange .ui-widget-header .ui-state-error a { color: #111111; }
 .darkorange .ui-state-error-text, .darkorange .ui-widget-content .ui-state-error-text, .darkorange .ui-widget-header .ui-state-error-text { color: #111111; }
 .darkorange .ui-priority-primary, .darkorange .ui-widget-content .ui-priority-primary, .darkorange .ui-widget-header .ui-priority-primary { font-weight: bold; }
@@ -88,14 +88,14 @@
 ----------------------------------*/
 
 /* states and images */
-.darkorange .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_dfdfdf_256x240.png); }
-.darkorange .ui-widget-content .ui-icon {background-image: url(images/ui-icons_dfdfdf_256x240.png); }
-.darkorange .ui-widget-header .ui-icon {background-image: url(images/ui-icons_dfdfdf_256x240.png); }
-.darkorange .ui-state-default .ui-icon { background-image: url(images/ui-icons_dfdfdf_256x240.png); }
-.darkorange .ui-state-hover .ui-icon, .darkorange .ui-state-focus .ui-icon {background-image: url(images/ui-icons_ff5500_256x240.png); }
-.darkorange .ui-state-active .ui-icon {background-image: url(images/ui-icons_000000_256x240.png); }
-.darkorange .ui-state-highlight .ui-icon {background-image: url(images/ui-icons_ff5500_256x240.png); }
-.darkorange .ui-state-error .ui-icon, .darkorange .ui-state-error-text .ui-icon {background-image: url(images/ui-icons_a83300_256x240.png); }
+.darkorange .ui-icon { width: 16px; height: 16px; background-image: url(images/icons_dfdfdf.png); }
+.darkorange .ui-widget-content .ui-icon {background-image: url(images/icons_dfdfdf.png); }
+.darkorange .ui-widget-header .ui-icon {background-image: url(images/icons_dfdfdf.png); }
+.darkorange .ui-state-default .ui-icon { background-image: url(images/icons_dfdfdf.png); }
+.darkorange .ui-state-hover .ui-icon, .darkorange .ui-state-focus .ui-icon {background-image: url(images/icons_ff5500.png); }
+.darkorange .ui-state-active .ui-icon {background-image: url(images/icons_000000.png); }
+.darkorange .ui-state-highlight .ui-icon {background-image: url(images/icons_ff5500.png); }
+.darkorange .ui-state-error .ui-icon, .darkorange .ui-state-error-text .ui-icon {background-image: url(images/icons_a83300.png); }
 
 /* positioning */
 .darkorange .ui-icon-carat-1-n { background-position: 0 0; }
@@ -290,8 +290,8 @@
 .darkorange .ui-corner-all { -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; }
 
 /* Overlays */
-.darkorange .ui-widget-overlay { background: #5c5c5c url(images/ui-bg_flat_50_5c5c5c_40x100.png) 50% 50% repeat-x; opacity: .80;filter:Alpha(Opacity=80); }
-.darkorange .ui-widget-shadow { margin: -3px 0 0 -3px; padding: 3px; background: #cccccc url(images/ui-bg_flat_30_cccccc_40x100.png) 50% 50% repeat-x; opacity: .60;filter:Alpha(Opacity=60); -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; }/*
+.darkorange .ui-widget-overlay { background: #5c5c5c url(images/bg_flat_50.png) 50% 50% repeat-x; opacity: .80;filter:Alpha(Opacity=80); }
+.darkorange .ui-widget-shadow { margin: -3px 0 0 -3px; padding: 3px; background: #cccccc url(images/bg_flat_30.png) 50% 50% repeat-x; opacity: .60;filter:Alpha(Opacity=60); -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; }/*
  * jQuery UI Resizable 1.8.6
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)

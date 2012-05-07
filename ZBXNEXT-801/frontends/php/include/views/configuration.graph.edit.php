@@ -46,6 +46,9 @@ $graphForm->addVar('ymax_itemid', $this->data['ymax_itemid']);
 
 // create form list
 $graphFormList = new CFormList('graphFormList');
+if (!empty($this->data['templates'])) {
+	$graphFormList->addRow(_('Parent graph'), $this->data['templates']);
+}
 $graphFormList->addRow(_('Name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 $graphFormList->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5));
 $graphFormList->addRow(_('Height'), new CNumericBox('height', $this->data['height'], 5));
@@ -294,21 +297,22 @@ $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 $graphForm->addItem($graphTab);
 
 // append buttons to form
+$saveButton = new CSubmit('save', _('Save'));
+$cancelButton = new CButtonCancel(url_param('parent_discoveryid'));
 if (!empty($this->data['graphid'])) {
-	$graphForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
-		array(
-			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete graph?'), url_param('graphid').url_param('parent_discoveryid')),
-			new CButtonCancel(url_param('parent_discoveryid'))
-		)
-	));
+	$deleteButton = new CButtonDelete(_('Delete graph?'), url_param('graphid').url_param('parent_discoveryid'));
+	$cloneButton = new CSubmit('clone', _('Clone'));
+
+	if (!empty($this->data['templates'])) {
+		$saveButton->setEnabled(false);
+		$deleteButton->setEnabled(false);
+		$cloneButton->setEnabled(false);
+	}
+
+	$graphForm->addItem(makeFormFooter($saveButton, array($cloneButton, $deleteButton, $cancelButton)));
 }
 else {
-	$graphForm->addItem(makeFormFooter(
-		new CSubmit('save', _('Save')),
-		new CButtonCancel(url_param('parent_discoveryid'))
-	));
+	$graphForm->addItem(makeFormFooter($saveButton, $cancelButton));
 }
 
 // insert js (depended from some variables inside the file)
