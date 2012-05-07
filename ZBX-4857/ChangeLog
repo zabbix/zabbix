@@ -2,12 +2,21 @@
 Changes for 2.0.0rc4
 
 New features:
+..F....... [ZBXNEXT-1196] redesigned setup form (Toms)
 ...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
-..F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Greek, Japanese, Russian and Spanish translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, Greek, Japanese, Latvian, Polish, Russian, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
 ..F....... [ZBX-4857] added validation for empty username, public and private keys in an item form (Sasha)
+..F....... [ZBX-4938] fixed constant not used in CAction.php (Toms)
+..F....... [ZBX-4926] fixed unable to add simple graphs and plain text to screen templates (Toms)
+........S. [ZBX-4921] fixed possible SQL errors while processing LLD data with long values (Sasha)
+........S. [ZBX-4889] fixed execution of GUI Scripts for disabled hosts (Sasha)
+..F.....S. [ZBX-4412] fixed updating of trigger last change by significant event (Sasha)
+A......... [ZBX-4880] fixed error 'JSON-rpc error generation failed. No such error' in API (Vedmak)
+..F....... [ZBX-4922] fixed importing of linked templates (Vedmak)
+..F....... [ZBX-4895] fixed host proxy exported as id (Vedmak)
 .......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
 ..F....... [ZBX-4914] fixed graph name encoding in form preview (Vedmak)
 ........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
