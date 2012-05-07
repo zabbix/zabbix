@@ -913,7 +913,7 @@ class CAction extends CZBXAPI {
 				$escPeriod = isset($action['esc_period']) ? $action['esc_period']: $updActions[$action['actionid']]['esc_period'];
 
 				if ($escPeriod < SEC_PER_MIN && EVENT_SOURCE_TRIGGERS == $eventsource) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" has incorrect value for "esc_period" (minimum 60 seconds).', $action['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" has incorrect value for "esc_period" (minimum %2$s seconds).', $action['name'], SEC_PER_MIN));
 				}
 			}
 
