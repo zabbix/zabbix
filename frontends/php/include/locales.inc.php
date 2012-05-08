@@ -37,20 +37,6 @@ function mbstrings_available() {
 	return function_exists('mb_strlen') && function_exists('mb_strtoupper') && function_exists('mb_strpos') && function_exists('mb_substr');
 }
 
-// translate global array $TRANSLATION into constants
-function process_locales() {
-	global $TRANSLATION;
-
-	if (isset($TRANSLATION) && is_array($TRANSLATION)) {
-		foreach ($TRANSLATION as $const => $label) {
-			if (!defined($const)) {
-				define($const, $label);
-			}
-		}
-	}
-	unset($GLOBALS['TRANSLATION']);
-}
-
 function set_zbx_locales() {
 	global $ZBX_LOCALES;
 

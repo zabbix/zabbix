@@ -197,7 +197,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		make_sorting_header(_('Name'), 'i.name'),
 		make_sorting_header(_('Last check'), 'i.lastclock'),
 		_('Last value'),
-		_('Change'),
+		_x('Change', 'noun in latest data'),
 		_('History')
 	));
 
