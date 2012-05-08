@@ -60,18 +60,21 @@ jQuery(function() {
 		return false;
 	});
 
-	// TODO: make menu labels translatable
+	/**
+	 * Handles the service configuration pop up menus.
+	 */
 	jQuery(document).on('click', '.service-conf-menu', function(event) {
 		var menuData = jQuery(this).data('menu');
 
 		var menu = [];
 		menu.push(createMenuHeader(menuData.name));
-		menu.push(createMenuItem('Add Service', 'services.php?form=1&parentid=' + menuData.serviceid + '&parentname=' + menuData.name));
-		menu.push(createMenuItem('Edit Service', 'services.php?form=1&serviceid=' + menuData.serviceid));
+		menu.push(createMenuItem(t('Add service'), 'services.php?form=1&parentid=' + menuData.serviceid + '&parentname=' + menuData.name));
+		menu.push(createMenuItem(t('Edit service'), 'services.php?form=1&serviceid=' + menuData.serviceid));
 
+		// don't display the delete link for services with children
 		if (!menuData.hasDependencies) {
-			menu.push(createMenuItem('Delete service', function() {
-				if (confirm('Delete selected services?')) {
+			menu.push(createMenuItem(t('Delete service'), function() {
+				if (confirm(t('Delete the selected service?'))) {
 					window.location.href = 'services.php?delete=1&serviceid=' + menuData.serviceid;
 				}
 			}));
