@@ -293,7 +293,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, a
 			$sla = new CDiv($slaBar, 'invisible');
 			$sla2 = array(
 				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? 'red' : 'green')),
-				' / ',
+				'/',
 				new CSpan(sprintf('%.4f', $service['goodsla']), 'sla-value')
 			);
 		}
@@ -329,21 +329,16 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, a
 	return $tree;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: update_services_rec                                              *
- *                                                                            *
- * Purpose: re-calculate and updates status of the service and its childs     *
- *                                                                            *
- * Parameters: serviceid - item to update services for                        *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev   (PHP ver. by Aly)                               *
- *                                                                            *
- * Comments: recursive function   !!! Don't forget sync code with C !!!       *
- *                                                                            *
- ******************************************************************************/
+/**
+ * Recalculates the status of the given service and it's parents.
+ *
+ * Note: this function does not update the status based on the status of the linked trigger,
+ * the status is calculated only based on the status of the child services.
+ *
+ * @param $serviceid
+ *
+ * @return bool
+ */
 function update_services_rec($serviceid) {
 	$result = DBselect(
 		'SELECT l.serviceupid,s.algorithm'.
@@ -373,23 +368,13 @@ function update_services_rec($serviceid) {
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: update_services                                                  *
- *                                                                            *
- * Purpose: re-calculate and updates status of the service and its childs     *
- * on trigger priority change                                                 *
- *                                                                            *
- * Parameters: serviceid - item to update services for                        *
- *             status - new status of the service                             *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev   (PHP ver. by Aly)                               *
- *                                                                            *
- * Comments: !!! Don't forget sync code with C !!!                            *
- *                                                                            *
- ******************************************************************************/
+/**
+ * Retrieves the service linked to given trigger, sets it's status to $status and propagates the status change
+ * to the parent services.
+ *
+ * @param $triggerid
+ * @param $status
+ */
 function update_services($triggerid, $status) {
 	DBexecute('UPDATE services SET status='.$status.' WHERE triggerid='.$triggerid);
 
