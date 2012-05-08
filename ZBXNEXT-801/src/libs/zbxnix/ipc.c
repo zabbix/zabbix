@@ -85,6 +85,8 @@ int	zbx_shmget(key_t key, size_t size)
 			ret = FAIL;
 		}
 
+		zabbix_log(LOG_LEVEL_DEBUG, "zbx_shmget(): removing existing shm_id=[%d]", shm_id);
+
 		if (SUCCEED == ret && -1 == shmctl(shm_id, IPC_RMID, 0))
 		{
 			zbx_error("cannot remove existing shared memory: %s", zbx_strerror(errno));

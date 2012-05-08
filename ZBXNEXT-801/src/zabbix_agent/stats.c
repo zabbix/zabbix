@@ -23,6 +23,7 @@
 #include "zbxconf.h"
 #include "diskdevices.h"
 #include "cfg.h"
+#include "mutexs.h"
 
 #if defined(_WINDOWS)
 #	include "service.h"
@@ -34,7 +35,10 @@
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
 #if !defined(_WINDOWS)
-static int	shm_id;
+	static int		shm_id;
+	int 			my_diskstat_shmid = NONEXISTENT_SHMID;
+	ZBX_DISKDEVICES_DATA    *diskdevices = NULL;
+	ZBX_MUTEX		diskstats_lock;
 #endif
 
 /******************************************************************************
@@ -133,7 +137,7 @@ return_one:
  * Comments: Unix version allocates memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
-void	init_collector_data()
+void	init_collector_data(void)
 {
 	int	cpu_count;
 	size_t	sz, sz_cpu;
@@ -177,6 +181,13 @@ void	init_collector_data()
 
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
 	collector->cpus.count = cpu_count;
+	collector->diskstat_shmid = NONEXISTENT_SHMID;
+
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&diskstats_lock, ZBX_MUTEX_DISKSTATS))
+	{
+		zbx_error("unable to create mutex for disk statistics collector");
+		exit(FAIL);
+	}
 #endif	/* _WINDOWS */
 
 #ifdef _AIX
@@ -195,7 +206,7 @@ void	init_collector_data()
  * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
-void	free_collector_data()
+void	free_collector_data(void)
 {
 #ifdef _WINDOWS
 	zbx_free(collector);
@@ -203,11 +214,191 @@ void	free_collector_data()
 	if (NULL == collector)
 		return;
 
+	if (NONEXISTENT_SHMID != collector->diskstat_shmid)
+	{
+		if (-1 == shmctl(collector->diskstat_shmid, IPC_RMID, 0))
+			zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for disk statistics collector: %s",
+				zbx_strerror(errno));
+		diskdevices = NULL;
+		collector->diskstat_shmid = NONEXISTENT_SHMID;
+	}
+
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for collector: %s", zbx_strerror(errno));
+
+	zbx_mutex_destroy(&diskstats_lock);
 #endif
 
 	collector = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diskstat_shm_init                                                *
+ *                                                                            *
+ * Purpose: Allocate shared memory for collecting disk statistics             *
+ *                                                                            *
+ ******************************************************************************/
+void	diskstat_shm_init(void)
+{
+#if !defined(_WINDOWS)
+	key_t	shm_key;
+	size_t	shm_size;
+
+	/* initially allocate memory for collecting statistics for only 1 disk */
+	shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA);
+
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID_DISKSTAT)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for disk statistics collector");
+		exit(FAIL);
+	}
+
+	if (-1 == (collector->diskstat_shmid = zbx_shmget(shm_key, shm_size)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for disk statistics collector");
+		exit(FAIL);
+	}
+
+	if ((void *)(-1) == (diskdevices = shmat(collector->diskstat_shmid, NULL, 0)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for disk statistics collector: %s",
+			zbx_strerror(errno));
+		exit(FAIL);
+	}
+
+	diskdevices->count = 0;
+	diskdevices->max_diskdev = 1;
+	my_diskstat_shmid = collector->diskstat_shmid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "diskstat_shm_init: allocated initial shm segment id=[%d]"
+					" for disk statistics collector", collector->diskstat_shmid);
+#endif	/* _WINDOWS */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diskstat_shm_reattach                                            *
+ *                                                                            *
+ * Purpose: If necessary, reattach to disk statistics shared memory segment.  *
+ *                                                                            *
+ ******************************************************************************/
+void	diskstat_shm_reattach(void)
+{
+#if !defined(_WINDOWS)
+	if (my_diskstat_shmid != collector->diskstat_shmid)
+	{
+		int old_shmid;
+
+		old_shmid = my_diskstat_shmid;
+
+		if (NONEXISTENT_SHMID != my_diskstat_shmid)
+		{
+			if (-1 == shmdt(diskdevices))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot detach from disk statistics collector shared"
+						" memory: %s", zbx_strerror(errno));
+				exit(FAIL);
+			}
+			diskdevices = NULL;
+			my_diskstat_shmid = NONEXISTENT_SHMID;
+		}
+
+		if ((void *)(-1) == (diskdevices = shmat(collector->diskstat_shmid, NULL, 0)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for disk statistics collector: %s",
+				zbx_strerror(errno));
+			exit(FAIL);
+		}
+		my_diskstat_shmid = collector->diskstat_shmid;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "diskstat_shm_reattach(): switched shm id from [%d] to [%d]",
+			old_shmid, my_diskstat_shmid);
+	}
+#endif	/* _WINDOWS */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: diskstat_shm_extend                                              *
+ *                                                                            *
+ * Purpose: create a new, larger disk statistics shared memory segment and    *
+ *          copy data from the old one.                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	diskstat_shm_extend(void)
+{
+#if !defined(_WINDOWS)
+	key_t			shm_key;
+	size_t			old_shm_size;
+	size_t			new_shm_size;
+	int			old_shmid;
+	int			new_shmid;
+	int			old_max;
+	int			new_max;
+	ZBX_DISKDEVICES_DATA	*new_diskdevices;
+
+	/* caclulate the size of the new shared memory segment */
+	old_max = diskdevices->max_diskdev;
+
+	if (old_max < 4)
+		new_max = old_max + 1;
+	else if (old_max < 256)
+		new_max = old_max * 2;
+	else
+		new_max = old_max + 256;
+
+	old_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA)*old_max;
+	new_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA)*new_max;
+
+	/* Create the new shared memory segment. The same key is used.*/
+	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID_DISKSTAT)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for extending disk statistics collector");
+		exit(FAIL);
+	}
+
+	/* zbx_shmget() will:
+	*	- see that a shared memory segment with this key exists,
+	*	- mark it for deletion,
+	*	- create a new segment with this key, but with a different id.*/
+
+	if (-1 == (new_shmid = zbx_shmget(shm_key, new_shm_size)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for extending disk statistics collector");
+		exit(FAIL);
+	}
+
+	if ((void *)(-1) == (new_diskdevices = shmat(new_shmid, NULL, 0)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for extending disk statistics collector: %s",
+			zbx_strerror(errno));
+		exit(FAIL);
+	}
+
+	/* copy data from the old segment */
+	memcpy(new_diskdevices, diskdevices, old_shm_size);
+	new_diskdevices->max_diskdev = new_max;
+
+	/* delete the old segment */
+	if (-1 == shmdt(diskdevices))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot detach from disk statistics collector shared memory");
+		exit(FAIL);
+	}
+
+	/* switch to the new segment */
+	old_shmid = collector->diskstat_shmid;
+	collector->diskstat_shmid = new_shmid;
+	my_diskstat_shmid = collector->diskstat_shmid;
+	diskdevices = new_diskdevices;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "diskstat_shm_extend() extended diskstat shared memory:"
+					" old_max=[%d], new_max=[%d], old_size=[%d], new_size=[%d],"
+					" old_shmid=[%d], new_shmid=[%d]",
+					old_max, new_max, old_shm_size, new_shm_size,
+					old_shmid, collector->diskstat_shmid);
+#endif	/* _WINDOWS */
 }
 
 /******************************************************************************
@@ -230,8 +421,6 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	if (SUCCEED != init_cpu_collector(&(collector->cpus)))
 		free_cpu_collector(&(collector->cpus));
 
-	collector_diskdevice_add("");
-
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_setproctitle("collector [processing data]");
@@ -241,7 +430,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		if (CPU_COLLECTOR_STARTED(collector))
 			collect_cpustat(&(collector->cpus));
 #endif
-		collect_stats_diskdevices(&(collector->diskdevices));
+		if (DISKDEVICE_COLLECTOR_STARTED(collector))
+			collect_stats_diskdevices();
 #ifdef _AIX
 		if (1 == collector->vmstat.enabled)
 			collect_vmstat_data(&collector->vmstat);
