@@ -125,11 +125,16 @@ class CsetupWizard extends CForm {
 
 		if (isset($this->stage[$this->getStep() + 1])) {
 			$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>');
-			$cancel = new CDiv(new CSubmit('cancel', _('Cancel')), 'footer_left');
 		}
 		else {
 			$next = new CSubmit('finish', _('Finish'));
+		}
+
+		if (isset($this->HIDE_CANCEL_BUTTON) && $this->HIDE_CANCEL_BUTTON) {
 			$cancel = null;
+		}
+		else {
+			$cancel = new CDiv(new CSubmit('cancel', _('Cancel')), 'footer_left');
 		}
 
 		if ($this->DISABLE_NEXT_BUTTON) {
@@ -393,51 +398,51 @@ class CsetupWizard extends CForm {
 		$config->save();
 
 		if ($config->load()) {
-			$error = '';
+			$error = false;
 
 			if ($config->config['DB']['TYPE'] != $this->getConfig('DB_TYPE')) {
-				$error = 'Config file DB type is not equal to wizard input.';
+				$error = true;
 			}
 			elseif ($config->config['DB']['SERVER'] != $this->getConfig('DB_SERVER')) {
-				$error = 'Config file DB server is not equal to wizard input.';
+				$error = true;
 			}
 			elseif ($config->config['DB']['PORT'] != $this->getConfig('DB_PORT')) {
-				$error = 'Config file DB port is not equal to wizard input.';
+				$error = true;
 			}
 			elseif ($config->config['DB']['DATABASE'] != $this->getConfig('DB_DATABASE')) {
-				$error = 'Config file DB database is not equal to wizard input.';
+				$error = true;
 			}
 			elseif ($config->config['DB']['USER'] != $this->getConfig('DB_USER')) {
-				$error = 'Config file DB user is not equal to wizard input.';
+				$error = true;
 			}
 			elseif ($config->config['DB']['PASSWORD'] != $this->getConfig('DB_PASSWORD')) {
-				$error = 'Config file DB password is not equal to wizard input.';
+				$error = true;
 			}
 			elseif ($this->getConfig('DB_TYPE') == ZBX_DB_DB2 && $config->config['DB']['SCHEMA'] != $this->getConfig('DB_SCHEMA')) {
-				$error = 'Config file DB schema is not equal to wizard input.';
+				$error = true;
 			}
 			elseif ($config->config['ZBX_SERVER'] != $this->getConfig('ZBX_SERVER')) {
-				$error = 'Config file Zabbix server is not equal to wizard input.';
+				$error = true;
 			}
 			elseif ($config->config['ZBX_SERVER_PORT'] != $this->getConfig('ZBX_SERVER_PORT')) {
-				$error = 'Config file Zabbix server port is not equal to wizard input.';
+				$error = true;
 			}
 			elseif ($config->config['ZBX_SERVER_NAME'] != $this->getConfig('ZBX_SERVER_NAME')) {
-				$error = 'Config file Zabbix server name is not equal to wizard input.';
+				$error = true;
 			}
+			$error_text = 'Unable to overwrite existing configuration file. ';
 		}
 		else {
-			$error = $config->error;
+			$error = true;
+			$error_text = 'Unable to create configuration file. ';
 		}
-
 		clear_messages();
-		if (!empty($error)) {
-			error($error);
-			show_messages();
+		if ($error) {
 			$this->setConfig('ZBX_CONFIG_FILE_CORRECT', false);
 		}
 
 		$this->DISABLE_NEXT_BUTTON = !$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false);
+		$this->HIDE_CANCEL_BUTTON = !$this->DISABLE_NEXT_BUTTON;
 
 
 		$table = array('Configuration file', BR(), '"'.$ZBX_CONFIGURATION_FILE.'"', BR(), 'created: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
@@ -449,7 +454,7 @@ class CsetupWizard extends CForm {
 			$table, BR(), BR(),
 			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry')), BR(), BR()) : null,
 			!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
-				? array('Please install configuration file manually, or fix permissions on conf directory.', BR(), BR(),
+				? array($error_text, BR(), 'Please install configuration file manually, or fix permissions on conf directory.', BR(), BR(),
 					'Press "Download configuration file" button, download configuration file ',
 					'and save it as ', BR(),
 					'"'.$ZBX_CONFIGURATION_FILE.'"', BR(), BR(),
