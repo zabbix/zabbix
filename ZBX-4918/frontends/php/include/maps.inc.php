@@ -778,7 +778,7 @@
 		$maps = CMap::get(array('mapids'=>$mapids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
 		$maps = zbx_toHash($maps, 'sysmapid');
 
-		$triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
+		$triggers = CTrigger::get(array('triggerids'=>$triggerids, 'extendoutput'=>1, 'nopermissions'=>1, 'expandDescription' => true, 'nodeids' => get_current_nodeid(true)));
 		$triggers = zbx_toHash($triggers, 'triggerid');
 
 		$hostgroups = CHostGroup::get(array('hostgroupids'=>$hostgroupids, 'extendoutput'=>1, 'nopermissions'=>1, 'nodeids' => get_current_nodeid(true)));
@@ -793,7 +793,7 @@
 					$selements[$snum]['elementName'] = $maps[$selement['elementid']]['name'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$selements[$snum]['elementName'] = expand_trigger_description_by_data($triggers[$selement['elementid']]);
+					$selements[$snum]['elementName'] = $triggers[$selement['elementid']]['description'];
 					break;
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 					$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
@@ -1253,7 +1253,8 @@
 				'nodeids' => get_current_nodeid(true),
 				'triggerids' => array_keys($triggers_map),
 				'output' => API_OUTPUT_EXTEND,
-				'nopermissions' => 1
+				'nopermissions' => 1,
+				'expandDescription' => true
 			);
 			$triggers = CTrigger::get($options);
 			$all_triggers = array_merge($all_triggers, $triggers);
@@ -1274,6 +1275,7 @@
 				'skipDependent' => 1,
 				'output' => API_OUTPUT_EXTEND,
 				'nopermissions' => 1,
+				'expandDescription' => true
 			);
 			$triggers = CTrigger::get($options);
 			$all_triggers = array_merge($all_triggers, $triggers);
@@ -1295,6 +1297,7 @@
 				'nodeids' => get_current_nodeid(true),
 				'monitored' => true,
 				'skipDependent' => 1,
+				'expandDescription' => true
 			);
 			$triggers = CTrigger::get($options);
 
@@ -1374,7 +1377,7 @@
 			$i['ack'] = (bool) !($i['problem_unack']);
 
 			if($sysmap['expandproblem'] && ($i['problem'] == 1)){
-				$i['problem_title'] = expand_trigger_description_by_data($all_triggers[$last_problemid]);
+				$i['problem_title'] = $all_triggers[$last_problemid]['description'];
 			}
 
 			if(($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) && ($i['maintenance'] == 1)){
@@ -1429,7 +1432,7 @@
 
 			if(!empty($elems['triggers'])){
 				foreach($elems['triggers'] as $elem){
-					$info[$elem['selementid']]['name'] = expand_trigger_description_by_data($all_triggers[$elem['elementid']]);
+					$info[$elem['selementid']]['name'] = $all_triggers[$elem['elementid']]['description'];
 				}
 			}
 			if(!empty($elems['hosts'])){
