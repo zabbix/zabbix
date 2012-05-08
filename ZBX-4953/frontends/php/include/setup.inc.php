@@ -397,8 +397,6 @@ class CsetupWizard extends CForm {
 		);
 		$config->save();
 
-		clear_messages();
-
 		if ($config->load()) {
 			$error = false;
 
@@ -438,7 +436,7 @@ class CsetupWizard extends CForm {
 			$error = true;
 			$error_text = 'Unable to create configuration file. ';
 		}
-
+		clear_messages();
 		if ($error) {
 			$this->setConfig('ZBX_CONFIG_FILE_CORRECT', false);
 		}
