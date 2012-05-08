@@ -1304,20 +1304,36 @@ function expand_trigger_description($triggerid) {
 	return htmlspecialchars(expand_trigger_description_simple($triggerid));
 }
 
-function expandTriggersDescriptions($triggerids) {
-	$result = array();
+/**
+ * Returns the given triggers with expanded descriptions.
+ *
+ * You can also use the "expandDescription" option for CTrigger::get().
+ *
+ * @param array $triggers
+ *
+ * @return array
+ */
+function expandTriggerDescriptions(array $triggers) {
 	$cursor = DBselect(
 		'SELECT DISTINCT h.host,t.description,t.expression,t.triggerid'.
-		' FROM triggers t,functions f,items i,hosts h'.
-		' WHERE f.triggerid=t.triggerid'.
+			' FROM triggers t,functions f,items i,hosts h'.
+			' WHERE f.triggerid=t.triggerid'.
 			' AND i.itemid=f.itemid'.
 			' AND h.hostid=i.hostid'.
-			' AND '.DBcondition('t.triggerid', $triggerids)
+			' AND '.DBcondition('t.triggerid', zbx_objectValues($triggers, 'triggerid'))
 	);
+	$descriptions = array();
 	while ($row = DBfetch($cursor)) {
-		$result[$row['triggerid']] = htmlspecialchars(expand_trigger_description_by_data($row));
+		$descriptions[$row['triggerid']] = htmlspecialchars(expand_trigger_description_by_data($row));
 	}
-	return $result;
+	foreach ($triggers as &$trigger) {
+		if (isset($trigger['triggerid'])) {
+			$trigger['description'] = $descriptions[$trigger['triggerid']];
+		}
+	}
+	unset($trigger);
+
+	return $triggers;
 }
 
 function updateTriggerValueToUnknownByHostId($hostIds) {

@@ -113,144 +113,44 @@ else {
 			break;
 	}
 
-	// create root service
-	$services = array();
-	$row = array(
-		'id' => 0,
-		'serviceid' => 0,
-		'serviceupid' => 0,
-		'caption' => _('root'),
-		'status' => SPACE,
-		'reason' => SPACE,
-		'sla' => SPACE,
-		'sla2' => SPACE,
-		'graph' => SPACE,
-		'linkid' => ''
-	);
-	$services[0] = $row;
-
-	// get service reason
-	$db_services_reasons = DBfetchArray(DBSelect(
-		'SELECT s.triggerid,s.serviceid'.
-		' FROM services s,triggers t'.
-		' WHERE s.status>0'.
-			' AND s.triggerid IS NOT NULL'.
-			' AND t.triggerid=s.triggerid'.
-			' AND '.DBcondition('t.triggerid', $available_triggers).
-			' AND '.DBin_node('s.serviceid').
-		' ORDER BY s.status DESC,t.description'
+	// fetch services
+	$services = API::Service()->get(array(
+		'output' => array('name', 'serviceid', 'showsla', 'goodsla', 'algorithm'),
+		'selectParent' => API_OUTPUT_EXTEND,
+		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
+		'selectTrigger' => array('description', 'triggerid'),
+		'preservekeys' => true,
+		'sortfield' => 'sortorder',
+		'sortorder' => ZBX_SORT_UP
 	));
-
-	// get services
-	$db_services = DBSelect(
-		'SELECT DISTINCT s.serviceid,sl.servicedownid,sl_p.serviceupid AS serviceupid,s.triggerid,'.
-			' s.name AS caption,s.algorithm,t.description,t.expression,s.sortorder,sl.linkid,s.showsla,s.goodsla,s.status'.
-		' FROM services s'.
-			' LEFT JOIN triggers t ON s.triggerid=t.triggerid'.
-			' LEFT JOIN services_links sl ON s.serviceid=sl.serviceupid AND NOT sl.soft=0'.
-			' LEFT JOIN services_links sl_p ON s.serviceid=sl_p.servicedownid AND sl_p.soft=0'.
-		' WHERE '.DBin_node('s.serviceid').
-			' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid', $available_triggers).')'.
-		' ORDER BY s.sortorder,sl_p.serviceupid,s.serviceid'
-	);
-	while ($row = DBFetch($db_services)) {
-		$row['id'] = $row['serviceid'];
-		$row['caption'] = array(get_node_name_by_elid($row['serviceid'], null, ': '), $row['caption']);
-		$row['graph'] = !empty($row['triggerid']) ? new CLink(_('Show'), 'srv_status.php?serviceid='.$row['serviceid'].'&showgraph=1'.url_param('path')) : '-';
-
-		if (empty($row['serviceupid'])) {
-			$row['serviceupid'] = '0';
-		}
-		if (empty($row['description'])) {
-			$row['description'] = _('None');
-		}
-
-		if (isset($row['triggerid']) && !empty($row['triggerid'])) {
-			$url = new CLink(expand_trigger_description($row['triggerid']), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$row['triggerid']);
-			$row['caption'] = array($row['caption'], ' [', $url, ']');
-		}
-
-		if ($row['status'] == 0 || (isset($service) && (bccomp($service['serviceid'], $row['serviceid']) == 0))) {
-			$row['reason'] = '-';
-		}
-		else {
-			$row['reason'] = '-';
-			foreach ($db_services_reasons as $services_reason) {
-				if (is_string($row['reason']) && $row['reason'] == '-') {
-					$row['reason'] = new CList(null, 'itservices');
-				}
-				if (does_service_depend_on_the_service($row['serviceid'], $services_reason['serviceid'])) {
-					$row['reason']->addItem(new CLink(expand_trigger_description($services_reason['triggerid']), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$services_reason['triggerid']));
-				}
-			}
-		}
-
-		if ($row['showsla'] == 1) {
-			$stat = calculateServiceAvailability($row['serviceid'], $period_start, $period_end);
-
-			$p = min($stat['problem'], 20);
-			$sla_style = $row['goodsla'] > $stat['ok'] ? 'on' : 'off';
-
-			$sizeX = 160;
-			$sizeY = 15;
-			$sizeX_red = $sizeX * $p / 20;
-			$sizeX_green = $sizeX - $sizeX_red;
-
-			$sla_tab = new CTable(null, 'invisible');
-
-			$chart1 = null;
-			if ($sizeX_green > 0) {
-				$chart1 = new CDiv(null, 'sla_green');
-				$chart1->setAttribute('style', 'width: '.$sizeX_green.'px;');
-				$chart1 = new CLink($chart1, 'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'), 'image');
-			}
-			$chart2 = null;
-			if ($sizeX_red > 0) {
-				$chart2 = new CDiv(null, 'sla_red');
-				$chart2->setAttribute('style', 'width: '.$sizeX_red.'px;');
-				$chart2 = new CLink($chart2, 'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'), 'image');
-			}
-
-			$text = new CLink(sprintf('%.2f', $stat['problem']), 'report3.php?serviceid='.$row['serviceid'].'&year='.date('Y'), $sla_style);
-			$sla_tab->addRow(array($chart1, $chart2, SPACE, $text));
-
-			$row['sla'] = $sla_tab;
-
-			if ($row['goodsla'] > $stat['ok']) {
-				$sla_style = 'red';
-			}
-			else {
-				$sla_style = 'green';
-			}
-
-			$row['sla2'] = array(new CSpan(sprintf('%.2f', $row['goodsla']), 'green'), '/', new CSpan(sprintf('%.2f', $stat['ok']), $sla_style));
-		}
-		else {
-			$row['sla'] = '-';
-			$row['sla2'] = '-';
-		}
-
-		if (isset($services[$row['serviceid']])) {
-			$services[$row['serviceid']] = zbx_array_merge($services[$row['serviceid']], $row);
-		}
-		else {
-			$services[$row['serviceid']] = $row;
-		}
-
-		if (isset($row['serviceupid'])) {
-			$services[$row['serviceupid']]['childs'][] = array('id' => $row['serviceid'], 'soft' => 0, 'linkid' => 0);
-		}
-
-		if (isset($row['servicedownid'])) {
-			$services[$row['serviceid']]['childs'][] = array('id' => $row['servicedownid'], 'soft' => 1, 'linkid' => $row['linkid']);
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($services, 'trigger');
+	$triggers = expandTriggerDescriptions(zbx_toHash($triggers, 'triggerid'));
+	foreach ($services as &$service) {
+		if ($service['trigger']) {
+			$service['trigger'] = $triggers[$service['trigger']['triggerid']];
 		}
 	}
+	unset($service);
 
-	$treeServ = array();
-	createShowServiceTree($services, $treeServ);
+	// fetch sla
+	$slaData = API::Service()->getSla(array(
+		'serviceids' => zbx_objectValues($services, 'serviceid'),
+		'intervals' => array(array(
+			'from' => $period_start,
+			'to' => $period_end
+		))
+	));
+	// expand problem trigger descriptions
+	foreach ($slaData as &$serviceSla) {
+		foreach ($serviceSla['problems'] as &$problemTrigger) {
+			$problemTrigger['description'] = $triggers[$problemTrigger['triggerid']]['description'];
+		}
+		unset($problemTrigger);
+	}
+	unset($serviceSla);
 
-	// permission issue
-	$treeServ = del_empty_nodes($treeServ);
+	$treeServ = createServiceMonitoringTree($services, $slaData, $period);
 
 	$tree = new CTree('service_status_tree',
 		$treeServ,
@@ -258,9 +158,8 @@ else {
 			'caption' => _('Service'),
 			'status' => _('Status'),
 			'reason' => _('Reason'),
-			'sla' => 'SLA ('.$periods[$period].')',
-			'sla2' => nbsp(_('SLA')),
-			'graph' => _('Graph')
+			'sla' => _('Problem time'),
+			'sla2' => nbsp(_('SLA').' / '._('Acceptable SLA'))
 		)
 	);
 
@@ -278,7 +177,7 @@ else {
 		}
 		$r_form->addItem(array(_('Period').SPACE, $period_combo));
 
-		$srv_wdgt = new CWidget('hat_services');
+		$srv_wdgt = new CWidget('hat_services', 'service-mon');
 		$srv_wdgt->addPageHeader(_('IT SERVICES'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 		$srv_wdgt->addHeader(_('IT services'), $r_form);
 		$srv_wdgt->addItem(BR());
