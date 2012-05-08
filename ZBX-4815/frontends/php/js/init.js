@@ -30,14 +30,6 @@ jQuery(function() {
 	 * Handles host pop up menus.
 	 */
 	jQuery(document).on('click', '.menu-host', function(event) {
-		function createMenuHeader(label) {
-			return [label, null, null, { outer: 'pum_oheader', inner: 'pum_iheader' }];
-		}
-
-		function createMenuItem(label, action) {
-			return [label, action, null, { outer: 'pum_o_item', inner: 'pum_i_item' }];
-		}
-
 		var menuData = jQuery(this).data('menu');
 		var menu = [];
 
@@ -60,6 +52,29 @@ jQuery(function() {
 		}
 		if (menuData.hasScreens) {
 			menu.push(createMenuItem(t('Host screens'), 'host_screen.php?hostid=' + menuData.hostid));
+		}
+
+		// render the menu
+		show_popup_menu(event, menu, 180);
+
+		return false;
+	});
+
+	// TODO: make menu labels translatable
+	jQuery(document).on('click', '.service-conf-menu', function(event) {
+		var menuData = jQuery(this).data('menu');
+
+		var menu = [];
+		menu.push(createMenuHeader(menuData.name));
+		menu.push(createMenuItem('Add Service', 'services.php?form=1&parentid=' + menuData.serviceid + '&parentname=' + menuData.name));
+		menu.push(createMenuItem('Edit Service', 'services.php?form=1&serviceid=' + menuData.serviceid));
+
+		if (!menuData.hasDependencies) {
+			menu.push(createMenuItem('Delete service', function() {
+				if (confirm('Delete selected services?')) {
+					window.location.href = 'services.php?delete=1&serviceid=' + menuData.serviceid;
+				}
+			}));
 		}
 
 		// render the menu
