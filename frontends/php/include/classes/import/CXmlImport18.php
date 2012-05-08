@@ -431,7 +431,7 @@ class CXmlImport18 {
 			unset($screen['screenid']);
 			$exists = API::Screen()->exists(array('name' => $screen['name']));
 
-			if($exists && isset($rules['screens']['updateExisting'])){
+			if($exists && !empty($rules['screens']['updateExisting'])){
 				$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
 				if(empty($db_screens)) throw new Exception(_('No permissions for screen').' "'.$screen['name'].'" import');
 
@@ -439,7 +439,7 @@ class CXmlImport18 {
 
 				$screen['screenid'] = $db_screen['screenid'];
 			}
-			else if($exists || !isset($rules['screens']['createMissing'])){
+			else if($exists || empty($rules['screens']['createMissing'])){
 				info('Screen ['.$screen['name'].'] skipped - user rule');
 				unset($importScreens[$mnum]);
 				continue; // break if not update exist
@@ -573,8 +573,8 @@ class CXmlImport18 {
 			$images_to_update = array();
 			foreach($images as $image){
 				if(API::Image()->exists($image)){
-					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['updateExisting']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['updateExisting']))))
+					if((($image['imagetype'] == IMAGE_TYPE_ICON) && !empty($rules['images']['updateExisting']))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (!empty($rules['images']['updateExisting']))))
 					{
 
 						$options = array(
@@ -594,8 +594,8 @@ class CXmlImport18 {
 					}
 				}
 				else{
-					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['createMissing']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['images']['createMissing'])))
+					if((($image['imagetype'] == IMAGE_TYPE_ICON) && !empty($rules['images']['createMissing']))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && !empty($rules['images']['createMissing'])))
 					{
 
 						// No need to decode_base64
@@ -631,14 +631,14 @@ class CXmlImport18 {
 				$sysmap['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
 			}
 
-			if($exists && isset($rules['maps']['updateExisting'])){
+			if($exists && !empty($rules['maps']['updateExisting'])){
 				$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
 				if(empty($db_maps)) throw new Exception(_('No permissions for map').' ['.$sysmap['name'].'] import');
 
 				$db_map = reset($db_maps);
 				$sysmap['sysmapid'] = $db_map['sysmapid'];
 			}
-			else if($exists || !isset($rules['maps']['createMissing'])){
+			else if($exists || empty($rules['maps']['createMissing'])){
 				info('Map ['.$sysmap['name'].'] skipped - user rule');
 				unset($importMaps[$mnum]);
 				continue; // break if not update updateExisting
@@ -806,7 +806,7 @@ class CXmlImport18 {
 	public static function parseMain($rules){
 		$triggers_for_dependencies = array();
 
-		if(isset($rules['hosts']['updateExisting']) || isset($rules['hosts']['createMissing'])){
+		if(!empty($rules['hosts']['updateExisting']) || !empty($rules['hosts']['createMissing'])){
 			$xpath = new DOMXPath(self::$xml);
 
 			$hosts = $xpath->query('hosts/host');
@@ -819,15 +819,16 @@ class CXmlImport18 {
 						? API::Template()->exists($host_db)
 						: API::Host()->exists($host_db);
 
+
 				if(!$current_host
-						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && !isset($rules['templates']['createMissing']))
-							|| ($host_db['status'] != HOST_STATUS_TEMPLATE && !isset($rules['hosts']['createMissing'])))) {
+						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && empty($rules['templates']['createMissing']))
+							|| ($host_db['status'] != HOST_STATUS_TEMPLATE && empty($rules['hosts']['createMissing'])))) {
 					continue;
 				}
 
 				if($current_host
-						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && !isset($rules['templates']['updateExisting']))
-								|| ($host_db['status'] != HOST_STATUS_TEMPLATE && !isset($rules['hosts']['updateExisting'])))) {
+						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && empty($rules['templates']['updateExisting']))
+								|| ($host_db['status'] != HOST_STATUS_TEMPLATE && empty($rules['hosts']['updateExisting'])))) {
 					continue;
 				}
 
@@ -1023,7 +1024,7 @@ class CXmlImport18 {
 
 
 // TEMPLATES {{{
-				if (isset($rules['templateLinkage']['createMissing'])) {
+				if (!empty($rules['templateLinkage']['createMissing'])) {
 					$templates = $xpath->query('templates/template', $host);
 
 					$templateLinkage = array();
@@ -1092,7 +1093,7 @@ class CXmlImport18 {
 					}
 				}
 
-				if ($current_host && isset($rules['hosts']['updateExisting'])) {
+				if ($current_host && !empty($rules['hosts']['updateExisting'])) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$host_db['templateid'] = $current_host['hostid'];
 						$result = API::Template()->update($host_db);
@@ -1107,7 +1108,7 @@ class CXmlImport18 {
 					$current_hostid = $current_host['hostid'];
 				}
 
-				if (!$current_host && isset($rules['hosts']['createMissing'])) {
+				if (!$current_host && !empty($rules['hosts']['createMissing'])) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$result = API::Template()->create($host_db);
 						if (!$result) {
@@ -1126,7 +1127,7 @@ class CXmlImport18 {
 				$current_hostname = $host_db['host'];
 
 // ITEMS {{{
-				if(isset($rules['items']['updateExisting']) || isset($rules['items']['createMissing'])){
+				if(!empty($rules['items']['updateExisting']) || !empty($rules['items']['createMissing'])){
 					$items = $xpath->query('items/item', $host);
 
 					// if this is an export from 1.8, we need to make some adjustments to items
@@ -1235,11 +1236,11 @@ class CXmlImport18 {
 						$current_item = API::Item()->get($options);
 						$current_item = reset($current_item);
 
-						if(!$current_item && !isset($rules['items']['createMissing'])){
+						if(!$current_item && empty($rules['items']['createMissing'])){
 							info('Item ['.$item_db['key_'].'] skipped - user rule');
 							continue; // break if not update updateExisting
 						}
-						if($current_item && !isset($rules['items']['updateExisting'])){
+						if($current_item && empty($rules['items']['updateExisting'])){
 							info('Item ['.$item_db['key_'].'] skipped - user rule');
 							continue; // break if not update updateExisting
 						}
@@ -1286,7 +1287,7 @@ class CXmlImport18 {
 						}
 // }}} ITEM APPLICATIONS
 
-						if($current_item && isset($rules['items']['updateExisting'])){
+						if($current_item && !empty($rules['items']['updateExisting'])){
 							$item_db['itemid'] = $current_item['itemid'];
 							$result = API::Item()->update($item_db);
 							if(!$result){
@@ -1302,7 +1303,7 @@ class CXmlImport18 {
 						}
 
 
-						if(!$current_item && isset($rules['items']['createMissing'])){
+						if(!$current_item && !empty($rules['items']['createMissing'])){
 							$result = API::Item()->create($item_db);
 							if(!$result){
 								throw new Exception();
@@ -1331,7 +1332,7 @@ class CXmlImport18 {
 
 
 // TRIGGERS {{{
-				if(isset($rules['triggers']['updateExisting']) || isset($rules['triggers']['createMissing'])){
+				if(!empty($rules['triggers']['updateExisting']) || !empty($rules['triggers']['createMissing'])){
 					$triggers = $xpath->query('triggers/trigger', $host);
 
 					$triggers_to_add = array();
@@ -1384,20 +1385,20 @@ class CXmlImport18 {
 						unset($trigger_db['hostid']);
 
 
-						if(!$current_trigger && !isset($rules['triggers']['createMissing'])){
+						if(!$current_trigger && empty($rules['triggers']['createMissing'])){
 							info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 							continue; // break if not update updateExisting
 						}
-						if($current_trigger && !isset($rules['triggers']['updateExisting'])){
+						if($current_trigger && empty($rules['triggers']['updateExisting'])){
 							info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 							continue; // break if not update updateExisting
 						}
 
-						if($current_trigger && isset($rules['triggers']['updateExisting'])){
+						if($current_trigger && !empty($rules['triggers']['updateExisting'])){
 							$trigger_db['triggerid'] = $current_trigger['triggerid'];
 							$triggers_to_upd[] = $trigger_db;
 						}
-						if(!$current_trigger && isset($rules['triggers']['createMissing'])){
+						if(!$current_trigger && !empty($rules['triggers']['createMissing'])){
 							$triggers_to_add[] = $trigger_db;
 						}
 					}
@@ -1434,7 +1435,7 @@ class CXmlImport18 {
 
 
 // GRAPHS {{{
-				if(isset($rules['graphs']['updateExisting']) || isset($rules['graphs']['createMissing'])){
+				if(!empty($rules['graphs']['updateExisting']) || !empty($rules['graphs']['createMissing'])){
 					$graphs = $xpath->query('graphs/graph', $host);
 
 					$graphs_to_add = array();
@@ -1511,11 +1512,11 @@ class CXmlImport18 {
 							$current_graph = reset($current_graph);
 						}
 
-						if(!$current_graph && !isset($rules['graphs']['createMissing'])){
+						if(!$current_graph && empty($rules['graphs']['createMissing'])){
 							info('Graph ['.$graph_db['name'].'] skipped - user rule');
 							continue; // break if not update updateExisting
 						}
-						if($current_graph && !isset($rules['graphs']['updateExisting'])){
+						if($current_graph && empty($rules['graphs']['updateExisting'])){
 							info('Graph ['.$graph_db['name'].'] skipped - user rule');
 							continue; // break if not update updateExisting
 						}
@@ -1580,7 +1581,7 @@ class CXmlImport18 {
 				}
 
 // SCREENS
-				if(isset($rules['screens']['updateExisting']) || isset($rules['screens']['createMissing'])){
+				if(!empty($rules['screens']['updateExisting']) || !empty($rules['screens']['createMissing'])){
 					$screens_node = $xpath->query('screens', $host);
 
 					if($screens_node->length > 0){
@@ -1596,11 +1597,11 @@ class CXmlImport18 {
 							));
 							$current_screen = reset($current_screen);
 
-							if(!$current_screen && !isset($rules['screens']['createMissing'])){
+							if(!$current_screen && empty($rules['screens']['createMissing'])){
 								info('Screen ['.$screen['name'].'] skipped - user rule');
 								continue;
 							}
-							if($current_screen && !isset($rules['screens']['updateExisting'])){
+							if($current_screen && empty($rules['screens']['updateExisting'])){
 								info('Screen ['.$screen['name'].'] skipped - user rule');
 								continue;
 							}

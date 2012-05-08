@@ -81,7 +81,10 @@ class CTemplateImporter extends CImporter {
 					$this->referencer->addProcessedHost($createdTemplate['host']);
 
 					if (!empty($templateLinkage[$createdTemplate['host']])) {
-						API::Template()->massAdd(array('templates' => array('hostid' => $hostId), 'templates_link' => $templateLinkage[$createdTemplate['host']]));
+						API::Template()->massAdd(array(
+							'templates' => array('hostid' => $hostId),
+							'templates_link' => $templateLinkage[$createdTemplate['host']]
+						));
 					}
 				}
 			}
@@ -92,7 +95,10 @@ class CTemplateImporter extends CImporter {
 					$this->referencer->addProcessedHost($updatedTemplate['host']);
 
 					if (!empty($templateLinkage[$updatedTemplate['host']])) {
-						API::Template()->massAdd(array('templates' => $updatedTemplate, 'templates_link' => $templateLinkage[$updatedTemplate['host']]));
+						API::Template()->massAdd(array(
+							'templates' => $updatedTemplate,
+							'templates_link' => $templateLinkage[$updatedTemplate['host']]
+						));
 					}
 				}
 			}

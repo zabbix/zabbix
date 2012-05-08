@@ -56,7 +56,6 @@ class CHostImporter extends CImporter {
 
 		$hostsToUpdate = $this->addInterfaceIds($hostsToUpdate);
 
-
 		// a list of hostids which were created or updated to create an interface cache for those hosts
 		$processedHosts = array();
 		// create/update hosts
@@ -69,7 +68,10 @@ class CHostImporter extends CImporter {
 				$this->referencer->addProcessedHost($host);
 
 				if (!empty($templateLinkage[$host['host']])) {
-					API::Template()->massAdd(array('hosts' => array('hostid' => $hostid), 'templates' => $templateLinkage[$host['host']]));
+					API::Template()->massAdd(array(
+						'hosts' => array('hostid' => $hostid),
+						'templates' => $templateLinkage[$host['host']]
+					));
 				}
 			}
 		}
@@ -80,7 +82,10 @@ class CHostImporter extends CImporter {
 				$processedHosts[$host['host']] = $host['hostid'];
 
 				if (!empty($templateLinkage[$host['host']])) {
-					API::Template()->massAdd(array('hosts' => $host, 'templates' => $templateLinkage[$host['host']]));
+					API::Template()->massAdd(array(
+						'hosts' => $host,
+						'templates' => $templateLinkage[$host['host']]
+					));
 				}
 			}
 		}
