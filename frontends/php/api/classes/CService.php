@@ -951,7 +951,7 @@ class CService extends CZBXAPI {
 
 	/**
 	 * Escalates the problem triggers from the child services to their parents and adds them to $slaData.
-	 * Status escalation is done according to the chosen service status update algorithm.
+	 * The escalation will stop if a service has status calculation disabled or is in OK state.
 	 *
 	 * @param array $services
 	 * @param array $serviceProblems    an array of service triggers defines as
@@ -972,11 +972,16 @@ class CService extends CZBXAPI {
 			foreach ($service['parentDependencies'] as $dependency) {
 				$parentServiceId = $dependency['serviceupid'];
 
-				if (isset($services[$parentServiceId]) && $this->isStatusEnabled($services[$parentServiceId])) {
-					if (!isset($parentProblems[$parentServiceId])) {
-						$parentProblems[$parentServiceId] = array();
+				if (isset($services[$parentServiceId])) {
+					$parentService = $services[$parentServiceId];
+
+					// escalate only if status calculation is enabled for the parent service and it's in problem state
+					if ($this->isStatusEnabled($parentService) && $parentService['status']) {
+						if (!isset($parentProblems[$parentServiceId])) {
+							$parentProblems[$parentServiceId] = array();
+						}
+						$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId], $problemTriggers);
 					}
-					$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId], $problemTriggers);
 				}
 			}
 		}
@@ -984,23 +989,6 @@ class CService extends CZBXAPI {
 		// propagate the problems to the parents
 		if ($parentProblems) {
 			$slaData = $this->escalateProblems($services, $parentProblems, $slaData);
-		}
-		else {
-			// once we've reached the top, clear the problems from all services that use the SERVICE_ALGORITHM_MIN
-			// algorithm, but don't have all children in problem state
-			foreach ($slaData as $serviceId => &$serviceSla) {
-				$service = $services[$serviceId];
-				if ($service['algorithm'] == SERVICE_ALGORITHM_MIN) {
-					foreach ($service['dependencies'] as $dependency) {
-						$childServiceId = $dependency['servicedownid'];
-
-						if (isset($services[$childServiceId]) && $services[$childServiceId]['status'] == 0) {
-							$serviceSla['problems'] = array();
-						}
-					}
-				}
-			}
-			unset($serviceSla);
 		}
 
 		return $slaData;
