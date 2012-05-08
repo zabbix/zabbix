@@ -21,7 +21,7 @@
 <?php
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = "S_IT_NOTIFICATIONS";
+$page['title'] = _('Notification report');
 $page['file'] = 'report4.php';
 $page['hist_arg'] = array('media_type','period','year');
 
@@ -126,7 +126,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$to	= date('Y');
 				array_unshift($header, new CCol(_('Year'),'center'));
 				function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
-				function format_time($t){	return zbx_date2str(S_REPORT4_ANNUALLY_DATE_FORMAT, $t);}
+				function format_time($t){	return zbx_date2str(REPORT4_ANNUALLY_DATE_FORMAT, $t);}
 				function format_time2($t){	return null; }
 				break;
 			case 'monthly':
@@ -134,7 +134,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$to	= 12;
 				array_unshift($header, new CCol(_('Month'),'center'));
 				function get_time($m)	{	global $year;	return mktime(0,0,0,$m,1,$year);	}
-				function format_time($t){	return zbx_date2str(S_REPORT4_MONTHLY_DATE_FORMAT,$t);	}
+				function format_time($t){	return zbx_date2str(REPORT4_MONTHLY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return null; }
 				break;
 			case 'daily':
@@ -142,7 +142,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				$to = DAY_IN_YEAR;
 				array_unshift($header, new CCol(_('Day'),'center'));
 				function get_time($d)	{	global $year;	return mktime(0,0,0,1,$d,$year);	}
-				function format_time($t){	return zbx_date2str(S_REPORT4_DAILY_DATE_FORMAT,$t);	}
+				function format_time($t){	return zbx_date2str(REPORT4_DAILY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return null; }
 				break;
 			case 'weekly':
@@ -159,7 +159,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 					return $time + ($w * 7 - $wd) * SEC_PER_DAY;
 				}
-				function format_time($t){	return zbx_date2str(S_REPORT4_WEEKLY_DATE_FORMAT,$t);	}
+				function format_time($t){	return zbx_date2str(REPORT4_WEEKLY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return format_time($t); }
 				break;
 
