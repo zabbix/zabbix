@@ -395,7 +395,9 @@ else {
 	}
 	unset($service);
 
-	$tree = new CTree('service_conf_tree', createServiceConfigurationTree($services), array(
+	$treeData = array();
+	createServiceConfigurationTree($services, null, null, null, $treeData);
+	$tree = new CTree('service_conf_tree', $treeData, array(
 		'caption' => _('Service'),
 		'algorithm' => _('Status calculation'),
 		'description' => _('Trigger')
