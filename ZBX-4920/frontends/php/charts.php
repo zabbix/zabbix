@@ -132,7 +132,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$r_form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
-	$r_form->addItem(array(SPACE.S_HOST.SPACE, $pageFilter->getHostsCB(true)));
+	$r_form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addItem(array(SPACE._('Graph').SPACE, $pageFilter->getGraphsCB(true)));
 
 ?>
