@@ -313,11 +313,8 @@ static void	zbx_load_config()
 
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
 
-	if (NULL == CONFIG_DBNAME)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "DBName not in config file");
-		exit(1);
-	}
+	if (NULL == CONFIG_DBHOST)
+		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
 
 	if (NULL == CONFIG_PID_FILE)
 	{

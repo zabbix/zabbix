@@ -111,12 +111,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	txn_init = 1;
 
+	assert(NULL != host && '\0' != *host);
+
 #if defined(HAVE_IBM_DB2)
-	connect = strdup("PROTOCOL=TCPIP;");
+	connect = zbx_strdcatf(connect, "PROTOCOL=TCPIP;HOSTNAME=%s;", host);
 	if (NULL != dbname && '\0' != *dbname)
 		connect = zbx_strdcatf(connect, "DATABASE=%s;", dbname);
-	if (NULL != host && '\0' != *host)
-		connect = zbx_strdcatf(connect, "HOSTNAME=%s;", host);
 	if (0 != port)
 		connect = zbx_strdcatf(connect, "PORT=%d;", port);
 	if (NULL != user && '\0' != *user)
@@ -223,33 +223,22 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	memset(&oracle, 0, sizeof(oracle));
 
 	/* connection string format: [//]host[:port][/service name] */
+	connect = zbx_strdcatf(connect, "//%s", host);
+	if (port)
+		connect = zbx_strdcatf(connect, ":%d", port);
+	if (dbname && *dbname)
+		connect = zbx_strdcatf(connect, "/%s", dbname);
 
-	if (NULL != host && '\0' != *host)
+	/* initialize environment */
+	err = OCIEnvCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
+			(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
+			(dvoid * (*)(dvoid *, dvoid *, size_t))0,
+			(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+
+	if (OCI_SUCCESS != err)
 	{
-		connect = zbx_strdcatf(connect, "//%s", host);
-
-		if (port)
-			connect = zbx_strdcatf(connect, ":%d", port);
-
-		if (dbname && *dbname)
-			connect = zbx_strdcatf(connect, "/%s", dbname);
-	}
-	else
+		zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
 		ret = ZBX_DB_FAIL;
-
-	if (ZBX_DB_OK == ret)
-	{
-		/* initialize environment */
-		err = OCIEnvCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
-				(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
-				(dvoid * (*)(dvoid *, dvoid *, size_t))0,
-				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
-
-		if (OCI_SUCCESS != err)
-		{
-			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
-			ret = ZBX_DB_FAIL;
-		}
 	}
 
 	if (ZBX_DB_OK == ret)
@@ -378,7 +367,7 @@ void	zbx_create_sqlite3_mutex(const char *dbname)
 }
 #endif	/* HAVE_SQLITE3 */
 
-void	zbx_db_init(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
+void	zbx_db_init(char *dbname)
 {
 #if defined(HAVE_SQLITE3)
 	struct stat	buf;

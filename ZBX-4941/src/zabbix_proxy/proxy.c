@@ -228,6 +228,9 @@ static void	zbx_set_defaults()
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_proxy.pid");
 
+	if (NULL == CONFIG_DBHOST)
+		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
+
 	if (NULL == CONFIG_TMPDIR)
 		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
 
