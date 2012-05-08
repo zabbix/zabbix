@@ -20,6 +20,7 @@
 ?>
 <?php
 
+require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../conf/zabbix.conf.php';
 require_once dirname(__FILE__).'/../../include/func.inc.php';
