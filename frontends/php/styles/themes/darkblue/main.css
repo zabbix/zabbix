@@ -529,36 +529,6 @@ div.calendar input[type="button"] {
 .column .widget .header{ border: 1px solid #77B7DA;}
 .column .widget .footer{ border: 0; background: #245078 url('../../../images/gradients/header_footer_blue.png') repeat-x top left;}
 
-/*////////////////	INSTALLATION	////////////////////*/
-table.setup_wizard{
-	background-color: #022744;
-	border: 1px solid #77B7DA;
-}
-
-table.setup_wizard tr.header {
-	border: 1px solid #77B7DA;
-}
-
-table.setup_wizard ul li {
-	color: #77B7DA;
-}
-
-table.setup_wizard ul li.current {
-	color: #FFCC00;
-}
-
-table.setup_wizard ul li.completed {
-	color: #3C759B;
-}
-
-table.setup_wizard tr.center td.right {
-	background-color: #3C759B;
-}
-
-table.setup_wizard div.licence {
-	background-color: #022744;
-}
-
 ul.formlist li.new { background: #022744; }
 
 .dropArea { background-color: #005089; }
