@@ -98,10 +98,8 @@ function get_service_childs($serviceid, $soft = 0) {
  * @param array $service
  * @param array $dependency
  * @param array $tree
- *
- * @return array
  */
-function createServiceConfigurationTree(array $services, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
+function createServiceConfigurationTree(array $services, array $parentService = array(), array $service = array(), array $dependency = array(), &$tree = array()) {
 	if (!$service) {
 		$serviceNode = array(
 			'serviceid' => 0,
@@ -152,7 +150,7 @@ function createServiceConfigurationTree(array $services, array $parentService = 
 
 		foreach ($service['dependencies'] as $dependency) {
 			$childService = $services[$dependency['servicedownid']];
-			$tree = createServiceConfigurationTree($services, $service, $childService, $dependency, $tree);
+			createServiceConfigurationTree($services, $service, $childService, $dependency, $tree);
 		}
 	}
 	else {
@@ -160,8 +158,6 @@ function createServiceConfigurationTree(array $services, array $parentService = 
 
 		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
 	}
-
-	return $tree;
 }
 
 /**
@@ -176,10 +172,8 @@ function createServiceConfigurationTree(array $services, array $parentService = 
  * @param array $service
  * @param array $dependency
  * @param array $tree
- *
- * @return array    an array of SLA tree nodes
  */
-function createServiceMonitoringTree(array $services, array $slaData, $period, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
+function createServiceMonitoringTree(array $services, array $slaData, $period, array $parentService = array(), array $service = array(), array $dependency = array(), &$tree = array()) {
 	// if no parent service is given, start from the root
 	if (!$service) {
 		$serviceNode = array(
@@ -316,7 +310,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, a
 
 		foreach ($service['dependencies'] as $dependency) {
 			$childService = $services[$dependency['servicedownid']];
-			$tree = createServiceMonitoringTree($services, $slaData, $period, $service, $childService, $dependency, $tree);
+			createServiceMonitoringTree($services, $slaData, $period, $service, $childService, $dependency, $tree);
 		}
 	}
 	// soft dependencies
@@ -325,8 +319,6 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, a
 
 		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
 	}
-
-	return $tree;
 }
 
 /**

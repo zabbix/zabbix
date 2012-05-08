@@ -554,7 +554,6 @@ class CService extends CZBXAPI {
 			'output' => array('serviceid', 'name', 'status', 'algorithm'),
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectParentDependencies' => array('serviceupid'),
-			'selectDependencies' => array('servicedownid'),
 			'selectTrigger' => API_OUTPUT_EXTEND,
 			'serviceids' => $serviceIds,
 			'preservekeys' => true

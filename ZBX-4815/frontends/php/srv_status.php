@@ -150,10 +150,10 @@ else {
 	}
 	unset($serviceSla);
 
-	$treeServ = createServiceMonitoringTree($services, $slaData, $period);
-
+	$treeData = array();
+	createServiceMonitoringTree($services, $slaData, $period, null, null, null, $treeData);
 	$tree = new CTree('service_status_tree',
-		$treeServ,
+		$treeData,
 		array(
 			'caption' => _('Service'),
 			'status' => _('Status'),
