@@ -228,22 +228,31 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	memset(&oracle, 0, sizeof(oracle));
 
 	/* connection string format: [//]host[:port][/service name] */
-	connect = zbx_strdcatf(connect, "//%s", host);
-	if (0 != port)
-		connect = zbx_strdcatf(connect, ":%d", port);
-	if (NULL != dbname && '\0' != *dbname)
-		connect = zbx_strdcatf(connect, "/%s", dbname);
 
-	/* initialize environment */
-	err = OCIEnvCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
-			(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
-			(dvoid * (*)(dvoid *, dvoid *, size_t))0,
-			(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
-
-	if (OCI_SUCCESS != err)
+	if ('\0' != *host)
 	{
-		zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
+		connect = zbx_strdcatf(connect, "//%s", host);
+		if (0 != port)
+			connect = zbx_strdcatf(connect, ":%d", port);
+		if (NULL != dbname && '\0' != *dbname)
+			connect = zbx_strdcatf(connect, "/%s", dbname);
+	}
+	else
 		ret = ZBX_DB_FAIL;
+
+	if (ZBX_DB_OK == ret)
+	{
+		/* initialize environment */
+		err = OCIEnvCreate((OCIEnv **)&oracle.envhp, (ub4)OCI_DEFAULT,
+				(dvoid *)0, (dvoid * (*)(dvoid *,size_t))0,
+				(dvoid * (*)(dvoid *, dvoid *, size_t))0,
+				(void (*)(dvoid *, dvoid *))0, (size_t)0, (dvoid **)0);
+
+		if (OCI_SUCCESS != err)
+		{
+			zabbix_errlog(ERR_Z3001, connect, err, zbx_oci_error(err));
+			ret = ZBX_DB_FAIL;
+		}
 	}
 
 	if (ZBX_DB_OK == ret)
