@@ -11,6 +11,7 @@ A......... [ZBXNEXT-1189] implemented the "selectTrigger", "selectParentDependen
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4953] fixed unclear messages in setup.php (Toms)
 ..F....... [ZBX-4402] added contexts for ambiguous translations (Vedmak)
 A.F....... [ZBX-4915] fixed host group filtering without hosts or templates (Eduard)
 A......... [ZBXNEXT-1189] implemented permission checks for the "selectDependencies" service.get parameter (Pavels)
