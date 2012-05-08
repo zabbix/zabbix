@@ -115,7 +115,6 @@ function createServiceConfigurationTree(array $services, array $parentService = 
 		$service = $serviceNode;
 		$service['dependencies'] = array();
 		$service['trigger'] = array();
-		$service['parent'] = array();
 
 		// add all top level services as children of "root"
 		foreach ($services as $topService) {
@@ -133,7 +132,7 @@ function createServiceConfigurationTree(array $services, array $parentService = 
 	else {
 		// caption
 		$caption = new CSpan($service['name'], 'link');
-		$caption->setAttribute('onclick', 'javascript: call_menu(event, '.CJs::encodeJson($service['serviceid']).','.CJs::encodeJson($service['name']).');');
+		$caption->setAttribute('onclick', 'javascript: call_menu(event,'.CJs::encodeJson($service['serviceid']).','.CJs::encodeJson($service['name']).');');
 
 		$serviceNode = array(
 			'serviceid' => $service['serviceid'],
@@ -145,9 +144,6 @@ function createServiceConfigurationTree(array $services, array $parentService = 
 	}
 
 	if (!$dependency || !$dependency['soft']) {
-		$caption_tmp = $serviceNode['caption'];
-		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'link');
-		$serviceNode['caption']->setAttribute('onclick', 'javascript: call_menu(event, '.zbx_jsvalue($serviceNode['serviceid']).','.zbx_jsvalue($caption_tmp).');');
 		$tree[$serviceNode['serviceid']] = $serviceNode;
 
 		foreach ($service['dependencies'] as $dependency) {
@@ -197,7 +193,6 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, a
 		$service = $serviceNode;
 		$service['dependencies'] = array();
 		$service['trigger'] = array();
-		$service['parent'] = array();
 
 		// add all top level services as children of "root"
 		foreach ($services as $topService) {
