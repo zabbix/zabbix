@@ -82,7 +82,7 @@ $ZBX_MENU = array(
 				'url' => 'srv_status.php',
 				'label' => _('IT services'),
 				'force_disable_all_nodes' => true,
-				'sub_pages' => array('report3.php', 'chart_sla.php', 'chart5.php')
+				'sub_pages' => array('report3.php', 'chart5.php')
 			),
 			array(
 				'url' => 'vtext.php'
