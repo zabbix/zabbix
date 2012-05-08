@@ -1586,9 +1586,12 @@ class CTrigger extends CTriggerGeneral {
 			'value' => $pks
 		));
 
-		parent::deleteByPks($pks);
+		// update linked services
+		foreach ($pks as $triggerId) {
+			update_services($triggerId, SERVICE_STATUS_OK);
+		}
 
-		update_services_status_all();
+		parent::deleteByPks($pks);
 	}
 
 	/**
