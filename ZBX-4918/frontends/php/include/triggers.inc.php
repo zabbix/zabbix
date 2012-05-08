@@ -1446,16 +1446,23 @@ function utf8RawUrlDecode($source){
 				}
 			}
 
-			for($i=0; $i<10; $i++){
+			for ($i = 0; $i < 10; $i++) {
 				$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)){
-					$value=($flag==ZBX_FLAG_TRIGGER)?
-							trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
-							trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $row['clock']);
+				if (zbx_strstr($description, $macro)) {
+					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
+					if (isset($functionid)) {
+						$sql = 'SELECT i.value_type,i.itemid,i.valuemapid,i.units'.
+								' FROM items i,functions f'.
+								' WHERE i.itemid=f.itemid'.
+								' AND f.functionid='.$functionid;
+						$row2 = DBfetch(DBselect($sql));
 
-					$description = str_replace($macro, $value, $description);
+						$row2['lastvalue'] = ($flag == ZBX_FLAG_TRIGGER)
+								? trigger_get_func_value($row['expression'], ZBX_FLAG_TRIGGER, $i ? $i : 1, 1)
+								: trigger_get_func_value($row['expression'], ZBX_FLAG_EVENT, $i ? $i : 1, $row['clock']);
+						$description = str_replace($macro, format_lastvalue($row2), $description);
+					}
 				}
-
 			}
 
 			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $arr)){
