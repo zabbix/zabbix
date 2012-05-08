@@ -197,23 +197,27 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Adds the given field to the "output" option if it's not already present.
+	 * Adds the given fields to the "output" option if it's not already present.
 	 *
 	 * @param string $tableName
-	 * @param string $field
+	 * @param string|array $fields  either a single field name, or an array of fields
 	 * @param string $output
 	 *
 	 * @return mixed
 	 */
-	protected function extendOutputOption($tableName, $field, $output) {
-		if ($output == API_OUTPUT_SHORTEN || $output == API_OUTPUT_REFER) {
-			$output = array(
-				$this->pk($tableName),
-				$field
-			);
-		}
-		if (is_array($output) && !in_array($field, $output)) {
-			$output[] = $field;
+	protected function extendOutputOption($tableName, $fields, $output) {
+		$fields = (array) $fields;
+
+		foreach ($fields as $field) {
+			if ($output == API_OUTPUT_SHORTEN || $output == API_OUTPUT_REFER) {
+				$output = array(
+					$this->pk($tableName),
+					$field
+				);
+			}
+			if (is_array($output) && !in_array($field, $output)) {
+				$output[] = $field;
+			}
 		}
 
 		return $output;
@@ -364,7 +368,7 @@ class CZBXAPI {
 	}
 
 	/**
-	 * Modifies the SQL parts to implement all of the ouput related options.
+	 * Modifies the SQL parts to implement all of the output related options.
 	 *
 	 * @param string $tableName
 	 * @param string $tableAlias
