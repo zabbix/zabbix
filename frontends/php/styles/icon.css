@@ -110,15 +110,6 @@
 	cursor:pointer;
 }
 
-.sla_green{
-	height: 15px;
-	background: url('../images/gradients/sla_green15.png') repeat-x;
-}
-.sla_red{
-	height: 15px;
-	background: url('../images/gradients/sla_red15.png') repeat-x;
-}
-
 .icon_sortup{
 	height: 16px;
 	width: 19px;

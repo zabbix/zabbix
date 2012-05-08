@@ -2,12 +2,22 @@
 Changes for 2.0.0rc4
 
 New features:
+A......... [ZBXNEXT-1189] implemented the service.getsla method (Pavels)
+A......... [ZBXNEXT-1189] implemented the "selectTrigger", "selectParentDependencies" and "selectAlarms" parameters for the service.get method (Pavels)
+..F....... [ZBXNEXT-1189] improved the design of the SLA report page (Pavels)
 ..F....... [ZBXNEXT-1196] redesigned setup form (Toms)
 ...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
 ..F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Dutch, Greek, Japanese, Latvian, Polish, Russian, Spanish and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+A......... [ZBXNEXT-1189] implemented permission checks for the "selectDependencies" service.get parameter (Pavels)
+..F....... [ZBXNEXT-1189] fixed service ordering on the SLA report page (Pavels)
+..F....... [ZBXNEXT-1189] fixed "Graph" links not being displayed for services with children on the SLA report page (Pavels)
+..F....... [ZBXNEXT-1189] fixed time period not being remembered when following a link to a detailed service SLA report (Pavels)
+..F....... [ZBXNEXT-1189] fixed problem reasons not being displayed for parent services on the SLA report page (Pavels)
+..F....... [ZBXNEXT-1189] fixed service status and problems being calculated if the service status algorithm is set to "do not calculate" (Pavels)
+A.F....... [ZBXNEXT-1189] fixed service status not being updated when changing the severity of a linked trigger (Pavels)
 ..F....... [ZBX-4857] added validation for empty username, public and private keys in an item form (Sasha)
 ..F....... [ZBX-4938] fixed constant not used in CAction.php (Toms)
 ..F....... [ZBX-4926] fixed unable to add simple graphs and plain text to screen templates (Toms)

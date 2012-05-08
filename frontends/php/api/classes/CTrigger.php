@@ -1875,6 +1875,12 @@ class CTrigger extends CTriggerGeneral {
 				'where' => array('triggerid' => $trigger['triggerid'])
 			));
 
+			// update service status
+			if (isset($trigger['priority']) && $trigger['priority'] != $dbTrigger['priority']) {
+				$serviceStatus = ($dbTrigger['value'] == TRIGGER_VALUE_TRUE) ? $trigger['priority'] : 0;
+				update_services($trigger['triggerid'], $serviceStatus);
+			}
+
 			// restore the full expression to properly validate dependencies
 			$trigger['expression'] = $expressionChanged ? explode_exp($trigger['expression']) : $expressionFull;
 
