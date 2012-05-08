@@ -50,7 +50,7 @@ $screenForm->addItem(makeFormFooter(
 	new CSubmit('save', _('Save')),
 	array(
 		!empty($this->data['screenid']) ? new CSubmit('clone', _('Clone')) : null,
-		!empty($this->data['screenid']) ? new CButtonDelete(_('Delete screen?'), url_param('form').url_param('screenid')) : null,
+		!empty($this->data['screenid']) ? new CButtonDelete(_('Delete screen?'), url_param('form').url_param('screenid').url_param('templateid')) : null,
 		new CButtonCancel(url_param('templateid'))
 	)
 ));
