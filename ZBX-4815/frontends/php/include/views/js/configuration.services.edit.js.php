@@ -1,12 +1,7 @@
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		jQuery('#showsla').bind('click', function() {
-			if (this.checked) {
-				jQuery('#goodsla').prop('disabled', false);
-			}
-			else {
-				jQuery('#goodsla').prop('disabled', true);
-			}
+		jQuery('#showsla').click(function() {
+			jQuery('#goodsla').prop('disabled', !this.checked);
 		});
 
 		jQuery('#add_service_time').bind('click', function() {
@@ -16,6 +11,11 @@
 			input.setAttribute('value', 1);
 			jQuery('form[name=servicesForm]').append(input);
 			jQuery('form[name=servicesForm]').submit();
+		});
+
+		jQuery('#algorithm').change(function() {
+			jQuery('#showsla, #trigger, #btn1, #goodsla')
+				.prop('disabled', jQuery(this).val() == <?php echo SERVICE_ALGORITHM_NONE ?>);
 		});
 	});
 
