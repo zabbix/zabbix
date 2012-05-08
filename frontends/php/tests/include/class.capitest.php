@@ -28,9 +28,7 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
 
 // locales
-require_once dirname(__FILE__).'/../../include/locales/en_gb.inc.php';
 require_once dirname(__FILE__).'/../../include/locales.inc.php';
-process_locales();
 
 // classes
 require_once dirname(__FILE__).'/../../include/classes/class.cwebuser.php';

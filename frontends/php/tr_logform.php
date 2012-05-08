@@ -276,7 +276,7 @@ if(isset($_REQUEST['sform'])){
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item&srctbl=items&srcfld1=itemid&srcfld2=name',800,450);";
 	$cbtn = new CSubmit('select_item',_('Select'),$script);
 
-	$frmTRLog->addRow(S_ITEM,array($ctb, $cbtn));
+	$frmTRLog->addRow(_('Item'), array($ctb, $cbtn));
 	$frmTRLog->addVar('itemid',$itemid);
 
 
@@ -334,7 +334,7 @@ if(isset($_REQUEST['sform'])){
 		$imgdn->setAttribute('onmouseover','javascript: this.style.cursor = "pointer";');
 
 		$del_url = new CSpan(_('Delete'),'link');
-		$del_url->setAttribute('onclick', 'javascript: if(confirm("'.S_DELETE_EXPRESSION_Q.'")) remove_expression("logtr'.$id.'"); return false;');
+		$del_url->setAttribute('onclick', 'javascript: if(confirm("'._('Delete expression?').'")) remove_expression("logtr'.$id.'"); return false;');
 
 		$row = new CRow(array(htmlspecialchars($expr['view']),(($expr['type']==REGEXP_INCLUDE)?_('Include'):_('Exclude')),array($imgup,SPACE,$imgdn),$del_url));
 		$row->setAttribute('id','logtr'.$id);

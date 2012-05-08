@@ -131,7 +131,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
 	$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
-	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
+	$r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB(true)));
 
 	$httpmon_wdgt->addHeader(_('Web checks'), $r_form);
 	$httpmon_wdgt->addItem(SPACE);
@@ -151,7 +151,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$table = new CTableInfo(_('No web checks defined.'));
 	$table->SetHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
-		$_REQUEST['hostid'] == 0 ? make_sorting_header(S_HOST, 'h.name') : null,
+		$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'h.name') : null,
 		make_sorting_header(array($link, SPACE, _('Name')), 'wt.name'),
 		_('Number of steps'),
 		_('Last check'),

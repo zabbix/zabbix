@@ -1006,8 +1006,8 @@ function make_discovery_status() {
 	$header = array(
 		is_show_all_nodes() ? new CCol(_('Node'), 'center') : null,
 		new CCol(_('Discovery rule'), 'center'),
-		new CCol(_('Up')),
-		new CCol(_('Down'))
+		new CCol(_x('Up', 'discovery results in dashboard')),
+		new CCol(_x('Down', 'discovery results in dashboard'))
 	);
 
 	$table  = new CTableInfo();

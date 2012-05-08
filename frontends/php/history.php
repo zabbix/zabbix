@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file']	= 'history.php';
-$page['title']	= 'S_HISTORY';
+$page['title']	= _('History');
 $page['hist_arg'] = array('itemid', 'hostid', 'groupid', 'graphid', 'period', 'dec', 'inc', 'left', 'right', 'stime', 'action');
 $page['scripts'] = array('class.calendar.js','gtlc.js');
 
@@ -326,7 +326,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$table = new CTableInfo(_('No history defined.'));
 			$table->setHeader(array(
 				_('Timestamp'),
-				$fewItems ? S_ITEM : null,
+				$fewItems ? _('Item') : null,
 				$logItem ? _('Local time') : null,
 				(($eventLogItem && $logItem) ? _('Source') : null),
 				(($eventLogItem && $logItem) ? _('Severity') : null),
@@ -368,14 +368,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					}
 				}
 
-				$row = array(nbsp(zbx_date2str(S_HISTORY_LOG_ITEM_DATE_FORMAT, $data['clock'])));
+				$row = array(nbsp(zbx_date2str(_('[Y.M.d H:i:s]'), $data['clock'])));
 
 				if ($fewItems) {
 					$row[] = $host['name'].':'.itemName($item);
 				}
 
 				if ($logItem) {
-					$row[] = ($data['timestamp'] == 0) ? '-' : zbx_date2str(S_HISTORY_LOG_LOCALTIME_DATE_FORMAT, $data['timestamp']);
+					$row[] = ($data['timestamp'] == 0) ? '-' : zbx_date2str(HISTORY_LOG_LOCALTIME_DATE_FORMAT, $data['timestamp']);
 
 					// if this is a eventLog item, showing additional info
 					if($eventLogItem){
@@ -408,7 +408,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // Plain Text
 				if(!isset($_REQUEST['plaintext'])) continue;
 
-				$ptData['body'][] = zbx_date2str(S_HISTORY_LOG_ITEM_PLAINTEXT,$data['clock']);
+				$ptData['body'][] = zbx_date2str(HISTORY_LOG_ITEM_PLAINTEXT, $data['clock']);
 				$ptData['body'][] = "\t".$data['clock']."\t".htmlspecialchars($data['value'])."\n";
 			}
 		}
@@ -438,7 +438,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					sscanf($data['value'], '%f', $value);
 
 				$table->addRow(array(
-					zbx_date2str(S_HISTORY_ITEM_DATE_FORMAT, $data['clock']),
+					zbx_date2str(HISTORY_ITEM_DATE_FORMAT, $data['clock']),
 					zbx_nl2br($value)
 				));
 
@@ -448,7 +448,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				if($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) sscanf($data['value'], '%f', $value);
 				else $value = $data['value'];
 
-				$ptData['body'][] = zbx_date2str(S_HISTORY_PLAINTEXT_DATE_FORMAT, $data['clock']);
+				$ptData['body'][] = zbx_date2str(HISTORY_PLAINTEXT_DATE_FORMAT, $data['clock']);
 				$ptData['body'][] = "\t".$data['clock']."\t".htmlspecialchars($value)."\n";
 			}
 		}

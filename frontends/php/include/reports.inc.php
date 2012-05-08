@@ -404,8 +404,8 @@ function bar_report_form2(){
 			$periods_table->addRow(array(
 					new CCheckBox('group_pid['.$pid.']'),
 					$caption,
-					zbx_date2str(S_REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']),
-					zbx_date2str(S_REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']),
+					zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timesince']),
+					zbx_date2str(REPORTS_BAR_REPORT_DATE_FORMAT, $period['report_timetill']),
 					$color,
 				));
 		}
@@ -692,7 +692,7 @@ function bar_report_form3(){
 			"srctbl=items&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
 			'T');
 
-	$reportForm->addRow(S_ITEM , array($txtCondVal,$btnSelect));
+	$reportForm->addRow(_('Item'), array($txtCondVal, $btnSelect));
 
 
 	$paletteCmb = new CComboBox('palette', $palette);

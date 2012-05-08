@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function condition_operator2str($operator){
 	$str_op[CONDITION_OPERATOR_EQUAL] 	= '=';
 	$str_op[CONDITION_OPERATOR_NOT_EQUAL]	= '<>';
@@ -634,7 +634,7 @@ function count_operations_delay($operations, $def_period=0){
 return $delays;
 }
 
-function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
+function get_history_of_actions($limit, &$last_clock = null, $sql_cond = '') {
 	validate_sort_and_sortorder('clock', ZBX_SORT_DOWN);
 	$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
 
@@ -643,9 +643,9 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Nodes'), 'a.alertid') : null,
-		make_sorting_header(_('Time'),'clock'),
-		make_sorting_header(_('Type'),'description'),
-		make_sorting_header(_('Status'),'status'),
+		make_sorting_header(_('Time'), 'clock'),
+		make_sorting_header(_('Type'), 'description'),
+		make_sorting_header(_('Status'), 'status'),
 		make_sorting_header(_('Retries left'), 'retries'),
 		make_sorting_header(_('Recipient(s)'), 'sendto'),
 		_('Message'),
@@ -658,24 +658,24 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 			' WHERE e.eventid = a.eventid '.
 				' AND alerttype IN ('.ALERT_TYPE_MESSAGE.') '.
 				$sql_cond.
-				' AND '.DBcondition('e.objectid',$available_triggers).
+				' AND '.DBcondition('e.objectid', $available_triggers).
 				' AND '.DBin_node('a.alertid').
 			' ORDER BY a.clock DESC';
-	$result = DBselect($sql,$limit);
-	while($row=DBfetch($result)){
+	$result = DBselect($sql, $limit);
+	while ($row = DBfetch($result)) {
 		$alerts[] = $row;
 		$clock[] = $row['clock'];
 	}
 
-	$last_clock = !empty($clock)?min($clock):null;
+	$last_clock = !empty($clock) ? min($clock) : null;
 
 	$sortfield = getPageSortField('clock');
 	$sortorder = getPageSortOrder();
 
 	order_result($alerts, $sortfield, $sortorder);
 
-	foreach($alerts as $num => $row){
-		$time=zbx_date2str(S_HISTORY_OF_ACTIONS_DATE_FORMAT,$row['clock']);
+	foreach ($alerts as $row) {
+		$time = zbx_date2str(HISTORY_OF_ACTIONS_DATE_FORMAT, $row['clock']);
 
 		if ($row['status'] == ALERT_STATUS_SENT) {
 			$status = new CSpan(_('sent'), 'green');
@@ -683,21 +683,30 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 		}
 		elseif ($row['status'] == ALERT_STATUS_NOT_SENT) {
 			$status = new CSpan(_('In progress'), 'orange');
-			$retries = new CSpan(ALERT_MAX_RETRIES - $row['retries'],'orange');
+			$retries = new CSpan(ALERT_MAX_RETRIES - $row['retries'], 'orange');
 		}
 		else {
 			$status = new CSpan(_('not sent'), 'red');
 			$retries = new CSpan(0, 'red');
 		}
-		$sendto=$row['sendto'];
+		$sendto = $row['sendto'];
 
-		$message = array(bold(_('Subject').': '),br(),$row['subject'],br(),br(),bold(_('Message').': '),br(),$row['message']);
+		$message = array(
+			bold(_('Subject').': '),
+			br(),
+			$row['subject'],
+			br(),
+			br(),
+			bold(_('Message').': '),
+			br(),
+			$row['message']
+		);
 
-		if(empty($row['error'])){
-			$error=new CSpan(SPACE,'off');
+		if (empty($row['error'])) {
+			$error = new CSpan(SPACE, 'off');
 		}
-		else{
-			$error=new CSpan($row['error'],'on');
+		else {
+			$error = new CSpan($row['error'], 'on');
 		}
 
 		$table->addRow(array(
@@ -708,14 +717,14 @@ function get_history_of_actions($limit,&$last_clock=null,$sql_cond=''){
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
 			new CCol($message, 'top'),
-			new CCol($error, 'wraptext top')));
+			new CCol($error, 'wraptext top')
+		));
 	}
-return $table;
+
+	return $table;
 }
 
-// Author: Aly
-function get_action_msgs_for_event($event){
-
+function get_action_msgs_for_event($event) {
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Nodes') : null,
@@ -728,17 +737,24 @@ function get_action_msgs_for_event($event){
 		_('Error')
 	));
 
-
 	$alerts = $event['alerts'];
-	foreach($alerts as $alertid => $alert){
-		if($alert['alerttype'] != ALERT_TYPE_MESSAGE) continue;
+	foreach ($alerts as $alertid => $alert) {
+		if ($alert['alerttype'] != ALERT_TYPE_MESSAGE) {
+			continue;
+		}
 
-// mediatypes
 		$mediatype = array_pop($alert['mediatypes']);
 
-		$time=zbx_date2str(S_EVENT_ACTION_MESSAGES_DATE_FORMAT,$alert["clock"]);
-		if($alert['esc_step'] > 0){
-			$time = array(bold(_('Step').': '),$alert["esc_step"],br(),bold(_('Time').': '),br(),$time);
+		$time = zbx_date2str(EVENT_ACTION_MESSAGES_DATE_FORMAT, $alert["clock"]);
+		if ($alert['esc_step'] > 0) {
+			$time = array(
+				bold(_('Step').': '),
+				$alert["esc_step"],
+				br(),
+				bold(_('Time').': '),
+				br(),
+				$time
+			);
 		}
 
 		if ($alert['status'] == ALERT_STATUS_SENT) {
@@ -753,16 +769,23 @@ function get_action_msgs_for_event($event){
 			$status = new CSpan(_('not sent'), 'red');
 			$retries = new CSpan(0, 'red');
 		}
-		$sendto=$alert['sendto'];
+		$sendto = $alert['sendto'];
 
-		$message = array(bold(_('Subject').':'),br(),$alert["subject"],br(),br(),bold(_('Message').':'));
+		$message = array(
+			bold(_('Subject').':'),
+			br(),
+			$alert["subject"],
+			br(),
+			br(),
+			bold(_('Message').':')
+		);
 		array_push($message, BR(), zbx_nl2br($alert['message']));
 
-		if(empty($alert['error'])){
-			$error=new CSpan(SPACE, 'off');
+		if (empty($alert['error'])) {
+			$error = new CSpan(SPACE, 'off');
 		}
-		else{
-			$error=new CSpan($alert['error'], 'on');
+		else {
+			$error = new CSpan($alert['error'], 'on');
 		}
 
 		$table->addRow(array(
@@ -773,15 +796,14 @@ function get_action_msgs_for_event($event){
 			new CCol($retries, 'top'),
 			new CCol($sendto, 'top'),
 			new CCol($message, 'wraptext top'),
-			new CCol($error, 'wraptext top')));
+			new CCol($error, 'wraptext top')
+		));
 	}
 
-return $table;
+	return $table;
 }
 
-// Author: Aly
-function get_action_cmds_for_event($event){
-
+function get_action_cmds_for_event($event) {
 	$table = new CTableInfo(_('No actions found.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? _('Nodes') : null,
@@ -792,24 +814,33 @@ function get_action_cmds_for_event($event){
 	));
 
 	$alerts = $event['alerts'];
-	foreach($alerts as $alertid => $alert){
-		if($alert['alerttype'] != ALERT_TYPE_COMMAND) continue;
-
-		$time = zbx_date2str(S_EVENT_ACTION_CMDS_DATE_FORMAT, $alert['clock']);
-		if($alert['esc_step'] > 0){
-			$time = array(bold(_('Step').': '), $alert['esc_step'], br(), bold(_('Time').': '), br(), $time);
+	foreach ($alerts as $alert) {
+		if ($alert['alerttype'] != ALERT_TYPE_COMMAND) {
+			continue;
 		}
 
-		switch($alert['status']){
+		$time = zbx_date2str(EVENT_ACTION_CMDS_DATE_FORMAT, $alert['clock']);
+		if ($alert['esc_step'] > 0) {
+			$time = array(
+				bold(_('Step').': '),
+				$alert['esc_step'],
+				br(),
+				bold(_('Time').': '),
+				br(),
+				$time
+			);
+		}
+
+		switch ($alert['status']) {
 			case ALERT_STATUS_SENT:
 				$status = new CSpan(_('executed'), 'green');
-			break;
+				break;
 			case ALERT_STATUS_NOT_SENT:
 				$status = new CSpan(_('In progress'), 'orange');
-			break;
+				break;
 			default:
 				$status = new CSpan(_('not sent'), 'red');
-			break;
+				break;
 		}
 
 		$message = array(bold(_('Command').':'));
@@ -826,7 +857,7 @@ function get_action_cmds_for_event($event){
 		));
 	}
 
-return $table;
+	return $table;
 }
 
 function get_actions_hint_by_eventid($eventid, $status = null) {
@@ -1028,4 +1059,3 @@ function get_event_actions_stat_hints($eventid) {
 	}
 	return $actionTable;
 }
-?>
