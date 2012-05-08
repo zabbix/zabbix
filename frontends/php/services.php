@@ -372,6 +372,7 @@ if (isset($_REQUEST['form'])) {
 	$servicesView->render();
 	$servicesView->show();
 }
+// service list
 else {
 
 	// fetch services
@@ -394,9 +395,7 @@ else {
 	}
 	unset($service);
 
-	$treeServ = createServiceConfigurationTree($services);
-
-	$tree = new CTree('service_conf_tree', $treeServ, array(
+	$tree = new CTree('service_conf_tree', createServiceConfigurationTree($services), array(
 		'caption' => _('Service'),
 		'algorithm' => _('Status calculation'),
 		'description' => _('Trigger')
