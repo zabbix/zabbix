@@ -111,10 +111,12 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	txn_init = 1;
 
-	assert(NULL != host && '\0' != *host);
+	assert(NULL != host);
 
 #if defined(HAVE_IBM_DB2)
-	connect = zbx_strdcatf(connect, "PROTOCOL=TCPIP;HOSTNAME=%s;", host);
+	connect = zbx_strdup(connect, "PROTOCOL=TCPIP;");
+	if ('\0' != *host)
+		connect = zbx_strdcatf(connect, "HOSTNAME=%s;", host);
 	if (NULL != dbname && '\0' != *dbname)
 		connect = zbx_strdcatf(connect, "DATABASE=%s;", dbname);
 	if (0 != port)
@@ -130,17 +132,20 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &ibm_db2.henv)))
 		ret = ZBX_DB_FAIL;
 
-	/* set attribute to enable application to run as ODBC 3.0 application; recommended for pure IBM DB2 CLI, but not required */
-	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetEnvAttr(ibm_db2.henv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0)))
+	/* set attribute to enable application to run as ODBC 3.0 application; */
+	/* recommended for pure IBM DB2 CLI, but not required */
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetEnvAttr(ibm_db2.henv, SQL_ATTR_ODBC_VERSION,
+			(void *)SQL_OV_ODBC3, 0)))
 		ret = ZBX_DB_FAIL;
 
 	/* allocate a database connection handle */
-	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_DBC, ibm_db2.henv, &ibm_db2.hdbc)))
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_DBC, ibm_db2.henv,
+			&ibm_db2.hdbc)))
 		ret = ZBX_DB_FAIL;
 
 	/* connect to the database */
-	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, (SQLCHAR *)connect, SQL_NTS,
-								NULL, 0, NULL, SQL_DRIVER_NOPROMPT)))
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLDriverConnect(ibm_db2.hdbc, NULL, (SQLCHAR *)connect,
+			SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT)))
 		ret = ZBX_DB_FAIL;
 
 	/* set autocommit on */
@@ -224,9 +229,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	/* connection string format: [//]host[:port][/service name] */
 	connect = zbx_strdcatf(connect, "//%s", host);
-	if (port)
+	if (0 != port)
 		connect = zbx_strdcatf(connect, ":%d", port);
-	if (dbname && *dbname)
+	if (NULL != dbname && '\0' != *dbname)
 		connect = zbx_strdcatf(connect, "/%s", dbname);
 
 	/* initialize environment */
