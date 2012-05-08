@@ -131,8 +131,12 @@ function createServiceConfigurationTree(array $services, array $parentService = 
 	}
 	else {
 		// caption
-		$caption = new CSpan($service['name'], 'link');
-		$caption->setAttribute('onclick', 'javascript: call_menu(event,'.CJs::encodeJson($service['serviceid']).','.CJs::encodeJson($service['name']).');');
+		$caption = new CSpan($service['name'], 'link service-conf-menu');
+		$caption->setAttribute('data-menu', array(
+			'serviceid' => $service['serviceid'],
+			'name' => $service['name'],
+			'hasDependencies' => (bool) $service['dependencies']
+		));
 
 		$serviceNode = array(
 			'serviceid' => $service['serviceid'],
