@@ -52,7 +52,7 @@ $algorithmComboBox->addItems(serviceAlgorythm());
 $servicesFormList->addRow(_('Status calculation algorithm'), $algorithmComboBox);
 
 // append SLA to form list
-$showslaCheckbox = new CCheckBox('showsla', $this->data['showsla'], ($this->data['showsla'] == 0) ? 'no' : 'yes', 1);
+$showslaCheckbox = new CCheckBox('showsla', ($this->data['showsla'] == 0) ? 'no' : 'yes', null, 1);
 $goodslaTextBox = new CTextBox('goodsla', $this->data['goodsla'], 6, 'no', 8);
 if (!$this->data['showsla']) {
 	$goodslaTextBox->setAttribute('disabled', 'disabled');
