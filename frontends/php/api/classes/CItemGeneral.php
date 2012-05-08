@@ -280,6 +280,21 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 			}
 
+			if ($fullItem['type'] == ITEM_TYPE_SSH || $fullItem['type'] == ITEM_TYPE_TELNET) {
+				if (zbx_empty($fullItem['username'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('No authentication user name specified.'));
+				}
+
+				if ($fullItem['type'] == ITEM_TYPE_SSH && $fullItem['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
+					if (zbx_empty($fullItem['publickey'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No public key file specified.'));
+					}
+					if (zbx_empty($fullItem['privatekey'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No private key file specified.'));
+					}
+				}
+			}
+
 			// SNMP port
 			if (isset($fullItem['port']) && !zbx_empty($fullItem['port']) && !validatePortNumberOrMacro($fullItem['port'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,

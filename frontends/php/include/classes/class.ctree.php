@@ -20,6 +20,11 @@
 ?>
 <?php
 
+/**
+ * A class for rendering service trees.
+ *
+ * @see createShowServiceTree() and createServiceTree() for a way of creating trees from services
+ */
 class CTree {
 
 	public $tree;
@@ -94,28 +99,16 @@ class CTree {
 		foreach ($this->fields as $value) {
 			$style = null;
 
-			if ($value == 'status' && $this->tree[$id]['serviceid'] > 0) {
-				switch ($this->tree[$id][$value]) {
-					case TRIGGER_SEVERITY_DISASTER:
-						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_DISASTER);
-						$style = getSeverityStyle(TRIGGER_SEVERITY_DISASTER);
-						break;
-					case TRIGGER_SEVERITY_HIGH:
-						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_HIGH);
-						$style = getSeverityStyle(TRIGGER_SEVERITY_HIGH);
-						break;
-					case TRIGGER_SEVERITY_AVERAGE:
-						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_AVERAGE);
-						$style = getSeverityStyle(TRIGGER_SEVERITY_AVERAGE);
-						break;
-					case TRIGGER_SEVERITY_WARNING:
-						$this->tree[$id][$value] = getSeverityCaption(TRIGGER_SEVERITY_WARNING);
-						$style = getSeverityStyle(TRIGGER_SEVERITY_WARNING);
-						break;
-					case TRIGGER_SEVERITY_INFORMATION:
-					default:
-						$this->tree[$id][$value] = new CSpan(_('OK'), 'green');
-						break;
+			if ($value == 'status' && zbx_is_int($this->tree[$id][$value]) && $this->tree[$id]['serviceid'] > 0) {
+				$status = $this->tree[$id][$value];
+
+				// do not show the severity for information and unclassified triggers
+				if (in_array($status, array(TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED))) {
+					$this->tree[$id][$value] = new CSpan(_('OK'), 'green');
+				}
+				else {
+					$this->tree[$id][$value] = getSeverityCaption($status);
+					$style = getSeverityStyle($status);
 				}
 			}
 			$tr->addItem(new CCol($this->tree[$id][$value], $style));
@@ -178,7 +171,7 @@ class CTree {
 
 	private function countDepth() {
 		foreach ($this->tree as $id => $rows) {
-			if ($rows['id'] == '0') {
+			if ($rows['serviceid'] == '0') {
 				continue;
 			}
 			$parentid = $this->tree[$id]['parentid'];
