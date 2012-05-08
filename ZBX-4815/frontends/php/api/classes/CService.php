@@ -554,6 +554,7 @@ class CService extends CZBXAPI {
 			'output' => array('serviceid', 'name', 'status', 'algorithm'),
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectParentDependencies' => array('serviceupid'),
+			'selectDependencies' => array('servicedownid'),
 			'selectTrigger' => API_OUTPUT_EXTEND,
 			'serviceids' => $serviceIds,
 			'preservekeys' => true
@@ -950,6 +951,7 @@ class CService extends CZBXAPI {
 
 	/**
 	 * Escalates the problem triggers from the child services to their parents and adds them to $slaData.
+	 * The escalation will stop if a service has status calculation disabled or is in OK state.
 	 *
 	 * @param array $services
 	 * @param array $serviceProblems    an array of service triggers defines as
@@ -970,15 +972,21 @@ class CService extends CZBXAPI {
 			foreach ($service['parentDependencies'] as $dependency) {
 				$parentServiceId = $dependency['serviceupid'];
 
-				if (isset($services[$parentServiceId]) && $this->isStatusEnabled($services[$parentServiceId])) {
-					if (!isset($parentProblems[$parentServiceId])) {
-						$parentProblems[$parentServiceId] = array();
+				if (isset($services[$parentServiceId])) {
+					$parentService = $services[$parentServiceId];
+
+					// escalate only if status calculation is enabled for the parent service and it's in problem state
+					if ($this->isStatusEnabled($parentService) && $parentService['status']) {
+						if (!isset($parentProblems[$parentServiceId])) {
+							$parentProblems[$parentServiceId] = array();
+						}
+						$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId], $problemTriggers);
 					}
-					$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId], $problemTriggers);
 				}
 			}
 		}
 
+		// propagate the problems to the parents
 		if ($parentProblems) {
 			$slaData = $this->escalateProblems($services, $parentProblems, $slaData);
 		}
