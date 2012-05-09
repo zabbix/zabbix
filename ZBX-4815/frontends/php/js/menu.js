@@ -421,9 +421,7 @@ function menu_item (o_parent, n_order) {
 	}
 
 	if (!o_parent.n_y_direction && !n_order) {
-		//	always show menu in down direction.
-		var mi_direction = 1;
-		o_parent.set_y_direction(mi_direction);
+		o_parent.set_y_direction(jQuery(window).height() + jQuery(window).scrollTop() - o_parent.n_y - this.getprop('height') * o_parent.a_config.length < 0 ? -1 : 1);
 	}
 
 	// top
@@ -432,7 +430,7 @@ function menu_item (o_parent, n_order) {
 		: o_parent.n_y + this.getprop('block_top') * (o_parent == o_root ? o_parent.get_y_direction() : 1);
 
 	if (-1 == o_parent.get_y_direction() && !n_order) {
-		this.n_y -= this.getprop('height') * (o_parent.a_config.length - item_offset);
+		this.n_y = jQuery(window).height() + jQuery(window).scrollTop() - this.getprop('height') * (o_parent.a_config.length - item_offset);
 	}
 
 	// generate item's HMTL

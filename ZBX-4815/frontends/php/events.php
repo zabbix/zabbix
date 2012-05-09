@@ -263,7 +263,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
+		$r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB(true)));
 	}
 
 	if($allow_discovery){
@@ -463,7 +463,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 							$event_data['object_data']['ip'] = _('Unknown');
 							$event_data['object_data']['dns'] = _('Unknown');
 						}
-						$event_data['description'] = S_HOST;
+						$event_data['description'] = _('Host');
 						break;
 					case EVENT_OBJECT_DSERVICE:
 						if(isset($dservices[$event_data['objectid']])){
@@ -487,7 +487,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 				if(!isset($event_data['object_data'])) continue;
 				$table->addRow(array(
-					zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
+					zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 					$event_data['object_data']['ip'],
 					zbx_empty($event_data['object_data']['dns']) ? SPACE : $event_data['object_data']['dns'],
 					$event_data['description'],
@@ -496,7 +496,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 				if($CSV_EXPORT){
 					$csvRows[] = array(
-						zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
+						zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 						$event_data['object_data']['ip'],
 						$event_data['object_data']['dns'],
 						$event_data['description'],
@@ -665,7 +665,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
 
 					$table->addRow(array(
-						new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT, $event['clock']),
+						new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 							'action'
 						),
@@ -681,7 +681,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 					if($CSV_EXPORT) {
 						$csvRows[] = array(
-							zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
+							zbx_date2str(EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 							is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 							$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 							$description,

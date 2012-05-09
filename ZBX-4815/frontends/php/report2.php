@@ -230,7 +230,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$table = new CTableInfo(_('No hosts defined.'));
 		$table->setHeader(array(
 			is_show_all_nodes() ? _('Node') : null,
-			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? S_HOST : NULL,
+			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? _('Host') : NULL,
 			_('Name'),
 			_('Problems'),
 			_('Ok'),

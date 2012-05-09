@@ -56,7 +56,7 @@ class testFormTemplate extends CWebTest {
 	public function testFormTemplate_SimpleUpdate() {
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid', 'Templates');
-		$this->click('link=Template_Linux');
+		$this->click('link=Template OS Linux');
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
@@ -104,12 +104,12 @@ class testFormTemplate extends CWebTest {
 		$this->dropdown_select_wait('groupid', 'all');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('template_name', 'Template_Linux');
+		$this->input_type('template_name', 'Template OS Linux');
 		$this->button_click('save');
 		$this->wait();
 		$this->assertTitle('Configuration of templates');
 		$this->ok('No groups for template');
-		$this->assertEquals(1, DBcount("select * from hosts where host='Template_Linux'"));
+		$this->assertEquals(1, DBcount("select * from hosts where host='Template OS Linux'"));
 	}
 
 	public function testFormTemplate_Delete() {
@@ -138,7 +138,7 @@ class testFormTemplate extends CWebTest {
 		// Clone template
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->click('link=Template_Linux');
+		$this->click('link=Template OS Linux');
 		$this->wait();
 		$this->button_click('clone');
 		$this->wait();
@@ -168,7 +168,7 @@ class testFormTemplate extends CWebTest {
 		// Full clone template
 		$this->login('templates.php');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->click('link=Template_Linux');
+		$this->click('link=Template OS Linux');
 		$this->wait();
 		$this->button_click('full_clone');
 		$this->wait();

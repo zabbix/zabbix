@@ -166,7 +166,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$frm_test->addItemToBottomRow($btn_test);
 	$frm_test->addItemToBottomRow(SPACE);
 
-	$btn_close = new CButton('close', S_CLOSE,'javascript: self.close();');
+	$btn_close = new CButton('close', _('Close'),'javascript: self.close();');
 	$frm_test->addItemToBottomRow($btn_close);
 
 	$frm_test->show();
