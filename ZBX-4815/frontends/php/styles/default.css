@@ -205,20 +205,20 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .objectgroup.footer { margin-top: 2px; }
 
 /* host interfaces */
-.host-edit .interface-row { margin-top: -3px; }
-.host-edit .interface-row .objectgroup { border-top-width: 0; padding-top: 4px; }
-.host-edit .interface-row-first { margin-top: 0; }
-.host-edit .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
-.host-edit .interface-row .interface-drag-control,
-.host-edit .interface-row .interface-add-control {
+.edit-host .interface-row { margin-top: -3px; }
+.edit-host .interface-row .objectgroup { border-top-width: 0; padding-top: 4px; }
+.edit-host .interface-row-first { margin-top: 0; }
+.edit-host .interface-row-first .objectgroup { border-top-width: 1px; padding-top: 0; }
+.edit-host .interface-row .interface-drag-control,
+.edit-host .interface-row .interface-add-control {
 	width: 2em;
 }
-.host-edit .interface-row .interface-ip { width: 16.5em; }
-.host-edit .interface-row .interface-dns { width: 20em; }
-.host-edit .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
-.host-edit .interface-row .interface-port { width: 11em; }
-.host-edit .interface-row .interface-default { width: 4em; }
-.host-edit .dropArea .interface-add-control { visibility: hidden; }
+.edit-host .interface-row .interface-ip { width: 16.5em; }
+.edit-host .interface-row .interface-dns { width: 20em; }
+.edit-host .interface-row .interface-connect-to { width: 8em; white-space: nowrap; }
+.edit-host .interface-row .interface-port { width: 11em; }
+.edit-host .interface-row .interface-default { width: 4em; }
+.edit-host .dropArea .interface-add-control { visibility: hidden; }
 
 .border_dotted { border: 1px dotted #6C80B9; }
 .border_none { border: 0; }
@@ -773,17 +773,17 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 .preloader { width: 80px; height: 12px; }
 
-.service-mon .tableinfo .sla-value { display: inline-block; width: 5em; text-align: right; padding-right: 0.2em; }
-.service-mon .tableinfo .service-caption-soft a { color: #888; }
-.service-mon .tableinfo ul.service-problems { margin: 0; list-style-type: none; padding-left: 0; }
-.service-mon .tableinfo .sla-bar { display: inline-block; position: relative; margin-right: 0.3em; }
-.service-mon .tableinfo .sla-bar .sla-bar-legend {
+.list-service .tableinfo .service-caption-soft a { color: #888; }
+.mon-service .tableinfo .sla-value { display: inline-block; width: 5em; text-align: right; padding-right: 0.2em; }
+.mon-service .tableinfo ul.service-problems { margin: 0; list-style-type: none; padding-left: 0; }
+.mon-service .tableinfo .sla-bar { display: inline-block; position: relative; margin-right: 0.3em; }
+.mon-service .tableinfo .sla-bar .sla-bar-legend {
 	color: #1F1F1F; position: absolute;
 	top: 0; font-size: 0.9em; display: none;
 }
-.service-mon .tableinfo .sla-bar:hover .sla-bar-legend { display: block; }
-.service-mon .tableinfo .sla-bar .sla-bar-legend-start { left: 0.5em; }
-.service-mon .tableinfo .sla-bar .sla-bar-legend-end { right: 0.5em; }
-.service-mon .tableinfo .sla-bar .sla-bar-part { height: 15px; display: inline-block; margin-bottom: -4px; }
-.service-mon .tableinfo .sla-bar .sla-green { background: url('../images/gradients/sla_green15.png') repeat-x; }
-.service-mon .tableinfo .sla-bar .sla-red { background: url('../images/gradients/sla_red15.png') repeat-x; }
+.mon-service .tableinfo .sla-bar:hover .sla-bar-legend { display: block; }
+.mon-service .tableinfo .sla-bar .sla-bar-legend-start { left: 0.5em; }
+.mon-service .tableinfo .sla-bar .sla-bar-legend-end { right: 0.5em; }
+.mon-service .tableinfo .sla-bar .sla-bar-part { height: 15px; display: inline-block; margin-bottom: -4px; }
+.mon-service .tableinfo .sla-bar .sla-green { background: url('../images/gradients/sla_green15.png') repeat-x; }
+.mon-service .tableinfo .sla-bar .sla-red { background: url('../images/gradients/sla_red15.png') repeat-x; }

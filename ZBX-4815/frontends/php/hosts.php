@@ -625,13 +625,13 @@ elseif (isset($_REQUEST['form'])) {
 
 	if ($hostid = get_request('hostid', 0)) {
 		$hosts_wdgt->addItem(get_header_host_table('', $_REQUEST['hostid']));
-		$hosts_wdgt->setRootClass('host-edit');
+		$hosts_wdgt->setRootClass('edit-host');
 	}
 	$hosts_wdgt->setRootClass('host-list');
 
 	$hostForm = new CView('configuration.host.edit');
 	$hosts_wdgt->addItem($hostForm->render());
-	$hosts_wdgt->setRootClass('host-edit');
+	$hosts_wdgt->setRootClass('edit-host');
 }
 else {
 	$frmForm = new CForm();

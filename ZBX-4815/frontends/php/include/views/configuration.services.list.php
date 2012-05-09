@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-$serviceWidget = new CWidget();
+$serviceWidget = new CWidget(null, 'list-service');
 $serviceWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'), SPACE);
 $serviceWidget->addHeader(_('IT services'));
 
