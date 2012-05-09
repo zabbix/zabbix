@@ -129,7 +129,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 	}
 	else {
 		// caption
-		$caption = new CSpan($service['name'], 'link service-conf-menu');
+		$caption = new CLink($service['name'], '#', 'service-conf-menu');
 		$caption->setAttribute('data-menu', array(
 			'serviceid' => $service['serviceid'],
 			'name' => $service['name'],
@@ -154,7 +154,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		}
 	}
 	else {
-		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'unknown');
+		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'service-caption-soft');
 
 		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
 	}
