@@ -346,7 +346,7 @@ class CScreenItem extends CZBXAPI {
 					if ($dbScreenItem['screenid'] == $screenItem['screenid']
 						&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
 						&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exist.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exists.'));
 					}
 				}
 			}
