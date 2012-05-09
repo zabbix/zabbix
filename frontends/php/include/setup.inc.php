@@ -430,11 +430,11 @@ class CsetupWizard extends CForm {
 			elseif ($config->config['ZBX_SERVER_NAME'] != $this->getConfig('ZBX_SERVER_NAME')) {
 				$error = true;
 			}
-			$error_text = 'Unable to overwrite existing configuration file. ';
+			$error_text = 'Unable to overwrite the existing configuration file. ';
 		}
 		else {
 			$error = true;
-			$error_text = 'Unable to create configuration file. ';
+			$error_text = 'Unable to create the configuration file. ';
 		}
 		clear_messages();
 		if ($error) {
@@ -454,8 +454,8 @@ class CsetupWizard extends CForm {
 			$table, BR(), BR(),
 			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry')), BR(), BR()) : null,
 			!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
-				? array($error_text, BR(), 'Please install configuration file manually, or fix permissions on conf directory.', BR(), BR(),
-					'Press "Download configuration file" button, download configuration file ',
+				? array($error_text, BR(), 'Please install it manually, or fix permissions on the conf directory.', BR(), BR(),
+					'Press the "Download configuration file" button, download the configuration file ',
 					'and save it as ', BR(),
 					'"'.$ZBX_CONFIGURATION_FILE.'"', BR(), BR(),
 					new CSubmit('save_config', 'Download configuration file'),
