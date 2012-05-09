@@ -55,7 +55,7 @@ $fields = array(
 	// actions
 	'save_service' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_service_time' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	// ajax
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"), null),
 	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),

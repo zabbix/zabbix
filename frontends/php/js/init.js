@@ -78,7 +78,7 @@ jQuery(function() {
 		if (!menuData.hasDependencies) {
 			menu.push(createMenuItem(t('Delete service'), function() {
 				if (confirm(t('Delete the selected service?'))) {
-					window.location.href = 'services.php?delete=1&serviceid=' + menuData.serviceid;
+					window.location.href = new Curl('services.php?delete=1&serviceid=' + menuData.serviceid).getUrl();
 				}
 			}));
 		}
