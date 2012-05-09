@@ -700,7 +700,7 @@ class CConfigurationImport {
 							$applicationsIds[] = $applicationId;
 						}
 						else {
-							throw new Exception(_s('Item "%1$s" on "%2$s": application "%3$s does not exist".',
+							throw new Exception(_s('Item "%1$s" on "%2$s": application "%3$s" does not exist".',
 								$item['name'], $host, $application['name']));
 						}
 					}
