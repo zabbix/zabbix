@@ -1,3 +1,7 @@
+Changes for 1.8.14
+
+...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
+
 Changes for 1.8.13rc1
 
 A.F....... [ZBX-4685] fixed hangup when users login at the same time (Toms)
