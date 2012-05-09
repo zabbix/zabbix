@@ -806,7 +806,11 @@ class CXmlImport18 {
 	public static function parseMain($rules){
 		$triggers_for_dependencies = array();
 
-		if(!empty($rules['hosts']['updateExisting']) || !empty($rules['hosts']['createMissing'])){
+		if(!empty($rules['hosts']['updateExisting'])
+				|| !empty($rules['hosts']['createMissing'])
+				|| !empty($rules['templates']['createMissing'])
+				|| !empty($rules['templates']['updateExisting'])
+				){
 			$xpath = new DOMXPath(self::$xml);
 
 			$hosts = $xpath->query('hosts/host');
@@ -1022,36 +1026,6 @@ class CXmlImport18 {
 				}
 // }}} MACROS
 
-
-// TEMPLATES {{{
-				if (!empty($rules['templateLinkage']['createMissing'])) {
-					$templates = $xpath->query('templates/template', $host);
-
-					$templateLinkage = array();
-					foreach ($templates as $template) {
-						$options = array(
-							'filter' => array('host' => $template->nodeValue),
-							'output' => API_OUTPUT_SHORTEN,
-							'editable' => true
-						);
-						$current_template = API::Template()->get($options);
-
-						if (empty($current_template)) {
-							throw new Exception(_s('No permission for template "%1$s".', $template->nodeValue));
-						}
-						$current_template = reset($current_template);
-
-						$templateLinkage[] = $current_template;
-					}
-
-					$result = API::Template()->massAdd(array('hosts' => $host_db, 'templates' => $templateLinkage));
-					if (!$result) {
-						throw new Exception();
-					}
-				}
-// }}} TEMPLATES
-
-
 				// host inventory
 				if ($old_version_input) {
 					$inventoryNode = $xpath->query('host_profile/*', $host);
@@ -1093,7 +1067,7 @@ class CXmlImport18 {
 					}
 				}
 
-				if ($current_host && !empty($rules['hosts']['updateExisting'])) {
+				if ($current_host && (!empty($rules['hosts']['updateExisting']) || !empty($rules['templates']['updateExisting']))) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$host_db['templateid'] = $current_host['hostid'];
 						$result = API::Template()->update($host_db);
@@ -1107,8 +1081,8 @@ class CXmlImport18 {
 					}
 					$current_hostid = $current_host['hostid'];
 				}
+				if (!$current_host && (!empty($rules['hosts']['createMissing']) || !empty($rules['templates']['createMissing']))) {
 
-				if (!$current_host && !empty($rules['hosts']['createMissing'])) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$result = API::Template()->create($host_db);
 						if (!$result) {
@@ -1125,6 +1099,37 @@ class CXmlImport18 {
 					}
 				}
 				$current_hostname = $host_db['host'];
+
+// TEMPLATES {{{
+				if (!empty($rules['templateLinkage']['createMissing'])) {
+					$templates = $xpath->query('templates/template', $host);
+
+					$templateLinkage = array();
+					foreach ($templates as $template) {
+						$options = array(
+							'filter' => array('host' => $template->nodeValue),
+							'output' => API_OUTPUT_SHORTEN,
+							'editable' => true
+						);
+						$current_template = API::Template()->get($options);
+
+						if (empty($current_template)) {
+							throw new Exception(_s('No permission for template "%1$s".', $template->nodeValue));
+						}
+						$current_template = reset($current_template);
+
+						$templateLinkage[] = $current_template;
+					}
+
+					$result = API::Template()->massAdd(array(
+						'hosts' => array('hostid' => $current_hostid),
+						'templates' => $templateLinkage
+					));
+					if (!$result) {
+						throw new Exception();
+					}
+				}
+// }}} TEMPLATES
 
 // ITEMS {{{
 				if(!empty($rules['items']['updateExisting']) || !empty($rules['items']['createMissing'])){
