@@ -20,14 +20,15 @@
 ?>
 <?php
 
-require_once(dirname(__FILE__).'/../../include/defines.inc.php');
-require_once(dirname(__FILE__).'/../../conf/zabbix.conf.php');
-require_once(dirname(__FILE__).'/../../include/copt.lib.php');
-require_once(dirname(__FILE__).'/../../include/func.inc.php');
-require_once(dirname(__FILE__).'/../../include/db.inc.php');
+require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
+require_once dirname(__FILE__).'/../../include/defines.inc.php';
+require_once dirname(__FILE__).'/../../conf/zabbix.conf.php';
+require_once dirname(__FILE__).'/../../include/func.inc.php';
+require_once dirname(__FILE__).'/../../include/db.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/db/DB.php';
+require_once dirname(__FILE__).'/../../include/classes/debug/CProfiler.php';
 
-function error($error)
-{
+function error($error) {
 	echo "\nError reported: $error\n";
 	return true;
 }
@@ -35,15 +36,13 @@ function error($error)
 /**
  * Returns database data suitable for PHPUnit data provider functions
  */
-function DBdata($query)
-{
+function DBdata($query) {
 	DBconnect($error);
 
 	$objects=array();
 
 	$result=DBselect($query);
-	while($object=DBfetch($result))
-	{
+	while ($object=DBfetch($result)) {
 		$objects[]=array($object);
 	}
 
@@ -56,9 +55,8 @@ function DBdata($query)
  * For example: DBget_tables('users')
  * Result: array(users,alerts,acknowledges,auditlog,auditlog_details,opmessage_usr,media,profiles,sessions,users_groups)
  */
-function DBget_tables(&$tables, $topTable)
-{
-	if(in_array($topTable, $tables))
+function DBget_tables(&$tables, $topTable) {
+	if (in_array($topTable, $tables))
 		return;
 
 	$schema = include(dirname(__FILE__).'/../../include/schema.inc.php');
@@ -66,25 +64,24 @@ function DBget_tables(&$tables, $topTable)
 	$tableData = $schema[$topTable];
 
 	$fields = $tableData['fields'];
-	foreach($fields as $field => $fieldData){
-		if(isset($fieldData['ref_table'])){
+	foreach ($fields as $field => $fieldData) {
+		if (isset($fieldData['ref_table'])) {
 			$refTable = $fieldData['ref_table'];
-			if($refTable != $topTable)
+			if ($refTable != $topTable)
 				DBget_tables($tables, $refTable);
 		}
 	}
 
-	if(!in_array($topTable, $tables))
+	if (!in_array($topTable, $tables))
 		$tables[] = $topTable;
 
-	foreach($schema as $table => $tableData)
-	{
+	foreach ($schema as $table => $tableData) {
 		$fields = $schema[$table]['fields'];
 		$referenced = false;
-		foreach($fields as $field => $fieldData){
-			if(isset($fieldData['ref_table'])){
+		foreach ($fields as $field => $fieldData) {
+			if (isset($fieldData['ref_table'])) {
 				$refTable = $fieldData['ref_table'];
-				if($refTable == $topTable && $topTable != $table){
+				if ($refTable == $topTable && $topTable != $table) {
 					DBget_tables($tables, $table);
 				}
 			}
@@ -96,17 +93,15 @@ function DBget_tables(&$tables, $topTable)
  * Saves data of the specified table and all dependent tables in temporary storage.
  * For example: DBsave_tables('users')
  */
-function DBsave_tables($topTable)
-{
+function DBsave_tables($topTable) {
 	global $DB;
 
 	$tables = array();
 
 	DBget_tables($tables, $topTable);
 
-	foreach($tables as $table)
-	{
-		switch($DB['TYPE']) {
+	foreach ($tables as $table) {
+		switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
 			DBexecute("drop table if exists ${table}_tmp");
 			DBexecute("create table ${table}_tmp like $table");
@@ -127,23 +122,20 @@ function DBsave_tables($topTable)
  * Restores data from temporary storage. DBsave_tables() must be called first.
  * For example: DBrestore_tables('users')
  */
-function DBrestore_tables($topTable)
-{
+function DBrestore_tables($topTable) {
 	global $DB;
 
 	$tables = array();
 
 	DBget_tables($tables, $topTable);
 
-	$tables_reversed = array_reverse($tables);
+	$tablesReversed = array_reverse($tables);
 
-	foreach($tables_reversed as $table)
-	{
+	foreach ($tablesReversed as $table) {
 		DBexecute("delete from $table");
 	}
 
-	foreach($tables as $table)
-	{
+	foreach ($tables as $table) {
 		DBexecute("insert into $table select * from ${table}_tmp");
 		DBexecute("drop table ${table}_tmp");
 	}
@@ -152,17 +144,14 @@ function DBrestore_tables($topTable)
 /**
  * Returns md5 hash sum of database result.
  */
-function DBhash($sql)
-{
+function DBhash($sql) {
 	global $DB;
 
 	$hash = '<empty hash>';
 
 	$result=DBselect($sql);
-	while($row = DBfetch($result))
-	{
-		foreach($row as $key => $value)
-		{
+	while ($row = DBfetch($result)) {
+		foreach ($row as $key => $value) {
 			$hash = md5($hash.$value);
 		}
 	}
@@ -173,24 +162,23 @@ function DBhash($sql)
 /**
  * Returns number of records in database result.
  */
-function DBcount($sql, $limit = null, $offset = null){
+function DBcount($sql, $limit = null, $offset = null) {
 	$cnt = 0;
 
-	if(isset($limit) && isset($offset)){
+	if (isset($limit) && isset($offset)) {
 		$result = DBselect($sql, $limit, $offset);
 	}
-	else if(isset($limit)){
-		$result = DBselect($sql,$limit);
+	elseif (isset($limit)) {
+		$result = DBselect($sql, $limit);
 	}
-	else{
+	else {
 		$result = DBselect($sql);
 	}
 
-	while(DBfetch($result)){
+	while (DBfetch($result)) {
 		$cnt++;
 	}
 
 	return $cnt;
 }
-
 ?>

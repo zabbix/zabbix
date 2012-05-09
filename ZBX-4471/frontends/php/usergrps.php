@@ -19,19 +19,19 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/media.inc.php');
-require_once('include/users.inc.php');
-require_once('include/forms.inc.php');
-require_once('include/js.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/media.inc.php';
+require_once dirname(__FILE__).'/include/users.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/js.inc.php';
 
-$page['title'] = _('User groups');
+$page['title'] = _('Configuration of user groups');
 $page['file'] = 'usergrps.php';
 $page['hist_arg'] = array('config');
 $page['scripts'] = array();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -206,7 +206,7 @@ elseif ($_REQUEST['go'] == 'set_gui_access') {
 	$sql = 'SELECT ug.usrgrpid, ug.name '.
 			' FROM usrgrp ug '.
 			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.DBcondition('ug.usrgrpid',$groupids);
+				' AND '.DBcondition('ug.usrgrpid', $groupids);
 	$db_groups = DBselect($sql);
 	while ($group = DBfetch($db_groups)) {
 		$groups[$group['usrgrpid']] = $group;
@@ -235,7 +235,7 @@ elseif (str_in_array($_REQUEST['go'], array('enable_debug', 'disable_debug'))) {
 	$sql = 'SELECT ug.usrgrpid, ug.name '.
 			' FROM usrgrp ug '.
 			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.DBcondition('ug.usrgrpid',$groupids);
+				' AND '.DBcondition('ug.usrgrpid', $groupids);
 	$db_group = DBselect($sql);
 	while ($group = DBfetch($db_group)) {
 		$groups[$group['usrgrpid']] = $group;
@@ -263,7 +263,7 @@ elseif (str_in_array($_REQUEST['go'], array('enable_status', 'disable_status')))
 	$sql = 'SELECT ug.usrgrpid, ug.name '.
 			' FROM usrgrp ug '.
 			' WHERE '.DBin_node('ug.usrgrpid').
-				' AND '.DBcondition('ug.usrgrpid',$groupids);
+				' AND '.DBcondition('ug.usrgrpid', $groupids);
 	$db_groups = DBselect($sql);
 	while ($group = DBfetch($db_groups)) {
 		$groups[$group['usrgrpid']] = $group;
@@ -395,5 +395,5 @@ else {
 	$userGroupsView->show();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

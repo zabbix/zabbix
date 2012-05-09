@@ -19,25 +19,23 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/class_cItemKey.php');
-require_once(dirname(__FILE__).'/function_DBcommit.php');
-require_once(dirname(__FILE__).'/function_DBcondition.php');
-require_once(dirname(__FILE__).'/function_DBconnect.php');
-require_once(dirname(__FILE__).'/function_DBclose.php');
-require_once(dirname(__FILE__).'/function_DBend.php');
-require_once(dirname(__FILE__).'/function_DBexecute.php');
-require_once(dirname(__FILE__).'/function_DBfetch.php');
-require_once(dirname(__FILE__).'/function_DBid2nodeid.php');
-require_once(dirname(__FILE__).'/function_DBin_node.php');
-require_once(dirname(__FILE__).'/function_DBloadfile.php');
-require_once(dirname(__FILE__).'/function_DBrollback.php');
-require_once(dirname(__FILE__).'/function_DBselect.php');
-require_once(dirname(__FILE__).'/function_DBstart.php');
+require_once dirname(__FILE__).'/class_cItemKey.php';
+require_once dirname(__FILE__).'/function_DBcommit.php';
+require_once dirname(__FILE__).'/function_DBcondition.php';
+require_once dirname(__FILE__).'/function_DBconnect.php';
+require_once dirname(__FILE__).'/function_DBclose.php';
+require_once dirname(__FILE__).'/function_DBend.php';
+require_once dirname(__FILE__).'/function_DBexecute.php';
+require_once dirname(__FILE__).'/function_DBfetch.php';
+require_once dirname(__FILE__).'/function_DBid2nodeid.php';
+require_once dirname(__FILE__).'/function_DBin_node.php';
+require_once dirname(__FILE__).'/function_DBloadfile.php';
+require_once dirname(__FILE__).'/function_DBrollback.php';
+require_once dirname(__FILE__).'/function_DBselect.php';
+require_once dirname(__FILE__).'/function_DBstart.php';
 
-class GeneralTests
-{
-	public static function suite()
-	{
+class GeneralTests {
+	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
 		$suite->addTestSuite('class_cItemKey');

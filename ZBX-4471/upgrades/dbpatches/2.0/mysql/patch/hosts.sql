@@ -59,21 +59,21 @@ ALTER TABLE items
 	ADD interfaceid bigint unsigned NULL,
 	ADD port varchar(64) DEFAULT '' NOT NULL,
 	ADD description text NOT NULL,
-	ADD inventory_link integer DEFAULT '0' NOT NULL;
-
-UPDATE items SET templateid=NULL WHERE templateid=0;
+	ADD inventory_link integer DEFAULT '0' NOT NULL,
+	ADD lifetime varchar(64) DEFAULT '30' NOT NULL;
 CREATE TEMPORARY TABLE tmp_items_itemid (itemid bigint unsigned PRIMARY KEY);
-
 INSERT INTO tmp_items_itemid (itemid) (SELECT itemid FROM items);
-UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM tmp_items_itemid);
+UPDATE items
+	SET templateid=NULL
+	WHERE templateid=0
+		OR templateid NOT IN (SELECT itemid FROM tmp_items_itemid);
 DROP TABLE tmp_items_itemid;
-
-UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
-UPDATE items SET valuemapid=NULL WHERE valuemapid IS NOT NULL AND valuemapid NOT IN (SELECT valuemapid from valuemaps);
+UPDATE items
+	SET valuemapid=NULL
+	WHERE valuemapid=0
+		OR valuemapid NOT IN (SELECT valuemapid FROM valuemaps);
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
-
 DELETE FROM items WHERE hostid NOT IN (SELECT hostid FROM hosts);
-
 ALTER TABLE items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
 ALTER TABLE items ADD CONSTRAINT c_items_2 FOREIGN KEY (templateid) REFERENCES items (itemid) ON DELETE CASCADE;
 ALTER TABLE items ADD CONSTRAINT c_items_3 FOREIGN KEY (valuemapid) REFERENCES valuemaps (valuemapid);
@@ -172,6 +172,33 @@ UPDATE items SET key_ = zbx_convert_simple_checks(itemid, hostid, key_)
 
 DROP FUNCTION zbx_convert_simple_checks;
 
+-- adding web.test.error[<web check>] items
+
+SET @itemid = (SELECT MAX(itemid) FROM items);
+SET @httptestitemid = (SELECT MAX(httptestitemid) FROM httptestitem);
+SET @itemappid = (SELECT MAX(itemappid) FROM items_applications);
+
+INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+	SELECT @itemid := @itemid + 1, hostid, type, 'Last error message of scenario \'$1\'', CONCAT('web.test.error', SUBSTR(key_, LOCATE('[', key_))), 1, '', delay, history, 0, status
+	FROM items
+	WHERE type = 9
+		AND key_ LIKE 'web.test.fail%';
+
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+	SELECT @httptestitemid := @httptestitemid + 1, ht.httptestid, i.itemid, 4
+	FROM httptest ht,applications a,items i
+	WHERE ht.applicationid=a.applicationid
+		AND a.hostid=i.hostid
+		AND CONCAT('web.test.error[', ht.name, ']') = i.key_;
+
+INSERT INTO items_applications (itemappid, applicationid, itemid)
+	SELECT @itemappid := @itemappid + 1, ht.applicationid, hti.itemid
+	FROM httptest ht, httptestitem hti
+	WHERE ht.httptestid = hti.httptestid
+		AND hti.type = 4;
+
+DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications');
+
 -- Patching table `hosts`
 
 ALTER TABLE hosts MODIFY hostid bigint unsigned NOT NULL,
@@ -191,8 +218,20 @@ ALTER TABLE hosts MODIFY hostid bigint unsigned NOT NULL,
 		  ADD jmx_errors_from integer DEFAULT '0' NOT NULL,
 		  ADD jmx_error varchar(128) DEFAULT '' NOT NULL,
 		  ADD name varchar(64) DEFAULT '' NOT NULL;
-UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
-UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
+CREATE TEMPORARY TABLE tmp_hosts_hostid (hostid bigint unsigned PRIMARY KEY);
+INSERT INTO tmp_hosts_hostid (hostid) (SELECT hostid FROM hosts);
+UPDATE hosts
+	SET proxy_hostid=NULL
+	WHERE proxy_hostid=0
+		OR proxy_hostid NOT IN (SELECT hostid FROM tmp_hosts_hostid);
+DROP TABLE tmp_hosts_hostid;
+UPDATE hosts
+	SET maintenanceid=NULL,
+		maintenance_status=0,
+		maintenance_type=0,
+		maintenance_from=0
+	WHERE maintenanceid=0
+		OR maintenanceid NOT IN (SELECT maintenanceid FROM maintenances);
 UPDATE hosts SET name=host WHERE status in (0,1,3);	-- MONITORED, NOT_MONITORED, TEMPLATE
 CREATE INDEX hosts_4 on hosts (name);
 ALTER TABLE hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);

@@ -26,7 +26,7 @@ class CPUMenu{
 	var $width;
 	*/
 /* public */
-	public function __construct($items=array(), $width=null){
+	public function __construct($items=array(), $width=null) {
 		/*********************** ITEM ARRAY ***********************
 		ITEM: array(name, url, param, css, submenu1, submenu2, ... , submenuN)
 

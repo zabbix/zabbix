@@ -19,11 +19,18 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormLogin extends CWebTest
-{
-	public function testFormLogin_LoginOK(){
+class testFormLogin extends CWebTest {
+
+	public function testFormLogin_ClearIds() {
+
+	DBexecute('DELETE FROM ids');
+
+	}
+
+	public function testFormLogin_LoginOK() {
+
 		$this->login('dashboard.php');
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
@@ -31,16 +38,19 @@ class testFormLogin extends CWebTest
 		$this->ok('Username');
 		$this->ok('Password');
 
-		$this->input_type('name','Admin');
-		$this->input_type('password','zabbix');
+		$this->input_type('name', 'Admin');
+		$this->input_type('password', 'zabbix');
 		$this->click('enter');
 		$this->wait();
 
 		$this->nok('Password');
-		$this->nok('Login name');
+		$this->nok('Username');
 	}
 
-	public function testFormLogin_LoginIncorrectPassword(){
+	public function testFormLogin_LoginIncorrectPassword() {
+
+		DBsave_tables('users');
+
 		$this->login('dashboard.php');
 		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
@@ -48,36 +58,110 @@ class testFormLogin extends CWebTest
 		$this->ok('Username');
 		$this->ok('Password');
 
-		$this->input_type('name','Admin');
-		$this->input_type('password','!@$#%$&^*(\"\'\\*;:');
+		$this->input_type('name', 'Admin');
+		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->click('enter');
 		$this->wait();
-		$this->ok('Login name or password is incorrect');
-		$this->ok('Login name');
+		$this->ok(array('Login name or password is incorrect', 'Username', 'Password'));
+
+		$sql = 'SELECT * FROM users WHERE attempt_failed>0 AND alias='.zbx_dbstr('Admin');
+		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_failed should not be zero after incorrect login.');
+		$sql = 'SELECT * FROM users WHERE attempt_clock>0 AND alias='.zbx_dbstr('Admin');
+		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_clock should not be zero after incorrect login.');
+		$sql = 'SELECT * FROM users WHERE attempt_ip<>\'\' AND alias='.zbx_dbstr('Admin');
+		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_ip should not be empty after incorrect login.');
+
+		DBrestore_tables('users');
+	}
+
+	public function testFormLogin_BlockAccount() {
+
+		DBsave_tables('users');
+
+		$this->login('dashboard.php');
+		$this->assertTitle('Dashboard');
+		$this->click('link=Logout');
+		$this->wait();
+		$this->ok('Username');
 		$this->ok('Password');
 
-		$sql="select * from users where alias='Admin' and attempt_failed>0";
-		$this->assertEquals(1,DBcount($sql),"Chuck Norris: Field users.attempt_failed should not be zero after incorrect login.");
-		$sql="select * from users where alias='Admin' and attempt_clock>0";
-		$this->assertEquals(1,DBcount($sql),"Chuck Norris: Field users.attempt_clock should not be zero after incorrect login.");
-		$sql="select * from users where alias='Admin' and attempt_ip<>''";
-		$this->assertEquals(1,DBcount($sql),"Chuck Norris: Field users.attempt_ip should not be empty after incorrect login.");
+		for ($i = 1; $i <= 5; $i++) {
+			$this->input_type('name', 'Admin');
+			$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
+			$this->click('enter');
+			$this->wait();
+			$this->ok(array('Login name or password is incorrect', 'Username', 'Password'));
+
+			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_failed='.$i.'';
+			$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_failed should be equal '.$i.' after '.$i.' incorrect login.');
+			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_clock>0';
+			$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_clock should not be zero after incorrect login.');
+			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_ip<>'.zbx_dbstr('');
+			$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_ip should not be empty after incorrect login.');
+		}
+
+		$this->input_type('name', 'Admin');
+		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
+		$this->click('enter');
+		$this->wait();
+		$this->ok(array('Account is blocked for', 'seconds', 'Username', 'Password'));
+
+		DBrestore_tables('users');
 	}
 
-	public function testFormLogin_LoginAfterIncorrectLogin(){
-		// TODO
-		// Make sure to check for 'N  failed login attempts logged. Last failed attempt was from';
-		$this->markTestIncomplete();
-	}
+	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
 
-	public function testFormLogin_BlockAccount(){
-		// TODO
-		$this->markTestIncomplete();
-	}
+		DBsave_tables('users');
 
-	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds(){
-		// TODO
-		$this->markTestIncomplete();
+		$this->login('dashboard.php');
+		$this->assertTitle('Dashboard');
+		$this->click('link=Logout');
+		$this->wait();
+		$this->ok('Username');
+		$this->ok('Password');
+
+		for ($i = 1; $i <= 5; $i++) {
+			$this->input_type('name', 'Admin');
+			$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
+			$this->click('enter');
+			$this->wait();
+			$this->ok('Login name or password is incorrect');
+			$this->ok('Username');
+			$this->ok('Password');
+
+			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_failed='.$i.'';
+			$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_failed should be equal '.$i.' after '.$i.' incorrect login.');
+			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_clock>0';
+			$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_clock should not be zero after incorrect login.');
+			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_ip<>'.zbx_dbstr('');
+			$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_ip should not be empty after incorrect login.');
+		}
+
+		$this->input_type('name', 'Admin');
+		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
+		$this->click('enter');
+		$this->wait();
+		$this->ok(array('Account is blocked for', 'seconds', 'Username', 'Password'));
+
+		// account is blocked, waiting 35 sec and trying to login
+		sleep(35);
+
+		$this->login('dashboard.php');
+		$this->assertTitle('Dashboard');
+		$this->click('link=Logout');
+		$this->wait();
+		$this->ok(array('Username', 'Password'));
+
+		$this->input_type('name', 'Admin');
+		$this->input_type('password', 'zabbix');
+		$this->click('enter');
+		$this->wait();
+
+		$this->nok('Password');
+		$this->nok('Username');
+
+		DBrestore_tables('users');
+
 	}
 }
 ?>

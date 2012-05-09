@@ -19,92 +19,42 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/images.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/images.inc.php';
 
-	$page['file']	= 'image.php';
-	$page['title']	= 'S_IMAGE';
-	$page['type']	= PAGE_TYPE_IMAGE;
+$page['file'] = 'image.php';
+$page['title'] = _('Image');
+$page['type'] = PAGE_TYPE_IMAGE;
 
-require_once('include/page_header.php');
-
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'imageid'=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,	NULL),
-		'width'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000),	NULL),
-		'height'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(1,2000),	NULL),
-	);
-	check_fields($fields);
+//	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'imageid' =>	array(T_ZBX_INT, O_MAND, P_SYS, DB_ID,				null),
+	'width' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(1, 2000),	null),
+	'height' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(1, 2000),	null),
+);
+check_fields($fields);
 ?>
 <?php
+$resize = false;
+if (isset($_REQUEST['width']) || isset($_REQUEST['height'])) {
+	$resize = true;
+	$width = get_request('width', 0);
+	$height = get_request('height', 0);
+}
+if (!($row = get_image_by_imageid($_REQUEST['imageid']))) {
+	error(_('Incorrect image index.'));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+}
+$source = imageFromString($row['image']);
+unset($row);
 
-	$resize = 0;
+if ($resize) {
+	$source = imageThumb($source, $width, $height);
+}
+imageout($source);
 
-	if(isset($_REQUEST['width']) || isset($_REQUEST['height'])){
-		$resize = 1;
-		$th_width = get_request('width',0);
-		$th_height = get_request('height',0);
-	}
-
-	if(!($row = get_image_by_imageid($_REQUEST['imageid']))){
-		error('Incorrect image index');
-		require_once('include/page_footer.php');
-	}
-
-	$source = imagecreatefromstring($row['image']);
-
-	unset($row);
-
-	if($resize == 1){
-		$src_width	= imagesx($source);
-		$src_height	= imagesy($source);
-
-		if($src_width > $th_width || $src_height > $th_height){
-			if($th_width == 0){
-				$th_width = $th_height * $src_width/$src_height;
-			}
-			else if($th_height == 0){
-				$th_height = $th_width * $src_height/$src_width;
-			}
-			else {
-				$a = $th_width/$th_height;
-				$b = $src_width/$src_height;
-
-				if($a > $b){
-					$th_width  = $b * $th_height;
-					$th_height = $th_height;
-				}
-				else {
-					$th_height = $th_width/$b;
-					$th_width  = $th_width;
-				}
-			}
-
-			if(function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1,1)){
-				$thumb = imagecreatetruecolor($th_width,$th_height);
-			}
-			else{
-				$thumb = imagecreate($th_width,$th_height);
-			}
-
-			imagecopyresized(
-				$thumb, $source,
-				0, 0,
-				0, 0,
-				$th_width, $th_height,
-				$src_width, $src_height);
-
-			imagedestroy($source);
-
-			$source = $thumb;
-		}
-	}
-	imageout($source);
-?>
-<?php
-
-require_once "include/page_footer.php";
-
+require_once 'include/page_footer.php';
 ?>

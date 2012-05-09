@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/triggers.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
 
 $page['title'] = _('Most busy triggers top 100');
 $page['file'] = 'report5.php';
 $page['hist_arg'] = array('period');
 $page['scripts'] = array();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -54,10 +54,10 @@ $form->addItem($cmbPeriod);
 
 $rprt_wdgt->addPageHeader(_('MOST BUSY TRIGGERS TOP 100'));
 
-$rprt_wdgt->addHeader(_('REPORT'), $form);
+$rprt_wdgt->addHeader(_('Report'), $form);
 $rprt_wdgt->addItem(BR());
 
-$table = new CTableInfo();
+$table = new CTableInfo(_('No hosts defined.'));
 $table->setHeader(array(
 	is_show_all_nodes() ? _('Node') : null,
 	_('Host'),
@@ -132,7 +132,7 @@ foreach ($triggers as $tid => $trigger) {
 	$triggers[$tid] = $trigger;
 }
 
-ArraySorter::sort($triggers, array(array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN), 'host', 'description', 'priority'));
+CArrayHelper::sort($triggers, array(array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN), 'host', 'description', 'priority'));
 foreach ($triggers as $trigger) {
 	$menus = '';
 	$host_nodeid = id2nodeid($trigger['hostid']);
@@ -173,6 +173,6 @@ foreach ($triggers as $trigger) {
 $rprt_wdgt->addItem($table);
 $rprt_wdgt->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

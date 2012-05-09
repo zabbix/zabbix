@@ -19,20 +19,27 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "groups";');
+global $USER_DETAILS;
+
 $hostgroupWidget = new CWidget();
 
 // create new hostgroup button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create group')));
+if ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
+	$tmp_item = new CSubmit('form', _('Create host group'));
+}
+else {
+	$tmp_item = new CSubmit('form', _('Create host group').SPACE._('(Only Super Admins can create group)'));
+	$tmp_item->setEnabled(false);
+}
+$createForm->addItem($tmp_item);
+
 $hostgroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'), $createForm);
 
 // header
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $hostgroupWidget->addHeader(_('Host groups'));
-$hostgroupWidget->addHeader($numRows);
+$hostgroupWidget->addHeaderRowNumber();
 
 // create form
 $hostgroupForm = new CForm();
@@ -111,8 +118,8 @@ foreach ($this->data['groups'] as $group) {
 
 // create go button
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Activate selected'));
-$goOption->setAttribute('confirm', _('Activate selected hosts?'));
+$goOption = new CComboItem('activate', _('Enable selected'));
+$goOption->setAttribute('confirm', _('Enable selected hosts?'));
 $goComboBox->addItem($goOption);
 $goOption = new CComboItem('disable', _('Disable selected'));
 $goOption->setAttribute('confirm', _('Disable hosts in the selected host groups?'));
@@ -122,6 +129,7 @@ $goOption->setAttribute('confirm', _('Delete selected host groups?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "groups";');
 
 // append table to form
 $hostgroupForm->addItem(array($this->data['paging'], $hostgroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

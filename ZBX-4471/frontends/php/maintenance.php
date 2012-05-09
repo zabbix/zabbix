@@ -19,20 +19,19 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/maintenances.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/maintenances.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Maintenance');
+$page['title'] = _('Configuration of maintenance');
 $page['file'] = 'maintenance.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.calendar.js');
 
-require_once('include/page_header.php');
-?>
-<?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+require_once dirname(__FILE__).'/include/page_header.php';
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
 	'groups' =>					array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -68,8 +67,7 @@ $fields = array(
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
-?>
-<?php
+
 $_REQUEST['go'] = get_request('go', 'none');
 
 // permissions
@@ -85,8 +83,9 @@ if (get_request('hostid', 0) > 0) {
 		access_deny();
 	}
 }
+
 /*
- * Clone
+ * Actions
  */
 if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 	unset($_REQUEST['maintenanceid']);
@@ -95,9 +94,6 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['maintenanceid'])) {
 elseif (isset($_REQUEST['cancel_new_timeperiod'])) {
 	unset($_REQUEST['new_timeperiod']);
 }
-/*
- * Save
- */
 elseif (isset($_REQUEST['save'])) {
 	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 		access_deny();
@@ -154,9 +150,6 @@ elseif (isset($_REQUEST['save'])) {
 		show_error_message($msg2);
 	}
 }
-/*
- * Delete
- */
 elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 	if (!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY))) {
 		access_deny();
@@ -474,5 +467,5 @@ else {
 	$maintenanceView->show();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

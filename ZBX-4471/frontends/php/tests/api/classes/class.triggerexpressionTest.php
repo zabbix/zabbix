@@ -21,19 +21,18 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../../../include/locales/en_gb.inc.php');
-require_once(dirname(__FILE__).'/../../../include/locales.inc.php');
-process_locales();
-require_once(dirname(__FILE__).'/../../../include/defines.inc.php');
-require_once(dirname(__FILE__).'/../../../include/validate.inc.php');
-require_once(dirname(__FILE__).'/../../../include/func.inc.php');
-require_once(dirname(__FILE__).'/../../../include/items.inc.php');
-require_once(dirname(__FILE__).'/../../../include/triggers.inc.php');
-require_once(dirname(__FILE__).'/../../../api/classes/class.ctriggerexpression.php');
-require_once(dirname(__FILE__).'/../../../api/classes/class.citemkey.php');
+require_once dirname(__FILE__).'/../../../include/locales.inc.php';
+require_once dirname(__FILE__).'/../../../include/gettextwrapper.inc.php';
+require_once dirname(__FILE__).'/../../../include/defines.inc.php';
+require_once dirname(__FILE__).'/../../../include/validate.inc.php';
+require_once dirname(__FILE__).'/../../../include/func.inc.php';
+require_once dirname(__FILE__).'/../../../include/items.inc.php';
+require_once dirname(__FILE__).'/../../../include/triggers.inc.php';
+require_once dirname(__FILE__).'/../../../api/classes/CTriggerExpression.php';
+require_once dirname(__FILE__).'/../../../api/classes/CItemKey.php';
 
-class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
-	public static function provider(){
+class class_triggerexpressionTest extends PHPUnit_Framework_TestCase {
+	public static function provider() {
 		return array(
 	// Correct trigger expressions
 			array('',false),
@@ -1356,10 +1355,10 @@ class class_triggerexpressionTest extends PHPUnit_Framework_TestCase{
 	/**
 	* @dataProvider provider
 	*/
-	public function test_parse($a, $b){
-		$trigger = new CTriggerExpression(array('expression'=>$a));
-		if(empty($trigger->errors)){
-			$this->assertEquals($b,true);
+	public function test_parse($a, $b) {
+		$trigger = new CTriggerExpression(array('expression' => $a));
+		if (empty($trigger->errors)) {
+			$this->assertEquals($b, true);
 		}
 		else {
 //			print_r($trigger->errors);

@@ -158,6 +158,8 @@ void    zbx_db_close();
 int	zbx_db_begin();
 int	zbx_db_commit();
 int	zbx_db_rollback();
+int	zbx_db_txn_level();
+int	zbx_db_txn_error();
 
 int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);

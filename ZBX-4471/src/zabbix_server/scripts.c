@@ -170,7 +170,6 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 	item.publickey = script->publickey;
 	item.privatekey = script->privatekey;
 	item.password = script->password;
-	item.params = script->command;
 
 	substitute_simple_macros(NULL, &host->hostid, NULL, NULL, &script->port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 
@@ -196,6 +195,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 		function = get_value_telnet;
 	}
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
+	item.params = zbx_strdup(item.params, script->command);
 
 	init_result(&agent_result);
 
@@ -214,6 +214,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 
 	free_result(&agent_result);
 
+	zbx_free(item.params);
 	zbx_free(item.key);
 fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

@@ -48,8 +48,13 @@ const char	*DBnode(const char *fieldid, int nodeid)
 
 	if (-1 != nodeid)
 	{
-		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between %d00000000000000 and %d99999999999999",
-				fieldid, nodeid, nodeid);
+		zbx_uint64_t	min, max;
+
+		min = (zbx_uint64_t)__UINT64_C(100000000000000) * (zbx_uint64_t)nodeid;
+		max = min + (zbx_uint64_t)__UINT64_C(99999999999999);
+
+		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+				fieldid, min, max);
 	}
 	else
 		*dbnode = '\0';
@@ -413,26 +418,40 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 	{
 		if (SUCCEED == DCconfig_check_trigger_dependencies(triggerid))
 		{
+			int	new_lastchange = 0;
+
+			*add_event = 1;
+
+			if (value != new_value || (TRIGGER_TYPE_MULTIPLE_TRUE == type &&
+					TRIGGER_VALUE_TRUE == new_value && TRIGGER_VALUE_FLAG_NORMAL == new_value_flags))
+			{
+				*value_changed = TRIGGER_VALUE_CHANGED_YES;
+				new_lastchange = ts->sec;
+			}
+
 			if (NULL == *sql)
 			{
 				*sql_alloc = 2 * ZBX_KIBIBYTE;
 				*sql = zbx_malloc(*sql, *sql_alloc);
 			}
 
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update triggers set lastchange=%d", ts->sec);
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update triggers set ");
+
+			if (0 != new_lastchange)
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
 
 			if (value != new_value)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",value=%d", new_value);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value=%d,", new_value);
 
 			if (value_flags != new_value_flags)
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",value_flags=%d", new_value_flags);
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value_flags=%d,", new_value_flags);
 
 			if (NULL == new_error)
 			{
 				DCconfig_set_trigger_value(triggerid, new_value, new_value_flags, "");
 
 				if ('\0' != *error)
-					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ",error=''");
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "error='',");
 			}
 			else
 			{
@@ -441,20 +460,14 @@ int	DBget_trigger_update_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, 
 				if (0 != strcmp(error, new_error))
 				{
 					new_error_esc = DBdyn_escape_string_len(new_error, TRIGGER_ERROR_LEN);
-					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ",error='%s'", new_error_esc);
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "error='%s',", new_error_esc);
 					zbx_free(new_error_esc);
 				}
 			}
 
+			(*sql_offset)--;
+
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where triggerid=" ZBX_FS_UI64, triggerid);
-
-			*add_event = 1;
-
-			if (value != new_value || (TRIGGER_TYPE_MULTIPLE_TRUE == type &&
-					TRIGGER_VALUE_TRUE == new_value && TRIGGER_VALUE_FLAG_UNKNOWN != new_value_flags))
-			{
-				*value_changed = TRIGGER_VALUE_CHANGED_YES;
-			}
 
 			ret = SUCCEED;
 		}
@@ -521,17 +534,16 @@ void	DBupdate_triggers_status_after_restart()
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
+				" and i.lastclock is not null"
 				" and f.triggerid=t.triggerid"
 				" and h.status in (%d)"
 				" and i.status in (%d)"
 				" and i.type not in (%d,%d)"
-				" and i.key_ not in ('%s')"
 				" and t.status in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP,
-			SERVER_STATUS_KEY,
 			TRIGGER_STATUS_ENABLED,
 			DBnode_local("t.triggerid"));
 
@@ -785,7 +797,6 @@ int	DBget_queue_count(int from, int to)
 				" and h.status=%d"
 				" and i.status=%d"
 				" and i.value_type not in (%d)"
-				" and i.key_ not in ('%s')"
 				" and ("
 					"i.lastclock is not null"
 					" and i.lastclock<%d"
@@ -797,11 +808,11 @@ int	DBget_queue_count(int from, int to)
 					" or (h.ipmi_available<>%d and i.type in (%d))"
 					" or (h.jmx_available<>%d and i.type in (%d))"
 					")"
+				" and i.flags not in (%d)"
 				DB_NODE,
 			HOST_STATUS_MONITORED,
 			ITEM_STATUS_ACTIVE,
 			ITEM_VALUE_TYPE_LOG,
-			SERVER_STATUS_KEY,
 			now - from,
 				ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 				ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
@@ -814,6 +825,7 @@ int	DBget_queue_count(int from, int to)
 				ITEM_TYPE_IPMI,
 			HOST_AVAILABLE_FALSE,
 				ITEM_TYPE_JMX,
+			ZBX_FLAG_DISCOVERY_CHILD,
 			DBnode_local("i.itemid"));
 
 	while (NULL != (row = DBfetch(result)))
@@ -888,7 +900,7 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 		ret = SUCCEED;
 	}
 	else
-		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist", hostname);
+		*error = zbx_dsprintf(*error, "proxy \"%s\" does not exist", hostname);
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1060,12 +1072,12 @@ char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 
 	for (s = src; NULL != s && '\0' != *s && 0 < max_src_len; s++)
 	{
+		if ('\r' == *s)
+			continue;
+
 		/* only UTF-8 characters should reduce a variable max_src_len */
 		if (0x80 != (0xc0 & *s) && 0 == --max_src_len)
 			break;
-
-		if ('\r' == *s)
-			continue;
 
 #if defined(HAVE_MYSQL)
 		if ('\'' == *s || '\\' == *s)
@@ -1325,7 +1337,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 	while (FAIL == found)
 	{
 		/* avoid eternal loop within failed transaction */
-		if (0 < txn_level && 0 != txn_error)
+		if (0 < zbx_db_txn_level() && 0 != zbx_db_txn_error())
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() transaction failed", __function_name);
 			return 0;
@@ -1424,15 +1436,45 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 	return DBget_nextid(tablename, num);
 }
 
-void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname, const zbx_uint64_t *values, const int num)
+void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
+		const zbx_uint64_t *values, const int num)
 {
 #define MAX_EXPRESSIONS	950
-	int	i;
+	int		i;
+	zbx_uint64_t	value;
 
 	if (0 == num)
 		return;
 
 	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ' ');
+
+	/* if only one value in an array we return " <field name>=<id>"*/
+
+	if (1 == num)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s=" ZBX_FS_UI64, fieldname, values[0]);
+		return;
+	}
+
+	/* if all values in an array are consecutive we return " <field name> between <id1> and <idN>"*/
+
+	value = values[0];
+
+	for (i = 1; i < num; i++)
+	{
+		if (values[i] != ++value)
+			break;
+	}
+
+	if (i == num)
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
+				fieldname, values[0], values[num - 1]);
+		return;
+	}
+
+	/* ... else we return " <field name> in (<id1>,<id2>,...,<idN>)"*/
+
 	if (MAX_EXPRESSIONS < num)
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
@@ -2026,7 +2068,7 @@ char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		**h_value = NULL;
-	int		h_alloc = 1, h_num = 0, retry = 0;
+	int		h_alloc = 1, h_num = 0, retry = 0, sec = 0, ns = 0;
 	const char	*func[] = {"min", "avg", "max", "sum", "count"};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2058,7 +2100,6 @@ retry:
 			break;
 		default:
 			assert(0);
-			break;
 	}
 
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where itemid=" ZBX_FS_UI64,
@@ -2066,17 +2107,31 @@ retry:
 
 	if (NULL == ts)
 	{
+		if (0 != last_n && 0 == clock_from && 0 != clock_to)
+		{
+			const int	steps[] = {SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH};
+
+			if (0 != retry)
+				clock_to -= steps[retry - 1];
+			if (4 != retry)
+			{
+				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+						" and clock>%d", clock_to - steps[retry]);
+			}
+		}
 		if (0 != clock_from)
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock>%d", clock_from);
 		if (0 != clock_to)
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<=%d", clock_to);
 	}
-	else if (0 == retry)
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns=%d", ts->sec, ts->ns);
 	else if (1 == retry)
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns<%d", ts->sec, ts->ns);
+	{
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d", sec);
+		if (-1 != ns)
+			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and ns<%d", ns);
+	}
 	else
-		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock<%d", ts->sec);
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, " and clock=%d and ns=%d", ts->sec, ts->ns);
 
 	if (0 != last_n)
 	{
@@ -2088,7 +2143,7 @@ retry:
 				case ITEM_VALUE_TYPE_UINT64:
 				case ITEM_VALUE_TYPE_STR:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-							" order by itemid,clock desc");
+							" order by clock desc");
 					break;
 				default:
 					offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
@@ -2096,13 +2151,13 @@ retry:
 					break;
 			}
 		}
-		else if (0 != retry)
+		else if (1 == retry)
 		{
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					" order by itemid,clock desc,ns desc");
+					" order by ns desc");
 		}
 
-		result = DBselectN(sql, last_n);
+		result = DBselectN(sql, last_n - h_num);
 	}
 	else
 		result = DBselect("%s", sql);
@@ -2119,7 +2174,30 @@ retry:
 	}
 	DBfree_result(result);
 
-	if (NULL != ts && 0 == h_num && 2 > retry)
+	if (NULL != ts && 0 == h_num && 0 == retry)
+	{
+		result = DBselect(
+				"select max(clock)"
+				" from %s"
+				" where itemid=" ZBX_FS_UI64
+					" and clock<=%d",
+				get_table_by_value_type(value_type), itemid, ts->sec);
+
+		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+		{
+			if (ts->sec == (sec = atoi(row[0])))
+				ns = ts->ns;
+			else
+				ns = -1;
+			retry = 1;
+		}
+		DBfree_result(result);
+
+		if (1 == retry)
+			goto retry;
+	}
+
+	if (NULL == ts && 0 != last_n && 0 == clock_from && 0 != clock_to && h_num != last_n && 4 != retry)
 	{
 		retry++;
 		goto retry;
@@ -2145,4 +2223,14 @@ void	DBfree_history(char **h_value)
 	zbx_free(h_value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+int	DBtxn_status()
+{
+	return 0 == zbx_db_txn_error() ? SUCCEED : FAIL;
+}
+
+int	DBtxn_ongoing()
+{
+	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
 }

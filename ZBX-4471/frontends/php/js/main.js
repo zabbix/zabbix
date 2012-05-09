@@ -604,17 +604,17 @@ var AudioList = {
 };
 
 /*
- * Replace standart blink functionality
+ * Replace standard blink functionality
  */
 /**
  * Sets HTML elements to blink.
  * Example of usage:
- *      <span class="blink" data-seconds-to-blink="60">test 1</span>
- *      <span class="blink" data-seconds-to-blink="30">test 2</span>
+ *      <span class="blink" data-time-to-blink="60">test 1</span>
+ *      <span class="blink" data-time-to-blink="30">test 2</span>
  *      <span class="blink">test 3</span>
  *      <script type="text/javascript">
  *          jQuery(document).ready(function(
- *              jqBlink.init();
+ *              jqBlink.blink();
  *          ));
  *      </script>
  * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
@@ -622,30 +622,21 @@ var AudioList = {
  * @author Konstantin Buravcov
  */
 var jqBlink = {
-	objects: [], // those objects will blink
 	shown: false, // are objects currently shown or hidden?
 	blinkInterval: 1000, // how fast will they blink (ms)
 	secondsSinceInit: 0,
 
 	/**
-	 * Initialize blinking
-	 */
-	init: function() {
-		if (this.objects.length === 0) {
-			this.findObjects();
-		}
-		this.blink();
-	},
-
-	/**
 	 * Shows/hides the elements and repeats it self after 'this.blinkInterval' ms
 	 */
 	blink: function() {
+		var objects = jQuery('.blink');
+
 		// maybe some of the objects should not blink any more?
-		this.filterOutNonBlinking();
+		objects = this.filterOutNonBlinking(objects);
 
 		// changing visibility state
-		this.objects.css('visibility', this.shown ? 'hidden' : 'visible');
+		objects.css('visibility', this.shown ? 'hidden' : 'visible');
 
 		// reversing the value of indicator attribute
 		this.shown = !this.shown;
@@ -658,19 +649,12 @@ var jqBlink = {
 	},
 
 	/**
-	 * Find all elements with class 'blink' and store them in this.objects
-	 */
-	findObjects: function() {
-		this.objects = jQuery('.blink');
-	},
-
-	/**
 	 * Check all currently found objects and exclude ones that should stop blinking by now
 	 */
-	filterOutNonBlinking: function() {
+	filterOutNonBlinking: function(objects) {
 		var that = this;
 
-		this.objects = this.objects.filter(function() {
+		return objects.filter(function() {
 			var obj = jQuery(this);
 			if (typeof obj.data('timeToBlink') !== 'undefined') {
 				var shouldBlink = parseInt(obj.data('timeToBlink'), 10) > that.secondsSinceInit;
@@ -693,163 +677,149 @@ var jqBlink = {
  * ZABBIX HintBoxes
  */
 var hintBox = {
-	boxes: {}, // array of dom Hint Boxes
-	boxesCount: 0, // unique box id
 
-	createBox: function(obj, hint_text, width, className, byClick) {
-		var boxid = 'hintbox_' + this.boxesCount;
-		var box = document.createElement('div');
-		var obj_tag = obj.nodeName.toLowerCase();
-
-		if (obj_tag == 'td' || obj_tag == 'body') {
-			obj.appendChild(box);
-		}
-		else {
-			obj.parentNode.appendChild(box);
-		}
-
-		box.setAttribute('id', boxid);
-		box.style.display = 'none';
-		box.className = 'hintbox';
+	createBox: function(e, target, hintText, width, className, isStatic) {
+		var box = jQuery('<div></div>').addClass('hintbox');
 
 		if (!empty(className)) {
-			hint_text = "<span class=\"" + className + "\">" + hint_text + "</span>";
+			box.append(jQuery('<span></span>').addClass(className).html(hintText));
+		}
+		else {
+			box.html(hintText);
 		}
 
 		if (!empty(width)) {
-			box.style.width = width + 'px';
+			box.css('width', width + 'px');
 		}
 
-		var close_link = '';
-		if (byClick) {
-			close_link = '<div class="link" '+
-							'style="text-align: right; border-bottom: 1px #333 solid;" '+
-							'onclick="javascript: hintBox.hide(\'' + boxid + '\');">' + locale['S_CLOSE'] + '</div>';
+		if (isStatic) {
+			var close_link = jQuery('<div>' + locale['S_CLOSE'] + '</div>')
+				.addClass('link')
+				.css({
+					'text-align': 'right',
+					'border-bottom': '1px #333 solid'
+				}).click(function() {
+					hintBox.hideHint(e, target, true);
+				});
+			box.prepend(close_link);
 		}
 
-		box.innerHTML = close_link + hint_text;
-		this.boxes[boxid] = box;
-		this.boxesCount++;
+		jQuery('body').append(box);
+
 		return box;
 	},
 
-	showOver: function(obj, hint_text, width, className) {
-		var hintid = obj.getAttribute('hintid');
-		var hintbox = $(hintid);
-
-		if (!empty(hintbox)) {
-			var byClick = hintbox.getAttribute('byclick');
-		}
-		else {
-			var byClick = null;
-		}
-
-		if (!empty(byClick)) {
-			return;
-		}
-
-		hintbox = this.createBox(obj, hint_text, width, className, false);
-		obj.setAttribute('hintid', hintbox.id);
-		this.show(obj, hintbox);
+	HintWraper: function(e, target, hintText, width, className) {
+		target.isStatic = false;
+		jQuery(target).bind('mouseenter', function(e, d){
+			if (d) e = d;
+			hintBox.showHint(e, target, hintText, width, className, false);
+		}).bind('mouseleave', function(e){
+			hintBox.hideHint(e, target);
+		});
+		jQuery(target).removeAttr('onmouseover');
+		jQuery(target).trigger('mouseenter', e);
 	},
 
-	hideOut: function(obj) {
-		var hintid = obj.getAttribute('hintid');
-		var hintbox = $(hintid);
-
-		if (!empty(hintbox)) {
-			var byClick = hintbox.getAttribute('byclick');
-		}
-		else {
-			var byClick = null;
-		}
-
-		if (!empty(byClick)) {
-			return;
-		}
-
-		if (!empty(hintid)) {
-			obj.removeAttribute('hintid');
-			obj.removeAttribute('byclick');
-			this.hide(hintid);
-		}
-	},
-
-	onClick: function(obj, hint_text, width, className) {
-		var hintid = obj.getAttribute('hintid');
-		var hintbox = $(hintid);
-
-		if (!empty(hintbox)) {
-			var byClick = hintbox.getAttribute('byclick');
-		}
-		else {
-			var byClick = null;
-		}
-
-		if (!empty(hintid) && empty(byClick)) {
-			obj.removeAttribute('hintid');
-			this.hide(hintid);
-			hintbox = this.createBox(obj, hint_text, width, className, true);
-			hintbox.setAttribute('byclick', 'true');
-			obj.setAttribute('hintid', hintbox.id);
-			this.show(obj, hintbox);
-		}
-		else if (!empty(hintid)) {
-			obj.removeAttribute('hintid');
-			hintbox.removeAttribute('byclick');
-			this.hide(hintid);
-		}
-		else {
-			hintbox = this.createBox(obj, hint_text, width, className, true);
-			hintbox.setAttribute('byclick', 'true');
-			obj.setAttribute('hintid', hintbox.id);
-			this.show(obj, hintbox);
-		}
-	},
-
-	show: function(obj, hintbox) {
-		var body_width = document.viewport.getDimensions().width;
-		hintbox.style.visibility = 'hidden';
-		hintbox.style.display = 'block';
-		var posit = $(obj).positionedOffset();
-		var cumoff = $(obj).cumulativeOffset();
-
-		if (parseInt(cumoff.left + 10 + hintbox.offsetWidth) > body_width) {
-			posit.left = posit.left - parseInt((cumoff.left + 10 + hintbox.offsetWidth) - body_width) + document.viewport.getScrollOffsets().left;
-			posit.left -= 10;
-			posit.left = (posit.left < 0) ? 0 : posit.left;
-		}
-		else {
-			posit.left += 10;
-		}
-		hintbox.x = posit.left;
-		hintbox.y = posit.top;
-		hintbox.style.left = hintbox.x + 'px';
-		hintbox.style.top = hintbox.y + 10 + parseInt(obj.offsetHeight / 2) + 'px';
-		hintbox.style.visibility = 'visible';
-		hintbox.style.zIndex = '999';
-	},
-
-	hide: function(boxid) {
-		var hint = $(boxid);
-		if (!is_null(hint)) {
-			delete(this.boxes[boxid]);
-
-			// Opera browser refresh bug!
-			hint.style.display = 'none';
-			if (OP) {
-				setTimeout(function(){ hint.remove(); }, 200);
+	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
+		var isStatic = target.isStatic;
+		hintBox.hideHint(e, target, true);
+		if (!isStatic) {
+			target.isStatic = true;
+			hintBox.showHint(e, target, hint, width, className, true);
+			if (resizeAfterLoad) {
+				hint.one('load', function(e){
+					hintBox.positionHint(e, target);
+				});
 			}
+		}
+	},
+
+	showHint: function(e, target, hintText, width, className, isStatic) {
+		if (target.hintBoxItem) return;
+		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, isStatic);
+
+		hintBox.positionHint(e, target);
+
+		target.hintBoxItem.show();
+	},
+
+	positionHint: function(e, target) {
+		var wWidth = jQuery(window).width(),
+			wHeight = jQuery(window).height(),
+			scrollTop = jQuery(window).scrollTop(),
+			scrollLeft = jQuery(window).scrollLeft(),
+			top, left;
+
+		// uses stored clientX on afterload positioning when there is no event
+		if (e.clientX) {
+			target.clientX = e.clientX;
+			target.clientY = e.clientY;
+		}
+
+		// doesn't fit in the screen horizontaly
+		if (target.hintBoxItem.width() + 10 > wWidth) {
+			left = scrollLeft + 2;
+		}
+		// 10px to right if fit
+		else if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+			left = scrollLeft + target.clientX + 10;
+		}
+		// 10px from screen right side
+		else {
+			left = scrollLeft + wWidth - 10 - target.hintBoxItem.width();
+		}
+
+		// 10px below if fit
+		if (wHeight - target.clientY - target.hintBoxItem.height() - 10 > 0) {
+			top = scrollTop + target.clientY + 10;
+		}
+		// 10px above if fit
+		else if (target.clientY - target.hintBoxItem.height() - 10 > 0) {
+			top = scrollTop + target.clientY - target.hintBoxItem.height() - 10;
+		}
+		// 10px below as fallback
+		else {
+			top = scrollTop + target.clientY + 10;
+		}
+
+		// fallback if doesnt't fit verticaly but could fit if aligned to right or left
+		if ((top - scrollTop + target.hintBoxItem.height() > wHeight)
+			&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
+
+			// align to left if fit
+			if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+				left = scrollLeft + target.clientX + 10;
+			}
+			// align to right
 			else {
-				hint.remove();
+				left = scrollLeft + target.clientX - target.hintBoxItem.width() - 10;
+			}
+
+			// 10px from bottom if fit
+			if (wHeight - 10 > target.hintBoxItem.height()) {
+				top = scrollTop + wHeight - target.hintBoxItem.height() - 10;
+			}
+			// 10px from top
+			else {
+				top = scrollTop + 10;
 			}
 		}
+
+		target.hintBoxItem.css({
+			'top': top + 'px',
+			'left': left + 'px',
+			'zIndex': '999'
+		});
 	},
 
-	hideAll: function() {
-		for (var id in this.boxes) {
-			if (typeof(this.boxes[id]) != 'undefined' && !empty(this.boxes[id])) {
-				this.hide(id);
+	hideHint: function(e, target, hideStatic) {
+		if (target.isStatic && !hideStatic) return;
+		if (target.hintBoxItem) {
+			target.hintBoxItem.remove();
+			delete target.hintBoxItem;
+			if (target.isStatic) {
+				delete target.isStatic;
 			}
 		}
 	}
@@ -869,16 +839,16 @@ function hide_color_picker() {
 	curr_txt = null;
 }
 
-function show_color_picker(name) {
+function show_color_picker(id) {
 	if (!color_picker) {
 		return;
 	}
-	curr_lbl = document.getElementById('lbl_' + name);
-	curr_txt = document.getElementById(name);
+	curr_lbl = document.getElementById('lbl_' + id);
+	curr_txt = document.getElementById(id);
 	var pos = getPosition(curr_lbl);
 	color_picker.x = pos.left;
 	color_picker.y = pos.top;
-	color_picker.style.left = color_picker.x + 'px';
+	color_picker.style.left = (color_picker.x + 20) + 'px';
 	color_picker.style.top = color_picker.y + 'px';
 	color_picker.style.visibility = 'visible';
 }
@@ -905,9 +875,9 @@ function set_color(color) {
 	hide_color_picker();
 }
 
-function set_color_by_name(name, color) {
-	curr_lbl = document.getElementById('lbl_' + name);
-	curr_txt = document.getElementById(name);
+function set_color_by_name(id, color) {
+	curr_lbl = document.getElementById('lbl_' + id);
+	curr_txt = document.getElementById(id);
 	set_color(color);
 }
 
@@ -926,7 +896,7 @@ function add2favorites(favobj, favid) {
 	var params = {
 		'favobj': favobj,
 		'favid': favid,
-		'action': 'add'
+		'favaction': 'add'
 	};
 
 	send_params(params);
@@ -945,7 +915,7 @@ function rm4favorites(favobj, favid, menu_rowid) {
 		'favobj': favobj,
 		'favid': favid,
 		'favcnt': menu_rowid,
-		'action': 'remove'
+		'favaction': 'remove'
 	};
 
 	send_params(params);
@@ -959,7 +929,7 @@ function change_flicker_state(divid) {
 		switchElementsClass($('flicker_icon_r'), 'dbl_arrow_up', 'dbl_arrow_down');
 	};
 
-	var filter_state = ShowHide(divid);
+	var filter_state = showHide(divid);
 	switchArrows();
 
 	if (false === filter_state) {
@@ -967,12 +937,11 @@ function change_flicker_state(divid) {
 	}
 
 	var params = {
-		'action': 'flop',
+		'favaction': 'flop',
 		'favobj': 'filter',
 		'favref': divid,
-		'state': filter_state
+		'favstate': filter_state
 	};
-
 	send_params(params);
 
 	// selection box position
@@ -1000,12 +969,11 @@ function changeHatStateUI(icon, divid) {
 	}
 
 	var params = {
-		'action': 'flop',
+		'favaction': 'flop',
 		'favobj': 'hat',
 		'favref': divid,
-		'state': hat_state
+		'favstate': hat_state
 	};
-
 	send_params(params);
 }
 
@@ -1016,7 +984,7 @@ function change_hat_state(icon, divid) {
 		switchElementsClass(icon, 'arrowup', 'arrowdown');
 	};
 
-	var hat_state = ShowHide(divid);
+	var hat_state = showHide(divid);
 	switchIcon();
 
 	if (false === hat_state) {
@@ -1024,12 +992,11 @@ function change_hat_state(icon, divid) {
 	}
 
 	var params = {
-		'action': 'flop',
+		'favaction': 'flop',
 		'favobj': 'hat',
 		'favref': divid,
-		'state': hat_state
+		'favstate': hat_state
 	};
-
 	send_params(params);
 }
 
@@ -1044,8 +1011,10 @@ function send_params(params) {
 	new Ajax.Request(url.getUrl(), {
 			'method': 'post',
 			'parameters': params,
-			'onSuccess': function(){ },
-			'onFailure': function(){ document.location = url.getPath() + '?' + Object.toQueryString(params); }
+			'onSuccess': function() { },
+			'onFailure': function() {
+				document.location = url.getPath() + '?' + Object.toQueryString(params);
+			}
 		}
 	);
 }
@@ -1077,8 +1046,27 @@ function switch_mute(icon) {
 	var params = {
 		'favobj': 'sound',
 		'favref': 'sound',
-		'state': sound_state
+		'favstate': sound_state
 	};
-
 	send_params(params);
+}
+
+function createPlaceholders() {
+	if (IE) {
+		jQuery(document).ready(function() {
+			'use strict';
+
+			jQuery('[placeholder]').focus(function() {
+				if (jQuery(this).val() == jQuery(this).attr('placeholder')) {
+					jQuery(this).val('');
+					jQuery(this).removeClass('placeholder');
+				}
+			}).blur(function() {
+				if (jQuery(this).val() == '' || jQuery(this).val() == jQuery(this).attr('placeholder')) {
+					jQuery(this).addClass('placeholder');
+					jQuery(this).val(jQuery(this).attr('placeholder'));
+				}
+			}).blur();
+		});
+	}
 }

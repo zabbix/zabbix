@@ -170,7 +170,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 		zbx_free(*directory);
 		zbx_free(*format);
 	}
-	
+
 	if (separator < filename)
 		return FAIL;
 

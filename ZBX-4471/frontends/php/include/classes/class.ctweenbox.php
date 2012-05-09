@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CTweenBox {
+
 	public function __construct(&$form, $name, $value = null, $size = 10) {
 		insert_javascript_for_tweenbox();
 
@@ -29,8 +31,8 @@ class CTweenBox {
 		$this->value = zbx_toHash($value);
 		$this->id_l = $this->varname.'_left';
 		$this->id_r = $this->varname.'_right';
-		$this->lbox = new ClistBox($this->id_l, null, $size);
-		$this->rbox = new ClistBox($this->id_r, null, $size);
+		$this->lbox = new CListBox($this->id_l, null, $size);
+		$this->rbox = new CListBox($this->id_r, null, $size);
 		$this->lbox->setAttribute('style', 'width: 280px;');
 		$this->rbox->setAttribute('style', 'width: 280px;');
 	}
@@ -41,7 +43,7 @@ class CTweenBox {
 		}
 	}
 
-	public function getName($name = null) {
+	public function getName() {
 		return $this->name;
 	}
 
@@ -85,13 +87,12 @@ class CTweenBox {
 			$grp_tab->addRow(array($caption_l, SPACE, $caption_r));
 		}
 
-		$add_btn = new CButton('add', ' &laquo; ');
-		$add_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'","'.$this->varname.'","'.$this->id_r.'","'.$this->id_l.'","add");');
-		$rmv_btn = new CButton('remove', ' &raquo; ');
-		$rmv_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'","'.$this->varname.'","'.$this->id_l.'","'.$this->id_r.'","rmv");');
+		$add_btn = new CButton('add', ' &laquo; ', null, 'formlist');
+		$add_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
+		$rmv_btn = new CButton('remove', ' &raquo; ', null, 'formlist');
+		$rmv_btn->setAttribute('onclick', 'javascript: moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
 
 		$grp_tab->addRow(array($this->lbox, new CCol(array($add_btn, BR(), $rmv_btn), 'top'), $this->rbox));
-
 		return $grp_tab;
 	}
 

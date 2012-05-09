@@ -19,47 +19,43 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageDiscovery extends CWebTest
-{
+class testPageDiscovery extends CWebTest {
 	// Returns all discovery rules
-	public static function allRules()
-	{
+	public static function allRules() {
 		return DBdata('select * from drules');
 	}
 
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_SimpleTest($rule)
-	{
+	public function testPageDiscovery_CheckLayout($rule) {
 		$this->login('discoveryconf.php');
 		$this->assertTitle('Configuration of discovery');
 
 		$this->ok('DISCOVERY');
 		$this->ok('Displaying');
-		$this->ok(array('Name','IP range','Delay','Checks','Status'));
+		$this->ok(array('Name', 'IP range', 'Delay', 'Checks', 'Status'));
 		$this->ok($rule['name']);
 		$this->ok($rule['iprange']);
 		$this->ok($rule['delay']);
-		$this->dropdown_select('go','Enable selected');
-		$this->dropdown_select('go','Disable selected');
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Enable selected');
+		$this->dropdown_select('go', 'Disable selected');
+		$this->dropdown_select('go', 'Delete selected');
 	}
 
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_SimpleUpdate($rule)
-	{
-		$name=$rule['name'];
-		$druleid=$rule['druleid'];
+	public function testPageDiscovery_SimpleUpdate($rule) {
+		$name = $rule['name'];
+		$druleid = $rule['druleid'];
 
-		$sql1="select * from drules where name='$name' order by druleid";
-		$oldHashRules=DBhash($sql1);
-		$sql2="select * from dchecks where druleid=$druleid order by dcheckid";
-		$oldHashChecks=DBhash($sql2);
+		$sqlRules = "select * from drules where name='$name' order by druleid";
+		$oldHashRules = DBhash($sqlRules);
+		$sqlChecks = "select * from dchecks where druleid=$druleid order by dcheckid";
+		$oldHashChecks = DBhash($sqlChecks);
 
 		$this->login('discoveryconf.php');
 		$this->assertTitle('Configuration of discovery');
@@ -72,15 +68,14 @@ class testPageDiscovery extends CWebTest
 		$this->ok("$name");
 		$this->ok('DISCOVERY');
 
-		$this->assertEquals($oldHashRules,DBhash($sql1));
-		$this->assertEquals($oldHashChecks,DBhash($sql2));
+		$this->assertEquals($oldHashRules, DBhash($sqlRules));
+		$this->assertEquals($oldHashChecks, DBhash($sqlChecks));
 	}
 
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_MassDelete($rule)
-	{
+	public function testPageDiscovery_MassDelete($rule) {
 		$druleid=$rule['druleid'];
 
 		DBsave_tables('drules');
@@ -90,7 +85,7 @@ class testPageDiscovery extends CWebTest
 		$this->login('discoveryconf.php');
 		$this->assertTitle('Configuration of discovery');
 		$this->checkbox_select("g_druleid[$druleid]");
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
@@ -98,10 +93,10 @@ class testPageDiscovery extends CWebTest
 		$this->assertTitle('Configuration of discovery');
 		$this->ok('Discovery rules deleted');
 
-		$sql="select * from drules where druleid=$druleid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from dchecks where druleid=$druleid";
-		$this->assertEquals(0,DBcount($sql));
+		$sql = "select * from drules where druleid=$druleid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from dchecks where druleid=$druleid";
+		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('drules');
 	}
@@ -109,44 +104,102 @@ class testPageDiscovery extends CWebTest
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_ChangeStatus($rule)
-	{
+	public function testPageDiscovery_ChangeStatus($rule) {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageDiscovery_MassEnableAll()
-	{
-// TODO
-		$this->markTestIncomplete();
+	public function testPageDiscovery_MassEnableAll() {
+		DBexecute('update drules set status='.DRULE_STATUS_DISABLED);
+
+		$this->chooseOkOnNextConfirmation();
+
+		$this->login('discoveryconf.php');
+		$this->assertTitle('Configuration of discovery');
+		$this->checkbox_select("all_drules");
+		$this->dropdown_select('go', 'Enable selected');
+		$this->button_click('goButton');
+		$this->wait();
+
+		$this->getConfirmation();
+		$this->assertTitle('Configuration of discovery');
+		$this->ok('Discovery rules updated');
+
+		$sql = "select * from drules where status=".DRULE_STATUS_DISABLED;
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_MassEnable($rule)
-	{
-// TODO
-		$this->markTestIncomplete();
+	public function testPageDiscovery_MassEnable($rule) {
+		$druleid=$rule['druleid'];
+
+		DBexecute('update drules set status='.DRULE_STATUS_DISABLED.' where druleid='.$druleid);
+
+		$this->chooseOkOnNextConfirmation();
+
+		$this->login('discoveryconf.php');
+		$this->assertTitle('Configuration of discovery');
+		$this->checkbox_select("g_druleid[$druleid]");
+		$this->dropdown_select('go', 'Enable selected');
+		$this->button_click('goButton');
+		$this->wait();
+
+		$this->getConfirmation();
+		$this->assertTitle('Configuration of discovery');
+		$this->ok('Discovery rules updated');
+
+		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_ACTIVE;
+		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageDiscovery_MassDisableAll()
-	{
-// TODO
-		$this->markTestIncomplete();
+	public function testPageDiscovery_MassDisableAll() {
+		DBexecute('update drules set status='.DRULE_STATUS_ACTIVE);
+
+		$this->chooseOkOnNextConfirmation();
+
+		$this->login('discoveryconf.php');
+		$this->assertTitle('Configuration of discovery');
+		$this->checkbox_select("all_drules");
+		$this->dropdown_select('go', 'Disable selected');
+		$this->button_click('goButton');
+		$this->wait();
+
+		$this->getConfirmation();
+		$this->assertTitle('Configuration of discovery');
+		$this->ok('Discovery rules updated');
+
+		$sql = "select * from drules where status=".DRULE_STATUS_ACTIVE;
+		$this->assertEquals(0, DBcount($sql));
 	}
 
 	/**
 	* @dataProvider allRules
 	*/
-	public function testPageDiscovery_MassDisable($rule)
-	{
-// TODO
-		$this->markTestIncomplete();
+	public function testPageDiscovery_MassDisable($rule) {
+		$druleid = $rule['druleid'];
+
+		DBexecute('update drules set status='.DRULE_STATUS_ACTIVE.' where druleid='.$druleid);
+
+		$this->chooseOkOnNextConfirmation();
+
+		$this->login('discoveryconf.php');
+		$this->assertTitle('Configuration of discovery');
+		$this->checkbox_select("g_druleid[$druleid]");
+		$this->dropdown_select('go', 'Disable selected');
+		$this->button_click('goButton');
+		$this->wait();
+
+		$this->getConfirmation();
+		$this->assertTitle('Configuration of discovery');
+		$this->ok('Discovery rules updated');
+
+		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_DISABLED;
+		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageDiscovery_Sorting()
-	{
+	public function testPageDiscovery_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}

@@ -22,12 +22,12 @@
 require_once ('include/config.inc.php');
 require_once ('include/reports.inc.php');
 
-$page['title']	= "S_BAR_REPORTS";
+$page['title']	= _('Bar reports');
 $page['file']	= 'report6.php';
 $page['hist_arg'] = array('period');
 $page['scripts'] = array('class.calendar.js');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -70,7 +70,7 @@ require_once('include/page_header.php');
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
@@ -78,12 +78,12 @@ require_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.report6.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.report6.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--------
@@ -155,14 +155,14 @@ require_once('include/page_header.php');
 // Header
 	$r_form = new CForm();
 	$cnfCmb = new CComboBox('config', $config, 'submit();');
-		$cnfCmb->addItem(1, S_BAR_REPORT_1);
-		$cnfCmb->addItem(2, S_BAR_REPORT_2);
-		$cnfCmb->addItem(3, S_BAR_REPORT_3);
+		$cnfCmb->addItem(1, _('Distribution of values for multiple periods'));
+		$cnfCmb->addItem(2, _('Distribution of values for multiple items'));
+		$cnfCmb->addItem(3, _('Compare values for multiple periods'));
 
-	$r_form->addItem(array(S_REPORTS.SPACE,$cnfCmb));
+	$r_form->addItem(array(_('Reports').SPACE,$cnfCmb));
 
-	$rep6_wdgt->addPageHeader(S_BAR_REPORTS);
-	$rep6_wdgt->addHeader(S_REPORT_BIG, $r_form);
+	$rep6_wdgt->addPageHeader(_('Bar reports'));
+	$rep6_wdgt->addHeader(_('Report'), $r_form);
 	$rep6_wdgt->addItem(BR());
 //-------------
 
@@ -180,7 +180,7 @@ require_once('include/page_header.php');
 		default: $rep_form = bar_report_form();
 	}
 
-	$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state',1));
+	$rep6_wdgt->addFlicker($rep_form, CProfile::get('web.report6.filter.state', 1));
 
 	if(isset($_REQUEST['report_show'])){
 		$src = 'chart_bar.php?config='.$_REQUEST['config'].
@@ -218,6 +218,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

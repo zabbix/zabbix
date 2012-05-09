@@ -299,7 +299,7 @@ int	process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 				source, strerror_from_system(GetLastError()));
 
 	zbx_free(wsource);
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

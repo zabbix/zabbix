@@ -19,8 +19,6 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
-
 $userGroupsWidget = new CWidget();
 
 // append page header to widget
@@ -29,14 +27,12 @@ $createForm->cleanItems();
 $configurationComboBox = new CComboBox('config', 'usergrps.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 $configurationComboBox->addItem('usergrps.php', _('User groups'));
 $configurationComboBox->addItem('users.php', _('Users'));
-$createForm->addItem(array($configurationComboBox, new CSubmit('form', _('Create group'))));
+$createForm->addItem(array($configurationComboBox, new CSubmit('form', _('Create user group'))));
 $userGroupsWidget->addPageHeader(_('CONFIGURATION OF USERS AND USER GROUPS'), $createForm);
 
 // append header to widget
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $userGroupsWidget->addHeader(_('User groups'));
-$userGroupsWidget->addHeader($numRows);
+$userGroupsWidget->addHeaderRowNumber();
 
 // create form
 $userGroupsForm = new CForm();
@@ -49,7 +45,7 @@ $userGroupTable->setHeader(array(
 	make_sorting_header(_('Name'), 'name'),
 	'#',
 	_('Members'),
-	_('Users status'),
+	_('Status'),
 	_('Frontend access'),
 	_('Debug mode')
 ));
@@ -152,6 +148,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go'));
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "group_groupid";');
 
 // append table to form
 $userGroupsForm->addItem(array($this->data['paging'], $userGroupTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

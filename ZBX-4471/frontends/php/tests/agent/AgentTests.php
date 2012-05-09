@@ -19,12 +19,10 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/testMetrics.php');
+require_once dirname(__FILE__).'/testMetrics.php';
 
-class AgentTests
-{
-	public static function suite()
-	{
+class AgentTests {
+	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
 		$suite->addTestSuite('testMetrics');

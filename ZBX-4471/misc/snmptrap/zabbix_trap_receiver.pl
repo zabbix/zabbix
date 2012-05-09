@@ -94,7 +94,7 @@ sub zabbix_receiver
 	print OUTPUT_FILE "VARBINDS:\n";
 	foreach my $x (@varbinds)
 	{
-		printf OUTPUT_FILE "  %-30s type=%-2d value=%s\n", $x->[0], $x->[2], $x->[1]; 
+		printf OUTPUT_FILE "  %-30s type=%-2d value=%s\n", $x->[0], $x->[2], $x->[1];
 	}
 
 	close (OUTPUT_FILE);

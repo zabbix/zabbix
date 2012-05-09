@@ -19,16 +19,14 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testFormMap extends CWebTest
-{
-
+class testFormMap extends CWebTest {
 	/**
 	 * Possible combinations of grid settings
 	 * @return array
 	 */
-	public function possibleGridOptions(){
+	public function possibleGridOptions() {
 		return array(
 			// grid size, show grid, auto align
 			array('20x20', 1, 1),
@@ -63,8 +61,7 @@ class testFormMap extends CWebTest
 	 *
 	 * @dataProvider possibleGridOptions
 	 */
-	public function testFormMap_UpdateGridOptions($gridSize, $showGrid, $autoAlign)
-	{
+	public function testFormMap_UpdateGridOptions($gridSize, $showGrid, $autoAlign) {
 
 		$map_name = 'Test map 1';
 
@@ -84,29 +81,30 @@ class testFormMap extends CWebTest
 		);
 
 		// grid should be shown by default
-		if($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON){
+		if ($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON) {
 			$this->ok('Shown');
 		}
-		else{
+		else {
 			$this->ok('Hidden');
 		}
 
 		// auto align should be on by default
-		if($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON){
+		if ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON) {
 			$this->ok('On');
 		}
-		else{
+		else {
 			$this->ok('Off');
 		}
 
 		// selecting new grid size
 		$this->dropdown_select('gridsize', $gridSize);
+		sleep(1);
 
 		// changing other two options if they are not already set as needed
-		if(($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON && $showGrid == 0) || ($db_map['grid_show'] == SYSMAP_GRID_SHOW_OFF && $showGrid == 1)){
+		if (($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON && $showGrid == 0) || ($db_map['grid_show'] == SYSMAP_GRID_SHOW_OFF && $showGrid == 1)) {
 			$this->click("gridshow");
 		}
-		if(($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON && $autoAlign == 0) || ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_OFF && $autoAlign == 1)){
+		if (($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON && $autoAlign == 0) || ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_OFF && $autoAlign == 1)) {
 			$this->click("gridautoalign");
 		}
 
@@ -115,7 +113,6 @@ class testFormMap extends CWebTest
 		$this->button_click('save');
 		$this->wait();
 		$this->getConfirmation();
-
 
 		// checking if DB was updated as expected
 		$db_result = DBSelect("SELECT * FROM sysmaps WHERE name = '$map_name'");
@@ -140,17 +137,17 @@ class testFormMap extends CWebTest
 			'Chuck Norris: When returning to map after update, I was expecting to see '.substr($gridSize, 0, strpos($gridSize, 'x')).' selected, but saw '.$this->getSelectedValue('gridsize')
 		);
 
-		if($showGrid){
+		if ($showGrid) {
 			$this->ok('Shown');
 		}
-		else{
+		else {
 			$this->ok('Hidden');
 		}
 
-		if($autoAlign){
+		if ($autoAlign) {
 			$this->ok('On');
 		}
-		else{
+		else {
 			$this->ok('Off');
 		}
 

@@ -127,14 +127,14 @@ static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
 
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	const MODE_FUNCTION	fl[] =
 	{
 		{"free",	VFS_FS_FREE},
 		{"total",	VFS_FS_TOTAL},
 		{"used",	VFS_FS_USED},
 		{"pfree",	VFS_FS_PFREE},
 		{"pused",	VFS_FS_PUSED},
-		{0,		0}
+		{NULL,		0}
 	};
 
 	char	fsname[MAX_STRING_LEN], mode[8];
@@ -168,7 +168,7 @@ int	VFS_FS_DISCOVERY(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_json_addarray(&j, cmd);
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
 	if (0 != (rc = getmntinfo(&mntbuf, MNT_WAIT)))
 	{

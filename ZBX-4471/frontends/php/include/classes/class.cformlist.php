@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CFormList extends CDiv {
+
 	protected $formList = null;
 	protected $editable = true;
 	protected $formInputs = array('ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox');
@@ -50,8 +52,6 @@ class CFormList extends CDiv {
 			$class = $defaultClass;
 		}
 
-
-
 		if (!is_null($description)) {
 			$this->formList->addItem(array(new CDiv($label, 'dt floatleft right'), new CDiv($description, 'dd')), $class, $id);
 		}
@@ -61,9 +61,13 @@ class CFormList extends CDiv {
 	}
 
 	public function addInfo($text, $label = null) {
-		$infoDiv = new CDiv(!empty($label) ? $label : _('Info'), 'dt right listInfoLabel');
-		$textDiv = new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText');
-		$this->formList->addItem(array($infoDiv, $textDiv), 'formrow listInfo');
+		$this->formList->addItem(
+			array(
+				new CDiv(!empty($label) ? $label : _('Info'), 'dt right listInfoLabel'),
+				new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText')
+			),
+			'formrow listInfo'
+		);
 	}
 
 	public function toString($destroy = true) {

@@ -19,36 +19,40 @@
 **/
 ?>
 <?php
+
 class CImg extends CTag {
+
+	public $preloader;
+
 	public function __construct($src, $name = null, $width = null, $height = null, $class = null) {
+		if (is_null($name)) {
+			$name = 'image';
+		}
+
 		parent::__construct('img', 'no');
 		$this->tag_start = '';
 		$this->tag_end = '';
 		$this->tag_body_start = '';
 		$this->tag_body_end = '';
-		if (is_null($name)) {
-			$name = 'image';
-		}
 		$this->setAttribute('border', 0);
-		$this->setAttribute('alt', $name);
 		$this->setName($name);
 		$this->setAltText($name);
 		$this->setSrc($src);
 		$this->setWidth($width);
 		$this->setHeight($height);
-		$this->setAttribute('class', $class);
+		$this->attr('class', $class);
 	}
 
 	public function setSrc($value) {
 		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetSrc ['.$value.']');
+			return $this->error('Incorrect value for SetSrc "'.$value.'".');
 		}
 		return $this->setAttribute('src', $value);
 	}
 
 	public function setAltText($value = null) {
 		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetText ['.$value.']');
+			return $this->error('Incorrect value for SetText "'.$value.'".');
 		}
 		return $this->setAttribute('alt', $value);
 	}
@@ -58,7 +62,7 @@ class CImg extends CTag {
 			$this->deleteOption('usemap');
 		}
 		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetMap ['.$value.']');
+			return $this->error('Incorrect value for SetMap "'.$value.'".');
 		}
 		$value = '#'.ltrim($value, '#');
 		return $this->setAttribute('usemap', $value);
@@ -69,10 +73,10 @@ class CImg extends CTag {
 			return $this->removeAttribute('width');
 		}
 		elseif (is_numeric($value) || is_int($value)) {
-			return $this->setAttribute('width',$value);
+			return $this->setAttribute('width', $value);
 		}
 		else {
-			return $this->error('Incorrect value for SetWidth ['.$value.']');
+			return $this->error('Incorrect value for SetWidth "'.$value.'".');
 		}
 	}
 
@@ -84,8 +88,29 @@ class CImg extends CTag {
 			return $this->setAttribute('height', $value);
 		}
 		else {
-			return $this->error('Incorrect value for SetHeight ['.$value.']');
+			return $this->error('Incorrect value for SetHeight "'.$value.'".');
 		}
+	}
+
+	public function preload() {
+		$id = $this->getAttribute('id');
+		if (empty($id)) {
+			$id = 'img'.uniqid();
+			$this->setAttribute('id', $id);
+		}
+
+		insert_js(
+			'jQuery(\''.$this->toString().'\').load(function() {
+				var parent = jQuery("#'.$id.'preloader").parent();
+				jQuery("#'.$id.'preloader").remove();
+				jQuery(parent).append(jQuery(this));
+			});',
+			true
+		);
+
+		$this->addClass('preloader');
+		$this->setAttribute('id', $id.'preloader');
+		$this->setAttribute('src', 'styles/themes/'.getUserTheme(CWebUser::$data).'/images/preloader.gif');
 	}
 }
 ?>

@@ -107,8 +107,10 @@ static void	sync_config()
 			" where m.userid=u.userid"
 				" and u.usrgrpid=c.alert_usrgrpid"
 				" and m.mediatypeid=mt.mediatypeid"
-				" and m.active=%d",
-			MEDIA_STATUS_ACTIVE);
+				" and m.active=%d"
+				" and mt.status=%d",
+			MEDIA_STATUS_ACTIVE,
+			MEDIA_TYPE_STATUS_ACTIVE);
 
 	if (NULL == result || (DB_RESULT)ZBX_DB_DOWN == result)
 	{
@@ -144,7 +146,6 @@ static void	sync_config()
 		STR_REPLACE(recipient->mediatype.gsm_modem, row[7]);
 		STR_REPLACE(recipient->mediatype.username, row[8]);
 		STR_REPLACE(recipient->mediatype.passwd, row[9]);
-
 		STR_REPLACE(recipient->alert.sendto, row[10]);
 
 		if (NULL == recipient->alert.subject)

@@ -23,15 +23,19 @@
 #include "cfg.h"
 #include "alias.h"
 
-#if defined(WITH_COMMON_METRICS)
+#ifdef WITH_AGENT_METRICS
+#	include "agent/agent.h"
+#endif
+
+#ifdef WITH_COMMON_METRICS
 #	include "common/common.h"
 #endif
 
-#if defined(WITH_SIMPLE_METRICS)
+#ifdef WITH_SIMPLE_METRICS
 #	include "simple/simple.h"
 #endif
 
-#if defined(WITH_SPECIFIC_METRICS)
+#ifdef WITH_SPECIFIC_METRICS
 #	include "specsysinfo.h"
 #endif
 
@@ -114,17 +118,22 @@ void	init_metrics()
 	commands = zbx_malloc(commands, sizeof(ZBX_METRIC));
 	commands[0].key = NULL;
 
-#if defined(WITH_COMMON_METRICS)
+#ifdef WITH_AGENT_METRICS
+	for (i = 0; NULL != parameters_agent[i].key; i++)
+		add_metric(&parameters_agent[i]);
+#endif
+
+#ifdef WITH_COMMON_METRICS
 	for (i = 0; NULL != parameters_common[i].key; i++)
 		add_metric(&parameters_common[i]);
 #endif
 
-#if defined(WITH_SPECIFIC_METRICS)
+#ifdef WITH_SPECIFIC_METRICS
 	for (i = 0; NULL != parameters_specific[i].key; i++)
 		add_metric(&parameters_specific[i]);
 #endif
 
-#if defined(WITH_SIMPLE_METRICS)
+#ifdef WITH_SIMPLE_METRICS
 	for (i = 0; NULL != parameters_simple[i].key; i++)
 		add_metric(&parameters_simple[i]);
 #endif
@@ -403,7 +412,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	return SUCCEED;
 notsupported:
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
+	SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
 	return NOTSUPPORTED;
 }
 
@@ -618,7 +627,6 @@ static char	**get_result_str_value(AGENT_RESULT *result)
 		*p = '\0'; /* replace to NUL */
 		SET_STR_RESULT(result, zbx_strdup(NULL, result->text)); /* copy line */
 		*p = tmp; /* restore result->text character */
-
 	}
 	else if (ISSET_UI64(result))
 	{

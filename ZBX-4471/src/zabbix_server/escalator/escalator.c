@@ -543,18 +543,24 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 
 	if (0 == mediatypeid)
 	{
-		result = DBselect("select mediatypeid,sendto,severity,period from media"
-				" where active=%d and userid=" ZBX_FS_UI64,
-				MEDIA_STATUS_ACTIVE,
-				userid);
+		result = DBselect(
+				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status"
+				" from media m,media_type mt"
+				" where m.mediatypeid=mt.mediatypeid"
+					" and m.active=%d"
+					" and m.userid=" ZBX_FS_UI64,
+				MEDIA_STATUS_ACTIVE, userid);
 	}
 	else
 	{
-		result = DBselect("select mediatypeid,sendto,severity,period from media"
-				" where active=%d and userid=" ZBX_FS_UI64 " and mediatypeid=" ZBX_FS_UI64,
-				MEDIA_STATUS_ACTIVE,
-				userid,
-				mediatypeid);
+		result = DBselect(
+				"select m.mediatypeid,m.sendto,m.severity,m.period,mt.status"
+				" from media m,media_type mt"
+				" where m.mediatypeid=mt.mediatypeid"
+					" and m.active=%d"
+					" and m.userid=" ZBX_FS_UI64
+					" and m.mediatypeid=" ZBX_FS_UI64,
+				MEDIA_STATUS_ACTIVE, userid, mediatypeid);
 	}
 
 	while (NULL != (row = DBfetch(result)))
@@ -582,25 +588,53 @@ static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACT
 		alertid		= DBget_maxid("alerts");
 		sendto_esc	= DBdyn_escape_string_len(row[1], ALERT_SENDTO_LEN);
 
-		DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
-				",mediatypeid,sendto,subject,message,status,alerttype,esc_step)"
-				" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d"
-				"," ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d)",
-				alertid,
-				action->actionid,
-				event->eventid,
-				userid,
-				now,
-				mediatypeid,
-				sendto_esc,
-				subject_esc,
-				message_esc,
-				ALERT_STATUS_NOT_SENT,
-				ALERT_TYPE_MESSAGE,
-				escalation->esc_step);
+		if (MEDIA_TYPE_STATUS_ACTIVE == atoi(row[4]))
+		{
+			DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
+					",mediatypeid,sendto,subject,message,status,alerttype,esc_step)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d"
+					"," ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d)",
+					alertid,
+					action->actionid,
+					event->eventid,
+					userid,
+					now,
+					mediatypeid,
+					sendto_esc,
+					subject_esc,
+					message_esc,
+					ALERT_STATUS_NOT_SENT,
+					ALERT_TYPE_MESSAGE,
+					escalation->esc_step);
+		}
+		else
+		{
+			error_esc = DBdyn_escape_string("Media type disabled");
+
+			DBexecute("insert into alerts (alertid,actionid,eventid,userid,clock"
+					",mediatypeid,sendto,subject,message,status,alerttype,esc_step,error)"
+					" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d"
+					"," ZBX_FS_UI64 ",'%s','%s','%s',%d,%d,%d,'%s')",
+					alertid,
+					action->actionid,
+					event->eventid,
+					userid,
+					now,
+					mediatypeid,
+					sendto_esc,
+					subject_esc,
+					message_esc,
+					ALERT_STATUS_FAILED,
+					ALERT_TYPE_MESSAGE,
+					escalation->esc_step,
+					error_esc);
+
+			zbx_free(error_esc);
+		}
 
 		zbx_free(sendto_esc);
 	}
+
 	DBfree_result(result);
 
 	if (0 == medias)

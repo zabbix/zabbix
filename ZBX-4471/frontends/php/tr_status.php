@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'tr_status.php';
-$page['title'] = 'S_STATUS_OF_TRIGGERS';
+$page['title'] = _('Status of triggers');
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.cswitcher.js');
 
@@ -33,10 +33,10 @@ if($page['type'] == PAGE_TYPE_HTML){
 	define('ZBX_PAGE_DO_REFRESH', 1);
 }
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 // js templates
-require_once('include/views/js/general.script.confirm.js.php');
+require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -60,19 +60,19 @@ require_once('include/views/js/general.script.confirm.js.php');
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})')
 	);
 
 	check_fields($fields);
 
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.tr_status.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.tr_status.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--------
@@ -125,7 +125,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$_REQUEST['txt_select'] = get_request('txt_select', CProfile::get('web.tr_status.filter.txt_select', ''));
 
 		if(EVENT_ACK_DISABLED == $config['event_ack_enable']){
-			if(!str_in_array($_REQUEST['show_events'],array(EVENTS_OPTION_NOEVENT,EVENTS_OPTION_ALL))){
+			if(!str_in_array($_REQUEST['show_events'], array(EVENTS_OPTION_NOEVENT, EVENTS_OPTION_ALL))){
 				$_REQUEST['show_events'] = EVENTS_OPTION_NOEVENT;
 			}
 			$_REQUEST['ack_status'] = ZBX_ACK_STS_ANY;
@@ -165,17 +165,14 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$trigg_wdgt = new CWidget();
 
 	$r_form = new CForm('get');
-	$r_form->addItem(array(S_GROUP . SPACE, $pageFilter->getGroupsCB(true)));
-	$r_form->addItem(array(SPACE . S_HOST . SPACE, $pageFilter->getHostsCB(true)));
+	$r_form->addItem(array(_('Group') . SPACE, $pageFilter->getGroupsCB(true)));
+	$r_form->addItem(array(SPACE . _('Host') . SPACE, $pageFilter->getHostsCB(true)));
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$trigg_wdgt->addPageHeader(S_STATUS_OF_TRIGGERS_BIG . ' [' . date(S_DATE_FORMAT_YMDHMS) . ']', array($fs_icon));
-
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
-	$trigg_wdgt->addHeader(S_TRIGGERS_BIG, $r_form);
-	$trigg_wdgt->addHeader($numrows);
+	$trigg_wdgt->addPageHeader(_('STATUS OF TRIGGERS').SPACE.'['.date(_('d M Y H:i:s')).']', $fs_icon);
+	$trigg_wdgt->addHeader(_('Triggers'), $r_form);
+	$trigg_wdgt->addHeaderRowNumber();
 
 /************************* FILTER **************************/
 /***********************************************************/
@@ -189,16 +186,16 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$filterForm->addVar('hostid', $_REQUEST['hostid']);
 
 	$tr_select = new CComboBox('show_triggers', $show_triggers);
-	$tr_select->addItem(TRIGGERS_OPTION_ALL, S_ANY);
-	$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, S_PROBLEM);
-	$filterForm->addRow(S_TRIGGERS_STATUS, $tr_select);
+	$tr_select->addItem(TRIGGERS_OPTION_ALL, _('Any'));
+	$tr_select->additem(TRIGGERS_OPTION_ONLYTRUE, _('Problem'));
+	$filterForm->addRow(_('Triggers status'), $tr_select);
 
 	if($config['event_ack_enable']){
 		$cb_ack_status = new CComboBox('ack_status', $ack_status);
-		$cb_ack_status->addItem(ZBX_ACK_STS_ANY, S_ANY);
-		$cb_ack_status->additem(ZBX_ACK_STS_WITH_UNACK, S_WITH_UNACKNOWLEDGED_EVENTS);
-		$cb_ack_status->additem(ZBX_ACK_STS_WITH_LAST_UNACK, S_WITH_LAST_EVENT_UNACKNOWLEDGED);
-		$filterForm->addRow(S_ACKNOWLEDGE_STATUS, $cb_ack_status);
+		$cb_ack_status->addItem(ZBX_ACK_STS_ANY, _('Any'));
+		$cb_ack_status->additem(ZBX_ACK_STS_WITH_UNACK, _('With unacknowledged events'));
+		$cb_ack_status->additem(ZBX_ACK_STS_WITH_LAST_UNACK, _('With last event unacknowledged'));
+		$filterForm->addRow(_('Acknowledge status'), $cb_ack_status);
 	}
 
 	$ev_select = new CComboBox('show_events', $_REQUEST['show_events']);
@@ -211,7 +208,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 	$severity_select = new CComboBox('show_severity', $show_severity);
 	$cb_items = array(
-		-1 => S_ALL_S,
+		-1 => _('All'),
 		TRIGGER_SEVERITY_NOT_CLASSIFIED => getSeverityCaption(TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		TRIGGER_SEVERITY_INFORMATION => getSeverityCaption(TRIGGER_SEVERITY_INFORMATION),
 		TRIGGER_SEVERITY_WARNING => getSeverityCaption(TRIGGER_SEVERITY_WARNING),
@@ -220,7 +217,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 		TRIGGER_SEVERITY_DISASTER => getSeverityCaption(TRIGGER_SEVERITY_DISASTER),
 	);
 	$severity_select->addItems($cb_items);
-	$filterForm->addRow(S_MIN_SEVERITY, $severity_select);
+	$filterForm->addRow(_('Min severity'), $severity_select);
 
 	$action = 'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()';
 	$sts_change_days_cb = new CNumericBox('status_change_days', $_REQUEST['status_change_days'], 4);
@@ -232,18 +229,18 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 	$spand = new CSpan(_('days'));
 	$spand->addStyle('vertical-align: middle;');
-	$filterForm->addRow(S_AGE_LESS_THAN, array(
+	$filterForm->addRow(_('Age less than'), array(
 		$cbd,
 		$sts_change_days_cb,
 		$spand,
 	));
 
-	$filterForm->addRow(S_SHOW_DETAILS, new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
+	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $_REQUEST['show_details'], null, 1));
 
-	$filterForm->addRow(S_FILTER_BY_NAME, new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
+	$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $_REQUEST['txt_select'], 40));
 
-	$filterForm->addItemToBottomRow(new CSubmit('filter_set', S_FILTER));
-	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', S_RESET));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter')));
+	$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset')));
 
 	$trigg_wdgt->addFlicker($filterForm, CProfile::get('web.tr_status.filter.state', 0));
 /*************** FILTER END ******************/
@@ -254,14 +251,14 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$triggerInfo->show();
 	}
 
-	$m_form = new CForm('get','acknow.php');
+	$m_form = new CForm('get', 'acknow.php');
 	$m_form->setName('tr_status');
 	$m_form->addVar('backurl', $page['file']);
 
 	$admin_links = (($USER_DETAILS['type'] == USER_TYPE_ZABBIX_ADMIN) || ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN));
 	$show_event_col = ($config['event_ack_enable'] && ($_REQUEST['show_events'] != EVENTS_OPTION_NOEVENT));
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No triggers defined.'));
 	$switcherName = 'trigger_switchers';
 
 	$header_cb = ($show_event_col) ? new CCheckBox('all_events', false, "checkAll('".$m_form->GetName()."','all_events','events');")
@@ -278,17 +275,17 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$table->setHeader(array(
 		$whow_hide_all,
 		$config['event_ack_enable'] ? $header_cb : null,
-		make_sorting_header(S_SEVERITY, 'priority'),
-		S_STATUS,
-		S_INFO,
+		make_sorting_header(_('Severity'), 'priority'),
+		_('Status'),
+		_('Info'),
 		make_sorting_header(_('Last change'), 'lastchange'),
-		S_AGE,
+		_('Age'),
 		$show_event_col ? _('Duration') : null,
 		$config['event_ack_enable'] ? _('Acknowledged') : null,
-		is_show_all_nodes() ? S_NODE : null,
-		S_HOST,
-		make_sorting_header(S_NAME, 'description'),
-		S_COMMENTS
+		is_show_all_nodes() ? _('Node') : null,
+		_('Host'),
+		make_sorting_header(_('Name'), 'description'),
+		_('Comments')
 	));
 
 
@@ -296,16 +293,13 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$sortorder = getPageSortOrder();
 	$options = array(
 		'nodeids' => get_current_nodeid(),
-		'filter' => array(),
-		'monitored' => 1,
-		'output' => API_OUTPUT_EXTEND,
-		'skipDependent' => 1,
-		'sortfield' => $sortfield,
-		'sortorder' => $sortorder,
-		'limit' => ($config['search_limit']+1)
+		'monitored' => true,
+		'output' => array('triggerid', $sortfield),
+		'skipDependent' => true,
+		'limit' => $config['search_limit'] + 1
 	);
 
-// Filtering
+	// filtering
 	if($pageFilter->hostsSelected){
 		if($pageFilter->hostid > 0)
 			$options['hostids'] = $pageFilter->hostid;
@@ -346,9 +340,10 @@ require_once('include/views/js/general.script.confirm.js.php');
 		'nodeids' => get_current_nodeid(),
 		'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
+		'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
 		'selectItems' => API_OUTPUT_EXTEND,
-		'selectDependencies' => API_OUTPUT_EXTEND
+		'selectDependencies' => API_OUTPUT_EXTEND,
+		'expandDescription' => true
 	);
 	$triggers = API::Trigger()->get($options);
 
@@ -357,36 +352,50 @@ require_once('include/views/js/general.script.confirm.js.php');
 	order_result($triggers, $sortfield, $sortorder);
 //---------
 
+	$triggerids = zbx_objectValues($triggers, 'triggerid');
+
 	if($config['event_ack_enable']){
-		foreach($triggers as $tnum => $trigger){
-			$options = array(
-				'countOutput' => true,
-				'triggerids' => $trigger['triggerid'],
-				'filter' => array(
-					'object' => EVENT_OBJECT_TRIGGER,
-					'value_changed' => TRIGGER_VALUE_CHANGED_YES,
-					'acknowledged' => 0,
-					'value' => TRIGGER_VALUE_TRUE,
-				),
-				'nopermissions' => true
-			);
-			$triggers[$tnum]['event_count'] = API::Event()->get($options);
+		$options = array(
+			'countOutput' => true,
+			'groupCount' => true,
+			'triggerids' => $triggerids,
+			'filter' => array(
+				'object' => EVENT_OBJECT_TRIGGER,
+				'value_changed' => TRIGGER_VALUE_CHANGED_YES,
+				'acknowledged' => 0,
+				'value' => TRIGGER_VALUE_TRUE
+			),
+			'nopermissions' => true
+		);
+		$event_counts = API::Event()->get($options);
+		foreach ($triggers as $tnum => $trigger) {
+			$triggers[$tnum]['event_count'] = 0;
+		}
+		foreach ($event_counts as $event_count) {
+			$triggers[$event_count['objectid']]['event_count'] = $event_count['rowscount'];
 		}
 	}
 
-
 	$tr_hostids = array();
-	foreach($triggers as $tnum => $trigger){
+	foreach ($triggers as $tnum => $trigger) {
 		$triggers[$tnum]['events'] = array();
 
 		//getting all host ids and names
-		foreach($trigger['hosts'] as $tr_hosts){
+		foreach ($trigger['hosts'] as $tr_hosts) {
 			$tr_hostids[$tr_hosts['hostid']] = $tr_hosts['hostid'];
 		}
 	}
 
 
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($tr_hostids);
+
+	// fetch all hosts
+	$hosts = API::Host()->get(array(
+		'hostids' => $tr_hostids,
+		'preservekeys' => true,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectInventory' => true
+	));
 
 	if($show_events != EVENTS_OPTION_NOEVENT){
 		$ev_options = array(
@@ -417,27 +426,33 @@ require_once('include/views/js/general.script.confirm.js.php');
 			array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
 			array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
 		);
-		ArraySorter::sort($events, $sortFields);
+		CArrayHelper::sort($events, $sortFields);
 
 		foreach($events as $enum => $event){
 			$triggers[$event['objectid']]['events'][] = $event;
 		}
 	}
 
+	$dep_res = DBselect(
+		'SELECT triggerid_down,triggerid_up'.
+		' FROM trigger_depends'.
+		' WHERE '.DBcondition('triggerid_up', $triggerids)
+	);
+	$triggerids_down = array();
+	while ($row = DBfetch($dep_res)) {
+		$triggerids_down[$row['triggerid_up']][] = intval($row['triggerid_down']);
+	}
 
-	foreach($triggers as $tnum => $trigger){
-
-		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
-
+	foreach ($triggers as $tnum => $trigger) {
 		$items = array();
 
 		$used_hosts = array();
-		foreach($trigger['hosts'] as $th){
+		foreach ($trigger['hosts'] as $th) {
 			$used_hosts[$th['hostid']] = $th['name'];
 		}
 		$used_host_count = count($used_hosts);
 
-		foreach($trigger['items'] as $inum => $item){
+		foreach ($trigger['items'] as $inum => $item) {
 			$item_name = itemName($item);
 
 			//if we have items from different hosts, we must prefix a host name
@@ -452,35 +467,26 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 		$trigger['items'] = $items;
 
-
-//----
-
-		$description = new CSpan($description, 'link_menu');
-
-// trigger description js menu {{{
-		$hosts = reset($trigger['hosts']);
-
+		// trigger js menu
 		$menu_trigger_conf = 'null';
 		if($admin_links && $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL){
-			$str_tmp = zbx_jsvalue('javascript: redirect("triggers.php?form=update&triggerid='.
-					$trigger['triggerid'].'&switch_node='.id2nodeid($trigger['triggerid']).'")');
-			$menu_trigger_conf = "['".S_CONFIGURATION_OF_TRIGGERS."',". $str_tmp .",
+			$str_tmp = CJs::encodeJson("triggers.php?form=update&triggerid=".$trigger['triggerid']."&switch_node=".id2nodeid($trigger['triggerid']));
+			$menu_trigger_conf = "['"._('Configuration of triggers')."',". $str_tmp .",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
 		$menu_trigger_url = 'null';
 		if (!zbx_empty($trigger['url'])) {
-			// double zbx_jsvalue is required to prevent XSS attacks
-			$menu_trigger_url = "['".S_URL."',\"javascript: window.location.href=".zbx_jsvalue(zbx_jsvalue(resolveTriggerUrl($trigger), null, false))."\",
+			// double CHtml::encode is required to prevent XSS attacks
+			$menu_trigger_url = "['"._('URL')."',".CJs::encodeJson(CHtml::encode(CHtml::encode(resolveTriggerUrl($trigger)))).",
 				null, {'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]";
 		}
+
+		$description = new CSpan($trigger['description'], 'link_menu');
 		$description->addAction('onclick',
 			"javascript: create_mon_trigger_menu(event, [{'triggerid': '".$trigger['triggerid'].
 				"', 'lastchange': '".$trigger['lastchange']."'}, ".$menu_trigger_conf.", ".$menu_trigger_url."],".
 			zbx_jsvalue($items, true).");"
 		);
-
-
-// }}} trigger description js menu
 
 		if($_REQUEST['show_details']){
 			$font = new CTag('font', 'yes');
@@ -510,18 +516,19 @@ require_once('include/views/js/general.script.confirm.js.php');
 		$dependency = false;
 		$dep_table = new CTableInfo();
 		$dep_table->setAttribute('style', 'width: 200px;');
-		$dep_table->addRow(bold(S_DEPENDENT.':'));
-
-		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_up='.$trigger['triggerid'];
-		$dep_res = DBselect($sql_dep);
-		while($dep_row = DBfetch($dep_res)){
-			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
-			$dependency = true;
+		$dep_table->addRow(bold(_('Dependent').':'));
+		if (!empty($triggerids_down[$trigger['triggerid']])) {
+			$depTriggers = zbx_toObject($triggerids_down[$trigger['triggerid']], 'triggerid');
+			$depTriggers = expandTriggerDescriptions($depTriggers);
+			foreach ($depTriggers as $depTrigger) {
+				$dep_table->addRow(SPACE.'-'.SPACE.$depTrigger['description']);
+				$dependency = true;
+			}
 		}
 
 		if($dependency){
-			$img = new Cimg('images/general/up_icon.png','DEP_UP');
-			$img->setAttribute('style','vertical-align: middle; border: 0px;');
+			$img = new Cimg('images/general/up_icon.png', 'DEP_UP');
+			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
 			$description = array($img,SPACE,$description);
@@ -534,34 +541,20 @@ require_once('include/views/js/general.script.confirm.js.php');
 
 // host JS menu {{{
 		$hosts_list = array();
-		foreach($trigger['hosts'] as $num => $trigger_host){
-			$menus = '';
+		foreach($trigger['hosts'] as $trigger_host){
+			$host = $hosts[$trigger_host['hostid']];
 
-			$host_nodeid = id2nodeid($trigger_host['hostid']);
-			if(isset($scripts_by_hosts[$trigger_host['hostid']])){
-				foreach($scripts_by_hosts[$trigger_host['hostid']] as $id => $script){
-					$script_nodeid = id2nodeid($script['scriptid']);
-					if( (bccomp($host_nodeid, $script_nodeid ) == 0)){
-						$str_tmp = zbx_jsvalue('javascript: executeScript('.$trigger_host['hostid'].', '.
-								$script['scriptid'].', '.
-								zbx_jsvalue($script['confirmation']).
-								')');
-
-						$menus.= "[".zbx_jsvalue($script['name']).", ".$str_tmp.", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-					}
+			// fetch scripts for the host JS menu
+			$menuScripts = array();
+			if (isset($scripts_by_hosts[$trigger_host['hostid']])) {
+				foreach ($scripts_by_hosts[$trigger_host['hostid']] as $script) {
+					$menuScripts[] = array(
+						'scriptid' => $script['scriptid'],
+						'confirmation' => $script['confirmation'],
+						'name' => $script['name']
+					);
 				}
 			}
-			if(!empty($scripts_by_hosts)){
-				$menus = "[".zbx_jsvalue(_('Scripts')).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus;
-			}
-
-			$menus.= "[".zbx_jsvalue(S_URLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],";
-			$menus.= "['".S_LATEST_DATA."',\"javascript: redirect('latest.php?hostid=".$trigger_host['hostid']."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
-
-			$menus = rtrim($menus,',');
-			$menus = 'show_popup_menu(event,['.$menus.'],180);';
-
-
 
 			$maint_span = null;
 			if($trigger_host['maintenance_status']){
@@ -581,8 +574,14 @@ require_once('include/views/js/general.script.confirm.js.php');
 				$maint_span->setHint($maint_hint);
 			}
 
-			$hosts_span = new CSpan($trigger_host['name'], 'link_menu');
-			$hosts_span->setAttribute('onclick','javascript: '.$menus);
+			$hosts_span = new CSpan($trigger_host['name'], 'link_menu menu-host');
+			$hosts_span->setAttribute('data-menu', array(
+				'scripts' => $menuScripts,
+				'hostid' => $trigger_host['hostid'],
+				'hasScreens' => (bool) $host['screens'],
+				'hasInventory' => (bool) $host['inventory']
+			));
+
 			$hosts_list[] = $hosts_span;
 			$hosts_list[] = $maint_span;
 			$hosts_list[] = ', ';
@@ -602,7 +601,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 			$config['event_ack_enable'] ? $trigger['event_count'] == 0 : false
 		);
 
-		$lastchange = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
+		$lastchange = new CLink(zbx_date2str(_('d M Y H:i:s'), $trigger['lastchange']), 'events.php?triggerid='.$trigger['triggerid']);
 		//.'&stime='.date('YmdHis', $trigger['lastchange']
 
 		if($config['event_ack_enable']){
@@ -637,7 +636,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 // Unknown triggers
 		$unknown = SPACE;
 		if($trigger['value_flags'] == TRIGGER_VALUE_FLAG_UNKNOWN){
-			$unknown = new CDiv(SPACE,'status_icon iconunknown');
+			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
 			$unknown->setHint($trigger['error'], '', 'on');
 		}
 //----
@@ -656,7 +655,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 			get_node_name_by_elid($trigger['triggerid']),
 			$host,
 			$tr_desc,
-			new CLink(zbx_empty($trigger['comments']) ? S_ADD : S_SHOW, 'tr_comments.php?triggerid='.$trigger['triggerid'])
+			new CLink(zbx_empty($trigger['comments']) ? _('Add') : _('Show'), 'tr_comments.php?triggerid='.$trigger['triggerid'])
 		), 'even_row');
 
 
@@ -687,7 +686,7 @@ require_once('include/views/js/general.script.confirm.js.php');
 					$ack_cb = SPACE;
 				}
 
-				$clock = new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS, $row_event['clock']),
+				$clock = new CLink(zbx_date2str(_('d M Y H:i:s'), $row_event['clock']),
 					'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$row_event['eventid']);
 				$next_clock = isset($trigger['events'][$enum-1]) ? $trigger['events'][$enum-1]['clock'] : time();
 
@@ -715,15 +714,14 @@ require_once('include/views/js/general.script.confirm.js.php');
 		}
 	}
 
-
 //----- GO ------
 	$footer = null;
 	if($config['event_ack_enable']){
 		$goBox = new CComboBox('go');
-		$goBox->addItem('bulkacknowledge', S_BULK_ACKNOWLEDGE);
+		$goBox->addItem('bulkacknowledge', _('Bulk acknowledge'));
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton', S_GO.' (0)');
+		$goButton = new CSubmit('goButton', _('Go'));
 		$goButton->setAttribute('id', 'goButton');
 
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
@@ -737,9 +735,9 @@ require_once('include/views/js/general.script.confirm.js.php');
 	$trigg_wdgt->addItem($m_form);
 	$trigg_wdgt->show();
 
-	zbx_add_post_js('jqBlink.init();');
-	zbx_add_post_js("var switcher = new CSwitcher('$switcherName');");
+	zbx_add_post_js('jqBlink.blink();');
+	zbx_add_post_js('var switcher = new CSwitcher(\''.$switcherName.'\');');
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

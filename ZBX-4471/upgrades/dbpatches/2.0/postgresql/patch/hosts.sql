@@ -10,7 +10,7 @@ CREATE TABLE interface (
 	dns                      varchar(64)     DEFAULT ''                NOT NULL,
 	port                     varchar(64)     DEFAULT '10050'           NOT NULL,
 	PRIMARY KEY (interfaceid)
-) with OIDS;
+);
 CREATE INDEX interface_1 on interface (hostid,type);
 CREATE INDEX interface_2 on interface (ip,dns);
 ALTER TABLE ONLY interface ADD CONSTRAINT c_interface_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
@@ -61,12 +61,16 @@ ALTER TABLE ONLY items
 	ADD interfaceid bigint NULL,
 	ADD port varchar(64) DEFAULT '' NOT NULL,
 	ADD description text DEFAULT '' NOT NULL,
-	ADD inventory_link integer DEFAULT '0' NOT NULL;
-
-UPDATE items SET templateid=NULL WHERE templateid=0;
-UPDATE items SET templateid=NULL WHERE NOT templateid IS NULL AND NOT templateid IN (SELECT itemid FROM items);
-UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
-UPDATE items SET valuemapid=NULL WHERE NOT valuemapid IS NULL AND NOT valuemapid IN (SELECT valuemapid from valuemaps);
+	ADD inventory_link integer DEFAULT '0' NOT NULL,
+	ADD lifetime varchar(64) DEFAULT '30' NOT NULL;
+UPDATE items
+	SET templateid=NULL
+	WHERE templateid=0
+		OR NOT EXISTS (SELECT 1 FROM items i WHERE i.itemid=items.templateid);
+UPDATE items
+	SET valuemapid=NULL
+	WHERE valuemapid=0
+		OR NOT EXISTS (SELECT 1 FROM valuemaps v WHERE v.valuemapid=items.valuemapid);
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
 DELETE FROM items WHERE NOT hostid IN (SELECT hostid FROM hosts);
 ALTER TABLE ONLY items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
@@ -169,6 +173,41 @@ DROP FUNCTION zbx_convert_simple_checks(v_itemid bigint, v_hostid bigint, v_key 
 
 DROP LANGUAGE 'plpgsql';
 
+-- adding web.test.error[<web check>] items
+
+CREATE SEQUENCE items_seq;
+CREATE SEQUENCE httptestitem_seq;
+CREATE SEQUENCE items_applications_seq;
+
+SELECT setval('items_seq', max(itemid)) FROM items;
+SELECT setval('httptestitem_seq', max(httptestitemid)) FROM httptestitem;
+SELECT setval('items_applications_seq', max(itemappid)) FROM items_applications;
+
+INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+	SELECT NEXTVAL('items_seq'), hostid, type, 'Last error message of scenario ''$1''', 'web.test.error' || SUBSTR(key_, STRPOS(key_, '[')), 1, '', delay, history, 0, status
+	FROM items
+	WHERE type = 9
+		AND key_ LIKE 'web.test.fail%';
+
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+	SELECT NEXTVAL('httptestitem_seq'), ht.httptestid, i.itemid, 4
+	FROM httptest ht,applications a,items i
+	WHERE ht.applicationid=a.applicationid
+		AND a.hostid=i.hostid
+		AND 'web.test.error[' || ht.name || ']' = i.key_;
+
+INSERT INTO items_applications (itemappid, applicationid, itemid)
+	SELECT NEXTVAL('items_applications_seq'), ht.applicationid, hti.itemid
+	FROM httptest ht, httptestitem hti
+	WHERE ht.httptestid = hti.httptestid
+		AND hti.type = 4;
+
+DROP SEQUENCE items_applications_seq;
+DROP SEQUENCE httptestitem_seq;
+DROP SEQUENCE items_seq;
+
+DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications');
+
 ---- Patching table `hosts`
 
 ALTER TABLE ONLY hosts ALTER hostid DROP DEFAULT,
@@ -190,8 +229,17 @@ ALTER TABLE ONLY hosts ALTER hostid DROP DEFAULT,
 		       ADD jmx_errors_from integer DEFAULT '0' NOT NULL,
 		       ADD jmx_error varchar(128) DEFAULT '' NOT NULL,
 		       ADD name varchar(64) DEFAULT '' NOT NULL;
-UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
-UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
+UPDATE hosts
+	SET proxy_hostid=NULL
+	WHERE proxy_hostid=0
+		OR NOT EXISTS (SELECT 1 FROM hosts h WHERE h.hostid=hosts.proxy_hostid);
+UPDATE hosts
+	SET maintenanceid=NULL,
+		maintenance_status=0,
+		maintenance_type=0,
+		maintenance_from=0
+	WHERE maintenanceid=0
+		OR NOT EXISTS (SELECT 1 FROM maintenances m WHERE m.maintenanceid=hosts.maintenanceid);
 UPDATE hosts SET name=host WHERE status in (0,1,3);	-- MONITORED, NOT_MONITORED, TEMPLATE
 CREATE INDEX hosts_4 on hosts (name);
 ALTER TABLE ONLY hosts ADD CONSTRAINT c_hosts_1 FOREIGN KEY (proxy_hostid) REFERENCES hosts (hostid);

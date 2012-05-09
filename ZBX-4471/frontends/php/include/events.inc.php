@@ -151,7 +151,7 @@ function make_small_eventlist($startEvent) {
 		array('field' => 'clock', 'order' => ZBX_SORT_DOWN),
 		array('field' => 'eventid', 'order' => ZBX_SORT_DOWN)
 	);
-	ArraySorter::sort($events, $sortFields);
+	CArrayHelper::sort($events, $sortFields);
 
 	foreach ($events as $event) {
 		$lclock = $clock;
@@ -231,13 +231,9 @@ function make_popup_eventlist($eventid, $trigger_type, $triggerid) {
 		$lclock = $event['clock'];
 
 		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+
 		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle(
-			$eventStatusSpan,
-			$event['value'],
-			$event['clock'],
-			$event['acknowledged']
-		);
+		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
 		$ack = getEventAckState($event, false, false);
 
@@ -308,7 +304,7 @@ function getLastEvents($options) {
 
 	$triggerOptions = array(
 		'filter' => array(),
-		'skipDependent'	=> 1,
+		'skipDependent' => 1,
 		'selectHosts' => array('hostid', 'host'),
 		'output' => API_OUTPUT_EXTEND,
 		'sortfield' => 'lastchange',

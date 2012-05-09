@@ -44,8 +44,8 @@ function sdi($msg = 'SDI') {
 	echo SBR;
 }
 
-function sdii($msg = 'SDII') {
-	echo 'DEBUG INFO: ';
+function sdii($msg = 'SDII', $for = '') {
+	echo 'DEBUG INFO: '.$for;
 	echo '<pre>'.print_r($msg, true).'</pre>';
 	echo SBR;
 }
@@ -111,6 +111,25 @@ function ilb($limit = 100) {
 		// just calling sdb is forbidden by pre-commit hook :/
 		call_user_func('sdb');
 		exit;
+	}
+}
+
+function timer($timer = null) {
+	static $timers = array();
+
+	if ($timer === null) {
+		$timer = '_general_';
+	}
+
+	$mtime = microtime(true);
+	if (isset($timers[$timer])) {
+		echo $timer.': '.round($mtime - $timers[$timer]['start'], 4).' ('.round($mtime - $timers[$timer]['last'], 4).')'.'<br>';
+		$timers[$timer]['last'] = $mtime;
+	}
+	else {
+		echo $timer.' started.'.'<br>';
+		$timers[$timer]['start'] = $mtime;
+		$timers[$timer]['last'] = $mtime;
 	}
 }
 ?>

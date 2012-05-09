@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = 'S_HOST_INVENTORY_OVERVIEW';
+$page['title'] = _('Host inventory overview');
 $page['file'] = 'hostinventoriesoverview.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -40,7 +40,7 @@ check_fields($fields);
 validate_sort_and_sortorder('host_count', ZBX_SORT_DOWN);
 
 if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 ?>
@@ -76,11 +76,12 @@ foreach($inventoryFields as $inventoryField){
 }
 
 $r_form = new CForm('get');
-$r_form->addItem(array(_('Group'), $pageFilter->getGroupsCB(true)));
-$r_form->addItem(array(_('Grouping by'), $inventoryFieldsComboBox));
-$hostinvent_wdgt->addHeader(_('HOSTS'), $r_form);
+$r_form->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(true), SPACE));
+$r_form->addItem(array(_('Grouping by'), SPACE, $inventoryFieldsComboBox));
+$hostinvent_wdgt->addHeader(_('Hosts'), $r_form);
+$hostinvent_wdgt->addItem(BR());
 
-$table = new CTableInfo();
+$table = new CTableInfo(_('No hosts defined.'));
 $table->setHeader(
 	array(
 		make_sorting_header($groupFieldTitle === '' ? _('Field') : $groupFieldTitle, 'inventory_field'),
@@ -132,5 +133,5 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 $hostinvent_wdgt->addItem($table);
 $hostinvent_wdgt->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

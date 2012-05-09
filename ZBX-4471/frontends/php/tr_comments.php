@@ -19,93 +19,81 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = 'S_TRIGGER_COMMENTS';
+$page['title'] = _('Trigger comments');
 $page['file'] = 'tr_comments.php';
 
-require_once('include/page_header.php');
-
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
+//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+$fields = array(
+	'triggerid' =>	array(T_ZBX_INT, O_MAND, P_SYS,			DB_ID,	null),
+	'comments' =>	array(T_ZBX_STR, O_OPT, null,			null,	'isset({save})'),
+	'save' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
+);
+check_fields($fields);
+?>
+<?php
+if (!isset($_REQUEST['triggerid'])) {
+	fatal_error(_('No triggers defined.'));
+}
 
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	$fields=array(
-		'triggerid'=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
-		'comments'=>	array(T_ZBX_STR, O_OPT,  null,	null, 'isset({save})'),
+$trigger = API::Trigger()->get(array(
+	'nodeids' => get_current_nodeid(true),
+	'triggerids' => $_REQUEST['triggerid'],
+	'output' => API_OUTPUT_EXTEND,
+	'expandDescription' => true
+));
+$trigger = reset($trigger);
+if (!$trigger) {
+	access_deny();
+}
 
-		'save'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-/*
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
-*/
+if (isset($_REQUEST['save'])) {
+	$result = DBexecute(
+		'UPDATE triggers'.
+		' SET comments='.zbx_dbstr($_REQUEST['comments']).
+		' WHERE triggerid='.$_REQUEST['triggerid']
 	);
-	check_fields($fields);
-?>
-<?php
+	show_messages($result, _('Comment updated'), _('Cannot update comment'));
 
-	if(!isset($_REQUEST['triggerid'])) fatal_error(S_NO_TRIGGERS_DEFINED);
+	$trigger['comments'] = $_REQUEST['comments'];
 
-	$options = array(
-		'nodeids' => get_current_nodeid(true),
-		'triggerids' => $_REQUEST['triggerid'],
-		'output' => API_OUTPUT_EXTEND,
-		'expandDescription' => true,
-	);
-	$trigger = API::Trigger()->get($options);
-	$trigger = reset($trigger);
-
-	if(!$trigger) access_deny();
-
-
-	if(isset($_REQUEST['save'])){
-		$result = DBexecute('UPDATE triggers '.
-						' SET comments='.zbx_dbstr($_REQUEST['comments']).
-						' WHERE triggerid='.$_REQUEST['triggerid']);
-		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
-
-		$trigger['comments'] = $_REQUEST['comments'];
-
-		if($result){
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER,
-				S_TRIGGER.' ['.$_REQUEST['triggerid'].'] ['.$trigger['description'].'] '.
-				S_COMMENTS.' ['.$_REQUEST['comments'].']');
-		}
+	if ($result) {
+		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
+			_('Trigger').' ['.$_REQUEST['triggerid'].'] ['.$trigger['description'].'] '.
+			_('Comments').' ['.$_REQUEST['comments'].']');
 	}
-	else if(isset($_REQUEST['cancel'])){
-		jsRedirect('tr_status.php');
-		exit();
-	}
+}
+elseif (isset($_REQUEST['cancel'])) {
+	jsRedirect('tr_status.php');
+	exit();
+}
 
-	show_table_header(S_TRIGGER_COMMENTS_BIG);
+show_table_header(_('TRIGGER COMMENTS'));
 
-	//if user has no permissions to edit comments, no "save" button for him
-	$triggerEditable = API::Trigger()->get(array(
-		'editable' => 1,
-		'trigegrids' => $_REQUEST['triggerid'],
-		'output' => API_OUTPUT_SHORTEN,
-	));
-	$triggerEditable = !empty($triggerEditable);
+// if user has no permissions to edit comments, no "save" button for him
+$triggerEditable = API::Trigger()->get(array(
+	'editable' => true,
+	'trigegrids' => $_REQUEST['triggerid'],
+	'output' => API_OUTPUT_SHORTEN
+));
+$triggerEditable = !empty($triggerEditable);
 
-	$frmComent = new CFormTable(S_COMMENTS.' for "'.$trigger['description'].'"');
-	$frmComent->addVar('triggerid', $_REQUEST['triggerid']);
-	$frmComent->addRow(S_COMMENTS, new CTextArea('comments', $trigger['comments'], 100, 25, !$triggerEditable));
+$frmComent = new CFormTable(_('Comments').' for "'.$trigger['description'].'"');
+$frmComent->addVar('triggerid', $_REQUEST['triggerid']);
+$frmComent->addRow(_('Comments'), new CTextArea('comments', $trigger['comments'], 25, ZBX_TEXTAREA_BIG_WIDTH, !$triggerEditable));
 
-	if($triggerEditable){
-		$frmComent->addItemToBottomRow(new CSubmit("save",S_SAVE));
-	}
+if ($triggerEditable) {
+	$frmComent->addItemToBottomRow(new CSubmit('save', _('Save')));
+}
+$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$_REQUEST['triggerid']));
+$frmComent->show();
 
-	$frmComent->addItemToBottomRow(new CButtonCancel('&triggerid='.$_REQUEST['triggerid']));
-
-	$frmComent->show();
-
-?>
-<?php
-
-require_once('include/page_footer.php');
-
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

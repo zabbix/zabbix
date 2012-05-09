@@ -21,7 +21,7 @@
 <?php
 $serviceWidget = new CWidget();
 $serviceWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'), SPACE);
-$serviceWidget->addHeader(_('It services'));
+$serviceWidget->addHeader(_('IT services'));
 
 // create form
 $serviceForm = new CForm();

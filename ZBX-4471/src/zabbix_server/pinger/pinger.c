@@ -28,14 +28,13 @@
 
 #include "pinger.h"
 
-/*some defines so the `fping' and `fping6' could successfully process pings*/
+/* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1
 #define MAX_COUNT	10000
 #define MIN_INTERVAL	20
 #define MIN_SIZE	24
 #define MAX_SIZE	65507
 #define MIN_TIMEOUT	50
-/*end some defines*/
 
 #define MAX_ITEMS	128
 
@@ -61,16 +60,18 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		int ping_result, char *error)
 {
 	const char	*__function_name = "process_value";
-
 	DC_ITEM		item;
+	int		errcode;
 	AGENT_RESULT	value;
 
 	assert(value_ui64 || value_dbl);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != DCconfig_get_item_by_itemid(&item, itemid))
-		return;
+	DCconfig_get_items_by_itemids(&item, &itemid, &errcode, 1);
+
+	if (SUCCEED != errcode)
+		goto clean;
 
 	if (NOTSUPPORTED == ping_result)
 	{
@@ -94,6 +95,8 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 
 		free_result(&value);
 	}
+clean:
+	DCconfig_clean_items(&item, &errcode, 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -371,7 +374,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 {
 	const char		*__function_name = "get_pinger_hosts";
 	DC_ITEM			items[MAX_ITEMS];
-	int			i, num, count, interval, size, timeout;
+	int			i, num, count, interval, size, timeout, rc;
 	char			error[MAX_STRING_LEN], *addr = NULL;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
@@ -382,16 +385,23 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 	for (i = 0; i < num; i++)
 	{
-		items[i].key = strdup(items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, &items[i].host, NULL, &items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		ZBX_STRDUP(items[i].key, items[i].key_orig);
+		rc = substitute_key_macros(&items[i].key, &items[i].host, NULL, MACRO_TYPE_ITEM_KEY,
+				error, sizeof(error));
 
-		items[i].interface.addr = (1 == items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
+		if (SUCCEED == rc)
+		{
+			items[i].interface.addr = (1 == items[i].interface.useip ?
+					items[i].interface.ip_orig : items[i].interface.dns_orig);
 
-		if (SUCCEED == parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
-					&interval, &size, &timeout, &type, error, sizeof(error)))
+			rc = parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
+					&interval, &size, &timeout, &type, error, sizeof(error));
+		}
+
+		if (SUCCEED == rc)
 		{
 			add_icmpping_item(icmp_items, icmp_items_alloc, icmp_items_count, count, interval, size,
-					timeout, items[i].itemid, addr, icmpping, type);
+				timeout, items[i].itemid, addr, icmpping, type);
 		}
 		else
 		{
@@ -407,6 +417,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 		zbx_free(items[i].key);
 	}
+
+	DCconfig_clean_items(items, NULL, num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, *icmp_items_count);
 }

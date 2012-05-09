@@ -20,26 +20,6 @@
 #ifndef ZABBIX_HTTPTEST_H
 #define ZABBIX_HTTPTEST_H
 
-typedef struct
-{
-	char	*data;
-	size_t	allocated;
-	size_t	offset;
-}
-ZBX_HTTPPAGE;
-
-typedef struct
-{
-	long   	rspcode;
-	double 	total_time;
-	double 	speed_download;
-	double	test_total_time;
-	int	test_last_step;
-}
-ZBX_HTTPSTAT;
-
-extern int	CONFIG_HTTPPOLLER_FORKS;
-
 void	process_httptests(int httppoller_num, int now);
 
 #endif

@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
 class testFormAction extends CWebTest {
 
-	public static function providerNewActions(){
+	public static function providerNewActions() {
 		$data = array(
 			array(array(
 				'name' => 'action test 2',
@@ -62,7 +62,7 @@ class testFormAction extends CWebTest {
 	/**
 	 * @dataProvider providerNewActions
 	 */
-	public function testActionCreateSimple($action){
+	public function testActionCreateSimple($action) {
 		DBsave_tables('actions');
 
 		$this->login('actionconf.php?form=1&eventsource=0');
@@ -74,10 +74,10 @@ class testFormAction extends CWebTest {
 		$this->type("def_longdata", $action['def_longdata']);
 
 		$this->click("link=Conditions");
-		foreach($action['conditions'] as $condition){
+		foreach ($action['conditions'] as $condition) {
 
 			$this->dropdown_select_wait("new_condition_conditiontype", $condition['type']);
-			switch($condition['type']){
+			switch ($condition['type']) {
 				case 'Trigger name':
 					$this->type("new_condition_value", $condition['value']);
 					$this->click('add_condition');
@@ -101,12 +101,12 @@ class testFormAction extends CWebTest {
 
 		$this->click("link=Operations");
 
-		foreach($action['operations'] as $operation){
+		foreach ($action['operations'] as $operation) {
 			$this->click('new_operation');
 			$this->wait();
 			$this->dropdown_select_wait('new_operation_operationtype', $operation['type']);
 
-			switch($operation['type']){
+			switch ($operation['type']) {
 				case 'Send message':
 					sleep(1);
 
@@ -145,7 +145,7 @@ class testFormAction extends CWebTest {
 		DBrestore_tables('actions');
 	}
 
-	public function testActionCreate(){
+	public function testActionCreate() {
 		DBsave_tables('actions');
 
 		$this->login('actionconf.php?form=1&eventsource=0');
@@ -185,8 +185,8 @@ class testFormAction extends CWebTest {
 		sleep(1);
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
-		$this->click("usrgrps_'7'");
-		$this->click("usrgrps_'2'");
+		$this->click("usrgrps_7");
+		$this->click("usrgrps_11");
 		$this->click("select");
 		$this->selectWindow("null");
 		sleep(1);
@@ -200,7 +200,7 @@ class testFormAction extends CWebTest {
 		$this->click("add_operation");
 		$this->wait();
 		$this->ok("Send message to users: Admin");
-		$this->ok("Send message to user groups: Database administrators, Zabbix administrators");
+		$this->ok("Send message to user groups: Enabled debug mode, Zabbix administrators");
 		$this->click("new_operation");
 		$this->wait();
 		$this->select("new_operation_operationtype", "label=Remote command");
@@ -216,7 +216,7 @@ class testFormAction extends CWebTest {
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
 		$this->dropdown_select_wait('groupid', 'Zabbix servers');
-		$this->click("spanid10017");
+		$this->click("spanid10053");
 		$this->selectWindow("null");
 		$this->click("//input[@name='save']");
 
@@ -238,7 +238,7 @@ class testFormAction extends CWebTest {
 		$this->click("add_operation");
 		$this->wait();
 		$this->ok("Run remote commands on current host");
-		$this->ok("Run remote commands on hosts: ЗАББИКС Сервер");
+		// $this->ok("Run remote commands on hosts: ЗАББИКС Сервер");
 		$this->ok("Run remote commands on host groups: Zabbix servers");
 		$this->click("new_operation");
 		$this->wait();
@@ -261,7 +261,5 @@ class testFormAction extends CWebTest {
 
 		DBrestore_tables('actions');
 	}
-
 }
-
 ?>

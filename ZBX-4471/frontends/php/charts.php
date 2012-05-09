@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/graphs.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/graphs.inc.php';
 
-$page['title'] = 'S_CUSTOM_GRAPHS';
+$page['title'] = _('Custom graphs');
 $page['file'] = 'charts.php';
 $page['hist_arg'] = array('hostid','groupid','graphid');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js');
@@ -32,7 +32,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -49,58 +49,58 @@ require_once('include/page_header.php');
 		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		null),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null),
-		'action'=>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"),null)
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		null),
+		'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove'"), null)
 	);
 
 	check_fields($fields);
 ?>
 <?php
 	if(isset($_REQUEST['favobj'])){
-		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.charts.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		if ('filter' == $_REQUEST['favobj']) {
+			CProfile::update('web.charts.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
-		if('hat' == $_REQUEST['favobj']){
-			CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+		if ('hat' == $_REQUEST['favobj']) {
+			CProfile::update('web.charts.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
-		if('timeline' == $_REQUEST['favobj']){
+		if ('timeline' == $_REQUEST['favobj']) {
 			if(isset($_REQUEST['graphid']) && isset($_REQUEST['period'])){
 				navigation_bar_calc('web.graph',$_REQUEST['favid'], true);
 			}
 		}
 		// saving fixed/dynamic setting to profile
-		if('timelinefixedperiod' == $_REQUEST['favobj']){
+		if ('timelinefixedperiod' == $_REQUEST['favobj']) {
 			if(isset($_REQUEST['favid'])){
 				CProfile::update('web.charts.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
 			}
 		}
 
-		if(str_in_array($_REQUEST['favobj'],array('itemid','graphid'))){
+		if (str_in_array($_REQUEST['favobj'],array('itemid','graphid'))) {
 			$result = false;
-			if('add' == $_REQUEST['action']){
+			if ('add' == $_REQUEST['favaction']) {
 				$result = add2favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 				if($result){
-					print('$("addrm_fav").title = "'.S_REMOVE_FROM.' '.S_FAVOURITES.'";'."\n");
+					print('$("addrm_fav").title = "'._('Remove from favourites').'";'."\n");
 					print('$("addrm_fav").onclick = function(){rm4favorites("graphid","'.$_REQUEST['favid'].'",0);}'."\n");
 				}
 			}
-			else if('remove' == $_REQUEST['action']){
+			elseif ('remove' == $_REQUEST['favaction']) {
 				$result = rm4favorites('web.favorite.graphids',$_REQUEST['favid'],$_REQUEST['favobj']);
 
 				if($result){
-					print('$("addrm_fav").title = "'.S_ADD_TO.' '.S_FAVOURITES.'";'."\n");
+					print('$("addrm_fav").title = "'._('Add to favourites').'";'."\n");
 					print('$("addrm_fav").onclick = function(){ add2favorites("graphid","'.$_REQUEST['favid'].'");}'."\n");
 				}
 			}
 
-			if((PAGE_TYPE_JS == $page['type']) && $result){
+			if ((PAGE_TYPE_JS == $page['type']) && $result) {
 				print('switchElementsClass("addrm_fav","iconminus","iconplus");');
 			}
 		}
 	}
 
-	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+	if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 ?>
@@ -121,7 +121,7 @@ require_once('include/page_header.php');
 	if(isset($_REQUEST['period']) || isset($_REQUEST['stime'])){
 		navigation_bar_calc('web.graph',$_REQUEST['graphid'], true);
 		jsRedirect('charts.php?graphid=' . $_REQUEST['graphid']);
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--
@@ -131,16 +131,16 @@ require_once('include/page_header.php');
 	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
-	$r_form->addItem(array(S_GROUP.SPACE, $pageFilter->getGroupsCB(true)));
-	$r_form->addItem(array(SPACE.S_HOST.SPACE, $pageFilter->getHostsCB(true)));
-	$r_form->addItem(array(SPACE.S_GRAPH.SPACE, $pageFilter->getGraphsCB(true)));
+	$r_form->addItem(array(_('Group').SPACE, $pageFilter->getGroupsCB(true)));
+	$r_form->addItem(array(SPACE._('Host').SPACE, $pageFilter->getHostsCB(true)));
+	$r_form->addItem(array(SPACE._('Graph').SPACE, $pageFilter->getGraphsCB(true)));
 
 ?>
 <?php
 
 	$icons = array();
 	$charts_wdgt = new CWidget('hat_charts');
-	$table = new CTableInfo('...','chart');
+	$table = new CTableInfo(_('No charts defined.'), 'chart');
 	$header = null;
 
 	if($pageFilter->graphsSelected){
@@ -176,7 +176,7 @@ require_once('include/page_header.php');
 		));
 		$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 		$rst_icon = get_icon('reset', array('id' => $_REQUEST['graphid']));
-		array_push($icons, $icon, $rst_icon, $fs_icon);
+		array_push($icons, $icon, SPACE, $rst_icon, SPACE, $fs_icon);
 
 // NAV BAR
 		$utime = zbxDateToTime($_REQUEST['stime']);
@@ -201,14 +201,15 @@ require_once('include/page_header.php');
 			'loadScroll' => 1,
 			'scrollWidthByImage' => $scrollWidthByImage,
 			'dynamic' => 1,
-			'periodFixed' => CProfile::get('web.charts.timelinefixed', 1)
+			'periodFixed' => CProfile::get('web.charts.timelinefixed', 1),
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
 		zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 		zbx_add_post_js('timeControl.processObjects();');
 	}
 
-	$charts_wdgt->addPageHeader(S_GRAPHS_BIG, $icons);
+	$charts_wdgt->addPageHeader(_('Graphs'), $icons);
 	$charts_wdgt->addHeader($header, $r_form);
 	$charts_wdgt->addItem(BR());
 	$charts_wdgt->addItem($table);
@@ -217,6 +218,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

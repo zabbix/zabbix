@@ -23,6 +23,7 @@ ALTER TABLE sysmaps ADD label_string_trigger nvarchar2(255) DEFAULT '';
 ALTER TABLE sysmaps ADD label_string_map nvarchar2(255) DEFAULT '';
 ALTER TABLE sysmaps ADD label_string_image nvarchar2(255) DEFAULT '';
 ALTER TABLE sysmaps ADD iconmapid number(20) NULL;
+ALTER TABLE sysmaps ADD expand_macros number(10) DEFAULT '0' NOT NULL;
 UPDATE sysmaps SET backgroundid=NULL WHERE backgroundid=0;
 UPDATE sysmaps SET show_unack=1 WHERE highlight>7 AND highlight<16;
 UPDATE sysmaps SET show_unack=2 WHERE highlight>23;

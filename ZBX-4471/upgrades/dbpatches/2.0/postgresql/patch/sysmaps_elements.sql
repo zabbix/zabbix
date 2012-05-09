@@ -4,7 +4,7 @@ CREATE TABLE sysmap_element_url (
 	name                     varchar(255)                              NOT NULL,
 	url                      varchar(255)    DEFAULT ''                NOT NULL,
 	PRIMARY KEY (sysmapelementurlid)
-) with OIDS;
+);
 CREATE UNIQUE INDEX sysmap_element_url_1 on sysmap_element_url (selementid,name);
 ALTER TABLE ONLY sysmap_element_url ADD CONSTRAINT c_sysmap_element_url_1 FOREIGN KEY (selementid) REFERENCES sysmaps_elements (selementid) ON DELETE CASCADE;
 

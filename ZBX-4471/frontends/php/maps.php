@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/maps.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/maps.inc.php';
 
-$page['title'] = 'S_NETWORK_MAPS';
+$page['title'] = _('Network maps');
 $page['file'] = 'maps.php';
 $page['hist_arg'] = array('sysmapid');
 $page['scripts'] = array();
@@ -34,7 +34,7 @@ if (PAGE_TYPE_HTML == $page['type']) {
 
 define('GET_PARAM_NAME', 'mapname');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 ?>
 <?php
@@ -48,29 +48,29 @@ $fields = array(
 	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT, 			NOT_EMPTY,				null),
 	'favid'=>			array(T_ZBX_INT, O_OPT, P_ACT, 			null,					null),
 	// actions
-	'state'=>			array(T_ZBX_INT, O_OPT, P_ACT,  		NOT_EMPTY,				null),
-	'action'=>			array(T_ZBX_STR, O_OPT, P_ACT, 			IN("'add', 'remove'"),	null)
+	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,  		NOT_EMPTY,				null),
+	'favaction'=>		array(T_ZBX_STR, O_OPT, P_ACT, 			IN("'add','remove'"),	null)
 );
 check_fields($fields);
 ?>
 <?php
 if (isset($_REQUEST['favobj'])) {
 	if ('hat' == $_REQUEST['favobj']) {
-		CProfile::update('web.maps.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.maps.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 	elseif ('sysmapid' == $_REQUEST['favobj']) {
 		$result = false;
-		if ('add' == $_REQUEST['action']) {
+		if ('add' == $_REQUEST['favaction']) {
 			$result = add2favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
-				echo '$("addrm_fav").title = "'._('Remove from Favourites').'";'."\n".
+				echo '$("addrm_fav").title = "'._('Remove from favourites').'";'."\n".
 					'$("addrm_fav").onclick = function(){rm4favorites("sysmapid","'.$_REQUEST['favid'].'",0);}'."\n";
 			}
 		}
-		elseif ('remove' == $_REQUEST['action']) {
+		elseif ('remove' == $_REQUEST['favaction']) {
 			$result = rm4favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 			if ($result) {
-				echo '$("addrm_fav").title = "'._('Add to Favourites').'";'."\n".
+				echo '$("addrm_fav").title = "'._('Add to favourites').'";'."\n".
 					'$("addrm_fav").onclick = function(){ add2favorites("sysmapid","'.$_REQUEST['favid'].'");}'."\n";
 			}
 		}
@@ -81,12 +81,12 @@ if (isset($_REQUEST['favobj'])) {
 	}
 }
 if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
 // js templates
-require_once('include/views/js/general.script.confirm.js.php');
+require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 $options = array(
 	'output' => API_OUTPUT_EXTEND,
@@ -176,8 +176,8 @@ if (!empty($maps)) {
 }
 
 $map_wdgt->addItem($table);
-$map_wdgt->addPageHeader(_('NETWORK MAPS'), array($icon, $fs_icon));
+$map_wdgt->addPageHeader(_('NETWORK MAPS'), array($icon, SPACE, $fs_icon));
 $map_wdgt->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

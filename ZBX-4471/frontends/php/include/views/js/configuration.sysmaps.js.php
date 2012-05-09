@@ -13,11 +13,11 @@
 					<td><label for="elementType"><?php echo _('Type'); ?></label></td>
 					<td>
 						<select size="1" class="input" name="elementtype" id="elementType">
-							<option value="0"><?php echo _('Host'); ?></option>
-							<option value="1"><?php echo _('Map'); ?></option>
-							<option value="2"><?php echo _('Trigger'); ?></option>
-							<option value="3"><?php echo _('Host group'); ?></option>
-							<option value="4"><?php echo _('Image'); ?></option>
+							<option value="<?php echo SYSMAP_ELEMENT_TYPE_HOST; ?>"><?php echo _('Host'); ?></option>
+							<option value="<?php echo SYSMAP_ELEMENT_TYPE_MAP; ?>"><?php echo _('Map'); ?></option>
+							<option value="<?php echo SYSMAP_ELEMENT_TYPE_TRIGGER; ?>"><?php echo _('Trigger'); ?></option>
+							<option value="<?php echo SYSMAP_ELEMENT_TYPE_HOST_GROUP; ?>"><?php echo _('Host group'); ?></option>
+							<option value="<?php echo SYSMAP_ELEMENT_TYPE_IMAGE; ?>"><?php echo _('Image'); ?></option>
 						</select>
 					</td>
 				</tr>
@@ -58,7 +58,7 @@
 					<td><label for="areaPlacing"><?php echo _('Placing algorithm'); ?></label></td>
 					<td>
 						<select id="areaPlacing" class="input">
-							<option value="0"><?php echo _('Grid'); ?></option>
+							<option value="<?php echo SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID; ?>"><?php echo _('Grid'); ?></option>
 						</select>
 					</td>
 				</tr>
@@ -70,10 +70,10 @@
 					<td><label for="label_location"><?php echo _('Label location'); ?></label></td>
 					<td><select id="label_location" class="input" name="label_location">
 						<option value="-1">-</option>
-						<option value="0"><?php echo _('Bottom'); ?></option>
-						<option value="1"><?php echo _('Left'); ?></option>
-						<option value="2"><?php echo _('Right'); ?></option>
-						<option value="3"><?php echo _('Top'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
+						<option value="<?php echo MAP_LABEL_LOC_TOP; ?>"><?php echo _('Top'); ?></option>
 					</select></td>
 				</tr>
 				<tr id="hostGroupSelectRow">
@@ -112,7 +112,7 @@
 							<table>
 								<tbody>
 								<tr id="useIconMapRow">
-									<td colspan="4">
+									<td colspan="2">
 										<label for="use_iconmap" id=use_iconmapLabel><?php echo _('Automatic icon selection'); ?></label>
 										<input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox" value="1">
 									</td>
@@ -128,6 +128,8 @@
 										<br />
 										<select class="input" name="iconid_on" id="iconid_on"></select>
 									</td>
+								</tr>
+								<tr>
 									<td id="iconMainetnanceRow">
 										<label for="iconid_maintenance"><?php echo _('Maintenance'); ?></label>
 										<br />
@@ -146,12 +148,13 @@
 				</tr>
 
 				<tr>
-					<td><label for="x"><?php echo _('Coordinate X'); ?></label></td>
-					<td><input id="x" maxlength="5" value="0" size="5" name="x" class="input"></td>
-				</tr>
-				<tr>
-					<td><label for="y"><?php echo _('Coordinate Y'); ?></label></td>
-					<td><input maxlength="5" value="0" size="5" id="y" name="y" class="input"></td>
+					<td><?php echo _('Coordinates'); ?></td>
+					<td>
+						<label for="x"><?php echo _('X'); ?></label>:
+						<input id="x" maxlength="5" value="0" size="5" name="x" class="input">
+						<label for="y"><?php echo _('Y'); ?></label>:
+						<input maxlength="5" value="0" size="5" id="y" name="y" class="input">
+					</td>
 				</tr>
 
 				<tr>
@@ -219,10 +222,10 @@
 					<td><label for="drawtype"><?php echo _('Type (OK)'); ?></label></td>
 					<td >
 						<select size="1" class="input" name="drawtype" id="drawtype">
-							<option value="0"><?php echo _('Line'); ?></option>
-							<option value="2"><?php echo _('Bold line'); ?></option>
-							<option value="3"><?php echo _('Dot'); ?></option>
-							<option value="4"><?php echo _('Dashed line'); ?></option>
+							<option value="<?php echo GRAPH_ITEM_DRAWTYPE_LINE; ?>"><?php echo _('Line'); ?></option>
+							<option value="<?php echo GRAPH_ITEM_DRAWTYPE_BOLD_LINE; ?>"><?php echo _('Bold line'); ?></option>
+							<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DOT; ?>"><?php echo _('Dot'); ?></option>
+							<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DASHED_LINE; ?>"><?php echo _('Dashed line'); ?></option>
 						</select>
 					</td>
 				</tr>
@@ -237,7 +240,7 @@
 					<td colspan="2">
 						<fieldset>
 							<legend><?php echo _('Link indicators'); ?></legend>
-							<table class="gridTable">
+							<table>
 								<thead>
 								<tr>
 									<td><?php echo _('Triggers'); ?></td>
@@ -250,7 +253,7 @@
 								<tfoot>
 								<tr>
 									<td colspan="4">
-										<input type="button" name="Add" value="<?php echo _('Add'); ?>" class="input button link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1');">
+										<span class="link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1');"><?php echo _('Add'); ?></span>
 									</td>
 								</tr>
 								</tfoot>
@@ -306,10 +309,10 @@
 					</td>
 					<td><select id="massLabelLocation" class="input" name="label_location">
 							<option value="-1">-</option>
-							<option value="0"><?php echo _('Bottom'); ?></option>
-							<option value="1"><?php echo _('Left'); ?></option>
-							<option value="2"><?php echo _('Right'); ?></option>
-							<option value="3"><?php echo _('Top'); ?></option>
+							<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
+							<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
+							<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
+							<option value="<?php echo MAP_LABEL_LOC_TOP; ?>"><?php echo _('Top'); ?></option>
 						</select>
 					</td>
 				</tr>
@@ -386,10 +389,10 @@
 			<input type="hidden" name="linktrigger_#{linktriggerid}_triggerid" value="#{triggerid}" />
 			<input type="hidden" name="linktrigger_#{linktriggerid}_linktriggerid" value="#{linktriggerid}" />
 			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype" class="input">
-				<option value="0"><?php echo _('Line'); ?></option>
-				<option value="2"><?php echo _('Bold line'); ?></option>
-				<option value="3"><?php echo _('Dot'); ?></option>
-				<option value="4"><?php echo _('Dashed line'); ?></option>
+				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_LINE; ?>"><?php echo _('Line'); ?></option>
+				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_BOLD_LINE; ?>"><?php echo _('Bold line'); ?></option>
+				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DOT; ?>"><?php echo _('Dot'); ?></option>
+				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DASHED_LINE; ?>"><?php echo _('Dashed line'); ?></option>
 			</select>
 		</td>
 		<td>

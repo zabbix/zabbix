@@ -33,57 +33,50 @@
  * Parameters: item - item we are interested in                               *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
- *                         and result_str (as string)                         *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
 int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 {
-	zbx_uint64_t	i;
+	int		nparams;
 	char		params[MAX_STRING_LEN], *error = NULL;
 	char		tmp[MAX_STRING_LEN], tmp1[HOST_HOST_LEN_MAX];
-	int		nparams, lastaccess;
 
 	init_result(result);
 
 	if (0 != strncmp(item->key, "zabbix[", 7))
 		goto notsupported;
 
-	if (parse_command(item->key, NULL, 0, params, sizeof(params)) != 2)
+	if (2 != parse_command(item->key, NULL, 0, params, sizeof(params)))
 		goto notsupported;
 
-	if (get_param(params, 1, tmp, sizeof(tmp)) != 0)
+	if (0 != get_param(params, 1, tmp, sizeof(tmp)))
 		goto notsupported;
 
 	nparams = num_param(params);
 
-	if (0 == strcmp(tmp, "triggers"))		/* zabbix["triggers"] */
+	if (0 == strcmp(tmp, "triggers"))			/* zabbix["triggers"] */
 	{
 		if (1 != nparams)
 			goto notsupported;
 
-		i = DBget_row_count("triggers");
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, DBget_row_count("triggers"));
 	}
-	else if (0 == strcmp(tmp, "items"))		/* zabbix["items"] */
+	else if (0 == strcmp(tmp, "items"))			/* zabbix["items"] */
 	{
 		if (1 != nparams)
 			goto notsupported;
 
-		i = DBget_row_count("items");
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, DBget_row_count("items"));
 	}
-	else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["items_unsupported"] */
+	else if (0 == strcmp(tmp, "items_unsupported"))		/* zabbix["items_unsupported"] */
 	{
 		if (1 != nparams)
 			goto notsupported;
 
-		i = DBget_items_unsupported_count();
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, DBget_items_unsupported_count());
 	}
 	else if (0 == strcmp(tmp, "history") ||			/* zabbix["history"] */
 			0 == strcmp(tmp, "history_log") ||	/* zabbix["history_log"] */
@@ -94,8 +87,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto notsupported;
 
-		i = DBget_row_count(tmp);
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, DBget_row_count(tmp));
 	}
 	else if (0 == strcmp(tmp, "trends") ||			/* zabbix["trends"] */
 			0 == strcmp(tmp, "trends_uint"))	/* zabbix["trends_uint"] */
@@ -103,50 +95,49 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (1 != nparams)
 			goto notsupported;
 
-		i = DBget_row_count(tmp);
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, DBget_row_count(tmp));
 	}
-	else if (0 == strcmp(tmp, "queue"))		/* zabbix["queue",<from>,<to>] */
+	else if (0 == strcmp(tmp, "queue"))			/* zabbix["queue",<from>,<to>] */
 	{
-		int	from = 6, to = (-1);
+		unsigned int	from = 6, to = (unsigned int)-1;
 
-		if (nparams > 3)
+		if (3 < nparams)
+		{
+			error = zbx_strdup(error, "Invalid number of parameters");
 			goto notsupported;
-
-		if (nparams >= 2)
-		{
-			if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
-				goto notsupported;
-			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
-			{
-				error = zbx_strdup(error, "Second parameter is badly formatted");
-				goto notsupported;
-			}
-			else
-				from = (*tmp != '\0' ? str2uint(tmp) : 6);
 		}
 
-		if (nparams >= 3)
+		if (2 <= nparams)
 		{
-			if (get_param(params, 3, tmp, sizeof(tmp)) != 0)
+			if (0 != get_param(params, 2, tmp, sizeof(tmp)))
 				goto notsupported;
-			else if (*tmp != '\0' && is_uint_prefix(tmp) == FAIL)
+
+			if ('\0' != *tmp && FAIL == is_uint_suffix(tmp, &from))
 			{
-				error = zbx_strdup(error, "Third parameter is badly formatted");
+				error = zbx_strdup(error, "Invalid second parameter");
 				goto notsupported;
 			}
-			else
-				to = (*tmp != '\0' ? str2uint(tmp) : -1);
 		}
 
-		if (from > to && -1 != to)
+		if (3 <= nparams)
+		{
+			if (0 != get_param(params, 3, tmp, sizeof(tmp)))
+				goto notsupported;
+
+			if ('\0' != *tmp && FAIL == is_uint_suffix(tmp, &to))
+			{
+				error = zbx_strdup(error, "Invalid third parameter");
+				goto notsupported;
+			}
+		}
+
+		if ((unsigned int)-1 != to && from > to)
 		{
 			error = zbx_strdup(error, "Parameters represent an invalid interval");
 			goto notsupported;
 		}
 
-		i = DBget_queue_count(from, to);
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, DBget_queue_count((int)from, (int)to));
 	}
 	else if (0 == strcmp(tmp, "requiredperformance"))	/* zabbix["requiredperformance"] */
 	{
@@ -155,44 +146,63 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		SET_DBL_RESULT(result, DBget_requiredperformance());
 	}
-	else if (0 == strcmp(tmp, "uptime"))		/* zabbix["uptime"] */
+	else if (0 == strcmp(tmp, "uptime"))			/* zabbix["uptime"] */
 	{
 		if (1 != nparams)
 			goto notsupported;
 
-		i = time(NULL) - CONFIG_SERVER_STARTUP_TIME;
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, time(NULL) - CONFIG_SERVER_STARTUP_TIME);
 	}
-	else if (0 == strcmp(tmp, "boottime"))		/* zabbix["boottime"] */
+	else if (0 == strcmp(tmp, "boottime"))			/* zabbix["boottime"] */
 	{
 		if (1 != nparams)
 			goto notsupported;
 
-		i = CONFIG_SERVER_STARTUP_TIME;
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, CONFIG_SERVER_STARTUP_TIME);
 	}
-	else if (0 == strcmp(tmp, "proxy"))		/* zabbix["proxy",<hostname>,"lastaccess"] */
+	else if (0 == strcmp(tmp, "host"))			/* zabbix["host",<type>,"available"] */
 	{
 		if (3 != nparams)
 			goto notsupported;
 
-		if (get_param(params, 2, tmp1, sizeof(tmp1)) != 0)
+		if (0 != get_param(params, 3, tmp, sizeof(tmp)) || 0 != strcmp(tmp, "available"))
 			goto notsupported;
 
-		if (get_param(params, 3, tmp, sizeof(tmp)) != 0)
+		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
 			goto notsupported;
 
-		if (0 == strcmp(tmp, "lastaccess"))
-		{
-			if (FAIL == DBget_proxy_lastaccess(tmp1, &lastaccess, &error))
-				goto notsupported;
-		}
+		if (0 == strcmp(tmp, "agent"))
+			SET_UI64_RESULT(result, item->host.available);
+		else if (0 == strcmp(tmp, "snmp"))
+			SET_UI64_RESULT(result, item->host.snmp_available);
+		else if (0 == strcmp(tmp, "ipmi"))
+			SET_UI64_RESULT(result, item->host.ipmi_available);
+		else if (0 == strcmp(tmp, "jmx"))
+			SET_UI64_RESULT(result, item->host.jmx_available);
 		else
+			goto notsupported;
+
+		result->ui64 = 2 - result->ui64;
+	}
+	else if (0 == strcmp(tmp, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess"] */
+	{
+		int	lastaccess;
+
+		if (3 != nparams)
+			goto notsupported;
+
+		if (0 != get_param(params, 2, tmp1, sizeof(tmp1)))
+			goto notsupported;
+
+		if (0 != get_param(params, 3, tmp, sizeof(tmp)) || 0 != strcmp(tmp, "lastaccess"))
+			goto notsupported;
+
+		if (FAIL == DBget_proxy_lastaccess(tmp1, &lastaccess, &error))
 			goto notsupported;
 
 		SET_UI64_RESULT(result, lastaccess);
 	}
-	else if (0 == strcmp(tmp, "java"))		/* zabbix["java",...] */
+	else if (0 == strcmp(tmp, "java"))			/* zabbix["java",...] */
 	{
 		int	res;
 
@@ -203,15 +213,15 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		if (SUCCEED != res)
 			goto notsupported;
 	}
-	else if (0 == strcmp(tmp, "process"))		/* zabbix["process",<type>,<mode>,<state>] */
+	else if (0 == strcmp(tmp, "process"))			/* zabbix["process",<type>,<mode>,<state>] */
 	{
 		unsigned char	process_type;
 		int		process_forks;
 		double		value;
 
-		if (nparams > 4)
+		if (4 < nparams)
 		{
-			error = zbx_strdup(error, "Too many parameters");
+			error = zbx_strdup(error, "Invalid number of parameters");
 			goto notsupported;
 		}
 
@@ -238,9 +248,9 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (0 == strcmp(tmp, "count"))
 		{
-			if (nparams > 3)
+			if (3 < nparams)
 			{
-				error = zbx_strdup(error, "Too many parameters");
+				error = zbx_strdup(error, "Invalid number of parameters");
 				goto notsupported;
 			}
 
@@ -257,7 +267,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				aggr_func = ZBX_AGGR_FUNC_MAX;
 			else if (0 == strcmp(tmp, "min"))
 				aggr_func = ZBX_AGGR_FUNC_MIN;
-			else if (SUCCEED == is_ushort(tmp, &process_num) && process_num > 0)
+			else if (SUCCEED == is_ushort(tmp, &process_num) && 0 < process_num)
 				aggr_func = ZBX_AGGR_FUNC_ONE;
 			else
 			{
@@ -296,15 +306,15 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			SET_DBL_RESULT(result, value);
 		}
 	}
-	else if (0 == strcmp(tmp, "wcache"))
+	else if (0 == strcmp(tmp, "wcache"))			/* zabbix[wcache,<cache>,<mode>] */
 	{
-		if (nparams > 3)
+		if (3 < nparams)
 			goto notsupported;
 
-		if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
+		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
 			goto notsupported;
 
-		if (get_param(params, 3, tmp1, sizeof(tmp1)) != 0)
+		if (0 != get_param(params, 3, tmp1, sizeof(tmp1)))
 			*tmp1 = '\0';
 
 		if (0 == strcmp(tmp, "values"))
@@ -368,15 +378,15 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		else
 			goto notsupported;
 	}
-	else if (0 == strcmp(tmp, "rcache"))
+	else if (0 == strcmp(tmp, "rcache"))			/* zabbix[rcache,<cache>,<mode>] */
 	{
-		if (nparams > 3)
+		if (3 < nparams)
 			goto notsupported;
 
-		if (get_param(params, 2, tmp, sizeof(tmp)) != 0)
+		if (0 != get_param(params, 2, tmp, sizeof(tmp)))
 			goto notsupported;
 
-		if (get_param(params, 3, tmp1, sizeof(tmp1)) != 0)
+		if (0 != get_param(params, 3, tmp1, sizeof(tmp1)))
 			*tmp1 = '\0';
 
 		if (0 == strcmp(tmp, "buffer"))

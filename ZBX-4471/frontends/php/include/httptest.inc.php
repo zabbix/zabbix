@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/defines.inc.php');
-require_once('include/items.inc.php');
+require_once dirname(__FILE__).'/defines.inc.php';
+require_once dirname(__FILE__).'/items.inc.php';
 
 function httptest_authentications($type = null) {
 	$authentication_types = array(
@@ -42,7 +42,7 @@ function httptest_authentications($type = null) {
 
 function httptest_status2str($status = null) {
 	$statuses = array(
-		HTTPTEST_STATUS_ACTIVE => _('Active'),
+		HTTPTEST_STATUS_ACTIVE => _('Enabled'),
 		HTTPTEST_STATUS_DISABLED => _('Disabled')
 	);
 
@@ -126,7 +126,7 @@ function delete_history_by_httptestid($httptestid) {
 			' AND s.httptestid='.$httptestid
 	);
 	while ($item_data = DBfetch($db_items)) {
-		if (!delete_history_by_itemid($item_data['itemid'], 0)) {
+		if (!delete_history_by_itemid($item_data['itemid'])) {
 			return false;
 		}
 	}

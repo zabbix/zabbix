@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/triggers.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
 
-$page['title'] = S_TEST;
+$page['title'] = _('Test');
 $page['file'] = 'tr_testexpr.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
@@ -30,12 +30,13 @@ define('COMBO_PATTERN', 'str_in_array({},array(');
 define('COMBO_PATTERN_LENGTH', zbx_strlen(COMBO_PATTERN));
 
 $definedErrorPhrases = array(
-			EXPRESSION_VALUE_TYPE_UNKNOWN => S_EXPRESSION_VALUE_TYPE_UNKNOWN,
-			EXPRESSION_HOST_UNKNOWN => S_EXPRESSION_HOST_UNKNOWN,
-			EXPRESSION_HOST_ITEM_UNKNOWN => S_EXPRESSION_HOST_ITEM_UNKNOWN,
-			EXPRESSION_NOT_A_MACRO_ERROR => S_EXPRESSION_NOT_A_MACRO_ERROR);
+	EXPRESSION_VALUE_TYPE_UNKNOWN => _('Unknown variable type, testing not available'),
+	EXPRESSION_HOST_UNKNOWN => _('Unknown host, no such host present in system'),
+	EXPRESSION_HOST_ITEM_UNKNOWN => _('Unknown host item, no such item in selected host'),
+	EXPRESSION_NOT_A_MACRO_ERROR => _('Given expression is not a macro')
+);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //----------------------------------------------------------------------
@@ -52,7 +53,7 @@ require_once('include/page_header.php');
 	$data_table = new CTable(null, 'tableinfo');
 	$data_table->setAttribute('id', 'data_list');
 
-	$data_table->setHeader(array(S_EXPRESSION_VARIABLE_ELEMENTS, S_RESULT_TYPE, S_VALUE));
+	$data_table->setHeader(array(_('Expression Variable Elements'), _('Result type'), _('Value')));
 
 	$octet = false;
 	$datas = array();
@@ -111,21 +112,21 @@ require_once('include/page_header.php');
 
 //------------------------ <FORM> ---------------------------
 
-	$frm_test = new CFormTable(S_TEST, 'tr_testexpr.php');
+	$frm_test = new CFormTable(_('Test'), 'tr_testexpr.php');
 	$frm_test->setHelp('web.testexpr.service.php');
 	$frm_test->setTableClass('formlongtable formtable');
 	$frm_test->addVar('form_refresh', get_request('form_refresh', 1));
 	$frm_test->addVar('expression', urlencode($expression));
 
 /* test data */
-	$frm_test->addRow(S_TEST_DATA, $data_table);
+	$frm_test->addRow(_('Test data'), $data_table);
 
 /* result */
 	$res_table = new CTable(null, 'tableinfo');
 	$res_table->setAttribute('id', 'result_list');
 	$res_table->setOddRowClass('even_row');
 	$res_table->setEvenRowClass('even_row');
-	$res_table->setHeader(array(S_EXPRESSION, S_RESULT));
+	$res_table->setHeader(array(_('Expression'), _('Result')));
 
 	ksort($rplcts, SORT_NUMERIC);
 
@@ -157,15 +158,15 @@ require_once('include/page_header.php');
 	$col->setAttribute('style', $style);
 	$res_table->setFooter(array($outline, $col), $res_table->headerClass);
 
-	$frm_test->addRow(S_RESULT, $res_table);
+	$frm_test->addRow(_('Result'), $res_table);
 
 // action buttons
-	$btn_test = new CSubmit('test_expression', S_TEST);
+	$btn_test = new CSubmit('test_expression', _('Test'));
 	if(!$allowedTesting) $btn_test->setAttribute('disabled', 'disabled');
 	$frm_test->addItemToBottomRow($btn_test);
 	$frm_test->addItemToBottomRow(SPACE);
 
-	$btn_close = new CButton('close', S_CLOSE,'javascript: self.close();');
+	$btn_close = new CButton('close', _('Close'),'javascript: self.close();');
 	$frm_test->addItemToBottomRow($btn_close);
 
 	$frm_test->show();
@@ -174,6 +175,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

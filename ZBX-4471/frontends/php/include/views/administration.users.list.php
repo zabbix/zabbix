@@ -19,8 +19,6 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
-
 $usersWidget = new CWidget();
 
 // append page header to widget
@@ -42,10 +40,8 @@ foreach ($this->data['userGroups'] as $userGroup) {
 }
 $userGroupListForm->addItem(array(_('User group').SPACE, $userGroupComboBox));
 
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $usersWidget->addHeader(_('Users'), $userGroupListForm);
-$usersWidget->addHeader($numRows);
+$usersWidget->addHeaderRowNumber();
 
 // create form
 $usersForm = new CForm();
@@ -84,7 +80,7 @@ foreach ($this->data['users'] as $user) {
 
 	// blocked
 	if ($user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-		$blocked = new CLink(_('Blocked'), 'users.php?go=unblock&group_userid%5B%5D='.$userid, 'on');
+		$blocked = new CLink(_('Blocked'), 'users.php?go=unblock&group_userid'.SQUAREBRACKETS.'='.$userid, 'on');
 	}
 	else {
 		$blocked = new CSpan(_('Ok'), 'green');
@@ -147,6 +143,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go'));
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "group_userid";');
 
 // append table to form
 $usersForm->addItem(array($this->data['paging'], $usersTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

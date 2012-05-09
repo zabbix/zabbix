@@ -19,15 +19,15 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventories');
 $page['file'] = 'hostinventories.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -42,7 +42,7 @@ $fields=array(
 	//ajax
 	'favobj'=>			array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
 	'favref'=>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})'),
-	'state'=>			array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})')
+	'favstate'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
 );
 
 check_fields($fields);
@@ -50,12 +50,12 @@ validate_sort_and_sortorder('name', ZBX_SORT_UP);
 
 if(isset($_REQUEST['favobj'])){
 	if('filter' == $_REQUEST['favobj']){
-		CProfile::update('web.hostinventories.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		CProfile::update('web.hostinventories.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
 
 if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 ?>
@@ -90,8 +90,8 @@ if($_REQUEST['hostid'] > 0){
 // list of hosts
 else{
 	$r_form = new CForm('get');
-	$r_form->addItem(array(_('Group'), $pageFilter->getGroupsCB(true)));
-	$hostinvent_wdgt->addHeader(_('HOSTS'), $r_form);
+	$r_form->addItem(array(_('Group'), SPACE, $pageFilter->getGroupsCB(true)));
+	$hostinvent_wdgt->addHeader(_('Hosts'), $r_form);
 
 	// HOST INVENTORY FILTER {{{
 	if(isset($_REQUEST['filter_set'])){
@@ -108,7 +108,7 @@ else{
 		$_REQUEST['filter_exact'] = CProfile::get('web.hostinventories.filter_exact');
 	}
 
-	$filter_table = new CTable('', 'filter_config');
+	$filter_table = new CTable('', 'filter');
 	// getting inventory fields to make a drop down
 	$inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
 	$inventoryFieldsComboBox = new CComboBox('filter_field', $_REQUEST['filter_field']);
@@ -131,14 +131,16 @@ else{
 		),
 	));
 
-	$reset = new CSpan(S_RESET,'link_menu');
-	$reset->onClick("javascript: clearAllForm('zbx_filter');");
+	$filter = new CButton('filter', _('Filter'), "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
+	$filter->useJQueryStyle('main');
 
-	$filter = new CButton('filter', S_FILTER, "javascript: create_var('zbx_filter', 'filter_set', '1', true);");
-	$filter->useJQueryStyle();
+	$reset = new CButton('reset', _('Reset'), "javascript: clearAllForm('zbx_filter');");
+	$reset->useJQueryStyle();
 
-	$footer_col = new CCol(array($filter, SPACE, SPACE, SPACE, $reset), 'center');
-	$footer_col->setColSpan(4);
+	$div_buttons = new CDiv(array($filter, SPACE, $reset));
+	$div_buttons->setAttribute('style', 'padding: 4px 0px;');
+
+	$footer_col = new CCol($div_buttons, 'controls');
 
 	$filter_table->addRow($footer_col);
 
@@ -147,13 +149,9 @@ else{
 	$filter_form->setAttribute('id','zbx_filter');
 	$filter_form->addItem($filter_table);
 	$hostinvent_wdgt->addFlicker($filter_form, CProfile::get('web.hostinventories.filter.state', 0));
-	// }}} HOST INVENTORY FILTER
+	$hostinvent_wdgt->addHeaderRowNumber();
 
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
-	$hostinvent_wdgt->addHeader($numrows);
-
-	$table = new CTableInfo();
+	$table = new CTableInfo(_('No hosts defined.'));
 	$table->setHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'hostid') : null,
 		make_sorting_header(_('Host'), 'name'),
@@ -165,6 +163,9 @@ else{
 		make_sorting_header(_('Tag'), 'pr_tag'),
 		make_sorting_header(_('MAC address A'), 'pr_macaddress_a'))
 	);
+
+	$hosts = array();
+	$paging = getPagingLine($hosts);
 
 	if($pageFilter->groupsSelected){
 		// which inventory fields we will need for displaying
@@ -180,10 +181,10 @@ else{
 		// checking if correct inventory field is specified for filter
 		$possibleInventoryFields = getHostInventories();
 		$possibleInventoryFields = zbx_toHash($possibleInventoryFields, 'db_field');
-		if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value']) && !isset($possibleInventoryFields[$_REQUEST['filter_field']])){
+		if(!empty($_REQUEST['filter_field'])
+				&& !empty($_REQUEST['filter_field_value'])
+				&& !isset($possibleInventoryFields[$_REQUEST['filter_field']])){
 			error(_s('Impossible to filter by inventory field "%s", which does not exist.', $_REQUEST['filter_field']));
-			$hosts = array();
-			$paging = getPagingLine($hosts);
 		}
 		else{
 			// if we are filtering by field, this field is also required
@@ -216,11 +217,11 @@ else{
 				if(!empty($_REQUEST['filter_field']) && !empty($_REQUEST['filter_field_value'])){
 					// must we filter exactly or using a substring (both are case insensitive)
 					$match = $_REQUEST['filter_exact']
-							? zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
-							: zbx_strpos(
-								zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]),
-								zbx_strtolower($_REQUEST['filter_field_value'])
-							) !== false;
+						? zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]) === zbx_strtolower($_REQUEST['filter_field_value'])
+						: zbx_strpos(
+							zbx_strtolower($hosts[$num]['inventory'][$_REQUEST['filter_field']]),
+							zbx_strtolower($_REQUEST['filter_field_value'])
+						) !== false;
 					if(!$match){
 						unset($hosts[$num]);
 					}
@@ -261,5 +262,5 @@ else{
 
 $hostinvent_wdgt->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

@@ -16,7 +16,7 @@ CREATE TABLE hosts_templates (
 	hostid                   bigint                                    NOT NULL,
 	templateid               bigint                                    NOT NULL,
 	PRIMARY KEY (hosttemplateid)
-) with OIDS;
+);
 CREATE UNIQUE INDEX hosts_templates_1 ON hosts_templates (hostid,templateid);
 CREATE INDEX hosts_templates_2 ON hosts_templates (templateid);
 ALTER TABLE ONLY hosts_templates ADD CONSTRAINT c_hosts_templates_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;

@@ -53,31 +53,6 @@ static int	is_bunch_poller(int poller_type)
 	return ZBX_POLLER_TYPE_JAVA == poller_type ? SUCCEED : FAIL;
 }
 
-static void	update_key_status(zbx_uint64_t hostid, int host_status, zbx_timespec_t *ts)
-{
-	const char	*__function_name = "update_key_status";
-	DC_ITEM		*items = NULL;
-	int		i, num;
-	AGENT_RESULT	agent;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " status:%d",
-			__function_name, hostid, host_status);
-
-	num = DCconfig_get_items(hostid, SERVER_STATUS_KEY, &items);
-	for (i = 0; i < num; i++)
-	{
-		init_result(&agent);
-		SET_UI64_RESULT(&agent, host_status);
-
-		dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent, ts,
-				ITEM_STATUS_ACTIVE, NULL, 0, NULL, 0, 0, 0, 0);
-
-		free_result(&agent);
-	}
-
-	zbx_free(items);
-}
-
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts, char *reason)
 {
 	const char	*__function_name = "update_triggers_status_to_unknown";
@@ -117,22 +92,21 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			assert(0);
 	}
 
-	/******************************************************************************
-	 * Set trigger status to UNKNOWN if all are true:                             *
-	 * - trigger's item status ACTIVE                                             *
-	 * - trigger's item type same as failed one                                   *
-	 * - trigger does not reference time-based functions- trigger status ENABLED  *
-	 * - trigger's host same as failed one                                        *
-	 * - trigger's host status MONITORED                                          *
-	 * - trigger does not reference "active" item                                 *
-	 *                                                                            *
-	 * An item is considered "active" if all are true:                            *
-	 * - item status ACTIVE                                                       *
-	 * - item's host status MONITORED                                             *
-	 * - item's trigger references time-based functions                           *
-	 *   OR                                                                       *
-	 *   item is of different type AND it's host is AVAILABLE                     *
-	 ******************************************************************************/
+	/*************************************************************************
+	 * Let's say an item MYITEM returns error. There is a trigger associated *
+	 * with it. We set that trigger status to UNKNOWN if ALL are true:       *
+	 * - MYITEM status is ACTIVE                                             *
+	 * - trigger does not reference time-based function                      *
+	 * - trigger status is ENABLED                                           *
+	 * - trigger and MYITEM reference the same host                          *
+	 * - trigger host status is MONITORED                                    *
+	 * - trigger does NOT reference an item that has ALL true:               *
+	 *   - item status is ACTIVE                                             *
+	 *   - item host status is MONITORED                                     *
+	 *   - item trigger references time-based function                       *
+	 *     OR                                                                *
+	 *     item and MYITEM types differ AND item host status is AVAILABLE    *
+	 *************************************************************************/
 	result = DBselect(
 			"select distinct t.triggerid,t.type,t.value,t.value_flags,t.error"
 			" from items i,functions f,triggers t,hosts h"
@@ -140,7 +114,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 				" and f.triggerid=t.triggerid"
 				" and i.hostid=h.hostid"
 				" and i.status=%d"
-				" and not i.key_ like '%s'"
 				" and i.type in (%s)"
 				" and f.function not in (" ZBX_SQL_TIME_FUNCTIONS ")"
 				" and t.status=%d"
@@ -166,12 +139,10 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 						")"
 					")"
 					" and i2.status=%d"
-					" and not i2.key_ like '%s'"
 					" and h2.status=%d"
 			")"
 			" order by t.triggerid",
 			ITEM_STATUS_ACTIVE,
-			SERVER_STATUS_KEY,
 			failed_type_buf,
 			TRIGGER_STATUS_ENABLED,
 			hostid,
@@ -183,7 +154,6 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			ITEM_TYPE_IPMI, HOST_AVAILABLE_TRUE,
 			ITEM_TYPE_JMX, HOST_AVAILABLE_TRUE,
 			ITEM_STATUS_ACTIVE,
-			SERVER_STATUS_KEY,
 			HOST_STATUS_MONITORED);
 
 	while (NULL != (row = DBfetch(result)))
@@ -332,9 +302,6 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 
 		*available = HOST_AVAILABLE_TRUE;
 		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,", fld_available, *available);
-
-		if (available == &item->host.available)
-			update_key_status(item->host.hostid, HOST_STATUS_MONITORED, ts);
 	}
 
 	*errors_from = 0;
@@ -455,9 +422,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 				offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "%s=%d,",
 						fld_available, *available);
 
-				if (available == &item->host.available)
-					update_key_status(item->host.hostid, HOST_AVAILABLE_FALSE, ts);
-
 				update_triggers_status_to_unknown(item->host.hostid, item->type, ts,
 						"Agent is unavailable.");
 			}
@@ -564,7 +528,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED != res)
 	{
 		if (!ISSET_MSG(result))
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "ZBX_NOTSUPPORTED"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
@@ -605,7 +569,7 @@ static int	get_values(unsigned char poller_type)
 	int		errcodes[MAX_BUNCH_ITEMS];
 	zbx_timespec_t	timespecs[MAX_BUNCH_ITEMS];
 	int		i, num;
-	char		*port;
+	char		*port = NULL, error[ITEM_ERROR_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -622,9 +586,17 @@ static int	get_values(unsigned char poller_type)
 		errcodes[i] = SUCCEED;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		substitute_simple_macros(NULL, NULL, &items[i].host, NULL, &items[i].key, MACRO_TYPE_ITEM_KEY, NULL, 0);
+		if (SUCCEED != substitute_key_macros(&items[i].key, &items[i].host, NULL,
+				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
+		{
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = NOTSUPPORTED;
+			zbx_timespec(&timespecs[i]);
+			continue;
+		}
 
-		items[i].interface.addr = (1 == items[i].interface.useip ? items[i].interface.ip_orig : items[i].interface.dns_orig);
+		items[i].interface.addr = (1 == items[i].interface.useip ?
+				items[i].interface.ip_orig : items[i].interface.dns_orig);
 
 		switch (items[i].type)
 		{
@@ -634,7 +606,7 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_SNMPv3:
 			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
-				port = zbx_strdup(NULL, items[i].interface.port_orig);
+				ZBX_STRDUP(port, items[i].interface.port_orig);
 				substitute_simple_macros(NULL, &items[i].host.hostid, NULL, NULL,
 						&port, MACRO_TYPE_INTERFACE_PORT, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
@@ -643,8 +615,8 @@ static int	get_values(unsigned char poller_type)
 								items[i].interface.port_orig));
 					errcodes[i] = NETWORK_ERROR;
 					zbx_timespec(&timespecs[i]);
+					continue;
 				}
-				zbx_free(port);
 				break;
 		}
 
@@ -668,41 +640,32 @@ static int	get_values(unsigned char poller_type)
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].snmp_community, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].snmp_oid, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				break;
-			case ITEM_TYPE_DB_MONITOR:
-				ZBX_STRDUP(items[i].params, items[i].params_orig);
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host, NULL,
+						MACRO_TYPE_SNMP_OID, error, sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = NOTSUPPORTED;
+					zbx_timespec(&timespecs[i]);
+					continue;
+				}
 				break;
 			case ITEM_TYPE_SSH:
-				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
-				ZBX_STRDUP(items[i].password, items[i].password_orig);
-				ZBX_STRDUP(items[i].params, items[i].params_orig);
 
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].publickey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].privatekey, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
-						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
-				break;
 			case ITEM_TYPE_TELNET:
 				ZBX_STRDUP(items[i].username, items[i].username_orig);
 				ZBX_STRDUP(items[i].password, items[i].password_orig);
-				ZBX_STRDUP(items[i].params, items[i].params_orig);
 
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].username, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].password, MACRO_TYPE_ITEM_FIELD, NULL, 0);
+			case ITEM_TYPE_DB_MONITOR:
 				substitute_simple_macros(NULL, NULL, &items[i].host, NULL,
 						&items[i].params, MACRO_TYPE_ITEM_FIELD, NULL, 0);
 				break;
@@ -718,20 +681,22 @@ static int	get_values(unsigned char poller_type)
 		}
 	}
 
+	zbx_free(port);
+
 	/* retrieve item values */
-	if (SUCCEED == errcodes[0])
+	if (SUCCEED != is_bunch_poller(poller_type))
 	{
-		if (SUCCEED != is_bunch_poller(poller_type))
+		if (SUCCEED == errcodes[0])
 		{
 			errcodes[0] = get_value(&items[0], &results[0]);
 			zbx_timespec(&timespecs[0]);
 		}
-		else if (ZBX_POLLER_TYPE_JAVA == poller_type)
-		{
-			alarm(CONFIG_TIMEOUT);
-			get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, timespecs, num);
-			alarm(0);
-		}
+	}
+	else if (ZBX_POLLER_TYPE_JAVA == poller_type)
+	{
+		alarm(CONFIG_TIMEOUT);
+		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, timespecs, num);
+		alarm(0);
 	}
 
 	/* process item values */
@@ -745,7 +710,7 @@ static int	get_values(unsigned char poller_type)
 				activate_host(&items[i], &timespecs[i]);
 				break;
 			case NETWORK_ERROR:
-			case PROXY_ERROR:
+			case GATEWAY_ERROR:
 				deactivate_host(&items[i], &timespecs[i], results[i].msg);
 				break;
 			default:
@@ -767,7 +732,7 @@ static int	get_values(unsigned char poller_type)
 
 			DCrequeue_reachable_item(items[i].itemid, ITEM_STATUS_NOTSUPPORTED, timespecs[i].sec);
 		}
-		else if (NETWORK_ERROR == errcodes[i] || PROXY_ERROR == errcodes[i])
+		else if (NETWORK_ERROR == errcodes[i] || GATEWAY_ERROR == errcodes[i])
 		{
 			DCrequeue_unreachable_item(items[i].itemid);
 		}
@@ -785,20 +750,12 @@ static int	get_values(unsigned char poller_type)
 				zbx_free(items[i].snmp_community);
 				zbx_free(items[i].snmp_oid);
 				break;
-			case ITEM_TYPE_DB_MONITOR:
-				zbx_free(items[i].params);
-				break;
 			case ITEM_TYPE_SSH:
-				zbx_free(items[i].username);
 				zbx_free(items[i].publickey);
 				zbx_free(items[i].privatekey);
-				zbx_free(items[i].password);
-				zbx_free(items[i].params);
-				break;
 			case ITEM_TYPE_TELNET:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
-				zbx_free(items[i].params);
 				break;
 			case ITEM_TYPE_JMX:
 				zbx_free(items[i].username);
@@ -808,6 +765,8 @@ static int	get_values(unsigned char poller_type)
 
 		free_result(&results[i]);
 	}
+
+	DCconfig_clean_items(items, NULL, num);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, num);
 

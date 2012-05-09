@@ -24,7 +24,7 @@
 
 	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
-	$page['title'] = "S_PERIOD";
+	$page['title'] = _('Period');
 	$page['file'] = 'popup_period.php';
 	$page['scripts'] = array('class.calendar.js');
 
@@ -63,8 +63,8 @@ require_once 'include/page_header.php';
 
 	$_REQUEST['caption'] = get_request('caption','');
 	if(zbx_empty($_REQUEST['caption']) && isset($_REQUEST['report_timesince']) && isset($_REQUEST['report_timetill'])){
-		$_REQUEST['caption'] = zbx_date2str(S_POPUP_PERIOD_CAPTION_DATE_FORMAT,  $_REQUEST['report_timesince']).' - '.
-								zbx_date2str(S_POPUP_PERIOD_CAPTION_DATE_FORMAT, $_REQUEST['report_timetill']);
+		$_REQUEST['caption'] = zbx_date2str(POPUP_PERIOD_CAPTION_DATE_FORMAT,  $_REQUEST['report_timesince']).' - '.
+								zbx_date2str(POPUP_PERIOD_CAPTION_DATE_FORMAT, $_REQUEST['report_timetill']);
 	}
 
 	if(isset($_REQUEST['save'])){
@@ -89,7 +89,7 @@ require_once 'include/page_header.php';
 	else{
 		echo SBR;
 
-		$frmPd = new CFormTable(S_PERIOD);
+		$frmPd = new CFormTable(_('Period'));
 		$frmPd->setName('period');
 
 		$frmPd->addVar('dstfrm',$_REQUEST['dstfrm']);
@@ -110,12 +110,9 @@ require_once 'include/page_header.php';
 			$frmPd->addVar('period_id',$_REQUEST['period_id']);
 
 
-		$frmPd->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT),
-			S_CAPTION), new CTextBox('caption',$caption,42));
+		$frmPd->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
+			_('Caption')), new CTextBox('caption',$caption,42));
 
-//		$frmPd->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
-
-//*
 		$clndr_icon = new CImg('images/general/bar/cal.gif','calendar', 16, 12, 'pointer');
 		$clndr_icon->addAction('onclick','javascript: '.
 											'var pos = getPosition(this); '.
@@ -130,18 +127,18 @@ require_once 'include/page_header.php';
 		$reporttimetab->setCellSpacing(0);
 
 		$reporttimetab->addRow(array(
-								S_FROM,
-								new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
-								'/',
-								new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
-								'/',
-								new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
-								SPACE,
-								new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
-								':',
-								new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
-								$clndr_icon
-						));
+			_('From'),
+			new CNumericBox('report_since_day',(($report_timesince>0)?date('d',$report_timesince):''),2),
+			'/',
+			new CNumericBox('report_since_month',(($report_timesince>0)?date('m',$report_timesince):''),2),
+			'/',
+			new CNumericBox('report_since_year',(($report_timesince>0)?date('Y',$report_timesince):''),4),
+			SPACE,
+			new CNumericBox('report_since_hour',(($report_timesince>0)?date('H',$report_timesince):''),2),
+			':',
+			new CNumericBox('report_since_minute',(($report_timesince>0)?date('i',$report_timesince):''),2),
+			$clndr_icon
+		));
 
 		zbx_add_post_js('create_calendar(null,'.
 						'["report_since_day","report_since_month","report_since_year","report_since_hour","report_since_minute"],'.
@@ -155,18 +152,18 @@ require_once 'include/page_header.php';
 											"CLNDR['avail_report_till'].clndr.clndrshow(pos.top,pos.left);");
 
 		$reporttimetab->addRow(array(
-								S_TILL,
-								new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
-								'/',
-								new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
-								'/',
-								new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
-								SPACE,
-								new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
-								':',
-								new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
-								$clndr_icon
-						));
+			_('Till'),
+			new CNumericBox('report_till_day',(($report_timetill>0)?date('d',$report_timetill):''),2),
+			'/',
+			new CNumericBox('report_till_month',(($report_timetill>0)?date('m',$report_timetill):''),2),
+			'/',
+			new CNumericBox('report_till_year',(($report_timetill>0)?date('Y',$report_timetill):''),4),
+			SPACE,
+			new CNumericBox('report_till_hour',(($report_timetill>0)?date('H',$report_timetill):''),2),
+			':',
+			new CNumericBox('report_till_minute',(($report_timetill>0)?date('i',$report_timetill):''),2),
+			$clndr_icon
+		));
 
 		zbx_add_post_js('create_calendar(null,'.
 						'["report_till_day","report_till_month","report_till_year","report_till_hour","report_till_minute"],'.
@@ -175,22 +172,19 @@ require_once 'include/page_header.php';
 						);
 
 
-		$frmPd->addRow(S_PERIOD, $reporttimetab);
+		$frmPd->addRow(_('Period'), $reporttimetab);
 //*/
 		if($config != 1)
-			$frmPd->addRow(S_COLOR, new CColor('color',$color));
+			$frmPd->addRow(_('Colour'), new CColor('color',$color));
 		else
 			$frmPd->addVar('color',$color);
 
 
-		$frmPd->addItemToBottomRow(new CSubmit('save', isset($_REQUEST['period_id'])?S_UPDATE:S_ADD));
+		$frmPd->addItemToBottomRow(new CSubmit('save', isset($_REQUEST['period_id']) ? _('Update') : _('Add')));
 
 		$frmPd->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmPd->Show();
 	}
-?>
-<?php
+
 
 require_once 'include/page_footer.php';
-
-?>

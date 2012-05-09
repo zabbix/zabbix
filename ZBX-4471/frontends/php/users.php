@@ -19,19 +19,19 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/media.inc.php');
-require_once('include/users.inc.php');
-require_once('include/forms.inc.php');
-require_once('include/js.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/media.inc.php';
+require_once dirname(__FILE__).'/include/users.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/js.inc.php';
 
-$page['title'] = _('Users');
+$page['title'] = _('Configuration of users');
 $page['file'] = 'users.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -40,9 +40,9 @@ $fields = array(
 	'userid' =>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form})&&({form}=="update")'),
 	'group_userid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	'filter_usrgrpid' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
-	'alias' =>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-	'name' =>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-	'surname' =>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
+	'alias' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Alias')),
+	'name' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Name')),
+	'surname' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})', _('Surname')),
 	'password1' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
 	'password2' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&(isset({form})&&({form}!="update"))&&isset({change_password})'),
 	'user_type' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1,2,3'),'isset({save})'),
@@ -57,10 +57,10 @@ $fields = array(
 	'lang' =>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 	'theme' =>				array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 	'autologin' =>			array(T_ZBX_INT, O_OPT,	null,	IN('1'),	null),
-	'autologout' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(90,10000), null),
+	'autologout' => array(T_ZBX_INT, O_OPT,	null,	BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
 	'url' =>				array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'refresh' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, SEC_PER_HOUR), 'isset({save})'),
-	'rows_per_page' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,999999),'isset({save})'),
+	'refresh' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({save})', _('Refresh (in seconds)')),
+	'rows_per_page' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999),'isset({save})', _('Rows per page')),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 	'register' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"add permission","delete permission"'), null),
@@ -366,5 +366,5 @@ else {
 	$usersView->render();
 	$usersView->show();
 }
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

@@ -19,11 +19,7 @@
 **/
 ?>
 <?php
-
-$comboTheme = new CComboBox('default_theme', $this->data['config']['default_theme']);
-$comboTheme->addItem('css_ob.css', _('Original blue'));
-$comboTheme->addItem('css_bb.css', _('Black & Blue'));
-$comboTheme->addItem('css_od.css', _('Dark orange'));
+$comboTheme = new CComboBox('default_theme', $this->data['config']['default_theme'], null, Z::getThemes());
 
 $comboDdFirstEntry = new CComboBox('dropdown_first_entry', $this->data['config']['dropdown_first_entry']);
 $comboDdFirstEntry->addItem(ZBX_DROPDOWN_FIRST_NONE, _('None'));
@@ -43,9 +39,7 @@ $guiView->addTab('gui', _('GUI'), $guiTab);
 
 $guiForm = new CForm();
 $guiForm->setName('guiForm');
-$guiForm->addVar('form', $this->data['form']);
 $guiForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
-$guiForm->addVar('config', get_request('config', 8));
 $guiForm->addItem($guiView);
 $guiForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save')))));
 

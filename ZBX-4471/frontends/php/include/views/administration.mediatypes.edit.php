@@ -91,6 +91,8 @@ elseif ($this->data['type'] == MEDIA_TYPE_JABBER || $this->data['type'] == MEDIA
 	}
 }
 
+$mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $this->data['status'], null, MEDIA_TYPE_STATUS_ACTIVE));
+
 // append form list to tab
 $mediaTypeTab = new CTabView();
 $mediaTypeTab->addTab('mediaTypeTab', _('Media'), $mediaTypeFormList);

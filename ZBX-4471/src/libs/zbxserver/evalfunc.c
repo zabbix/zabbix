@@ -53,10 +53,9 @@ static int	get_function_parameter_uint(zbx_uint64_t hostid, const char *paramete
 				res = SUCCEED;
 			}
 		}
-		else if (SUCCEED == is_uint_prefix(parameter))
+		else if (SUCCEED == is_uint_suffix(parameter, (unsigned int *)value))
 		{
 			*flag = ZBX_FLAG_SEC;
-			*value = str2uint(parameter);
 			res = SUCCEED;
 		}
 	}

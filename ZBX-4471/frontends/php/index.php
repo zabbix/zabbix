@@ -19,46 +19,41 @@
 **/
 ?>
 <?php
-define('ZBX_PAGE_NO_AUTHORIZATION', 1);
-define('ZBX_NOT_ALLOW_ALL_NODES', 1);
-define('ZBX_HIDE_NODE_SELECTION', 1);
+define('ZBX_PAGE_NO_AUTHORIZATION', true);
+define('ZBX_NOT_ALLOW_ALL_NODES', true);
+define('ZBX_HIDE_NODE_SELECTION', true);
+define('ZBX_PAGE_NO_MENU', true);
 
-require_once('include/config.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title']	= 'S_ZABBIX_BIG';
-$page['file']	= 'index.php';
+$page['title'] = _('ZABBIX');
+$page['file'] = 'index.php';
 
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'name' =>			array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,	'isset({enter})', _('Username')),
-	'password' =>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({enter})'),
-	'sessionid' =>		array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'reconnect' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535), null),
-	'enter' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'autologin' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'request' =>		array(T_ZBX_STR, O_OPT, null,	null,		null)
+	'name' =>		array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,	'isset({enter})', _('Username')),
+	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,		'isset({enter})'),
+	'sessionid' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
+	'reconnect' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
+	'enter' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'autologin' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'request' =>	array(T_ZBX_STR, O_OPT, null,	null,		null)
 );
 check_fields($fields);
-?>
-<?php
-$sessionid = get_cookie('zbx_sessionid');
 
-if (isset($_REQUEST['reconnect']) && isset($sessionid)) {
+// logout
+if (isset($_REQUEST['reconnect'])) {
 	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
 
-	CWebUser::logout($sessionid);
+	CWebUser::logout(get_cookie('zbx_sessionid'));
 	clear_messages(1);
-
-	$loginForm = new CView('general.login');
-	$loginForm->render();
-	exit();
 }
 
 $config = select_config();
 
 if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
-	if (isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])) {
+	if (!empty($_SERVER['PHP_AUTH_USER'])) {
 		$_REQUEST['enter'] = _('Sign in');
 		$_REQUEST['name'] = $_SERVER['PHP_AUTH_USER'];
 		$_REQUEST['password'] = 'zabbix';
@@ -68,37 +63,37 @@ if ($config['authentication_type'] == ZBX_AUTH_HTTP) {
 	}
 }
 
-$request = get_request('request');
-
+// login via form
 if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
-	$name = get_request('name', '');
-	$passwd = get_request('password', '');
-	$login = CWebUser::login($name, $passwd);
-
-	if ($login) {
-		// save remember login preferance
+	// try to login
+	if (CWebUser::login(get_request('name', ''), get_request('password', ''))) {
+		// save remember login preference
 		$user = array('autologin' => get_request('autologin', 0));
 		if (CWebUser::$data['autologin'] != $user['autologin']) {
 			$result = API::User()->updateProfile($user);
 		}
-
 		add_audit_ext(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', null, null, null);
 
+		$request = get_request('request');
 		$url = zbx_empty($request) ? CWebUser::$data['url'] : $request;
 		if (zbx_empty($url) || $url == $page['file']) {
 			$url = 'dashboard.php';
 		}
-
 		redirect($url);
 		exit();
 	}
+	// login failed, fall back to a guest account
+	else {
+		CWebUser::checkAuthentication(null);
+	}
+}
+else {
+	// login the user from the session, if the session id is empty - login as a guest
+	CWebUser::checkAuthentication(get_cookie('zbx_sessionid'));
 }
 
-if ($sessionid) {
-	CWebUser::checkAuthentication($sessionid);
-}
-
-if (CWebUser::$data['alias'] == ZBX_GUEST_USER) {
+// the user is not logged in, display the login form
+if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 	switch ($config['authentication_type']) {
 		case ZBX_AUTH_HTTP:
 			break;
@@ -112,7 +107,6 @@ if (CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 				$messages = array_pop($messages);
 				$_REQUEST['message'] = $messages['message'];
 			}
-
 			$loginForm = new CView('general.login');
 			$loginForm->render();
 	}

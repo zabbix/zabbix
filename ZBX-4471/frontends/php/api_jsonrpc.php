@@ -20,7 +20,7 @@
 ?>
 <?php
 define('ZBX_RPC_REQUEST', 1);
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
 $allowed_content = array(
 	'application/json-rpc'		=> 'json-rpc',

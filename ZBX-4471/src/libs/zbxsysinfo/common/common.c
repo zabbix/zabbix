@@ -38,17 +38,12 @@
 
 extern int	CONFIG_TIMEOUT;
 
-static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	SYSTEM_RUN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common[] =
 /*      KEY                     FLAG		FUNCTION        ADD_PARAM       TEST_PARAM */
 {
-	{"agent.ping",		0,		AGENT_PING, 		0,	0},
-	{"agent.version",	0,		AGENT_VERSION,		0,	0},
-
 	{"system.localtime",	CF_USEUPARAM,	SYSTEM_LOCALTIME,	0,	"utc"},
 	{"system.run",		CF_USEUPARAM,	SYSTEM_RUN,	 	0,	"echo test"},
 
@@ -88,20 +83,6 @@ static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Accessible only as active check!"));
 
 	return SYSINFO_RET_FAIL;
-}
-
-static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	SET_UI64_RESULT(result, 1);
-
-	return SYSINFO_RET_OK;
-}
-
-static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	SET_STR_RESULT(result, zbx_strdup(NULL, ZABBIX_VERSION));
-
-	return SYSINFO_RET_OK;
 }
 
 int	EXECUTE_USER_PARAMETER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/events.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/discovery.inc.php');
-require_once('include/html.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/events.inc.php';
+require_once dirname(__FILE__).'/include/actions.inc.php';
+require_once dirname(__FILE__).'/include/discovery.inc.php';
+require_once dirname(__FILE__).'/include/html.inc.php';
 
 if(isset($_REQUEST['csv_export'])){
 	$CSV_EXPORT = true;
@@ -33,12 +33,12 @@ if(isset($_REQUEST['csv_export'])){
 	$page['type'] = detect_page_type(PAGE_TYPE_CSV);
 	$page['file'] = 'zbx_events_export.csv';
 
-	require_once('include/func.inc.php');
+	require_once dirname(__FILE__).'/include/func.inc.php';
 }
 else{
 	$CSV_EXPORT = false;
 
-	$page['title'] = 'S_LATEST_EVENTS';
+	$page['title'] = _('Latest events');
 	$page['file'] = 'events.php';
 	$page['hist_arg'] = array('groupid','hostid');
 	$page['scripts'] = array('class.calendar.js','gtlc.js');
@@ -50,7 +50,7 @@ else{
 	}
 }
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 	$allow_discovery = check_right_on_discovery(PERM_READ_ONLY);
@@ -83,8 +83,8 @@ require_once('include/page_header.php');
 		'showUnknown'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
 //ajax
 		'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
-		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
-		'state'=>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj}) && ("filter"=={favobj})'),
+		'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
+		'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
 		'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 	);
 
@@ -93,7 +93,7 @@ require_once('include/page_header.php');
 /* AJAX */
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.events.filter.state',$_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.events.filter.state',$_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 		// saving fixed/dynamic setting to profile
 		if('timelinefixedperiod' == $_REQUEST['favobj']){
@@ -104,7 +104,7 @@ require_once('include/page_header.php');
 	}
 
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 //--------
@@ -136,7 +136,7 @@ require_once('include/page_header.php');
 			$oldTrigger['hosts'] = zbx_toHash($oldTrigger['hosts'],'hostid');
 			$oldTrigger['items'] = zbx_toHash($oldTrigger['items'],'itemid');
 			$oldTrigger['functions'] = zbx_toHash($oldTrigger['functions'],'functionid');
-			$oldExpression = triggerExpression($oldTrigger,false);
+			$oldExpression = triggerExpression($oldTrigger);
 
 			if(isset($oldTrigger['hosts'][$hostid])) break;
 
@@ -178,7 +178,7 @@ require_once('include/page_header.php');
 				$newTrigger['hosts'] = $oldTrigger['hosts'];
 				$newTrigger['items'] = $oldTrigger['items'];
 
-				$newExpression = triggerExpression($newTrigger,false);
+				$newExpression = triggerExpression($newTrigger);
 
 				if(strcmp($oldExpression, $newExpression) == 0){
 					$_REQUEST['triggerid'] = $newTrigger['triggerid'];
@@ -200,14 +200,40 @@ require_once('include/page_header.php');
 ?>
 <?php
 
+	// js templates
+	require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
+
 	$events_wdgt = new CWidget();
 
-// PAGE HEADER {{{
-	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$events_wdgt->addPageHeader(array(S_HISTORY_OF_EVENTS_BIG.SPACE.S_ON_BIG.SPACE, zbx_date2str(S_EVENTS_DATE_FORMAT,time())), $fs_icon);
-// }}}PAGE HEADER
+	// header
+	// allow CSV export button
+	$frmForm = new CForm();
+	$frmForm->cleanItems();
+	if (isset($_REQUEST['groupid'])) {
+		$frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
+	}
+	if (isset($_REQUEST['hostid'])) {
+		$frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
+	}
+	if (isset($_REQUEST['source'])) {
+		$frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
+	}
+	if (isset($_REQUEST['start'])) {
+		$frmForm->addVar('start', $_REQUEST['start'], 'start_csv');
+	}
+	if (isset($_REQUEST['stime'])) {
+		$frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
+	}
+	if (isset($_REQUEST['period'])) {
+		$frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
+	}
+	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
-// HEADER {{{
+	$events_wdgt->addPageHeader(
+		_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(_('d M Y H:i:s'), time()).']',
+		array($frmForm, SPACE, get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
+	);
+
 	$r_form = new CForm('get');
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 	$r_form->addVar('stime', get_request('stime'));
@@ -236,42 +262,19 @@ require_once('include/page_header.php');
 			$_REQUEST['triggerid'] = $pageFilter->triggerid;
 		}
 
-		$r_form->addItem(array(S_GROUP.SPACE,$pageFilter->getGroupsCB(true)));
-		$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
+		$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
+		$r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB(true)));
 	}
 
 	if($allow_discovery){
 		$cmbSource = new CComboBox('source', $source, 'submit()');
-		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, S_TRIGGER);
-		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
-		$r_form->addItem(array(SPACE.S_SOURCE.SPACE, $cmbSource));
+		$cmbSource->addItem(EVENT_SOURCE_TRIGGERS, _('Trigger'));
+		$cmbSource->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
+		$r_form->addItem(array(SPACE._('Source').SPACE, $cmbSource));
 	}
 
-	$events_wdgt->addHeader(_('EVENTS'), $r_form);
-
-
-
-	// allow CSV export button
-	$frmForm = new CForm();
-	$frmForm->cleanItems();
-	if(isset($_REQUEST['groupid'])) $frmForm->addVar('groupid', $_REQUEST['groupid'], 'groupid_csv');
-	if(isset($_REQUEST['hostid'])) $frmForm->addVar('hostid', $_REQUEST['hostid'], 'hostid_csv');
-	if(isset($_REQUEST['source'])) $frmForm->addVar('source', $_REQUEST['source'], 'source_csv');
-	if(isset($_REQUEST['start'])) $frmForm->addVar('start', $_REQUEST['start'], 'start_csv');
-	if(isset($_REQUEST['stime'])) $frmForm->addVar('stime', $_REQUEST['stime'], 'stime_csv');
-	if(isset($_REQUEST['period'])) $frmForm->addVar('period', $_REQUEST['period'], 'period_csv');
-	$buttons = new CDiv(array(
-		new CSubmit('csv_export', _('Export to CSV')),
-	));
-	$buttons->useJQueryStyle();
-	$frmForm->addItem($buttons);
-
-	$numrows = new CDiv();
-	$numrows->setAttribute('name', 'numrows');
-	$events_wdgt->addHeader($numrows, $frmForm);
-
-// }}} HEADER
-
+	$events_wdgt->addHeader(_('Events'), $r_form);
+	$events_wdgt->addHeaderRowNumber();
 
 // FILTER {{{
 	$filterForm = null;
@@ -298,10 +301,10 @@ require_once('include/page_header.php');
 		}
 
 		$row = new CRow(array(
-			new CCol(S_TRIGGER,'form_row_l'),
+			new CCol(_('Trigger'),'form_row_l'),
 			new CCol(array(
 				new CTextBox('trigger',$trigger,96,'yes'),
-				new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
+				new CButton("btn1",_('Select'),"return PopUp('popup.php?"."dstfrm=".$filterForm->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
 			),'form_row_r')
 		));
 		$filterForm->addRow($row);
@@ -312,24 +315,24 @@ require_once('include/page_header.php');
 			'javascript: create_var("'.$filterForm->GetName().'", "showUnknown", (this.checked?1:0), 0); ',
 			'1');
 
-		$filterForm->addRow(S_SHOW_UNKNOWN_EVENTS,$unkcbx);
+		$filterForm->addRow(_('Show unknown events'),$unkcbx);
 
-		$reset = new CButton('filter_rst',S_RESET,'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
+		$reset = new CButton('filter_rst',_('Reset'),'javascript: var uri = new Curl(location.href); uri.setArgument("filter_rst",1); location.href = uri.getUrl();');
 
-		$filterForm->addItemToBottomRow(new CSubmit('filter_set',S_FILTER));
+		$filterForm->addItemToBottomRow(new CSubmit('filter_set',_('Filter')));
 		$filterForm->addItemToBottomRow($reset);
 	}
 
-	$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state',0));
+	$events_wdgt->addFlicker($filterForm, CProfile::get('web.events.filter.state', 0));
 
 
 	$scroll_div = new CDiv();
 	$scroll_div->setAttribute('id', 'scrollbar_cntr');
-	$events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state',0));
+	$events_wdgt->addFlicker($scroll_div, CProfile::get('web.events.filter.state', 0));
 // }}} FILTER
 
 
-	$table = new CTableInfo(S_NO_EVENTS_FOUND);
+	$table = new CTableInfo(_('No events defined.'));
 
 // CHECK IF EVENTS EXISTS {{{
 	$options = array(
@@ -368,6 +371,7 @@ require_once('include/page_header.php');
 	$csv_disabled = true;
 
 	if(empty($firstEvent)){
+
 		$starttime = null;
 		$events = array();
 		$paging = getPagingLine($events);
@@ -432,20 +436,20 @@ require_once('include/page_header.php');
 
 // TABLE
 			$table->setHeader(array(
-				S_TIME,
-				S_IP,
-				S_DNS,
-				S_DESCRIPTION,
-				S_STATUS
+				_('Time'),
+				_('IP'),
+				_('DNS'),
+				_('Description'),
+				_('Status')
 			));
 
 			if($CSV_EXPORT){
 				$csvRows[] = array(
-					S_TIME,
-					S_IP,
-					S_DNS,
-					S_DESCRIPTION,
-					S_STATUS
+					_('Time'),
+					_('IP'),
+					_('DNS'),
+					_('Description'),
+					_('Status')
 				);
 			}
 
@@ -456,20 +460,20 @@ require_once('include/page_header.php');
 							$event_data['object_data'] = $dhosts[$event_data['objectid']];
 						}
 						else{
-							$event_data['object_data']['ip'] = S_UNKNOWN;
-							$event_data['object_data']['dns'] = S_UNKNOWN;
+							$event_data['object_data']['ip'] = _('Unknown');
+							$event_data['object_data']['dns'] = _('Unknown');
 						}
-						$event_data['description'] = S_HOST;
+						$event_data['description'] = _('Host');
 						break;
 					case EVENT_OBJECT_DSERVICE:
 						if(isset($dservices[$event_data['objectid']])){
 							$event_data['object_data'] = $dservices[$event_data['objectid']];
 						}
 						else{
-							$event_data['object_data']['ip'] = S_UNKNOWN;
-							$event_data['object_data']['dns'] = S_UNKNOWN;
-							$event_data['object_data']['type'] = S_UNKNOWN;
-							$event_data['object_data']['port'] = S_UNKNOWN;
+							$event_data['object_data']['ip'] = _('Unknown');
+							$event_data['object_data']['dns'] = _('Unknown');
+							$event_data['object_data']['type'] = _('Unknown');
+							$event_data['object_data']['port'] = _('Unknown');
 						}
 
 						$event_data['description'] = _('Service').': '.
@@ -483,7 +487,7 @@ require_once('include/page_header.php');
 
 				if(!isset($event_data['object_data'])) continue;
 				$table->addRow(array(
-					zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
+					zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 					$event_data['object_data']['ip'],
 					zbx_empty($event_data['object_data']['dns']) ? SPACE : $event_data['object_data']['dns'],
 					$event_data['description'],
@@ -492,7 +496,7 @@ require_once('include/page_header.php');
 
 				if($CSV_EXPORT){
 					$csvRows[] = array(
-						zbx_date2str(S_EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
+						zbx_date2str(EVENTS_DISCOVERY_TIME_FORMAT,$event_data['clock']),
 						$event_data['object_data']['ip'],
 						$event_data['object_data']['dns'],
 						$event_data['description'],
@@ -505,28 +509,28 @@ require_once('include/page_header.php');
 		}
 		else{
 			$table->setHeader(array(
-				S_TIME,
-				is_show_all_nodes()?S_NODE:null,
-				($_REQUEST['hostid'] == 0)?S_HOST:null,
-				S_DESCRIPTION,
-				S_STATUS,
-				S_SEVERITY,
+				_('Time'),
+				is_show_all_nodes() ? _('Node') : null,
+				($_REQUEST['hostid'] == 0) ? _('Host') : null,
+				_('Description'),
+				_('Status'),
+				_('Severity'),
 				_('Duration'),
-				($config['event_ack_enable'])?S_ACK:NULL,
-				S_ACTIONS
+				($config['event_ack_enable']) ? _('Ack') : null,
+				_('Actions')
 			));
 
 			if($CSV_EXPORT){
 				$csvRows[] = array(
-					S_TIME,
-					is_show_all_nodes()?S_NODE:null,
-					($_REQUEST['hostid'] == 0)?S_HOST:null,
-					S_DESCRIPTION,
-					S_STATUS,
-					S_SEVERITY,
+					_('Time'),
+					is_show_all_nodes() ? _('Node') : null,
+					($_REQUEST['hostid'] == 0) ? _('Host') : null,
+					_('Description'),
+					_('Status'),
+					_('Severity'),
 					_('Duration'),
-					($config['event_ack_enable'])?S_ACK:NULL,
-					S_ACTIONS
+					($config['event_ack_enable']) ? _('Ack') : null,
+					_('Actions')
 				);
 			}
 
@@ -585,7 +589,7 @@ require_once('include/page_header.php');
 
 				$triggersOptions = array(
 					'triggerids' => zbx_objectValues($events, 'objectid'),
-					'selectHosts' => API_OUTPUT_EXTEND,
+					'selectHosts' => array('hostid'),
 					'selectTriggers' => API_OUTPUT_EXTEND,
 					'selectItems' => API_OUTPUT_EXTEND,
 					'output' => API_OUTPUT_EXTEND
@@ -593,9 +597,28 @@ require_once('include/page_header.php');
 				$triggers = API::Trigger()->get($triggersOptions);
 				$triggers = zbx_toHash($triggers, 'triggerid');
 
+				// fetch hosts
+				$hosts = array();
+				foreach ($triggers as $trigger) {
+					$hosts[] = reset($trigger['hosts']);
+				}
+				$hostids = zbx_objectValues($hosts, 'hostid');
+				$hosts = API::Host()->get(array(
+					'output' => array('name', 'hostid'),
+					'hostids' => $hostids,
+					'selectAppllications' => API_OUTPUT_EXTEND,
+					'selectScreens' => API_OUTPUT_COUNT,
+					'selectInventory' => true,
+					'preservekeys' => true
+				));
+
+				// fetch scripts for the host JS menu
+				$hostScripts = API::Script()->getScriptsByHosts($hostids);
+
 				foreach($events as $enum => $event){
 					$trigger = $triggers[$event['objectid']];
 					$host = reset($trigger['hosts']);
+					$host = $hosts[$host['hostid']];
 
 					$items = array();
 					foreach($trigger['items'] as $inum => $item){
@@ -636,31 +659,36 @@ require_once('include/page_header.php');
 						$event['acknowledged']
 					);
 
+					// host JS menu link
+					$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
+					$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
+					$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+
 					$table->addRow(array(
-						new CLink(zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
+						new CLink(zbx_date2str(EVENTS_ACTION_TIME_FORMAT, $event['clock']),
 							'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
 							'action'
-							),
+						),
 						is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
-						$_REQUEST['hostid'] == 0 ? $host['name'] : null,
+						$_REQUEST['hostid'] ? null : $hostSpan,
 						new CSpan($tr_desc, 'link_menu'),
 						$statusSpan,
 						getSeverityCell($trigger['priority'], null, !$event['value']),
 						$event['duration'],
-						($config['event_ack_enable'])?$ack:NULL,
+						($config['event_ack_enable']) ? $ack : NULL,
 						$actions
 					));
 
 					if($CSV_EXPORT) {
 						$csvRows[] = array(
-							zbx_date2str(S_EVENTS_ACTION_TIME_FORMAT,$event['clock']),
+							zbx_date2str(EVENTS_ACTION_TIME_FORMAT,$event['clock']),
 							is_show_all_nodes() ? get_node_name_by_elid($event['objectid']) : null,
 							$_REQUEST['hostid'] == 0 ? $host['name'] : null,
 							$description,
 							trigger_value2str($event['value']),
 							getSeverityCaption($trigger['priority']),
 							$event['duration'],
-							($config['event_ack_enable'])? ($event['acknowledges']?S_YES:S_NO) :NULL, // ($config['event_ack_enable'])? $ack :NULL,
+							($config['event_ack_enable']) ? ($event['acknowledges'] ? _('Yes') : _('No')) : null, // ($config['event_ack_enable'])? $ack :NULL,
 							strip_tags( (string)$actions )
 						);
 					}
@@ -697,10 +725,11 @@ require_once('include/page_header.php');
 		'loadScroll' => 1,
 		'dynamic' => 0,
 		'mainObject' => 1,
-		'periodFixed' => CProfile::get('web.events.timelinefixed', 1)
+		'periodFixed' => CProfile::get('web.events.timelinefixed', 1),
+		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 	);
 
-	zbx_add_post_js('jqBlink.init();');
+	zbx_add_post_js('jqBlink.blink();');
 	zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 	zbx_add_post_js('timeControl.processObjects();');
 
@@ -710,6 +739,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>
