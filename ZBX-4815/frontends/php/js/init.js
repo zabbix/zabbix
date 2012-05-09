@@ -69,7 +69,10 @@ jQuery(function() {
 		var menu = [];
 		menu.push(createMenuHeader(menuData.name));
 		menu.push(createMenuItem(t('Add service'), 'services.php?form=1&parentid=' + menuData.serviceid + '&parentname=' + menuData.name));
-		menu.push(createMenuItem(t('Edit service'), 'services.php?form=1&serviceid=' + menuData.serviceid));
+
+		if (menuData.serviceid) {
+			menu.push(createMenuItem(t('Edit service'), 'services.php?form=1&serviceid=' + menuData.serviceid));
+		}
 
 		// don't display the delete link for services with children
 		if (!menuData.hasDependencies) {
