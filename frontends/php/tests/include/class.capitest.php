@@ -20,36 +20,32 @@
 ?>
 <?php
 
-require_once(dirname(__FILE__).'/../../include/validate.inc.php');
-require_once(dirname(__FILE__).'/../../include/gettextwrapper.inc.php');
-require_once(dirname(__FILE__).'/../../include/nodes.inc.php');
-require_once(dirname(__FILE__).'/../../include/hosts.inc.php');
-require_once(dirname(__FILE__).'/../../include/items.inc.php');
-require_once(dirname(__FILE__).'/../../include/api.inc.php');
-require_once(dirname(__FILE__).'/dbfunc.php');
+require_once dirname(__FILE__).'/../../include/validate.inc.php';
+require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
+require_once dirname(__FILE__).'/../../include/nodes.inc.php';
+require_once dirname(__FILE__).'/../../include/hosts.inc.php';
+require_once dirname(__FILE__).'/../../include/items.inc.php';
+require_once dirname(__FILE__).'/dbfunc.php';
 
 // locales
-require_once(dirname(__FILE__).'/../../include/locales/en_gb.inc.php');
-require_once(dirname(__FILE__).'/../../include/locales.inc.php');
-process_locales();
+require_once dirname(__FILE__).'/../../include/locales.inc.php';
 
 // classes
-require_once(dirname(__FILE__).'/../../include/classes/class.cwebuser.php');
+require_once dirname(__FILE__).'/../../include/classes/class.cwebuser.php';
 
 // APIs
-require_once(dirname(__FILE__).'/../../api/classes/class.apiexception.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.apiexception.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.czbxapi.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.citemgeneral.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.citemkey.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.citem.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.chost.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.chostgroup.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.ctemplate.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.chostinterface.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.cproxy.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.cgraph.php');
-require_once(dirname(__FILE__).'/../../api/classes/class.ctrigger.php');
+require_once dirname(__FILE__).'/../../include/classes/api/APIException.php';
+require_once dirname(__FILE__).'/../../include/classes/api/CZBXAPI.php';
+require_once dirname(__FILE__).'/../../api/classes/CItemGeneral.php';
+require_once dirname(__FILE__).'/../../api/classes/CItemKey.php';
+require_once dirname(__FILE__).'/../../api/classes/CItem.php';
+require_once dirname(__FILE__).'/../../api/classes/CHost.php';
+require_once dirname(__FILE__).'/../../api/classes/CHostGroup.php';
+require_once dirname(__FILE__).'/../../api/classes/CTemplate.php';
+require_once dirname(__FILE__).'/../../api/classes/CHostInterface.php';
+require_once dirname(__FILE__).'/../../api/classes/CProxy.php';
+require_once dirname(__FILE__).'/../../api/classes/CGraph.php';
+require_once dirname(__FILE__).'/../../api/classes/CTrigger.php';
 
 if (!function_exists('info')) {
 	function info($data) {
@@ -152,9 +148,11 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 	public function testGet(array $object) {
 		$this->createTestObject($object);
 
-		$rs = $this->api->get(array(
-			$this->api->pkOption() => $this->createdPks
-		));
+		$rs = $this->api->get(
+			array(
+				$this->api->pkOption() => $this->createdPks
+			)
+		);
 
 		$this->assertCount(1, $rs, 'One of the objects has not been retrieved.');
 	}
@@ -228,9 +226,11 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 
 		// create a test group
 		$hostGroupApi = API::HostGroup();
-		$hostGroupRs = $hostGroupApi->create(array(
-			'name' => 'Test host group'
-		));
+		$hostGroupRs = $hostGroupApi->create(
+			array(
+				'name' => 'Test host group'
+			)
+		);
 
 		// create a test host
 		$hostApi = new CHost();
@@ -277,3 +277,4 @@ abstract class CApiTest extends PHPUnit_Framework_TestCase {
 		$this->testHost = null;
 	}
 }
+?>

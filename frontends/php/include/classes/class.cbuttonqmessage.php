@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CButtonQMessage extends CSubmit {
+
 	public $vars;
 	public $msg;
 	public $name;
@@ -36,13 +38,13 @@ class CButtonQMessage extends CSubmit {
 
 	public function setVars($value = null) {
 		if (!is_string($value) && !is_null($value)) {
-			return $this->error('Incorrect value for setVars ['.$value.']');
+			return $this->error('Incorrect value for setVars "'.$value.'".');
 		}
 		$this->vars = $value;
 		$this->setAction(null);
 	}
 
-	public function setMessage($value = null){
+	public function setMessage($value = null) {
 		if (is_null($value)) {
 			$value = _('Are you sure you want perform this action?');
 		}
@@ -53,7 +55,7 @@ class CButtonQMessage extends CSubmit {
 		$this->msg = zbx_jsvalue(
 			$value,
 			false, // not as object
-			false  // do not add quotes to the string
+			false // do not add quotes to the string
 		);
 		$this->setAction(null);
 	}
@@ -74,7 +76,7 @@ class CButtonQMessage extends CSubmit {
 		else {
 			$action = 'true';
 		}
-		return parent::setAttribute('onclick', 'if('.$confirmation.') return '.$action.'; else return false;');
+		return parent::setAttribute('onclick', 'if ('.$confirmation.') { return '.$action.'; } else { return false; }');
 	}
 }
 ?>

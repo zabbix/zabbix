@@ -5,6 +5,6 @@ CREATE TABLE sysmap_url (
 	url                      varchar(255)    DEFAULT ''                NOT NULL,
 	elementtype              integer         DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (sysmapurlid)
-) with OIDS;
+);
 CREATE UNIQUE INDEX sysmap_url_1 on sysmap_url (sysmapid,name);
 ALTER TABLE ONLY sysmap_url ADD CONSTRAINT c_sysmap_url_1 FOREIGN KEY (sysmapid) REFERENCES sysmaps (sysmapid) ON DELETE CASCADE;

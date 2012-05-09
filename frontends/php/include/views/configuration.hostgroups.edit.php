@@ -54,7 +54,7 @@ foreach ($this->data['r_hosts'] as $host) {
 		$hostsComboBox->addItem($host['hostid'], $host['name'], true, false);
 	}
 }
-$hostgroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), array(_('Other hosts | group').SPACE, $groupsComboBox)));
+$hostgroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
 
 // append tabs to form
 $hostgroupTab = new CTabView();

@@ -104,7 +104,7 @@ int	zbx_hashmap_get(zbx_hashmap_t *hm, zbx_uint64_t key)
 	int			i, value = FAIL;
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
-	
+
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
 
@@ -188,7 +188,7 @@ void	zbx_hashmap_remove(zbx_hashmap_t *hm, zbx_uint64_t key)
 	int			i;
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
-	
+
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
 

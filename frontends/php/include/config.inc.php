@@ -19,108 +19,41 @@
 **/
 ?>
 <?php
-require_once('include/debug.inc.php');
 
-function __autoload($class_name) {
-	$class_name_lower = zbx_strtolower($class_name);
-	$api = array(
-		'apiexception' => 1,
-		'caction' => 1,
-		'calert' => 1,
-		'capiinfo' => 1,
-		'capplication' => 1,
-		'cdcheck' => 1,
-		'cdhost' => 1,
-		'cdiscoveryrule' => 1,
-		'cdrule' => 1,
-		'cdservice' => 1,
-		'cevent' => 1,
-		'cgraph' => 1,
-		'cgraphprototype' => 1,
-		'cgraphitem' => 1,
-		'chistory' => 1,
-		'chost' => 1,
-		'chostgroup' => 1,
-		'chostinterface'=> 1,
-		'ciconmap' => 1,
-		'cimage' => 1,
-		'citem' => 1,
-		'citemgeneral' => 1,
-		'citemprototype' => 1,
-		'cmaintenance' => 1,
-		'cmap' => 1,
-		'cmapelement' => 1,
-		'cmediatype' => 1,
-		'cproxy' => 1,
-		'cscreen' => 1,
-		'cscreenitem' => 1,
-		'cscript' => 1,
-		'ctemplate' => 1,
-		'ctemplatescreen' => 1,
-		'ctrigger' => 1,
-		'ctriggerexpression' => 1,
-		'citemkey' => 1,
-		'ctriggerprototype' => 1,
-		'cuser' => 1,
-		'cusergroup' => 1,
-		'cusermacro' => 1,
-		'cusermedia' => 1,
-		'cwebcheck' => 1,
-		'czbxapi' => 1,
-	);
+require_once dirname(__FILE__).'/classes/core/Z.php';
+Z::getInstance()->run();
 
-	$rpc = array(
-		'cjsonrpc' =>1,
-		'czbxrpc' => 1,
-		'cxmlrpc' => null,
-		'csoap' => null,
-		'csoapjr' => null
-	);
+require_once dirname(__FILE__).'/debug.inc.php';
+require_once dirname(__FILE__).'/gettextwrapper.inc.php';
+require_once dirname(__FILE__).'/defines.inc.php';
+require_once dirname(__FILE__).'/func.inc.php';
+require_once dirname(__FILE__).'/html.inc.php';
 
-	if (isset($api[$class_name_lower])) {
-		require_once('api/classes/class.'.$class_name_lower.'.php');
-	}
-	elseif (isset($rpc[$class_name_lower])) {
-		require_once('api/rpc/class.'.$class_name_lower.'.php');
-	}
-	elseif (file_exists('include/classes/class.'.$class_name_lower.'.php')) {
-		require_once('include/classes/class.'.$class_name_lower.'.php');
-	}
-	// a temporary fix to support new classes folder structure
-	else {
-		require_once('include/classes/sysmaps/'.$class_name.'.php');
-	}
-}
-?>
-<?php
-require_once('include/api.inc.php');
-require_once('include/gettextwrapper.inc.php');
-require_once('include/defines.inc.php');
-require_once('include/func.inc.php');
-require_once('include/html.inc.php');
-require_once('include/copt.lib.php');
-require_once('include/profiles.inc.php');
-require_once('conf/maintenance.inc.php');
+CProfiler::getInstance()->start();
+
+require_once dirname(__FILE__).'/profiles.inc.php';
+require_once dirname(__FILE__).'/../conf/maintenance.inc.php';
+
 // abc sorting
-require_once('include/acknow.inc.php');
-require_once('include/actions.inc.php');
-require_once('include/discovery.inc.php');
-require_once('include/events.inc.php');
-require_once('include/graphs.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/httptest.inc.php');
-require_once('include/ident.inc.php');
-require_once('include/images.inc.php');
-require_once('include/items.inc.php');
-require_once('include/maintenances.inc.php');
-require_once('include/maps.inc.php');
-require_once('include/media.inc.php');
-require_once('include/nodes.inc.php');
-require_once('include/services.inc.php');
-require_once('include/sounds.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/users.inc.php');
-require_once('include/valuemap.inc.php');
+require_once dirname(__FILE__).'/acknow.inc.php';
+require_once dirname(__FILE__).'/actions.inc.php';
+require_once dirname(__FILE__).'/discovery.inc.php';
+require_once dirname(__FILE__).'/events.inc.php';
+require_once dirname(__FILE__).'/graphs.inc.php';
+require_once dirname(__FILE__).'/hosts.inc.php';
+require_once dirname(__FILE__).'/httptest.inc.php';
+require_once dirname(__FILE__).'/ident.inc.php';
+require_once dirname(__FILE__).'/images.inc.php';
+require_once dirname(__FILE__).'/items.inc.php';
+require_once dirname(__FILE__).'/maintenances.inc.php';
+require_once dirname(__FILE__).'/maps.inc.php';
+require_once dirname(__FILE__).'/media.inc.php';
+require_once dirname(__FILE__).'/nodes.inc.php';
+require_once dirname(__FILE__).'/services.inc.php';
+require_once dirname(__FILE__).'/sounds.inc.php';
+require_once dirname(__FILE__).'/triggers.inc.php';
+require_once dirname(__FILE__).'/users.inc.php';
+require_once dirname(__FILE__).'/valuemap.inc.php';
 
 global $USER_DETAILS, $USER_RIGHTS, $ZBX_PAGE_POST_JS, $page;
 global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB;
@@ -133,21 +66,20 @@ $USER_RIGHTS = array();
 $ZBX_LOCALNODEID = 0;
 $ZBX_LOCMASTERID = 0;
 $ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
-$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
+$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).DIRECTORY_SEPARATOR.basename($ZBX_CONFIGURATION_FILE);
 
-// include Tactical Overview modules
-require_once('include/locales.inc.php');
-require_once('include/perm.inc.php');
-require_once('include/audit.inc.php');
-require_once('include/js.inc.php');
+// include tactical overview modules
+require_once dirname(__FILE__).'/locales.inc.php';
+require_once dirname(__FILE__).'/perm.inc.php';
+require_once dirname(__FILE__).'/audit.inc.php';
+require_once dirname(__FILE__).'/js.inc.php';
 
-// include Validation
-require_once('include/validate.inc.php');
+// include validation
+require_once dirname(__FILE__).'/validate.inc.php';
 
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	$pathLength = strlen(__FILE__);
 
-	// strlen(include/config.inc.php) = 22
 	$pathLength -= 22;
 	$errfile = substr($errfile, $pathLength);
 
@@ -162,8 +94,8 @@ unset($show_setup);
 
 if (defined('ZBX_DENY_GUI_ACCESS')) {
 	if (isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)) {
-		$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? ($_SERVER['HTTP_X_FORWARDED_FOR']) : ($_SERVER['REMOTE_ADDR']);
-		if (!str_in_array($user_ip,$ZBX_GUI_ACCESS_IP_RANGE)) {
+		$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+		if (!str_in_array($user_ip, $ZBX_GUI_ACCESS_IP_RANGE)) {
 			$DENY_GUI = true;
 		}
 	}
@@ -186,7 +118,7 @@ if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !i
 		error($config->error);
 	}
 
-	require_once('include/db.inc.php');
+	require_once dirname(__FILE__).'/db.inc.php';
 
 	if (!isset($show_warning)) {
 		$error = '';
@@ -203,7 +135,7 @@ if (file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !i
 			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 
 			// init LOCAL NODE ID
-			if ($local_node_data = DBfetch(DBselect('SELECT * FROM nodes WHERE nodetype=1 ORDER BY nodeid'))) {
+			if ($local_node_data = DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodetype=1 ORDER BY n.nodeid'))) {
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
 				$ZBX_LOCMASTERID = $local_node_data['masterid'];
 				$ZBX_NODES[$local_node_data['nodeid']] = $local_node_data;
@@ -224,7 +156,7 @@ else {
 		ob_end_clean();
 	}
 
-	require_once('include/db.inc.php');
+	require_once dirname(__FILE__).'/db.inc.php';
 
 	if (!defined('ZBX_PAGE_NO_AUTHORIZATION')) {
 		define('ZBX_PAGE_NO_AUTHORIZATION', true);
@@ -235,9 +167,6 @@ else {
 
 if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
-		require_once('include/locales/en_gb.inc.php');
-		process_locales();
-
 		include('index.php');
 		exit();
 	}
@@ -268,31 +197,31 @@ if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	else {
 		error('Your PHP has no gettext support. Zabbix translations are not available.');
 	}
+
 	// numeric Locale to default
 	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
 else {
 	CWebUser::$data = array(
 		'alias' => ZBX_GUEST_USER,
-		'userid'=> 0,
-		'lang'  => 'en_gb',
-		'type'  => '0',
-		'node'  => array(
-			'name'  => '- unknown -',
-			'nodeid'=> 0)
-		);
+		'userid' => 0,
+		'lang' => 'en_gb',
+		'type' => '0',
+		'node' => array(
+			'name' => '- unknown -',
+			'nodeid' => 0
+		)
+	);
 
 	$USER_DETAILS = CWebUser::$data;
 }
 
-require_once('include/locales/en_gb.inc.php');
-process_locales();
 set_zbx_locales();
 
 // init mb strings if it's available
 init_mbstrings();
 
-// Ajax - do not need warnings or Errors
+// ajax - do not need warnings or errors
 if ((isset($DENY_GUI) || isset($show_setup) || isset($show_warning)) && PAGE_TYPE_HTML <> detect_page_type()) {
 	header('Ajax-response: false');
 	exit();
@@ -300,44 +229,45 @@ if ((isset($DENY_GUI) || isset($show_setup) || isset($show_warning)) && PAGE_TYP
 
 if (isset($DENY_GUI)) {
 	unset($show_warning);
-	require_once('warning.php');
+	require_once dirname(__FILE__).'/../warning.php';
 }
 
 if (isset($show_setup)) {
 	unset($show_setup);
-	require_once('setup.php');
+	require_once dirname(__FILE__).'/../setup.php';
 }
 elseif (isset($show_warning)) {
 	unset($show_warning);
-	require_once('warning.php');
+	require_once dirname(__FILE__).'/../warning.php';
 }
 
 function access_deny() {
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/page_header.php';
 
 	if (CWebUser::$data['alias'] != ZBX_GUEST_USER) {
-		show_error_message(S_NO_PERMISSIONS);
+		show_error_message(_('No permissions to referred object or it does not exist!'));
 	}
 	else {
-		$req = new Curl($_SERVER['REQUEST_URI']);
-		$req->setArgument('sid', null);
+		$url = new CUrl($_SERVER['REQUEST_URI']);
+		$url->setArgument('sid', null);
+		$url = urlencode($url->toString());
 
-		$table = new CTable(null, 'warningTable');
-		$table->setAlign('center');
-		$table->setHeader(new CCol(_('You are not logged in.'), 'left'), 'header');
-		$table->addRow(new CCol(array(_('You cannot view this URL as a'), SPACE, bold(ZBX_GUEST_USER), '. ', _('You must login to view this page.'), BR(), _('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')), 'center'));
-
-		$url = urlencode($req->toString());
-		$footer = new CCol(
-			array(
-				new CButton('login', _('Login'), "javascript: document.location = 'index.php?request=$url';"),
-				new CButton('back', _('Cancel'), 'javascript: window.history.back();')
-			),
-			'left');
-		$table->setFooter($footer,'footer');
-		$table->show();
+		$warning = new CWarning(_('You are not logged in.'), array(
+			_('You cannot view this URL as a'),
+			SPACE,
+			bold(ZBX_GUEST_USER),
+			'. ',
+			_('You must login to view this page.'),
+			BR(),
+			_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+		));
+		$warning->setButtons(array(
+			new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'formlist'),
+			new CButton('back', _('Cancel'), 'javascript: window.history.back();', 'formlist')
+		));
+		$warning->show();
 	}
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/page_footer.php';
 }
 
 function detect_page_type($default = PAGE_TYPE_HTML) {
@@ -371,6 +301,7 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 
 function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
+
 	if (!defined('PAGE_HEADER_LOADED')) {
 		return null;
 	}
@@ -400,7 +331,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 					'color' => (!$bool) ? array('R' => 255, 'G' => 0, 'B' => 0) : array('R' => 34, 'G' => 51, 'B' => 68),
 					'font' => 2
 				));
-				$width = max($width, ImageFontWidth(2) * zbx_strlen($msg) + 1);
+				$width = max($width, imagefontwidth(2) * zbx_strlen($msg) + 1);
 				$height += imagefontheight(2) + 1;
 				break;
 			case PAGE_TYPE_XML:
@@ -420,7 +351,7 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 
 				if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
 					$msg_details = new CDiv(_('Details'), 'blacklink');
-					$msg_details->setAttribute('onclick', "javascript: ShowHide('msg_messages', IE?'block':'table');");
+					$msg_details->setAttribute('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
 					$msg_details->setAttribute('title', _('Maximize').'/'._('Minimize'));
 					array_unshift($row, new CCol($msg_details, 'clr'));
 				}
@@ -445,7 +376,8 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 					array_push($message, array(
 						'text' => $msg['message'],
 						'color' => array('R' => 155, 'G' => 155, 'B' => 55),
-						'font' => $msg_font));
+						'font' => $msg_font
+					));
 				}
 				$width = max($width, imagefontwidth($msg_font) * zbx_strlen($msg['message']) + 1);
 				$height += imagefontheight($msg_font) + 1;
@@ -460,13 +392,12 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 			$lst_error = new CList(null,'messages');
 			foreach ($ZBX_MESSAGES as $msg) {
 				$lst_error->addItem($msg['message'], $msg['type']);
-				$bool = ($bool && ('error' != zbx_strtolower($msg['type'])));
+				$bool = ($bool && 'error' != zbx_strtolower($msg['type']));
 			}
 			$msg_show = 6;
 			$msg_count = count($ZBX_MESSAGES);
 			if ($msg_count > $msg_show) {
-				$msg_count = $msg_show;
-				$msg_count = ($msg_count * 16);
+				$msg_count = $msg_show * 16;
 				$lst_error->setAttribute('style', 'height: '.$msg_count.'px;');
 			}
 			$tab = new CTable(null, ($bool ? 'msgok' : 'msgerr'));
@@ -517,6 +448,7 @@ function show_error_message($msg) {
 
 function info($msgs) {
 	global $ZBX_MESSAGES;
+
 	zbx_value2array($msgs);
 	if (is_null($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = array();
@@ -528,12 +460,12 @@ function info($msgs) {
 
 function error($msgs) {
 	global $ZBX_MESSAGES;
-	$msgs = zbx_toArray($msgs);
 
 	if (is_null($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = array();
 	}
 
+	$msgs = zbx_toArray($msgs);
 	foreach ($msgs as $msg) {
 		if (isset(CWebUser::$data['debug_mode']) && !is_object($msg) && !CWebUser::$data['debug_mode']) {
 			$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
@@ -544,6 +476,7 @@ function error($msgs) {
 
 function clear_messages($count = null) {
 	global $ZBX_MESSAGES;
+
 	$result = array();
 	if (!is_null($count)) {
 		while ($count-- > 0) {
@@ -558,9 +491,9 @@ function clear_messages($count = null) {
 }
 
 function fatal_error($msg) {
-	require_once('include/page_header.php');
+	require_once dirname(__FILE__).'/page_header.php';
 	show_error_message($msg);
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/page_footer.php';
 }
 
 function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {
@@ -582,9 +515,9 @@ function get_tree_by_parentid($parentid, &$tree, $parent_field, $level = 0) {
 
 	foreach ($tree_ids as $key => $id) {
 		$child = $tree[$id];
-		if (bccomp($child[$parent_field],$parentid) == 0) {
+		if (bccomp($child[$parent_field], $parentid) == 0) {
 			$result[$id] = $child;
-			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // ATTENTION RECURSION !!!
+			$childs = get_tree_by_parentid($id, $tree, $parent_field, $level); // attention recursion !!!
 			$result += $childs;
 		}
 	}
@@ -604,13 +537,12 @@ function parse_period($str) {
 			if (!isset($out[$i])) {
 				$out[$i] = array();
 			}
-			array_push($out[$i],
-				array(
-					'start_h'	=> $arr[3],
-					'start_m'	=> $arr[4],
-					'end_h'		=> $arr[5],
-					'end_m'		=> $arr[6]
-				));
+			array_push($out[$i], array(
+				'start_h' => $arr[3],
+				'start_m' => $arr[4],
+				'end_h' => $arr[5],
+				'end_m' => $arr[6]
+			));
 		}
 	}
 	return $out;
@@ -618,7 +550,25 @@ function parse_period($str) {
 
 function get_status() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-	$status = array();
+
+	$status = array(
+		'triggers_count' => 0,
+		'triggers_count_enabled' => 0,
+		'triggers_count_disabled' => 0,
+		'triggers_count_off' => 0,
+		'triggers_count_on' => 0,
+		'triggers_count_unknown' => 0,
+		'items_count' => 0,
+		'items_count_monitored' => 0,
+		'items_count_disabled' => 0,
+		'items_count_not_supported' => 0,
+		'hosts_count' => 0,
+		'hosts_count_monitored' => 0,
+		'hosts_count_not_monitored' => 0,
+		'hosts_count_template' => 0,
+		'users_online' => 0,
+		'qps_total' => 0
+	);
 
 	// server
 	$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
@@ -631,79 +581,94 @@ function get_status() {
 	}
 
 	// triggers
-	$sql = 'SELECT COUNT(DISTINCT t.triggerid) AS cnt'.
-			' FROM triggers t,functions f,items i,hosts h'.
-			' WHERE t.triggerid=f.triggerid'.
-				' AND f.itemid=i.itemid'.
-				' AND i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.hostid=h.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED;
-
-	$row = DBfetch(DBselect($sql));
-	$status['triggers_count'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED));
-	$status['triggers_count_enabled'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_DISABLED));
-	$status['triggers_count_disabled'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED.' AND t.value='.TRIGGER_VALUE_FALSE));
-	$status['triggers_count_off'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED.' AND t.value='.TRIGGER_VALUE_TRUE));
-	$status['triggers_count_on'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND t.status='.TRIGGER_STATUS_ENABLED.' AND t.value='.TRIGGER_VALUE_UNKNOWN));
-	$status['triggers_count_unknown'] = $row['cnt'];
+	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) as cnt,t.status,t.value'.
+			' FROM triggers t'.
+				' INNER JOIN functions f ON t.triggerid=f.triggerid'.
+				' INNER JOIN items i ON f.itemid=i.itemid'.
+				' INNER JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE i.status='.ITEM_STATUS_ACTIVE.
+				' AND h.status='.HOST_STATUS_MONITORED.
+			' GROUP BY t.status,t.value');
+	while ($dbTrigger = DBfetch($dbTriggers)) {
+		switch ($dbTrigger['status']) {
+			case TRIGGER_STATUS_ENABLED:
+				switch ($dbTrigger['value']) {
+					case TRIGGER_VALUE_FALSE:
+						$status['triggers_count_off'] = $dbTrigger['cnt'];
+						break;
+					case TRIGGER_VALUE_TRUE:
+						$status['triggers_count_on'] = $dbTrigger['cnt'];
+						break;
+					case TRIGGER_VALUE_UNKNOWN:
+						$status['triggers_count_unknown'] = $dbTrigger['cnt'];
+						break;
+				}
+				break;
+			case TRIGGER_STATUS_DISABLED:
+				$status['triggers_count_disabled'] += $dbTrigger['cnt'];
+				break;
+		}
+	}
+	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on']
+			+ $status['triggers_count_unknown'];
+	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
 
 	// items
-	$sql = 'SELECT COUNT(i.itemid) AS cnt'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED;
-
-	$row = DBfetch(DBselect($sql));
-	$status['items_count'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND i.status='.ITEM_STATUS_ACTIVE));
-	$status['items_count_monitored'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND i.status='.ITEM_STATUS_DISABLED));
-	$status['items_count_disabled'] = $row['cnt'];
-
-	$row = DBfetch(DBselect($sql.' AND i.status='.ITEM_STATUS_NOTSUPPORTED));
-	$status['items_count_not_supported'] = $row['cnt'];
+	$dbItems = DBselect('SELECT COUNT(*) as cnt,i.status'.
+			' FROM items i'.
+				' INNER JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND '.DBcondition('i.status', array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED)).
+			' GROUP BY i.status');
+	while ($dbItem = DBfetch($dbItems)) {
+		switch ($dbItem['status']) {
+			case ITEM_STATUS_ACTIVE:
+				$status['items_count_monitored'] = $dbItem['cnt'];
+				break;
+			case ITEM_STATUS_DISABLED:
+				$status['items_count_disabled'] = $dbItem['cnt'];
+				break;
+			case ITEM_STATUS_NOTSUPPORTED:
+				$status['items_count_not_supported'] = $dbItem['cnt'];
+				break;
+		}
+	}
+	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']
+			+ $status['items_count_not_supported'];
 
 	// hosts
-	$sql = 'SELECT COUNT(hostid) AS cnt'.
-			' FROM hosts'.
-			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
-
-	$row = DBfetch(DBselect($sql));
-	$status['hosts_count'] = $row['cnt'];
-
-	$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_MONITORED));
-	$status['hosts_count_monitored'] = $row['cnt'];
-
-	$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_NOT_MONITORED));
-	$status['hosts_count_not_monitored'] = $row['cnt'];
-
-	$row = DBfetch(DBselect('SELECT COUNT(hostid) as cnt FROM hosts WHERE status='.HOST_STATUS_TEMPLATE));
-	$status['hosts_count_template'] = $row['cnt'];
+	$dbHosts = DBselect('SELECT COUNT(*) as cnt,h.status'.
+			' FROM hosts h'.
+			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
+			' GROUP BY h.status');
+	while ($dbHost = DBfetch($dbHosts)) {
+		switch ($dbHost['status']) {
+			case HOST_STATUS_MONITORED:
+				$status['hosts_count_monitored'] = $dbHost['cnt'];
+				break;
+			case HOST_STATUS_NOT_MONITORED:
+				$status['hosts_count_not_monitored'] = $dbHost['cnt'];
+				break;
+			case HOST_STATUS_TEMPLATE:
+				$status['hosts_count_template'] = $dbHost['cnt'];
+				break;
+		}
+	}
+	$status['hosts_count'] = $status['hosts_count_monitored'] + $status['hosts_count_not_monitored']
+			+ $status['hosts_count_template'];
 
 	// users
-	$row = DBfetch(DBselect('SELECT COUNT(userid) as usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
+	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
 	$status['users_count'] = $row['usr_cnt'];
-
 	$status['users_online'] = 0;
 
-	$sql = 'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
-			' FROM sessions s'.
-			' WHERE '.DBin_node('s.userid').
-				' AND s.status='.ZBX_SESSION_ACTIVE.
-			' GROUP BY s.userid,s.status';
-	$db_sessions = DBselect($sql);
+	$db_sessions = DBselect(
+		'SELECT s.userid,s.status,MAX(s.lastaccess) AS lastaccess'.
+		' FROM sessions s'.
+		' WHERE '.DBin_node('s.userid').
+			' AND s.status='.ZBX_SESSION_ACTIVE.
+		' GROUP BY s.userid,s.status'
+	);
 	while ($session = DBfetch($db_sessions)) {
 		if (($session['lastaccess'] + ZBX_USER_ONLINE_TIME) >= time()) {
 			$status['users_online']++;
@@ -711,19 +676,22 @@ function get_status() {
 	}
 
 	// comments: !!! Don't forget sync code with C !!!
-	$sql = 'SELECT sum(1.0/i.delay) AS qps'.
-			' FROM items i,hosts h'.
-			' WHERE i.status='.ITEM_STATUS_ACTIVE.
-				' AND i.hostid=h.hostid'.
-				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND i.delay<>0';
-	$row = DBfetch(DBselect($sql));
+	$row = DBfetch(DBselect(
+		'SELECT SUM(1.0/i.delay) AS qps'.
+		' FROM items i,hosts h'.
+		' WHERE i.status='.ITEM_STATUS_ACTIVE.
+			' AND i.hostid=h.hostid'.
+			' AND h.status='.HOST_STATUS_MONITORED.
+			' AND i.delay<>0'
+	));
 	$status['qps_total'] = round($row['qps'], 2);
+
 	return $status;
 }
 
 function set_image_header($format = null) {
 	global $IMAGE_FORMAT_DEFAULT;
+
 	if (is_null($format)) {
 		$format = $IMAGE_FORMAT_DEFAULT;
 	}
@@ -738,7 +706,7 @@ function set_image_header($format = null) {
 		header('Content-type:  image/png');
 	}
 
-	header('Expires:  Mon, 17 Aug 1998 12:51:50 GMT');
+	header('Expires: Mon, 17 Aug 1998 12:51:50 GMT');
 }
 
 function imageOut(&$image, $format = null) {
@@ -770,25 +738,22 @@ function imageOut(&$image, $format = null) {
 
 	switch ($page['type']) {
 		case PAGE_TYPE_IMAGE:
-			print($imageSource);
+			echo $imageSource;
 			break;
 		case PAGE_TYPE_JSON:
 			$json = new CJSON();
-			print($json->encode(array('result' => $imageId)));
+			echo $json->encode(array('result' => $imageId));
 			break;
 		case PAGE_TYPE_TEXT:
 		default:
-			print($imageId);
+			echo $imageId;
 	}
 }
 
 function encode_log($data) {
-	if (defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding')) {
-		return mb_convert_encoding($data, _('UTF-8'), ZBX_LOG_ENCODING_DEFAULT);
-	}
-	else {
-		return $data;
-	}
+	return (defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding'))
+		? mb_convert_encoding($data, _('UTF-8'), ZBX_LOG_ENCODING_DEFAULT)
+		: $data;
 }
 
 // function used in defines, so can't move it to func.inc.php
@@ -803,4 +768,15 @@ function zbx_stripslashes($value) {
 	}
 	return $value;
 }
-?>
+
+function no_errors() {
+	global $ZBX_MESSAGES;
+
+	foreach ($ZBX_MESSAGES as $message) {
+		if ($message['type'] == 'error') {
+			return false;
+		}
+	}
+
+	return true;
+}

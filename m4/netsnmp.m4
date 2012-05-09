@@ -60,11 +60,11 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		_full_libnetsnmp_libs="`$_libnetsnmp_config --libs` -lcrypto"
 		for i in $_full_libnetsnmp_libs; do
 			case $i in
-				-l*)
-					SNMP_LDFLAGS="${SNMP_LDFLAGS} $i"
-			;;
 				-L*)
 					SNMP_LDFLAGS="${SNMP_LDFLAGS} $i"
+			;;
+				-l*)
+					SNMP_LIBS="${SNMP_LIBS} $i"
 			;;
 			esac
 		done
@@ -87,40 +87,38 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 			done
 		fi
 
-		_save_netsnmp_libs="${LIBS}"
-		_save_netsnmp_ldflags="${LDFLAGS}"
-		_save_netsnmp_cflags="${CFLAGS}"
-		LIBS="${LIBS} ${SNMP_LIBS}"
-		LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
-		CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
+		_save_netsnmp_cflags="$CFLAGS"
+		_save_netsnmp_ldflags="$LDFLAGS"
+		_save_netsnmp_libs="$LIBS"
+		CFLAGS="$CFLAGS $SNMP_CFLAGS"
+		LDFLAGS="$LDFLAGS $SNMP_LDFLAGS"
+		LIBS="$LIBS $SNMP_LIBS"
 
-		AC_CHECK_LIB(netsnmp, main, [
-			SNMP_LIBS="-lnetsnmp ${SNMP_LIBS}"
-			],[
-		       	AC_MSG_ERROR([Not found NET-SNMP library])
-			])
+		AC_CHECK_LIB(netsnmp, main, , [AC_MSG_ERROR([Not found NET-SNMP library])])
 
 		dnl Check for localname in struct snmp_session
 		AC_MSG_CHECKING(for localname in struct snmp_session)
-		AC_TRY_COMPILE([#include <net-snmp/net-snmp-config.h>
-		#include <net-snmp/net-snmp-includes.h>],
-		[struct snmp_session session;
-		session.localname = "";
+		AC_TRY_COMPILE([
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>],
+		[
+struct snmp_session session;
+session.localname = "";
 		],
-		AC_DEFINE(HAVE_SNMP_SESSION_LOCALNAME,1,[Define to 1 if 'session.localname' exist.])
+		AC_DEFINE(HAVE_SNMP_SESSION_LOCALNAME, 1, [Define to 1 if 'session.localname' exist.])
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 
-		LIBS="${_save_netsnmp_libs}"
-		LDFLAGS="${_save_netsnmp_ldflags}"
-		CFLAGS="${_save_netsnmp_cflags}"
-		unset _save_netsnmp_libs
-		unset _save_netsnmp_ldflags
+		CFLAGS="$_save_netsnmp_cflags"
+		LDFLAGS="$_save_netsnmp_ldflags"
+		LIBS="$_save_netsnmp_libs"
 		unset _save_netsnmp_cflags
+		unset _save_netsnmp_ldflags
+		unset _save_netsnmp_libs
 
-		AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NET-SNMP should be enabled.])
-		AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
-		AC_DEFINE([SNMP_NO_DEBUGGING],[],[Disabling debugging messages from NET-SNMP library])
+		AC_DEFINE(HAVE_NETSNMP, 1, [Define to 1 if NET-SNMP should be enabled.])
+		AC_DEFINE(HAVE_SNMP, 1, [Define to 1 if SNMP should be enabled.])
+		AC_DEFINE([SNMP_NO_DEBUGGING], [], [Disabling debugging messages from NET-SNMP library])
 
 		found_netsnmp="yes"
 	else

@@ -27,6 +27,9 @@
 #include "nodewatcher.h"
 #include "nodecomms.h"
 
+extern int	CONFIG_NODE_NOHISTORY;
+extern int	CONFIG_NODE_NOEVENTS;
+
 /******************************************************************************
  *                                                                            *
  * Function: get_history_lastid                                               *
@@ -234,20 +237,27 @@ static void	process_history_table_data(const ZBX_TABLE *table, int master_nodeid
 static void	process_history_tables(int master_nodeid, int nodeid)
 {
 	const char	*__function_name = "process_history_tables";
-	int		t, start;
+	const ZBX_TABLE	*t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	start = time(NULL);
-
-	for (t = 0; NULL != tables[t].table; t++)
+	for (t = tables; NULL != t->table; t++)
 	{
-		if (0 != (tables[t].flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
-			process_history_table_data(&tables[t], master_nodeid, nodeid);
-	}
+		if (0 == (t->flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC)))
+			continue;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "NODE %d: Spent %d seconds for node %d in process_history_tables",
-		CONFIG_NODEID, time(NULL) - start, nodeid);
+		/* Do not send history or events for current node if CONFIG_NODE_NO* is set */
+		if (CONFIG_NODEID == nodeid)
+		{
+			if (0 != CONFIG_NODE_NOHISTORY && 0 == strncmp(t->table, "history", 7))
+				continue;
+
+			if (0 != CONFIG_NODE_NOEVENTS && SUCCEED == str_in_list("events,acknowledges", t->table, ','))
+				continue;
+		}
+
+		process_history_table_data(t, master_nodeid, nodeid);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

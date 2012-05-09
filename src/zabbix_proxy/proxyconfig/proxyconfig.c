@@ -58,8 +58,7 @@ static void	process_configuration_sync()
 
 	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
 
-	if (FAIL == get_data_from_server(&sock,
-			ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
+	if (FAIL == get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &data))
 		goto exit;
 
 	if ('\0' != *data)

@@ -23,7 +23,6 @@ $this->data['cnf_wdgt']->addHeader(_('Regular expressions'));
 
 $regExpForm = new CForm();
 $regExpForm->setName('regularExpressionsForm');
-$regExpForm->addVar('config', get_request('config', 10));
 $regExpForm->addItem(BR());
 
 $goBox = new CComboBox('go');
@@ -33,13 +32,13 @@ $goOption->setAttribute('confirm', _('Delete selected regular expressions?'));
 
 $goBox->addItem($goOption);
 
-$goButton = new CButton('goButton', S_GO, 'if(chkbxRange.pageGoCount>0) submit();');
+$goButton = new CButton('goButton', _('Go'), 'if(chkbxRange.pageGoCount>0) submit();');
 $goButton->setAttribute('id', 'goButton');
 
 zbx_add_post_js('chkbxRange.pageGoName = "regexpids";');
 
-$regExpTable = new CTableInfo();
-$regExpTable->setHeader(array(new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm','all_regexps','regexpids');"), _('Name'), _('Expressions')));
+$regExpTable = new CTableInfo(_('No regular expressions defined.'));
+$regExpTable->setHeader(array(new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');"), _('Name'), _('Expressions')));
 $regExpTable->setFooter(new CCol(array($goBox, $goButton)));
 
 $expressions = array();
@@ -59,7 +58,7 @@ foreach($this->data['db_exps'] as $exp) {
 foreach($this->data['regexps'] as $regexpid => $regexp) {
 	$regExpTable->addRow(array(
 		new CCheckBox('regexpids['.$regexp['regexpid'].']', null, null, $regexp['regexpid']),
-		new CLink($regexp['name'], 'config.php?form=update'.url_param('config').'&regexpid='.$regexp['regexpid'].'#form'),
+		new CLink($regexp['name'], 'adm.regexps.php?form=update'.'&regexpid='.$regexp['regexpid']),
 		isset($expressions[$regexpid]) ? $expressions[$regexpid] : '-'
 	));
 }

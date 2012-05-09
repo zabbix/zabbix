@@ -33,7 +33,7 @@ class CJSONrpc{
 	private $_zbx2jsonErrors;
 	private $_jsonDecoded;
 
-	public function __construct($jsonData){
+	public function __construct($jsonData) {
 		$this->json = new CJSON();
 		$this->initErrors();
 
@@ -42,23 +42,23 @@ class CJSONrpc{
 		$this->_response = array();
 
 		$this->_jsonDecoded = $this->json->decode($jsonData, true);
-		if(!$this->_jsonDecoded){
+		if (!$this->_jsonDecoded) {
 			$this->jsonError(null, '-32700', null, null, true);
 			return;
 		}
 
-		if(!isset($this->_jsonDecoded['jsonrpc']))
+		if (!isset($this->_jsonDecoded['jsonrpc']))
 			$this->multicall = true;
 		else
 			$this->_jsonDecoded = array($this->_jsonDecoded);
 
 	}
 
-	public function execute($encoded=true){
-		foreach($this->_jsonDecoded as $call){
-			if(!isset($call['id'])) $call['id'] = null;  // Notification
+	public function execute($encoded=true) {
+		foreach ($this->_jsonDecoded as $call) {
+			if (!isset($call['id'])) $call['id'] = null;  // Notification
 
-			if(!$this->validate($call)) continue;
+			if (!$this->validate($call)) continue;
 
 			$params = isset($call['params']) ? $call['params'] : null;
 			$auth = isset($call['auth']) ? $call['auth'] : null;
@@ -67,27 +67,27 @@ class CJSONrpc{
 			$this->processResult($call, $result);
 		}
 
-		if(!$encoded) return $this->_response;
+		if (!$encoded) return $this->_response;
 		else return $this->json->encode($this->_response);
 	}
 
-	public function validate($call){
-		if(!isset($call['jsonrpc'])){
+	public function validate($call) {
+		if (!isset($call['jsonrpc'])) {
 			$this->jsonError($call['id'], '-32600', _('JSON-rpc version is not specified.'), null, true);
 			return false;
 		}
 
-		if($call['jsonrpc'] != self::VERSION){
-			$this->jsonError($call['id'], '-32600', _s('Expecting JSON-rpc version 2.0, "%s" is given.',$call['jsonrpc']), null, true);
+		if ($call['jsonrpc'] != self::VERSION) {
+			$this->jsonError($call['id'], '-32600', _s('Expecting JSON-rpc version 2.0, "%s" is given.', $call['jsonrpc']), null, true);
 			return false;
 		}
 
-		if(!isset($call['method'])){
+		if (!isset($call['method'])) {
 			$this->jsonError($call['id'], '-32600', _('JSON-rpc method is not defined.'));
 			return false;
 		}
 
-		if(isset($call['params']) && !is_array($call['params'])){
+		if (isset($call['params']) && !is_array($call['params'])) {
 			$this->jsonError($call['id'], '-32602', _('JSON-rpc params is not an Array.'));
 			return false;
 		}
@@ -95,10 +95,10 @@ class CJSONrpc{
 	return true;
 	}
 
-	public function processResult($call, $result){
-		if(isset($result['result'])){
+	public function processResult($call, $result) {
+		if (isset($result['result'])) {
 // Notifications MUST NOT be answered
-			if($call['id'] === null) return;
+			if ($call['id'] === null) return;
 
 			$formedResp = array(
 				'jsonrpc' => self::VERSION,
@@ -106,12 +106,12 @@ class CJSONrpc{
 				'id' => $call['id']
 			);
 
-			if($this->multicall)
+			if ($this->multicall)
 				$this->_response[] = $formedResp;
 			else
 				$this->_response = $formedResp;
 		}
-		else{
+		else {
 			$result['data'] = isset($result['data']) ? $result['data'] : null;
 			$result['debug'] = isset($result['debug']) ? $result['debug'] : null;
 			$errno = $this->_zbx2jsonErrors[$result['error']];
@@ -120,29 +120,29 @@ class CJSONrpc{
 		}
 	}
 
-	public function isError(){
+	public function isError() {
 		return $this->_error;
 	}
 
 // NOT Public methods
 //------------------------------------------------------------------------------
 
-	private function jsonError($id, $errno, $data=null, $debug=null, $force_err=false){
+	private function jsonError($id, $errno, $data=null, $debug=null, $force_err=false) {
 // Notifications MUST NOT be answered, but error MUST be generated on JSON parse error
-		if(is_null($id) && !$force_err) return;
+		if (is_null($id) && !$force_err) return;
 
 		$this->_error = true;
 
-		if(!isset($this->_error_list[$errno])){
-			$data = _s('JSON-rpc error generation failed. No such error "%s".',$errno);
+		if (!isset($this->_error_list[$errno])) {
+			$data = _s('JSON-rpc error generation failed. No such error "%s".', $errno);
 			$errno = '-32400';
 		}
 
 		$error = $this->_error_list[$errno];
 
-		if(!is_null($data))
+		if (!is_null($data))
 			$error['data'] = $data;
-		if(!is_null($debug))
+		if (!is_null($debug))
 			$error['debug'] = $debug;
 
 
@@ -152,13 +152,13 @@ class CJSONrpc{
 			'id' => $id
 		);
 
-		if($this->multicall)
+		if ($this->multicall)
 			$this->_response[] = $formed_error;
 		else
 			$this->_response = $formed_error;
 	}
 
-	private function initErrors(){
+	private function initErrors() {
 		$this->_error_list = array(
 			'-32700' => array(
 					'code' => -32700,

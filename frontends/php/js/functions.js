@@ -43,19 +43,20 @@ function call_ins_macro_menu(ev) {
 	show_popup_menu(ev,
 		[
 			[locale['S_INSERT_MACRO'], null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],
-			['TRIGGER.VALUE=0', 'javascript: set_macro(0);',
+			['TRIGGER.VALUE=0', function() { set_macro(0); },
 			null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
-			['TRIGGER.VALUE=1', 'javascript: set_macro(1);',
+			['TRIGGER.VALUE=1', function() { set_macro(1); },
 			null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
-			['TRIGGER.VALUE=2', 'javascript: set_macro(2);',
+			['TRIGGER.VALUE=2', function() { set_macro(2); },
 			null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
-			['TRIGGER.VALUE#0', 'javascript: set_macro(10);',
+			['TRIGGER.VALUE#0', function() { set_macro(10); },
 			null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
-			['TRIGGER.VALUE#1', 'javascript: set_macro(11);',
+			['TRIGGER.VALUE#1', function() { set_macro(11); },
 			null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
-			['TRIGGER.VALUE#2', 'javascript: set_macro(12);',
-			null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
+			['TRIGGER.VALUE#2', function() { set_macro(12); },
+			null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}]
 		], 150);
+
 	return false;
 }
 
@@ -75,7 +76,7 @@ function call_triggerlog_menu(evnt, id, name, menu_options) {
 			[
 				[name, null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],
 				[tname, "javascript: openWinCentered('tr_logform.php?sform=1&itemid=" + id + "', 'ServiceForm', 760, 540, 'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}]
-			],140);
+			], 140);
 	}
 	return false;
 }
@@ -204,7 +205,7 @@ function add_logexpr() {
 	tr.appendChild(td);
 
 	var url = document.createElement('a');
-	url.setAttribute('href', 'javascript: if (confirm("' + locale['S_DELETE_EXPRESSION_Q'] + '")) { remove_expression("logtr'+logexpr_count+'"); }');
+	url.setAttribute('href', 'javascript: if (confirm("' + locale['S_DELETE_EXPRESSION_Q'] + '")) { remove_expression("logtr' + logexpr_count + '"); }');
 	url.setAttribute(classattr, 'action');
 	url.appendChild(document.createTextNode(locale['S_DELETE']));
 
@@ -243,7 +244,7 @@ function remove_expression(expr_id) {
 function getIdFromNodeId(id) {
 	if (typeof(id) == 'string') {
 		var reg = /logtr([0-9])/i;
-		id = parseInt(id.replace(reg, "$1"));
+		id = parseInt(id.replace(reg, '$1'));
 	}
 	if (typeof(id) == 'number') {
 		return id;
@@ -307,8 +308,8 @@ function swapNodesNames(n1, n2) {
 	var id2 = n2.id;
 	if (is_string(id1) && is_string(id2)) {
 		var reg = /logtr([0-9])/i;
-		id1 = parseInt(id1.replace(reg, "$1"));
-		id2 = parseInt(id2.replace(reg, "$1"));
+		id1 = parseInt(id1.replace(reg, '$1'));
+		id2 = parseInt(id2.replace(reg, '$1'));
 	}
 
 	if (is_number(id1) && is_number(id2)) {
@@ -424,7 +425,7 @@ function add_keyword_or() {
 function getIdFromNodeKeyId(id) {
 	if (typeof(id) == 'string') {
 		var reg = /keytr([0-9])/i;
-		id = parseInt(id.replace(reg, "$1"));
+		id = parseInt(id.replace(reg, '$1'));
 	}
 	if (typeof(id) == 'number') {
 		return id;
@@ -497,9 +498,9 @@ function copy_expression(id) {
 }
 
 function set_macro(v) {
-	var expr_temp = document.getElementsByName('expr_temp')[0];
-	if (expr_temp.value.length > 0 && !confirm(locale['DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'])) {
-		return null;
+	var expr_temp = jQuery('#expr_temp');
+	if (expr_temp.val().length > 0 && !confirm(locale['DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q'])) {
+		return false;
 	}
 
 	var sign = '=';
@@ -507,14 +508,16 @@ function set_macro(v) {
 		v %= 10;
 		sign = '#';
 	}
-	expr_temp.value = '{TRIGGER.VALUE}' + sign + v;
+	expr_temp.val('{TRIGGER.VALUE}' + sign + v);
+
+	return true;
 }
 
 /*
  * Graph related stuff
  */
 var graphs = {
-		graphtype : 0,
+	graphtype : 0,
 
 	submit : function(obj) {
 		if (obj.name == 'graphtype') {
@@ -536,7 +539,7 @@ function call_menu(evnt, id, name) {
 				[name, null, null, {'outer' : ['pum_oheader'], 'inner' : ['pum_iheader']}],
 				['Add Service', "javascript: window.location.href = 'services.php?form=1&parentid=" + id + "&parentname=" + name + "';", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
 				['Edit Service', "javascript: window.location.href = 'services.php?form=1&serviceid=" + id + "';", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}],
-				['Delete Service', "javascript: if (Confirm('Delete selected services?')) { window.location.href = 'services.php?form=1&delete=1&serviceid=" + id + "'; }", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}]
+				['Delete Service', "javascript: if (Confirm('Delete selected services?')) { window.location.href = 'services.php?delete=1&serviceid=" + id + "'; }", null, {'outer' : ['pum_o_item'], 'inner' : ['pum_i_item']}]
 			],
 			120
 		);
@@ -549,61 +552,6 @@ function call_menu(evnt, id, name) {
 		);
 	}
 	return false;
-}
-
-function services_showsla(sla) {
-	try {
-		if (sla.checked) {
-			document.getElementById('SLA').style.display = 'none';
-		} else {
-			document.getElementById('SLA').style.display = (!IE || OP) ? 'table-row' : 'block';
-		}
-	} catch(e) {
-		alert(e);
-	}
-}
-
-function check_childs(form_name, chkMain, chkName) {
-	var frmForm = document.forms[form_name];
-	var value = frmForm.elements[chkName].checked;
-
-	for (var i=0; i < frmForm.length; i++) {
-		if (frmForm.elements[i].type != 'checkbox') {
-			continue;
-		}
-		if (frmForm.elements[i].disabled) {
-			continue;
-		}
-
-		var splt = frmForm.elements[i].name.split('[');
-		var name = splt[0];
-		var serviceid = splt[1];
-
-		if (chkName && chkName == name) {
-			continue;
-		}
-		if (chkMain && chkMain != name) {
-			continue;
-		}
-
-		if (frmForm.elements[i].name != chkMain + '[' + serviceid + '[serviceid]') {
-			continue;
-		}
-		frmForm.elements[i].checked = value;
-	}
-}
-
-function display_element(name) {
-	var elmnt = document.getElementById(name);
-	if (typeof(elmnt) == 'undefined') {
-		return null;
-	}
-	else if (elmnt.offsetWidth == 0 || elmnt.style.display == 'none') {
-		elmnt.style.display = IE ? 'block' : 'table-row';
-	}
-	else {
-		elmnt.style.display = 'none';
-	}
 }
 
 function cloneRow(elementid, count) {
@@ -621,12 +569,12 @@ function cloneRow(elementid, count) {
 	$(newEntry).descendants().each(function(e) {
 		e.removeAttribute('disabled');
 	});
-	newEntry.setAttribute('id', 'entry_'+cloneRow.count);
+	newEntry.setAttribute('id', 'entry_' + cloneRow.count);
 	newEntry.style.display = '';
 }
 
 // dashboard js menu
-function create_page_menu(e,id) {
+function create_page_menu(e, id) {
 	if (!e) {
 		e = window.event;
 	}
@@ -710,10 +658,9 @@ function create_mon_trigger_menu(e, args, items) {
 	show_popup_menu(e, tr_menu, 280);
 }
 
-// users form
 function testUserSound(idx) {
 	var sound = $(idx).options[$(idx).selectedIndex].value;
-	var repeat = $('messages[sounds.repeat]').options[$('messages[sounds.repeat]').selectedIndex].value;
+	var repeat = $('messages_sounds.repeat').options[$('messages_sounds.repeat').selectedIndex].value;
 
 	if (repeat == 1) {
 		AudioList.play(sound);
@@ -722,12 +669,12 @@ function testUserSound(idx) {
 		AudioList.loop(sound, {'seconds': repeat});
 	}
 	else {
-		AudioList.loop(sound, {'seconds': $('messages[timeout]').value});
+		AudioList.loop(sound, {'seconds': $('messages_timeout').value});
 	}
 }
 
 function removeObjectById(id) {
-	obj = document.getElementById(id);
+	var obj = document.getElementById(id);
 	if (obj != null && typeof(obj) == 'object') {
 		obj.parentNode.removeChild(obj);
 	}
@@ -737,12 +684,146 @@ function removeObjectById(id) {
  * Converts all HTML entities into the corresponding symbols.
  */
 jQuery.unescapeHtml = function(html) {
-	return jQuery("<div />").html(html).text();
+	return jQuery('<div />').html(html).text();
 }
 
 /**
  * Converts all HTML symbols into HTML entities.
  */
 jQuery.escapeHtml = function(html) {
-	return jQuery("<div />").text(html).html();
+	return jQuery('<div />').text(html).html();
+}
+
+function validateNumericBox(obj, allowempty, allownegative) {
+	if (obj != null) {
+		if (allowempty) {
+			if (obj.value.length == 0 || obj.value == null) {
+				obj.value = '';
+			}
+			else {
+				if (isNaN(parseInt(obj.value, 10))) {
+					obj.value = 0;
+				}
+				else {
+					obj.value = parseInt(obj.value, 10);
+				}
+			}
+		}
+		else {
+			if (isNaN(parseInt(obj.value, 10))) {
+				obj.value = 0;
+			}
+			else {
+				obj.value = parseInt(obj.value, 10);
+			}
+		}
+	}
+	if (!allownegative) {
+		if (obj.value < 0) {
+			obj.value = obj.value * -1;
+		}
+	}
+}
+
+/**
+ * Translates the given string.
+ *
+ * @param {String} str
+ */
+function t(str) {
+	return (!!locale[str]) ? locale[str] : str;
+}
+
+function getRandomId(remember) {
+	var id;
+
+	if (typeof this.generated === 'undefined') {
+		this.generated = [];
+	}
+	id = Math.floor(Math.random() * 10000000);
+
+	if (this.generated.indexOf(id) > -1) {
+		id = getRandomId(false); // attention recursion !!!
+	}
+
+	if (typeof remember === 'undefined') {
+		this.generated.push(id);
+	}
+	return id.toString();
+}
+
+/**
+ * Color palette, (implementation from PHP)
+ */
+var prevColor = {'color': 0, 'gradient': 0};
+
+function incrementNextColor() {
+	prevColor['color']++;
+	if (prevColor['color'] == 7) {
+		prevColor['color'] = 0;
+
+		prevColor['gradient']++;
+		if (prevColor['gradient'] == 3) {
+			prevColor['gradient'] = 0;
+		}
+	}
+}
+
+function getNextColor(paletteType) {
+	var palette, gradient, hexColor, r, g, b;
+
+	switch (paletteType) {
+		case 1:
+			palette = [200, 150, 255, 100, 50, 0];
+			break;
+		case 2:
+			palette = [100, 50, 200, 150, 250, 0];
+			break;
+		case 0:
+		default:
+			palette = [255, 200, 150, 100, 50, 0];
+			break;
+	}
+
+	gradient = palette[prevColor['gradient']];
+	r = (100 < gradient) ? 0 : 255;
+	g = r;
+	b = r;
+
+	switch (prevColor['color']) {
+		case 0:
+			r = gradient;
+			break;
+		case 1:
+			g = gradient;
+			break;
+		case 2:
+			b = gradient;
+			break;
+		case 3:
+			b = gradient;
+			r = b;
+			break;
+		case 4:
+			b = gradient;
+			g = b;
+			break;
+		case 5:
+			g = gradient;
+			r = g;
+			break;
+		case 6:
+			b = gradient;
+			g = b;
+			r = b;
+			break;
+	}
+
+	incrementNextColor();
+
+	hexColor = ('0' + parseInt(r, 10).toString(16)).slice(-2)
+				+ ('0' + parseInt(g, 10).toString(16)).slice(-2)
+				+ ('0' + parseInt(b, 10).toString(16)).slice(-2);
+
+	return hexColor.toUpperCase();
 }

@@ -19,25 +19,25 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageInventory extends CWebTest{
+class testPageInventory extends CWebTest {
 	// Returns all host inventories
-	public static function allInventory(){
+	public static function allInventory() {
 		return DBdata("select * from host_inventory order by hostid");
 	}
 
 	/**
 	* @dataProvider allInventory
 	*/
-	public function testPageInventory_SimpleTest($inventory){
+	public function testPageInventory_CheckLayout($inventory) {
 		$hostid = $inventory['hostid'];
 		$host = DBfetch(DBselect("select name from hosts where hostid=$hostid"));
 		$name = $host['name'];
 
 		$this->login('hostinventories.php');
 
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 
 		$this->assertTitle('Host inventories');
 		$this->ok('HOST INVENTORIES');
@@ -47,21 +47,23 @@ class testPageInventory extends CWebTest{
 		$this->ok(array('Host', 'Group', 'Name', 'Type', 'OS', 'Serial number A', 'Tag', 'MAC address A'));
 
 // Data
-		$this->ok(array(
-			$name,
-			$inventory['name'],
-			$inventory['type'],
-			$inventory['os'],
-			$inventory['serialno_a'],
-			$inventory['tag'],
-			$inventory['macaddress_a'],
-		));
+		$this->ok(
+			array(
+				$name,
+				$inventory['name'],
+				$inventory['type'],
+				$inventory['os'],
+				$inventory['serialno_a'],
+				$inventory['tag'],
+				$inventory['macaddress_a'],
+			)
+		);
 	}
 
 	/**
 	* @dataProvider allInventory
 	*/
-	public function testPageHostInventory_ViewInventory($inventory){
+	public function testPageHostInventory_ViewInventory($inventory) {
 		$this->login('hostinventories.php?hostid='.$inventory['hostid']);
 		$this->assertTitle('Host inventories');
 
@@ -75,7 +77,7 @@ class testPageInventory extends CWebTest{
 		$this->ok('HOST INVENTORIES');
 	}
 
-	public function testPageHostInventory_Sorting(){
+	public function testPageHostInventory_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}

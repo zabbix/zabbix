@@ -113,13 +113,19 @@ ALTER TABLE items ADD inventory_link integer WITH DEFAULT '0' NOT NULL
 /
 REORG TABLE items
 /
-UPDATE items SET templateid=NULL WHERE templateid=0
+ALTER TABLE items ADD lifetime varchar(64) WITH DEFAULT '30' NOT NULL
 /
-UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM items)
+REORG TABLE items
 /
-UPDATE items SET valuemapid=NULL WHERE valuemapid=0
+UPDATE items
+	SET templateid=NULL
+	WHERE templateid=0
+		OR templateid NOT IN (SELECT itemid FROM items)
 /
-UPDATE items SET valuemapid=NULL WHERE valuemapid IS NOT NULL AND valuemapid NOT IN (SELECT valuemapid from valuemaps)
+UPDATE items
+	SET valuemapid=NULL
+	WHERE valuemapid=0
+		OR valuemapid NOT IN (SELECT valuemapid from valuemaps)
 /
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps'
 /
@@ -257,6 +263,146 @@ DROP FUNCTION zbx_convert_simple_checks
 ROLLBACK
 /
 
+-- adding web.test.error[<web check>] items
+
+CREATE SEQUENCE items_seq AS bigint
+/
+CREATE SEQUENCE httptestitem_seq AS bigint
+/
+CREATE SEQUENCE items_applications_seq AS bigint
+/
+
+CREATE PROCEDURE zbx_add_web_test_error()
+LANGUAGE SQL
+BEGIN
+	DECLARE max_itemid bigint;
+	DECLARE max_httptestitemid bigint;
+	DECLARE max_itemappid bigint;
+
+	BEGIN
+		DECLARE m_done integer DEFAULT 0;
+		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
+		DECLARE m_cur CURSOR FOR (SELECT MAX(itemid) FROM items);
+		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+
+		OPEN m_cur;
+
+		m_loop: LOOP
+			FETCH m_cur INTO max_itemid;
+
+			IF m_done = 1 THEN
+				LEAVE m_loop;
+			END IF;
+		END LOOP m_loop;
+
+		CLOSE m_cur;
+	END;
+
+	BEGIN
+		DECLARE m_done integer DEFAULT 0;
+		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
+		DECLARE m_cur CURSOR FOR (SELECT MAX(httptestitemid) FROM httptestitem);
+		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+
+		OPEN m_cur;
+
+		m_loop: LOOP
+			FETCH m_cur INTO max_httptestitemid;
+
+			IF m_done = 1 THEN
+				LEAVE m_loop;
+			END IF;
+		END LOOP m_loop;
+
+		CLOSE m_cur;
+	END;
+
+	BEGIN
+		DECLARE m_done integer DEFAULT 0;
+		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
+		DECLARE m_cur CURSOR FOR (SELECT MAX(itemappid) FROM items_applications);
+		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+
+		OPEN m_cur;
+
+		m_loop: LOOP
+			FETCH m_cur INTO max_itemappid;
+
+			IF m_done = 1 THEN
+				LEAVE m_loop;
+			END IF;
+		END LOOP m_loop;
+
+		CLOSE m_cur;
+	END;
+
+	IF max_itemid IS NULL OR max_httptestitemid IS NULL OR max_itemappid IS NULL THEN
+		RETURN;
+	END IF;
+
+	BEGIN
+		DECLARE v_httptestid bigint;
+		DECLARE v_name varchar(64);
+		DECLARE v_delay integer;
+		DECLARE v_status integer;
+		DECLARE v_applicationid bigint;
+		DECLARE v_hostid bigint;
+		DECLARE v_itemid bigint;
+		DECLARE v_httptestitemid bigint;
+		DECLARE v_itemappid bigint;
+		DECLARE m_done integer DEFAULT 0;
+		DECLARE m_not_found CONDITION FOR SQLSTATE '02000';
+		DECLARE m_cur CURSOR FOR (
+			SELECT ht.httptestid, ht.name, ht.delay, ht.status, a.applicationid, a.hostid
+				FROM httptest ht,applications a
+				WHERE ht.applicationid = a.applicationid
+		);
+		DECLARE CONTINUE HANDLER FOR m_not_found SET m_done = 1;
+
+		OPEN m_cur;
+
+		m_loop: LOOP
+			FETCH m_cur INTO v_httptestid, v_name, v_delay, v_status, v_applicationid, v_hostid;
+
+			IF m_done = 1 THEN
+				LEAVE m_loop;
+			END IF;
+
+			SET v_itemid = max_itemid + (NEXTVAL FOR items_seq);
+			SET v_httptestitemid = max_httptestitemid + (NEXTVAL FOR httptestitem_seq);
+			SET v_itemappid = max_itemappid + (NEXTVAL FOR items_applications_seq);
+
+			INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+				VALUES (v_itemid, v_hostid, 9, 'Last error message of scenario ''$1''', 'web.test.error[' || v_name || ']', 1, '', v_delay, 30, 0, v_status);
+
+			INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+				VALUES (v_httptestitemid, v_httptestid, v_itemid, 4);
+
+			INSERT INTO items_applications (itemappid, applicationid, itemid)
+				VALUES (v_itemappid, v_applicationid, v_itemid);
+		END LOOP m_loop;
+
+		CLOSE m_cur;
+	END;
+END
+/
+
+CALL zbx_add_web_test_error
+/
+
+DROP PROCEDURE zbx_add_web_test_error
+/
+
+DROP SEQUENCE items_applications_seq
+/
+DROP SEQUENCE httptestitem_seq
+/
+DROP SEQUENCE items_seq
+/
+
+DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications')
+/
+
 ---- Patching table `hosts`
 
 ALTER TABLE hosts ALTER COLUMN hostid SET WITH DEFAULT NULL
@@ -335,9 +481,18 @@ ALTER TABLE hosts ADD name varchar(64) WITH DEFAULT '' NOT NULL
 /
 REORG TABLE hosts
 /
-UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0
+UPDATE hosts
+	SET proxy_hostid=NULL
+	WHERE proxy_hostid=0
+		OR NOT EXISTS (SELECT 1 FROM hosts h WHERE h.hostid=hosts.proxy_hostid)
 /
-UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0
+UPDATE hosts
+	SET maintenanceid=NULL,
+		maintenance_status=0,
+		maintenance_type=0,
+		maintenance_from=0
+	WHERE maintenanceid=0
+		OR NOT EXISTS (SELECT 1 FROM maintenances m WHERE m.maintenanceid=hosts.maintenanceid)
 /
 UPDATE hosts SET name=host WHERE status in (0,1,3)
 /

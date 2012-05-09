@@ -29,7 +29,7 @@
 //debugger;
 
 // Getting CSS style property
-function get_style(el,styleProp) {
+function get_style(el, styleProp) {
 	if (el.currentStyle) {
 		var y = el.currentStyle[styleProp];
 	}
@@ -88,17 +88,24 @@ function truncateText(text, len) {
 }
 
 function show_popup_menu(e, content, width){
+
+	if (A_MENUS[0] !== undefined) {
+		A_MENUS[0].collapse();
+	}
+
 	var cursor = get_cursor_position(e);
 	var tmp_width = 0;
 	var max_width = 0;
 	var menuTextLength = 35;
 
 	for (var i = 0; i < content.length; i++) {
-		content[i][0] = truncateText(content[i][0], menuTextLength);
-		tmp_width = get_real_text_width(content[i][0], i);
+		if (content[i].length) {
+			content[i][0] = truncateText(content[i][0], menuTextLength);
+			tmp_width = get_real_text_width(content[i][0], i);
 
-		if (max_width < tmp_width) {
-			max_width = tmp_width;
+			if (max_width < tmp_width) {
+				max_width = tmp_width;
+			}
 		}
 
 		// truncate sub menu text
@@ -141,15 +148,12 @@ function popup_menu (a_items, a_tpl, x, y) {
 		return null;
 	}
 	this.n_scroll_left = get_scroll_pos()[0];
-	this.n_scroll_top = get_scroll_pos()[1];
 
 	if (document.body.clientWidth) {
 		this.n_scr_width = document.body.clientWidth;
-		this.n_scr_height = document.body.clientHeight;
 	}
 	else {
 		this.n_scr_width = document.width;
-		this.n_scr_height = document.height;
 	}
 
 	// store items structure
@@ -310,10 +314,7 @@ function menu_onclick (n_id) {
 		o_item.e_oelement.className = o_item.getstyle(0, 0);
 		o_item.e_ielement.className = o_item.getstyle(1, 0);
 
-		// update status line
-		o_item.upstatus(7);
-
-		this.o_hidetimer = setTimeout('A_MENUS[' + this.n_id + '].collapse();', 100);
+		this.o_hidetimer = setTimeout('if (typeof(A_MENUS[' + this.n_id + ']) != "undefined") { A_MENUS['+ this.n_id +'].collapse(); }', 100);
 		return true;
 	}
 	return false;
@@ -327,9 +328,6 @@ function menu_onmouseout (n_id) {
 	o_item.e_oelement.className = o_item.getstyle(0, 0);
 	o_item.e_ielement.className = o_item.getstyle(1, 0);
 
-	// update status line
-	o_item.upstatus(7);
-
 	// run mouseover timer
 	this.o_hidetimer = setTimeout('if (typeof(A_MENUS[' + this.n_id + ']) != "undefined") { A_MENUS['+ this.n_id +'].collapse(); }', o_item.getprop('hide_delay'));
 }
@@ -342,9 +340,6 @@ function menu_onmouseover (n_id) {
 
 	// lookup new item's object
 	var o_item = this.a_index[n_id];
-
-	// update status line
-	o_item.upstatus();
 
 	// apply rollover
 	o_item.e_oelement.className = o_item.getstyle(0, 1);
@@ -404,7 +399,6 @@ function menu_item (o_parent, n_order) {
 	// assign methods
 	this.getprop  = mitem_getprop;
 	this.getstyle = mitem_getstyle;
-	this.upstatus = mitem_upstatus;
 
 	this.set_x_direction = mitem_set_x_direction;
 	this.get_x_direction = mitem_get_x_direction;
@@ -427,9 +421,7 @@ function menu_item (o_parent, n_order) {
 	}
 
 	if (!o_parent.n_y_direction && !n_order) {
-		//	always show menu in down direction.
-		var mi_direction = 1;
-		o_parent.set_y_direction(mi_direction);
+		o_parent.set_y_direction(jQuery(window).height() + jQuery(window).scrollTop() - o_parent.n_y - this.getprop('height') * o_parent.a_config.length < 0 ? -1 : 1);
 	}
 
 	// top
@@ -438,21 +430,30 @@ function menu_item (o_parent, n_order) {
 		: o_parent.n_y + this.getprop('block_top') * (o_parent == o_root ? o_parent.get_y_direction() : 1);
 
 	if (-1 == o_parent.get_y_direction() && !n_order) {
-		this.n_y -= this.getprop('height') * (o_parent.a_config.length - item_offset);
-	}
-
-	if (!is_null(this.a_config[1]) && (this.a_config[1].indexOf('javascript') == -1) && !(!is_null(this.a_config[2]) || this.a_config[2] == 'nosid')) {
-		var url = new Curl(this.a_config[1]);
-		this.a_config[1] = url.getUrl();
+		this.n_y = jQuery(window).height() + jQuery(window).scrollTop() - this.getprop('height') * (o_parent.a_config.length - item_offset);
 	}
 
 	// generate item's HMTL
 	var el = document.createElement('a');
-	el.setAttribute('id', 'e' + o_root.n_id + '_' + this.n_id + 'o');
-	el.setAttribute('href', this.a_config[1]);
+	var menuItemId = 'e' + o_root.n_id + '_' + this.n_id + 'o';
+	el.setAttribute('id', menuItemId);
 
-	if (this.a_config[2] && this.a_config[2]['tw']) {
-		el.setAttribute('target', this.a_config[2]['tw']);
+	// js callback action
+	if (jQuery.isFunction(this.a_config[1])) {
+		jQuery(el).click(this.a_config[1]);
+	}
+	// url action
+	else {
+		if (!is_null(this.a_config[1]) && (this.a_config[1].indexOf('javascript') == -1)
+				&& !(!is_null(this.a_config[2]) || this.a_config[2] == 'nosid')) {
+			var url = new Curl(this.a_config[1]);
+			this.a_config[1] = url.getUrl();
+		}
+
+		el.setAttribute('href', this.a_config[1]);
+		if (this.a_config[2] && this.a_config[2]['tw']) {
+			el.setAttribute('target', this.a_config[2]['tw']);
+		}
 	}
 
 	el.className = this.getstyle(0, 0);
@@ -577,16 +578,4 @@ function mitem_getstyle (n_pos, n_state) {
 			return a_oclass[n_currst];
 		}
 	}
-}
-
-// updates status bar message of the browser
-function mitem_upstatus (b_clear) {
-	window.setTimeout("window.status=unescape('" + (b_clear
-		? ''
-		: (this.a_config[2] && this.a_config[2]['sb']
-			? escape(this.a_config[2]['sb'])
-			: escape(this.a_config[0]) + (this.a_config[1]
-				? ' ('+ escape(this.a_config[1]) + ')'
-				: ''))) + "')", 10
-	);
 }

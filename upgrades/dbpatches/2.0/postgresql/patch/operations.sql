@@ -129,7 +129,7 @@ CREATE TABLE operations (
 	esc_step_to              integer         DEFAULT '1'               NOT NULL,
 	evaltype                 integer         DEFAULT '0'               NOT NULL,
 	PRIMARY KEY (operationid)
-) with OIDS;
+);
 CREATE INDEX operations_1 ON operations (actionid);
 ALTER TABLE ONLY operations ADD CONSTRAINT c_operations_1 FOREIGN KEY (actionid) REFERENCES actions (actionid) ON DELETE CASCADE;
 
@@ -140,7 +140,7 @@ CREATE TABLE opmessage (
 	message                  text            DEFAULT ''                NOT NULL,
 	mediatypeid              bigint                                    NULL,
 	PRIMARY KEY (operationid)
-) with OIDS;
+);
 ALTER TABLE ONLY opmessage ADD CONSTRAINT c_opmessage_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opmessage ADD CONSTRAINT c_opmessage_2 FOREIGN KEY (mediatypeid) REFERENCES media_type (mediatypeid);
 
@@ -149,7 +149,7 @@ CREATE TABLE opmessage_grp (
 	operationid              bigint                                    NOT NULL,
 	usrgrpid                 bigint                                    NOT NULL,
 	PRIMARY KEY (opmessage_grpid)
-) with OIDS;
+);
 CREATE UNIQUE INDEX opmessage_grp_1 ON opmessage_grp (operationid,usrgrpid);
 ALTER TABLE ONLY opmessage_grp ADD CONSTRAINT c_opmessage_grp_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opmessage_grp ADD CONSTRAINT c_opmessage_grp_2 FOREIGN KEY (usrgrpid) REFERENCES usrgrp (usrgrpid);
@@ -159,7 +159,7 @@ CREATE TABLE opmessage_usr (
 	operationid              bigint                                    NOT NULL,
 	userid                   bigint                                    NOT NULL,
 	PRIMARY KEY (opmessage_usrid)
-) with OIDS;
+);
 CREATE UNIQUE INDEX opmessage_usr_1 ON opmessage_usr (operationid,userid);
 ALTER TABLE ONLY opmessage_usr ADD CONSTRAINT c_opmessage_usr_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opmessage_usr ADD CONSTRAINT c_opmessage_usr_2 FOREIGN KEY (userid) REFERENCES users (userid);
@@ -177,7 +177,7 @@ CREATE TABLE opcommand (
 	privatekey               varchar(64)     DEFAULT ''                NOT NULL,
 	command                  text            DEFAULT ''                NOT NULL,
 	PRIMARY KEY (operationid)
-) with OIDS;
+);
 ALTER TABLE ONLY opcommand ADD CONSTRAINT c_opcommand_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opcommand ADD CONSTRAINT c_opcommand_2 FOREIGN KEY (scriptid) REFERENCES scripts (scriptid);
 
@@ -186,7 +186,7 @@ CREATE TABLE opcommand_hst (
 	operationid              bigint                                    NOT NULL,
 	hostid                   bigint                                    NULL,
 	PRIMARY KEY (opcommand_hstid)
-) with OIDS;
+);
 CREATE INDEX opcommand_hst_1 ON opcommand_hst (operationid);
 ALTER TABLE ONLY opcommand_hst ADD CONSTRAINT c_opcommand_hst_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opcommand_hst ADD CONSTRAINT c_opcommand_hst_2 FOREIGN KEY (hostid) REFERENCES hosts (hostid);
@@ -196,7 +196,7 @@ CREATE TABLE opcommand_grp (
 	operationid              bigint                                    NOT NULL,
 	groupid                  bigint                                    NOT NULL,
 	PRIMARY KEY (opcommand_grpid)
-) with OIDS;
+);
 CREATE INDEX opcommand_grp_1 ON opcommand_grp (operationid);
 ALTER TABLE ONLY opcommand_grp ADD CONSTRAINT c_opcommand_grp_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opcommand_grp ADD CONSTRAINT c_opcommand_grp_2 FOREIGN KEY (groupid) REFERENCES groups (groupid);
@@ -206,7 +206,7 @@ CREATE TABLE opgroup (
 	operationid              bigint                                    NOT NULL,
 	groupid                  bigint                                    NOT NULL,
 	PRIMARY KEY (opgroupid)
-) with OIDS;
+);
 CREATE UNIQUE INDEX opgroup_1 ON opgroup (operationid,groupid);
 ALTER TABLE ONLY opgroup ADD CONSTRAINT c_opgroup_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY opgroup ADD CONSTRAINT c_opgroup_2 FOREIGN KEY (groupid) REFERENCES groups (groupid);
@@ -216,7 +216,7 @@ CREATE TABLE optemplate (
 	operationid              bigint                                    NOT NULL,
 	templateid               bigint                                    NOT NULL,
 	PRIMARY KEY (optemplateid)
-) with OIDS;
+);
 CREATE UNIQUE INDEX optemplate_1 ON optemplate (operationid,templateid);
 ALTER TABLE ONLY optemplate ADD CONSTRAINT c_optemplate_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 ALTER TABLE ONLY optemplate ADD CONSTRAINT c_optemplate_2 FOREIGN KEY (templateid) REFERENCES hosts (hostid);
@@ -228,7 +228,7 @@ CREATE TABLE opconditions (
 	operator                 integer         DEFAULT '0'               NOT NULL,
 	value                    varchar(255)    DEFAULT ''                NOT NULL,
 	PRIMARY KEY (opconditionid)
-) with OIDS;
+);
 CREATE INDEX opconditions_1 ON opconditions (operationid);
 ALTER TABLE ONLY opconditions ADD CONSTRAINT c_opconditions_1 FOREIGN KEY (operationid) REFERENCES operations (operationid) ON DELETE CASCADE;
 

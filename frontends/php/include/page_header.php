@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/perm.inc.php');
+require_once dirname(__FILE__).'/config.inc.php';
+require_once dirname(__FILE__).'/perm.inc.php';
 
 if (!isset($page['type'])) {
 	$page['type'] = PAGE_TYPE_HTML;
@@ -32,9 +32,13 @@ if ($_REQUEST['fullscreen'] = get_request('fullscreen', 0)) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
 
-require_once('include/menu.inc.php');
+require_once dirname(__FILE__).'/menu.inc.php';
 
 zbx_define_menu_restrictions($page, $ZBX_MENU);
+
+if (!defined('ZBX_PAGE_NO_THEME')) {
+	define('ZBX_PAGE_NO_THEME', false);
+}
 
 // init CURRENT NODE ID
 init_nodes();
@@ -46,54 +50,69 @@ switch ($page['type']) {
 	case PAGE_TYPE_XML:
 		header('Content-Type: text/xml');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_JS:
 		header('Content-Type: application/javascript; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_JSON:
 		header('Content-Type: application/json');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_JSON_RPC:
 		header('Content-Type: application/json-rpc');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_JSON_RPC:
 		header('Content-Type: application/json-rpc');
-		if(!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if(!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_CSS:
 		header('Content-Type: text/css; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_TEXT:
 		header('Content-Type: text/plain; charset=UTF-8');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_TEXT_FILE:
 		header('Content-Type: text/plain; charset=UTF-8');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_CSV:
 		header('Content-Type: text/csv; charset=UTF-8');
 		header('Content-Disposition: attachment; filename="'.$page['file'].'"');
-		if (!defined('ZBX_PAGE_NO_MENU')) define('ZBX_PAGE_NO_MENU', 1);
+		if (!defined('ZBX_PAGE_NO_MENU')) {
+			define('ZBX_PAGE_NO_MENU', 1);
+		}
 		break;
 	case PAGE_TYPE_HTML:
 	default:
-		if (!isset($page['encoding'])) {
-			header('Content-Type: text/html; charset='.S_HTML_CHARSET);
-		}
-		else {
-			header('Content-Type: text/html; charset='.$page['encoding']);
-		}
+		header('Content-Type: text/html; charset=UTF-8');
 
 		// page title
 		$page_title = '';
@@ -101,12 +120,12 @@ switch ($page['type']) {
 			$page_title = $ZBX_SERVER_NAME.': ';
 		}
 		if (!isset($page['title'])) {
-			$page['title'] = 'S_ZABBIX';
+			$page['title'] = _('Zabbix');
 		}
 		$page_title = defined($page['title']) ? constant($page['title']) : $page['title'];
 		if (ZBX_DISTRIBUTED) {
-			if (isset($ZBX_VIEWED_NODES) && ($ZBX_VIEWED_NODES['selected'] == 0)) { // all selected
-				$page_title .= ' ('.S_ALL_NODES.') ';
+			if (isset($ZBX_VIEWED_NODES) && $ZBX_VIEWED_NODES['selected'] == 0) { // all selected
+				$page_title .= ' ('._('All nodes').') ';
 			}
 			elseif (!empty($ZBX_NODES)) {
 				$page_title .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
@@ -115,7 +134,7 @@ switch ($page['type']) {
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
 			$page_title .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
 		}
-	break;
+		break;
 }
 
 // construct menu
@@ -136,33 +155,23 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		<link rel="shortcut icon" href="images/general/zabbix.ico" />
 		<link rel="stylesheet" type="text/css" href="css.css" />
 <?php
-	$css = 'css_ob.css';
-	$bodyCSS = 'originalblue';
-	if (!empty($DB['DB'])) {
-		$config = select_config();
-
-		$css = getUserTheme(CWebUser::$data);
-		switch ($css) {
-			case 'css_od.css':
-				$bodyCSS = 'darkorange';
-				break;
-			case 'css_bb.css':
-				$bodyCSS = 'darkblue';
-				break;
-			default:
-				$bodyCSS = 'originalblue';
+	$css = ZBX_DEFAULT_THEME;
+	if (!ZBX_PAGE_NO_THEME) {
+		if (!empty($DB['DB'])) {
+			$config = select_config();
+			$css = getUserTheme(CWebUser::$data);
+			echo '<style type="text/css">'."\n".
+					'.disaster { background-color: #'.$config['severity_color_5'].' !important; }'."\n".
+					'.high { background-color: #'.$config['severity_color_4'].' !important; }'."\n".
+					'.average { background-color: #'.$config['severity_color_3'].' !important; }'."\n".
+					'.warning { background-color: #'.$config['severity_color_2'].' !important; }'."\n".
+					'.information { background-color: #'.$config['severity_color_1'].' !important; }'."\n".
+					'.not_classified { background-color: #'.$config['severity_color_0'].' !important; }'."\n".
+					'.trigger_unknown { background-color: #DBDBDB !important; }'."\n".
+				'</style>';
 		}
-		echo '<style type="text/css">'."\n".
-				'.disaster { background-color: #'.$config['severity_color_5'].' !important;}'."\n".
-				'.high { background-color: #'.$config['severity_color_4'].' !important;}'."\n".
-				'.average { background-color: #'.$config['severity_color_3'].' !important;}'."\n".
-				'.warning { background-color: #'.$config['severity_color_2'].' !important;}'."\n".
-				'.information { background-color: #'.$config['severity_color_1'].' !important;}'."\n".
-				'.not_classified { background-color: #'.$config['severity_color_0'].' !important;}'."\n".
-				'.trigger_unknown { background-color: #DBDBDB !important;}'."\n".
-			'</style>';
 	}
-	echo '<link rel="stylesheet" type="text/css" href="styles/'.$css.'" />'."\n";
+	echo '<link rel="stylesheet" type="text/css" href="styles/themes/'.$css.'/main.css" />'."\n";
 
 	if ($page['file'] == 'sysmap.php') {
 		echo '<link rel="stylesheet" type="text/css" href="imgstore.php?css=1&amp;output=css" />';
@@ -184,8 +193,13 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		echo '<script type="text/javascript" src="'.$path.'"></script>'."\n";
 	}
 ?>
+<script type="text/javascript">
+	if (jQuery(window).width() < 1024) {
+		document.write('<link rel="stylesheet" type="text/css" href="styles/handheld.css" />');
+	}
+</script>
 </head>
-<body class="<?php echo $bodyCSS; ?>" >
+<body class="<?php echo $css; ?>">
 <?php
 }
 
@@ -212,8 +226,6 @@ if (isset($_REQUEST['print'])) {
 }
 
 if (!defined('ZBX_PAGE_NO_MENU')) {
-	COpt::compare_files_with_menu($ZBX_MENU);
-
 	$help = new CLink(_('Help'), 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
 	$help->setTarget('_blank');
 	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
@@ -230,15 +242,14 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'), '|');
 
 		if (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-			$debug = new CLink(S_DEBUG, '#debug', 'small_font', null, 'nosid');
-			$d_script = " if (!isset('state', this)) this.state = 'none';".
-						" if (this.state == 'none') this.state = 'block';".
-						" else this.state = 'none';".
+			$debug = new CLink(_('Debug'), '#debug', 'small_font', null, 'nosid');
+			$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
+						" if (this.state == 'none') { this.state = 'block'; }".
+						" else { this.state = 'none'; }".
 						" showHideByName('zbx_gebug_info', this.state);";
 			$debug->setAttribute('onclick', 'javascript: '.$d_script);
 			array_push($page_header_r_col, $debug, '|');
 		}
-
 		array_push($page_header_r_col, new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
 	}
 	else {
@@ -270,38 +281,42 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 		$available_nodes = get_accessible_nodes_by_user(CWebUser::$data, PERM_READ_LIST, PERM_RES_DATA_ARRAY);
 		$available_nodes = get_tree_by_parentid($ZBX_LOCALNODEID, $available_nodes, 'masterid'); // remove parent nodes
+		if (empty($available_nodes[0])) {
+			unset($available_nodes[0]);
+		}
 
 		if (!empty($available_nodes)) {
-
-			$node_form = new CForm();
-			$node_form->setMethod('get');
+			$node_form = new CForm('get');
 			$node_form->setAttribute('id', 'node_form');
 
 			// create ComboBox with selected nodes
-			$combo_node_list = null;
+			$nodesComboBox = null;
 			if (count($ZBX_VIEWED_NODES['nodes']) > 0) {
-				$combo_node_list = new CComboBox('switch_node', $ZBX_VIEWED_NODES['selected'], 'submit()');
+				$nodesComboBox = new CComboBox('switch_node', $ZBX_VIEWED_NODES['selected'], 'submit()');
 
 				foreach ($ZBX_VIEWED_NODES['nodes'] as $nodeid => $nodedata) {
-					$combo_node_list->addItem($nodeid, $nodedata['name']);
+					$nodesComboBox->addItem($nodeid, $nodedata['name']);
 				}
 			}
 
-			$jscript = 'javascript : '.
+			$jscript = 'javascript: '.
 				" var pos = getPosition('button_show_tree');".
-				" ShowHide('div_node_tree', 'table');".
+				" showHide('div_node_tree', 'table');".
 				' pos.top += 20;'.
-				" \$('div_node_tree').setStyle({top: pos.top+'px'});";
-			$button_show_tree = new CButton('show_node_tree', S_SELECT_NODES, $jscript);
+				" \$('div_node_tree').setStyle({top: pos.top + 'px'});";
+			$button_show_tree = new CButton('show_node_tree', _('Select Nodes'), $jscript);
 			$button_show_tree->setAttribute('id', 'button_show_tree');
 
 			// create node tree
-			$combo_check_all = new CCheckbox('check_all_nodes', null, "javascript : check_all('node_form', this.checked);");
-
 			$node_tree = array();
-			$node_tree[0] = array('id' => 0, 'caption' => _('All'), 'combo_select_node' => $combo_check_all, 'parentid' => 0); // root
+			$node_tree[0] = array(
+				'id' => 0,
+				'caption' => _('All'),
+				'combo_select_node' => new CCheckbox('check_all_nodes', null, "javascript : check_all('node_form', this.checked);"),
+				'parentid' => 0 // master
+			);
 
-			foreach ($available_nodes as $num => $node) {
+			foreach ($available_nodes as $node) {
 				$checked = isset($ZBX_VIEWED_NODES['nodeids'][$node['nodeid']]);
 				$combo_select_node = new CCheckbox('selected_nodes['.$node['nodeid'].']', $checked, null, $node['nodeid']);
 				$combo_select_node->setAttribute('style', 'margin: 1px 4px 2px 4px;');
@@ -323,17 +338,16 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 			$div_node_tree = new CDiv();
 			$div_node_tree->addItem($node_tree->getHTML());
-			$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display:'none'});"));
-
+			$div_node_tree->addItem(new CSubmit('select_nodes', _('Select'), "\$('div_node_tree').setStyle({display: 'none'});"));
 			$div_node_tree->setAttribute('id', 'div_node_tree');
 			$div_node_tree->addStyle('display: none');
 
-			if (!is_null($combo_node_list)) {
-				$node_form->addItem(array(new CSpan(_('Current node').SPACE, 'textcolorstyles'), $combo_node_list));
+			if (!is_null($nodesComboBox)) {
+				$node_form->addItem(array(new CSpan(_('Current node').SPACE, 'textcolorstyles'), $nodesComboBox));
 			}
 			$node_form->addItem($button_show_tree);
 			$node_form->addItem($div_node_tree);
-			unset($combo_node_list);
+			unset($nodesComboBox);
 		}
 	}
 
@@ -372,6 +386,8 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			if (empty($sub_page['menu_text'])) {
 				$sub_page['menu_text'] = SPACE;
 			}
+
+			$sub_page['menu_url'] .= '?ddreset=1';
 
 			$sub_menu_item = new CLink($sub_page['menu_text'], $sub_page['menu_url'], $sub_page['class'].' nowrap');
 			if ($sub_page['selected']) {
@@ -418,14 +434,10 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 // create history
 if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 	$table = new CTable(null, 'history left');
-	$table->setCellSpacing(0);
-	$table->setCellPadding(0);
-
-	$history = get_user_history();
-	$tr = new CRow(new CCol(_('History').':', 'caption'));
-	$tr->addItem($history);
-
-	$table->addRow($tr);
+	$table->addRow(new CRow(array(
+		new CCol(_('History').':', 'caption'),
+		get_user_history()
+	)));
 	$table->show();
 }
 elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
@@ -443,18 +455,19 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	zbx_add_post_js('var msglistid = initMessages({});');
 }
 
-if ($failed_attempt = CProfile::get('web.login.attempt.failed', 0)) {
+// if a user logs in after several unsuccessful attempts, display a warning
+if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	$attempip = CProfile::get('web.login.attempt.ip', '');
 	$attempdate = CProfile::get('web.login.attempt.clock', 0);
 
-	$error_msg = array(
-		new CSpan($failed_attempt, 'bold'),
-		_(' failed login attempts logged. Last failed attempt was from '),
-		new CSpan($attempip, 'bold'),
-		_(' on '),
-		new CSpan(zbx_date2str(_('d.m.Y H:i'), $attempdate), 'bold'),
+	$error_msg = _n('%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s.',
+			'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s.',
+			$failedAttempts,
+			$attempip,
+			zbx_date2str(_('d M Y'), $attempdate),
+			zbx_date2str(_('H:i'), $attempdate)
 	);
-	error(new CSpan($error_msg));
+	error($error_msg);
 
 	CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
 }

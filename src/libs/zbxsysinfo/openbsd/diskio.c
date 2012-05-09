@@ -131,11 +131,11 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	const MODE_FUNCTION	fl[] =
 	{
 		{"bytes",	VFS_DEV_WRITE_BYTES},
 		{"operations",	VFS_DEV_WRITE_OPERATIONS},
-		{0,		0}
+		{NULL,		0}
 	};
 
 	char	devname[MAX_STRING_LEN];
@@ -168,11 +168,11 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	const MODE_FUNCTION	fl[] =
 	{
 		{"bytes",	VFS_DEV_READ_BYTES},
 		{"operations",	VFS_DEV_READ_OPERATIONS},
-		{0,		0}
+		{NULL,		0}
 	};
 
 	char	devname[MAX_STRING_LEN];
@@ -189,7 +189,7 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	if (*devname == '\0')
 		zbx_snprintf(devname, sizeof(devname), "all");
 
-	if (0 != get_param(param, 2, mode, sizeof(mode)) != 0)
+	if (0 != get_param(param, 2, mode, sizeof(mode)))
 		*mode = '\0';
 
 	/* default parameter */

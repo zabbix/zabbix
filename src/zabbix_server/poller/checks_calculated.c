@@ -93,14 +93,14 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp,
 	size_t		exp_alloc = 128, exp_offset = 0;
 	int		functionid, ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params_orig);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
 
 	assert(dc_item);
 	assert(exp);
 
 	exp->exp = zbx_malloc(exp->exp, exp_alloc);
 
-	for (e = dc_item->params_orig; '\0' != *e; e++)
+	for (e = dc_item->params; '\0' != *e; e++)
 	{
 		if (NULL != strchr(" \t\r\n", *e))
 			continue;
@@ -152,7 +152,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 	DB_ROW		db_row;
 	DB_ITEM		item;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, exp->exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == exp->functions_num)
 		return ret;
@@ -160,7 +160,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 	for (i = 0; i < exp->functions_num; i++)
 	{
 		f = &exp->functions[i];
-		
+
 		buf = get_param_dyn(f->params, 1);	/* for first parameter result is not NULL */
 
 		if (SUCCEED != parse_host_key(buf, &f->host, &f->key))
@@ -233,7 +233,7 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp,
 
 			if (0 != strcmp(f->key, item.key))
 				continue;
-					
+
 			if (0 != strcmp(f->host, item.host_name))
 				continue;
 
@@ -292,7 +292,7 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	double		value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' expression:'%s'", __function_name,
-			dc_item->key_orig, dc_item->params_orig);
+			dc_item->key_orig, dc_item->params);
 
 	memset(&exp, 0, sizeof(exp));
 
@@ -322,6 +322,6 @@ clean:
 	free_expression(&exp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-			
+
 	return ret;
 }

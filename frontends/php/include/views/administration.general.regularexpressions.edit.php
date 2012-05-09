@@ -24,7 +24,6 @@ $regExpForm = new CForm();
 $regExpForm->setName('regularExpressionsForm');
 $regExpForm->addVar('form', $this->data['form']);
 $regExpForm->addVar('form_refresh', $this->data['form_refresh']);
-$regExpForm->addVar('config', get_request('config', 10));
 $regExpForm->addVar('regexpid', get_request('regexpid'));
 
 $regExpLeftTable = new CTable();

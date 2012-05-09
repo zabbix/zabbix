@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once('include/config.inc.php');
-require_once('include/blocks.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Dashboard');
 $page['file'] = 'dashboard.php';
@@ -27,7 +27,7 @@ $page['hist_arg'] = array();
 $page['scripts'] = array('class.pmaster.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
@@ -43,9 +43,8 @@ $fields = array(
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
 	'favcnt' =>		array(T_ZBX_INT, O_OPT,	null,	null,			null),
 	'pmasterid' =>	array(T_ZBX_STR, O_OPT,	P_SYS,	null,			null),
-	// actions
-	'action' =>		array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"), null),
-	'state' =>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({action}) && ("flop"=={action})'),
+	'favaction' =>	array(T_ZBX_STR, O_OPT, P_ACT, 	IN("'add','remove','refresh','flop'"), null),
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favaction})&&("flop"=={favaction})'),
 );
 check_fields($fields);
 
@@ -89,10 +88,10 @@ if (isset($_REQUEST['favobj'])) {
 	$_REQUEST['pmasterid'] = get_request('pmasterid', 'mainpage');
 
 	if ($_REQUEST['favobj'] == 'hat') {
-		if ($_REQUEST['action'] == 'flop') {
-			CProfile::update('web.dashboard.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+		if ($_REQUEST['favaction'] == 'flop') {
+			CProfile::update('web.dashboard.hats.'.$_REQUEST['favref'].'.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
-		elseif ($_REQUEST['action'] == 'refresh') {
+		elseif ($_REQUEST['favaction'] == 'refresh') {
 			switch ($_REQUEST['favref']) {
 				case 'hat_syssum':
 					$syssum = make_system_status($dashconf);
@@ -122,7 +121,7 @@ if (isset($_REQUEST['favobj'])) {
 		}
 	}
 
-	if ('set_rf_rate' == $_REQUEST['favobj']) {
+	if ($_REQUEST['favobj'] == 'set_rf_rate') {
 		if (str_in_array($_REQUEST['favref'], array('hat_syssum', 'hat_stszbx', 'hat_lastiss', 'hat_webovr', 'hat_dscvry', 'hat_hoststat'))) {
 			CProfile::update('web.dashboard.rf_rate.'.$_REQUEST['favref'], $_REQUEST['favcnt'], PROFILE_TYPE_INT);
 			$_REQUEST['favcnt'] = CProfile::get('web.dashboard.rf_rate.'.$_REQUEST['favref'], 60);
@@ -141,18 +140,18 @@ if (isset($_REQUEST['favobj'])) {
 
 	if (str_in_array($_REQUEST['favobj'], array('itemid', 'graphid'))) {
 		$result = false;
-		if ($_REQUEST['action'] == 'add') {
+		if ($_REQUEST['favaction'] == 'add') {
 			zbx_value2array($_REQUEST['favid']);
 
 			foreach ($_REQUEST['favid'] as $sourceid) {
 				$result = add2favorites('web.favorite.graphids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
-		elseif ($_REQUEST['action'] == 'remove') {
+		elseif ($_REQUEST['favaction'] == 'remove') {
 			$result = rm4favorites('web.favorite.graphids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
-		if (PAGE_TYPE_JS == $page['type'] && $result) {
+		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			$innerHTML = make_favorite_graphs();
 			$innerHTML = $innerHTML->toString();
 			echo '$("hat_favgrph").update('.zbx_jsvalue($innerHTML).');';
@@ -165,17 +164,17 @@ if (isset($_REQUEST['favobj'])) {
 
 	if ($_REQUEST['favobj'] == 'sysmapid') {
 		$result = false;
-		if ($_REQUEST['action'] == 'add') {
+		if ($_REQUEST['favaction'] == 'add') {
 			zbx_value2array($_REQUEST['favid']);
 			foreach ($_REQUEST['favid'] as $sourceid) {
 				$result = add2favorites('web.favorite.sysmapids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
-		elseif ($_REQUEST['action'] == 'remove') {
+		elseif ($_REQUEST['favaction'] == 'remove') {
 			$result = rm4favorites('web.favorite.sysmapids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
-		if (PAGE_TYPE_JS == $page['type'] && $result) {
+		if ($page['type'] == PAGE_TYPE_JS&& $result) {
 			$innerHTML = make_favorite_maps();
 			$innerHTML = $innerHTML->toString();
 			echo '$("hat_favmap").update('.zbx_jsvalue($innerHTML).');';
@@ -188,17 +187,17 @@ if (isset($_REQUEST['favobj'])) {
 
 	if (str_in_array($_REQUEST['favobj'], array('screenid', 'slideshowid'))) {
 		$result = false;
-		if ($_REQUEST['action'] == 'add') {
+		if ($_REQUEST['favaction'] == 'add') {
 			zbx_value2array($_REQUEST['favid']);
 			foreach ($_REQUEST['favid'] as $sourceid) {
 				$result = add2favorites('web.favorite.screenids', $sourceid, $_REQUEST['favobj']);
 			}
 		}
-		elseif ('remove' == $_REQUEST['action']) {
+		elseif ($_REQUEST['favaction'] == 'remove') {
 			$result = rm4favorites('web.favorite.screenids', $_REQUEST['favid'], $_REQUEST['favobj']);
 		}
 
-		if (PAGE_TYPE_JS == $page['type'] && $result) {
+		if ($page['type'] == PAGE_TYPE_JS && $result) {
 			$innerHTML = make_favorite_screens();
 			$innerHTML = $innerHTML->toString();
 			echo '$("hat_favscr").update('.zbx_jsvalue($innerHTML).');';
@@ -210,16 +209,16 @@ if (isset($_REQUEST['favobj'])) {
 	}
 }
 
-if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
-	require_once('include/page_footer.php');
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
+	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
 
 // js templates
-require_once('include/views/js/general.script.confirm.js.php');
+require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 /*
- * Dsiplay
+ * Display
  */
 $dashboardWidget = new CWidget('dashboard_wdgt');
 $dashboardWidget->setClass('header');
@@ -229,6 +228,7 @@ $dashboardWidget->addHeader(_('PERSONAL DASHBOARD'), array(
 		$dashconf['filterEnable'] ? 'iconconfig_hl' : 'iconconfig',
 		"document.location = 'dashconf.php';"
 	),
+	SPACE,
 	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
 );
 
@@ -278,9 +278,9 @@ $leftColumn[] = $fav_maps;
 $refresh_tab = array(
 	array('id' => 'hat_syssum', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_syssum', 120)),
 	array('id' => 'hat_stszbx', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_stszbx', 120)),
-	array('id' => 'hat_lastiss', 'frequency'  => CProfile::get('web.dashboard.rf_rate.hat_lastiss', 60)),
-	array('id' => 'hat_webovr', 'frequency'  => CProfile::get('web.dashboard.rf_rate.hat_webovr', 60)),
-	array('id' => 'hat_hoststat', 'frequency'  => CProfile::get('web.dashboard.rf_rate.hat_hoststat', 60))
+	array('id' => 'hat_lastiss', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_lastiss', 60)),
+	array('id' => 'hat_webovr', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_webovr', 60)),
+	array('id' => 'hat_hoststat', 'frequency' => CProfile::get('web.dashboard.rf_rate.hat_hoststat', 60))
 );
 
 /*
@@ -314,7 +314,7 @@ $rightColumn[] = $hoststat;
 // last issues
 $refresh_menu = get_icon('menu', array('menu' => 'hat_lastiss'));
 $lastiss = new CUIWidget('hat_lastiss', new CSpan(_('Loading...'), 'textcolorstyles'), CProfile::get('web.dashboard.hats.hat_lastiss.state', 1));
-$lastiss->setHeader(_s('Last %d issues', DEFAULT_LATEST_ISSUES_CNT), array($refresh_menu));
+$lastiss->setHeader(_n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT), array($refresh_menu));
 $lastiss->setFooter(new CDiv(SPACE, 'textwhite', 'hat_lastiss_footer'));
 $rightColumn[] = $lastiss;
 
@@ -345,7 +345,7 @@ $dashboardWidget->addItem($dashboardTable);
 $dashboardWidget->show();
 
 // activating blinking
-zbx_add_post_js('jqBlink.init();');
+zbx_add_post_js('jqBlink.blink();');
 ?>
 <script type="text/javascript">
 	//<!--<![CDATA[
@@ -367,7 +367,7 @@ zbx_add_post_js('jqBlink.init();');
 			var params = {
 				'favobj': list.object,
 				'favid[]': favid,
-				'action': 'add'
+				'favaction': 'add'
 			}
 			send_params(params);
 		}
@@ -375,5 +375,5 @@ zbx_add_post_js('jqBlink.init();');
 	//]]> -->
 </script>
 <?php
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

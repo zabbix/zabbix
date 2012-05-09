@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
 $maintenanceWidget = new CWidget();
 
 // create new maintenance button
@@ -31,17 +30,15 @@ $maintenanceWidget->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'), $cr
 // header
 $filterForm = new CForm('get');
 $filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
 $maintenanceWidget->addHeader(_('Maintenance periods'), $filterForm);
-$maintenanceWidget->addHeader($numRows);
+$maintenanceWidget->addHeaderRowNumber();
 
 // create form
 $maintenanceForm = new CForm();
 $maintenanceForm->setName('maintenanceForm');
 
 // create table
-$maintenanceTable = new CTableInfo(_('No maintenance defined'));
+$maintenanceTable = new CTableInfo(_('No maintenance defined.'));
 $maintenanceTable->setHeader(array(
 	new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');"),
 	make_sorting_header(_('Name'), 'name'),
@@ -55,13 +52,13 @@ foreach ($this->data['maintenances'] as $maintenance) {
 
 	switch ($maintenance['status']) {
 		case MAINTENANCE_STATUS_EXPIRED:
-			$maintenanceStatus = new CSpan(_('Expired'), 'red');
+			$maintenanceStatus = new CSpan(_x('Expired', 'maintenance status'), 'red');
 			break;
 		case MAINTENANCE_STATUS_APPROACH:
-			$maintenanceStatus = new CSpan(_('Approaching'), 'blue');
+			$maintenanceStatus = new CSpan(_x('Approaching', 'maintenance status'), 'blue');
 			break;
 		case MAINTENANCE_STATUS_ACTIVE:
-			$maintenanceStatus = new CSpan(_('Active'), 'green');
+			$maintenanceStatus = new CSpan(_x('Active', 'maintenance status'), 'green');
 			break;
 	}
 
@@ -81,12 +78,12 @@ $goOption->setAttribute('confirm', _('Delete selected maintenance periods?'));
 $goComboBox->addItem($goOption);
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "maintenanceids";');
 
 // append table to form
 $maintenanceForm->addItem(array($this->data['paging'], $maintenanceTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
 
 // append form to widget
 $maintenanceWidget->addItem($maintenanceForm);
-
 return $maintenanceWidget;
 ?>

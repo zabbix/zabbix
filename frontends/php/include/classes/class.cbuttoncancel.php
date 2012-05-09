@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CButtonCancel extends CButton {
+
 	public function __construct($vars = null, $action = null, $class = null) {
 		parent::__construct('cancel', _('Cancel'), $action, $class);
 		if (is_null($action)) {
@@ -29,7 +31,7 @@ class CButtonCancel extends CButton {
 
 	public function setVars($value = null) {
 		$url = '?cancel=1';
-		if (!is_null($value)) {
+		if (!empty($value)) {
 			$url .= $value;
 		}
 		$uri = new Curl($url);

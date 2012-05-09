@@ -19,37 +19,36 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/services.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['file'] = 'chart5.php';
 $page['type'] = PAGE_TYPE_IMAGE;
 
 include_once('include/page_header.php');
-?>
-<?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'serviceid' => array(T_ZBX_INT, O_MAND,P_SYS, DB_ID, null)
+	'serviceid' => array(T_ZBX_INT, O_MAND, P_SYS, DB_ID, null)
 );
 check_fields($fields);
 
-if (!$service = DBfetch(DBselect('SELECT s.* FROM services s WHERE s.serviceid='.$_REQUEST['serviceid'], 1))) {
-	fatal_error(_('No IT services defined.'));
+/*
+ * Permissions
+ */
+$service = API::Service()->get(array(
+	'output' => array('serviceid', 'name', 'showsla', 'goodsla'),
+	'selectTimes' => API_OUTPUT_EXTEND,
+	'serviceids' => $_REQUEST['serviceid']
+));
+$service = reset($service);
+if (!$service) {
+	access_deny();
 }
 
-if (!is_null($service['triggerid'])) {
-	$options = array(
-		'triggerids' => $service['triggerid'],
-		'output' => API_OUTPUT_SHORTEN,
-		'nodeids' => get_current_nodeid(true)
-	);
-	$db_data = API::Trigger()->get($options);
-	if (empty($db_data)) {
-		access_deny();
-	}
-}
-
+/*
+ * Display
+ */
 $start_time = microtime(true);
 
 $sizeX = 900;
@@ -102,6 +101,7 @@ $start = $start - ($wday - 1) * 24 * 3600;
 
 $weeks = (int) date('W') + ($wday ? 1 : 0);
 
+$intervals = array();
 for ($i = 0; $i < 52; $i++) {
 	if (($period_start = $start + 7 * 24 * 3600 * $i) > time()) {
 		break;
@@ -111,19 +111,30 @@ for ($i = 0; $i < 52; $i++) {
 		$period_end = time();
 	}
 
-	$stat = calculateServiceAvailability($_REQUEST['serviceid'], $period_start, $period_end);
+	$intervals[] = array(
+		'from' => $period_start,
+		'to' => $period_end
+	);
+}
 
-	$problem[$i] = $stat['problem'];
-	$ok[$i] = $stat['ok'];
+$sla = API::Service()->getSla(array(
+	'serviceids' => $service['serviceid'],
+	'intervals' => $intervals
+));
+$sla = reset($sla);
+
+foreach ($sla['sla'] as $i => $intervalSla) {
+	$problem[$i] = 100 - $intervalSla['problem'];
+	$ok[$i] = $intervalSla['sla'];
 	$count_now[$i] = 1;
 }
 
 for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
-	DashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gray);
+	dashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gray);
 }
 
 for ($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX / 52) {
-	DashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
+	dashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
 	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 35, $black, zbx_date2str(_('d.M'), $period_start));
 	$period_start += 7 * 24 * 3600;
 }
@@ -190,7 +201,7 @@ $str = sprintf('%0.2f', microtime(true) - $start_time);
 $str = _s('Generated in %s sec', $str);
 $strSize = imageTextSize(6, 0, $str);
 imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $gray, $str);
-ImageOut($im);
+imageOut($im);
 imagedestroy($im);
 
 include_once('include/page_footer.php');

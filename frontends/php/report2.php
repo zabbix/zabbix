@@ -20,17 +20,17 @@
 ?>
 <?php
 
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/reports.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/reports.inc.php';
 
-$page['title'] = 'S_AVAILABILITY_REPORT';
+$page['title'] = _('Availability report');
 $page['file'] = 'report2.php';
 $page['hist_arg'] = array('config', 'groupid', 'hostid', 'tpl_triggerid');
 $page['scripts'] = array('class.calendar.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 
@@ -50,7 +50,7 @@ require_once('include/page_header.php');
 //ajax
 		'favobj' => array(T_ZBX_STR, O_OPT, P_ACT, NULL, NULL),
 		'favref' => array(T_ZBX_STR, O_OPT, P_ACT, NOT_EMPTY, 'isset({favobj})'),
-		'state' => array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY, 'isset({favobj}) && ("filter"=={favobj})'),
+		'favstate' => array(T_ZBX_INT, O_OPT, P_ACT, NOT_EMPTY, 'isset({favobj})&&("filter"=={favobj})'),
 	);
 
 	check_fields($fields);
@@ -58,11 +58,11 @@ require_once('include/page_header.php');
 // AJAX
 	if(isset($_REQUEST['favobj'])){
 		if('filter' == $_REQUEST['favobj']){
-			CProfile::update('web.avail_report.filter.state', $_REQUEST['state'], PROFILE_TYPE_INT);
+			CProfile::update('web.avail_report.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 		}
 	}
 	if((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])){
-		require_once('include/page_footer.php');
+		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 
@@ -139,7 +139,7 @@ require_once('include/page_header.php');
 			$available_hosts = $PAGE_HOSTS['hostids'];
 	}
 
-	$rep2_wdgt->addPageHeader(S_AVAILABILITY_REPORT_BIG);
+	$rep2_wdgt->addPageHeader(_('AVAILABILITY REPORT'));
 //	show_report2_header($config, $PAGE_GROUPS, $PAGE_HOSTS);
 
 	if(isset($_REQUEST['triggerid'])){
@@ -174,6 +174,7 @@ require_once('include/page_header.php');
 		$table = new CTableInfo(null, 'graph');
 		$table->addRow(new CImg('chart4.php?triggerid=' . $_REQUEST['triggerid']));
 
+		$rep2_wdgt->addItem(BR());
 		$rep2_wdgt->addItem($table);
 		$rep2_wdgt->show();
 	}
@@ -183,11 +184,11 @@ require_once('include/page_header.php');
 		$r_form->setMethod('get');
 
 		$cmbConf = new CComboBox('config', $config, 'submit()');
-		$cmbConf->addItem(0, S_BY_HOST);
-		$cmbConf->addItem(1, S_BY_TRIGGER_TEMPLATE);
+		$cmbConf->addItem(0, _('By host'));
+		$cmbConf->addItem(1, _('By trigger template'));
 		$r_form->addItem($cmbConf);
 
-		$rep2_wdgt->addHeader(S_REPORT_BIG, array(S_MODE . SPACE, $r_form));
+		$rep2_wdgt->addHeader(_('Report'), array(_('Mode').SPACE, $r_form));
 // FILTER
 		$filterForm = get_report2_filter($config, $PAGE_GROUPS, $PAGE_HOSTS);
 		$rep2_wdgt->addFlicker($filterForm, CProfile::get('web.avail_report.filter.state', 0));
@@ -224,17 +225,17 @@ require_once('include/page_header.php');
 		}
 
 		$triggers = API::Trigger()->get($options);
-		ArraySorter::sort($triggers, array('host', 'description'));
+		CArrayHelper::sort($triggers, array('host', 'description'));
 
-		$table = new CTableInfo();
+		$table = new CTableInfo(_('No hosts defined.'));
 		$table->setHeader(array(
-			is_show_all_nodes() ? S_NODE : null,
-			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? S_HOST : NULL,
-			S_NAME,
-			S_PROBLEMS,
-			S_OK,
-			S_UNKNOWN,
-			S_GRAPH
+			is_show_all_nodes() ? _('Node') : null,
+			(($_REQUEST['hostid'] == 0) || (1 == $config)) ? _('Host') : NULL,
+			_('Name'),
+			_('Problems'),
+			_('Ok'),
+			_('Unknown'),
+			_('Graph')
 		));
 
 		foreach($triggers as $trigger){
@@ -243,7 +244,7 @@ require_once('include/page_header.php');
 			$true = new CSpan(sprintf('%.4f%%', $availability['true']), 'on');
 			$false = new CSpan(sprintf('%.4f%%', $availability['false']), 'off');
 			$unknown = new CSpan(sprintf('%.4f%%', $availability['unknown']), 'unknown');
-			$actions = new CLink(S_SHOW, 'report2.php?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $_REQUEST['hostid'] . '&triggerid=' . $trigger['triggerid']);
+			$actions = new CLink(_('Show'), 'report2.php?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $_REQUEST['hostid'] . '&triggerid=' . $trigger['triggerid']);
 
 			$table->addRow(array(
 				get_node_name_by_elid($trigger['hostid']),
@@ -256,10 +257,11 @@ require_once('include/page_header.php');
 			));
 		}
 
+		$rep2_wdgt->addItem(BR());
 		$rep2_wdgt->addItem($table);
 		$rep2_wdgt->show();
 	}
 ?>
 <?php
-	require_once('include/page_footer.php');
+	require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

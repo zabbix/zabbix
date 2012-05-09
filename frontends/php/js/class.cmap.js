@@ -124,9 +124,11 @@ ZABBIX.apps.map = (function() {
 			if (this.container.length === 0) {
 				this.container = jQuery(document.body);
 			}
+
 			this.container.css({
 				width: this.data.width + 'px',
-				height: this.data.height + 'px'
+				height: this.data.height + 'px',
+				overflow: 'hidden'
 			});
 
 			if (IE) {
@@ -183,7 +185,7 @@ ZABBIX.apps.map = (function() {
 				})
 				.appendTo('body')
 				.draggable({
-					containment: [0,0,3200,3200]
+					containment: [0, 0, 3200, 3200]
 				});
 
 			this.updateImage();
@@ -256,6 +258,7 @@ ZABBIX.apps.map = (function() {
 					data: {
 						output: 'json',
 						sysmapid: this.sysmapid,
+						expand_macros: this.data.expand_macros,
 						noselements: 1,
 						nolinks: 1,
 						nocalculations: 1,
@@ -381,6 +384,13 @@ ZABBIX.apps.map = (function() {
 				var that = this;
 
 				// MAP PANEL EVENTS
+				// toggle expand macros
+				jQuery('#expand_macros').click(function() {
+					that.data.expand_macros = that.data.expand_macros === '1' ? '0' : '1';
+					jQuery(this).html(that.data.expand_macros === '1' ? locale['S_ON'] : locale['S_OFF']);
+					that.updateImage();
+				});
+
 				// change grid size
 				jQuery('#gridsize').change(function() {
 					var value = jQuery(this).val();
@@ -623,7 +633,7 @@ ZABBIX.apps.map = (function() {
 		 * @param {Object} [linkData] link data from db
 		 */
 		function Link(sysmap, linkData) {
-			var linkid, selementid, lnktrigger;
+			var selementid, lnktrigger;
 			this.sysmap = sysmap;
 
 			if (!linkData) {
@@ -646,10 +656,7 @@ ZABBIX.apps.map = (function() {
 				}
 
 				// generate unique linkid
-				do {
-					linkid = Math.floor(Math.random() * 10000000).toString();
-				} while (typeof this.sysmap.data.links[linkid] !== 'undefined');
-				linkData.linkid = linkid;
+				linkData.linkid = getRandomId();
 			}
 			else {
 				if (jQuery.isArray(linkData.linktriggers)) {
@@ -712,7 +719,6 @@ ZABBIX.apps.map = (function() {
 		 * @param {Object} selementData element db values
 		 */
 		function Selement(sysmap, selementData) {
-			var selementid;
 			this.sysmap = sysmap;
 			this.selected = false;
 
@@ -731,10 +737,7 @@ ZABBIX.apps.map = (function() {
 				};
 
 				// generate unique selementid
-				do {
-					selementid = Math.floor(Math.random() * 10000000).toString();
-				} while (typeof this.sysmap.data.selements[selementid] !== 'undefined');
-				selementData.selementid = selementid;
+				selementData.selementid = getRandomId();
 			}
 			else {
 				if (jQuery.isArray(selementData.urls)) {
@@ -786,7 +789,7 @@ ZABBIX.apps.map = (function() {
 			 * @param {Boolean} unsetUndefined if true, all fields that are not in data parameter will be removed from element
 			 */
 			update: function(data, unsetUndefined) {
-				var	fieldName,
+				var fieldName,
 					dataFelds = [
 						'elementtype', 'elementid', 'iconid_off', 'iconid_on', 'iconid_maintenance',
 						'iconid_disabled', 'label', 'label_location', 'x', 'y', 'elementsubtype',  'areatype', 'width',
@@ -827,7 +830,7 @@ ZABBIX.apps.map = (function() {
 
 				// if image element, set elementName to image name
 				if (this.data.elementtype === '4') {
-					for (i = 0, ln = this.sysmap.iconList.length; i < ln; i++) {
+					for (i in this.sysmap.iconList) {
 						if (this.sysmap.iconList[i].imageid === this.data.iconid_off) {
 							this.data.elementName = this.sysmap.iconList[i].name;
 						}
@@ -945,14 +948,6 @@ ZABBIX.apps.map = (function() {
 						newY += gridSize;
 					}
 
-					if ((newX + dims.width) > this.sysmap.data.width) {
-						newWidth = this.sysmap.data.width - newX * 2;
-						realign = true;
-					}
-					if ((newY + dims.height) > this.sysmap.data.height) {
-						newHeight = this.sysmap.data.height - newY * 2;
-						realign = true;
-					}
 				}
 
 				this.data.y = newY;
@@ -969,9 +964,6 @@ ZABBIX.apps.map = (function() {
 					height: newHeight
 				});
 
-				if (realign) {
-					this.align(doAutoAlign);
-				}
 			},
 
 			/**
@@ -1137,11 +1129,11 @@ ZABBIX.apps.map = (function() {
 
 			if (this.sysmap.data.iconmapid === '0') {
 				jQuery('#use_iconmapLabel')
-					.mouseenter(function() {
-						hintBox.showOver(this, locale['S_ICONMAP_IS_NOT_ENABLED']);
+					.mouseenter(function(e) {
+						hintBox.showHint(e, this, locale['S_ICONMAP_IS_NOT_ENABLED']);
 					})
-					.mouseleave(function() {
-						hintBox.hideOut(this);
+					.mouseleave(function(e) {
+						hintBox.hideHint(e, this);
 					});
 			}
 
@@ -1721,9 +1713,7 @@ ZABBIX.apps.map = (function() {
 						continue;
 					}
 
-					do {
-						linktriggerid = Math.floor(Math.random() * 10000000).toString();
-					} while (typeof this.sysmap.allLinkTriggerIds[linktriggerid] !== 'undefined');
+					linktriggerid = getRandomId();
 
 					// store linktriggerid to generate every time unique one
 					this.sysmap.allLinkTriggerIds[linktriggerid] = true;

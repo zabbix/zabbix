@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CForm extends CTag {
+
 	public function __construct($method = 'post', $action = null, $enctype = null) {
 		parent::__construct('form', 'yes');
 		$this->setMethod($method);
@@ -39,6 +41,7 @@ class CForm extends CTag {
 
 	public function setAction($value) {
 		global $page;
+
 		if (is_null($value)) {
 			$value = isset($page['file']) ? $page['file'] : '#';
 		}
@@ -50,7 +53,7 @@ class CForm extends CTag {
 			return $this->removeAttribute('enctype');
 		}
 		elseif (!is_string($value)) {
-			return $this->error('Incorrect value for SetEnctype ['.$value.']');
+			return $this->error('Incorrect value for SetEnctype "'.$value.'".');
 		}
 		return $this->setAttribute('enctype', $value);
 	}

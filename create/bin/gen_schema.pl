@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 #
 # Zabbix
 # Copyright (C) 2000-2011 Zabbix SIA
@@ -16,22 +16,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-use Switch;
+use strict;
 use File::Basename;
 
-$file = dirname($0)."/../src/schema.tmpl";	# name the file
+my $file = dirname($0)."/../src/schema.tmpl";	# name the file
 
-my $state;
-my $output;
-my $eol, $fk_bol, $fk_eol;
-my $ltab, $szcol1, $szcol2, $szcol3, $szcol4;
-my $sequences;
-my $sql_suffix;
-my $fkeys, $fkeys_prefix, $fkeys_suffix;
-my $fkeys_drop;
-my $uniq;
+my ($state, %output, $eol, $fk_bol, $fk_eol, $ltab, $pkey, $table_name);
+my ($szcol1, $szcol2, $szcol3, $szcol4, $sequences, $sql_suffix);
+my ($fkeys, $fkeys_prefix, $fkeys_suffix, $fkeys_drop, $uniq);
 
-%c = (
+my %c = (
 	"type"		=>	"code",
 	"database"	=>	"",
 	"after"		=>	"\t{0}\n};\n",
@@ -44,6 +38,7 @@ my $uniq;
 	"t_id"		=>	"ZBX_TYPE_ID",
 	"t_image"	=>	"ZBX_TYPE_BLOB",
 	"t_integer"	=>	"ZBX_TYPE_INT",
+	"t_longtext"	=>	"ZBX_TYPE_TEXT",
 	"t_nanosec"	=>	"ZBX_TYPE_INT",
 	"t_serial"	=>	"ZBX_TYPE_UINT",
 	"t_text"	=>	"ZBX_TYPE_TEXT",
@@ -76,11 +71,12 @@ $c{"before"} = "/*
 const ZBX_TABLE\ttables[] = {
 ";
 
-%ibm_db2 = (
+my %ibm_db2 = (
 	"type"		=>	"sql",
 	"database"	=>	"ibm_db2",
 	"before"	=>	"",
 	"after"		=>	"",
+	"table_options"	=>	"",
 	"t_bigint"	=>	"bigint",
 	"t_char"	=>	"varchar",
 	"t_cksum_text"	=>	"varchar(2048)",
@@ -90,6 +86,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"blob",
 	"t_integer"	=>	"integer",
+	"t_longtext"	=>	"varchar(2048)",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigint",
 	"t_text"	=>	"varchar(2048)",
@@ -97,7 +94,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_varchar"	=>	"varchar"
 );
 
-%mysql = (
+my %mysql = (
 	"type"		=>	"sql",
 	"database"	=>	"mysql",
 	"before"	=>	"",
@@ -112,6 +109,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"bigint unsigned",
 	"t_image"	=>	"longblob",
 	"t_integer"	=>	"integer",
+	"t_longtext"	=>	"longtext",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"bigint unsigned",
 	"t_text"	=>	"text",
@@ -119,11 +117,12 @@ const ZBX_TABLE\ttables[] = {
 	"t_varchar"	=>	"varchar"
 );
 
-%oracle = (
+my %oracle = (
 	"type"		=>	"sql",
 	"database"	=>	"oracle",
 	"before"	=>	"",
 	"after"		=>	"",
+	"table_options"	=>	"",
 	"t_bigint"	=>	"number(20)",
 	"t_char"	=>	"nvarchar2",
 	"t_cksum_text"	=>	"nclob",
@@ -133,6 +132,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"number(20)",
 	"t_image"	=>	"blob",
 	"t_integer"	=>	"number(10)",
+	"t_longtext"	=>	"nclob",
 	"t_nanosec"	=>	"number(10)",
 	"t_serial"	=>	"number(20)",
 	"t_text"	=>	"nvarchar2(2048)",
@@ -140,12 +140,12 @@ const ZBX_TABLE\ttables[] = {
 	"t_varchar"	=>	"nvarchar2"
 );
 
-%postgresql = (
+my %postgresql = (
 	"type"		=>	"sql",
 	"database"	=>	"postgresql",
 	"before"	=>	"",
 	"after"		=>	"",
-	"table_options"	=>	" with OIDS",
+	"table_options"	=>	"",
 	"t_bigint"	=>	"numeric(20)",
 	"t_char"	=>	"char",
 	"t_cksum_text"	=>	"text",
@@ -155,6 +155,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"bytea",
 	"t_integer"	=>	"integer",
+	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"serial",
 	"t_text"	=>	"text",
@@ -162,11 +163,12 @@ const ZBX_TABLE\ttables[] = {
 	"t_varchar"	=>	"varchar"
 );
 
-%sqlite3 = (
+my %sqlite3 = (
 	"type"		=>	"sql",
 	"database"	=>	"sqlite3",
 	"before"	=>	"",
 	"after"		=>	"",
+	"table_options"	=>	"",
 	"t_bigint"	=>	"bigint",
 	"t_char"	=>	"char",
 	"t_cksum_text"	=>	"text",
@@ -176,6 +178,7 @@ const ZBX_TABLE\ttables[] = {
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"longblob",
 	"t_integer"	=>	"integer",
+	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
 	"t_serial"	=>	"integer",
 	"t_text"	=>	"text",
@@ -186,7 +189,7 @@ const ZBX_TABLE\ttables[] = {
 sub rtrim($)
 {
 	my $string = shift;
-	$string =~ s/(\r|\n)+$//;
+	$string =~ s/(\r|\n)+$// if ($string);
 	return $string;
 }
 
@@ -212,6 +215,7 @@ sub newstate
 sub process_table
 {
 	my $line = $_[0];
+	my $flags;
 
 	newstate("table");
 
@@ -250,11 +254,22 @@ sub process_table
 sub process_field
 {
 	my $line = $_[0];
+	my $type_2;
 
 	newstate("field");
 
+	my $name = "";
+	my $type = "";
+	my $default = "";
+	my $null = "";
+	my $flags = "";
+	my $relN = "";
+	my $fk_table = "";
+	my $fk_field = "";
+	my $fk_flags = "";
+
 	($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
-	($type_short, $length) = split(/\(/, $type, 2);
+	my ($type_short, $length) = split(/\(/, $type, 2);
 
 	if ($output{"type"} eq "code")
 	{
@@ -305,15 +320,15 @@ sub process_field
 
 		if ($fk_table)
 		{
-			if ($fk_field eq "")
+			if (not $fk_field or $fk_field eq "")
 			{
-				$fk_field = "${name}";
+				$fk_field = $name;
 			}
 
 			$fk_table = "\"${fk_table}\"";
 			$fk_field = "\"${fk_field}\"";
 
-			if ($fk_flags eq "")
+			if (not $fk_flags or $fk_flags eq "")
 			{
 				$fk_flags = "ZBX_FK_CASCADE_DELETE";
 			}
@@ -333,6 +348,7 @@ sub process_field
 	}
 	else
 	{
+		my @text_fields;
 		$a = $output{$type_short};
 		$_ = $type;
 		s/$type_short/$a/g;
@@ -374,12 +390,8 @@ sub process_field
 		{
 			$null = "";
 		}
-		else
-		{
-			$null = "${null}";
-		}
 
-		$row = "${null}";
+		my $row = $null;
 
 		if ($type eq "t_serial")
 		{
@@ -411,17 +423,21 @@ sub process_field
 			}
 		}
 
-		if ($relN ne "" and $relN ne "-")
+		my $references = "";
+
+		if ($relN and $relN ne "" and $relN ne "-")
 		{
-			if ($fk_field eq "")
+			my $only = "";
+
+			if (not $fk_field or $fk_field eq "")
 			{
-				$fk_field = "${name}";
+				$fk_field = $name;
 			}
 
 # RESTRICT may contains new line chars we need to clean them out
-			$fk_flags = rtrim ($fk_flags);
+			$fk_flags = rtrim($fk_flags);
 
-			if ($fk_flags eq "")
+			if (not $fk_flags or $fk_flags eq "")
 			{
 				$fk_flags = " ON DELETE CASCADE";
 			}
@@ -434,12 +450,8 @@ sub process_field
 			{
 				$only = " ONLY";
 			}
-			else
-			{
-				$only = "";
-			}
 
-			$cname = "c_${table_name}_${relN}";
+			my $cname = "c_${table_name}_${relN}";
 
 			if ($output{"database"} eq "sqlite3")
 			{
@@ -461,10 +473,6 @@ sub process_field
 				}
 			}
 		}
-		else
-		{
-			$references = "";
-		}
 
 		printf "${ltab}%-*s %-*s %-*s ${row}${references}", $szcol1, $name, $szcol2, $type_2, $szcol3, $default;
 	}
@@ -477,7 +485,7 @@ sub process_index
 
 	newstate("index");
 
-	($name, $fields) = split(/\|/, $line, 2);
+	my ($name, $fields) = split(/\|/, $line, 2);
 
 	if ($output{"type"} eq "code")
 	{
@@ -511,9 +519,10 @@ sub process
 	$fkeys_drop = "";
 	$sequences = "";
 	$uniq = "";
+	my ($type, $line);
 
 	open(INFO, $file);	# open the file
-	@lines = <INFO>;	# read it into an array
+	my @lines = <INFO>;	# read it into an array
 	close(INFO);		# close the file
 
 	foreach $line (@lines)
@@ -523,12 +532,12 @@ sub process
 
 		($type, $line) = split(/\|/, $line, 2);
 
-		switch ($type)
+		if ($type)
 		{
-			case "TABLE"	{ process_table($line); }
-			case "INDEX"	{ process_index($line, 0); }
-			case "UNIQUE"	{ process_index($line, 1); }
-			case "FIELD"	{ process_field($line); }
+			if ($type eq 'FIELD')		{ process_field($line); }
+			elsif ($type eq 'INDEX')	{ process_index($line, 0); }
+			elsif ($type eq 'TABLE')	{ process_table($line); }
+			elsif ($type eq 'UNIQUE')	{ process_index($line, 1); }
 		}
 	}
 
@@ -546,7 +555,7 @@ sub main
 		usage();
 	}
 
-	$format = $ARGV[0];
+	my $format = $ARGV[0];
 	$eol = "";
 	$fk_bol = "";
 	$fk_eol = ";";
@@ -558,18 +567,15 @@ sub main
 	$sql_suffix="";
 	$fkeys_prefix = "";
 	$fkeys_suffix = "";
-	$fkeys_drop_prefix = "";
+	my $fkeys_drop_prefix = "";
 
-	switch ($format)
-	{
-		case "c"		{ %output = %c; }
-		case "ibm_db2"		{ %output = %ibm_db2; }
-		case "mysql"		{ %output = %mysql; }
-		case "oracle"		{ %output = %oracle; }
-		case "postgresql"	{ %output = %postgresql; }
-		case "sqlite3"		{ %output = %sqlite3; }
-		else			{ usage(); }
-	}
+	if ($format eq 'c')		{ %output = %c; }
+	elsif ($format eq 'ibm_db2')	{ %output = %ibm_db2; }
+	elsif ($format eq 'mysql')	{ %output = %mysql; }
+	elsif ($format eq 'oracle')	{ %output = %oracle; }
+	elsif ($format eq 'postgresql')	{ %output = %postgresql; }
+	elsif ($format eq 'sqlite3')	{ %output = %sqlite3; }
+	else				{ usage(); }
 
 	process();
 

@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = "S_RESOURCE";
+$page['title'] = _('Resource');
 $page['file'] = 'popup_right.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -53,7 +53,7 @@ check_fields($fields);
 		$available_nodes = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_RES_IDS_ARRAY);
 
 		$cmbResourceNode = new CComboBox('nodeid',$nodeid,'submit();');
-		$cmbResourceNode->addItem(0, S_ALL_S);
+		$cmbResourceNode->addItem(0, _('All'));
 
 		$sql = 'SELECT name,nodeid '.
 			' FROM nodes '.
@@ -63,7 +63,7 @@ check_fields($fields);
 			$cmbResourceNode->addItem($node['nodeid'], $node['name']);
 		}
 
-		$frmTitle->addItem(array(S_NODE, SPACE, $cmbResourceNode));
+		$frmTitle->addItem(array(_('Node'), SPACE, $cmbResourceNode));
 	}
 
 	show_table_header(permission2str($permission),$frmTitle);
@@ -71,8 +71,8 @@ check_fields($fields);
 	$form = new CForm();
 	$form->setAttribute('id', 'groups');
 
-	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
-	$table->setHeader(new CCol(array(new CCheckBox('all_groups', NULL, 'check_all(this.checked)'),S_NAME)));
+	$table = new CTableInfo(_('No resources defined.'));
+	$table->setHeader(new CCol(array(new CCheckBox('all_groups', NULL, 'check_all(this.checked)'),_('Name'))));
 
 // NODES
 	if($nodeid == 0) $nodeids = get_current_nodeid(true);
@@ -106,7 +106,7 @@ check_fields($fields);
 
 	insert_js('var grouplist = '.zbx_jsvalue($grouplist).';');
 
-	$button = new CButton('select', S_SELECT, 'add_groups("'.$dstfrm.'")');
+	$button = new CButton('select', _('Select'), 'add_groups("'.$dstfrm.'")');
 	$table->setFooter(new CCol($button,'right'));
 
 	$form->addItem($table);
@@ -139,6 +139,6 @@ function check_all(value) {
 </script>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

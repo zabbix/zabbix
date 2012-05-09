@@ -98,6 +98,10 @@ ALTER TABLE sysmaps ADD iconmapid bigint NULL
 /
 REORG TABLE sysmaps
 /
+ALTER TABLE sysmaps ADD expand_macros integer WITH DEFAULT '0' NOT NULL
+/
+REORG TABLE sysmaps
+/
 UPDATE sysmaps SET backgroundid=NULL WHERE backgroundid=0
 /
 UPDATE sysmaps SET show_unack=1 WHERE highlight>7 AND highlight<16

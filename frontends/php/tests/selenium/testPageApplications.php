@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
-class testPageApplications extends CWebTest{
+class testPageApplications extends CWebTest {
 	// Returns all hosts
-	public static function allHosts(){
+	public static function allHosts() {
 		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 	}
 
@@ -31,26 +31,26 @@ class testPageApplications extends CWebTest{
 	* @dataProvider allHosts
 	*/
 
-	public function testPageApplications_SimpleTest($host){
-		$hostid=$host['hostid'];
+	public function testPageApplications_CheckLayout($host) {
+		$hostid = $host['hostid'];
 
 		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('HOSTS');
 		// Go to the list of applications
 		$this->href_click("applications.php?groupid=0&hostid=$hostid&sid=");
 		$this->wait();
 		// We are in the list of applications
-		$this->assertTitle('Applications');
+		$this->assertTitle('Configuration of applications');
 		$this->ok('CONFIGURATION OF APPLICATIONS');
 		$this->ok('Displaying');
 		$this->ok('Host list');
 		// Header
 		$this->ok(array('Applications', 'Show'));
 
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Delete selected');
 	}

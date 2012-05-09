@@ -209,7 +209,7 @@ zbx_hash_t	zbx_hash_djb2(const void *data, size_t len, zbx_hash_t seed)
 	const uchar	*p = (const uchar *)data;
 
 	zbx_hash_t	hash;
-       
+
 	hash = 5381u ^ seed;
 
 	while (len-- >= 1)

@@ -19,12 +19,9 @@
 **/
 ?>
 <?php
-/**
- * Description of class
- * Produces Zabbix object for more comfortable usage of jQuery tabbed view
- * @author Aly
- */
+
 class CTabView extends CDiv {
+
 	protected $id = 'tabs';
 	protected $tabs = array();
 	protected $headers = array();
@@ -60,9 +57,6 @@ class CTabView extends CDiv {
 		$this->tabs[$id]->attr('id', zbx_formatDomId($id));
 	}
 
-	public static function setFooter($main, $others) {// TODO
-	}
-
 	public function toString($destroy = true) {
 		if (count($this->tabs) == 1) {
 			$this->setAttribute('class', 'min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
@@ -84,7 +78,6 @@ class CTabView extends CDiv {
 				$tabLink->setAttribute('id', 'tab_'.$id);
 				$headersList->addItem($tabLink);
 			}
-
 			$this->addItem($headersList);
 			$this->addItem($this->tabs);
 
@@ -92,11 +85,10 @@ class CTabView extends CDiv {
 			if (!is_null($this->selectedTab)) {
 				$options['selected'] = $this->selectedTab;
 			}
-			if (!is_null($this->rememberTab) && ($this->rememberTab > 0)) {
-				$options['cookie'] = array('expires' => $this->rememberTab);
+			if ($this->rememberTab) {
+				$options['cookie'] = array();
 			}
-
-			zbx_add_post_js('jQuery(function() { jQuery( "#'.$this->id.'" ).tabs('.zbx_jsvalue($options, true).').show(); });');
+			zbx_add_post_js('jQuery("#'.$this->id.'").tabs('.zbx_jsvalue($options, true).').show();');
 		}
 		return parent::toString($destroy);
 	}

@@ -19,14 +19,14 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/services.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('IT services availability report');
 $page['file'] = 'report3.php';
 $page['hist_arg'] = array();
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 ?>
 <?php
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -42,28 +42,15 @@ $period = get_request('period', 'weekly');
 $year = get_request('year', date('Y'));
 
 define('YEAR_LEFT_SHIFT', 5);
-?>
-<?php
-$result = DBselect('SELECT s.* FROM services s WHERE s.serviceid='.$_REQUEST['serviceid'], 1);
-if (!$service = DBfetch($result)) {
-	fatal_error(_('No IT services defined.'));
-}
 
-if ($service['triggerid']) {
-	$options = array(
-		'triggerids' => $service['triggerid'],
-		'output' => API_OUTPUT_SHORTEN,
-		'nodeids' => get_current_nodeid(true)
-	);
-
-	$db_data = API::Trigger()->get($options);
-	if (empty($db_data)) {
-		access_deny();
-	}
-}
-
-if (!DBfetch(DBselect('SELECT s.serviceid FROM services s WHERE s.serviceid='.$_REQUEST['serviceid']))) {
-	fatal_error(_('No IT services defined.'));
+$service = API::Service()->get(array(
+	'output' => array('serviceid', 'name', 'showsla', 'goodsla'),
+	'selectTimes' => API_OUTPUT_EXTEND,
+	'serviceids' => $_REQUEST['serviceid']
+));
+$service = reset($service);
+if (!$service) {
+	access_deny();
 }
 
 $form = new CForm();
@@ -96,7 +83,7 @@ show_table_header(array(
 
 $table = new CTableInfo();
 
-$header = array(_('Ok'), _('Problems'), _('Downtime'), _('Percentage'), _('SLA'));
+$header = array(_('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA'));
 
 switch ($period) {
 	case 'yearly':
@@ -136,7 +123,7 @@ switch ($period) {
 		break;
 	case 'daily':
 		$from = 1;
-		$to = 365;
+		$to = DAY_IN_YEAR;
 		array_unshift($header, new CCol(_('Day'), 'center'));
 
 		function get_time($d) {
@@ -185,6 +172,7 @@ switch ($period) {
 
 $table->setHeader($header);
 
+$intervals = array();
 for ($t = $from; $t <= $to; $t++) {
 	if (($start = get_time($t)) > time()) {
 		break;
@@ -194,43 +182,54 @@ for ($t = $from; $t <= $to; $t++) {
 		$end = time();
 	}
 
-	$stat = calculateServiceAvailability($service['serviceid'], $start, $end);
+	$intervals[] = array(
+		'from' => $start,
+		'to' => $end
+	);
+}
 
+$sla = API::Service()->getSla(array(
+	'serviceids' => $service['serviceid'],
+	'intervals' => $intervals
+));
+$sla = reset($sla);
+
+foreach ($sla['sla'] as $intervalSla) {
 	$ok = new CSpan(
 		sprintf('%dd %dh %dm',
-			$stat['ok_time'] / SEC_PER_DAY,
-			($stat['ok_time'] % SEC_PER_DAY) / SEC_PER_HOUR,
-			($stat['ok_time'] % SEC_PER_HOUR) / SEC_PER_MIN
+			$intervalSla['okTime'] / SEC_PER_DAY,
+			($intervalSla['okTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
+			($intervalSla['okTime'] % SEC_PER_HOUR) / SEC_PER_MIN
 		), 'off'
 	);
 
 	$problems = new CSpan(
 		sprintf('%dd %dh %dm',
-			$stat['problem_time'] / SEC_PER_DAY,
-			($stat['problem_time'] % SEC_PER_DAY) / SEC_PER_HOUR,
-			($stat['problem_time'] % SEC_PER_HOUR) /SEC_PER_MIN
+			$intervalSla['problemTime'] / SEC_PER_DAY,
+			($intervalSla['problemTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
+			($intervalSla['problemTime'] % SEC_PER_HOUR) /SEC_PER_MIN
 		), 'on'
 	);
 
 	$downtime = sprintf('%dd %dh %dm',
-		$stat['downtime_time'] / SEC_PER_DAY,
-		($stat['downtime_time'] % SEC_PER_DAY) / SEC_PER_HOUR,
-		($stat['downtime_time'] % SEC_PER_HOUR) / SEC_PER_MIN
+		$intervalSla['downtimeTime'] / SEC_PER_DAY,
+		($intervalSla['downtimeTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
+		($intervalSla['downtimeTime'] % SEC_PER_HOUR) / SEC_PER_MIN
 	);
 
-	$percentage = new CSpan(sprintf('%2.2f%%', $stat['ok']), 'off');
+	$percentage = new CSpan(sprintf('%2.4f', $intervalSla['sla']), ($intervalSla['sla'] >= $service['goodsla'] ? 'off' : 'on'));
 
 	$table->addRow(array(
-		format_time($start),
-		format_time2($end),
+		format_time($intervalSla['from']),
+		format_time2($intervalSla['to']),
 		$ok,
 		$problems,
 		$downtime,
-		$percentage,
-		$service['showsla'] == 1 ? new CSpan($service['goodsla'], $stat['ok'] >= $service['goodsla'] ? 'off' : 'on') : '-'
+		($service['showsla']) ? $percentage : '-',
+		($service['showsla']) ? new CSpan($service['goodsla']) : '-'
 	));
 }
 $table->show();
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

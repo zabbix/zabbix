@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__) . '/../include/class.cwebtest.php');
+require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 
-class testPageItems extends CWebTest{
+class testPageItems extends CWebTest {
 	// Returns all hosts
-	public static function allHosts(){
+	public static function allHosts() {
 		return DBdata('select * from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')');
 	}
 
@@ -31,13 +31,13 @@ class testPageItems extends CWebTest{
 	* @dataProvider allHosts
 	*/
 
-	public function testPageItems_SimpleTest($host){
-		$hostid=$host['hostid'];
+	public function testPageItems_CheckLayout($host) {
+		$hostid = $host['hostid'];
 
 		$this->login('hosts.php');
-		$this->dropdown_select_wait('groupid','all');
+		$this->dropdown_select_wait('groupid', 'all');
 
-		$this->assertTitle('Hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('HOSTS');
 		// Go to the list of items
 		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
@@ -45,13 +45,28 @@ class testPageItems extends CWebTest{
 		// We are in the list of items
 		$this->assertTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
+		$this->ok('Items');
 		$this->ok('Displaying');
 		$this->ok('Host list');
 		// Header
-		$this->ok(array('Wizard', 'Name', 'Triggers', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Status', 'Applications', 'Error'));
+		$this->ok(
+			array(
+				'Wizard',
+				'Name',
+				'Triggers',
+				'Key',
+				'Interval',
+				'History',
+				'Trends',
+				'Type',
+				'Applications',
+				'Status',
+				'Error'
+			)
+		);
 		// someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
-		$this->dropdown_select('go', 'Activate selected');
+		$this->dropdown_select('go', 'Enable selected');
 		$this->dropdown_select('go', 'Disable selected');
 		$this->dropdown_select('go', 'Mass update');
 		$this->dropdown_select('go', 'Copy selected to ...');

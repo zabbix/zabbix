@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CComboBox extends CTag {
+
 	public $value;
 
 	public function __construct($name = 'combobox', $value = null, $action = null, $items = null) {
@@ -61,7 +63,7 @@ class CComboBox extends CTag {
 	}
 
 	public function addItem($value, $caption = '', $selected = null, $enabled = 'yes') {
-		if (is_object($value) && zbx_strtolower(get_class($value)) == 'ccomboitem') {
+		if ($value instanceof CComboItem || $value instanceof COptGroup) {
 			parent::addItem($value);
 		}
 		else {
@@ -94,6 +96,7 @@ class CComboBox extends CTag {
 }
 
 class COptGroup extends CTag {
+
 	public function __construct($label) {
 		parent::__construct('optgroup', 'yes');
 		$this->setAttribute('label', $label);

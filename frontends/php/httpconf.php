@@ -19,19 +19,18 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/httptest.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/httptest.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Configuration of Web monitoring');
+$page['title'] = _('Configuration of web monitoring');
 $page['file'] = 'httpconf.php';
-$page['hist_arg'] = array('groupid','hostid');
+$page['hist_arg'] = array('groupid', 'hostid');
 
-require_once('include/page_header.php');
-?>
-<?php
-//	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+require_once dirname(__FILE__).'/include/page_header.php';
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'applications' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 	'applicationid' =>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
@@ -40,20 +39,24 @@ $fields = array(
 	'groupid' =>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
 	'hostid' =>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'isset({form})||isset({save})'),
 	'httptestid' =>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form})&&({form}=="update"))'),
-	'application' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-	'name' =>			array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-	'delay' =>			array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, SEC_PER_DAY), 'isset({save})'),
+	'application' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Application')),
+	'name' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({save})', _('Name')),
+	'delay' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY), 'isset({save})', _('Update interval (in sec)')),
 	'status' =>			array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	'isset({save})'),
 	'agent' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 	'macros' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
-	'steps' =>			array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+	'steps' => array(T_ZBX_STR, O_OPT, null, null, 'isset({save})', _('Steps')),
 	'authentication' =>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1,2'),'isset({save})'),
-	'http_user' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.'||{authentication}=='.HTTPTEST_AUTH_NTLM.')'),
-	'http_password' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save}) && isset({authentication}) && ({authentication}=='.HTTPTEST_AUTH_BASIC.'||{authentication}=='.HTTPTEST_AUTH_NTLM.')'),
+	'http_user' =>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
+		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('User')),
+	'http_password' =>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,
+		'isset({save})&&isset({authentication})&&({authentication}=='.HTTPTEST_AUTH_BASIC.
+		'||{authentication}=='.HTTPTEST_AUTH_NTLM.')', _('Password')),
 	'new_httpstep' =>	array(T_ZBX_STR, O_OPT,	null,	null,		null),
-	'move_up' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0,65534), null),
-	'move_down' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0,65534), null),
-	'sel_step' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65534), null),
+	'move_up' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0, 65534), null),
+	'move_down' =>		array(T_ZBX_INT, O_OPT,	P_ACT,	BETWEEN(0, 65534), null),
+	'sel_step' =>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0, 65534), null),
 	'group_httptestid' => array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'showdisabled' =>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),	null),
 	// actions
@@ -75,17 +78,21 @@ $showDisabled = get_request('showdisabled', 1);
 CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_STR);
 $_REQUEST['go'] = get_request('go', 'none');
 
+if (!empty($_REQUEST['steps'])) {
+	order_result($_REQUEST['steps'], 'no');
+}
+
 /*
  * Filter
  */
 $options = array(
 	'groups' => array(
-		'real_hosts' => 1,
-		'not_proxy_hosts' => 1,
-		'editable' => 1
+		'real_hosts' => true,
+		'not_proxy_hosts' => true,
+		'editable' => true
 	),
 	'hosts' => array(
-		'editable' => 1
+		'editable' => true
 	),
 	'hostid' => get_request('hostid', null),
 	'groupid' => get_request('groupid', null)
@@ -143,7 +150,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['httptestid'])) {
 	if ($result) {
 		$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$_REQUEST['httptestid'].'] '._('Host').' ['.$host['host'].']');
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.
+			$_REQUEST['httptestid'].'] '._('Host').' ['.$host['host'].']');
 	}
 	unset($_REQUEST['httptestid'], $_REQUEST['form']);
 }
@@ -168,8 +176,6 @@ elseif (isset($_REQUEST['save'])) {
 
 		$steps = get_request('steps', array());
 		if (!empty($steps)) {
-			order_result($steps, 'no');
-
 			$i = 1;
 			foreach ($steps as $snum => $step) {
 				$steps[$snum]['no'] = $i++;
@@ -181,7 +187,7 @@ elseif (isset($_REQUEST['save'])) {
 			}
 		}
 
-		$webcheck = array(
+		$httpTest = array(
 			'hostid' => $_REQUEST['hostid'],
 			'name' => $_REQUEST['name'],
 			'authentication' => $_REQUEST['authentication'],
@@ -199,7 +205,7 @@ elseif (isset($_REQUEST['save'])) {
 				' AND a.hostid='.$_REQUEST['hostid']
 		);
 		if ($applicationid = DBfetch($db_app_result)) {
-			$webcheck['applicationid'] = $applicationid['applicationid'];
+			$httpTest['applicationid'] = $applicationid['applicationid'];
 		}
 		else {
 			$result = API::Application()->create(array(
@@ -207,39 +213,40 @@ elseif (isset($_REQUEST['save'])) {
 				'hostid' => $_REQUEST['hostid']
 			));
 			if (!$result) {
-				throw new Exception(_('Cannot add new application').' [ '.$application.' ]');
+				throw new Exception(_('Cannot add new application.').' [ '.$application.' ]');
 			}
 			else {
-				$webcheck['applicationid'] = reset($result['applicationids']);
+				$httpTest['applicationid'] = reset($result['applicationids']);
 			}
 		}
 
 		if ($_REQUEST['authentication'] != HTTPTEST_AUTH_NONE) {
-			$webcheck['http_user'] = htmlspecialchars($_REQUEST['http_user']);
-			$webcheck['http_password'] = htmlspecialchars($_REQUEST['http_password']);
+			$httpTest['http_user'] = htmlspecialchars($_REQUEST['http_user']);
+			$httpTest['http_password'] = htmlspecialchars($_REQUEST['http_password']);
 		}
 		else {
-			$webcheck['http_user'] = '';
-			$webcheck['http_password'] = '';
+			$httpTest['http_user'] = '';
+			$httpTest['http_password'] = '';
 		}
 
 		if (isset($_REQUEST['httptestid'])) {
-			$webcheck['webcheckid'] = $httptestid = $_REQUEST['httptestid'];
-			$result = API::WebCheck()->update($webcheck);
+			$httpTest['httptestid'] = $httptestid = $_REQUEST['httptestid'];
+			$result = API::WebCheck()->update($httpTest);
 			if (!$result) {
 				throw new Exception();
 			}
 		}
 		else {
-			$result = API::WebCheck()->create($webcheck);
+			$result = API::WebCheck()->create($httpTest);
 			if (!$result) {
 				throw new Exception();
 			}
-			$httptestid = reset($result['webcheckids']);
+			$httptestid = reset($result['httptestids']);
 		}
 
 		$host = get_host_by_hostid($_REQUEST['hostid']);
-		add_audit($action, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$_REQUEST['name'].'] ['.$httptestid.'] '._('Host').' ['.$host['host'].']');
+		add_audit($action, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$_REQUEST['name'].'] ['.$httptestid.'] '.
+			_('Host').' ['.$host['host'].']');
 
 		unset($_REQUEST['httptestid'], $_REQUEST['form']);
 		show_messages(true, $message_true);
@@ -250,9 +257,6 @@ elseif (isset($_REQUEST['save'])) {
 		show_messages(false, null, $message_false);
 	}
 }
-/*
- * Go buttons
- */
 elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_httptestid'])) {
 	$go_result = false;
 	$group_httptestid = $_REQUEST['group_httptestid'];
@@ -265,7 +269,8 @@ elseif ($_REQUEST['go'] == 'activate' && isset($_REQUEST['group_httptestid'])) {
 			$go_result = true;
 			$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].']'._('Scenario activated'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
+				_('Host').' ['.$host['host'].']'._('Scenario activated'));
 		}
 	}
 	show_messages($go_result, _('Scenario activated'), null);
@@ -282,7 +287,8 @@ elseif ($_REQUEST['go'] == 'disable' && isset($_REQUEST['group_httptestid'])) {
 			$go_result = true;
 			$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '._('Host').' ['.$host['host'].']'._('Scenario disabled'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
+				_('Host').' ['.$host['host'].']'._('Scenario disabled'));
 		}
 	}
 	show_messages($go_result, _('Scenario disabled'), null);
@@ -301,7 +307,8 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_httptestid'
 
 			$host = get_host_by_applicationid($httptest_data['applicationid']);
 
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '._('Host').' ['.$host['host'].']'._('History cleared'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCENARIO, _('Scenario').' ['.$httptest_data['name'].'] ['.$id.'] '.
+				_('Host').' ['.$host['host'].']'._('History cleared'));
 		}
 	}
 	show_messages($go_result, _('History cleared'), null);
@@ -316,8 +323,7 @@ if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 	$path = $url->getPath();
 	insert_js('cookie.eraseArray("'.$path.'")');
 }
-?>
-<?php
+
 /*
  * Display
  */
@@ -432,5 +438,5 @@ else {
 	$httpView->render();
 	$httpView->show();
 }
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

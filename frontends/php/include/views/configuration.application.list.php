@@ -19,12 +19,11 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "applications";');
 $applicationWidget = new CWidget();
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$applicationWidget->addItem(get_header_host_table($this->data['hostid'], 'applications'));
+	$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
 }
 
 // create new application button
@@ -37,10 +36,9 @@ $applicationWidget->addPageHeader(_('CONFIGURATION OF APPLICATIONS'), $createFor
 $filterForm = new CForm('get');
 $filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
 $filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
+
 $applicationWidget->addHeader(_('Applications'), $filterForm);
-$applicationWidget->addHeader($numRows);
+$applicationWidget->addHeaderRowNumber();
 
 // create form
 $applicationForm = new CForm('get');
@@ -49,7 +47,7 @@ $applicationForm->addVar('groupid', $this->data['groupid']);
 $applicationForm->addVar('hostid', $this->data['hostid']);
 
 // create table
-$applicationTable = new CTableInfo();
+$applicationTable = new CTableInfo(_('No applications defined.'));
 $applicationTable->setHeader(array(
 	new CCheckBox('all_applications', null, "checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');"),
 	$this->data['hostid'] > 0 ? null : _('Host'),
@@ -80,8 +78,8 @@ foreach ($this->data['applications'] as $application) {
 
 // create go buttons
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Activate selected'));
-$goOption->setAttribute('confirm', _('Activate selected applications?'));
+$goOption = new CComboItem('activate', _('Enable selected'));
+$goOption->setAttribute('confirm', _('Enable selected applications?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));
@@ -94,6 +92,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "applications";');
 
 // append table to form
 $applicationForm->addItem(array($this->data['paging'], $applicationTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));

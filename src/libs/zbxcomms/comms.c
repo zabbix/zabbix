@@ -1166,7 +1166,7 @@ int	zbx_tcp_check_security(zbx_sock_t *s, const char *ip_list, int allow_if_empt
 						case AF_INET  :
 							/* incoming AF_INET6, must see whether it is comp or mapped */
 							if((0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr, ipv4_cmp_mask, 12) ||
-								0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) && 
+								0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr, ipv4_mpd_mask, 12)) &&
 								0 == memcmp(&((struct sockaddr_in6*)&name)->sin6_addr.s6_addr[12],
 									(unsigned char*)&((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr, 4))
 							{

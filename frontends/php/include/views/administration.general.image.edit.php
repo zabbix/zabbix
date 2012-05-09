@@ -19,11 +19,9 @@
 **/
 ?>
 <?php
-
 $imageForm = new CForm('post', null, 'multipart/form-data');
 $imageForm->setName('imageForm');
 $imageForm->addVar('form', $this->data['form']);
-$imageForm->addVar('config', 3);
 $imageForm->addVar('imageid', $this->data['imageid']);
 
 $imageCb = new CComboBox('imagetype', $this->data['imagetype']);
@@ -37,7 +35,7 @@ $imageFormList->addRow(_('Type'), $imageCb);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
 if (!empty($this->data['imageid'])) {
 	if ($data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
-		$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?iconid='.$this->data['imageid'], 'no image', 200), 'image.php?imageid='.$this->data['imageid']));
+		$imageFormList->addRow(_('Image'), new CLink(new CImg('imgstore.php?width=200&height=200&iconid='.$this->data['imageid'], 'no image'), 'image.php?imageid='.$this->data['imageid']));
 	}
 	else {
 		$imageFormList->addRow(_('Image'), new CImg('imgstore.php?iconid='.$this->data['imageid'], 'no image', null));
@@ -51,10 +49,10 @@ $imageTab->addTab('imageTab', _('Image'), $imageFormList);
 // append buttons
 $imageForm->addItem($imageTab);
 if (!empty($this->data['imageid'])) {
-	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid').url_param('config')), new CButtonCancel(url_param('config')))));
+	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), array(new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')), new CButtonCancel())));
 }
 else {
-	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButtonCancel(url_param('config'))));
+	$imageForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), new CButtonCancel()));
 }
 
 return $imageForm;

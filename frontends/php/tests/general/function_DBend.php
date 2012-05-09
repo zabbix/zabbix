@@ -21,12 +21,10 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once(dirname(__FILE__).'/../include/class.czabbixtest.php');
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class function_DBend extends CZabbixTest
-{
-	public function test_DBend()
-	{
+class function_DBend extends CZabbixTest {
+	public function test_DBend() {
 		// TODO
 		$this->markTestIncomplete();
 	}

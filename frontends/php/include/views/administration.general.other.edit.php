@@ -43,10 +43,7 @@ $otherView->addTab('other', _('Other parameters'), $otherTab);
 
 $otherForm = new CForm();
 $otherForm->setName('otherForm');
-//$houseKeeperForm->setHelp('web.config.other.php');
-$otherForm->addVar('form', $this->data['form']);
 $otherForm->addVar('form_refresh', $this->data['form_refresh'] + 1);
-$otherForm->addVar('config', get_request('config', 5));
 $otherForm->addItem($otherView);
 $otherForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save')))));
 

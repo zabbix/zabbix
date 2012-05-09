@@ -25,17 +25,18 @@
 
 #include "checks_java.h"
 
-static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, zbx_timespec_t *timespecs, int num,
-			char *response, char *error, int max_error_len)
+static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num,
+		char *response, char *error, int max_error_len)
 {
 	const char		*p;
 	struct zbx_json_parse	jp, jp_data, jp_row;
-	char			value[MAX_BUFFER_LEN];
-	int			i, ret = PROXY_ERROR;
+	char			*value = NULL;
+	size_t			value_alloc = 0;
+	int			i, ret = GATEWAY_ERROR;
 
 	if (SUCCEED == zbx_json_open(response, &jp))
 	{
-		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value)))
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_RESPONSE, &value, &value_alloc))
 		{
 			zbx_snprintf(error, max_error_len, "No '%s' tag in received JSON", ZBX_PROTO_TAG_RESPONSE);
 			goto exit;
@@ -53,6 +54,9 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 
 			for (i = 0; i < num; i++)
 			{
+				if (SUCCEED != errcodes[i])
+					continue;
+
 				if (NULL == (p = zbx_json_next(&jp_data, p)))
 				{
 					zbx_strlcpy(error, "Not all values included in received JSON", max_error_len);
@@ -65,7 +69,7 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 					goto exit;
 				}
 
-				if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value)))
+				if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 				{
 					if (SUCCEED == set_result_type(&results[i],
 								items[i].value_type, items[i].data_type, value))
@@ -73,7 +77,7 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 					else
 						errcodes[i] = NOTSUPPORTED;
 				}
-				else if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, value, sizeof(value)))
+				else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &value, &value_alloc))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, value));
 					errcodes[i] = NOTSUPPORTED;
@@ -109,17 +113,19 @@ static int	parse_response(DC_ITEM *items, AGENT_RESULT *results, int *errcodes, 
 		goto exit;
 	}
 exit:
+	zbx_free(value);
+
 	return ret;
 }
 
 int	get_value_java(unsigned char request, DC_ITEM *item, AGENT_RESULT *result)
 {
-	int		res;
-	zbx_timespec_t	ts;
+	int		errcode = SUCCEED;
+	zbx_timespec_t	timespec;
 
-	get_values_java(request, item, result, &res, &ts, 1);
+	get_values_java(request, item, result, &errcode, &timespec, 1);
 
-	return res;
+	return errcode;
 }
 
 void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *results,
@@ -131,16 +137,25 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 	struct zbx_json	json;
 	char		error[MAX_STRING_LEN];
 	char		*buffer = NULL;
-	int		i, err = SUCCEED;
+	int		i, j, err = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__function_name, items[0].host.host, items[0].interface.addr, num);
+
+	for (j = 0; j < num; j++)	/* locate first supported item */
+	{
+		if (SUCCEED == errcodes[j])
+			break;
+	}
+
+	if (j == num)	/* all items already NOTSUPPORTED (with invalid key or port) */
+		goto out;
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	if (NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY)
 	{
-		err = PROXY_ERROR;
+		err = GATEWAY_ERROR;
 		strscpy(error, "JavaGateway configuration parameter not set or empty");
 		goto exit;
 	}
@@ -151,14 +166,17 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 	}
 	else if (ZBX_JAVA_GATEWAY_REQUEST_JMX == request)
 	{
-		for (i = 1; i < num; i++)
+		for (i = j + 1; i < num; i++)
 		{
-			if (0 != strcmp(items[0].interface.addr, items[i].interface.addr) ||
-					items[0].interface.port != items[i].interface.port ||
-					0 != strcmp(items[0].username, items[i].username) ||
-					0 != strcmp(items[0].password, items[i].password))
+			if (SUCCEED != errcodes[i])
+				continue;
+
+			if (0 != strcmp(items[j].interface.addr, items[i].interface.addr) ||
+					items[j].interface.port != items[i].interface.port ||
+					0 != strcmp(items[j].username, items[i].username) ||
+					0 != strcmp(items[j].password, items[i].password))
 			{
-				err = PROXY_ERROR;
+				err = GATEWAY_ERROR;
 				strscpy(error, "Java poller received items with different connection parameters");
 				goto exit;
 			}
@@ -166,19 +184,24 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_JAVA_GATEWAY_JMX, ZBX_JSON_TYPE_STRING);
 
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_CONN, items[0].interface.addr, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, items[0].interface.port);
-		if ('\0' != *items[0].username)
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_USERNAME, items[0].username, ZBX_JSON_TYPE_STRING);
-		if ('\0' != *items[0].password)
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_PASSWORD, items[0].password, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_CONN, items[j].interface.addr, ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, items[j].interface.port);
+		if ('\0' != *items[j].username)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_USERNAME, items[j].username, ZBX_JSON_TYPE_STRING);
+		if ('\0' != *items[j].password)
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_PASSWORD, items[j].password, ZBX_JSON_TYPE_STRING);
 	}
 	else
 		assert(0);
 
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_KEYS);
 	for (i = 0; i < num; i++)
+	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
 		zbx_json_addstring(&json, NULL, items[i].key, ZBX_JSON_TYPE_STRING);
+	}
 	zbx_json_close(&json);
 
 	if (SUCCEED == (err = zbx_tcp_connect(&s, CONFIG_SOURCE_IP,
@@ -192,7 +215,7 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "JSON back [%s]", buffer);
 
-				err = parse_response(items, results, errcodes, timespecs, num, buffer, error, sizeof(error));
+				err = parse_response(items, results, errcodes, num, buffer, error, sizeof(error));
 			}
 		}
 
@@ -204,15 +227,18 @@ void	get_values_java(unsigned char request, DC_ITEM *items, AGENT_RESULT *result
 	if (FAIL == err)
 	{
 		strscpy(error, zbx_tcp_strerror());
-		err = PROXY_ERROR;
+		err = GATEWAY_ERROR;
 	}
 exit:
-	if (NETWORK_ERROR == err || PROXY_ERROR == err)
+	if (NETWORK_ERROR == err || GATEWAY_ERROR == err)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Getting Java values failed: %s", error);
 
 		for (i = 0; i < num; i++)
 		{
+			if (SUCCEED != errcodes[i])
+				continue;
+
 			if (!ISSET_MSG(&results[i]))
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
@@ -224,7 +250,12 @@ exit:
 	zbx_timespec(&timespecs[0]);
 
 	for (i = 1; i < num; i++)
-		timespecs[i] = timespecs[0];
+	{
+		if (SUCCEED != errcodes[i])
+			continue;
 
+		timespecs[i] = timespecs[0];
+	}
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

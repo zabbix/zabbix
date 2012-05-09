@@ -19,23 +19,15 @@
 **/
 ?>
 <?php
-// include JS + templates
-require_once('include/views/js/general.search.js.php');
-?>
-<?php
-//	$hosts_wdgt->addItem();
-	$searchDiv = new CDiv();
-	$searchInputDiv = new CDiv();
-	$searchButtonDiv = new CDiv();
+	$searchForm = new CForm('get','search.php');
 
-	$search_form = new CForm('get','search.php');
 	$searchBox = new CTextBox('search', get_request('search'));
 	$searchBox->setAttribute('autocomplete', 'off');
 	$searchBox->addClass('search');
+	$searchForm->addItem($searchBox);
 
-	$search_form->addItem(new CDiv(array(_('Search').': ', $searchBox)));
+	$searchBtn = new CSubmit('searchbttn', _('Search'), null, 'input button ui-button ui-widget ui-state-default ui-corner-all');
+	$searchForm->addItem($searchBtn);
 
-	$search_div = new CDiv(SPACE, 'zbx_search nowrap', 'zbx_search');
-
-return new CDiv(SPACE, 'zbx_search', 'zbx_search');
+	return new CDiv($searchForm, 'zbx_search', 'zbx_search');
 ?>

@@ -102,7 +102,7 @@ typedef struct
 	unsigned char 	type;
 	unsigned char	data_type;
 	unsigned char	value_type;
-	char		key_orig[ITEM_KEY_LEN_MAX], *key;
+	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	int		delay;
 	int		nextcheck;
 	unsigned char	status;
@@ -115,7 +115,7 @@ typedef struct
 	char		snmpv3_authpassphrase_orig[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX], *snmpv3_authpassphrase;
 	char		snmpv3_privpassphrase_orig[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX], *snmpv3_privpassphrase;
 	char		ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
-	char		params_orig[ITEM_PARAMS_LEN_MAX], *params;
+	char		*params;
 	char		delay_flex[ITEM_DELAY_FLEX_LEN_MAX];
 	unsigned char	authtype;
 	char		username_orig[ITEM_USERNAME_LEN_MAX], *username;
@@ -129,6 +129,7 @@ DC_ITEM;
 typedef struct
 {
 	zbx_uint64_t	functionid;
+	zbx_uint64_t	triggerid;
 	zbx_uint64_t	itemid;
 	char		*function;
 	char		*parameter;
@@ -205,10 +206,12 @@ void	init_configuration_cache();
 void	free_configuration_cache();
 void	DCload_config();
 
+void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_item_by_key(DC_ITEM *item, zbx_uint64_t proxy_hostid, const char *host, const char *key);
-int	DCconfig_get_item_by_itemid(DC_ITEM *item, zbx_uint64_t itemid);
-int	DCconfig_get_function_by_functionid(DC_FUNCTION *function, zbx_uint64_t functionid);
+void	DCconfig_get_items_by_itemids(DC_ITEM *items, zbx_uint64_t *itemids, int *errcodes, size_t num);
+void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes, size_t num);
+void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int item_num);
 int	DCconfig_get_trigger_for_event(DB_TRIGGER *trigger, zbx_uint64_t triggerid);
@@ -216,9 +219,8 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type);
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type);
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items, int max_items);
-int	DCconfig_get_items(zbx_uint64_t hostid, const char *key, DC_ITEM **items);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
-int	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
+size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
 #define	CONFIG_ALERT_HISTORY		1
 #define	CONFIG_EVENT_HISTORY		2

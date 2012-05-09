@@ -25,7 +25,7 @@
 
 	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
-	$page['title'] = "S_GRAPH_ITEM";
+	$page['title'] = _('Graph item');
 	$page['file'] = 'popup_bitem.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
@@ -43,8 +43,8 @@ require_once 'include/page_header.php';
 
 		'list_name'=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
 		'caption'=>		array(T_ZBX_STR, O_OPT,  null,	null,			null),
-		'itemid'=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
-		'color'=>		array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
+		'itemid'=> array(T_ZBX_INT, O_OPT, null, DB_ID.'({}!=0)', 'isset({save})', _('Parameter')),
+		'color'=> array(T_ZBX_CLR, O_OPT,  null, null, 'isset({save})', _('Colour')),
 		'calc_fnc'=>	array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({save})'),
 		'axisside'=>	array(T_ZBX_INT, O_OPT,	 null,	IN(GRAPH_YAXIS_SIDE_LEFT.','.GRAPH_YAXIS_SIDE_RIGHT),	null),
 
@@ -92,7 +92,7 @@ require_once 'include/page_header.php';
 	else{
 		echo SBR;
 
-		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH);
+		$frmGItem = new CFormTable(_('New item for the graph'));
 		$frmGItem->setName('graph_item');
 		$frmGItem->setHelp('web.graph.item.php');
 
@@ -118,52 +118,47 @@ require_once 'include/page_header.php';
 		$frmGItem->addVar('list_name',$list_name);
 		$frmGItem->addVar('itemid',$itemid);
 
-		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', S_DEFAULT),
-			S_CAPTION), new CTextBox('caption',$caption,32));
-
-//		$frmGItem->addRow(S_CAPTION, new CTextBox('caption',$caption,10));
+		$frmGItem->addRow(array( new CVisibilityBox('caption_visible', !zbx_empty($caption), 'caption', _('Default')),
+			_('Caption')), new CTextBox('caption',$caption,32));
 
 		$txtCondVal = new CTextBox('name',$description,50,'yes');
 
-		$btnSelect = new CSubmit('btn1',S_SELECT,
+		$btnSelect = new CSubmit('btn1',_('Select'),
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
 				'&dstfld1=itemid&dstfld2=name&srctbl=items'.
 				"&srcfld1=itemid&srcfld2=name&monitored_hosts=1');",
 				'T');
 
-		$frmGItem->addRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
+		$frmGItem->addRow(_('Parameter') ,array($txtCondVal,$btnSelect));
 
 		$cmbFnc = new CComboBox('calc_fnc',$calc_fnc);
-			$cmbFnc->addItem(CALC_FNC_MIN, S_MIN_SMALL);
-			$cmbFnc->addItem(CALC_FNC_AVG, S_AVG_SMALL);
-			$cmbFnc->addItem(CALC_FNC_MAX, S_MAX_SMALL);
-			$cmbFnc->addItem(0, S_COUNT);
+			$cmbFnc->addItem(CALC_FNC_MIN, _('min'));
+			$cmbFnc->addItem(CALC_FNC_AVG, _('avg'));
+			$cmbFnc->addItem(CALC_FNC_MAX, _('max'));
+			$cmbFnc->addItem(0, _('Count'));
 
-		$frmGItem->addRow(S_FUNCTION, $cmbFnc);
+		$frmGItem->addRow(_('Function'), $cmbFnc);
 
 		if($config == 1){
 			$cmbAxis = new CComboBox('axisside',$axisside);
-				$cmbAxis->addItem(GRAPH_YAXIS_SIDE_LEFT, S_LEFT);
-				$cmbAxis->addItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
+				$cmbAxis->addItem(GRAPH_YAXIS_SIDE_LEFT, _('Left'));
+				$cmbAxis->addItem(GRAPH_YAXIS_SIDE_RIGHT, _('Right'));
 
-			$frmGItem->addRow(S_AXIS_SIDE, $cmbAxis);
+			$frmGItem->addRow(_('Axis side'), $cmbAxis);
 		}
 
 
 		if($config == 1)
-			$frmGItem->addRow(S_COLOR, new CColor('color',$color));
+			$frmGItem->addRow(_('Colour'), new CColor('color',$color));
 		else
 			$frmGItem->addVar('color',$color);
 
 
-		$frmGItem->addItemToBottomRow(new CSubmit('save', isset($gid)?S_SAVE:S_ADD));
+		$frmGItem->addItemToBottomRow(new CSubmit('save', isset($gid)?_('Save'):_('Add')));
 
 		$frmGItem->addItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmGItem->Show();
 	}
-?>
-<?php
 
 require_once 'include/page_footer.php';
-
 ?>

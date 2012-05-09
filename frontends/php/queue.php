@@ -22,7 +22,7 @@
 require_once 'include/config.inc.php';
 require_once 'include/items.inc.php';
 
-$page['title'] = 'S_QUEUE';
+$page['title'] = _('Queue');
 $page['file'] = 'queue.php';
 $page['hist_arg'] = array('config');
 
@@ -105,7 +105,6 @@ require_once 'include/page_header.php';
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
 			' AND i.value_type NOT IN ('.ITEM_VALUE_TYPE_LOG.')'.
-			' AND i.key_ NOT IN ('.zbx_dbstr('status').')'.
 			' AND NOT i.lastclock IS NULL'.
 			' AND ('.
 				' i.type IN ('.implode(',',$norm_item_types).')'.
@@ -115,6 +114,7 @@ require_once 'include/page_header.php';
 				' OR (h.jmx_available<>'.HOST_AVAILABLE_FALSE.' AND i.type IN ('.implode(',',$jmx_item_types).'))'.
 				')'.
 			' AND '.DBin_node('i.itemid', get_current_nodeid()).
+			' AND i.flags NOT IN ('.ZBX_FLAG_DISCOVERY_CHILD.')'.
 		' ORDER BY i.lastclock,h.name,i.name,i.key_';
 	$result = DBselect($sql);
 
@@ -273,7 +273,7 @@ require_once 'include/page_header.php';
 			}
 
 			$table->addRow(array(
-				zbx_date2str(S_QUEUE_NODES_DATE_FORMAT, $r[0]),
+				zbx_date2str(QUEUE_NODES_DATE_FORMAT, $r[0]),
 				zbx_date2age($r[0]),
 				get_node_name_by_elid($r[1]),
 				$r[2],
@@ -290,5 +290,5 @@ require_once 'include/page_header.php';
 	}
 
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

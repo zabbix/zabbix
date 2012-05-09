@@ -61,11 +61,15 @@ ALTER TABLE items ADD interfaceid number(20) NULL;
 ALTER TABLE items ADD port nvarchar2(64) DEFAULT '';
 ALTER TABLE items ADD description nvarchar2(2048) DEFAULT '';
 ALTER TABLE items ADD inventory_link number(10) DEFAULT '0' NOT NULL;
-
-UPDATE items SET templateid=NULL WHERE templateid=0;
-UPDATE items SET templateid=NULL WHERE templateid IS NOT NULL AND templateid NOT IN (SELECT itemid FROM items);
-UPDATE items SET valuemapid=NULL WHERE valuemapid=0;
-UPDATE items SET valuemapid=NULL WHERE valuemapid IS NOT NULL AND valuemapid NOT IN (SELECT valuemapid from valuemaps);
+ALTER TABLE items ADD lifetime nvarchar2(64) DEFAULT '30';
+UPDATE items
+	SET templateid=NULL
+	WHERE templateid=0
+		OR templateid NOT IN (SELECT itemid FROM items);
+UPDATE items
+	SET valuemapid=NULL
+	WHERE valuemapid=0
+		OR valuemapid NOT IN (SELECT valuemapid from valuemaps);
 UPDATE items SET units='Bps' WHERE type=9 AND units='bps';
 DELETE FROM items WHERE NOT hostid IN (SELECT hostid FROM hosts);
 ALTER TABLE items ADD CONSTRAINT c_items_1 FOREIGN KEY (hostid) REFERENCES hosts (hostid) ON DELETE CASCADE;
@@ -190,6 +194,47 @@ END;
 
 DROP FUNCTION zbx_key_exists;
 
+-- adding web.test.error[<web check>] items
+
+VARIABLE item_maxid number;
+VARIABLE httptestitem_maxid number;
+VARIABLE itemapp_maxid number;
+BEGIN
+SELECT MAX(itemid) INTO :item_maxid FROM items;
+SELECT MAX(httptestitemid) INTO :httptestitem_maxid FROM httptestitem;
+SELECT MAX(itemappid) INTO :itemapp_maxid FROM items_applications;
+END;
+/
+
+CREATE SEQUENCE items_seq;
+CREATE SEQUENCE httptestitem_seq;
+CREATE SEQUENCE items_applications_seq;
+
+INSERT INTO items (itemid, hostid, type, name, key_, value_type, units, delay, history, trends, status)
+	SELECT :item_maxid + items_seq.NEXTVAL, hostid, type, 'Last error message of scenario ''$1''', 'web.test.error' || SUBSTR(key_, INSTR(key_, '[')), 1, '', delay, history, 0, status
+	FROM items
+	WHERE type = 9
+		AND key_ LIKE 'web.test.fail%';
+
+INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type)
+	SELECT :httptestitem_maxid + httptestitem_seq.NEXTVAL, ht.httptestid, i.itemid, 4
+	FROM httptest ht,applications a,items i
+	WHERE ht.applicationid=a.applicationid
+		AND a.hostid=i.hostid
+		AND 'web.test.error[' || ht.name || ']' = i.key_;
+
+INSERT INTO items_applications (itemappid, applicationid, itemid)
+	SELECT :itemapp_maxid + items_applications_seq.NEXTVAL, ht.applicationid, hti.itemid
+	FROM httptest ht, httptestitem hti
+	WHERE ht.httptestid = hti.httptestid
+		AND hti.type = 4;
+
+DROP SEQUENCE items_applications_seq;
+DROP SEQUENCE httptestitem_seq;
+DROP SEQUENCE items_seq;
+
+DELETE FROM ids WHERE table_name IN ('items', 'httptestitem', 'items_applications');
+
 ---- Patching table `hosts`
 
 ALTER TABLE hosts MODIFY hostid DEFAULT NULL;
@@ -211,8 +256,17 @@ ALTER TABLE hosts ADD jmx_available number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE hosts ADD jmx_errors_from number(10) DEFAULT '0' NOT NULL;
 ALTER TABLE hosts ADD jmx_error nvarchar2(128) DEFAULT '';
 ALTER TABLE hosts ADD name nvarchar2(64) DEFAULT '';
-UPDATE hosts SET proxy_hostid=NULL WHERE proxy_hostid=0;
-UPDATE hosts SET maintenanceid=NULL WHERE maintenanceid=0;
+UPDATE hosts
+	SET proxy_hostid=NULL
+	WHERE proxy_hostid=0
+		OR NOT EXISTS (SELECT 1 FROM hosts h WHERE h.hostid=hosts.proxy_hostid);
+UPDATE hosts
+	SET maintenanceid=NULL,
+		maintenance_status=0,
+		maintenance_type=0,
+		maintenance_from=0
+	WHERE maintenanceid=0
+		OR NOT EXISTS (SELECT 1 FROM maintenances m WHERE m.maintenanceid=hosts.maintenanceid);
 UPDATE hosts SET name=host WHERE status in (0,1,3)	-- MONITORED, NOT_MONITORED, TEMPLATE
 /
 CREATE INDEX hosts_4 on hosts (name);

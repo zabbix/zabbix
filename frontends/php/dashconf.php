@@ -18,19 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/triggers.inc.php');
-require_once('include/html.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/triggers.inc.php';
+require_once dirname(__FILE__).'/include/html.inc.php';
 
-$page['title'] = 'S_DASHBOARD_CONFIGURATION';
+$page['title'] = _('Dashboard configuration');
 $page['file'] = 'dashconf.php';
 $page['hist_arg'] = array();
 $page['scripts'] = array();
 
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields = array(
@@ -39,9 +39,9 @@ require_once('include/page_header.php');
 		'groupids'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
 		'new_right'=>	array(T_ZBX_STR, O_OPT,	null,	null,				null),
 		'trgSeverity'=>	array(T_ZBX_INT, O_OPT, P_SYS,	NULL,				NULL),
-		'grpswitch'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0,1),		NULL),
+		'grpswitch'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),		NULL),
 
-		'maintenance'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0,1),		NULL),
+		'maintenance'=>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 1),		NULL),
 		'extAck'=>	array(T_ZBX_INT, O_OPT, P_SYS,	null,		NULL),
 
 		'form_refresh'=>array(T_ZBX_INT, O_OPT, P_SYS,	null,				NULL),
@@ -53,12 +53,12 @@ require_once('include/page_header.php');
 ?>
 <?php
 // ACTION /////////////////////////////////////////////////////////////////////////////
-	if(isset($_REQUEST['save'])){
+	if (isset($_REQUEST['save'])) {
 // FILTER
 		$filterEnable = get_request('filterEnable', 0);
 		CProfile::update('web.dashconf.filter.enable', $filterEnable, PROFILE_TYPE_INT);
 
-		if($filterEnable == 1){
+		if ($filterEnable == 1) {
 // GROUPS
 			$groupids = get_request('groupids', array());
 
@@ -85,18 +85,18 @@ require_once('include/page_header.php');
 
 		jsRedirect('dashboard.php');
 	}
-	else if(isset($_REQUEST['new_right'])){
+	elseif (isset($_REQUEST['new_right'])) {
 		$_REQUEST['groupids'] = get_request('groupids', array());
 
-		foreach($_REQUEST['new_right'] as $id => $group){
+		foreach ($_REQUEST['new_right'] as $id => $group) {
 			$_REQUEST['groupids'][$id] = $id;
 		}
 	}
-	else if(isset($_REQUEST['delete'])){
-		$del_groups = get_request('del_groups',array());
+	elseif (isset($_REQUEST['delete'])) {
+		$del_groups = get_request('del_groups', array());
 
-		foreach($del_groups as $gnum => $groupid){
-			if(!isset($_REQUEST['groupids'][$groupid])) continue;
+		foreach ($del_groups as $gnum => $groupid) {
+			if (!isset($_REQUEST['groupids'][$groupid])) continue;
 
 			unset($_REQUEST['groupids'][$groupid]);
 		}
@@ -107,7 +107,7 @@ require_once('include/page_header.php');
 
 // Header
 	$dashboard_wdgt->setClass('header');
-	$dashboard_wdgt->addPageHeader(S_DASHBOARD_CONFIGURATION_BIG, SPACE);
+	$dashboard_wdgt->addPageHeader(_('DASHBOARD CONFIGURATION'), SPACE);
 
 //-------------
 // GROUPS
@@ -154,21 +154,21 @@ require_once('include/page_header.php');
 	$dashForm->addVar('filterEnable', $filterEnable);
 
 	if($filterEnable){
-		$cbFilter = new CSpan(S_ENABLED, 'green underline pointer');
+		$cbFilter = new CSpan(_('Enabled'), 'green underline pointer');
 		$cbFilter->setAttribute('onclick', "create_var('" . $dashForm->getName() . "', 'filterEnable', 0, true);");
 	}
 	else{
-		$cbFilter = new CSpan(S_DISABLED, 'red underline pointer');
+		$cbFilter = new CSpan(_('Disabled'), 'red underline pointer');
 		$cbFilter->setAttribute('onclick', "$('dashform').enable(); create_var('" . $dashForm->getName() . "', 'filterEnable', 1, true);");
 	}
 
-	$dashList->addRow(S_DASHBOARD_FILTER, $cbFilter);
+	$dashList->addRow(_('Dashboard filter'), $cbFilter);
 
 	$dashForm->addVar('groupids', $groupids);
 
 	$cmbGroups = new CComboBox('grpswitch', $grpswitch, 'submit();');
-	$cmbGroups->addItem(0, S_ALL_S);
-	$cmbGroups->addItem(1, S_SELECTED);
+	$cmbGroups->addItem(0, _('All'));
+	$cmbGroups->addItem(1, _('Selected'));
 
 	if(!$filterEnable) $cmbGroups->setAttribute('disabled', 'disabled');
 
@@ -210,7 +210,7 @@ require_once('include/page_header.php');
 	$cbMain = new CCheckBox('maintenance', $maintenance, null, '1');
 	if(!$filterEnable) $cbMain->setAttribute('disabled', 'disabled');
 
-	$dashList->addRow(S_HOSTS, array($cbMain, S_SHOW_HOSTS_IN_MAINTENANCE));
+	$dashList->addRow(_('Hosts'), array($cbMain, _('Show hosts in maintenance')));
 
 // Trigger
 	$severity = zbx_toHash($severity);
@@ -232,28 +232,28 @@ require_once('include/page_header.php');
 	}
 	array_pop($trgSeverities);
 
-	$dashList->addRow(S_TRIGGERS_WITH_SEVERITY, $trgSeverities);
+	$dashList->addRow(_('Triggers with severity'), $trgSeverities);
 
 	$config = select_config();
 	$cb = new CComboBox('extAck', $extAck);
 	$cb->addItems(array(
 		EXTACK_OPTION_ALL => _('All'),
-		EXTACK_OPTION_BOTH => S_O_SEPARATED,
-		EXTACK_OPTION_UNACK => S_O_UNACKNOWLEDGED_ONLY,
+		EXTACK_OPTION_BOTH => _('Separated'),
+		EXTACK_OPTION_UNACK => _('Unacknowledged only'),
 	));
 	$cb->setEnabled($filterEnable && $config['event_ack_enable']);
 	if(!$config['event_ack_enable']){
-		$cb->setAttribute('title', S_EVENT_ACKNOWLEDGING_DISABLED);
+		$cb->setAttribute('title', _('Event acknowledging disabled'));
 	}
-	$dashList->addRow(S_PROBLEM_DISPLAY, $cb);
+	$dashList->addRow(_('Problem display'), $cb);
 //-----
 
-	$divTabs->addTab('dashFilterTab', S_FILTER, $dashList);
+	$divTabs->addTab('dashFilterTab', _('Filter'), $dashList);
 
 	$dashForm->addItem($divTabs);
 
 // Footer
-	$main = array(new CSubmit('save', S_SAVE));
+	$main = array(new CSubmit('save', _('Save')));
 	$others = array();
 
 	$dashForm->addItem(makeFormFooter($main, $others));
@@ -264,6 +264,6 @@ require_once('include/page_header.php');
 ?>
 <?php
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 
 ?>

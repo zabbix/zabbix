@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CLink extends CTag {
+
 	protected $sid = null;
 
 	public function __construct($item = null, $url = null, $class = null, $action = null, $nosid = null) {
@@ -51,12 +53,9 @@ class CLink extends CTag {
 				$this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'], 16, 16) : null;
 			}
 			if (!is_null($this->sid)) {
-				if (zbx_strstr($value, '&') !== false || zbx_strstr($value, '?') !== false) {
-					$value .= '&sid='.$this->sid;
-				}
-				else {
-					$value .= '?sid='.$this->sid;
-				}
+				$value .= (zbx_strstr($value, '&') !== false || zbx_strstr($value, '?') !== false)
+					? '&sid='.$this->sid
+					: '?sid='.$this->sid;
 			}
 			$url = $value;
 		}
@@ -67,12 +66,7 @@ class CLink extends CTag {
 	}
 
 	public function getUrl() {
-		if (isset($this->attributes['href'])) {
-			return $this->attributes['href'];
-		}
-		else {
-			return null;
-		}
+		return isset($this->attributes['href']) ? $this->attributes['href'] : null;
 	}
 
 	public function setTarget($value = null) {

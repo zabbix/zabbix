@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"25 November 2011"
-#define	ZABBIX_VERSION		"1.9.9"
+#define	ZABBIX_REVDATE		"20 April 2012"
+#define	ZABBIX_VERSION		"2.0.0rc4"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -139,7 +139,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	NETWORK_ERROR	-3
 #define	TIMEOUT_ERROR	-4
 #define	AGENT_ERROR	-5
-#define	PROXY_ERROR	-6
+#define	GATEWAY_ERROR	-6
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_result_string(int result);
@@ -149,6 +149,7 @@ const char	*zbx_result_string(int result);
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	64
 
+#define ZBX_MAX_UINT64_LEN	21
 #define ZBX_DM_DELIMITER	'\255'
 
 typedef struct
@@ -256,13 +257,6 @@ typedef enum
 	ITEM_DATA_TYPE_BOOLEAN
 } zbx_item_data_type_t;
 const char	*zbx_item_data_type_string(zbx_item_data_type_t data_type);
-
-/* HTTP test states */
-typedef enum
-{
-	HTTPTEST_STATE_IDLE = 0,
-	HTTPTEST_STATE_BUSY
-} zbx_httptest_state_type_t;
 
 /* service supported by discoverer */
 typedef enum
@@ -405,8 +399,6 @@ typedef enum
 	AUDIT_RESOURCE_REGEXP
 } zbx_auditlog_resourcetype_t;
 
-/* special item key used for storing server status */
-#define SERVER_STATUS_KEY	"status"
 /* special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
 /* special item key used for ICMP ping latency */
@@ -416,6 +408,11 @@ typedef enum
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD	"config_cache_reload"
+
+/* value for not supported items */
+#define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
+/* Zabbix Agent non-critical error */
+#define ZBX_ERROR		"ZBX_ERROR"
 
 /* media types */
 typedef enum
@@ -594,6 +591,10 @@ const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
 
+/* media type statuses */
+#define MEDIA_TYPE_STATUS_ACTIVE	0
+#define MEDIA_TYPE_STATUS_DISABLED	1
+
 /* operation types */
 #define OPERATION_TYPE_MESSAGE		0
 #define OPERATION_TYPE_COMMAND		1
@@ -621,13 +622,11 @@ const char	*zbx_item_logtype_string(zbx_item_logtype_t logtype);
 #define	NODE_CONFIGLOG_OP_DELETE	2
 
 /* HTTP item types */
-typedef enum
-{
-	ZBX_HTTPITEM_TYPE_RSPCODE = 0,
-	ZBX_HTTPITEM_TYPE_TIME,
-	ZBX_HTTPITEM_TYPE_SPEED,
-	ZBX_HTTPITEM_TYPE_LASTSTEP
-} zbx_httpitem_type_t;
+#define ZBX_HTTPITEM_TYPE_RSPCODE	0
+#define ZBX_HTTPITEM_TYPE_TIME		1
+#define ZBX_HTTPITEM_TYPE_SPEED		2
+#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
+#define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
 /* user permissions */
 typedef enum
@@ -769,12 +768,12 @@ ZBX_TASK_EX;
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
-int	is_double_prefix(const char *str);
+int	is_double_suffix(const char *str);
 int	is_double(const char *c);
-int	is_uint_prefix(const char *c);
+int	is_uint_suffix(const char *c, unsigned int *value);
 int	is_uint(const char *c);
 int	is_int_prefix(const char *c);
-#define is_uint64(src, value)	is_uint64_n(src, INT_MAX, value)
+#define is_uint64(src, value)	is_uint64_n(src, ZBX_MAX_UINT64_LEN, value)
 int	is_uint64_n(const char *str, size_t n, zbx_uint64_t *value);
 int	is_ushort(const char *str, unsigned short *value);
 int	is_boolean(const char *str, zbx_uint64_t *value);
@@ -800,6 +799,7 @@ void	remove_param(char *param, int num);
 const char	*get_string(const char *p, char *buf, size_t bufsize);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
+size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int item_type,
 		int delay, const char *flex_intervals, time_t now, int *effective_delay);
@@ -912,6 +912,9 @@ int	regexp_match_ex(ZBX_REGEXP *regexps, int regexps_num, const char *string, co
 		zbx_case_sensitive_t cs);
 
 /* misc functions */
+#ifdef HAVE_IPV6
+int	is_ip6(const char *ip);
+#endif
 int	is_ip4(const char *ip);
 
 void	zbx_on_exit(); /* calls exit() at the end! */
@@ -922,8 +925,8 @@ int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(char *list, char *ip);
 
-#ifdef HAVE_IPV6
 int	expand_ipv6(const char *ip, char *str, size_t str_len);
+#ifdef HAVE_IPV6
 char	*collapse_ipv6(char *str, size_t str_len);
 #endif
 
@@ -966,7 +969,6 @@ char	*zbx_replace_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
 void	dos2unix(char *str);
-int	str2uint(const char *str);
 int	str2uint64(char *str, zbx_uint64_t *value);
 double	str2double(const char *str);
 
@@ -975,6 +977,7 @@ int	__zbx_stat(const char *path, struct stat *buf);
 int	__zbx_open(const char *pathname, int flags);
 #endif	/* _WINDOWS && _UNICODE */
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
+int	zbx_is_regular_file(const char *path);
 
 int	MAIN_ZABBIX_ENTRY();
 
@@ -986,6 +989,7 @@ int	zbx_check_hostname(const char *hostname);
 int	is_hostname_char(char c);
 int	is_key_char(char c);
 int	is_function_char(char c);
+int	is_macro_char(char c);
 
 int	is_time_function(const char *func);
 
@@ -1000,5 +1004,7 @@ void	make_hostname(char *host);
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
 int	calculate_sleeptime(int nextcheck, int max_sleeptime);
+
+void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 
 #endif

@@ -475,7 +475,7 @@ function &DBselect($query, $limit = null, $offset = 0) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}
 
-	COpt::savesqlrequest(microtime(true) - $time_start, $query);
+	CProfiler::getInstance()->profileSql(microtime(true) - $time_start, $query);
 	return $result;
 }
 
@@ -543,7 +543,7 @@ function DBexecute($query, $skip_error_messages = 0) {
 		$DB['TRANSACTION_NO_FAILED_SQLS'] = false;
 	}
 
-	COpt::savesqlrequest(microtime(true) - $time_start, $query);
+	CProfiler::getInstance()->profileSql(microtime(true) - $time_start, $query);
 	return (bool) $result;
 }
 
@@ -874,7 +874,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 	$tableSchema = DB::getSchema($table);
 	if (!$tableSchema) {
-		info('Error in search request for table ['.$table.']');
+		info(_s('Error in search request for table "%1$s".', $table));
 	}
 
 	$start = is_null($options['startSearch']) ? '%' : '';
@@ -930,7 +930,7 @@ function zbx_db_filter($table, $options, &$sql_parts) {
 
 	$tableSchema = DB::getSchema($table);
 	if (!$tableSchema) {
-		info('Error in search request for table ['.$table.']');
+		info(_s('Error in search request for table "%1$s".', $table));
 	}
 
 	$filter = array();
@@ -966,7 +966,7 @@ function zbx_db_sorting(&$sql_parts, $options, $sort_columns, $alias) {
 		foreach ($options['sortfield'] as $i => $sortfield) {
 			// validate sortfield
 			if (!str_in_array($sortfield, $sort_columns)) {
-				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%s" not allowed.', $sortfield));
+				throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
 			}
 
 			// add sort field to order
@@ -1025,7 +1025,7 @@ function DBcondition($fieldname, $array, $notin = false) {
 	$concat = $notin ? ' AND ':' OR ';
 
 	$items = array_chunk($array, 950);
-	foreach ($items as $id => $values) {
+	foreach ($items as $values) {
 		$condition .= !empty($condition) ? ')'.$concat.$fieldname.$in.'(' : '';
 		$condition .= implode(',', zbx_dbstr($values));
 	}
@@ -1085,366 +1085,14 @@ function unlock_sqlite3_access() {
 	sem_release($DB['SEM_ID']);
 }
 
-class DB {
-	const SCHEMA_FILE = 'schema.inc.php';
-	const DBEXECUTE_ERROR = 1;
-	const RESERVEIDS_ERROR = 2;
-	const SCHEMA_ERROR = 3;
-	const TABLE_TYPE_CONFIG = 1;
-	const TABLE_TYPE_HISTORY = 2;
-	const FIELD_TYPE_INT = 'int';
-	const FIELD_TYPE_CHAR = 'char';
-	const FIELD_TYPE_ID = 'id';
-	const FIELD_TYPE_FLOAT = 'float';
-	const FIELD_TYPE_UINT = 'uint';
-	const FIELD_TYPE_BLOB = 'blob';
-	const FIELD_TYPE_TEXT = 'text';
-
-	private static $schema = null;
-	private static $nodeId = null;
-	private static $maxNodeId = null;
-	private static $minNodeId = null;
-
-	private static function exception($code, $errors = array()) {
-		throw new APIException($code, $errors);
-	}
-
-	/**
-	 * Reserve ids for primary key of passed table.
-	 * If record for table does not exist or value is out of range, ids record is recreated
-	 * using maximum id from table or minimum allowed value.
-	 *
-	 * @throw APIException
-	 * @static
-	 *
-	 * @param string $table table name
-	 * @param int $count number of ids to reserve
-	 *
-	 * @return string
-	 */
-	protected static function reserveIds($table, $count) {
-		global $DB;
-		$tableSchema = self::getSchema($table);
-		$id_name = $tableSchema['key'];
-
-		$sql = 'SELECT nextid'.
-				' FROM ids'.
-				' WHERE nodeid='.self::$nodeId.
-					' AND table_name='.zbx_dbstr($table).
-					' AND field_name='.zbx_dbstr($id_name);
-
-		// SQLite3 does not support this syntax. Since we are in transaction, it can be ignored.
-		if ($DB['TYPE'] != ZBX_DB_SQLITE3) {
-			$sql = $sql.' FOR UPDATE';
-		}
-
-		$res = DBfetch(DBselect($sql));
-		if ($res) {
-			$maxNextId = bcadd($res['nextid'], $count, 0);
-			if (bccomp($maxNextId, self::$maxNodeId, 0) == 1 || bccomp($maxNextId, self::$minNodeId, 0) == -1) {
-				$nextid = self::refreshIds($table, $count);
-			}
-			else {
-				$sql = 'UPDATE ids'.
-						' SET nextid=nextid+'.$count.
-						' WHERE nodeid='.self::$nodeId.
-							' AND table_name='.zbx_dbstr($table).
-							' AND field_name='.zbx_dbstr($id_name);
-				if (!DBexecute($sql)) {
-					self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-				}
-				$nextid = bcadd($res['nextid'], 1, 0);
-			}
-		}
-		else {
-			$nextid = self::refreshIds($table, $count);
-		}
-		return $nextid;
-	}
-
-	/**
-	 * Refresh id record for given table.
-	 * Record is deleted and then created again with value of maximum id from table or minimu allowed.
-	 *
-	 * @throw APIException
-	 * @static
-	 *
-	 * @param string $table table name
-	 * @param int $count number of ids to reserve
-	 *
-	 * @return string
-	 */
-	private static function refreshIds($table, $count) {
-		$tableSchema = self::getSchema($table);
-		$id_name = $tableSchema['key'];
-
-		$sql = 'DELETE FROM ids'.
-				' WHERE nodeid='.self::$nodeId.
-					' AND table_name='.zbx_dbstr($table).
-					' AND field_name='.zbx_dbstr($id_name);
-		if (!DBexecute($sql)) {
-			self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-		}
-
-		$sql = 'SELECT MAX('.$id_name.') AS id'.
-				' FROM '.$table.
-				' WHERE '.$id_name.'>='.self::$minNodeId.
-					' AND '.$id_name.'<='.self::$maxNodeId;
-		$row = DBfetch(DBselect($sql));
-
-		$nextid = (!$row || is_null($row['id'])) ? self::$minNodeId : $row['id'];
-
-		$maxNextId = bcadd($nextid, $count, 0);
-		if (bccomp($maxNextId, self::$maxNodeId, 0) == 1) {
-			self::exception(self::RESERVEIDS_ERROR, __METHOD__.' ID greater than maximum allowed for table "'.$table.'"');
-		}
-
-		$sql = 'INSERT INTO ids (nodeid,table_name,field_name,nextid)'.
-				' VALUES ('.self::$nodeId.','.zbx_dbstr($table).','.zbx_dbstr($id_name).','.$maxNextId.')';
-		if (!DBexecute($sql)) {
-			self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
-		}
-
-		$nextid = bcadd($nextid, 1, 0);
-		return $nextid;
-	}
-
-	public static function getSchema($table = null) {
-		global $ZBX_LOCALNODEID;
-
-		if (is_null(self::$schema)) {
-			self::$schema = include(self::SCHEMA_FILE);
-		}
-
-		if (is_null(self::$nodeId)) {
-			self::$nodeId = get_current_nodeid(false);
-			self::$minNodeId = bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0);
-			self::$maxNodeId = bcadd(bcadd(bcmul(self::$nodeId, '100000000000000', 0), bcmul($ZBX_LOCALNODEID, '100000000000', 0), 0), '99999999999', 0);
-		}
-
-		if (is_null($table)) {
-			return self::$schema;
-		}
-		elseif (isset(self::$schema[$table])) {
-			return self::$schema[$table];
-		}
-		else {
-			self::exception(self::SCHEMA_ERROR, _s('Table "%s" does not exist.', $table));
-		}
-	}
-
-	public static function getDefaults($table) {
-		$table = self::getSchema($table);
-
-		$defaults = array();
-		foreach ($table['fields'] as $name => $field) {
-			if (isset($field['default'])) {
-				$defaults[$name] = $field['default'];
-			}
-		}
-		return $defaults;
-	}
-
-	public static function checkValueTypes($table, &$values) {
-		global $DB;
-		$tableSchema = self::getSchema($table);
-
-		foreach ($values as $field => $value) {
-			if (!isset($tableSchema['fields'][$field])) {
-				unset($values[$field]);
-				continue;
-			}
-
-			if (is_null($values[$field])) {
-				if ($tableSchema['fields'][$field]['null']) {
-					$values[$field] = 'NULL';
-				}
-				elseif (isset($tableSchema['fields'][$field]['default'])) {
-					$values[$field] = $tableSchema['fields'][$field]['default'];
-				}
-				else {
-					self::exception(self::DBEXECUTE_ERROR, _s('Mandatory field "%1$s" is missing in table "%2$s".', $field, $table));
-				}
-			}
-
-			if (isset($tableSchema['fields'][$field]['ref_table'])) {
-				if ($tableSchema['fields'][$field]['null']) {
-					$values[$field] = zero2null($values[$field]);
-				}
-			}
-
-			if ($values[$field] === 'NULL') {
-				if (!$tableSchema['fields'][$field]['null']) {
-					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "NULL" for NOT NULL field "%s".', $field));
-				}
-			}
-			else {
-				switch ($tableSchema['fields'][$field]['type']) {
-					case self::FIELD_TYPE_CHAR:
-						$length = zbx_strlen($values[$field]);
-						$values[$field] = zbx_dbstr($values[$field]);
-
-						if ($length > $tableSchema['fields'][$field]['length']) {
-							self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
-								$values[$field], $field, $length, $tableSchema['fields'][$field]['length']));
-						}
-						break;
-					case self::FIELD_TYPE_ID:
-					case self::FIELD_TYPE_UINT:
-						if (!zbx_ctype_digit($values[$field])) {
-							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for unsigned int field "%2$s".', $values[$field], $field));
-						}
-						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-					case self::FIELD_TYPE_INT:
-						if (!zbx_is_int($values[$field])) {
-							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for int field "%2$s".', $values[$field], $field));
-						}
-						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-					case self::FIELD_TYPE_FLOAT:
-						if (!is_numeric($values[$field])) {
-							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for float field "%2$s".', $values[$field], $field));
-						}
-						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-					case self::FIELD_TYPE_TEXT:
-						$length = zbx_strlen($values[$field]);
-						$values[$field] = zbx_dbstr($values[$field]);
-
-						if ($DB['TYPE'] == ZBX_DB_DB2) {
-							if ($length > 2048) {
-								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is 2048 characters.',
-									$values[$field], $field, $length));
-							}
-						}
-						break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Insert data into DB
-	 *
-	 * @param string $table
-	 * @param array $values pair of fieldname => fieldvalue
-	 * @return array of ids
-	 */
-	public static function insert($table, $values, $getids = true) {
-		if (empty($values)) {
-			return true;
-		}
-		$resultIds = array();
-
-		if ($getids) {
-			$id = self::reserveIds($table, count($values));
-		}
-		$tableSchema = self::getSchema($table);
-
-		foreach ($values as $key => $row) {
-			self::checkValueTypes($table, $row);
-
-			if ($getids) {
-				$resultIds[$key] = $id;
-				$row[$tableSchema['key']] = $id;
-				$id = bcadd($id, 1, 0);
-			}
-
-			$sql = 'INSERT INTO '.$table.' ('.implode(',', array_keys($row)).')'.
-					' VALUES ('.implode(',', array_values($row)).')';
-			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
-			}
-		}
-		return $resultIds;
-	}
-
-	/**
-	 * Update data in DB
-	 *
-	 * @param string $table
-	 * @param array $data
-	 * @param array $data[...]['values'] pair of fieldname => fieldvalue for SET clause
-	 * @param array $data[...]['where'] pair of fieldname => fieldvalue for WHERE clause
-	 * @return array of ids
-	 */
-	public static function update($table, $data) {
-		if (empty($data)) {
-			return true;
-		}
-		$tableSchema = self::getSchema($table);
-
-		$data = zbx_toArray($data);
-		foreach ($data as $row) {
-			// check
-			self::checkValueTypes($table, $row['values']);
-			if (empty($row['values'])) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%s" without values.', $table));
-			}
-
-			// set creation
-			$sqlSet = '';
-			foreach ($row['values'] as $field => $value) {
-				$sqlSet .= ' '.$field.'='.$value.',';
-			}
-			$sqlSet = rtrim($sqlSet, ',');
-
-			if (!isset($row['where']) || empty($row['where']) || !is_array($row['where'])) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%s" without where condition.', $table));
-			}
-
-			// where condition proccess
-			$sqlWhere = array();
-			foreach ($row['where'] as $field => $values) {
-				if (!isset($tableSchema['fields'][$field]) || is_null($values)) {
-					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
-				}
-				$sqlWhere[] = DBcondition($field, zbx_toArray($values));
-			}
-
-			// sql execution
-			$sql = 'UPDATE '.$table.' SET '.$sqlSet.' WHERE '.implode(' AND ', $sqlWhere);
-			if (!DBexecute($sql)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Delete data from DB
-	 *
-	 * Example:
-	 * DB::delete('applications', array('applicationid'=>array(1, 8, 6)));
-	 * DELETE FROM applications WHERE applicationid IN (1, 8, 6)
-	 *
-	 * DB::delete('applications', array('applicationid'=>array(1), 'templateid'=array(10)));
-	 * DELETE FROM applications WHERE applicationid IN (1) AND templateid IN (10)
-	 *
-	 * @param string $table
-	 * @param array $where pair of fieldname => fieldvalues
-	 * @return bool
-	 */
-	public static function delete($table, $wheres, $use_or = false) {
-		if (empty($wheres) || !is_array($wheres)) {
-			self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform delete statement on table "%s" without where condition.', $table));
-		}
-		$table_schema = self::getSchema($table);
-
-		$sqlWhere = array();
-		foreach ($wheres as $field => $values) {
-			if (!isset($table_schema['fields'][$field]) || is_null($values)) {
-				self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
-			}
-			$sqlWhere[] = DBcondition($field, zbx_toArray($values));
-		}
-
-		$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sqlWhere);
-		if (!DBexecute($sql)) {
-			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%s"', $sql));
-		}
-		return true;
-	}
+/**
+ * Returns true if both IDs are equal.
+ *
+ * @param $id1
+ * @param $id2
+ *
+ * @return bool
+ */
+function idcmp($id1, $id2) {
+	return $id1 === $id2;
 }
-?>

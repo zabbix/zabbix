@@ -19,79 +19,74 @@
 **/
 ?>
 <?php
-require_once(dirname(__FILE__).'/../include/class.cwebtest.php');
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPageMaintenance extends CWebTest
-{
+class testPageMaintenance extends CWebTest {
 	// Returns all maintenances
-	public static function allMaintenances()
-	{
+	public static function allMaintenances() {
 		return DBdata('select * from maintenances');
 	}
 
 	/**
 	* @dataProvider allMaintenances
 	*/
-	public function testPageMaintenance_SimpleTest($maintenance)
-	{
+	public function testPageMaintenance_CheckLayout($maintenance) {
 		$this->login('maintenance.php');
-		$this->dropdown_select_wait('groupid','all');
-		$this->assertTitle('Maintenance');
+		$this->dropdown_select_wait('groupid', 'all');
+		$this->assertTitle('Configuration of maintenance');
 
 		$this->ok('Maintenance');
 		$this->ok('CONFIGURATION OF MAINTENANCE PERIODS');
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
-		$this->ok(array('Name','Type','State','Description'));
+		$this->ok(array('Name', 'Type', 'State', 'Description'));
 		$this->ok($maintenance['name']);
-		if($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)	$this->ok('With data collection');
-		if($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)	$this->ok('No data collection');
-		$this->dropdown_select('go','Delete selected');
+		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)	$this->ok('With data collection');
+		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)	$this->ok('No data collection');
+		$this->dropdown_select('go', 'Delete selected');
 		// TODO
-		// $this->dropdown_select('go','Enable selected');
-		// $this->dropdown_select('go','Disable selected');
+		// $this->dropdown_select('go', 'Enable selected');
+		// $this->dropdown_select('go', 'Disable selected');
 	}
 
 	/**
 	* @dataProvider allMaintenances
 	*/
-	public function testPageMaintenance_SimpleUpdate($maintenance)
-	{
-		$name=$maintenance['name'];
-		$maintenanceid=$maintenance['maintenanceid'];
+	public function testPageMaintenance_SimpleUpdate($maintenance) {
+		$name = $maintenance['name'];
+		$maintenanceid = $maintenance['maintenanceid'];
 
-		$sql1="select * from maintenances where name='$name' order by maintenanceid";
-		$oldHashMaintenance=DBhash($sql1);
-		$sql2="select * from maintenances_hosts where maintenanceid=$maintenanceid order by maintenance_hostid";
-		$oldHashHosts=DBhash($sql2);
-		$sql3="select * from maintenances_groups where maintenanceid=$maintenanceid order by maintenance_groupid";
-		$oldHashGroups=DBhash($sql3);
-		$sql4="select * from maintenances_windows where maintenanceid=$maintenanceid order by maintenance_timeperiodid";
-		$oldHashWindows=DBhash($sql4);
-		$sql5="select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid) order by timeperiodid";
-		$oldHashTimeperiods=DBhash($sql5);
+		$sqlMaintenance = "select * from maintenances where name='$name' order by maintenanceid";
+		$oldHashMaintenance = DBhash($sqlMaintenance);
+		$sqlHosts = "select * from maintenances_hosts where maintenanceid=$maintenanceid order by maintenance_hostid";
+		$oldHashHosts = DBhash($sqlHosts);
+		$sqlGroups = "select * from maintenances_groups where maintenanceid=$maintenanceid order by maintenance_groupid";
+		$oldHashGroups = DBhash($sqlGroups);
+		$sqlWindows = "select * from maintenances_windows where maintenanceid=$maintenanceid order by maintenance_timeperiodid";
+		$oldHashWindows = DBhash($sqlWindows);
+		$sqlTimeperiods = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid) order by timeperiodid";
+		$oldHashTimeperiods = DBhash($sqlTimeperiods);
 
 		$this->login('maintenance.php');
-		$this->dropdown_select_wait('groupid','all');
-		$this->assertTitle('Maintenance');
+		$this->dropdown_select_wait('groupid', 'all');
+		$this->assertTitle('Configuration of maintenance');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Maintenance');
+		$this->assertTitle('Configuration of maintenance');
 		$this->ok('Maintenance updated');
 		$this->ok("$name");
 		$this->ok('CONFIGURATION OF MAINTENANCE PERIODS');
 
-		$this->assertEquals($oldHashMaintenance,DBhash($sql1),"Chuck Norris: Maintenance update changed data in table 'maintenances'");
-		$this->assertEquals($oldHashHosts,DBhash($sql2),"Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
-		$this->assertEquals($oldHashGroups,DBhash($sql3),"Chuck Norris: Maintenance update changed data in table 'maintenances_groups'");
-		$this->assertEquals($oldHashWindows,DBhash($sql4),"Chuck Norris: Maintenance update changed data in table 'maintenances_windows'");
-		$this->assertEquals($oldHashTimeperiods,DBhash($sql5),"Chuck Norris: Maintenance update changed data in table 'timeperiods'");
+		$this->assertEquals($oldHashMaintenance, DBhash($sqlMaintenance), "Chuck Norris: Maintenance update changed data in table 'maintenances'");
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
+		$this->assertEquals($oldHashGroups, DBhash($sqlGroups), "Chuck Norris: Maintenance update changed data in table 'maintenances_groups'");
+		$this->assertEquals($oldHashWindows, DBhash($sqlWindows), "Chuck Norris: Maintenance update changed data in table 'maintenances_windows'");
+		$this->assertEquals($oldHashTimeperiods, DBhash($sqlTimeperiods), "Chuck Norris: Maintenance update changed data in table 'timeperiods'");
 	}
 
-	public function testPageMaintenance_MassDeleteAll()
-	{
+	public function testPageMaintenance_MassDeleteAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
@@ -99,78 +94,70 @@ class testPageMaintenance extends CWebTest
 	/**
 	* @dataProvider allMaintenances
 	*/
-	public function testPageMaintenance_MassDelete($maintenance)
-	{
-		$maintenanceid=$maintenance['maintenanceid'];
+	public function testPageMaintenance_MassDelete($maintenance) {
+		$maintenanceid = $maintenance['maintenanceid'];
 
 		DBsave_tables('maintenances');
 
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('maintenance.php');
-		$this->dropdown_select_wait('groupid','all');
-		$this->assertTitle('Maintenance');
+		$this->dropdown_select_wait('groupid', 'all');
+		$this->assertTitle('Configuration of maintenance');
 		$this->checkbox_select("maintenanceids[$maintenanceid]");
-		$this->dropdown_select('go','Delete selected');
+		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->assertTitle('Maintenance');
+		$this->assertTitle('Configuration of maintenance');
 		$this->ok('Maintenance deleted');
 
-		$sql="select * from maintenances where maintenanceid=$maintenanceid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from maintenances_hosts where maintenanceid=$maintenanceid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from maintenances_groups where maintenanceid=$maintenanceid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from maintenances_windows where maintenanceid=$maintenanceid";
-		$this->assertEquals(0,DBcount($sql));
-		$sql="select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid)";
-		$this->assertEquals(0,DBcount($sql));
+		$sql = "select * from maintenances where maintenanceid=$maintenanceid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from maintenances_hosts where maintenanceid=$maintenanceid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from maintenances_groups where maintenanceid=$maintenanceid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from maintenances_windows where maintenanceid=$maintenanceid";
+		$this->assertEquals(0, DBcount($sql));
+		$sql = "select * from timeperiods where timeperiodid in (select timeperiodid from maintenances_windows where maintenanceid=$maintenanceid)";
+		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('maintenances');
 	}
 
-	public function testPageMaintenance_SingleEnable()
-	{
+	public function testPageMaintenance_SingleEnable() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageMaintenance_SingleDisable()
-	{
+	public function testPageMaintenance_SingleDisable() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageMaintenance_MassEnableAll()
-	{
+	public function testPageMaintenance_MassEnableAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageMaintenance_MassEnable()
-	{
+	public function testPageMaintenance_MassEnable() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageMaintenance_MassDisableAll()
-	{
+	public function testPageMaintenance_MassDisableAll() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageMaintenance_MassDisable()
-	{
+	public function testPageMaintenance_MassDisable() {
 // TODO
 		$this->markTestIncomplete();
 	}
 
-	public function testPageMaintenance_Sorting()
-	{
+	public function testPageMaintenance_Sorting() {
 // TODO
 		$this->markTestIncomplete();
 	}

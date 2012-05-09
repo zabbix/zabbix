@@ -7,11 +7,11 @@
 # If not supplied, DEFAULT-ACTION is no.
 #
 # This macro #defines HAVE_LDAP if a required header files is
-# found, and sets @LDAP_LDFLAGS@ and @LDAP_CPPFLAGS@ to the necessary
-# values.
+# found, and sets @LDAP_CPPFLAGS@, @LDAP_LDFLAGS@ and @LDAP_LIBS@
+# to the necessary values.
 #
 # Users may override the detected values by doing something like:
-# LDAP_LDFLAGS="-lldap" LDAP_CPPFLAGS="-I/usr/myinclude" ./configure
+# LDAP_LIBS="-lldap" LDAP_CPPFLAGS="-I/usr/myinclude" ./configure
 #
 # This macro is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -65,21 +65,19 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                fi
        fi
 
-       if test "x$found_ldap" != "xno" ; then
-
+       if test "x$found_ldap" != "xno"; then
                if test "x$enable_static" = "xyes"; then
                        LDAP_LIBS=" -lgnutls -lpthread -lsasl2 $LDAP_LIBS"
                fi
 
-               LDAP_CPPFLAGS=-I$LDAP_INCDIR
-               LDAP_LDFLAGS="-L$LDAP_LIBDIR -lldap -llber $LDAP_LIBS"
+               LDAP_CPPFLAGS="-I$LDAP_INCDIR"
+               LDAP_LDFLAGS="-L$LDAP_LIBDIR"
+               LDAP_LIBS="-lldap -llber $LDAP_LIBS"
 
                found_ldap="yes"
                AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
 	       AC_DEFINE(LDAP_DEPRECATED, 1, [Define to 1 if LDAP depricated functions is used.])
                AC_MSG_RESULT(yes)
-
-#               AC_CHECK_LIB(lber, main, , AC_MSG_ERROR([Not found LBER library]))
 
 	       if test "x$enable_static" = "xyes"; then
                        AC_CHECK_LIB(gnutls, main, , AC_MSG_ERROR([Not found GnuTLS library]))
@@ -92,6 +90,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
 
   AC_SUBST(LDAP_CPPFLAGS)
   AC_SUBST(LDAP_LDFLAGS)
+  AC_SUBST(LDAP_LIBS)
 
   unset _libldap_with
 ])dnl

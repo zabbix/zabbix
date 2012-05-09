@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CJSscript extends CObject {
+
 	public function __construct($item = null) {
 		$this->items = array();
 		$this->addItem($item);

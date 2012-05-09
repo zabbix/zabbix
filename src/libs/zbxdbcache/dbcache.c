@@ -28,7 +28,6 @@
 #include "zbxserver.h"
 #include "proxy.h"
 #include "events.h"
-
 #include "memalloc.h"
 #include "zbxalgo.h"
 
@@ -53,6 +52,7 @@ static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
 extern unsigned char	daemon_type;
 
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
+extern int		CONFIG_NODE_NOHISTORY;
 
 static int		ZBX_HISTORY_SIZE = 0;
 int			ZBX_SYNC_MAX = 1000;	/* must be less than ZBX_HISTORY_SIZE */
@@ -280,7 +280,6 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			table_name = "trends_uint";
 			break;
 		default:
-			zbx_error("unsupported value type for trends: %d", (int)value_type);
 			assert(0);
 	}
 
@@ -334,11 +333,14 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			{
 				trend = &trends[i];
 
-				if (itemid == trend->itemid && clock == trend->clock && value_type == trend->value_type)
-				{
-					trend->disable_from = clock;
-					break;
-				}
+				if (itemid != trend->itemid)
+					continue;
+
+				if (clock != trend->clock || value_type != trend->value_type)
+					continue;
+
+				trend->disable_from = clock;
+				break;
 			}
 		}
 	}
@@ -380,8 +382,13 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			{
 				trend = &trends[i];
 
-				if (itemid == trend->itemid && clock == trend->clock && value_type == trend->value_type)
-					break;
+				if (itemid != trend->itemid)
+					continue;
+
+				if (clock != trend->clock || value_type != trend->value_type)
+					continue;
+
+				break;
 			}
 
 			if (i == trends_to)
@@ -469,7 +476,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			if (clock != trends[i].clock || value_type != trends[i].value_type)
 				continue;
 
-			if (0 == trend[i].disable_from || trend[i].disable_from > clock)
+			if (0 == trends[i].disable_from || trends[i].disable_from > clock)
 				continue;
 
 			if (NULL != (trend = zbx_hashset_search(&cache->trends, &trends[i].itemid)))
@@ -707,7 +714,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 
 	UNLOCK_TRENDS;
 
-	while (trends_num > 0)
+	while (0 < trends_num)
 		DCflush_trends(trends, &trends_num, 1);
 
 	zbx_free(trends);
@@ -731,8 +738,7 @@ static void	DCsync_trends()
 	ZBX_DC_TREND		*trends = NULL, *trend;
 	int			trends_alloc = 0, trends_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d",
-			__function_name, cache->trends_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trends_num:%d", __function_name, cache->trends_num);
 
 	zabbix_log(LOG_LEVEL_WARNING, "syncing trends data...");
 
@@ -896,8 +902,11 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 			switch (item->delta)
 			{
 				case ITEM_STORE_AS_IS:
-					if (1 != item->prevorgvalue_null)
+					if (0 == item->prevorgvalue_null)
+					{
 						zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ",prevorgvalue=null");
+						item->prevorgvalue_null = 1;
+					}
 
 					h->value.dbl = DBmultiply_value_float(item, h->value_orig.dbl);
 
@@ -908,9 +917,6 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					break;
 				case ITEM_STORE_SPEED_PER_SECOND:
-					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-							",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
-
 					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl &&
 							(item->lastclock < h->clock ||
 								(item->lastclock == h->clock && item->lastns < h->ns)))
@@ -928,11 +934,15 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					else
 						h->value_null = 1;
+
+					if (ITEM_STATUS_NOTSUPPORTED != h->status)
+					{
+						zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
+						item->prevorgvalue_null = 0;
+					}
 					break;
 				case ITEM_STORE_SIMPLE_CHANGE:
-					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-							",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
-
 					if (0 == item->prevorgvalue_null && item->prevorgvalue.dbl <= h->value_orig.dbl)
 					{
 						h->value.dbl = h->value_orig.dbl - item->prevorgvalue.dbl;
@@ -946,10 +956,17 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					else
 						h->value_null = 1;
+
+					if (ITEM_STATUS_NOTSUPPORTED != h->status)
+					{
+						zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+								",prevorgvalue='" ZBX_FS_DBL "'", h->value_orig.dbl);
+						item->prevorgvalue_null = 0;
+					}
 					break;
 			}
 
-			if (1 != h->value_null)
+			if (0 == h->value_null)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 						",prevvalue=lastvalue,lastvalue='" ZBX_FS_DBL "'",
@@ -969,15 +986,15 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 			switch (item->delta)
 			{
 				case ITEM_STORE_AS_IS:
-					if (1 != item->prevorgvalue_null)
+					if (0 == item->prevorgvalue_null)
+					{
 						zbx_strcpy_alloc(&sql, &sql_alloc, sql_offset, ",prevorgvalue=null");
+						item->prevorgvalue_null = 1;
+					}
 
 					h->value.ui64 = DBmultiply_value_uint64(item, h->value_orig.ui64);
 					break;
 				case ITEM_STORE_SPEED_PER_SECOND:
-					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
-							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
-
 					if (0 == item->prevorgvalue_null &&
 							item->prevorgvalue.ui64 <= h->value_orig.ui64 &&
 							(item->lastclock < h->clock ||
@@ -990,11 +1007,12 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					else
 						h->value_null = 1;
-					break;
-				case ITEM_STORE_SIMPLE_CHANGE:
+
 					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
-
+					item->prevorgvalue_null = 0;
+					break;
+				case ITEM_STORE_SIMPLE_CHANGE:
 					if (0 == item->prevorgvalue_null && item->prevorgvalue.ui64 <= h->value_orig.ui64)
 					{
 						h->value.ui64 = h->value_orig.ui64 - item->prevorgvalue.ui64;
@@ -1002,10 +1020,14 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 					}
 					else
 						h->value_null = 1;
+
+					zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+							",prevorgvalue='" ZBX_FS_UI64 "'", h->value_orig.ui64);
+					item->prevorgvalue_null = 0;
 					break;
 			}
 
-			if (1 != h->value_null)
+			if (0 == h->value_null)
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
 						",prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "'",
@@ -1032,6 +1054,13 @@ notsupported:
 					zbx_host_key_string(h->itemid), h->value_orig.err);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",status=%d", (int)h->status);
+		}
+
+		if (0 == item->prevorgvalue_null)
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset,
+					",prevorgvalue=null");
+			item->prevorgvalue_null = 1;
 		}
 
 		if (0 != strcmp(item->error, h->value_orig.err))
@@ -1763,6 +1792,14 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 #else
 	const char	*row_dl = ";\n";
 #endif
+	const char	*ins_proxy_history_sql =
+			"insert into proxy_history"
+			" (itemid,clock,ns,value,status)"
+			" values ";
+	const char      *ins_proxy_history_log_sql =
+			"insert into proxy_history"
+			" (itemid,clock,ns,timestamp,source,severity,value,logeventid,status)"
+			" values ";
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1770,61 +1807,56 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into proxy_history (itemid,clock,ns,value) values ");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_proxy_history_sql);
 #endif
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 != history[i].value_null)
+		if (ITEM_VALUE_TYPE_LOG == history[i].value_type)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-		switch (history[i].value_type)
-		{
-			case ITEM_VALUE_TYPE_FLOAT:
-			case ITEM_VALUE_TYPE_UINT64:
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-						"insert into proxy_history (itemid,clock,ns,value) values ");
-				break;
-		}
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_proxy_history_sql);
 #endif
-		switch (history[i].value_type)
+		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
 		{
-			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_DBL "')%s",
-						history[i].itemid,
-						history[i].clock,
-						history[i].ns,
-						history[i].value_orig.dbl,
-						row_dl);
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_UI64 "')%s",
-						history[i].itemid,
-						history[i].clock,
-						history[i].ns,
-						history[i].value_orig.ui64,
-						row_dl);
-				break;
-			case ITEM_VALUE_TYPE_STR:
-			case ITEM_VALUE_TYPE_TEXT:
-				value_esc = DBdyn_escape_string(history[i].value_orig.str);
+			value_esc = DBdyn_escape_string(history[i].value_orig.err);
 
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"(" ZBX_FS_UI64 ",%d,%d,'%s')%s",
-						history[i].itemid,
-						history[i].clock,
-						history[i].ns,
-						value_esc,
-						row_dl);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 ",%d,%d,'%s',%d)%s",
+					history[i].itemid, history[i].clock, history[i].ns,
+					value_esc, (int)history[i].status, row_dl);
 
-				zbx_free(value_esc);
-				break;
+			zbx_free(value_esc);
+		}
+		else
+		{
+			switch (history[i].value_type)
+			{
+				case ITEM_VALUE_TYPE_FLOAT:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_DBL "',%d)%s",
+							history[i].itemid, history[i].clock, history[i].ns,
+							history[i].value_orig.dbl, (int)history[i].status, row_dl);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"(" ZBX_FS_UI64 ",%d,%d,'" ZBX_FS_UI64 "',%d)%s",
+							history[i].itemid, history[i].clock, history[i].ns,
+							history[i].value_orig.ui64, (int)history[i].status, row_dl);
+					break;
+				case ITEM_VALUE_TYPE_STR:
+				case ITEM_VALUE_TYPE_TEXT:
+					value_esc = DBdyn_escape_string(history[i].value_orig.str);
+
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"(" ZBX_FS_UI64 ",%d,%d,'%s',%d)%s",
+							history[i].itemid, history[i].clock, history[i].ns,
+							value_esc, (int)history[i].status, row_dl);
+
+					zbx_free(value_esc);
+					break;
+			}
 		}
 	}
 
@@ -1840,39 +1872,42 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 
 #ifdef HAVE_MULTIROW_INSERT
 	tmp_offset = sql_offset;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"insert into proxy_history (itemid,clock,ns,timestamp,source,severity,value,logeventid) values ");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_proxy_history_log_sql);
 #endif
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 != history[i].value_null)
-			continue;
-
 		if (ITEM_VALUE_TYPE_LOG != history[i].value_type)
 			continue;
 
 #ifndef HAVE_MULTIROW_INSERT
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"insert into proxy_history (itemid,clock,ns,timestamp,source,severity,value,logeventid) values ");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ins_proxy_history_log_sql);
 #endif
-		source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
-		value_esc = DBdyn_escape_string(history[i].value_orig.str);
+		if (ITEM_STATUS_NOTSUPPORTED == history[i].status)
+		{
+			value_esc = DBdyn_escape_string(history[i].value_orig.err);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"(" ZBX_FS_UI64 ",%d,%d,%d,'%s',%d,'%s',%d)%s",
-				history[i].itemid,
-				history[i].clock,
-				history[i].ns,
-				history[i].timestamp,
-				source_esc,
-				history[i].severity,
-				value_esc,
-				history[i].logeventid,
-				row_dl);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 ",%d,%d,0,'',0,'%s',0,%d)%s",
+					history[i].itemid, history[i].clock, history[i].ns,
+					value_esc, (int)history[i].status, row_dl);
 
-		zbx_free(value_esc);
-		zbx_free(source_esc);
+			zbx_free(value_esc);
+		}
+		else
+		{
+			source_esc = DBdyn_escape_string_len(history[i].value.str, HISTORY_LOG_SOURCE_LEN);
+			value_esc = DBdyn_escape_string(history[i].value_orig.str);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"(" ZBX_FS_UI64 ",%d,%d,%d,'%s',%d,'%s',%d,%d)%s",
+					history[i].itemid, history[i].clock, history[i].ns,
+					history[i].timestamp, source_esc, history[i].severity,
+					value_esc, history[i].logeventid, (int)history[i].status, row_dl);
+
+			zbx_free(value_esc);
+			zbx_free(source_esc);
+		}
 	}
 
 #ifdef HAVE_MULTIROW_INSERT
@@ -2489,6 +2524,34 @@ static void	DCadd_history_text(zbx_uint64_t itemid, const char *value_orig, zbx_
 	UNLOCK_CACHE;
 }
 
+/* lld item values should be stored without a limit */
+static void	DCadd_history_lld(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts)
+{
+	ZBX_DC_HISTORY	*history;
+	size_t		len;
+
+	len = strlen(value_orig) + 1;
+
+	LOCK_CACHE;
+
+	DCcheck_ns(ts);
+
+	history = DCget_history_ptr(len);
+
+	history->itemid = itemid;
+	history->clock = ts->sec;
+	history->ns = ts->ns;
+	history->status = ITEM_STATUS_ACTIVE;
+	history->value_type = ITEM_VALUE_TYPE_TEXT;
+	DCadd_text(&history->value_orig.str, value_orig, len);
+	history->value_null = 0;
+
+	cache->stats.history_counter++;
+	cache->stats.history_text_counter++;
+
+	UNLOCK_CACHE;
+}
+
 static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts,
 		int timestamp, const char *source, int severity, int logeventid, int lastlogsize, int mtime)
 {
@@ -2577,10 +2640,19 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		return;
 	}
 
-	/* check for low-level discovery (lld) item */
-	if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type) && 0 != (ZBX_FLAG_DISCOVERY & flags))
+	if (0 != (ZBX_FLAG_DISCOVERY & flags))
 	{
-		DBlld_process_discovery_rule(itemid, value->text);
+		/* server processes low-level discovery (lld) items while proxy stores their values in db */
+		if (0 != (ZBX_DAEMON_TYPE_SERVER & daemon_type))
+		{
+			DBlld_process_discovery_rule(itemid, value->text, ts);
+		}
+		else
+		{
+			if (GET_TEXT_RESULT(value))
+				DCadd_history_lld(itemid, value->text, ts);
+		}
+
 		return;
 	}
 
@@ -2617,6 +2689,56 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 /******************************************************************************
  *                                                                            *
+ * Function: init_trend_cache                                                 *
+ *                                                                            *
+ * Purpose: Allocate shared memory for trend cache (part of database cache)   *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ * Comments: Is optionally called from init_database_cache()                  *
+ *                                                                            *
+ ******************************************************************************/
+
+ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
+
+static void	init_trend_cache()
+{
+	const char	*__function_name = "init_trend_cache";
+	key_t		trend_shm_key;
+	size_t		sz;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC key for trend cache");
+		exit(FAIL);
+	}
+
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
+	{
+		zbx_error("cannot create mutex for trend cache");
+		exit(FAIL);
+	}
+
+	sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
+	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
+
+	cache->trends_num = 0;
+
+#define INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
+
+	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
+
+#undef INIT_HASHSET_SIZE
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: init_database_cache                                              *
  *                                                                            *
  * Purpose: Allocate shared memory for database cache                         *
@@ -2627,21 +2749,19 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 ZBX_MEM_FUNC1_IMPL_MALLOC(__history, history_mem);
 ZBX_MEM_FUNC1_IMPL_MALLOC(__history_text, history_text_mem);
-ZBX_MEM_FUNC_IMPL(__trend, trend_mem);
 
 void	init_database_cache()
 {
 	const char	*__function_name = "init_database_cache";
-	key_t		history_shm_key, history_text_shm_key, trend_shm_key;
+	key_t		history_shm_key, history_text_shm_key;
 	size_t		sz;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (-1 == (history_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_ID)) ||
-			-1 == (history_text_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_TEXT_ID)) ||
-			-1 == (trend_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_TREND_ID)))
+			-1 == (history_text_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_TEXT_ID)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history and trend caches");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history cache");
 		exit(FAIL);
 	}
 
@@ -2651,15 +2771,9 @@ void	init_database_cache()
 		exit(FAIL);
 	}
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&trends_lock, ZBX_MUTEX_TRENDS))
-	{
-		zbx_error("cannot create mutex for trend cache");
-		exit(FAIL);
-	}
-
 	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS))
 	{
-		zbx_error("cannot create mutex for id cache");
+		zbx_error("cannot create mutex for IDs cache");
 		exit(FAIL);
 	}
 
@@ -2702,22 +2816,11 @@ void	init_database_cache()
 	cache->text_free = CONFIG_TEXT_CACHE_SIZE;
 
 	/* trend cache */
+	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		init_trend_cache();
 
-	sz = zbx_mem_required_size(CONFIG_TRENDS_CACHE_SIZE, 1, "trend cache", "TrendCacheSize");
-
-	zbx_mem_create(&trend_mem, trend_shm_key, ZBX_NO_MUTEX, sz, "trend cache", "TrendCacheSize");
-
-	cache->trends_num = 0;
 	cache->last_ts.sec = 0;
 	cache->last_ts.ns = 0;
-
-#define	INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
-
-	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
-
-#undef	INIT_HASHSET_SIZE
 
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_alloc);
@@ -2739,7 +2842,8 @@ static void	DCsync_all()
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
 	DCsync_history(ZBX_SYNC_FULL);
-	DCsync_trends();
+	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		DCsync_trends();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_all()");
 }
@@ -2761,22 +2865,16 @@ void	free_database_cache()
 
 	DCsync_all();
 
-	LOCK_CACHE;
-	LOCK_TRENDS;
-	LOCK_CACHE_IDS;
-
 	cache = NULL;
 	zbx_mem_destroy(history_mem);
 	zbx_mem_destroy(history_text_mem);
-	zbx_mem_destroy(trend_mem);
-
-	UNLOCK_CACHE_IDS;
-	UNLOCK_TRENDS;
-	UNLOCK_CACHE;
+	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		zbx_mem_destroy(trend_mem);
 
 	zbx_mutex_destroy(&cache_lock);
-	zbx_mutex_destroy(&trends_lock);
 	zbx_mutex_destroy(&cache_ids_lock);
+	if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		zbx_mutex_destroy(&trends_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

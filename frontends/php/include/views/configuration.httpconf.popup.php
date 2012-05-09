@@ -32,7 +32,8 @@ if (isset($_REQUEST['save'])) {
 			zbx_jsvalue($_REQUEST['url']).','.
 			zbx_jsvalue($_REQUEST['posts']).','.
 			zbx_jsvalue($_REQUEST['required']).','.
-			zbx_jsvalue($_REQUEST['status_codes']).");\n");
+			zbx_jsvalue($_REQUEST['status_codes']).");\n"
+		);
 	}
 	else {
 		insert_js('update_httpstep('.
@@ -44,7 +45,8 @@ if (isset($_REQUEST['save'])) {
 			zbx_jsvalue($_REQUEST['url']).','.
 			zbx_jsvalue($_REQUEST['posts']).','.
 			zbx_jsvalue($_REQUEST['required']).','.
-			zbx_jsvalue($_REQUEST['status_codes']).");\n");
+			zbx_jsvalue($_REQUEST['status_codes']).");\n"
+		);
 	}
 }
 else {
@@ -56,7 +58,7 @@ else {
 	$httpPopupFormList = new CFormList('httpPopupFormList');
 	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', get_request('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, 'no', 64));
 	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', get_request('url', ''), ZBX_TEXTBOX_STANDARD_SIZE));
-	$httpPopupFormList->addRow(_('Post'), new CTextArea('posts', get_request('posts', ''), ZBX_TEXTAREA_STANDARD_SIZE, 10));
+	$httpPopupFormList->addRow(_('Post'), new CTextArea('posts', get_request('posts', '')));
 	$httpPopupFormList->addRow(_('Timeout'), new CNumericBox('timeout', get_request('timeout', 15), 5));
 	$httpPopupFormList->addRow(_('Required string'), new CTextBox('required', get_request('required', ''), ZBX_TEXTBOX_STANDARD_SIZE));
 	$httpPopupFormList->addRow(_('Required status codes'), new CTextBox('status_codes', get_request('status_codes', ''), ZBX_TEXTBOX_STANDARD_SIZE));

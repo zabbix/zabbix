@@ -19,15 +19,12 @@
 **/
 ?>
 <?php
-class CHelp extends CIcon{
-	public function __construct($url='index.php', $side='right'){
-		if($side != 'right'){
-			$side = 'left';
-		}
 
-		parent::__construct("http://www.zabbix.com/documentation",'iconhelp');//'http://www.zabbix.com/manual/v1.1/'.$url);
+class CHelp extends CIcon {
+
+	public function __construct() {
+		parent::__construct('http://www.zabbix.com/documentation', 'iconhelp');
 		parent::onClick('window.open("http://www.zabbix.com/documentation/");');
-		$this->attributes['style'] = 'float:'.$side.'; text-decoration: none;';
 	}
 }
 ?>

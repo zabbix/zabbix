@@ -21,7 +21,7 @@ echo "--
 --
 -- You should have received a copy of the GNU General Public License
 -- along with this program; if not, write to the Free Software
--- Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --
 "
 
@@ -37,14 +37,14 @@ for table in `grep TABLE "$schema" | grep ZBX_DATA | awk -F'|' '{print $2}'`; do
 		line=`grep -v ZBX_NODATA "$schema" | grep -A $i "TABLE|$table|" | tail -1 | grep FIELD`
 		[ -z "$line" ] && break
 		field=`echo $line | awk -F'|' '{print $2}'`
-		fields="$fields,replace($field,'|','&pipe;') as $field"
+		fields="$fields,replace(replace($field,'|','&pipe;'),'\n','&eol;') as $field"
 		# figure out references to itself for correct sort order
 		reftable=`echo $line | cut -f8 -d'|' | sed -e 's/ //'`
 		if [ "$table" = "$reftable" ]; then
 			pri_field=`echo $line | cut -f2 -d'|' | sed -e 's/ //'`
 			ref_field=`echo $line | cut -f9 -d'|' | sed -e 's/ //'`
 			# this strange sort order works fine with MySQL
-			sortorder="order by $pri_field>$ref_field"
+			sortorder="order by $pri_field<$ref_field,$ref_field"
 		fi
 	done
 	# remove first comma

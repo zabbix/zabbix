@@ -19,6 +19,7 @@
 #
 #     AC_SUBST(SQLITE3_CPPFLAGS)
 #     AC_SUBST(SQLITE3_LDFLAGS)
+#     AC_SUBST(SQLITE3_LIBS)
 #     AC_SUBST(SQLITE3_VERSION)
 #
 #   And sets:
@@ -60,6 +61,7 @@ AC_DEFUN([AX_LIB_SQLITE3],
 
     SQLITE3_CFLAGS=""
     SQLITE3_LDFLAGS=""
+    SQLITE3_LIBS=""
     SQLITE3_VERSION=""
 
     if test "x$WANT_SQLITE3" = "xyes"; then
@@ -82,21 +84,19 @@ AC_DEFUN([AX_LIB_SQLITE3],
         AC_MSG_CHECKING([for SQLite3 library >= $sqlite3_version_req])
 
         if test "$ac_sqlite3_path" != ""; then
-            ac_sqlite3_ldflags="-L$ac_sqlite3_path/lib"
             ac_sqlite3_cppflags="-I$ac_sqlite3_path/include"
+            ac_sqlite3_ldflags="-L$ac_sqlite3_path/lib"
         else
             for ac_sqlite3_path_tmp in /usr /usr/local /opt ; do
                 if test -f "$ac_sqlite3_path_tmp/include/$ac_sqlite3_header" \
                     && test -r "$ac_sqlite3_path_tmp/include/$ac_sqlite3_header"; then
                     ac_sqlite3_path=$ac_sqlite3_path_tmp
-                    ac_sqlite3_ldflags="-I$ac_sqlite3_path_tmp/include"
-                    ac_sqlite3_cppflags="-L$ac_sqlite3_path_tmp/lib"
+                    ac_sqlite3_cppflags="-I$ac_sqlite3_path/include"
+                    ac_sqlite3_ldflags="-L$ac_sqlite3_path/lib"
                     break;
                 fi
             done
         fi
-
-        ac_sqlite3_ldflags="$ac_sqlite3_ldflags -lsqlite3"
 
         saved_CPPFLAGS="$CPPFLAGS"
         CPPFLAGS="$CPPFLAGS $ac_sqlite3_cppflags"
@@ -131,6 +131,7 @@ dnl      AC_LANG_POP([C++])
 
             SQLITE3_CPPFLAGS="$ac_sqlite3_cppflags"
             SQLITE3_LDFLAGS="$ac_sqlite3_ldflags"
+            SQLITE3_LIBS="-lsqlite3"
 
             ac_sqlite3_header_path="$ac_sqlite3_path/include/$ac_sqlite3_header"
 
@@ -148,6 +149,7 @@ dnl      AC_LANG_POP([C++])
 
             AC_SUBST(SQLITE3_CPPFLAGS)
             AC_SUBST(SQLITE3_LDFLAGS)
+            AC_SUBST(SQLITE3_LIBS)
             AC_SUBST(SQLITE3_VERSION)
             AC_DEFINE(HAVE_SQLITE3, [1], [Define to 1 if SQLite libraries are available])
         fi

@@ -114,14 +114,14 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	MODE_FUNCTION fl[] =
+	const MODE_FUNCTION	fl[] =
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
 		{"used",	SYSTEM_SWAP_USED},
 		{"pfree",	SYSTEM_SWAP_PFREE},
 		{"pused",	SYSTEM_SWAP_PUSED},
-		{0,		0}
+		{NULL,		0}
 	};
 
 	char	swapdev[MAX_STRING_LEN];
@@ -155,7 +155,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return SYSINFO_RET_FAIL;
 }
 
-int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t *ocount, zbx_uint64_t *opages)
+static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t *ocount, zbx_uint64_t *opages)
 {
 	int		mib[2];
 	size_t		len;

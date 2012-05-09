@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
+
 $httpWidget = new CWidget();
 
 // create new scenario button
@@ -31,7 +31,7 @@ if ($this->data['hostid'] > 0) {
 }
 else {
 	$createScenarioButton = new CSubmit('form', _('Create scenario (select host first)'));
-	$createScenarioButton->setEnabled('no');
+	$createScenarioButton->setEnabled(false);
 }
 $createForm->addItem($createScenarioButton);
 $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
@@ -40,10 +40,13 @@ $httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'), $createForm);
 $filterForm = new CForm('get');
 $filterForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
 $filterForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-$numRows = new CDiv();
-$numRows->setAttribute('name', 'numrows');
+
 $httpWidget->addHeader(_('Scenarios'), $filterForm);
-$httpWidget->addHeader($numRows, array('[ ', new CLink($this->data['showDisabled'] ? _('Hide disabled scenarios') : _('Show disabled scenarios'), '?showdisabled='.($this->data['showDisabled'] ? 0 : 1), null), ' ]'));
+$httpWidget->addHeaderRowNumber(array(
+	'[ ',
+	new CLink($this->data['showDisabled'] ? _('Hide disabled scenarios') : _('Show disabled scenarios'),
+	'?showdisabled='.($this->data['showDisabled'] ? 0 : 1), null), ' ]'
+));
 
 // create form
 $httpForm = new CForm('get');
@@ -57,7 +60,7 @@ else {
 	$expandLink = new CLink(new CImg('images/general/closed.gif'), '?open=1'.url_param('groupid').url_param('hostid'));
 }
 
-$httpTable = new CTableInfo();
+$httpTable = new CTableInfo(_('No web scenarios defined.'));
 $httpTable->setHeader(array(
 	new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
 	is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
@@ -67,8 +70,6 @@ $httpTable->setHeader(array(
 	_('Update interval'),
 	make_sorting_header(_('Status'), 'status'))
 );
-
-$httpWidget->addItem(BR());
 
 $httpTableRows = array();
 foreach ($this->data['db_httptests'] as $httptestid => $httptest_data) {
@@ -125,8 +126,8 @@ foreach ($httpTableRows as $appid => $app_rows) {
 
 // create go buttons
 $goComboBox = new CComboBox('go');
-$goOption = new CComboItem('activate', _('Activate selected'));
-$goOption->setAttribute('confirm', _('Activate selected WEB scenarios?'));
+$goOption = new CComboItem('activate', _('Enable selected'));
+$goOption->setAttribute('confirm', _('Enable selected WEB scenarios?'));
 $goComboBox->addItem($goOption);
 
 $goOption = new CComboItem('disable', _('Disable selected'));
@@ -143,6 +144,7 @@ $goComboBox->addItem($goOption);
 
 $goButton = new CSubmit('goButton', _('Go').' (0)');
 $goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "group_httptestid";');
 
 // append table to form
 $httpForm->addItem(array($this->data['paging'], $httpTable, $this->data['paging'], get_table_header(array($goComboBox, $goButton))));
@@ -150,4 +152,3 @@ $httpForm->addItem(array($this->data['paging'], $httpTable, $this->data['paging'
 // append form to widget
 $httpWidget->addItem($httpForm);
 return $httpWidget;
-?>

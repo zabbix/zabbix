@@ -19,8 +19,11 @@
 **/
 ?>
 <?php
+
 class CTextBox extends CInput {
+
 	private $caption;
+
 	public function __construct($name = 'textbox', $value = '', $size = 20, $readonly = 'no', $maxlength = 255) {
 		parent::__construct('text', $name, $value);
 		$this->setReadonly($readonly);
@@ -28,6 +31,11 @@ class CTextBox extends CInput {
 		$this->tag_body_start = '';
 		$this->setAttribute('size', $size);
 		$this->setAttribute('maxlength', $maxlength);
+
+		// require for align input field using css width
+		if ($size == ZBX_TEXTBOX_STANDARD_SIZE) {
+			$this->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+		}
 	}
 }
 ?>

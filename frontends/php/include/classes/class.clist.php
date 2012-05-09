@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
+
 class CList extends CTag {
+
 	public $emptyList;
 
 	public function __construct($value = null, $class = null) {

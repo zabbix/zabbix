@@ -19,19 +19,19 @@
 **/
 ?>
 <?php
-	require_once('include/config.inc.php');
-	require_once('include/triggers.inc.php');
-	require_once('include/forms.inc.php');
-	require_once('include/js.inc.php');
+	require_once dirname(__FILE__).'/include/config.inc.php';
+	require_once dirname(__FILE__).'/include/triggers.inc.php';
+	require_once dirname(__FILE__).'/include/forms.inc.php';
+	require_once dirname(__FILE__).'/include/js.inc.php';
 
 	$dstfrm		= get_request('dstfrm',		0);	// destination form
 
-	$page['title'] = "S_MEDIA";
+	$page['title'] = _('Media');
 	$page['file'] = 'popup_media.php';
 
 	define('ZBX_PAGE_NO_MENU', 1);
 
-require_once('include/page_header.php');
+require_once dirname(__FILE__).'/include/page_header.php';
 
 	if($USER_DETAILS['alias'] == ZBX_GUEST_USER) {
 		access_deny();
@@ -62,7 +62,7 @@ require_once('include/page_header.php');
 
 	if(isset($_REQUEST['add'])){
 		if( !validate_period($_REQUEST['period']) ){
-			error(S_INCORRECT_TIME_PERIOD);
+			error(_('Incorrect time period'));
 		}
 		else{
 			$severity = 0;
@@ -103,7 +103,7 @@ require_once('include/page_header.php');
 	$period		= get_request('period',ZBX_DEFAULT_INTERVAL);
 
 
-	$frmMedia = new CFormTable(S_NEW_MEDIA);
+	$frmMedia = new CFormTable(_('New media'));
 	$frmMedia->SetHelp('web.media.php');
 
 	$frmMedia->addVar('media',$media);
@@ -121,10 +121,10 @@ require_once('include/page_header.php');
 				get_node_name_by_elid($type['mediatypeid'], null, ': ').$type['description']
 				);
 	}
-	$frmMedia->addRow(S_TYPE,$cmbType);
+	$frmMedia->addRow(_('Type'),$cmbType);
 
-	$frmMedia->addRow(S_SEND_TO, new CTextBox('sendto',$sendto,20));
-	$frmMedia->addRow(S_WHEN_ACTIVE, new CTextBox('period',$period,48));
+	$frmMedia->addRow(_('Send to'), new CTextBox('sendto',$sendto,20));
+	$frmMedia->addRow(_('When active'), new CTextBox('period',$period,48));
 
 	$frm_row = array();
 	for($i=0; $i<=5; $i++){
@@ -139,18 +139,18 @@ require_once('include/page_header.php');
 			),
 			BR());
 	}
-	$frmMedia->addRow(S_USE_IF_SEVERITY,$frm_row);
+	$frmMedia->addRow(_('Use if severity'),$frm_row);
 
 	$cmbStat = new CComboBox('active',$active);
-	$cmbStat->addItem(0,S_ENABLED);
-	$cmbStat->addItem(1,S_DISABLED);
-	$frmMedia->addRow(S_STATUS,$cmbStat);
+	$cmbStat->addItem(0,_('Enabled'));
+	$cmbStat->addItem(1,_('Disabled'));
+	$frmMedia->addRow(_('Status'),$cmbStat);
 
-	$frmMedia->addItemToBottomRow(new CSubmit('add', ($media > -1)?S_SAVE:S_ADD));
+	$frmMedia->addItemToBottomRow(new CSubmit('add', ($media > -1)?_('Save'):_('Add')));
 	$frmMedia->addItemToBottomRow(SPACE);
 	$frmMedia->addItemToBottomRow(new CButtonCancel(null, 'close_window();'));
 	$frmMedia->Show();
 
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

@@ -19,19 +19,18 @@
 **/
 ?>
 <?php
-require_once('include/config.inc.php');
-require_once('include/hosts.inc.php');
-require_once('include/forms.inc.php');
+require_once dirname(__FILE__).'/include/config.inc.php';
+require_once dirname(__FILE__).'/include/hosts.inc.php';
+require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('Applications');
+$page['title'] = _('Configuration of applications');
 $page['file'] = 'applications.php';
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array();
 
-require_once('include/page_header.php');
-?>
-<?php
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+require_once dirname(__FILE__).'/include/page_header.php';
+
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'hosts' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
 	'groups' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
@@ -51,14 +50,13 @@ $fields = array(
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null, 	null),
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null, 	null),
+	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 	'form_refresh' =>		array(T_ZBX_STR, O_OPT, null,	null,	null)
 );
 check_fields($fields);
 validate_sort_and_sortorder('name', ZBX_SORT_UP);
-?>
-<?php
+
 $_REQUEST['go'] = get_request('go', 'none');
 
 if (get_request('groupid', 0) > 0) {
@@ -294,5 +292,5 @@ else {
 	$applicationView->show();
 }
 
-require_once('include/page_footer.php');
+require_once dirname(__FILE__).'/include/page_footer.php';
 ?>

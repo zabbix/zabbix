@@ -21,6 +21,7 @@
 #define ZABBIX_DB_H
 
 #include "common.h"
+#include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
 
@@ -34,7 +35,6 @@ extern int	CONFIG_DBPORT;
 extern int	CONFIG_NODEID;
 extern int	CONFIG_MASTER_NODEID;
 extern int	CONFIG_HISTSYNCER_FORKS;
-extern int	CONFIG_NODE_NOHISTORY;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
@@ -87,12 +87,9 @@ zbx_graph_item_type;
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
 
-#define TRIGGER_DESCRIPTION_LEN		1020
-#define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
+#define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		255
 #define TRIGGER_EXPRESSION_LEN_MAX	TRIGGER_EXPRESSION_LEN+1
-#define TRIGGER_URL_LEN			255
-#define TRIGGER_URL_LEN_MAX		TRIGGER_URL_LEN+1
 #define TRIGGER_ERROR_LEN		128
 #define TRIGGER_ERROR_LEN_MAX		TRIGGER_ERROR_LEN+1
 
@@ -114,36 +111,29 @@ zbx_graph_item_type;
 #define INTERFACE_PORT_LEN		64
 #define INTERFACE_PORT_LEN_MAX		INTERFACE_PORT_LEN+1
 
-#define ITEM_KEY_LEN			1020
-#define ITEM_KEY_LEN_MAX		ITEM_KEY_LEN+1
+#define ITEM_NAME_LEN			255
+#define ITEM_KEY_LEN			255
 #define ITEM_SNMP_COMMUNITY_LEN		64
 #define ITEM_SNMP_COMMUNITY_LEN_MAX	ITEM_SNMP_COMMUNITY_LEN+1
 #define ITEM_SNMP_OID_LEN		255
 #define ITEM_SNMP_OID_LEN_MAX		ITEM_SNMP_OID_LEN+1
 #define ITEM_LASTVALUE_LEN		255
-#define ITEM_LASTVALUE_LEN_MAX		ITEM_LASTVALUE_LEN+1
 #define ITEM_ERROR_LEN			128
 #define ITEM_ERROR_LEN_MAX		ITEM_ERROR_LEN+1
 #define ITEM_TRAPPER_HOSTS_LEN		255
 #define ITEM_TRAPPER_HOSTS_LEN_MAX	ITEM_TRAPPER_HOSTS_LEN+1
-#define ITEM_UNITS_LEN			10
-#define ITEM_UNITS_LEN_MAX		ITEM_UNITS_LEN+1
 #define ITEM_SNMPV3_SECURITYNAME_LEN		64
 #define ITEM_SNMPV3_SECURITYNAME_LEN_MAX	ITEM_SNMPV3_SECURITYNAME_LEN+1
 #define ITEM_SNMPV3_AUTHPASSPHRASE_LEN		64
 #define ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX	ITEM_SNMPV3_AUTHPASSPHRASE_LEN+1
 #define ITEM_SNMPV3_PRIVPASSPHRASE_LEN		64
 #define ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX	ITEM_SNMPV3_PRIVPASSPHRASE_LEN+1
-#define ITEM_FORMULA_LEN		255
-#define ITEM_FORMULA_LEN_MAX		ITEM_FORMULA_LEN+1
 #define ITEM_LOGTIMEFMT_LEN		64
 #define ITEM_LOGTIMEFMT_LEN_MAX		ITEM_LOGTIMEFMT_LEN+1
 #define ITEM_DELAY_FLEX_LEN		255
 #define ITEM_DELAY_FLEX_LEN_MAX		ITEM_DELAY_FLEX_LEN+1
 #define ITEM_IPMI_SENSOR_LEN		128
 #define ITEM_IPMI_SENSOR_LEN_MAX	ITEM_IPMI_SENSOR_LEN+1
-#define ITEM_PARAMS_LEN			2048
-#define ITEM_PARAMS_LEN_MAX		ITEM_PARAMS_LEN+1
 #define ITEM_USERNAME_LEN		64
 #define ITEM_USERNAME_LEN_MAX		ITEM_USERNAME_LEN+1
 #define ITEM_PASSWORD_LEN		64
@@ -152,6 +142,7 @@ zbx_graph_item_type;
 #define ITEM_PUBLICKEY_LEN_MAX		ITEM_PUBLICKEY_LEN+1
 #define ITEM_PRIVATEKEY_LEN		64
 #define ITEM_PRIVATEKEY_LEN_MAX		ITEM_PRIVATEKEY_LEN+1
+#define ITEM_PARAM_LEN			65535
 
 #define FUNCTION_FUNCTION_LEN		12
 #define FUNCTION_FUNCTION_LEN_MAX	FUNCTION_FUNCTION_LEN+1
@@ -171,19 +162,17 @@ zbx_graph_item_type;
 #define HISTORY_LOG_SOURCE_LEN_MAX	HISTORY_LOG_SOURCE_LEN+1
 
 #define ALERT_SENDTO_LEN		100
-#define ALERT_SENDTO_LEN_MAX		ALERT_SENDTO_LEN+1
 #define ALERT_SUBJECT_LEN		255
-#define ALERT_SUBJECT_LEN_MAX		ALERT_SUBJECT_LEN+1
 #define ALERT_MESSAGE_LEN		65535
-#define ALERT_MESSAGE_LEN_MAX		ALERT_MESSAGE_LEN+1
 #define ALERT_ERROR_LEN			128
 #define ALERT_ERROR_LEN_MAX		ALERT_ERROR_LEN+1
+
+#define GRAPH_NAME_LEN			128
 
 #define GRAPH_ITEM_COLOR_LEN		6
 #define GRAPH_ITEM_COLOR_LEN_MAX	GRAPH_ITEM_COLOR_LEN+1
 
 #define DSERVICE_KEY_LEN		255
-#define DSERVICE_KEY_LEN_MAX		DSERVICE_KEY_LEN+1
 #define DSERVICE_VALUE_LEN		255
 #define DSERVICE_VALUE_LEN_MAX		DSERVICE_VALUE_LEN+1
 
@@ -193,18 +182,7 @@ zbx_graph_item_type;
 #define HTTPTEST_HTTP_PASSWORD_LEN_MAX	HTTPTEST_HTTP_PASSWORD_LEN+1
 
 #define PROXY_DHISTORY_KEY_LEN		255
-#define PROXY_DHISTORY_KEY_LEN_MAX	PROXY_DHISTORY_KEY_LEN+1
 #define PROXY_DHISTORY_VALUE_LEN	255
-#define PROXY_DHISTORY_VALUE_LEN_MAX	PROXY_DHISTORY_VALUE_LEN+1
-
-#define HTTPTEST_ERROR_LEN		255
-#define HTTPTEST_ERROR_LEN_MAX		HTTPTEST_ERROR_LEN+1
-
-#define HTTPSTEP_STATUS_LEN		255
-#define HTTPSTEP_STATUS_LEN_MAX		HTTPSTEP_STATUS_LEN+1
-
-#define HTTPSTEP_REQUIRED_LEN		255
-#define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
 #define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.lastvalue,"		\
 				"i.prevvalue,i.hostid,i.value_type,i.delta,i.prevorgvalue,"	\
@@ -289,7 +267,7 @@ DB_DSERVICE;
 typedef struct
 {
 	zbx_uint64_t	triggerid;
-	char		description[TRIGGER_DESCRIPTION_LEN_MAX];
+	char		description[TRIGGER_DESCRIPTION_LEN * 4 + 1];
 	char		expression[TRIGGER_EXPRESSION_LEN_MAX];
 	char		*url;
 	char		*comments;
@@ -428,15 +406,11 @@ typedef struct
 {
 	zbx_uint64_t	httptestid;
 	char		*name;
-	zbx_uint64_t	applicationid;
-	int		nextcheck;
-	int		status;
 	char		*macros;
 	char		*agent;
-	double		time;
-	int		authentication;
 	char		*http_user;
 	char		*http_password;
+	int		authentication;
 }
 DB_HTTPTEST;
 
@@ -444,33 +418,15 @@ typedef struct
 {
 	zbx_uint64_t	httpstepid;
 	zbx_uint64_t	httptestid;
-	int		no;
 	char		*name;
-	char		url[MAX_STRING_LEN];	/* excessive length is required to support macros */
+	char		*url;
+	char		*posts;
+	char		*required;
+	char		*status_codes;
+	int		no;
 	int		timeout;
-	char		posts[MAX_STRING_LEN];
-	char		required[HTTPSTEP_REQUIRED_LEN_MAX];
-	char		status_codes[HTTPSTEP_STATUS_LEN_MAX];
 }
 DB_HTTPSTEP;
-
-typedef struct
-{
-	zbx_uint64_t	httpstepitemid;
-	zbx_uint64_t	httpstepid;
-	zbx_uint64_t	itemid;
-	zbx_httpitem_type_t	type;
-}
-DB_HTTPSTEPITEM;
-
-typedef struct
-{
-	zbx_uint64_t	httptestitemid;
-	zbx_uint64_t	httptestid;
-	zbx_uint64_t	itemid;
-	zbx_httpitem_type_t	type;
-}
-DB_HTTPTESTITEM;
 
 typedef struct
 {
@@ -538,7 +494,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid; /* itemid should come first for correct sorting */
 	zbx_uint64_t	gitemid;
-	char		key[ITEM_KEY_LEN_MAX];
+	char		key[ITEM_KEY_LEN * 4 + 1];
 	int		drawtype;
 	int		sortorder;
 	char		color[GRAPH_ITEM_COLOR_LEN_MAX];
@@ -584,9 +540,11 @@ void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
 int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 
-int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_uint64_t templateid);
-int	DBdelete_host(zbx_uint64_t hostid);
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids);
+int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_templateids);
+
+void	DBdelete_items(zbx_vector_uint64_t *itemids);
+void	DBdelete_host(zbx_uint64_t hostid);
 void	DBget_graphitems(const char *sql, ZBX_GRAPH_ITEMS **gitems, size_t *gitems_alloc, size_t *gitems_num);
 void	DBupdate_services(zbx_uint64_t triggerid, int status, int clock);
 
@@ -627,5 +585,8 @@ unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
 char	**DBget_history(zbx_uint64_t itemid, unsigned char value_type, int function, int clock_from, int clock_to,
 		zbx_timespec_t *ts, const char *field_name, int last_n);
 void	DBfree_history(char **value);
+
+int	DBtxn_status();
+int	DBtxn_ongoing();
 
 #endif

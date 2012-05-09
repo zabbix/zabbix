@@ -31,7 +31,6 @@ $this->data['widget']->addHeader(_('Images'), $imageCbForm);
 // form
 $imageForm = new CForm();
 $imageForm->setName('imageForm');
-$imageForm->addVar('config', 3);
 $imageForm->addItem(BR());
 
 $imageTable = new CTable(_('No images defined.'), 'header_wide');
@@ -40,13 +39,13 @@ $count = 0;
 $imageRow = new CRow();
 foreach ($this->data['images'] as $number => $image) {
 	if ($image['imagetype'] == IMAGE_TYPE_BACKGROUND) {
-		$img = new CLink(new CImg('imgstore.php?iconid='.$image['imageid'], 'no image', 200), 'image.php?imageid='.$image['imageid']);
+		$img = new CLink(new CImg('imgstore.php?width=200&height=200&iconid='.$image['imageid'], 'no image'), 'image.php?imageid='.$image['imageid']);
 	}
 	else {
 		$img = new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');
 	}
 
-	$name = new CLink($image['name'], 'config.php?form=update'.url_param('config').'&imageid='.$image['imageid']);
+	$name = new CLink($image['name'], 'adm.images.php?form=update'.'&imageid='.$image['imageid']);
 
 	$imgColumn = new CCol();
 	$imgColumn->setAttribute('align', 'center');
