@@ -1,13 +1,13 @@
-delimiter $
+DELIMITER $
 CREATE PROCEDURE zbx_drop_indexes()
 BEGIN
 	DECLARE dummy INT DEFAULT 0;
-	DECLARE CONTINUE HANDLER FOR SQLSTATE '42000' set dummy = 1;
+	DECLARE CONTINUE HANDLER FOR SQLSTATE '42000' SET dummy = 1;
 
-	DROP INDEX node_cksum_1 on node_cksum;
-	DROP INDEX node_cksum_cksum_1 on node_cksum;
+	DROP INDEX node_cksum_1 ON node_cksum;
+	DROP INDEX node_cksum_cksum_1 ON node_cksum;
 END$
-delimiter ;
+DELIMITER ;
 
 CALL zbx_drop_indexes();
 DROP PROCEDURE zbx_drop_indexes;
