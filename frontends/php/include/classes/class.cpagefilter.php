@@ -17,8 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
 
 /**
  * @property string $groupid
@@ -255,7 +253,8 @@ class CPageFilter {
 	private function _initGroups($groupid, $options) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'with_hosts_and_templates' => true
 		);
 		$options = zbx_array_merge($def_options, $options);
 		$groups = API::HostGroup()->get($options);
@@ -466,4 +465,3 @@ class CPageFilter {
 		return $cmb;
 	}
 }
-?>

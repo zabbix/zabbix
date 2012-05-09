@@ -153,7 +153,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$result = API::Map()->update($map);
 
 			add_audit_if($result, AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
-			show_messages($result, S_MAP_UPDATED, S_CANNOT_UPDATE_MAP);
+			show_messages($result, _('Network map updated'), _('Cannot update network map'));
 		}
 		else{
 			if(!count(get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_WRITE, PERM_RES_IDS_ARRAY)))
@@ -162,7 +162,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$result = API::Map()->create($map);
 
 			add_audit_if($result, AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP, 'Name ['.$_REQUEST['name'].']');
-			show_messages($result, S_MAP_ADDED, S_CANNOT_ADD_MAP);
+			show_messages($result, _('Network map added'), _('Cannot add network map'));
 		}
 
 		if($result){
@@ -182,7 +182,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		));
 		$go_result = API::Map()->delete($sysmapids);
 
-		show_messages($go_result, S_MAP_DELETED, S_CANNOT_DELETE_MAP);
+		show_messages($go_result, _('Network map deleted'), _('Cannot delete network map'));
 		if($go_result){
 			unset($_REQUEST['form']);
 			foreach($maps as $map){
@@ -203,7 +203,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 	$form = new CForm('get');
 	$form->cleanItems();
-	$form->addItem(new CSubmit('form', S_CREATE_MAP));
+	$form->addItem(new CSubmit('form', _('Create map')));
 	$form->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'));
 
 	$map_wdgt = new CWidget();
@@ -263,9 +263,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$table->setHeader(array(
 			new CCheckBox('all_maps',NULL,"checkAll('".$form->getName()."','all_maps','maps');"),
 			make_sorting_header(_('Name'),'name'),
-			make_sorting_header(S_WIDTH,'width'),
-			make_sorting_header(S_HEIGHT,'height'),
-			S_EDIT
+			make_sorting_header(_('Width'), 'width'),
+			make_sorting_header(_('Height'), 'height'),
+			_('Edit')
 		));
 
 
@@ -289,7 +289,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				new CLink($map['name'], 'sysmap.php?sysmapid='.$map['sysmapid']),
 				$map['width'],
 				$map['height'],
-				new CLink(S_EDIT, 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form')
+				new CLink(_('Edit'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form')
 			));
 		}
 
@@ -297,7 +297,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$goBox = new CComboBox('go');
 		$goBox->addItem('export', _('Export selected'));
 		$goOption = new CComboItem('delete', _('Delete selected'));
-		$goOption->setAttribute('confirm',S_DELETE_SELECTED_MAPS_Q);
+		$goOption->setAttribute('confirm', _('Delete selected maps?'));
 
 		$goBox->addItem($goOption);
 

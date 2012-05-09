@@ -167,9 +167,6 @@ else {
 
 if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
-		require_once dirname(__FILE__).'/locales/en_gb.inc.php';
-		process_locales();
-
 		include('index.php');
 		exit();
 	}
@@ -219,8 +216,6 @@ else {
 	$USER_DETAILS = CWebUser::$data;
 }
 
-require_once dirname(__FILE__).'/locales/en_gb.inc.php';
-process_locales();
 set_zbx_locales();
 
 // init mb strings if it's available

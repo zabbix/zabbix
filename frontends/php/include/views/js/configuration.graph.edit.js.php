@@ -146,6 +146,7 @@
 
 			var itemTpl = new Template(jQuery('#itemTpl').html());
 			jQuery('#itemButtonsRow').before(itemTpl.evaluate(item));
+			jQuery('#items_' + item['number'] + '_calc_fnc').val(<?php echo CALC_FNC_AVG; ?>);
 			jQuery('#items_' + item['number'] + '_color').val(item['color']);
 			jQuery('#lbl_items_' + item['number'] + '_color').attr('title', '#' + item['color']);
 			jQuery('#lbl_items_' + item['number'] + '_color').css('background-color', '#' + item['color']);
