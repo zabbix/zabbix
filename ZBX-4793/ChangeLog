@@ -1,3 +1,7 @@
+Changes for 1.8.14
+
+.......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
+
 Changes for 1.8.13rc1
 
 A.F....... [ZBX-4685] fixed hangup when users login at the same time (Toms)

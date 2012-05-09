@@ -402,20 +402,25 @@ static void	snmp_close_session(struct snmp_session *session)
 static char	*snmp_get_octet_string(struct variable_list *vars)
 {
 	char	*strval_dyn = NULL;
-	size_t	i;
+	size_t	i, len = vars->val_len;
 
-	for (i = 0; i < vars->val_len; i++)
+	for (i = 0; i < len; i++)
 	{
 		/* check for printable characters */
 		if (0 == isprint(vars->val.string[i]) && 0 == isspace(vars->val.string[i]))
 			break;
 	}
 
-	if (i == vars->val_len)	/* all characters are printable or string is empty */
+	/* string terminated with a NUL character */
+	if (i == len - 1 && '\0' == vars->val.string[i])
+		len--;
+
+	/* all characters are printable or string is empty */
+	if (i == len)
 	{
-		strval_dyn = zbx_malloc(strval_dyn, vars->val_len + 1);
-		memcpy(strval_dyn, vars->val.string, vars->val_len);
-		strval_dyn[vars->val_len] = '\0';
+		strval_dyn = zbx_malloc(strval_dyn, len + 1);
+		memcpy(strval_dyn, vars->val.string, len);
+		strval_dyn[len] = '\0';
 
 		zabbix_log(LOG_LEVEL_DEBUG, "STRING: %s", strval_dyn);
 	}
@@ -423,10 +428,10 @@ static char	*snmp_get_octet_string(struct variable_list *vars)
 	{
 		size_t sz, offset;
 
-		sz = vars->val_len * 3;
+		sz = len * 3;
 		strval_dyn = zbx_malloc(strval_dyn, sz);
 		offset = zbx_snprintf(strval_dyn, sz, "%02X", vars->val.string[0]);
-		for (i = 1; i < vars->val_len; i++)
+		for (i = 1; i < len; i++)
 		{
 			offset += zbx_snprintf(strval_dyn + offset, sz - offset,
 					" %02X", vars->val.string[i]);
