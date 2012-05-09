@@ -11,6 +11,7 @@ A......... [ZBXNEXT-1189] implemented the "selectTrigger", "selectParentDependen
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+..F....... [ZBX-3148] fixed user macro not expanded in trigger names (Toms)
 ..F....... [ZBX-4493] fixed host popup menu overlap the screen range (Toms)
 ..F....... [ZBX-4924] fixed deletion of template screens (Vedmak)
 ..F....... [ZBX-4953] fixed unclear messages in setup.php (Toms)
