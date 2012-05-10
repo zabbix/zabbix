@@ -592,6 +592,7 @@ class CConfigurationExport {
 		$graphItems = API::Item()->get(array(
 			'itemids' => $graphItemIds,
 			'output' => array('key_', 'flags'),
+			'webitems' => true,
 			'selectHosts' => array('host'),
 			'preservekeys' => true
 		));
