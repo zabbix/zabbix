@@ -1453,7 +1453,7 @@ elseif ($srctbl == 'simple_graph') {
 	foreach ($items as $item) {
 		$host = reset($item['hosts']);
 		$item['hostname'] = $host['name'];
-		$$item['name'] = itemName($item);
+		$item['name'] = itemName($item);
 		$description = new CLink($item['name'], '#');
 
 		if (!$simpleName) {
