@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 /**
  * Class to operate with frontend setup information.
@@ -76,6 +75,8 @@ class FrontendSetup {
 		$result[] = $this->checkPhpGd();
 		$result[] = $this->checkPhpGdPng();
 		$result[] = $this->checkPhpLibxml();
+		$result[] = $this->checkPhpXmlWriter();
+		$result[] = $this->checkPhpXmlReader();
 		$result[] = $this->checkPhpCtype();
 		$result[] = $this->checkPhpSession();
 		$result[] = $this->checkPhpGettext();
@@ -427,6 +428,44 @@ class FrontendSetup {
 	}
 
 	/**
+	 * Checks for PHP xmlwriter extension.
+	 *
+	 * @return array
+	 */
+	public function checkPhpXmlWriter() {
+		$current = extension_loaded('xmlwriter');
+
+		$result = array(
+			'name' => _('PHP xmlwriter'),
+			'current' => $current ? _('yes') : _('no'),
+			'required' => null,
+			'result' => $current,
+			'error' => _('PHP xmlwriter module missing')
+		);
+
+		return $result;
+	}
+
+	/**
+	 * Checks for PHP xmlreader extension.
+	 *
+	 * @return array
+	 */
+	public function checkPhpXmlReader() {
+		$current = extension_loaded('xmlreader');
+
+		$result = array(
+			'name' => _('PHP xmlreader'),
+			'current' => $current ? _('yes') : _('no'),
+			'required' => null,
+			'result' => $current,
+			'error' => _('PHP xmlreader module missing')
+		);
+
+		return $result;
+	}
+
+	/**
 	 * Checks for PHP ctype extension.
 	 *
 	 * @return array
@@ -493,7 +532,4 @@ class FrontendSetup {
 
 		return $result;
 	}
-
 }
-
-?>
