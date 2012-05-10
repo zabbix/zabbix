@@ -38,15 +38,6 @@ abstract class CTriggerGeneral extends CZBXAPI {
 	 *
 	 * @param array $array
 	 *
-	 * @return bool
-	 */
-	abstract public function exists(array $array);
-
-	/**
-	 * @abstract
-	 *
-	 * @param array $array
-	 *
 	 * @return array
 	 */
 	abstract protected function createReal(array &$array);
@@ -243,7 +234,17 @@ abstract class CTriggerGeneral extends CZBXAPI {
 		return $newTrigger;
 	}
 
-	// TODO: comment
+	/**
+	 * Checks that no trigger with the same description and expression as $trigger exist on the given host.
+	 * Assumes the given trigger is valid.
+	 *
+	 * @throws APIException if at lean one trigger exists
+	 *
+	 * @param array $trigger    a trigger with an exploded expression
+	 * @param null $hostid
+	 *
+	 * @return void
+	 */
 	protected function checkIfExistsOnHost(array $trigger, $hostid = null) {
 		$filter = array('description' => $trigger['description']);
 		if ($hostid) {
@@ -256,17 +257,9 @@ abstract class CTriggerGeneral extends CZBXAPI {
 
 		$options = array(
 			'filter' => $filter,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('expression', 'triggerid'),
 			'nopermissions' => true
 		);
-
-		// TODO: check if this is required
-		if (isset($trigger['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($trigger['node']);
-		}
-		elseif (isset($trigger['nodeids'])) {
-			$options['nodeids'] = $trigger['nodeids'];
-		}
 
 		$triggers = $this->get($options);
 		foreach ($triggers as $dbTrigger) {
