@@ -352,11 +352,11 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatTriggers(array $triggers) {
-		$result = array();
 		order_result($triggers, 'description');
 
+		$result = array();
 		foreach ($triggers as $trigger) {
-			$result[] = array(
+			$tr = array(
 				'expression' => $trigger['expression'],
 				'name' => $trigger['description'],
 				'url' => $trigger['url'],
@@ -364,8 +364,12 @@ class CConfigurationExportBuilder {
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
 				'type' => $trigger['type'],
-				'dependencies' => $this->formatDependencies($trigger['dependencies'])
 			);
+			if (isset($trigger['dependencies'])) {
+				$tr['dependencies'] = $this->formatDependencies($trigger['dependencies']);
+			}
+
+			$result[] = $tr;
 		}
 		return $result;
 	}
