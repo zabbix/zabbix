@@ -17,8 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
@@ -1455,7 +1453,7 @@ elseif ($srctbl == 'simple_graph') {
 	foreach ($items as $item) {
 		$host = reset($item['hosts']);
 		$item['hostname'] = $host['name'];
-		$$item['name'] = itemName($item);
+		$item['name'] = itemName($item);
 		$description = new CLink($item['name'], '#');
 
 		if (!$simpleName) {
@@ -2000,4 +1998,3 @@ elseif ($srctbl == 'scripts') {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

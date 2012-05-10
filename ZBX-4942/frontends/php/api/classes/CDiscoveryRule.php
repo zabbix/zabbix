@@ -829,11 +829,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// save new triggers
 		$dstTriggers = $srcTriggers;
-		foreach ($dstTriggers as &$trigger) {
+		foreach ($dstTriggers as $key => $trigger) {
 			unset($trigger['triggerid']);
 
 			// update expression
-			$trigger['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
+			$dstTriggers[$key]['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
 
 		}
 

@@ -1,4 +1,24 @@
 <?php
+/*
+** Zabbix
+** Copyright (C) 2000-2012 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
 // get language translations
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/include/js.inc.php';
@@ -24,9 +44,6 @@ if (isset($_GET['lang'])) {
 	// numeric Locale to default
 	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
-
-require_once dirname(__FILE__).'/include/locales/en_gb.inc.php';
-$translations = $TRANSLATION;
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $availableJScripts = array(
@@ -61,30 +78,96 @@ $availableJScripts = array(
 );
 
 $tranStrings = array(
-	'gtlc.js' => array('S_ALL_S', 'S_ZOOM', 'S_FIXED_SMALL', 'S_DYNAMIC_SMALL', 'S_NOW_SMALL', 'S_YEAR_SHORT',
-		'S_MONTH_SHORT', 'S_WEEK_SHORT', 'S_DAY_SHORT', 'S_HOUR_SHORT', 'S_MINUTE_SHORT'
+	'gtlc.js' => array(
+		'S_ALL_S' => _('All'),
+		'S_ZOOM' => _('Zoom'),
+		'S_FIXED_SMALL' => _('fixed'),
+		'S_DYNAMIC_SMALL' => _('dynamic'),
+		'S_NOW_SMALL' => _('now'),
+		'S_YEAR_SHORT' => _x('y', 'year short'),
+		'S_MONTH_SHORT' => _x('m', 'month short'),
+		'S_WEEK_SHORT' => _x('w', 'week short'),
+		'S_DAY_SHORT' => _x('d', 'day short'),
+		'S_HOUR_SHORT' => _x('h', 'hour short'),
+		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 	),
-	'functions.js' => array('DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q', 'S_INSERT_MACRO', 'S_ADD_SERVICE',
-		'S_EDIT_SERVICE', 'S_DELETE_SERVICE', 'S_DELETE_SELECTED_SERVICES_Q', 'S_CREATE_LOG_TRIGGER', 'S_DELETE',
-		'S_DELETE_KEYWORD_Q', 'S_DELETE_EXPRESSION_Q', 'S_SIMPLE_GRAPHS', 'S_HISTORY', 'S_HISTORY_AND_SIMPLE_GRAPHS'
+	'functions.js' => array(
+		'DO_YOU_REPLACE_CONDITIONAL_EXPRESSION_Q' => _('Do you wish to replace the conditional expression?'),
+		'S_INSERT_MACRO' => _('Insert macro'),
+		'S_CREATE_LOG_TRIGGER' => _('Create trigger'),
+		'S_DELETE' => _('Delete'),
+		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
+		'S_DELETE_EXPRESSION_Q' => _('Delete expression?'),
+		'S_SIMPLE_GRAPHS' => _('Simple graphs'),
+		'S_HISTORY' => _('History'),
+		'S_HISTORY_AND_SIMPLE_GRAPHS' => _('History and simple graphs'),
 	),
-	'class.calendar.js' => array('S_JANUARY', 'S_FEBRUARY', 'S_MARCH', 'S_APRIL', 'S_MAY', 'S_JUNE',
-		'S_JULY', 'S_AUGUST', 'S_SEPTEMBER', 'S_OCTOBER', 'S_NOVEMBER', 'S_DECEMBER', 'S_MONDAY_SHORT_BIG',
-		'S_TUESDAY_SHORT_BIG', 'S_WEDNESDAY_SHORT_BIG', 'S_THURSDAY_SHORT_BIG', 'S_FRIDAY_SHORT_BIG',
-		'S_SATURDAY_SHORT_BIG', 'S_SUNDAY_SHORT_BIG', 'S_TIME', 'S_NOW', 'S_DONE'
+	'class.calendar.js' => array(
+		'S_JANUARY' => _('January'),
+		'S_FEBRUARY' => _('February'),
+		'S_MARCH' => _('March'),
+		'S_APRIL' => _('April'),
+		'S_MAY' => _('May'),
+		'S_JUNE' => _('June'),
+		'S_JULY' => _('July'),
+		'S_AUGUST' => _('August'),
+		'S_SEPTEMBER' => _('September'),
+		'S_OCTOBER' => _('October'),
+		'S_NOVEMBER' => _('November'),
+		'S_DECEMBER' => _('December'),
+		'S_MONDAY_SHORT_BIG' => _x('M', 'Monday short'),
+		'S_TUESDAY_SHORT_BIG' => _x('T', 'Tuesday short'),
+		'S_WEDNESDAY_SHORT_BIG' => _x('W', 'Wednesday short'),
+		'S_THURSDAY_SHORT_BIG' => _x('T', 'Thursday short'),
+		'S_FRIDAY_SHORT_BIG' => _x('F', 'Friday short'),
+		'S_SATURDAY_SHORT_BIG' => _x('S', 'Saturday short'),
+		'S_SUNDAY_SHORT_BIG' => _x('S', 'Sunday short'),
+		'S_NOW' => _('Now'),
+		'S_DONE' => _('Done'),
+		'S_TIME' => _('Time'),
 	),
-	'class.cmap.js' => array('S_ON', 'S_OFF', 'S_HIDDEN', 'S_SHOWN', 'S_ERROR', 'S_TYPE', 'S_LABEL', 'S_SHOW', 'S_HIDE',
-		'S_HOST', 'S_MAP', 'S_TRIGGER', 'S_SELECT', 'S_HOST_GROUP', 'S_IMAGE', 'S_URL', 'S_URLS', 'S_BOTTOM', 'S_TOP',
-		'S_LEFT', 'S_RIGHT', 'S_DEFAULT', 'S_REMOVE', 'S_CLOSE', 'S_PLEASE_SELECT_TWO_ELEMENTS', 'S_ELEMENT', 'S_TRIGGERS',
-		'S_COLOR', 'S_ADD', 'S_DESCRIPTION', 'S_NAME', 'S_LINE', 'S_BOLD_LINE', 'S_DOT', 'S_DASHED_LINE', 'S_TWO_ELEMENTS_SHOULD_BE_SELECTED',
-		'S_DELETE_SELECTED_ELEMENTS_Q', 'S_PLEASE_SELECT_TWO_ELEMENTS', 'S_NEW_ELEMENT', 'S_SELECT', 'S_INCORRECT_ELEMENT_MAP_LINK',
-		'S_EACH_URL_SHOULD_HAVE_UNIQUE', 'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q', 'S_NO_IMAGES', 'S_ICONMAP_IS_NOT_ENABLED'
+	'class.cmap.js' => array(
+		'S_ON' => _('On'),
+		'S_OFF' => _('Off'),
+		'S_HIDDEN' => _('Hidden'),
+		'S_SHOWN' => _('Shown'),
+		'S_HOST' => _('Host'),
+		'S_MAP' => _('Map'),
+		'S_TRIGGER' => _('Trigger'),
+		'S_HOST_GROUP' => _('Host group'),
+		'S_IMAGE' => _('Image'),
+		'S_DEFAULT' => _('Default'),
+		'S_CLOSE' => _('Close'),
+		'S_PLEASE_SELECT_TWO_ELEMENTS' => _('Please select two elements'),
+		'S_DOT' => _('Dot'),
+		'S_TWO_ELEMENTS_SHOULD_BE_SELECTED' => _('Two elements should be selected'),
+		'S_DELETE_SELECTED_ELEMENTS_Q' => _('Delete selected elements?'),
+		'S_NEW_ELEMENT' => _('New element'),
+		'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "URL" specified'),
+		'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please make sure there is only one URL named'),
+		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
+		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
+		'S_ICONMAP_IS_NOT_ENABLED' => _('Iconmap is not enabled'),
 	),
-	'class.cmessages.js' => array('S_MUTE', 'S_UNMUTE', 'S_MESSAGES', 'S_CLEAR', 'S_SNOOZE', 'S_MOVE'),
-	'class.cookie.js' => array('S_MAX_COOKIE_SIZE_REACHED'),
+	'class.cmessages.js' => array(
+		'S_MUTE' => _('Mute'),
+		'S_UNMUTE' => _('Unmute'),
+		'S_MESSAGES' => _('Messages'),
+		'S_CLEAR' => _('Clear'),
+		'S_SNOOZE' => _('Snooze'),
+		'S_MOVE' => _('Move'),
+	),
+	'class.cookie.js' => array(
+		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.'),
+	),
 	'main.js' => array(
-		'S_CLOSE', 'S_NO_ELEMENTS_SELECTED', 'S_INTERFACES', 'Host screens', 'Go to', 'Latest data',
-		'Scripts', 'Host inventories'
+		'S_CLOSE' => _('Close'),
+		'S_NO_ELEMENTS_SELECTED' => _('No elements selected!'),
+		'Host screens' => _('Host screens'),
+		'Go to' => _('Go to'),
+		'Latest data' => _('Latest data'),
+		'Scripts' => _('Scripts'),
+		'Host inventories' => _('Host inventories'),
 	)
 );
 
@@ -115,15 +198,8 @@ else {
 $js = 'if(typeof(locale) == "undefined") var locale = {};'."\n";
 foreach ($files as $file) {
 	if (isset($tranStrings[$file])) {
-		foreach ($tranStrings[$file] as $str) {
-			// old translation string
-			if (isset($translations[$str])) {
-				$js .= "locale['".$str."'] = ".zbx_jsvalue($translations[$str]).";";
-			}
-			// a gettext string
-			else {
-				$js .= "locale['".$str."'] = ".zbx_jsvalue(_($str)).";";
-			}
+		foreach ($tranStrings[$file] as $origStr => $str) {
+			$js .= "locale['".$origStr."'] = ".zbx_jsvalue($str).";";
 		}
 	}
 }
@@ -149,4 +225,3 @@ header('Cache-Control: public, must-revalidate');
 header('ETag: '.$ETag);
 
 echo $js;
-?>

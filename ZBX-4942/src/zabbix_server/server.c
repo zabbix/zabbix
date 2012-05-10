@@ -175,17 +175,84 @@ char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
-/* Zabbix server startup time */
-int	CONFIG_SERVER_STARTUP_TIME	= 0;
+int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 
-/* Parameters for passive proxies */
-int	CONFIG_PROXYPOLLER_FORKS	= 1;
-/* How often Zabbix Server sends configuration data to Proxy in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600; /* 1h */
-int	CONFIG_PROXYDATA_FREQUENCY	= 1; /* 1s */
+int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 
-/* Mutex for node syncs */
+/* how often zabbix server sends configuration data to proxy, in seconds */
+int	CONFIG_PROXYCONFIG_FREQUENCY	= 3600;	/* 1h */
+int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
+
+/* mutex for node syncs */
 ZBX_MUTEX	node_sync_access;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_set_defaults                                                 *
+ *                                                                            *
+ * Purpose: set configuration defaults                                        *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_set_defaults()
+{
+	CONFIG_SERVER_STARTUP_TIME = time(NULL);
+
+	if (NULL == CONFIG_DBHOST)
+		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
+
+	if (NULL == CONFIG_SNMPTRAP_FILE)
+		CONFIG_SNMPTRAP_FILE = zbx_strdup(CONFIG_SNMPTRAP_FILE, "/tmp/zabbix_traps.tmp");
+
+	if (NULL == CONFIG_PID_FILE)
+		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
+
+	if (NULL == CONFIG_ALERT_SCRIPTS_PATH)
+		CONFIG_ALERT_SCRIPTS_PATH = zbx_strdup(CONFIG_ALERT_SCRIPTS_PATH, DATADIR "/zabbix/alertscripts");
+
+	if (NULL == CONFIG_TMPDIR)
+		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
+
+	if (NULL == CONFIG_FPING_LOCATION)
+		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
+
+#ifdef HAVE_IPV6
+	if (NULL == CONFIG_FPING6_LOCATION)
+		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
+#endif
+
+	if (NULL == CONFIG_EXTERNALSCRIPTS)
+		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
+
+	if (0 == CONFIG_NODEID)
+		CONFIG_NODEWATCHER_FORKS = 0;
+
+#ifdef HAVE_SQLITE3
+	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
+#endif
+
+	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
+		CONFIG_HOUSEKEEPER_FORKS = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_validate_config                                              *
+ *                                                                            *
+ * Purpose: validate configuration parameters                                 *
+ *                                                                            *
+ * Author: Vladimir Levijev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_validate_config()
+{
+	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && CONFIG_JAVAPOLLER_FORKS > 0)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not specified in config file or empty");
+		exit(1);
+	}
+}
 
 /******************************************************************************
  *                                                                            *
@@ -321,54 +388,11 @@ static void	zbx_load_config()
 		{NULL}
 	};
 
-	CONFIG_SERVER_STARTUP_TIME = time(NULL);
-
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
 
-	if (NULL == CONFIG_DBNAME)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "DBName not in config file");
-		exit(1);
-	}
+	zbx_set_defaults();
 
-	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && CONFIG_JAVAPOLLER_FORKS > 0)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not in config file or empty");
-		exit(1);
-	}
-
-	if (NULL == CONFIG_SNMPTRAP_FILE)
-		CONFIG_SNMPTRAP_FILE = zbx_strdup(CONFIG_SNMPTRAP_FILE, "/tmp/zabbix_traps.tmp");
-
-	if (NULL == CONFIG_PID_FILE)
-		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
-
-	if (NULL == CONFIG_ALERT_SCRIPTS_PATH)
-		CONFIG_ALERT_SCRIPTS_PATH = zbx_strdup(CONFIG_ALERT_SCRIPTS_PATH, DATADIR "/zabbix/alertscripts");
-
-	if (NULL == CONFIG_TMPDIR)
-		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
-
-	if (NULL == CONFIG_FPING_LOCATION)
-		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
-
-#ifdef HAVE_IPV6
-	if (NULL == CONFIG_FPING6_LOCATION)
-		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
-#endif
-
-	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DATADIR "/zabbix/externalscripts");
-
-	if (0 == CONFIG_NODEID)
-		CONFIG_NODEWATCHER_FORKS = 0;
-
-#ifdef HAVE_SQLITE3
-	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
-#endif
-
-	if (1 == CONFIG_DISABLE_HOUSEKEEPING)
-		CONFIG_HOUSEKEEPER_FORKS = 0;
+	zbx_validate_config();
 }
 
 #ifdef HAVE_SIGQUEUE
