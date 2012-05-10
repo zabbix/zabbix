@@ -1013,49 +1013,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		return $result;
 	}
 
-	public function exists(array $object) {
-		$keyFields = array(array('hostid', 'host'), 'description');
-
-		$result = false;
-
-		if (!isset($object['hostid']) && !isset($object['host'])) {
-			$expr = new CTriggerExpression($object);
-
-			if (!empty($expr->errors)) {
-				return false;
-			}
-			if (empty($expr->data['hosts'])) {
-				return false;
-			}
-
-			$object['host'] = reset($expr->data['hosts']);
-		}
-
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true
-		);
-
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
-
-		$triggers = $this->get($options);
-		foreach ($triggers as $tnum => $trigger) {
-			$tmpExp = explode_exp($trigger['expression']);
-			if (strcmp($tmpExp, $object['expression']) == 0) {
-				$result = true;
-				break;
-			}
-		}
-
-		return $result;
-	}
-
 	/**
 	 * Add triggers
 	 *
