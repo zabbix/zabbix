@@ -77,9 +77,9 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (14,12,0,0,'3');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (15,12,0,1,'4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (16,12,13,0,'10001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (17,12,13,1,'10002');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (18,12,1,0,'10017');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (19,12,1,1,'10017');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (17,12,13,1,'10081');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (18,12,1,0,'10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (19,12,1,1,'10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (20,12,2,0,'12786');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (21,12,2,1,'12771');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (22,12,3,2,'Oracle');
@@ -101,9 +101,9 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (38,13,0,0,'3');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (39,13,0,1,'4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (40,13,13,0,'10001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (41,13,13,1,'10002');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (42,13,1,0,'10017');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (43,13,1,1,'10017');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (41,13,13,1,'10081');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (42,13,1,0,'10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (43,13,1,1,'10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (44,13,2,0,'12786');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (45,13,2,1,'12771');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (46,13,3,2,'Oracle');
@@ -125,9 +125,9 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (62,14,0,0,'3');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (63,14,0,1,'4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (64,14,13,0,'10001');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (65,14,13,1,'10002');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (66,14,1,0,'10017');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (67,14,1,1,'10017');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (65,14,13,1,'10081');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (66,14,1,0,'10084');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (67,14,1,1,'10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (68,14,2,0,'12786');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (69,14,2,1,'12771');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (70,14,3,2,'Oracle');
@@ -274,7 +274,7 @@ INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, wid
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (55,30,6,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (56,31,1,18443,500,100,0,0,0,0,0,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (57,32,14,4,500,100,0,0,0,0,25,0,0,0,'',0,0);
-INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (58,33,16,10017,500,100,0,0,0,0,25,0,0,0,'',0,0);
+INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (58,33,16,10084,500,100,0,0,0,0,25,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (59,34,15,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (60,35,5,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (61,36,9,4,500,100,0,0,0,0,0,0,0,0,'',0,0);
@@ -339,7 +339,7 @@ INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, icon
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (4,3,2,1,3,NULL,'Map element (Local network)',0,401,101,NULL,NULL);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (5,3,12788,2,15,NULL,'Trigger element (CPU load)',0,101,301,NULL,NULL);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (6,3,3,3,1,NULL,'Host group element (Windows servers)',0,301,351,NULL,NULL);
-INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (7,3,10017,0,19,NULL,'Host element (Zabbix Server)',0,501,301,NULL,NULL);
+INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (7,3,10084,0,19,NULL,'Host element (Zabbix Server)',0,501,301,NULL,NULL);
 
 INSERT INTO sysmaps_links (linkid, sysmapid, selementid1, selementid2, drawtype, color, label) VALUES (1,3,3,4,2,'00CC00','CPU load: {Zabbix Server:system.cpu.load[].last(0)}');
 INSERT INTO sysmaps_links (linkid, sysmapid, selementid1, selementid2, drawtype, color, label) VALUES (2,3,3,5,0,'00CC00','');
