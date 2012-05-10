@@ -46,6 +46,7 @@ extern unsigned char	daemon_type;
 static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port, zbx_uint64_t *hostid, char *error)
 {
 	const char	*__function_name = "get_hostid_by_host";
+
 	char		*host_esc, dns[INTERFACE_DNS_LEN_MAX];
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -139,6 +140,7 @@ out:
 int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 {
 	const char	*__function_name = "send_list_of_active_checks";
+
 	char		*host = NULL, *p;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -175,8 +177,12 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *request)
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			"select i.key_,i.delay,i.lastlogsize"
 			" from items i,hosts h"
-			" where i.hostid=h.hostid and h.status=%d and i.type=%d and i.flags<>%d"
-				" and h.hostid=" ZBX_FS_UI64 " and h.proxy_hostid is null",
+			" where i.hostid=h.hostid"
+				" and h.status=%d"
+				" and i.type=%d"
+				" and i.flags<>%d"
+				" and h.hostid=" ZBX_FS_UI64
+				" and h.proxy_hostid is null",
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			ZBX_FLAG_DISCOVERY_CHILD,
@@ -322,8 +328,12 @@ int	send_list_of_active_checks_json(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select i.key_,i.delay,i.lastlogsize,i.mtime"
 			" from items i,hosts h"
-			" where i.hostid=h.hostid and h.status=%d and i.type=%d and i.flags<>%d"
-				" and h.hostid=" ZBX_FS_UI64 " and h.proxy_hostid is null",
+			" where i.hostid=h.hostid"
+				" and h.status=%d"
+				" and i.type=%d"
+				" and i.flags<>%d"
+				" and h.hostid=" ZBX_FS_UI64
+				" and h.proxy_hostid is null",
 			HOST_STATUS_MONITORED,
 			ITEM_TYPE_ZABBIX_ACTIVE,
 			ZBX_FLAG_DISCOVERY_CHILD,
