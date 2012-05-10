@@ -13,16 +13,14 @@
 			jQuery('form[name=servicesForm]').submit();
 		});
 
-		jQuery('#algorithm')
-			.change(function() {
-				var statusDisabled = (jQuery(this).val() == <?php echo SERVICE_ALGORITHM_NONE ?>);
-				jQuery('#showsla, #trigger, #btn1, #goodsla').prop('disabled', statusDisabled);
+		jQuery('#algorithm').change(function() {
+			var statusDisabled = (jQuery(this).val() == <?php echo SERVICE_ALGORITHM_NONE ?>);
+			jQuery('#showsla, #trigger, #btn1, #goodsla').prop('disabled', statusDisabled);
 
-				if (!statusDisabled) {
-					jQuery('#showsla').trigger('change');
-				}
-			})
-			.trigger('change');
+			if (!statusDisabled) {
+				jQuery('#showsla').change();
+			}
+		}).change();
 	});
 
 	function add_child_service(name, serviceid, trigger, triggerid) {
