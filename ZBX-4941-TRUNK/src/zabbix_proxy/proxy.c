@@ -230,14 +230,14 @@ static void	zbx_set_defaults()
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
 
+	if (NULL == CONFIG_DBHOST)
+		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
+
 	if (NULL == CONFIG_SNMPTRAP_FILE)
 		CONFIG_SNMPTRAP_FILE = zbx_strdup(CONFIG_SNMPTRAP_FILE, "/tmp/zabbix_traps.tmp");
 
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_proxy.pid");
-
-	if (NULL == CONFIG_DBHOST)
-		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
 
 	if (NULL == CONFIG_TMPDIR)
 		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
