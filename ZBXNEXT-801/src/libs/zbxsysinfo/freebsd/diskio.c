@@ -34,7 +34,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	struct devstat	*ds = NULL;
 	int		ret = FAIL;
 	char		dev[DEVSTAT_NAME_LEN + 10];
-	char		*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0'*/
+	const char	*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0'*/
 	int		not_empty;
 
 	assert(devname);

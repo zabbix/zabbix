@@ -47,8 +47,7 @@ typedef struct c_diskdevices_data
 {
 	int				count;		/* Number of disks to collect statistics for.*/
 	int				max_diskdev;	/* Number of "slots" for disk statistics.*/
-	ZBX_SINGLE_DISKDEVICE_DATA	device[];	/* "Slots" for disk statistics added dynamically.*/
-							/* Structure with flexible array member (a c99 feature).*/
+	ZBX_SINGLE_DISKDEVICE_DATA	device[1];	/* More "slots" for disk statistics added dynamically.*/
 } ZBX_DISKDEVICES_DATA;
 
 #define DISKDEVICE_COLLECTOR_STARTED(collector) ((collector) && ((collector)->diskstat_shmid != NONEXISTENT_SHMID))
