@@ -120,29 +120,42 @@ sub process_row
 		$_ =~ s/^\s+//;
 		$_ =~ s/\s+$//;
 
-		# escape single quotes
-		if ($output{'database'} eq 'postgresql')
-		{
-			$_ =~ s/\\/\\\\/g;
-			$_ =~ s/'/''/g;
-		}
-		elsif ($output{'database'} eq 'mysql')
-		{
-			$_ =~ s/\\/\\\\/g;
-			$_ =~ s/'/\\'/g;
-		}
-		else
-		{
-			$_ =~ s/'/''/g;
-		}
-
 		if ($_ eq 'NULL')
 		{
 			$values = "$values$_";
 		}
 		else
 		{
-			$values = "$values'$_'";
+			my $modifier = '';
+
+			# escape backslashes
+			if (/\\/)
+			{
+				if ($output{'database'} eq 'postgresql')
+				{
+					$_ =~ s/\\/\\\\/g;
+					$modifier = 'E';
+				}
+				elsif ($output{'database'} eq 'mysql')
+				{
+					$_ =~ s/\\/\\\\/g;
+				}
+			}
+
+			# escape single quotes
+			if (/'/)
+			{
+				if ($output{'database'} eq 'mysql')
+				{
+					$_ =~ s/'/\\'/g;
+				}
+				else
+				{
+					$_ =~ s/'/''/g;
+				}
+			}
+
+			$values = "$values$modifier'$_'";
 		}
 	}
 
