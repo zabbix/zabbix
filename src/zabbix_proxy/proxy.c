@@ -180,10 +180,10 @@ char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
 
-/* Zabbix server startup time */
+/* zabbix server startup time */
 int	CONFIG_SERVER_STARTUP_TIME	= 0;
 
-/* Mutex for node syncs; not used in proxy */
+/* mutex for node syncs; not used in proxy */
 ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
@@ -199,6 +199,8 @@ static void	zbx_set_defaults()
 {
 	AGENT_RESULT	result;
 	char		**value = NULL;
+
+	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
@@ -228,6 +230,9 @@ static void	zbx_set_defaults()
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
 
+	if (NULL == CONFIG_DBHOST)
+		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
+
 	if (NULL == CONFIG_SNMPTRAP_FILE)
 		CONFIG_SNMPTRAP_FILE = zbx_strdup(CONFIG_SNMPTRAP_FILE, "/tmp/zabbix_traps.tmp");
 
@@ -250,6 +255,12 @@ static void	zbx_set_defaults()
 
 	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
 		CONFIG_HEARTBEAT_FORKS = 0;
+
+	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
+	{
+		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
+		daemon_type = ZBX_DAEMON_TYPE_PROXY_PASSIVE;
+	}
 }
 
 /******************************************************************************
@@ -263,7 +274,6 @@ static void	zbx_set_defaults()
  ******************************************************************************/
 static void	zbx_validate_config()
 {
-
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "JavaGateway not in config file or empty");
@@ -415,17 +425,7 @@ static void	zbx_load_config()
 		{NULL}
 	};
 
-	CONFIG_SERVER_STARTUP_TIME = time(NULL);
-
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT);
-
-	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
-	{
-		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
-		daemon_type = ZBX_DAEMON_TYPE_PROXY_PASSIVE;
-	}
-	else
-		daemon_type = ZBX_DAEMON_TYPE_PROXY_ACTIVE;
 
 	zbx_set_defaults();
 
