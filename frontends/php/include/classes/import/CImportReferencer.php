@@ -25,6 +25,10 @@
  */
 class CImportReferencer {
 
+	/**
+	 * @var array with references to interfaceid (hostid -> reference_name -> interfaceid)
+	 */
+	public $interfacesCache = array();
 	protected $processedHosts = array();
 	protected $groups = array();
 	protected $templates = array();

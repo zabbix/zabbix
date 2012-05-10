@@ -60,12 +60,6 @@ class CConfigurationImport {
 	protected $formattedData = array();
 
 	/**
-	 * @var array with references to interfaceid (hostid -> reference_name -> interfaceid)
-	 */
-	protected $interfacesCache = array();
-
-
-	/**
 	 * Constructor.
 	 * Source string must be suitable for reader class,
 	 * i.e. if string contains json then reader should be able to read json.
@@ -137,7 +131,10 @@ class CConfigurationImport {
 				if ($this->options['screens']['updateExisting'] || $this->options['screens']['createMissing']) {
 					CXmlImport18::parseScreen($this->options);
 				}
-				if ($this->options['hosts']['updateExisting'] || $this->options['hosts']['createMissing']) {
+				if ($this->options['hosts']['updateExisting']
+						|| $this->options['hosts']['createMissing']
+						|| $this->options['templates']['updateExisting']
+						|| $this->options['templates']['createMissing']) {
 					CXmlImport18::parseMain($this->options);
 				}
 			}
@@ -477,8 +474,8 @@ class CConfigurationImport {
 	 */
 	protected function processTemplates() {
 		if ($templates = $this->getFormattedTemplates()) {
-			$mapImporter = new CTemplateImporter($this->options, $this->referencer);
-			$mapImporter->import($templates);
+			$templateImporter = new CTemplateImporter($this->options, $this->referencer);
+			$templateImporter->import($templates);
 		}
 	}
 
@@ -488,152 +485,9 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function processHosts() {
-		$hosts = $this->getFormattedHosts();
-		if (empty($hosts)) {
-			return;
-		}
-
-		// if we don't need to update linkage, unset templates
-		if (!$this->options['templateLinkage']['createMissing']) {
-			foreach ($hosts as &$host) {
-				unset($host['templates']);
-			}
-			unset($host);
-		}
-
-		// a list of hostids which were created or updated to create an interface cache for those hosts
-		$processedHosts = array();
-		// create interface references
-		$hostInterfacesRefsByName = array();
-		foreach ($hosts as $host) {
-			$hostInterfacesRefsByName[$host['host']] = array();
-			foreach ($host['interfaces'] as $interface) {
-				$hostInterfacesRefsByName[$host['host']][$interface['interface_ref']] = $interface;
-			}
-		}
-
-		$hostsToCreate = $hostsToUpdate = array();
-		foreach ($hosts as $host) {
-			foreach ($host['groups'] as $gnum => $group) {
-				$groupId = $this->referencer->resolveGroup($group['name']);
-				if (!$groupId) {
-					throw new Exception(_s('Group "%1$s" for host "%2$s" does not exist.', $group['name'], $host['host']));
-				}
-				$host['groups'][$gnum] = array('groupid' => $groupId);
-			}
-
-			if (!empty($host['templates'])) {
-				foreach ($host['templates'] as $tnum => $template) {
-					$templateId = $this->referencer->resolveTemplate($template['name']);
-					if (!$templateId) {
-						throw new Exception(_s('Template "%1$s" for host "%2$s" does not exist.', $template['name'], $host['host']));
-					}
-					$host['templates'][$tnum] = array('templateid' => $templateId);
-				}
-			}
-
-			if (isset($host['proxy'])) {
-				if (empty($host['proxy'])) {
-					$proxyId = 0;
-				}
-				else {
-					$proxyId = $this->referencer->resolveProxy($host['proxy']['name']);
-					if (!$proxyId) {
-						throw new Exception(_s('Proxy "%1$s" for host "%2$s" does not exist.', $host['proxy']['name'], $host['host']));
-					}
-				}
-
-				$host['proxy_hostid'] = $proxyId;
-			}
-
-			if ($hostId = $this->referencer->resolveHost($host['host'])) {
-				$host['hostid'] = $hostId;
-				foreach ($host['macros'] as &$macro) {
-					if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
-						$macro['hostmacroid'] = $hostMacroId;
-					}
-				}
-				unset($macro);
-
-				$processedHosts[$host['host']] = $hostId;
-				$hostsToUpdate[] = $host;
-			}
-			else {
-				$hostsToCreate[] = $host;
-			}
-		}
-
-		// for existing hosts we need to set an interfaceid for existing interfaces or they will be added
-		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => zbx_objectValues($hostsToUpdate, 'hostid'),
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-		foreach ($dbInterfaces as $dbInterface) {
-			foreach ($hostsToUpdate as $hnum => $host) {
-				if (!empty($host['interfaces']) && idcmp($host['hostid'], $dbInterface['hostid'])) {
-					foreach ($host['interfaces'] as $inum => $interface) {
-						if ($dbInterface['ip'] == $interface['ip']
-								&& $dbInterface['dns'] == $interface['dns']
-								&& $dbInterface['useip'] == $interface['useip']
-								&& $dbInterface['port'] == $interface['port']
-								&& $dbInterface['type'] == $interface['type']
-								&& $dbInterface['main'] == $interface['main']) {
-							$hostsToUpdate[$hnum]['interfaces'][$inum]['interfaceid'] = $dbInterface['interfaceid'];
-							break;
-						}
-					}
-				}
-				if (empty($hostsToUpdate[$hnum]['interfaces'])) {
-					unset($hostsToUpdate[$hnum]['interfaces']);
-				}
-			}
-		}
-
-		// create/update hosts
-		if ($this->options['hosts']['createMissing'] && $hostsToCreate) {
-			$newHostIds = API::Host()->create($hostsToCreate);
-			foreach ($newHostIds['hostids'] as $hnum => $hostid) {
-				$host = $hostsToCreate[$hnum]['host'];
-				$processedHosts[$host] = $hostid;
-				$this->referencer->addHostRef($host, $hostid);
-				$this->referencer->addProcessedHost($host);
-			}
-		}
-		if ($this->options['hosts']['updateExisting'] && $hostsToUpdate) {
-			API::Host()->update($hostsToUpdate);
-			foreach ($hostsToUpdate as $host) {
-				$this->referencer->addProcessedHost($host['host']);
-				$processedHosts[$host['host']] = $host['hostid'];
-			}
-		}
-
-		// create interfaces cache interface_ref->interfaceid
-		$dbInterfaces = API::HostInterface()->get(array(
-			'hostids' => $processedHosts,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		));
-
-		foreach ($dbInterfaces as $dbInterface) {
-			foreach ($hostInterfacesRefsByName as $hostName => $interfaceRefs) {
-				$hostId = $this->referencer->resolveHost($hostName);
-				if (!isset($this->interfacesCache[$processedHosts[$hostName]])) {
-					$this->interfacesCache[$hostId] = array();
-				}
-
-				foreach ($interfaceRefs as $refName => $interface) {
-					if ($hostId == $dbInterface['hostid']
-							&& $dbInterface['ip'] == $interface['ip']
-							&& $dbInterface['dns'] == $interface['dns']
-							&& $dbInterface['useip'] == $interface['useip']
-							&& $dbInterface['port'] == $interface['port']
-							&& $dbInterface['type'] == $interface['type']
-							&& $dbInterface['main'] == $interface['main']) {
-						$this->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
-					}
-				}
-			}
+		if ($hosts = $this->getFormattedHosts()) {
+			$hostImporter = new CHostImporter($this->options, $this->referencer);
+			$hostImporter->import($hosts);
 		}
 	}
 
@@ -708,7 +562,7 @@ class CConfigurationImport {
 				}
 
 				if (isset($item['interface_ref'])) {
-					$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
 				}
 
 				if (!empty($item['valuemap'])) {
@@ -768,7 +622,7 @@ class CConfigurationImport {
 				$item['hostid'] = $hostid;
 
 				if (isset($item['interface_ref'])) {
-					$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
 				}
 				unset($item['item_prototypes']);
 				unset($item['trigger_prototypes']);
@@ -832,7 +686,7 @@ class CConfigurationImport {
 					$prototype['applications'] = $applicationsIds;
 
 					if (isset($prototype['interface_ref'])) {
-						$prototype['interfaceid'] = $this->interfacesCache[$hostid][$prototype['interface_ref']];
+						$prototype['interfaceid'] = $this->referencer->interfacesCache[$hostid][$prototype['interface_ref']];
 					}
 
 					if (!empty($prototype['valuemap'])) {
@@ -852,7 +706,7 @@ class CConfigurationImport {
 
 
 				if (isset($item['interface_ref'])) {
-					$item['interfaceid'] = $this->interfacesCache[$hostid][$item['interface_ref']];
+					$item['interfaceid'] = $this->referencer->interfacesCache[$hostid][$item['interface_ref']];
 				}
 				unset($item['item_prototypes']);
 				unset($item['trigger_prototypes']);
@@ -1011,11 +865,11 @@ class CConfigurationImport {
 			}
 
 			foreach ($graph['gitems'] as &$gitem) {
-				$gitemhostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+				$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
 
-				$gitem['itemid'] = $this->referencer->resolveItem($gitemhostId, $gitem['item']['key']);
+				$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
 
-				$graphHostIds[$gitemhostId] = $gitemhostId;
+				$graphHostIds[$gitemHostId] = $gitemHostId;
 			}
 			unset($gitem);
 
@@ -1045,7 +899,6 @@ class CConfigurationImport {
 			}
 		}
 
-		// create/update items and create hash hostid->key_->itemid
 		if ($this->options['graphs']['createMissing'] && $graphsToCreate) {
 			API::Graph()->create($graphsToCreate);
 		}
