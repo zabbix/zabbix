@@ -46,7 +46,7 @@ class CHostImporter extends CImporter {
 
 			$host = $this->resolveHostReferences($host);
 
-			if ($host['hostid']) {
+			if (isset($host['hostid'])) {
 				$hostsToUpdate[] = $host;
 			}
 			else {
@@ -62,15 +62,15 @@ class CHostImporter extends CImporter {
 		if ($this->options['hosts']['createMissing'] && $hostsToCreate) {
 			$newHostIds = API::Host()->create($hostsToCreate);
 			foreach ($newHostIds['hostids'] as $hnum => $hostid) {
-				$host = $hostsToCreate[$hnum]['host'];
-				$processedHosts[$host] = $hostid;
-				$this->referencer->addHostRef($host, $hostid);
-				$this->referencer->addProcessedHost($host);
+				$hostHost = $hostsToCreate[$hnum]['host'];
+				$processedHosts[$hostHost] = $hostid;
+				$this->referencer->addHostRef($hostHost, $hostid);
+				$this->referencer->addProcessedHost($hostHost);
 
-				if (!empty($templateLinkage[$host['host']])) {
+				if (!empty($templateLinkage[$hostHost])) {
 					API::Template()->massAdd(array(
 						'hosts' => array('hostid' => $hostid),
-						'templates' => $templateLinkage[$host['host']]
+						'templates' => $templateLinkage[$hostHost]
 					));
 				}
 			}
