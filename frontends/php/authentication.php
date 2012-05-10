@@ -83,7 +83,7 @@ if ($_REQUEST['config'] == ZBX_AUTH_INTERNAL) {
 			$isAuthenticationTypeChanged = false;
 		}
 		else {
-			show_error_message(_('Cannot change authentication method to Zabbix internal.'));
+			show_error_message(_('Cannot change authentication method to Zabbix internal'));
 		}
 	}
 }
@@ -119,11 +119,11 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 			}
 			CProfile::update('web.authentication.config', $_REQUEST['config'], PROFILE_TYPE_INT);
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed to LDAP'));
-			show_message(_('Authentication method changed to LDAP.'));
+			show_message(_('Authentication method changed to LDAP'));
 			$isAuthenticationTypeChanged = false;
 		}
 		catch (Exception $e) {
-			show_error_message(_('Cannot change authentication method to LDAP.'));
+			show_error_message(_('Cannot change authentication method to LDAP'));
 		}
 	}
 	elseif (isset($_REQUEST['test'])) {
@@ -134,7 +134,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_LDAP) {
 			'cnf' => $ldap_cnf
 		));
 
-		show_messages($result, _('LDAP login successful.'), _('LDAP login was not successful.'));
+		show_messages($result, _('LDAP login successful'), _('LDAP login was not successful'));
 	}
 }
 elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
@@ -155,12 +155,12 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
 		// update config
 		if (update_config($config)) {
 			CProfile::update('web.authentication.config', $_REQUEST['config'], PROFILE_TYPE_INT);
-			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed to HTTP.'));
-			show_message(_('Authentication method changed to HTTP.'));
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, _('Authentication method changed to HTTP'));
+			show_message(_('Authentication method changed to HTTP'));
 			$isAuthenticationTypeChanged = false;
 		}
 		else {
-			show_error_message(_('Cannot changed authentication method to HTTP.'));
+			show_error_message(_('Cannot changed authentication method to HTTP'));
 		}
 	}
 }
