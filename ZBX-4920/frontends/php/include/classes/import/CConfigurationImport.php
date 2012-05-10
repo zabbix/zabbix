@@ -865,11 +865,11 @@ class CConfigurationImport {
 			}
 
 			foreach ($graph['gitems'] as &$gitem) {
-				$gitemhostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
+				$gitemHostId = $this->referencer->resolveHostOrTemplate($gitem['item']['host']);
 
-				$gitem['itemid'] = $this->referencer->resolveItem($gitemhostId, $gitem['item']['key']);
+				$gitem['itemid'] = $this->referencer->resolveItem($gitemHostId, $gitem['item']['key']);
 
-				$graphHostIds[$gitemhostId] = $gitemhostId;
+				$graphHostIds[$gitemHostId] = $gitemHostId;
 			}
 			unset($gitem);
 
@@ -899,7 +899,6 @@ class CConfigurationImport {
 			}
 		}
 
-		// create/update items and create hash hostid->key_->itemid
 		if ($this->options['graphs']['createMissing'] && $graphsToCreate) {
 			API::Graph()->create($graphsToCreate);
 		}
