@@ -334,6 +334,7 @@ elseif ($real_hosts) {
 }
 else {
 	$options['hosts']['templated_hosts'] = true;
+	$options['groups']['templated_hosts'] = true;
 }
 
 $pageFilter = new CPageFilter($options);
