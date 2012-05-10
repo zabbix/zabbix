@@ -11,6 +11,7 @@ A......... [ZBXNEXT-1189] implemented the "selectTrigger", "selectParentDependen
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4969] fixed item key param macro not resolved in simple graph popup (Vedmak)
 ..F....... [ZBX-4964] added requirements checks for xmlreader and xmlwriter (Vedmak)
 ..F....... [ZBX-4967] fixed template full clone (Toms)
 ..F....... [ZBX-3148] fixed user macro not expanded in trigger names (Toms)
