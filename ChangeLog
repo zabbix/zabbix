@@ -11,6 +11,17 @@ A......... [ZBXNEXT-1189] implemented the "selectTrigger", "selectParentDependen
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+....I..PS. [ZBX-4941] added default DBHost configuration parameter value "localhost" (dimir)
+....I..... [ZBX-4471] fixed warnings when applying 2.0 dbpatches (dimir)
+..F....... [ZBX-4969] fixed item key param macro not resolved in simple graph popup (Vedmak)
+..F....... [ZBX-4964] added requirements checks for xmlreader and xmlwriter (Vedmak)
+..F....... [ZBX-4967] fixed template full clone (Toms)
+..F....... [ZBX-3148] fixed user macro not expanded in trigger names (Toms)
+..F....... [ZBX-4493] fixed host popup menu overlap the screen range (Toms)
+..F....... [ZBX-4924] fixed deletion of template screens (Vedmak)
+..F....... [ZBX-4953] fixed unclear messages in setup.php (Toms)
+..F....... [ZBX-4402] added contexts for ambiguous translations (Vedmak)
+A.F....... [ZBX-4915] fixed host group filtering without hosts or templates (Eduard)
 A......... [ZBXNEXT-1189] implemented permission checks for the "selectDependencies" service.get parameter (Pavels)
 ..F....... [ZBXNEXT-1189] fixed service ordering on the SLA report page (Pavels)
 ..F....... [ZBXNEXT-1189] fixed "Graph" links not being displayed for services with children on the SLA report page (Pavels)

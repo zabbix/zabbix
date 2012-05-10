@@ -128,8 +128,7 @@ int	DBconnect(int flag)
  ******************************************************************************/
 void	DBinit()
 {
-	zbx_db_init(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME,
-			CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT);
+	zbx_db_init(CONFIG_DBNAME);
 }
 
 /******************************************************************************
