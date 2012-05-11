@@ -257,7 +257,7 @@ UPDATE t_host_inventory SET poc_2_notes='' WHERE poc_2_notes IS NULL;
 
 -- merge notes field
 UPDATE t_host_inventory SET notes_ext='' WHERE notes_ext IS NULL;
-UPDATE t_host_inventory SET notes=notes||'\r\n'||notes_ext WHERE notes<>'' AND notes_ext<>'';
+UPDATE t_host_inventory SET notes=notes||E'\r\n'||notes_ext WHERE notes<>'' AND notes_ext<>'';
 UPDATE t_host_inventory SET notes=notes_ext WHERE notes='';
 ALTER TABLE ONLY t_host_inventory DROP COLUMN notes_ext;
 

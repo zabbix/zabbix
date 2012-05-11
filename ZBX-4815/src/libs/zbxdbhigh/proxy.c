@@ -1446,6 +1446,9 @@ void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
 		if (SUCCEED != DCconfig_get_item_by_key(&item, proxy_hostid, values[i].host_name, values[i].key))
 			continue;
 
+		if (ZBX_FLAG_DISCOVERY_CHILD == item.flags)
+			goto clean;
+
 		if (HOST_MAINTENANCE_STATUS_ON == item.host.maintenance_status &&
 				MAINTENANCE_TYPE_NODATA == item.host.maintenance_type &&
 				item.host.maintenance_from <= values[i].ts.sec)

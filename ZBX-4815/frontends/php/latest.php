@@ -189,7 +189,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //		$link = new CLink(new CImg('images/general/closed.gif'),$url,null,"javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."','".$url."');");
 	}
 
-	$table = new CTableInfo(_('No latest data defined.'));
+	$table = new CTableInfo(_('No values found.'));
 	$table->setHeader(array(
 		$link,
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,

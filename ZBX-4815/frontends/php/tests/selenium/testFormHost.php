@@ -220,13 +220,13 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_TemplateLink() {
-		$this->templateLink("Visible host for template linkage", "Template_Linux");
+		$this->templateLink("Visible host for template linkage", "Template OS Linux");
 	}
 
 	public function testFormHost_TemplateUnlink() {
 		// Unlink a template from a host from host properties page
 
-		$template = "Template_Linux";
+		$template = "Template OS Linux";
 		$host = "Template linkage test host";
 
 		$sql = "select hostid from hosts where host='".$host."' and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")";
@@ -268,13 +268,13 @@ class testFormHost extends CWebTest {
 	}
 
 	public function testFormHost_TemplateLinkUpdate() {
-		$this->templateLink("Visible host for template linkage", "Template_Linux");
+		$this->templateLink("Visible host for template linkage", "Template OS Linux");
 	}
 
 	public function testFormHost_TemplateUnlinkAndClear() {
 		// Unlink and clear a template from a host from host properties page
 
-		$template = "Template_Linux";
+		$template = "Template OS Linux";
 
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid', 'all');

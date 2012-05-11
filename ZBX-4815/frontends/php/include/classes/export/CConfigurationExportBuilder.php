@@ -85,39 +85,7 @@ class CConfigurationExportBuilder {
 		$this->data['hosts'] = array();
 
 		foreach ($hosts as $host) {
-			$references = array(
-				'num' => 1,
-				'refs' => array()
-			);
-
-			// create interface references
-			foreach ($host['interfaces'] as &$interface) {
-				$refNum = $references['num']++;
-				$referenceKey = 'if'.$refNum;
-				$interface['interface_ref'] = $referenceKey;
-				$references['refs'][$interface['interfaceid']] = $referenceKey;
-			}
-			unset($interface);
-
-			// add interfaces references to items
-			foreach ($host['items'] as &$item) {
-				// only for items that require interface
-				if ($item['interfaceid']) {
-					$item['interface_ref'] = $references['refs'][$item['interfaceid']];
-				}
-			}
-			unset($item);
-
-			// add interfaces references to discovery rules and item prototypes
-			foreach ($host['discoveryRules'] as &$discoveryRule) {
-				$discoveryRule['interface_ref'] = $references['refs'][$discoveryRule['interfaceid']];
-
-				foreach ($discoveryRule['itemPrototypes'] as &$prototype) {
-					$prototype['interface_ref'] = $references['refs'][$prototype['interfaceid']];
-				}
-				unset($prototype);
-			}
-			unset($discoveryRule);
+			$host = $this->createInterfaceReferences($host);
 
 			$this->data['hosts'][] = array(
 				'host' => $host['host'],
@@ -226,6 +194,53 @@ class CConfigurationExportBuilder {
 				'links' => $this->formatMapLinks($map['links'])
 			);
 		}
+	}
+
+	/**
+	 * For each host interface an unique reference must be created and then added for all items, discovery rules
+	 * and item prototypes that use the interface.
+	 *
+	 * @param array $host
+	 *
+	 * @return array
+	 */
+	protected function createInterfaceReferences(array $host) {
+		$references = array(
+			'num' => 1,
+			'refs' => array()
+		);
+
+		// create interface references
+		foreach ($host['interfaces'] as &$interface) {
+			$refNum = $references['num']++;
+			$referenceKey = 'if'.$refNum;
+			$interface['interface_ref'] = $referenceKey;
+			$references['refs'][$interface['interfaceid']] = $referenceKey;
+		}
+		unset($interface);
+
+		foreach ($host['items'] as &$item) {
+			if ($item['interfaceid']) {
+				$item['interface_ref'] = $references['refs'][$item['interfaceid']];
+			}
+		}
+		unset($item);
+
+		foreach ($host['discoveryRules'] as &$discoveryRule) {
+			if ($discoveryRule['interfaceid']) {
+				$discoveryRule['interface_ref'] = $references['refs'][$discoveryRule['interfaceid']];
+			}
+
+			foreach ($discoveryRule['itemPrototypes'] as &$prototype) {
+				if ($prototype['interfaceid']) {
+					$prototype['interface_ref'] = $references['refs'][$prototype['interfaceid']];
+				}
+			}
+			unset($prototype);
+		}
+		unset($discoveryRule);
+
+		return $host;
 	}
 
 	/**
@@ -352,11 +367,11 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatTriggers(array $triggers) {
-		$result = array();
 		order_result($triggers, 'description');
 
+		$result = array();
 		foreach ($triggers as $trigger) {
-			$result[] = array(
+			$tr = array(
 				'expression' => $trigger['expression'],
 				'name' => $trigger['description'],
 				'url' => $trigger['url'],
@@ -364,8 +379,12 @@ class CConfigurationExportBuilder {
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
 				'type' => $trigger['type'],
-				'dependencies' => $this->formatDependencies($trigger['dependencies'])
 			);
+			if (isset($trigger['dependencies'])) {
+				$tr['dependencies'] = $this->formatDependencies($trigger['dependencies']);
+			}
+
+			$result[] = $tr;
 		}
 		return $result;
 	}
