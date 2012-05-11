@@ -579,3 +579,26 @@ function mitem_getstyle (n_pos, n_state) {
 		}
 	}
 }
+
+/**
+ * Creates a header object for the menu.
+ *
+ * @param label
+ *
+ * @return {Array}
+ */
+function createMenuHeader(label) {
+	return [label, null, null, { outer: 'pum_oheader', inner: 'pum_iheader' }];
+}
+
+/**
+ * Creates a menu link object for the menu
+ *
+ * @param label
+ * @param action    the target URL
+ *
+ * @return {Array}
+ */
+function createMenuItem(label, action) {
+	return [label, action, null, { outer: 'pum_o_item', inner: 'pum_i_item' }];
+}

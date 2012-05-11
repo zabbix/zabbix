@@ -2,6 +2,9 @@
 Changes for 2.0.0rc4
 
 New features:
+..F....... [ZBX-4815] forbidden deleting IT services that have dependecies (Pavels)
+..F....... [ZBX-4815] all status-related fields will now be disabled when choosing "do not calculate" in the IT service configuration form (Pavels)
+..F....... [ZBX-4815] implemented multiselect support for the IT service dependency pop up (Pavels)
 A......... [ZBXNEXT-1189] implemented the service.getsla method (Pavels)
 A......... [ZBXNEXT-1189] implemented the "selectTrigger", "selectParentDependencies" and "selectAlarms" parameters for the service.get method (Pavels)
 ..F....... [ZBXNEXT-1189] improved the design of the SLA report page (Pavels)
@@ -11,6 +14,11 @@ A......... [ZBXNEXT-1189] implemented the "selectTrigger", "selectParentDependen
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4815] improved IT service configuration and SLA report page performance (Pavels)
+..F....... [ZBX-4815] fixed IT service sorting on the service configuration page (Pavels)
+..F....... [ZBX-4815] fixed IT service configuration pop up menu translation (Pavels)
+..F....... [ZBX-4815] fixed IT service status update when changing the linked trigger severity (Pavels)
+A......... [ZBX-4815] fixed sorting for results returned by the "selectDepdendencies" and "selectParentDependencies" parameters for service.get (Pavels)
 ..F....... [ZBX-4960] fixed LDAP frontend messages, fixed message in latest data (Vedmak)
 ..F....... [ZBX-4920] fixed templates from 1.8 xml are dependent on 'hosts' rules (Vedmak)
 ...G...PS. [ZBX-4942] do not send prototypes for active agent to process (dimir)
