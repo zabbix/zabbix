@@ -448,10 +448,11 @@ class CHost extends CZBXAPI{
 
 // with_graphs
 		if(!is_null($options['with_graphs'])){
-			$sql_parts['from']['items'] = 'items i';
-			$sql_parts['from']['graphs_items'] = 'graphs_items gi';
-			$sql_parts['where']['ih'] = 'i.hostid=h.hostid';
-			$sql_parts['where']['igi'] = 'i.itemid=gi.itemid';
+			$sql_parts['where'][] = 'EXISTS ('.
+				'SELECT 1'.
+				' FROM items i,graphs_items gi'.
+				' WHERE i.hostid=h.hostid'.
+					' AND i.itemid=gi.itemid '.zbx_limit(1).')';
 		}
 
 // output
