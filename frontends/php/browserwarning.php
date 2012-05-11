@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-require_once dirname(__FILE__).'/include/defines.inc.php';
 require_once dirname(__FILE__).'/include/classes/class.cview.php';
 
 $browserWarningForm = new CView('general.browserwarning');
