@@ -553,6 +553,9 @@ div.setup_wizard {
 	height: 541px;
 	background: url(../images/general/setup/background.png) no-repeat;
 }
+div.setup_wizard_welcome {
+	background: url(../images/general/setup/welcome_screen.png) no-repeat;
+}
 div.setup_wizard_licence {
 	margin-top: 80px;
 	margin-left: 10px;
@@ -573,11 +576,6 @@ div.setup_wizard div.setup_version {
 	color: #608CB6;
 	font-weight: bold;
 	font-size: 16px;
-}
-div.setup_wizard div.first_page_img {
-	width: 530px;
-	height: 380px;
-	background: url(../images/general/setup/leaf.jpg) no-repeat;
 }
 div.setup_wizard div.left_menu { margin: 50px 0 0 }
 div.setup_wizard div.left_menu ul { list-style-type: none }
@@ -609,6 +607,7 @@ div.setup_wizard div.right div.setup_title {
 	font-size: 20px;
 }
 div.setup_wizard div.right div.blank_title { height: 38px }
+div.setup_wizard div.right div.blank_under_title { height: 383px }
 div.setup_wizard div.under_title {
 	display: table-cell;
 	width: 530px;
