@@ -487,12 +487,19 @@ class CConfigurationExport {
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+			'selectItems' => array('flags', 'type'),
 			'inherited' => false,
 			'preservekeys' => true,
 			'expandData' => true
 		));
 
 		foreach($triggers as $trigger){
+			foreach ($trigger['items'] as $item) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
+					continue 2;
+				}
+			}
+
 			$trigger['expression'] = explode_exp($trigger['expression']);
 			$items[$trigger['discoveryRule']['itemid']]['triggerPrototypes'][] = $trigger;
 		}
@@ -607,12 +614,19 @@ class CConfigurationExport {
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'selectDependencies' => API_OUTPUT_EXTEND,
+			'selectItems' => array('flags', 'type'),
 			'inherited' => false,
 			'preservekeys' => true,
 			'expandData' => true
 		));
 
 		foreach($triggers as $trigger){
+			foreach ($trigger['items'] as $item) {
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
+					continue 2;
+				}
+			}
+
 			$trigger['expression'] = explode_exp($trigger['expression']);
 
 			foreach ($trigger['dependencies'] as &$dependency) {
