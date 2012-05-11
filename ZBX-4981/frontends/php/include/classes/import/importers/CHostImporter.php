@@ -32,7 +32,7 @@ class CHostImporter extends CImporter {
 			}
 
 			// preserve host related templates to massAdd them later
-			if ($this->options['templateLinkage']['createMissing']) {
+			if ($this->options['templateLinkage']['createMissing'] && !empty($host['templates'])) {
 				foreach ($host['templates'] as $template) {
 					$templateId = $this->referencer->resolveTemplate($template['name']);
 					if (!$templateId) {
