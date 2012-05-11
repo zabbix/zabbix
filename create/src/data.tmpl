@@ -61,6 +61,7 @@ ROW   |7       |System performance  |2    |1    |10075     |
 ROW   |9       |System performance  |2    |2    |10074     |
 ROW   |10      |System performance  |2    |1    |10078     |
 ROW   |15      |MySQL performance   |2    |1    |10073     |
+ROW   |16      |Zabbix server       |2    |2    |NULL      |
 
 TABLE |screens_items
 FIELDS|screenitemid|screenid|resourcetype|resourceid|width|height|x|y|colspan|rowspan|elements|valign|halign|style|url |dynamic|sort_triggers|
@@ -85,6 +86,9 @@ ROW   |40          |10      |0           |481       |500  |114   |0|0|1      |1 
 ROW   |41          |10      |0           |480       |500  |100   |1|0|1      |1      |0       |1     |0     |0    |    |0      |0            |
 ROW   |42          |15      |0           |454       |500  |200   |0|0|1      |1      |0       |1     |0     |0    |    |0      |0            |
 ROW   |43          |15      |0           |455       |500  |270   |1|0|1      |1      |0       |1     |0     |0    |    |0      |0            |
+ROW   |44          |16      |2           |1         |500  |100   |0|0|2      |0      |0       |0     |0     |0    |    |0      |0            |
+ROW   |45          |16      |0           |524       |400  |156   |0|1|1      |1      |0       |0     |0     |0    |    |0      |0            |
+ROW   |46          |16      |0           |525       |400  |100   |1|1|1      |1      |0       |0     |0     |0    |    |0      |0            |
 
 TABLE |drules
 FIELDS|druleid|proxy_hostid|name         |iprange        |delay|status|
@@ -2764,7 +2768,11 @@ ROW   |71       |11        |3    |testing           |
 
 TABLE |sysmaps
 FIELDS|sysmapid|name         |width|height|backgroundid|label_type|label_location|highlight|expandproblem|markelements|show_unack|grid_size|grid_show|grid_align|label_format|label_type_host|label_type_hostgroup|label_type_trigger|label_type_map|label_type_image|label_string_host|label_string_hostgroup|label_string_trigger|label_string_map|label_string_image|iconmapid|expand_macros|
-ROW   |2       |Local network|680  |200   |NULL        |0         |0             |1        |1            |1           |0         |50       |1        |1         |0           |2              |2                   |2                 |2             |2               |                 |                      |                    |                |                  |NULL     |0            |
+ROW   |1       |Local network|680  |200   |NULL        |0         |0             |1        |1            |1           |0         |50       |1        |1         |0           |2              |2                   |2                 |2             |2               |                 |                      |                    |                |                  |NULL     |1            |
+
+TABLE |sysmaps_elements
+FIELDS|selementid|sysmapid|elementid|elementtype|iconid_off|iconid_on|label                       |label_location|x  |y |iconid_disabled|iconid_maintenance|elementsubtype|areatype|width|height|viewtype|use_iconmap|
+ROW   |1         |1       |10084    |0          |185       |NULL     |{HOST.NAME}&eol;{HOST.CONN}|0             |111|61|NULL           |NULL              |0             |0       |200  |200   |0       |0          |
 
 TABLE |regexps
 FIELDS|regexpid|name                              |test_string|
