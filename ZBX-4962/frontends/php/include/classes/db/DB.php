@@ -200,7 +200,6 @@ class DB {
 		}
 	}
 
-
 	/**
 	 * Returns the names of the fields that are used as the primary key of the table.
 	 *
@@ -236,20 +235,23 @@ class DB {
 		return isset($schema['fields'][$fieldName]);
 	}
 
-	public static function addMissingFields($table, &$values) {
+	private static function addMissingFields($tableSchema, $values) {
 		global $DB;
 
 		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-			$table = self::getSchema($table);
-
-			for ($i = 0, $size = count($values); $i < $size; $i++) {
-				foreach ($table['fields'] as $name => $field) {
-					if (isset($field['null']) && !$field['null'] && $field['type'] == DB::FIELD_TYPE_TEXT && !isset($values[$i][$name])) {
-						$values[$i][$name] = '';
+			foreach ($tableSchema['fields'] as $name => $field) {
+				if ($field['type'] == DB::FIELD_TYPE_TEXT && !$field['null']) {
+					foreach ($values as &$value) {
+						if (!isset($value[$name])) {
+							$value[$name] = '';
+						}
 					}
+					unset($value);
 				}
 			}
 		}
+
+		return $values;
 	}
 
 	public static function getDefaults($table) {
@@ -394,9 +396,9 @@ class DB {
 			$id = self::reserveIds($table, count($values));
 		}
 
-		self::addMissingFields($table, $values);
-
 		$tableSchema = self::getSchema($table);
+
+		$values = self::addMissingFields($tableSchema, $values);
 
 		foreach ($values as $key => $row) {
 			self::checkValueTypes($table, $row);
