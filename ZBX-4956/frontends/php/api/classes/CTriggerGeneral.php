@@ -240,8 +240,8 @@ abstract class CTriggerGeneral extends CZBXAPI {
 	 *
 	 * @throws APIException if at lean one trigger exists
 	 *
-	 * @param array $trigger    a trigger with an exploded expression
-	 * @param null $hostid
+	 * @param array $trigger a trigger with an exploded expression
+	 * @param null  $hostid
 	 *
 	 * @return void
 	 */
@@ -255,20 +255,17 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			$filter['host'] = reset($expr->data['hosts']);
 		}
 
-		$options = array(
+		$triggers = $this->get(array(
 			'filter' => $filter,
 			'output' => array('expression', 'triggerid'),
 			'nopermissions' => true
-		);
-
-		$triggers = $this->get($options);
+		));
 		foreach ($triggers as $dbTrigger) {
 			$tmpExp = explode_exp($dbTrigger['expression']);
 
 			// check if the expressions are also equal and that this is a different trigger
 			$differentTrigger = (!isset($trigger['triggerid']) || !idcmp($trigger['triggerid'], $dbTrigger['triggerid']));
 			if (strcmp($tmpExp, $trigger['expression']) == 0 && $differentTrigger) {
-
 				$options = array(
 					'output' => array('name'),
 					'templated_hosts' => true,
