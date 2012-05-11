@@ -420,6 +420,7 @@ $itemFormList->addRow(_('Description'), $description);
 // status
 if (isset($this->data['is_item_prototype'])) {
 	$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
+	$enabledCheckBox->addStyle('vertical-align: middle;');
 	$itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 }
 else {
