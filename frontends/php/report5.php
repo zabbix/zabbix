@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 
@@ -28,15 +27,13 @@ $page['hist_arg'] = array('period');
 $page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'period' => array(T_ZBX_STR,	O_OPT,	P_SYS | P_NZERO,	IN('"day","week","month","year"'),	NULL)
 );
 check_fields($fields);
-?>
-<?php
+
 $rprt_wdgt = new CWidget();
 
 $_REQUEST['period'] = get_request('period', 'day');
@@ -57,7 +54,7 @@ $rprt_wdgt->addPageHeader(_('MOST BUSY TRIGGERS TOP 100'));
 $rprt_wdgt->addHeader(_('Report'), $form);
 $rprt_wdgt->addItem(BR());
 
-$table = new CTableInfo(_('No hosts defined.'));
+$table = new CTableInfo(_('No triggers found.'));
 $table->setHeader(array(
 	is_show_all_nodes() ? _('Node') : null,
 	_('Host'),
@@ -174,5 +171,3 @@ $rprt_wdgt->addItem($table);
 $rprt_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
-?>
