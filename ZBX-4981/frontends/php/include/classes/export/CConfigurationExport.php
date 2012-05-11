@@ -487,7 +487,7 @@ class CConfigurationExport {
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectItems' => API_OUTPUT_EXTEND,
+			'selectItems' => array('flags', 'type'),
 			'inherited' => false,
 			'preservekeys' => true,
 			'expandData' => true
@@ -614,7 +614,7 @@ class CConfigurationExport {
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
 			'selectDependencies' => API_OUTPUT_EXTEND,
-			'selectItems' => API_OUTPUT_EXTEND,
+			'selectItems' => array('flags', 'type'),
 			'inherited' => false,
 			'preservekeys' => true,
 			'expandData' => true
