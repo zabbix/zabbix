@@ -281,9 +281,7 @@ class CConfigurationExport {
 		}
 
 		foreach ($hosts as &$host) {
-			if ($host['proxy_hostid']) {
-				$host['proxy'] = array('name' => $proxies[$host['proxy_hostid']]);
-			}
+			$host['proxy'] = $host['proxy_hostid'] ? array('name' => $proxies[$host['proxy_hostid']]) : null;
 		}
 		unset($host);
 
@@ -479,68 +477,8 @@ class CConfigurationExport {
 			'inherited' => false,
 			'preservekeys' => true
 		));
-		// get item axis items info
-		$graphItemIds = array();
+		$graphs = $this->prepareGraphs($graphs);
 		foreach ($graphs as $graph) {
-			foreach ($graph['gitems'] as $gItem) {
-				$graphItemIds[$gItem['itemid']] = $gItem['itemid'];
-			}
-			if ($graph['ymin_itemid']) {
-				$graphItemIds[$graph['ymin_itemid']] = $graph['ymin_itemid'];
-			}
-			if ($graph['ymax_itemid']) {
-				$graphItemIds[$graph['ymax_itemid']] = $graph['ymax_itemid'];
-			}
-		}
-		$graphItems = API::Item()->get(array(
-			'itemids' => $graphItemIds,
-			'output' => array('key_', 'flags'),
-			'selectHosts' => array('host'),
-			'preservekeys' => true
-		));
-
-		foreach ($graphs as $gnum => $graph) {
-			if ($graph['ymin_itemid']) {
-				$axisItem = $graphItems[$graph['ymin_itemid']];
-				// unset lld dependent graphs
-				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					unset($graphs[$gnum]);
-					continue;
-				}
-
-				$axisItemHost = reset($axisItem['hosts']);
-				$graph['ymin_itemid'] = array(
-					'host' => $axisItemHost['host'],
-					'key' => $axisItem['key_']
-				);
-			}
-			if ($graph['ymax_itemid']) {
-				$axisItem = $graphItems[$graph['ymax_itemid']];
-				// unset lld dependent graphs
-				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					unset($graphs[$gnum]);
-					continue;
-				}
-				$axisItemHost = reset($axisItem['hosts']);
-				$graph['ymax_itemid'] = array(
-					'host' => $axisItemHost['host'],
-					'key' => $axisItem['key_']
-				);
-			}
-
-			foreach ($graph['gitems'] as $ginum => $gItem) {
-				$item = $graphItems[$gItem['itemid']];
-
-				if($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					unset($graphs[$gnum]);
-					continue 2;
-				}
-				$itemHost = reset($item['hosts']);
-				$graph['gitems'][$ginum]['itemid'] = array(
-					'host' => $itemHost['host'],
-					'key' => $item['key_']
-				);
-			}
 			$items[$graph['discoveryRule']['itemid']]['graphPrototypes'][] = $graph;
 		}
 
@@ -577,6 +515,17 @@ class CConfigurationExport {
 			'preservekeys' => true
 		));
 
+		$this->data['graphs'] = $this->prepareGraphs($graphs);
+	}
+
+	/**
+	 * Unset graphs that have lld created items or web items.
+	 *
+	 * @param array $graphs
+	 *
+	 * @return array
+	 */
+	protected function prepareGraphs(array $graphs) {
 		// get item axis items info
 		$graphItemIds = array();
 		foreach ($graphs as $graph) {
@@ -593,35 +542,36 @@ class CConfigurationExport {
 
 		$graphItems = API::Item()->get(array(
 			'itemids' => $graphItemIds,
-			'output' => array('key_', 'flags'),
+			'output' => array('key_', 'flags', 'type'),
+			'webitems' => true,
 			'selectHosts' => array('host'),
 			'preservekeys' => true
 		));
 
 		foreach ($graphs as $gnum => $graph) {
-			if ($graph['ymin_itemid']) {
+			if ($graph['ymin_itemid'] && isset($graphItems[$graph['ymin_itemid']])) {
 				$axisItem = $graphItems[$graph['ymin_itemid']];
-				// unset lld dependent graphs
-				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				// unset lld and web graphs
+				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $axisItem['type'] == ITEM_TYPE_HTTPTEST) {
 					unset($graphs[$gnum]);
 					continue;
 				}
 
 				$axisItemHost = reset($axisItem['hosts']);
-				$graph['ymin_itemid'] = array(
+				$graphs[$gnum]['ymin_itemid'] = array(
 					'host' => $axisItemHost['host'],
 					'key' => $axisItem['key_']
 				);
 			}
-			if ($graph['ymax_itemid']) {
+			if ($graph['ymax_itemid'] && isset($graphItems[$graph['ymax_itemid']])) {
 				$axisItem = $graphItems[$graph['ymax_itemid']];
-				// unset lld dependent graphs
-				if($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				// unset lld and web graphs
+				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $axisItem['type'] == ITEM_TYPE_HTTPTEST) {
 					unset($graphs[$gnum]);
 					continue;
 				}
 				$axisItemHost = reset($axisItem['hosts']);
-				$graph['ymax_itemid'] = array(
+				$graphs[$gnum]['ymax_itemid'] = array(
 					'host' => $axisItemHost['host'],
 					'key' => $axisItem['key_']
 				);
@@ -630,20 +580,20 @@ class CConfigurationExport {
 			foreach ($graph['gitems'] as $ginum => $gItem) {
 				$item = $graphItems[$gItem['itemid']];
 
-				if($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				// unset lld and web graphs
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
 					unset($graphs[$gnum]);
 					continue 2;
 				}
 				$itemHost = reset($item['hosts']);
-				$graph['gitems'][$ginum]['itemid'] = array(
+				$graphs[$gnum]['gitems'][$ginum]['itemid'] = array(
 					'host' => $itemHost['host'],
 					'key' => $item['key_']
 				);
 			}
-
-			$this->data['graphs'][] = $graph;
 		}
 
+		return $graphs;
 	}
 
 	/**

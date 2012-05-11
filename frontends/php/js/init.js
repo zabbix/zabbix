@@ -30,14 +30,6 @@ jQuery(function() {
 	 * Handles host pop up menus.
 	 */
 	jQuery(document).on('click', '.menu-host', function(event) {
-		function createMenuHeader(label) {
-			return [label, null, null, { outer: 'pum_oheader', inner: 'pum_iheader' }];
-		}
-
-		function createMenuItem(label, action) {
-			return [label, action, null, { outer: 'pum_o_item', inner: 'pum_i_item' }];
-		}
-
 		var menuData = jQuery(this).data('menu');
 		var menu = [];
 
