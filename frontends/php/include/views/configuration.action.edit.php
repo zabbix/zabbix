@@ -193,7 +193,7 @@ switch ($new_condition['conditiontype']) {
 			new CButton('btn1', _('Select'),
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 				"&dstfld1=new_condition_value&dstfld2=hostname&srctbl=host_templates".
-				"&srcfld1=templateid&srcfld2=name', 450, 450);",
+				"&srcfld1=templateid&srcfld2=name&templated_hosts=1', 450, 450);",
 				'link_menu'
 			)
 		);
@@ -205,7 +205,7 @@ switch ($new_condition['conditiontype']) {
 			new CButton('btn1', _('Select'),
 				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
 				"&dstfld1=new_condition_value&dstfld2=hostname&srctbl=hosts".
-				"&srcfld1=hostid&srcfld2=name', 450, 450);",
+				"&srcfld1=hostid&srcfld2=name&real_hosts=1', 450, 450);",
 				'link_menu'
 			)
 		);
@@ -798,7 +798,7 @@ if (isset($_REQUEST['new_operation'])) {
 			$templateList = new CTable();
 			$templateList->setAttribute('id', 'opTemplateList');
 
-			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_templates&srcfld1=templateid&srcfld2=name&multiselect=1&reference=dsc_templateid",450,450)', 'link_menu');
+			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_templates&srcfld1=templateid&srcfld2=name&multiselect=1&reference=dsc_templateid&templated_hosts=1",450,450)', 'link_menu');
 
 			$col = new CCol($addUsrgrpBtn);
 			$col->setAttribute('colspan', 2);
