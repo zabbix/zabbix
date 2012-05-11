@@ -1,3 +1,7 @@
+Changes for 1.8.13
+
+1.8.13rc1 was released as 1.8.13 without any changes
+
 Changes for 1.8.13rc1
 
 A.F....... [ZBX-4685] fixed hangup when users login at the same time (Toms)
