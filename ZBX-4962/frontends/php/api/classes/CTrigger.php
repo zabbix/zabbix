@@ -1740,6 +1740,9 @@ class CTrigger extends CTriggerGeneral {
 		// insert triggers without expression
 		$triggersCopy = $triggers;
 		for ($i = 0, $size = count($triggersCopy); $i < $size; $i++) {
+			if (empty($triggersCopy[$i]['comments'])) {
+				$triggersCopy[$i]['comments'] = '';
+			}
 			unset($triggersCopy[$i]['expression']);
 		}
 		$triggerids = DB::insert('triggers', $triggersCopy);
