@@ -39,7 +39,6 @@ class CTemplateImporter extends CImporter {
 			// screens are imported separately
 			unset($template['screens']);
 
-			// if we don't need to update linkage, unset templates
 			if (!$this->options['templateLinkage']['createMissing']) {
 				unset($template['templates']);
 			}
@@ -52,11 +51,18 @@ class CTemplateImporter extends CImporter {
 
 			$templatesToCreate = array();
 			$templatesToUpdate = array();
+			$templateLinkage = array();
 			foreach ($independentTemplates as $name) {
 				$template = $templates[$name];
 				unset($templates[$name]);
 
 				$template = $this->resolveTemplateReferences($template);
+
+				// if we need to add linkages, save linked templates to massAdd later
+				if ($this->options['templateLinkage']['createMissing'] && !empty($template['templates'])) {
+					$templateLinkage[$template['host']] = $template['templates'];
+					unset($template['templates']);
+				}
 
 				if (!empty($template['templateid'])) {
 					$templatesToUpdate[] = $template;
@@ -68,18 +74,33 @@ class CTemplateImporter extends CImporter {
 
 			if ($this->options['templates']['createMissing'] && $templatesToCreate) {
 				$newHostIds = API::Template()->create($templatesToCreate);
+
 				foreach ($templatesToCreate as $num => $createdTemplate) {
 					$hostId = $newHostIds['templateids'][$num];
 					$this->referencer->addTemplateRef($createdTemplate['host'], $hostId);
 					$this->referencer->addProcessedHost($createdTemplate['host']);
+
+					if (!empty($templateLinkage[$createdTemplate['host']])) {
+						API::Template()->massAdd(array(
+							'templates' => array('hostid' => $hostId),
+							'templates_link' => $templateLinkage[$createdTemplate['host']]
+						));
+					}
 				}
 			}
 			if ($this->options['templates']['updateExisting'] && $templatesToUpdate) {
 				API::Template()->update($templatesToUpdate);
+
 				foreach ($templatesToUpdate as $updatedTemplate) {
 					$this->referencer->addProcessedHost($updatedTemplate['host']);
-				}
 
+					if (!empty($templateLinkage[$updatedTemplate['host']])) {
+						API::Template()->massAdd(array(
+							'templates' => $updatedTemplate,
+							'templates_link' => $templateLinkage[$updatedTemplate['host']]
+						));
+					}
+				}
 			}
 		} while (!empty($independentTemplates));
 
@@ -87,8 +108,8 @@ class CTemplateImporter extends CImporter {
 		foreach ($templates as $template) {
 			$unresolvedReferences = array();
 			foreach ($template['templates'] as $linkedTemplate) {
-				if (!$this->referencer->resolveTemplate($linkedTemplate['template'])) {
-					$unresolvedReferences[] = $linkedTemplate['template'];
+				if (!$this->referencer->resolveTemplate($linkedTemplate['name'])) {
+					$unresolvedReferences[] = $linkedTemplate['name'];
 				}
 			}
 			throw new Exception(_n('Cannot import template "%2$s", linked template "%3$s" does not exist.',

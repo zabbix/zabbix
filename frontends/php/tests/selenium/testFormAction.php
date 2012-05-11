@@ -186,7 +186,7 @@ class testFormAction extends CWebTest {
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
 		$this->click("usrgrps_7");
-		$this->click("usrgrps_2");
+		$this->click("usrgrps_11");
 		$this->click("select");
 		$this->selectWindow("null");
 		sleep(1);
@@ -200,7 +200,7 @@ class testFormAction extends CWebTest {
 		$this->click("add_operation");
 		$this->wait();
 		$this->ok("Send message to users: Admin");
-		$this->ok("Send message to user groups: Database administrators, Zabbix administrators");
+		$this->ok("Send message to user groups: Enabled debug mode, Zabbix administrators");
 		$this->click("new_operation");
 		$this->wait();
 		$this->select("new_operation_operationtype", "label=Remote command");
@@ -216,7 +216,7 @@ class testFormAction extends CWebTest {
 		$this->waitForPopUp("zbx_popup", "30000");
 		$this->selectWindow("name=zbx_popup");
 		$this->dropdown_select_wait('groupid', 'Zabbix servers');
-		$this->click("spanid10017");
+		$this->click("spanid10053");
 		$this->selectWindow("null");
 		$this->click("//input[@name='save']");
 
@@ -238,7 +238,7 @@ class testFormAction extends CWebTest {
 		$this->click("add_operation");
 		$this->wait();
 		$this->ok("Run remote commands on current host");
-		$this->ok("Run remote commands on hosts: ЗАББИКС Сервер");
+		// $this->ok("Run remote commands on hosts: ЗАББИКС Сервер");
 		$this->ok("Run remote commands on host groups: Zabbix servers");
 		$this->click("new_operation");
 		$this->wait();

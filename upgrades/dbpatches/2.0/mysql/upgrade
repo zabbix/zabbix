@@ -76,21 +76,21 @@ create_index() {
 
 # ********************   1
 
-echo "Dropping indexes that might need re-creation..."
+#echo "Dropping indexes that might need re-creation..."
 
-timer start dropping of indexes
-for i in\
- "node_cksum_1 node_cksum_cksum_1"; do
-	drop_index $i
-done
-echo -n " ... "
-timer stop dropping of indexes
+#timer start dropping of indexes
+#for i in\
+# "node_cksum_1 node_cksum_cksum_1"; do
+#	drop_index $i
+#done
+#echo -n " ... "
+#timer stop dropping of indexes
 
-echo "Creating possibly missing indexes..."
+#echo "Creating possibly missing indexes..."
 
-timer start creating of indexes
+#timer start creating of indexes
 # create_index index_name table_name columns
-timer stop creating of indexes
+#timer stop creating of indexes
 
 # ********************   2
 

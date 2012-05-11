@@ -178,6 +178,7 @@ frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/import/importers/CAbstractScreenImporter.php -text
+frontends/php/include/classes/import/importers/CHostImporter.php -text
 frontends/php/include/classes/import/importers/CScreenImporter.php -text
 frontends/php/include/classes/import/importers/CTemplateImporter.php -text
 frontends/php/include/classes/import/importers/CTemplateScreenImporter.php -text
