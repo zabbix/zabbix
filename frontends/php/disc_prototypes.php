@@ -49,7 +49,7 @@ $fields = array(
 	'new_delay_flex' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add_delay_flex})&&(isset({type})&&({type}!=2))',
 		_('New flexible interval')),
 	'delay_flex' =>				array(T_ZBX_STR, O_OPT, null,	'',			null),
-	'status' =>					array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({save})'),
+	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null),
 	'type' =>					array(T_ZBX_INT, O_OPT, null,
 		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_AGGREGATE, ITEM_TYPE_EXTERNAL,
@@ -226,7 +226,7 @@ elseif (isset($_REQUEST['save'])) {
 		'hostid'		=> get_request('hostid'),
 		'interfaceid'	=> get_request('interfaceid'),
 		'delay'			=> get_request('delay'),
-		'status'		=> get_request('status'),
+		'status'		=> get_request('status', ITEM_STATUS_DISABLED),
 		'type'			=> get_request('type'),
 		'snmp_community' => get_request('snmp_community'),
 		'snmp_oid'		=> get_request('snmp_oid'),
@@ -311,6 +311,7 @@ if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 if (isset($_REQUEST['form'])) {
 	$data = getItemFormData();
 	$data['page_header'] = _('CONFIGURATION OF ITEM PROTOTYPES');
+	$data['is_item_prototype'] = true;
 
 	// render view
 	$itemView = new CView('configuration.item.edit', $data);
