@@ -773,8 +773,8 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 .preloader { width: 80px; height: 12px; }
 
+.service-list .tableinfo .service-caption-soft a { color: #888; }
 .service-mon .tableinfo .sla-value { display: inline-block; width: 5em; text-align: right; padding-right: 0.2em; }
-.service-mon .tableinfo .service-caption-soft a { color: #888; }
 .service-mon .tableinfo ul.service-problems { margin: 0; list-style-type: none; padding-left: 0; }
 .service-mon .tableinfo .sla-bar { display: inline-block; position: relative; margin-right: 0.3em; }
 .service-mon .tableinfo .sla-bar .sla-bar-legend {

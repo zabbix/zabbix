@@ -554,7 +554,6 @@ class CService extends CZBXAPI {
 			'output' => array('serviceid', 'name', 'status', 'algorithm'),
 			'selectTimes' => API_OUTPUT_EXTEND,
 			'selectParentDependencies' => array('serviceupid'),
-			'selectDependencies' => array('servicedownid'),
 			'selectTrigger' => API_OUTPUT_EXTEND,
 			'serviceids' => $serviceIds,
 			'preservekeys' => true
@@ -1040,7 +1039,7 @@ class CService extends CZBXAPI {
 		// sort by sortorder
 		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
 		$sqlParts['where'][] = 'sl.servicedownid='.$this->fieldId('serviceid');
-		$sqlParts['order'][] = $this->fieldId('sortorder').' '.ZBX_SORT_UP;
+		$sqlParts['order'][] = $this->fieldId('sortorder').', '.$this->fieldId('serviceid');
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
@@ -1070,7 +1069,7 @@ class CService extends CZBXAPI {
 		// sort by sortorder
 		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
 		$sqlParts['where'][] = 'sl.serviceupid='.$this->fieldId('serviceid');
-		$sqlParts['order'][] = $this->fieldId('sortorder').' '.ZBX_SORT_UP;
+		$sqlParts['order'][] = $this->fieldId('sortorder').', '.$this->fieldId('serviceid');
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {

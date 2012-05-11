@@ -55,7 +55,7 @@ $fields = array(
 	// actions
 	'save_service' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_service_time' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,		null),
 	// ajax
 	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	IN("'hat'"), null),
 	'favref' =>				array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
@@ -372,61 +372,32 @@ if (isset($_REQUEST['form'])) {
 	$servicesView->render();
 	$servicesView->show();
 }
+// service list
 else {
-	$services = array();
-	$row = array(
-		'id' => 0,
-		'serviceid' => 0,
-		'serviceupid' => 0,
-		'caption' => _('root'),
-		'status' => SPACE,
-		'algorithm' => SPACE,
-		'description' => SPACE,
-		'soft' => 0,
-		'linkid' => '',
-		'add' => SPACE,
-		'remove' => SPACE
-	);
-	$services[] = $row;
 
-	$db_services = DBSelect(
-		'SELECT DISTINCT s.serviceid,sl.servicedownid,sl_p.serviceupid AS serviceupid,s.triggerid,'.
-			's.name AS caption,s.algorithm,t.description,t.expression,s.sortorder,sl.linkid,s.showsla,s.goodsla,s.status'.
-		' FROM services s'.
-			' LEFT JOIN triggers t ON s.triggerid=t.triggerid'.
-			' LEFT JOIN services_links sl ON s.serviceid=sl.serviceupid AND sl.soft=1'.
-			' LEFT JOIN services_links sl_p ON s.serviceid=sl_p.servicedownid AND sl_p.soft=0'.
-		' WHERE '.DBin_node('s.serviceid').
-			' AND (t.triggerid IS NULL OR '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY)).')'.
-		' ORDER BY s.sortorder,sl_p.serviceupid,s.serviceid'
-	);
-	while ($row = DBFetch($db_services)) {
-		$row['id'] = $row['serviceid'];
-		$row['description'] = empty($row['triggerid']) ? _('None') : expand_trigger_description($row['triggerid']);
-		if (empty($row['serviceupid'])) {
-			$row['serviceupid'] = '0';
-		}
-
-		if (isset($services[$row['serviceid']])) {
-			$services[$row['serviceid']] = zbx_array_merge($services[$row['serviceid']], $row);
-		}
-		else {
-			$services[$row['serviceid']] = $row;
-		}
-
-		if (isset($row['serviceupid'])) {
-			$services[$row['serviceupid']]['childs'][] = array('id' => $row['serviceid'], 'soft' => 0, 'linkid' => 0);
-		}
-		if (isset($row['servicedownid'])) {
-			$services[$row['serviceid']]['childs'][] = array('id' => $row['servicedownid'], 'soft' => 1, 'linkid' => $row['linkid']);
+	// fetch services
+	$services = API::Service()->get(array(
+		'output' => array('name', 'serviceid', 'algorithm'),
+		'selectParent' => API_OUTPUT_EXTEND,
+		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
+		'selectTrigger' => array('description', 'triggerid'),
+		'preservekeys' => true,
+		'sortfield' => 'sortorder',
+		'sortorder' => ZBX_SORT_UP
+	));
+	// expand trigger descriptions
+	$triggers = zbx_objectValues($services, 'trigger');
+	$triggers = expandTriggerDescriptions(zbx_toHash($triggers, 'triggerid'));
+	foreach ($services as &$service) {
+		if ($service['trigger']) {
+			$service['trigger'] = $triggers[$service['trigger']['triggerid']];
 		}
 	}
+	unset($service);
 
-	// create tree
-	$treeServ = array();
-	createServiceTree($services, $treeServ);
-	$treeServ = del_empty_nodes($treeServ);
-	$tree = new CTree('service_conf_tree', $treeServ, array(
+	$treeData = array();
+	createServiceConfigurationTree($services, $treeData);
+	$tree = new CTree('service_conf_tree', $treeData, array(
 		'caption' => _('Service'),
 		'algorithm' => _('Status calculation'),
 		'description' => _('Trigger')

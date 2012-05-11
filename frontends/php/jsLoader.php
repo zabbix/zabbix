@@ -163,11 +163,17 @@ $tranStrings = array(
 	'main.js' => array(
 		'S_CLOSE' => _('Close'),
 		'S_NO_ELEMENTS_SELECTED' => _('No elements selected!'),
+	),
+	'init.js' => array(
 		'Host screens' => _('Host screens'),
 		'Go to' => _('Go to'),
 		'Latest data' => _('Latest data'),
 		'Scripts' => _('Scripts'),
 		'Host inventories' => _('Host inventories'),
+		'Add service' => _('Add service'),
+		'Edit service' => _('Edit service'),
+		'Delete service' => _('Delete service'),
+		'Delete the selected service?' => _('Delete the selected service?')
 	)
 );
 
