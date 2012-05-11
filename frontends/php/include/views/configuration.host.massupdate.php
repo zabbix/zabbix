@@ -104,7 +104,7 @@ $templatesDiv = new CDiv(
 		$templatesTable,
 		new CButton('btn1', _('Add'),
 			'return PopUp("popup.php?dstfrm='.$hostForm->getName().
-				'&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host&multiselect=1'.
+				'&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host&multiselect=1&templated_hosts=1'.
 				url_param($this->data['templates'], false, 'existed_templates').'", 450, 450)',
 			'link_menu'
 		),
