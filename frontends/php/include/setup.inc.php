@@ -103,15 +103,6 @@ class CsetupWizard extends CForm {
 		$left->addItem(new CDiv(ZABBIX_VERSION, 'setup_version'));
 		$left->addItem(new CDiv($this->getList(), 'left_menu'));
 
-		$right = new CDiv(null, 'right');
-		if ($this->getStep() ==0 ) {
-			$right->addItem(new CDiv(null, 'blank_title'));
-		}
-		else {
-			$right->addItem(new CDiv($this->stage[$this->getStep()]['title'], 'setup_title'));
-		}
-		$right->addItem(new CDiv($this->getState(), 'under_title'));
-
 		$link1 = new CLink('www.zabbix.com', 'http://www.zabbix.com/', null, null, true);
 		$link1->setAttribute('target', '_blank');
 
@@ -121,7 +112,17 @@ class CsetupWizard extends CForm {
 		$licence = new CDiv(array($link1, BR(), ' Licensed under ', $link2), 'setup_wizard_licence');
 		$left->addItem($licence);
 
-		$container = new CDiv(array($left, $right), 'setup_wizard');
+		$right = new CDiv(null, 'right');
+		if ($this->getStep() ==0 ) {
+			$right->addItem(new CDiv(null, 'blank_title'));
+			$right->addItem(new CDiv($this->getState(), 'blank_under_title'));
+			$container = new CDiv(array($left, $right), 'setup_wizard setup_wizard_welcome');
+		}
+		else {
+			$right->addItem(new CDiv($this->stage[$this->getStep()]['title'], 'setup_title'));
+			$right->addItem(new CDiv($this->getState(), 'under_title'));
+			$container = new CDiv(array($left, $right), 'setup_wizard');
+		}
 
 		if (isset($this->stage[$this->getStep() + 1])) {
 			$next = new CSubmit('next['.$this->getStep().']', _('Next').' >>');
@@ -160,7 +161,7 @@ class CsetupWizard extends CForm {
 			if ($id < $this->getStep()) {
 				$style = 'completed';
 			}
-			elseif ($id == $this->getStep()) {
+			elseif ($id == $this->getStep() && $this->getStep() != 0) {
 				$style = 'current';
 			}
 			else {
@@ -178,7 +179,7 @@ class CsetupWizard extends CForm {
 	}
 
 	function stage1() {
-		return new CDiv('', 'first_page_img');
+		return null;
 	}
 
 	function stage2() {
