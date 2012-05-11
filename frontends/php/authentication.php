@@ -160,7 +160,7 @@ elseif ($_REQUEST['config'] == ZBX_AUTH_HTTP) {
 			$isAuthenticationTypeChanged = false;
 		}
 		else {
-			show_error_message(_('Cannot changed authentication method to HTTP'));
+			show_error_message(_('Cannot change authentication method to HTTP'));
 		}
 	}
 }
