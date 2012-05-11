@@ -1314,9 +1314,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		foreach ($triggers as &$trigger) {
 			$trigger['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
-			if (empty($trigger['comments'])) {
-				$trigger['comments'] = '';
-			}
 		}
 		unset($trigger);
 
