@@ -417,12 +417,17 @@ $description = new CTextArea('description', $this->data['description']);
 $description->addStyle('margin-top: 5px;');
 $itemFormList->addRow(_('Description'), $description);
 
-// append status to form list
-$statusComboBox = new CComboBox('status', $this->data['status']);
-foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $status) {
-	$statusComboBox->addItem($status, item_status2str($status));
+// status
+if (isset($this->data['is_item_prototype'])) {
+	$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
+	$enabledCheckBox->addStyle('vertical-align: middle;');
+	$itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 }
-$itemFormList->addRow(_('Status'), $statusComboBox);
+else {
+	$statusComboBox = new CComboBox('status', $this->data['status']);
+	$statusComboBox->addItems(item_status2str());
+	$itemFormList->addRow(_('Status'), $statusComboBox);
+}
 
 // append tabs to form
 $itemTab = new CTabView();

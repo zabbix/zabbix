@@ -14,6 +14,7 @@ A......... [ZBXNEXT-1189] implemented the "selectTrigger", "selectParentDependen
 ..F....... [ZBXNEXT-1181] redesign Host mass update (Eduard)
 
 Bug fixes:
+..F....... [ZBX-4957] removed error column from item prototypes list, removed 'not supported' status from item prototype edit form (Vedmak)
 ..F....... [ZBX-4981] triggers with lld created or web items are not exported for now (Vedmak)
 A.F....... [ZBX-4956] fixed incorrent trigger existance checks (Pavels)
 ..F....... [ZBX-4815] improved IT service configuration and SLA report page performance (Pavels)
