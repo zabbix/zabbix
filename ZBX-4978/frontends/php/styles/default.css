@@ -553,7 +553,7 @@ div.setup_wizard {
 	height: 541px;
 	background: url(../images/general/setup/background.png) no-repeat;
 }
-div.setup_wizard2 {
+div.setup_wizard_welcome {
 	background: url(../images/general/setup/welcome_screen.png) no-repeat;
 }
 div.setup_wizard_licence {

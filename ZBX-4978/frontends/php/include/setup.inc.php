@@ -116,7 +116,7 @@ class CsetupWizard extends CForm {
 		if ($this->getStep() ==0 ) {
 			$right->addItem(new CDiv(null, 'blank_title'));
 			$right->addItem(new CDiv($this->getState(), 'blank_under_title'));
-			$container = new CDiv(array($left, $right), 'setup_wizard setup_wizard2');
+			$container = new CDiv(array($left, $right), 'setup_wizard setup_wizard_welcome');
 		}
 		else {
 			$right->addItem(new CDiv($this->stage[$this->getStep()]['title'], 'setup_title'));
