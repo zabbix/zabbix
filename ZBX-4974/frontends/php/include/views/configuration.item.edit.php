@@ -57,8 +57,8 @@ if (!$this->data['is_discovery_rule']) {
 			new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 			empty($this->data['itemid'])
 				? new CButton('btn_host', _('Select'),
-					"return PopUp('popup.php?dstfrm=".$itemForm->getName().'&dstfld1=hostname&dstfld2=form_hostid'.
-						"&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&noempty=1&submitParent=1', 450, 450);",
+					"return PopUp('popup.php?dstfrm=".$itemForm->getName().'&dstfld1=form_hostid&dstfld2=hostname'.
+						"&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name&noempty=1&submitParent=1', 450, 450);",
 					'formlist'
 				)
 				: null

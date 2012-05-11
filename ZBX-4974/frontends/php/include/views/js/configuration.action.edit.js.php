@@ -319,7 +319,7 @@ function selectOpCmdTarget() {
 		PopUp("popup.php?dstfrm=action.edit&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1", 480, 480);
 	}
 	else {
-		PopUp("popup.php?dstfrm=action.edit&srctbl=hosts&srcfld1=hostid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1", 780, 480);
+		PopUp("popup.php?dstfrm=action.edit&srctbl=hosts&srcfld1=hostid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1&real_hosts=1", 780, 480);
 	}
 }
 
