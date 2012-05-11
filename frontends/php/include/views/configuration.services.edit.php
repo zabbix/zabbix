@@ -22,6 +22,8 @@
 include('include/views/js/configuration.services.edit.js.php');
 global $ZBX_MESSAGES;
 
+$service = $this->data['service'];
+
 $servicesWidget = new CWidget();
 $servicesWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'));
 
@@ -52,7 +54,7 @@ $algorithmComboBox->addItems(serviceAlgorythm());
 $servicesFormList->addRow(_('Status calculation algorithm'), $algorithmComboBox);
 
 // append SLA to form list
-$showslaCheckbox = new CCheckBox('showsla', $this->data['showsla'], ($this->data['showsla'] == 0) ? 'no' : 'yes', 1);
+$showslaCheckbox = new CCheckBox('showsla', ($this->data['showsla'] == 0) ? 'no' : 'yes', null, 1);
 $goodslaTextBox = new CTextBox('goodsla', $this->data['goodsla'], 6, 'no', 8);
 if (!$this->data['showsla']) {
 	$goodslaTextBox->setAttribute('disabled', 'disabled');
@@ -260,21 +262,16 @@ $servicesTab->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
 $servicesForm->addItem($servicesTab);
 
 // append buttons to form
-if (!empty($this->data['service']['serviceid'])) {
-	$servicesForm->addItem(makeFormFooter(
-		array(new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';')),
-		array(
-			new CButtonDelete('Delete selected service?', url_param('form').url_param('serviceid').'&saction=1'),
-			new CButtonCancel()
-		)
-	));
+$buttons = array();
+if ($service['serviceid'] && !$service['dependencies']) {
+	$buttons[] = new CButtonDelete('Delete selected service?', url_param('form').url_param('serviceid').'&saction=1');
 }
-else {
-	$servicesForm->addItem(makeFormFooter(
-		array(new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';')),
-		array(new CButtonCancel())
-	));
-}
+$buttons[] = new CButtonCancel();
+
+$servicesForm->addItem(makeFormFooter(
+	array(new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';')),
+	$buttons
+));
 
 // append form to widget
 $servicesWidget->addItem($servicesForm);

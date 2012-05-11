@@ -150,10 +150,10 @@ else {
 	}
 	unset($serviceSla);
 
-	$treeServ = createServiceMonitoringTree($services, $slaData, $period);
-
+	$treeData = array();
+	createServiceMonitoringTree($services, $slaData, $period, $treeData);
 	$tree = new CTree('service_status_tree',
-		$treeServ,
+		$treeData,
 		array(
 			'caption' => _('Service'),
 			'status' => _('Status'),
@@ -177,7 +177,7 @@ else {
 		}
 		$r_form->addItem(array(_('Period').SPACE, $period_combo));
 
-		$srv_wdgt = new CWidget('hat_services', 'service-mon');
+		$srv_wdgt = new CWidget('hat_services', 'service-list service-mon');
 		$srv_wdgt->addPageHeader(_('IT SERVICES'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
 		$srv_wdgt->addHeader(_('IT services'), $r_form);
 		$srv_wdgt->addItem(BR());

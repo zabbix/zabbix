@@ -17,9 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-$serviceWidget = new CWidget();
+
+
+include('include/views/js/configuration.services.list.js.php');
+
+$serviceWidget = new CWidget(null, 'service-list');
 $serviceWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'), SPACE);
 $serviceWidget->addHeader(_('IT services'));
 
@@ -30,4 +32,3 @@ $serviceForm->setName('serviceForm');
 $serviceWidget->addItem(BR());
 $serviceWidget->addItem($this->data['tree']->getHTML());
 return $serviceWidget;
-?>
