@@ -38,15 +38,6 @@ abstract class CTriggerGeneral extends CZBXAPI {
 	 *
 	 * @param array $array
 	 *
-	 * @return bool
-	 */
-	abstract public function exists(array $array);
-
-	/**
-	 * @abstract
-	 *
-	 * @param array $array
-	 *
 	 * @return array
 	 */
 	abstract protected function createReal(array &$array);
@@ -169,6 +160,8 @@ abstract class CTriggerGeneral extends CZBXAPI {
 	protected function inheritOnHost(array $trigger, array $chdHost, array $triggerTemplates) {
 		$newTrigger = $trigger;
 		$newTrigger['templateid'] = $trigger['triggerid'];
+		unset($newTrigger['triggerid']);
+
 
 		if (isset($trigger['dependencies'])) {
 			$deps = zbx_objectValues($trigger['dependencies'], 'triggerid');
@@ -191,38 +184,22 @@ abstract class CTriggerGeneral extends CZBXAPI {
 			}
 		}
 
-		// check if templated trigger exists
+		// check if a child trigger already exists on the host
 		$childTriggers = $this->get(array(
-			'filter' => array('templateid' => $newTrigger['triggerid']),
+			'filter' => array('templateid' => $newTrigger['templateid']),
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
 			'hostids' => $chdHost['hostid']
 		));
 
+		// yes we have a child trigger, just update it
 		if ($childTrigger = reset($childTriggers)) {
-			$childTrigger['expression'] = explode_exp($childTrigger['expression']);
-
-			if (strcmp($childTrigger['expression'], $newTrigger['expression']) != 0
-				|| strcmp($childTrigger['description'], $newTrigger['description']) != 0) {
-				$exists = $this->exists(array(
-					'description' => $newTrigger['description'],
-					'expression' => $newTrigger['expression'],
-					'hostids' => $chdHost['hostid']
-				));
-				if ($exists) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger "%1$s" already exists on "%2$s".', $newTrigger['description'], $chdHost['host']));
-				}
-			}
-			elseif ($childTrigger['flags'] != $newTrigger['flags']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists.'));
-			}
-
 			$newTrigger['triggerid'] = $childTrigger['triggerid'];
-			$this->updateReal($newTrigger);
 		}
+		// no child trigger found
 		else {
-			$options = array(
+			// look for a trigger with the same description and expression
+			$childTriggers = $this->get(array(
 				'filter' => array(
 					'description' => $newTrigger['description'],
 					'flags' => null
@@ -231,36 +208,81 @@ abstract class CTriggerGeneral extends CZBXAPI {
 				'preservekeys' => 1,
 				'nopermissions' => 1,
 				'hostids' => $chdHost['hostid']
-			);
-			$childTriggers = $this->get($options);
+			));
 
-			$childTrigger = false;
-			foreach ($childTriggers as $tr) {
-				$tmpExp = explode_exp($tr['expression']);
+			foreach ($childTriggers as $childTrigger) {
+				$tmpExp = explode_exp($childTrigger['expression']);
 				if (strcmp($tmpExp, $newTrigger['expression']) == 0) {
-					$childTrigger = $tr;
+					// we have a trigger with the same description and expression as the parent
+					// convert it to a template trigger
+					$newTrigger['triggerid'] = $childTrigger['triggerid'];
 					break;
 				}
 			}
+		}
 
-			if ($childTrigger) {
-				if ($childTrigger['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger "%1$s" already exists on "%2$s".', $childTrigger['description'], $chdHost['host']));
-				}
-				elseif ($childTrigger['flags'] != $newTrigger['flags']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger with same name but other type exists.'));
-				}
+		$this->checkIfExistsOnHost($newTrigger, $chdHost['hostid']);
 
-				$newTrigger['triggerid'] = $childTrigger['triggerid'];
-				$this->updateReal($newTrigger);
-			}
-			else {
-				$this->createReal($newTrigger);
-				$newTrigger = reset($newTrigger);
-			}
+		if (isset($newTrigger['triggerid'])) {
+			$this->updateReal($newTrigger);
+		}
+		else {
+			$this->createReal($newTrigger);
+			$newTrigger = reset($newTrigger);
 		}
 
 		return $newTrigger;
+	}
+
+	/**
+	 * Checks that no trigger with the same description and expression as $trigger exist on the given host.
+	 * Assumes the given trigger is valid.
+	 *
+	 * @throws APIException if at lean one trigger exists
+	 *
+	 * @param array $trigger a trigger with an exploded expression
+	 * @param null  $hostid
+	 *
+	 * @return void
+	 */
+	protected function checkIfExistsOnHost(array $trigger, $hostid = null) {
+		$filter = array('description' => $trigger['description']);
+		if ($hostid) {
+			$filter['hostid'] = $hostid;
+		}
+		else {
+			$expr = new CTriggerExpression($trigger);
+			$filter['host'] = reset($expr->data['hosts']);
+		}
+
+		$triggers = $this->get(array(
+			'filter' => $filter,
+			'output' => array('expression', 'triggerid'),
+			'nopermissions' => true
+		));
+		foreach ($triggers as $dbTrigger) {
+			$tmpExp = explode_exp($dbTrigger['expression']);
+
+			// check if the expressions are also equal and that this is a different trigger
+			$differentTrigger = (!isset($trigger['triggerid']) || !idcmp($trigger['triggerid'], $dbTrigger['triggerid']));
+			if (strcmp($tmpExp, $trigger['expression']) == 0 && $differentTrigger) {
+				$options = array(
+					'output' => array('name'),
+					'templated_hosts' => true,
+					'nopermissions' => true,
+					'limit' => 1
+				);
+				if (isset($filter['host'])) {
+					$options['filter'] = array('host' => $filter['host']);
+				}
+				else {
+					$options['hostids'] = $hostid;
+				}
+				$host = API::Host()->get($options);
+				$host = reset($host);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s" already exists on "%2$s".', $trigger['description'], $host['name']));
+			}
+		}
 	}
 }
