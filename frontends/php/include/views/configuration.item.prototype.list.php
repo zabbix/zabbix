@@ -55,8 +55,7 @@ $itemTable->setHeader(array(
 	make_sorting_header(_('Trends'), 'trends', $sortLink),
 	make_sorting_header(_('Type'), 'type', $sortLink),
 	make_sorting_header(_('Status'), 'status', $sortLink),
-	_('Applications'),
-	_('Error')
+	_('Applications')
 ));
 
 foreach ($this->data['items'] as $item) {
@@ -73,14 +72,6 @@ foreach ($this->data['items'] as $item) {
 	$status = new CLink(item_status2str($item['status']), '?group_itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid'].
 		'&go='.($item['status'] ? 'activate' : 'disable'), item_status2style($item['status'])
 	);
-
-	if (zbx_empty($item['error'])) {
-		$error = new CDiv(SPACE, 'status_icon iconok');
-	}
-	else {
-		$error = new CDiv(SPACE, 'status_icon iconerror');
-		$error->setHint($item['error'], '', 'on');
-	}
 
 	if (!empty($item['applications'])) {
 		order_result($item['applications'], 'name');
@@ -105,7 +96,6 @@ foreach ($this->data['items'] as $item) {
 		item_type2str($item['type']),
 		$status,
 		new CCol($applications, 'wraptext'),
-		$error
 	));
 }
 

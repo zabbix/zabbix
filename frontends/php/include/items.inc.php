@@ -148,7 +148,6 @@ function item_status2str($type = null) {
 		ITEM_STATUS_NOTSUPPORTED => _('Not supported')
 	);
 	if (is_null($type)) {
-		natsort($types);
 		return $types;
 	}
 	elseif (isset($types[$type])) {
