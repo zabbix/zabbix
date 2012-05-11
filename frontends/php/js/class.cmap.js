@@ -197,7 +197,7 @@ ZABBIX.apps.map = (function() {
 			// initialize SELECTABLE
 			this.container.selectable({
 				start: jQuery.proxy(function(event) {
-					if(!event.ctrlKey){
+					if(!event.ctrlKey && !event.metaKey){
 						this.clearSelection();
 					}
 				}, this),
@@ -213,7 +213,7 @@ ZABBIX.apps.map = (function() {
 						// remove ui-selected class, to not confuse next selection
 						selected.removeClass('ui-selected');
 					}
-					this.selectElements(ids, event.ctrlKey);
+					this.selectElements(ids, event.ctrlKey || event.metaKey);
 				}, this)
 			});
 		};
@@ -463,7 +463,7 @@ ZABBIX.apps.map = (function() {
 				// SELEMENTS EVENTS
 				// delegate selements icons clicks
 				jQuery(this.container).delegate('.sysmap_element', 'click', function(event) {
-					that.selectElements([jQuery(this).data('id')], event.ctrlKey);
+					that.selectElements([jQuery(this).data('id')], event.ctrlKey || event.metaKey);
 				});
 
 
