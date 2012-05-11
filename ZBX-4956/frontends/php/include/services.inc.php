@@ -88,37 +88,83 @@ function get_service_childs($serviceid, $soft = 0) {
 	return $childs;
 }
 
-function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $parentid = 0, $soft = 0, $linkid = '') {
-	$rows = $services[$id];
-	if ($rows['serviceid'] > 0 && $rows['caption'] != 'root') {
-		$rows['algorithm'] = serviceAlgorythm($rows['algorithm']);
+/**
+ * Creates nodes that can be used to display the service configuration tree using the CTree class.
+ *
+ * @see CTree
+ *
+ * @param array $services
+ * @param array $parentService
+ * @param array $service
+ * @param array $dependency
+ * @param array $tree
+ */
+function createServiceConfigurationTree(array $services, &$tree, array $parentService = array(), array $service = array(), array $dependency = array()) {
+	if (!$service) {
+		$caption = new CLink(_('root'), '#', 'service-conf-menu');
+		$caption->setAttribute('data-menu', array(
+			'serviceid' => 0,
+			'name' => _('root'),
+			'hasDependencies' => true
+		));
+
+		$serviceNode = array(
+			'serviceid' => 0,
+			'parentid' => 0,
+			'caption' => $caption,
+			'trigger' => array(),
+			'algorithm' => SPACE,
+			'description' => SPACE
+		);
+
+		$service = $serviceNode;
+		$service['dependencies'] = array();
+		$service['trigger'] = array();
+
+		// add all top level services as children of "root"
+		foreach ($services as $topService) {
+			if (!$topService['parent']) {
+				$service['dependencies'][] = array(
+					'servicedownid' => $topService['serviceid'],
+					'soft' => 0,
+					'linkid' => 0
+				);
+			}
+		}
+
+		$tree = array($serviceNode);
+	}
+	else {
+		// caption
+		$caption = new CLink($service['name'], '#', 'service-conf-menu');
+		$caption->setAttribute('data-menu', array(
+			'serviceid' => $service['serviceid'],
+			'name' => $service['name'],
+			'hasDependencies' => (bool) $service['dependencies']
+		));
+
+		$serviceNode = array(
+			'serviceid' => $service['serviceid'],
+			'caption' => $caption,
+			'description' => ($service['trigger']) ? $service['trigger']['description'] : '-',
+			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
+			'algorithm' => serviceAlgorythm($service['algorithm'])
+		);
 	}
 
-	$rows['parentid'] = $parentid;
-	if ($soft == 0) {
-		$caption_tmp = $rows['caption'];
-		$rows['caption'] = new CSpan($rows['caption'], 'link');
-		$rows['caption']->setAttribute('onclick', 'javascript: call_menu(event, '.zbx_jsvalue($rows['serviceid']).','.zbx_jsvalue($caption_tmp).');');
-		$temp[$rows['serviceid']] = $rows;
+	if (!$dependency || !$dependency['soft']) {
+		$tree[$serviceNode['serviceid']] = $serviceNode;
 
-		if (isset($rows['childs'])) {
-			foreach ($rows['childs'] as $nodeid) {
-				if (!isset($services[$nodeid['id']])) {
-					continue;
-				}
-				if (isset($services[$nodeid['id']]['serviceupid'])) {
-					createServiceTree($services, $temp, $nodeid['id'], $services[$nodeid['id']]['serviceupid'], $rows['serviceid'], $nodeid['soft'], $nodeid['linkid']);
-				}
-			}
+		foreach ($service['dependencies'] as $dependency) {
+			$childService = $services[$dependency['servicedownid']];
+			createServiceConfigurationTree($services, $tree, $service, $childService, $dependency);
 		}
 	}
 	else {
-		if ($rows['serviceid'] != 0 && $linkid != 0) {
-			$rows['caption'] = new CSpan($rows['caption'], 'unknown');
-			$temp[$rows['serviceid'].'.'.$linkid] = $rows;
-		}
+		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'service-caption-soft');
+
+		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
 	}
-	return null;
 }
 
 /**
@@ -133,10 +179,8 @@ function createServiceTree(&$services, &$temp, $id = 0, $serviceupid = 0, $paren
  * @param array $service
  * @param array $dependency
  * @param array $tree
- *
- * @return array    an array of SLA tree nodes
  */
-function createServiceMonitoringTree(array $services, array $slaData, $period, array $parentService = array(), array $service = array(), array $dependency = array(), $tree = array()) {
+function createServiceMonitoringTree(array $services, array $slaData, $period, &$tree, array $parentService = array(), array $service = array(), array $dependency = array()) {
 	// if no parent service is given, start from the root
 	if (!$service) {
 		$serviceNode = array(
@@ -154,7 +198,6 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, a
 		$service = $serviceNode;
 		$service['dependencies'] = array();
 		$service['trigger'] = array();
-		$service['parent'] = array();
 
 		// add all top level services as children of "root"
 		foreach ($services as $topService) {
@@ -274,7 +317,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, a
 
 		foreach ($service['dependencies'] as $dependency) {
 			$childService = $services[$dependency['servicedownid']];
-			$tree = createServiceMonitoringTree($services, $slaData, $period, $service, $childService, $dependency, $tree);
+			createServiceMonitoringTree($services, $slaData, $period, $tree, $service, $childService, $dependency);
 		}
 	}
 	// soft dependencies
@@ -283,22 +326,6 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, a
 
 		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
 	}
-
-	return $tree;
-}
-
-function del_empty_nodes($services) {
-	do {
-		unset($retry);
-		foreach ($services as $id => $data) {
-			if (isset($data['serviceupid']) && !isset($services[$data['serviceupid']])) {
-				unset($services[$id]);
-				$retry = true;
-			}
-		}
-	} while (isset($retry));
-
-	return $services;
 }
 
 /**
