@@ -1013,49 +1013,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		return $result;
 	}
 
-	public function exists(array $object) {
-		$keyFields = array(array('hostid', 'host'), 'description');
-
-		$result = false;
-
-		if (!isset($object['hostid']) && !isset($object['host'])) {
-			$expr = new CTriggerExpression($object);
-
-			if (!empty($expr->errors)) {
-				return false;
-			}
-			if (empty($expr->data['hosts'])) {
-				return false;
-			}
-
-			$object['host'] = reset($expr->data['hosts']);
-		}
-
-		$options = array(
-			'filter' => zbx_array_mintersect($keyFields, $object),
-			'output' => API_OUTPUT_EXTEND,
-			'nopermissions' => true
-		);
-
-		if (isset($object['node'])) {
-			$options['nodeids'] = getNodeIdByNodeName($object['node']);
-		}
-		elseif (isset($object['nodeids'])) {
-			$options['nodeids'] = $object['nodeids'];
-		}
-
-		$triggers = $this->get($options);
-		foreach ($triggers as $tnum => $trigger) {
-			$tmpExp = explode_exp($trigger['expression']);
-			if (strcmp($tmpExp, $object['expression']) == 0) {
-				$result = true;
-				break;
-			}
-		}
-
-		return $result;
-	}
-
 	/**
 	 * Add triggers
 	 *
@@ -1085,10 +1042,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
 			}
 
-			if (API::Trigger()->exists(array('description' => $trigger['description'], 'expression' => $trigger['expression']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					sprintf(_('Trigger "%1$s:%2$s" already exists.'), $trigger['description'], $trigger['expression']));
-			}
+			$this->checkIfExistsOnHost($trigger);
 		}
 
 		$this->createReal($triggers);
@@ -1174,6 +1128,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			if (isset($trigger['status']) && $trigger['status'] == $dbTrigger['status']) {
 				unset($triggers[$tnum]['status']);
 			}
+
+			$this->checkIfExistsOnHost($trigger);
 		}
 
 		$this->updateReal($triggers);
@@ -1374,27 +1330,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 				if (!empty($expressionData->errors)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, implode(' ', $expressionData->errors));
-				}
-
-				$host = reset($expressionData->data['hosts']);
-
-				$triggersExist = API::Trigger()->get(array(
-					'filter' => array('description' => $trigger['description'], 'host' => $host),
-					'output' => API_OUTPUT_EXTEND,
-					'editable' => true,
-					'nopermissions' => true
-				));
-
-				$triggerExist = false;
-				foreach ($triggersExist as $tr) {
-					$tmpExp = explode_exp($tr['expression']);
-					if (strcmp($tmpExp, $expressionFull) == 0) {
-						$triggerExist = $tr;
-						break;
-					}
-				}
-				if ($triggerExist && bccomp($triggerExist['triggerid'], $trigger['triggerid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s" already exists.', $trigger['description']));
 				}
 			}
 
