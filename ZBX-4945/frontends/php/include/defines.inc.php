@@ -390,6 +390,8 @@ define('SERVICE_SLA', 99.05);
 define('SERVICE_SHOW_SLA_OFF', 0);
 define('SERVICE_SHOW_SLA_ON',  1);
 
+define('SERVICE_STATUS_OK',  0);
+
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
 
