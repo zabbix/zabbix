@@ -35,6 +35,7 @@ switch ($srctbl) {
 	case 'templates':
 		$page['title'] = _('Templates');
 		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		$templated_hosts = true;
 		break;
 	case 'hosts_and_templates':
 		$page['title'] = _('Hosts and templates');
@@ -267,6 +268,18 @@ if (isset($only_hostid)) {
 	unset($_REQUEST['groupid'], $_REQUEST['nodeid']);
 }
 
+$host_status = null;
+$templated = null;
+if ($real_hosts) {
+	$templated = 0;
+}
+elseif ($monitored_hosts) {
+	$host_status = 'monitored_hosts';
+}
+elseif ($templated_hosts) {
+	$templated = 1;
+	$host_status = 'templated_hosts';
+}
 
 $url = new CUrl();
 $path = $url->getPath();
@@ -301,40 +314,26 @@ if (!empty($host)) {
 	}
 	unset($dbHost);
 }
-
 $options = array(
-	'config' => array('select_latest' => true, 'deny_all' => true, 'popupDD' => true),
+	'config' => array('select_latest' => true, 'deny_all' => true),
 	'groups' => array('nodeids' => $nodeid),
 	'hosts' => array('nodeids' => $nodeid),
 	'groupid' => get_request('groupid', null),
 	'hostid' => get_request('hostid', null)
 );
-
 if (!is_null($writeonly)) {
 	$options['groups']['editable'] = true;
 	$options['hosts']['editable'] = true;
 }
-
-$host_status = null;
-$templated = null;
-
 if ($monitored_hosts) {
 	$options['groups']['monitored_hosts'] = true;
 	$options['hosts']['monitored_hosts'] = true;
-	$host_status = 'monitored_hosts';
 }
 elseif ($real_hosts) {
 	$options['groups']['real_hosts'] = true;
-	$templated = 0;
-}
-elseif ($templated_hosts) {
-	$options['hosts']['templated_hosts'] = true;
-	$options['groups']['templated_hosts'] = true;
-	$templated = 1;
-	$host_status = 'templated_hosts';
 }
 else {
-	$options['groups']['with_hosts_and_templates'] = true;
+	$options['hosts']['templated_hosts'] = true;
 }
 
 $pageFilter = new CPageFilter($options);
