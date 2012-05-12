@@ -74,14 +74,14 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (11,12,15,0,'MySQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (12,12,15,2,'MYSQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (13,12,15,3,'PostgreSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (14,12,0,0,'3');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (14,12,0,0,'2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (15,12,0,1,'4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (16,12,13,0,'10001');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (17,12,13,1,'10081');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (18,12,1,0,'10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (19,12,1,1,'10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (20,12,2,0,'12786');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (21,12,2,1,'12771');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (20,12,2,0,'13496');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (21,12,2,1,'13491');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (22,12,3,2,'Oracle');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (23,12,3,3,'DB2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (24,12,4,0,'1');
@@ -98,14 +98,14 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (35,13,15,0,'MySQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (36,13,15,2,'MYSQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (37,13,15,3,'PostgreSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (38,13,0,0,'3');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (38,13,0,0,'2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (39,13,0,1,'4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (40,13,13,0,'10001');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (41,13,13,1,'10081');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (42,13,1,0,'10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (43,13,1,1,'10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (44,13,2,0,'12786');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (45,13,2,1,'12771');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (44,13,2,0,'13496');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (45,13,2,1,'13491');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (46,13,3,2,'Oracle');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (47,13,3,3,'DB2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (48,13,4,0,'1');
@@ -122,14 +122,14 @@ INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) V
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (59,14,15,0,'MySQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (60,14,15,2,'MYSQL');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (61,14,15,3,'PostgreSQL');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (62,14,0,0,'3');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (62,14,0,0,'2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (63,14,0,1,'4');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (64,14,13,0,'10001');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (65,14,13,1,'10081');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (66,14,1,0,'10084');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (67,14,1,1,'10084');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (68,14,2,0,'12786');
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (69,14,2,1,'12771');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (68,14,2,0,'13496');
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (69,14,2,1,'13491');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (70,14,3,2,'Oracle');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (71,14,3,3,'DB2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (72,14,4,0,'1');
@@ -341,9 +341,9 @@ INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timep
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack) VALUES (3,'Test map 1',800,600,NULL,0,0,1,1,1,2);
 
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (3,3,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
-INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (4,3,2,1,3,NULL,'Map element (Local network)',0,401,101,NULL,NULL);
-INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (5,3,12788,2,15,NULL,'Trigger element (CPU load)',0,101,301,NULL,NULL);
-INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (6,3,3,3,1,NULL,'Host group element (Windows servers)',0,301,351,NULL,NULL);
+INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (4,3,1,1,3,NULL,'Map element (Local network)',0,401,101,NULL,NULL);
+INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (5,3,13497,2,15,NULL,'Trigger element (CPU load)',0,101,301,NULL,NULL);
+INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (6,3,2,3,1,NULL,'Host group element (Linux servers)',0,301,351,NULL,NULL);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (7,3,10084,0,19,NULL,'Host element (Zabbix Server)',0,501,301,NULL,NULL);
 
 INSERT INTO sysmaps_links (linkid, sysmapid, selementid1, selementid2, drawtype, color, label) VALUES (1,3,3,4,2,'00CC00','CPU load: {Zabbix Server:system.cpu.load[].last(0)}');
