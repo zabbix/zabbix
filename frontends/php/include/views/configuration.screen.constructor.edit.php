@@ -316,7 +316,7 @@ else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 			new CButton('select', _('Select'),
 				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&dstfld1=resourceid'.
-					"&dstfld2=caption&srctbl=hosts&srcfld1=hostid&srcfld2=name&real_hosts=1', 800, 450);", 'formlist'
+					"&dstfld2=caption&srctbl=hosts&srcfld1=hostid&srcfld2=name', 800, 450);", 'formlist'
 			)
 		));
 	}
