@@ -1,5 +1,6 @@
 Changes for 1.8.14rc1
 
+..F....... [ZBX-4918] fixed value mapping when resolve {ITEM.LASTVALUE} and {ITEM.VALUE} macros (Vedmak)
 A......... [ZBX-4917] fixed slow screens for non-Super-Admins (Toms)
 
 Changes for 1.8.13
