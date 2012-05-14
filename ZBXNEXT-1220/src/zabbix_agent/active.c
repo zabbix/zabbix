@@ -120,11 +120,13 @@ static int	get_min_nextcheck()
 	return min;
 }
 
-static void	add_check(const char *key, const char *key_orig, int refresh, long lastlogsize, int mtime)
+static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
 {
+	const char	*__function_name = "add_check";
 	int	i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_check('%s', %i, %li, %i)", key, refresh, lastlogsize, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d",
+			__function_name, key, refresh, lastlogsize, mtime);
 
 	for (i = 0; NULL != active_metrics[i].key; i++)
 	{
@@ -134,9 +136,9 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 		if (0 != strcmp(active_metrics[i].key, key))
 		{
 			zbx_free(active_metrics[i].key);
-			active_metrics[i].key		= strdup(key);
-			active_metrics[i].lastlogsize	= lastlogsize;
-			active_metrics[i].mtime		= mtime;
+			active_metrics[i].key = strdup(key);
+			active_metrics[i].lastlogsize = lastlogsize;
+			active_metrics[i].mtime = mtime;
 		}
 
 		/* replace metric */
@@ -147,19 +149,19 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 		}
 		active_metrics[i].status = ITEM_STATUS_ACTIVE;
 
-		return;
+		goto out;
 	}
 
 	/* add new metric */
-	active_metrics[i].key		= strdup(key);
-	active_metrics[i].key_orig	= strdup(key_orig);
-	active_metrics[i].refresh	= refresh;
-	active_metrics[i].nextcheck	= 0;
-	active_metrics[i].status	= ITEM_STATUS_ACTIVE;
-	active_metrics[i].lastlogsize	= lastlogsize;
-	active_metrics[i].mtime		= mtime;
+	active_metrics[i].key = zbx_strdup(NULL, key);
+	active_metrics[i].key_orig = zbx_strdup(NULL, key_orig);
+	active_metrics[i].refresh = refresh;
+	active_metrics[i].nextcheck = 0;
+	active_metrics[i].status = ITEM_STATUS_ACTIVE;
+	active_metrics[i].lastlogsize = lastlogsize;
+	active_metrics[i].mtime = mtime;
 	/* can skip existing log[] and eventlog[] data */
-	active_metrics[i].skip_old_data	= active_metrics[i].lastlogsize ? 0 : 1;
+	active_metrics[i].skip_old_data = active_metrics[i].lastlogsize ? 0 : 1;
 
 	/* move to the last metric */
 	i++;
@@ -169,6 +171,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, long l
 
 	/* initialize last metric */
 	active_metrics[i].key = NULL;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -196,7 +200,8 @@ static int	parse_list_of_checks(char *str)
 	const char		*p;
 	char			name[MAX_STRING_LEN], key_orig[MAX_STRING_LEN], expression[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
 				exp_delimiter;
-	int			delay, lastlogsize, mtime, expression_type, case_sensitive;
+	int			delay, mtime, expression_type, case_sensitive;
+	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp;
 	struct zbx_json_parse	jp_data, jp_row;
 
@@ -250,14 +255,13 @@ static int	parse_list_of_checks(char *str)
 
 		delay = atoi(tmp);
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, sizeof(tmp)) || '\0' == *tmp)
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, tmp, sizeof(tmp)) ||
+				SUCCEED != is_uint64(tmp, &lastlogsize))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Unable to retrieve value of tag \"%s\"",
 					ZBX_PROTO_TAG_LOGLASTSIZE);
 			continue;
 		}
-
-		lastlogsize = atoi(tmp);
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_MTIME, tmp, sizeof(tmp)) || '\0' == *tmp)
 		{
@@ -505,7 +509,7 @@ static int	send_buffer(const char *host, unsigned short port)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, el->host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, el->key, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
-		if (el->lastlogsize)
+		if (0 != el->lastlogsize)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGLASTSIZE, el->lastlogsize);
 		if (el->mtime)
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
@@ -611,7 +615,7 @@ static int	process_value(
 		const char	*host,
 		const char	*key,
 		const char	*value,
-		long		*lastlogsize,
+		zbx_uint64_t	*lastlogsize,
 		int		*mtime,
 		unsigned long	*timestamp,
 		const char	*source,
@@ -716,7 +720,7 @@ static void	process_active_checks(char *server, unsigned short port)
 	char		**pvalue;
 	int		now, send_err = SUCCEED, ret;
 	char		*value = NULL;
-	long		lastlogsize;
+	zbx_uint64_t	lastlogsize;
 	int		mtime;
 	char		params[MAX_STRING_LEN];
 	char		filename[MAX_STRING_LEN];
@@ -797,7 +801,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				{
 					active_metrics[i].skip_old_data = 0;
 
-					if (NULL == value) /* End of file. The file could become empty, must save `lastlogsize'. */
+					/* End of file. The file could become empty, must save `lastlogsize'. */
+					if (NULL == value)
 					{
 						active_metrics[i].lastlogsize = lastlogsize;
 						break;
@@ -817,7 +822,9 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (SUCCEED == send_err)
 						active_metrics[i].lastlogsize = lastlogsize;
 					else
-					{ /* buffer is full, stop processing active checks till the buffer is cleared */
+					{
+						/* buffer is full, stop processing active checks */
+						/* till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
 						goto ret;
 					}
@@ -893,7 +900,9 @@ static void	process_active_checks(char *server, unsigned short port)
 				{
 					active_metrics[i].skip_old_data = 0;
 
-					if (NULL == value) /* End of file. The file could become empty, must save `lastlogsize' and `mtime'. */
+					/* End of file. The file could become empty,*/
+					/* must save `lastlogsize' and `mtime'. */
+					if (NULL == value)
 					{
 						active_metrics[i].lastlogsize = lastlogsize;
 						active_metrics[i].mtime	= mtime;
@@ -917,7 +926,9 @@ static void	process_active_checks(char *server, unsigned short port)
 						active_metrics[i].mtime = mtime;
 					}
 					else
-					{ /* buffer is full, stop processing active checks till the buffer is cleared */
+					{
+						/* buffer is full, stop processing active checks*/
+						/* till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
 						mtime = active_metrics[i].mtime;
 						goto ret;
@@ -992,7 +1003,6 @@ static void	process_active_checks(char *server, unsigned short port)
 				s_count = 0;
 				p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
-				/* "mtime" parameter is not used by "eventlog" checks */
 
 				while (SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
 						&timestamp, &source, &severity, &value, &logeventid,
@@ -1000,7 +1010,8 @@ static void	process_active_checks(char *server, unsigned short port)
 				{
 					active_metrics[i].skip_old_data = 0;
 
-					if (NULL == value) /* End of file. The eventlog could become empty, must save `lastlogsize'. */
+					/* End of file. The eventlog could become empty, must save `lastlogsize'. */
+					if (NULL == value)
 					{
 						active_metrics[i].lastlogsize = lastlogsize;
 						break;
@@ -1053,7 +1064,9 @@ static void	process_active_checks(char *server, unsigned short port)
 					if (SUCCEED == send_err)
 						active_metrics[i].lastlogsize = lastlogsize;
 					else
-					{ /* buffer is full, stop processing active checks till the buffer is cleared */
+					{
+						/* buffer is full, stop processing active checks*/
+						/* till the buffer is cleared */
 						lastlogsize = active_metrics[i].lastlogsize;
 						goto ret;
 					}

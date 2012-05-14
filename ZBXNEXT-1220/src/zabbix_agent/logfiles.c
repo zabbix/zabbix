@@ -363,8 +363,11 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
  *    Return SUCCEED and NULL value if end of file received.                  *
  *                                                                            *
  ******************************************************************************/
-int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, const char *encoding, unsigned char skip_old_data)
+int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **value, const char *encoding,
+		unsigned char skip_old_data)
 {
+	const char		*__function_name = "process_logrt";
+
 	int			i = 0, nbytes, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, fd = 0, length = 0, j = 0;
 	char			buffer[MAX_BUFFER_LEN], *directory = NULL, *format = NULL, *logfile_candidate = NULL;
 	struct stat		file_buf;
@@ -378,8 +381,8 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 	struct dirent		*d_ent = NULL;
 #endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_logrt() filename [%s] lastlogsize [%li] mtime [%d]",
-			filename, *lastlogsize, *mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
+			__function_name, filename, *lastlogsize, *mtime);
 
 	/* splitting filename */
 	if (SUCCEED != split_filename(filename, &directory, &format))
@@ -493,17 +496,15 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 
 		if (1 == skip_old_data)
 		{
-			*lastlogsize = (long)file_buf.st_size;
-			zabbix_log(LOG_LEVEL_DEBUG, "Skipping existing data. filename:'%s' lastlogsize:%li",
+			*lastlogsize = (zbx_uint64_t)file_buf.st_size;
+			zabbix_log(LOG_LEVEL_DEBUG, "skipping existing data. filename:'%s' lastlogsize:" ZBX_FS_UI64,
 					logfile_candidate, *lastlogsize);
 		}
 
 		*mtime = (int)file_buf.st_mtime;	/* must contain the latest mtime as possible */
 
 		if (file_buf.st_size < *lastlogsize)
-		{
 			*lastlogsize = 0;	/* maintain backward compatibility */
-		}
 
 		if (-1 == (fd = zbx_open(logfile_candidate, O_RDONLY)))
 		{
@@ -548,7 +549,7 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
 		}
 		else	/* cannot position in the file */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set position to [%li] for [%s]: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set position to [" ZBX_FS_UI64 "] for [%s]: %s",
 					*lastlogsize, logfile_candidate, zbx_strerror(errno));
 			break;	/* must return, situation could have changed */
 		}
@@ -608,8 +609,11 @@ int	process_logrt(char *filename, long *lastlogsize, int *mtime, char **value, c
  *    Return SUCCEED and NULL value if end of file received.                  *
  *                                                                            *
  ******************************************************************************/
-int	process_log(char *filename, long *lastlogsize, char **value, const char *encoding, unsigned char skip_old_data)
+int	process_log(char *filename, zbx_uint64_t *lastlogsize, char **value, const char *encoding,
+		unsigned char skip_old_data)
 {
+	const char	*__function_name = "process_log";
+
 	int		f;
 	struct stat	buf;
 	int		nbytes, ret = FAIL;
@@ -620,7 +624,8 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 	assert(value);
 	assert(encoding);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_log() filename:'%s' lastlogsize:%li", filename, *lastlogsize);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64,
+			__function_name, filename, *lastlogsize);
 
 	/* handling of file shrinking */
 	if (0 != zbx_stat(filename, &buf))
@@ -631,8 +636,8 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 
 	if (1 == skip_old_data)
 	{
-		*lastlogsize = (long)buf.st_size;
-		zabbix_log(LOG_LEVEL_DEBUG, "Skipping existing data. filename:'%s' lastlogsize:%li",
+		*lastlogsize = (zbx_uint64_t)buf.st_size;
+		zabbix_log(LOG_LEVEL_DEBUG, "skipping existing data. filename:'%s' lastlogsize:" ZBX_FS_UI64,
 				filename, *lastlogsize);
 	}
 
@@ -661,7 +666,8 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 			zabbix_log(LOG_LEVEL_WARNING, "cannot read from [%s]: %s", filename, zbx_strerror(errno));
 	}
 	else
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to [%li] for [%s]: %s", *lastlogsize, filename, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to [" ZBX_FS_UI64 "] for [%s]: %s",
+				*lastlogsize, filename, zbx_strerror(errno));
 
 	close(f);
 
