@@ -2,6 +2,12 @@
 Changes for 2.0.0rc4
 
 New features:
+..F....... [ZBX-1357] updated Brazilian Portuguese, Dutch, Greek, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.0rc4
+
+New features:
 ..F....... [ZBX-4815] forbidden deleting IT services that have dependecies (Pavels)
 ..F....... [ZBX-4815] all status-related fields will now be disabled when choosing "do not calculate" in the IT service configuration form (Pavels)
 ..F....... [ZBX-4815] implemented multiselect support for the IT service dependency pop up (Pavels)
