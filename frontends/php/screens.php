@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Custom screens');
 $page['file'] = 'screens.php';
+$page['section'] = ZBX_MENU_SECTION_MON;
 $page['hist_arg'] = array('elementid', 'screenname');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);

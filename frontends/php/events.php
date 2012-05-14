@@ -40,6 +40,7 @@ else{
 
 	$page['title'] = _('Latest events');
 	$page['file'] = 'events.php';
+	$page['section'] = ZBX_MENU_SECTION_MON;
 	$page['hist_arg'] = array('groupid','hostid');
 	$page['scripts'] = array('class.calendar.js','gtlc.js');
 

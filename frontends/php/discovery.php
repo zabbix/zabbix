@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/include/discovery.inc.php';
 
 $page['title'] = _('Status of discovery');
 $page['file'] = 'discovery.php';
+$page['section'] = ZBX_MENU_SECTION_MON;
 $page['hist_arg'] = array('druleid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
