@@ -111,7 +111,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 		$this->input_type('refresh_unsupported', '700');
 		$this->dropdown_select('discovery_groupid', 'Linux servers');
-		$this->dropdown_select('alert_usrgrpid', 'Database administrators');
+		$this->dropdown_select('alert_usrgrpid', 'Zabbix administrators');
 		$this->checkbox_select('snmptrap_logging');  // 1 - yes, 0 - no
 		$this->button_click('save');
 		$this->wait();
@@ -130,7 +130,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		// trying to enter max possible value
 		$this->input_type('refresh_unsupported', '65535');
 		$this->dropdown_select('discovery_groupid', 'Linux servers');
-		$this->dropdown_select('alert_usrgrpid', 'Database administrators');
+		$this->dropdown_select('alert_usrgrpid', 'Enabled debug mode');
 		$this->checkbox_unselect('snmptrap_logging');
 		$this->button_click('save');
 		$this->wait();
