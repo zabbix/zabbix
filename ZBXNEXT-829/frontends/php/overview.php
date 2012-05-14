@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
+$page['section'] = ZBX_MENU_SECTION_MON;
 $page['hist_arg'] = array('groupid', 'type');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
