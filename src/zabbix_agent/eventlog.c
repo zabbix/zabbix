@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#if defined(_WINDOWS)
-
 #include "common.h"
 
 #include "log.h"
@@ -231,7 +229,7 @@ out:
 	return ret;
 }
 
-int	process_eventlog(const char *source, long *lastlogsize, unsigned long *out_timestamp, char **out_source,
+int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp, char **out_source,
 		unsigned short *out_severity, char **out_message, unsigned long	*out_eventid, unsigned char skip_old_data)
 {
 	const char	*__function_name = "process_eventlog";
@@ -254,7 +252,7 @@ int	process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 	*out_message	= NULL;
 	*out_eventid	= 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' lastlogsize:%ld",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' lastlogsize:" ZBX_FS_UI64,
 			__function_name, source, *lastlogsize);
 
 	if (NULL == source || '\0' == *source)
@@ -272,7 +270,7 @@ int	process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 		if (1 == skip_old_data)
 		{
 			*lastlogsize = LastID - 1;
-			zabbix_log(LOG_LEVEL_DEBUG, "Skipping existing data. lastlogsize:%li",
+			zabbix_log(LOG_LEVEL_DEBUG, "Skipping existing data. lastlogsize:" ZBX_FS_UI64,
 					*lastlogsize);
 		}
 
@@ -304,5 +302,3 @@ int	process_eventlog(const char *source, long *lastlogsize, unsigned long *out_t
 
 	return ret;
 }
-
-#endif	/* if defined(_WINDOWS) */
