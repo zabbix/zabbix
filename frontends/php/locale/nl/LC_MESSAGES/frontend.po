@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-14 23:21+0300\n"
-"PO-Revision-Date: 2012-04-30 21:39+0200\n"
+"POT-Creation-Date: 2012-05-14 23:29+0300\n"
+"PO-Revision-Date: 2012-05-04 21:18+0200\n"
 "Last-Translator: Raymond Kuiper <qix@the-wired.net>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -1591,7 +1591,7 @@ msgstr ""
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Kan item \"%1$s\" gebruikt in scherm \"%2$s\" niet vinden."
 
 #: include/classes/import/CXmlImport18.php:698
 #, php-format
@@ -1606,16 +1606,16 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:200
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "Kan de kaart \"%1$s\" gebruikt in kaart \"%2$s\" niet vinden."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Kan kaart \"%1$s\" gebruikt in scherm \"%2$s\" niet vinden."
 
 #: include/js.inc.php:326
 msgid "Cannot find objects with name"
-msgstr ""
+msgstr "Kan geen objecten vinden met naam"
 
 #: include/classes/import/CXmlImport18.php:522
 #, php-format
@@ -1625,12 +1625,12 @@ msgstr ""
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Kan scherm \"%1$s\" gebruikt in scherm \"%2$s\" niet vinden."
 
 #: include/classes/import/importers/CMapImporter.php:266
 #, php-format
 msgid "Cannot find trigger \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Kan de trigger \"%1$s\" voor kaart \"%2$s\" niet vinden."
 
 #: include/classes/import/CXmlImport18.php:731
 #: include/classes/import/CXmlImport18.php:767
@@ -1641,11 +1641,11 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:225
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "Kan de trigger \"%1$s\" in kaart \"%2$s\" niet vinden."
 
 #: srv_status.php:188
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr ""
+msgstr "Kan boom niet opmaken. Controleer de structuur van de service links."
 
 #: services.php:406
 msgid "Cannot format tree."
@@ -1673,8 +1673,8 @@ msgstr[1] ""
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan template \"%2$s\" niet importen, de gekoppelde template \"%3$s\" bestaat niet."
+msgstr[1] "Kan template \"%2$s\" niet importen, de gekoppelde templates \"%3$s\" bestaan niet."
 
 #: include/classes/class.cview.php:114
 #, fuzzy, php-format
@@ -1683,7 +1683,7 @@ msgstr "Kan view bestand \"%s\" niet invoegen."
 
 #: api/classes/CUser.php:827
 msgid "Cannot insert user medias"
-msgstr ""
+msgstr "Kan gebruikers media niet invoeren"
 
 #: api/classes/CHost.php:1988
 msgid "Cannot link template"
@@ -1717,17 +1717,17 @@ msgstr "Kan dubbele template IDs niet verwerken bij koppelen: %s."
 #: include/classes/db/DB.php:511
 #, php-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "Kan het delete statement niet uitvoeren op tabel \"%1$s\" zonder where conditie."
 
 #: include/classes/db/DB.php:422
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr ""
+msgstr "Kan de update statement niet uitvoeren op tabel \"%1$s\" zonder waarden."
 
 #: include/classes/db/DB.php:433
 #, php-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr ""
+msgstr "Kan de update statement niet uitvoeren op tabel \"%1$s\" zonder where conditie."
 
 #: adm.macros.php:104
 msgid "Cannot remove macro."
@@ -1743,7 +1743,7 @@ msgstr "Kan de discovery regel niet opslaan zonder checks."
 
 #: api/classes/CHostInterface.php:516
 msgid "Cannot switch host for interface."
-msgstr ""
+msgstr "Kan de host interface niet omschakelen."
 
 #: users.php:276
 msgid "Cannot unblock users"
@@ -1784,7 +1784,7 @@ msgstr "Kan template niet ontkoppelen"
 #: api/classes/CTemplate.php:1882
 #, php-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "Kan de trigger \"%s\" niet onkopplen, er is een template aan de host gekoppeld welke de items bevat."
 
 #: actionconf.php:158
 msgid "Cannot update action"
@@ -1802,7 +1802,7 @@ msgstr "Kan opmerkingen niet bijwerken"
 #: adm.triggerdisplayingoptions.php:66 adm.triggerdisplayoptions.php:68
 #: adm.triggerseverities.php:69 adm.workingtime.php:47
 msgid "Cannot update configuration"
-msgstr ""
+msgstr "Kan de configuratie niet bijwerken"
 
 #: usergrps.php:254
 msgid "Cannot update debug mode"
@@ -1814,7 +1814,7 @@ msgstr "Kan discovery rule niet bijwerken"
 
 #: usergrps.php:225
 msgid "Cannot update frontend access"
-msgstr ""
+msgstr "Kan frontend toegang niet bijwerken"
 
 #: graphs.php:277
 msgid "Cannot update graph"
@@ -1842,7 +1842,7 @@ msgstr "Kan hosts niet bijwerken"
 
 #: adm.iconmapping.php:61
 msgid "Cannot update icon map"
-msgstr ""
+msgstr "kan icoon map niet bijwerken"
 
 #: adm.images.php:48 include/classes/import/CXmlImport18.php:617
 msgid "Cannot update image"
@@ -1854,7 +1854,7 @@ msgstr "Kan item niet bijwerken"
 
 #: items.php:536
 msgid "Cannot update items"
-msgstr ""
+msgstr "Kan items niet bijwerken"
 
 #: adm.macros.php:93
 msgid "Cannot update macro"
@@ -1875,7 +1875,7 @@ msgstr "Kan kaart \"%s\" niet aanmaken."
 
 #: media_types.php:86
 msgid "Cannot update media type"
-msgstr ""
+msgstr "Kan mediatype niet bijwerken"
 
 #: sysmaps.php:156
 msgid "Cannot update network map"
@@ -1911,7 +1911,7 @@ msgstr "Kan service niet bijwerken"
 
 #: slideconf.php:80
 msgid "Cannot update slide show"
-msgstr ""
+msgstr "Kan de diavoorstelling niet bijwerken"
 
 #: actionconf.php:330 trigger_prototypes.php:284 triggers.php:314
 msgid "Cannot update status"
@@ -1932,7 +1932,7 @@ msgstr "Kan gebruiker niet bijwerken"
 
 #: api/classes/CUser.php:819
 msgid "Cannot update user medias"
-msgstr ""
+msgstr "Kan gebruikers media niet bijwerken"
 
 #: profile.php:112 users.php:125
 msgid "Cannot update user. Both passwords must be equal."
@@ -1940,7 +1940,7 @@ msgstr "Kan gebruiker niet bijwerken. Beide wachtwoorden moeten hetzelfde zijn."
 
 #: usergrps.php:282
 msgid "Cannot update users status"
-msgstr ""
+msgstr "Kan gebruikers status niet bijwerken"
 
 #: adm.valuemapping.php:54
 msgid "Cannot update value map"
@@ -1948,15 +1948,15 @@ msgstr "Kan value map niet bijwerken"
 
 #: popup_bitem.php:122 popup_period.php:114
 msgid "Caption"
-msgstr ""
+msgstr "Beschrijving"
 
 #: include/forms.inc.php:1864 include/forms.inc.php:1960
 msgid "Case sensitive"
-msgstr ""
+msgstr "Hoofdlettergevoelig"
 
 #: include/views/configuration.screen.constructor.edit.php:548
 msgid "Center"
-msgstr ""
+msgstr "Midden"
 
 #: include/screens.inc.php:674 include/screens.inc.php:750
 #: include/screens.inc.php:784 include/screens.inc.php:801
@@ -1979,7 +1979,7 @@ msgstr ""
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
 msgid "Change password"
-msgstr ""
+msgstr "Wachtwoord wijzigen"
 
 #: include/forms.inc.php:416 include/items.inc.php:110
 #: include/triggers.inc.php:2475 include/views/configuration.item.edit.php:209
@@ -1989,19 +1989,19 @@ msgstr "Karakter"
 
 #: include/regexp.inc.php:178
 msgid "Character string included"
-msgstr ""
+msgstr "Iedere character string meegenomen"
 
 #: include/regexp.inc.php:184
 msgid "Character string not included"
-msgstr ""
+msgstr "Iedere character string niet meegenomen"
 
 #: include/hosts.inc.php:240
 msgid "Chassis"
-msgstr ""
+msgstr "Chassis"
 
 #: include/views/js/configuration.discovery.edit.js.php:286
 msgid "Check already exists."
-msgstr ""
+msgstr "Controle bestaat al."
 
 #: api/classes/CTriggerExpression.php:52
 #, php-format

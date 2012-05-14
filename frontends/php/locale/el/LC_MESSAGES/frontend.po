@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-14 23:21+0300\n"
-"PO-Revision-Date: 2012-05-01 22:15+0200\n"
+"POT-Creation-Date: 2012-05-14 23:29+0300\n"
+"PO-Revision-Date: 2012-05-04 10:10+0200\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
 "Language: el\n"
@@ -277,7 +277,7 @@ msgstr "Ενέργεια"
 #: api/classes/CAction.php:817 api/classes/CAction.php:916
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "Ενέργεια \"%1$s\" έχει λανθασμένη τιμή για \"esc_period\" (ελάχιστο %2$s δευτερόλεπτα)."
 
 #: api/classes/CAction.php:820 api/classes/CAction.php:835
 #: api/classes/CAction.php:925 api/classes/CAction.php:945
@@ -1516,7 +1516,7 @@ msgstr "Δεν βρίσκω γράφημα \"%1$s\" χρησιμοποιούμε
 #: include/classes/import/importers/CMapImporter.php:208
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Δεν βρίσκω ομάδα \"%1$s\" χρησιμοποιούμενη στο χάρτη \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
@@ -1536,7 +1536,7 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:216
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμενο στο χάρτη \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
@@ -4719,7 +4719,7 @@ msgstr "Η ομάδα \"%1$s\" δεν υπάρχει."
 #: include/classes/import/importers/CHostImporter.php:135
 #, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "Ομάδα \"%1$s\" για ξενιστή \"%2$s\" δεν υπάρχει."
 
 #: api/classes/CHostGroup.php:724
 #, php-format
@@ -6031,25 +6031,25 @@ msgstr "Λανθασμένο ID οθόνης \"%s\" παρέχεται για σ
 
 #: include/services.inc.php:479 include/services.inc.php:488
 msgid "Incorrect service end time."
-msgstr ""
+msgstr "Λανθασμένη ώρα λήξης υπηρεσίας."
 
 #: include/services.inc.php:476 include/services.inc.php:485
 msgid "Incorrect service start time."
-msgstr ""
+msgstr "Λανθασμένη ώρα έναρξης υπηρεσίας."
 
 #: include/services.inc.php:470
 msgid "Incorrect service time type."
-msgstr ""
+msgstr "Λανθασμένος τύπος χρόνου υπηρεσίας."
 
 #: api/classes/CService.php:1175
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένη σειρά ταξινόμησης για την υπηρεσία \"%1$s\"."
 
 #: api/classes/CService.php:1229
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένη κατάσταση για την υπηρεσία \"%1$s\"."
 
 #: api/classes/CDRule.php:441
 msgid "Incorrect status."
@@ -6081,7 +6081,7 @@ msgstr "Λανθασμένη χρονική περίοδος \"%1$s\"."
 #: api/classes/CService.php:1190
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
-msgstr ""
+msgstr "Λανθασμένο αναγνωριστικό εναύσματος για την υπηρεσία \"%1$s\"."
 
 #: include/triggers.inc.php:694
 msgid "Incorrect trigger expression"
@@ -6506,7 +6506,7 @@ msgstr "Κατάλογος συλλεκτών"
 
 #: graphs.php:173
 msgid "Items required for graph."
-msgstr ""
+msgstr "Συλλέκτες απαιτούμενοι για γράφημα."
 
 #: items.php:536
 msgid "Items updated"
@@ -6710,8 +6710,8 @@ msgstr ""
 #, php-format
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Τελευταίο %1$d θέμα"
+msgstr[1] "Τελευταία %1$d θέματα"
 
 #: srv_status.php:87
 msgid "Last 24 hours"
@@ -6837,7 +6837,7 @@ msgstr "Ο σύνδεσμος πρέπει να έχει \"name\" και \"url\"
 
 #: include/views/configuration.host.massupdate.php:127
 msgid "Link templates"
-msgstr ""
+msgstr "Σύνδεση σχεδιότυπων"
 
 #: include/actions.inc.php:481
 msgid "Link to template"
@@ -7845,11 +7845,11 @@ msgstr "Δεν παρέχεται ID γραφήματος για στοιχεί�
 #: include/graphs.inc.php:291
 #, php-format
 msgid "No graph item with graphid \"%s\"."
-msgstr ""
+msgstr "Χωρίς στοιχείο γραφήματος με αναγνωριστικό \"%s\"."
 
 #: include/views/configuration.graph.list.php:71
 msgid "No graph prototypes defined."
-msgstr ""
+msgstr "Δεν ορίσθηκαν πρωτότυπα γραφήματα."
 
 #: chart2.php:45 chart6.php:47 include/views/configuration.graph.list.php:71
 #: popup.php:1287
@@ -7904,7 +7904,7 @@ msgstr "Χωρίς ομάδες ξενιστών με groupid \"%s\"."
 #: include/hosts.inc.php:1183
 #, php-format
 msgid "No host with applicationid \"%1$s\"."
-msgstr ""
+msgstr "Χωρίς ξενιστή με αναγνωριστικό κατηγορίας \"%1$s\"."
 
 #: include/hosts.inc.php:531
 #, php-format
@@ -8328,7 +8328,7 @@ msgstr "Χωρίς Εποπτεία"
 
 #: include/html.inc.php:97
 msgid "Not request variable require."
-msgstr ""
+msgstr "Δεν απαιτείται μεταβλητή αίτησης."
 
 #: include/items.inc.php:148
 msgid "Not supported"
@@ -8881,7 +8881,7 @@ msgstr "ΠΡΟΒΛΗΜΑ"
 
 #: include/validate.inc.php:607
 msgid "Page received incorrect data"
-msgstr ""
+msgstr "Η σελίδα έλαβε λάθος δεδομένα"
 
 #: include/reports.inc.php:709
 msgid "Palette"
@@ -8925,7 +8925,7 @@ msgstr "Αναμένοντας παράμετρο sec ή μακροεντολή 
 
 #: include/views/configuration.graph.edit.php:50
 msgid "Parent graph"
-msgstr ""
+msgstr "Γονικό γράφημα"
 
 #: include/views/configuration.services.edit.php:46
 msgid "Parent service"
@@ -9233,7 +9233,7 @@ msgstr "Διαμεσολαβητής"
 #: include/classes/import/importers/CHostImporter.php:147
 #, php-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "Διαμεσολαβητής \"%1$s\" για ξενιστή \"%2$s\" δεν υπάρχει."
 
 #: api/classes/CProxy.php:381
 #, php-format
@@ -9628,7 +9628,7 @@ msgstr "Αποτέλεσμα ΑΛΗΘΕΣ"
 #: include/views/general.script.execute.php:29
 #, php-format
 msgid "Result of \"%s\""
-msgstr ""
+msgstr "Αποτέλεσμα από \"%s\""
 
 #: tr_testexpr.php:56
 msgid "Result type"
@@ -10346,22 +10346,22 @@ msgstr "Υπηρεσία"
 #: api/classes/CService.php:1296
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
-msgstr ""
+msgstr "Η υπηρεσία \"%1$s\" δεν διαγράφεται, επειδή εξαρτάται από άλλη υπηρεσία."
 
 #: api/classes/CService.php:1317
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
-msgstr ""
+msgstr "Η υπηρεσία \"%1$s\" δεν μπορεί να αυτοεξαρτάται."
 
 #: api/classes/CService.php:1396
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
-msgstr ""
+msgstr "Η υπηρεσία \"%1$s\" δεν μπορεί να συνδέεται με έναυσμα και να έχει θυγατρικό την ίδια στιγμή."
 
 #: api/classes/CService.php:1371
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
-msgstr ""
+msgstr "Η υπηρεσία \"%1$s\" είναι ήδη διασυνδεδεμένη σε διαφορετική υπηρεσία."
 
 #: api/classes/CService.php:1214
 msgid "Service cannot be parent and child at the same time."
@@ -10377,7 +10377,7 @@ msgstr "Θύρα υπηρεσίας"
 
 #: include/services.inc.php:493
 msgid "Service start time must be less than end time."
-msgstr ""
+msgstr "Χρόνος έναρξης υπηρεσίας πρέπει να είναι μικρότερος του χρόνου λήξης."
 
 #: include/views/configuration.services.edit.php:152
 msgid "Service times"
@@ -10988,7 +10988,7 @@ msgstr "Το σχεδιότυπο \"%1$s\" υπάρχει ήδη."
 #: include/classes/import/importers/CHostImporter.php:39
 #, php-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "Σχεδιότυπο \"%1$s\" για ξενιστή \"%2$s\" δεν υπάρχει."
 
 #: api/classes/CTemplate.php:1001
 #, php-format
@@ -11246,7 +11246,7 @@ msgstr "Σε"
 
 #: include/views/js/configuration.item.edit.js.php:43
 msgid "To set a host interface select a single item type for all items"
-msgstr ""
+msgstr "Για να ορίσετε διεπαφή ξενιστή επιλέξτε απλό τύπο στοιχείου για όλα τα στοιχεία"
 
 #: srv_status.php:83
 msgid "Today"
@@ -11934,7 +11934,7 @@ msgstr "Ο χρήστης δεν μπορεί να αλλάξει τον τύπ�
 
 #: include/users.inc.php:160
 msgid "User cannot change GUI access for himself."
-msgstr ""
+msgstr "Ο χρήστης δεν μπορεί να αλλάξει την πρόσβαση GUI για τον εαυτό του."
 
 #: api/classes/CUserGroup.php:421 api/classes/CUserGroup.php:526
 msgid "User cannot change status of himself"
@@ -11943,7 +11943,7 @@ msgstr "Ο χρήστης δεν μπορεί να αλλάξει την κατ�
 #: include/users.inc.php:98 include/users.inc.php:109
 #: include/users.inc.php:144
 msgid "User cannot change status of himself."
-msgstr ""
+msgstr "Ο χρήστης δεν μπορεί να αλλάξει την κατάσταση του εαυτού του."
 
 #: users.php:212 users.php:300
 msgid "User deleted"
@@ -12200,7 +12200,7 @@ msgstr "Προειδοποίηση"
 
 #: chart7.php:74
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "Προειδοποίηση. Δεν μπορούν να εμφανισθούν πλέον του ενός συλλέκτες τύπου \"Graph sum\"."
 
 #: include/validate.inc.php:486
 #, php-format
@@ -12225,7 +12225,7 @@ msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι �
 #: include/validate.inc.php:403
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι δεκαδικός αριθμός."
 
 #: include/validate.inc.php:379
 #, php-format
@@ -12404,7 +12404,7 @@ msgstr "Εγγραφή"
 #: api/classes/CService.php:398
 #, php-format
 msgid "Wrong fields for dependency for service \"%1$s\"."
-msgstr ""
+msgstr "Λάθος πεδία για εξάρτηση υπηρεσίας \"%1$s\"."
 
 #: api/classes/CMapElement.php:515
 msgid "Wrong fields for element."
@@ -12466,17 +12466,17 @@ msgstr "Λάθος πεδία για οθόνη \"%s\"."
 
 #: api/classes/CScript.php:303
 msgid "Wrong fields for script."
-msgstr ""
+msgstr "Λάθος πεδία για δέσμη εντολών."
 
 #: api/classes/CService.php:128 api/classes/CService.php:239
 #, php-format
 msgid "Wrong fields for service \"%1$s\"."
-msgstr ""
+msgstr "Λάθος πεδία για υπηρεσία \"%1$s\"."
 
 #: api/classes/CService.php:481
 #, php-format
 msgid "Wrong fields for time for service \"%1$s\"."
-msgstr ""
+msgstr "Λάθος πεδία για χρόνο υπηρεσίας \"%1$s\"."
 
 #: api/classes/CTriggerPrototype.php:1036
 #: api/classes/CTriggerPrototype.php:1101
@@ -12796,6 +12796,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"Εξυπηρετητής Zabbix \"%s\" δεν εντοπίζεται. Πιθανοί λόγοι:\n"
+"1. Λανθασμένος εξυπηρετητής IP/DNS στο \"zabbix.conf.php\";\n"
+"2. Λανθασμένη διαμόρφωση δικτύου.\n"
 
 #: include/blocks.inc.php:674
 msgid "Zabbix server IP or port is not set!"
