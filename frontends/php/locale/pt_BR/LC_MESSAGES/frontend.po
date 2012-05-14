@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-14 23:21+0300\n"
-"PO-Revision-Date: 2012-04-10 23:49+0200\n"
-"Last-Translator: Frederico <fred.passos@gmail.com>\n"
+"POT-Creation-Date: 2012-05-14 23:29+0300\n"
+"PO-Revision-Date: 2012-05-10 22:52+0200\n"
+"Last-Translator: jrprado <jrpradojunior@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: maintenance.php:116 maintenance.php:120
 #, php-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18"
-msgstr "\"%s\" precisa estar 1970.01.01 e 2038.01.18"
+msgstr "\"%s\" precisa estar entre 1970.01.01 e 2038.01.18"
 
 #: include/profiles.inc.php:281
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -40,8 +40,8 @@ msgstr[1] "%1$d dias, "
 #, php-format
 msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d cenário"
+msgstr[1] "%1$d cenários"
 
 #: chart4.php:92 chart5.php:84
 #, php-format
@@ -59,8 +59,8 @@ msgstr[1] "%1$s Itens"
 #, php-format
 msgid "%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s."
 msgid_plural "%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s falha de login registrada. Última falha de login foi de %2$s em %3$s às %4$s."
+msgstr[1] "%1$s falhas de login registradas. Última falha de login foi de %2$s em %3$s às %4$s."
 
 #: include/blocks.inc.php:903
 #, php-format
@@ -273,7 +273,7 @@ msgstr "Ação"
 #: api/classes/CAction.php:817 api/classes/CAction.php:916
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "Ação \"%1$s\" tem um valor incorreto para \"esc_period\" (mínimo %2$s segundos)."
 
 #: api/classes/CAction.php:820 api/classes/CAction.php:835
 #: api/classes/CAction.php:925 api/classes/CAction.php:945
@@ -470,7 +470,7 @@ msgstr "Idade menor que"
 #: overview.php:106
 #, php-format
 msgid "Age less than %s"
-msgstr ""
+msgstr "Idade menor que %s"
 
 #: include/items.inc.php:182 include/views/administration.script.list.php:64
 #: include/views/configuration.httpconf.edit.php:112 popup.php:1972
@@ -479,11 +479,11 @@ msgstr "Agente"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Interfaces do agente"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Agente ou SNMP ou JMX ou IPMI interface"
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:49
 #: include/views/administration.users.list.php:54 popup.php:846 users.php:43
@@ -553,7 +553,7 @@ msgstr "Aplicação"
 #: api/classes/CApplication.php:787
 #, php-format
 msgid "Application \"%1$s\" already exists for host \"%2$s\"."
-msgstr ""
+msgstr "Aplicação \"%1$s\" já existe para o host \"%2$s\"."
 
 #: api/classes/CApplication.php:482
 #, php-format
@@ -584,7 +584,7 @@ msgstr "Aplicação atualizada"
 #: api/classes/CItemGeneral.php:309
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "Aplicação com ID \"%1$s\" não está disponível no \"%2$s\"."
 
 #: hosts.php:690 hosts.php:766 include/forms.inc.php:812
 #: include/html.inc.php:408 include/html.inc.php:412
@@ -676,11 +676,11 @@ msgstr "Auditoria"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr ""
+msgstr "Auditória de Ações"
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr ""
+msgstr "Auditória de logs"
 
 #: include/func.inc.php:225
 msgid "Aug"
@@ -719,11 +719,11 @@ msgstr "Método de autenticação alterado para Zabbix nativo"
 
 #: actionconf.php:446
 msgid "Auto registration"
-msgstr "Auto-registro"
+msgstr "Auto registro"
 
 #: include/views/administration.users.edit.php:119
 msgid "Auto-login"
-msgstr "Auto-login"
+msgstr "Login automático"
 
 #: include/views/administration.users.edit.php:120 profile.php:48 users.php:60
 msgid "Auto-logout (min 90 seconds)"
@@ -856,7 +856,7 @@ msgstr "Por trigger template"
 
 #: actionconf.php:435 actionconf.php:449
 msgid "CONFIGURATION OF ACTIONS"
-msgstr ""
+msgstr "CONFIGURAÇÃO DE AÇÕES"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:33
@@ -865,12 +865,12 @@ msgstr "CONFIGURAÇÃO DE APLICAÇÕES"
 
 #: include/views/administration.authentication.edit.php:23
 msgid "CONFIGURATION OF AUTHENTICATION"
-msgstr ""
+msgstr "CONFIGURAÇÃO DE AUTENTICAÇÃO"
 
 #: include/views/configuration.discovery.edit.php:25
 #: include/views/configuration.discovery.list.php:28
 msgid "CONFIGURATION OF DISCOVERY RULE"
-msgstr ""
+msgstr "CONFIGURAÇÃO DA REGRA DE DISCOVERY"
 
 #: host_discovery.php:263
 #: include/views/configuration.host.discovery.list.php:30
@@ -889,7 +889,7 @@ msgstr "CONFIGURAÇÃO DE GRÁFICOS"
 
 #: adm.gui.php:104
 msgid "CONFIGURATION OF GUI"
-msgstr ""
+msgstr "CONFIGURAÇÃO DA GUI"
 
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:38
@@ -898,11 +898,11 @@ msgstr "CONFIGURAÇÃO DE GRUPOS DO HOST"
 
 #: hosts.php:575 hosts.php:624 hosts.php:646
 msgid "CONFIGURATION OF HOSTS"
-msgstr ""
+msgstr "CONFIGURAÇÃO DE HOSTS"
 
 #: adm.housekeeper.php:82
 msgid "CONFIGURATION OF HOUSEKEEPER"
-msgstr ""
+msgstr "CONFIGURAÇÃO DO HOUSEKEEPER"
 
 #: adm.iconmapping.php:111
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -910,7 +910,7 @@ msgstr ""
 
 #: adm.images.php:145
 msgid "CONFIGURATION OF IMAGES"
-msgstr ""
+msgstr "CONFIGURAÇÃO DE IMAGENS"
 
 #: include/views/configuration.services.edit.php:28
 #: include/views/configuration.services.list.php:25
@@ -930,7 +930,7 @@ msgstr "CONFIGURAÇÃO DE ITENS"
 
 #: adm.macros.php:173
 msgid "CONFIGURATION OF MACROS"
-msgstr ""
+msgstr "CONFIGURAÇÃO DE MACROS"
 
 #: include/views/configuration.maintenance.edit.php:23
 #: include/views/configuration.maintenance.list.php:28
@@ -958,7 +958,7 @@ msgstr "CONFIGURAÇÃO DE PROXIES"
 
 #: adm.regexps.php:200
 msgid "CONFIGURATION OF REGULAR EXPRESSIONS"
-msgstr ""
+msgstr "CONFIGURAÇÃO DE EXPRESSÕES REGULARES"
 
 #: include/views/configuration.screen.constructor.list.php:23
 msgid "CONFIGURATION OF SCREEN"
@@ -981,7 +981,7 @@ msgstr "CONFIGURAÇÃO DE SLIDESHOWS"
 
 #: templates.php:400 templates.php:420
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr ""
+msgstr "CONFIGURAÇÃO DE TEMPLATES"
 
 #: adm.triggerdisplayingoptions.php:91
 msgid "CONFIGURATION OF TRIGGER DISPLAYING OPTIONS"
@@ -1018,7 +1018,7 @@ msgstr "CONFIGURAÇÃO DE USUÁRIOS E GRUPOS"
 
 #: adm.valuemapping.php:133
 msgid "CONFIGURATION OF VALUE MAPPING"
-msgstr ""
+msgstr "CONFIGURAÇÃO DO MAPEAMENTO DE VALOR"
 
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:37
@@ -1107,7 +1107,7 @@ msgstr "Aplicação não foi incluída"
 
 #: api/classes/CTrigger.php:2004
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "Não é possível adicionar dependência de um host para um template."
 
 #: host_discovery.php:233
 msgid "Cannot add discovery rule"
@@ -1156,7 +1156,7 @@ msgstr "Não foi possível adicionar mapa de rede"
 
 #: httpconf.php:216
 msgid "Cannot add new application."
-msgstr ""
+msgstr "Não é possível adicionar nova aplicação."
 
 #: nodes.php:80
 msgid "Cannot add node"
@@ -1271,7 +1271,7 @@ msgstr "Não foi possível criar outra conexão ao banco de dados."
 
 #: api/classes/CTrigger.php:1673
 msgid "Cannot create dependency"
-msgstr ""
+msgstr "Não é possível criar dependência"
 
 #: discoveryconf.php:122
 msgid "Cannot create discovery rule"
@@ -1279,11 +1279,11 @@ msgstr "Não foi possível criar a regra de discovery"
 
 #: api/classes/CHostGroup.php:629
 msgid "Cannot create group without name."
-msgstr ""
+msgstr "Não é possível criar grupo sem nome."
 
 #: api/classes/CHost.php:1903
 msgid "Cannot create host group."
-msgstr ""
+msgstr "Não é possível criar o grupo de host."
 
 #: adm.iconmapping.php:66
 msgid "Cannot create icon map"
@@ -1306,7 +1306,7 @@ msgstr "Não foi possivel criar um novo elemento"
 #: api/classes/CUserMedia.php:414 api/classes/CUser.php:404
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "Não é possível deletar o usuário interno do Zabbix \"%1$s\", tente desabilitar esse usuário."
 
 #: actionconf.php:181
 msgid "Cannot delete action"
@@ -12627,7 +12627,7 @@ msgstr ""
 
 #: api/classes/CHost.php:1690
 msgid "You do not have enough rights for operation."
-msgstr ""
+msgstr "Você não tem direitos suficientes para operação."
 
 #: api/classes/CMaintenance.php:441
 msgid "You do not have permission to perform this operation"
@@ -12656,7 +12656,7 @@ msgstr "Você não tem permissão para executar esta operação"
 #: api/classes/CTemplate.php:1569 api/classes/CTemplateScreen.php:579
 #: api/classes/CTemplateScreen.php:645 api/classes/CWebCheck.php:344
 msgid "You do not have permission to perform this operation."
-msgstr ""
+msgstr "Você não tem permissão para executar esta operação."
 
 #: api/classes/CUserMedia.php:408
 msgid "You do not have permissions or user media does not exist."
@@ -12676,11 +12676,12 @@ msgstr "Você não tem permissão para excluir o usuário ou o usuário não exi
 
 #: api/classes/CUser.php:395
 msgid "You do not have permissions to delete users."
-msgstr "Você não tem permissões para excluir estes usuários."
+msgstr "Você não tem permissão para excluir estes usuários."
 
+# Você estava escrito incorreto (Voucê) e permissões estava sem acento
 #: api/classes/CUserMedia.php:398 api/classes/CUser.php:387
 msgid "You do not have permissions to update other users."
-msgstr "Voucê não tem permisoes para alterar outros usuários."
+msgstr "Você não tem permissão para alterar outros usuários."
 
 #: api/classes/CUserMedia.php:392
 msgid "You do not have permissions to update user media or user media does not exist."
@@ -12692,7 +12693,7 @@ msgstr "Você não tem permissão para atualizar as mídias do usuário."
 
 #: api/classes/CUser.php:383
 msgid "You do not have permissions to update user or user does not exist."
-msgstr "Você não tem permissões para atualizar o usuário ou o usuário não existe."
+msgstr "Você não tem permissão para atualizar o usuário ou o usuário não existe."
 
 #: include/config.inc.php:260
 msgid "You must login to view this page."
@@ -12762,7 +12763,7 @@ msgstr "Zabbix autenticação interna."
 
 #: warning.php:54
 msgid "Zabbix is temporarily unavailable!"
-msgstr ""
+msgstr "Zabbix está temporariamente indisponível!"
 
 #: include/classes/class.cserverinfo.php:39
 #: include/classes/class.cserverinfo.php:40 include/setup.inc.php:368
@@ -12786,7 +12787,7 @@ msgstr "Zabbix Server IP ou porta não estão definidas!"
 
 #: include/classes/class.cserverinfo.php:42
 msgid "Zabbix server info"
-msgstr ""
+msgstr "Informação do servidor Zabbix"
 
 #: include/blocks.inc.php:672
 msgid "Zabbix server is running"
@@ -12947,7 +12948,7 @@ msgstr ""
 #: include/setup.inc.php:353 include/views/configuration.slideconf.edit.php:64
 #: include/views/js/configuration.slideconf.edit.js.php:13
 msgid "default"
-msgstr ""
+msgstr "padrão"
 
 #: jsLoader.php:85
 msgid "dynamic"
@@ -12999,7 +13000,7 @@ msgstr ""
 #: include/views/configuration.services.edit.php:221
 #: include/views/configuration.services.edit.php:227
 msgid "hh"
-msgstr ""
+msgstr "hh"
 
 #: api/classes/CMap.php:610
 msgid "host"
