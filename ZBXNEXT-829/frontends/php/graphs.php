@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of graphs');
 $page['file'] = 'graphs.php';
-$page['section'] = ZBX_MENU_SECTION_MON;
 $page['hist_arg'] = array();
 $page['scripts'] = array();
 

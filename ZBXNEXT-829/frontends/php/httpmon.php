@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Status of Web monitoring');
 $page['file'] = 'httpmon.php';
-$page['section'] = ZBX_MENU_SECTION_MON;
 $page['hist_arg'] = array('open','groupid','hostid');
 
 define('ZBX_PAGE_DO_REFRESH', 1);

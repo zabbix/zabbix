@@ -164,7 +164,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 					'.trigger_unknown { background-color: #DBDBDB !important; }'."\n".
 				'</style>';
 
-			if (isset($page['section']) && $page['section'] == ZBX_MENU_SECTION_MON) {
+			// perform Zabbix server check only for standard pages
+			if (!defined('ZBX_PAGE_NO_MENU') && $config['server_check_interval']) {
 				$page['scripts'][] = 'servercheck.js';
 				zbx_add_post_js('checkServerStatus('.$config['server_check_interval'].');');
 			}
