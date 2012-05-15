@@ -1,5 +1,6 @@
 Changes for 1.8.14rc1
 
+...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
 ..F....... [ZBX-4918] fixed value mapping when resolve {ITEM.LASTVALUE} and {ITEM.VALUE} macros (Vedmak)
 A......... [ZBX-4917] fixed slow screens for non-Super-Admins (Toms)
 
