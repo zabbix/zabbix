@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of GUI');
@@ -41,6 +41,8 @@ $fields = array(
 		_('Max count of elements to show inside table cell')),
 	'search_limit' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({save})',
 		_('Search/Filter elements limit')),
+	'server_check_interval' => array(T_ZBX_INT, O_OPT, null, null, 'isset({save})',
+		_('Zabbix server is running check interval')),
 	'save' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,				null),
 	'form_refresh' =>				array(T_ZBX_INT, O_OPT, null,			null,				null)
 );
@@ -58,7 +60,8 @@ if (isset($_REQUEST['save'])) {
 		'dropdown_first_entry' => get_request('dropdown_first_entry'),
 		'dropdown_first_remember' => (is_null(get_request('dropdown_first_remember')) ? 0 : 1),
 		'max_in_table' => get_request('max_in_table'),
-		'search_limit' => get_request('search_limit')
+		'search_limit' => get_request('search_limit'),
+		'server_check_interval' => get_request('server_check_interval')
 	);
 
 	$result = update_config($configs);
@@ -74,6 +77,7 @@ if (isset($_REQUEST['save'])) {
 		$msg[] = _s('Dropdown first entry "%1$s".', get_request('dropdown_first_entry'));
 		$msg[] = _s('Dropdown remember selected "%1$s".', get_request('dropdown_first_remember'));
 		$msg[] = _s('Max count of elements to show inside table cell "%1$s".', get_request('max_in_table'));
+		$msg[] = _s('Zabbix server is running check interval "%1$s".', get_request('server_check_interval'));
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ZABBIX_CONFIG, implode('; ', $msg));
 	}
@@ -115,6 +119,7 @@ if ($data['form_refresh']) {
 	$data['config']['max_in_table'] = get_request('max_in_table');
 	$data['config']['event_expire'] = get_request('event_expire');
 	$data['config']['event_show_max'] = get_request('event_show_max');
+	$data['config']['server_check_interval'] = get_request('server_check_interval');
 }
 else {
 	$data['config'] = select_config(false);
@@ -125,4 +130,3 @@ $cnf_wdgt->addItem($guiForm->render());
 $cnf_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

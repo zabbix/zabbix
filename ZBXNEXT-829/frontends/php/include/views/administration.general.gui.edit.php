@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $comboTheme = new CComboBox('default_theme', $this->data['config']['default_theme'], null, Z::getThemes());
 
 $comboDdFirstEntry = new CComboBox('dropdown_first_entry', $this->data['config']['dropdown_first_entry']);
@@ -33,6 +33,8 @@ $guiTab->addRow(_('Max count of elements to show inside table cell'), new CNumer
 $guiTab->addRow(_('Enable event acknowledges'), new CCheckBox('event_ack_enable', $this->data['config']['event_ack_enable'], null, 1));
 $guiTab->addRow(_('Show events not older than (in days)'), new CTextBox('event_expire', $this->data['config']['event_expire'], 5));
 $guiTab->addRow(_('Max count of events per trigger to show'), new CTextBox('event_show_max', $this->data['config']['event_show_max'], 5));
+$guiTab->addRow(_('Zabbix server is running check interval (in seconds)'),
+	array(new CTextBox('server_check_interval', $this->data['config']['server_check_interval'], 5), ' 0 - '._('disabled')));
 
 $guiView = new CTabView();
 $guiView->addTab('gui', _('GUI'), $guiTab);
@@ -44,5 +46,4 @@ $guiForm->addItem($guiView);
 $guiForm->addItem(makeFormFooter(array(new CSubmit('save', _('Save')))));
 
 return $guiForm;
-?>
 
