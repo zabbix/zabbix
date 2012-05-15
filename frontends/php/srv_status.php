@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/services.inc.php';
 
 $page['title'] = _('IT services');
 $page['file'] = 'srv_status.php';
-$page['section'] = ZBX_MENU_SECTION_MON;
 $page['scripts'] = array();
 $page['hist_arg'] = array();
 

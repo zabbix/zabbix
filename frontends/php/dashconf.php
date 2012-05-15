@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Dashboard configuration');
 $page['file'] = 'dashconf.php';
-$page['section'] = ZBX_MENU_SECTION_MON;
 $page['hist_arg'] = array();
 $page['scripts'] = array();
 

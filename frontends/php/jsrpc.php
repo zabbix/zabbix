@@ -153,7 +153,7 @@ switch ($data['method']) {
 		break;
 	case 'zabbix.status':
 		$config = select_config();
-		if (!isset($_SESSION['zabbixStatus']) || $_SESSION['zabbixStatus']['time'] + $config['server_check_interval'] < time()) {
+		if (!isset($_SESSION['zabbixStatus']) || ($_SESSION['zabbixStatus']['time'] + $config['server_check_interval']) <= time()) {
 			$_SESSION['zabbixStatus'] = array(
 				'time' => time(),
 				'status' => zabbixRunning()

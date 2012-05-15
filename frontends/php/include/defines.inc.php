@@ -848,10 +848,6 @@ define('ZBX_VALID_OK',		0);
 define('ZBX_VALID_ERROR',	1);
 define('ZBX_VALID_WARNING',	2);
 
-define('ZBX_MENU_SECTION_MON', 'monitoring');
-define('ZBX_MENU_SECTION_CONF', 'configuration');
-define('ZBX_MENU_SECTION_ADM', 'administration');
-
 // user default theme
 define('THEME_DEFAULT', 'default');
 

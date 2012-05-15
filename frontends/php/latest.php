@@ -25,7 +25,6 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
-$page['section'] = ZBX_MENU_SECTION_MON;
 $page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
 $page['scripts'] = array();
 

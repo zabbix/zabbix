@@ -22,7 +22,6 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['file'] = 'tr_status.php';
-$page['section'] = ZBX_MENU_SECTION_MON;
 $page['title'] = _('Status of triggers');
 $page['hist_arg'] = array('groupid', 'hostid');
 $page['scripts'] = array('class.cswitcher.js');
