@@ -1324,7 +1324,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update items set lastlogsize=" ZBX_FS_UI64 ", mtime=%d where itemid=" ZBX_FS_UI64 ";\n",
+				"update items set lastlogsize=" ZBX_FS_UI64 ",mtime=%d where itemid=" ZBX_FS_UI64 ";\n",
 				lastlogsize,
 				mtime,
 				ids[i]);

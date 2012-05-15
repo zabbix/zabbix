@@ -239,25 +239,25 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 	register long	i;
 	LPTSTR		wsource;
 
-	assert(lastlogsize);
-	assert(out_timestamp);
-	assert(out_source);
-	assert(out_severity);
-	assert(out_message);
-	assert(out_eventid);
-
-	*out_timestamp	= 0;
-	*out_source	= NULL;
-	*out_severity	= 0;
-	*out_message	= NULL;
-	*out_eventid	= 0;
+	assert(NULL != lastlogsize);
+	assert(NULL != out_timestamp);
+	assert(NULL != out_source);
+	assert(NULL != out_severity);
+	assert(NULL != out_message);
+	assert(NULL != out_eventid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' lastlogsize:" ZBX_FS_UI64,
 			__function_name, source, *lastlogsize);
 
+	*out_timestamp = 0;
+	*out_source = NULL;
+	*out_severity = 0;
+	*out_message = NULL;
+	*out_eventid = 0;
+
 	if (NULL == source || '\0' == *source)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Can't open eventlog with empty name");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot open eventlog with empty name");
 		return ret;
 	}
 
@@ -270,8 +270,7 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 		if (1 == skip_old_data)
 		{
 			*lastlogsize = LastID - 1;
-			zabbix_log(LOG_LEVEL_DEBUG, "Skipping existing data. lastlogsize:" ZBX_FS_UI64,
-					*lastlogsize);
+			zabbix_log(LOG_LEVEL_DEBUG, "skipping existing data: lastlogsize:" ZBX_FS_UI64, *lastlogsize);
 		}
 
 		if (*lastlogsize > LastID)
@@ -293,8 +292,7 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 		ret = SUCCEED;
 	}
 	else
-		zabbix_log(LOG_LEVEL_ERR, "Can't open eventlog '%s' [%s]",
-				source, strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_ERR, "cannot open eventlog '%s': %s", source, strerror_from_system(GetLastError()));
 
 	zbx_free(wsource);
 

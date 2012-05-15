@@ -21,7 +21,7 @@
 #define ZABBIX_EVENTLOG_H
 
 #ifndef _WINDOWS
-#	error "This module allowed only for Windows OS"
+#	error "This module is only available for Windows OS"
 #endif
 
 int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp,
