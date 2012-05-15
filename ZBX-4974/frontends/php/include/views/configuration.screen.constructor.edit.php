@@ -129,7 +129,7 @@ if ($resourcetype == SCREEN_RESOURCE_GRAPH) {
 	else {
 		$selectButton = new CButton('select', _('Select'),
 			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid'.
+				'&real_hosts=1&with_graphs=1&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid'.
 				"&srcfld2=name', 800, 450);", 'formlist'
 		);
 	}
@@ -178,7 +178,7 @@ elseif ($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 	else {
 		$selectButton = new CButton('select', _('Select'),
 			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&real_hosts=1'.
-				"&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=name', 800, 450);",
+				"&with_simple_graph_items=1&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=name', 800, 450);",
 			'formlist'
 		);
 	}
