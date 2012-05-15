@@ -867,7 +867,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => DAY_IN_YEAR
+				'default' => '365',
 			),
 			'lastvalue' => array(
 				'null' => true,
@@ -1301,7 +1301,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
-				'default' => 'default.css',
+				'default' => 'default',
 			),
 			'attempt_failed' => array(
 				'null' => false,
@@ -2176,6 +2176,12 @@ return array(
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1',
+			),
+			'server_check_interval' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '60',
 			),
 		),
 	),
@@ -4289,6 +4295,12 @@ return array(
 				'length' => 10,
 				'default' => '0',
 			),
+			'status' => array(
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			),
 		),
 	),
 	'proxy_dhistory' => array(
@@ -5469,7 +5481,7 @@ return array(
 		),
 	),
 	'item_discovery' => array(
-		'type' => DB::TABLE_TYPE_CONFIG,
+		'type' => DB::TABLE_TYPE_HISTORY,
 		'key' => 'itemdiscoveryid',
 		'fields' => array(
 			'itemdiscoveryid' => array(
