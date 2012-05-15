@@ -351,7 +351,8 @@ include_once('include/page_header.php');
 		'output' => API_OUTPUT_EXTEND,
 		'select_hosts' => array('hostid', 'host', 'maintenance_status', 'maintenance_type', 'maintenanceid'),
 		'select_items' => API_OUTPUT_EXTEND,
-		'select_dependencies' => API_OUTPUT_EXTEND
+		'select_dependencies' => API_OUTPUT_EXTEND,
+		'expandDescription' => true
 	);
 	$triggers = CTrigger::get($options);
 	$triggers = zbx_toHash($triggers, 'triggerid');
@@ -420,8 +421,7 @@ include_once('include/page_header.php');
 
 
 	foreach($triggers as $tnum => $trigger){
-
-		$trigger['desc'] = $description = expand_trigger_description($trigger['triggerid']);
+		$description = $trigger['description'];
 
 		$items = array();
 

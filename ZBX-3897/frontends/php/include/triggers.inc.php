@@ -1406,72 +1406,79 @@ function utf8RawUrlDecode($source){
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER){
-		if($row){
-			$description = expand_trigger_description_constants($row['description'], $row);
+function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
+	if ($row) {
+		$description = expand_trigger_description_constants($row['description'], $row);
 
-			for($i=0; $i<10; $i++){
-				$macro = '{HOSTNAME'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)) {
-					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
+		for ($i = 0; $i < 10; $i++) {
+			$macro = '{HOSTNAME'.($i ? $i : '').'}';
+			if (zbx_strstr($description, $macro)) {
+				$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
-					if(isset($functionid)) {
-						$sql = 'SELECT DISTINCT h.host'.
-								' FROM functions f,items i,hosts h'.
-								' WHERE f.itemid=i.itemid'.
-									' AND i.hostid=h.hostid'.
-									' AND f.functionid='.$functionid;
-						$host = DBfetch(DBselect($sql));
-						if(is_null($host['host']))
-							$host['host'] = $macro;
-						$description = str_replace($macro, $host['host'], $description);
+				if (isset($functionid)) {
+					$sql = 'SELECT DISTINCT h.host'.
+							' FROM functions f,items i,hosts h'.
+							' WHERE f.itemid=i.itemid'.
+								' AND i.hostid=h.hostid'.
+								' AND f.functionid='.$functionid;
+					$host = DBfetch(DBselect($sql));
+					if (is_null($host['host'])) {
+						$host['host'] = $macro;
 					}
+					$description = str_replace($macro, $host['host'], $description);
 				}
 			}
 
-			for($i=0; $i<10; $i++){
-				$macro = '{ITEM.LASTVALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)){
-					$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
+			$itemData = null;
+			$macro = '{ITEM.LASTVALUE'.($i ? $i : '').'}';
+			if (zbx_strstr($description, $macro)) {
+				$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
 
-					if(isset($functionid)){
-						$sql = 'SELECT i.lastvalue, i.value_type, i.itemid, i.valuemapid, i.units '.
-								' FROM items i, functions f '.
-								' WHERE i.itemid=f.itemid '.
-									' AND f.functionid='.$functionid;
-						$row2=DBfetch(DBselect($sql));
-						$description = str_replace($macro, format_lastvalue($row2), $description);
+				if (isset($functionid)) {
+					$sql = 'SELECT i.lastvalue,i.value_type,i.itemid,i.valuemapid,i.units'.
+							' FROM items i,functions f'.
+							' WHERE i.itemid=f.itemid'.
+							' AND f.functionid='.$functionid;
+					$itemData = DBfetch(DBselect($sql));
+					$description = str_replace($macro, format_lastvalue($itemData), $description);
+				}
+			}
 
+			$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
+			if (zbx_strstr($description, $macro)) {
+				$functionid = trigger_get_N_functionid($row['expression'], $i ? $i : 1);
+				if (isset($functionid)) {
+					// if $itemData is set by resolving {ITEM.LASTVALUE} macro, no need to select data again
+					if (!$itemData) {
+						$sql = 'SELECT i.value_type,i.itemid,i.valuemapid,i.units'.
+								' FROM items i,functions f'.
+								' WHERE i.itemid=f.itemid'.
+								' AND f.functionid='.$functionid;
+						$itemData = DBfetch(DBselect($sql));
 					}
+
+					$itemData['lastvalue'] = ($flag == ZBX_FLAG_TRIGGER)
+							? trigger_get_func_value($row['expression'], ZBX_FLAG_TRIGGER, $i ? $i : 1, 1)
+							: trigger_get_func_value($row['expression'], ZBX_FLAG_EVENT, $i ? $i : 1, $row['clock']);
+					$description = str_replace($macro, format_lastvalue($itemData), $description);
 				}
-			}
-
-			for($i=0; $i<10; $i++){
-				$macro = '{ITEM.VALUE'.($i ? $i : '').'}';
-				if(zbx_strstr($description, $macro)){
-					$value=($flag==ZBX_FLAG_TRIGGER)?
-							trigger_get_func_value($row['expression'],ZBX_FLAG_TRIGGER,$i ? $i : 1, 1):
-							trigger_get_func_value($row['expression'],ZBX_FLAG_EVENT,$i ? $i : 1, $row['clock']);
-
-					$description = str_replace($macro, $value, $description);
-				}
-
-			}
-
-			if($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $arr)){
-				$macros = CUserMacro::getMacros($arr[1], array('triggerid' => $row['triggerid']));
-
-				$search = array_keys($macros);
-				$values = array_values($macros);
-
-				$description = str_replace($search, $values, $description);
 			}
 		}
-		else{
-			$description = '*ERROR*';
+
+		if ($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $arr)) {
+			$macros = CUserMacro::getMacros($arr[1], array('triggerid' => $row['triggerid']));
+
+			$search = array_keys($macros);
+			$values = array_values($macros);
+
+			$description = str_replace($search, $values, $description);
 		}
-	return $description;
 	}
+	else {
+		$description = '*ERROR*';
+	}
+	return $description;
+}
 
 	function expand_trigger_description_simple($triggerid){
 		$sql = 'SELECT DISTINCT h.host,t.description,t.expression,t.triggerid '.
