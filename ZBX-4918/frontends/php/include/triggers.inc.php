@@ -1076,48 +1076,36 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 				continue;
 			}
 
-			// processing of macros {HOST.HOST1..9}
-			$macro = '{HOST.HOST'.($i ? $i : '').'}';
-			if (zbx_strstr($description, $macro)) {
-				$host = DBfetch(DBselect(
-					'SELECT DISTINCT h.host'.
-					' FROM functions f,items i,hosts h'.
-					' WHERE f.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND f.functionid='.$functionid
-				));
-				$description = str_replace($macro, $host['host'], $description);
-			}
-
+			$hostData = null;
 			// processing of deprecated macros {HOSTNAME1..9}
-			$macro = '{HOSTNAME'.($i ? $i : '').'}';
-			if (zbx_strstr($description, $macro)) {
-				$host = DBfetch(DBselect(
-					'SELECT DISTINCT h.host'.
-					' FROM functions f,items i,hosts h'.
-					' WHERE f.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND f.functionid='.$functionid
-				));
-				if (is_null($host['host'])) {
-					$host['host'] = $macro;
+			// processing of macros {HOST.HOST1..9}
+			foreach(array('{HOSTNAME'.($i ? $i : '').'}', '{HOST.HOST'.($i ? $i : '').'}') as $macro) {
+				if (zbx_strstr($description, $macro)) {
+					if (!$hostData) {
+						$hostData = DBfetch(DBselect(
+							'SELECT DISTINCT h.host'.
+							' FROM functions f,items i,hosts h'.
+							' WHERE f.itemid=i.itemid'.
+								' AND i.hostid=h.hostid'.
+								' AND f.functionid='.$functionid
+						));
+					}
+
+					$description = str_replace($macro, $hostData['host'], $description);
 				}
-				$description = str_replace($macro, $host['host'], $description);
 			}
 
 			// processing of macros {HOST.NAME1..9}
 			$macro = '{HOST.NAME'.($i ? $i : '').'}';
 			if (zbx_strstr($description, $macro)) {
-				if (isset($functionid)) {
-					$host = DBfetch(DBselect(
-						'SELECT DISTINCT h.name'.
-						' FROM functions f,items i,hosts h'.
-						' WHERE f.itemid=i.itemid'.
-							' AND i.hostid=h.hostid'.
-							' AND f.functionid='.$functionid
-					));
-					$description = str_replace($macro, $host['name'], $description);
-				}
+				$host = DBfetch(DBselect(
+					'SELECT DISTINCT h.name'.
+					' FROM functions f,items i,hosts h'.
+					' WHERE f.itemid=i.itemid'.
+						' AND i.hostid=h.hostid'.
+						' AND f.functionid='.$functionid
+				));
+				$description = str_replace($macro, $host['name'], $description);
 			}
 
 			// deprecated macro
