@@ -166,7 +166,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 			if (isset($page['section']) && $page['section'] == ZBX_MENU_SECTION_MON) {
 				$page['scripts'][] = 'servercheck.js';
-				zbx_add_post_js('checkServerStatus('.ZBX_CHECK_INTERVAL.');');
+				zbx_add_post_js('checkServerStatus('.$config['server_check_interval'].');');
 			}
 		}
 	}

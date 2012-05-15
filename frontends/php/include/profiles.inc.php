@@ -287,6 +287,14 @@ function update_config($configs) {
 		return false;
 	}
 
+	if (isset($configs['server_check_interval'])
+			&& $configs['server_check_interval'] != 0
+			&& ($configs['server_check_interval'] < 30
+			|| $configs['server_check_interval'] > SEC_PER_DAY)) {
+		error(_('"Zabbix server is running check interval" must be "0" or a positive integer greater than "30" and less than "86400".'));
+		return false;
+	}
+
 	$currentConfig = select_config();
 
 	// check duplicate severity names and if name is empty.
