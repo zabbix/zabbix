@@ -58,7 +58,7 @@ foreach ($this->data['applications'] as $application) {
 	if (!empty($application['template_host'])) {
 		$name = array(
 			new CLink($application['template_host']['name'], 'applications.php?hostid='.$application['template_host']['hostid'], 'unknown'),
-			':',
+			': ',
 			$application['name']
 		);
 	}
