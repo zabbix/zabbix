@@ -57,7 +57,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	size_t		i, szbyte;
 	const char	*cr, *lf;
 	int		nbytes;
-#ifdef WINDOWS
+#ifdef _WINDOWS
 	__int64		offset;
 #else
 	off_t		offset;

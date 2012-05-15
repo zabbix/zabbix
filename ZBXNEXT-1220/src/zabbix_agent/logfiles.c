@@ -512,7 +512,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 			break;	/* must return, situation could have changed */
 		}
 
-#ifdef WINDOWS
+#ifdef _WINDOWS
 		if (-1L != _lseeki64(fd, (__int64)*lastlogsize, SEEK_SET))
 #else
 		if ((off_t)-1 != lseek(fd, (off_t)*lastlogsize, SEEK_SET))
@@ -644,8 +644,8 @@ int	process_log(char *filename, zbx_uint64_t *lastlogsize, char **value, const c
 		return ret;
 	}
 
-#ifdef WINDOWS
-	if (-1L != _lseeki64(fd, (__int64)*lastlogsize, SEEK_SET))
+#ifdef _WINDOWS
+	if (-1L != _lseeki64(f, (__int64)*lastlogsize, SEEK_SET))
 #else
 	if ((off_t)-1 != lseek(f, (off_t)*lastlogsize, SEEK_SET))
 #endif
