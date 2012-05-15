@@ -100,6 +100,11 @@ function DBsave_tables($topTable) {
 
 	DBget_tables($tables, $topTable);
 
+	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		DBexecute('SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0');
+		DBexecute('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0');
+	}
+
 	foreach ($tables as $table) {
 		switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
@@ -115,6 +120,11 @@ function DBsave_tables($topTable) {
 			DBexecute("drop table if exists ${table}_tmp");
 			DBexecute("select * into temp table ${table}_tmp from $table");
 		}
+	}
+
+	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		DBexecute('SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECK');
+		DBexecute('SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS');
 	}
 }
 
