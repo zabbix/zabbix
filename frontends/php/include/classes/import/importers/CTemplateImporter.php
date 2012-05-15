@@ -45,7 +45,6 @@ class CTemplateImporter extends CImporter {
 		}
 		unset($template);
 
-
 		do {
 			$independentTemplates = $this->getIndependentTemplates($templates);
 
