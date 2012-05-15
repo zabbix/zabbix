@@ -6,21 +6,20 @@ var checkServerStatus = (function ($) {
 		warning: false,
 
 		check: function() {
-			var that = this;
-
 			new RPC.Call({
 				'method': 'zabbix.status',
 				'params': {},
-				'onSuccess': function(result) {
-					if (result) {
-						that.hideWarning()
-					}
-					else {
-						that.showWarning();
-					}
-				},
-				'onFailure': function() {}
+				'onSuccess': $.proxy(this.onSuccess, this)
 			});
+		},
+
+		onSuccess: function(result) {
+			if (result) {
+				this.hideWarning()
+			}
+			else {
+				this.showWarning();
+			}
 		},
 
 		showWarning: function() {
