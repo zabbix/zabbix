@@ -1,8 +1,11 @@
 --------------------------------------------------------------------------------
-Changes for 2.0.0rc4
+Changes for 2.0.0rc5
 
 New features:
 ..F....... [ZBX-1357] updated Brazilian Portuguese, Dutch, Greek, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+.......PS. [ZBX-4980] fixed trapper process crash/hang on decoding big base64 encoded values (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.0rc4
@@ -667,6 +670,14 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.14rc1
+
+.......PS. [ZBX-4980] fixed trapper process crash/hang on decoding big base64 encoded values (Andris)
+
+Changes for 1.8.13
+
+1.8.13rc1 was released as 1.8.13 without any changes
+
 Changes for 1.8.13rc1
 
 ...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
