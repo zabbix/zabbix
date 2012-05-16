@@ -247,7 +247,7 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
  * Purpose	:  Decode a base64 string into a string
  *
  * Parameters	:  p_b64str (in)	- the base64 string to decode
- *		   p_str (out)		- the encoded str to return
+ *		   p_str (out)		- the decoded str to return
  *		   p_str_maxsize (in)	- the size of p_str buffer
  *		   p_out_size (out)	- the size (len) of the str decoded
  *
