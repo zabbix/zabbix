@@ -260,7 +260,7 @@ void str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_ou
 {
 	const char	*p;
 	char		from[4];
-	unsigned char	to1, to2, to3, to4;
+	unsigned char	to[4];
 	int		i = 0, j = 0;
 	int		lasti = -1;	/* index of the last filled-in element of from[] */
 	int		finished = 0;
@@ -275,10 +275,10 @@ void str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_ou
 
 	while (1)
 	{
-		if (*p != '\0')
+		if ('\0' != *p)
 		{
 			/* skip non-base64 characters */
-			if (! is_base64(*p))
+			if (0 == is_base64(*p))
 			{
 				p++;
 				continue;
@@ -298,35 +298,35 @@ void str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_ou
 		else	/* no more data to read */
 		{
 			finished = 1;
-			for (j=lasti + 1; j <= 3; j++)
+			for (j = lasti + 1; 3 >= j; j++)
 				from[j] = 'A';
 		}
 
 		if (-1 != lasti)
 		{
 			/* decode a 4-character block */
-			to1 = char_base64_decode(from[0]);
-			to2 = char_base64_decode(from[1]);
-			to3 = char_base64_decode(from[2]);
-			to4 = char_base64_decode(from[3]);
+			to[0] = char_base64_decode(from[0]);
+			to[1] = char_base64_decode(from[1]);
+			to[2] = char_base64_decode(from[2]);
+			to[3] = char_base64_decode(from[3]);
 
 			if (1 <= lasti)	/* from[0], from[1] available */
 			{
-				*p_str++ = ((to1 << 2) | (to2 >> 4));
+				*p_str++ = ((to[0] << 2) | (to[1] >> 4));
 				if (++(*p_out_size) == maxsize)
 					break;
 			}
 
-			if ( (2 <= lasti) && (from[2] != '=') )	/* from[2] available */
+			if (2 <= lasti && '=' != from[2])	/* from[2] available */
 			{
-				*p_str++ = (((to2 & 0xf) << 4) | (to3 >> 2));
+				*p_str++ = (((to[1] & 0xf) << 4) | (to[2] >> 2));
 				if (++(*p_out_size) == maxsize)
 					break;
 			}
 
-			if ( (3 == lasti) && ( from[3] != '=') )	/* from[3] available */
+			if (3 == lasti && '=' != from[3])	/* from[3] available */
 			{
-				*p_str++ =  (((to3 & 0x3) << 6) | to4);
+				*p_str++ = (((to[2] & 0x3) << 6) | to[3]);
 				if (++(*p_out_size) == maxsize)
 					break;
 			}
