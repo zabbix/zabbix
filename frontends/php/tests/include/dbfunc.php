@@ -101,8 +101,10 @@ function DBsave_tables($topTable) {
 	DBget_tables($tables, $topTable);
 
 	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-		DBexecute('SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0');
-		DBexecute('SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0');
+		$result = DBselect('select @@unique_checks,@@foreign_key_checks');
+		$row = DBfetch($result);
+		DBexecute('set unique_checks=0');
+		DBexecute('set foreign_key_checks=0');
 	}
 
 	foreach ($tables as $table) {
@@ -123,8 +125,8 @@ function DBsave_tables($topTable) {
 	}
 
 	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-		DBexecute('SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECK');
-		DBexecute('SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS');
+		DBexecute('set foreign_key_checks='.$row['@@foreign_key_checks']);
+		DBexecute('set unique_checks='.$row['@@unique_checks']);
 	}
 }
 
