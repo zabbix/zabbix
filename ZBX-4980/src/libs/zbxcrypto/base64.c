@@ -298,7 +298,7 @@ void str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_ou
 		else	/* no more data to read */
 		{
 			finished = 1;
-			for (j = lasti + 1; j <= 3; j++)
+			for (j = lasti + 1; j < 4; j++)
 				from[j] = 'A';
 		}
 
