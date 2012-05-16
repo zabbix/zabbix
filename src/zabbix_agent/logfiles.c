@@ -73,8 +73,8 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s()%s part1:'%s' part2:'%s'", __function_name, zbx_result_string(ret), *part1,
-			*part2);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s part1:'%s' part2:'%s'",
+			__function_name, zbx_result_string(ret), *part1, *part2);
 
 	return ret;
 }
@@ -201,7 +201,7 @@ static int	split_filename(const char *filename, char **directory, char **format)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s()%s directory:'%s' format:'%s'", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s directory:'%s' format:'%s'", __function_name, zbx_result_string(ret),
 			*directory, *format);
 
 	return ret;
@@ -244,7 +244,7 @@ static void free_logfiles(struct st_logfile **logfiles, int *logfiles_alloc, int
 	*logfiles_alloc = 0;
 	*logfiles_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -340,7 +340,7 @@ static void add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 	(*logfiles)[i].mtime = mtime;
 	++(*logfiles_num);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -553,7 +553,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 		}
 		else	/* cannot position in the file */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for fil '%s': %s",
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set position to " ZBX_FS_UI64 " for file '%s': %s",
 					*lastlogsize, logfile_candidate, zbx_strerror(errno));
 			break;	/* must return, situation could have changed */
 		}
@@ -578,7 +578,7 @@ int	process_logrt(char *filename, zbx_uint64_t *lastlogsize, int *mtime, char **
 	zbx_free(directory);
 	zbx_free(format);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s()%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

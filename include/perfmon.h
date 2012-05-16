@@ -20,8 +20,8 @@
 #ifndef ZABBIX_PERFMON_H
 #define ZABBIX_PERFMON_H
 
-#if !defined(_WINDOWS)
-#	error "This module allowed only for Windows OS"
+#ifndef _WINDOWS
+#	error "This module is only available for Windows OS"
 #endif
 
 #define PCI_SYSTEM			2

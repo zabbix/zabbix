@@ -20,9 +20,9 @@
 #ifndef ZABBIX_SERVICE_H
 #define ZABBIX_SERVICE_H
 
-#if !defined(_WINDOWS)
-#	error "This module allowed only for Windows OS"
-#endif /* _WINDOWS */
+#ifndef _WINDOWS
+#	error "This module is only available for Windows OS"
+#endif
 
 #include "threads.h"
 
