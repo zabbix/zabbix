@@ -228,10 +228,8 @@ INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (2, 19, 
 INSERT INTO opcommand_hst (opcommand_hstid, operationid, hostid) VALUES (3, 26, NULL);
 
 INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (3, 22, 5);
-INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (4, 29, 5);
 
 INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (3, 23, 10001);
-INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (4, 30, 10001);
 
 -- Add test graph
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (200000,'Test graph 1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,0);
