@@ -22,20 +22,11 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormUserProfile extends CWebTest {
-	public $oldHash;
-
-	public function hashUsersExcept($user) {
-		$this->oldHash=DBhash("select * from users where alias<>'$user' order by userid");
-	}
-
-	protected function assertPreConditions() {
-		$this->oldHash=$this->hashUsersExcept(PHPUNIT_LOGIN_NAME);
-	}
-
-	protected function assertPostConditions() {
-	}
 
 	public function testFormProfile_SimpleUpdate() {
+		$sqlHashUsers = 'select * from users order by userid';
+		$oldHashUsers = DBhash($sqlHashUsers);
+
 		$this->login('profile.php');
 
 		$this->assertTitle('User profile');
@@ -44,7 +35,7 @@ class testFormUserProfile extends CWebTest {
 		$this->wait();
 		$this->ok('Copyright');
 
-		$this->assertEquals($this->oldHash, $this->hashUsersExcept(PHPUNIT_LOGIN_NAME));
+		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public function testFormProfile_Cancel() {
@@ -58,6 +49,9 @@ class testFormUserProfile extends CWebTest {
 	public function testFormProfile_PasswordChange() {
 		$pwd="'\'$\"\"!$@$#^%$+-=~`\`\\";
 
+		$sqlHashUsers = 'select * from users where alias<>'.zbx_dbstr(PHPUNIT_LOGIN_NAME).' order by userid';
+		$oldHashUsers = DBhash($sqlHashUsers);
+
 		$this->login('profile.php');
 
 		$this->button_click('change_password');
@@ -69,10 +63,10 @@ class testFormUserProfile extends CWebTest {
 		$this->wait();
 		$this->ok('Copyright');
 
-		$row=DBfetch(DBselect('select passwd from users where alias='.zbx_dbstr(PHPUNIT_LOGIN_NAME)));
+		$row = DBfetch(DBselect('select passwd from users where alias='.zbx_dbstr(PHPUNIT_LOGIN_NAME)));
 		$this->assertEquals(md5($pwd), $row['passwd']);
 
-		$this->assertEquals($this->oldHash, $this->hashUsersExcept(PHPUNIT_LOGIN_NAME));
+		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 
 		/* set default password */
 		$this->open('profile.php');
@@ -86,10 +80,13 @@ class testFormUserProfile extends CWebTest {
 		$this->wait();
 		$this->ok('Copyright');
 
-		$this->assertEquals($this->oldHash, $this->hashUsersExcept(PHPUNIT_LOGIN_NAME));
+		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public function testFormProfile_EmptyPasswords() {
+		$sqlHashUsers = 'select * from users order by userid';
+		$oldHashUsers = DBhash($sqlHashUsers);
+
 		$this->login('profile.php');
 
 		$this->button_click('change_password');
@@ -102,10 +99,13 @@ class testFormUserProfile extends CWebTest {
 		$this->ok('ERROR: Password should not be empty');
 		$this->assertTitle('User profile');
 
-		$this->assertEquals($this->oldHash, $this->hashUsersExcept(PHPUNIT_LOGIN_NAME));
+		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public function testFormProfile_DifferentPasswords() {
+		$sqlHashUsers = 'select * from users order by userid';
+		$oldHashUsers = DBhash($sqlHashUsers);
+
 		$this->login('profile.php');
 
 		$this->button_click('change_password');
@@ -117,10 +117,13 @@ class testFormUserProfile extends CWebTest {
 		$this->wait();
 		$this->ok('ERROR: Cannot update user. Both passwords must be equal.');
 		$this->assertTitle('User profile');
+
+		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public function testFormProfile_ThemeChange() {
-		global $DB;
+		$sqlHashUsers = 'select * from users where alias<>'.zbx_dbstr(PHPUNIT_LOGIN_NAME).' order by userid';
+		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->login('profile.php');
 
@@ -132,7 +135,7 @@ class testFormUserProfile extends CWebTest {
 		$row = DBfetch(DBselect('select theme from users where alias='.zbx_dbstr(PHPUNIT_LOGIN_NAME)));
 		$this->assertEquals('originalblue', $row['theme']);
 
-		$this->assertEquals($this->oldHash, $this->hashUsersExcept(PHPUNIT_LOGIN_NAME));
+		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
 
 	public function testFormProfile_GlobalMessagingEnable() {
