@@ -517,7 +517,10 @@ class DB {
 			if (!isset($table_schema['fields'][$field]) || is_null($values)) {
 				self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
 			}
-			$sqlWhere[] = DBcondition($field, zbx_toArray($values));
+			$values = zbx_toArray($values);
+			sort($values);
+
+			$sqlWhere[] = DBcondition($field, $values);
 		}
 
 		$sql = 'DELETE FROM '.$table.' WHERE '.implode(($use_or ? ' OR ' : ' AND '), $sqlWhere);
