@@ -51,6 +51,7 @@ ALTER TABLE ONLY items
 	ALTER itemid DROP DEFAULT,
 	ALTER hostid DROP DEFAULT,
 	ALTER units TYPE varchar(255),
+	ALTER lastlogsize TYPE numeric(20),
 	ALTER templateid DROP DEFAULT,
 	ALTER templateid DROP NOT NULL,
 	ALTER valuemapid DROP DEFAULT,

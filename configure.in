@@ -158,6 +158,7 @@ dnl *****************************************************************
 
 AC_C_CONST
 AC_TYPE_PID_T
+AC_SYS_LARGEFILE
 
 AC_MSG_CHECKING(for socklen_t)
 AC_TRY_COMPILE([
