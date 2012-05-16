@@ -21,9 +21,7 @@
 <?php
 
 /**
- * A class for rendering service trees.
- *
- * @see createShowServiceTree() and createServiceTree() for a way of creating trees from services
+ * A class for rendering HTML trees.
  */
 class CTree {
 
@@ -97,23 +95,21 @@ class CTree {
 		$tr->setAttribute('style', $this->tree[$id]['parentid'] != '0' ? 'display: none;' : '');
 
 		foreach ($this->fields as $value) {
-			$style = null;
-
-			if ($value == 'status' && zbx_is_int($this->tree[$id][$value]) && $this->tree[$id]['serviceid'] > 0) {
-				$status = $this->tree[$id][$value];
-
-				// do not show the severity for information and unclassified triggers
-				if (in_array($status, array(TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED))) {
-					$this->tree[$id][$value] = new CSpan(_('OK'), 'green');
-				}
-				else {
-					$this->tree[$id][$value] = getSeverityCaption($status);
-					$style = getSeverityStyle($status);
-				}
-			}
-			$tr->addItem(new CCol($this->tree[$id][$value], $style));
+			$tr->addItem($this->makeCol($id, $value));
 		}
 		return $tr;
+	}
+
+	/**
+	 * Returns a column object for the given row and field.
+	 *
+	 * @param $rowId
+	 * @param $colName
+	 *
+	 * @return CCol
+	 */
+	protected function makeCol($rowId, $colName) {
+		return new CCol($this->tree[$rowId][$colName]);
 	}
 
 	private function makeSImgStr($id) {
@@ -171,7 +167,7 @@ class CTree {
 
 	private function countDepth() {
 		foreach ($this->tree as $id => $rows) {
-			if ($rows['serviceid'] == '0') {
+			if ($rows['id'] == '0') {
 				continue;
 			}
 			$parentid = $this->tree[$id]['parentid'];
