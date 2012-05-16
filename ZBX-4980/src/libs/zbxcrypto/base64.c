@@ -298,17 +298,15 @@ void str_base64_decode(const char *p_b64str, char *p_str, int maxsize, int *p_ou
 		else	/* no more data to read */
 		{
 			finished = 1;
-			for (j = lasti + 1; 3 >= j; j++)
+			for (j = lasti + 1; j <= 3; j++)
 				from[j] = 'A';
 		}
 
 		if (-1 != lasti)
 		{
 			/* decode a 4-character block */
-			to[0] = char_base64_decode(from[0]);
-			to[1] = char_base64_decode(from[1]);
-			to[2] = char_base64_decode(from[2]);
-			to[3] = char_base64_decode(from[3]);
+			for (j = 0; j < 4; j++)
+				to[j] = char_base64_decode(from[j]);
 
 			if (1 <= lasti)	/* from[0], from[1] available */
 			{
