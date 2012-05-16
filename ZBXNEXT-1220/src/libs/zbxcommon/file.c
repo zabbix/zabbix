@@ -22,7 +22,7 @@
 #if defined(_WINDOWS) && defined(_UNICODE)
 int	__zbx_stat(const char *path, struct stat *buf)
 {
-	int		ret;
+	int	ret;
 	wchar_t	*wpath;
 
 	wpath = zbx_utf8_to_unicode(path);
