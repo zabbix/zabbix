@@ -58,11 +58,11 @@ extern int	CONFIG_LISTEN_PORT;
 typedef struct
 {
 	char		*key, *key_orig;
+	zbx_uint64_t	lastlogsize;
 	int		refresh;
 	int		nextcheck;
 	int		status;
 /* must be long for fseek() */
-	long		lastlogsize;
 	int		mtime;
 	unsigned char	skip_old_data;	/* for processing [event]log metrics */
 }
@@ -80,10 +80,10 @@ typedef struct
 	char		*host;
 	char		*key;
 	char		*value;
+	zbx_uint64_t	lastlogsize;
 	int		timestamp;
 	char		*source;
 	int		severity;
-	long		lastlogsize;
 	zbx_timespec_t	ts;
 	int		logeventid;
 	int		mtime;

@@ -20,14 +20,12 @@
 #ifndef ZABBIX_EVENTLOG_H
 #define ZABBIX_EVENTLOG_H
 
-int process_eventlog(
-	const char	*source,
-	long		*lastlogsize,
-	unsigned long	*out_timestamp,
-	char		**out_source,
-	unsigned short	*out_severity,
-	char		**out_message,
-	unsigned long	*out_eventid,
-	unsigned char	skip_old_data);
+#ifndef _WINDOWS
+#	error "This module is only available for Windows OS"
+#endif
+
+int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp,
+		char **out_source, unsigned short *out_severity, char **out_message, unsigned long *out_eventid,
+		unsigned char skip_old_data);
 
 #endif /* ZABBIX_EVENTLOG_H */
