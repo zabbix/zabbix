@@ -64,7 +64,7 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 	color: #383838;
 }
 .classic .ui-state-hover, .classic .ui-widget-content .ui-state-hover, .classic .ui-widget-header .ui-state-hover, .classic .ui-state-focus, .classic .ui-widget-content .ui-state-focus, .classic .ui-widget-header .ui-state-focus { background: #CCCCCC; }
-.classic .ui-state-disabled { color: #999; }
+.classic .ui-state-disabled, .classic .ui-button-disabled { color: #999 !important; }
 .classic .ui-state-active a, .classic .ui-state-active a:link, .classic .ui-state-active a:visited {
 	color: #DDD;
 }
