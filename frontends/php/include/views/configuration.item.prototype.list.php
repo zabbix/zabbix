@@ -65,7 +65,7 @@ foreach ($this->data['items'] as $item) {
 		$templateDiscoveryRuleId = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $template_host['hostid']);
 
 		$description[] = new CLink($template_host['host'], '?parent_discoveryid='.$templateDiscoveryRuleId, 'unknown');
-		$description[] = ':';
+		$description[] = ': ';
 	}
 	$description[] = new CLink(itemName($item), '?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']);
 
