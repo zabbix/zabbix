@@ -19,10 +19,20 @@
 **/
 
 
-require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/include/defines.inc.php';
-require_once dirname(__FILE__).'/include/classes/class.cview.php';
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-$browserWarningForm = new CView('general.browserwarning');
-$browserWarningForm->render();
-?>
+class testPageBrowserWarning extends CWebTest {
+
+	public function testPageBrowserWarning_CheckLayout() {
+		$this->open('browserwarning.php');
+		$this->assertTitle('WARNING! You are using an outdated browser.');
+		$this->ok('WARNING! You are using an outdated browser.');
+		$this->ok(array(
+			'Google Chrome',
+			'Mozilla Firefox',
+			'Internet Explorer',
+			'Opera browser',
+			'Apple Safari'
+		));
+	}
+}
