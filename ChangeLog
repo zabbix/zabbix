@@ -7,6 +7,7 @@ New features:
 ...G...... [ZBX-3151] added support of monitoring files more than 2GB in the vfs.file.size[] item (Sasha)
 
 Bug fixes:
+....I..... [ZBX-5003] backticked table and field names in the MySQL scheme and default data (Sasha)
 ..F....... [ZBX-5004] fixed error when import templates (Vedmak)
 ..F....... [ZBX-5002] fixed undefined index error when rendering a node tree on a DM setup (Pavels)
 A.F....... [ZBX-5008] fixed updating users that do not belong to the selected node (Pavels)
