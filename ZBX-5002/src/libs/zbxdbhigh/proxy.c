@@ -1630,7 +1630,10 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 		av->value = zbx_strdup(av->value, tmp);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, &tmp, &tmp_alloc))
-			av->lastlogsize = atoi(tmp);
+		{
+			if (SUCCEED != is_uint64(tmp, &av->lastlogsize))
+				av->lastlogsize = 0;
+		}
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
 			av->mtime = atoi(tmp);
