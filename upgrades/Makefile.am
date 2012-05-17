@@ -28,3 +28,7 @@ dist-hook:
 	cat $(srcdir)/dbpatches/2.0/oracle/patch/* >$(distdir)/dbpatches/2.0/oracle/patch.sql
 	cat $(srcdir)/dbpatches/2.0/postgresql/patch/* >$(distdir)/dbpatches/2.0/postgresql/patch.sql
 	cp $(srcdir)/dbpatches/2.0/mysql/upgrade $(distdir)/dbpatches/2.0/mysql/
+	cp $(srcdir)/dbpatches/2.0/ibm_db2/rc4_rc5.sql $(distdir)/dbpatches/2.0/ibm_db2/
+	cp $(srcdir)/dbpatches/2.0/mysql/rc4_rc5.sql $(distdir)/dbpatches/2.0/mysql/
+	cp $(srcdir)/dbpatches/2.0/oracle/rc4_rc5.sql $(distdir)/dbpatches/2.0/oracle/
+	cp $(srcdir)/dbpatches/2.0/postgresql/rc4_rc5.sql $(distdir)/dbpatches/2.0/postgresql/
