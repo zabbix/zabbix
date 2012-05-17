@@ -20,10 +20,13 @@
 
 body { background: #E5E5E5; }
 
-.ui-widget-header.sub_menu, .ui-widget-header.page_footer { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #6D88AD; border: 0; }
-table.menu tr td.active { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #5C9CCC; border-color: #6666AA; }
-div.thin_header { background: url("images/menu_not_active2.gif") repeat-x scroll left top #5C9CCC; }
-table.flicker { background: url("images/menu_not_active2.gif") repeat-x scroll left top #6D88AD }
+.ui-widget-header.sub_menu, .ui-widget-header.page_footer { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #365081; border: 0; }
+table.menu tr td.active { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #5C9CCC; border-color: #365081; }
+div.thin_header { background: url("images/menu_not_active2.gif") repeat-x scroll left top #4E6EA7; }
+
+table.flicker, table.formtable tr td.form_row_first, table.formtable tr td.form_row_last, table.ack_msgs tr.title {
+	background: url("images/menu_not_active2.gif") repeat-x scroll left top #6F89B4
+}
 
 table.tableinfo { border-spacing: 1px; background-color: #AAA; }
 table.tableinfo tr td { border-radius: 0; }
@@ -35,13 +38,15 @@ table.tableinfo tr.odd_row > td { background: #DDD; }
 
 ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 
+.pum_oheader { background: #1A1A1A url('images/bg_h-hard_55.gif') repeat-x top left; }
+
 .header { margin-bottom: 0; }
 .column .widget, #search_wdgt .widget { padding: 0; border-radius: 0; border: 0; }
 .widget .footer { margin-top: 0; border-top: 0; }
 .classic .ui-corner-all { border-radius: 0; }
 .classic #dashboard_wdgt .ui-widget-content { background: #EEE; }
 .ui-tabs.ui-widget-content { background: #EEEEEE; }
-.footer.ui-widget-content { background: url("images/widget_header.gif") repeat-x scroll #5C9CCC; }
+.footer.ui-widget-content { background: url("images/widget_header.gif") repeat-x scroll #4E6EA7; }
 .border_dotted { border-color: #777; }
 
 .classic .ui-state-default, .classic .ui-widget-content .ui-state-default, .classic .ui-widget-header .ui-state-default {
