@@ -107,6 +107,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/import/formatters',
 			$this->rootDir.'/include/classes/sysmaps',
 			$this->rootDir.'/include/classes/helpers',
+			$this->rootDir.'/include/classes/tree',
 			$this->rootDir.'/api/classes',
 			$this->rootDir.'/api/rpc'
 		);

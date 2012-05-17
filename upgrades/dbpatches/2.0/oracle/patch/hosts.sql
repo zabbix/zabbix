@@ -47,21 +47,24 @@ INSERT INTO interface (interfaceid,hostid,main,type,ip,dns,useip,port)
 ---- Patching table `items`
 
 ALTER TABLE items RENAME COLUMN description to name;
-ALTER TABLE items MODIFY itemid DEFAULT NULL;
-ALTER TABLE items MODIFY hostid DEFAULT NULL;
-ALTER TABLE items MODIFY units nvarchar2(255);
-ALTER TABLE items MODIFY templateid DEFAULT NULL;
-ALTER TABLE items MODIFY templateid NULL;
-ALTER TABLE items MODIFY valuemapid DEFAULT NULL;
-ALTER TABLE items MODIFY valuemapid NULL;
-ALTER TABLE items ADD lastns number(10) NULL;
-ALTER TABLE items ADD flags number(10) DEFAULT '0' NOT NULL;
-ALTER TABLE items ADD filter nvarchar2(255) DEFAULT '';
-ALTER TABLE items ADD interfaceid number(20) NULL;
-ALTER TABLE items ADD port nvarchar2(64) DEFAULT '';
-ALTER TABLE items ADD description nvarchar2(2048) DEFAULT '';
-ALTER TABLE items ADD inventory_link number(10) DEFAULT '0' NOT NULL;
-ALTER TABLE items ADD lifetime nvarchar2(64) DEFAULT '30';
+ALTER TABLE items MODIFY (
+	itemid DEFAULT NULL,
+	hostid DEFAULT NULL,
+	units nvarchar2(255),
+	templateid DEFAULT NULL NULL,
+	lastlogsize number(20),
+	valuemapid DEFAULT NULL NULL
+);
+ALTER TABLE items ADD (
+	lastns number(10) NULL,
+	flags number(10) DEFAULT '0' NOT NULL,
+	filter nvarchar2(255) DEFAULT '',
+	interfaceid number(20) NULL,
+	port nvarchar2(64) DEFAULT '',
+	description nvarchar2(2048) DEFAULT '',
+	inventory_link number(10) DEFAULT '0' NOT NULL,
+	lifetime nvarchar2(64) DEFAULT '30'
+);
 UPDATE items
 	SET templateid=NULL
 	WHERE templateid=0
