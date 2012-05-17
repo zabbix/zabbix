@@ -124,9 +124,6 @@ class CUser extends CZBXAPI {
 			$options['userids'] = self::$userData['userid'];
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// userids
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
@@ -201,6 +198,8 @@ class CUser extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+
 		$userids = array();
 
 		$sqlParts['select'] = array_unique($sqlParts['select']);
@@ -219,7 +218,7 @@ class CUser extends CZBXAPI {
 			$sqlFrom.= implode(',', $sqlParts['from']);
 		}
 		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
+			$sqlWhere .= implode(' AND ', $sqlParts['where']);
 		}
 		if (!empty($sqlParts['order'])) {
 			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
@@ -228,8 +227,7 @@ class CUser extends CZBXAPI {
 
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('u.userid', $nodeids).
-				$sqlWhere.
+				' WHERE '.$sqlWhere.
 				$sqlOrder;
 		$res = DBselect($sql, $sqlLimit);
 		while ($user = DBfetch($res)) {
@@ -1123,6 +1121,14 @@ class CUser extends CZBXAPI {
 		));
 
 		return (count($ids) == $count);
+	}
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		if (!isset($options['usrgrpids'])) {
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 }
 
