@@ -4,8 +4,8 @@ Changes for 2.0.0rc5
 New features:
 ..F.I..... [ZBXNEXT-1225] added the "Classic" frontend theme (Pavels)
 ..F....... [ZBX-1357] updated Brazilian Portuguese, Dutch, Greek, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
-...G...PS. [ZBXNEXT-1220] added support of monitoring of log files more than 2GB (Sasha)
-...G...... [ZBX-3151] added support of monitoring files more than 2GB in the vfs.file.size[] item (Sasha)
+...G...PS. [ZBXNEXT-1220] added support of monitoring of log files larger than 2GB (Sasha)
+...G...... [ZBX-3151] added support of monitoring files larger than 2GB in the vfs.file.size[] item (Sasha)
 
 Bug fixes:
 ..F....... [ZBX-5005] fixed escape of percent character in translation string (Vedmak)
