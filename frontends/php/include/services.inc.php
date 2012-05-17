@@ -109,7 +109,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		));
 
 		$serviceNode = array(
-			'serviceid' => 0,
+			'id' => 0,
 			'parentid' => 0,
 			'caption' => $caption,
 			'trigger' => array(),
@@ -118,6 +118,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		);
 
 		$service = $serviceNode;
+		$service['serviceid'] = 0;
 		$service['dependencies'] = array();
 		$service['trigger'] = array();
 
@@ -144,7 +145,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		));
 
 		$serviceNode = array(
-			'serviceid' => $service['serviceid'],
+			'id' => $service['serviceid'],
 			'caption' => $caption,
 			'description' => ($service['trigger']) ? $service['trigger']['description'] : '-',
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
@@ -153,7 +154,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 	}
 
 	if (!$dependency || !$dependency['soft']) {
-		$tree[$serviceNode['serviceid']] = $serviceNode;
+		$tree[$serviceNode['id']] = $serviceNode;
 
 		foreach ($service['dependencies'] as $dependency) {
 			$childService = $services[$dependency['servicedownid']];
@@ -163,7 +164,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 	else {
 		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'service-caption-soft');
 
-		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
+		$tree[$serviceNode['id'].'.'.$dependency['linkid']] = $serviceNode;
 	}
 }
 
@@ -184,7 +185,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	// if no parent service is given, start from the root
 	if (!$service) {
 		$serviceNode = array(
-			'serviceid' => 0,
+			'id' => 0,
 			'parentid' => 0,
 			'caption' => _('root'),
 			'status' => SPACE,
@@ -196,6 +197,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		);
 
 		$service = $serviceNode;
+		$service['serviceid'] = 0;
 		$service['dependencies'] = array();
 		$service['trigger'] = array();
 
@@ -300,7 +302,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		}
 
 		$serviceNode = array(
-			'serviceid' => $service['serviceid'],
+			'id' => $service['serviceid'],
 			'caption' => $caption,
 			'description' => ($service['trigger']) ? $service['trigger']['description'] : _('None'),
 			'reason' => $problemList,
@@ -313,7 +315,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 
 	// hard dependencies and dependencies for the "root" node
 	if (!$dependency || $dependency['soft'] == 0) {
-		$tree[$serviceNode['serviceid']] = $serviceNode;
+		$tree[$serviceNode['id']] = $serviceNode;
 
 		foreach ($service['dependencies'] as $dependency) {
 			$childService = $services[$dependency['servicedownid']];
@@ -324,7 +326,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	else {
 		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'service-caption-soft');
 
-		$tree[$serviceNode['serviceid'].'.'.$dependency['linkid']] = $serviceNode;
+		$tree[$serviceNode['id'].'.'.$dependency['linkid']] = $serviceNode;
 	}
 }
 
