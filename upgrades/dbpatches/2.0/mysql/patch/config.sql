@@ -25,7 +25,8 @@ ALTER TABLE config
 	ADD problem_ack_style integer DEFAULT '1' NOT NULL,
 	ADD ok_unack_style integer DEFAULT '1' NOT NULL,
 	ADD ok_ack_style integer DEFAULT '1' NOT NULL,
-	ADD snmptrap_logging integer DEFAULT '1' NOT NULL;
+	ADD snmptrap_logging integer DEFAULT '1' NOT NULL,
+	ADD server_check_interval integer DEFAULT '60' NOT NULL;
 
 UPDATE config SET alert_usrgrpid=NULL WHERE NOT alert_usrgrpid IN (SELECT usrgrpid FROM usrgrp);
 UPDATE config SET discovery_groupid=NULL WHERE NOT discovery_groupid IN (SELECT groupid FROM groups);
