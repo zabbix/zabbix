@@ -1,0 +1,72 @@
+/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+@import "jquery-ui.css";
+
+body { background: #E5E5E5; }
+
+.ui-widget-header.sub_menu { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #6D88AD; border: 0; }
+table.menu tr td.active { background: url("images/bg_h-hard_55.gif") repeat-x scroll left top #5C9CCC; border-color: #6666AA; }
+div.thin_header { background: url("images/menu_not_active2.gif") repeat-x scroll left top #5C9CCC; }
+table.flicker { background: url("images/menu_not_active2.gif") repeat-x scroll left top #6D88AD }
+
+table.tableinfo { border-spacing: 1px; background-color: #AAA; }
+table.tableinfo tr td { border-radius: 0; }
+table.tableinfo tr.header td { background: #CCC; }
+table.tableinfo tr.header td.hover_grey { background: #BBB; }
+table.tableinfo tr.header td.hover_grey:hover { background: #999; color: #EEE; }
+table.tableinfo tr.even_row > td{ background: #EEE; }
+table.tableinfo tr.odd_row > td { background: #DDD; }
+
+.header { margin-bottom: 0; }
+.column .widget, #search_wdgt .widget { padding: 0; border-radius: 0; border: 0; }
+.widget .footer { margin-top: 0; border-top: 0; }
+.classic .ui-corner-all { border-radius: 0; }
+.classic #dashboard_wdgt .ui-widget-content { background: #EEE; }
+.ui-tabs.ui-widget-content { background: #EEEEEE; }
+.footer.ui-widget-content { background: url("images/widget_header.gif") repeat-x scroll #5C9CCC; }
+.border_dotted { border-color: #777; }
+
+.classic .ui-state-default, .classic .ui-widget-content .ui-state-default, .classic .ui-widget-header .ui-state-default {
+	background: #2C487A; color: #DDD;
+}
+.classic .ui-state-default a, .classic .ui-state-default a:link, .classic .ui-state-default a:visited {
+	color: #DDD;
+}
+.classic .ui-state-active, .classic .ui-widget-content .ui-state-active, .classic .ui-widget-header .ui-state-active {
+	background: #303F5C; color: #DDD;
+}
+.classic .ui-button.ui-state-active .ui-button-text { color: #DDD; }
+div.footer .formrow .main, div.ui-dialog-buttonpane div.ui-dialog-buttonset button.main, input.main[type="button"] {
+	border-color: #9DB2CD;
+}
+
+.input { border-color: gray; }
+
+.unknown, a.unknown { color: #777; }
+a.unknown:hover { color: #999; }
+
+table.filter { background: white; border: 1px solid #EEE; }
+table.filter tr td { border: 1px solid #EEE; }
+
+ul.formlist li.new { background: #DFDFDF; }
+
+.dropArea { background-color: #FFB; }
+.dropHereText { color: #5481AB; }
+
+table.ack_msgs tr.msg { background-color: #F8F8F8; }
