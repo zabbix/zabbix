@@ -47,6 +47,7 @@ switch ($theme) {
 		$shadow = array('red' => 105, 'green' => 105, 'blue' => 105);
 		break;
 	case 'originalblue':
+	case 'classic':
 	default:
 		$color = array('red' => 0, 'green' => 0, 'blue' => 0);
 		$shadow = array('red' => 175, 'green' => 175, 'blue' => 175);

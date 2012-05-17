@@ -120,6 +120,7 @@ class ZBase {
 	 */
 	public static function getThemes() {
 		return array(
+			'classic' => _('Classic'),
 			'originalblue' => _('Original blue'),
 			'darkblue' => _('Black & Blue'),
 			'darkorange' => _('Dark orange')
