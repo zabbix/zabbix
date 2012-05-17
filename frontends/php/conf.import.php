@@ -31,7 +31,7 @@ ob_start();
 require_once 'include/page_header.php';
 
 $fields = array(
-	'rules' => array(T_ZBX_STR, O_OPT, null, null,	null),
+	'rules' => array(T_ZBX_STR, O_OPT, null, null, null),
 	'import' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'rules_preset' => array(T_ZBX_STR, O_OPT, null, null, null),
 	'cancel' => array(T_ZBX_STR, O_OPT, P_SYS, null, null),
@@ -100,7 +100,6 @@ if (isset($_REQUEST['rules'])) {
 	// if form was submitted with some checkboxes unchecked, those values are not submitted
 	// so that we set missing values to false
 	foreach ($data['rules'] as $ruleName => $rule) {
-
 		if (!isset($requestRules[$ruleName])) {
 			if (isset($rule['updateExisting'])) {
 				$requestRules[$ruleName]['updateExisting'] = false;
