@@ -247,7 +247,14 @@ sub process_table
 			$pkey = ",${eol}\n${ltab}PRIMARY KEY (${pkey})";
 		}
 
-		print "CREATE TABLE ${table_name} (${eol}\n";
+		if ($output{"database"} eq "mysql")
+		{
+			print "CREATE TABLE `${table_name}` (${eol}\n";
+		}
+		else
+		{
+			print "CREATE TABLE ${table_name} (${eol}\n";
+		}
 	}
 }
 
@@ -354,38 +361,6 @@ sub process_field
 		s/$type_short/$a/g;
 		$type_2 = $_;
 
-		if ($default ne "")
-		{
-			if ($output{"database"} eq "ibm_db2")
-			{
-				$default = "WITH DEFAULT $default";
-			}
-			else
-			{
-				$default = "DEFAULT $default";
-			}
-		}
-
-		if ($output{"database"} eq "mysql")
-		{
-			@text_fields = ('blob', 'longblob', 'text', 'longtext');
-
-			if (grep /$output{$type_short}/, @text_fields)
-			{
-				$default = "";
-			}
-		}
-
-		if ($output{"database"} eq "ibm_db2")
-		{
-			@text_fields = ('blob');
-
-			if (grep /$output{$type_short}/, @text_fields)
-			{
-				$default = "";
-			}
-		}
-
 		if (($output{"database"} eq "oracle") && (0 == index($type_2, "nvarchar2") || 0 == index($type_2, "nclob")))
 		{
 			$null = "";
@@ -461,16 +436,50 @@ sub process_field
 			{
 				$references = "";
 
-				$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
-
 				if ($output{"database"} eq "mysql")
 				{
-					$fkeys_drop = "${fkeys_drop}${fk_bol}ALTER TABLE${only} ${table_name} DROP FOREIGN KEY ${cname}${fk_eol}\n";
+					$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} `${table_name}` ADD CONSTRAINT `${cname}` FOREIGN KEY (`${name}`) REFERENCES `${fk_table}` (`${fk_field}`)${fk_flags}${fk_eol}\n";
+					$fkeys_drop = "${fkeys_drop}${fk_bol}ALTER TABLE${only} `${table_name}` DROP FOREIGN KEY `${cname}`${fk_eol}\n";
 				}
 				else
 				{
+					$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
 					$fkeys_drop = "${fkeys_drop}${fk_bol}ALTER TABLE${only} ${table_name} DROP CONSTRAINT ${cname}${fk_eol}\n";
 				}
+			}
+		}
+
+		if ($default ne "")
+		{
+			if ($output{"database"} eq "ibm_db2")
+			{
+				$default = "WITH DEFAULT $default";
+			}
+			else
+			{
+				$default = "DEFAULT $default";
+			}
+		}
+
+		if ($output{"database"} eq "mysql")
+		{
+			@text_fields = ('blob', 'longblob', 'text', 'longtext');
+
+			if (grep /$output{$type_short}/, @text_fields)
+			{
+				$default = "";
+			}
+
+			$name = "`${name}`";
+		}
+
+		if ($output{"database"} eq "ibm_db2")
+		{
+			@text_fields = ('blob');
+
+			if (grep /$output{$type_short}/, @text_fields)
+			{
+				$default = "";
 			}
 		}
 
@@ -496,10 +505,27 @@ sub process_index
 	}
 	else
 	{
-		if (1 == $unique) { $unique = " UNIQUE"; }
-		else { $unique = ""; }
+		if (1 == $unique)
+		{
+			$unique = " UNIQUE";
+		}
+		else
+		{
+			$unique = "";
+		}
 
-		print "CREATE${unique} INDEX ${table_name}_$name\ ON $table_name ($fields);${eol}\n";
+		if ($output{"database"} eq "mysql")
+		{
+			for ($fields)
+			{
+				s/,/`,`/g;
+			}
+			print "CREATE${unique} INDEX `${table_name}_$name` ON `$table_name` (`$fields`);${eol}\n";
+		}
+		else
+		{
+			print "CREATE${unique} INDEX ${table_name}_$name ON $table_name ($fields);${eol}\n";
+		}
 	}
 }
 
