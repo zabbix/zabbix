@@ -65,6 +65,8 @@ sub process_table
 {
 	my $line = $_[0];
 
+	$line = "`$line`" if ($output{'database'} eq 'mysql');
+
 	$insert_into = "INSERT INTO $line";
 }
 
@@ -77,17 +79,29 @@ sub process_fields
 	my $first = 1;
 	$fields = "(";
 
-	foreach (@array)
+	if ($output{'database'} eq 'mysql')
 	{
-		if ($first == 0)
+		foreach (@array)
 		{
-			$fields = "$fields,";
+			$fields = "$fields," if ($first == 0);
+			$first = 0;
+
+			$_ =~ s/\s+$//; # remove trailing spaces
+
+			$fields = "$fields`$_`";
 		}
-		$first = 0;
+	}
+	else
+	{
+		foreach (@array)
+		{
+			$fields = "$fields," if ($first == 0);
+			$first = 0;
 
-		$_ =~ s/\s+$//; # remove trailing spaces
+			$_ =~ s/\s+$//; # remove trailing spaces
 
-		$fields = "$fields$_";
+			$fields = "$fields$_";
+		}
 	}
 
 	$fields = "$fields)";
