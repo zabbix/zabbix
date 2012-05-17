@@ -152,7 +152,7 @@ else {
 
 	$treeData = array();
 	createServiceMonitoringTree($services, $slaData, $period, $treeData);
-	$tree = new CTree('service_status_tree',
+	$tree = new CServiceTree('service_status_tree',
 		$treeData,
 		array(
 			'caption' => _('Service'),

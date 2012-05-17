@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
@@ -17,15 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_EVENTLOG_H
-#define ZABBIX_EVENTLOG_H
 
-#ifndef _WINDOWS
-#	error "This module is only available for Windows OS"
-#endif
+require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned long *out_timestamp,
-		char **out_source, unsigned short *out_severity, char **out_message, unsigned long *out_eventid,
-		unsigned char skip_old_data);
+class testPageBrowserWarning extends CWebTest {
 
-#endif /* ZABBIX_EVENTLOG_H */
+	public function testPageBrowserWarning_CheckLayout() {
+		$this->open('browserwarning.php');
+		$this->assertTitle('WARNING! You are using an outdated browser.');
+		$this->ok('WARNING! You are using an outdated browser.');
+		$this->ok(array(
+			'Google Chrome',
+			'Mozilla Firefox',
+			'Internet Explorer',
+			'Opera browser',
+			'Apple Safari'
+		));
+	}
+}

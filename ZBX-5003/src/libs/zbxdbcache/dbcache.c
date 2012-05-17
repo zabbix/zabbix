@@ -80,12 +80,12 @@ typedef struct
 	zbx_uint64_t	itemid;
 	history_value_t	value_orig;
 	history_value_t	value;			/* used as source for log items */
+	zbx_uint64_t	lastlogsize;
 	int		clock;
 	int		ns;
 	int		timestamp;
 	int		severity;
 	int		logeventid;
-	int		lastlogsize;
 	int		mtime;
 	int		num;			/* number of continuous values with the same itemid */
 	unsigned char	value_type;
@@ -1035,7 +1035,7 @@ static void	DCadd_update_item_sql(size_t *sql_offset, DB_ITEM *item, ZBX_DC_HIST
 			}
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",lastlogsize=%d,mtime=%d",
+			zbx_snprintf_alloc(&sql, &sql_alloc, sql_offset, ",lastlogsize=" ZBX_FS_UI64 ",mtime=%d",
 					h->lastlogsize, h->mtime);
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
@@ -1284,9 +1284,9 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 {
 	const char	*__function_name = "DCmass_proxy_update_items";
 	size_t		sql_offset = 0;
-	zbx_uint64_t	*ids = NULL;
+	zbx_uint64_t	*ids = NULL, lastlogsize;
 	int		ids_alloc, ids_num = 0;
-	int		lastlogsize, mtime, i, j;
+	int		mtime, i, j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1324,7 +1324,7 @@ static void	DCmass_proxy_update_items(ZBX_DC_HISTORY *history, int history_num)
 			continue;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update items set lastlogsize=%d, mtime=%d where itemid=" ZBX_FS_UI64 ";\n",
+				"update items set lastlogsize=" ZBX_FS_UI64 ",mtime=%d where itemid=" ZBX_FS_UI64 ";\n",
 				lastlogsize,
 				mtime,
 				ids[i]);
@@ -2553,7 +2553,7 @@ static void	DCadd_history_lld(zbx_uint64_t itemid, const char *value_orig, zbx_t
 }
 
 static void	DCadd_history_log(zbx_uint64_t itemid, const char *value_orig, zbx_timespec_t *ts,
-		int timestamp, const char *source, int severity, int logeventid, int lastlogsize, int mtime)
+		int timestamp, const char *source, int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime)
 {
 	ZBX_DC_HISTORY	*history;
 	size_t		len1, len2;
@@ -2632,7 +2632,7 @@ static void	DCadd_history_notsupported(zbx_uint64_t itemid, const char *error, z
  ******************************************************************************/
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags,
 		AGENT_RESULT *value, zbx_timespec_t *ts, unsigned char status, const char *error,
-		int timestamp, const char *source, int severity, int logeventid, int lastlogsize, int mtime)
+		int timestamp, const char *source, int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime)
 {
 	if (ITEM_STATUS_NOTSUPPORTED == status)
 	{
