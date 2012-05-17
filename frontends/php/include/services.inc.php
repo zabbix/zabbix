@@ -286,7 +286,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 				new CDiv('100%', 'sla-bar-legend sla-bar-legend-end')
 			), 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'));
 			$bar = new CDiv($bar, 'sla-bar');
-			$bar->setAttribute('title', _('Only the last 20%% of the indicator is displayed.'));
+			$bar->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
 
 			$slaBar = array(
 				$bar,

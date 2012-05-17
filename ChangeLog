@@ -8,6 +8,7 @@ New features:
 ...G...... [ZBX-3151] added support of monitoring files more than 2GB in the vfs.file.size[] item (Sasha)
 
 Bug fixes:
+..F....... [ZBX-5005] fixed escape of percent character in translation string (Vedmak)
 A......... [ZBX-4997] fixed inherited items interfaces are set to null when update by import parent template (Eduard)
 ....I..... [ZBX-5003] backticked table and field names in the MySQL scheme and default data (Sasha)
 ..F....... [ZBX-5004] fixed error when import templates (Vedmak)
