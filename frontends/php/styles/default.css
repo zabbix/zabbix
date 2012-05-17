@@ -768,7 +768,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	background: url('../images/general/transparent.png') repeat scroll center top transparent;
 }
 
-.disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal { color: #222; }
+.disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal { color: #222 !important; }
 
 .preloader { width: 80px; height: 12px; }
 
