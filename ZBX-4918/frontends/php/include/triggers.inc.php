@@ -1108,51 +1108,32 @@ function expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER) {
 				$description = str_replace($macro, $host['name'], $description);
 			}
 
+			$ip = null;
 			// deprecated macro
-			$macro = '{IPADDRESS'.($i ? $i : '').'}';
-			if (zbx_strstr($description, $macro)) {
-				$db_interfaces = DBselect(
-					'SELECT DISTINCT n.ip,n.type'.
-					' FROM functions f,items i,interface n'.
-					' WHERE f.itemid=i.itemid'.
-						' AND n.main=1'.
-						' AND n.type IN ('.implode(',', array_keys($priorities)).')'.
-						' AND i.hostid=n.hostid'.
-						' AND f.functionid='.$functionid
-				);
-				$result = $macro;
-				$priority = 0;
-				while ($interface = DBfetch($db_interfaces)) {
-					if ($priority >= $priorities[$interface['type']]) {
-						continue;
+			foreach(array('{IPADDRESS'.($i ? $i : '').'}', '{HOST.IP'.($i ? $i : '').'}') as $macro) {
+				if (zbx_strstr($description, $macro)) {
+					if (!$ip) {
+						$db_interfaces = DBselect(
+							'SELECT DISTINCT n.ip,n.type'.
+									' FROM functions f,items i,interface n'.
+									' WHERE f.itemid=i.itemid'.
+									' AND n.main=1'.
+									' AND n.type IN ('.implode(',', array_keys($priorities)).')'.
+									' AND i.hostid=n.hostid'.
+									' AND f.functionid='.$functionid
+						);
+						$ip = $macro;
+						$priority = 0;
+						while ($interface = DBfetch($db_interfaces)) {
+							if ($priority >= $priorities[$interface['type']]) {
+								continue;
+							}
+							$priority = $priorities[$interface['type']];
+							$ip = $interface['ip'];
+						}
 					}
-					$priority = $priorities[$interface['type']];
-					$result = $interface['ip'];
+					$description = str_replace($macro, $ip, $description);
 				}
-				$description = str_replace($macro, $result, $description);
-			}
-
-			$macro = '{HOST.IP'.($i ? $i : '').'}';
-			if (zbx_strstr($description, $macro)) {
-				$db_interfaces = DBselect(
-					'SELECT DISTINCT n.ip,n.type'.
-					' FROM functions f,items i,interface n'.
-					' WHERE f.itemid=i.itemid'.
-						' AND n.main=1'.
-						' AND n.type IN ('.implode(',', array_keys($priorities)).')'.
-						' AND i.hostid=n.hostid'.
-						' AND f.functionid='.$functionid
-				);
-				$result = $macro;
-				$priority = 0;
-				while ($interface = DBfetch($db_interfaces)) {
-					if ($priority >= $priorities[$interface['type']]) {
-						continue;
-					}
-					$priority = $priorities[$interface['type']];
-					$result = $interface['ip'];
-				}
-				$description = str_replace($macro, $result, $description);
 			}
 
 			$macro = '{HOST.DNS'.($i ? $i : '').'}';
