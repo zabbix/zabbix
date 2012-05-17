@@ -22,7 +22,7 @@
 #if defined(_WINDOWS) && defined(_UNICODE)
 int	__zbx_stat(const char *path, struct stat *buf)
 {
-	int		ret;
+	int	ret;
 	wchar_t	*wpath;
 
 	wpath = zbx_utf8_to_unicode(path);
@@ -57,7 +57,11 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	size_t		i, szbyte;
 	const char	*cr, *lf;
 	int		nbytes;
+#ifdef _WINDOWS
+	__int64		offset;
+#else
 	off_t		offset;
+#endif
 
 	offset = lseek(fd, 0, SEEK_CUR);
 
