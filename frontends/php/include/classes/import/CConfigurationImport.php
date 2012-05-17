@@ -140,14 +140,14 @@ class CConfigurationImport {
 			}
 			else {
 				$this->formatter = $this->getFormatter($version);
+
 				// pass data to formatter
 				// export has root key "zabbix_export" which is not passed
 				$this->formatter->setData($this->data['zabbix_export']);
-
 				$this->referencer = new CImportReferencer();
+
 				// parse all import for references to resolve them all together with less sql count
 				$this->gatherReferences();
-
 				$this->processGroups();
 				$this->processTemplates();
 				$this->processHosts();
@@ -158,6 +158,7 @@ class CConfigurationImport {
 				$this->processGraphs();
 				$this->processImages();
 				$this->processMaps();
+
 				// screens should be created after all other elements
 				$this->processTemplateScreens();
 				$this->processScreens();
@@ -798,11 +799,11 @@ class CConfigurationImport {
 
 					// TODO: do this for all graphs at once
 					$sql = 'SELECT g.graphid
-					FROM graphs g, graphs_items gi, items i
-					WHERE g.graphid=gi.graphid
-						AND gi.itemid=i.itemid
-						AND g.name='.zbx_dbstr($graph['name']).'
-						AND '.DBcondition('i.hostid', $graphHostIds);
+							FROM graphs g,graphs_items gi,items i
+							WHERE g.graphid=gi.graphid
+								AND gi.itemid=i.itemid
+								AND g.name='.zbx_dbstr($graph['name']).'
+								AND '.DBcondition('i.hostid', $graphHostIds);
 					$graphExists = DBfetch(DBselect($sql));
 
 					if ($graphExists) {
@@ -875,11 +876,11 @@ class CConfigurationImport {
 
 			// TODO: do this for all graphs at once
 			$sql = 'SELECT g.graphid
-			FROM graphs g, graphs_items gi, items i
-			WHERE g.graphid=gi.graphid
-				AND gi.itemid=i.itemid
-				AND g.name='.zbx_dbstr($graph['name']).'
-				AND '.DBcondition('i.hostid', $graphHostIds);
+					FROM graphs g,graphs_items gi,items i
+					WHERE g.graphid=gi.graphid
+						AND gi.itemid=i.itemid
+						AND g.name='.zbx_dbstr($graph['name']).'
+						AND '.DBcondition('i.hostid', $graphHostIds);
 			$graphExists = DBfetch(DBselect($sql));
 
 			if ($graphExists) {
@@ -965,7 +966,6 @@ class CConfigurationImport {
 			}
 		}
 
-
 		if ($this->options['triggers']['updateExisting'] && $triggersToUpdate) {
 			API::Trigger()->update($triggersToUpdate);
 		}
@@ -992,7 +992,7 @@ class CConfigurationImport {
 		$imagesToUpdate = array();
 		$allImages = zbx_toHash($allImages, 'name');
 
-		$dbImages = DBselect('SELECT i.imageid, i.name FROM images i WHERE '.DBcondition('i.name', array_keys($allImages)));
+		$dbImages = DBselect('SELECT i.imageid,i.name FROM images i WHERE '.DBcondition('i.name', array_keys($allImages)));
 		while ($dbImage = DBfetch($dbImages)) {
 			$dbImage['image'] = $allImages[$dbImage['name']]['image'];
 			$imagesToUpdate[] = $dbImage;
@@ -1051,11 +1051,9 @@ class CConfigurationImport {
 		switch ($version) {
 			case '2.0':
 				return new C20ImportFormatter;
-
 			default:
 				throw new InvalidArgumentException('Unknown import version.');
 		}
-
 	}
 
 	/**
