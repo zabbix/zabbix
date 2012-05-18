@@ -206,7 +206,20 @@ include_once('include/page_header.php');
 		);
 		$gitems = CGraphItem::get($params);
 
+		$params = array(
+			'itemids' => zbx_objectValues($gitems, 'itemid'),
+			'preservekeys' => 1,
+			'webitems' => true,
+			'output' => API_OUTPUT_EXTEND
+		);
+		$items = CItem::get($params);
+
 		foreach($gitems as $gnum => $gitem){
+			if ($items[$gitem['itemid']]['type'] == ITEM_TYPE_HTTPTEST) {
+				unset($graphs[$gitem['graphid']]);
+				unset($gitems[$gitem['gitemid']]);
+				continue;
+			}
 			$gitems[$gitem['gitemid']]['host_key_'] = $gitem['host'].':'.$gitem['key_'];
 		}
 // SELECT TEMPLATES
@@ -249,11 +262,18 @@ include_once('include/page_header.php');
 			'hostids' => $hostids,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => 1,
+			'select_items' => API_OUTPUT_EXTEND,
 			'select_dependencies' => API_OUTPUT_EXTEND,
 			'expandData' => 1
 		);
 		$triggers = CTrigger::get($params);
 		foreach($triggers as $tnum => $trigger){
+			foreach ($trigger['items'] as $item) {
+				if ($item['type'] == ITEM_TYPE_HTTPTEST) {
+					unset($triggers[$tnum]);
+					continue 2;
+				}
+			}
 			$triggers[$trigger['triggerid']]['expression'] = explode_exp($trigger['expression']);
 		}
 
