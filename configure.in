@@ -156,9 +156,22 @@ dnl *          Checks for type definitions and structures           *
 dnl *                                                               *
 dnl *****************************************************************
 
+dnl large file support
+largefile=yes
+
+dnl disable large file support on 32-bit Solaris as it's incompatible with procfs and swapctl
+case "${host_os}" in
+	solaris*)
+		largefile=no
+		;;
+esac
+
+if test "$largefile" = "yes"; then
+	AC_SYS_LARGEFILE
+fi
+
 AC_C_CONST
 AC_TYPE_PID_T
-AC_SYS_LARGEFILE
 
 AC_MSG_CHECKING(for socklen_t)
 AC_TRY_COMPILE([
