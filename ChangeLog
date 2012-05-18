@@ -28,7 +28,7 @@ A.F....... [ZBX-5008] fixed updating users that do not belong to the selected no
 Changes for 2.0.0rc4
 
 New features:
-..F....... [ZBX-4815] forbidden deleting IT services that have dependecies (Pavels)
+..F....... [ZBX-4815] forbidden deleting IT services that have dependencies (Pavels)
 ..F....... [ZBX-4815] all status-related fields will now be disabled when choosing "do not calculate" in the IT service configuration form (Pavels)
 ..F....... [ZBX-4815] implemented multiselect support for the IT service dependency pop up (Pavels)
 A......... [ZBXNEXT-1189] implemented the service.getsla method (Pavels)
@@ -45,12 +45,12 @@ Bug fixes:
 ..F....... [ZBX-4944] fixed translation string in top100 report (Vedmak)
 ..F....... [ZBX-4957] removed error column from item prototypes list, removed 'not supported' status from item prototype edit form (Vedmak)
 ..F....... [ZBX-4981] triggers with lld created or web items are not exported for now (Vedmak)
-A.F....... [ZBX-4956] fixed incorrent trigger existance checks (Pavels)
+A.F....... [ZBX-4956] fixed incorrect trigger existence checks (Pavels)
 ..F....... [ZBX-4815] improved IT service configuration and SLA report page performance (Pavels)
 ..F....... [ZBX-4815] fixed IT service sorting on the service configuration page (Pavels)
 ..F....... [ZBX-4815] fixed IT service configuration pop up menu translation (Pavels)
 ..F....... [ZBX-4815] fixed IT service status update when changing the linked trigger severity (Pavels)
-A......... [ZBX-4815] fixed sorting for results returned by the "selectDepdendencies" and "selectParentDependencies" parameters for service.get (Pavels)
+A......... [ZBX-4815] fixed sorting for results returned by the "selectDependencies" and "selectParentDependencies" parameters for service.get (Pavels)
 ..F....... [ZBX-4960] fixed LDAP frontend messages, fixed message in latest data (Vedmak)
 ..F....... [ZBX-4920] fixed templates from 1.8 xml are dependent on 'hosts' rules (Vedmak)
 ...G...PS. [ZBX-4942] do not send prototypes for active agent to process (dimir)
