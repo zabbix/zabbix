@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-14 23:29+0300\n"
+"POT-Creation-Date: 2012-05-18 20:14+0300\n"
 "PO-Revision-Date: 2012-05-14 03:36+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -201,7 +201,7 @@ msgstr ""
 msgid "Access denied!"
 msgstr "Доступ заборонено!"
 
-#: api/classes/CUser.php:922
+#: api/classes/CUser.php:920
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Обліковий запис заблоковано на %s секунд"
@@ -586,7 +586,7 @@ msgstr "Помилка програми."
 msgid "Application updated"
 msgstr "Групу елементів даних оновлено"
 
-#: api/classes/CItemGeneral.php:309
+#: api/classes/CItemGeneral.php:308
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Група елементів даних з ID \"%1$s\" недоступна для \"%2$s\"."
@@ -814,7 +814,7 @@ msgstr "Ім'я для підключення (BindDN)"
 msgid "Bind password"
 msgstr "Пароль підключення (Bind password)"
 
-#: include/classes/core/ZBase.php:123
+#: include/classes/core/ZBase.php:125
 msgid "Black & Blue"
 msgstr "Бірюзові сутінки"
 
@@ -1308,7 +1308,7 @@ msgstr "Не вдалося створити карту мережі \"%s\"."
 msgid "Cannot create new element"
 msgstr "Не вдалося створити новий елемент"
 
-#: api/classes/CUserMedia.php:414 api/classes/CUser.php:404
+#: api/classes/CUserMedia.php:414 api/classes/CUser.php:402
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Не вдалося видалити внутрішнього користувача Zabbix \"%1$s\", спробуйте відключити цього користувача."
@@ -1338,7 +1338,7 @@ msgstr "Не вдалося видалити графік"
 msgid "Cannot delete graph prototype."
 msgstr "Не вдалося видалити прототип графіку."
 
-#: api/classes/CItem.php:1040
+#: api/classes/CItem.php:1041
 msgid "Cannot delete graph."
 msgstr "Не вдалося видалити графік."
 
@@ -1449,7 +1449,7 @@ msgstr "Не вдалося видалити шаблон"
 msgid "Cannot delete templated graphs."
 msgstr "Не вдалося видалити шаблонний графік."
 
-#: api/classes/CItem.php:1004
+#: api/classes/CItem.php:1005
 msgid "Cannot delete templated item."
 msgstr "Не вдалося видалити шаблонний елемент даних."
 
@@ -1466,7 +1466,7 @@ msgstr "Не вдалося видалити шаблонний тригер \"%
 msgid "Cannot delete trigger"
 msgstr "Не вдалося видалити тригер"
 
-#: api/classes/CItem.php:1056
+#: api/classes/CItem.php:1057
 msgid "Cannot delete trigger."
 msgstr "Не вдалося видалити тригер."
 
@@ -1478,7 +1478,7 @@ msgstr "Не вдалося видалити тригери"
 msgid "Cannot delete user"
 msgstr "Не вдалося видалити користувача"
 
-#: api/classes/CUser.php:800
+#: api/classes/CUser.php:798
 msgid "Cannot delete user medias"
 msgstr "Не вдалося видалити методи повідомлень користувача"
 
@@ -1674,7 +1674,7 @@ msgstr[0] "Не вдалося імпортувати комплексний е�
 msgstr[1] "Не вдалося імпортувати комплексний екран \"%2$s\": підлеглі комплексні екрани \"%3$s\" не існують."
 msgstr[2] "Не вдалося імпортувати комплексний екран \"%2$s\": підлеглі комплексні екрани \"%3$s\" не існують."
 
-#: include/classes/import/importers/CTemplateImporter.php:115
+#: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
@@ -1687,7 +1687,7 @@ msgstr[2] "Не вдалося імпортувати шаблон \"%2$s\", з'
 msgid "Cannot include view file \"%s\"."
 msgstr "Не вдалося включити файлу вигляду \"%s\"."
 
-#: api/classes/CUser.php:827
+#: api/classes/CUser.php:825
 msgid "Cannot insert user medias"
 msgstr "Не вдалося вставити методи повідомлень користувача"
 
@@ -1695,7 +1695,7 @@ msgstr "Не вдалося вставити методи повідомлень
 msgid "Cannot link template"
 msgstr "Не вдалося приєднати шаблон"
 
-#: api/classes/CUser.php:886
+#: api/classes/CUser.php:884
 msgid "Cannot logout."
 msgstr "Не вдалося виконати вихід."
 
@@ -1739,7 +1739,7 @@ msgstr "Неможливо виконати запит оновлення таб
 msgid "Cannot remove macro."
 msgstr "Не вдалося видалити макрос."
 
-#: api/classes/CUser.php:413
+#: api/classes/CUser.php:411
 msgid "Cannot rename guest user"
 msgstr "Не вдалося перейменувати користувача guest"
 
@@ -1936,7 +1936,7 @@ msgstr "Не вдалося оновити тригер"
 msgid "Cannot update user"
 msgstr "Не вдалося оновити дані користувача"
 
-#: api/classes/CUser.php:819
+#: api/classes/CUser.php:817
 msgid "Cannot update user medias"
 msgstr "Не вдалося оновити методи повідомлень користувача"
 
@@ -2014,7 +2014,7 @@ msgstr "Перевірка вже існує."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Перевірте частину виразу починаючи з \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:239
+#: api/classes/CItemGeneral.php:238
 msgid "Check the key, please. Default example was passed."
 msgstr "Будь ласка, перевірте ключ. Приклад по замовчуванню показано."
 
@@ -2058,10 +2058,14 @@ msgstr "Посилання, утворююче кільце, в картах м�
 msgid "Circular reference in screens: %1$s."
 msgstr "Посилання, утворююче кільце, в комплексних екранах: %1$s."
 
-#: include/classes/import/importers/CTemplateImporter.php:140
+#: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
 msgid "Circular reference in templates: %1$s."
 msgstr "Посилання, утворююче кільце, в шаблонах: %1$s."
+
+#: include/classes/core/ZBase.php:123
+msgid "Classic"
+msgstr ""
 
 #: jsLoader.php:156
 msgid "Clear"
@@ -2450,7 +2454,7 @@ msgstr "Копіювати"
 msgid "Copy selected to ..."
 msgstr "Копіювати вибране в ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:984
 #, php-format
 msgid "Correct login [%s]"
 msgstr "Правильне ім'я користувача [%s]"
@@ -2593,7 +2597,7 @@ msgstr "Створено: Група елементів даних \"%1$s\" у \
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "Створено: Правило виявлення\"%1$s\" у \"%2$s\"."
 
-#: api/classes/CItem.php:904
+#: api/classes/CItem.php:907
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr "Створено: Елемент даних \"%1$s\" у \"%2$s\"."
@@ -2788,7 +2792,7 @@ msgstr "НЕДОСТУПНИЙ"
 msgid "Daily"
 msgstr "Щодня"
 
-#: include/classes/core/ZBase.php:124
+#: include/classes/core/ZBase.php:126
 msgid "Dark orange"
 msgstr "Помаранчева ніч"
 
@@ -3293,7 +3297,7 @@ msgstr "Видалено: Графік \"%1$s\" із \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Видалено: Вузел мережі \"%1$s\"."
 
-#: api/classes/CItem.php:1095
+#: api/classes/CItem.php:1096
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr "Видалено: Елемент даних \"%1$s\" із \"%2$s\"."
@@ -3765,7 +3769,7 @@ msgstr "Дублікат імені скрипта \"%s\"."
 msgid "Duplicate severity name \"%s\"."
 msgstr "Дублікат назви важливості \"%s\"."
 
-#: api/classes/CUser.php:420
+#: api/classes/CUser.php:418
 #, php-format
 msgid "Duplicate user alias \"%s\"."
 msgstr "Дублікат імені користувача \"%s\"."
@@ -3874,7 +3878,7 @@ msgstr "У виразі вказано пусте ім'я вузла мереж�
 #: api/classes/CGraphPrototype.php:966 api/classes/CHostGroup.php:653
 #: api/classes/CHostGroup.php:702 api/classes/CHostInterface.php:657
 #: api/classes/CHost.php:2181 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:983 api/classes/CItemPrototype.php:678
+#: api/classes/CItem.php:985 api/classes/CItemPrototype.php:678
 #: api/classes/CProxy.php:500 api/classes/CService.php:342
 #: api/classes/CService.php:378 api/classes/CService.php:443
 #: api/classes/CService.php:515 api/classes/CTemplate.php:1113
@@ -4056,7 +4060,7 @@ msgstr "Опис помилки: константа ZBX_SCRIPT_TIMEOUT тайм�
 msgid "Error description: empty response received."
 msgstr "Опис помилки: отримано пусту відповідь."
 
-#: api/classes/CItemGeneral.php:244
+#: api/classes/CItemGeneral.php:243
 #, php-format
 msgid "Error in item key: \"%s\"."
 msgstr "Помилка в ключі елемента даних: \"%s\"."
@@ -4714,7 +4718,7 @@ msgstr "Сітка"
 msgid "Group"
 msgstr "Група"
 
-#: include/classes/import/importers/CTemplateImporter.php:234
+#: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
 msgid "Group \"%1$s\" does not exist."
 msgstr "Група \"%1$s\" не існує."
@@ -5498,7 +5502,7 @@ msgstr "Негайно"
 msgid "Import"
 msgstr "Імпорт"
 
-#: conf.import.php:136
+#: conf.import.php:135
 msgid "Import failed"
 msgstr "Імпорт не вдався"
 
@@ -5506,7 +5510,7 @@ msgstr "Імпорт не вдався"
 msgid "Import file"
 msgstr "Імпорт файлу"
 
-#: conf.import.php:132
+#: conf.import.php:131
 msgid "Imported successfully"
 msgstr "Імпортовано успішно"
 
@@ -5705,7 +5709,7 @@ msgstr "Некоректний алгоритм для послуги \"%1$s\"."
 msgid "Incorrect arguments passed to function"
 msgstr "Функції передано некоректні параметри"
 
-#: api/classes/CHostInterface.php:506 api/classes/CItemGeneral.php:171
+#: api/classes/CHostInterface.php:506 api/classes/CItemGeneral.php:170
 #: api/classes/CWebCheck.php:348
 msgid "Incorrect arguments passed to function."
 msgstr "Функції передано некоректні параметри."
@@ -6031,15 +6035,15 @@ msgstr "Вказано некоректний тип ресурсу для ел�
 msgid "Incorrect screen ID \"%s\" provided for screen element."
 msgstr "Некоректний ID комплексного екрану \"%s\" надано для елемента комплексного екрану."
 
-#: include/services.inc.php:479 include/services.inc.php:488
+#: include/services.inc.php:481 include/services.inc.php:490
 msgid "Incorrect service end time."
 msgstr "Некоректний час завершення послуги."
 
-#: include/services.inc.php:476 include/services.inc.php:485
+#: include/services.inc.php:478 include/services.inc.php:487
 msgid "Incorrect service start time."
 msgstr "Некоректний час початку послуги."
 
-#: include/services.inc.php:470
+#: include/services.inc.php:472
 msgid "Incorrect service time type."
 msgstr "Некоректний тип часу послуги."
 
@@ -6071,11 +6075,11 @@ msgstr "Некоректний синтаксис поруч з \"%1$s\" в по
 msgid "Incorrect syntax near \"%1$s\"."
 msgstr "Некоректний синтаксис поруч з \"%1$s\"."
 
-#: api/classes/CUserMedia.php:421 api/classes/CUser.php:709 popup_media.php:65
+#: api/classes/CUserMedia.php:421 api/classes/CUser.php:707 popup_media.php:65
 msgid "Incorrect time period"
 msgstr "Некоректний період часу"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:805
 #, php-format
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Некоректний період часу \"%1$s\"."
@@ -6334,11 +6338,11 @@ msgstr "В системі?"
 msgid "Issue"
 msgstr "Проблема"
 
-#: api/classes/CUser.php:183
+#: api/classes/CUser.php:180
 msgid "It is not possible to filter by user password"
 msgstr "Неможливо фільтрувати по паролю користувача"
 
-#: api/classes/CUserMedia.php:216 api/classes/CUser.php:191
+#: api/classes/CUserMedia.php:216 api/classes/CUser.php:188
 msgid "It is not possible to search by user password"
 msgstr "Неможливо шукати по паролю користувача"
 
@@ -6360,7 +6364,7 @@ msgstr "Елемент даних"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Елемент даних \"%1$s\" вже існує в \"%2$s\", успадковано з іншого шаблону."
 
-#: api/classes/CItem.php:1282
+#: api/classes/CItem.php:1276
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr "Елемент даних \"%1$s\" не може заповнювати відсутнє поле під номером \"%2$d\" інвентарних даних вузла мережі. Оберіть з: від 0 (не заповнювати) до %3$d."
@@ -6370,12 +6374,12 @@ msgstr "Елемент даних \"%1$s\" не може заповнювати 
 msgid "Item \"%1$s\" does not exist."
 msgstr "Елемент даних \"%1$s\" не існує."
 
-#: include/classes/import/CConfigurationImport.php:557
+#: include/classes/import/CConfigurationImport.php:558
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:301
+#: api/classes/CItemGeneral.php:300
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Елемент даних \"%1$s:%2$s\" має неправильний порт: \"%3$s\"."
@@ -6420,44 +6424,44 @@ msgstr "Прототипи елементів даних для"
 msgid "Item updated"
 msgstr "Елемент оновлено"
 
-#: api/classes/CItemGeneral.php:223
+#: api/classes/CItemGeneral.php:222
 msgid "Item uses host interface from non-parent host."
 msgstr "Елемент даних використовує інтерфейс не від батьківського вузла мережі."
 
-#: api/classes/CItemGeneral.php:226
+#: api/classes/CItemGeneral.php:225
 msgid "Item uses incorrect interface type."
 msgstr "Елемент даних використовує некоректний тип інтерфейсу."
 
-#: api/classes/CItemGeneral.php:279
+#: api/classes/CItemGeneral.php:278
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемент не було оновлено. Будь ласка введіть коректний інтервал оновлення."
 
-#: api/classes/CItemGeneral.php:349
+#: api/classes/CItemGeneral.php:348
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\", як правило виявлення."
 
-#: api/classes/CItemGeneral.php:355
+#: api/classes/CItemGeneral.php:354
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\", як елемент даних створений з прототипу елемента даних."
 
-#: api/classes/CItemGeneral.php:352
+#: api/classes/CItemGeneral.php:351
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\", як прототип елемента даних."
 
-#: api/classes/CItemGeneral.php:346
+#: api/classes/CItemGeneral.php:345
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\", як елемент даних."
 
-#: api/classes/CItemGeneral.php:358
+#: api/classes/CItemGeneral.php:357
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\", як невідомий елемент даних."
 
-#: api/classes/CItemGeneral.php:694
+#: api/classes/CItemGeneral.php:696
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\"."
@@ -6623,7 +6627,7 @@ msgstr "Зберігати динаміку змін (дні)"
 msgid "Key"
 msgstr "Ключ"
 
-#: api/classes/CItemGeneral.php:254
+#: api/classes/CItemGeneral.php:253
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не співпадає з <grpmax|grpmin|grpsum|grpavg>[\"Група вузлів мережі\", \"Ключ елемента даних\", \"<last|min|max|avg|sum|count>\", \"параметр\"]."
@@ -6922,13 +6926,13 @@ msgstr "Вхід в систему"
 msgid "Login as Guest"
 msgstr "Увійти як Гість"
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:975
 #, php-format
 msgid "Login failed [%s]"
 msgstr "Помилка при вході в систему [%s]"
 
-#: api/classes/CUser.php:858 api/classes/CUser.php:873
-#: api/classes/CUser.php:915
+#: api/classes/CUser.php:856 api/classes/CUser.php:871
+#: api/classes/CUser.php:913
 msgid "Login name or password is incorrect"
 msgstr "Ім'я для входу або пароль некоректні"
 
@@ -7232,7 +7236,7 @@ msgstr "Макс. кількість подій у тригера для від�
 msgid "Maximize"
 msgstr "Розгорнути"
 
-#: api/classes/CUser.php:427
+#: api/classes/CUser.php:425
 #, php-format
 msgid "Maximum alias length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -7755,7 +7759,7 @@ msgstr "Не вказано тип аутентифікації для кома�
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Не вказано імені користувача аутентифікації для команди \"%s\" в операції дії."
 
-#: api/classes/CItemGeneral.php:285
+#: api/classes/CItemGeneral.php:284
 msgid "No authentication user name specified."
 msgstr ""
 
@@ -7945,7 +7949,7 @@ msgstr "Картинок не визначено."
 msgid "No interface found"
 msgstr "Інтерфейсу не знайдено"
 
-#: api/classes/CItemGeneral.php:220
+#: api/classes/CItemGeneral.php:219
 msgid "No interface found."
 msgstr "Інтерфейсу не знайдено."
 
@@ -8029,8 +8033,8 @@ msgstr "Нод не визначено."
 msgid "No operations defined."
 msgstr "Операцій не визначено."
 
-#: include/classes/import/CConfigurationImport.php:815
-#: include/classes/import/CConfigurationImport.php:892
+#: include/classes/import/CConfigurationImport.php:816
+#: include/classes/import/CConfigurationImport.php:893
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr "Немає прав доступу до графіка \"%1$s\"."
@@ -8062,7 +8066,7 @@ msgstr "Немає прав доступу до карти мережі"
 msgid "No permissions for screen"
 msgstr "Немає прав доступу до комплексного екрану"
 
-#: api/classes/CUser.php:929 api/classes/CUser.php:1032
+#: api/classes/CUser.php:927 api/classes/CUser.php:1030
 msgid "No permissions for system access."
 msgstr "Немає прав доступу до системи."
 
@@ -8080,8 +8084,8 @@ msgstr "Немає прав доступу до системи."
 #: api/classes/CHost.php:1378 api/classes/CHost.php:1410
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
-#: api/classes/CItemGeneral.php:176 api/classes/CItemGeneral.php:200
-#: api/classes/CItem.php:1001 api/classes/CItemPrototype.php:695
+#: api/classes/CItemGeneral.php:175 api/classes/CItemGeneral.php:199
+#: api/classes/CItem.php:1002 api/classes/CItemPrototype.php:695
 #: api/classes/CMapElement.php:519 api/classes/CMapElement.php:575
 #: api/classes/CMap.php:585 api/classes/CProxy.php:324
 #: api/classes/CProxy.php:342 api/classes/CScreenItem.php:249
@@ -8103,7 +8107,7 @@ msgstr "Немає прав доступу до запитуваного об'є
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не вказано файл приватного ключа для команди \"%s\" в операції дії."
 
-#: api/classes/CItemGeneral.php:293
+#: api/classes/CItemGeneral.php:292
 msgid "No private key file specified."
 msgstr ""
 
@@ -8120,7 +8124,7 @@ msgstr "Без проксі"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Не вказано файл публічного ключа для команди \"%s\" в операції дії."
 
-#: api/classes/CItemGeneral.php:290
+#: api/classes/CItemGeneral.php:289
 msgid "No public key file specified."
 msgstr ""
 
@@ -8274,7 +8278,7 @@ msgid "Nodes"
 msgstr "Ноди"
 
 #: adm.other.php:79 include/hosts.inc.php:39 include/httptest.inc.php:27
-#: include/services.inc.php:305
+#: include/services.inc.php:307
 #: include/views/administration.general.gui.edit.php:25
 #: include/views/administration.general.other.edit.php:31
 #: include/views/configuration.item.edit.php:382
@@ -8304,7 +8308,7 @@ msgstr "Немає елементів даних з шаблону"
 msgid "Not all templates are linked to host \"%s\"."
 msgstr "Не всі шаблони приєднано до вузла мережі \"%s\"."
 
-#: api/classes/CUser.php:473
+#: api/classes/CUser.php:471
 msgid "Not allowed to set password for user \"guest\"."
 msgstr "Забороняється встановлювати пароль для користувача \"гість\"."
 
@@ -8427,7 +8431,7 @@ msgid "OEM"
 msgstr "OEM"
 
 #: chart4.php:169 chart5.php:193 httpdetails.php:146 httpdetails.php:211
-#: httpmon.php:272 include/classes/class.ctree.php:107
+#: httpmon.php:272 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:646 include/maps.inc.php:727 include/maps.inc.php:815
 #: include/maps.inc.php:903 include/setup.inc.php:201
 #: include/setup.inc.php:232 include/setup.inc.php:297
@@ -8568,15 +8572,15 @@ msgstr "Тільки Супер-Адміністратори можуть ред
 msgid "Only Super Admins can update user groups."
 msgstr "Тільки Супер-Адміністратори можуть редагувати групи користувачів."
 
-#: api/classes/CUser.php:701
+#: api/classes/CUser.php:699
 msgid "Only Zabbix Admins can add user Medias"
 msgstr "Тільки Zabbix-Адміністратори можуть додавати повідомлення користувача"
 
-#: api/classes/CUser.php:769
+#: api/classes/CUser.php:767
 msgid "Only Zabbix Admins can change user Medias"
 msgstr "Тільки Zabbix-Адміністратори можуть редагувати повідомлення користувача"
 
-#: api/classes/CUser.php:739
+#: api/classes/CUser.php:737
 msgid "Only Zabbix Admins can remove user Medias"
 msgstr "Тільки Zabbix-Адміністратори можуть видаляти повідомлення користувача"
 
@@ -8592,9 +8596,9 @@ msgstr "Підраховуються елементи даних тільки у
 msgid "Only one check can be unique."
 msgstr "Тільки одна перевірка може бути унікальною."
 
-#: include/services.inc.php:287
+#: include/services.inc.php:289
 #, php-format
-msgid "Only the last 20% of the indicator is displayed."
+msgid "Only the last 20%% of the indicator is displayed."
 msgstr ""
 
 #: include/blocks.inc.php:695
@@ -8690,7 +8694,7 @@ msgstr "Оператор"
 msgid "Original"
 msgstr "Оригінальне"
 
-#: include/classes/core/ZBase.php:122
+#: include/classes/core/ZBase.php:124
 msgid "Original blue"
 msgstr "Оригінальна блакитна"
 
@@ -9182,7 +9186,7 @@ msgstr "Файл приватного ключа"
 msgid "Privilege level"
 msgstr "Рівень привілеїв"
 
-#: api/classes/CUser.php:850
+#: api/classes/CUser.php:848
 msgid "Probably php-ldap module is missing"
 msgstr "Ймовірно модуль php-ldap відсутній"
 
@@ -9805,7 +9809,7 @@ msgstr ""
 msgid "SNMP trap"
 msgstr ""
 
-#: api/classes/CItemGeneral.php:262
+#: api/classes/CItemGeneral.php:261
 msgid "SNMP trap key is invalid."
 msgstr ""
 
@@ -10380,7 +10384,7 @@ msgstr "Послугу видалено"
 msgid "Service port"
 msgstr "Порт сервісу"
 
-#: include/services.inc.php:493
+#: include/services.inc.php:495
 msgid "Service start time must be less than end time."
 msgstr ""
 
@@ -10400,7 +10404,7 @@ msgstr "Послугу оновлено"
 msgid "Services"
 msgstr "Послуги"
 
-#: api/classes/CUser.php:1027
+#: api/classes/CUser.php:1025
 msgid "Session terminated, re-login, please."
 msgstr "Сесія завершилась, будь-ласка повторно увійдіть в систему."
 
@@ -11500,7 +11504,7 @@ msgstr "Вівторок"
 msgid "Two elements should be selected"
 msgstr "Має бути обрано два елементи"
 
-#: api/classes/CItem.php:1346
+#: api/classes/CItem.php:1337
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr ""
@@ -11556,7 +11560,7 @@ msgstr "Тип калькуляції"
 msgid "Type of information"
 msgstr "Тип інформації"
 
-#: api/classes/CItemGeneral.php:271
+#: api/classes/CItemGeneral.php:270
 msgid "Type of information must be Log for log key."
 msgstr "Тип інформації має бути Лог (багато полів) для ключа логів."
 
@@ -11697,7 +11701,7 @@ msgstr "Невідомо"
 msgid "Unknown action"
 msgstr "Невідома дія"
 
-#: include/services.inc.php:358
+#: include/services.inc.php:360
 msgid "Unknown calculation algorithm of service status"
 msgstr "Невідомий алгоритм розрахунку статусу послуги"
 
@@ -11861,7 +11865,7 @@ msgstr ""
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:956
+#: api/classes/CItem.php:958
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -11927,7 +11931,7 @@ msgstr "Використовується в діях"
 msgid "User"
 msgstr "Користувач"
 
-#: api/classes/CUser.php:438
+#: api/classes/CUser.php:436
 #, php-format
 msgid "User \"%s\" cannot be without user group."
 msgstr "Користувач \"%s\" не може існувати без групи користувачів."
@@ -11989,16 +11993,16 @@ msgstr ""
 msgid "User groups"
 msgstr "Групи користувачів"
 
-#: api/classes/CUserMedia.php:411 api/classes/CUser.php:401
+#: api/classes/CUserMedia.php:411 api/classes/CUser.php:399
 msgid "User is not allowed to delete himself."
 msgstr "Користувачу не дозволено видалити самого себе."
 
-#: api/classes/CUser.php:450
+#: api/classes/CUser.php:448
 #, php-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr "Користувач не може модифікувати доступ до GUI для самого себе шляхом введення в групу користувачів \"%s\"."
 
-#: api/classes/CUser.php:453
+#: api/classes/CUser.php:451
 #, php-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr "Користувач не може модифікувати системний статус для самого себе шляхом введення в групу користувачів \"%s\"."
@@ -12027,7 +12031,7 @@ msgstr "Тип користувача"
 msgid "User updated"
 msgstr "Дані користувача оновлено"
 
-#: api/classes/CUser.php:488
+#: api/classes/CUser.php:486
 #, php-format
 msgid "User with alias \"%s\" already exists."
 msgstr "Користувач з псевдонімом \"%s\" вже існує."
@@ -12152,7 +12156,7 @@ msgstr ""
 msgid "Value maps are used to create a mapping between numeric values and string representations."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:267
+#: api/classes/CItemGeneral.php:266
 msgid "Value type must be Float for aggregate items."
 msgstr "Тип інформації повинен бути Числовий (дробове) для агрегованих елементів даних."
 
@@ -12492,7 +12496,7 @@ msgstr ""
 msgid "Wrong fields for trigger."
 msgstr ""
 
-#: api/classes/CUser.php:371
+#: api/classes/CUser.php:369
 #, php-format
 msgid "Wrong fields for user \"%s\"."
 msgstr "Помилкові поля для користувача \"%s\"."
@@ -12616,7 +12620,7 @@ msgstr "Йота"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr "Ви не можете вибрати деякі з мов, тому що їх локалі не встановлено на веб-сервері."
 
-#: api/classes/CUser.php:459
+#: api/classes/CUser.php:457
 #, php-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Вам не дозволено змінювати привілеї користувача \"%s\"."
@@ -12692,19 +12696,19 @@ msgstr "У вас немає повноважень або метод повід
 msgid "You do not have permissions to create user medias."
 msgstr "У вас немає повноважень для створення методів повідомлень користувача."
 
-#: api/classes/CUser.php:377
+#: api/classes/CUser.php:375
 msgid "You do not have permissions to create users."
 msgstr "У вас немає повноважень для створення користувачів."
 
-#: api/classes/CUser.php:398
+#: api/classes/CUser.php:396
 msgid "You do not have permissions to delete user or user does not exist."
 msgstr "У вас немає повноважень для видалення користувача або користувач не існує."
 
-#: api/classes/CUser.php:395
+#: api/classes/CUser.php:393
 msgid "You do not have permissions to delete users."
 msgstr "У вас немає повноважень для видалення користувачів."
 
-#: api/classes/CUserMedia.php:398 api/classes/CUser.php:387
+#: api/classes/CUserMedia.php:398 api/classes/CUser.php:385
 msgid "You do not have permissions to update other users."
 msgstr "У вас немає повноважень для оновлення інших користувачів."
 
@@ -12716,7 +12720,7 @@ msgstr "У вас немає повноважень для оновлення м
 msgid "You do not have permissions to update user medias."
 msgstr "У вас немає повноважень для оновлення методів повідомлень користувача."
 
-#: api/classes/CUser.php:383
+#: api/classes/CUser.php:381
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "У вас немає повноважень для оновлення користувача або користувач не існує."
 
@@ -13210,7 +13214,7 @@ msgid "remember selected"
 msgstr "запам'ятати обране"
 
 #: include/services.inc.php:104 include/services.inc.php:107
-#: include/services.inc.php:189
+#: include/services.inc.php:190
 #: include/views/configuration.services.parent.list.php:41
 #: include/views/configuration.services.parent.list.php:42
 #: include/views/configuration.services.parent.list.php:43
