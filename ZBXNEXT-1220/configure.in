@@ -1449,7 +1449,6 @@ Configuration:
   Detected OS:           ${host_os}
   Install path:          ${prefix}
   Compilation arch:      ${ARCH}
-  Large file support:    ${largefile}
 
   Compiler:              ${CC}
   Compiler flags:        ${CFLAGS}
