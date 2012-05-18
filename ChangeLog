@@ -4,6 +4,8 @@ New features:
 ..F....... [ZBX-1357] updated Brazilian Portuguese, French, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+....I..... [ZBXNEXT-973] changed units to "bps" for monitoring of network traffic items (Sasha)
+....I..... [ZBXNEXT-973] changed colors in the "MySQL operations" graph (Sasha)
 ...G...PS. [ZBXNEXT-1220] fixed compilation errors on Solaris (dimir)
 
 --------------------------------------------------------------------------------
