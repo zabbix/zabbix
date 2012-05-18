@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-14 23:29+0300\n"
+"POT-Creation-Date: 2012-05-18 20:14+0300\n"
 "PO-Revision-Date: 2011-10-04 17:17+0200\n"
 "Last-Translator: Marcel <maco@blava.net>\n"
 "Language-Team: Zabbix translation team\n"
@@ -203,7 +203,7 @@ msgstr ""
 msgid "Access denied!"
 msgstr "Prístup zamietnutý!"
 
-#: api/classes/CUser.php:922
+#: api/classes/CUser.php:920
 #, php-format
 msgid "Account is blocked for %s seconds"
 msgstr "Konto je blokované na %s sekúnd."
@@ -588,7 +588,7 @@ msgstr "Chyba aplikácie."
 msgid "Application updated"
 msgstr "Aplikácia bola aktualizovaná"
 
-#: api/classes/CItemGeneral.php:309
+#: api/classes/CItemGeneral.php:308
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr ""
@@ -820,7 +820,7 @@ msgstr "Bind DN"
 msgid "Bind password"
 msgstr ""
 
-#: include/classes/core/ZBase.php:123
+#: include/classes/core/ZBase.php:125
 msgid "Black & Blue"
 msgstr "Čierna a modrá"
 
@@ -1315,7 +1315,7 @@ msgstr ""
 msgid "Cannot create new element"
 msgstr ""
 
-#: api/classes/CUserMedia.php:414 api/classes/CUser.php:404
+#: api/classes/CUserMedia.php:414 api/classes/CUser.php:402
 #, php-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr ""
@@ -1345,7 +1345,7 @@ msgstr "Cannot delete graph"
 msgid "Cannot delete graph prototype."
 msgstr ""
 
-#: api/classes/CItem.php:1040
+#: api/classes/CItem.php:1041
 msgid "Cannot delete graph."
 msgstr ""
 
@@ -1456,7 +1456,7 @@ msgstr "Nebolo možné vymazať šablónu"
 msgid "Cannot delete templated graphs."
 msgstr ""
 
-#: api/classes/CItem.php:1004
+#: api/classes/CItem.php:1005
 msgid "Cannot delete templated item."
 msgstr ""
 
@@ -1473,7 +1473,7 @@ msgstr ""
 msgid "Cannot delete trigger"
 msgstr "Cannot delete trigger"
 
-#: api/classes/CItem.php:1056
+#: api/classes/CItem.php:1057
 msgid "Cannot delete trigger."
 msgstr ""
 
@@ -1485,7 +1485,7 @@ msgstr "Cannot delete triggers"
 msgid "Cannot delete user"
 msgstr "Nie je možné vymazať užívateľa"
 
-#: api/classes/CUser.php:800
+#: api/classes/CUser.php:798
 msgid "Cannot delete user medias"
 msgstr ""
 
@@ -1681,7 +1681,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: include/classes/import/importers/CTemplateImporter.php:115
+#: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
@@ -1694,7 +1694,7 @@ msgstr[2] ""
 msgid "Cannot include view file \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:827
+#: api/classes/CUser.php:825
 msgid "Cannot insert user medias"
 msgstr ""
 
@@ -1702,7 +1702,7 @@ msgstr ""
 msgid "Cannot link template"
 msgstr "Cannot link template"
 
-#: api/classes/CUser.php:886
+#: api/classes/CUser.php:884
 msgid "Cannot logout."
 msgstr ""
 
@@ -1746,7 +1746,7 @@ msgstr ""
 msgid "Cannot remove macro."
 msgstr ""
 
-#: api/classes/CUser.php:413
+#: api/classes/CUser.php:411
 msgid "Cannot rename guest user"
 msgstr "Cannot rename guest user"
 
@@ -1943,7 +1943,7 @@ msgstr "Cannot update trigger"
 msgid "Cannot update user"
 msgstr "Cannot update user"
 
-#: api/classes/CUser.php:819
+#: api/classes/CUser.php:817
 msgid "Cannot update user medias"
 msgstr ""
 
@@ -2021,7 +2021,7 @@ msgstr ""
 msgid "Check expression part starting from \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:239
+#: api/classes/CItemGeneral.php:238
 msgid "Check the key, please. Default example was passed."
 msgstr ""
 
@@ -2065,9 +2065,13 @@ msgstr ""
 msgid "Circular reference in screens: %1$s."
 msgstr ""
 
-#: include/classes/import/importers/CTemplateImporter.php:140
+#: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
 msgid "Circular reference in templates: %1$s."
+msgstr ""
+
+#: include/classes/core/ZBase.php:123
+msgid "Classic"
 msgstr ""
 
 #: jsLoader.php:156
@@ -2446,7 +2450,7 @@ msgstr "Copy"
 msgid "Copy selected to ..."
 msgstr "Kopírovať označené do ..."
 
-#: api/classes/CUser.php:986
+#: api/classes/CUser.php:984
 #, php-format
 msgid "Correct login [%s]"
 msgstr ""
@@ -2589,7 +2593,7 @@ msgstr ""
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:904
+#: api/classes/CItem.php:907
 #, php-format
 msgid "Created: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -2784,7 +2788,7 @@ msgstr "DOWN"
 msgid "Daily"
 msgstr "Daily"
 
-#: include/classes/core/ZBase.php:124
+#: include/classes/core/ZBase.php:126
 msgid "Dark orange"
 msgstr "Dark orange"
 
@@ -3289,7 +3293,7 @@ msgstr ""
 msgid "Deleted: Host \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:1095
+#: api/classes/CItem.php:1096
 #, php-format
 msgid "Deleted: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -3762,7 +3766,7 @@ msgstr ""
 msgid "Duplicate severity name \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:420
+#: api/classes/CUser.php:418
 #, php-format
 msgid "Duplicate user alias \"%s\"."
 msgstr ""
@@ -3871,7 +3875,7 @@ msgstr ""
 #: api/classes/CGraphPrototype.php:966 api/classes/CHostGroup.php:653
 #: api/classes/CHostGroup.php:702 api/classes/CHostInterface.php:657
 #: api/classes/CHost.php:2181 api/classes/CIconMap.php:409
-#: api/classes/CItem.php:983 api/classes/CItemPrototype.php:678
+#: api/classes/CItem.php:985 api/classes/CItemPrototype.php:678
 #: api/classes/CProxy.php:500 api/classes/CService.php:342
 #: api/classes/CService.php:378 api/classes/CService.php:443
 #: api/classes/CService.php:515 api/classes/CTemplate.php:1113
@@ -4054,7 +4058,7 @@ msgstr ""
 msgid "Error description: empty response received."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:244
+#: api/classes/CItemGeneral.php:243
 #, php-format
 msgid "Error in item key: \"%s\"."
 msgstr ""
@@ -4712,7 +4716,7 @@ msgstr "Grid"
 msgid "Group"
 msgstr "Skupina"
 
-#: include/classes/import/importers/CTemplateImporter.php:234
+#: include/classes/import/importers/CTemplateImporter.php:233
 #, php-format
 msgid "Group \"%1$s\" does not exist."
 msgstr ""
@@ -5496,7 +5500,7 @@ msgstr "Immediately"
 msgid "Import"
 msgstr "Import"
 
-#: conf.import.php:136
+#: conf.import.php:135
 msgid "Import failed"
 msgstr ""
 
@@ -5504,7 +5508,7 @@ msgstr ""
 msgid "Import file"
 msgstr "Import súbor"
 
-#: conf.import.php:132
+#: conf.import.php:131
 msgid "Imported successfully"
 msgstr ""
 
@@ -5703,7 +5707,7 @@ msgstr ""
 msgid "Incorrect arguments passed to function"
 msgstr "Incorrect arguments passed to function"
 
-#: api/classes/CHostInterface.php:506 api/classes/CItemGeneral.php:171
+#: api/classes/CHostInterface.php:506 api/classes/CItemGeneral.php:170
 #: api/classes/CWebCheck.php:348
 msgid "Incorrect arguments passed to function."
 msgstr ""
@@ -6029,15 +6033,15 @@ msgstr ""
 msgid "Incorrect screen ID \"%s\" provided for screen element."
 msgstr ""
 
-#: include/services.inc.php:479 include/services.inc.php:488
+#: include/services.inc.php:481 include/services.inc.php:490
 msgid "Incorrect service end time."
 msgstr ""
 
-#: include/services.inc.php:476 include/services.inc.php:485
+#: include/services.inc.php:478 include/services.inc.php:487
 msgid "Incorrect service start time."
 msgstr ""
 
-#: include/services.inc.php:470
+#: include/services.inc.php:472
 msgid "Incorrect service time type."
 msgstr ""
 
@@ -6069,11 +6073,11 @@ msgstr ""
 msgid "Incorrect syntax near \"%1$s\"."
 msgstr ""
 
-#: api/classes/CUserMedia.php:421 api/classes/CUser.php:709 popup_media.php:65
+#: api/classes/CUserMedia.php:421 api/classes/CUser.php:707 popup_media.php:65
 msgid "Incorrect time period"
 msgstr "Incorrect time period"
 
-#: api/classes/CUser.php:807
+#: api/classes/CUser.php:805
 #, php-format
 msgid "Incorrect time period \"%1$s\"."
 msgstr ""
@@ -6332,11 +6336,11 @@ msgstr "Is online?"
 msgid "Issue"
 msgstr "Issue"
 
-#: api/classes/CUser.php:183
+#: api/classes/CUser.php:180
 msgid "It is not possible to filter by user password"
 msgstr ""
 
-#: api/classes/CUserMedia.php:216 api/classes/CUser.php:191
+#: api/classes/CUserMedia.php:216 api/classes/CUser.php:188
 msgid "It is not possible to search by user password"
 msgstr ""
 
@@ -6358,7 +6362,7 @@ msgstr "Item"
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
 
-#: api/classes/CItem.php:1282
+#: api/classes/CItem.php:1276
 #, php-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
 msgstr ""
@@ -6368,12 +6372,12 @@ msgstr ""
 msgid "Item \"%1$s\" does not exist."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:557
+#: include/classes/import/CConfigurationImport.php:558
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:301
+#: api/classes/CItemGeneral.php:300
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
@@ -6418,44 +6422,44 @@ msgstr ""
 msgid "Item updated"
 msgstr "Item updated"
 
-#: api/classes/CItemGeneral.php:223
+#: api/classes/CItemGeneral.php:222
 msgid "Item uses host interface from non-parent host."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:226
+#: api/classes/CItemGeneral.php:225
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:279
+#: api/classes/CItemGeneral.php:278
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Item will not be refreshed. Please enter a correct update interval."
 
-#: api/classes/CItemGeneral.php:349
+#: api/classes/CItemGeneral.php:348
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:355
+#: api/classes/CItemGeneral.php:354
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:352
+#: api/classes/CItemGeneral.php:351
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:346
+#: api/classes/CItemGeneral.php:345
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:358
+#: api/classes/CItemGeneral.php:357
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:694
+#: api/classes/CItemGeneral.php:696
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
@@ -6621,7 +6625,7 @@ msgstr "Keep trends (in days)"
 msgid "Key"
 msgstr "Key"
 
-#: api/classes/CItemGeneral.php:254
+#: api/classes/CItemGeneral.php:253
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr ""
@@ -6920,13 +6924,13 @@ msgstr "Login"
 msgid "Login as Guest"
 msgstr ""
 
-#: api/classes/CUser.php:977
+#: api/classes/CUser.php:975
 #, php-format
 msgid "Login failed [%s]"
 msgstr ""
 
-#: api/classes/CUser.php:858 api/classes/CUser.php:873
-#: api/classes/CUser.php:915
+#: api/classes/CUser.php:856 api/classes/CUser.php:871
+#: api/classes/CUser.php:913
 msgid "Login name or password is incorrect"
 msgstr "Login name or password is incorrect"
 
@@ -7230,7 +7234,7 @@ msgstr "Max count of events per trigger to show"
 msgid "Maximize"
 msgstr "Maximize"
 
-#: api/classes/CUser.php:427
+#: api/classes/CUser.php:425
 #, php-format
 msgid "Maximum alias length is %2$d characters, \"%3$s\" is %1$d character."
 msgid_plural "Maximum alias length is %2$d characters, \"%3$s\" is %1$d characters."
@@ -7753,7 +7757,7 @@ msgstr ""
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:285
+#: api/classes/CItemGeneral.php:284
 msgid "No authentication user name specified."
 msgstr ""
 
@@ -7943,7 +7947,7 @@ msgstr ""
 msgid "No interface found"
 msgstr ""
 
-#: api/classes/CItemGeneral.php:220
+#: api/classes/CItemGeneral.php:219
 msgid "No interface found."
 msgstr ""
 
@@ -8027,8 +8031,8 @@ msgstr ""
 msgid "No operations defined."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:815
-#: include/classes/import/CConfigurationImport.php:892
+#: include/classes/import/CConfigurationImport.php:816
+#: include/classes/import/CConfigurationImport.php:893
 #, php-format
 msgid "No permission for Graph \"%1$s\"."
 msgstr ""
@@ -8060,7 +8064,7 @@ msgstr "No permissions for map"
 msgid "No permissions for screen"
 msgstr "No permissions for screen"
 
-#: api/classes/CUser.php:929 api/classes/CUser.php:1032
+#: api/classes/CUser.php:927 api/classes/CUser.php:1030
 msgid "No permissions for system access."
 msgstr ""
 
@@ -8078,8 +8082,8 @@ msgstr ""
 #: api/classes/CHost.php:1378 api/classes/CHost.php:1410
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:400 api/classes/CImage.php:506
-#: api/classes/CItemGeneral.php:176 api/classes/CItemGeneral.php:200
-#: api/classes/CItem.php:1001 api/classes/CItemPrototype.php:695
+#: api/classes/CItemGeneral.php:175 api/classes/CItemGeneral.php:199
+#: api/classes/CItem.php:1002 api/classes/CItemPrototype.php:695
 #: api/classes/CMapElement.php:519 api/classes/CMapElement.php:575
 #: api/classes/CMap.php:585 api/classes/CProxy.php:324
 #: api/classes/CProxy.php:342 api/classes/CScreenItem.php:249
@@ -8101,7 +8105,7 @@ msgstr ""
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:293
+#: api/classes/CItemGeneral.php:292
 msgid "No private key file specified."
 msgstr ""
 
@@ -8118,7 +8122,7 @@ msgstr ""
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:290
+#: api/classes/CItemGeneral.php:289
 msgid "No public key file specified."
 msgstr ""
 
@@ -8272,7 +8276,7 @@ msgid "Nodes"
 msgstr "Nodes"
 
 #: adm.other.php:79 include/hosts.inc.php:39 include/httptest.inc.php:27
-#: include/services.inc.php:305
+#: include/services.inc.php:307
 #: include/views/administration.general.gui.edit.php:25
 #: include/views/administration.general.other.edit.php:31
 #: include/views/configuration.item.edit.php:382
@@ -8303,7 +8307,7 @@ msgstr "Not Templated items"
 msgid "Not all templates are linked to host \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:473
+#: api/classes/CUser.php:471
 msgid "Not allowed to set password for user \"guest\"."
 msgstr ""
 
@@ -8426,7 +8430,7 @@ msgid "OEM"
 msgstr "OEM"
 
 #: chart4.php:169 chart5.php:193 httpdetails.php:146 httpdetails.php:211
-#: httpmon.php:272 include/classes/class.ctree.php:107
+#: httpmon.php:272 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:646 include/maps.inc.php:727 include/maps.inc.php:815
 #: include/maps.inc.php:903 include/setup.inc.php:201
 #: include/setup.inc.php:232 include/setup.inc.php:297
@@ -8568,15 +8572,15 @@ msgstr ""
 msgid "Only Super Admins can update user groups."
 msgstr ""
 
-#: api/classes/CUser.php:701
+#: api/classes/CUser.php:699
 msgid "Only Zabbix Admins can add user Medias"
 msgstr "Only Zabbix Admins can add user Medias"
 
-#: api/classes/CUser.php:769
+#: api/classes/CUser.php:767
 msgid "Only Zabbix Admins can change user Medias"
 msgstr "Only Zabbix Admins can change user Medias"
 
-#: api/classes/CUser.php:739
+#: api/classes/CUser.php:737
 msgid "Only Zabbix Admins can remove user Medias"
 msgstr "Only Zabbix Admins can remove user Medias"
 
@@ -8592,9 +8596,9 @@ msgstr "Only items assigned to enabled hosts are counted"
 msgid "Only one check can be unique."
 msgstr ""
 
-#: include/services.inc.php:287
+#: include/services.inc.php:289
 #, php-format
-msgid "Only the last 20% of the indicator is displayed."
+msgid "Only the last 20%% of the indicator is displayed."
 msgstr ""
 
 #: include/blocks.inc.php:695
@@ -8690,7 +8694,7 @@ msgstr "Operátor"
 msgid "Original"
 msgstr "Original"
 
-#: include/classes/core/ZBase.php:122
+#: include/classes/core/ZBase.php:124
 msgid "Original blue"
 msgstr "Original blue"
 
@@ -9182,7 +9186,7 @@ msgstr "Private key file"
 msgid "Privilege level"
 msgstr ""
 
-#: api/classes/CUser.php:850
+#: api/classes/CUser.php:848
 msgid "Probably php-ldap module is missing"
 msgstr "Probably php-ldap module is missing"
 
@@ -9805,7 +9809,7 @@ msgstr ""
 msgid "SNMP trap"
 msgstr ""
 
-#: api/classes/CItemGeneral.php:262
+#: api/classes/CItemGeneral.php:261
 msgid "SNMP trap key is invalid."
 msgstr ""
 
@@ -10380,7 +10384,7 @@ msgstr "Service deleted"
 msgid "Service port"
 msgstr "Port služby"
 
-#: include/services.inc.php:493
+#: include/services.inc.php:495
 msgid "Service start time must be less than end time."
 msgstr ""
 
@@ -10400,7 +10404,7 @@ msgstr "Service updated"
 msgid "Services"
 msgstr "Služby"
 
-#: api/classes/CUser.php:1027
+#: api/classes/CUser.php:1025
 msgid "Session terminated, re-login, please."
 msgstr ""
 
@@ -11501,7 +11505,7 @@ msgstr "Utorok"
 msgid "Two elements should be selected"
 msgstr "Two elements should be selected"
 
-#: api/classes/CItem.php:1346
+#: api/classes/CItem.php:1337
 #, php-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
 msgstr ""
@@ -11557,7 +11561,7 @@ msgstr "Type of calculation"
 msgid "Type of information"
 msgstr "Type of information"
 
-#: api/classes/CItemGeneral.php:271
+#: api/classes/CItemGeneral.php:270
 msgid "Type of information must be Log for log key."
 msgstr ""
 
@@ -11698,7 +11702,7 @@ msgstr "Neznáme"
 msgid "Unknown action"
 msgstr "Unknown action"
 
-#: include/services.inc.php:358
+#: include/services.inc.php:360
 msgid "Unknown calculation algorithm of service status"
 msgstr "Unknown calculation algorithm of service status"
 
@@ -11862,7 +11866,7 @@ msgstr ""
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItem.php:956
+#: api/classes/CItem.php:958
 #, php-format
 msgid "Updated: Item \"%1$s\" on \"%2$s\"."
 msgstr ""
@@ -11929,7 +11933,7 @@ msgstr ""
 msgid "User"
 msgstr "Užívateľ"
 
-#: api/classes/CUser.php:438
+#: api/classes/CUser.php:436
 #, php-format
 msgid "User \"%s\" cannot be without user group."
 msgstr ""
@@ -11991,16 +11995,16 @@ msgstr ""
 msgid "User groups"
 msgstr "User groups"
 
-#: api/classes/CUserMedia.php:411 api/classes/CUser.php:401
+#: api/classes/CUserMedia.php:411 api/classes/CUser.php:399
 msgid "User is not allowed to delete himself."
 msgstr ""
 
-#: api/classes/CUser.php:450
+#: api/classes/CUser.php:448
 #, php-format
 msgid "User may not modify GUI access for himself by becoming a member of user group \"%s\"."
 msgstr ""
 
-#: api/classes/CUser.php:453
+#: api/classes/CUser.php:451
 #, php-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
 msgstr ""
@@ -12029,7 +12033,7 @@ msgstr "Typ užívateľa"
 msgid "User updated"
 msgstr "User updated"
 
-#: api/classes/CUser.php:488
+#: api/classes/CUser.php:486
 #, php-format
 msgid "User with alias \"%s\" already exists."
 msgstr ""
@@ -12154,7 +12158,7 @@ msgstr ""
 msgid "Value maps are used to create a mapping between numeric values and string representations."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:267
+#: api/classes/CItemGeneral.php:266
 msgid "Value type must be Float for aggregate items."
 msgstr ""
 
@@ -12494,7 +12498,7 @@ msgstr ""
 msgid "Wrong fields for trigger."
 msgstr ""
 
-#: api/classes/CUser.php:371
+#: api/classes/CUser.php:369
 #, php-format
 msgid "Wrong fields for user \"%s\"."
 msgstr ""
@@ -12618,7 +12622,7 @@ msgstr "Yotta"
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
 msgstr ""
 
-#: api/classes/CUser.php:459
+#: api/classes/CUser.php:457
 #, php-format
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr ""
@@ -12694,19 +12698,19 @@ msgstr ""
 msgid "You do not have permissions to create user medias."
 msgstr ""
 
-#: api/classes/CUser.php:377
+#: api/classes/CUser.php:375
 msgid "You do not have permissions to create users."
 msgstr ""
 
-#: api/classes/CUser.php:398
+#: api/classes/CUser.php:396
 msgid "You do not have permissions to delete user or user does not exist."
 msgstr ""
 
-#: api/classes/CUser.php:395
+#: api/classes/CUser.php:393
 msgid "You do not have permissions to delete users."
 msgstr ""
 
-#: api/classes/CUserMedia.php:398 api/classes/CUser.php:387
+#: api/classes/CUserMedia.php:398 api/classes/CUser.php:385
 msgid "You do not have permissions to update other users."
 msgstr ""
 
@@ -12718,7 +12722,7 @@ msgstr ""
 msgid "You do not have permissions to update user medias."
 msgstr ""
 
-#: api/classes/CUser.php:383
+#: api/classes/CUser.php:381
 msgid "You do not have permissions to update user or user does not exist."
 msgstr ""
 
@@ -13214,7 +13218,7 @@ msgid "remember selected"
 msgstr ""
 
 #: include/services.inc.php:104 include/services.inc.php:107
-#: include/services.inc.php:189
+#: include/services.inc.php:190
 #: include/views/configuration.services.parent.list.php:41
 #: include/views/configuration.services.parent.list.php:42
 #: include/views/configuration.services.parent.list.php:43
