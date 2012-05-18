@@ -117,7 +117,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_MEMORY_LIMIT),
 			'result' => str2mem($current) >= self::MIN_PHP_MEMORY_LIMIT,
-			'error' => _s('Minimum PHP memory limit is %s (configuration parameter "memory_limit")', mem2str(self::MIN_PHP_MEMORY_LIMIT))
+			'error' => _s('Minimum required PHP memory limit is %s (configuration option "memory_limit")', mem2str(self::MIN_PHP_MEMORY_LIMIT))
 		);
 
 		return $result;
@@ -136,7 +136,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_POST_MAX_SIZE),
 			'result' => str2mem($current) >= self::MIN_PHP_POST_MAX_SIZE,
-			'error' => _s('Minimum size of PHP post is %s (configuration parameter "post_max_size")', mem2str(self::MIN_PHP_POST_MAX_SIZE))
+			'error' => _s('Minimum required size of PHP post is %s (configuration option "post_max_size")', mem2str(self::MIN_PHP_POST_MAX_SIZE))
 		);
 
 		return $result;
@@ -155,7 +155,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE),
 			'result' => str2mem($current) >= self::MIN_PHP_UPLOAD_MAX_FILESIZE,
-			'error' => _s('Minimum for PHP upload filesize is %s (configuration parameter "upload_max_filesize")', mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE))
+			'error' => _s('Minimum required PHP upload filesize is %s (configuration option "upload_max_filesize")', mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE))
 		);
 
 		return $result;
@@ -174,7 +174,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_EXECUTION_TIME,
 			'result' => $current >= self::MIN_PHP_MAX_EXECUTION_TIME,
-			'error' => _s('Minimum limit on execution time of PHP scripts is %s (configuration parameter "max_execution_time")', self::MIN_PHP_MAX_EXECUTION_TIME)
+			'error' => _s('Minimum required limit on execution time of PHP scripts is %s (configuration option "max_execution_time")', self::MIN_PHP_MAX_EXECUTION_TIME)
 		);
 
 		return $result;
@@ -193,7 +193,7 @@ class FrontendSetup {
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_INPUT_TIME,
 			'result' => $current >= self::MIN_PHP_MAX_INPUT_TIME,
-			'error' => _s('Minimum limit on input parse time for PHP scripts is %s (configuration parameter "max_input_time")', self::MIN_PHP_MAX_INPUT_TIME)
+			'error' => _s('Minimum required limit on input parse time for PHP scripts is %s (configuration option "max_input_time")', self::MIN_PHP_MAX_INPUT_TIME)
 		);
 
 		return $result;
