@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-18 20:14+0300\n"
-"PO-Revision-Date: 2012-05-14 03:36+0200\n"
+"POT-Creation-Date: 2012-05-18 20:30+0300\n"
+"PO-Revision-Date: 2012-05-15 23:07+0200\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -195,7 +195,7 @@ msgstr "ЗВІТ ПРО ДОСТУПНІСТЬ"
 
 #: report3.php:86 srv_status.php:162
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "Допустимий рівень SLA"
 
 #: sysmap.php:85
 msgid "Access denied!"
@@ -329,7 +329,7 @@ msgstr "Активний"
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Активний"
 
 #: api/classes/CMaintenance.php:508 api/classes/CMaintenance.php:621
 #: include/views/configuration.maintenance.edit.php:58 maintenance.php:116
@@ -612,7 +612,7 @@ msgstr "Задіяти"
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "Наближається"
 
 #: include/func.inc.php:221
 msgid "Apr"
@@ -712,7 +712,7 @@ msgstr "Метод аутентифікації"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Метод аутентифікації змінено на HTTP"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
@@ -777,7 +777,7 @@ msgstr "Розміщення вісі X"
 #: include/func.inc.php:387
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "Б"
 
 #: include/page_header.php:220
 msgid "BACK"
@@ -1222,15 +1222,15 @@ msgstr "Не вдалося додати перетворення значенн
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "Не вдалося змінити метод аутентифікації на HTTP"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Не вдалося змінити метод аутентифікації на LDAP"
 
 #: authentication.php:86
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Не вдалося змінити метод аутентифікації на внутрішній Zabbix"
 
 #: api/classes/CTemplateScreen.php:591
 #, php-format
@@ -1497,7 +1497,7 @@ msgstr "Не вдалося активувати метод повідомлен
 #: include/classes/import/CXmlImport18.php:668
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти фонове зображення \"%1$s\" використовуване в експорті карти мережі \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
@@ -1508,7 +1508,7 @@ msgstr "Не вдалося видалити фонове зображення �
 #: include/classes/import/CXmlImport18.php:1627
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти графік \"%1$s\" використовуваний в експорті комплексного екрану \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
@@ -1528,12 +1528,12 @@ msgstr "Не вдалося знайти групу \"%1$s\" використо�
 #: include/classes/import/CXmlImport18.php:720
 #, php-format
 msgid "Cannot find host \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти вузел мережі \"%1$s\" використовуваний в експорті карти мережі \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:476
 #, php-format
 msgid "Cannot find host \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти вузел мережі \"%1$s\" використовуваний в експорті комплексного екрану \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:216
 #, php-format
@@ -1559,12 +1559,12 @@ msgstr "Не вдалося знайти інтерфейс у вузла мер
 #: include/classes/import/CXmlImport18.php:709
 #, php-format
 msgid "Cannot find hostgroup \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти групу вузлів мережі \"%1$s\" використовувану в експорті карти мережі \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:464
 #, php-format
 msgid "Cannot find hostgroup \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти групу вузлів мережі \"%1$s\" використовувану в експорті комплексного екрану \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:245
 #, php-format
@@ -1584,13 +1584,13 @@ msgstr "Не вдалося знайти призначення іконок \"%
 #: include/classes/import/CXmlImport18.php:748
 #, php-format
 msgid "Cannot find image \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти картинку \"%1$s\" використовувану в експорті карти мережі \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:500
 #: include/classes/import/CXmlImport18.php:1640
 #, php-format
 msgid "Cannot find item \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти елемент даних \"%1$s\" використовуваний в експорті комплексного екрану \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
@@ -1600,12 +1600,12 @@ msgstr "Не вдалося знайти елемент даних \"%1$s\" ви
 #: include/classes/import/CXmlImport18.php:698
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти карту мережі \"%1$s\" використовувану в експорті карти мережі \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:511
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти карту мережі \"%1$s\" використовувану в експорті комплексного екрану \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:200
 #, php-format
@@ -1624,7 +1624,7 @@ msgstr "Не вдалося знайти об'єкти з іменем"
 #: include/classes/import/CXmlImport18.php:522
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти комплексний екран \"%1$s\" використовуваний в експорті комплексного екрану \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
@@ -1640,7 +1640,7 @@ msgstr "Не вдалося знайти тригер \"%1$s\" для карти
 #: include/classes/import/CXmlImport18.php:767
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Не вдалося знайти тригер \"%1$s\" використовуваний в експорті карти мережі \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:225
 #, php-format
@@ -1980,7 +1980,7 @@ msgstr "Змінити"
 #: latest.php:200
 msgctxt "noun in latest data"
 msgid "Change"
-msgstr ""
+msgstr "Зміна"
 
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
@@ -2747,7 +2747,7 @@ msgstr "D"
 
 #: include/defines.inc.php:896
 msgid "D, d M Y H:i:s O"
-msgstr ""
+msgstr "D, d M Y H:i:s O"
 
 #: dashconf.php:110
 msgid "DASHBOARD CONFIGURATION"
@@ -3267,7 +3267,7 @@ msgstr "Видалити шаблон?"
 
 #: jsLoader.php:176
 msgid "Delete the selected service?"
-msgstr ""
+msgstr "Видалити вибрану послугу?"
 
 #: include/views/configuration.triggers.edit.php:350
 msgid "Delete trigger?"
@@ -3686,12 +3686,12 @@ msgstr "Лінія з крапок"
 #: include/blocks.inc.php:1010
 msgctxt "discovery results in dashboard"
 msgid "Down"
-msgstr ""
+msgstr "Недоступно"
 
 #: include/discovery.inc.php:150
 msgctxt "discovery status"
 msgid "Down"
-msgstr ""
+msgstr "Недоступний"
 
 #: api/classes/CWebCheck.php:512
 #, php-format
@@ -3790,7 +3790,7 @@ msgstr "Динамічний елемент"
 #: include/func.inc.php:553
 msgctxt "Exa short"
 msgid "E"
-msgstr ""
+msgstr "Е"
 
 #: include/config.inc.php:320
 msgid "ERROR"
@@ -4188,7 +4188,7 @@ msgstr "Очікувався JSON-rpc версії 2.0, а отримано \"%s
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
 msgid "Expired"
-msgstr ""
+msgstr "Завершено"
 
 #: include/graphs.inc.php:28 popup.php:1366
 msgid "Exploded"
@@ -4252,7 +4252,7 @@ msgstr "Ez Texting"
 #: jsLoader.php:122
 msgctxt "Friday short"
 msgid "F"
-msgstr ""
+msgstr "Пт"
 
 #: include/forms.inc.php:1787 include/forms.inc.php:1807
 msgid "FALSE"
@@ -4373,7 +4373,7 @@ msgstr "Перший"
 #: include/func.inc.php:1531
 msgctxt "page navigation"
 msgid "First"
-msgstr ""
+msgstr "Перша"
 
 #: include/views/js/configuration.sysmaps.js.php:41
 msgid "Fit to map"
@@ -4463,7 +4463,7 @@ msgstr "Функція підтримує \"%1$s\" параметри."
 #: include/func.inc.php:550
 msgctxt "Giga short"
 msgid "G"
-msgstr ""
+msgstr "Г"
 
 #: include/views/administration.mediatypes.edit.php:60
 #: include/views/administration.mediatypes.list.php:57
@@ -5303,7 +5303,7 @@ msgstr "IT послуга"
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
-msgstr ""
+msgstr "Залежності послуги ІТ"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT service parent"

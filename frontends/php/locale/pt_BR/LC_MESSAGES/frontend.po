@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-18 20:14+0300\n"
-"PO-Revision-Date: 2012-05-10 22:52+0200\n"
-"Last-Translator: jrprado <jrpradojunior@gmail.com>\n"
+"POT-Creation-Date: 2012-05-18 20:30+0300\n"
+"PO-Revision-Date: 2012-05-18 19:39+0200\n"
+"Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -189,7 +189,7 @@ msgstr "RELATÓRIO DE DISPONIBILIDADE"
 
 #: report3.php:86 srv_status.php:162
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "SLA Aceitável"
 
 #: sysmap.php:85
 msgid "Access denied!"
@@ -323,7 +323,7 @@ msgstr "Ativo"
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "Ativo"
 
 #: api/classes/CMaintenance.php:508 api/classes/CMaintenance.php:621
 #: include/views/configuration.maintenance.edit.php:58 maintenance.php:116
@@ -707,7 +707,7 @@ msgstr "Método de autenticação"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "Método de autenticação alterado para HTTP"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
@@ -1148,7 +1148,7 @@ msgstr "Não é possível adicionar o tipo de mídia"
 #: api/classes/CGraph.php:1074 api/classes/CGraphPrototype.php:1068
 #, php-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Não é possível adicionar mais de um item do tipo \"Graph sum\" no gráfico \"%1$s\"."
 
 #: sysmaps.php:165
 msgid "Cannot add network map"
@@ -1217,15 +1217,15 @@ msgstr "Mapeamento de valor não foi incluído"
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "Não é possível alterar o método de autenticação para HTTP"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "Não é possível alterar o método de autenticação para LDAP"
 
 #: authentication.php:86
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "Não é possível alterar o método de autenticação para interno Zabbix"
 
 #: api/classes/CTemplateScreen.php:591
 #, php-format
@@ -1318,7 +1318,7 @@ msgstr "Aplicação não foi removida"
 
 #: api/classes/CTrigger.php:1723
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "Não é possível deletar dependência"
 
 #: api/classes/CDiscoveryRule.php:624 discoveryconf.php:135
 #: host_discovery.php:166 host_discovery.php:250
@@ -1412,7 +1412,7 @@ msgstr "Não foi possível remover script"
 
 #: api/classes/CScript.php:408
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr ""
+msgstr "Não é possível deletar scripts. Parâmetro \"scriptids\" vazio."
 
 #: api/classes/CScript.php:432
 #, php-format
@@ -1446,16 +1446,16 @@ msgstr ""
 
 #: api/classes/CItem.php:1005
 msgid "Cannot delete templated item."
-msgstr ""
+msgstr "Não é possível deletar item do template."
 
 #: api/classes/CDiscoveryRule.php:583
 msgid "Cannot delete templated items."
-msgstr ""
+msgstr "Não é possível deletar itens do template."
 
 #: api/classes/CTrigger.php:1308 api/classes/CTriggerPrototype.php:1194
 #, php-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr ""
+msgstr "Não é possível deletar a trigger \"%1$s:%2$s\" do template."
 
 #: trigger_prototypes.php:178 triggers.php:169
 msgid "Cannot delete trigger"
@@ -1475,7 +1475,7 @@ msgstr "Usuário não foi removido"
 
 #: api/classes/CUser.php:798
 msgid "Cannot delete user medias"
-msgstr ""
+msgstr "Não foi possível deletar medias do usuário."
 
 #: adm.valuemapping.php:78
 msgid "Cannot delete value map"
@@ -1483,27 +1483,27 @@ msgstr "Mapeamento não foi removido"
 
 #: media_types.php:136
 msgid "Cannot disable media type"
-msgstr ""
+msgstr "Não foi possível desabilitar o tipo de media."
 
 #: media_types.php:120
 msgid "Cannot enable media type"
-msgstr ""
+msgstr "Não foi possível habilitar o tipo de media"
 
 #: include/classes/import/CXmlImport18.php:668
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar a imagem de fundo \"%1$s\" utilizada no mapa exportado \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
 msgid "Cannot find background image for map \"%1$s."
-msgstr ""
+msgstr "Não foi possível encontrar a imagem de fundo para o mapa \"%1$s."
 
 #: include/classes/import/CXmlImport18.php:487
 #: include/classes/import/CXmlImport18.php:1627
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar o gráfico \"%1$s\" usado na tela exportada \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
