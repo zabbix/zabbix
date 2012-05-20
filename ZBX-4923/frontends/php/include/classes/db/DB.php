@@ -440,7 +440,7 @@ class DB {
 					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
 				}
 				$values = zbx_toArray($values);
-				sort($values);
+				sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
 
 				$sqlWhere[] = DBcondition($field, $values);
 			}
@@ -521,7 +521,7 @@ class DB {
 				self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
 			}
 			$values = zbx_toArray($values);
-			sort($values);
+			sort($values); // sorting ids to prevent deadlocks when two transactions depends from each other
 
 			$sqlWhere[] = DBcondition($field, $values);
 		}
