@@ -1127,7 +1127,7 @@ function zbx_array_merge() {
 }
 
 function uint_in_array($needle, $haystack) {
-	foreach ($haystack as $id => $value) {
+	foreach ($haystack as $value) {
 		if (bccomp($needle, $value) == 0) {
 			return true;
 		}
