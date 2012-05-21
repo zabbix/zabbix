@@ -72,7 +72,6 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 .classic .ui-state-active, .classic .ui-widget-content .ui-state-active, .classic .ui-widget-header .ui-state-active {
 	background: #2C487A; color: #DDD;
 }
-.classic .ui-button.ui-state-active .ui-button-text { color: #DDD; }
 
 table.tableinfo tr.vertical_header td { background-color: #CCC; }
 
