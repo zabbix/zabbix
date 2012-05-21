@@ -558,6 +558,22 @@ class CZBXAPI {
 	}
 
 	/**
+	 * An extendObjects() wrapper for singular objects.
+	 *
+	 * @see extendObjects()
+	 *
+	 * @param $tableName
+	 * @param array $object
+	 * @param array $fields
+	 *
+	 * @return mixed
+	 */
+	protected function extendObject($tableName, array $object, array $fields) {
+		$objects = $this->extendObjects($tableName, array($object), $fields);
+		return reset($objects);
+	}
+
+	/**
 	 * Checks if the object has any fields, that are not defined in the schema or in $additionalFields.
 	 *
 	 * @param $tableName

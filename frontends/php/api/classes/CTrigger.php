@@ -1300,7 +1300,6 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($update) {
 				$dbTrigger = $dbTriggers[$trigger['triggerid']];
-				$currentTrigger['description'] = $dbTrigger['description'];
 			}
 			elseif ($delete) {
 				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
