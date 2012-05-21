@@ -200,7 +200,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 </script>
 </head>
 <body class="<?php echo $css; ?>">
-	<div id="message-global"><?php echo _('Zabbix server is not running!'); ?></div>
+	<div id="message-global"><?php echo _('Zabbix server is, probably, not running!'); ?></div>
 <?php
 }
 
