@@ -113,7 +113,7 @@ function DBsave_tables($topTable) {
 			break;
 		default:
 			DBexecute("drop table if exists ${table}_tmp");
-			DBexecute("select * into temp table ${table}_tmp from $table");
+			DBexecute("select * into table ${table}_tmp from $table");
 		}
 	}
 }
@@ -127,6 +127,13 @@ function DBrestore_tables($topTable) {
 
 	$tables = array();
 
+	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		$result = DBselect('select @@unique_checks,@@foreign_key_checks');
+		$row = DBfetch($result);
+		DBexecute('set unique_checks=0');
+		DBexecute('set foreign_key_checks=0');
+	}
+
 	DBget_tables($tables, $topTable);
 
 	$tablesReversed = array_reverse($tables);
@@ -138,6 +145,11 @@ function DBrestore_tables($topTable) {
 	foreach ($tables as $table) {
 		DBexecute("insert into $table select * from ${table}_tmp");
 		DBexecute("drop table ${table}_tmp");
+	}
+
+	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		DBexecute('set foreign_key_checks='.$row['@@foreign_key_checks']);
+		DBexecute('set unique_checks='.$row['@@unique_checks']);
 	}
 }
 

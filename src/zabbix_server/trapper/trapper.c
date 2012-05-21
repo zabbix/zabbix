@@ -203,7 +203,7 @@ static void	recv_proxy_heartbeat(zbx_sock_t *sock, struct zbx_json_parse *jp)
 static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 {
 	char	*pl, *pr, *data, value_dec[MAX_BUFFER_LEN];
-	char	lastlogsize[11], timestamp[11], source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
+	char	lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11], source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11];
 	int	sender_nodeid, nodeid;
 	char	*answer;
 
@@ -355,7 +355,8 @@ static int	process_trap(zbx_sock_t	*sock, char *s, int max_len)
 					source, sizeof(source),	severity, sizeof(severity));
 
 			av.value	= value_dec;
-			av.lastlogsize	= atoi(lastlogsize);
+			if (SUCCEED != is_uint64(lastlogsize, &av.lastlogsize))
+				av.lastlogsize = 0;
 			av.timestamp	= atoi(timestamp);
 			av.source	= source;
 			av.severity	= atoi(severity);

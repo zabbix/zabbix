@@ -39,7 +39,7 @@ class testPageEvents extends CWebTest {
 		$this->ok('Displaying');
 		// table header
 		if (0 == DBcount('select * from events where value_changed=1 and source='.EVENT_SOURCE_TRIGGERS)) {
-			$this->ok('No events found');
+			$this->ok('No events defined.');
 		}
 		else {
 			$this->ok(array('Time', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
@@ -58,7 +58,7 @@ class testPageEvents extends CWebTest {
 		$this->ok('Displaying');
 		// table header
 		if (0 == DBcount('select * from events where source='.EVENT_SOURCE_DISCOVERY)) {
-			$this->ok('No events found');
+			$this->ok('No events defined.');
 		}
 		else {
 			$this->ok(array('Time','IP','DNS','Description','Status'));
