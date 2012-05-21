@@ -113,7 +113,7 @@ function DBsave_tables($topTable) {
 			break;
 		default:
 			DBexecute("drop table if exists ${table}_tmp");
-			DBexecute("select * into temp table ${table}_tmp from $table");
+			DBexecute("select * into table ${table}_tmp from $table");
 		}
 	}
 }
