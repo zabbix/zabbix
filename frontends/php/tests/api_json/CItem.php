@@ -43,37 +43,41 @@ class API_JSON_Item extends CZabbixTest {
 		return $data;
 	}
 
+	public function testCItem_backup() {
+		DBsave_tables('items');
+	}
+
 	/**
 	 * @dataProvider inventory_links
 	 */
 	public function testCItem_create_inventory_item($inventoryFieldNr, $successExpected) {
-		DBsave_tables('items');
-
 		$debug = null;
 
 		// creating item
 		$result = $this->api_acall(
 			'item.create',
 			array(
-				"name" => "Item that populates field ".$inventoryFieldNr,
-				"key_" => "key.test.pop.".$inventoryFieldNr,
-				"hostid" => "10017",
-				"type" => "0",
-				'value_type' => '3',
-				'delay' => '30',
-				"interfaceid" => "10017",
-				"inventory_link" => $inventoryFieldNr
+				'name' => 'Item that populates field '.$inventoryFieldNr,
+				'key_' => 'key.test.pop.'.$inventoryFieldNr,
+				'hostid' => 10053,
+				'type' => 0,
+				'value_type' => 3,
+				'delay' => 30,
+				'interfaceid' => 10021,
+				'inventory_link' => $inventoryFieldNr
 			),
 			$debug
 		);
 
 		if ($successExpected) {
-			$this->assertTrue(!array_key_exists('error', $result), "Chuck Norris: Method returned an error. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
+			$this->assertTrue(!array_key_exists('error', $result), 'Chuck Norris: Method returned an error. Result is: '.print_r($result, true)."\nDebug: ".print_r($debug, true));
 		}
 		else {
-			$this->assertTrue(array_key_exists('error', $result), "Chuck Norris: I was expecting call to fail, but it did not. Result is: ".print_r($result, true)."\nDebug: ".print_r($debug, true));
+			$this->assertTrue(array_key_exists('error', $result), 'Chuck Norris: I was expecting call to fail, but it did not. Result is: '.print_r($result, true)."\nDebug: ".print_r($debug, true));
 		}
+	}
 
+	public function testCItem_restore() {
 		DBrestore_tables('items');
 	}
 }
