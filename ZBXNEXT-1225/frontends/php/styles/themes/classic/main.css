@@ -52,6 +52,7 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 .ui-tabs.ui-widget-content { background: #EEEEEE; }
 .footer.ui-widget-content { background: url("images/widget_header.gif") repeat-x scroll #4E6EA7; }
 .border_dotted { border-color: #777; }
+.link_menu[disabled] { color: #AAA; }
 
 .classic .ui-state-default, .classic .ui-widget-content .ui-state-default, .classic .ui-widget-header .ui-state-default {
 	background: #EEE; color: #383838;
@@ -74,9 +75,6 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 .classic .ui-button.ui-state-active .ui-button-text { color: #DDD; }
 
 table.tableinfo tr.vertical_header td { background-color: #CCC; }
-
-
-.input { border-color: gray; }
 
 .unknown, a.unknown { color: #777; }
 a.unknown:hover { color: #999; }
