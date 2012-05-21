@@ -187,7 +187,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 	padding: 1px 1px 0 1px;
 	margin: 0;
 }
-.link_menu:hover { color: #6C80B9; border-bottom: 1px dotted #6C80B9; }
+.link_menu:hover, .link_menu[disabled]:hover { color: #6C80B9; border-bottom: 1px dotted #6C80B9; }
 .link_menu[disabled] { color: #DDD; text-decoration: none; cursor: default; border: 0; }
 
 .checkbox { padding: 0; border: 0; background: none; }
