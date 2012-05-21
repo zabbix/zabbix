@@ -1,6 +1,8 @@
 Changes for 2.0.0
 
 Bug fixes:
+..F....... [ZBX-5004] fixed error when import linked templates (Vedmak)
+
 
 --------------------------------------------------------------------------------
 Changes for 2.0.0rc6
@@ -26,7 +28,6 @@ Bug fixes:
 ..F....... [ZBX-5005] fixed escaping of percent character in translation string (Vedmak)
 A......... [ZBX-4997] fixed inherited item interfaces being set to null when updated by importing parent template (Eduard)
 ....I..... [ZBX-5003] backticked table and field names in the MySQL scheme and default data (Sasha)
-..F....... [ZBX-5004] fixed error when importing templates (Vedmak)
 ..F....... [ZBX-5002] fixed undefined index error when rendering a node tree in a DM setup (Pavels)
 A.F....... [ZBX-5008] fixed updating users that do not belong to the selected node (Pavels)
 .......PS. [ZBX-4980] fixed trapper process crash/hang on decoding big base64 encoded values (Andris)
