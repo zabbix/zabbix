@@ -2,8 +2,7 @@ Changes for 2.0.0
 
 Bug fixes:
 A......... [ZBX-5025] fixed "undefined index" error when updating specific trigger properties (Pavels)
-..F....... [ZBX-5004] fixed error when import linked templates (Vedmak)
-
+..F....... [ZBX-5004] fixed error when importing linked templates (Vedmak)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.0rc6
