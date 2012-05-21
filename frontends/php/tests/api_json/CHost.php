@@ -35,73 +35,73 @@ class API_JSON_Host extends CZabbixTest {
 		return array(
 			array(
 				array(
-				'host' => 'Host to test dup ids 1',
-				'name' => 'Host visible to test dup ids 1',
-				'interfaces' => array(
+					'host' => 'Host to test dup ids 1',
+					'name' => 'Host visible to test dup ids 1',
+					'interfaces' => array(
 						array(
-							"type" => 1,
-							"useip" => 1,
-							"ip" => "192.168.3.1",
-							"dns" => "",
-							"port" => 567,
+							'type' => INTERFACE_TYPE_AGENT,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '192.168.3.1',
+							'dns' => '',
+							'port' => 567,
 							'main' => 1
 						)
 					),
-					"groups" => array(
-						array("groupid" => 5)
+					'groups' => array(
+						array('groupid' => 5)		/* Discovered hosts */
 					),
-					"templates" => array(
-						array("templateid" => 10001)
+					'templates' => array(
+						array('templateid' => 10050)	/* Template App Zabbix Agent */
 					)
 				),
 				true
 			),
 			array(
 				array(
-				'host' => 'Host to test dup ids 2',
-				'name' => 'Host visible to test dup ids 2',
-				'interfaces' => array(
+					'host' => 'Host to test dup ids 2',
+					'name' => 'Host visible to test dup ids 2',
+					'interfaces' => array(
 						array(
-							"type" => 1,
-							"useip" => 1,
-							"ip" => "192.168.3.1",
-							"dns" => "",
-							"port" => 567,
+							'type' => INTERFACE_TYPE_AGENT,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '192.168.3.1',
+							'dns' => '',
+							'port' => 567,
 							'main' => 1
 						)
 					),
-					"groups" => array(
-						array("groupid" => 5)
+					'groups' => array(
+						array('groupid' => 5)		/* Discovered hosts */
 					),
-					"templates" => array(
-						array("templateid" => 10001),
-						array("templateid" => 10001)
+					'templates' => array(
+						array('templateid' => 10050),	/* Template App Zabbix Agent */
+						array('templateid' => 10050)	/* Template App Zabbix Agent */
 					)
 				),
 				false
 			),
 			array(
 				array(
-				'host' => 'Host to test dup ids 3',
-				'name' => 'Host visible to test dup ids 3',
-				'interfaces' => array(
+					'host' => 'Host to test dup ids 3',
+					'name' => 'Host visible to test dup ids 3',
+					'interfaces' => array(
 						array(
-							"type" => 1,
-							"useip" => 1,
-							"ip" => "192.168.3.1",
-							"dns" => "",
-							"port" => 567,
+							'type' => INTERFACE_TYPE_AGENT,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '192.168.3.1',
+							'dns' => '',
+							'port' => 567,
 							'main' => 1
 						)
 					),
-					"groups" => array(
-						array("groupid" => 5)
+					'groups' => array(
+						array('groupid' => 5)		/* Discovered hosts */
 					),
-					"templates" => array(
-						array("templateid" => 10043),
-						array("templateid" => 10001),
-						array("templateid" => 10001),
-						array("templateid" => 10002),
+					'templates' => array(
+						array('templateid' => 10047),	/* Template App Zabbix Server */
+						array('templateid' => 10050),	/* Template App Zabbix Agent */
+						array('templateid' => 10050),	/* Template App Zabbix Agent */
+						array('templateid' => 10056)	/* Template App Agentless */
 					)
 				),
 				false
