@@ -163,11 +163,11 @@ class API_JSON_Host extends CZabbixTest {
 				array(
 					'withInventory' => true,
 					'selectInventory' => array('type'),
-					'hostids' => 10017
+					'hostids' => 10053
 				),
 				// expected result
 				array(
-					'hostid' => 10017,
+					'hostid' => 10053,
 					'type' => 'Type'
 				)
 			),
@@ -176,11 +176,11 @@ class API_JSON_Host extends CZabbixTest {
 				array(
 					'withInventory' => true,
 					'selectInventory' => array('os', 'tag'),
-					'hostids' => 10017
+					'hostids' => 10053
 				),
 				// expected result
 				array(
-					'hostid' => 10017,
+					'hostid' => 10053,
 					'os' => 'OS',
 					'tag' => 'Tag'
 				)
@@ -190,16 +190,15 @@ class API_JSON_Host extends CZabbixTest {
 				array(
 					'withInventory' => true,
 					'selectInventory' => array('blabla'), // non existent field
-					'hostids' => 10017
+					'hostids' => 10053
 				),
 				// expected result
 				array(
-					'hostid' => 10017
+					'hostid' => 10053
 				)
-			),
+			)
 		);
 	}
-
 
 	/**
 	 * @dataProvider inventoryGetRequests
@@ -215,7 +214,7 @@ class API_JSON_Host extends CZabbixTest {
 
 		$this->assertFalse(
 			!isset($result['result'][0]['inventory']) || $result['result'][0]['inventory'] != $expectedResult,
-			"Chuck Norris: I was expecting that host.get would return this result in 'inventories' element: ".print_r($expectedResult, true).", but it returned: ".print_r($result, true)." \nDebug: ".print_r($debug, true)
+			"Chuck Norris: I was expecting that host.get would return this result in 'inventories' element: ".print_r($expectedResult, true).', but it returned: '.print_r($result, true)." \nDebug: ".print_r($debug, true)
 		);
 	}
 }
