@@ -103,19 +103,69 @@ class testFormHost extends CWebTest {
 
 	}
 
-	public function testFormHost_CreateExistingHostNoGroups() {
-		// Attempt to create a host with a name that already exists and not add it to any groups
-		// In future should also check these conditions individually
+	public function testFormHost_CreateHostNoGroups() {
+		$host = 'Test host w/o groups';
+
+		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
+		$oldHashHosts = DBhash($sqlHosts);
+
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid', 'all');
 		$this->button_click('form');
 		$this->wait();
-		$this->input_type('host', 'Test host');
+		$this->input_type('host', $host);
 		$this->button_click('save');
 		$this->wait();
+
 		$this->assertTitle('Configuration of hosts');
-		$this->ok('No groups for host');
-		$this->assertEquals(0, DBcount("select * from hosts where host='Test host'"));
+		$this->ok('ERROR: Cannot add host');
+		$this->ok('No groups for host "'.$host.'".');
+
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
+	}
+
+	public function testFormHost_CreateHostExistingHostName() {
+		$host = 'Test host';
+
+		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
+		$oldHashHosts = DBhash($sqlHosts);
+
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid', 'Zabbix servers');
+		$this->button_click('form');
+		$this->wait();
+		$this->input_type('host', $host);
+		$this->button_click('save');
+		$this->wait();
+
+		$this->assertTitle('Configuration of hosts');
+		$this->ok('ERROR: Cannot add host');
+		$this->ok('Host with the same name "'.$host.'" already exists.');
+
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
+	}
+
+	public function testFormHost_CreateHostExistingVisibleName() {
+		$host = 'Test host 001 with existing visible name';
+		$hostVisible = 'ЗАББИКС Сервер';
+
+		$sqlHosts = 'select * from hosts where host='.zbx_dbstr($host);
+		$oldHashHosts = DBhash($sqlHosts);
+
+		$this->login('hosts.php');
+		$this->dropdown_select_wait('groupid', 'Zabbix servers');
+		$this->button_click('form');
+		$this->wait();
+		$this->input_type('host', $host);
+		$this->input_type('visiblename', $hostVisible);
+		$this->button_click('save');
+		$this->wait();
+
+		$this->assertTitle('Configuration of hosts');
+		$this->ok('ERROR: Cannot add host');
+		$this->ok('Host with the same visible name "'.$hostVisible.'" already exists.');
+
+		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));
 	}
 
 	public function testFormHost_CloneHost() {

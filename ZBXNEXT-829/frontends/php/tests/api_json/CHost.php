@@ -35,73 +35,73 @@ class API_JSON_Host extends CZabbixTest {
 		return array(
 			array(
 				array(
-				'host' => 'Host to test dup ids 1',
-				'name' => 'Host visible to test dup ids 1',
-				'interfaces' => array(
+					'host' => 'Host to test dup ids 1',
+					'name' => 'Host visible to test dup ids 1',
+					'interfaces' => array(
 						array(
-							"type" => 1,
-							"useip" => 1,
-							"ip" => "192.168.3.1",
-							"dns" => "",
-							"port" => 567,
+							'type' => INTERFACE_TYPE_AGENT,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '192.168.3.1',
+							'dns' => '',
+							'port' => 567,
 							'main' => 1
 						)
 					),
-					"groups" => array(
-						array("groupid" => 5)
+					'groups' => array(
+						array('groupid' => 5)		/* Discovered hosts */
 					),
-					"templates" => array(
-						array("templateid" => 10001)
+					'templates' => array(
+						array('templateid' => 10050)	/* Template App Zabbix Agent */
 					)
 				),
 				true
 			),
 			array(
 				array(
-				'host' => 'Host to test dup ids 2',
-				'name' => 'Host visible to test dup ids 2',
-				'interfaces' => array(
+					'host' => 'Host to test dup ids 2',
+					'name' => 'Host visible to test dup ids 2',
+					'interfaces' => array(
 						array(
-							"type" => 1,
-							"useip" => 1,
-							"ip" => "192.168.3.1",
-							"dns" => "",
-							"port" => 567,
+							'type' => INTERFACE_TYPE_AGENT,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '192.168.3.1',
+							'dns' => '',
+							'port' => 567,
 							'main' => 1
 						)
 					),
-					"groups" => array(
-						array("groupid" => 5)
+					'groups' => array(
+						array('groupid' => 5)		/* Discovered hosts */
 					),
-					"templates" => array(
-						array("templateid" => 10001),
-						array("templateid" => 10001)
+					'templates' => array(
+						array('templateid' => 10050),	/* Template App Zabbix Agent */
+						array('templateid' => 10050)	/* Template App Zabbix Agent */
 					)
 				),
 				false
 			),
 			array(
 				array(
-				'host' => 'Host to test dup ids 3',
-				'name' => 'Host visible to test dup ids 3',
-				'interfaces' => array(
+					'host' => 'Host to test dup ids 3',
+					'name' => 'Host visible to test dup ids 3',
+					'interfaces' => array(
 						array(
-							"type" => 1,
-							"useip" => 1,
-							"ip" => "192.168.3.1",
-							"dns" => "",
-							"port" => 567,
+							'type' => INTERFACE_TYPE_AGENT,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '192.168.3.1',
+							'dns' => '',
+							'port' => 567,
 							'main' => 1
 						)
 					),
-					"groups" => array(
-						array("groupid" => 5)
+					'groups' => array(
+						array('groupid' => 5)		/* Discovered hosts */
 					),
-					"templates" => array(
-						array("templateid" => 10043),
-						array("templateid" => 10001),
-						array("templateid" => 10001),
-						array("templateid" => 10002),
+					'templates' => array(
+						array('templateid' => 10047),	/* Template App Zabbix Server */
+						array('templateid' => 10050),	/* Template App Zabbix Agent */
+						array('templateid' => 10050),	/* Template App Zabbix Agent */
+						array('templateid' => 10056)	/* Template App Agentless */
 					)
 				),
 				false
@@ -163,11 +163,11 @@ class API_JSON_Host extends CZabbixTest {
 				array(
 					'withInventory' => true,
 					'selectInventory' => array('type'),
-					'hostids' => 10017
+					'hostids' => 10053
 				),
 				// expected result
 				array(
-					'hostid' => 10017,
+					'hostid' => 10053,
 					'type' => 'Type'
 				)
 			),
@@ -176,11 +176,11 @@ class API_JSON_Host extends CZabbixTest {
 				array(
 					'withInventory' => true,
 					'selectInventory' => array('os', 'tag'),
-					'hostids' => 10017
+					'hostids' => 10053
 				),
 				// expected result
 				array(
-					'hostid' => 10017,
+					'hostid' => 10053,
 					'os' => 'OS',
 					'tag' => 'Tag'
 				)
@@ -190,16 +190,15 @@ class API_JSON_Host extends CZabbixTest {
 				array(
 					'withInventory' => true,
 					'selectInventory' => array('blabla'), // non existent field
-					'hostids' => 10017
+					'hostids' => 10053
 				),
 				// expected result
 				array(
-					'hostid' => 10017
+					'hostid' => 10053
 				)
-			),
+			)
 		);
 	}
-
 
 	/**
 	 * @dataProvider inventoryGetRequests
@@ -215,7 +214,7 @@ class API_JSON_Host extends CZabbixTest {
 
 		$this->assertFalse(
 			!isset($result['result'][0]['inventory']) || $result['result'][0]['inventory'] != $expectedResult,
-			"Chuck Norris: I was expecting that host.get would return this result in 'inventories' element: ".print_r($expectedResult, true).", but it returned: ".print_r($result, true)." \nDebug: ".print_r($debug, true)
+			"Chuck Norris: I was expecting that host.get would return this result in 'inventories' element: ".print_r($expectedResult, true).', but it returned: '.print_r($result, true)." \nDebug: ".print_r($debug, true)
 		);
 	}
 }
