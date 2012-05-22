@@ -342,8 +342,11 @@ if ($monitored_hosts) {
 elseif ($real_hosts) {
 	$options['groups']['real_hosts'] = true;
 }
-else {
+elseif ($templated_hosts) {
 	$options['hosts']['templated_hosts'] = true;
+	$options['groups']['templated_hosts'] = true;
+	$templated = 1;
+	$host_status = 'templated_hosts';
 }
 else {
 	$options['groups']['with_hosts_and_templates'] = true;
