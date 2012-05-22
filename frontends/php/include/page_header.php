@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/config.inc.php';
 require_once dirname(__FILE__).'/perm.inc.php';
 
@@ -472,4 +472,3 @@ if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
 }
 show_messages();
-?>
