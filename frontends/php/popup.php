@@ -213,6 +213,11 @@ $fields = array(
 	'real_hosts' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'normal_only' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'simpleName' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_applications' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_graphs' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_items' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_simple_graph_items' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_triggers' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'itemtype' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'value_types' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 15), null),
 	'reference' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
@@ -249,6 +254,9 @@ $multiselect = get_request('multiselect', 0); // if create popup with checkboxes
 $dstact = get_request('dstact', '');
 $writeonly = get_request('writeonly');
 $simpleName = get_request('simpleName');
+$with_applications = get_request('with_applications', 0);
+$with_graphs = get_request('with_graphs', 0);
+$with_items = get_request('with_items', 0);
 $noempty = get_request('noempty'); // display/hide "Empty" button
 $existed_templates = get_request('existed_templates', null);
 $excludeids = get_request('excludeids', null);
@@ -256,6 +264,8 @@ $reference = get_request('reference', get_request('srcfld1', 'unknown'));
 $real_hosts = get_request('real_hosts', 0);
 $monitored_hosts = get_request('monitored_hosts', 0);
 $templated_hosts = get_request('templated_hosts', 0);
+$with_simple_graph_items = get_request('with_simple_graph_items', 0);
+$with_triggers = get_request('with_triggers', 0);
 $value_types = get_request('value_types', null);
 $submitParent = get_request('submitParent', 0);
 $normal_only = get_request('normal_only');
@@ -335,7 +345,28 @@ elseif ($real_hosts) {
 else {
 	$options['hosts']['templated_hosts'] = true;
 }
+else {
+	$options['groups']['with_hosts_and_templates'] = true;
+	// for hosts templated_hosts comes with monitored and not monitored hosts
+	$options['hosts']['templated_hosts'] = true;
+}
 
+if ($with_applications) {
+	$options['groups']['with_applications'] = true;
+	$options['hosts']['with_applications'] = true;
+}
+elseif ($with_graphs) {
+	$options['groups']['with_graphs'] = true;
+	$options['hosts']['with_graphs'] = true;
+}
+elseif ($with_simple_graph_items) {
+	$options['groups']['with_simple_graph_items'] = true;
+	$options['hosts']['with_simple_graph_items'] = true;
+}
+elseif ($with_triggers) {
+	$options['groups']['with_triggers'] = true;
+	$options['hosts']['with_triggers'] = true;
+}
 $pageFilter = new CPageFilter($options);
 
 // get groupid
@@ -375,6 +406,21 @@ if ($real_hosts) {
 }
 if ($templated_hosts) {
 	$frmTitle->addVar('templated_hosts', 1);
+}
+if ($with_applications) {
+	$frmTitle->addVar('with_applications', 1);
+}
+if ($with_graphs) {
+	$frmTitle->addVar('with_graphs', 1);
+}
+if ($with_items) {
+	$frmTitle->addVar('with_items', 1);
+}
+if ($with_simple_graph_items) {
+	$frmTitle->addVar('with_simple_graph_items', 1);
+}
+if ($with_triggers) {
+	$frmTitle->addVar('with_triggers', 1);
 }
 if ($value_types) {
 	$frmTitle->addVar('value_types', $value_types);
