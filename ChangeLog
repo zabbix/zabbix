@@ -16,6 +16,7 @@ Changes for 2.0.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-5016] fixed graphs borders (Eduard)
 A......... [ZBX-4962] fixed varchar default saving in mysql (Eduard)
 ..F....... [ZBX-4977] fixed GUI messaging (Eduard)
 A......... [ZBX-4923] fixed ids sorting before update and delete (Eduard)
