@@ -193,6 +193,13 @@ abstract class CItemGeneral extends CZBXAPI {
 				if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
 					$item['error'] = '';
 				}
+
+				// if a templated item is being assigned to an interface with a different type, ignore it
+				if ($fullItem['templateid'] && isset($item['interfaceid']) && isset($interfaces[$item['interfaceid']])
+						&& $interfaces[$item['interfaceid']]['type'] != itemTypeInterface($dbItems[$item['itemid']]['type'])) {
+
+					unset($item['interfaceid']);
+				}
 			}
 			else {
 				if (!isset($dbHosts[$item['hostid']])) {
@@ -214,7 +221,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 			// check if the item requires an interface
 			$itemInterfaceType = itemTypeInterface($fullItem['type']);
-			if ($itemInterfaceType !== false && $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
+			if ($itemInterfaceType !== false && $host['status'] != HOST_STATUS_TEMPLATE) {
 				if (!$fullItem['interfaceid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
 				}
