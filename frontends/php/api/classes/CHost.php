@@ -106,11 +106,13 @@ class CHost extends CZBXAPI {
 			'with_items'				=> null,
 			'with_monitored_items'		=> null,
 			'with_historical_items'		=> null,
+			'with_simple_graph_items'		=> null,
 			'with_triggers'				=> null,
 			'with_monitored_triggers'	=> null,
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
+			'with_applications'		=> null,
 			'withInventory'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -430,7 +432,7 @@ class CHost extends CZBXAPI {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 
-// with_items, with_monitored_items, with_historical_items
+// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
 			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
 		}
@@ -439,6 +441,11 @@ class CHost extends CZBXAPI {
 		}
 		elseif (!is_null($options['with_historical_items'])) {
 			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.status='.ITEM_STATUS_ACTIVE.' OR i.status='.ITEM_STATUS_NOTSUPPORTED.') AND i.lastvalue IS NOT NULL)';
+		}
+		elseif (!is_null($options['with_simple_graph_items'])) {
+			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid AND (i.value_type IN ('.
+			ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.') AND i.status='.ITEM_STATUS_ACTIVE.' AND i.flags IN ('.
+			ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')))';
 		}
 
 // with_triggers, with_monitored_triggers
@@ -485,6 +492,12 @@ class CHost extends CZBXAPI {
 					' FROM items i, graphs_items gi'.
 					' WHERE i.hostid=h.hostid'.
 						' AND i.itemid=gi.itemid)';
+		}
+
+		// with applications
+		if (!is_null($options['with_applications'])) {
+			$sqlParts['from']['applications'] = 'applications a';
+			$sqlParts['where'][] = 'a.hostid=h.hostid';
 		}
 
 // withInventory
