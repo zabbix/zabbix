@@ -1404,38 +1404,6 @@ int	is_int_prefix(const char *c)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_int                                                           *
- *                                                                            *
- * Purpose: check if string is a signed integer                               *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *             value - pointer to result (can be NULL)                       *
- *                                                                            *
- * Return value:  SUCCEED - string is a signed integer                        *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- ******************************************************************************/
-int	is_int(const char *str, int *value)
-{
-	long l;
-	char *endp;
-
-	errno = 0;
-	l = strtol(str, &endp, 10);
-
-	if (errno != 0 || endp == str || INT_MIN > l || INT_MAX < l)
-		return FAIL;
-
-	if (NULL != value)
-		*value = (int)l;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: is_uint64                                                        *
  *                                                                            *
  * Purpose: check if the string is 64bit unsigned integer                     *
