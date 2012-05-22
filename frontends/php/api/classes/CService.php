@@ -18,11 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Class containing methods for operations with IT Services
  * @package API
  */
 class CService extends CZBXAPI {
+
 	protected $tableName = 'services';
 	protected $tableAlias = 's';
 	protected $sortColumns = array('sortorder', 'name');
@@ -41,7 +43,7 @@ class CService extends CZBXAPI {
 			'selectAlarms' => null,
 			'selectTrigger' => null,
 			'sortfield' => '',
-			'sortorder' => '',
+			'sortorder' => ''
 		));
 	}
 
@@ -595,10 +597,10 @@ class CService extends CZBXAPI {
 				}
 				$query = DBselect(
 					'SELECT *'.
-						' FROM service_alarms sa'.
-						' WHERE '.DBcondition('sa.serviceid', $usedSeviceIds).
+					' FROM service_alarms sa'.
+					' WHERE '.DBcondition('sa.serviceid', $usedSeviceIds).
 						' AND ('.implode(' OR ', $intervalConditions).')'.
-						' ORDER BY sa.clock,sa.servicealarmid'
+					' ORDER BY sa.clock,sa.servicealarmid'
 				);
 				while ($data = DBfetch($query)) {
 					$services[$data['serviceid']]['alarms'][] = $data;
@@ -627,7 +629,7 @@ class CService extends CZBXAPI {
 								'ok' => null,
 								'okTime' => null,
 								'problemTime' => null,
-								'downtimeTime' => null,
+								'downtimeTime' => null
 							);
 						}
 
@@ -637,7 +639,7 @@ class CService extends CZBXAPI {
 							'sla' => $intervalSla['ok'],
 							'okTime' => $intervalSla['okTime'],
 							'problemTime' => $intervalSla['problemTime'],
-							'downtimeTime' => $intervalSla['downtimeTime'],
+							'downtimeTime' => $intervalSla['downtimeTime']
 						);
 					}
 				}
@@ -740,7 +742,6 @@ class CService extends CZBXAPI {
 		 * - ut_s	- count of uptime starts
 		 * - ut_e	- count of uptime ends
 		 */
-
 		foreach ($service['alarms'] as $alarm) {
 			if ($alarm['clock'] >= $periodStart && $alarm['clock'] <= $periodEnd) {
 				$data[$alarm['clock']]['alarm'] = $alarm['value'];
@@ -829,7 +830,7 @@ class CService extends CZBXAPI {
 
 			// state=0,1 [OK] (1 - information severity of trigger), >1 [PROBLEMS] (trigger severity)
 			if ($prevAlarm > 1) {
-				$slaTime[$periodType]['problemTime']	+= $ts - $prevTime;
+				$slaTime[$periodType]['problemTime'] += $ts - $prevTime;
 			}
 			else {
 				$slaTime[$periodType]['okTime'] += $ts - $prevTime;
@@ -929,12 +930,12 @@ class CService extends CZBXAPI {
 		// get service reason
 		$triggers = DBfetchArray(DBSelect(
 			'SELECT s.serviceid,t.*'.
-				' FROM services s,triggers t'.
-				' WHERE s.status>0'.
+			' FROM services s,triggers t'.
+			' WHERE s.status>0'.
 				' AND t.triggerid=s.triggerid'.
 				' AND '.DBcondition('t.triggerid', get_accessible_triggers(PERM_READ_ONLY)).
 				' AND '.DBcondition('s.serviceid', $serviceIds).
-				' ORDER BY s.status DESC,t.description'
+			' ORDER BY s.status DESC,t.description'
 		));
 
 		$rs = array();
@@ -1006,12 +1007,12 @@ class CService extends CZBXAPI {
 		// since multiple alarms can have the same timestamp, we only need to save the last one
 		$query = DBSelect(
 			'SELECT sa.serviceid,sa.value
-			FROM service_alarms as sa
-				LEFT OUTER JOIN service_alarms sa2 ON (sa.serviceid=sa2.serviceid AND sa.clock<sa2.clock AND sa2.clock<'.zbx_dbstr($beforeTime).')
-			WHERE sa2.servicealarmid IS NULL
-				AND sa.clock<'.zbx_dbstr($beforeTime).'
-				AND '.DBcondition('sa.serviceid', $serviceIds).'
-			ORDER BY sa.servicealarmid ASC'
+				FROM service_alarms as sa
+					LEFT OUTER JOIN service_alarms sa2 ON (sa.serviceid=sa2.serviceid AND sa.clock<sa2.clock AND sa2.clock<'.zbx_dbstr($beforeTime).')
+				WHERE sa2.servicealarmid IS NULL
+					AND sa.clock<'.zbx_dbstr($beforeTime).'
+					AND '.DBcondition('sa.serviceid', $serviceIds).'
+				ORDER BY sa.servicealarmid'
 		);
 
 		$rs = array();
@@ -1039,7 +1040,8 @@ class CService extends CZBXAPI {
 		// sort by sortorder
 		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
 		$sqlParts['where'][] = 'sl.servicedownid='.$this->fieldId('serviceid');
-		$sqlParts['order'][] = $this->fieldId('sortorder').', '.$this->fieldId('serviceid');
+		$sqlParts = $this->addQueryOrder($this->fieldId('sortorder'), $sqlParts);
+		$sqlParts = $this->addQueryOrder($this->fieldId('serviceid'), $sqlParts);
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
@@ -1069,7 +1071,8 @@ class CService extends CZBXAPI {
 		// sort by sortorder
 		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
 		$sqlParts['where'][] = 'sl.serviceupid='.$this->fieldId('serviceid');
-		$sqlParts['order'][] = $this->fieldId('sortorder').', '.$this->fieldId('serviceid');
+		$sqlParts = $this->addQueryOrder($this->fieldId('sortorder'), $sqlParts);
+		$sqlParts = $this->addQueryOrder($this->fieldId('serviceid'), $sqlParts);
 
 		// add permission filter
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
@@ -1134,7 +1137,7 @@ class CService extends CZBXAPI {
 	protected function checkShowSla(array $service) {
 		$showSlaValues = array(
 			SERVICE_SHOW_SLA_OFF => true,
-			SERVICE_SHOW_SLA_ON => true,
+			SERVICE_SHOW_SLA_ON => true
 		);
 		if (!isset($service['showsla']) || !isset($showSlaValues[$service['showsla']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect calculate SLA value for service "%1$s".', $service['name']));
@@ -1547,7 +1550,7 @@ class CService extends CZBXAPI {
 			$triggers = API::getApi()->select('triggers', array(
 				'output' => $options['selectTrigger'],
 				'triggerids' => array_unique(zbx_objectValues($result, 'triggerid')),
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			foreach ($result as &$service) {
 				$service['trigger'] = ($service['triggerid']) ? $triggers[$service['triggerid']] : array();
