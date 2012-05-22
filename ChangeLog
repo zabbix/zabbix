@@ -3,6 +3,7 @@ Changes for 2.1.0
 New features:
 
 Bug fixes:
+..F....... [ZBX-5013] fixed requirements check in frontend setup (Vedmak)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.1rc1
