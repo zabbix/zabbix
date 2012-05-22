@@ -88,8 +88,8 @@ class DB {
 		$sql = 'SELECT nextid'.
 				' FROM ids'.
 				' WHERE nodeid='.self::$nodeId.
-				' AND table_name='.zbx_dbstr($table).
-				' AND field_name='.zbx_dbstr($id_name);
+					' AND table_name='.zbx_dbstr($table).
+					' AND field_name='.zbx_dbstr($id_name);
 
 		// SQLite3 does not support this syntax. Since we are in transaction, it can be ignored.
 		if ($DB['TYPE'] != ZBX_DB_SQLITE3) {
@@ -106,8 +106,8 @@ class DB {
 				$sql = 'UPDATE ids'.
 						' SET nextid=nextid+'.$count.
 						' WHERE nodeid='.self::$nodeId.
-						' AND table_name='.zbx_dbstr($table).
-						' AND field_name='.zbx_dbstr($id_name);
+							' AND table_name='.zbx_dbstr($table).
+							' AND field_name='.zbx_dbstr($id_name);
 				if (!DBexecute($sql)) {
 					self::exception(self::DBEXECUTE_ERROR, 'DBEXECUTE_ERROR');
 				}
@@ -169,7 +169,6 @@ class DB {
 		return $nextid;
 	}
 
-
 	/**
 	 * Returns the array describing the database schema.
 	 *
@@ -200,7 +199,6 @@ class DB {
 			self::exception(self::SCHEMA_ERROR, _s('Table "%1$s" does not exist.', $table));
 		}
 	}
-
 
 	/**
 	 * Returns the names of the fields that are used as the primary key of the table.
@@ -237,6 +235,24 @@ class DB {
 		return isset($schema['fields'][$fieldName]);
 	}
 
+	private static function addMissingFields($tableSchema, $values) {
+		global $DB;
+
+		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+			foreach ($tableSchema['fields'] as $name => $field) {
+				if ($field['type'] == DB::FIELD_TYPE_TEXT && !$field['null']) {
+					foreach ($values as &$value) {
+						if (!isset($value[$name])) {
+							$value[$name] = '';
+						}
+					}
+					unset($value);
+				}
+			}
+		}
+
+		return $values;
+	}
 
 	public static function getDefaults($table) {
 		$table = self::getSchema($table);
@@ -379,7 +395,10 @@ class DB {
 		if ($getids) {
 			$id = self::reserveIds($table, count($values));
 		}
+
 		$tableSchema = self::getSchema($table);
+
+		$values = self::addMissingFields($tableSchema, $values);
 
 		foreach ($values as $key => $row) {
 			self::checkValueTypes($table, $row);
@@ -392,6 +411,7 @@ class DB {
 
 			$sql = 'INSERT INTO '.$table.' ('.implode(',', array_keys($row)).')'.
 					' VALUES ('.implode(',', array_values($row)).')';
+
 			if (!DBexecute($sql)) {
 				self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 			}
@@ -484,7 +504,6 @@ class DB {
 			}
 
 			$pk = array($dbPkNames => $pk);
-
 		}
 
 		return self::update($tableName, array(

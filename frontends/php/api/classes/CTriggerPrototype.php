@@ -1278,6 +1278,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		for ($i = 0, $size = count($triggersCopy); $i < $size; $i++) {
 			unset($triggersCopy[$i]['expression']);
 		}
+
 		$triggerids = DB::insert('triggers', $triggersCopy);
 		unset($triggersCopy);
 
