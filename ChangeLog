@@ -3,6 +3,7 @@ Changes for 2.0.1rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.0
@@ -705,6 +706,7 @@ New features:
 Changes for 1.8.14rc1
 
 .......PS. [ZBX-4980] fixed trapper process crash/hang on decoding big base64 encoded values (Andris)
+...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
 
 Changes for 1.8.13
 
