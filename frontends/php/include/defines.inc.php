@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-define('ZABBIX_VERSION',		'2.0.0');
+define('ZABBIX_VERSION',		'2.1.0');
 define('ZABBIX_API_VERSION',	'1.4');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);
