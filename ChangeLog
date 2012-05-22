@@ -3,6 +3,7 @@ Changes for 2.0.1rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-4923] fixed ids sorting before update and delete (Eduard)
 A......... [ZBX-5026] fixed error messages when creating IT Service (Eduard)
 ...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
 
