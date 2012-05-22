@@ -116,11 +116,15 @@ if ($data['form_refresh']) {
 	$data['config']['event_expire'] = get_request('event_expire');
 	$data['config']['event_show_max'] = get_request('event_show_max');
 	$data['config']['server_check_enabled'] = get_request('server_check_enabled');
-	$data['config']['server_check_interval'] = get_request('server_check_interval', 0);
+	$data['config']['server_check_interval'] = get_request('server_check_interval', 30);
 }
 else {
 	$data['config'] = select_config(false);
 	$data['config']['server_check_enabled'] = (bool) $data['config']['server_check_interval'];
+
+	if (!$data['config']['server_check_interval']) {
+		$data['config']['server_check_interval'] = 30;
+	}
 }
 
 $guiForm = new CView('administration.general.gui.edit', $data);
