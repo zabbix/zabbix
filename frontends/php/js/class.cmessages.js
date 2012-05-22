@@ -16,6 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+
 var ZBX_MESSAGES = [];
 
 // use this function to initialize Messaging system
@@ -39,14 +41,14 @@ var CMessageList = Class.create(CDebug, {
 	messagePipe:		[],		// messageid pipe line
 	messageLast:		{},		// last message's sourceid by caption
 	effectTimeout:		1000,	// effect time out
-	sounds:{					// sound playback settings
-		'priority': 0,			// max new message priority
-		'sound': null,			// sound to play
+	dom:				{},		// dom object links
+	sounds: {					// sound playback settings
+		'priority':	0,			// max new message priority
+		'sound':	null,		// sound to play
 		'repeat':	1,			// loop sound for 1,3,5,10 .. times
 		'mute':		0,			// mute alarms
 		'timeout':	0
 	},
-	dom:				{},		// dom object links
 
 	initialize: function($super, messagesListId, args) {
 		this.messageListId = messagesListId;
@@ -64,7 +66,7 @@ var CMessageList = Class.create(CDebug, {
 		jQuery(this.dom.container).draggable({
 			handle: [this.dom.caption, this.dom.move],
 			axis: 'y',
-			containment: [0,0,0,1600]
+			containment: [0, 0, 0, 1600]
 		});
 	},
 
@@ -102,6 +104,7 @@ var CMessageList = Class.create(CDebug, {
 		if (this.sounds.mute == 1) {
 			this.dom.mute.className = 'iconmute menu_icon shadow';
 		}
+
 		if (settings.enabled != 1) {
 			this.stop();
 		}
@@ -147,9 +150,7 @@ var CMessageList = Class.create(CDebug, {
 			'messageid': this.messageList[this.msgcounter].messageid
 		};
 
-		if (this.msgcounter == 1) {
-			jQuery(this.dom.container).fadeTo('fast', 0.9);
-		}
+		jQuery(this.dom.container).fadeTo('fast', 0.9);
 
 		return this.messageList[this.msgcounter];
 	},
@@ -306,7 +307,7 @@ var CMessageList = Class.create(CDebug, {
 			}
 			var msg = this.messageList[messageid];
 			if ((msg.time + parseInt(msg.timeout, 10)) < now) {
-				setTimeout(this.closeMessage.bind(this, messageid, true), (500 * timeout));
+				setTimeout(this.closeMessage.bind(this, messageid, true), 500 * timeout);
 				timeout++;
 			}
 		}
@@ -345,9 +346,7 @@ var CMessageList = Class.create(CDebug, {
 
 	createContainer: function() {
 		this.debug('createContainer');
-
 		this.dom.container = $('zbx_messages');
-
 		if (!empty(this.dom.container)) {
 			return false;
 		}
@@ -386,12 +385,6 @@ var CMessageList = Class.create(CDebug, {
 		this.dom.controls.appendChild(this.dom.controlList);
 		this.dom.controlList.style.cssFloat = 'right';
 
-		// move
-		this.dom.move = document.createElement('div');
-		this.dom.move.setAttribute('title', locale['S_MOVE']);
-		this.dom.move.className = 'iconmove menu_icon shadow';
-		this.dom.controlList.addItem(this.dom.move, 'linear');
-
 		// snooze
 		this.dom.snooze = document.createElement('div');
 		this.dom.snooze.setAttribute('title', locale['S_SNOOZE']);
@@ -419,7 +412,7 @@ var CMessageList = Class.create(CDebug, {
 var CMessage = Class.create(CDebug, {
 	list:		null,		// link to message list containing this message
 	messageid:	null,		// msg id
-	caption:	'unknown',	// msg caption (events, actions, infos..  e.t.c.)
+	caption:	'unknown',	// msg caption (events, actions, infos.. e.t.c.)
 	sourceid:	null,		// caption + sourceid = identifier for server
 	type:		0,			// 1 - sound, 2 - text, 3 - sound & text, 4 - notdefined
 	priority:	0,			// msg priority ASC
@@ -451,16 +444,10 @@ var CMessage = Class.create(CDebug, {
 		this.createMessage();
 	},
 
-	show: function() {
-	},
-
 	close: function() {
 		this.debug('close');
 		$(this.dom.listItem).remove();
 		this.dom = {};
-	},
-
-	notify: function() {
 	},
 
 	remove: function() {
@@ -497,7 +484,7 @@ var CMessage = Class.create(CDebug, {
 		if (!is_array(this.body)) {
 			this.body = [this.body];
 		}
-		for (var i=0; i < this.body.length; i++) {
+		for (var i = 0; i < this.body.length; i++) {
 			if (!isset(i, this.body) || empty(this.body[i])) {
 				continue;
 			}
@@ -507,7 +494,10 @@ var CMessage = Class.create(CDebug, {
 			$(this.dom.body).update(BBCode.Parse(this.body[i]));
 			this.dom.body.className = 'body';
 		}
-	}
+	},
+
+	show: function() {},
+	notify: function() {}
 });
 
 var CNode = Class.create({
