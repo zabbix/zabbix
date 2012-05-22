@@ -911,5 +911,7 @@ $_REQUEST = $_POST + $_GET;
 // init precision
 ini_set('precision', 14);
 
-// BC Math scale
-bcscale(7);
+// BC Math scale. bcscale() can be undefined prior requirement check in setup.
+if (function_exists('bcscale')) {
+	bcscale(7);
+}

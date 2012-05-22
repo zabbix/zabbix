@@ -632,7 +632,7 @@ function zbx_is_int($var) {
 	}
 
 	if (is_string($var)) {
-		if (ctype_digit($var) || strcmp(intval($var), $var) == 0) {
+		if (function_exists('ctype_digit') && ctype_digit($var) || strcmp(intval($var), $var) == 0) {
 			return true;
 		}
 	}
@@ -1127,7 +1127,7 @@ function zbx_array_merge() {
 }
 
 function uint_in_array($needle, $haystack) {
-	foreach ($haystack as $id => $value) {
+	foreach ($haystack as $value) {
 		if (bccomp($needle, $value) == 0) {
 			return true;
 		}
