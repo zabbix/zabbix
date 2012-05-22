@@ -235,7 +235,7 @@ if (isset($_REQUEST['form'])) {
 }
 else {
 	$options = array(
-		'groups' => array('editable' => 1),
+		'groups' => array('editable' => 1, 'with_hosts_and_templates' => true),
 		'hosts' => array('editable' => 1, 'templated_hosts' => 1),
 		'hostid' => get_request('hostid', null),
 		'groupid' => get_request('groupid', null)
