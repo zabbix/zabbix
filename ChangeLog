@@ -10,6 +10,7 @@ Changes for 2.0.1rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-5026] fixed error messages when creating IT Service (Eduard)
 ..F....... [ZBX-5013] fixed requirements check in frontend setup (Vedmak)
 
 --------------------------------------------------------------------------------
