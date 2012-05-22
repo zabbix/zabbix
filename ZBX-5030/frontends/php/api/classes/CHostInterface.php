@@ -728,7 +728,7 @@ class CHostInterface extends CZBXAPI {
 	/**
 	 * Replace existing host interfaces with input interfaces.
 	 *
-	 * @param $hosts
+	 * @param $host
 	 */
 	public function replaceHostInterfaces(array $host) {
 		if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
@@ -773,7 +773,7 @@ class CHostInterface extends CZBXAPI {
 			}
 
 			if (!empty($interfacesToDelete)) {
-				DB::delete('interface', array('interfaceid' => zbx_objectValues($interfacesToDelete, 'interfaceid')));
+				$this->delete(zbx_objectValues($interfacesToDelete, 'interfaceid'));
 			}
 		}
 	}

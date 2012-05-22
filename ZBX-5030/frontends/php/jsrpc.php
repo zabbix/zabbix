@@ -129,7 +129,7 @@ switch ($data['method']) {
 				'color' => getSeverityColor($trigger['priority'], $event['value']),
 				'title' => $title.' '.get_node_name_by_elid($host['hostid'], null, ':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
 				'body' => array(
-					_('Details').': '.' [url='.$url_events.']'.$trigger['description'].'[/url]',
+					_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
 					_('Date').': [b][url='.$url_tr_events.']'.zbx_date2str(_('d M Y H:i:s'), $event['clock']).'[/url][/b]',
 				),
 				'timeout' => $msgsettings['timeout']

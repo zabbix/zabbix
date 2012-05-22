@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/config.inc.php';
 
 // if we include footer in some function
@@ -72,7 +72,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	$post_script .= "jQuery(function() {\n";
 
 	if (isset($ZBX_PAGE_POST_JS)) {
-		foreach ($ZBX_PAGE_POST_JS as $num => $script) {
+		foreach ($ZBX_PAGE_POST_JS as $script) {
 			$post_script .= $script."\n";
 		}
 	}
@@ -115,4 +115,3 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		'</html>'."\n";
 }
 exit;
-?>
