@@ -3,14 +3,14 @@ Changes for 2.0.1rc1
 New features:
 
 Bug fixes:
-A......... [ZBX-5030] fixed IT services query in oracle (Eduard)
+A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
 ....I..... [ZBX-5041] changed {HOSTNAME} macro to {HOST.NAME} in the default templates (Sasha)
 A.F....... [ZBX-4974] fixed and improved several popups (Toms)
 ..F....... [ZBX-5020] fixed undefined functions prior requirement check in setup.php (Toms)
 ..F....... [ZBX-5016] fixed graphs borders (Eduard)
-A......... [ZBX-4962] fixed varchar default saving in mysql (Eduard)
+A......... [ZBX-4962] fixed varchar default saving in MySQL (Eduard)
 ..F....... [ZBX-4977] fixed GUI messaging (Eduard)
-A......... [ZBX-4994] fixed sql error when try to remove host interface used in items (Vedmak)
+A......... [ZBX-4994] fixed SQL error when trying to remove host interface used in items (Vedmak)
 ..F....... [ZBX-4918] fixed value mapping for {ITEM.VALUE} and {ITEM.LASTVALUE} macros (Vedmak)
 ..F....... [ZBX-5013] fixed requirements check in frontend setup (Vedmak)
 A......... [ZBX-4923] fixed ids sorting before update and delete (Eduard)
