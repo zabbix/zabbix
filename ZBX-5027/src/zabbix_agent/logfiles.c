@@ -618,7 +618,7 @@ int	process_log(char *filename, long *lastlogsize, char **value, const char *enc
 
 	if (INT_MAX < buf.st_size)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process log [%s]: file size is over limit", filename);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process log [%s]: file size is over limit (2 GB)", filename);
 		return ret;
 	}
 
