@@ -1020,7 +1020,7 @@ class CTrigger extends CTriggerGeneral {
 			$triggersToExpandItems = array();
 			$triggersToExpandItems2 = array();
 
-			foreach ($result as $tnum => $trigger) {
+			foreach ($result as $trigger) {
 				preg_match_all('/{HOST\.NAME([1-9]?)}/u', $trigger['description'], $hnums);
 				if (!empty($hnums[1])) {
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
@@ -1099,21 +1099,19 @@ class CTrigger extends CTriggerGeneral {
 
 			if (!empty($functionids)) {
 				$dbFuncs = DBselect(
-					'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name,i.lastvalue'.
-					' FROM functions f,items i,hosts h'.
-					' WHERE f.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND h.status<>'.HOST_STATUS_TEMPLATE.
+					'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name,i.lastvalue,m.newvalue'.
+					' FROM functions f'.
+						' INNER JOIN items i ON f.itemid=i.itemid'.
+						' INNER JOIN hosts h ON i.hostid=h.hostid'.
+						' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
+					' WHERE h.status<>'.HOST_STATUS_TEMPLATE.
 						' AND '.DBcondition('f.functionid', $functionids)
 				);
 				while ($func = DBfetch($dbFuncs)) {
 					if (isset($triggersToExpandHosts[$func['triggerid']][$func['functionid']])) {
 						$fnum = $triggersToExpandHosts[$func['triggerid']][$func['functionid']];
-						if ($fnum == 1) {
-							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
-							$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME}', $func['name'], $result[$func['triggerid']]['description']);
-							$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST}', $func['host'], $result[$func['triggerid']]['description']);
-						}
+						$fnum = $fnum > 1 ? $fnum : '';
+
 						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
 						$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
 						$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
@@ -1121,18 +1119,20 @@ class CTrigger extends CTriggerGeneral {
 
 					if (isset($triggersToExpandItems[$func['triggerid']][$func['functionid']])) {
 						$fnum = $triggersToExpandItems[$func['triggerid']][$func['functionid']];
-						if ($fnum == 1) {
-							$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
-						}
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+						$fnum = $fnum > 1 ? $fnum : '';
+
+						$value = $func['newvalue'] ? $func['newvalue'].' '.'('.$func['lastvalue'].')' : $func['lastvalue'];
+
+						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $value, $result[$func['triggerid']]['description']);
 					}
 
 					if (isset($triggersToExpandItems2[$func['triggerid']][$func['functionid']])) {
 						$fnum = $triggersToExpandItems2[$func['triggerid']][$func['functionid']];
-						if ($fnum == 1) {
-							$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
-						}
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+						$fnum = $fnum > 1 ? $fnum : '';
+
+						$value = $func['newvalue'] ? $func['newvalue'].' '.'('.$func['lastvalue'].')' : $func['lastvalue'];
+
+						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $value, $result[$func['triggerid']]['description']);
 					}
 				}
 			}
