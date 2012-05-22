@@ -485,7 +485,7 @@ class CZBXAPI {
 	 *
 	 * @return array
 	 */
-	protected function extendQuerySelect($fieldId, array $sqlParts) {
+	protected function addQuerySelect($fieldId, array $sqlParts) {
 		list($tableAlias, $field) = explode('.', $fieldId);
 
 		if (!in_array($fieldId, $sqlParts['select']) && !in_array($this->fieldId('*', $tableAlias), $sqlParts['select'])) {
@@ -501,6 +501,24 @@ class CZBXAPI {
 
 			$sqlParts['select'][] = $fieldId;
 		}
+
+		return $sqlParts;
+	}
+
+	/**
+	 * Adds the given field to the ORDER BY part of the $sqlParts array.
+	 *
+	 * @param $fieldId
+	 * @param array $sqlParts
+	 * @param string $sortorder     sort direction, ZBX_SORT_UP or ZBX_SORT_DOWN
+	 *
+	 * @return array
+	 */
+	protected function addQueryOrder($fieldId, array $sqlParts, $sortorder = null) {
+		// some databases require the sortable column to be present in the SELECT part of the query
+		$sqlParts = $this->addQuerySelect($fieldId, $sqlParts);
+
+		$sqlParts['order'][] = $fieldId.(($sortorder) ? ' '.$sortorder : '');
 
 		return $sqlParts;
 	}
