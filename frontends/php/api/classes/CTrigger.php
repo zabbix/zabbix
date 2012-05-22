@@ -17,14 +17,15 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CTrigger class for API.
  *
  * @package API
  */
 class CTrigger extends CTriggerGeneral {
+
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
 
@@ -2170,4 +2171,3 @@ class CTrigger extends CTriggerGeneral {
 		return count($ids) == $count;
 	}
 }
-?>
