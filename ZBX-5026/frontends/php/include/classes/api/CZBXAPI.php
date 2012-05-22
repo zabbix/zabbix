@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 class CZBXAPI {
 
 	public static $userData;
@@ -231,11 +231,11 @@ class CZBXAPI {
 	 * If the $option parameter is set to API_OUTPUT_EXTEND or to API_OUTPUT_REFER, return the result as is.
 	 * If the $option parameter is an array of fields, return only them.
 	 *
-	 * @param string $tableName      The table that stores the object
-	 * @param array $object          The object from the database
-	 * @param array $output          The original requested output
+	 * @param string $tableName		The table that stores the object
+	 * @param array $object			The object from the database
+	 * @param array $output			The original requested output
 	 *
-	 * @return array           The resulting object
+	 * @return array				The resulting object
 	 */
 	protected function unsetExtraFields($tableName, array $object, $output) {
 		// for API_OUTPUT_SHORTEN return only the private key
@@ -359,10 +359,10 @@ class CZBXAPI {
 		$sqlGroup = (!empty($sqlParts['group'])) ? ' GROUP BY '.implode(',', array_unique($sqlParts['group'])) : '';
 		$sqlOrder = (!empty($sqlParts['order'])) ? ' ORDER BY '.implode(',', array_unique($sqlParts['order'])) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-			' FROM '.$sqlFrom.
-			$sqlWhere.
-			$sqlGroup.
-			$sqlOrder;
+				' FROM '.$sqlFrom.
+				$sqlWhere.
+				$sqlGroup.
+				$sqlOrder;
 
 		return $sql;
 	}
@@ -588,4 +588,3 @@ class CZBXAPI {
 		throw new APIException($code, $error);
 	}
 }
-?>
