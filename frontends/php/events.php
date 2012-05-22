@@ -294,7 +294,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			// prepending host name to trigger description
 			$triggerHostDB = get_hosts_by_triggerid($_REQUEST['triggerid']);
 			$triggerHost = DBfetch($triggerHostDB);
-			$trigger = $triggerHost['host'].':'.$trigger;
+			$trigger = $triggerHost['name'].':'.$trigger;
 		}
 		else{
 			$trigger = '';

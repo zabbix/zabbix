@@ -473,4 +473,3 @@ if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	CProfile::update('web.login.attempt.failed', 0, PROFILE_TYPE_INT);
 }
 show_messages();
-?>

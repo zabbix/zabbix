@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 require_once dirname(__FILE__).'/classes/core/Z.php';
 Z::getInstance()->run();
@@ -572,7 +571,7 @@ function get_status() {
 	$status['zabbix_server'] = zabbixRunning() ? _('Yes') : _('No');
 
 	// triggers
-	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) as cnt,t.status,t.value'.
+	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
 			' FROM triggers t'.
 				' INNER JOIN functions f ON t.triggerid=f.triggerid'.
 				' INNER JOIN items i ON f.itemid=i.itemid'.
@@ -601,11 +600,11 @@ function get_status() {
 		}
 	}
 	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on']
-			+ $status['triggers_count_unknown'];
+		+ $status['triggers_count_unknown'];
 	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
 
 	// items
-	$dbItems = DBselect('SELECT COUNT(*) as cnt,i.status'.
+	$dbItems = DBselect('SELECT COUNT(*) AS cnt,i.status'.
 			' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 			' WHERE h.status='.HOST_STATUS_MONITORED.
@@ -625,10 +624,10 @@ function get_status() {
 		}
 	}
 	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']
-			+ $status['items_count_not_supported'];
+		+ $status['items_count_not_supported'];
 
 	// hosts
-	$dbHosts = DBselect('SELECT COUNT(*) as cnt,h.status'.
+	$dbHosts = DBselect('SELECT COUNT(*) AS cnt,h.status'.
 			' FROM hosts h'.
 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
 			' GROUP BY h.status');
@@ -646,7 +645,7 @@ function get_status() {
 		}
 	}
 	$status['hosts_count'] = $status['hosts_count_monitored'] + $status['hosts_count_not_monitored']
-			+ $status['hosts_count_template'];
+		+ $status['hosts_count_template'];
 
 	// users
 	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u WHERE '.DBin_node('u.userid')));

@@ -196,7 +196,7 @@ class CEvent extends CZBXAPI {
 			zbx_value2array($options['groupids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts = $this->extendQuerySelect('hg.groupid', $sqlParts);
+				$sqlParts = $this->addQuerySelect('hg.groupid', $sqlParts);
 			}
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
@@ -212,7 +212,7 @@ class CEvent extends CZBXAPI {
 			zbx_value2array($options['hostids']);
 
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
-				$sqlParts = $this->extendQuerySelect('i.hostid', $sqlParts);
+				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
 			}
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
@@ -229,7 +229,7 @@ class CEvent extends CZBXAPI {
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts = $this->extendQuerySelect('e.*', $sqlParts);
+			$sqlParts = $this->addQuerySelect('e.*', $sqlParts);
 		}
 
 		// countOutput
@@ -314,8 +314,8 @@ class CEvent extends CZBXAPI {
 
 		// selectHosts, selectTriggers, selectItems
 		if ($options['output'] != API_OUTPUT_EXTEND && (!is_null($options['selectHosts']) || !is_null($options['selectTriggers']) || !is_null($options['selectItems']))) {
-			$sqlParts = $this->extendQuerySelect($this->fieldId('object'), $sqlParts);
-			$sqlParts = $this->extendQuerySelect($this->fieldId('objectid'), $sqlParts);
+			$sqlParts = $this->addQuerySelect($this->fieldId('object'), $sqlParts);
+			$sqlParts = $this->addQuerySelect($this->fieldId('objectid'), $sqlParts);
 		}
 
 		$eventids = array();

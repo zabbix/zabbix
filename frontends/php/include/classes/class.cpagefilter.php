@@ -301,23 +301,27 @@ class CPageFilter {
 			);
 			$options = zbx_array_merge($def_options, $options);
 			$hosts = API::Host()->get($options);
-			order_result($hosts, 'host');
+			order_result($hosts, 'name');
 
 			foreach ($hosts as $host) {
 				$this->data['hosts'][$host['hostid']] = $host['name'];
 			}
 
-			if (is_null($hostid)) {
+			// select remebered selection
+			if (is_null($hostid) && $this->_profileIds['hostid']) {
 				$hostid = $this->_profileIds['hostid'];
 			}
 
+			// nonexisting or unset $hostid
 			if ((!isset($this->data['hosts'][$hostid]) && $hostid > 0) || is_null($hostid)) {
-				if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) {
-					$hostid = 0;
+				// for popup select first host in the list
+				if ($this->config['popupDD']) {
+					reset($this->data['hosts']);
+					$hostid = key($this->data['hosts']);
 				}
-				elseif (is_null($this->_requestIds['hostid']) || $this->_requestIds['hostid'] > 0) {
-					$hostids = array_keys($this->data['hosts']);
-					$hostid = empty($hostids) ? 0 : reset($hostids);
+				// otherwise hostid = 0 for 'Dropdown first entry' option ALL or NONE
+				else {
+					$hostid = 0;
 				}
 			}
 		}
