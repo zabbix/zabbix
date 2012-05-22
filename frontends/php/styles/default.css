@@ -32,6 +32,7 @@ table { border-spacing: 0; }
 td, tr { color: inherit; text-decoration: none; padding: 0; }
 a { text-decoration: underline; color:#3C3089; }
 a:hover { color:#6C80B9; }
+a img { border: 0; }
 ul { margin-left: 0; padding-left: 1em; }
 form { margin: 0; }
 
