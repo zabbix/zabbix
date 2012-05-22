@@ -3,6 +3,7 @@ Changes for 2.1.0
 New features:
 
 Bug fixes:
+....I..... [ZBX-5041] changed {HOSTNAME} macro to {HOST.NAME} in the default templates (Sasha)
 A......... [ZBX-5030] fixed IT services query in oracle (Eduard)
 A.F....... [ZBX-4974] fixed and improved several popups (Toms)
 ..F....... [ZBX-5020] fixed undefined functions prior requirement check in setup.php (Toms)
