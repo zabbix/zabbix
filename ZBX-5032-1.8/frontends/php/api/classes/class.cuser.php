@@ -328,8 +328,21 @@ Copt::memoryPick();
 // Adding medias
 		if(!is_null($options['select_medias']) && str_in_array($options['select_medias'], $subselects_allowed_outputs)){
 		}
-// Adding mediatypes
+
+		// adding mediatypes
 		if(!is_null($options['select_mediatypes']) && str_in_array($options['select_mediatypes'], $subselects_allowed_outputs)){
+			$userMediatypes = CMediatype::get(array(
+				'output' => $options['select_mediatypes'],
+				'userids' => $userids,
+				'preservekeys' => true
+			));
+			foreach ($userMediatypes as $userMediatype) {
+				$utypes = $userMediatype['users'];
+				unset($userMediatype['users']);
+				foreach ($utypes as $user) {
+					$result[$user['userid']]['mediatypes'][] = $userMediatype;
+				}
+			}
 		}
 
 // removing keys (hash -> array)

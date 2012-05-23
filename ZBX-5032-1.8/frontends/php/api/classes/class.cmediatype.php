@@ -136,7 +136,7 @@ class CMediatype extends CZBXAPI{
 			if($options['output'] != API_OUTPUT_SHORTEN){
 				$sql_parts['select']['mediaid'] = 'm.mediaid';
 			}
-			$sql_parts['from']['medias'] = 'medias m';
+			$sql_parts['from']['media'] = 'media m';
 			$sql_parts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
 			$sql_parts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 
@@ -153,7 +153,7 @@ class CMediatype extends CZBXAPI{
 				$sql_parts['select']['userid'] = 'm.userid';
 			}
 
-			$sql_parts['from']['medias'] = 'medias m';
+			$sql_parts['from']['media'] = 'media m';
 			$sql_parts['where'][] = DBcondition('m.userid', $options['userids']);
 			$sql_parts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 
