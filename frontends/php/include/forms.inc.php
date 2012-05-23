@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -501,7 +501,7 @@
 			new CCol(array(
 				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
 				new CButton('btn_host', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_hostname&dstfld2=filter_hostid&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
+					'&dstfld1=filter_hostid&dstfld2=filter_hostname&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
 				)
 			)),
 			new CCol($updateIntervalLabel, 'label'),
