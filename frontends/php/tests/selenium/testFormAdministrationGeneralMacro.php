@@ -69,19 +69,27 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacro_Update() {
-		$row = DBfetch(DBselect('select * from globalmacro order by macro limit 1'));
+		DBsave_tables('globalmacro');
+
 		$macro = '{$UPDATEDMACRO}';
 		$macrovalue = 'Value of the updated macro';
 
 		$this->login('adm.macros.php');
-		// id=macros_0_macro
+		$globalmacroid = $this->getValue('macros[0][globalmacroid]');
 		$this->input_type('macros[0][macro]', $macro);
 		$this->input_type('macros[0][value]', $macrovalue);
 		$this->button_click('save');
 		$this->wait();
 		// checking that value of the macro has been updated in the DB
-		$sql = "SELECT * FROM globalmacro WHERE macro='$macro' AND value='$macrovalue' and globalmacroid=".$row['globalmacroid'];
-		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Value of the macro has not been updated in the DB. Perhaps it was saved with different globalmacroid.');
+		$count = DBcount(
+			'SELECT globalmacroid FROM globalmacro'.
+			' WHERE globalmacroid='.$globalmacroid.
+				' AND macro='.zbx_dbstr($macro).
+				' AND value='.zbx_dbstr($macrovalue)
+		);
+		$this->assertEquals(1, $count, 'Chuck Norris: Value of the macro has not been updated in the DB. Perhaps it was saved with different globalmacroid.');
+
+		DBrestore_tables('globalmacro');
 	}
 
 	public function testFormAdministrationGeneralMacro_CreateDuplicate() {
