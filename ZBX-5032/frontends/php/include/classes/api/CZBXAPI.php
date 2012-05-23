@@ -316,7 +316,7 @@ class CZBXAPI {
 	 *
 	 * @return array         The resulting SQL parts array
 	 */
-	protected function createSelectQueryParts($tableName, $tableAlias, array $options) {
+	protected function createSelectQueryParts($tableName, $tableAlias, array &$options) {
 		// extend default options
 		$options = zbx_array_merge($this->globalGetOptions, $options);
 
@@ -377,11 +377,12 @@ class CZBXAPI {
 	 *
 	 * @return array         The resulting SQL parts array
 	 */
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array &$options, array $sqlParts) {
 		$pkFieldId = $this->fieldId($this->pk($tableName), $tableAlias);
 
 		// count
 		if (isset($options['countOutput'])) {
+			$options['sortfield'] = '';
 			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
 		}
 		// custom output

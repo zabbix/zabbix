@@ -168,7 +168,7 @@ class CMediatype extends CZBXAPI {
 		}
 
 		// countOutput
-		if (!is_null($options['countOutput']) && is_null($options['groupCount'])) {
+		if (!is_null($options['countOutput']) && !is_null($options['groupCount'])) {
 			foreach ($sqlParts['group'] as $key => $fields) {
 				$sqlParts['select'][$key] = $fields;
 			}

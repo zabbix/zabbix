@@ -55,9 +55,6 @@ class CUser extends CZBXAPI {
 		// allowed columns for sorting
 		$sortColumns = array('userid', 'alias');
 
-		// allowed output options for [ select_* ] params
-		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND);
-
 		$sqlParts = array(
 			'select'	=> array('users' => 'u.userid'),
 			'from'		=> array('users' => 'users u'),
@@ -300,36 +297,8 @@ class CUser extends CZBXAPI {
 						' AND g.usrgrpid=ug.usrgrpid'.
 					' GROUP BY ug.userid'
 			);
-			while ($useracc = DBfetch($access)) {
-				$result[$useracc['userid']] = zbx_array_merge($result[$useracc['userid']], $useracc);
-			}
-		}
-
-		// adding usergroups
-		if (!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], $subselectsAllowedOutputs)) {
-			$usrgrps = API::UserGroup()->get(array(
-				'output' => $options['selectUsrgrps'],
-				'userids' => $userids,
-				'preservekeys' => true
-			));
-			foreach ($usrgrps as $usrgrp) {
-				$uusers = $usrgrp['users'];
-				unset($usrgrp['users']);
-				foreach ($uusers as $user) {
-					$result[$user['userid']]['usrgrps'][] = $usrgrp;
-				}
-			}
-		}
-
-		// adding medias
-		if (!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], $subselectsAllowedOutputs)) {
-			$userMedias = API::UserMedia()->get(array(
-				'output' => $options['selectMedias'],
-				'userids' => $userids,
-				'preservekeys' => true
-			));
-			foreach ($userMedias as $mediaid => $media) {
-				$result[$media['userid']]['medias'][] = $media;
+			while ($userAccess = DBfetch($access)) {
+				$result[$userAccess['userid']] = zbx_array_merge($result[$userAccess['userid']], $userAccess);
 			}
 		}
 
@@ -1184,10 +1153,52 @@ class CUser extends CZBXAPI {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$userIds = zbx_objectValues($result, 'userid');
+		$userids = zbx_objectValues($result, 'userid');
+
+		// adding usergroups
+		if (!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], array(API_OUTPUT_REFER, API_OUTPUT_EXTEND))) {
+			foreach ($result as &$user) {
+				$user['usrgrps'] = array();
+			}
+			unset($user);
+
+			$usrgrps = API::UserGroup()->get(array(
+				'output' => $options['selectUsrgrps'],
+				'userids' => $userids,
+				'preservekeys' => true
+			));
+			foreach ($usrgrps as $usrgrp) {
+				$uusers = $usrgrp['users'];
+				unset($usrgrp['users']);
+				$usrgrps = $this->unsetExtraFields('usrgrp', $usrgrps, $options['selectUsrgrps']);
+
+				foreach ($uusers as $user) {
+					$result[$user['userid']]['usrgrps'][] = $usrgrp;
+				}
+			}
+		}
+
+		// adding medias
+		if (!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], array(API_OUTPUT_REFER, API_OUTPUT_EXTEND))) {
+			foreach ($result as &$user) {
+				$user['medias'] = array();
+			}
+			unset($user);
+
+			$userMedias = API::UserMedia()->get(array(
+				'output' => $options['selectMedias'],
+				'userids' => $userids,
+				'preservekeys' => true
+			));
+			$userMedias = $this->unsetExtraFields('media', $userMedias, $options['selectMedias']);
+
+			foreach ($userMedias as $mediaid => $media) {
+				$result[$media['userid']]['medias'][] = $media;
+			}
+		}
 
 		// adding media types
-		if ($options['selectMediatypes'] !== null) {
+		if (!is_null($options['selectMediatypes'])) {
 			foreach ($result as &$user) {
 				$user['mediatypes'] = array();
 			}
@@ -1195,7 +1206,7 @@ class CUser extends CZBXAPI {
 
 			$mediatypes = API::Mediatype()->get(array(
 				'output' => $options['selectMediatypes'],
-				'userids' => $userIds,
+				'userids' => $userids,
 				'selectUsers' => API_OUTPUT_REFER,
 				'preservekeys' => true
 			));
@@ -1203,6 +1214,7 @@ class CUser extends CZBXAPI {
 				$utypes = $mediatype['users'];
 				unset($mediatype['users']);
 				$mediatype = $this->unsetExtraFields('media_type', $mediatype, $options['selectMediatypes']);
+
 				foreach ($utypes as $user) {
 					$result[$user['userid']]['mediatypes'][] = $mediatype;
 				}
