@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,22 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * Function: map_link_drawtypes
- *
- * Description:
- *     Return available drawing types for links
- */
-function map_link_drawtypes() {
-	return array(
-		MAP_LINK_DRAWTYPE_LINE,
-		MAP_LINK_DRAWTYPE_BOLD_LINE,
-		(function_exists('imagesetstyle') ? MAP_LINK_DRAWTYPE_DOT : null),
-		MAP_LINK_DRAWTYPE_DASHED_LINE
-	);
-}
+
 
 function sysmap_element_types($type = null) {
 	$types = array(
@@ -74,33 +59,6 @@ function sysmapElementLabel($label = null) {
 	else {
 		return false;
 	}
-}
-
-/**
- * Function: map_link_drawtype2str
- *
- * Description:
- *     Represent integer value of links drawing type into the string
- */
-function map_link_drawtype2str($drawtype) {
-	switch ($drawtype) {
-		case MAP_LINK_DRAWTYPE_LINE:
-			$drawtype = _('Line');
-			break;
-		case MAP_LINK_DRAWTYPE_BOLD_LINE:
-			$drawtype = _('Bold line');
-			break;
-		case MAP_LINK_DRAWTYPE_DOT:
-			$drawtype = _('Dot');
-			break;
-		case MAP_LINK_DRAWTYPE_DASHED_LINE:
-			$drawtype = _('Dashed line');
-			break;
-		default:
-			$drawtype = _('Unknown');
-			break;
-	}
-	return $drawtype;
 }
 
 function getActionMapBySysmap($sysmap) {
@@ -193,7 +151,7 @@ function getActionMapBySysmap($sysmap) {
 		$menus = trim($menus, ',');
 		$menus = 'show_popup_menu(event,['.$menus.'],180); cancelEvent(event);';
 
-		$back = get_png_by_selement($db_element, $map_info[$db_element['selementid']]);
+		$back = get_png_by_selement($map_info[$db_element['selementid']]);
 		if (!$back) {
 			continue;
 		}
@@ -232,7 +190,7 @@ function get_icon_center_by_selement($element, $info, $map) {
 		}
 	}
 	else {
-		$image = get_png_by_selement($element, $info);
+		$image = get_png_by_selement($info);
 		if ($image) {
 			$w = imagesx($image);
 			$h = imagesy($image);
@@ -282,10 +240,10 @@ function MyDrawLine($image, $x1, $y1, $x2, $y2, $color, $drawtype) {
 	}
 }
 
-function get_png_by_selement($selement, $info) {
+function get_png_by_selement($info) {
 	$image = get_image_by_imageid($info['iconid']);
 	if (!$image) {
-		return get_default_image(true);
+		return get_default_image();
 	}
 	return imagecreatefromstring($image['image']);
 }
@@ -1374,7 +1332,7 @@ function drawMapSelements(&$im, $map, $map_info) {
 		}
 
 		$el_info = $map_info[$selementid];
-		$img = get_png_by_selement($selement, $el_info);
+		$img = get_png_by_selement($el_info);
 
 		$iconX = imagesx($img);
 		$iconY = imagesy($img);
@@ -1392,7 +1350,7 @@ function drawMapHighligts(&$im, $map, $map_info) {
 		}
 
 		$el_info = $map_info[$selementid];
-		$img = get_png_by_selement($selement, $el_info);
+		$img = get_png_by_selement($el_info);
 
 		$iconX = imagesx($img);
 		$iconY = imagesy($img);
@@ -1517,7 +1475,7 @@ function drawMapSelementsMarks(&$im, &$map, &$map_info) {
 			continue;
 		}
 
-		$img = get_png_by_selement($selement, $el_info);
+		$img = get_png_by_selement($el_info);
 
 		$iconX = imagesx($img);
 		$iconY = imagesy($img);
@@ -1892,7 +1850,7 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 		$y = $selement['y'];
 		$iconX = $iconY = 0;
 
-		$image = get_png_by_selement($selement, $el_info);
+		$image = get_png_by_selement($el_info);
 		if ($image) {
 			$iconX = imagesx($image);
 			$iconY = imagesy($image);
@@ -2081,7 +2039,7 @@ function processAreasCoordinates(array &$map, array $areas, array $mapInfo) {
 		foreach ($area['selementids'] as $selementid) {
 			$selement = $map['selements'][$selementid];
 
-			$image = get_png_by_selement($selement, $mapInfo[$selementid]);
+			$image = get_png_by_selement($mapInfo[$selementid]);
 			$iconX = imagesx($image);
 			$iconY = imagesy($image);
 
@@ -2195,4 +2153,3 @@ function getIconByMapping($iconMap, $inventory) {
 	}
 	return $iconid;
 }
-?>
