@@ -65,7 +65,7 @@ $table->setHeader(array(
 
 switch ($_REQUEST['period']) {
 	case 'week':
-		$time_dif = SEC_PER_DAY;
+		$time_dif = SEC_PER_WEEK;
 		break;
 	case 'month':
 		$time_dif = SEC_PER_MONTH;
