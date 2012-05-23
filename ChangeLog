@@ -755,7 +755,7 @@ Changes for 1.8.13
 Changes for 1.8.13rc1
 
 ...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
-........S. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
+.......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
 ........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
 A.F....... [ZBX-4877] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-4900] improved performance of the 'Status of Zabbix' dashboard widget (Vedmak)
