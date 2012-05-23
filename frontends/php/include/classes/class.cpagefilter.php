@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ class CPageFilter {
 		$this->config['all_nodes'] = $ZBX_WITH_ALL_NODES;
 		$this->config['select_latest'] = isset($options['config']['select_latest']);
 		$this->config['DDReset'] = get_request('ddreset', null);
+		$this->config['popupDD'] = isset($options['config']['popupDD']);
 
 		$config = select_config();
 
@@ -253,8 +254,7 @@ class CPageFilter {
 	private function _initGroups($groupid, $options) {
 		$def_options = array(
 			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
-			'output' => API_OUTPUT_EXTEND,
-			'with_hosts_and_templates' => true
+			'output' => API_OUTPUT_EXTEND
 		);
 		$options = zbx_array_merge($def_options, $options);
 		$groups = API::HostGroup()->get($options);
@@ -265,17 +265,21 @@ class CPageFilter {
 			$this->data['groups'][$group['groupid']] = $group['name'];
 		}
 
-		if (is_null($groupid)) {
+		// select remebered selection
+		if (is_null($groupid) && $this->_profileIds['groupid']) {
 			$groupid = $this->_profileIds['groupid'];
 		}
 
+		// nonexisting or unset $groupid
 		if ((!isset($this->data['groups'][$groupid]) && $groupid > 0) || is_null($groupid)) {
-			if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) {
-				$groupid = 0;
+			// for popup select first group in the list
+			if ($this->config['popupDD']) {
+				reset($this->data['groups']);
+				$groupid = key($this->data['groups']);
 			}
-			elseif (is_null($this->_requestIds['groupid']) || $this->_requestIds['groupid'] > 0) {
-				$groupids = array_keys($this->data['groups']);
-				$groupid = empty($groupids) ? 0 : reset($groupids);
+			// otherwise groupid = 0 for 'Dropdown first entry' option ALL or NONE
+			else {
+				$groupid = 0;
 			}
 		}
 
@@ -462,10 +466,15 @@ class CPageFilter {
 		}
 
 		natcasesort($items);
-		$items = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all')) + $items;
+
+		if (!$this->config['popupDD']) {
+			$items = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all')) + $items;
+		}
+
 		foreach ($items as $id => $name) {
 			$cmb->addItem($id, $name);
 		}
+
 		return $cmb;
 	}
 }
