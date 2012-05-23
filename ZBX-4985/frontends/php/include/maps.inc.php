@@ -152,9 +152,7 @@ function getActionMapBySysmap($sysmap) {
 		$menus = 'show_popup_menu(event,['.$menus.'],180); cancelEvent(event);';
 
 		$back = get_png_by_selement($map_info[$db_element['selementid']]);
-		if (!$back) {
-			continue;
-		}
+
 		$r_area = new CArea(
 			array(
 				$db_element['x'],
@@ -177,7 +175,6 @@ function getActionMapBySysmap($sysmap) {
 function get_icon_center_by_selement($element, $info, $map) {
 	$x = $element['x'];
 	$y = $element['y'];
-	$w = $h = 0;
 
 	if (isset($element['elementsubtype']) && $element['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
 		if ($element['areatype'] == SYSMAP_ELEMENT_AREA_TYPE_CUSTOM) {
@@ -191,10 +188,8 @@ function get_icon_center_by_selement($element, $info, $map) {
 	}
 	else {
 		$image = get_png_by_selement($info);
-		if ($image) {
-			$w = imagesx($image);
-			$h = imagesy($image);
-		}
+		$w = imagesx($image);
+		$h = imagesy($image);
 	}
 
 	$x += $w / 2;
@@ -1647,6 +1642,7 @@ function drawMapLinkLabels(&$im, $map, $map_info, $resolveMacros = true) {
 				break;
 			case MAP_LINK_DRAWTYPE_BOLD_LINE:
 				imagerectangle($im, $boxX_left - 1, $boxY_top - 1, $boxX_right + 1, $boxY_bottom + 1, $color);
+				break;
 			case MAP_LINK_DRAWTYPE_LINE:
 			default:
 				imagerectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);
@@ -1848,13 +1844,10 @@ function drawMapLabels(&$im, $map, $map_info, $resolveMacros = true) {
 
 		$x = $selement['x'];
 		$y = $selement['y'];
-		$iconX = $iconY = 0;
 
 		$image = get_png_by_selement($el_info);
-		if ($image) {
-			$iconX = imagesx($image);
-			$iconY = imagesy($image);
-		}
+		$iconX = imagesx($image);
+		$iconY = imagesy($image);
 
 		if (!is_null($hl_color)) {
 			$icon_hl = 14;
@@ -2019,6 +2012,7 @@ function populateFromMapAreas(array &$map) {
  * @param array $map
  * @param array $areas
  * @param array $mapInfo
+ *
  * @return void
  */
 function processAreasCoordinates(array &$map, array $areas, array $mapInfo) {
@@ -2048,19 +2042,19 @@ function processAreasCoordinates(array &$map, array $areas, array $mapInfo) {
 			switch ($label_location) {
 				case MAP_LABEL_LOC_TOP:
 					$newX = $area['x'] + ($xOffset / 2) - ($iconX / 2);
-					$newY = $area['y'] + $yOffset - $iconY;
+					$newY = $area['y'] + $yOffset - $iconY - ($iconY >= $iconX ? 0 : abs($iconX - $iconY) / 2) - 20;
 					break;
 				case MAP_LABEL_LOC_LEFT:
-					$newX = $area['x'] + $xOffset - $iconX;
+					$newX = $area['x'] + $xOffset - $iconX - 20;
 					$newY = $area['y'] + ($yOffset / 2) - ($iconY / 2);
 					break;
 				case MAP_LABEL_LOC_RIGHT:
-					$newX = $area['x'];
+					$newX = $area['x'] + 20;
 					$newY = $area['y'] + ($yOffset / 2) - ($iconY / 2);
 					break;
 				case MAP_LABEL_LOC_BOTTOM:
 					$newX = $area['x'] + ($xOffset / 2) - ($iconX / 2);
-					$newY = $area['y'];
+					$newY = $area['y'] + abs($iconX - $iconY) / 2 + 20;
 					break;
 			}
 
@@ -2079,12 +2073,13 @@ function processAreasCoordinates(array &$map, array $areas, array $mapInfo) {
 /**
  * Calculates area connector point on area perimeter
  *
- * @param int $ax x area coordinate
- * @param  $ay y area coordinate
- * @param  $aWidth area width
- * @param  $aHeight area height
- * @param  $x2 x coordinate of connector second element
- * @param  $y2 y coordinate of connector second element
+ * @param int $ax      x area coordinate
+ * @param int $ay      y area coordinate
+ * @param int $aWidth  area width
+ * @param int $aHeight area height
+ * @param int $x2      x coordinate of connector second element
+ * @param int $y2      y coordinate of connector second element
+ *
  * @return array contains two values, x and y coordinates of new area connector point
  */
 function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
@@ -2126,8 +2121,9 @@ function calculateMapAreaLinkCoord($ax, $ay, $aWidth, $aHeight, $x2, $y2) {
 }
 
 /**
- * @param $iconMap
- * @param $inventory
+ * @param array $iconMap
+ * @param array $inventory
+ *
  * @return int icon id
  */
 function getIconByMapping($iconMap, $inventory) {
