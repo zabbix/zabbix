@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,12 +62,6 @@ switch ($page['type']) {
 		break;
 	case PAGE_TYPE_JSON:
 		header('Content-Type: application/json');
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
-		}
-		break;
-	case PAGE_TYPE_JSON_RPC:
-		header('Content-Type: application/json-rpc');
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', 1);
 		}
@@ -169,6 +163,12 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 					'.not_classified { background-color: #'.$config['severity_color_0'].' !important; }'."\n".
 					'.trigger_unknown { background-color: #DBDBDB !important; }'."\n".
 				'</style>';
+
+			// perform Zabbix server check only for standard pages
+			if (!defined('ZBX_PAGE_NO_MENU') && $config['server_check_interval']) {
+				$page['scripts'][] = 'servercheck.js';
+				zbx_add_post_js('checkServerStatus('.$config['server_check_interval'].');');
+			}
 		}
 	}
 	echo '<link rel="stylesheet" type="text/css" href="styles/themes/'.$css.'/main.css" />'."\n";
@@ -187,7 +187,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	echo '<script type="text/javascript" src="'.$path.'"></script>'."\n";
 
 	if (!empty($page['scripts']) && is_array($page['scripts'])) {
-		foreach ($page['scripts'] as $id => $script) {
+		foreach ($page['scripts'] as $script) {
 			$path .= '&amp;files[]='.$script;
 		}
 		echo '<script type="text/javascript" src="'.$path.'"></script>'."\n";
@@ -200,6 +200,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 </script>
 </head>
 <body class="<?php echo $css; ?>">
+	<div id="message-global"><?php echo _('Zabbix server might be down!'); ?></div>
 <?php
 }
 
