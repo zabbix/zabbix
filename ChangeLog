@@ -732,6 +732,8 @@ Changes for 1.8.13
 
 Changes for 1.8.13rc1
 
+A.F....... [ZBX-4685] fixed hangup when users login at the same time (Toms)
+....I..... [ZBX-4810] fixed the ifInOctets and ifOutOctets items in the Dell_PowerConnect_5224, Template_Dell_PowerConnect_5324, Template_C3750-48TS and Template_Cisco_PIX515E templates (Sasha)
 ...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
 .......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
 ........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
