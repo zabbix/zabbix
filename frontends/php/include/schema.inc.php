@@ -5481,7 +5481,7 @@ return array(
 		),
 	),
 	'item_discovery' => array(
-		'type' => DB::TABLE_TYPE_CONFIG,
+		'type' => DB::TABLE_TYPE_HISTORY,
 		'key' => 'itemdiscoveryid',
 		'fields' => array(
 			'itemdiscoveryid' => array(

@@ -791,3 +791,13 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .service-mon .tableinfo .sla-bar .sla-bar-part { height: 15px; display: inline-block; margin-bottom: -4px; }
 .service-mon .tableinfo .sla-bar .sla-green { background: url('../images/gradients/sla_green15.png') repeat-x; }
 .service-mon .tableinfo .sla-bar .sla-red { background: url('../images/gradients/sla_red15.png') repeat-x; }
+
+#message-global {
+	padding: 5px;
+	font-size: 1.2em;
+	background-color: #FBB;
+	border: 2px solid #C44;
+	text-align: center;
+	display: none;
+}
+

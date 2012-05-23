@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 define('ZABBIX_VERSION',		'2.0.1rc1');
 define('ZABBIX_API_VERSION',	'1.4');
 
@@ -790,34 +790,18 @@ define('IPMI_PRIVILEGE_OEM',		5);
 
 define('ZBX_HAVE_IPV6', 1);
 
+
+define('ZBX_SOCKET_TIMEOUT', 3);
+
 // XML export|import tags
-define('XML_TAG_MACROS',			'macros');
 define('XML_TAG_MACRO',				'macro');
-define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
-define('XML_TAG_HOSTS',				'hosts');
 define('XML_TAG_HOST',				'host');
 define('XML_TAG_HOSTINVENTORY',		'host_inventory');
-define('XML_TAG_GROUPS',			'groups');
-define('XML_TAG_GROUP',				'group');
-define('XML_TAG_APPLICATIONS',		'applications');
-define('XML_TAG_APPLICATION',		'application');
-define('XML_TAG_ITEMS',				'items');
 define('XML_TAG_ITEM',				'item');
-define('XML_TAG_TEMPLATES',			'templates');
-define('XML_TAG_TEMPLATE',			'template');
-define('XML_TAG_TRIGGERS',			'triggers');
 define('XML_TAG_TRIGGER',			'trigger');
-define('XML_TAG_GRAPHS',			'graphs');
 define('XML_TAG_GRAPH',				'graph');
 define('XML_TAG_GRAPH_ELEMENT',		'graph_element');
-define('XML_TAG_GRAPH_ELEMENTS',	'graph_elements');
-define('XML_TAG_SCREENS',			'screens');
-define('XML_TAG_SCREEN',			'screen');
-define('XML_TAG_SCREEN_ELEMENT',	'screen_element');
-define('XML_TAG_SCREEN_ELEMENTS',	'screen_elements');
-define('XML_TAG_DEPENDENCIES',		'dependencies');
 define('XML_TAG_DEPENDENCY',		'dependency');
-define('XML_TAG_DEPENDS',			'depends');
 
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
