@@ -741,8 +741,12 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+..F....... [ZBX-5014] fixed error in dm setup for guest user (Vedmak)
+..F....... [ZBX-4984] fixed export include graphs and triggers with web items (Vedmak)
 .......PS. [ZBX-4980] fixed trapper process crash/hang on decoding big base64 encoded values (Andris)
 ...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
+..F....... [ZBX-4918] fixed value mapping when resolve {ITEM.LASTVALUE} and {ITEM.VALUE} macros (Vedmak)
+A......... [ZBX-4917] fixed slow screens for non-Super-Admins (Toms)
 
 Changes for 1.8.13
 
