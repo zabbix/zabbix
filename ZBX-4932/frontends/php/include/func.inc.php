@@ -1366,11 +1366,16 @@ function zbx_str2links($text) {
 	return $result;
 }
 
-function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
+function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 	if (!isset($mainArray[$sIndex])) {
 		$mainArray[$sIndex] = array();
 	}
-	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
+	if ($key) {
+		$mainArray[$sIndex][$key] = is_null($element) ? $sIndex : $element;
+	}
+	else {
+		$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
+	}
 }
 
 /**
