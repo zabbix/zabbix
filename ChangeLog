@@ -1,9 +1,11 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-1019] updated jQuery to 1.7.2 and jQuery UI to 1.8.20 (Vedmak)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3106] fixed supported types for calculated items (Toms)
 A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
 ....I..... [ZBX-5041] changed {HOSTNAME} macro to {HOST.NAME} in the default templates (Sasha)
 A.F....... [ZBX-4974] fixed and improved several popups (Toms)
@@ -22,9 +24,11 @@ A......... [ZBX-5026] fixed error messages when creating IT Service (Eduard)
 Changes for 2.0.1rc1
 
 New features:
+..F....... [ZBXNEXT-1019] updated jQuery to 1.7.2 and jQuery UI to 1.8.20 (Vedmak)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3106] fixed supported types for calculated items (Toms)
 A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
 ....I..... [ZBX-5041] changed {HOSTNAME} macro to {HOST.NAME} in the default templates (Sasha)
 A.F....... [ZBX-4974] fixed and improved several popups (Toms)
@@ -739,8 +743,12 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+..F....... [ZBX-5014] fixed error in dm setup for guest user (Vedmak)
+..F....... [ZBX-4984] fixed export include graphs and triggers with web items (Vedmak)
 .......PS. [ZBX-4980] fixed trapper process crash/hang on decoding big base64 encoded values (Andris)
 ...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
+..F....... [ZBX-4918] fixed value mapping when resolve {ITEM.LASTVALUE} and {ITEM.VALUE} macros (Vedmak)
+A......... [ZBX-4917] fixed slow screens for non-Super-Admins (Toms)
 
 Changes for 1.8.13
 
@@ -748,8 +756,10 @@ Changes for 1.8.13
 
 Changes for 1.8.13rc1
 
+A.F....... [ZBX-4685] fixed hangup when users login at the same time (Toms)
+....I..... [ZBX-4810] fixed the ifInOctets and ifOutOctets items in the Dell_PowerConnect_5224, Template_Dell_PowerConnect_5324, Template_C3750-48TS and Template_Cisco_PIX515E templates (Sasha)
 ...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
-........S. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
+.......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
 ........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
 A.F....... [ZBX-4877] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-4900] improved performance of the 'Status of Zabbix' dashboard widget (Vedmak)

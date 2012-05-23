@@ -589,6 +589,14 @@ foreach ($this->data['types'] as $type => $label) {
 	zbx_subarray_push($this->data['typeVisibility'], $type, 'row_delay');
 }
 
+// disable dropdown items for calculated and aggregate items
+foreach (array(ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE) as $type) {
+	// set to disable character, log and text items in value type
+	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT), 'value_type');
+	// disable octal, hexadecimal and boolean items in data_type; Necessary for Numeric (unsigned) value type only
+	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_DATA_TYPE_OCTAL, ITEM_DATA_TYPE_HEXADECIMAL, ITEM_DATA_TYPE_BOOLEAN), 'data_type');
+}
+
 $this->data['valueTypeVisibility'] = array();
 if (!$this->data['is_discovery_rule']) {
 	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'data_type');
