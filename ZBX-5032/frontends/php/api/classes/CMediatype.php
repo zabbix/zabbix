@@ -102,6 +102,9 @@ class CMediatype extends CZBXAPI {
 			return array();
 		}
 
+		// output
+		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+
 		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
 
@@ -164,21 +167,10 @@ class CMediatype extends CZBXAPI {
 			zbx_db_search('media_type mt', $options, $sqlParts);
 		}
 
-		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['media_type'] = 'mt.*';
-		}
-
 		// countOutput
-		if (!is_null($options['countOutput'])) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = array('COUNT(DISTINCT mt.mediatypeid) AS rowscount');
-
-			// groupCount
-			if (!is_null($options['groupCount'])) {
-				foreach ($sqlParts['group'] as $key => $fields) {
-					$sqlParts['select'][$key] = $fields;
-				}
+		if (!is_null($options['countOutput']) && is_null($options['groupCount'])) {
+			foreach ($sqlParts['group'] as $key => $fields) {
+				$sqlParts['select'][$key] = $fields;
 			}
 		}
 

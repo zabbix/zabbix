@@ -333,21 +333,7 @@ class CUser extends CZBXAPI {
 			}
 		}
 
-		// adding mediatypeids
-		if (!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselectsAllowedOutputs)) {
-			$userMediatypes = API::Mediatype()->get(array(
-				'output' => $options['selectMediatypes'],
-				'userids' => $userids,
-				'preservekeys' => true
-			));
-			foreach ($userMediatypes as $userMediatype) {
-				$utypes = $userMediatype['users'];
-				unset($userMediatype['users']);
-				foreach ($utypes as $user) {
-					$result[$user['userid']]['mediatypes'][] = $userMediatype;
-				}
-			}
-		}
+		$result = $this->addRelatedObjects($options, $result);
 
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
@@ -1193,5 +1179,36 @@ class CUser extends CZBXAPI {
 		}
 
 		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$userIds = zbx_objectValues($result, 'userid');
+
+		// adding media types
+		if ($options['selectMediatypes'] !== null) {
+			foreach ($result as &$user) {
+				$user['mediatypes'] = array();
+			}
+			unset($user);
+
+			$mediatypes = API::Mediatype()->get(array(
+				'output' => $options['selectMediatypes'],
+				'userids' => $userIds,
+				'selectUsers' => API_OUTPUT_REFER,
+				'preservekeys' => true
+			));
+			foreach ($mediatypes as $mediatype) {
+				$utypes = $mediatype['users'];
+				unset($mediatype['users']);
+				$mediatype = $this->unsetExtraFields('media_type', $mediatype, $options['selectMediatypes']);
+				foreach ($utypes as $user) {
+					$result[$user['userid']]['mediatypes'][] = $mediatype;
+				}
+			}
+		}
+
+		return $result;
 	}
 }
