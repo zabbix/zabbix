@@ -595,7 +595,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 	$value = rtrim($value, '.');
 
-	return sprintf('%s %s%s', $value, $desc, $units);
+	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
 }
 
 /************* ZBX MISC *************/
