@@ -142,7 +142,8 @@
 		<?php }
 		if (!empty($this->data['typeVisibility'])) { ?>
 			var typeSwitcher = new CViewSwitcher('type', 'change',
-				<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>);
+				<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>,
+				<?php echo zbx_jsvalue($this->data['typeDisable'], true); ?>);
 		<?php }
 		if (!empty($this->data['securityLevelVisibility'])) { ?>
 			var securityLevelSwitcher = new CViewSwitcher('snmpv3_securitylevel', 'change',

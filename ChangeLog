@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3106] fixed supported types for calculated items (Toms)
 A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
 ....I..... [ZBX-5041] changed {HOSTNAME} macro to {HOST.NAME} in the default templates (Sasha)
 A.F....... [ZBX-4974] fixed and improved several popups (Toms)
@@ -25,6 +26,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3106] fixed supported types for calculated items (Toms)
 A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
 ....I..... [ZBX-5041] changed {HOSTNAME} macro to {HOST.NAME} in the default templates (Sasha)
 A.F....... [ZBX-4974] fixed and improved several popups (Toms)
