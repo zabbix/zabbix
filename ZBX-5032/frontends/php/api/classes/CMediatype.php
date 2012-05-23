@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CMediatype class for API.
  * @package API
@@ -29,7 +29,6 @@
 class CMediatype extends CZBXAPI {
 
 	protected $tableName = 'media_type';
-
 	protected $tableAlias = 'mt';
 
 	/**
@@ -97,9 +96,9 @@ class CMediatype extends CZBXAPI {
 		// permission check
 		if (USER_TYPE_SUPER_ADMIN == $userType) {
 		}
-		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
+		elseif (is_null($options['editable']) && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
 		}
-		elseif (!is_null($options['editable']) || (self::$userData['type'] != USER_TYPE_SUPER_ADMIN)) {
+		elseif (!is_null($options['editable']) || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			return array();
 		}
 
@@ -123,7 +122,7 @@ class CMediatype extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['mediaid'] = 'm.mediaid';
 			}
-			$sqlParts['from']['medias'] = 'medias m';
+			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = DBcondition('m.mediaid', $options['mediaids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 
@@ -139,7 +138,7 @@ class CMediatype extends CZBXAPI {
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
 				$sqlParts['select']['userid'] = 'm.userid';
 			}
-			$sqlParts['from']['medias'] = 'medias m';
+			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = DBcondition('m.userid', $options['userids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 
@@ -173,7 +172,7 @@ class CMediatype extends CZBXAPI {
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT mt.mediatypeid) as rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT mt.mediatypeid) AS rowscount');
 
 			// groupCount
 			if (!is_null($options['groupCount'])) {
@@ -279,13 +278,12 @@ class CMediatype extends CZBXAPI {
 		 */
 		// adding users
 		if (!is_null($options['selectUsers']) && str_in_array($options['selectUsers'], $subselectsAllowedOutputs)) {
-			$objParams = array(
+			$users = API::User()->get(array(
 				'output' => $options['selectUsers'],
 				'mediatypeids' => $mediatypeids,
 				'preservekeys' => true
-			);
-			$users = API::User()->get($objParams);
-			foreach ($users as $userid => $user) {
+			));
+			foreach ($users as $user) {
 				$umediatypes = $user['mediatypes'];
 				unset($user['mediatypes']);
 				foreach ($umediatypes as $mediatype) {
@@ -301,22 +299,22 @@ class CMediatype extends CZBXAPI {
 		return $result;
 	}
 
-/**
- * Add Media types
- *
- * @param array $mediatypes
- * @param string $mediatypes['type']
- * @param string $mediatypes['description']
- * @param string $mediatypes['smtp_server']
- * @param string $mediatypes['smtp_helo']
- * @param string $mediatypes['smtp_email']
- * @param string $mediatypes['exec_path']
- * @param string $mediatypes['gsm_modem']
- * @param string $mediatypes['username']
- * @param string $mediatypes['passwd']
- * @param integer $mediatypes['status']
- * @return array|boolean
- */
+	/**
+	 * Add Media types
+	 *
+	 * @param array $mediatypes
+	 * @param string $mediatypes['type']
+	 * @param string $mediatypes['description']
+	 * @param string $mediatypes['smtp_server']
+	 * @param string $mediatypes['smtp_helo']
+	 * @param string $mediatypes['smtp_email']
+	 * @param string $mediatypes['exec_path']
+	 * @param string $mediatypes['gsm_modem']
+	 * @param string $mediatypes['username']
+	 * @param string $mediatypes['passwd']
+	 * @param integer $mediatypes['status']
+	 * @return array|boolean
+	 */
 	public function create($mediatypes) {
 		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types.'));
@@ -327,7 +325,7 @@ class CMediatype extends CZBXAPI {
 		foreach ($mediatypes as $mediatype) {
 			$mediatypeDbFields = array(
 				'type' => null,
-				'description' => null,
+				'description' => null
 			);
 			if (!check_db_fields($mediatypeDbFields, $mediatype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
@@ -338,39 +336,37 @@ class CMediatype extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type.'));
 			}
 
-			$options = array(
+			$mediatypeExist = $this->get(array(
 				'filter' => array('description' => $mediatype['description']),
 				'output' => API_OUTPUT_EXTEND
-			);
-			$mediatypeExist = $this->get($options);
+			));
 			if (!empty($mediatypeExist)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%s" already exists.', $mediatypeExist[0]['description']));
 			}
-
 		}
+
 		$mediatypeids = DB::insert('media_type', $mediatypes);
 
 		return array('mediatypeids' => $mediatypeids);
 	}
 
-/**
- * Update Media types
- *
- * @param array $mediatypes
- * @param string $mediatypes['type']
- * @param string $mediatypes['description']
- * @param string $mediatypes['smtp_server']
- * @param string $mediatypes['smtp_helo']
- * @param string $mediatypes['smtp_email']
- * @param string $mediatypes['exec_path']
- * @param string $mediatypes['gsm_modem']
- * @param string $mediatypes['username']
- * @param string $mediatypes['passwd']
- * @param integer $mediatypes['status']
- * @return array
- */
+	/**
+	 * Update Media types
+	 *
+	 * @param array $mediatypes
+	 * @param string $mediatypes['type']
+	 * @param string $mediatypes['description']
+	 * @param string $mediatypes['smtp_server']
+	 * @param string $mediatypes['smtp_helo']
+	 * @param string $mediatypes['smtp_email']
+	 * @param string $mediatypes['exec_path']
+	 * @param string $mediatypes['gsm_modem']
+	 * @param string $mediatypes['username']
+	 * @param string $mediatypes['passwd']
+	 * @param integer $mediatypes['status']
+	 * @return array
+	 */
 	public function update($mediatypes) {
-
 		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can edit media types.'));
 		}
@@ -380,7 +376,7 @@ class CMediatype extends CZBXAPI {
 		$update = array();
 		foreach ($mediatypes as $mediatype) {
 			$mediatypeDbFields = array(
-				'mediatypeid' => null,
+				'mediatypeid' => null
 			);
 			if (!check_db_fields($mediatypeDbFields, $mediatype)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
@@ -389,14 +385,15 @@ class CMediatype extends CZBXAPI {
 			if (isset($mediatype['description'])) {
 				$options = array(
 					'filter' => array('description' => $mediatype['description']),
-					'preservekeys' => 1,
-					'output' => API_OUTPUT_SHORTEN,
+					'preservekeys' => true,
+					'output' => API_OUTPUT_SHORTEN
 				);
 				$existMediatypes = $this->get($options);
 				$existMediatype = reset($existMediatypes);
 
-				if ($existMediatype && (bccomp($existMediatype['mediatypeid'], $mediatype['mediatypeid']) != 0))
+				if ($existMediatype && bccomp($existMediatype['mediatypeid'], $mediatype['mediatypeid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%s" already exists.', $mediatype['description']));
+				}
 			}
 
 			if (array_key_exists('passwd', $mediatype) && empty($mediatype['passwd'])) {
@@ -413,7 +410,7 @@ class CMediatype extends CZBXAPI {
 			if (!empty($mediatype)) {
 				$update[] = array(
 					'values' => $mediatype,
-					'where' => array('mediatypeid'=>$mediatypeid),
+					'where' => array('mediatypeid' => $mediatypeid)
 				);
 			}
 		}
@@ -424,13 +421,13 @@ class CMediatype extends CZBXAPI {
 		return array('mediatypeids' => $mediatypeids);
 	}
 
-/**
- * Delete Media types.
- *
- * @param array $mediatypeids
- *
- * @return boolean
- */
+	/**
+	 * Delete Media types.
+	 *
+	 * @param array $mediatypeids
+	 *
+	 * @return boolean
+	 */
 	public function delete($mediatypeids) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can delete media types.'));
@@ -453,4 +450,3 @@ class CMediatype extends CZBXAPI {
 		return array('mediatypeids' => $mediatypeids);
 	}
 }
-?>
