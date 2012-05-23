@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
 A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
@@ -21,6 +22,7 @@ A......... [ZBX-5026] fixed error messages when creating IT Service (Eduard)
 Changes for 2.0.1rc1
 
 New features:
+..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
 A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
