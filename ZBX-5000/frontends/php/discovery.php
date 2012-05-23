@@ -78,9 +78,16 @@ $options = array(
 	'selectDHosts' => API_OUTPUT_EXTEND,
 	'output' => API_OUTPUT_EXTEND
 );
+
+$config = select_config();
+
 if (!empty($data['druleid'])) {
 	$options['druleids'] = $data['druleid'];
 }
+elseif ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE) {
+	$options['druleids'] = array();
+}
+
 $data['drules'] = API::DRule()->get($options);
 if (!empty($data['drules'])) {
 	order_result($data['drules'], 'name');
