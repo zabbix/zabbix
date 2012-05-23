@@ -383,7 +383,7 @@ class CUserMedia extends CZBXAPI {
 // PERMISSION CHECK
 			if ($create) {
 				if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to create user medias.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to create user media.'));
 
 				$dbMedia = $media;
 			}
@@ -399,7 +399,7 @@ class CUserMedia extends CZBXAPI {
 				}
 				else{
 					if (USER_TYPE_ZABBIX_ADMIN != self::$userData['type'])
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user medias.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user media.'));
 				}
 
 			}

@@ -716,7 +716,7 @@ class CUser extends CZBXAPI {
 		$userids = array();
 
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user Medias.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user media.'));
 		}
 
 		foreach ($users as $user) {
@@ -753,7 +753,7 @@ class CUser extends CZBXAPI {
 		$mediaids = zbx_toArray($mediaids);
 
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user Medias.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
 		}
 
 		$sql = 'DELETE FROM media WHERE '.DBcondition('mediaid', $mediaids);
@@ -783,7 +783,7 @@ class CUser extends CZBXAPI {
 		$users = zbx_toArray($mediaData['users']);
 
 		if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user Medias.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Zabbix Admins can change user media.'));
 		}
 
 		$updMedias = array();
@@ -817,7 +817,7 @@ class CUser extends CZBXAPI {
 			$mediaids = zbx_objectValues($delMedias, 'mediaid');
 			$result = $this->deleteMedia($mediaids);
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete user medias.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete user media.'));
 			}
 		}
 
@@ -837,7 +837,7 @@ class CUser extends CZBXAPI {
 				' WHERE mediaid='.$media['mediaid']
 			);
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update user medias.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update user media.'));
 			}
 		}
 
@@ -845,7 +845,7 @@ class CUser extends CZBXAPI {
 		if (!empty($newMedias)) {
 			$result = $this->addMedia(array('users' => $users, 'medias' => $newMedias));
 			if (!$result) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot insert user medias.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot insert user media.'));
 			}
 		}
 
