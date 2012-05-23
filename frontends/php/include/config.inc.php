@@ -548,8 +548,6 @@ function parse_period($str) {
 }
 
 function get_status() {
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
 	$status = array(
 		'triggers_count' => 0,
 		'triggers_count_enabled' => 0,
@@ -570,14 +568,7 @@ function get_status() {
 	);
 
 	// server
-	$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
-	if (!$checkport) {
-		clear_messages();
-		$status['zabbix_server'] = _('No');
-	}
-	else {
-		$status['zabbix_server'] = _('Yes');
-	}
+	$status['zabbix_server'] = zabbixRunning() ? _('Yes') : _('No');
 
 	// triggers
 	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
@@ -686,6 +677,17 @@ function get_status() {
 	$status['qps_total'] = round($row['qps'], 2);
 
 	return $status;
+}
+
+function zabbixRunning() {
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+	$result = (bool) fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, ZBX_SOCKET_TIMEOUT);
+	if (!$result) {
+		clear_messages();
+	}
+
+	return $result;
 }
 
 function set_image_header($format = null) {
