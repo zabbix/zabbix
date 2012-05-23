@@ -17,8 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
+session_start();
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = 'RPC';
@@ -150,6 +151,17 @@ switch ($data['method']) {
 				break;
 		}
 		break;
+	case 'zabbix.status':
+		$config = select_config();
+		if (!isset($_SESSION['zabbixStatus']) || ($_SESSION['zabbixStatus']['time'] + $config['server_check_interval']) <= time()) {
+			$_SESSION['zabbixStatus'] = array(
+				'time' => time(),
+				'status' => zabbixRunning()
+			);
+		}
+
+		$result = $_SESSION['zabbixStatus']['status'];
+		break;
 	default:
 		fatal_error('Wrong RPC call to JS RPC');
 }
@@ -164,4 +176,3 @@ if (isset($data['id'])) {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
