@@ -382,6 +382,9 @@ static struct snmp_session	*snmp_open_session(DC_ITEM *item, char *err)
 		zbx_snprintf(err, MAX_STRING_LEN, "Error doing snmp_open()");
 	}
 end:
+	/* no prefix (e. g. "STRING: ") in returned values */
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_QUICK_PRINT, 1);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return ss;
@@ -399,48 +402,26 @@ static void	snmp_close_session(struct snmp_session *session)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static char	*snmp_get_octet_string(struct variable_list *vars)
+static char	*snmp_get_octet_string(struct variable_list *vars, const oid *objid, size_t objidlen)
 {
-	char	*strval_dyn = NULL;
-	size_t	i, len = vars->val_len;
+	char		*buf = NULL;
+	size_t		buf_len = 0, out_len = 0;
+	int		buf_overflow = 0;
+	const char	*hint;
+	struct tree	*subtree;
 
-	for (i = 0; i < len; i++)
-	{
-		/* check for printable characters */
-		if (0 == isprint(vars->val.string[i]) && 0 == isspace(vars->val.string[i]))
-			break;
-	}
+	/* find the subtree */
+	subtree = netsnmp_sprint_realloc_objid_tree((u_char **)&buf, &buf_len, &out_len, 0, &buf_overflow, objid, objidlen);
 
-	/* string terminated with a NUL character */
-	if (i == len - 1 && '\0' == vars->val.string[i])
-		len--;
+	/* default hint, in order to avoid double-quoting the value */
+	hint = subtree->hint ? subtree->hint : "a";
 
-	/* all characters are printable or string is empty */
-	if (i == len)
-	{
-		strval_dyn = zbx_malloc(strval_dyn, len + 1);
-		memcpy(strval_dyn, vars->val.string, len);
-		strval_dyn[len] = '\0';
+	if (0 == sprint_realloc_octet_string((u_char **)&buf, &buf_len, &out_len, 1, vars, subtree->enums, hint, NULL))
+		return NULL;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "STRING: %s", strval_dyn);
-	}
-	else
-	{
-		size_t sz, offset;
+	zabbix_log(LOG_LEVEL_DEBUG, "STRING: %s", buf);
 
-		sz = len * 3;
-		strval_dyn = zbx_malloc(strval_dyn, sz);
-		offset = zbx_snprintf(strval_dyn, sz, "%02X", vars->val.string[0]);
-		for (i = 1; i < len; i++)
-		{
-			offset += zbx_snprintf(strval_dyn + offset, sz - offset,
-					" %02X", vars->val.string[i]);
-		}
-
-		zabbix_log(LOG_LEVEL_DEBUG, "Hex-STRING: %s", strval_dyn);
-	}
-
-	return strval_dyn;
+	return buf;
 }
 
 /******************************************************************************
@@ -527,9 +508,17 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 
 						if (ASN_OCTET_STR == vars->type)
 						{
-							strval_dyn = snmp_get_octet_string(vars);
-							strscpy(strval, strval_dyn);
-							zbx_free(strval_dyn);
+							if (NULL == (strval_dyn = snmp_get_octet_string(vars, anOID, anOID_len)))
+							{
+								running = 0;
+								zbx_snprintf(err, MAX_STRING_LEN, "out of memory");
+								ret = NOTSUPPORTED;
+							}
+							else
+							{
+								strscpy(strval, strval_dyn);
+								zbx_free(strval_dyn);
+							}
 						}
 #ifdef OPAQUE_SPECIAL_TYPES
 						else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type ||
@@ -663,12 +652,17 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 		{
 			if (ASN_OCTET_STR == vars->type)
 			{
-				strval_dyn = snmp_get_octet_string(vars);
-
-				if (SUCCEED != set_result_type(value, item->value_type, item->data_type, strval_dyn))
+				if (NULL == (strval_dyn = snmp_get_octet_string(vars, anOID, anOID_len)))
+				{
 					ret = NOTSUPPORTED;
+				}
+				else
+				{
+					if (SUCCEED != set_result_type(value, item->value_type, item->data_type, strval_dyn))
+						ret = NOTSUPPORTED;
 
-				zbx_free(strval_dyn);
+					zbx_free(strval_dyn);
+				}
 			}
 #ifdef OPAQUE_SPECIAL_TYPES
 			else if (ASN_UINTEGER == vars->type || ASN_COUNTER == vars->type ||
