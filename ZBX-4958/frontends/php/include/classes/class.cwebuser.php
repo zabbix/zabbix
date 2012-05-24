@@ -72,6 +72,11 @@ class CWebUser {
 	}
 
 	public static function checkAuthentication($sessionid) {
+		// prevent double authentication
+		if (self::$data && self::$data['is_authenticated']) {
+			return;
+		}
+
 		try {
 			if ($sessionid !== null) {
 				self::$data = API::User()->checkAuthentication($sessionid);
@@ -108,8 +113,9 @@ class CWebUser {
 		}
 	}
 
-	private static function setDefault() {
+	public static function setDefault() {
 		self::$data = array(
+			'is_authenticated' => true,
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => 'en_gb',
