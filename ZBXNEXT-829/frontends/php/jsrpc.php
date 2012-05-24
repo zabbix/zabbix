@@ -156,7 +156,7 @@ switch ($data['method']) {
 		$checkStatus = CProfile::get('zabbix.available');
 		$checkTime = CProfile::get('zabbix.available.time', 0);
 
-		if ($checkStatus === null || ($checkTime + $config['server_check_interval']) <= time()) {
+		if ($checkStatus === null || isset($data['params']['nocache']) || ($checkTime + $config['server_check_interval']) <= time()) {
 			$checkStatus = zabbixRunning();
 			CProfile::update('zabbix.available', (int) $checkStatus, PROFILE_TYPE_INT);
 			CProfile::update('zabbix.available.time', time(), PROFILE_TYPE_INT);
