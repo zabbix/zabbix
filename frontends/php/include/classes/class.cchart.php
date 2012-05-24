@@ -1124,7 +1124,9 @@ class CChart extends CGraphDraw {
 		);
 	}
 
-	// vertical grid
+	/**
+	 * Draws Y scale grid.
+	 */
 	private function drawVerticalGrid() {
 		$hline_count = round($this->sizeY / $this->gridPixels);
 
@@ -1387,6 +1389,7 @@ class CChart extends CGraphDraw {
 
 			// using bc library, incase of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
+			$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_LEFT, $i));
 			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
 				continue;
 			}
@@ -1394,12 +1397,16 @@ class CChart extends CGraphDraw {
 
 			$dims = imageTextSize(8, 0, $str);
 
+			// marker Y coordinate
+			$posY = $this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_LEFT] * $i + $this->shiftY + 4;
+			$posY += $this->getYStepMarkerPosOffset(GRAPH_YAXIS_SIDE_LEFT, $i);
+
 			imageText(
 				$this->im,
 				8,
 				0,
 				$this->shiftXleft - $dims['width'] - 6,
-				$this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_LEFT] * $i + $this->shiftY + 4,
+				$posY,
 				$this->getColor($this->graphtheme['textcolor'], 0),
 				$str
 			);
@@ -1490,18 +1497,23 @@ class CChart extends CGraphDraw {
 
 			// using bc module in case of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
+			$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_LEFT, $i));
 			if (bccomp(bcadd($val, bcdiv($step, 2)), $maxY) == 1) {
 				continue;
 			}
 
 			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
 
+			// marker Y coordinate
+			$posY = $this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT] * $i + $this->shiftY + 4;
+			$posY += $this->getYStepMarkerPosOffset(GRAPH_YAXIS_SIDE_RIGHT, $i);
+
 			imageText(
 				$this->im,
 				8,
 				0,
 				$this->sizeX + $this->shiftXleft + 12,
-				$this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT] * $i + $this->shiftY + 4,
+				$posY,
 				$this->getColor($this->graphtheme['textcolor'], 0),
 				$str
 			);
@@ -1529,6 +1541,22 @@ class CChart extends CGraphDraw {
 				$this->getColor(GRAPH_ZERO_LINE_COLOR_RIGHT)
 			);
 		}
+	}
+
+	protected function getYStepMarkerValueOffset($yAxis, $stepNumber) {
+		$step = $this->gridStep[$yAxis];
+		$minY = $this->m_minY[$yAxis];
+
+		$offset = 0;
+		if ($stepNumber > 0 && $minY) {
+			$offset = ($minY > $step) ? bcmod($minY, $step) : $minY;
+		}
+
+		return $offset;
+	}
+
+	protected function getYStepMarkerPosOffset($yAxis, $stepNumber) {
+		return $this->gridStepX[$yAxis] / $this->gridStep[$yAxis] * $this->getYStepMarkerValueOffset($yAxis, $stepNumber);
 	}
 
 	protected function drawWorkPeriod() {
