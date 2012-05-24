@@ -14,24 +14,24 @@ var checkServerStatus = (function ($) {
 		},
 
 		onSuccess: function(result) {
-			if (result) {
+			if (result.result) {
 				this.hideWarning()
 			}
 			else {
-				this.showWarning();
+				this.showWarning(result.message);
 			}
 		},
 
-		showWarning: function() {
+		showWarning: function(message) {
 			if (!this.warning) {
-				$('#message-global').show();
+				$('#message-global').text(message).addClass('warning-global');
 				this.warning = true;
 			}
 		},
 
 		hideWarning: function() {
 			if (this.warning) {
-				$('#message-global').hide();
+				$('#message-global').text('').removeClass('warning-global');
 				this.warning = false;
 			}
 		}
