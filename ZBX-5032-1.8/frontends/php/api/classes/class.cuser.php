@@ -88,7 +88,6 @@ class CUser extends CZBXAPI{
 			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'select_usrgrps'			=> null,
-			'select_medias'				=> null,
 			'select_mediatypes'			=> null,
 			'get_access'				=> null,
 			'countOutput'				=> null,
@@ -261,15 +260,6 @@ class CUser extends CZBXAPI{
 						unset($user['usrgrpid']);
 					}
 
-// mediaids
-					if(isset($user['mediaid']) && is_null($options['select_medias'])){
-						if(!isset($result[$user['userid']]['medias']))
-							$result[$user['userid']]['medias'] = array();
-
-						$result[$user['userid']]['medias'][] = array('mediaid' => $user['mediaid']);
-						unset($user['mediaid']);
-					}
-
 // mediatypeids
 					if(isset($user['mediatypeid']) && is_null($options['select_mediatypes'])){
 						if(!isset($result[$user['userid']]['mediatypes']))
@@ -289,7 +279,7 @@ Copt::memoryPick();
 			return $result;
 		}
 
-// Adding Objects
+		// adding objects
 		if(!is_null($options['get_access'])){
 			foreach($result as $userid => $user){
 				$result[$userid] += array('api_access' => 0, 'gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
@@ -307,7 +297,7 @@ Copt::memoryPick();
 			}
 		}
 
-// Adding usergroups
+		// adding usergroups
 		if(!is_null($options['select_usrgrps']) && str_in_array($options['select_usrgrps'], $subselects_allowed_outputs)){
 			$obj_params = array(
 				'output' => $options['select_usrgrps'],
@@ -324,13 +314,13 @@ Copt::memoryPick();
 			}
 		}
 
-// TODO:
-// Adding medias
-		if(!is_null($options['select_medias']) && str_in_array($options['select_medias'], $subselects_allowed_outputs)){
-		}
-
 		// adding mediatypes
-		if(!is_null($options['select_mediatypes']) && str_in_array($options['select_mediatypes'], $subselects_allowed_outputs)){
+		if (!is_null($options['select_mediatypes']) && str_in_array($options['select_mediatypes'], $subselects_allowed_outputs)) {
+			foreach ($result as &$user) {
+				$user['mediatypes'] = array();
+			}
+			unset($user);
+
 			$userMediatypes = CMediatype::get(array(
 				'output' => $options['select_mediatypes'],
 				'userids' => $userids,
@@ -345,7 +335,7 @@ Copt::memoryPick();
 			}
 		}
 
-// removing keys (hash -> array)
+		// removing keys (hash -> array)
 		if(is_null($options['preservekeys'])){
 			$result = zbx_cleanHashes($result);
 		}
