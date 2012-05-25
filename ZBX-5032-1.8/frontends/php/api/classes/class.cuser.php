@@ -327,10 +327,13 @@ Copt::memoryPick();
 				'preservekeys' => true
 			));
 			foreach ($userMediatypes as $userMediatype) {
-				$utypes = $userMediatype['users'];
+				$users = $userMediatype['users'];
 				unset($userMediatype['users']);
-				foreach ($utypes as $user) {
-					$result[$user['userid']]['mediatypes'][] = $userMediatype;
+
+				foreach ($users as $user) {
+					if (!empty($result[$user['userid']])) {
+						$result[$user['userid']]['mediatypes'][] = $userMediatype;
+					}
 				}
 			}
 		}
