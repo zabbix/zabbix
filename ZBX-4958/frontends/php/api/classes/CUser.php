@@ -987,12 +987,12 @@ class CUser extends CZBXAPI {
 		$userData = $this->_getUserData($userInfo['userid']);
 		$userData['sessionid'] = $sessionid;
 		$userData['gui_access'] = $guiAccess;
+		$userData['userid'] = $userInfo['userid'];
 
 		if ($userInfo['attempt_failed']) {
 			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$userInfo['userid']);
 		}
 
-		$userData['userid'] = $userInfo['userid'];
 		CWebUser::$data = self::$userData = $userData;
 
 		return isset($user['userData']) ? $userData : $userData['sessionid'];

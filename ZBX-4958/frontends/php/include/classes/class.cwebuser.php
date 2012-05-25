@@ -76,14 +76,15 @@ class CWebUser {
 				self::$data = API::User()->checkAuthentication($sessionid);
 			}
 
-			if ($sessionid === null || !self::$data) {
+			if ($sessionid === null || empty(self::$data)) {
+				self::setDefault();
 				self::$data = API::User()->login(array(
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
 					'userData' => true
 				));
 
-				if (!self::$data) {
+				if (empty(self::$data)) {
 					clear_messages(1);
 					throw new Exception();
 				}
