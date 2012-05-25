@@ -49,6 +49,32 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok(array('Macro', 'Value'));
 	}
 
+	private function checkGlobalMacrosOrder($skip_index = -1) {
+		$globalMacros = array();
+
+		$result = DBselect('select globalmacroid,macro,value from globalmacro');
+		while ($row = DBfetch($result)) {
+			$globalMacros[] = $row;
+		}
+
+		$globalMacros = order_macros($globalMacros, 'macro');
+		$globalMacros = array_values($globalMacros);
+		$countGlobalMacros = count($globalMacros);
+
+		for ($i = 0; $i < $countGlobalMacros; $i++) {
+			if ($i == $skip_index) {
+				continue;
+			}
+
+			$this->assertEquals($globalMacros[$i]['globalmacroid'],
+					$this->getValue('macros['.$i.'][globalmacroid]'));
+			$this->assertEquals($globalMacros[$i]['macro'],
+					$this->getValue('macros['.$i.'][macro]'));
+			$this->assertEquals($globalMacros[$i]['value'],
+					$this->getValue('macros['.$i.'][value]'));
+		}
+	}
+
 	private function saveGlobalMacros($confirmation = false) {
 		$this->button_click('save');
 		if ($confirmation) {
@@ -93,6 +119,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->openGlobalMacros();
 
+		$this->checkGlobalMacrosOrder();
+
 		$this->assertElementPresent('macro_add');
 		$this->assertElementPresent('save');
 
@@ -131,6 +159,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('Macros updated');
 
+		$this->checkGlobalMacrosOrder();
+
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
 				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
@@ -149,6 +179,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->saveGlobalMacros();
 		$this->ok('Macros updated');
+
+		$this->checkGlobalMacrosOrder();
 
 		$this->assertElementNotPresent('macros['.$countGlobalMacros.'][macro]');
 		$this->assertElementNotPresent('macros['.$countGlobalMacros.'][value]');
@@ -180,6 +212,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Wrong macro "'.$macro.'".');
 
+		$this->checkGlobalMacrosOrder();
+
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
 				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
@@ -202,6 +236,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty value for macro "'.$this->newMacro.'".');
 
+		$this->checkGlobalMacrosOrder();
+
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
 				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
@@ -223,6 +259,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty macro.');
+
+		$this->checkGlobalMacrosOrder();
 
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
@@ -250,6 +288,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->saveGlobalMacros();
 		$this->ok('Macros updated');
+
+		$this->checkGlobalMacrosOrder();
 
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
@@ -281,6 +321,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Macro "'.$this->newMacro.'" already exists.');
 
+		$this->checkGlobalMacrosOrder();
+
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
 				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
@@ -302,6 +344,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Wrong macro "'.$macro.'".');
 
+		$this->checkGlobalMacrosOrder(0);
+
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
 				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
@@ -320,6 +364,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty value for macro "'.$this->updMacro.'".');
 
+		$this->checkGlobalMacrosOrder(0);
+
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
 				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
@@ -337,6 +383,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty macro.');
+
+		$this->checkGlobalMacrosOrder(0);
 
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
@@ -366,6 +414,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->saveGlobalMacros();
 		$this->ok('Macros updated');
+
+		$this->checkGlobalMacrosOrder($i);
 
 		$count = DBcount(
 			'SELECT globalmacroid FROM globalmacro'.
@@ -404,6 +454,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Macro "'.$this->newMacro.'" already exists.');
 
+		$this->checkGlobalMacrosOrder($i);
+
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
 				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
@@ -428,6 +480,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros(true);
 		$this->ok('Macros updated');
 
+		$this->checkGlobalMacrosOrder();
+
 		$count = DBcount('SELECT globalmacroid FROM globalmacro WHERE globalmacroid='.$this->oldGlobalMacroId);
 		$this->assertEquals(0, $count, 'Chuck Norris: Global magrp has not been deleted from the DB.');
 	}
@@ -447,6 +501,8 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->saveGlobalMacros();
 		$this->ok('Macros updated');
+
+		$this->checkGlobalMacrosOrder();
 
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
 		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
