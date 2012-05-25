@@ -682,6 +682,10 @@ function get_status() {
 function zabbixRunning() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
+	if (empty($ZBX_SERVER) || empty ($ZBX_SERVER_PORT)) {
+		return false;
+	}
+
 	$result = (bool) fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, ZBX_SOCKET_TIMEOUT);
 	if (!$result) {
 		clear_messages();

@@ -5,40 +5,47 @@ var checkServerStatus = (function ($) {
 		timeout: 0,
 		warning: false,
 
-		check: function() {
+		/**
+		 * Sends ajax request to get Zabbis server availability and message to show if server is not available.
+		 *
+		 * @param nocache add 'nocache' parameter to get result not from cache
+		 */
+		check: function(nocache) {
+			var params = nocache ? {nocache: true} : {};
+
 			new RPC.Call({
 				'method': 'zabbix.status',
-				'params': {},
+				'params': params,
 				'onSuccess': $.proxy(this.onSuccess, this)
 			});
 		},
 
 		onSuccess: function(result) {
-			if (result) {
+			if (result.result) {
 				this.hideWarning()
 			}
 			else {
-				this.showWarning();
+				this.showWarning(result.message);
 			}
 		},
 
-		showWarning: function() {
+		showWarning: function(message) {
 			if (!this.warning) {
-				$('#message-global').show();
+				$('#message-global').text(message).addClass('warning-global');
 				this.warning = true;
 			}
 		},
 
 		hideWarning: function() {
 			if (this.warning) {
-				$('#message-global').hide();
+				$('#message-global').text('').removeClass('warning-global');
 				this.warning = false;
 			}
 		}
 	};
 
-	function checkStatus() {
-		checker.check();
+	function checkStatus(nocache) {
+		checker.check(nocache);
 
 		window.setTimeout(checkStatus, checker.timeout);
 	}
@@ -46,7 +53,7 @@ var checkServerStatus = (function ($) {
 	return function(timeout) {
 		checker.timeout = timeout * 1000;
 
-		checkStatus();
+		checkStatus(true);
 	}
 }(jQuery));
 

@@ -200,7 +200,6 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 </script>
 </head>
 <body class="<?php echo $css; ?>">
-	<div id="message-global"><?php echo _('Zabbix server might be down!'); ?></div>
 <?php
 }
 
@@ -260,8 +259,13 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$logo = new CLink(new CDiv(SPACE, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
 	$logo->setTarget('_blank');
 
-	$td_r = new CCol($page_header_r_col, 'maxwidth page_header_r');
-	$top_page_row = array(new CCol($logo, 'page_header_l'), $td_r);
+	$tdm = new CCol('', 'page_header_m');
+	$tdm->attr('id', 'message-global');
+	$top_page_row = array(
+		new CCol($logo, 'page_header_l'),
+		$tdm,
+		new CCol($page_header_r_col, 'maxwidth page_header_r')
+	);
 
 	unset($logo, $page_header_r_col, $help, $support);
 
