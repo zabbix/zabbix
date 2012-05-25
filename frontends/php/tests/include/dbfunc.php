@@ -36,18 +36,18 @@ function error($error) {
 /**
  * Returns database data suitable for PHPUnit data provider functions
  */
-function DBdata($query) {
+function DBdata($sql) {
 	DBconnect($error);
 
-	$objects=array();
+	$data = array();
 
-	$result=DBselect($query);
-	while ($object=DBfetch($result)) {
-		$objects[]=array($object);
+	$result = DBselect($sql);
+	while ($row = DBfetch($result)) {
+		$data[] = array($row);
 	}
-
 	DBclose();
-	return $objects;
+
+	return $data;
 }
 
 /**
