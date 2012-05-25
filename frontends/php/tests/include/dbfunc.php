@@ -157,13 +157,11 @@ function DBrestore_tables($topTable) {
  * Returns md5 hash sum of database result.
  */
 function DBhash($sql) {
-	global $DB;
-
 	$hash = '<empty hash>';
 
-	$result=DBselect($sql);
+	$result = DBselect($sql);
 	while ($row = DBfetch($result)) {
-		foreach ($row as $key => $value) {
+		foreach ($row as $value) {
 			$hash = md5($hash.$value);
 		}
 	}
