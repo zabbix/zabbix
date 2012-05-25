@@ -1011,7 +1011,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 		left = sizeof(s->buf_stat) - read_bytes - 1;
 
 		/* fill static buffer */
-		if ( s->buf_stat[ read_bytes - 1 ] != '\n' ) /* Don't try to read from an empty socket. */
+		if (s->buf_stat[read_bytes - 1] != '\n') /* don't try to read from an empty socket */
 		{
 			while (read_bytes < expected_len &&
 					left > 0 &&
@@ -1027,8 +1027,17 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 				}
 				else
 				{
-					if (nbytes < left)
-						break;
+					if (nbytes < left)	/* should we stop reading? */
+					{
+						if (s->buf_stat[0] == '<')	/* XML protocol? */
+						{
+							/* closing tag received? */
+							if (NULL != strstr(s->buf_stat, "</req>"))
+								break;
+						}
+						else
+							break;
+					}
 				}
 
 				left -= nbytes;
@@ -1064,8 +1073,17 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 				}
 				else
 				{
-					if (nbytes < sizeof(s->buf_stat) - 1)
-						break;
+					if (nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
+					{
+						if (s->buf_dyn[0] == '<')	/* XML protocol? */
+						{
+							/* closing tag received? */
+							if (NULL != strstr(s->buf_dyn, "</req>"))
+								break;
+						}
+						else
+							break;
+					}
 				}
 			}
 
