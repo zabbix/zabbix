@@ -212,6 +212,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Wrong macro "'.$macro.'".');
 
+		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $macro);
+		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
+
 		$this->checkGlobalMacrosOrder();
 
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
@@ -231,10 +234,14 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
 		$this->input_type('macros['.$countGlobalMacros.'][macro]', $this->newMacro);
+		$this->input_type('macros['.$countGlobalMacros.'][value]', '');
 
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty value for macro "'.$this->newMacro.'".');
+
+		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $this->newMacro);
+		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), '');
 
 		$this->checkGlobalMacrosOrder();
 
@@ -254,11 +261,15 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->click('id=macro_add');
 		$this->waitForVisible('macros['.$countGlobalMacros.'][macro]');
 
+		$this->input_type('macros['.$countGlobalMacros.'][macro]', '');
 		$this->input_type('macros['.$countGlobalMacros.'][value]', $this->newValue);
 
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty macro.');
+
+		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), '');
+		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
 
 		$this->checkGlobalMacrosOrder();
 
@@ -321,6 +332,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Macro "'.$this->newMacro.'" already exists.');
 
+		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $this->newMacro);
+		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
+
 		$this->checkGlobalMacrosOrder();
 
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
@@ -344,6 +358,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Wrong macro "'.$macro.'".');
 
+		$this->assertEquals($this->getValue('macros[0][macro]'), $macro);
+		$this->assertEquals($this->getValue('macros[0][value]'), $this->updValue);
+
 		$this->checkGlobalMacrosOrder(0);
 
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
@@ -364,6 +381,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty value for macro "'.$this->updMacro.'".');
 
+		$this->assertEquals($this->getValue('macros[0][macro]'), $this->updMacro);
+		$this->assertEquals($this->getValue('macros[0][value]'), '');
+
 		$this->checkGlobalMacrosOrder(0);
 
 		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
@@ -383,6 +403,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty macro.');
+
+		$this->assertEquals($this->getValue('macros[0][macro]'), '');
+		$this->assertEquals($this->getValue('macros[0][value]'), $this->updValue);
 
 		$this->checkGlobalMacrosOrder(0);
 
@@ -453,6 +476,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Macro "'.$this->newMacro.'" already exists.');
+
+		$this->assertEquals($this->getValue('macros['.$i.'][macro]'), $this->newMacro);
+		$this->assertEquals($this->getValue('macros['.$i.'][value]'), $this->newValue);
 
 		$this->checkGlobalMacrosOrder($i);
 
