@@ -1211,12 +1211,14 @@ class CUser extends CZBXAPI {
 				'preservekeys' => true
 			));
 			foreach ($mediatypes as $mediatype) {
-				$utypes = $mediatype['users'];
+				$users = $mediatype['users'];
 				unset($mediatype['users']);
 				$mediatype = $this->unsetExtraFields('media_type', $mediatype, $options['selectMediatypes']);
 
-				foreach ($utypes as $user) {
-					$result[$user['userid']]['mediatypes'][] = $mediatype;
+				foreach ($users as $user) {
+					if (!empty($result[$user['userid']])) {
+						$result[$user['userid']]['mediatypes'][] = $mediatype;
+					}
 				}
 			}
 		}
