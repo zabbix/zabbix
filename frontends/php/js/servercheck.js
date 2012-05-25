@@ -6,7 +6,7 @@ var checkServerStatus = (function ($) {
 		warning: false,
 
 		/**
-		 * Sends ajax request to get Zabbis server availability and message to show if server is not available.
+		 * Sends ajax request to get Zabbix server availability and message to show if server is not available.
 		 *
 		 * @param nocache add 'nocache' parameter to get result not from cache
 		 */
