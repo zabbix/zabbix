@@ -333,11 +333,36 @@ div.formElement_footer {
 }
 
 /* page table */
-table.page_header { background-color: #FFFFFF; border: 0; padding-right: 0; padding-left: 0; }
-table.page_header tr td.page_header_l { vertical-align: middle; padding: 0; }
-table.page_header tr td.page_header_r { vertical-align: middle; text-align: right; }
-table.page_header tr td.page_header_r a { margin: 0 5px; }
-table.page_footer { margin-top: 20px; padding: 3px; }
+table.page_header {
+	background-color: #FFF;
+	border: 0;
+	padding-right: 0;
+	padding-left: 0;
+	vertical-align: middle;
+}
+table.page_header tr td.page_header_l {
+	padding: 0;
+}
+table.page_header tr td.page_header_m {
+	width: 100%;
+	font-size: 1.2em;
+	text-align: center;
+}
+table.page_header tr td.page_header_m.warning-global {
+	background-color: #FBB;
+}
+table.page_header tr td.page_header_r {
+	text-align: right;
+	white-space: nowrap;
+}
+table.page_header tr td.page_header_r a {
+	margin: 0 5px;
+}
+
+table.page_footer {
+	margin-top: 20px;
+	padding: 3px;
+}
 
 /* form table */
 table.formtable {
@@ -794,13 +819,3 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .service-mon .tableinfo .sla-bar .sla-bar-part { height: 15px; display: inline-block; margin-bottom: -4px; }
 .service-mon .tableinfo .sla-bar .sla-green { background: url('../images/gradients/sla_green15.png') repeat-x; }
 .service-mon .tableinfo .sla-bar .sla-red { background: url('../images/gradients/sla_red15.png') repeat-x; }
-
-#message-global {
-	padding: 5px;
-	font-size: 1.2em;
-	background-color: #FBB;
-	border: 2px solid #C44;
-	text-align: center;
-	display: none;
-}
-
