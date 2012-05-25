@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBXNEXT-1225] fixed multiple design issues (Pavels)
 ..F....... [ZBX-4932] fixed weekly top 100 trigger report using incorrect time period (Pavels)
 ..F....... [ZBX-3106] fixed supported types for calculated items (Toms)
 A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
@@ -29,6 +30,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBXNEXT-1225] fixed multiple design issues (Pavels)
 ..F....... [ZBX-4932] fixed weekly top 100 trigger report using incorrect time period (Pavels)
 ..F....... [ZBX-3106] fixed supported types for calculated items (Toms)
 A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
