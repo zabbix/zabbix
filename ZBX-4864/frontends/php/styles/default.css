@@ -32,6 +32,7 @@ table { border-spacing: 0; }
 td, tr { color: inherit; text-decoration: none; padding: 0; }
 a { text-decoration: underline; color:#3C3089; }
 a:hover { color:#6C80B9; }
+a img { border: 0; }
 ul { margin-left: 0; padding-left: 1em; }
 form { margin: 0; }
 
@@ -167,6 +168,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 .select { cursor: pointer; margin: 1px 2px 1px 1px; }
 .selectShorten { width: 200px; }
 .radio { margin: 2px 2px; vertical-align: top; }
+.checkbox { padding: 0; border: 0; }
 .formrow .listInfoLabel { vertical-align: middle; display: table-cell; height:100%; }
 .formrow .listInfoText { margin-left: 1%; }
 .listInfo { width: 100%; display: table; }
@@ -187,10 +189,8 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 	padding: 1px 1px 0 1px;
 	margin: 0;
 }
-.link_menu:hover { color: #6C80B9; border-bottom: 1px dotted #6C80B9; }
+.link_menu:hover, .link_menu[disabled]:hover { color: #6C80B9; border-bottom: 1px dotted #6C80B9; }
 .link_menu[disabled] { color: #DDD; text-decoration: none; cursor: default; border: 0; }
-
-.checkbox { padding: 0; border: 0; background: none; }
 
 .transparent { border: 0; background-color: transparent; }
 .transparent:focus { outline-width: 0; }
@@ -773,7 +773,10 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 	background: url('../images/general/transparent.png') repeat scroll center top transparent;
 }
 
-.disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal { color: #222; }
+.disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal,
+.trigger-severity, .trigger-severity span {
+	color: #222;
+}
 
 .preloader { width: 80px; height: 12px; }
 
