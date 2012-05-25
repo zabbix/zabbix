@@ -168,9 +168,12 @@ class CMediatype extends CZBXAPI {
 		}
 
 		// countOutput
-		if (!is_null($options['countOutput']) && !is_null($options['groupCount'])) {
-			foreach ($sqlParts['group'] as $key => $fields) {
-				$sqlParts['select'][$key] = $fields;
+		if (!is_null($options['countOutput'])) {
+			$options['sortfield'] = '';
+			if (!is_null($options['groupCount'])) {
+				foreach ($sqlParts['group'] as $key => $fields) {
+					$sqlParts['select'][$key] = $fields;
+				}
 			}
 		}
 
@@ -218,6 +221,7 @@ class CMediatype extends CZBXAPI {
 					$sqlWhere.
 					$sqlGroup.
 					$sqlOrder;
+		var_dump($sql);die;
 		$res = DBselect($sql, $sqlLimit);
 		while ($mediatype = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
