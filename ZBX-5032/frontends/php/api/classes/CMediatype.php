@@ -221,7 +221,6 @@ class CMediatype extends CZBXAPI {
 					$sqlWhere.
 					$sqlGroup.
 					$sqlOrder;
-		var_dump($sql);die;
 		$res = DBselect($sql, $sqlLimit);
 		while ($mediatype = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
