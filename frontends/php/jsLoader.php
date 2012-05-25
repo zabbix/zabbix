@@ -74,7 +74,8 @@ $availableJScripts = array(
 	'class.cviewswitcher.js' => '',
 	'init.js' => '',
 	// templates
-	'sysmap.tpl.js' => 'templates/'
+	'sysmap.tpl.js' => 'templates/',
+	'servercheck.js' => ''
 );
 
 $tranStrings = array(

@@ -100,13 +100,6 @@ function DBsave_tables($topTable) {
 
 	DBget_tables($tables, $topTable);
 
-	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-		$result = DBselect('select @@unique_checks,@@foreign_key_checks');
-		$row = DBfetch($result);
-		DBexecute('set unique_checks=0');
-		DBexecute('set foreign_key_checks=0');
-	}
-
 	foreach ($tables as $table) {
 		switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
@@ -120,13 +113,8 @@ function DBsave_tables($topTable) {
 			break;
 		default:
 			DBexecute("drop table if exists ${table}_tmp");
-			DBexecute("select * into temp table ${table}_tmp from $table");
+			DBexecute("select * into table ${table}_tmp from $table");
 		}
-	}
-
-	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-		DBexecute('set foreign_key_checks='.$row['@@foreign_key_checks']);
-		DBexecute('set unique_checks='.$row['@@unique_checks']);
 	}
 }
 
@@ -138,6 +126,13 @@ function DBrestore_tables($topTable) {
 	global $DB;
 
 	$tables = array();
+
+	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		$result = DBselect('select @@unique_checks,@@foreign_key_checks');
+		$row = DBfetch($result);
+		DBexecute('set unique_checks=0');
+		DBexecute('set foreign_key_checks=0');
+	}
 
 	DBget_tables($tables, $topTable);
 
@@ -151,19 +146,22 @@ function DBrestore_tables($topTable) {
 		DBexecute("insert into $table select * from ${table}_tmp");
 		DBexecute("drop table ${table}_tmp");
 	}
+
+	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		DBexecute('set foreign_key_checks='.$row['@@foreign_key_checks']);
+		DBexecute('set unique_checks='.$row['@@unique_checks']);
+	}
 }
 
 /**
  * Returns md5 hash sum of database result.
  */
 function DBhash($sql) {
-	global $DB;
-
 	$hash = '<empty hash>';
 
-	$result=DBselect($sql);
+	$result = DBselect($sql);
 	while ($row = DBfetch($result)) {
-		foreach ($row as $key => $value) {
+		foreach ($row as $value) {
 			$hash = md5($hash.$value);
 		}
 	}
