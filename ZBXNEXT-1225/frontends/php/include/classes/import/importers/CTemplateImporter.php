@@ -81,7 +81,7 @@ class CTemplateImporter extends CImporter {
 
 					if (!empty($templateLinkage[$createdTemplate['host']])) {
 						API::Template()->massAdd(array(
-							'templates' => array('hostid' => $hostId),
+							'templates' => array('templateid' => $hostId),
 							'templates_link' => $templateLinkage[$createdTemplate['host']]
 						));
 					}

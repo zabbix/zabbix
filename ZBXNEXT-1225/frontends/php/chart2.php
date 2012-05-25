@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file'] = 'chart2.php';
 $page['type'] = PAGE_TYPE_IMAGE;
+//$page['type'] = PAGE_TYPE_HTML;
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

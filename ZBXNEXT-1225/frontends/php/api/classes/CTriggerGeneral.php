@@ -238,7 +238,7 @@ abstract class CTriggerGeneral extends CZBXAPI {
 	 * Checks that no trigger with the same description and expression as $trigger exist on the given host.
 	 * Assumes the given trigger is valid.
 	 *
-	 * @throws APIException if at lean one trigger exists
+	 * @throws APIException if at least one trigger exists
 	 *
 	 * @param array $trigger a trigger with an exploded expression
 	 * @param null  $hostid
@@ -246,6 +246,20 @@ abstract class CTriggerGeneral extends CZBXAPI {
 	 * @return void
 	 */
 	protected function checkIfExistsOnHost(array $trigger, $hostid = null) {
+		// skip the check if the description and expression haven't been changed
+		if (!isset($trigger['description']) && !isset($trigger['expression'])) {
+			return;
+		}
+
+		// make sure we have all the required data
+		if (!isset($trigger['description']) || !isset($trigger['expression'])) {
+			$explodeExpression = !isset($trigger['expression']);
+			$trigger = $this->extendObject($this->tableName(), $trigger, array('description', 'expression'));
+			if ($explodeExpression) {
+				$trigger['expression'] = explode_exp($trigger['expression']);
+			}
+		}
+
 		$filter = array('description' => $trigger['description']);
 		if ($hostid) {
 			$filter['hostid'] = $hostid;

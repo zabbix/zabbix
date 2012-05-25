@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -693,8 +693,13 @@ table.requirements select { width: 152px; }
 
 /* filter */
 table.filter { width: 100%; border-collapse: collapse; min-width: 1024px; text-align: center; }
-table.filter tr td { line-height: 20px; height: 26px; vertical-align: middle; border-left: 0 !important;
-	padding: 0 2px 0 6px; white-space: nowrap; }
+table.filter tr td {
+	line-height: 20px;
+	height: 26px;
+	vertical-align: middle;
+	border-left: 0 !important;
+	padding: 0 2px 0 6px;
+}
 table.filter tr td.label { border-right: 0 !important; }
 table.filter tr td.controls { text-align: center; }
 
@@ -770,7 +775,7 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 
 .disaster, .high, .average, .warning, .information, .not_classified, .trigger_unknown, .normal,
 .trigger-severity, .trigger-severity span {
-	color: #222 !important;
+	color: #222;
 }
 
 .preloader { width: 80px; height: 12px; }
@@ -789,3 +794,13 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .service-mon .tableinfo .sla-bar .sla-bar-part { height: 15px; display: inline-block; margin-bottom: -4px; }
 .service-mon .tableinfo .sla-bar .sla-green { background: url('../images/gradients/sla_green15.png') repeat-x; }
 .service-mon .tableinfo .sla-bar .sla-red { background: url('../images/gradients/sla_red15.png') repeat-x; }
+
+#message-global {
+	padding: 5px;
+	font-size: 1.2em;
+	background-color: #FBB;
+	border: 2px solid #C44;
+	text-align: center;
+	display: none;
+}
+

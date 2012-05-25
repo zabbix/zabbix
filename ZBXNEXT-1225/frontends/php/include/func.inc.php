@@ -632,7 +632,7 @@ function zbx_is_int($var) {
 	}
 
 	if (is_string($var)) {
-		if (ctype_digit($var) || strcmp(intval($var), $var) == 0) {
+		if (function_exists('ctype_digit') && ctype_digit($var) || strcmp(intval($var), $var) == 0) {
 			return true;
 		}
 	}
@@ -1127,7 +1127,7 @@ function zbx_array_merge() {
 }
 
 function uint_in_array($needle, $haystack) {
-	foreach ($haystack as $id => $value) {
+	foreach ($haystack as $value) {
 		if (bccomp($needle, $value) == 0) {
 			return true;
 		}
@@ -1366,11 +1366,16 @@ function zbx_str2links($text) {
 	return $result;
 }
 
-function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
+function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 	if (!isset($mainArray[$sIndex])) {
 		$mainArray[$sIndex] = array();
 	}
-	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
+	if ($key) {
+		$mainArray[$sIndex][$key] = is_null($element) ? $sIndex : $element;
+	}
+	else {
+		$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
+	}
 }
 
 /**
