@@ -89,6 +89,7 @@ class CUserMedia extends CZBXAPI {
 			'selectUsers'				=> null,
 			'selectMediatypes'			=> null,
 			'countOutput'				=> null,
+			'groupCount'                => null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
