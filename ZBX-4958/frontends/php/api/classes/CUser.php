@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,14 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
- * File containing CUser class for API.
  * @package API
- */
-/**
- * Class containing methods for operations with Users
  */
 class CUser extends CZBXAPI {
 
@@ -909,22 +905,23 @@ class CUser extends CZBXAPI {
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 
 		$userInfo = DBfetch(DBselect($sql));
-		if (!$userInfo)
+		if (!$userInfo) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect'));
-
-		self::$userData['userid'] = $userInfo['userid'];
+		}
 
 // check if user is blocked
 		if ($userInfo['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-			if ((time() - $userInfo['attempt_clock']) < ZBX_LOGIN_BLOCK)
+			if ((time() - $userInfo['attempt_clock']) < ZBX_LOGIN_BLOCK) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Account is blocked for %s seconds', (ZBX_LOGIN_BLOCK - (time() - $userInfo['attempt_clock']))));
+			}
 
 			DBexecute('UPDATE users SET attempt_clock='.time().' WHERE alias='.zbx_dbstr($name));
 		}
 
 // check system permissions
-		if (!check_perm2system($userInfo['userid']))
+		if (!check_perm2system($userInfo['userid'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+		}
 
 
 		$sql = 'SELECT MAX(g.gui_access) as gui_access'.
@@ -932,16 +929,19 @@ class CUser extends CZBXAPI {
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid';
 		$dbAccess = DBfetch(DBselect($sql));
-		if (!zbx_empty($dbAccess['gui_access']))
+		if (!zbx_empty($dbAccess['gui_access'])) {
 			$guiAccess = $dbAccess['gui_access'];
-		else
+		}
+		else {
 			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
+		}
 
 		switch ($guiAccess) {
 			case GROUP_GUI_ACCESS_INTERNAL:
 				$authType = ZBX_AUTH_INTERNAL;
 				break;
 			case GROUP_GUI_ACCESS_DISABLED:
+				/* fall through */
 			case GROUP_GUI_ACCESS_SYSTEM:
 				$config = select_config();
 				$authType = $config['authentication_type'];
@@ -988,12 +988,14 @@ class CUser extends CZBXAPI {
 		$userData['sessionid'] = $sessionid;
 		$userData['gui_access'] = $guiAccess;
 
-		if ($userInfo['attempt_failed'])
+		if ($userInfo['attempt_failed']) {
 			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$userInfo['userid']);
+		}
 
+		$userData['userid'] = $userInfo['userid'];
 		CWebUser::$data = self::$userData = $userData;
 
-	return isset($user['userData']) ? $userData : $userData['sessionid'];
+		return isset($user['userData']) ? $userData : $userData['sessionid'];
 	}
 
 	/**
@@ -1021,16 +1023,19 @@ class CUser extends CZBXAPI {
 					' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID);
 		$userInfo = DBfetch(DBselect($sql));
 
-		if (!$userInfo)
+		if (!$userInfo) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+		}
 
 		// don't check permissions on the same second
 		if ($time != $userInfo['lastaccess']) {
-			if (!check_perm2system($userInfo['userid']))
+			if (!check_perm2system($userInfo['userid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+			}
 
-			if ($userInfo['autologout'] > 0)
+			if ($userInfo['autologout'] > 0) {
 				DBexecute('DELETE FROM sessions WHERE userid='.$userInfo['userid'].' AND lastaccess<'.(time() - $userInfo['autologout']));
+			}
 
 			DBexecute('UPDATE sessions SET lastaccess='.time().' WHERE userid='.$userInfo['userid'].' AND sessionid='.zbx_dbstr($sessionid));
 		}
@@ -1040,10 +1045,12 @@ class CUser extends CZBXAPI {
 			' WHERE ug.userid='.$userInfo['userid'].
 				' AND g.usrgrpid=ug.usrgrpid';
 		$dbAccess = DBfetch(DBselect($sql));
-		if (!zbx_empty($dbAccess['gui_access']))
+		if (!zbx_empty($dbAccess['gui_access'])) {
 			$guiAccess = $dbAccess['gui_access'];
-		else
+		}
+		else {
 			$guiAccess = GROUP_GUI_ACCESS_SYSTEM;
+		}
 
 		$userData = $this->_getUserData($userInfo['userid']);
 		$userData['sessionid'] = $sessionid;
@@ -1081,18 +1088,22 @@ class CUser extends CZBXAPI {
 		if (isset($ZBX_NODES[$ZBX_LOCALNODEID])) {
 			$userData['node'] = $ZBX_NODES[$ZBX_LOCALNODEID];
 		}
-		else{
+		else {
 			$userData['node'] = array();
 			$userData['node']['name'] = '- unknown -';
 			$userData['node']['nodeid'] = $ZBX_LOCALNODEID;
 		}
 
-	return $userData;
+		return $userData;
 	}
 
 	public function isReadable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -1107,8 +1118,12 @@ class CUser extends CZBXAPI {
 	}
 
 	public function isWritable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
+		if (!is_array($ids)) {
+			return false;
+		}
+		if (empty($ids)) {
+			return true;
+		}
 
 		$ids = array_unique($ids);
 
@@ -1131,5 +1146,3 @@ class CUser extends CZBXAPI {
 		return $sqlParts;
 	}
 }
-
-?>

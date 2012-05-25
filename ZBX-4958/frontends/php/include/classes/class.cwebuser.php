@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CWebUser {
 
@@ -72,18 +71,12 @@ class CWebUser {
 	}
 
 	public static function checkAuthentication($sessionid) {
-		// prevent double authentication
-		if (self::$data && self::$data['is_authenticated']) {
-			return;
-		}
-
 		try {
 			if ($sessionid !== null) {
 				self::$data = API::User()->checkAuthentication($sessionid);
 			}
 
 			if ($sessionid === null || !self::$data) {
-				self::setDefault();
 				self::$data = API::User()->login(array(
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
@@ -115,7 +108,6 @@ class CWebUser {
 
 	public static function setDefault() {
 		self::$data = array(
-			'is_authenticated' => true,
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => 'en_gb',
