@@ -406,14 +406,13 @@ static char	*snmp_get_octet_string(struct variable_list *vars, const oid *objid,
 {
 	char		*buf = NULL;
 	size_t		buf_len = 0, out_len = 0;
-	int		buf_overflow = 0;
 	const char	*hint;
 	struct tree	*subtree;
 
 	/* find the subtree */
-	subtree = netsnmp_sprint_realloc_objid_tree((u_char **)&buf, &buf_len, &out_len, 0, &buf_overflow, objid, objidlen);
+	subtree = get_tree(objid, objidlen, get_tree_head());
 
-	/* default hint, in order to avoid double-quoting the value */
+	/* default hint, in order to avoid value double-quoting */
 	hint = subtree->hint ? subtree->hint : "a";
 
 	if (0 == sprint_realloc_octet_string((u_char **)&buf, &buf_len, &out_len, 1, vars, subtree->enums, hint, NULL))
