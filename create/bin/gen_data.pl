@@ -113,12 +113,6 @@ sub process_row
 
 	my @array = split(/\|/, $line);
 
-	foreach (@array)
-	{
-		$_ =~ s/&pipe;/|/g;
-		$_ =~ s/&eol;/\x0D\x0A/g;
-	}
-
 	my $first = 1;
 	my $values = "(";
 
@@ -167,6 +161,17 @@ sub process_row
 				{
 					$_ =~ s/'/''/g;
 				}
+			}
+
+			$_ =~ s/&pipe;/|/g;
+
+			if ($output{'database'} eq 'mysql')
+			{
+				$_ =~ s/&eol;/\\r\\n/g;
+			}
+			else
+			{
+				$_ =~ s/&eol;/\x0D\x0A/g;
 			}
 
 			$values = "$values$modifier'$_'";
