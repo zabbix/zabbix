@@ -38,6 +38,9 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	private $updMacro = '{$UPD_MACRO}';
 	private $updValue = 'Value of the updated macro';
 
+	private $sqlHashGlobalMacros = '';
+	private $oldHashGlobalMacros = '';
+
 	private function openGlobalMacros() {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
@@ -85,6 +88,19 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->ok('CONFIGURATION OF MACROS');
 		$this->ok('Macros');
 		$this->ok(array('Macro', 'Value'));
+	}
+
+	private function calculateHash($conditions = null) {
+		$this->sqlHashGlobalMacros =
+			'SELECT * FROM globalmacro'.
+			($conditions ? ' WHERE '.$conditions : '').
+			' ORDER BY globalmacroid';
+		$this->oldHashGlobalMacros = DBhash($this->sqlHashGlobalMacros);
+	}
+
+	private function verifyHash() {
+		$this->assertEquals($this->oldHashGlobalMacros, DBhash($this->sqlHashGlobalMacros),
+				'Chuck Norris: Data in the DB table "globalmacro" has been changed.');
 	}
 
 	public static function wrongMacros() {
@@ -151,8 +167,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacros_SimpleUpdate() {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$this->openGlobalMacros();
 
@@ -161,14 +176,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder();
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_SimpleUpdateWithEmptyRow() {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
 
@@ -186,17 +198,14 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->assertElementNotPresent('macros['.$countGlobalMacros.'][value]');
 		$this->assertElementNotPresent('macros_'.$countGlobalMacros.'_remove');
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	/**
 	 * @dataProvider wrongMacros
 	 */
 	public function testFormAdministrationGeneralMacros_CreateWrong($macro) {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
 
@@ -217,14 +226,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder();
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_CreateWrongEmptyValue() {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
 
@@ -245,14 +251,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder();
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_CreateWrongEmptyMacro() {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
 
@@ -273,19 +276,13 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder();
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_Create() {
 		$row = DBfetch(DBselect('SELECT MAX(globalmacroid) AS globalmacroid FROM globalmacro'));
 
-		$sqlHashGlobalMacros =
-			'SELECT * FROM globalmacro'.
-			' WHERE globalmacroid<='.$row['globalmacroid'].
-			' ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash('globalmacroid<='.$row['globalmacroid']);
 
 		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
 
@@ -302,9 +299,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder();
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 
 		$count = DBcount(
 			'SELECT globalmacroid FROM globalmacro'.
@@ -315,8 +310,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacros_CreateDuplicate() {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
 
@@ -337,17 +331,14 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder();
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	/**
 	 * @dataProvider wrongMacros
 	 */
 	public function testFormAdministrationGeneralMacros_UpdateWrong($macro) {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$this->openGlobalMacros();
 
@@ -363,14 +354,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder(0);
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_UpdateWrongEmptyValue() {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$this->openGlobalMacros();
 
@@ -386,14 +374,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder(0);
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_UpdateWrongEmptyMacro() {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$this->openGlobalMacros();
 
@@ -409,17 +394,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder(0);
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_Update() {
-		$sqlHashGlobalMacros =
-			'SELECT * FROM globalmacro'.
-			' WHERE globalmacroid<>'.$this->oldGlobalMacroId.
-			' ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash('globalmacroid<>'.$this->oldGlobalMacroId);
 
 		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
 
@@ -450,14 +429,11 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 				'Chuck Norris: Value of the macro has not been updated in the DB.'.
 				' Perhaps it was saved with different globalmacroid.');
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_UpdateDuplicate() {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
 
@@ -482,9 +458,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder($i);
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_Delete() {
@@ -513,8 +487,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	}
 
 	public function testFormAdministrationGeneralMacros_DeleteNew() {
-		$sqlHashGlobalMacros = 'SELECT * FROM globalmacro ORDER BY globalmacroid';
-		$oldHashGlobalMacros = DBhash($sqlHashGlobalMacros);
+		$this->calculateHash();
 
 		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
 
@@ -530,9 +503,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 		$this->checkGlobalMacrosOrder();
 
-		$newHashGlobalMacros = DBhash($sqlHashGlobalMacros);
-		$this->assertEquals($oldHashGlobalMacros, $newHashGlobalMacros,
-				'Chuck Norris: Data in the DB table "globalmacro" has been changed');
+		$this->verifyHash();
 	}
 
 	public function testFormAdministrationGeneralMacros_restore() {
