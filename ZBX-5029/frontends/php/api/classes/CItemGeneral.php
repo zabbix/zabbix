@@ -195,8 +195,9 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 
 				// if a templated item is being assigned to an interface with a different type, ignore it
+				$itemInterfaceType = itemTypeInterface($dbItems[$item['itemid']]['type']);
 				if ($fullItem['templateid'] && isset($item['interfaceid']) && isset($interfaces[$item['interfaceid']])
-						&& $interfaces[$item['interfaceid']]['type'] != itemTypeInterface($dbItems[$item['itemid']]['type'])) {
+						&& $itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
 
 					unset($item['interfaceid']);
 				}
