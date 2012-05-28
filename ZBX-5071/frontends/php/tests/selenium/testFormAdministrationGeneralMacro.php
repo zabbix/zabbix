@@ -222,6 +222,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Wrong macro "'.$macro.'".');
+		$this->ok('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $macro);
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
@@ -247,6 +248,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty value for macro "'.$this->newMacro.'".');
+		$this->ok('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $this->newMacro);
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), '');
@@ -272,6 +274,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty macro.');
+		$this->ok('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), '');
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
@@ -327,6 +330,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Macro "'.$this->newMacro.'" already exists.');
+		$this->ok('Cannot add macro.');
 
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][macro]'), $this->newMacro);
 		$this->assertEquals($this->getValue('macros['.$countGlobalMacros.'][value]'), $this->newValue);
@@ -350,6 +354,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Wrong macro "'.$macro.'".');
+		$this->ok('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), $macro);
 		$this->assertEquals($this->getValue('macros[0][value]'), $this->updValue);
@@ -370,6 +375,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty value for macro "'.$this->updMacro.'".');
+		$this->ok('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), $this->updMacro);
 		$this->assertEquals($this->getValue('macros[0][value]'), '');
@@ -390,6 +396,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty macro.');
+		$this->ok('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), '');
 		$this->assertEquals($this->getValue('macros[0][value]'), $this->updValue);
@@ -410,6 +417,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Empty macro.');
+		$this->ok('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros[0][macro]'), '');
 		$this->assertEquals($this->getValue('macros[0][value]'), '');
@@ -474,6 +482,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->saveGlobalMacros();
 		$this->ok('ERROR: Cannot update macros');
 		$this->ok('Macro "'.$this->newMacro.'" already exists.');
+		$this->ok('Cannot update macro.');
 
 		$this->assertEquals($this->getValue('macros['.$i.'][macro]'), $this->newMacro);
 		$this->assertEquals($this->getValue('macros['.$i.'][value]'), $this->newValue);
