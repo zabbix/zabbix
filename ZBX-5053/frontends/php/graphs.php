@@ -77,10 +77,10 @@ if (!isset($percentVisible['percent_left'])) {
 if (!isset($percentVisible['percent_right'])) {
 	unset($_REQUEST['percent_right']);
 }
-if (empty($_REQUEST['yaxismin'])) {
+if (isset($_REQUEST['yaxismin']) && zbx_empty($_REQUEST['yaxismin'])) {
 	unset($_REQUEST['yaxismin']);
 }
-if (empty($_REQUEST['yaxismax'])) {
+if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 	unset($_REQUEST['yaxismax']);
 }
 
