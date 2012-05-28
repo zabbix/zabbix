@@ -751,6 +751,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)
 ..F....... [ZBX-5014] fixed error in dm setup for guest user (Vedmak)
 ..F....... [ZBX-4984] fixed export include graphs and triggers with web items (Vedmak)
 .......PS. [ZBX-4980] fixed trapper process crash/hang on decoding big base64 encoded values (Andris)
