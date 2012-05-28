@@ -78,16 +78,18 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		}
 	}
 
-	private function saveGlobalMacros($confirmation = false) {
+	private function saveGlobalMacros($confirmation = false, $wait = true) {
 		$this->button_click('save');
 		if ($confirmation) {
 			$this->waitForConfirmation();
 		}
-		$this->wait();
+		if ($wait) {
+			$this->wait();
 
-		$this->ok('CONFIGURATION OF MACROS');
-		$this->ok('Macros');
-		$this->ok(array('Macro', 'Value'));
+			$this->ok('CONFIGURATION OF MACROS');
+			$this->ok('Macros');
+			$this->ok(array('Macro', 'Value'));
+		}
 	}
 
 	private function calculateHash($conditions = null) {
@@ -397,6 +399,26 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->verifyHash();
 	}
 
+	public function testFormAdministrationGeneralMacros_UpdateWrongEmptyMacroValue() {
+		$this->calculateHash();
+
+		$this->openGlobalMacros();
+
+		$this->input_type('macros[0][macro]', '');
+		$this->input_type('macros[0][value]', '');
+
+		$this->saveGlobalMacros();
+		$this->ok('ERROR: Cannot update macros');
+		$this->ok('Empty macro.');
+
+		$this->assertEquals($this->getValue('macros[0][macro]'), '');
+		$this->assertEquals($this->getValue('macros[0][value]'), '');
+
+		$this->checkGlobalMacrosOrder(0);
+
+		$this->verifyHash();
+	}
+
 	public function testFormAdministrationGeneralMacros_Update() {
 		$this->calculateHash('globalmacroid<>'.$this->oldGlobalMacroId);
 
@@ -461,6 +483,35 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->verifyHash();
 	}
 
+	public function testFormAdministrationGeneralMacros_DeleteCancel() {
+		$this->chooseCancelOnNextConfirmation();
+
+		$countGlobalMacros = DBcount('SELECT globalmacroid FROM globalmacro');
+
+		$this->openGlobalMacros();
+
+		for ($i = 0; $i < $countGlobalMacros; $i++) {
+			if ($this->getValue('macros['.$i.'][globalmacroid]') == $this->oldGlobalMacroId) {
+				break;
+			}
+		}
+		$this->assertNotEquals($i, $countGlobalMacros);
+
+		$this->click('id=macros_'.$i.'_remove');
+
+		$this->saveGlobalMacros(true, false);
+
+		$this->assertElementNotPresent('macros['.$i.'][macro]');
+		$this->assertElementNotPresent('macros['.$i.'][value]');
+		$this->assertElementNotPresent('macros_'.$i.'_remove');
+		$this->assertElementNotPresent('macros['.$i.'][globalmacroid]');
+
+		$this->checkGlobalMacrosOrder($i);
+
+		$count = DBcount('SELECT globalmacroid FROM globalmacro WHERE globalmacroid='.$this->oldGlobalMacroId);
+		$this->assertEquals(1, $count, 'Chuck Norris: Global macro has been deleted from the DB.');
+	}
+
 	public function testFormAdministrationGeneralMacros_Delete() {
 		$this->chooseOkOnNextConfirmation();
 
@@ -483,7 +534,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->checkGlobalMacrosOrder();
 
 		$count = DBcount('SELECT globalmacroid FROM globalmacro WHERE globalmacroid='.$this->oldGlobalMacroId);
-		$this->assertEquals(0, $count, 'Chuck Norris: Global magrp has not been deleted from the DB.');
+		$this->assertEquals(0, $count, 'Chuck Norris: Global macro has not been deleted from the DB.');
 	}
 
 	public function testFormAdministrationGeneralMacros_DeleteNew() {
