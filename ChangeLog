@@ -32,6 +32,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+.......PS. [ZBX-5076] fixed possible server or proxy crash when using Calculated, DB Monitor, SSH or Telnet items (Sasha)
 A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)
 ..F....... [ZBX-4864] fixed graph Y axis label alignment (Pavels)
 ..F....... [ZBXNEXT-1225] fixed multiple design issues (Pavels)
