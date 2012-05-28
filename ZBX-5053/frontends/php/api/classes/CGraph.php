@@ -1078,8 +1078,8 @@ class CGraph extends CZBXAPI {
 			// Y axis MIN value < Y axis MAX value
 			if (($graph['graphtype'] == GRAPH_TYPE_NORMAL || $graph['graphtype'] == GRAPH_TYPE_STACKED)
 					&& $graph['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED
-					&& $graph['yaxismin'] > $graph['yaxismax']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Y axis MIN value cannot be higher than Y axis MAX value.'));
+					&& $graph['yaxismin'] >= $graph['yaxismax']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Y axis MAX value must be greater than Y axis MIN value.'));
 			}
 		}
 
