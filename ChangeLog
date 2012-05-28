@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)
 ..F....... [ZBX-4864] fixed graph Y axis label alignment (Pavels)
 ..F....... [ZBXNEXT-1225] fixed multiple design issues (Pavels)
 ..F....... [ZBX-4932] fixed weekly top 100 trigger report using incorrect time period (Pavels)

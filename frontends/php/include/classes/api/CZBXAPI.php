@@ -470,7 +470,7 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if ($this->sortColumns) {
+		if ($this->sortColumns && $options['countOutput'] === null) {
 			zbx_db_sorting($sqlParts, $options, $this->sortColumns, $tableAlias);
 		}
 
