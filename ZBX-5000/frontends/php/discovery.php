@@ -60,10 +60,12 @@ $data = array(
 	'fullscreen' => get_request('fullscreen', 0),
 	'druleid' => get_request('druleid', 0),
 	'sort' => get_request('sort'),
-	'sortorder' => get_request('sortorder')
+	'sortorder' => get_request('sortorder'),
+	'services' => array(),
+	'drules' => array()
 );
 
-// all discovery rules
+// get all discovery rules
 $data['drules_all'] = API::DRule()->get(array(
 	'filter' => array('status' => DRULE_STATUS_ACTIVE),
 	'output' => API_OUTPUT_EXTEND
@@ -82,65 +84,68 @@ $options = array(
 $config = select_config();
 
 if (!empty($data['druleid'])) {
-	$options['druleids'] = $data['druleid'];
+	$options['druleids'] = $data['druleid']; // set selected discovery rule id
 }
 elseif ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE) {
-	$options['druleids'] = array();
+	$options['druleids'] = array(); // set empty array to select no discovery rules
 }
 
-$data['drules'] = API::DRule()->get($options);
-if (!empty($data['drules'])) {
-	order_result($data['drules'], 'name');
-}
+if (!($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE && empty($data['druleid']))) { // do not retrieve data when select first none and discovery rule not selected
 
-// discovery services
-$options = array(
-	'selectHosts' => array('hostid', 'name', 'status'),
-	'output' => API_OUTPUT_EXTEND,
-	'sortfield' => getPageSortField('ip'),
-	'sortorder' => getPageSortOrder(),
-	'limitSelects' => 1
-);
-if (!empty($data['druleid'])) {
-	$options['druleids'] = $data['druleid'];
-}
-else {
-	$options['druleids'] = zbx_objectValues($data['drules'], 'druleid');
-}
-$dservices = API::DService()->get($options);
-
-// user macros
-$data['macros'] = API::UserMacro()->get(array(
-	'output' => API_OUTPUT_EXTEND,
-	'globalmacro' => true
-));
-$data['macros'] = zbx_toHash($data['macros'], 'macro');
-
-// services
-$data['services'] = array();
-foreach ($dservices as $dservice) {
-	$key_ = $dservice['key_'];
-	if (!zbx_empty($key_)) {
-		if (isset($data['macros'][$key_])) {
-			$key_ = $data['macros'][$key_]['value'];
-		}
-		$key_ = ': '.$key_;
+	$data['drules'] = API::DRule()->get($options);
+	if (!empty($data['drules'])) {
+		order_result($data['drules'], 'name');
 	}
-	$serviceName = discovery_check_type2str($dservice['type']).discovery_port2str($dservice['type'], $dservice['port']).$key_;
-	$data['services'][$serviceName] = 1;
+
+	// discovery services
+	$options = array(
+		'selectHosts' => array('hostid', 'name', 'status'),
+		'output' => API_OUTPUT_EXTEND,
+		'sortfield' => getPageSortField('ip'),
+		'sortorder' => getPageSortOrder(),
+		'limitSelects' => 1
+	);
+	if (!empty($data['druleid'])) {
+		$options['druleids'] = $data['druleid'];
+	}
+	else {
+		$options['druleids'] = zbx_objectValues($data['drules'], 'druleid');
+	}
+	$dservices = API::DService()->get($options);
+
+	// user macros
+	$data['macros'] = API::UserMacro()->get(array(
+		'output' => API_OUTPUT_EXTEND,
+		'globalmacro' => true
+	));
+	$data['macros'] = zbx_toHash($data['macros'], 'macro');
+
+	// services
+	$data['services'] = array();
+	foreach ($dservices as $dservice) {
+		$key_ = $dservice['key_'];
+		if (!zbx_empty($key_)) {
+			if (isset($data['macros'][$key_])) {
+				$key_ = $data['macros'][$key_]['value'];
+			}
+			$key_ = ': '.$key_;
+		}
+		$serviceName = discovery_check_type2str($dservice['type']).discovery_port2str($dservice['type'], $dservice['port']).$key_;
+		$data['services'][$serviceName] = 1;
+	}
+	ksort($data['services']);
+
+	// discovery services to hash
+	$data['dservices'] = zbx_toHash($dservices, 'dserviceid');
+
+	// discovery hosts
+	$data['dhosts'] = API::DHost()->get(array(
+		'druleids' => zbx_objectValues($data['drules'], 'druleid'),
+		'selectDServices' => API_OUTPUT_REFER,
+		'output' => API_OUTPUT_REFER
+	));
+	$data['dhosts'] = zbx_toHash($data['dhosts'], 'dhostid');
 }
-ksort($data['services']);
-
-// discovery services to hash
-$data['dservices'] = zbx_toHash($dservices, 'dserviceid');
-
-// discovery hosts
-$data['dhosts'] = API::DHost()->get(array(
-	'druleids' => zbx_objectValues($data['drules'], 'druleid'),
-	'selectDServices' => API_OUTPUT_REFER,
-	'output' => API_OUTPUT_REFER
-));
-$data['dhosts'] = zbx_toHash($data['dhosts'], 'dhostid');
 
 // render view
 $discoveryView = new CView('monitoring.discovery', $data);
