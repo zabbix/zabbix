@@ -38,6 +38,7 @@ class CPageFilter {
 	const HOST_LATEST_IDX = 'web.latest.hostid';
 	const GRAPH_LATEST_IDX = 'web.latest.graphid';
 	const TRIGGER_LATEST_IDX = 'web.latest.triggerid';
+	const DRULE_LATEST_IDX = 'web.latest.druleid';
 
 	public function __get($name) {
 		if (isset($this->data[$name])) {
@@ -121,6 +122,11 @@ class CPageFilter {
 		if (isset($options['triggers'])) {
 			$this->_initTriggers($options['triggerid'], $options['triggers']);
 		}
+
+		// drules
+		if (isset($options['drules'])) {
+			$this->_initDiscoveries($options['druleid'], $options['drules']);
+		}
 	}
 
 	private function _getProfiles($options) {
@@ -131,30 +137,35 @@ class CPageFilter {
 		$this->_profileIdx['hosts'] = 'web.'.$profileSection.'.hostid';
 		$this->_profileIdx['graphs'] = 'web.'.$profileSection.'.graphid';
 		$this->_profileIdx['triggers'] = 'web.'.$profileSection.'.triggerid';
+		$this->_profileIdx['drules'] = 'web.'.$profileSection.'.druleid';
 
 		if ($this->config['select_latest']) {
 			$this->_profileIds['groupid'] = CProfile::get(self::GROUP_LATEST_IDX);
 			$this->_profileIds['hostid'] = CProfile::get(self::HOST_LATEST_IDX);
 			$this->_profileIds['graphid'] = CProfile::get(self::GRAPH_LATEST_IDX);
 			$this->_profileIds['triggerid'] = null;
+			$this->_profileIds['druleid'] = CProfile::get(self::DRULE_LATEST_IDX);
 		}
 		elseif ($this->config['DDReset'] && !$this->config['DDRemember']) {
 			$this->_profileIds['groupid'] = 0;
 			$this->_profileIds['hostid'] = 0;
 			$this->_profileIds['graphid'] = 0;
 			$this->_profileIds['triggerid'] = 0;
+			$this->_profileIds['druleid'] = 0;
 		}
 		else {
 			$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
 			$this->_profileIds['hostid'] = CProfile::get($this->_profileIdx['hosts']);
 			$this->_profileIds['graphid'] = CProfile::get($this->_profileIdx['graphs']);
 			$this->_profileIds['triggerid'] = null;
+			$this->_profileIds['druleid'] = CProfile::get($this->_profileIdx['drules']);
 		}
 
 		$this->_requestIds['groupid'] = isset($options['groupid']) ? $options['groupid'] : null;
 		$this->_requestIds['hostid'] = isset($options['hostid']) ? $options['hostid'] : null;
 		$this->_requestIds['graphid'] = isset($options['graphid']) ? $options['graphid'] : null;
 		$this->_requestIds['triggerid'] = isset($options['triggerid']) ? $options['triggerid'] : null;
+		$this->_requestIds['druleid'] = isset($options['druleid']) ? $options['druleid'] : null;
 	}
 
 	private function _updateByGraph(&$options) {
@@ -422,6 +433,42 @@ class CPageFilter {
 		$this->ids['triggerid'] = $triggerid;
 	}
 
+	private function _initDiscoveries($druleid, $options) {
+		$def_options = array(
+			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
+			'output' => API_OUTPUT_EXTEND
+		);
+		$options = zbx_array_merge($def_options, $options);
+		$drules = API::DRule()->get($options);
+		order_result($drules, 'name');
+
+		$this->data['drules'] = array();
+		foreach ($drules as $drule) {
+			$this->data['drules'][$drule['druleid']] = $drule['name'];
+		}
+
+		if (is_null($druleid)) {
+			$druleid = $this->_profileIds['druleid'];
+		}
+
+		if ((!isset($this->data['drules'][$druleid]) && $druleid > 0) || is_null($druleid)) {
+			if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) {
+				$druleid = 0;
+			}
+			elseif (is_null($this->_requestIds['druleid']) || $this->_requestIds['druleid'] > 0) {
+				$druleids = array_keys($this->data['drules']);
+				$druleid = empty($druleids) ? 0 : reset($druleids);
+			}
+		}
+
+		CProfile::update($this->_profileIdx['drules'], $druleid, PROFILE_TYPE_ID);
+		CProfile::update(self::DRULE_LATEST_IDX, $druleid, PROFILE_TYPE_ID);
+
+		$this->isSelected['drulesSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['drules'])) || $druleid > 0;
+		$this->isSelected['drulesAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['drules']) && $druleid == 0;
+		$this->ids['druleid'] = $druleid;
+	}
+
 	public function getHostsCB($withNode = false) {
 		return $this->_getCB('hostid', $this->hostid, $this->hosts, $withNode);
 	}
@@ -450,6 +497,10 @@ class CPageFilter {
 
 	public function getTriggerCB($withNode = false) {
 		return $this->_getCB('triggerid', $this->triggerid, $this->triggers, $withNode);
+	}
+
+	public function getDiscoveryCB($withNode = false) {
+		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode);
 	}
 
 	private function _getCB($cbname, $selectedid, $items, $withNode) {

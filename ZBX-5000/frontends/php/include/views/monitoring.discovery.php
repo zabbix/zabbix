@@ -29,14 +29,8 @@ $discoveryHeaderForm->setName('slideHeaderForm');
 $discoveryHeaderForm->addVar('fullscreen', $this->data['fullscreen']);
 $discoveryWidget->addPageHeader(_('STATUS OF DISCOVERY'), get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
 
-$discoveryRulesComboBox = new CComboBox('druleid', $this->data['druleid'], 'submit()');
+$discoveryRulesComboBox = $this->data['pageFilter']->getDiscoveryCB();
 
-$config = select_config();
-$discoveryRulesComboBox->addItem(0, $config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE ? _('not selected') : _('all'));
-
-foreach ($this->data['drules_all'] as $drule) {
-	$discoveryRulesComboBox->addItem($drule['druleid'], get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name']);
-}
 $discoveryHeaderForm->addItem(array(_('Discovery rule').SPACE, $discoveryRulesComboBox));
 $discoveryWidget->addHeader(_('Discovery rules'), $discoveryHeaderForm);
 
