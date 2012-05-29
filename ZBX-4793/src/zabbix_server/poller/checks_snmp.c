@@ -399,9 +399,10 @@ static char	*snmp_get_octet_string(struct variable_list *vars)
 	const char	*__function_name = "snmp_get_octet_string";
 	static char	buf[MAX_STRING_LEN];
 	const char	*hint;
-	char		is_hex = 0;
+	char		*strval_dyn = NULL, is_hex = 0;
 	size_t          offset = 0;
 	struct tree     *subtree;
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -411,7 +412,7 @@ static char	*snmp_get_octet_string(struct variable_list *vars)
 
 	/* we will decide if we want the value from vars->val or what snprint_value() returned later */
 	if (-1 == snprint_value(buf, sizeof(buf), vars->name, vars->name_length, vars))
-		return NULL;
+		goto end;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() full value:'%s'", __function_name, buf);
 
@@ -421,8 +422,6 @@ static char	*snmp_get_octet_string(struct variable_list *vars)
 		is_hex = 1;
 		offset = 12;
 	}
-
-	char    *strval_dyn = NULL;
 
 	/* in case of no hex and no display hint take the value from */
 	/* vars->val, it contains unquoted and unescaped string */
@@ -453,8 +452,8 @@ static char	*snmp_get_octet_string(struct variable_list *vars)
 
 	zbx_rtrim(strval_dyn, ZBX_WHITESPACE);
 	zbx_ltrim(strval_dyn, ZBX_WHITESPACE);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, strval_dyn);
+end:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, strval_dyn ? strval_dyn : "(null)");
 
 	return strval_dyn;
 }
