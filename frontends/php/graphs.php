@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
@@ -77,6 +76,12 @@ if (!isset($percentVisible['percent_left'])) {
 }
 if (!isset($percentVisible['percent_right'])) {
 	unset($_REQUEST['percent_right']);
+}
+if (isset($_REQUEST['yaxismin']) && zbx_empty($_REQUEST['yaxismin'])) {
+	unset($_REQUEST['yaxismin']);
+}
+if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
+	unset($_REQUEST['yaxismax']);
 }
 
 check_fields($fields);
@@ -462,8 +467,8 @@ elseif (isset($_REQUEST['form'])) {
 
 		$data['ymin_type'] = get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED);
 		$data['ymax_type'] = get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED);
-		$data['yaxismin'] = get_request('yaxismin', 0.00);
-		$data['yaxismax'] = get_request('yaxismax', 100.00);
+		$data['yaxismin'] = get_request('yaxismin', '0.00');
+		$data['yaxismax'] = get_request('yaxismax', '100.00');
 		$data['ymin_itemid'] = get_request('ymin_itemid', 0);
 		$data['ymax_itemid'] = get_request('ymax_itemid', 0);
 		$data['showworkperiod'] = get_request('showworkperiod', 0);

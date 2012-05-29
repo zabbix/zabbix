@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-5053] fixed Y max/min value validation for calculated graph scales (Eduard)
 A.F....... [ZBX-4958] fixed undefined indexes when switching auth method (Eduard)
 ..F....... [ZBX-5071] fixed macros being deleted when leaving the "macro" and "value" fields empty (Pavels)
 .......PS. [ZBX-5076] fixed possible server or proxy crash when using Calculated, DB Monitor, SSH or Telnet items (Sasha)
