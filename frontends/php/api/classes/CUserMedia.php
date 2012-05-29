@@ -39,7 +39,6 @@ class CUserMedia extends CZBXAPI {
 	 * @param array $options['usrgrpids'] filter by UserGroup IDs
 	 * @param array $options['userids'] filter by User IDs
 	 * @param boolean $options['type'] filter by User type [ USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3 ]
-	 * @param boolean $options['selectUsrgrps'] extend with UserGroups data for each User
 	 * @param boolean $options['getAccess'] extend with access data for each User
 	 * @param boolean $options['count'] output only count of objects in result. ( result returned in property 'rowscount' )
 	 * @param string $options['pattern'] filter by Host name containing only give pattern
@@ -85,9 +84,6 @@ class CUserMedia extends CZBXAPI {
 			// output
 			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
-			'selectUsrgrps'				=> null,
-			'selectUsers'				=> null,
-			'selectMediatypes'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -300,16 +296,6 @@ class CUserMedia extends CZBXAPI {
 					if (!isset($result[$media['mediaid']])) {
 						$result[$media['mediaid']]= array();
 					}
-
-					// usrgrpids
-					if (isset($media['usrgrpid']) && is_null($options['selectUsrgrps'])) {
-						if (!isset($result[$media['mediaid']]['usrgrps'])) {
-							$result[$media['mediaid']]['usrgrps'] = array();
-						}
-						$result[$media['mediaid']]['usrgrps'][] = array('usrgrpid' => $media['usrgrpid']);
-						unset($media['usrgrpid']);
-					}
-					$result[$media['mediaid']] += $media;
 				}
 			}
 		}
