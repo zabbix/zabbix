@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 define('ZBX_PAGE_NO_AUTHORIZATION', true);
 define('ZBX_NOT_ALLOW_ALL_NODES', true);
 define('ZBX_HIDE_NODE_SELECTION', true);
@@ -87,7 +87,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		CWebUser::checkAuthentication(null);
 	}
 }
-else {
+elseif (empty(CWebUser::$data)) {
 	// login the user from the session, if the session id is empty - login as a guest
 	CWebUser::checkAuthentication(get_cookie('zbx_sessionid'));
 }
@@ -114,4 +114,3 @@ if (!CWebUser::$data['alias'] || CWebUser::$data['alias'] == ZBX_GUEST_USER) {
 else {
 	redirect(zbx_empty(CWebUser::$data['url']) ? 'dashboard.php' : CWebUser::$data['url']);
 }
-?>
