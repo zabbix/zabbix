@@ -681,6 +681,7 @@ class CGraphPrototype extends CZBXAPI {
 			'selectGraphItems' => API_OUTPUT_EXTEND
 		));
 
+		$graphsToUpdate = array();
 		foreach ($graphs as $gnum => $graph) {
 			// if missing in $updGraphs then no permissions
 			if (!isset($updGraphs[$graph['graphid']])) {
@@ -698,8 +699,8 @@ class CGraphPrototype extends CZBXAPI {
 					break;
 				}
 			}
-			if ($ok) {
-				$graphs[$gnum]['notUpdate'] = true;
+			if (!$ok) {
+				$graphsToUpdate[$graphs[$gnum]['graphid']] = true; // graph has changes so it should be updated
 			}
 		}
 
@@ -708,6 +709,8 @@ class CGraphPrototype extends CZBXAPI {
 		foreach ($graphs as $graph) {
 			unset($graph['templateid']);
 
+			$itemsToInsert = array();
+			$itemsToUpdate = array();
 			foreach ($graph['gitems'] as $key => $gitem) {
 				if (isset($updGraphs[$graph['graphid']]['gitems'][$gitem['gitemid']])) {
 					// unset not changed graph items
@@ -723,19 +726,22 @@ class CGraphPrototype extends CZBXAPI {
 						}
 					}
 					if ($ok) {
-						unset($graph['gitems'][$key]);
+						unset($graph['gitems'][$key]); // unset not changed graph items
+					}
+					else {
+						$itemsToUpdate[$key] = $graph['gitems'][$key]; // for update
 					}
 					unset($updGraphs[$graph['graphid']]['gitems'][$gitem['gitemid']]); // leave in $updGraphs only items for deletion
 				}
 				elseif (isset($graph['gitems'][$key])) {
-					$graph['gitems'][$key]['insert'] = true; // set flag for items which should be inserted
+					$itemsToInsert[$key] = $graph['gitems'][$key]; // for insert
 				}
 			}
 
 			// items to delete
-			$graph['itemsToDel'] = array();
+			$itemsToDel = array();
 			foreach ($updGraphs[$graph['graphid']]['gitems'] as $updItems) {
-				$graph['itemsToDel'][] = $updItems['gitemid'];
+				$itemsToDel[] = $updItems['gitemid'];
 			}
 
 			$graphHosts = API::Host()->get(array(
@@ -760,7 +766,13 @@ class CGraphPrototype extends CZBXAPI {
 			// check ymin, ymax items
 			$this->checkAxisItems($graph, $templatedGraph);
 
-			$this->updateReal($graph);
+			//$this->updateReal($graph);
+			if (isset($graphsToUpdate[$graph['graphid']]) && $graphsToUpdate[$graph['graphid']]) {
+				$this->updateGraphReal($graph);
+			}
+			$this->deleteGraphItemsReal($itemsToDel);
+			$this->updateGraphItemsReal($itemsToUpdate, $graph['graphid']);
+			$this->insertGraphItemsReal($itemsToInsert, $graph['graphid']);
 
 			// inheritance
 			if ($templatedGraph) {
@@ -787,25 +799,43 @@ class CGraphPrototype extends CZBXAPI {
 		return $graphid;
 	}
 
-	protected function updateReal($graph) {
-		if (!(isset($graph['notUpdate']) && $graph['notUpdate'])) {
-			$data = array(array('values' => $graph, 'where' => array('graphid' => $graph['graphid'])));
-			DB::update('graphs', $data);
-		}
+	protected function updateGraphReal($graph) {
+		$data = array(array('values' => $graph, 'where' => array('graphid' => $graph['graphid'])));
+		DB::update('graphs', $data);
+	}
 
-		if (!empty($graph['itemsToDel'])) {
-			DB::delete('graphs_items', array('gitemid' => $graph['itemsToDel']));
+	protected function deleteGraphItemsReal($itemsToDel) {
+		if (!empty($itemsToDel)) {
+			DB::delete('graphs_items', array('gitemid' => $itemsToDel));
 		}
+	}
+
+	protected function updateGraphItemsReal($itemsToUpdate, $graphid) {
+		foreach ($itemsToUpdate as $gitem) {
+			$gitem['graphid'] = $graphid;
+			DB::update('graphs_items', array(array('values' => $gitem, 'where' => array('gitemid' => $gitem['gitemid']))));
+		}
+	}
+
+	protected function insertGraphItemsReal($itemsToInsert, $graphid) {
+		foreach ($itemsToInsert as $gitem) {
+			$gitem['graphid'] = $graphid;
+			DB::insert('graphs_items', array($gitem));
+		}
+	}
+
+	// deprecated use updateGraphReal(), deleteGraphItemsReal(), updateGraphItemsReal(), insertGraphItemsReal() insted
+	protected function updateReal($graph) {
+		$data = array(array('values' => $graph, 'where' => array('graphid' => $graph['graphid'])));
+		DB::update('graphs', $data);
 
 		if (isset($graph['gitems'])) {
+			DB::delete('graphs_items', array('graphid' => $graph['graphid']));
+
 			foreach ($graph['gitems'] as $gitem) {
 				$gitem['graphid'] = $graph['graphid'];
-				if (isset($gitem['insert']) && $gitem['insert']) {
-					DB::insert('graphs_items', array($gitem));
-				}
-				else {
-					DB::update('graphs_items', array(array('values' => $gitem, 'where' => array('gitemid' => $gitem['gitemid']))));
-				}
+
+				DB::insert('graphs_items', array($gitem));
 			}
 		}
 
