@@ -86,8 +86,6 @@ class CUserMedia extends CZBXAPI {
 			'output'					=> API_OUTPUT_REFER,
 			'editable'					=> null,
 			'selectUsrgrps'				=> null,
-			'selectUsers'				=> null,
-			'selectMediatypes'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
