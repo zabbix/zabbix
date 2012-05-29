@@ -763,6 +763,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+..F....... [ZBX-4031] fixed error message when deleting a link in a map (Pavels)
 ..F....... [ZBX-5006] fixed allowed memory size exceeded; thanks to Mike Brady (Toms)
 A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)
 ..F....... [ZBX-5014] fixed error in dm setup for guest user (Vedmak)
