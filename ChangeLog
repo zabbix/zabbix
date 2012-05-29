@@ -753,6 +753,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+..F....... [ZBX-5006] fixed allowed memory size exceeded; thanks to Mike Brady (Toms)
 A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)
 ..F....... [ZBX-5014] fixed error in dm setup for guest user (Vedmak)
 ..F....... [ZBX-4984] fixed export include graphs and triggers with web items (Vedmak)
