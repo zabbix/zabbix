@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing graph class for API.
  * @package API
@@ -1074,6 +1074,13 @@ class CGraph extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot add more than one item with type "Graph sum" on graph "%1$s".', $graph['name']));
 				}
 			}
+
+			// Y axis MIN value < Y axis MAX value
+			if (($graph['graphtype'] == GRAPH_TYPE_NORMAL || $graph['graphtype'] == GRAPH_TYPE_STACKED)
+					&& $graph['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED
+					&& $graph['yaxismin'] >= $graph['yaxismax']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Y axis MAX value must be greater than Y axis MIN value.'));
+			}
 		}
 
 		if (!empty($itemids)) {
@@ -1155,4 +1162,3 @@ class CGraph extends CZBXAPI {
 		return true;
 	}
 }
-?>
