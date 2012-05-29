@@ -1718,6 +1718,18 @@ function bcround($number, $precision = 0) {
 }
 
 /**
+ * Calculates the modulus for float numbers.
+ *
+ * @param string $number
+ * @param string $modulus
+ *
+ * @return string
+ */
+function bcfmod($number, $modulus) {
+	return bcsub($number, bcmul($modulus, bcfloor(bcdiv($number, $modulus))));
+}
+
+/**
  * Converts number to letter representation.
  * From A to Z, then from AA to ZZ etc.
  * Example: 0 => A, 25 => Z, 26 => AA, 27 => AB, 52 => BA, ...

@@ -714,14 +714,14 @@ class CChart extends CGraphDraw {
 		$intervals = array();
 		foreach (array(1, 2, 3, 4) as $num) {
 			$dec = pow(0.1, $num);
-			foreach (array(1, 2, 5) as $n => $int) {
-				$intervals[] = $int * $dec;
+			foreach (array(1, 2, 5) as $int) {
+				$intervals[] = bcmul($int, $dec);
 			}
 		}
 
 		foreach (array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18) as $num) {
 			$dec = bcpow(10, $num);
-			foreach (array(1, 2, 5) as $n => $int) {
+			foreach (array(1, 2, 5) as $int) {
 				$intervals[] = bcmul($int, $dec);
 			}
 		}
@@ -1556,7 +1556,7 @@ class CChart extends CGraphDraw {
 
 		$offset = 0;
 		if ($stepNumber > 0 && $minY) {
-			$offset = ($minY > $step) ? bcmod($minY, $step) : $minY;
+			$offset = ($minY > $step) ? bcfmod($minY, $step) : $minY;
 		}
 
 		return $offset;
