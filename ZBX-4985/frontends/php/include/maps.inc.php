@@ -2030,6 +2030,8 @@ function processAreasCoordinates(array &$map, array $areas, array $mapInfo) {
 
 		$colNum = 0;
 		$rowNum = 0;
+		// some offset is required so that icon highlights are not drawn outside area
+		$borderOffset = 20;
 		foreach ($area['selementids'] as $selementid) {
 			$selement = $map['selements'][$selementid];
 
@@ -2042,19 +2044,19 @@ function processAreasCoordinates(array &$map, array $areas, array $mapInfo) {
 			switch ($label_location) {
 				case MAP_LABEL_LOC_TOP:
 					$newX = $area['x'] + ($xOffset / 2) - ($iconX / 2);
-					$newY = $area['y'] + $yOffset - $iconY - ($iconY >= $iconX ? 0 : abs($iconX - $iconY) / 2) - 20;
+					$newY = $area['y'] + $yOffset - $iconY - ($iconY >= $iconX ? 0 : abs($iconX - $iconY) / 2) - $borderOffset;
 					break;
 				case MAP_LABEL_LOC_LEFT:
-					$newX = $area['x'] + $xOffset - $iconX - 20;
+					$newX = $area['x'] + $xOffset - $iconX - $borderOffset;
 					$newY = $area['y'] + ($yOffset / 2) - ($iconY / 2);
 					break;
 				case MAP_LABEL_LOC_RIGHT:
-					$newX = $area['x'] + 20;
+					$newX = $area['x'] + $borderOffset;
 					$newY = $area['y'] + ($yOffset / 2) - ($iconY / 2);
 					break;
 				case MAP_LABEL_LOC_BOTTOM:
 					$newX = $area['x'] + ($xOffset / 2) - ($iconX / 2);
-					$newY = $area['y'] + abs($iconX - $iconY) / 2 + 20;
+					$newY = $area['y'] + abs($iconX - $iconY) / 2 + $borderOffset;
 					break;
 			}
 
