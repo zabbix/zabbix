@@ -56,9 +56,9 @@ if (isset($_REQUEST['save'])) {
 
 		$newMacros = get_request('macros', array());
 
-		// remove item from new macros array if name and value is empty
+		// remove empty new macro lines
 		foreach ($newMacros as $number => $newMacro) {
-			if (zbx_empty($newMacro['macro']) && zbx_empty($newMacro['value'])) {
+			if (!isset($newMacro['globalmacroid']) && zbx_empty($newMacro['macro']) && zbx_empty($newMacro['value'])) {
 				unset($newMacros[$number]);
 			}
 		}
@@ -90,7 +90,7 @@ if (isset($_REQUEST['save'])) {
 		}
 		if (!empty($macrosToUpdate)) {
 			if (!API::UserMacro()->updateGlobal($macrosToUpdate)) {
-				throw new Exception(_('Cannot update macro'));
+				throw new Exception(_('Cannot update macro.'));
 			}
 			foreach ($macrosToUpdate as $macro) {
 				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
@@ -117,7 +117,7 @@ if (isset($_REQUEST['save'])) {
 
 			$newMacrosIds = API::UserMacro()->createGlobal(array_values($newMacros));
 			if (!$newMacrosIds) {
-				throw new Exception(_('Cannot add macro'));
+				throw new Exception(_('Cannot add macro.'));
 			}
 			$newMacrosCreated = API::UserMacro()->get(array(
 				'globalmacroids' => $newMacrosIds['globalmacroids'],

@@ -1,8 +1,22 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBXNEXT-1019] updated jQuery to 1.7.2 and jQuery UI to 1.8.20 (Vedmak)
+..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-4958] fixed undefined indexes when switching auth method (Eduard)
+..F....... [ZBX-5071] fixed macros being deleted when leaving the "macro" and "value" fields empty (Pavels)
+.......PS. [ZBX-5076] fixed possible server or proxy crash when using Calculated, DB Monitor, SSH or Telnet items (Sasha)
+A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)
+..F....... [ZBX-4864] fixed graph Y axis label alignment (Pavels)
+..F....... [ZBXNEXT-1225] fixed multiple design issues (Pavels)
+..F....... [ZBX-4932] fixed weekly top 100 trigger report using incorrect time period (Pavels)
+..F....... [ZBX-3106] fixed supported types for calculated items (Toms)
+A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
+....I..... [ZBX-5041] changed {HOSTNAME} macro to {HOST.NAME} in the default templates (Sasha)
+A.F....... [ZBX-4974] fixed and improved several popups (Toms)
+..F....... [ZBX-5020] fixed undefined functions prior requirement check in setup.php (Toms)
 ..F....... [ZBX-5016] fixed graphs borders (Eduard)
 A......... [ZBX-4962] fixed varchar default saving in mysql (Eduard)
 ..F....... [ZBX-4977] fixed GUI messaging (Eduard)
@@ -17,12 +31,26 @@ A......... [ZBX-5026] fixed error messages when creating IT Service (Eduard)
 Changes for 2.0.1rc1
 
 New features:
+..F....... [ZBXNEXT-1019] updated jQuery to 1.7.2 and jQuery UI to 1.8.20 (Vedmak)
+..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-4958] fixed undefined indexes when switching auth method (Eduard)
+..F....... [ZBX-5071] fixed macros being deleted when leaving the "macro" and "value" fields empty (Pavels)
+.......PS. [ZBX-5076] fixed possible server or proxy crash when using Calculated, DB Monitor, SSH or Telnet items (Sasha)
+A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)
+..F....... [ZBX-4864] fixed graph Y axis label alignment (Pavels)
+..F....... [ZBXNEXT-1225] fixed multiple design issues (Pavels)
+..F....... [ZBX-4932] fixed weekly top 100 trigger report using incorrect time period (Pavels)
+..F....... [ZBX-3106] fixed supported types for calculated items (Toms)
+A......... [ZBX-5030] fixed IT services query in Oracle (Eduard)
+....I..... [ZBX-5041] changed {HOSTNAME} macro to {HOST.NAME} in the default templates (Sasha)
+A.F....... [ZBX-4974] fixed and improved several popups (Toms)
+..F....... [ZBX-5020] fixed undefined functions prior requirement check in setup.php (Toms)
 ..F....... [ZBX-5016] fixed graphs borders (Eduard)
-A......... [ZBX-4962] fixed varchar default saving in mysql (Eduard)
+A......... [ZBX-4962] fixed varchar default saving in MySQL (Eduard)
 ..F....... [ZBX-4977] fixed GUI messaging (Eduard)
-A......... [ZBX-4994] fixed sql error when try to remove host interface used in items (Vedmak)
+A......... [ZBX-4994] fixed SQL error when trying to remove host interface used in items (Vedmak)
 ..F....... [ZBX-4918] fixed value mapping for {ITEM.VALUE} and {ITEM.LASTVALUE} macros (Vedmak)
 ..F....... [ZBX-5013] fixed requirements check in frontend setup (Vedmak)
 A......... [ZBX-4923] fixed ids sorting before update and delete (Eduard)
@@ -729,8 +757,14 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+..F....... [ZBX-5006] fixed allowed memory size exceeded; thanks to Mike Brady (Toms)
+A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)
+..F....... [ZBX-5014] fixed error in dm setup for guest user (Vedmak)
+..F....... [ZBX-4984] fixed export include graphs and triggers with web items (Vedmak)
 .......PS. [ZBX-4980] fixed trapper process crash/hang on decoding big base64 encoded values (Andris)
 ...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
+..F....... [ZBX-4918] fixed value mapping when resolve {ITEM.LASTVALUE} and {ITEM.VALUE} macros (Vedmak)
+A......... [ZBX-4917] fixed slow screens for non-Super-Admins (Toms)
 
 Changes for 1.8.13
 
@@ -738,8 +772,10 @@ Changes for 1.8.13
 
 Changes for 1.8.13rc1
 
+A.F....... [ZBX-4685] fixed hangup when users login at the same time (Toms)
+....I..... [ZBX-4810] fixed the ifInOctets and ifOutOctets items in the Dell_PowerConnect_5224, Template_Dell_PowerConnect_5324, Template_C3750-48TS and Template_Cisco_PIX515E templates (Sasha)
 ...G...... [ZBXNEXT-1188] added support of "agent.hostname" check (Sasha)
-........S. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
+.......PS. [ZBX-4857] fixed poller hanging on ssh check when using public key authentication (dimir)
 ........S. [ZBX-4881] fixed slow select queries from partitioned history tables (Sasha)
 A.F....... [ZBX-4877] updated French translation; thanks to Joseph Bueno (Richlv)
 ..F....... [ZBX-4900] improved performance of the 'Status of Zabbix' dashboard widget (Vedmak)
