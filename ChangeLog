@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5078] fixed item prototype application linking when fully cloning a host (Pavels)
 A.F....... [ZBX-5053] fixed Y max/min value validation for calculated graph scales (Eduard)
 A.F....... [ZBX-5029] fixed inherited item interface being updated incorrectly when changing it's type (Pavels)
 A.F....... [ZBX-4958] fixed undefined indexes when switching auth method (Eduard)
