@@ -74,22 +74,23 @@ if (!empty($data['drules_all'])) {
 	order_result($data['drules_all'], 'name');
 }
 
+// discovery rules
+$options = array(
+	'filter' => array('status' => DRULE_STATUS_ACTIVE),
+	'selectDHosts' => API_OUTPUT_EXTEND,
+	'output' => API_OUTPUT_EXTEND
+);
+
 $config = select_config();
 
-// do not retrieve data when select first none and discovery rule not selected
-if (!($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE && empty($data['druleid']))) {
+if (!empty($data['druleid'])) {
+	$options['druleids'] = $data['druleid']; // set selected discovery rule id
+}
+elseif ($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE) {
+	$options['druleids'] = array(); // set empty array to select no discovery rules
+}
 
-	// discovery rules
-	$options = array(
-		'filter' => array('status' => DRULE_STATUS_ACTIVE),
-		'selectDHosts' => API_OUTPUT_EXTEND,
-		'output' => API_OUTPUT_EXTEND
-	);
-
-	// set selected discovery rule id
-	if (!empty($data['druleid'])) {
-		$options['druleids'] = $data['druleid'];
-	}
+if (!($config['dropdown_first_entry'] == ZBX_DROPDOWN_FIRST_NONE && empty($data['druleid']))) { // do not retrieve data when select first none and discovery rule not selected
 
 	$data['drules'] = API::DRule()->get($options);
 	if (!empty($data['drules'])) {
