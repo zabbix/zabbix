@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CWebUser {
 
@@ -77,7 +76,7 @@ class CWebUser {
 				self::$data = API::User()->checkAuthentication($sessionid);
 			}
 
-			if ($sessionid === null || !self::$data) {
+			if ($sessionid === null || empty(self::$data)) {
 				self::setDefault();
 				self::$data = API::User()->login(array(
 					'user' => ZBX_GUEST_USER,
@@ -85,7 +84,7 @@ class CWebUser {
 					'userData' => true
 				));
 
-				if (!self::$data) {
+				if (empty(self::$data)) {
 					clear_messages(1);
 					throw new Exception();
 				}
@@ -108,7 +107,7 @@ class CWebUser {
 		}
 	}
 
-	private static function setDefault() {
+	public static function setDefault() {
 		self::$data = array(
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,

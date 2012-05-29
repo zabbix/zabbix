@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,7 @@
 
 
 /**
- * File containing CUser class for API.
  * @package API
- */
-/**
- * Class containing methods for operations with Users
  */
 class CUser extends CZBXAPI {
 
@@ -913,8 +909,6 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Login name or password is incorrect.'));
 		}
 
-		self::$userData['userid'] = $userInfo['userid'];
-
 		// check if user is blocked
 		if ($userInfo['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
 			if ((time() - $userInfo['attempt_clock']) < ZBX_LOGIN_BLOCK) {
@@ -928,7 +922,6 @@ class CUser extends CZBXAPI {
 		if (!check_perm2system($userInfo['userid'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
 		}
-
 
 		$dbAccess = DBfetch(DBselect(
 			'SELECT MAX(g.gui_access) AS gui_access'.
@@ -948,6 +941,7 @@ class CUser extends CZBXAPI {
 				$authType = ZBX_AUTH_INTERNAL;
 				break;
 			case GROUP_GUI_ACCESS_DISABLED:
+				/* fall through */
 			case GROUP_GUI_ACCESS_SYSTEM:
 				$config = select_config();
 				$authType = $config['authentication_type'];
@@ -992,6 +986,7 @@ class CUser extends CZBXAPI {
 		$userData = $this->_getUserData($userInfo['userid']);
 		$userData['sessionid'] = $sessionid;
 		$userData['gui_access'] = $guiAccess;
+		$userData['userid'] = $userInfo['userid'];
 
 		if ($userInfo['attempt_failed']) {
 			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.$userInfo['userid']);
