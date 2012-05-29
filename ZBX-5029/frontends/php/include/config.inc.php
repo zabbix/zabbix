@@ -201,18 +201,7 @@ if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
 else {
-	CWebUser::$data = array(
-		'alias' => ZBX_GUEST_USER,
-		'userid' => 0,
-		'lang' => 'en_gb',
-		'type' => '0',
-		'node' => array(
-			'name' => '- unknown -',
-			'nodeid' => 0
-		)
-	);
-
-	$USER_DETAILS = CWebUser::$data;
+	CWebUser::setDefault();
 }
 
 set_zbx_locales();
@@ -548,8 +537,6 @@ function parse_period($str) {
 }
 
 function get_status() {
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
 	$status = array(
 		'triggers_count' => 0,
 		'triggers_count_enabled' => 0,
@@ -570,14 +557,7 @@ function get_status() {
 	);
 
 	// server
-	$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
-	if (!$checkport) {
-		clear_messages();
-		$status['zabbix_server'] = _('No');
-	}
-	else {
-		$status['zabbix_server'] = _('Yes');
-	}
+	$status['zabbix_server'] = zabbixRunning() ? _('Yes') : _('No');
 
 	// triggers
 	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
@@ -686,6 +666,21 @@ function get_status() {
 	$status['qps_total'] = round($row['qps'], 2);
 
 	return $status;
+}
+
+function zabbixRunning() {
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+	if (empty($ZBX_SERVER) || empty ($ZBX_SERVER_PORT)) {
+		return false;
+	}
+
+	$result = (bool) fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, ZBX_SOCKET_TIMEOUT);
+	if (!$result) {
+		clear_messages();
+	}
+
+	return $result;
 }
 
 function set_image_header($format = null) {

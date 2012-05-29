@@ -1,30 +1,26 @@
 <script type="text/javascript">
 	var selectedSeverity = <?php echo $this->data['priority']; ?>;
 
-	jQuery(document).ready(function() {
-		jQuery('#severity_label_<?php echo $this->data['priority']; ?>').css('background', '#<?php echo $this->data['config']['severity_color_'.$this->data['priority']]; ?>');
-	});
-
 	function focusSeverity(priority) {
-		jQuery('#severity_label_0 span').removeClass('not_classified');
-		jQuery('#severity_label_1 span').removeClass('information');
-		jQuery('#severity_label_2 span').removeClass('warning');
-		jQuery('#severity_label_3 span').removeClass('average');
-		jQuery('#severity_label_4 span').removeClass('high');
-		jQuery('#severity_label_5 span').removeClass('disaster');
-		jQuery('#severity_label_0, #severity_label_1, #severity_label_2, #severity_label_3, #severity_label_4, #severity_label_5').css('background', '');
+		jQuery('#severity_label_0').removeClass('not_classified');
+		jQuery('#severity_label_1').removeClass('information');
+		jQuery('#severity_label_2').removeClass('warning');
+		jQuery('#severity_label_3').removeClass('average');
+		jQuery('#severity_label_4').removeClass('high');
+		jQuery('#severity_label_5').removeClass('disaster');
+		jQuery('.trigger-severity').css('background', '');
 
-		jQuery('#severity_label_' + priority + ' span').addClass(getSeverityName(priority));
+		jQuery('#severity_label_' + priority + '').addClass(getSeverityName(priority));
 		selectedSeverity = priority;
 	}
 
 	function mouseOverSeverity(priority) {
-		jQuery('#severity_label_' + priority +' span').addClass(getSeverityName(priority));
+		jQuery('#severity_label_' + priority).addClass(getSeverityName(priority));
 	}
 
 	function mouseOutSeverity(priority) {
 		if (selectedSeverity != priority) {
-			jQuery('#severity_label_' + priority +' span').removeClass(getSeverityName(priority));
+			jQuery('#severity_label_' + priority).removeClass(getSeverityName(priority));
 		}
 	}
 
@@ -73,5 +69,8 @@
 				jQuery('#priority_div').buttonset();
 			}
 		});
+
+		var severity = jQuery('input[name="priority"]:checked').val();
+		focusSeverity(severity);
 	});
 </script>

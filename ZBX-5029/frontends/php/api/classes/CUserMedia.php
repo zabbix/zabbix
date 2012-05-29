@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CUser class for API.
  * @package API
@@ -29,7 +29,6 @@
 class CUserMedia extends CZBXAPI {
 
 	protected $tableName = 'media';
-
 	protected $tableAlias = 'm';
 
 	/**
@@ -90,6 +89,7 @@ class CUserMedia extends CZBXAPI {
 			'selectUsers'				=> null,
 			'selectMediatypes'			=> null,
 			'countOutput'				=> null,
+			'groupCount'				=> null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
 			'sortorder'					=> '',
@@ -117,12 +117,12 @@ class CUserMedia extends CZBXAPI {
 			$sqlParts['from']['users_groups'] = 'users_groups ug';
 			$sqlParts['where']['mug'] = 'm.userid=ug.userid';
 			$sqlParts['where'][] = 'ug.usrgrpid IN ('.
-										' SELECT uug.usrgrpid'.
-											' FROM users_groups uug'.
-											' WHERE uug.userid='.self::$userData['userid'].
-										' )';
+				' SELECT uug.usrgrpid'.
+					' FROM users_groups uug'.
+					' WHERE uug.userid='.self::$userData['userid'].
+				' )';
 		}
-		elseif (!is_null($options['editable']) || (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)) {
+		elseif (!is_null($options['editable']) || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			$options['userids'] = self::$userData['userid'];
 		}
 
@@ -213,7 +213,7 @@ class CUserMedia extends CZBXAPI {
 		// search
 		if (is_array($options['search'])) {
 			if ($options['search']['passwd']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password.'));
 			}
 			zbx_db_search('media m', $options, $sqlParts);
 		}
@@ -226,7 +226,7 @@ class CUserMedia extends CZBXAPI {
 		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT m.mediaid) as rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT m.mediaid) AS rowscount');
 
 			// groupCount
 			if (!is_null($options['groupCount'])) {
@@ -318,249 +318,10 @@ class CUserMedia extends CZBXAPI {
 			return $result;
 		}
 
-		/*
-		 * Adding objects
-		 */
-		// adding usergroups
-		if (!is_null($options['selectUsrgrps']) && str_in_array($options['selectUsrgrps'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-				'output' => $options['selectUsrgrps'],
-				'userids' => $userids,
-				'preservekeys' => true
-			);
-			$usrgrps = API::UserGroup()->get($objParams);
-			foreach ($usrgrps as $usrgrpid => $usrgrp) {
-				$uusers = $usrgrp['users'];
-				unset($usrgrp['users']);
-				foreach ($uusers as $user) {
-					$result[$user['userid']]['usrgrps'][] = $usrgrp;
-				}
-			}
-		}
-
-		// TODO:
-		// adding users
-		if (!is_null($options['selectMedias']) && str_in_array($options['selectMedias'], $subselectsAllowedOutputs)) {
-		}
-
-		// adding mediatypes
-		if (!is_null($options['selectMediatypes']) && str_in_array($options['selectMediatypes'], $subselectsAllowedOutputs)) {
-		}
-
 		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
 		return $result;
 	}
-
-	protected function checkInput(&$medias, $method) {
-		$create = ($method == 'create');
-		$update = ($method == 'update');
-		$delete = ($method == 'delete');
-
-// permissions
-
-		if ($update || $delete) {
-			$mediaDBfields = array('mediaid'=> null);
-			$dbMedias = $this->get(array(
-				'output' => array('mediaid','userid','mediatypeid'),
-				'mediaids' => zbx_objectValues($medias, 'mediaid'),
-				'editable' => true,
-				'preservekeys' => true
-			));
-		}
-		else{
-			$mediaDBfields = array('userid'=>null,'mediatypeid'=>null,'sendto'=>null,'period'=>array());
-		}
-
-		$alias = array();
-		foreach ($medias as $unum => &$media) {
-			if (!check_db_fields($mediaDBfields, $media)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for user media "%s".', $media['sendto']));
-			}
-
-// PERMISSION CHECK
-			if ($create) {
-				if (self::$userData['type'] < USER_TYPE_ZABBIX_ADMIN)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to create user medias.'));
-
-				$dbMedia = $media;
-			}
-			elseif ($update) {
-				if (!isset($dbMedias[$media['mediaid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user media or user media does not exist.'));
-
-				$dbMedia = $dbMedias[$media['mediaid']];
-
-				if (bccomp(self::$userData['userid'], $dbMedia['userid']) != 0) {
-					if (USER_TYPE_SUPER_ADMIN != self::$userData['type'])
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update other users.'));
-				}
-				else{
-					if (USER_TYPE_ZABBIX_ADMIN != self::$userData['type'])
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions to update user medias.'));
-				}
-
-			}
-			else{
-				if (!isset($dbMedias[$media['mediaid']]))
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('You do not have permissions or user media does not exist.'));
-
-				if (bccomp(self::$userData['userid'], $media['userid']) == 0)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User is not allowed to delete himself.'));
-
-				if ($dbMedias[$media['mediaid']]['alias'] == ZBX_GUEST_USER)
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER));
-
-				continue;
-			}
-
-
-			if (isset($media['period']) && !validate_period($media['period']))
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect time period'));
-
-		}
-		unset($media);
-	}
-
-/**
- * Add Medias for User
- *
- * @param array $medias
- * @param string $medias['userid']
- * @param string $medias['medias']['mediatypeid']
- * @param string $medias['medias']['address']
- * @param int $medias['medias']['severity']
- * @param int $medias['medias']['active']
- * @param string $medias['medias']['period']
- * @return boolean
- */
-	public function create($medias) {
-		$medias = zbx_toArray($medias['medias']);
-		$mediaids = array();
-
-		$this->checkInput($medias, __FUNCTION__);
-
-		$mediaids = DB::insert('media', $medias);
-
-		return array('mediaids' => $mediaids);
-	}
-
-/**
- * Update Medias for User
- *
- * @param array $mediaData
- * @param array $mediaData['users']
- * @param array $mediaData['users']['userid']
- * @param array $mediaData['medias']
- * @param string $mediaData['medias']['mediatypeid']
- * @param string $mediaData['medias']['sendto']
- * @param int $mediaData['medias']['severity']
- * @param int $mediaData['medias']['active']
- * @param string $mediaData['medias']['period']
- * @return boolean
- */
-	public function update($medias) {
-		$medias = zbx_toArray($medias);
-
-		$this->checkInput($medias, __FUNCTION__);
-
-		$updMedias = array();
-		$delMedias = array();
-
-		$userids = zbx_objectValues($users, 'userid');
-		$sql = 'SELECT m.mediaid '.
-				' FROM media m '.
-				' WHERE '.DBcondition('userid', $userids);
-		$result = DBselect($sql);
-		while ($media = DBfetch($result)) {
-			$delMedias[$media['mediaid']] = $media;
-		}
-
-		foreach ($medias as $mnum => $media) {
-			if (!isset($media['mediaid'])) continue;
-
-			if (isset($delMedias[$media['mediaid']])) {
-				$updMedias[$media['mediaid']] = $medias[$mnum];
-			}
-
-			unset($medias[$mnum]);
-			unset($delMedias[$media['mediaid']]);
-		}
-
-// DELETE
-		if (!empty($delMedias))
-			$this->delete($delMedias);
-
-// UPDATE
-		$update = array();
-		foreach ($updMedias as $mnum => $media) {
-			$update[] = array(
-				'values' => $media,
-				'where' => array('mediaid' => $media['mediaid'])
-			);
-		}
-		DB::update('media', $update);
-
-// CREATE
-		if (!empty($medias))
-			$this->create($medias);
-
-		return array('userids'=>$userids);
-	}
-
-
-/**
- * Delete User Medias
- *
- * @param array $mediaids
- * @return boolean
- */
-	public function delete($medias) {
-		$medias = zbx_toArray($medias);
-		$mediaids = zbx_objectValues($medias, 'mediaid');
-
-		$this->checkInput($medias, __FUNCTION__);
-
-		DB::delete('media m', array('mediaid' => $mediaids));
-
-		return array('mediaids'=>$mediaids);
-	}
-
-
-	public function isReadable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
-
-		$ids = array_unique($ids);
-
-		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'userids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
-			'countOutput' => true
-		));
-
-		return (count($ids) == $count);
-	}
-
-	public function isWritable($ids) {
-		if (!is_array($ids)) return false;
-		if (empty($ids)) return true;
-
-		$ids = array_unique($ids);
-
-		$count = $this->get(array(
-			'nodeids' => get_current_nodeid(true),
-			'userids' => $ids,
-			'output' => API_OUTPUT_SHORTEN,
-			'editable' => true,
-			'countOutput' => true
-		));
-
-		return (count($ids) == $count);
-	}
 }
-
-?>
