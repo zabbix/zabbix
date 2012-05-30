@@ -57,8 +57,9 @@ if (!$this->data['is_discovery_rule']) {
 			new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 			empty($this->data['itemid'])
 				? new CButton('btn_host', _('Select'),
-					"return PopUp('popup.php?dstfrm=".$itemForm->getName().'&dstfld1=hostname&dstfld2=form_hostid'.
-						"&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&noempty=1&submitParent=1', 450, 450);",
+					'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid'.
+						'&dstfrm='.$itemForm->getName().'&dstfld1=hostname&dstfld2=form_hostid'.
+						'&noempty=1&submitParent=1", 450, 450);',
 					'formlist'
 				)
 				: null
@@ -85,8 +86,8 @@ $itemFormList->addRow(_('Key'), array(
 	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
 	!$this->data['limited']
 	? new CButton('keyButton', _('Select'),
-		"return PopUp('popup.php?dstfrm=".$itemForm->getName().
-			"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+jQuery('#type option:selected').val());",
+		'return PopUp("popup.php?srctbl=help_items&srcfld1=key_'.
+			'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
 		'formlist')
 	: null
 ));

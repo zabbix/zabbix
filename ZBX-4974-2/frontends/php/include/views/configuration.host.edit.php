@@ -485,10 +485,12 @@ foreach ($templates as $tid => $temp_name) {
 	));
 }
 
-$tmplAdd = new CButton('add', _('Add'), "return PopUp('popup.php?dstfrm=".$frmHost->getName().
-	"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host&templated_hosts=1".
-	url_param($templates, false, 'existed_templates')."', 450, 450)",
-	'link_menu');
+$tmplAdd = new CButton('add', _('Add'),
+	'return PopUp("popup.php?srctbl=templates&srcfld1=hostid&srcfld2=host'.
+		'&dstfrm='.$frmHost->getName().'&dstfld1=new_template&templated_hosts=1'.
+		url_param($templates, false, 'existed_templates').'", 450, 450)',
+	'link_menu'
+);
 
 $tmplList->addRow($tmplAdd, SPACE);
 

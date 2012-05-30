@@ -82,7 +82,10 @@ foreach ($this->data['slides'] as $step => $slides) {
 
 $addButtonColumn = new CCol(
 	empty($this->data['work_slide'])
-		? new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm='.$slideForm->getName().'&srctbl=screens&srcfld1=screenid&multiselect=1", 450, 450)', 'link_menu')
+		? new CButton('add', _('Add'),
+			'return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$slideForm->getName().
+				'&multiselect=1", 450, 450)',
+			'link_menu')
 		: null,
 	null,
 	5
