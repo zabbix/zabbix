@@ -212,11 +212,10 @@ class CUserMacro extends CZBXAPI{
 				$sql_parts['select']['templateid'] = 'ht.templateid';
 			}
 
-			$sql_parts['from']['macros_templates'] = 'macros_templates ht';
+			$sql_parts['from']['macros_templates'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
 			$sql_parts['where']['hht'] = 'hm.hostid=ht.macroid';
 		}
-
 
 // search
 		if(is_array($options['search'])){
@@ -1038,7 +1037,7 @@ class CUserMacro extends CZBXAPI{
 	public static function getMacros($macros, $options){
 		zbx_value2array($macros);
 		$macros = array_unique($macros);
-		
+
 		$result = array();
 
 		$obj_options = array(
@@ -1050,8 +1049,8 @@ class CUserMacro extends CZBXAPI{
 			'templated_hosts' => true,
 		);
 		$hosts = CHost::get($obj_options);
-		$hostids = array_keys($hosts);	
-		
+		$hostids = array_keys($hosts);
+
 		do{
 			$obj_options = array(
 				'hostids' => $hostids,
