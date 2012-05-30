@@ -6,6 +6,5 @@ name="zabbix_agentd"
 load_rc_config ${name}
 rcvar=`set_rcvar`
 command="${prefix:-"/usr/local"}/sbin/${name}"
-required_files="/etc/zabbix/${name}.conf"
 
 run_rc_command "$1"

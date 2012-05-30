@@ -7,7 +7,10 @@
 # chkconfig: - 95 5
 # description: Zabbix Monitoring Server
 # processname: zabbix_server
-# pidfile: /var/tmp/zabbix_server.pid
+# pidfile: /tmp/zabbix_server.pid
+
+# Modified for Zabbix 2.0.0
+# May 2012, Zabbix SIA
 
 # Source function library.
 
@@ -15,16 +18,7 @@
 
 RETVAL=0
 prog="Zabbix Server"
-CONFIG_FILE="/etc/zabbix/zabbix_server.conf"
-ZABBIX_BIN="/usr/sbin/zabbix_server"
-
-test -x $ZABBIX_BIN || exit 0
-
-if [ ! -f ${CONFIG_FILE} ]; then
-                echo -n "${NAME}configuration file ${CONFIG_FILE} does not exist. "
-                # Tell the user this has skipped
-                exit 6
-fi
+ZABBIX_BIN="/usr/local/sbin/zabbix_server"
 
 if [ ! -x ${ZABBIX_BIN} ] ; then
         echo -n "${ZABBIX_BIN} not installed! "
@@ -34,7 +28,7 @@ fi
 
 start() {
         echo -n $"Starting $prog: "
-        daemon $ZABBIX_BIN -c $CONFIG_FILE
+        daemon $ZABBIX_BIN
         RETVAL=$?
         [ $RETVAL -eq 0 ] && touch /var/lock/subsys/zabbix_server
         echo

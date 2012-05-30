@@ -9,6 +9,9 @@
 # @author:	Alexander Hagenah <hagenah@topconcepts.com>
 # @created:	18.04.2006
 #
+# Modified for Zabbix 2.0.0
+# May 2012, Zabbix SIA
+#
 # Source function library.
 . /etc/init.d/functions
 
@@ -16,16 +19,16 @@
 # Edit these to match your system settings
 
 	# Zabbix-Directory
-	BASEDIR=/opt/zabbix
+	BASEDIR=/usr/local
 
 	# Binary File
 	BINARY_NAME=zabbix_server
 
 	# Full Binary File Call
-	FULLPATH=$BASEDIR/bin/$BINARY_NAME
+	FULLPATH=$BASEDIR/sbin/$BINARY_NAME
 
 	# PID file
-	PIDFILE=/var/tmp/$BINARY_NAME.pid
+	PIDFILE=/tmp/$BINARY_NAME.pid
 
 	# Establish args
 	ERROR=0
