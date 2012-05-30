@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,28 +17,13 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-function get_default_image($image = false, $imagetype = IMAGE_TYPE_ICON) {
-	if ($image) {
-		$image = imagecreate(50, 50);
-		$color = imagecolorallocate($image, 250, 50, 50);
-		imagefill($image, 0, 0, $color);
-	}
-	else {
-		$sql = 'SELECT i.imageid'.
-				' FROM images i'.
-				' WHERE '.DBin_node('i.imageid', false).
-					' AND i.imagetype='.$imagetype.
-				' ORDER BY i.name';
-		$result = DBselect($sql, 1);
-		if ($image = DBfetch($result)) {
-			return $image;
-		}
-		else {
-			$image = array('imageid' => 0);
-		}
-	}
+
+
+function get_default_image() {
+	$image = imagecreate(50, 50);
+	$color = imagecolorallocate($image, 250, 50, 50);
+	imagefill($image, 0, 0, $color);
+
 	return $image;
 }
 
@@ -98,11 +83,9 @@ function imageThumb($source, $thumbWidth = 0, $thumbHeight = 0) {
 
 			if ($a > $b) {
 				$thumbWidth = $b * $thumbHeight;
-				$thumbHeight = $thumbHeight;
 			}
 			else {
 				$thumbHeight = $thumbWidth / $b;
-				$thumbWidth = $thumbWidth;
 			}
 		}
 
@@ -145,4 +128,3 @@ function imageFromString($imageString) {
 	imagesavealpha($image, true);
 	return $image;
 }
-?>
