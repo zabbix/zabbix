@@ -23,11 +23,13 @@ $actionWidget = new CWidget();
 
 // create new action button
 $createForm = new CForm('get');
+$createForm->cleanItems();
+$createForm->addVar('eventsource', $this->data['eventsource']);
 $createForm->addItem(new CSubmit('form', _('Create action')));
 $actionWidget->addPageHeader(_('CONFIGURATION OF ACTIONS'), $createForm);
 
 // create widget header
-$sourceComboBox = new CComboBox('eventsource', $_REQUEST['eventsource'], 'submit()');
+$sourceComboBox = new CComboBox('eventsource', $this->data['eventsource'], 'submit()');
 $sourceComboBox->addItem(EVENT_SOURCE_TRIGGERS, _('Triggers'));
 $sourceComboBox->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
 $sourceComboBox->addItem(EVENT_SOURCE_AUTO_REGISTRATION, _('Auto registration'));

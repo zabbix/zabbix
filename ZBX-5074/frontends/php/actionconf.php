@@ -36,7 +36,7 @@ $fields = array(
 	'evaltype' =>			array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_EVAL_TYPE_AND_OR, ACTION_EVAL_TYPE_AND, ACTION_EVAL_TYPE_OR)), 'isset({save})'),
 	'esc_period' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), 'isset({save})&&isset({escalation})', _('Default escalation period')),
 	'escalation' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'), null),
-	'status' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)), null),
+	'status' =>				array(T_ZBX_INT, O_OPT, null,	IN(array(ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED)), null),
 	'def_shortdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'def_longdata' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({save})'),
 	'recovery_msg' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
@@ -44,25 +44,19 @@ $fields = array(
 	'r_longdata' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({recovery_msg})&&isset({save})', _('Recovery message')),
 	'g_actionid' =>			array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
 	'conditions' =>			array(null,		O_OPT,	null,	null,		null),
-	'g_conditionid' =>		array(null,		O_OPT,	null,	null,		null),
 	'new_condition' =>		array(null,		O_OPT,	null,	null,		'isset({add_condition})'),
 	'operations' =>			array(null,		O_OPT,	null,	null,		'isset({save})'),
-	'g_operationid' =>		array(null,		O_OPT,	null,	null,		null),
 	'edit_operationid' =>	array(null,		O_OPT,	P_ACT,	DB_ID,		null),
 	'new_operation' =>		array(null,		O_OPT,	null,	null,		'isset({add_operation})'),
 	'opconditions' =>		array(null,		O_OPT,	null,	null,		null),
-	'g_opconditionid' =>	array(null,		O_OPT,	null,	null,		null),
 	'new_opcondition' =>	array(null,		O_OPT,	null,	null,		'isset({add_opcondition})'),
 	// actions
 	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'add_condition' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'del_condition' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_condition' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'add_operation' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'del_operation' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_operation' => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'add_opcondition' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'del_opcondition' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'cancel_new_opcondition' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
 	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
 	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
@@ -90,7 +84,7 @@ if (isset($_REQUEST['favobj'])) {
 		CProfile::update('web.audit.filter.state', $_REQUEST['favstate'], PROFILE_TYPE_INT);
 	}
 }
-if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
+if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit();
 }
@@ -139,8 +133,8 @@ elseif (isset($_REQUEST['save'])) {
 		'operations'	=> get_request('operations', array()),
 	);
 
-	foreach ($action['operations'] as $num => $op) {
-		if (isset($op['opmessage']) && !isset($op['opmessage']['default_msg'])) {
+	foreach ($action['operations'] as $num => $operation) {
+		if (isset($operation['opmessage']) && !isset($operation['opmessage']['default_msg'])) {
 			$action['operations'][$num]['opmessage']['default_msg'] = 0;
 		}
 	}
@@ -204,12 +198,6 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		error($e->getMessage());
 	}
 }
-elseif (isset($_REQUEST['del_condition']) && isset($_REQUEST['g_conditionid'])) {
-	$_REQUEST['conditions'] = get_request('conditions', array());
-	foreach ($_REQUEST['g_conditionid'] as $condition) {
-		unset($_REQUEST['conditions'][$condition]);
-	}
-}
 elseif (isset($_REQUEST['add_opcondition']) && isset($_REQUEST['new_opcondition'])) {
 	$new_opcondition = $_REQUEST['new_opcondition'];
 
@@ -231,15 +219,6 @@ elseif (isset($_REQUEST['add_opcondition']) && isset($_REQUEST['new_opcondition'
 	catch (APIException $e) {
 		error($e->getMessage());
 	}
-}
-elseif (isset($_REQUEST['del_opcondition']) && isset($_REQUEST['g_opconditionid'])) {
-	$new_operation = get_request('new_operation', array());
-
-	foreach ($_REQUEST['g_opconditionid'] as $condition) {
-		unset($new_operation['opconditions'][$condition]);
-	}
-
-	$_REQUEST['new_operation'] = $new_operation;
 }
 elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) {
 	$new_operation = $_REQUEST['new_operation'];
@@ -279,13 +258,6 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 
 		unset($_REQUEST['new_operation']);
 	}
-}
-elseif (isset($_REQUEST['del_operation']) && isset($_REQUEST['g_operationid'])) {
-	$_REQUEST['operations'] = get_request('operations', array());
-	foreach ($_REQUEST['g_operationid'] as $condition) {
-		unset($_REQUEST['operations'][$condition]);
-	}
-	sortOperations($_REQUEST['operations']);
 }
 elseif (isset($_REQUEST['edit_operationid'])) {
 	$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
@@ -346,75 +318,76 @@ if ($_REQUEST['go'] != 'none' && isset($go_result) && $go_result) {
 /*
  * Display
  */
-$action_wdgt = new CWidget();
-
-if (!isset($_REQUEST['form'])) {
-	$formActions = new CForm('get');
-	$formActions->cleanItems();
-	$formActions->addVar('eventsource', $_REQUEST['eventsource']);
-	$formActions->addItem(new CSubmit('form', _('Create action')));
-}
+show_messages();
 
 if (isset($_REQUEST['form'])) {
+	$data = array(
+		'form' => get_request('form'),
+		'form_refresh' => get_request('form_refresh', 0),
+		'actionid' => get_request('actionid'),
+		'eventsource' => get_request('eventsource'),
+		'new_condition' => get_request('new_condition', array()),
+		'new_operation' => get_request('new_operation', null)
+	);
+
 	$action = null;
-	if (isset($_REQUEST['actionid'])) {
-		$options = array(
-			'actionids' => $_REQUEST['actionid'],
+	if (!empty($data['actionid'])) {
+		$data['action'] = API::Action()->get(array(
+			'actionids' => $data['actionid'],
 			'selectOperations' => API_OUTPUT_EXTEND,
 			'selectConditions' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
-		);
-		$actions = API::Action()->get($options);
-		$action = reset($actions);
+		));
+		$data['action'] = reset($data['action']);
 	}
 	else {
-		$eventsource = get_request('eventsource');
-		$evaltype = get_request('evaltype');
-		$esc_period	= get_request('esc_period');
+		$data['eventsource'] = get_request('eventsource');
+		$data['evaltype'] = get_request('evaltype');
+		$data['esc_period'] = get_request('esc_period');
 	}
 
-	if (isset($action['actionid']) && !isset($_REQUEST['form_refresh'])) {
-		sortOperations($action['operations']);
+	if (isset($data['action']['actionid']) && !isset($_REQUEST['form_refresh'])) {
+		sortOperations($data['action']['operations']);
 	}
 	else {
-		if (isset($_REQUEST['escalation']) && 0 == $_REQUEST['esc_period']) {
+		if (isset($_REQUEST['escalation']) && $_REQUEST['esc_period'] == 0) {
 			$_REQUEST['esc_period'] = SEC_PER_HOUR;
 		}
 
-		$action['name'] = get_request('name');
-		$action['eventsource'] = get_request('eventsource');
-		$action['evaltype'] = get_request('evaltype', 0);
-		$action['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
-		$action['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
-		$action['recovery_msg'] = get_request('recovery_msg', 0);
-		$action['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
-		$action['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG_TRIGGER);
-		$action['conditions'] = get_request('conditions', array());
-		$action['operations'] = get_request('operations', array());
+		$data['action']['name'] = get_request('name');
+		$data['action']['eventsource'] = get_request('eventsource');
+		$data['action']['evaltype'] = get_request('evaltype', 0);
+		$data['action']['esc_period'] = get_request('esc_period', SEC_PER_HOUR);
+		$data['action']['status'] = get_request('status', isset($_REQUEST['form_refresh']) ? 1 : 0);
+		$data['action']['recovery_msg'] = get_request('recovery_msg', 0);
+		$data['action']['r_shortdata'] = get_request('r_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
+		$data['action']['r_longdata'] = get_request('r_longdata', ACTION_DEFAULT_MSG_TRIGGER);
+		$data['action']['conditions'] = get_request('conditions', array());
+		$data['action']['operations'] = get_request('operations', array());
 
-		if (isset($_REQUEST['actionid']) && isset($_REQUEST['form_refresh'])) {
-			$action['def_shortdata'] = get_request('def_shortdata');
-			$action['def_longdata'] = get_request('def_longdata');
+		if (!empty($data['actionid']) && isset($_REQUEST['form_refresh'])) {
+			$data['action']['def_shortdata'] = get_request('def_shortdata');
+			$data['action']['def_longdata'] = get_request('def_longdata');
 		}
 		else {
-			if ($eventsource == EVENT_SOURCE_TRIGGERS) {
-				$action['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
-				$action['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
+			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+				$data['action']['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_TRIGGER);
+				$data['action']['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_TRIGGER);
 			}
-			elseif ($eventsource == EVENT_SOURCE_DISCOVERY) {
-				$action['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
-				$action['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
+			elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
+				$data['action']['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_DISCOVERY);
+				$data['action']['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_DISCOVERY);
 			}
-			elseif ($eventsource == EVENT_SOURCE_AUTO_REGISTRATION) {
-				$action['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
-				$action['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
+			elseif ($data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
+				$data['action']['def_shortdata'] = get_request('def_shortdata', ACTION_DEFAULT_SUBJ_AUTOREG);
+				$data['action']['def_longdata'] = get_request('def_longdata', ACTION_DEFAULT_MSG_AUTOREG);
 			}
 		}
 	}
 
-	if (!isset($action['actionid']) && !isset($_REQUEST['form_refresh'])) {
-		$action['conditions'] = array(
+	if (empty($data['action']['actionid']) && !isset($_REQUEST['form_refresh'])) {
+		$data['action']['conditions'] = array(
 			array(
 				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
 				'operator' => CONDITION_OPERATOR_EQUAL,
@@ -428,17 +401,52 @@ if (isset($_REQUEST['form'])) {
 		);
 	}
 
-	$actionForm = new CView('configuration.action.edit', $action);
+	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
+	$data['allowedOperations'] = get_operations_by_eventsource($data['eventsource']);
 
-	$action_wdgt->addPageHeader(_('CONFIGURATION OF ACTIONS'));
-	$action_wdgt->addItem($actionForm->render());
+	// sort conditions
+	$sortFields = array(
+		array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
+		array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
+		array('field' => 'value', 'order' => ZBX_SORT_DOWN)
+	);
+	CArrayHelper::sort($data['action']['conditions'], $sortFields);
 
-	show_messages();
+	// new condition
+	$data['new_condition'] = array(
+		'conditiontype' => isset($data['new_condition']['conditiontype']) ? $data['new_condition']['conditiontype'] : CONDITION_TYPE_TRIGGER_NAME,
+		'operator' => isset($data['new_condition']['operator']) ? $data['new_condition']['operator'] : CONDITION_OPERATOR_LIKE,
+		'value' => isset($data['new_condition']['value']) ? $data['new_condition']['value'] : ''
+	);
+
+	if (!str_in_array($data['new_condition']['conditiontype'], $data['allowedConditions'])) {
+		$data['new_condition']['conditiontype'] = $data['allowedConditions'][0];
+	}
+
+	// new operation
+	if (!empty($data['new_operation'])) {
+		if (!is_array($data['new_operation'])) {
+			$data['new_operation'] = array(
+				'action' => 'create',
+				'operationtype' => 0,
+				'esc_period' => 0,
+				'esc_step_from' => 1,
+				'esc_step_to' => 1,
+				'evaltype' => 0
+			);
+		}
+	}
+
+	// render view
+	$actionView = new CView('configuration.action.edit', $data);
+	$actionView->render();
+	$actionView->show();
 }
 else {
 	$data = array(
 		'eventsource' => get_request('eventsource')
 	);
+
 	$sortfield = getPageSortField('name');
 
 	$data['actions'] = API::Action()->get(array(
@@ -460,7 +468,5 @@ else {
 	$actionView->render();
 	$actionView->show();
 }
-
-$action_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

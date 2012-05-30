@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $itemWidget = new CWidget();
 
 if (!empty($this->data['hostid'])) {
@@ -86,7 +86,7 @@ $itemFormList->addRow(_('Key'), array(
 	!$this->data['limited']
 	? new CButton('keyButton', _('Select'),
 		"return PopUp('popup.php?dstfrm=".$itemForm->getName().
-			"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+jQuery('#type option:selected').val());",
+			"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=' + jQuery('#type option:selected').val());",
 		'formlist')
 	: null
 ));
@@ -669,4 +669,3 @@ if (!$this->data['is_discovery_rule']) {
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 return $itemWidget;
-?>
