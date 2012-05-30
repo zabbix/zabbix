@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,57 +17,56 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
 
-class CCanvas{
+
+class CCanvas {
 
 	protected $canvas;
 	protected $width;
 	protected $height;
 	protected $colors = array();
 
-	public function __construct($w, $h){
+	public function __construct($w, $h) {
 		$this->width = $w;
 		$this->height = $h;
 
-		if(function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)){
+		if (function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
 			$this->canvas = imagecreatetruecolor($this->width, $this->height);
 		}
-		else{
+		else {
 			$this->canvas = imagecreate($this->width, $this->height);
 		}
 
 		$this->allocateColors();
 	}
 
-	public function getWidth(){
+	public function getWidth() {
 		return $this->width;
 	}
 
-	public function getHeight(){
+	public function getHeight() {
 		return $this->height;
 	}
 
-	public function fill($color){
+	public function fill($color) {
 		imagefilledrectangle($this->canvas, 0, 0, $this->width, $this->height, $this->getColor($color));
 	}
 
-	public function setBgImage($image){
+	public function setBgImage($image) {
 		$bg = imagecreatefromstring($image);
 		imagecopy($this->canvas, $bg, 0, 0, 0, 0, imagesx($bg), imagesy($bg));
 	}
 
-	public function drawTitle($text, $color){
+	public function drawTitle($text, $color) {
 		$x = $this->width / 2 - imagefontwidth(4) * zbx_strlen($text) / 2;
 		imagetext($this->canvas, 10, 0, $x, 25, $this->getColor($color), $text);
 	}
 
-	public function drawBorder($color){
+	public function drawBorder($color) {
 		imagerectangle($this->canvas, 0, 0, $this->width - 1, $this->height - 1, $this->getColor($color));
 	}
 
-	public function getCanvas(){
+	public function getCanvas() {
 		$date = zbx_date2str(MAPS_DATE_FORMAT);
 		imagestring($this->canvas, 0, $this->width - 120, $this->height - 12, $date, $this->getColor('gray'));
 		imagestringup($this->canvas, 0, $this->width - 10, $this->height - 50, ZABBIX_HOMEPAGE, $this->getColor('gray'));
@@ -75,19 +74,19 @@ class CCanvas{
 		return $this->canvas;
 	}
 
-	public function drawLine($x1, $y1, $x2, $y2, $color, $drawtype){
+	public function drawLine($x1, $y1, $x2, $y2, $color, $drawtype) {
 		MyDrawLine($this->canvas, $x1, $y1, $x2, $y2, $this->getColor($color), $drawtype);
 	}
 
-	public function drawText($fontsize, $angle, $x, $y, $color, $string){
+	public function drawText($fontsize, $angle, $x, $y, $color, $string) {
 		imageText($this->canvas, $fontsize, $angle, $x, $y, $this->getColor($color), $string);
 	}
 
-	public function drawRectangle($x1, $y1, $x2, $y2, $color){
+	public function drawRectangle($x1, $y1, $x2, $y2, $color) {
 		imagerectangle($this->canvas, $x1, $y1, $x2, $y2, $this->getColor($color));
 	}
 
-	public function drawRoundedRectangle($x1, $y1, $x2, $y2, $radius, $color){
+	public function drawRoundedRectangle($x1, $y1, $x2, $y2, $radius, $color) {
 		$color = $this->getColor($color);
 		$arcRadius = $radius * 2;
 		imagearc($this->canvas, $x1 + $radius, $y1 + $radius, $arcRadius, $arcRadius, 180, 270, $color);
@@ -101,14 +100,14 @@ class CCanvas{
 		imageline($this->canvas, $x2, $y1 + $radius, $x2, $y2 - $radius, $color);
 	}
 
-	protected function getColor($color){
-		if(!isset($this->colors[$color])){
+	protected function getColor($color) {
+		if (!isset($this->colors[$color])) {
 			throw new Exception('Color "'.$color.'" is not allocated.');
 		}
 		return $this->colors[$color];
 	}
 
-	protected function allocateColors(){
+	protected function allocateColors() {
 		$this->colors['red'] = imagecolorallocate($this->canvas, 255, 0, 0);
 		$this->colors['darkred'] = imagecolorallocate($this->canvas, 150, 0, 0);
 		$this->colors['green'] = imagecolorallocate($this->canvas, 0, 255, 0);
@@ -127,4 +126,4 @@ class CCanvas{
 		$this->colors['orange'] = imagecolorallocate($this->canvas, 238, 96, 0);
 	}
 }
-?>
+
