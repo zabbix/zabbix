@@ -21,7 +21,7 @@
 <?php
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testPopup extends CWebTest {
+class testPagePopup extends CWebTest {
 	private $urlPopupTemplates =
 			'popup.php?srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm=form&dstfld1=fld1&templated_hosts=1';
 	private $urlPopupHostTemplates =
@@ -35,7 +35,7 @@ class testPopup extends CWebTest {
 	private $urlPopupApplications =
 			'popup.php?srctbl=applications&srcfld1=name&dstfrm=form&dstfld1=fld1';
 
-	public function testPopupTemplates_CheckLayout() {
+	public function testPagePopupTemplates_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupTemplates);
 		$this->assertTitle('Templates');
@@ -101,7 +101,7 @@ class testPopup extends CWebTest {
 		}
 	}
 
-	public function testPopupHostTemplates_CheckLayout() {
+	public function testPagePopupHostTemplates_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupHostTemplates);
 		$this->assertTitle('Templates');
@@ -162,7 +162,7 @@ class testPopup extends CWebTest {
 		}
 	}
 
-	public function testPopupHostsAndTemplates_CheckLayout() {
+	public function testPagePopupHostsAndTemplates_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupHostsAndTemplates);
 		$this->assertTitle('Hosts and templates');
@@ -224,7 +224,7 @@ class testPopup extends CWebTest {
 		}
 	}
 
-	public function testPopupHosts_CheckLayout() {
+	public function testPagePopupHosts_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupHosts);
 		$this->assertTitle('Hosts');
@@ -286,7 +286,7 @@ class testPopup extends CWebTest {
 		}
 	}
 
-	public function testPopupProxies_CheckLayout() {
+	public function testPagePopupProxies_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupProxies);
 		$this->assertTitle('Proxies');
@@ -303,7 +303,7 @@ class testPopup extends CWebTest {
 		}
 	}
 
-	public function testPopupApplications_CheckLayout() {
+	public function testPagePopupApplications_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupApplications);
 		$this->assertTitle('Applications');
