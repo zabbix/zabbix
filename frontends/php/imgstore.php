@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 define('ZBX_PAGE_NO_AUTHERIZATION', 1);
 
 require_once dirname(__FILE__).'/include/config.inc.php';
@@ -29,8 +29,6 @@ $page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-?>
-<?php
 //	VAR		TYPE	OPTIONAL 	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'css' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,				null),
@@ -85,7 +83,7 @@ elseif (isset($_REQUEST['iconid'])) {
 		$source = imageFromString($image);
 	}
 	else {
-		$source = get_default_image(true);
+		$source = get_default_image();
 	}
 
 	if ($resize) {
@@ -105,4 +103,3 @@ elseif (isset($_REQUEST['imageid'])) {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
