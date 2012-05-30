@@ -34,12 +34,12 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	struct devstat	*ds = NULL;
 	int		ret = FAIL;
 	char		dev[DEVSTAT_NAME_LEN + 10];
-	const char	*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0'*/
-	int		not_empty;
+	const char	*pd;	/* pointer to device name without '/dev/' prefix, e.g. 'da0' */
+	int		empty;
 
 	assert(devname);
 
-	not_empty = '\0' != *devname;
+	empty = '\0' == *devname;
 
 	for (i = 0; i < ZBX_DSTAT_MAX; i++)
 		dstat[i] = (zbx_uint64_t)__UINT64_C(0);
@@ -54,7 +54,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	pd = devname;
 
 	/* skip prefix ZBX_DEV_PFX, if present */
-	if (not_empty && (0 == strncmp(pd, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1)))
+	if (0 == empty && (0 == strncmp(pd, ZBX_DEV_PFX, sizeof(ZBX_DEV_PFX) - 1)))
 			pd += sizeof(ZBX_DEV_PFX) - 1;
 
 #if DEVSTAT_USER_API_VER >= 5
@@ -68,7 +68,8 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 	{
 		ds = &si->dinfo->devices[i];
 
-		if (not_empty)	/* empty '*devname' string means adding statistics for all disks together */
+		/* empty '*devname' string means adding statistics for all disks together */
+		if (0 == empty)
 		{
 			zbx_snprintf(dev, sizeof(dev), "%s%d", ds->device_name, ds->unit_number);
 			if (0 != strcmp(dev, pd))
@@ -88,7 +89,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 #endif
 		ret = SUCCEED;
 
-		if (not_empty)
+		if (0 == empty)
 			break;
 	}
 

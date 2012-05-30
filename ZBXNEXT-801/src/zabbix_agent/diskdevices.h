@@ -45,15 +45,15 @@ typedef struct c_single_diskdevice_data
 
 typedef struct c_diskdevices_data
 {
-	int				count;		/* Number of disks to collect statistics for.*/
-	int				max_diskdev;	/* Number of "slots" for disk statistics.*/
-	ZBX_SINGLE_DISKDEVICE_DATA	device[1];	/* More "slots" for disk statistics added dynamically.*/
+	int				count;		/* number of disks to collect statistics for */
+	int				max_diskdev;	/* number of "slots" for disk statistics */
+	ZBX_SINGLE_DISKDEVICE_DATA	device[1];	/* more "slots" for disk statistics added dynamically */
 } ZBX_DISKDEVICES_DATA;
 
-#define DISKDEVICE_COLLECTOR_STARTED(collector) ((collector) && ((collector)->diskstat_shmid != NONEXISTENT_SHMID))
+#define DISKDEVICE_COLLECTOR_STARTED(collector)	((collector) && ((collector)->diskstat_shmid != NONEXISTENT_SHMID))
 
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname);
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname);
-void				collect_stats_diskdevices(void);
+void				collect_stats_diskdevices();
 
 #endif

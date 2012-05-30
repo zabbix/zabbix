@@ -107,7 +107,8 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 					|| major(dev_st.st_rdev) != rdev_major
 					|| minor(dev_st.st_rdev) != rdev_minor)
 					continue;
-			} else
+			}
+			else
 				found = 1;
 		}
 
