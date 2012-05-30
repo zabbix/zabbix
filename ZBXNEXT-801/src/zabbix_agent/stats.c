@@ -139,11 +139,14 @@ return_one:
  ******************************************************************************/
 void	init_collector_data()
 {
-	int	cpu_count;
-	size_t	sz, sz_cpu;
+	const char	*__function_name = "init_collector_data";
+	int		cpu_count;
+	size_t		sz, sz_cpu;
 #if !defined(_WINDOWS)
-	key_t	shm_key;
+	key_t		shm_key;
 #endif
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	cpu_count = zbx_get_cpu_num();
 	sz = sizeof(ZBX_COLLECTOR_DATA);
@@ -193,6 +196,7 @@ void	init_collector_data()
 #ifdef _AIX
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
 #endif
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************

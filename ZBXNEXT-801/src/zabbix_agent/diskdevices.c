@@ -24,7 +24,7 @@
 #include "mutexs.h"
 
 #if !defined(_WINDOWS)
-	extern ZBX_MUTEX	diskstats_lock;
+extern ZBX_MUTEX	diskstats_lock;
 #	define LOCK_DISKSTATS	zbx_mutex_lock(&diskstats_lock)
 #	define UNLOCK_DISKSTATS	zbx_mutex_unlock(&diskstats_lock)
 #endif
@@ -39,7 +39,7 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_u
 
 	device->index++;
 
-	if (device->index == MAX_COLLECTOR_HISTORY)
+	if (MAX_COLLECTOR_HISTORY == device->index)
 		device->index = 0;
 
 	device->clock[device->index] = now;
@@ -139,9 +139,10 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 
 	for (i = 0; i < diskdevices->count; i ++)
 	{
-		if (0 == strcmp(devname, (diskdevices->device[i]).name))
+		if (0 == strcmp(devname, diskdevices->device[i].name))
 		{
 			device = &(diskdevices->device[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() device '%s' found", __function_name, devname);
 			break;
 		}
 	}

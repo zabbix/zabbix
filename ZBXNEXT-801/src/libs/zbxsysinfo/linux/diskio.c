@@ -119,7 +119,7 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 		ret = SUCCEED;
 
-		if (found)
+		if (1 == found)
 			break;
 	}
 	zbx_fclose(f);
