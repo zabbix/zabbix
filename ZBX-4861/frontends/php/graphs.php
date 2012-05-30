@@ -185,7 +185,7 @@ elseif (isset($_REQUEST['save'])) { // save graph
 		);
 
 		if (!empty($_REQUEST['parent_discoveryid'])) {
-			//$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
+			$graph['flags'] = ZBX_FLAG_DISCOVERY_CHILD;
 		}
 
 		if (isset($_REQUEST['graphid'])) {

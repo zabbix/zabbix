@@ -681,68 +681,19 @@ class CGraphPrototype extends CZBXAPI {
 			'selectGraphItems' => API_OUTPUT_EXTEND
 		));
 
-		$graphsToUpdate = array();
-		foreach ($graphs as $gnum => $graph) {
+		foreach ($graphs as $graph) {
 			// if missing in $updGraphs then no permissions
 			if (!isset($updGraphs[$graph['graphid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-			// set to not update graphs without changes
-			$ok = true;
-			foreach ($graph as $param => $val) {
-
-				if (!isset($updGraphs[$graph['graphid']][$param]) || $param === 'gitems') {
-					continue; // skip nonexisting  params and gitems
-				}
-				if ($updGraphs[$graph['graphid']][$param] != $val) {
-					$ok = false;
-					break;
-				}
-			}
-			if (!$ok) {
-				$graphsToUpdate[$graphs[$gnum]['graphid']] = true; // graph has changes so it should be updated
 			}
 		}
 
 		$this->checkInput($graphs, true);
 
 		foreach ($graphs as $graph) {
+			$dbGraph = $updGraphs[$graph['graphid']];
+
 			unset($graph['templateid']);
-
-			$itemsToInsert = array();
-			$itemsToUpdate = array();
-			foreach ($graph['gitems'] as $key => $gitem) {
-				if (isset($updGraphs[$graph['graphid']]['gitems'][$gitem['gitemid']])) {
-					// unset not changed graph items
-					$ok = true;
-					foreach ($gitem as $param => $val) {
-
-						if (!isset($updGraphs[$gitem['graphid']]['gitems'][$gitem['gitemid']][$param])) {
-							continue; // skip nonexisting  params
-						}
-						if ($updGraphs[$gitem['graphid']]['gitems'][$gitem['gitemid']][$param] != $val) {
-							$ok = false;
-							break;
-						}
-					}
-					if ($ok) {
-						unset($graph['gitems'][$key]); // unset not changed graph items
-					}
-					else {
-						$itemsToUpdate[$key] = $graph['gitems'][$key]; // for update
-					}
-					unset($updGraphs[$graph['graphid']]['gitems'][$gitem['gitemid']]); // leave in $updGraphs only items for deletion
-				}
-				elseif (isset($graph['gitems'][$key])) {
-					$itemsToInsert[$key] = $graph['gitems'][$key]; // for insert
-				}
-			}
-
-			// items to delete
-			$itemsToDel = array();
-			foreach ($updGraphs[$graph['graphid']]['gitems'] as $updItems) {
-				$itemsToDel[] = $updItems['gitemid'];
-			}
 
 			$graphHosts = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
@@ -766,13 +717,7 @@ class CGraphPrototype extends CZBXAPI {
 			// check ymin, ymax items
 			$this->checkAxisItems($graph, $templatedGraph);
 
-			//$this->updateReal($graph);
-			if (isset($graphsToUpdate[$graph['graphid']]) && $graphsToUpdate[$graph['graphid']]) {
-				$this->updateGraphReal($graph);
-			}
-			$this->deleteGraphItemsReal($itemsToDel);
-			$this->updateGraphItemsReal($itemsToUpdate, $graph['graphid']);
-			$this->insertGraphItemsReal($itemsToInsert, $graph['graphid']);
+			$this->updateReal($graph, $dbGraph);
 
 			// inheritance
 			if ($templatedGraph) {
@@ -799,44 +744,48 @@ class CGraphPrototype extends CZBXAPI {
 		return $graphid;
 	}
 
-	protected function updateGraphReal($graph) {
-		$data = array(array('values' => $graph, 'where' => array('graphid' => $graph['graphid'])));
-		DB::update('graphs', $data);
-	}
+	/**
+	 * Updates the graph if $graph differs from $dbGraph.
+	 *
+	 * @param $graph
+	 * @param $dbGraph
+	 *
+	 * @return string
+	 */
+	protected function updateReal($graph, $dbGraph) {
+		$dbGitems = $dbGraph['gitems'];
+		$dbGitemIds = zbx_objectValues($dbGitems, 'gitemid');
 
-	protected function deleteGraphItemsReal($itemsToDel) {
-		if (!empty($itemsToDel)) {
-			DB::delete('graphs_items', array('gitemid' => $itemsToDel));
+		// update the graph if it's modified
+		if ($this->objectModified($graph, $dbGraph)) {
+			DB::updateByPk($this->tableName(), $graph['graphid'], $graph);
 		}
-	}
 
-	protected function updateGraphItemsReal($itemsToUpdate, $graphid) {
-		foreach ($itemsToUpdate as $gitem) {
-			$gitem['graphid'] = $graphid;
-			DB::update('graphs_items', array(array('values' => $gitem, 'where' => array('gitemid' => $gitem['gitemid']))));
-		}
-	}
+		// update graph items
+		$insertGitems = array();
+		$deleteGitemIds = array_combine($dbGitemIds, $dbGitemIds);
+		foreach ($graph['gitems'] as $gitem) {
+			// updating an existing item
+			if (isset($dbGitems[$gitem['gitemid']])) {
+				if ($this->objectModified($gitem, $dbGitems[$gitem['gitemid']], 'graphs_items')) {
+					DB::updateByPk('graphs_items', $gitem['gitemid'], $gitem);
+				}
 
-	protected function insertGraphItemsReal($itemsToInsert, $graphid) {
-		foreach ($itemsToInsert as $gitem) {
-			$gitem['graphid'] = $graphid;
-			DB::insert('graphs_items', array($gitem));
-		}
-	}
-
-	// deprecated use updateGraphReal(), deleteGraphItemsReal(), updateGraphItemsReal(), insertGraphItemsReal() insted
-	protected function updateReal($graph) {
-		$data = array(array('values' => $graph, 'where' => array('graphid' => $graph['graphid'])));
-		DB::update('graphs', $data);
-
-		if (isset($graph['gitems'])) {
-			DB::delete('graphs_items', array('graphid' => $graph['graphid']));
-
-			foreach ($graph['gitems'] as $gitem) {
-				$gitem['graphid'] = $graph['graphid'];
-
-				DB::insert('graphs_items', array($gitem));
+				// remove this graph item from the collection so it won't get deleted
+				unset($deleteGitemIds[$gitem['gitemid']]);
 			}
+			// adding a new item
+			else {
+				$gitem['graphid'] = $graph['graphid'];
+				$insertGitems[] = $gitem;
+			}
+		}
+
+		if ($deleteGitemIds) {
+			DB::delete('graphs_items', array('gitemid' => $deleteGitemIds));
+		}
+		if ($insertGitems) {
+			DB::insert('graphs_items', $insertGitems);
 		}
 
 		return $graph['graphid'];
@@ -902,6 +851,7 @@ class CGraphPrototype extends CZBXAPI {
 			$chdGraphs = $this->get(array(
 				'filter' => array('templateid' => $tmpGraph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
 				'output' => API_OUTPUT_EXTEND,
+				'selectGraphItems' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
 				'hostids' => $chdHost['hostid']
 			));
@@ -916,13 +866,14 @@ class CGraphPrototype extends CZBXAPI {
 				}
 
 				$tmpGraph['graphid'] = $chdGraph['graphid'];
-				$this->updateReal($tmpGraph);
+				$this->updateReal($tmpGraph, $chdGraph);
 			}
 			// check if graph with same name and items exists
 			else {
 				$chdGraph = $this->get(array(
 					'filter' => array('name' => $tmpGraph['name'], 'flags' => null),
 					'output' => API_OUTPUT_EXTEND,
+					'selectGraphItems' => API_OUTPUT_EXTEND,
 					'preservekeys' => true,
 					'nopermissions' => true,
 					'hostids' => $chdHost['hostid']
@@ -955,7 +906,7 @@ class CGraphPrototype extends CZBXAPI {
 						}
 
 						$tmpGraph['graphid'] = $chdGraph['graphid'];
-						$this->updateReal($tmpGraph);
+						$this->updateReal($tmpGraph, $chdGraph);
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" already exists on "%2$s" (items are not identical).', $tmpGraph['name'], $chdHost['host']));

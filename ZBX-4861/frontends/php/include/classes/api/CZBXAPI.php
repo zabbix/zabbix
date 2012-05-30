@@ -592,6 +592,25 @@ class CZBXAPI {
 	}
 
 	/**
+	 * Compares the fields, that are present in both objects, and returns true if any of the values differ.
+	 *
+	 * @param $existingObject
+	 * @param $newObject
+	 * @param null $tableName
+	 *
+	 * @return bool
+	 */
+	protected function objectModified($newObject, $existingObject, $tableName = null) {
+		foreach ($existingObject as $field => $value) {
+			if ($this->hasField($field, $tableName) && isset($newObject[$field]) && $value != $newObject[$field]) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Checks if the object has any fields, that are not defined in the schema or in $additionalFields.
 	 *
 	 * @param $tableName
