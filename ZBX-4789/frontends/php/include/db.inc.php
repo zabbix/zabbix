@@ -861,7 +861,8 @@ function create_id_by_nodeid($id, $nodeid = 0) {
 }
 
 function zbx_db_distinct($sql_parts) {
-	if (count($sql_parts['from']) > 1) {
+	// if having not empty => parts have grouping by key field added for permission check
+	if (empty($sql_parts['having']) && count($sql_parts['from']) > 1) {
 		return ' DISTINCT ';
 	}
 	else {

@@ -19,9 +19,6 @@
 **/
 
 
-/**
- * @package API
- */
 abstract class CItemGeneral extends CZBXAPI {
 
 	protected $fieldRules;
@@ -704,5 +701,43 @@ abstract class CItemGeneral extends CZBXAPI {
 					_s('Item with key "%1$s" already exists on "%2$s".', $dbItem['key_'], $dbItem['host']));
 			}
 		}
+	}
+
+	protected function addPermissionParts(array $sqlParts, $options) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+
+			if (empty($sqlParts['group']) && empty($options['countOutput'])) {
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['from']['rights'] = 'rights r';
+				$sqlParts['from']['users_groups'] = 'users_groups ug';
+				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sqlParts['where'][] = 'r.id=hg.groupid';
+				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
+				$sqlParts['group'][] = 'i.itemid';
+				$sqlParts['having'][] = 'min(r.permission)>='.$permission;
+			}
+			else {
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['from']['rights'] = 'rights r';
+				$sqlParts['from']['users_groups'] = 'users_groups ug';
+				$sqlParts['where'][] = 'hg.hostid=i.hostid';
+				$sqlParts['where'][] = 'r.id=hg.groupid ';
+				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
+				$sqlParts['where'][] = 'r.permission>='.$permission;
+				$sqlParts['where'][] = 'NOT EXISTS ('.
+						' SELECT hgg.groupid'.
+						' FROM hosts_groups hgg,rights rr,users_groups gg'.
+						' WHERE hgg.hostid=hg.hostid'.
+						' AND rr.id=hgg.groupid'.
+						' AND rr.groupid=gg.usrgrpid'.
+						' AND gg.userid='.self::$userData['userid'].
+						' AND rr.permission<'.$permission.')';
+			}
+		}
+
+		return $sqlParts;
 	}
 }

@@ -19,9 +19,6 @@
 **/
 
 
-/**
- * @package API
- */
 class CHost extends CZBXAPI {
 
 	protected $tableName = 'hosts';
@@ -65,10 +62,7 @@ class CHost extends CZBXAPI {
 	 * @return array|boolean Host data as array or false if error
 	 */
 	public function get($options = array()) {
-		$result = array();
 		$nodeCheck = false;
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
 
 		// allowed columns for sorting
 		$sortColumns = array('hostid', 'host', 'name', 'status');
@@ -77,12 +71,13 @@ class CHost extends CZBXAPI {
 		$subselectsAllowedOutputs = array(API_OUTPUT_REFER, API_OUTPUT_EXTEND, API_OUTPUT_CUSTOM);
 
 		$sqlParts = array(
-			'select'	=> array('hosts' => 'h.hostid'),
-			'from'		=> array('hosts' => 'hosts h'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
-			'limit'		=> null
+			'select' => array('hosts' => 'h.hostid'),
+			'from' => array('hosts' => 'hosts h'),
+			'where' => array(),
+			'group' => array(),
+			'order' => array(),
+			'having' => array(),
+			'limit' => null
 		);
 
 		$defOptions = array(
@@ -106,13 +101,13 @@ class CHost extends CZBXAPI {
 			'with_items'				=> null,
 			'with_monitored_items'		=> null,
 			'with_historical_items'		=> null,
-			'with_simple_graph_items'		=> null,
+			'with_simple_graph_items'	=> null,
 			'with_triggers'				=> null,
 			'with_monitored_triggers'	=> null,
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'with_applications'		=> null,
+			'with_applications'			=> null,
 			'withInventory'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -162,34 +157,9 @@ class CHost extends CZBXAPI {
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
-// editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
-		}
-		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
-
-			$sqlParts['where'][] = 'EXISTS ('.
-							' SELECT hh.hostid'.
-							' FROM hosts hh, hosts_groups hgg, rights r, users_groups ug'.
-							' WHERE hh.hostid=h.hostid'.
-								' AND hh.hostid=hgg.hostid'.
-								' AND r.id=hgg.groupid'.
-								' AND r.groupid=ug.usrgrpid'.
-								' AND ug.userid='.$userid.
-								' AND r.permission>='.$permission.
-								' AND NOT EXISTS('.
-									' SELECT hggg.groupid'.
-									' FROM hosts_groups hggg, rights rr, users_groups gg'.
-									' WHERE hggg.hostid=hgg.hostid'.
-										' AND rr.id=hggg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.
-								'))';
-		}
-
 // nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+		$sqlParts['where']['nodeids'] = DBin_node('h.hostid', $nodeids);
 
 // hostids
 		if (!is_null($options['hostids'])) {
@@ -555,43 +525,47 @@ class CHost extends CZBXAPI {
 //-------
 
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+
+			if (empty($sqlParts['group']) && empty($options['countOutput'])) {
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['from']['rights'] = 'rights r';
+				$sqlParts['from']['users_groups'] = 'users_groups ug';
+				$sqlParts['where']['hgi'] = 'hg.hostid=h.hostid';
+				$sqlParts['where'][] = 'r.id=hg.groupid';
+				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
+				$sqlParts['group'][] = 'h.hostid';
+				$sqlParts['having'][] = 'min(r.permission)>='.$permission;
+			}
+			else {
+				$sqlParts['where'][] = 'EXISTS ('.
+					' SELECT hh.hostid'.
+					' FROM hosts hh, hosts_groups hgg, rights r, users_groups ug'.
+					' WHERE hh.hostid=h.hostid'.
+						' AND hh.hostid=hgg.hostid'.
+						' AND r.id=hgg.groupid'.
+						' AND r.groupid=ug.usrgrpid'.
+						' AND ug.userid='.self::$userData['userid'].
+						' AND r.permission>='.$permission.
+						' AND NOT EXISTS('.
+							' SELECT hggg.groupid'.
+							' FROM hosts_groups hggg, rights rr, users_groups gg'.
+							' WHERE hggg.hostid=hgg.hostid'.
+								' AND rr.id=hggg.groupid'.
+								' AND rr.groupid=gg.usrgrpid'.
+								' AND gg.userid='.self::$userData['userid'].
+								' AND rr.permission<'.$permission.
+					'))';
+			}
+		}
+
+
 		$hostids = array();
+		$result = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where']))	{
-			$sqlWhere .= implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group']))	{
-			$sqlGroup .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order']))	{
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.$sqlWhere.
-				$sqlGroup.
-				$sqlOrder;
-
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($host = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {

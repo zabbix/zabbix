@@ -17,11 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * Class containing common methods for operations with triggers.
- */
+
+
 abstract class CTriggerGeneral extends CZBXAPI {
 
 	/**
@@ -298,5 +295,56 @@ abstract class CTriggerGeneral extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s" already exists on "%2$s".', $trigger['description'], $host['name']));
 			}
 		}
+	}
+
+	protected function addPermissionParts(array $sqlParts, $options) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+
+			if (empty($sqlParts['group']) && empty($options['countOutput'])) {
+				$sqlParts['from']['functions'] = 'functions f';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['from']['rights'] = 'rights r';
+				$sqlParts['from']['users_groups'] = 'users_groups ug';
+				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sqlParts['where'][] = 'r.id=hg.groupid';
+				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
+				$sqlParts['group'][] = 't.triggerid';
+				$sqlParts['having'][] = 'min(r.permission)>='.$permission;
+			}
+			else {
+				$sqlParts['from']['functions'] = 'functions f';
+				$sqlParts['from']['items'] = 'items i';
+				$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+				$sqlParts['from']['rights'] = 'rights r';
+				$sqlParts['from']['users_groups'] = 'users_groups ug';
+				$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+				$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+				$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
+				$sqlParts['where'][] = 'r.id=hg.groupid';
+				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
+				$sqlParts['where'][] = 'r.permission>='.$permission;
+				$sqlParts['where'][] = 'NOT EXISTS ('.
+						' SELECT ff.triggerid'.
+						' FROM functions ff,items ii'.
+						' WHERE ff.triggerid=t.triggerid'.
+						' AND ff.itemid=ii.itemid'.
+						' AND EXISTS ('.
+						' SELECT hgg.groupid'.
+						' FROM hosts_groups hgg,rights rr,users_groups gg'.
+						' WHERE hgg.hostid=ii.hostid'.
+						' AND rr.id=hgg.groupid'.
+						' AND rr.groupid=gg.usrgrpid'.
+						' AND gg.userid='.self::$userData['userid'].
+						' AND rr.permission<'.$permission.'))';
+			}
+		}
+
+		return $sqlParts;
 	}
 }

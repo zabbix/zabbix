@@ -18,13 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/**
- * File containing CHostGroup class for API.
- * @package API
- */
-/**
- * Class containing methods for operations with HostGroups
- */
+
 class CHostGroup extends CZBXAPI {
 
 	protected $tableName = 'groups';
@@ -37,10 +31,6 @@ class CHostGroup extends CZBXAPI {
 	 * @return array
 	 */
 	public function get($params) {
-		$result = array();
-		$userType = self::$userData['type'];
-		$userid = self::$userData['userid'];
-
 		// allowed columns for sorting
 		$sortColumns = array('groupid', 'name');
 
@@ -51,8 +41,10 @@ class CHostGroup extends CZBXAPI {
 			'select'	=> array('groups' => 'g.groupid'),
 			'from'		=> array('groups' => 'groups g'),
 			'where'		=> array(),
-			'order'		=> array(),
-			'limit'		=> null
+			'group' => array(),
+			'order' => array(),
+			'having' => array(),
+			'limit' => null
 		);
 
 		$defOptions = array(
@@ -114,29 +106,9 @@ class CHostGroup extends CZBXAPI {
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
-		// editable + PERMISSION CHECK
-		if (USER_TYPE_SUPER_ADMIN == $userType || $options['nopermissions']) {
-		}
-		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
-
-			$sqlParts['from']['rights'] = 'rights r';
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = 'r.id=g.groupid';
-			$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
-			$sqlParts['where'][] = 'ug.userid='.$userid;
-			$sqlParts['where'][] = 'r.permission>='.$permission;
-			$sqlParts['where'][] = 'NOT EXISTS ('.
-				' SELECT gg.groupid'.
-					' FROM groups gg,rights rr,users_groups ugg'.
-					' WHERE rr.id=g.groupid'.
-						' AND rr.groupid=ugg.usrgrpid'.
-						' AND ugg.userid='.$userid.
-						' AND rr.permission<'.$permission.')';
-		}
-
 		// nodeids
 		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+		$sqlParts['where']['nodeids'] = DBin_node('g.groupid', $nodeids);
 
 		// groupids
 		if (!is_null($options['groupids'])) {
@@ -369,37 +341,41 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
+
+			if (empty($sqlParts['group']) && empty($options['countOutput'])) {
+				$sqlParts['from']['rights'] = 'rights r';
+				$sqlParts['from']['users_groups'] = 'users_groups ug';
+				$sqlParts['where'][] = 'r.id=g.groupid';
+				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
+				$sqlParts['group'][] = 'g.groupid';
+				$sqlParts['having'][] = 'min(r.permission)>='.$permission;
+			}
+			else {
+				$sqlParts['from']['rights'] = 'rights r';
+				$sqlParts['from']['users_groups'] = 'users_groups ug';
+				$sqlParts['where'][] = 'r.id=g.groupid';
+				$sqlParts['where'][] = 'r.groupid=ug.usrgrpid';
+				$sqlParts['where'][] = 'ug.userid='.self::$userData['userid'];
+				$sqlParts['where'][] = 'r.permission>='.$permission;
+				$sqlParts['where'][] = 'NOT EXISTS ('.
+						' SELECT gg.groupid'.
+						' FROM groups gg,rights rr,users_groups ugg'.
+						' WHERE rr.id=g.groupid'.
+						' AND rr.groupid=ugg.usrgrpid'.
+						' AND ugg.userid='.self::$userData['userid'].
+						' AND rr.permission<'.$permission.')';
+			}
+		}
+
+
 		$groupids = array();
+		$result = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('g.groupid', $nodeids).
-					$sqlWhere.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($group = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {

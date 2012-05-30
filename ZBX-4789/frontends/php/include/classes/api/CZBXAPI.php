@@ -357,11 +357,13 @@ class CZBXAPI {
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
 		$sqlWhere = (!empty($sqlParts['where'])) ? ' WHERE '.implode(' AND ', array_unique($sqlParts['where'])) : '';
 		$sqlGroup = (!empty($sqlParts['group'])) ? ' GROUP BY '.implode(',', array_unique($sqlParts['group'])) : '';
+		$sqlHaving = (!empty($sqlParts['having'])) ? ' HAVING '.implode(',', array_unique($sqlParts['having'])) : '';
 		$sqlOrder = (!empty($sqlParts['order'])) ? ' ORDER BY '.implode(',', array_unique($sqlParts['order'])) : '';
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
 				' FROM '.$sqlFrom.
 				$sqlWhere.
 				$sqlGroup.
+				$sqlHaving.
 				$sqlOrder;
 
 		return $sql;
