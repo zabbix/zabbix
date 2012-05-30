@@ -433,21 +433,10 @@ static char	*snmp_get_octet_string(struct variable_list *vars)
 	}
 	else
 	{
-		size_t	out_len = 0;
-
-		if (0 == strncmp(buf, "STRING: ", 8))
-		{
+		if (0 == is_hex && 0 == strncmp(buf, "STRING: ", 8))
 			offset = 8;
-		}
 
-		if (0 != offset)
-		{
-			out_len = strlen(buf) - offset;
-			memmove(buf, buf + offset, out_len);
-			buf[out_len] = '\0';
-		}
-
-		strval_dyn = zbx_strdup(strval_dyn, buf);
+		strval_dyn = zbx_strdup(strval_dyn, buf + offset);
 	}
 
 	zbx_rtrim(strval_dyn, ZBX_WHITESPACE);
@@ -544,9 +533,9 @@ static int	snmp_get_index(struct snmp_session *ss, DC_ITEM *item, const char *OI
 						{
 							if (NULL == (strval_dyn = snmp_get_octet_string(vars)))
 							{
-								running = 0;
-								zbx_snprintf(err, MAX_STRING_LEN, "out of memory");
+								zbx_strlcpy(err, "out of memory", MAX_STRING_LEN);
 								ret = NOTSUPPORTED;
+								running = 0;
 							}
 							else
 							{
@@ -688,6 +677,7 @@ static int	get_snmp(struct snmp_session *ss, DC_ITEM *item, char *snmp_oid, AGEN
 			{
 				if (NULL == (strval_dyn = snmp_get_octet_string(vars)))
 				{
+					SET_MSG_RESULT(value, zbx_strdup(NULL, "Cannot receive string value: out of memory"));
 					ret = NOTSUPPORTED;
 				}
 				else
