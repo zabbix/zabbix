@@ -1,5 +1,7 @@
 #! /bin/sh
 # Copyright (c) 07/2004 A.Tophofen, Germany
+# Modified for Zabbix 2.0.0
+# May 2012, Zabbix SIA
 #
 # init.d/zabbix_agentd
 #
@@ -15,17 +17,9 @@
 . /etc/rc.status
 rc_reset
 NAME="Zabbix_Server"
-CONFIG_FILE="/etc/zabbix/zabbix_server.conf"
 
-if [ ! -f ${CONFIG_FILE} ]; then
-		echo -n "${NAME}configuration file ${CONFIG_FILE} does not exist. "
-		# Tell the user this has skipped
-		rc_status -s
-		exit 6
-fi
-
-ZABBIX_BIN="/home/zabbix/sbin/zabbix_server"
-ZABBIX_PID="/home/zabbix/lock/zabbix_server.pid"
+ZABBIX_BIN="/usr/local/sbin/zabbix_server"
+ZABBIX_PID="/tmp/zabbix_server.pid"
 
 
 if [ ! -x ${ZABBIX_BIN} ] ; then
@@ -36,7 +30,7 @@ if [ ! -x ${ZABBIX_BIN} ] ; then
 fi
 
 
-export PATH="/sbin:/usr/sbin:/bin:/usr/bin:/home/zabbix/bin"
+export PATH="/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/sbin"
 
 case "$1" in
     start)

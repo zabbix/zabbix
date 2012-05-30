@@ -3,11 +3,14 @@
 # Zabbix agent start/stop script.
 #
 # Written by A. Tophofen
+# Modified for Zabbix 2.0.0
+# May 2012, Zabbix SIA
+
 NAME=zabbix_agentd
-PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
-DAEMON=/home/zabbix/bin/${NAME}
+PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/sbin
+DAEMON=/usr/local/sbin/${NAME}
 DESC="Zabbix agent"
-PID=/home/zabbix/lock/$NAME.pid
+PID=/tmp/$NAME.pid
 
 opts="${opts} reload"
 

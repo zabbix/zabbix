@@ -2,6 +2,8 @@
 # Copyright (c) 07/2004 A.Tophofen, Germany
 # Modified for Zabbix 1.1alpha7 and SuSE Linux 9.2
 # April 2005, A. Kiepe, Switzerland
+# Modified for Zabbix 2.0.0
+# May 2012, Zabbix SIA
 #
 # init.d/zabbix_server
 #
@@ -18,18 +20,9 @@
 . /etc/rc.status
 rc_reset
 NAME="zabbix_server"
-CONFIG_FILE="/etc/zabbix/zabbix_server.conf"
 
-if [ ! -f ${CONFIG_FILE} ]; then
-		echo -n "${NAME}configuration file ${CONFIG_FILE} does not exist. "
-		# Tell the user this has skipped
-		rc_status -s
-		exit 6
-fi
-
-ZABBIX_BIN="/opt/zabbix/sbin/zabbix_server"
-ZABBIX_PID="/var/tmp/zabbix_server.pid"
-
+ZABBIX_BIN="/usr/local/sbin/zabbix_server"
+ZABBIX_PID="/tmp/zabbix_server.pid"
 
 if [ ! -x ${ZABBIX_BIN} ] ; then
 	echo -n "${ZABBIX_BIN} not installed! "
@@ -38,8 +31,7 @@ if [ ! -x ${ZABBIX_BIN} ] ; then
 	exit 5
 fi
 
-
-export PATH=$PATH:/opt/zabbix/bin
+export PATH=$PATH:/usr/local/sbin
 
 case "$1" in
     start)
