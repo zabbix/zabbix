@@ -792,7 +792,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryTriggers(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
+	protected function copyTriggerPrototypes(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
 		$srcTriggers = API::TriggerPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
@@ -807,7 +807,13 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		$itemKeys = array();
-		foreach ($srcTriggers as $trigger) {
+		foreach ($srcTriggers as $key => $trigger) {
+			// skip triggers with web items
+			if (httpItemExists($trigger['items'])) {
+				unset($srcTriggers[$key]);
+				continue;
+			}
+
 			foreach ($trigger['items'] as $item) {
 				$itemKeys[] = $item['key_'];
 			}
@@ -834,7 +840,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 			// update expression
 			$dstTriggers[$key]['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
-
 		}
 
 		$rs = API::TriggerPrototype()->create($dstTriggers);
@@ -997,6 +1002,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @param type $discoveryid  The ID of the discovery rule to be copied
 	 * @param type $hostid       Destination host id
+	 *
+	 * @return bool
 	 */
 	protected function copyDiscoveryRule($discoveryid, $hostid) {
 		// fetch discovery to clone
@@ -1038,7 +1045,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
 
 		// copy prototypes
-		$newPrototypes = $this->copyDiscoveryPrototypes($srcDiscovery, $dstDiscovery, $dstHost);
+		$newPrototypes = $this->copyItemPrototypes($srcDiscovery, $dstDiscovery, $dstHost);
 
 		// if there were prototypes defined, clone everything else
 		if ($newPrototypes) {
@@ -1050,10 +1057,10 @@ class CDiscoveryRule extends CItemGeneral {
 			$dstDiscovery['items'] = $newPrototypes;
 
 			// copy graphs
-			$this->copyDiscoveryGraphs($srcDiscovery, $dstDiscovery);
+			$this->copyGraphPrototypes($srcDiscovery, $dstDiscovery);
 
 			// copy triggers
-			$this->copyDiscoveryTriggers($srcDiscovery, $dstDiscovery, $srcHost, $dstHost);
+			$this->copyTriggerPrototypes($srcDiscovery, $dstDiscovery, $srcHost, $dstHost);
 		}
 		return true;
 	}
@@ -1070,7 +1077,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
+	protected function copyItemPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$prototypes = API::ItemPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'selectApplications' => API_OUTPUT_EXTEND,
@@ -1120,7 +1127,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryGraphs(array $srcDiscovery, array $dstDiscovery) {
+	protected function copyGraphPrototypes(array $srcDiscovery, array $dstDiscovery) {
 		// fetch source graphs
 		$srcGraphs = API::GraphPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
