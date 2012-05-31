@@ -155,13 +155,13 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			$config = select_config();
 			$css = getUserTheme(CWebUser::$data);
 			echo '<style type="text/css">'."\n".
-					'.disaster { background-color: #'.$config['severity_color_5'].' !important; }'."\n".
-					'.high { background-color: #'.$config['severity_color_4'].' !important; }'."\n".
-					'.average { background-color: #'.$config['severity_color_3'].' !important; }'."\n".
-					'.warning { background-color: #'.$config['severity_color_2'].' !important; }'."\n".
-					'.information { background-color: #'.$config['severity_color_1'].' !important; }'."\n".
-					'.not_classified { background-color: #'.$config['severity_color_0'].' !important; }'."\n".
-					'.trigger_unknown { background-color: #DBDBDB !important; }'."\n".
+					'.disaster { background: #'.$config['severity_color_5'].' !important; }'."\n".
+					'.high { background: #'.$config['severity_color_4'].' !important; }'."\n".
+					'.average { background: #'.$config['severity_color_3'].' !important; }'."\n".
+					'.warning { background: #'.$config['severity_color_2'].' !important; }'."\n".
+					'.information { background: #'.$config['severity_color_1'].' !important; }'."\n".
+					'.not_classified { background: #'.$config['severity_color_0'].' !important; }'."\n".
+					'.trigger_unknown { background: #DBDBDB !important; }'."\n".
 				'</style>';
 
 			// perform Zabbix server check only for standard pages
