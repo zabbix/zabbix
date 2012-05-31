@@ -212,7 +212,7 @@ class CUserMacro extends CZBXAPI{
 				$sql_parts['select']['templateid'] = 'ht.templateid';
 			}
 
-			$sql_parts['from']['macros_templates'] = 'hosts_templates ht';
+			$sql_parts['from']['hosts_templates'] = 'hosts_templates ht';
 			$sql_parts['where'][] = DBcondition('ht.templateid', $options['templateids']);
 			$sql_parts['where']['hmht'] = 'hm.hostid=ht.hostid';
 		}
