@@ -992,14 +992,14 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 	else if (ZBX_TCP_ERROR != nbytes)
 	{
 		read_bytes = nbytes;
-		expected_len = 16*ZBX_MEBIBYTE;
+		expected_len = 16 * ZBX_MEBIBYTE;
 	}
 
 	if (ZBX_TCP_ERROR != nbytes)
 	{
 		if (flags & ZBX_TCP_READ_UNTIL_CLOSE)
 		{
-			if (nbytes == 0)
+			if (0 == nbytes)
 				goto cleanup;
 		}
 		else
@@ -1011,25 +1011,24 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 		left = sizeof(s->buf_stat) - read_bytes - 1;
 
 		/* fill static buffer */
-		if (s->buf_stat[read_bytes - 1] != '\n') /* don't try to read from an empty socket */
+		if ('\n' != s->buf_stat[read_bytes - 1])	/* don't try to read from an empty socket */
 		{
-			while (read_bytes < expected_len &&
-					left > 0 &&
+			while (read_bytes < expected_len && left > 0 &&
 					ZBX_TCP_ERROR !=
-					(nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
+					(nbytes = ZBX_TCP_READ(s->socket, s->buf_stat + read_bytes, left)))
 			{
 				read_bytes += nbytes;
 
 				if (flags & ZBX_TCP_READ_UNTIL_CLOSE)
 				{
-					if (nbytes == 0)
+					if (0 == nbytes)
 						break;
 				}
 				else
 				{
 					if (nbytes < left)	/* should we stop reading? */
 					{
-						if (s->buf_stat[0] == '<')	/* XML protocol? */
+						if ('<' == s->buf_stat[0])	/* XML protocol? */
 						{
 							/* closing tag received? */
 							if (NULL != strstr(s->buf_stat, "</req>"))
@@ -1059,23 +1058,22 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 			/* fill dynamic buffer */
 			while (read_bytes < expected_len &&
 					ZBX_TCP_ERROR !=
-					(nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat)-1)))
+					(nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat) - 1)))
 			{
 				s->buf_stat[nbytes] = '\0';
-				zbx_snprintf_alloc(&(s->buf_dyn), &allocated, &offset, sizeof(s->buf_stat), "%s",
-						s->buf_stat);
+				zbx_strcpy_alloc(&s->buf_dyn, &allocated, &offset, s->buf_stat);
 				read_bytes += nbytes;
 
 				if (flags & ZBX_TCP_READ_UNTIL_CLOSE)
 				{
-					if (nbytes == 0)
+					if (0 == nbytes)
 						break;
 				}
 				else
 				{
 					if (nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
 					{
-						if (s->buf_dyn[0] == '<')	/* XML protocol? */
+						if ('<' == s->buf_dyn[0])	/* XML protocol? */
 						{
 							/* closing tag received? */
 							if (NULL != strstr(s->buf_dyn, "</req>"))
