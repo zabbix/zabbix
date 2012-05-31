@@ -80,14 +80,14 @@
 					<td><?php echo _('Host group'); ?></td>
 					<td>
 						<input readonly="readonly" size="50" id="elementNameHostGroup" name="elementName" class="input">
-						<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHostGroup&srctbl=host_group&srcfld1=groupid&srcfld2=name',450,450)"><?php echo _('Select'); ?></span>
+						<span class="link" onclick="PopUp('popup.php?srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHostGroup&writeonly=1&noempty=1', 450, 450)"><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
 				<tr id="hostSelectRow">
 					<td><?php echo _('Host'); ?></td>
 					<td>
 						<input readonly="readonly" size="50" id="elementNameHost" name="elementName" class="input">
-						<span class="link" onclick="PopUp('popup.php?writeonly=1&real_hosts=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHost&srctbl=hosts&srcfld1=hostid&srcfld2=name',450,450)"><?php echo _('Select'); ?></span>
+						<span class="link" onclick="PopUp('popup.php?srctbl=hosts&srcfld1=hostid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameHost&real_hosts=1&writeonly=1&noempty=1', 450, 450)"><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
 				<tr id="triggerSelectRow">
@@ -101,7 +101,7 @@
 					<td><?php echo _('Map'); ?></td>
 					<td>
 						<input readonly="readonly" size="50" id="elementNameMap" name="elementName" class="input">
-						<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&excludeids[]=#{sysmapid}',450,450)"><?php echo _('Select'); ?></span>
+						<span class="link" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}", 450, 450)'><?php echo _('Select'); ?></span>
 					</td>
 				</tr>
 

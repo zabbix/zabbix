@@ -44,8 +44,9 @@ if (empty($this->data['applicationid'])) {
 	$applicationFormList->addRow(_('Host'), array(
 		new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 		new CButton('btn1', _('Select'),
-			"return PopUp('popup.php?dstfrm=".$applicationForm->getName().
-			"&dstfld1=apphostid&dstfld2=hostname&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name&noempty=1', 450, 450);",
+			'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name'.
+				'&dstfrm='.$applicationForm->getName().'&dstfld1=apphostid&dstfld2=hostname'.
+				'&noempty=1", 450, 450);',
 			'formlist'
 		)
 	));

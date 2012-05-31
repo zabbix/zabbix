@@ -45,7 +45,9 @@ $httpFormList->addRow(_('Application'), array(
 	new CTextBox('application', $this->data['application'], ZBX_TEXTBOX_STANDARD_SIZE),
 	SPACE,
 	new CButton('select_app', _('Select'),
-		'return PopUp("popup.php?dstfrm='.$httpForm->getName().'&dstfld1=application&srctbl=applications&srcfld1=name&only_hostid='.$this->data['hostid'].'", 500, 600, "application");',
+		'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
+			'&dstfrm='.$httpForm->getName().'&dstfld1=application'.
+			'&only_hostid='.$this->data['hostid'].'", 500, 600, "application");',
 		'formlist'
 	)
 ));

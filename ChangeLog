@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-4974] fixed don't show groups w/o templates when linking a template (Toms)
 ..F....... [ZBX-5096] fixed error when create hostgroup with too long name (Vedmak)
 ..F....... [ZBX-4985] improved hostgroup area icons layout (Vedmak)
 ..F....... [ZBX-5078] fixed item prototype application linking when fully cloning a host (Pavels)
@@ -40,6 +41,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-4974] fixed don't show groups w/o templates when linking a template (Toms)
 ..F....... [ZBX-5096] fixed error when create hostgroup with too long name (Vedmak)
 ..F....... [ZBX-4985] improved hostgroup area icons layout (Vedmak)
 ..F....... [ZBX-5078] fixed item prototype application linking when fully cloning a host (Pavels)
