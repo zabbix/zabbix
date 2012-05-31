@@ -328,10 +328,10 @@ elseif (isset($_REQUEST['save'])) {
 			$msg_fail = _('Cannot add host');
 		}
 
-		$clone_hostid = false;
+		$srcHostId = false;
 		if ($_REQUEST['form'] == 'full_clone') {
 			$create_new = true;
-			$clone_hostid = $_REQUEST['hostid'];
+			$srcHostId = $_REQUEST['hostid'];
 		}
 
 		$templates = array_keys($templates);
@@ -410,20 +410,20 @@ elseif (isset($_REQUEST['save'])) {
 		if ($create_new) {
 			$hostids = API::Host()->create($host);
 			if ($hostids) {
-				$hostid = reset($hostids['hostids']);
+				$newHostId = reset($hostids['hostids']);
 			}
 			else {
 				throw new Exception();
 			}
 
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host['host'], null, null, null);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $newHostId, $host['host'], null, null, null);
 		}
 		else {
-			$hostid = $host['hostid'] = $_REQUEST['hostid'];
+			$newHostId = $host['hostid'] = $_REQUEST['hostid'];
 			$host['templates_clear'] = $templates_clear;
 
 			$host_old = API::Host()->get(array(
-				'hostids' => $hostid,
+				'hostids' => $newHostId,
 				'editable' => true,
 				'output' => API_OUTPUT_EXTEND
 			));
@@ -434,7 +434,7 @@ elseif (isset($_REQUEST['save'])) {
 			}
 
 			$host_new = API::Host()->get(array(
-				'hostids' => $hostid,
+				'hostids' => $newHostId,
 				'editable' => true,
 				'output' => API_OUTPUT_EXTEND
 			));
@@ -443,28 +443,37 @@ elseif (isset($_REQUEST['save'])) {
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host_old, $host_new);
 		}
 
-		if ($clone_hostid && $_REQUEST['form'] == 'full_clone') {
-			if (!copyApplications($clone_hostid, $hostid)) {
+		if ($srcHostId && $_REQUEST['form'] == 'full_clone') {
+			if (!copyApplications($srcHostId, $newHostId)) {
 				throw new Exception();
 			}
 
-			if (!copyItems($clone_hostid, $hostid)) {
+			if (!copyItems($srcHostId, $newHostId)) {
 				throw new Exception();
 			}
 
-			if (!copyTriggers($clone_hostid, $hostid)) {
-				throw new Exception();
+			// clone triggers
+			$triggers = API::Trigger()->get(array(
+				'output' => API_OUTPUT_SHORTEN,
+				'hostids' => $srcHostId,
+				'inherited' => false
+			));
+			if ($triggers) {
+				if (!copyTriggersToHosts(zbx_objectValues($triggers, 'triggerid'), $newHostId, $srcHostId)) {
+					throw new Exception();
+				}
 			}
 
 			// clone discovery rules
 			$discoveryRules = API::DiscoveryRule()->get(array(
-				'hostids' => $clone_hostid,
+				'output' => API_OUTPUT_SHORTEN,
+				'hostids' => $srcHostId,
 				'inherited' => false
 			));
 			if ($discoveryRules) {
 				$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
 					'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
-					'hostids' => array($hostid)
+					'hostids' => array($newHostId)
 				));
 				if (!$copyDiscoveryRules) {
 					throw new Exception();
@@ -472,7 +481,7 @@ elseif (isset($_REQUEST['save'])) {
 			}
 
 			$graphs = API::Graph()->get(array(
-				'hostids' => $clone_hostid,
+				'hostids' => $srcHostId,
 				'selectItems' => API_OUTPUT_EXTEND,
 				'output' => API_OUTPUT_EXTEND,
 				'inherited' => false,
@@ -488,7 +497,7 @@ elseif (isset($_REQUEST['save'])) {
 					continue;
 				}
 
-				if (!copy_graph_to_host($graph['graphid'], $hostid)) {
+				if (!copy_graph_to_host($graph['graphid'], $newHostId)) {
 					throw new Exception();
 				}
 			}
