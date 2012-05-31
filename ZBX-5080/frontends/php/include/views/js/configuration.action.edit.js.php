@@ -316,10 +316,10 @@ function selectOpCmdTarget() {
 	var target = jQuery('#opcmdEditForm select[name="opCmdTarget"]').val();
 
 	if (target.toString() == '2') {
-		PopUp("popup.php?dstfrm=action.edit&srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1", 480, 480);
+		PopUp("popup.php?srctbl=host_group&srcfld1=groupid&srcfld2=name&dstfrm=action.edit&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1&noempty=1", 480, 480);
 	}
 	else {
-		PopUp("popup.php?dstfrm=action.edit&srctbl=hosts&srcfld1=hostid&srcfld2=name&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&writeonly=1", 780, 480);
+		PopUp('popup.php?srctbl=hosts&srcfld1=hostid&srcfld2=name&dstfrm=action.edit&dstfld1=opCmdTargetObjectId&dstfld2=opCmdTargetObjectName&real_hosts=1&writeonly=1&noempty=1', 780, 480);
 	}
 }
 
@@ -429,7 +429,7 @@ jQuery(document).ready(function() {
 	showOpTypeForm();
 
 	jQuery('#select_opcommand_script').click(function() {
-		PopUp("popup.php?dstfrm=action.edit&srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script",480,720);
+		PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script', 480, 720);
 	})
 });
 

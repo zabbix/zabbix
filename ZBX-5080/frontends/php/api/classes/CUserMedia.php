@@ -296,6 +296,7 @@ class CUserMedia extends CZBXAPI {
 					if (!isset($result[$media['mediaid']])) {
 						$result[$media['mediaid']]= array();
 					}
+					$result[$media['mediaid']] += $media;
 				}
 			}
 		}

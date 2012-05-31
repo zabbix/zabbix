@@ -5,6 +5,9 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-4974] fixed don't show groups w/o templates when linking a template (Toms)
+..F....... [ZBX-5096] fixed error when create hostgroup with too long name (Vedmak)
+..F....... [ZBX-4985] improved hostgroup area icons layout (Vedmak)
 ..F....... [ZBX-5078] fixed item prototype application linking when fully cloning a host (Pavels)
 A.F....... [ZBX-5053] fixed Y max/min value validation for calculated graph scales (Eduard)
 A.F....... [ZBX-5029] fixed inherited item interface being updated incorrectly when changing it's type (Pavels)
@@ -730,6 +733,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+..F....... [ZBX-4031] fixed error message when deleting a link in a map (Pavels)
 ..F....... [ZBX-5006] fixed allowed memory size exceeded; thanks to Mike Brady (Toms)
 A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)
 ..F....... [ZBX-5014] fixed error in dm setup for guest user (Vedmak)
