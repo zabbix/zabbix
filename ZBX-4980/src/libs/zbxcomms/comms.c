@@ -1028,10 +1028,13 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 				{
 					if (nbytes < left)	/* should we stop reading? */
 					{
-						if ('<' == s->buf_stat[0])	/* XML protocol? */
+						/* XML protocol? */
+						if (0 == strncmp(s->buf_stat, "<req>", sizeof("<req>") - 1))
 						{
-							/* closing tag received? */
-							if (NULL != strstr(s->buf_stat, "</req>"))
+							/* closing tag received in the last 10 bytes? */
+							s->buf_stat[read_bytes] = '\0';
+							if (NULL != strstr(s->buf_stat + read_bytes -
+									(10 > read_bytes ? read_bytes : 10), "</req>"))
 								break;
 						}
 						else
@@ -1073,10 +1076,13 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 				{
 					if (nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
 					{
-						if ('<' == s->buf_dyn[0])	/* XML protocol? */
+						/* XML protocol? */
+						if (0 == strncmp(s->buf_dyn, "<req>", sizeof("<req>") - 1))
 						{
-							/* closing tag received? */
-							if (NULL != strstr(s->buf_dyn, "</req>"))
+							/* closing tag received in the last 10 bytes? */
+							s->buf_dyn[read_bytes] = '\0';
+							if (NULL != strstr(s->buf_dyn + read_bytes -
+									(10 > read_bytes ? read_bytes : 10), "</req>"))
 								break;
 						}
 						else
