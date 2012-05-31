@@ -77,6 +77,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
+<br/>
 <div id="opcmdEditForm" class="objectgroup border_dotted ui-corner-all inlineblock">
 <table class="formElementTable" style="min-width: 310px;"><tbody>
 <tr>
@@ -132,6 +133,8 @@
 	function removeCondition(index) {
 		jQuery('#conditions_' + index).find('*').remove();
 		jQuery('#conditions_' + index).remove();
+
+		processTypeOfCalculation();
 	}
 
 	function removeOperation(index) {
@@ -346,7 +349,7 @@
 
 	function closeOpCmdForm() {
 		jQuery('#opCmdDraft').attr('id', jQuery('#opCmdDraft').attr('origid'));
-		jQuery("#opcmdEditForm").remove();
+		jQuery('#opcmdEditForm').remove();
 		return true;
 	}
 
@@ -399,7 +402,7 @@
 	function showOpTypeAuth() {
 		var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
 
-		if (currentOpTypeAuth === <?php echo(ITEM_AUTHTYPE_PASSWORD); ?>) {
+		if (currentOpTypeAuth === <?php echo ITEM_AUTHTYPE_PASSWORD; ?>) {
 			jQuery('#operationlist .class_authentication_publickey').toggleClass('hidden', true);
 			jQuery('#new_operation_opcommand_publickey').prop('disabled', true);
 			jQuery('#operationlist .class_authentication_privatekey').toggleClass('hidden', true);
@@ -428,11 +431,60 @@
 	ZBX_SCRIPT_TYPES['ssh'] = <?php echo ZBX_SCRIPT_TYPE_SSH; ?>;
 	ZBX_SCRIPT_TYPES['userscript'] = <?php echo ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT; ?>;
 
+	function processTypeOfCalculation() {
+		var count = jQuery('#conditionTable tr').length - 1;
+		if (count > 1) {
+			jQuery('#conditionRow').css('display', 'block');
+
+			var groupOperator = '',
+				globalOperator = '',
+				str = '';
+
+			if (jQuery('#evaltype').val() == <?php echo ACTION_EVAL_TYPE_AND; ?>) {
+				groupOperator = '<?php echo _('and'); ?>';
+				globalOperator = '<?php echo _('and'); ?>';
+			}
+			else if (jQuery('#evaltype').val() == <?php echo ACTION_EVAL_TYPE_OR; ?>) {
+				groupOperator = '<?php echo _('or'); ?>';
+				globalOperator = '<?php echo _('or'); ?>';
+			}
+			else {
+				groupOperator = '<?php echo _('or'); ?>';
+				globalOperator = '<?php echo _('and'); ?>';
+			}
+
+			var conditionTypeHold = '';
+			jQuery('#conditionTable tr').not('.header').each(function() {
+				var conditionType = jQuery(this).find('.label').data('conditiontype');
+
+				if (empty(str)) {
+					str = '(' + jQuery(this).find('.label').data('label');
+					conditionTypeHold = conditionType;
+				}
+				else {
+					if (conditionType != conditionTypeHold) {
+						str += ') ' + globalOperator + ' (' + jQuery(this).find('.label').data('label');
+						conditionTypeHold = conditionType;
+					}
+					else {
+						str += ' ' + groupOperator + ' ' + jQuery(this).find('.label').data('label');
+					}
+				}
+			});
+			str += ')';
+
+			jQuery('#conditionLabel').html(str);
+		}
+		else {
+			jQuery('#conditionRow').css('display', 'none');
+		}
+	}
+
 	jQuery(document).ready(function() {
 		setTimeout(function() {jQuery('#name').focus()}, 10);
 
 		// clone button
-		jQuery('#clone').click(function(){
+		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
 			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#name').focus();
@@ -444,5 +496,7 @@
 		jQuery('#select_opcommand_script').click(function() {
 			PopUp('popup.php?dstfrm=action.edit&srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script', 480, 720);
 		})
+
+		processTypeOfCalculation();
 	});
 </script>

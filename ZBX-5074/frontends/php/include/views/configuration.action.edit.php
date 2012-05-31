@@ -73,11 +73,11 @@ $conditionFormList = new CFormList('conditionlist');
 
 // create condition table
 $conditionTable = new CTable(_('No conditions defined.'), 'formElementTable');
+$conditionTable->attr('id', 'conditionTable');
 $conditionTable->attr('style', 'min-width: 350px;');
 $conditionTable->setHeader(array(_('Label'), _('Name'), _('Action')));
 
 $i = 0;
-$groupedConditions = array();
 foreach ($this->data['action']['conditions'] as $condition) {
 	if (!isset($condition['conditiontype'])) {
 		$condition['conditiontype'] = 0;
@@ -93,10 +93,13 @@ foreach ($this->data['action']['conditions'] as $condition) {
 	}
 
 	$label = num2letter($i);
+	$labelSpan = new CSpan('('.$label.')', 'label');
+	$labelSpan->setAttribute('data-conditiontype', $condition['conditiontype']);
+	$labelSpan->setAttribute('data-label', $label);
 
 	$conditionTable->addRow(
 		array(
-			'('.$label.')'.SPACE,
+			$labelSpan,
 			get_condition_desc($condition['conditiontype'], $condition['operator'], $condition['value']).SPACE,
 			array(
 				new CButton('remove', _('Remove'), 'javascript: removeCondition('.$i.');', 'link_menu'),
@@ -106,38 +109,14 @@ foreach ($this->data['action']['conditions'] as $condition) {
 		null, 'conditions_'.$i
 	);
 
-	$groupedConditions[$condition['conditiontype']][] = $label;
 	$i++;
 }
 
-if ($conditionTable->itemsCount() > 1) {
-	switch ($this->data['action']['evaltype']) {
-		case ACTION_EVAL_TYPE_AND:
-			$group_op = $glog_op = _('and');
-			break;
-		case ACTION_EVAL_TYPE_OR:
-			$group_op = $glog_op = _('or');
-			break;
-		default:
-			$group_op = _('or');
-			$glog_op = _('and');
-	}
-
-	foreach ($groupedConditions as $id => $condition) {
-		$groupedConditions[$id] = '('.implode(' '.$group_op.' ', $condition).')';
-	}
-	$groupedConditions = implode(' '.$glog_op.' ', $groupedConditions);
-
-	$calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['evaltype'], 'submit()');
-	$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_AND_OR, _('AND / OR'));
-	$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_AND, _('AND'));
-	$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_OR, _('OR'));
-	$conditionFormList->addRow(_('Type of calculation'), array($calculationTypeComboBox, new CSpan($groupedConditions)));
-}
-else {
-	$actionForm->addVar('evaltype', $this->data['action']['evaltype']);
-}
-
+$calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['evaltype'], 'submit()');
+$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_AND_OR, _('AND / OR'));
+$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_AND, _('AND'));
+$calculationTypeComboBox->addItem(ACTION_EVAL_TYPE_OR, _('OR'));
+$conditionFormList->addRow(_('Type of calculation'), array($calculationTypeComboBox, new CSpan('', null, 'conditionLabel')), false, 'conditionRow');
 $conditionFormList->addRow(_('Conditions'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
 
 // append new condition to form list
@@ -440,15 +419,16 @@ if (!empty($this->data['new_operation'])) {
 		$stepNumericBox->addAction('onchange', 'javascript:'.$stepNumericBox->getAttribute('onchange').' if(this.value == 0) this.value=1;');
 
 		$stepTable = new CTable();
-		$stepTable->addRow(array(_('From'), $stepNumericBox));
+		$stepTable->addRow(array(_('From'), $stepNumericBox), 'indent_both');
 		$stepTable->addRow(array(
 			_('To'),
 			new CCol(array(
 				new CNumericBox('new_operation[esc_step_to]', $this->data['new_operation']['esc_step_to'], 5),
 				SPACE,
 				_('(0 - infinitely)')
-			))
-		));
+			))),
+			'indent_both'
+		);
 
 		$stepTable->addRow(array(
 			_('Escalation period'),
@@ -456,8 +436,9 @@ if (!empty($this->data['new_operation'])) {
 				new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 5),
 				SPACE,
 				_('(minimum 60 seconds, 0 - use action default)')
-			))
-		));
+			))),
+			'indent_both'
+		);
 
 		$newOperationsTable->addRow(array(_('Step'), $stepTable));
 	}
@@ -472,7 +453,7 @@ if (!empty($this->data['new_operation'])) {
 		$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 	}
 
-	$newOperationsTable->addRow(array(_('Operation type'), $operationTypeComboBox));
+	$newOperationsTable->addRow(array(_('Operation type'), $operationTypeComboBox), 'indent_both');
 	switch ($this->data['new_operation']['operationtype']) {
 		case OPERATION_TYPE_MESSAGE:
 			if (!isset($this->data['new_operation']['opmessage'])) {
@@ -557,7 +538,13 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$newOperationsTable->addRow(array(_('Send only to'), $mediaTypeComboBox));
-			$newOperationsTable->addRow(array(_('Default message'), new CCheckBox('new_operation[opmessage][default_msg]', $this->data['new_operation']['opmessage']['default_msg'], 'javascript: submit();', 1)));
+			$newOperationsTable->addRow(
+				array(
+					_('Default message'),
+					new CCheckBox('new_operation[opmessage][default_msg]', $this->data['new_operation']['opmessage']['default_msg'], 'javascript: submit();', 1)
+				),
+				'indent_top'
+			);
 
 			if (!$this->data['new_operation']['opmessage']['default_msg']) {
 				$newOperationsTable->addRow(array(
@@ -660,7 +647,7 @@ if (!empty($this->data['new_operation'])) {
 			// target list
 			$cmdList = new CDiv($cmdList, 'objectgroup border_dotted ui-corner-all inlineblock');
 			$cmdList->setAttribute('id', 'opCmdList');
-			$newOperationsTable->addRow(array(_('Target list'), $cmdList));
+			$newOperationsTable->addRow(array(_('Target list'), $cmdList), 'indent_top');
 
 			// type
 			$typeComboBox = new CComboBox('new_operation[opcommand][type]', $this->data['new_operation']['opcommand']['type'], 'javascript: showOpTypeForm();');
@@ -676,24 +663,24 @@ if (!empty($this->data['new_operation'])) {
 
 			$userScript = new CDiv(array($userScriptId, $userScriptName, SPACE, $userScriptSelect), 'class_opcommand_userscript inlineblock hidden');
 
-			$newOperationsTable->addRow(array(_('Type'), array($typeComboBox, SPACE, $userScript)));
+			$newOperationsTable->addRow(array(_('Type'), array($typeComboBox, SPACE, $userScript)), 'indent_bottom');
 
 			// script
-			$executeOnRb = new CRadioButtonList('new_operation[opcommand][execute_on]', $this->data['new_operation']['opcommand']['execute_on']);
-			$executeOnRb->makeVertical();
-			$executeOnRb->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
-			$executeOnRb->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
-			$newOperationsTable->addRow(array(_('Execute on'), new CDiv($executeOnRb, 'objectgroup border_dotted ui-corner-all inlineblock')), 'class_opcommand_execute_on hidden');
+			$executeOnRadioButton = new CRadioButtonList('new_operation[opcommand][execute_on]', $this->data['new_operation']['opcommand']['execute_on']);
+			$executeOnRadioButton->makeVertical();
+			$executeOnRadioButton->addValue(SPACE._('Zabbix agent').SPACE, ZBX_SCRIPT_EXECUTE_ON_AGENT);
+			$executeOnRadioButton->addValue(SPACE._('Zabbix server').SPACE, ZBX_SCRIPT_EXECUTE_ON_SERVER);
+			$newOperationsTable->addRow(array(_('Execute on'), new CDiv($executeOnRadioButton, 'objectgroup border_dotted ui-corner-all inlineblock')), 'class_opcommand_execute_on hidden indent_both');
 
 			// ssh
-			$cmbAuthType = new CComboBox('new_operation[opcommand][authtype]', $this->data['new_operation']['opcommand']['authtype'], 'javascript: showOpTypeAuth();');
-			$cmbAuthType->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
-			$cmbAuthType->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
+			$authTypeComboBox = new CComboBox('new_operation[opcommand][authtype]', $this->data['new_operation']['opcommand']['authtype'], 'javascript: showOpTypeAuth();');
+			$authTypeComboBox->addItem(ITEM_AUTHTYPE_PASSWORD, _('Password'));
+			$authTypeComboBox->addItem(ITEM_AUTHTYPE_PUBLICKEY, _('Public key'));
 
 			$newOperationsTable->addRow(
 				array(
 					_('Authentication method'),
-					$cmbAuthType
+					$authTypeComboBox
 				),
 				'class_authentication_method hidden'
 			);
@@ -702,28 +689,28 @@ if (!empty($this->data['new_operation'])) {
 					_('User name'),
 					new CTextBox('new_operation[opcommand][username]', $this->data['new_operation']['opcommand']['username'], ZBX_TEXTBOX_SMALL_SIZE)
 				),
-				'class_authentication_username hidden'
+				'class_authentication_username hidden indent_both'
 			);
 			$newOperationsTable->addRow(
 				array(
 					_('Public key file'),
 					new CTextBox('new_operation[opcommand][publickey]', $this->data['new_operation']['opcommand']['publickey'], ZBX_TEXTBOX_SMALL_SIZE)
 				),
-				'class_authentication_publickey hidden'
+				'class_authentication_publickey hidden indent_both'
 			);
 			$newOperationsTable->addRow(
 				array(
 					_('Private key file'),
 					new CTextBox('new_operation[opcommand][privatekey]', $this->data['new_operation']['opcommand']['privatekey'], ZBX_TEXTBOX_SMALL_SIZE)
 				),
-				'class_authentication_privatekey hidden'
+				'class_authentication_privatekey hidden indent_both'
 			);
 			$newOperationsTable->addRow(
 				array(
 					_('Password'),
 					new CTextBox('new_operation[opcommand][password]', $this->data['new_operation']['opcommand']['password'], ZBX_TEXTBOX_SMALL_SIZE)
 				),
-				'class_authentication_password hidden'
+				'class_authentication_password hidden indent_both'
 			);
 
 			// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
@@ -737,16 +724,16 @@ if (!empty($this->data['new_operation'])) {
 					_('Port'),
 					new CTextBox('new_operation[opcommand][port]', $this->data['new_operation']['opcommand']['port'], ZBX_TEXTBOX_SMALL_SIZE)
 				),
-				'class_opcommand_port hidden'
+				'class_opcommand_port hidden indent_both'
 			);
 
 			// command
 			$commandTextArea = new CTextArea('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command']);
-			$newOperationsTable->addRow(array(_('Commands'), $commandTextArea), 'class_opcommand_command hidden');
+			$newOperationsTable->addRow(array(_('Commands'), $commandTextArea), 'class_opcommand_command hidden indent_both');
 
 			$commandIpmiTextBox = new CTextBox('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command'], ZBX_TEXTBOX_STANDARD_SIZE);
 			$commandIpmiTextBox->attr('id', 'opcommand_command_ipmi');
-			$newOperationsTable->addRow(array(_('Commands'), $commandIpmiTextBox), 'class_opcommand_command_ipmi hidden');
+			$newOperationsTable->addRow(array(_('Commands'), $commandIpmiTextBox), 'class_opcommand_command_ipmi hidden indent_both');
 			break;
 		case OPERATION_TYPE_HOST_ADD:
 		case OPERATION_TYPE_HOST_REMOVE:
@@ -825,7 +812,7 @@ if (!empty($this->data['new_operation'])) {
 			break;
 	}
 
-	// new operation conditions
+	// append operation conditions to form list
 	if ($this->data['eventsource'] == 0) {
 		if (!isset($this->data['new_operation']['opconditions'])) {
 			$this->data['new_operation']['opconditions'] = array();
@@ -914,20 +901,12 @@ if (!empty($this->data['new_operation'])) {
 		if (!isset($_REQUEST['new_opcondition'])) {
 			$operationConditionsTable->addRow(new CCol(new CSubmit('new_opcondition', _('New'), null, 'link_menu')));
 		}
-		$newOperationsTable->addRow(array(_('Conditions'), new CDiv($operationConditionsTable, 'objectgroup inlineblock border_dotted ui-corner-all')));
+		$newOperationsTable->addRow(array(_('Conditions'), new CDiv($operationConditionsTable, 'objectgroup inlineblock border_dotted ui-corner-all')), 'indent_top');
 	}
 
-	$footer = array(
-		new CSubmit('add_operation', ($this->data['new_operation']['action'] == 'update') ? _('Update') : _('Add'), null, 'link_menu'),
-		SPACE.SPACE,
-		new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
-	);
-
-	$operationFormList->addRow(_('Operation details'), new CDiv(array($newOperationsTable, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
-
-	// new operation condition
+	// append new operation condition to form list
 	if (isset($_REQUEST['new_opcondition'])) {
-		$operationConditionsTable = new CTable(null, 'formElementTable');
+		$newOperationConditionTable = new CTable(null, 'formElementTable');
 
 		$allowedOpConditions = get_opconditions_by_eventsource($this->data['eventsource']);
 
@@ -965,16 +944,23 @@ if (!empty($this->data['new_operation'])) {
 			$operationConditionValueComboBox->addItem(1, _('Ack'));
 			$rowCondition[] = $operationConditionValueComboBox;
 		}
-		$operationConditionsTable->addRow($rowCondition);
+		$newOperationConditionTable->addRow($rowCondition);
 
-		$footer = array(
+		$newOperationConditionFooter = array(
 			new CSubmit('add_opcondition', _('Add'), null, 'link_menu'),
-			SPACE,
+			SPACE.SPACE,
 			new CSubmit('cancel_new_opcondition', _('Cancel'), null, 'link_menu')
 		);
 
-		$operationFormList->addRow(_('Operation condition'), new CDiv(array($operationConditionsTable, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
+		$newOperationsTable->addRow(array(_('Operation condition'), new CDiv(array($newOperationConditionTable, $newOperationConditionFooter), 'objectgroup inlineblock border_dotted ui-corner-all')));
 	}
+
+	$footer = array(
+		new CSubmit('add_operation', ($this->data['new_operation']['action'] == 'update') ? _('Update') : _('Add'), null, 'link_menu'),
+		SPACE.SPACE,
+		new CSubmit('cancel_new_operation', _('Cancel'), null, 'link_menu')
+	);
+	$operationFormList->addRow(_('Operation details'), new CDiv(array($newOperationsTable, $footer), 'objectgroup inlineblock border_dotted ui-corner-all'));
 }
 
 // append tabs to form
