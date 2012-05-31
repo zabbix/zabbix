@@ -576,9 +576,11 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	));
 
 	$newTriggerIds = array();
+	$httpTriggerIds = array();
 	foreach ($db_dstHosts as $dstHost) {
 		foreach ($db_srcTriggers as $srcTrigger) {
 			if (httpItemExists($srcTrigger['items'])) {
+				$httpTriggerIds[$srcTrigger['triggerid']] = $srcTrigger['triggerid'];
 				continue;
 			}
 
@@ -605,7 +607,6 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	}
 
 	// map dependencies to the new trigger IDs and save
-	// TODO: remove dependencies pointing to web items
 	if ($newTriggerIds) {
 		$dependencies = array();
 		foreach ($db_srcTriggers as $trigger) {
@@ -614,6 +615,11 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 
 			if ($trigger['dependencies']) {
 				foreach ($trigger['dependencies'] as $depTrigger) {
+					// skip dependencies on triggers containing web items
+					if (isset($httpTriggerIds[$depTrigger['triggerid']])) {
+						continue;
+					}
+
 					$depTriggerId = $depTrigger['triggerid'];
 					$depTriggerId = (isset($newTriggerIds[$depTriggerId])) ? $newTriggerIds[$depTriggerId] : $depTriggerId;
 
