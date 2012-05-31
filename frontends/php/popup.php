@@ -176,14 +176,14 @@ $allowedSrcFields = array(
 	'screens'				=> '"screenid"',
 	'screens2'				=> '"screenid", "name"',
 	'host_group_scr'		=> '"groupid", "name"',
-	'host_templates'		=> '"hostid", "host", "templateid", "name"',
+	'host_templates'		=> '"templateid", "name"',
 	'nodes'					=> '"nodeid", "name"',
 	'drules'				=> '"druleid", "name"',
 	'dchecks'				=> '"dcheckid", "name"',
 	'proxies'				=> '"hostid", "host"',
 	'usrgrp'				=> '"usrgrpid", "name"',
 	'templates'				=> '"hostid", "host"',
-	'applications'			=> '"name", "host"',
+	'applications'			=> '"name"',
 	'scripts'				=> '"scriptid", "name"'
 );
 
