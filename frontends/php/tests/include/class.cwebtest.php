@@ -33,36 +33,36 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	// List of strings that should NOT appear on any page
 	public $failIfExists = array (
-		"pg_query",
-		"Error in",
-		"expects parameter",
-		"Undefined index",
-		"Undefined variable",
-		"Undefined offset",
-		"Fatal error",
-		"Call to undefined method",
-		"Invalid argument supplied",
-		"Missing argument",
-		"Warning:",
-		"PHP notice",
-		"PHP warning",
-		"Use of undefined",
-		"You must login",
-		"DEBUG INFO",
-		"Cannot modify header",
-		"Parse error",
-		"syntax error"
+		'pg_query',
+		'Error in',
+		'expects parameter',
+		'Undefined index',
+		'Undefined variable',
+		'Undefined offset',
+		'Fatal error',
+		'Call to undefined method',
+		'Invalid argument supplied',
+		'Missing argument',
+		'Warning:',
+		'PHP notice',
+		'PHP warning',
+		'Use of undefined',
+		'You must login',
+		'DEBUG INFO',
+		'Cannot modify header',
+		'Parse error',
+		'syntax error'
 	);
 
 	// List of strings that SHOULD appear on every page
 	public $failIfNotExists = array (
-		"Help",
-		"Get support",
-		"Print",
-		"Profile",
-		"Logout",
-		"Connected",
-		"Admin"
+		'Help',
+		'Get support',
+		'Print',
+		'Profile',
+		'Logout',
+		'Connected',
+		'Admin'
 	);
 
 	protected function setUp() {
@@ -176,6 +176,28 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->checkFatalErrors();
 	}
 
+	// zbx_popup is the default opened window id if none is passed
+	public function zbxLaunchPopup($buttonId, $windowId = 'zbx_popup') {
+		// $this->button_click('add');
+		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
+		$this->click("//input[@id='$buttonId' and contains(@onclick, 'return PopUp')]");
+		$this->waitForPopUp($windowId, 6000);
+		$this->selectWindow($windowId);
+		$this->checkFatalErrors();
+	}
+
+	public function zbxGetDropDownElements($dropdownId) {
+		$optionCount = $this->getXpathCount('//*[@id="'.$dropdownId.'"]/option');
+		$optionList = array();
+		for ($i = 1; $i <= $optionCount; $i++) {
+			$optionList[] = array(
+				'id' => $this->getAttribute('//*[@id="'.$dropdownId.'"]/option['.$i.']@value'),
+				'content' => $this->getText('//*[@id="'.$dropdownId.'"]/option['.$i.']')
+			);
+		}
+		return $optionList;
+	}
+
 	public function template_unlink_and_clear($template) {
 		// WARNING: not tested yet
 		// clicks button named "Unlink and clear" next to template named $template
@@ -206,13 +228,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 		// adds template $template to the list of linked templates
 		// for now, ignores the fact that template might be already linked
-		// $this->button_click('add');
-		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
-		$this->click("//input[@id='add' and @name='add' and @value='Add' and @type='button' and contains(@onclick, 'return PopUp')]");
-		// zbx_popup is the default opened window id if none is passed
-		$this->waitForPopUp('zbx_popup', 6000);
-		$this->selectWindow('zbx_popup');
-		$this->checkFatalErrors();
+		$this->zbxLaunchPopup('add');
 		$this->dropdown_select_wait('groupid', 'Templates');
 		$this->check("//input[@value='$template' and @type='checkbox']");
 		$this->button_click('select');
@@ -262,9 +278,14 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	}
 
-// Check that page does not have real (not visible) host or template names
+	// check that page does not have real (not visible) host or template names
 	public function checkNoRealHostnames() {
-		$result = DBselect('select host from hosts where status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.') and name <> host');
+		$result = DBselect(
+			'SELECT host'.
+			' FROM hosts'.
+			' WHERE status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
+				' AND name <> host'
+		);
 		while ($row = DBfetch($result)) {
 			$this->nok($row['host']);
 		}

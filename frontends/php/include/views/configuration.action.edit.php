@@ -191,9 +191,9 @@ switch ($new_condition['conditiontype']) {
 		$rowCondition[] = array(
 			new CTextBox('hostname', '', 40, 'yes'),
 			new CButton('btn1', _('Select'),
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-				"&dstfld1=new_condition_value&dstfld2=hostname&srctbl=host_templates".
-				"&srcfld1=templateid&srcfld2=name', 450, 450);",
+				'return PopUp("popup.php?srctbl=host_templates&srcfld1=templateid&srcfld2=name'.
+					'&dstfrm='.$frmAction->getName().'&dstfld1=new_condition_value&dstfld2=hostname'.
+					'&templated_hosts=1&writeonly=1", 450, 450);',
 				'link_menu'
 			)
 		);
@@ -203,9 +203,9 @@ switch ($new_condition['conditiontype']) {
 		$rowCondition[] = array(
 			new CTextBox('hostname', '', 40, 'yes'),
 			new CButton('btn1', _('Select'),
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-				"&dstfld1=new_condition_value&dstfld2=hostname&srctbl=hosts".
-				"&srcfld1=hostid&srcfld2=name', 450, 450);",
+				'return PopUp("popup.php?srctbl=hosts&srcfld1=hostid&srcfld2=name'.
+					'&dstfrm='.$frmAction->getName().'&dstfld1=new_condition_value&dstfld2=hostname'.
+					'&real_hosts=1&writeonly=1&noempty=1", 450, 450);',
 				'link_menu'
 			)
 		);
@@ -248,9 +248,9 @@ switch ($new_condition['conditiontype']) {
 		$rowCondition[] = array(
 			new CTextBox('node', '', 40, 'yes'),
 			new CButton('btn1', _('Select'),
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-				"&dstfld1=new_condition_value&dstfld2=node&srctbl=nodes".
-				"&srcfld1=nodeid&srcfld2=name', 450, 450);",
+				'return PopUp("popup.php?srctbl=nodes&srcfld1=nodeid&srcfld2=name'.
+					'&dstfrm='.$frmAction->getName().'&dstfld1=new_condition_value&dstfld2=node'.
+					'&writeonly=1", 450, 450);',
 				'link_menu'
 			)
 		);
@@ -260,9 +260,8 @@ switch ($new_condition['conditiontype']) {
 		$rowCondition[] = array(
 			new CTextBox('drule', '', 40, 'yes'),
 			new CButton('btn1', _('Select'),
-				"return PopUp('popup.php?dstfrm=".$frmAction->getName().
-				"&dstfld1=new_condition_value&dstfld2=drule&srctbl=drules".
-				"&srcfld1=druleid&srcfld2=name', 450, 450);",
+				'return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
+					'&dstfrm='.$frmAction->getName().'&dstfld1=new_condition_value&dstfld2=drule", 450, 450);',
 				'link_menu'
 			)
 		);
@@ -272,9 +271,8 @@ switch ($new_condition['conditiontype']) {
 		$rowCondition[] = array(
 			new CTextBox('dcheck', '', 40, 'yes'),
 			new CButton('btn1',_('Select'),
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-				"&dstfld1=new_condition_value&dstfld2=dcheck&srctbl=dchecks".
-				"&srcfld1=dcheckid&srcfld2=name', 450, 450);",
+				'return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
+					'&dstfrm='.$frmAction->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1", 450, 450);',
 				'link_menu'
 			)
 		);
@@ -283,10 +281,10 @@ switch ($new_condition['conditiontype']) {
 		$conditionList->addItem(new CVar('new_condition[value]', '0'));
 		$rowCondition[] = array(
 			new CTextBox('proxy', '', 40, 'yes'),
-			new CButton('btn1',_('Select'),
-				"return PopUp('popup.php?writeonly=1&dstfrm=".$frmAction->getName().
-				"&dstfld1=new_condition_value&dstfld2=proxy&srctbl=proxies".
-				"&srcfld1=hostid&srcfld2=host', 450, 450);",
+			new CButton('btn1', _('Select'),
+				'return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
+					'&dstfrm='.$frmAction->getName().'&dstfld1=new_condition_value&dstfld2=proxy'.
+					'", 450, 450);',
 				'link_menu'
 			)
 		);
@@ -798,7 +796,10 @@ if (isset($_REQUEST['new_operation'])) {
 			$templateList = new CTable();
 			$templateList->setAttribute('id', 'opTemplateList');
 
-			$addUsrgrpBtn = new CButton('add', _('Add'), 'return PopUp("popup.php?dstfrm=action.edit&srctbl=host_templates&srcfld1=templateid&srcfld2=name&multiselect=1&reference=dsc_templateid",450,450)', 'link_menu');
+			$addUsrgrpBtn = new CButton('add', _('Add'),
+				'return PopUp("popup.php?srctbl=host_templates&srcfld1=templateid&srcfld2=name'.
+					'&dstfrm=action.edit&reference=dsc_templateid&templated_hosts=1&multiselect=1",450,450)',
+				'link_menu');
 
 			$col = new CCol($addUsrgrpBtn);
 			$col->setAttribute('colspan', 2);
