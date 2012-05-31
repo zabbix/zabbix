@@ -484,8 +484,10 @@
 			new CCol(bold(_('Host group').': '), 'label col1'),
 			new CCol(array(
 				new CTextBox('filter_group', $filter_group, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_group', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_group&srctbl=host_group&srcfld1=name", 450, 450);', 'G'
+				new CButton('btn_group', _('Select'),
+					'return PopUp("popup.php?srctbl=host_group&srcfld1=name'.
+						'&dstfrm='.$form->getName().'&dstfld1=filter_group", 450, 450);',
+					'G'
 				)
 			), 'col1'),
 			new CCol(bold(_('Type').': '), 'label col2'),
@@ -500,8 +502,10 @@
 			new CCol(bold(_('Host').': '), 'label'),
 			new CCol(array(
 				new CTextBox('filter_hostname', $filter_hostname, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_host', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_hostid&dstfld2=filter_hostname&srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
+				new CButton('btn_host', _('Select'),
+					'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=hostid&srcfld2=name'.
+					'&dstfrm='.$form->getName().'&dstfld1=filter_hostid&dstfld2=filter_hostname'.
+					'&group=" + jQuery("#filter_group").val(), 450, 450);', 'H'
 				)
 			)),
 			new CCol($updateIntervalLabel, 'label'),
@@ -520,9 +524,12 @@
 			new CCol(bold(_('Application').': '), 'label'),
 			new CCol(array(
 				new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
-				new CButton('btn_app', _('Select'), 'return PopUp("popup.php?dstfrm='.$form->getName().
-					'&dstfld1=filter_application&srctbl=applications&srcfld1=name&with_applications=1'.
-					'&host=" + jQuery("#filter_hostname").val(), 550, 450, "application");', 'A'
+				new CButton('btn_app', _('Select'),
+					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
+						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
+						'&with_applications=1&host=" + jQuery("#filter_hostname").val()'
+						.', 550, 450, "application");',
+					'A'
 				)
 			)),
 			new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),

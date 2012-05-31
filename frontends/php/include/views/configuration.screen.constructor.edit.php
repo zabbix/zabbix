@@ -121,16 +121,19 @@ if ($resourcetype == SCREEN_RESOURCE_GRAPH) {
 
 	if ($this->data['screen']['templateid']) {
 		$selectButton = new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].'&dstfld1=resourceid&'.
-				"dstfld2=caption&srctbl=graphs&srcfld1=graphid&srcfld2=name&simpleName=1', 800, 450);", 'formlist'
+			'javascript: return PopUp("popup.php?srctbl=graphs&srcfld1=graphid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
+				'&writeonly=1&simpleName=1", 800, 450);',
+			'formlist'
 		);
 	}
 	else {
 		$selectButton = new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&real_hosts=1&with_graphs=1&dstfld1=resourceid&dstfld2=caption&srctbl=graphs&srcfld1=graphid'.
-				"&srcfld2=name', 800, 450);", 'formlist'
+			'javascript: return PopUp("popup.php?srctbl=graphs&srcfld1=graphid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&real_hosts=1&with_graphs=1&writeonly=1", 800, 450);',
+			'formlist'
 		);
 	}
 
@@ -170,15 +173,17 @@ elseif ($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 
 	if ($this->data['screen']['templateid']) {
 		$selectButton = new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].'&dstfld1=resourceid&'.
-				"dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=name&simpleName=1', 800, 450);", 'formlist'
+			'javascript: return PopUp("popup.php?srctbl=simple_graph&srcfld1=itemid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
+				'&simpleName=1&writeonly=1", 800, 450);', 'formlist'
 		);
 	}
 	else {
 		$selectButton = new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&real_hosts=1'.
-				"&with_simple_graph_items=1&dstfld1=resourceid&dstfld2=caption&srctbl=simple_graph&srcfld1=itemid&srcfld2=name', 800, 450);",
+			'javascript: return PopUp("popup.php?srctbl=simple_graph&srcfld1=itemid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&real_hosts=1&with_simple_graph_items=1&writeonly=1", 800, 450);',
 			'formlist'
 		);
 	}
@@ -215,8 +220,10 @@ elseif ($resourcetype == SCREEN_RESOURCE_MAP) {
 	$screenFormList->addRow(_('Parameter'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 		new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&dstfld1=resourceid'.
-				"&dstfld2=caption&srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name', 400, 450);", 'formlist'
+			'javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&writeonly=1", 400, 450);',
+			'formlist'
 		)
 	));
 }
@@ -247,16 +254,19 @@ elseif ($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT) {
 
 	if ($this->data['screen']['templateid']) {
 		$selectButton = new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].'&dstfld1=resourceid'.
-				"&dstfld2=caption&srctbl=plain_text&srcfld1=itemid&srcfld2=name', 800, 450);", 'formlist'
+			'javascript: return PopUp("popup.php?srctbl=plain_text&srcfld1=itemid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
+				'&writeonly=1", 800, 450);',
+			'formlist'
 		);
 	}
 	else {
 		$selectButton = new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&real_hosts=1&dstfld1=resourceid&dstfld2=caption&srctbl=plain_text&srcfld1=itemid'.
-				"&srcfld2=name', 800, 450);", 'formlist'
+			'javascript: return PopUp("popup.php?srctbl=plain_text&srcfld1=itemid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&real_hosts=1&writeonly=1", 800, 450);',
+			'formlist'
 		);
 	}
 
@@ -293,8 +303,10 @@ else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 		$screenFormList->addRow(_('Group'), array(
 			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 			new CButton('select', _('Select'),
-				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&dstfld1=resourceid'.
-					"&dstfld2=caption&srctbl=host_group&srcfld1=groupid&srcfld2=name', 800, 450);", 'formlist'
+				'javascript: return PopUp("popup.php?srctbl=host_group&srcfld1=groupid&srcfld2=name'.
+					'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+					'&writeonly=1", 800, 450);',
+				'formlist'
 			)
 		));
 	}
@@ -315,8 +327,10 @@ else if(in_array($resourcetype, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
 		$screenFormList->addRow(_('Host'), array(
 			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 			new CButton('select', _('Select'),
-				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&dstfld1=resourceid'.
-					"&dstfld2=caption&srctbl=hosts&srcfld1=hostid&srcfld2=name&real_hosts=1', 800, 450);", 'formlist'
+				'javascript: return PopUp("popup.php?srctbl=hosts&srcfld1=hostid&srcfld2=name'.
+					'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+					'&real_hosts=1&writeonly=1", 800, 450);',
+				'formlist'
 			)
 		));
 	}
@@ -364,8 +378,9 @@ elseif (in_array($resourcetype, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_
 	$screenFormList->addRow(_('Group'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 		new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				"&dstfld1=resourceid&dstfld2=caption&srctbl=overview&srcfld1=groupid&srcfld2=name', 800, 450);",
+			'javascript: return PopUp("popup.php?srctbl=overview&srcfld1=groupid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&writeonly=1", 800, 450);',
 			'formlist'
 		)
 	));
@@ -407,9 +422,10 @@ elseif ($resourcetype == SCREEN_RESOURCE_SCREEN) {
 	$screenFormList->addRow(_('Parameter'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 		new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				'&dstfld1=resourceid&dstfld2=caption&srctbl=screens2&srcfld1=screenid&srcfld2=name'.
-				'&screenid='.$_REQUEST['screenid']."', 800, 450);", 'formlist'
+			'javascript: return PopUp("popup.php?srctbl=screens2&srcfld1=screenid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&writeonly=1&screenid='.$_REQUEST['screenid'].'", 800, 450);',
+			'formlist'
 		)
 	));
 }
@@ -444,8 +460,9 @@ elseif ($resourcetype == SCREEN_RESOURCE_HOSTS_INFO || $resourcetype == SCREEN_R
 	$screenFormList->addRow(_('Group'), array(
 		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
 		new CButton('select', _('Select'),
-			"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
-				"&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name', 480, 450);",
+			'javascript: return PopUp("popup.php?srctbl=host_group_scr&srcfld1=groupid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&writeonly=1", 480, 450);',
 			'formlist'
 		)
 	));
