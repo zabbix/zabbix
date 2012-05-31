@@ -107,7 +107,7 @@ if (isset($_REQUEST['favobj'])) {
 					'screenids' => $screen['screenid']
 				));
 				if (empty($screens)) {
-					echo alert('No permissions');
+					insert_js('alert("No permissions");');
 				}
 				else {
 					$screens = API::Screen()->get(array(

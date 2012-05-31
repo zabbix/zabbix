@@ -523,7 +523,7 @@ else {
 	}
 }
 
-show_table_header(defined($page['title']) ? constant($page['title']) : $page['title'], $frmTitle);
+show_table_header($page['title'], $frmTitle);
 
 insert_js_function('addSelectedValues');
 insert_js_function('addValues');

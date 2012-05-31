@@ -350,8 +350,7 @@ function get_user_history() {
 
 	for ($i = 1; $i < 6; $i++) {
 		if (!zbx_empty($history['title'.$i])) {
-			$title = defined($history['title'.$i]) ? constant($history['title'.$i]) : $history['title'.$i];
-			$url = new CLink($title, $history['url'.$i], 'history');
+			$url = new CLink($history['title'.$i], $history['url'.$i], 'history');
 			array_push($result, array(SPACE, $url, SPACE));
 			array_push($result, $delimiter);
 		}

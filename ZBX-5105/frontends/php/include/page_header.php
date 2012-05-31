@@ -110,13 +110,11 @@ switch ($page['type']) {
 
 		// page title
 		$page_title = '';
-		if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
+		if (!zbx_empty($ZBX_SERVER_NAME)) {
 			$page_title = $ZBX_SERVER_NAME.': ';
 		}
-		if (!isset($page['title'])) {
-			$page['title'] = _('Zabbix');
-		}
-		$page_title = defined($page['title']) ? constant($page['title']) : $page['title'];
+		$page_title .= isset($page['title']) ? $page['title'] : _('Zabbix');
+
 		if (ZBX_DISTRIBUTED) {
 			if (isset($ZBX_VIEWED_NODES) && $ZBX_VIEWED_NODES['selected'] == 0) { // all selected
 				$page_title .= ' ('._('All nodes').') ';
@@ -125,6 +123,7 @@ switch ($page['type']) {
 				$page_title .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
 			}
 		}
+
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
 			$page_title .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
 		}
@@ -356,7 +355,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		}
 	}
 
-	if (!empty($ZBX_SERVER_NAME)) {
+	if (!zbx_empty($ZBX_SERVER_NAME)) {
 		$table = new CTable();
 		$table->addStyle('width: 100%;');
 
