@@ -458,7 +458,7 @@
 				var conditionType = jQuery(this).find('.label').data('conditiontype');
 
 				if (empty(str)) {
-					str = '(' + jQuery(this).find('.label').data('label');
+					str = ' (' + jQuery(this).find('.label').data('label');
 					conditionTypeHold = conditionType;
 				}
 				else {
