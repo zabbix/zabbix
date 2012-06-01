@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5000] fixed "all" shown instead of "not selected" in Monitoring -> Discovery (Toms)
 .......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
 .......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
 ..F....... [ZBX-5080] fixed incorrect JavaScript parameter encoding in the map editor (Pavels)
@@ -44,6 +45,7 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5000] fixed "all" shown instead of "not selected" in Monitoring -> Discovery (Toms)
 .......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
 .......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
 ..F....... [ZBX-5080] fixed incorrect JavaScript parameter encoding in the map editor (Pavels)
