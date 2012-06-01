@@ -701,6 +701,7 @@ class CGraph extends CZBXAPI {
 		$this->checkInput($graphs, true);
 
 		foreach ($graphs as $graph) {
+			// forbid updating templateid
 			unset($graph['templateid']);
 
 			$graphHosts = API::Host()->get(array(
@@ -785,26 +786,6 @@ class CGraph extends CZBXAPI {
 		}
 		if ($insertGitems) {
 			DB::insert('graphs_items', $insertGitems);
-		}
-
-		return $graph['graphid'];
-	}
-
-	protected function updateRealo($graph) {
-		$data = array(array(
-			'values' => $graph,
-			'where' => array('graphid' => $graph['graphid'])
-		));
-		DB::update('graphs', $data);
-
-		if (isset($graph['gitems'])) {
-			DB::delete('graphs_items', array('graphid' => $graph['graphid']));
-
-			foreach ($graph['gitems'] as $gitem) {
-				$gitem['graphid'] = $graph['graphid'];
-
-				DB::insert('graphs_items', array($gitem));
-			}
 		}
 
 		return $graph['graphid'];

@@ -691,6 +691,7 @@ class CGraphPrototype extends CZBXAPI {
 		$this->checkInput($graphs, true);
 
 		foreach ($graphs as $graph) {
+			// forbid updating templateid
 			unset($graph['templateid']);
 
 			$graphHosts = API::Host()->get(array(
