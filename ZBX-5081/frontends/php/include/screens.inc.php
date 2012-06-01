@@ -260,15 +260,18 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	foreach ($slides as $slide) {
 		$slide['delay'] = $slide['delay'] ? $slide['delay'] : 0;
 		if (isset($db_slides[$slide['slideid']])) {
-			if ($db_slides[$slide['slideid']]['delay'] != $slide['delay'] || $db_slides[$slide['slideid']]['step'] != $step) { // update slide
+			// update slide
+			if ($db_slides[$slide['slideid']]['delay'] != $slide['delay'] || $db_slides[$slide['slideid']]['step'] != $step) {
 				$result = DBexecute('UPDATE slides SET  step='.$step.', delay='.$slide['delay'].' WHERE slideid='.$slide['slideid']);
 			}
-			else { // do nothing with slide
+			// do nothing with slide
+			else {
 				$result = true;
 			}
 			unset($slidesToDel[$slide['slideid']]);
 		}
-		else { // insert slide
+		// insert slide
+		else {
 			$slideid = get_dbid('slides', 'slideid');
 			$result = DBexecute(
 				'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
@@ -281,7 +284,8 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 		}
 	}
 
-	if (!empty($slidesToDel)) { // delete unnecessary slides
+	// delete unnecessary slides
+	if (!empty($slidesToDel)) {
 		DBexecute('DELETE FROM slides WHERE slideid IN('.implode(',', $slidesToDel).')');
 	}
 
