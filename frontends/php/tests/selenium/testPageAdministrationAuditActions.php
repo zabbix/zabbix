@@ -26,7 +26,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 	public function testPageAdministrationAuditActions_CheckLayout() {
 
 		$this->login('auditacts.php?stime=20130207090000&period=63072000');
-		$this->assertTitle('Audit');
+		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 		$this->ok('AUDIT ACTIONS');
 		$this->ok('ACTIONS');
@@ -54,7 +54,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 	public function testPageAdministrationAuditActions_CheckValues($auditactions) {
 
 		$this->login('auditacts.php?stime=20130207090000&period=63072000');
-		$this->assertTitle('Audit');
+		$this->checkTitle('Audit');
 		$this->assertElementPresent('config');
 		$this->ok('AUDIT ACTIONS');
 		$this->ok('ACTIONS');
