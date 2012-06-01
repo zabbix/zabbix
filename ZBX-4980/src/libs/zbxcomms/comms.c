@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "comms.h"
-#include "log.h"
 
 #if defined(_WINDOWS)
 #	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
@@ -979,7 +978,6 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 
 	if (ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 	{
-
 		left = sizeof(zbx_uint64_t);
 		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
 		expected_len = zbx_letoh_uint64(expected_len);
@@ -1080,9 +1078,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int timeou
 						if (0 == strncmp(s->buf_dyn, "<req>", sizeof("<req>") - 1))
 						{
 							/* closing tag received in the last 10 bytes? */
-							s->buf_dyn[read_bytes] = '\0';
-							if (NULL != strstr(s->buf_dyn + read_bytes -
-									(10 > read_bytes ? read_bytes : 10), "</req>"))
+							if (NULL != strstr(s->buf_dyn + read_bytes - 10, "</req>"))
 								break;
 						}
 						else
