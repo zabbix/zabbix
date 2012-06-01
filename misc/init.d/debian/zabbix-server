@@ -24,6 +24,7 @@ case "$1" in
 	;;
   restart|force-reload)
 	$0 stop
+	sleep 10
 	$0 start
 	;;
   *)
