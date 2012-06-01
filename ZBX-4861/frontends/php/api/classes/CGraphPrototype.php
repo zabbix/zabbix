@@ -691,8 +691,6 @@ class CGraphPrototype extends CZBXAPI {
 		$this->checkInput($graphs, true);
 
 		foreach ($graphs as $graph) {
-			$dbGraph = $updGraphs[$graph['graphid']];
-
 			unset($graph['templateid']);
 
 			$graphHosts = API::Host()->get(array(
@@ -717,14 +715,13 @@ class CGraphPrototype extends CZBXAPI {
 			// check ymin, ymax items
 			$this->checkAxisItems($graph, $templatedGraph);
 
-			$this->updateReal($graph, $dbGraph);
+			$this->updateReal($graph, $updGraphs[$graph['graphid']]);
 
 			// inheritance
 			if ($templatedGraph) {
 				$this->inherit($graph);
 			}
 		}
-
 		return array('graphids' => $graphids);
 	}
 
@@ -1101,6 +1098,11 @@ class CGraphPrototype extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
 				}
 
+				// check color
+				if (!preg_match('/^[A-F0-9]{6}$/i', $gitem['color'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect colour "%1$s".', $gitem['color']));
+				}
+
 				// assigning with key preservs unique itemids
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
@@ -1144,7 +1146,7 @@ class CGraphPrototype extends CZBXAPI {
 			// check if the graph has at least one prototype
 			$hasPrototype = false;
 			foreach ($graph['gitems'] as $gitem) {
-				// $allowedItems used becaouse it is possible to make API call without full item data
+				// $allowedItems used because it is possible to make API call without full item data
 				if ($allowedItems[$gitem['itemid']]['flags'] == ZBX_FLAG_DISCOVERY_CHILD) {
 					$hasPrototype = true;
 					break;
@@ -1168,6 +1170,7 @@ class CGraphPrototype extends CZBXAPI {
 				'output' => API_OUTPUT_SHORTEN,
 				'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
 				'nopermissions' => true,
+				'preservekeys' => true, // faster
 				'limit' => 1 // one match enough for check
 			));
 			// if graph exists with given name and it is create action or update action with ids not matching, rise exception

@@ -443,7 +443,7 @@ class CGraph extends CZBXAPI {
 				$ggraphs = $gitem['graphs'];
 				unset($gitem['graphs']);
 				foreach ($ggraphs as $graph) {
-					$result[$graph['graphid']]['gitems'][] = $gitem;
+					$result[$graph['graphid']]['gitems'][$gitem['gitemid']] = $gitem;
 				}
 			}
 		}
@@ -687,16 +687,14 @@ class CGraph extends CZBXAPI {
 			'graphids' => $graphids,
 			'editable' => true,
 			'preservekeys' => true,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND
 		));
 
 		foreach ($graphs as $gnum => $graph) {
+			// if missing in $updateGraphs then no permissions
 			if (!isset($updateGraphs[$graph['graphid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-			if (!isset($graph['gitems'])) {
-				$graphs[$gnum]['gitems'] = $updateGraphs[$graph['graphid']]['gitems'];
 			}
 		}
 
@@ -717,17 +715,18 @@ class CGraph extends CZBXAPI {
 			foreach ($graphHosts as $host) {
 				if (HOST_STATUS_TEMPLATE == $host['status']) {
 					$templatedGraph = $host['hostid'];
+					if (count($graphHosts) > 1) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
+					}
 					break;
 				}
 			}
-			if ($templatedGraph && count($graphHosts) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" with template host cannot contain items from other hosts.', $graph['name']));
-			}
+
 
 			// check ymin, ymax items
 			$this->checkAxisItems($graph, $templatedGraph);
 
-			$this->updateReal($graph);
+			$this->updateReal($graph, $updateGraphs[$graph['graphid']]);
 
 			// inheritance
 			if ($templatedGraph) {
@@ -752,7 +751,46 @@ class CGraph extends CZBXAPI {
 		return $graphid;
 	}
 
-	protected function updateReal($graph) {
+	protected function updateReal($graph, $dbGraph) {
+		$dbGitems = $dbGraph['gitems'];
+		$dbGitemIds = zbx_objectValues($dbGitems, 'gitemid');
+
+		// update the graph if it's modified
+		if ($this->objectModified($graph, $dbGraph)) {
+			DB::updateByPk($this->tableName(), $graph['graphid'], $graph);
+		}
+
+		// update graph items
+		$insertGitems = array();
+		$deleteGitemIds = array_combine($dbGitemIds, $dbGitemIds);
+		foreach ($graph['gitems'] as $gitem) {
+			// updating an existing item
+			if (isset($dbGitems[$gitem['gitemid']])) {
+				if ($this->objectModified($gitem, $dbGitems[$gitem['gitemid']], 'graphs_items')) {
+					DB::updateByPk('graphs_items', $gitem['gitemid'], $gitem);
+				}
+
+				// remove this graph item from the collection so it won't get deleted
+				unset($deleteGitemIds[$gitem['gitemid']]);
+			}
+			// adding a new item
+			else {
+				$gitem['graphid'] = $graph['graphid'];
+				$insertGitems[] = $gitem;
+			}
+		}
+
+		if ($deleteGitemIds) {
+			DB::delete('graphs_items', array('gitemid' => $deleteGitemIds));
+		}
+		if ($insertGitems) {
+			DB::insert('graphs_items', $insertGitems);
+		}
+
+		return $graph['graphid'];
+	}
+
+	protected function updateRealo($graph) {
 		$data = array(array(
 			'values' => $graph,
 			'where' => array('graphid' => $graph['graphid'])
@@ -832,6 +870,7 @@ class CGraph extends CZBXAPI {
 			$chdGraphs = $this->get(array(
 				'filter' => array('templateid' => $tmpGraph['graphid'], 'flags' => array(ZBX_FLAG_DISCOVERY_CHILD, ZBX_FLAG_DISCOVERY_NORMAL)),
 				'output' => API_OUTPUT_EXTEND,
+				'selectGraphItems' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
 				'hostids' => $chdHost['hostid']
 			));
@@ -846,13 +885,14 @@ class CGraph extends CZBXAPI {
 				}
 
 				$tmpGraph['graphid'] = $chdGraph['graphid'];
-				$this->updateReal($tmpGraph);
+				$this->updateReal($tmpGraph, $chdGraph);
 			}
 			// check if graph with same name and items exists
 			else {
 				$chdGraph = $this->get(array(
 					'filter' => array('name' => $tmpGraph['name'], 'flags' => null),
 					'output' => API_OUTPUT_EXTEND,
+					'selectGraphItems' => API_OUTPUT_EXTEND,
 					'preservekeys' => true,
 					'nopermissions' => true,
 					'hostids' => $chdHost['hostid']
@@ -884,7 +924,7 @@ class CGraph extends CZBXAPI {
 						}
 
 						$tmpGraph['graphid'] = $chdGraph['graphid'];
-						$this->updateReal($tmpGraph);
+						$this->updateReal($tmpGraph, $chdGraph);
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph "%1$s" already exists on "%2$s" (items are not identical).', $tmpGraph['name'], $chdHost['host']));
@@ -1039,7 +1079,7 @@ class CGraph extends CZBXAPI {
 			// graph fields
 			$fields = array('name' => null);
 			if (!$update && !check_db_fields($fields, $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for graph.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "name" field for graph.'));
 			}
 
 			// no items
@@ -1051,7 +1091,7 @@ class CGraph extends CZBXAPI {
 			$fields = array('itemid' => null);
 			foreach ($graph['gitems'] as $gitem) {
 				if (!check_db_fields($fields, $gitem)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for items.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Missing "itemid" field for item.'));
 				}
 
 				// check color
@@ -1059,6 +1099,7 @@ class CGraph extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect colour "%1$s".', $gitem['color']));
 				}
 
+				// assigning with key preservs unique itemids
 				$itemids[$gitem['itemid']] = $gitem['itemid'];
 			}
 
@@ -1076,16 +1117,18 @@ class CGraph extends CZBXAPI {
 			}
 		}
 
-		if (!empty($itemids)) {
-			$allowedItems = API::Item()->get(array(
-				'nodeids' => get_current_nodeid(true),
-				'itemids' => array_unique($itemids),
-				'webitems' => true,
-				'editable' => true,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true
-			));
 
+		$allowedItems = API::Item()->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'itemids' => $itemids,
+			'webitems' => true,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		));
+
+		// check permissions only for non super admins
+		if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
 			foreach ($itemids as $itemid) {
 				if (!isset($allowedItems[$itemid])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -1093,11 +1136,11 @@ class CGraph extends CZBXAPI {
 			}
 		}
 
-		foreach ($graphs as $graph) {
-			if (!isset($graph['name'])) {
-				continue;
-			}
 
+		$graphNames = array();
+		foreach ($graphs as $graph) {
+
+			// check if the host has any graphs in DB with the same name within host
 			$hosts = API::Host()->get(array(
 				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
 				'output' => API_OUTPUT_SHORTEN,
@@ -1105,18 +1148,32 @@ class CGraph extends CZBXAPI {
 				'preservekeys' => true
 			));
 
+			$hostids = array_keys($hosts);
 			$graphsExists = $this->get(array(
-				'hostids' => array_keys($hosts),
+				'hostids' => $hostids,
 				'output' => API_OUTPUT_SHORTEN,
-				'filter' => array('name' => $graph['name'], 'flags' => null),
+				'filter' => array('name' => $graph['name'], 'flags' => null), // 'flags' => null overrides default behaviour
 				'nopermissions' => true,
-				'preservekeys' => true,
-				'limit' => 1
+				'preservekeys' => true, // faster
+				'limit' => 1 // one match enough for check
 			));
 
+			// if graph exists with given name and it is create action or update action with ids not matching, rise exception
 			foreach ($graphsExists as $graphExists) {
 				if (!$update || (bccomp($graphExists['graphid'], $graph['graphid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Graph with name "%1$s" already exists.', $graph['name']));
+				}
+			}
+			// cheks that there is no two graphs with the same name within host
+			foreach ($hostids as $hostid) {
+				if (!isset($graphNames[$graph['name']])) {
+					$graphNames[$graph['name']] = array();
+				}
+				if (isset($graphNames[$graph['name']][$hostid])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('More than one graph with name "%1$s" within host.', $graph['name']));
+				}
+				else {
+					$graphNames[$graph['name']][$hostid] = true;
 				}
 			}
 		}
