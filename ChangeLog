@@ -5,6 +5,8 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+.......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
+.......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
 ..F....... [ZBX-5080] fixed incorrect JavaScript parameter encoding in the map editor (Pavels)
 ..F....... [ZBX-4974] fixed don't show groups w/o templates when linking a template (Toms)
 ..F....... [ZBX-5096] fixed error when create hostgroup with too long name (Vedmak)
@@ -42,6 +44,8 @@ New features:
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+.......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
+.......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
 ..F....... [ZBX-5080] fixed incorrect JavaScript parameter encoding in the map editor (Pavels)
 ..F....... [ZBX-4974] fixed don't show groups w/o templates when linking a template (Toms)
 ..F....... [ZBX-5096] fixed error when create hostgroup with too long name (Vedmak)
@@ -771,6 +775,8 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+.......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
+.......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
 A......... [ZBX-5091] fixed usermacro.get templateids filter (Vedmak)
 ..F....... [ZBX-4031] fixed error message when deleting a link in a map (Pavels)
 ..F....... [ZBX-5006] fixed allowed memory size exceeded; thanks to Mike Brady (Toms)
