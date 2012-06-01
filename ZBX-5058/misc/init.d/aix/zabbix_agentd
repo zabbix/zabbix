@@ -14,7 +14,7 @@ stop)
 
 restart)
 	$0 stop
-	sleep 5
+	sleep 10
 	$0 start
 	;;
 

@@ -51,6 +51,7 @@ case "$1" in
         ;;
   reload|restart)
         stop
+        sleep 10
         start
         RETVAL=$?
         ;;
