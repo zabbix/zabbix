@@ -33,7 +33,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	public function testPageAdministrationGeneralRegexp_CheckLayout($regexp) {
 
 		$this->login('adm.regexps.php');
-		$this->assertTitle('Configuration of regular expressions');
+		$this->checkTitle('Configuration of regular expressions');
 		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->ok('Regular expressions');
 		$this->ok(array('Name', 'Expressions'));

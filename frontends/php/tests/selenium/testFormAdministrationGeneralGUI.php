@@ -186,7 +186,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('search_limit', '1');
 		$this->button_click('save');
@@ -197,7 +197,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('search_limit', '999999');
 		$this->button_click('save');
@@ -209,7 +209,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		// Check to enter 0 value
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok('CONFIGURATION OF GUI');
 		$this->ok('GUI');
 		$this->input_type('search_limit', '0');
@@ -221,7 +221,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		// Check to enter -1 value
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('search_limit', '-1');
 		$this->button_click('save');
@@ -249,7 +249,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "max_in_table"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('max_in_table', '1');
 		$this->button_click('save');
@@ -260,7 +260,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "max_in_table"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('max_in_table', '99999');
 		$this->button_click('save');
@@ -271,7 +271,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "max_in_table"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('max_in_table', '-1');
 		$this->button_click('save');
@@ -302,7 +302,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_ack_enable"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->checkbox_unselect('event_ack_enable');
 
@@ -335,7 +335,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_expire"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok('CONFIGURATION OF GUI');
 		$this->ok('GUI');
 		$this->input_type('event_expire', '1');
@@ -350,7 +350,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_expire"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('event_expire', '100000');
 		$this->button_click('save');
@@ -360,7 +360,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('event_expire', '0');
 		$this->button_click('save');
@@ -388,7 +388,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_show_max"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', ));
 		$this->input_type('event_show_max', '1');
 		$this->button_click('save');
@@ -399,7 +399,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_show_max"');
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('event_show_max', '100000');
 		$this->button_click('save');
@@ -409,7 +409,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
 
 		$this->dropdown_select_wait('configDropDown', 'GUI');
-		$this->assertTitle('Configuration of GUI');
+		$this->checkTitle('Configuration of GUI');
 		$this->ok(array('CONFIGURATION OF GUI', 'GUI'));
 		$this->input_type('event_show_max', '0');
 		$this->button_click('save');
