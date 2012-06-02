@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-02 09:03+0300\n"
-"PO-Revision-Date: 2011-09-23 13:46+0200\n"
+"POT-Creation-Date: 2012-06-02 09:04+0300\n"
+"PO-Revision-Date: 2012-05-21 18:34+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -183,7 +183,7 @@ msgstr "稼働レポート"
 
 #: report3.php:86 srv_status.php:162
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "SLAの許容値"
 
 #: sysmap.php:85
 msgid "Access denied!"
@@ -267,7 +267,7 @@ msgstr "アクション"
 #: api/classes/CAction.php:817 api/classes/CAction.php:916
 #, php-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "アクション\"%1$s\"の\"エスカレーションの間隔\"の設定が正しくありません (最小%2$s秒)."
 
 #: api/classes/CAction.php:820 api/classes/CAction.php:835
 #: api/classes/CAction.php:925 api/classes/CAction.php:945
@@ -317,7 +317,7 @@ msgstr "アクティブ"
 #: include/views/configuration.maintenance.list.php:61
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "有効"
 
 #: api/classes/CMaintenance.php:508 api/classes/CMaintenance.php:621
 #: include/views/configuration.maintenance.edit.php:58 maintenance.php:116
@@ -600,7 +600,7 @@ msgstr "適用"
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "メンテナンス待ち"
 
 #: include/func.inc.php:221
 msgid "Apr"
@@ -700,7 +700,7 @@ msgstr "認証方式"
 
 #: authentication.php:158 authentication.php:159
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "認証方式をHTTPに変更"
 
 #: authentication.php:121 authentication.php:122
 msgid "Authentication method changed to LDAP"
@@ -765,7 +765,7 @@ msgstr "軸の位置"
 #: include/func.inc.php:387
 msgctxt "Byte short"
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: include/page_header.php:220
 msgid "BACK"
@@ -1209,15 +1209,15 @@ msgstr "値のマッピングを追加できません"
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "認証方式をHTTPに変更できません"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP"
-msgstr ""
+msgstr "認証方式をLDAPに変更できません"
 
 #: authentication.php:86
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr ""
+msgstr "認証方式をZabbix内部データベースに変更できません"
 
 #: api/classes/CTemplateScreen.php:591
 #, php-format
@@ -1484,7 +1484,7 @@ msgstr "メディアタイプを有効にできません"
 #: include/classes/import/CXmlImport18.php:668
 #, php-format
 msgid "Cannot find background image \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたマップ\"%2$s\"で利用されている背景イメージ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:188
 #, php-format
@@ -1495,7 +1495,7 @@ msgstr "マップ\"%1$sの背景イメージが見つかりません。"
 #: include/classes/import/CXmlImport18.php:1627
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたスクリーン\"%2$s\"で利用されているグラフ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
@@ -1505,7 +1505,7 @@ msgstr "スクリーン\"%2$s\"で利用されているグラフ\"%1$s\"が見�
 #: include/classes/import/importers/CMapImporter.php:208
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているグループ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
 #, php-format
@@ -1515,17 +1515,17 @@ msgstr "スクリーン\"%2$s\"で利用されているグループ\"%1$s\"が�
 #: include/classes/import/CXmlImport18.php:720
 #, php-format
 msgid "Cannot find host \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたマップ\"%2$s\"で利用されているホスト\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:476
 #, php-format
 msgid "Cannot find host \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたスクリーン\"%2$s\"で利用されているホスト\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:216
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"で利用されているホスト\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
@@ -1546,12 +1546,12 @@ msgstr "アイテムのキー\"%2$s\"のインターフェースはホスト\"%1
 #: include/classes/import/CXmlImport18.php:709
 #, php-format
 msgid "Cannot find hostgroup \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたマップ\"%2$s\"で利用されているホストグループ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:464
 #, php-format
 msgid "Cannot find hostgroup \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたスクリーン\"%2$s\"で利用されているホストグループ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:245
 #, php-format
@@ -1571,13 +1571,13 @@ msgstr "エクスポートされたマップ\"%2$s\"で利用されているア�
 #: include/classes/import/CXmlImport18.php:748
 #, php-format
 msgid "Cannot find image \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたマップ\"%2$s\"で利用されているイメージ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:500
 #: include/classes/import/CXmlImport18.php:1640
 #, php-format
 msgid "Cannot find item \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたスクリーン\"%2$s\"で利用されているアイテム\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
@@ -1587,12 +1587,12 @@ msgstr "スクリーン\"%2$s\"で利用されているアイテム\"%1$s\"が�
 #: include/classes/import/CXmlImport18.php:698
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたマップ\"%2$s\"で利用されているマップ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/CXmlImport18.php:511
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたスクリーン\"%2$s\"で利用されているマップ\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:200
 #, php-format
@@ -1611,7 +1611,7 @@ msgstr "そのような名前を持ったオブジェクトは存在しません
 #: include/classes/import/CXmlImport18.php:522
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたスクリーン\"%2$s\"で利用されているスクリーン\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
@@ -1627,7 +1627,7 @@ msgstr "マップ\"%2$s\"のトリガー\"%1$s\"が見つかりません。"
 #: include/classes/import/CXmlImport18.php:767
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "エクスポートされたマップ\"%2$s\"で利用されているトリガー\"%1$s\"が見つかりません。"
 
 #: include/classes/import/importers/CMapImporter.php:225
 #, php-format
@@ -1963,7 +1963,7 @@ msgstr "変更"
 #: latest.php:200
 msgctxt "noun in latest data"
 msgid "Change"
-msgstr ""
+msgstr "変更"
 
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
@@ -2048,7 +2048,7 @@ msgstr "テンプレート%1$sに循環参照が存在します。"
 
 #: include/classes/core/ZBase.php:123
 msgid "Classic"
-msgstr ""
+msgstr "クラシック"
 
 #: jsLoader.php:157
 msgid "Clear"
@@ -2730,7 +2730,7 @@ msgstr "D"
 
 #: include/defines.inc.php:880
 msgid "D, d M Y H:i:s O"
-msgstr ""
+msgstr "D, Y/m/d H:i:s O"
 
 #: dashconf.php:110
 msgid "DASHBOARD CONFIGURATION"
@@ -3247,7 +3247,7 @@ msgstr "テンプレートを削除しますか？"
 
 #: jsLoader.php:177
 msgid "Delete the selected service?"
-msgstr ""
+msgstr "選択したサービスを削除しますか？"
 
 #: include/views/configuration.triggers.edit.php:356
 msgid "Delete trigger?"
@@ -3665,12 +3665,12 @@ msgstr "点線"
 #: include/blocks.inc.php:1010
 msgctxt "discovery results in dashboard"
 msgid "Down"
-msgstr ""
+msgstr "Down"
 
 #: include/discovery.inc.php:150
 msgctxt "discovery status"
 msgid "Down"
-msgstr ""
+msgstr "Down"
 
 #: api/classes/CWebCheck.php:512
 #, php-format
@@ -3769,7 +3769,7 @@ msgstr "ダイナミックアイテム"
 #: include/func.inc.php:553
 msgctxt "Exa short"
 msgid "E"
-msgstr ""
+msgstr "E"
 
 #: include/config.inc.php:308
 msgid "ERROR"
@@ -4171,7 +4171,7 @@ msgstr "JSON-rpc version 2.0が必要です, \"%s\" でリクエストされま�
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
 msgid "Expired"
-msgstr ""
+msgstr "期限切れ"
 
 #: include/graphs.inc.php:28 popup.php:1410
 msgid "Exploded"
@@ -4235,7 +4235,7 @@ msgstr "Ez Texting"
 #: jsLoader.php:123
 msgctxt "Friday short"
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #: include/forms.inc.php:1795 include/forms.inc.php:1815
 msgid "FALSE"
@@ -4356,7 +4356,7 @@ msgstr "第1週"
 #: include/func.inc.php:1536
 msgctxt "page navigation"
 msgid "First"
-msgstr ""
+msgstr "第1週"
 
 #: include/views/js/configuration.sysmaps.js.php:41
 msgid "Fit to map"
@@ -4446,7 +4446,7 @@ msgstr "関数は\"%1$s\"パラメータをサポートします。"
 #: include/func.inc.php:550
 msgctxt "Giga short"
 msgid "G"
-msgstr ""
+msgstr "G"
 
 #: include/views/administration.mediatypes.edit.php:60
 #: include/views/administration.mediatypes.list.php:57
@@ -4472,7 +4472,7 @@ msgstr "一般設定"
 #: chart4.php:182 chart5.php:201 include/classes/class.cbar.php:739
 #, php-format
 msgid "Generated in %s sec"
-msgstr ""
+msgstr "Generated in %s sec"
 
 #: include/locales.inc.php:49
 msgid "German (de_DE)"
@@ -4709,7 +4709,7 @@ msgstr "グループ\"%1$s\"は存在しません。"
 #: include/classes/import/importers/CHostImporter.php:135
 #, php-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "ホスト\"%2$s\"のグループ\"%1$s\"は存在しません。"
 
 #: api/classes/CHostGroup.php:750
 #, php-format
@@ -5286,11 +5286,11 @@ msgstr "ITサービス"
 
 #: include/views/configuration.services.child.list.php:25
 msgid "IT service dependencies"
-msgstr ""
+msgstr "ITサービスの依存関係"
 
 #: include/views/configuration.services.parent.list.php:25
 msgid "IT service parent"
-msgstr ""
+msgstr "ITサービスの親"
 
 #: include/menu.inc.php:83 include/menu.inc.php:219
 #: include/views/configuration.services.list.php:26 srv_status.php:26
@@ -6360,7 +6360,7 @@ msgstr "アイテム\"%1$s\"は存在しません。"
 #: include/classes/import/CConfigurationImport.php:558
 #, php-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
-msgstr ""
+msgstr "\"%2$s\"上のアイテム\"%1$s\": アプリケーション\"%3$s\"は存在しません。"
 
 #: api/classes/CItemGeneral.php:308
 #, php-format
@@ -6574,7 +6574,7 @@ msgstr "6月"
 #: include/func.inc.php:394 include/func.inc.php:548
 msgctxt "Kilo short"
 msgid "K"
-msgstr ""
+msgstr "K"
 
 #: include/forms.inc.php:537
 msgid "Keep history"
@@ -6657,11 +6657,11 @@ msgstr "LDAPホスト"
 
 #: authentication.php:137
 msgid "LDAP login successful"
-msgstr ""
+msgstr "LDAPによるログインが成功しました"
 
 #: authentication.php:137
 msgid "LDAP login was not successful"
-msgstr ""
+msgstr "LDAPによるログインが失敗しました"
 
 #: include/screens.inc.php:1127
 msgid "LOCAL"
@@ -6693,7 +6693,7 @@ msgstr "最新"
 #: include/func.inc.php:1579
 msgctxt "page navigation"
 msgid "Last"
-msgstr ""
+msgstr "最新"
 
 #: dashboard.php:317
 #, php-format
@@ -6934,12 +6934,12 @@ msgstr "不明"
 #: include/func.inc.php:390 include/func.inc.php:549
 msgctxt "Mega short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:119
 msgctxt "Monday short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: include/defines.inc.php:874 report3.php:117
 msgid "M Y"
@@ -7242,7 +7242,7 @@ msgstr "5月"
 #: include/func.inc.php:222
 msgctxt "May short"
 msgid "May"
-msgstr ""
+msgstr "5月"
 
 #: include/views/administration.mediatypes.edit.php:98
 #: include/views/administration.users.edit.php:161
@@ -7661,7 +7661,7 @@ msgstr "次へ"
 #: include/func.inc.php:1571
 msgctxt "page navigation"
 msgid "Next"
-msgstr ""
+msgstr "次へ"
 
 #: queue.php:246
 msgid "Next check"
@@ -7735,7 +7735,7 @@ msgstr "実行するアクションのコマンド\"%s\"に認証ユーザー名
 
 #: api/classes/CItemGeneral.php:292
 msgid "No authentication user name specified."
-msgstr ""
+msgstr "認証ユーザー名設定されていません。"
 
 #: charts.php:143 history.php:462
 msgid "No charts defined."
@@ -8021,7 +8021,7 @@ msgstr "アイテム\"%1$s\"への権限がありません。"
 #: include/classes/import/CXmlImport18.php:1117
 #, php-format
 msgid "No permission for template \"%1$s\"."
-msgstr ""
+msgstr "テンプレート\"%1$s\"への権限がありません。"
 
 #: include/classes/import/CXmlImport18.php:1387
 #, php-format
@@ -8083,7 +8083,7 @@ msgstr "実行するアクションのコマンド\"%s\"に秘密鍵ファイル
 
 #: api/classes/CItemGeneral.php:300
 msgid "No private key file specified."
-msgstr ""
+msgstr "秘密鍵ファイルが設定されていません。"
 
 #: include/views/administration.proxy.list.php:42 popup.php:1936
 msgid "No proxies defined."
@@ -8100,7 +8100,7 @@ msgstr "実行するアクションのコマンド\"%s\"に公開鍵ファイル
 
 #: api/classes/CItemGeneral.php:297
 msgid "No public key file specified."
-msgstr ""
+msgstr "公開鍵ファイルが設定されていません。"
 
 #: api/classes/CAction.php:1529
 msgid "No recipients for action operation message."
@@ -8184,7 +8184,7 @@ msgstr "トリガーが設定されていません。"
 
 #: report5.php:57
 msgid "No triggers found."
-msgstr ""
+msgstr "トリガーが存在しません。"
 
 #: include/views/administration.usergroups.list.php:42 popup.php:829
 #: popup_usrgrp.php:89
@@ -8201,7 +8201,7 @@ msgstr "値のマッピングが設定されていません。"
 
 #: latest.php:192
 msgid "No values found."
-msgstr ""
+msgstr "値が存在しません。"
 
 #: httpmon.php:139
 msgid "No web checks defined."
@@ -8573,7 +8573,7 @@ msgstr "ユニークかどうかだけチェックします。"
 #: include/services.inc.php:289
 #, php-format
 msgid "Only the last 20%% of the indicator is displayed."
-msgstr ""
+msgstr "上位20%%の領域が表示されています。"
 
 #: include/blocks.inc.php:695
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
@@ -8728,7 +8728,7 @@ msgstr "プロキシごとの概要"
 #: include/func.inc.php:552
 msgctxt "Peta short"
 msgid "P"
-msgstr ""
+msgstr "P"
 
 #: dashboard.php:225
 msgid "PERSONAL DASHBOARD"
@@ -9132,7 +9132,7 @@ msgstr "前"
 #: include/func.inc.php:1544
 msgctxt "page navigation"
 msgid "Previous"
-msgstr ""
+msgstr "前"
 
 #: include/hosts.inc.php:405
 msgid "Primary POC cell"
@@ -9195,7 +9195,7 @@ msgstr "障害"
 
 #: srv_status.php:161
 msgid "Problem time"
-msgstr ""
+msgstr "障害時間"
 
 #: include/services.inc.php:60
 msgid "Problem, if all children have problems"
@@ -9232,7 +9232,7 @@ msgstr "プロキシ"
 #: include/classes/import/importers/CHostImporter.php:147
 #, php-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "ホスト\"%2$s\"のプロキシ\"%1$s\"は存在しません。"
 
 #: api/classes/CProxy.php:381
 #, php-format
@@ -9715,12 +9715,12 @@ msgstr "ロシア語 (ru_RU)"
 #: jsLoader.php:124
 msgctxt "Saturday short"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #: jsLoader.php:125
 msgctxt "Sunday short"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #: host_screen.php:140 host_screen.php:159
 #: include/views/monitoring.screen.php:38
@@ -10051,7 +10051,7 @@ msgstr "スクリーンを削除しました"
 
 #: api/classes/CScreenItem.php:349
 msgid "Screen item in same cell already exists."
-msgstr ""
+msgstr "同じセルにスクリーンの要素がすでに存在します。"
 
 #: screenedit.php:236 screenedit.php:251
 msgid "Screen should contain at least one row and column."
@@ -10891,17 +10891,17 @@ msgstr "システムステータス"
 #: include/func.inc.php:551
 msgctxt "Tera short"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: jsLoader.php:122
 msgctxt "Thursday short"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: jsLoader.php:120
 msgctxt "Tuesday short"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 #: include/discovery.inc.php:65
 #: include/views/js/configuration.discovery.edit.js.php:125
@@ -10987,7 +10987,7 @@ msgstr "テンプレート\"%1$s\"はそでに存在します。"
 #: include/classes/import/importers/CHostImporter.php:39
 #, php-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
-msgstr ""
+msgstr "ホスト\"%2$s\"のテンプレート\"%1$s\"は存在しません。"
 
 #: api/classes/CTemplate.php:1001
 #, php-format
@@ -11792,12 +11792,12 @@ msgstr "インポートフォーマット\"%1$s\"はサポートされていま�
 #: include/blocks.inc.php:1009
 msgctxt "discovery results in dashboard"
 msgid "Up"
-msgstr ""
+msgstr "Up"
 
 #: include/discovery.inc.php:149
 msgctxt "discovery status"
 msgid "Up"
-msgstr ""
+msgstr "Up"
 
 #: include/views/administration.auditlogs.list.php:46
 #: include/views/configuration.action.edit.php:924
@@ -11891,7 +11891,7 @@ msgstr "アップタイム/ダウンタイム"
 #: include/screens.inc.php:44
 #: include/views/configuration.screen.constructor.edit.php:545
 msgid "Url"
-msgstr ""
+msgstr "URL"
 
 #: include/views/configuration.item.edit.php:257
 msgid "Use custom multiplier"
@@ -12185,7 +12185,7 @@ msgstr "ホスト名を設定しない場合、表示名は必須項目です。
 #: jsLoader.php:121
 msgctxt "Wednesday short"
 msgid "W"
-msgstr ""
+msgstr "W"
 
 #: adm.triggerseverities.php:58 include/items.inc.php:33
 #: include/views/administration.general.triggerSeverity.edit.php:46
@@ -12523,13 +12523,13 @@ msgstr "Y"
 #: include/func.inc.php:555
 msgctxt "Yotta short"
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #. GETTEXT: Date format (year). Do not translate.
 #: include/defines.inc.php:873
 msgctxt "date format"
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: include/views/configuration.graph.edit.php:273
 msgid "Y axis MAX value"
@@ -12698,7 +12698,7 @@ msgstr "分散監視用に設定されていません。"
 #: include/func.inc.php:554
 msgctxt "Zetta short"
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: index.php:30
 msgid "ZABBIX"
@@ -12892,7 +12892,7 @@ msgstr "平均"
 #: include/func.inc.php:456 jsLoader.php:91
 msgctxt "day short"
 msgid "d"
-msgstr ""
+msgstr "d"
 
 #: include/defines.inc.php:875 include/maintenances.inc.php:57
 #: include/page_header.php:472 include/views/configuration.item.list.php:101
@@ -12999,7 +12999,7 @@ msgstr "found"
 #: include/func.inc.php:464 jsLoader.php:92
 msgctxt "hour short"
 msgid "h"
-msgstr ""
+msgstr "h"
 
 #: include/views/configuration.maintenance.edit.php:54
 #: include/views/configuration.maintenance.edit.php:69
@@ -13050,17 +13050,17 @@ msgstr "含まれる"
 #: include/func.inc.php:546
 msgctxt "Milli short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/func.inc.php:472 jsLoader.php:93
 msgctxt "minute short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/func.inc.php:448 jsLoader.php:89
 msgctxt "month short"
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: include/views/js/common.macros.js.php:53
 msgid "macro(s)"
@@ -13104,7 +13104,7 @@ msgstr ""
 #: include/func.inc.php:426 include/func.inc.php:482
 msgctxt "millisecond short"
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: include/views/administration.authentication.edit.php:63
 msgid "must be a valid LDAP user"
@@ -13208,7 +13208,7 @@ msgstr "実行中"
 #: include/func.inc.php:426 include/func.inc.php:477
 msgctxt "second short"
 msgid "s"
-msgstr ""
+msgstr "s"
 
 #: include/page_header.php:129
 #: include/views/configuration.httpconf.edit.php:188
@@ -13266,7 +13266,7 @@ msgstr "値"
 #: jsLoader.php:90
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #: include/maintenances.inc.php:74
 msgid "week"
@@ -13283,7 +13283,7 @@ msgstr "整数"
 #: include/func.inc.php:440 jsLoader.php:88
 msgctxt "year short"
 msgid "y"
-msgstr ""
+msgstr "y"
 
 #: include/classes/class.frontendsetup.php:316
 #: include/classes/class.frontendsetup.php:335
@@ -13309,4 +13309,4 @@ msgstr ""
 #: include/func.inc.php:545
 msgctxt "Micro short"
 msgid "µ"
-msgstr ""
+msgstr "µ"

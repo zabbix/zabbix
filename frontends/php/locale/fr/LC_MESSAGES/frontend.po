@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-02 09:03+0300\n"
-"PO-Revision-Date: 2012-05-17 20:52+0200\n"
+"POT-Creation-Date: 2012-06-02 09:04+0300\n"
+"PO-Revision-Date: 2012-05-19 16:54+0200\n"
 "Last-Translator: JBo <jbo759346@aperto.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1027,7 +1027,7 @@ msgstr "CONFIGURATION DE LA SUPERVISION WEB"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
-msgstr ""
+msgstr "CONFIGURATION DES HEURES OUVRÉES"
 
 #: adm.triggerdisplayoptions.php:92
 msgid "CONFIGURATION OF ZABBIX"
@@ -1595,22 +1595,22 @@ msgstr "Impossible de trouver l'élément \"%1$s\" utilisé dans l'écran \"%2$s
 #: include/classes/import/CXmlImport18.php:698
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver la carte \"%1$s\" utilisée dans la carte exportée \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:511
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver la carte \"%1$s\" utilisée dans l'écran exporté \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:200
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "Impossible de trouver la carte \"%1$s\" utilisée dans la carte \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver la carte \"%1$s\" utilisée dans l'écran \"%2$s\"."
 
 #: include/js.inc.php:326
 msgid "Cannot find objects with name"
@@ -1619,28 +1619,28 @@ msgstr "Impossible de trouver les objets avec le nom"
 #: include/classes/import/CXmlImport18.php:522
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'écran \"%1$s\" utilisée dans l'écran exporté \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'écran \"%1$s\" utilisée dans l'écran \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:266
 #, php-format
 msgid "Cannot find trigger \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver le déclencheur \"%1$s\" pour la carte \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:731
 #: include/classes/import/CXmlImport18.php:767
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver le déclencheur \"%1$s\" utilisé dans la carte exportée \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:225
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "Impossible de trouver le déclencheur \"%1$s\" utilisé dans la carte \"%2$s\"."
 
 #: srv_status.php:188
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -1648,7 +1648,7 @@ msgstr ""
 
 #: services.php:406
 msgid "Cannot format tree."
-msgstr ""
+msgstr "Impossible de formater l'arborescence"
 
 #: api/classes/CTemplate.php:1412
 msgid "Cannot have empty visible template name"
@@ -1665,15 +1665,15 @@ msgstr "Impossible d'imploser l'expression \"%s\"."
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'importer l'écran \"%2$s\": le sous-écran \"%3$s\" n'existe pas."
+msgstr[1] "Impossible d'importer l'écran \"%2$s\": les sous-écrans \"%3$s\" n'existent pas."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'importer le modèle \"%2$s\": le modèle lié \"%3$s\" n'existe pas."
+msgstr[1] "Impossible d'importer le modèle \"%2$s\": les modèles liés \"%3$s\" n'existent pas."
 
 #: include/classes/class.cview.php:114
 #, php-format
@@ -1975,7 +1975,7 @@ msgstr "Changement"
 #: latest.php:200
 msgctxt "noun in latest data"
 msgid "Change"
-msgstr ""
+msgstr "Variation"
 
 #: include/views/administration.mediatypes.edit.php:68
 #: include/views/administration.users.edit.php:64
@@ -2046,21 +2046,21 @@ msgstr "Impossible de créer un lien circulaire pour l'élément de la carte \"%
 #: include/classes/import/importers/CMapImporter.php:89
 #, php-format
 msgid "Circular reference in maps: %1$s."
-msgstr ""
+msgstr "Référence circulaire dans les cartes: %1$s."
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, php-format
 msgid "Circular reference in screens: %1$s."
-msgstr ""
+msgstr "Référence circulaire dans les écrans: %1$s."
 
 #: include/classes/import/importers/CTemplateImporter.php:139
 #, php-format
 msgid "Circular reference in templates: %1$s."
-msgstr ""
+msgstr "Référence circulaire dans les modèles: %1$s."
 
 #: include/classes/core/ZBase.php:123
 msgid "Classic"
-msgstr ""
+msgstr "Classique"
 
 #: jsLoader.php:157
 msgid "Clear"
@@ -2224,11 +2224,11 @@ msgstr "Configuration des actions"
 
 #: applications.php:26
 msgid "Configuration of applications"
-msgstr ""
+msgstr "Configuration des applications"
 
 #: authentication.php:24
 msgid "Configuration of authentication"
-msgstr ""
+msgstr "Configuration de l'authentification"
 
 #: discoveryconf.php:26
 msgid "Configuration of discovery"
@@ -2236,7 +2236,7 @@ msgstr "Configuration de la découverte"
 
 #: host_discovery.php:27
 msgid "Configuration of discovery rules"
-msgstr ""
+msgstr "Configuration des règles de découverte"
 
 #: graphs.php:27
 msgid "Configuration of graphs"
@@ -2244,11 +2244,11 @@ msgstr "Configuration des graphiques"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
-msgstr ""
+msgstr "Configuration des groupes d'hôtes"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
-msgstr ""
+msgstr "Configuration des hôtes"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeper"
@@ -2260,11 +2260,11 @@ msgstr ""
 
 #: adm.images.php:25
 msgid "Configuration of images"
-msgstr ""
+msgstr "Configuration des images"
 
 #: disc_prototypes.php:27
 msgid "Configuration of item prototypes"
-msgstr ""
+msgstr "Configuration des prototypes d'éléments"
 
 #: items.php:27
 msgid "Configuration of items"
@@ -2272,15 +2272,15 @@ msgstr "Configuration des éléments"
 
 #: adm.macros.php:24
 msgid "Configuration of macros"
-msgstr ""
+msgstr "Configuration des macros"
 
 #: maintenance.php:27
 msgid "Configuration of maintenance"
-msgstr ""
+msgstr "Configuration de la maintenance"
 
 #: media_types.php:26
 msgid "Configuration of media types"
-msgstr ""
+msgstr "Configuration des types de médias"
 
 #: sysmap.php:26 sysmaps.php:34
 msgid "Configuration of network maps"
@@ -2288,7 +2288,7 @@ msgstr "CONFIGURATION DE LA CARTE DES ELEMENTS RESEAU"
 
 #: nodes.php:25
 msgid "Configuration of nodes"
-msgstr ""
+msgstr "Configuration des nœuds"
 
 #: proxies.php:25
 msgid "Configuration of proxies"
@@ -2296,7 +2296,7 @@ msgstr ""
 
 #: adm.regexps.php:26
 msgid "Configuration of regular expressions"
-msgstr ""
+msgstr "Configuration des expressions régulières"
 
 #: screenconf.php:38 screenedit.php:27
 msgid "Configuration of screens"
@@ -2304,7 +2304,7 @@ msgstr "Configuration des écrans"
 
 #: scripts.php:23
 msgid "Configuration of scripts"
-msgstr ""
+msgstr "Configuration des scripts"
 
 #: slideconf.php:27
 msgid "Configuration of slide shows"
@@ -2312,7 +2312,7 @@ msgstr "Configuration des diaporamas"
 
 #: templates.php:38
 msgid "Configuration of templates"
-msgstr ""
+msgstr "Configuration des modèles"
 
 #: report5.php:152
 msgid "Configuration of trigger"
@@ -2320,15 +2320,15 @@ msgstr "Configuration du déclencheur"
 
 #: adm.triggerdisplayingoptions.php:24
 msgid "Configuration of trigger displaying options"
-msgstr ""
+msgstr "Configuration des options d'affichage des déclencheurs"
 
 #: trigger_prototypes.php:27
 msgid "Configuration of trigger prototypes"
-msgstr ""
+msgstr "Configuration des prototypes de déclencheurs"
 
 #: adm.triggerseverities.php:24
 msgid "Configuration of trigger severities"
-msgstr ""
+msgstr "Configuration des sévérités des déclencheurs"
 
 #: triggers.php:27 tr_status.php:474
 msgid "Configuration of triggers"
@@ -2336,11 +2336,11 @@ msgstr "Configuration des déclencheurs"
 
 #: usergrps.php:29
 msgid "Configuration of user groups"
-msgstr ""
+msgstr "Configuration des groupes d'utilisateurs"
 
 #: users.php:29
 msgid "Configuration of users"
-msgstr ""
+msgstr "Configuration des utilisateurs"
 
 #: adm.valuemapping.php:24
 msgid "Configuration of value mapping"
@@ -2352,7 +2352,7 @@ msgstr ""
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
-msgstr ""
+msgstr "Configuration des heures ouvrées"
 
 #: adm.gui.php:65 adm.housekeeper.php:51 adm.other.php:56
 #: adm.triggerdisplayingoptions.php:66 adm.triggerdisplayoptions.php:68
@@ -2425,7 +2425,7 @@ msgstr "Numéro de contrat"
 
 #: include/views/js/configuration.sysmaps.js.php:151
 msgid "Coordinates"
-msgstr ""
+msgstr "Coordonnées"
 
 #: include/views/configuration.copy.elements.php:102
 #: include/views/configuration.item.copy.php:82
@@ -2476,20 +2476,20 @@ msgstr "Créer un graphique"
 
 #: include/views/configuration.graph.list.php:43
 msgid "Create graph (select host first)"
-msgstr ""
+msgstr "Créer un graphique (sélectionner l'hôte d'abord)"
 
 #: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
-msgstr ""
+msgstr "Créer un prototype de graphique"
 
 #: hosts.php:641
 msgid "Create host"
-msgstr ""
+msgstr "Créer un hôte"
 
 #: include/views/configuration.hostgroups.list.php:28
 #: include/views/configuration.hostgroups.list.php:31
 msgid "Create host group"
-msgstr ""
+msgstr "Créer un groupe d'hôtes"
 
 #: adm.iconmapping.php:107
 msgid "Create icon map"
@@ -2505,7 +2505,7 @@ msgstr "Créer un élément"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
-msgstr ""
+msgstr "Créer un prototype d'élément"
 
 #: include/views/configuration.maintenance.list.php:27
 msgid "Create maintenance period"
@@ -2521,7 +2521,7 @@ msgstr "Créer un type de média"
 
 #: include/views/administration.node.list.php:32
 msgid "Create node"
-msgstr ""
+msgstr "Créer un nœud"
 
 #: include/views/administration.proxy.list.php:32
 msgid "Create proxy"
@@ -2549,7 +2549,7 @@ msgstr "Créer un diaporama"
 
 #: templates.php:414
 msgid "Create template"
-msgstr ""
+msgstr "Créer un modèle"
 
 #: include/views/configuration.triggers.list.php:45 jsLoader.php:98
 msgid "Create trigger"
@@ -2557,7 +2557,7 @@ msgstr "Créer un déclencheur"
 
 #: include/views/configuration.triggers.list.php:40
 msgid "Create trigger prototype"
-msgstr ""
+msgstr "Créer un prototype de déclencheur"
 
 #: include/views/administration.users.list.php:30
 msgid "Create user"
@@ -2565,7 +2565,7 @@ msgstr "Créer un utilisateur"
 
 #: include/views/administration.usergroups.list.php:30
 msgid "Create user group"
-msgstr ""
+msgstr "Créer un groupe d'utilisateurs"
 
 #: adm.valuemapping.php:129
 msgid "Create value map"
@@ -2629,7 +2629,7 @@ msgstr "Erreur critique. Le champ \"%1$s\" n'est pas une couleur."
 #: include/validate.inc.php:399
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Erreur critique. Le champ \"%1$s\" n'est pas un nombre décimal."
 
 #: include/validate.inc.php:375
 #, php-format
@@ -2654,7 +2654,7 @@ msgstr "Erreur critique. Le champ \"%1$s\" est absent."
 #: include/validate.inc.php:553
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
-msgstr "Erreur critique. Valeur incorrecte \"%1$s\" pour  le champ \"%2$s\"."
+msgstr "Erreur critique. Valeur incorrecte \"%1$s\" pour le champ \"%2$s\"."
 
 #: include/validate.inc.php:543
 #, php-format
@@ -2732,7 +2732,7 @@ msgstr "D"
 
 #: include/defines.inc.php:880
 msgid "D, d M Y H:i:s O"
-msgstr ""
+msgstr "D, d M Y H:i:s O"
 
 #: dashconf.php:110
 msgid "DASHBOARD CONFIGURATION"
@@ -2947,7 +2947,7 @@ msgstr "Délai par défaut (en secondes)"
 
 #: actionconf.php:41
 msgid "Default escalation period"
-msgstr ""
+msgstr "Période d'escalade par défaut"
 
 #: include/views/configuration.action.edit.php:49
 msgid "Default escalation period (minimum 60 seconds)"
@@ -2969,7 +2969,7 @@ msgstr "Thème par défaut"
 #: adm.gui.php:69
 #, php-format
 msgid "Default theme \"%1$s\"."
-msgstr ""
+msgstr "Thème par défaut \"%1$s\"."
 
 #: include/views/configuration.action.edit.php:351
 #: include/views/configuration.discovery.list.php:42
@@ -3250,7 +3250,7 @@ msgstr "Supprimer le modèle ?"
 
 #: jsLoader.php:177
 msgid "Delete the selected service?"
-msgstr ""
+msgstr "Supprimer le service sélectionné ?"
 
 #: include/views/configuration.triggers.edit.php:356
 msgid "Delete trigger?"
@@ -3641,7 +3641,7 @@ msgstr "Ne pas conserver les actions plus anciennes que (jours)"
 #: adm.housekeeper.php:56
 #, php-format
 msgid "Do not keep actions older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "Ne pas conserver les actions plus anciennes que (en jours) \"%1$s\". "
 
 #: adm.housekeeper.php:35
 #: include/views/administration.general.housekeeper.edit.php:25
@@ -3651,7 +3651,7 @@ msgstr "Ne pas conserver les événements plus anciens que (jours)"
 #: adm.housekeeper.php:55
 #, php-format
 msgid "Do not keep events older than (in days) \"%1$s\"."
-msgstr ""
+msgstr "Ne pas conserver les événements plus anciens que (en jours) \"%1$s\"."
 
 #: jsLoader.php:96
 msgid "Do you wish to replace the conditional expression?"
@@ -3887,7 +3887,7 @@ msgstr "Macro vide."
 
 #: api/classes/CService.php:1109
 msgid "Empty name."
-msgstr ""
+msgstr "Nom vide."
 
 #: api/classes/CImage.php:502 api/rpc/class.czbxrpc.php:45
 msgid "Empty parameters"
@@ -4060,7 +4060,7 @@ msgstr "Erreur dans la requête de recherche dans la table \"%1$s\"."
 #: httpdetails.php:155 httpdetails.php:207
 #, php-format
 msgid "Error: %1$s"
-msgstr ""
+msgstr "Erreur: %1$s"
 
 #: include/views/configuration.action.edit.php:478
 msgid "Escalation period"
@@ -4239,7 +4239,7 @@ msgstr "Ez Texting"
 #: jsLoader.php:123
 msgctxt "Friday short"
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #: include/forms.inc.php:1795 include/forms.inc.php:1815
 msgid "FALSE"
