@@ -17,7 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
+?>
+<?php
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testGeneric extends CWebTest {
@@ -27,6 +28,7 @@ class testGeneric extends CWebTest {
 		return array(
 
 			// Monitoring
+			array('index.php',		'Dashboard'),
 			array('dashboard.php',	'Dashboard'),
 			array('dashconf.php',	'Dashboard configuration'),
 
@@ -128,7 +130,7 @@ class testGeneric extends CWebTest {
 	public function testTitles($a, $b) {
 		$this->login();
 		$this->open($a);
-		$this->checkTitle($b);
+		$this->assertTitle($b);
 	}
 
 	/**
@@ -153,3 +155,4 @@ class testGeneric extends CWebTest {
 		}
 	}
 }
+?>

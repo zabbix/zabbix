@@ -29,7 +29,7 @@ class testTriggerExpression extends CWebTest {
 	public function testTriggerExpression_SimpleTest($where, $what, $expected) {
 		$this->login('index.php');
 		$this->open("tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C".$where);
-		$this->checkTitle('Test');
+		$this->assertTitle('Test');
 		$this->input_type("//input[@type='text']", $what);
 
 		$this->button_click("//input[@value='Test']");

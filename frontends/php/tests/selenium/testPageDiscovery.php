@@ -32,7 +32,7 @@ class testPageDiscovery extends CWebTest {
 	*/
 	public function testPageDiscovery_CheckLayout($rule) {
 		$this->login('discoveryconf.php');
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 
 		$this->ok('DISCOVERY');
 		$this->ok('Displaying');
@@ -58,12 +58,12 @@ class testPageDiscovery extends CWebTest {
 		$oldHashChecks = DBhash($sqlChecks);
 
 		$this->login('discoveryconf.php');
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->ok('Discovery rule updated');
 		$this->ok("$name");
 		$this->ok('DISCOVERY');
@@ -83,14 +83,14 @@ class testPageDiscovery extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('discoveryconf.php');
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->checkbox_select("g_druleid[$druleid]");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->ok('Discovery rules deleted');
 
 		$sql = "select * from drules where druleid=$druleid";
@@ -115,14 +115,14 @@ class testPageDiscovery extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('discoveryconf.php');
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->checkbox_select("all_drules");
 		$this->dropdown_select('go', 'Enable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->ok('Discovery rules updated');
 
 		$sql = "select * from drules where status=".DRULE_STATUS_DISABLED;
@@ -140,14 +140,14 @@ class testPageDiscovery extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('discoveryconf.php');
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->checkbox_select("g_druleid[$druleid]");
 		$this->dropdown_select('go', 'Enable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->ok('Discovery rules updated');
 
 		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_ACTIVE;
@@ -160,14 +160,14 @@ class testPageDiscovery extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('discoveryconf.php');
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->checkbox_select("all_drules");
 		$this->dropdown_select('go', 'Disable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->ok('Discovery rules updated');
 
 		$sql = "select * from drules where status=".DRULE_STATUS_ACTIVE;
@@ -185,14 +185,14 @@ class testPageDiscovery extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('discoveryconf.php');
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->checkbox_select("g_druleid[$druleid]");
 		$this->dropdown_select('go', 'Disable selected');
 		$this->button_click('goButton');
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->checkTitle('Configuration of discovery');
+		$this->assertTitle('Configuration of discovery');
 		$this->ok('Discovery rules updated');
 
 		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_DISABLED;

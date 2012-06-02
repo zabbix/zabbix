@@ -38,7 +38,7 @@ class testPagePopup extends CWebTest {
 	public function testPagePopupTemplates_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupTemplates);
-		$this->checkTitle('Templates');
+		$this->assertTitle('Templates');
 		$this->ok('Templates');
 		$this->ok('Group');
 		$this->ok('Name');
@@ -104,7 +104,7 @@ class testPagePopup extends CWebTest {
 	public function testPagePopupHostTemplates_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupHostTemplates);
-		$this->checkTitle('Templates');
+		$this->assertTitle('Templates');
 		$this->ok('Templates');
 		$this->ok('Group');
 		$this->ok('Name');
@@ -165,7 +165,7 @@ class testPagePopup extends CWebTest {
 	public function testPagePopupHostsAndTemplates_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupHostsAndTemplates);
-		$this->checkTitle('Hosts and templates');
+		$this->assertTitle('Hosts and templates');
 		$this->ok('Hosts and templates');
 		$this->ok('Group');
 		$this->ok('Name');
@@ -227,7 +227,7 @@ class testPagePopup extends CWebTest {
 	public function testPagePopupHosts_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupHosts);
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->ok('Hosts');
 		$this->ok('Group');
 		$this->ok(array('Name', 'DNS', 'IP', 'Port', 'Status', 'Availability'));
@@ -289,7 +289,7 @@ class testPagePopup extends CWebTest {
 	public function testPagePopupProxies_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupProxies);
-		$this->checkTitle('Proxies');
+		$this->assertTitle('Proxies');
 		$this->ok('Proxies');
 		$this->ok(array('Name'));
 
@@ -306,7 +306,7 @@ class testPagePopup extends CWebTest {
 	public function testPagePopupApplications_CheckLayout() {
 		$this->login();
 		$this->open($this->urlPopupApplications);
-		$this->checkTitle('Applications');
+		$this->assertTitle('Applications');
 		$this->ok('Applications');
 		$this->ok(array('Group', 'Host'));
 		$this->ok('Name');

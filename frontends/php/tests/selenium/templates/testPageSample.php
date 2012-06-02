@@ -34,7 +34,7 @@ class testPageHosts extends CWebTest {
 	public function testPageHosts_CheckLayout($host) {
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid', 'Zabbix servers');
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->ok('HOSTS');
 		$this->ok('Displaying');
 		// Header
@@ -77,7 +77,7 @@ class testPageHosts extends CWebTest {
 
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->ok('HOSTS');
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
@@ -88,7 +88,7 @@ class testPageHosts extends CWebTest {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->ok('Host updated');
 
 		$this->assertEquals($oldHashHosts, DBhash($sql1), "Chuck Norris: Host update changed data in table 'hosts'");
@@ -173,16 +173,16 @@ class testPageHosts extends CWebTest {
 		$hostid=$host['hostid'];
 
 		$this->login('hosts.php');
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->ok('HOSTS');
 		$this->ok('Displaying');
 		// Go to the list of items
 		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
 		$this->wait();
 		// We are in the list of items
-		$this->checkTitle('Configuration of items');
+		$this->assertTitle('Configuration of items');
 		$this->ok('Displaying');
 		// Header
 		$this->ok(array('Wizard', 'Name', 'Triggers', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Status', 'Applications', 'Error'));
@@ -214,7 +214,7 @@ class testPageHosts extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('hosts.php');
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->dropdown_select_wait('groupid', 'all');
 
 		$this->checkbox_select("all_hosts");
@@ -223,7 +223,7 @@ class testPageHosts extends CWebTest {
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->ok('Host status updated');
 
 		$sql="select * from hosts where status=".HOST_STATUS_NOT_MONITORED;
@@ -241,7 +241,7 @@ class testPageHosts extends CWebTest {
 		$hostid = $host['hostid'];
 
 		$this->login('hosts.php');
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->dropdown_select_wait('groupid', 'all');
 
 		$this->checkbox_select("hosts_$hostid");
@@ -250,7 +250,7 @@ class testPageHosts extends CWebTest {
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->ok('Host status updated');
 
 		$sql="select * from hosts where hostid=$hostid and status=".HOST_STATUS_MONITORED;
@@ -263,7 +263,7 @@ class testPageHosts extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('hosts.php');
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->dropdown_select_wait('groupid', 'all');
 
 		$this->checkbox_select("all_hosts");
@@ -272,7 +272,7 @@ class testPageHosts extends CWebTest {
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->ok('Host status updated');
 
 		$sql="select * from hosts where status=".HOST_STATUS_MONITORED;
@@ -290,7 +290,7 @@ class testPageHosts extends CWebTest {
 		$hostid = $host['hostid'];
 
 		$this->login('hosts.php');
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->dropdown_select_wait('groupid', 'all');
 
 		$this->checkbox_select("hosts_$hostid");
@@ -299,7 +299,7 @@ class testPageHosts extends CWebTest {
 		$this->wait();
 
 		$this->getConfirmation();
-		$this->checkTitle('Hosts');
+		$this->assertTitle('Hosts');
 		$this->ok('Host status updated');
 
 		$sql="select * from hosts where hostid=$hostid and status=".HOST_STATUS_NOT_MONITORED;
