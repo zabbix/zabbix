@@ -54,12 +54,12 @@ class testFormItem extends CWebTest {
 	public function testFormItem_CheckLayout($itemTypeID, $itemType ) {
 
 		$this->login('items.php');
-		$this->checkTitle('Configuration of items');
+		$this->assertTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
 
 		$this->button_click('form');
 		$this->wait();
-		$this->checkTitle('Configuration of items');
+		$this->assertTitle('Configuration of items');
 
 		$this->ok('Host interface');
 		$this->ok('Type of information');
@@ -237,10 +237,10 @@ class testFormItem extends CWebTest {
 	 */
 	public function testFormItem_Create($expected, $visibleHostname, $name, $type, $key, $errorMsgs) {
 		$this->login('hosts.php');
-		$this->checkTitle('Configuration of hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('CONFIGURATION OF HOSTS');
 		$this->dropdown_select_wait('groupid', 'all');
-		$this->checkTitle('Configuration of hosts');
+		$this->assertTitle('Configuration of hosts');
 		$this->ok('CONFIGURATION OF HOSTS');
 
 
@@ -250,12 +250,12 @@ class testFormItem extends CWebTest {
 		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
 		$this->wait();
 
-		$this->checkTitle('Configuration of items');
+		$this->assertTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
 
 		$this->button_click('form');
 		$this->wait();
-		$this->checkTitle('Configuration of items');
+		$this->assertTitle('Configuration of items');
 
 		$this->input_type('name', $name);
 		$this->input_type('key', $key);
@@ -265,12 +265,12 @@ class testFormItem extends CWebTest {
 		switch ($expected) {
 			case ITEM_GOOD:
 				$this->ok('Item added');
-				$this->checkTitle('Configuration of items');
+				$this->assertTitle('Configuration of items');
 				$this->ok('CONFIGURATION OF ITEMS');
 				break;
 
 			case ITEM_BAD:
-				$this->checkTitle('Configuration of items');
+				$this->assertTitle('Configuration of items');
 				$this->ok('CONFIGURATION OF ITEMS');
 				foreach ($errorMsgs as $msg) {
 					$this->ok($msg);

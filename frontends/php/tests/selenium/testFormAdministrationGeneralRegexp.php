@@ -31,7 +31,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
-		$this->checkTitle('Configuration of regular expressions');
+		$this->assertTitle('Configuration of regular expressions');
 		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->ok(array('Regular expressions', 'Name', 'Expressions'));
 
@@ -39,7 +39,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->button_click('form');
 		$this->wait();
 
-		$this->checkTitle('Configuration of regular expressions');
+		$this->assertTitle('Configuration of regular expressions');
 		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->ok('Regular expression');
 		$this->ok('Name');
@@ -187,7 +187,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		// Test #1 for the result=True
 		$this->button_click('test');
 		$this->wait();
-		$this->checkTitle('Configuration of regular expressions');
+		$this->assertTitle('Configuration of regular expressions');
 		$this->ok('TRUE');
 	}
 

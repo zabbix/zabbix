@@ -32,7 +32,7 @@ class testFormLogin extends CWebTest {
 	public function testFormLogin_LoginOK() {
 
 		$this->login('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
 		$this->ok('Username');
@@ -52,7 +52,7 @@ class testFormLogin extends CWebTest {
 		DBsave_tables('users');
 
 		$this->login('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
 		$this->ok('Username');
@@ -79,7 +79,7 @@ class testFormLogin extends CWebTest {
 		DBsave_tables('users');
 
 		$this->login('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
 		$this->ok('Username');
@@ -114,7 +114,7 @@ class testFormLogin extends CWebTest {
 		DBsave_tables('users');
 
 		$this->login('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
 		$this->ok('Username');
@@ -147,7 +147,7 @@ class testFormLogin extends CWebTest {
 		sleep(35);
 
 		$this->login('dashboard.php');
-		$this->checkTitle('Dashboard');
+		$this->assertTitle('Dashboard');
 		$this->click('link=Logout');
 		$this->wait();
 		$this->ok(array('Username', 'Password'));

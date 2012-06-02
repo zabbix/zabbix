@@ -29,7 +29,7 @@ class testFormUserProfile extends CWebTest {
 
 		$this->login('profile.php');
 
-		$this->checkTitle('User profile');
+		$this->assertTitle('User profile');
 
 		$this->button_click('save');
 		$this->wait();
@@ -97,7 +97,7 @@ class testFormUserProfile extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('ERROR: Password should not be empty');
-		$this->checkTitle('User profile');
+		$this->assertTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}
@@ -116,7 +116,7 @@ class testFormUserProfile extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 		$this->ok('ERROR: Cannot update user. Both passwords must be equal.');
-		$this->checkTitle('User profile');
+		$this->assertTitle('User profile');
 
 		$this->assertEquals($oldHashUsers, DBhash($sqlHashUsers));
 	}

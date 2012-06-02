@@ -32,7 +32,7 @@ class testPageQueueOverviewByProxy extends CWebTest {
 	*/
 	public function testPageQueueOverviewByProxy_CheckLayout($proxy) {
 		$this->login('queue.php?config=1');
-		$this->checkTitle('Queue \[refreshed every 30 sec\]');
+		$this->assertTitle('Queue \[refreshed every 30 sec\]');
 		$this->ok('Queue');
 		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
