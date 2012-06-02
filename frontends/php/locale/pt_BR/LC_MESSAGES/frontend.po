@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-02 09:03+0300\n"
-"PO-Revision-Date: 2012-05-18 19:39+0200\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2012-06-02 09:04+0300\n"
+"PO-Revision-Date: 2012-05-18 23:02+0200\n"
+"Last-Translator: jrprado <jrpradojunior@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -1216,15 +1216,15 @@ msgstr "Mapeamento de valor não foi incluído"
 
 #: authentication.php:163
 msgid "Cannot change authentication method to HTTP"
-msgstr "Não é possível alterar o método de autenticação para HTTP"
+msgstr "Não foi possível alterar o método de autenticação para HTTP"
 
 #: authentication.php:126
 msgid "Cannot change authentication method to LDAP"
-msgstr "Não é possível alterar o método de autenticação para LDAP"
+msgstr "Não foi possível alterar o método de autenticação para LDAP"
 
 #: authentication.php:86
 msgid "Cannot change authentication method to Zabbix internal"
-msgstr "Não é possível alterar o método de autenticação para interno Zabbix"
+msgstr "Não foi possível alterar o método de autenticação para interno Zabbix"
 
 #: api/classes/CTemplateScreen.php:591
 #, php-format
@@ -1270,7 +1270,7 @@ msgstr "Não foi possível criar outra conexão ao banco de dados."
 
 #: api/classes/CTrigger.php:1673
 msgid "Cannot create dependency"
-msgstr "Não é possível criar dependência"
+msgstr "Não foi possível criar dependência"
 
 #: discoveryconf.php:122
 msgid "Cannot create discovery rule"
@@ -1507,37 +1507,37 @@ msgstr "Não foi possível encontrar o gráfico \"%1$s\" usado na tela exportada
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, php-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o gráfico \"%1$s\" usado na tela \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:208
 #, php-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o grupo \"%1$s\" usado no mapa \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:53
-#, php-format
+#, fuzzy, php-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o grupo \"%1$s\" usado na tela \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:720
 #, php-format
 msgid "Cannot find host \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o host \"%1$s\" usado no mapa exportado \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:476
 #, php-format
 msgid "Cannot find host \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o host \"%1$s\" usado na tela exportada \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:216
 #, php-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o host \"%1$s\" usado no mapa \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, php-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o host \"%1$s\" usado na tela \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:1032 api/classes/CItemGeneral.php:564
 #: include/items.inc.php:285 include/items.inc.php:341
@@ -1553,22 +1553,22 @@ msgstr ""
 #: include/classes/import/CXmlImport18.php:709
 #, php-format
 msgid "Cannot find hostgroup \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o hostgroup \"%1$s\" usado no mapa exportado \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:464
 #, php-format
 msgid "Cannot find hostgroup \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o hostgroup \"%1$s\" usado na tela exportada \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:245
 #, php-format
 msgid "Cannot find icon \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o ícone \"%1$s\" para o mapa \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:180
 #, php-format
 msgid "Cannot find icon map \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o ícone do mapa \"%1$s\" para o mapa \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:657
 #, php-format
@@ -1578,38 +1578,38 @@ msgstr "Não foi possível localizar ícone do mapa \"%1$s\" usado no mapa expor
 #: include/classes/import/CXmlImport18.php:748
 #, php-format
 msgid "Cannot find image \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrada a imagem \"%1$s\" usada no mapa exportado \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:500
 #: include/classes/import/CXmlImport18.php:1640
 #, php-format
 msgid "Cannot find item \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o item \"%1$s\" usado na tela exportada \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:82
 #, php-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o item \"%1$s\" usado na tela \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:698
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o mapa \"%1$s\" usado no mapa exportado \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:511
 #, php-format
 msgid "Cannot find map \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o mapa \"%1$s\" usado na tela exportada \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:200
 #, php-format
 msgid "Cannot find map \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o mapa \"%1$s\" usado no mapa %2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:90
 #, php-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrado o mapa \"%1$s\" usado na tela \"%2$s\"."
 
 #: include/js.inc.php:326
 msgid "Cannot find objects with name"
@@ -1618,32 +1618,32 @@ msgstr "Não foi possível localizar objetos com nome"
 #: include/classes/import/CXmlImport18.php:522
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in exported screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrada a tela \"%1$s\" usada na tela exportada \"%2$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:98
 #, php-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrada a tela \"%1$s\" usada na tela \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:266
 #, php-format
 msgid "Cannot find trigger \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrada a trigger \"%1$s\" para o mapa \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:731
 #: include/classes/import/CXmlImport18.php:767
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in exported map \"%2$s\"."
-msgstr ""
+msgstr "Não foi encontrada a trigger \"%1$s\" usada no mapa exportado \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:225
 #, php-format
 msgid "Cannot find trigger \"%1$s\" used in map %2$s\"."
-msgstr ""
+msgstr "Não foi encontrada a trigger \"%1$s\" usada no mapa %2$s\"."
 
 #: srv_status.php:188
 msgid "Cannot format Tree. Check logic structure in service links."
-msgstr ""
+msgstr "Não foi possível formatar a Árvore. Cheque a estrutura lógica nos links de serviço."
 
 #: services.php:406
 msgid "Cannot format tree."
@@ -1651,7 +1651,7 @@ msgstr ""
 
 #: api/classes/CTemplate.php:1412
 msgid "Cannot have empty visible template name"
-msgstr ""
+msgstr "Não pode ter espaço vazio no nome do template"
 
 #: api/classes/CTrigger.php:1751 api/classes/CTrigger.php:1816
 #: api/classes/CTriggerPrototype.php:1291
@@ -1664,20 +1664,20 @@ msgstr ""
 #, php-format
 msgid "Cannot import screen \"%2$s\": subscreen \"%3$s\" does not exist."
 msgid_plural "Cannot import screen \"%2$s\": subscreens \"%3$s\" do not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Tela \"%2$s\" não foi importada: sub-tela \"%3$s\" não existe."
+msgstr[1] "Tela \"%2$s\" não foi importada: sub-telas \"%3$s\" não existem."
 
 #: include/classes/import/importers/CTemplateImporter.php:114
 #, php-format
 msgid "Cannot import template \"%2$s\", linked template \"%3$s\" does not exist."
 msgid_plural "Cannot import template \"%2$s\", linked templates \"%3$s\" does not exist."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Não foi possível importar o template \"%2$s\", o template associado \"%3$s\" não existe."
+msgstr[1] "Não foi possível importar o template \"%2$s\", os templates associados \"%3$s\" não existem."
 
 #: include/classes/class.cview.php:114
 #, php-format
 msgid "Cannot include view file \"%s\"."
-msgstr ""
+msgstr "Não foi possível incluir o arquivo de visualização \"%s\"."
 
 #: api/classes/CUser.php:813
 msgid "Cannot insert user media."
