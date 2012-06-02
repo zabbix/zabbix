@@ -17,12 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
+?>
+<?php
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testClicks extends CWebTest {
-
 	public static function provider() {
 		// List of URLs to test
 		// URL, navigation, expected page Title, expected String
@@ -119,10 +118,11 @@ class testClicks extends CWebTest {
 		}
 
 		foreach ($this->failIfNotExists as $str) {
-			$this->ok($str);
+			$this->assertTextPresent($str);
 		}
-		$this->checkTitle($title);
-		$this->ok($expected);
+		$this->assertTitle($title);
+		$this->assertTextPresent($expected);
 		$this->logout();
 	}
 }
+?>

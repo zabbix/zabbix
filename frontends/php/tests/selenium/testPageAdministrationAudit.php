@@ -34,7 +34,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_CheckLayout() {
 
 		$this->login('auditlogs.php?stime=1328684400&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -101,7 +101,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_LoginUser($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->click('flicker_icon_l');
@@ -132,7 +132,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_LogoutUser($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -167,7 +167,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddUser($auditlog) {
 
 		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -203,7 +203,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateUser($auditlog) {
 
 		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -239,7 +239,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteUser($auditlog) {
 
 		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -275,7 +275,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddHost($auditlog) {
 
 		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -315,7 +315,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateHost($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -356,7 +356,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteHost($auditlog) {
 
 		$this->login('auditlogs.php?stime=20130207090000&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -400,7 +400,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -441,7 +441,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -483,7 +483,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -524,7 +524,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -564,7 +564,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -604,7 +604,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -644,7 +644,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -683,7 +683,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateImage($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -723,7 +723,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 		//$this->login('auditlogs.php?stime=20130207090000&period=63072000');
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -762,7 +762,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddItem($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -801,7 +801,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateItem($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -840,7 +840,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteItem($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -878,7 +878,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DisableItem($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -917,7 +917,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_EnableItem($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -956,7 +956,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddTrigger($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -997,7 +997,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateTrigger($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1038,7 +1038,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteTrigger($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1076,7 +1076,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DisableTrigger($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1115,7 +1115,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_EnableTrigger($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1154,7 +1154,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddGraph($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1193,7 +1193,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateGraph($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1232,7 +1232,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteGraph($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1270,7 +1270,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddAction($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1309,7 +1309,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateAction($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1348,7 +1348,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteAction($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1386,7 +1386,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DisableAction($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1425,7 +1425,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_EnableAction($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1464,7 +1464,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddApplication($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1502,7 +1502,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateApplication($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1540,7 +1540,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteApplication($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1577,7 +1577,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddDRule ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1615,7 +1615,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateDRule($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1653,7 +1653,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteDRule($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1690,7 +1690,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DisableDRule($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1729,7 +1729,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_EnableDRule($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1768,7 +1768,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddMacro ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1806,7 +1806,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateMacro($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1844,7 +1844,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteMacro($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1881,7 +1881,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddMaintenance ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1919,7 +1919,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateMaintenance($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1957,7 +1957,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteMaintenance($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -1994,7 +1994,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddMap ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2032,7 +2032,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateMap($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2070,7 +2070,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteMap($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2107,7 +2107,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddMediaType ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2145,7 +2145,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateMediaType($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2183,7 +2183,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DisableMediaType($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2221,7 +2221,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_EnableMediaType($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2259,7 +2259,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteMediaType($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2296,7 +2296,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddRegexp ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2334,7 +2334,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateRegexp($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2372,7 +2372,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteRegexp($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2409,7 +2409,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddScenario ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2447,7 +2447,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateScenario($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2485,7 +2485,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DisableScenario($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2525,7 +2525,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_EnableScenario($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2565,7 +2565,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteScenario($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2602,7 +2602,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddScreen($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2640,7 +2640,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateScreen($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2678,7 +2678,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteScreen($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2715,7 +2715,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddScript ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2753,7 +2753,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateScript($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2791,7 +2791,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteScript($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2828,7 +2828,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddSlideshow ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2866,7 +2866,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateSlideshow($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2904,7 +2904,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteSlideshow($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2941,7 +2941,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_AddValuemap ($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -2979,7 +2979,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateValuemap($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -3017,7 +3017,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_DeleteValuemap($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');
@@ -3054,7 +3054,7 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_UpdateConfig($auditlog) {
 
 		$this->login('auditlogs.php?stime='.$auditlog['clock'].'&period=63072000');
-		$this->checkTitle('Audit');
+		$this->assertTitle('Audit');
 		$this->assertElementPresent('config');
 
 		$this->ok('AUDIT LOGS');

@@ -66,7 +66,7 @@ class testFormAction extends CWebTest {
 		DBsave_tables('actions');
 
 		$this->login('actionconf.php?form=1&eventsource=0');
-		$this->checkTitle('Configuration of actions');
+		$this->assertTitle('Configuration of actions');
 
 		$this->type('name', $action['name']);
 		$this->type('esc_period', $action['esc_period']);
@@ -149,7 +149,7 @@ class testFormAction extends CWebTest {
 		DBsave_tables('actions');
 
 		$this->login('actionconf.php?form=1&eventsource=0');
-		$this->checkTitle('Configuration of actions');
+		$this->assertTitle('Configuration of actions');
 
 		$this->type("name", "action test");
 		$this->type("esc_period", "123");

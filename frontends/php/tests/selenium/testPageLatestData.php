@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageLatestData extends CWebTest {
 	public function testPageLatestData_CheckLayout() {
 		$this->login('latest.php');
-		$this->checkTitle('Latest data \[refreshed every 30 sec\]');
+		$this->assertTitle('Latest data \[refreshed every 30 sec\]');
 		$this->ok('LATEST DATA');
 		$this->ok('Items');
 		$this->ok(array('Host', 'Group'));
@@ -35,7 +35,7 @@ class testPageLatestData extends CWebTest {
 // Check that no real host or template names displayed
 	public function testPageLatestData_NoHostNames() {
 		$this->login('latest.php');
-		$this->checkTitle('Latest data \[refreshed every 30 sec\]');
+		$this->assertTitle('Latest data \[refreshed every 30 sec\]');
 		$this->checkNoRealHostnames();
 	}
 }

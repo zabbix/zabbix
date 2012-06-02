@@ -36,7 +36,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 		$this->login('adm.triggerseverities.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
-		$this->checkTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger severities', 'Custom severity', 'Colour'));
 
 		$this->assertElementPresent('severity_name_0');
@@ -93,7 +93,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 
 		$this->login('adm.triggerseverities.php');
 		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
-		$this->checkTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(array('CONFIGURATION OF ZABBIX', 'Trigger severities', 'Custom severity', 'Colour'));
 		$this->ok('Custom severity names affect all locales and require manual translation!');
 
@@ -169,7 +169,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CWebTest {
 
 		$this->login('adm.triggerseverities.php');
 		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
-		$this->checkTitle('Configuration of Zabbix');
+		$this->assertTitle('Configuration of Zabbix');
 		$this->ok(
 			array(
 				'CONFIGURATION OF ZABBIX',

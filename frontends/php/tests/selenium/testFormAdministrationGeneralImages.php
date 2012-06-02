@@ -32,7 +32,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Images');
-		$this->checkTitle('Configuration of images');
+		$this->assertTitle('Configuration of images');
 		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
@@ -63,7 +63,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/UPS.png');
 		$this->click('save');
 		$this->wait();
-		$this->checkTitle('Configuration of images');
+		$this->assertTitle('Configuration of images');
 		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type', 'Image added'));
 
 		// $sql = 'SELECT * FROM images WHERE name=\''.$this->icon_image_name.'\'';
@@ -98,7 +98,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Notebook.png');
 		$this->click('save');
 		$this->wait();
-		$this->checkTitle('Configuration of images');
+		$this->assertTitle('Configuration of images');
 		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Image updated'));
 
 		// SELECT * FROM images WHERE name='...' AND imagetype=1;
@@ -115,7 +115,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->checkTitle('Configuration of images');
+		$this->assertTitle('Configuration of images');
 		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Image deleted'));
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
@@ -132,7 +132,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->type('image', '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/sysmaps/Printer.png');
 		$this->click('save');
 		$this->wait();
-		$this->checkTitle('Configuration of images');
+		$this->assertTitle('Configuration of images');
 		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Type', 'Image added'));
 
 		// SELECT * FROM images WHERE name='...' AND imagetype=2;
@@ -151,7 +151,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->type('image', '/home/hudson/igor/trunk/frontends/php/images/sysmaps/Satellite.png');
 		$this->click('save');
 		$this->wait();
-		$this->checkTitle('Configuration of images');
+		$this->assertTitle('Configuration of images');
 		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Image updated'));
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name2.'\'';
@@ -168,7 +168,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->checkTitle('Configuration of images');
+		$this->assertTitle('Configuration of images');
 		$this->ok(array('CONFIGURATION OF IMAGES', 'Images', 'Image deleted'));
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name2.'\'';

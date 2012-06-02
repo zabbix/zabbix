@@ -34,7 +34,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->login('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Working time');
-		$this->checkTitle('Configuration of working time');
+		$this->assertTitle('Configuration of working time');
 		$this->ok(array('CONFIGURATION OF WORKING TIME', 'Working time', 'Working time'));
 		$this->assertElementPresent('work_period');
 		$this->assertAttribute("//input[@id='work_period']/@maxlength", '255');
@@ -48,7 +48,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->login('adm.workingtime.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Working time');
-		$this->checkTitle('Configuration of working time');
+		$this->assertTitle('Configuration of working time');
 		$this->ok(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 
 		$sqlHash = 'SELECT configid,alert_history,event_history,refresh_unsupported,alert_usrgrpid,'.
@@ -78,7 +78,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 		// checking also for the following error: ERROR: Configuration was not updated | Incorrect working time: "1-8,09:00-25:00".
 		$this->dropdown_select_wait('configDropDown', 'Working time');
-		$this->checkTitle('Configuration of working time');
+		$this->assertTitle('Configuration of working time');
 		$this->ok('CONFIGURATION OF WORKING TIME');
 		$this->ok('Working time');
 		$this->input_type('work_period', '1-8,09:00-25:00');
@@ -88,7 +88,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 		// trying to save empty work period
 		$this->dropdown_select_wait('configDropDown', 'Working time');
-		$this->checkTitle('Configuration of working time');
+		$this->assertTitle('Configuration of working time');
 		$this->ok(array('CONFIGURATION OF WORKING TIME', 'Working time'));
 		$this->input_type('work_period', '');
 		$this->button_click('save');
