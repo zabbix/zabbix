@@ -495,7 +495,7 @@ remove_selements: function(e){
 	this.debug('remove_selements');
 //--
 
-	if(Confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
+	if(confirm(locale['S_DELETE_SELECTED_ELEMENTS_Q'])){
 		for(var i=0; i<this.selection.position; i++){
 			if(!isset(i, this.selection.selements)) continue;
 
@@ -665,7 +665,7 @@ remove_links: function(e){
 	var linkids = this.get_linkid_by_selementids(selementid1,selementid2);
 
 	if(linkids !== false){
-		if(Confirm(locale['S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'])){
+		if(confirm(locale['S_DELETE_LINK_BETWEEN_SELECTED_ELEMENTS_Q'])){
 			for(var linkid in linkids){
 				this.remove_link(linkid);
 			}
@@ -3386,7 +3386,7 @@ deleteForm_link: function(e){
 
 	var maplink = this.links[linkid];
 
-	if(Confirm('Remove link between "'+this.selements[maplink.selementid1].label+'" and "'+this.selements[maplink.selementid2].label+'"?')){
+	if(confirm(locale['S_DELETE_LINK_BETWEEN_SELECTED_ELEMENTS_Q'])){
 		this.remove_link(linkid, true);
 		this.update_linkContainer(e);
 		this.hideForm_link(e);

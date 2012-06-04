@@ -822,9 +822,10 @@ char	* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
 int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
 void	xml_free_data_dyn(char **data);
 
-int	comms_parse_response(char *xml, char *host, int host_len, char *key, int key_len, char *data, int data_len,
-		char *lastlogsize, int lastlogsize_len, char *timestamp, int timestamp_len,
-		char *source, int source_len, char *severity, int severity_len);
+int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
+		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
+		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
+		char *severity, size_t severity_len);
 
 int 	parse_command(const char *command, char *cmd, size_t cmd_max_len, char *param, size_t param_max_len);
 

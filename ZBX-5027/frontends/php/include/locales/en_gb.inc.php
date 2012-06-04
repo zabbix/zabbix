@@ -1269,7 +1269,7 @@
 	'S_TWO_ELEMENTS_SHOULD_BE_SELECTED'=>		'Two elements should be selected',
 	'S_DELETE_SELECTED_ELEMENTS_Q'=>		'Delete selected elements?',
 	'S_PLEASE_SELECT_TWO_ELEMENTS'=>		'Please select two elements',
-	'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q'=>	'Delete Links between selected elements?',
+	'S_DELETE_LINK_BETWEEN_SELECTED_ELEMENTS_Q'=>	'Delete the link between the selected elements?',
 	'S_NO_LINKS'=>					'No links',
 	'S_WRONG_TYPE_OF_ARGUMENTS_PASSED_TO_FUNCTION'=>'Wrong type of arguments passed to function',
 	'S_NEW_ELEMENT'=>				'New element',
