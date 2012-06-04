@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 function italic($str) {
 	if (is_array($str)) {
@@ -80,9 +79,9 @@ function nbsp($str) {
 function prepare_url(&$var, $varname = null) {
 	$result = '';
 	if (is_array($var)) {
-		foreach ($var as $id => $par )
-			$result .= prepare_url($par, isset($varname) ? $varname.'['.$id.']' : $id);
-	}
+		foreach ($var as $id => $par)
+					$result .= prepare_url($par, isset($varname) ? $varname.'['.$id.']' : $id);
+				}
 	else {
 		$result = '&'.$varname.'='.urlencode($var);
 	}
@@ -544,4 +543,27 @@ function makeFormFooter($main, $others = null) {
 		'objectgroup footer min-width ui-widget-content ui-corner-all'
 	);
 }
-?>
+
+/**
+ * Create control for trigger severities.
+ * It's mostly the same as usual button set, but background color is changed based on selected severiity.
+ * Js file "/include/views/js/configuration.triggers.edit.js.php" is needed to make it work correcty.
+ *
+ * @param $selectedSeverity
+ *
+ * @return CDiv
+ */
+function getSeverityControl($selectedSeverity = TRIGGER_SEVERITY_NOT_CLASSIFIED) {
+	$controls = array();
+	foreach (getSeverityCaption() as $severity => $caption) {
+		$controls[] = new CRadioButton('priority', $severity, null, 'severity_'.$severity, $selectedSeverity == $severity);
+
+		$label = new CLabel($caption, 'severity_'.$severity, 'severity_label_'.$severity);
+		$label->attr('data-severity', $severity);
+		$label->attr('data-severity-style', getSeverityStyle($severity));
+		$controls[] = $label;
+
+	}
+
+	return new CDiv($controls, 'jqueryinputset control-severity');
+}

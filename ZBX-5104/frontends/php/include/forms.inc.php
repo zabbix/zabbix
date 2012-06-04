@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 	function getUserFormData($userid, $isProfile = false) {
 		$config = select_config();
 		$data = array('is_profile' => $isProfile);
@@ -1240,11 +1240,9 @@
 			'status' => get_request('status', 0),
 			'comments' => get_request('comments', ''),
 			'url' => get_request('url', ''),
-			'expr_temp' => get_request('expr_temp', ''),
 			'input_method' => get_request('input_method', IM_ESTABLISHED),
 			'limited' => null,
-			'templates' => array(),
-			'config' => select_config()
+			'templates' => array()
 		);
 
 		// get hostid
@@ -1981,4 +1979,3 @@
 
 	return $tblExpFooter;
 	}
-?>

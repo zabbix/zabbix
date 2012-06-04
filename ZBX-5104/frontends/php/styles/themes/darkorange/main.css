@@ -504,3 +504,10 @@ ul.formlist li.new { background: #2F2F2F; }
 .dragHelpText { color: #FF5500; }
 
 table.ack_msgs tr.msg { background-color: #3F3F3F; }
+
+div.control-severity label span {
+	color: #DFDFDF;
+}
+div.control-severity label span:hover {
+	color: #000;
+}

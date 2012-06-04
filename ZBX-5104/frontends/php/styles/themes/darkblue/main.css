@@ -529,3 +529,10 @@ table.ack_msgs tr.msg { background-color: #022744; }
 
 #zbx_search input[type="text"], #zbx_search input { border-color: #EFEFEF; }
 #zbx_search input.button { color: #FBFBFB; }
+
+div.control-severity label span {
+	color: #77B7DA;
+}
+div.control-severity label span:hover {
+	color: #000;
+}
