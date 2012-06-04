@@ -364,6 +364,11 @@ table.page_footer {
 	padding: 3px;
 }
 
+/* row indents */
+table .indent_top td { padding-top: 2px; }
+table .indent_bottom td { padding-bottom: 2px; }
+table .indent_both td { padding-top: 2px; padding-bottom: 2px; }
+
 /* form table */
 table.formtable {
 	background-color: #EEEEEE;
@@ -473,11 +478,6 @@ table.tableinfo caption {
 	line-height: 22px;
 }
 
-/* header */
-.header a { color: #FFFFFF; }
-.header .header_l { padding-left: 5px; }
-.header .header_r { padding-right: 5px; }
-
 /* flicker */
 table.flicker { background: #5c9ccc url(themes/originalblue/images/bg_h-hard_55.png) 50% 50% repeat-x;  border: 0; }
 table.flicker tr td.flicker_c { height: 16px; padding-left: 4px; padding-right: 4px; line-height: 12px; }
@@ -569,6 +569,11 @@ table.warningTable tr.footer td { padding: 0; text-align: right; }
 table.warningTable tr.footer .buttons { margin: 0 10px 5px; padding-top: 5px; border-top: 1px dotted #1F1F1F; }
 table.warningTable tr.content { vertical-align: text-top; text-align: justify; font-size: 10px; }
 table.warningTable tr.content.center { text-align: center; }
+
+/* header */
+.header a { color: #FFFFFF; }
+.header .header_l { padding-left: 5px; }
+.header .header_r { padding-right: 5px; }
 
 /* setup wizard */
 .setupBG { background: #AABBCC url(../images/gradients/texture_diagonal.gif); }
