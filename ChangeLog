@@ -7,6 +7,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+.......PS. [ZBX-4980] fixed error in decoding of big base64 encoded values (Andris)
 ..F....... [ZBX-5081] fixed simple slide show update changes slideids in a database (Toms)
 A......... [ZBX-5092] fixed the get method "nodeids" parameter not working in some APIs (Pavels)
 ..F....... [ZBX-5000] fixed "all" shown instead of "not selected" in Monitoring -> Discovery (Toms)
@@ -51,6 +52,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+.......PS. [ZBX-4980] fixed error in decoding of big base64 encoded values (Andris)
 ..F....... [ZBX-5081] fixed simple slide show update changes slideids in a database (Toms)
 A......... [ZBX-5092] fixed the get method "nodeids" parameter not working in some APIs (Pavels)
 ..F....... [ZBX-5000] fixed "all" shown instead of "not selected" in Monitoring -> Discovery (Toms)
