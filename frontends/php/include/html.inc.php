@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 function italic($str) {
 	if (is_array($str)) {
@@ -544,4 +543,3 @@ function makeFormFooter($main, $others = null) {
 		'objectgroup footer min-width ui-widget-content ui-corner-all'
 	);
 }
-?>

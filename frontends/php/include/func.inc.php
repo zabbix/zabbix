@@ -1717,6 +1717,7 @@ function bcround($number, $precision = 0) {
 	elseif ($precision != 0) {
 		$number .= '.' . str_repeat('0', $precision);
 	}
+
 	// according to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
 	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
