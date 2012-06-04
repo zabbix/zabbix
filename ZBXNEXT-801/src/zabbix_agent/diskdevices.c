@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef _WINDOWS
+
 #include "common.h"
 #include "diskdevices.h"
 #include "stats.h"
 #include "log.h"
 #include "mutexs.h"
 
-#if !defined(_WINDOWS)
-extern ZBX_MUTEX	diskstats_lock;
-#	define LOCK_DISKSTATS	zbx_mutex_lock(&diskstats_lock)
-#	define UNLOCK_DISKSTATS	zbx_mutex_unlock(&diskstats_lock)
-#endif
+extern ZBX_MUTEX		diskstats_lock;
+#define LOCK_DISKSTATS		zbx_mutex_lock(&diskstats_lock)
+#define UNLOCK_DISKSTATS	zbx_mutex_unlock(&diskstats_lock)
 
 static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_uint64_t *dstat)
 {
@@ -190,3 +190,5 @@ end:
 
 	return device;
 }
+
+#endif	/* _WINDOWS */

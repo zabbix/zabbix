@@ -25,7 +25,7 @@
 #include "cfg.h"
 #include "mutexs.h"
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 #	include "service.h"
 #else
 #	include "daemon.h"
@@ -34,7 +34,7 @@
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 static int		shm_id;
 int 			my_diskstat_shmid = NONEXISTENT_SHMID;
 ZBX_DISKDEVICES_DATA	*diskdevices = NULL;
@@ -288,7 +288,7 @@ void	diskstat_shm_init()
  ******************************************************************************/
 void	diskstat_shm_reattach()
 {
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 	if (my_diskstat_shmid != collector->diskstat_shmid)
 	{
 		int old_shmid;
@@ -427,11 +427,12 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #ifdef _WINDOWS
 		collect_perfstat();
 #else
-		if (CPU_COLLECTOR_STARTED(collector))
+		if (0 != CPU_COLLECTOR_STARTED(collector))
 			collect_cpustat(&(collector->cpus));
-#endif
+
 		if (0 != DISKDEVICE_COLLECTOR_STARTED(collector))
 			collect_stats_diskdevices();
+#endif
 #ifdef _AIX
 		if (1 == collector->vmstat.enabled)
 			collect_vmstat_data(&collector->vmstat);

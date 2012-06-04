@@ -33,7 +33,7 @@
 
 #ifndef _WINDOWS
 #	define NONEXISTENT_SHMID	(-1)
-#endif	/* _WINDOWS */
+#endif
 
 typedef struct
 {

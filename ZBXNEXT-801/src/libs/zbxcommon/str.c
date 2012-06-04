@@ -1911,7 +1911,7 @@ size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *o
 	}
 	o = *output;
 
-	while (i - input < ilen)
+	while ((size_t)(i - input) < ilen)
 	{
 		*o++ = zbx_num2hex((*i >> 4) & 0xf);
 		*o++ = zbx_num2hex(*i & 0xf);
