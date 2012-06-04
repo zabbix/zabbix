@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "comms.h"
+#include "log.h"
 
 #if defined(_WINDOWS)
 #	if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
