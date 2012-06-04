@@ -179,6 +179,7 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/import/importers/CHostImporter.php -text
 frontends/php/include/classes/tree/CServiceTree.php -text
+frontends/php/include/views/configuration.action.list.php -text
 frontends/php/include/views/js/administration.general.gui.php -text
 frontends/php/js/servercheck.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text

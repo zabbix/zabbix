@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CTable extends CTag {
 
@@ -66,7 +65,7 @@ class CTable extends CTag {
 		return $this->attributes['cellspacing'] = strval($value);
 	}
 
-	public function prepareRow($item, $rowClass = null) {
+	public function prepareRow($item, $class = null, $id = null) {
 		if (is_null($item)) {
 			return null;
 		}
@@ -74,14 +73,14 @@ class CTable extends CTag {
 			if (isset($this->header) && !isset($item->attributes['colspan'])) {
 				$item->attributes['colspan'] = $this->colnum;
 			}
-			$item = new CRow($item, $rowClass);
+			$item = new CRow($item, $class, $id);
 		}
 
 		if (is_object($item) && zbx_strtolower(get_class($item)) == 'crow') {
-			$item->attr('class', $rowClass);
+			$item->attr('class', $class);
 		}
 		else {
-			$item = new CRow($item, $rowClass);
+			$item = new CRow($item, $class, $id);
 		}
 
 		if (!isset($item->attributes['class']) || is_array($item->attributes['class'])) {
@@ -122,14 +121,14 @@ class CTable extends CTag {
 		$this->footer = $this->footer->toString();
 	}
 
-	public function addRow($item, $rowClass = null) {
-		$item = $this->addItem($this->prepareRow($item, $rowClass));
+	public function addRow($item, $class = null, $id = null) {
+		$item = $this->addItem($this->prepareRow($item, $class, $id));
 		++$this->rownum;
 		return $item;
 	}
 
-	public function showRow($item, $rowClass = null) {
-		echo $this->prepareRow($item, $rowClass)->toString();
+	public function showRow($item, $class = null, $id = null) {
+		echo $this->prepareRow($item, $class, $id)->toString();
 		++$this->rownum;
 	}
 
@@ -154,4 +153,3 @@ class CTable extends CTag {
 		return $ret;
 	}
 }
-?>

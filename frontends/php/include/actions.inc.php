@@ -19,65 +19,68 @@
 **/
 
 
-function condition_operator2str($operator){
-	$str_op[CONDITION_OPERATOR_EQUAL] 	= '=';
-	$str_op[CONDITION_OPERATOR_NOT_EQUAL]	= '<>';
-	$str_op[CONDITION_OPERATOR_LIKE]	= _('like');
-	$str_op[CONDITION_OPERATOR_NOT_LIKE]	= _('not like');
-	$str_op[CONDITION_OPERATOR_IN]		= _('in');
-	$str_op[CONDITION_OPERATOR_MORE_EQUAL]	= '>=';
-	$str_op[CONDITION_OPERATOR_LESS_EQUAL]	= '<=';
-	$str_op[CONDITION_OPERATOR_NOT_IN]	= _('not in');
+function condition_operator2str($operator) {
+	$str_op[CONDITION_OPERATOR_EQUAL] = '=';
+	$str_op[CONDITION_OPERATOR_NOT_EQUAL] = '<>';
+	$str_op[CONDITION_OPERATOR_LIKE] = _('like');
+	$str_op[CONDITION_OPERATOR_NOT_LIKE] = _('not like');
+	$str_op[CONDITION_OPERATOR_IN] = _('in');
+	$str_op[CONDITION_OPERATOR_MORE_EQUAL] = '>=';
+	$str_op[CONDITION_OPERATOR_LESS_EQUAL] = '<=';
+	$str_op[CONDITION_OPERATOR_NOT_IN] = _('not in');
 
-	if(isset($str_op[$operator]))
+	if (isset($str_op[$operator])) {
 		return $str_op[$operator];
+	}
 
 	return _('Unknown');
 }
 
-function condition_type2str($conditiontype){
-	$str_type[CONDITION_TYPE_HOST_GROUP]		= _('Host group');
-	$str_type[CONDITION_TYPE_HOST_TEMPLATE]		= _('Host template');
-	$str_type[CONDITION_TYPE_TRIGGER]		= _('Trigger');
-	$str_type[CONDITION_TYPE_HOST]			= _('Host');
-	$str_type[CONDITION_TYPE_TRIGGER_NAME]		= _('Trigger name');
-	$str_type[CONDITION_TYPE_TRIGGER_VALUE]		= _('Trigger value');
-	$str_type[CONDITION_TYPE_TRIGGER_SEVERITY]	= _('Trigger severity');
-	$str_type[CONDITION_TYPE_TIME_PERIOD]		= _('Time period');
-	$str_type[CONDITION_TYPE_MAINTENANCE]		= _('Maintenance status');
-	$str_type[CONDITION_TYPE_NODE]			= _('Node');
-	$str_type[CONDITION_TYPE_DRULE]			= _('Discovery rule');
-	$str_type[CONDITION_TYPE_DCHECK]		= _('Discovery check');
-	$str_type[CONDITION_TYPE_DOBJECT]		= _('Discovery object');
-	$str_type[CONDITION_TYPE_DHOST_IP]		= _('Host IP');
-	$str_type[CONDITION_TYPE_DSERVICE_TYPE]		= _('Service type');
-	$str_type[CONDITION_TYPE_DSERVICE_PORT]		= _('Service port');
-	$str_type[CONDITION_TYPE_DSTATUS]		= _('Discovery status');
-	$str_type[CONDITION_TYPE_DUPTIME]		= _('Uptime/Downtime');
-	$str_type[CONDITION_TYPE_DVALUE]		= _('Received value');
-	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED]	= _('Event acknowledged');
-	$str_type[CONDITION_TYPE_APPLICATION]		= _('Application');
-	$str_type[CONDITION_TYPE_PROXY]			= _('Proxy');
-	$str_type[CONDITION_TYPE_HOST_NAME]		= _('Host name');
+function condition_type2str($conditiontype) {
+	$str_type[CONDITION_TYPE_HOST_GROUP] = _('Host group');
+	$str_type[CONDITION_TYPE_HOST_TEMPLATE] = _('Host template');
+	$str_type[CONDITION_TYPE_TRIGGER] = _('Trigger');
+	$str_type[CONDITION_TYPE_HOST] = _('Host');
+	$str_type[CONDITION_TYPE_TRIGGER_NAME] = _('Trigger name');
+	$str_type[CONDITION_TYPE_TRIGGER_VALUE] = _('Trigger value');
+	$str_type[CONDITION_TYPE_TRIGGER_SEVERITY] = _('Trigger severity');
+	$str_type[CONDITION_TYPE_TIME_PERIOD] = _('Time period');
+	$str_type[CONDITION_TYPE_MAINTENANCE] = _('Maintenance status');
+	$str_type[CONDITION_TYPE_NODE] = _('Node');
+	$str_type[CONDITION_TYPE_DRULE] = _('Discovery rule');
+	$str_type[CONDITION_TYPE_DCHECK] = _('Discovery check');
+	$str_type[CONDITION_TYPE_DOBJECT] = _('Discovery object');
+	$str_type[CONDITION_TYPE_DHOST_IP] = _('Host IP');
+	$str_type[CONDITION_TYPE_DSERVICE_TYPE] = _('Service type');
+	$str_type[CONDITION_TYPE_DSERVICE_PORT] = _('Service port');
+	$str_type[CONDITION_TYPE_DSTATUS] = _('Discovery status');
+	$str_type[CONDITION_TYPE_DUPTIME] = _('Uptime/Downtime');
+	$str_type[CONDITION_TYPE_DVALUE] = _('Received value');
+	$str_type[CONDITION_TYPE_EVENT_ACKNOWLEDGED] = _('Event acknowledged');
+	$str_type[CONDITION_TYPE_APPLICATION] = _('Application');
+	$str_type[CONDITION_TYPE_PROXY] = _('Proxy');
+	$str_type[CONDITION_TYPE_HOST_NAME] = _('Host name');
 
-	if(isset($str_type[$conditiontype]))
+	if (isset($str_type[$conditiontype])) {
 		return $str_type[$conditiontype];
+	}
 
 	return _('Unknown');
 }
 
-function discovery_object2str($object){
+function discovery_object2str($object) {
 	$str_object[EVENT_OBJECT_DHOST] = _('Device');
 	$str_object[EVENT_OBJECT_DSERVICE] = _('Service');
 
-	if(isset($str_object[$object]))
+	if (isset($str_object[$object])) {
 		return $str_object[$object];
+	}
 
-return _('Unknown');
+	return _('Unknown');
 }
 
-function condition_value2str($conditiontype, $value){
-	switch($conditiontype){
+function condition_value2str($conditiontype, $value) {
+	switch ($conditiontype) {
 		case CONDITION_TYPE_HOST_GROUP:
 			$groups = API::HostGroup()->get(array(
 				'groupids' => $value,
@@ -86,14 +89,16 @@ function condition_value2str($conditiontype, $value){
 				'limit' => 1
 			));
 
-			if(!$group = reset($groups))
+			if (!$group = reset($groups)) {
 				error(_s('No host groups with groupid "%s".', $value));
+			}
 
 			$str_val = '';
-			if(id2nodeid($value) != get_current_nodeid())
+			if (id2nodeid($value) != get_current_nodeid()) {
 				$str_val = get_node_name_by_elid($value, true, ': ');
+			}
 
-			$str_val.= $group['name'];
+			$str_val .= $group['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER:
 			$trigs = API::Trigger()->get(array(
@@ -107,16 +112,19 @@ function condition_value2str($conditiontype, $value){
 			$trig = reset($trigs);
 			$host = reset($trig['hosts']);
 			$str_val = '';
-			if(id2nodeid($value) != get_current_nodeid())
+			if (id2nodeid($value) != get_current_nodeid()) {
 				$str_val = get_node_name_by_elid($value, true, ': ');
+			}
 
-			$str_val .= $host['name'].':'.$trig['description'];
+			$str_val .= $host['name'].': '.$trig['description'];
 			break;
 		case CONDITION_TYPE_HOST:
 		case CONDITION_TYPE_HOST_TEMPLATE:
 			$host = get_host_by_hostid($value);
 			$str_val = '';
-			if(id2nodeid($value) != get_current_nodeid()) $str_val = get_node_name_by_elid($value, true, ': ');
+			if (id2nodeid($value) != get_current_nodeid()) {
+				$str_val = get_node_name_by_elid($value, true, ': ');
+			}
 			$str_val.= $host['name'];
 			break;
 		case CONDITION_TYPE_TRIGGER_NAME:
@@ -144,12 +152,13 @@ function condition_value2str($conditiontype, $value){
 			$str_val = $drule['name'];
 			break;
 		case CONDITION_TYPE_DCHECK:
-			$sql = 'SELECT DISTINCT dr.name,c.dcheckid,c.type,c.key_,c.ports'.
-					' FROM drules dr,dchecks c '.
-					' WHERE dr.druleid=c.druleid '.
-						' AND c.dcheckid='.$value;
-			$row = DBfetch(DBselect($sql));
-			$str_val = $row['name'].':'.discovery_check2str($row['type'], $row['key_'], $row['ports']);
+			$row = DBfetch(DBselect(
+				'SELECT DISTINCT dr.name,c.dcheckid,c.type,c.key_,c.ports'.
+				' FROM drules dr,dchecks c '.
+				' WHERE dr.druleid=c.druleid '.
+					' AND c.dcheckid='.$value
+			));
+			$str_val = $row['name'].': '.discovery_check2str($row['type'], $row['key_'], $row['ports']);
 			break;
 		case CONDITION_TYPE_DOBJECT:
 			$str_val = discovery_object2str($value);
@@ -190,80 +199,84 @@ function condition_value2str($conditiontype, $value){
 	return '"'.$str_val.'"';
 }
 
-function get_condition_desc($conditiontype, $operator, $value){
-	return condition_type2str($conditiontype).' '.
-		condition_operator2str($operator).' '.
-		condition_value2str($conditiontype, $value);
+function get_condition_desc($conditiontype, $operator, $value) {
+	return condition_type2str($conditiontype).' '.condition_operator2str($operator).' '.condition_value2str($conditiontype, $value);
 }
 
-define('LONG_DESCRIPTION', 0);
-define('SHORT_DESCRIPTION', 1);
-
-function get_operation_desc($type, $data){
+function get_operation_desc($type, $data) {
 	$result = array();
 
-	if($type == SHORT_DESCRIPTION){
-		switch($data['operationtype']){
+	if ($type == SHORT_DESCRIPTION) {
+		switch ($data['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				if(!isset($data['opmessage_usr'])) $data['opmessage_usr'] = array();
-				if(!isset($data['opmessage_grp'])) $data['opmessage_grp'] = array();
+				if (!isset($data['opmessage_usr'])) {
+					$data['opmessage_usr'] = array();
+				}
+				if (!isset($data['opmessage_grp'])) {
+					$data['opmessage_grp'] = array();
+				}
 
 				$users = API::User()->get(array(
-					'userids' => zbx_objectValues($data['opmessage_usr'],'userid'),
+					'userids' => zbx_objectValues($data['opmessage_usr'], 'userid'),
 					'output' => array('userid', 'alias')
 				));
-				if(!empty($users)){
+				if (!empty($users)) {
 					order_result($users, 'alias');
 
 					$result[] = bold(array(_('Send message to users').':'.SPACE));
-					$result[] = array(implode(', ', zbx_objectValues($users,'alias')), BR());
+					$result[] = array(implode(', ', zbx_objectValues($users, 'alias')), BR());
 				}
 
-
 				$usrgrps = API::UserGroup()->get(array(
-					'usrgrpids' => zbx_objectValues($data['opmessage_grp'],'usrgrpid'),
+					'usrgrpids' => zbx_objectValues($data['opmessage_grp'], 'usrgrpid'),
 					'output' => API_OUTPUT_EXTEND
 				));
-				if(!empty($usrgrps)){
+				if (!empty($usrgrps)) {
 					order_result($usrgrps, 'name');
 
 					$result[] = bold(array(_('Send message to user groups').':'.SPACE));
-					$result[] = array(implode(', ', zbx_objectValues($usrgrps,'name')), BR());
+					$result[] = array(implode(', ', zbx_objectValues($usrgrps, 'name')), BR());
 				}
 				break;
 			case OPERATION_TYPE_COMMAND:
-				if(!isset($data['opcommand_grp'])) $data['opcommand_grp'] = array();
-				if(!isset($data['opcommand_hst'])) $data['opcommand_hst'] = array();
+				if (!isset($data['opcommand_grp'])) {
+					$data['opcommand_grp'] = array();
+				}
+				if (!isset($data['opcommand_hst'])) {
+					$data['opcommand_hst'] = array();
+				}
 
 				$hosts = API::Host()->get(array(
-					'hostids' => zbx_objectValues($data['opcommand_hst'],'hostid'),
+					'hostids' => zbx_objectValues($data['opcommand_hst'], 'hostid'),
 					'output' => array('hostid', 'name')
 				));
 
-				foreach($data['opcommand_hst'] as $num => $cmd){
-					if($cmd['hostid'] != 0) continue;
+				foreach ($data['opcommand_hst'] as $cmd) {
+					if ($cmd['hostid'] != 0) {
+						continue;
+					}
 
 					$result[] = array(bold(_('Run remote commands on current host')), BR());
 					break;
 				}
 
-				if(!empty($hosts)){
+				if (!empty($hosts)) {
 					order_result($hosts, 'name');
 
 					$result[] = bold(_('Run remote commands on hosts').':'.SPACE);
-					$result[] = array(implode(', ', zbx_objectValues($hosts,'name')), BR());
+					$result[] = array(implode(', ', zbx_objectValues($hosts, 'name')), BR());
 				}
 
 				$groups = API::HostGroup()->get(array(
-					'groupids' => zbx_objectValues($data['opcommand_grp'],'groupid'),
+					'groupids' => zbx_objectValues($data['opcommand_grp'], 'groupid'),
 					'output' => array('groupid', 'name')
 				));
 
-				if(!empty($groups)){
+				if (!empty($groups)) {
 					order_result($groups, 'name');
 
 					$result[] = bold(_('Run remote commands on host groups').':'.SPACE);
-					$result[] = array(implode(', ', zbx_objectValues($groups,'name')), BR());
+					$result[] = array(implode(', ', zbx_objectValues($groups, 'name')), BR());
 				}
 				break;
 			case OPERATION_TYPE_HOST_ADD:
@@ -280,40 +293,48 @@ function get_operation_desc($type, $data){
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
 			case OPERATION_TYPE_GROUP_REMOVE:
-				if(!isset($data['opgroup'])) $data['opgroup'] = array();
+				if (!isset($data['opgroup'])) {
+					$data['opgroup'] = array();
+				}
 
 				$groups = API::HostGroup()->get(array(
-					'groupids' => zbx_objectValues($data['opgroup'],'groupid'),
+					'groupids' => zbx_objectValues($data['opgroup'], 'groupid'),
 					'output' => array('groupid', 'name')
 				));
 
-				if(!empty($groups)){
+				if (!empty($groups)) {
 					order_result($groups, 'name');
 
-					if(OPERATION_TYPE_GROUP_ADD == $data['operationtype'])
+					if (OPERATION_TYPE_GROUP_ADD == $data['operationtype']) {
 						$result[] = bold(_('Add to host groups').':'.SPACE);
-					else
+					}
+					else {
 						$result[] = bold(_('Remove from host groups').':'.SPACE);
+					}
 
-					$result[] = array(implode(', ', zbx_objectValues($groups,'name')), BR());
+					$result[] = array(implode(', ', zbx_objectValues($groups, 'name')), BR());
 				}
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				if(!isset($data['optemplate'])) $data['optemplate'] = array();
+				if (!isset($data['optemplate'])) {
+					$data['optemplate'] = array();
+				}
 
 				$templates = API::Template()->get(array(
-					'templateids' => zbx_objectValues($data['optemplate'],'templateid'),
+					'templateids' => zbx_objectValues($data['optemplate'], 'templateid'),
 					'output' => array('hostid', 'name')
 				));
 
-				if(!empty($templates)){
+				if (!empty($templates)) {
 					order_result($templates, 'name');
 
-					if(OPERATION_TYPE_TEMPLATE_ADD == $data['operationtype'])
+					if (OPERATION_TYPE_TEMPLATE_ADD == $data['operationtype']) {
 						$result[] = bold(_('Link to templates').':'.SPACE);
-					else
+					}
+					else {
 						$result[] = bold(_('Unlink from templates').':'.SPACE);
+					}
 
 					$result[] = array(implode(', ', zbx_objectValues($templates, 'name')), BR());
 				}
@@ -321,33 +342,33 @@ function get_operation_desc($type, $data){
 			default:
 		}
 	}
-	else{
-		switch($data['operationtype']){
+	else {
+		switch ($data['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				if(isset($data['opmessage']['default_msg']) && !empty($data['opmessage']['default_msg'])){
-					if(isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])){
-						$result[] = array(bold(_('Subject').': '),BR(),zbx_nl2br($_REQUEST['def_shortdata']));
-						$result[] = array(bold(_('Message').':'),BR(),zbx_nl2br($_REQUEST['def_longdata']));
+				if (isset($data['opmessage']['default_msg']) && !empty($data['opmessage']['default_msg'])) {
+					if (isset($_REQUEST['def_shortdata']) && isset($_REQUEST['def_longdata'])) {
+						$result[] = array(bold(_('Subject').': '), BR(), zbx_nl2br($_REQUEST['def_shortdata']));
+						$result[] = array(bold(_('Message').':'), BR(), zbx_nl2br($_REQUEST['def_longdata']));
 					}
-					else if(isset($data['opmessage']['operationid'])){
+					elseif (isset($data['opmessage']['operationid'])) {
 						$sql = 'SELECT a.def_shortdata,a.def_longdata '.
-								' FROM actions a, operations o '.
+								' FROM actions a,operations o '.
 								' WHERE a.actionid=o.actionid '.
 									' AND o.operationid='.$data['operationid'];
-						if($rows = DBfetch(DBselect($sql,1))){
-							$result[] = array(bold(_('Subject').': '), BR(),zbx_nl2br($rows['def_shortdata']));
-							$result[] = array(bold(_('Message').':'), BR(),zbx_nl2br($rows['def_longdata']));
+						if ($rows = DBfetch(DBselect($sql, 1))) {
+							$result[] = array(bold(_('Subject').': '), BR(), zbx_nl2br($rows['def_shortdata']));
+							$result[] = array(bold(_('Message').': '), BR(), zbx_nl2br($rows['def_longdata']));
 						}
 					}
 				}
-				else{
+				else {
 					$result[] = array(bold(_('Subject').': '), BR(), zbx_nl2br($data['opmessage']['subject']));
-					$result[] = array(bold(_('Message').':'), BR(), zbx_nl2br($data['opmessage']['message']));
+					$result[] = array(bold(_('Message').': '), BR(), zbx_nl2br($data['opmessage']['message']));
 				}
 
 				break;
 			case OPERATION_TYPE_COMMAND:
-				switch($data['opcommand']['type']){
+				switch ($data['opcommand']['type']) {
 					case ZBX_SCRIPT_TYPE_IPMI:
 						$result[] = array(bold(_('Run IPMI command').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
@@ -358,10 +379,12 @@ function get_operation_desc($type, $data){
 						$result[] = array(bold(_('Run TELNET commands').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
 						break;
 					case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-						if($data['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT)
+						if ($data['opcommand']['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_AGENT) {
 							$result[] = array(bold(_('Run custom commands on Zabbix agent').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
-						else
+						}
+						else {
 							$result[] = array(bold(_('Run custom commands on Zabbix server').':'), BR(), italic(zbx_nl2br($data['opcommand']['command'])));
+						}
 						break;
 					case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
 						$userScripts = API::Script()->get(array(
@@ -383,60 +406,59 @@ function get_operation_desc($type, $data){
 	return $result;
 }
 
-function get_conditions_by_eventsource($eventsource){
+function get_conditions_by_eventsource($eventsource) {
 	$conditions[EVENT_SOURCE_TRIGGERS] = array(
-			CONDITION_TYPE_APPLICATION,
-//			CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-			CONDITION_TYPE_HOST_GROUP,
-			CONDITION_TYPE_HOST_TEMPLATE,
-			CONDITION_TYPE_HOST,
-			CONDITION_TYPE_TRIGGER,
-			CONDITION_TYPE_TRIGGER_NAME,
-			CONDITION_TYPE_TRIGGER_SEVERITY,
-			CONDITION_TYPE_TRIGGER_VALUE,
-			CONDITION_TYPE_TIME_PERIOD,
-			CONDITION_TYPE_MAINTENANCE
-		);
+		CONDITION_TYPE_APPLICATION,
+		CONDITION_TYPE_HOST_GROUP,
+		CONDITION_TYPE_HOST_TEMPLATE,
+		CONDITION_TYPE_HOST,
+		CONDITION_TYPE_TRIGGER,
+		CONDITION_TYPE_TRIGGER_NAME,
+		CONDITION_TYPE_TRIGGER_SEVERITY,
+		CONDITION_TYPE_TRIGGER_VALUE,
+		CONDITION_TYPE_TIME_PERIOD,
+		CONDITION_TYPE_MAINTENANCE
+	);
 	$conditions[EVENT_SOURCE_DISCOVERY] = array(
-			CONDITION_TYPE_DHOST_IP,
-			CONDITION_TYPE_DSERVICE_TYPE,
-			CONDITION_TYPE_DSERVICE_PORT,
-			CONDITION_TYPE_DRULE,
-			CONDITION_TYPE_DCHECK,
-			CONDITION_TYPE_DOBJECT,
-			CONDITION_TYPE_DSTATUS,
-			CONDITION_TYPE_DUPTIME,
-			CONDITION_TYPE_DVALUE,
-			CONDITION_TYPE_PROXY
-		);
+		CONDITION_TYPE_DHOST_IP,
+		CONDITION_TYPE_DSERVICE_TYPE,
+		CONDITION_TYPE_DSERVICE_PORT,
+		CONDITION_TYPE_DRULE,
+		CONDITION_TYPE_DCHECK,
+		CONDITION_TYPE_DOBJECT,
+		CONDITION_TYPE_DSTATUS,
+		CONDITION_TYPE_DUPTIME,
+		CONDITION_TYPE_DVALUE,
+		CONDITION_TYPE_PROXY
+	);
 	$conditions[EVENT_SOURCE_AUTO_REGISTRATION] = array(
-			CONDITION_TYPE_HOST_NAME,
-			CONDITION_TYPE_PROXY
-		);
+		CONDITION_TYPE_HOST_NAME,
+		CONDITION_TYPE_PROXY
+	);
 
-	if (ZBX_DISTRIBUTED)
+	if (ZBX_DISTRIBUTED) {
 		array_push($conditions[EVENT_SOURCE_TRIGGERS], CONDITION_TYPE_NODE);
+	}
 
-	if(isset($conditions[$eventsource]))
+	if (isset($conditions[$eventsource])) {
 		return $conditions[$eventsource];
+	}
 
 	return $conditions[EVENT_SOURCE_TRIGGERS];
 }
 
-function get_opconditions_by_eventsource($eventsource){
+function get_opconditions_by_eventsource($eventsource) {
 	$conditions = array(
-		EVENT_SOURCE_TRIGGERS => array(
-			CONDITION_TYPE_EVENT_ACKNOWLEDGED
-		),
+		EVENT_SOURCE_TRIGGERS => array(CONDITION_TYPE_EVENT_ACKNOWLEDGED),
 		EVENT_SOURCE_DISCOVERY => array(),
-		);
+	);
 
-	if(isset($conditions[$eventsource]))
+	if (isset($conditions[$eventsource])) {
 		return $conditions[$eventsource];
-
+	}
 }
 
-function get_operations_by_eventsource($eventsource){
+function get_operations_by_eventsource($eventsource) {
 	$operations[EVENT_SOURCE_TRIGGERS] = array(
 		OPERATION_TYPE_MESSAGE,
 		OPERATION_TYPE_COMMAND
@@ -451,7 +473,7 @@ function get_operations_by_eventsource($eventsource){
 		OPERATION_TYPE_TEMPLATE_ADD,
 		OPERATION_TYPE_TEMPLATE_REMOVE,
 		OPERATION_TYPE_HOST_ENABLE,
-		OPERATION_TYPE_HOST_DISABLE,
+		OPERATION_TYPE_HOST_DISABLE
 	);
 	$operations[EVENT_SOURCE_AUTO_REGISTRATION] = array(
 		OPERATION_TYPE_MESSAGE,
@@ -459,16 +481,17 @@ function get_operations_by_eventsource($eventsource){
 		OPERATION_TYPE_HOST_ADD,
 		OPERATION_TYPE_GROUP_ADD,
 		OPERATION_TYPE_TEMPLATE_ADD,
-		OPERATION_TYPE_HOST_DISABLE,
+		OPERATION_TYPE_HOST_DISABLE
 	);
 
-	if(isset($operations[$eventsource]))
+	if (isset($operations[$eventsource])) {
 		return $operations[$eventsource];
+	}
 
 	return $operations[EVENT_SOURCE_TRIGGERS];
 }
 
-function operation_type2str($type=null){
+function operation_type2str($type = null) {
 	$types = array(
 		OPERATION_TYPE_MESSAGE => _('Send message'),
 		OPERATION_TYPE_COMMAND => _('Remote command'),
@@ -479,22 +502,27 @@ function operation_type2str($type=null){
 		OPERATION_TYPE_GROUP_ADD => _('Add to host group'),
 		OPERATION_TYPE_GROUP_REMOVE => _('Remove from host group'),
 		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
-		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
+		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template')
 	);
 
-	if(is_null($type))
+	if (is_null($type)) {
 		return order_result($types);
-	else if(isset($types[$type]))
+	}
+	elseif (isset($types[$type])) {
 		return $types[$type];
-	else return _('Unknown');
+	}
+	else {
+		return _('Unknown');
+	}
 }
 
-function sortOperations(&$operations){
+function sortOperations(&$operations) {
 	$esc_step_from = array();
 	$esc_step_to = array();
 	$esc_period = array();
 	$operationTypes = array();
-	foreach($operations as $key => $operation) {
+
+	foreach ($operations as $key => $operation) {
 		$esc_step_from[$key] = $operation['esc_step_from'];
 		$esc_step_to[$key] = $operation['esc_step_to'];
 		$esc_period[$key] = $operation['esc_period'];
@@ -503,135 +531,137 @@ function sortOperations(&$operations){
 	array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes, SORT_ASC, $operations);
 }
 
-function get_operators_by_conditiontype($conditiontype){
+function get_operators_by_conditiontype($conditiontype) {
 	$operators[CONDITION_TYPE_HOST_GROUP] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_HOST_TEMPLATE] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_HOST] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_TRIGGER] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_TRIGGER_NAME] = array(
-			CONDITION_OPERATOR_LIKE,
-			CONDITION_OPERATOR_NOT_LIKE
-		);
+		CONDITION_OPERATOR_LIKE,
+		CONDITION_OPERATOR_NOT_LIKE
+	);
 	$operators[CONDITION_TYPE_TRIGGER_SEVERITY] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL,
-			CONDITION_OPERATOR_MORE_EQUAL,
-			CONDITION_OPERATOR_LESS_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL,
+		CONDITION_OPERATOR_MORE_EQUAL,
+		CONDITION_OPERATOR_LESS_EQUAL
+	);
 	$operators[CONDITION_TYPE_TRIGGER_VALUE] = array(
-			CONDITION_OPERATOR_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL
+	);
 	$operators[CONDITION_TYPE_TIME_PERIOD] = array(
-			CONDITION_OPERATOR_IN,
-			CONDITION_OPERATOR_NOT_IN
-		);
+		CONDITION_OPERATOR_IN,
+		CONDITION_OPERATOR_NOT_IN
+	);
 	$operators[CONDITION_TYPE_MAINTENANCE] = array(
-			CONDITION_OPERATOR_IN,
-			CONDITION_OPERATOR_NOT_IN
-		);
+		CONDITION_OPERATOR_IN,
+		CONDITION_OPERATOR_NOT_IN
+	);
 	$operators[CONDITION_TYPE_NODE] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_DRULE] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_DCHECK] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_DOBJECT] = array(
-			CONDITION_OPERATOR_EQUAL,
-		);
+		CONDITION_OPERATOR_EQUAL,
+	);
 	$operators[CONDITION_TYPE_PROXY] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_DHOST_IP] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_DSERVICE_TYPE] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_DSERVICE_PORT] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL
+	);
 	$operators[CONDITION_TYPE_DSTATUS] = array(
-			CONDITION_OPERATOR_EQUAL,
-		);
+		CONDITION_OPERATOR_EQUAL,
+	);
 	$operators[CONDITION_TYPE_DUPTIME] = array(
-			CONDITION_OPERATOR_MORE_EQUAL,
-			CONDITION_OPERATOR_LESS_EQUAL
-		);
+		CONDITION_OPERATOR_MORE_EQUAL,
+		CONDITION_OPERATOR_LESS_EQUAL
+	);
 	$operators[CONDITION_TYPE_DVALUE] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_NOT_EQUAL,
-			CONDITION_OPERATOR_MORE_EQUAL,
-			CONDITION_OPERATOR_LESS_EQUAL,
-			CONDITION_OPERATOR_LIKE,
-			CONDITION_OPERATOR_NOT_LIKE
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL,
+		CONDITION_OPERATOR_MORE_EQUAL,
+		CONDITION_OPERATOR_LESS_EQUAL,
+		CONDITION_OPERATOR_LIKE,
+		CONDITION_OPERATOR_NOT_LIKE
+	);
 	$operators[CONDITION_TYPE_EVENT_ACKNOWLEDGED] = array(
-			CONDITION_OPERATOR_EQUAL
-		);
+		CONDITION_OPERATOR_EQUAL
+	);
 	$operators[CONDITION_TYPE_APPLICATION] = array(
-			CONDITION_OPERATOR_EQUAL,
-			CONDITION_OPERATOR_LIKE,
-			CONDITION_OPERATOR_NOT_LIKE
-		);
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_LIKE,
+		CONDITION_OPERATOR_NOT_LIKE
+	);
 	$operators[CONDITION_TYPE_HOST_NAME] = array(
-			CONDITION_OPERATOR_LIKE,
-			CONDITION_OPERATOR_NOT_LIKE
-		);
+		CONDITION_OPERATOR_LIKE,
+		CONDITION_OPERATOR_NOT_LIKE
+	);
 
-	if(isset($operators[$conditiontype]))
+	if (isset($operators[$conditiontype])) {
 		return $operators[$conditiontype];
+	}
 
 	return array();
 }
 
-function count_operations_delay($operations, $def_period=0){
-	$delays = array(0,0);
+function count_operations_delay($operations, $def_period = 0) {
+	$delays = array(0, 0);
 	$periods = array();
 	$max_step = 0;
-	foreach($operations as $operation){
-		$step_from = $operation['esc_step_from']?$operation['esc_step_from']:1;
-		$step_to = $operation['esc_step_to']?$operation['esc_step_to']:9999;
-		$esc_period = $operation['esc_period']?$operation['esc_period']:$def_period;
 
-		$max_step = ($max_step>$step_from)?$max_step:$step_from;
+	foreach ($operations as $operation) {
+		$step_from = $operation['esc_step_from'] ? $operation['esc_step_from'] : 1;
+		$step_to = $operation['esc_step_to'] ? $operation['esc_step_to'] : 9999;
+		$esc_period = $operation['esc_period'] ? $operation['esc_period'] : $def_period;
 
-		for($i=$step_from; $i<$step_to; $i++){
-			if(isset($periods[$i]) && ($periods[$i] < $esc_period)){
+		$max_step = ($max_step > $step_from) ? $max_step : $step_from;
+
+		for ($i = $step_from; $i < $step_to; $i++) {
+			if (isset($periods[$i]) && $periods[$i] < $esc_period) {
 			}
-			else{
+			else {
 				$periods[$i]= $esc_period;
 			}
 		}
 	}
 
-	for($i=1; $i<=$max_step; $i++){
-		$esc_period = isset($periods[$i])?$periods[$i]:$def_period;
+	for ($i = 1; $i <= $max_step; $i++) {
+		$esc_period = isset($periods[$i]) ? $periods[$i] : $def_period;
 		$delays[$i+1] = $delays[$i] + $esc_period;
 	}
 
-return $delays;
+	return $delays;
 }
 
 function get_history_of_actions($limit, &$last_clock = null, $sql_cond = '') {
@@ -652,10 +682,10 @@ function get_history_of_actions($limit, &$last_clock = null, $sql_cond = '') {
 		_('Error')
 	));
 
-	$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
-			' FROM events e, alerts a '.
+	$sql = 'SELECT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error'.
+			' FROM events e,alerts a'.
 				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid '.
-			' WHERE e.eventid = a.eventid '.
+			' WHERE e.eventid=a.eventid'.
 				' AND alerttype IN ('.ALERT_TYPE_MESSAGE.') '.
 				$sql_cond.
 				' AND '.DBcondition('e.objectid', $available_triggers).
@@ -745,7 +775,7 @@ function get_action_msgs_for_event($event) {
 
 		$mediatype = array_pop($alert['mediatypes']);
 
-		$time = zbx_date2str(EVENT_ACTION_MESSAGES_DATE_FORMAT, $alert["clock"]);
+		$time = zbx_date2str(EVENT_ACTION_MESSAGES_DATE_FORMAT, $alert['clock']);
 		if ($alert['esc_step'] > 0) {
 			$time = array(
 				bold(_('Step').': '),
@@ -774,7 +804,7 @@ function get_action_msgs_for_event($event) {
 		$message = array(
 			bold(_('Subject').':'),
 			br(),
-			$alert["subject"],
+			$alert['subject'],
 			br(),
 			br(),
 			bold(_('Message').':')
