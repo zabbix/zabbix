@@ -919,7 +919,8 @@
 			'alreadyPopulated' => null,
 			'lifetime' => get_request('lifetime', 30),
 			'filter' => isset($ifm, $ifv) ? $ifm.':'.$ifv : '',
-			'initial_item_type' => null
+			'initial_item_type' => null,
+			'templates' => array()
 		);
 
 		// hostid
@@ -956,60 +957,58 @@
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 			$data['limited'] = $data['item']['templateid'] != 0;
 
-			// caption
-			if (empty($data['is_discovery_rule'])) {
-				$data['caption'] = array();
-				$itemid = $data['itemid'];
-				do {
-					$item = API::Item()->get(array(
-						'itemids' => $itemid,
-						'output' => array('itemid', 'templateid'),
-						'selectHosts' => array('name'),
-						'selectDiscoveryRule' => array('itemid')
-					));
-					$item = reset($item);
-					if (!empty($item)) {
-						$host = reset($item['hosts']);
-						if (!empty($item['hosts'])) {
-							if (bccomp($data['itemid'], $itemid) == 0) {
-								$data['caption'][] = SPACE;
-								$data['caption'][] = $host['name'];
-							}
-							// item prototype
-							elseif ($item['discoveryRule']) {
-								$data['caption'][] = ' : ';
-								$data['caption'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline');
-							}
-							// plain item
-							else {
-								$data['caption'][] = ' : ';
-								$data['caption'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline');
-							}
-						}
-						$itemid = $item['templateid'];
-					}
-					else {
-						break;
-					}
-				} while ($itemid != 0);
+			// get templates
+			$itemid = $data['itemid'];
+			do {
+				$options = array(
+					'itemids' => $itemid,
+					'output' => array('itemid', 'templateid'),
+					'selectHosts' => array('name'),
+					'selectDiscoveryRule' => array('itemid')
+				);
+				if ($data['is_discovery_rule']) {
+					$options['filter'] = array('flags' => ZBX_FLAG_DISCOVERY);
+				}
+				$item = API::Item()->get($options);
+				$item = reset($item);
 
-				$data['caption'][] = !empty($data['parent_discoveryid']) ? _('Item prototype').' "' : _('Item').' "';
-				$data['caption'] = array_reverse($data['caption']);
-				$data['caption'][] = ': ';
-				$data['caption'][] = $data['item']['name'];
-				$data['caption'][] = '"';
-			}
-			else {
-				$data['caption'] = _('Discovery rule');
-			}
+				if (!empty($item)) {
+					$host = reset($item['hosts']);
+					if (!empty($item['hosts'])) {
+						if (bccomp($data['itemid'], $itemid) == 0) {
+						}
+						// discovery rule
+						elseif ($data['is_discovery_rule']) {
+							$data['templates'][] = new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+							$data['templates'][] = SPACE.RARR.SPACE;
+						}
+						// item prototype
+						elseif ($item['discoveryRule']) {
+							$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline weight_normal');
+							$data['templates'][] = SPACE.RARR.SPACE;
+						}
+						// plain item
+						else {
+							$data['templates'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+							$data['templates'][] = SPACE.RARR.SPACE;
+						}
+					}
+					$itemid = $item['templateid'];
+				}
+				else {
+					break;
+				}
+			} while ($itemid != 0);
+			$data['templates'] = array_reverse($data['templates']);
+			array_shift($data['templates']);
+		}
+
+		// caption
+		if (!empty($data['is_discovery_rule'])) {
+			$data['caption'] = _('Discovery rule');
 		}
 		else {
-			if (empty($data['is_discovery_rule'])) {
-				$data['caption'] = _s('Item %1$s : %2$s', $data['hostname'], $data['name']);
-			}
-			else {
-				$data['caption'] = _('Discovery rule');
-			}
+			$data['caption'] = !empty($data['parent_discoveryid']) ? _('Item prototype') : _('Item');
 		}
 
 		// hostname

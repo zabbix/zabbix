@@ -106,7 +106,9 @@ if (!empty($_REQUEST['parent_discoveryid'])) {
 		access_deny();
 	}
 
-	$_REQUEST['hostid'] = $discovery_rule['hostid'];
+	if (empty($_REQUEST['hostid'])) {
+		$_REQUEST['hostid'] = $discovery_rule['hostid'];
+	}
 
 	if (isset($_REQUEST['graphid'])) {
 		$graphPrototype = API::GraphPrototype()->get(array(
