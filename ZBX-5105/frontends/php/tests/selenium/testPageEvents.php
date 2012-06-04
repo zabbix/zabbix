@@ -30,7 +30,7 @@ class testPageEvents extends CWebTest {
 		$this->dropdown_select_wait('groupid', 'all');
 		$this->dropdown_select_wait('hostid', 'all');
 
-		$this->assertTitle('Latest events');
+		$this->checkTitle('Latest events');
 		$this->ok('HISTORY OF EVENTS');
 		$this->ok('Group');
 		$this->ok('Host');
@@ -51,7 +51,7 @@ class testPageEvents extends CWebTest {
 
 		$this->dropdown_select_wait('source', 'Discovery');
 
-		$this->assertTitle('Latest events');
+		$this->checkTitle('Latest events');
 		$this->ok('HISTORY OF EVENTS');
 		$this->ok('Source');
 		$this->ok('Filter');
@@ -74,7 +74,7 @@ class testPageEvents extends CWebTest {
 	public function testPageEvents_Triggers_NoHostNames() {
 		$this->login('events.php');
 		$this->dropdown_select_wait('source', 'Trigger');
-		$this->assertTitle('Latest events');
+		$this->checkTitle('Latest events');
 
 		$this->checkNoRealHostnames();
 	}
@@ -83,7 +83,7 @@ class testPageEvents extends CWebTest {
 	public function testPageEvents_Discovery_NoHostNames() {
 		$this->login('events.php');
 		$this->dropdown_select_wait('source', 'Discovery');
-		$this->assertTitle('Latest events');
+		$this->checkTitle('Latest events');
 
 		$this->checkNoRealHostnames();
 	}

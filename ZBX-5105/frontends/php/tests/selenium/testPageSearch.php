@@ -27,7 +27,7 @@ class testPageSearch extends CWebTest {
 		$this->input_type('search', "ЗАББИКС Сервер");
 		$this->keyPress('search', "\\13");
 		$this->wait();
-		$this->assertTitle('Search');
+		$this->checkTitle('Search');
 		$this->ok('Hosts');
 		$this->ok('Displaying 1 of 1 found');
 		$this->ok('Displaying 0 of 0 found');
@@ -50,7 +50,7 @@ class testPageSearch extends CWebTest {
 		$this->input_type('search', "_");
 		$this->keyPress('search', "\\13");
 		$this->wait();
-		$this->assertTitle('Search');
+		$this->checkTitle('Search');
 		$this->nok('Displaying 1 of 1 found');
 		$this->nok('ЗАББИКС Сервер');
 		$this->ok('Displaying 0 of 0 found');
@@ -62,7 +62,7 @@ class testPageSearch extends CWebTest {
 		$this->input_type('search', "%");
 		$this->keyPress('search', "\\13");
 		$this->wait();
-		$this->assertTitle('Search');
+		$this->checkTitle('Search');
 		$this->nok('Displaying 1 of 1 found');
 		$this->nok('ЗАББИКС Сервер');
 		$this->ok('Displaying 0 of 0 found');

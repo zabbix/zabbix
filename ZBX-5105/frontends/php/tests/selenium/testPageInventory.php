@@ -39,7 +39,7 @@ class testPageInventory extends CWebTest {
 
 		$this->dropdown_select_wait('groupid', 'all');
 
-		$this->assertTitle('Host inventories');
+		$this->checkTitle('Host inventories');
 		$this->ok('HOST INVENTORIES');
 		$this->ok('Displaying');
 		$this->nok('Displaying 0');
@@ -65,7 +65,7 @@ class testPageInventory extends CWebTest {
 	*/
 	public function testPageHostInventory_ViewInventory($inventory) {
 		$this->login('hostinventories.php?hostid='.$inventory['hostid']);
-		$this->assertTitle('Host inventories');
+		$this->checkTitle('Host inventories');
 
 		unset($inventory['hostid']);
 		$this->ok($inventory);
@@ -73,7 +73,7 @@ class testPageInventory extends CWebTest {
 		$this->button_click('cancel');
 		$this->wait();
 
-		$this->assertTitle('Host inventories');
+		$this->checkTitle('Host inventories');
 		$this->ok('HOST INVENTORIES');
 	}
 
