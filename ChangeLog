@@ -787,6 +787,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+...G...... [ZBX-5027] added file size check to log monitoring to report error if it's over 2 GB (dimir)
 .......PS. [ZBX-4980] fixed error in decoding of big base64 encoded values (Andris)
 .......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
 .......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
