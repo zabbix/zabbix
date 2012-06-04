@@ -87,7 +87,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 		CWebUser::checkAuthentication(null);
 	}
 }
-elseif (empty(CWebUser::$data)) {
+else {
 	// login the user from the session, if the session id is empty - login as a guest
 	CWebUser::checkAuthentication(get_cookie('zbx_sessionid'));
 }
