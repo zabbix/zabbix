@@ -47,7 +47,7 @@ Changes for 2.0.1rc1
 
 New features:
 A.F....... [ZBX-5074] redesign configuration of action (Eduard)
-..F....... [ZBX-1357] updated Brazilian Portuguese, Greek, Japanese, Ukrainian and Russian translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBX-1357] updated Brazilian Portuguese, French, Greek, Japanese, Ukrainian and Russian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1019] updated jQuery to 1.7.2 and jQuery UI to 1.8.20 (Vedmak)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
