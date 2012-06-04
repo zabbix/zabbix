@@ -110,7 +110,7 @@ switch ($page['type']) {
 
 		// page title
 		$page_title = '';
-		if (!zbx_empty($ZBX_SERVER_NAME)) {
+		if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
 			$page_title = $ZBX_SERVER_NAME.': ';
 		}
 		$page_title .= isset($page['title']) ? $page['title'] : _('Zabbix');
@@ -355,7 +355,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		}
 	}
 
-	if (!zbx_empty($ZBX_SERVER_NAME)) {
+	if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
 		$table = new CTable();
 		$table->addStyle('width: 100%;');
 
