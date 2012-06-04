@@ -1073,6 +1073,7 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$prototypes = API::ItemPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
+			'selectApplications' => API_OUTPUT_EXTEND,
 			'output' => API_OUTPUT_EXTEND
 		));
 
@@ -1094,6 +1095,9 @@ class CDiscoveryRule extends CItemGeneral {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on host "%1$s" for item key "%2$s".', $dstHost['name'], $prototype['key_']));
 					}
 				}
+
+				// add new applications
+				$prototype['applications'] = get_same_applications_for_host(zbx_objectValues($prototype['applications'], 'applicationid'), $dstHost['hostid']);
 
 				$prototypes[$key] = $prototype;
 			}

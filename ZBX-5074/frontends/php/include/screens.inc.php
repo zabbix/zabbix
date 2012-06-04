@@ -235,49 +235,60 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 		return false;
 	}
 
-	if (!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.$delay.' WHERE slideshowid='.$slideshowid)) {
-		return false;
+	$db_slideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.$slideshowid));
+	$db_slideshow = $db_slideshow[0];
+	$changed = false;
+	$slideshow = array('name' => $name, 'delay' => $delay);
+	foreach ($slideshow as $key => $val) {
+		if ($db_slideshow[$key] != $val) {
+			$changed = true;
+			break;
+		}
+	}
+	if ($changed) {
+		if (!$result = DBexecute('UPDATE slideshows SET name='.zbx_dbstr($name).',delay='.$delay.' WHERE slideshowid='.$slideshowid)) {
+			return false;
+		}
 	}
 
 	// get slides
-	$db_slides = DBfetchArray(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.$slideshowid.' ORDER BY s.step'));
+	$db_slides = DBfetchArrayAssoc(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.$slideshowid), 'slideid');
 
-	// checking, if at least one of them has changes
-	$slidesChanged = false;
-	if (count($db_slides) != count($slides)) {
-		$slidesChanged = true;
-	}
-	else {
-		foreach ($db_slides as $i => $slide) {
-			if (bccomp($db_slides[$i]['screenid'], $slides[$i]['screenid']) != 0 || $db_slides[$i]['delay'] != $slides[$i]['delay']) {
-				$slidesChanged = true;
-				break;
+	$slidesToDel = zbx_objectValues($db_slides, 'slideid');
+	$slidesToDel = zbx_toHash($slidesToDel);
+	$step = 0;
+	foreach ($slides as $slide) {
+		$slide['delay'] = $slide['delay'] ? $slide['delay'] : 0;
+		if (isset($db_slides[$slide['slideid']])) {
+			// update slide
+			if ($db_slides[$slide['slideid']]['delay'] != $slide['delay'] || $db_slides[$slide['slideid']]['step'] != $step) {
+				$result = DBexecute('UPDATE slides SET  step='.$step.', delay='.$slide['delay'].' WHERE slideid='.$slide['slideid']);
 			}
+			// do nothing with slide
+			else {
+				$result = true;
+			}
+			unset($slidesToDel[$slide['slideid']]);
 		}
-	}
-
-	// update slides
-	if ($slidesChanged) {
-		DBexecute('DELETE FROM slides where slideshowid='.$slideshowid);
-
-		$i = 0;
-		foreach ($slides as $slide) {
+		// insert slide
+		else {
 			$slideid = get_dbid('slides', 'slideid');
-
-			// set default delay
-			if (empty($slide['delay'])) {
-				$slide['delay'] = 0;
-			}
-
 			$result = DBexecute(
 				'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
-				' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')'
+				' VALUES ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.$step.','.$slide['delay'].')'
 			);
-			if (!$result) {
-				return false;
-			}
+		}
+		$step ++;
+		if (!$result) {
+			return false;
 		}
 	}
+
+	// delete unnecessary slides
+	if (!empty($slidesToDel)) {
+		DBexecute('DELETE FROM slides WHERE slideid IN('.implode(',', $slidesToDel).')');
+	}
+
 	return true;
 }
 

@@ -3125,7 +3125,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 			dbitem = zbx_hashset_search(&config->dbitems, &src_item->itemid);
-			dst_item->params = zbx_strdup(dst_item->params, NULL != dbitem ? dbitem->params : "");
+			dst_item->params = zbx_strdup(NULL, NULL != dbitem ? dbitem->params : "");
 			break;
 		case ITEM_TYPE_SSH:
 			if (NULL != (sshitem = zbx_hashset_search(&config->sshitems, &src_item->itemid)))
@@ -3135,7 +3135,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				strscpy(dst_item->publickey_orig, sshitem->publickey);
 				strscpy(dst_item->privatekey_orig, sshitem->privatekey);
 				strscpy(dst_item->password_orig, sshitem->password);
-				dst_item->params = zbx_strdup(dst_item->params, sshitem->params);
+				dst_item->params = zbx_strdup(NULL, sshitem->params);
 			}
 			else
 			{
@@ -3144,7 +3144,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->publickey_orig = '\0';
 				*dst_item->privatekey_orig = '\0';
 				*dst_item->password_orig = '\0';
-				dst_item->params = zbx_strdup(dst_item->params, "");
+				dst_item->params = zbx_strdup(NULL, "");
 			}
 			dst_item->username = NULL;
 			dst_item->publickey = NULL;
@@ -3156,13 +3156,13 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			{
 				strscpy(dst_item->username_orig, telnetitem->username);
 				strscpy(dst_item->password_orig, telnetitem->password);
-				dst_item->params = zbx_strdup(dst_item->params, telnetitem->params);
+				dst_item->params = zbx_strdup(NULL, telnetitem->params);
 			}
 			else
 			{
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
-				dst_item->params = zbx_strdup(dst_item->params, "");
+				dst_item->params = zbx_strdup(NULL, "");
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
@@ -3183,7 +3183,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			break;
 		case ITEM_TYPE_CALCULATED:
 			calcitem = zbx_hashset_search(&config->calcitems, &src_item->itemid);
-			dst_item->params = zbx_strdup(dst_item->params, NULL != calcitem ? calcitem->params : "");
+			dst_item->params = zbx_strdup(NULL, NULL != calcitem ? calcitem->params : "");
 			break;
 		default:
 			/* nothing to do */;

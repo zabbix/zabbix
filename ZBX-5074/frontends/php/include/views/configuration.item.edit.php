@@ -57,8 +57,9 @@ if (!$this->data['is_discovery_rule']) {
 			new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 			empty($this->data['itemid'])
 				? new CButton('btn_host', _('Select'),
-					"return PopUp('popup.php?dstfrm=".$itemForm->getName().'&dstfld1=hostname&dstfld2=form_hostid'.
-						"&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&noempty=1&submitParent=1', 450, 450);",
+					'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid'.
+						'&dstfrm='.$itemForm->getName().'&dstfld1=hostname&dstfld2=form_hostid'.
+						'&noempty=1&submitParent=1", 450, 450);',
 					'formlist'
 				)
 				: null
@@ -85,8 +86,8 @@ $itemFormList->addRow(_('Key'), array(
 	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
 	!$this->data['limited']
 	? new CButton('keyButton', _('Select'),
-		"return PopUp('popup.php?dstfrm=".$itemForm->getName().
-			"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=' + jQuery('#type option:selected').val());",
+		'return PopUp("popup.php?srctbl=help_items&srcfld1=key_'.
+			'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
 		'formlist')
 	: null
 ));
@@ -593,6 +594,7 @@ foreach ($this->data['types'] as $type => $label) {
 foreach (array(ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE) as $type) {
 	// set to disable character, log and text items in value type
 	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT), 'value_type');
+
 	// disable octal, hexadecimal and boolean items in data_type; Necessary for Numeric (unsigned) value type only
 	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_DATA_TYPE_OCTAL, ITEM_DATA_TYPE_HEXADECIMAL, ITEM_DATA_TYPE_BOOLEAN), 'data_type');
 }
