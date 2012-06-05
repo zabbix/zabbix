@@ -1692,11 +1692,12 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Deletes all trigger dependencies from the given triggers and their children.
 	 *
-	 * @param array $triggers   an array of triggers with the 'triggerid' field defined
+	 * @param array $triggers	an array of triggers with the 'triggerid' field defined
+	 * @param bool $onlyTemplated	true to delete only dependencies from templates
 	 *
 	 * @return boolean
 	 */
-	public function deleteDependencies(array $triggers) {
+	public function deleteDependencies(array $triggers, $onlyTemplated = false) {
 		$triggers = zbx_toArray($triggers);
 
 		$this->validateDeleteDependencies($triggers);
@@ -1712,12 +1713,19 @@ class CTrigger extends CTriggerGeneral {
 				)
 			));
 			if ($childTriggers) {
-				$this->deleteDependencies($childTriggers);
+				$this->deleteDependencies($childTriggers, $onlyTemplated);
 			}
 
-			DB::delete('trigger_depends', array(
-				'triggerid_down' => $triggerids
-			));
+			if ($onlyTemplated) {
+				DBexecute("DELETE td FROM trigger_depends td
+					LEFT JOIN triggers t ON td.triggerid_up = t.triggerid
+					WHERE  templateid is not null AND".  DBcondition('triggerid_down', $triggerids));
+			}
+			else {
+				DB::delete('trigger_depends', array(
+					'triggerid_down' => $triggerids
+				));
+			}
 		}
 		catch (APIException $e) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete dependency'));
@@ -1966,7 +1974,7 @@ class CTrigger extends CTriggerGeneral {
 						}
 					}
 				}
-				$this->deleteDependencies($childTriggers);
+				$this->deleteDependencies($childTriggers, true);
 
 				if ($newDependencies) {
 					$this->addDependencies($newDependencies);
