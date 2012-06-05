@@ -65,6 +65,13 @@ class CZBXAPI {
 	 */
 	protected $getOptions = array();
 
+	/**
+	 * An array containing all of the error strings.
+	 *
+	 * @var array
+	 */
+	protected $errorMessages = array();
+
 	public function __construct() {
 		// set the PK of the table
 		$this->pk = $this->pk($this->tableName());
@@ -194,6 +201,17 @@ class CZBXAPI {
 		$schema = $this->getTableSchema($tableName);
 
 		return isset($schema['fields'][$fieldName]);
+	}
+
+	/**
+	 * Returns a translated error message.
+	 *
+	 * @param $id
+	 *
+	 * @return string
+	 */
+	protected function getErrorMsg($id) {
+		return $this->errorMessages[$id];
 	}
 
 	/**

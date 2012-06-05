@@ -30,11 +30,12 @@ class CGraphPrototype extends CGraphGeneral {
 	protected $tableName = 'graphs';
 	protected $tableAlias = 'g';
 
-	protected static function getErrorMsg($id) {
-		$errors = array(
-			1 => 'Graph prototype "%1$s" with template host cannot contain items from other hosts.'
-		);
-		return $errors[$id];
+	public function __construct() {
+		parent::__construct();
+
+		$this->errorMessages = array_merge($this->errorMessages, array(
+			self::ERROR_TEMPLATE_HOST_MIX => _('Graph prototype "%1$s" with template host cannot contain items from other hosts.')
+		));
 	}
 
 	/**

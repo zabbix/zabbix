@@ -24,6 +24,8 @@
  */
 abstract class CGraphGeneral extends CZBXAPI {
 
+	const ERROR_TEMPLATE_HOST_MIX = 'templateHostMix';
+
 	/**
 	 * Update existing graphs
 	 *
@@ -67,7 +69,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 				if (HOST_STATUS_TEMPLATE == $host['status']) {
 					$templatedGraph = $host['hostid'];
 					if (count($graphHosts) > 1) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s($this->getErrorMsg(1), $graph['name']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s($this->getErrorMsg(self::ERROR_TEMPLATE_HOST_MIX), $graph['name']));
 					}
 					break;
 				}
@@ -117,7 +119,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 				}
 			}
 			if ($templatedGraph && count($graphHosts) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s($this->getErrorMsg(1), $graph['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s($this->getErrorMsg(self::ERROR_TEMPLATE_HOST_MIX), $graph['name']));
 			}
 
 			// check ymin, ymax items
