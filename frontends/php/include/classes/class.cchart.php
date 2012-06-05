@@ -1396,18 +1396,20 @@ class CChart extends CGraphDraw {
 			$dims = imageTextSize(8, 0, $str);
 
 			// marker Y coordinate
-			$posY = $this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_LEFT] * $i + $this->shiftY + 4;
-			$posY += $this->getYStepMarkerPosOffset(GRAPH_YAXIS_SIDE_LEFT, $i);
+			$posY = $this->getYStepMarkerPosY(GRAPH_YAXIS_SIDE_LEFT, $i);
 
-			imageText(
-				$this->im,
-				8,
-				0,
-				$this->shiftXleft - $dims['width'] - 6,
-				$posY,
-				$this->getColor($this->graphtheme['textcolor'], 0),
-				$str
-			);
+			// only draw the marker if it doesn't overlay the previous one
+			if (($posY + $dims['height']) < $this->getYStepMarkerPosY(GRAPH_YAXIS_SIDE_LEFT, $i - 1)) {
+				imageText(
+					$this->im,
+					8,
+					0,
+					$this->shiftXleft - $dims['width'] - 6,
+					$posY,
+					$this->getColor($this->graphtheme['textcolor'], 0),
+					$str
+				);
+			}
 		}
 
 		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
@@ -1503,18 +1505,21 @@ class CChart extends CGraphDraw {
 			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
 
 			// marker Y coordinate
-			$posY = $this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT] * $i + $this->shiftY + 4;
-			$posY += $this->getYStepMarkerPosOffset(GRAPH_YAXIS_SIDE_RIGHT, $i);
+			$dims = imageTextSize(8, 0, $str);
+			$posY = $this->getYStepMarkerPosY(GRAPH_YAXIS_SIDE_RIGHT, $i);
 
-			imageText(
-				$this->im,
-				8,
-				0,
-				$this->sizeX + $this->shiftXleft + 12,
-				$posY,
-				$this->getColor($this->graphtheme['textcolor'], 0),
-				$str
-			);
+			// only draw the marker if it doesn't overlay the previous one
+			if (($posY + $dims['height']) <= $this->getYStepMarkerPosY(GRAPH_YAXIS_SIDE_RIGHT, $i - 1)) {
+				imageText(
+					$this->im,
+					8,
+					0,
+					$this->sizeX + $this->shiftXleft + 12,
+					$posY,
+					$this->getColor($this->graphtheme['textcolor'], 0),
+					$str
+				);
+			}
 		}
 
 		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
@@ -1539,6 +1544,21 @@ class CChart extends CGraphDraw {
 				$this->getColor(GRAPH_ZERO_LINE_COLOR_RIGHT)
 			);
 		}
+	}
+
+	/**
+	 * Calculates the Y coordinate of the Y scale marker value label.
+	 *
+	 * @param $yAxis
+	 * @param $stepNumber
+	 *
+	 * @return float|int
+	 */
+	protected function getYStepMarkerPosY($yAxis, $stepNumber) {
+		$posY = $this->sizeY - $this->gridStepX[$yAxis] * $stepNumber + $this->shiftY + 4;
+		$posY += $this->getYStepMarkerPosOffset($yAxis, $stepNumber);
+
+		return $posY;
 	}
 
 	/**
