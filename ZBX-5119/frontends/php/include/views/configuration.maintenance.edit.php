@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $maintenanceWidget = new CWidget();
 $maintenanceWidget->addPageHeader(_('CONFIGURATION OF MAINTENANCE PERIODS'));
 
@@ -59,7 +59,7 @@ $maintenanceFormList->addRow(_('Active since'), array($maintenanceSinceDay, '/',
 zbx_add_post_js('create_calendar(null, ["mntc_since_day", "mntc_since_month", "mntc_since_year", "mntc_since_hour", "mntc_since_minute"], "mntc_active_since", "active_since");');
 
 $calendarIcon->addAction('onclick', 'javascript: var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["mntc_active_till"].clndr.clndrshow(pos.top, pos.left); CLNDR["mntc_active_since"].clndr.clndrhide();');
-$maintenanceTillDay = new CNumericBox('mntc_till_day', $this->data['active_since'] > 0 ? date('d', $this->data['active_since']) : '', 2);
+$maintenanceTillDay = new CNumericBox('mntc_till_day', $this->data['active_till'] > 0 ? date('d', $this->data['active_till']) : '', 2);
 $maintenanceTillDay->setAttribute('placeholder', _('dd'));
 $maintenanceTillMonth = new CNumericBox('mntc_till_month', $this->data['active_till'] > 0 ? date('m', $this->data['active_till']) : '', 2);
 $maintenanceTillMonth->setAttribute('placeholder', _('mm'));
@@ -175,4 +175,3 @@ else {
 
 $maintenanceWidget->addItem($maintenanceForm);
 return $maintenanceWidget;
-?>
