@@ -110,7 +110,7 @@ else {
 	array_push($options, 'templated_hosts');
 }
 
-if(!$ZBX_WITH_ALL_NODES) {
+if (!$ZBX_WITH_ALL_NODES) {
 	array_push($options, 'only_current_node');
 }
 
