@@ -17,14 +17,15 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CTrigger class for API.
  *
  * @package API
  */
 class CTrigger extends CTriggerGeneral {
+
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
 
@@ -947,7 +948,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// adding items
-		if (!is_null($options['selectItems']) && str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
+		if (!is_null($options['selectItems']) && (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
 			$objParams = array(
 				'nodeids' => $nodeids,
 				'output' => $options['selectItems'],
@@ -1020,7 +1021,7 @@ class CTrigger extends CTriggerGeneral {
 			$triggersToExpandItems = array();
 			$triggersToExpandItems2 = array();
 
-			foreach ($result as $tnum => $trigger) {
+			foreach ($result as $trigger) {
 				preg_match_all('/{HOST\.NAME([1-9]?)}/u', $trigger['description'], $hnums);
 				if (!empty($hnums[1])) {
 					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
@@ -1099,21 +1100,19 @@ class CTrigger extends CTriggerGeneral {
 
 			if (!empty($functionids)) {
 				$dbFuncs = DBselect(
-					'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name,i.lastvalue'.
-					' FROM functions f,items i,hosts h'.
-					' WHERE f.itemid=i.itemid'.
-						' AND i.hostid=h.hostid'.
-						' AND h.status<>'.HOST_STATUS_TEMPLATE.
+					'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name,i.lastvalue,m.newvalue'.
+					' FROM functions f'.
+						' INNER JOIN items i ON f.itemid=i.itemid'.
+						' INNER JOIN hosts h ON i.hostid=h.hostid'.
+						' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
+					' WHERE h.status<>'.HOST_STATUS_TEMPLATE.
 						' AND '.DBcondition('f.functionid', $functionids)
 				);
 				while ($func = DBfetch($dbFuncs)) {
 					if (isset($triggersToExpandHosts[$func['triggerid']][$func['functionid']])) {
 						$fnum = $triggersToExpandHosts[$func['triggerid']][$func['functionid']];
-						if ($fnum == 1) {
-							$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME}', $func['host'], $result[$func['triggerid']]['description']);
-							$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME}', $func['name'], $result[$func['triggerid']]['description']);
-							$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST}', $func['host'], $result[$func['triggerid']]['description']);
-						}
+						$fnum = $fnum > 1 ? $fnum : '';
+
 						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
 						$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
 						$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
@@ -1121,18 +1120,20 @@ class CTrigger extends CTriggerGeneral {
 
 					if (isset($triggersToExpandItems[$func['triggerid']][$func['functionid']])) {
 						$fnum = $triggersToExpandItems[$func['triggerid']][$func['functionid']];
-						if ($fnum == 1) {
-							$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
-						}
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+						$fnum = $fnum > 1 ? $fnum : '';
+
+						$value = $func['newvalue'] ? $func['newvalue'].' '.'('.$func['lastvalue'].')' : $func['lastvalue'];
+
+						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $value, $result[$func['triggerid']]['description']);
 					}
 
 					if (isset($triggersToExpandItems2[$func['triggerid']][$func['functionid']])) {
 						$fnum = $triggersToExpandItems2[$func['triggerid']][$func['functionid']];
-						if ($fnum == 1) {
-							$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE}', $func['lastvalue'], $result[$func['triggerid']]['description']);
-						}
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $func['lastvalue'], $result[$func['triggerid']]['description']);
+						$fnum = $fnum > 1 ? $fnum : '';
+
+						$value = $func['newvalue'] ? $func['newvalue'].' '.'('.$func['lastvalue'].')' : $func['lastvalue'];
+
+						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $value, $result[$func['triggerid']]['description']);
 					}
 				}
 			}
@@ -1300,7 +1301,6 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($update) {
 				$dbTrigger = $dbTriggers[$trigger['triggerid']];
-				$currentTrigger['description'] = $dbTrigger['description'];
 			}
 			elseif ($delete) {
 				if ($dbTriggers[$trigger['triggerid']]['templateid'] != 0) {
@@ -1400,16 +1400,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			// check existing
-			if ($create) {
-				$existTrigger = API::Trigger()->exists(array(
-					'description' => $trigger['description'],
-					'expression' => $trigger['expression']
-				));
-
-				if ($existTrigger) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%1$s:%2$s" already exists.', $trigger['description'], $trigger['expression']));
-				}
-			}
+			$this->checkIfExistsOnHost($currentTrigger);
 		}
 		unset($trigger);
 	}
@@ -1586,9 +1577,12 @@ class CTrigger extends CTriggerGeneral {
 			'value' => $pks
 		));
 
-		parent::deleteByPks($pks);
+		// update linked services
+		foreach ($pks as $triggerId) {
+			update_services($triggerId, SERVICE_STATUS_OK);
+		}
 
-		update_services_status_all();
+		parent::deleteByPks($pks);
 	}
 
 	/**
@@ -1809,34 +1803,8 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($descriptionChanged || $expressionChanged) {
 				$expressionData = new CTriggerExpression(array('expression' => $expressionFull));
-
 				if (!empty($expressionData->errors)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, reset($expressionData->errors));
-				}
-
-				$host = reset($expressionData->data['hosts']);
-
-				$options = array(
-					'filter' => array(
-						'description' => $trigger['description'],
-						'host' => $host
-					),
-					'output' => API_OUTPUT_EXTEND,
-					'editable' => true,
-					'nopermissions' => true
-				);
-				$triggersExist = API::Trigger()->get($options);
-
-				$triggerExist = false;
-				foreach ($triggersExist as $tr) {
-					$tmpExp = explode_exp($tr['expression']);
-					if (strcmp($tmpExp, $expressionFull) == 0) {
-						$triggerExist = $tr;
-						break;
-					}
-				}
-				if ($triggerExist && bccomp($triggerExist['triggerid'], $trigger['triggerid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Trigger "%s" already exists.', $trigger['description']));
 				}
 			}
 
@@ -1874,6 +1842,12 @@ class CTrigger extends CTriggerGeneral {
 				'values' => $triggerUpdate,
 				'where' => array('triggerid' => $trigger['triggerid'])
 			));
+
+			// update service status
+			if (isset($trigger['priority']) && $trigger['priority'] != $dbTrigger['priority']) {
+				$serviceStatus = ($dbTrigger['value'] == TRIGGER_VALUE_TRUE) ? $trigger['priority'] : 0;
+				update_services($trigger['triggerid'], $serviceStatus);
+			}
 
 			// restore the full expression to properly validate dependencies
 			$trigger['expression'] = $expressionChanged ? explode_exp($trigger['expression']) : $expressionFull;
@@ -2197,4 +2171,3 @@ class CTrigger extends CTriggerGeneral {
 		return count($ids) == $count;
 	}
 }
-?>

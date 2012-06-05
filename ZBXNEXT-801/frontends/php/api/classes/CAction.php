@@ -17,15 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * @package API
  */
 class CAction extends CZBXAPI {
 
 	protected $tableName = 'actions';
-
 	protected $tableAlias = 'a';
 
 	/**
@@ -124,7 +123,7 @@ class CAction extends CZBXAPI {
 					' WHERE cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
 						' AND cc.actionid=a.actionid'.
 						' AND ('.
-							' NOT EXISTS('.
+							' NOT EXISTS ('.
 								' SELECT rr.id'.
 								' FROM rights rr,users_groups ug'.
 								' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
@@ -132,7 +131,7 @@ class CAction extends CZBXAPI {
 									' AND ug.userid='.$userid.
 									' AND rr.permission>='.$permission.
 							' )'.
-							' OR EXISTS('.
+							' OR EXISTS ('.
 								' SELECT rr.id'.
 								' FROM rights rr,users_groups ugg'.
 								' WHERE rr.id='.zbx_dbcast_2bigint('cc.value').
@@ -334,7 +333,7 @@ class CAction extends CZBXAPI {
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
 
-			$sqlParts['select'] = array('COUNT(DISTINCT a.actionid) as rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT a.actionid) AS rowscount');
 		}
 
 		// sorting
@@ -604,7 +603,7 @@ class CAction extends CZBXAPI {
 		/*
 		 * Adding objects
 		 */
-		// Adding Conditions
+		// adding conditions
 		if (!is_null($options['selectConditions']) && str_in_array($options['selectConditions'], $subselectsAllowedOutputs)) {
 			$res = DBselect('SELECT c.* FROM conditions c WHERE '.DBcondition('c.actionid', $actionids));
 			while ($condition = DBfetch($res)) {
@@ -824,13 +823,12 @@ class CAction extends CZBXAPI {
 			}
 		}
 
-		$options = array(
+		$dbActions = $this->get(array(
 			'filter' => array('name' => $duplicates),
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'nopermissions' => true
-		);
-		$dbActions = $this->get($options);
+		));
 		foreach ($dbActions as $dbAction) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $dbAction['name']));
 		}
@@ -885,15 +883,14 @@ class CAction extends CZBXAPI {
 		$actionids = zbx_objectValues($actions, 'actionid');
 		$update = array();
 
-		$options = array(
+		$updActions = $this->get(array(
 			'actionids' => $actionids,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectConditions' => API_OUTPUT_EXTEND,
-		);
-		$updActions = $this->get($options);
+			'selectConditions' => API_OUTPUT_EXTEND
+		));
 			foreach ($actions as $action) {
 			if (isset($action['actionid']) && !isset($updActions[$action['actionid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -933,14 +930,13 @@ class CAction extends CZBXAPI {
 		$conditionsCreate = $conditionsUpdate = $conditionidsDelete = array();
 		foreach ($actions as $action) {
 			if (isset($action['name'])) {
-				$options = array(
+				$actionExists = $this->get(array(
 					'filter' => array('name' => $action['name']),
 					'output' => API_OUTPUT_SHORTEN,
 					'editable' => true,
 					'nopermissions' => true,
 					'preservekeys' => true
-				);
-				$actionExists = $this->get($options);
+				));
 				if (($actionExist = reset($actionExists)) && (bccomp($actionExist['actionid'], $action['actionid']) != 0)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%s" already exists.', $action['name']));
 				}
@@ -961,7 +957,7 @@ class CAction extends CZBXAPI {
 						unset($conditionsDb[$condition['conditionid']]);
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action conditionid'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action conditionid.'));
 					}
 				}
 
@@ -986,7 +982,7 @@ class CAction extends CZBXAPI {
 						unset($operationsDb[$operation['operationid']]);
 					}
 					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid.'));
 					}
 				}
 				$operationidsDelete = array_merge($operationidsDelete, array_keys($operationsDb));
@@ -1323,7 +1319,7 @@ class CAction extends CZBXAPI {
 						$opcommandUpdate[] = array(
 							'values' => $operation['opcommand'],
 							'where' => array('operationid' => $operation['operationid'])
-							);
+						);
 
 						$diff = zbx_array_diff($operation['opcommand_grp'], $operationDb['opcommand_grp'], 'groupid');
 						$opcommandGrpCreate = array_merge($opcommandGrpCreate, $diff['first']);
@@ -1475,13 +1471,12 @@ class CAction extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$options = array(
+		$delActions = $this->get(array(
 			'actionids' => $actionids,
 			'editable' => true,
 			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true
-		);
-		$delActions = $this->get($options);
+		));
 		foreach ($actionids as $actionid) {
 			if (isset($delActions[$actionid])) {
 				continue;
@@ -1833,4 +1828,3 @@ class CAction extends CZBXAPI {
 		return true;
 	}
 }
-?>

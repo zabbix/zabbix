@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $itemWidget = new CWidget();
 
 if (!empty($this->data['hostid'])) {
@@ -57,8 +57,9 @@ if (!$this->data['is_discovery_rule']) {
 			new CTextBox('hostname', $this->data['hostname'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 			empty($this->data['itemid'])
 				? new CButton('btn_host', _('Select'),
-					"return PopUp('popup.php?dstfrm=".$itemForm->getName().'&dstfld1=hostname&dstfld2=form_hostid'.
-						"&srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid&noempty=1&submitParent=1', 450, 450);",
+					'return PopUp("popup.php?srctbl=hosts_and_templates&srcfld1=name&srcfld2=hostid'.
+						'&dstfrm='.$itemForm->getName().'&dstfld1=hostname&dstfld2=form_hostid'.
+						'&noempty=1&submitParent=1", 450, 450);',
 					'formlist'
 				)
 				: null
@@ -85,8 +86,8 @@ $itemFormList->addRow(_('Key'), array(
 	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
 	!$this->data['limited']
 	? new CButton('keyButton', _('Select'),
-		"return PopUp('popup.php?dstfrm=".$itemForm->getName().
-			"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype='+jQuery('#type option:selected').val());",
+		'return PopUp("popup.php?srctbl=help_items&srcfld1=key_'.
+			'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
 		'formlist')
 	: null
 ));
@@ -417,12 +418,17 @@ $description = new CTextArea('description', $this->data['description']);
 $description->addStyle('margin-top: 5px;');
 $itemFormList->addRow(_('Description'), $description);
 
-// append status to form list
-$statusComboBox = new CComboBox('status', $this->data['status']);
-foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED, ITEM_STATUS_NOTSUPPORTED) as $status) {
-	$statusComboBox->addItem($status, item_status2str($status));
+// status
+if (isset($this->data['is_item_prototype'])) {
+	$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
+	$enabledCheckBox->addStyle('vertical-align: middle;');
+	$itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 }
-$itemFormList->addRow(_('Status'), $statusComboBox);
+else {
+	$statusComboBox = new CComboBox('status', $this->data['status']);
+	$statusComboBox->addItems(item_status2str());
+	$itemFormList->addRow(_('Status'), $statusComboBox);
+}
 
 // append tabs to form
 $itemTab = new CTabView();
@@ -584,6 +590,15 @@ foreach ($this->data['types'] as $type => $label) {
 	zbx_subarray_push($this->data['typeVisibility'], $type, 'row_delay');
 }
 
+// disable dropdown items for calculated and aggregate items
+foreach (array(ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE) as $type) {
+	// set to disable character, log and text items in value type
+	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT), 'value_type');
+
+	// disable octal, hexadecimal and boolean items in data_type; Necessary for Numeric (unsigned) value type only
+	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_DATA_TYPE_OCTAL, ITEM_DATA_TYPE_HEXADECIMAL, ITEM_DATA_TYPE_BOOLEAN), 'data_type');
+}
+
 $this->data['valueTypeVisibility'] = array();
 if (!$this->data['is_discovery_rule']) {
 	zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'data_type');
@@ -656,4 +671,3 @@ if (!$this->data['is_discovery_rule']) {
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 return $itemWidget;
-?>

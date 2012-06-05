@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 if (!isset($DB)) {
 	$DB = array();
 	if (isset($DB_TYPE)) {
@@ -1048,6 +1048,19 @@ function DBfetchArray($cursor) {
 	$result = array();
 	while ($row = DBfetch($cursor)) {
 		$result[] = $row;
+	}
+	return $result;
+}
+
+/**
+ * Transform DB cursor to array
+ *
+ * @return array
+ */
+function DBfetchArrayAssoc($cursor, $field) {
+	$result = array();
+	while ($row = DBfetch($cursor)) {
+		$result[$row[$field]] = $row;
 	}
 	return $result;
 }

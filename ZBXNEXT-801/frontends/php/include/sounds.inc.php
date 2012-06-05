@@ -17,12 +17,12 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function getSounds() {
 	$fileList = array();
 	$dir = scandir('./audio');
-	foreach ($dir as $fnum => $file) {
+	foreach ($dir as $file) {
 		if (!preg_match('/^([\w\d_]+)\.(wav|ogg)$/i', $file)) {
 			continue;
 		}
@@ -120,7 +120,7 @@ function updateMessageSettings($messages) {
 		}
 	}
 
-	try{
+	try {
 		DB::insert('profiles', $inserts);
 		DB::update('profiles', $updates);
 	}
@@ -129,4 +129,3 @@ function updateMessageSettings($messages) {
 	}
 	return $messages;
 }
-?>

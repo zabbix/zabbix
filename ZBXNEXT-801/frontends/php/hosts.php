@@ -368,8 +368,9 @@ elseif (isset($_REQUEST['save'])) {
 			$interfaces[$jmxAgentId]['main'] = '1';
 		}
 
+		// remove empty new macro lines
 		foreach ($macros as $mnum => $macro) {
-			if (zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
+			if (!isset($macro['hostmacroid']) && zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 				unset($macros[$mnum]);
 			}
 		}

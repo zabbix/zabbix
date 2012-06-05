@@ -20,6 +20,7 @@
 ?>
 <?php
 
+require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../conf/zabbix.conf.php';
 require_once dirname(__FILE__).'/../../include/func.inc.php';
@@ -35,18 +36,18 @@ function error($error) {
 /**
  * Returns database data suitable for PHPUnit data provider functions
  */
-function DBdata($query) {
+function DBdata($sql) {
 	DBconnect($error);
 
-	$objects=array();
+	$data = array();
 
-	$result=DBselect($query);
-	while ($object=DBfetch($result)) {
-		$objects[]=array($object);
+	$result = DBselect($sql);
+	while ($row = DBfetch($result)) {
+		$data[] = array($row);
 	}
-
 	DBclose();
-	return $objects;
+
+	return $data;
 }
 
 /**
@@ -112,7 +113,7 @@ function DBsave_tables($topTable) {
 			break;
 		default:
 			DBexecute("drop table if exists ${table}_tmp");
-			DBexecute("select * into temp table ${table}_tmp from $table");
+			DBexecute("select * into table ${table}_tmp from $table");
 		}
 	}
 }
@@ -126,6 +127,13 @@ function DBrestore_tables($topTable) {
 
 	$tables = array();
 
+	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		$result = DBselect('select @@unique_checks,@@foreign_key_checks');
+		$row = DBfetch($result);
+		DBexecute('set unique_checks=0');
+		DBexecute('set foreign_key_checks=0');
+	}
+
 	DBget_tables($tables, $topTable);
 
 	$tablesReversed = array_reverse($tables);
@@ -138,19 +146,22 @@ function DBrestore_tables($topTable) {
 		DBexecute("insert into $table select * from ${table}_tmp");
 		DBexecute("drop table ${table}_tmp");
 	}
+
+	if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		DBexecute('set foreign_key_checks='.$row['@@foreign_key_checks']);
+		DBexecute('set unique_checks='.$row['@@unique_checks']);
+	}
 }
 
 /**
  * Returns md5 hash sum of database result.
  */
 function DBhash($sql) {
-	global $DB;
-
 	$hash = '<empty hash>';
 
-	$result=DBselect($sql);
+	$result = DBselect($sql);
 	while ($row = DBfetch($result)) {
-		foreach ($row as $key => $value) {
+		foreach ($row as $value) {
 			$hash = md5($hash.$value);
 		}
 	}

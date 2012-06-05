@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 require_once dirname(__FILE__).'/classes/core/Z.php';
 Z::getInstance()->run();
@@ -167,9 +166,6 @@ else {
 
 if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	if (!CWebUser::checkAuthentication(get_cookie('zbx_sessionid'))) {
-		require_once dirname(__FILE__).'/locales/en_gb.inc.php';
-		process_locales();
-
 		include('index.php');
 		exit();
 	}
@@ -205,22 +201,9 @@ if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
 else {
-	CWebUser::$data = array(
-		'alias' => ZBX_GUEST_USER,
-		'userid' => 0,
-		'lang' => 'en_gb',
-		'type' => '0',
-		'node' => array(
-			'name' => '- unknown -',
-			'nodeid' => 0
-		)
-	);
-
-	$USER_DETAILS = CWebUser::$data;
+	CWebUser::setDefault();
 }
 
-require_once dirname(__FILE__).'/locales/en_gb.inc.php';
-process_locales();
 set_zbx_locales();
 
 // init mb strings if it's available
@@ -554,8 +537,6 @@ function parse_period($str) {
 }
 
 function get_status() {
-	global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
 	$status = array(
 		'triggers_count' => 0,
 		'triggers_count_enabled' => 0,
@@ -576,17 +557,10 @@ function get_status() {
 	);
 
 	// server
-	$checkport = fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, 2);
-	if (!$checkport) {
-		clear_messages();
-		$status['zabbix_server'] = _('No');
-	}
-	else {
-		$status['zabbix_server'] = _('Yes');
-	}
+	$status['zabbix_server'] = zabbixRunning() ? _('Yes') : _('No');
 
 	// triggers
-	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) as cnt,t.status,t.value'.
+	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
 			' FROM triggers t'.
 				' INNER JOIN functions f ON t.triggerid=f.triggerid'.
 				' INNER JOIN items i ON f.itemid=i.itemid'.
@@ -615,11 +589,11 @@ function get_status() {
 		}
 	}
 	$status['triggers_count_enabled'] = $status['triggers_count_off'] + $status['triggers_count_on']
-			+ $status['triggers_count_unknown'];
+		+ $status['triggers_count_unknown'];
 	$status['triggers_count'] = $status['triggers_count_enabled'] + $status['triggers_count_disabled'];
 
 	// items
-	$dbItems = DBselect('SELECT COUNT(*) as cnt,i.status'.
+	$dbItems = DBselect('SELECT COUNT(*) AS cnt,i.status'.
 			' FROM items i'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
 			' WHERE h.status='.HOST_STATUS_MONITORED.
@@ -639,10 +613,10 @@ function get_status() {
 		}
 	}
 	$status['items_count'] = $status['items_count_monitored'] + $status['items_count_disabled']
-			+ $status['items_count_not_supported'];
+		+ $status['items_count_not_supported'];
 
 	// hosts
-	$dbHosts = DBselect('SELECT COUNT(*) as cnt,h.status'.
+	$dbHosts = DBselect('SELECT COUNT(*) AS cnt,h.status'.
 			' FROM hosts h'.
 			' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.' )'.
 			' GROUP BY h.status');
@@ -660,7 +634,7 @@ function get_status() {
 		}
 	}
 	$status['hosts_count'] = $status['hosts_count_monitored'] + $status['hosts_count_not_monitored']
-			+ $status['hosts_count_template'];
+		+ $status['hosts_count_template'];
 
 	// users
 	$row = DBfetch(DBselect('SELECT COUNT(*) AS usr_cnt FROM users u WHERE '.DBin_node('u.userid')));
@@ -692,6 +666,21 @@ function get_status() {
 	$status['qps_total'] = round($row['qps'], 2);
 
 	return $status;
+}
+
+function zabbixRunning() {
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+	if (empty($ZBX_SERVER) || empty ($ZBX_SERVER_PORT)) {
+		return false;
+	}
+
+	$result = (bool) fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, ZBX_SOCKET_TIMEOUT);
+	if (!$result) {
+		clear_messages();
+	}
+
+	return $result;
 }
 
 function set_image_header($format = null) {

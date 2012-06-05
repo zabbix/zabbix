@@ -306,11 +306,6 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 		'nopermissions' => true
 	));
 	foreach ($db_triggers as $triggerid => $trigger) {
-		$servStatus = isset($_REQUEST['activate']) ? get_service_status_of_trigger($triggerid) : 0;
-
-		// updating status to all services by the dependency
-		update_services($trigger['triggerid'], $servStatus);
-
 		$host = reset($trigger['hosts']);
 		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $triggerid,
 			$host['host'].':'.$trigger['description'], 'triggers', $statusOld, $statusNew);
@@ -429,7 +424,8 @@ else {
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectFunctions' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_EXTEND,
-		'selectDiscoveryRule' => API_OUTPUT_EXTEND
+		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
+		'expandDescription' => true
 	));
 	order_result($data['triggers'], $sortfield, getPageSortOrder());
 

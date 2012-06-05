@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = 'RPC';
@@ -129,7 +129,7 @@ switch ($data['method']) {
 				'color' => getSeverityColor($trigger['priority'], $event['value']),
 				'title' => $title.' '.get_node_name_by_elid($host['hostid'], null, ':').'[url='.$url_tr_status.']'.$host['host'].'[/url]',
 				'body' => array(
-					_('Details').': '.' [url='.$url_events.']'.$trigger['description'].'[/url]',
+					_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
 					_('Date').': [b][url='.$url_tr_events.']'.zbx_date2str(_('d M Y H:i:s'), $event['clock']).'[/url][/b]',
 				),
 				'timeout' => $msgsettings['timeout']
@@ -150,6 +150,23 @@ switch ($data['method']) {
 				break;
 		}
 		break;
+	case 'zabbix.status':
+		$config = select_config();
+
+		$checkStatus = CProfile::get('zabbix.available');
+		$checkTime = CProfile::get('zabbix.available.time', 0);
+
+		if ($checkStatus === null || isset($data['params']['nocache']) || ($checkTime + $config['server_check_interval']) <= time()) {
+			$checkStatus = zabbixRunning();
+			CProfile::update('zabbix.available', (int) $checkStatus, PROFILE_TYPE_INT);
+			CProfile::update('zabbix.available.time', time(), PROFILE_TYPE_INT);
+		}
+
+		$result = array(
+			'result' => (bool) $checkStatus,
+			'message' => $checkStatus ? '' : _('Zabbix server might be down!')
+		);
+		break;
 	default:
 		fatal_error('Wrong RPC call to JS RPC');
 }
@@ -164,4 +181,3 @@ if (isset($data['id'])) {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

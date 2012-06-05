@@ -246,31 +246,37 @@ $labelNotClassified = new CLabel(_($this->data['config']['severity_name_'.TRIGGE
 $labelNotClassified->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_NOT_CLASSIFIED.');');
 $labelNotClassified->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_NOT_CLASSIFIED.');');
 $labelNotClassified->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_NOT_CLASSIFIED.');');
+$labelNotClassified->addClass('trigger-severity');
 
 $labelInformation = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_INFORMATION]), 'severity_'.TRIGGER_SEVERITY_INFORMATION, 'severity_label_'.TRIGGER_SEVERITY_INFORMATION);
 $labelInformation->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_INFORMATION.');');
 $labelInformation->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_INFORMATION.');');
 $labelInformation->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_INFORMATION.');');
+$labelInformation->addClass('trigger-severity');
 
 $labelWarning = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_WARNING]), 'severity_'.TRIGGER_SEVERITY_WARNING, 'severity_label_'.TRIGGER_SEVERITY_WARNING);
 $labelWarning->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_WARNING.');');
 $labelWarning->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_WARNING.');');
 $labelWarning->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_WARNING.');');
+$labelWarning->addClass('trigger-severity');
 
 $labelAverage = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_AVERAGE]), 'severity_'.TRIGGER_SEVERITY_AVERAGE, 'severity_label_'.TRIGGER_SEVERITY_AVERAGE);
 $labelAverage->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_AVERAGE.');');
 $labelAverage->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_AVERAGE.');');
 $labelAverage->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_AVERAGE.');');
+$labelAverage->addClass('trigger-severity');
 
 $labelHigh = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_HIGH]), 'severity_'.TRIGGER_SEVERITY_HIGH, 'severity_label_'.TRIGGER_SEVERITY_HIGH);
 $labelHigh->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_HIGH.');');
 $labelHigh->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_HIGH.');');
 $labelHigh->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_HIGH.');');
+$labelHigh->addClass('trigger-severity');
 
 $labelDisaster = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_DISASTER]), 'severity_'.TRIGGER_SEVERITY_DISASTER, 'severity_label_'.TRIGGER_SEVERITY_DISASTER);
 $labelDisaster->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_DISASTER.');');
 $labelDisaster->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_DISASTER.');');
 $labelDisaster->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_DISASTER.');');
+$labelDisaster->addClass('trigger-severity');
 
 $triggersFormList->addRow(_('Severity'), new CDiv(
 	array(

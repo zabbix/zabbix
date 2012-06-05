@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CTag extends CObject {
 
@@ -175,6 +174,17 @@ class CTag extends CObject {
 		}
 	}
 
+	/**
+	 * Sets multiple HTML attributes.
+	 *
+	 * @param array $attributes     defined as array(attributeName1 => value1, attributeName2 => value2, ...)
+	 */
+	public function setAttributes(array $attributes) {
+		foreach ($attributes as $name => $value) {
+			$this->setAttribute($name, $value);
+		}
+	}
+
 	public function removeAttr($name) {
 		$this->removeAttribute($name);
 	}
@@ -274,4 +284,3 @@ class CTag extends CObject {
 		return $this->encStrategy;
 	}
 }
-?>

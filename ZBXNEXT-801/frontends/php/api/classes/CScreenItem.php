@@ -346,7 +346,7 @@ class CScreenItem extends CZBXAPI {
 					if ($dbScreenItem['screenid'] == $screenItem['screenid']
 						&& strcmp($dbScreenItem['x'], $screenItem['x']) == 0
 						&& strcmp($dbScreenItem['y'], $screenItem['y']) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exist.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen item in same cell already exists.'));
 					}
 				}
 			}
@@ -517,7 +517,7 @@ class CScreenItem extends CZBXAPI {
 		// screen ids
 		if ($options['screenids'] !== null) {
 			zbx_value2array($options['screenids']);
-			$sqlParts = $this->extendQuerySelect($this->fieldId('screenid'), $sqlParts);
+			$sqlParts = $this->addQuerySelect($this->fieldId('screenid'), $sqlParts);
 			$sqlParts['where'][] = DBcondition($this->fieldId('screenid'), $options['screenids']);
 		}
 

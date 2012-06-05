@@ -43,12 +43,12 @@ class testClicks extends CWebTest {
 				'Host updated'
 			),
 			array('hostgroups.php',
-				array('link=Template_Linux','save'),
+				array('link=Template OS Linux','save'),
 				'Configuration of templates',
 				'Template updated'
 			),
 			array('templates.php',
-				array('link=Template_Linux','save'),
+				array('link=Template OS Linux','save'),
 				'Configuration of templates',
 				'Template updated'
 			),

@@ -17,12 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * @package API
  */
-
 abstract class CItemGeneral extends CZBXAPI {
 
 	protected $fieldRules;
@@ -47,8 +46,8 @@ abstract class CItemGeneral extends CZBXAPI {
 			'snmp_community'		=> array(),
 			'snmp_oid'				=> array('template' => 1),
 			'hostid'				=> array(),
-			'name' 					=> array('template' => 1),
-			'description' 			=> array(),
+			'name'					=> array('template' => 1),
+			'description'			=> array(),
 			'key_'					=> array('template' => 1),
 			'delay'					=> array(),
 			'history'				=> array(),
@@ -194,6 +193,14 @@ abstract class CItemGeneral extends CZBXAPI {
 				if (isset($item['status']) && $item['status'] != ITEM_STATUS_NOTSUPPORTED) {
 					$item['error'] = '';
 				}
+
+				// if a templated item is being assigned to an interface with a different type, ignore it
+				$itemInterfaceType = itemTypeInterface($dbItems[$item['itemid']]['type']);
+				if ($fullItem['templateid'] && isset($item['interfaceid']) && isset($interfaces[$item['interfaceid']])
+						&& $itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
+
+					unset($item['interfaceid']);
+				}
 			}
 			else {
 				if (!isset($dbHosts[$item['hostid']])) {
@@ -215,7 +222,7 @@ abstract class CItemGeneral extends CZBXAPI {
 
 			// check if the item requires an interface
 			$itemInterfaceType = itemTypeInterface($fullItem['type']);
-			if ($itemInterfaceType !== false && $dbHosts[$fullItem['hostid']]['status'] != HOST_STATUS_TEMPLATE) {
+			if ($itemInterfaceType !== false && $host['status'] != HOST_STATUS_TEMPLATE) {
 				if (!$fullItem['interfaceid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
 				}
@@ -551,10 +558,13 @@ abstract class CItemGeneral extends CZBXAPI {
 	 * @return array an array of unsaved child items
 	 */
 	protected function prepareInheritedItems(array $itemsToInherit, array $hostIds = null, array $errors = array()) {
-		$errors = array_merge(array(
-			'exists' => _('Item "%1$s" already exists on "%2$s", inherited from another template.'),
-			'noInterface' => _('Cannot find host interface on "%1$s" for item key "%2$s".')
-		), $errors);
+		$errors = array_merge(
+			array(
+				'exists' => _('Item "%1$s" already exists on "%2$s", inherited from another template.'),
+				'noInterface' => _('Cannot find host interface on "%1$s" for item key "%2$s".')
+			),
+			$errors
+		);
 
 		// fetch all child hosts
 		$chdHosts = API::Host()->get(array(
@@ -612,21 +622,21 @@ abstract class CItemGeneral extends CZBXAPI {
 					}
 				}
 
-
 				if ($host['status'] == HOST_STATUS_TEMPLATE || !isset($parentItem['type'])) {
 					unset($parentItem['interfaceid']);
 				}
 				elseif ((isset($parentItem['type']) && isset($exItem) && $parentItem['type'] != $exItem['type']) || !isset($exItem)) {
-
-					// find a matching interface
 					$interface = self::findInterfaceForItem($parentItem, $host['interfaces']);
-					if ($interface) {
+
+					if (!empty($interface)) {
 						$parentItem['interfaceid'] = $interface['interfaceid'];
 					}
-					// no matching interface found, throw an error
-					elseif($interface !== false) {
+					elseif ($interface !== false) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s($errors['noInterface'], $host['host'], $parentItem['key_']));
 					}
+				}
+				else {
+					unset($parentItem['interfaceid']);
 				}
 
 				// copying item
@@ -680,9 +690,9 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 
 		if ($sqlWhere) {
-			$sql = 'SELECT i.key_, h.host'.
-				' FROM items i, hosts h'.
-				' WHERE i.hostid = h.hostid AND ('.implode(' OR ', $sqlWhere).')';
+			$sql = 'SELECT i.key_,h.host'.
+					' FROM items i,hosts h'.
+					' WHERE i.hostid=h.hostid AND ('.implode(' OR ', $sqlWhere).')';
 
 			// if we update existing items we need to exclude them from result.
 			if ($itemIds) {
@@ -696,4 +706,3 @@ abstract class CItemGeneral extends CZBXAPI {
 		}
 	}
 }
-?>

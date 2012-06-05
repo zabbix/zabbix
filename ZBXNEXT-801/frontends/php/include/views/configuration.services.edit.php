@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 <?php
 include('include/views/js/configuration.services.edit.js.php');
 global $ZBX_MESSAGES;
+
+$service = $this->data['service'];
 
 $servicesWidget = new CWidget();
 $servicesWidget->addPageHeader(_('CONFIGURATION OF IT SERVICES'));
@@ -52,7 +54,7 @@ $algorithmComboBox->addItems(serviceAlgorythm());
 $servicesFormList->addRow(_('Status calculation algorithm'), $algorithmComboBox);
 
 // append SLA to form list
-$showslaCheckbox = new CCheckBox('showsla', $this->data['showsla'], ($this->data['showsla'] == 0) ? 'no' : 'yes', 1);
+$showslaCheckbox = new CCheckBox('showsla', ($this->data['showsla'] == 0) ? 'no' : 'yes', null, 1);
 $goodslaTextBox = new CTextBox('goodsla', $this->data['goodsla'], 6, 'no', 8);
 if (!$this->data['showsla']) {
 	$goodslaTextBox->setAttribute('disabled', 'disabled');
@@ -62,7 +64,8 @@ $servicesFormList->addRow(_('Calculate SLA, acceptable SLA (in %)'), array($show
 // append trigger to form list
 $servicesFormList->addRow(_('Trigger'), array(
 	new CTextBox('trigger', $this->data['trigger'], ZBX_TEXTBOX_STANDARD_SIZE, 'yes'),
-	new CButton('btn1', _('Select'), "return PopUp('popup.php?"."dstfrm=".$servicesForm->getName()."&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');", 'formlist')
+	new CButton('btn1', _('Select'), "return PopUp('popup.php?"."dstfrm=".$servicesForm->getName()."&dstfld1=triggerid".
+		"&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1&with_triggers=1');", 'formlist')
 ));
 $servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $this->data['sortorder'], 3, 'no', 3));
 
@@ -260,21 +263,16 @@ $servicesTab->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
 $servicesForm->addItem($servicesTab);
 
 // append buttons to form
-if (!empty($this->data['service']['serviceid'])) {
-	$servicesForm->addItem(makeFormFooter(
-		array(new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';')),
-		array(
-			new CButtonDelete('Delete selected service?', url_param('form').url_param('serviceid').'&saction=1'),
-			new CButtonCancel()
-		)
-	));
+$buttons = array();
+if ($service['serviceid'] && !$service['dependencies']) {
+	$buttons[] = new CButtonDelete('Delete selected service?', url_param('form').url_param('serviceid').'&saction=1');
 }
-else {
-	$servicesForm->addItem(makeFormFooter(
-		array(new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';')),
-		array(new CButtonCancel())
-	));
-}
+$buttons[] = new CButtonCancel();
+
+$servicesForm->addItem(makeFormFooter(
+	array(new CSubmit('save_service', _('Save'), 'javascript: document.forms[0].action += \'?saction=1\';')),
+	$buttons
+));
 
 // append form to widget
 $servicesWidget->addItem($servicesForm);

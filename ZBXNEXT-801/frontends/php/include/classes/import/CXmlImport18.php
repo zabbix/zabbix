@@ -300,8 +300,8 @@ class CXmlImport18 {
 
 		$root = $doc->appendChild(new DOMElement('zabbix_export'));
 		$root->setAttributeNode(new DOMAttr('version', '1.0'));
-		$root->setAttributeNode(new DOMAttr('date', zbx_date2str(S_EXPORT_DATE_ATTRIBUTE_DATE_FORMAT)));
-		$root->setAttributeNode(new DOMAttr('time', zbx_date2str(S_EXPORT_TIME_ATTRIBUTE_DATE_FORMAT)));
+		$root->setAttributeNode(new DOMAttr('date', zbx_date2str(XML_DATE_DATE_FORMAT)));
+		$root->setAttributeNode(new DOMAttr('time', zbx_date2str(XML_TIME_DATE_FORMAT)));
 
 		return $root;
 	}
@@ -431,7 +431,7 @@ class CXmlImport18 {
 			unset($screen['screenid']);
 			$exists = API::Screen()->exists(array('name' => $screen['name']));
 
-			if($exists && isset($rules['screens']['updateExisting'])){
+			if($exists && !empty($rules['screens']['updateExisting'])){
 				$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
 				if(empty($db_screens)) throw new Exception(_('No permissions for screen').' "'.$screen['name'].'" import');
 
@@ -439,7 +439,7 @@ class CXmlImport18 {
 
 				$screen['screenid'] = $db_screen['screenid'];
 			}
-			else if($exists || !isset($rules['screens']['createMissing'])){
+			else if($exists || empty($rules['screens']['createMissing'])){
 				info('Screen ['.$screen['name'].'] skipped - user rule');
 				unset($importScreens[$mnum]);
 				continue; // break if not update exist
@@ -461,7 +461,8 @@ class CXmlImport18 {
 							if(is_array($screenitem['resourceid'])){
 								$db_hostgroups = API::HostGroup()->getObjects($screenitem['resourceid']);
 								if(empty($db_hostgroups)){
-									$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+									$error = _s('Cannot find hostgroup "%1$s" used in exported screen "%2$s".',
+											$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
 									throw new Exception($error);
 								}
 
@@ -472,7 +473,8 @@ class CXmlImport18 {
 						case SCREEN_RESOURCE_HOST_TRIGGERS:
 							$db_hosts = API::Host()->getObjects($screenitem['resourceid']);
 							if(empty($db_hosts)){
-								$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$screenitem['resourceid']['host'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								$error = _s('Cannot find host "%1$s" used in exported screen "%2$s".',
+										$nodeCaption.$screenitem['resourceid']['host'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -482,7 +484,8 @@ class CXmlImport18 {
 						case SCREEN_RESOURCE_GRAPH:
 							$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
 							if(empty($db_graphs)){
-								$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								$error = _s('Cannot find graph "%1$s" used in exported screen "%2$s".',
+										$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -494,7 +497,8 @@ class CXmlImport18 {
 							$db_items = API::Item()->getObjects($screenitem['resourceid']);
 
 							if(empty($db_items)){
-								$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								$error = _s('Cannot find item "%1$s" used in exported screen "%2$s".',
+										$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -504,7 +508,8 @@ class CXmlImport18 {
 						case SCREEN_RESOURCE_MAP:
 							$db_sysmaps = API::Map()->getObjects($screenitem['resourceid']);
 							if(empty($db_sysmaps)){
-								$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								$error = _s('Cannot find map "%1$s" used in exported screen "%2$s".',
+										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -514,7 +519,8 @@ class CXmlImport18 {
 						case SCREEN_RESOURCE_SCREEN:
 							$db_screens = API::Screen()->get(array('screenids' => $screenitem['resourceid']));
 							if(empty($db_screens)){
-								$error = S_CANNOT_FIND_SCREEN.' "'.$nodeCaption.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+								$error = _s('Cannot find screen "%1$s" used in exported screen "%2$s".',
+										$nodeCaption.$screenitem['resourceid']['name'], $screen['name']);
 								throw new Exception($error);
 							}
 
@@ -567,8 +573,8 @@ class CXmlImport18 {
 			$images_to_update = array();
 			foreach($images as $image){
 				if(API::Image()->exists($image)){
-					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['updateExisting']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (isset($rules['images']['updateExisting']))))
+					if((($image['imagetype'] == IMAGE_TYPE_ICON) && !empty($rules['images']['updateExisting']))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && (!empty($rules['images']['updateExisting']))))
 					{
 
 						$options = array(
@@ -588,8 +594,8 @@ class CXmlImport18 {
 					}
 				}
 				else{
-					if((($image['imagetype'] == IMAGE_TYPE_ICON) && isset($rules['images']['createMissing']))
-							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && isset($rules['images']['createMissing'])))
+					if((($image['imagetype'] == IMAGE_TYPE_ICON) && !empty($rules['images']['createMissing']))
+							|| (($image['imagetype'] == IMAGE_TYPE_BACKGROUND) && !empty($rules['images']['createMissing'])))
 					{
 
 						// No need to decode_base64
@@ -625,14 +631,14 @@ class CXmlImport18 {
 				$sysmap['label_format'] = SYSMAP_LABEL_ADVANCED_OFF;
 			}
 
-			if($exists && isset($rules['maps']['updateExisting'])){
+			if($exists && !empty($rules['maps']['updateExisting'])){
 				$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
 				if(empty($db_maps)) throw new Exception(_('No permissions for map').' ['.$sysmap['name'].'] import');
 
 				$db_map = reset($db_maps);
 				$sysmap['sysmapid'] = $db_map['sysmapid'];
 			}
-			else if($exists || !isset($rules['maps']['createMissing'])){
+			else if($exists || empty($rules['maps']['createMissing'])){
 				info('Map ['.$sysmap['name'].'] skipped - user rule');
 				unset($importMaps[$mnum]);
 				continue; // break if not update updateExisting
@@ -659,7 +665,8 @@ class CXmlImport18 {
 				$image = getImageByIdent($sysmap['backgroundid']);
 
 				if(!$image){
-					error(S_CANNOT_FIND_BACKGROUND_IMAGE.' "'.$sysmap['backgroundid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"');
+					error(_s('Cannot find background image "%1$s" used in exported map "%2$s".',
+						$sysmap['backgroundid']['name'], $sysmap['name']));
 					$sysmap['backgroundid'] = 0;
 				}
 				else{
@@ -688,7 +695,8 @@ class CXmlImport18 {
 					case SYSMAP_ELEMENT_TYPE_MAP:
 						$db_sysmaps = API::Map()->getObjects($selement['elementid']);
 						if(empty($db_sysmaps)){
-							$error = S_CANNOT_FIND_MAP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							$error = _s('Cannot find map "%1$s" used in exported map "%2$s".',
+									$nodeCaption.$selement['elementid']['name'], $sysmap['name']);
 							throw new Exception($error);
 						}
 
@@ -698,7 +706,8 @@ class CXmlImport18 {
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						$db_hostgroups = API::HostGroup()->getObjects($selement['elementid']);
 						if(empty($db_hostgroups)){
-							$error = S_CANNOT_FIND_HOSTGROUP.' "'.$nodeCaption.$selement['elementid']['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							$error = _s('Cannot find hostgroup "%1$s" used in exported map "%2$s".',
+									$nodeCaption.$selement['elementid']['name'], $sysmap['name']);
 							throw new Exception($error);
 						}
 
@@ -708,7 +717,8 @@ class CXmlImport18 {
 					case SYSMAP_ELEMENT_TYPE_HOST:
 						$db_hosts = API::Host()->getObjects($selement['elementid']);
 						if(empty($db_hosts)){
-							$error = S_CANNOT_FIND_HOST.' "'.$nodeCaption.$selement['elementid']['host'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							$error = _s('Cannot find host "%1$s" used in exported map "%2$s".',
+									$nodeCaption.$selement['elementid']['host'], $sysmap['name']);
 							throw new Exception($error);
 						}
 
@@ -718,7 +728,8 @@ class CXmlImport18 {
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
 						$db_triggers = API::Trigger()->getObjects($selement['elementid']);
 						if(empty($db_triggers)){
-							$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							$error = _s('Cannot find trigger "%1$s" used in exported map "%2$s".',
+									$nodeCaption.$selement['elementid']['host'].':'.$selement['elementid']['description'], $sysmap['name']);
 							throw new Exception($error);
 						}
 
@@ -734,7 +745,7 @@ class CXmlImport18 {
 					if(isset($selement[$icon])){
 						$image = getImageByIdent($selement[$icon]);
 						if(!$image){
-							$error = S_CANNOT_FIND_IMAGE.' "'.$selement[$icon]['name'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+							$error = _s('Cannot find image "%1$s" used in exported map "%2$s".', $selement[$icon]['name'], $sysmap['name']);
 							throw new Exception($error);
 						}
 						$selement[$icon] = $image['imageid'];
@@ -753,7 +764,8 @@ class CXmlImport18 {
 					$db_triggers = API::Trigger()->getObjects($linktrigger['triggerid']);
 					if(empty($db_triggers)){
 						$nodeCaption = isset($linktrigger['triggerid']['node'])?$linktrigger['triggerid']['node'].':':'';
-						$error = S_CANNOT_FIND_TRIGGER.' "'.$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'].'" '.S_USED_IN_EXPORTED_MAP_SMALL.' "'.$sysmap['name'].'"';
+						$error = _s('Cannot find trigger "%1$s" used in exported map "%2$s".',
+								$nodeCaption.$linktrigger['triggerid']['host'].':'.$linktrigger['triggerid']['description'], $sysmap['name']);
 						throw new Exception($error);
 					}
 
@@ -794,7 +806,11 @@ class CXmlImport18 {
 	public static function parseMain($rules){
 		$triggers_for_dependencies = array();
 
-		if(isset($rules['hosts']['updateExisting']) || isset($rules['hosts']['createMissing'])){
+		if(!empty($rules['hosts']['updateExisting'])
+				|| !empty($rules['hosts']['createMissing'])
+				|| !empty($rules['templates']['createMissing'])
+				|| !empty($rules['templates']['updateExisting'])
+				){
 			$xpath = new DOMXPath(self::$xml);
 
 			$hosts = $xpath->query('hosts/host');
@@ -807,13 +823,17 @@ class CXmlImport18 {
 						? API::Template()->exists($host_db)
 						: API::Host()->exists($host_db);
 
-				if(!$current_host && !isset($rules['hosts']['createMissing'])){
-					info('Host ['.$host_db['host'].'] skipped - user rule');
-					continue; // break if update nonexist
+
+				if(!$current_host
+						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && empty($rules['templates']['createMissing']))
+							|| ($host_db['status'] != HOST_STATUS_TEMPLATE && empty($rules['hosts']['createMissing'])))) {
+					continue;
 				}
-				if($current_host && !isset($rules['hosts']['updateExisting'])){
-					info('Host ['.$host_db['host'].'] skipped - user rule');
-					continue; // break if not update updateExisting
+
+				if($current_host
+						&& (($host_db['status'] == HOST_STATUS_TEMPLATE && empty($rules['templates']['updateExisting']))
+								|| ($host_db['status'] != HOST_STATUS_TEMPLATE && empty($rules['hosts']['updateExisting'])))) {
+					continue;
 				}
 
 				// there were no host visible names in 1.8
@@ -998,50 +1018,13 @@ class CXmlImport18 {
 
 // MACROS
 				$macros = $xpath->query('macros/macro', $host);
-				if($macros->length > 0){
+				if ($macros->length > 0) {
 					$host_db['macros'] = array();
-					foreach($macros as $macro){
+					foreach ($macros as $macro) {
 						$host_db['macros'][] = self::mapXML2arr($macro, XML_TAG_MACRO);
 					}
 				}
 // }}} MACROS
-
-
-// TEMPLATES {{{
-				if(isset($rules['templates']['updateExisting'])){
-					$templates = $xpath->query('templates/template', $host);
-
-					$host_db['templates'] = array();
-					foreach($templates as $template){
-
-						$options = array(
-							'filter' => array('host' => $template->nodeValue),
-							'output' => API_OUTPUT_EXTEND,
-							'editable' => 1
-						);
-						$current_template = API::Template()->get($options);
-
-						if(empty($current_template)){
-							throw new Exception('No permission for Template ['.$template->nodeValue.']');
-						}
-
-						$current_template = reset($current_template);
-
-
-						if(!$current_template && !isset($rules['templates']['createMissing'])){
-							info('Template ['.$template->nodeValue.'] skipped - user rule');
-							continue;
-						}
-						if($current_template && !isset($rules['templates']['updateExisting'])){
-							info('Template ['.$template->nodeValue.'] skipped - user rule');
-							continue;
-						}
-
-						$host_db['templates'][] = $current_template;
-					}
-				}
-// }}} TEMPLATES
-
 
 				// host inventory
 				if ($old_version_input) {
@@ -1084,7 +1067,7 @@ class CXmlImport18 {
 					}
 				}
 
-				if ($current_host && isset($rules['hosts']['updateExisting'])) {
+				if ($current_host && (!empty($rules['hosts']['updateExisting']) || !empty($rules['templates']['updateExisting']))) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$host_db['templateid'] = $current_host['hostid'];
 						$result = API::Template()->update($host_db);
@@ -1098,8 +1081,8 @@ class CXmlImport18 {
 					}
 					$current_hostid = $current_host['hostid'];
 				}
+				if (!$current_host && (!empty($rules['hosts']['createMissing']) || !empty($rules['templates']['createMissing']))) {
 
-				if (!$current_host && isset($rules['hosts']['createMissing'])) {
 					if ($host_db['status'] == HOST_STATUS_TEMPLATE) {
 						$result = API::Template()->create($host_db);
 						if (!$result) {
@@ -1117,8 +1100,39 @@ class CXmlImport18 {
 				}
 				$current_hostname = $host_db['host'];
 
+// TEMPLATES {{{
+				if (!empty($rules['templateLinkage']['createMissing'])) {
+					$templates = $xpath->query('templates/template', $host);
+
+					$templateLinkage = array();
+					foreach ($templates as $template) {
+						$options = array(
+							'filter' => array('host' => $template->nodeValue),
+							'output' => API_OUTPUT_SHORTEN,
+							'editable' => true
+						);
+						$current_template = API::Template()->get($options);
+
+						if (empty($current_template)) {
+							throw new Exception(_s('No permission for template "%1$s".', $template->nodeValue));
+						}
+						$current_template = reset($current_template);
+
+						$templateLinkage[] = $current_template;
+					}
+
+					$result = API::Template()->massAdd(array(
+						'hosts' => array('hostid' => $current_hostid),
+						'templates' => $templateLinkage
+					));
+					if (!$result) {
+						throw new Exception();
+					}
+				}
+// }}} TEMPLATES
+
 // ITEMS {{{
-				if(isset($rules['items']['updateExisting']) || isset($rules['items']['createMissing'])){
+				if(!empty($rules['items']['updateExisting']) || !empty($rules['items']['createMissing'])){
 					$items = $xpath->query('items/item', $host);
 
 					// if this is an export from 1.8, we need to make some adjustments to items
@@ -1227,11 +1241,11 @@ class CXmlImport18 {
 						$current_item = API::Item()->get($options);
 						$current_item = reset($current_item);
 
-						if(!$current_item && !isset($rules['items']['createMissing'])){
+						if(!$current_item && empty($rules['items']['createMissing'])){
 							info('Item ['.$item_db['key_'].'] skipped - user rule');
 							continue; // break if not update updateExisting
 						}
-						if($current_item && !isset($rules['items']['updateExisting'])){
+						if($current_item && empty($rules['items']['updateExisting'])){
 							info('Item ['.$item_db['key_'].'] skipped - user rule');
 							continue; // break if not update updateExisting
 						}
@@ -1278,7 +1292,7 @@ class CXmlImport18 {
 						}
 // }}} ITEM APPLICATIONS
 
-						if($current_item && isset($rules['items']['updateExisting'])){
+						if($current_item && !empty($rules['items']['updateExisting'])){
 							$item_db['itemid'] = $current_item['itemid'];
 							$result = API::Item()->update($item_db);
 							if(!$result){
@@ -1294,7 +1308,7 @@ class CXmlImport18 {
 						}
 
 
-						if(!$current_item && isset($rules['items']['createMissing'])){
+						if(!$current_item && !empty($rules['items']['createMissing'])){
 							$result = API::Item()->create($item_db);
 							if(!$result){
 								throw new Exception();
@@ -1323,7 +1337,7 @@ class CXmlImport18 {
 
 
 // TRIGGERS {{{
-				if(isset($rules['triggers']['updateExisting']) || isset($rules['triggers']['createMissing'])){
+				if(!empty($rules['triggers']['updateExisting']) || !empty($rules['triggers']['createMissing'])){
 					$triggers = $xpath->query('triggers/trigger', $host);
 
 					$triggers_to_add = array();
@@ -1376,20 +1390,20 @@ class CXmlImport18 {
 						unset($trigger_db['hostid']);
 
 
-						if(!$current_trigger && !isset($rules['triggers']['createMissing'])){
+						if(!$current_trigger && empty($rules['triggers']['createMissing'])){
 							info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 							continue; // break if not update updateExisting
 						}
-						if($current_trigger && !isset($rules['triggers']['updateExisting'])){
+						if($current_trigger && empty($rules['triggers']['updateExisting'])){
 							info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
 							continue; // break if not update updateExisting
 						}
 
-						if($current_trigger && isset($rules['triggers']['updateExisting'])){
+						if($current_trigger && !empty($rules['triggers']['updateExisting'])){
 							$trigger_db['triggerid'] = $current_trigger['triggerid'];
 							$triggers_to_upd[] = $trigger_db;
 						}
-						if(!$current_trigger && isset($rules['triggers']['createMissing'])){
+						if(!$current_trigger && !empty($rules['triggers']['createMissing'])){
 							$triggers_to_add[] = $trigger_db;
 						}
 					}
@@ -1426,7 +1440,7 @@ class CXmlImport18 {
 
 
 // GRAPHS {{{
-				if(isset($rules['graphs']['updateExisting']) || isset($rules['graphs']['createMissing'])){
+				if(!empty($rules['graphs']['updateExisting']) || !empty($rules['graphs']['createMissing'])){
 					$graphs = $xpath->query('graphs/graph', $host);
 
 					$graphs_to_add = array();
@@ -1503,11 +1517,11 @@ class CXmlImport18 {
 							$current_graph = reset($current_graph);
 						}
 
-						if(!$current_graph && !isset($rules['graphs']['createMissing'])){
+						if(!$current_graph && empty($rules['graphs']['createMissing'])){
 							info('Graph ['.$graph_db['name'].'] skipped - user rule');
 							continue; // break if not update updateExisting
 						}
-						if($current_graph && !isset($rules['graphs']['updateExisting'])){
+						if($current_graph && empty($rules['graphs']['updateExisting'])){
 							info('Graph ['.$graph_db['name'].'] skipped - user rule');
 							continue; // break if not update updateExisting
 						}
@@ -1572,7 +1586,7 @@ class CXmlImport18 {
 				}
 
 // SCREENS
-				if(isset($rules['screens']['updateExisting']) || isset($rules['screens']['createMissing'])){
+				if(!empty($rules['screens']['updateExisting']) || !empty($rules['screens']['createMissing'])){
 					$screens_node = $xpath->query('screens', $host);
 
 					if($screens_node->length > 0){
@@ -1588,11 +1602,11 @@ class CXmlImport18 {
 							));
 							$current_screen = reset($current_screen);
 
-							if(!$current_screen && !isset($rules['screens']['createMissing'])){
+							if(!$current_screen && empty($rules['screens']['createMissing'])){
 								info('Screen ['.$screen['name'].'] skipped - user rule');
 								continue;
 							}
-							if($current_screen && !isset($rules['screens']['updateExisting'])){
+							if($current_screen && empty($rules['screens']['updateExisting'])){
 								info('Screen ['.$screen['name'].'] skipped - user rule');
 								continue;
 							}
@@ -1610,7 +1624,8 @@ class CXmlImport18 {
 												$db_graphs = API::Graph()->getObjects($screenitem['resourceid']);
 
 												if(empty($db_graphs)){
-													$error = S_CANNOT_FIND_GRAPH.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+													$error = _s('Cannot find graph "%1$s" used in exported screen "%2$s".',
+															$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['name'], $screen['name']);
 													throw new Exception($error);
 												}
 
@@ -1622,7 +1637,8 @@ class CXmlImport18 {
 												$db_items = API::Item()->getObjects($screenitem['resourceid']);
 
 												if(empty($db_items)){
-													$error = S_CANNOT_FIND_ITEM.' "'.$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'].'" '.S_USED_IN_EXPORTED_SCREEN_SMALL.' "'.$screen['name'].'"';
+													$error = _s('Cannot find item "%1$s" used in exported screen "%2$s".',
+															$nodeCaption.$screenitem['resourceid']['host'].':'.$screenitem['resourceid']['key_'], $screen['name']);
 													throw new Exception($error);
 												}
 

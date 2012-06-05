@@ -219,7 +219,7 @@ function zbx_date2str($format, $value = null) {
 			2 => _('Feb'),
 			3 => _('Mar'),
 			4 => _('Apr'),
-			5 => _('May'),
+			5 => _x('May', 'May short'),
 			6 => _('Jun'),
 			7 => _('Jul'),
 			8 => _('Aug'),
@@ -384,14 +384,14 @@ function str2mem($val) {
 }
 
 function mem2str($size) {
-	$prefix = _('B');
+	$prefix = _x('B', 'Byte short');
 	if ($size > 1048576) {
 		$size = $size / 1048576;
-		$prefix = _('M');
+		$prefix = _x('M', 'Mega short');
 	}
 	elseif ($size > 1024) {
 		$size = $size / 1024;
-		$prefix = _('K');
+		$prefix = _x('K', 'Kilo short');
 	}
 	return round($size, 6).$prefix;
 }
@@ -423,7 +423,7 @@ function convertUnitsUptime($value) {
 
 function convertUnitsS($value) {
 	if (floor(abs($value) * 1000) == 0) {
-		$value = ($value == 0) ? '0'._('s') : '< 1'._('ms');
+		$value = ($value == 0) ? '0'._x('s', 'second short') : '< 1'._x('ms', 'millisecond short');
 		return $value;
 	}
 
@@ -437,7 +437,7 @@ function convertUnitsS($value) {
 	$n_unit = 0;
 
 	if (($n = floor($secs / SEC_PER_YEAR)) != 0) {
-		$value .= $n._('y').' ';
+		$value .= $n._x('y', 'year short').' ';
 		$secs -= $n * SEC_PER_YEAR;
 		if (0 == $n_unit) {
 			$n_unit = 4;
@@ -445,7 +445,7 @@ function convertUnitsS($value) {
 	}
 
 	if (($n = floor($secs / SEC_PER_MONTH)) != 0) {
-		$value .= $n._('m').' ';
+		$value .= $n._x('m', 'month short').' ';
 		$secs -= $n * SEC_PER_MONTH;
 		if (0 == $n_unit) {
 			$n_unit = 3;
@@ -453,7 +453,7 @@ function convertUnitsS($value) {
 	}
 
 	if (($n = floor($secs / SEC_PER_DAY)) != 0) {
-		$value .= $n._('d').' ';
+		$value .= $n._x('d', 'day short').' ';
 		$secs -= $n * SEC_PER_DAY;
 		if (0 == $n_unit) {
 			$n_unit = 2;
@@ -461,7 +461,7 @@ function convertUnitsS($value) {
 	}
 
 	if ($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0) {
-		$value .= $n._('h').' ';
+		$value .= $n._x('h', 'hour short').' ';
 		$secs -= $n * SEC_PER_HOUR;
 		if (0 == $n_unit) {
 			$n_unit = 1;
@@ -469,17 +469,17 @@ function convertUnitsS($value) {
 	}
 
 	if ($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0) {
-		$value .= $n._('m').' ';
+		$value .= $n._x('m', 'minute short').' ';
 		$secs -= $n * SEC_PER_MIN;
 	}
 
 	if ($n_unit < 2 && ($n = floor($secs)) != 0) {
-		$value .= $n._('s').' ';
+		$value .= $n._x('s', 'second short').' ';
 		$secs -= $n;
 	}
 
 	if ($n_unit < 1 && ($n = round($secs * 1000)) != 0) {
-		$value .= $n._('ms');
+		$value .= $n._x('ms', 'millisecond short');
 	}
 
 	return rtrim($value);
@@ -542,17 +542,17 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 
 	if (!isset($digitUnits[$step])) {
 		$digitUnits[$step] = array(
-			array('pow' => -2, 'short' => _('µ'), 'long' => _('Micro')),
-			array('pow' => -1, 'short' => _('m'), 'long' => _('Milli')),
+			array('pow' => -2, 'short' => _x('µ', 'Micro short'), 'long' => _('Micro')),
+			array('pow' => -1, 'short' => _x('m', 'Milli short'), 'long' => _('Milli')),
 			array('pow' => 0, 'short' => '', 'long' => ''),
-			array('pow' => 1, 'short' => _('K'), 'long' => _('Kilo')),
-			array('pow' => 2, 'short' => _('M'), 'long' => _('Mega')),
-			array('pow' => 3, 'short' => _('G'), 'long' => _('Giga')),
-			array('pow' => 4, 'short' => _('T'), 'long' => _('Tera')),
-			array('pow' => 5, 'short' => _('P'), 'long' => _('Peta')),
-			array('pow' => 6, 'short' => _('E'), 'long' => _('Exa')),
-			array('pow' => 7, 'short' => _('Z'), 'long' => _('Zetta')),
-			array('pow' => 8, 'short' => _('Y'), 'long' => _('Yotta'))
+			array('pow' => 1, 'short' => _x('K', 'Kilo short'), 'long' => _('Kilo')),
+			array('pow' => 2, 'short' => _x('M', 'Mega short'), 'long' => _('Mega')),
+			array('pow' => 3, 'short' => _x('G', 'Giga short'), 'long' => _('Giga')),
+			array('pow' => 4, 'short' => _x('T', 'Tera short'), 'long' => _('Tera')),
+			array('pow' => 5, 'short' => _x('P', 'Peta short'), 'long' => _('Peta')),
+			array('pow' => 6, 'short' => _x('E', 'Exa short'), 'long' => _('Exa')),
+			array('pow' => 7, 'short' => _x('Z', 'Zetta short'), 'long' => _('Zetta')),
+			array('pow' => 8, 'short' => _x('Y', 'Yotta short'), 'long' => _('Yotta'))
 		);
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
@@ -595,7 +595,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 	$value = rtrim($value, '.');
 
-	return sprintf('%s %s%s', $value, $desc, $units);
+	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
 }
 
 /************* ZBX MISC *************/
@@ -632,7 +632,7 @@ function zbx_is_int($var) {
 	}
 
 	if (is_string($var)) {
-		if (ctype_digit($var) || strcmp(intval($var), $var) == 0) {
+		if (function_exists('ctype_digit') && ctype_digit($var) || strcmp(intval($var), $var) == 0) {
 			return true;
 		}
 	}
@@ -1127,7 +1127,7 @@ function zbx_array_merge() {
 }
 
 function uint_in_array($needle, $haystack) {
-	foreach ($haystack as $id => $value) {
+	foreach ($haystack as $value) {
 		if (bccomp($needle, $value) == 0) {
 			return true;
 		}
@@ -1366,11 +1366,16 @@ function zbx_str2links($text) {
 	return $result;
 }
 
-function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
+function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 	if (!isset($mainArray[$sIndex])) {
 		$mainArray[$sIndex] = array();
 	}
-	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
+	if ($key) {
+		$mainArray[$sIndex][$key] = is_null($element) ? $sIndex : $element;
+	}
+	else {
+		$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
+	}
 }
 
 /**
@@ -1528,7 +1533,7 @@ function getPagingLine(&$items, $autotrim = true) {
 	$table = BR();
 	if ($cnt_pages > 1) {
 		if ($startPage > 1) {
-			$pagespan = new CSpan('<< '._('First'), 'darklink');
+			$pagespan = new CSpan('<< '._x('First', 'page navigation'), 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage(0);');
 
 			$pageline[] = $pagespan;
@@ -1536,7 +1541,7 @@ function getPagingLine(&$items, $autotrim = true) {
 		}
 
 		if ($crnt_page > 1) {
-			$pagespan = new CSpan('< '._('Previous'), 'darklink');
+			$pagespan = new CSpan('< '._x('Previous', 'page navigation'), 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($crnt_page - 2) * $rows_per_page).');');
 
 			$pageline[] = $pagespan;
@@ -1563,7 +1568,7 @@ function getPagingLine(&$items, $autotrim = true) {
 		array_pop($pageline);
 
 		if ($crnt_page < $cnt_pages) {
-			$pagespan = new CSpan(_('Next').' >', 'darklink');
+			$pagespan = new CSpan(_x('Next', 'page navigation').' >', 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
 
 			$pageline[] = ' | ';
@@ -1571,7 +1576,7 @@ function getPagingLine(&$items, $autotrim = true) {
 		}
 
 		if ($p < $cnt_pages) {
-			$pagespan = new CSpan(_('Last').' >>', 'darklink');
+			$pagespan = new CSpan(_x('Last', 'page navigation').' >>', 'darklink');
 			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages - 1) * $rows_per_page).');');
 
 			$pageline[] = '&nbsp;&nbsp;';
@@ -1712,6 +1717,7 @@ function bcround($number, $precision = 0) {
 	elseif ($precision != 0) {
 		$number .= '.' . str_repeat('0', $precision);
 	}
+
 	// according to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
 	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
@@ -1743,4 +1749,3 @@ function num2letter($number) {
 
 	return $str;
 }
-?>

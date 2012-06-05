@@ -65,6 +65,8 @@ sub process_table
 {
 	my $line = $_[0];
 
+	$line = "`$line`" if ($output{'database'} eq 'mysql');
+
 	$insert_into = "INSERT INTO $line";
 }
 
@@ -77,17 +79,29 @@ sub process_fields
 	my $first = 1;
 	$fields = "(";
 
-	foreach (@array)
+	if ($output{'database'} eq 'mysql')
 	{
-		if ($first == 0)
+		foreach (@array)
 		{
-			$fields = "$fields,";
+			$fields = "$fields," if ($first == 0);
+			$first = 0;
+
+			$_ =~ s/\s+$//; # remove trailing spaces
+
+			$fields = "$fields`$_`";
 		}
-		$first = 0;
+	}
+	else
+	{
+		foreach (@array)
+		{
+			$fields = "$fields," if ($first == 0);
+			$first = 0;
 
-		$_ =~ s/\s+$//; # remove trailing spaces
+			$_ =~ s/\s+$//; # remove trailing spaces
 
-		$fields = "$fields$_";
+			$fields = "$fields$_";
+		}
 	}
 
 	$fields = "$fields)";
@@ -98,12 +112,6 @@ sub process_row
 	my $line = $_[0];
 
 	my @array = split(/\|/, $line);
-
-	foreach (@array)
-	{
-		$_ =~ s/&pipe;/|/g;
-		$_ =~ s/&eol;/\n/g;
-	}
 
 	my $first = 1;
 	my $values = "(";
@@ -120,29 +128,53 @@ sub process_row
 		$_ =~ s/^\s+//;
 		$_ =~ s/\s+$//;
 
-		# escape single quotes
-		if ($output{'database'} eq 'postgresql')
-		{
-			$_ =~ s/\\/\\\\/g;
-			$_ =~ s/'/''/g;
-		}
-		elsif ($output{'database'} eq 'mysql')
-		{
-			$_ =~ s/\\/\\\\/g;
-			$_ =~ s/'/\\'/g;
-		}
-		else
-		{
-			$_ =~ s/'/''/g;
-		}
-
 		if ($_ eq 'NULL')
 		{
 			$values = "$values$_";
 		}
 		else
 		{
-			$values = "$values'$_'";
+			my $modifier = '';
+
+			# escape backslashes
+			if (/\\/)
+			{
+				if ($output{'database'} eq 'postgresql')
+				{
+					$_ =~ s/\\/\\\\/g;
+					$modifier = 'E';
+				}
+				elsif ($output{'database'} eq 'mysql')
+				{
+					$_ =~ s/\\/\\\\/g;
+				}
+			}
+
+			# escape single quotes
+			if (/'/)
+			{
+				if ($output{'database'} eq 'mysql')
+				{
+					$_ =~ s/'/\\'/g;
+				}
+				else
+				{
+					$_ =~ s/'/''/g;
+				}
+			}
+
+			$_ =~ s/&pipe;/|/g;
+
+			if ($output{'database'} eq 'mysql')
+			{
+				$_ =~ s/&eol;/\\r\\n/g;
+			}
+			else
+			{
+				$_ =~ s/&eol;/\x0D\x0A/g;
+			}
+
+			$values = "$values$modifier'$_'";
 		}
 	}
 

@@ -17,9 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-define('ZABBIX_VERSION',		'2.0.0rc4');
+
+
+define('ZABBIX_VERSION',		'2.0.1rc1');
 define('ZABBIX_API_VERSION',	'1.4');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);
@@ -381,14 +381,16 @@ define('MAP_LINK_DRAWTYPE_BOLD_LINE',		2);
 define('MAP_LINK_DRAWTYPE_DOT',				3);
 define('MAP_LINK_DRAWTYPE_DASHED_LINE',		4);
 
-define('SERVICE_ALGORITHM_NONE',	0);
-define('SERVICE_ALGORITHM_MAX',		1);
-define('SERVICE_ALGORITHM_MIN',		2);
+define('SERVICE_ALGORITHM_NONE',	0); // do not calculate
+define('SERVICE_ALGORITHM_MAX',		1); // problem, if one children has a problem
+define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
 
 define('SERVICE_SLA', 99.05);
 
 define('SERVICE_SHOW_SLA_OFF', 0);
 define('SERVICE_SHOW_SLA_ON',  1);
+
+define('SERVICE_STATUS_OK',  0);
 
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
@@ -788,34 +790,18 @@ define('IPMI_PRIVILEGE_OEM',		5);
 
 define('ZBX_HAVE_IPV6', 1);
 
+
+define('ZBX_SOCKET_TIMEOUT', 3);
+
 // XML export|import tags
-define('XML_TAG_MACROS',			'macros');
 define('XML_TAG_MACRO',				'macro');
-define('XML_TAG_ZABBIX_EXPORT',		'zabbix_export');
-define('XML_TAG_HOSTS',				'hosts');
 define('XML_TAG_HOST',				'host');
 define('XML_TAG_HOSTINVENTORY',		'host_inventory');
-define('XML_TAG_GROUPS',			'groups');
-define('XML_TAG_GROUP',				'group');
-define('XML_TAG_APPLICATIONS',		'applications');
-define('XML_TAG_APPLICATION',		'application');
-define('XML_TAG_ITEMS',				'items');
 define('XML_TAG_ITEM',				'item');
-define('XML_TAG_TEMPLATES',			'templates');
-define('XML_TAG_TEMPLATE',			'template');
-define('XML_TAG_TRIGGERS',			'triggers');
 define('XML_TAG_TRIGGER',			'trigger');
-define('XML_TAG_GRAPHS',			'graphs');
 define('XML_TAG_GRAPH',				'graph');
 define('XML_TAG_GRAPH_ELEMENT',		'graph_element');
-define('XML_TAG_GRAPH_ELEMENTS',	'graph_elements');
-define('XML_TAG_SCREENS',			'screens');
-define('XML_TAG_SCREEN',			'screen');
-define('XML_TAG_SCREEN_ELEMENT',	'screen_element');
-define('XML_TAG_SCREEN_ELEMENTS',	'screen_elements');
-define('XML_TAG_DEPENDENCIES',		'dependencies');
 define('XML_TAG_DEPENDENCY',		'dependency');
-define('XML_TAG_DEPENDS',			'depends');
 
 define('ZBX_DEFAULT_IMPORT_HOST_GROUP', 'Imported hosts');
 
@@ -868,6 +854,37 @@ define('THEME_DEFAULT', 'default');
 // the default theme
 define('ZBX_DEFAULT_THEME', 'originalblue');
 
+define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
+
+// date formats
+define('HISTORY_OF_ACTIONS_DATE_FORMAT', _('d M Y H:i:s'));
+define('EVENT_ACTION_MESSAGES_DATE_FORMAT', _('d M Y H:i:s'));
+define('EVENT_ACTION_CMDS_DATE_FORMAT', _('Y.M.d H:i:s'));
+define('HISTORY_LOG_LOCALTIME_DATE_FORMAT', _('Y.M.d H:i:s'));
+define('HISTORY_LOG_ITEM_PLAINTEXT', _('Y-m-d H:i:s'));
+define('HISTORY_PLAINTEXT_DATE_FORMAT', _('Y-m-d H:i:s'));
+define('HISTORY_ITEM_DATE_FORMAT', _('Y.M.d H:i:s'));
+define('EVENTS_DISCOVERY_TIME_FORMAT', _('d M Y H:i:s'));
+define('EVENTS_ACTION_TIME_FORMAT', _('d M Y H:i:s'));
+define('QUEUE_NODES_DATE_FORMAT', _('d M Y H:i:s'));
+define('CHARTBAR_HOURLY_DATE_FORMAT', _('Y.m.d H:i'));
+define('CHARTBAR_DAILY_DATE_FORMAT', _('Y.m.d'));
+// GETTEXT: Date format (year). Do not translate.
+define('REPORT4_ANNUALLY_DATE_FORMAT', _x('Y', 'date format'));
+define('REPORT4_MONTHLY_DATE_FORMAT', _('M Y'));
+define('REPORT4_DAILY_DATE_FORMAT', _('d M Y'));
+define('REPORT4_WEEKLY_DATE_FORMAT', _('d M Y H:i'));
+define('REPORTS_BAR_REPORT_DATE_FORMAT', _('d M Y H:i:s'));
+define('POPUP_PERIOD_CAPTION_DATE_FORMAT', _('d M Y H:i:s'));
+define('MAPS_DATE_FORMAT', _('Y.m.d H:i:s'));
+define('SERVER_INFO_DATE_FORMAT', _('D, d M Y H:i:s O'));
+define('XML_DATE_DATE_FORMAT', _('d.m.y'));
+define('XML_TIME_DATE_FORMAT', _('H.i'));
+
+// actions
+define('LONG_DESCRIPTION',	0);
+define('SHORT_DESCRIPTION',	1);
+
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
 	$_GET = zbx_stripslashes($_GET);
@@ -882,5 +899,7 @@ $_REQUEST = $_POST + $_GET;
 // init precision
 ini_set('precision', 14);
 
-// BC Math scale
-bcscale(7);
+// BC Math scale. bcscale() can be undefined prior requirement check in setup.
+if (function_exists('bcscale')) {
+	bcscale(7);
+}

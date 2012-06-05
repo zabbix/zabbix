@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2001-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
 
 /**
  * @property string $groupid
@@ -40,6 +38,7 @@ class CPageFilter {
 	const HOST_LATEST_IDX = 'web.latest.hostid';
 	const GRAPH_LATEST_IDX = 'web.latest.graphid';
 	const TRIGGER_LATEST_IDX = 'web.latest.triggerid';
+	const DRULE_LATEST_IDX = 'web.latest.druleid';
 
 	public function __get($name) {
 		if (isset($this->data[$name])) {
@@ -63,6 +62,7 @@ class CPageFilter {
 		$this->config['all_nodes'] = $ZBX_WITH_ALL_NODES;
 		$this->config['select_latest'] = isset($options['config']['select_latest']);
 		$this->config['DDReset'] = get_request('ddreset', null);
+		$this->config['popupDD'] = isset($options['config']['popupDD']);
 
 		$config = select_config();
 
@@ -123,6 +123,11 @@ class CPageFilter {
 		if (isset($options['triggers'])) {
 			$this->_initTriggers($options['triggerid'], $options['triggers']);
 		}
+
+		// drules
+		if (isset($options['drules'])) {
+			$this->_initDiscoveries($options['druleid'], $options['drules']);
+		}
 	}
 
 	private function _getProfiles($options) {
@@ -133,30 +138,35 @@ class CPageFilter {
 		$this->_profileIdx['hosts'] = 'web.'.$profileSection.'.hostid';
 		$this->_profileIdx['graphs'] = 'web.'.$profileSection.'.graphid';
 		$this->_profileIdx['triggers'] = 'web.'.$profileSection.'.triggerid';
+		$this->_profileIdx['drules'] = 'web.'.$profileSection.'.druleid';
 
 		if ($this->config['select_latest']) {
 			$this->_profileIds['groupid'] = CProfile::get(self::GROUP_LATEST_IDX);
 			$this->_profileIds['hostid'] = CProfile::get(self::HOST_LATEST_IDX);
 			$this->_profileIds['graphid'] = CProfile::get(self::GRAPH_LATEST_IDX);
 			$this->_profileIds['triggerid'] = null;
+			$this->_profileIds['druleid'] = CProfile::get(self::DRULE_LATEST_IDX);
 		}
 		elseif ($this->config['DDReset'] && !$this->config['DDRemember']) {
 			$this->_profileIds['groupid'] = 0;
 			$this->_profileIds['hostid'] = 0;
 			$this->_profileIds['graphid'] = 0;
 			$this->_profileIds['triggerid'] = 0;
+			$this->_profileIds['druleid'] = 0;
 		}
 		else {
 			$this->_profileIds['groupid'] = CProfile::get($this->_profileIdx['groups']);
 			$this->_profileIds['hostid'] = CProfile::get($this->_profileIdx['hosts']);
 			$this->_profileIds['graphid'] = CProfile::get($this->_profileIdx['graphs']);
 			$this->_profileIds['triggerid'] = null;
+			$this->_profileIds['druleid'] = CProfile::get($this->_profileIdx['drules']);
 		}
 
 		$this->_requestIds['groupid'] = isset($options['groupid']) ? $options['groupid'] : null;
 		$this->_requestIds['hostid'] = isset($options['hostid']) ? $options['hostid'] : null;
 		$this->_requestIds['graphid'] = isset($options['graphid']) ? $options['graphid'] : null;
 		$this->_requestIds['triggerid'] = isset($options['triggerid']) ? $options['triggerid'] : null;
+		$this->_requestIds['druleid'] = isset($options['druleid']) ? $options['druleid'] : null;
 	}
 
 	private function _updateByGraph(&$options) {
@@ -266,17 +276,21 @@ class CPageFilter {
 			$this->data['groups'][$group['groupid']] = $group['name'];
 		}
 
-		if (is_null($groupid)) {
+		// select remebered selection
+		if (is_null($groupid) && $this->_profileIds['groupid']) {
 			$groupid = $this->_profileIds['groupid'];
 		}
 
+		// nonexisting or unset $groupid
 		if ((!isset($this->data['groups'][$groupid]) && $groupid > 0) || is_null($groupid)) {
-			if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) {
-				$groupid = 0;
+			// for popup select first group in the list
+			if ($this->config['popupDD']) {
+				reset($this->data['groups']);
+				$groupid = key($this->data['groups']);
 			}
-			elseif (is_null($this->_requestIds['groupid']) || $this->_requestIds['groupid'] > 0) {
-				$groupids = array_keys($this->data['groups']);
-				$groupid = empty($groupids) ? 0 : reset($groupids);
+			// otherwise groupid = 0 for 'Dropdown first entry' option ALL or NONE
+			else {
+				$groupid = 0;
 			}
 		}
 
@@ -302,23 +316,27 @@ class CPageFilter {
 			);
 			$options = zbx_array_merge($def_options, $options);
 			$hosts = API::Host()->get($options);
-			order_result($hosts, 'host');
+			order_result($hosts, 'name');
 
 			foreach ($hosts as $host) {
 				$this->data['hosts'][$host['hostid']] = $host['name'];
 			}
 
-			if (is_null($hostid)) {
+			// select remebered selection
+			if (is_null($hostid) && $this->_profileIds['hostid']) {
 				$hostid = $this->_profileIds['hostid'];
 			}
 
+			// nonexisting or unset $hostid
 			if ((!isset($this->data['hosts'][$hostid]) && $hostid > 0) || is_null($hostid)) {
-				if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) {
-					$hostid = 0;
+				// for popup select first host in the list
+				if ($this->config['popupDD']) {
+					reset($this->data['hosts']);
+					$hostid = key($this->data['hosts']);
 				}
-				elseif (is_null($this->_requestIds['hostid']) || $this->_requestIds['hostid'] > 0) {
-					$hostids = array_keys($this->data['hosts']);
-					$hostid = empty($hostids) ? 0 : reset($hostids);
+				// otherwise hostid = 0 for 'Dropdown first entry' option ALL or NONE
+				else {
+					$hostid = 0;
 				}
 			}
 		}
@@ -419,6 +437,42 @@ class CPageFilter {
 		$this->ids['triggerid'] = $triggerid;
 	}
 
+	private function _initDiscoveries($druleid, $options) {
+		$def_options = array(
+			'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
+			'output' => API_OUTPUT_EXTEND
+		);
+		$options = zbx_array_merge($def_options, $options);
+		$drules = API::DRule()->get($options);
+		order_result($drules, 'name');
+
+		$this->data['drules'] = array();
+		foreach ($drules as $drule) {
+			$this->data['drules'][$drule['druleid']] = $drule['name'];
+		}
+
+		if (is_null($druleid)) {
+			$druleid = $this->_profileIds['druleid'];
+		}
+
+		if ((!isset($this->data['drules'][$druleid]) && $druleid > 0) || is_null($druleid)) {
+			if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) {
+				$druleid = 0;
+			}
+			elseif (is_null($this->_requestIds['druleid']) || $this->_requestIds['druleid'] > 0) {
+				$druleids = array_keys($this->data['drules']);
+				$druleid = empty($druleids) ? 0 : reset($druleids);
+			}
+		}
+
+		CProfile::update($this->_profileIdx['drules'], $druleid, PROFILE_TYPE_ID);
+		CProfile::update(self::DRULE_LATEST_IDX, $druleid, PROFILE_TYPE_ID);
+
+		$this->isSelected['drulesSelected'] = ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['drules'])) || $druleid > 0;
+		$this->isSelected['drulesAll'] = $this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_ALL && !empty($this->data['drules']) && $druleid == 0;
+		$this->ids['druleid'] = $druleid;
+	}
+
 	public function getHostsCB($withNode = false) {
 		return $this->_getCB('hostid', $this->hostid, $this->hosts, $withNode);
 	}
@@ -449,6 +503,10 @@ class CPageFilter {
 		return $this->_getCB('triggerid', $this->triggerid, $this->triggers, $withNode);
 	}
 
+	public function getDiscoveryCB($withNode = false) {
+		return $this->_getCB('druleid', $this->druleid, $this->drules, $withNode);
+	}
+
 	private function _getCB($cbname, $selectedid, $items, $withNode) {
 		$cmb = new CComboBox($cbname, $selectedid, 'javascript: submit();');
 
@@ -459,11 +517,15 @@ class CPageFilter {
 		}
 
 		natcasesort($items);
-		$items = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all')) + $items;
+
+		if (!$this->config['popupDD']) {
+			$items = array(0 => ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE) ? _('not selected') : _('all')) + $items;
+		}
+
 		foreach ($items as $id => $name) {
 			$cmb->addItem($id, $name);
 		}
+
 		return $cmb;
 	}
 }
-?>

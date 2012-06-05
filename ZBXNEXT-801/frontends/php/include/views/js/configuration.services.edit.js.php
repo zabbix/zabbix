@@ -1,15 +1,10 @@
 <script type="text/javascript">
-	jQuery(document).ready(function() {
-		jQuery('#showsla').bind('click', function() {
-			if (this.checked) {
-				jQuery('#goodsla').prop('disabled', false);
-			}
-			else {
-				jQuery('#goodsla').prop('disabled', true);
-			}
+	jQuery(function() {
+		jQuery('#showsla').change(function() {
+			jQuery('#goodsla').prop('disabled', !this.checked);
 		});
 
-		jQuery('#add_service_time').bind('click', function() {
+		jQuery('#add_service_time').click(function() {
 			var input = document.createElement('input');
 			input.setAttribute('type', 'hidden');
 			input.setAttribute('name', 'add_service_time');
@@ -17,6 +12,15 @@
 			jQuery('form[name=servicesForm]').append(input);
 			jQuery('form[name=servicesForm]').submit();
 		});
+
+		jQuery('#algorithm').change(function() {
+			var statusDisabled = (jQuery(this).val() == <?php echo SERVICE_ALGORITHM_NONE ?>);
+			jQuery('#showsla, #trigger, #btn1, #goodsla').prop('disabled', statusDisabled);
+
+			if (!statusDisabled) {
+				jQuery('#showsla').change();
+			}
+		}).change();
 	});
 
 	function add_child_service(name, serviceid, trigger, triggerid) {

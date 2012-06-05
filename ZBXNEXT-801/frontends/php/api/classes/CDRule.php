@@ -528,7 +528,7 @@ class CDRule extends CZBXAPI {
 				}
 			}
 		}
-		else{
+		else {
 			foreach ($dRules as $dRule) {
 				if (!isset($dRule['name']) || zbx_empty($dRule['name'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
@@ -554,38 +554,39 @@ class CDRule extends CZBXAPI {
 						break;
 					}
 				}
-				if ($equal) self::exception(ZBX_API_ERROR_PARAMETERS, _('Checks should be unique.'));
+				if ($equal) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Checks should be unique.'));
+				}
 			}
 		}
 	}
 
-/**
- * Create new discovery rules
- *
- * @param array(
- *  name => string,
- *  proxy_hostid => int,
- *  iprange => string,
- *  delay => string,
- *  status => int,
- *  dchecks => array(
- *  	array(
- *  		type => int,
- *  		ports => string,
- *  		key_ => string,
- *  		snmp_community => string,
- *  		snmpv3_securityname => string,
- *  		snmpv3_securitylevel => int,
- *  		snmpv3_authpassphrase => string,
- *  		snmpv3_privpassphrase => string,
- *  		uniq => int,
- *  	), ...
- *  )
- * ) $drules
- * @return array
- */
+	/**
+	 * Create new discovery rules
+	 *
+	 * @param array(
+	 *  name => string,
+	 *  proxy_hostid => int,
+	 *  iprange => string,
+	 *  delay => string,
+	 *  status => int,
+	 *  dchecks => array(
+	 *  	array(
+	 *  		type => int,
+	 *  		ports => string,
+	 *  		key_ => string,
+	 *  		snmp_community => string,
+	 *  		snmpv3_securityname => string,
+	 *  		snmpv3_securitylevel => int,
+	 *  		snmpv3_authpassphrase => string,
+	 *  		snmpv3_privpassphrase => string,
+	 *  		uniq => int,
+	 *  	), ...
+	 *  )
+	 * ) $drules
+	 * @return array
+	 */
 	public function create(array $dRules) {
-
 		$this->checkInput($dRules);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
 

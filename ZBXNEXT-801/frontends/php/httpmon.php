@@ -17,12 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
-require_once dirname(__FILE__).'/include/hosts.inc.php';
-require_once dirname(__FILE__).'/include/httptest.inc.php';
-require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Status of Web monitoring');
 $page['file'] = 'httpmon.php';
@@ -31,9 +28,6 @@ $page['hist_arg'] = array('open','groupid','hostid');
 define('ZBX_PAGE_DO_REFRESH', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-
-?>
-<?php
 
 //		VAR				TYPE		OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 	$fields = array(
@@ -65,9 +59,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	}
 //--------
 	validate_sort_and_sortorder('wt.name',ZBX_SORT_DOWN);
-?>
-<?php
-	// $_REQUEST['applications'] = get_request('applications',CProfile::get('web.httpmon.applications',array()));
 
 	$_REQUEST['applications'] = get_request('applications', get_favorites('web.httpmon.applications'));
 	$_REQUEST['applications'] = zbx_objectValues($_REQUEST['applications'], 'value');
@@ -98,12 +89,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	foreach ($_REQUEST['applications'] as $application) {
 		add2favorites('web.httpmon.applications', $application);
 	}
-	// CProfile::update('web.httpmon.applications',$_REQUEST['applications'],PROFILE_TYPE_ARRAY_ID);
-?>
-<?php
+
 
 	$httpmon_wdgt = new CWidget();
-
 // Table HEADER
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
 	$httpmon_wdgt->addPageHeader(_('STATUS OF WEB MONITORING'), $fs_icon);
@@ -131,7 +119,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$r_form->addVar('fullscreen',$_REQUEST['fullscreen']);
 
 	$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB(true)));
-	$r_form->addItem(array(SPACE.S_HOST.SPACE,$pageFilter->getHostsCB(true)));
+	$r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB(true)));
 
 	$httpmon_wdgt->addHeader(_('Web checks'), $r_form);
 	$httpmon_wdgt->addItem(SPACE);
@@ -151,7 +139,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$table = new CTableInfo(_('No web checks defined.'));
 	$table->SetHeader(array(
 		is_show_all_nodes() ? make_sorting_header(_('Node'), 'h.hostid') : null,
-		$_REQUEST['hostid'] == 0 ? make_sorting_header(S_HOST, 'h.name') : null,
+		$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'h.name') : null,
 		make_sorting_header(array($link, SPACE, _('Name')), 'wt.name'),
 		_('Number of steps'),
 		_('Last check'),
@@ -330,5 +318,3 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-
-?>

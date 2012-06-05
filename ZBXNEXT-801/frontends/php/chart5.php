@@ -36,19 +36,14 @@ check_fields($fields);
 /*
  * Permissions
  */
-if (!$service = DBfetch(DBselect('SELECT s.* FROM services s WHERE s.serviceid='.$_REQUEST['serviceid'], 1))) {
-	fatal_error(_('No IT services defined.'));
-}
-
-if ($service['triggerid']) {
-	$db_data = API::Trigger()->get(array(
-		'triggerids' => $service['triggerid'],
-		'output' => API_OUTPUT_SHORTEN,
-		'nodeids' => get_current_nodeid(true)
-	));
-	if (empty($db_data)) {
-		access_deny();
-	}
+$service = API::Service()->get(array(
+	'output' => array('serviceid', 'name', 'showsla', 'goodsla'),
+	'selectTimes' => API_OUTPUT_EXTEND,
+	'serviceids' => $_REQUEST['serviceid']
+));
+$service = reset($service);
+if (!$service) {
+	access_deny();
 }
 
 /*
@@ -106,6 +101,7 @@ $start = $start - ($wday - 1) * 24 * 3600;
 
 $weeks = (int) date('W') + ($wday ? 1 : 0);
 
+$intervals = array();
 for ($i = 0; $i < 52; $i++) {
 	if (($period_start = $start + 7 * 24 * 3600 * $i) > time()) {
 		break;
@@ -115,10 +111,21 @@ for ($i = 0; $i < 52; $i++) {
 		$period_end = time();
 	}
 
-	$stat = calculateServiceAvailability($_REQUEST['serviceid'], $period_start, $period_end);
+	$intervals[] = array(
+		'from' => $period_start,
+		'to' => $period_end
+	);
+}
 
-	$problem[$i] = $stat['problem'];
-	$ok[$i] = $stat['ok'];
+$sla = API::Service()->getSla(array(
+	'serviceids' => $service['serviceid'],
+	'intervals' => $intervals
+));
+$sla = reset($sla);
+
+foreach ($sla['sla'] as $i => $intervalSla) {
+	$problem[$i] = 100 - $intervalSla['problem'];
+	$ok[$i] = $intervalSla['sla'];
 	$count_now[$i] = 1;
 }
 

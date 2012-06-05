@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
-include('include/views/js/configuration.services.edit.js.php');
+include(dirname(__FILE__).'/js/configuration.services.child.list.js.php');
 
 $servicesChildWidget = new CWidget();
-$servicesChildWidget->addPageHeader(_('IT SERVICES: CHILDS'));
+$servicesChildWidget->addPageHeader(_('IT service dependencies'));
 
 // create form
 $servicesChildForm = new CForm();
@@ -33,20 +33,35 @@ if (!empty($this->data['service'])) {
 
 // create table
 $servicesChildTable = new CTableInfo();
-$servicesChildTable->setHeader(array(_('Service'), _('Status calculation'), _('Trigger')));
+$servicesChildTable->setHeader(array(
+	new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');"),
+	_('Service'),
+	_('Status calculation'),
+	_('Trigger')
+));
 
 $prefix = null;
-foreach ($this->data['db_cservices'] as $db_service) {
-	$description = new CLink(
-		$db_service['name'], '#', null,
-		'window.opener.add_child_service('.zbx_jsvalue($db_service['name']).','.zbx_jsvalue($db_service['serviceid'])
-			.','.zbx_jsvalue($db_service['trigger']).','.zbx_jsvalue($db_service['triggerid']).'); self.close(); return false;'
+foreach ($this->data['db_cservices'] as $service) {
+	$description = new CLink($service['name'], '#', 'service-name');
+	$description->setAttributes(array(
+		'id' => 'service-name-'.$service['serviceid'],
+		'data-name' => $service['name'],
+		'data-serviceid' => $service['serviceid'],
+		'data-trigger' => $service['trigger'],
+		'data-triggerid' => $service['triggerid']
+	));
+
+	$cb = new CCheckBox('services['.$service['serviceid'].']', null, null, $service['serviceid']);
+	$cb->addClass('service-select');
+
+	$servicesChildTable->addRow(array(
+		$cb,
+		array($prefix, $description),
+		serviceAlgorythm($service['algorithm']),
+		$service['trigger'])
 	);
-	$servicesChildTable->addRow(array(array($prefix, $description), serviceAlgorythm($db_service['algorithm']), $db_service['trigger']));
 }
-$column = new CCol(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
-$column->setAttribute('style', 'text-align:right;');
-$servicesChildTable->setFooter($column);
+$servicesChildTable->setFooter(new CCol(new CButton('select', _('Select')), 'right'));
 
 // append table to form
 $servicesChildForm->addItem($servicesChildTable);

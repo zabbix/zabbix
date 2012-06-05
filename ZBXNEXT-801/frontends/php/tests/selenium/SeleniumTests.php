@@ -44,6 +44,7 @@ require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageNodes.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
+require_once dirname(__FILE__).'/testPagePopup.php';
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
 require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
@@ -80,6 +81,7 @@ require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
+require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -110,6 +112,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageNodes');
 		$suite->addTestSuite('testPageOverview');
+		$suite->addTestSuite('testPagePopup');
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
 		$suite->addTestSuite('testPageQueueOverviewByProxy');
@@ -145,6 +148,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testPageApplications');
+		$suite->addTestSuite('testPageBrowserWarning');
 
 		return $suite;
 	}
