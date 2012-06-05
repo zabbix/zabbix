@@ -1,0 +1,89 @@
+#!/bin/bash
+#
+# chkconfig: - 55 45
+# description: zabbix_agentd  
+# probe: false
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up. If you are running without a network, comment this out.
+[ "${NETWORKING}" = "no" ] && exit 0
+
+RETVAL=0
+progdir="/usr/local/zabbix/bin/"
+prog="zabbix_agentd"
+
+start() {
+        # Start daemons.
+	if [ -n "`/sbin/pidof $prog`" ]; then
+		echo -n "$prog: already running"
+		failure $"$prog start"
+		echo
+		return 1
+	fi
+        echo -n $"Starting $prog: "
+	# we can't seem to use daemon here - emulate its functionality
+        su -c $progdir$prog - $USER 
+	RETVAL=$?
+	usleep 100000
+	if [ -z "`/sbin/pidof $progdir$prog`" ]; then
+		# The child processes have died after fork()ing, e.g.
+		# because of a broken config file
+		RETVAL=1
+	fi
+	[ $RETVAL -ne 0 ] && failure $"$prog startup"
+ 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog && success $"$prog startup"
+	echo	
+	return $RETVAL
+}
+stop() {
+	RETVAL=0
+	pid=
+        # Stop daemons.
+        echo -n $"Stopping $prog: "
+	pid=`/sbin/pidof -s $prog`
+	if [ -n "$pid" ]; then
+	 kill -TERM $pid
+        else
+	 failure $"$prog stop"
+	 echo
+	 return 1
+        fi
+	RETVAL=$?
+	[ $RETVAL -ne 0 ] && failure $"$prog stop" 
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$prog && success $"$prog stop" 
+	echo
+	return $RETVAL
+}
+restart() {
+	stop
+# wait for forked daemons to die
+	usleep 1000000
+	start
+}	
+
+# See how we were called.
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart)
+		restart
+		;;
+	condrestart)
+		[ -f /var/lock/subsys/$prog ] && restart
+		;;
+	*)
+        	echo $"Usage: $0 {start|stop|restart|condrestart}"
+		exit 1
+esac
+
+exit $?
+
