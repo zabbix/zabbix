@@ -22,7 +22,7 @@
 #if defined(_WINDOWS) && defined(_UNICODE)
 int	__zbx_stat(const char *path, struct stat *buf)
 {
-	int		ret;
+	int	ret;
 	wchar_t	*wpath;
 
 	wpath = zbx_utf8_to_unicode(path);
@@ -34,7 +34,7 @@ int	__zbx_stat(const char *path, struct stat *buf)
 
 int	__zbx_open(const char *pathname, int flags)
 {
-	int		ret;
+	int	ret;
 	wchar_t	*wpathname;
 
 	wpathname = zbx_utf8_to_unicode(pathname);
@@ -61,7 +61,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 
 	offset = lseek(fd, 0, SEEK_CUR);
 
-	if ((nbytes = (int)read(fd, buf, count)) <= 0)
+	if ((nbytes = (int)read(fd, buf, (unsigned int)count)) <= 0)
 		return nbytes;
 
 	if (0 == strcmp(encoding, "UNICODE") || 0 == strcmp(encoding, "UNICODELITTLE") ||
@@ -116,9 +116,9 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		}
 	}
 
-	lseek(fd, offset + i, SEEK_SET);
+	lseek(fd, (long int)(offset + i), SEEK_SET);
 
-	return i;
+	return (int)i;
 }
 
 int	zbx_is_regular_file(const char *path)

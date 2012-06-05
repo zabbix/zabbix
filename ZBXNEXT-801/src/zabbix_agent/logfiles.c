@@ -42,20 +42,19 @@
  ******************************************************************************/
 static int	split_string(const char *str, const char *del, char **part1, char **part2)
 {
-	int	str_length = 0;
-	int	part1_length = 0;
-	int	part2_length = 0;
+	const char	*__function_name = "split_string";
+	size_t		str_length = 0, part1_length = 0, part2_length = 0;
 
-	assert(str);
-	assert(*str);/* why to split an empty string */
-	assert(del);
-	assert(*del);/* why to split if "part2" is empty */
-	assert(part1);
-	assert(NULL == *part1);/* target 1 must be empty */
-	assert(part2);
-	assert(NULL == *part2);/* target 2 must be empty */
+	assert(NULL != str);
+	assert('\0' != *str);
+	assert(NULL != del);
+	assert('\0' != *del);
+	assert(NULL != part1);
+	assert(NULL == *part1);	/* target 1 must be empty */
+	assert(NULL != part2);
+	assert(NULL == *part2);	/* target 2 must be empty */
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In split_string(): str [%s] del [%s]", str, del);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() str:'%s' del:'%s'", __function_name, str, del);
 
 	str_length = strlen(str);
 
@@ -76,7 +75,7 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 	*part2 = zbx_malloc(*part2, part2_length + 1);
 	zbx_strlcpy(*part2, str + part1_length, part2_length + 1);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End split_string(): part1 [%s] part2 [%s]", *part1, *part2);
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s() part1:'%s' part2:'%s'", __function_name, *part1, *part2);
 
 	return SUCCEED;
 }
