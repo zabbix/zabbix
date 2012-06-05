@@ -77,14 +77,14 @@ jQuery(function($) {
 		$(document).on('mousemove.messagehide', function(e) {
 			if (e.pageX < x1 || e.pageX > x2 || e.pageY < y1 || e.pageY > y2) {
 				obj.show();
-				$(this).off('mousemove.messagehide');
-				$(this).off('mouseleave.messagehide');
+				$(document).off('mousemove.messagehide');
+				$(document).off('mouseleave.messagehide');
 			}
 		});
-		$(document).on('mouseleave.messagehide', function(e) {
+		$(document).on('mouseleave.messagehide', function() {
 			obj.show();
-			$(this).off('mouseleave.messagehide');
-			$(this).off('mousemove.messagehide');
+			$(document).off('mouseleave.messagehide');
+			$(document).off('mousemove.messagehide');
 		});
 	});
 });
