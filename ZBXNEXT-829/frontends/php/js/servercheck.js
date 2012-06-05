@@ -7,7 +7,7 @@ jQuery(function($) {
 	 * @type {Object}
 	 */
 	var checker = {
-		timeout: 10,
+		timeout: 10000,
 		warning: false,
 
 		/**
@@ -74,11 +74,17 @@ jQuery(function($) {
 
 		obj.hide();
 
-		$('body').on('mousemove.messagehide', function(e) {
+		$(document).on('mousemove.messagehide', function(e) {
 			if (e.pageX < x1 || e.pageX > x2 || e.pageY < y1 || e.pageY > y2) {
 				obj.show();
 				$(this).off('mousemove.messagehide');
+				$(this).off('mouseleave.messagehide');
 			}
+		});
+		$(document).on('mouseleave.messagehide', function(e) {
+			obj.show();
+			$(this).off('mouseleave.messagehide');
+			$(this).off('mousemove.messagehide');
 		});
 	});
 });
