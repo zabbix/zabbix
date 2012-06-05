@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * @property string $groupid
  * @property string $hostid
@@ -51,7 +52,7 @@ class CPageFilter {
 			return $this->isSelected[$name];
 		}
 		else {
-			trigger_error('Try to read inaccessible property: '.get_class($this).'->'.$name, E_USER_WARNING);
+			trigger_error(_s('Try to read inaccessible property "%s".', get_class($this).'->'.$name), E_USER_WARNING);
 			return false;
 		}
 	}
@@ -288,10 +289,11 @@ class CPageFilter {
 				reset($this->data['groups']);
 				$groupid = key($this->data['groups']);
 			}
-			// otherwise groupid = 0 for 'Dropdown first entry' option ALL or NONE
-			else {
-				$groupid = 0;
-			}
+		}
+
+		// groupid = 0 for 'Dropdown first entry' option ALL or NONE
+		if (empty($groupid)) {
+			$groupid = 0;
 		}
 
 		CProfile::update($this->_profileIdx['groups'], $groupid, PROFILE_TYPE_ID);
