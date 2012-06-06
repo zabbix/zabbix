@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $itemWidget = new CWidget();
 
 if (!empty($this->data['hostid'])) {
@@ -594,6 +594,7 @@ foreach ($this->data['types'] as $type => $label) {
 foreach (array(ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE) as $type) {
 	// set to disable character, log and text items in value type
 	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT), 'value_type');
+
 	// disable octal, hexadecimal and boolean items in data_type; Necessary for Numeric (unsigned) value type only
 	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_DATA_TYPE_OCTAL, ITEM_DATA_TYPE_HEXADECIMAL, ITEM_DATA_TYPE_BOOLEAN), 'data_type');
 }
@@ -670,4 +671,3 @@ if (!$this->data['is_discovery_rule']) {
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 return $itemWidget;
-?>
