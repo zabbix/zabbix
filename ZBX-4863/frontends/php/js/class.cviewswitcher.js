@@ -23,12 +23,18 @@ var CViewSwitcher = Class.create({
 	depObjects: {},
 	lastValue: null,
 
-	initialize : function(objId, objAction, confData) {
+	initialize : function(objId, objAction, confData, disableDDItems) {
 		this.mainObj = $(objId);
+		this.objAction = objAction;
+
 		if (is_null(this.mainObj)) {
 			throw('ViewSwitcher error: main object not found!');
 		}
 		this.depObjects = {};
+
+		if (disableDDItems) {
+			this.disableDDItems = disableDDItems;
+		}
 
 		for (var key in confData) {
 			if (empty(confData[key])) {
@@ -50,7 +56,7 @@ var CViewSwitcher = Class.create({
 			}
 		}
 
-		addListener(this.mainObj, objAction, this.rebuildView.bindAsEventListener(this));
+		jQuery(this.mainObj).on(objAction, this.rebuildView.bindAsEventListener(this));
 		globalAllObjForViewSwitcher[objId] = this;
 
 		this.hideAllObjs();
@@ -59,6 +65,28 @@ var CViewSwitcher = Class.create({
 
 	rebuildView: function(e) {
 		var myValue = this.objValue(this.mainObj);
+
+		// enable previously disabled dropdown items
+		if (this.disableDDItems && this.disableDDItems[this.lastValue]) {
+			for (var DDi in this.disableDDItems[this.lastValue]) {
+				jQuery('#'+DDi).find('option').attr('disabled', false);
+			}
+		}
+
+		// disable dropdown items
+		if (this.disableDDItems && this.disableDDItems[myValue]) {
+			for (var DDi in this.disableDDItems[myValue]) {
+				var DD = jQuery('#'+DDi);
+				for (var Oi in this.disableDDItems[myValue][DDi]) {
+					DD.find('[value='+this.disableDDItems[myValue][DDi][Oi]+']').attr('disabled', true);
+				}
+				// if selected option unavailable set to first available
+				if (DD.find('option:selected').attr('disabled')) {
+					DD.find('option:not(:disabled):first').attr('selected', true);
+					DD.trigger(this.objAction);
+				}
+			}
+		}
 
 		if (isset(this.lastValue, this.depObjects)) {
 			for (var key in this.depObjects[this.lastValue]) {

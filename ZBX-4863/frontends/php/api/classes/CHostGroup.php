@@ -19,11 +19,7 @@
 **/
 
 /**
- * File containing CHostGroup class for API.
  * @package API
- */
-/**
- * Class containing methods for operations with HostGroups
  */
 class CHostGroup extends CZBXAPI {
 
@@ -31,9 +27,10 @@ class CHostGroup extends CZBXAPI {
 	protected $tableAlias = 'g';
 
 	/**
-	 * Get HostGroups
+	 * Get host groups.
 	 *
 	 * @param array $params
+	 *
 	 * @return array
 	 */
 	public function get($params) {
@@ -583,11 +580,12 @@ class CHostGroup extends CZBXAPI {
 	}
 
 	/**
-	 * Get HostGroup ID by name
+	 * Get host group id by name.
 	 *
-	 * @param array $data
-	 * @param array $data['name']
-	 * @return string|boolean HostGroup ID or false if error
+	 * @param array $hostgroupData
+	 * @param array $hostgroupData['name']
+	 *
+	 * @return string|boolean host group id or false if error
 	 */
 	public function getObjects($hostgroupData) {
 		$options = array(
@@ -624,46 +622,48 @@ class CHostGroup extends CZBXAPI {
 			$options['nodeids'] = $object['nodeids'];
 		}
 		$objs = $this->get($options);
+
 		return !empty($objs);
 	}
 
 	/**
-	 * Add hostGroups
+	 * Create host groups.
 	 *
-	 * @param array $groups array with HostGroup names
+	 * @param array $groups array with host group names
 	 * @param array $groups['name']
+	 *
 	 * @return array
 	 */
-	public function create($groups) {
+	public function create(array $groups) {
 		$groups = zbx_toArray($groups);
-		$insert = array();
 
 		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create host groups.'));
 		}
 
 		foreach ($groups as $group) {
-			if (!is_array($group) || !isset($group['name']) || empty($group['name'])) {
+			if (empty($group['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot create group without name.'));
 			}
 			if ($this->exists(array('name' => $group['name']))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%s" already exists.', $group['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
 			}
-			$insert[] = $group;
 		}
-		$groupids = DB::insert('groups', $insert);
+		$groupids = DB::insert('groups', $groups);
+
 		return array('groupids' => $groupids);
 	}
 
 	/**
-	 * Update HostGroup
+	 * Update host groups.
 	 *
 	 * @param array $groups
 	 * @param array $groups[0]['name'], ...
 	 * @param array $groups[0]['groupid'], ...
+	 *
 	 * @return boolean
 	 */
-	public function update($groups) {
+	public function update(array $groups) {
 		$groups = zbx_toArray($groups);
 		$groupids = zbx_objectValues($groups, 'groupid');
 
@@ -675,7 +675,7 @@ class CHostGroup extends CZBXAPI {
 		$updGroups = $this->get(array(
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => API_OUTPUT_SHORTEN,
 			'preservekeys' => true
 		));
 		foreach ($groups as $group) {
@@ -687,64 +687,72 @@ class CHostGroup extends CZBXAPI {
 		// name duplicate check
 		$groupsNames = $this->get(array(
 			'filter' => array('name' => zbx_objectValues($groups, 'name')),
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('groupid', 'name'),
 			'editable' => true,
 			'nopermissions' => true
 		));
 		$groupsNames = zbx_toHash($groupsNames, 'name');
 
+		$update = array();
 		foreach ($groups as $group) {
-			if (isset($group['name']) && isset($groupsNames[$group['name']]) && (bccomp($groupsNames[$group['name']]['groupid'], $group['groupid']) != 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%s" already exists.', $group['name']));
+			if (isset($group['name'])
+				&& isset($groupsNames[$group['name']])
+				&& !idcmp($groupsNames[$group['name']]['groupid'], $group['groupid'])
+			) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
 			}
 
 			// prevents updating several groups with same name
 			$groupsNames[$group['name']] = array('groupid' => $group['groupid']);
 
-			$sql = 'UPDATE groups SET name='.zbx_dbstr($group['name']).' WHERE groupid='.$group['groupid'];
-			if (!DBexecute($sql)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
-			}
+			$update[] = array(
+				'values' => array('name' => $group['name']),
+				'where' => array('groupid' => $group['groupid'])
+			);
 		}
+
+		DB::update('groups', $update);
+
 		return array('groupids' => $groupids);
 	}
 
 	/**
-	 * Delete HostGroups
+	 * Delete host groups.
 	 *
 	 * @param array $groupids
+	 *
 	 * @return boolean
 	 */
-	public function delete($groupids) {
-			if (empty($groupids)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
-			}
-			$groupids = zbx_toArray($groupids);
+	public function delete(array $groupids) {
+		if (empty($groupids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+		$groupids = zbx_toArray($groupids);
 
-			$options = array(
-				'groupids' => $groupids,
-				'editable' => true,
-				'output' => API_OUTPUT_EXTEND,
-				'preservekeys' => true
-			);
-			$delGroups = $this->get($options);
+		$options = array(
+			'groupids' => $groupids,
+			'editable' => true,
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		);
+		$delGroups = $this->get($options);
+		foreach ($groupids as $groupid) {
+			if (!isset($delGroups[$groupid])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			}
+		}
+
+		$dltGroupids = getDeletableHostGroups($groupids);
+		if (count($groupids) != count($dltGroupids)) {
 			foreach ($groupids as $groupid) {
-				if (!isset($delGroups[$groupid])) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+				if ($delGroups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Group "%1$s" is internal and can not be deleted.', $delGroups[$groupid]['name']));
 				}
-			}
-
-			$dltGroupids = getDeletableHostGroups($groupids);
-			if (count($groupids) != count($dltGroupids)) {
-				foreach ($groupids as $groupid) {
-					if ($delGroups[$groupid]['internal'] == ZBX_INTERNAL_GROUP) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Group "%1$s" is internal and can not be deleted.', $delGroups[$groupid]['name']));
-					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Group "%s" cannot be deleted, because some hosts depend on it.', $delGroups[$groupid]['name']));
-					}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Group "%s" cannot be deleted, because some hosts depend on it.', $delGroups[$groupid]['name']));
+				}
 			}
 		}
 
@@ -864,15 +872,16 @@ class CHostGroup extends CZBXAPI {
 	}
 
 	/**
-	 * Add Hosts to HostGroups. All Hosts are added to all HostGroups.
+	 * Add hosts to host groups. All hosts are added to all host groups.
 	 *
 	 * @param array $data
 	 * @param array $data['groups']
 	 * @param array $data['hosts']
 	 * @param array $data['templates']
+	 *
 	 * @return boolean
 	 */
-	public function massAdd($data) {
+	public function massAdd(array $data) {
 		$groups = zbx_toArray($data['groups']);
 		$groupids = zbx_objectValues($groups, 'groupid');
 
@@ -918,15 +927,16 @@ class CHostGroup extends CZBXAPI {
 	}
 
 	/**
-	 * Remove Hosts from HostGroups
+	 * Remove hosts from host groups.
 	 *
 	 * @param array $data
 	 * @param array $data['groupids']
 	 * @param array $data['hostids']
 	 * @param array $data['templateids']
+	 *
 	 * @return boolean
 	 */
-	public function massRemove($data) {
+	public function massRemove(array $data) {
 		$groupids = zbx_toArray($data['groupids'], 'groupid');
 
 		$updGroups = $this->get(array(
@@ -958,15 +968,16 @@ class CHostGroup extends CZBXAPI {
 	}
 
 	/**
-	 * Update HostGroups with new Hosts (rewrite)
+	 * Update host groups with new hosts (rewrite)
 	 *
 	 * @param array $data
 	 * @param array $data['groups']
 	 * @param array $data['hosts']
 	 * @param array $data['templates']
+	 *
 	 * @return boolean
 	 */
-	public function massUpdate($data) {
+	public function massUpdate(array $data) {
 		$groups = zbx_toArray($data['groups']);
 		$hosts = isset($data['hosts']) ? zbx_toArray($data['hosts']) : null;
 		$templates = isset($data['templates']) ? zbx_toArray($data['templates']) : null;

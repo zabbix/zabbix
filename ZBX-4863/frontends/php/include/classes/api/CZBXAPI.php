@@ -451,7 +451,7 @@ class CZBXAPI {
 
 		// if no specific ids are given, apply the node filter
 		if (!isset($options[$pkOption])) {
-			$nodeids = (isset($options['nodeids'])) ? $options[$pkOption] : get_current_nodeid();
+			$nodeids = (isset($options['nodeids'])) ? $options['nodeids'] : get_current_nodeid();
 			$sqlParts['where'][] = DBin_node($pkFieldId, $nodeids);
 		}
 
@@ -470,7 +470,7 @@ class CZBXAPI {
 	 * @return array
 	 */
 	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if ($this->sortColumns) {
+		if ($this->sortColumns && $options['countOutput'] === null) {
 			zbx_db_sorting($sqlParts, $options, $this->sortColumns, $tableAlias);
 		}
 

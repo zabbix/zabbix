@@ -595,7 +595,7 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	$value = preg_replace('/^([\-0-9]+)(\.)([0-9]*)[0]+$/U','$1$2$3', round($valUnit['value'], ZBX_UNITS_ROUNDOFF_UPPER_LIMIT));
 	$value = rtrim($value, '.');
 
-	return sprintf('%s %s%s', $value, $desc, $units);
+	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
 }
 
 /************* ZBX MISC *************/
@@ -1366,11 +1366,16 @@ function zbx_str2links($text) {
 	return $result;
 }
 
-function zbx_subarray_push(&$mainArray, $sIndex, $element = null) {
+function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 	if (!isset($mainArray[$sIndex])) {
 		$mainArray[$sIndex] = array();
 	}
-	$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
+	if ($key) {
+		$mainArray[$sIndex][$key] = is_null($element) ? $sIndex : $element;
+	}
+	else {
+		$mainArray[$sIndex][] = is_null($element) ? $sIndex : $element;
+	}
 }
 
 /**
@@ -1712,6 +1717,7 @@ function bcround($number, $precision = 0) {
 	elseif ($precision != 0) {
 		$number .= '.' . str_repeat('0', $precision);
 	}
+
 	// according to bccomp(), '-0.0' does not equal '-0'. However, '0.0' and '0' are equal.
 	$zero = ($number[0] != '-' ? bccomp($number, '0') == 0 : bccomp(substr($number, 1), '0') == 0);
 	return $zero ? ($precision == 0 ? '0' : '0.' . str_repeat('0', $precision)) : $number;
