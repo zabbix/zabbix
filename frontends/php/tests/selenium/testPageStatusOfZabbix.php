@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageStatusOfZabbix extends CWebTest {
 	public function testPageStatusOfZabbix_CheckLayout() {
 		$this->login('report1.php');
-		$this->assertTitle('Status of Zabbix');
+		$this->checkTitle('Status of Zabbix');
 		$this->ok('Status of Zabbix');
 		$this->ok('STATUS OF ZABBIX');
 		$this->ok('Report');
