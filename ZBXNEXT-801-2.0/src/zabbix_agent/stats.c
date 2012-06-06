@@ -21,7 +21,9 @@
 #include "stats.h"
 #include "log.h"
 #include "zbxconf.h"
-#include "diskdevices.h"
+#ifndef _WINDOWS
+#	include "diskdevices.h"
+#endif
 #include "cfg.h"
 #include "mutexs.h"
 
@@ -119,7 +121,7 @@ static int	zbx_get_cpu_num()
 	return (int)ps_cpu_total.ncpus;
 #endif
 
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 return_one:
 	zabbix_log(LOG_LEVEL_WARNING, "cannot determine number of CPUs, assuming 1");
 	return 1;
@@ -142,7 +144,7 @@ void	init_collector_data()
 	const char	*__function_name = "init_collector_data";
 	int		cpu_count;
 	size_t		sz, sz_cpu;
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 	key_t		shm_key;
 #endif
 
@@ -191,7 +193,7 @@ void	init_collector_data()
 		zbx_error("cannot create mutex for disk statistics collector");
 		exit(EXIT_FAILURE);
 	}
-#endif	/* _WINDOWS */
+#endif
 
 #ifdef _AIX
 	memset(&collector->vmstat, 0, sizeof(collector->vmstat));
@@ -244,7 +246,7 @@ void	free_collector_data()
  ******************************************************************************/
 void	diskstat_shm_init()
 {
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 	key_t	shm_key;
 	size_t	shm_size;
 
@@ -276,7 +278,7 @@ void	diskstat_shm_init()
 
 	zabbix_log(LOG_LEVEL_DEBUG, "diskstat_shm_init() allocated initial shm segment id:%d"
 			" for disk statistics collector", collector->diskstat_shmid);
-#endif	/* _WINDOWS */
+#endif
 }
 
 /******************************************************************************
@@ -318,7 +320,7 @@ void	diskstat_shm_reattach()
 		zabbix_log(LOG_LEVEL_DEBUG, "diskstat_shm_reattach() switched shm id from %d to %d",
 				old_shmid, my_diskstat_shmid);
 	}
-#endif	/* _WINDOWS */
+#endif
 }
 
 /******************************************************************************
@@ -331,7 +333,7 @@ void	diskstat_shm_reattach()
  ******************************************************************************/
 void	diskstat_shm_extend()
 {
-#if !defined(_WINDOWS)
+#ifndef _WINDOWS
 	const char		*__function_name = "diskstat_shm_extend";
 	key_t			shm_key;
 	size_t			old_shm_size, new_shm_size;
@@ -398,7 +400,7 @@ void	diskstat_shm_extend()
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() extended diskstat shared memory: old_max:%d new_max:%d old_size:%d"
 			" new_size:%d old_shmid:%d new_shmid:%d", __function_name, old_max, new_max, old_shm_size,
 			new_shm_size, old_shmid, collector->diskstat_shmid);
-#endif	/* _WINDOWS */
+#endif
 }
 
 /******************************************************************************

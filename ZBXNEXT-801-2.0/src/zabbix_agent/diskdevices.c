@@ -141,7 +141,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 	{
 		if (0 == strcmp(devname, diskdevices->device[i].name))
 		{
-			device = &(diskdevices->device[i]);
+			device = &diskdevices->device[i];
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() device '%s' found", __function_name, devname);
 			break;
 		}

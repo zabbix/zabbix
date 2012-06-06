@@ -20,6 +20,10 @@
 #ifndef ZABBIX_DISKDEVICES_H
 #define ZABBIX_DISKDEVICES_H
 
+#ifdef _WINDOWS
+#	error "This module allowed only for Unix OS"
+#endif
+
 #include "sysinfo.h"
 
 #define	MAX_DISKDEVICES	1024

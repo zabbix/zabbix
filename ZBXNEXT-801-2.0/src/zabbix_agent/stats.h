@@ -21,7 +21,9 @@
 #define ZABBIX_STATS_H
 
 #include "threads.h"
-#include "diskdevices.h"
+#ifndef _WINDOWS
+#	include "diskdevices.h"
+#endif
 #ifdef _WINDOWS
 #	include "perfmon.h"
 #	include "perfstat.h"
@@ -38,7 +40,9 @@
 typedef struct
 {
 	ZBX_CPUS_STAT_DATA	cpus;
+#ifndef _WINDOWS
 	int 			diskstat_shmid;
+#endif
 #ifdef _WINDOWS
 	ZBX_PERF_STAT_DATA	perfs;
 #endif	/* _WINDOWS */
@@ -49,8 +53,10 @@ typedef struct
 ZBX_COLLECTOR_DATA;
 
 extern ZBX_COLLECTOR_DATA	*collector;
+#ifndef _WINDOWS
 extern ZBX_DISKDEVICES_DATA	*diskdevices;
 extern int			my_diskstat_shmid;
+#endif
 
 ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);
 

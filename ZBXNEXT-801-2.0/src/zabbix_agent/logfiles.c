@@ -43,7 +43,7 @@
 static int	split_string(const char *str, const char *del, char **part1, char **part2)
 {
 	const char	*__function_name = "split_string";
-	size_t		str_length = 0, part1_length = 0, part2_length = 0, ret = FAIL;
+	size_t		str_length = 0, part1_length = 0, part2_length = 0;
 	int		ret = FAIL;
 
 	assert(NULL != str && '\0' != *str);
