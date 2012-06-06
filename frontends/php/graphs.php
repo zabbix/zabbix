@@ -31,43 +31,43 @@ $page['scripts'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-//	VAR					TYPE	OPTIONAL FLAGS		VALIDATION		EXCEPTION
+// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'parent_discoveryid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
+	'parent_discoveryid' =>	array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
-	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
+	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null),
 	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0,1'),		'isset({copy})'),
 	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null),
 	'graphid' =>			array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'(isset({form})&&({form}=="update"))'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({save})', _('Name')),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	'isset({save})', _('Width').' (min:20, max:65535)'),
-	'height' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	'isset({save})', _('Height').' (min:20, max:65535)'),
-	'ymin_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
-	'ymax_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
-	'graphtype' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),		'isset({save})'),
+	'name' =>				array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,		'isset({save})', _('Name')),
+	'width' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({save})', _('Width').' (min:20, max:65535)'),
+	'height' =>				array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535), 'isset({save})', _('Height').' (min:20, max:65535)'),
+	'ymin_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
+	'ymax_type' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null),
+	'graphtype' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1,2,3'),	'isset({save})'),
 	'yaxismin' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
 	'yaxismax' =>			array(T_ZBX_DBL, O_OPT, null,		null,			'isset({save})&&(({graphtype}==0)||({graphtype}==1))'),
 	'graph3d' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
-	'legend' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
+	'legend' =>				array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null),
 	'ymin_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymin_type})&&({ymin_type}==3)'),
 	'ymax_itemid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			'isset({save})&&isset({ymax_type})&&({ymax_type}==3)'),
-	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null, _('Percentile line (Left)')),
-	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null, _('Percentile line (Right)')),
-	'visible' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),		null),
-	'items' =>			array(T_ZBX_STR, O_OPT, null,		null,			null),
+	'percent_left' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (Left)')),
+	'percent_right' =>		array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (Right)')),
+	'visible' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null),
+	'items' =>				array(T_ZBX_STR, O_OPT, null,		null,			null),
 	'showworkperiod' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
 	'showtriggers' =>		array(T_ZBX_INT, O_OPT, null,		IN('1'),		null),
 	'group_graphid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,		DB_ID,			null),
 	'filter_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			'isset({copy})&&(isset({copy_type})&&({copy_type}==0))'),
 	// actions
-	'go' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
-	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
-	'copy' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,			null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
+	'go' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'save' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'copy' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
+	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
+	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,		null,			null),
 	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,		null,			null)
 );
 $percentVisible = get_request('visible');
@@ -95,16 +95,15 @@ $_REQUEST['legend'] = get_request('legend', 0);
 /*
  * Permissions
  */
-// check permissions only for non super admins
-if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
+if (CUser::$userData['type'] !== USER_TYPE_SUPER_ADMIN) {
 	if (!empty($_REQUEST['parent_discoveryid'])) {
-		// check whether discovery rule with id $_REQUEST['parent_discoveryid'] is editable by user
+		// check whether discovery rule is editable by user
 		$discovery_rule = API::DiscoveryRule()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'itemids' => array($_REQUEST['parent_discoveryid']),
-			'output' => API_OUTPUT_EXTEND, // extended data for later usage
+			'output' => API_OUTPUT_EXTEND,
 			'editable' => true,
-			'preservekeys' => true // doesn't flush keys ... faster
+			'preservekeys' => true
 		));
 		$discovery_rule = reset($discovery_rule);
 		if (!$discovery_rule) {
@@ -112,15 +111,17 @@ if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
 		}
 
 		// sets coresponding hostid for later usage
-		$_REQUEST['hostid'] = $discovery_rule['hostid'];
+		if (empty($_REQUEST['hostid'])) {
+			$_REQUEST['hostid'] = $discovery_rule['hostid'];
+		}
 
-		// check whether graph prototype with id $_REQUEST['graphid'] is editable by user
+		// check whether graph prototype is editable by user
 		if (isset($_REQUEST['graphid'])) {
 			$graphPrototype = API::GraphPrototype()->get(array(
 				'graphids' => array($_REQUEST['graphid']),
-				'output' => API_OUTPUT_SHORTEN, // faster ... default API_OUTPUT_REFER
+				'output' => API_OUTPUT_SHORTEN,
 				'editable' => true,
-				'preservekeys' => true // doesn't flush keys ... faster
+				'preservekeys' => true
 			));
 			if (empty($graphPrototype)) {
 				access_deny();
@@ -128,28 +129,28 @@ if (USER_TYPE_SUPER_ADMIN !== CUser::$userData['type']) {
 		}
 	}
 	elseif (!empty($_REQUEST['graphid'])) {
-		// check whether graph with id $_REQUEST['graphid'] is normal and editable by user
+		// check whether graph is normal and editable by user
 		$graphs = API::Graph()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
 			'graphids' => array($_REQUEST['graphid']),
 			'editable' => true,
-			'preservekeys' => true // doesn't flush keys ... faster
+			'preservekeys' => true
 		));
 		if (empty($graphs)) {
 			access_deny();
 		}
 	}
 	elseif (!empty($_REQUEST['hostid'])) {
-		// check whether host with id $_REQUEST['hostid'] is editable by user
+		// check whether host is editable by user
 		$hosts = API::Host()->get(array(
 			'nodeids' => get_current_nodeid(true),
 			'hostids' => array($_REQUEST['hostid']),
 			'templated_hosts' => true,
 			'editable' => true,
-			'preservekeys' => true // doesn't flush keys ... faster
+			'preservekeys' => true
 		));
-		if(empty($hosts)) {
+		if (empty($hosts)) {
 			access_deny();
 		}
 	}
@@ -162,13 +163,12 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 	unset($_REQUEST['graphid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['save'])) { // save graph
+elseif (isset($_REQUEST['save'])) {
 	$result = true;
 
 	$items = get_request('items', array());
 
-	if ($result) { // there is correct item data
-
+	if ($result) {
 		$graph = array(
 			'name' => $_REQUEST['name'],
 			'width' => $_REQUEST['width'],
