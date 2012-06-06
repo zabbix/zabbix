@@ -246,7 +246,7 @@ void	diskstat_shm_init(void)
 	size_t	shm_size;
 
 	/* initially allocate memory for collecting statistics for only 1 disk */
-	shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA);
+	shm_size = sizeof(ZBX_DISKDEVICES_DATA);
 
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID_DISKSTAT)))
 	{
@@ -294,7 +294,7 @@ void	diskstat_shm_reattach(void)
 
 		if (NONEXISTENT_SHMID != my_diskstat_shmid)
 		{
-			if (-1 == shmdt(diskdevices))
+			if (-1 == shmdt((void *) diskdevices))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot detach from disk statistics collector shared"
 						" memory: %s", zbx_strerror(errno));
@@ -348,8 +348,8 @@ void	diskstat_shm_extend(void)
 	else
 		new_max = old_max + 256;
 
-	old_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA)*old_max;
-	new_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA)*new_max;
+	old_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA)*(old_max - 1);
+	new_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA)*(new_max - 1);
 
 	/* Create the new shared memory segment. The same key is used.*/
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_COLLECTOR_ID_DISKSTAT)))
@@ -381,7 +381,7 @@ void	diskstat_shm_extend(void)
 	new_diskdevices->max_diskdev = new_max;
 
 	/* delete the old segment */
-	if (-1 == shmdt(diskdevices))
+	if (-1 == shmdt((void *) diskdevices))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot detach from disk statistics collector shared memory");
 		exit(FAIL);

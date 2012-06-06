@@ -46,7 +46,7 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 
 	zbx_fclose(f);
 
-	if (1 == sscanf(line, "%*lf\t%*lf\t%lf\n", &value))
+	if (1 == sscanf(line, "%*f\t%*f\t%lf\n", &value))
 	{
 		(*cnt)++;
 
