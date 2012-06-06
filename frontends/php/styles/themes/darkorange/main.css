@@ -406,13 +406,6 @@ div.messagecontainer .message .messagebox{
 	margin-bottom: 0;
 }
 
-div.formElement_header{
-	background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left;
-}
-div.formElement_body{
-	border: 1px solid #222222;
-}
-div.formElement_footer{ background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left; }
 div.thin_header{ background: #1A1A1A url('../../../images/gradients/table_head2_bb.gif') repeat-x top left; }
 div.zabbix_logo{ background-image:url('../../../images/general/zabbix_od.png'); }
 .iconzbxavailable{ background-image: url('../../../images/general/zabbix_available_bb.png'); }
@@ -432,7 +425,6 @@ div#scrolltabright{ color: #00CCFF; }
 div#selection_box{ filter:alpha(opacity=60); opacity:.60; background-color:#6666FF; }
 
 div.formElement{ border: 1px solid #5A5A5A;}
-div.formElement_body{ background-color: #1A1A1A; }
 
 div.objectgroup { border-color: #888; }
 div.border_dotted { border: 1px dotted #888; }
@@ -512,3 +504,10 @@ ul.formlist li.new { background: #2F2F2F; }
 .dragHelpText { color: #FF5500; }
 
 table.ack_msgs tr.msg { background-color: #3F3F3F; }
+
+div.control-severity label span {
+	color: #DFDFDF;
+}
+div.control-severity label span:hover {
+	color: #000;
+}
