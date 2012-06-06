@@ -111,7 +111,7 @@ class testFormConfigTriggerSeverity extends CWebTest {
 
 	public function testFormTriggerSeverity_Layout() {
 		$this->login('adm.triggerseverities.php');
-		$this->assertTitle('Configuration of trigger severities');
+		$this->checkTitle('Configuration of trigger severities');
 
 		$this->dropdown_select_wait('configDropDown', 'Trigger severities');
 
