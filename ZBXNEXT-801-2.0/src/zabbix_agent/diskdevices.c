@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef _WINDOWS
+
 #include "common.h"
 #include "diskdevices.h"
 #include "stats.h"
 #include "log.h"
 #include "mutexs.h"
 
-#if !defined(_WINDOWS)
-	extern ZBX_MUTEX	diskstats_lock;
-#	define LOCK_DISKSTATS	zbx_mutex_lock(&diskstats_lock)
-#	define UNLOCK_DISKSTATS	zbx_mutex_unlock(&diskstats_lock)
-#endif
+extern ZBX_MUTEX		diskstats_lock;
+#define LOCK_DISKSTATS		zbx_mutex_lock(&diskstats_lock)
+#define UNLOCK_DISKSTATS	zbx_mutex_unlock(&diskstats_lock)
 
 static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_uint64_t *dstat)
 {
@@ -39,7 +39,7 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_u
 
 	device->index++;
 
-	if (device->index == MAX_COLLECTOR_HISTORY)
+	if (MAX_COLLECTOR_HISTORY == device->index)
 		device->index = 0;
 
 	device->clock[device->index] = now;
@@ -108,7 +108,7 @@ static void	process_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device)
 	apply_diskstat(device, now, dstat);
 }
 
-void	collect_stats_diskdevices(void)
+void	collect_stats_diskdevices()
 {
 	int	i;
 
@@ -123,58 +123,55 @@ void	collect_stats_diskdevices(void)
 
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 {
-	const char	*__function_name = "collector_diskdevice_get";
-
-	int	i;
+	const char			*__function_name = "collector_diskdevice_get";
+	int				i;
+	ZBX_SINGLE_DISKDEVICE_DATA	*device = NULL;
 
 	assert(devname);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __function_name, devname);
 
 	LOCK_DISKSTATS;
-	if (! DISKDEVICE_COLLECTOR_STARTED(collector))
+	if (0 == DISKDEVICE_COLLECTOR_STARTED(collector))
 		diskstat_shm_init();
 	else
 		diskstat_shm_reattach();
 
 	for (i = 0; i < diskdevices->count; i ++)
 	{
-		if (0 == strcmp(devname, (diskdevices->device[i]).name))
+		if (0 == strcmp(devname, diskdevices->device[i].name))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name,
-					&(diskdevices->device[i]));
-			UNLOCK_DISKSTATS;
-			return &(diskdevices->device[i]);
+			device = &(diskdevices->device[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() device '%s' found", __function_name, devname);
+			break;
 		}
 	}
 	UNLOCK_DISKSTATS;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():NULL", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, device);
 
-	return NULL;
+	return device;
 }
 
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 {
-	const char	*__function_name = "collector_diskdevice_add";
-
-	ZBX_SINGLE_DISKDEVICE_DATA	*device;
+	const char			*__function_name = "collector_diskdevice_add";
+	ZBX_SINGLE_DISKDEVICE_DATA	*device = NULL;
 
 	assert(devname);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __function_name, devname);
 
 	LOCK_DISKSTATS;
-	if (! DISKDEVICE_COLLECTOR_STARTED(collector))
+	if (0 == DISKDEVICE_COLLECTOR_STARTED(collector))
 		diskstat_shm_init();
 	else
 		diskstat_shm_reattach();
 
 	if (diskdevices->count == MAX_DISKDEVICES)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():NULL collector is full", __function_name);
-		UNLOCK_DISKSTATS;
-		return NULL;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() collector is full", __function_name);
+		goto end;
 	}
 
 	if (diskdevices->count == diskdevices->max_diskdev)
@@ -186,9 +183,12 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
 	(diskdevices->count)++;
 
 	process_diskstat(device);
+end:
 	UNLOCK_DISKSTATS;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, device);
 
 	return device;
 }
+
+#endif	/* _WINDOWS */

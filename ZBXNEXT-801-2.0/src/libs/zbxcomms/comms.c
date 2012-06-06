@@ -308,7 +308,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 			goto out;
 		}
 
-		if (ZBX_TCP_ERROR == bind(s->socket, ai_bind->ai_addr, ai_bind->ai_addrlen))
+		if (ZBX_TCP_ERROR == bind(s->socket, ai_bind->ai_addr, (int)ai_bind->ai_addrlen))
 		{
 			zbx_set_tcp_strerror("bind() failed: %s", strerror_from_system(zbx_sock_last_error()));
 			goto out;
@@ -318,7 +318,7 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *source_ip, const char *ip, unsign
 	if (0 != timeout)
 		zbx_tcp_timeout_set(s, timeout);
 
-	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen))
+	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, (int)ai->ai_addrlen))
 	{
 		zbx_set_tcp_strerror("cannot connect to [[%s]:%d]: %s", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
@@ -631,7 +631,7 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 			}
 #endif
 
-			if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr, current_ai->ai_addrlen))
+			if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr, (int)current_ai->ai_addrlen))
 			{
 				zbx_set_tcp_strerror("bind() for [[%s]:%s] failed: %s",
 						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));

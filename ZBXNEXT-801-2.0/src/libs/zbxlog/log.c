@@ -439,7 +439,7 @@ char *strerror_from_system(unsigned long error)
 		return utf8_string;
 	}
 
-	zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, sizeof(utf8_string) - offset);
+	zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, (int)(sizeof(utf8_string) - offset));
 
 	zbx_rtrim(utf8_string, "\r\n ");
 
@@ -473,7 +473,7 @@ char	*strerror_from_module(unsigned long error, LPCTSTR module)
 		return utf8_string;
 	}
 
-	zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, sizeof(utf8_string) - offset);
+	zbx_unicode_to_utf8_static(wide_string, utf8_string + offset, (int)(sizeof(utf8_string) - offset));
 
 	zbx_rtrim(utf8_string, "\r\n ");
 
