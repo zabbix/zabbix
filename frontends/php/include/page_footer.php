@@ -64,11 +64,6 @@ if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$post_script .= 'var page_refresh = null;'."\n";
 
-	if (isset($JS_TRANSLATE)) {
-		$post_script .= 'var newLocale = '.zbx_jsvalue($JS_TRANSLATE)."\n";
-		$post_script .= 'var locale = (typeof(locale) == "undefined" ? {} : locale);'."\n";
-		$post_script .= 'for(key in newLocale){locale[key] = newLocale[key];}'."\n";
-	}
 	$post_script .= "jQuery(function() {\n";
 
 	if (isset($ZBX_PAGE_POST_JS)) {

@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
 require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
@@ -27,6 +26,7 @@ require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/dbfunc.php';
 
 class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
+
 	protected $captureScreenshotOnFailure = TRUE;
 	protected $screenshotPath = '/home/hudson/public_html/screenshots';
 	protected $screenshotUrl = 'http://192.168.3.32/~hudson/screenshots';
@@ -78,19 +78,25 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 			$this->setBrowserUrl('http://hudson/~hudson/'.PHPUNIT_URL.'/frontends/php/');
 		}
 
-/*		if (!DBConnect($error)) {
+		/*
+		if (!DBConnect($error)) {
 			$this->assertTrue(FALSE, 'Unable to connect to the database: '.$error);
 			exit;
-		}*/
+		}
+		*/
 
-		if (!isset($DB['DB'])) DBConnect($error);
+		if (!isset($DB['DB'])) {
+			DBConnect($error);
+		}
 	}
 
 	protected function tearDown() {
-/*		DBclose();*/
+		// DBclose();
 	}
 
-	public function login($url = NULL) {
+	public function login($url = null) {
+		global $ZBX_SERVER_NAME;
+
 		$this->open('index.php');
 		$this->wait();
 		// Login if not logged in already
@@ -104,6 +110,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 			$this->open($url);
 			$this->wait();
 		}
+		$this->ok($ZBX_SERVER_NAME);
 		$this->ok('Admin');
 		$this->nok('Login name or password is incorrect');
 	}
@@ -119,15 +126,29 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		}
 	}
 
+	public function checkTitle($title) {
+		global $ZBX_SERVER_NAME;
+
+		if ($ZBX_SERVER_NAME !== '') {
+			$title = $ZBX_SERVER_NAME.': '.$title;
+		}
+
+		$this->assertTitle($title);
+	}
+
 	public function ok($strings) {
-		if (!is_array($strings)) $strings=array($strings);
+		if (!is_array($strings)) {
+			$strings = array($strings);
+		}
 		foreach ($strings as $string) {
 			$this->assertTextPresent($string, "Chuck Norris: I expect string '$string' here");
 		}
 	}
 
 	public function nok($strings) {
-		if (!is_array($strings)) $strings=array($strings);
+		if (!is_array($strings)) {
+			$strings = array($strings);
+		}
 		foreach ($strings as $string) {
 			$this->assertTextNotPresent($string, "Chuck Norris: I do not expect string '$string' here");
 		}
@@ -142,11 +163,15 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 	}
 
 	public function checkbox_select($a) {
-		if (!$this->isChecked($a)) $this->click($a);
+		if (!$this->isChecked($a)) {
+			$this->check($a);
+		}
 	}
 
 	public function checkbox_unselect($a) {
-		if ($this->isChecked($a)) $this->click($a);
+		if ($this->isChecked($a)) {
+			$this->uncheck($a);
+		}
 	}
 
 	public function input_type($id, $str) {
@@ -162,7 +187,9 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$selected = $this->getSelectedLabel($id);
 		$this->dropdown_select($id, $str);
 		// Wait only if drop down selection was changed
-		if ($selected != $str) $this->wait();
+		if ($selected != $str) {
+			$this->wait();
+		}
 	}
 
 	public function wait() {
@@ -237,7 +264,7 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host updated');
 		// no entities should be deleted, they all should be updated
 		$this->nok('deleted');
@@ -292,4 +319,3 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 		}
 	}
 }
-?>

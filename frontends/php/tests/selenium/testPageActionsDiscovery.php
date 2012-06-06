@@ -35,7 +35,7 @@ class testPageActionsDiscovery extends CWebTest {
 		$name = $action['name'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 
 // eventsource is used for a hidden field, so it does not work. See above: ?eventsource=0 is used instead
 //		$this->dropdown_select('eventsource','Discovery');
@@ -66,12 +66,12 @@ class testPageActionsDiscovery extends CWebTest {
 		$oldHashConditions = DBhash($sqlConditions);
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		$this->click("link=$name");
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		$this->ok('Action updated');
 		$this->ok("$name");
 
@@ -87,7 +87,7 @@ class testPageActionsDiscovery extends CWebTest {
 		$actionid = $action['actionid'];
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
 				$this->href_click("actionconf.php?go=disable&g_actionid%5B%5D=$actionid&");
@@ -98,7 +98,7 @@ class testPageActionsDiscovery extends CWebTest {
 		}
 		$this->wait();
 
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		$this->ok('Status updated');
 
 		switch ($action['status']) {
@@ -132,7 +132,7 @@ class testPageActionsDiscovery extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		$this->checkbox_select("g_actionid[$actionid]");
 		$this->dropdown_select('go', 'Disable selected');
 		$this->button_click('goButton');
@@ -140,7 +140,7 @@ class testPageActionsDiscovery extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		$this->ok('Status updated');
 		$this->ok('Disabled');
 
@@ -163,7 +163,7 @@ class testPageActionsDiscovery extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		$this->checkbox_select("g_actionid[$actionid]");
 		$this->dropdown_select('go', 'Enable selected');
 		$this->button_click('goButton');
@@ -171,7 +171,7 @@ class testPageActionsDiscovery extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		$this->ok('Status updated');
 		$this->ok('Enabled');
 
@@ -196,7 +196,7 @@ class testPageActionsDiscovery extends CWebTest {
 		DBsave_tables('actions');
 
 		$this->login('actionconf.php?eventsource='.EVENT_SOURCE_DISCOVERY);
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		$this->checkbox_select("g_actionid[$actionid]");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
@@ -204,7 +204,7 @@ class testPageActionsDiscovery extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->assertTitle('Configuration of actions');
+		$this->checkTitle('Configuration of actions');
 		$this->ok('Selected actions deleted');
 
 		$sql = "select * from actions where actionid=$actionid";

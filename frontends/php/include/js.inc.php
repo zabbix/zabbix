@@ -108,24 +108,6 @@ function zbx_add_post_js($script) {
 	}
 }
 
-function zbx_addJSLocale($to_translate) {
-	global $JS_TRANSLATE;
-
-	zbx_value2array($to_translate);
-	if (empty($JS_TRANSLATE)) {
-		$JS_TRANSLATE = array();
-	}
-
-	foreach ($to_translate as $string) {
-		if (defined($string)) {
-			$JS_TRANSLATE[$string] = constant($string);
-		}
-		else {
-			$JS_TRANSLATE[$string] = 'UNTRANSLATED['.$string.']';
-		}
-	}
-}
-
 function insert_javascript_for_editable_combobox() {
 	if (defined('EDITABLE_COMBOBOX_SCRIPT_INSERTTED')) {
 		return null;
@@ -370,14 +352,6 @@ function play_sound($filename) {
 		}');
 }
 
-function setFocus($frm_name, $fld_name) {
-	insert_js('document.forms["'.$frm_name.'"].elements["'.$fld_name.'"].focus();');
-}
-
-function alert($msg) {
-	insert_js('alert("'.$msg.'");');
-}
-
 function insert_js_function($fnct_name) {
 	switch ($fnct_name) {
 		case 'add_item_variable':
@@ -619,8 +593,4 @@ function get_js($script, $jQueryDocumentReady = false) {
 	return $jQueryDocumentReady
 		? '<script type="text/javascript">// <![CDATA['."\n".'jQuery(document).ready(function() { '.$script.' });'."\n".'// ]]></script>'
 		: '<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>';
-}
-
-function include_js($script) {
-	echo '<script src="'.$script.'" type="text/javascript"></script>';
 }

@@ -37,11 +37,11 @@ class testPageHistory extends CWebTest {
 		// also different header for log items (different for eventlog items ?)
 		$itemid = $item['itemid'];
 		$this->login("history.php?action=showvalues&itemid=$itemid");
-		$this->assertTitle('History');
+		$this->checkTitle('History');
 		// Header
 		$this->ok(array('Timestamp', 'Value'));
 		$this->dropdown_select_wait('action', '500 latest values');
-		$this->assertTitle('History');
+		$this->checkTitle('History');
 		$this->button_click('plaintext');
 		$this->wait();
 
@@ -49,7 +49,7 @@ class testPageHistory extends CWebTest {
 		$this->goBack();
 		$this->wait();
 		$this->dropdown_select_wait('action', 'Values');
-		$this->assertTitle('History');
+		$this->checkTitle('History');
 		$this->button_click('plaintext');
 		$this->wait();
 

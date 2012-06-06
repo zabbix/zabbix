@@ -7,6 +7,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5105] fixed server name not shown in page title (Vedmak)
 ..F....... [ZBX-4863] fixed graph Y marker positions and values when setting a minimum value for the Y scale (Pavels)
 A.F....... [ZBX-4861] fixed excess queries upon no-change graph saving (Toms)
 A.F....... [ZBX-5090] fixed errors when fully cloning a host that contains trigger prototypes with web items in the expression (Pavels)
@@ -56,6 +57,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5105] fixed server name not shown in page title (Vedmak)
 ..F....... [ZBX-4863] fixed graph Y marker positions and values when setting a minimum value for the Y scale (Pavels)
 A.F....... [ZBX-4861] fixed excess queries upon no-change graph saving (Toms)
 A.F....... [ZBX-5090] fixed errors when fully cloning a host that contains trigger prototypes with web items in the expression (Pavels)
