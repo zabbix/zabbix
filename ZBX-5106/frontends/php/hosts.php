@@ -314,7 +314,6 @@ elseif (isset($_REQUEST['save'])) {
 		$macros = get_request('macros', array());
 		$interfaces = get_request('interfaces', array());
 		$templates = get_request('templates', array());
-		$templates_clear = get_request('clear_templates', array());
 		$groups = get_request('groups', array());
 
 		if (isset($_REQUEST['hostid']) && $_REQUEST['form'] != 'full_clone') {
@@ -328,15 +327,8 @@ elseif (isset($_REQUEST['save'])) {
 			$msg_fail = _('Cannot add host');
 		}
 
-		$srcHostId = false;
-		if ($_REQUEST['form'] == 'full_clone') {
-			$create_new = true;
-			$srcHostId = $_REQUEST['hostid'];
-		}
-
 		$templates = array_keys($templates);
 		$templates = zbx_toObject($templates, 'templateid');
-		$templates_clear = zbx_toObject($templates_clear, 'templateid');
 
 		foreach ($interfaces as $inum => $interface) {
 			if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
@@ -410,20 +402,21 @@ elseif (isset($_REQUEST['save'])) {
 		if ($create_new) {
 			$hostids = API::Host()->create($host);
 			if ($hostids) {
-				$newHostId = reset($hostids['hostids']);
+				$hostid = reset($hostids['hostids']);
 			}
 			else {
 				throw new Exception();
 			}
 
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $newHostId, $host['host'], null, null, null);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host['host'], null, null, null);
 		}
 		else {
-			$newHostId = $host['hostid'] = $_REQUEST['hostid'];
-			$host['templates_clear'] = $templates_clear;
+			$hostid = $host['hostid'] = $_REQUEST['hostid'];
+
+			$host['templates_clear'] = zbx_toObject(get_request('clear_templates', array()), 'templateid');
 
 			$host_old = API::Host()->get(array(
-				'hostids' => $newHostId,
+				'hostids' => $hostid,
 				'editable' => true,
 				'output' => API_OUTPUT_EXTEND
 			));
@@ -434,7 +427,7 @@ elseif (isset($_REQUEST['save'])) {
 			}
 
 			$host_new = API::Host()->get(array(
-				'hostids' => $newHostId,
+				'hostids' => $hostid,
 				'editable' => true,
 				'output' => API_OUTPUT_EXTEND
 			));
@@ -443,12 +436,14 @@ elseif (isset($_REQUEST['save'])) {
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host_old, $host_new);
 		}
 
-		if ($srcHostId && $_REQUEST['form'] == 'full_clone') {
-			if (!copyApplications($srcHostId, $newHostId)) {
+		if ($_REQUEST['form'] == 'full_clone') {
+			$srcHostId = get_request('hostid');
+
+			if (!copyApplications($srcHostId, $hostid)) {
 				throw new Exception();
 			}
 
-			if (!copyItems($srcHostId, $newHostId)) {
+			if (!copyItems($srcHostId, $hostid)) {
 				throw new Exception();
 			}
 
@@ -459,7 +454,7 @@ elseif (isset($_REQUEST['save'])) {
 				'inherited' => false
 			));
 			if ($triggers) {
-				if (!copyTriggersToHosts(zbx_objectValues($triggers, 'triggerid'), $newHostId, $srcHostId)) {
+				if (!copyTriggersToHosts(zbx_objectValues($triggers, 'triggerid'), $hostid, $srcHostId)) {
 					throw new Exception();
 				}
 			}
@@ -473,7 +468,7 @@ elseif (isset($_REQUEST['save'])) {
 			if ($discoveryRules) {
 				$copyDiscoveryRules = API::DiscoveryRule()->copy(array(
 					'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
-					'hostids' => array($newHostId)
+					'hostids' => array($hostid)
 				));
 				if (!$copyDiscoveryRules) {
 					throw new Exception();
@@ -497,7 +492,7 @@ elseif (isset($_REQUEST['save'])) {
 					continue;
 				}
 
-				if (!copy_graph_to_host($graph['graphid'], $newHostId)) {
+				if (!copy_graph_to_host($graph['graphid'], $hostid)) {
 					throw new Exception();
 				}
 			}
