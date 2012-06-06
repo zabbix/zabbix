@@ -714,14 +714,14 @@ class CChart extends CGraphDraw {
 		$intervals = array();
 		foreach (array(1, 2, 3, 4) as $num) {
 			$dec = pow(0.1, $num);
-			foreach (array(1, 2, 5) as $n => $int) {
-				$intervals[] = $int * $dec;
+			foreach (array(1, 2, 5) as $int) {
+				$intervals[] = bcmul($int, $dec);
 			}
 		}
 
 		foreach (array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18) as $num) {
 			$dec = bcpow(10, $num);
-			foreach (array(1, 2, 5) as $n => $int) {
+			foreach (array(1, 2, 5) as $int) {
 				$intervals[] = bcmul($int, $dec);
 			}
 		}
@@ -1124,18 +1124,16 @@ class CChart extends CGraphDraw {
 		);
 	}
 
-	// vertical grid
+	/**
+	 * Draws Y scale grid.
+	 */
 	private function drawVerticalGrid() {
 		$hline_count = round($this->sizeY / $this->gridPixels);
 
-		if ($this->yaxisleft) {
-			$tmp_hlines = $this->gridLinesCount[GRAPH_YAXIS_SIDE_LEFT];
-			$stepX = $this->gridStepX[GRAPH_YAXIS_SIDE_LEFT];
-		}
-		else {
-			$tmp_hlines = $this->gridLinesCount[GRAPH_YAXIS_SIDE_RIGHT];
-			$stepX = $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT];
-		}
+		$yAxis = ($this->yaxisleft) ? GRAPH_YAXIS_SIDE_LEFT : GRAPH_YAXIS_SIDE_RIGHT;
+
+		$tmp_hlines = $this->gridLinesCount[$yAxis];
+		$stepX = $this->gridStepX[$yAxis];
 
 		if ($tmp_hlines < $hline_count) {
 			$hline_count = $tmp_hlines * 2;
@@ -1146,17 +1144,19 @@ class CChart extends CGraphDraw {
 		}
 
 		for ($i = 1; $i < $hline_count; $i++) {
-			$y = $stepX * $i;
-			if ($y >= $this->sizeY) {
+			$yOffset = $stepX * $i - $this->getYStepMarkerPosOffset($yAxis, $i);
+			if ($yOffset >= $this->sizeY || $yOffset <= 0) {
 				continue;
 			}
+
+			$y = $this->sizeY - $yOffset + $this->shiftY;
 
 			dashedLine(
 				$this->im,
 				$this->shiftXleft,
-				$this->sizeY - $y + $this->shiftY,
+				$y,
 				$this->sizeX + $this->shiftXleft,
-				$this->sizeY - $y + $this->shiftY,
+				$y,
 				$this->getColor($this->graphtheme['maingridcolor'], 0)
 			);
 		}
@@ -1387,6 +1387,7 @@ class CChart extends CGraphDraw {
 
 			// using bc library, incase of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
+			$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_LEFT, $i));
 			if (bccomp(bcadd($val, bcdiv($step,2)), $maxY) == 1) {
 				continue;
 			}
@@ -1394,15 +1395,21 @@ class CChart extends CGraphDraw {
 
 			$dims = imageTextSize(8, 0, $str);
 
-			imageText(
-				$this->im,
-				8,
-				0,
-				$this->shiftXleft - $dims['width'] - 9,
-				$this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_LEFT] * $i + $this->shiftY + 4,
-				$this->getColor($this->graphtheme['textcolor'], 0),
-				$str
-			);
+			// marker Y coordinate
+			$posY = $this->getYStepMarkerPosY(GRAPH_YAXIS_SIDE_LEFT, $i);
+
+			// only draw the marker if it doesn't overlay the previous one
+			if (($posY + $dims['height']) < $this->getYStepMarkerPosY(GRAPH_YAXIS_SIDE_LEFT, $i - 1)) {
+				imageText(
+					$this->im,
+					8,
+					0,
+					$this->shiftXleft - $dims['width'] - 9,
+					$posY,
+					$this->getColor($this->graphtheme['textcolor'], 0),
+					$str
+				);
+			}
 		}
 
 		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
@@ -1490,21 +1497,29 @@ class CChart extends CGraphDraw {
 
 			// using bc module in case of large numbers
 			$val = bcadd(bcmul($i, $step), $minY);
+			$val = bcsub($val, $this->getYStepMarkerValueOffset(GRAPH_YAXIS_SIDE_RIGHT, $i));
 			if (bccomp(bcadd($val, bcdiv($step, 2)), $maxY) == 1) {
 				continue;
 			}
 
 			$str = convert_units($val, $units, ITEM_CONVERT_NO_UNITS);
 
-			imageText(
-				$this->im,
-				8,
-				0,
-				$this->sizeX + $this->shiftXleft + 12,
-				$this->sizeY - $this->gridStepX[GRAPH_YAXIS_SIDE_RIGHT] * $i + $this->shiftY + 4,
-				$this->getColor($this->graphtheme['textcolor'], 0),
-				$str
-			);
+			// marker Y coordinate
+			$dims = imageTextSize(8, 0, $str);
+			$posY = $this->getYStepMarkerPosY(GRAPH_YAXIS_SIDE_RIGHT, $i);
+
+			// only draw the marker if it doesn't overlay the previous one
+			if (($posY + $dims['height']) <= $this->getYStepMarkerPosY(GRAPH_YAXIS_SIDE_RIGHT, $i - 1)) {
+				imageText(
+					$this->im,
+					8,
+					0,
+					$this->sizeX + $this->shiftXleft + 12,
+					$posY,
+					$this->getColor($this->graphtheme['textcolor'], 0),
+					$str
+				);
+			}
 		}
 
 		$str = convert_units($maxY, $units, ITEM_CONVERT_NO_UNITS);
@@ -1529,6 +1544,57 @@ class CChart extends CGraphDraw {
 				$this->getColor(GRAPH_ZERO_LINE_COLOR_RIGHT)
 			);
 		}
+	}
+
+	/**
+	 * Calculates the Y coordinate of the Y scale marker value label.
+	 *
+	 * @param $yAxis
+	 * @param $stepNumber
+	 *
+	 * @return float|int
+	 */
+	protected function getYStepMarkerPosY($yAxis, $stepNumber) {
+		$posY = $this->sizeY - $this->gridStepX[$yAxis] * $stepNumber + $this->shiftY + 4;
+		$posY += $this->getYStepMarkerPosOffset($yAxis, $stepNumber);
+
+		return $posY;
+	}
+
+	/**
+	 * Calculates and returns the offset of the value caused by using a fixed min Y scale value, e.g., will
+	 * transform markers like 0.3, 1.3, 2.3 into 0.3, 1.0, 2.0.
+	 *
+	 * @param $yAxis
+	 * @param $stepNumber
+	 *
+	 * @return int|string
+	 */
+	protected function getYStepMarkerValueOffset($yAxis, $stepNumber) {
+		$step = $this->gridStep[$yAxis];
+		$minY = $this->m_minY[$yAxis];
+
+		$offset = 0;
+		if ($stepNumber > 0 && $minY) {
+			$offset = ($minY > $step) ? bcfmod($minY, $step) : $minY;
+		}
+
+		return $offset;
+	}
+
+	/**
+	 * Calculates and returns the position of the Y scale markers caused by the use of a fixed min Y scale value.
+	 *
+	 * @param $yAxis
+	 * @param $stepNumber
+	 *
+	 * @return float
+	 */
+	protected function getYStepMarkerPosOffset($yAxis, $stepNumber) {
+		$offset = bcdiv($this->gridStepX[$yAxis], $this->gridStep[$yAxis]);
+		$offset = bcmul($offset, $this->getYStepMarkerValueOffset($yAxis, $stepNumber));
+
+		return $offset;
 	}
 
 	protected function drawWorkPeriod() {
