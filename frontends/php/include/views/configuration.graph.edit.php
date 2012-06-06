@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $graphWidget = new CWidget();
 
 if (!empty($this->data['parent_discoveryid'])) {
