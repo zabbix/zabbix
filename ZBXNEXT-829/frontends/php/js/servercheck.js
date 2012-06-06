@@ -7,7 +7,7 @@ jQuery(function($) {
 	 * @type {Object}
 	 */
 	var checker = {
-		timeout: 10000,
+		timeout: 10000, // 10 seconds
 		warning: false,
 
 		/**
