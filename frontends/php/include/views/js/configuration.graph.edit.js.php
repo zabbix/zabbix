@@ -3,7 +3,6 @@
 	<!-- icon + hidden -->
 	<td>
 		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-		<input type="hidden" id="items_#{number}_graphs_0_graphid" name="items[#{number}][graphs][0][graphid]" value="">
 		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
 		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
