@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageStatusOfTriggers extends CWebTest {
 	public function testPageStatusOfTriggers_CheckLayout() {
 		$this->login('tr_status.php');
-		$this->assertTitle('Status of triggers \[refreshed every 30 sec\]');
+		$this->checkTitle('Status of triggers \[refreshed every 30 sec\]');
 		$this->ok('STATUS OF TRIGGERS');
 		$this->ok('Triggers');
 		$this->ok('Displaying');
@@ -35,7 +35,7 @@ class testPageStatusOfTriggers extends CWebTest {
 // Check that no real host or template names displayed
 	public function testPageStatusOfTriggers_NoHostNames() {
 		$this->login('tr_status.php');
-		$this->assertTitle('Status of triggers \[refreshed every 30 sec\]');
+		$this->checkTitle('Status of triggers \[refreshed every 30 sec\]');
 		$this->checkNoRealHostnames();
 	}
 }
