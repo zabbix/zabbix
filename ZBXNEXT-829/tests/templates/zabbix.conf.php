@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
 ** Zabbix
 ** Copyright (C) 2000-2011 Zabbix SIA
 **
@@ -29,7 +29,7 @@ $DB["PASSWORD"]		= "{DBPASSWORD}";
 
 $ZBX_SERVER		= "hudson";
 $ZBX_SERVER_PORT	= "10051";
-$ZBX_SERVER_NAME	= "";
+$ZBX_SERVER_NAME	= "TEST_SERVER_NAME";
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 ?>

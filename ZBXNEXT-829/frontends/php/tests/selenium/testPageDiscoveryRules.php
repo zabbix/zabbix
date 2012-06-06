@@ -43,7 +43,7 @@ class testPageDiscoveryRules extends CWebTest {
 		DBsave_tables('triggers');
 
 		$this->login('host_discovery.php?&hostid='.$rule['hostid']);
-		$this->assertTitle('Configuration of discovery');
+		$this->checkTitle('Configuration of discovery');
 		$this->checkbox_select("group_itemid[$itemid]");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
@@ -51,7 +51,7 @@ class testPageDiscoveryRules extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->assertTitle('Configuration of discovery');
+		$this->checkTitle('Configuration of discovery');
 		$this->ok('Discovery rule deleted');
 		$this->ok('CONFIGURATION OF DISCOVERY RULES');
 

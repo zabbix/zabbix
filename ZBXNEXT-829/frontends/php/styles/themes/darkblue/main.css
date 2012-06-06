@@ -451,13 +451,6 @@ div.messagecontainer .message .messagebox{
 	margin-bottom: 0;
 }
 
-div.formElement_header{
-	background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x;
-}
-div.formElement_body{
-	border: 1px solid #245078;
-}
-div.formElement_footer{ background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
 div.thin_header{ background: #3C759B url(images/bg_i-soft_25.png) 50% 50% repeat-x; }
 div.zabbix_logo{ background-image:url('../../../images/general/zabbix_bb.png'); }
 .iconzbxavailable{ background-image: url('../../../images/general/zabbix_available_bb.png'); }
@@ -477,7 +470,6 @@ div#scrolltabright{ color: #00CCFF; }
 div#selection_box{ filter:alpha(opacity=60); opacity:.60; background-color:#6666FF; }
 
 div.formElement{ border: 1px solid #77B7DA;}
-div.formElement_body{ background-color: #001C31; }
 
 div.objectgroup { border-color: #4B7489; }
 div.border_dotted { border: 1px dotted #4B7489; }
@@ -537,3 +529,10 @@ table.ack_msgs tr.msg { background-color: #022744; }
 
 #zbx_search input[type="text"], #zbx_search input { border-color: #EFEFEF; }
 #zbx_search input.button { color: #FBFBFB; }
+
+div.control-severity label span {
+	color: #77B7DA;
+}
+div.control-severity label span:hover {
+	color: #000;
+}

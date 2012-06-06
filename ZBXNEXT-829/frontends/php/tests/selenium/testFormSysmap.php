@@ -49,7 +49,7 @@ class testFormSysmap extends CWebTest {
 
 	public function testFormSysmapOpen() {
 		$this->login('sysmaps.php');
-		$this->assertTitle('Network maps');
+		$this->checkTitle('Network maps');
 	}
 
 
@@ -67,7 +67,7 @@ class testFormSysmap extends CWebTest {
 		$this->input_type('name', $mapName);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Network maps');
+		$this->checkTitle('Network maps');
 		if ($successExpected) {
 			$this->ok('Network map added');
 			$this->ok($mapName);
@@ -87,7 +87,7 @@ class testFormSysmap extends CWebTest {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Network maps');
+		$this->checkTitle('Network maps');
 		$this->ok('Network map updated');
 		$this->ok($this->mapName);
 	}
@@ -108,7 +108,7 @@ class testFormSysmap extends CWebTest {
 		$this->input_type('name', $mapName);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Network maps');
+		$this->checkTitle('Network maps');
 
 		if ($successExpected) {
 			$this->ok('Network map updated');
@@ -134,7 +134,7 @@ class testFormSysmap extends CWebTest {
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->assertTitle('Network maps');
+		$this->checkTitle('Network maps');
 		$this->ok('Network map deleted');
 
 		DBrestore_tables('sysmaps');
@@ -152,7 +152,7 @@ class testFormSysmap extends CWebTest {
 		$this->input_type('name', $mapName);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Network maps');
+		$this->checkTitle('Network maps');
 		$this->ok('Network map added');
 		$this->ok($mapName);
 		return $mapName;
@@ -173,7 +173,7 @@ class testFormSysmap extends CWebTest {
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
-		$this->assertTitle('Network maps');
+		$this->checkTitle('Network maps');
 		$this->ok('Network map deleted');
 	}
 

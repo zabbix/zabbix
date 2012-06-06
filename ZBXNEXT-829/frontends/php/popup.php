@@ -523,7 +523,7 @@ else {
 	}
 }
 
-show_table_header(defined($page['title']) ? constant($page['title']) : $page['title'], $frmTitle);
+show_table_header($page['title'], $frmTitle);
 
 insert_js_function('addSelectedValues');
 insert_js_function('addValues');
@@ -1208,7 +1208,7 @@ elseif ($srctbl == 'prototypes') {
 
 	$items = API::Item()->get(array(
 		'nodeids' => $nodeid,
-		'selectHosts' => array('host'),
+		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'output' => API_OUTPUT_EXTEND,
@@ -1220,7 +1220,7 @@ elseif ($srctbl == 'prototypes') {
 		$host = reset($item['hosts']);
 
 		$description = new CSpan(itemName($item), 'link');
-		$item['name'] = $host['host'].': '.$item['name'];
+		$item['name'] = $host['name'].': '.$item['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';
