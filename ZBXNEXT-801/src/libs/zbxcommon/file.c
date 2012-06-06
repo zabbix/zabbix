@@ -65,7 +65,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 
 	offset = lseek(fd, 0, SEEK_CUR);
 
-	if ((nbytes = (int)read(fd, buf, (unsigned int)count)) <= 0)
+	if (0 >= (nbytes = (int)read(fd, buf, count)))
 		return nbytes;
 
 	if (0 == strcmp(encoding, "UNICODE") || 0 == strcmp(encoding, "UNICODELITTLE") ||
@@ -120,7 +120,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		}
 	}
 
-	lseek(fd, (long int)(offset + i), SEEK_SET);
+	lseek(fd, offset + i, SEEK_SET);
 
 	return (int)i;
 }

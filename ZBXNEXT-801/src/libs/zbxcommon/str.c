@@ -2827,7 +2827,7 @@ void	zbx_strupper(char *str)
 		*str = toupper(*str);
 }
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 #include "log.h"
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 {

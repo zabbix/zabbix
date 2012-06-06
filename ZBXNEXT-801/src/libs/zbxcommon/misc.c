@@ -859,9 +859,9 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len)
 
 	c = 0;	/* colons count */
 	for (ptr = strchr(ip, ':'); ptr != NULL; ptr = strchr(ptr + 1, ':'))
-		c ++;
+		c++;
 
-	if (c < 2 || c > 7)
+	if (2 > c || c > 7)
 		return FAIL;
 
 	ip_len = strlen(ip);
