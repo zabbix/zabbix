@@ -22,7 +22,7 @@
 
 #include "sysinfo.h"
 
-#define	MAX_DISKDEVICES	8
+#define	MAX_DISKDEVICES	1024
 
 typedef struct c_single_diskdevice_data
 {
@@ -45,14 +45,16 @@ typedef struct c_single_diskdevice_data
 
 typedef struct c_diskdevices_data
 {
-	int				count;
-	ZBX_SINGLE_DISKDEVICE_DATA	device[MAX_DISKDEVICES];
+	int				count;		/* Number of disks to collect statistics for.*/
+	int				max_diskdev;	/* Number of "slots" for disk statistics.*/
+	ZBX_SINGLE_DISKDEVICE_DATA	device[];	/* "Slots" for disk statistics added dynamically.*/
+							/* Structure with flexible array member (a c99 feature).*/
 } ZBX_DISKDEVICES_DATA;
 
-#define DISKDEVICE_COLLECTOR_STARTED(collector) collector
+#define DISKDEVICE_COLLECTOR_STARTED(collector) ((collector) && ((collector)->diskstat_shmid != NONEXISTENT_SHMID))
 
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname);
 ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname);
-void				collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *pdiskdevices);
+void				collect_stats_diskdevices(void);
 
 #endif

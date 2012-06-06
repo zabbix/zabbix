@@ -31,10 +31,14 @@
 #	include "vmstats.h"
 #endif	/* _AIX */
 
+#ifndef _WINDOWS
+#	define NONEXISTENT_SHMID	(-1)
+#endif	/* _WINDOWS */
+
 typedef struct
 {
 	ZBX_CPUS_STAT_DATA	cpus;
-	ZBX_DISKDEVICES_DATA	diskdevices;
+	int 			diskstat_shmid;
 #ifdef _WINDOWS
 	ZBX_PERF_STAT_DATA	perfs;
 #endif	/* _WINDOWS */
@@ -45,10 +49,15 @@ typedef struct
 ZBX_COLLECTOR_DATA;
 
 extern ZBX_COLLECTOR_DATA	*collector;
+extern ZBX_DISKDEVICES_DATA	*diskdevices;
+extern int			my_diskstat_shmid;
 
 ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);
 
-void	init_collector_data();
-void	free_collector_data();
+void	init_collector_data(void);
+void	free_collector_data(void);
+void	diskstat_shm_init(void);
+void	diskstat_shm_reattach(void);
+void	diskstat_shm_extend(void);
 
 #endif	/* ZABBIX_STATS_H */
