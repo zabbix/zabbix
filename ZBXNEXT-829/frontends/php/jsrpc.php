@@ -161,7 +161,7 @@ switch ($data['method']) {
 
 		$result = array(
 			'result' => (bool) $session['serverCheckResult'],
-			'message' => $session['serverCheckResult'] ? '' : _('Zabbix server is not running. The displayed information cannot be trusted.')
+			'message' => $session['serverCheckResult'] ? '' : _('Zabbix server is not running: the information displayed may not be current.')
 		);
 		break;
 	default:
