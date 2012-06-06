@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 /**
  * Convert PHP variable to string version of JavaScript style
@@ -106,24 +105,6 @@ function zbx_add_post_js($script) {
 	}
 	if (!in_array($script, $ZBX_PAGE_POST_JS)) {
 		$ZBX_PAGE_POST_JS[] = $script;
-	}
-}
-
-function zbx_addJSLocale($to_translate) {
-	global $JS_TRANSLATE;
-
-	zbx_value2array($to_translate);
-	if (empty($JS_TRANSLATE)) {
-		$JS_TRANSLATE = array();
-	}
-
-	foreach ($to_translate as $string) {
-		if (defined($string)) {
-			$JS_TRANSLATE[$string] = constant($string);
-		}
-		else {
-			$JS_TRANSLATE[$string] = 'UNTRANSLATED['.$string.']';
-		}
 	}
 }
 
@@ -371,14 +352,6 @@ function play_sound($filename) {
 		}');
 }
 
-function setFocus($frm_name, $fld_name) {
-	insert_js('document.forms["'.$frm_name.'"].elements["'.$fld_name.'"].focus();');
-}
-
-function alert($msg) {
-	insert_js('alert("'.$msg.'");');
-}
-
 function insert_js_function($fnct_name) {
 	switch ($fnct_name) {
 		case 'add_item_variable':
@@ -621,8 +594,3 @@ function get_js($script, $jQueryDocumentReady = false) {
 		? '<script type="text/javascript">// <![CDATA['."\n".'jQuery(document).ready(function() { '.$script.' });'."\n".'// ]]></script>'
 		: '<script type="text/javascript">// <![CDATA['."\n".$script."\n".'// ]]></script>';
 }
-
-function include_js($script) {
-	echo '<script src="'.$script.'" type="text/javascript"></script>';
-}
-?>

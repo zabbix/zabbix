@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageQueueDetails extends CWebTest {
 	public function testPageQueueDetails_CheckLayout() {
 		$this->login('queue.php?config=2');
-		$this->assertTitle('Queue \[refreshed every 30 sec\]');
+		$this->checkTitle('Queue \[refreshed every 30 sec\]');
 		$this->ok('Queue');
 		$this->ok('QUEUE OF ITEMS TO BE UPDATED');
 		// Header

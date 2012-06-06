@@ -995,6 +995,16 @@ function remove_nodes_from_id($id) {
 	return bcmod($id, '100000000000');
 }
 
+/**
+ * Cheks whether all $db_fields keys exists as $args keys.
+ *
+ * If $db_fields element value is given and corresponding $args is not then it is assigned to $args element.
+ *
+ * @param $db_fields
+ * @param $args
+ *
+ * @return boolean
+ */
 function check_db_fields($db_fields, &$args) {
 	if (!is_array($args)) {
 		return false;
@@ -1048,6 +1058,19 @@ function DBfetchArray($cursor) {
 	$result = array();
 	while ($row = DBfetch($cursor)) {
 		$result[] = $row;
+	}
+	return $result;
+}
+
+/**
+ * Transform DB cursor to array
+ *
+ * @return array
+ */
+function DBfetchArrayAssoc($cursor, $field) {
+	$result = array();
+	while ($row = DBfetch($cursor)) {
+		$result[$row[$field]] = $row;
 	}
 	return $result;
 }

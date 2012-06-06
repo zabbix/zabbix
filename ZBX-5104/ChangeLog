@@ -1,10 +1,25 @@
 Changes for 2.0.1rc1
 
 New features:
+....I..... [ZBXNEXT-1256] added example Solaris partition LLD user parameter (Richlv)
+A.F....... [ZBX-5074] redesign configuration of action (Eduard)
+..F....... [ZBX-1357] updated Brazilian Portuguese, French, Greek, Japanese, Ukrainian and Russian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1019] updated jQuery to 1.7.2 and jQuery UI to 1.8.20 (Vedmak)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5119] fixed maintenance till day (Eduard)
+..F....... [ZBX-5105] fixed server name not shown in page title (Vedmak)
+..F....... [ZBX-4863] fixed graph Y marker positions and values when setting a minimum value for the Y scale (Pavels)
+A.F....... [ZBX-4861] fixed excess queries upon no-change graph saving (Toms)
+A.F....... [ZBX-5090] fixed errors when fully cloning a host that contains trigger prototypes with web items in the expression (Pavels)
+....I..... [ZBXNEXT-1256] fixed example Linux partition LLD item (Richlv)
+.......PS. [ZBX-4980] fixed error in decoding of big base64 encoded values (Andris)
+..F....... [ZBX-5081] fixed simple slide show update changes slideids in a database (Toms)
+A......... [ZBX-5092] fixed the get method "nodeids" parameter not working in some APIs (Pavels)
+..F....... [ZBX-5000] fixed "all" shown instead of "not selected" in Monitoring -> Discovery (Toms)
+.......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
+.......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
 ..F....... [ZBX-5080] fixed incorrect JavaScript parameter encoding in the map editor (Pavels)
 ..F....... [ZBX-4974] fixed don't show groups w/o templates when linking a template (Toms)
 ..F....... [ZBX-5096] fixed error when create hostgroup with too long name (Vedmak)
@@ -734,6 +749,11 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+...G...... [ZBX-5027] added file size check to log monitoring to report error if it's over 2 GB (dimir)
+.......PS. [ZBX-4980] fixed error in decoding of big base64 encoded values (Andris)
+.......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)
+.......PS. [ZBX-4793] added support for display-hint when getting SNMP octet string values (dimir)
+A......... [ZBX-5091] fixed usermacro.get templateids filter (Vedmak)
 ..F....... [ZBX-4031] fixed error message when deleting a link in a map (Pavels)
 ..F....... [ZBX-5006] fixed allowed memory size exceeded; thanks to Mike Brady (Toms)
 A.F....... [ZBX-5032] fixed select mediatypes in User (Eduard)

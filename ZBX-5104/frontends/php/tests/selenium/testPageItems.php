@@ -37,13 +37,13 @@ class testPageItems extends CWebTest {
 		$this->login('hosts.php');
 		$this->dropdown_select_wait('groupid', 'all');
 
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('HOSTS');
 		// Go to the list of items
 		$this->href_click("items.php?filter_set=1&hostid=$hostid&sid=");
 		$this->wait();
 		// We are in the list of items
-		$this->assertTitle('Configuration of items');
+		$this->checkTitle('Configuration of items');
 		$this->ok('CONFIGURATION OF ITEMS');
 		$this->ok('Items');
 		$this->ok('Displaying');
