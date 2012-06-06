@@ -201,18 +201,7 @@ if (!defined('ZBX_PAGE_NO_AUTHORIZATION') && !defined('ZBX_RPC_REQUEST')) {
 	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
 }
 else {
-	CWebUser::$data = array(
-		'alias' => ZBX_GUEST_USER,
-		'userid' => 0,
-		'lang' => 'en_gb',
-		'type' => '0',
-		'node' => array(
-			'name' => '- unknown -',
-			'nodeid' => 0
-		)
-	);
-
-	$USER_DETAILS = CWebUser::$data;
+	CWebUser::setDefault();
 }
 
 set_zbx_locales();
@@ -681,6 +670,10 @@ function get_status() {
 
 function zabbixRunning() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+	if (empty($ZBX_SERVER) || empty ($ZBX_SERVER_PORT)) {
+		return false;
+	}
 
 	$result = (bool) fsockopen($ZBX_SERVER, $ZBX_SERVER_PORT, $errnum, $errstr, ZBX_SOCKET_TIMEOUT);
 	if (!$result) {

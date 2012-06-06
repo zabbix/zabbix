@@ -36,18 +36,18 @@ function error($error) {
 /**
  * Returns database data suitable for PHPUnit data provider functions
  */
-function DBdata($query) {
+function DBdata($sql) {
 	DBconnect($error);
 
-	$objects=array();
+	$data = array();
 
-	$result=DBselect($query);
-	while ($object=DBfetch($result)) {
-		$objects[]=array($object);
+	$result = DBselect($sql);
+	while ($row = DBfetch($result)) {
+		$data[] = array($row);
 	}
-
 	DBclose();
-	return $objects;
+
+	return $data;
 }
 
 /**
@@ -157,13 +157,11 @@ function DBrestore_tables($topTable) {
  * Returns md5 hash sum of database result.
  */
 function DBhash($sql) {
-	global $DB;
-
 	$hash = '<empty hash>';
 
-	$result=DBselect($sql);
+	$result = DBselect($sql);
 	while ($row = DBfetch($result)) {
-		foreach ($row as $key => $value) {
+		foreach ($row as $value) {
 			$hash = md5($hash.$value);
 		}
 	}

@@ -19,7 +19,6 @@
 **/
 
 
-session_start();
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = 'RPC';
@@ -153,14 +152,20 @@ switch ($data['method']) {
 		break;
 	case 'zabbix.status':
 		$config = select_config();
-		if (!isset($_SESSION['zabbixStatus']) || ($_SESSION['zabbixStatus']['time'] + $config['server_check_interval']) <= time()) {
-			$_SESSION['zabbixStatus'] = array(
-				'time' => time(),
-				'status' => zabbixRunning()
-			);
+
+		$checkStatus = CProfile::get('zabbix.available');
+		$checkTime = CProfile::get('zabbix.available.time', 0);
+
+		if ($checkStatus === null || isset($data['params']['nocache']) || ($checkTime + $config['server_check_interval']) <= time()) {
+			$checkStatus = zabbixRunning();
+			CProfile::update('zabbix.available', (int) $checkStatus, PROFILE_TYPE_INT);
+			CProfile::update('zabbix.available.time', time(), PROFILE_TYPE_INT);
 		}
 
-		$result = $_SESSION['zabbixStatus']['status'];
+		$result = array(
+			'result' => (bool) $checkStatus,
+			'message' => $checkStatus ? '' : _('Zabbix server might be down!')
+		);
 		break;
 	default:
 		fatal_error('Wrong RPC call to JS RPC');

@@ -17,16 +17,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-global $USER_DETAILS;
+
 
 $hostgroupWidget = new CWidget();
 
 // create new hostgroup button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-if ($USER_DETAILS['type'] == USER_TYPE_SUPER_ADMIN) {
+if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	$tmp_item = new CSubmit('form', _('Create host group'));
 }
 else {
@@ -136,5 +134,5 @@ $hostgroupForm->addItem(array($this->data['paging'], $hostgroupTable, $this->dat
 
 // append form to widget
 $hostgroupWidget->addItem($hostgroupForm);
+
 return $hostgroupWidget;
-?>

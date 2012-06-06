@@ -1404,7 +1404,7 @@ class CChart extends CGraphDraw {
 					$this->im,
 					8,
 					0,
-					$this->shiftXleft - $dims['width'] - 6,
+					$this->shiftXleft - $dims['width'] - 9,
 					$posY,
 					$this->getColor($this->graphtheme['textcolor'], 0),
 					$str
@@ -1418,7 +1418,7 @@ class CChart extends CGraphDraw {
 			$this->im,
 			8,
 			0,
-			$this->shiftXleft - $dims['width'] - 6,
+			$this->shiftXleft - $dims['width'] - 9,
 			$this->shiftY  + 4,
 			$this->getColor($this->graphtheme['textcolor'], 0),
 			$str

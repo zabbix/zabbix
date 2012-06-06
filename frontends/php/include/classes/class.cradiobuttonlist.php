@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CRadioButtonList extends CDiv {
 
@@ -38,7 +37,6 @@ class CRadioButtonList extends CDiv {
 		parent::__construct(null, null, $name);
 	}
 
-
 	public function addValue($name, $value, $checked = null) {
 		$this->count++;
 
@@ -47,7 +45,7 @@ class CRadioButtonList extends CDiv {
 		$radio = new CInput('radio', $this->name, $value);
 		$radio->attr('id', zbx_formatDomId($id));
 
-		if ((strcmp($value,$this->value) == 0) || !is_null($checked) || $checked) {
+		if (strcmp($value, $this->value) == 0 || !is_null($checked) || $checked) {
 			$radio->attr('checked', 'checked');
 		}
 
@@ -69,4 +67,3 @@ class CRadioButtonList extends CDiv {
 		$this->orientation = self::ORIENTATION_VERTICAL;
 	}
 }
-?>
