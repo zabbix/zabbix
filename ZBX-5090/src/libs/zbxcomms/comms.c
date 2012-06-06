@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -979,8 +979,20 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 				}
 				else
 				{
-					if (nbytes < left)
-						break;
+					if (nbytes < left)	/* should we stop reading? */
+					{
+						/* XML protocol? */
+						if (0 == strncmp(s->buf_stat, "<req>", sizeof("<req>") - 1))
+						{
+							/* closing tag received in the last 10 bytes? */
+							s->buf_stat[read_bytes] = '\0';
+							if (NULL != strstr(s->buf_stat + read_bytes -
+									(10 > read_bytes ? read_bytes : 10), "</req>"))
+								break;
+						}
+						else
+							break;
+					}
 				}
 
 				left -= nbytes;
@@ -1013,8 +1025,18 @@ ssize_t	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags, int ti
 				}
 				else
 				{
-					if (nbytes < sizeof(s->buf_stat) - 1)
-						break;
+					if (nbytes < sizeof(s->buf_stat) - 1)	/* should we stop reading? */
+					{
+						/* XML protocol? */
+						if (0 == strncmp(s->buf_dyn, "<req>", sizeof("<req>") - 1))
+						{
+							/* closing tag received in the last 10 bytes? */
+							if (NULL != strstr(s->buf_dyn + read_bytes - 10, "</req>"))
+								break;
+						}
+						else
+							break;
+					}
 				}
 			}
 

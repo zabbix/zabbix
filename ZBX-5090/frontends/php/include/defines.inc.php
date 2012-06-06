@@ -881,6 +881,10 @@ define('SERVER_INFO_DATE_FORMAT', _('D, d M Y H:i:s O'));
 define('XML_DATE_DATE_FORMAT', _('d.m.y'));
 define('XML_TIME_DATE_FORMAT', _('H.i'));
 
+// actions
+define('LONG_DESCRIPTION',	0);
+define('SHORT_DESCRIPTION',	1);
+
 // if magic quotes on, then get rid of them
 if (version_compare(phpversion(), '6.0', '<') && get_magic_quotes_gpc()) {
 	$_GET = zbx_stripslashes($_GET);
