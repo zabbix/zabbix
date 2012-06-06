@@ -285,15 +285,14 @@ class CPageFilter {
 		// nonexisting or unset $groupid
 		if ((!isset($this->data['groups'][$groupid]) && $groupid > 0) || is_null($groupid)) {
 			// for popup select first group in the list
-			if ($this->config['popupDD']) {
+			if ($this->config['popupDD'] && !empty($this->data['groups'])) {
 				reset($this->data['groups']);
 				$groupid = key($this->data['groups']);
 			}
-		}
-
-		// groupid = 0 for 'Dropdown first entry' option ALL or NONE
-		if (empty($groupid)) {
-			$groupid = 0;
+			// otherwise groupid = 0 for 'Dropdown first entry' option ALL or NONE
+			else {
+				$groupid = 0;
+			}
 		}
 
 		CProfile::update($this->_profileIdx['groups'], $groupid, PROFILE_TYPE_ID);
@@ -332,7 +331,7 @@ class CPageFilter {
 			// nonexisting or unset $hostid
 			if ((!isset($this->data['hosts'][$hostid]) && $hostid > 0) || is_null($hostid)) {
 				// for popup select first host in the list
-				if ($this->config['popupDD']) {
+				if ($this->config['popupDD'] && !empty($this->data['hosts'])) {
 					reset($this->data['hosts']);
 					$hostid = key($this->data['hosts']);
 				}
