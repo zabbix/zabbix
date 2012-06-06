@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * @package API
  */
@@ -792,14 +792,15 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryTriggers(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
+	protected function copyTriggerPrototypes(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
 		$srcTriggers = API::TriggerPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => API_OUTPUT_EXTEND,
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectFunctions' => API_OUTPUT_EXTEND
+			'selectFunctions' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
 		));
 
 		if (!$srcTriggers) {
@@ -807,12 +808,17 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		$itemKeys = array();
-		foreach ($srcTriggers as $trigger) {
+		foreach ($srcTriggers as $id => $trigger) {
+			// skip triggers with web items
+			if (httpItemExists($trigger['items'])) {
+				unset($srcTriggers[$id]);
+				continue;
+			}
+
 			foreach ($trigger['items'] as $item) {
-				$itemKeys[] = $item['key_'];
+				$itemKeys[$item['key_']] = $item['key_'];
 			}
 		}
-		array_unique($itemKeys);
 
 		// fetch newly created items
 		$items = API::Item()->get(array(
@@ -820,7 +826,8 @@ class CDiscoveryRule extends CItemGeneral {
 			'filter' => array(
 				'key_' => $itemKeys
 			),
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
 		));
 		$dstItems = array();
 		foreach ($items as $item) {
@@ -829,12 +836,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// save new triggers
 		$dstTriggers = $srcTriggers;
-		foreach ($dstTriggers as $key => $trigger) {
+		foreach ($dstTriggers as $id => $trigger) {
 			unset($trigger['triggerid']);
 
 			// update expression
-			$dstTriggers[$key]['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
-
+			$dstTriggers[$id]['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
 		}
 
 		$rs = API::TriggerPrototype()->create($dstTriggers);
@@ -995,16 +1001,19 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @throws APIException if the discovery rule interfaces could not be mapped
 	 * to the new host interfaces.
 	 *
-	 * @param type $discoveryid  The ID of the discovery rule to be copied
-	 * @param type $hostid       Destination host id
+	 * @param string $discoveryid  The ID of the discovery rule to be copied
+	 * @param string $hostid       Destination host id
+	 *
+	 * @return bool
 	 */
 	protected function copyDiscoveryRule($discoveryid, $hostid) {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get(array(
 			'itemids' => $discoveryid,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
 		));
-		$srcDiscovery = $srcDiscovery[0];
+		$srcDiscovery = reset($srcDiscovery);
 
 		// fetch source and destination hosts
 		$hosts = API::Host()->get(array(
@@ -1038,22 +1047,23 @@ class CDiscoveryRule extends CItemGeneral {
 		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
 
 		// copy prototypes
-		$newPrototypes = $this->copyDiscoveryPrototypes($srcDiscovery, $dstDiscovery, $dstHost);
+		$newPrototypes = $this->copyItemPrototypes($srcDiscovery, $dstDiscovery, $dstHost);
 
 		// if there were prototypes defined, clone everything else
 		if ($newPrototypes) {
 			// fetch new prototypes
 			$newPrototypes = API::ItemPrototype()->get(array(
 				'itemids' => $newPrototypes['itemids'],
-				'output' => API_OUTPUT_EXTEND
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
 			));
 			$dstDiscovery['items'] = $newPrototypes;
 
 			// copy graphs
-			$this->copyDiscoveryGraphs($srcDiscovery, $dstDiscovery);
+			$this->copyGraphPrototypes($srcDiscovery, $dstDiscovery);
 
 			// copy triggers
-			$this->copyDiscoveryTriggers($srcDiscovery, $dstDiscovery, $srcHost, $dstHost);
+			$this->copyTriggerPrototypes($srcDiscovery, $dstDiscovery, $srcHost, $dstHost);
 		}
 		return true;
 	}
@@ -1070,11 +1080,12 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
+	protected function copyItemPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$prototypes = API::ItemPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'selectApplications' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
 		));
 
 		$rs = array();
@@ -1120,13 +1131,14 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @return array
 	 */
-	protected function copyDiscoveryGraphs(array $srcDiscovery, array $dstDiscovery) {
+	protected function copyGraphPrototypes(array $srcDiscovery, array $dstDiscovery) {
 		// fetch source graphs
 		$srcGraphs = API::GraphPrototype()->get(array(
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
-			'selectHosts' => API_OUTPUT_REFER
+			'selectHosts' => API_OUTPUT_REFER,
+			'preservekeys' => true
 		));
 
 		if (!$srcGraphs) {
@@ -1149,28 +1161,28 @@ class CDiscoveryRule extends CItemGeneral {
 
 			// save all used item ids to map them to the new items
 			foreach ($graph['gitems'] as $item) {
-				$srcItemIds[] = $item['itemid'];
+				$srcItemIds[$item['itemid']] = $item['itemid'];
 			}
 			if ($graph['ymin_itemid']) {
-				$srcItemIds[] = $graph['ymin_itemid'];
+				$srcItemIds[$graph['ymin_itemid']] = $graph['ymin_itemid'];
 			}
 			if ($graph['ymax_itemid']) {
-				$srcItemIds[] = $graph['ymax_itemid'];
+				$srcItemIds[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 			}
 		}
 
 		// fetch source items
 		$items = API::Item()->get(array(
 			'itemids' => $srcItemIds,
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
 		));
 		$srcItems = array();
 		$itemKeys = array();
 		foreach ($items as $item) {
 			$srcItems[$item['itemid']] = $item;
-			$itemKeys[] = $item['key_'];
+			$itemKeys[$item['key_']] = $item['key_'];
 		}
-		$itemKeys = array_unique($itemKeys);
 
 		// fetch newly cloned items
 		$items = array_merge($dstDiscovery['items'], API::Item()->get(array(
@@ -1178,7 +1190,8 @@ class CDiscoveryRule extends CItemGeneral {
 			'filter' => array(
 				'key_' => $itemKeys
 			),
-			'output' => API_OUTPUT_EXTEND
+			'output' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
 		)));
 		$dstItems = array();
 		foreach ($items as $item) {
@@ -1220,4 +1233,3 @@ class CDiscoveryRule extends CItemGeneral {
 		return (validateNumber($lifetime, self::MIN_LIFETIME, self::MAX_LIFETIME) || validateUserMacro($lifetime));
 	}
 }
-?>
