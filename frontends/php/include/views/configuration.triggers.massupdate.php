@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $triggersWidget = new CWidget();
@@ -57,59 +57,7 @@ foreach ($this->data['g_triggerid'] as $triggerid) {
 $triggersFormList = new CFormList('triggersFormList');
 
 // append severity to form list
-$labelNotClassified = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_NOT_CLASSIFIED]), 'severity_'.TRIGGER_SEVERITY_NOT_CLASSIFIED, 'severity_label_'.TRIGGER_SEVERITY_NOT_CLASSIFIED);
-$labelNotClassified->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_NOT_CLASSIFIED.');');
-$labelNotClassified->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_NOT_CLASSIFIED.');');
-$labelNotClassified->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_NOT_CLASSIFIED.');');
-$labelNotClassified->addClass('trigger-severity');
-
-$labelInformation = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_INFORMATION]), 'severity_'.TRIGGER_SEVERITY_INFORMATION, 'severity_label_'.TRIGGER_SEVERITY_INFORMATION);
-$labelInformation->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_INFORMATION.');');
-$labelInformation->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_INFORMATION.');');
-$labelInformation->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_INFORMATION.');');
-$labelInformation->addClass('trigger-severity');
-
-$labelWarning = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_WARNING]), 'severity_'.TRIGGER_SEVERITY_WARNING, 'severity_label_'.TRIGGER_SEVERITY_WARNING);
-$labelWarning->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_WARNING.');');
-$labelWarning->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_WARNING.');');
-$labelWarning->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_WARNING.');');
-$labelWarning->addClass('trigger-severity');
-
-$labelAverage = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_AVERAGE]), 'severity_'.TRIGGER_SEVERITY_AVERAGE, 'severity_label_'.TRIGGER_SEVERITY_AVERAGE);
-$labelAverage->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_AVERAGE.');');
-$labelAverage->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_AVERAGE.');');
-$labelAverage->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_AVERAGE.');');
-$labelAverage->addClass('trigger-severity');
-
-$labelHigh = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_HIGH]), 'severity_'.TRIGGER_SEVERITY_HIGH, 'severity_label_'.TRIGGER_SEVERITY_HIGH);
-$labelHigh->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_HIGH.');');
-$labelHigh->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_HIGH.');');
-$labelHigh->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_HIGH.');');
-$labelHigh->addClass('trigger-severity');
-
-$labelDisaster = new CLabel(_($this->data['config']['severity_name_'.TRIGGER_SEVERITY_DISASTER]), 'severity_'.TRIGGER_SEVERITY_DISASTER, 'severity_label_'.TRIGGER_SEVERITY_DISASTER);
-$labelDisaster->addAction('onmouseover', 'mouseOverSeverity('.TRIGGER_SEVERITY_DISASTER.');');
-$labelDisaster->addAction('onmouseout', 'mouseOutSeverity('.TRIGGER_SEVERITY_DISASTER.');');
-$labelDisaster->addAction('onclick', 'focusSeverity('.TRIGGER_SEVERITY_DISASTER.');');
-$labelDisaster->addClass('trigger-severity');
-
-$severityDiv = new CDiv(
-	array(
-		new CRadioButton('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED, null, 'severity_'.TRIGGER_SEVERITY_NOT_CLASSIFIED, $this->data['priority'] == TRIGGER_SEVERITY_NOT_CLASSIFIED),
-		$labelNotClassified,
-		new CRadioButton('priority', TRIGGER_SEVERITY_INFORMATION, null, 'severity_'.TRIGGER_SEVERITY_INFORMATION, $this->data['priority'] == TRIGGER_SEVERITY_INFORMATION),
-		$labelInformation,
-		new CRadioButton('priority', TRIGGER_SEVERITY_WARNING, null, 'severity_'.TRIGGER_SEVERITY_WARNING, $this->data['priority'] == TRIGGER_SEVERITY_WARNING),
-		$labelWarning,
-		new CRadioButton('priority', TRIGGER_SEVERITY_AVERAGE, null, 'severity_'.TRIGGER_SEVERITY_AVERAGE, $this->data['priority'] == TRIGGER_SEVERITY_AVERAGE),
-		$labelAverage,
-		new CRadioButton('priority', TRIGGER_SEVERITY_HIGH, null, 'severity_'.TRIGGER_SEVERITY_HIGH, $this->data['priority'] == TRIGGER_SEVERITY_HIGH),
-		$labelHigh,
-		new CRadioButton('priority', TRIGGER_SEVERITY_DISASTER, null, 'severity_'.TRIGGER_SEVERITY_DISASTER, $this->data['priority'] == TRIGGER_SEVERITY_DISASTER),
-		$labelDisaster
-	),
-	'jqueryinputset'
-);
+$severityDiv = getSeverityControl();
 $severityDiv->setAttribute('id', 'priority_div');
 
 $triggersFormList->addRow(
@@ -178,5 +126,5 @@ $triggersForm->addItem(makeFormFooter(
 ));
 
 $triggersWidget->addItem($triggersForm);
+
 return $triggersWidget;
-?>
