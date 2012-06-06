@@ -1053,6 +1053,19 @@ function DBfetchArray($cursor) {
 }
 
 /**
+ * Transform DB cursor to array
+ *
+ * @return array
+ */
+function DBfetchArrayAssoc($cursor, $field) {
+	$result = array();
+	while ($row = DBfetch($cursor)) {
+		$result[$row[$field]] = $row;
+	}
+	return $result;
+}
+
+/**
  * Initialize access to SQLite3 database
  *
  * The function creates a semaphore for exclusive SQLite3 access. It is
