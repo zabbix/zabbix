@@ -360,14 +360,13 @@ elseif (isset($_REQUEST['save'])) {
 			$interfaces[$jmxAgentId]['main'] = '1';
 		}
 
-		// remove empty new macro lines
+		// ignore empty new macros, i.e., macros rows that have not been filled
 		foreach ($macros as $mnum => $macro) {
 			if (!isset($macro['hostmacroid']) && zbx_empty($macro['macro']) && zbx_empty($macro['value'])) {
 				unset($macros[$mnum]);
 			}
 		}
 
-		$duplicatedMacros = array();
 		foreach ($macros as $mnum => $macro) {
 			// transform macros to uppercase {$aaa} => {$AAA}
 			$macros[$mnum]['macro'] = zbx_strtoupper($macro['macro']);
