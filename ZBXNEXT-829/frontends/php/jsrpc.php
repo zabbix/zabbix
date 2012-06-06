@@ -154,7 +154,7 @@ switch ($data['method']) {
 		$config = select_config();
 		$session = Z::getInstance()->getSession();
 
-		if (!isset($session['serverCheckResult']) || ($session['serverCheckTime'] + $config['server_check_interval']) <= time()) {
+		if (!isset($session['serverCheckResult']) || ($session['serverCheckTime'] + SERVER_CHECK_INTERVAL) <= time()) {
 			$session['serverCheckResult'] = zabbixIsRunning();
 			$session['serverCheckTime'] = time();
 		}
