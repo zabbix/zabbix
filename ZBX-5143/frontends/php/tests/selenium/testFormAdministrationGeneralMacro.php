@@ -45,6 +45,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Macros');
+		$this->assertElementPresent('configDropDown');
 
 		$this->checkTitle('Configuration of macros');
 		$this->ok('CONFIGURATION OF MACROS');
