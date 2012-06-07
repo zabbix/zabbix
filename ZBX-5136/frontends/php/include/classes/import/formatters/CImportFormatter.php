@@ -164,4 +164,32 @@ abstract class CImportFormatter {
 	protected function renameItemFields(array $item) {
 		return $this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
 	}
+
+	/**
+	 * Rename triggers, trigger prototypes fields.
+	 *
+	 * @param array $trigger
+	 *
+	 * @return array
+	 */
+	protected function renameTriggerFields(array $trigger) {
+		$trigger = $this->renameData($trigger, array('description' => 'comments'));
+		return $this->renameData($trigger, array('name' => 'description', 'severity' => 'priority'));
+	}
+
+	/**
+	 * Rename graphs, graph prototypes fields.
+	 *
+	 * @param array $graph
+	 *
+	 * @return array
+	 */
+	protected function renameGraphFields(array $graph) {
+		return $this->renameData($graph, array(
+			'type' => 'graphtype',
+			'ymin_type_1' => 'ymin_type',
+			'ymax_type_1' => 'ymax_type',
+			'graph_items' => 'gitems'
+		));
+	}
 }
