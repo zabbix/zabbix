@@ -40,8 +40,8 @@ XML
 				array(
 					'root' => array(
 						'tag' => 'tag',
-						'empty_tag' => null,
-						'empty' => null,
+						'empty_tag' => '',
+						'empty' => '',
 						'array' => array(
 							'tag' => 'tag'
 						)
@@ -58,7 +58,7 @@ XML
 		$reader = new CXmlImportReader();
 		$array = $reader->read($xml);
 
-		$this->assertEquals($array, $expectedResult);
+		$this->assertTrue($array === $expectedResult);
 	}
 
 }

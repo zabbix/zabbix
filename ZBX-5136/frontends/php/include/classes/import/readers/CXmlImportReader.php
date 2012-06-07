@@ -72,7 +72,7 @@ class CXmlImportReader extends CImportReader {
 	 * @return array|string
 	 */
 	protected function xmlToArray(XMLReader $xml) {
-		$array = null;
+		$array = '';
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:
@@ -84,7 +84,7 @@ class CXmlImportReader extends CImportReader {
 					if (isset($array[$nodeName])) {
 						$nodeName .= count($array);
 					}
-					$array[$nodeName] = $xml->isEmptyElement ? null : $this->xmlToArray($xml);
+					$array[$nodeName] = $xml->isEmptyElement ? '' : $this->xmlToArray($xml);
 					break;
 
 				case XMLReader::TEXT:
