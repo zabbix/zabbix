@@ -164,13 +164,13 @@ class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
 
 	public function checkbox_select($a) {
 		if (!$this->isChecked($a)) {
-			$this->check($a);
+			$this->click($a);
 		}
 	}
 
 	public function checkbox_unselect($a) {
 		if ($this->isChecked($a)) {
-			$this->uncheck($a);
+			$this->click($a);
 		}
 	}
 
