@@ -25,7 +25,7 @@ class testPageBrowserWarning extends CWebTest {
 
 	public function testPageBrowserWarning_CheckLayout() {
 		$this->open('browserwarning.php');
-		$this->checkTitle('WARNING! You are using an outdated browser.');
+		$this->assertTitle('WARNING! You are using an outdated browser.');
 		$this->ok('WARNING! You are using an outdated browser.');
 		$this->ok(array(
 			'Google Chrome',
