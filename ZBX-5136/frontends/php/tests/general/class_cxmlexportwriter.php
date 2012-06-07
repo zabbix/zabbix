@@ -18,46 +18,45 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/classes/import/readers/CImportReader.php';
-require_once dirname(__FILE__).'/../../include/classes/import/readers/CXmlImportReader.php';
+require_once dirname(__FILE__).'/../../include/func.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/export/writers/CExportWriter.php';
+require_once dirname(__FILE__).'/../../include/classes/export/writers/CXmlExportWriter.php';
 
-class class_cxmlimportreader extends PHPUnit_Framework_TestCase {
+class class_cxmlexportwriter extends PHPUnit_Framework_TestCase {
 
 	public static function provider() {
 		return array(
 			array(
-				<<< XML
-<root>
-	<tag>tag</tag>
-	<empty_tag></empty_tag>
-	<empty />
-	<array>
-		<tag>tag</tag>
-	</array>
-</root>
-XML
-				,
 				array(
 					'root' => array(
-						'tag' => 'tag',
-						'empty_tag' => '',
+						'string' => 'string',
+						'null' => null,
 						'empty' => '',
 						'array' => array(
-							'tag' => 'tag'
+							'string' => 'string'
 						)
 					)
 				),
-			),
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
+				"<root>\n".
+				"    <string>string</string>\n".
+				"    <null/>\n".
+				"    <empty/>\n".
+				"    <array>\n".
+				"        <string>string</string>\n".
+				"    </array>\n".
+				"</root>\n"
+			)
 		);
 	}
 
 	/**
 	 * @dataProvider provider
 	 */
-	public function test_readXml($xml, $expectedResult) {
-		$reader = new CXmlImportReader();
-		$array = $reader->read($xml);
+	public function test_writeXml($array, $expectedResult) {
+		$writer = new CXmlExportWriter();
+		$xml = $writer->write($array);
 
-		$this->assertTrue($array === $expectedResult);
+		$this->assertEquals($xml, $expectedResult);
 	}
 }
