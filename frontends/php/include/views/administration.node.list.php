@@ -17,36 +17,31 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $nodeWidget = new CWidget();
 
-// create new proxy button
 $configComboBox = new CComboBox('config', 'nodes.php', 'javascript: redirect(this.options[this.selectedIndex].value);');
 $configComboBox->addItem('nodes.php', _('Nodes'));
 $configComboBox->addItem('proxies.php', _('Proxies'));
 
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$createForm->addItem($configComboBox);
-$createForm->addItem(ZBX_DISTRIBUTED ? new CSubmit('form', _('Create node')) : null);
-$nodeWidget->addPageHeader(_('CONFIGURATION OF NODES'), $createForm);
+$nodeTable = new CTableInfo(_('Your setup is not configured for distributed monitoring.'));
 
-// create form
-$nodeForm = new CForm('get');
-$nodeForm->setName('nodeForm');
-$nodeForm->addItem(BR());
-
+$createForm = null;
 if (ZBX_DISTRIBUTED) {
 	$nodeWidget->addHeader(_('Nodes'));
 
-	// create table
+	$createForm = new CForm();
+	$createForm->cleanItems();
+	$createForm->addItem(new CSubmit('form', _('Create node')));
+
+
 	$nodeTable = new CTableInfo(_('No nodes defined.'));
 	$nodeTable->setHeader(array(
 		make_sorting_header(_('ID'), 'n.nodeid'),
 		make_sorting_header(_('Name'), 'n.name'),
 		_('Type'),
-		make_sorting_header(_('IP').SPACE.':'.SPACE._('Port'), 'n.ip')
+		make_sorting_header(_('IP').' : '._('Port'), 'n.ip')
 	));
 
 	while ($node = DBfetch($this->data['nodes'])) {
@@ -54,19 +49,15 @@ if (ZBX_DISTRIBUTED) {
 			$node['nodeid'],
 			array(
 				get_node_path($node['masterid']),
-				new CLink($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name'], '?&form=update&nodeid='.$node['nodeid'])
+				new CLink($node['name'], '?form=update&nodeid='.$node['nodeid'])
 			),
 			node_type2str($node['nodetype']),
-			new CSpan($node['ip'].SPACE.':'.SPACE.$node['port'], $node['nodetype'] ? 'bold' : null)
+			$node['ip'].' : '.$node['port']
 		));
 	}
-	$nodeForm->addItem($nodeTable);
-}
-else {
-	$nodeForm->addItem(new CTable(new CCol(_('Your setup is not configured for distributed monitoring.'), 'center'), 'formElementTable'));
 }
 
-// append form to widget
-$nodeWidget->addItem($nodeForm);
+$nodeWidget->addPageHeader(_('CONFIGURATION OF NODES'), array($configComboBox, $createForm));
+$nodeWidget->addItem($nodeTable);
+
 return $nodeWidget;
-?>

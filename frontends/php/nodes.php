@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/nodes.inc.php';
 
@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'nodeid' =>			array(T_ZBX_INT, O_NO,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
+	'nodeid' =>			array(T_ZBX_INT, O_OPT,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 	'new_nodeid' =>		array(T_ZBX_STR, O_OPT, null,	DB_ID.NOT_ZERO,	'isset({save})', _('ID')),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({save})'),
 	'ip' =>				array(T_ZBX_IP,	 O_OPT, null,	null,			'isset({save})'),
@@ -46,7 +46,6 @@ $fields = array(
 	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,	null)
 );
 check_fields($fields);
-validate_sort_and_sortorder();
 
 /*
  * Permissions
@@ -60,8 +59,6 @@ if (count($available_nodes) == 0) {
  * Actions
  */
 if (isset($_REQUEST['save'])) {
-	$result = false;
-
 	if (isset($_REQUEST['nodeid'])) {
 		$nodeid = get_request('nodeid');
 
@@ -108,9 +105,8 @@ elseif (isset($_REQUEST['delete'])) {
  */
 if (isset($_REQUEST['form'])) {
 	$data = array(
-		'form' => get_request('form', 1),
-		'form_refresh' => get_request('form_refresh', 0) + 1,
-		'nodeid' => get_request('nodeid')
+		'nodeid' => get_request('nodeid'),
+		'masterNode' => DBfetch(DBselect('SELECT n.name FROM nodes n WHERE n.masterid IS NULL AND n.nodetype='.ZBX_NODE_MASTER))
 	);
 
 	if (isset($_REQUEST['nodeid']) && !isset($_REQUEST['form_refresh'])) {
@@ -121,7 +117,7 @@ if (isset($_REQUEST['form'])) {
 		$data['ip'] = $node['ip'];
 		$data['port'] = $node['port'];
 		$data['masterid'] = $node['masterid'];
-		$data['nodetype'] = detect_node_type($node['nodeid'], $node['masterid']);
+		$data['nodetype'] = $node['nodetype'];
 	}
 	else {
 		$data['new_nodeid'] = get_request('new_nodeid');
@@ -132,25 +128,20 @@ if (isset($_REQUEST['form'])) {
 		$data['masterid'] = get_request('masterid', get_current_nodeid(false));
 	}
 
-	$data['masterNode'] = DBfetch(DBselect('SELECT n.name FROM nodes n WHERE n.masterid IS NULL AND n.nodetype='.ZBX_NODE_MASTER));
-
-	// render view
 	$nodeView = new CView('administration.node.edit', $data);
-	$nodeView->render();
-	$nodeView->show();
 }
 else {
-	$data = array();
+	validate_sort_and_sortorder();
 
+	$data = array();
 	if (ZBX_DISTRIBUTED) {
 		$data['nodes'] = DBselect('SELECT n.* FROM nodes n '.order_by('n.nodeid,n.name,n.ip', 'n.masterid'));
 	}
 
-	// render view
 	$nodeView = new CView('administration.node.list', $data);
-	$nodeView->render();
-	$nodeView->show();
 }
 
+$nodeView->render();
+$nodeView->show();
+
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
