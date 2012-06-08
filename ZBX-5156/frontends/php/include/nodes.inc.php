@@ -335,12 +335,16 @@ function get_node_by_nodeid($nodeid) {
 	return DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodeid='.$nodeid));
 }
 
-function get_node_path($nodeid, $result = '/') {
-	if ($node_data = get_node_by_nodeid($nodeid)) {
+function get_node_path($nodeid, $result = '') {
+	global $ZBX_NODES;
+
+	$node_data = isset($ZBX_NODES[$nodeid]) ? $ZBX_NODES[$nodeid] : false;
+	if ($node_data) {
 		if ($node_data['masterid']) {
 			$result = get_node_path($node_data['masterid'], $result);
 		}
-		$result .= $node_data['name'].'/';
+		$result .= $node_data['name'].' &rArr; ';
 	}
+
 	return $result;
 }

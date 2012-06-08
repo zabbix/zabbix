@@ -117,7 +117,7 @@ if (isset($_REQUEST['form'])) {
 		$data['ip'] = $node['ip'];
 		$data['port'] = $node['port'];
 		$data['masterid'] = $node['masterid'];
-		$data['nodetype'] = detect_node_type($node['nodeid'], $node['masterid']);
+		$data['nodetype'] = $node['nodetype'];
 	}
 	else {
 		$data['new_nodeid'] = get_request('new_nodeid');

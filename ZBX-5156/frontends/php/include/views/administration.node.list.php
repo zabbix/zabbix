@@ -49,10 +49,10 @@ if (ZBX_DISTRIBUTED) {
 			$node['nodeid'],
 			array(
 				get_node_path($node['masterid']),
-				new CLink($node['nodetype'] ? new CSpan($node['name'], 'bold') : $node['name'], '?&form=update&nodeid='.$node['nodeid'])
+				new CLink($node['name'], '?form=update&nodeid='.$node['nodeid'])
 			),
 			node_type2str($node['nodetype']),
-			new CSpan($node['ip'].' : '.$node['port'], $node['nodetype'] ? 'bold' : null)
+			$node['ip'].' : '.$node['port']
 		));
 	}
 }
