@@ -80,7 +80,7 @@ switch ($data['method']) {
 		}
 
 		// timeout
-		$timeOut = (time() - $msgsettings['timeout']);
+		$timeOut = time() - $msgsettings['timeout'];
 		$lastMsgTime = 0;
 		if (isset($params['messageLast']['events'])) {
 			$lastMsgTime = $params['messageLast']['events']['time'];
@@ -145,7 +145,7 @@ switch ($data['method']) {
 		$msgsettings = getMessageSettings();
 		switch (strtolower($params['caption'])) {
 			case 'events':
-				$msgsettings['last.clock'] = (int)$params['time'] + 1;
+				$msgsettings['last.clock'] = (int) $params['time'] + 1;
 				updateMessageSettings($msgsettings);
 				break;
 		}
@@ -165,6 +165,14 @@ switch ($data['method']) {
 		$result = array(
 			'result' => (bool) $checkStatus,
 			'message' => $checkStatus ? '' : _('Zabbix server might be down!')
+		);
+		break;
+	case 'flickerfreeScreenItem.get':
+		$name = $data['name'];
+		$screenItem = new $name($data);
+
+		$result = array(
+			'data' => $screenItem->get()
 		);
 		break;
 	default:

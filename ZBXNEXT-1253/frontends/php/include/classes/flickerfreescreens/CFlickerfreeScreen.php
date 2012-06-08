@@ -1,0 +1,371 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2000-2011 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+class CFlickerfreeScreen {
+
+	public $screen;
+	public $mode;
+	public $effectiveperiod;
+
+	public function __construct(array $options = array()) {
+		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
+		$this->effectiveperiod = isset($options['effectiveperiod']) ? $options['effectiveperiod'] : ZBX_MIN_PERIOD;
+
+		// get screen
+		if (!empty($options['screen'])) {
+			$this->screen = $options['screen'];
+		}
+		elseif (!empty($options['screenid'])) {
+			$options = array(
+				'output' => API_OUTPUT_EXTEND,
+				'selectScreenItems' => API_OUTPUT_EXTEND
+			);
+			if (in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_EDIT))) {
+				$options['editable'] = true;
+			}
+			if (!empty($options['screenid'])) {
+				$options['screenids'] = $options['screenid'];
+			}
+			else {
+				access_deny();
+			}
+
+			$this->screen = API::Screen()->get($options);
+			if (empty($this->screen)) {
+				$this->screen = API::TemplateScreen()->get($options);
+				if (empty($this->screen)) {
+					access_deny();
+				}
+			}
+			$this->screen = reset($this->screen);
+		}
+	}
+
+	private function getClass($resourcetype) {
+		switch ($resourcetype) {
+			case SCREEN_RESOURCE_GRAPH:
+				return new CFlickerfreeScreenGraph();
+			case SCREEN_RESOURCE_SIMPLE_GRAPH:
+				return new CFlickerfreeScreenGraphSimple();
+			case SCREEN_RESOURCE_MAP:
+				return new CFlickerfreeScreenMap();
+			case SCREEN_RESOURCE_PLAIN_TEXT:
+				return new CFlickerfreeScreenPlainText();
+			case SCREEN_RESOURCE_HOSTS_INFO:
+				return new CFlickerfreeScreenHostsInfo();
+			case SCREEN_RESOURCE_TRIGGERS_INFO:
+				return new CFlickerfreeScreenTriggersInfo();
+			case SCREEN_RESOURCE_SERVER_INFO:
+				return new CFlickerfreeScreenServerInfo();
+			case SCREEN_RESOURCE_CLOCK:
+				return new CFlickerfreeScreenClock();
+			case SCREEN_RESOURCE_SCREEN:
+				return new CFlickerfreeScreenScreen();
+			case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+				return new CFlickerfreeScreenTriggersOverview();
+			case SCREEN_RESOURCE_DATA_OVERVIEW:
+				return new CFlickerfreeScreenDataOverview();
+			case SCREEN_RESOURCE_URL:
+				return new CFlickerfreeScreenUrl();
+			case SCREEN_RESOURCE_ACTIONS:
+				return new CFlickerfreeScreenActions();
+			case SCREEN_RESOURCE_EVENTS:
+				return new CFlickerfreeScreenEvents();
+			case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+				return new CFlickerfreeScreenHostgroupTriggers();
+			case SCREEN_RESOURCE_SYSTEM_STATUS:
+				return new CFlickerfreeScreenSystemStatus();
+			case SCREEN_RESOURCE_HOST_TRIGGERS:
+				return new CFlickerfreeScreenHostTriggers();
+			default:
+				return null;
+		}
+	}
+
+	public function show() {
+		if (empty($this->screen)) {
+			return new CTableInfo(_('No screens defined.'));
+		}
+
+		$skipedFields = array();
+		$screenitems = array();
+		$emptyScreenColumns = array();
+
+		foreach ($this->screen['screenitems'] as $screenitem) {
+			$screenitems[] = $screenitem;
+
+			for ($i = 0; $i < $screenitem['rowspan'] || $i == 0; $i++) {
+				for ($j = 0; $j < $screenitem['colspan'] || $j == 0; $j++) {
+					if ($i != 0 || $j != 0) {
+						if (!isset($skipedFields[$screenitem['y'] + $i])) {
+							$skipedFields[$screenitem['y'] + $i] = array();
+						}
+						$skipedFields[$screenitem['y'] + $i][$screenitem['x'] + $j] = 1;
+					}
+				}
+			}
+		}
+
+		// create screen table
+		$screenTable = new CTable(
+			new CLink(
+				_('No rows in screen.').SPACE.$this->screen['name'],
+				'screenconf.php?config=0&form=update&screenid='.$this->screen['screenid']),
+				($this->mode == SCREEN_MODE_PREVIEW || $this->mode == SCREEN_MODE_VIEW) ? 'screen_view' : 'screen_edit'
+		);
+		$screenTable->setAttribute('id', 'iframe');
+
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$newColumns = array(new CCol(new CImg('images/general/zero.png', 'zero', 1, 1)));
+
+			for ($i = 0, $size = $this->screen['hsize'] + 1; $i < $size; $i++) {
+				$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
+				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i.'";');
+
+				array_push($newColumns, new CCol($icon));
+			}
+
+			$screenTable->addRow($newColumns);
+		}
+
+		for ($r = 0; $r < $this->screen['vsize']; $r++) {
+			$newColumns = array();
+			$emptyScreenRow = true;
+
+			if ($this->mode == SCREEN_MODE_EDIT) {
+				$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
+				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
+
+				array_push($newColumns, new CCol($icon));
+			}
+
+			for ($c = 0; $c < $this->screen['hsize']; $c++) {
+				if (isset($skipedFields[$r][$c])) {
+					continue;
+				}
+
+				$isEditForm = false;
+				$screenitem = array();
+
+				foreach ($screenitems as $tmprow) {
+					if ($tmprow['x'] == $c && $tmprow['y'] == $r) {
+						$screenitem = $tmprow;
+						break;
+					}
+				}
+
+				if (empty($screenitem)) {
+					$screenitem = array(
+						'screenitemid' => 0,
+						'resourcetype' => 0,
+						'resourceid' => 0,
+						'width' => 0,
+						'height' => 0,
+						'colspan' => 1,
+						'rowspan' => 1,
+						'elements' => 0,
+						'valign' => VALIGN_DEFAULT,
+						'halign' => HALIGN_DEFAULT,
+						'style' => 0,
+						'url' => '',
+						'dynamic' => 0,
+						'sort_triggers' => SCREEN_SORT_TRIGGERS_DATE_DESC
+					);
+				}
+
+				if ($screenitem['screenitemid'] > 0) {
+					$emptyScreenRow = false;
+					$emptyScreenColumns[$c] = 1;
+				}
+
+				if ($this->mode == SCREEN_MODE_EDIT && $screenitem['screenitemid'] != 0) {
+					$action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitem['screenitemid'];
+				}
+				elseif ($this->mode == SCREEN_MODE_EDIT && $screenitem['screenitemid'] == 0) {
+					$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
+				}
+				else {
+					$action = null;
+				}
+
+				if ($this->mode == SCREEN_MODE_EDIT && isset($_REQUEST['form'])
+						&& (isset($_REQUEST['x']) && $_REQUEST['x'] == $c && isset($_REQUEST['y']) && $_REQUEST['y'] == $r)
+								|| (isset($_REQUEST['screenitemid']) && bccomp($_REQUEST['screenitemid'], $screenitem['screenitemid']) == 0)) {
+					$screenView = new CView('configuration.screen.constructor.edit', array('screen' => $this->screen));
+					$item = $screenView->render();
+					$isEditForm = true;
+				}
+				elseif (!empty($screenitem['screenitemid']) && isset($screenitem['resourcetype'])) {
+					$flickerfreeScreen = $this->getClass($screenitem['resourcetype']);
+					if (!empty($flickerfreeScreen)) {
+						$flickerfreeScreen->screenitem = $screenitem;
+						$flickerfreeScreen->mode = $this->mode;
+						$flickerfreeScreen->effectiveperiod = $this->effectiveperiod;
+
+						$item = $flickerfreeScreen->get();
+					}
+					else {
+						$item = null;
+					}
+				}
+				else {
+					$item = array(SPACE);
+					if ($this->mode == SCREEN_MODE_EDIT) {
+						array_push($item, BR(), new CLink(_('Change'), $action, 'empty_change_link'));
+					}
+				}
+
+				$str_halign = 'def';
+				if ($screenitem['halign'] == HALIGN_CENTER) {
+					$str_halign = 'cntr';
+				}
+				if ($screenitem['halign'] == HALIGN_LEFT) {
+					$str_halign = 'left';
+				}
+				if ($screenitem['halign'] == HALIGN_RIGHT) {
+					$str_halign = 'right';
+				}
+
+				$str_valign = 'def';
+				if ($screenitem['valign'] == VALIGN_MIDDLE) {
+					$str_valign = 'mdl';
+				}
+				if ($screenitem['valign'] == VALIGN_TOP) {
+					$str_valign = 'top';
+				}
+				if ($screenitem['valign'] == VALIGN_BOTTOM) {
+					$str_valign = 'bttm';
+				}
+
+				if ($this->mode == SCREEN_MODE_EDIT && !$isEditForm) {
+					$item = new CDiv($item, 'draggable');
+					$item->setAttribute('id', 'position_'.$r.'_'.$c);
+					$item->setAttribute('data-xcoord', $c);
+					$item->setAttribute('data-ycoord', $r);
+				}
+
+				$newColumn = new CCol($item, $str_halign.'_'.$str_valign.' screenitem');
+				if (!empty($screenitem['colspan'])) {
+					$newColumn->setColSpan($screenitem['colspan']);
+				}
+				if (!empty($screenitem['rowspan'])) {
+					$newColumn->setRowSpan($screenitem['rowspan']);
+				}
+				array_push($newColumns, $newColumn);
+			}
+
+			if ($this->mode == SCREEN_MODE_EDIT) {
+				$icon = new CImg('images/general/minus.png', null, null, null, 'pointer');
+				if ($emptyScreenRow) {
+					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";';
+				}
+				else {
+					$removeRowLink = 'javascript: if (Confirm("'._('This screen-row is not empty. Delete it?').'")) {'.
+						' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'"; }';
+				}
+				$icon->addAction('onclick', $removeRowLink);
+				array_push($newColumns, new CCol($icon));
+			}
+			$screenTable->addRow(new CRow($newColumns));
+		}
+
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
+			$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
+			$newColumns = array(new CCol($icon));
+
+			for ($i = 0; $i < $this->screen['hsize']; $i++) {
+				$icon = new CImg('images/general/minus.png', null, null, null, 'pointer');
+				if (isset($emptyScreenColumns[$i])) {
+					$removeColumnLink = 'javascript: if (Confirm("'._('This screen-column is not empty. Delete it?').'")) {'.
+						' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_col='.$i.'"; }';
+				}
+				else {
+					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&rmv_col='.$i.'";';
+				}
+				$icon->addAction('onclick', $removeColumnLink);
+
+				array_push($newColumns, new CCol($icon));
+			}
+
+			array_push($newColumns, new CCol(new CImg('images/general/zero.png', 'zero', 1, 1)));
+			$screenTable->addRow($newColumns);
+		}
+
+		return $screenTable;
+	}
+}
+
+class CFlickerfreeScreenItem {
+
+	public $screen;
+	public $screenitem;
+	public $mode;
+	public $effectiveperiod;
+
+	public function __construct(array $options = array()) {
+		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
+
+		// get screen
+		if (!empty($options['screen'])) {
+			$this->screen = $options['screen'];
+		}
+		elseif (!empty($options['screenid']) || !empty($options['screenitemid'])) {
+			$options = array(
+				'output' => API_OUTPUT_EXTEND,
+				'selectScreenItems' => API_OUTPUT_SHORTEN
+			);
+			if (in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_EDIT))) {
+				$options['editable'] = true;
+			}
+			if (!empty($options['screenid'])) {
+				$options['screenids'] = $options['screenid'];
+			}
+			elseif (!empty($options['screenitemid'])) {
+				$options['screenitemids'] = $options['screenitemid'];
+			}
+			else {
+				access_deny();
+			}
+
+			$this->screen = API::Screen()->get($options);
+			if (empty($this->screen)) {
+				$this->screen = API::TemplateScreen()->get($options);
+				if (empty($this->screen)) {
+					access_deny();
+				}
+			}
+			$this->screen = reset($this->screen);
+		}
+
+		// get screen item
+		if (!empty($options['screenitemid'])) {
+			$this->screenitem = API::ScreenItem()->get(array(
+				'screenitemids' => $options['screenitemid'],
+				'output' => API_OUTPUT_EXTEND
+			));
+
+			if (!empty($this->screenitem)) {
+				$this->screenitem = reset($this->screenitem);
+			}
+		}
+	}
+}

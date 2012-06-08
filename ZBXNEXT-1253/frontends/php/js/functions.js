@@ -177,7 +177,7 @@ function add_logexpr() {
 	td.setAttribute(IE ? 'cssText' : 'style', 'white-space: nowrap;');
 
 	var img = document.createElement('img');
-	img.setAttribute('src', 'images/general/arrowup.gif');
+	img.setAttribute('src', 'images/general/arrow_up.png');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'up');
 
@@ -190,7 +190,7 @@ function add_logexpr() {
 	td.appendChild(document.createTextNode(' '));
 
 	var img = document.createElement('img');
-	img.setAttribute('src', 'images/general/arrowdown.gif');
+	img.setAttribute('src', 'images/general/arrow_down.png');
 	img.setAttribute('border', '0');
 	img.setAttribute('alt', 'down');
 

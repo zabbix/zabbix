@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 require_once dirname(__FILE__).'/include/screens.inc.php';
@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 $page['title'] = _('Custom screens');
 $page['file'] = 'screens.php';
 $page['hist_arg'] = array('elementid', 'screenname');
-$page['scripts'] = array('class.calendar.js', 'gtlc.js');
+$page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreens.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 if (PAGE_TYPE_HTML == $page['type']) {
@@ -160,4 +160,3 @@ $screenView->render();
 $screenView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * File containing CTemplateScreen class for API.
  * @package API
@@ -144,12 +144,12 @@ class CTemplateScreen extends CScreen {
 				$sqlParts['where'][] = 'r.permission>='.$permission;
 				$sqlParts['where'][] = 'NOT EXISTS ('.
 					' SELECT hgg.groupid'.
-					' FROM hosts_groups hgg,rights rr,users_groups gg'.
+						' FROM hosts_groups hgg,rights rr,users_groups gg'.
 					' WHERE hgg.hostid=hg.hostid'.
-					' AND rr.id=hgg.groupid'.
-					' AND rr.groupid=gg.usrgrpid'.
-					' AND gg.userid='.self::$userData['userid'].
-					' AND rr.permission<'.$permission.')';
+						' AND rr.id=hgg.groupid'.
+						' AND rr.groupid=gg.usrgrpid'.
+						' AND gg.userid='.self::$userData['userid'].
+						' AND rr.permission<'.$permission.')';
 			}
 		}
 
@@ -288,9 +288,9 @@ class CTemplateScreen extends CScreen {
 		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.'
 					FROM '.$sqlFrom.'
 					WHERE '.DBin_node('s.screenid', $nodeids).
-			$sqlWhere.
-			$sqlGroup.
-			$sqlOrder;
+					$sqlWhere.
+					$sqlGroup.
+					$sqlOrder;
 
 		$res = DBselect($sql, $sqlLimit);
 		while ($screen = DBfetch($res)) {
@@ -409,7 +409,7 @@ class CTemplateScreen extends CScreen {
 				));
 
 				$realItems = array();
-				foreach ($dbItems as $itemid => $item) {
+				foreach ($dbItems as $item) {
 					unset($item['hosts']);
 
 					if (!isset($realItems[$item['hostid']])) {
@@ -532,7 +532,7 @@ class CTemplateScreen extends CScreen {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for screen "%s".', $screen['name']));
 			}
 
-			foreach ($dbScreens as $dbsnum => $dbScreen) {
+			foreach ($dbScreens as $dbScreen) {
 				if ($dbScreen['name'] == $screen['name'] && bccomp($dbScreen['templateid'], $screen['templateid']) == 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen').' "'.$dbScreen['name'].'" '._('already exists'));
 				}
@@ -567,14 +567,13 @@ class CTemplateScreen extends CScreen {
 		$screens = zbx_toArray($screens);
 		$update = array();
 
-		$options = array(
+		$updScreens = $this->get(array(
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		);
-		$updScreens = $this->get($options);
-		foreach ($screens as $gnum => $screen) {
+		));
+		foreach ($screens as $screen) {
 			if (!isset($screen['screenid'], $updScreens[$screen['screenid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
@@ -592,20 +591,20 @@ class CTemplateScreen extends CScreen {
 			}
 
 			if (isset($screen['name'])) {
-				$options = array(
+				$existScreens = $this->get(array(
 					'filter' => array(
 						'name' => $screen['name'],
 						'templateid' => $dbScreen['templateid']
 					),
-					'preservekeys' => 1,
-					'nopermissions' => 1,
+					'preservekeys' => true,
+					'nopermissions' => true,
 					'output' => API_OUTPUT_SHORTEN
-				);
-				$existScreens = $this->get($options);
+				));
 				$existScreen = reset($existScreens);
 
-				if ($existScreen && (bccomp($existScreen['screenid'], $screen['screenid']) != 0))
+				if ($existScreen && bccomp($existScreen['screenid'], $screen['screenid']) != 0) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Screen').' "'.$screen['name'].'" '._('already exists'));
+				}
 			}
 
 			$screenid = $screen['screenid'];
@@ -654,4 +653,3 @@ class CTemplateScreen extends CScreen {
 		return array('screenids' => $screenids);
 	}
 }
-?>

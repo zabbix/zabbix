@@ -16,6 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf('opera') != -1) && window.opera;
 var IE = (agt.indexOf('msie') != -1) && document.all && !OP;

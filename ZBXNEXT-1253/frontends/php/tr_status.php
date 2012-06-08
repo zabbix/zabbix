@@ -506,7 +506,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 				$dep_table->addRow(' - '.expand_trigger_description($dep['triggerid']));
 			}
 
-			$img = new Cimg('images/general/down_icon.png', 'DEP_UP');
+			$img = new Cimg('images/general/arrow_down2.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 
@@ -527,7 +527,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		}
 
 		if($dependency){
-			$img = new Cimg('images/general/up_icon.png', 'DEP_UP');
+			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 

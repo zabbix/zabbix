@@ -227,8 +227,8 @@ define('HOST_MAINTENANCE_STATUS_ON',	1);
 define('INTERFACE_SECONDARY',	0);
 define('INTERFACE_PRIMARY',		1);
 
-define('INTERFACE_USE_DNS',		0);
-define('INTERFACE_USE_IP',		1);
+define('INTERFACE_USE_DNS',	0);
+define('INTERFACE_USE_IP',	1);
 
 define('INTERFACE_TYPE_ANY',		-1);
 define('INTERFACE_TYPE_UNKNOWN',	0);
@@ -255,8 +255,8 @@ define('TIMEPERIOD_TYPE_WEEKLY',	3);
 define('TIMEPERIOD_TYPE_MONTHLY',	4);
 define('TIMEPERIOD_TYPE_YEARLY',	5);
 
-define('SYSMAP_LABEL_ADVANCED_OFF',		0);
-define('SYSMAP_LABEL_ADVANCED_ON',		1);
+define('SYSMAP_LABEL_ADVANCED_OFF',	0);
+define('SYSMAP_LABEL_ADVANCED_ON',	1);
 
 define('MAP_LABEL_TYPE_LABEL',		0);
 define('MAP_LABEL_TYPE_IP',			1);
@@ -265,10 +265,10 @@ define('MAP_LABEL_TYPE_STATUS',		3);
 define('MAP_LABEL_TYPE_NOTHING',	4);
 define('MAP_LABEL_TYPE_CUSTOM',		5);
 
-define('MAP_LABEL_LOC_BOTTOM',		0);
-define('MAP_LABEL_LOC_LEFT',		1);
-define('MAP_LABEL_LOC_RIGHT',		2);
-define('MAP_LABEL_LOC_TOP',			3);
+define('MAP_LABEL_LOC_BOTTOM',	0);
+define('MAP_LABEL_LOC_LEFT',	1);
+define('MAP_LABEL_LOC_RIGHT',	2);
+define('MAP_LABEL_LOC_TOP',		3);
 
 define('SYSMAP_ELEMENT_TYPE_HOST',		0);
 define('SYSMAP_ELEMENT_TYPE_MAP',		1);
@@ -276,11 +276,11 @@ define('SYSMAP_ELEMENT_TYPE_TRIGGER',	2);
 define('SYSMAP_ELEMENT_TYPE_HOST_GROUP',3);
 define('SYSMAP_ELEMENT_TYPE_IMAGE',		4);
 
-define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP', 0);
-define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS', 1);
+define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP',				0);
+define('SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS',	1);
 
-define('SYSMAP_ELEMENT_AREA_TYPE_FIT', 0);
-define('SYSMAP_ELEMENT_AREA_TYPE_CUSTOM', 1);
+define('SYSMAP_ELEMENT_AREA_TYPE_FIT',		0);
+define('SYSMAP_ELEMENT_AREA_TYPE_CUSTOM',	1);
 
 define('SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID', 0);
 
@@ -292,11 +292,11 @@ define('SYSMAP_ELEMENT_ICON_DISABLED',		4);
 define('SYSMAP_HIGHLIGHT_OFF',		0);
 define('SYSMAP_HIGHLIGHT_ON',		1);
 
-define('SYSMAP_EXPANDPROBLEM_OFF',		0);
-define('SYSMAP_EXPANDPROBLEM_ON',		1);
+define('SYSMAP_EXPANDPROBLEM_OFF',	0);
+define('SYSMAP_EXPANDPROBLEM_ON',	1);
 
-define('SYSMAP_MARKELEMENTS_OFF',		0);
-define('SYSMAP_MARKELEMENTS_ON',		1);
+define('SYSMAP_MARKELEMENTS_OFF',	0);
+define('SYSMAP_MARKELEMENTS_ON',	1);
 
 define('SYSMAP_GRID_SHOW_ON',		1);
 define('SYSMAP_GRID_SHOW_OFF',		0);
@@ -353,7 +353,7 @@ define('ITEM_STATUS_ACTIVE',		0);
 define('ITEM_STATUS_DISABLED',		1);
 define('ITEM_STATUS_NOTSUPPORTED',	3);
 
-define('ITEM_TYPE_SNMPTRAP',			17);
+define('ITEM_TYPE_SNMPTRAP', 17);
 
 define('ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV',	0);
 define('ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV',		1);
@@ -387,10 +387,10 @@ define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
 
 define('SERVICE_SLA', 99.05);
 
-define('SERVICE_SHOW_SLA_OFF', 0);
-define('SERVICE_SHOW_SLA_ON',  1);
+define('SERVICE_SHOW_SLA_OFF',	0);
+define('SERVICE_SHOW_SLA_ON',	1);
 
-define('SERVICE_STATUS_OK',  0);
+define('SERVICE_STATUS_OK', 0);
 
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
@@ -398,15 +398,15 @@ define('TRIGGER_MULT_EVENT_ENABLED',	1);
 define('TRIGGER_STATUS_ENABLED',	0);
 define('TRIGGER_STATUS_DISABLED',	1);
 
-define('TRIGGER_VALUE_FALSE',		0);
-define('TRIGGER_VALUE_TRUE',		1);
-define('TRIGGER_VALUE_UNKNOWN',		2); // only in "events" table
+define('TRIGGER_VALUE_FALSE',	0);
+define('TRIGGER_VALUE_TRUE',	1);
+define('TRIGGER_VALUE_UNKNOWN', 2); // only in "events" table
 
-define('TRIGGER_VALUE_FLAG_NORMAL',	0);
-define('TRIGGER_VALUE_FLAG_UNKNOWN',1);
+define('TRIGGER_VALUE_FLAG_NORMAL',		0);
+define('TRIGGER_VALUE_FLAG_UNKNOWN',	1);
 
 define('TRIGGER_VALUE_CHANGED_NO',	0);
-define('TRIGGER_VALUE_CHANGED_YES',	1);
+define('TRIGGER_VALUE_CHANGED_YES', 1);
 
 define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 define('TRIGGER_SEVERITY_INFORMATION',		1);
@@ -419,12 +419,12 @@ define('TRIGGER_SEVERITY_COUNT',			6);
 
 define('ALERT_MAX_RETRIES',		3);
 
-define('ALERT_STATUS_NOT_SENT',		0);
-define('ALERT_STATUS_SENT',			1);
-define('ALERT_STATUS_FAILED',		2);
+define('ALERT_STATUS_NOT_SENT', 0);
+define('ALERT_STATUS_SENT',		1);
+define('ALERT_STATUS_FAILED',	2);
 
-define('ALERT_TYPE_MESSAGE',		0);
-define('ALERT_TYPE_COMMAND',		1);
+define('ALERT_TYPE_MESSAGE',	0);
+define('ALERT_TYPE_COMMAND',	1);
 
 define('MEDIA_TYPE_STATUS_ACTIVE',	0);
 define('MEDIA_TYPE_STATUS_DISABLED',1);
@@ -486,9 +486,7 @@ define('LOGFILE_SEVERITY_DISASTER',			5);
 define('LOGFILE_SEVERITY_AUDIT_SUCCESS',	6);
 define('LOGFILE_SEVERITY_AUDIT_FAILURE',	7);
 
-define('SCREEN_SIMPLE_ITEM',		0);
-define('SCREEN_DYNAMIC_ITEM',		1);
-
+// screen
 define('SCREEN_RESOURCE_GRAPH',				0);
 define('SCREEN_RESOURCE_SIMPLE_GRAPH',		1);
 define('SCREEN_RESOURCE_MAP',				2);
@@ -507,14 +505,21 @@ define('SCREEN_RESOURCE_HOSTGROUP_TRIGGERS',14);
 define('SCREEN_RESOURCE_SYSTEM_STATUS',		15);
 define('SCREEN_RESOURCE_HOST_TRIGGERS',		16);
 
-define('SCREEN_TYPE_NORMAL',	0);
-define('SCREEN_TYPE_TEMPLATED',	1);
-
-define('DEFAULT_LATEST_ISSUES_CNT', 20);
-
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',		0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',	1);
 define('SCREEN_SORT_TRIGGERS_HOST_NAME_ASC',	2);
+
+define('SCREEN_MODE_PREVIEW',	0);
+define('SCREEN_MODE_EDIT',		1);
+define('SCREEN_MODE_VIEW',		2);
+
+define('SCREEN_TYPE_NORMAL',	0);
+define('SCREEN_TYPE_TEMPLATED',	1);
+
+define('SCREEN_SIMPLE_ITEM',	0);
+define('SCREEN_DYNAMIC_ITEM',	1);
+
+define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
 // alignes
 define('HALIGN_DEFAULT',	0);
@@ -557,11 +562,11 @@ define('PROFILE_TYPE_ARRAY_ID',		4);
 define('PROFILE_TYPE_ARRAY_INT',	5);
 define('PROFILE_TYPE_ARRAY_STR',	6);
 
-define('CALC_FNC_MIN',	1);
-define('CALC_FNC_AVG',	2);
-define('CALC_FNC_MAX',	4);
-define('CALC_FNC_ALL',	7);
-define('CALC_FNC_LST',	9);
+define('CALC_FNC_MIN', 1);
+define('CALC_FNC_AVG', 2);
+define('CALC_FNC_MAX', 4);
+define('CALC_FNC_ALL', 7);
+define('CALC_FNC_LST', 9);
 
 define('SERVICE_TIME_TYPE_UPTIME',				0);
 define('SERVICE_TIME_TYPE_DOWNTIME',			1);
@@ -574,18 +579,18 @@ define('USER_TYPE_SUPER_ADMIN',		3);
 define('ZBX_NOT_INTERNAL_GROUP',	0);
 define('ZBX_INTERNAL_GROUP',		1);
 
-define('GROUP_STATUS_DISABLED',		1);
-define('GROUP_STATUS_ENABLED',		0);
+define('GROUP_STATUS_DISABLED', 1);
+define('GROUP_STATUS_ENABLED',	0);
 
 // IMPORTANT!!! by priority DESC
 define('GROUP_GUI_ACCESS_SYSTEM',	0);
-define('GROUP_GUI_ACCESS_INTERNAL',	1);
-define('GROUP_GUI_ACCESS_DISABLED',	2);
+define('GROUP_GUI_ACCESS_INTERNAL', 1);
+define('GROUP_GUI_ACCESS_DISABLED', 2);
 
-define('GROUP_API_ACCESS_DISABLED',	0);
+define('GROUP_API_ACCESS_DISABLED', 0);
 define('GROUP_API_ACCESS_ENABLED',	1);
 
-define('GROUP_DEBUG_MODE_DISABLED',	0);
+define('GROUP_DEBUG_MODE_DISABLED', 0);
 define('GROUP_DEBUG_MODE_ENABLED',	1);
 
 define('PERM_MAX',			3);
@@ -663,16 +668,16 @@ define('GRAPH_TYPE_COLUMN',			7);
 define('GRAPH_TYPE_BAR_STACKED',	8);
 define('GRAPH_TYPE_COLUMN_STACKED',	9);
 
-define('GRAPH_3D_ANGLE',			70);
+define('GRAPH_3D_ANGLE', 70);
 
-define('GRAPH_STACKED_ALFA',		15); // 0..100 transparency
+define('GRAPH_STACKED_ALFA', 15); // 0..100 transparency
 
 define('GRAPH_ZERO_LINE_COLOR_LEFT',	'AAAAAA');
 define('GRAPH_ZERO_LINE_COLOR_RIGHT',	'888888');
 
 define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR', '000');
 
-define('ZBX_MAX_TREND_DIFF',		3600);
+define('ZBX_MAX_TREND_DIFF', 3600);
 
 define('ZBX_GRAPH_MAX_SKIP_CELL',	16);
 define('ZBX_GRAPH_MAX_SKIP_DELAY',	4);
@@ -688,16 +693,16 @@ define('DRULE_STATUS_DISABLED',		1);
 define('DSVC_STATUS_ACTIVE',		0);
 define('DSVC_STATUS_DISABLED',		1);
 
-define('SVC_SSH',	0);
-define('SVC_LDAP',	1);
-define('SVC_SMTP',	2);
-define('SVC_FTP',	3);
-define('SVC_HTTP',	4);
-define('SVC_POP',	5);
-define('SVC_NNTP',	6);
-define('SVC_IMAP',	7);
-define('SVC_TCP',	8);
-define('SVC_AGENT',	9);
+define('SVC_SSH',		0);
+define('SVC_LDAP',		1);
+define('SVC_SMTP',		2);
+define('SVC_FTP',		3);
+define('SVC_HTTP',		4);
+define('SVC_POP',		5);
+define('SVC_NNTP',		6);
+define('SVC_IMAP',		7);
+define('SVC_TCP',		8);
+define('SVC_AGENT',		9);
 define('SVC_SNMPv1',	10);
 define('SVC_SNMPv2c',	11);
 define('SVC_ICMPPING',	12);
@@ -705,12 +710,12 @@ define('SVC_SNMPv3',	13);
 define('SVC_HTTPS',		14);
 define('SVC_TELNET',	15);
 
-define('DHOST_STATUS_ACTIVE',		0);
-define('DHOST_STATUS_DISABLED',		1);
+define('DHOST_STATUS_ACTIVE',	0);
+define('DHOST_STATUS_DISABLED', 1);
 
-define('IM_FORCED',		0);
-define('IM_ESTABLISHED',1);
-define('IM_TREE',		2);
+define('IM_FORCED',			0);
+define('IM_ESTABLISHED',	1);
+define('IM_TREE',			2);
 
 define('EXPRESSION_TYPE_INCLUDED',		0);
 define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
@@ -718,9 +723,9 @@ define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
 define('EXPRESSION_TYPE_TRUE',			3);
 define('EXPRESSION_TYPE_FALSE',			4);
 
-define('HOST_INVENTORY_DISABLED',		-1);
-define('HOST_INVENTORY_MANUAL',			0);
-define('HOST_INVENTORY_AUTOMATIC',		1);
+define('HOST_INVENTORY_DISABLED',	-1);
+define('HOST_INVENTORY_MANUAL',		0);
+define('HOST_INVENTORY_AUTOMATIC',	1);
 
 define('EXPRESSION_VALUE_TYPE_UNKNOWN',	'#ERROR_VALUE_TYPE#');
 define('EXPRESSION_HOST_UNKNOWN',		'#ERROR_HOST#');
@@ -825,7 +830,7 @@ define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
 define('SEC_PER_MONTH',	2592000); // 30 * SEC_PER_DAY
 define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
 
-define('DAY_IN_YEAR',	365);
+define('DAY_IN_YEAR', 365);
 
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);

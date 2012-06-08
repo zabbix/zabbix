@@ -426,9 +426,9 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 	$table->setAttribute('id', 'iframe');
 
 	if ($editmode == 1) {
-		$new_cols = array(new CCol(new CImg('images/general/zero.gif', 'zero', 1, 1)));
+		$new_cols = array(new CCol(new CImg('images/general/zero.png', 'zero', 1, 1)));
 		for ($c = 0; $c < $screen['hsize'] + 1; $c++) {
-			$add_icon = new CImg('images/general/closed.gif', null, null, null, 'pointer');
+			$add_icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
 			$add_icon->addAction('onclick', 'javascript: location.href = \'screenedit.php?config=1&screenid='.$screen['screenid'].'&add_col='.$c.'\';');
 			array_push($new_cols, new CCol($add_icon));
 		}
@@ -442,7 +442,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 		$empty_screen_row = true;
 
 		if ($editmode == 1) {
-			$add_icon = new CImg('images/general/closed.gif', null, null, null, 'pointer');
+			$add_icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
 			$add_icon->addAction('onclick', 'javascript: location.href = \'screenedit.php?config=1&screenid='.$screen['screenid'].'&add_row='.$r.'\';');
 			array_push($new_cols, new CCol($add_icon));
 		}
@@ -1324,7 +1324,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 		}
 
 		if ($editmode == 1) {
-			$removeIcon = new CImg('images/general/opened.gif', null, null, null, 'pointer');
+			$removeIcon = new CImg('images/general/minus.png', null, null, null, 'pointer');
 			if ($empty_screen_row) {
 				$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$screen['screenid'].'&rmv_row='.$r.'";';
 			}
@@ -1339,12 +1339,12 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 	}
 
 	if ($editmode == 1) {
-		$add_icon = new CImg('images/general/closed.gif', null, null, null, 'pointer');
+		$add_icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
 		$add_icon->addAction('onclick', 'javascript: location.href = "screenedit.php?screenid='.$screen['screenid'].'&add_row='.$screen['vsize'].'";');
 		$new_cols = array(new CCol($add_icon));
 
 		for ($c = 0; $c < $screen['hsize']; $c++) {
-			$removeIcon = new CImg('images/general/opened.gif', null, null, null, 'pointer');
+			$removeIcon = new CImg('images/general/minus.png', null, null, null, 'pointer');
 			if (isset($empty_screen_col[$c])) {
 				$removeColumnLink = 'javascript: if (Confirm("'._('This screen-column is not empty. Delete it?').'")) {'.
 					' location.href = "screenedit.php?screenid='.$screen['screenid'].'&rmv_col='.$c.'"; }';
@@ -1356,7 +1356,7 @@ function get_screen($screen, $editmode, $effectiveperiod = null) {
 			array_push($new_cols, new CCol($removeIcon));
 		}
 
-		array_push($new_cols, new CCol(new CImg('images/general/zero.gif', 'zero', 1, 1)));
+		array_push($new_cols, new CCol(new CImg('images/general/zero.png', 'zero', 1, 1)));
 		$table->addRow($new_cols);
 	}
 

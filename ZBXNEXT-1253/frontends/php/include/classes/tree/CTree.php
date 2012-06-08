@@ -121,11 +121,11 @@ class CTree {
 			switch ($this->tree[$id]['nodeimg'][$i]) {
 				case 'O':
 					$td->setAttribute('style', 'width: 22px');
-					$img = new CImg('images/general/tree/zero.gif', 'o', '22', '14');
+					$img = new CImg('images/general/tree/zero.png', 'o', '22', '14');
 					break;
 				case 'I':
 					$td->setAttribute('style', 'width:22px; background-image:url(images/general/tree/pointc.gif);');
-					$img = new CImg('images/general/tree/zero.gif', 'i', '22', '14');
+					$img = new CImg('images/general/tree/zero.png', 'i', '22', '14');
 					break;
 				case 'L':
 					$td->setAttribute('valign', 'top');

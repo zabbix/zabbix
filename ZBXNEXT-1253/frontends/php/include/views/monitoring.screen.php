@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once('include/views/js/general.script.confirm.js.php');
 
 $screenWidget = new CWidget();
@@ -121,7 +121,12 @@ else {
 	$screenWidget->addHeader($screen['name'], $headerForm);
 
 	$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
-	$element = get_screen($screen, 0, $effectiveperiod);
+
+	$flickerfreeScreen = new CFlickerfreeScreen(array(
+		'screen' => $screen,
+		'effectiveperiod' => $effectiveperiod,
+		'mode' => SCREEN_MODE_PREVIEW
+	));
 
 	// create time control
 	if ($this->data['fullscreen'] != 2) {
@@ -149,9 +154,10 @@ else {
 		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
 		zbx_add_post_js('timeControl.processObjects();');
 	}
-	$screenWidget->addItem($element);
+	$screenWidget->addItem($flickerfreeScreen->show());
 	$screenWidget->addItem(BR());
+
+	//zbx_add_post_js('checkServerStatus('.$config['server_check_interval'].');');
 }
 
 return $screenWidget;
-?>

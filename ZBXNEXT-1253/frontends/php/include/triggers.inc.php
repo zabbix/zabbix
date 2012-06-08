@@ -1614,7 +1614,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $params = array())
 		}
 
 		if ($dependency) {
-			$img = new Cimg('images/general/down_icon.png', 'DEP_DOWN');
+			$img = new Cimg('images/general/arrow_down2.png', 'DEP_DOWN');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 			array_push($desc, $img);
@@ -1634,7 +1634,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $params = array())
 		}
 
 		if ($dependency) {
-			$img = new Cimg('images/general/up_icon.png', 'DEP_UP');
+			$img = new Cimg('images/general/arrow_up2.png', 'DEP_UP');
 			$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
 			$img->setHint($dep_table);
 			array_push($desc, $img);

@@ -68,7 +68,7 @@ class testPageMaps extends CWebTest {
 		$this->click("link=$name");
 		$this->wait();
 
-//		$this->waitForCondition("selenium.browserbot.getUserWindow().jQuery('img[name=sysmap]').attr('src') != 'images/general/tree/zero.gif'", 5000);
+//		$this->waitForCondition("selenium.browserbot.getUserWindow().jQuery('img[name=sysmap]').attr('src') != 'images/general/tree/zero.png'", 5000);
 
 		$this->button_click('sysmap_save');
 		$this->wait();

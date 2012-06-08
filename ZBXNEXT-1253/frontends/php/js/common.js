@@ -124,7 +124,6 @@ function SDJ(obj, name) {
 }
 
 // functions below should be sorted alphabetically
-
 function addListener(element, eventname, expression, bubbling) {
 	bubbling = bubbling || false;
 
@@ -208,7 +207,7 @@ function checkAll(form_name, chkMain, shkName) {
 function checkLocalAll(form_name, chkMain, chkName) {
 	var frmForm = document.forms[form_name];
 
-	var checkboxes = $$('input[name='+chkName+']');
+	var checkboxes = $$('input[name=' + chkName + ']');
 	for (var i = 0; i < checkboxes.length; i++) {
 		if (isset('type', checkboxes[i]) && checkboxes[i].type == 'checkbox') {
 			checkboxes[i].checked = frmForm.elements[chkMain].checked;
@@ -402,18 +401,18 @@ function get_bodywidth() {
 	var w2 = parseInt(document.body.offsetWidth);
 
 	if (KQ) {
-		w = (w2 < w)?w2:w;
+		w = (w2 < w) ? w2 : w;
 		w-=16;
 	}
 	else {
-		w = (w2 < w)?w2:w;
+		w = (w2 < w) ? w2 : w;
 	}
 	return w;
 }
 
 function get_cursor_position(e) {
 	e = e || window.event;
-	var cursor = {x:0, y:0};
+	var cursor = {x: 0, y: 0};
 	if (e.pageX || e.pageY) {
 		cursor.x = e.pageX;
 		cursor.y = e.pageY;
@@ -429,6 +428,7 @@ function get_cursor_position(e) {
 
 function get_scroll_pos() {
 	var scrOfX = 0, scrOfY = 0;
+
 	// netscape compliant
 	if (typeof(window.pageYOffset) == 'number') {
 		scrOfY = window.pageYOffset;
@@ -449,7 +449,7 @@ function get_scroll_pos() {
 
 function insertInElement(element_name, text, tagName) {
 	if (IE) {
-		var elems = $$(tagName+'[name='+element_name+']');
+		var elems = $$(tagName + '[name=' + element_name + ']');
 	}
 	else {
 		var elems = document.getElementsByName(element_name);
@@ -515,7 +515,7 @@ function redirect(uri, method, needle) {
 				continue;
 			}
 			if (typeof(needle) != 'undefined' && key.indexOf(needle) > -1) {
-				action += '&'+key+'='+args[key];
+				action += '&' + key + '=' + args[key];
 				continue;
 			}
 			var hInput = document.createElement('input');
@@ -668,7 +668,7 @@ function switchElementsClass(obj, class1, class2) {
 	return result;
 }
 
-function zbx_throw(msg){
+function zbx_throw(msg) {
 	throw(msg);
 }
 

@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 $action = 'screenedit.php?form=update&screenid='.get_request('screenid');
 if (isset($_REQUEST['screenitemid'])) {
@@ -605,4 +604,3 @@ array_push($buttons, new CButtonCancel(url_param('screenid')));
 $screenForm->addItem(makeFormFooter(new CSubmit('save', _('Save')), $buttons));
 
 return $screenForm;
-?>

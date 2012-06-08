@@ -208,7 +208,7 @@ $elcn_tab->addRow($menuRow);
 show_table_header($elcn_tab);
 
 
-$sysmap_img = new CImg('images/general/tree/zero.gif', 'Sysmap');
+$sysmap_img = new CImg('images/general/tree/zero.png', 'Sysmap');
 $sysmap_img->setAttribute('id', 'sysmap_img', $sysmap['width'], $sysmap['height']);
 
 $table = new CTable();

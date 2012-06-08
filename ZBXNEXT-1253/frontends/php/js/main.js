@@ -21,6 +21,7 @@
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (searchElement) {
 		'use strict';
+
 		if (this === void 0 || this === null) {
 			throw new TypeError();
 		}
