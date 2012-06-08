@@ -165,7 +165,7 @@ sub process_row
 
 			$_ =~ s/&pipe;/|/g;
 
-			if ($output{'database'} eq 'mysql')
+			if ($output{'database'} eq 'mysql' || $output{'database'} eq 'oracle')
 			{
 				$_ =~ s/&eol;/\\r\\n/g;
 			}

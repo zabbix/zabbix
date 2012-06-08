@@ -144,7 +144,8 @@ static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *err
 	{
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select t1.description,h1.host,t2.description,h2.host"
+				/* don't remove "description2 and host2" aliases, the ORACLE needs them */
+				"select t1.description,h1.host,t2.description as description2,h2.host as host2"
 				" from trigger_depends td,triggers t1,functions f1,items i1,hosts h1,"
 					"triggers t2,functions f2,items i2,hosts h2"
 				" where td.triggerid_down=t1.triggerid"

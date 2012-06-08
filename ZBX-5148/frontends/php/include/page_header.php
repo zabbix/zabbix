@@ -291,6 +291,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 		if (!empty($available_nodes)) {
 			$node_form = new CForm('get');
+			$node_form->cleanItems();
 			$node_form->setAttribute('id', 'node_form');
 
 			// create ComboBox with selected nodes
