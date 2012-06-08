@@ -1,6 +1,8 @@
 Changes for 2.1.0
 
 New features:
+..F....... [ZBX-5106] fixed trigger dependencies not being mapped to new triggers when cloning a host (Pavels)
+..F....... [ZBX-5106] fixed trigger dependencies on web triggers not being removed when cloning a host (Pavels)
 A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBX-1357] updated Brazilian Portuguese, French, Japanese, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1019] updated jQuery to 1.7.2 and jQuery UI to 1.8.20 (Vedmak)
@@ -62,6 +64,8 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5106] fixed trigger dependencies not being mapped to new triggers when cloning a host (Pavels)
+..F....... [ZBX-5106] fixed trigger dependencies on web triggers not being removed when cloning a host (Pavels)
 ..F....... [ZBX-5128] fixed pagefilter->groupid (Eduard)
 ..F....... [ZBX-5073] fixed parent template links in items, triggers, graphs and discovery rules (Eduard)
 ..F....... [ZBX-5104] fixed severity colors in trigger forms (Vedmak)
