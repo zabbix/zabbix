@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function update_node_profile($nodeids) {
 	DBstart();
 	DBexecute('DELETE FROM profiles WHERE userid='.CWebUser::$data['userid'].' AND idx='.zbx_dbstr('web.nodes.selected'));
@@ -244,7 +244,6 @@ function detect_node_type($nodeid, $masterid) {
 }
 
 function node_type2str($nodetype) {
-	$result = '';
 	switch ($nodetype) {
 		case ZBX_NODE_CHILD:
 			$result = _('Child');
@@ -345,4 +344,3 @@ function get_node_path($nodeid, $result = '/') {
 	}
 	return $result;
 }
-?>
