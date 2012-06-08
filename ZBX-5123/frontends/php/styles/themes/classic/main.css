@@ -56,20 +56,47 @@ ul.favorites { margin: 0; padding: 4px 4px 4px 1em; border: 1px solid #AAAAAA; }
 .classic .ui-state-default, .classic .ui-widget-content .ui-state-default, .classic .ui-widget-header .ui-state-default {
 	background: #EEE; color: #383838;
 }
+
 .classic .filter .ui-state-default {
 	background: url("images/menu_not_active2.gif") repeat-x scroll left top #5473AA; color: #FFF;
 }
-.classic .filter .ui-state-hover { background: #5473AA }
-.classic .ui-state-default a, .classic .ui-state-default a:link, .classic .ui-state-default a:visited {
+
+.classic .filter .ui-state-hover {
+	background: #5473AA
+}
+
+.classic .ui-state-default a,
+.classic .ui-state-default a:link,
+.classic .ui-state-default a:visited {
 	color: #383838;
 }
-.classic .ui-state-hover, .classic .ui-widget-content .ui-state-hover, .classic .ui-widget-header .ui-state-hover, .classic .ui-state-focus, .classic .ui-widget-content .ui-state-focus, .classic .ui-widget-header .ui-state-focus { background: #CCCCCC; }
-.classic .ui-state-disabled, .classic .ui-button-disabled { color: #999 !important; }
-.classic .ui-state-active a, .classic .ui-state-active a:link, .classic .ui-state-active a:visited {
+
+.classic .ui-state-hover,
+.classic .ui-widget-content .ui-state-hover,
+.classic .ui-widget-header .ui-state-hover,
+.classic .ui-state-focus,
+.classic .ui-widget-content .ui-state-focus,
+.classic .ui-widget-header .ui-state-focus {
+	background: #CCCCCC;
+}
+
+.classic .ui-state-disabled,
+.classic .ui-button-disabled {
+	color: #999 !important;
+}
+
+.classic .ui-state-active a,
+.classic .ui-state-active a:link,
+.classic .ui-state-active a:visited {
 	color: #FFF;
 }
-.classic .ui-state-active, .classic .ui-widget-content .ui-state-active, .classic .ui-widget-header .ui-state-active {
-	background: #888; color: #FFF; border-color: #9F9F9F;
+
+.classic .ui-state-active,
+.classic .ui-widget-content .ui-state-active,
+.classic .ui-widget-header .ui-state-active {
+	background: #888;
+	color: #FFF;
+	border-color: #9F9F9F;
 }
 
 .ui-tabs.ui-widget-content { background: #EEEEEE; }

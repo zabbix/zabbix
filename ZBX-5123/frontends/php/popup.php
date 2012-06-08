@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
@@ -212,10 +213,10 @@ $fields = array(
 	'real_hosts' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'normal_only' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'simpleName' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'with_applications' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_applications' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'with_graphs' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'with_items' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'with_simple_graph_items' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_items' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
+	'with_simple_graph_items' => array(T_ZBX_INT, O_OPT, null, IN('0,1'), null),
 	'with_triggers' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'itemtype' =>			array(T_ZBX_INT, O_OPT, null,	null,		null),
 	'value_types' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 15), null),
@@ -345,8 +346,7 @@ elseif ($templated_hosts) {
 }
 else {
 	$options['groups']['with_hosts_and_templates'] = true;
-	// for hosts templated_hosts comes with monitored and not monitored hosts
-	$options['hosts']['templated_hosts'] = true;
+	$options['hosts']['templated_hosts'] = true; // for hosts templated_hosts comes with monitored and not monitored hosts
 }
 
 if ($with_applications) {
@@ -523,7 +523,7 @@ else {
 	}
 }
 
-show_table_header(defined($page['title']) ? constant($page['title']) : $page['title'], $frmTitle);
+show_table_header($page['title'], $frmTitle);
 
 insert_js_function('addSelectedValues');
 insert_js_function('addValues');
@@ -635,8 +635,8 @@ elseif ($srctbl == 'templates') {
 		$options['editable'] = 1;
 	}
 
-	$template_list = API::Template()->get($options);
-	foreach ($template_list as $host) {
+	$dbTemplates = API::Template()->get($options);
+	foreach ($dbTemplates as $host) {
 		$chk = new CCheckBox('templates['.$host['hostid'].']', isset($templates[$host['hostid']]), null, $host['name']);
 		$chk->setEnabled(!isset($existed_templates[$host['hostid']]) && !isset($excludeids[$host['hostid']]));
 		$table->addRow(array(array($chk, $host['name'])));
@@ -1208,7 +1208,7 @@ elseif ($srctbl == 'prototypes') {
 
 	$items = API::Item()->get(array(
 		'nodeids' => $nodeid,
-		'selectHosts' => array('host'),
+		'selectHosts' => array('name'),
 		'discoveryids' => get_request('parent_discoveryid'),
 		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CHILD),
 		'output' => API_OUTPUT_EXTEND,
@@ -1220,7 +1220,7 @@ elseif ($srctbl == 'prototypes') {
 		$host = reset($item['hosts']);
 
 		$description = new CSpan(itemName($item), 'link');
-		$item['name'] = $host['host'].': '.$item['name'];
+		$item['name'] = $host['name'].': '.$item['name'];
 
 		if ($multiselect) {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($item['itemid']).');';

@@ -31,7 +31,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Value mapping');
-		$this->assertTitle('Configuration of value mapping');
+		$this->checkTitle('Configuration of value mapping');
 		$this->ok('CONFIGURATION OF VALUE MAPPING');
 		$this->ok('Value mapping');
 		$this->assertElementPresent('form');

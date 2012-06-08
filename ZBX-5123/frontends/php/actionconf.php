@@ -130,7 +130,7 @@ elseif (isset($_REQUEST['save'])) {
 		'r_shortdata'	=> get_request('r_shortdata', ''),
 		'r_longdata'	=> get_request('r_longdata', ''),
 		'conditions'	=> get_request('conditions', array()),
-		'operations'	=> get_request('operations', array()),
+		'operations'	=> get_request('operations', array())
 	);
 
 	foreach ($action['operations'] as $num => $operation) {
