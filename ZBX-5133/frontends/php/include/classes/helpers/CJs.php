@@ -39,13 +39,15 @@ class CJs {
 	 *
 	 * @param mixed $data
 	 *
+	 * @param bool $forceObject force all arrays to objects
+	 *
 	 * @return mixed
 	 */
-	public static function encodeJson($data) {
+	public static function encodeJson($data, $forceObject = false) {
 		if (self::$json === null) {
 			self::$json = new CJSON();
 		}
 
-		return self::$json->encode($data);
+		return self::$json->encode($data, array(), $forceObject);
 	}
 }
