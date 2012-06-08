@@ -596,7 +596,7 @@ else {
 	$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-	$goButton = new CSubmit('goButton', _('Go').' (0)');
+	$goButton = new CSubmit('goButton', _('Go'));
 	$goButton->setAttribute('id', 'goButton');
 
 	zbx_add_post_js('chkbxRange.pageGoName = "templates";');

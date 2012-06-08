@@ -59,7 +59,7 @@ $goComboBox = new CComboBox('go');
 $goOption = new CComboItem('delete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected slide shows?'));
 $goComboBox->addItem($goOption);
-$goButton = new CSubmit('goButton', _('Go').' (0)');
+$goButton = new CSubmit('goButton', _('Go'));
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "shows";');
 

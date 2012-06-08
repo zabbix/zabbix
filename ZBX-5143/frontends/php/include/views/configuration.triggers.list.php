@@ -238,7 +238,7 @@ if (empty($this->data['parent_discoveryid'])) {
 $goOption = new CComboItem('delete', _('Delete selected'));
 $goOption->setAttribute('confirm', _('Delete selected triggers?'));
 $goComboBox->addItem($goOption);
-$goButton = new CSubmit('goButton', _('Go').' (0)');
+$goButton = new CSubmit('goButton', _('Go'));
 $goButton->setAttribute('id', 'goButton');
 zbx_add_post_js('chkbxRange.pageGoName = "g_triggerid";');
 
