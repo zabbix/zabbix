@@ -2969,12 +2969,14 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			size_t		proto_alloc = 0, proto_num = 0;
 
 			sql_offset = 0;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select i.itemid,r.itemid"
 					" from items i,item_discovery id,items r"
 					" where i.templateid=id.itemid"
 						" and id.parent_itemid=r.templateid"
-						" and");
+						" and r.hostid=" ZBX_FS_UI64
+						" and",
+					hostid);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", protoids, protoids_num);
 
 			result = DBselect("%s", sql);
