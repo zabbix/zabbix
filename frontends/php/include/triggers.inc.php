@@ -526,13 +526,21 @@ function utf8RawUrlDecode($source) {
 	return $decodedStr;
 }
 
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
-function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
-	if ($srcHostId != 0) {
+/**
+ * Copies the given triggers to the given hosts or templates.
+ *
+ * Without the $srcHostId parameter it will only be able to copy triggers that belong to only one host. If the
+ * $srcHostId parameter is not passed, and a trigger has multiple hosts, it will throw an error. If the
+ * $srcHostId parameter is passed, the given host will be replaced with the destination host.
+ *
+ * @param string|array $srcTriggerIds
+ * @param string|array $dstHostIds
+ * @param string $srcHostId
+ *
+ * @return bool
+ */
+function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
+	if ($srcHostId) {
 		$options = array(
 			'output' => array('hostid', 'host'),
 			'hostids' => $srcHostId,
@@ -554,7 +562,7 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_REFER
 	);
-	if ($srcHostId == 0) {
+	if (!$srcHostId) {
 		$options['selectHosts'] = array('hostid', 'host');
 	}
 	$db_srcTriggers = API::Trigger()->get($options);
@@ -568,9 +576,11 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 	));
 
 	$newTriggerIds = array();
+	$httpTriggerIds = array();
 	foreach ($db_dstHosts as $dstHost) {
 		foreach ($db_srcTriggers as $srcTrigger) {
 			if (httpItemExists($srcTrigger['items'])) {
+				$httpTriggerIds[$srcTrigger['triggerid']] = $srcTrigger['triggerid'];
 				continue;
 			}
 
@@ -605,6 +615,11 @@ function copyTriggersToHosts($srcHostId, $srcTriggerIds, $dstHostIds) {
 
 			if ($trigger['dependencies']) {
 				foreach ($trigger['dependencies'] as $depTrigger) {
+					// skip dependencies on triggers containing web items
+					if (isset($httpTriggerIds[$depTrigger['triggerid']])) {
+						continue;
+					}
+
 					$depTriggerId = $depTrigger['triggerid'];
 					$depTriggerId = (isset($newTriggerIds[$depTriggerId])) ? $newTriggerIds[$depTriggerId] : $depTriggerId;
 
@@ -2535,47 +2550,6 @@ function get_item_function_info($expr) {
 		}
 	}
 	return $result;
-}
-
-function copyTriggers($srcHostId, $dstHostId) {
-	$options = array(
-		'hostids' => array($srcHostId, $dstHostId),
-		'output' => array('host'),
-		'templated_hosts' => true,
-		'preservekeys' => true
-	);
-	$hosts = API::Host()->get($options);
-	if (!isset($hosts[$srcHostId], $hosts[$dstHostId])) {
-		return false;
-	}
-
-	$srcHost = $hosts[$srcHostId];
-	$dstHost = $hosts[$dstHostId];
-
-	$options = array(
-		'hostids' => $srcHostId,
-		'output' => array('triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'inherited' => false,
-		'selectItems' => API_OUTPUT_EXTEND,
-		'selectDependencies' => API_OUTPUT_REFER
-	);
-	$srcTriggers = API::Trigger()->get($options);
-
-	$hash = array();
-	foreach ($srcTriggers as $srcTrigger) {
-		if (httpItemExists($srcTrigger['items'])) {
-			continue;
-		}
-		$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
-
-		if (!$result = API::Trigger()->create($srcTrigger)) {
-			return false;
-		}
-		$hash[$srcTrigger['triggerid']] = reset($result['triggerids']);
-	}
-
-	return true;
 }
 
 function evalExpressionData($expression, $rplcts, $oct = false) {
