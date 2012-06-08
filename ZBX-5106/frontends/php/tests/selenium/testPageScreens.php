@@ -32,7 +32,7 @@ class testPageScreens extends CWebTest {
 	*/
 	public function testPageScreens_CheckLayout($screen) {
 		$this->login('screenconf.php');
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 
 		$this->ok('CONFIGURATION OF SCREENS');
 		$this->ok('Screens');
@@ -54,10 +54,10 @@ class testPageScreens extends CWebTest {
 		$name = $screen['name'];
 
 		$this->login('screenconf.php');
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 		$this->click("link=$name");
 		$this->wait();
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 		$this->ok("$name");
 		$this->ok('Change');
 		$this->ok('CONFIGURATION OF SCREEN');
@@ -78,7 +78,7 @@ class testPageScreens extends CWebTest {
 		DBsave_tables('screens');
 
 		$this->login('screenconf.php');
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 		$this->href_click("?form=update&screenid=$screenid&sid=");
 		$this->wait();
 
@@ -92,7 +92,7 @@ class testPageScreens extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 		$this->ok('Screen updated');
 
 		$this->assertEquals($oldHashScreen, DBhash($sqlScreen));
@@ -103,11 +103,11 @@ class testPageScreens extends CWebTest {
 
 	public function testPageScreens_Create() {
 		$this->login('screenconf.php');
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 		$this->button_click('form');
 		$this->wait();
 
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 		$this->ok('Screens');
 		$this->ok('Name');
 		$this->ok('Columns');
@@ -116,7 +116,7 @@ class testPageScreens extends CWebTest {
 		$this->button_click('cancel');
 		$this->wait();
 
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 		$this->nok('Columns');
 	}
 
@@ -155,7 +155,7 @@ class testPageScreens extends CWebTest {
 		DBsave_tables('screens');
 
 		$this->login('screenconf.php');
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 		$this->checkbox_select("screens[$screenid]");
 		$this->dropdown_select('go', 'Delete selected');
 		$this->button_click('goButton');
@@ -163,7 +163,7 @@ class testPageScreens extends CWebTest {
 
 		$this->getConfirmation();
 
-		$this->assertTitle('Configuration of screens');
+		$this->checkTitle('Configuration of screens');
 		$this->ok('Screen deleted');
 		$this->ok('CONFIGURATION OF SCREENS');
 

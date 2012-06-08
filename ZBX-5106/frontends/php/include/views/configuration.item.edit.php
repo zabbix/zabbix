@@ -48,6 +48,14 @@ if (!empty($this->data['itemid'])) {
 
 // create form list
 $itemFormList = new CFormList('itemFormList');
+if (!empty($this->data['templates'])) {
+	if ($this->data['is_discovery_rule']) {
+		$itemFormList->addRow(_('Parent discovery rules'), $this->data['templates']);
+	}
+	else {
+		$itemFormList->addRow(_('Parent items'), $this->data['templates']);
+	}
+}
 
 if (!$this->data['is_discovery_rule']) {
 	// append host to form list

@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
@@ -29,8 +29,7 @@ $page['file'] = 'triggers.php';
 $page['hist_arg'] = array('hostid', 'groupid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
@@ -227,13 +226,12 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 	DBstart();
 
 	// get requested triggers with permission check
-	$options = array(
+	$db_triggers = API::Trigger()->get(array(
 		'triggerids' => $_REQUEST['g_triggerid'],
 		'editable' => true,
 		'output' => array('triggerid', 'status'),
 		'preservekeys' => true
-	);
-	$db_triggers = API::Trigger()->get($options);
+	));
 
 	// triggerids which status must be changed
 	$triggerIdsToUpdate = array();
@@ -248,13 +246,12 @@ elseif (str_in_array($_REQUEST['go'], array('activate', 'disable')) && isset($_R
 
 	do {
 		// gather all triggerids which status should be changed including child triggers
-		$options = array(
+		$db_triggers = API::Trigger()->get(array(
 			'filter' => array('templateid' => $childTriggerIds),
 			'output' => array('triggerid', 'status'),
 			'preservekeys' => true,
 			'nopermissions' => true
-		);
-		$db_triggers = API::Trigger()->get($options);
+		));
 		foreach ($db_triggers as $triggerid => $trigger) {
 			if ($trigger['status'] != $status) {
 				$triggerIdsToUpdate[] = $triggerid;
@@ -439,4 +436,3 @@ else {
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
