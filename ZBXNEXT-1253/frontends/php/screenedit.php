@@ -261,14 +261,14 @@ $data = array(
 );
 
 // getting updated screen, so we wont have to refresh the page to see changes
-$data['screens'] = API::Screen()->get($options);
-if (empty($data['screens'])) {
-	$data['screens'] = API::TemplateScreen()->get($options);
-	if (empty($data['screens'])) {
+$data['screen'] = API::Screen()->get($options);
+if (empty($data['screen'])) {
+	$data['screen'] = API::TemplateScreen()->get($options);
+	if (empty($data['screen'])) {
 		access_deny();
 	}
 }
-$data['screen'] = reset($data['screens']);
+$data['screen'] = reset($data['screen']);
 
 // render view
 $screenView = new CView('configuration.screen.constructor.list', $data);

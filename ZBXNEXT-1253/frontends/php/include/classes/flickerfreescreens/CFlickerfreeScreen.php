@@ -35,17 +35,12 @@ class CFlickerfreeScreen {
 		}
 		elseif (!empty($options['screenid'])) {
 			$options = array(
+				'screenids' => $options['screenid'],
 				'output' => API_OUTPUT_EXTEND,
 				'selectScreenItems' => API_OUTPUT_EXTEND
 			);
 			if (in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_EDIT))) {
 				$options['editable'] = true;
-			}
-			if (!empty($options['screenid'])) {
-				$options['screenids'] = $options['screenid'];
-			}
-			else {
-				access_deny();
 			}
 
 			$this->screen = API::Screen()->get($options);
@@ -206,9 +201,10 @@ class CFlickerfreeScreen {
 					$action = null;
 				}
 
-				if ($this->mode == SCREEN_MODE_EDIT && isset($_REQUEST['form'])
-						&& (isset($_REQUEST['x']) && $_REQUEST['x'] == $c && isset($_REQUEST['y']) && $_REQUEST['y'] == $r)
-								|| (isset($_REQUEST['screenitemid']) && bccomp($_REQUEST['screenitemid'], $screenitem['screenitemid']) == 0)) {
+				if ($this->mode == SCREEN_MODE_EDIT
+						&& (isset($_REQUEST['form']) && $_REQUEST['form'] == 'update')
+						&& ((isset($_REQUEST['x']) && $_REQUEST['x'] == $c && isset($_REQUEST['y']) && $_REQUEST['y'] == $r)
+								|| (isset($_REQUEST['screenitemid']) && bccomp($_REQUEST['screenitemid'], $screenitem['screenitemid']) == 0))) {
 					$screenView = new CView('configuration.screen.constructor.edit', array('screen' => $this->screen));
 					$item = $screenView->render();
 					$isEditForm = true;
@@ -219,6 +215,16 @@ class CFlickerfreeScreen {
 						$flickerfreeScreen->screenitem = $screenitem;
 						$flickerfreeScreen->mode = $this->mode;
 						$flickerfreeScreen->effectiveperiod = $this->effectiveperiod;
+
+						if ($this->mode == SCREEN_MODE_EDIT && !empty($screenitem['screenitemid'])) {
+							$flickerfreeScreen->action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitem['screenitemid'];
+						}
+						elseif ($this->mode == SCREEN_MODE_EDIT && empty($screenitem['screenitemid'])) {
+							$flickerfreeScreen->action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
+						}
+						elseif ($this->mode == SCREEN_MODE_PREVIEW) {
+							$flickerfreeScreen->action = 'charts.php?graphid='.$screenitem['resourceid'].url_params(array('period', 'stime'));
+						}
 
 						$item = $flickerfreeScreen->get();
 					}
@@ -233,26 +239,26 @@ class CFlickerfreeScreen {
 					}
 				}
 
-				$str_halign = 'def';
+				$halign = 'def';
 				if ($screenitem['halign'] == HALIGN_CENTER) {
-					$str_halign = 'cntr';
+					$halign = 'cntr';
 				}
 				if ($screenitem['halign'] == HALIGN_LEFT) {
-					$str_halign = 'left';
+					$halign = 'left';
 				}
 				if ($screenitem['halign'] == HALIGN_RIGHT) {
-					$str_halign = 'right';
+					$halign = 'right';
 				}
 
-				$str_valign = 'def';
+				$valign = 'def';
 				if ($screenitem['valign'] == VALIGN_MIDDLE) {
-					$str_valign = 'mdl';
+					$valign = 'mdl';
 				}
 				if ($screenitem['valign'] == VALIGN_TOP) {
-					$str_valign = 'top';
+					$valign = 'top';
 				}
 				if ($screenitem['valign'] == VALIGN_BOTTOM) {
-					$str_valign = 'bttm';
+					$valign = 'bttm';
 				}
 
 				if ($this->mode == SCREEN_MODE_EDIT && !$isEditForm) {
@@ -262,7 +268,7 @@ class CFlickerfreeScreen {
 					$item->setAttribute('data-ycoord', $r);
 				}
 
-				$newColumn = new CCol($item, $str_halign.'_'.$str_valign.' screenitem');
+				$newColumn = new CCol($item, $halign.'_'.$valign.' screenitem');
 				if (!empty($screenitem['colspan'])) {
 					$newColumn->setColSpan($screenitem['colspan']);
 				}
@@ -320,6 +326,7 @@ class CFlickerfreeScreenItem {
 	public $screenitem;
 	public $mode;
 	public $effectiveperiod;
+	public $action;
 
 	public function __construct(array $options = array()) {
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;

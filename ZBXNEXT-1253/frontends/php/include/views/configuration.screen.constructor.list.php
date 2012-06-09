@@ -27,10 +27,15 @@ if (!empty($this->data['screen']['templateid'])) {
 	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
 }
 
-$screenTable = get_screen($this->data['screen'], 1);
+//$screenWidget->addItem(get_screen($this->data['screen'], 1));
+
+$flickerfreeScreen = new CFlickerfreeScreen(array(
+	'screen' => $this->data['screen'],
+	'mode' => SCREEN_MODE_EDIT
+));
+$screenWidget->addItem($flickerfreeScreen->show());
+
 zbx_add_post_js('init_screen("'.$this->data['screenid'].'", "iframe", "'.$this->data['screenid'].'");');
 zbx_add_post_js('timeControl.processObjects();');
 
-// append form to widget
-$screenWidget->addItem($screenTable);
 return $screenWidget;

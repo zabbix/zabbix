@@ -21,15 +21,17 @@
 
 class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 
+	private $hostid;
+	private $stime;
+
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
+
+		$this->hostid = get_request('hostid', 0);
+		$this->stime = get_request('stime', null);
 	}
 
 	public function get() {
-		if ($this->mode == SCREEN_MODE_PREVIEW) {
-			$action = 'charts.php?graphid='.$this->screenitem['resourceid'].url_params(array('period', 'stime'));
-		}
-
 		$domGraphid = 'graph_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['resourceid'];
 		$containerid = 'graph_cont_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['resourceid'];
 		$graphDims = getGraphDims($this->screenitem['resourceid']);
@@ -40,14 +42,15 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 		$legend = $graph['show_legend'];
 		$graph3d = $graph['show_3d'];
 
-		// host feature
-		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && isset($_REQUEST['hostid']) && $_REQUEST['hostid'] > 0) {
+		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && !empty($this->hostid)) {
+			// get host
 			$hosts = API::Host()->get(array(
-				'hostids' => $_REQUEST['hostid'],
+				'hostids' => $this->hostid,
 				'output' => array('hostid', 'host')
 			));
 			$host = reset($hosts);
 
+			// get graph
 			$graph = API::Graph()->get(array(
 				'graphids' => $this->screenitem['resourceid'],
 				'output' => API_OUTPUT_EXTEND,
@@ -56,13 +59,13 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 			));
 			$graph = reset($graph);
 
+			// if items from one host we change them, or set calculated if not exist on that host
 			if (count($graph['hosts']) == 1) {
-				// if items from one host we change them, or set calculated if not exist on that host
 				if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
 					$newDinamic = get_same_graphitems_for_host(
 						array(array('itemid' => $graph['ymax_itemid'])),
-						$_REQUEST['hostid'],
-						false // false = don't rise Error if item doesn't exist
+						$this->hostid,
+						false
 					);
 					$newDinamic = reset($newDinamic);
 
@@ -77,8 +80,8 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 				if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']) {
 					$newDinamic = get_same_graphitems_for_host(
 						array(array('itemid' => $graph['ymin_itemid'])),
-						$_REQUEST['hostid'],
-						false // false = don't rise Error if item doesn't exist
+						$this->hostid,
+						false
 					);
 					$newDinamic = reset($newDinamic);
 
@@ -91,9 +94,10 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 				}
 			}
 
+			// get url
 			$url = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
-					? 'chart7.php'
-					: 'chart3.php';
+				? 'chart7.php'
+				: 'chart3.php';
 			$url = new CUrl($url);
 
 			foreach ($graph as $name => $value) {
@@ -103,19 +107,20 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 				$url->setArgument($name, $value);
 			}
 
-			$new_items = get_same_graphitems_for_host($graph['gitems'], $_REQUEST['hostid'], false);
-			foreach ($new_items as $gitem) {
-				unset($gitem['gitemid'], $gitem['graphid']);
+			$newGraphItems = get_same_graphitems_for_host($graph['gitems'], $this->hostid, false);
+			foreach ($newGraphItems as $newGraphItem) {
+				unset($newGraphItem['gitemid'], $newGraphItem['graphid']);
 
-				foreach ($gitem as $name => $value) {
-					$url->setArgument('items['.$gitem['itemid'].']['.$name.']', $value);
+				foreach ($newGraphItem as $name => $value) {
+					$url->setArgument('items['.$newGraphItem['itemid'].']['.$name.']', $value);
 				}
 			}
 			$url->setArgument('name', $host['host'].': '.$graph['name']);
 			$url = $url->getUrl();
 		}
 
-		$objData = array(
+		// get timecontroll
+		$timecontrollData = array(
 			'id' => $this->screenitem['resourceid'],
 			'domid' => $domGraphid,
 			'containerid' => $containerid,
@@ -128,70 +133,70 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
-		$default = false;
+		$isDefault = false;
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($url)) {
-				$url='chart6.php?graphid='.$this->screenitem['resourceid'];
-				$default = true;
+				$url = 'chart6.php?graphid='.$this->screenitem['resourceid'];
+				$isDefault = true;
 			}
 
 			$timeline = array();
 			$timeline['period'] = $this->effectiveperiod;
 			$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($this->screenitem['resourceid']));
 
-			if (isset($_REQUEST['stime'])) {
-				$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+			if (isset($this->stime)) {
+				$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
 			}
 
 			$src = $url.'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'].'&legend='.$this->screenitem['legend'].'&graph3d='.$graph3d.'&period='.$this->effectiveperiod.url_param('stime');
 
-			$objData['src'] = $src;
+			$timecontrollData['src'] = $src;
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($url)) {
 				$url = 'chart2.php?graphid='.$this->screenitem['resourceid'];
-				$default = true;
+				$isDefault = true;
 			}
 
 			$src = $url.'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'].'&period='.$this->effectiveperiod.url_param('stime');
 
 			$timeline = array();
-			if (isset($graphid) && !is_null($graphid) && $this->mode != SCREEN_MODE_EDIT) {
+			if ($this->mode != SCREEN_MODE_EDIT && !empty($graphid)) {
 				$timeline['period'] = $this->effectiveperiod;
 				$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD);
 
-				if (isset($_REQUEST['stime'])) {
-					$timeline['usertime'] = date('YmdHis', zbxDateToTime($_REQUEST['stime']) + $timeline['period']);
+				if (!empty($this->stime)) {
+					$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
 				}
 				if ($this->mode == SCREEN_MODE_PREVIEW) {
-					$objData['loadSBox'] = 1;
+					$timecontrollData['loadSBox'] = 1;
 				}
 			}
-			$objData['src'] = $src;
+			$timecontrollData['src'] = $src;
 		}
 
-		if ($this->mode || !$default) {
-			$item = new CDiv();
+		// process output
+		if ($this->mode || !$isDefault) {
+			$element = new CDiv();
 		}
 		else {
-			$item = new CLink(null, $action);
+			$element = new CLink(null, $this->action);
 		}
+		$element->setAttribute('id', $containerid);
 
-		$item->setAttribute('id', $containerid);
-
-		$item = array($item);
+		$output = array($element);
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$item[] = BR();
-			$item[] = new CLink(_('Change'), $action);
+			$output[] = BR();
+			$output[] = new CLink(_('Change'), $this->action);
 		}
 
 		if ($this->mode == SCREEN_MODE_VIEW) {
-			insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
+			insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timecontrollData).');');
 		}
 		else {
-			zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
+			zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timecontrollData).');');
 		}
 
-		return $item;
+		return $output;
 	}
 }
