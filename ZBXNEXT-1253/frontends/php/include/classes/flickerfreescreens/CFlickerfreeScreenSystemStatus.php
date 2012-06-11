@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,21 +19,31 @@
 **/
 
 
-$screenWidget = new CWidget();
-$screenWidget->addPageHeader(_('CONFIGURATION OF SCREEN'));
-$screenWidget->addHeader($this->data['screen']['name']);
-$screenWidget->addItem(BR());
-if (!empty($this->data['screen']['templateid'])) {
-	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
+class CFlickerfreeScreenSystemStatus extends CFlickerfreeScreenItem {
+
+	public function __construct(array $options = array()) {
+		parent::__construct($options);
+	}
+
+	public function get() {
+		$output = new CUIWidget('hat_syssum', make_system_status(array(
+			'groupids' => null,
+			'hostids' => null,
+			'maintenance' => null,
+			'severity' => null,
+			'limit' => null,
+			'extAck' => 0,
+			'screenid' => $this->screenid
+		)));
+		$output->setHeader(_('Status of Zabbix'), SPACE);
+		$output->setFooter(_s('Updated: %s', zbx_date2str(_('H:i:s'))));
+
+		$output = array($output);
+
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			array_push($output, new CLink(_('Change'), $this->action));
+		}
+
+		return $output;
+	}
 }
-
-$flickerfreeScreen = new CFlickerfreeScreen(array(
-	'screen' => $this->data['screen'],
-	'mode' => SCREEN_MODE_EDIT
-));
-$screenWidget->addItem($flickerfreeScreen->show());
-
-zbx_add_post_js('init_screen("'.$this->data['screenid'].'", "iframe", "'.$this->data['screenid'].'");');
-zbx_add_post_js('timeControl.processObjects();');
-
-return $screenWidget;

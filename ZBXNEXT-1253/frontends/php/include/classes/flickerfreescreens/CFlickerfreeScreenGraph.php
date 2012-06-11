@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,16 +95,16 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 			}
 
 			// get url
-			$url = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
+			$this->screenitem['url'] = ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED)
 				? 'chart7.php'
 				: 'chart3.php';
-			$url = new CUrl($url);
+			$this->screenitem['url'] = new CUrl($this->screenitem['url']);
 
 			foreach ($graph as $name => $value) {
 				if ($name == 'width' || $name == 'height') {
 					continue;
 				}
-				$url->setArgument($name, $value);
+				$this->screenitem['url']->setArgument($name, $value);
 			}
 
 			$newGraphItems = get_same_graphitems_for_host($graph['gitems'], $this->hostid, false);
@@ -112,11 +112,11 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 				unset($newGraphItem['gitemid'], $newGraphItem['graphid']);
 
 				foreach ($newGraphItem as $name => $value) {
-					$url->setArgument('items['.$newGraphItem['itemid'].']['.$name.']', $value);
+					$this->screenitem['url']->setArgument('items['.$newGraphItem['itemid'].']['.$name.']', $value);
 				}
 			}
-			$url->setArgument('name', $host['host'].': '.$graph['name']);
-			$url = $url->getUrl();
+			$this->screenitem['url']->setArgument('name', $host['host'].': '.$graph['name']);
+			$this->screenitem['url'] = $this->screenitem['url']->getUrl();
 		}
 
 		// get timecontroll
@@ -135,8 +135,8 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 
 		$isDefault = false;
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($url)) {
-				$url = 'chart6.php?graphid='.$this->screenitem['resourceid'];
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
+				$this->screenitem['url'] = 'chart6.php?graphid='.$this->screenitem['resourceid'];
 				$isDefault = true;
 			}
 
@@ -148,17 +148,19 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 				$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
 			}
 
-			$src = $url.'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'].'&legend='.$this->screenitem['legend'].'&graph3d='.$graph3d.'&period='.$this->effectiveperiod.url_param('stime');
+			$src = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
+				.'&legend='.$this->screenitem['legend'].'&graph3d='.$graph3d.'&period='.$this->effectiveperiod.url_param('stime');
 
 			$timecontrollData['src'] = $src;
 		}
 		else {
-			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($url)) {
-				$url = 'chart2.php?graphid='.$this->screenitem['resourceid'];
+			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
+				$this->screenitem['url'] = 'chart2.php?graphid='.$this->screenitem['resourceid'];
 				$isDefault = true;
 			}
 
-			$src = $url.'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'].'&period='.$this->effectiveperiod.url_param('stime');
+			$src = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
+				.'&period='.$this->effectiveperiod.url_param('stime');
 
 			$timeline = array();
 			if ($this->mode != SCREEN_MODE_EDIT && !empty($graphid)) {
@@ -176,15 +178,15 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 		}
 
 		// process output
-		if ($this->mode || !$isDefault) {
-			$element = new CDiv();
+		if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) || !$isDefault) {
+			$item = new CDiv();
 		}
 		else {
-			$element = new CLink(null, $this->action);
+			$item = new CLink(null, $this->action);
 		}
-		$element->setAttribute('id', $containerid);
+		$item->setAttribute('id', $containerid);
 
-		$output = array($element);
+		$output = array($item);
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$output[] = BR();
 			$output[] = new CLink(_('Change'), $this->action);

@@ -87,16 +87,14 @@ function getActionMapBySysmap($sysmap) {
 
 	$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
 
-	$options = array(
+	$hosts = API::Host()->get(array(
 		'nodeids' => get_current_nodeid(true),
 		'hostids' => $hostids,
 		'output' => array('status'),
 		'nopermissions' => true,
 		'preservekeys' => true,
 		'selectScreens' => API_OUTPUT_COUNT,
-	);
-	$hosts = API::Host()->get($options);
-
+	));
 
 	foreach ($sysmap['selements'] as $db_element) {
 		$links_menus = '';

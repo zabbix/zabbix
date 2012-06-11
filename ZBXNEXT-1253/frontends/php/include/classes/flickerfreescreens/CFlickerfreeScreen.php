@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,38 +58,55 @@ class CFlickerfreeScreen {
 		switch ($resourcetype) {
 			case SCREEN_RESOURCE_GRAPH:
 				return new CFlickerfreeScreenGraph();
+
 			case SCREEN_RESOURCE_SIMPLE_GRAPH:
-				return new CFlickerfreeScreenGraphSimple();
+				return new CFlickerfreeScreenSimpleGraph();
+
 			case SCREEN_RESOURCE_MAP:
 				return new CFlickerfreeScreenMap();
+
 			case SCREEN_RESOURCE_PLAIN_TEXT:
 				return new CFlickerfreeScreenPlainText();
+
 			case SCREEN_RESOURCE_HOSTS_INFO:
 				return new CFlickerfreeScreenHostsInfo();
+
 			case SCREEN_RESOURCE_TRIGGERS_INFO:
 				return new CFlickerfreeScreenTriggersInfo();
+
 			case SCREEN_RESOURCE_SERVER_INFO:
 				return new CFlickerfreeScreenServerInfo();
+
 			case SCREEN_RESOURCE_CLOCK:
 				return new CFlickerfreeScreenClock();
+
 			case SCREEN_RESOURCE_SCREEN:
 				return new CFlickerfreeScreenScreen();
+
 			case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
 				return new CFlickerfreeScreenTriggersOverview();
+
 			case SCREEN_RESOURCE_DATA_OVERVIEW:
 				return new CFlickerfreeScreenDataOverview();
+
 			case SCREEN_RESOURCE_URL:
 				return new CFlickerfreeScreenUrl();
+
 			case SCREEN_RESOURCE_ACTIONS:
 				return new CFlickerfreeScreenActions();
+
 			case SCREEN_RESOURCE_EVENTS:
 				return new CFlickerfreeScreenEvents();
+
 			case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
 				return new CFlickerfreeScreenHostgroupTriggers();
+
 			case SCREEN_RESOURCE_SYSTEM_STATUS:
 				return new CFlickerfreeScreenSystemStatus();
+
 			case SCREEN_RESOURCE_HOST_TRIGGERS:
 				return new CFlickerfreeScreenHostTriggers();
+
 			default:
 				return null;
 		}
@@ -104,6 +121,7 @@ class CFlickerfreeScreen {
 		$screenitems = array();
 		$emptyScreenColumns = array();
 
+		// calculate table columns and rows
 		foreach ($this->screen['screenitems'] as $screenitem) {
 			$screenitems[] = $screenitem;
 
@@ -128,6 +146,7 @@ class CFlickerfreeScreen {
 		);
 		$screenTable->setAttribute('id', 'iframe');
 
+		// action top row
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$newColumns = array(new CCol(new CImg('images/general/zero.png', 'zero', 1, 1)));
 
@@ -145,6 +164,7 @@ class CFlickerfreeScreen {
 			$newColumns = array();
 			$emptyScreenRow = true;
 
+			// action left cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
 				$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
 				$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
@@ -157,6 +177,7 @@ class CFlickerfreeScreen {
 					continue;
 				}
 
+				// screen item
 				$isEditForm = false;
 				$screenitem = array();
 
@@ -186,11 +207,12 @@ class CFlickerfreeScreen {
 					);
 				}
 
-				if ($screenitem['screenitemid'] > 0) {
+				if (!empty($screenitem['screenitemid'])) {
 					$emptyScreenRow = false;
 					$emptyScreenColumns[$c] = 1;
 				}
 
+				// action
 				if ($this->mode == SCREEN_MODE_EDIT && $screenitem['screenitemid'] != 0) {
 					$action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitem['screenitemid'];
 				}
@@ -201,6 +223,7 @@ class CFlickerfreeScreen {
 					$action = null;
 				}
 
+				// edit form cell
 				if ($this->mode == SCREEN_MODE_EDIT
 						&& (isset($_REQUEST['form']) && $_REQUEST['form'] == 'update')
 						&& ((isset($_REQUEST['x']) && $_REQUEST['x'] == $c && isset($_REQUEST['y']) && $_REQUEST['y'] == $r)
@@ -209,9 +232,11 @@ class CFlickerfreeScreen {
 					$item = $screenView->render();
 					$isEditForm = true;
 				}
+				// screen cell
 				elseif (!empty($screenitem['screenitemid']) && isset($screenitem['resourcetype'])) {
 					$flickerfreeScreen = $this->getClass($screenitem['resourcetype']);
 					if (!empty($flickerfreeScreen)) {
+						$flickerfreeScreen->screenid = $this->screen['screenid'];
 						$flickerfreeScreen->screenitem = $screenitem;
 						$flickerfreeScreen->mode = $this->mode;
 						$flickerfreeScreen->effectiveperiod = $this->effectiveperiod;
@@ -232,6 +257,7 @@ class CFlickerfreeScreen {
 						$item = null;
 					}
 				}
+				// change/empty cell
 				else {
 					$item = array(SPACE);
 					if ($this->mode == SCREEN_MODE_EDIT) {
@@ -239,6 +265,7 @@ class CFlickerfreeScreen {
 					}
 				}
 
+				// align
 				$halign = 'def';
 				if ($screenitem['halign'] == HALIGN_CENTER) {
 					$halign = 'cntr';
@@ -268,6 +295,7 @@ class CFlickerfreeScreen {
 					$item->setAttribute('data-ycoord', $r);
 				}
 
+				// colspan/rowspan
 				$newColumn = new CCol($item, $halign.'_'.$valign.' screenitem');
 				if (!empty($screenitem['colspan'])) {
 					$newColumn->setColSpan($screenitem['colspan']);
@@ -278,6 +306,7 @@ class CFlickerfreeScreen {
 				array_push($newColumns, $newColumn);
 			}
 
+			// action right cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
 				$icon = new CImg('images/general/minus.png', null, null, null, 'pointer');
 				if ($emptyScreenRow) {
@@ -293,6 +322,7 @@ class CFlickerfreeScreen {
 			$screenTable->addRow(new CRow($newColumns));
 		}
 
+		// action bottom row
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$icon = new CImg('images/general/plus.png', null, null, null, 'pointer');
 			$icon->addAction('onclick', 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";');
@@ -322,57 +352,28 @@ class CFlickerfreeScreen {
 
 class CFlickerfreeScreenItem {
 
-	public $screen;
+	public $screenid;
 	public $screenitem;
 	public $mode;
 	public $effectiveperiod;
 	public $action;
 
 	public function __construct(array $options = array()) {
+		$this->screenid = isset($options['screenid']) ? $options['screenid'] : null;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
-
-		// get screen
-		if (!empty($options['screen'])) {
-			$this->screen = $options['screen'];
-		}
-		elseif (!empty($options['screenid']) || !empty($options['screenitemid'])) {
-			$options = array(
-				'output' => API_OUTPUT_EXTEND,
-				'selectScreenItems' => API_OUTPUT_SHORTEN
-			);
-			if (in_array($this->mode, array(SCREEN_MODE_PREVIEW, SCREEN_MODE_EDIT))) {
-				$options['editable'] = true;
-			}
-			if (!empty($options['screenid'])) {
-				$options['screenids'] = $options['screenid'];
-			}
-			elseif (!empty($options['screenitemid'])) {
-				$options['screenitemids'] = $options['screenitemid'];
-			}
-			else {
-				access_deny();
-			}
-
-			$this->screen = API::Screen()->get($options);
-			if (empty($this->screen)) {
-				$this->screen = API::TemplateScreen()->get($options);
-				if (empty($this->screen)) {
-					access_deny();
-				}
-			}
-			$this->screen = reset($this->screen);
-		}
+		$this->effectiveperiod = isset($options['effectiveperiod']) ? $options['effectiveperiod'] : ZBX_MAX_PERIOD;
+		$this->action = isset($options['action']) ? $options['action'] : '';
 
 		// get screen item
-		if (!empty($options['screenitemid'])) {
+		if (!empty($options['$screenitem'])) {
+			$this->$screenitem = $options['$screenitem'];
+		}
+		elseif (!empty($options['screenitemid'])) {
 			$this->screenitem = API::ScreenItem()->get(array(
 				'screenitemids' => $options['screenitemid'],
 				'output' => API_OUTPUT_EXTEND
 			));
-
-			if (!empty($this->screenitem)) {
-				$this->screenitem = reset($this->screenitem);
-			}
+			$this->screenitem = reset($this->screenitem);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -127,6 +127,7 @@ else {
 		'effectiveperiod' => $effectiveperiod,
 		'mode' => SCREEN_MODE_PREVIEW
 	));
+	$screenWidget->addItem($flickerfreeScreen->show());
 
 	// create time control
 	if ($this->data['fullscreen'] != 2) {
@@ -154,7 +155,6 @@ else {
 		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
 		zbx_add_post_js('timeControl.processObjects();');
 	}
-	$screenWidget->addItem($flickerfreeScreen->show());
 	$screenWidget->addItem(BR());
 
 	//zbx_add_post_js('checkServerStatus('.$config['server_check_interval'].');');
