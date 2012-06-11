@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 require_once dirname(__FILE__).'/include/regexp.inc.php';
@@ -111,7 +111,11 @@ elseif (isset($_REQUEST['go'])) {
 		$result = DBexecute('DELETE FROM regexps WHERE '.DBcondition('regexpid', $regexpids));
 		$result = Dbend($result);
 
-		show_messages($result, _('Regular expression deleted'), _('Cannot delete regular expression'));
+		$regexpCount = count($regexpids);
+		show_messages($result,
+			_n('Regular expression deleted', 'Regular expressions deleted', $regexpCount),
+			_n('Cannot delete regular expression', 'Cannot delete regular expressions', $regexpCount)
+		);
 		if ($result) {
 			foreach ($regexps as $regexpid => $regexp) {
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_REGEXP, 'Id ['.$regexpid.'] '._('Name').' ['.$regexp['name'].']');
@@ -232,4 +236,3 @@ $cnf_wdgt->addItem($regExpForm->render());
 $cnf_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

@@ -721,7 +721,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$goBox->addItem('bulkacknowledge', _('Bulk acknowledge'));
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton', _('Go'));
+		$goButton = new CSubmit('goButton', _('Go').' (0)');
 		$goButton->setAttribute('id', 'goButton');
 
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');
