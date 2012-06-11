@@ -1019,7 +1019,6 @@ class CTrigger extends CTriggerGeneral {
 			$functionids = array();
 			$triggersToExpandHosts = array();
 			$triggersToExpandItems = array();
-			$triggersToExpandItems2 = array();
 
 			foreach ($result as $trigger) {
 				preg_match_all('/{HOST\.NAME([1-9]?)}/u', $trigger['description'], $hnums);
@@ -1092,7 +1091,7 @@ class CTrigger extends CTriggerGeneral {
 						if (isset($funcs[$fnum - 1])) {
 							$functionid = $funcs[$fnum - 1];
 							$functionids[$functionid] = $functionid;
-							$triggersToExpandItems2[$trigger['triggerid']][$functionid] = $fnum;
+							$triggersToExpandItems[$trigger['triggerid']][$functionid] = $fnum;
 						}
 					}
 				}
@@ -1111,29 +1110,34 @@ class CTrigger extends CTriggerGeneral {
 				while ($func = DBfetch($dbFuncs)) {
 					if (isset($triggersToExpandHosts[$func['triggerid']][$func['functionid']])) {
 						$fnum = $triggersToExpandHosts[$func['triggerid']][$func['functionid']];
-						$fnum = $fnum > 1 ? $fnum : '';
 
-						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
-						$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
-						$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
+						$hostMacros = array('{HOSTNAME'.$fnum.'}', '{HOST.HOST'.$fnum.'}');
+						$nameMacros = array('{HOST.NAME'.$fnum.'}');
+						if ($fnum == 1) {
+							$hostMacros[] = '{HOSTNAME}';
+							$hostMacros[] = '{HOST.HOST}';
+							$nameMacros[] = '{HOST.NAME}';
+						}
+
+						$result[$func['triggerid']]['description'] = str_replace(
+							$hostMacros, $func['host'], $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace(
+							$nameMacros, $func['name'], $result[$func['triggerid']]['description']);
 					}
 
 					if (isset($triggersToExpandItems[$func['triggerid']][$func['functionid']])) {
 						$fnum = $triggersToExpandItems[$func['triggerid']][$func['functionid']];
-						$fnum = $fnum > 1 ? $fnum : '';
 
-						$value = $func['newvalue'] ? $func['newvalue'].' '.'('.$func['lastvalue'].')' : $func['lastvalue'];
+						$valueMacros = array('{ITEM.LASTVALUE'.$fnum.'}', '{ITEM.VALUE'.$fnum.'}');
+						if ($fnum == 1) {
+							$valueMacros[] = '{ITEM.LASTVALUE}';
+							$valueMacros[] = '{ITEM.VALUE}';
+						}
 
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $value, $result[$func['triggerid']]['description']);
-					}
+						$value = $func['newvalue'] ? $func['newvalue'].' ('.$func['lastvalue'].')' : $func['lastvalue'];
 
-					if (isset($triggersToExpandItems2[$func['triggerid']][$func['functionid']])) {
-						$fnum = $triggersToExpandItems2[$func['triggerid']][$func['functionid']];
-						$fnum = $fnum > 1 ? $fnum : '';
-
-						$value = $func['newvalue'] ? $func['newvalue'].' '.'('.$func['lastvalue'].')' : $func['lastvalue'];
-
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $value, $result[$func['triggerid']]['description']);
+						$result[$func['triggerid']]['description'] = str_replace(
+							$valueMacros, $value, $result[$func['triggerid']]['description']);
 					}
 				}
 			}
