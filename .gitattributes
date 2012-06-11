@@ -533,6 +533,7 @@ misc/images/svg/elements/Zabbix_server_3D.svg -text svneol=native#image/svg%2Bxm
 misc/images/svg/equipment_rack/Rack_42.svg -text svneol=native#image/svg%2Bxml
 misc/images/svg/equipment_rack/Rack_42_with_door.svg -text svneol=native#image/svg%2Bxml
 misc/images/svg_to_png.sh svneol=native#text/x-sh
+misc/init.d/README -text
 misc/init.d/aix/zabbix_agentd svneol=native#text/x-sh
 misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
