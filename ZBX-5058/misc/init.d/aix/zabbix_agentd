@@ -7,7 +7,7 @@
 case $1 in
 
 start)
-	/usr/local/sbin/zabbix_agentd -c /usr/local/etc/zabbix_agentd.conf;;
+	/usr/local/sbin/zabbix_agentd -c /usr/local/etc/zabbix_agentd.conf ;;
 
 stop)
 	kill -TERM `cat /tmp/zabbix_agentd.pid` ;;
