@@ -939,7 +939,7 @@ else {
 	$goOption->setAttribute('confirm', _('Delete selected hosts?'));
 	$goBox->addItem($goOption);
 
-	$goButton = new CSubmit('goButton', _('Go'));
+	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');
 	zbx_add_post_js('chkbxRange.pageGoName = "hosts";');
 
