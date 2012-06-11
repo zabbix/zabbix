@@ -717,7 +717,7 @@ function t(str) {
  * @return string
  */
 function getUniqueId() {
-	if ( typeof getUniqueId.id == 'undefined' ) {
+	if (typeof getUniqueId.id === 'undefined') {
 		getUniqueId.id = 0;
 	}
 	return 'new' + (getUniqueId.id++).toString();

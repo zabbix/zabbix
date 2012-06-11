@@ -149,7 +149,7 @@ class CJSON {
 		}
 		else {
 			// fall back to php-only method
-			$this::$forceObject = $forceObject ? JSON_FORCE_OBJECT : null;
+			self::$forceObject = $forceObject ? JSON_FORCE_OBJECT : null;
 			$encoded = $this->_json_encode($valueToEncode);
 		}
 
@@ -391,7 +391,7 @@ class CJSON {
 				 */
 
 				// treat as a JSON object
-				if ($this::$forceObject || is_array($var) && count($var) && array_keys($var) !== range(0, sizeof($var) - 1)) {
+				if (self::$forceObject || is_array($var) && count($var) && array_keys($var) !== range(0, sizeof($var) - 1)) {
 					$properties = array_map(array($this, '_name_value'), array_keys($var), array_values($var));
 					return '{' . join(',', $properties) . '}';
 				}

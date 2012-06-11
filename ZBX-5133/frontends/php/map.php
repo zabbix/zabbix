@@ -121,7 +121,6 @@ if ($nocalculations) {
 	}
 
 	$map_info = array();
-
 	foreach ($map['selements'] as $selement) {
 		// if element use icon map and icon map is set for map, and is host like element, we use default icon map icon
 		if ($map['iconmapid'] && $selement['use_iconmap'] &&
