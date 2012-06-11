@@ -373,7 +373,7 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 					zbx_strlcpy(error, "Too many hosts in a trigger expression", max_error_len);
 					break;
 				case EVENT_SOURCE_DISCOVERY:
-					zbx_strlcpy(error, "Too many hosts with same IP addreses", max_error_len);
+					zbx_strlcpy(error, "Too many hosts with same IP addresses", max_error_len);
 					break;
 			}
 			ret = FAIL;
