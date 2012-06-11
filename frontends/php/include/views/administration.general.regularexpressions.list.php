@@ -17,29 +17,17 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 $this->data['cnf_wdgt']->addHeader(_('Regular expressions'));
 
 $regExpForm = new CForm();
 $regExpForm->setName('regularExpressionsForm');
 $regExpForm->addItem(BR());
 
-$goBox = new CComboBox('go');
-
-$goOption = new CComboItem('delete', _('Delete selected'));
-$goOption->setAttribute('confirm', _('Delete selected regular expressions?'));
-
-$goBox->addItem($goOption);
-
-$goButton = new CButton('goButton', _('Go'), 'if(chkbxRange.pageGoCount>0) submit();');
-$goButton->setAttribute('id', 'goButton');
-
-zbx_add_post_js('chkbxRange.pageGoName = "regexpids";');
-
 $regExpTable = new CTableInfo(_('No regular expressions defined.'));
 $regExpTable->setHeader(array(new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');"), _('Name'), _('Expressions')));
-$regExpTable->setFooter(new CCol(array($goBox, $goButton)));
+
 
 $expressions = array();
 $values = array();
@@ -63,7 +51,20 @@ foreach($this->data['regexps'] as $regexpid => $regexp) {
 	));
 }
 
+
+$goBox = new CComboBox('go');
+
+$goOption = new CComboItem('delete', _('Delete selected'));
+$goOption->setAttribute('confirm', _('Delete selected regular expressions?'));
+
+$goBox->addItem($goOption);
+
+$goButton = new CSubmit('goButton', _('Go').' (0)');
+$goButton->setAttribute('id', 'goButton');
+zbx_add_post_js('chkbxRange.pageGoName = "regexpids";');
+
+$regExpTable->setFooter(new CCol(array($goBox, $goButton)));
+
 $regExpForm->addItem($regExpTable);
 
 return $regExpForm;
-?>
