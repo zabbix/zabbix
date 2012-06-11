@@ -22,104 +22,144 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageAdministrationGeneralRegexp extends CWebTest {
+	private $sqlHashRegexps = '';
+	private $oldHashRegexps = '';
 
-	public static function allRegexps() {
-		return DBdata('select * from regexps');
-	}
+	private $sqlHashExpressions = '';
+	private $oldHashExpressions = '';
 
-	/**
-	* @dataProvider allRegexps
-	*/
-	public function testPageAdministrationGeneralRegexp_CheckLayout($regexp) {
+	private $oldRegexpId = 20;
 
-		$this->login('adm.regexps.php');
+	private function openRegularExpressions() {
+		$this->login('adm.gui.php');
+		$this->assertElementPresent('configDropDown');
+		$this->dropdown_select_wait('configDropDown', 'Regular expressions');
+		$this->assertElementPresent('configDropDown');
+
 		$this->checkTitle('Configuration of regular expressions');
 		$this->ok('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->ok('Regular expressions');
 		$this->ok(array('Name', 'Expressions'));
-		// checking that all elements exists
-		$this->assertElementPresent('go');
-		// single quotes does not work here
-		$this->assertElementPresent("//select[@id='go']/option[text()='Delete selected']");
-		$this->assertElementPresent('goButton');
-
-		// checking that all regexps are present in the report
-		$this->ok(array($regexp['name']));
-		$this->dropdown_select('go', 'Delete selected');
 	}
 
-	/**
-	* @dataProvider allRegexps
-	*/
-	public function testPageAdministrationGeneralRegexp_SimpleUpdate($regexp) {
+	private function calculateHash($conditions = null) {
+		$this->sqlHashRegexps =
+			'SELECT * FROM regexps'.
+			($conditions ? ' WHERE '.$conditions : '').
+			' ORDER BY regexpid';
+		$this->oldHashRegexps = DBhash($this->sqlHashRegexps);
 
-		$sqlRegexps="select * from regexps order by regexpid";
-		$oldHashRegexps=DBhash($sqlRegexps);
-
-		$sqlExpressions="select * from expressions order by expressionid";
-		$oldHashExpressions=DBhash($sqlExpressions);
-
-		$this->login('adm.regexps.php');
-		// checking that can click on each regexp and then save it without any changes
-		$this->click('link='.$regexp['name']);
-		$this->wait();
-		$this->button_click('save');
-		$this->wait();
-		$this->ok('Regular expression updated');
-
-		$this->assertEquals($oldHashRegexps, DBhash($sqlRegexps), "Chuck Norris: no-change regexp update should not update data in table 'regexps'");
-
-		$this->assertEquals($oldHashExpressions, DBhash($sqlExpressions), "Chuck Norris: no-change regexp update should not update data in table 'expressions'");
+		$this->sqlHashExpressions =
+			'SELECT * FROM expressions'.
+			($conditions ? ' WHERE '.$conditions : '').
+			' ORDER BY expressionid';
+		$this->oldHashExpressions = DBhash($this->sqlHashExpressions);
 	}
 
-	/**
-	* @dataProvider allRegexps
-	*/
-	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
-		$name = $regexp['name'];
+	private function verifyHash() {
+		$this->assertEquals($this->oldHashRegexps, DBhash($this->sqlHashRegexps),
+				'Chuck Norris: Data in the DB table "regexps" has been changed.');
 
+		$this->assertEquals($this->oldHashExpressions, DBhash($this->sqlHashExpressions),
+				'Chuck Norris: Data in the DB table "expressions" has been changed.');
+	}
+
+	public function testPageAdministrationGeneralRegexp_backup() {
 		DBsave_tables('regexps');
+	}
 
-		$this->login('adm.regexps.php');
-		// detecting "regexpid" values for clicking checkboxes "regexpids[$regexpid]"
-		$sql = "SELECT regexpid FROM regexps WHERE name='$name'";
-		$result = DBfetch(DBselect($sql));
-		$regexpid = $result['regexpid'];
-		$this->checkbox_select("regexpids[$regexpid]");
+	public function testPageAdministrationGeneralRegexp_CheckLayout() {
+		$this->openRegularExpressions();
+
+		$this->assertElementPresent('form');
+		$this->assertElementPresent('all_regexps');
+
+		$result = DBselect('select regexpid,name from regexps');
+		while ($row = DBfetch($result)) {
+			$this->assertElementPresent('regexpids['.$row['regexpid'].']');
+			$this->ok($row['name']);
+		}
+
+		$this->assertElementPresent('go');
+		$goElements = $this->zbxGetDropDownElements('go');
+		$this->assertEquals(count($goElements), 1);
+		$this->assertEquals($goElements[0]['content'], 'Delete selected');
+
+		$this->assertElementPresent('goButton');
+	}
+
+	public function testPageAdministrationGeneralRegexp_MassDeleteEmpty() {
+		$this->calculateHash();
+
+		$this->openRegularExpressions();
+
 		$this->dropdown_select('go', 'Delete selected');
-		$this->chooseOkOnNextConfirmation();
 		$this->click('goButton');
+		$this->waitForAlertPresent();
+		$this->assertAlert('No elements selected!');
+
+		$this->verifyHash();
+	}
+
+	public function testPageAdministrationGeneralRegexp_MassDeleteCancel() {
+		$this->chooseCancelOnNextConfirmation();
+
+		$this->calculateHash();
+
+		$this->openRegularExpressions();
+
+		$this->checkbox_select('all_regexps');
+		$this->dropdown_select('go', 'Delete selected');
+		$this->button_click('goButton');
+		$this->waitForConfirmation();
+
+		$this->verifyHash();
+	}
+
+	public function testPageAdministrationGeneralRegexp_MassDeleteOne() {
+		$this->chooseOkOnNextConfirmation();
+
+		$this->calculateHash('regexpid<>'.$this->oldRegexpId);
+
+		$this->openRegularExpressions();
+
+		$this->checkbox_select('regexpids['.$this->oldRegexpId.']');
+		$this->dropdown_select('go', 'Delete selected');
+		$this->button_click('goButton');
+		$this->waitForConfirmation();
 		$this->wait();
 		$this->ok('Regular expression deleted');
 
-		// $sql = "SELECT * FROM regexps r WHERE r.name='$name'";
-		$sql = "SELECT * FROM regexps r WHERE r.name='$name'";
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$count = DBcount('SELECT regexpid FROM regexps WHERE regexpid='.$this->oldRegexpId);
+		$this->assertEquals(0, $count, 'Chuck Norris: Record(s) has not been deleted from the DB.');
 
-		$sql = "SELECT * FROM expressions e WHERE e.regexpid=$regexpid";
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
-		DBrestore_tables('regexps');
+		$count = DBcount('SELECT expressionid FROM expressions WHERE regexpid='.$this->oldRegexpId);
+		$this->assertEquals(0, $count, 'Chuck Norris: Record(s) has not been deleted from the DB.');
+
+		$this->verifyHash();
 	}
 
 	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
-
-		// DBsave_tables('regexps');
-
-		$this->login('adm.regexps.php');
-		$this->checkbox_select("all_regexps");
-		$this->dropdown_select('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
-		$this->click('goButton');
+
+		$this->openRegularExpressions();
+
+		$this->checkbox_select('all_regexps');
+		$this->dropdown_select('go', 'Delete selected');
+		$this->button_click('goButton');
+		$this->waitForConfirmation();
 		$this->wait();
-		$this->ok('Regular expression deleted');
+		$this->ok('Regular expressions deleted');
 
-		$sql = "SELECT * FROM regexps";
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
+		$count = DBcount('SELECT regexpid FROM regexps');
+		$this->assertEquals(0, $count, 'Chuck Norris: Record(s) has not been deleted from the DB');
 
-		$sql = "SELECT * FROM regexps r,expressions e WHERE r.regexpid=e.regexpid";
-		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp expressions has not been deleted from the DB');
+		$count = DBcount('SELECT expressionid FROM expressions');
+		$this->assertEquals(0, $count, 'Chuck Norris: Record(s) has not been deleted from the DB');
+	}
 
-		// DBrestore_tables('regexps');
+	public function testPageAdministrationGeneralRegexp_restore() {
+		DBrestore_tables('regexps');
 	}
 
 }
