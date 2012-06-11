@@ -9,6 +9,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5143] fixed regular expression delete action ignores cancelation in confirmation dialog (Vedmak)
 ........S. [ZBX-5148] fixed linking of item prototypes by a discovery rule (Sasha)
 ....I..... [ZBX-5061] fixed Oracle SQL errors when executing data.sql (Sasha)
 ........S. [ZBX-5123] fixed Oracle SQL error while linking a template by server (Sasha)
@@ -69,6 +70,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5143] fixed regular expression delete action ignores cancelation in confirmation dialog (Vedmak)
 ........S. [ZBX-5148] fixed linking of item prototypes by a discovery rule (Sasha)
 ....I..... [ZBX-5061] fixed Oracle SQL errors when executing data.sql (Sasha)
 ........S. [ZBX-5123] fixed Oracle SQL error while linking a template by server (Sasha)
