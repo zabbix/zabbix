@@ -9,6 +9,8 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+........S. [ZBX-5042] fixed server crash while sync `host_inventory` table (Sasha)
+........S. [ZBX-5042] fixed possible sql errors while node sync (Sasha)
 ....I..... [ZBX-5058] init.d scripts updated for Zabbix 2.0 (Andris)
 ..F....... [ZBX-5143] fixed regular expression delete action ignores cancelation in confirmation dialog (Vedmak)
 ........S. [ZBX-5148] fixed linking of item prototypes by a discovery rule (Sasha)
