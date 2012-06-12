@@ -29,18 +29,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'default_theme'           => array(T_ZBX_STR, O_OPT, null,        NOT_EMPTY,                 'isset({save})'),
-	'event_ack_enable'        => array(T_ZBX_INT, O_OPT, null,        IN('1'),                   null),
-	'event_expire'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),         'isset({save})', _('Show events not older than (in days)')),
-	'event_show_max'          => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),         'isset({save})', _('Max count of events per trigger to show')),
-	'dropdown_first_entry'    => array(T_ZBX_INT, O_OPT, null,        IN('0,1,2'),               'isset({save})'),
-	'dropdown_first_remember' => array(T_ZBX_INT, O_OPT, null,        IN('1'),                   null),
-	'max_in_table'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),         'isset({save})', _('Max count of elements to show inside table cell')),
-	'search_limit'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 999999),        'isset({save})', _('Search/Filter elements limit')),
-	'server_check_interval'   => array(T_ZBX_INT, O_OPT, null,        BETWEEN(30, SEC_PER_HOUR), null, _('Zabbix server activity check interval')),
-	'server_check_enabled'    => array(T_ZBX_INT, O_OPT, null,        null,                      null),
-	'save'                    => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,                      null),
-	'form_refresh'            => array(T_ZBX_INT, O_OPT, null,        null,                      null)
+	'default_theme'           => array(T_ZBX_STR, O_OPT, null,        NOT_EMPTY,          'isset({save})'),
+	'event_ack_enable'        => array(T_ZBX_INT, O_OPT, null,        IN('1'),            null),
+	'event_expire'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({save})', _('Show events not older than (in days)')),
+	'event_show_max'          => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({save})', _('Max count of events per trigger to show')),
+	'dropdown_first_entry'    => array(T_ZBX_INT, O_OPT, null,        IN('0,1,2'),        'isset({save})'),
+	'dropdown_first_remember' => array(T_ZBX_INT, O_OPT, null,        IN('1'),            null),
+	'max_in_table'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 99999),  'isset({save})', _('Max count of elements to show inside table cell')),
+	'search_limit'            => array(T_ZBX_INT, O_OPT, null,        BETWEEN(1, 999999), 'isset({save})', _('Search/Filter elements limit')),
+	'server_check_interval'   => array(T_ZBX_INT, O_OPT, null,        null,               null, _('Zabbix server activity check interval')),
+	'save'                    => array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,               null),
+	'form_refresh'            => array(T_ZBX_INT, O_OPT, null,        null,               null)
 );
 check_fields($fields);
 
@@ -116,15 +115,10 @@ if ($data['form_refresh']) {
 	$data['config']['event_expire'] = get_request('event_expire');
 	$data['config']['event_show_max'] = get_request('event_show_max');
 	$data['config']['server_check_enabled'] = get_request('server_check_enabled');
-	$data['config']['server_check_interval'] = get_request('server_check_interval', 60);
+	$data['config']['server_check_interval'] = get_request('server_check_interval', 0);
 }
 else {
 	$data['config'] = select_config(false);
-	$data['config']['server_check_enabled'] = (bool) $data['config']['server_check_interval'];
-
-	if (!$data['config']['server_check_interval']) {
-		$data['config']['server_check_interval'] = 60;
-	}
 }
 
 $guiForm = new CView('administration.general.gui.edit', $data);
