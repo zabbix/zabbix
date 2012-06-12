@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/blocks.inc.php';
 
@@ -30,10 +30,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 $reportWidget = new CWidget();
 $reportWidget->addPageHeader(_('STATUS OF ZABBIX'));
-$reportWidget->addHeader(_('Report'));
-$reportWidget->addItem(BR());
 $reportWidget->addItem(make_status_of_zbx());
 $reportWidget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

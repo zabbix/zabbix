@@ -557,7 +557,7 @@ function get_status() {
 	);
 
 	// server
-	$status['zabbix_server'] = zabbixRunning() ? _('Yes') : _('No');
+	$status['zabbix_server'] = zabbixIsRunning() ? _('Yes') : _('No');
 
 	// triggers
 	$dbTriggers = DBselect('SELECT COUNT(DISTINCT t.triggerid) AS cnt,t.status,t.value'.
@@ -668,7 +668,7 @@ function get_status() {
 	return $status;
 }
 
-function zabbixRunning() {
+function zabbixIsRunning() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 	if (empty($ZBX_SERVER) || empty ($ZBX_SERVER_PORT)) {
