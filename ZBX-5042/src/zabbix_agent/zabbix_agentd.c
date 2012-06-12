@@ -574,7 +574,6 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 	}
 
-	/* collector data must be initiated by user 'zabbix' */
 	init_collector_data();
 
 #ifdef _WINDOWS

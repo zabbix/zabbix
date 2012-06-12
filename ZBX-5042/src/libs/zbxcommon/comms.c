@@ -28,13 +28,13 @@ int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size
 	int	i, ret = SUCCEED;
 	char	*data_b64 = NULL;
 
-	assert(host && 0 != host_len);
-	assert(key && 0 != key_len);
-	assert(data && 0 != data_len);
-	assert(lastlogsize && 0 != lastlogsize_len);
-	assert(timestamp && 0 != timestamp_len);
-	assert(source && 0 != source_len);
-	assert(severity && 0 != severity_len);
+	assert(NULL != host && 0 != host_len);
+	assert(NULL != key && 0 != key_len);
+	assert(NULL != data && 0 != data_len);
+	assert(NULL != lastlogsize && 0 != lastlogsize_len);
+	assert(NULL != timestamp && 0 != timestamp_len);
+	assert(NULL != source && 0 != source_len);
+	assert(NULL != severity && 0 != severity_len);
 
 	if (SUCCEED == xml_get_data_dyn(xml, "host", &data_b64))
 	{
