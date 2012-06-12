@@ -333,9 +333,6 @@ table.page_header tr td.page_header_m {
 	font-size: 1.2em;
 	text-align: center;
 }
-table.page_header tr td.page_header_m.warning-global {
-	background-color: #FBB;
-}
 table.page_header tr td.page_header_r {
 	text-align: right;
 	white-space: nowrap;
@@ -798,3 +795,20 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 .service-mon .tableinfo .sla-bar .sla-bar-part { height: 15px; display: inline-block; margin-bottom: -4px; }
 .service-mon .tableinfo .sla-bar .sla-green { background: url('../images/gradients/sla_green15.png') repeat-x; }
 .service-mon .tableinfo .sla-bar .sla-red { background: url('../images/gradients/sla_red15.png') repeat-x; }
+
+#message-global-wrap {
+	display: none;
+	position: fixed;
+	left: 25%;
+	right: 25%;
+	text-align : center;
+	padding: 0 10px 10px;
+}
+#message-global {
+	color: #FFF;
+	background-color: #C33;
+	border: 5px solid #C33;
+	border-radius: 5px;
+	font-size: 1.5em;
+}
+

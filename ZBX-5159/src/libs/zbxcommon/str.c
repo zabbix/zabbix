@@ -1911,7 +1911,7 @@ size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *o
 	}
 	o = *output;
 
-	while (i - input < ilen)
+	while ((size_t)(i - input) < ilen)
 	{
 		*o++ = zbx_num2hex((*i >> 4) & 0xf);
 		*o++ = zbx_num2hex(*i & 0xf);
@@ -2167,7 +2167,8 @@ size_t	zbx_get_next_field(const char **line, char **output, size_t *olen, char s
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
 	const char	*end;
-	int		len, ret = FAIL;
+	int		ret = FAIL;
+	size_t		len;
 
 	len = strlen(value);
 
@@ -2826,7 +2827,7 @@ void	zbx_strupper(char *str)
 		*str = toupper(*str);
 }
 
-#if defined(_WINDOWS)
+#ifdef _WINDOWS
 #include "log.h"
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 {
@@ -2839,7 +2840,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 
 	if (FAIL == get_codepage(encoding, &codepage))
 	{
-		utf8_size = in_size + 1;
+		utf8_size = (int)in_size + 1;
 		utf8_string = zbx_malloc(utf8_string, utf8_size);
 		memcpy(utf8_string, in, in_size);
 		utf8_string[in_size] = '\0';
@@ -2850,19 +2851,19 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 
 	if (1200 != codepage)	/* UTF-16 */
 	{
-		wide_size = MultiByteToWideChar(codepage, 0, in, in_size, NULL, 0);
+		wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0);
 		if (wide_size > STATIC_SIZE)
 			wide_string = (LPTSTR)zbx_malloc(wide_string, (size_t)wide_size * sizeof(TCHAR));
 		else
 			wide_string = wide_string_static;
 
 		/* convert from in to wide_string */
-		MultiByteToWideChar(codepage, 0, in, in_size, wide_string, wide_size);
+		MultiByteToWideChar(codepage, 0, in, (int)in_size, wide_string, wide_size);
 	}
 	else
 	{
 		wide_string = (wchar_t *)in;
-		wide_size = in_size / 2;
+		wide_size = (int)in_size / 2;
 	}
 
 	utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL);
@@ -3169,17 +3170,12 @@ int	is_ascii_string(const char *str)
  ******************************************************************************/
 char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 {
-	size_t	src_size;	/* input length */
-	size_t	dst_size;	/* output length */
-	size_t	delim_size;	/* delimiter length */
-	int	feeds;		/* number of feeds */
-	size_t	left;		/* what's left after last feed */
-	char	*dst = NULL;	/* output with linefeeds */
+	size_t		src_size, dst_size, delim_size, left;
+	int		feeds;		/* number of feeds */
+	char		*dst = NULL;	/* output with linefeeds */
+	const char	*p_src;
+	char		*p_dst;
 
-	const char	*p_src;	/* working pointer to input */
-	char		*p_dst;	/* working pointer to output */
-
-	/* check input */
 	assert(NULL != src);
 	assert(0 < maxline);
 
@@ -3191,7 +3187,7 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
 	delim_size = strlen(delim);
 
 	/* make sure we don't feed the last line */
-	feeds = src_size / maxline - (0 != src_size % maxline || 0 == src_size ? 0 : 1);
+	feeds = (int)(src_size / maxline - (0 != src_size % maxline || 0 == src_size ? 0 : 1));
 
 	left = src_size - feeds * maxline;
 	dst_size = src_size + feeds * delim_size + 1;

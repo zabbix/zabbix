@@ -284,7 +284,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->click('goButton');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->ok('Regular expression deleted');
+		$this->ok('Regular expressions deleted');
 
 		$sql = 'SELECT * FROM regexps';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');
