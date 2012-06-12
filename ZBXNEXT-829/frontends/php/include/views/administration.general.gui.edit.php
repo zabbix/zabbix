@@ -45,7 +45,7 @@ $guiTab->addRow(_('Show events not older than (in days)'),
 $guiTab->addRow(_('Max count of events per trigger to show'),
 	new CTextBox('event_show_max', $this->data['config']['event_show_max'], 5));
 $guiTab->addRow(_('Show warning if Zabbix server is down'),
-	new CCheckBox('server_check_interval', $this->data['config']['server_check_interval'], null, 1));
+	new CCheckBox('server_check_interval', $this->data['config']['server_check_interval'], null, SERVER_CHECK_INTERVAL));
 
 $guiView = new CTabView();
 $guiView->addTab('gui', _('GUI'), $guiTab);

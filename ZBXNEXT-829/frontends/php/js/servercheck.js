@@ -37,14 +37,14 @@ jQuery(function($) {
 		showWarning: function(message) {
 			if (!this.warning) {
 				$('#message-global').text(message);
-				$('#message-global-wrap').show();
+				$('#message-global-wrap').fadeIn(100);
 				this.warning = true;
 			}
 		},
 
 		hideWarning: function() {
 			if (this.warning) {
-				$('#message-global-wrap').hide();
+				$('#message-global-wrap').fadeOut(100);
 				this.warning = false;
 			}
 		}
@@ -72,17 +72,17 @@ jQuery(function($) {
 			y1 = offset.top,
 			y2 = y1 + obj.outerHeight();
 
-		obj.hide();
+		obj.fadeOut(100);
 
 		$(document).on('mousemove.messagehide', function(e) {
 			if (e.pageX < x1 || e.pageX > x2 || e.pageY < y1 || e.pageY > y2) {
-				obj.show();
+				obj.fadeIn(100);
 				$(document).off('mousemove.messagehide');
 				$(document).off('mouseleave.messagehide');
 			}
 		});
 		$(document).on('mouseleave.messagehide', function() {
-			obj.show();
+			obj.fadeIn(100);
 			$(document).off('mouseleave.messagehide');
 			$(document).off('mousemove.messagehide');
 		});

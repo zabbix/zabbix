@@ -799,8 +799,8 @@ table.suggest tr td { text-align: left; padding-left: 4px; line-height: 2.2em; f
 #message-global-wrap {
 	display: none;
 	position: fixed;
-	left: 20%;
-	right: 20%;
+	left: 25%;
+	right: 25%;
 	text-align : center;
 	padding: 0 10px 10px;
 }
