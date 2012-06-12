@@ -29,20 +29,23 @@ $comboDdFirstEntry->addItem(ZBX_DROPDOWN_FIRST_ALL, _('All'));
 
 $guiTab = new CFormList('scriptsTab');
 $guiTab->addRow(_('Default theme'), array($comboTheme));
-$guiTab->addRow(_('Dropdown first entry'), array($comboDdFirstEntry, new CCheckBox('dropdown_first_remember', $this->data['config']['dropdown_first_remember'], null, 1), _('remember selected')));
-$guiTab->addRow(_('Search/Filter elements limit'), new CNumericBox('search_limit', $this->data['config']['search_limit'], 6));
-$guiTab->addRow(_('Max count of elements to show inside table cell'), new CNumericBox('max_in_table', $this->data['config']['max_in_table'], 5));
-$guiTab->addRow(_('Enable event acknowledges'), new CCheckBox('event_ack_enable', $this->data['config']['event_ack_enable'], null, 1));
-$guiTab->addRow(_('Show events not older than (in days)'), new CTextBox('event_expire', $this->data['config']['event_expire'], 5));
-$guiTab->addRow(_('Max count of events per trigger to show'), new CTextBox('event_show_max', $this->data['config']['event_show_max'], 5));
-$guiTab->addRow(_('Enable Zabbix server availability check every'), array(
-	new CCheckBox('server_check_enabled', $this->data['config']['server_check_enabled'], null, 1),
-	SPACE,
-	new CNumericBox('server_check_interval', $this->data['config']['server_check_interval'], 4),
-	SPACE,
-	_('seconds')
-
+$guiTab->addRow(_('Dropdown first entry'), array(
+	$comboDdFirstEntry,
+	new CCheckBox('dropdown_first_remember', $this->data['config']['dropdown_first_remember'], null, 1),
+	_('remember selected')
 ));
+$guiTab->addRow(_('Search/Filter elements limit'),
+	new CNumericBox('search_limit', $this->data['config']['search_limit'], 6));
+$guiTab->addRow(_('Max count of elements to show inside table cell'),
+	new CNumericBox('max_in_table', $this->data['config']['max_in_table'], 5));
+$guiTab->addRow(_('Enable event acknowledges'),
+	new CCheckBox('event_ack_enable', $this->data['config']['event_ack_enable'], null, 1));
+$guiTab->addRow(_('Show events not older than (in days)'),
+	new CTextBox('event_expire', $this->data['config']['event_expire'], 5));
+$guiTab->addRow(_('Max count of events per trigger to show'),
+	new CTextBox('event_show_max', $this->data['config']['event_show_max'], 5));
+$guiTab->addRow(_('Show warning if Zabbix server is down'),
+	new CCheckBox('server_check_interval', $this->data['config']['server_check_interval'], null, SERVER_CHECK_INTERVAL));
 
 $guiView = new CTabView();
 $guiView->addTab('gui', _('GUI'), $guiTab);
