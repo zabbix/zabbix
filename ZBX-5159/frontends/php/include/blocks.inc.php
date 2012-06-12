@@ -866,7 +866,7 @@ function make_latest_issues(array $filter = array()) {
 		));
 		if ($event = reset($events)) {
 			$ack = getEventAckState($event, true, true, $ackParams);
-			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])), ZBX_FLAG_EVENT);
+			$description = expandTriggerDescription(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])), ZBX_FLAG_EVENT);
 
 			// actions
 			$actions = get_event_actions_stat_hints($event['eventid']);

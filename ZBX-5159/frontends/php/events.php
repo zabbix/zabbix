@@ -279,7 +279,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // FILTER {{{
 	$filterForm = null;
 
-	if(EVENT_SOURCE_TRIGGERS == $source){
+	if (EVENT_SOURCE_TRIGGERS == $source) {
 		$filterForm = new CFormTable(null, null, 'get');//,'events.php?filter_set=1','POST',null,'sform');
 		$filterForm->setAttribute('name', 'zbx_filter');
 		$filterForm->setAttribute('id', 'zbx_filter');
@@ -288,13 +288,17 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$filterForm->addVar('stime', get_request('stime'));
 		$filterForm->addVar('period', get_request('period'));
 
-		if(isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)){
-			// trigger description
-			$trigger = expand_trigger_description_simple($_REQUEST['triggerid']);
-			// prepending host name to trigger description
-			$triggerHostDB = get_hosts_by_triggerid($_REQUEST['triggerid']);
-			$triggerHost = DBfetch($triggerHostDB);
-			$trigger = $triggerHost['name'].':'.$trigger;
+		if (isset($_REQUEST['triggerid']) && ($_REQUEST['triggerid']>0)) {
+			$dbTrigger = API::Trigger()->get(array(
+				'triggerids' => $_REQUEST['triggerid'],
+				'output' => array('description', 'expression'),
+				'selectHosts' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+				'expandDescription' => true
+			));
+			$dbTrigger = reset($dbTrigger);
+			$host = reset($dbTrigger['hosts']);
+			$trigger = $host['name'].':'.$dbTrigger['description'];
 		}
 		else{
 			$trigger = '';
@@ -635,7 +639,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 					$ack = getEventAckState($event, true);
 
-					$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
+					$description = expandTriggerDescription(zbx_array_merge($trigger, array('clock'=>$event['clock'], 'ns'=>$event['ns'])), ZBX_FLAG_EVENT);
 
 					$tr_desc = new CSpan($description,'pointer');
 					$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".

@@ -112,7 +112,7 @@ function make_event_details($event, $trigger) {
 	$config = select_config();
 	$table = new CTableInfo();
 
-	$table->addRow(array(_('Event'), expand_trigger_description_by_data(array_merge($trigger, $event), ZBX_FLAG_EVENT)));
+	$table->addRow(array(_('Event'), expandTriggerDescription(array_merge($trigger, $event), ZBX_FLAG_EVENT)));
 	$table->addRow(array(_('Time'), zbx_date2str(_('d M Y H:i:s'), $event['clock'])));
 
 	if ($config['event_ack_enable']) {
@@ -362,7 +362,7 @@ function getLastEvents($options) {
 
 		//expanding description for the state where event was
 		$merged_event = array_merge($event, $triggers[$event['objectid']]);
-		$events[$enum]['trigger']['description'] = expand_trigger_description_by_data($merged_event, ZBX_FLAG_EVENT);
+		$events[$enum]['trigger']['description'] = expandTriggerDescription($merged_event, ZBX_FLAG_EVENT);
 	}
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);
 

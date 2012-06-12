@@ -147,7 +147,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			'triggerids' => $_REQUEST['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
-			'nodeids' => get_current_nodeid(true)
+			'nodeids' => get_current_nodeid(true),
+			'expandDescription' => true
 		);
 
 		$trigger_data = API::Trigger()->get($options);
@@ -168,8 +169,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		$rep2_wdgt->addHeader(array(
 			new CLink($trigger_data['hostname'], '?filter_groupid=' . $_REQUEST['groupid'] . '&filter_hostid=' . $trigger_data['hostid']),
 			' : ',
-			expand_trigger_description_by_data($trigger_data)
-				), SPACE);
+			$trigger_data['description']
+		), SPACE);
 
 		$table = new CTableInfo(null, 'graph');
 		$table->addRow(new CImg('chart4.php?triggerid=' . $_REQUEST['triggerid']));

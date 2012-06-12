@@ -227,11 +227,17 @@ add_elementNames($sysmap['selements']);
 
 foreach ($sysmap['links'] as &$link) {
 	foreach ($link['linktriggers'] as $lnum => $linktrigger) {
-		$hosts = get_hosts_by_triggerid($linktrigger['triggerid']);
-		if ($host = DBfetch($hosts)) {
-			$description = $host['name'].':'.expand_trigger_description_simple($linktrigger['triggerid']);
-		}
-		$link['linktriggers'][$lnum]['desc_exp'] = $description;
+		$dbTrigger = API::Trigger()->get(array(
+			'triggerids' => $linktrigger['triggerid'],
+			'output' => array('description', 'expression'),
+			'selectHosts' => API_OUTPUT_EXTEND,
+			'preservekeys' => true,
+			'expandDescription' => true
+		));
+		$dbTrigger = reset($dbTrigger);
+		$host = reset($dbTrigger['hosts']);
+
+		$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].':'.$dbTrigger['description'];
 	}
 	order_result($link['linktriggers'], 'desc_exp');
 }
