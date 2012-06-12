@@ -850,34 +850,29 @@ int	is_ip(const char *ip)
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	expand_ipv6(const char *ip, char *str, size_t str_len )
+int	expand_ipv6(const char *ip, char *str, size_t str_len)
 {
-	unsigned int	i[8]; /* x:x:x:x:x:x:x:x */
+	unsigned int	i[8];	/* x:x:x:x:x:x:x:x */
 	char		buf[5], *ptr;
-	int		c, dc, pos = 0, j, len, ip_len;
+	int		c, dc, pos = 0, len;
+	size_t		ip_len, j;
 
-	c = 0; /* colons count */
+	c = 0;	/* colons count */
 	for (ptr = strchr(ip, ':'); ptr != NULL; ptr = strchr(ptr + 1, ':'))
-	{
-		c ++;
-	}
+		c++;
 
-	if (c < 2 || c > 7)
-	{
+	if (2 > c || c > 7)
 		return FAIL;
-	}
 
 	ip_len = strlen(ip);
 	if ((ip[0] == ':' && ip[1] != ':') || (ip[ip_len - 1] == ':' && ip[ip_len - 2] != ':'))
-	{
 		return FAIL;
-	}
 
 	memset(i, 0x00, sizeof(i));
 
 	dc  = 0; /* double colon flag */
 	len = 0;
-	for (j = 0; j<ip_len; j++)
+	for (j = 0; j < ip_len; j++)
 	{
 		if (0 != isxdigit(ip[j]))
 		{
@@ -1266,7 +1261,7 @@ int	int_in_list(char *list, int value)
 int	is_double_suffix(const char *str)
 {
 	size_t	i;
-	int	dot = -1;
+	char	dot = 0;
 
 	for (i = 0; '\0' != str[i]; i++)
 	{
@@ -1277,9 +1272,9 @@ int	is_double_suffix(const char *str)
 		if (0 != isdigit(str[i]))
 			continue;
 
-		if ('.' == str[i] && -1 == dot)
+		if ('.' == str[i] && 0 == dot)
 		{
-			dot = i;
+			dot = 1;
 			continue;
 		}
 
@@ -1310,7 +1305,7 @@ int	is_double_suffix(const char *str)
 int	is_double(const char *str)
 {
 	size_t	i, len;
-	int	dot = -1;
+	char	dot = 0;
 
 	for (i = 0; ' ' == str[i] && '\0' != str[i]; i++)	/* trim left spaces */
 		;
@@ -1324,9 +1319,9 @@ int	is_double(const char *str)
 		if (0 != isdigit(str[i]))
 			continue;
 
-		if ('.' == str[i] && -1 == dot)
+		if ('.' == str[i] && 0 == dot)
 		{
-			dot = i;
+			dot = 1;
 			continue;
 		}
 
@@ -1342,7 +1337,7 @@ int	is_double(const char *str)
 		return FAIL;
 	}
 
-	if (0 == len || (1 == len && -1 != dot))
+	if (0 == len || (1 == len && 0 != dot))
 		return FAIL;
 
 	return SUCCEED;

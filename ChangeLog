@@ -1,6 +1,7 @@
 Changes for 2.1.0
 
 New features:
+...G...... [ZBXNEXT-801] maximum number of monitored disks increased to 1024, with dynamic increasing of shared memory size (Andris)
 ..F....... [ZBX-5106] fixed trigger dependencies not being mapped to new triggers when cloning a host (Pavels)
 ..F....... [ZBX-5106] fixed trigger dependencies on web triggers not being removed when cloning a host (Pavels)
 A.F....... [ZBX-5074] redesign configuration of action (Eduard)
@@ -64,6 +65,7 @@ A......... [ZBX-5026] fixed error messages when creating IT Service (Eduard)
 Changes for 2.0.1rc1
 
 New features:
+...G...... [ZBXNEXT-801] maximum number of monitored disks increased to 1024, with dynamic increasing of shared memory size (Andris)
 ....I..... [ZBXNEXT-1256] added example Solaris partition LLD user parameter (Richlv)
 A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBX-1357] updated Brazilian Portuguese, French, Greek, Japanese, Ukrainian and Russian translations; thanks to Zabbix translators (Richlv)

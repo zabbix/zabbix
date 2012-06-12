@@ -77,7 +77,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t buf_size, int tim
 	{
 		if (0 != in_buf_size)
 		{
-			if (0 != ReadFile(hRead, *buf, MIN(in_buf_size, buf_size), &read_bytes, NULL))
+			if (0 != ReadFile(hRead, *buf, (DWORD)MIN(in_buf_size, buf_size), &read_bytes, NULL))
 			{
 				*buf += read_bytes;
 				if (0 == (buf_size -= read_bytes))
