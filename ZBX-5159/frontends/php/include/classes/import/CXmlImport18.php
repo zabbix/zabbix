@@ -1707,5 +1707,4 @@ class CXmlImport18 {
 			}
 		}
 	}
-
 }

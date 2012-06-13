@@ -1664,7 +1664,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			if ($expressionChanged) {
-				delete_function_by_triggerid($trigger['triggerid']);
+				DB::delete('functions', array('triggerid' => $trigger['triggerid']));
 
 				$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
 				if (is_null($trigger['expression'])) {

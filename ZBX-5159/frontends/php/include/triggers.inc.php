@@ -1048,52 +1048,299 @@ function implode_exp($expression, $triggerid, &$hostnames = array()) {
 	return $expr;
 }
 
-/**
- * @param array $trigger
- *
- * @return mixed
- */
-function expandUserMacros(array $trigger) {
-	$description = $trigger['description'];
 
-	if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $matches)) {
-		$macros = API::UserMacro()->getMacros(array(
-			'macros' => $matches[1],
-			'triggerid' => $trigger['triggerid']
-		));
-		$description = str_replace(array_keys($macros), array_values($macros), $description);
+
+
+class CTriggerDescription {
+
+	protected $triggers;
+	protected $soloTrigger;
+
+	public function addTrigger(array $trigger) {
+		$this->soloTrigger = true;
+
+		$this->add(array($trigger));
 	}
 
-	return $description;
+	public function addTriggers(array $triggers) {
+		$this->soloTrigger = false;
+		$this->add($triggers);
+	}
+
+	public function addTriggerById($triggerId) {
+		$this->soloTrigger = true;
+
+		$trigger = DBfetch(DBselect(
+			'SELECT DISTINCT t.description,t.expression,t.triggerid'.
+				' FROM triggers t'.
+				' WHERE t.triggerid='.$triggerId
+		));
+		$this->add(array($trigger));
+	}
+
+	protected function add(array $triggers) {
+		$this->triggers = zbx_toHash($triggers, 'triggerid');
+	}
+
+	public function expand() {
+		$expandHost = array();
+		$expandIp = array();
+		$expandItem = array();
+
+		foreach ($this->triggers as &$trigger) {
+			$trigger['description'] = $this->expandReferenceMacros($trigger);
+
+			$functions = $this->findFunctions($trigger['expression']);
+
+			foreach($this->findHostMacros($trigger['description']) as $macro => $fNum) {
+				$expandHost[$functions[$fNum]][$fNum] = $macro;
+			}
+
+			foreach($this->findIpMacros($trigger['description']) as $macro => $fNum) {
+				$expandIp[$functions[$fNum]][$fNum] = $macro;
+			}
+
+			foreach($this->findItemMacros($trigger['description']) as $macro => $fNum) {
+				$expandItem[$functions[$fNum]][$fNum] = $macro;
+			}
+
+
+			$trigger['description'] = $this->expandUserMacros($trigger);
+		}
+		unset($trigger);
+
+		$this->expandHostMacros($expandHost);
+		$this->expandIpMacros($expandIp);
+		$this->expandItemMacros($expandItem);
+
+		if ($this->soloTrigger) {
+			$trigger = reset($trigger);
+			return $trigger['description'];
+		}
+		else {
+			return $this->triggers;
+		}
+	}
+
+	protected function expandReferenceMacros(array $trigger) {
+		$expression = $trigger['expression'];
+		$description = $trigger['description'];
+
+		// search for reference macros $1, $2, $3, ...
+		preg_match_all('/\$([1-9])/', $description, $refNumbers);
+		$refNumbers = $refNumbers[1];
+
+		// replace functionids with string to make values search easier
+		preg_replace('/\{[0-9]+\}/', 'function', $expression);
+
+		// search for numeric values in expression
+		preg_match_all('/'.ZBX_PREG_NUMBER.'/', $expression, $values);
+
+		$search = array();
+		$replace = array();
+		foreach ($refNumbers as $i) {
+			$search[] = '$'.$i;
+			$replace[] = isset($values[0][$i - 1]) ? $values[0][$i - 1] : '';
+		}
+
+		return str_replace($search, $replace, $description);
+	}
+
+	protected function expandUserMacros(array $trigger) {
+		$description = $trigger['description'];
+
+		if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $description, $matches)) {
+			$macros = API::UserMacro()->getMacros(array(
+				'macros' => $matches[1],
+				'triggerid' => $trigger['triggerid']
+			));
+			$description = str_replace(array_keys($macros), array_values($macros), $description);
+		}
+
+		return $description;
+	}
+
+	protected function findFunctions($expression) {
+		preg_match_all('/\{([0-9]+)\}/', $expression, $matches);
+		$functions = array();
+		foreach ($matches[1] as $i => $functionid) {
+			$functions[$i + 1] = $functionid;
+		}
+
+		return $functions;
+	}
+
+	protected function findHostMacros($description) {
+		return $this->findMacrosInDescription('HOSTNAME|HOST\.HOST|HOST\.NAME', $description);
+	}
+
+	protected function findIpMacros($description) {
+		return $this->findMacrosInDescription('IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN', $description);
+	}
+
+	protected function findItemMacros($description) {
+		return $this->findMacrosInDescription('ITEM\.LASTVALUE|ITEM\.VALUE', $description);
+	}
+
+	protected function findMacrosInDescription(array $macrosPattern, $description) {
+		$result = array();
+
+		preg_match_all('/{('.$macrosPattern.')([1-9]?)}/', $description, $matches);
+		foreach ($matches[1] as $num => $foundMacro) {
+			$functionNum = $matches[2][$num] ? $matches[2][$num] : 1;
+			$result[$foundMacro][$functionNum] = $functionNum;
+		}
+
+		return $result;
+	}
+
+	protected function expandHostMacros(array $expandHost) {
+		if (!empty($expandHost)) {
+			$dbFuncs = DBselect(
+				'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name'.
+					' FROM functions f'.
+					' INNER JOIN items i ON f.itemid=i.itemid'.
+					' INNER JOIN hosts h ON i.hostid=h.hostid'.
+					' WHERE '.DBcondition('f.functionid', array_keys($expandHost))
+			);
+			while ($func = DBfetch($dbFuncs)) {
+				foreach ($expandHost[$func['functionid']] as $fNum => $macro) {
+					switch ($macro) {
+						case 'HOSTNAME':
+							/* fall through */
+						case 'HOST.HOST':
+							$replace = $func['host'];
+							break;
+						case 'HOST.NAME':
+							$replace = $func['name'];
+							break;
+					}
+
+					$macros = array('{'.$macro.$fNum.'}');
+					if ($fNum == 1) {
+						$macros[] = '{'.$macro.'}';
+					}
+					$this->triggers[$func['triggerid']]['description'] = str_replace(
+						$macros, $replace, $this->triggers[$func['triggerid']]['description']);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	protected function expandIpMacros(array $expandIp) {
+		if (!empty($expandIp)) {
+			$priorities = array(
+				INTERFACE_TYPE_AGENT => 4,
+				INTERFACE_TYPE_SNMP => 3,
+				INTERFACE_TYPE_JMX => 2,
+				INTERFACE_TYPE_IPMI => 1
+			);
+			$dbInterfaces = DBselect(
+				'SELECT DISTINCT f.triggerid,f.functionid,n.ip,n.dns,n.type,n.useip'.
+					' FROM functions f'.
+					' INNER JOIN items i ON f.itemid=i.itemid'.
+					' INNER JOIN interface n ON i.hostid=n.hostid'.
+					' WHERE '.DBcondition('f.functionid', array_keys($expandIp)).
+						' AND n.main=1'.
+						' AND '.DBcondition('n.type', array_keys($priorities))
+			);
+			$priority = 0;
+			while ($dbInterface = DBfetch($dbInterfaces)) {
+				if ($priority >= $priorities[$dbInterface['type']]) {
+					continue;
+				}
+				$priority = $priorities[$dbInterface['type']];
+				$interface = $dbInterface;
+			}
+			foreach ($expandIp[$interface['functionid']] as $fNum => $macro) {
+				switch ($macro) {
+					case 'IPADDRESS':
+						$replace = $interface['ip'];
+						break;
+					case 'HOST.DNS':
+						$replace = $interface['dns'];
+						break;
+					case 'HOST.CONN':
+						$replace = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+						break;
+				}
+
+				$macros = array('{'.$macro.$fNum.'}');
+				if ($fNum == 1) {
+					$macros[] = '{'.$macro.'}';
+				}
+				$this->triggers[$interface['triggerid']]['description'] = str_replace(
+					$macros, $replace, $this->triggers[$interface['triggerid']]['description']);
+			}
+		}
+
+		return true;
+	}
+
+	protected function expandItemMacros(array $expandItem) {
+		if (!empty($expandItem)) {
+			$dbFuncs = DBselect(
+				'SELECT DISTINCT f.triggerid,f.functionid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.newvalue'.
+					' FROM functions f'.
+					' INNER JOIN items i ON f.itemid=i.itemid'.
+					' INNER JOIN hosts h ON i.hostid=h.hostid'.
+					' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
+					' WHERE '.DBcondition('f.functionid', array_keys($expandItem))
+			);
+			while ($func = DBfetch($dbFuncs)) {
+				foreach ($expandItem[$func['functionid']] as $fNum => $macro) {
+					switch ($macro) {
+						case 'ITEM.LASTVALUE':
+							$replace = $this->resolveItemLastvalueMacro($func);
+							break;
+						case 'ITEM.VALUE':
+							$replace = $this->resolveItemValueMacro($func);
+							break;
+					}
+
+					$macros = array('{'.$macro.$fNum.'}');
+					if ($fNum == 1) {
+						$macros[] = '{'.$macro.'}';
+					}
+					$this->triggers[$func['triggerid']]['description'] = str_replace(
+						$macros, $replace, $this->triggers[$func['triggerid']]['description']);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	protected function resolveItemLastvalueMacro(array $item) {
+		if ($item['newvalue']) {
+			$value = $item['newvalue'].' ('.$item['lastvalue'].')';
+		}
+		else {
+			$value = formatItemValueType($item);
+		}
+
+		return $value;
+	}
+
+	protected function resolveItemValueMacro(array $item) {
+		return $this->resolveItemLastvalueMacro($item);
+	}
 }
 
-/**
- * @param array $trigger
- *
- * @return mixed
- */
-function expandReferenceMacros(array $trigger) {
-	$expression = $trigger['expression'];
-	$description = $trigger['description'];
+class CEventDescription extends CTriggerDescription {
 
-	// search for reference macros $1, $2, $3, ...
-	preg_match_all('/\$([1-9])/', $description, $refNumbers);
-	$refNumbers = $refNumbers[1];
+	protected function resolveItemValueMacro(array $item) {
+		$item['lastvalue'] = item_get_history(
+			$item,
+			0,
+			$this->triggers[$item['triggerid']]['clock'],
+			$this->triggers[$item['triggerid']]['ns']
+		);
 
-	// replace functionids with string to make values search easier
-	preg_replace('/\{[0-9]+\}/', 'function', $expression);
-
-	// search for numeric values in expression
-	preg_match_all('/'.ZBX_PREG_NUMBER.'/', $expression, $values);
-
-	$search = array();
-	$replace = array();
-	foreach ($refNumbers as $i) {
-		$search[] = '$'.$i;
-		$replace[] = isset($values[0][$i - 1]) ? $values[0][$i - 1] : '';
+		return formatItemValue($item);
 	}
-
-	return str_replace($search, $replace, $description);
 }
 
 /**
@@ -1189,7 +1436,7 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 
 	if (!empty($expandItemFunctions)) {
 		$dbFuncs = DBselect(
-			'SELECT DISTINCT f.triggerid,f.functionid,i.lastvalue,i.lastclock,i.value_type,i.units,m.newvalue'.
+			'SELECT DISTINCT f.triggerid,f.functionid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.newvalue'.
 				' FROM functions f'.
 				' INNER JOIN items i ON f.itemid=i.itemid'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
@@ -1214,14 +1461,14 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 					$valueMacros, $value, $triggers[$func['triggerid']]['description']);
 
 
-				// {ITEM.VALUE} expand differently for events
 				$valueMacros = array('{ITEM.VALUE'.$num.'}');
 				if ($num == 1) {
 					$valueMacros[] = '{ITEM.VALUE}';
 				}
 
+				// {ITEM.VALUE} expand differently for events
 				if ($flag == ZBX_FLAG_EVENT) {
-					$value = trigger_get_func_value(
+					$func['lastvalue'] = trigger_get_func_value(
 						$triggers[$func['triggerid']]['expression'],
 						ZBX_FLAG_EVENT,
 						$num,
@@ -1229,12 +1476,7 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 						$triggers[$func['triggerid']]['ns']
 					);
 
-					if ($func['newvalue']) {
-						$value = $func['newvalue'].' ('.$func['lastvalue'].')';
-					}
-					else {
-						$value = formatItemValueType($func);
-					}
+					$value = formatItemValue($func);
 				}
 				else {
 					if ($func['newvalue']) {
@@ -1262,7 +1504,7 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 			'SELECT DISTINCT f.triggerid,f.functionid,n.ip,n.dns,n.type,n.useip'.
 				' FROM functions f'.
 				' INNER JOIN items i ON f.itemid=i.itemid'.
-				' INNER JOIN interfaces n ON i.hostid=n.hostid'.
+				' INNER JOIN interface n ON i.hostid=n.hostid'.
 				' WHERE '.DBcondition('f.functionid', $expandIpFunctions).
 					' AND n.main=1'.
 					' AND '.DBcondition('n.type', array_keys($priorities))
@@ -1321,6 +1563,9 @@ function expand_trigger_description_simple($triggerid) {
 	));
 	return expandTriggerDescription($trigger);
 }
+
+
+
 
 function updateTriggerValueToUnknownByHostId($hostIds) {
 	zbx_value2array($hostIds);
@@ -1392,11 +1637,6 @@ function check_right_on_trigger_by_expression($permission, $expression) {
 	return true;
 }
 
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
 function replace_template_dependencies($deps, $hostid) {
 	foreach ($deps as $id => $val) {
 		$sql = 'SELECT t.triggerid'.
@@ -1410,17 +1650,6 @@ function replace_template_dependencies($deps, $hostid) {
 		}
 	}
 	return $deps;
-}
-
-/******************************************************************************
- *																			*
- * Comments: !!! Don't forget sync code with C !!!							*
- *																			*
- ******************************************************************************/
-
-function delete_function_by_triggerid($triggerids) {
-	zbx_value2array($triggerids);
-	return DBexecute('DELETE FROM functions WHERE '.DBcondition('triggerid', $triggerids));
 }
 
 function get_triggers_overview($hostids, $view_style = null, $params = array()) {
@@ -2421,20 +2650,6 @@ function remake_expression($expression, $actionid, $action, $new_expr) {
 	}
 }
 
-function &find_node(&$node, $nodeid) {
-	if ($node['id'] == $nodeid) {
-		return $node;
-	}
-	if (isset($node['left'])) {
-		$res = &find_node($node['left'], $nodeid);
-		if (!is_array($res)) {
-			$res = &find_node($node['right'], $nodeid);
-		}
-		return $res;
-	}
-	return $nodeid;
-}
-
 function make_expression($node, &$map, $parent_expr = null) {
 	$expr = '';
 	if (isset($node['left'])) {
@@ -2620,7 +2835,7 @@ function parseTriggerExpressions($expressions, $askData = false) {
 
 	$data = array();
 	$noErrors = true;
-	foreach ($expressions as $key => $str) {
+	foreach ($expressions as $str) {
 		if (!isset($triggersData[$str])) {
 			$tmp_expr = $str;
 			if ($scparser->parse($tmp_expr)) {
