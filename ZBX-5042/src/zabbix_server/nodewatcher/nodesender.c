@@ -299,13 +299,6 @@ static void	DMcollect_table_data(int nodeid, unsigned char dest_nodetype, const 
 			if (NULL != curr_cksum && NULL != (d_curr_cksum = strchr(curr_cksum, ',')))
 				*d_curr_cksum = '\0';
 
-if (0 == strcmp(table->table, "host_inventory"))
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "DMcollect_table_data() sync:%p s:%p dest_nodetype:%d", sync, s, (int)dest_nodetype);
-	zabbix_log(LOG_LEVEL_DEBUG, "DMcollect_table_data() status:%c", s[dest_nodetype]);
-	zabbix_log(LOG_LEVEL_DEBUG, "DMcollect_table_data() field:%s prev_cksum:%s curr_cksum:%s",
-			table->fields[f].name, prev_cksum, curr_cksum);
-}
 			if (NULL == prev_cksum || NULL == curr_cksum || ZBX_REC_UPDATED != s[dest_nodetype] ||
 					0 != strcmp(prev_cksum, curr_cksum))
 			{
@@ -320,10 +313,6 @@ if (0 == strcmp(table->table, "host_inventory"))
 
 			/* "host_inventory" table has more than 64 fields */
 			/* remaining fields are processed as one */
-if (0 == strcmp(table->table, "host_inventory"))
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "DMcollect_table_data() s - sync:%d", (int)(s - sync));
-}
 			if (126 > s - sync)
 				s += 2;
 			f++;
