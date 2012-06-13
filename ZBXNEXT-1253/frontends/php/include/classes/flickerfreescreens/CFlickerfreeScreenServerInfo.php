@@ -26,12 +26,6 @@ class CFlickerfreeScreenServerInfo extends CFlickerfreeScreenItem {
 	}
 
 	public function get() {
-		$output = array(new CServerInfo());
-
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput(new CServerInfo());
 	}
 }

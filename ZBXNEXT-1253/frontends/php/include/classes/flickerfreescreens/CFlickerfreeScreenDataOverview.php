@@ -32,12 +32,6 @@ class CFlickerfreeScreenDataOverview extends CFlickerfreeScreenItem {
 			$hostids[$dbHostGroup['hostid']] = $dbHostGroup['hostid'];
 		}
 
-		$output = array(get_items_data_overview($hostids, $this->screenitem['style']));
-
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput(get_items_data_overview($hostids, $this->screenitem['style']));
 	}
 }

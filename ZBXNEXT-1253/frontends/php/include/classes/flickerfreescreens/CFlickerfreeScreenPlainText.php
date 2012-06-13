@@ -40,11 +40,6 @@ class CFlickerfreeScreenPlainText extends CFlickerfreeScreenItem {
 			}
 		}
 
-		$output = array(get_screen_plaintext($this->screenitem['resourceid'], $this->screenitem['elements'], $this->screenitem['style']));
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput(get_screen_plaintext($this->screenitem['resourceid'], $this->screenitem['elements'], $this->screenitem['style']));
 	}
 }

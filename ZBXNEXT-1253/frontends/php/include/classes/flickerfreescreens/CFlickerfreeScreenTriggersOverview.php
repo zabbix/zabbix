@@ -32,12 +32,6 @@ class CFlickerfreeScreenTriggersOverview extends CFlickerfreeScreenItem {
 			$hostids[$dbHostGroup['hostid']] = $dbHostGroup['hostid'];
 		}
 
-		$output = array(get_triggers_overview($hostids, $this->screenitem['style'], array('screenid' => $this->screenid)));
-
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput(get_triggers_overview($hostids, $this->screenitem['style'], array('screenid' => $this->screenid)));
 	}
 }

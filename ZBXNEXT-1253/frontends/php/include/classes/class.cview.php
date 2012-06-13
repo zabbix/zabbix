@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CView {
 
@@ -110,7 +109,7 @@ class CView {
 		$data = $this->data;
 		ob_start();
 		$this->template = include($this->filePath);
-		if (false === $this->template) {
+		if ($this->template === false) {
 			throw new Exception(_s('Cannot include view file "%s".', $this->filePath));
 		}
 		$this->scripts = ob_get_clean();
@@ -132,4 +131,3 @@ class CView {
 		$this->template->show();
 	}
 }
-?>

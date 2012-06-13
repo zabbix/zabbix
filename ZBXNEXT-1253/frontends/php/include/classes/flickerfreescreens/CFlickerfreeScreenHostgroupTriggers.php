@@ -123,12 +123,6 @@ class CFlickerfreeScreenHostgroupTriggers extends CFlickerfreeScreenItem {
 		$output = new CUIWidget('hat_htstatus', make_latest_issues($params, true));
 		$output->setDoubleHeader(array(_('STATUS OF TRIGGERS'), SPACE, zbx_date2str(_('[H:i:s]')), SPACE), $item);
 
-		$output = array($output);
-
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput($output);
 	}
 }

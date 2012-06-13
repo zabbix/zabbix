@@ -38,8 +38,8 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 		$graphDims['graphHeight'] = $this->screenitem['height'];
 		$graphDims['width'] = $this->screenitem['width'];
 
-		// get timecontroll
-		$timecontrollData = array(
+		// get time control
+		$timeControlData = array(
 			'id' => $this->screenitem['resourceid'],
 			'domid' => $domGraphid,
 			'containerid' => $containerid,
@@ -77,16 +77,23 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 				$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
 			}
 			if ($this->mode == SCREEN_MODE_PREVIEW) {
-				$timecontrollData['loadSBox'] = 1;
+				$timeControlData['loadSBox'] = 1;
 			}
 		}
 
-		$timecontrollData['src'] = zbx_empty($this->screenitem['resourceid'])
+		$timeControlData['src'] = zbx_empty($this->screenitem['resourceid'])
 			? 'chart3.php?'
 			: 'chart.php?itemid='.$this->screenitem['resourceid'].'&'.$this->screenitem['url'].'width='.$this->screenitem['width']
 				.'&height='.$this->screenitem['height'];
 
-		// process output
+		if ($this->mode == SCREEN_MODE_VIEW) {
+			insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+		}
+		else {
+			zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+		}
+
+		// output
 		if ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) {
 			$item = new CDiv();
 		}
@@ -95,19 +102,6 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 		}
 		$item->setAttribute('id', $containerid);
 
-		$output = array($item);
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			$output[] = BR();
-			$output[] = new CLink(_('Change'), $this->action);
-		}
-
-		if ($this->mode == SCREEN_MODE_VIEW) {
-			insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timecontrollData).');');
-		}
-		else {
-			zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timecontrollData).');');
-		}
-
-		return $output;
+		return $this->getOutput($item);
 	}
 }

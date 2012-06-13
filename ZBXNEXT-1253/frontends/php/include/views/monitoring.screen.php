@@ -156,8 +156,6 @@ else {
 		zbx_add_post_js('timeControl.processObjects();');
 	}
 	$screenWidget->addItem(BR());
-
-	//zbx_add_post_js('checkServerStatus('.$config['server_check_interval'].');');
 }
 
 return $screenWidget;

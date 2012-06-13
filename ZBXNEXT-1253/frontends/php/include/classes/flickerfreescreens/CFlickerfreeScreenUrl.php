@@ -26,12 +26,6 @@ class CFlickerfreeScreenUrl extends CFlickerfreeScreenItem {
 	}
 
 	public function get() {
-		$output = array(new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto'));
-
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, BR(), new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput(new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto'));
 	}
 }

@@ -82,16 +82,9 @@ class CFlickerfreeScreenClock extends CFlickerfreeScreenItem {
 		$item->setTimeZone($timeZone);
 		$item->setTimeOffset($timeOffset);
 
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			$flashclockOverDiv = new CDiv(null, 'flashclock');
-			$flashclockOverDiv->setAttribute('style', 'width: '.$this->screenitem['width'].'px; height: '.$this->screenitem['height'].'px;');
+		$flashclockOverDiv = new CDiv(null, 'flashclock');
+		$flashclockOverDiv->setAttribute('style', 'width: '.$this->screenitem['width'].'px; height: '.$this->screenitem['height'].'px;');
 
-			$output = array($flashclockOverDiv, $item, BR(), new CLink(_('Change'), $this->action));
-		}
-		else {
-			$output = array($item);
-		}
-
-		return $output;
+		return $this->getOutput(array($item, $flashclockOverDiv));
 	}
 }

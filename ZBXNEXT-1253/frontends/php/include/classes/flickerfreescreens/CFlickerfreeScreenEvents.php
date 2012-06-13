@@ -37,8 +37,8 @@ class CFlickerfreeScreenEvents extends CFlickerfreeScreenItem {
 			$options['value'] = array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE);
 		}
 
-		$output = new CTableInfo(_('No events defined.'));
-		$output->setHeader(array(
+		$item = new CTableInfo(_('No events defined.'));
+		$item->setHeader(array(
 			_('Time'),
 			is_show_all_nodes() ? _('Node') : null,
 			_('Host'),
@@ -57,7 +57,7 @@ class CFlickerfreeScreenEvents extends CFlickerfreeScreenItem {
 			// add colors and blinking to span depending on configuration and trigger parameters
 			addTriggerValueStyle($statusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
-			$output->addRow(array(
+			$item->addRow(array(
 				zbx_date2str(_('d M Y H:i:s'), $event['clock']),
 				get_node_name_by_elid($event['objectid']),
 				$host['host'],
@@ -70,11 +70,6 @@ class CFlickerfreeScreenEvents extends CFlickerfreeScreenItem {
 			));
 		}
 
-		$output = array($output);
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput($item);
 	}
 }

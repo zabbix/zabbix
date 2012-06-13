@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /************ REQUEST ************/
 function redirect($url) {
 	zbx_flush_post_cookies();
@@ -1748,4 +1748,8 @@ function num2letter($number) {
 	} while (0 != $number);
 
 	return $str;
+}
+
+function zbx_floatToString($float) {
+	return number_format($float, 0, '', '');
 }

@@ -26,12 +26,6 @@ class CFlickerfreeScreenTriggersInfo extends CFlickerfreeScreenItem {
 	}
 
 	public function get() {
-		$output = array(new CTriggersInfo($this->screenitem['resourceid'], null, $this->screenitem['style']));
-
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput(new CTriggersInfo($this->screenitem['resourceid'], null, $this->screenitem['style']));
 	}
 }

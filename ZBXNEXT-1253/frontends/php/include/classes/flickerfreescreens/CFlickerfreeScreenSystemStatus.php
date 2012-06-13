@@ -26,7 +26,7 @@ class CFlickerfreeScreenSystemStatus extends CFlickerfreeScreenItem {
 	}
 
 	public function get() {
-		$output = new CUIWidget('hat_syssum', make_system_status(array(
+		$item = new CUIWidget('hat_syssum', make_system_status(array(
 			'groupids' => null,
 			'hostids' => null,
 			'maintenance' => null,
@@ -35,15 +35,9 @@ class CFlickerfreeScreenSystemStatus extends CFlickerfreeScreenItem {
 			'extAck' => 0,
 			'screenid' => $this->screenid
 		)));
-		$output->setHeader(_('Status of Zabbix'), SPACE);
-		$output->setFooter(_s('Updated: %s', zbx_date2str(_('H:i:s'))));
+		$item->setHeader(_('Status of Zabbix'), SPACE);
+		$item->setFooter(_s('Updated: %s', zbx_date2str(_('H:i:s'))));
 
-		$output = array($output);
-
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput($item);
 	}
 }

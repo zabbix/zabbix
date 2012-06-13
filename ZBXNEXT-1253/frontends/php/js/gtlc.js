@@ -26,6 +26,12 @@ var timeControl = {
 	debug_info: '', // debug string
 	debug_prev: '', // don't log repeated fnc
 
+	refreshObject: function(domid) {
+		this.objectList[domid].processed = 0;
+
+		this.processObjects();
+	},
+
 	addObject: function(domid, time, objData) {
 		this.debug('addObject', domid);
 
@@ -67,15 +73,14 @@ var timeControl = {
 			time.starttime = time.endtime - 3 * ((time.period < 86400) ? 86400 : time.period);
 		}
 		else {
-			time.starttime = (nowDate.setZBXDate(time.starttime) / 1000);
+			time.starttime = nowDate.setZBXDate(time.starttime) / 1000;
 		}
-
 
 		if (!isset('usertime', time)) {
 			time.usertime = time.endtime;
 		}
 		else {
-			time.usertime = (nowDate.setZBXDate(time.usertime) / 1000);
+			time.usertime = nowDate.setZBXDate(time.usertime) / 1000;
 		}
 
 		this.objectList[domid].time = time;
@@ -117,7 +122,7 @@ var timeControl = {
 				obj.objDims.width += g_width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
 			}
 
-			if (isset('graphtype', obj.objDims) && (obj.objDims.graphtype < 2)) {
+			if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
 				var g_url = new Curl(obj.src);
 				g_url.setArgument('width', obj.objDims.width);
 
@@ -144,26 +149,25 @@ var timeControl = {
 
 		var obj = this.objectList[objid];
 
-		var g_img = document.createElement('img');
-		$(obj.containerid).appendChild(g_img);
-
-		g_img.className = 'borderless';
-		g_img.setAttribute('id', obj.domid);
-		g_img.setAttribute('src', obj.src);
+		var img = document.createElement('img');
+		img.className = 'borderless';
+		img.setAttribute('id', obj.domid);
+		img.setAttribute('src', obj.src);
+		$(obj.containerid).appendChild(img);
 
 		if (obj.loadScroll) {
 			obj.scroll_listener = this.addScroll.bindAsEventListener(this, obj.domid);
-			addListener(g_img, 'load', obj.scroll_listener);
+			addListener(img, 'load', obj.scroll_listener);
 		}
 
 		if (obj.loadSBox) {
 			obj.sbox_listener = this.addSBox.bindAsEventListener(this, obj.domid);
-			addListener(g_img, 'load', obj.sbox_listener);
-			addListener(g_img, 'load', moveSBoxes);
+			addListener(img, 'load', obj.sbox_listener);
+			addListener(img, 'load', moveSBoxes);
 
 			if (IE) {
 				// workaround to IE6 & IE7 DOM redraw problem
-				addListener(obj.domid, 'load', function() { setTimeout( function(){$('scrollbar_cntr').show(); }, 500); });
+				addListener(obj.domid, 'load', function() { setTimeout( function() { $('scrollbar_cntr').show(); }, 500); });
 			}
 		}
 	},
@@ -407,7 +411,7 @@ function onload_update_scroll(id, w, period, stime, timel, bar_stime) {
 	}
 }
 
-// Title: TimeLine COntrol CORE
+// title: timeline control core
 var ZBX_TIMELINES = {};
 
 function create_timeline(tlid, period, starttime, usertime, endtime, maximumperiod) {
@@ -1091,7 +1095,7 @@ var CScrollBar = Class.create(CDebug, {
 		});
 	},
 
-	// <LEFT ARR>
+	// <left arr>
 	make_left_arr_dragable: function(element) {
 		this.debug('make_left_arr_dragable');
 
@@ -1151,7 +1155,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.setBarByGhost();
 	},
 
-	// <RIGHT ARR>
+	// <right arr>
 	make_right_arr_dragable: function(element) {
 		this.debug('make_right_arr_dragable');
 
@@ -1403,8 +1407,8 @@ var CScrollBar = Class.create(CDebug, {
 			weeks = parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400) / (7 * 86400));
 		}
 
-		var days = 	parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400 - weeks * 7 * 86400) / 86400);
-		var hours =  parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400 - weeks * 7 * 86400 - days * 86400) / 3600);
+		var days = parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400 - weeks * 7 * 86400) / 86400);
+		var hours = parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400 - weeks * 7 * 86400 - days * 86400) / 3600);
 		var minutes = parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400 - weeks * 7 * 86400 - days * 86400 - hours * 3600) / 60);
 
 		if (tsDouble) {

@@ -21,26 +21,30 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
+$requestType = get_request('type', PAGE_TYPE_JSON);
+if ($requestType == PAGE_TYPE_JSON) {
+	$http_request = new CHTTP_request();
+	$json = new CJSON();
+	$data = $json->decode($http_request->body(), true);
+}
+else {
+	$data = $_REQUEST;
+}
+
 $page['title'] = 'RPC';
 $page['file'] = 'jsrpc.php';
 $page['hist_arg'] = array();
-$page['type'] = detect_page_type(PAGE_TYPE_JSON);
+$page['type'] = detect_page_type($requestType);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-
-$http_request = new CHTTP_request();
-$data = $http_request->body();
-
-$json = new CJSON();
-$data = $json->decode($data, true);
 
 if (!is_array($data)) {
 	fatal_error('Wrong RPC call to JS RPC');
 }
-if (!isset($data['method']) || !isset($data['params'])) {
+if (!isset($data['method'])) {
 	fatal_error('Wrong RPC call to JS RPC');
 }
-if (!is_array($data['params'])) {
+if ($requestType == PAGE_TYPE_JSON && (!isset($data['params']) || !is_array($data['params']))) {
 	fatal_error('Wrong RPC call to JS RPC');
 }
 
@@ -167,25 +171,41 @@ switch ($data['method']) {
 			'message' => $checkStatus ? '' : _('Zabbix server might be down!')
 		);
 		break;
-	case 'flickerfreeScreenItem.get':
-		$name = $data['name'];
-		$screenItem = new $name($data);
+	case 'flickerfreeScreen.get':
+		/*if (!empty($data['params']['screenitemid'])) {
+			$data['params']['screenitemid'] = zbx_floatToString($data['params']['screenitemid']);
+		}*/
 
-		$result = array(
-			'data' => $screenItem->get()
-		);
+		$flickerfreeScreen = CFlickerfreeScreen::getScreen(array(
+			'screenitemid' => $data['screenitemid'],
+			'mode' => !empty($data['mode']) ? $data['mode'] : SCREEN_MODE_VIEW,
+			'effectiveperiod' => !empty($data['effectiveperiod']) ? $data['effectiveperiod'] : ZBX_MAX_PERIOD
+		));
+		$flickerfreeScreen = $flickerfreeScreen->get();
+		if (!empty($flickerfreeScreen) && is_object($flickerfreeScreen)) {
+			$result = $flickerfreeScreen->toString();
+		}
+		else {
+			fatal_error('Wrong RPC call to JS RPC');
+		}
+
 		break;
 	default:
 		fatal_error('Wrong RPC call to JS RPC');
 }
 
-if (isset($data['id'])) {
-	$rpcResp = array(
-		'jsonrpc' => '2.0',
-		'result' => $result,
-		'id' => $data['id']
-	);
-	echo $json->encode($rpcResp);
+if ($requestType == PAGE_TYPE_JSON) {
+	if (isset($data['id'])) {
+		$rpcResp = array(
+			'jsonrpc' => '2.0',
+			'result' => $result,
+			'id' => $data['id']
+		);
+		echo $json->encode($rpcResp);
+	}
+}
+elseif ($requestType == PAGE_TYPE_TEXT) {
+	echo $result;
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

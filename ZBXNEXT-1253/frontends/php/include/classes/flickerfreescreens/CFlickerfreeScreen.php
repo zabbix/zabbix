@@ -54,58 +54,76 @@ class CFlickerfreeScreen {
 		}
 	}
 
-	private function getClass($resourcetype) {
-		switch ($resourcetype) {
+	public static function getScreen(array $options = array()) {
+		if (empty($options['resourcetype'])) {
+			if (!empty($options['screenitemid']) && empty($options['screenitem'])) {
+				$options['screenitem'] = API::ScreenItem()->get(array(
+					'screenitemids' => $options['screenitemid'],
+					'output' => API_OUTPUT_EXTEND
+				));
+				$options['screenitem'] = reset($options['screenitem']);
+			}
+
+			if (!empty($options['screenitem'])) {
+				$options['resourcetype'] = $options['screenitem']['resourcetype'];
+			}
+		}
+
+		if (!array_key_exists('resourcetype', $options)) {
+			return null;
+		}
+
+		switch ($options['resourcetype']) {
 			case SCREEN_RESOURCE_GRAPH:
-				return new CFlickerfreeScreenGraph();
+				return new CFlickerfreeScreenGraph($options);
 
 			case SCREEN_RESOURCE_SIMPLE_GRAPH:
-				return new CFlickerfreeScreenSimpleGraph();
+				return new CFlickerfreeScreenSimpleGraph($options);
 
 			case SCREEN_RESOURCE_MAP:
-				return new CFlickerfreeScreenMap();
+				return new CFlickerfreeScreenMap($options);
 
 			case SCREEN_RESOURCE_PLAIN_TEXT:
-				return new CFlickerfreeScreenPlainText();
+				return new CFlickerfreeScreenPlainText($options);
 
 			case SCREEN_RESOURCE_HOSTS_INFO:
-				return new CFlickerfreeScreenHostsInfo();
+				return new CFlickerfreeScreenHostsInfo($options);
 
 			case SCREEN_RESOURCE_TRIGGERS_INFO:
-				return new CFlickerfreeScreenTriggersInfo();
+				return new CFlickerfreeScreenTriggersInfo($options);
 
 			case SCREEN_RESOURCE_SERVER_INFO:
-				return new CFlickerfreeScreenServerInfo();
+				return new CFlickerfreeScreenServerInfo($options);
 
 			case SCREEN_RESOURCE_CLOCK:
-				return new CFlickerfreeScreenClock();
+				return new CFlickerfreeScreenClock($options);
 
 			case SCREEN_RESOURCE_SCREEN:
-				return new CFlickerfreeScreenScreen();
+				return new CFlickerfreeScreenScreen($options);
 
 			case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-				return new CFlickerfreeScreenTriggersOverview();
+				return new CFlickerfreeScreenTriggersOverview($options);
 
 			case SCREEN_RESOURCE_DATA_OVERVIEW:
-				return new CFlickerfreeScreenDataOverview();
+				return new CFlickerfreeScreenDataOverview($options);
 
 			case SCREEN_RESOURCE_URL:
-				return new CFlickerfreeScreenUrl();
+				return new CFlickerfreeScreenUrl($options);
 
 			case SCREEN_RESOURCE_ACTIONS:
-				return new CFlickerfreeScreenActions();
+				return new CFlickerfreeScreenActions($options);
 
 			case SCREEN_RESOURCE_EVENTS:
-				return new CFlickerfreeScreenEvents();
+				return new CFlickerfreeScreenEvents($options);
 
 			case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-				return new CFlickerfreeScreenHostgroupTriggers();
+				return new CFlickerfreeScreenHostgroupTriggers($options);
 
 			case SCREEN_RESOURCE_SYSTEM_STATUS:
-				return new CFlickerfreeScreenSystemStatus();
+				return new CFlickerfreeScreenSystemStatus($options);
 
 			case SCREEN_RESOURCE_HOST_TRIGGERS:
-				return new CFlickerfreeScreenHostTriggers();
+				return new CFlickerfreeScreenHostTriggers($options);
 
 			default:
 				return null;
@@ -234,13 +252,14 @@ class CFlickerfreeScreen {
 				}
 				// screen cell
 				elseif (!empty($screenitem['screenitemid']) && isset($screenitem['resourcetype'])) {
-					$flickerfreeScreen = $this->getClass($screenitem['resourcetype']);
-					if (!empty($flickerfreeScreen)) {
-						$flickerfreeScreen->screenid = $this->screen['screenid'];
-						$flickerfreeScreen->screenitem = $screenitem;
-						$flickerfreeScreen->mode = $this->mode;
-						$flickerfreeScreen->effectiveperiod = $this->effectiveperiod;
+					$flickerfreeScreen = CFlickerfreeScreen::getScreen(array(
+						'resourcetype' => $screenitem['resourcetype'],
+						'screenitem' => $screenitem,
+						'mode' => $this->mode,
+						'effectiveperiod' => $this->effectiveperiod,
+					));
 
+					if (!empty($flickerfreeScreen)) {
 						if ($this->mode == SCREEN_MODE_EDIT && !empty($screenitem['screenitemid'])) {
 							$flickerfreeScreen->action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitem['screenitemid'];
 						}
@@ -357,6 +376,7 @@ class CFlickerfreeScreenItem {
 	public $mode;
 	public $effectiveperiod;
 	public $action;
+	public $id;
 
 	public function __construct(array $options = array()) {
 		$this->screenid = isset($options['screenid']) ? $options['screenid'] : null;
@@ -364,9 +384,9 @@ class CFlickerfreeScreenItem {
 		$this->effectiveperiod = isset($options['effectiveperiod']) ? $options['effectiveperiod'] : ZBX_MAX_PERIOD;
 		$this->action = isset($options['action']) ? $options['action'] : '';
 
-		// get screen item
-		if (!empty($options['$screenitem'])) {
-			$this->$screenitem = $options['$screenitem'];
+		// get screenitem
+		if (!empty($options['screenitem'])) {
+			$this->screenitem = $options['screenitem'];
 		}
 		elseif (!empty($options['screenitemid'])) {
 			$this->screenitem = API::ScreenItem()->get(array(
@@ -375,5 +395,28 @@ class CFlickerfreeScreenItem {
 			));
 			$this->screenitem = reset($this->screenitem);
 		}
+	}
+
+	public function getId() {
+		if (empty($this->id) && !empty($this->screenitem)) {
+			$this->id = 'flickerfreescreen_'.$this->screenitem['screenitemid'];
+		}
+
+		return $this->id;
+	}
+
+	public function getOutput($item = null) {
+		$this->insertFlickerfreeJs();
+
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			return new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getId());
+		}
+		else {
+			return new CDiv($item, null, $this->getId());
+		}
+	}
+
+	public function insertFlickerfreeJs() {
+		zbx_add_post_js('flickerfreeScreen('.$this->screenitem['screenitemid'].', '.CWebUser::$data['refresh'].', '.$this->mode.', '.$this->screenitem['resourcetype'].');');
 	}
 }

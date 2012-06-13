@@ -26,12 +26,6 @@ class CFlickerfreeScreenActions extends CFlickerfreeScreenItem {
 	}
 
 	public function get() {
-		$output = array(get_history_of_actions($this->screenitem['elements']));
-
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput(get_history_of_actions($this->screenitem['elements']));
 	}
 }

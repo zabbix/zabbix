@@ -154,6 +154,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 		if (!empty($DB['DB'])) {
 			$config = select_config();
 			$css = getUserTheme(CWebUser::$data);
+
 			echo '<style type="text/css">'."\n".
 					'.disaster { background-color: #'.$config['severity_color_5'].' !important; }'."\n".
 					'.high { background-color: #'.$config['severity_color_4'].' !important; }'."\n".
@@ -181,6 +182,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	<link rel="stylesheet" type="text/css" href="styles/ie.css" />
 <![endif]-->
 <script type="text/javascript" src="js/browsers.js"></script>
+<script type="text/javascript" src="js/jsDump.js"></script>
 <script type="text/javascript">var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
 	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'];
@@ -466,11 +468,11 @@ if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
 	$attempdate = CProfile::get('web.login.attempt.clock', 0);
 
 	$error_msg = _n('%1$s failed login attempt logged. Last failed attempt was from %2$s on %3$s at %4$s.',
-			'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s.',
-			$failedAttempts,
-			$attempip,
-			zbx_date2str(_('d M Y'), $attempdate),
-			zbx_date2str(_('H:i'), $attempdate)
+		'%1$s failed login attempts logged. Last failed attempt was from %2$s on %3$s at %4$s.',
+		$failedAttempts,
+		$attempip,
+		zbx_date2str(_('d M Y'), $attempdate),
+		zbx_date2str(_('H:i'), $attempdate)
 	);
 	error($error_msg);
 

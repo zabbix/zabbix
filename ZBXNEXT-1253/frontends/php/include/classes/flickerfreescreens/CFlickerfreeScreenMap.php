@@ -28,7 +28,6 @@ class CFlickerfreeScreenMap extends CFlickerfreeScreenItem {
 	public function get() {
 		$image = new CImg('map.php?noedit=1&sysmapid='.$this->screenitem['resourceid'].'&width='.$this->screenitem['width']
 			.'&height='.$this->screenitem['height'].'&curtime='.time());
-		$output = array($image);
 
 		if ($this->mode == SCREEN_MODE_PREVIEW) {
 			$sysmap = API::Map()->get(array(
@@ -47,10 +46,14 @@ class CFlickerfreeScreenMap extends CFlickerfreeScreenItem {
 			$output = array($actionMap, $image);
 		}
 		elseif ($this->mode == SCREEN_MODE_EDIT) {
-			$output[] = BR();
-			$output[] = new CLink(_('Change'), $this->action);
+			$output = array($image, BR(), new CLink(_('Change'), $this->action));
+		}
+		else {
+			$output = array($image);
 		}
 
-		return $output;
+		$this->insertFlickerfreeJs();
+
+		return new CDiv($output, null, $this->getId());
 	}
 }

@@ -38,12 +38,7 @@ class CFlickerfreeScreenScreen extends CFlickerfreeScreenItem {
 			'effectiveperiod' => $this->effectiveperiod,
 			'mode' => ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) ? SCREEN_MODE_VIEW : SCREEN_MODE_PREVIEW
 		));
-		$output = array($flickerfreeScreen->show());
 
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			array_push($output, new CLink(_('Change'), $this->action));
-		}
-
-		return $output;
+		return $this->getOutput($flickerfreeScreen->show());
 	}
 }
