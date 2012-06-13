@@ -120,7 +120,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	if ($result) {
 		$event_acknowledged = true;
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, _('Acknowledge added').
-			' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : expandTriggerDescription($event_trigger).']'.
+			' ['.($bulk) ? ' BULK ACKNOWLEDGE ' : $event_trigger.']'.
 			' ['.$_REQUEST['message'].']');
 	}
 

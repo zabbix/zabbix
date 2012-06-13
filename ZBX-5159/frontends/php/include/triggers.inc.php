@@ -17,8 +17,8 @@
 ** along with this program; ifnot, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function init_trigger_expression_structures($getMacros = true, $getFunctions = true) {
 	if ($getMacros) {
 		$ZBX_TR_EXPR_SIMPLE_MACROS = array(
@@ -1189,7 +1189,7 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 
 	if (!empty($expandItemFunctions)) {
 		$dbFuncs = DBselect(
-			'SELECT DISTINCT f.triggerid,f.functionid,i.lastvalue,i.value_type,i.units,m.newvalue'.
+			'SELECT DISTINCT f.triggerid,f.functionid,i.lastvalue,i.lastclock,i.value_type,i.units,m.newvalue'.
 				' FROM functions f'.
 				' INNER JOIN items i ON f.itemid=i.itemid'.
 				' INNER JOIN hosts h ON i.hostid=h.hostid'.
@@ -1197,7 +1197,7 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 				' WHERE '.DBcondition('f.functionid', $expandItemFunctions)
 		);
 		while ($func = DBfetch($dbFuncs)) {
-			foreach ($expandHost[$func['triggerid']][$func['functionid']] as $num) {
+			foreach ($expandItem[$func['triggerid']][$func['functionid']] as $num) {
 				$valueMacros = array('{ITEM.LASTVALUE'.$num.'}');
 				if ($num == 1) {
 					$valueMacros[] = '{ITEM.LASTVALUE}';
@@ -1207,7 +1207,7 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 					$value = $func['newvalue'].' ('.$func['lastvalue'].')';
 				}
 				else {
-					$value = format_lastvalue($func);
+					$value = formatItemValueType($func);
 				}
 
 				$triggers[$func['triggerid']]['description'] = str_replace(
@@ -1233,7 +1233,7 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 						$value = $func['newvalue'].' ('.$func['lastvalue'].')';
 					}
 					else {
-						$value = format_lastvalue($func);
+						$value = formatItemValueType($func);
 					}
 				}
 				else {
@@ -1241,7 +1241,7 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 						$value = $func['newvalue'].' ('.$func['lastvalue'].')';
 					}
 					else {
-						$value = format_lastvalue($func);
+						$value = formatItemValueType($func);
 					}
 				}
 
@@ -1276,7 +1276,7 @@ function expandTriggersDescription(array $triggers, $flag = ZBX_FLAG_TRIGGER) {
 			$interface = $dbInterface;
 		}
 
-		foreach ($expandHost[$interface['triggerid']][$interface['functionid']] as $num) {
+		foreach ($expandIp[$interface['triggerid']][$interface['functionid']] as $num) {
 			$ipMacros = array('{IPADDRESS'.$num.'}');
 			$dnsMacros = array('{HOST.DNS'.$num.'}');
 			$connMacros = array('{HOST.CONN'.$num.'}');
@@ -1313,55 +1313,13 @@ function expandTriggerDescription(array $trigger, $flag = ZBX_FLAG_TRIGGER) {
 	return $trigger['description'];
 }
 
-
-
-
 function expand_trigger_description_simple($triggerid) {
 	$trigger = DBfetch(DBselect(
-		'SELECT DISTINCT h.host,t.description,t.expression,t.triggerid'.
-		' FROM triggers t,functions f,items i,hosts h'.
-		' WHERE f.triggerid=t.triggerid '.
-			' AND i.itemid=f.itemid '.
-			' AND h.hostid=i.hostid '.
-			' AND t.triggerid='.$triggerid
+		'SELECT DISTINCT t.description,t.expression,t.triggerid'.
+		' FROM triggers t'.
+		' WHERE t.triggerid='.$triggerid
 	));
 	return expandTriggerDescription($trigger);
-}
-
-function expand_trigger_description($triggerid) {
-	return htmlspecialchars(expand_trigger_description_simple($triggerid));
-}
-
-/**
- * Returns the given triggers with expanded descriptions.
- *
- * You can also use the "expandDescription" option for CTrigger::get().
- *
- * @param array $triggers
- *
- * @return array
- */
-function expandTriggerDescriptions(array $triggers) {
-	$cursor = DBselect(
-		'SELECT DISTINCT h.host,t.description,t.expression,t.triggerid'.
-			' FROM triggers t,functions f,items i,hosts h'.
-			' WHERE f.triggerid=t.triggerid'.
-			' AND i.itemid=f.itemid'.
-			' AND h.hostid=i.hostid'.
-			' AND '.DBcondition('t.triggerid', zbx_objectValues($triggers, 'triggerid'))
-	);
-	$descriptions = array();
-	while ($row = DBfetch($cursor)) {
-		$descriptions[$row['triggerid']] = htmlspecialchars(expandTriggerDescription($row));
-	}
-	foreach ($triggers as &$trigger) {
-		if (isset($trigger['triggerid'])) {
-			$trigger['description'] = $descriptions[$trigger['triggerid']];
-		}
-	}
-	unset($trigger);
-
-	return $triggers;
 }
 
 function updateTriggerValueToUnknownByHostId($hostIds) {
@@ -1697,7 +1655,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $params = array())
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.$triggerid);
 		while ($dep_row = DBfetch($dep_res)) {
-			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
+			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description_simple($dep_row['triggerid_up']));
 			$dependency = true;
 		}
 
@@ -1717,7 +1675,7 @@ function get_trigger_overview_cells($triggerHosts, $hostName, $params = array())
 		$dependency = false;
 		$dep_res = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.$triggerid);
 		while ($dep_row = DBfetch($dep_res)) {
-			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_down']));
+			$dep_table->addRow(SPACE.'-'.SPACE.expand_trigger_description_simple($dep_row['triggerid_down']));
 			$dependency = true;
 		}
 
@@ -2831,4 +2789,3 @@ function convert($value) {
 	}
 	return $value;
 }
-?>

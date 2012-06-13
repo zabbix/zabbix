@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 class CChart extends CGraphDraw {
 
@@ -2379,4 +2378,3 @@ class CChart extends CGraphDraw {
 		imageOut($this->im);
 	}
 }
-?>
