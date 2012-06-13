@@ -67,9 +67,9 @@ jQuery(function($) {
 	$('#message-global-wrap').on('mouseenter', function() {
 		var obj = $(this),
 			offset = obj.offset(),
-			x1 = offset.left,
+			x1 = Math.floor(offset.left),
 			x2 = x1 + obj.outerWidth(),
-			y1 = offset.top,
+			y1 = Math.floor(offset.top),
 			y2 = y1 + obj.outerHeight();
 
 		obj.fadeOut(100);
