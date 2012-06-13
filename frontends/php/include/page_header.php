@@ -30,6 +30,7 @@ if (!isset($page['file'])) {
 }
 if ($_REQUEST['fullscreen'] = get_request('fullscreen', 0)) {
 	define('ZBX_PAGE_NO_MENU', 1);
+	define('ZBX_PAGE_FULLSCREEN', 1);
 }
 
 require_once dirname(__FILE__).'/menu.inc.php';
@@ -164,8 +165,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				'</style>';
 
 			// perform Zabbix server check only for standard pages
-			if (!defined('ZBX_PAGE_NO_MENU') && $config['server_check_interval'] && !empty($ZBX_SERVER)
-					&& !empty($ZBX_SERVER_PORT)) {
+			if ((!defined('ZBX_PAGE_NO_MENU') || defined('ZBX_PAGE_FULLSCREEN')) && $config['server_check_interval']
+					&& !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
 				$page['scripts'][] = 'servercheck.js';
 			}
 		}
