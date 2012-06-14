@@ -115,6 +115,9 @@ class CJSON {
 	public function __destruct() {
 	}
 
+	// used for fallback _json_encode
+	private static $forceObject = null;
+
 	/**
 	 *
 	 * Encodes the mixed $valueToEncode into JSON format.
@@ -124,10 +127,12 @@ class CJSON {
 	 * @param array $deQuote Array of keys whose values should **not** be
 	 * quoted in encoded string.
 	 *
+	 * @param bool $forceObject force all arrays to objects
+	 *
 	 * @return string JSON encoded value
 	 *
 	 */
-	public function encode($valueToEncode, $deQuote = array()) {
+	public function encode($valueToEncode, $deQuote = array(), $forceObject = false) {
 		mb_internal_encoding('ASCII');
 		if (!$this->_config['bypass_ext'] && function_exists('json_encode')) {
 
@@ -135,7 +140,7 @@ class CJSON {
 				$old_errlevel = error_reporting(E_ERROR ^ E_WARNING);
 			}
 
-			$encoded = json_encode($valueToEncode);
+			$encoded = json_encode($valueToEncode, $forceObject ? JSON_FORCE_OBJECT : null);
 
 			if ($this->_config['noerror']) {
 				error_reporting($old_errlevel);
@@ -144,6 +149,7 @@ class CJSON {
 		}
 		else {
 			// fall back to php-only method
+			self::$forceObject = $forceObject ? JSON_FORCE_OBJECT : null;
 			$encoded = $this->_json_encode($valueToEncode);
 		}
 
@@ -385,7 +391,7 @@ class CJSON {
 				 */
 
 				// treat as a JSON object
-				if (is_array($var) && count($var) && array_keys($var) !== range(0, sizeof($var) - 1)) {
+				if (self::$forceObject || is_array($var) && count($var) && array_keys($var) !== range(0, sizeof($var) - 1)) {
 					$properties = array_map(array($this, '_name_value'), array_keys($var), array_values($var));
 					return '{' . join(',', $properties) . '}';
 				}

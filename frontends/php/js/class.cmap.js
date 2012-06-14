@@ -169,10 +169,14 @@ ZABBIX.apps.map = (function() {
 			}
 
 			for (selementid in this.data.selements) {
-				this.selements[selementid] = new Selement(this, this.data.selements[selementid]);
+				if (this.data.selements.hasOwnProperty(selementid)) {
+					this.selements[selementid] = new Selement(this, this.data.selements[selementid]);
+				}
 			}
 			for (linkid in this.data.links) {
-				this.links[linkid] = new Link(this, this.data.links[linkid]);
+				if (this.data.selements.hasOwnProperty(selementid)) {
+					this.links[linkid] = new Link(this, this.data.links[linkid]);
+				}
 			}
 
 			// create container for forms
@@ -633,17 +637,17 @@ ZABBIX.apps.map = (function() {
 		 * @param {Object} [linkData] link data from db
 		 */
 		function Link(sysmap, linkData) {
-			var selementid, lnktrigger;
+			var selementid;
 			this.sysmap = sysmap;
 
 			if (!linkData) {
 				linkData = {
-					label:			'',
+					label:		'',
 					selementid1:	null,
 					selementid2:	null,
 					linktriggers:	{},
-					drawtype:		0,
-					color:			'00CC00'
+					drawtype:	0,
+					color:		'00CC00'
 				};
 
 				for (selementid in this.sysmap.selection.selements) {
@@ -656,7 +660,7 @@ ZABBIX.apps.map = (function() {
 				}
 
 				// generate unique linkid
-				linkData.linkid = getRandomId();
+				linkData.linkid =  getUniqueId();
 			}
 			else {
 				if (jQuery.isArray(linkData.linktriggers)) {
@@ -667,8 +671,8 @@ ZABBIX.apps.map = (function() {
 			this.data = linkData;
 			this.id = this.data.linkid;
 
-			for (lnktrigger in this.data.linktriggers) {
-				this.sysmap.allLinkTriggerIds[lnktrigger.triggerid] = true;
+			for (var linktrigger in this.data.linktriggers) {
+				this.sysmap.allLinkTriggerIds[linktrigger.triggerid] = true;
 			}
 
 			// assign by reference
@@ -685,6 +689,7 @@ ZABBIX.apps.map = (function() {
 				for (key in data) {
 					this.data[key] = data[key];
 				}
+
 				this.trigger('afterUpdate', this);
 			},
 
@@ -737,7 +742,7 @@ ZABBIX.apps.map = (function() {
 				};
 
 				// generate unique selementid
-				selementData.selementid = getRandomId();
+				selementData.selementid = getUniqueId();
 			}
 			else {
 				if (jQuery.isArray(selementData.urls)) {
@@ -1285,7 +1290,6 @@ ZABBIX.apps.map = (function() {
 					linkedSelementid,
 					element,
 					elementTypeText,
-					linktrigger,
 					linktriggers;
 
 				if (links.length) {
@@ -1309,7 +1313,7 @@ ZABBIX.apps.map = (function() {
 						}
 
 						linktriggers = [];
-						for (linktrigger in link.linktriggers) {
+						for (var linktrigger in link.linktriggers) {
 							linktriggers.push(link.linktriggers[linktrigger].desc_exp);
 						}
 
@@ -1589,7 +1593,7 @@ ZABBIX.apps.map = (function() {
 					},
 					i,
 					ln,
-					linkTriggerPattern = /^linktrigger_(\d+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/,
+					linkTriggerPattern = /^linktrigger_(\w+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/,
 					linkTrigger;
 
 				for (i = 0, ln = values.length; i < ln; i++) {
@@ -1713,7 +1717,7 @@ ZABBIX.apps.map = (function() {
 						continue;
 					}
 
-					linktriggerid = getRandomId();
+					linktriggerid = getUniqueId();
 
 					// store linktriggerid to generate every time unique one
 					this.sysmap.allLinkTriggerIds[linktriggerid] = true;
