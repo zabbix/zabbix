@@ -261,7 +261,7 @@ order_result($iconList, 'name');
 zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson(array(
 	'sysmap' => $sysmap,
 	'iconList' => $iconList,
-	'defaultAutoIconId' => $defaultAutoIconId)
-).');');
+	'defaultAutoIconId' => $defaultAutoIconId
+), true).');');
 
 require_once dirname(__FILE__).'/include/page_footer.php';

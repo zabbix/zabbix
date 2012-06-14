@@ -46,7 +46,7 @@
 
 		jQuery('#addMapping').click(function() {
 			var tpl = new Template(jQuery('#rowTpl').html()),
-				iconmappingid = getRandomId(),
+				iconmappingid =  getUniqueId(),
 				mapping = {};
 
 			mapping.iconmappingid = iconmappingid;
