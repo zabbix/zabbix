@@ -187,14 +187,12 @@ int	calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t re
  *                                                                            *
  * Purpose: obtain configuration changes to required node                     *
  *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: the changes are collected into data parameter                    *
  *                                                                            *
  ******************************************************************************/
 static void	DMcollect_table_data(int nodeid, unsigned char dest_nodetype, const ZBX_TABLE *table,
@@ -591,9 +589,9 @@ int	update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 	if (NULL != tablename)
 	{
 		zbx_snprintf(sql[0], sizeof(sql[0]), " and curr.tablename='%s' and curr.recordid=" ZBX_FS_UI64,
-			tablename, id);
+				tablename, id);
 		zbx_snprintf(sql[1], sizeof(sql[1]), " and prev.tablename='%s' and prev.recordid=" ZBX_FS_UI64,
-			tablename, id);
+				tablename, id);
 	}
 	else
 	{
@@ -643,7 +641,7 @@ int	update_checksums(int nodeid, int synked_nodetype, int synked, const char *ta
 	{
 		if (NULL == (table = DBget_table(row[0])))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot find table [%s]", row[0]);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot find table [%s]", row[0]);
 			continue;
 		}
 
@@ -856,7 +854,7 @@ void process_nodes()
 
 		res = calculate_checksums(nodeid, NULL, 0);
 		if (SUCCEED == res && NULL != (data = DMget_config_data(nodeid, ZBX_NODE_MASTER))) {
-			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending configuration changes to master node %d for node %d datalen %d",
+			zabbix_log(LOG_LEVEL_WARNING, "NODE %d: sending configuration changes to master node %d for node %d datalen %d",
 				CONFIG_NODEID,
 				master_nodeid,
 				nodeid,
