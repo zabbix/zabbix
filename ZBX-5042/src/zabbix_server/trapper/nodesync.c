@@ -91,7 +91,7 @@ zbx_records_t;
 
 		zbx_get_next_field((const char **)&r, &buf, &buf_alloc, ZBX_DM_DELIMITER);	/* operation type */
 
-		if ('0' + NODE_CONFIGLOG_OP_DELETE == *buf)
+		if ('2' == *buf)	/* deleted record */
 			zbx_vector_uint64_append(&rec->recids, recid);
 next:
 		if (lf != NULL)
