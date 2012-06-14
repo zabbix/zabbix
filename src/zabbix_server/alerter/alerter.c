@@ -86,26 +86,33 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 	}
 	else if (MEDIA_TYPE_EXEC == mediatype->type)
 	{
-		char	full_path[MAX_STRING_LEN], *send_to, *subject, *message, *output = NULL;
+		char	cmd[MAX_STRING_LEN], *send_to, *subject, *message, *output = NULL;
 
-		send_to = zbx_dyn_escape_string(alert->sendto, "\"\\");
-		subject = zbx_dyn_escape_string(alert->subject, "\"\\");
-		message = zbx_dyn_escape_string(alert->message, "\"\\");
+		zbx_snprintf(cmd, sizeof(cmd), "%s/%s", CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
 
-		zbx_snprintf(full_path, sizeof(full_path), "%s/%s \"%s\" \"%s\" \"%s\"",
-				CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path, send_to, subject, message);
-
-		zbx_free(send_to);
-		zbx_free(subject);
-		zbx_free(message);
-
-		if (SUCCEED == (res = zbx_execute(full_path, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
+		if (0 == access(cmd, X_OK))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", mediatype->exec_path, output);
-			zbx_free(output);
+			send_to = zbx_dyn_escape_string(alert->sendto, "\"\\");
+			subject = zbx_dyn_escape_string(alert->subject, "\"\\");
+			message = zbx_dyn_escape_string(alert->message, "\"\\");
+
+			zbx_snprintf(cmd, sizeof(cmd), "%s/%s \"%s\" \"%s\" \"%s\"",
+					CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path, send_to, subject, message);
+
+			zbx_free(send_to);
+			zbx_free(subject);
+			zbx_free(message);
+
+			if (SUCCEED == (res = zbx_execute(cmd, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s output:\n%s", mediatype->exec_path, output);
+				zbx_free(output);
+			}
+			else
+				res = FAIL;
 		}
 		else
-			res = FAIL;
+			zbx_snprintf(error, max_error_len, "%s: %s", cmd, zbx_strerror(errno));
 	}
 	else
 	{
