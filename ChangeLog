@@ -69,6 +69,7 @@ A......... [ZBX-5026] fixed error messages when creating IT Service (Eduard)
 Changes for 2.0.1rc1
 
 New features:
+........S. [ZBXNEXT-1259] added a script file existence and permissions check for a "Script" media type (Sasha)
 ...G...... [ZBXNEXT-801] maximum number of monitored disks increased to 1024, with dynamic increasing of shared memory size (Andris)
 ....I..... [ZBXNEXT-1256] added example Solaris partition LLD user parameter (Richlv)
 A.F....... [ZBX-5074] redesign configuration of action (Eduard)
