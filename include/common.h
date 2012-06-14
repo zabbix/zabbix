@@ -647,8 +647,8 @@ typedef enum
 
 const char	*zbx_permission_string(int perm);
 
-#define	ZBX_NODE_MASTER	0
-#define	ZBX_NODE_SLAVE	1
+#define	ZBX_NODE_SLAVE	0
+#define	ZBX_NODE_MASTER	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
 typedef struct
