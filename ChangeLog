@@ -10,6 +10,8 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
+........S. [ZBX-5042] fixed possible sql errors while node synchronization (Sasha)
 ..F....... [ZBX-5133] fixed error when adding the first map element (Toms)
 A......... [ZBX-5115] fixed API object names being case sensitive (Pavels)
 ....I..... [ZBX-5058] init.d scripts updated for Zabbix 2.0 (Andris)
@@ -75,6 +77,8 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
+........S. [ZBX-5042] fixed possible sql errors while node synchronization (Sasha)
 ..F....... [ZBX-5133] fixed error when adding the first map element (Toms)
 A......... [ZBX-5115] fixed API object names being case sensitive (Pavels)
 ....I..... [ZBX-5058] init.d scripts updated for Zabbix 2.0 (Andris)
