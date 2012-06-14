@@ -142,7 +142,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 }
 ob_end_flush();
 
-$msg = $bulk ? ' BULK ACKNOWLEDGE ' : expandTriggerDescription($event_trigger);
+$msg = $bulk ? ' BULK ACKNOWLEDGE ' : CDescription::expandTrigger($event_trigger);
 show_table_header(array(_('ALARM ACKNOWLEDGES').': ', $msg));
 echo SBR;
 

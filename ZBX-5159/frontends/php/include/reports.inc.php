@@ -98,7 +98,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 		while ($row = DBfetch($result)) {
 			$cmbTrigs->addItem(
 				$row['triggerid'],
-				get_node_name_by_elid($row['triggerid'], null, ': ').expand_trigger_description_simple($row['triggerid'])
+				get_node_name_by_elid($row['triggerid'], null, ': ').CDescription::expandTriggerById($row['triggerid'])
 			);
 		}
 

@@ -237,7 +237,9 @@ if (isset($_REQUEST['pservices'])) {
 	}
 
 	foreach ($parentServices as $key => $childService) {
-		$parentServices[$key]['trigger'] = !empty($childService['triggerid']) ? expand_trigger_description_simple($childService['triggerid']) : '-';
+		$parentServices[$key]['trigger'] = !empty($childService['triggerid'])
+			? CDescription::expandTriggerById($childService['triggerid'])
+			: '-';
 	}
 
 	$data['db_pservices'] = $parentServices;
@@ -274,7 +276,9 @@ if (isset($_REQUEST['cservices'])) {
 	}
 
 	foreach ($childServices as $key => $childService) {
-		$childServices[$key]['trigger'] = !empty($childService['triggerid']) ? expand_trigger_description_simple($childService['triggerid']) : '-';
+		$childServices[$key]['trigger'] = !empty($childService['triggerid'])
+			? CDescription::expandTriggerById($childService['triggerid'])
+			: '-';
 	}
 
 	$data['db_cservices'] = $childServices;
@@ -331,7 +335,9 @@ if (isset($_REQUEST['form'])) {
 				$data['children'][] = array(
 					'name' => $childService['name'],
 					'triggerid' => $childService['triggerid'],
-					'trigger' => !empty($childService['triggerid']) ? expand_trigger_description_simple($childService['triggerid']) : '-',
+					'trigger' => !empty($childService['triggerid'])
+							? CDescription::expandTriggerById($childService['triggerid'])
+							: '-',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
 				);
@@ -387,7 +393,9 @@ else {
 	));
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
-	$triggers = expandTriggersDescription(zbx_toHash($triggers, 'triggerid'));
+
+	$triggers = CDescription::expandTriggers($triggers);
+
 	foreach ($services as &$service) {
 		if ($service['trigger']) {
 			$service['trigger'] = $triggers[$service['trigger']['triggerid']];

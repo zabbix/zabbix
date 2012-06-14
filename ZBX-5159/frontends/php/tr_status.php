@@ -503,7 +503,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			$dep_table->addRow(bold(_('Depends on').':'));
 
 			foreach($trigger['dependencies'] as $dep){
-				$dep_table->addRow(' - '.expand_trigger_description_simple($dep['triggerid']));
+				$dep_table->addRow(' - '.CDescription::expandTriggerById($dep['triggerid']));
 			}
 
 			$img = new Cimg('images/general/down_icon.png', 'DEP_UP');
@@ -518,8 +518,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
 		if (!empty($triggerids_down[$trigger['triggerid']])) {
-			$depTriggers = zbx_toObject($triggerids_down[$trigger['triggerid']], 'triggerid');
-			$depTriggers = expandTriggersDescription($depTriggers);
+			$depTriggers = CDescription::expandTriggersById($triggerids_down[$trigger['triggerid']]);
+
 			foreach ($depTriggers as $depTrigger) {
 				$dep_table->addRow(SPACE.'-'.SPACE.$depTrigger['description']);
 				$dependency = true;

@@ -125,7 +125,9 @@ else {
 	));
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
-	$triggers = expandTriggersDescription(zbx_toHash($triggers, 'triggerid'));
+
+	$triggers = CDescription::expandTriggers($triggers);
+
 	foreach ($services as &$service) {
 		if ($service['trigger']) {
 			$service['trigger'] = $triggers[$service['trigger']['triggerid']];

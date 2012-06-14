@@ -966,8 +966,6 @@ function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
 			break;
 	}
 
-	$config = select_config();
-
 	if ($last == 0) {
 		$sql = 'SELECT value'.
 				' FROM '.$table.
