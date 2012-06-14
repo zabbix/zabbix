@@ -822,10 +822,10 @@ function moveListBoxSelectedItem(formname, objname, from, to, action) {
 		fromel = jQuery(fromel);
 		if (action.toLowerCase() == "add") {
 			jQuery(document.forms[formname]).append("<input name='" + objname + "["+fromel.val() + "]"
-				+ "' id='" + objname + "_" + fromel.val() + "' value='" + fromel.val() + "'>");
+				+ "' id='" + objname + "_" + fromel.val() + "' value='" + fromel.val() + "' hidden>");
 		}
 		else if (action.toLowerCase() == "rmv") {
-			jQuery("#".objname + "_" + fromel.val()).remove();
+			jQuery("#"+objname + "_" + fromel.val()).remove();
 		}
 
 
