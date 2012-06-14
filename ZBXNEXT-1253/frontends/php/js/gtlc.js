@@ -28,7 +28,7 @@ var timeControl = {
 
 	refreshObject: function(domid) {
 		this.objectList[domid].processed = 0;
-
+		this.objectList[domid].refresh = true;
 		this.processObjects();
 	},
 
@@ -36,6 +36,7 @@ var timeControl = {
 		this.debug('addObject', domid);
 
 		this.objectList[domid] = {
+			'refresh': false,
 			'processed': 0,
 			'id': domid,
 			'containerid': null,
@@ -136,7 +137,12 @@ var timeControl = {
 			}
 
 			if (obj.loadImage) {
-				this.addImage(obj.domid);
+				if (obj.refresh) {
+					this.refreshImage(obj.domid);
+				}
+				else {
+					this.addImage(obj.domid);
+				}
 			}
 			else if (obj.loadScroll) {
 				this.addScroll(null, obj.domid);
@@ -170,6 +176,15 @@ var timeControl = {
 				addListener(obj.domid, 'load', function() { setTimeout( function() { $('scrollbar_cntr').show(); }, 500); });
 			}
 		}
+	},
+
+	refreshImage: function(objid) {
+		var obj = this.objectList[objid];
+		var img = jQuery('<img />', {id: obj.domid + '_tmp', src: obj.src, class: 'borderless'}).load(function() {
+			var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
+			jQuery('#' + id).replaceWith(jQuery(this));
+			jQuery(this).attr('id', id);
+		});
 	},
 
 	addSBox: function(e, objid) {

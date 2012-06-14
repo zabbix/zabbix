@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/graphs.inc.php';
 require_once dirname(__FILE__).'/screens.inc.php';
 require_once dirname(__FILE__).'/maps.inc.php';
@@ -136,15 +136,15 @@ function make_favorite_maps() {
 	$favList = new CList(null, 'favorites');
 	$fav_sysmaps = get_favorites('web.favorite.sysmapids');
 	$sysmapids = array();
+
 	foreach ($fav_sysmaps as $favorite) {
 		$sysmapids[$favorite['value']] = $favorite['value'];
 	}
 
-	$options = array(
+	$sysmaps = API::Map()->get(array(
 		'sysmapids' => $sysmapids,
 		'output' => API_OUTPUT_EXTEND
-	);
-	$sysmaps = API::Map()->get($options);
+	));
 	foreach ($sysmaps as $sysmap) {
 		$sysmapid = $sysmap['sysmapid'];
 
@@ -183,7 +183,6 @@ function make_system_status($filter) {
 		'preservekeys' => true
 	);
 	$groups = API::HostGroup()->get($options);
-	// we need natural sort
 	order_result($groups, 'name');
 
 	$groupids = array();

@@ -31,7 +31,7 @@ $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js')
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 if (PAGE_TYPE_HTML == $page['type']) {
-	define('ZBX_PAGE_DO_REFRESH', 1);
+	//define('ZBX_PAGE_DO_REFRESH', 1);
 }
 
 require_once dirname(__FILE__).'/include/page_header.php';

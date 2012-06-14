@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../blocks.inc.php';
+
 class CFlickerfreeScreenHostTriggers extends CFlickerfreeScreenItem {
 
 	public function __construct(array $options = array()) {

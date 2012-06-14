@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../screens.inc.php';
+
 class CFlickerfreeScreenPlainText extends CFlickerfreeScreenItem {
 
 	private $hostid;

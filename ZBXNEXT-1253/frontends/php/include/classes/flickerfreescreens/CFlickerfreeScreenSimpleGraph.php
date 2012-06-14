@@ -86,22 +86,22 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 			: 'chart.php?itemid='.$this->screenitem['resourceid'].'&'.$this->screenitem['url'].'width='.$this->screenitem['width']
 				.'&height='.$this->screenitem['height'];
 
-		if ($this->mode == SCREEN_MODE_VIEW) {
-			insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
-		}
-		else {
-			zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
-		}
-
 		// output
-		if ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) {
-			$item = new CDiv();
+		if ($this->mode == SCREEN_MODE_JS) {
+			return 'timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
-			$item = new CLink(null, $this->action);
-		}
-		$item->setAttribute('id', $containerid);
+			insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
 
-		return $this->getOutput($item);
+			if ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) {
+				$item = new CDiv();
+			}
+			else {
+				$item = new CLink(null, $this->action);
+			}
+			$item->setAttribute('id', $containerid);
+
+			return $this->getOutput($item);
+		}
 	}
 }

@@ -32,8 +32,8 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 	}
 
 	public function get() {
-		$domGraphid = 'graph_'.$this->screenitem['screenitemid'];//.'_'.$this->screenitem['resourceid'];
-		$containerid = 'graph_container_'.$this->screenitem['screenitemid'];//.'_'.$this->screenitem['resourceid'];
+		$domGraphid = 'graph_'.$this->screenitem['screenitemid'];
+		$containerid = 'graph_container_'.$this->screenitem['screenitemid'];
 		$graphDims = getGraphDims($this->screenitem['resourceid']);
 		$graphDims['graphHeight'] = $this->screenitem['height'];
 		$graphDims['width'] = $this->screenitem['width'];
@@ -177,22 +177,22 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 			$timeControlData['src'] = $src;
 		}
 
-		if ($this->mode == SCREEN_MODE_VIEW) {
-			insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
-		}
-		else {
-			zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
-		}
-
 		// output
-		if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) || !$isDefault) {
-			$item = new CDiv();
+		if ($this->mode == SCREEN_MODE_JS) {
+			return 'timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
-			$item = new CLink(null, $this->action);
-		}
-		$item->setAttribute('id', $containerid);
+			insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
 
-		return $this->getOutput($item);
+			if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) || !$isDefault) {
+				$item = new CDiv();
+			}
+			else {
+				$item = new CLink(null, $this->action);
+			}
+			$item->setAttribute('id', $containerid);
+
+			return $this->getOutput($item);
+		}
 	}
 }

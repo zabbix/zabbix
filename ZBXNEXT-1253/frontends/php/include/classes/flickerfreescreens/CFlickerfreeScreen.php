@@ -395,6 +395,10 @@ class CFlickerfreeScreenItem {
 			));
 			$this->screenitem = reset($this->screenitem);
 		}
+
+		if (empty($this->screenid) && !empty($this->screenitem)) {
+			$this->screenid = $this->screenitem['screenid'];
+		}
 	}
 
 	public function getId() {

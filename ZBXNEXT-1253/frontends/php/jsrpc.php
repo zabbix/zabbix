@@ -172,21 +172,24 @@ switch ($data['method']) {
 		);
 		break;
 	case 'flickerfreeScreen.get':
-		/*if (!empty($data['params']['screenitemid'])) {
-			$data['params']['screenitemid'] = zbx_floatToString($data['params']['screenitemid']);
-		}*/
+		$mode = !empty($data['mode']) ? $data['mode'] : SCREEN_MODE_VIEW;
 
 		$flickerfreeScreen = CFlickerfreeScreen::getScreen(array(
 			'screenitemid' => $data['screenitemid'],
-			'mode' => !empty($data['mode']) ? $data['mode'] : SCREEN_MODE_VIEW,
+			'mode' => $mode,
 			'effectiveperiod' => !empty($data['effectiveperiod']) ? $data['effectiveperiod'] : ZBX_MAX_PERIOD
 		));
 		$flickerfreeScreen = $flickerfreeScreen->get();
-		if (!empty($flickerfreeScreen) && is_object($flickerfreeScreen)) {
-			$result = $flickerfreeScreen->toString();
-		}
-		else {
-			fatal_error('Wrong RPC call to JS RPC');
+
+		if (!empty($flickerfreeScreen)) {
+			if ($mode == SCREEN_MODE_JS) {
+				$result = $flickerfreeScreen;
+			}
+			else {
+				if (is_object($flickerfreeScreen)) {
+					$result = $flickerfreeScreen->toString();
+				}
+			}
 		}
 
 		break;
@@ -204,7 +207,7 @@ if ($requestType == PAGE_TYPE_JSON) {
 		echo $json->encode($rpcResp);
 	}
 }
-elseif ($requestType == PAGE_TYPE_TEXT) {
+elseif ($requestType == PAGE_TYPE_TEXT || $requestType == PAGE_TYPE_JS) {
 	echo $result;
 }
 
