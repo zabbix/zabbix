@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5154] fixed host group tab doesn't add selected hosts to host group (Toms)
 A.F....... [ZBX-5176] fixed trigger events not being deleted when changing it to a templated trigger (Pavels)
 ........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
 ........S. [ZBX-5042] fixed possible sql errors while node synchronization (Sasha)
@@ -80,6 +81,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5154] fixed host group tab doesn't add selected hosts to host group (Toms)
 A.F....... [ZBX-5176] fixed trigger events not being deleted when changing it to a templated trigger (Pavels)
 ........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
 ........S. [ZBX-5042] fixed possible sql errors while node synchronization (Sasha)
