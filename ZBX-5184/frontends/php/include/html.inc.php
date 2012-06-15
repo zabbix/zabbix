@@ -376,22 +376,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 				break;
 		}
 
-		if ($dbHost['available'] == HOST_AVAILABLE_TRUE) {
-			$available = new CSpan(_('Available'), 'off');
-		}
-		elseif ($dbHost['available'] == HOST_AVAILABLE_FALSE) {
-			$available = new CSpan(_('Not available'), 'on');
-		}
-		elseif ($dbHost['available'] == HOST_AVAILABLE_UNKNOWN) {
-			$available = new CSpan(_('Unknown'), 'unknown');
-		}
-
-		$available = getAvailabilityTable($dbHost);
-		//$available->set
-
 		$list->addItem(array(bold(_('Host').': '), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
 		$list->addItem($status);
-		$list->addItem( $available);
+		$list->addItem(getAvailabilityTable($dbHost));
 	}
 
 	if (!empty($dbDiscovery)) {
