@@ -24,19 +24,30 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../conf/zabbix.conf.php';
 require_once dirname(__FILE__).'/../../include/func.inc.php';
 require_once dirname(__FILE__).'/../../include/db.inc.php';
-require_once dirname(__FILE__).'/../../include/classes/db/DB.php';
-require_once dirname(__FILE__).'/../../include/classes/debug/CProfiler.php';
-require_once dirname(__FILE__).'/../../include/classes/helpers/trigger/CDescription.php';
-require_once dirname(__FILE__).'/../../include/classes/helpers/trigger/CTriggerDescription.php';
-require_once dirname(__FILE__).'/../../include/classes/helpers/trigger/CEventDescription.php';
+require_once dirname(__FILE__).'/../../include/items.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/core/Z.php';
+
+function error($error) {
+	echo "\nError reported: $error\n";
+	return true;
+}
 
 class class_CDescription extends PHPUnit_Framework_TestCase {
+
+	public static function setUpBeforeClass() {
+		$z = new Z();
+		$z->run();
+		DBconnect($error);
+	}
 
 	public static function providerTriggers() {
 		return array(
 			array(
-				'1111',
-				'description'
+				'13517',
+				'trigger host.host:Host for trigger description macros | '.
+				'host.host2:{HOST.HOST2} | host.name:Host for trigger description macros | '.
+				'item.value:5 | item.value1:5 | item.lastvalue:5 | host.ip:127.0.0.1 | '.
+				'host.dns: | host.conn:127.0.0.1'
 			),
 		);
 	}
@@ -67,11 +78,14 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 		);
 	}
 
+	/**
+	 * @dataProvider providerTriggers
+	 */
 	public function test_expandTrigger($triggerId, $expectedDescription) {
 		$trigger = DBfetch(DBselect(
-			'SELECT t.trigerid,t,expression,t.description'.
+			'SELECT t.triggerid,t.expression,t.description'.
 				' FROM triggers t'.
-				' WHERE t.trigerid='.$triggerId
+				' WHERE t.triggerid='.$triggerId
 		));
 		$description = CDescription::expandTrigger($trigger);
 

@@ -60,10 +60,10 @@ if($allow_discovery) $allowed_sources[] = EVENT_SOURCE_DISCOVERY;
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields=array(
-	'source'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN($allowed_sources),	NULL),
-	'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-	'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-	'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
+	'source'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN($allowed_sources),	null),
+	'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
+	'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
+	'triggerid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	null),
 
 	'period'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
 	'dec'=>				array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -72,17 +72,17 @@ $fields=array(
 	'right'=>			array(T_ZBX_INT, O_OPT,	 null,	null, null),
 	'stime'=>			array(T_ZBX_STR, O_OPT,	 null,	null, null),
 
-	'load'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
-	'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
+	'load'=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			null),
+	'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null),
 // Export
 	'csv_export'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 // filter
-	'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
-	'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	NULL),
+	'filter_rst'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	null),
+	'filter_set'=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null),
 
-	'showUnknown'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+	'showUnknown'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	null),
 //ajax
-	'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	NULL,			NULL),
+	'favobj'=>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
 	'favref'=>		array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
 	'favstate'=>	array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})'),
 	'favid'=>		array(T_ZBX_INT, O_OPT, P_ACT,  null,			null),
@@ -678,7 +678,7 @@ else{
 					$statusSpan,
 					getSeverityCell($trigger['priority'], null, !$event['value']),
 					$event['duration'],
-					($config['event_ack_enable']) ? $ack : NULL,
+					($config['event_ack_enable']) ? $ack : null,
 					$actions
 				));
 
