@@ -134,7 +134,7 @@ class CJSON {
 	 */
 	public function encode($valueToEncode, $deQuote = array(), $forceObject = false) {
 		mb_internal_encoding('ASCII');
-		if (0 && !$this->_config['bypass_ext'] && function_exists('json_encode') && defined(JSON_FORCE_OBJECT)) {
+		if (!$this->_config['bypass_ext'] && function_exists('json_encode') && defined(JSON_FORCE_OBJECT)) {
 
 			if ($this->_config['noerror']) {
 				$old_errlevel = error_reporting(E_ERROR ^ E_WARNING);
