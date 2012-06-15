@@ -20,6 +20,8 @@
 ?>
 <?php
 require_once dirname(__FILE__).'/class_cItemKey.php';
+require_once dirname(__FILE__).'/class_cxmlexportwriter.php';
+require_once dirname(__FILE__).'/class_cxmlimportreader.php';
 require_once dirname(__FILE__).'/function_DBcommit.php';
 require_once dirname(__FILE__).'/function_DBcondition.php';
 require_once dirname(__FILE__).'/function_DBconnect.php';
