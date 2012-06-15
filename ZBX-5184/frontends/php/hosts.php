@@ -823,61 +823,6 @@ else {
 
 		$status = new CLink($status_caption, $status_url, $status_class, $status_script);
 
-		switch ($host['available']) {
-			case HOST_AVAILABLE_TRUE:
-				$zbx_available = new CDiv(SPACE, 'status_icon iconzbxavailable');
-				break;
-			case HOST_AVAILABLE_FALSE:
-				$zbx_available = new CDiv(SPACE, 'status_icon iconzbxunavailable');
-				$zbx_available->setHint($host['error'], '', 'on');
-				break;
-			case HOST_AVAILABLE_UNKNOWN:
-				$zbx_available = new CDiv(SPACE, 'status_icon iconzbxunknown');
-				break;
-		}
-
-		switch ($host['snmp_available']) {
-			case HOST_AVAILABLE_TRUE:
-				$snmp_available = new CDiv(SPACE, 'status_icon iconsnmpavailable');
-				break;
-			case HOST_AVAILABLE_FALSE:
-				$snmp_available = new CDiv(SPACE, 'status_icon iconsnmpunavailable');
-				$snmp_available->setHint($host['snmp_error'], '', 'on');
-				break;
-			case HOST_AVAILABLE_UNKNOWN:
-				$snmp_available = new CDiv(SPACE, 'status_icon iconsnmpunknown');
-				break;
-		}
-
-		switch ($host['jmx_available']) {
-			case HOST_AVAILABLE_TRUE:
-				$jmx_available = new CDiv(SPACE, 'status_icon iconjmxavailable');
-				break;
-			case HOST_AVAILABLE_FALSE:
-				$jmx_available = new CDiv(SPACE, 'status_icon iconjmxunavailable');
-				$jmx_available->setHint($host['jmx_error'], '', 'on');
-				break;
-			case HOST_AVAILABLE_UNKNOWN:
-				$jmx_available = new CDiv(SPACE, 'status_icon iconjmxunknown');
-				break;
-		}
-
-		switch ($host['ipmi_available']) {
-			case HOST_AVAILABLE_TRUE:
-				$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiavailable');
-				break;
-			case HOST_AVAILABLE_FALSE:
-				$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiunavailable');
-				$ipmi_available->setHint($host['ipmi_error'], '', 'on');
-				break;
-			case HOST_AVAILABLE_UNKNOWN:
-				$ipmi_available = new CDiv(SPACE, 'status_icon iconipmiunknown');
-				break;
-		}
-
-		$av_table = new CTable(null, 'invisible');
-		$av_table->addRow(array($zbx_available, $snmp_available, $jmx_available, $ipmi_available));
-
 		if (empty($host['parentTemplates'])) {
 			$hostTemplates = '-';
 		}
@@ -922,7 +867,7 @@ else {
 			$hostIF,
 			new CCol($hostTemplates, 'wraptext'),
 			$status,
-			$av_table
+			getAvailabilityTable($host)
 		));
 	}
 
