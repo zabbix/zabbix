@@ -53,6 +53,6 @@ var flickerfreeScreen = (function ($) {
 	return function(screenitemid, refreshInterval, mode, resourcetype) {
 		refresh(screenitemid, mode, resourcetype);
 
-		window.setTimeout(function() { flickerfreeScreen(screenitemid, refreshInterval, mode, resourcetype); }, refreshInterval * 200);
+		window.setTimeout(function() { flickerfreeScreen(screenitemid, refreshInterval, mode, resourcetype); }, refreshInterval * 1000);
 	}
 }(jQuery));

@@ -23,11 +23,9 @@ class CFlickerfreeScreen {
 
 	public $screen;
 	public $mode;
-	public $effectiveperiod;
 
 	public function __construct(array $options = array()) {
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
-		$this->effectiveperiod = isset($options['effectiveperiod']) ? $options['effectiveperiod'] : ZBX_MIN_PERIOD;
 
 		// get screen
 		if (!empty($options['screen'])) {
@@ -255,8 +253,7 @@ class CFlickerfreeScreen {
 					$flickerfreeScreen = CFlickerfreeScreen::getScreen(array(
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem,
-						'mode' => $this->mode,
-						'effectiveperiod' => $this->effectiveperiod,
+						'mode' => $this->mode
 					));
 
 					if (!empty($flickerfreeScreen)) {
@@ -374,14 +371,12 @@ class CFlickerfreeScreenItem {
 	public $screenid;
 	public $screenitem;
 	public $mode;
-	public $effectiveperiod;
 	public $action;
 	public $id;
 
 	public function __construct(array $options = array()) {
 		$this->screenid = isset($options['screenid']) ? $options['screenid'] : null;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
-		$this->effectiveperiod = isset($options['effectiveperiod']) ? $options['effectiveperiod'] : ZBX_MAX_PERIOD;
 		$this->action = isset($options['action']) ? $options['action'] : '';
 
 		// get screenitem

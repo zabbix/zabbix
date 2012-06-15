@@ -22,13 +22,15 @@
 class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 
 	private $hostid;
+	private $period;
 	private $stime;
 
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
 
-		$this->hostid = get_request('hostid', 0);
-		$this->stime = get_request('stime', null);
+		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : get_request('hostid', 0);
+		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
+		$this->stime = !empty($options['stime']) ? $options['stime'] : get_request('stime', null);
 	}
 
 	public function get() {
@@ -115,6 +117,7 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 					$this->screenitem['url']->setArgument('items['.$newGraphItem['itemid'].']['.$name.']', $value);
 				}
 			}
+
 			$this->screenitem['url']->setArgument('name', $host['host'].': '.$graph['name']);
 			$this->screenitem['url'] = $this->screenitem['url']->getUrl();
 		}
@@ -140,16 +143,17 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 				$isDefault = true;
 			}
 
-			$timeline = array();
-			$timeline['period'] = $this->effectiveperiod;
-			$timeline['starttime'] = date('YmdHis', get_min_itemclock_by_graphid($this->screenitem['resourceid']));
+			$timeline = array(
+				'period' => $this->period,
+				'starttime' => date('YmdHis', get_min_itemclock_by_graphid($this->screenitem['resourceid']))
+			);
 
-			if (isset($this->stime)) {
+			if (!empty($this->stime)) {
 				$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
 			}
 
 			$src = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-				.'&legend='.$this->screenitem['legend'].'&graph3d='.$graph3d.'&period='.$this->effectiveperiod.url_param('stime');
+				.'&legend='.$this->screenitem['legend'].'&graph3d='.$graph3d.'&period='.$this->period.url_param('stime');
 
 			$timeControlData['src'] = $src;
 		}
@@ -160,11 +164,13 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 			}
 
 			$src = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-				.'&period='.$this->effectiveperiod.url_param('stime');
+				.'&period='.$this->period.url_param('stime');
 
-			$timeline = array();
+			$timeline = array(
+				'period' => $this->period
+			);
+
 			if ($this->mode != SCREEN_MODE_EDIT && !empty($graphid)) {
-				$timeline['period'] = $this->effectiveperiod;
 				$timeline['starttime'] = date('YmdHis', time() - ZBX_MAX_PERIOD);
 
 				if (!empty($this->stime)) {

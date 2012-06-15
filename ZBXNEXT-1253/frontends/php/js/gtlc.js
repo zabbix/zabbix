@@ -17,20 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 // graphs timeline controls (gtlc)
 var timeControl = {
 	objectList: {}, // objects needs to be controlled
-
-	// debug
 	debug_status: 0, // debug status: 0 - off, 1 - on, 2 - SDI;
 	debug_info: '', // debug string
 	debug_prev: '', // don't log repeated fnc
-
-	refreshObject: function(domid) {
-		this.objectList[domid].processed = 0;
-		this.objectList[domid].refresh = true;
-		this.processObjects();
-	},
 
 	addObject: function(domid, time, objData) {
 		this.debug('addObject', domid);
@@ -66,6 +59,7 @@ var timeControl = {
 		if (!isset('period', time)) {
 			time.period = 3600;
 		}
+
 		if (!isset('endtime', time)) {
 			time.endtime = now;
 		}
@@ -111,6 +105,7 @@ var timeControl = {
 
 			var obj = this.objectList[key];
 
+			// width
 			if ((!isset('width', obj.objDims) || (obj.objDims.width < 0)) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)) {
 				var g_width = get_bodywidth();
 				if (!is_number(g_width)) {
@@ -123,29 +118,31 @@ var timeControl = {
 				obj.objDims.width += g_width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
 			}
 
+			// url
 			if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
-				var g_url = new Curl(obj.src);
-				g_url.setArgument('width', obj.objDims.width);
-
 				var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
-				var url_stime = date.getZBXDate();
+				var graphUrl = new Curl(obj.src);
 
-				g_url.setArgument('period', obj.time.period);
-				g_url.setArgument('stime', url_stime);
+				graphUrl.setArgument('width', obj.objDims.width);
+				graphUrl.setArgument('period', obj.time.period);
+				graphUrl.setArgument('stime', date.getZBXDate());
 
-				obj.src = g_url.getUrl();
+				obj.src = graphUrl.getUrl();
 			}
 
+			// image
 			if (obj.loadImage) {
-				if (obj.refresh) {
-					this.refreshImage(obj.domid);
-				}
-				else {
+				if (!obj.refresh) {
 					this.addImage(obj.domid);
 				}
 			}
 			else if (obj.loadScroll) {
 				this.addScroll(null, obj.domid);
+			}
+
+			// refresh
+			if (obj.refresh) {
+				this.refreshGraph(obj.domid);
 			}
 		}
 	},
@@ -178,13 +175,30 @@ var timeControl = {
 		}
 	},
 
-	refreshImage: function(objid) {
+	refreshGraph: function(objid) {
 		var obj = this.objectList[objid];
+
+		// image
 		var img = jQuery('<img />', {id: obj.domid + '_tmp', src: obj.src, class: 'borderless'}).load(function() {
 			var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 			jQuery('#' + id).replaceWith(jQuery(this));
 			jQuery(this).attr('id', id);
 		});
+
+		// link
+		var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
+		var graphUrl = new Curl(jQuery('#' + obj.containerid).attr('href'));
+
+		graphUrl.setArgument('width', obj.objDims.width);
+		graphUrl.setArgument('period', obj.time.period);
+		graphUrl.setArgument('stime', date.getZBXDate());
+		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
+	},
+
+	refreshObject: function(domid) {
+		this.objectList[domid].processed = 0;
+		this.objectList[domid].refresh = true;
+		this.processObjects();
 	},
 
 	addSBox: function(e, objid) {

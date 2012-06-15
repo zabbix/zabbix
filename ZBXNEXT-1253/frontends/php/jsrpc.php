@@ -177,7 +177,9 @@ switch ($data['method']) {
 		$flickerfreeScreen = CFlickerfreeScreen::getScreen(array(
 			'screenitemid' => $data['screenitemid'],
 			'mode' => $mode,
-			'effectiveperiod' => !empty($data['effectiveperiod']) ? $data['effectiveperiod'] : ZBX_MAX_PERIOD
+			'hostid' => !empty($data['hostid']) ? $data['hostid'] : 0,
+			'period' => !empty($data['period']) ? $data['period'] : ZBX_MAX_PERIOD,
+			'stime' => !empty($data['stime']) ? $data['stime'] : null
 		));
 		$flickerfreeScreen = $flickerfreeScreen->get();
 
