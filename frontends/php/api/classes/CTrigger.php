@@ -1801,14 +1801,21 @@ class CTrigger extends CTriggerGeneral {
 				$trigger['error'] = 'Trigger expression updated. No status update so far.';
 			}
 
-			if ($descriptionChanged || $expressionChanged) {
+			if ($expressionChanged) {
+				// check the expression
 				$expressionData = new CTriggerExpression(array('expression' => $expressionFull));
 				if (!empty($expressionData->errors)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, reset($expressionData->errors));
 				}
-			}
 
-			if ($expressionChanged) {
+				// if the trigger contains templates, delete any events that may exist
+				if ($this->expressionHasTemplates($expressionData)) {
+					DB::delete('events', array(
+						'object' => EVENT_OBJECT_TRIGGER,
+						'objectid' => $trigger['triggerid']
+					));
+				}
+
 				delete_function_by_triggerid($trigger['triggerid']);
 
 				$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
@@ -2169,5 +2176,30 @@ class CTrigger extends CTriggerGeneral {
 			'countOutput' => true
 		));
 		return count($ids) == $count;
+	}
+
+	/**
+	 * Returns true if the given expression contains templates.
+	 *
+	 * @param CTriggerExpression $exp
+	 *
+	 * @return bool
+	 */
+	protected function expressionHasTemplates(CTriggerExpression $exp) {
+		$hosts = API::Host()->get(array(
+			'output' => array('status'),
+			'filter' => array(
+				'name' => $exp->data['hosts']
+			),
+			'templated_hosts' => true
+		));
+
+		foreach ($hosts as $host) {
+			if ($host['status'] == HOST_STATUS_TEMPLATE) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
