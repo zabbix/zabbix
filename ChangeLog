@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-5176] fixed trigger events not being deleted when changing it to a templated trigger (Pavels)
 ........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
 ........S. [ZBX-5042] fixed possible sql errors while node synchronization (Sasha)
 ..F....... [ZBX-5133] fixed error when adding the first map element (Toms)
@@ -79,6 +80,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-5176] fixed trigger events not being deleted when changing it to a templated trigger (Pavels)
 ........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
 ........S. [ZBX-5042] fixed possible sql errors while node synchronization (Sasha)
 ..F....... [ZBX-5133] fixed error when adding the first map element (Toms)
