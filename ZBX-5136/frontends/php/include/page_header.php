@@ -30,6 +30,7 @@ if (!isset($page['file'])) {
 }
 if ($_REQUEST['fullscreen'] = get_request('fullscreen', 0)) {
 	define('ZBX_PAGE_NO_MENU', 1);
+	define('ZBX_PAGE_FULLSCREEN', 1);
 }
 
 require_once dirname(__FILE__).'/menu.inc.php';
@@ -164,9 +165,9 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 				'</style>';
 
 			// perform Zabbix server check only for standard pages
-			if (!defined('ZBX_PAGE_NO_MENU') && $config['server_check_interval']) {
+			if ((!defined('ZBX_PAGE_NO_MENU') || defined('ZBX_PAGE_FULLSCREEN')) && $config['server_check_interval']
+					&& !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
 				$page['scripts'][] = 'servercheck.js';
-				zbx_add_post_js('checkServerStatus('.$config['server_check_interval'].');');
 			}
 		}
 	}
@@ -199,6 +200,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 </script>
 </head>
 <body class="<?php echo $css; ?>">
+<div id="message-global-wrap"><div id="message-global"></div></div>
 <?php
 }
 
@@ -258,11 +260,8 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$logo = new CLink(new CDiv(SPACE, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
 	$logo->setTarget('_blank');
 
-	$tdm = new CCol('', 'page_header_m');
-	$tdm->attr('id', 'message-global');
 	$top_page_row = array(
 		new CCol($logo, 'page_header_l'),
-		$tdm,
 		new CCol($page_header_r_col, 'maxwidth page_header_r')
 	);
 
@@ -291,6 +290,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 		if (!empty($available_nodes)) {
 			$node_form = new CForm('get');
+			$node_form->cleanItems();
 			$node_form->setAttribute('id', 'node_form');
 
 			// create ComboBox with selected nodes

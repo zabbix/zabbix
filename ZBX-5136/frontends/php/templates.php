@@ -259,8 +259,16 @@ elseif (isset($_REQUEST['save'])) {
 				throw new Exception();
 			}
 
-			if (!copyTriggers($clone_templateid, $templateid)) {
-				throw new Exception();
+			// clone triggers
+			$triggers = API::Trigger()->get(array(
+				'output' => API_OUTPUT_SHORTEN,
+				'hostids' => $clone_templateid,
+				'inherited' => false
+			));
+			if ($triggers) {
+				if (!copyTriggersToHosts(zbx_objectValues($triggers, 'triggerid'), $templateid, $clone_templateid)) {
+					throw new Exception();
+				}
 			}
 
 			// Host graphs
@@ -596,7 +604,7 @@ else {
 	$goBox->addItem($goOption);
 
 // goButton name is necessary!!!
-	$goButton = new CSubmit('goButton', _('Go'));
+	$goButton = new CSubmit('goButton', _('Go').' (0)');
 	$goButton->setAttribute('id', 'goButton');
 
 	zbx_add_post_js('chkbxRange.pageGoName = "templates";');

@@ -1,6 +1,8 @@
 Changes for 2.0.1rc1
 
 New features:
+........S. [ZBXNEXT-1259] added a script file existence and permissions check for a "Script" media type (Sasha)
+...G...... [ZBXNEXT-801] maximum number of monitored disks increased to 1024, with dynamic increasing of shared memory size (Andris)
 ....I..... [ZBXNEXT-1256] added example Solaris partition LLD user parameter (Richlv)
 A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBX-1357] updated Brazilian Portuguese, French, Greek, Japanese, Ukrainian and Russian translations; thanks to Zabbix translators (Richlv)
@@ -8,6 +10,20 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-5176] fixed trigger events not being deleted when changing it to a templated trigger (Pavels)
+........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
+........S. [ZBX-5042] fixed possible sql errors while node synchronization (Sasha)
+..F....... [ZBX-5133] fixed error when adding the first map element (Toms)
+A......... [ZBX-5115] fixed API object names being case sensitive (Pavels)
+....I..... [ZBX-5058] init.d scripts updated for Zabbix 2.0 (Andris)
+..F....... [ZBX-5143] fixed regular expression delete action ignores cancelation in confirmation dialog (Vedmak)
+........S. [ZBX-5148] fixed linking of item prototypes by a discovery rule (Sasha)
+....I..... [ZBX-5061] fixed Oracle SQL errors when executing data.sql (Sasha)
+........S. [ZBX-5123] fixed Oracle SQL error while linking a template by server (Sasha)
+..F....... [ZBX-5156] fixed incorrect values in node edit form (Vedmak)
+A......... [ZBX-5140] fixed usermacro.get return macros from all nodes by default (Vedmak)
+..F....... [ZBX-5106] fixed trigger dependencies not being mapped to new triggers when cloning a host (Pavels)
+..F....... [ZBX-5106] fixed trigger dependencies on web triggers not being removed when cloning a host (Pavels)
 ..F....... [ZBX-5128] fixed pagefilter->groupid (Eduard)
 ..F....... [ZBX-5073] fixed parent template links in items, triggers, graphs and discovery rules (Eduard)
 ..F....... [ZBX-5104] fixed severity colors in trigger forms (Vedmak)
@@ -753,6 +769,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+..F....... [ZBX-5147] fixed profiler lib doesn't work with G suffix for memory_limit option (Vedmak)
 ...G...... [ZBX-5027] added file size check to log monitoring to report error if it's over 2 GB (dimir)
 .......PS. [ZBX-4980] fixed error in decoding of big base64 encoded values (Andris)
 .......PS. [ZBX-4793] fixed processing of SNMP strings terminated with a NUL character (Sasha)

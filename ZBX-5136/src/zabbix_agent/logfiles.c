@@ -43,7 +43,8 @@
 static int	split_string(const char *str, const char *del, char **part1, char **part2)
 {
 	const char	*__function_name = "split_string";
-	int		str_length = 0, part1_length = 0, part2_length = 0, ret = FAIL;
+	size_t		str_length = 0, part1_length = 0, part2_length = 0;
+	int		ret = FAIL;
 
 	assert(NULL != str && '\0' != *str);
 	assert(NULL != del && '\0' != *del);
@@ -73,8 +74,8 @@ static int	split_string(const char *str, const char *del, char **part1, char **p
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s part1:'%s' part2:'%s'",
-			__function_name, zbx_result_string(ret), *part1, *part2);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s part1:'%s' part2:'%s'", __function_name, zbx_result_string(ret),
+			*part1, *part2);
 
 	return ret;
 }
