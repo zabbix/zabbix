@@ -804,6 +804,19 @@ function getNextColor(paletteType) {
 	return hexColor.toUpperCase();
 }
 
+/**
+ * Used for php ctweenbox object.
+ * Moves item from 'from' select to 'to' select and adds or removes hidden fields to 'formname' for posting data.
+ * Moving perserves alphabetical order.
+ *
+ * @formname string	form name where hidden fields will be added
+ * @objname string	unique name for hidden field naming
+ * @from string		from select id
+ * @to string		to select id
+ * @action string	action to perform with hidden field
+ *
+ * @return true
+ */
 function moveListBoxSelectedItem(formname, objname, from, to, action) {
 	to = jQuery("#"+to);
 	jQuery("#"+from).find("option:selected").each(function(i, fromel){
