@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5136] fixed xml import can broke on short empty tag syntax (Vedmak)
 ..F....... [ZBX-5154] fixed host group tab doesn't add selected hosts to host group (Toms)
 A.F....... [ZBX-5176] fixed trigger events not being deleted when changing it to a templated trigger (Pavels)
 ........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
@@ -81,6 +82,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5136] fixed xml import can broke on short empty tag syntax (Vedmak)
 ..F....... [ZBX-5154] fixed host group tab doesn't add selected hosts to host group (Toms)
 A.F....... [ZBX-5176] fixed trigger events not being deleted when changing it to a templated trigger (Pavels)
 ........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
