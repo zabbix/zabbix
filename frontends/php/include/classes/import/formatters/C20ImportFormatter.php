@@ -32,70 +32,68 @@ class C20ImportFormatter extends CImportFormatter {
 	}
 
 	public function getTemplates() {
-		if (!isset($this->data['templates'])) {
-			return array();
+		$templatesData = array();
+
+		if (!empty($this->data['templates'])) {
+			foreach ($this->data['templates'] as $template) {
+				$template = $this->renameData($template, array('template' => 'host'));
+
+				CArrayHelper::convertFieldToArray($template, 'templates');
+				if (empty($template['templates'])) {
+					unset($template['templates']);
+				}
+				CArrayHelper::convertFieldToArray($template, 'macros');
+				CArrayHelper::convertFieldToArray($template, 'groups');
+
+				CArrayHelper::convertFieldToArray($template, 'screens');
+				if (!empty($template['screens'])) {
+					foreach ($template['screens'] as &$screen) {
+						$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+					}
+					unset($screen);
+				}
+
+
+				$templatesData[] = CArrayHelper::getByKeys($template, array(
+					'groups', 'macros', 'screens', 'templates', 'host', 'status', 'name'
+				));
+			}
 		}
-		$hostsData = array();
 
-		foreach ($this->data['templates'] as $host) {
-			$host = $this->renameData($host, array('template' => 'host'));
-
-			if (empty($host['templates'])) {
-				unset($host['templates']);
-			}
-			else {
-				$host['templates'] = array_values($host['templates']);
-			}
-
-			$host['macros'] = array_values($host['macros']);
-			$host['groups'] = array_values($host['groups']);
-
-			foreach ($host['screens'] as &$screen) {
-				$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
-			}
-			unset($screen);
-
-			$hostsData[] = CArrayHelper::getByKeys($host, array(
-				'groups', 'macros', 'screens', 'templates', 'host', 'status', 'name'
-			));
-		}
-
-		return $hostsData;
+		return $templatesData;
 	}
 
 	public function getHosts() {
-		if (!isset($this->data['hosts'])) {
-			return array();
-		}
 		$hostsData = array();
 
-		foreach ($this->data['hosts'] as $host) {
-			$host = $this->renameData($host, array('proxyid' => 'proxy_hostid'));
+		if (!empty($this->data['hosts'])) {
+			foreach ($this->data['hosts'] as $host) {
+				$host = $this->renameData($host, array('proxyid' => 'proxy_hostid'));
 
-			foreach ($host['interfaces'] as $inum => $interface) {
-				$host['interfaces'][$inum] = $this->renameData($interface, array('default' => 'main'));
+				CArrayHelper::convertFieldToArray($host, 'interfaces');
+				if (!empty($host['interfaces'])) {
+					foreach ($host['interfaces'] as $inum => $interface) {
+						$host['interfaces'][$inum] = $this->renameData($interface, array('default' => 'main'));
+					}
+				}
+
+				CArrayHelper::convertFieldToArray($host, 'templates');
+				if (empty($host['templates'])) {
+					unset($host['templates']);
+				}
+				CArrayHelper::convertFieldToArray($host, 'macros');
+				CArrayHelper::convertFieldToArray($host, 'groups');
+
+				if (!empty($host['inventory']) && isset($host['inventory']['inventory_mode'])) {
+					$host['inventory_mode'] = $host['inventory']['inventory_mode'];
+					unset($host['inventory']['inventory_mode']);
+				}
+
+				$hostsData[] = CArrayHelper::getByKeys($host, array(
+					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
+					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'inventory_mode'
+				));
 			}
-			$host['interfaces'] = array_values($host['interfaces']);
-
-			if (empty($host['templates'])) {
-				unset($host['templates']);
-			}
-			else {
-				$host['templates'] = array_values($host['templates']);
-			}
-
-			$host['macros'] = array_values($host['macros']);
-			$host['groups'] = array_values($host['groups']);
-
-			if (!empty($host['inventory']) && isset($host['inventory']['inventory_mode'])) {
-				$host['inventory_mode'] = $host['inventory']['inventory_mode'];
-				unset($host['inventory']['inventory_mode']);
-			}
-
-			$hostsData[] = CArrayHelper::getByKeys($host, array(
-				'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
-				'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'inventory_mode'
-			));
 		}
 
 		return $hostsData;
@@ -106,15 +104,19 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
-				foreach ($host['applications'] as $application) {
-					$applicationsData[$host['host']][$application['name']] = $application;
+				if (!empty($host['applications'])) {
+					foreach ($host['applications'] as $application) {
+						$applicationsData[$host['host']][$application['name']] = $application;
+					}
 				}
 			}
 		}
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
-				foreach ($template['applications'] as $application) {
-					$applicationsData[$template['template']][$application['name']] = $application;
+				if (!empty($template['applications'])) {
+					foreach ($template['applications'] as $application) {
+						$applicationsData[$template['template']][$application['name']] = $application;
+					}
 				}
 			}
 		}
@@ -127,17 +129,21 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
-				foreach ($host['items'] as $item) {
-					$item = $this->renameItemFields($item);
-					$itemsData[$host['host']][$item['key_']] = $item;
+				if (!empty($host['items'])) {
+					foreach ($host['items'] as $item) {
+						$item = $this->renameItemFields($item);
+						$itemsData[$host['host']][$item['key_']] = $item;
+					}
 				}
 			}
 		}
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
-				foreach ($template['items'] as $item) {
-					$item = $this->renameItemFields($item);
-					$itemsData[$template['template']][$item['key_']] = $item;
+				if (!empty($template['items'])) {
+					foreach ($template['items'] as $item) {
+						$item = $this->renameItemFields($item);
+						$itemsData[$template['template']][$item['key_']] = $item;
+					}
 				}
 			}
 		}
@@ -150,66 +156,24 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (isset($this->data['hosts'])) {
 			foreach ($this->data['hosts'] as $host) {
-				foreach ($host['discovery_rules'] as $item) {
-					$item = $this->renameItemFields($item);
-					foreach ($item['item_prototypes'] as &$prototype) {
-						$prototype = $this->renameItemFields($prototype);
-					}
-					unset($prototype);
+				if (!empty($host['discovery_rules'])) {
+					foreach ($host['discovery_rules'] as $item) {
+						$item = $this->formatDiscoveryRule($item);
 
-					foreach ($item['trigger_prototypes'] as &$trigger) {
-						$trigger = $this->renameData($trigger, array('description' => 'comments'));
-						$trigger = $this->renameData($trigger, array(
-							'name' => 'description',
-							'severity' => 'priority'
-						));
+						$discoveryRulesData[$host['host']][$item['key_']] = $item;
 					}
-					unset($trigger);
-
-					foreach ($item['graph_prototypes'] as &$graph) {
-						$graph = $this->renameData($graph, array(
-							'type' => 'graphtype',
-							'ymin_type_1' => 'ymin_type',
-							'ymax_type_1' => 'ymax_type',
-							'graph_items' => 'gitems'
-						));
-					}
-					unset($graph);
-
-					$discoveryRulesData[$host['host']][$item['key_']] = $item;
 				}
 			}
 		}
 
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
-				foreach ($template['discovery_rules'] as $item) {
-					$item = $this->renameItemFields($item);
-					foreach ($item['item_prototypes'] as &$prototype) {
-						$prototype = $this->renameItemFields($prototype);
-					}
-					unset($prototype);
+				if (!empty($host['discovery_rules'])) {
+					foreach ($template['discovery_rules'] as $item) {
+						$item = $this->formatDiscoveryRule($item);
 
-					foreach ($item['trigger_prototypes'] as &$trigger) {
-						$trigger = $this->renameData($trigger, array('description' => 'comments'));
-						$trigger = $this->renameData($trigger, array(
-							'name' => 'description',
-							'severity' => 'priority'
-						));
+						$discoveryRulesData[$template['template']][$item['key_']] = $item;
 					}
-					unset($trigger);
-
-					foreach ($item['graph_prototypes'] as &$graph) {
-						$graph = $this->renameData($graph, array(
-							'type' => 'graphtype',
-							'ymin_type_1' => 'ymin_type',
-							'ymax_type_1' => 'ymax_type',
-							'graph_items' => 'gitems'
-						));
-					}
-					unset($graph);
-
-					$discoveryRulesData[$template['template']][$item['key_']] = $item;
 				}
 			}
 		}
@@ -218,86 +182,75 @@ class C20ImportFormatter extends CImportFormatter {
 	}
 
 	public function getGraphs() {
-		if (!isset($this->data['graphs'])) {
-			return array();
-		}
-
 		$graphsData = array();
-		foreach ($this->data['graphs'] as $graph) {
-			$graph = $this->renameData($graph, array(
-				'type' => 'graphtype',
-				'ymin_type_1' => 'ymin_type',
-				'ymax_type_1' => 'ymax_type',
-				'graph_items' => 'gitems'
-			));
 
-			$graph['gitems'] = array_values($graph['gitems']);
+		if (!empty($this->data['graphs'])) {
+			foreach ($this->data['graphs'] as $graph) {
+				$graph = $this->renameGraphFields($graph);
 
-			$graphsData[] = $graph;
+				$graph['gitems'] = array_values($graph['gitems']);
+
+				$graphsData[] = $graph;
+			}
 		}
 
 		return $graphsData;
 	}
 
 	public function getTriggers() {
-		if (!isset($this->data['triggers'])) {
-			return array();
-		}
-
 		$triggersData = array();
-		foreach ($this->data['triggers'] as $trigger) {
-			$trigger = $this->renameData($trigger, array('description' => 'comments'));
-			$trigger = $this->renameData($trigger, array(
-				'name' => 'description',
-				'severity' => 'priority'
-			));
 
-			$triggersData[] = $trigger;
+		if (!empty($this->data['triggers'])) {
+			foreach ($this->data['triggers'] as $trigger) {
+				CArrayHelper::convertFieldToArray($trigger, 'dependencies');
+				$triggersData[] = $this->renameTriggerFields($trigger);
+
+			}
 		}
 
 		return $triggersData;
 	}
 
 	public function getImages() {
-		if (!isset($this->data['images'])) {
-			return array();
+		$imagesData = array();
+
+		if (!empty($this->data['images'])) {
+			foreach ($this->data['images'] as $image) {
+				$imagesData[] = $this->renameData($image, array('encodedImage' => 'image'));
+			}
 		}
-		foreach ($this->data['images'] as &$image) {
-			$image = $this->renameData($image, array('encodedImage' => 'image'));
-		}
-		unset($image);
-		return $this->data['images'];
+
+		return $imagesData;
 	}
 
 	public function getMaps() {
-		if (!isset($this->data['maps'])) {
-			return array();
-		}
-
 		$mapsData = array();
-		foreach ($this->data['maps'] as $map) {
-			if (isset($map['selements'])) {
-				$map['selements'] = array_values($map['selements']);
+
+		if (!empty($this->data['maps'])) {
+			foreach ($this->data['maps'] as $map) {
+				if (!empty($map['selements'])) {
+					$map['selements'] = array_values($map['selements']);
+				}
+				if (!empty($map['links'])) {
+					$map['links'] = array_values($map['links']);
+				}
+				$mapsData[] = $map;
 			}
-			if (isset($map['links'])) {
-				$map['links'] = array_values($map['links']);
-			}
-			$mapsData[] = $map;
 		}
 
 		return $mapsData;
 	}
 
 	public function getScreens() {
-		if (!isset($this->data['screens'])) {
-			return array();
+		$screensData = array();
+
+		if (!empty($this->data['screens'])) {
+			foreach ($this->data['screens'] as $screen) {
+				$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+				$screensData[] = $screen;
+			}
 		}
 
-		$screensData = array();
-		foreach ($this->data['screens'] as $screen) {
-			$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
-			$screensData[] = $screen;
-		}
 		return $screensData;
 	}
 
@@ -306,13 +259,88 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
-				foreach ($template['screens'] as $screen) {
-					$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
-					$screensData[$template['template']][$screen['name']] = $screen;
+				if (!empty($template['screens'])) {
+					foreach ($template['screens'] as $screen) {
+						$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
+						$screensData[$template['template']][$screen['name']] = $screen;
+					}
 				}
 			}
 		}
 
 		return $screensData;
+	}
+
+	/**
+	 * Format discovery rule.
+	 *
+	 * @param array $discoveryRule
+	 *
+	 * @return array
+	 */
+	protected function formatDiscoveryRule(array $discoveryRule) {
+		$discoveryRule = $this->renameItemFields($discoveryRule);
+
+		if (!empty($discoveryRule['item_prototypes'])) {
+			foreach ($discoveryRule['item_prototypes'] as &$prototype) {
+				$prototype = $this->renameItemFields($prototype);
+			}
+			unset($prototype);
+		}
+
+		if (!empty($discoveryRule['trigger_prototypes'])) {
+			foreach ($discoveryRule['trigger_prototypes'] as &$trigger) {
+				$trigger = $this->renameTriggerFields($trigger);
+			}
+			unset($trigger);
+		}
+
+		if (!empty($discoveryRule['graph_prototypes'])) {
+			foreach ($discoveryRule['graph_prototypes'] as &$graph) {
+				$graph = $this->renameGraphFields($graph);
+			}
+			unset($graph);
+		}
+
+		return $discoveryRule;
+	}
+
+	/**
+	 * Rename items, discovery rules, item prototypes fields.
+	 *
+	 * @param array $item
+	 *
+	 * @return array
+	 */
+	protected function renameItemFields(array $item) {
+		return $this->renameData($item, array('key' => 'key_', 'allowed_hosts' => 'trapper_hosts'));
+	}
+
+	/**
+	 * Rename triggers, trigger prototypes fields.
+	 *
+	 * @param array $trigger
+	 *
+	 * @return array
+	 */
+	protected function renameTriggerFields(array $trigger) {
+		$trigger = $this->renameData($trigger, array('description' => 'comments'));
+		return $this->renameData($trigger, array('name' => 'description', 'severity' => 'priority'));
+	}
+
+	/**
+	 * Rename graphs, graph prototypes fields.
+	 *
+	 * @param array $graph
+	 *
+	 * @return array
+	 */
+	protected function renameGraphFields(array $graph) {
+		return $this->renameData($graph, array(
+			'type' => 'graphtype',
+			'ymin_type_1' => 'ymin_type',
+			'ymax_type_1' => 'ymax_type',
+			'graph_items' => 'gitems'
+		));
 	}
 }
