@@ -68,7 +68,7 @@ class CXmlExportWriter extends CExportWriter {
 			if (is_array($value)) {
 				$this->fromArray($value, $name);
 			}
-			elseif ($value !== null) {
+			elseif (!zbx_empty($value)) {
 				$this->xmlWriter->text($value);
 			}
 

@@ -39,6 +39,8 @@ class GeneralTests {
 		$suite = new PHPUnit_Framework_TestSuite('general');
 
 		$suite->addTestSuite('class_cItemKey');
+		$suite->addTestSuite('class_cxmlexportwriter');
+		$suite->addTestSuite('class_cxmlimportreader');
 		$suite->addTestSuite('function_DBcommit');
 		$suite->addTestSuite('function_DBcondition');
 		$suite->addTestSuite('function_DBconnect');
