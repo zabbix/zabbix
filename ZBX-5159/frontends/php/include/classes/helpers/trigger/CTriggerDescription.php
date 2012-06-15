@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CTriggerDescription {
 
 	/**
@@ -33,6 +34,13 @@ class CTriggerDescription {
 	 * @var bool
 	 */
 	protected $soloTrigger;
+
+	/**
+	 * Values to replace for macros.
+	 *
+	 * @var array
+	 */
+	protected $macroValues = array();
 
 	/**
 	 * Add one trigger to expand description.
@@ -83,8 +91,8 @@ class CTriggerDescription {
 
 		$dbTriggers = DBselect(
 			'SELECT DISTINCT t.description,t.expression,t.triggerid'.
-					' FROM triggers t'.
-					' WHERE '.DBcondition('t.triggerid', $triggerIds)
+				' FROM triggers t'.
+				' WHERE '.DBcondition('t.triggerid', $triggerIds)
 		);
 		$triggers = array();
 		while ($trigger = DBfetch($dbTriggers)) {
@@ -145,6 +153,7 @@ class CTriggerDescription {
 		$this->expandHostMacros($expandHost);
 		$this->expandIpMacros($expandIp);
 		$this->expandItemMacros($expandItem);
+		$this->replaceMacroValues();
 
 		if ($this->soloTrigger) {
 			$trigger = reset($this->triggers);
@@ -163,7 +172,7 @@ class CTriggerDescription {
 	 *
 	 * @return string
 	 */
-	protected function expandReferenceMacros(array $trigger) {
+	public function expandReferenceMacros(array $trigger) {
 		$expression = $trigger['expression'];
 		$description = $trigger['description'];
 
@@ -222,6 +231,9 @@ class CTriggerDescription {
 			$functions[$i + 1] = $functionid;
 		}
 
+		// macro without number is same as 1. but we need to distinguish them, so it's treated as 0
+		$functions[0] = $functions[1];
+
 		return $functions;
 	}
 
@@ -271,8 +283,8 @@ class CTriggerDescription {
 
 		preg_match_all('/{('.$macrosPattern.')([1-9]?)}/', $description, $matches);
 		foreach ($matches[1] as $num => $foundMacro) {
-			$functionNum = $matches[2][$num] ? $matches[2][$num] : 1;
-			$result[$foundMacro][$functionNum] = $functionNum;
+			$fNum = $matches[2][$num] ? $matches[2][$num] : 0;
+			$result[$foundMacro][$fNum] = $fNum;
 		}
 
 		return $result;
@@ -289,10 +301,10 @@ class CTriggerDescription {
 		if (!empty($expandHost)) {
 			$dbFuncs = DBselect(
 				'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name'.
-						' FROM functions f'.
-						' INNER JOIN items i ON f.itemid=i.itemid'.
-						' INNER JOIN hosts h ON i.hostid=h.hostid'.
-						' WHERE '.DBcondition('f.functionid', array_keys($expandHost))
+					' FROM functions f'.
+					' INNER JOIN items i ON f.itemid=i.itemid'.
+					' INNER JOIN hosts h ON i.hostid=h.hostid'.
+					' WHERE '.DBcondition('f.functionid', array_keys($expandHost))
 			);
 			while ($func = DBfetch($dbFuncs)) {
 				foreach ($expandHost[$func['functionid']] as $fNum => $macro) {
@@ -307,12 +319,8 @@ class CTriggerDescription {
 							break;
 					}
 
-					$macros = array('{'.$macro.$fNum.'}');
-					if ($fNum == 1) {
-						$macros[] = '{'.$macro.'}';
-					}
-					$this->triggers[$func['triggerid']]['description'] = str_replace(
-						$macros, $replace, $this->triggers[$func['triggerid']]['description']);
+					$macro = '{'.$macro.($fNum ? $fNum : '').'}';
+					$this->macroValues[$func['triggerid']][$macro] = $replace;
 				}
 			}
 		}
@@ -365,19 +373,16 @@ class CTriggerDescription {
 						break;
 				}
 
-				$macros = array('{'.$macro.$fNum.'}');
-				if ($fNum == 1) {
-					$macros[] = '{'.$macro.'}';
-				}
-				$this->triggers[$interface['triggerid']]['description'] = str_replace(
-					$macros, $replace, $this->triggers[$interface['triggerid']]['description']);
+				$macro = '{'.$macro.($fNum ? $fNum : '').'}';
+				$this->macroValues[$interface['triggerid']][$macro] = $replace;
 			}
 		}
 
 		return true;
 	}
 
-	/**Expand item macros.
+	/**
+	 * Expand item macros.
 	 *
 	 * @param array $expandItem
 	 *
@@ -404,17 +409,44 @@ class CTriggerDescription {
 							break;
 					}
 
-					$macros = array('{'.$macro.$fNum.'}');
-					if ($fNum == 1) {
-						$macros[] = '{'.$macro.'}';
-					}
-					$this->triggers[$func['triggerid']]['description'] = str_replace(
-						$macros, $replace, $this->triggers[$func['triggerid']]['description']);
+					$macro = '{'.$macro.($fNum ? $fNum : '').'}';
+					$this->macroValues[$func['triggerid']][$macro] = $replace;
 				}
 			}
 		}
 
 		return true;
+	}
+
+	protected function replaceMacroValues() {
+		foreach ($this->triggers as &$trigger) {
+			$macroBegin = false;
+			for ($i = 0, $l = zbx_strlen($trigger['description']); $i < $l; $i++) {
+				$c = zbx_substr($trigger['description'], $i, 1);
+
+				switch ($c) {
+					case '{':
+						$macroBegin = $i;
+						break;
+					case '}':
+						if ($macroBegin !== false) {
+							$macro = zbx_substr($trigger['description'], $macroBegin, $i - $macroBegin + 1);
+							if (isset($this->macroValues[$trigger['triggerid']][$macro])) {
+								$replace = $this->macroValues[$trigger['triggerid']][$macro];
+								$trigger['description'] = zbx_substr_replace(
+									$trigger['description'],
+									$replace,
+									$macroBegin,
+									zbx_strlen($macro)
+								);
+								$i = $macroBegin + zbx_strlen($replace);
+							}
+						}
+						break;
+				}
+			}
+		}
+		unset($trigger);
 	}
 
 	/**

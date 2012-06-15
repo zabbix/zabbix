@@ -1622,15 +1622,16 @@ function make_trigger_details($trigger) {
 	// host js link
 	$hostSpan = new CSpan($host['name'], 'link_menu menu-host');
 	$scripts = ($hostScripts[$host['hostid']]) ? $hostScripts[$host['hostid']] : array();
-	$hostSpan->setAttribute('data-menu', hostMenuData($host, $scripts));
+	$hostSpan->attr('data-menu', hostMenuData($host, $scripts));
 
 	// get visible name of the first host
 	$table->addRow(array(_('Host'), $hostSpan));
-	$table->addRow(array(_('Trigger'), $trigger['description']));
+	$table->addRow(array(_('Trigger'), CDescription::expandTrigger($trigger)));
 	$table->addRow(array(_('Severity'), getSeverityCell($trigger['priority'])));
 	$table->addRow(array(_('Expression'), $expression));
 	$table->addRow(array(_('Event generation'), _('Normal').(TRIGGER_MULT_EVENT_ENABLED == $trigger['type'] ? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')));
 	$table->addRow(array(_('Disabled'), (TRIGGER_STATUS_ENABLED == $trigger['status'] ? new CCol(_('No'), 'off') : new CCol(_('Yes'), 'on'))));
+
 	return $table;
 }
 

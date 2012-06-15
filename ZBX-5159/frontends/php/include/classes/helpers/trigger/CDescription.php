@@ -98,6 +98,11 @@ class CDescription {
 		return self::$tDescription->expand();
 	}
 
+	public static function expandReferenceMacros(array $trigger) {
+		self::initTriggers();
+		return self::$tDescription->expandReferenceMacros($trigger);
+	}
+
 	/**
 	 * Helper for CEventDescription->addTrigger.
 	 *
