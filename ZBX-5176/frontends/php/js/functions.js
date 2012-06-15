@@ -710,22 +710,17 @@ function t(str) {
 	return (!!locale[str]) ? locale[str] : str;
 }
 
-function getRandomId(remember) {
-	var id;
-
-	if (typeof this.generated === 'undefined') {
-		this.generated = [];
+/**
+ * Generates unique id with prefix 'new'.
+ * id starts from 0 in each JS session.
+ *
+ * @return string
+ */
+function getUniqueId() {
+	if (typeof getUniqueId.id === 'undefined') {
+		getUniqueId.id = 0;
 	}
-	id = Math.floor(Math.random() * 10000000);
-
-	if (this.generated.indexOf(id) > -1) {
-		id = getRandomId(false); // attention recursion !!!
-	}
-
-	if (typeof remember === 'undefined') {
-		this.generated.push(id);
-	}
-	return id.toString();
+	return 'new' + (getUniqueId.id++).toString();
 }
 
 /**

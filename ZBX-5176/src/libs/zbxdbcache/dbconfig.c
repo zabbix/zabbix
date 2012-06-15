@@ -359,6 +359,8 @@ static ZBX_DC_CONFIG	*config = NULL;
 static ZBX_MUTEX	config_lock;
 static zbx_mem_info_t	*config_mem;
 
+extern unsigned char	daemon_type;
+
 ZBX_MEM_FUNC_IMPL(__config, config_mem);
 
 static void	poller_by_item(zbx_uint64_t itemid, zbx_uint64_t proxy_hostid,
@@ -658,7 +660,8 @@ static int	DCsync_config(DB_RESULT result)
 
 	if (NULL == (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			zabbix_log(LOG_LEVEL_ERR, "no records in table 'config'");
 
 		if (0 == found)
 		{

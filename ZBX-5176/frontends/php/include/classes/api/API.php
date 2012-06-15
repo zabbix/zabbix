@@ -77,7 +77,7 @@ class API {
 	);
 
 	/**
-	 * Returns the class name for the given API object.
+	 * Returns the class name for the given API object. The name of the object should not be case sensitive.
 	 *
 	 * @static
 	 *
@@ -86,7 +86,7 @@ class API {
 	 * @return string
 	 */
 	public static function getObjectClassName($object) {
-		return self::$classMap[$object];
+		return self::$classMap[strtolower($object)];
 	}
 
 	public static function setReturnAPI() {
