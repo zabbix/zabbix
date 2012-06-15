@@ -528,29 +528,34 @@ int	MAIN_ZABBIX_ENTRY()
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
 #ifdef	HAVE_SNMP
-#	define SNMP_FEATURE_STATUS "YES"
+#	define SNMP_FEATURE_STATUS 	"YES"
 #else
-#	define SNMP_FEATURE_STATUS " NO"
+#	define SNMP_FEATURE_STATUS 	" NO"
 #endif
 #ifdef	HAVE_OPENIPMI
-#	define IPMI_FEATURE_STATUS "YES"
+#	define IPMI_FEATURE_STATUS 	"YES"
 #else
-#	define IPMI_FEATURE_STATUS " NO"
+#	define IPMI_FEATURE_STATUS 	" NO"
+#endif
+#ifdef	HAVE_LIBCURL
+#	define LIBCURL_FEATURE_STATUS	"YES"
+#else
+#	define LIBCURL_FEATURE_STATUS	" NO"
 #endif
 #ifdef	HAVE_ODBC
-#	define ODBC_FEATURE_STATUS "YES"
+#	define ODBC_FEATURE_STATUS 	"YES"
 #else
-#	define ODBC_FEATURE_STATUS " NO"
+#	define ODBC_FEATURE_STATUS 	" NO"
 #endif
 #ifdef	HAVE_SSH2
-#	define SSH2_FEATURE_STATUS "YES"
+#	define SSH2_FEATURE_STATUS 	"YES"
 #else
-#	define SSH2_FEATURE_STATUS " NO"
+#	define SSH2_FEATURE_STATUS 	" NO"
 #endif
 #ifdef	HAVE_IPV6
-#	define IPV6_FEATURE_STATUS "YES"
+#	define IPV6_FEATURE_STATUS 	"YES"
 #else
-#	define IPV6_FEATURE_STATUS " NO"
+#	define IPV6_FEATURE_STATUS 	" NO"
 #endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).",
@@ -560,6 +565,7 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
 	zabbix_log(LOG_LEVEL_INFORMATION, "SNMP monitoring:       " SNMP_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPMI monitoring:       " IPMI_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "WEB monitoring:        " LIBCURL_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                  " ODBC_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH2 support:          " SSH2_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
