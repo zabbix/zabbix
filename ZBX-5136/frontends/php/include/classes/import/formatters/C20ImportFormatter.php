@@ -38,14 +38,14 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['templates'] as $template) {
 				$template = $this->renameData($template, array('template' => 'host'));
 
-				CArrayHelper::canvertFieldToArray($template, 'templates');
+				CArrayHelper::convertFieldToArray($template, 'templates');
 				if (empty($template['templates'])) {
 					unset($template['templates']);
 				}
-				CArrayHelper::canvertFieldToArray($template, 'macros');
-				CArrayHelper::canvertFieldToArray($template, 'groups');
+				CArrayHelper::convertFieldToArray($template, 'macros');
+				CArrayHelper::convertFieldToArray($template, 'groups');
 
-				CArrayHelper::canvertFieldToArray($template, 'screens');
+				CArrayHelper::convertFieldToArray($template, 'screens');
 				if (!empty($template['screens'])) {
 					foreach ($template['screens'] as &$screen) {
 						$screen = $this->renameData($screen, array('screen_items' => 'screenitems'));
@@ -70,19 +70,19 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				$host = $this->renameData($host, array('proxyid' => 'proxy_hostid'));
 
-				CArrayHelper::canvertFieldToArray($host, 'interfaces');
+				CArrayHelper::convertFieldToArray($host, 'interfaces');
 				if (!empty($host['interfaces'])) {
 					foreach ($host['interfaces'] as $inum => $interface) {
 						$host['interfaces'][$inum] = $this->renameData($interface, array('default' => 'main'));
 					}
 				}
 
-				CArrayHelper::canvertFieldToArray($host, 'templates');
+				CArrayHelper::convertFieldToArray($host, 'templates');
 				if (empty($host['templates'])) {
 					unset($host['templates']);
 				}
-				CArrayHelper::canvertFieldToArray($host, 'macros');
-				CArrayHelper::canvertFieldToArray($host, 'groups');
+				CArrayHelper::convertFieldToArray($host, 'macros');
+				CArrayHelper::convertFieldToArray($host, 'groups');
 
 				if (!empty($host['inventory']) && isset($host['inventory']['inventory_mode'])) {
 					$host['inventory_mode'] = $host['inventory']['inventory_mode'];
@@ -202,7 +202,7 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (!empty($this->data['triggers'])) {
 			foreach ($this->data['triggers'] as $trigger) {
-				CArrayHelper::canvertFieldToArray($trigger, 'dependencies');
+				CArrayHelper::convertFieldToArray($trigger, 'dependencies');
 				$triggersData[] = $this->renameTriggerFields($trigger);
 
 			}

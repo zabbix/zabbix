@@ -75,13 +75,13 @@ class CArrayHelper {
 	}
 
 	/**
-	 * Converts field with given key to either an empty array if field is empty, or to an array with numeric keys.
-	 * If field with given key does not exist do nothing.
+	 * Converts the field with the given key to either an empty array, if the field is empty, or to an array with numeric keys.
+	 * If the field with the given key does not exist, does nothing.
 	 *
 	 * @param array  $array
 	 * @param string $fieldKey
 	 */
-	public static function canvertFieldToArray(array &$array, $fieldKey) {
+	public static function convertFieldToArray(array &$array, $fieldKey) {
 		if (array_key_exists($fieldKey, $array)) {
 			if (is_array($array[$fieldKey])) {
 				$array[$fieldKey] = array_values($array[$fieldKey]);
