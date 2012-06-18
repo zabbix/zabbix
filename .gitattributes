@@ -177,10 +177,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/import/importers/CHostImporter.php -text
-frontends/php/include/classes/tree/CServiceTree.php -text
-frontends/php/include/views/configuration.action.list.php -text
-frontends/php/include/views/js/administration.general.gui.php -text
 frontends/php/js/servercheck.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
@@ -261,9 +257,6 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
-frontends/php/tests/general/class_cxmlexportwriter.php -text
-frontends/php/tests/general/class_cxmlimportreader.php -text
-frontends/php/tests/selenium/testPagePopup.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -548,8 +541,6 @@ src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
 tests/data/README -text
 tests/templates/sqlite3.init -text
-tests/templates/zabbix_agentd.conf -text
-tests/templates/zabbix_server.conf -text
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png
@@ -570,7 +561,3 @@ upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/p
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
-upgrades/dbpatches/2.0/ibm_db2/rc4_rc5.sql -text
-upgrades/dbpatches/2.0/mysql/rc4_rc5.sql -text
-upgrades/dbpatches/2.0/oracle/rc4_rc5.sql -text
-upgrades/dbpatches/2.0/postgresql/rc4_rc5.sql -text
