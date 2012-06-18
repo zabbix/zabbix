@@ -89,11 +89,11 @@ function DBconnect(&$error) {
 				break;
 			case ZBX_DB_POSTGRESQL:
 				$pg_connection_string =
-					(!empty($DB['SERVER']) ? 'host=\''.$DB['SERVER'].'\' ' : '').
-					'dbname=\''.$DB['DATABASE'].'\' '.
-					(!empty($DB['USER']) ? 'user=\''.$DB['USER'].'\' ' : '').
-					(!empty($DB['PASSWORD']) ? 'password=\''.$DB['PASSWORD'].'\' ' : '').
-					(!empty($DB['PORT']) ? 'port='.$DB['PORT'] : '');
+					(!empty($DB['SERVER']) ? 'host=\''.addslashes($DB['SERVER']).'\' ' : '').
+					'dbname=\''.addslashes($DB['DATABASE']).'\' '.
+					(!empty($DB['USER']) ? 'user=\''.addslashes($DB['USER']).'\' ' : '').
+					(!empty($DB['PASSWORD']) ? 'password=\''.addslashes($DB['PASSWORD']).'\' ' : '').
+					(!empty($DB['PORT']) ? 'port='.addslashes($DB['PORT']) : '');
 
 				$DB['DB']= pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
