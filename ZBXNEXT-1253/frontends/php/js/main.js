@@ -975,6 +975,7 @@ function changeHatStateUI(icon, divid) {
 		'favref': divid,
 		'favstate': hat_state
 	};
+
 	send_params(params);
 }
 
@@ -998,6 +999,7 @@ function change_hat_state(icon, divid) {
 		'favref': divid,
 		'favstate': hat_state
 	};
+
 	send_params(params);
 }
 
@@ -1032,6 +1034,7 @@ function setRefreshRate(pmasterid, dollid, interval, params) {
 	params['favobj'] = 'set_rf_rate';
 	params['favref'] = dollid;
 	params['favcnt'] = interval;
+
 	send_params(params);
 }
 
@@ -1049,6 +1052,7 @@ function switch_mute(icon) {
 		'favref': 'sound',
 		'favstate': sound_state
 	};
+
 	send_params(params);
 }
 

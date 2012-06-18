@@ -34,8 +34,8 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 	}
 
 	public function get() {
-		$domGraphid = 'graph_'.$this->screenitem['screenitemid'];
-		$containerid = 'graph_container_'.$this->screenitem['screenitemid'];
+		$domGraphid = 'graph_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
+		$containerid = 'graph_container_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$graphDims = getGraphDims();
 		$graphDims['graphHeight'] = $this->screenitem['height'];
 		$graphDims['width'] = $this->screenitem['width'];

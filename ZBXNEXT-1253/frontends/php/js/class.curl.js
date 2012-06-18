@@ -20,8 +20,9 @@
 
 var Curl = Class.create();
 Curl.prototype = {
+
 	url:		'', // actually, it's deprecated/private variable
-	port:		 -1,
+	port:		-1,
 	host:		'',
 	protocol:	'',
 	username:	'',
@@ -165,7 +166,7 @@ Curl.prototype = {
 			keyval = args[i].split('=');
 			if (keyval.length > 1) {
 				try {
-					var tmp = keyval[1].replace(/\+/g,'%20');
+					var tmp = keyval[1].replace(/\+/g, '%20');
 					this.args[keyval[0]] = decodeURIComponent(tmp);
 				}
 				catch(exc) {

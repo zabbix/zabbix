@@ -22,25 +22,25 @@
 define('ZABBIX_VERSION',		'2.0.1rc1');
 define('ZABBIX_API_VERSION',	'1.4');
 
-define('ZBX_LOGIN_ATTEMPTS',			5);
-define('ZBX_LOGIN_BLOCK',				30); // sec
+define('ZBX_LOGIN_ATTEMPTS',	5);
+define('ZBX_LOGIN_BLOCK',		30); // sec
 
-define('ZBX_MIN_PERIOD',				3600); // 1 hour
-define('ZBX_MAX_PERIOD',				63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
-define('ZBX_PERIOD_DEFAULT',			3600); // 1 hour
+define('ZBX_MIN_PERIOD',		3600); // 1 hour
+define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
+define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
 
-define('ZBX_WIDGET_ROWS',				20);
+define('ZBX_WIDGET_ROWS', 20);
 
-define('ZBX_FONTPATH',					realpath('fonts')); // where to search for font (GD > 2.0.18)
-define('ZBX_GRAPH_FONT_NAME',			'DejaVuSans'); // font file name
-define('ZBX_GRAPH_LEGEND_HEIGHT',		120); // when graph height is less then this value, some legend will not show up
+define('ZBX_FONTPATH',				realpath('fonts')); // where to search for font (GD > 2.0.18)
+define('ZBX_GRAPH_FONT_NAME',		'DejaVuSans'); // font file name
+define('ZBX_GRAPH_LEGEND_HEIGHT',	120); // when graph height is less then this value, some legend will not show up
 
-define('ZBX_SCRIPT_TIMEOUT',			60); // in seconds
-define('ZBX_SCRIPT_BYTES_LIMIT',		1048576); // 1048576 is 1MB in bytes
+define('ZBX_SCRIPT_TIMEOUT',		60); // in seconds
+define('ZBX_SCRIPT_BYTES_LIMIT',	1048576); // 1048576 is 1MB in bytes
 
-define('GRAPH_YAXIS_SIDE_DEFAULT',		0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
+define('GRAPH_YAXIS_SIDE_DEFAULT', 0); // 0 - LEFT SIDE, 1 - RIGHT SIDE
 
-define('ZBX_MAX_IMAGE_SIZE',			1048576); // 1024 * 1024
+define('ZBX_MAX_IMAGE_SIZE', 1048576); // 1024 * 1024
 
 define('ZBX_UNITS_ROUNDOFF_THRESHOLD',		0.01);
 define('ZBX_UNITS_ROUNDOFF_UPPER_LIMIT',	2);
@@ -49,7 +49,7 @@ define('ZBX_UNITS_ROUNDOFF_LOWER_LIMIT',	6);
 define('ZBX_DEFAULT_INTERVAL', '1-7,00:00-24:00');
 
 // for partitioned DB installs!!
-define('ZBX_HISTORY_DATA_UPKEEP',		-1); // in days; -1: disabled, 0: always use trends
+define('ZBX_HISTORY_DATA_UPKEEP', -1); // in days; -1: disabled, 0: always use trends
 
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
@@ -89,23 +89,23 @@ define('ZBX_AUTH_HTTP',		2);
 define('ZBX_DB_DB2',		'IBM_DB2');
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_ORACLE',		'ORACLE');
-define('ZBX_DB_POSTGRESQL',		'POSTGRESQL');
-define('ZBX_DB_SQLITE3',		'SQLITE3');
+define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
+define('ZBX_DB_SQLITE3',	'SQLITE3');
 
-define('PAGE_TYPE_HTML',			0);
-define('PAGE_TYPE_IMAGE',			1);
-define('PAGE_TYPE_XML',				2);
-define('PAGE_TYPE_JS',				3);	// javascript
-define('PAGE_TYPE_CSS',				4);
-define('PAGE_TYPE_HTML_BLOCK',		5);	// simple block of html (as text)
-define('PAGE_TYPE_JSON',			6);	// simple JSON
-define('PAGE_TYPE_JSON_RPC',		7);	// api call
-define('PAGE_TYPE_TEXT_FILE',		8);	// api call
-define('PAGE_TYPE_TEXT',			9); // simple text
-define('PAGE_TYPE_CSV',				10); // CSV format
+define('PAGE_TYPE_HTML',		0);
+define('PAGE_TYPE_IMAGE',		1);
+define('PAGE_TYPE_XML',			2);
+define('PAGE_TYPE_JS',			3); // javascript
+define('PAGE_TYPE_CSS',			4);
+define('PAGE_TYPE_HTML_BLOCK',	5); // simple block of html (as text)
+define('PAGE_TYPE_JSON',		6); // simple JSON
+define('PAGE_TYPE_JSON_RPC',	7); // api call
+define('PAGE_TYPE_TEXT_FILE',	8); // api call
+define('PAGE_TYPE_TEXT',		9); // simple text
+define('PAGE_TYPE_CSV',			10); // CSV format
 
-define('ZBX_SESSION_ACTIVE',		0);
-define('ZBX_SESSION_PASSIVE',		1);
+define('ZBX_SESSION_ACTIVE',	0);
+define('ZBX_SESSION_PASSIVE',	1);
 
 define('ZBX_DROPDOWN_FIRST_NONE',	0);
 define('ZBX_DROPDOWN_FIRST_ALL',	1);
@@ -119,9 +119,9 @@ define('T_ZBX_CLR',			5);
 define('T_ZBX_IP_RANGE',	7);
 define('T_ZBX_INT_RANGE',	8);
 
-define('O_MAND',			0);
-define('O_OPT',				1);
-define('O_NO',				2);
+define('O_MAND',	0);
+define('O_OPT',		1);
+define('O_NO',		2);
 
 define('P_SYS',				1);
 define('P_UNSET_EMPTY',		2);
@@ -129,9 +129,9 @@ define('P_ACT',				16);
 define('P_NZERO',			32);
 
 //	misc parameters
-define('IMAGE_FORMAT_PNG',		'PNG');
-define('IMAGE_FORMAT_JPEG',		'JPEG');
-define('IMAGE_FORMAT_TEXT',		'JPEG');
+define('IMAGE_FORMAT_PNG',	'PNG');
+define('IMAGE_FORMAT_JPEG',	'JPEG');
+define('IMAGE_FORMAT_TEXT',	'JPEG');
 
 define('IMAGE_TYPE_UNKNOWN',		0);
 define('IMAGE_TYPE_ICON',			1);
@@ -142,16 +142,16 @@ define('ITEM_CONVERT_NO_UNITS',		1); // - no units
 define('ITEM_CONVERT_SHORT_UNITS',	2); // - to short units
 define('ITEM_CONVERT_LONG_UNITS',	3); // - to long units
 
-define('ZBX_SORT_UP',			'ASC');
-define('ZBX_SORT_DOWN',			'DESC');
+define('ZBX_SORT_UP',	'ASC');
+define('ZBX_SORT_DOWN',	'DESC');
 
-define('AUDIT_ACTION_ADD',			0);
-define('AUDIT_ACTION_UPDATE',		1);
-define('AUDIT_ACTION_DELETE',		2);
-define('AUDIT_ACTION_LOGIN',		3);
-define('AUDIT_ACTION_LOGOUT',		4);
-define('AUDIT_ACTION_ENABLE',		5);
-define('AUDIT_ACTION_DISABLE',		6);
+define('AUDIT_ACTION_ADD',		0);
+define('AUDIT_ACTION_UPDATE',	1);
+define('AUDIT_ACTION_DELETE',	2);
+define('AUDIT_ACTION_LOGIN',	3);
+define('AUDIT_ACTION_LOGOUT',	4);
+define('AUDIT_ACTION_ENABLE',	5);
+define('AUDIT_ACTION_DISABLE',	6);
 
 define('AUDIT_RESOURCE_USER',			0);
 define('AUDIT_RESOURCE_ZABBIX_CONFIG',	2);
@@ -298,14 +298,14 @@ define('SYSMAP_EXPANDPROBLEM_ON',	1);
 define('SYSMAP_MARKELEMENTS_OFF',	0);
 define('SYSMAP_MARKELEMENTS_ON',	1);
 
-define('SYSMAP_GRID_SHOW_ON',		1);
-define('SYSMAP_GRID_SHOW_OFF',		0);
+define('SYSMAP_GRID_SHOW_ON',	1);
+define('SYSMAP_GRID_SHOW_OFF',	0);
 
 define('SYSMAP_EXPAND_MACROS_OFF',	0);
 define('SYSMAP_EXPAND_MACROS_ON',	1);
 
-define('SYSMAP_GRID_ALIGN_ON',		1);
-define('SYSMAP_GRID_ALIGN_OFF',		0);
+define('SYSMAP_GRID_ALIGN_ON',	1);
+define('SYSMAP_GRID_ALIGN_OFF',	0);
 
 define('ZBX_ITEM_DELAY_DEFAULT', 30);
 
@@ -414,10 +414,9 @@ define('TRIGGER_SEVERITY_WARNING',			2);
 define('TRIGGER_SEVERITY_AVERAGE',			3);
 define('TRIGGER_SEVERITY_HIGH',				4);
 define('TRIGGER_SEVERITY_DISASTER',			5);
-
 define('TRIGGER_SEVERITY_COUNT',			6);
 
-define('ALERT_MAX_RETRIES',		3);
+define('ALERT_MAX_RETRIES', 3);
 
 define('ALERT_STATUS_NOT_SENT', 0);
 define('ALERT_STATUS_SENT',		1);

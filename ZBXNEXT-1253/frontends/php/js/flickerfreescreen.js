@@ -18,19 +18,37 @@
  **/
 
 
-var flickerfreeScreen = (function ($) {
-	'use strict';
+var flickerfreeScreen = {
 
-	function refresh(screenitemid, mode, resourcetype) {
+	screens: [],
+
+	refresh: function(screenitemid) {
+		var screen = this.screens[screenitemid];
+		if (empty(screen.resourcetype)) {
+			return;
+		}
+
+		var url = new Curl('jsrpc.php');
+		url.setArgument('type', 9); // PAGE_TYPE_TEXT
+		url.setArgument('method', 'flickerfreeScreen.get');
+		url.setArgument('mode', screen.mode);
+		url.setArgument('screenitemid', screenitemid);
+
 		// SCREEN_RESOURCE_GRAPH && SCREEN_RESOURCE_SIMPLE_GRAPH
-		if (resourcetype == 0 || resourcetype == 1) {
-			jQuery.getScript('jsrpc.php?type=3&method=flickerfreeScreen.get&mode=3&screenitemid=' + screenitemid, function(data, textStatus, jqxhr) {
-				timeControl.refreshObject('graph_' + screenitemid);
+		if (screen.resourcetype == 0 || screen.resourcetype == 1) {
+			var graphId = 'graph_' + screenitemid + '_' + screen.screenid;
+
+			url.setArgument('mode', 3); // SCREEN_MODE_JS
+			url.setArgument('period', !empty(screen.period) ? screen.period : timeControl.getPeriod(graphId));
+			url.setArgument('stime', !empty(screen.stime) ? screen.stime : timeControl.getSTime(graphId));
+
+			jQuery.getScript(url.getUrl(), function(data, textStatus, jqxhr) {
+				timeControl.refreshObject(graphId);
 			});
 		}
 		// SCREEN_RESOURCE_MAP
-		else if (resourcetype == 2) {
-			jQuery('<div>').load('jsrpc.php?type=9&method=flickerfreeScreen.get&screenitemid=' + screenitemid + '&mode=' + mode, function() {
+		else if (screen.resourcetype == 2) {
+			jQuery('<div>').load(url.getUrl(), function() {
 				jQuery(this).find('img').each(function() {
 					jQuery('<img />', {id: jQuery(this).attr('id') + '_tmp'}).attr('src', jQuery(this).attr('src')).load(function() {
 						var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
@@ -42,17 +60,39 @@ var flickerfreeScreen = (function ($) {
 			});
 		}
 		// SCREEN_RESOURCE_CLOCK
-		else if (resourcetype == 7) {
+		// SCREEN_RESOURCE_URL
+		else if (screen.resourcetype == 7 || screen.resourcetype == 11) {
 			// don't refresh screen
 		}
 		else {
-			jQuery('#flickerfreescreen_' + screenitemid).load('jsrpc.php?type=9&method=flickerfreeScreen.get&screenitemid=' + screenitemid + '&mode=' + mode);
+			jQuery('#flickerfreescreen_' + screenitemid).load(url.getUrl());
 		}
-	}
+	},
 
-	return function(screenitemid, refreshInterval, mode, resourcetype) {
-		refresh(screenitemid, mode, resourcetype);
+	refreshAll: function(period, stime) {
+		for (var screenitemid in this.screens) {
+			if (empty(this.screens[screenitemid])) {
+				continue;
+			}
 
-		window.setTimeout(function() { flickerfreeScreen(screenitemid, refreshInterval, mode, resourcetype); }, refreshInterval * 1000);
+			this.screens[screenitemid].period = period;
+			this.screens[screenitemid].stime = stime;
+
+			this.refresh(screenitemid);
+		}
+	},
+
+	add: function(screenitemid, screenid, resourcetype, mode, refreshInterval) {
+		timeControl.refreshPage = false;
+		this.screens[screenitemid] = {
+			'screenid': screenid,
+			'resourcetype': resourcetype,
+			'mode': mode,
+			'period': null,
+			'stime': null
+		};
+		this.refresh(screenitemid);
+
+		window.setInterval(function() { flickerfreeScreen.refresh(screenitemid); }, refreshInterval * 1000);
 	}
-}(jQuery));
+};

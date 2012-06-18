@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@
 
 // graphs timeline controls (gtlc)
 var timeControl = {
+
 	objectList: {}, // objects needs to be controlled
+	refreshPage : true,
 	debug_status: 0, // debug status: 0 - off, 1 - on, 2 - SDI;
 	debug_info: '', // debug string
 	debug_prev: '', // don't log repeated fnc
@@ -177,38 +179,56 @@ var timeControl = {
 
 	refreshGraph: function(objid) {
 		var obj = this.objectList[objid];
+		var period = this.getPeriod(objid);
+		var stime = this.getSTime(objid);
 
 		// image
-		var img = jQuery('<img />', {id: obj.domid + '_tmp', src: obj.src, class: 'borderless'}).load(function() {
+		var imgUrl = new Curl(obj.src);
+		imgUrl.setArgument('period', period);
+		imgUrl.setArgument('stime', stime);
+
+		jQuery('<img />', {id: obj.domid + '_tmp', src: obj.src, class: 'borderless'}).load(function() {
 			var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 			jQuery('#' + id).replaceWith(jQuery(this));
 			jQuery(this).attr('id', id);
 		});
 
 		// link
-		var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
 		var graphUrl = new Curl(jQuery('#' + obj.containerid).attr('href'));
-
 		graphUrl.setArgument('width', obj.objDims.width);
-		graphUrl.setArgument('period', obj.time.period);
-		graphUrl.setArgument('stime', date.getZBXDate());
+		graphUrl.setArgument('period', period);
+		graphUrl.setArgument('stime', stime);
+
 		jQuery('#' + obj.containerid).attr('href', graphUrl.getUrl());
 	},
 
-	refreshObject: function(domid) {
-		this.objectList[domid].processed = 0;
-		this.objectList[domid].refresh = true;
+	refreshObject: function(objid) {
+		this.objectList[objid].processed = 0;
+		this.objectList[objid].refresh = true;
 		this.processObjects();
+	},
+
+	getPeriod: function(objid) {
+		var obj = this.objectList[objid];
+
+		return obj.time.period;
+	},
+
+	getSTime: function(objid) {
+		var obj = this.objectList[objid];
+		var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
+
+		return date.getZBXDate();
 	},
 
 	addSBox: function(e, objid) {
 		this.debug('addSBox', objid);
 
 		var obj = this.objectList[objid];
-		var g_img = $(obj.domid);
+		var img = $(obj.domid);
 
-		if (!is_null(g_img)) {
-			removeListener(g_img, 'load', obj.sbox_listener);
+		if (!is_null(img)) {
+			removeListener(img, 'load', obj.sbox_listener);
 		}
 
 		ZBX_SBOX[obj.domid] = new Object;
@@ -224,52 +244,52 @@ var timeControl = {
 
 	addScroll: function(e, objid) {
 		this.debug('addScroll', objid);
-		var obj = this.objectList[objid];
-		var g_img = $(obj.domid);
 
-		if (!is_null(g_img)) {
-			removeListener(g_img, 'load', obj.scroll_listener);
+		var obj = this.objectList[objid];
+		var img = $(obj.domid);
+
+		if (!is_null(img)) {
+			removeListener(img, 'load', obj.scroll_listener);
 		}
 
-		var g_width = null;
+		var width = null;
 		if (obj.scrollWidthByImage == 0) {
-			g_width = get_bodywidth() - 30;
-			if (!is_number(g_width)) {
-				g_width = 900;
+			width = get_bodywidth() - 30;
+			if (!is_number(width)) {
+				width = 900;
 			}
 		}
 
-		var scrl = scrollCreate(obj.domid, g_width, obj.timeline.timelineid, this.objectList[objid].periodFixed,
+		var scrl = scrollCreate(obj.domid, width, obj.timeline.timelineid, this.objectList[objid].periodFixed,
 			this.objectList[objid].sliderMaximumTimePeriod);
 		scrl.onchange = this.objectUpdate.bind(this);
 
-		if (obj.dynamic && !is_null($(g_img))) {
+		if (obj.dynamic && !is_null($(img))) {
 			addListener(obj.domid, 'load', function() { ZBX_SCROLLBARS[scrl.scrollbarid].disabled = 0; });
 		}
 	},
 
-	objectUpdate: function(domid, timelineid) {
-		this.debug('objectUpdate', domid);
+	objectUpdate: function(objid, timelineid) {
+		this.debug('objectUpdate', objid);
 
-		if (!isset(domid, this.objectList)) {
-			throw('timeControl: Object is not declared "' + domid + '"');
+		if (!isset(objid, this.objectList)) {
+			throw('timeControl: Object is not declared "' + objid + '"');
 		}
 
-		var obj = this.objectList[domid];
+		var obj = this.objectList[objid];
 		var usertime = ZBX_TIMELINES[timelineid].usertime();
 		var period = ZBX_TIMELINES[timelineid].period();
 		var now = ZBX_TIMELINES[timelineid].now();
 
 		if (now) {
-			usertime += 86400 * 365;
+			usertime += 31536000; // 86400 * 365
 		}
 
 		var date = new CDate((usertime - period) * 1000);
 		var url_stime = date.getZBXDate();
 
 		if (obj.dynamic) {
-			// ajax update of starttime and period
-			this.updateProfile(obj.id, url_stime, period);
+			this.updateProfile(obj.id, url_stime, period); // ajax update of starttime and period
 
 			if (obj.mainObject) {
 				for (var key in this.objectList) {
@@ -296,24 +316,29 @@ var timeControl = {
 			else {
 				this.loadDynamic(obj.domid, url_stime, period);
 
-				if (isset(domid, ZBX_SCROLLBARS)) {
-					ZBX_SCROLLBARS[domid].setBarPosition();
-					ZBX_SCROLLBARS[domid].setGhostByBar();
-					ZBX_SCROLLBARS[domid].setTabInfo();
+				if (isset(objid, ZBX_SCROLLBARS)) {
+					ZBX_SCROLLBARS[objid].setBarPosition();
+					ZBX_SCROLLBARS[objid].setGhostByBar();
+					ZBX_SCROLLBARS[objid].setTabInfo();
+
 					if (!is_null($(obj.domid))) {
-						ZBX_SCROLLBARS[domid].disabled = 1;
+						ZBX_SCROLLBARS[objid].disabled = 1;
 					}
 				}
 			}
 		}
+		else {
+			if (this.refreshPage) {
+				var url = new Curl(location.href);
+				url.setArgument('stime', url_stime);
+				url.setArgument('period', period);
+				url.unsetArgument('output');
 
-		if (!obj.dynamic) {
-			var url = new Curl(location.href);
-			url.setArgument('stime', url_stime);
-			url.setArgument('period', period);
-			url.unsetArgument('output');
-
-			location.href = url.getUrl();
+				location.href = url.getUrl();
+			}
+			else {
+				flickerfreeScreen.refreshAll(period, url_stime);
+			}
 		}
 	},
 
@@ -350,7 +375,6 @@ var timeControl = {
 				url.unsetArgument('stime');
 				url.unsetArgument('period');
 				url.unsetArgument('output');
-
 				location.href = url.getUrl();
 			}
 		}
@@ -440,7 +464,7 @@ function onload_update_scroll(id, w, period, stime, timel, bar_stime) {
 	}
 }
 
-// title: timeline control core
+// timeline control core
 var ZBX_TIMELINES = {};
 
 function create_timeline(tlid, period, starttime, usertime, endtime, maximumperiod) {
@@ -464,6 +488,7 @@ function create_timeline(tlid, period, starttime, usertime, endtime, maximumperi
 }
 
 var CTimeLine = Class.create(CDebug, {
+
 	_starttime:	null,	// timeline start time (left, past)
 	_endtime:	null,	// timeline end time (right, now)
 	_usertime:	null,	// selected end time (bar, user selection)
@@ -520,8 +545,8 @@ var CTimeLine = Class.create(CDebug, {
 		if (period < this.minperiod) {
 			period = this.minperiod;
 		}
-
 		this._period = period;
+
 		return this._period;
 	},
 
@@ -550,8 +575,8 @@ var CTimeLine = Class.create(CDebug, {
 		if ('undefined' == typeof(starttime)) {
 			return this._starttime;
 		}
-
 		this._starttime = starttime;
+
 		return this._starttime;
 	},
 
@@ -564,8 +589,8 @@ var CTimeLine = Class.create(CDebug, {
 		if (endtime < (this._starttime + this._period * 3)) {
 			endtime = this._starttime + this._period * 3;
 		}
-
 		this._endtime = endtime;
+
 		return this._endtime;
 	},
 
@@ -590,7 +615,7 @@ var CTimeLine = Class.create(CDebug, {
 	}
 });
 
-// title: graph scrolling
+// graph scrolling
 var ZBX_SCROLLBARS = {};
 
 function scrollCreate(sbid, w, timelineid, fixedperiod, maximumperiod) {
@@ -599,7 +624,7 @@ function scrollCreate(sbid, w, timelineid, fixedperiod, maximumperiod) {
 	}
 
 	if (is_null(timelineid)) {
-		throw "Parameters haven't been sent properly";
+		throw 'Parameters haven\'t been sent properly';
 	}
 
 	if (is_null(w)) {
@@ -616,6 +641,7 @@ function scrollCreate(sbid, w, timelineid, fixedperiod, maximumperiod) {
 }
 
 var CScrollBar = Class.create(CDebug, {
+
 	scrollbarid:	null, // scroll id in array
 	timelineid:		null, // timeline id to which it is connected
 	timeline:		null, // time Line object
@@ -696,7 +722,7 @@ var CScrollBar = Class.create(CDebug, {
 			// variable initialization
 			this.timeline = ZBX_TIMELINES[timelineid];
 			this.ghostBox = new CGhostBox(this.dom.ghost);
-			this.size.scrollline = width - (17 * 2) - 2; // border
+			this.size.scrollline = width - 32; // border (17 * 2) - 2 = 32
 			this.px2sec = (this.timeline.endtime() - this.timeline.starttime()) / this.size.scrollline;
 
 			// additional dom objects
@@ -974,8 +1000,7 @@ var CScrollBar = Class.create(CDebug, {
 
 		var dimensions = getDimensions(this.dom.ghost);
 
-		// bar
-		// set time
+		// bar: set time
 		this.setBarPosition(dimensions.right, dimensions.width, false);
 		this.onBarChange();
 	},
@@ -1927,7 +1952,7 @@ var CGhostBox = Class.create(CDebug, {
 	}
 });
 
-// title: selection box uppon graphs
+// selection box uppon graphs
 var ZBX_SBOX = {}; // selection box obj reference
 
 function sbox_init(sbid, timeline, domobjectid) {
@@ -1963,11 +1988,12 @@ function sbox_init(sbid, timeline, domobjectid) {
 }
 
 var sbox = Class.create(CDebug, {
+
 	sbox_id:			'',		// id to create references in array to self
 	mouse_event:		{},		// json object wheres defined needed event params
 	start_event:		{},		// copy of mouse_event when box created
-	stime:				0,		//	new start time
-	period:				0,		//	new period
+	stime:				0,		// new start time
+	period:				0,		// new period
 	cobj:				{},		// objects params
 	dom_obj:			null,	// selection div html obj
 	box:				{},		// object params
@@ -2013,19 +2039,19 @@ var sbox = Class.create(CDebug, {
 		else {
 			addListener(this.dom_obj, 'mousedown', this.mousedown.bindAsEventListener(this), false);
 			addListener(document, 'mousemove', this.mousemove.bindAsEventListener(this), true);
-			addListener(this.dom_obj, 'click', function(event){ cancelEvent(event); });
+			addListener(this.dom_obj, 'click', function(event) { cancelEvent(event); });
 		}
 		addListener(document, 'mouseup', this.mouseup.bindAsEventListener(this), true);
 
 		ZBX_SBOX[this.sbox_id].mousedown = false;
 	},
 
-	onselect: function(){
+	onselect: function() {
 		this.debug('onselect');
 
 		this.px2time = this.timeline.period() / this.cobj.width;
 		var userstarttime = (this.timeline.usertime() - this.timeline.period());
-		userstarttime += Math.round((this.box.left-(this.cobj.left - this.shifts.left)) * this.px2time);
+		userstarttime += Math.round((this.box.left - (this.cobj.left - this.shifts.left)) * this.px2time);
 		var new_period = this.calcperiod();
 
 		if (this.start_event.left < this.mouse_event.left) {
@@ -2034,10 +2060,10 @@ var sbox = Class.create(CDebug, {
 
 		this.timeline.period(new_period);
 		this.timeline.usertime(userstarttime);
+		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
 		this.onchange(this.sbox_id, this.timeline.timelineid, true);
 	},
 
-	// bind any func to this
 	onchange: function() {
 	},
 
@@ -2228,7 +2254,7 @@ var sbox = Class.create(CDebug, {
 		timestamp = timestamp || 0;
 		var days = parseInt(timestamp / 86400);
 		var hours = parseInt((timestamp - days * 86400) / 3600);
-		var minutes = parseInt((timestamp -days * 86400 - hours * 3600) / 60);
+		var minutes = parseInt((timestamp - days * 86400 - hours * 3600) / 60);
 
 		var str = (days == 0) ? '' : days + 'd ';
 		str += hours + 'h ' + minutes + 'm ';
@@ -2256,7 +2282,7 @@ var sbox = Class.create(CDebug, {
 		if (h <= 0) {
 			h = 1;
 		}
-		if (((this.start_event.top-this.cobj.top) + h)>this.cobj.height) {
+		if (((this.start_event.top-this.cobj.top) + h) > this.cobj.height) {
 			h = this.cobj.height - this.start_event.top;
 		}
 
@@ -2273,8 +2299,8 @@ var sbox = Class.create(CDebug, {
 		this.dom_obj.style.left = posxy.left + 'px';
 		this.dom_obj.style.width = dims.width + 'px';
 
-		this.cobj.top = posxy.top+ZBX_SBOX[this.sbox_id].shiftT;
-		this.cobj.left = posxy.left+ZBX_SBOX[this.sbox_id].shiftL;
+		this.cobj.top = posxy.top + ZBX_SBOX[this.sbox_id].shiftT;
+		this.cobj.left = posxy.left + ZBX_SBOX[this.sbox_id].shiftL;
 	},
 
 	optimizeEvent: function(e) {
@@ -2286,7 +2312,7 @@ var sbox = Class.create(CDebug, {
 		}
 		else if (e.clientX || e.clientY) {
 			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-			this.mouse_event.top = e.clientY + document.body.scrollTop	+ document.documentElement.scrollTop;
+			this.mouse_event.top = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 		}
 
 		this.mouse_event.left = parseInt(this.mouse_event.left);
