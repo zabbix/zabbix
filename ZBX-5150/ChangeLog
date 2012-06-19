@@ -2,6 +2,7 @@ Changes for 2.0.1rc1
 
 New features:
 A.F.....S. [ZBX-5150] added support of Numeric(unsigned) type for aggregated items (Sasha)
+........S. [ZBXNEXT-1259] added a script file existence and permissions check for a "Script" media type (Sasha)
 ...G...... [ZBXNEXT-801] maximum number of monitored disks increased to 1024, with dynamic increasing of shared memory size (Andris)
 ....I..... [ZBXNEXT-1256] added example Solaris partition LLD user parameter (Richlv)
 A.F....... [ZBX-5074] redesign configuration of action (Eduard)
@@ -10,6 +11,12 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5136] fixed xml import can broke on short empty tag syntax (Vedmak)
+..F....... [ZBX-5154] fixed host group tab doesn't add selected hosts to host group (Toms)
+A.F....... [ZBX-5176] fixed trigger events not being deleted when changing it to a templated trigger (Pavels)
+........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
+........S. [ZBX-5042] fixed possible sql errors while node synchronization (Sasha)
+..F....... [ZBX-5133] fixed error when adding the first map element (Toms)
 A......... [ZBX-5115] fixed API object names being case sensitive (Pavels)
 ....I..... [ZBX-5058] init.d scripts updated for Zabbix 2.0 (Andris)
 ..F....... [ZBX-5143] fixed regular expression delete action ignores cancelation in confirmation dialog (Vedmak)

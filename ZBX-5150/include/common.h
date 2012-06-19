@@ -121,7 +121,7 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"21 May 2012"
+#define	ZABBIX_REVDATE		"14 June 2012"
 #define	ZABBIX_VERSION		"2.0.1rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
@@ -656,8 +656,8 @@ typedef enum
 
 const char	*zbx_permission_string(int perm);
 
-#define	ZBX_NODE_MASTER	0
-#define	ZBX_NODE_SLAVE	1
+#define	ZBX_NODE_SLAVE	0
+#define	ZBX_NODE_MASTER	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
 typedef struct

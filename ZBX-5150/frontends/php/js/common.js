@@ -549,47 +549,6 @@ function removeListener(element, eventname, expression, bubbling) {
 	}
 }
 
-function remove_childs(form_name, rmvbyname, tag) {
-	tag = tag.toUpperCase();
-	var frmForm = document.forms[form_name];
-	for (var i = 0; i < frmForm.length; i++) {
-		if (frmForm.elements[i].type != 'checkbox') {
-			continue;
-		}
-		if (frmForm.elements[i].disabled) {
-			continue;
-		}
-		if (frmForm.elements[i].checked != true) {
-			continue;
-		}
-
-		var splt = frmForm.elements[i].name.split('[');
-		var name = splt[0];
-
-		if (rmvbyname && rmvbyname != name) {
-			continue;
-		}
-		remove_element(frmForm.elements[i],tag);
-		i--;
-	}
-}
-
-function remove_element(elmnt, tag) {
-	elmnt = $(elmnt);
-	if (!is_null(elmnt)) {
-		if ('undefined' != typeof(elmnt.nodeName) && elmnt.nodeName.toLowerCase() == tag.toLowerCase()) {
-			elmnt.parentNode.removeChild(elmnt);
-		}
-		else if (elmnt.nodeType == 9) {
-			return false;
-		}
-		else {
-			remove_element(elmnt.parentNode, tag);
-		}
-	}
-	return true;
-}
-
 function showHide(obj, style) {
 	if (typeof(style) == 'undefined') {
 		style = 'inline';

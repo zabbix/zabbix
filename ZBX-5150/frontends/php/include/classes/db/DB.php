@@ -401,13 +401,13 @@ class DB {
 		$values = self::addMissingFields($tableSchema, $values);
 
 		foreach ($values as $key => $row) {
-			self::checkValueTypes($table, $row);
-
 			if ($getids) {
 				$resultIds[$key] = $id;
 				$row[$tableSchema['key']] = $id;
 				$id = bcadd($id, 1, 0);
 			}
+
+			self::checkValueTypes($table, $row);
 
 			$sql = 'INSERT INTO '.$table.' ('.implode(',', array_keys($row)).')'.
 					' VALUES ('.implode(',', array_values($row)).')';

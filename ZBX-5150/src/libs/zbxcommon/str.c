@@ -2637,9 +2637,12 @@ const char	*zbx_nodetype_string(unsigned char nodetype)
 {
 	switch (nodetype)
 	{
-		case ZBX_NODE_MASTER: return "MASTER";
-		case ZBX_NODE_SLAVE: return "SLAVE";
-		default: return "unknown";
+		case ZBX_NODE_MASTER:
+			return "master";
+		case ZBX_NODE_SLAVE:
+			return "slave";
+		default:
+			return "unknown";
 	}
 }
 
