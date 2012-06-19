@@ -27,33 +27,66 @@
 #define ZBX_GRP_FUNC_MAX	2
 #define ZBX_GRP_FUNC_SUM	3
 
-static void	evaluate_one(double *result, int *num, int grp_func, const char *value, unsigned char value_type)
+static void	evaluate_one(DC_ITEM *item, history_value_t *result, int *num, int grp_func,
+		const char *value_str, unsigned char value_type)
 {
-	double	value_float;
+	history_value_t	value;
 
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
+			value.dbl = atof(value_str);
+			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
+				value.ui64 = (zbx_uint64_t)value.dbl;
+			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			value_float = atof(value);
+			ZBX_STR2UINT64(value.ui64, value_str);
+			if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+				value.dbl = (double)value.ui64;
 			break;
 		default:
 			assert(0);
 	}
 
-	switch (grp_func)
+	switch (item->value_type)
 	{
-		case ZBX_GRP_FUNC_AVG:
-		case ZBX_GRP_FUNC_SUM:
-			*result += value_float;
+		case ITEM_VALUE_TYPE_FLOAT:
+			switch (grp_func)
+			{
+				case ZBX_GRP_FUNC_AVG:
+				case ZBX_GRP_FUNC_SUM:
+					result->dbl += value.dbl;
+					break;
+				case ZBX_GRP_FUNC_MIN:
+					if (0 == *num || value.dbl < result->dbl)
+						result->dbl = value.dbl;
+					break;
+				case ZBX_GRP_FUNC_MAX:
+					if (0 == *num || value.dbl > result->dbl)
+						result->dbl = value.dbl;
+					break;
+				default:
+					assert(0);
+			}
 			break;
-		case ZBX_GRP_FUNC_MIN:
-			if (0 == *num || value_float < *result)
-				*result = value_float;
-			break;
-		case ZBX_GRP_FUNC_MAX:
-			if (0 == *num || value_float > *result)
-				*result = value_float;
+		case ITEM_VALUE_TYPE_UINT64:
+			switch (grp_func)
+			{
+				case ZBX_GRP_FUNC_AVG:
+				case ZBX_GRP_FUNC_SUM:
+					result->ui64 += value.ui64;
+					break;
+				case ZBX_GRP_FUNC_MIN:
+					if (0 == *num || value.ui64 < result->ui64)
+						result->ui64 = value.ui64;
+					break;
+				case ZBX_GRP_FUNC_MAX:
+					if (0 == *num || value.ui64 > result->ui64)
+						result->ui64 = value.ui64;
+					break;
+				default:
+					assert(0);
+			}
 			break;
 		default:
 			assert(0);
@@ -68,14 +101,15 @@ static void	evaluate_one(double *result, int *num, int grp_func, const char *val
  *                                                                            *
  * Purpose: get array of items specified by key for selected groups           *
  *                                                                            *
- * Parameters: ids - result, list of items                                    *
- *             groups - list of comma-separated host groups                   *
- *             itemkey - item key to aggregate                                *
+ * Parameters: itemids - [OUT] list of item ids                               *
+ *             groups  - [IN] list of comma-separated host groups             *
+ *             itemkey - [IN] item key to aggregate                           *
  *                                                                            *
  ******************************************************************************/
-static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num, const char *groups,
-		const char *itemkey)
+static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups, const char *itemkey)
 {
+	const char	*__function_name = "aggregate_get_items";
+
 	char		*group, *esc;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -84,22 +118,22 @@ static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num
 	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 	int		num, n;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:'%s' itemkey:'%s'", __function_name, groups, itemkey);
+
 	sql = zbx_malloc(sql, sql_alloc);
 
 	esc = DBdyn_escape_string(itemkey);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid"
-			" from items i,hosts_groups hg,hosts h,groups g"
-			" where hg.groupid=g.groupid"
-				" and i.hostid=h.hostid"
-				" and hg.hostid=h.hostid"
+			"select distinct i.itemid"
+			" from items i,hosts h,hosts_groups hg,groups g"
+			" where i.hostid=h.hostid"
+				" and h.hostid=hg.hostid"
+				" and hg.groupid=g.groupid"
 				" and i.key_='%s'"
 				" and i.status=%d"
 				" and h.status=%d",
-			esc,
-			ITEM_STATUS_ACTIVE,
-			HOST_STATUS_MONITORED);
+			esc, ITEM_STATUS_ACTIVE, HOST_STATUS_MONITORED);
 
 	zbx_free(esc);
 
@@ -132,78 +166,54 @@ static void	aggregate_get_items(zbx_uint64_t **ids, int *ids_alloc, int *ids_num
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(itemid, row[0]);
-		uint64_array_add(ids, ids_alloc, ids_num, itemid, 64);
+		zbx_vector_uint64_append(itemids, itemid);
 	}
 	DBfree_result(result);
+
+	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_aggregate                                               *
  *                                                                            *
- * Parameters: grpfunc - grpavg, grpmax, grpmin, grpsum                       *
- *             groups - list of comma-separated host groups                   *
- *             itemkey - item key to aggregate                                *
- *             itemfunc - avg, count, last, max, min, sum                     *
- *             param - itemfunc parameter (optional)                          *
+ * Parameters: item      - [IN] aggregated item                               *
+ *             grp_func  - [IN] one of ZBX_GRP_FUNC_*                         *
+ *             groups    - [IN] list of comma-separated host groups           *
+ *             itemkey   - [IN] item key to aggregate                         *
+ *             item_func - [IN] one of ZBX_DB_GET_HIST_*                      *
+ *             param     - [IN] item_func parameter (optional)                *
  *                                                                            *
  * Return value: SUCCEED - aggregate item evaluated successfully              *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char *groups, const char *itemkey,
-		const char *itemfunc, const char *param)
+static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, const char *groups,
+		const char *itemkey, int item_func, const char *param)
 {
-	const char	*__function_name = "evaluate_aggregate";
-	char		*sql = NULL;
-	size_t		sql_alloc = 1024, sql_offset = 0;
-	zbx_uint64_t	itemid, *ids = NULL;
-	int		ids_alloc = 0, ids_num = 0;
+	const char		*__function_name = "evaluate_aggregate";
 
-	DB_RESULT	result;
-	DB_ROW		row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 1024, sql_offset = 0;
+	zbx_uint64_t		itemid;
+	zbx_vector_uint64_t	itemids;
+	DB_RESULT		result;
+	DB_ROW			row;
+	unsigned char		value_type;
+	history_value_t		value;
+	int			num = 0, ret = FAIL;
 
-	unsigned char	value_type;
-	double		d = 0;
-	int		num = 0;
-	int		item_func, grp_func;
-	int		ret = FAIL;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grp_func:%d groups:'%s' itemkey:'%s' item_func:%d param:'%s'",
+			__function_name, grp_func, groups, itemkey, item_func, param);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() grpfunc:'%s' groups:'%s' itemkey:'%s' function:'%s(%s)'",
-			__function_name, grpfunc, groups, itemkey, itemfunc, param);
+	memset(&value, 0, sizeof(value));
 
-	if (0 == strcmp(grpfunc, "grpmin"))
-		grp_func = ZBX_GRP_FUNC_MIN;
-	else if (0 == strcmp(grpfunc, "grpavg"))
-		grp_func = ZBX_GRP_FUNC_AVG;
-	else if (0 == strcmp(grpfunc, "grpmax"))
-		grp_func = ZBX_GRP_FUNC_MAX;
-	else if (0 == strcmp(grpfunc, "grpsum"))
-		grp_func = ZBX_GRP_FUNC_SUM;
-	else
-		goto clean;
+	zbx_vector_uint64_create(&itemids);
+	aggregate_get_items(&itemids, groups, itemkey);
 
-	if (0 == strcmp(itemfunc, "min"))
-		item_func = ZBX_DB_GET_HIST_MIN;
-	else if (0 == strcmp(itemfunc, "avg"))
-		item_func = ZBX_DB_GET_HIST_AVG;
-	else if (0 == strcmp(itemfunc, "max"))
-		item_func = ZBX_DB_GET_HIST_MAX;
-	else if (0 == strcmp(itemfunc, "sum"))
-		item_func = ZBX_DB_GET_HIST_SUM;
-	else if (0 == strcmp(itemfunc, "count"))
-		item_func = ZBX_DB_GET_HIST_COUNT;
-	else if (0 == strcmp(itemfunc, "last"))
-		item_func = ZBX_DB_GET_HIST_VALUE;
-	else
-	{
-		SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid third parameter"));
-		goto clean;
-	}
-
-	aggregate_get_items(&ids, &ids_alloc, &ids_num, groups, itemkey);
-
-	if (0 == ids_num)
+	if (0 == itemids.values_num)
 	{
 		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key [%s] in group(s) [%s]", itemkey, groups));
 		goto clean;
@@ -220,7 +230,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 					" and value_type in (%d,%d)"
 					" and",
 				ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids, ids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -228,7 +238,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 		{
 			value_type = (unsigned char)atoi(row[0]);
 
-			evaluate_one(&d, &num, grp_func, row[1], value_type);
+			evaluate_one(item, &value, &num, grp_func, row[1], value_type);
 		}
 		DBfree_result(result);
 	}
@@ -252,7 +262,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 				" where value_type in (%d,%d)"
 					" and",
 				ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64);
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", ids, ids_num);
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids.values, itemids.values_num);
 
 		result = DBselect("%s", sql);
 
@@ -264,7 +274,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 			h_value = DBget_history(itemid, value_type, item_func, clock_from, 0, NULL, NULL, 0);
 
 			if (NULL != h_value[0])
-				evaluate_one(&d, &num, grp_func, h_value[0], value_type);
+				evaluate_one(item, &value, &num, grp_func, h_value[0], value_type);
 			DBfree_history(h_value);
 		}
 		DBfree_result(result);
@@ -272,20 +282,33 @@ static int	evaluate_aggregate(AGENT_RESULT *res, const char *grpfunc, const char
 
 	if (0 == num)
 	{
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key [%s] in group [%s]", itemkey, groups));
+		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key \"%s\" in group(s) \"%s\"", itemkey, groups));
 		goto clean;
 	}
 
 	if (ZBX_GRP_FUNC_AVG == grp_func)
-		d = d / num;
+	{
+		switch (item->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				value.dbl = value.dbl / num;
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				value.ui64 = value.ui64 / num;
+				break;
+			default:
+				assert(0);
+		}
+	}
 
-	SET_DBL_RESULT(res, d);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() result:" ZBX_FS_DBL, __function_name, d);
+	if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		SET_DBL_RESULT(res, value.dbl);
+	else
+		SET_UI64_RESULT(res, value.ui64);
 
 	ret = SUCCEED;
 clean:
-	zbx_free(ids);
+	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -313,18 +336,33 @@ clean:
 int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_aggregate";
-	char		key[8], params[MAX_STRING_LEN],
-			groups[MAX_STRING_LEN], itemkey[MAX_STRING_LEN], func[8], funcp[32];
-	int		ret = SUCCEED;
+
+	char		tmp[8], params[MAX_STRING_LEN], groups[MAX_STRING_LEN], itemkey[MAX_STRING_LEN], funcp[32];
+	int		grp_func, item_func, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __function_name, item->key_orig);
 
-	init_result(result);
+	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Value type must be Numeric for aggregate items"));
+		return NOTSUPPORTED;
+	}
 
-	if (2 != parse_command(item->key, key, sizeof(key), params, sizeof(params)))
+	if (2 != parse_command(item->key, tmp, sizeof(tmp), params, sizeof(params)))
 		return NOTSUPPORTED;
 
-	if (num_param(params) != 4)
+	if (0 == strcmp(tmp, "grpmin"))
+		grp_func = ZBX_GRP_FUNC_MIN;
+	else if (0 == strcmp(tmp, "grpavg"))
+		grp_func = ZBX_GRP_FUNC_AVG;
+	else if (0 == strcmp(tmp, "grpmax"))
+		grp_func = ZBX_GRP_FUNC_MAX;
+	else if (0 == strcmp(tmp, "grpsum"))
+		grp_func = ZBX_GRP_FUNC_SUM;
+	else
+		return NOTSUPPORTED;
+
+	if (4 != num_param(params))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters"));
 		return NOTSUPPORTED;
@@ -336,13 +374,31 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 	if (0 != get_param(params, 2, itemkey, sizeof(itemkey)))
 		return NOTSUPPORTED;
 
-	if (0 != get_param(params, 3, func, sizeof(func)))
+	if (0 != get_param(params, 3, tmp, sizeof(tmp)))
 		return NOTSUPPORTED;
+
+	if (0 == strcmp(tmp, "min"))
+		item_func = ZBX_DB_GET_HIST_MIN;
+	else if (0 == strcmp(tmp, "avg"))
+		item_func = ZBX_DB_GET_HIST_AVG;
+	else if (0 == strcmp(tmp, "max"))
+		item_func = ZBX_DB_GET_HIST_MAX;
+	else if (0 == strcmp(tmp, "sum"))
+		item_func = ZBX_DB_GET_HIST_SUM;
+	else if (0 == strcmp(tmp, "count"))
+		item_func = ZBX_DB_GET_HIST_COUNT;
+	else if (0 == strcmp(tmp, "last"))
+		item_func = ZBX_DB_GET_HIST_VALUE;
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter"));
+		return NOTSUPPORTED;
+	}
 
 	if (0 != get_param(params, 4, funcp, sizeof(funcp)))
 		return NOTSUPPORTED;
 
-	if (SUCCEED != evaluate_aggregate(result, key, groups, itemkey, func, funcp))
+	if (SUCCEED != evaluate_aggregate(item, result, grp_func, groups, itemkey, item_func, funcp))
 		ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

@@ -1,6 +1,7 @@
 Changes for 2.0.1rc1
 
 New features:
+A.F.....S. [ZBX-5150] added support of Numeric(unsigned) type for aggregated items (Sasha)
 ........S. [ZBXNEXT-1259] added a script file existence and permissions check for a "Script" media type (Sasha)
 ...G...... [ZBXNEXT-801] maximum number of monitored disks increased to 1024, with dynamic increasing of shared memory size (Andris)
 ....I..... [ZBXNEXT-1256] added example Solaris partition LLD user parameter (Richlv)
@@ -10,6 +11,9 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5155] fixed importing of triggers with dependencies from 1.8 to 2.0 (Pavels)
+..F....... [ZBX-5184] fixed Zabbix doesn't show availability for all type except agent items in object views of host (Toms)
+..F....... [ZBX-5136] fixed xml import can broke on short empty tag syntax (Vedmak)
 ..F....... [ZBX-5154] fixed host group tab doesn't add selected hosts to host group (Toms)
 A.F....... [ZBX-5176] fixed trigger events not being deleted when changing it to a templated trigger (Pavels)
 ........S. [ZBX-5042] fixed server crash while synchronization host_inventory table (Sasha)
@@ -770,6 +774,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)
 ..F....... [ZBX-5147] fixed profiler lib doesn't work with G suffix for memory_limit option (Vedmak)
 ...G...... [ZBX-5027] added file size check to log monitoring to report error if it's over 2 GB (dimir)
 .......PS. [ZBX-4980] fixed error in decoding of big base64 encoded values (Andris)

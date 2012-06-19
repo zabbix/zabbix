@@ -175,7 +175,7 @@ abstract class CGraphGeneral extends CZBXAPI {
 		$deleteGitemIds = array_combine($dbGitemIds, $dbGitemIds);
 		foreach ($graph['gitems'] as $gitem) {
 			// updating an existing item
-			if (isset($dbGitems[$gitem['gitemid']])) {
+			if (isset($gitem['gitemid'], $dbGitems[$gitem['gitemid']])) {
 				if ($this->objectModified($gitem, $dbGitems[$gitem['gitemid']], 'graphs_items')) {
 					DB::updateByPk('graphs_items', $gitem['gitemid'], $gitem);
 				}
