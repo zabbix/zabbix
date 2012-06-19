@@ -1629,7 +1629,7 @@
 
 
 	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
-	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
+	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot update slideshow',
 	'S_SLIDESHOW_ADDED'=>			'Slideshow added',
 	'S_CANNOT_ADD_SLIDESHOW'=>		'Cannot add slideshow',
 	'S_SLIDESHOW_DELETED'=>			'Slideshow deleted',

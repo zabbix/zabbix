@@ -160,7 +160,7 @@ require_once('include/js.inc.php');
 		$screenids = zbx_objectValues($slides, 'screenid');
 		$screens = CScreen::get(array(
 			'screenids' => $screenids,
-			'output' => API_OUTPUT_SHORTEN,
+			'output' => API_OUTPUT_SHORTEN
 		));
 		$screens = ZBX_toHash($screens, 'screenid');
 		foreach($screenids as $screenid){
