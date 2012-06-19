@@ -650,7 +650,6 @@ function get_items_data_overview($hostids, $view_style) {
 	global $USER_DETAILS;
 
 	$table = new CTableInfo(_('No items defined.'));
-
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
@@ -658,6 +657,7 @@ function get_items_data_overview($hostids, $view_style) {
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
 			' LEFT JOIN triggers t ON t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
 		' WHERE '.DBcondition('h.hostid', $hostids).
+			' AND '.DBin_node('h.hostid', get_current_nodeid(null, PERM_READ_ONLY)).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
