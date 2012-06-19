@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5155] fixed importing of triggers with dependencies from 1.8 to 2.0 (Pavels)
 ..F....... [ZBX-5184] fixed Zabbix doesn't show availability for all type except agent items in object views of host (Toms)
 ..F....... [ZBX-5136] fixed xml import can broke on short empty tag syntax (Vedmak)
 ..F....... [ZBX-5154] fixed host group tab doesn't add selected hosts to host group (Toms)
@@ -84,6 +85,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5155] fixed importing of triggers with dependencies from 1.8 to 2.0 (Pavels)
 ..F....... [ZBX-5184] fixed Zabbix doesn't show availability for all type except agent items in object views of host (Toms)
 ..F....... [ZBX-5136] fixed xml import can broke on short empty tag syntax (Vedmak)
 ..F....... [ZBX-5154] fixed host group tab doesn't add selected hosts to host group (Toms)
