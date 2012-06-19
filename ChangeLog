@@ -844,6 +844,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.14rc1
 
+A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)
 ..F....... [ZBX-5147] fixed profiler lib doesn't work with G suffix for memory_limit option (Vedmak)
 ...G...... [ZBX-5027] added file size check to log monitoring to report error if it's over 2 GB (dimir)
 .......PS. [ZBX-4980] fixed error in decoding of big base64 encoded values (Andris)
