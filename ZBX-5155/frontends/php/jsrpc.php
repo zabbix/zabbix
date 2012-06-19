@@ -152,19 +152,16 @@ switch ($data['method']) {
 		break;
 	case 'zabbix.status':
 		$config = select_config();
+		$session = Z::getInstance()->getSession();
 
-		$checkStatus = CProfile::get('zabbix.available');
-		$checkTime = CProfile::get('zabbix.available.time', 0);
-
-		if ($checkStatus === null || isset($data['params']['nocache']) || ($checkTime + $config['server_check_interval']) <= time()) {
-			$checkStatus = zabbixRunning();
-			CProfile::update('zabbix.available', (int) $checkStatus, PROFILE_TYPE_INT);
-			CProfile::update('zabbix.available.time', time(), PROFILE_TYPE_INT);
+		if (!isset($session['serverCheckResult']) || ($session['serverCheckTime'] + SERVER_CHECK_INTERVAL) <= time()) {
+			$session['serverCheckResult'] = zabbixIsRunning();
+			$session['serverCheckTime'] = time();
 		}
 
 		$result = array(
-			'result' => (bool) $checkStatus,
-			'message' => $checkStatus ? '' : _('Zabbix server might be down!')
+			'result' => (bool) $session['serverCheckResult'],
+			'message' => $session['serverCheckResult'] ? '' : _('Zabbix server is not running: the information displayed may not be current.')
 		);
 		break;
 	default:

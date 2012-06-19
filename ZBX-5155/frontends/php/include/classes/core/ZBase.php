@@ -38,6 +38,13 @@ class ZBase {
 	protected $rootDir;
 
 	/**
+	 * Session object.
+	 *
+	 * @var CSession
+	 */
+	protected $session;
+
+	/**
 	 * Returns the current instance of Z.
 	 *
 	 * @static
@@ -95,6 +102,7 @@ class ZBase {
 	private function getIncludePaths() {
 		return array(
 			$this->rootDir.'/include/classes',
+			$this->rootDir.'/include/classes/core',
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',
@@ -125,5 +133,18 @@ class ZBase {
 			'darkblue' => _('Black & Blue'),
 			'darkorange' => _('Dark orange')
 		);
+	}
+
+	/**
+	 * Return session object.
+	 *
+	 * @return CSession
+	 */
+	public function getSession() {
+		if ($this->session === null) {
+			$this->session = new CSession();
+		}
+
+		return $this->session;
 	}
 }

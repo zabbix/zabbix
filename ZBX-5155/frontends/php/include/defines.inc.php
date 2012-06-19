@@ -793,6 +793,9 @@ define('ZBX_HAVE_IPV6', 1);
 
 define('ZBX_SOCKET_TIMEOUT', 3);
 
+// value is also used in servercheck.js file
+define('SERVER_CHECK_INTERVAL', 10);
+
 // XML export|import tags
 define('XML_TAG_MACRO',				'macro');
 define('XML_TAG_HOST',				'host');
