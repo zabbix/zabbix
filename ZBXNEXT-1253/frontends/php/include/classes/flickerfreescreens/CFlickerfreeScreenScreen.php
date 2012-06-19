@@ -40,9 +40,9 @@ class CFlickerfreeScreenScreen extends CFlickerfreeScreenItem {
 		$flickerfreeScreen = new CFlickerfreeScreen(array(
 			'screen' => $screen,
 			'period' => $this->period,
-			'mode' => ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) ? SCREEN_MODE_VIEW : SCREEN_MODE_PREVIEW
+			'mode' => SCREEN_MODE_VIEW
 		));
 
-		return $this->getOutput($flickerfreeScreen->show());
+		return $this->getOutput($flickerfreeScreen->show(), false);
 	}
 }

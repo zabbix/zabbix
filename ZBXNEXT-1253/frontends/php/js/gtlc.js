@@ -81,7 +81,8 @@ var timeControl = {
 		}
 
 		this.objectList[domid].time = time;
-		this.objectList[domid].timeline = create_timeline(this.objectList[domid].domid,
+		this.objectList[domid].timeline = create_timeline(
+			this.objectList[domid].domid,
 			parseInt(time.period),
 			parseInt(time.starttime),
 			parseInt(time.usertime),
@@ -109,15 +110,15 @@ var timeControl = {
 
 			// width
 			if ((!isset('width', obj.objDims) || (obj.objDims.width < 0)) && isset('shiftXleft', obj.objDims) && isset('shiftXright', obj.objDims)) {
-				var g_width = get_bodywidth();
-				if (!is_number(g_width)) {
-					g_width = 1000;
+				var width = get_bodywidth();
+				if (!is_number(width)) {
+					width = 1000;
 				}
 
 				if (!isset('width', obj.objDims)) {
 					obj.objDims.width = 0;
 				}
-				obj.objDims.width += g_width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
+				obj.objDims.width += width - (parseInt(obj.objDims.shiftXleft) + parseInt(obj.objDims.shiftXright) + 27);
 			}
 
 			// url
@@ -205,20 +206,8 @@ var timeControl = {
 	refreshObject: function(objid) {
 		this.objectList[objid].processed = 0;
 		this.objectList[objid].refresh = true;
+
 		this.processObjects();
-	},
-
-	getPeriod: function(objid) {
-		var obj = this.objectList[objid];
-
-		return obj.time.period;
-	},
-
-	getSTime: function(objid) {
-		var obj = this.objectList[objid];
-		var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
-
-		return date.getZBXDate();
 	},
 
 	addSBox: function(e, objid) {
@@ -273,7 +262,7 @@ var timeControl = {
 		this.debug('objectUpdate', objid);
 
 		if (!isset(objid, this.objectList)) {
-			throw('timeControl: Object is not declared "' + objid + '"');
+			throw('timeControl: Object is not declared "' + objid + '".');
 		}
 
 		var obj = this.objectList[objid];
@@ -409,6 +398,23 @@ var timeControl = {
 		params['stime'] = stime;
 
 		send_params(params);
+	},
+
+	getPeriod: function(objid) {
+		var obj = this.objectList[objid];
+
+		return obj.time.period;
+	},
+
+	getSTime: function(objid) {
+		var obj = this.objectList[objid];
+		var date = new CDate((obj.time.usertime - obj.time.period) * 1000);
+
+		return date.getZBXDate();
+	},
+
+	getObject: function(objid) {
+		return this.objectList[objid];
 	},
 
 	debug: function(fnc_name, id) {
@@ -624,7 +630,7 @@ function scrollCreate(sbid, w, timelineid, fixedperiod, maximumperiod) {
 	}
 
 	if (is_null(timelineid)) {
-		throw 'Parameters haven\'t been sent properly';
+		throw('Parameters haven\'t been sent properly.');
 	}
 
 	if (is_null(w)) {
@@ -644,10 +650,11 @@ var CScrollBar = Class.create(CDebug, {
 
 	scrollbarid:	null, // scroll id in array
 	timelineid:		null, // timeline id to which it is connected
-	timeline:		null, // time Line object
+	timeline:		null, // time line object
 	ghostBox:		null, // ghost box object
-	clndrLeft:		null, // calendar object Left
-	clndrRight:		null, // calendar object Right
+	clndrLeft:		null, // calendar object left
+	clndrRight:		null, // calendar object right
+	px2sec:			null, // seconds in pixel
 
 	dom: {
 		'scrollbar':	null,
@@ -678,7 +685,6 @@ var CScrollBar = Class.create(CDebug, {
 		'info_period':	null
 	},
 
-	// params
 	size: {
 		'scrollline':	null,	// scroll line width
 		'barminwidth':	21		// bar minimal width
@@ -690,8 +696,6 @@ var CScrollBar = Class.create(CDebug, {
 		'leftArr':	null,	// left arrow dimensions
 		'rightArr':	null	// right arrow dimensions
 	},
-
-	px2sec: null, // seconds in pixel
 
 	// status
 	scrollmsover:	0,		// if mouse over scrollbar then = 1, out = 0
@@ -713,7 +717,7 @@ var CScrollBar = Class.create(CDebug, {
 
 			// checks
 			if (!isset(timelineid, ZBX_TIMELINES)) {
-				throw('Failed to initialize ScrollBar with given TimeLine');
+				throw('Failed to initialize ScrollBar with given TimeLine.');
 			}
 			if (empty(this.dom.scrollbar)) {
 				this.scrollcreate(width);
@@ -744,7 +748,7 @@ var CScrollBar = Class.create(CDebug, {
 
 		}
 		catch(e) {
-			throw 'ERROR: ScrollBar initialization failed!';
+			throw('ERROR: ScrollBar initialization failed!');
 		}
 	},
 
@@ -1960,7 +1964,7 @@ function sbox_init(sbid, timeline, domobjectid) {
 		throw('TimeControl: SBOX is not defined for object "' + domobjectid + '".');
 	}
 	if (is_null(timeline)) {
-		throw('Parametrs haven\'t been sent properly');
+		throw('Parametrs haven\'t been sent properly.');
 	}
 
 	if (is_null(sbid)) {
@@ -2060,7 +2064,9 @@ var sbox = Class.create(CDebug, {
 
 		this.timeline.period(new_period);
 		this.timeline.usertime(userstarttime);
+
 		ZBX_TIMELINES[this.timeline.timelineid] = this.timeline;
+
 		this.onchange(this.sbox_id, this.timeline.timelineid, true);
 	},
 

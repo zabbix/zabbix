@@ -45,6 +45,7 @@ var flickerfreeScreen = {
 			jQuery.getScript(url.getUrl(), function(data, textStatus, jqxhr) {
 				timeControl.refreshObject(graphId);
 			});
+
 		}
 		// SCREEN_RESOURCE_MAP
 		else if (screen.resourcetype == 2) {

@@ -404,8 +404,10 @@ class CFlickerfreeScreenItem {
 		return $this->id;
 	}
 
-	public function getOutput($item = null) {
-		$this->insertFlickerfreeJs();
+	public function getOutput($item = null, $insertFlickerfreeJs = true) {
+		if ($insertFlickerfreeJs) {
+			$this->insertFlickerfreeJs();
+		}
 
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			return new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getId());
@@ -414,6 +416,7 @@ class CFlickerfreeScreenItem {
 			return new CDiv($item, null, $this->getId());
 		}
 	}
+
 
 	public function insertFlickerfreeJs() {
 		zbx_add_post_js('flickerfreeScreen.add('.$this->screenitem['screenitemid'].', '.$this->screenitem['screenid'].', '.$this->screenitem['resourcetype'].', '.$this->mode.', '.CWebUser::$data['refresh'].');');

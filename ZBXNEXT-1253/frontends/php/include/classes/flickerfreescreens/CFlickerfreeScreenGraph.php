@@ -122,7 +122,7 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 			$this->screenitem['url'] = $this->screenitem['url']->getUrl();
 		}
 
-		// get timecontroll
+		// get time control
 		$timeControlData = array(
 			'id' => $this->screenitem['resourceid'],
 			'domid' => $domGraphid,
@@ -188,7 +188,7 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 			return 'timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
-			insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+			zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
 
 			if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) || !$isDefault) {
 				$item = new CDiv();
