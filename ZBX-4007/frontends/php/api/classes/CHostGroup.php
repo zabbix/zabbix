@@ -132,9 +132,6 @@ class CHostGroup extends CZBXAPI {
 						' AND rr.permission<'.$permission.')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
@@ -443,7 +440,7 @@ class CHostGroup extends CZBXAPI {
 		// adding hosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'groupids' => $groupids,
 				'preservekeys' => true
 			);
@@ -495,7 +492,7 @@ class CHostGroup extends CZBXAPI {
 		// adding templates
 		if (!is_null($options['selectTemplates'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'groupids' => $groupids,
 				'preservekeys' => true
 			);
@@ -1082,7 +1079,12 @@ class CHostGroup extends CZBXAPI {
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// only apply the node option if no specific ids are given
-		if ($options['groupids'] === null) {
+		if ($options['groupids'] === null &&
+				$options['hostids'] === null &&
+				$options['templateids'] === null &&
+				$options['graphids'] === null &&
+				$options['triggerids'] === null) {
+
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
 

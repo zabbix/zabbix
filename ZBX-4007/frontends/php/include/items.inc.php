@@ -657,7 +657,6 @@ function get_items_data_overview($hostids, $view_style) {
 			' LEFT JOIN functions f ON f.itemid=i.itemid'.
 			' LEFT JOIN triggers t ON t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
 		' WHERE '.DBcondition('h.hostid', $hostids).
-			' AND '.DBin_node('h.hostid', get_current_nodeid(null, PERM_READ_ONLY)).
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -669,6 +668,7 @@ function get_items_data_overview($hostids, $view_style) {
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
 		'monitored_hosts' => true,
+		'hostids' => $hostids,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => true,
 		'preservekeys' => true
