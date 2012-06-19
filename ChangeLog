@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5188] fixed incorrect graph themes being used for graphs from child nodes (Pavels)
 A......... [ZBX-5155] fixed importing of triggers with dependencies from 1.8 to 2.0 (Pavels)
 ..F....... [ZBX-5184] fixed Zabbix doesn't show availability for all type except agent items in object views of host (Toms)
 ..F....... [ZBX-5136] fixed xml import can broke on short empty tag syntax (Vedmak)
@@ -85,6 +86,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5188] fixed incorrect graph themes being used for graphs from child nodes (Pavels)
 A......... [ZBX-5155] fixed importing of triggers with dependencies from 1.8 to 2.0 (Pavels)
 ..F....... [ZBX-5184] fixed Zabbix doesn't show availability for all type except agent items in object views of host (Toms)
 ..F....... [ZBX-5136] fixed xml import can broke on short empty tag syntax (Vedmak)
