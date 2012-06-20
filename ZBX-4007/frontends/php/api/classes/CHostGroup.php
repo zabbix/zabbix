@@ -408,7 +408,7 @@ class CHostGroup extends CZBXAPI {
 							$result[$group['groupid']]['graphs'] = array();
 						}
 						$result[$group['groupid']]['graphs'][] = array('graphid' => $group['graphid']);
-						unset($group['hostid']);
+						unset($group['graphid']);
 					}
 
 					// maintenanceids

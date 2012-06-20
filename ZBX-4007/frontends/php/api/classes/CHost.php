@@ -47,7 +47,6 @@ class CHost extends CZBXAPI {
 	 * @param boolean       $options['with_graphs']              only with graphs
 	 * @param boolean       $options['editable']                 only with read-write permission. Ignored for SuperAdmins
 	 * @param boolean       $options['selectGroups']             select HostGroups
-	 * @param boolean       $options['selectTemplates']          select Templates
 	 * @param boolean       $options['selectItems']              select Items
 	 * @param boolean       $options['selectTriggers']           select Triggers
 	 * @param boolean       $options['selectGraphs']             select Graphs
