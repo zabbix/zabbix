@@ -190,7 +190,11 @@ function make_system_status($filter) {
 	unset($group);
 
 	// we need natural sort
-	doubleOrder($groups, 'nodename', 'name');
+	$sortFields = array(
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
+	CArrayHelper::sort($groups, $sortFields);
 
 	$groupids = array();
 	foreach ($groups as $group) {
@@ -361,7 +365,11 @@ function make_hoststat_summary($filter) {
 	unset($group);
 
 	// we need natural sort
-	doubleOrder($groups, 'nodename', 'name');
+	$sortFields = array(
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
+	CArrayHelper::sort($groups, $sortFields);
 
 	// get hosts
 	$options = array(
@@ -934,7 +942,11 @@ function make_webmon_overview($filter) {
 	unset($group);
 
 	// we need natural sort
-	doubleOrder($groups, 'nodename', 'name');
+	$sortFields = array(
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
+	CArrayHelper::sort($groups, $sortFields);
 
 	$availableHosts = API::Host()->get(array(
 		'groupids' => array_keys($groups),
@@ -1016,7 +1028,11 @@ function make_discovery_status() {
 	unset($drule);
 
 	// we need natural sort
-	doubleOrder($drules, 'nodename', 'name');
+	$sortFields = array(
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
+	CArrayHelper::sort($drules, $sortFields);
 
 
 	foreach ($drules as $drnum => $drule) {

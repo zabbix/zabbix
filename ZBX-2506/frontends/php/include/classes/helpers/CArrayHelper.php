@@ -123,17 +123,13 @@ class CArrayHelper {
 	 */
 	protected static function compare($a, $b) {
 		foreach (self::$fields as $field) {
-			if (!(isset($a[$field['field']]) && isset($b[$field['field']]))) {
-				return 0;
+			if (!isset($a[$field['field']]) || !isset($b[$field['field']])) {
+				return 0; // this is wrong
 			}
 
-			if ($a[$field['field']] != $b[$field['field']]) {
-				if ($field['order'] == ZBX_SORT_UP) {
-					return strnatcasecmp($a[$field['field']], $b[$field['field']]);
-				}
-				else {
-					return strnatcasecmp($b[$field['field']], $a[$field['field']]);
-				}
+			$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
+			if ($cmp != 0) {
+				return $cmp * ($field['order'] == ZBX_SORT_UP?1:-1);
 			}
 		}
 		return 0;

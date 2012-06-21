@@ -1039,39 +1039,6 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 	return true;
 }
 
-/**
- * sorts data naturaly by two fields
- *
- * @param array $data		data to sort
- * @param string $sField1	primary sort field
- * @param string $sField2	secondary sort field
- * @param bool $sortAsc		should sort ascending, default <b>true</b>
- */
-function doubleOrder(&$data, $sField1, $sField2, $sortAsc = true) {
-
-	class sort{
-		private static  $sField1, $sField2, $sortAsc;
-
-		function __construct($sField1, $sField2, $sortAsc) {
-			self::$sField1 = $sField1;
-			self::$sField2 = $sField2;
-			self::$sortAsc = $sortAsc;
-		}
-
-		static function mySort($a, $b) {
-			$c = strnatcasecmp($a[self::$sField1], $b[self::$sField1]) * self::$sortAsc;
-			if ($c === 0) {
-				return  strnatcasecmp($a[self::$sField2], $b[self::$sField2]) * self::$sortAsc;
-			}
-			else {
-				return $c;
-			}
-		}
-	}
-
-	uasort($data, array(new sort($sField1, $sField2, $sortAsc?1:-1), 'mySort'));
-}
-
 function order_by($def, $allways = '') {
 	global $page;
 	$orderString = '';
