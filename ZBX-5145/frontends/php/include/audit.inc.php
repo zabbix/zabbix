@@ -78,7 +78,7 @@ function add_audit($action, $resourcetype, $details) {
 		$details = zbx_substr($details, 0, 125).'...';
 	}
 
-	$ip = (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 	$ip = substr($ip, 0, 39);
 
 	$result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,action,resourcetype,details,ip)'.
@@ -108,7 +108,7 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 		$resourcename = zbx_substr($resourcename, 0, 252).'...';
 	}
 
-	$ip = (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 	$ip = substr($ip, 0, 39);
 
 	$result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename)'.
@@ -134,7 +134,7 @@ function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $
 		$resourcename = zbx_substr($resourcename, 0, 252).'...';
 	}
 
-	$ip = (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 	$ip = substr($ip, 0, 39);
 
 	$result = DBexecute('INSERT INTO auditlog (auditid,userid,clock,ip,action,resourcetype,resourceid,resourcename,details)'.
