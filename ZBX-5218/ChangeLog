@@ -1,3 +1,11 @@
+Changes for 2.0.2rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-5218] fixed generating of triggers without functions when editing a trigger prototype expression (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.1rc2
 
 New features:

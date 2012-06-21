@@ -857,6 +857,13 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		zbx_free(error_esc);
 	}
 
+	if (new_triggers < triggers->values_num)
+	{
+		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
+		DBexecute("%s", sql4);
+		zbx_free(sql4);
+	}
+
 	if (0 != new_functions)
 	{
 #ifdef HAVE_MULTIROW_INSERT
@@ -866,13 +873,6 @@ static void	DBlld_save_triggers(zbx_vector_ptr_t *triggers, unsigned char status
 		DBend_multiple_update(&sql3, &sql3_alloc, &sql3_offset);
 		DBexecute("%s", sql3);
 		zbx_free(sql3);
-	}
-
-	if (new_triggers < triggers->values_num)
-	{
-		DBend_multiple_update(&sql4, &sql4_alloc, &sql4_offset);
-		DBexecute("%s", sql4);
-		zbx_free(sql4);
 	}
 }
 
