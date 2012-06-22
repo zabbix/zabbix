@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 $page['title'] = _('Custom slides');
 $page['file'] = 'slides.php';
 $page['hist_arg'] = array('elementid');
-$page['scripts'] = array('class.pmaster.js', 'class.calendar.js', 'gtlc.js');
+$page['scripts'] = array('class.pmaster.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -115,7 +115,6 @@ if (isset($_REQUEST['favobj'])) {
 						'selectScreenItems' => API_OUTPUT_EXTEND
 					));
 					$cur_screen = reset($screens);
-					$element = get_screen($cur_screen, 2, $effectiveperiod);
 
 					$refresh_multipl = CProfile::get('web.slides.rf_rate.hat_slides', 1, $elementid);
 
@@ -126,11 +125,17 @@ if (isset($_REQUEST['favobj'])) {
 						$refresh = $slideshow['delay'];
 					}
 
-					$element->show();
+					$flickerfreeScreen = new CFlickerfreeScreen(array(
+						'is_flickerfree' => false,
+						'screen' => $cur_screen,
+						'mode' => SCREEN_MODE_VIEW,
+						'period' => $effectiveperiod
+					));
+					echo $flickerfreeScreen->show()->toString();
 
 					$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh * $refresh_multipl)."\n";
-					$script.= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
-					$script.= 'timeControl.processObjects();';
+					$script .= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";
+					$script .= 'timeControl.processObjects();';
 					insert_js($script);
 				}
 			}

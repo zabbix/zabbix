@@ -187,7 +187,12 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 			return 'timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
-			zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+			if ($this->mode == SCREEN_MODE_VIEW) { // used is slide shows
+				insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+			}
+			else {
+				zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+			}
 
 			if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) || !$isDefault) {
 				$item = new CDiv();
