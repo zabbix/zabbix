@@ -289,9 +289,6 @@ function resolveMapLabelMacrosAll(array $selement) {
 		$db_host = DBfetch(DBselect($sql));
 	}
 
-	$hostParam = ($resolveHostMacros && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) ? $db_host['host'] : null;
-	$label = resolveMapLabelMacros($label, $hostParam);
-
 	if ($resolveHostMacros) {
 		$replace = array(
 			'{HOST.NAME}' => $db_host['name'],
@@ -304,6 +301,9 @@ function resolveMapLabelMacrosAll(array $selement) {
 		);
 		$label = str_replace(array_keys($replace), $replace, $label);
 	}
+
+	$hostParam = ($resolveHostMacros && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) ? $db_host['host'] : null;
+	$label = resolveMapLabelMacros($label, $hostParam);
 
 	switch ($selement['elementtype']) {
 		case SYSMAP_ELEMENT_TYPE_HOST:
@@ -345,6 +345,12 @@ function resolveMapLabelMacrosAll(array $selement) {
 	return $label;
 }
 
+/**
+ * @param $label
+ * @param null $replaceHost the name of the host
+ *
+ * @return mixed
+ */
 function resolveMapLabelMacros($label, $replaceHost = null) {
 	if (null === $replaceHost) {
 		$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
