@@ -22,10 +22,10 @@
 $screenWidget = new CWidget();
 $screenWidget->addPageHeader(_('CONFIGURATION OF SCREEN'));
 $screenWidget->addHeader($this->data['screen']['name']);
-$screenWidget->addItem(BR());
 if (!empty($this->data['screen']['templateid'])) {
 	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
 }
+$screenWidget->addItem(BR());
 
 $flickerfreeScreen = new CFlickerfreeScreen(array(
 	'screen' => $this->data['screen'],
@@ -33,7 +33,7 @@ $flickerfreeScreen = new CFlickerfreeScreen(array(
 ));
 $screenWidget->addItem($flickerfreeScreen->show());
 
-zbx_add_post_js('init_screen("'.$this->data['screenid'].'", "iframe", "'.$this->data['screenid'].'");');
-zbx_add_post_js('timeControl.processObjects();');
+CFlickerfreeScreen::insertInitScreenJs($this->data['screenid']);
+CFlickerfreeScreen::insertProcessObjectsJs();
 
 return $screenWidget;

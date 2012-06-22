@@ -188,7 +188,7 @@ var timeControl = {
 		imgUrl.setArgument('period', period);
 		imgUrl.setArgument('stime', stime);
 
-		jQuery('<img />', {id: obj.domid + '_tmp', src: obj.src, class: 'borderless'}).load(function() {
+		jQuery('<img />', {id: obj.domid + '_tmp', src: imgUrl.getUrl(), class: 'borderless'}).load(function() {
 			var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 			jQuery('#' + id).replaceWith(jQuery(this));
 			jQuery(this).attr('id', id);

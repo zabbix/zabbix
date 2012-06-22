@@ -22,10 +22,7 @@
 require_once('include/views/js/general.script.confirm.js.php');
 
 $screenWidget = new CWidget();
-
-$scrollDiv = new CDiv();
-$scrollDiv->setAttribute('id', 'scrollbar_cntr');
-$screenWidget->addFlicker($scrollDiv, CProfile::get('web.screens.filter.state', 1));
+$screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.screens.filter.state', 1));
 
 // header form
 $configComboBox = new CComboBox('config', 'screens.php', 'javascript: redirect(this.options[this.selectedIndex].value);');

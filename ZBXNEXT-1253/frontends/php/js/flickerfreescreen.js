@@ -34,18 +34,19 @@ var flickerfreeScreen = {
 		url.setArgument('mode', screen.mode);
 		url.setArgument('screenitemid', screenitemid);
 
-		// SCREEN_RESOURCE_GRAPH && SCREEN_RESOURCE_SIMPLE_GRAPH
+		// SCREEN_RESOURCE_GRAPH
+		// SCREEN_RESOURCE_SIMPLE_GRAPH
 		if (screen.resourcetype == 0 || screen.resourcetype == 1) {
 			var graphId = 'graph_' + screenitemid + '_' + screen.screenid;
 
 			url.setArgument('mode', 3); // SCREEN_MODE_JS
+			url.setArgument('hostid', screen.hostid);
 			url.setArgument('period', !empty(screen.period) ? screen.period : timeControl.getPeriod(graphId));
 			url.setArgument('stime', !empty(screen.stime) ? screen.stime : timeControl.getSTime(graphId));
 
 			jQuery.getScript(url.getUrl(), function(data, textStatus, jqxhr) {
 				timeControl.refreshObject(graphId);
 			});
-
 		}
 		// SCREEN_RESOURCE_MAP
 		else if (screen.resourcetype == 2) {
@@ -83,17 +84,18 @@ var flickerfreeScreen = {
 		}
 	},
 
-	add: function(screenitemid, screenid, resourcetype, mode, refreshInterval) {
+	add: function(data) {
 		timeControl.refreshPage = false;
-		this.screens[screenitemid] = {
-			'screenid': screenid,
-			'resourcetype': resourcetype,
-			'mode': mode,
+		this.screens[data.screenitemid] = {
+			'screenid': data.screenid,
+			'resourcetype': data.resourcetype,
+			'mode': data.mode,
+			'hostid': data.hostid,
 			'period': null,
 			'stime': null
 		};
-		this.refresh(screenitemid);
+		this.refresh(data.screenitemid);
 
-		window.setInterval(function() { flickerfreeScreen.refresh(screenitemid); }, refreshInterval * 1000);
+		window.setInterval(function() { flickerfreeScreen.refresh(data.screenitemid); }, data.refreshInterval * 1000);
 	}
 };

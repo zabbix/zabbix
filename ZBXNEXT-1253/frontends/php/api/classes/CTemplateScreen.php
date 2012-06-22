@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ class CTemplateScreen extends CScreen {
 			'nodeids'					=> null,
 			'screenids'					=> null,
 			'screenitemids'				=> null,
-			'templateids'	 			=> null,
+			'templateids'				=> null,
 			'hostids'					=> null,
 			'editable'					=> null,
 			'noInheritance'				=> null,
@@ -335,7 +335,7 @@ class CTemplateScreen extends CScreen {
 		// hashing
 		$options['hostids'] = zbx_toHash($options['hostids']);
 
-		// adding ScreenItems
+		// adding screenitems
 		if (!is_null($options['selectScreenItems']) && str_in_array($options['selectScreenItems'], $subselectsAllowedOutputs)) {
 			$screensItems = array();
 			$dbSitems = DBselect('SELECT si.* FROM screens_items si WHERE '.DBcondition('si.screenid', $screenids));
@@ -363,7 +363,7 @@ class CTemplateScreen extends CScreen {
 
 		// creating linkage of template -> real objects
 		if (!is_null($options['selectScreenItems']) && !is_null($options['hostids'])) {
-			// prepare Graphs
+			// prepare graphs
 			if (!empty($graphids)) {
 				$tplGraphs = API::Graph()->get(array(
 					'output' => array('graphid', 'name'),
@@ -380,7 +380,7 @@ class CTemplateScreen extends CScreen {
 					'preservekeys' => true
 				));
 				$realGraphs = array();
-				foreach ($dbGraphs as $graphid => $graph) {
+				foreach ($dbGraphs as $graph) {
 					$host = reset($graph['hosts']);
 					unset($graph['hosts']);
 
@@ -391,7 +391,7 @@ class CTemplateScreen extends CScreen {
 				}
 			}
 
-			// prepare Items
+			// prepare items
 			if (!empty($itemids)) {
 				$tplItems = API::Item()->get(array(
 					'output' => array('itemid', 'key_'),
@@ -425,7 +425,7 @@ class CTemplateScreen extends CScreen {
 		$screenNum = 0;
 		$vrtResult = array();
 
-		foreach ($result as $screenid => $screen) {
+		foreach ($result as $screen) {
 			if (is_null($options['hostids']) || isset($options['hostids'][$screen['templateid']])) {
 				$screenNum++;
 				$vrtResult[$screenNum] = $screen;
@@ -452,12 +452,12 @@ class CTemplateScreen extends CScreen {
 					switch ($screenitem['resourcetype']) {
 						case SCREEN_RESOURCE_GRAPH:
 							$graphName = $tplGraphs[$screenitem['resourceid']]['name'];
-							$screenitem['resourceid'] = $realGraphs[$hostid][$graphName]['graphid'];
+							$screenitem['real_resourceid'] = $realGraphs[$hostid][$graphName]['graphid'];
 							break;
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
 							$itemKey = $tplItems[$screenitem['resourceid']]['key_'];
-							$screenitem['resourceid'] = $realItems[$hostid][$itemKey]['itemid'];
+							$screenitem['real_resourceid'] = $realItems[$hostid][$itemKey]['itemid'];
 							break;
 					}
 				}

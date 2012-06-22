@@ -21,11 +21,13 @@
 
 class CFlickerfreeScreen {
 
+	public $is_template;
 	public $screen;
 	public $mode;
 
 	public function __construct(array $options = array()) {
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
+		$this->is_template = isset($options['is_template']) ? $options['is_template'] : false;
 
 		// get screen
 		if (!empty($options['screen'])) {
@@ -41,8 +43,10 @@ class CFlickerfreeScreen {
 				$options['editable'] = true;
 			}
 
-			$this->screen = API::Screen()->get($options);
-			if (empty($this->screen)) {
+			$this->screen = $this->is_template
+				? API::TemplateScreen()->get($options)
+				: API::Screen()->get($options);
+			if (empty($this->screen) && !$this->is_template) {
 				$this->screen = API::TemplateScreen()->get($options);
 				if (empty($this->screen)) {
 					access_deny();
@@ -57,7 +61,9 @@ class CFlickerfreeScreen {
 			if (!empty($options['screenitemid']) && empty($options['screenitem'])) {
 				$options['screenitem'] = API::ScreenItem()->get(array(
 					'screenitemids' => $options['screenitemid'],
-					'output' => API_OUTPUT_EXTEND
+					'hostids' => !empty($options['hostid']) ? $options['hostid'] : 0,
+					'output' => API_OUTPUT_EXTEND,
+					'fillReals' => true
 				));
 				$options['screenitem'] = reset($options['screenitem']);
 			}
@@ -263,9 +269,6 @@ class CFlickerfreeScreen {
 						elseif ($this->mode == SCREEN_MODE_EDIT && empty($screenitem['screenitemid'])) {
 							$flickerfreeScreen->action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
 						}
-						elseif ($this->mode == SCREEN_MODE_PREVIEW) {
-							$flickerfreeScreen->action = 'charts.php?graphid='.$screenitem['resourceid'].url_params(array('period', 'stime'));
-						}
 
 						$item = $flickerfreeScreen->get();
 					}
@@ -364,6 +367,31 @@ class CFlickerfreeScreen {
 
 		return $screenTable;
 	}
+
+	public static function insertScreenScrollJs($id, $timeline) {
+		$domGraphId = 'screen_scroll';
+		$timeControlData = array(
+			'id' => $id,
+			'domid' => $domGraphId,
+			'loadSBox' => 0,
+			'loadImage' => 0,
+			'loadScroll' => 1,
+			'scrollWidthByImage' => 0,
+			'dynamic' => 0,
+			'mainObject' => 1,
+			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+		);
+
+		zbx_add_post_js('timeControl.addObject("'.$domGraphId.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+	}
+
+	public static function insertInitScreenJs($screenid) {
+		zbx_add_post_js('init_screen("'.$screenid.'", "iframe", "'.$screenid.'");');
+	}
+
+	public static function insertProcessObjectsJs() {
+		zbx_add_post_js('timeControl.processObjects();');
+	}
 }
 
 class CFlickerfreeScreenItem {
@@ -373,11 +401,13 @@ class CFlickerfreeScreenItem {
 	public $mode;
 	public $action;
 	public $id;
+	public $hostid;
 
 	public function __construct(array $options = array()) {
 		$this->screenid = isset($options['screenid']) ? $options['screenid'] : null;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
 		$this->action = isset($options['action']) ? $options['action'] : '';
+		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : get_request('hostid', 0);
 
 		// get screenitem
 		if (!empty($options['screenitem'])) {
@@ -386,7 +416,9 @@ class CFlickerfreeScreenItem {
 		elseif (!empty($options['screenitemid'])) {
 			$this->screenitem = API::ScreenItem()->get(array(
 				'screenitemids' => $options['screenitemid'],
-				'output' => API_OUTPUT_EXTEND
+				'hostids' => $this->hostid,
+				'output' => API_OUTPUT_EXTEND,
+				'fillReals' => true
 			));
 			$this->screenitem = reset($this->screenitem);
 		}
@@ -419,6 +451,14 @@ class CFlickerfreeScreenItem {
 
 
 	public function insertFlickerfreeJs() {
-		zbx_add_post_js('flickerfreeScreen.add('.$this->screenitem['screenitemid'].', '.$this->screenitem['screenid'].', '.$this->screenitem['resourcetype'].', '.$this->mode.', '.CWebUser::$data['refresh'].');');
+		$data = array(
+			'screenitemid' => $this->screenitem['screenitemid'],
+			'screenid' => $this->screenitem['screenid'],
+			'resourcetype' => $this->screenitem['resourcetype'],
+			'mode' => $this->mode,
+			'refreshInterval' => CWebUser::$data['refresh'],
+			'hostid' => $this->hostid
+		);
+		zbx_add_post_js('flickerfreeScreen.add('.zbx_jsvalue($data).');');
 	}
 }

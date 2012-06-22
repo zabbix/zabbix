@@ -21,25 +21,24 @@
 
 class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 
-	private $hostid;
 	private $period;
 	private $stime;
 
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
 
-		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : get_request('hostid', 0);
 		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
 		$this->stime = !empty($options['stime']) ? $options['stime'] : get_request('stime', null);
 	}
 
 	public function get() {
+		$resourceid = !empty($this->screenitem['real_resourceid']) ? $this->screenitem['real_resourceid'] : $this->screenitem['resourceid'];
 		$domGraphid = 'graph_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$containerid = 'graph_container_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
-		$graphDims = getGraphDims($this->screenitem['resourceid']);
+		$graphDims = getGraphDims($resourceid);
 		$graphDims['graphHeight'] = $this->screenitem['height'];
 		$graphDims['width'] = $this->screenitem['width'];
-		$graph = get_graph_by_graphid($this->screenitem['resourceid']);
+		$graph = get_graph_by_graphid($resourceid);
 		$graphid = $graph['graphid'];
 		$legend = $graph['show_legend'];
 		$graph3d = $graph['show_3d'];
@@ -54,7 +53,7 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 
 			// get graph
 			$graph = API::Graph()->get(array(
-				'graphids' => $this->screenitem['resourceid'],
+				'graphids' => $resourceid,
 				'output' => API_OUTPUT_EXTEND,
 				'selectHosts' => API_OUTPUT_REFER,
 				'selectGraphItems' => API_OUTPUT_EXTEND
@@ -124,7 +123,7 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 
 		// get time control
 		$timeControlData = array(
-			'id' => $this->screenitem['resourceid'],
+			'id' => $this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'],
 			'domid' => $domGraphid,
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
@@ -139,13 +138,13 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 		$isDefault = false;
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
-				$this->screenitem['url'] = 'chart6.php?graphid='.$this->screenitem['resourceid'];
+				$this->screenitem['url'] = 'chart6.php?graphid='.$resourceid;
 				$isDefault = true;
 			}
 
 			$timeline = array(
 				'period' => $this->period,
-				'starttime' => date('YmdHis', get_min_itemclock_by_graphid($this->screenitem['resourceid']))
+				'starttime' => date('YmdHis', get_min_itemclock_by_graphid($resourceid))
 			);
 
 			if (!empty($this->stime)) {
@@ -159,7 +158,7 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
-				$this->screenitem['url'] = 'chart2.php?graphid='.$this->screenitem['resourceid'];
+				$this->screenitem['url'] = 'chart2.php?graphid='.$resourceid;
 				$isDefault = true;
 			}
 
@@ -193,8 +192,8 @@ class CFlickerfreeScreenGraph extends CFlickerfreeScreenItem {
 			if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) || !$isDefault) {
 				$item = new CDiv();
 			}
-			else {
-				$item = new CLink(null, $this->action);
+			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
+				$item = new CLink(null, 'charts.php?graphid='.$resourceid.url_params(array('period', 'stime')));
 			}
 			$item->setAttribute('id', $containerid);
 

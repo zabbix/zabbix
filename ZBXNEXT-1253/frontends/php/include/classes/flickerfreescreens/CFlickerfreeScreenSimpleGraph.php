@@ -21,19 +21,18 @@
 
 class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 
-	private $hostid;
 	private $period;
 	private $stime;
 
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
 
-		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : get_request('hostid', 0);
 		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
 		$this->stime = !empty($options['stime']) ? $options['stime'] : get_request('stime', null);
 	}
 
 	public function get() {
+		$resourceid = !empty($this->screenitem['real_resourceid']) ? $this->screenitem['real_resourceid'] : $this->screenitem['resourceid'];
 		$domGraphid = 'graph_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$containerid = 'graph_container_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$graphDims = getGraphDims();
@@ -42,7 +41,7 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 
 		// get time control
 		$timeControlData = array(
-			'id' => $this->screenitem['resourceid'],
+			'id' => $resourceid,
 			'domid' => $domGraphid,
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
@@ -56,12 +55,12 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 
 		// host feature
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && !empty($this->hostid)) {
-			$newitemid = get_same_item_for_host($this->screenitem['resourceid'], $this->hostid);
-			$this->screenitem['resourceid'] = !empty($newitemid) ? $newitemid : '';
+			$newitemid = get_same_item_for_host($resourceid, $this->hostid);
+			$resourceid = !empty($newitemid) ? $newitemid : '';
 		}
 
-		if ($this->mode == SCREEN_MODE_PREVIEW && !empty($this->screenitem['resourceid'])) {
-			$this->action = 'history.php?action=showgraph&itemid='.$this->screenitem['resourceid'].url_params(array('period', 'stime'));
+		if ($this->mode == SCREEN_MODE_PREVIEW && !empty($resourceid)) {
+			$this->action = 'history.php?action=showgraph&itemid='.$resourceid.url_params(array('period', 'stime'));
 		}
 
 		$timeline = array(
@@ -69,7 +68,7 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 			'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
 		);
 
-		if (!zbx_empty($this->screenitem['resourceid']) && $this->mode != SCREEN_MODE_EDIT) {
+		if (!zbx_empty($resourceid) && $this->mode != SCREEN_MODE_EDIT) {
 			if (!empty($this->stime)) {
 				$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
 			}
@@ -78,9 +77,9 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 			}
 		}
 
-		$timeControlData['src'] = zbx_empty($this->screenitem['resourceid'])
+		$timeControlData['src'] = zbx_empty($resourceid)
 			? 'chart3.php?'
-			: 'chart.php?itemid='.$this->screenitem['resourceid'].'&'.$this->screenitem['url'].'width='.$this->screenitem['width']
+			: 'chart.php?itemid='.$resourceid.'&'.$this->screenitem['url'].'width='.$this->screenitem['width']
 				.'&height='.$this->screenitem['height'];
 
 		// output
@@ -93,8 +92,8 @@ class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 			if ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) {
 				$item = new CDiv();
 			}
-			else {
-				$item = new CLink(null, $this->action);
+			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
+				$item = new CLink(null, 'charts.php?graphid='.$resourceid.url_params(array('period', 'stime')));
 			}
 			$item->setAttribute('id', $containerid);
 

@@ -104,6 +104,9 @@ define('PAGE_TYPE_TEXT_FILE',	8); // api call
 define('PAGE_TYPE_TEXT',		9); // simple text
 define('PAGE_TYPE_CSV',			10); // CSV format
 
+define('PAGE_VIEW_NORMAL',		0);
+define('PAGE_VIEW_FULLSCREEN',	1);
+
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);
 
@@ -289,8 +292,8 @@ define('SYSMAP_ELEMENT_ICON_OFF',			1);
 define('SYSMAP_ELEMENT_ICON_MAINTENANCE',	3);
 define('SYSMAP_ELEMENT_ICON_DISABLED',		4);
 
-define('SYSMAP_HIGHLIGHT_OFF',		0);
-define('SYSMAP_HIGHLIGHT_ON',		1);
+define('SYSMAP_HIGHLIGHT_OFF',	0);
+define('SYSMAP_HIGHLIGHT_ON',	1);
 
 define('SYSMAP_EXPANDPROBLEM_OFF',	0);
 define('SYSMAP_EXPANDPROBLEM_ON',	1);
@@ -425,8 +428,8 @@ define('ALERT_STATUS_FAILED',	2);
 define('ALERT_TYPE_MESSAGE',	0);
 define('ALERT_TYPE_COMMAND',	1);
 
-define('MEDIA_TYPE_STATUS_ACTIVE',	0);
-define('MEDIA_TYPE_STATUS_DISABLED',1);
+define('MEDIA_TYPE_STATUS_ACTIVE',		0);
+define('MEDIA_TYPE_STATUS_DISABLED',	1);
 
 define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);

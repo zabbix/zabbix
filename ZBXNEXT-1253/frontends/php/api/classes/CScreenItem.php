@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,8 +67,9 @@ class CScreenItem extends CZBXAPI {
 		$this->getOptions = zbx_array_merge($this->getOptions, array(
 			'screenitemids'	=> null,
 			'screenids'		=> null,
+			'hostids'		=> null,
 			'editable'		=> null,
-			'selectScreen'	=> null, // not implemented
+			'fillReals'		=> null,
 			'sortfield'		=> '',
 			'sortorder'		=> '',
 			'preservekeys'	=> null,
@@ -98,11 +99,11 @@ class CScreenItem extends CZBXAPI {
 		// fetch results
 		$result = array();
 		while ($row = DBfetch($res)) {
-			// a count query, return a single result
+			// count query, return a single result
 			if ($options['countOutput'] !== null) {
 				$result = $row['rowscount'];
 			}
-			// a normal select query
+			// normal select query
 			else {
 				if ($options['preservekeys'] !== null) {
 					$result[$row['screenitemid']] = $this->unsetExtraFields($this->tableName(), $row, $options['output']);
@@ -112,6 +113,32 @@ class CScreenItem extends CZBXAPI {
 				}
 			}
 		}
+
+		// fill result with real resourceid
+		if (!is_null($options['hostids']) && !empty($result)) {
+			if (empty($options['screenitemid'])) {
+				$options['screenitemid'] = zbx_objectValues($result, 'screenitemid');
+			}
+
+			$templateScreens = API::TemplateScreen()->get(array(
+				'screenitemids' => $options['screenitemid'],
+				'hostids' => $options['hostids'],
+				'selectScreenItems' => API_OUTPUT_EXTEND
+			));
+			if (!empty($templateScreens)) {
+				foreach ($result as &$resultScreenitem) {
+					foreach ($templateScreens as $templateScreen) {
+						foreach ($templateScreen['screenitems'] as $screenitem) {
+							if ($resultScreenitem['screenitemid'] == $screenitem['screenitemid'] && !empty($screenitem['real_resourceid'])) {
+								$resultScreenitem['real_resourceid'] = $screenitem['real_resourceid'];
+							}
+						}
+					}
+				}
+				unset($resultScreenitem);
+			}
+		}
+
 		return $result;
 	}
 

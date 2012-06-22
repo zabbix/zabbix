@@ -413,6 +413,7 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	else {
 		$_REQUEST['stime'] = date('YmdHis', time() - $_REQUEST['period']);
 	}
+
 	return $_REQUEST['period'];
 }
 

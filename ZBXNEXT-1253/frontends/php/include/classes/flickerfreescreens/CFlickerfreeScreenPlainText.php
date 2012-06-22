@@ -23,12 +23,8 @@ require_once dirname(__FILE__).'/../../screens.inc.php';
 
 class CFlickerfreeScreenPlainText extends CFlickerfreeScreenItem {
 
-	private $hostid;
-
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
-
-		$this->hostid = get_request('hostid', 0);
 	}
 
 	public function get() {
