@@ -1439,7 +1439,7 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 
 	zbx_value2array($obj);
 	$div = new CDiv();
-	$div->setAttribute('style', 'float:left;');
+	$div->setAttribute('style', 'display:inline-block;');
 
 	foreach ($obj as $enum => $el) {
 		if (is_object($el) || $el === SPACE) {
@@ -1459,7 +1459,7 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 		else {
 			$img = new CDiv(SPACE, 'icon_sortup');
 		}
-		$img->setAttribute('style', 'float: left;');
+		$img->setAttribute('style', 'display:inline-block;');
 	}
 	$col = new CCol(array($div, $img), 'nowrap hover_grey');
 	$col->setAttribute('onclick', $script);
