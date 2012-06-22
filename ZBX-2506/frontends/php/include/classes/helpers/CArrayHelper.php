@@ -124,7 +124,8 @@ class CArrayHelper {
 	protected static function compare($a, $b) {
 		foreach (self::$fields as $field) {
 			if (!isset($a[$field['field']]) || !isset($b[$field['field']])) {
-				return 0; // this is wrong
+				// this is wrong, we cannot compare the values, if they are missing
+				return 0;
 			}
 
 			$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
