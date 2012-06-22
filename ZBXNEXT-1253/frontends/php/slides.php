@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 require_once dirname(__FILE__).'/include/screens.inc.php';
@@ -31,8 +31,7 @@ $page['scripts'] = array('class.pmaster.js', 'class.calendar.js', 'gtlc.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-?>
-<?php
+
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
@@ -44,7 +43,7 @@ $fields = array(
 	'period' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,	null),
 	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 	'reset' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
-	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), null),
+	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
 	// ajax
 	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
 	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY, null),
@@ -186,9 +185,9 @@ order_result($data['slideshows'], 'name');
 // get element id
 $data['elementid'] = get_request('elementid', CProfile::get('web.slides.elementid', null));
 $data['fullscreen'] = get_request('fullscreen', null);
-if ($data['fullscreen'] != 2) {
-	CProfile::update('web.slides.elementid', $data['elementid'], PROFILE_TYPE_ID);
-}
+
+CProfile::update('web.slides.elementid', $data['elementid'], PROFILE_TYPE_ID);
+
 if (!isset($data['slideshows'][$data['elementid']])) {
 	$slideshow = reset($data['slideshows']);
 	$data['elementid'] = $slideshow['slideshowid'];
@@ -200,7 +199,7 @@ if (!empty($data['screen'])) {
 	$data['tmpstime'] = get_request('stime');
 
 	// get groups and hosts
-	if ($data['fullscreen'] != 2 && check_dynamic_items($data['elementid'], 1)) {
+	if (check_dynamic_items($data['elementid'], 1)) {
 		$data['hostid'] = get_request('hostid', 0);
 
 		$options = array('allow_all_hosts', 'monitored_hosts', 'with_items');
@@ -241,4 +240,3 @@ $slidesView->render();
 $slidesView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

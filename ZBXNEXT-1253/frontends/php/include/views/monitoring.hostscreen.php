@@ -71,11 +71,9 @@ else {
 		$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
 	}
 
-	CFlickerfreeScreen::insertScreenScrollJs($this->data['screen']['screenid'], $timeline);
-
 	$screenWidget->addItem($flickerfreeScreen->show());
-	//$screenWidget->addItem(get_screen($this->data['screen'], 0, $effectiveperiod));
 
+	CFlickerfreeScreen::insertScreenScrollJs($this->data['screen']['screenid'], $timeline);
 	CFlickerfreeScreen::insertProcessObjectsJs();
 }
 

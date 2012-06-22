@@ -30,10 +30,6 @@ $page['hist_arg'] = array('elementid', 'screenname');
 $page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-if (PAGE_TYPE_HTML == $page['type']) {
-	//define('ZBX_PAGE_DO_REFRESH', 1);
-}
-
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -48,7 +44,7 @@ $fields = array(
 	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
 	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN("'reset'"), null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2'), null),
+	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	null),

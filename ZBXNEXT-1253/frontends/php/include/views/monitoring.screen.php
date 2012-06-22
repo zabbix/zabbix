@@ -54,7 +54,7 @@ else {
 	}
 
 	// if elementid is used to fetch an element, saving it in profile
-	if ($this->data['fullscreen'] != 2 && !$this->data['use_screen_name']) {
+	if (!$this->data['use_screen_name']) {
 		CProfile::update('web.screens.elementid', $screen['screenid'] , PROFILE_TYPE_ID);
 	}
 
@@ -79,7 +79,7 @@ else {
 	}
 	$headerForm->addItem(array(_('Screens').SPACE, $elementsComboBox));
 
-	if ($this->data['fullscreen'] != 2 && check_dynamic_items($screen['screenid'], 0)) {
+	if (check_dynamic_items($screen['screenid'], 0)) {
 		global $ZBX_WITH_ALL_NODES;
 
 		if (!isset($_REQUEST['hostid'])) {
@@ -127,31 +127,29 @@ else {
 	$screenWidget->addItem($flickerfreeScreen->show());
 
 	// create time control
-	if ($this->data['fullscreen'] != 2) {
-		$timeline = array(
-			'period' => $effectiveperiod,
-			'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
-		);
+	$timeline = array(
+		'period' => $effectiveperiod,
+		'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
+	);
 
-		if (!empty($this->data['stime'])) {
-			$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
-		}
-
-		$objData = array(
-			'id' => $screen['screenid'],
-			'domid' => 'screen_scroll',
-			'loadSBox' => 0,
-			'loadImage' => 0,
-			'loadScroll' => 1,
-			'scrollWidthByImage' => 0,
-			'dynamic' => 0,
-			'mainObject' => 1,
-			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
-			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-		);
-		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
-		zbx_add_post_js('timeControl.processObjects();');
+	if (!empty($this->data['stime'])) {
+		$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
 	}
+
+	$objData = array(
+		'id' => $screen['screenid'],
+		'domid' => 'screen_scroll',
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'loadScroll' => 1,
+		'scrollWidthByImage' => 0,
+		'dynamic' => 0,
+		'mainObject' => 1,
+		'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
+		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
+	);
+	zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
+	zbx_add_post_js('timeControl.processObjects();');
 	$screenWidget->addItem(BR());
 }
 

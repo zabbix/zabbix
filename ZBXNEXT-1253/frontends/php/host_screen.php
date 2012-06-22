@@ -42,7 +42,7 @@ $fields = array(
 	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null),
 	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
 	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN("'reset'"), null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1,2'),	null),
+	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
 	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT, NOT_EMPTY,	null),
