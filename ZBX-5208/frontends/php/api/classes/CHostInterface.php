@@ -732,6 +732,7 @@ class CHostInterface extends CZBXAPI {
 	 */
 	public function replaceHostInterfaces(array $host) {
 		if (isset($host['interfaces']) && !is_null($host['interfaces'])) {
+			$host['interfaces'] = zbx_toArray($host['interfaces']);
 			$this->checkHostInterfaces($host['interfaces'], $host['hostid']);
 
 			$interfacesToDelete = API::HostInterface()->get(array(
