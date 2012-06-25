@@ -573,7 +573,7 @@ class CScreen extends CZBXAPI {
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// only apply the node option if no specific ids are given
-		if ($options['screenids'] === null) {
+		if ($options['screenids'] === null && $options['screenitemids'] === null) {
 			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
 		}
 
