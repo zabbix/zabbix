@@ -1941,7 +1941,7 @@ class CHost extends CZBXAPI {
 			));
 
 			$this->massRemove(array(
-				'hosts' => $hosts,
+				'hostids' => $hostids,
 				'interfaces' => $hostInterfaces
 			));
 			$this->massAdd(array(
