@@ -287,6 +287,9 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 			unset($prototype);
 		}
+		else {
+			$discoveryRule['item_prototypes'] = array();
+		}
 
 		if (!empty($discoveryRule['trigger_prototypes'])) {
 			foreach ($discoveryRule['trigger_prototypes'] as &$trigger) {
@@ -294,12 +297,18 @@ class C20ImportFormatter extends CImportFormatter {
 			}
 			unset($trigger);
 		}
+		else {
+			$discoveryRule['trigger_prototypes'] = array();
+		}
 
 		if (!empty($discoveryRule['graph_prototypes'])) {
 			foreach ($discoveryRule['graph_prototypes'] as &$graph) {
 				$graph = $this->renameGraphFields($graph);
 			}
 			unset($graph);
+		}
+		else {
+			$discoveryRule['graph_prototypes'] = array();
 		}
 
 		return $discoveryRule;
