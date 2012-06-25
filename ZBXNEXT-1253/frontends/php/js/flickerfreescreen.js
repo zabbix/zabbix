@@ -33,6 +33,8 @@ var flickerfreeScreen = {
 		url.setArgument('method', 'flickerfreeScreen.get');
 		url.setArgument('mode', screen.mode);
 		url.setArgument('screenitemid', screenitemid);
+		url.setArgument('period', !empty(screen.period) ? screen.period : null);
+		url.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
 
 		// SCREEN_RESOURCE_GRAPH
 		// SCREEN_RESOURCE_SIMPLE_GRAPH
@@ -41,8 +43,6 @@ var flickerfreeScreen = {
 
 			url.setArgument('mode', 3); // SCREEN_MODE_JS
 			url.setArgument('hostid', screen.hostid);
-			url.setArgument('period', !empty(screen.period) ? screen.period : timeControl.getPeriod(graphId));
-			url.setArgument('stime', !empty(screen.stime) ? screen.stime : timeControl.getSTime(graphId));
 
 			jQuery.getScript(url.getUrl(), function(data, textStatus, jqxhr) {
 				timeControl.refreshObject(graphId);
