@@ -168,7 +168,7 @@ class C20ImportFormatter extends CImportFormatter {
 
 		if (isset($this->data['templates'])) {
 			foreach ($this->data['templates'] as $template) {
-				if (!empty($host['discovery_rules'])) {
+				if (!empty($template['discovery_rules'])) {
 					foreach ($template['discovery_rules'] as $item) {
 						$item = $this->formatDiscoveryRule($item);
 
