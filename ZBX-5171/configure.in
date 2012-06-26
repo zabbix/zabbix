@@ -835,6 +835,110 @@ AC_MSG_RESULT(no))
 
 dnl *****************************************************************
 dnl *                                                               *
+dnl *                 Checks for operating systems                  *
+dnl *                                                               *
+dnl *****************************************************************
+
+AC_MSG_CHECKING(for libperfstat 5.2.0.40 fileset)
+AC_TRY_COMPILE([#include <libperfstat.h>],
+[perfstat_memory_total_t	memstats;
+memstats.virt_active = 0;
+],
+AC_DEFINE(HAVE_AIXOSLEVEL_520004,1,[Define to 1 if libperfstat 5.2.0.40 fileset exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for libperfstat 5.3.0.60 fileset)
+AC_TRY_COMPILE([#include <libperfstat.h>],
+[perfstat_partition_total_t	lparstats;
+lparstats.type.b.donate_enabled = 0;
+lparstats.idle_donated_purr = 0;
+lparstats.busy_donated_purr = 0;
+lparstats.idle_stolen_purr = 0;
+lparstats.busy_stolen_purr = 0;
+],
+AC_DEFINE(HAVE_AIXOSLEVEL_530006,1,[Define to 1 if libperfstat 5.3.0.60 fileset exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+AC_MSG_CHECKING(for architecture)
+
+case "$host_os" in
+linux*)
+	ARCH="linux"
+
+	AC_MSG_RESULT([ok (${host_os})])
+
+	AC_MSG_CHECKING([for the kernel version])
+
+        kernel=`uname -r`
+
+        case "${kernel}" in
+             2.6.*)
+        	    AC_MSG_RESULT([2.6 family (${kernel})])
+        	    AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you are using Linux 2.6.x])
+        	    ;;
+             2.4.*)
+        	    AC_MSG_RESULT([2.4 family (${kernel})])
+        	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you are using Linux 2.4.x])
+        	    ;;
+        esac
+;;
+aix*)
+	ARCH="aix"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+darwin*|rhapsody*)
+	ARCH="osx"
+
+	AC_MSG_RESULT([ok (${host_os})])
+	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you are using Mac OS X])
+;;
+*solaris*)
+	ARCH="solaris"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+hpux*)
+	ARCH="hpux"
+
+	AGENT_LIBS="${AGENT_LIBS} -lipv6"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+freebsd*)
+	ARCH="freebsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+netbsd*)
+	ARCH="netbsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+osf*)
+	ARCH="osf"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+openbsd*)
+	ARCH="openbsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+*)
+	ARCH="unknown"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+esac
+
+AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
+AC_SUBST(ARCH)
+
+dnl *****************************************************************
+dnl *                                                               *
 dnl *         Checks for options given on the command line          *
 dnl *                                                               *
 dnl *****************************************************************
@@ -1247,108 +1351,6 @@ AC_SUBST(PROXY_LIBS)
 
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
-
-dnl *****************************************************************
-dnl *                                                               *
-dnl *                 Checks for operating systems                  *
-dnl *                                                               *
-dnl *****************************************************************
-
-AC_MSG_CHECKING(for libperfstat 5.2.0.40 fileset)
-AC_TRY_COMPILE([#include <libperfstat.h>],
-[perfstat_memory_total_t	memstats;
-memstats.virt_active = 0;
-],
-AC_DEFINE(HAVE_AIXOSLEVEL_520004,1,[Define to 1 if libperfstat 5.2.0.40 fileset exists.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for libperfstat 5.3.0.60 fileset)
-AC_TRY_COMPILE([#include <libperfstat.h>],
-[perfstat_partition_total_t	lparstats;
-lparstats.type.b.donate_enabled = 0;
-lparstats.idle_donated_purr = 0;
-lparstats.busy_donated_purr = 0;
-lparstats.idle_stolen_purr = 0;
-lparstats.busy_stolen_purr = 0;
-],
-AC_DEFINE(HAVE_AIXOSLEVEL_530006,1,[Define to 1 if libperfstat 5.3.0.60 fileset exists.])
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
-AC_MSG_CHECKING(for architecture)
-
-case "$host_os" in
-linux*)
-	ARCH="linux"
-
-	AC_MSG_RESULT([ok (${host_os})])
-
-	AC_MSG_CHECKING([for the kernel version])
-
-        kernel=`uname -r`
-
-        case "${kernel}" in
-             2.6.*)
-        	    AC_MSG_RESULT([2.6 family (${kernel})])
-        	    AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you are using Linux 2.6.x])
-        	    ;;
-             2.4.*)
-        	    AC_MSG_RESULT([2.4 family (${kernel})])
-        	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you are using Linux 2.4.x])
-        	    ;;
-        esac
-;;
-aix*)
-	ARCH="aix"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
-darwin*|rhapsody*)
-	ARCH="osx"
-
-	AC_MSG_RESULT([ok (${host_os})])
-	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you are using Mac OS X])
-;;
-*solaris*)
-	ARCH="solaris"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
-hpux*)
-	ARCH="hpux"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
-freebsd*)
-	ARCH="freebsd"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
-netbsd*)
-	ARCH="netbsd"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
-osf*)
-	ARCH="osf"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
-openbsd*)
-	ARCH="openbsd"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
-*)
-	ARCH="unknown"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
-esac
-
-AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
-AC_SUBST(ARCH)
 
 dnl *****************************************************************
 dnl *                                                               *
