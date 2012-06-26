@@ -86,14 +86,16 @@ var flickerfreeScreen = {
 
 	add: function(data) {
 		timeControl.refreshPage = false;
+
 		this.screens[data.screenitemid] = {
 			'screenid': data.screenid,
 			'resourcetype': data.resourcetype,
 			'mode': data.mode,
 			'hostid': data.hostid,
-			'period': null,
-			'stime': null
+			'period': data.period,
+			'stime': data.stime
 		};
+
 		this.refresh(data.screenitemid);
 
 		window.setInterval(function() { flickerfreeScreen.refresh(data.screenitemid); }, data.refreshInterval * 1000);

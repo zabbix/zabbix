@@ -461,7 +461,9 @@ class CFlickerfreeScreenItem {
 				'resourcetype' => $this->screenitem['resourcetype'],
 				'mode' => $this->mode,
 				'refreshInterval' => CWebUser::$data['refresh'],
-				'hostid' => $this->hostid
+				'hostid' => $this->hostid,
+				'period' => get_request('period', null),
+				'stime' => get_request('stime', null)
 			);
 			zbx_add_post_js('flickerfreeScreen.add('.zbx_jsvalue($data).');');
 		}
