@@ -541,7 +541,8 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 			if (day >= d1 && day <= d2 && sec >= sec1 && sec <= sec2)	/* current period */
 			{
 				if (0 == next || next > now - sec + sec2)
-					next = now - sec + sec2;
+					next = now - sec + sec2 + 1;		/* the next second after the */
+										/* current interval's upper bound */
 			}
 			else if (day >= d1 && day <= d2 && sec < sec1)			/* will be active today */
 			{
@@ -635,35 +636,47 @@ int	calculate_item_nextcheck(zbx_uint64_t interfaceid, zbx_uint64_t itemid, int 
 	else
 	{
 		int		current_delay;
-		time_t		next_interval;
+		time_t		next_interval, t, tmax;
 		zbx_uint64_t	shift;
 
-		current_delay = get_current_delay(delay, flex_intervals, now);
+		/* Try to find the nearest 'nextcheck' value with condition */
+		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR */
 
-		if (FAIL != get_next_delay_interval(flex_intervals, now, &next_interval) && now + current_delay > next_interval)
+		t = now;
+		tmax = now + SEC_PER_YEAR;
+
+		while (t < tmax)
 		{
-			/* next check falls out of the current interval */
-			do
+			/* calculate 'nextcheck' value for the current interval */
+			current_delay = get_current_delay(delay, flex_intervals, t);
+
+			shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
+			nextcheck = current_delay * (int)(t / (time_t)current_delay) + (int)(shift % (zbx_uint64_t)current_delay);
+
+			while (nextcheck <= t)
+				nextcheck += current_delay;
+
+			/* 'nextcheck' < end of the current interval ? */
+			/* the end of the current interval is the beginning of the next interval -1 */
+			if (FAIL != get_next_delay_interval(flex_intervals, t, &next_interval) && nextcheck > next_interval - 1)
 			{
-				current_delay = get_current_delay(delay, flex_intervals, next_interval + 1);
+				/* 'nextcheck' falls out of the current interval */
 
-				/* as soon as item check in the interval is not forbidden with delay=0, use it */
-				if (SEC_PER_YEAR != current_delay)
+				/* Special case: current_delay equal to interval length, e.g. 60/1,12:45-12:46. */
+				/* For some itemid's, the 'nextcheck' points to the very beginning of */
+				/* the next interval, while it should be at the beginning of the current interval */
+				if (nextcheck == next_interval &&  now < (nextcheck - current_delay))
+				{
+					nextcheck -= current_delay;
 					break;
+				}
 
-				get_next_delay_interval(flex_intervals, next_interval + 1, &next_interval);
+				t = next_interval;
 			}
-			while (next_interval - now < SEC_PER_WEEK);	/* checking the nearest week for delay!=0 */
-
-			now = next_interval;
+			else
+				break;
 		}
-
 		delay = current_delay;
-		shift = (ITEM_TYPE_JMX == item_type ? interfaceid : itemid);
-		nextcheck = delay * (int)(now / (time_t)delay) + (int)(shift % (zbx_uint64_t)delay);
-
-		while (nextcheck <= now)
-			nextcheck += delay;
 	}
 
 	if (NULL != effective_delay)
