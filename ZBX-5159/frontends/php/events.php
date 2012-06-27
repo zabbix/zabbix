@@ -638,7 +638,7 @@ else{
 
 				$ack = getEventAckState($event, true);
 
-				$description = CDescription::expandEvent(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])));
+				$description = CEventHelper::expandDescription(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])));
 
 				$tr_desc = new CSpan($description,'pointer');
 				$tr_desc->addAction('onclick', "create_mon_trigger_menu(event, ".

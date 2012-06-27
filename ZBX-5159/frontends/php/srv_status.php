@@ -126,7 +126,7 @@ else {
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
 
-	$triggers = CDescription::expandTriggers($triggers);
+	$triggers = CTriggerHelper::batchExpandDescription($triggers);
 
 	foreach ($services as &$service) {
 		if ($service['trigger']) {

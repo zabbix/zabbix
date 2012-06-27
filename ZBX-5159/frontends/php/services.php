@@ -238,7 +238,7 @@ if (isset($_REQUEST['pservices'])) {
 
 	foreach ($parentServices as $key => $childService) {
 		$parentServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CDescription::expandTriggerById($childService['triggerid'])
+			? CTriggerHelper::expandDescriptionById($childService['triggerid'])
 			: '-';
 	}
 
@@ -277,7 +277,7 @@ if (isset($_REQUEST['cservices'])) {
 
 	foreach ($childServices as $key => $childService) {
 		$childServices[$key]['trigger'] = !empty($childService['triggerid'])
-			? CDescription::expandTriggerById($childService['triggerid'])
+			? CTriggerHelper::expandDescriptionById($childService['triggerid'])
 			: '-';
 	}
 
@@ -336,7 +336,7 @@ if (isset($_REQUEST['form'])) {
 					'name' => $childService['name'],
 					'triggerid' => $childService['triggerid'],
 					'trigger' => !empty($childService['triggerid'])
-							? CDescription::expandTriggerById($childService['triggerid'])
+							? CTriggerHelper::expandDescriptionById($childService['triggerid'])
 							: '-',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
@@ -394,7 +394,7 @@ else {
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
 
-	$triggers = CDescription::expandTriggers($triggers);
+	$triggers = CTriggerHelper::batchExpandDescription($triggers);
 
 	foreach ($services as &$service) {
 		if ($service['trigger']) {

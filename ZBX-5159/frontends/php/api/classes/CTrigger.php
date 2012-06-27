@@ -1005,7 +1005,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// expandDescription
 		if (!is_null($options['expandDescription'])) {
-			$result = CDescription::expandTriggers($result);
+			$result = CTriggerHelper::batchExpandDescription($result);
 		}
 
 		if (!empty($fieldsToUnset)) {

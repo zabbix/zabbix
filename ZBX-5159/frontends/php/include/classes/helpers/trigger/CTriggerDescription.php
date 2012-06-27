@@ -27,15 +27,6 @@ class CTriggerDescription {
 	protected $triggers;
 
 	/**
-	 * Determines what is returned by expand() method.
-	 * If true: expanded description string from first trigger is returned.
-	 * If false: all triggers with expanded description are returned.
-	 *
-	 * @var bool
-	 */
-	protected $soloTrigger;
-
-	/**
 	 * Values to replace for macros.
 	 *
 	 * @var array
@@ -47,11 +38,15 @@ class CTriggerDescription {
 	 * Trigger array must have 'triggerid', 'description' and 'expression' fields.
 	 *
 	 * @param array $trigger
+	 *
+	 * @return string
 	 */
-	public function addTrigger(array $trigger) {
-		$this->soloTrigger = true;
+	public function expand(array $trigger) {
+		$this->triggers = array($trigger['triggerid'] => $trigger);
+		$this->expandDescriptions();
+		$trigger = reset($this->triggers);
 
-		$this->add(array($trigger));
+		return $trigger['description'];
 	}
 
 	/**
@@ -59,53 +54,56 @@ class CTriggerDescription {
 	 * Every trigger must have 'triggerid', 'description' and 'expression' fields.
 	 *
 	 * @param array $triggers
+	 *
+	 * @return array
 	 */
-	public function addTriggers(array $triggers) {
-		$this->soloTrigger = false;
-		$this->add($triggers);
+	public function batchExpand(array $triggers) {
+		$this->triggers = zbx_toHash($triggers, 'triggerid');
+		$this->expandDescriptions();
+
+		return $this->triggers;
 	}
 
 	/**
 	 * Add trigger by trigger id, required fields for description expanding are queried from DB.
 	 *
 	 * @param string $triggerId
+	 *
+	 * @return string
 	 */
-	public function addTriggerById($triggerId) {
-		$this->soloTrigger = true;
-
+	public function expandById($triggerId) {
 		$trigger = DBfetch(DBselect(
 			'SELECT DISTINCT t.description,t.expression,t.triggerid'.
 					' FROM triggers t'.
 					' WHERE t.triggerid='.$triggerId
 		));
-		$this->add(array($trigger));
+		$this->triggers = array($trigger['triggerid'] => $trigger);
+		$this->expandDescriptions();
+		$trigger = reset($this->triggers);
+
+		return $trigger['description'];
 	}
 
 	/**
 	 * Add triggers by trigger ids, required fields for description expanding are queried from DB.
 	 *
-	 * @param string $triggerIds
+	 * @param array $triggerIds
+	 *
+	 * @return array
 	 */
-	public function addTriggersById(array $triggerIds) {
-		$this->soloTrigger = false;
-
+	public function batchExpandById(array $triggerIds) {
 		$dbTriggers = DBselect(
 			'SELECT DISTINCT t.description,t.expression,t.triggerid'.
 				' FROM triggers t'.
 				' WHERE '.DBcondition('t.triggerid', $triggerIds)
 		);
-		$triggers = array();
 		while ($trigger = DBfetch($dbTriggers)) {
-			$triggers[] = $trigger;
+			$this->triggers[$trigger['triggerid']] = $trigger;
 		}
-		$this->add($triggers);
-	}
 
-	/**
-	 * @param array $triggers
-	 */
-	protected function add(array $triggers) {
-		$this->triggers = zbx_toHash($triggers, 'triggerid');
+		$this->expandDescriptions();
+
+		return $this->triggers;
 	}
 
 	/**
@@ -117,7 +115,7 @@ class CTriggerDescription {
 	 *
 	 * @return array|string depends on $soloTrigger property
 	 */
-	public function expand() {
+	public function expandDescriptions() {
 		$expandHost = array();
 		$expandIp = array();
 		$expandItem = array();
@@ -159,14 +157,6 @@ class CTriggerDescription {
 		$this->expandItemMacros($expandItem);
 
 		$this->replaceMacroValues();
-
-		if ($this->soloTrigger) {
-			$trigger = reset($this->triggers);
-			return $trigger['description'];
-		}
-		else {
-			return $this->triggers;
-		}
 	}
 
 	/**

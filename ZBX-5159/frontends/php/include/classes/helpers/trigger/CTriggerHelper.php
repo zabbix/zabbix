@@ -22,17 +22,12 @@
 /**
  * Helper class that simplifies working with CTriggerDescription class.
  */
-class CDescription {
+class CTriggerHelper {
 
 	/**
 	 * @var CTriggerDescription
 	 */
 	private static $tDescription;
-
-	/**
-	 * @var CEventDescription
-	 */
-	private static $eDescription;
 
 	/**
 	 * Helper for CTriggerDescription->addTrigger.
@@ -44,10 +39,9 @@ class CDescription {
 	 *
 	 * @return string
 	 */
-	public static function expandTrigger(array $trigger) {
-		self::initTriggers();
-		self::$tDescription->addTrigger($trigger);
-		return self::$tDescription->expand();
+	public static function expandDescription(array $trigger) {
+		self::init();
+		return self::$tDescription->expand($trigger);
 	}
 
 	/**
@@ -60,10 +54,9 @@ class CDescription {
 	 *
 	 * @return array
 	 */
-	public static function expandTriggers(array $triggers) {
-		self::initTriggers();
-		self::$tDescription->addTriggers($triggers);
-		return self::$tDescription->expand();
+	public static function batchExpandDescription(array $triggers) {
+		self::init();
+		return self::$tDescription->batchExpand($triggers);
 	}
 
 	/**
@@ -76,10 +69,9 @@ class CDescription {
 	 *
 	 * @return string
 	 */
-	public static function expandTriggerById($triggerId) {
-		self::initTriggers();
-		self::$tDescription->addTriggerById($triggerId);
-		return self::$tDescription->expand();
+	public static function expandDescriptionById($triggerId) {
+		self::init();
+		return self::$tDescription->expandById($triggerId);
 	}
 
 	/**
@@ -92,31 +84,14 @@ class CDescription {
 	 *
 	 * @return array
 	 */
-	public static function expandTriggersById(array $triggerIds) {
-		self::initTriggers();
-		self::$tDescription->addTriggersById($triggerIds);
-		return self::$tDescription->expand();
+	public static function batchExpandDescriptionById(array $triggerIds) {
+		self::init();
+		return self::$tDescription->batchExpandById($triggerIds);
 	}
 
 	public static function expandReferenceMacros(array $trigger) {
-		self::initTriggers();
+		self::init();
 		return self::$tDescription->expandReferenceMacros($trigger);
-	}
-
-	/**
-	 * Helper for CEventDescription->addTrigger.
-	 *
-	 * @static
-	 * @see CEventDescription
-	 *
-	 * @param array $event
-	 *
-	 * @return string
-	 */
-	public static function expandEvent(array $event) {
-		self::initEvents();
-		self::$eDescription->addTrigger($event);
-		return self::$eDescription->expand();
 	}
 
 	/**
@@ -124,20 +99,9 @@ class CDescription {
 	 *
 	 * @static
 	 */
-	private static function initTriggers() {
+	private static function init() {
 		if (self::$tDescription === null) {
 			self::$tDescription = new CTriggerDescription();
-		}
-	}
-
-	/**
-	 * Create CEventDescription object and store in static variable.
-	 *
-	 * @static
-	 */
-	private static function initEvents() {
-		if (self::$eDescription === null) {
-			self::$eDescription = new CEventDescription();
 		}
 	}
 }
