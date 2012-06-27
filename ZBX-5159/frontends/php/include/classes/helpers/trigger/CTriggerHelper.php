@@ -30,7 +30,7 @@ class CTriggerHelper {
 	private static $tDescription;
 
 	/**
-	 * Helper for CTriggerDescription->addTrigger.
+	 * Helper for CTriggerDescription->expand.
 	 *
 	 * @static
 	 * @see CTriggerDescription
@@ -45,7 +45,7 @@ class CTriggerHelper {
 	}
 
 	/**
-	 * Helper for CTriggerDescription->addTriggers.
+	 * Helper for CTriggerDescription->batchExpand.
 	 *
 	 * @static
 	 * @see CTriggerDescription
@@ -60,7 +60,7 @@ class CTriggerHelper {
 	}
 
 	/**
-	 * Helper for CTriggerDescription->addTriggerById.
+	 * Helper for CTriggerDescription->expandById.
 	 *
 	 * @static
 	 * @see CTriggerDescription
@@ -75,7 +75,7 @@ class CTriggerHelper {
 	}
 
 	/**
-	 * Helper for CTriggerDescription->addTriggersById.
+	 * Helper for CTriggerDescription->batchExpandById.
 	 *
 	 * @static
 	 * @see CTriggerDescription
@@ -89,6 +89,16 @@ class CTriggerHelper {
 		return self::$tDescription->batchExpandById($triggerIds);
 	}
 
+	/**
+	 * Helper for CTriggerDescription->expandReferenceMacros.
+	 *
+	 * @static
+	 * @see CTriggerDescription
+	 *
+	 * @param array $trigger
+	 *
+	 * @return string
+	 */
 	public static function expandReferenceMacros(array $trigger) {
 		self::init();
 		return self::$tDescription->expandReferenceMacros($trigger);

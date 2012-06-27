@@ -442,6 +442,10 @@ class CTriggerDescription {
 		return true;
 	}
 
+	/**
+	 * Replace macros in trigger description by values.
+	 * All macros are resolved in one go.
+	 */
 	protected function replaceMacroValues() {
 		foreach ($this->triggers as &$trigger) {
 			$macroBegin = false;

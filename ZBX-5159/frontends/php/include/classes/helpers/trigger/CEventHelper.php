@@ -20,7 +20,7 @@
 
 
 /**
- * Helper class that simplifies working with CTriggerDescription class.
+ * Helper class that simplifies working with CEventDescription class.
  */
 class CEventHelper {
 
@@ -30,7 +30,7 @@ class CEventHelper {
 	private static $eDescription;
 
 	/**
-	 * Helper for CEventDescription->addTrigger.
+	 * Helper for CEventDescription->expand.
 	 *
 	 * @static
 	 * @see CEventDescription
