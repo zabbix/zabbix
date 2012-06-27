@@ -608,41 +608,31 @@ elseif ($_REQUEST['go'] == 'clean_history' && isset($_REQUEST['group_itemid'])) 
 	show_messages($go_result, _('History cleared'), $go_result);
 }
 elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_itemid'])) {
-	global $USER_DETAILS;
-
-	$go_result = true;
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_WRITE);
 	$group_itemid = $_REQUEST['group_itemid'];
 
-	$db_items = DBselect(
-		'SELECT h.name AS hostname,i.itemid,i.name,i.key_,i.templateid,i.type'.
-		' FROM items i,hosts h'.
-		' WHERE '.DBcondition('i.itemid', $group_itemid).
-			' AND h.hostid=i.hostid'.
-			' AND '.DBcondition('h.hostid', $available_hosts)
-	);
-	while ($item = DBfetch($db_items)) {
-		if ($item['templateid'] != ITEM_TYPE_ZABBIX) {
-			unset($group_itemid[$item['itemid']]);
-			error(_('Item').SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE._('Cannot delete item').SPACE.
-				'('._('Templated item').')');
-			continue;
-		}
-		elseif($item['type'] == ITEM_TYPE_HTTPTEST) {
-			unset($group_itemid[$item['itemid']]);
-			error(_('Item').SPACE."'".$item['hostname'].':'.itemName($item)."'".SPACE._('Cannot delete item').SPACE.
-				'('._('Web item').')');
-			continue;
-		}
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
-			_('Host').' ['.$item['hostname'].']');
-	}
+	$itemsToDelete = API::Item()->get(array(
+		'output' => array('key_', 'itemid'),
+		'selectHosts' => array('name'),
+		'itemids' => $group_itemid,
+		'preservekeys' => true
+	));
 
-	$go_result &= !empty($group_itemid);
-	if ($go_result) {
-		$go_result = API::Item()->delete($group_itemid);
+	$rs = API::Item()->delete($group_itemid);
+
+	if ($rs) {
+		foreach ($rs['itemids'] as $itemId) {
+			$item = $itemsToDelete[$itemId];
+			$host = reset($item['hosts']);
+
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, _('Item').' ['.$item['key_'].'] ['.$item['itemid'].'] '.
+				_('Host').' ['.$host['name'].']');
+		}
+
+		show_messages(true, _('Items deleted'));
 	}
-	show_messages($go_result, _('Items deleted'), _('Cannot delete items'));
+	else {
+		show_messages(false, null, _('Cannot delete items'));
+	}
 }
 if ($_REQUEST['go'] != 'none' && !empty($go_result)) {
 	$url = new CUrl();
