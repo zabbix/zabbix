@@ -1445,7 +1445,7 @@ class CService extends CZBXAPI {
 	 *
 	 * @return void
 	 */
-	protected function DFCircularitySearch($id, $depId, &$arr) {
+	protected function dfCircularitySearch($id, $depId, &$arr) {
 		if ($id == $depId) {
 			// cycle found
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Services form a circular dependency.'));
