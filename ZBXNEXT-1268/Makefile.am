@@ -26,10 +26,6 @@ dist-hook:
 	mv $(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java.new \
 		$(top_distdir)/src/zabbix_java/src/com/zabbix/gateway/GeneralInformation.java
 
-	@zabbix_fileversion=`grep '\<ZABBIX_VERSION\>' $(top_distdir)/include/version.h | awk '/\./ {print $$3}' | sed 's/"//g;s/[a-z].*//g;s/\./,/g'`; \
-	cat $(top_distdir)/build/win32/project/resource.h|sed  "s/{ZABBIX_FILEVERSION}/$$zabbix_fileversion/g" > $(top_distdir)/build/win32/project/resource.h.new; \
-	mv $(top_distdir)/build/win32/project/resource.h.new $(top_distdir)/build/win32/project/resource.h
-
 	rm -rf `find $(top_distdir) -name ".svn"`
 	rm -f $(top_distdir)/create/data/data_test.sql
 	rm -f $(top_distdir)/include/config.h

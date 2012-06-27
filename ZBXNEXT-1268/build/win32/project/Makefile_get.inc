@@ -1,6 +1,6 @@
 CC = cl.exe /nologo
 LINKER = link.exe /NOLOGO
-RC = rc.exe /d "ZABBIX_GET_DESC"
+RC = rc.exe /d "ZABBIX_GET"
 MC = mc.exe
 MT = mt.exe
 MESSAGES_H = messages.h

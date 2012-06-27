@@ -23,6 +23,7 @@
 #define APPLICATION_NAME	"Zabbix Agent"
 #define ZABBIX_REVDATE		"20 June 2012"
 #define ZABBIX_VERSION		"2.0.1rc2"
+#define ZABBIX_VERSION_WIN	2,0,1
 #define ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #endif
