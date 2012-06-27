@@ -47,9 +47,11 @@ class CHostsInfo extends CTable {
 
 		// fetch accessible host ids
 		$hosts = API::Host()->get(array(
+			'nodeids' => get_current_nodeid(true),
 			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => true
 		));
-		$hostIds = zbx_objectValues($hosts, 'hostid');
+		$hostIds = array_keys($hosts);
 
 		$cond_from = '';
 		if (remove_nodes_from_id($this->groupid) > 0) {
