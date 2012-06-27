@@ -131,7 +131,7 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['hosts'] as $host) {
 				if (!empty($host['items'])) {
 					foreach ($host['items'] as $item) {
-						$item = $this->renameItemFields($item);
+						$item = $this->formatItem($item);
 						$itemsData[$host['host']][$item['key_']] = $item;
 					}
 				}
@@ -141,7 +141,7 @@ class C20ImportFormatter extends CImportFormatter {
 			foreach ($this->data['templates'] as $template) {
 				if (!empty($template['items'])) {
 					foreach ($template['items'] as $item) {
-						$item = $this->renameItemFields($item);
+						$item = $this->formatItem($item);
 						$itemsData[$template['template']][$item['key_']] = $item;
 					}
 				}
@@ -269,6 +269,21 @@ class C20ImportFormatter extends CImportFormatter {
 		}
 
 		return $screensData;
+	}
+
+	/**
+	 * Format item.
+	 *
+	 * @param array $item
+	 *
+	 * @return array
+	 */
+	protected function formatItem(array $item) {
+		$item = $this->renameItemFields($item);
+
+		$item['applications'] = (!empty($item['applications'])) ? $item['applications'] : array();
+
+		return $item;
 	}
 
 	/**
