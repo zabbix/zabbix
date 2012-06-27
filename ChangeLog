@@ -857,6 +857,10 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.14
+
+1.8.14rc1 was released as 1.8.14 without any changes
+
 Changes for 1.8.14rc1
 
 A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)
