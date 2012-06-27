@@ -804,7 +804,7 @@ class CXmlImport18 {
 	}
 
 	public static function parseMain($rules){
-		$triggers_for_dependencies = array();
+		$triggersForDependencies = array();
 
 		if(!empty($rules['hosts']['updateExisting'])
 				|| !empty($rules['hosts']['createMissing'])
@@ -1420,7 +1420,7 @@ class CXmlImport18 {
 						);
 						$r = API::Trigger()->get($options);
 
-						$triggers_for_dependencies = array_merge($triggers_for_dependencies, $r);
+						$triggersForDependencies = array_merge($triggersForDependencies, $r);
 					}
 					if(!empty($triggers_to_add)){
 						$result = API::Trigger()->create($triggers_to_add);
@@ -1433,7 +1433,7 @@ class CXmlImport18 {
 							'output' => API_OUTPUT_EXTEND
 						);
 						$r = API::Trigger()->get($options);
-						$triggers_for_dependencies = array_merge($triggers_for_dependencies, $r);
+						$triggersForDependencies = array_merge($triggersForDependencies, $r);
 					}
 				}
 // }}} TRIGGERS
@@ -1677,32 +1677,32 @@ class CXmlImport18 {
 // DEPENDENCIES
 			$dependencies = $xpath->query('dependencies/dependency');
 
-			if($dependencies->length > 0){
-				$triggers_for_dependencies = zbx_objectValues($triggers_for_dependencies, 'triggerid');
-				$triggers_for_dependencies = array_flip($triggers_for_dependencies);
-				foreach($dependencies as $dependency){
-					$triggers_to_add_dep = array();
+			if ($dependencies->length > 0) {
+				$triggersForDependencies = zbx_objectValues($triggersForDependencies, 'triggerid');
+				$triggersForDependencies = array_flip($triggersForDependencies);
+				$newDependencies = array();
+				foreach ($dependencies as $dependency) {
 
-					$trigger_description = $dependency->getAttribute('description');
-					$current_triggerid = get_trigger_by_description($trigger_description);
+					$triggerDescription = $dependency->getAttribute('description');
+					$currentTrigger = get_trigger_by_description($triggerDescription);
 
-					if($current_triggerid && isset($triggers_for_dependencies[$current_triggerid['triggerid']])){
-						$depends_on_list = $xpath->query('depends', $dependency);
+					if ($currentTrigger && isset($triggersForDependencies[$currentTrigger['triggerid']])) {
+						$dependsOnList = $xpath->query('depends', $dependency);
 
-						foreach($depends_on_list as $depends_on){
-							$depends_triggerid = get_trigger_by_description($depends_on->nodeValue);;
-							if($depends_triggerid['triggerid']){
-								$triggers_to_add_dep[] = $depends_triggerid['triggerid'];
+						foreach ($dependsOnList as $dependsOn) {
+							$depTrigger = get_trigger_by_description($dependsOn->nodeValue);
+							if ($depTrigger['triggerid']) {
+								$newDependencies[] = array(
+									'triggerid' => $currentTrigger['triggerid'],
+									'dependsOnTriggerid' => $depTrigger['triggerid']
+								);
 							}
 						}
-						$r = API::Trigger()->update(array(
-							'triggerid' => $current_triggerid['triggerid'],
-							'dependencies' => $triggers_to_add_dep,
-						));
-						if($r === false){
-							throw new Exception();
-						}
 					}
+				}
+
+				if ($newDependencies) {
+					API::Trigger()->addDependencies($newDependencies);
 				}
 			}
 		}
