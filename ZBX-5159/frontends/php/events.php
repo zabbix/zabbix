@@ -198,10 +198,6 @@ if(isset($_REQUEST['filter_set']) || isset($_REQUEST['filter_rst'])){
 
 CProfile::update('web.events.source',$source, PROFILE_TYPE_INT);
 
-
-// js templates
-require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
-
 $events_wdgt = new CWidget();
 
 // header
@@ -735,6 +731,9 @@ $objData = array(
 zbx_add_post_js('jqBlink.blink();');
 zbx_add_post_js('timeControl.addObject("'.$dom_graph_id.'",'.zbx_jsvalue($timeline).','.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');
+
+// js templates
+require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php';
 
 $events_wdgt->show();
 if($csv_disabled) zbx_add_post_js('document.getElementById(\'csv_export\').disabled=true;');
