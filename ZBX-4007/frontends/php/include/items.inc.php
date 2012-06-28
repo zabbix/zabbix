@@ -667,10 +667,11 @@ function get_items_data_overview($hostids, $view_style) {
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
-		'monitored_hosts' => true,
-		'hostids' => $hostids,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => true,
+		'monitored_hosts' => true,
+		'hostids' => $hostids,
+		'with_monitored_items' => true,
 		'preservekeys' => true
 	));
 	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
