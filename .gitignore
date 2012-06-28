@@ -33,6 +33,7 @@ database/postgresql/schema.sql
 database/sqlite3/data.sql
 database/sqlite3/schema.sql
 /depcomp
+frontends/php/.htpasswd
 frontends/php/.idea
 frontends/php/conf/zabbix.conf.php
 frontends/php/conf/zabbix.conf.php.bckp

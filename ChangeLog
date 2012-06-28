@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5107] fixed in popup it is possible to select more than once (Toms)
 ...G...... [ZBX-5094] removed trailing backslash from return value {#FSNAME} by Windows agent (Sasha)
 ..F....... [ZBX-5188] fixed incorrect graph themes being used for graphs from child nodes (Pavels)
 A......... [ZBX-5155] fixed importing of triggers with dependencies from 1.8 to 2.0 (Pavels)
@@ -72,6 +73,14 @@ A......... [ZBX-4994] fixed sql error when try to remove host interface used in 
 ...G...... [ZBX-3897] fixed processing of proc.num[] item under FreeBSD; thanks to Jim Riggs (Sasha)
 A......... [ZBX-5026] fixed error messages when creating IT Service (Eduard)
 ..F....... [ZBX-5013] fixed requirements check in frontend setup (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.2rc2
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-5107] fixed in popup it is possible to select more than once (Toms)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.1
