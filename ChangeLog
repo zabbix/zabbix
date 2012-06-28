@@ -11,6 +11,9 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5065] fixed cannot delete a service with soft linked dependencies (Toms)
+A.F....... [ZBX-5065] added circularity check for IT services (Toms)
+..F....... [ZBX-2501] fixed subnodes not opening when parent node is opened in IT services (Toms)
 ..F....... [ZBX-2506] fixed ordering for dashboard filter; fixed multisort function (Toms)
 A......... [ZBX-5079] fixed returning triggers and graphs with no permissions and incorrect counts for templates (Toms)
 ..F....... [ZBX-2854] fixed table sorting icon positioning (Toms)
@@ -83,6 +86,9 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-5065] fixed cannot delete a service with soft linked dependencies (Toms)
+A.F....... [ZBX-5065] added circularity check for IT services (Toms)
+..F....... [ZBX-2501] fixed subnodes not opening when parent node is opened in IT services (Toms)
 ..F....... [ZBX-2506] fixed ordering for dashboard filter; fixed multisort function (Toms)
 A......... [ZBX-5079] fixed returning triggers and graphs with no permissions and incorrect counts for templates (Toms)
 ..F....... [ZBX-2854] fixed table sorting icon positioning (Toms)
