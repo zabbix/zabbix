@@ -272,11 +272,11 @@ abstract class CItemGeneral extends CZBXAPI {
 			// type of information
 			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE && $fullItem['value_type'] != ITEM_VALUE_TYPE_FLOAT
 					&& $fullItem['value_type'] != ITEM_VALUE_TYPE_UINT64) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Value type must be Numeric for aggregate items.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be "Numeric (float)" for aggregate items.'));
 			}
 
 			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG && str_in_array($itemKey->getKeyId(), array('log', 'logrt', 'eventlog'))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be Log for log key.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be "Log" for log key.'));
 			}
 
 			// update interval
