@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.0.1rc2');
+define('ZABBIX_VERSION',		'2.0.1');
 define('ZABBIX_API_VERSION',	'1.4');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);

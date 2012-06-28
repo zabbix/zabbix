@@ -181,12 +181,22 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			'output' => API_OUTPUT_EXTEND
 		);
 		$groups = API::HostGroup()->get($options);
-		order_result($groups, 'name');
+
+		foreach ($groups as &$group) {
+			$group['nodename'] = get_node_name_by_elid($group['groupid']);
+		}
+		unset($group);
+
+		$sortFields = array(
+			array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+			array('field' => 'name', 'order' => ZBX_SORT_UP)
+		);
+		CArrayHelper::sort($groups, $sortFields);
 
 		$lstGroups = new CListBox('del_groups[]', null, 15);
 		$lstGroups->setAttribute('style', 'width: 200px;');
 		foreach ($groups as $gnum => $group) {
-			$lstGroups->addItem($group['groupid'], get_node_name_by_elid($group['groupid'], true, ':').$group['name']);
+			$lstGroups->addItem($group['groupid'], $group['nodename'].': '.$group['name']);
 		}
 
 		if (!$filterEnable) {

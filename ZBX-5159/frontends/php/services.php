@@ -81,8 +81,7 @@ if (PAGE_TYPE_JS == $page['type'] || PAGE_TYPE_HTML_BLOCK == $page['type']) {
 	exit();
 }
 
-// get triggers and check permissions
-$available_triggers = get_accessible_triggers(PERM_READ_ONLY, array());
+// check permissions
 if (!empty($_REQUEST['serviceid'])) {
 	$service = API::Service()->get(array(
 		'output' => API_OUTPUT_EXTEND,
