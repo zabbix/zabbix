@@ -95,7 +95,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 		$table->addRow(array(
 			new CCol(new CLink(
-				_s('Zabbix %s Copyright 2001-2012 by Zabbix SIA', ZABBIX_VERSION),
+				_s('Zabbix %s Copyright %s-%s by Zabbix SIA', ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO),
 				'http://www.zabbix.com', 'highlight', null, true), 'center'),
 			new CCol(array(
 				new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
