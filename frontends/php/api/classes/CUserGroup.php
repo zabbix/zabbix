@@ -478,22 +478,26 @@ class CUserGroup extends CZBXAPI {
 	}
 
 	public function massUpdate($data) {
-
 		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can update user groups.'));
 		}
 
 		$usrgrpids = zbx_toArray($data['usrgrpids']);
-		$userids = (isset($data['userids']) && !is_null($data['userids'])) ? zbx_toArray($data['userids']) : null;;
-		$rights = zbx_toArray($data['rights']);
+		unset($data['usrgrpids']);
 
-		$update = array();
+		$userids = isset($data['userids']) ? zbx_toArray($data['userids']) : array();
+		unset($data['userids']);
 
-		if (isset($data['name']) && count($usrgrpids)>1) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, 'Multiple Name column');
+		$rights = isset($data['rights']) ? zbx_toArray($data['rights']) : array();
+		unset($data['rights']);
+
+		// check that we're not trying to set a single name to multiple groups
+		if (isset($data['name']) && count($usrgrpids) > 1) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update user group names.'));
 		}
 
-		foreach ($usrgrpids as $ugnum => $usrgrpid) {
+		$update = array();
+		foreach ($usrgrpids as $usrgrpid) {
 			if (isset($data['name'])) {
 				$groupExists = $this->get(array(
 					'filter' => array('name' => $data['name']),
@@ -512,9 +516,11 @@ class CUserGroup extends CZBXAPI {
 				);
 			}
 		}
-		DB::update('usrgrp', $update);
+		if ($update) {
+			DB::update('usrgrp', $update);
+		}
 
-		if (!is_null($userids)) {
+		if ($userids) {
 			$usrgrps = $this->get(array(
 				'usrgrpids' => $usrgrpids,
 				'output' => API_OUTPUT_EXTEND,
@@ -562,7 +568,7 @@ class CUserGroup extends CZBXAPI {
 				));
 		}
 
-		if (!is_null($rights)) {
+		if ($rights) {
 			$linkedRights = array();
 			$sql = 'SELECT groupid, permission, id'.
 				' FROM rights'.

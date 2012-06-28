@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5213] fixed usergroup.massupdate failing when updating only permissions or users (Pavels)
 ..F....... [ZBX-5145] fixed PosgreSQL error when inserting an audit record if the X_FORWARDED_FOR header value is too long (Pavels)
 ..F....... [ZBX-5065] fixed cannot delete a service with soft linked dependencies (Toms)
 A.F....... [ZBX-5065] added circularity check for IT services (Toms)
@@ -87,6 +88,7 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-5213] fixed usergroup.massupdate failing when updating only permissions or users (Pavels)
 ..F....... [ZBX-5145] fixed PosgreSQL error when inserting an audit record if the X_FORWARDED_FOR header value is too long (Pavels)
 ..F....... [ZBX-5065] fixed cannot delete a service with soft linked dependencies (Toms)
 A.F....... [ZBX-5065] added circularity check for IT services (Toms)
