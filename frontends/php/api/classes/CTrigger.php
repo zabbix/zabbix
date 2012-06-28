@@ -183,9 +183,6 @@ class CTrigger extends CTriggerGeneral {
 													' AND rr.permission<'.$permission.'))';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
@@ -616,41 +613,8 @@ class CTrigger extends CTriggerGeneral {
 
 		$triggerids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('t.triggerid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -854,7 +818,7 @@ class CTrigger extends CTriggerGeneral {
 		// adding groups
 		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'output' => $options['selectGroups'],
 				'triggerids' => $triggerids,
 				'preservekeys' => true
@@ -873,7 +837,7 @@ class CTrigger extends CTriggerGeneral {
 		// adding hosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'triggerids' => $triggerids,
 				'templated_hosts' => true,
 				'nopermissions' => true,
@@ -950,7 +914,7 @@ class CTrigger extends CTriggerGeneral {
 		// adding items
 		if (!is_null($options['selectItems']) && (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
 				'webitems' => true,
@@ -985,7 +949,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'itemids' => $ruleids,
 				'nopermissions' => true,
 				'preservekeys' => true,
@@ -2201,5 +2165,21 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return false;
+	}
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// only apply the node option if no specific ids are given
+		if ($options['groupids'] === null &&
+			$options['templateids'] === null &&
+			$options['hostids'] === null &&
+			$options['triggerids'] === null &&
+			$options['itemids'] === null &&
+			$options['applicationids'] === null &&
+			$options['discoveryids'] === null) {
+
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 }
