@@ -894,18 +894,18 @@
 				);
 			}
 
+			// set element to problem state if it has problem events, ignore unknown events
+			if ($info['info']) {
+				$info['iconid'] = $selement['iconid_on'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
+				$has_problem = true;
+			}
+
 			if($i['unknown']){
 				$info['info']['unknown'] = array(
 					'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 					'color' => $colors['Gray']
 				);
-			}
-
-			// only hi
-			if ($info['info']) {
-				$info['iconid'] = $selement['iconid_on'];
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-				$has_problem = true;
 			}
 		}
 		else if($i['unknown']){
@@ -916,7 +916,6 @@
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
-			$has_problem = true;
 		}
 
 		if($i['maintenance']){
@@ -981,17 +980,18 @@
 				);
 			}
 
+			// set element to problem state if it has problem events, ignore unknown events
+			if ($info['info']) {
+				$info['iconid'] = $selement['iconid_on'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
+				$has_problem = true;
+			}
+
 			if($i['unknown']){
 				$info['info']['unknown'] = array(
 					'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 					'color' => $colors['Gray']
 				);
-			}
-
-			if ($info['info']) {
-				$info['iconid'] = $selement['iconid_on'];
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-				$has_problem = true;
 			}
 		}
 		else if($i['unknown']){
@@ -1001,7 +1001,6 @@
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
-			$has_problem = true;
 		}
 
 		if($i['maintenance']){
@@ -1073,17 +1072,17 @@
 				);
 			}
 
+			if ($info['info']) {
+				$info['iconid'] = $selement['iconid_on'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
+				$has_problem = true;
+			}
+
 			if($i['unknown']){
 				$info['info']['unknown'] = array(
 					'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 					'color' => $colors['Gray']
 				);
-			}
-
-			if ($info['info']) {
-				$info['iconid'] = $selement['iconid_on'];
-				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-				$has_problem = true;
 			}
 		}
 		else if($i['unknown']){
@@ -1094,7 +1093,6 @@
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
-			$has_problem = true;
 		}
 
 		if($i['maintenance']){
