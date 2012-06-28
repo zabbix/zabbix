@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5108] fixed permission check errors caused by empty user groups (Pavels)
 A......... [ZBX-5208] fixed updating interfaces via host.massupdate (Pavels)
 A......... [ZBX-5208] fixed main interface validation in hostinterface.massremove (Pavels)
 A......... [ZBX-5208] fixed host.update only accepting arrays of interfaces and not working with a single interface (Pavels)
@@ -94,6 +95,7 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-5108] fixed permission check errors caused by empty user groups (Pavels)
 A......... [ZBX-5208] fixed updating interfaces via host.massupdate (Pavels)
 A......... [ZBX-5208] fixed main interface validation in hostinterface.massremove (Pavels)
 A......... [ZBX-5208] fixed host.update only accepting arrays of interfaces and not working with a single interface (Pavels)

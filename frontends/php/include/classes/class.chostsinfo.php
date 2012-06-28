@@ -45,7 +45,13 @@ class CHostsInfo extends CTable {
 
 		$total = 0;
 
-		$accessible_hosts = get_accessible_hosts_by_user(CWebUser::$data, PERM_READ_ONLY,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
+		// fetch accessible host ids
+		$hosts = API::Host()->get(array(
+			'nodeids' => get_current_nodeid(true),
+			'output' => API_OUTPUT_SHORTEN,
+			'preservekeys' => true
+		));
+		$hostIds = array_keys($hosts);
 
 		$cond_from = '';
 		if (remove_nodes_from_id($this->groupid) > 0) {
@@ -61,7 +67,7 @@ class CHostsInfo extends CTable {
 			' FROM hosts h'.$cond_from.
 			' WHERE h.available='.HOST_AVAILABLE_TRUE.
 				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND '.DBcondition('h.hostid', $accessible_hosts).
+				' AND '.DBcondition('h.hostid', $hostIds).
 				$cond_where
 		);
 
@@ -74,7 +80,7 @@ class CHostsInfo extends CTable {
 			' FROM hosts h'.$cond_from.
 			' WHERE h.available='.HOST_AVAILABLE_FALSE.
 				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND '.DBcondition('h.hostid', $accessible_hosts).
+				' AND '.DBcondition('h.hostid', $hostIds).
 				$cond_where
 		);
 
@@ -87,7 +93,7 @@ class CHostsInfo extends CTable {
 			' FROM hosts h'.$cond_from.
 			' WHERE h.available='.HOST_AVAILABLE_UNKNOWN.
 				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-				' AND '.DBcondition('h.hostid', $accessible_hosts).
+				' AND '.DBcondition('h.hostid', $hostIds).
 				$cond_where
 		);
 
