@@ -11,6 +11,11 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A.F....... [ZBX-4007] fixed using screen elements with resources from child nodes (Pavels)
+A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)
+..F....... [ZBX-4007] fixed undefined index when switching nodes in the screen selection pop up (Pavels)
+A......... [ZBX-4007] fixed node criteria being applied when passing the  "screenitemids" parameter to screen.get (Pavels)
+A......... [ZBX-4007] fixed hostgroup.get returning the "graphid" property (Pavels)
 ..F....... [ZBX-5108] fixed permission check errors caused by empty user groups (Pavels)
 A......... [ZBX-5208] fixed updating interfaces via host.massupdate (Pavels)
 A......... [ZBX-5208] fixed main interface validation in hostinterface.massremove (Pavels)
@@ -95,6 +100,11 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-4007] fixed using screen elements with resources from child nodes (Pavels)
+A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)
+..F....... [ZBX-4007] fixed undefined index when switching nodes in the screen selection pop up (Pavels)
+A......... [ZBX-4007] fixed node criteria being applied when passing the  "screenitemids" parameter to screen.get (Pavels)
+A......... [ZBX-4007] fixed hostgroup.get returning the "graphid" property (Pavels)
 ..F....... [ZBX-5108] fixed permission check errors caused by empty user groups (Pavels)
 A......... [ZBX-5208] fixed updating interfaces via host.massupdate (Pavels)
 A......... [ZBX-5208] fixed main interface validation in hostinterface.massremove (Pavels)
