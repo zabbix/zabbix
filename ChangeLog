@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5079] fixed returning triggers and graphs with no permissions and incorrect counts for templates (Toms)
 ..F....... [ZBX-2854] fixed table sorting icon positioning (Toms)
 ..F....... [ZBX-5107] fixed in popup it is possible to select more than once (Toms)
 ...G...... [ZBX-5094] removed trailing backslash from return value {#FSNAME} by Windows agent (Sasha)
@@ -81,6 +82,7 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-5079] fixed returning triggers and graphs with no permissions and incorrect counts for templates (Toms)
 ..F....... [ZBX-2854] fixed table sorting icon positioning (Toms)
 ..F....... [ZBX-5107] fixed in popup it is possible to select more than once (Toms)
 
