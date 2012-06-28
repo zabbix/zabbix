@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-2854] fixed table sorting icon positioning (Toms)
 ..F....... [ZBX-5107] fixed in popup it is possible to select more than once (Toms)
 ...G...... [ZBX-5094] removed trailing backslash from return value {#FSNAME} by Windows agent (Sasha)
 ..F....... [ZBX-5188] fixed incorrect graph themes being used for graphs from child nodes (Pavels)
@@ -80,6 +81,7 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-2854] fixed table sorting icon positioning (Toms)
 ..F....... [ZBX-5107] fixed in popup it is possible to select more than once (Toms)
 
 --------------------------------------------------------------------------------
