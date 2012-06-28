@@ -435,6 +435,9 @@ if (!is_null($excludeids)) {
 if (isset($only_hostid)) {
 	$frmTitle->addVar('only_hostid', $only_hostid);
 }
+if (get_request('screenid')) {
+	$frmTitle->addVar('screenid', get_request('screenid'));
+}
 
 // adding param to a form, so that it would remain when page is refreshed
 $frmTitle->addVar('dstfrm', $dstfrm);
