@@ -94,7 +94,7 @@ foreach ($ZBX_LOCALES as $loc_id => $loc_name) {
 	// checking if this locale exists in the system. The only way of doing it is to try and set one
 	// trying to set only the LC_MESSAGES locale to avoid changing LC_NUMERIC
 	$locale_exists = setlocale(LC_MESSAGES, zbx_locale_variants($loc_id)) || $loc_id == 'en_GB' ? 'yes' : 'no';
-	$selected = ($loc_id == $USER_DETAILS['lang']) ? true : null;
+	$selected = ($loc_id == $this->data['lang']) ? true : null;
 	$languageComboBox->addItem($loc_id, $loc_name, $selected, $locale_exists);
 
 	if ($locale_exists != 'yes') {
