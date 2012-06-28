@@ -1438,30 +1438,28 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 	}
 
 	zbx_value2array($obj);
-	$div = new CDiv();
-	$div->setAttribute('style', 'float:left;');
+	$cont = new CSpan();
 
-	foreach ($obj as $enum => $el) {
+	foreach ($obj as $el) {
 		if (is_object($el) || $el === SPACE) {
-			$div->addItem($el);
+			$cont->addItem($el);
 		}
 		else {
-			$div->addItem(new CSpan($el, 'underline'));
+			$cont->addItem(new CSpan($el, 'underline'));
 		}
 	}
-	$div->addItem(SPACE);
+	$cont->addItem(SPACE);
 
 	$img = null;
 	if (isset($_REQUEST['sort']) && $tabfield == $_REQUEST['sort']) {
 		if ($sortorder == ZBX_SORT_UP) {
-			$img = new CDiv(SPACE, 'icon_sortdown');
+			$img = new CSpan(SPACE, 'icon_sortdown');
 		}
 		else {
-			$img = new CDiv(SPACE, 'icon_sortup');
+			$img = new CSpan(SPACE, 'icon_sortup');
 		}
-		$img->setAttribute('style', 'float: left;');
 	}
-	$col = new CCol(array($div, $img), 'nowrap hover_grey');
+	$col = new CCol(array($cont, $img), 'nowrap hover_grey');
 	$col->setAttribute('onclick', $script);
 	return $col;
 }
