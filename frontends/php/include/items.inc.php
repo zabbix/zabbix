@@ -650,7 +650,6 @@ function get_items_data_overview($hostids, $view_style) {
 	global $USER_DETAILS;
 
 	$table = new CTableInfo(_('No items defined.'));
-
 	$db_items = DBselect(
 		'SELECT DISTINCT h.hostid,h.name AS hostname,i.itemid,i.key_,i.value_type,i.lastvalue,i.units,i.lastclock,'.
 			'i.name,t.priority,i.valuemapid,t.value AS tr_value,t.triggerid'.
@@ -668,9 +667,11 @@ function get_items_data_overview($hostids, $view_style) {
 	// fetch data for the host JS menu
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
-		'monitored_hosts' => true,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => true,
+		'monitored_hosts' => true,
+		'hostids' => $hostids,
+		'with_monitored_items' => true,
 		'preservekeys' => true
 	));
 	$hostScripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));

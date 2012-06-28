@@ -151,9 +151,6 @@ class CItem extends CItemGeneral {
 						' AND rr.permission<'.$permission.')';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
@@ -423,41 +420,8 @@ class CItem extends CItemGeneral {
 
 		$itemids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('i.itemid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-		$res = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($item = DBfetch($res)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -537,7 +501,7 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['selectHosts'])) {
 			if (is_array($options['selectHosts']) || str_in_array($options['selectHosts'], $subselectsAllowedOutputs)) {
 				$objParams = array(
-					'nodeids' => $nodeids,
+					'nodeids' => $options['nodeids'],
 					'itemids' => $itemids,
 					'templated_hosts' => true,
 					'output' => $options['selectHosts'],
@@ -568,7 +532,7 @@ class CItem extends CItemGeneral {
 		if (!is_null($options['selectInterfaces'])) {
 			if (is_array($options['selectInterfaces']) || str_in_array($options['selectInterfaces'], $subselectsAllowedOutputs)) {
 				$interfaces = API::HostInterface()->get(array(
-					'nodeids' => $nodeids,
+					'nodeids' => $options['nodeids'],
 					'itemids' => $itemids,
 					'output' => $options['selectInterfaces'],
 					'nopermissions' => true,
@@ -587,7 +551,7 @@ class CItem extends CItemGeneral {
 		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'itemids' => $itemids,
 				'preservekeys' => true
 			);
@@ -638,7 +602,7 @@ class CItem extends CItemGeneral {
 		// adding graphs
 		if (!is_null($options['selectGraphs'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'itemids' => $itemids,
 				'preservekeys' => true
 			);
@@ -689,7 +653,7 @@ class CItem extends CItemGeneral {
 		// adding applications
 		if (!is_null($options['selectApplications']) && str_in_array($options['selectApplications'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'output' => $options['selectApplications'],
 				'itemids' => $itemids,
 				'preservekeys' => true
@@ -734,7 +698,7 @@ class CItem extends CItemGeneral {
 			}
 
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'itemids' => $ruleids,
 				'filter' => array('flags' => null),
 				'nopermissions' => true,
@@ -1371,5 +1335,24 @@ class CItem extends CItemGeneral {
 		}
 
 		return $result;
+	}
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// only apply the node option if no specific ids are given
+		if ($options['groupids'] === null &&
+			$options['templateids'] === null &&
+			$options['hostids'] === null &&
+			$options['proxyids'] === null &&
+			$options['itemids'] === null &&
+			$options['interfaceids'] === null &&
+			$options['graphids'] === null &&
+			$options['triggerids'] === null &&
+			$options['applicationids'] === null &&
+			$options['discoveryids'] === null) {
+
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 }
