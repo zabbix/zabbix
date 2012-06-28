@@ -303,7 +303,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 
 	$options = array(
 		'hostids' => $hostid,
-		'output' => array('hostid', 'name', 'status', 'proxy_hostid', 'available'),
+		'output' => API_OUTPUT_EXTEND,
 		'templated_hosts' => true
 	);
 	if (isset($elements['items'])) {
@@ -376,19 +376,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 				break;
 		}
 
-		if ($dbHost['available'] == HOST_AVAILABLE_TRUE) {
-			$available = new CSpan(_('Available'), 'off');
-		}
-		elseif ($dbHost['available'] == HOST_AVAILABLE_FALSE) {
-			$available = new CSpan(_('Not available'), 'on');
-		}
-		elseif ($dbHost['available'] == HOST_AVAILABLE_UNKNOWN) {
-			$available = new CSpan(_('Unknown'), 'unknown');
-		}
-
 		$list->addItem(array(bold(_('Host').': '), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
 		$list->addItem($status);
-		$list->addItem(array(_('Availability').': ', $available));
+		$list->addItem(getAvailabilityTable($dbHost));
 	}
 
 	if (!empty($dbDiscovery)) {
@@ -566,4 +556,39 @@ function getSeverityControl($selectedSeverity = TRIGGER_SEVERITY_NOT_CLASSIFIED)
 	}
 
 	return new CDiv($controls, 'jqueryinputset control-severity');
+}
+
+/**
+ * Returns zbx, snmp, jmx, ipmi availability status icons.
+ *
+ * @param type $host
+ *
+ * @return CDiv
+ */
+function getAvailabilityTable($host) {
+	$arr = array('zbx', 'snmp', 'jmx', 'ipmi');
+
+	// for consistency in foreach loop
+	$host['zbx_available'] = $host['available'];
+	$host['zbx_error'] = $host['error'];
+
+	$ad = new CDiv(null, 'invisible');
+
+	foreach ($arr as $val) {
+		switch ($host[$val.'_available']) {
+			case HOST_AVAILABLE_TRUE:
+				$ai = new CDiv(SPACE, 'status_icon status_icon_extra icon'.$val.'available');
+				break;
+			case HOST_AVAILABLE_FALSE:
+				$ai = new CDiv(SPACE, 'status_icon status_icon_extra icon'.$val.'unavailable');
+				$ai->setHint($host[$val.'_error'], '', 'on');
+				break;
+			case HOST_AVAILABLE_UNKNOWN:
+				$ai = new CDiv(SPACE, 'status_icon status_icon_extra icon'.$val.'unknown');
+				break;
+		}
+		$ad->addItem($ai);
+	}
+
+	return $ad;
 }

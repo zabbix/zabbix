@@ -182,7 +182,7 @@ class CTree {
 
 	public function createJS() {
 		$js = '<script src="js/class.ctree.js" type="text/javascript"></script>'."\n".
-				'<script type="text/javascript"> var '.$this->treename.'_tree = [];';
+				'<script type="text/javascript"> var '.$this->treename.'_tree = {};';
 
 		foreach ($this->tree as $id => $rows) {
 			$parentid = $rows['parentid'];
@@ -191,6 +191,7 @@ class CTree {
 
 		foreach ($this->tree as $id => $rows) {
 			if ($rows['nodetype'] == '2') {
+				$rows['nodelist'] = rtrim($rows['nodelist'], ',');
 				$js .= $this->treename.'_tree[\''.$id.'\'] = { status: \'close\', nodelist : \''.$rows['nodelist'].'\', parentid : \''.$rows['parentid'].'\'};';
 				$js .= "\n";
 			}

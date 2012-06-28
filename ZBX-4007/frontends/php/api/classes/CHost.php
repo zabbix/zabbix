@@ -910,18 +910,17 @@ class CHost extends CZBXAPI {
 
 // Adding triggers
 		if (!is_null($options['selectTriggers'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
-			);
-
 			if (is_array($options['selectTriggers']) || str_in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
-				$objParams['output'] = $options['selectTriggers'];
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::Trigger()->get(array(
+					'nodeids' => $options['nodeids'],
+					'hostids' => $hostids,
+					'preservekeys' => true,
+					'output' => $options['selectTriggers']
+				));
 
-				if (!is_null($options['limitSelects'])) order_result($triggers, 'description');
+				if (!is_null($options['limitSelects'])) {
+					order_result($triggers, 'description');
+				}
 
 				$count = array();
 				foreach ($triggers as $triggerid => $trigger) {
@@ -944,32 +943,35 @@ class CHost extends CZBXAPI {
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$triggers = API::Trigger()->get($objParams);
+				$triggers = API::Trigger()->get(array(
+					'nodeids' => $nodeids,
+					'hostids' => $hostids,
+					'countOutput' => true,
+					'groupCount' => true
+				));
 				$triggers = zbx_toHash($triggers, 'hostid');
+
 				foreach ($result as $hostid => $host) {
-					if (isset($triggers[$hostid]))
+					if (isset($triggers[$hostid])) {
 						$result[$hostid]['triggers'] = $triggers[$hostid]['rowscount'];
-					else
+					}
+					else {
 						$result[$hostid]['triggers'] = 0;
+					}
 				}
 			}
 		}
 
 // Adding graphs
 		if (!is_null($options['selectGraphs'])) {
-			$objParams = array(
-				'nodeids' => $options['nodeids'],
-				'hostids' => $hostids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
-			);
-
 			if (is_array($options['selectGraphs']) || str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::Graph()->get(array(
+					'nodeids' => $options['nodeids'],
+					'hostids' => $hostids,
+					'preservekeys' => true,
+					'output' => $options['selectGraphs']
+				));
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($graphs, 'name');
@@ -996,10 +998,12 @@ class CHost extends CZBXAPI {
 				}
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
-				$objParams['countOutput'] = 1;
-				$objParams['groupCount'] = 1;
-
-				$graphs = API::Graph()->get($objParams);
+				$graphs = API::Graph()->get(array(
+					'nodeids' => $nodeids,
+					'hostids' => $hostids,
+					'countOutput' => true,
+					'groupCount' => true
+				));
 				$graphs = zbx_toHash($graphs, 'hostid');
 				foreach ($result as $hostid => $host) {
 					if (isset($graphs[$hostid]))
@@ -1852,7 +1856,7 @@ class CHost extends CZBXAPI {
 			));
 
 			$this->massRemove(array(
-				'hosts' => $hosts,
+				'hostids' => $hostids,
 				'interfaces' => $hostInterfaces
 			));
 			$this->massAdd(array(
