@@ -281,7 +281,9 @@ class C20ImportFormatter extends CImportFormatter {
 	protected function formatItem(array $item) {
 		$item = $this->renameItemFields($item);
 
-		$item['applications'] = (!empty($item['applications'])) ? $item['applications'] : array();
+		if (empty($item['applications'])) {
+			$item['applications'] = array();
+		}
 
 		return $item;
 	}
