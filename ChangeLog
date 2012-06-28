@@ -26,7 +26,6 @@ A......... [ZBX-5079] fixed returning triggers and graphs with no permissions an
 ..F....... [ZBX-5107] fixed in popup it is possible to select more than once (Toms)
 
 --------------------------------------------------------------------------------
-
 Changes for 2.0.1
 
 2.0.1rc2 was released as 2.0.1 without any changes
