@@ -124,25 +124,7 @@ $PAGE_HOSTS = get_viewed_hosts(PERM_READ_ONLY, $PAGE_GROUPS['selected'], $params
 validate_group_with_host($PAGE_GROUPS, $PAGE_HOSTS);
 
 $rep2_wdgt = new CWidget();
-
-// HEADER
-if (0 == $config) {
-	$available_groups = $PAGE_GROUPS['groupids'];
-	$available_hosts = $PAGE_HOSTS['hostids'];
-}
-else {
-	$available_groups = get_accessible_groups_by_user($USER_DETAILS, PERM_READ_ONLY);
-
-	if ($PAGE_HOSTS['selected'] != 0) {
-		$PAGE_HOSTS['hostids'] = $available_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY);
-	}
-	else {
-		$available_hosts = $PAGE_HOSTS['hostids'];
-	}
-}
-
 $rep2_wdgt->addPageHeader(_('AVAILABILITY REPORT'));
-//	show_report2_header($config, $PAGE_GROUPS, $PAGE_HOSTS);
 
 if (isset($_REQUEST['triggerid'])) {
 	$options = array(

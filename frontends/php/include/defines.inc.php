@@ -598,7 +598,6 @@ define('PERM_READ_ONLY',	2);
 define('PERM_READ_LIST',	1);
 define('PERM_DENY',			0);
 
-define('PERM_RES_STRING_LINE',	0); // return string of nodes id - '1,2,3,4,5'
 define('PERM_RES_IDS_ARRAY',	1); // return array of nodes id - array(1,2,3,4)
 define('PERM_RES_DATA_ARRAY',	2);
 
