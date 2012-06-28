@@ -21,12 +21,8 @@
 
 class CFlickerfreeScreenScreen extends CFlickerfreeScreenItem {
 
-	private $period;
-
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
-
-		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
 	}
 
 	public function get() {
@@ -38,9 +34,12 @@ class CFlickerfreeScreenScreen extends CFlickerfreeScreenItem {
 		$screen = reset($screen);
 
 		$flickerfreeScreen = new CFlickerfreeScreen(array(
+			'is_flickerfree' => $this->is_flickerfree,
+			'mode' => SCREEN_MODE_VIEW,
 			'screen' => $screen,
 			'period' => $this->period,
-			'mode' => SCREEN_MODE_VIEW
+			'stime' => $this->stime,
+			'profile_idx' => $this->profile_idx
 		));
 
 		return $this->getOutput($flickerfreeScreen->show(), false);
