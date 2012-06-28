@@ -60,7 +60,8 @@ else {
 	$flickerfreeScreen = new CFlickerfreeScreen(array(
 		'screen' => $this->data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
-		'period' => $effectiveperiod
+		'period' => $effectiveperiod,
+		'profile_idx' => 'web.screens'
 	));
 
 	$timeline = array(

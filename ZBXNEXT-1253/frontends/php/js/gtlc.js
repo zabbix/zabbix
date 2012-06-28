@@ -145,7 +145,7 @@ var timeControl = {
 
 			// refresh
 			if (obj.refresh) {
-				this.refreshGraph(obj.domid);
+				this.refreshImage(obj.domid);
 			}
 		}
 	},
@@ -178,7 +178,7 @@ var timeControl = {
 		}
 	},
 
-	refreshGraph: function(objid) {
+	refreshImage: function(objid) {
 		var obj = this.objectList[objid];
 		var period = this.getPeriod(objid);
 		var stime = this.getSTime(objid);
@@ -249,8 +249,13 @@ var timeControl = {
 			}
 		}
 
-		var scrl = scrollCreate(obj.domid, width, obj.timeline.timelineid, this.objectList[objid].periodFixed,
-			this.objectList[objid].sliderMaximumTimePeriod);
+		var scrl = scrollCreate(
+			obj.domid,
+			width,
+			obj.timeline.timelineid,
+			this.objectList[objid].periodFixed,
+			this.objectList[objid].sliderMaximumTimePeriod
+		);
 		scrl.onchange = this.objectUpdate.bind(this);
 
 		if (obj.dynamic && !is_null($(img))) {
@@ -275,10 +280,10 @@ var timeControl = {
 		}
 
 		var date = new CDate((usertime - period) * 1000);
-		var url_stime = date.getZBXDate();
+		var stime = date.getZBXDate();
 
 		if (obj.dynamic) {
-			this.updateProfile(obj.id, url_stime, period); // ajax update of starttime and period
+			this.updateProfile(obj.id, stime, period); // ajax update of starttime and period
 
 			if (obj.mainObject) {
 				for (var key in this.objectList) {
@@ -289,12 +294,14 @@ var timeControl = {
 					if (this.objectList[key].dynamic) {
 						this.objectList[key].timeline.period(period);
 						this.objectList[key].timeline.usertime(usertime);
-						this.loadDynamic(this.objectList[key].domid, url_stime, period);
+						this.loadDynamic(this.objectList[key].domid, stime, period);
 
 						if (isset(key, ZBX_SCROLLBARS)) {
+
 							ZBX_SCROLLBARS[key].setBarPosition();
 							ZBX_SCROLLBARS[key].setGhostByBar();
 							ZBX_SCROLLBARS[key].setTabInfo();
+
 							if (this.objectList[key].loadImage && !is_null($(obj.domid))) {
 								ZBX_SCROLLBARS[key].disabled = 1;
 							}
@@ -303,7 +310,7 @@ var timeControl = {
 				}
 			}
 			else {
-				this.loadDynamic(obj.domid, url_stime, period);
+				this.loadDynamic(obj.domid, stime, period);
 
 				if (isset(objid, ZBX_SCROLLBARS)) {
 					ZBX_SCROLLBARS[objid].setBarPosition();
@@ -319,14 +326,29 @@ var timeControl = {
 		else {
 			if (this.refreshPage) {
 				var url = new Curl(location.href);
-				url.setArgument('stime', url_stime);
+				url.setArgument('stime', stime);
 				url.setArgument('period', period);
 				url.unsetArgument('output');
 
 				location.href = url.getUrl();
 			}
 			else {
-				flickerfreeScreen.refreshAll(period, url_stime);
+				flickerfreeScreen.refreshAll(period, stime);
+			}
+		}
+
+		for (var key in this.objectList) {
+			if (empty(this.objectList[key]) || !this.objectList[key].mainObject) {
+				continue;
+			}
+
+			this.objectList[key].timeline.period(period);
+			this.objectList[key].timeline.usertime(usertime);
+
+			if (isset(key, ZBX_SCROLLBARS)) {
+				ZBX_SCROLLBARS[key].setBarPosition();
+				ZBX_SCROLLBARS[key].setGhostByBar();
+				ZBX_SCROLLBARS[key].setTabInfo();
 			}
 		}
 	},
@@ -335,9 +357,9 @@ var timeControl = {
 		// unix timestamp
 		var usertime = 1600000000;
 		var period = 3600;
-		var url_stime = 201911051255;
+		var stime = 201911051255;
 
-		this.updateProfile(id, url_stime, period);
+		this.updateProfile(id, stime, period);
 
 		for (var key in this.objectList) {
 			if (empty(this.objectList[key])) {
@@ -347,7 +369,7 @@ var timeControl = {
 			if (this.objectList[key].dynamic) {
 				this.objectList[key].timeline.period(period);
 				this.objectList[key].timeline.usertime(usertime);
-				this.loadDynamic(this.objectList[key].domid, url_stime, period);
+				this.loadDynamic(this.objectList[key].domid, stime, period);
 
 				if (isset(key, ZBX_SCROLLBARS)) {
 					ZBX_SCROLLBARS[key].setBarPosition();
@@ -443,7 +465,7 @@ function datetoarray(unixtime) {
 	var thedate = [];
 
 	thedate[0] = date.getDate();
-	thedate[1] = date.getMonth()+1;
+	thedate[1] = date.getMonth() + 1;
 	thedate[2] = date.getFullYear();
 	thedate[3] = date.getHours();
 	thedate[4] = date.getMinutes();
@@ -707,7 +729,7 @@ var CScrollBar = Class.create(CDebug, {
 	disabled:		1,		// activates/disables scrollbars
 	maxperiod:		null,	// max period in seconds
 
-	initialize: function($super, sbid, timelineid, width, fixedperiod, maximalperiod) { // where to put bar on start(time on graph)
+	initialize: function($super, sbid, timelineid, width, fixedperiod, maximalperiod) {
 		this.scrollbarid = sbid;
 		$super('CScrollBar[' + sbid + ']');
 		this.maxperiod = maximalperiod;
@@ -734,7 +756,7 @@ var CScrollBar = Class.create(CDebug, {
 			this.appendNavLinks();
 			this.appendCalendars();
 
-			// after px2sec is set.	important!
+			// after px2sec is set. important!
 			this.position.bar = getDimensions(this.bar);
 			this.setBarPosition();
 			this.setGhostByBar();
@@ -766,7 +788,7 @@ var CScrollBar = Class.create(CDebug, {
 	scrollmouseover: function() { // u may use this func to attach some function on mouseover from scroll method
 	},
 
-	onchange: function() { // executed every time the bar period or bar time is changed(mouse button released)
+	onchange: function() { // executed every time the bar period or bar time is changed (mouse button released)
 	},
 
 	//------- MOVE -------
@@ -779,8 +801,6 @@ var CScrollBar = Class.create(CDebug, {
 
 		this.timeline.setNow();
 		this.timeline.period(this.maxperiod);
-
-		// bar
 		this.setBarPosition();
 		this.setGhostByBar();
 		this.setTabInfo();
@@ -793,9 +813,8 @@ var CScrollBar = Class.create(CDebug, {
 		if (this.disabled) {
 			return false;
 		}
-		this.timeline.period(zoom);
 
-		// bar
+		this.timeline.period(zoom);
 		this.setBarPosition();
 		this.setGhostByBar();
 		this.setTabInfo();
@@ -912,7 +931,7 @@ var CScrollBar = Class.create(CDebug, {
 
 		if (is_null(periodWidth)) {
 			var periodTime = this.timeline.period();
-			var width = Math.round(periodTime / this.px2sec); // Ceil
+			var width = Math.round(periodTime / this.px2sec);
 			periodWidth = width;
 		}
 		else {
@@ -945,7 +964,7 @@ var CScrollBar = Class.create(CDebug, {
 			}
 			right = width;
 
-			// actual bar dimensions shouldnt be over side limits
+			// actual bar dimensions shouldn't be over side limits
 			rightSide = right;
 		}
 
@@ -956,7 +975,7 @@ var CScrollBar = Class.create(CDebug, {
 			}
 			right = this.size.scrollline;
 
-			// actual bar dimensions shouldnt be over side limits
+			// actual bar dimensions shouldn't be over side limits
 			rightSide = right;
 		}
 
@@ -1004,7 +1023,6 @@ var CScrollBar = Class.create(CDebug, {
 
 		var dimensions = getDimensions(this.dom.ghost);
 
-		// bar: set time
 		this.setBarPosition(dimensions.right, dimensions.width, false);
 		this.onBarChange();
 	},
@@ -1160,7 +1178,7 @@ var CScrollBar = Class.create(CDebug, {
 		var pD = {
 			'left': jQuery(this.dom.overlevel).offset().left,
 			'width': jQuery(this.dom.overlevel).width()
-		}
+		};
 
 		// TODO: write proper function
 		jQuery(element).draggable({
@@ -1220,7 +1238,7 @@ var CScrollBar = Class.create(CDebug, {
 		var pD = {
 			'left': jQuery(this.dom.overlevel).offset().left,
 			'width': jQuery(this.dom.overlevel).width()
-		}
+		};
 
 		// TODO: write proper function
 		jQuery(element).draggable({
@@ -1307,7 +1325,7 @@ var CScrollBar = Class.create(CDebug, {
 		var date = new CDate(time * 1000);
 		var TimezoneOffset = date.getTimezoneOffset();
 
-		return TimezoneOffset*60;
+		return TimezoneOffset * 60;
 	},
 
 	getTZdiff: function(time1, time2) {
@@ -1346,7 +1364,6 @@ var CScrollBar = Class.create(CDebug, {
 		// timeline update
 		var starttime = this.timeline.starttime();
 		var period = this.timeline.period();
-
 		var new_usertime = parseInt(dim.right * this.px2sec, 10) + starttime;
 		var new_period = parseInt(dim.width * this.px2sec, 10);
 
@@ -1503,7 +1520,6 @@ var CScrollBar = Class.create(CDebug, {
 
 		return str;
 	},
-
 
 	//----------------------------------------------------------------
 	//-------- SCROLL CREATION ---------------------------------------
@@ -2276,7 +2292,7 @@ var sbox = Class.create(CDebug, {
 		}
 
 		if (this.mouse_event.left < this.cobj.left) {
-			w = 0
+			w = 0;
 		}
 
 		return w;

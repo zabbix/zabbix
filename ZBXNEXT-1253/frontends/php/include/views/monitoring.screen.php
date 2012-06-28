@@ -118,11 +118,11 @@ else {
 	$screenWidget->addHeader($screen['name'], $headerForm);
 
 	$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
-
 	$flickerfreeScreen = new CFlickerfreeScreen(array(
 		'screen' => $screen,
 		'effectiveperiod' => $effectiveperiod,
-		'mode' => SCREEN_MODE_PREVIEW
+		'mode' => SCREEN_MODE_PREVIEW,
+		'profile_idx' => 'web.screens'
 	));
 	$screenWidget->addItem($flickerfreeScreen->show());
 
@@ -131,25 +131,13 @@ else {
 		'period' => $effectiveperiod,
 		'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
 	);
-
 	if (!empty($this->data['stime'])) {
 		$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
 	}
 
-	$objData = array(
-		'id' => $screen['screenid'],
-		'domid' => 'screen_scroll',
-		'loadSBox' => 0,
-		'loadImage' => 0,
-		'loadScroll' => 1,
-		'scrollWidthByImage' => 0,
-		'dynamic' => 0,
-		'mainObject' => 1,
-		'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
-		'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-	);
-	zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($objData).');');
-	zbx_add_post_js('timeControl.processObjects();');
+	CFlickerfreeScreen::insertScreenScrollJs($screen['screenid'], $timeline);
+	CFlickerfreeScreen::insertProcessObjectsJs();
+
 	$screenWidget->addItem(BR());
 }
 

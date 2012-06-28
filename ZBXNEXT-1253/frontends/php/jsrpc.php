@@ -179,8 +179,10 @@ switch ($data['method']) {
 			'mode' => $mode,
 			'hostid' => !empty($data['hostid']) ? $data['hostid'] : 0,
 			'period' => !empty($data['period']) ? $data['period'] : ZBX_MAX_PERIOD,
-			'stime' => !empty($data['stime']) ? $data['stime'] : null
+			'stime' => !empty($data['stime']) ? $data['stime'] : null,
+			'profile_idx' => !empty($data['profile_idx']) ? $data['profile_idx'] : null
 		));
+		$flickerfreeScreen->updateProfile();
 		$flickerfreeScreen = $flickerfreeScreen->get();
 
 		if (!empty($flickerfreeScreen)) {

@@ -21,14 +21,9 @@
 
 class CFlickerfreeScreenPlainText extends CFlickerfreeScreenItem {
 
-	private $period;
-	private $stime;
-
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
 
-		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
-		$this->stime = !empty($options['stime']) ? $options['stime'] : get_request('stime', null);
 		if (!empty($this->stime)) {
 			$this->stime = zbxDateToTime($this->stime);
 		}

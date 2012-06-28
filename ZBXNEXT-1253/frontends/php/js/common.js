@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 // jQuery no conflict
 if (typeof(jQuery) != 'undefined') {
@@ -36,7 +37,7 @@ function empty(obj) {
 	if (obj === false) {
 		return true;
 	}
-	if (is_string(obj) && (obj === '')) {
+	if (is_string(obj) && obj === '') {
 		return true;
 	}
 	return is_array(obj) && obj.length == 0;
@@ -72,7 +73,7 @@ function is_string(obj) {
 }
 
 function is_array(obj) {
-	return (obj != null) && (typeof obj == "object") && ('splice' in obj) && ('join' in obj);
+	return (obj != null) && (typeof obj == 'object') && ('splice' in obj) && ('join' in obj);
 }
 
 function SDI(msg) {
@@ -371,7 +372,7 @@ function getPosition(obj) {
 				pos.left += obj.offsetLeft;
 				pos.top += obj.offsetTop;
 
-				if (IE && (obj.offsetParent.toString() == 'unknown')) {
+				if (IE && obj.offsetParent.toString() == 'unknown') {
 					break;
 				}
 			}
@@ -402,7 +403,7 @@ function get_bodywidth() {
 
 	if (KQ) {
 		w = (w2 < w) ? w2 : w;
-		w-=16;
+		w -=16;
 	}
 	else {
 		w = (w2 < w) ? w2 : w;
@@ -472,7 +473,7 @@ function openWinCentered(loc, winname, iwidth, iheight, params) {
 		params = ', ' + params;
 	}
 
-	var WinObjReferer = window.open(loc, winname, 'width=' + iwidth + ',height=' + iheight + ',top=' + tp + ',left=' + lf + params);
+	var WinObjReferer = window.open(loc, winname, 'width=' + iwidth + ', height=' + iheight + ', top=' + tp + ', left=' + lf + params);
 	WinObjReferer.focus();
 }
 
@@ -489,7 +490,7 @@ function PopUp(url, width, height, form_name) {
 	var left = (screen.width - (width + 150)) / 2;
 	var top = (screen.height - (height + 150)) / 2;
 
-	var popup = window.open(url, form_name, 'width=' + width + ',height=' + height + ',top=' + top + ',left=' + left + ',resizable=yes,scrollbars=yes,location=no,menubar=no');
+	var popup = window.open(url, form_name, 'width=' + width + ', height=' + height + ', top=' + top + ', left=' + left + ', resizable=yes, scrollbars=yes, location=no, menubar=no');
 	popup.focus();
 	return false;
 }
@@ -526,7 +527,7 @@ function redirect(uri, method, needle) {
 			hInput.setAttribute('value', args[key]);
 		}
 
-		postForm.setAttribute('action', url.getPath()+'?'+action.substr(1));
+		postForm.setAttribute('action', url.getPath() + '?' + action.substr(1));
 		postForm.submit();
 	}
 	return false;
@@ -569,7 +570,7 @@ function remove_childs(form_name, rmvbyname, tag) {
 		if (rmvbyname && rmvbyname != name) {
 			continue;
 		}
-		remove_element(frmForm.elements[i],tag);
+		remove_element(frmForm.elements[i], tag);
 		i--;
 	}
 }

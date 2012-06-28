@@ -104,9 +104,6 @@ define('PAGE_TYPE_TEXT_FILE',	8); // api call
 define('PAGE_TYPE_TEXT',		9); // simple text
 define('PAGE_TYPE_CSV',			10); // CSV format
 
-define('PAGE_VIEW_NORMAL',		0);
-define('PAGE_VIEW_FULLSCREEN',	1);
-
 define('ZBX_SESSION_ACTIVE',	0);
 define('ZBX_SESSION_PASSIVE',	1);
 

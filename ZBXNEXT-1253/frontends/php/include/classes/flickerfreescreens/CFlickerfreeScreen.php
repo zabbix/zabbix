@@ -25,11 +25,13 @@ class CFlickerfreeScreen {
 	public $is_template;
 	public $screen;
 	public $mode;
+	public $profile_idx;
 
 	public function __construct(array $options = array()) {
 		$this->is_flickerfree = isset($options['is_flickerfree']) ? $options['is_flickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
 		$this->is_template = isset($options['is_template']) ? $options['is_template'] : false;
+		$this->profile_idx = !empty($options['profile_idx']) ? $options['profile_idx'] : '';
 
 		// get screen
 		if (!empty($options['screen'])) {
@@ -261,7 +263,8 @@ class CFlickerfreeScreen {
 					$flickerfreeScreen = CFlickerfreeScreen::getScreen(array(
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem,
-						'mode' => $this->mode
+						'mode' => $this->mode,
+						'profile_idx' => $this->profile_idx
 					));
 
 					if (!empty($flickerfreeScreen)) {
@@ -371,10 +374,9 @@ class CFlickerfreeScreen {
 	}
 
 	public static function insertScreenScrollJs($id, $timeline) {
-		$domGraphId = 'screen_scroll';
 		$timeControlData = array(
 			'id' => $id,
-			'domid' => $domGraphId,
+			'domid' => 'screen_scroll',
 			'loadSBox' => 0,
 			'loadImage' => 0,
 			'loadScroll' => 1,
@@ -384,7 +386,7 @@ class CFlickerfreeScreen {
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 		);
 
-		zbx_add_post_js('timeControl.addObject("'.$domGraphId.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
 	}
 
 	public static function insertInitScreenJs($screenid) {
@@ -399,19 +401,25 @@ class CFlickerfreeScreen {
 class CFlickerfreeScreenItem {
 
 	public $is_flickerfree;
+	public $mode;
 	public $screenid;
 	public $screenitem;
-	public $mode;
 	public $action;
 	public $id;
 	public $hostid;
+	public $period;
+	public $stime;
+	public $profile_idx;
 
 	public function __construct(array $options = array()) {
 		$this->is_flickerfree = isset($options['is_flickerfree']) ? $options['is_flickerfree'] : true;
-		$this->screenid = isset($options['screenid']) ? $options['screenid'] : null;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
-		$this->action = isset($options['action']) ? $options['action'] : '';
+		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
+		$this->action = !empty($options['action']) ? $options['action'] : '';
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : get_request('hostid', 0);
+		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
+		$this->stime = !empty($options['stime']) ? $options['stime'] : get_request('stime', null);
+		$this->profile_idx = !empty($options['profile_idx']) ? $options['profile_idx'] : '';
 
 		// get screenitem
 		if (!empty($options['screenitem'])) {
@@ -429,6 +437,17 @@ class CFlickerfreeScreenItem {
 
 		if (empty($this->screenid) && !empty($this->screenitem)) {
 			$this->screenid = $this->screenitem['screenid'];
+		}
+	}
+
+	public function updateProfile() {
+		if (!empty($this->profile_idx)) {
+			if (!empty($this->period) && $this->period >= ZBX_MIN_PERIOD) {
+				CProfile::update($this->profile_idx.'.period', $this->period, PROFILE_TYPE_INT, $this->screenid);
+			}
+			if (!empty($this->stime)) {
+				CProfile::update($this->profile_idx.'.stime', $this->stime, PROFILE_TYPE_STR, $this->screenid);
+			}
 		}
 	}
 
@@ -463,7 +482,8 @@ class CFlickerfreeScreenItem {
 				'refreshInterval' => CWebUser::$data['refresh'],
 				'hostid' => $this->hostid,
 				'period' => get_request('period', null),
-				'stime' => get_request('stime', null)
+				'stime' => get_request('stime', null),
+				'profile_idx' => $this->profile_idx
 			);
 			zbx_add_post_js('flickerfreeScreen.add('.zbx_jsvalue($data).');');
 		}
