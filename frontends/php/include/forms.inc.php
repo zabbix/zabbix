@@ -447,7 +447,7 @@
 		$dataTypeInput->setEnabled('no');
 
 		// filter table
-		$table = new CTable('', 'filter filter-item');
+		$table = new CTable('', 'filter');
 		$table->setCellPadding(0);
 		$table->setCellSpacing(0);
 
