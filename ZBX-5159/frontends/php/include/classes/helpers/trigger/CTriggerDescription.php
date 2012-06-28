@@ -22,18 +22,6 @@
 class CTriggerDescription {
 
 	/**
-	 * @var array
-	 */
-	protected $triggers;
-
-	/**
-	 * Values to replace for macros.
-	 *
-	 * @var array
-	 */
-	protected $macroValues = array();
-
-	/**
 	 * Add one trigger to expand description.
 	 * Trigger array must have 'triggerid', 'description' and 'expression' fields.
 	 *
@@ -42,9 +30,8 @@ class CTriggerDescription {
 	 * @return string
 	 */
 	public function expand(array $trigger) {
-		$this->triggers = array($trigger['triggerid'] => $trigger);
-		$this->expandDescriptions();
-		$trigger = reset($this->triggers);
+		$triggers = $this->expandDescriptions(array($trigger['triggerid'] => $trigger));
+		$trigger = reset($triggers);
 
 		return $trigger['description'];
 	}
@@ -58,10 +45,7 @@ class CTriggerDescription {
 	 * @return array
 	 */
 	public function batchExpand(array $triggers) {
-		$this->triggers = zbx_toHash($triggers, 'triggerid');
-		$this->expandDescriptions();
-
-		return $this->triggers;
+		return $this->expandDescriptions(zbx_toHash($triggers, 'triggerid'));
 	}
 
 	/**
@@ -77,9 +61,8 @@ class CTriggerDescription {
 					' FROM triggers t'.
 					' WHERE t.triggerid='.$triggerId
 		));
-		$this->triggers = array($trigger['triggerid'] => $trigger);
-		$this->expandDescriptions();
-		$trigger = reset($this->triggers);
+		$triggers = $this->expandDescriptions(array($trigger['triggerid'] => $trigger));
+		$trigger = reset($triggers);
 
 		return $trigger['description'];
 	}
@@ -97,13 +80,12 @@ class CTriggerDescription {
 				' FROM triggers t'.
 				' WHERE '.DBcondition('t.triggerid', $triggerIds)
 		);
+		$triggers = array();
 		while ($trigger = DBfetch($dbTriggers)) {
-			$this->triggers[$trigger['triggerid']] = $trigger;
+			$triggers[$trigger['triggerid']] = $trigger;
 		}
 
-		$this->expandDescriptions();
-
-		return $this->triggers;
+		return $this->expandDescriptions($triggers);
 	}
 
 	/**
@@ -113,15 +95,18 @@ class CTriggerDescription {
 	 * System macros: {HOSTNAME}, {HOST.HOST}, {HOST.NAME}, {IPADDRESS}, {HOST.IP}
 	 *     {HOST.DNS}, {HOST.CONN}, {ITEM.LASTVALUE}, {ITEM.VALUE}
 	 *
-	 * @return array|string depends on $soloTrigger property
+	 * @param array $triggers
+	 *
+	 * @return array
 	 */
-	public function expandDescriptions() {
+	public function expandDescriptions(array $triggers) {
 		$expandHost = array();
 		$expandIp = array();
 		$expandItem = array();
+		$macroValues = array();
 
-		foreach ($this->triggers as $tid => $trigger) {
-			$this->triggers[$tid]['description'] = $this->expandReferenceMacros($trigger);
+		foreach ($triggers as $tid => $trigger) {
+			$triggers[$tid]['description'] = $this->expandReferenceMacros($trigger);
 
 			$functions = $this->findFunctions($trigger['expression']);
 
@@ -149,14 +134,18 @@ class CTriggerDescription {
 				}
 			}
 
-			$this->expandUserMacros($trigger);
+			$macroValues[$trigger['triggerid']] = $this->expandUserMacros($trigger);
 		}
 
-		$this->expandHostMacros($expandHost);
-		$this->expandIpMacros($expandIp);
-		$this->expandItemMacros($expandItem);
+		$macroValues = $this->expandHostMacros($expandHost, $macroValues);
+		$macroValues = $this->expandIpMacros($expandIp, $macroValues);
+		$macroValues = $this->expandItemMacros($expandItem, $triggers, $macroValues);
 
-		$this->replaceMacroValues();
+		foreach ($triggers as $triggerId => $trigger) {
+			$triggers[$triggerId] = $this->replaceMacroValues($trigger, $macroValues[$triggerId]);
+		}
+
+		return $triggers;
 	}
 
 	/**
@@ -199,18 +188,16 @@ class CTriggerDescription {
 	 * @return mixed
 	 */
 	protected function expandUserMacros(array $trigger) {
+		$macros = array();
+
 		if (preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $matches)) {
 			$macros = API::UserMacro()->getMacros(array(
 				'macros' => $matches[1],
 				'triggerid' => $trigger['triggerid']
 			));
-
-			foreach ($macros as $macro => $value) {
-				$this->macroValues[$trigger['triggerid']][$macro] = $value;
-			}
 		}
 
-		return true;
+		return $macros;
 	}
 
 	/**
@@ -292,10 +279,11 @@ class CTriggerDescription {
 	 * Expand host macros.
 	 *
 	 * @param array $expandHost
+	 * @param array $macroValues
 	 *
 	 * @return bool
 	 */
-	protected function expandHostMacros(array $expandHost) {
+	protected function expandHostMacros(array $expandHost, array $macroValues = array()) {
 		if (!empty($expandHost)) {
 			$dbFuncs = DBselect(
 				'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name'.
@@ -319,29 +307,30 @@ class CTriggerDescription {
 
 					if ($fNum == 0 || $fNum == 1) {
 						$m = '{'.$macro.'}';
-						$this->macroValues[$func['triggerid']][$m] = $replace;
+						$macroValues[$func['triggerid']][$m] = $replace;
 						$m = '{'.$macro.'1}';
-						$this->macroValues[$func['triggerid']][$m] = $replace;
+						$macroValues[$func['triggerid']][$m] = $replace;
 					}
 					else {
 						$m = '{'.$macro.$fNum.'}';
-						$this->macroValues[$func['triggerid']][$m] = $replace;
+						$macroValues[$func['triggerid']][$m] = $replace;
 					}
 				}
 			}
 		}
 
-		return true;
+		return $macroValues;
 	}
 
 	/**
 	 * Expand interface macros.
 	 *
 	 * @param array $expandIp
+	 * @param array $macroValues
 	 *
 	 * @return bool
 	 */
-	protected function expandIpMacros(array $expandIp) {
+	protected function expandIpMacros(array $expandIp, array $macroValues = array()) {
 		if (!empty($expandIp)) {
 			$priorities = array(
 				INTERFACE_TYPE_AGENT => 4,
@@ -383,28 +372,30 @@ class CTriggerDescription {
 
 				if ($fNum == 0 || $fNum == 1) {
 					$m = '{'.$macro.'}';
-					$this->macroValues[$interface['triggerid']][$m] = $replace;
+					$macroValues[$interface['triggerid']][$m] = $replace;
 					$m = '{'.$macro.'1}';
-					$this->macroValues[$interface['triggerid']][$m] = $replace;
+					$macroValues[$interface['triggerid']][$m] = $replace;
 				}
 				else {
 					$m = '{'.$macro.$fNum.'}';
-					$this->macroValues[$interface['triggerid']][$m] = $replace;
+					$macroValues[$interface['triggerid']][$m] = $replace;
 				}
 			}
 		}
 
-		return true;
+		return $macroValues;
 	}
 
 	/**
 	 * Expand item macros.
 	 *
 	 * @param array $expandItem
+	 * @param array $triggers
+	 * @param array $macroValues
 	 *
 	 * @return bool
 	 */
-	protected function expandItemMacros(array $expandItem) {
+	protected function expandItemMacros(array $expandItem, array $triggers, array $macroValues = array()) {
 		if (!empty($expandItem)) {
 			$dbFuncs = DBselect(
 				'SELECT DISTINCT f.triggerid,f.functionid,i.itemid,i.lastvalue,i.lastclock,i.value_type,i.units,i.valuemapid,m.newvalue'.
@@ -421,60 +412,64 @@ class CTriggerDescription {
 							$replace = $this->resolveItemLastvalueMacro($func);
 							break;
 						case 'ITEM.VALUE':
-							$replace = $this->resolveItemValueMacro($func);
+							$replace = $this->resolveItemValueMacro($func, $triggers[$func['triggerid']]);
 							break;
 					}
 
 					if ($fNum == 0 || $fNum == 1) {
 						$m = '{'.$macro.'}';
-						$this->macroValues[$func['triggerid']][$m] = $replace;
+						$macroValues[$func['triggerid']][$m] = $replace;
 						$m = '{'.$macro.'1}';
-						$this->macroValues[$func['triggerid']][$m] = $replace;
+						$macroValues[$func['triggerid']][$m] = $replace;
 					}
 					else {
 						$m = '{'.$macro.$fNum.'}';
-						$this->macroValues[$func['triggerid']][$m] = $replace;
+						$macroValues[$func['triggerid']][$m] = $replace;
 					}
 				}
 			}
 		}
 
-		return true;
+		return $macroValues;
 	}
 
 	/**
 	 * Replace macros in trigger description by values.
 	 * All macros are resolved in one go.
+	 *
+	 * @param array $trigger
+	 * @param array $macroValues
+	 *
+	 * @return array
 	 */
-	protected function replaceMacroValues() {
-		foreach ($this->triggers as &$trigger) {
-			$macroBegin = false;
-			for ($i = 0; $i < zbx_strlen($trigger['description']); $i++) {
-				$c = zbx_substr($trigger['description'], $i, 1);
+	protected function replaceMacroValues(array $trigger, array $macroValues) {
+		$macroBegin = false;
+		for ($i = 0; $i < zbx_strlen($trigger['description']); $i++) {
+			$c = zbx_substr($trigger['description'], $i, 1);
 
-				switch ($c) {
-					case '{':
-						$macroBegin = $i;
-						break;
-					case '}':
-						if ($macroBegin !== false) {
-							$macro = zbx_substr($trigger['description'], $macroBegin, $i - $macroBegin + 1);
-							if (isset($this->macroValues[$trigger['triggerid']][$macro])) {
-								$replace = $this->macroValues[$trigger['triggerid']][$macro];
-								$trigger['description'] = zbx_substr_replace(
-									$trigger['description'],
-									$replace,
-									$macroBegin,
-									zbx_strlen($macro)
-								);
-								$i = $macroBegin + zbx_strlen($replace);
-							}
+			switch ($c) {
+				case '{':
+					$macroBegin = $i;
+					break;
+				case '}':
+					if ($macroBegin !== false) {
+						$macro = zbx_substr($trigger['description'], $macroBegin, $i - $macroBegin + 1);
+						if (isset($macroValues[$macro])) {
+							$replace = $macroValues[$macro];
+							$trigger['description'] = zbx_substr_replace(
+								$trigger['description'],
+								$replace,
+								$macroBegin,
+								zbx_strlen($macro)
+							);
+							$i = $macroBegin + zbx_strlen($replace);
 						}
-						break;
-				}
+					}
+					break;
 			}
 		}
-		unset($trigger);
+
+		return $trigger;
 	}
 
 	/**
@@ -503,10 +498,11 @@ class CTriggerDescription {
 	 * @see CEventDescription
 	 *
 	 * @param array $item
+	 * @param array $trigger
 	 *
 	 * @return string
 	 */
-	protected function resolveItemValueMacro(array $item) {
+	protected function resolveItemValueMacro(array $item, array $trigger) {
 		return $this->resolveItemLastvalueMacro($item);
 	}
 }

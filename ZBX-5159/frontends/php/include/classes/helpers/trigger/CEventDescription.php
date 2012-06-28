@@ -21,12 +21,12 @@
 
 class CEventDescription extends CTriggerDescription {
 
-	protected function resolveItemValueMacro(array $item) {
+	protected function resolveItemValueMacro(array $item, array $trigger) {
 		$item['lastvalue'] = item_get_history(
 			$item,
 			0,
-			$this->triggers[$item['triggerid']]['clock'],
-			$this->triggers[$item['triggerid']]['ns']
+			$trigger['clock'],
+			$trigger['ns']
 		);
 
 		return formatItemValue($item);
