@@ -1,3 +1,7 @@
+Changes for 1.8.15rc1
+
+A......... [ZBX-4929] optimized host groups sql queries (Eduard)
+
 Changes for 1.8.14
 
 1.8.14rc1 was released as 1.8.14 without any changes
