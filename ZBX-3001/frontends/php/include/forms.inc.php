@@ -63,12 +63,12 @@
 			$data['user_groups']	= zbx_toHash($userGroup);
 
 			$data['user_medias'] = array();
-			$db_medias = DBselect('SELECT m.mediaid, m.mediatypeid, m.period, m.sendto, m.severity, m.active'.
+			$dbMedias = DBselect('SELECT m.mediaid, m.mediatypeid, m.period, m.sendto, m.severity, m.active'.
 					' FROM media m'.
 					' WHERE m.userid='.$userid
 			);
-			while ($db_media = DBfetch($db_medias)) {
-				$data['user_medias'][] = $db_media;
+			while ($dbMedia = DBfetch($dbMedias)) {
+				$data['user_medias'][] = $dbMedia;
 			}
 
 			if ($data['autologout'] > 0) {
@@ -118,12 +118,12 @@
 		// set media types
 		if (!empty($data['user_medias'])) {
 			$mediaTypeDescriptions = array();
-			$db_media_types = DBselect(
+			$dbMediaTypes = DBselect(
 				'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
 					DBcondition('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
 			);
-			while ($db_media_type = DBfetch($db_media_types)) {
-				$mediaTypeDescriptions[$db_media_type['mediatypeid']] = $db_media_type['description'];
+			while ($dbMediaType = DBfetch($dbMediaTypes)) {
+				$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
 			}
 
 			foreach ($data['user_medias'] as &$media) {
