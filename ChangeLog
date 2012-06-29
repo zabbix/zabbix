@@ -3,6 +3,8 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-5232] fixed import of templated low level discoveries (Pavels)
+A......... [ZBX-5232] fixed errors when importing empty low level discoveries and items without applications (Pavels)
 .D........ [ZBX-2510] clarify in the Zabbix sender manpage which parameters from the agent config file sender supports (Richlv)
 A.F....... [ZBX-4007] fixed using screen elements with resources from child nodes (Pavels)
 A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)
