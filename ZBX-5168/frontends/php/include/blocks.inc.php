@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/graphs.inc.php';
 require_once dirname(__FILE__).'/screens.inc.php';
 require_once dirname(__FILE__).'/maps.inc.php';
@@ -183,8 +183,18 @@ function make_system_status($filter) {
 		'preservekeys' => true
 	);
 	$groups = API::HostGroup()->get($options);
+
+	foreach($groups as &$group) {
+		$group['nodename'] = get_node_name_by_elid($group['groupid']);
+	}
+	unset($group);
+
 	// we need natural sort
-	order_result($groups, 'name');
+	$sortFields = array(
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
+	CArrayHelper::sort($groups, $sortFields);
 
 	$groupids = array();
 	foreach ($groups as $group) {
@@ -276,7 +286,7 @@ function make_system_status($filter) {
 	foreach ($groups as $group) {
 		$group_row = new CRow();
 		if (is_show_all_nodes()) {
-			$group_row->addItem(get_node_name_by_elid($group['groupid']));
+			$group_row->addItem($group['nodename']);
 		}
 
 		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
@@ -348,7 +358,18 @@ function make_hoststat_summary($filter) {
 	);
 	$groups = API::HostGroup()->get($options);
 	$groups = zbx_toHash($groups, 'groupid');
-	order_result($groups, 'name');
+
+	foreach($groups as &$group) {
+		$group['nodename'] = get_node_name_by_elid($group['groupid']);
+	}
+	unset($group);
+
+	// we need natural sort
+	$sortFields = array(
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
+	CArrayHelper::sort($groups, $sortFields);
 
 	// get hosts
 	$options = array(
@@ -524,7 +545,7 @@ function make_hoststat_summary($filter) {
 
 		$group_row = new CRow();
 		if (is_show_all_nodes()) {
-			$group_row->addItem(get_node_name_by_elid($group['groupid']));
+			$group_row->addItem($group['nodename']);
 		}
 
 		$name = new CLink($group['name'], 'tr_status.php?groupid='.$group['groupid'].'&hostid=0&show_triggers='.TRIGGERS_OPTION_ONLYTRUE);
@@ -866,7 +887,7 @@ function make_latest_issues(array $filter = array()) {
 		));
 		if ($event = reset($events)) {
 			$ack = getEventAckState($event, true, true, $ackParams);
-			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])), ZBX_FLAG_EVENT);
+			$description = CEventHelper::expandDescription(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])));
 
 			// actions
 			$actions = get_event_actions_stat_hints($event['eventid']);
@@ -914,6 +935,19 @@ function make_webmon_overview($filter) {
 		'output' => array('groupid', 'name'),
 		'preservekeys' => true
 	));
+
+	foreach($groups as &$group) {
+		$group['nodename'] = get_node_name_by_elid($group['groupid']);
+	}
+	unset($group);
+
+	// we need natural sort
+	$sortFields = array(
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
+	CArrayHelper::sort($groups, $sortFields);
+
 	$availableHosts = API::Host()->get(array(
 		'groupids' => array_keys($groups),
 		'monitored_hosts' => true,
@@ -967,7 +1001,7 @@ function make_webmon_overview($filter) {
 
 		if ($showGroup) {
 			$table->addRow(array(
-				is_show_all_nodes() ? get_node_name_by_elid($group['groupid']) : null,
+				is_show_all_nodes() ? $group['nodename'] : null,
 				$group['name'],
 				new CSpan($okCount, 'off'),
 				new CSpan($failedCount, $failedCount ? 'on' : 'off'),
@@ -987,7 +1021,19 @@ function make_discovery_status() {
 		'output' => API_OUTPUT_EXTEND
 	);
 	$drules = API::DRule()->get($options);
-	order_result($drules, 'name');
+
+	foreach($drules as &$drule) {
+		$drule['nodename'] = get_node_name_by_elid($drule['druleid']);
+	}
+	unset($drule);
+
+	// we need natural sort
+	$sortFields = array(
+		array('field' => 'nodename', 'order' => ZBX_SORT_UP),
+		array('field' => 'name', 'order' => ZBX_SORT_UP)
+	);
+	CArrayHelper::sort($drules, $sortFields);
+
 
 	foreach ($drules as $drnum => $drule) {
 		$drules[$drnum]['up'] = 0;
@@ -1015,8 +1061,8 @@ function make_discovery_status() {
 
 	foreach ($drules as $drule) {
 		$table->addRow(array(
-			get_node_name_by_elid($drule['druleid']),
-			new CLink(get_node_name_by_elid($drule['druleid'], null, ': ').$drule['name'], 'discovery.php?druleid='.$drule['druleid']),
+			$drule['nodename'],
+			new CLink($drule['nodename'].($drule['nodename'] ? ': ' : '').$drule['name'], 'discovery.php?druleid='.$drule['druleid']),
 			new CSpan($drule['up'], 'green'),
 			new CSpan($drule['down'], ($drule['down'] > 0) ? 'red' : 'green')
 		));

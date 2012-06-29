@@ -435,6 +435,9 @@ if (!is_null($excludeids)) {
 if (isset($only_hostid)) {
 	$frmTitle->addVar('only_hostid', $only_hostid);
 }
+if (get_request('screenid')) {
+	$frmTitle->addVar('screenid', get_request('screenid'));
+}
 
 // adding param to a form, so that it would remain when page is refreshed
 $frmTitle->addVar('dstfrm', $dstfrm);
@@ -703,7 +706,7 @@ elseif ($srctbl == 'host_group') {
 			}
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); return false;';
 		}
-		$name->setAttribute('onclick', $js_action);
+		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow(array(
 			$multiselect ? new CCheckBox('groups['.zbx_jsValue($group[$srcfld1]).']', null, null, $group['groupid']) : null,
@@ -760,7 +763,7 @@ elseif ($srctbl == 'host_templates') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$name->setAttribute('onclick', $js_action);
+		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow(array(
 			$multiselect ? new CCheckBox('templates['.zbx_jsValue($template[$srcfld1]).']', null, null, $template['templateid']) : null,
@@ -857,7 +860,7 @@ elseif ($srctbl == 'usrgrp') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$name->setAttribute('onclick', $js_action);
+		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow(array(
 			$multiselect ? new CCheckBox('usrgrps['.$userGroup['usrgrpid'].']', null, null, $userGroup['usrgrpid']) : null,
@@ -917,7 +920,7 @@ elseif ($srctbl == 'users') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$alias->setAttribute('onclick', $js_action);
+		$alias->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow(array(
 			$multiselect ? new CCheckBox('users['.zbx_jsValue($user[$srcfld1]).']', null, null, $user['userid']) : null,
@@ -1012,7 +1015,7 @@ elseif ($srctbl == 'triggers') {
 			);
 			$js_action = 'addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); return false;';
 		}
-		$description->setAttribute('onclick', $js_action);
+		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if (count($trigger['dependencies']) > 0) {
 			$description = array(
@@ -1023,7 +1026,7 @@ elseif ($srctbl == 'triggers') {
 			);
 
 			foreach ($trigger['dependencies'] as $val) {
-				$description[] = array(expand_trigger_description_by_data($val), BR());
+				$description[] = array(CTriggerHelper::expandDescription($val), BR());
 			}
 		}
 
@@ -1140,7 +1143,7 @@ elseif ($srctbl == 'items') {
 			// if we need to submit parent window
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).', '.($submitParent ? 'true' : 'false').'); return false;';
 		}
-		$description->setAttribute('onclick', $js_action);
+		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow(array(
 			$hostid > 0 ? null : $item['hostname'],
@@ -1239,7 +1242,7 @@ elseif ($srctbl == 'prototypes') {
 			// if we need to submit parent window
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).', '.($submitParent ? 'true' : 'false').'); return false;';
 		}
-		$description->setAttribute('onclick', $js_action);
+		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$description = new CCol(array(new CCheckBox('items['.zbx_jsValue($item[$srcfld1]).']', null, null, $item['itemid']), $description));
@@ -1393,7 +1396,7 @@ elseif ($srctbl == 'graphs') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$description->setAttribute('onclick', $js_action);
+		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$description = new CCol(array(new CCheckBox('graphs['.zbx_jsValue($graph[$srcfld1]).']', null, null, $graph['graphid']), $description));
@@ -1514,7 +1517,7 @@ elseif ($srctbl == 'simple_graph') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$description->setAttribute('onclick', $js_action);
+		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$description = new CCol(array(new CCheckBox('items['.zbx_jsValue($item[$srcfld1]).']', null, null, $item['itemid']), $description));
@@ -1590,7 +1593,7 @@ elseif ($srctbl == 'sysmaps') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$description->setAttribute('onclick', $js_action);
+		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$description = new CCol(array(new CCheckBox('sysmaps['.zbx_jsValue($sysmap[$srcfld1]).']', null, null, $sysmap['sysmapid']), $description));
@@ -1705,7 +1708,7 @@ elseif ($srctbl == 'slides') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$name->setAttribute('onclick', $js_action);
+		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$name = new CCol(array(new CCheckBox('slides['.zbx_jsValue($row[$srcfld1]).']', null, null, $row['slideshowid']), $name));
@@ -1767,7 +1770,7 @@ elseif ($srctbl == 'screens') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$name->setAttribute('onclick', $js_action);
+		$name->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$name = new CCol(array(new CCheckBox('screens['.zbx_jsValue($row[$srcfld1]).']', null, null, $row['screenid']), $name));
@@ -2004,7 +2007,7 @@ elseif ($srctbl == 'scripts') {
 			);
 			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
 		}
-		$description->setAttribute('onclick', $js_action);
+		$description->setAttribute('onclick', $js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
 			$description = new CCol(array(new CCheckBox('scripts['.zbx_jsValue($script[$srcfld1]).']', null, null, $script['scriptid']), $description));

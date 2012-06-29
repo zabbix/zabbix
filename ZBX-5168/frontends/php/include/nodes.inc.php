@@ -147,10 +147,9 @@ function get_current_nodeid($force_all_nodes = null, $perm = null) {
 	return $result;
 }
 
-function get_viewed_nodes($options = array()) {
+function get_viewed_nodes() {
 	global $ZBX_LOCALNODEID;
 
-	$options = zbx_array_merge(array('allow_all' => 0), $options);
 	$result = array('selected' => 0, 'nodes' => array(), 'nodeids' => array());
 
 	if (!defined('ZBX_NOT_ALLOW_ALL_NODES')) {
@@ -326,7 +325,9 @@ function delete_node($nodeid) {
 			DBexecute('UPDATE nodes SET masterid=NULL WHERE masterid='.$nodeid) &&
 			DBexecute('DELETE FROM nodes WHERE nodeid='.$nodeid)
 		);
-		error(_('Please be aware that database still contains data related to the deleted node.'));
+		if ($nodetype != ZBX_NODE_MASTER) {
+			error(_('Please be aware that database still contains data related to the deleted node.'));
+		}
 	}
 	return $result;
 }

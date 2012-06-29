@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 
 function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 	$available_hosts = $PAGE_HOSTS['hostids'];
@@ -96,11 +95,11 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 			' ORDER BY t.description';
 		$result=DBselect($sql);
 
-		while($row=DBfetch($result)){
+		while ($row = DBfetch($result)) {
 			$cmbTrigs->addItem(
-					$row['triggerid'],
-					get_node_name_by_elid($row['triggerid'], null, ': ').expand_trigger_description($row['triggerid'])
-					);
+				$row['triggerid'],
+				get_node_name_by_elid($row['triggerid'], null, ': ').CTriggerHelper::expandDescriptionById($row['triggerid'])
+			);
 		}
 
 		$filterForm->addRow(_('Template trigger'),$cmbTrigs);
@@ -176,7 +175,7 @@ function get_report2_filter($config,&$PAGE_GROUPS, &$PAGE_HOSTS){
 
 	$filterForm->addItemToBottomRow($reset);
 
-return $filterForm;
+	return $filterForm;
 }
 
 function bar_report_form(){
@@ -715,4 +714,3 @@ function bar_report_form3(){
 
 	return $reportForm;
 }
-?>

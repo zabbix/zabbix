@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/services.inc.php';
@@ -118,14 +118,16 @@ else {
 		'output' => array('name', 'serviceid', 'showsla', 'goodsla', 'algorithm'),
 		'selectParent' => API_OUTPUT_EXTEND,
 		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
-		'selectTrigger' => array('description', 'triggerid'),
+		'selectTrigger' => array('description', 'triggerid', 'expression'),
 		'preservekeys' => true,
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
 	));
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
-	$triggers = expandTriggerDescriptions(zbx_toHash($triggers, 'triggerid'));
+
+	$triggers = CTriggerHelper::batchExpandDescription($triggers);
+
 	foreach ($services as &$service) {
 		if ($service['trigger']) {
 			$service['trigger'] = $triggers[$service['trigger']['triggerid']];
@@ -189,4 +191,3 @@ else {
 	}
 }
 include_once('include/page_footer.php');
-?>

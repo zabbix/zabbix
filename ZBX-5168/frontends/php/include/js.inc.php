@@ -232,65 +232,6 @@ function insert_show_color_picker_javascript() {
 	zbx_add_post_js('create_color_picker();');
 }
 
-function insert_javascript_for_tweenbox() {
-	global $page;
-	if (defined('SHOW_TWINBOX_SCRIPT_INSERTTED') || (PAGE_TYPE_HTML != $page['type'])) {
-		return null;
-	}
-	define('SHOW_TWINBOX_SCRIPT_INSERTTED', 1);
-
-	$js = '
-		function moveListBoxSelectedItem(formname, objname, from, to, action) {
-			var result = true
-
-			from = $(from);
-			to = $(to);
-
-			var j = 0;
-			var i = 0;
-			while (i < from.options.length) {
-				if (from.options[i].selected == true && from.options[i].disabled != true) {
-					var temp = from.options[i].cloneNode(true);
-
-					if (action.toLowerCase() == "add") {
-						result &= create_var(formname, objname + "[" + from.options[i].value + "]", from.options[i].value, false);
-					}
-					else if (action.toLowerCase() == "rmv") {
-						result &= remove_element(objname + "_" + from.options[i].value, "input");
-					}
-
-					while (true) {
-						if (to.options.length == 0) {
-							$(to).insert(from.options[i]);
-							break;
-						}
-
-						if (from.options[i].innerHTML.toLowerCase() < to.options[j].innerHTML.toLowerCase()) {
-							$(to.options[j]).insert({
-								before: from.options[i]
-							});
-							break;
-						}
-
-						if (typeof(to.options[j + 1]) == "undefined" || is_null(to.options[j + 1])) {
-							$(to.options[j]).insert({
-								after: from.options[i]
-							});
-							break;
-						}
-
-						j++;
-					}
-					continue;
-				}
-				i++;
-			}
-			return result;
-		}';
-	insert_js($js);
-	zbx_add_post_js('if (IE7) $$("select option[disabled]").each(function(e) { e.setStyle({color: "gray"}); });');
-}
-
 function insert_javascript_for_visibilitybox() {
 	if (defined('CVISIBILITYBOX_JAVASCRIPT_INSERTED')) {
 		return null;

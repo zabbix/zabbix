@@ -75,6 +75,24 @@ class CArrayHelper {
 	}
 
 	/**
+	 * Converts the field with the given key to either an empty array, if the field is empty, or to an array with numeric keys.
+	 * If the field with the given key does not exist, does nothing.
+	 *
+	 * @param array  $array
+	 * @param string $fieldKey
+	 */
+	public static function convertFieldToArray(array &$array, $fieldKey) {
+		if (array_key_exists($fieldKey, $array)) {
+			if (is_array($array[$fieldKey])) {
+				$array[$fieldKey] = array_values($array[$fieldKey]);
+			}
+			else {
+				$array[$fieldKey] = array();
+			}
+		}
+	}
+
+	/**
 	 * Sort array by multiple fields.
 	 *
 	 * @static
@@ -105,17 +123,14 @@ class CArrayHelper {
 	 */
 	protected static function compare($a, $b) {
 		foreach (self::$fields as $field) {
-			if (!(isset($a[$field['field']]) && isset($b[$field['field']]))) {
+			if (!isset($a[$field['field']]) || !isset($b[$field['field']])) {
+				// this is wrong, we cannot compare the values, if they are missing
 				return 0;
 			}
 
-			if ($a[$field['field']] != $b[$field['field']]) {
-				if ($field['order'] == ZBX_SORT_UP) {
-					return strnatcasecmp($a[$field['field']], $b[$field['field']]);
-				}
-				else {
-					return strnatcasecmp($b[$field['field']], $a[$field['field']]);
-				}
+			$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
+			if ($cmp != 0) {
+				return $cmp * ($field['order'] == ZBX_SORT_UP?1:-1);
 			}
 		}
 		return 0;
