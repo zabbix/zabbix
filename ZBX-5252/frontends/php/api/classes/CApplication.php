@@ -775,7 +775,7 @@ class CApplication extends CZBXAPI {
 			foreach ($parentApplications as $parentApplicationId => $parentApplication) {
 				$exApplication = null;
 
-				// update by tempalteid
+				// update by templateid
 				if (isset($exApplicationsTpl[$parentApplicationId])) {
 					$exApplication = $exApplicationsTpl[$parentApplicationId];
 				}
