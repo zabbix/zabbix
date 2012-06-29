@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 /**
  * Convert windows events type constant in to the string representation
  *
@@ -770,7 +770,7 @@ function get_item_data_overview_cells(&$table_row, &$ithosts, $hostname) {
 				$ack = null;
 			}
 		}
-		$value = format_lastvalue($ithosts[$hostname]);
+		$value = formatItemValue($ithosts[$hostname]);
 
 		$it_ov_menu = array(
 			array(_('Values'), null, null, array('outer' => array('pum_oheader'), 'inner' => array('pum_iheader'))),
@@ -887,27 +887,57 @@ function delete_trends_by_itemid($itemIds) {
 	return $r1 && $r2;
 }
 
-function format_lastvalue($db_item) {
-	if (!isset($db_item['lastvalue']) || $db_item['lastclock'] == 0) {
+/**
+ * Format item lastvalue.
+ * First try to apply value map if any is defined for item. If applied successfully it is returned.
+ * If value map was not applied, format value depending on it's value type.
+ *
+ * @param array $item
+ *
+ * @return string
+ */
+function formatItemValue(array $item) {
+	if (!isset($item['lastvalue']) || $item['lastclock'] == 0) {
 		return '-';
 	}
-	if ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$lastvalue=convert_units($db_item['lastvalue'], $db_item['units']);
+
+	$value = null;
+	if ($item['valuemapid'] > 0) {
+		$value = applyValueMap($item['lastvalue'], $item['valuemapid']);
 	}
-	elseif ($db_item['value_type'] == ITEM_VALUE_TYPE_STR || $db_item['value_type'] == ITEM_VALUE_TYPE_TEXT || $db_item['value_type'] == ITEM_VALUE_TYPE_LOG) {
-		$lastvalue = $db_item['lastvalue'];
-		if (zbx_strlen($lastvalue) > 20) {
-			$lastvalue = zbx_substr($lastvalue, 0, 20).' ...';
+
+	if ($value != $item['lastvalue']) {
+		$value = formatItemValueType($item);
+	}
+
+	return $value;
+}
+
+/**
+ * Format item lastvalue depending on it's value type.
+ *
+ * @param array $item
+ *
+ * @return string
+ */
+function formatItemValueType(array $item) {
+	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+		$value = convert_units($item['lastvalue'], $item['units']);
+	}
+	elseif ($item['value_type'] == ITEM_VALUE_TYPE_STR
+			|| $item['value_type'] == ITEM_VALUE_TYPE_TEXT
+			|| $item['value_type'] == ITEM_VALUE_TYPE_LOG) {
+		$value = $item['lastvalue'];
+		if (zbx_strlen($value) > 20) {
+			$value = zbx_substr($value, 0, 20).' ...';
 		}
-		$lastvalue = nbsp(htmlspecialchars($lastvalue));
+		$value = nbsp(htmlspecialchars($value));
 	}
 	else {
-		$lastvalue = _('Unknown value type');
+		$value = _('Unknown value type');
 	}
-	if ($db_item['valuemapid'] > 0) {
-		$lastvalue = applyValueMap($lastvalue, $db_item['valuemapid']);
-	}
-	return $lastvalue;
+
+	return $value;
 }
 
 /*
@@ -936,8 +966,6 @@ function item_get_history($db_item, $last = 1, $clock = 0, $ns = 0) {
 			$table = 'history_log';
 			break;
 	}
-
-	$config = select_config();
 
 	if ($last == 0) {
 		$sql = 'SELECT value'.
@@ -1303,4 +1331,3 @@ function getParamFieldLabelByType($itemType) {
 			return 'params';
 	}
 }
-?>
