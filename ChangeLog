@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+....I..... [ZBX-5168] added missing and fixed existing help_items (Sasha)
 ........S. [ZBX-5218] fixed generating of triggers without functions when editing a trigger prototype expression (Sasha)
 ..F....... [ZBX-3001] fixed media sorting in user profile (Vedmak)
 ..F....... [ZBX-5159] fixed macro resolving in trigger description (Vedmak)
@@ -106,6 +107,7 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+....I..... [ZBX-5168] added missing and fixed existing help_items (Sasha)
 ........S. [ZBX-5218] fixed generating of triggers without functions when editing a trigger prototype expression (Sasha)
 ..F....... [ZBX-3001] fixed media sorting in user profile (Vedmak)
 ..F....... [ZBX-5159] fixed macro resolving in trigger description (Vedmak)
