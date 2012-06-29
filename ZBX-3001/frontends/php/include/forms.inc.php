@@ -63,12 +63,12 @@
 			$data['user_groups']	= zbx_toHash($userGroup);
 
 			$data['user_medias'] = array();
-			$dbMedias = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
+			$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
 					' FROM media m'.
 					' WHERE m.userid='.$userid
 			);
-			while ($dbMedia = DBfetch($dbMedias)) {
-				$data['user_medias'][] = $dbMedia;
+			while ($dbMedium = DBfetch($dbMedia)) {
+				$data['user_medias'][] = $dbMedium;
 			}
 
 			if ($data['autologout'] > 0) {
