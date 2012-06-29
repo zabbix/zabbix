@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenServerInfo extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		return $this->getOutput(new CServerInfo());
 	}

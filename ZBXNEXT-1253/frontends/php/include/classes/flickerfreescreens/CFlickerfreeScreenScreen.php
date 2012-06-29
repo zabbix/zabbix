@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenScreen extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		$screen = API::Screen()->get(array(
 			'screenids' => $this->screenitem['resourceid'],

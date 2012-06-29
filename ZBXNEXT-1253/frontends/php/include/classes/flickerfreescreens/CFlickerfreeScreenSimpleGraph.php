@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenSimpleGraph extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		$resourceid = !empty($this->screenitem['real_resourceid']) ? $this->screenitem['real_resourceid'] : $this->screenitem['resourceid'];
 		$domGraphid = 'graph_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];

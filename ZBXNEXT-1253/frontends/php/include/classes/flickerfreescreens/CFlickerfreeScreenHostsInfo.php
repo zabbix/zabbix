@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenHostsInfo extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		return $this->getOutput(new CHostsInfo($this->screenitem['resourceid'], $this->screenitem['style']));
 	}

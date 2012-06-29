@@ -98,6 +98,11 @@ var flickerfreeScreen = {
 			'profile_idx': data.profile_idx
 		};
 
-		window.setInterval(function() { flickerfreeScreen.refresh(data.screenitemid); }, data.refreshInterval * 1000);
+		if (data.refreshInterval > 0) {
+			window.setInterval(function() { flickerfreeScreen.refresh(data.screenitemid); }, data.refreshInterval * 1000);
+		}
+		else {
+			flickerfreeScreen.refresh(data.screenitemid);
+		}
 	}
 };

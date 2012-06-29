@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenEvents extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		$options = array(
 			'monitored' => true,

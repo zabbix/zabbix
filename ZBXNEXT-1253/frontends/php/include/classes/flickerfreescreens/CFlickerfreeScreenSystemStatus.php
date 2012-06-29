@@ -23,10 +23,6 @@ require_once dirname(__FILE__).'/../../blocks.inc.php';
 
 class CFlickerfreeScreenSystemStatus extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		$item = new CUIWidget('hat_syssum', make_system_status(array(
 			'groupids' => null,

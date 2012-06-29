@@ -23,10 +23,6 @@ require_once dirname(__FILE__).'/../../blocks.inc.php';
 
 class CFlickerfreeScreenHostgroupTriggers extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		$params = array(
 			'groupids' => null,

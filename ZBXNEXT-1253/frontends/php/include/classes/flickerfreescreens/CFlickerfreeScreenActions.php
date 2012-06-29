@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenActions extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		return $this->getOutput(get_history_of_actions($this->screenitem['elements']));
 	}

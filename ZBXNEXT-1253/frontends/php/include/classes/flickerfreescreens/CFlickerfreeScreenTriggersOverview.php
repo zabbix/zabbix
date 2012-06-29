@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenTriggersOverview extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		$hostids = array();
 		$dbHostGroups = DBselect('SELECT DISTINCT hg.hostid FROM hosts_groups hg WHERE hg.groupid='.$this->screenitem['resourceid']);

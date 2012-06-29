@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenUrl extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		return $this->getOutput(new CIFrame($this->screenitem['url'], $this->screenitem['width'], $this->screenitem['height'], 'auto'));
 	}

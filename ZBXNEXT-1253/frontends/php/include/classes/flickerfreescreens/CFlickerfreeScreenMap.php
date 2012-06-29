@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenMap extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		$image = new CImg('map.php?noedit=1&sysmapid='.$this->screenitem['resourceid'].'&width='.$this->screenitem['width']
 			.'&height='.$this->screenitem['height'].'&curtime='.time());

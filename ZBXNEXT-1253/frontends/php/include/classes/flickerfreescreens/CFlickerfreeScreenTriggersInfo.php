@@ -21,10 +21,6 @@
 
 class CFlickerfreeScreenTriggersInfo extends CFlickerfreeScreenItem {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-	}
-
 	public function get() {
 		return $this->getOutput(new CTriggersInfo($this->screenitem['resourceid'], null, $this->screenitem['style']));
 	}
