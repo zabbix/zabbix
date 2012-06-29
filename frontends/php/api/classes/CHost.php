@@ -25,7 +25,6 @@
 class CHost extends CZBXAPI {
 
 	protected $tableName = 'hosts';
-
 	protected $tableAlias = 'h';
 
 	/**
@@ -104,13 +103,13 @@ class CHost extends CZBXAPI {
 			'with_items'				=> null,
 			'with_monitored_items'		=> null,
 			'with_historical_items'		=> null,
-			'with_simple_graph_items'		=> null,
+			'with_simple_graph_items'	=> null,
 			'with_triggers'				=> null,
 			'with_monitored_triggers'	=> null,
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'with_applications'		=> null,
+			'with_applications'			=> null,
 			'withInventory'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -139,7 +138,6 @@ class CHost extends CZBXAPI {
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
-
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
@@ -160,39 +158,39 @@ class CHost extends CZBXAPI {
 			$options['output'] = API_OUTPUT_CUSTOM;
 		}
 
-// editable + PERMISSION CHECK
-		if ((USER_TYPE_SUPER_ADMIN == $userType) || $options['nopermissions']) {
+		// editable + PERMISSION CHECK
+		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
 		}
 		else {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ_ONLY;
 
 			$sqlParts['where'][] = 'EXISTS ('.
-							' SELECT hh.hostid'.
-							' FROM hosts hh, hosts_groups hgg, rights r, users_groups ug'.
-							' WHERE hh.hostid=h.hostid'.
-								' AND hh.hostid=hgg.hostid'.
-								' AND r.id=hgg.groupid'.
-								' AND r.groupid=ug.usrgrpid'.
-								' AND ug.userid='.$userid.
-								' AND r.permission>='.$permission.
-								' AND NOT EXISTS('.
-									' SELECT hggg.groupid'.
-									' FROM hosts_groups hggg, rights rr, users_groups gg'.
-									' WHERE hggg.hostid=hgg.hostid'.
-										' AND rr.id=hggg.groupid'.
-										' AND rr.groupid=gg.usrgrpid'.
-										' AND gg.userid='.$userid.
-										' AND rr.permission<'.$permission.
-								'))';
+				' SELECT hh.hostid'.
+				' FROM hosts hh,hosts_groups hgg,rights r,users_groups ug'.
+				' WHERE hh.hostid=h.hostid'.
+					' AND hh.hostid=hgg.hostid'.
+					' AND r.id=hgg.groupid'.
+					' AND r.groupid=ug.usrgrpid'.
+					' AND ug.userid='.$userid.
+					' AND r.permission>='.$permission.
+					' AND NOT EXISTS ('.
+						' SELECT hggg.groupid'.
+						' FROM hosts_groups hggg,rights rr,users_groups gg'.
+						' WHERE hggg.hostid=hgg.hostid'.
+							' AND rr.id=hggg.groupid'.
+							' AND rr.groupid=gg.usrgrpid'.
+							' AND gg.userid='.$userid.
+							' AND rr.permission<'.$permission.
+					'))';
 		}
 
-// hostids
+		// hostids
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 			$sqlParts['where']['hostid'] = DBcondition('h.hostid', $options['hostids']);
 		}
 
-// groupids
+		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -208,8 +206,7 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-
-// proxyids
+		// proxyids
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -218,7 +215,7 @@ class CHost extends CZBXAPI {
 			$sqlParts['where'][] = DBcondition('h.proxy_hostid', $options['proxyids']);
 		}
 
-// templateids
+		// templateids
 		if (!is_null($options['templateids'])) {
 			zbx_value2array($options['templateids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -234,7 +231,7 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// interfaceids
+		// interfaceids
 		if (!is_null($options['interfaceids'])) {
 			zbx_value2array($options['interfaceids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -246,7 +243,7 @@ class CHost extends CZBXAPI {
 			$sqlParts['where']['hi'] = 'h.hostid=hi.hostid';
 		}
 
-// itemids
+		// itemids
 		if (!is_null($options['itemids'])) {
 			zbx_value2array($options['itemids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -258,7 +255,7 @@ class CHost extends CZBXAPI {
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
-// triggerids
+		// triggerids
 		if (!is_null($options['triggerids'])) {
 			zbx_value2array($options['triggerids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -272,7 +269,7 @@ class CHost extends CZBXAPI {
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 		}
 
-// httptestids
+		// httptestids
 		if (!is_null($options['httptestids'])) {
 			zbx_value2array($options['httptestids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -286,7 +283,7 @@ class CHost extends CZBXAPI {
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
 		}
 
-// graphids
+		// graphids
 		if (!is_null($options['graphids'])) {
 			zbx_value2array($options['graphids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -300,7 +297,7 @@ class CHost extends CZBXAPI {
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
 		}
 
-// applicationids
+		// applicationids
 		if (!is_null($options['applicationids'])) {
 			zbx_value2array($options['applicationids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -312,7 +309,7 @@ class CHost extends CZBXAPI {
 			$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
 		}
 
-// dhostids
+		// dhostids
 		if (!is_null($options['dhostids'])) {
 			zbx_value2array($options['dhostids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -328,7 +325,7 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// dserviceids
+		// dserviceids
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -346,7 +343,7 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// maintenanceids
+		// maintenanceids
 		if (!is_null($options['maintenanceids'])) {
 			zbx_value2array($options['maintenanceids']);
 			if ($options['output'] != API_OUTPUT_SHORTEN) {
@@ -362,7 +359,7 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// monitored_hosts, templated_hosts
+		// monitored_hosts, templated_hosts
 		if (!is_null($options['monitored_hosts'])) {
 			$sqlParts['where']['status'] = 'h.status='.HOST_STATUS_MONITORED;
 		}
@@ -376,7 +373,7 @@ class CHost extends CZBXAPI {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
 		}
 
-// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
+		// with_items, with_monitored_items, with_historical_items, with_simple_graph_items
 		if (!is_null($options['with_items'])) {
 			$sqlParts['where'][] = 'EXISTS (SELECT i.hostid FROM items i WHERE h.hostid=i.hostid )';
 		}
@@ -392,50 +389,50 @@ class CHost extends CZBXAPI {
 			ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')))';
 		}
 
-// with_triggers, with_monitored_triggers
+		// with_triggers, with_monitored_triggers
 		if (!is_null($options['with_triggers'])) {
-			$sqlParts['where'][] = 'EXISTS('.
-					' SELECT i.itemid'.
-					' FROM items i, functions f, triggers t'.
-					' WHERE i.hostid=h.hostid'.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid)';
+			$sqlParts['where'][] = 'EXISTS ('.
+				' SELECT i.itemid'.
+				' FROM items i,functions f,triggers t'.
+				' WHERE i.hostid=h.hostid'.
+					' AND i.itemid=f.itemid'.
+					' AND f.triggerid=t.triggerid)';
 		}
 		elseif (!is_null($options['with_monitored_triggers'])) {
-			$sqlParts['where'][] = 'EXISTS('.
-					' SELECT i.itemid'.
-					' FROM items i, functions f, triggers t'.
-					' WHERE i.hostid=h.hostid'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'.
-						' AND t.status='.TRIGGER_STATUS_ENABLED.')';
+			$sqlParts['where'][] = 'EXISTS ('.
+				' SELECT i.itemid'.
+				' FROM items i,functions f,triggers t'.
+				' WHERE i.hostid=h.hostid'.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND i.itemid=f.itemid'.
+					' AND f.triggerid=t.triggerid'.
+					' AND t.status='.TRIGGER_STATUS_ENABLED.')';
 		}
 
-// with_httptests, with_monitored_httptests
+		// with_httptests, with_monitored_httptests
 		if (!is_null($options['with_httptests'])) {
-			$sqlParts['where'][] = 'EXISTS('.
-					' SELECT a.applicationid'.
-					' FROM applications a, httptest ht'.
-					' WHERE a.hostid=h.hostid'.
-						' AND ht.applicationid=a.applicationid)';
+			$sqlParts['where'][] = 'EXISTS ('.
+				' SELECT a.applicationid'.
+				' FROM applications a,httptest ht'.
+				' WHERE a.hostid=h.hostid'.
+					' AND ht.applicationid=a.applicationid)';
 		}
 		elseif (!is_null($options['with_monitored_httptests'])) {
-			$sqlParts['where'][] = 'EXISTS('.
-					' SELECT a.applicationid'.
-					' FROM applications a, httptest ht'.
-					' WHERE a.hostid=h.hostid'.
-						' AND ht.applicationid=a.applicationid'.
-						' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
+			$sqlParts['where'][] = 'EXISTS ('.
+				' SELECT a.applicationid'.
+				' FROM applications a,httptest ht'.
+				' WHERE a.hostid=h.hostid'.
+					' AND ht.applicationid=a.applicationid'.
+					' AND ht.status='.HTTPTEST_STATUS_ACTIVE.')';
 		}
 
-// with_graphs
+		// with_graphs
 		if (!is_null($options['with_graphs'])) {
-			$sqlParts['where'][] = 'EXISTS('.
-					' SELECT DISTINCT i.itemid'.
-					' FROM items i, graphs_items gi'.
+			$sqlParts['where'][] = 'EXISTS ('.
+					' SELECT 1'.
+					' FROM items i,graphs_items gi'.
 					' WHERE i.hostid=h.hostid'.
-						' AND i.itemid=gi.itemid)';
+						' AND i.itemid=gi.itemid '.zbx_limit(1).')';
 		}
 
 		// with applications
@@ -444,14 +441,14 @@ class CHost extends CZBXAPI {
 			$sqlParts['where'][] = 'a.hostid=h.hostid';
 		}
 
-// withInventory
+		// withInventory
 		if (!is_null($options['withInventory']) && $options['withInventory']) {
 			$sqlParts['where'][] = ' h.hostid IN ('.
 					' SELECT hin.hostid'.
 					' FROM host_inventory hin)';
 		}
 
-// search
+		// search
 		if (is_array($options['search'])) {
 			zbx_db_search('hosts h', $options, $sqlParts);
 
@@ -461,7 +458,7 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// filter
+		// filter
 		if (is_array($options['filter'])) {
 			zbx_db_filter('hosts h', $options, $sqlParts);
 
@@ -471,17 +468,17 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// output
+		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$sqlParts['select']['hosts'] = 'h.*';
 		}
 
-// countOutput
+		// countOutput
 		if (!is_null($options['countOutput'])) {
 			$options['sortfield'] = '';
-			$sqlParts['select'] = array('count(DISTINCT h.hostid) as rowscount');
+			$sqlParts['select'] = array('COUNT(DISTINCT h.hostid) AS rowscount');
 
-// groupCount
+			// groupCount
 			if (!is_null($options['groupCount'])) {
 				foreach ($sqlParts['group'] as $key => $fields) {
 					$sqlParts['select'][$key] = $fields;
@@ -492,12 +489,10 @@ class CHost extends CZBXAPI {
 		// sorting
 		zbx_db_sorting($sqlParts, $options, $sortColumns, 'h');
 
-// limit
+		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
-//-------
-
 
 		$hostids = array();
 
@@ -563,19 +558,21 @@ class CHost extends CZBXAPI {
 						$result[$host['hostid']]['interfaces'] = array();
 					}
 
-// groupids
+					// groupids
 					if (isset($host['groupid']) && is_null($options['selectGroups'])) {
-						if (!isset($result[$host['hostid']]['groups']))
+						if (!isset($result[$host['hostid']]['groups'])) {
 							$result[$host['hostid']]['groups'] = array();
+						}
 
 						$result[$host['hostid']]['groups'][] = array('groupid' => $host['groupid']);
 						unset($host['groupid']);
 					}
 
-// templateids
+					// templateids
 					if (isset($host['templateid'])) {
-						if (!isset($result[$host['hostid']]['templates']))
+						if (!isset($result[$host['hostid']]['templates'])) {
 							$result[$host['hostid']]['templates'] = array();
+						}
 
 						$result[$host['hostid']]['templates'][] = array(
 							'templateid' => $host['templateid'],
@@ -584,82 +581,95 @@ class CHost extends CZBXAPI {
 						unset($host['templateid']);
 					}
 
-// triggerids
+					// triggerids
 					if (isset($host['triggerid']) && is_null($options['selectTriggers'])) {
-						if (!isset($result[$host['hostid']]['triggers']))
+						if (!isset($result[$host['hostid']]['triggers'])) {
 							$result[$host['hostid']]['triggers'] = array();
+						}
 
 						$result[$host['hostid']]['triggers'][] = array('triggerid' => $host['triggerid']);
 						unset($host['triggerid']);
 					}
 
-// interfaceids
+					// interfaceids
 					if (isset($host['interfaceid']) && is_null($options['selectInterfaces'])) {
-						if (!isset($result[$host['hostid']]['interfaces']))
+						if (!isset($result[$host['hostid']]['interfaces'])) {
 							$result[$host['hostid']]['interfaces'] = array();
+						}
 
 						$result[$host['hostid']]['interfaces'][] = array('interfaceid' => $host['interfaceid']);
 						unset($host['interfaceid']);
 					}
 
-// itemids
+					// itemids
 					if (isset($host['itemid']) && is_null($options['selectItems'])) {
-						if (!isset($result[$host['hostid']]['items']))
+						if (!isset($result[$host['hostid']]['items'])) {
 							$result[$host['hostid']]['items'] = array();
+						}
 
 						$result[$host['hostid']]['items'][] = array('itemid' => $host['itemid']);
 						unset($host['itemid']);
 					}
 
-// graphids
+					// graphids
 					if (isset($host['graphid']) && is_null($options['selectGraphs'])) {
-						if (!isset($result[$host['hostid']]['graphs']))
+						if (!isset($result[$host['hostid']]['graphs'])) {
 							$result[$host['hostid']]['graphs'] = array();
+						}
 
 						$result[$host['hostid']]['graphs'][] = array('graphid' => $host['graphid']);
 						unset($host['graphid']);
 					}
-// graphids
+
+					// graphids
 					if (isset($host['applicationid'])) {
-						if (!isset($result[$host['hostid']]['applications']))
+						if (!isset($result[$host['hostid']]['applications'])) {
 							$result[$host['hostid']]['applications'] = array();
+						}
 
 						$result[$host['hostid']]['applications'][] = array('applicationid' => $host['applicationid']);
 						unset($host['applicationid']);
 					}
-// httptestids
+
+					// httptestids
 					if (isset($host['httptestid'])) {
-						if (!isset($result[$host['hostid']]['httptests']))
+						if (!isset($result[$host['hostid']]['httptests'])) {
 							$result[$host['hostid']]['httptests'] = array();
+						}
 
 						$result[$host['hostid']]['httptests'][] = array('httptestid' => $host['httptestid']);
 						unset($host['httptestid']);
 					}
 
-// dhostids
+					// dhostids
 					if (isset($host['dhostid']) && is_null($options['selectDHosts'])) {
-						if (!isset($result[$host['hostid']]['dhosts']))
+						if (!isset($result[$host['hostid']]['dhosts'])) {
 							$result[$host['hostid']]['dhosts'] = array();
+						}
 
 						$result[$host['hostid']]['dhosts'][] = array('dhostid' => $host['dhostid']);
 						unset($host['dhostid']);
 					}
 
-// dserviceids
+					// dserviceids
 					if (isset($host['dserviceid']) && is_null($options['selectDServices'])) {
-						if (!isset($result[$host['hostid']]['dservices']))
+						if (!isset($result[$host['hostid']]['dservices'])) {
 							$result[$host['hostid']]['dservices'] = array();
+						}
 
 						$result[$host['hostid']]['dservices'][] = array('dserviceid' => $host['dserviceid']);
 						unset($host['dserviceid']);
 					}
-// maintenanceids
-					if (isset($host['maintenanceid'])) {
-						if (!isset($result[$host['hostid']]['maintenances']))
-							$result[$host['hostid']]['maintenances'] = array();
 
-						if ($host['maintenanceid'] > 0)
+					// maintenanceids
+					if (isset($host['maintenanceid'])) {
+						if (!isset($result[$host['hostid']]['maintenances'])) {
+							$result[$host['hostid']]['maintenances'] = array();
+						}
+
+						if ($host['maintenanceid'] > 0) {
 							$result[$host['hostid']]['maintenances'][] = array('maintenanceid' => $host['maintenanceid']);
+						}
 					}
 
 					$result[$host['hostid']] += $host;
@@ -671,16 +681,17 @@ class CHost extends CZBXAPI {
 			return $result;
 		}
 
-// Adding Objects
-// Adding Groups
+		/*
+		 * adding objects
+		 */
+		// adding groups
 		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
-			$objParams = array(
-					'nodeids' => $options['nodeids'],
-					'output' => $options['selectGroups'],
-					'hostids' => $hostids,
-					'preservekeys' => 1
-				);
-			$groups = API::HostGroup()->get($objParams);
+			$groups = API::HostGroup()->get(array(
+				'nodeids' => $options['nodeids'],
+				'output' => $options['selectGroups'],
+				'hostids' => $hostids,
+				'preservekeys' => true
+			));
 
 			foreach ($groups as $group) {
 				$ghosts = $group['hosts'];
@@ -691,15 +702,16 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// Adding Inventories
+		// adding inventories
 		if (!is_null($options['selectInventory']) && $options['selectInventory'] !== false) {
 			if (is_array($options['selectInventory'])) {
 				// if we are given a list of fields that needs to be fetched
 				$dbTable = DB::getSchema('host_inventory');
 				$selectHIn = array('hin.hostid');
 				foreach ($options['selectInventory'] as $field) {
-					if (isset($dbTable['fields'][$field]))
+					if (isset($dbTable['fields'][$field])) {
 						$selectHIn[] = 'hin.'.$field;
+					}
 				}
 			}
 			else {
@@ -707,20 +719,22 @@ class CHost extends CZBXAPI {
 				$selectHIn = array('hin.*');
 			}
 
-			$sql = 'SELECT '.implode(', ', $selectHIn).
+			$dbInventory = DBselect(
+				'SELECT '.implode(', ', $selectHIn).
 				' FROM host_inventory hin'.
-				' WHERE '.DBcondition('hin.hostid', $hostids);
-			$dbInventory = DBselect($sql);
-			while ($inventory = DBfetch($dbInventory))
+				' WHERE '.DBcondition('hin.hostid', $hostids)
+			);
+			while ($inventory = DBfetch($dbInventory)) {
 				$result[$inventory['hostid']]['inventory'] = $inventory;
+			}
 		}
 
-// Adding Templates
+		// adding templates
 		if (!is_null($options['selectParentTemplates'])) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'hostids' => $hostids,
-				'preservekeys' => 1
+				'preservekeys' => true
 			);
 
 			if (is_array($options['selectParentTemplates']) || str_in_array($options['selectParentTemplates'], $subselectsAllowedOutputs)) {
@@ -756,15 +770,12 @@ class CHost extends CZBXAPI {
 				$templates = API::Template()->get($objParams);
 				$templates = zbx_toHash($templates, 'hostid');
 				foreach ($result as $hostid => $host) {
-					if (isset($templates[$hostid]))
-						$result[$hostid]['templates'] = $templates[$hostid]['rowscount'];
-					else
-						$result[$hostid]['templates'] = 0;
+					$result[$hostid]['templates'] = isset($templates[$hostid]) ? $templates[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
 
-// Adding HostInterfaces
+		// adding hostinterfaces
 		if (!is_null($options['selectInterfaces'])) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
@@ -776,9 +787,8 @@ class CHost extends CZBXAPI {
 				$objParams['output'] = $options['selectInterfaces'];
 				$interfaces = API::HostInterface()->get($objParams);
 
-// we need to order interfaces for proper linkage and viewing
-//				if (!is_null($options['limitSelects']))
-					order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
+				// we need to order interfaces for proper linkage and viewing
+				order_result($interfaces, 'interfaceid', ZBX_SORT_UP);
 
 				$count = array();
 				foreach ($interfaces as $interfaceid => $interface) {
@@ -803,22 +813,19 @@ class CHost extends CZBXAPI {
 				$interfaces = API::HostInterface()->get($objParams);
 				$interfaces = zbx_toHash($interfaces, 'hostid');
 				foreach ($result as $hostid => $host) {
-					if (isset($interfaces[$hostid]))
-						$result[$hostid]['interfaces'] = $interfaces[$hostid]['rowscount'];
-					else
-						$result[$hostid]['interfaces'] = 0;
+					$result[$hostid]['interfaces'] = isset($interfaces[$hostid]) ? $interfaces[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
 
-// Adding Items
+		// adding items
 		if (!is_null($options['selectItems'])) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'hostids' => $hostids,
 				'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)),
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 
 			if (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs)) {
@@ -851,21 +858,18 @@ class CHost extends CZBXAPI {
 				$items = API::Item()->get($objParams);
 				$items = zbx_toHash($items, 'hostid');
 				foreach ($result as $hostid => $host) {
-					if (isset($items[$hostid]))
-						$result[$hostid]['items'] = $items[$hostid]['rowscount'];
-					else
-						$result[$hostid]['items'] = 0;
+					$result[$hostid]['items'] = isset($items[$hostid]) ? $items[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
 
-// Adding Discoveries
+		// adding discoveries
 		if (!is_null($options['selectDiscoveries'])) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'hostids' => $hostids,
-				'nopermissions' => 1,
-				'preservekeys' => 1,
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 
 			if (is_array($options['selectDiscoveries']) || str_in_array($options['selectDiscoveries'], $subselectsAllowedOutputs)) {
@@ -900,15 +904,12 @@ class CHost extends CZBXAPI {
 				$items = API::DiscoveryRule()->get($objParams);
 				$items = zbx_toHash($items, 'hostid');
 				foreach ($result as $hostid => $host) {
-					if (isset($items[$hostid]))
-						$result[$hostid]['discoveries'] = $items[$hostid]['rowscount'];
-					else
-						$result[$hostid]['discoveries'] = 0;
+					$result[$hostid]['discoveries'] = isset($items[$hostid]) ? $items[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
 
-// Adding triggers
+		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			if (is_array($options['selectTriggers']) || str_in_array($options['selectTriggers'], $subselectsAllowedOutputs)) {
 				$triggers = API::Trigger()->get(array(
@@ -952,17 +953,12 @@ class CHost extends CZBXAPI {
 				$triggers = zbx_toHash($triggers, 'hostid');
 
 				foreach ($result as $hostid => $host) {
-					if (isset($triggers[$hostid])) {
-						$result[$hostid]['triggers'] = $triggers[$hostid]['rowscount'];
-					}
-					else {
-						$result[$hostid]['triggers'] = 0;
-					}
+					$result[$hostid]['triggers'] = isset($triggers[$hostid]) ? $triggers[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
 
-// Adding graphs
+		// adding graphs
 		if (!is_null($options['selectGraphs'])) {
 			if (is_array($options['selectGraphs']) || str_in_array($options['selectGraphs'], $subselectsAllowedOutputs)) {
 				$objParams['output'] = $options['selectGraphs'];
@@ -1006,21 +1002,18 @@ class CHost extends CZBXAPI {
 				));
 				$graphs = zbx_toHash($graphs, 'hostid');
 				foreach ($result as $hostid => $host) {
-					if (isset($graphs[$hostid]))
-						$result[$hostid]['graphs'] = $graphs[$hostid]['rowscount'];
-					else
-						$result[$hostid]['graphs'] = 0;
+					$result[$hostid]['graphs'] = isset($graphs[$hostid]) ? $graphs[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
 
-// Adding discovery hosts
+		// adding discovery hosts
 		if (!is_null($options['selectDHosts'])) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'hostids' => $hostids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 
 			if (is_array($options['selectDHosts']) || str_in_array($options['selectDHosts'], $subselectsAllowedOutputs)) {
@@ -1058,21 +1051,18 @@ class CHost extends CZBXAPI {
 				$dhosts = API::DHost()->get($objParams);
 				$dhosts = zbx_toHash($dhosts, 'hostid');
 				foreach ($result as $hostid => $host) {
-					if (isset($dhosts[$hostid]))
-						$result[$hostid]['dhosts'] = $dhosts[$hostid]['rowscount'];
-					else
-						$result[$hostid]['dhosts'] = 0;
+					$result[$hostid]['dhosts'] = isset($dhosts[$hostid]) ? $dhosts[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
 
-// Adding applications
+		// adding applications
 		if (!is_null($options['selectApplications'])) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'hostids' => $hostids,
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 
 			if (is_array($options['selectApplications']) || str_in_array($options['selectApplications'], $subselectsAllowedOutputs)) {
@@ -1111,21 +1101,18 @@ class CHost extends CZBXAPI {
 
 				$applications = zbx_toHash($applications, 'hostid');
 				foreach ($result as $hostid => $host) {
-					if (isset($applications[$hostid]))
-						$result[$hostid]['applications'] = $applications[$hostid]['rowscount'];
-					else
-						$result[$hostid]['applications'] = 0;
+					$result[$hostid]['applications'] = isset($applications[$hostid]) ? $applications[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
 
-// Adding macros
+		// adding macros
 		if (!is_null($options['selectMacros']) && str_in_array($options['selectMacros'], $subselectsAllowedOutputs)) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'output' => $options['selectMacros'],
 				'hostids' => $hostids,
-				'preservekeys' => 1
+				'preservekeys' => true
 			);
 			$macros = API::UserMacro()->get($objParams);
 
@@ -1138,14 +1125,14 @@ class CHost extends CZBXAPI {
 			}
 		}
 
-// Adding screens
+		// adding screens
 		if (!is_null($options['selectScreens'])) {
 			$objParams = array(
 				'nodeids' => $options['nodeids'],
 				'hostids' => $hostids,
 				'editable' => $options['editable'],
-				'nopermissions' => 1,
-				'preservekeys' => 1
+				'nopermissions' => true,
+				'preservekeys' => true
 			);
 
 			if (is_array($options['selectScreens']) || str_in_array($options['selectScreens'], $subselectsAllowedOutputs)) {
@@ -1171,16 +1158,13 @@ class CHost extends CZBXAPI {
 				$screens = zbx_toHash($screens, 'hostid');
 
 				foreach ($result as $hostid => $host) {
-					if (isset($screens[$hostid]))
-						$result[$hostid]['screens'] = $screens[$hostid]['rowscount'];
-					else
-						$result[$hostid]['screens'] = 0;
+					$result[$hostid]['screens'] = isset($screens[$hostid]) ? $screens[$hostid]['rowscount'] : 0;
 				}
 			}
 		}
 
 
-// removing keys (hash -> array)
+		// removing keys (hash -> array)
 		if (is_null($options['preservekeys'])) {
 			$result = zbx_cleanHashes($result);
 		}
