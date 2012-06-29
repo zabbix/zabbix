@@ -3,6 +3,7 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-5218] fixed generating of triggers without functions when editing a trigger prototype expression (Sasha)
 ..F....... [ZBX-3001] fixed media sorting in user profile (Vedmak)
 ..F....... [ZBX-5159] fixed macro resolving in trigger description (Vedmak)
 ..F....... [ZBX-5144] fixed PostgreSQL injection in the database configuration setup form (Pavels)
