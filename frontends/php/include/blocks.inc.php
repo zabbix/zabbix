@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/graphs.inc.php';
 require_once dirname(__FILE__).'/screens.inc.php';
 require_once dirname(__FILE__).'/maps.inc.php';
@@ -887,7 +887,7 @@ function make_latest_issues(array $filter = array()) {
 		));
 		if ($event = reset($events)) {
 			$ack = getEventAckState($event, true, true, $ackParams);
-			$description = expand_trigger_description_by_data(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])), ZBX_FLAG_EVENT);
+			$description = CEventHelper::expandDescription(zbx_array_merge($trigger, array('clock' => $event['clock'], 'ns' => $event['ns'])));
 
 			// actions
 			$actions = get_event_actions_stat_hints($event['eventid']);

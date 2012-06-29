@@ -551,7 +551,8 @@ function add_elementNames(&$selements) {
 				break;
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
 				$hostname = reset($triggers[$selement['elementid']]['hosts']);
-				$selements[$snum]['elementName'] = $hostname['name'].':'.expand_trigger_description_by_data($triggers[$selement['elementid']]);
+				$selements[$snum]['elementName'] = $hostname['name'].':'.
+						CTriggerHelper::expandDescription($triggers[$selement['elementid']]);
 				break;
 			case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 				$selements[$snum]['elementName'] = $hostgroups[$selement['elementid']]['name'];
@@ -1134,7 +1135,7 @@ function getSelementsInfo($sysmap) {
 		$i['ack'] = (bool) !($i['problem_unack']);
 
 		if ($sysmap['expandproblem'] && ($i['problem'] == 1)) {
-			$i['problem_title'] = expand_trigger_description_by_data($all_triggers[$last_problemid]);
+			$i['problem_title'] = CTriggerHelper::expandDescription($all_triggers[$last_problemid]);
 		}
 
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST && $i['maintenance'] == 1) {
@@ -1202,7 +1203,7 @@ function getSelementsInfo($sysmap) {
 
 	if (!empty($elems['triggers']) && $tlabel) {
 		foreach ($elems['triggers'] as $elem) {
-			$info[$elem['selementid']]['name'] = expand_trigger_description_by_data($all_triggers[$elem['elementid']]);
+			$info[$elem['selementid']]['name'] = CTriggerHelper::expandDescription($all_triggers[$elem['elementid']]);
 		}
 	}
 	if (!empty($elems['hosts']) && $hlabel) {

@@ -213,8 +213,7 @@
 			'inherited' => false,
 			'hostids' => $templateid,
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
-			'expandDescription' => true,
+			'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
 		));
 		if(!empty($hostTriggers)){
 			$triggersList = array();
@@ -297,8 +296,7 @@
 				'hostids' => $templateid,
 				'discoveryids' => $hostDiscoveryRuleids,
 				'inherited' => false,
-				'output' => API_OUTPUT_EXTEND,
-				'expandDescription' => true,
+				'output' => API_OUTPUT_EXTEND
 			));
 			if(!empty($hostTriggerPrototypes)){
 				$prototypeList = array();

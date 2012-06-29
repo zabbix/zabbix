@@ -1026,7 +1026,7 @@ elseif ($srctbl == 'triggers') {
 			);
 
 			foreach ($trigger['dependencies'] as $val) {
-				$description[] = array(expand_trigger_description_by_data($val), BR());
+				$description[] = array(CTriggerHelper::expandDescription($val), BR());
 			}
 		}
 
