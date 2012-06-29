@@ -1427,7 +1427,7 @@ var CScrollBar = Class.create(CDebug, {
 		// usertime
 		var userstarttime = usertime - period;
 
-		this.dom.info_period.innerHTML = this.formatStampByDHM(period, true, false);
+		this.dom.info_period.innerHTML = this.formatStampByDHM(period, false, true);
 
 		var date = datetoarray(userstarttime);
 		this.dom.info_left.innerHTML = date[0] + '.' + date[1] + '.' + date[2] + ' ' + date[3] + ':' + date[4];
@@ -1468,7 +1468,15 @@ var CScrollBar = Class.create(CDebug, {
 		}
 	},
 
-	formatStampByDHM: function(timestamp, tsDouble, extend) {
+	/**
+	 * optimization:
+	 *
+	 * 86400 = 24 * 60 * 60
+	 * 31536000 = 365 * 86400
+	 * 2592000 = 30 * 86400
+	 * 604800 = 7 * 86400
+	 */
+	formatStampByDHM: function(timestamp, isTsDouble, isExtend) {
 		this.debug('formatStampByDHM');
 
 		timestamp = timestamp || 0;
@@ -1476,17 +1484,17 @@ var CScrollBar = Class.create(CDebug, {
 		var months = 0;
 		var weeks = 0;
 
-		if (extend) {
-			years = parseInt(timestamp / (365 * 86400));
-			months = parseInt((timestamp - years * 365 * 86400) / (30 * 86400));
-			weeks = parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400) / (7 * 86400));
+		if (isExtend) {
+			years = parseInt(timestamp / 31536000);
+			months = parseInt((timestamp - years * 31536000) / 2592000);
+			//weeks = parseInt((timestamp - years * 31536000 - months * 2592000) / 604800);
 		}
 
-		var days = parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400 - weeks * 7 * 86400) / 86400);
-		var hours = parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400 - weeks * 7 * 86400 - days * 86400) / 3600);
-		var minutes = parseInt((timestamp - years * 365 * 86400 - months * 30 * 86400 - weeks * 7 * 86400 - days * 86400 - hours * 3600) / 60);
+		var days = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800) / 86400);
+		var hours = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400) / 3600);
+		var minutes = parseInt((timestamp - years * 31536000 - months * 2592000 - weeks * 604800 - days * 86400 - hours * 3600) / 60);
 
-		if (tsDouble) {
+		if (isTsDouble) {
 			if (months.toString().length == 1) {
 				months = '0' + months;
 			}
@@ -1508,15 +1516,13 @@ var CScrollBar = Class.create(CDebug, {
 		str += (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
 		str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
 		str += (weeks == 0) ? '' : weeks + locale['S_WEEK_SHORT'] + ' ';
-
-		if (extend && tsDouble) {
-			str += days + locale['S_DAY_SHORT'] + ' ';
-		}
-		else {
-			str += (days == 0) ? '' : days + locale['S_DAY_SHORT'] + ' ';
-		}
-
-		str += hours + locale['S_HOUR_SHORT'] + ' ' + minutes + locale['S_MINUTE_SHORT'] + ' ';
+		str += (isExtend && isTsDouble)
+			? days + locale['S_DAY_SHORT'] + ' '
+			: (days == 0)
+				? ''
+				: days + locale['S_DAY_SHORT'] + ' ';
+		str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
+		str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
 
 		return str;
 	},
