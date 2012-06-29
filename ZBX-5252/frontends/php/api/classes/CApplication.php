@@ -467,7 +467,7 @@ class CApplication extends CZBXAPI {
 				}
 			}
 
-			// check existance
+			// check existence
 			if ($update || $create) {
 				$applicationsExists = $this->get(array(
 					'output' => API_OUTPUT_EXTEND,

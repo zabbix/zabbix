@@ -58,8 +58,8 @@ function updateValueMap(array $valueMap, array $mappings) {
 	$valueMapId = $valueMap['valuemapid'];
 	unset($valueMap['valuemapid']);
 
-	// check existance
-	if(!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId))) {
+	// check existence
+	if (!DBfetch(DBselect('SELECT v.valuemapid FROM valuemaps v WHERE v.valuemapid='.$valueMapId))) {
 		throw new Exception(_s('Value map with valuemapid "%1$s" does not exist.', $valueMapId));
 	}
 
