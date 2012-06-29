@@ -478,7 +478,7 @@ while ($db_item = DBfetch($db_items)) {
 		$digits = ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 2 : 0;
 
 		// for 'unixtime' change should be calculated as uptime
-		$change .= $change.convert_units(
+		$change .= convert_units(
 			bcsub($db_item['lastvalue'], $db_item['prevvalue'], $digits),
 			$db_item['units'] == 'unixtime' ? 'uptime' : $db_item['units'],
 			0
