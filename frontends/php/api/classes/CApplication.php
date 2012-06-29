@@ -755,9 +755,9 @@ class CApplication extends CZBXAPI {
 
 			// skip applications not from parent templates of current host
 			$parentApplications = array();
-			foreach ($applications as $parentApplicationId => $parentApplication) {
-				if (isset($templateids[$parentApplication['hostid']])) {
-					$parentApplications[$parentApplicationId] = $parentApplication;
+			foreach ($applications as $applicationid => $application) {
+				if (isset($templateids[$application['hostid']])) {
+					$parentApplications[$applicationid] = $application;
 				}
 			}
 
@@ -772,25 +772,25 @@ class CApplication extends CZBXAPI {
 			$exApplicationsNames = zbx_toHash($exApplications, 'name');
 			$exApplicationsTpl = zbx_toHash($exApplications, 'templateid');
 
-			foreach ($parentApplications as $parentApplicationId => $parentApplication) {
+			foreach ($parentApplications as $applicationid => $application) {
 				$exApplication = null;
 
 				// update by tempalteid
-				if (isset($exApplicationsTpl[$parentApplicationId])) {
-					$exApplication = $exApplicationsTpl[$parentApplicationId];
+				if (isset($exApplicationsTpl[$applicationid])) {
+					$exApplication = $exApplicationsTpl[$applicationid];
 				}
 
 				// update by name
-				if (isset($parentApplication['name']) && isset($exApplicationsNames[$parentApplication['name']])) {
-					$exApplication = $exApplicationsNames[$parentApplication['name']];
-					if ($exApplication['templateid'] > 0 && !idcmp($exApplication['templateid'], $parentApplication['applicationid'])) {
+				if (isset($application['name']) && isset($exApplicationsNames[$application['name']])) {
+					$exApplication = $exApplicationsNames[$application['name']];
+					if ($exApplication['templateid'] > 0 && bccomp($exApplication['templateid'], $application['applicationid'] != 0)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['name']));
 					}
 				}
 
-				$newApplication = $parentApplication;
+				$newApplication = $application;
 				$newApplication['hostid'] = $host['hostid'];
-				$newApplication['templateid'] = $parentApplication['applicationid'];
+				$newApplication['templateid'] = $application['applicationid'];
 
 				if ($exApplication) {
 					$newApplication['applicationid'] = $exApplication['applicationid'];
