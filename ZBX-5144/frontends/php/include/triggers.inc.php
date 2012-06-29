@@ -1414,7 +1414,7 @@ function get_triggers_overview($hostids, $view_style = null, $params = array()) 
 	}
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid'),
-		'hotids' => $hostids,
+		'hostids' => $hostids,
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectInventory' => true,
 		'preservekeys' => true
