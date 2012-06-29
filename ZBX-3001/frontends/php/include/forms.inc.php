@@ -63,7 +63,7 @@
 			$data['user_groups']	= zbx_toHash($userGroup);
 
 			$data['user_medias'] = array();
-			$dbMedias = DBselect('SELECT m.mediaid, m.mediatypeid, m.period, m.sendto, m.severity, m.active'.
+			$dbMedias = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
 					' FROM media m'.
 					' WHERE m.userid='.$userid
 			);
