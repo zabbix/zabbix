@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5144] fixed PostgreSQL injection in the database configuration setup form (Pavels)
 A......... [ZBX-5232] fixed import of templated low level discoveries (Pavels)
 A......... [ZBX-5232] fixed errors when importing empty low level discoveries and items without applications (Pavels)
 A.F....... [ZBX-4007] fixed using screen elements with resources from child nodes (Pavels)
@@ -102,6 +103,7 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-5144] fixed PostgreSQL injection in the database configuration setup form (Pavels)
 A......... [ZBX-5232] fixed import of templated low level discoveries (Pavels)
 A......... [ZBX-5232] fixed errors when importing empty low level discoveries and items without applications (Pavels)
 .D........ [ZBX-2510] clarify in the Zabbix sender manpage which parameters from the agent config file sender supports (Richlv)
