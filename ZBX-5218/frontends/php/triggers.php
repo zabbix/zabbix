@@ -421,8 +421,7 @@ else {
 		'selectItems' => API_OUTPUT_EXTEND,
 		'selectFunctions' => API_OUTPUT_EXTEND,
 		'selectDependencies' => API_OUTPUT_EXTEND,
-		'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-		'expandDescription' => true
+		'selectDiscoveryRule' => API_OUTPUT_EXTEND
 	));
 	order_result($data['triggers'], $sortfield, getPageSortOrder());
 

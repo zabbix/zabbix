@@ -679,3 +679,11 @@ INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, send
 
 -- deleting auditid from the ids table
 -- delete from ids where table_name='auditlog' and field_name='auditid'
+
+-- host, item, trigger  for testing macro resolving in trigger description
+INSERT INTO hosts (host, name, status, hostid) VALUES ('Host for trigger description macros','Host for trigger description macros', 2, 20006);
+INSERT INTO hosts_groups (hostid, groupid, hostgroupid) VALUES (20006, 4, 101);
+INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 20006, 10025);
+INSERT INTO items (name, key_, hostid, interfaceid, delay, value_type, lastvalue, itemid) VALUES ('item1', 'key1', 20006, 10025, 30, 3, 5, 23328);
+INSERT INTO triggers (description, value, value_flags, lastchange, triggerid) VALUES ('trigger host.host:{HOST.HOST} | host.host2:{HOST.HOST2} | host.name:{HOST.NAME} | item.value:{ITEM.VALUE} | item.value1:{ITEM.VALUE1} | item.lastvalue:{ITEM.LASTVALUE} | host.ip:{HOST.IP} | host.dns:{HOST.DNS} | host.conn:{HOST.CONN}', 0, 1, '1339761311', 13517);
+INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (12946, 23328, 13517, 'last', '0');

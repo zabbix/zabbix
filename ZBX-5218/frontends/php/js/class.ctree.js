@@ -29,7 +29,7 @@ initialize : function(tree_name, treenode){
 
 	if((tree_init = cookie.read(tree_name)) != null){
 		var nodes = tree_init.split(',');
-		var c = nodes.length-1;
+		var c = nodes.length;
 		for(var i=0; i<c; i++){
 			this.onStartSetStatus(nodes[i]);
 		}
@@ -66,6 +66,7 @@ ChangeNodeStatus : function(id){
 				}
 			}
 		}
+		cookie_str = cookie_str.slice(0, -1);
 		cookie.create(this.tree_name,cookie_str);
 	}
 	catch(e){
@@ -94,13 +95,11 @@ closeSNodeX : function(id,img){
 
 OpenNode : function(nodelist){
 	try{
-		var c = nodelist.length-1;
+		var c = nodelist.length;
 		for(var i=0; i<c; i++){
 			document.getElementById('id_'+nodelist[i]).style.display = (IE)?('block'):('table-row');
-			if(this.checkParent(nodelist[i])){
-				if(this.getNodeStatus(nodelist[i]) == 'open'){
-					this.OpenNode(this.treenode[nodelist[i]].nodelist.split(','));
-				}
+			if(this.getNodeStatus(nodelist[i]) == 'open'){
+				this.OpenNode(this.treenode[nodelist[i]].nodelist.split(','));
 			}
 		}
 	}
@@ -111,7 +110,7 @@ OpenNode : function(nodelist){
 
 CloseNode : function(nodelist){
 	try{
-		var c = nodelist.length-1;
+		var c = nodelist.length;
 		for(var i=0; i<c; i++){
 			document.getElementById('id_'+nodelist[i]).style.display = 'none';
 			if(this.checkParent(nodelist[i])){
@@ -128,11 +127,10 @@ CloseNode : function(nodelist){
 
 onStartOpen : function(){
 	var nodes = tree_init.split(',');
-	var c = nodes.length-1;
+	var c = nodes.length;
 	for(var i=0; i<c;i++){
 		if(typeof(nodes[i]) != 'undefined'){
 			try{
-//				alert(nodes[i]+' : '+this.checkParent(nodes[i]));
 				if(this.checkParent(nodes[i])){
 					var nodelist = this.treenode[nodes[i]].nodelist.split(',');
 					this.OpenNode(nodelist);
