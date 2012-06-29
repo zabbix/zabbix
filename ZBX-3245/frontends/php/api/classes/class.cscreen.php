@@ -102,9 +102,6 @@ class CScreen extends CZBXAPI{
 
 // editable + PERMISSION CHECK
 
-// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 // screenids
 		if(!is_null($options['screenids'])){
 			zbx_value2array($options['screenids']);
@@ -144,6 +141,12 @@ class CScreen extends CZBXAPI{
 			zbx_db_search('screens s', $options, $sql_parts);
 		}
 
+		// node
+		if (!isset($options['screenids']) && !isset($options['screenitemids'])) {
+			$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
+			$sql_parts['where']['node'] = DBin_node('s.screenid', $nodeids);
+		}
+
 // order
 // restrict not allowed columns for sorting
 		$options['sortfield'] = str_in_array($options['sortfield'], $sort_columns) ? $options['sortfield'] : '';
@@ -176,13 +179,12 @@ class CScreen extends CZBXAPI{
 		$sql_order = '';
 		if(!empty($sql_parts['select']))	$sql_select.= implode(',',$sql_parts['select']);
 		if(!empty($sql_parts['from']))		$sql_from.= implode(',',$sql_parts['from']);
-		if(!empty($sql_parts['where']))		$sql_where.= ' AND '.implode(' AND ',$sql_parts['where']);
+		if(!empty($sql_parts['where']))		$sql_where.= ' WHERE '.implode(' AND ',$sql_parts['where']);
 		if(!empty($sql_parts['order']))		$sql_order.= ' ORDER BY '.implode(',',$sql_parts['order']);
 		$sql_limit = $sql_parts['limit'];
 
 		$sql = 'SELECT '.zbx_db_distinct($sql_parts).' '.$sql_select.'
-				FROM '.$sql_from.'
-				WHERE '.DBin_node('s.screenid', $nodeids).
+				FROM '.$sql_from.
 				$sql_where.
 				$sql_order;
 

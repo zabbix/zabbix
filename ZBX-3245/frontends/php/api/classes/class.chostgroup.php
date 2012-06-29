@@ -308,13 +308,13 @@ class CHostGroup extends CZBXAPI{
 		}
 
 // with_graphs
-		if(!is_null($options['with_graphs'])){
+		if (!is_null($options['with_graphs'])) {
 			$sql_parts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sql_parts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sql_parts['where'][] = 'EXISTS( SELECT DISTINCT i.itemid '.
-										' FROM items i, graphs_items gi '.
-										' WHERE i.hostid=hg.hostid '.
-											' AND i.itemid=gi.itemid)';
+			$sql_parts['where'][] = 'EXISTS (SELECT 1'.
+											' FROM items i,graphs_items gi'.
+											' WHERE i.hostid=hg.hostid'.
+												' AND i.itemid=gi.itemid '.zbx_limit(1).')';
 		}
 
 // output
