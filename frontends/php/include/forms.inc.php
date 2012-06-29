@@ -62,19 +62,14 @@
 			$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
 			$data['user_groups']	= zbx_toHash($userGroup);
 
-			$user_medias = array();
-			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.$userid);
-			while ($db_media = DBfetch($db_medias)) {
-				$user_medias[] = array(
-					'mediaid' => $db_media['mediaid'],
-					'mediatypeid' => $db_media['mediatypeid'],
-					'period' => $db_media['period'],
-					'sendto' => $db_media['sendto'],
-					'severity' => $db_media['severity'],
-					'active' => $db_media['active']
-				);
+			$data['user_medias'] = array();
+			$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
+					' FROM media m'.
+					' WHERE m.userid='.$userid
+			);
+			while ($dbMedium = DBfetch($dbMedia)) {
+				$data['user_medias'][] = $dbMedium;
 			}
-			$data['user_medias'] = $user_medias;
 
 			if ($data['autologout'] > 0) {
 				$_REQUEST['autologout'] = $data['autologout'];
@@ -121,16 +116,22 @@
 		}
 
 		// set media types
-		$data['media_types'] = array();
-		$media_type_ids = array();
-		foreach ($data['user_medias'] as $media) {
-			$media_type_ids[$media['mediatypeid']] = 1;
-		}
-		if (count($media_type_ids) > 0) {
-			$db_media_types = DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE mt.mediatypeid IN ('.implode(',', array_keys($media_type_ids)).')');
-			while ($db_media_type = DBfetch($db_media_types)) {
-				$data['media_types'][$db_media_type['mediatypeid']] = $db_media_type['description'];
+		if (!empty($data['user_medias'])) {
+			$mediaTypeDescriptions = array();
+			$dbMediaTypes = DBselect(
+				'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
+					DBcondition('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
+			);
+			while ($dbMediaType = DBfetch($dbMediaTypes)) {
+				$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
 			}
+
+			foreach ($data['user_medias'] as &$media) {
+				$media['description'] = $mediaTypeDescriptions[$media['mediatypeid']];
+			}
+			unset($media);
+
+			CArrayHelper::sort($data['user_medias'], array('description', 'sendto'));
 		}
 
 		// set user rights

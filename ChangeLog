@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3001] fixed media sorting in user profile (Vedmak)
 ..F....... [ZBX-5159] fixed macro resolving in trigger description (Vedmak)
 ..F....... [ZBX-5144] fixed PostgreSQL injection in the database configuration setup form (Pavels)
 A......... [ZBX-5232] fixed import of templated low level discoveries (Pavels)
@@ -104,6 +105,7 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-3001] fixed media sorting in user profile (Vedmak)
 ..F....... [ZBX-5159] fixed macro resolving in trigger description (Vedmak)
 ..F....... [ZBX-5144] fixed PostgreSQL injection in the database configuration setup form (Pavels)
 A......... [ZBX-5232] fixed import of templated low level discoveries (Pavels)
