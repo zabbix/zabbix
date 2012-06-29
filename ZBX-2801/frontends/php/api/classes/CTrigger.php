@@ -183,9 +183,6 @@ class CTrigger extends CTriggerGeneral {
 													' AND rr.permission<'.$permission.'))';
 		}
 
-		// nodeids
-		$nodeids = !is_null($options['nodeids']) ? $options['nodeids'] : get_current_nodeid();
-
 		// groupids
 		if (!is_null($options['groupids'])) {
 			zbx_value2array($options['groupids']);
@@ -616,41 +613,8 @@ class CTrigger extends CTriggerGeneral {
 
 		$triggerids = array();
 
-		$sqlParts['select'] = array_unique($sqlParts['select']);
-		$sqlParts['from'] = array_unique($sqlParts['from']);
-		$sqlParts['where'] = array_unique($sqlParts['where']);
-		$sqlParts['group'] = array_unique($sqlParts['group']);
-		$sqlParts['order'] = array_unique($sqlParts['order']);
-
-		$sqlSelect = '';
-		$sqlFrom = '';
-		$sqlWhere = '';
-		$sqlGroup = '';
-		$sqlOrder = '';
-		if (!empty($sqlParts['select'])) {
-			$sqlSelect .= implode(',', $sqlParts['select']);
-		}
-		if (!empty($sqlParts['from'])) {
-			$sqlFrom .= implode(',', $sqlParts['from']);
-		}
-		if (!empty($sqlParts['where'])) {
-			$sqlWhere .= ' AND '.implode(' AND ', $sqlParts['where']);
-		}
-		if (!empty($sqlParts['group'])) {
-			$sqlWhere .= ' GROUP BY '.implode(',', $sqlParts['group']);
-		}
-		if (!empty($sqlParts['order'])) {
-			$sqlOrder .= ' ORDER BY '.implode(',', $sqlParts['order']);
-		}
-		$sqlLimit = $sqlParts['limit'];
-
-		$sql = 'SELECT '.zbx_db_distinct($sqlParts).' '.$sqlSelect.
-				' FROM '.$sqlFrom.
-				' WHERE '.DBin_node('t.triggerid', $nodeids).
-					$sqlWhere.
-					$sqlGroup.
-					$sqlOrder;
-		$dbRes = DBselect($sql, $sqlLimit);
+		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
+		$dbRes = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($trigger = DBfetch($dbRes)) {
 			if (!is_null($options['countOutput'])) {
 				if (!is_null($options['groupCount'])) {
@@ -854,7 +818,7 @@ class CTrigger extends CTriggerGeneral {
 		// adding groups
 		if (!is_null($options['selectGroups']) && str_in_array($options['selectGroups'], $subselectsAllowedOutputs)) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'output' => $options['selectGroups'],
 				'triggerids' => $triggerids,
 				'preservekeys' => true
@@ -873,7 +837,7 @@ class CTrigger extends CTriggerGeneral {
 		// adding hosts
 		if (!is_null($options['selectHosts'])) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'triggerids' => $triggerids,
 				'templated_hosts' => true,
 				'nopermissions' => true,
@@ -950,7 +914,7 @@ class CTrigger extends CTriggerGeneral {
 		// adding items
 		if (!is_null($options['selectItems']) && (is_array($options['selectItems']) || str_in_array($options['selectItems'], $subselectsAllowedOutputs))) {
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'output' => $options['selectItems'],
 				'triggerids' => $triggerids,
 				'webitems' => true,
@@ -985,7 +949,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			$objParams = array(
-				'nodeids' => $nodeids,
+				'nodeids' => $options['nodeids'],
 				'itemids' => $ruleids,
 				'nopermissions' => true,
 				'preservekeys' => true,
@@ -1005,152 +969,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// expandDescription
 		if (!is_null($options['expandDescription'])) {
-			// compare values
-			foreach ($result as $tnum => $trigger) {
-				preg_match_all('/\$([1-9])/u', $trigger['description'], $numbers);
-				preg_match_all('~{[0-9]+}[+\-\*/<>=#]?[\(]*(?P<val>[+\-0-9]+)[\)]*~u', $trigger['expression'], $matches);
-
-				foreach ($numbers[1] as $i) {
-					$rep = isset($matches['val'][$i - 1]) ? $matches['val'][$i - 1] : '';
-					$result[$tnum]['description'] = str_replace('$'.($i), $rep, $result[$tnum]['description']);
-				}
-			}
-
-			$functionids = array();
-			$triggersToExpandHosts = array();
-			$triggersToExpandItems = array();
-			$triggersToExpandItems2 = array();
-
-			foreach ($result as $trigger) {
-				preg_match_all('/{HOST\.NAME([1-9]?)}/u', $trigger['description'], $hnums);
-				if (!empty($hnums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($hnums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandHosts[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-
-				preg_match_all('/{HOSTNAME([1-9]?)}/u', $trigger['description'], $hnums);
-				if (!empty($hnums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($hnums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandHosts[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-
-				preg_match_all('/{HOST\.HOST([1-9]?)}/u', $trigger['description'], $hnums);
-				if (!empty($hnums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($hnums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandHosts[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-
-				preg_match_all('/{ITEM\.LASTVALUE([1-9]?)}/u', $trigger['description'], $inums);
-				if (!empty($inums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($inums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandItems[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-
-				preg_match_all('/{ITEM\.VALUE([1-9]?)}/u', $trigger['description'], $inums);
-				if (!empty($inums[1])) {
-					preg_match_all('/{([0-9]+)}/u', $trigger['expression'], $funcs);
-					$funcs = $funcs[1];
-
-					foreach ($inums[1] as $fnum) {
-						$fnum = $fnum ? $fnum : 1;
-						if (isset($funcs[$fnum - 1])) {
-							$functionid = $funcs[$fnum - 1];
-							$functionids[$functionid] = $functionid;
-							$triggersToExpandItems2[$trigger['triggerid']][$functionid] = $fnum;
-						}
-					}
-				}
-			}
-
-			if (!empty($functionids)) {
-				$dbFuncs = DBselect(
-					'SELECT DISTINCT f.triggerid,f.functionid,h.host,h.name,i.lastvalue,m.newvalue'.
-					' FROM functions f'.
-						' INNER JOIN items i ON f.itemid=i.itemid'.
-						' INNER JOIN hosts h ON i.hostid=h.hostid'.
-						' LEFT JOIN mappings m ON i.valuemapid=m.valuemapid AND i.lastvalue=m.value'.
-					' WHERE h.status<>'.HOST_STATUS_TEMPLATE.
-						' AND '.DBcondition('f.functionid', $functionids)
-				);
-				while ($func = DBfetch($dbFuncs)) {
-					if (isset($triggersToExpandHosts[$func['triggerid']][$func['functionid']])) {
-						$fnum = $triggersToExpandHosts[$func['triggerid']][$func['functionid']];
-						$fnum = $fnum > 1 ? $fnum : '';
-
-						$result[$func['triggerid']]['description'] = str_replace('{HOSTNAME'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
-						$result[$func['triggerid']]['description'] = str_replace('{HOST.NAME'.$fnum.'}', $func['name'], $result[$func['triggerid']]['description']);
-						$result[$func['triggerid']]['description'] = str_replace('{HOST.HOST'.$fnum.'}', $func['host'], $result[$func['triggerid']]['description']);
-					}
-
-					if (isset($triggersToExpandItems[$func['triggerid']][$func['functionid']])) {
-						$fnum = $triggersToExpandItems[$func['triggerid']][$func['functionid']];
-						$fnum = $fnum > 1 ? $fnum : '';
-
-						$value = $func['newvalue'] ? $func['newvalue'].' '.'('.$func['lastvalue'].')' : $func['lastvalue'];
-
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.LASTVALUE'.$fnum.'}', $value, $result[$func['triggerid']]['description']);
-					}
-
-					if (isset($triggersToExpandItems2[$func['triggerid']][$func['functionid']])) {
-						$fnum = $triggersToExpandItems2[$func['triggerid']][$func['functionid']];
-						$fnum = $fnum > 1 ? $fnum : '';
-
-						$value = $func['newvalue'] ? $func['newvalue'].' '.'('.$func['lastvalue'].')' : $func['lastvalue'];
-
-						$result[$func['triggerid']]['description'] = str_replace('{ITEM.VALUE'.$fnum.'}', $value, $result[$func['triggerid']]['description']);
-					}
-				}
-			}
-
-			foreach ($result as $tnum => $trigger) {
-				if ($res = preg_match_all('/'.ZBX_PREG_EXPRESSION_USER_MACROS.'/', $trigger['description'], $arr)) {
-					$macros = API::UserMacro()->getMacros(array(
-						'macros' => $arr[1],
-						'triggerid' => $trigger['triggerid']
-					));
-
-					$search = array_keys($macros);
-					$values = array_values($macros);
-
-					$result[$tnum]['description'] = str_replace($search, $values, $trigger['description']);
-				}
-			}
+			$result = CTriggerHelper::batchExpandDescription($result);
 		}
 
 		if (!empty($fieldsToUnset)) {
@@ -1816,7 +1635,7 @@ class CTrigger extends CTriggerGeneral {
 					));
 				}
 
-				delete_function_by_triggerid($trigger['triggerid']);
+				DB::delete('functions', array('triggerid' => $trigger['triggerid']));
 
 				$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
 				if (is_null($trigger['expression'])) {
@@ -2201,5 +2020,21 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		return false;
+	}
+
+	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		// only apply the node option if no specific ids are given
+		if ($options['groupids'] === null &&
+			$options['templateids'] === null &&
+			$options['hostids'] === null &&
+			$options['triggerids'] === null &&
+			$options['itemids'] === null &&
+			$options['applicationids'] === null &&
+			$options['discoveryids'] === null) {
+
+			$sqlParts = parent::applyQueryNodeOptions($tableName, $tableAlias, $options, $sqlParts);
+		}
+
+		return $sqlParts;
 	}
 }

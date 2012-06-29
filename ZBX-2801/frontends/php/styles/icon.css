@@ -127,12 +127,14 @@
 	width: 19px;
 	background: url('../images/general/sort_up.gif') no-repeat;
 	cursor: pointer;
+	display:inline-block;
 }
 .icon_sortdown{
 	height: 16px;
 	width: 19px;
 	background: url('../images/general/sort_down.gif') no-repeat;
 	cursor: pointer;
+	display:inline-block;
 }
 .default_cursor{
 	cursor: default !important;

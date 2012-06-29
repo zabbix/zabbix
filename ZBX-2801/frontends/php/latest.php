@@ -295,7 +295,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 			$lastclock = ' - ';
 		}
 
-		$lastvalue = format_lastvalue($db_item);
+		$lastvalue = formatItemValue($db_item);
 
 		if(isset($db_item['lastvalue']) && isset($db_item['prevvalue'])
 				&& in_array($db_item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
@@ -461,7 +461,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 		}
 
 		// column "lastvalue"
-		$lastvalue = format_lastvalue($db_item);
+		$lastvalue = formatItemValue($db_item);
 
 		// column "change"
 		if (isset($db_item['lastvalue']) && isset($db_item['prevvalue'])

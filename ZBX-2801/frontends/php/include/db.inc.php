@@ -89,11 +89,11 @@ function DBconnect(&$error) {
 				break;
 			case ZBX_DB_POSTGRESQL:
 				$pg_connection_string =
-					(!empty($DB['SERVER']) ? 'host=\''.$DB['SERVER'].'\' ' : '').
-					'dbname=\''.$DB['DATABASE'].'\' '.
-					(!empty($DB['USER']) ? 'user=\''.$DB['USER'].'\' ' : '').
-					(!empty($DB['PASSWORD']) ? 'password=\''.$DB['PASSWORD'].'\' ' : '').
-					(!empty($DB['PORT']) ? 'port='.$DB['PORT'] : '');
+					(!empty($DB['SERVER']) ? 'host=\''.pg_connect_escape($DB['SERVER']).'\' ' : '').
+					'dbname=\''.pg_connect_escape($DB['DATABASE']).'\' '.
+					(!empty($DB['USER']) ? 'user=\''.pg_connect_escape($DB['USER']).'\' ' : '').
+					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
+					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
 				$DB['DB']= pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
@@ -1118,4 +1118,15 @@ function unlock_sqlite3_access() {
  */
 function idcmp($id1, $id2) {
 	return $id1 === $id2;
+}
+
+/**
+ * Escapes the value to be used in the PostgreSQL connection string for the pg_connect() function.
+ *
+ * @param $string
+ *
+ * @return string
+ */
+function pg_connect_escape($string) {
+	return addcslashes($string, "'\\");
 }
