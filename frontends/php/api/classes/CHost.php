@@ -944,7 +944,7 @@ class CHost extends CZBXAPI {
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectTriggers']) {
 				$triggers = API::Trigger()->get(array(
-					'nodeids' => $nodeids,
+					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'countOutput' => true,
 					'groupCount' => true
@@ -999,7 +999,7 @@ class CHost extends CZBXAPI {
 			}
 			elseif (API_OUTPUT_COUNT == $options['selectGraphs']) {
 				$graphs = API::Graph()->get(array(
-					'nodeids' => $nodeids,
+					'nodeids' => $options['nodeids'],
 					'hostids' => $hostids,
 					'countOutput' => true,
 					'groupCount' => true
