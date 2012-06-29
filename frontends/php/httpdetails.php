@@ -184,11 +184,11 @@
 			$itemids[] = $item_data['itemid'];
 		}
 
-		$speed = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
-		$resp = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
+		$speed = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]);
+		$resp = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_RSPCODE]);
 
 		$respTime = $httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]['lastvalue'];
-		$respItemTime = format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
+		$respItemTime = formatItemValue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_TIME]);
 
 		$table->addRow(array(
 			$httpstep_data['name'],
@@ -215,7 +215,7 @@
 	$table->addRow(array(
 		bold(_('TOTAL')),
 		SPACE,
-		bold(format_lastvalue($totalTime)),
+		bold(formatItemValue($totalTime)),
 		SPACE,
 		new CSpan($status['msg'], $status['style'].' bold')
 	));
