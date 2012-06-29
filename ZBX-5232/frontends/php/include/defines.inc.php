@@ -19,8 +19,12 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.0.1rc2');
+define('ZABBIX_VERSION',		'2.0.1');
 define('ZABBIX_API_VERSION',	'1.4');
+
+// copyright years
+define('ZABBIX_COPYRIGHT_FROM', '2001');
+define('ZABBIX_COPYRIGHT_TO', '2012');
 
 define('ZBX_LOGIN_ATTEMPTS',			5);
 define('ZBX_LOGIN_BLOCK',				30); // sec
@@ -594,7 +598,6 @@ define('PERM_READ_ONLY',	2);
 define('PERM_READ_LIST',	1);
 define('PERM_DENY',			0);
 
-define('PERM_RES_STRING_LINE',	0); // return string of nodes id - '1,2,3,4,5'
 define('PERM_RES_IDS_ARRAY',	1); // return array of nodes id - array(1,2,3,4)
 define('PERM_RES_DATA_ARRAY',	2);
 

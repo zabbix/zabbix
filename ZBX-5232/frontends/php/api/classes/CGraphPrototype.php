@@ -35,7 +35,7 @@ class CGraphPrototype extends CGraphGeneral {
 		parent::__construct();
 
 		$this->errorMessages = array_merge($this->errorMessages, array(
-			self::ERROR_TEMPLATE_HOST_MIX => _('Graph prototype "%1$s" with template host cannot contain items from other hosts.')
+			self::ERROR_TEMPLATE_HOST_MIX => _('Graph prototype "%1$s" with templated items cannot contain items from other hosts.')
 		));
 	}
 

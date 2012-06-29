@@ -1,3 +1,37 @@
+Changes for 2.0.2rc1
+
+New features:
+
+Bug fixes:
+.D........ [ZBX-2510] clarify in the Zabbix sender manpage which parameters from the agent config file sender supports (Richlv)
+A.F....... [ZBX-4007] fixed using screen elements with resources from child nodes (Pavels)
+A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)
+..F....... [ZBX-4007] fixed undefined index when switching nodes in the screen selection pop up (Pavels)
+A......... [ZBX-4007] fixed node criteria being applied when passing the  "screenitemids" parameter to screen.get (Pavels)
+A......... [ZBX-4007] fixed hostgroup.get returning the "graphid" property (Pavels)
+..F....... [ZBX-5108] fixed permission check errors caused by empty user groups (Pavels)
+A......... [ZBX-5208] fixed updating interfaces via host.massupdate (Pavels)
+A......... [ZBX-5208] fixed main interface validation in hostinterface.massremove (Pavels)
+A......... [ZBX-5208] fixed host.update only accepting arrays of interfaces and not working with a single interface (Pavels)
+..F....... [ZBX-5237] fixed event CSV export (Pavels)
+..F....... [ZBX-5179] fixed filter layout on low resolution screens (Pavels)
+..F....... [ZBX-3853] changed several message strings (Pavels)
+A......... [ZBX-5213] fixed usergroup.massupdate failing when updating only permissions or users (Pavels)
+..F....... [ZBX-5145] fixed PosgreSQL error when inserting an audit record if the X_FORWARDED_FOR header value is too long (Pavels)
+..F....... [ZBX-5065] fixed cannot delete a service with soft linked dependencies (Toms)
+A.F....... [ZBX-5065] added circularity check for IT services (Toms)
+..F....... [ZBX-2501] fixed subnodes not opening when parent node is opened in IT services (Toms)
+..F....... [ZBX-2506] fixed ordering for dashboard filter; fixed multisort function (Toms)
+A......... [ZBX-5079] fixed returning triggers and graphs with no permissions and incorrect counts for templates (Toms)
+..F....... [ZBX-2854] fixed table sorting icon positioning (Toms)
+..F....... [ZBX-5107] fixed in popup it is possible to select more than once (Toms)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.1
+
+2.0.1rc2 was released as 2.0.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.1rc2
 
 New features:
@@ -781,6 +815,10 @@ New features:
  - [DEV-444] added optional suppressing of processing of older data in log[], logrt[] and eventlog[] (Sasha)
 
 --------------------------------------------------------------------------------
+Changes for 1.8.14
+
+1.8.14rc1 was released as 1.8.14 without any changes
+
 Changes for 1.8.14rc1
 
 A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)
