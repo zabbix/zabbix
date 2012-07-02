@@ -1,3 +1,12 @@
+Changes for 1.8.15rc1
+
+..F....... [ZBX-3245] fixed trigger item selection pop up not working with items from child nodes (Pavels)
+A......... [ZBX-4929] optimized host groups sql queries (Eduard)
+
+Changes for 1.8.14
+
+1.8.14rc1 was released as 1.8.14 without any changes
+
 Changes for 1.8.14rc1
 
 A.F....... [ZBX-4007] fixed not being able to add screens from a child node to a slideshow (Pavels)

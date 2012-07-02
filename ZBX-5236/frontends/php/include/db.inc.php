@@ -675,6 +675,10 @@ if(isset($DB['TYPE']) && $DB['TYPE'] == "MYSQL") {
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS UNSIGNED) ';
 	}
+
+	function zbx_limit($min = 1, $max = null) {
+		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
+	}
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
 	function zbx_dbstr($var){
@@ -688,6 +692,10 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == "POSTGRESQL") {
 
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS BIGINT) ';
+	}
+
+	function zbx_limit($min = 1, $max = null) {
+		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
@@ -703,6 +711,10 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == 'ORACLE') {
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS NUMBER(20)) ';
 	}
+
+	function zbx_limit($min = 1, $max = null) {
+		return !empty($max) ? 'ROWNUM BETWEEN '.$min.' AND '.$max : 'ROWNUM <='.$min;
+	}
 }
 else if(isset($DB['TYPE']) && $DB['TYPE'] == 'IBM_DB2') {
 	function zbx_dbstr($var){
@@ -717,6 +729,10 @@ else if(isset($DB['TYPE']) && $DB['TYPE'] == 'IBM_DB2') {
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS BIGINT) ';
 	}
+
+	function zbx_limit($min = 1, $max = null) {
+		return !empty($max) ? 'ROWNUM BETWEEN '.$min.' AND '.$max : 'ROWNUM <='.$min;
+	}
 }
 else {
 	function zbx_dbstr($var){
@@ -730,6 +746,10 @@ else {
 
 	function zbx_dbcast_2bigint($field){
 		return ' CAST('.$field.' AS BIGINT) ';
+	}
+
+	function zbx_limit($min = 1, $max = null) {
+		return !empty($max) ? 'LIMIT '.$min.','.$max : 'LIMIT '.$min;
 	}
 }
 
