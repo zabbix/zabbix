@@ -109,6 +109,7 @@ A......... [ZBX-5026] fixed error messages when creating IT Service (Eduard)
 Changes for 2.0.2rc1
 
 New features:
+A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ..F....... [ZBX-3387] fixed incorrect frontend language shown as active in the user profile (Vedmak)
