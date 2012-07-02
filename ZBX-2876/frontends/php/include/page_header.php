@@ -456,7 +456,7 @@ if ($denied_page_requested) {
 	access_deny();
 }
 
-if ($page['type'] == PAGE_TYPE_HTML) {
+if ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 	zbx_add_post_js('var msglistid = initMessages({});');
 }
 
