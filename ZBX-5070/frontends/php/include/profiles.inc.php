@@ -87,6 +87,10 @@ class CProfile {
 	}
 
 	public static function get($idx, $default_value = null, $idx2 = 0) {
+		if (!CWebUser::$data) {
+			return false;
+		}
+
 		if (is_null(self::$profiles)) {
 			self::init();
 		}
