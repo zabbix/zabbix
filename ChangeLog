@@ -1,14 +1,12 @@
 Changes for 2.1.0
 
 New features:
-........S. [ZBXNEXT-1259] added a script file existence and permissions check for a "Script" media type (Sasha)
+........S. [ZBXNEXT-1259] added a script file existence and permissions check for the "Script" media type (Sasha)
 ...G...... [ZBXNEXT-801] maximum number of monitored disks increased to 1024, with dynamic increasing of shared memory size (Andris)
-..F....... [ZBX-5106] fixed trigger dependencies not being mapped to new triggers when cloning a host (Pavels)
-..F....... [ZBX-5106] fixed trigger dependencies on web triggers not being removed when cloning a host (Pavels)
-A.F....... [ZBX-5074] redesign configuration of action (Eduard)
+A.F....... [ZBX-5074] redesigned action configuration page (Eduard)
 ..F....... [ZBX-1357] updated Brazilian Portuguese, French, Japanese, Russian and Ukrainian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-1019] updated jQuery to 1.7.2 and jQuery UI to 1.8.20 (Vedmak)
-..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
+..F....... [ZBXNEXT-829] added Zabbix server availability check (Vedmak)
 
 Bug fixes:
 ..F....... [ZBX-3387] fixed incorrect gui language is shown as active in user profile (Vedmak)
@@ -61,6 +59,9 @@ A......... [ZBX-5115] fixed API object names being case sensitive (Pavels)
 ........S. [ZBX-5123] fixed Oracle SQL error while linking a template by server (Sasha)
 ..F....... [ZBX-5156] fixed incorrect values in node edit form (Vedmak)
 A......... [ZBX-5140] fixed usermacro.get return macros from all nodes by default (Vedmak)
+..F....... [ZBX-5106] fixed trigger dependencies not being mapped to new triggers when cloning a host (Pavels)
+..F....... [ZBX-5106] fixed trigger dependencies on web triggers not being removed when cloning a host (Pavels)
+
 ..F....... [ZBX-5128] fixed pagefilter->groupid (Eduard)
 ..F....... [ZBX-5073] fixed parent template links in items, triggers, graphs and discovery rules (Eduard)
 ..F....... [ZBX-5104] fixed severity colors in trigger forms (Vedmak)
