@@ -1720,7 +1720,10 @@ class CAction extends CZBXAPI {
 					break;
 
 				case CONDITION_TYPE_TIME_PERIOD:
-					if (!validate_period($condition['value'])) {
+					try {
+						validateTimePeriods($condition['value']);
+					}
+					catch (Exception $e) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action condition period "%s".', $condition['value']));
 					}
 					break;

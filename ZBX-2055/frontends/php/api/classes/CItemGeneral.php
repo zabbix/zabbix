@@ -319,6 +319,9 @@ abstract class CItemGeneral extends CZBXAPI {
 					}
 				}
 			}
+
+			$this->validateDelayFlex($fullItem);
+
 			$this->checkSpecificFields($fullItem);
 		}
 		unset($item);
@@ -703,6 +706,42 @@ abstract class CItemGeneral extends CZBXAPI {
 			while ($dbItem = DBfetch($dbItems)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Item with key "%1$s" already exists on "%2$s".', $dbItem['key_'], $dbItem['host']));
+			}
+		}
+	}
+
+	/**
+	 * Validate flexible intervals.
+	 * Flexible intervals is string with format:
+	 *   'delay/day1-day2,time1-time2;interval2;interval3;...' (day2 is optional)
+	 * Examples:
+	 *   600/5-7,00:00-09:00;600/1-2,00:00-09:00
+	 *   600/5,0:0-9:0;600/1-2,0:0-9:0
+	 *
+	 * @param array $item
+	 *
+	 * @return bool
+	 */
+	protected function validateDelayFlex(array $item) {
+		if (array_key_exists('delay_flex', $item)) {
+			$delayFlex = $item['delay_flex'];
+
+			if (!is_string($delayFlex)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Flexible interval must be a string.', $item['name']));
+			}
+
+			$intervals = explode(';', rtrim($delayFlex, ';'));
+			foreach ($intervals as $interval) {
+				if (!preg_match('#^\d+/(.+)$#', $interval, $matches)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect flexible interval "%1$s".', $interval));
+				}
+
+				try {
+					validateTimePeriod($matches[1]);
+				}
+				catch (Exception $e) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
+				}
 			}
 		}
 	}

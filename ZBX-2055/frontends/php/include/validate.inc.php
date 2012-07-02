@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function unset_request($key) {
 	unset($_GET[$key], $_POST[$key], $_REQUEST[$key]);
 }
@@ -230,39 +230,63 @@ function validate_port_list($str) {
 	return true;
 }
 
-function validate_period(&$str) {
-	$str = trim($str, ';');
-	$out = '';
-	$periods = explode(';', $str);
-	foreach ($periods as $period) {
-		// arr[idx]		1	2	3	4	5	6
-		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $arr)) {
-			return false;
-		}
-		// check week day
-		if ($arr[1] > $arr[2]) {
-			return false;
-		}
-		// check hour
-		if ($arr[3] > 23 || $arr[3] < 0 || $arr[5] > 24 || $arr[5] < 0) {
-			return false;
-		}
-		// check min
-		if ($arr[4] > 59 || $arr[4] < 0 || $arr[6] > 59 || $arr[6] < 0) {
-			return false;
-		}
-		// check max time 24:00
-		if (($arr[5]*100 + $arr[6]) > 2400) {
-			return false;
-		}
-		// check time period
-		if (($arr[3] * 100 + $arr[4]) >= ($arr[5] * 100 + $arr[6])) {
-			return false;
-		}
-		$out .= sprintf('%d-%d,%02d:%02d-%02d:%02d', $arr[1], $arr[2], $arr[3], $arr[4], $arr[5], $arr[6]).';';
+/**
+ * Validate multiple time periods.
+ * Time periods is a string with format:
+ *   'day1-day2,time1-time2;interval2;interval3;...' (day2 and last ';' are optional)
+ * Examples:
+ *   5-7,00:00-09:00;1,10:00-20:00;
+ *   5,0:0-9:0
+ *
+ * @param string $periods
+ */
+function validateTimePeriods($periods) {
+	// remove one last ';'
+	if ($periods[strlen($periods) - 1] === ';') {
+		$periods = substr($periods, 0, strlen($periods) - 1);;
 	}
-	$str = $out;
-	return true;
+
+	$periods = explode(';', $periods);
+
+	foreach ($periods as $period) {
+		validateTimePeriod($period);
+	}
+}
+
+
+/**
+ * Validate single time period.
+ * Time period is a string with format:
+ *   'day1-day2,time1-time2;' (day2 and ';' are optional)
+ * Examples:
+ *   5-7,00:00-09:00
+ *   5,0:0-9:0
+ *
+ * @param string $period
+ *
+ * @throws Exception
+ */
+function validateTimePeriod($period) {
+	$daysRegExp = '(?P<day1>[1-7])(-(?P<day2>[1-7]))?';
+	$time1RegExp = '(?P<hour1>20|21|22|23|24|[0-1]\d|\d):(?P<min1>[0-5]\d)';
+	$time2RegExp = '(?P<hour2>20|21|22|23|24|[0-1]\d|\d):(?P<min2>[0-5]\d)';
+
+	if (!preg_match('#^'.$daysRegExp.','.$time1RegExp.'-'.$time2RegExp.'$#', $period, $matches)) {
+		throw new Exception(_s('Incorrect time period "%1$s".', $period));
+	}
+
+	if ($matches['hour2'] == '24' && $matches['min2'] != 0) {
+		throw new Exception(_s('Incorrect time period "%1$s".', $period));
+	}
+
+	if (!zbx_empty($matches['day2']) && ($matches['day1'] > $matches['day2'])) {
+		throw new Exception(_s('Incorrect time period "%1$s" start day must be less or equal to end day.', $period));
+	}
+
+	if (($matches['hour1'] > $matches['hour2'])
+			|| (($matches['hour1'] == $matches['hour2']) && ($matches['min1'] >= $matches['min2']))) {
+		throw new Exception(_s('Incorrect time period "%1$s" start time must be less than end time.', $period));
+	}
 }
 
 function calc_exp($fields, $field, $expression) {
@@ -641,5 +665,3 @@ function validateUserMacro($value) {
 function validateMaxTime($time) {
 	return $time <= 2147464800; // 2038.01.19 00:00
 }
-
-?>

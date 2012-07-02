@@ -58,10 +58,9 @@ check_fields($fields);
 insert_js_function('add_media');
 
 if (isset($_REQUEST['add'])) {
-	if (!validate_period($_REQUEST['period'])) {
-		error(_('Incorrect time period'));
-	}
-	else {
+	try {
+		validateTimePeriods($_REQUEST['period']);
+
 		$severity = 0;
 		$_REQUEST['severity'] = get_request('severity', array());
 		foreach ($_REQUEST['severity'] as $id) {
@@ -77,6 +76,9 @@ if (isset($_REQUEST['add'])) {
 				$_REQUEST['active'].','.
 				$severity.');'.
 				'</script>';
+	}
+	catch (Exception $e) {
+		error($e->getMessage());
 	}
 }
 

@@ -688,8 +688,11 @@ class CUser extends CZBXAPI {
 			$userids[] = $user['userid'];
 
 			foreach ($medias as $media) {
-				if (!validate_period($media['period'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect time period'));
+				try {
+					validateTimePeriods($media['period']);
+				}
+				catch (Exception $e) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 				}
 
 				$mediaid = get_dbid('media', 'mediaid');
@@ -788,8 +791,11 @@ class CUser extends CZBXAPI {
 
 		// update
 		foreach ($updMedias as $media) {
-			if (!validate_period($media['period'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect time period "%1$s".', $media['period']));
+			try {
+				validateTimePeriods($media['period']);
+			}
+			catch (CException $e) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $e->getMessage());
 			}
 
 			$result = DBexecute(

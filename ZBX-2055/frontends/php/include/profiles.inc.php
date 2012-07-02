@@ -231,8 +231,11 @@ function update_config($configs) {
 	$update = array();
 
 	if (isset($configs['work_period'])) {
-		if (!validate_period($configs['work_period'])) {
-			error(_s('Incorrect working time: "%s".', $configs['work_period']));
+		try {
+			validateTimePeriods($configs['work_period']);
+		}
+		catch (Exception $e) {
+			error($e->getMessage());
 			return false;
 		}
 	}

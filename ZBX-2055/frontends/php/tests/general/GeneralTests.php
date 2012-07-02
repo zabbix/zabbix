@@ -35,6 +35,7 @@ require_once dirname(__FILE__).'/function_DBloadfile.php';
 require_once dirname(__FILE__).'/function_DBrollback.php';
 require_once dirname(__FILE__).'/function_DBselect.php';
 require_once dirname(__FILE__).'/function_DBstart.php';
+require_once dirname(__FILE__).'/function_validateTimePeriods.php';
 
 class GeneralTests {
 	public static function suite() {
@@ -56,6 +57,7 @@ class GeneralTests {
 		$suite->addTestSuite('function_DBrollback');
 		$suite->addTestSuite('function_DBselect');
 		$suite->addTestSuite('function_DBstart');
+		$suite->addTestSuite('function_validateTimePeriods');
 
 		return $suite;
 	}
