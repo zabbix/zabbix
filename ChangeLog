@@ -11,6 +11,7 @@ A.F....... [ZBX-5074] redesign configuration of action (Eduard)
 ..F....... [ZBXNEXT-829] Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3387] fixed incorrect gui language is shown as active in user profile (Vedmak)
 ..F....... [ZBX-2046] fixed paging can work incorrectly if elements count changes (Vedmak)
 A......... [ZBX-5060] fixed cannot Mass Update inventory mode (Toms)
 A......... [ZBX-4929] optimized host groups sql queries (Eduard)
@@ -110,6 +111,7 @@ Changes for 2.0.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-3387] fixed incorrect gui language is shown as active in user profile (Vedmak)
 ..F....... [ZBX-2046] fixed paging can work incorrectly if elements count changes (Vedmak)
 A......... [ZBX-5060] fixed cannot Mass Update inventory mode (Toms)
 A......... [ZBX-4929] optimized host groups sql queries (Eduard)
