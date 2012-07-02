@@ -61,7 +61,6 @@ A......... [ZBX-5115] fixed API object names being case sensitive (Pavels)
 A......... [ZBX-5140] fixed usermacro.get return macros from all nodes by default (Vedmak)
 ..F....... [ZBX-5106] fixed trigger dependencies not being mapped to new triggers when cloning a host (Pavels)
 ..F....... [ZBX-5106] fixed trigger dependencies on web triggers not being removed when cloning a host (Pavels)
-
 ..F....... [ZBX-5128] fixed pagefilter->groupid (Eduard)
 ..F....... [ZBX-5073] fixed parent template links in items, triggers, graphs and discovery rules (Eduard)
 ..F....... [ZBX-5104] fixed severity colors in trigger forms (Vedmak)
