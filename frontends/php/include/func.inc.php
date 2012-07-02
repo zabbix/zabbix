@@ -1475,7 +1475,7 @@ function getPageSortOrder($def = ZBX_SORT_UP) {
 }
 
 /************* PAGING *************/
-function getPagingLine(&$items, $autotrim = true) {
+function getPagingLine(&$items) {
 	global $page;
 	$config = select_config();
 
@@ -1485,78 +1485,72 @@ function getPagingLine(&$items, $autotrim = true) {
 		$search_limit = '+';
 	}
 
-	$start = get_request('start', null);
+	$rowsPerPage = CWebUser::$data['rows_per_page'];
+	$itemsCount = count($items);
+	$pagesCount = $itemsCount > 0 ? ceil($itemsCount / $rowsPerPage) : 1;
 
-	if (is_null($start)) {
+	$currentPage = get_request('page');
+	if ($currentPage === null) {
 		$last_page = CProfile::get('web.paging.lastpage');
-		$start = ($last_page == $page['file']) ? CProfile::get('web.paging.start', 0) : 0;
+		$currentPage = ($last_page == $page['file']) ? CProfile::get('web.paging.page', 1) : 1;
 	}
 
-	$rows_per_page = CWebUser::$data['rows_per_page'];
-
-	$cnt_items = count($items);
-	$cnt_pages = ceil($cnt_items / $rows_per_page);
-
-	if ($cnt_items < $start) {
-		$start = 0;
+	if ($currentPage < 1) {
+		$currentPage = 1;
 	}
+
+	if ($itemsCount < (($currentPage - 1) * $rowsPerPage)) {
+		$currentPage = $pagesCount;
+	}
+
+	$start = ($currentPage - 1) * $rowsPerPage;
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
-	CProfile::update('web.paging.start', $start, PROFILE_TYPE_INT);
+	CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
 
-	if ($cnt_pages < 1) {
-		$cnt_pages = 1;
-	}
-
-	$crnt_page = floor($start / $rows_per_page) + 1;
-
-	if ($autotrim) {
-		$items = array_slice($items, $start, $rows_per_page, true);
-	}
+	// trim array with items to contain items for current page
+	$items = array_slice($items, $start, $rowsPerPage, true);
 
 	// viewed pages (better to use not odd)
-	$view_pages = 11;
+	$pagingNavRange = 11;
 
-	$endPage = $crnt_page + floor($view_pages / 2);
-	if ($endPage < $view_pages) {
-		$endPage = $view_pages;
+	$endPage = $currentPage + floor($pagingNavRange / 2);
+	if ($endPage < $pagingNavRange) {
+		$endPage = $pagingNavRange;
 	}
-	if ($endPage > $cnt_pages) {
-		$endPage = $cnt_pages;
+	if ($endPage > $pagesCount) {
+		$endPage = $pagesCount;
 	}
 
-	$startPage = ($endPage > $view_pages) ? $endPage - $view_pages + 1 : 1;
+	$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
 	$pageline = array();
 
 	$table = BR();
-	if ($cnt_pages > 1) {
+	if ($pagesCount > 1) {
+		$url = new Curl();
 		if ($startPage > 1) {
-			$pagespan = new CSpan('<< '._x('First', 'page navigation'), 'darklink');
-			$pagespan->setAttribute('onclick', 'javascript: openPage(0);');
-
-			$pageline[] = $pagespan;
+			$url->setArgument('page', 1);
+			$pageline[] = new CLink('<< '._x('First', 'page navigation'), $url->getUrl(), null, null, true);
 			$pageline[] = '&nbsp;&nbsp;';
 		}
 
-		if ($crnt_page > 1) {
-			$pagespan = new CSpan('< '._x('Previous', 'page navigation'), 'darklink');
-			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($crnt_page - 2) * $rows_per_page).');');
-
-			$pageline[] = $pagespan;
+		if ($currentPage > 1) {
+			$url->setArgument('page', $currentPage - 1);
+			$pageline[] = new CLink('< '._x('Previous', 'page navigation'), $url->getUrl(), null, null, true);
 			$pageline[] = ' | ';
 		}
 
-		for ($p = $startPage; $p <= $cnt_pages; $p++) {
+		for ($p = $startPage; $p <= $pagesCount; $p++) {
 			if ($p > $endPage) {
 				break;
 			}
 
-			if ($p == $crnt_page) {
+			if ($p == $currentPage) {
 				$pagespan = new CSpan($p, 'bold textcolorstyles');
 			}
 			else {
-				$pagespan = new CSpan($p, 'darklink');
-				$pagespan->setAttribute('onclick', 'javascript: openPage('.(($p - 1) * $rows_per_page).');');
+				$url->setArgument('page', $p);
+				$pagespan = new CLink($p, $url->getUrl(), null, null, true);
 			}
 
 			$pageline[] = $pagespan;
@@ -1565,43 +1559,41 @@ function getPagingLine(&$items, $autotrim = true) {
 
 		array_pop($pageline);
 
-		if ($crnt_page < $cnt_pages) {
-			$pagespan = new CSpan(_x('Next', 'page navigation').' >', 'darklink');
-			$pagespan->setAttribute('onclick', 'javascript: openPage('.($crnt_page * $rows_per_page).');');
-
+		if ($currentPage < $pagesCount) {
 			$pageline[] = ' | ';
-			$pageline[] = $pagespan;
+
+			$url->setArgument('page', $currentPage + 1);
+			$pageline[] = new CLink(_x('Next', 'page navigation').' >', $url->getUrl(), null, null, true);
 		}
 
-		if ($p < $cnt_pages) {
-			$pagespan = new CSpan(_x('Last', 'page navigation').' >>', 'darklink');
-			$pagespan->setAttribute('onclick', 'javascript: openPage('.(($cnt_pages - 1) * $rows_per_page).');');
-
+		if ($p < $pagesCount) {
 			$pageline[] = '&nbsp;&nbsp;';
-			$pageline[] = $pagespan;
+
+			$url->setArgument('page', $pagesCount);
+			$pageline[] = new CLink(_x('Last', 'page navigation').' >>', $url->getUrl(), null, null, true);
 		}
 
 		$table = new CTable(null, 'paging');
-		$table ->addRow(new CCol($pageline));
+		$table->addRow(new CCol($pageline));
 	}
 
-	$view_from_page = ($crnt_page-1) * $rows_per_page + 1;
+	$view_from_page = ($currentPage - 1) * $rowsPerPage + 1;
 
-	$view_till_page = $crnt_page * $rows_per_page;
-	if ($view_till_page > $cnt_items) {
-		$view_till_page = $cnt_items;
+	$view_till_page = $currentPage * $rowsPerPage;
+	if ($view_till_page > $itemsCount) {
+		$view_till_page = $itemsCount;
 	}
 
 	$page_view = array();
 	$page_view[] = _('Displaying').SPACE;
-	if ($cnt_items > 0) {
+	if ($itemsCount > 0) {
 		$page_view[] = new CSpan($view_from_page, 'info');
 		$page_view[] = SPACE._('to').SPACE;
 	}
 
 	$page_view[] = new CSpan($view_till_page, 'info');
 	$page_view[] = SPACE._('of').SPACE;
-	$page_view[] = new CSpan($cnt_items, 'info');
+	$page_view[] = new CSpan($itemsCount, 'info');
 	$page_view[] = $search_limit;
 	$page_view[] = SPACE._('found');
 
