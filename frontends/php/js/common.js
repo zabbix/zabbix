@@ -630,13 +630,3 @@ function switchElementsClass(obj, class1, class2) {
 function zbx_throw(msg){
 	throw(msg);
 }
-
-/************************************************************************************/
-/*									Pages stuff										*/
-/************************************************************************************/
-function openPage(start) {
-	var lnk = new Curl(location.href);
-	lnk.setArgument('start', start);
-	location.href = lnk.getUrl();
-	return false;
-}
