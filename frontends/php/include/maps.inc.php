@@ -807,19 +807,21 @@
 
 //------------------------------------
 
- 	function getTriggersInfo($selement, $i){
+	function getTriggersInfo($selement, $i, $showUnack) {
 		global $colors;
 
 		$info = array(
 			'latelyChanged' => $i['latelyChanged'],
 			'ack' => $i['ack'],
 			'priority' => $i['priority'],
+			'info' => array(),
 		);
 
-		if($i['problem']){
+		if($i['problem'] && ($i['problem_unack'] && $showUnack == EXTACK_OPTION_UNACK
+				|| in_array($showUnack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH)))) {
+
 			$info['iconid'] = $selement['iconid_on'];
 			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-			$info['info'] = array();
 			$info['info']['unack'] = array(
 				'msg' => S_PROBLEM_BIG,
 				'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
@@ -871,9 +873,6 @@
 		$has_problem = false;
 
 		if($i['problem']){
-			$info['iconid'] = $selement['iconid_on'];
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-
 			if(in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
 				if($i['problem'] > 1)
 					$msg = $i['problem'].' '.S_PROBLEMS;
@@ -895,13 +894,19 @@
 				);
 			}
 
+			// set element to problem state if it has problem events, ignore unknown events
+			if ($info['info']) {
+				$info['iconid'] = $selement['iconid_on'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
+				$has_problem = true;
+			}
+
 			if($i['unknown']){
 				$info['info']['unknown'] = array(
 					'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 					'color' => $colors['Gray']
 				);
 			}
-			$has_problem = true;
 		}
 		else if($i['unknown']){
 			$info['iconid'] = $selement['iconid_unknown'];
@@ -911,7 +916,6 @@
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
-			$has_problem = true;
 		}
 
 		if($i['maintenance']){
@@ -955,9 +959,6 @@
 		$has_status = false;
 
 		if($i['problem']){
-			$info['iconid'] = $selement['iconid_on'];
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
-
 			if(in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
 				if($i['problem'] > 1)
 					$msg = $i['problem'].' '.S_PROBLEMS;
@@ -979,13 +980,19 @@
 				);
 			}
 
+			// set element to problem state if it has problem events, ignore unknown events
+			if ($info['info']) {
+				$info['iconid'] = $selement['iconid_on'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
+				$has_problem = true;
+			}
+
 			if($i['unknown']){
 				$info['info']['unknown'] = array(
 					'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 					'color' => $colors['Gray']
 				);
 			}
-			$has_problem = true;
 		}
 		else if($i['unknown']){
 			$info['iconid'] = $selement['iconid_unknown'];
@@ -994,7 +1001,6 @@
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
-			$has_problem = true;
 		}
 
 		if($i['maintenance']){
@@ -1045,8 +1051,6 @@
 		$has_status = false;
 
 		if($i['problem']){
-			$info['iconid'] = $selement['iconid_on'];
-			$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 			if(in_array($show_unack, array(EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH))){
 				if($i['problem'] > 1)
 					$msg = $i['problem'].' '.S_PROBLEMS;
@@ -1068,13 +1072,18 @@
 				);
 			}
 
+			if ($info['info']) {
+				$info['iconid'] = $selement['iconid_on'];
+				$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
+				$has_problem = true;
+			}
+
 			if($i['unknown']){
 				$info['info']['unknown'] = array(
 					'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 					'color' => $colors['Gray']
 				);
 			}
-			$has_problem = true;
 		}
 		else if($i['unknown']){
 			$info['iconid'] = $selement['iconid_unknown'];
@@ -1084,7 +1093,6 @@
 				'msg' => $i['unknown'] . ' ' . S_UNKNOWN,
 				'color' => $colors['Gray']
 			);
-			$has_problem = true;
 		}
 
 		if($i['maintenance']){
@@ -1396,7 +1404,7 @@
 					$info[$selementid] = getHostsInfo($selement, $i, $show_unack);
 				break;
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
-					$info[$selementid] = getTriggersInfo($selement, $i);
+					$info[$selementid] = getTriggersInfo($selement, $i, $show_unack);
 				break;
 				case SYSMAP_ELEMENT_TYPE_IMAGE:
 					$info[$selementid] = getImagesInfo($selement);
