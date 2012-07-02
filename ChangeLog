@@ -933,6 +933,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.15rc1
 
+..F....... [ZBX-5236] fixed some map element rendering ignoring the "Problem display" map option (Pavels)
 ..F....... [ZBX-3245] fixed trigger item selection pop up not working with items from child nodes (Pavels)
 A......... [ZBX-4929] optimized host groups sql queries (Eduard)
 
