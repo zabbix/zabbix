@@ -1142,6 +1142,17 @@ function getSelementsInfo($sysmap) {
 			$i['maintenance_title'] = $mnt['name'];
 		}
 
+		// replace default icons
+		if (!$selement['iconid_on']) {
+			$selement['iconid_on'] = $selement['iconid_off'];
+		}
+		if (!$selement['iconid_maintenance']) {
+			$selement['iconid_maintenance'] = $selement['iconid_off'];
+		}
+		if (!$selement['iconid_disabled']) {
+			$selement['iconid_disabled'] = $selement['iconid_off'];
+		}
+
 		switch ($selement['elementtype']) {
 			case SYSMAP_ELEMENT_TYPE_MAP:
 				$info[$selementid] = getMapsInfo($selement, $i, $show_unack);
