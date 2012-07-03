@@ -100,7 +100,7 @@ class CTimePeriodValidator extends CValidator {
 	/**
 	 * Set default options.
 	 * Possible options:
-	 *  - allow_multiple: assume that period string contain multiple periods separated by ';'
+	 *  - allow_multiple: assume that period string contains multiple periods separated by ';'
 	 */
 	protected function initOptions() {
 		$this->options['allow_multiple'] = true;
