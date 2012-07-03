@@ -146,7 +146,7 @@ A.F....... [ZBX-5065] added circularity check for IT services (Toms)
 ..F....... [ZBX-2506] fixed ordering for dashboard filter; fixed multisort function (Toms)
 A......... [ZBX-5079] fixed returning triggers and graphs with no permissions and incorrect counts for templates (Toms)
 ..F....... [ZBX-2854] fixed table sorting icon positioning (Toms)
-..F....... [ZBX-5107] fixed ability to elect entities more than once in popups (Toms)
+..F....... [ZBX-5107] fixed ability to select entities more than once in popups (Toms)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.1
