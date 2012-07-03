@@ -23,9 +23,19 @@ require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/locales.inc.php';
 require_once dirname(__FILE__).'/../../include/func.inc.php';
-require_once dirname(__FILE__).'/../../include/validate.inc.php';
+require_once dirname(__FILE__).'/../../include/classes/validators/CValidator.php';
+require_once dirname(__FILE__).'/../../include/classes/validators/CTimePeriodValidator.php';
 
-class function_validateTimePeriods extends PHPUnit_Framework_TestCase {
+class CTimePeriodValidatorTest extends PHPUnit_Framework_TestCase {
+
+	/**
+	 * @var CTimePeriodValidator
+	 */
+	protected static $validator;
+
+	public static function setUpBeforeClass() {
+		self::$validator = new CTimePeriodValidator();
+	}
 
 	public static function validPeriods() {
 		return array(
@@ -56,25 +66,15 @@ class function_validateTimePeriods extends PHPUnit_Framework_TestCase {
 	 * @dataProvider validPeriods
 	 */
 	public function test_valid($period) {
-		try {
-			validateTimePeriods($period);
-		}
-		catch (Exception $e) {
-			$this->fail(sprintf('Valid time period "%s" is treated as invalid', $period));
-		}
+		$result = self::$validator->validate($period);
+		$this->assertTrue($result, sprintf('Valid time period "%s" is treated as invalid', $period));
 	}
 
 	/**
 	 * @dataProvider invalidPeriods
 	 */
 	public function test_invalid($period) {
-		try {
-			validateTimePeriods($period);
-		}
-		catch (Exception $e) {
-			return;
-		}
-
-		$this->fail(sprintf('Invalid time period "%s" is treated as valid', $period));
+		$result = self::$validator->validate($period);
+		$this->assertFalse($result, sprintf('Invalid time period "%s" is treated as valid', $period));
 	}
 }

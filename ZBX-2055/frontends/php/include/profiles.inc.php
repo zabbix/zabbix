@@ -231,11 +231,9 @@ function update_config($configs) {
 	$update = array();
 
 	if (isset($configs['work_period'])) {
-		try {
-			validateTimePeriods($configs['work_period']);
-		}
-		catch (Exception $e) {
-			error($e->getMessage());
+		$timePeriodValidator = new CTimePeriodValidator();
+		if (!$timePeriodValidator->validate($configs['work_period'])) {
+			error($timePeriodValidator->getError());
 			return false;
 		}
 	}

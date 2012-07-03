@@ -58,9 +58,8 @@ check_fields($fields);
 insert_js_function('add_media');
 
 if (isset($_REQUEST['add'])) {
-	try {
-		validateTimePeriods($_REQUEST['period']);
-
+	$validator = new CTimePeriodValidator();
+	if ($validator->validate($_REQUEST['period'])) {
 		$severity = 0;
 		$_REQUEST['severity'] = get_request('severity', array());
 		foreach ($_REQUEST['severity'] as $id) {
@@ -77,8 +76,8 @@ if (isset($_REQUEST['add'])) {
 				$severity.');'.
 				'</script>';
 	}
-	catch (Exception $e) {
-		error($e->getMessage());
+	else {
+		error($validator->getError());
 	}
 }
 
