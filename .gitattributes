@@ -181,6 +181,8 @@ frontends/php/include/classes/helpers/trigger/CEventDescription.php -text
 frontends/php/include/classes/helpers/trigger/CEventHelper.php -text
 frontends/php/include/classes/helpers/trigger/CTriggerDescription.php -text
 frontends/php/include/classes/helpers/trigger/CTriggerHelper.php -text
+frontends/php/include/classes/validators/CTimePeriodValidator.php -text
+frontends/php/include/classes/validators/CValidator.php -text
 frontends/php/js/servercheck.js -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
@@ -261,6 +263,7 @@ frontends/php/styles/themes/originalblue/images/icons_d40000.png -text
 frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/general/CTimePeriodValidatorTest.php -text
 frontends/php/tests/general/class_CDescription.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
