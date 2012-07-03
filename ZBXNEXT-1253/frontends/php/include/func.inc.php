@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,13 +31,10 @@ function redirect($url) {
 function jsRedirect($url, $timeout = null) {
 	zbx_flush_post_cookies();
 
-	$script = '';
-	if (is_numeric($timeout)) {
-		$script .= 'setTimeout(\'window.location="'.$url.'"\', '.($timeout * 1000).')';
-	}
-	else {
-		$script .= 'window.location.replace("'.$url.'");';
-	}
+	$script = is_numeric($timeout)
+		? 'setTimeout(\'window.location="'.$url.'"\', '.($timeout * 1000).')'
+		: 'window.location.replace("'.$url.'");';
+
 	insert_js($script);
 }
 
