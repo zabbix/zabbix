@@ -9,6 +9,7 @@ A.F....... [ZBX-5074] redesigned action configuration page (Eduard)
 ..F....... [ZBXNEXT-829] added Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5045] fixed audit error message when deleting global macros (Pavels)
 ..F....... [ZBX-3387] fixed incorrect gui language is shown as active in user profile (Vedmak)
 ..F....... [ZBX-2046] fixed paging can work incorrectly if elements count changes (Vedmak)
 A......... [ZBX-5060] fixed cannot Mass Update inventory mode (Toms)
@@ -112,6 +113,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-5045] fixed audit error message when deleting global macros (Pavels)
 ..F....... [ZBX-3387] fixed incorrect frontend language shown as active in the user profile (Vedmak)
 ..F....... [ZBX-2046] fixed paging when element count changes (Vedmak)
 A......... [ZBX-5060] fixed inability to mass update host inventory mode (Toms)
