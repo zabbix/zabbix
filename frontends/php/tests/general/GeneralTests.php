@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/class_cItemKey.php';
 require_once dirname(__FILE__).'/class_cxmlexportwriter.php';
 require_once dirname(__FILE__).'/class_cxmlimportreader.php';
@@ -35,6 +34,7 @@ require_once dirname(__FILE__).'/function_DBloadfile.php';
 require_once dirname(__FILE__).'/function_DBrollback.php';
 require_once dirname(__FILE__).'/function_DBselect.php';
 require_once dirname(__FILE__).'/function_DBstart.php';
+require_once dirname(__FILE__).'/CTimePeriodValidatorTest.php';
 
 class GeneralTests {
 	public static function suite() {
@@ -56,8 +56,8 @@ class GeneralTests {
 		$suite->addTestSuite('function_DBrollback');
 		$suite->addTestSuite('function_DBselect');
 		$suite->addTestSuite('function_DBstart');
+		$suite->addTestSuite('CTimePeriodValidatorTest');
 
 		return $suite;
 	}
 }
-?>
