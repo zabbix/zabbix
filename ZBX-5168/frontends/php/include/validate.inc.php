@@ -581,7 +581,7 @@ function check_fields(&$fields, $show_messages = true) {
 		'print' =>		array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
 		'sort' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
 		'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-		'start' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
+		'page' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
 		'ddreset' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null)
 	);
 	$fields = zbx_array_merge($system_fields, $fields);
