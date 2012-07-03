@@ -901,6 +901,7 @@
 			'new_application' => get_request('new_application', ''),
 			'applications' => get_request('applications', array()),
 			'delay_flex' => get_request('delay_flex', array()),
+			'new_delay_flex' => get_request('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
 			'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
 			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),

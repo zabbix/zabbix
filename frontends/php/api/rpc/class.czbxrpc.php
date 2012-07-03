@@ -111,11 +111,11 @@ class czbxrpc{
 			return array('result' => $result);
 		}
 		catch (Exception $e) {
-			if ($e instanceof DBException) {
-				$code = ZBX_API_ERROR_INTERNAL;
+			if ($e instanceof APIException) {
+				$code = $e->getCode();
 			}
 			else {
-				$code = $e->getCode();
+				$code = ZBX_API_ERROR_INTERNAL;
 			}
 
 			API::setReturnRPC();

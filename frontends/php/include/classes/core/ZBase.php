@@ -106,6 +106,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/api',
 			$this->rootDir.'/include/classes/db',
 			$this->rootDir.'/include/classes/debug',
+			$this->rootDir.'/include/classes/validators',
 			$this->rootDir.'/include/classes/export',
 			$this->rootDir.'/include/classes/export/writers',
 			$this->rootDir.'/include/classes/export/elements',
