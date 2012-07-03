@@ -177,10 +177,6 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
-frontends/php/include/classes/helpers/trigger/CEventDescription.php -text
-frontends/php/include/classes/helpers/trigger/CEventHelper.php -text
-frontends/php/include/classes/helpers/trigger/CTriggerDescription.php -text
-frontends/php/include/classes/helpers/trigger/CTriggerHelper.php -text
 frontends/php/include/classes/validators/CTimePeriodValidator.php -text
 frontends/php/include/classes/validators/CValidator.php -text
 frontends/php/js/servercheck.js -text
@@ -264,7 +260,6 @@ frontends/php/styles/themes/originalblue/images/icons_ffffff.png -text
 frontends/php/styles/themes/originalblue/images/preloader.gif -text
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/general/CTimePeriodValidatorTest.php -text
-frontends/php/tests/general/class_CDescription.php -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
