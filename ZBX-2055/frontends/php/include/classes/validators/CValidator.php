@@ -47,7 +47,7 @@ abstract class CValidator {
 	}
 
 	/**
-	 * Get last validation error.
+	 * Get first validation error.
 	 *
 	 * @return string
 	 */
