@@ -35,12 +35,17 @@ class CTimePeriodValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($periods) {
-		// remove one last ';'
-		if ($periods[strlen($periods) - 1] === ';') {
-			$periods = substr($periods, 0, strlen($periods) - 1);;
-		}
+		if ($this->options['allow_multiple']) {
+			// remove one last ';'
+			if ($periods[strlen($periods) - 1] === ';') {
+				$periods = substr($periods, 0, strlen($periods) - 1);;
+			}
 
-		$periods = explode(';', $periods);
+			$periods = explode(';', $periods);
+		}
+		else {
+			$periods = array($periods);
+		}
 
 		foreach ($periods as $period) {
 			if (!$this->validateSinglePeriod($period)) {
@@ -63,7 +68,7 @@ class CTimePeriodValidator extends CValidator {
 	 *
 	 * @return bool
 	 */
-	public function validateSinglePeriod($period) {
+	protected  function validateSinglePeriod($period) {
 		$daysRegExp = '(?P<day1>[1-7])(-(?P<day2>[1-7]))?';
 		$time1RegExp = '(?P<hour1>20|21|22|23|24|[0-1]\d|\d):(?P<min1>[0-5]\d)';
 		$time2RegExp = '(?P<hour2>20|21|22|23|24|[0-1]\d|\d):(?P<min2>[0-5]\d)';
@@ -90,5 +95,14 @@ class CTimePeriodValidator extends CValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Set default options.
+	 * Possible options:
+	 *  - allow_multiple: assume that period string contain multiple periods separated by ';'
+	 */
+	protected function initOptions() {
+		$this->options['allow_multiple'] = true;
 	}
 }

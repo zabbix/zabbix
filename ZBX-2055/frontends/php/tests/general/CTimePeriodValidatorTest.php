@@ -77,4 +77,12 @@ class CTimePeriodValidatorTest extends PHPUnit_Framework_TestCase {
 		$result = self::$validator->validate($period);
 		$this->assertFalse($result, sprintf('Invalid time period "%s" is treated as valid', $period));
 	}
+
+	public function test_option_allow_multiple() {
+		$validator = new CTimePeriodValidator(array('allow_multiple' => false));
+		$validMultiPeriod = '1-7,00:00-09:00;1-7,00:00-09:00;';
+
+		$result = $validator->validate($validMultiPeriod);
+		$this->assertFalse($result, '"allow_multiple" option does not work');
+	}
 }

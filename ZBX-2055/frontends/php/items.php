@@ -328,10 +328,10 @@ foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'su
  */
 $result = false;
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
-	$timePeriodValidator = new CTimePeriodValidator();
+	$timePeriodValidator = new CTimePeriodValidator(array('allow_multiple' => false));
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
 
-	if ($timePeriodValidator->validateSinglePeriod($_REQUEST['new_delay_flex']['period'])) {
+	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
 		array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
 		unset($_REQUEST['new_delay_flex']);
 	}

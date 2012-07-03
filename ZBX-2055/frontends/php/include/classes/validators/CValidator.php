@@ -27,7 +27,12 @@ abstract class CValidator {
 	 * @var array
 	 */
 	private $errors = array();
+	protected $options = array();
 
+	public function __construct(array $options = array()) {
+		$this->initOptions();
+		$this->options = zbx_array_merge($this->options, $options);
+	}
 	/**
 	 * @abstract
 	 *
@@ -36,15 +41,6 @@ abstract class CValidator {
 	 * @return bool
 	 */
 	abstract public function validate($value);
-
-	/**
-	 * Add validation error.
-	 *
-	 * @param $error
-	 */
-	protected function addError($error) {
-		$this->errors[] = $error;
-	}
 
 	/**
 	 * Get first validation error.
@@ -56,4 +52,15 @@ abstract class CValidator {
 
 		return $error;
 	}
+
+	/**
+	 * Add validation error.
+	 *
+	 * @param $error
+	 */
+	protected function addError($error) {
+		$this->errors[] = $error;
+	}
+
+	protected function initOptions() {}
 }
