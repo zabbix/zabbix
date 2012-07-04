@@ -1650,14 +1650,14 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
-		// get templates which exists in all targets
-		$arr = DBfetchArray(DBselect('SELECT * FROM hosts_templates WHERE'.DBcondition('hostid', $targetids).''));
+		// get DB templates which exists in all targets
+		$res = DBselect('SELECT * FROM hosts_templates WHERE'.DBcondition('hostid', $targetids));
 		$mas = array();
-		foreach ($arr as $v) {
-			if (!isset($mas[$v['templateid']])) {
-				$mas[$v['templateid']] = array();
+		while ($row = DBfetch($res)) {
+			if (!isset($mas[$row['templateid']])) {
+				$mas[$row['templateid']] = array();
 			}
-			$mas[$v['templateid']][$v['hostid']] = 1;
+			$mas[$row['templateid']][$row['hostid']] = 1;
 		}
 		$targetIdCount = count($targetids);
 		$commonDBTemplateIds = array();
