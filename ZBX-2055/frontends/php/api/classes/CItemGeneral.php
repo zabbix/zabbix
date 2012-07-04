@@ -731,6 +731,10 @@ abstract class CItemGeneral extends CZBXAPI {
 					_s('Incorrect flexible interval in item "%1$s". Flexible interval must be a string.', $item['name']));
 			}
 
+			if ($delayFlex === '') {
+				return true;
+			}
+
 			$validator = new CTimePeriodValidator();
 			$intervals = explode(';', rtrim($delayFlex, ';'));
 			foreach ($intervals as $interval) {
