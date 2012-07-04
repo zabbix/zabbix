@@ -503,7 +503,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 			$dep_table->addRow(bold(_('Depends on').':'));
 
 			foreach($trigger['dependencies'] as $dep){
-				$dep_table->addRow(' - '.expand_trigger_description($dep['triggerid']));
+				$dep_table->addRow(' - '.CTriggerHelper::expandDescriptionById($dep['triggerid']));
 			}
 
 			$img = new Cimg('images/general/arrow_down2.png', 'DEP_UP');
@@ -518,8 +518,8 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$dep_table->setAttribute('style', 'width: 200px;');
 		$dep_table->addRow(bold(_('Dependent').':'));
 		if (!empty($triggerids_down[$trigger['triggerid']])) {
-			$depTriggers = zbx_toObject($triggerids_down[$trigger['triggerid']], 'triggerid');
-			$depTriggers = expandTriggerDescriptions($depTriggers);
+			$depTriggers = CTriggerHelper::batchExpandDescriptionById($triggerids_down[$trigger['triggerid']]);
+
 			foreach ($depTriggers as $depTrigger) {
 				$dep_table->addRow(SPACE.'-'.SPACE.$depTrigger['description']);
 				$dependency = true;
@@ -721,7 +721,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 		$goBox->addItem('bulkacknowledge', _('Bulk acknowledge'));
 
 // goButton name is necessary!!!
-		$goButton = new CSubmit('goButton', _('Go'));
+		$goButton = new CSubmit('goButton', _('Go').' (0)');
 		$goButton->setAttribute('id', 'goButton');
 
 		$show_event_col ? zbx_add_post_js('chkbxRange.pageGoName = "events";') : zbx_add_post_js('chkbxRange.pageGoName = "triggers";');

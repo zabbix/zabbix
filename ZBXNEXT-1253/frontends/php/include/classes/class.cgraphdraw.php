@@ -117,22 +117,15 @@ class CGraphDraw {
 		}
 	}
 
-	public function applyGraphTheme($description = null) {
-		if (!is_null($description)) {
-			$sql_where = ' AND gt.description='.zbx_dbstr($description);
-		}
-		else {
-			$css = getUserTheme(CWebUser::$data);
-			$sql_where = ' AND gt.theme='.zbx_dbstr($css);
-		}
-
-		$dbThemes = DBselect(
-			'SELECT gt.*'.
-			' FROM graph_theme gt'.
-			' WHERE '.DBin_node('gt.graphthemeid').
-				$sql_where
-		);
-		if ($theme = DBfetch($dbThemes)) {
+	/**
+	 * Load the graph theme from the database.
+	 */
+	public function applyGraphTheme() {
+		$theme = DB::find('graph_theme', array(
+			'theme' => getUserTheme(CWebUser::$data)
+		));
+		$theme = reset($theme);
+		if ($theme) {
 			$this->graphtheme = $theme;
 		}
 	}

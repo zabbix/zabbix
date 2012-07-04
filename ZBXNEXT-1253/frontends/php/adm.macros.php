@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of macros');
@@ -104,7 +104,7 @@ if (isset($_REQUEST['save'])) {
 				throw new Exception(_('Cannot remove macro.'));
 			}
 			foreach ($globalMacros as $macro) {
-				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro.SPACE.RARR.SPACE.$macro['value'], null, null, null);
+				add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MACRO, $macro['globalmacroid'], $macro['macro'].SPACE.RARR.SPACE.$macro['value'], null, null, null);
 			}
 		}
 
@@ -202,4 +202,3 @@ $cnf_wdgt->addItem($macrosForm->render());
 $cnf_wdgt->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>

@@ -30,6 +30,7 @@ if (!isset($page['file'])) {
 }
 if ($_REQUEST['fullscreen'] = get_request('fullscreen', 0)) {
 	define('ZBX_PAGE_NO_MENU', 1);
+	define('ZBX_PAGE_FULLSCREEN', 1);
 }
 
 require_once dirname(__FILE__).'/menu.inc.php';
@@ -113,10 +114,8 @@ switch ($page['type']) {
 		if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
 			$page_title = $ZBX_SERVER_NAME.': ';
 		}
-		if (!isset($page['title'])) {
-			$page['title'] = _('Zabbix');
-		}
-		$page_title = defined($page['title']) ? constant($page['title']) : $page['title'];
+		$page_title .= isset($page['title']) ? $page['title'] : _('Zabbix');
+
 		if (ZBX_DISTRIBUTED) {
 			if (isset($ZBX_VIEWED_NODES) && $ZBX_VIEWED_NODES['selected'] == 0) { // all selected
 				$page_title .= ' ('._('All nodes').') ';
@@ -125,6 +124,7 @@ switch ($page['type']) {
 				$page_title .= ' ('.$ZBX_NODES[$ZBX_CURRENT_NODEID]['name'].')';
 			}
 		}
+
 		if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::$data['refresh']) {
 			$page_title .= ' ['._('refreshed every').' '.CWebUser::$data['refresh'].' '._('sec').']';
 		}
@@ -156,19 +156,19 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			$css = getUserTheme(CWebUser::$data);
 
 			echo '<style type="text/css">'."\n".
-					'.disaster { background-color: #'.$config['severity_color_5'].' !important; }'."\n".
-					'.high { background-color: #'.$config['severity_color_4'].' !important; }'."\n".
-					'.average { background-color: #'.$config['severity_color_3'].' !important; }'."\n".
-					'.warning { background-color: #'.$config['severity_color_2'].' !important; }'."\n".
-					'.information { background-color: #'.$config['severity_color_1'].' !important; }'."\n".
-					'.not_classified { background-color: #'.$config['severity_color_0'].' !important; }'."\n".
-					'.trigger_unknown { background-color: #DBDBDB !important; }'."\n".
+					'.disaster { background: #'.$config['severity_color_5'].' !important; }'."\n".
+					'.high { background: #'.$config['severity_color_4'].' !important; }'."\n".
+					'.average { background: #'.$config['severity_color_3'].' !important; }'."\n".
+					'.warning { background: #'.$config['severity_color_2'].' !important; }'."\n".
+					'.information { background: #'.$config['severity_color_1'].' !important; }'."\n".
+					'.not_classified { background: #'.$config['severity_color_0'].' !important; }'."\n".
+					'.trigger_unknown { background: #DBDBDB !important; }'."\n".
 				'</style>';
 
 			// perform Zabbix server check only for standard pages
-			if (!defined('ZBX_PAGE_NO_MENU') && $config['server_check_interval']) {
+			if ((!defined('ZBX_PAGE_NO_MENU') || defined('ZBX_PAGE_FULLSCREEN')) && $config['server_check_interval']
+					&& !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
 				$page['scripts'][] = 'servercheck.js';
-				zbx_add_post_js('checkServerStatus('.$config['server_check_interval'].');');
 			}
 		}
 	}
@@ -201,6 +201,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 </script>
 </head>
 <body class="<?php echo $css; ?>">
+<div id="message-global-wrap"><div id="message-global"></div></div>
 <?php
 }
 
@@ -260,11 +261,8 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 	$logo = new CLink(new CDiv(SPACE, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
 	$logo->setTarget('_blank');
 
-	$tdm = new CCol('', 'page_header_m');
-	$tdm->attr('id', 'message-global');
 	$top_page_row = array(
 		new CCol($logo, 'page_header_l'),
-		$tdm,
 		new CCol($page_header_r_col, 'maxwidth page_header_r')
 	);
 
@@ -293,6 +291,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 
 		if (!empty($available_nodes)) {
 			$node_form = new CForm('get');
+			$node_form->cleanItems();
 			$node_form->setAttribute('id', 'node_form');
 
 			// create ComboBox with selected nodes
@@ -357,7 +356,7 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 		}
 	}
 
-	if (!empty($ZBX_SERVER_NAME)) {
+	if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
 		$table = new CTable();
 		$table->addStyle('width: 100%;');
 

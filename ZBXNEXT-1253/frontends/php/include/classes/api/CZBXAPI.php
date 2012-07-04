@@ -65,6 +65,13 @@ class CZBXAPI {
 	 */
 	protected $getOptions = array();
 
+	/**
+	 * An array containing all of the error strings.
+	 *
+	 * @var array
+	 */
+	protected $errorMessages = array();
+
 	public function __construct() {
 		// set the PK of the table
 		$this->pk = $this->pk($this->tableName());
@@ -194,6 +201,17 @@ class CZBXAPI {
 		$schema = $this->getTableSchema($tableName);
 
 		return isset($schema['fields'][$fieldName]);
+	}
+
+	/**
+	 * Returns a translated error message.
+	 *
+	 * @param $id
+	 *
+	 * @return string
+	 */
+	protected function getErrorMsg($id) {
+		return $this->errorMessages[$id];
 	}
 
 	/**
@@ -589,6 +607,25 @@ class CZBXAPI {
 	protected function extendObject($tableName, array $object, array $fields) {
 		$objects = $this->extendObjects($tableName, array($object), $fields);
 		return reset($objects);
+	}
+
+	/**
+	 * Compares the fields, that are present in both objects, and returns true if any of the values differ.
+	 *
+	 * @param $existingObject
+	 * @param $newObject
+	 * @param null $tableName
+	 *
+	 * @return bool
+	 */
+	protected function objectModified($newObject, $existingObject, $tableName = null) {
+		foreach ($existingObject as $field => $value) {
+			if ($this->hasField($field, $tableName) && isset($newObject[$field]) && $value != $newObject[$field]) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

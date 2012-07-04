@@ -121,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"Zabbix Agent"
-#define	ZABBIX_REVDATE		"21 May 2012"
-#define	ZABBIX_VERSION		"2.0.1rc1"
+#define	ZABBIX_REVDATE		"27 June 2012"
+#define	ZABBIX_VERSION		"2.0.2rc1"
 #define	ZABBIX_REVISION		"{ZABBIX_REVISION}"
 
 #if defined(_WINDOWS)
@@ -247,6 +247,15 @@ typedef enum
 	ITEM_VALUE_TYPE_TEXT
 } zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
+
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+}
+history_value_t;
 
 /* item data types */
 typedef enum
@@ -647,8 +656,8 @@ typedef enum
 
 const char	*zbx_permission_string(int perm);
 
-#define	ZBX_NODE_MASTER	0
-#define	ZBX_NODE_SLAVE	1
+#define	ZBX_NODE_SLAVE	0
+#define	ZBX_NODE_MASTER	1
 const char	*zbx_nodetype_string(unsigned char nodetype);
 
 typedef struct

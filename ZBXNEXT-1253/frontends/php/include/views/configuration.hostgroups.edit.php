@@ -24,6 +24,7 @@ $hostgroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'));
 
 // create form
 $hostgroupForm = new CForm();
+$hostgroupForm->setName('hostgroupForm');
 $hostgroupForm->addVar('form', $this->data['form']);
 if (isset($this->data['groupid'])) {
 	$hostgroupForm->addVar('groupid', $this->data['groupid']);

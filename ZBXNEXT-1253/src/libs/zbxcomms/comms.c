@@ -630,7 +630,6 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
 			}
 #endif
-
 			if (ZBX_TCP_ERROR == bind(s->sockets[s->num_socks], current_ai->ai_addr, current_ai->ai_addrlen))
 			{
 				zbx_set_tcp_strerror("bind() for [[%s]:%s] failed: %s",

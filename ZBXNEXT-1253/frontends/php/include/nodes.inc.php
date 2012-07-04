@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 function update_node_profile($nodeids) {
 	DBstart();
 	DBexecute('DELETE FROM profiles WHERE userid='.CWebUser::$data['userid'].' AND idx='.zbx_dbstr('web.nodes.selected'));
@@ -147,10 +147,9 @@ function get_current_nodeid($force_all_nodes = null, $perm = null) {
 	return $result;
 }
 
-function get_viewed_nodes($options = array()) {
+function get_viewed_nodes() {
 	global $ZBX_LOCALNODEID;
 
-	$options = zbx_array_merge(array('allow_all' => 0), $options);
 	$result = array('selected' => 0, 'nodes' => array(), 'nodeids' => array());
 
 	if (!defined('ZBX_NOT_ALLOW_ALL_NODES')) {
@@ -244,7 +243,6 @@ function detect_node_type($nodeid, $masterid) {
 }
 
 function node_type2str($nodetype) {
-	$result = '';
 	switch ($nodetype) {
 		case ZBX_NODE_CHILD:
 			$result = _('Child');
@@ -327,7 +325,9 @@ function delete_node($nodeid) {
 			DBexecute('UPDATE nodes SET masterid=NULL WHERE masterid='.$nodeid) &&
 			DBexecute('DELETE FROM nodes WHERE nodeid='.$nodeid)
 		);
-		error(_('Please be aware that database still contains data related to the deleted node.'));
+		if ($nodetype != ZBX_NODE_MASTER) {
+			error(_('Please be aware that database still contains data related to the deleted node.'));
+		}
 	}
 	return $result;
 }
@@ -336,13 +336,16 @@ function get_node_by_nodeid($nodeid) {
 	return DBfetch(DBselect('SELECT n.* FROM nodes n WHERE n.nodeid='.$nodeid));
 }
 
-function get_node_path($nodeid, $result = '/') {
-	if ($node_data = get_node_by_nodeid($nodeid)) {
+function get_node_path($nodeid, $result = '') {
+	global $ZBX_NODES;
+
+	$node_data = isset($ZBX_NODES[$nodeid]) ? $ZBX_NODES[$nodeid] : false;
+	if ($node_data) {
 		if ($node_data['masterid']) {
 			$result = get_node_path($node_data['masterid'], $result);
 		}
-		$result .= $node_data['name'].'/';
+		$result .= $node_data['name'].' &rArr; ';
 	}
+
 	return $result;
 }
-?>

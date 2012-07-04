@@ -48,6 +48,14 @@ if (!empty($this->data['itemid'])) {
 
 // create form list
 $itemFormList = new CFormList('itemFormList');
+if (!empty($this->data['templates'])) {
+	if ($this->data['is_discovery_rule']) {
+		$itemFormList->addRow(_('Parent discovery rules'), $this->data['templates']);
+	}
+	else {
+		$itemFormList->addRow(_('Parent items'), $this->data['templates']);
+	}
+}
 
 if (!$this->data['is_discovery_rule']) {
 	// append host to form list
@@ -297,11 +305,11 @@ $itemFormList->addRow(
 	array(
 		_('Interval (in sec)'),
 		SPACE,
-		new CNumericBox('new_delay_flex[delay]', 50, 5),
+		new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5),
 		SPACE,
 		_('Period'),
 		SPACE,
-		new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
+		new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 		SPACE,
 		new CSubmit('add_delay_flex', _('Add'), null, 'formlist')
 	),

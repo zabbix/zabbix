@@ -79,9 +79,9 @@ function nbsp($str) {
 function prepare_url(&$var, $varname = null) {
 	$result = '';
 	if (is_array($var)) {
-		foreach ($var as $id => $par )
-			$result .= prepare_url($par, isset($varname) ? $varname.'['.$id.']' : $id);
-	}
+		foreach ($var as $id => $par)
+					$result .= prepare_url($par, isset($varname) ? $varname.'['.$id.']' : $id);
+				}
 	else {
 		$result = '&'.$varname.'='.urlencode($var);
 	}
@@ -303,7 +303,7 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 
 	$options = array(
 		'hostids' => $hostid,
-		'output' => array('hostid', 'name', 'status', 'proxy_hostid', 'available'),
+		'output' => API_OUTPUT_EXTEND,
 		'templated_hosts' => true
 	);
 	if (isset($elements['items'])) {
@@ -376,19 +376,9 @@ function get_header_host_table($currentElement, $hostid, $discoveryid = null) {
 				break;
 		}
 
-		if ($dbHost['available'] == HOST_AVAILABLE_TRUE) {
-			$available = new CSpan(_('Available'), 'off');
-		}
-		elseif ($dbHost['available'] == HOST_AVAILABLE_FALSE) {
-			$available = new CSpan(_('Not available'), 'on');
-		}
-		elseif ($dbHost['available'] == HOST_AVAILABLE_UNKNOWN) {
-			$available = new CSpan(_('Unknown'), 'unknown');
-		}
-
 		$list->addItem(array(bold(_('Host').': '), new CLink($description, 'hosts.php?form=update&hostid='.$dbHost['hostid'])));
 		$list->addItem($status);
-		$list->addItem(array(_('Availability').': ', $available));
+		$list->addItem(getAvailabilityTable($dbHost));
 	}
 
 	if (!empty($dbDiscovery)) {
@@ -542,4 +532,63 @@ function makeFormFooter($main, $others = null) {
 		),
 		'objectgroup footer min-width ui-widget-content ui-corner-all'
 	);
+}
+
+/**
+ * Create control for trigger severities.
+ * It's mostly the same as usual button set, but background color is changed based on selected severiity.
+ * Js file "/include/views/js/configuration.triggers.edit.js.php" is needed to make it work correcty.
+ *
+ * @param $selectedSeverity
+ *
+ * @return CDiv
+ */
+function getSeverityControl($selectedSeverity = TRIGGER_SEVERITY_NOT_CLASSIFIED) {
+	$controls = array();
+	foreach (getSeverityCaption() as $severity => $caption) {
+		$controls[] = new CRadioButton('priority', $severity, null, 'severity_'.$severity, $selectedSeverity == $severity);
+
+		$label = new CLabel($caption, 'severity_'.$severity, 'severity_label_'.$severity);
+		$label->attr('data-severity', $severity);
+		$label->attr('data-severity-style', getSeverityStyle($severity));
+		$controls[] = $label;
+
+	}
+
+	return new CDiv($controls, 'jqueryinputset control-severity');
+}
+
+/**
+ * Returns zbx, snmp, jmx, ipmi availability status icons.
+ *
+ * @param type $host
+ *
+ * @return CDiv
+ */
+function getAvailabilityTable($host) {
+	$arr = array('zbx', 'snmp', 'jmx', 'ipmi');
+
+	// for consistency in foreach loop
+	$host['zbx_available'] = $host['available'];
+	$host['zbx_error'] = $host['error'];
+
+	$ad = new CDiv(null, 'invisible');
+
+	foreach ($arr as $val) {
+		switch ($host[$val.'_available']) {
+			case HOST_AVAILABLE_TRUE:
+				$ai = new CDiv(SPACE, 'status_icon status_icon_extra icon'.$val.'available');
+				break;
+			case HOST_AVAILABLE_FALSE:
+				$ai = new CDiv(SPACE, 'status_icon status_icon_extra icon'.$val.'unavailable');
+				$ai->setHint($host[$val.'_error'], '', 'on');
+				break;
+			case HOST_AVAILABLE_UNKNOWN:
+				$ai = new CDiv(SPACE, 'status_icon status_icon_extra icon'.$val.'unknown');
+				break;
+		}
+		$ad->addItem($ai);
+	}
+
+	return $ad;
 }

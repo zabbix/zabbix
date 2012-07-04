@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * @property string $groupid
  * @property string $hostid
@@ -51,7 +52,7 @@ class CPageFilter {
 			return $this->isSelected[$name];
 		}
 		else {
-			trigger_error('Try to read inaccessible property: '.get_class($this).'->'.$name, E_USER_WARNING);
+			trigger_error(_s('Try to read inaccessible property "%s".', get_class($this).'->'.$name), E_USER_WARNING);
 			return false;
 		}
 	}
@@ -284,7 +285,7 @@ class CPageFilter {
 		// nonexisting or unset $groupid
 		if ((!isset($this->data['groups'][$groupid]) && $groupid > 0) || is_null($groupid)) {
 			// for popup select first group in the list
-			if ($this->config['popupDD']) {
+			if ($this->config['popupDD'] && !empty($this->data['groups'])) {
 				reset($this->data['groups']);
 				$groupid = key($this->data['groups']);
 			}
@@ -330,7 +331,7 @@ class CPageFilter {
 			// nonexisting or unset $hostid
 			if ((!isset($this->data['hosts'][$hostid]) && $hostid > 0) || is_null($hostid)) {
 				// for popup select first host in the list
-				if ($this->config['popupDD']) {
+				if ($this->config['popupDD'] && !empty($this->data['hosts'])) {
 					reset($this->data['hosts']);
 					$hostid = key($this->data['hosts']);
 				}

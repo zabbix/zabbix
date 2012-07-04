@@ -144,7 +144,8 @@ static int	validate_linked_templates(zbx_vector_uint64_t *templateids, char *err
 	{
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select t1.description,h1.host,t2.description,h2.host"
+				/* don't remove "description2 and host2" aliases, the ORACLE needs them */
+				"select t1.description,h1.host,t2.description as description2,h2.host as host2"
 				" from trigger_depends td,triggers t1,functions f1,items i1,hosts h1,"
 					"triggers t2,functions f2,items i2,hosts h2"
 				" where td.triggerid_down=t1.triggerid"
@@ -2968,12 +2969,14 @@ static void	DBcopy_template_items(zbx_uint64_t hostid, zbx_vector_uint64_t *temp
 			size_t		proto_alloc = 0, proto_num = 0;
 
 			sql_offset = 0;
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"select i.itemid,r.itemid"
 					" from items i,item_discovery id,items r"
 					" where i.templateid=id.itemid"
 						" and id.parent_itemid=r.templateid"
-						" and");
+						" and r.hostid=" ZBX_FS_UI64
+						" and",
+					hostid);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.itemid", protoids, protoids_num);
 
 			result = DBselect("%s", sql);

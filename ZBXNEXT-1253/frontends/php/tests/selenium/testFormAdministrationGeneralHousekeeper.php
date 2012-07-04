@@ -34,7 +34,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->login('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of housekeeper');
+		$this->checkTitle('Configuration of housekeeper');
 		$this->ok(array('Housekeeper', 'Do not keep actions older than (in days)', 'Do not keep events older than (in days)'));
 		$this->assertElementPresent('configDropDown');
 		$this->assertElementPresent('alert_history');
@@ -64,7 +64,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "alert_history"');
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of housekeeper');
+		$this->checkTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('alert_history', '65535');
 		$this->button_click('save');
@@ -75,7 +75,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "alert_history"');
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of housekeeper');
+		$this->checkTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('alert_history', '-1');
 		$this->button_click('save');
@@ -83,7 +83,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep actions older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep actions older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of housekeeper');
+		$this->checkTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('alert_history', '65536');
 		$this->button_click('save');
@@ -110,7 +110,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_history"');
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of housekeeper');
+		$this->checkTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('event_history', '65535');
 		$this->button_click('save');
@@ -121,7 +121,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_history"');
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of housekeeper');
+		$this->checkTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('event_history', '-1');
 		$this->button_click('save');
@@ -129,7 +129,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 		$this->ok(array('ERROR: Page received incorrect data', 'Warning. Incorrect value for field "Do not keep events older than (in days)": must be between 0 and 65535.', 'CONFIGURATION OF HOUSEKEEPER', 'Housekeeper', 'Do not keep events older than (in days)'));
 
 		$this->dropdown_select_wait('configDropDown', 'Housekeeper');
-		$this->assertTitle('Configuration of housekeeper');
+		$this->checkTitle('Configuration of housekeeper');
 		$this->ok('Housekeeper');
 		$this->input_type('event_history', '65536');
 		$this->button_click('save');

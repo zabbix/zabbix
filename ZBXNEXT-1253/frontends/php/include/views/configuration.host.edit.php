@@ -327,8 +327,7 @@ if ($_REQUEST['form'] == 'full_clone') {
 			'description'
 		),
 		'selectItems' => API_OUTPUT_EXTEND,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
-		'expandDescription' => true
+		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
 	));
 
 	if (!empty($hostTriggers)) {
@@ -430,19 +429,26 @@ if ($_REQUEST['form'] == 'full_clone') {
 		'discoveryids' => $hostDiscoveryRuleids,
 		'inherited' => false,
 		'output' => API_OUTPUT_EXTEND,
-		'expandDescription' => true
+		'selectItems' => API_OUTPUT_EXTEND
 	));
 	if (!empty($hostTriggerPrototypes)) {
 		$prototypeList = array();
 		foreach ($hostTriggerPrototypes as $triggerPrototype) {
+			// skip trigger prototypes with web items
+			if (httpItemExists($triggerPrototype['items'])) {
+				continue;
+			}
 			$prototypeList[$triggerPrototype['triggerid']] = $triggerPrototype['description'];
 		}
-		order_result($prototypeList);
 
-		$listBox = new CListBox('triggerprototypes', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($prototypeList);
-		$hostList->addRow(_('Trigger prototypes'), $listBox);
+		if ($prototypeList) {
+			order_result($prototypeList);
+
+			$listBox = new CListBox('triggerprototypes', null, 8);
+			$listBox->setAttribute('disabled', 'disabled');
+			$listBox->addItems($prototypeList);
+			$hostList->addRow(_('Trigger prototypes'), $listBox);
+		}
 	}
 
 	// Graph prototypes

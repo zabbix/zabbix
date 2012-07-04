@@ -242,7 +242,7 @@ function getValueMapMappings($valueMapId) {
  * If value map or mapping is not found unchanged value returned,
  * otherwise mapped value returned in format: "<mapped_value> (<initial_value>)".
  *
- * @param string $value	  value that mapping should be applied to
+ * @param string $value	     value that mapping should be applied to
  * @param int    $valueMapId value map id which should be used
  *
  * @return string

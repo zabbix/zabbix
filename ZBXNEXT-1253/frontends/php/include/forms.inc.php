@@ -17,8 +17,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
+
 	function getUserFormData($userid, $isProfile = false) {
 		$config = select_config();
 		$data = array('is_profile' => $isProfile);
@@ -62,19 +62,14 @@
 			$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
 			$data['user_groups']	= zbx_toHash($userGroup);
 
-			$user_medias = array();
-			$db_medias = DBselect('SELECT m.* FROM media m WHERE m.userid='.$userid);
-			while ($db_media = DBfetch($db_medias)) {
-				$user_medias[] = array(
-					'mediaid' => $db_media['mediaid'],
-					'mediatypeid' => $db_media['mediatypeid'],
-					'period' => $db_media['period'],
-					'sendto' => $db_media['sendto'],
-					'severity' => $db_media['severity'],
-					'active' => $db_media['active']
-				);
+			$data['user_medias'] = array();
+			$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
+					' FROM media m'.
+					' WHERE m.userid='.$userid
+			);
+			while ($dbMedium = DBfetch($dbMedia)) {
+				$data['user_medias'][] = $dbMedium;
 			}
-			$data['user_medias'] = $user_medias;
 
 			if ($data['autologout'] > 0) {
 				$_REQUEST['autologout'] = $data['autologout'];
@@ -121,16 +116,22 @@
 		}
 
 		// set media types
-		$data['media_types'] = array();
-		$media_type_ids = array();
-		foreach ($data['user_medias'] as $media) {
-			$media_type_ids[$media['mediatypeid']] = 1;
-		}
-		if (count($media_type_ids) > 0) {
-			$db_media_types = DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE mt.mediatypeid IN ('.implode(',', array_keys($media_type_ids)).')');
-			while ($db_media_type = DBfetch($db_media_types)) {
-				$data['media_types'][$db_media_type['mediatypeid']] = $db_media_type['description'];
+		if (!empty($data['user_medias'])) {
+			$mediaTypeDescriptions = array();
+			$dbMediaTypes = DBselect(
+				'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
+					DBcondition('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
+			);
+			while ($dbMediaType = DBfetch($dbMediaTypes)) {
+				$mediaTypeDescriptions[$dbMediaType['mediatypeid']] = $dbMediaType['description'];
 			}
+
+			foreach ($data['user_medias'] as &$media) {
+				$media['description'] = $mediaTypeDescriptions[$media['mediatypeid']];
+			}
+			unset($media);
+
+			CArrayHelper::sort($data['user_medias'], array('description', 'sendto'));
 		}
 
 		// set user rights
@@ -447,7 +448,7 @@
 		$dataTypeInput->setEnabled('no');
 
 		// filter table
-		$table = new CTable('', 'filter filter-item');
+		$table = new CTable('', 'filter');
 		$table->setCellPadding(0);
 		$table->setCellSpacing(0);
 
@@ -900,6 +901,7 @@
 			'new_application' => get_request('new_application', ''),
 			'applications' => get_request('applications', array()),
 			'delay_flex' => get_request('delay_flex', array()),
+			'new_delay_flex' => get_request('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
 			'snmpv3_securityname' => get_request('snmpv3_securityname', ''),
 			'snmpv3_securitylevel' => get_request('snmpv3_securitylevel', 0),
 			'snmpv3_authpassphrase' => get_request('snmpv3_authpassphrase', ''),
@@ -919,7 +921,8 @@
 			'alreadyPopulated' => null,
 			'lifetime' => get_request('lifetime', 30),
 			'filter' => isset($ifm, $ifv) ? $ifm.':'.$ifv : '',
-			'initial_item_type' => null
+			'initial_item_type' => null,
+			'templates' => array()
 		);
 
 		// hostid
@@ -956,60 +959,58 @@
 			$data['hostid'] = !empty($data['hostid']) ? $data['hostid'] : $data['item']['hostid'];
 			$data['limited'] = $data['item']['templateid'] != 0;
 
-			// caption
-			if (empty($data['is_discovery_rule'])) {
-				$data['caption'] = array();
-				$itemid = $data['itemid'];
-				do {
-					$item = API::Item()->get(array(
-						'itemids' => $itemid,
-						'output' => array('itemid', 'templateid'),
-						'selectHosts' => array('name'),
-						'selectDiscoveryRule' => array('itemid')
-					));
-					$item = reset($item);
-					if (!empty($item)) {
-						$host = reset($item['hosts']);
-						if (!empty($item['hosts'])) {
-							if (bccomp($data['itemid'], $itemid) == 0) {
-								$data['caption'][] = SPACE;
-								$data['caption'][] = $host['name'];
-							}
-							// item prototype
-							elseif ($item['discoveryRule']) {
-								$data['caption'][] = ' : ';
-								$data['caption'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline');
-							}
-							// plain item
-							else {
-								$data['caption'][] = ' : ';
-								$data['caption'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline');
-							}
-						}
-						$itemid = $item['templateid'];
-					}
-					else {
-						break;
-					}
-				} while ($itemid != 0);
+			// get templates
+			$itemid = $data['itemid'];
+			do {
+				$options = array(
+					'itemids' => $itemid,
+					'output' => array('itemid', 'templateid'),
+					'selectHosts' => array('name'),
+					'selectDiscoveryRule' => array('itemid')
+				);
+				if ($data['is_discovery_rule']) {
+					$options['filter'] = array('flags' => ZBX_FLAG_DISCOVERY);
+				}
+				$item = API::Item()->get($options);
+				$item = reset($item);
 
-				$data['caption'][] = !empty($data['parent_discoveryid']) ? _('Item prototype').' "' : _('Item').' "';
-				$data['caption'] = array_reverse($data['caption']);
-				$data['caption'][] = ': ';
-				$data['caption'][] = $data['item']['name'];
-				$data['caption'][] = '"';
-			}
-			else {
-				$data['caption'] = _('Discovery rule');
-			}
+				if (!empty($item)) {
+					$host = reset($item['hosts']);
+					if (!empty($item['hosts'])) {
+						if (bccomp($data['itemid'], $itemid) == 0) {
+						}
+						// discovery rule
+						elseif ($data['is_discovery_rule']) {
+							$data['templates'][] = new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+							$data['templates'][] = SPACE.RARR.SPACE;
+						}
+						// item prototype
+						elseif ($item['discoveryRule']) {
+							$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline weight_normal');
+							$data['templates'][] = SPACE.RARR.SPACE;
+						}
+						// plain item
+						else {
+							$data['templates'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+							$data['templates'][] = SPACE.RARR.SPACE;
+						}
+					}
+					$itemid = $item['templateid'];
+				}
+				else {
+					break;
+				}
+			} while ($itemid != 0);
+			$data['templates'] = array_reverse($data['templates']);
+			array_shift($data['templates']);
+		}
+
+		// caption
+		if (!empty($data['is_discovery_rule'])) {
+			$data['caption'] = _('Discovery rule');
 		}
 		else {
-			if (empty($data['is_discovery_rule'])) {
-				$data['caption'] = _s('Item %1$s : %2$s', $data['hostname'], $data['name']);
-			}
-			else {
-				$data['caption'] = _('Discovery rule');
-			}
+			$data['caption'] = !empty($data['parent_discoveryid']) ? _('Item prototype') : _('Item');
 		}
 
 		// hostname
@@ -1240,11 +1241,9 @@
 			'status' => get_request('status', 0),
 			'comments' => get_request('comments', ''),
 			'url' => get_request('url', ''),
-			'expr_temp' => get_request('expr_temp', ''),
 			'input_method' => get_request('input_method', IM_ESTABLISHED),
 			'limited' => null,
-			'templates' => array(),
-			'config' => select_config()
+			'templates' => array()
 		);
 
 		// get hostid
@@ -1981,4 +1980,3 @@
 
 	return $tblExpFooter;
 	}
-?>

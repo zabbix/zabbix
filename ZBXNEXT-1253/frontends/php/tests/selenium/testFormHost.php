@@ -51,7 +51,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', $this->host);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host added');
 		$this->ok($this->host);
 	}
@@ -66,7 +66,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', $host);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host added');
 		$this->ok($host);
 	}
@@ -78,7 +78,7 @@ class testFormHost extends CWebTest {
 		$this->wait();
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host updated');
 		$this->ok($this->host);
 	}
@@ -117,7 +117,7 @@ class testFormHost extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('ERROR: Cannot add host');
 		$this->ok('No groups for host "'.$host.'".');
 
@@ -138,7 +138,7 @@ class testFormHost extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('ERROR: Cannot add host');
 		$this->ok('Host with the same name "'.$host.'" already exists.');
 
@@ -161,7 +161,7 @@ class testFormHost extends CWebTest {
 		$this->button_click('save');
 		$this->wait();
 
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('ERROR: Cannot add host');
 		$this->ok('Host with the same visible name "'.$hostVisible.'" already exists.');
 
@@ -180,7 +180,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('visiblename', $this->host_cloned_visible);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host added');
 	}
 
@@ -195,7 +195,7 @@ class testFormHost extends CWebTest {
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host deleted');
 	}
 
@@ -211,7 +211,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('visiblename', $this->host_fullcloned_visible);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host added');
 	}
 
@@ -226,7 +226,7 @@ class testFormHost extends CWebTest {
 		$this->button_click('delete');
 		$this->wait();
 		$this->getConfirmation();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host deleted');
 	}
 
@@ -239,7 +239,7 @@ class testFormHost extends CWebTest {
 		$this->input_type('host', $this->host_tmp);
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host updated');
 	}
 
@@ -258,7 +258,7 @@ class testFormHost extends CWebTest {
 		$this->button_click('delete');
 		$this->waitForConfirmation();
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host deleted');
 
 		// check if all records have been deleted
@@ -297,7 +297,7 @@ class testFormHost extends CWebTest {
 		$this->nok("$template");
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host updated');
 
 		// this should be a separate test
@@ -340,7 +340,7 @@ class testFormHost extends CWebTest {
 		$this->nok("$template");
 		$this->button_click('save');
 		$this->wait();
-		$this->assertTitle('Configuration of hosts');
+		$this->checkTitle('Configuration of hosts');
 		$this->ok('Host updated');
 	}
 

@@ -17,11 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
-/**
- * @package API
- */
+
 
 class CUserMacro extends CZBXAPI {
 
@@ -141,6 +137,7 @@ class CUserMacro extends CZBXAPI {
 
 		// global macro
 		if (!is_null($options['globalmacro'])) {
+			$sqlPartsGlobal['where'][] = DBin_node('gm.globalmacroid', $nodeids);
 			$options['groupids'] = null;
 			$options['hostmacroids'] = null;
 			$options['triggerids'] = null;
@@ -149,6 +146,9 @@ class CUserMacro extends CZBXAPI {
 			$options['selectGroups'] = null;
 			$options['selectTemplates'] = null;
 			$options['selectHosts'] = null;
+		}
+		else {
+			$sqlParts['where'][] = DBin_node('hm.hostmacroid', $nodeids);
 		}
 
 		// globalmacroids
@@ -1081,4 +1081,3 @@ class CUserMacro extends CZBXAPI {
 		}
 	}
 }
-?>

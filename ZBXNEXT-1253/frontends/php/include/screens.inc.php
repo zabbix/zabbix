@@ -166,7 +166,7 @@ function add_slideshow($name, $delay, $slides) {
 	$screens = ZBX_toHash($screens, 'screenid');
 	foreach ($screenids as $screenid) {
 		if (!isset($screens[$screenid])) {
-			error(_('Invalid screen found.'));
+			error(_('Incorrect screen provided for slide show.'));
 			return false;
 		}
 	}
@@ -222,7 +222,7 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	$screens = ZBX_toHash($screens, 'screenid');
 	foreach ($screenids as $screenid) {
 		if (!isset($screens[$screenid])) {
-			error(_('Invalid screen found.'));
+			error(_('Incorrect screen provided for slide show.'));
 			return false;
 		}
 	}

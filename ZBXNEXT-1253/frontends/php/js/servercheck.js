@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2000-2011 Zabbix SIA
+ ** Copyright (C) 2000-2012 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,16 @@
  **/
 
 
-var checkServerStatus = (function ($) {
+jQuery(function($) {
 	'use strict';
 
+	/**
+	 * Object that sends ajax request for server status and show/hide warning messages.
+	 *
+	 * @type {Object}
+	 */
 	var checker = {
-		timeout: 0,
+		timeout: 10000, // 10 seconds
 		warning: false,
 
 		/**
@@ -42,7 +47,7 @@ var checkServerStatus = (function ($) {
 
 		onSuccess: function(result) {
 			if (result.result) {
-				this.hideWarning()
+				this.hideWarning();
 			}
 			else {
 				this.showWarning(result.message);
@@ -51,29 +56,55 @@ var checkServerStatus = (function ($) {
 
 		showWarning: function(message) {
 			if (!this.warning) {
-				$('#message-global').text(message).addClass('warning-global');
+				$('#message-global').text(message);
+				$('#message-global-wrap').fadeIn(100);
 				this.warning = true;
 			}
 		},
 
 		hideWarning: function() {
 			if (this.warning) {
-				$('#message-global').text('').removeClass('warning-global');
+				$('#message-global-wrap').fadeOut(100);
 				this.warning = false;
 			}
 		}
 	};
 
+	// looping function that check for server status every 10 seconds
 	function checkStatus(nocache) {
 		checker.check(nocache);
 
 		window.setTimeout(checkStatus, checker.timeout);
 	}
 
-	return function(timeout) {
-		checker.timeout = timeout * 1000;
-
+	// start server status checks with 5 sec dealy after page is loaded
+	window.setTimeout(function() {
 		checkStatus(true);
-	}
-}(jQuery));
+	}, 5000);
 
+
+	// event that hide warning message when mouse hover it
+	$('#message-global-wrap').on('mouseenter', function() {
+		var obj = $(this),
+			offset = obj.offset(),
+			x1 = Math.floor(offset.left),
+			x2 = x1 + obj.outerWidth(),
+			y1 = Math.floor(offset.top),
+			y2 = y1 + obj.outerHeight();
+
+		obj.fadeOut(100);
+
+		$(document).on('mousemove.messagehide', function(e) {
+			if (e.pageX < x1 || e.pageX > x2 || e.pageY < y1 || e.pageY > y2) {
+				obj.fadeIn(100);
+				$(document).off('mousemove.messagehide');
+				$(document).off('mouseleave.messagehide');
+			}
+		});
+		$(document).on('mouseleave.messagehide', function() {
+			obj.fadeIn(100);
+			$(document).off('mouseleave.messagehide');
+			$(document).off('mousemove.messagehide');
+		});
+	});
+});

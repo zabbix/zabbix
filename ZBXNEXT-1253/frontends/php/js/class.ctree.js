@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ CTree.prototype = {
 
 		if ((tree_init = cookie.read(tree_name)) != null) {
 			var nodes = tree_init.split(',');
-			var c = nodes.length-1;
+			var c = nodes.length;
 			for (var i = 0; i < c; i++) {
 				this.onStartSetStatus(nodes[i]);
 			}
@@ -67,6 +67,8 @@ CTree.prototype = {
 					}
 				}
 			}
+
+			cookie_str = cookie_str.slice(0, -1);
 			cookie.create(this.tree_name, cookie_str);
 		}
 		catch(e) {
@@ -95,13 +97,11 @@ CTree.prototype = {
 
 	OpenNode: function(nodelist) {
 		try {
-			var c = nodelist.length - 1;
+			var c = nodelist.length;
 			for (var i = 0; i < c; i++) {
 				document.getElementById('id_' + nodelist[i]).style.display = IE ? 'block' : 'table-row';
-				if (this.checkParent(nodelist[i])) {
-					if (this.getNodeStatus(nodelist[i]) == 'open') {
-						this.OpenNode(this.treenode[nodelist[i]].nodelist.split(','));
-					}
+				if (this.getNodeStatus(nodelist[i]) == 'open') {
+					this.OpenNode(this.treenode[nodelist[i]].nodelist.split(','));
 				}
 			}
 		}
@@ -112,7 +112,7 @@ CTree.prototype = {
 
 	CloseNode: function(nodelist) {
 		try {
-			var c = nodelist.length - 1;
+			var c = nodelist.length;
 			for (var i = 0; i < c; i++) {
 				document.getElementById('id_' + nodelist[i]).style.display = 'none';
 				if (this.checkParent(nodelist[i])) {
@@ -129,8 +129,9 @@ CTree.prototype = {
 
 	onStartOpen : function() {
 		var nodes = tree_init.split(',');
-		var c = nodes.length - 1;
-		for (var i = 0; i < c;i++) {
+		var c = nodes.length;
+
+		for (var i = 0; i < c; i++) {
 			if (typeof(nodes[i]) != 'undefined') {
 				try {
 					if (this.checkParent(nodes[i])) {

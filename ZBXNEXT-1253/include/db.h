@@ -292,15 +292,6 @@ typedef struct
 }
 DB_EVENT;
 
-typedef union
-{
-	double		dbl;
-	zbx_uint64_t	ui64;
-	char		*str;
-	char		*err;
-}
-history_value_t;
-
 typedef struct
 {
 	zbx_uint64_t		itemid;
