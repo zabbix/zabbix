@@ -1650,7 +1650,25 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
-		// CHECK TEMPLATE TRIGGERS DEPENDENCIES
+		// get templates which exists in all targets
+		$arr = DBfetchArray(DBselect('SELECT * FROM hosts_templates WHERE'.DBcondition('hostid', $targetids).''));
+		$mas = array();
+		foreach ($arr as $v) {
+			if (!isset($mas[$v['templateid']])) {
+				$mas[$v['templateid']] = array();
+			}
+			$mas[$v['templateid']][$v['hostid']] = 1;
+		}
+		$targetIdCount = count($targetids);
+		$commonDBTemplateIds = array();
+		foreach ($mas as $templateId => $targetList) {
+			if (count($targetList) == $targetIdCount) {
+				$commonDBTemplateIds[] = $templateId;
+			}
+		}
+
+		// Check if there are any template with triggers which depends on triggers in templates which will be not linked
+		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateids));
 		foreach ($templateids as $templateid) {
 			$triggerids = array();
 			$dbTriggers = get_triggers_by_hostid($templateid);
@@ -1666,7 +1684,7 @@ class CTemplate extends CZBXAPI {
 				' )'.
 				' AND i.itemid=f.itemid'.
 				' AND h.hostid=i.hostid'.
-				' AND '.DBcondition('h.hostid', $templateids, true).
+				' AND '.DBcondition('h.hostid', $commonTemplateIds, true).
 				' AND h.status='.HOST_STATUS_TEMPLATE;
 
 			if ($dbDepHost = DBfetch(DBselect($sql))) {
@@ -1682,7 +1700,6 @@ class CTemplate extends CZBXAPI {
 					_s('Trigger in template "%1$s" has dependency with trigger in template "%2$s".', $tmpTpl['host'], $dbDepHost['host']));
 			}
 		}
-
 
 		$linked = array();
 		$sql = 'SELECT hostid,templateid'.
