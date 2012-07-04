@@ -133,6 +133,9 @@ class CFlickerfreeScreen {
 			case SCREEN_RESOURCE_HOST_TRIGGERS:
 				return new CFlickerfreeScreenHostTriggers($options);
 
+			case SCREEN_RESOURCE_HISTORY:
+				return new CFlickerfreeScreenHistory($options);
+
 			default:
 				return null;
 		}
@@ -481,8 +484,8 @@ class CFlickerfreeScreenItem {
 				'mode' => $this->mode,
 				'refreshInterval' => CWebUser::$data['refresh'],
 				'hostid' => $this->hostid,
-				'period' => get_request('period', null),
-				'stime' => get_request('stime', null),
+				'period' => $this->period,
+				'stime' => $this->stime,
 				'profile_idx' => $this->profile_idx
 			);
 			zbx_add_post_js('flickerfreeScreen.add('.zbx_jsvalue($data).');');

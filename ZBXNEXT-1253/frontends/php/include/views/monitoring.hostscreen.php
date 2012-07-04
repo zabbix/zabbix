@@ -55,17 +55,17 @@ else {
 	}
 	$screenWidget->addHeader($screenList);
 
-	$effectiveperiod = navigation_bar_calc('web.screens', $this->data['screen']['screenid'], true);
+	$period = navigation_bar_calc('web.screens', $this->data['screen']['screenid'], true);
 
 	$flickerfreeScreen = new CFlickerfreeScreen(array(
 		'screen' => $this->data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
-		'period' => $effectiveperiod,
+		'period' => $period,
 		'profile_idx' => 'web.screens'
 	));
 
 	$timeline = array(
-		'period' => $effectiveperiod,
+		'period' => $period,
 		'starttime' => date('YmdHis', time() - ZBX_MAX_PERIOD)
 	);
 	if (!empty($this->data['stime'])) {

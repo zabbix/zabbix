@@ -176,18 +176,12 @@ $data = array(
 	'items' => $items,
 	'action' => get_request('action'),
 	'period' => navigation_bar_calc('web.item.graph', $item['itemid']),
-	'time' => zbxDateToTime($_REQUEST['stime'])
+	'time' => zbxDateToTime(get_request('stime')),
+	'is_plaintext' => isset($_REQUEST['plaintext']),
+	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
+	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1)
 );
 $data['till'] = $data['time'] + $data['period'];
-
-$data['iv_string'] = array(
-	ITEM_VALUE_TYPE_LOG => 1,
-	ITEM_VALUE_TYPE_TEXT => 1
-);
-$data['iv_numeric'] = array(
-	ITEM_VALUE_TYPE_FLOAT => 1,
-	ITEM_VALUE_TYPE_UINT64 => 1
-);
 
 // render view
 $historyView = new CView('monitoring.history', $data);
