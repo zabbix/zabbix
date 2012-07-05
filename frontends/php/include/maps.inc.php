@@ -289,8 +289,13 @@ function resolveMapLabelMacrosAll(array $selement) {
 		$db_host = DBfetch(DBselect($sql));
 	}
 
-	$hostParam = ($resolveHostMacros && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) ? $db_host['host'] : null;
-	$label = resolveMapLabelMacros($label, $hostParam);
+	if ($resolveHostMacros
+			&& ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST || $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)) {
+		$label = resolveMapLabelMacros($label, $db_host['host']);
+	}
+	else {
+		$label = resolveMapLabelMacros($label);
+	}
 
 	if ($resolveHostMacros) {
 		$replace = array(
