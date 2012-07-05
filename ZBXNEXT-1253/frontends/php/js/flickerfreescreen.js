@@ -30,7 +30,7 @@ var flickerfreeScreen = {
 
 		var url = new Curl('jsrpc.php');
 		url.setArgument('type', 9); // PAGE_TYPE_TEXT
-		url.setArgument('method', 'flickerfreeScreen.get');
+		url.setArgument('method', 'screen.get');
 		url.setArgument('mode', screen.mode);
 		url.setArgument('screenitemid', screenitemid);
 		url.setArgument('profile_idx', !empty(screen.profile_idx) ? screen.profile_idx : null);

@@ -118,13 +118,13 @@ else {
 	$screenWidget->addHeader($screen['name'], $headerForm);
 
 	$effectiveperiod = navigation_bar_calc('web.screens', $screen['screenid'], true);
-	$flickerfreeScreen = new CFlickerfreeScreen(array(
+	$screenBuilder = new CScreenBuilder(array(
 		'screen' => $screen,
 		'effectiveperiod' => $effectiveperiod,
 		'mode' => SCREEN_MODE_PREVIEW,
 		'profile_idx' => 'web.screens'
 	));
-	$screenWidget->addItem($flickerfreeScreen->show());
+	$screenWidget->addItem($screenBuilder->show());
 
 	// create time control
 	$timeline = array(
@@ -135,8 +135,8 @@ else {
 		$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
 	}
 
-	CFlickerfreeScreen::insertScreenScrollJs($screen['screenid'], $timeline);
-	CFlickerfreeScreen::insertProcessObjectsJs();
+	CScreenBuilder::insertScreenScrollJs($screen['screenid'], $timeline);
+	CScreenBuilder::insertProcessObjectsJs();
 
 	$screenWidget->addItem(BR());
 }

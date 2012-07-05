@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2012 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,23 +19,25 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
+class CScreenScreen extends CScreenBase {
 
-$screenWidget = new CWidget();
-$screenWidget->addPageHeader(_('CONFIGURATION OF SCREEN'));
-$screenWidget->addHeader($this->data['screen']['name']);
-if (!empty($this->data['screen']['templateid'])) {
-	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
+	public function get() {
+		$screen = API::Screen()->get(array(
+			'screenids' => $this->screenitem['resourceid'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectScreenItems' => API_OUTPUT_EXTEND
+		));
+		$screen = reset($screen);
+
+		$screenBuilder = new CScreenBuilder(array(
+			'is_flickerfree' => $this->is_flickerfree,
+			'mode' => SCREEN_MODE_VIEW,
+			'screen' => $screen,
+			'period' => $this->period,
+			'stime' => $this->stime,
+			'profile_idx' => $this->profile_idx
+		));
+
+		return $this->getOutput($screenBuilder->show(), false);
+	}
 }
-$screenWidget->addItem(BR());
-
-$screenBuilder = new CScreenBuilder(array(
-	'screen' => $this->data['screen'],
-	'mode' => SCREEN_MODE_EDIT
-));
-$screenWidget->addItem($screenBuilder->show());
-
-CScreenBuilder::insertInitScreenJs($this->data['screenid']);
-CScreenBuilder::insertProcessObjectsJs();
-
-return $screenWidget;

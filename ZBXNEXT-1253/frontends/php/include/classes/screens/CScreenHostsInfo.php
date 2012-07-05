@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2012 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,23 +19,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/general.script.confirm.js.php';
+class CScreenHostsInfo extends CScreenBase {
 
-$screenWidget = new CWidget();
-$screenWidget->addPageHeader(_('CONFIGURATION OF SCREEN'));
-$screenWidget->addHeader($this->data['screen']['name']);
-if (!empty($this->data['screen']['templateid'])) {
-	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
+	public function get() {
+		return $this->getOutput(new CHostsInfo($this->screenitem['resourceid'], $this->screenitem['style']));
+	}
 }
-$screenWidget->addItem(BR());
-
-$screenBuilder = new CScreenBuilder(array(
-	'screen' => $this->data['screen'],
-	'mode' => SCREEN_MODE_EDIT
-));
-$screenWidget->addItem($screenBuilder->show());
-
-CScreenBuilder::insertInitScreenJs($this->data['screenid']);
-CScreenBuilder::insertProcessObjectsJs();
-
-return $screenWidget;

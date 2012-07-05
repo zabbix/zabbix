@@ -126,7 +126,7 @@ if ($this->data['action'] == 'showvalues' || $this->data['action'] == 'showlates
 }
 
 // create history screen
-$flickerfreeScreen = CFlickerfreeScreen::getScreen(array(
+$screenBuilder = CScreenBuilder::getScreen(array(
 	'resourcetype' => SCREEN_RESOURCE_HISTORY,
 	'action' => $this->data['action'],
 	'items' => $this->data['items'],
@@ -139,7 +139,7 @@ $flickerfreeScreen = CFlickerfreeScreen::getScreen(array(
 	'mark_color' => get_request('mark_color'),
 	'is_plaintext' => $this->data['is_plaintext']
 ));
-$flickerfreeScreen = $flickerfreeScreen->get();
+$screenBuilder = $screenBuilder->get();
 
 // append graph to widget
 if (!$this->data['is_plaintext']) {
@@ -153,7 +153,7 @@ if (!$this->data['is_plaintext']) {
 		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
 	}
 
-	$historyWidget->addItem($flickerfreeScreen);
+	$historyWidget->addItem($screenBuilder);
 
 	if (str_in_array($this->data['action'], array('showvalues', 'showgraph'))) {
 		$historyWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.history.filter.state', 1));
@@ -169,7 +169,7 @@ else {
 	}
 
 	$pre = new CTag('pre', true);
-	foreach ($flickerfreeScreen as $text) {
+	foreach ($screenBuilder as $text) {
 		$pre->addItem(new CJSscript($text));
 	}
 	$plaintextSpan->addItem($pre);

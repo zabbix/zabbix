@@ -125,13 +125,13 @@ if (isset($_REQUEST['favobj'])) {
 						$refresh = $slideshow['delay'];
 					}
 
-					$flickerfreeScreen = new CFlickerfreeScreen(array(
+					$screenBuilder = new CScreenBuilder(array(
 						'is_flickerfree' => false,
 						'screen' => $cur_screen,
 						'mode' => SCREEN_MODE_VIEW,
 						'period' => $effectiveperiod
 					));
-					echo $flickerfreeScreen->show()->toString();
+					echo $screenBuilder->show()->toString();
 
 					$script = get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $refresh * $refresh_multipl)."\n";
 					$script .= get_update_doll_script('mainpage', $_REQUEST['favref'], 'restartDoll')."\n";

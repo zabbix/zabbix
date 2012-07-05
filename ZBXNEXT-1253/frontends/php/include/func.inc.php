@@ -1745,7 +1745,3 @@ function num2letter($number) {
 
 	return $str;
 }
-
-function zbx_floatToString($float) {
-	return number_format($float, 0, '', '');
-}

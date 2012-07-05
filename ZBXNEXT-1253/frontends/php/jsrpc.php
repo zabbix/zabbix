@@ -168,10 +168,10 @@ switch ($data['method']) {
 			'message' => $session['serverCheckResult'] ? '' : _('Zabbix server is not running: the information displayed may not be current.')
 		);
 		break;
-	case 'flickerfreeScreen.get':
+	case 'screen.get':
 		$mode = !empty($data['mode']) ? $data['mode'] : SCREEN_MODE_VIEW;
 
-		$flickerfreeScreen = CFlickerfreeScreen::getScreen(array(
+		$screenBuilder = CScreenBuilder::getScreen(array(
 			'screenitemid' => $data['screenitemid'],
 			'mode' => $mode,
 			'hostid' => !empty($data['hostid']) ? $data['hostid'] : 0,
@@ -179,16 +179,16 @@ switch ($data['method']) {
 			'stime' => !empty($data['stime']) ? $data['stime'] : null,
 			'profile_idx' => !empty($data['profile_idx']) ? $data['profile_idx'] : null
 		));
-		$flickerfreeScreen->updateProfile();
-		$flickerfreeScreen = $flickerfreeScreen->get();
+		$screenBuilder->updateProfile();
+		$screenBuilder = $screenBuilder->get();
 
-		if (!empty($flickerfreeScreen)) {
+		if (!empty($screenBuilder)) {
 			if ($mode == SCREEN_MODE_JS) {
-				$result = $flickerfreeScreen;
+				$result = $screenBuilder;
 			}
 			else {
-				if (is_object($flickerfreeScreen)) {
-					$result = $flickerfreeScreen->toString();
+				if (is_object($screenBuilder)) {
+					$result = $screenBuilder->toString();
 				}
 			}
 		}

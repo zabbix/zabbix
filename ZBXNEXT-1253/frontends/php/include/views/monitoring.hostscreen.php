@@ -57,7 +57,7 @@ else {
 
 	$period = navigation_bar_calc('web.screens', $this->data['screen']['screenid'], true);
 
-	$flickerfreeScreen = new CFlickerfreeScreen(array(
+	$screenBuilder = new CScreenBuilder(array(
 		'screen' => $this->data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
 		'period' => $period,
@@ -72,10 +72,10 @@ else {
 		$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->data['stime']) + $timeline['period']);
 	}
 
-	$screenWidget->addItem($flickerfreeScreen->show());
+	$screenWidget->addItem($screenBuilder->show());
 
-	CFlickerfreeScreen::insertScreenScrollJs($this->data['screen']['screenid'], $timeline);
-	CFlickerfreeScreen::insertProcessObjectsJs();
+	CScreenBuilder::insertScreenScrollJs($this->data['screen']['screenid'], $timeline);
+	CScreenBuilder::insertProcessObjectsJs();
 }
 
 return $screenWidget;

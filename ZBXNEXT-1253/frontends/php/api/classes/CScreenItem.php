@@ -69,7 +69,6 @@ class CScreenItem extends CZBXAPI {
 			'screenids'		=> null,
 			'hostids'		=> null,
 			'editable'		=> null,
-			'fillReals'		=> null,
 			'sortfield'		=> '',
 			'sortorder'		=> '',
 			'preservekeys'	=> null,
