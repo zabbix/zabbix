@@ -9,6 +9,7 @@ A.F....... [ZBX-5074] redesigned action configuration page (Eduard)
 ..F....... [ZBXNEXT-829] added Zabbix server availability check (Vedmak)
 
 Bug fixes:
+A......... [ZBX-5252] fixed multiple level templated application inheritance (Pavels)
 ..F....... [ZBX-2183] fixed change column in latest data for items with 'unixtime' units (Vedmak)
 A.F....... [ZBX-2055] added flexible intervals and time periods validation (Vedmak)
 ..F....... [ZBX-5045] fixed audit error message when deleting global macros (Pavels)
@@ -115,6 +116,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-5252] fixed multiple level templated application inheritance (Pavels)
 ..F....... [ZBX-2183] fixed change column in latest data for items with 'unixtime' units (Vedmak)
 A.F....... [ZBX-2055] added flexible intervals and time periods validation (Vedmak)
 ..F....... [ZBX-5045] fixed audit error message when deleting global macros (Pavels)
