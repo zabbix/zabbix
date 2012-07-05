@@ -627,20 +627,17 @@ function convertFunctionValue($value) {
 			case 'w':
 				$value = bcmul($value, '604800');
 				break;
-			case 'w':
-				$value = bcmul($value, '604800');
-				break;
 			case 'K':
 				$value = bcmul($value, '1000');
 				break;
 			case 'M':
-				$value = bcmul($value, '1000000');
+				$value = bcmul($value, '1048576');
 				break;
 			case 'G':
-				$value = bcmul($value, '1000000000');
+				$value = bcmul($value, '1073741824');
 				break;
 			case 'T':
-				$value = bcmul($value, '1000000000000');
+				$value = bcmul($value, '1099511627776');
 				break;
 		}
 	}
