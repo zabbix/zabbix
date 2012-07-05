@@ -454,9 +454,16 @@ if (!empty($this->data['itemid'])) {
 		);
 	}
 	if (!$this->data['limited']) {
-		array_push($buttons, new CButtonDelete(_('Delete selected item?'),
-			url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid')))
-		);
+		if ($this->data['is_discovery_rule']) {
+			array_push($buttons, new CButtonDelete(_('Delete discovery rule?'),
+				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid')))
+			);
+		}
+		else {
+			array_push($buttons, new CButtonDelete(_('Delete item?'),
+				url_params(array('form', 'groupid', 'itemid', 'parent_discoveryid')))
+			);
+		}
 	}
 }
 array_push($buttons, new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid')));
