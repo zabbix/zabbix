@@ -22,8 +22,8 @@ var flickerfreeScreen = {
 
 	screens: [],
 
-	refresh: function(screenitemid) {
-		var screen = this.screens[screenitemid];
+	refresh: function(id) {
+		var screen = this.screens[id];
 		if (empty(screen.resourcetype)) {
 			return;
 		}
@@ -32,7 +32,7 @@ var flickerfreeScreen = {
 		url.setArgument('type', 9); // PAGE_TYPE_TEXT
 		url.setArgument('method', 'screen.get');
 		url.setArgument('mode', screen.mode);
-		url.setArgument('screenitemid', screenitemid);
+		url.setArgument('screenitemid', screen.screenitemid);
 		url.setArgument('profile_idx', !empty(screen.profile_idx) ? screen.profile_idx : null);
 		url.setArgument('period', !empty(screen.period) ? screen.period : null);
 		url.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
@@ -40,7 +40,7 @@ var flickerfreeScreen = {
 		// SCREEN_RESOURCE_GRAPH
 		// SCREEN_RESOURCE_SIMPLE_GRAPH
 		if (screen.resourcetype == 0 || screen.resourcetype == 1) {
-			var graphId = 'graph_' + screenitemid + '_' + screen.screenid;
+			var graphId = 'graph_' + screen.screenitemid + '_' + screen.screenid;
 
 			url.setArgument('mode', 3); // SCREEN_MODE_JS
 			url.setArgument('hostid', screen.hostid);
@@ -49,6 +49,7 @@ var flickerfreeScreen = {
 				timeControl.refreshObject(graphId);
 			});
 		}
+
 		// SCREEN_RESOURCE_MAP
 		else if (screen.resourcetype == 2) {
 			jQuery('<div>').load(url.getUrl(), function() {
@@ -62,47 +63,64 @@ var flickerfreeScreen = {
 				});
 			});
 		}
+
 		// SCREEN_RESOURCE_CLOCK
 		// SCREEN_RESOURCE_URL
 		else if (screen.resourcetype == 7 || screen.resourcetype == 11) {
 			// don't refresh screen
 		}
+
+		// SCREEN_RESOURCE_HISTORY
+		else if (screen.resourcetype == 17) {
+			url.setArgument('resourcetype', !empty(screen.resourcetype) ? screen.resourcetype : null);
+			url.setArgument('itemid', !empty(screen.data.itemid) ? screen.data.itemid : null);
+			url.setArgument('action', !empty(screen.data.action) ? screen.data.action : null);
+			url.setArgument('filter', !empty(screen.data.filter) ? screen.data.filter : null);
+			url.setArgument('filter_task', !empty(screen.data.filter_task) ? screen.data.filter_task : null);
+			url.setArgument('mark_color', !empty(screen.data.mark_color) ? screen.data.mark_color : null);
+			url.setArgument('plaintext', !empty(screen.data.plaintext) ? screen.data.plaintext : null);
+
+			jQuery('#flickerfreescreen_' + id).load(url.getUrl());
+		}
+
 		else {
-			jQuery('#flickerfreescreen_' + screenitemid).load(url.getUrl());
+			jQuery('#flickerfreescreen_' + id).load(url.getUrl());
 		}
 	},
 
 	refreshAll: function(period, stime) {
-		for (var screenitemid in this.screens) {
-			if (empty(this.screens[screenitemid])) {
+		for (var id in this.screens) {
+			if (empty(this.screens[id])) {
 				continue;
 			}
 
-			this.screens[screenitemid].period = period;
-			this.screens[screenitemid].stime = stime;
+			this.screens[id].period = period;
+			this.screens[id].stime = stime;
 
-			this.refresh(screenitemid);
+			this.refresh(id);
 		}
 	},
 
-	add: function(data) {
+	add: function(screen) {
 		timeControl.refreshPage = false;
 
-		this.screens[data.screenitemid] = {
-			'screenid': data.screenid,
-			'resourcetype': data.resourcetype,
-			'mode': data.mode,
-			'hostid': data.hostid,
-			'period': data.period,
-			'stime': data.stime,
-			'profile_idx': data.profile_idx
+		this.screens[screen.id] = {
+			'screenitemid': screen.screenitemid,
+			'screenid': screen.screenid,
+			'resourcetype': screen.resourcetype,
+			'mode': screen.mode,
+			'hostid': screen.hostid,
+			'period': screen.period,
+			'stime': screen.stime,
+			'profile_idx': screen.profile_idx,
+			'data': screen.data
 		};
 
-		if (data.refreshInterval > 0) {
-			window.setInterval(function() { flickerfreeScreen.refresh(data.screenitemid); }, data.refreshInterval * 1000);
+		if (screen.refreshInterval > 0) {
+			window.setInterval(function() { flickerfreeScreen.refresh(screen.id); }, screen.refreshInterval * 1000);
 		}
 		else {
-			flickerfreeScreen.refresh(data.screenitemid);
+			flickerfreeScreen.refresh(screen.id);
 		}
 	}
 };

@@ -21,32 +21,49 @@
 
 class CScreenHistory extends CScreenBase {
 
-	public $items;
-	public $item;
 	public $itemid;
-	public $time;
-	public $till;
 	public $filter;
 	public $filter_task;
 	public $mark_color;
-	public $is_plaintext;
+	public $plaintext;
+	public $items;
+	public $item;
 
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
 
-		$this->items = isset($options['items']) ? $options['items'] : null;
-		$this->item = isset($options['item']) ? $options['item'] : null;
+		$this->resourcetype = SCREEN_RESOURCE_HISTORY;
+
+		// mandatory
 		$this->itemid = isset($options['itemid']) ? $options['itemid'] : null;
-		$this->time = zbxDateToTime($this->stime);
-		$this->till = $this->time + $this->period;
 		$this->filter = isset($options['filter']) ? $options['filter'] : null;
 		$this->filter_task = isset($options['filter_task']) ? $options['filter_task'] : null;
 		$this->mark_color = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
-		$this->is_plaintext = isset($options['plaintext']) ? $options['plaintext'] : null;
+		$this->plaintext = isset($options['plaintext']) ? $options['plaintext'] : null;
+
+		// optional
+		$this->items = isset($options['items']) ? $options['items'] : null;
+		$this->item = isset($options['item']) ? $options['item'] : null;
+
+		if (empty($this->items)) {
+			$this->items = API::Item()->get(array(
+				'nodeids' => get_current_nodeid(),
+				'itemids' => $this->itemid,
+				'webitems' => true,
+				'selectHosts' => array('hostid', 'name'),
+				'output' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			));
+
+			$this->item = reset($this->items);
+		}
 	}
 
 	public function get() {
 		$output = array();
+
+		$time = zbxDateToTime($this->stime);
+		$till = $time + $this->period;
 
 		$iv_string = array(
 			ITEM_VALUE_TYPE_LOG => 1,
@@ -72,8 +89,8 @@ class CScreenHistory extends CScreenBase {
 			elseif ($this->action == 'showvalues') {
 				$config = select_config();
 
-				$options['time_from'] = $this->time - 10; // some seconds to allow script to execute
-				$options['time_till'] = $this->till;
+				$options['time_from'] = $time - 10; // some seconds to allow script to execute
+				$options['time_till'] = $till;
 				$options['limit'] = $config['search_limit'];
 			}
 
@@ -219,7 +236,7 @@ class CScreenHistory extends CScreenBase {
 						zbx_nl2br($value)
 					));
 
-					if (empty($this->is_plaintext)) {
+					if (empty($this->plaintext)) {
 						continue;
 					}
 
@@ -255,14 +272,14 @@ class CScreenHistory extends CScreenBase {
 			$graphDims = getGraphDims();
 
 			$starttime = get_min_itemclock_by_itemid($this->item['itemid']);
-			if ($this->time < $starttime) {
-				$starttime = $this->time;
+			if ($time < $starttime) {
+				$starttime = $time;
 			}
 
 			$timeline = array(
 				'starttime' => date('YmdHis', $starttime),
 				'period' => $this->period,
-				'usertime' => date('YmdHis', $this->till)
+				'usertime' => date('YmdHis', $till)
 			);
 
 			$timeControlData = array(
@@ -293,12 +310,21 @@ class CScreenHistory extends CScreenBase {
 				$timeControlData['mainObject'] = 1;
 			}
 
-			if (!$this->is_plaintext) {
+			if (!$this->plaintext) {
 				zbx_add_post_js('timeControl.addObject("'.$domGraphId.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
 				zbx_add_post_js('timeControl.processObjects();');
 			}
 		}
 
-		return $this->getOutput($output, false);
+		$flickerfreeData = array(
+			'itemid' => $this->itemid,
+			'action' => $this->action,
+			'filter' => $this->filter,
+			'filter_task' => $this->filter_task,
+			'mark_color' => $this->mark_color,
+			'plaintext' => $this->plaintext
+		);
+
+		return $this->getOutput($output, true, $flickerfreeData);
 	}
 }

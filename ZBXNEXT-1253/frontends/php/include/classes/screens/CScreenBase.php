@@ -23,10 +23,10 @@ class CScreenBase {
 
 	public $is_flickerfree;
 	public $mode;
+	public $resourcetype;
 	public $screenid;
 	public $screenitem;
 	public $action;
-	public $id;
 	public $hostid;
 	public $period;
 	public $stime;
@@ -56,8 +56,14 @@ class CScreenBase {
 			$this->screenitem = reset($this->screenitem);
 		}
 
+		// get screenid
 		if (empty($this->screenid) && !empty($this->screenitem)) {
 			$this->screenid = $this->screenitem['screenid'];
+		}
+
+		// get resourcetype
+		if (!empty($this->screenitem['resourcetype'])) {
+			$this->resourcetype = $this->screenitem['resourcetype'];
 		}
 	}
 
@@ -72,17 +78,17 @@ class CScreenBase {
 		}
 	}
 
-	public function getId() {
-		if (empty($this->id) && !empty($this->screenitem)) {
-			$this->id = 'flickerfreescreen_'.$this->screenitem['screenitemid'];
-		}
-
-		return $this->id;
+	public function getDataId() {
+		return !empty($this->screenitem) ? $this->screenitem['screenitemid'] : 1;
 	}
 
-	public function getOutput($item = null, $insertFlickerfreeJs = true) {
+	public function getId() {
+		return 'flickerfreescreen_'.$this->getDataId();
+	}
+
+	public function getOutput($item = null, $insertFlickerfreeJs = true, $flickerfreeData = array()) {
 		if ($insertFlickerfreeJs) {
-			$this->insertFlickerfreeJs();
+			$this->insertFlickerfreeJs($flickerfreeData);
 		}
 
 		if ($this->mode == SCREEN_MODE_EDIT) {
@@ -93,20 +99,23 @@ class CScreenBase {
 		}
 	}
 
-	public function insertFlickerfreeJs() {
+	public function insertFlickerfreeJs($data = array()) {
 		if ($this->is_flickerfree) {
-			$data = array(
-				'screenitemid' => $this->screenitem['screenitemid'],
-				'screenid' => $this->screenitem['screenid'],
-				'resourcetype' => $this->screenitem['resourcetype'],
+			$jsData = array(
+				'id' => $this->getDataId(),
+				'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
+				'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : null,
+				'resourcetype' => $this->resourcetype,
 				'mode' => $this->mode,
 				'refreshInterval' => CWebUser::$data['refresh'],
 				'hostid' => $this->hostid,
 				'period' => $this->period,
 				'stime' => $this->stime,
-				'profile_idx' => $this->profile_idx
+				'profile_idx' => $this->profile_idx,
+				'data' => !empty($data) ? $data : null
 			);
-			zbx_add_post_js('flickerfreeScreen.add('.zbx_jsvalue($data).');');
+
+			zbx_add_post_js('flickerfreeScreen.add('.zbx_jsvalue($jsData).');');
 		}
 	}
 }

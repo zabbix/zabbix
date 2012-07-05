@@ -170,25 +170,37 @@ switch ($data['method']) {
 		break;
 	case 'screen.get':
 		$mode = !empty($data['mode']) ? $data['mode'] : SCREEN_MODE_VIEW;
+		$resourcetype = !empty($data['resourcetype']) ? $data['resourcetype'] : null;
 
-		$screenBuilder = CScreenBuilder::getScreen(array(
-			'screenitemid' => $data['screenitemid'],
+		$options = array(
+			'screenitemid' => !empty($data['screenitemid']) ? $data['screenitemid'] : null,
 			'mode' => $mode,
 			'hostid' => !empty($data['hostid']) ? $data['hostid'] : 0,
 			'period' => !empty($data['period']) ? $data['period'] : ZBX_MAX_PERIOD,
 			'stime' => !empty($data['stime']) ? $data['stime'] : null,
 			'profile_idx' => !empty($data['profile_idx']) ? $data['profile_idx'] : null
-		));
-		$screenBuilder->updateProfile();
-		$screenBuilder = $screenBuilder->get();
+		);
+		if ($resourcetype == SCREEN_RESOURCE_HISTORY) {
+			$options['resourcetype'] = $resourcetype;
+			$options['itemid'] = !empty($data['itemid']) ? $data['itemid'] : null;
+			$options['action'] = !empty($data['action']) ? $data['action'] : null;
+			$options['filter'] = !empty($data['filter']) ? $data['filter'] : null;
+			$options['filter_task'] = !empty($data['filter_task']) ? $data['filter_task'] : null;
+			$options['mark_color'] = !empty($data['mark_color']) ? $data['mark_color'] : null;
+			$options['plaintext'] = !empty($data['plaintext']) ? $data['plaintext'] : null;
+		}
 
-		if (!empty($screenBuilder)) {
+		$screen = CScreenBuilder::getScreen($options);
+		$screen->updateProfile();
+		$screen = $screen->get();
+
+		if (!empty($screen)) {
 			if ($mode == SCREEN_MODE_JS) {
-				$result = $screenBuilder;
+				$result = $screen;
 			}
 			else {
-				if (is_object($screenBuilder)) {
-					$result = $screenBuilder->toString();
+				if (is_object($screen)) {
+					$result = $screen->toString();
 				}
 			}
 		}

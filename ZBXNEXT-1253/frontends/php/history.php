@@ -135,7 +135,7 @@ if (isset($_REQUEST['remove_log']) && isset($_REQUEST['cmbitemlist'])) {
 }
 
 /*
- * Init
+ * Display
  */
 $items = API::Item()->get(array(
 	'nodeids' => get_current_nodeid(),
@@ -152,30 +152,27 @@ foreach ($_REQUEST['itemid'] as $itemid) {
 	}
 }
 
-$item = reset($items);
-$host = reset($item['hosts']);
-$item['hostname'] = $host['name'];
-
 // resets get params for proper page refresh
 if (isset($_REQUEST['period']) || isset($_REQUEST['stime'])) {
-	navigation_bar_calc('web.item.graph', $item['itemid'], true);
+	navigation_bar_calc('web.item.graph', $_REQUEST['itemid'], true);
 
 	if ($_REQUEST['action'] != 'showvalues') {
-		jsRedirect('history.php?action='.get_request('action', 'showgraph').'&itemid='.$item['itemid']);
+		jsRedirect('history.php?action='.get_request('action', 'showgraph').'&itemid='.$_REQUEST['itemid']);
 		require_once dirname(__FILE__).'/include/page_footer.php';
 		exit();
 	}
 }
 
-/*
- * Display
- */
+$item = reset($items);
+$host = reset($item['hosts']);
+$item['hostname'] = $host['name'];
+
 $data = array(
 	'itemid' => get_request('itemid'),
-	'item' => $item,
 	'items' => $items,
+	'item' => $item,
 	'action' => get_request('action'),
-	'period' => navigation_bar_calc('web.item.graph', $item['itemid']),
+	'period' => get_request('period'),
 	'time' => zbxDateToTime(get_request('stime')),
 	'is_plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
