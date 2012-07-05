@@ -467,7 +467,7 @@ class CApplication extends CZBXAPI {
 				}
 			}
 
-			// check existance
+			// check existence
 			if ($update || $create) {
 				$applicationsExists = $this->get(array(
 					'output' => API_OUTPUT_EXTEND,
@@ -755,9 +755,9 @@ class CApplication extends CZBXAPI {
 
 			// skip applications not from parent templates of current host
 			$parentApplications = array();
-			foreach ($applications as $applicationid => $application) {
-				if (isset($templateids[$application['hostid']])) {
-					$parentApplications[$applicationid] = $application;
+			foreach ($applications as $parentApplicationId => $parentApplication) {
+				if (isset($templateids[$parentApplication['hostid']])) {
+					$parentApplications[$parentApplicationId] = $parentApplication;
 				}
 			}
 
@@ -772,25 +772,25 @@ class CApplication extends CZBXAPI {
 			$exApplicationsNames = zbx_toHash($exApplications, 'name');
 			$exApplicationsTpl = zbx_toHash($exApplications, 'templateid');
 
-			foreach ($parentApplications as $applicationid => $application) {
+			foreach ($parentApplications as $parentApplicationId => $parentApplication) {
 				$exApplication = null;
 
-				// update by tempalteid
-				if (isset($exApplicationsTpl[$applicationid])) {
-					$exApplication = $exApplicationsTpl[$applicationid];
+				// update by templateid
+				if (isset($exApplicationsTpl[$parentApplicationId])) {
+					$exApplication = $exApplicationsTpl[$parentApplicationId];
 				}
 
 				// update by name
-				if (isset($application['name']) && isset($exApplicationsNames[$application['name']])) {
-					$exApplication = $exApplicationsNames[$application['name']];
-					if ($exApplication['templateid'] > 0 && bccomp($exApplication['templateid'], $application['applicationid'] != 0)) {
+				if (isset($parentApplication['name']) && isset($exApplicationsNames[$parentApplication['name']])) {
+					$exApplication = $exApplicationsNames[$parentApplication['name']];
+					if ($exApplication['templateid'] > 0 && !idcmp($exApplication['templateid'], $parentApplication['applicationid'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists for host "%2$s".', $exApplication['name'], $host['name']));
 					}
 				}
 
-				$newApplication = $application;
+				$newApplication = $parentApplication;
 				$newApplication['hostid'] = $host['hostid'];
-				$newApplication['templateid'] = $application['applicationid'];
+				$newApplication['templateid'] = $parentApplication['applicationid'];
 
 				if ($exApplication) {
 					$newApplication['applicationid'] = $exApplication['applicationid'];
