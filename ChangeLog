@@ -9,6 +9,7 @@ A.F....... [ZBX-5074] redesigned action configuration page (Eduard)
 ..F....... [ZBXNEXT-829] added Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3782] fixed {HOSTNAME} macro not working in map labels trigger expression macro (Vedmak)
 ..F....... [ZBX-5236] fixed some map element rendering ignoring the "Problem display" map option (Pavels)
 A......... [ZBX-5252] fixed multiple level templated application inheritance (Pavels)
 ..F....... [ZBX-2183] fixed change column in latest data for items with 'unixtime' units (Vedmak)
@@ -117,6 +118,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3782] fixed {HOSTNAME} macro not working in map labels trigger expression macro (Vedmak)
 .......... [ZBXNEXT-1256] changed partition discovery keys for Solaris and Linux example userparams, so that example file may be directly included (Richlv)
 ..F....... [ZBX-5236] fixed some map element rendering ignoring the "Problem display" map option (Pavels)
 A......... [ZBX-5252] fixed multiple level templated application inheritance (Pavels)
@@ -949,6 +951,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.15rc1
 
+..F....... [ZBX-3782] fixed {HOSTNAME} macro not working in map labels trigger expression macro (Vedmak)
 ..F....... [ZBX-5236] fixed some map element rendering ignoring the "Problem display" map option (Pavels)
 ..F....... [ZBX-3245] fixed trigger item selection pop up not working with items from child nodes (Pavels)
 A......... [ZBX-4929] optimized host group SQL queries (Eduard)
