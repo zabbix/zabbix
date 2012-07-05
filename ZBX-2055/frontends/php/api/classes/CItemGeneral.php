@@ -723,12 +723,16 @@ abstract class CItemGeneral extends CZBXAPI {
 	 * @return bool
 	 */
 	protected function checkDelayFlex(array $item) {
-		if (array_key_exists('delay_flex', $item) && !zbx_empty($item['delay_flex'])) {
+		if (array_key_exists('delay_flex', $item)) {
 			$delayFlex = $item['delay_flex'];
 
 			if (!is_string($delayFlex)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect flexible interval in item "%1$s". Flexible interval must be a string.', $item['name']));
+			}
+
+			if ($delayFlex === '') {
+				return true;
 			}
 
 			$validator = new CTimePeriodValidator();
