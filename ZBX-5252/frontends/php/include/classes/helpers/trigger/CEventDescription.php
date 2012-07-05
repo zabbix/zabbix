@@ -1,6 +1,7 @@
+<?php
 /*
 ** Zabbix
-** Copyright (C) 2000-2011 Zabbix SIA
+** Copyright (C) 2000-2012 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,17 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
 
-class GeneralInformation
-{
-	public static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	public static final String REVISION_DATE = "27 June 2012";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "2.0.2rc1";
+class CEventDescription extends CTriggerDescription {
 
-	public static void printVersion()
-	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
+	protected function resolveItemValueMacro(array $item, array $trigger) {
+		$item['lastvalue'] = item_get_history(
+			$item,
+			0,
+			$trigger['clock'],
+			$trigger['ns']
+		);
+
+		return formatItemValue($item);
 	}
 }

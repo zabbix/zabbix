@@ -74,7 +74,7 @@ class CHostGroup extends CZBXAPI {
 			'with_httptests'			=> null,
 			'with_monitored_httptests'	=> null,
 			'with_graphs'				=> null,
-			'with_applications'		=> null,
+			'with_applications'			=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -312,10 +312,10 @@ class CHostGroup extends CZBXAPI {
 		if (!is_null($options['with_graphs'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'EXISTS (SELECT DISTINCT i.itemid'.
+			$sqlParts['where'][] = 'EXISTS (SELECT 1'.
 											' FROM items i,graphs_items gi'.
 											' WHERE i.hostid=hg.hostid'.
-												' AND i.itemid=gi.itemid)';
+												' AND i.itemid=gi.itemid '.zbx_limit(1).')';
 		}
 
 		if (!is_null($options['with_applications'])) {

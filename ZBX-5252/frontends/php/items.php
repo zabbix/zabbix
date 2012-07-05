@@ -328,8 +328,17 @@ foreach (array('subfilter_apps', 'subfilter_types', 'subfilter_value_types', 'su
  */
 $result = false;
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
+	$timePeriodValidator = new CTimePeriodValidator(array('allow_multiple' => false));
 	$_REQUEST['delay_flex'] = get_request('delay_flex', array());
-	array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
+
+	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
+		array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
+		unset($_REQUEST['new_delay_flex']);
+	}
+	else {
+		error($timePeriodValidator->getError());
+		show_messages(false, null, _('Invalid time period'));
+	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = false;
