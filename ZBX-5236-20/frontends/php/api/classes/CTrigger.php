@@ -1833,7 +1833,7 @@ class CTrigger extends CTriggerGeneral {
 
 			$downTriggerIds = $trigger['dependencies'];
 
-			// the trigger can't be dependant on itself
+			// the trigger can't depend on itself
 			if (in_array($trigger['triggerid'], $trigger['dependencies'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect dependency.'));
 			}

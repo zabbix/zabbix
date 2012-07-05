@@ -684,12 +684,13 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can add user media.'));
 		}
 
+		$timePeriodValidator = new CTimePeriodValidator();
 		foreach ($users as $user) {
 			$userids[] = $user['userid'];
 
 			foreach ($medias as $media) {
-				if (!validate_period($media['period'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect time period'));
+				if (!$timePeriodValidator->validate($media['period'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
 				}
 
 				$mediaid = get_dbid('media', 'mediaid');
@@ -787,9 +788,10 @@ class CUser extends CZBXAPI {
 		}
 
 		// update
+		$timePeriodValidator = new CTimePeriodValidator();
 		foreach ($updMedias as $media) {
-			if (!validate_period($media['period'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect time period "%1$s".', $media['period']));
+			if (!$timePeriodValidator->validate($media['period'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $timePeriodValidator->getError());
 			}
 
 			$result = DBexecute(
