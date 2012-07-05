@@ -117,6 +117,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......... [ZBXNEXT-1256] changed partition discovery keys for Solaris and Linux example userparams, so that example file may be directly included (Richlv)
 ..F....... [ZBX-5236] fixed some map element rendering ignoring the "Problem display" map option (Pavels)
 A......... [ZBX-5252] fixed multiple level templated application inheritance (Pavels)
 ..F....... [ZBX-2183] fixed change column in latest data for items with 'unixtime' units (Vedmak)
