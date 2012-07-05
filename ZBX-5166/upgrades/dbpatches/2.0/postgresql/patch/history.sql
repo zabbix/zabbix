@@ -1,3 +1,0 @@
-ALTER TABLE ONLY history
-	ALTER itemid DROP DEFAULT,
-	ADD ns integer DEFAULT '0' NOT NULL;
