@@ -170,7 +170,7 @@ require_once dirname(__FILE__).'/include/views/js/general.script.confirm.js.php'
 	$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 	$fs_icon = get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']));
-	$trigg_wdgt->addPageHeader(_('STATUS OF TRIGGERS').SPACE.'['.date(_('d M Y H:i:s')).']', $fs_icon);
+	$trigg_wdgt->addPageHeader(_('STATUS OF TRIGGERS').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']', $fs_icon);
 	$trigg_wdgt->addHeader(_('Triggers'), $r_form);
 	$trigg_wdgt->addHeaderRowNumber();
 
