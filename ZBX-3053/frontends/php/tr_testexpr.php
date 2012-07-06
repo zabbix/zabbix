@@ -42,7 +42,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //----------------------------------------------------------------------
 
 // expression analyze
-	$expression = urldecode(get_request('expression', ''));
+	$expression = get_request('expression', '');
 
 	define('NO_LINK_IN_TESTING', true);
 	$triggerExpr = new CTriggerExpression(array('expression' => $expression));
