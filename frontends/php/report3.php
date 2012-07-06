@@ -146,18 +146,16 @@ switch ($period) {
 		array_unshift($header, new CCol(_('From'), 'center'), new CCol(_('Till'), 'center'));
 
 		function get_time($w) {
-			global $year;
+			static $beg;
+			if (!isset($beg)) {
+				global $year;
+				$time = mktime(0,0,0,1, 1, $year);
+				$wd = date('w', $time);
+				$wd = $wd == 0 ? 6 : $wd - 1;
+				$beg =  $time - $wd * SEC_PER_DAY;
+			}
 
-			$time = mktime(12, 0, 0, 1, 1, $year);
-			$time += $w * SEC_PER_WEEK;
-
-			$wd = date('w', $time);
-			$time -= $wd * SEC_PER_DAY;
-
-			$y = date('Y', $time);
-			$m = date('m', $time);
-			$d = date('d', $time);
-			return mktime(0, 0, 0, $m, $d, $y);
+			return strtotime("+$w week", $beg);
 		}
 
 		function format_time($t) {
