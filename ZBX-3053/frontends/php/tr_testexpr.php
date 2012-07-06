@@ -116,7 +116,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	$frm_test->setHelp('web.testexpr.service.php');
 	$frm_test->setTableClass('formlongtable formtable');
 	$frm_test->addVar('form_refresh', get_request('form_refresh', 1));
-	$frm_test->addVar('expression', urlencode($expression));
+	$frm_test->addVar('expression', $expression);
 
 /* test data */
 	$frm_test->addRow(_('Test data'), $data_table);
