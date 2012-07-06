@@ -976,7 +976,7 @@ class CXmlImport18 {
 					}
 
 					if (empty($current_host)) {
-						throw new Exception(_s('No permission for host "%1$s"', $host_db['host']));
+						throw new Exception(_s('No permission for host "%1$s".', $host_db['host']));
 					}
 					else {
 						$current_host = reset($current_host);
@@ -1570,20 +1570,20 @@ class CXmlImport18 {
 						}
 
 						if (!$current_graph && empty($rules['graphs']['createMissing'])) {
-							info(_s('Graph "%1$s" skipped - user rule', $graph_db['name']));
+							info(_s('Graph "%1$s" skipped - user rule.', $graph_db['name']));
 							continue; // break if not update updateExisting
 						}
 						if ($current_graph && empty($rules['graphs']['updateExisting'])) {
-							info(_s('Graph "%1$s" skipped - user rule', $graph_db['name']));
+							info(_s('Graph "%1$s" skipped - user rule.', $graph_db['name']));
 							continue; // break if not update updateExisting
 						}
 
 						if (!isset($graph_db['ymin_type'])) {
-							throw new Exception(_s('No "ymin_type" field for graph "%s"', $graph_db['name']));
+							throw new Exception(_s('No "ymin_type" field for graph "%s".', $graph_db['name']));
 						}
 
 						if (!isset($graph_db['ymax_type'])) {
-							throw new Exception(_s('No "ymax_type" field for graph "%s"', $graph_db['name']));
+							throw new Exception(_s('No "ymax_type" field for graph "%s".', $graph_db['name']));
 						}
 
 						if ($graph_db['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
