@@ -289,8 +289,13 @@ function resolveMapLabelMacrosAll(array $selement) {
 		$db_host = DBfetch(DBselect($sql));
 	}
 
-	$hostParam = ($resolveHostMacros && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) ? $db_host['host'] : null;
-	$label = resolveMapLabelMacros($label, $hostParam);
+	if ($resolveHostMacros
+			&& ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST || $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)) {
+		$label = resolveMapLabelMacros($label, $db_host['host']);
+	}
+	else {
+		$label = resolveMapLabelMacros($label);
+	}
 
 	if ($resolveHostMacros) {
 		$replace = array(
@@ -347,10 +352,10 @@ function resolveMapLabelMacrosAll(array $selement) {
 
 function resolveMapLabelMacros($label, $replaceHost = null) {
 	if (null === $replaceHost) {
-		$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
+		$pattern = "/{".ZBX_PREG_HOST_FORMAT.":.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
 	}
 	else {
-		$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOSTNAME}|{HOST.HOST}):.+\.(last|max|min|avg)\([0-9]+\)}/Uu";
+		$pattern = "/{(".ZBX_PREG_HOST_FORMAT."|{HOSTNAME}|{HOST.HOST}):.+\.(last|max|min|avg)\([0-9]+[smhdwKMGT]?\)}/Uu";
 	}
 
 	preg_match_all($pattern, $label, $matches);
@@ -374,7 +379,7 @@ function resolveMapLabelMacros($label, $replaceHost = null) {
 		$itemHost = reset($trigExpr->data['hosts']);
 		$key = reset($trigExpr->data['items']);
 		$function = reset($trigExpr->data['functions']);
-		$parameter = reset($trigExpr->data['functionParams']);
+		$parameter = convertFunctionValue(reset($trigExpr->data['functionParams']));
 
 		$item = API::Item()->get(array(
 			'filter' => array(
