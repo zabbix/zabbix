@@ -251,7 +251,17 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			$debug->setAttribute('onclick', 'javascript: '.$d_script);
 			array_push($page_header_r_col, $debug, '|');
 		}
-		array_push($page_header_r_col, new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
+
+		// it is not possible to logout from HTTP authentication
+		$chck = $page['file'] == 'authentication.php' && isset($_REQUEST['save'], $_REQUEST['config']);
+		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && $config['authentication_type'] == ZBX_AUTH_HTTP) {
+			$logout =  new CLink(_('Logout'), '', 'small_font', null, 'nosid');
+			$logout->setHint(_s('It is not possible to logout from HTTP authentication.'), null, null, false);
+		}
+		else {
+			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, 'nosid');
+		}
+		array_push($page_header_r_col, $logout);
 	}
 	else {
 		$page_header_r_col[] = array('|', new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, 'nosid'));
