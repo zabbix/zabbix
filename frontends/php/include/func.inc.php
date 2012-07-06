@@ -598,6 +598,53 @@ function convert_units($value, $units, $convert = ITEM_CONVERT_WITH_UNITS) {
 	return rtrim(sprintf('%s %s%s', $value, $desc, $units));
 }
 
+/**
+ * Converts value with suffix to actual value.
+ * Supported time suffixes: s, m, h, d, w
+ * Supported metric suffixes: K, M, G, T
+ *
+ * @param string $value
+ *
+ * @return string
+ */
+function convertFunctionValue($value) {
+	$suffix = $value[strlen($value) - 1];
+	if (!ctype_digit($suffix)) {
+		$value = substr($value, 0, strlen($value) - 1);
+
+		switch ($suffix) {
+			case 's':
+				break;
+			case 'm':
+				$value = bcmul($value, '60');
+				break;
+			case 'h':
+				$value = bcmul($value, '3600');
+				break;
+			case 'd':
+				$value = bcmul($value, '86400');
+				break;
+			case 'w':
+				$value = bcmul($value, '604800');
+				break;
+			case 'K':
+				$value = bcmul($value, '1000');
+				break;
+			case 'M':
+				$value = bcmul($value, '1048576');
+				break;
+			case 'G':
+				$value = bcmul($value, '1073741824');
+				break;
+			case 'T':
+				$value = bcmul($value, '1099511627776');
+				break;
+		}
+	}
+
+	return $value;
+}
+
 /************* ZBX MISC *************/
 function zbx_avg($values) {
 	zbx_value2array($values);
