@@ -4,6 +4,8 @@ New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3637] fixed "IT Services availability report" generates wrong weekly timing (Toms)
+..F....... [ZBX-3637] fixed notification report does not take daylight saving time into account (Toms)
 ..F....... [ZBX-3782] fixed {HOSTNAME} macro not working in map labels trigger expression macro (Vedmak)
 .......... [ZBXNEXT-1256] changed partition discovery keys for Solaris and Linux example userparams, so that example file may be directly included (Richlv)
 ..F....... [ZBX-5236] fixed some map element rendering ignoring the "Problem display" map option (Pavels)
