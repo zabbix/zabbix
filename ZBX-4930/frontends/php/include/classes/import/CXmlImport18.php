@@ -433,14 +433,16 @@ class CXmlImport18 {
 
 			if($exists && !empty($rules['screens']['updateExisting'])){
 				$db_screens = API::Screen()->get(array('filter' => array('name' => $screen['name'])));
-				if(empty($db_screens)) throw new Exception(_('No permissions for screen').' "'.$screen['name'].'" import');
+				if(empty($db_screens)) {
+					throw new Exception(_s('No permissions for screen "%1$s".', $screen['name']));
+				}
 
 				$db_screen = reset($db_screens);
 
 				$screen['screenid'] = $db_screen['screenid'];
 			}
 			else if($exists || empty($rules['screens']['createMissing'])){
-				info('Screen ['.$screen['name'].'] skipped - user rule');
+				info(_s('Screen "%1$s" skipped - user rule.', $screen['name']));
 				unset($importScreens[$mnum]);
 				continue; // break if not update exist
 			}
@@ -609,12 +611,12 @@ class CXmlImport18 {
 
 			if (!empty($images_to_add)) {
 				$result = API::Image()->create($images_to_add);
-				if (!$result) throw new Exception(_('Cannot add image'));
+				if (!$result) throw new Exception(_('Cannot add image.'));
 			}
 
 			if (!empty($images_to_update)) {
 				$result = API::Image()->update($images_to_update);
-				if (!$result) throw new Exception(_('Cannot update image'));
+				if (!$result) throw new Exception(_('Cannot update image.'));
 			}
 		}
 
@@ -633,13 +635,15 @@ class CXmlImport18 {
 
 			if($exists && !empty($rules['maps']['updateExisting'])){
 				$db_maps = API::Map()->getObjects(array('name' => $sysmap['name']));
-				if(empty($db_maps)) throw new Exception(_('No permissions for map').' ['.$sysmap['name'].'] import');
+				if(empty($db_maps)) {
+					throw new Exception(_s('No permissions for map "%1$s".', $sysmap['name']));
+				}
 
 				$db_map = reset($db_maps);
 				$sysmap['sysmapid'] = $db_map['sysmapid'];
 			}
 			else if($exists || empty($rules['maps']['createMissing'])){
-				info('Map ['.$sysmap['name'].'] skipped - user rule');
+				info(_s('Map "%1$s" skipped - user rule.', $sysmap['name']));
 				unset($importMaps[$mnum]);
 				continue; // break if not update updateExisting
 			}
@@ -932,7 +936,7 @@ class CXmlImport18 {
 						$current_host = API::Host()->get($options);
 
 					if(empty($current_host)){
-						throw new Exception('No permission for host ['.$host_db['host'].']');
+						throw new Exception(_s('No permission for host "%1$s"', $host_db['host']));
 					}
 					else{
 						$current_host = reset($current_host);
@@ -993,7 +997,7 @@ class CXmlImport18 {
 						);
 						$current_group = API::HostGroup()->get($options);
 						if(empty($current_group)){
-							throw new Exception('No permissions for group '. $group['name']);
+							throw new Exception(_s('No permissions for group "%1$s".', $group['name']));
 						}
 
 						$host_db['groups'][] = reset($current_group);
@@ -1242,11 +1246,11 @@ class CXmlImport18 {
 						$current_item = reset($current_item);
 
 						if(!$current_item && empty($rules['items']['createMissing'])){
-							info('Item ['.$item_db['key_'].'] skipped - user rule');
+							info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
 							continue; // break if not update updateExisting
 						}
 						if($current_item && empty($rules['items']['updateExisting'])){
-							info('Item ['.$item_db['key_'].'] skipped - user rule');
+							info(_s('Item "%1$s" skipped - user rule.', $item_db['key_']));
 							continue; // break if not update updateExisting
 						}
 
@@ -1384,18 +1388,18 @@ class CXmlImport18 {
 								}
 							}
 							if(!$current_trigger){
-								throw new Exception(_s('No permission for trigger "%s"', $trigger_db['description']));
+								throw new Exception(_s('No permission for trigger "%s".', $trigger_db['description']));
 							}
 						}
 						unset($trigger_db['hostid']);
 
 
 						if(!$current_trigger && empty($rules['triggers']['createMissing'])){
-							info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
+							info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
 							continue; // break if not update updateExisting
 						}
 						if($current_trigger && empty($rules['triggers']['updateExisting'])){
-							info('Trigger "'.$trigger_db['description'].'" skipped - user rule');
+							info(_s('Trigger "%1$s" skipped - user rule.', $trigger_db['description']));
 							continue; // break if not update updateExisting
 						}
 
@@ -1512,36 +1516,36 @@ class CXmlImport18 {
 							));
 
 							if(empty($current_graph)){
-								throw new Exception('No permission for Graph ['.$graph_db['name'].']');
+								throw new Exception(_s('No permission for graph "%1$s".', $graph_db['name']));
 							}
 							$current_graph = reset($current_graph);
 						}
 
 						if(!$current_graph && empty($rules['graphs']['createMissing'])){
-							info('Graph ['.$graph_db['name'].'] skipped - user rule');
+							info(_s('Graph "%1$s" skipped - user rule', $graph_db['name']));
 							continue; // break if not update updateExisting
 						}
 						if($current_graph && empty($rules['graphs']['updateExisting'])){
-							info('Graph ['.$graph_db['name'].'] skipped - user rule');
+							info(_s('Graph "%1$s" skipped - user rule', $graph_db['name']));
 							continue; // break if not update updateExisting
 						}
 
 						if(!isset($graph_db['ymin_type'])) {
-							throw new APIException(1, _s('No "ymin_type" field for graph "%s"', $graph_db['name']));
+							throw new Exception(_s('No "ymin_type" field for graph "%s"', $graph_db['name']));
 						}
 
 						if(!isset($graph_db['ymax_type'])) {
-							throw new APIException(1, _s('No "ymax_type" field for graph "%s"', $graph_db['name']));
+							throw new Exception(_s('No "ymax_type" field for graph "%s"', $graph_db['name']));
 						}
 
 						if($graph_db['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 							$item_data = explode(':', $graph_db['ymin_item_key'], 2);
 							if(count($item_data) < 2){
-								throw new APIException(1, 'Incorrect y min item for graph ['.$graph_db['name'].']');
+								throw new Exception(_s('Incorrect y min item for graph "%1$s".',$graph_db['name']));
 							}
 
 							if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-								throw new APIException(1, 'Missing item ['.$graph_db['ymin_item_key'].'] for host ['.$host_db['host'].']');
+								throw new Exception(_s('Missing item "%1$s" for host "%2$s".', $graph_db['ymin_item_key'], $host_db['host']));
 							}
 
 							$graph_db['ymin_itemid'] = $item['itemid'];
@@ -1550,11 +1554,11 @@ class CXmlImport18 {
 						if($graph_db['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE){
 							$item_data = explode(':', $graph_db['ymax_item_key'], 2);
 							if(count($item_data) < 2){
-								throw new APIException(1, 'Incorrect y max item for graph ['.$graph_db['name'].']');
+								throw new Exception(_s('Incorrect y max item for graph "%1$s".', $graph_db['name']));
 							}
 
 							if(!$item = get_item_by_key($item_data[1], $item_data[0])){
-								throw new APIException(1, 'Missing item ['.$graph_db['ymax_item_key'].'] for host ['.$host_db['host'].']');
+								throw new Exception(_s('Missing item "%1$s" for host "%2$s".', $graph_db['ymax_item_key'], $host_db['host']));
 							}
 
 							$graph_db['ymax_itemid'] = $item['itemid'];
@@ -1603,11 +1607,11 @@ class CXmlImport18 {
 							$current_screen = reset($current_screen);
 
 							if(!$current_screen && empty($rules['screens']['createMissing'])){
-								info('Screen ['.$screen['name'].'] skipped - user rule');
+								info(_s('Screen "%1$s" skipped - user rule.', $screen['name']));
 								continue;
 							}
 							if($current_screen && empty($rules['screens']['updateExisting'])){
-								info('Screen ['.$screen['name'].'] skipped - user rule');
+								info(_s('Screen "%1$s" skipped - user rule.', $screen['name']));
 								continue;
 							}
 
@@ -1658,13 +1662,17 @@ class CXmlImport18 {
 								$screen['screenid'] = $current_screen['screenid'];
 
 								$result = API::TemplateScreen()->update($screen);
-								if(!$result) throw new Exception('Cannot update screen');
+								if(!$result) {
+									throw new Exception(_('Cannot update screen.'));
+								}
 
 								info('['.$current_hostname.'] '._s('Screen "%1$s" updated.', $screen['name']));
 							}
 							else{
 								$result = API::TemplateScreen()->create($screen);
-								if(!$result) throw new Exception('Cannot create screen');
+								if(!$result) {
+									throw new Exception(_('Cannot create screen.'));
+								}
 
 								info('['.$current_hostname.'] '._s('Screen "%1$s" added.', $screen['name']));
 							}
