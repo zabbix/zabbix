@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
-<?php
+
 require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Notification report');
@@ -27,8 +26,6 @@ $page['hist_arg'] = array('media_type','period','year');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-?>
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'year'=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	NULL,						NULL),
@@ -37,16 +34,14 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	);
 
 	check_fields($fields);
-?>
-<?php
-	$year		= get_request('year', 		intval(date('Y')));
-	$period		= get_request('period',		'weekly');
-	$media_type	= get_request('media_type',	0);
-?>
-<?php
-	$_REQUEST['year']	= $year;
-	$_REQUEST['period']	= $period;
-	$_REQUEST['media_type']	= $media_type;
+
+	$year = get_request('year', intval(date('Y')));
+	$period	= get_request('period', 'weekly');
+	$media_type = get_request('media_type', 0);
+
+	$_REQUEST['year'] = $year;
+	$_REQUEST['period'] = $period;
+	$_REQUEST['media_type'] = $media_type;
 
 	$css = getUserTheme($USER_DETAILS);
 
@@ -122,16 +117,16 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		switch($period){
 			case 'yearly':
-				$from	= $MIN_YEAR;
-				$to	= date('Y');
+				$from = $MIN_YEAR;
+				$to = date('Y');
 				array_unshift($header, new CCol(_('Year'),'center'));
 				function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
 				function format_time($t){	return zbx_date2str(REPORT4_ANNUALLY_DATE_FORMAT, $t);}
 				function format_time2($t){	return null; }
 				break;
 			case 'monthly':
-				$from	= 1;
-				$to	= 12;
+				$from = 1;
+				$to = 12;
 				array_unshift($header, new CCol(_('Month'),'center'));
 				function get_time($m)	{	global $year;	return mktime(0,0,0,$m,1,$year);	}
 				function format_time($t){	return zbx_date2str(REPORT4_MONTHLY_DATE_FORMAT,$t);	}
@@ -147,17 +142,21 @@ require_once dirname(__FILE__).'/include/page_header.php';
 				break;
 			case 'weekly':
 			default:
-				$from	= 0;
-				$to	= 52;
+				$from = 0;
+				$to = 52;
 				array_unshift($header,new CCol(_('From'),'center'),new CCol(_('Till'),'center'));
-				function get_time($w)	{
-					global $year;
 
-					$time	= mktime(0,0,0,1, 1, $year);
-					$wd	= date('w', $time);
-					$wd	= $wd == 0 ? 6 : $wd - 1;
+				function get_time($w) {
+					static $beg;
+					if (!isset($beg)) {
+						global $year;
+						$time = mktime(0,0,0,1, 1, $year);
+						$wd = date('w', $time);
+						$wd = $wd == 0 ? 6 : $wd - 1;
+						$beg =  $time - $wd * SEC_PER_DAY;
+					}
 
-					return $time + ($w * 7 - $wd) * SEC_PER_DAY;
+					return strtotime("+$w week", $beg);
 				}
 				function format_time($t){	return zbx_date2str(REPORT4_WEEKLY_DATE_FORMAT,$t);	}
 				function format_time2($t){	return format_time($t); }
@@ -167,11 +166,13 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 		$table->setHeader($header,'vertical_header');
 		for($t = $from; $t <= $to; $t++){
-			if(($start = get_time($t)) > time())
+			if(($start = get_time($t)) > time()) {
 				break;
+			}
 
-			if(($end = get_time($t+1)) > time())
+			if(($end = get_time($t+1)) > time()) {
 				$end = time();
+			}
 
 			$table_row = array(format_time($start),format_time2($end));
 
@@ -237,4 +238,4 @@ require_once dirname(__FILE__).'/include/page_header.php';
 	}
 
 require_once dirname(__FILE__).'/include/page_footer.php';
-?>
+
