@@ -511,3 +511,6 @@ div.control-severity label span {
 div.control-severity label span:hover {
 	color: #000;
 }
+
+.ui-widget-content a.on { color: #DC0000; }
+.ui-widget-content a.on:hover { color: #CC7777; }

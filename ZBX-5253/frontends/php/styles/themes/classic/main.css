@@ -116,3 +116,6 @@ ul.formlist li.new { background: #DFDFDF; }
 .dropHereText { color: #5481AB; }
 
 table.ack_msgs tr.msg { background-color: #F8F8F8; }
+
+.ui-widget-content a.on { color: #DC0000; }
+.ui-widget-content a.on:hover { color: #CC7777; }
