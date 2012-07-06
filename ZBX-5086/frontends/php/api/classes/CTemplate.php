@@ -1701,23 +1701,21 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
+		$res = DBselect('SELECT hostid,templateid FROM hosts_templates'.
+			' WHERE '.DBcondition('hostid', $targetids).' AND '.DBcondition('templateid', $templateids));
 		$linked = array();
-		$sql = 'SELECT hostid,templateid'.
-			' FROM hosts_templates'.
-			' WHERE '.DBcondition('hostid', $targetids).
-			' AND '.DBcondition('templateid', $templateids);
-		$linkedDb = DBselect($sql);
-		while ($pair = DBfetch($linkedDb)) {
-			$linked[] = array($pair['hostid'] => $pair['templateid']);
+		while ($row = DBfetch($res)) {
+			if (!isset($linked[$row['hostid']])) {
+				$linked[$row['hostid']] = array();
+			}
+			$linked[$row['hostid']][$row['templateid']] = 1;
 		}
 
 		// add template linkages, if problems rollback later
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
-				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
-						continue 2;
-					}
+				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+					continue;
 				}
 
 				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
@@ -1783,10 +1781,8 @@ class CTemplate extends CZBXAPI {
 
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
-				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
-						continue 2;
-					}
+				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+					continue;
 				}
 
 				API::Application()->syncTemplates(array(
@@ -1812,10 +1808,8 @@ class CTemplate extends CZBXAPI {
 
 			// we do linkage in two separate loops because for triggers you need all items already created on host
 			foreach ($templateids as $templateid) {
-				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
-						continue 2;
-					}
+				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+					continue;
 				}
 
 				// sync triggers
