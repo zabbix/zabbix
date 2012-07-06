@@ -238,7 +238,7 @@ function update_config($configs) {
 	if (isset($configs['work_period'])) {
 		$timePeriodValidator = new CTimePeriodValidator();
 		if (!$timePeriodValidator->validate($configs['work_period'])) {
-			error($timePeriodValidator->getError());
+			error(_('Incorrect working time.'));
 			return false;
 		}
 	}

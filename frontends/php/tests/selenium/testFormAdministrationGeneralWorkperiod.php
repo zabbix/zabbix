@@ -84,7 +84,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->input_type('work_period', '1-8,09:00-25:00');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Cannot update configuration', 'Incorrect working time:'));
+		$this->ok(array('ERROR: Cannot update configuration', 'Incorrect working time.'));
 
 		// trying to save empty work period
 		$this->dropdown_select_wait('configDropDown', 'Working time');
@@ -93,7 +93,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->input_type('work_period', '');
 		$this->button_click('save');
 		$this->wait();
-		$this->ok(array('ERROR: Cannot update configuration', 'Incorrect working time: "".'));
+		$this->ok(array('ERROR: Cannot update configuration', 'Incorrect working time.'));
 	}
 }
 ?>
