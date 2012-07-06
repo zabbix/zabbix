@@ -70,7 +70,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 
 		$result = DBselect('SELECT work_period FROM config');
 		if ($row = DBfetch($result)) {
-			$this->assertEquals('1-7,09:00-20:00;', $row['work_period'], 'Incorrect value in the DB field "work_period"');
+			$this->assertEquals('1-7,09:00-20:00', $row['work_period'], 'Incorrect value in the DB field "work_period"');
 		};
 
 		$newHash=DBhash($sqlHash);
