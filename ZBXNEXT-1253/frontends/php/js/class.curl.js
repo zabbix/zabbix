@@ -179,7 +179,7 @@ Curl.prototype = {
 		}
 	},
 
-	setArgument: function(key,value) {
+	setArgument: function(key, value) {
 		this.args[key] = value;
 		this.formatQuery();
 	},

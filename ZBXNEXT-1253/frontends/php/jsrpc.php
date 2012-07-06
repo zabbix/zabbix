@@ -39,13 +39,13 @@ $page['type'] = detect_page_type($requestType);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 if (!is_array($data)) {
-	fatal_error('Wrong RPC call to JS RPC');
+	fatal_error('Wrong RPC call to JS RPC!');
 }
 if (!isset($data['method'])) {
-	fatal_error('Wrong RPC call to JS RPC');
+	fatal_error('Wrong RPC call to JS RPC!');
 }
 if ($requestType == PAGE_TYPE_JSON && (!isset($data['params']) || !is_array($data['params']))) {
-	fatal_error('Wrong RPC call to JS RPC');
+	fatal_error('Wrong RPC call to JS RPC!');
 }
 
 $result = array();
@@ -187,7 +187,6 @@ switch ($data['method']) {
 			$options['filter'] = !empty($data['filter']) ? $data['filter'] : null;
 			$options['filter_task'] = !empty($data['filter_task']) ? $data['filter_task'] : null;
 			$options['mark_color'] = !empty($data['mark_color']) ? $data['mark_color'] : null;
-			$options['plaintext'] = !empty($data['plaintext']) ? $data['plaintext'] : null;
 		}
 
 		$screen = CScreenBuilder::getScreen($options);
@@ -207,7 +206,7 @@ switch ($data['method']) {
 
 		break;
 	default:
-		fatal_error('Wrong RPC call to JS RPC');
+		fatal_error('Wrong RPC call to JS RPC!');
 }
 
 if ($requestType == PAGE_TYPE_JSON) {

@@ -137,12 +137,12 @@ $screenBuilder = CScreenBuilder::getScreen(array(
 	'filter' => get_request('filter'),
 	'filter_task' => get_request('filter_task'),
 	'mark_color' => get_request('mark_color'),
-	'is_plaintext' => $this->data['is_plaintext']
+	'plaintext' => $this->data['plaintext']
 ));
 $screenBuilder = $screenBuilder->get();
 
 // append graph to widget
-if (!$this->data['is_plaintext']) {
+if (!$this->data['plaintext']) {
 	$right = new CTable();
 	$right->addRow($header['right']);
 

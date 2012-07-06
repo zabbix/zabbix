@@ -40,13 +40,11 @@ var flickerfreeScreen = {
 		// SCREEN_RESOURCE_GRAPH
 		// SCREEN_RESOURCE_SIMPLE_GRAPH
 		if (screen.resourcetype == 0 || screen.resourcetype == 1) {
-			var graphId = 'graph_' + screen.screenitemid + '_' + screen.screenid;
-
 			url.setArgument('mode', 3); // SCREEN_MODE_JS
 			url.setArgument('hostid', screen.hostid);
 
 			jQuery.getScript(url.getUrl(), function(data, textStatus, jqxhr) {
-				timeControl.refreshObject(graphId);
+				timeControl.refreshObject(id);
 			});
 		}
 
@@ -78,9 +76,17 @@ var flickerfreeScreen = {
 			url.setArgument('filter', !empty(screen.data.filter) ? screen.data.filter : null);
 			url.setArgument('filter_task', !empty(screen.data.filter_task) ? screen.data.filter_task : null);
 			url.setArgument('mark_color', !empty(screen.data.mark_color) ? screen.data.mark_color : null);
-			url.setArgument('plaintext', !empty(screen.data.plaintext) ? screen.data.plaintext : null);
 
-			jQuery('#flickerfreescreen_' + id).load(url.getUrl());
+			if (screen.data.action == 'showgraph') {
+				url.setArgument('mode', 3); // SCREEN_MODE_JS
+
+				jQuery.getScript(url.getUrl(), function(data, textStatus, jqxhr) {
+					timeControl.refreshObject(id);
+				});
+			}
+			else {
+				jQuery('#flickerfreescreen_' + id).load(url.getUrl());
+			}
 		}
 
 		else {

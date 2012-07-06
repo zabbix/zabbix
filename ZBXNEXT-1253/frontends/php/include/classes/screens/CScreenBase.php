@@ -31,10 +31,12 @@ class CScreenBase {
 	public $period;
 	public $stime;
 	public $profile_idx;
+	public $data_id;
 
 	public function __construct(array $options = array()) {
 		$this->is_flickerfree = isset($options['is_flickerfree']) ? $options['is_flickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
+		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
 		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 		$this->action = !empty($options['action']) ? $options['action'] : '';
 		$this->hostid = !empty($options['hostid']) ? $options['hostid'] : get_request('hostid', 0);
@@ -62,7 +64,7 @@ class CScreenBase {
 		}
 
 		// get resourcetype
-		if (!empty($this->screenitem['resourcetype'])) {
+		if (is_null($this->resourcetype) && !empty($this->screenitem['resourcetype'])) {
 			$this->resourcetype = $this->screenitem['resourcetype'];
 		}
 	}
@@ -79,10 +81,14 @@ class CScreenBase {
 	}
 
 	public function getDataId() {
-		return !empty($this->screenitem) ? $this->screenitem['screenitemid'] : 1;
+		if (empty($this->data_id)) {
+			$this->data_id = !empty($this->screenitem) ? $this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'] : 1;
+		}
+
+		return $this->data_id;
 	}
 
-	public function getId() {
+	public function getScreenId() {
 		return 'flickerfreescreen_'.$this->getDataId();
 	}
 
@@ -92,10 +98,10 @@ class CScreenBase {
 		}
 
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			return new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getId());
+			return new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), null, $this->getScreenId());
 		}
 		else {
-			return new CDiv($item, null, $this->getId());
+			return new CDiv($item, null, $this->getScreenId());
 		}
 	}
 

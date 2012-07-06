@@ -51,6 +51,6 @@ class CScreenMap extends CScreenBase {
 
 		$this->insertFlickerfreeJs();
 
-		return new CDiv($output, null, $this->getId());
+		return new CDiv($output, null, $this->getScreenId());
 	}
 }

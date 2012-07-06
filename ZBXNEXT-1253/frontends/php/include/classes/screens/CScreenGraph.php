@@ -22,8 +22,8 @@
 class CScreenGraph extends CScreenBase {
 
 	public function get() {
+		$this->data_id = 'graph_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$resourceid = !empty($this->screenitem['real_resourceid']) ? $this->screenitem['real_resourceid'] : $this->screenitem['resourceid'];
-		$domGraphid = 'graph_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$containerid = 'graph_container_'.$this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'];
 		$graphDims = getGraphDims($resourceid);
 		$graphDims['graphHeight'] = $this->screenitem['height'];
@@ -114,7 +114,7 @@ class CScreenGraph extends CScreenBase {
 		// get time control
 		$timeControlData = array(
 			'id' => $this->screenitem['screenitemid'].'_'.$this->screenitem['screenid'],
-			'domid' => $domGraphid,
+			'domid' => $this->getDataId(),
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
 			'loadSBox' => 0,
@@ -174,14 +174,14 @@ class CScreenGraph extends CScreenBase {
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
-			return 'timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).')';
+			return 'timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).')';
 		}
 		else {
 			if ($this->mode == SCREEN_MODE_VIEW) { // used is slide shows
-				insert_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+				insert_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 			else {
-				zbx_add_post_js('timeControl.addObject("'.$domGraphid.'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
+				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
 			if (($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_VIEW) || !$isDefault) {

@@ -174,7 +174,7 @@ $data = array(
 	'action' => get_request('action'),
 	'period' => get_request('period'),
 	'time' => zbxDateToTime(get_request('stime')),
-	'is_plaintext' => isset($_REQUEST['plaintext']),
+	'plaintext' => isset($_REQUEST['plaintext']),
 	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
 	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1)
 );
