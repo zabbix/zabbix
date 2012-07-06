@@ -206,6 +206,8 @@ abstract class CItemGeneral extends CZBXAPI {
 				if (!isset($dbHosts[$item['hostid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+
+				check_db_fields($itemDbFields, $fullItem);
 			}
 
 			$host = $dbHosts[$fullItem['hostid']];
