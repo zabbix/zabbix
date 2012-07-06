@@ -9,6 +9,7 @@ A.F....... [ZBX-5074] redesigned action configuration page (Eduard)
 ..F....... [ZBXNEXT-829] added Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-3284] fixed messages for discovery rule manipulations (Vedmak)
 ..F....... [ZBX-3003] added support for suffixes in map label trigger expression macro function parameter (Vedmak)
 ..F....... [ZBX-5070] fixed SQL error on logout with HTTP authentication (Toms)
 ..F....... [ZBX-4741] fixed authentication configuration page still uses "profiles" table (Toms)
@@ -123,6 +124,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-3284] fixed messages for discovery rule manipulations (Vedmak)
 ..F....... [ZBX-2586] fixed localization of the date in the header on the trigger status page (Pavels)
 ..F....... [ZBX-3003] added support for suffixes in map label trigger expression macro function parameter (Vedmak)
 ..F....... [ZBX-5070] fixed SQL error on logout with HTTP authentication (Toms)
