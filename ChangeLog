@@ -9,6 +9,8 @@ A.F....... [ZBX-5074] redesigned action configuration page (Eduard)
 ..F....... [ZBXNEXT-829] added Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-5070] fixed SQL error on logout with HTTP authentication (Toms)
+..F....... [ZBX-4741] fixed authentication configuration page still uses "profiles" table (Toms)
 ..F....... [ZBX-3637] fixed "IT Services availability report" generates wrong weekly timing (Toms)
 ..F....... [ZBX-3637] fixed notification report does not take daylight saving time into account (Toms)
 ..F....... [ZBX-3782] fixed {HOSTNAME} macro not working in map labels trigger expression macro (Vedmak)
@@ -120,6 +122,8 @@ New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-5070] fixed SQL error on logout with HTTP authentication (Toms)
+..F....... [ZBX-4741] fixed authentication configuration page still uses "profiles" table (Toms)
 ..F....... [ZBX-3637] fixed "IT Services availability report" generates wrong weekly timing (Toms)
 ..F....... [ZBX-3637] fixed notification report does not take daylight saving time into account (Toms)
 ..F....... [ZBX-3782] fixed {HOSTNAME} macro not working in map labels trigger expression macro (Vedmak)
