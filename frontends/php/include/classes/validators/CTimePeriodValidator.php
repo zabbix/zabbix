@@ -35,6 +35,11 @@ class CTimePeriodValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($periods) {
+		if (zbx_empty($periods)) {
+			$this->addError(_('Empty time period.'));
+			return false;
+		}
+
 		if ($this->options['allow_multiple']) {
 			// remove one last ';'
 			if ($periods[strlen($periods) - 1] === ';') {
