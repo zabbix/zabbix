@@ -225,7 +225,7 @@ if (isset($_REQUEST['period'])) {
 $frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
 
 $events_wdgt->addPageHeader(
-	_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(_('d M Y H:i:s'), time()).']',
+	_('HISTORY OF EVENTS').SPACE.'['.zbx_date2str(_('d M Y H:i:s')).']',
 	array($frmForm, SPACE, get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
 );
 
