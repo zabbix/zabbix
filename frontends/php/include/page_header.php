@@ -183,7 +183,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 <script type="text/javascript" src="js/browsers.js"></script>
 <script type="text/javascript">var PHP_TZ_OFFSET = <?php echo date('Z'); ?>;</script>
 <?php
-	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'];
+	// is menu is frontend messaging
+	$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'].'&isMenu='.(defined('ZBX_PAGE_NO_MENU') ? 0 : 1);
 	echo '<script type="text/javascript" src="'.$path.'"></script>'."\n";
 
 	if (!empty($page['scripts']) && is_array($page['scripts'])) {
@@ -465,7 +466,7 @@ if ($denied_page_requested) {
 	access_deny();
 }
 
-if ($page['type'] == PAGE_TYPE_HTML) {
+if ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
 	zbx_add_post_js('var msglistid = initMessages({});');
 }
 
