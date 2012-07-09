@@ -32,6 +32,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 if (isset($_REQUEST['plaintext'])) {
 	define('ZBX_PAGE_NO_MENU', 1);
 }
+define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
