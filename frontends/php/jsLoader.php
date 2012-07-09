@@ -191,12 +191,15 @@ if (empty($_GET['files'])) {
 		'class.rpc.js',
 		'class.bbcode.js',
 		'class.csuggest.js',
-		'class.cmessages.js',
 		'main.js',
 		'functions.js',
 		'menu.js',
 		'init.js'
 	);
+	// load frontend messaging only for pages with menus
+	if (isset($_GET['isMenu']) && $_GET['isMenu']) {
+		$files[] = 'class.cmessages.js';
+	}
 }
 else {
 	$files = $_GET['files'];
