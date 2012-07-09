@@ -9,6 +9,7 @@ A.F....... [ZBX-5074] redesigned action configuration page (Eduard)
 ..F....... [ZBXNEXT-829] added Zabbix server availability check (Vedmak)
 
 Bug fixes:
+..F....... [ZBX-2876] fixed GUI messaging should not work in popups i.e. pages without menus (Toms)
 ..F....... [ZBX-4930] improved translations for import error messages (Vedmak)
 ..F....... [ZBX-5253] fixed color of disabled host link on search page (Vedmak)
 A.F....... [ZBX-5281] fixed error when create item without delay_flex field specified (Vedmak)
@@ -127,6 +128,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-2876] fixed GUI messaging should not work in popups i.e. pages without menus (Toms)
 ..F....... [ZBX-4930] improved translations for import error messages (Vedmak)
 ..F....... [ZBX-5253] fixed color of disabled host link on search page (Vedmak)
 A.F....... [ZBX-5281] fixed error when create item without delay_flex field specified (Vedmak)
