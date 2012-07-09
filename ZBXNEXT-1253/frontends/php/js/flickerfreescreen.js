@@ -55,7 +55,16 @@ var flickerfreeScreen = {
 		else if (screen.resourcetype == 2) {
 			jQuery('<div>').load(url.getUrl(), function() {
 				jQuery(this).find('img').each(function() {
-					jQuery('<img />', {id: jQuery(this).attr('id') + '_tmp'}).attr('src', jQuery(this).attr('src')).load(function() {
+					var id = '#' + jQuery(this).attr('id');
+
+					jQuery('<img />', {
+						id: jQuery(this).attr('id') + '_tmp',
+						calss: jQuery(id).attr('class'),
+						border: jQuery(id).attr('border'),
+						usemap: jQuery(id).attr('usemap'),
+						alt: jQuery(id).attr('alt'),
+						name: jQuery(id).attr('name')
+					}).attr('src', jQuery(this).attr('src')).load(function() {
 						var id = jQuery(this).attr('id').substring(0, jQuery(this).attr('id').indexOf('_tmp'));
 
 						jQuery(this).attr('id', id);
