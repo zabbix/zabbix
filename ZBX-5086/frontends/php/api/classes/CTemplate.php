@@ -1744,7 +1744,7 @@ class CTemplate extends CZBXAPI {
 
 		// check template linkage circularity
 		$res = DBselect('SELECT ht.hostid,ht.templateid FROM hosts_templates ht,hosts h '.
-			'WHERE ht.hostid=h.hostid AND h.status='.HOST_STATUS_TEMPLATE);
+			'WHERE ht.hostid=h.hostid AND h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
 		// build linkage graph and prepare list for $rootList generation
 		$graph = array();
 		$hasParentList = array();
