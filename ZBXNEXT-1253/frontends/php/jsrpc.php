@@ -169,6 +169,8 @@ switch ($data['method']) {
 		);
 		break;
 	case 'screen.get':
+		$page['is_flickerfree'] = true;
+
 		$mode = !empty($data['mode']) ? $data['mode'] : SCREEN_MODE_VIEW;
 		$resourcetype = !empty($data['resourcetype']) ? $data['resourcetype'] : null;
 

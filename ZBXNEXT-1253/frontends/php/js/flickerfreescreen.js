@@ -32,10 +32,13 @@ var flickerfreeScreen = {
 		url.setArgument('type', 9); // PAGE_TYPE_TEXT
 		url.setArgument('method', 'screen.get');
 		url.setArgument('mode', screen.mode);
+		url.setArgument('flickerfreeScreenId', id);
 		url.setArgument('screenitemid', screen.screenitemid);
 		url.setArgument('profile_idx', !empty(screen.profile_idx) ? screen.profile_idx : null);
 		url.setArgument('period', !empty(screen.period) ? screen.period : null);
 		url.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
+		url.setArgument('sort', !empty(screen.sort) ? screen.sort : null);
+		url.setArgument('sortorder', !empty(screen.sortorder) ? screen.sortorder : null);
 
 		// SCREEN_RESOURCE_GRAPH
 		// SCREEN_RESOURCE_SIMPLE_GRAPH
@@ -92,6 +95,10 @@ var flickerfreeScreen = {
 		else {
 			jQuery('#flickerfreescreen_' + id).load(url.getUrl());
 		}
+
+		if (screen.refreshInterval > 0) {
+			window.setTimeout(function() { flickerfreeScreen.refresh(id); }, screen.refreshInterval);
+		}
 	},
 
 	refreshAll: function(period, stime) {
@@ -107,26 +114,36 @@ var flickerfreeScreen = {
 		}
 	},
 
+	refreshWithSorting: function(id, sort, sortorder) {
+		this.screens[id].sort = sort;
+		this.screens[id].sortorder = sortorder;
+
+		flickerfreeScreen.refresh(id);
+	},
+
 	add: function(screen) {
 		timeControl.refreshPage = false;
 
 		this.screens[screen.id] = {
 			'screenitemid': screen.screenitemid,
 			'screenid': screen.screenid,
-			'resourcetype': screen.resourcetype,
-			'mode': screen.mode,
 			'hostid': screen.hostid,
 			'period': screen.period,
 			'stime': screen.stime,
+			'sort': screen.sort,
+			'sortorder': screen.sortorder,
+			'refreshInterval': screen.refreshInterval * 1000,
+			'mode': screen.mode,
+			'resourcetype': screen.resourcetype,
 			'profile_idx': screen.profile_idx,
 			'data': screen.data
 		};
 
 		if (screen.refreshInterval > 0) {
-			window.setInterval(function() { flickerfreeScreen.refresh(screen.id); }, screen.refreshInterval * 1000);
+			window.setTimeout(function() { flickerfreeScreen.refresh(screen.id); }, this.screens[screen.id].refreshInterval);
 		}
 		else {
 			flickerfreeScreen.refresh(screen.id);
 		}
-	}
+	},
 };

@@ -651,14 +651,14 @@ function count_operations_delay($operations, $def_period = 0) {
 			if (isset($periods[$i]) && $periods[$i] < $esc_period) {
 			}
 			else {
-				$periods[$i]= $esc_period;
+				$periods[$i] = $esc_period;
 			}
 		}
 	}
 
 	for ($i = 1; $i <= $max_step; $i++) {
 		$esc_period = isset($periods[$i]) ? $periods[$i] : $def_period;
-		$delays[$i+1] = $delays[$i] + $esc_period;
+		$delays[$i + 1] = $delays[$i] + $esc_period;
 	}
 
 	return $delays;

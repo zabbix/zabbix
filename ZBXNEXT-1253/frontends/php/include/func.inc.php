@@ -1427,8 +1427,11 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 	if ($page['type'] != PAGE_TYPE_HTML && defined('ZBX_PAGE_MAIN_HAT')) {
 		$script = "javascript: return updater.onetime_update('".ZBX_PAGE_MAIN_HAT."', '".$url."');";
 	}
+	elseif (!empty($page['is_flickerfree'])) {
+		$script = 'javascript: flickerfreeScreen.refreshWithSorting("'.$link->getArgument('flickerfreeScreenId').'", "'.$tabfield.'", "'.$sortorder.'");';
+	}
 	else {
-		$script = "javascript: redirect('".$url."');";
+		$script = 'javascript: redirect("'.$url.'");';
 	}
 
 	zbx_value2array($obj);
@@ -1455,6 +1458,7 @@ function make_sorting_header($obj, $tabfield, $url = '') {
 	}
 	$col = new CCol(array($cont, $img), 'nowrap hover_grey');
 	$col->setAttribute('onclick', $script);
+
 	return $col;
 }
 

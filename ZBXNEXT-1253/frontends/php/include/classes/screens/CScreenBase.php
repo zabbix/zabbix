@@ -31,6 +31,8 @@ class CScreenBase {
 	public $period;
 	public $stime;
 	public $profile_idx;
+	public $sort;
+	public $sortorder;
 	public $data_id;
 
 	public function __construct(array $options = array()) {
@@ -43,6 +45,8 @@ class CScreenBase {
 		$this->period = !empty($options['period']) ? $options['period'] : get_request('period', ZBX_MAX_PERIOD);
 		$this->stime = !empty($options['stime']) ? $options['stime'] : get_request('stime', null);
 		$this->profile_idx = !empty($options['profile_idx']) ? $options['profile_idx'] : '';
+		$this->sort = !empty($options['sort']) ? $options['sort'] : get_request('sort', null);
+		$this->sortorder = !empty($options['sortorder']) ? $options['sortorder'] : get_request('sortorder', null);
 
 		// get screenitem
 		if (!empty($options['screenitem'])) {
@@ -118,6 +122,8 @@ class CScreenBase {
 				'period' => $this->period,
 				'stime' => $this->stime,
 				'profile_idx' => $this->profile_idx,
+				'sort' => $this->sort,
+				'sortorder' => $this->sortorder,
 				'data' => !empty($data) ? $data : null
 			);
 
