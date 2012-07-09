@@ -1834,10 +1834,19 @@ class CTemplate extends CZBXAPI {
 				));
 			}
 		}
-		API::Trigger()->syncTemplateDependencies(array(
-			'templateids' => $templateids,
-			'hostids' => $targetids,
-		));
+
+		foreach ($targetids as $targetid) {
+			foreach ($templateids as $templateid) {
+				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+					continue;
+				}
+
+				API::Trigger()->syncTemplateDependencies(array(
+					'templateids' => $templateid,
+					'hostids' => $targetid,
+				));
+			}
+		}
 
 		return true;
 	}
