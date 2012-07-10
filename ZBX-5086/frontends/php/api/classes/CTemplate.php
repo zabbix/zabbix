@@ -1701,8 +1701,12 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
-		$res = DBselect('SELECT hostid,templateid FROM hosts_templates'.
-			' WHERE '.DBcondition('hostid', $targetids).' AND '.DBcondition('templateid', $templateids));
+		$res = DBselect(
+			'SELECT hostid,templateid'.
+			' FROM hosts_templates'.
+			' WHERE '.DBcondition('hostid', $targetids).
+				' AND '.DBcondition('templateid', $templateids)
+		);
 		$linked = array();
 		while ($row = DBfetch($res)) {
 			if (!isset($linked[$row['hostid']])) {
@@ -1743,8 +1747,12 @@ class CTemplate extends CZBXAPI {
 		}
 
 		// check template linkage circularity
-		$res = DBselect('SELECT ht.hostid,ht.templateid FROM hosts_templates ht,hosts h '.
-			'WHERE ht.hostid=h.hostid AND h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
+		$res = DBselect(
+			'SELECT ht.hostid,ht.templateid'.
+			' FROM hosts_templates ht,hosts h '.
+			' WHERE ht.hostid=h.hostid '.
+				' AND h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
+		);
 		// build linkage graph and prepare list for $rootList generation
 		$graph = array();
 		$hasParentList = array();
@@ -1771,11 +1779,11 @@ class CTemplate extends CZBXAPI {
 		// search cycles and double linkages in rooted parts of graph
 		foreach ($rootList as $root) {
 			$path = array();
-			// rise exception on cycle or double linkage
+			// raise exception on cycle or double linkage
 			$this->checkCircularAndDoubleLinkage($graph, $root, $path, $visited);
 		}
 		// there is still possible cycles without root
-		if (count($visited)<count($all)) {
+		if (count($visited) < count($all)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
 
