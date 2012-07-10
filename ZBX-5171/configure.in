@@ -166,7 +166,7 @@ case "${host_os}" in
 		;;
 esac
 
-if test "$largefile" = "yes"; then
+if test "x$largefile" = "xyes"; then
 	AC_SYS_LARGEFILE
 fi
 
@@ -866,73 +866,59 @@ AC_MSG_CHECKING(for architecture)
 case "$host_os" in
 linux*)
 	ARCH="linux"
-
-	AC_MSG_RESULT([ok (${host_os})])
-
-	AC_MSG_CHECKING([for the kernel version])
-
-        kernel=`uname -r`
-
-        case "${kernel}" in
-             2.6.*)
-        	    AC_MSG_RESULT([2.6 family (${kernel})])
-        	    AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you are using Linux 2.6.x])
-        	    ;;
-             2.4.*)
-        	    AC_MSG_RESULT([2.4 family (${kernel})])
-        	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you are using Linux 2.4.x])
-        	    ;;
-        esac
-;;
+	;;
 aix*)
 	ARCH="aix"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
+	;;
 darwin*|rhapsody*)
 	ARCH="osx"
-
-	AC_MSG_RESULT([ok (${host_os})])
 	AC_DEFINE([MAC_OS_X], 1, [Define to 1 if you are using Mac OS X])
-;;
+	;;
 *solaris*)
 	ARCH="solaris"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
+	;;
 hpux*)
 	ARCH="hpux"
-
 	AGENT_LIBS="${AGENT_LIBS} -lipv6"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
+	;;
 freebsd*)
 	ARCH="freebsd"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
+	;;
 netbsd*)
 	ARCH="netbsd"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
+	;;
 osf*)
 	ARCH="osf"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
+	;;
 openbsd*)
 	ARCH="openbsd"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
+	;;
 *)
 	ARCH="unknown"
-
-	AC_MSG_RESULT([ok (${host_os})])
-;;
+	;;
 esac
+
+AC_MSG_RESULT([ok (${host_os})])
+
+if test "x$ARCH" = "xlinux"; then
+	AC_MSG_CHECKING([for the kernel version])
+
+	kernel=`uname -r`
+
+	case "${kernel}" in
+		2.6.*)
+			AC_MSG_RESULT([2.6 family (${kernel})])
+			AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you are using Linux 2.6.x])
+			;;
+		2.4.*)
+			AC_MSG_RESULT([2.4 family (${kernel})])
+			AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you are using Linux 2.4.x])
+			;;
+		*)
+			AC_MSG_RESULT([unknown family (${kernel})])
+			;;
+	esac
+fi
 
 AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
 AC_SUBST(ARCH)
@@ -1003,12 +989,12 @@ have_ipmi="no"
 have_ipv6="no"
 have_ssh2="no"
 
-if test "$ipv6" = "yes"; then
+if test "x$ipv6" = "xyes"; then
 	AC_DEFINE(HAVE_IPV6,1,[Define to 1 if IPv6 should be enabled.])
 	have_ipv6="yes"
 fi
 
-if test "$server" = "yes" || test "$proxy" = "yes"; then
+if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	have_multirow_insert="no"
 
@@ -1297,7 +1283,7 @@ if test "$server" = "yes" || test "$proxy" = "yes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 fi
 
-if test "$java" = "yes"; then
+if test "x$java" = "xyes"; then
 	AC_CHECK_PROGS([JAVAC], [javac], [no])
 	if test "x$JAVAC" = "xno"; then
 		AC_MSG_ERROR([Unable to find "javac" executable in path])
