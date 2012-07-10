@@ -226,6 +226,8 @@ $searchWidget->addItem(new CDiv($wdgt_hosts));
 $params = array(
 	'nodeids' => get_current_nodeid(true),
 	'output' => API_OUTPUT_EXTEND,
+	'selectHosts' => API_OUTPUT_COUNT,
+	'selectTemplates' => API_OUTPUT_COUNT,
 	'search' => array('name' => $search),
 	'limit' => $rows_per_page
 );
@@ -257,7 +259,8 @@ $header = array(
 	new CCol(_('Latest data')),
 	new CCol(_('Triggers')),
 	new CCol(_('Events')),
-	$admin ? new CCol(_('Edit hosts')) : null,
+	$admin ? new CCol(_('Hosts')) : null,
+	$admin ? new CCol(_('Templates')) : null,
 );
 
 $table = new CTableInfo();
@@ -269,19 +272,37 @@ foreach ($hostGroups as $hnum => $group) {
 	$caption = make_decoration($group['name'], $search);
 	$link = 'groupid='.$hostgroupid.'&hostid=0&switch_node='.id2nodeid($hostgroupid);
 
+	$hostsLink = null;
+	$templatesLink = null;
+	$hgroup_link = new CSpan($caption);
 	if ($admin) {
 		if (isset($rw_hostGroups[$hostgroupid])) {
-			$admin_link = new CLink(_('Edit hosts'), 'hosts.php?config=1&groupid='.$hostgroupid.'&hostid=0'.'&switch_node='.id2nodeid($hostgroupid));
+			if ($group['hosts']) {
+				$hostsLink = array(
+					new CLink(_('Hosts'), 'hosts.php?groupid='.$hostgroupid.'&switch_node='.id2nodeid($hostgroupid)),
+					' ('.$group['hosts'].')'
+				);
+			}
+			else {
+				$hostsLink = new CSpan(_('Hosts').' (0)', 'unknown');
+			}
+
+			if ($group['templates']) {
+				$templatesLink = array(
+					new CLink(_('Templates'), 'templates.php?groupid='.$hostgroupid.'&switch_node='.id2nodeid($hostgroupid)),
+					' ('.$group['templates'].')'
+				);
+			}
+			else {
+				$templatesLink = new CSpan(_('Templates').' (0)', 'unknown');
+			}
+
 			$hgroup_link = new CLink($caption, 'hostgroups.php?form=update&'.$link);
 		}
 		else {
-			$admin_link = new CSpan(_('Edit hosts'), 'unknown');
-			$hgroup_link = new CSpan($caption);
+			$hostsLink = _('Hosts');
+			$templatesLink = _('Templates');
 		}
-	}
-	else {
-		$admin_link = null;
-		$hgroup_link = new CSpan($caption);
 	}
 
 	$table->addRow(array(
@@ -290,7 +311,8 @@ foreach ($hostGroups as $hnum => $group) {
 		new CLink(_('Latest data'), 'latest.php?'.$link),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?'.$link),
-		$admin_link,
+		$hostsLink,
+		$templatesLink
 	));
 }
 
