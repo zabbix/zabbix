@@ -21,14 +21,6 @@
 
 class CScreenPlainText extends CScreenBase {
 
-	public function __construct(array $options = array()) {
-		parent::__construct($options);
-
-		if (!empty($this->stime)) {
-			$this->stime = zbxDateToTime($this->stime);
-		}
-	}
-
 	public function get() {
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && !empty($this->hostid)) {
 			$newitemid = get_same_item_for_host($this->screenitem['resourceid'], $this->hostid);

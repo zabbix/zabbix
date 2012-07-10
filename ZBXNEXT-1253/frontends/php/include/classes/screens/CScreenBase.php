@@ -48,6 +48,15 @@ class CScreenBase {
 		$this->sort = !empty($options['sort']) ? $options['sort'] : get_request('sort', null);
 		$this->sortorder = !empty($options['sortorder']) ? $options['sortorder'] : get_request('sortorder', null);
 
+		// calculate stime
+		if ($this->stime > 19000000000000 && $this->stime < 21000000000000) {
+			$this->stime = zbxDateToTime($this->stime);
+
+		}
+		if (($this->stime + $this->period) > time()) {
+			$this->stime = time() - $this->period;
+		}
+
 		// get screenitem
 		if (!empty($options['screenitem'])) {
 			$this->screenitem = $options['screenitem'];

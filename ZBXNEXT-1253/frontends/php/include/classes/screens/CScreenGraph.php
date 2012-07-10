@@ -142,7 +142,7 @@ class CScreenGraph extends CScreenBase {
 			}
 
 			$src = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-				.'&legend='.$legend.'&graph3d='.$graph3d.'&period='.$this->period.url_param('stime');
+					.'&legend='.$legend.'&graph3d='.$graph3d.'&period='.$this->period.url_param('stime');
 
 			$timeControlData['src'] = $src;
 		}
@@ -153,7 +153,7 @@ class CScreenGraph extends CScreenBase {
 			}
 
 			$src = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-				.'&period='.$this->period.url_param('stime');
+					.'&period='.$this->period.url_param('stime');
 
 			$timeline = array(
 				'period' => $this->period

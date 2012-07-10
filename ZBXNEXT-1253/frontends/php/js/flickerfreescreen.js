@@ -119,7 +119,7 @@ var flickerfreeScreen = {
 			this.screens[id].period = period;
 			this.screens[id].stime = stime;
 
-			this.refresh(id, true);
+			this.refresh(id, false);
 		}
 	},
 

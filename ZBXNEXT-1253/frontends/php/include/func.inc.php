@@ -292,7 +292,7 @@ function zbxDateToTime($strdate) {
 		return mktime($hours, $minutes, 0, $month, $date, $year);
 	}
 	else {
-		return time();
+		return !empty($strdate) ? $strdate : time();
 	}
 }
 
