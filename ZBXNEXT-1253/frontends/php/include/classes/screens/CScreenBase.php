@@ -53,7 +53,7 @@ class CScreenBase {
 			$this->stime = zbxDateToTime($this->stime);
 
 		}
-		if (($this->stime + $this->period) > time()) {
+		if (($this->stime + $this->period) > time() || empty($this->stime)) {
 			$this->stime = time() - $this->period;
 		}
 

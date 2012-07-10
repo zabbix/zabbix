@@ -141,19 +141,14 @@ class CScreenGraph extends CScreenBase {
 				$timeline['usertime'] = date('YmdHis', zbxDateToTime($this->stime) + $timeline['period']);
 			}
 
-			$src = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-					.'&legend='.$legend.'&graph3d='.$graph3d.'&period='.$this->period.url_param('stime');
-
-			$timeControlData['src'] = $src;
+			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
+				.'&legend='.$legend.'&graph3d='.$graph3d.'&period='.$this->period.url_param('stime');
 		}
 		else {
 			if ($this->screenitem['dynamic'] == SCREEN_SIMPLE_ITEM || empty($this->screenitem['url'])) {
 				$this->screenitem['url'] = 'chart2.php?graphid='.$resourceid;
 				$isDefault = true;
 			}
-
-			$src = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
-					.'&period='.$this->period.url_param('stime');
 
 			$timeline = array(
 				'period' => $this->period
@@ -169,7 +164,9 @@ class CScreenGraph extends CScreenBase {
 					$timeControlData['loadSBox'] = 1;
 				}
 			}
-			$timeControlData['src'] = $src;
+
+			$timeControlData['src'] = $this->screenitem['url'].'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height']
+				.'&period='.$this->period.url_param('stime');
 		}
 
 		// output
