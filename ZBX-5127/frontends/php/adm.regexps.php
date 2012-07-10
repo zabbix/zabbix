@@ -33,7 +33,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = array(
 	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
 	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
-	'rename' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Name')),
+	'name' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Name')),
 	'test_string' =>			array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Test string')),
 	'delete_regexp' =>			array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'g_expressionid' =>			array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
@@ -59,12 +59,9 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['regexpid'])) {
 	unset($_REQUEST['regexpid']);
 	$_REQUEST['form'] = 'clone';
 }
-elseif (isset($_REQUEST['cancel_new_expression'])) {
-	unset($_REQUEST['new_expression']);
-}
 elseif (isset($_REQUEST['save'])) {
 	$regexp = array(
-		'name' => $_REQUEST['rename'],
+		'name' => $_REQUEST['name'],
 		'test_string' => $_REQUEST['test_string']
 	);
 	$expressions = get_request('expressions', array());
@@ -88,7 +85,7 @@ elseif (isset($_REQUEST['save'])) {
 
 	if ($result) {
 		add_audit(!isset($_REQUEST['regexpid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,
-			AUDIT_RESOURCE_REGEXP, _('Name').': '.$_REQUEST['rename']);
+			AUDIT_RESOURCE_REGEXP, _('Name').': '.$_REQUEST['name']);
 
 		unset($_REQUEST['form']);
 	}
@@ -130,51 +127,7 @@ elseif (isset($_REQUEST['go'])) {
 		}
 	}
 }
-elseif (isset($_REQUEST['add_expression']) && isset($_REQUEST['new_expression'])) {
-	$new_expression = $_REQUEST['new_expression'];
 
-	if (!zbx_empty($new_expression['expression'])) {
-		if (!isset($new_expression['case_sensitive'])) {
-			$new_expression['case_sensitive'] = 0;
-		}
-
-		if (!isset($new_expression['id'])) {
-			if (!isset($_REQUEST['expressions'])) {
-				$_REQUEST['expressions'] = array();
-			}
-
-			if (!str_in_array($new_expression, $_REQUEST['expressions'])) {
-				$_REQUEST['expressions'][] = $new_expression;
-			}
-		}
-		else {
-			$id = $new_expression['id'];
-			unset($new_expression['id']);
-			$_REQUEST['expressions'][$id] = $new_expression;
-		}
-
-		unset($_REQUEST['new_expression']);
-	}
-	else {
-		error(_('Incorrect expression'));
-	}
-}
-elseif (isset($_REQUEST['delete_expression']) && isset($_REQUEST['g_expressionid'])) {
-	$_REQUEST['expressions'] = get_request('expressions', array());
-	foreach ($_REQUEST['g_expressionid'] as $val) {
-		unset($_REQUEST['expressions'][$val]);
-	}
-}
-elseif (isset($_REQUEST['edit_expressionid'])) {
-	$_REQUEST['edit_expressionid'] = array_keys($_REQUEST['edit_expressionid']);
-	$edit_expressionid = array_pop($_REQUEST['edit_expressionid']);
-	$_REQUEST['expressions'] = get_request('expressions', array());
-
-	if (isset($_REQUEST['expressions'][$edit_expressionid])) {
-		$_REQUEST['new_expression'] = $_REQUEST['expressions'][$edit_expressionid];
-		$_REQUEST['new_expression']['id'] = $edit_expressionid;
-	}
-}
 
 /*
  * Display
@@ -204,10 +157,29 @@ $cnf_wdgt = new CWidget();
 $cnf_wdgt->addPageHeader(_('CONFIGURATION OF REGULAR EXPRESSIONS'), $form);
 
 $data = array();
-
 if (isset($_REQUEST['form'])) {
-	$data['form'] = get_request('form', 1);
-	$data['form_refresh'] = get_request('form_refresh', 0) + 1;
+	$data['regexpid'] = get_request('regexpid');
+
+	if (isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])) {
+		$regExp = DBfetch(DBSelect('SELECT re.name, re.test_string'.
+				' FROM regexps re'.
+				' WHERE '.DBin_node('re.regexpid').
+				' AND re.regexpid='.$_REQUEST['regexpid']));
+		$data['name'] = $regExp['name'];
+		$data['test_string'] = $regExp['test_string'];
+
+		$dbExpressions = DBselect('SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
+				' FROM expressions e'.
+				' WHERE '.DBin_node('e.expressionid').
+				' AND e.regexpid='.$_REQUEST['regexpid'].
+				' ORDER BY e.expression_type');
+		$data['expressions'] = DBfetchArray($dbExpressions);
+	}
+	else {
+		$data['name'] = get_request('name', '');
+		$data['test_string'] = get_request('test_string', '');
+		$data['expressions'] = get_request('expressions', array());
+	}
 
 	$regExpForm = new CView('administration.general.regularexpressions.edit', $data);
 }
