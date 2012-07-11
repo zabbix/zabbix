@@ -1,11 +1,27 @@
 <script type="text/x-jquery-tmpl" id="expressionRow">
 	<tr id="exprRow_#{id}">
-		<td><button type="button" class="link_menu exprEdit" data-id="#{id}">#{expression}</button></td>
+		<td>#{expression}</td>
 		<td>#{type}</td>
 		<td>#{case_sensitive}</td>
 		<td>
+			<button class="input link_menu exprEdit" type="button" data-id="#{id}"><?php echo _('Edit'); ?></button>&nbsp;
 			<button class="input link_menu exprRemove" type="button" data-id="#{id}"><?php echo _('Remove'); ?></button>
 		</td>
+	</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="testTableRow">
+	<tr class="even_row">
+		<td>#{expression}</td>
+		<td>#{type}</td>
+		<td><span class="bold #{resultClass}">#{result}</span></td>
+	</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="testCombinedTableRow">
+	<tr class="odd_row">
+		<td colspan="2"><?php echo _('Combined result'); ?></td>
+		<td><span class="bold #{resultClass}">#{result}</span></td>
 	</tr>
 </script>
 
@@ -38,10 +54,6 @@
 					case_sensitive: this.case2str()
 				};
 
-				if (+this.data.expression_type === <?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>) {
-					tplData.type += ' (' + '<?php echo _('Delimiter'); ?>' + '="' + this.data.exp_delimiter + '")';
-				}
-
 				if (isNew) {
 					$('#exprTable tr.footer').before(this.expressionRowTpl.evaluate(tplData));
 				}
@@ -60,18 +72,31 @@
 			},
 
 			type2str: function() {
+				var str;
+
 				switch (+this.data.expression_type) {
 					case <?php echo EXPRESSION_TYPE_INCLUDED; ?>:
-						return '<?php echo _('Character string included'); ?>';
+						str = '<?php echo _('Character string included'); ?>';
+						break;
 					case <?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>:
-						return '<?php echo _('Any character string included'); ?>';
+						str = '<?php echo _('Any character string included'); ?>';
+						break;
 					case <?php echo EXPRESSION_TYPE_NOT_INCLUDED; ?>:
-						return '<?php echo _('Character string not included'); ?>';
+						str = '<?php echo _('Character string not included'); ?>';
+						break;
 					case <?php echo EXPRESSION_TYPE_TRUE; ?>:
-						return '<?php echo _('Result is TRUE'); ?>';
+						str = '<?php echo _('Result is TRUE'); ?>';
+						break;
 					case <?php echo EXPRESSION_TYPE_FALSE; ?>:
-						return '<?php echo _('Result is FALSE'); ?>';
+						str = '<?php echo _('Result is FALSE'); ?>';
+						break;
 				}
+
+				if (+this.data.expression_type === <?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>) {
+					str += ' (' + '<?php echo _('delimiter'); ?>' + '="' + this.data.exp_delimiter + '")';
+				}
+
+				return str;
 			},
 
 			case2str: function() {
@@ -88,6 +113,8 @@
 		window.zabbixRegExp = {
 			expressions: {},
 			selectedID: null,
+			testTableRowTpl: new Template($('#testTableRow').html()),
+			testCombinedTableRowTpl: new Template($('#testCombinedTableRow').html()),
 
 			addExpressions: function(expressions) {
 				var expr;
@@ -155,7 +182,53 @@
 			removeExpression: function(id) {
 				this.expressions[id].remove();
 				delete this.expressions[id];
+			},
+
+			testExpressions: function(string) {
+				var ajaxData = {
+					testString: string,
+					expressions: {}
+				},
+					url = new Curl();
+
+				for (var id in this.expressions) {
+					ajaxData.expressions[id] = this.expressions[id].data;
+				}
+
+				$.post(
+					'adm.regexps.php?output=ajax&ajaxaction=test&sid='+url.getArgument('sid'),
+					{ajaxdata: ajaxData},
+					$.proxy(this.showTestResults, this),
+					'json'
+				);
+			},
+
+			showTestResults: function(response) {
+				var tplData, expr, exprResult;
+
+				jQuery('#testResultTable tr:not(.header)').remove();
+
+				for (var id in this.expressions) {
+					expr = this.expressions[id];
+					exprResult = response.data.expressions[id];
+
+					tplData = {
+						expression: expr.data.expression,
+						type: expr.type2str(),
+						result: exprResult ? '<?php echo _('TRUE'); ?>' : '<?php echo _('FALSE'); ?>',
+						resultClass: exprResult ? 'green' : 'red'
+					};
+
+					$('#testResultTable').append(this.testTableRowTpl.evaluate(tplData));
+				}
+
+				tplData = {
+					resultClass: response.data.final ? 'green' : 'red',
+					result: response.data.final ? '<?php echo _('TRUE'); ?>' : '<?php echo _('FALSE'); ?>'
+				};
+				$('#testResultTable').append(this.testCombinedTableRowTpl.evaluate(tplData));
 			}
+
 		};
 	}(jQuery));
 
@@ -182,6 +255,11 @@
 			zabbixRegExp.hideForm();
 		});
 
+		$('#testExpression, #tab_test').click(function() {
+			zabbixRegExp.testExpressions($('#test_string').val());
+		});
+
+		// on submit we need to add all expressions data as hidden fields to form
 		$('#zabbixRegExpForm').submit(function() {
 			var form = $('#zabbixRegExpForm'),
 				expr,
@@ -200,6 +278,8 @@
 			}
 		});
 
+		// on clone we remove regexpid hidden field and also expressionid from expressions
+		// it's needed because after clone all expressions should be added as new for cloned reg. exp
 		$('#clone').click(function() {
 			$('#regexpid').remove();
 			$('#clone').remove();
@@ -208,10 +288,9 @@
 			for (var id in zabbixRegExp.expressions) {
 				delete zabbixRegExp.expressions[id].data['expressionid'];
 			}
-
-			console.log(zabbixRegExp.expressions);
 		});
 
+		// handler for type select in form, show/hide delimiter select
 		$('#typeNew').change(function() {
 			if ($(this).val() !== '<?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>') {
 				$('#delimiterNewRow').hide();
