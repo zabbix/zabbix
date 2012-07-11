@@ -3,4 +3,4 @@
 
 #define VER_FILEDESCRIPTION_STR		"Zabbix agent is deployed on a host to monitor resources and applications and send data to Zabbix server."
 
-#endif	/* _ZABBIX_AGENT_DESC_H_ */
+#endif

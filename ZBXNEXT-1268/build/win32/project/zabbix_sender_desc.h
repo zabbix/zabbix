@@ -3,4 +3,4 @@
 
 #define VER_FILEDESCRIPTION_STR		"A command line utility to send data to Zabbix server."
 
-#endif	/* _ZABBIX_SENDER_DESC_H_ */
+#endif

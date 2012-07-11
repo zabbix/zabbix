@@ -3,4 +3,4 @@
 
 #define VER_FILEDESCRIPTION_STR		"A command line utility to retrieve information from Zabbix agent."
 
-#endif	/* _ZABBIX_GET_DESC_H_ */
+#endif
