@@ -383,7 +383,7 @@ elseif (isset($_REQUEST['form'])) {
 					$parentGraphPrototype = reset($parentGraphPrototype);
 					$parentTemplate = reset($parentGraphPrototype['templates']);
 
-					$link = new CLink($parentTemplate['host'],
+					$link = new CLink($parentTemplate['name'],
 						'graphs.php?form=update&graphid='.$parentGraphPrototype['graphid'].'&hostid='.$parentTemplate['hostid'].'&parent_discoveryid='.$parentGraphPrototype['discoveryRule']['itemid']
 					);
 				}
@@ -392,7 +392,7 @@ elseif (isset($_REQUEST['form'])) {
 					$parentTemplate = get_hosts_by_graphid($parentGraph['graphid']);
 					$parentTemplate = DBfetch($parentTemplate);
 
-					$link = new CLink($parentTemplate['host'],
+					$link = new CLink($parentTemplate['name'],
 						'graphs.php?form=update&graphid='.$parentGraph['graphid'].'&hostid='.$parentTemplate['hostid']
 					);
 				}
