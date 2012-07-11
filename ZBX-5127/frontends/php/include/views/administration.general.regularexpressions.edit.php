@@ -84,7 +84,7 @@ $secondaryActions = array(new CButtonCancel());
 if (isset($this->data['regexpid'])) {
 	array_unshift($secondaryActions,
 		new CSubmit('clone', _('Clone')),
-		new CButtonDelete(_('Delete regular expression?'), url_param('form').url_param('regexpid'))
+		new CButtonDelete(_('Delete regular expression?'), url_param('form').url_param('regexpid').url_param('delete', false, 'go'))
 	);
 }
 $form->addItem(makeFormFooter(array(new CSubmit('save', _('Save'))), $secondaryActions));

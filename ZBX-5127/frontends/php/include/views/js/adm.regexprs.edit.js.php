@@ -29,6 +29,18 @@
 	(function($) {
 		'use strict';
 
+		/**
+		 * Class for single expression from global regular expression.
+		 * @constructor
+		 *
+		 * @param {Object} expression Expression data.
+		 *                 If expression has 'expressionid' it means that it exists in DB,
+		 *                 otherwise it's treated as new expression.
+		 *
+		 * @property {String} id Unique id of expression.
+		 *                    For new expression it's generated, for existing it's equal to 'expressionid'.
+		 * @property {Object} data Expression data same as in DB table.
+		 */
 		function Expression(expression) {
 			this.data = expression;
 
@@ -42,10 +54,19 @@
 			this.render(true);
 		}
 		Expression.prototype = {
-			expressionRowTpl: new Template($('#expressionRow').html()),
-			data: {},
-			id: null,
 
+			/**
+			 * Template for expression in expressions list.
+			 *
+			 * @type {Object}
+			 */
+			expressionRowTpl: new Template($('#expressionRow').html()),
+
+			/**
+			 * Render expression row in list of expressions.
+			 *
+			 * @param {Boolean} isNew If true it appends row to list, otherwise it search for expression row and replace it.
+			 */
 			render: function(isNew) {
 				var tplData = {
 					id: this.id,
@@ -62,15 +83,28 @@
 				}
 			},
 
+			/**
+			 * Remove expression row.
+			 */
 			remove: function() {
 				$('#exprRow_'+this.id).remove();
 			},
 
+			/**
+			 * Update expression 'data' property with new values and rerender expression row.
+			 *
+			 * @param {Object} data New expression data values
+			 */
 			update: function(data) {
 				$.extend(this.data, data);
 				this.render();
 			},
 
+			/**
+			 * Converts expression_type numeric value to string.
+			 *
+			 * @return {String}
+			 */
 			type2str: function() {
 				var str;
 
@@ -99,6 +133,11 @@
 				return str;
 			},
 
+			/**
+			 * Converts expression case_sensitive numeric value to string.
+			 *
+			 * @return {String}
+			 */
 			case2str: function() {
 				if (+this.data.case_sensitive) {
 					return '<?php echo _('Yes'); ?>';
@@ -106,16 +145,60 @@
 				else {
 					return '<?php echo _('No'); ?>';
 				}
+			},
+
+			/**
+			 * Compare with object.
+			 *
+			 * @param {Object} obj
+			 *
+			 * @return {Boolean}
+			 */
+			equals: function(obj) {
+				return this.data.expression === obj.expression
+						&& this.data.expression_type === obj.expression_type
+						&& this.data.case_sensitive === obj.case_sensitive
+						&& this.data.exp_delimiter === obj.exp_delimiter;
 			}
 		};
 
 
+		/**
+		 * Object to manage expression related GUI elements.
+		 * @type {Object}
+		 */
 		window.zabbixRegExp = {
+
+			/**
+			 * List of Expression objects with keys equal to Expression.id.
+			 * @type {Object}
+			 */
 			expressions: {},
+
+			/**
+			 * When upen expression form, it holds expression id if we update any or null if we create new.
+			 * @type {String|Null}
+			 */
 			selectedID: null,
+
+			/**
+			 * Template for expression row of testing results table.
+			 * @type {String}
+			 */
 			testTableRowTpl: new Template($('#testTableRow').html()),
+
+			/**
+			 * Template for combined result row in testing results table.
+			 * @type {String}
+			 */
 			testCombinedTableRowTpl: new Template($('#testCombinedTableRow').html()),
 
+			/**
+			 * Add expressions to manipulate with.
+			 * For each expression data new Expression object is created.
+			 *
+			 * @param {Array} expressions List of expressions with DB data
+			 */
 			addExpressions: function(expressions) {
 				var expr;
 
@@ -125,6 +208,35 @@
 				}
 			},
 
+			/**
+			 * Validate expression data.
+			 *  - expression cannot be empty
+			 *  - expression must be unique
+			 *
+			 * @param {Object} data
+			 */
+			validateExpression: function(data) {
+				if (data.expression === '') {
+					alert('<?php echo _('Expression cannot be empty'); ?>');
+					return false;
+				}
+				for (var id in this.expressions) {
+					if (this.expressions[id].equals(data)) {
+						alert('<?php echo _('Identical expression already exists'); ?>');
+						return false;
+					}
+				}
+
+				return true;
+			},
+
+			/**
+			 * Show expression edit form.
+			 *
+			 * @param {String[]} id Id of expression which data should be shown in form.
+			 *                      If id is not passed, form is filled with default values
+			 *                      and on save new expression should be created.
+			 */
 			showForm: function(id) {
 				var data;
 
@@ -157,33 +269,51 @@
 				$('#exprForm').show();
 			},
 
+			/**
+			 * Hide expression form.
+			 */
 			hideForm: function() {
 				$('#exprForm').hide();
 			},
 
+			/**
+			 * Either update data of existing expression or create new expression with data in form.			 *
+			 */
 			saveForm: function() {
 				var data = {
 					expression: $('#expressionNew').val(),
 					expression_type: $('#typeNew').val(),
 					exp_delimiter: $('#delimiterNew').val(),
-					case_sensitive: +$('#case_sensitiveNew').prop('checked')
+					case_sensitive: $('#case_sensitiveNew').prop('checked') ? '1' : '0'
 				};
 
-				if (this.selectedID === null) {
-					this.addExpressions([data]);
-				}
-				else {
-					this.expressions[this.selectedID].update(data);
-				}
+				if (this.validateExpression(data)) {
+					if (this.selectedID === null) {
+						this.addExpressions([data]);
+					}
+					else {
+						this.expressions[this.selectedID].update(data);
+					}
 
-				this.hideForm();
+					this.hideForm();
+				}
 			},
 
+			/**
+			 * Remove expression.
+			 *
+			 * @param {String} id Id of expression
+			 */
 			removeExpression: function(id) {
 				this.expressions[id].remove();
 				delete this.expressions[id];
 			},
 
+			/**
+			 * Send all expressions data to server with test string.
+			 *
+			 * @param {String} string Test string to test expression against
+			 */
 			testExpressions: function(string) {
 				var ajaxData = {
 					testString: string,
@@ -203,10 +333,15 @@
 				);
 			},
 
+			/**
+			 * Update test results table with data received form server.
+			 *
+			 * @param {Object} response ajax response
+			 */
 			showTestResults: function(response) {
 				var tplData, expr, exprResult;
 
-				jQuery('#testResultTable tr:not(.header)').remove();
+				$('#testResultTable tr:not(.header)').remove();
 
 				for (var id in this.expressions) {
 					expr = this.expressions[id];
@@ -228,7 +363,6 @@
 				};
 				$('#testResultTable').append(this.testCombinedTableRowTpl.evaluate(tplData));
 			}
-
 		};
 	}(jQuery));
 
