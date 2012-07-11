@@ -21,6 +21,11 @@
 
 class CScreenMap extends CScreenBase {
 
+	/**
+	 * Process screen.
+	 *
+	 * @return object CDiv (screen inside container)
+	 */
 	public function get() {
 		$image = new CImg('map.php?noedit=1&sysmapid='.$this->screenitem['resourceid'].'&width='.$this->screenitem['width']
 			.'&height='.$this->screenitem['height'].'&curtime='.time());

@@ -21,6 +21,11 @@
 
 class CScreenClock extends CScreenBase {
 
+	/**
+	 * Process screen.
+	 *
+	 * @return object CDiv (screen inside container)
+	 */
 	public function get() {
 		$error = null;
 		$timeOffset = null;

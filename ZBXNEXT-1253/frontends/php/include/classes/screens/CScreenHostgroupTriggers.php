@@ -23,6 +23,11 @@ require_once dirname(__FILE__).'/../../blocks.inc.php';
 
 class CScreenHostgroupTriggers extends CScreenBase {
 
+	/**
+	 * Process screen.
+	 *
+	 * @return object CDiv (screen inside container)
+	 */
 	public function get() {
 		$params = array(
 			'groupids' => null,

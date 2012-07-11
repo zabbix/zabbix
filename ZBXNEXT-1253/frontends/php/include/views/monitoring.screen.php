@@ -122,7 +122,7 @@ else {
 		'screen' => $screen,
 		'effectiveperiod' => $effectiveperiod,
 		'mode' => SCREEN_MODE_PREVIEW,
-		'profile_idx' => 'web.screens'
+		'profileIdx' => 'web.screens'
 	));
 	$screenWidget->addItem($screenBuilder->show());
 

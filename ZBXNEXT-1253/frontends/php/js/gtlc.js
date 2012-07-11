@@ -1063,7 +1063,7 @@ var CScrollBar = Class.create(CDebug, {
 		this.clndrRight.clndr.clndrshow(pos.top, pos.left);
 	},
 
-	setCalendarLeft: function(time){
+	setCalendarLeft: function(time) {
 		this.debug('setCalendarLeft', time);
 
 		if (this.disabled) {
@@ -1648,7 +1648,7 @@ var CScrollBar = Class.create(CDebug, {
 		tmp_raquo.innerHTML = ' &raquo;&raquo; ';
 	},
 
-	setZoomLinksStyle: function(){
+	setZoomLinksStyle: function() {
 		var period = this.timeline.period();
 		for (var i = 0; i < this.dom.linklist.length; i++) {
 			if (!isset(i, this.dom.linklist) || empty(this.dom.linklist[i])) {
@@ -2133,7 +2133,7 @@ var sbox = Class.create(CDebug, {
 		return false;
 	},
 
-	mousemove: function(e){
+	mousemove: function(e) {
 		this.debug('mousemove', this.sbox_id);
 
 		e = e || window.event;
@@ -2205,7 +2205,7 @@ var sbox = Class.create(CDebug, {
 		ZBX_SBOX[this.sbox_id].mousedown = false;
 	},
 
-	resizebox: function(){
+	resizebox: function() {
 		this.debug('resizebox',this.sbox_id);
 
 		if (ZBX_SBOX[this.sbox_id].mousedown == true) {

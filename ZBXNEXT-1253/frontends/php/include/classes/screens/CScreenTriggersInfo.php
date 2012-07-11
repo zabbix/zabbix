@@ -21,6 +21,11 @@
 
 class CScreenTriggersInfo extends CScreenBase {
 
+	/**
+	 * Process screen.
+	 *
+	 * @return object CDiv (screen inside container)
+	 */
 	public function get() {
 		return $this->getOutput(new CTriggersInfo($this->screenitem['resourceid'], null, $this->screenitem['style']));
 	}

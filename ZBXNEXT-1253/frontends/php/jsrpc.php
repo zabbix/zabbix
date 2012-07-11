@@ -169,26 +169,23 @@ switch ($data['method']) {
 		);
 		break;
 	case 'screen.get':
-		$page['is_flickerfree'] = true;
-
-		$mode = !empty($data['mode']) ? $data['mode'] : SCREEN_MODE_VIEW;
-		$resourcetype = !empty($data['resourcetype']) ? $data['resourcetype'] : null;
+		$page['isFlickerfree'] = true;
 
 		$options = array(
+			'mode' => !empty($data['mode']) ? $data['mode'] : null,
+			'resourcetype' => !empty($data['resourcetype']) ? $data['resourcetype'] : null,
 			'screenitemid' => !empty($data['screenitemid']) ? $data['screenitemid'] : null,
-			'mode' => $mode,
-			'hostid' => !empty($data['hostid']) ? $data['hostid'] : 0,
-			'period' => !empty($data['period']) ? $data['period'] : ZBX_MAX_PERIOD,
+			'hostid' => !empty($data['hostid']) ? $data['hostid'] : null,
+			'period' => !empty($data['period']) ? $data['period'] : null,
 			'stime' => !empty($data['stime']) ? $data['stime'] : null,
-			'profile_idx' => !empty($data['profile_idx']) ? $data['profile_idx'] : null
+			'profileIdx' => !empty($data['profileIdx']) ? $data['profileIdx'] : null
 		);
-		if ($resourcetype == SCREEN_RESOURCE_HISTORY) {
-			$options['resourcetype'] = $resourcetype;
+		if ($options['resourcetype'] == SCREEN_RESOURCE_HISTORY) {
 			$options['itemid'] = !empty($data['itemid']) ? $data['itemid'] : null;
 			$options['action'] = !empty($data['action']) ? $data['action'] : null;
 			$options['filter'] = !empty($data['filter']) ? $data['filter'] : null;
-			$options['filter_task'] = !empty($data['filter_task']) ? $data['filter_task'] : null;
-			$options['mark_color'] = !empty($data['mark_color']) ? $data['mark_color'] : null;
+			$options['filter_task'] = !empty($data['filterTask']) ? $data['filterTask'] : null;
+			$options['mark_color'] = !empty($data['markColor']) ? $data['markColor'] : null;
 		}
 
 		$screen = CScreenBuilder::getScreen($options);
@@ -196,7 +193,7 @@ switch ($data['method']) {
 		$screen = $screen->get();
 
 		if (!empty($screen)) {
-			if ($mode == SCREEN_MODE_JS) {
+			if ($options['mode'] == SCREEN_MODE_JS) {
 				$result = $screen;
 			}
 			else {

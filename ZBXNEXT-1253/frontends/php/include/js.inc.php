@@ -494,7 +494,7 @@ function insert_js_function($fnct_name) {
 		case 'check_all':
 			insert_js('
 				function check_all(objname, value) {
-					$(objname).getInputs("checkbox").each(function(e){
+					$(objname).getInputs("checkbox").each(function(e) {
 						e.checked = value;
 					});
 				}');

@@ -21,6 +21,11 @@
 
 class CScreenPlainText extends CScreenBase {
 
+	/**
+	 * Process screen.
+	 *
+	 * @return object CDiv (screen inside container)
+	 */
 	public function get() {
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && !empty($this->hostid)) {
 			$newitemid = get_same_item_for_host($this->screenitem['resourceid'], $this->hostid);
@@ -30,6 +35,7 @@ class CScreenPlainText extends CScreenBase {
 		if ($this->screenitem['resourceid'] == 0) {
 			$table = new CTableInfo(_('No data defined.'));
 			$table->setHeader(array(_('Timestamp'), _('Item')));
+
 			return $this->getOutput($table);
 		}
 

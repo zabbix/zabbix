@@ -21,6 +21,11 @@
 
 class CScreenActions extends CScreenBase {
 
+	/**
+	 * Process screen.
+	 *
+	 * @return object CDiv (screen inside container)
+	 */
 	public function get() {
 		return $this->getOutput(get_history_of_actions($this->screenitem['elements']));
 	}

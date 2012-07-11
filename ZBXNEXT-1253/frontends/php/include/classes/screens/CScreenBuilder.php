@@ -21,17 +21,27 @@
 
 class CScreenBuilder {
 
-	public $is_flickerfree;
-	public $is_template;
+	public $isFlickerfree;
+	public $isTemplate;
 	public $screen;
 	public $mode;
-	public $profile_idx;
+	public $profileIdx;
 
+	/**
+	 * Init screen data.
+	 *
+	 * @param array		$options
+	 * @param boolean	$options['isFlickerfree']
+	 * @param int		$options['mode']
+	 * @param boolean	$options['isTemplate']
+	 * @param string	$options['profileIdx']
+	 * @param array		$options['screen']
+	 */
 	public function __construct(array $options = array()) {
-		$this->is_flickerfree = isset($options['is_flickerfree']) ? $options['is_flickerfree'] : true;
+		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_VIEW;
-		$this->is_template = isset($options['is_template']) ? $options['is_template'] : false;
-		$this->profile_idx = !empty($options['profile_idx']) ? $options['profile_idx'] : '';
+		$this->isTemplate = isset($options['isTemplate']) ? $options['isTemplate'] : false;
+		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
 
 		// get screen
 		if (!empty($options['screen'])) {
@@ -47,10 +57,10 @@ class CScreenBuilder {
 				$options['editable'] = true;
 			}
 
-			$this->screen = $this->is_template
+			$this->screen = $this->isTemplate
 				? API::TemplateScreen()->get($options)
 				: API::Screen()->get($options);
-			if (empty($this->screen) && !$this->is_template) {
+			if (empty($this->screen) && !$this->isTemplate) {
 				$this->screen = API::TemplateScreen()->get($options);
 				if (empty($this->screen)) {
 					access_deny();
@@ -60,24 +70,31 @@ class CScreenBuilder {
 		}
 	}
 
+	/**
+	 * Get particular screen object.
+	 *
+	 * @param array		$options
+	 * @param int		$options['resourcetype']
+	 * @param int		$options['screenitemid']
+	 * @param int		$options['hostid']
+	 *
+	 * @return object CScreenBase
+	 */
 	public static function getScreen(array $options = array()) {
-		if (empty($options['resourcetype'])) {
-			if (!empty($options['screenitemid']) && empty($options['screenitem'])) {
-				$options['screenitem'] = API::ScreenItem()->get(array(
-					'screenitemids' => $options['screenitemid'],
-					'hostids' => !empty($options['hostid']) ? $options['hostid'] : 0,
-					'output' => API_OUTPUT_EXTEND,
-					'fillReals' => true
-				));
-				$options['screenitem'] = reset($options['screenitem']);
-			}
-
-			if (!empty($options['screenitem'])) {
-				$options['resourcetype'] = $options['screenitem']['resourcetype'];
-			}
+		if (!empty($options['screenitemid']) && empty($options['screenitem'])) {
+			$options['screenitem'] = API::ScreenItem()->get(array(
+				'screenitemids' => $options['screenitemid'],
+				'hostids' => !empty($options['hostid']) ? $options['hostid'] : 0,
+				'output' => API_OUTPUT_EXTEND
+			));
+			$options['screenitem'] = reset($options['screenitem']);
 		}
 
-		if (!array_key_exists('resourcetype', $options)) {
+		if (zbx_empty($options['resourcetype']) && !empty($options['screenitem']['resourcetype'])) {
+			$options['resourcetype'] = $options['screenitem']['resourcetype'];
+		}
+
+		if (zbx_empty($options['resourcetype'])) {
 			return null;
 		}
 
@@ -141,6 +158,11 @@ class CScreenBuilder {
 		}
 	}
 
+	/**
+	 * Process screen with particular screen objects.
+	 *
+	 * @return object CTable
+	 */
 	public function show() {
 		if (empty($this->screen)) {
 			return new CTableInfo(_('No screens defined.'));
@@ -267,7 +289,7 @@ class CScreenBuilder {
 						'resourcetype' => $screenitem['resourcetype'],
 						'screenitem' => $screenitem,
 						'mode' => $this->mode,
-						'profile_idx' => $this->profile_idx
+						'profileIdx' => $this->profileIdx
 					));
 
 					if (!empty($screenBuilder)) {
@@ -376,6 +398,12 @@ class CScreenBuilder {
 		return $screenTable;
 	}
 
+	/**
+	 * Insert javascript to create scroll in time control.
+	 *
+	 * @param string	$id
+	 * @param array		$timeline
+	 */
 	public static function insertScreenScrollJs($id, $timeline) {
 		$timeControlData = array(
 			'id' => $id,
@@ -392,10 +420,20 @@ class CScreenBuilder {
 		zbx_add_post_js('timeControl.addObject("screen_scroll", '.zbx_jsvalue($timeline).', '.zbx_jsvalue($timeControlData).');');
 	}
 
+	/**
+	 * Insert javascript to init screens.
+	 *
+	 * @param string	$screenid
+	 */
 	public static function insertInitScreenJs($screenid) {
 		zbx_add_post_js('init_screen("'.$screenid.'", "iframe", "'.$screenid.'");');
 	}
 
+	/**
+	 * Insert javascript to start time control rendering.
+	 *
+	 * @param string	$screenid
+	 */
 	public static function insertProcessObjectsJs() {
 		zbx_add_post_js('timeControl.processObjects();');
 	}

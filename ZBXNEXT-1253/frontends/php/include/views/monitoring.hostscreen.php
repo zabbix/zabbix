@@ -61,7 +61,7 @@ else {
 		'screen' => $this->data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
 		'period' => $period,
-		'profile_idx' => 'web.screens'
+		'profileIdx' => 'web.screens'
 	));
 
 	$timeline = array(

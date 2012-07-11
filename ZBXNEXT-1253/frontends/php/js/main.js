@@ -345,7 +345,7 @@ var chkbxRange = {
 		}
 	},
 
-	submitGo: function(e){
+	submitGo: function(e) {
 		e = e || window.event;
 
 		if (this.pageGoCount > 0) {
@@ -462,7 +462,7 @@ var AudioList = {
 		this.endLoop(audiofile);
 	},
 
-	stopAll: function(e){
+	stopAll: function(e) {
 		for (var name in this.list) {
 			if (empty(this.dom[name])) {
 				continue;
@@ -675,7 +675,7 @@ var jqBlink = {
 };
 
 /*
- * ZABBIX HintBoxes
+ * HintBox class.
  */
 var hintBox = {
 
@@ -712,12 +712,18 @@ var hintBox = {
 
 	HintWraper: function(e, target, hintText, width, className) {
 		target.isStatic = false;
-		jQuery(target).bind('mouseenter', function(e, d){
-			if (d) e = d;
+
+		jQuery(target).on('mouseenter', function(e, d) {
+			if (d) {
+				e = d;
+			}
 			hintBox.showHint(e, target, hintText, width, className, false);
-		}).bind('mouseleave', function(e){
+		}).on('mouseleave', function(e) {
+			hintBox.hideHint(e, target);
+		}).on('remove', function(e) {
 			hintBox.hideHint(e, target);
 		});
+
 		jQuery(target).removeAttr('onmouseover');
 		jQuery(target).trigger('mouseenter', e);
 	},
@@ -725,11 +731,13 @@ var hintBox = {
 	showStaticHint: function(e, target, hint, width, className, resizeAfterLoad) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
+
 		if (!isStatic) {
 			target.isStatic = true;
 			hintBox.showHint(e, target, hint, width, className, true);
+
 			if (resizeAfterLoad) {
-				hint.one('load', function(e){
+				hint.one('load', function(e) {
 					hintBox.positionHint(e, target);
 				});
 			}
@@ -737,11 +745,12 @@ var hintBox = {
 	},
 
 	showHint: function(e, target, hintText, width, className, isStatic) {
-		if (target.hintBoxItem) return;
+		if (target.hintBoxItem) {
+			return;
+		}
+
 		target.hintBoxItem = hintBox.createBox(e, target, hintText, width, className, isStatic);
-
 		hintBox.positionHint(e, target);
-
 		target.hintBoxItem.show();
 	},
 
@@ -815,10 +824,13 @@ var hintBox = {
 	},
 
 	hideHint: function(e, target, hideStatic) {
-		if (target.isStatic && !hideStatic) return;
+		if (target.isStatic && !hideStatic) {
+			return;
+		}
 		if (target.hintBoxItem) {
 			target.hintBoxItem.remove();
 			delete target.hintBoxItem;
+
 			if (target.isStatic) {
 				delete target.isStatic;
 			}

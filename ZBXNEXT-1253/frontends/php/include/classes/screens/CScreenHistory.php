@@ -23,12 +23,24 @@ class CScreenHistory extends CScreenBase {
 
 	public $itemid;
 	public $filter;
-	public $filter_task;
-	public $mark_color;
+	public $filterTask;
+	public $markColor;
 	public $plaintext;
 	public $items;
 	public $item;
 
+	/**
+	 * Init screen data.
+	 *
+	 * @param array		$options
+	 * @param int		$options['itemid']
+	 * @param string	$options['filter']
+	 * @param string	$options['filterTask']
+	 * @param int		$options['markColor']
+	 * @param boolean	$options['plaintext']
+	 * @param array		$options['items']
+	 * @param array		$options['item']
+	 */
 	public function __construct(array $options = array()) {
 		parent::__construct($options);
 
@@ -37,8 +49,8 @@ class CScreenHistory extends CScreenBase {
 		// mandatory
 		$this->itemid = isset($options['itemid']) ? $options['itemid'] : null;
 		$this->filter = isset($options['filter']) ? $options['filter'] : null;
-		$this->filter_task = isset($options['filter_task']) ? $options['filter_task'] : null;
-		$this->mark_color = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
+		$this->filterTask = isset($options['filterTask']) ? $options['filterTask'] : null;
+		$this->markColor = isset($options['markColor']) ? $options['markColor'] : MARK_COLOR_RED;
 
 		// optional
 		$this->items = isset($options['items']) ? $options['items'] : null;
@@ -59,6 +71,11 @@ class CScreenHistory extends CScreenBase {
 		}
 	}
 
+	/**
+	 * Process screen.
+	 *
+	 * @return object CDiv (screen inside container)
+	 */
 	public function get() {
 		$output = array();
 
@@ -114,9 +131,9 @@ class CScreenHistory extends CScreenBase {
 					);
 				}
 
-				if (!zbx_empty($this->filter) && in_array($this->filter_task, array(FILTER_TASK_SHOW, FILTER_TASK_HIDE))) {
+				if (!zbx_empty($this->filter) && in_array($this->filterTask, array(filterTask_SHOW, filterTask_HIDE))) {
 					$options['search'] = array('value' => $this->filter);
-					if ($this->filter_task == FILTER_TASK_HIDE) {
+					if ($this->filterTask == filterTask_HIDE) {
 						$options['excludeSearch'] = 1;
 					}
 				}
@@ -135,11 +152,11 @@ class CScreenHistory extends CScreenBase {
 						if (isset($this->filter) && !zbx_empty($this->filter)) {
 							$contain = zbx_stristr($data['value'], $this->filter);
 
-							if ($contain && $this->filter_task == FILTER_TASK_MARK) {
-								$color = $this->mark_color;
+							if ($contain && $this->filterTask == filterTask_MARK) {
+								$color = $this->markColor;
 							}
-							if (!$contain && $this->filter_task == FILTER_TASK_INVERT_MARK) {
-								$color = $this->mark_color;
+							if (!$contain && $this->filterTask == filterTask_INVERT_MARK) {
+								$color = $this->markColor;
 							}
 
 							switch ($color) {
@@ -259,7 +276,7 @@ class CScreenHistory extends CScreenBase {
 		}
 
 		if ($this->action == 'showgraph' && !isset($iv_string[$this->item['value_type']])) {
-			$this->data_id = 'historyGraph';
+			$this->dataId = 'historyGraph';
 			$containerid = 'graph_cont1';
 			$src = 'chart.php?itemid='.$this->item['itemid'];
 
@@ -290,7 +307,7 @@ class CScreenHistory extends CScreenBase {
 				'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 			);
 
-			if (!empty($this->data_id)) {
+			if (!empty($this->dataId)) {
 				$timeControlData['id'] = $this->getDataId();
 				$timeControlData['domid'] = $this->getDataId();
 				$timeControlData['containerid'] = $containerid;
@@ -303,7 +320,7 @@ class CScreenHistory extends CScreenBase {
 				$timeControlData['dynamic'] = 1;
 			}
 			else {
-				$this->data_id = 'historyGraph';
+				$this->dataId = 'historyGraph';
 				$timeControlData['id'] = $this->getDataId();
 				$timeControlData['domid'] = $this->getDataId();
 				$timeControlData['loadSBox'] = 0;
@@ -331,8 +348,8 @@ class CScreenHistory extends CScreenBase {
 					'itemid' => $this->itemid,
 					'action' => $this->action,
 					'filter' => $this->filter,
-					'filter_task' => $this->filter_task,
-					'mark_color' => $this->mark_color
+					'filterTask' => $this->filterTask,
+					'markColor' => $this->markColor
 				);
 
 				return $this->getOutput($output, true, $flickerfreeData);

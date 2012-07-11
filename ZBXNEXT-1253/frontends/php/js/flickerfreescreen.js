@@ -34,7 +34,7 @@ var flickerfreeScreen = {
 		url.setArgument('mode', screen.mode);
 		url.setArgument('flickerfreeScreenId', id);
 		url.setArgument('screenitemid', screen.screenitemid);
-		url.setArgument('profile_idx', !empty(screen.profile_idx) ? screen.profile_idx : null);
+		url.setArgument('profileIdx', !empty(screen.profileIdx) ? screen.profileIdx : null);
 		url.setArgument('period', !empty(screen.period) ? screen.period : null);
 		url.setArgument('stime', !empty(screen.stime) ? screen.stime : null);
 		url.setArgument('sort', !empty(screen.sort) ? screen.sort : null);
@@ -86,8 +86,8 @@ var flickerfreeScreen = {
 			url.setArgument('itemid', !empty(screen.data.itemid) ? screen.data.itemid : null);
 			url.setArgument('action', !empty(screen.data.action) ? screen.data.action : null);
 			url.setArgument('filter', !empty(screen.data.filter) ? screen.data.filter : null);
-			url.setArgument('filter_task', !empty(screen.data.filter_task) ? screen.data.filter_task : null);
-			url.setArgument('mark_color', !empty(screen.data.mark_color) ? screen.data.mark_color : null);
+			url.setArgument('filter_task', !empty(screen.data.filterTask) ? screen.data.filterTask : null);
+			url.setArgument('mark_color', !empty(screen.data.markColor) ? screen.data.markColor : null);
 
 			if (screen.data.action == 'showgraph') {
 				url.setArgument('mode', 3); // SCREEN_MODE_JS
@@ -143,7 +143,7 @@ var flickerfreeScreen = {
 			'sortorder': screen.sortorder,
 			'mode': screen.mode,
 			'resourcetype': screen.resourcetype,
-			'profile_idx': screen.profile_idx,
+			'profileIdx': screen.profileIdx,
 			'data': screen.data
 		};
 

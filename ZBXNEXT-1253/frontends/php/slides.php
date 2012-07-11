@@ -128,7 +128,7 @@ if (isset($_REQUEST['favobj'])) {
 					}
 
 					$screenBuilder = new CScreenBuilder(array(
-						'is_flickerfree' => false,
+						'isFlickerfree' => false,
 						'screen' => $cur_screen,
 						'mode' => SCREEN_MODE_VIEW,
 						'period' => $effectiveperiod

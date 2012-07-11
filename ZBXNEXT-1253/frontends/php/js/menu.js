@@ -87,8 +87,7 @@ function truncateText(text, len) {
 	return (text.length > len) ? text.substring(0, len) + '...' : text;
 }
 
-function show_popup_menu(e, content, width){
-
+function show_popup_menu(e, content, width) {
 	if (A_MENUS[0] !== undefined) {
 		A_MENUS[0].collapse();
 	}

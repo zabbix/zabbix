@@ -813,11 +813,11 @@ function getNextColor(paletteType) {
  * @return true
  */
 function moveListBoxSelectedItem(formname, objname, from, to, action) {
-	to = jQuery("#"+to);
-	jQuery("#"+from).find("option:selected").each(function(i, fromel){
+	to = jQuery('#' + to);
+	jQuery('#' + from).find('option:selected').each(function(i, fromel) {
 
 		var notApp = true;
-		to.find("option").each(function(j, toel){
+		to.find('option').each(function(j, toel) {
 			if (toel.innerHTML.toLowerCase() > fromel.innerHTML.toLowerCase()) {
 				jQuery(toel).before(fromel);
 				notApp = false;
@@ -828,15 +828,13 @@ function moveListBoxSelectedItem(formname, objname, from, to, action) {
 			to.append(fromel);
 		}
 		fromel = jQuery(fromel);
-		if (action.toLowerCase() == "add") {
-			jQuery(document.forms[formname]).append("<input name='" + objname + "["+fromel.val() + "]"
-				+ "' id='" + objname + "_" + fromel.val() + "' value='" + fromel.val() + "' hidden>");
+		if (action.toLowerCase() == 'add') {
+			jQuery(document.forms[formname]).append("<input name='" + objname + '[' + fromel.val() + ']'
+				+ "' id='" + objname + '_' + fromel.val() + "' value='" + fromel.val() + "' hidden>");
 		}
-		else if (action.toLowerCase() == "rmv") {
-			jQuery("#"+objname + "_" + fromel.val()).remove();
+		else if (action.toLowerCase() == 'rmv') {
+			jQuery('#' + objname + '_' + fromel.val()).remove();
 		}
-
-
 	});
 
 	return true;

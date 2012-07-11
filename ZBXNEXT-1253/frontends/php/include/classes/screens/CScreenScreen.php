@@ -21,6 +21,11 @@
 
 class CScreenScreen extends CScreenBase {
 
+	/**
+	 * Process screen.
+	 *
+	 * @return object CDiv (screen inside container)
+	 */
 	public function get() {
 		$screen = API::Screen()->get(array(
 			'screenids' => $this->screenitem['resourceid'],
@@ -30,12 +35,12 @@ class CScreenScreen extends CScreenBase {
 		$screen = reset($screen);
 
 		$screenBuilder = new CScreenBuilder(array(
-			'is_flickerfree' => $this->is_flickerfree,
+			'isFlickerfree' => $this->isFlickerfree,
 			'mode' => SCREEN_MODE_VIEW,
 			'screen' => $screen,
 			'period' => $this->period,
 			'stime' => $this->stime,
-			'profile_idx' => $this->profile_idx
+			'profileIdx' => $this->profileIdx
 		));
 
 		return $this->getOutput($screenBuilder->show(), false);
