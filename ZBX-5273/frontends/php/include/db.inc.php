@@ -607,7 +607,7 @@ function DBfetch(&$cursor) {
 				foreach ($result as &$value) {
 					$value = (string) $value;
 				}
-				unset($values);
+				unset($value);
 			}
 			if ($DB['TRANSACTIONS'] == 0) {
 				unlock_sqlite3_access();
