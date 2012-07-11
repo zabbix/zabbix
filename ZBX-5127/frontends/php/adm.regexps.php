@@ -26,31 +26,65 @@ require_once dirname(__FILE__).'/include/regexp.inc.php';
 $page['title'] = _('Configuration of regular expressions');
 $page['file'] = 'adm.regexps.php';
 $page['hist_arg'] = array();
+$page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		null),
-	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,		'isset({form})&&({form}=="update")'),
-	'name' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Name')),
-	'test_string' =>			array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY,	'isset({save})', _('Test string')),
-	'delete_regexp' =>			array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'g_expressionid' =>			array(T_ZBX_INT, O_OPT, null,		DB_ID,		null),
-	'expressions' =>			array(T_ZBX_STR, O_OPT, null,		null,		'isset({save})'),
-	'new_expression' =>			array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'cancel_new_expression' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'add_expression' =>			array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'edit_expressionid' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'delete_expression' =>		array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'clone' =>					array(T_ZBX_STR, O_OPT, null,		null,		null),
-	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,		null,		null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,		null,		null)
+	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,       DB_ID,     null),
+	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,       DB_ID,     'isset({form})&&({form}=="update")'),
+	'name' =>					array(T_ZBX_STR, O_OPT, null,        NOT_EMPTY, 'isset({save})', _('Name')),
+	'test_string' =>			array(T_ZBX_STR, O_OPT, null,        NOT_EMPTY, 'isset({save})', _('Test string')),
+	'delete_regexp' =>			array(T_ZBX_STR, O_OPT, null,        null,      null),
+	'g_expressionid' =>			array(T_ZBX_INT, O_OPT, null,        DB_ID,     null),
+	'expressions' =>			array(T_ZBX_STR, O_OPT, null,        null,      'isset({save})'),
+	'new_expression' =>			array(T_ZBX_STR, O_OPT, null,        null,      null),
+	'cancel_new_expression' =>	array(T_ZBX_STR, O_OPT, null,        null,      null),
+	'add_expression' =>			array(T_ZBX_STR, O_OPT, null,        null,      null),
+	'edit_expressionid' =>		array(T_ZBX_STR, O_OPT, null,        null,      null),
+	'delete_expression' =>		array(T_ZBX_STR, O_OPT, null,        null,      null),
+	'save' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,      null),
+	'delete' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,      null),
+	'clone' =>					array(T_ZBX_STR, O_OPT, null,        null,      null),
+	'go' =>						array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,      null),
+	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,       null,      null),
+	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,        null,      null),
+	// ajax
+	'output' =>					array(T_ZBX_STR, O_OPT, P_ACT,       null,      null),
+	'ajaxaction' =>				array(T_ZBX_STR, O_OPT, P_ACT,       null,      null),
+	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT,       null,      null)
 );
 check_fields($fields);
+
+
+// ajax
+if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
+	$ajaxResponse = new AjaxResponse;
+	$ajaxData = get_request('ajaxdata', array());
+
+	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'test') {
+		$result = array(
+			'expressions' => array(),
+			'final' => true
+		);
+		$testString = $ajaxData['testString'];
+
+		foreach ($ajaxData['expressions'] as $id => $expression) {
+			$match = GlobalRegExp::matchExpression($expression, $testString);
+
+			$result['expressions'][$id] = $match;
+			$result['final'] = $result['final'] && $match;
+		}
+
+		$ajaxResponse->success($result);
+	}
+
+	$ajaxResponse->send();
+
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit();
+}
 
 /*
  * Actions

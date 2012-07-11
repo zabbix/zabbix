@@ -37,7 +37,7 @@ $exprTable->addStyle('min-width: 600px');
 
 $exprTable->setHeader(array(
 	_('Expression'),
-	_('Expected result'),
+	_('Expression type'),
 	_('Case sensitive'),
 	SPACE
 ));
@@ -49,7 +49,6 @@ $exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dott
 
 
 $exprForm = new CTable(null, 'formElementTable');
-
 $exprForm->addRow(array(_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)));
 $exprForm->addRow(array(_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())));
 $exprForm->addRow(array(_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())), null, 'delimiterNewRow');
@@ -66,94 +65,12 @@ $exprTab->addRow(SPACE, $exprTabDiv);
 // Test tab
 $testTab = new CFormList('testTab');
 $testTab->addRow(_('Test string'), new CTextArea('test_string', $this->get('test_string')));
-$testTab->addRow(SPACE, new CButton('testExpr', _('Test regular expressions'), null, 'link_menu'));
+$testTab->addRow(SPACE, new CButton('testExpression', _('Test regular expressions'), null, 'link_menu'));
 
-$tabExp = new CTableInfo();
-$tabExp->setHeader(array(_('Expression'), _('Result'), _('Expected result'), _('Final result')));
-
-
-
-
-$final_result = !empty($test_string);
-foreach($this->get('expressions') as $id => $expression){
-	$results = array();
-	$paterns = array($expression['expression']);
-
-	if(!empty($test_string)){
-		if($expression['expression_type'] == EXPRESSION_TYPE_ANY_INCLUDED){
-			$paterns = explode($expression['exp_delimiter'],$expression['expression']);
-		}
-
-		if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_TRUE,EXPRESSION_TYPE_FALSE))){
-			if($expression['case_sensitive'])
-				$results[$id] = preg_match('/'.$paterns[0].'/',$test_string);
-			else
-				$results[$id] = preg_match('/'.$paterns[0].'/i',$test_string);
-
-			if($expression['expression_type'] == EXPRESSION_TYPE_TRUE)
-				$final_result &= $results[$id];
-			else
-				$final_result &= !$results[$id];
-		}
-		else{
-			$results[$id] = true;
-
-			$tmp_result = false;
-			if($expression['case_sensitive']){
-				foreach($paterns as $pid => $patern){
-					$tmp_result |= (zbx_strstr($test_string,$patern) !== false);
-				}
-			}
-			else{
-				foreach($paterns as $pid => $patern){
-					$tmp_result |= (zbx_stristr($test_string,$patern) !== false);
-				}
-			}
-
-			if(uint_in_array($expression['expression_type'], array(EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED)))
-				$results[$id] &= $tmp_result;
-			else if($expression['expression_type'] == EXPRESSION_TYPE_NOT_INCLUDED){
-				$results[$id] &= !$tmp_result;
-			}
-			$final_result &= $results[$id];
-		}
-	}
-
-	if(isset($results[$id]) && $results[$id])
-		$exp_res = new CSpan(_('TRUE'), 'green bold');
-	else
-		$exp_res = new CSpan(_('FALSE'), 'red bold');
-
-	$expec_result = expression_type2str($expression['expression_type']);
-	if(EXPRESSION_TYPE_ANY_INCLUDED == $expression['expression_type'])
-		$expec_result.=' ('._('Delimiter')."='".$expression['exp_delimiter']."')";
-
-	$tabExp->addRow(array(
-		$expression['expression'],
-		$exp_res,
-		$expec_result,
-		'asd'
-	));
-
-}
-
-$td = new CCol(_('Combined result'), 'bold');
-$td->setColSpan(3);
-
-if ($final_result) {
-	$final_result = new CSpan(_('TRUE'), 'green bold');
-}
-else {
-	$final_result = new CSpan(_('FALSE'), 'red bold');
-}
-
-$tabExp->addRow(array(
-	$td,
-	$final_result
-));
-
+$tabExp = new CTableInfo(null);
+$tabExp->attr('id', 'testResultTable');
+$tabExp->setHeader(array(_('Expression'), _('Expression type'), _('Result')));
 $testTab->addRow(_('Result'), $tabExp);
-
 
 
 $regExpView = new CTabView();
