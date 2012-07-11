@@ -1267,12 +1267,12 @@
 			do {
 				$db_triggers = DBfetch(DBselect(
 					'SELECT t.triggerid,t.templateid,id.parent_itemid,h.name,h.hostid'.
-					' FROM triggers t,functions f,items i,hosts h,item_discovery id'.
-					' WHERE t.triggerid='.$tmp_triggerid.
-						' AND h.hostid=i.hostid'.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'.
-						' AND i.itemid=id.itemid'
+					' FROM triggers t'.
+						' LEFT JOIN functions f ON t.triggerid=f.triggerid'.
+						' LEFT JOIN items i ON f.itemid=i.itemid'.
+						' LEFT JOIN hosts h ON i.hostid=h.hostid'.
+						' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+					' WHERE t.triggerid='.$tmp_triggerid
 				));
 				if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
 					// parent trigger prototype link
