@@ -1629,7 +1629,7 @@ class CTemplate extends CZBXAPI {
 
 			$sql = 'SELECT key_,count(itemid) as cnt'.
 				' FROM items'.
-				' WHERE'.DBcondition('hostid', $allids).
+					' WHERE'.DBcondition('hostid', $allids).
 				' GROUP BY key_'.
 				' HAVING count(itemid)>1';
 			$res = DBselect($sql);
@@ -1650,7 +1650,25 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
-		// CHECK TEMPLATE TRIGGERS DEPENDENCIES
+		// get DB templates which exists in all targets
+		$res = DBselect('SELECT * FROM hosts_templates WHERE'.DBcondition('hostid', $targetids));
+		$mas = array();
+		while ($row = DBfetch($res)) {
+			if (!isset($mas[$row['templateid']])) {
+				$mas[$row['templateid']] = array();
+			}
+			$mas[$row['templateid']][$row['hostid']] = 1;
+		}
+		$targetIdCount = count($targetids);
+		$commonDBTemplateIds = array();
+		foreach ($mas as $templateId => $targetList) {
+			if (count($targetList) == $targetIdCount) {
+				$commonDBTemplateIds[] = $templateId;
+			}
+		}
+
+		// Check if there are any template with triggers which depends on triggers in templates which will be not linked
+		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateids));
 		foreach ($templateids as $templateid) {
 			$triggerids = array();
 			$dbTriggers = get_triggers_by_hostid($templateid);
@@ -1666,7 +1684,7 @@ class CTemplate extends CZBXAPI {
 				' )'.
 				' AND i.itemid=f.itemid'.
 				' AND h.hostid=i.hostid'.
-				' AND '.DBcondition('h.hostid', $templateids, true).
+				' AND '.DBcondition('h.hostid', $commonTemplateIds, true).
 				' AND h.status='.HOST_STATUS_TEMPLATE;
 
 			if ($dbDepHost = DBfetch(DBselect($sql))) {
@@ -1683,24 +1701,25 @@ class CTemplate extends CZBXAPI {
 			}
 		}
 
-
-		$linked = array();
-		$sql = 'SELECT hostid,templateid'.
+		$res = DBselect(
+			'SELECT hostid,templateid'.
 			' FROM hosts_templates'.
 			' WHERE '.DBcondition('hostid', $targetids).
-			' AND '.DBcondition('templateid', $templateids);
-		$linkedDb = DBselect($sql);
-		while ($pair = DBfetch($linkedDb)) {
-			$linked[] = array($pair['hostid'] => $pair['templateid']);
+				' AND '.DBcondition('templateid', $templateids)
+		);
+		$linked = array();
+		while ($row = DBfetch($res)) {
+			if (!isset($linked[$row['hostid']])) {
+				$linked[$row['hostid']] = array();
+			}
+			$linked[$row['hostid']][$row['templateid']] = 1;
 		}
 
 		// add template linkages, if problems rollback later
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
-				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
-						continue 2;
-					}
+				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+					continue;
 				}
 
 				$values = array(get_dbid('hosts_templates', 'hosttemplateid'), $targetid, $templateid);
@@ -1716,25 +1735,10 @@ class CTemplate extends CZBXAPI {
 		// check if all trigger templates are linked to host.
 		// we try to find template that is not linked to hosts ($targetids)
 		// and exists trigger which reference that template and template from ($templateids)
-		$sql = 'SELECT DISTINCT h.host'.
-			' FROM functions f,items i,triggers t,hosts h'.
-			' WHERE f.itemid=i.itemid'.
-			' AND f.triggerid=t.triggerid'.
-			' AND i.hostid=h.hostid'.
-			' AND h.status='.HOST_STATUS_TEMPLATE.
-			' AND NOT EXISTS ('.
-			'SELECT 1'.
-			' FROM hosts_templates ht'.
-			' WHERE ht.templateid=i.hostid'.
-			' AND '.DBcondition('ht.hostid', $targetids).
-			')'.
-			' AND EXISTS ('.
-			'SELECT 1'.
-			' FROM functions ff,items ii'.
-			' WHERE ff.itemid=ii.itemid'.
-			' AND ff.triggerid=t.triggerid'.
-			' AND '.DBcondition('ii.hostid', $templateids).
-			')';
+		$sql = 'SELECT DISTINCT h.host FROM functions f,items i,triggers t,hosts h'.
+			' WHERE f.itemid=i.itemid AND f.triggerid=t.triggerid AND i.hostid=h.hostid AND h.status='.HOST_STATUS_TEMPLATE.
+			' AND NOT EXISTS (SELECT 1 FROM hosts_templates ht WHERE ht.templateid=i.hostid AND '.DBcondition('ht.hostid', $targetids).')'.
+			' AND EXISTS (SELECT 1 FROM functions ff,items ii WHERE ff.itemid=ii.itemid AND ff.triggerid=t.triggerid AND '.DBcondition('ii.hostid', $templateids). ')';
 		if ($dbNotLinkedTpl = DBfetch(DBSelect($sql, 1))) {
 			self::exception(
 				ZBX_API_ERROR_PARAMETERS,
@@ -1742,54 +1746,51 @@ class CTemplate extends CZBXAPI {
 			);
 		}
 
-		// CHECK CIRCULAR LINKAGE
-		// get template linkage graph
+		// check template linkage circularity
+		$res = DBselect(
+			'SELECT ht.hostid,ht.templateid'.
+			' FROM hosts_templates ht,hosts h '.
+			' WHERE ht.hostid=h.hostid '.
+				' AND h.status IN('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'
+		);
+		// build linkage graph and prepare list for $rootList generation
 		$graph = array();
-		$sql = 'SELECT ht.hostid,ht.templateid'.
-			' FROM hosts_templates ht,hosts h'.
-			' WHERE ht.hostid=h.hostid'.
-			' AND h.status='.HOST_STATUS_TEMPLATE;
-		$dbGraph = DBselect($sql);
-		while ($branch = DBfetch($dbGraph)) {
-			if (!isset($graph[$branch['hostid']])) $graph[$branch['hostid']] = array();
-			$graph[$branch['hostid']][$branch['templateid']] = $branch['templateid'];
-		}
-
-		// get points that have more than one parent templates
-		$startPoints = array();
-		$sql = 'SELECT max(ht.hostid) as hostid,ht.templateid'.
-			' FROM('.
-			'SELECT count(htt.templateid) as ccc,htt.hostid'.
-			' FROM hosts_templates htt'.
-			' WHERE htt.hostid NOT IN (SELECT httt.templateid FROM hosts_templates httt)'.
-			' GROUP BY htt.hostid'.
-			') ggg, hosts_templates ht'.
-			' WHERE ggg.ccc>1'.
-			' AND ht.hostid=ggg.hostid'.
-			' GROUP BY ht.templateid';
-		$dbStartPoints = DBselect($sql);
-		while ($startPoint = DBfetch($dbStartPoints)) {
-			$startPoints[] = $startPoint['hostid'];
-			$graph[$startPoint['hostid']][$startPoint['templateid']] = $startPoint['templateid'];
-		}
-
-		// add to the start points also points which we add current templates
-		$startPoints = array_merge($startPoints, $targetids);
-		$startPoints = array_unique($startPoints);
-
-		foreach ($startPoints as $start) {
-			$path = array();
-			if (!$this->checkCircularLink($graph, $start, $path)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular link cannot be created'));
+		$hasParentList = array();
+		$hasChildList = array();
+		$all = array();
+		while ($row = DBfetch($res)) {
+			if (!isset($graph[$row['hostid']])) {
+				$graph[$row['hostid']] = array();
 			}
+			$graph[$row['hostid']][] = $row['templateid'];
+			$hasParentList[$row['templateid']] = $row['templateid'];
+			$hasChildList[$row['hostid']] = $row['hostid'];
+			$all[$row['templateid']] = $row['templateid'];
+			$all[$row['hostid']] = $row['hostid'];
+		}
+		// get list of templates without parents
+		$rootList = array();
+		foreach ($hasChildList as $parentId) {
+			if (!isset($hasParentList[$parentId])) {
+				$rootList[] = $parentId;
+			}
+		}
+		$visited = array();
+		// search cycles and double linkages in rooted parts of graph
+		foreach ($rootList as $root) {
+			$path = array();
+			// raise exception on cycle or double linkage
+			$this->checkCircularAndDoubleLinkage($graph, $root, $path, $visited);
+		}
+		// there is still possible cycles without root
+		if (count($visited) < count($all)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
 		}
 
 		foreach ($targetids as $targetid) {
 			foreach ($templateids as $templateid) {
-				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
-						continue 2;
-					}
+				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+					continue;
 				}
 
 				API::Application()->syncTemplates(array(
@@ -1815,10 +1816,8 @@ class CTemplate extends CZBXAPI {
 
 			// we do linkage in two separate loops because for triggers you need all items already created on host
 			foreach ($templateids as $templateid) {
-				foreach ($linked as $link) {
-					if (isset($link[$targetid]) && bccomp($link[$targetid], $templateid) == 0) {
-						continue 2;
-					}
+				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+					continue;
 				}
 
 				// sync triggers
@@ -1843,12 +1842,55 @@ class CTemplate extends CZBXAPI {
 				));
 			}
 		}
-		API::Trigger()->syncTemplateDependencies(array(
-			'templateids' => $templateids,
-			'hostids' => $targetids,
-		));
+
+		foreach ($targetids as $targetid) {
+			foreach ($templateids as $templateid) {
+				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
+					continue;
+				}
+
+				API::Trigger()->syncTemplateDependencies(array(
+					'templateids' => $templateid,
+					'hostids' => $targetid,
+				));
+			}
+		}
 
 		return true;
+	}
+
+	/**
+	 * Searches for cycles and double linkages in graph.
+	 *
+	 * @exception rises exception if cycle or double linkage is found
+	 *
+	 * @param array $graph - array with keys as parent ids and values as arrays with child ids
+	 * @param int $current - cursor for recursive DFS traversal, starting point for algorithm
+	 * @param array $path - should be passed empty array for DFS
+	 * @param array $visited - there will be stored visited graph node ids
+	 * @return false
+	 */
+	private function checkCircularAndDoubleLinkage($graph, $current, &$path, &$visited) {
+		if (isset($path[$current])) {
+			if ($path[$current] == 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Circular template linkage is not allowed.'));
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Template cannot be linked to another template more than once even through other templates.'));
+			}
+		}
+		$path[$current] = 1;
+		$visited[$current] = 1;
+
+		if (isset($graph[$current])) {
+			foreach ($graph[$current] as $next) {
+				$this->checkCircularAndDoubleLinkage($graph, $next, $path, $visited);
+			}
+		}
+
+		$path[$current] = 2;
+
+		return false;
 	}
 
 	private function unlink($templateids, $targetids=null, $clear=false) {
@@ -2179,19 +2221,6 @@ class CTemplate extends CZBXAPI {
 			$templates = implode(', ', zbx_objectValues($templates, 'host'));
 
 			info(_s('Templates "%1$s" unlinked from hosts "%2$s".', $templates, $hosts));
-		}
-
-		return true;
-	}
-
-	private function checkCircularLink(&$graph, $current, &$path) {
-
-		if (isset($path[$current])) return false;
-		$path[$current] = $current;
-		if (!isset($graph[$current])) return true;
-
-		foreach ($graph[$current] as $step) {
-			if (!$this->checkCircularLink($graph, $step, $path)) return false;
 		}
 
 		return true;
