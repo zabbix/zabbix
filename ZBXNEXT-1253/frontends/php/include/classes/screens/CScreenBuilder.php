@@ -90,7 +90,7 @@ class CScreenBuilder {
 			$options['screenitem'] = reset($options['screenitem']);
 		}
 
-		if (zbx_empty($options['resourcetype']) && !empty($options['screenitem']['resourcetype'])) {
+		if (zbx_empty($options['resourcetype']) && !zbx_empty($options['screenitem']['resourcetype'])) {
 			$options['resourcetype'] = $options['screenitem']['resourcetype'];
 		}
 
