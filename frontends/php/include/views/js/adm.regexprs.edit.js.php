@@ -12,7 +12,7 @@
 
 <script type="text/x-jquery-tmpl" id="testTableRow">
 	<tr class="even_row">
-		<td>#{expression}</td>
+		<td style="white-space: normal">#{expression}</td>
 		<td>#{type}</td>
 		<td><span class="bold #{resultClass}">#{result}</span></td>
 	</tr>
