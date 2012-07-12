@@ -319,23 +319,30 @@
 					testString: string,
 					expressions: {}
 				},
+					url;
+
+				if ($.isEmptyObject(this.expressions)) {
+					$('#testResultTable tr:not(.header)').remove();
+				}
+				else {
 					url = new Curl();
 
-				$('#testResultTable').css({
-					opacity: 0.5
-				});
-				$('#testPreloader').show();
+					$('#testResultTable').css({
+						opacity: 0.5
+					});
+					$('#testPreloader').show();
 
-				for (var id in this.expressions) {
-					ajaxData.expressions[id] = this.expressions[id].data;
+					for (var id in this.expressions) {
+						ajaxData.expressions[id] = this.expressions[id].data;
+					}
+
+					$.post(
+							'adm.regexps.php?output=ajax&ajaxaction=test&sid='+url.getArgument('sid'),
+							{ajaxdata: ajaxData},
+							$.proxy(this.showTestResults, this),
+							'json'
+					);
 				}
-
-				$.post(
-					'adm.regexps.php?output=ajax&ajaxaction=test&sid='+url.getArgument('sid'),
-					{ajaxdata: ajaxData},
-					$.proxy(this.showTestResults, this),
-					'json'
-				);
 			},
 
 			/**
