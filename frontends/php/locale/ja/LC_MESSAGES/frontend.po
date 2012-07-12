@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 00:19+0300\n"
-"PO-Revision-Date: 2012-05-21 18:34+0200\n"
+"POT-Creation-Date: 2012-07-13 00:22+0300\n"
+"PO-Revision-Date: 2012-06-20 11:12+0200\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1136,7 +1136,7 @@ msgstr "アイテムを追加できません"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
-msgstr ""
+msgstr "マクロを追加できません"
 
 #: maintenance.php:108
 msgid "Cannot add maintenance"
@@ -1485,7 +1485,7 @@ msgstr "ユーザーを削除できません"
 
 #: api/classes/CUser.php:786
 msgid "Cannot delete user media."
-msgstr ""
+msgstr "ユーザーのメディアを削除できません"
 
 #: adm.valuemapping.php:78
 msgid "Cannot delete value map"
@@ -1690,7 +1690,7 @@ msgstr "ビューファイル\"%s\"を読み込めません。"
 
 #: api/classes/CUser.php:815
 msgid "Cannot insert user media."
-msgstr ""
+msgstr "ユーザーメディアを追加できません"
 
 #: api/classes/CHost.php:1906
 msgid "Cannot link template"
@@ -1746,7 +1746,7 @@ msgstr "マクロを削除できません"
 
 #: api/classes/CUser.php:380
 msgid "Cannot rename guest user."
-msgstr ""
+msgstr "ゲストユーザーの名前は変更できません"
 
 #: api/classes/CDRule.php:445
 msgid "Cannot save discovery rule without checks."
@@ -1873,7 +1873,7 @@ msgstr "アイテムを更新できません"
 
 #: adm.macros.php:93
 msgid "Cannot update macro."
-msgstr ""
+msgstr "マクロを更新できません"
 
 #: adm.macros.php:147
 msgid "Cannot update macros"
@@ -1951,7 +1951,7 @@ msgstr "ユーザーを更新できません"
 
 #: api/classes/CUser.php:807
 msgid "Cannot update user media."
-msgstr ""
+msgstr "ユーザーのメディアを更新できません"
 
 #: profile.php:110 users.php:125
 msgid "Cannot update user. Both passwords must be equal."
@@ -2471,7 +2471,7 @@ msgstr "選択をコピー..."
 #: api/classes/CUser.php:986
 #, php-format
 msgid "Correct login \"%s\"."
-msgstr ""
+msgstr "ユーザー\"%s\"のログイン"
 
 #: api/classes/CImage.php:485
 msgid "Could not save image!"
@@ -5048,7 +5048,7 @@ msgstr "ホストグループ"
 #: api/classes/CHostGroup.php:619 api/classes/CHostGroup.php:672
 #, php-format
 msgid "Host group \"%1$s\" already exists."
-msgstr ""
+msgstr "ホストグループ\"%1$s\"はすでに存在しています。"
 
 #: include/views/js/configuration.sysmaps.js.php:32
 msgid "Host group elements"
@@ -6386,7 +6386,7 @@ msgstr "問題"
 
 #: api/classes/CUser.php:172
 msgid "It is not possible to filter by user password."
-msgstr ""
+msgstr "ユーザーのパスワードによるフィルターは行えません。"
 
 #: include/page_header.php:260
 msgid "It is not possible to logout from HTTP authentication."
@@ -6394,7 +6394,7 @@ msgstr ""
 
 #: api/classes/CUserMedia.php:212 api/classes/CUser.php:180
 msgid "It is not possible to search by user password."
-msgstr ""
+msgstr "ユーザーのパスワードによる検索は行えません。"
 
 #: include/locales.inc.php:52
 msgid "Italian (it_IT)"
@@ -6975,12 +6975,12 @@ msgstr "ゲストとしてログイン"
 #: api/classes/CUser.php:978
 #, php-format
 msgid "Login failed \"%s\"."
-msgstr ""
+msgstr "ログイン失敗\"%s\""
 
 #: api/classes/CUser.php:848 api/classes/CUser.php:866
 #: api/classes/CUser.php:911
 msgid "Login name or password is incorrect."
-msgstr ""
+msgstr "ログイン名かパスワードが間違っています。"
 
 #: auditlogs.php:146 include/page_header.php:259 include/page_header.php:263
 #: include/views/administration.auditlogs.list.php:44
@@ -7443,12 +7443,12 @@ msgstr "最小化"
 #: include/classes/class.frontendsetup.php:120
 #, php-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")"
-msgstr ""
+msgstr "PHPメモリ上限の最小値は%sです (\"memory_limit\"設定オプション)"
 
 #: include/classes/class.frontendsetup.php:158
 #, php-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")"
-msgstr ""
+msgstr "PHPアップロードファイルサイズの最小値は%sです (\"upload_max_filesize\"設定オプション)"
 
 #: include/classes/class.frontendsetup.php:101
 #, php-format
@@ -7458,17 +7458,17 @@ msgstr "PHPの最小バージョンは%sです"
 #: include/classes/class.frontendsetup.php:177
 #, php-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")"
-msgstr ""
+msgstr "PHPスクリプトの実行時間の最小値は%sです (\"max_execution_time\"設定オプション)"
 
 #: include/classes/class.frontendsetup.php:196
 #, php-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")"
-msgstr ""
+msgstr "PHPスクリプトの入力パース時間の最小値は%sです (\"max_input_time\"設定オプション)"
 
 #: include/classes/class.frontendsetup.php:139
 #, php-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")"
-msgstr ""
+msgstr "PHPのpostサイズの最小値は%sです (\"post_max_size\"設定オプション)"
 
 #: include/forms.inc.php:1664
 msgid "Minutes"
@@ -8662,15 +8662,15 @@ msgstr "特権管理者のみがユーザーグループを更新できます。
 
 #: api/classes/CUser.php:684
 msgid "Only Zabbix Admins can add user media."
-msgstr ""
+msgstr "特権管理者のみがユーザーのメディアを追加できます。"
 
 #: api/classes/CUser.php:752
 msgid "Only Zabbix Admins can change user media."
-msgstr ""
+msgstr "特権管理者のみがユーザーのメディアを変更できます。"
 
 #: api/classes/CUser.php:722
 msgid "Only Zabbix Admins can remove user media."
-msgstr ""
+msgstr "特権管理者のみがユーザーのメディアを削除できます。"
 
 #: api/classes/CWebCheck.php:303 api/classes/CWebCheck.php:353
 msgid "Only characters are allowed."
@@ -8855,7 +8855,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:319
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
-msgstr ""
+msgstr "PHP bcmathモジュールが存在しません (PHPのconfigure時のパラメータ --enable-bcmath)"
 
 #: include/classes/class.frontendsetup.php:546
 msgid "PHP ctype"
@@ -8863,7 +8863,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:550
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
-msgstr ""
+msgstr "PHP ctypeモジュールが存在しません (PHPのconfigure時のパラメータ --enable-ctype)"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "PHP databases support"
@@ -8875,31 +8875,31 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:455
 msgid "PHP gd FreeType support"
-msgstr ""
+msgstr "PHP gd FreeTypeのサポート"
 
 #: include/classes/class.frontendsetup.php:459
 msgid "PHP gd FreeType support missing"
-msgstr ""
+msgstr "PHP gd FreeTypeがサポートされていません"
 
 #: include/classes/class.frontendsetup.php:434
 msgid "PHP gd JPEG image support missing"
-msgstr ""
+msgstr "PHP gd JPEGイメージがサポートされていません"
 
 #: include/classes/class.frontendsetup.php:430
 msgid "PHP gd JPEG support"
-msgstr ""
+msgstr "PHP gd JPEGのサポート"
 
 #: include/classes/class.frontendsetup.php:408
 msgid "PHP gd PNG image support missing"
-msgstr ""
+msgstr "PHP gd PNGイメージがサポートされていません"
 
 #: include/classes/class.frontendsetup.php:404
 msgid "PHP gd PNG support"
-msgstr ""
+msgstr "PHP gd PNGのサポート"
 
 #: include/classes/class.frontendsetup.php:383
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)"
-msgstr ""
+msgstr "PHP GDモジュールが存在しません (PHPのconfigure時のパラメータ --with-gd)"
 
 #: include/classes/class.frontendsetup.php:584
 msgid "PHP gettext"
@@ -8907,7 +8907,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:588
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
-msgstr ""
+msgstr "PHP gettextモジュールが存在しません (PHPのconfigure時のパラメータ --with-gettext)"
 
 #: include/classes/class.frontendsetup.php:479
 msgid "PHP libxml"
@@ -8915,7 +8915,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:483
 msgid "PHP libxml extension missing"
-msgstr ""
+msgstr "PHP libxmlモジュールが存在しません"
 
 #: include/classes/class.frontendsetup.php:334
 msgid "PHP mbstring"
@@ -8923,27 +8923,27 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:338
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)"
-msgstr ""
+msgstr "PHP mbstringモジュールが存在しません (PHPのconfigure時のパラメータ --enable-mbstring)"
 
 #: include/classes/class.frontendsetup.php:173
 msgid "PHP option max_execution_time"
-msgstr ""
+msgstr "PHP max_execution_timeオプション"
 
 #: include/classes/class.frontendsetup.php:192
 msgid "PHP option max_input_time"
-msgstr ""
+msgstr "PHP max_input_timeオプション"
 
 #: include/classes/class.frontendsetup.php:116
 msgid "PHP option memory_limit"
-msgstr ""
+msgstr "PHP memory_limitオプション"
 
 #: include/classes/class.frontendsetup.php:135
 msgid "PHP option post_max_size"
-msgstr ""
+msgstr "PHP post_max_sizeオプション"
 
 #: include/classes/class.frontendsetup.php:154
 msgid "PHP option upload_max_filesize"
-msgstr ""
+msgstr "PHP upload_max_filesizeオプション"
 
 #: include/classes/class.frontendsetup.php:565
 msgid "PHP session"
@@ -8951,7 +8951,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:569
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
-msgstr ""
+msgstr "PHP sessionモジュールが存在しません (PHPのconfigure時のパラメータ --enable-session)"
 
 #: include/classes/class.frontendsetup.php:353
 msgid "PHP sockets"
@@ -8959,7 +8959,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:357
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)"
-msgstr ""
+msgstr "PHP socketsモジュールが存在しません (PHPのconfigure時のパラメータ --enable-sockets)"
 
 #: include/classes/class.frontendsetup.php:211
 msgid "PHP time zone"
@@ -8975,7 +8975,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:521
 msgid "PHP xmlreader extension missing"
-msgstr ""
+msgstr "PHP xmlreaderモジュールが存在しません"
 
 #: include/classes/class.frontendsetup.php:498
 msgid "PHP xmlwriter"
@@ -8983,7 +8983,7 @@ msgstr ""
 
 #: include/classes/class.frontendsetup.php:502
 msgid "PHP xmlwriter extension missing"
-msgstr ""
+msgstr "PHP xmlreaderモジュールが存在しません"
 
 #: include/discovery.inc.php:62
 #: include/views/js/configuration.discovery.edit.js.php:128
@@ -9301,7 +9301,7 @@ msgstr "特権レベル"
 
 #: api/classes/CUser.php:838
 msgid "Probably php-ldap module is missing."
-msgstr ""
+msgstr "php-ldapモジュールが見つかりません。"
 
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:844
 #: include/views/js/configuration.sysmaps.js.php:127 tr_status.php:190
@@ -12683,7 +12683,7 @@ msgstr "Y軸の最大値"
 
 #: api/classes/CGraph.php:866 api/classes/CGraphPrototype.php:911
 msgid "Y axis MAX value must be greater than Y axis MIN value."
-msgstr ""
+msgstr "Y軸の最大値はY軸の最小値よりも大きな値を設定してください。"
 
 #: include/views/configuration.graph.edit.php:216
 msgid "Y axis MIN value"
@@ -12933,7 +12933,7 @@ msgstr "Zabbix serverのIPアドレスまたはポート番号が設定されて
 
 #: adm.gui.php:40
 msgid "Zabbix server activity check interval"
-msgstr ""
+msgstr "Zabbixサーバーの動作チェック間隔"
 
 #: include/classes/class.cserverinfo.php:42
 msgid "Zabbix server info"
@@ -12950,7 +12950,7 @@ msgstr "Zabbixサーバの起動"
 #: adm.gui.php:75
 #, php-format
 msgid "Zabbix server is running check interval \"%1$s\"."
-msgstr ""
+msgstr "Zabbixサーバーの動作チェック間隔\"%1$s\""
 
 #: include/setup.inc.php:370
 msgid "Zabbix server name"

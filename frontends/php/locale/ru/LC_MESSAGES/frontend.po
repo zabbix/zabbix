@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 1.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-13 00:19+0300\n"
-"PO-Revision-Date: 2012-06-04 16:23+0200\n"
+"POT-Creation-Date: 2012-07-13 00:22+0300\n"
+"PO-Revision-Date: 2012-07-03 10:43+0200\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -1415,12 +1415,11 @@ msgid "Cannot delete proxy"
 msgstr "Не удалось удалить прокси"
 
 #: adm.regexps.php:117
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Не удалось удалить регулярное выражение"
-msgstr[1] "Не удалось удалить регулярное выражение"
-msgstr[2] "Не удалось удалить регулярное выражение"
+msgstr[1] "Не удалось удалить регулярные выражения"
+msgstr[2] "Не удалось удалить регулярные выражения"
 
 #: httpconf.php:149
 msgid "Cannot delete scenario"
@@ -1728,7 +1727,7 @@ msgstr "Невозможно массово обновить имя шаблон
 
 #: api/classes/CUserGroup.php:496
 msgid "Cannot mass update user group names."
-msgstr ""
+msgstr "Невозможно массово обновить имена групп пользователей."
 
 #: api/classes/CHost.php:1714
 msgid "Cannot mass update visible host name."
@@ -4634,7 +4633,7 @@ msgstr ""
 #: api/classes/CGraph.php:38
 #, php-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "График \"%1$s\" с элементами данных из шаблона не может содержать элементы данных из других узлов сети."
 
 #: graphs.php:226
 msgid "Graph added"
@@ -4659,7 +4658,7 @@ msgstr "Имя графика"
 #: api/classes/CGraphPrototype.php:38
 #, php-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr ""
+msgstr "Прототип графика \"%1$s\" с элементами данных из шаблона не может содержать элементы данных из других узлов сети."
 
 #: api/classes/CGraphPrototype.php:843
 #, php-format
@@ -5688,7 +5687,7 @@ msgstr "Некорректный тип условия действия."
 
 #: api/classes/CAction.php:960
 msgid "Incorrect action conditionid."
-msgstr ""
+msgstr "Некорректный conditionid действия."
 
 #: api/classes/CAction.php:1585
 msgid "Incorrect action operation command type."
@@ -5737,7 +5736,7 @@ msgstr "Некорректный пользователь для операци�
 
 #: api/classes/CAction.php:985
 msgid "Incorrect action operationid."
-msgstr ""
+msgstr "Некорректный operationid действия."
 
 #: api/classes/CService.php:1125
 #, php-format
@@ -6087,7 +6086,7 @@ msgstr "Указан некорректный ID комплексного экр
 
 #: include/screens.inc.php:169 include/screens.inc.php:225
 msgid "Incorrect screen provided for slide show."
-msgstr ""
+msgstr "Для слайд-шоу указан некорректный комплексный экран."
 
 #: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
@@ -7472,12 +7471,12 @@ msgstr "Свернуть"
 #: include/classes/class.frontendsetup.php:120
 #, php-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")"
-msgstr ""
+msgstr "Минимально требуемый лимит памяти в PHP - %s (конфигурационный параметр \"memory_limit\")"
 
 #: include/classes/class.frontendsetup.php:158
 #, php-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")"
-msgstr ""
+msgstr "Минимально требуемый размер загружаемого файла в PHP - %s (конфигурационный параметр \"upload_max_filesize\")"
 
 #: include/classes/class.frontendsetup.php:101
 #, php-format
@@ -7487,17 +7486,17 @@ msgstr "Минимально требуемая версия PHP - %s"
 #: include/classes/class.frontendsetup.php:177
 #, php-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")"
-msgstr ""
+msgstr "Минимально требуемый лимит времени выполнения скриптов в PHP - %s (конфигурационный параметр \"max_execution_time\")"
 
 #: include/classes/class.frontendsetup.php:196
 #, php-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")"
-msgstr ""
+msgstr "Минимально требуемый лимит времени обработки ввода для PHP скриптов - %s (конфигурационный параметр \"max_input_time\")"
 
 #: include/classes/class.frontendsetup.php:139
 #, php-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")"
-msgstr ""
+msgstr "Минимально требуемый размер PHP post - %s (конфигурационный параметр \"post_max_size\")"
 
 #: include/forms.inc.php:1664
 msgid "Minutes"
@@ -7505,11 +7504,11 @@ msgstr "Минут"
 
 #: api/classes/CGraph.php:837 api/classes/CGraphPrototype.php:882
 msgid "Missing \"itemid\" field for item."
-msgstr ""
+msgstr "Пропущено поле \"itemid\" для элемента данных."
 
 #: api/classes/CGraph.php:825 api/classes/CGraphPrototype.php:870
 msgid "Missing \"name\" field for graph."
-msgstr ""
+msgstr "Пропущено поле \"name\" для графика."
 
 #: include/classes/import/CXmlImport18.php:1596
 #: include/classes/import/CXmlImport18.php:1609
@@ -7580,7 +7579,7 @@ msgstr "Более 10 минут"
 #: api/classes/CGraph.php:923 api/classes/CGraphPrototype.php:979
 #, php-format
 msgid "More than one graph with name \"%1$s\" within host."
-msgstr ""
+msgstr "Более чем один график с  именем \"%1$s\" у узла сети."
 
 #: report5.php:24
 msgid "Most busy triggers top 100"
@@ -8163,7 +8162,7 @@ msgstr ""
 
 #: slides.php:110
 msgid "No permissions"
-msgstr ""
+msgstr "Нет прав доступа"
 
 #: include/views/administration.usergroups.edit.php:79
 msgid "No permissions defined."
@@ -8691,15 +8690,15 @@ msgstr "Только Супер-Администраторы могут обно
 
 #: api/classes/CUser.php:684
 msgid "Only Zabbix Admins can add user media."
-msgstr ""
+msgstr "Только Супер-Администраторы могут добавлять пользователям оповещения."
 
 #: api/classes/CUser.php:752
 msgid "Only Zabbix Admins can change user media."
-msgstr ""
+msgstr "Только Супер-Администраторы могут изменять оповещения пользователей."
 
 #: api/classes/CUser.php:722
 msgid "Only Zabbix Admins can remove user media."
-msgstr ""
+msgstr "Только Супер-Администраторы могут удалять оповещения пользователей."
 
 #: api/classes/CWebCheck.php:303 api/classes/CWebCheck.php:353
 msgid "Only characters are allowed."
@@ -8884,7 +8883,7 @@ msgstr "PHP bcmath"
 
 #: include/classes/class.frontendsetup.php:319
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)"
-msgstr ""
+msgstr "Отсутствует расширение PHP bcmath (конфигурационный параметр --enable-bcmath в PHP)"
 
 #: include/classes/class.frontendsetup.php:546
 msgid "PHP ctype"
@@ -8892,7 +8891,7 @@ msgstr "PHP ctype"
 
 #: include/classes/class.frontendsetup.php:550
 msgid "PHP ctype extension missing (PHP configuration parameter --enable-ctype)"
-msgstr ""
+msgstr "Отсутствует расширение PHP ctype (конфигурационный параметр --enable-ctype в PHP)"
 
 #: include/classes/class.frontendsetup.php:287
 msgid "PHP databases support"
@@ -8900,35 +8899,35 @@ msgstr "Поддержка баз данных PHP"
 
 #: include/classes/class.frontendsetup.php:379
 msgid "PHP gd"
-msgstr ""
+msgstr "PHP gd"
 
 #: include/classes/class.frontendsetup.php:455
 msgid "PHP gd FreeType support"
-msgstr ""
+msgstr "Поддержка PHP gd FreeType"
 
 #: include/classes/class.frontendsetup.php:459
 msgid "PHP gd FreeType support missing"
-msgstr ""
+msgstr "Отсутствует поддержка PHP gd FreeType"
 
 #: include/classes/class.frontendsetup.php:434
 msgid "PHP gd JPEG image support missing"
-msgstr ""
+msgstr "Отсутствует поддержка изображений PHP gd JPEG"
 
 #: include/classes/class.frontendsetup.php:430
 msgid "PHP gd JPEG support"
-msgstr ""
+msgstr "Поддержка PHP gd JPEG"
 
 #: include/classes/class.frontendsetup.php:408
 msgid "PHP gd PNG image support missing"
-msgstr ""
+msgstr "Отсутствует поддержка изображений PHP gd PNG"
 
 #: include/classes/class.frontendsetup.php:404
 msgid "PHP gd PNG support"
-msgstr ""
+msgstr "Поддержка PHP gd PNG"
 
 #: include/classes/class.frontendsetup.php:383
 msgid "PHP gd extension missing (PHP configuration parameter --with-gd)"
-msgstr ""
+msgstr "Отсутствует расширение PHP gd (конфигурационный параметр --with-gd в PHP)"
 
 #: include/classes/class.frontendsetup.php:584
 msgid "PHP gettext"
@@ -8936,7 +8935,7 @@ msgstr "PHP gettext"
 
 #: include/classes/class.frontendsetup.php:588
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext)"
-msgstr ""
+msgstr "Отсутствует расширение PHP gettext (конфигурационный параметр --with-gettext в PHP)"
 
 #: include/classes/class.frontendsetup.php:479
 msgid "PHP libxml"
@@ -8944,7 +8943,7 @@ msgstr "PHP libxml"
 
 #: include/classes/class.frontendsetup.php:483
 msgid "PHP libxml extension missing"
-msgstr ""
+msgstr "Отсутствует расширение PHP libxml"
 
 #: include/classes/class.frontendsetup.php:334
 msgid "PHP mbstring"
@@ -8952,27 +8951,27 @@ msgstr "PHP mbstring"
 
 #: include/classes/class.frontendsetup.php:338
 msgid "PHP mbstring extension missing (PHP configuration parameter --enable-mbstring)"
-msgstr ""
+msgstr "Отсутствует расширение PHP mbstring (конфигурационный параметр --enable-mbstring в PHP)"
 
 #: include/classes/class.frontendsetup.php:173
 msgid "PHP option max_execution_time"
-msgstr ""
+msgstr "PHP опция max_execution_time"
 
 #: include/classes/class.frontendsetup.php:192
 msgid "PHP option max_input_time"
-msgstr ""
+msgstr "PHP опция max_input_time"
 
 #: include/classes/class.frontendsetup.php:116
 msgid "PHP option memory_limit"
-msgstr ""
+msgstr "PHP опция memory_limit"
 
 #: include/classes/class.frontendsetup.php:135
 msgid "PHP option post_max_size"
-msgstr ""
+msgstr "PHP опция post_max_size"
 
 #: include/classes/class.frontendsetup.php:154
 msgid "PHP option upload_max_filesize"
-msgstr ""
+msgstr "PHP опция upload_max_filesize"
 
 #: include/classes/class.frontendsetup.php:565
 msgid "PHP session"
@@ -8980,7 +8979,7 @@ msgstr "PHP session"
 
 #: include/classes/class.frontendsetup.php:569
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
-msgstr ""
+msgstr "Отсутствует расширение PHP session (конфигурационный параметр --enable-session в PHP)"
 
 #: include/classes/class.frontendsetup.php:353
 msgid "PHP sockets"
@@ -8988,7 +8987,7 @@ msgstr "PHP sockets"
 
 #: include/classes/class.frontendsetup.php:357
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)"
-msgstr ""
+msgstr "Отсутствует расширение PHP sockets (конфигурационный параметр --enable-sockets в PHP)"
 
 #: include/classes/class.frontendsetup.php:211
 msgid "PHP time zone"
@@ -9004,7 +9003,7 @@ msgstr "PHP xmlreader"
 
 #: include/classes/class.frontendsetup.php:521
 msgid "PHP xmlreader extension missing"
-msgstr ""
+msgstr "Отсутствует расширение PHP xmlreader"
 
 #: include/classes/class.frontendsetup.php:498
 msgid "PHP xmlwriter"
@@ -9012,7 +9011,7 @@ msgstr "PHP xmlwriter"
 
 #: include/classes/class.frontendsetup.php:502
 msgid "PHP xmlwriter extension missing"
-msgstr ""
+msgstr "Отсутствует расширение PHP xmlwriter"
 
 #: include/discovery.inc.php:62
 #: include/views/js/configuration.discovery.edit.js.php:128
@@ -9069,7 +9068,7 @@ msgstr "Ожидался параметр sec или пользовательс�
 
 #: include/views/configuration.item.edit.php:53
 msgid "Parent discovery rules"
-msgstr ""
+msgstr "Родительские правила обнаружения"
 
 #: include/views/configuration.graph.edit.php:51
 msgid "Parent graph"
@@ -9077,7 +9076,7 @@ msgstr "Родительский график"
 
 #: include/views/configuration.item.edit.php:56
 msgid "Parent items"
-msgstr ""
+msgstr "Родительские элементы данных"
 
 #: include/views/configuration.services.edit.php:46
 msgid "Parent service"
@@ -9330,7 +9329,7 @@ msgstr "Уровень привилегий"
 
 #: api/classes/CUser.php:838
 msgid "Probably php-ldap module is missing."
-msgstr ""
+msgstr "Возможно отсутствует модуль php-ldap."
 
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:844
 #: include/views/js/configuration.sysmaps.js.php:127 tr_status.php:190
@@ -9533,12 +9532,11 @@ msgid "Regular expression added"
 msgstr "Регулярное выражение добавлено"
 
 #: adm.regexps.php:116
-#, fuzzy
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Регулярное выражение удалено"
-msgstr[1] "Регулярное выражение удалено"
-msgstr[2] "Регулярное выражение удалено"
+msgstr[1] "Регулярные выражения удалены"
+msgstr[2] "Регулярные выражения удалены"
 
 #: include/regexp.inc.php:79
 msgid "Regular expression does not exist."
@@ -10561,7 +10559,7 @@ msgstr "Услуги"
 
 #: api/classes/CService.php:1451
 msgid "Services form a circular dependency."
-msgstr ""
+msgstr "Услуги образуют круговую зависимость."
 
 #: api/classes/CUser.php:1029
 msgid "Session terminated, re-login, please."
@@ -10683,7 +10681,7 @@ msgstr "Показать значения элемента данных"
 
 #: include/views/administration.general.gui.edit.php:47
 msgid "Show warning if Zabbix server is down"
-msgstr ""
+msgstr "Показывать предупреждение, если Zabbix сервер недоступен"
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show working time"
@@ -11665,7 +11663,7 @@ msgstr "Укорочено"
 #: include/classes/class.cpagefilter.php:55
 #, php-format
 msgid "Try to read inaccessible property \"%s\"."
-msgstr ""
+msgstr "Попытка прочитать недоступное свойство \"%s\"."
 
 #: include/func.inc.php:196
 msgid "Tue"
@@ -11738,11 +11736,11 @@ msgstr "Тип информации"
 
 #: api/classes/CItemGeneral.php:281
 msgid "Type of information must be \"Log\" for log key."
-msgstr ""
+msgstr "Для ключа журнала тип информации должен быть \"Журнал (лог)\"."
 
 #: api/classes/CItemGeneral.php:277
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
-msgstr ""
+msgstr "Для агрегатных элементов данных тип информации должен быть \"Числовой (с плавающей точкой)\"."
 
 #: include/forms.inc.php:826
 msgid "Types"
@@ -12725,7 +12723,7 @@ msgstr "МАКС значение оси Y"
 
 #: api/classes/CGraph.php:866 api/classes/CGraphPrototype.php:911
 msgid "Y axis MAX value must be greater than Y axis MIN value."
-msgstr ""
+msgstr "МАКС значение оси Y должно быть больше чем МИН значение оси Y."
 
 #: include/views/configuration.graph.edit.php:216
 msgid "Y axis MIN value"
@@ -12899,7 +12897,7 @@ msgstr "Zabbix"
 #: include/page_footer.php:98
 #, php-format
 msgid "Zabbix %s Copyright %s-%s by Zabbix SIA"
-msgstr ""
+msgstr "Zabbix %s Все права защищены %s-%s SIA Zabbix"
 
 #: include/views/general.login.php:47
 #, php-format
@@ -12983,7 +12981,7 @@ msgstr "Инфо о Zabbix сервере"
 
 #: jsrpc.php:164
 msgid "Zabbix server is not running: the information displayed may not be current."
-msgstr ""
+msgstr "Zabbix сервер не запущен: отображаемая информация может быть не актуальной."
 
 #: include/blocks.inc.php:693
 msgid "Zabbix server is running"
