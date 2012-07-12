@@ -66,7 +66,7 @@ $exprTab->addRow(SPACE, $exprTabDiv);
 $testTab = new CFormList('testTab');
 $testTab->addRow(_('Test string'), new CTextArea('test_string', $this->get('test_string')));
 $preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
-$testTab->addRow(SPACE, array(new CButton('testExpression', _('Test regular expressions'), null, 'link_menu'), $preloaderDiv));
+$testTab->addRow(SPACE, array(new CButton('testExpression', _('Test expressions'), null, 'link_menu'), $preloaderDiv));
 
 $tabExp = new CTableInfo(null);
 $tabExp->attr('id', 'testResultTable');

@@ -187,6 +187,7 @@ div.footer .formrow .main:hover, div.ui-dialog-buttonpane div.ui-dialog-buttonse
 	text-decoration: none;
 	padding: 1px 1px 0 1px;
 	margin: 0;
+	cursor: pointer;
 }
 .link_menu:hover {
 	color: #6C80B9;
