@@ -132,6 +132,8 @@ Changes for 2.0.2rc1
 
 New features:
 A.F....... [ZBX-1357] updated French, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBX-4281] separated links to hosts and templates for host groups on search page (Vedmak)
+..F....... [ZBX-3003] added support for suffixes in map label trigger expression macro function parameter (Vedmak)
 
 Bug fixes:
 A......... [ZBX-5290] fixed slow query in "Host status" dashboard widget for large setups (Toms)
@@ -139,7 +141,6 @@ A......... [ZBX-5086] fixed that, when saving host without changes, templated tr
 A......... [ZBX-5086] fixed just one dependency added to host trigger when linking template with trigger who has several dependencies (Toms)
 A......... [ZBX-5086] improved template linkage circularity check; added more precise exception messages (Toms)
 A.F....... [ZBX-4317] fixed cannot link templates with trigger dependency using mass update (Toms)
-..F....... [ZBX-4281] separated links to hosts and templates for host groups on search page (Vedmak)
 ..F....... [ZBX-3053] fixed trigger expression testing when an item key contains the "+" character (Pavels)
 ..F....... [ZBX-2876] fixed GUI messaging should not work in popups i.e. pages without menus (Toms)
 ..F....... [ZBX-4930] improved translations for import error messages (Vedmak)
@@ -147,7 +148,6 @@ A.F....... [ZBX-4317] fixed cannot link templates with trigger dependency using 
 A.F....... [ZBX-5281] fixed error when create item without delay_flex field specified (Vedmak)
 ..F....... [ZBX-3284] fixed messages for discovery rule manipulations (Vedmak)
 ..F....... [ZBX-2586] fixed localization of the date in the header on the trigger status page (Pavels)
-..F....... [ZBX-3003] added support for suffixes in map label trigger expression macro function parameter (Vedmak)
 ..F....... [ZBX-5070] fixed SQL error on logout with HTTP authentication (Toms)
 ..F....... [ZBX-4741] fixed authentication configuration page still uses "profiles" table (Toms)
 ..F....... [ZBX-3637] fixed "IT Services availability report" generates wrong weekly timing (Toms)
